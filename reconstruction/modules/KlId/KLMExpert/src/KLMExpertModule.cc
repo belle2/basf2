@@ -172,7 +172,7 @@ void KLMExpertModule::event()
     const TVector3* poca = get<2>(closestTrackAndDistance).get();
 
     if (poca and closestECLCluster) {
-      const TVector3& trackECLClusterDist = closestECLCluster->getPosition() - *poca;
+      const TVector3& trackECLClusterDist = closestECLCluster->getClusterPosition() - *poca;
       m_KLMtrackToECL = trackECLClusterDist.Mag2();
     } else {
       m_KLMtrackToECL = -999;

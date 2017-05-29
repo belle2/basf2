@@ -16,6 +16,8 @@
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/ECLCluster.h>
 
+#include <analysis/ClusterUtility/ClusterUtils.h>
+
 #include <analysis/modules/TreeFitter/RecoPhoton.h>
 #include <analysis/modules/TreeFitter/FitParams.h>
 #include <analysis/modules/TreeFitter/HelixUtils.h>
@@ -88,7 +90,12 @@ namespace TreeFitter {
     TVector3 centroid = recoCalo->getClusterPosition();
     double energy = recoCalo->getEnergy();
     m_init = true ;
-    TMatrixDSym cov_pE = recoCalo->getCovarianceMatrix4x4();//FT: error on xyz is extracted from error on p (sort of backwards but ok)
+
+    // This returns the covariance matrix assuming the photons comes from the nominal IP
+    ClusterUtils C;
+    TMatrixDSym cov_pE = C.GetCovarianceMatrix4x4FromCluster(
+                           recoCalo);//FT: error on xyz is extracted from error on p (sort of backwards but ok)
+
     for (int row = 1; row <= 4; ++row)
       for (int col = row; col <= 4; ++col)
         m_matrixV(row, col) = cov_pE[row - 1][col - 1];

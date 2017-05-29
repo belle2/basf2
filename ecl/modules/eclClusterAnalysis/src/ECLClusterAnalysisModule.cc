@@ -28,6 +28,8 @@
 //#include <ecl/dataobjects/ECLSimHit.h>
 //#include <ecl/dataobjects/ECLPidLikelihood.h>
 
+#include <analysis/ClusterUtility/ClusterUtils.h>
+
 //#include <ecl/dataobjects/ECLTrig.h>
 #include <list>
 #include <iostream>
@@ -528,9 +530,12 @@ void ECLClusterAnalysisModule::event()
     m_eclClusterLat->push_back(aECLClusters->getLAT());
     m_eclClusterNofCrystals->push_back(aECLClusters->getNumberOfCrystals());
     m_eclClusterCrystalHealth->push_back(aECLClusters->getStatus());
-    m_eclClusterPx->push_back(aECLClusters->getPx());
-    m_eclClusterPy->push_back(aECLClusters->getPy());
-    m_eclClusterPz->push_back(aECLClusters->getPz());
+
+    ClusterUtils C;
+    TLorentzVector fourmom = C.Get4MomentumFromCluster(aECLClusters);
+    m_eclClusterPx->push_back(fourmom.Px());
+    m_eclClusterPy->push_back(fourmom.Py());
+    m_eclClusterPz->push_back(fourmom.Pz());
     m_eclClusterIsTrack->push_back(aECLClusters->isTrack());
     m_eclClusterDeltaL->push_back(aECLClusters->getDeltaL());
 

@@ -33,6 +33,8 @@
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 
+#include <analysis/ClusterUtility/ClusterUtils.h>
+
 //#include <ecl/dataobjects/ECLTrig.h>
 
 using namespace std;
@@ -1182,9 +1184,12 @@ void ECLDataAnalysisModule::event()
     m_eclClusterHighestE->push_back(aECLClusters->getEnergyHighestCrystal());
     m_eclClusterNofCrystals->push_back(aECLClusters->getNumberOfCrystals());
     m_eclClusterCrystalHealth->push_back(aECLClusters->getStatus());
-    m_eclClusterPx->push_back(aECLClusters->getPx());
-    m_eclClusterPy->push_back(aECLClusters->getPy());
-    m_eclClusterPz->push_back(aECLClusters->getPz());
+
+    ClusterUtils C;
+    TLorentzVector fourmom = C.Get4MomentumFromCluster(aECLClusters);
+    m_eclClusterPx->push_back(fourmom.Px());
+    m_eclClusterPy->push_back(fourmom.Py());
+    m_eclClusterPz->push_back(fourmom.Pz());
     m_eclClusterIsTrack->push_back(aECLClusters->isTrack());
     m_eclClusterClosestTrackDist->push_back(aECLClusters->getMinTrkDistance());
     m_eclClusterDeltaL->push_back(aECLClusters->getDeltaL());

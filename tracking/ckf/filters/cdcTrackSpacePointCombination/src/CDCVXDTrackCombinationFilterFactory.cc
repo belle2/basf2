@@ -15,6 +15,7 @@
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCVXDTrackCombinationVarSet.h>
 
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
@@ -37,6 +38,9 @@ namespace {
 
   /// All filter for VXD - CDC relations.
   using AllCDCVXDTrackCombinationFilter = AllFilter<BaseCDCVXDTrackCombinationFilter>;
+
+  /// Filter using a trained MVA method
+  using MVACDCVXDTrackCombinationFilter = MVAFilter<CDCVXDTrackCombinationVarSet>;
 }
 
 CDCVXDTrackCombinationFilterFactory::CDCVXDTrackCombinationFilterFactory(const std::string& defaultFilterName)
@@ -77,6 +81,8 @@ CDCVXDTrackCombinationFilterFactory::create(const std::string& filterName) const
     return makeUnique<AllCDCVXDTrackCombinationFilter >();
   } else if (filterName == "recording") {
     return makeUnique<RecordingCDCVXDTrackCombinationFilter>();
+  } else if (filterName == "mva") {
+    return makeUnique<MVACDCVXDTrackCombinationFilter>("tracking/data/ckf_CDCVXDTrackCombination.xml");
   } else if (filterName == "truth") {
     return makeUnique<MCCDCVXDTrackCombinationFilter >();
   } else if (filterName == "truth_number") {

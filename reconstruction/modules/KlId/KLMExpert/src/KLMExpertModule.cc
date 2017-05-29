@@ -1,5 +1,6 @@
 /**************************************************************************
  *
+ *
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
@@ -80,34 +81,17 @@ void KLMExpertModule::initialize()
 
 void KLMExpertModule::beginRun()
 {
-  std::cout << "begin run " << endl;
   if (m_weightfile_representation) {
     if (m_weightfile_representation->hasChanged()) {
       std::stringstream ss((*m_weightfile_representation)->m_data);
       auto weightfile = MVA::Weightfile::loadFromStream(ss);
-      std::cout << "init weight from stream " <<  std::endl;
-
-      if (! weightfile) {
-        B2FATAL("no weigthfile spezified");
-      }
-
-
-
       init_mva(weightfile);
     }
   } else {
     auto weightfile = MVA::Weightfile::loadFromFile(m_identifier);
-
-    std::cout << "init weight files from else " << std::endl;
-    if (! weightfile) {
-      B2FATAL("no weigthfile spezified");
-    }
-
     init_mva(weightfile);
 
   }
-
-  std::cout << "begin run end " << endl;
 }
 /** init mva file taken from mva/ExpertModule */
 void KLMExpertModule::init_mva(MVA::Weightfile& weightfile)
@@ -195,13 +179,36 @@ void KLMExpertModule::event()
 
 
 
-    TrackClusterSeparation* trackSep = cluster.getRelatedTo<TrackClusterSeparation>();
-    m_KLMTrackSepDist         = trackSep->getDistance();
-    m_KLMTrackSepAngle        = trackSep->getTrackClusterAngle();
+//    TrackClusterSeparation* trackSep = cluster.getRelatedTo<TrackClusterSeparation>();
 
-    m_KLMInitialTrackSepAngle = trackSep->getTrackClusterInitialSeparationAngle();
-    m_KLMTrackRotationAngle   = trackSep->getTrackRotationAngle();
-    m_KLMTrackClusterSepAngle = trackSep->getTrackClusterSeparationAngle();
+    auto trackSeperations = cluster.getRelationsTo<TrackClusterSeparation>();
+    TrackClusterSeparation* trackSep;
+    float best_dist = 10000000000000;
+    float dist;
+    for (auto trackSeperation :  trackSeperations) {
+      dist = trackSeperation.getDistance();
+      if (dist < best_dist) {
+        best_dist = dist;
+        trackSep = &trackSeperation;
+      }
+    }
+
+    if (trackSep) {
+      m_KLMTrackSepDist         = trackSep->getDistance();
+      m_KLMTrackSepAngle        = trackSep->getTrackClusterAngle();
+      m_KLMInitialTrackSepAngle = trackSep->getTrackClusterInitialSeparationAngle();
+      m_KLMTrackRotationAngle   = trackSep->getTrackRotationAngle();
+      m_KLMTrackClusterSepAngle = trackSep->getTrackClusterSeparationAngle();
+    } else {
+      m_KLMTrackSepDist         = 100000000;
+      m_KLMTrackSepAngle        = 100000000;
+      m_KLMInitialTrackSepAngle = 100000000;
+      m_KLMTrackRotationAngle   = 100000000;
+      m_KLMTrackClusterSepAngle = 100000000;
+    }
+
+
+
 
 
     if (isnan(m_KLMglobalZ))              { m_KLMglobalZ              = -999;}
@@ -244,7 +251,7 @@ void KLMExpertModule::event()
     }
 
     IDMVAOut = m_expert->apply(*m_dataset)[0];
-    B2INFO("KLM Expert classification: " << IDMVAOut);
+    B2DEBUG(175, "KLM Expert classification: " << IDMVAOut);
     // KlId, bkg prob, KLM, ECL
     klid = KlIds.appendNew(IDMVAOut, -1, 1, 0);
     cluster.addRelationTo(klid);

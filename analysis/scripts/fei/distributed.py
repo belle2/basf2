@@ -9,13 +9,16 @@ import argparse
 import glob
 import time
 import stat
+import shutil
 
 
 def getCommandLineOptions():
     """ Parses the command line options of the fei and returns the corresponding arguments. """
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--steeringFile', dest='steering', type=str, required=True,
-                        help='Steering file')
+                        help='Steering file. Calls fei.get_path()')
+    parser.add_argument('-t', '--trainingFile', dest='training', type=str, required=True,
+                        help='Training file. Calls fei.do_trainings() with correct configuration')
     parser.add_argument('-w', '--workingDirectory', dest='directory', type=str, required=True,
                         help='Working directory for basf2 jobs. On KEKCC, this must NOT be on HSM!')
     parser.add_argument('-l', '--largeDirectory', dest='large_dir', type=str, default='',
@@ -41,9 +44,10 @@ def get_job_script(args, i):
         else
           INPUT="{d}/input_*.root"
         fi
-        time basf2 -l error --execute-path basf2_path.pickle -i "$INPUT" -o {d}/basf2_output.root {pipes}
+        export FEI_STAGE=$(python3 -c 'import pickle; print(pickle.load(open("{d}/collection/stage_cache", "rb")))')
+        time basf2 -l error {d}/collection/basf2_steering_file.py -i "$INPUT" -o {d}/jobs/{i}/basf2_output.root {pipes}
         touch basf2_finished_successfully
-    """.format(d=args.directory + '/jobs/' + str(i), pipes="&> my_output_hack.log || touch basf2_job_error")
+    """.format(d=args.directory, i=str(i), pipes="&> my_output_hack.log || touch basf2_job_error")
     return job_script
 
 
@@ -67,7 +71,7 @@ def setup(args):
     os.mkdir('collection')
     os.mkdir('collection/localdb')
     os.mkdir('collection/B2BII_MC_database')
-    open('collection/basf2_path.pickle', 'w').close()
+    pickle.dump(0, open(args.directory + '/collection/stage_cache', 'wb'))
     os.mkdir('jobs')
     if args.large_dir:
         os.mkdir(args.large_dir)
@@ -76,45 +80,18 @@ def setup(args):
         # Create job directory
         os.mkdir('jobs/{}'.format(i))
         # Create job script
+        with open('jobs/{}/basf2_steering_file.py'.format(i), 'w') as f:
+            f.write(get_steering_file(args, i))
+            os.chmod(f.fileno(), stat.S_IXUSR | stat.S_IRUSR)
         with open('jobs/{}/basf2_script.sh'.format(i), 'w') as f:
-            f.write(get_job_script(args, i))
+            f.write(get_job_script())
             os.chmod(f.fileno(), stat.S_IXUSR | stat.S_IRUSR)
         # Symlink initial input data files
         for j, data_input in enumerate(data_chunks[i]):
             os.symlink(data_input, 'jobs/{}/input_{}.root'.format(i, j))
         # Symlink weight directory and basf2_path
-        os.symlink(args.directory + '/collection/basf2_path.pickle', 'jobs/{}/basf2_path.pickle'.format(i))
         os.symlink(args.directory + '/collection/localdb', 'jobs/{}/localdb'.format(i))
         os.symlink(args.directory + '/collection/B2BII_MC_database', 'jobs/{}/B2BII_MC_database'.format(i))
-
-
-def run_basf2(args):
-    os.chdir(args.directory + '/collection')
-    if args.site == 'kekcc' or args.site == 'kekcc2':
-        ret = subprocess.call(['basf2', args.steering, '--dump-path', 'basf2_path.pickle', '-i', 'dummy.root', '--', '-monitor',
-                               '--prune',
-                               '--verbose', '--nThreads', '4', '--cache', 'cache.pkl', '--externTeacher', 'externClusterTeacher'])
-    else:
-        ret = subprocess.call(['basf2', args.steering, '--dump-path', 'basf2_path.pickle', '-i', 'dummy.root', '--',
-                               '--prune',
-                               '--verbose', '--nThreads', '4', '--cache', 'cache.pkl', '-monitor', '-prune'])
-    os.chdir(args.directory)
-    return ret == 0
-
-
-def dump_final_fei_path(args):
-    os.chdir(args.directory + '/collection')
-    ret = subprocess.call(['basf2', args.steering, '--dump-path', 'basf2_final_path.pickle', '-i', 'dummy.root', '--',
-                           '--verbose', '--dump-path'])
-    shutil.copy2('basf2_final_path.pickle', 'basf2_path.pickle')
-    ret = subprocess.call(['basf2', args.steering, '--dump-path', 'basf2_final_path_without_selection.pickle',
-                           '-i', 'dummy.root', '--', '--verbose', '--dump-path', '--noSelection'])
-    ret = subprocess.call(['basf2', args.steering, '--dump-path', 'basf2_monitor_path.pickle', '-i', 'dummy.root', '--',
-                           '--verbose', '--dump-path', '--monitor'])
-    ret = subprocess.call(['basf2', args.steering, '--dump-path', 'basf2_monitor_path_without_selection.pickle',
-                           '-i', 'dummy.root', '--', '--verbose', '--dump-path', '--noSelection', '--monitor'])
-    os.chdir(args.directory)
-    return ret == 0
 
 
 def create_report(args, summary_file):
@@ -142,6 +119,12 @@ def submit_job(args, i):
         raise RuntimeError('Given site {} is not supported'.format(args.site))
     os.chdir(args.directory)
     return ret == 0
+
+
+def do_trainings(args):
+    os.chdir(args.directory + '/collection')
+    ret = subprocess.call('basf2 basf2_do_trainings.py', shell=True)
+    os.chdir(args.directory)
 
 
 def jobs_finished(args):
@@ -191,6 +174,9 @@ def update_input_files(args):
         else:
             shutil.move(output_file, input_file)
 
+    stage = pickle.load(open(args.directory + '/collection/stage_cache', 'rb'))
+    pickle.dump(stage+1, open(args.directory + '/collection/stage_cache', 'wb'))
+
 
 def clean_job_directory(args):
     files = glob.glob(args.directory + '/jobs/*/basf2_finished_successfully')
@@ -204,6 +190,10 @@ if __name__ == '__main__':
     args = getCommandLineOptions()
 
     os.chdir(args.directory)
+
+    print("Copy steering file into collection directory")
+    shutil.copyfile(args.steering, 'collection/basf2_steering_file.py')
+    shutil.copyfile(args.training, 'collection/basf2_do_trainings.py')
 
     if args.skip:
         print('Skipping setup')
@@ -263,13 +253,11 @@ if __name__ == '__main__':
         setup(args)
 
     while True:
-        print('Run basf2')
-        if not run_basf2(args):
-            raise RuntimeError('Error during executing basf2')
+        print('Do available trainings')
+        do_trainings(args)
 
         summary_file = glob.glob(args.directory + '/collection/Summary_*.pickle')
         if len(summary_file) > 0:
-            dump_final_fei_path(args)
             create_report(args, summary_file)
             break
 

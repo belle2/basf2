@@ -44,6 +44,8 @@
 namespace Belle2 {
   namespace MVA {
 
+    void loadRootDictionary() { }
+
     void download(const std::string& identifier, const std::string& filename, int experiment, int run, int event)
     {
       Belle2::EventMetaData emd(event, run, experiment);

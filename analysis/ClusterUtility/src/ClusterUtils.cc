@@ -131,7 +131,7 @@ const TMatrixDSym ClusterUtils::GetCovarianceMatrix4x4FromCluster(const ECLClust
   jacobian(3, 4) = 0.0; // dE/dvy
   jacobian(3, 5) = 0.0; // dE/dvz
 
-  TMatrixDSym covmatCart(4, 4);
+  TMatrixDSym covmatCart(4);
   covmatCart = covmatcombined.Similarity(jacobian);
 
   return covmatCart;

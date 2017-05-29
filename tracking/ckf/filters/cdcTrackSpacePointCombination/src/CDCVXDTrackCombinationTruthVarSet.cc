@@ -21,8 +21,8 @@ bool CDCVXDTrackCombinationTruthVarSet::extract(const BaseCDCVXDTrackCombination
   if (not cdcTrack) return false;
 
   StoreObjPtr<EventMetaData> eventMetaData;
-  var<named("event_number")>() = eventMetaData->getEvent();
-  var<named("cdc_number")>() = cdcTrack->getArrayIndex();
+  var<named("truth_event_number")>() = eventMetaData->getEvent();
+  var<named("truth_cdc_number")>() = cdcTrack->getArrayIndex();
 
   const std::string& cdcTrackStoreArrayName = cdcTrack->getArrayName();
 

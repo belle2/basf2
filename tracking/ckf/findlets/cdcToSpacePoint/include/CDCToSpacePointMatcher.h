@@ -23,6 +23,9 @@
 namespace Belle2 {
   class CDCToSpacePointMatcher : public TrackFindingCDC::ProcessingSignalListener {
   public:
+    /// Maximal number of ladders per layer
+    constexpr static unsigned int maximumLadderNumbers[6] = {8, 12, 7, 10, 12, 16};
+
     /**
      * Return a range of all possible next child states on the next layer or all hits on the next segment on the same
      * layer for overlaps.
@@ -48,9 +51,6 @@ namespace Belle2 {
 
     /// Temporary object pool for finding the next state
     std::array < std::vector<CKFCDCToVXDStateObject>, CKFCDCToVXDStateObject::N + 1 > m_temporaryStates;
-
-    /// Maximal number of ladders per layer
-    std::vector<unsigned int> m_maximumLadderNumbers = {8, 12, 7, 10, 12, 16};
 
     /// return the next hits for a given state, which are the hits on the next layer (or the same for overlaps)
     TrackFindingCDC::VectorRange<const SpacePoint*> getMatchingHits(CKFCDCToVXDStateObject& currentState);

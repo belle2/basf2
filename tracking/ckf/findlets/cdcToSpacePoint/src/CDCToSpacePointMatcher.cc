@@ -12,6 +12,8 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+constexpr unsigned int CDCToSpacePointMatcher::maximumLadderNumbers[6];
+
 std::vector<CKFCDCToVXDStateObject*> CDCToSpacePointMatcher::getChildStates(CKFCDCToVXDStateObject& currentState)
 {
   const auto& matchingHits = getMatchingHits(currentState);
@@ -57,7 +59,7 @@ VectorRange<const SpacePoint*> CDCToSpacePointMatcher::getMatchingHits(CKFCDCToV
 
     const unsigned int ladderNumber = lastAddedSpacePoint->getVxdID().getLadderNumber();
     const unsigned int currentLayer = currentState.extractGeometryLayer();
-    const unsigned int maximumLadderNumber = m_maximumLadderNumbers[currentLayer];
+    const unsigned int maximumLadderNumber = CDCToSpacePointMatcher::maximumLadderNumbers[currentLayer];
 
     // the reason for this strange formula is the numbering scheme in the VXD.
     // we first substract 1 from the ladder number to have a ladder counting from 0 to N - 1,

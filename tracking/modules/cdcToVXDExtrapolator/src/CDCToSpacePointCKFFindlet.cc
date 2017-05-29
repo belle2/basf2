@@ -16,6 +16,8 @@ using namespace TrackFindingCDC;
 
 CDCToSpacePointCKFFindlet::CDCToSpacePointCKFFindlet()
 {
+  addProcessingSignalListener(&m_cdcTracksLoader);
+  addProcessingSignalListener(&m_hitsLoader);
   addProcessingSignalListener(&m_treeSearchFindlet);
   addProcessingSignalListener(&m_storeArrayHandler);
   addProcessingSignalListener(&m_overlapResolver);
@@ -25,6 +27,8 @@ void CDCToSpacePointCKFFindlet::exposeParameters(ModuleParamList* moduleParamLis
 {
   Super::exposeParameters(moduleParamList, prefix);
 
+  m_cdcTracksLoader.exposeParameters(moduleParamList, prefix);
+  m_hitsLoader.exposeParameters(moduleParamList, prefix);
   m_treeSearchFindlet.exposeParameters(moduleParamList, prefix);
   m_storeArrayHandler.exposeParameters(moduleParamList, prefix);
   m_overlapResolver.exposeParameters(moduleParamList, prefix);
@@ -41,7 +45,8 @@ void CDCToSpacePointCKFFindlet::beginEvent()
 
 void CDCToSpacePointCKFFindlet::apply()
 {
-  m_storeArrayHandler.fetch(m_cdcRecoTrackVector, m_spacePointVector);
+  m_cdcTracksLoader.apply(m_cdcRecoTrackVector);
+  m_hitsLoader.apply(m_spacePointVector);
 
   m_treeSearchFindlet.apply(m_cdcRecoTrackVector, m_spacePointVector, m_results);
 

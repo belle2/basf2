@@ -10,39 +10,29 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
 #include <framework/core/ModuleParamList.h>
 
 #include <framework/dataobjects/Helix.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
-#include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
   /**
-   * Findlet to handle import and export from the StoreArray.
+   * Findlet to handle export to the StoreArray.
    *
-   * Its fetch function fills a vector of RecoTracks from the fitted tracks in an input store array
-   * and additionally a hit vector.
-   *
-   * Its relateAndCombineTracks function can be used in derived classes, to export previously related
-   * reco track candidates into a third store array.
+   * Its functions can be used in derived classes, to export the result objects into a store array and merge it
+   * together with other store arrays.
    */
-  template <class AStateObject>
-  class StoreArrayHandler : public TrackFindingCDC::Findlet<const typename AStateObject::ResultObject> {
-    using Super = TrackFindingCDC::Findlet<const typename AStateObject::ResultObject>;
-    using HitObject = typename AStateObject::HitObject;
-
+  class StoreArrayHandler : public TrackFindingCDC::ProcessingSignalListener {
+    using Super = TrackFindingCDC::ProcessingSignalListener;
   public:
     /// Expose the parameters of the findlet
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
     {
-      // CDC input tracks
-      moduleParamList->addParameter("CDCRecoTrackStoreArrayName", m_param_cdcRecoTrackStoreArrayName,
-                                    "StoreArray name of the CDC Track Store Array", m_param_cdcRecoTrackStoreArrayName);
-      // VXD input tracks
+      // VXD tracks
       moduleParamList->addParameter("VXDRecoTrackStoreArrayName", m_param_vxdRecoTrackStoreArrayName,
                                     "StoreArray name of the VXD Track Store Array", m_param_vxdRecoTrackStoreArrayName);
 
@@ -50,9 +40,6 @@ namespace Belle2 {
       moduleParamList->addParameter("MergedRecoTrackStoreArrayName", m_param_mergedRecoTrackStoreArrayName,
                                     "StoreArray name of the merged Track Store Array", m_param_mergedRecoTrackStoreArrayName);
 
-
-      moduleParamList->addParameter("exportTracks", m_param_exportTracks, "Export the result tracks into a StoreArray.",
-                                    m_param_exportTracks);
       moduleParamList->addParameter("exportAlsoMergedTracks", m_param_exportAlsoMergedTracks,
                                     "Export also the merged tracks into a StoreArray.",
                                     m_param_exportAlsoMergedTracks);
@@ -63,67 +50,24 @@ namespace Belle2 {
     {
       Super::initialize();
 
-      m_cdcRecoTracks.isRequired(m_param_cdcRecoTrackStoreArrayName);
-      m_hits.isRequired();
-
       m_vxdRecoTracks.registerInDataStore(m_param_vxdRecoTrackStoreArrayName);
       RecoTrack::registerRequiredRelations(m_vxdRecoTracks);
 
       m_mergedRecoTracks.registerInDataStore(m_param_mergedRecoTrackStoreArrayName);
       RecoTrack::registerRequiredRelations(m_mergedRecoTracks);
 
-      m_cdcRecoTracks.registerRelationTo(m_vxdRecoTracks);
-      m_vxdRecoTracks.registerRelationTo(m_cdcRecoTracks);
+      // TODO: Make this general enough
+      StoreArray<RecoTrack> cdcRecoTracks("CDCRecoTracks");
+      cdcRecoTracks.registerRelationTo(m_vxdRecoTracks);
     }
 
-    /// Fetch the CDC RecoTracks and the hits from the input Store Arrays and fill them into a vector.
-    void fetch(std::vector<RecoTrack*>& cdcRecoTrackVector, std::vector<const HitObject*>& hitVector)
-    {
-      cdcRecoTrackVector.reserve(cdcRecoTrackVector.size() + m_cdcRecoTracks.getEntries());
-
-      for (RecoTrack& recoTrack : m_cdcRecoTracks) {
-        if (recoTrack.wasFitSuccessful()) {
-          cdcRecoTrackVector.push_back(&recoTrack);
-        }
-      }
-
-      hitVector.reserve(hitVector.size() + m_hits.getEntries());
-
-      for (const HitObject& hit : m_hits) {
-        hitVector.push_back(&hit);
-      }
-    }
-
-  protected:
-    // Parameters
-    /** StoreArray name of the VXD Track Store Array */
-    std::string m_param_vxdRecoTrackStoreArrayName = "CKFVXDRecoTracks";
-    /** StoreArray name of the CDC Track Store Array */
-    std::string m_param_cdcRecoTrackStoreArrayName = "CDCRecoTracks";
-    /** StoreArray name of the merged Track Store Array */
-    std::string m_param_mergedRecoTrackStoreArrayName = "MergedRecoTracks";
-    /** Export the tracks or not */
-    bool m_param_exportTracks = true;
-    /** Export also the merged tracks */
-    bool m_param_exportAlsoMergedTracks = true;
-
-    // Store Arrays
-    /// CDC Reco Tracks Store Array
-    StoreArray<RecoTrack> m_cdcRecoTracks;
-    /// Space Points Store Array
-    StoreArray<HitObject> m_hits;
-    /// VXD Reco Tracks Store Array
-    StoreArray<RecoTrack> m_vxdRecoTracks;
-    /// Merged Reco Tracks Store Array
-    StoreArray<RecoTrack> m_mergedRecoTracks;
-
-    template <class AHitType>
-    void combine(const std::vector<std::pair<const RecoTrack*, std::pair<TVector3, std::vector<const AHitType*>>>>& seedsWithHits)
+    template <class AResult>
+    void combine(const std::vector<AResult>& seedsWithHits)
     {
       for (const auto& seedWithHits : seedsWithHits) {
-        const RecoTrack* seedTrack = seedWithHits.first;
-        const TVector3& vxdPosition = seedWithHits.second.first;
-        const std::vector<const AHitType*>& hits = seedWithHits.second.second;
+        const auto& seedTrack = seedWithHits.first;
+        const auto& vxdPosition = seedWithHits.second.first;
+        const auto& hits = seedWithHits.second.second;
 
         TVector3 trackMomentum;
         int trackCharge;
@@ -143,6 +87,20 @@ namespace Belle2 {
     }
 
   private:
+    // Parameters
+    /** StoreArray name of the VXD Track Store Array */
+    std::string m_param_vxdRecoTrackStoreArrayName = "CKFVXDRecoTracks";
+    /** StoreArray name of the merged Track Store Array */
+    std::string m_param_mergedRecoTrackStoreArrayName = "MergedRecoTracks";
+    /** Export also the merged tracks */
+    bool m_param_exportAlsoMergedTracks = true;
+
+    // Store Arrays
+    /// VXD Reco Tracks Store Array
+    StoreArray<RecoTrack> m_vxdRecoTracks;
+    /// Merged Reco Tracks Store Array
+    StoreArray<RecoTrack> m_mergedRecoTracks;
+
     /// Helper function to get the seed or the measured state on plane from a track
     void extractTrackState(const RecoTrack& recoTrack, TVector3& position, TVector3& momentum, int& charge) const
     {

@@ -56,6 +56,14 @@ namespace Belle2 {
   class CDCVXDTrackCombinationVarSet : public TrackFindingCDC::VarSet<CDCVXDTrackCombinationVarNames> {
 
   public:
+    CDCVXDTrackCombinationVarSet() : TrackFindingCDC::VarSet<CDCVXDTrackCombinationVarNames>()
+    {
+      ModuleParamList moduleParamList;
+      const std::string prefix = "";
+      m_advanceAlgorithm.exposeParameters(&moduleParamList, prefix);
+      moduleParamList.getParameter<bool>("useMaterialEffects").setDefaultValue(false);
+    }
+
     /// Generate and assign the variables from the object.
     bool extract(const BaseCDCVXDTrackCombinationFilter::Object* object) final;
 

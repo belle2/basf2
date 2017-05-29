@@ -69,5 +69,5 @@ void dedx1_curves()
 {
   gROOT->SetStyle("Plain");
 
-  plot("EvtGenSimRec_dedx.root");
+  plot("../EvtGenSimRec_dedx.root");
 }

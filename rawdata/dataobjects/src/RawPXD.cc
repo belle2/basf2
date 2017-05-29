@@ -49,7 +49,7 @@ RawPXD::RawPXD(const std::vector <unsigned int>& header, const std::vector <std:
 
   m_buffer = new int[m_nwords];
 
-  B2INFO("RawPXD Frames " << header.size() << " Data " << payload_size << " (32 bitword)");
+  B2DEBUG(20, "RawPXD Frames " << header.size() << " Data " << payload_size << " (32 bitword)");
 
   // now we know the actual payload length
   int offset = 0;

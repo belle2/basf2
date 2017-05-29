@@ -46,12 +46,13 @@ namespace Belle2 {
       data_clear_();
     }
 
-    int TOPalign::addData(int moduleID, int pixelID, int TDC, double time)
+    int TOPalign::addData(int moduleID, int pixelID, double time)
     {
       int status = 0;
       moduleID--; // 0-based ID used in fortran
       pixelID--;   // 0-based ID used in fortran
       float t = (float) time;
+      int TDC = 0; // not used in Fortran code
       data_put_(&moduleID, &pixelID, &TDC, &t, &status);
       return status;
     }

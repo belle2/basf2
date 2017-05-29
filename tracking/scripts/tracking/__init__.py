@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from ROOT import Belle2
 
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trigger_mode="all", additionalTrackFitHypotheses=None,
-                                reco_tracks="RecoTracks", keep_temporary_tracks=False):
+                                reco_tracks="RecoTracks", keep_temporary_tracks=False, use_vxdtf2=False):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.
@@ -41,7 +42,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         add_mc_track_finding(path, components=components, reco_tracks=reco_tracks)
     else:
         add_track_finding(path, components=components, trigger_mode=trigger_mode, reco_tracks=reco_tracks,
-                          keep_temporary_tracks=keep_temporary_tracks)
+                          keep_temporary_tracks=keep_temporary_tracks, use_vxdtf2=use_vxdtf2)
 
     if trigger_mode in ["hlt", "all"]:
         add_mc_matcher(path, components=components, reco_tracks=reco_tracks)
@@ -192,11 +193,13 @@ def add_cdc_cr_track_fit_and_track_creator(
                     )
 
     if eventTimingExtraction is True:
-        # Select the tracks for the time extraction.
-        path.add_module("SelectionForTrackTimeExtraction")
-
         # Extract the time
-        path.add_module("FullGridTrackTimeExtraction")
+        path.add_module("FullGridTrackTimeExtraction",
+                        recoTracksStoreArrayName="RecoTracks",
+                        maximalT0Shift=70,
+                        minimalT0Shift=-70,
+                        numberOfGrids=6
+                        )
 
         # Track fitting
         path.add_module("DAFRecoFitter",
@@ -256,7 +259,13 @@ def add_prune_tracks(path, components=None, reco_tracks="RecoTracks"):
     path.add_module("PruneGenfitTracks")
 
 
-def add_track_finding(path, components=None, trigger_mode="all", reco_tracks="RecoTracks", keep_temporary_tracks=False):
+def add_track_finding(
+        path,
+        components=None,
+        trigger_mode="all",
+        reco_tracks="RecoTracks",
+        keep_temporary_tracks=False,
+        use_vxdtf2=False):
     """
     Adds the realistic track finding to the path.
     The result is a StoreArray 'RecoTracks' full of RecoTracks (not TrackCands any more!).
@@ -292,7 +301,12 @@ def add_track_finding(path, components=None, trigger_mode="all", reco_tracks="Re
 
     # VXD track finder
     if use_svd and trigger_mode in ["hlt", "all"]:
-        add_vxd_track_finding(path, components=components, reco_tracks=vxd_reco_tracks)
+        if use_vxdtf2:
+            # version 2 of the track finder
+            add_vxd_track_finding_vxdtf2(path, components=components, reco_tracks=vxd_reco_tracks)
+        else:
+            # version 1 of the track finder
+            add_vxd_track_finding(path, components=components, reco_tracks=vxd_reco_tracks)
 
         # track merging
         if use_svd and use_cdc:
@@ -470,10 +484,10 @@ def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0
                     RecoTracksStoreArrayName=reco_tracks)
 
 
-def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None):
+def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None, suffix=""):
     """
     Convenience function for adding all vxd track finder modules
-    to the path.
+    to the path. This is for version1 of the trackfinder
 
     The result is a StoreArray with name @param reco_tracks full of RecoTracks (not TrackCands any more!).
     Use the GenfitTrackCandidatesCreator Module to convert back.
@@ -482,10 +496,13 @@ def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None):
     :param reco_tracks: Name of the output RecoTracks, Defaults to RecoTracks.
     :param components: List of the detector components to be used in the reconstruction. Defaults to None which means all
                 components.
+    :param suffix: all names of intermediate Storearrays will have the suffix appended. Useful in cases someone needs to put several
+                   instances of track finding in one path.
     """
 
     # Temporary array
-    vxd_trackcands = '__VXDGFTrackCands'
+    # add a suffix to be able to have different
+    vxd_trackcands = '__VXDGFTrackCands' + suffix
 
     vxd_trackfinder = path.add_module('VXDTF', GFTrackCandidatesColName=vxd_trackcands)
     # WARNING: workaround for possible clashes between fitting and VXDTF
@@ -509,6 +526,145 @@ def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None):
     # Convert VXD trackcands to reco tracks
     path.add_module("RecoTrackCreator", trackCandidatesStoreArrayName=vxd_trackcands,
                     recoTracksStoreArrayName=reco_tracks, recreateSortingParameters=True)
+
+
+def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None, suffix=""):
+    """
+    Convenience function for adding all vxd track finder Version 2 modules
+    to the path.
+
+    The result is a StoreArray with name @param reco_tracks full of RecoTracks (not TrackCands any more!).
+    Use the GenfitTrackCandidatesCreator Module to convert back.
+
+    :param path: basf2 path
+    :param reco_tracks: Name of the output RecoTracks, Defaults to RecoTracks.
+    :param components: List of the detector components to be used in the reconstruction. Defaults to None which means all
+                       components.
+    :param suffix: all names of intermediate Storearrays will have the suffix appended. Useful in cases someone needs to put several
+                   instances of track finding in one path.
+    """
+    ##########################
+    # some setting for VXDTF2
+    ##########################
+    use_segment_network_filters = True
+    filter_overlapping = True
+    # the 'tripletFit' currently does not work with PXD
+    quality_estimator = 'tripletFit'  # other option is 'circleFit'
+    overlap_filter = 'greedy'  # other option is  'hopfield'
+    # setting different for pxd and svd:
+    if is_pxd_used(components):
+        sec_map_file = Belle2.FileSystem.findFile("data/tracking/SVDPXDDefaultMap.root")
+        setup_name = "SVDPXDDefault"
+        use_pxd = True
+    else:
+        sec_map_file = Belle2.FileSystem.findFile("data/tracking/SVDOnlyDefaultMap.root")
+        setup_name = "SVDOnlyDefault"
+        use_pxd = False
+
+    #################
+    # VXDTF2 Step 0
+    # Preparation
+    #################
+    nameSPs = 'SpacePoints' + suffix
+    if use_pxd:
+        spCreatorPXD = register_module('SpacePointCreatorPXD')
+        spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
+        spCreatorPXD.param('SpacePoints', nameSPs)
+        path.add_module(spCreatorPXD)
+
+    # always use svd!
+    spCreatorSVD = register_module('SpacePointCreatorSVD')
+    spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
+    spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
+    spCreatorSVD.param('SpacePoints', nameSPs)
+    path.add_module(spCreatorSVD)
+
+    # SecMap Bootstrap
+    secMapBootStrap = register_module('SectorMapBootstrap')
+    secMapBootStrap.param('ReadSectorMap', True)
+    secMapBootStrap.param('SectorMapsInputFile', sec_map_file)
+    secMapBootStrap.param('SetupToRead', setup_name)
+    secMapBootStrap.param('WriteSectorMap', False)
+    path.add_module(secMapBootStrap)
+
+    ##################
+    # VXDTF2 Step 1
+    # SegmentNet
+    ##################
+    nameSegNet = 'SegmentNetwork' + suffix
+    segNetProducer = register_module('SegmentNetworkProducer')
+    segNetProducer.param('CreateNeworks', 3)
+    segNetProducer.param('NetworkOutputName', nameSegNet)
+    segNetProducer.param('allFiltersOff', not use_segment_network_filters)
+    segNetProducer.param('SpacePointsArrayNames', [nameSPs])
+    segNetProducer.param('printNetworks', False)
+    segNetProducer.param('sectorMapName', setup_name)
+    segNetProducer.param('addVirtualIP', False)
+    segNetProducer.param('observerType', 0)
+    path.add_module(segNetProducer)
+
+    #################
+    # VXDTF2 Step 2
+    # TrackFinder
+    #################
+
+    # append a suffix to the storearray name
+    nameSPTCs = 'SPTrackCands' + suffix
+
+    cellOmat = register_module('TrackFinderVXDCellOMat')
+    cellOmat.param('NetworkName', nameSegNet)
+    cellOmat.param('SpacePointTrackCandArrayName', nameSPTCs)
+    cellOmat.param('SpacePoints', nameSPs)
+    cellOmat.param('printNetworks', False)
+    cellOmat.param('strictSeeding', True)
+    path.add_module(cellOmat)
+
+    #################
+    # VXDTF2 Step 3
+    # Analyzer
+    #################
+
+    # Quality
+    qualityEstimator = register_module('QualityEstimatorVXD')
+    qualityEstimator.param('EstimationMethod', quality_estimator)
+    qualityEstimator.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
+    path.add_module(qualityEstimator)
+
+    # will discard track candidates (with low quality estimators) if the number of TC is above threshold
+    maxCandidateSelection = register_module('BestVXDTrackCandidatesSelector')
+    maxCandidateSelection.param('NameSpacePointTrackCands', nameSPTCs)
+    maxCandidateSelection.param('NewNameSpacePointTrackCands', nameSPTCs)
+    maxCandidateSelection.param('SubsetCreation', False)
+    path.add_module(maxCandidateSelection)
+
+    # Properties
+    vIPRemover = register_module('SPTCvirtualIPRemover')
+    vIPRemover.param('tcArrayName', nameSPTCs)
+    vIPRemover.param('maxTCLengthForVIPKeeping', 0)  # want to remove virtualIP for any track length
+    path.add_module(vIPRemover)
+
+    #################
+    # VXDTF2 Step 4
+    # OverlapFilter
+    #################
+
+    if filter_overlapping:
+        overlapResolver = register_module('SVDOverlapResolver')
+        overlapResolver.param('NameSpacePointTrackCands', nameSPTCs)
+        overlapResolver.param('ResolveMethod', overlap_filter.lower())
+        path.add_module(overlapResolver)
+    #################
+    # VXDTF2 Step 5
+    # Converter
+    #################
+    momSeedRetriever = register_module('SPTCmomentumSeedRetriever')
+    momSeedRetriever.param('tcArrayName', nameSPTCs)
+    path.add_module(momSeedRetriever)
+
+    converter = register_module('SPTC2RTConverter')
+    converter.param('recoTracksStoreArrayName', reco_tracks)
+    converter.param('spacePointsTCsStoreArrayName', nameSPTCs)
+    path.add_module(converter)
 
 
 def is_svd_used(components):

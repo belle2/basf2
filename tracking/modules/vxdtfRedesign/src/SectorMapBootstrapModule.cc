@@ -72,7 +72,10 @@ retrieve the SectorMaps from SectorMapsInputFile during initialize.", m_readSect
   addParam("WriteSectorMap", m_writeSectorMap, "If set to true \
 at endRun write the SectorMaps to SectorMapsOutputFile.", m_writeSectorMap);
 
-
+  addParam("SetupToRead", m_setupToRead, "If non empty only the setup with the given name will be read"
+           " from the from the root file. All other will be ignored. If empty \"\" (default) all setups are read. Will "
+           "only used if sectormap is retrieved from root file. Case will be ignored!",
+           std::string(""));
 }
 
 void
@@ -118,6 +121,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   // WARNING: chose the names of the configs in that way that they are not contained in each other!
   //       E.g. having two configs with names "BobTheGreat" and "Bob" is not allowed as it will cause problems in some modules!
 
+
+  // for now declare this as default config for SVD only tracking!
   SectorMapConfig config1;
 //   config1.pTmin = 0.02;
 //   config1.pTmax = 0.08;
@@ -139,7 +144,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1.seedMaxDist2IPZ = 23.5;
   config1.nHitsMin = 3;
   config1.vIP = B2Vector3D(0, 0, 0);
-  config1.secMapName = "lowTestRedesign";
+  config1.secMapName = "SVDOnlyDefault"; // has been: "lowTestRedesign";
   config1.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "Distance1DZ", "SlopeRZ", "Distance3DNormed"};
   config1.threeHitFilters = { "Angle3DSimple", "CosAngleXY", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
   config1.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
@@ -151,6 +156,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
 
 
   // same as config1 but allows the PXD layers
+  // default for VXD tracking (SVD+PXD)
   SectorMapConfig config1point1;
   config1point1.pTmin = 0.02; // minimal relevant version
   config1point1.pTmax = 3.15; // minimal relevant version // Feb18-onePass-Test
@@ -163,7 +169,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1point1.seedMaxDist2IPZ = 23.5;
   config1point1.nHitsMin = 3;
   config1point1.vIP = B2Vector3D(0, 0, 0);
-  config1point1.secMapName = "lowTestSVDPXD";
+  config1point1.secMapName = "SVDPXDDefault"; // has been: "lowTestSVDPXD";
   config1point1.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "Distance1DZ", "SlopeRZ", "Distance3DNormed"};
   config1point1.threeHitFilters = { "Angle3DSimple", "CosAngleXY", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
   config1point1.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
@@ -404,10 +410,24 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
   tree->SetBranchAddress(c_setupKeyNameBranchName.c_str(),
                          & setupKeyName);
 
+  // ignore case, so only upper case
+  TString setupToRead_upper = m_setupToRead;
+  setupToRead_upper.ToUpper();
+  // to monitor if anything was read from the root files
+  bool read_something = false;
+
   FiltersContainer<SpacePoint>& filtersContainer = FiltersContainer<SpacePoint>::getInstance();
   auto nEntries = tree->GetEntriesFast();
   for (int i = 0;  i < nEntries ; i++) {
     tree->GetEntry(i);
+
+    // if a setup name is specified only read that one
+    if (setupToRead_upper != "") {
+      TString buff = setupKeyName->Data();
+      buff.ToUpper();
+      if (buff != setupToRead_upper) continue;
+    }
+
     rootFile.cd(setupKeyName->Data());
 
     B2DEBUG(1, "Retrieving SectorMap with name " << setupKeyName->Data());
@@ -424,8 +444,10 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
 
     setupKeyName->Clear();
 
+    read_something = true;
   }
 
+  if (!read_something) B2WARNING("No setup was read from the root file! The requested setup name was: " << m_setupToRead);
 
   rootFile.Close();
 

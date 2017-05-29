@@ -88,7 +88,7 @@ namespace VXDTFObserversTest {
   /** returns a svdCluster with given sensorID, uType and local position */
   SVDCluster provideSVDCluster(VxdID aVxdID, bool isU, double position, double error = 0.1)
   {
-    return SVDCluster(aVxdID, isU, position, error, 0.1, 0.1, 1, 1, 1);
+    return SVDCluster(aVxdID, isU, position, error, 0.1, 0.1, 1, 1, 1, 1);
   }
 
 

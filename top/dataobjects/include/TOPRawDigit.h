@@ -17,7 +17,7 @@ namespace Belle2 {
 
   /**
    * Class to store unpacked raw data (hits in feature-extraction format)
-   * It provides also calculation of 50% CFD leading and falling edge times
+   * It provides also calculation of 50% CFD leading and falling edge times and errors
    */
 
   class TOPRawDigit : public RelationsObject {
@@ -270,7 +270,7 @@ namespace Belle2 {
 
     /**
      * Returns leading edge CFD time
-     * @return time [samples] (not in [ns], conversion factor is ~0.368 ns / sample)
+     * @return time [samples] (not in [ns]!)
      */
     double getCFDLeadingTime() const
     {
@@ -279,7 +279,7 @@ namespace Belle2 {
 
     /**
      * Returns falling edge CFD time
-     * @return time [samples] (not in [ns], conversion factor is ~0.368 ns / sample)
+     * @return time [samples] (not in [ns]!)
      */
     double getCFDFallingTime() const
     {
@@ -287,8 +287,28 @@ namespace Belle2 {
     }
 
     /**
+     * Returns leading edge CFD time uncertainty (assuming uncorrelated noise)
+     * @param rmsNoise r.m.s of the pedestal fluctuations [ADC counts]
+     * @return time uncertainty [samples] (not in [ns]!)
+     */
+    double getCFDLeadingTimeError(double rmsNoise) const
+    {
+      return rmsNoise * timeErrorCoefficient(m_VRise0, m_VRise1);
+    }
+
+    /**
+     * Returns falling edge CFD time uncertainty (assuming uncorrelated noise)
+     * @param rmsNoise r.m.s of the pedestal fluctuations [ADC counts]
+     * @return time uncertainty [samples] (not in [ns]!)
+     */
+    double getCFDFallingTimeError(double rmsNoise) const
+    {
+      return rmsNoise * timeErrorCoefficient(m_VFall0, m_VFall1);
+    }
+
+    /**
      * Returns signal full width half maximum
-     * @return FWHM [samples] (not in [ns], conversion factor is ~0.368 ns / sample)
+     * @return FWHM [samples] (not in [ns]!)
      */
     double getFWHM() const {return getCFDFallingTime() - getCFDLeadingTime();}
 
@@ -355,6 +375,14 @@ namespace Belle2 {
       if (slope == 0) return sample;
       return (int(m_VPeak) - 2 * value) / (2 * slope) + sample;
     }
+
+    /**
+     * Calculate the coefficient of time error
+     * @param y1 first value (e.g. VRise0 or VFall0)
+     * @param y2 second value (e.g. VRise1 or VFall1)
+     * @return coefficient of time error
+     */
+    double timeErrorCoefficient(double y1, double y2) const;
 
     /**
      * Checks if values v0, v1 and vp are consistent

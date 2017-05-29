@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CATESTMODULEMODULE_H
-#define CATESTMODULEMODULE_H
+#pragma once
 
 #include <calibration/CalibrationCollectorModule.h>
 
@@ -43,6 +42,3 @@ namespace Belle2 {
     int m_wait;
   };
 }
-
-#endif /* CATESTMODULEMODULE_H */
-

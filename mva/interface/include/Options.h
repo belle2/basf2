@@ -138,13 +138,27 @@ namespace Belle2 {
     };
 
     template<typename T>
-    std::function<void(T)> check_bounds(T min, T max, std::string name)
+    std::function<void(T)> check_bounds(T min, T max, const std::string& name)
     {
       return [name, min, max](T v) -> void {
         if (v <= min || v >= max)
         {
           throw po::validation_error(po::validation_error::invalid_option_value, name,
           std::to_string(min) + " <= " + name + " <= " + std::to_string(max) + ": provided value " + std::to_string(v));
+        }
+      };
+    }
+
+    template<typename T>
+    std::function<void(std::vector<T>)> check_bounds_vector(T min, T max, const std::string& name)
+    {
+      return [name, min, max](const std::vector<T>& vec) -> void {
+        for (auto v : vec)
+        {
+          if (v <= min || v >= max) {
+            throw po::validation_error(po::validation_error::invalid_option_value, name,
+            std::to_string(min) + " <= " + name + " <= " + std::to_string(max) + ": provided value " + std::to_string(v));
+          }
         }
       };
     }

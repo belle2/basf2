@@ -21,6 +21,8 @@ REG_MODULE(BestVXDTrackCandidatesSelector)
 BestVXDTrackCandidatesSelectorModule::BestVXDTrackCandidatesSelectorModule() : Module()
 {
   setDescription("Module that selects a subset with a fixed size x out of all SpacePointTrackCandidates. Based on qualityIndex.");
+  setPropertyFlags(c_ParallelProcessingCertified);
+
 
   addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray.", std::string(""));
   addParam("SubsetSize", m_subsetSize, "Target size of selected subset.", (unsigned short)(1000));

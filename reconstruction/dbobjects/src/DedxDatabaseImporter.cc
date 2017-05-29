@@ -32,9 +32,9 @@
 // NAMESPACES
 using namespace Belle2;
 
-DedxDatabaseImporter::DedxDatabaseImporter(std::vector<std::string> inputFileNames, std::string name)
+DedxDatabaseImporter::DedxDatabaseImporter(std::string inputFileName, std::string name)
 {
-  m_inputFileNames.push_back(inputFileNames[0]);
+  m_inputFileNames.push_back(inputFileName);
   m_name = name;
 }
 
@@ -56,7 +56,7 @@ void DedxDatabaseImporter::importWireGainCalibration()
 
       std::string histconstants = key->GetName();
 
-      if (histconstants.compare("CDCDedxWireGainCollector") == 0) {
+      if (histconstants.compare("CDCDedxWireGains") == 0) {
         gains = (TH2F*)f->Get(histconstants.c_str());
         B2INFO("Key name matches: " << histconstants);
       }

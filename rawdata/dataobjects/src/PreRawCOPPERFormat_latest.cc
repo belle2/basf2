@@ -511,7 +511,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   if (copper_buf[ POS_CH_A_DATA_LENGTH ] != 0) {
 
     if ((m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
-      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (1 << tmp_header.B2LINK_PACKET_CRC_ERROR);
+      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
       printf("[ERROR] B2link packet CRC error slot A eve %8u foooter %.8x : %s %s %d\n", cur_ftsw_eve32,
              m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
              __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -520,7 +520,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   }
   if (copper_buf[ POS_CH_B_DATA_LENGTH ] != 0) {
     if ((m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
-      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (1 << tmp_header.B2LINK_PACKET_CRC_ERROR);
+      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
       printf("[ERROR] B2link packet CRC error slot B eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
              m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
              __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -529,7 +529,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   }
   if (copper_buf[ POS_CH_C_DATA_LENGTH ] != 0) {
     if ((m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
-      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (1 << tmp_header.B2LINK_PACKET_CRC_ERROR);
+      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
       printf("[ERROR] B2link packet CRC error slot C eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
              m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
              __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -538,7 +538,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   }
   if (copper_buf[ POS_CH_D_DATA_LENGTH ] != 0) {
     if ((m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF) != 0) {
-      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (1 << tmp_header.B2LINK_PACKET_CRC_ERROR);
+      m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
       printf("[ERROR] B2link packet CRC error slot D eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
              m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
              __FILE__, __PRETTY_FUNCTION__, __LINE__);

@@ -161,11 +161,10 @@ namespace Belle2 {
     for (const auto& digit : digits) {
       if (digit.getHitQuality() == TOPDigit::EHitQuality::c_Good) {
         int returnCode = reco.addData(digit.getModuleID(), digit.getPixelID(),
-                                      digit.getTDC(), digit.getTime());
+                                      digit.getTime());
         if (returnCode == 0)
           B2ERROR("TOPReconstructor: Could not add module ID:" << digit.getModuleID()
                   << " pixel: " << digit.getPixelID()
-                  << " with TDC: " << digit.getTDC()
                   << " time: " << digit.getTime());
       }
     }

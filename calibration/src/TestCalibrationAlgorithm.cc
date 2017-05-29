@@ -24,7 +24,7 @@ TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithm("CaTe
 
 CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
 {
-  // Pulling in data from collector output
+  // Pulling in data from collector output, we only use the histogram in this test
   auto& histogram1 = getObject<TH1F>("histogram1");
   auto& ttree = getObject<TTree>("tree");
   auto& mille = getObject<MilleData>("test_mille");
@@ -32,22 +32,17 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
   if (histogram1.GetEntries() < 100 || ttree.GetEntries() < 100 || mille.getFiles().empty())
     return c_NotEnoughData;
 
-  Double_t mean = histogram1.GetMean();
-  Double_t meanerror = histogram1.GetMeanError();
+  Float_t mean = histogram1.GetMean();
+  Float_t meanError = histogram1.GetMeanError();
 
-  if (meanerror <= 0.)
+  if (meanError <= 0.)
     return c_Failure;
 
-  // Example of saving a DBObject. In this case it is a DBObject derived from TH1I
-  string mean_name = "TestCalibMean_";
-  static int nameDistinguisher(0);  // ROOT's habit of holding onto object references forever.
-  mean_name += to_string(nameDistinguisher);
-
-  TestCalibMean* correction = new TestCalibMean(mean_name, mean);  // Not really certain whose job it is to delete this...
+  // Example of saving a DBObject.
+  TestCalibMean* correction = new TestCalibMean(mean, meanError);
   saveCalibration(correction, "TestCalibMean");
-  nameDistinguisher++;
 
-  // Example of using a Belle2 DBArray of DBObjects defined in the dbobjects directory
+  // Example of saving a Belle2 DBArray of DBObjects defined in the dbobjects directory
   TClonesArray* exampleDBArrayConstants = new TClonesArray("Belle2::TestCalibObject", 2);
   float val = 0.0;
   for (int i = 0; i < 2; i++) {
@@ -58,6 +53,7 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
 
   // Iterate until we find answer to the most fundamental question...
   B2INFO("mean: " << mean);
+  B2INFO("meanError: " << meanError);
   if (mean - 42. >= 1.)
     return c_Iterate;
 

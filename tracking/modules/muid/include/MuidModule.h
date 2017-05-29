@@ -89,6 +89,9 @@ namespace Belle2 {
     //! Name of the KLMCluster collection
     std::string m_KLMClustersColName;
 
+    //! Name of the ECLCluster collection
+    std::string m_ECLClustersColName;
+
     //! Name of the TrackClusterSeparation collection
     std::string m_TrackClusterSeparationsColName;
 
@@ -110,8 +113,11 @@ namespace Belle2 {
     //! user-defined maximum squared-distance (#variances) for matching hit to extrapolation
     double m_MaxDistSqInVariances;
 
-    //! user-defined maximum cone angle (radians) between KLMCluster and associated track
-    double m_MaxClusterTrackConeAngle;
+    //! user-defined maximum distance in cm between KLMCluster and associated track
+    double m_MaxKLMTrackClusterDistance;
+
+    //! user-defined maximum distance in cm between ECLCluster and associated track
+    double m_MaxECLTrackClusterDistance;
 
     //! Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info
     int m_TrackingVerbosity;

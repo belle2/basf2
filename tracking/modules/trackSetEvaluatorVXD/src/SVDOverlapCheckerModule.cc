@@ -30,6 +30,8 @@ SVDOverlapCheckerModule::SVDOverlapCheckerModule() : Module()
  and stores them in an OverlapNetwork, which is basically a matrix of overlaps.");
 
   addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray.", string(""));
+
+  addParam("OutputArrayName", m_outputArrayName, "Name of the output StoreArray which stores the Overlap networks.", string(""));
 }
 
 void SVDOverlapCheckerModule::event()

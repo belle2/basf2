@@ -40,13 +40,33 @@ namespace Belle2 {
 
       /**
        * Constructor.
+       * @param[in] printOverlaps Print information about overlaps or not.
        */
-      AlignmentChecker();
+      AlignmentChecker(bool printOverlaps);
 
       /**
        * Destructor.
        */
       ~AlignmentChecker();
+
+      /**
+       * Check sector alignment.
+       * @param[in] sectorAlignment Sector alignment.
+       * @return true Alignment is correct (no overlaps).
+       */
+      bool checkSectorAlignment(EKLMAlignmentData* sectorAlignment) const;
+
+      /**
+       * Check segment alignment.
+       * @param[in] iPlane           Plane number.
+       * @param[in] iSegment         Segment number.
+       * @param[in] sectorAlignment  Sector alignment.
+       * @param[in] segmentAlignment Segment alignment.
+       * @return true Alignment is correct (no overlaps).
+       */
+      bool checkSegmentAlignment(int iPlane, int iSegment,
+                                 EKLMAlignmentData* sectorAlignment,
+                                 EKLMAlignmentData* segmentAlignment) const;
 
       /**
        * Check alignment.
@@ -56,16 +76,33 @@ namespace Belle2 {
       bool checkAlignment(EKLMAlignment* alignment) const;
 
       /**
-       * Check segment alignment.
-       * @param[in] iPlane    Plane number.
-       * @param[in] iSegment  Segment number.
-       * @param[in] alignment Alignment data.
-       * @return true Alignment is correct (no overlaps).
+       * Restore sector alignment.
+       * @param[in] sectorAlignment    Sector alignment.
+       * @param[in] oldSectorAlignment Old sector alignment.
        */
-      bool checkSegmentAlignment(int iPlane, int iSegment,
-                                 EKLMAlignmentData* alignment) const;
+      void restoreSectorAlignment(EKLMAlignmentData* sectorAlignment,
+                                  EKLMAlignmentData* oldSectorAlignment) const;
+
+      /**
+       * Restore segment alignment.
+       * @param[in] segmentAlignment    Segment alignment.
+       * @param[in] oldSegmentAlignment Old segment alignment.
+       */
+      void restoreSegmentAlignment(EKLMAlignmentData* segmentAlignment,
+                                   EKLMAlignmentData* oldSegmentAlignment) const;
+
+      /**
+       * Restore alignment (check and move elements if there are overlaps).
+       * @param[in] alignment    Alignment to be checked.
+       * @param[in] oldAlignment Old alignment (if NULL, restores to zeros).
+       */
+      void restoreAlignment(EKLMAlignment* alignment,
+                            EKLMAlignment* oldAlignment) const;
 
     private:
+
+      /** Print information about overlaps or not. */
+      bool m_PrintOverlaps;
 
       /** Geometry data. */
       const GeometryData* m_GeoDat;
@@ -87,6 +124,12 @@ namespace Belle2 {
 
       /** Segment support. */
       Polygon2D*** m_SegmentSupport;
+
+      /** Last checked sector. */
+      EKLMAlignmentData* m_LastCheckedSector;
+
+      /** Last sector check result. */
+      bool m_LastSectorCheckResult;
 
     };
 

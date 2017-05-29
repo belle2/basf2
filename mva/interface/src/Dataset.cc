@@ -17,6 +17,7 @@
 #include <TDirectory.h>
 
 #include <boost/filesystem/operations.hpp>
+#include <iostream>
 
 namespace Belle2 {
   namespace MVA {
@@ -142,7 +143,10 @@ namespace Belle2 {
     void MultiDataset::loadEvent(unsigned int iEvent)
     {
       m_input = m_matrix[iEvent];
-      m_spectators = m_spectator_matrix[iEvent];
+
+      if (m_spectator_matrix.size() > 0) {
+        m_spectators = m_spectator_matrix[iEvent];
+      }
 
       if (m_targets.size() > 0) {
         m_target = m_targets[iEvent];
@@ -289,7 +293,9 @@ namespace Belle2 {
 
     void ROOTDataset::loadEvent(unsigned int event)
     {
-      m_tree->GetEvent(event, 0);
+      if (m_tree->GetEntry(event, 0) == 0) {
+        B2ERROR("Error during loading entry from chain");
+      }
       m_isSignal = std::lround(m_target) == m_general_options.m_signal_class;
     }
 
@@ -300,10 +306,22 @@ namespace Belle2 {
       std::vector<float> values(nentries);
 
       float object;
+      // Get current tree
+      auto currentTreeNumber = m_tree->GetTreeNumber();
       TBranch* branch = m_tree->GetBranch(branchName.c_str());
       branch->SetAddress(&object);
       for (int i = 0; i < nentries; ++i) {
-        branch->GetEntry(m_tree->LoadTree(i));
+        auto entry = m_tree->LoadTree(i);
+        if (entry < 0) {
+          B2ERROR("Error during loading root tree from chain, error code: " << entry);
+        }
+        // if current tree changed we have to update the branch
+        if (currentTreeNumber != m_tree->GetTreeNumber()) {
+          currentTreeNumber = m_tree->GetTreeNumber();
+          branch = m_tree->GetBranch(branchName.c_str());
+          branch->SetAddress(&object);
+        }
+        branch->GetEntry(entry);
         values[i] = object;
       }
       // Reset branch to correct input address, just to be sure
@@ -318,10 +336,22 @@ namespace Belle2 {
       std::vector<float> values(nentries);
 
       float object;
+      // Get current tree
+      auto currentTreeNumber = m_tree->GetTreeNumber();
       TBranch* branch = m_tree->GetBranch(branchName.c_str());
       branch->SetAddress(&object);
       for (int i = 0; i < nentries; ++i) {
-        branch->GetEntry(m_tree->LoadTree(i));
+        auto entry = m_tree->LoadTree(i);
+        if (entry < 0) {
+          B2ERROR("Error during loading root tree from chain, error code: " << entry);
+        }
+        // if current tree changed we have to update the branch
+        if (currentTreeNumber != m_tree->GetTreeNumber()) {
+          currentTreeNumber = m_tree->GetTreeNumber();
+          branch = m_tree->GetBranch(branchName.c_str());
+          branch->SetAddress(&object);
+        }
+        branch->GetEntry(entry);
         values[i] = object;
       }
       // Reset branch to correct input address, just to be sure
@@ -336,10 +366,22 @@ namespace Belle2 {
       std::vector<float> values(nentries);
 
       float object;
+      // Get current tree
+      auto currentTreeNumber = m_tree->GetTreeNumber();
       TBranch* branch = m_tree->GetBranch(branchName.c_str());
       branch->SetAddress(&object);
       for (int i = 0; i < nentries; ++i) {
-        branch->GetEntry(m_tree->LoadTree(i));
+        auto entry = m_tree->LoadTree(i);
+        if (entry < 0) {
+          B2ERROR("Error during loading root tree from chain, error code: " << entry);
+        }
+        // if current tree changed we have to update the branch
+        if (currentTreeNumber != m_tree->GetTreeNumber()) {
+          currentTreeNumber = m_tree->GetTreeNumber();
+          branch = m_tree->GetBranch(branchName.c_str());
+          branch->SetAddress(&object);
+        }
+        branch->GetEntry(entry);
         values[i] = object;
       }
       // Reset branch to correct input address, just to be sure

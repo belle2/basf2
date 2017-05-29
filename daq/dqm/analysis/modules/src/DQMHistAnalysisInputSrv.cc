@@ -42,8 +42,8 @@ void DQMHistAnalysisInputSrvModule::initialize()
   m_count = 0;
   m_memory = new DqmMemFile(m_mempath.c_str());
   m_eventMetaDataPtr.registerInDataStore();
-  m_serv = new THttpServer("http:8081");
-  m_serv->SetReadOnly(kFALSE);
+  //m_serv = new THttpServer("http:8081");
+  //m_serv->SetReadOnly(kFALSE);
   B2INFO("DQMHistAnalysisInputSrv: initialized.");
 }
 
@@ -94,8 +94,8 @@ void DQMHistAnalysisInputSrvModule::event()
   TTimer t(m_interval, kFALSE);// in ms
 
   do { // call at least once!
-    m_serv->ProcessRequests();
-    gSystem->Sleep(10);  // 10 ms sleep
+    //m_serv->ProcessRequests();
+    //gSystem->Sleep(10);  // 10 ms sleep
   } while (!t.CheckTimer(gSystem->Now()));
 
 }

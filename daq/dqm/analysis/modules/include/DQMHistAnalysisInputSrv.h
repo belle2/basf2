@@ -15,7 +15,7 @@
 
 #include <daq/dqm/DqmMemFile.h>
 #include <daq/dqm/analysis/modules/DQMHistAnalysis.h>
-#include <THttpServer.h>
+//#include <THttpServer.h>
 
 #include <string>
 
@@ -47,7 +47,7 @@ namespace Belle2 {
     std::string m_mempath;
     int m_memsize;
     int m_interval;
-    THttpServer* m_serv;
+    //  THttpServer* m_serv;
 
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 

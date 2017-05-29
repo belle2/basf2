@@ -52,6 +52,10 @@ namespace Belle2 {
 
     std::string m_sectorMapsInputFile = "SectorMaps.root";
     std::string m_sectorMapsOutputFile = "SectorMaps.root";
+
+    // if specified (non "") ONLY the setup with this name will be read. Else all setups in the root file will be read
+    std::string m_setupToRead = std::string("");
+
     bool m_readSectorMap  = true;
     bool m_writeSectorMap = false;
   };

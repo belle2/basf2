@@ -65,8 +65,8 @@ for sector in range(1, 9):
             for ipar in [1, 2, 3, 4, 5, 6]:
 
                 # For U=1 or V=2 do not fix param
-                if ipar in [1, 2]:
-                    continue
+                # if ipar in [1, 2]:
+                #     continue
 
                 bklmid = Belle2.BKLMElementID()
                 bklmid.setIsForward(forward)
@@ -84,15 +84,21 @@ for endcap in range(1, 3):
         maxlayer = 14
     for layer in range(1, maxlayer + 1):
         for sector in range(1, 5):
+            for ipar in range(3, 4):
+                eklmid = Belle2.EKLMElementID(endcap, layer, sector)
+                label = Belle2.GlobalLabel(eklmid, ipar)
+                cmd = str(label.label()) + ' 0. -1.'
+                # Uncomment to fix EKLM parameters.
+                algo.steering().command(cmd)
             for plane in range(1, 3):
                 for segment in range(1, 6):
                     for ipar in range(1, 3):
-                        eklmid = Belle2.EKLMSegmentID(endcap, layer, sector,
+                        eklmid = Belle2.EKLMElementID(endcap, layer, sector,
                                                       plane, segment)
                         label = Belle2.GlobalLabel(eklmid, ipar)
                         cmd = str(label.label()) + ' 0. -1.'
                         # Uncomment to fix EKLM parameters.
-                        # algo.steering().command(cmd)
+                        algo.steering().command(cmd)
 
 # ---------- end of parameter fixing ----------------------
 
@@ -103,6 +109,11 @@ for endcap in range(1, 3):
 algo.execute()
 
 # -----------------------------------------------------------
+payloads = list(algo.getPayloads())
+eklm = None
+for payload in payloads:
+    if payload.name == 'EKLMDisplacement':
+        eklm = payload.object.IsA().DynamicCast(Belle2.EKLMAlignment().IsA(), payload.object, False)
 
 # Profile plot for all determined parameters
 profile = ROOT.TH1F(
@@ -115,6 +126,7 @@ profile = ROOT.TH1F(
 # Define some branch variables
 param = np.zeros(1, dtype=int)
 value = np.zeros(1, dtype=np.float32)
+correction = np.zeros(1, dtype=np.float32)
 error = np.zeros(1, dtype=np.float32)
 layer = np.zeros(1, dtype=int)
 ladder = np.zeros(1, dtype=int)
@@ -132,13 +144,13 @@ vxdtree.Branch('layer', layer, 'layer/I')
 vxdtree.Branch('ladder', ladder, 'ladder/I')
 vxdtree.Branch('sensor', sensor, 'sensor/I')
 vxdtree.Branch('param', param, 'param/I')
-vxdtree.Branch('value', value, 'value/F')
+vxdtree.Branch('correction', correction, 'correction/F')
 vxdtree.Branch('error', error, 'error/F')
 # Tree with CDC data
 cdctree = ROOT.TTree('cdc', 'CDC data')
 cdctree.Branch('layer', layer, 'layer/I')
 cdctree.Branch('param', param, 'param/I')
-cdctree.Branch('value', value, 'value/F')
+cdctree.Branch('correction', correction, 'correction/F')
 cdctree.Branch('error', error, 'error/F')
 # Tree with BKLM data
 bklmtree = ROOT.TTree('bklm', 'BKLM data')
@@ -146,18 +158,29 @@ bklmtree.Branch('layer', layer, 'layer/I')
 bklmtree.Branch('sector', sector, 'sector/I')
 bklmtree.Branch('forward', forward, 'forward/I')
 bklmtree.Branch('param', param, 'param/I')
-bklmtree.Branch('value', value, 'value/F')
+bklmtree.Branch('correction', correction, 'correction/F')
 bklmtree.Branch('error', error, 'error/F')
-# Tree with EKLM data.
-eklmtree = ROOT.TTree('eklm', 'EKLM data')
-eklmtree.Branch('endcap', endcap, 'endcap/I')
-eklmtree.Branch('layer', layer, 'layer/I')
-eklmtree.Branch('sector', sector, 'sector/I')
-eklmtree.Branch('plane', plane, 'plane/I')
-eklmtree.Branch('segment', segment, 'segment/I')
-eklmtree.Branch('param', param, 'param/I')
-eklmtree.Branch('value', value, 'value/F')
-eklmtree.Branch('error', error, 'error/F')
+# Tree with EKLM sector data.
+eklmsectortree = ROOT.TTree('eklm_sector', 'EKLM sector alignment data')
+eklmsectortree.Branch('endcap', endcap, 'endcap/I')
+eklmsectortree.Branch('layer', layer, 'layer/I')
+eklmsectortree.Branch('sector', sector, 'sector/I')
+eklmsectortree.Branch('param', param, 'param/I')
+eklmsectortree.Branch('value', value, 'value/F')
+eklmsectortree.Branch('correction', correction, 'correction/F')
+eklmsectortree.Branch('error', error, 'error/F')
+# Tree with EKLM segment data.
+eklmsegmenttree = ROOT.TTree('eklm_segment', 'EKLM segment alignment data')
+eklmsegmenttree.Branch('endcap', endcap, 'endcap/I')
+eklmsegmenttree.Branch('layer', layer, 'layer/I')
+eklmsegmenttree.Branch('sector', sector, 'sector/I')
+eklmsegmenttree.Branch('plane', plane, 'plane/I')
+eklmsegmenttree.Branch('segment', segment, 'segment/I')
+eklmsegmenttree.Branch('param', param, 'param/I')
+eklmsegmenttree.Branch('value', value, 'value/F')
+eklmsegmenttree.Branch('correction', correction, 'correction/F')
+eklmsegmenttree.Branch('error', error, 'error/F')
+
 
 # Index of determined param
 ibin = 0
@@ -165,12 +188,13 @@ ibin = 0
 for ipar in range(0, algo.result().getNoParameters()):
     label = Belle2.GlobalLabel(algo.result().getParameterLabel(ipar))
     param[0] = label.getParameterId()
+    value[0] = 0.0
 
     if algo.result().isParameterDetermined(ipar):
-        value[0] = algo.result().getParameterCorrection(ipar)
+        correction[0] = algo.result().getParameterCorrection(ipar)
         error[0] = algo.result().getParameterError(ipar)
     else:
-        value[0] = 0.0
+        correction[0] = 0.0
         error[0] = -1.0
 
     if (label.isVXD()):
@@ -190,12 +214,33 @@ for ipar in range(0, algo.result().getNoParameters()):
         bklmtree.Fill()
 
     if (label.isEKLM()):
-        endcap[0] = label.getEklmID().getEndcap()
-        layer[0] = label.getEklmID().getLayer()
-        sector[0] = label.getEklmID().getSector()
-        plane[0] = label.getEklmID().getPlane()
-        segment[0] = label.getEklmID().getSegment()
-        eklmtree.Fill()
+        if (label.getEklmID().getType() == 2):  # 2 = sector
+            endcap[0] = label.getEklmID().getEndcap()
+            layer[0] = label.getEklmID().getLayer()
+            sector[0] = label.getEklmID().getSector()
+            if (eklm is not None):
+                alignment = eklm.getSectorAlignment(label.getEklmID().getSectorNumber())
+                if (param[0] == 1):
+                    value[0] = alignment.getDx()
+                elif (param[0] == 2):
+                    value[0] = alignment.getDy()
+                elif (param[0] == 3):
+                    value[0] = alignment.getDalpha()
+
+            eklmsectortree.Fill()
+        else:
+            endcap[0] = label.getEklmID().getEndcap()
+            layer[0] = label.getEklmID().getLayer()
+            sector[0] = label.getEklmID().getSector()
+            plane[0] = label.getEklmID().getPlane()
+            segment[0] = label.getEklmID().getSegment()
+            if (eklm is not None):
+                alignment = eklm.getSegmentAlignment(label.getEklmID().getSegmentNumber())
+                if (param[0] == 1):
+                    value[0] = alignment.getDy()
+                elif (param[0] == 2):
+                    value[0] = alignment.getDalpha()
+            eklmsegmenttree.Fill()
 
     if not algo.result().isParameterDetermined(ipar):
         continue
@@ -213,7 +258,8 @@ profile.Write()
 vxdtree.Write()
 cdctree.Write()
 bklmtree.Write()
-eklmtree.Write()
+eklmsectortree.Write()
+eklmsegmenttree.Write()
 alignment_file.Close()
 
 algo.commit()

@@ -14,7 +14,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <daq/dqm/analysis/modules/DQMHistAnalysis.h>
-#include <THttpServer.h>
+//#include <THttpServer.h>
 
 #include <string>
 #ifdef _BELLE2_EPICS
@@ -66,7 +66,7 @@ namespace Belle2 {
     int m_interval;
     bool m_callback;
     bool m_server;
-    THttpServer* m_serv{0};
+    //THttpServer* m_serv{0};
     int m_nhist = 0;
 
     /** Parameter list for histograms */

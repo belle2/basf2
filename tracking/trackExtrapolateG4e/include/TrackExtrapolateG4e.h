@@ -26,8 +26,7 @@
 class G4ErrorSymMatrix;
 class G4VPhysicalVolume;
 class G4ErrorFreeTrajState;
-
-namespace genfit { class AbsTrackRep; }
+class G4StepPoint;
 
 namespace Belle2 {
 
@@ -35,6 +34,8 @@ namespace Belle2 {
   class RecoTrack;
   class Muid;
   class MuidPar;
+  class KLMCluster;
+  class ECLCluster;
   namespace Simulation {
     class ExtCylSurfaceTarget;
     class ExtManager;
@@ -68,20 +69,18 @@ namespace Belle2 {
 
   //! Data structure to define extrapolation state
   struct ExtState {
-    //! Particle hypothesis that is being extrapolated
-    int pdgCode;
-    //! Pointer to the geant4e state
-    G4ErrorFreeTrajState* g4eState;
     //! Pointer to the reconstructed track
     const Track* track;
-    //! MUID: true if in the forward EKLM
-    bool isForward;
-    //! Time of flight (ns), updated during extrapolation
-    double tof;
+    //! Particle hypothesis that is being extrapolated
+    int pdgCode;
     //! True for back-propagation of a cosmic ray
     bool isCosmic;
-    //! MUID: list of track(s) using each BKLMHit2d
-    std::vector<std::map<const Track*, double> >* bklmHitUsed;
+    //! Time of flight from IP (ns), updated during extrapolation
+    double tof;
+    //! Length from start of extrapolation (rad lengths), updated during extrapolation
+    double length;
+    //! MUID: initial direction of track, used for KLID
+    G4ThreeVector directionAtIP;
     //! MUID: accumulated chi-squared of all in-plane transverse deviations between extrapolation and matching hit
     double chi2;
     //! MUID: accumulated number of points with matching 2D hits
@@ -180,6 +179,9 @@ namespace Belle2 {
     //! Assign the KLMClusters collection name before initialization
     void setKLMClustersColName(std::string& klmClustersColName) { m_KLMClustersColName = &klmClustersColName; }
 
+    //! Assign the ECLClusters collection name before initialization
+    void setECLClustersColName(std::string& eclClustersColName) { m_ECLClustersColName = &eclClustersColName; }
+
     //! Assign the TrackClusterSeparations collection name before initialization
     void setTrackClusterSeparationsColName(std::string& trackClusterSeparationsColName) { m_TrackClusterSeparationsColName = &trackClusterSeparationsColName; }
 
@@ -194,13 +196,14 @@ namespace Belle2 {
     //! @param meanDt Mean value of the in-time window (ns).
     //! @param maxDt Half-width of the in-time window (ns).
     //! @param maxSeparation Maximum separation between track crossing and matching hit in detector plane (#sigmas).
-    //! @param maxClusterTrackConeAngle Maximum angle between track and KLM-cluster directions (deg).
+    //! @param maxKLMTrackClusterDistance Maximum distance between associated track and KLMCluster (cm).
+    //! @param maxECLTrackClusterDistance Maximum distance between associated track and ECLCluster (cm).
     //! @param minPt Minimum transverse momentum to begin extrapolation (GeV/c).
     //! @param minKE Minimum kinetic energy to continue extrapolation (GeV/c).
     //! @param hypotheses Vector of charged-particle hypotheses used in extrapolation of each track.
     void initialize(double meanDt, double maxDt, double maxSeparation,
-                    double maxClusterTrackConeAngle, double minPt, double minKE,
-                    std::vector<Const::ChargedStable>& hypotheses);
+                    double maxKLMTrackClusterDistance, double maxECLTrackClusterDistance,
+                    double minPt, double minKE, std::vector<Const::ChargedStable>& hypotheses);
 
     //! Perform beginning-of-run actions.
     //! @param flag True if called by Muid module, false if called by Ext module.
@@ -255,12 +258,13 @@ namespace Belle2 {
     TrackExtrapolateG4e(TrackExtrapolateG4e&);
 
     //! Swim a single track (MUID) until it stops or leaves the target cylinder
-    void swim(const Track*, int, double, bool, const G4ThreeVector&, const G4ThreeVector&, const G4ThreeVector&,
-              const G4ErrorSymMatrix&,
-              const std::vector<G4ThreeVector>*, std::vector<Track*>*, std::vector<std::map<const Track*, double> >*);
+    void swim(ExtState&, G4ErrorFreeTrajState&,
+              const std::vector<std::pair<ECLCluster*, G4ThreeVector> >*,
+              const std::vector<std::pair<KLMCluster*, G4ThreeVector> >*,
+              std::vector<std::map<const Track*, double> >*);
 
     //! Swim a single track (EXT) until it stops or leaves the target cylinder
-    void swim(const Track*, int, double, bool, const G4ThreeVector&, const G4ThreeVector&, const G4ErrorSymMatrix&);
+    void swim(ExtState&, G4ErrorFreeTrajState&);
 
     //! Register the list of geant4 physical volumes whose entry/exit
     //! points will be saved during extrapolation
@@ -270,7 +274,7 @@ namespace Belle2 {
     void getVolumeID(const G4TouchableHandle&, Const::EDetector&, int&);
 
     //! Convert the geant4e 5x5 covariance to phasespace 6x6 covariance
-    void fromG4eToPhasespace(const G4ErrorFreeTrajState*, G4ErrorSymMatrix&);
+    void fromG4eToPhasespace(const G4ErrorFreeTrajState&, G4ErrorSymMatrix&);
 
     //! Convert the phasespace covariance to geant4e covariance
     void fromPhasespaceToG4e(const G4ThreeVector&, const G4ErrorSymMatrix&, G4ErrorTrajErr&);
@@ -279,32 +283,35 @@ namespace Belle2 {
     void fromPhasespaceToG4e(const TVector3&, const TMatrixDSym&, G4ErrorTrajErr&);
 
     //! Get the start point for a new reconstructed track with specific PDG hypothesis
-    void getStartPoint(const Track&, int&, double&, bool&,
-                       G4ThreeVector&, G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&);
+    ExtState getStartPoint(const Track&, int, G4ErrorFreeTrajState&);
 
     //! Create another EXT extrapolation hit for a track candidate
-    void createExtHit(ExtHitStatus, const Belle2::ExtState&);
+    void createExtHit(ExtHitStatus, const ExtState&, const G4ErrorFreeTrajState&, const G4StepPoint*, const G4TouchableHandle&);
+
+    //! Create another EXT ECL-crystal-crossing hit for a track candidate
+    void createECLHit(const ExtState&, const G4ErrorFreeTrajState&, const G4StepPoint*, const G4StepPoint*, const G4TouchableHandle&,
+                      const std::pair<ECLCluster*, G4ThreeVector>&, double, double);
 
     //! Create another MUID extrapolation hit for a track candidate
-    bool createMuidHit(Belle2::ExtState&);
+    bool createMuidHit(ExtState&, G4ErrorFreeTrajState&, std::vector<std::map<const Track*, double> >*);
 
     //! Find the intersection point of the track with the crossed BKLM plane
-    bool findBarrelIntersection(Belle2::ExtState&, const G4ThreeVector&, Belle2::Intersection&);
+    bool findBarrelIntersection(ExtState&, const G4ThreeVector&, Intersection&);
 
     //! Find the intersection point of the track with the crossed EKLM plane
-    bool findEndcapIntersection(Belle2::ExtState&, const G4ThreeVector&, Belle2::Intersection&);
+    bool findEndcapIntersection(ExtState&, const G4ThreeVector&, Intersection&);
 
     //! Find the matching BKLM 2D hit nearest the intersection point of the track with the crossed BKLM plane
-    bool findMatchingBarrelHit(Belle2::Intersection&, const Track*);
+    bool findMatchingBarrelHit(Intersection&, const Track*);
 
     //! Find the matching EKLM 2D hit nearest the intersection point of the track with the crossed EKLM plane
-    bool findMatchingEndcapHit(Belle2::Intersection&, const Track*);
+    bool findMatchingEndcapHit(Intersection&, const Track*);
 
     //! Nudge the track using the matching hit
-    void adjustIntersection(Belle2::Intersection&, const double*, const G4ThreeVector&, const G4ThreeVector&);
+    void adjustIntersection(Intersection&, const double*, const G4ThreeVector&, const G4ThreeVector&);
 
     //! Complete muon identification after end of track extrapolation
-    void finishTrack(const Belle2::ExtState&, Muid*);
+    void finishTrack(const ExtState&, Muid*, bool);
 
     //! Stores pointer to the singleton class
     static TrackExtrapolateG4e* m_Singleton;
@@ -324,8 +331,11 @@ namespace Belle2 {
     //! user-defined maximum squared-distance (#variances) for matching hit to extrapolation
     double m_MaxDistSqInVariances;
 
-    //! user-defined maximum cone angle (radians) between KLMCluster and associated track
-    double m_MaxClusterTrackConeAngle;
+    //! user-defined maximum distance (mm) between KLMCluster and associated track (for KLID)
+    double m_MaxKLMTrackClusterDistance;
+
+    //! user-defined maximum distance (mm) between ECLCluster and associated track (for EID)
+    double m_MaxECLTrackClusterDistance;
 
     //! Minimum transverse momentum in MeV/c for extrapolation to be started
     double m_MinPt;
@@ -356,6 +366,9 @@ namespace Belle2 {
 
     //! Pointer to name of the KLMCluster collection
     std::string* m_KLMClustersColName;
+
+    //! Pointer to name of the ECLCluster collection
+    std::string* m_ECLClustersColName;
 
     //! Pointer to name of the TrackClusterSeparation collection
     std::string* m_TrackClusterSeparationsColName;

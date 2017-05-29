@@ -166,7 +166,7 @@ def getRunNumber(fname):
     """
     Get run number from file name.
     """
-    run = int((fname.split('/')[-1]).split('.')[3])
+    run = int(((fname.split('/')[-1]).split('.')[3]).split('_')[0])
     return run
 
 

@@ -33,7 +33,18 @@
   targetClass="Belle2::TOPBarHit" target="m_moduleID" \
   code="{m_moduleID = onfile.m_barID;}"
 
-#pragma read sourceClass="Belle2::TOPDigit" version="[-6]" \
+#pragma read sourceClass="Belle2::TOPDigit" version="[-12]" \
+  source="int m_TDC" \
+  targetClass="Belle2::TOPDigit" \
+  target="m_rawTime" \
+  code="{m_rawTime = onfile.m_TDC / 16.0;}"
+#pragma read sourceClass="Belle2::TOPDigit" version="[-12]" \
+  source="int m_ADC" \
+  targetClass="Belle2::TOPDigit" \
+  target="m_pulseHeight" \
+  code="{m_pulseHeight = onfile.m_ADC;}"
+
+#pragma read sourceClass="Belle2::TOPDigit" version="[-6]"  \
   source="int m_barID" \
   targetClass="Belle2::TOPDigit" \
   target="m_moduleID" \

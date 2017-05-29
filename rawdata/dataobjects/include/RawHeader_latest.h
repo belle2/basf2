@@ -224,9 +224,10 @@ namespace Belle2 {
     };
 
     /* Error bit in POS_TRUNC_MASK_DATATYPE */
+    /* Changed from the position of error bit to actual error value ( 0 -> 0x1, 1 -> 0x2 ) */
     enum {
-      B2LINK_PACKET_CRC_ERROR = 0,
-      B2LINK_EVENT_CRC_ERROR = 1
+      B2LINK_PACKET_CRC_ERROR = 0x1,
+      B2LINK_EVENT_CRC_ERROR = 0x2
     };
 
   private:
@@ -442,8 +443,7 @@ namespace Belle2 {
   {
     CheckGetBuffer();
     unsigned int temp_err_flag = GetErrorBitFlag();
-    if ((temp_err_flag &
-         (0x1 <<  B2LINK_PACKET_CRC_ERROR)) == 0) {
+    if ((temp_err_flag & B2LINK_PACKET_CRC_ERROR) == 0) {
       return 0;
     }
     return 1;
@@ -453,8 +453,7 @@ namespace Belle2 {
   {
     CheckGetBuffer();
     unsigned int temp_err_flag = GetErrorBitFlag();
-    if ((temp_err_flag &
-         (0x1 <<  B2LINK_EVENT_CRC_ERROR)) == 0) {
+    if ((temp_err_flag & B2LINK_EVENT_CRC_ERROR) == 0) {
       return 0;
     }
     return 1;

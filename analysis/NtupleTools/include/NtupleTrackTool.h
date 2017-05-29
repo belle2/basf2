@@ -26,8 +26,12 @@ namespace Belle2 {
   private:
     /** track's d0 : signed distance to the POCA in the r-phi plane */
     float* m_fD0;
+    /** track's d0 error: signed distance to the POCA in the r-phi plane */
+    float* m_ferrD0;
     /** track's z0 : z coordinate of the POCA */
     float* m_fZ0;
+    /** track's z0 error: z coordinate of the POCA */
+    float* m_ferrZ0;
     /** Track fit pValue. */
     float* m_fTrPval;
     /** Create branches in m_tree - this function should be called by the constructor only. */

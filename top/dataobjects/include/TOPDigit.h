@@ -41,15 +41,15 @@ namespace Belle2 {
     {}
 
     /**
-     * Almost full constructor
-     * @param moduleID     module ID (1-based)
+     * Usefull constructor
+     * @param moduleID  module ID (1-based)
      * @param pixelID   pixel ID (1-based)
-     * @param TDC       digitized detection time
+     * @param rawTime   raw time expressed in samples (TDC bins)
      */
-    TOPDigit(int moduleID, int pixelID, int TDC):
+    TOPDigit(int moduleID, int pixelID, double rawTime):
       m_moduleID(moduleID),
       m_pixelID(pixelID),
-      m_TDC(TDC),
+      m_rawTime(rawTime),
       m_quality(c_Good)
     {}
 
@@ -66,34 +66,34 @@ namespace Belle2 {
     static void setPileupTime(double time) {s_pileupTime = time;}
 
     /**
-     * Sets detection time
+     * Sets hardware channel number (0-based)
+     * @param channel hardware channel number
+     */
+    void setChannel(unsigned int channel) {m_channel = channel;}
+
+    /**
+     * Sets raw detection time
+     * @param rawTime raw time expressed in samples (TDC bins)
+     */
+    void setRawTime(double rawTime) {m_rawTime = rawTime;}
+
+    /**
+     * Sets calibrated detection time
      * @param time time in [ns]
      */
     void setTime(double time) {m_time = time;}
 
     /**
-     * Sets time uncertainty
+     * Sets calibrated time uncertainty
      * @param timeError uncertainty (r.m.s.) in [ns]
      */
     void setTimeError(double timeError) {m_timeError = timeError;}
 
     /**
-     * Sets digitized detection time
-     * @param TDC digitized time
-     */
-    void setTDC(int TDC) {m_TDC = TDC;}
-
-    /**
      * Sets pulse height
-     * @param ADC pulse height [ADC counts]
+     * @param pulseHeight pulse height [ADC counts]
      */
-    void setADC(int ADC) {m_ADC = ADC;}
-
-    /**
-     * Sets pulse integral
-     * @param integral pulse integral [ADC counts]
-     */
-    void setIntegral(int integral) {m_integral = integral;}
+    void setPulseHeight(int pulseHeight) {m_pulseHeight = pulseHeight;}
 
     /**
      * Sets pulse width
@@ -102,10 +102,10 @@ namespace Belle2 {
     void setPulseWidth(double width) {m_pulseWidth = width;}
 
     /**
-     * Sets hardware channel number (0-based)
-     * @param channel hardware channel number
+     * Sets pulse integral
+     * @param integral pulse integral [ADC counts]
      */
-    void setChannel(unsigned int channel) {m_channel = channel;}
+    void setIntegral(int integral) {m_integral = integral;}
 
     /**
      * Sets first ASIC window number of the merged waveform this hit is taken from
@@ -192,42 +192,6 @@ namespace Belle2 {
     int getPMTPixel() const {return getPMTPixelCol() + (getPMTPixelRow() - 1) * 4;}
 
     /**
-     * Returns t0-subtracted and calibrated time (converted back from TDC counts)
-     * @return time in [ns]
-     */
-    double getTime() const { return m_time; }
-
-    /**
-     * Returns time uncertainty
-     * @return uncertainty (r.m.s.) in [ns]
-     */
-    double getTimeError() const {return m_timeError;}
-
-    /**
-     * Returns digitized time
-     * @return digitized time
-     */
-    int getTDC() const { return m_TDC; }
-
-    /**
-     * Returns pulse height
-     * @return pulse height [ADC counts]
-     */
-    int getADC() const { return m_ADC; }
-
-    /**
-     * Returns pulse integral
-     * @return pulse integral [ADC counts]
-     */
-    int getIntegral() const {return m_integral;}
-
-    /**
-     * Returns pulse width
-     * @return pulse width (FWHM) in [ns]
-     */
-    double getPulseWidth() const { return m_pulseWidth; }
-
-    /**
      * Returns hardware channel number
      * @return hardware channel number
      */
@@ -258,6 +222,48 @@ namespace Belle2 {
     unsigned int getBoardstackNumber() const {return (m_channel >> 7) & 0x03;}
 
     /**
+     * Returns raw detection time
+     * @return time expressed in samples (TDC bins)
+     */
+    double getRawTime() const { return m_rawTime; }
+
+    /**
+     * Returns sample number modulo 256
+     * @return sample number modulo 256
+     */
+    int getModulo256Sample() const;
+
+    /**
+     * Returns t0-subtracted and calibrated time
+     * @return time in [ns]
+     */
+    double getTime() const { return m_time; }
+
+    /**
+     * Returns calibrated time uncertainty
+     * @return uncertainty (r.m.s.) in [ns]
+     */
+    double getTimeError() const {return m_timeError;}
+
+    /**
+     * Returns pulse height
+     * @return pulse height [ADC counts]
+     */
+    int getPulseHeight() const { return m_pulseHeight; }
+
+    /**
+     * Returns pulse width
+     * @return pulse width (FWHM) in [ns]
+     */
+    double getPulseWidth() const { return m_pulseWidth; }
+
+    /**
+     * Returns pulse integral
+     * @return pulse integral [ADC counts]
+     */
+    int getIntegral() const {return m_integral;}
+
+    /**
      * Returns first ASIC window number of the merged waveform this hit is taken from
      * @return window number
      */
@@ -282,20 +288,20 @@ namespace Belle2 {
   private:
     int m_moduleID = 0;       /**< module ID (1-based) */
     int m_pixelID = 0;        /**< software channel ID (1-based) */
-    int m_TDC = 0;            /**< digitized time */
-    int m_ADC = 0;            /**< pulse height [ADC counts] */
-    int m_integral = 0;       /**< pulse integral [ADC counts] */
     unsigned m_channel = 0;   /**< hardware channel number (0-based) */
-    EHitQuality m_quality = c_Junk;  /**< hit quality */
+    float m_rawTime = 0;      /**< raw time expressed in samples (TDC bins) */
     float m_time = 0;         /**< calibrated time in [ns], t0-subtracted */
     float m_timeError = 0;    /**< time uncertainty (r.m.s) in [ns] */
+    int m_pulseHeight = 0;    /**< pulse height [ADC counts] */
     float m_pulseWidth = 0;   /**< pulse width (FWHM) in [ns] */
+    int m_integral = 0;       /**< pulse integral [ADC counts] */
     unsigned short m_firstWindow = 0; /**< first ASIC window of the merged waveform */
+    EHitQuality m_quality = c_Junk;  /**< hit quality */
 
     static float s_doubleHitResolution; /**< double hit resolving time in [ns] */
     static float s_pileupTime; /**< pile-up time in [ns] */
 
-    ClassDef(TOPDigit, 12); /**< ClassDef */
+    ClassDef(TOPDigit, 13); /**< ClassDef */
 
   };
 

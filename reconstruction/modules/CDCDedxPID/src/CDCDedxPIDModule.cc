@@ -71,7 +71,7 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
   addParam("enableDebugOutput", m_enableDebugOutput,
            "Option to write out debugging information to CDCDedxTracks (DataStore objects).", true);
   addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.",
-           std::string("/data/reconstruction/dedxPID_PDFs_fbf2a31_500k_events.root"));
+           std::string("/data/reconstruction/dedxPID_PDFs_b6d3c44_500k_events.root"));
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 
   m_eventID = -1;
@@ -324,7 +324,7 @@ void CDCDedxPIDModule::event()
 
       // get the global wire ID (between 0 and 14336) and the layer info
       WireID wireID = cdcRecoHit->getWireID();
-      const int wire = wireID.getIWire();
+      const int wire = wireID.getEWire();
       int layer = cdcHit->getILayer();
       int superlayer = cdcHit->getISuperLayer();
       int currentLayer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer);

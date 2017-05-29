@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/SimpleCDCTrackSpacePointCombinationFilter.h>
+#include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointMatcher.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
@@ -18,6 +19,14 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+namespace {
+  template <class ARhs, class ALhs>
+  decltype(ARhs() % ALhs()) mod(ARhs a, ALhs b)
+  {
+    return (a % b + b) % b;
+  }
+}
 
 void SimpleCDCTrackSpacePointCombinationFilter::exposeParameters(ModuleParamList* moduleParamList,
     const std::string& prefix)
@@ -57,7 +66,28 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
     if (currentState.isOnOverlapLayer() or currentState.getNumberOfHolesOnNonOverlappingLayers() <= m_param_hitJumpingUpTo) {
       return 1;
     } else {
-      return std::nan("");
+      return NAN;
+    }
+  }
+
+  // Check the distance (in ladders and sensors) to the last hit and only allow those, which point "more or less" to
+  // the origin
+  if (not currentState.isOnOverlapLayer()) {
+    const auto* overlappingParent = currentState.getParent();
+    if (overlappingParent) {
+      const auto* lastLayerParent = overlappingParent->getParent();
+      if (lastLayerParent and lastLayerParent->getHit()) {
+        const VxdID& currentID = spacePoint->getVxdID();
+        const VxdID& lastID = lastLayerParent->getHit()->getVxdID();
+
+        const int deltaSensor = lastID.getSensorNumber() - currentID.getSensorNumber();
+        const int deltaLadder = mod(lastID.getLadderNumber() - currentID.getLadderNumber(),
+                                    CDCToSpacePointMatcher::maximumLadderNumbers[currentID.getLayerNumber()]);
+
+        if ((deltaSensor != 0 and deltaSensor != 1) or (deltaLadder > 5)) {
+          return NAN;
+        }
+      }
     }
   }
 

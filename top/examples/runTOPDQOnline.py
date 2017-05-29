@@ -14,8 +14,8 @@ roinput = register_module('SeqRootInput')
 main.add_module(roinput)
 
 # conversion from RawCOPPER or RawDataBlock to RawTOP
-converter = register_module('Convert2RawDet')
-main.add_module(converter)
+# converter = register_module('Convert2RawDet')
+# main.add_module(converter)
 
 # geometry parameters
 gearbox = register_module('Gearbox')
@@ -41,8 +41,13 @@ converter.param('useCommonT0Calibration', False)
 main.add_module(converter)
 
 # TOP's data quality module
-histomanager = register_module("HistoManager")
-main.add_module(histomanager)
+histo = register_module("HistoManager")
+# histo = register_module("DqmHistoManager")
+# histo.param('HostName', 'localhost')
+# histo.param('Port', 9991)
+# histo.param('DumpInterval', 1000)
+main.add_module(histo)
+
 dqm = register_module('TOPDataQualityOnline')
 main.add_module(dqm)
 

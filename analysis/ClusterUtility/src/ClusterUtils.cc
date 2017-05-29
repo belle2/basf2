@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <analysis/ClusterUtility/ClusterUtils.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
@@ -173,13 +174,22 @@ const TMatrixDSym ClusterUtils::GetCovarianceMatrix7x7FromCluster(const ECLClust
 // -----------------------------------------------------------------------------
 const TVector3 ClusterUtils::GetIPPosition()
 {
-
-  return m_beamParams->getVertex();
+  if (!m_beamParams) {
+    B2WARNING("Beam parameters not available, using (0, 0, 0) as IP position instead.");
+    return TVector3(0.0, 0.0, 0.0);
+  } else return m_beamParams->getVertex();
 }
 
 // -----------------------------------------------------------------------------
 const TMatrixDSym ClusterUtils::GetIPPositionCovarianceMatrix()
 {
+  if (!m_beamParams) {
+    B2WARNING("Beam parameters not available, using ((1, 0, 0), (0, 1, 0), (0, 0, 1)) as IP covariance matrix instead.");
 
-  return m_beamParams->getCovVertex();
+    TMatrixDSym covmat(3);
+    for (int i = 0; i < 3; ++i) {
+      covmat(i, i) = 1.0; // 1.0*1.0 cm^2
+    }
+    return covmat;
+  } else return m_beamParams->getCovVertex();
 }

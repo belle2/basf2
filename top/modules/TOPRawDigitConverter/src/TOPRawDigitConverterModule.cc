@@ -80,9 +80,9 @@ namespace Belle2 {
     addParam("calpulseWidthMax", m_calpulseWidthMax,
              "calpulse selection: maximal width [ns]", 0.0);
     addParam("calpulseHeightMin", m_calpulseHeightMin,
-             "calpulse selection: minimal height [ns]", 0);
+             "calpulse selection: minimal height [ADC counts]", 0);
     addParam("calpulseHeightMax", m_calpulseHeightMax,
-             "calpulse selection: maximal height [ns]", 0);
+             "calpulse selection: maximal height [ADC counts]", 0);
   }
 
 

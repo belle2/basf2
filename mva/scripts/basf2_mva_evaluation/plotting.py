@@ -595,6 +595,17 @@ class Box(Plotter):
     #: @var x_axis_label
     #: Label on x axis
 
+    def __init__(self, figure=None, axis=None):
+        """
+        Creates a new figure and axis if None is given, sets the default plot parameters
+        @param figure default draw figure which is used
+        @param axis default draw axis which is used
+        """
+        super().__init__(figure=figure, axis=axis)
+
+        #: Label on x axis
+        self.x_axis_label = ""
+
     def add(self, data, column, mask=None, weight_column=None):
         """
         Add a new boxplot to the plots

@@ -269,9 +269,6 @@ def add_cluster_expert_modules(path, components=None):
         KLMClassifier = register_module('KLMExpert')
         path.add_module(KLMClassifier)
 
-        ECLClassifier = register_module('ECLExpert')
-        path.add_module(ECLClassifier)
-
 
 def add_pid_module(path, components=None):
     """

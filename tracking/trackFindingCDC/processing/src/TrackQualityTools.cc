@@ -207,7 +207,7 @@ void TrackQualityTools::removeHitsAfterLayerBreak(CDCTrack& track, double m_maxi
 
   std::vector<std::vector<const CDCRecoHit3D*>> trackletList;
 
-  double lastArcLength2D = std::nan("");
+  double lastArcLength2D = NAN;
 
   std::vector<const CDCRecoHit3D*>* currentTracklet = nullptr;
 
@@ -346,7 +346,7 @@ void TrackQualityTools::removeArcLength2DHoles(CDCTrack& track, double m_maximum
     return;
   }
 
-  double lastArcLength2D = std::nan("");
+  double lastArcLength2D = NAN;
   bool removeAfterThis = false;
 
   for (const CDCRecoHit3D& recoHit : track) {

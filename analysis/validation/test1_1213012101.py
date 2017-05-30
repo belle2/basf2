@@ -45,7 +45,8 @@ matchMCTruth('B-:dk')
 # buildContinuumSuppression('B-:dk')
 
 toolsBDk = ['EventMetaData', 'B-']
-toolsBDk += ['InvMass', '^B- -> [^D0:kspi0 -> ^K_S0:all ^pi0:all] ^K-:all']
+toolsBDk += ['InvMass', '^B- -> [^D0:kspi0 -> ^K_S0:all pi0:all] ^K-:all']
+toolsBDk += ['InvMass[BeforeFit]', 'B- -> [D0:kspi0 -> K_S0:all ^pi0:all] K-:all']
 toolsBDk += ['DeltaEMbc', '^B-']
 # toolsBDk += ['CustomFloats[isSignal]', '^B-']
 # toolsBDk += ['CustomFloats[isNotContinuumEvent]', '^B-']

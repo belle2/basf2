@@ -53,7 +53,6 @@
 #include <G4VTouchable.hh>
 #include <G4TouchableHandle.hh>
 #include <G4NavigationHistory.hh>
-#include <G4AffineTransform.hh>
 #include <G4ParticleTable.hh>
 #include <G4ErrorPropagatorData.hh>
 #include <G4ErrorFreeTrajState.hh>
@@ -85,6 +84,7 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_MuidInitialized(false), // initialized later
   m_MeanDt(0.0), // initialized later
   m_MaxDt(0.0), // initialized later
+  m_MagneticField(0.0), // initialized later
   m_MaxDistSqInVariances(0.0), // initialized later
   m_MaxKLMTrackClusterDistance(0.0), // initialized later
   m_MaxECLTrackClusterDistance(0.0), // initialized later
@@ -172,6 +172,9 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
   tracks.registerRelationTo(extHits);
   RecoTrack::registerRequiredRelations(recoTracks);
 
+  // Save the magnetic field z component (gauss) at the origin
+  m_MagneticField = BFieldManager::getField(B2Vector3D(0, 0, 0)).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss;
+
   // Convert user cutoff values to geant4 units
   m_MinPt = max(0.0, minPt) * CLHEP::GeV;
   m_MinKE = max(0.0, minKE) * CLHEP::GeV;
@@ -193,9 +196,8 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
   double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
   m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
-  GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
-  double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2") * CLHEP::cm; // mm
-  m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
+  double r = 400.0 * CLHEP::mm;
+  m_MinRadiusSq = r * r;
 
 }
 
@@ -241,6 +243,9 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_MeanDt = meanDt;
   m_MaxDt = maxDt;
 
+  // Save the magnetic field z component (gauss) at the origin
+  m_MagneticField = BFieldManager::getField(B2Vector3D(0, 0, 0)).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss;
+
   // Convert from sigma to variance for hit-position uncertainty
   m_MaxDistSqInVariances = maxKLMTrackHitDistance * maxKLMTrackHitDistance;
 
@@ -270,8 +275,8 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   // Set up the MUID-specific geometry
   bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();
   const EKLM::GeometryData& eklmGeometry = EKLM::GeometryData::Instance();
-  m_MinRadiusSq = bklmGeometry->getSolenoidOuterRadius() * CLHEP::cm * 0.2; // roughly 400 mm
-  m_MinRadiusSq *= m_MinRadiusSq;
+  double r = bklmGeometry->getSolenoidOuterRadius() * CLHEP::cm * 0.2; // roughly 400 mm
+  m_MinRadiusSq = r * r;
   m_BarrelHalfLength = bklmGeometry->getHalfLength() * CLHEP::cm; // in G4 units (mm)
   m_EndcapHalfLength = 0.5 * eklmGeometry.getEndcapPosition()->getLength(); // in G4 units (mm)
   m_OffsetZ = bklmGeometry->getOffsetZ() * CLHEP::cm; // in G4 units (mm)
@@ -400,7 +405,6 @@ void TrackExtrapolateG4e::event(bool byMuid)
       eclClusterInfo[c].second = G4ThreeVector(eclClusters[c]->getClusterPosition().X(),
                                                eclClusters[c]->getClusterPosition().Y(),
                                                eclClusters[c]->getClusterPosition().Z()) * CLHEP::cm;
-      //std::cout << "   " << c << ": r=(" << eclClusterInfo[c].second.x() << ", " << eclClusterInfo[c].second.y() << ", " << eclClusterInfo[c].second.z() << ")" << std::endl;
     }
     StoreArray<KLMCluster> klmClusters(*m_KLMClustersColName);
     std::vector<std::pair<KLMCluster*, G4ThreeVector> > klmClusterInfo(klmClusters.getEntries());
@@ -692,7 +696,6 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
           double f = postD / (postD - preD);
           G4ThreeVector midPos = pos + (prePos - pos) * f;
           double tof = extState.tof + dt * f * (extState.isCosmic ? +1 : -1); // in ns, at end of step
-          //std::cout << "Cross ECL plane: pre=(" << prePos.x() << ", " << prePos.y() << ", " << prePos.z() << ", " << prePos.mag() << ")  post=(" << pos.x() << ", " << pos.y() << ", " << pos.z() << ", " << pos.mag() << ")  f=" << f << "  mid=(" << midPos.x()*10 << ", " << midPos.y()*10 << ", " << midPos.z()*10 << ", " << midPos.mag() << ")" << std::endl;
           G4ErrorSymMatrix covariance(6);
           fromG4eToPhasespace(g4eState, covariance);
           eclHit[c].update(EXT_ECLCROSS, tof, midPos / CLHEP::cm, mom / CLHEP::GeV, covariance);
@@ -1029,27 +1032,38 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
     extState.isCosmic = true;
     extState.tof = firstState.getTime(); // DIVOT: must be revised when IP profile (reconstructed beam spot) become available!
   }
+
   G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
   if (pdgCode != trackRep->getPDG()) {
     double pSq = lastMomentum.Mag2();
     double mass = particle->GetPDGMass() / CLHEP::GeV;
     extState.tof *= sqrt((pSq + mass * mass) / (pSq + lastState.getMass() * lastState.getMass()));
   }
-  G4ThreeVector directionAtIP(firstMomentum.Unit().X(), firstMomentum.Unit().Y(), firstMomentum.Unit().Z());
-  double Bz = BFieldManager::getField(B2Vector3D(0, 0, 0)).Z() / Unit::T * CLHEP::tesla / CLHEP::gauss; // Bz in gauss
-  if (Bz != 0.0) {
-    double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) / (CLHEP::c_light * charge * Bz); // in cm
-    double centerPhi = directionAtIP.phi() - M_PI_2;
+
+  extState.directionAtIP.set(firstMomentum.Unit().X(), firstMomentum.Unit().Y(), firstMomentum.Unit().Z());
+  if (m_MagneticField != 0.0) { // in gauss
+    double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) / (CLHEP::c_light * charge * m_MagneticField); // in cm
+    double centerPhi = extState.directionAtIP.phi() - M_PI_2;
     double centerX = firstPosition.X() + radius * cos(centerPhi);
     double centerY = firstPosition.Y() + radius * sin(centerPhi);
     double pocaPhi = atan2(charge * centerY, charge * centerX) + M_PI;
-    double ipPerp = directionAtIP.perp();
+    double ipPerp = extState.directionAtIP.perp();
     if (ipPerp > 0.0) {
-      directionAtIP.setX(+sin(pocaPhi) * ipPerp);
-      directionAtIP.setY(-cos(pocaPhi) * ipPerp);
+      extState.directionAtIP.setX(+sin(pocaPhi) * ipPerp);
+      extState.directionAtIP.setY(-cos(pocaPhi) * ipPerp);
     }
+  } else {
+    // No field: replace flaky covariance matrix with a diagonal one measured in 1.5T field
+    // for a 10 GeV/c track ... and replace momentum magnitude with fixed 10 GeV/c
+    lastCov *= 0.0;
+    lastCov[0][0] = 5.0E-5;
+    lastCov[1][1] = 1.0E-7;
+    lastCov[2][2] = 5.0E-4;
+    lastCov[3][3] = 3.5E-3;
+    lastCov[4][4] = 3.5E-3;
+    lastMomentum = lastMomentum.Unit() * 10.0;
   }
-  extState.directionAtIP = directionAtIP;
+
   G4ThreeVector posG4e(lastPosition.X() * CLHEP::cm, lastPosition.Y() * CLHEP::cm,
                        lastPosition.Z() * CLHEP::cm); // in Geant4 units (mm)
   G4ThreeVector momG4e(lastMomentum.X() * CLHEP::GeV, lastMomentum.Y() * CLHEP::GeV,
@@ -1058,6 +1072,7 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
   fromPhasespaceToG4e(lastMomentum, lastCov, covG4e); // in Geant4e units (GeV/c, cm)
   g4eState.SetData("g4e_" + particle->GetParticleName(), posG4e, momG4e);
   g4eState.SetError(covG4e);
+
   return extState;
 }
 
@@ -1322,10 +1337,6 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
   // Adjust geant4e's position, momentum and covariance based on matching hit and tell caller to update the geant4e state.
   if (intersection.chi2 >= 0.0) {
     StoreArray<MuidHit> muidHits(*m_MuidHitsColName);
-    // BEGIN DIVOT until MuidHit is updated to accept the Intersection structure
-    // MuidHit* muidHit = muidHits.appendNew(extState.pdgCode, intersection.inBarrel, intersection.isForward, intersection.sector,
-    //                                       intersection.layer, intersection.position,
-    //                                       intersection.positionAtHitPlane, extState.tof, intersection.time, intersection.chi2);
     TVector3 tpos(intersection.position.x(), intersection.position.y(), intersection.position.z());
     TVector3 tposAtHitPlane(intersection.positionAtHitPlane.x(),
                             intersection.positionAtHitPlane.y(),
@@ -1333,7 +1344,6 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
     MuidHit* muidHit = muidHits.appendNew(extState.pdgCode, intersection.inBarrel, intersection.isForward, intersection.sector,
                                           intersection.layer, tpos,
                                           tposAtHitPlane, extState.tof, intersection.time, intersection.chi2);
-    // END DIVOT
     if (extState.track != NULL) { extState.track->addRelationTo(muidHit); }
     G4Point3D newPos(intersection.position.x() * CLHEP::cm,
                      intersection.position.y() * CLHEP::cm,
@@ -1659,6 +1669,11 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
   G4ErrorSymMatrix hitCov(2); // initialized to all zeroes
   hitCov[0][0] = localVariance[0];
   hitCov[1][1] = localVariance[1];
+  // No magnetic field: increase the hit uncertainty
+  if (m_MagneticField == 0.0) {
+    hitCov[0][0] *= 10.0;
+    hitCov[1][1] *= 10.0;
+  }
 
 // Now get the correction matrix: combined covariance of EXT and KLM hit.
 // 1st dimension = nB, 2nd dimension = nC.

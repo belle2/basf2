@@ -86,7 +86,7 @@ namespace Belle2 {
     TEfficiency* m_fakeMom;
 
     /** output path   */
-    std::string m_outPath = "KlongValidationData.root";
+    std::string m_outPath = "nightlyKlongValidation.root";
 
     /** root tree etc. */
     TFile* m_f = nullptr;  //

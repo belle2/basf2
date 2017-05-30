@@ -55,7 +55,7 @@ namespace KlIdHelpers {
     return 0;
   }
 
-
+  /** checks if a cluster is signal under the mcWeightcondition (mcWeight = energy deposition) */
   bool isKLMClusterSignal(const Belle2::KLMCluster& cluster, float mcWeigthCut = 0.66)
   {
     const auto mcParticleWeightPair = cluster.getRelatedToWithWeight<Belle2::MCParticle>();
@@ -68,6 +68,7 @@ namespace KlIdHelpers {
       return false;
     }
   }
+  /** checks if a cluster is signal under the mcWeightcondition (mcWeight = energy deposition) */
   bool isECLClusterSignal(const Belle2::ECLCluster& cluster, float mcWeigthCut = 0.66)
   {
     const auto mcParticleWeightPair = cluster.getRelatedToWithWeight<Belle2::MCParticle>();

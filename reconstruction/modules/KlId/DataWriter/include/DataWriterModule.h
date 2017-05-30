@@ -90,7 +90,7 @@ namespace Belle2 {
     Float_t m_KLMTrackRotationAngle;
     /** angle between trach momentum and cluster (measured from ip) */
     Float_t m_KLMTrackClusterSepAngle;
-
+    /** angle between KLMcluster and Mcparticle */
     Float_t m_KLMAngleToMC    ;
 
 

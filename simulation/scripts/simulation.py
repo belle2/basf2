@@ -34,18 +34,18 @@ def check_simulation(path):
                 % (", ".join(required), ", ".join(found)))
 
 
-def add_PXDDataReduction(path, components=None):
+def add_PXDDataReduction(path, components, use_vxdtf2=False):
 
     pxd_unfiltered_digits = 'pxd_unfiltered_digits'
     pxd_digitizer = register_module('PXDDigitizer')
     pxd_digitizer.param('Digits', pxd_unfiltered_digits)
     path.add_module(pxd_digitizer)
 
-    # SVD+CDC tracking
+    # SVD tracking
 
     svd_reco_tracks = '__ROIsvdRecoTracks'
 
-    add_tracking_for_PXDDataReduction_simulation(path, ['SVD', 'CDC'], False)
+    add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2)
 
     pxdDataRed = register_module('PXDDataReduction')
     param_pxdDataRed = {
@@ -72,7 +72,14 @@ def add_PXDDataReduction(path, components=None):
     path.add_module(pxd_digifilter)
 
 
-def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None, bkgscale=1.0, usePXDDataReduction=False):
+def add_simulation(
+        path,
+        components=None,
+        bkgfiles=None,
+        bkgcomponents=None,
+        bkgscale=1.0,
+        usePXDDataReduction=True,
+        use_vxdtf2=False):
     """
     This function adds the standard simulation modules to a path.
     """
@@ -127,8 +134,7 @@ def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None, bkg
     # PXD digitization
     if components is None or 'PXD' in components:
         if usePXDDataReduction:
-            # if 'SVD' in components:
-            add_PXDDataReduction(path, components)
+            add_PXDDataReduction(path, components, use_vxdtf2)
         else:
             pxd_digitizer = register_module('PXDDigitizer')
             path.add_module(pxd_digitizer)
@@ -164,7 +170,7 @@ def add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None, bkg
 
 
 def add_cosmics_simulation(path, components=None, globalBoxSize=["20", "20", "9"], acceptBox=[8, 8, 8],
-                           keepBox=[8, 8, 8], usePXDDataReduction=False):
+                           keepBox=[8, 8, 8], usePXDDataReduction=False, use_vxdtf2=False):
     """
     This function adds the cosmic simulation modules to a path.
     CRY generator is used to generate cosmic rays.
@@ -245,8 +251,7 @@ def add_cosmics_simulation(path, components=None, globalBoxSize=["20", "20", "9"
     # PXD digitization
     if components is None or 'PXD' in components:
         if usePXDDataReduction:
-            # if 'SVD' in components:
-            add_PXDDataReduction(path, components)
+            add_PXDDataReduction(path, components, use_vxdtf2)
         else:
             pxd_digitizer = register_module('PXDDigitizer')
             path.add_module(pxd_digitizer)

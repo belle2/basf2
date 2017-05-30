@@ -699,25 +699,18 @@ def is_cdc_used(components):
     return components is None or 'CDC' in components
 
 
-def add_tracking_for_PXDDataReduction_simulation(path, components=None, skipGeometryAdding=False):
+def add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2=False):
     """
     This function adds the standard reconstruction modules for tracking to be used for the simulation of PXD data reduction
     to a path.
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components, always exclude the PXD.
-    :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
-        if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
-        determine, if the geometry is already loaded. This flag can be used o just turn off the geometry adding at
-        all (but you will have to add it on your own then).
+    :param use_vxdtf2: true if VXDTF2 is used instead of VXDTF1
     """
 
-    if not is_svd_used(components) and not is_cdc_used(components):
+    if not is_svd_used(components):
         return
-
-    if not skipGeometryAdding:
-        # Add the geometry in all trigger modes if not already in the path
-        add_geometry_modules(path, components)
 
     # Material effects
     if 'SetupGenfitExtrapolation' not in path:
@@ -726,35 +719,15 @@ def add_tracking_for_PXDDataReduction_simulation(path, components=None, skipGeom
         path.add_module(material_effects)
 
     # SET StoreArray names
-    svd_tracks = '__ROIsvdTracks'
-    svd_track_fit_results = "__ROIsvdTrackFitResults"
     svd_reco_tracks = "__ROIsvdRecoTracks"
-    svd_gf_trackcands = '__ROIsvdGFTrackCands'
 
     # SVD ONLY TRACK FINDING
-    vxd_trackfinder = path.add_module('VXDTF')
-    vxd_trackfinder.set_name('SVD-only VXDTF')
-    vxd_trackfinder.param('GFTrackCandidatesColName', svd_gf_trackcands)
-    vxd_trackfinder.param('TESTERexpandedTestingRoutines', False)
-    vxd_trackfinder.param('sectorSetup',
-                          ['shiftedL3IssueTestSVDStd-moreThan400MeV_SVD',
-                           'shiftedL3IssueTestSVDStd-100to400MeV_SVD',
-                           'shiftedL3IssueTestSVDStd-25to100MeV_SVD'
-                           ])
-    vxd_trackfinder.param('tuneCutoffs', 0.06)
-
-    # Convert VXD trackcands to reco tracks
-    # not in the path yet, wait for the transition to RecoTracks before
-    recoTrackCreator = register_module("RecoTrackCreator")
-    recoTrackCreator.param('trackCandidatesStoreArrayName', svd_gf_trackcands)
-    recoTrackCreator.param('recoTracksStoreArrayName', svd_reco_tracks)
-    recoTrackCreator.param('recreateSortingParameters', True)
-    path.add_module(recoTrackCreator)
+    if(use_vxdtf2):
+        add_vxd_track_finding_vxdtf2(path, components=['SVD'], reco_tracks=svd_reco_tracks, suffix="__ROI")
+    else:
+        add_vxd_track_finding(path, components=['SVD'], reco_tracks=svd_reco_tracks, suffix="__ROI")
 
     # TRACK FITTING
-
-    # Correct time seed - needed?
-    # path.add_module("IPTrackTimeEstimator", useFittedInformation=False)
 
     # track fitting
     dafRecoFitter = register_module("DAFRecoFitter")

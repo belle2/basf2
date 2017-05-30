@@ -90,7 +90,7 @@ SectorMapBootstrapModule::initialize()
 
   if (m_readSecMapFromDB)
     retrieveSectorMapFromDB();
-  if (m_readSectorMap)
+  else if (m_readSectorMap)
     retrieveSectorMap();
   else
     bootstrapSectorMap();

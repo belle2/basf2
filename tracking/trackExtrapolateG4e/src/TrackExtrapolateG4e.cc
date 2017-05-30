@@ -196,8 +196,7 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
   double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
   m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
-  bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();
-  double r = bklmGeometry->getSolenoidOuterRadius() * CLHEP::cm * 0.2; // roughly 400 mm
+  double r = 400.0 * CLHEP::mm;
   m_MinRadiusSq = r * r;
 
 }

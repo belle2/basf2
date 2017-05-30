@@ -45,6 +45,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sys/statvfs.h>
+#include <zlib.h>
 
 using namespace Belle2;
 
@@ -91,19 +92,9 @@ public:
   int getFileId() { return m_fileid; }
 
 public:
-  int open(const std::string& dir, int ndisks, int expno, int runno)
+  int open(const std::string& dir, int ndisks, int expno, int runno, int fileid)
   {
-    try {
-      m_db.connect();
-      DBObject obj = DBObjectLoader::load(m_db, g_table, m_host + ":");
-      if (obj.hasValue("fileid")) {
-        m_fileid = (obj.hasValue("fileid")) ? obj.getInt("fileid") + 1 : 0;
-        m_diskid = (obj.hasValue("diskid")) ? obj.getInt("diskid") : 1;
-      }
-      m_db.close();
-    } catch (const DBHandlerException& e) {
-      LogFile::warning("Failed to access db for read: %s", e.what());
-    }
+    m_fileid = fileid;
     char filename[1024];
     bool available = false;
     for (int i = 0; i < ndisks; i++) {
@@ -118,11 +109,11 @@ public:
         fin >> flag;
         if (flag != 1) {
           available = true;
-          B2INFO("disk : " << m_diskid << " is available");
+          std::cout << "[DEBUG] disk : " << m_diskid << " is available" << std::endl;
           break;
         }
         fin.close();
-        B2INFO("disk : " << m_diskid << " is still full");
+        std::cout << "[DEBUG] disk : " << m_diskid << " is still full" << std::endl;
       } else {
         sprintf(filename, "%s%02d/storage/full_flag", dir.c_str(), m_diskid);
         std::ofstream fout(filename);
@@ -133,7 +124,10 @@ public:
       m_diskid++;
       if (m_diskid > ndisks) m_diskid = 1;
     }
-    if (!available) B2FATAL("No disk available for writing");
+    if (!available) {
+      B2FATAL("No disk available for writing");
+      exit(1);
+    }
     if (m_fileid > 0) {
       sprintf(filename, "%s%02d/storage/%s.%4.4d.%6.6d.sroot-%d",
               dir.c_str(), m_diskid, m_runtype.c_str(), expno, runno, m_fileid);
@@ -144,27 +138,17 @@ public:
     m_file = ::open(filename,  O_WRONLY | O_CREAT | O_EXCL, 0664);
     m_path = filename;
     if (m_file < 0) {
-      B2ERROR("Failed to open file : " << filename);
+      B2FATAL("Failed to open file : " << filename);
       exit(1);
     }
-    B2INFO("New file " << filename << " is opened");
-    DBObject obj;
-    m_configname = m_host + StringUtil::form("%s:%04d:%06d:%04d", m_runtype.c_str(), expno, runno, m_fileid);
-    obj.setName(m_configname);
-    obj.addText("host", m_host);
-    obj.addText("path", filename);
-    obj.addText("runtype", m_runtype);
-    obj.addInt("expno", expno);
-    obj.addInt("runno", runno);
-    obj.addInt("fileid", m_fileid);
-    obj.addInt("diskid", m_diskid);
-    DBObjectLoader::createDB(m_db, g_table, m_configname);
+    std::cout << "[DEBUG] New file " << filename << " is opened" << std::endl;
     return m_id;
   }
 
   void close()
   {
     if (m_file > 0) {
+      std::cout << "[DEBUG] File closed" << std::endl;
       ::close(m_file);
     }
   }
@@ -251,6 +235,7 @@ int main(int argc, char** argv)
   SharedEventBuffer::Header iheader;
   int ecount = 0;
   bool newrun = false;
+  unsigned int fileid = 0;
   while (true) {
     if (use_info) info.reportRunning();
     ibuf.read(evtbuf, true, &iheader);
@@ -262,6 +247,7 @@ int main(int argc, char** argv)
       isnew = true;
       expno = iheader.expno;
       runno = iheader.runno;
+      fileid = 0;
       if (use_info) {
         info.setExpNumber(expno);
         info.setRunNumber(runno);
@@ -279,7 +265,8 @@ int main(int argc, char** argv)
       oheader->runno = runno;
       obuf.unlock();
       if (file) file.close();
-      file.open(path, ndisks, expno, runno);
+      file.open(path, ndisks, expno, runno, fileid);
+      fileid++;
     }
     if (use_info) {
       info.addInputCount(1);
@@ -289,7 +276,8 @@ int main(int argc, char** argv)
       if (nbyte_out > MAX_FILE_SIZE) {
         file.close();
         nbyte_out = 0;
-        file.open(path, ndisks, expno, runno);
+        file.open(path, ndisks, expno, runno, fileid);
+        fileid++;
       }
       file.write((char*)evtbuf, nbyte);
       nbyte_out += nbyte;

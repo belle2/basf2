@@ -139,6 +139,21 @@ def add_standard_finder(path):
     tracking.add_track_finding(path, components=components)
 
 
+def add_cosmics_finder(path):
+    import tracking
+    components = None
+    for module in path.modules():
+        if module.type() == "Geometry":
+            components = utilities.get_module_param(module, "components")
+    if not components:
+        components = None
+
+    if 'SetupGenfitExtrapolation' not in path:
+        path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
+
+    tracking.add_cr_tracking_reconstruction(path, components=components)
+
+
 def add_standard_reconstruction(path):
     import reconstruction
     components = None
@@ -149,12 +164,26 @@ def add_standard_reconstruction(path):
         components = None
     reconstruction.add_reconstruction(path, components=components)
 
+
+def add_cosmics_reconstruction(path):
+    import reconstruction
+    components = None
+    for module in path.modules():
+        if module.type() == "Geometry":
+            components = utilities.get_module_param(module, "components")
+    if not components:
+        components = None
+    reconstruction.add_cosmics_reconstruction(path, components=components)
+
 finder_modules_by_short_name = {
     'MC': 'TrackFinderMCTruthRecoTracks',
     'Reconstruction': add_standard_reconstruction,
+    'CosmicsReconstruction': add_cosmics_reconstruction,
     'TrackFinder': add_standard_finder,
+    'CosmicsTrackFinder': add_cosmics_finder,
     'TrackFinderVXD': tracking.add_vxd_track_finding,
     'TFCDC': lambda path: tracking.add_cdc_track_finding(path, with_ca=True),
+    'TFCDC_Cosmics': lambda path: tracking.add_cdc_cr_track_finding(path),
     'TFCDC_Global': tracking.add_cdc_track_finding,
     'TFCDC_Ca': lambda path: (path.add_module('TFCDC_WireHitPreparer',
                                               flightTimeEstimation="outwards"),

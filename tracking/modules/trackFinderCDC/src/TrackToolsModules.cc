@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Oliver Frost                                             *
+ * Contributors: Oliver Frost, Nils Braun                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,8 +19,14 @@ REG_MODULE(TFCDC_TrackQualityAsserter);
 REG_MODULE(TFCDC_TrackOrienter);
 REG_MODULE(TFCDC_TrackFlightTimeAdjuster);
 REG_MODULE(TFCDC_TrackExporter);
+REG_MODULE(TFCDC_CosmicsTrackMerger);
 
 TFCDC_TrackRejecterModule::TFCDC_TrackRejecterModule()
+  : Super( {"CDCTrackVector"})
+{
+}
+
+TFCDC_CosmicsTrackMergerModule::TFCDC_CosmicsTrackMergerModule()
   : Super( {"CDCTrackVector"})
 {
 }

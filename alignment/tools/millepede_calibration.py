@@ -64,6 +64,17 @@ if __name__ == '__main__':
                     millepede.fixVXDid(layer, ladder, sensor)
                     pass
 
+    if args.scenario == 'VXDAlignmentFullHierarchy':
+        millepede = MillepedeCalibration(
+            ['VXDAlignment'],
+            magnet=magnet,
+            primary_vertices=['Z0:mumu'],
+            particles=['mu+:bbmu'],
+            tracks=['CosmicRecoTracks'])
+        millepede.algo.invertSign()
+        millepede.algo.steering().command('Fortranfiles')
+        millepede.algo.steering().command('constraints.txt')
+
     if args.scenario == 'VXDAlignment':
         millepede = MillepedeCalibration(
             ['VXDAlignment'],
@@ -72,10 +83,19 @@ if __name__ == '__main__':
             particles=['mu+:bbmu'],
             tracks=['CosmicRecoTracks'])
         millepede.algo.invertSign()
-        # Add the constraints (auto-generated from hierarchy), so you can
-        # play with unfixing degrees of freedom below
-        # millepede.algo.steering().command('Fortranfiles')
-        # millepede.algo.steering().command('constraints.txt')
+
+        millepede.fixSVDPat()
+        millepede.fixSVDMat()
+        millepede.fixPXDYing()
+        millepede.fixPXDYang()
+        for layer in range(1, 7):
+            for ladder in range(1, 17):
+                # Fix also all ladders
+                millepede.fixVXDid(layer, ladder, 0)
+                for sensor in range(1, 6):
+                    # Fix all sensors
+                    # millepede.fixVXDid(layer, ladder, sensor)
+                    pass
         millepede.fixVXDid(1, 1, 1)
 
     if args.scenario == 'CDCLayerAlignment':

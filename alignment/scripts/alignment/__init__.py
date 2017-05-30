@@ -19,6 +19,9 @@ class MillepedeCalibration():
         primary_vertices are names of ParticleLists with at least two body decays fitted with beam+vertex constraint
         """
 
+        if (tracks is None) and (particles is None) and (vertices is None) and (primary_vertices is None):
+            tracks = ['']
+
         if particles is None:
             particles = []
 
@@ -27,9 +30,6 @@ class MillepedeCalibration():
 
         if primary_vertices is None:
             primary_vertices = []
-
-        if tracks is None:
-            tracks = ['']
 
         self.components = components
         self.parameters = []
@@ -48,7 +48,7 @@ class MillepedeCalibration():
         self.algo.steering().command('outlierdownweighting 3')
         self.algo.steering().command('dwfractioncut 0.1')
 
-        calibrate_vertex = ((components == []) or ('BeamParameters' in components)) and primary_vertices is not None
+        calibrate_vertex = ((components == []) or ('BeamParameters' in components))
 
         self.collector = register_module('MillepedeCollector',
                                          minPValue=0.,

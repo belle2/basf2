@@ -40,10 +40,12 @@ ana.fillParticleList('mu+:qed', 'muid > 0.1 and useLabFrame(p) > 2.', True, main
 ana.reconstructDecay('Z0:mumu -> mu-:qed mu+:qed', '', writeOut=True, path=main)
 ana.vertexRaveDaughtersUpdate('Z0:mumu', 0.0, path=main, constraint='ipprofile')
 
-# ana.matchMCTruth('Z0:mumu', main)
-# ana.matchMCTruth('mu+:good', main)
+ana.matchMCTruth('Z0:mumu', main)
+ana.matchMCTruth('mu+:good', main)
 
-# ana.printVariableValues('Z0:mumu', ['E', 'deltaE', 'M', 'mcPDG'], path=main)
+ana.printVariableValues('Z0:mumu', ['E', 'deltaE', 'M', 'mcPDG'], path=main)
+ana.printVariableValues('mu+:qed', ['E', 'p', 'mcPDG'], path=main)
+ana.printVariableValues('mu-:qed', ['E', 'p', 'mcPDG'], path=main)
 
 main.add_module("Progress")
 main.add_module("RootOutput")

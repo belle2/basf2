@@ -53,7 +53,11 @@ def add_unpackers(path, components=DEFAULT_HLT_COMPONENTS):
         path.add_module("SVDClusterizer")
 
 
-def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None, components=DEFAULT_HLT_COMPONENTS):
+def add_softwaretrigger_reconstruction(
+        path,
+        store_array_debug_prescale=None,
+        components=DEFAULT_HLT_COMPONENTS,
+        additionalTrackFitHypotheses=[]):
     """
     Add all modules, conditions and conditional paths to the given path, that are needed for a full
     reconstruction stack in the HLT using the software trigger modules. Several steps are performed:
@@ -100,7 +104,7 @@ def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None, co
 
     # Add fast reco reconstruction
     reconstruction.add_reconstruction(fast_reco_reconstruction_path, trigger_mode="fast_reco", skipGeometryAdding=True,
-                                      components=components)
+                                      components=components, additionalTrackFitHypotheses=additionalTrackFitHypotheses)
 
     # Add fast reco cuts
     fast_reco_cut_module = add_fast_reco_software_trigger(fast_reco_reconstruction_path, store_array_debug_prescale)
@@ -118,7 +122,7 @@ def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None, co
 
     # Add hlt reconstruction
     reconstruction.add_reconstruction(hlt_reconstruction_path, trigger_mode="hlt", skipGeometryAdding=True,
-                                      components=components)
+                                      components=components, additionalTrackFitHypotheses=additionalTrackFitHypotheses)
     hlt_cut_module = add_hlt_software_trigger(hlt_reconstruction_path, store_array_debug_prescale)
 
     # Fill the calibration_and_store_only_rawdata_path path

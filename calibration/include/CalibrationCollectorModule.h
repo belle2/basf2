@@ -47,7 +47,7 @@ namespace Belle2 {
     /// Replacement for event(). Fill you calibration data objects here
     virtual void collect() {}
     /// Replacement for beginRun(). Do anything you would normally do in beginRun here
-    virtual void prepareRun() {}
+    virtual void startRun() {}
 
     /// Register object with name, takes ownership, do not access the pointer beyond prepare()
     template <class T>
@@ -87,8 +87,11 @@ namespace Belle2 {
 
     /// Whether or not we will run the collect() function, basically skips the event() function if false
     bool m_runCollect = true;
-    /// How many events processed this run so far
-    unsigned int m_eventNumInRun = 0;
+    /// How many events processed for each ExpRun so far, stops counting up once max is hit
+    /// Only used/incremented if m_maxEventsPerRun > -1
+    std::map<std::pair<int, int>, int> m_expRunEvents;
+    /// Will point at correct value in m_expRunEvents
+    int* m_eventsCollectedInRun;
   };
 } // Belle2 namespace
 

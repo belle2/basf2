@@ -54,6 +54,12 @@ namespace Belle2 {
     void importSimulationParams();
 
     /**
+     * Import reconstruction parameters (for now only initializes "default" values and imports)
+     */
+    void importReconstructionParams();
+
+
+    /**
      * Print simulation parameters from the database (QE curve, etc.)
      */
     void printSimulationPar();

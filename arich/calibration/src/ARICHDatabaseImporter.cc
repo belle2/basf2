@@ -28,6 +28,7 @@
 #include <arich/dbobjects/ARICHMergerMapping.h>
 #include <arich/dbobjects/ARICHCopperMapping.h>
 #include <arich/dbobjects/ARICHSimulationPar.h>
+#include <arich/dbobjects/ARICHReconstructionPar.h>
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 
 // channel histogram
@@ -244,6 +245,18 @@ void ARICHDatabaseImporter::importChannelMask()
 
 }
 
+
+void ARICHDatabaseImporter::importReconstructionParams()
+{
+  ARICHReconstructionPar recPar;
+  recPar.initializeDefault();
+
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  DBImportObjPtr<ARICHReconstructionPar> importObj;
+  importObj.construct(recPar);
+  importObj.import(iov);
+
+}
 
 void ARICHDatabaseImporter::importSimulationParams()
 {

@@ -35,9 +35,9 @@ main.add_module(kkgeninput)
 sim.add_simulation(main)
 reco.add_reconstruction(main, pruneTracks=False)
 
-ana.fillParticleList('mu+:good', 'muid > 0.1 and useLabFrame(p) > 4.', True, main)
+ana.fillParticleList('mu+:qed', 'muid > 0.1 and useLabFrame(p) > 2.', True, main)
 
-ana.reconstructDecay('Z0:mumu -> mu-:good mu+:good', '', writeOut=True, path=main)
+ana.reconstructDecay('Z0:mumu -> mu-:qed mu+:qed', '', writeOut=True, path=main)
 ana.vertexRaveDaughtersUpdate('Z0:mumu', 0.0, path=main, constraint='ipprofile')
 
 # ana.matchMCTruth('Z0:mumu', main)

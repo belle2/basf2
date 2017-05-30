@@ -26,7 +26,7 @@ main.add_module('EvtGenInput')
 sim.add_simulation(main)
 reco.add_reconstruction(main, pruneTracks=False)
 
-ana.fillParticleList('mu+:bbmu', 'muid > 0.5 and useLabFrame(p) > 0.5', True, main)
+ana.fillParticleList('mu+:bbmu', 'muid > 0.1 and useLabFrame(p) > 0.5', True, main)
 
 main.add_module("Progress")
 main.add_module("RootOutput")

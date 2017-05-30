@@ -15,7 +15,7 @@ from ROOT import Belle2
 import alignment.misalignment as misalignment
 
 deformations = []
-deformations.append(misalignment.RadialExpansion(1.))
+deformations.append(misalignment.Bowing(0.0003))
 # deformations.append(misalignment.Curl(0.001, 0.)) # Curl can have two parameters
 # deformations.append(misalignment.Twist(0.001))
 

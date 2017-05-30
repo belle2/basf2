@@ -35,19 +35,24 @@ namespace Belle2 {
     /**
      * saves the smallest pull
      */
-    void setSmallestPulls(const std::vector<float> pulls, const std::vector<int> bestpeaks = {})
+    void setSmallestPulls(const std::vector<float>& pulls, const std::vector<int>& bestpeaks = {})
     {
       m_smallest_pulls = pulls;
       m_ks1 = bestpeaks; // optional
     }
-    void setPullsFromSmallestDiff(const std::vector<float> pulls, const std::vector<int> bestpeaks = {})
+    void setPullsFromSmallestDiff(const std::vector<float>& pulls, const std::vector<int>& bestpeaks = {})
     {
       m_pulls_from_smallest = pulls;
       m_ks2 = bestpeaks; // optional
     }
+    void setPullsFromWeightedAve(const std::vector<double>& pulls)
+    {
+      m_pulls_from_weighted = pulls;
+    }
     std::vector<float> m_smallest_pulls; /**< the smallest pulls */
     std::vector<int> m_ks1; /**< the index of the peak giving the smallest pull */
     std::vector<float> m_pulls_from_smallest; /**< the pulls from the closest peak */
+    std::vector<double> m_pulls_from_weighted; /**< the pulls from the weighted average of all peaks */
     std::vector<int> m_ks2; /**< the index of the closest pull */
 
   private:

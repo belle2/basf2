@@ -264,15 +264,24 @@ namespace Belle2 {
         float position = 0, width = 0, numPhotons = 0; //, this_pull = 0;
         vector<float> smallest_pulls(digits.getEntries(), 10000);
         vector<float> pulls_from_smallest_diffs(digits.getEntries(), 10000);
+        vector<double> pulls_from_weightedAve(digits.getEntries(), 10000);
 
         // FIXME this does not loop over the digits for this track under
         // whatever hypothesis but ALL digits...
         for (int i = 0; i < digits.getEntries(); i++) {
           int pixelID = digits[i]->getPixelID();
           double t = digits[i]->getTime();
+          // Computes a weighted average for the pdf
+          double avePos = 0;
+          double aveWidth = 0;
+          double sumPhotons = 0;
           for (int k = 0; k < reco.getNumOfPDFPeaks(pixelID); k++) {
             // get this peak, calculate pull
             reco.getPDFPeak(pixelID, k, position, width, numPhotons);
+            sumPhotons += numPhotons;
+            avePos += numPhotons * position;
+            aveWidth += numPhotons * width;
+
             float this_diff = (t - position);
             float this_pull = this_diff / width;
 
@@ -284,14 +293,17 @@ namespace Belle2 {
             if (abs(this_pull) < abs(smallest_pulls[i])) {
               smallest_pulls[i] = this_pull;
             }
-
           } // end loop over peaks
+          avePos /= sumPhotons;
+          aveWidth /= sumPhotons;
+          pulls_from_weightedAve[i] = (t - avePos) / aveWidth;
         } // end loop over (ALL) digits
 
         // FIXME should split this up for each TOPDigit and register reltation
         TOPSmallestPullCollection* tspc = pullCollection.appendNew();
         tspc->setSmallestPulls(smallest_pulls);
         tspc->setPullsFromSmallestDiff(pulls_from_smallest_diffs);
+        tspc->setPullsFromWeightedAve(pulls_from_weightedAve);
         track.addRelationTo(tspc);
 
       } // closes if statement about optional writing out pulls

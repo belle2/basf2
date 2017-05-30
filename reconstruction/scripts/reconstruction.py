@@ -20,7 +20,7 @@ from softwaretrigger import (
 
 
 def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False,
-                       additionalTrackFitHypotheses=None, addClusterExpertModules=True):
+                       additionalTrackFitHypotheses=None, addClusterExpertModules=True, use_vxdtf2=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -48,6 +48,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
         the additional fitted hypotheses are muon, kaon and proton, i.e. [13, 321, 2212].
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
+    :param use_vxdtf2: if true the VXDTF version 2 will be used if false (default) verion 1 of the VXDTF will be used.
     """
 
     # Add tracking reconstruction modules
@@ -57,7 +58,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                 mcTrackFinding=False,
                                 trigger_mode=trigger_mode,
                                 skipGeometryAdding=skipGeometryAdding,
-                                additionalTrackFitHypotheses=additionalTrackFitHypotheses)
+                                additionalTrackFitHypotheses=additionalTrackFitHypotheses,
+                                use_vxdtf2=use_vxdtf2)
 
     # Add further reconstruction modules
     add_posttracking_reconstruction(path,

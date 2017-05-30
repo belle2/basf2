@@ -462,7 +462,7 @@ void DeSerializerPCModule::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* d
 
 
 void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* exp_copper_0, unsigned int* run_copper_0,
-                                     unsigned int* subrun_copper_0, unsigned int* eve_copper_0, int* error_bit_flag)
+                                     unsigned int* subrun_copper_0, unsigned int* eve_copper_0, unsigned int* error_bit_flag)
 {
 
   //  int data_size_copper_0 = -1;
@@ -595,7 +595,8 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
         cpr_num++;
 
         // Check Error bit flag
-        if (temp_rawcopper->GetEventCRCError(0) != 0)(*error_bit_flag)++;
+        *error_bit_flag |= temp_rawcopper->GetErrorBitFlag(0);
+
         delete temp_rawcopper;
       }
     }
@@ -661,6 +662,22 @@ void DeSerializerPCModule::waitResume()
 }
 #endif
 
+void DeSerializerPCModule::setErrorFlag(unsigned int error_flag, StoreObjPtr<EventMetaData> evtmetadata)
+{
+  //  RawHeader_latest raw_hdr;
+  int error_set = 0;
+  if (error_flag & RawHeader_latest::B2LINK_PACKET_CRC_ERROR) {
+    evtmetadata->addErrorFlag(EventMetaData::c_B2LinkPacketCRCError);
+    error_set = 1;
+  }
+  if (error_flag & RawHeader_latest::B2LINK_EVENT_CRC_ERROR) {
+    evtmetadata->addErrorFlag(EventMetaData::c_B2LinkEventCRCError);
+    error_set = 1;
+  }
+  if (error_set)  B2INFO("Raw2Ds: Error flag was set in EventMetaData.");
+}
+
+
 void DeSerializerPCModule::event()
 {
 
@@ -669,7 +686,7 @@ void DeSerializerPCModule::event()
   unsigned int run_copper_0 = 0;
   unsigned int subrun_copper_0 = 0;
   unsigned int eve_copper_0 = 0;
-  int error_bit_flag = 0;
+  unsigned int error_bit_flag = 0;
 
   clearNumUsedBuf();
 
@@ -753,6 +770,8 @@ void DeSerializerPCModule::event()
   m_eventMetaDataPtr->setRun(run_copper_0);
   m_eventMetaDataPtr->setSubrun(subrun_copper_0);
   m_eventMetaDataPtr->setEvent(eve_copper_0);
+
+  setErrorFlag(error_bit_flag, m_eventMetaDataPtr);
   if (error_bit_flag != 0) {
     m_eventMetaDataPtr->addErrorFlag(EventMetaData::c_B2LinkEventCRCError);
     printf("[ERROR] error bit was detected. exp %d run %d eve %d count = %d\n",
@@ -795,3 +814,5 @@ void DeSerializerPCModule::event()
 
   return;
 }
+
+

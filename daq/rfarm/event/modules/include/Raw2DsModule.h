@@ -65,6 +65,8 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
+    void setErrorFlag(unsigned int error_flag, StoreObjPtr<EventMetaData> evtmetadata);
+
   private:
     //! function to register data buffer in DataStore as RawCOPPERs
     void registerRawCOPPERs();

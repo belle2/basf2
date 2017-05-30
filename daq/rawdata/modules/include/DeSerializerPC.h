@@ -75,7 +75,9 @@ namespace Belle2 {
     //    virtual void checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0);
     virtual void checkData(RawDataBlock* raw_datablk, unsigned int* exp_copper_0,
                            unsigned int* run_copper_0, unsigned int* subrun_copper_0,
-                           unsigned int* eve_copper_0, int* error_bit_flag);
+                           unsigned int* eve_copper_0, unsigned int* error_bit_flag);
+
+    void setErrorFlag(unsigned int error_flag, StoreObjPtr<EventMetaData> evtmetadata);
 
 #ifdef NONSTOP
     //! wait for resume

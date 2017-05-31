@@ -31,6 +31,9 @@ namespace Belle2 {
     /** sets flag whether Segment is allowed to be the seed of a new track candidate or not */
     bool m_seed;
 
+    /** identifier for all connected cells */
+    short m_family;
+
 
   public:
     /** ************************* CONSTRUCTORS ************************* */
@@ -40,7 +43,8 @@ namespace Belle2 {
       m_state(0),
       m_activated(true),
       m_stateUpgrade(false),
-      m_seed(false) {}
+      m_seed(false),
+      m_family(-1) {}
 
 
     /** ************************* OPERATORS ************************* */
@@ -59,6 +63,8 @@ namespace Belle2 {
     /** returns state of CACell (CA-feature) */
     inline unsigned int getState() const { return m_state; }
 
+    /** returns identifier of this cell */
+    inline short getFamily() const { return m_family; }
 
     /** returns whether CACell is allowed to be a seed for TCs */
     inline bool isSeed() const { return m_seed; }
@@ -88,5 +94,8 @@ namespace Belle2 {
 
     /** sets flag whether CACell is active (takes part during current CA iteration) or inactive (does not take part, it is 'dead') */
     inline void setActivationState(bool activationState) { m_activated = activationState; }
+
+    /** assign a family identifier to this cell */
+    inline void setFamily(short family) { m_family = family; }
   };
 } //Belle2 namespace

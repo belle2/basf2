@@ -100,7 +100,7 @@ namespace Belle2 {
     m_tree->Branch("phiDec", &m_arich.phiDec, "phiDec/F");
     m_tree->Branch("status", &m_arich.status, "status/I");
 
-    m_tree->Branch("detPhot",  &m_arich.detPhot,  "e/F:mu:pi:K:p:d");
+    m_tree->Branch("detPhot",  &m_arich.detPhot,  "detPhot/I");
     m_tree->Branch("numBkg",  &m_arich.numBkg,  "e/F:mu:pi:K:p:d");
     m_tree->Branch("expPhot",  &m_arich.expPhot,  "e/F:mu:pi:K:p:d");
     m_tree->Branch("logL",  &m_arich.logL,  "e/F:mu:pi:K:p:d");
@@ -163,12 +163,7 @@ namespace Belle2 {
       m_arich.expPhot.p = lkh->getExpPhot(Const::proton);
       m_arich.expPhot.d = lkh->getExpPhot(Const::deuteron);
 
-      m_arich.detPhot.e = lkh->getDetPhot(Const::electron);
-      m_arich.detPhot.mu = lkh->getDetPhot(Const::muon);
-      m_arich.detPhot.pi = lkh->getDetPhot(Const::pion);
-      m_arich.detPhot.K = lkh->getDetPhot(Const::kaon);
-      m_arich.detPhot.p = lkh->getDetPhot(Const::proton);
-      m_arich.detPhot.d = lkh->getDetPhot(Const::deuteron);
+      m_arich.detPhot = lkh->getDetPhot();
 
       m_arich.status = 1;
       const MCParticle* particle = 0;

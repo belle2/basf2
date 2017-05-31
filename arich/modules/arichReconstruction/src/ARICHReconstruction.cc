@@ -40,11 +40,9 @@ namespace Belle2 {
 
   ARICHReconstruction::ARICHReconstruction(int storePhot):
     m_arichgp(),
-    m_bkgLevel(0),
+    m_recPars(),
     m_trackPosRes(0),
     m_trackAngRes(0),
-    m_singleRes(0),
-    m_aeroMerit(0),
     m_nAerogelLayers(0),
     m_storePhot(storePhot)
   {
@@ -81,8 +79,8 @@ namespace Belle2 {
       // measured FOM; aeroMerit is number of detected photons for beam of beta=1 and perpedicular incidence to aerogel tile
       // (corrected for geometrical acceptance). n0[i] is then calculated from
       // aeroMerit[i]=n0[i]*sin2(thc)*transmissionLen[i] * (1 - exp(-thickness[i] / transmissionLen[i])
-      m_n0[i] = m_aeroMerit[i] / ((1. - 1. / m_refractiveInd[i]) * m_transmissionLen[i] * (1 - exp(
-                                    -m_thickness[i] / m_transmissionLen[i])));
+      m_n0[i] = m_recPars->getAerogelFOM(i) / ((1. - 1. / m_refractiveInd[i] / m_refractiveInd[i]) * m_transmissionLen[i] * (1 - exp(
+                                                 -m_thickness[i] / m_transmissionLen[i])));
       m_thickness[m_nAerogelLayers]   += m_thickness[i];
     }
     m_refractiveInd[m_nAerogelLayers  ]   = 1.0;
@@ -349,14 +347,11 @@ namespace Belle2 {
 
     // read some geometry parameters
     double padSize = m_arichgp->getHAPDGeometry().getPadSize();
-    double padArea = padSize / Unit::m * padSize / Unit::m;
     int nMirSeg = m_arichgp->getMirrors().getNMirrors();
     double angmir  = m_arichgp->getMirrors().getStartAngle();
 
-    // Detected photons within expected cherenkov ring (within +/-3 sigma)
-    int nDetPhotons[c_noOfHypotheses] = {0};
-
-    double bkgPerPad = m_bkgLevel * padArea; // number of background hits per pad (flat background)
+    // Detected photons in cherenkov ring (integrated over 0.1<theta<0.5)
+    int nDetPhotons = 0;
 
     double ebgri[c_noOfHypotheses] = {0.0}; // number of expected background photons per pad
     double  nBgr[c_noOfHypotheses] = {0.0}; // total number of expected background photons (in 0.1-0.5 rad ring)
@@ -364,6 +359,11 @@ namespace Belle2 {
     // reconstructed track direction
     TVector3 edir = arichTrack.getDirection();
     if (edir.z() < 0) return 0;
+    double momentum = arichTrack.getMomentum();
+
+    double thcResolution = m_recPars->getThcResolution(momentum);
+    double wideGaussFract = (m_recPars->getParameters())[0];
+    double wideGaussSigma = (m_recPars->getParameters())[1];
 
     //------------------------------------------------------
     // Calculate number of expected detected photons (emmited x geometrical acceptance).
@@ -375,13 +375,13 @@ namespace Belle2 {
     // loop over all particle hypotheses
     for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
 
-      // absorbtion factor
+      // absorbtion factor (scattering)
       double abs = 1;
 
       // loop over aerogel layers
       for (int iAerogel = m_nAerogelLayers - 1; iAerogel >= 0; iAerogel--) {
 
-        thetaCh[iHyp][iAerogel] = ExpectedCherenkovAngle(arichTrack.getMomentum(),
+        thetaCh[iHyp][iAerogel] = ExpectedCherenkovAngle(momentum,
                                                          p_mass[iHyp],
                                                          m_refractiveInd[iAerogel]);
 
@@ -400,7 +400,7 @@ namespace Belle2 {
 
           TVector3 epoint = exit_point - (0.5 + iepoint) * dxx * edir;
           abs *= exp(-dxx / m_transmissionLen[iAerogel]);
-          unsigned int genPhot = nPhot * abs; // number of photons to emmit in current step, including absorbtion correction
+          unsigned int genPhot = nPhot * abs; // number of photons to emmit in current step, including scattering  correction
 
           // loop over emmited "photons"
           for (unsigned int iPhoton = 0; iPhoton < genPhot; iPhoton++) {
@@ -437,11 +437,9 @@ namespace Belle2 {
         }
       }
 
-      // number of expected background hits
-      ebgri[iHyp] = bkgPerPad;
-
-      // implement method to calculate expected number of background hits (for now set to 0, same for all particle hypotheses)
-      nBgr[iHyp] = 0; //m_bkgLevel * padArea * padNum * m_arichgp->getNMCopies();
+      // get number of expected background photons in ring (integrated from 0.1 to 0.5 rad)
+      std::vector<double> bkgPars = {momentum / sqrt(p_mass[iHyp]*p_mass[iHyp] + momentum * momentum), double(arichTrack.hitsWindow())};
+      nBgr[iHyp] = m_recPars->getExpectedBackgroundHits(bkgPars);
 
     }  // for (int iHyp=0;iHyp < c_noOfHypotheses; iHyp++ )
     //#####################################################
@@ -473,9 +471,9 @@ namespace Belle2 {
       ARICHHit* h = arichHits[iPhoton];
       int modID = h->getModule();
       TVector3 hitpos = m_arichgp->getMasterVolume().pointToLocal(h->getPosition());
-
-      int nfoo[c_noOfHypotheses];
-      for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) { esigi[iHyp] = 0; nfoo[iHyp] = nDetPhotons[iHyp];}
+      bool bkgAdded = false;
+      int nfoo = nDetPhotons;
+      for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) { esigi[iHyp] = 0; ebgri[iHyp] = 0;}
 
       // loop over possible mirror reflections
       for (int mirr = 0; mirr < refl; mirr++) {
@@ -486,9 +484,9 @@ namespace Belle2 {
         // (not reconstructing hits with irrelevantly large Cherenkov angle)
         if ((track_at_detector - virthitpos).Mag() > 15.0) continue;
 
-        double sigExpArr[c_noOfHypotheses] = {0.0};
-        double th_cer = 0;
-        double fi_cer = 0;
+        double sigExpArr[c_noOfHypotheses] = {0.0}; // esigi for given mirror hypothesis only
+        double th_cer_1st = 0;
+        double fi_cer_1st = 0;
         int proc = 0;
 
         // loop over all arogel layers
@@ -503,11 +501,16 @@ namespace Belle2 {
                               m_nAerogelLayers - iAerogel, mirrors[mirr]) < 0) break;
 
           TVector3 dirch = TransformToFixed(edir) * photonDirection;
-          fi_cer = dirch.Phi();
-          th_cer = dirch.Theta();
+          double fi_cer = dirch.Phi();
+          double th_cer = dirch.Theta();
 
-          // skip photons with irrelevantly large Cherenkov angle
-          if (th_cer > 0.5 && iAerogel == 0) break;
+          // skip photons with irrelevantly large/small Cherenkov angle
+          if ((th_cer > 0.5 || th_cer < 0.1) && iAerogel == 0) break;
+
+          // count photons with 0.1<thc<0.5
+          if (nfoo == nDetPhotons) nDetPhotons++;
+
+          if (iAerogel == 0) { th_cer_1st = th_cer; fi_cer_1st = fi_cer;}
 
           if (fi_cer < 0) fi_cer += 2 * M_PI;
           double fii = fi_cer;
@@ -519,9 +522,6 @@ namespace Belle2 {
 
           // loop over all particle hypotheses
           for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
-
-            // if reconstruced cherekov angle is within the expected cherenkov ring (+/-3 sigma) add it to number of detected photons
-            if (fabs(th_cer - thetaCh[iHyp][iAerogel]) < 0.042 && nfoo[iHyp] == nDetPhotons[iHyp] && th_cer > 0.07) nDetPhotons[iHyp]++;
 
             // track a photon from the mean emission point to the detector surface
             TVector3  photonDirection1 = setThetaPhi(thetaCh[iHyp][iAerogel], fi_cer);  // particle system
@@ -539,37 +539,46 @@ namespace Belle2 {
             double   path              = meanr.Mag();
             meanr                      = meanr.Unit();
 
-            double   detector_sigma    = m_singleRes * path / meanr.z();
-
+            double   detector_sigma    = thcResolution * path / meanr.z();
+            double wide_sigma = wideGaussSigma * path / meanr.z();
             // calculate pad orientation and distance relative to that photon
             double modphi =  m_arichgp->getDetectorPlane().getSlotPhi(modID);
 
             double      pad_fi = fii - modphi;
-
             double      dx     = (detector_position - hitpos).Mag();
-            // calculate pad acceptance
             double  dr = (track_at_detector - detector_position).Mag();
 
-            if (dr > 0 && thetaCh[iHyp][iAerogel]) {
-              double padSizemm = padSize / Unit::mm;
-              double normalizacija = nSig_wo_acc[iHyp][iAerogel][ifi] * padSizemm / (0.1 * M_PI * dr / Unit::mm);
-              double integral = SquareInt(padSizemm, pad_fi, dx / Unit::mm, detector_sigma * 10.) / sqrt(2.);
+            if (dr > 0.01) {
+              double normalizacija = nSig_wo_acc[iHyp][iAerogel][ifi] * padSize / (0.1 * M_PI * dr);
+              double integralMain = SquareInt(padSize, pad_fi, dx, detector_sigma) / sqrt(2.);
+              double integralWide = SquareInt(padSize, pad_fi, dx, wide_sigma) / sqrt(2.);
               // expected number of signal photons in each pixel
-              esigi[iHyp] += normalizacija * integral;
-              sigExpArr[iHyp] += normalizacija * integral;
+              double exp = normalizacija * ((1 - wideGaussFract) * integralMain + wideGaussFract * integralWide);
+              esigi[iHyp] += exp;
+              sigExpArr[iHyp] += exp;
             } // if (dr>0 && thetaCh[iHyp][iAerogel])
 
           }// for (int iHyp=0;iHyp< c_noOfHypotheses; iHyp++)
           if (iAerogel == m_nAerogelLayers - 1) proc = 1; // successfully processed for all layers
         }// for (unsigned int iAerogel=0; iAerogel<m_nAerogelLayers;iAerogel++)
 
-        if (m_storePhot && proc) {
-          ARICHPhoton phot(iPhoton, th_cer, fi_cer, mirrors[mirr]); // th_cer of the last aerogel layer assumption is stored
-          phot.setBkgExp(ebgri[2], ebgri[3]); // store expected number of background hits for pi and K hypothesis
-          phot.setSigExp(sigExpArr[2], sigExpArr[3]); // store expected number of signal hits for pi and K hypothesis
-          arichTrack.addPhoton(phot);
+        if (proc) {
+          // add background contribution if not yet (add only once)
+          if (!bkgAdded) {
+            for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
+              std::vector<double> pars = {momentum / sqrt(p_mass[iHyp]*p_mass[iHyp] + momentum * momentum), double(arichTrack.hitsWindow())};
+              ebgri[iHyp] += m_recPars->getBackgroundPerPad(th_cer_1st, pars);
+            }
+            bkgAdded = true;
+          }
+          // create ARICHPhoton if desired
+          if (m_storePhot) {
+            ARICHPhoton phot(iPhoton, th_cer_1st, fi_cer_1st, mirrors[mirr]); // th_cer of the first aerogel layer assumption is stored
+            phot.setBkgExp(ebgri); // store expected number of background hits
+            phot.setSigExp(sigExpArr); // store expected number of signal hits
+            arichTrack.addPhoton(phot);
+          }
         }
-
 
       }// for (int mirr = 0; mirr < refl; mirr++)
 
@@ -579,7 +588,7 @@ namespace Belle2 {
 
       for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
         double expected = esigi[iHyp] + ebgri[iHyp];
-        logL[iHyp] += expected + log(1 - exp(-expected));
+        if (bkgAdded) logL[iHyp] += expected + log(1 - exp(-expected));
       }
 
     } // for (unsigned  int iPhoton=0; iPhoton< nPhotonHits; iPhoton++)
@@ -587,9 +596,11 @@ namespace Belle2 {
     //*********************************************
     // add constant term to the LIKELIHOOD function
     //*********************************************
-
+    double exppho[6] = {0.0};
     for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
-      logL[iHyp] -= (nSig_w_acc[iHyp][m_nAerogelLayers] + nBgr[iHyp]);
+      exppho[iHyp] = nSig_w_acc[iHyp][m_nAerogelLayers] * (1 - wideGaussFract) + wideGaussFract * 0.7 *
+                     nSig_wo_accInt[iHyp][m_nAerogelLayers] + nBgr[iHyp];
+      logL[iHyp] -= exppho[iHyp];
     }
 
     //******************************************
@@ -599,21 +610,12 @@ namespace Belle2 {
     int flag = 1;
     if ((thetaCh[0][0] > 0 || thetaCh[0][1] > 0) &&  nSig_w_acc[0][m_nAerogelLayers] == 0) flag = 0;
 
-    double exppho[6] = {0.0};
-    for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
-      exppho[iHyp] = nSig_w_acc[iHyp][m_nAerogelLayers] + nBgr[iHyp];
-    }
-
     // set values of ARICHLikelihood
     arichLikelihood.setValues(flag, logL, nDetPhotons, exppho);
 
     return 1;
   }
 
-  void ARICHReconstruction::setBackgroundLevel(double bkgLevel)
-  {
-    m_bkgLevel = bkgLevel;
-  }
   void ARICHReconstruction::setTrackPositionResolution(double pRes)
   {
     m_trackPosRes = pRes;
@@ -621,14 +623,6 @@ namespace Belle2 {
   void ARICHReconstruction::setTrackAngleResolution(double aRes)
   {
     m_trackAngRes = aRes;
-  }
-  void ARICHReconstruction::setSinglePhotonResolution(double sRes)
-  {
-    m_singleRes = sRes;
-  }
-  void ARICHReconstruction::setAerogelFigureOfMerit(std::vector<double>& merit)
-  {
-    m_aeroMerit = merit;
   }
 
   TVector3 ARICHReconstruction::getTrackMeanEmissionPosition(const ARICHTrack& track, int iAero)
@@ -638,8 +632,8 @@ namespace Belle2 {
     TVector3 dir = track.getDirection();
     if (dir.Z() == 0) return TVector3();
     double d   = m_thickness[iAero] / dir.Z() / m_transmissionLen[iAero];
-    //double dmean = 1 - d / expm1(d);
-    double dmean = -log((1 + exp(-d)) / 2.);
+    double dmean = 1 - d / expm1(d);
+    //double dmean = -log((1 + exp(-d)) / 2.);
     double mel = dmean * m_transmissionLen[iAero];
 
     return (getTrackPositionAtZ(track, m_zaero[iAero]) - mel * dir);

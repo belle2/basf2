@@ -97,7 +97,7 @@ namespace Belle2 {
       Float_t phiDec;  /**< decay vertex (cylindrical coordinate phi) of MCParticle */
       Int_t scatter;     /**< 1 if particle scattered (i.e. has daughter with same PDG) */
 
-      ParticlesArray detPhot;      /**< number of detected photons */
+      Int_t detPhot;      /**< number of detected photons */
       ParticlesArray numBkg;       /**< number of expected background photons */
       ParticlesArray expPhot;      /**< number of expected photons (signal + bkg) */
       ParticlesArray logL;   /**< log likelihoods */
@@ -145,7 +145,7 @@ namespace Belle2 {
         scatter = 0;
         nRec = 0;
 
-        detPhot.clear();
+        detPhot = 0;
         numBkg.clear();
         expPhot.clear();
         logL.clear();

@@ -88,19 +88,32 @@ namespace Belle2 {
 
       /**
        * Restore sector alignment.
+       * @param[in] endcap             Endcap.
+       * @param[in] layer              Layer.
+       * @param[in] sector             Sector.
        * @param[in] sectorAlignment    Sector alignment.
        * @param[in] oldSectorAlignment Old sector alignment.
        */
-      void restoreSectorAlignment(EKLMAlignmentData* sectorAlignment,
-                                  EKLMAlignmentData* oldSectorAlignment) const;
+      void restoreSectorAlignment(int endcap, int layer, int sector,
+                                  EKLMAlignmentData* sectorAlignment,
+                                  EKLMAlignmentData* oldSectorAlignment);
 
       /**
        * Restore segment alignment.
+       * @param[in] endcap              Endcap.
+       * @param[in] layer               Layer.
+       * @param[in] sector              Sector.
+       * @param[in] plane               Plane.
+       * @param[in] segment             Segment.
+       * @param[in] sectorAlignment     Sector alignment.
        * @param[in] segmentAlignment    Segment alignment.
        * @param[in] oldSegmentAlignment Old segment alignment.
        */
-      void restoreSegmentAlignment(EKLMAlignmentData* segmentAlignment,
-                                   EKLMAlignmentData* oldSegmentAlignment) const;
+      void restoreSegmentAlignment(
+        int endcap, int layer, int sector, int plane, int segment,
+        EKLMAlignmentData* sectorAlignment,
+        EKLMAlignmentData* segmentAlignment,
+        EKLMAlignmentData* oldSegmentAlignment);
 
       /**
        * Restore alignment (check and move elements if there are overlaps).
@@ -108,7 +121,7 @@ namespace Belle2 {
        * @param[in] oldAlignment Old alignment (if NULL, restores to zeros).
        */
       void restoreAlignment(EKLMAlignment* alignment,
-                            EKLMAlignment* oldAlignment) const;
+                            EKLMAlignment* oldAlignment);
 
     private:
 

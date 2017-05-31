@@ -62,19 +62,22 @@ namespace Belle2 {
 
       /**
        * Check segment alignment.
-       * @param[in] endcap           Endcap.
-       * @param[in] layer            Layer.
-       * @param[in] sector           Sector.
-       * @param[in] plane            Plane number.
-       * @param[in] segment          Segment number.
-       * @param[in] sectorAlignment  Sector alignment.
-       * @param[in] segmentAlignment Segment alignment.
+       * @param[in] endcap                Endcap.
+       * @param[in] layer                 Layer.
+       * @param[in] sector                Sector.
+       * @param[in] plane                 Plane number.
+       * @param[in] segment               Segment number.
+       * @param[in] sectorAlignment       Sector alignment.
+       * @param[in] segmentAlignment      Segment alignment.
+       * @param[in] calledFromSectorCheck Called from checkSectorAlignment()
+       *                                  or not.
        * @return true Alignment is correct (no overlaps).
        */
       bool checkSegmentAlignment(int endcap, int layer, int sector, int plane,
                                  int segment,
                                  EKLMAlignmentData* sectorAlignment,
-                                 EKLMAlignmentData* segmentAlignment) const;
+                                 EKLMAlignmentData* segmentAlignment,
+                                 bool calledFromSectorCheck) const;
 
       /**
        * Check alignment.

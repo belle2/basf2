@@ -78,13 +78,14 @@ bool EKLM::AlignmentChecker::
 checkSectorAlignment(int endcap, int layer, int sector,
                      EKLMAlignmentData* sectorAlignment) const
 {
-  int iPlane, iSegmentSupport, j;
+  int iPlane, iSegmentSupport, iSegment, j;
   double lx, ly;
   HepGeom::Point3D<double> supportRectangle[4];
   HepGeom::Transform3D t;
   const EKLMGeometry::SegmentSupportPosition* segmentSupportPos;
   const EKLMGeometry::SegmentSupportGeometry* segmentSupportGeometry =
     m_GeoDat->getSegmentSupportGeometry();
+  EKLMAlignmentData segmentAlignment(0, 0, 0);
   if (sectorAlignment == m_LastCheckedSector)
     return m_LastSectorCheckResult;
   for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
@@ -173,13 +174,21 @@ checkSectorAlignment(int endcap, int layer, int sector,
       }
     }
   }
+  for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
+    for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
+      if (!checkSegmentAlignment(endcap, layer, sector, iPlane, iSegment,
+                                 sectorAlignment, &segmentAlignment, true))
+        return false;
+    }
+  }
   return true;
 }
 
 bool EKLM::AlignmentChecker::
 checkSegmentAlignment(int endcap, int layer, int sector, int plane, int segment,
                       EKLMAlignmentData* sectorAlignment,
-                      EKLMAlignmentData* segmentAlignment) const
+                      EKLMAlignmentData* segmentAlignment,
+                      bool calledFromSectorCheck) const
 {
   int i, j, iStrip;
   double lx, ly;
@@ -188,8 +197,10 @@ checkSegmentAlignment(int endcap, int layer, int sector, int plane, int segment,
   const EKLMGeometry::ElementPosition* stripPosition;
   const EKLMGeometry::StripGeometry* stripGeometry =
     m_GeoDat->getStripGeometry();
-  if (!checkSectorAlignment(endcap, layer, sector, sectorAlignment))
-    return false;
+  if (!calledFromSectorCheck) {
+    if (!checkSectorAlignment(endcap, layer, sector, sectorAlignment))
+      return false;
+  }
   ly = 0.5 * stripGeometry->getWidth();
   for (i = 1; i <= m_GeoDat->getNStripsSegment(); i++) {
     iStrip = m_GeoDat->getNStripsSegment() * (segment - 1) + i;
@@ -296,7 +307,7 @@ bool EKLM::AlignmentChecker::checkAlignment(EKLMAlignment* alignment) const
               B2FATAL("Incomplete alignment data.");
             if (!checkSegmentAlignment(iEndcap, iLayer, iSector, iPlane,
                                        iSegment, sectorAlignment,
-                                       segmentAlignment))
+                                       segmentAlignment, false))
               return false;
           }
         }
@@ -368,7 +379,7 @@ void EKLM::AlignmentChecker::restoreAlignment(EKLMAlignment* alignment,
               B2FATAL("Incomplete alignment data.");
             if (!checkSegmentAlignment(iEndcap, iLayer, iSector, iPlane,
                                        iSegment, sectorAlignment,
-                                       segmentAlignment)) {
+                                       segmentAlignment, false)) {
               if (oldAlignment != NULL) {
                 oldSegmentAlignment =
                   oldAlignment->getSegmentAlignment(segment);

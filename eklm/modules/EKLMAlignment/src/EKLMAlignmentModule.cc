@@ -150,7 +150,8 @@ sector:
             else
               d = gRandom->Uniform(sectorMinDalpha, sectorMaxDalpha);
             sectorAlignment.setDalpha(d);
-          } while (!alignmentChecker.checkSectorAlignment(&sectorAlignment));
+          } while (!alignmentChecker.checkSectorAlignment(
+                     iEndcap, iLayer, iSector, &sectorAlignment));
           sector = m_GeoDat->sectorNumber(iEndcap, iLayer, iSector);
           alignment.setSectorAlignment(sector, &sectorAlignment);
         }
@@ -166,7 +167,7 @@ sector:
                 segmentAlignment.setDalpha(
                   gRandom->Uniform(segmentMinDalpha, segmentMaxDalpha));
               } while (!alignmentChecker.checkSegmentAlignment(
-                         iPlane, iSegment,
+                         iEndcap, iLayer, iSector, iPlane, iSegment,
                          &sectorAlignment, &segmentAlignment));
               segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector,
                                                 iPlane, iSegment);
@@ -178,7 +179,8 @@ sector:
             for (iSegment = 1; iSegment <= m_GeoDat->getNSegments();
                  iSegment++) {
               if (!alignmentChecker.checkSegmentAlignment(
-                    iPlane, iSegment, &sectorAlignment, &segmentAlignment))
+                    iEndcap, iLayer, iSector, iPlane, iSegment,
+                    &sectorAlignment, &segmentAlignment))
                 goto sector;
             }
           }

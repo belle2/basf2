@@ -182,12 +182,12 @@ SegmentNetworkProducerModule::initialize()
 void SegmentNetworkProducerModule::event()
 {
   m_eventCounter++;
-  B2INFO("\n" << "SegmentNetworkProducerModule:event: event " << m_eventCounter << "\n");
+  B2DEBUG(1, "\n" << "SegmentNetworkProducerModule:event: event " << m_eventCounter << "\n");
 
   // make sure that network exists:
   if (! m_network) {
     m_network.create();
-    B2INFO("As no network (DirectedNodeNetworkContainer) was present, a new network was created");
+    B2DEBUG(1, "As no network (DirectedNodeNetworkContainer) was present, a new network was created");
   }
 
   vector< RawSectorData > collectedData = matchSpacePointToSectors();

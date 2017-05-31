@@ -43,28 +43,8 @@ namespace Belle2 {
     EXPECT_EQ(0, myECLCluster.getUncertaintyTheta());
     EXPECT_EQ(0, myECLCluster.getUncertaintyPhi());
 
-//    EXPECT_EQ(0, myECLCluster.getPx());
-//    EXPECT_EQ(0, myECLCluster.getPy());
-//    EXPECT_EQ(exp(-5.), myECLCluster.getPz());
-
     EXPECT_FALSE(myECLCluster.isTrack());
     EXPECT_TRUE(myECLCluster.isNeutral());
-
-//    double px = myECLCluster.getMomentum().X();
-//    double py = myECLCluster.getMomentum().Y();
-//    double pz = myECLCluster.getMomentum().Z();
-//    EXPECT_EQ(0, px);
-//    EXPECT_EQ(0, py);
-//    EXPECT_EQ(exp(-5.), pz);
-
-//    px = myECLCluster.get4Vector().X();
-//    py = myECLCluster.get4Vector().Y();
-//    pz = myECLCluster.get4Vector().Z();
-//    double energy = myECLCluster.get4Vector().E();
-//    EXPECT_EQ(0, px);
-//    EXPECT_EQ(0, py);
-//    EXPECT_EQ(exp(-5.), pz);
-//    EXPECT_EQ(exp(-5.), energy);
 
     double x = myECLCluster.getClusterPosition().X();
     double y = myECLCluster.getClusterPosition().Y();
@@ -72,13 +52,6 @@ namespace Belle2 {
     EXPECT_EQ(0, x);
     EXPECT_EQ(0, y);
     EXPECT_EQ(0, z);
-
-//    x = myECLCluster.getPosition().X();
-//    y = myECLCluster.getPosition().Y();
-//    z = myECLCluster.getPosition().Z();
-//    EXPECT_EQ(0, x);
-//    EXPECT_EQ(0, y);
-//    EXPECT_EQ(0, z);
 
     const auto error3x3 = myECLCluster.getCovarianceMatrix3x3();
     EXPECT_EQ(0, error3x3(0, 0));
@@ -91,74 +64,6 @@ namespace Belle2 {
     EXPECT_EQ(0, error3x3(2, 1));
     EXPECT_EQ(0, error3x3(2, 2));
 
-//    const auto error4x4 = myECLCluster.getCovarianceMatrix4x4();
-//    EXPECT_EQ(0, error4x4(0, 0));
-//    EXPECT_EQ(0, error4x4(0, 1));
-//    EXPECT_EQ(0, error4x4(0, 2));
-//    EXPECT_EQ(0, error4x4(0, 3));
-//    EXPECT_EQ(0, error4x4(1, 0));
-//    EXPECT_EQ(0, error4x4(1, 1));
-//    EXPECT_EQ(0, error4x4(1, 2));
-//    EXPECT_EQ(0, error4x4(1, 3));
-//    EXPECT_EQ(0, error4x4(2, 0));
-//    EXPECT_EQ(0, error4x4(2, 1));
-//    EXPECT_EQ(0, error4x4(2, 2));
-//    EXPECT_EQ(0, error4x4(2, 3));
-//    EXPECT_EQ(0, error4x4(3, 0));
-//    EXPECT_EQ(0, error4x4(3, 1));
-//    EXPECT_EQ(0, error4x4(3, 2));
-//    EXPECT_EQ(0, error4x4(3, 3));
-
-//    const auto error7x7 = myECLCluster.getCovarianceMatrix7x7();
-//    EXPECT_EQ(0, error7x7(0, 0));
-//    EXPECT_EQ(0, error7x7(0, 1));
-//    EXPECT_EQ(0, error7x7(0, 2));
-//    EXPECT_EQ(0, error7x7(0, 3));
-//    EXPECT_EQ(0, error7x7(0, 4));
-//    EXPECT_EQ(0, error7x7(0, 5));
-//    EXPECT_EQ(0, error7x7(0, 6));
-//    EXPECT_EQ(0, error7x7(1, 0));
-//    EXPECT_EQ(0, error7x7(1, 1));
-//    EXPECT_EQ(0, error7x7(1, 2));
-//    EXPECT_EQ(0, error7x7(1, 3));
-//    EXPECT_EQ(0, error7x7(1, 4));
-//    EXPECT_EQ(0, error7x7(1, 5));
-//    EXPECT_EQ(0, error7x7(1, 6));
-//    EXPECT_EQ(0, error7x7(2, 0));
-//    EXPECT_EQ(0, error7x7(2, 1));
-//    EXPECT_EQ(0, error7x7(2, 2));
-//    EXPECT_EQ(0, error7x7(2, 3));
-//    EXPECT_EQ(0, error7x7(2, 4));
-//    EXPECT_EQ(0, error7x7(2, 5));
-//    EXPECT_EQ(0, error7x7(2, 6));
-//    EXPECT_EQ(0, error7x7(3, 0));
-//    EXPECT_EQ(0, error7x7(3, 1));
-//    EXPECT_EQ(0, error7x7(3, 2));
-//    EXPECT_EQ(0, error7x7(3, 3));
-//    EXPECT_EQ(0, error7x7(3, 4));
-//    EXPECT_EQ(0, error7x7(3, 5));
-//    EXPECT_EQ(0, error7x7(3, 6));
-//    EXPECT_EQ(0, error7x7(4, 0));
-//    EXPECT_EQ(0, error7x7(4, 1));
-//    EXPECT_EQ(0, error7x7(4, 2));
-//    EXPECT_EQ(0, error7x7(4, 3));
-//    EXPECT_EQ(1, error7x7(4, 4));
-//    EXPECT_EQ(0, error7x7(4, 5));
-//    EXPECT_EQ(0, error7x7(4, 6));
-//    EXPECT_EQ(0, error7x7(5, 0));
-//    EXPECT_EQ(0, error7x7(5, 1));
-//    EXPECT_EQ(0, error7x7(5, 2));
-//    EXPECT_EQ(0, error7x7(5, 3));
-//    EXPECT_EQ(0, error7x7(5, 4));
-//    EXPECT_EQ(1, error7x7(5, 5));
-//    EXPECT_EQ(0, error7x7(5, 6));
-//    EXPECT_EQ(0, error7x7(6, 0));
-//    EXPECT_EQ(0, error7x7(6, 1));
-//    EXPECT_EQ(0, error7x7(6, 2));
-//    EXPECT_EQ(0, error7x7(6, 3));
-//    EXPECT_EQ(0, error7x7(6, 4));
-//    EXPECT_EQ(0, error7x7(6, 5));
-//    EXPECT_EQ(1, error7x7(6, 6));
   } // default constructor
 
   /** Test setter and getter. */
@@ -214,42 +119,8 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(error[5], myECLCluster.getUncertaintyTheta()*myECLCluster.getUncertaintyTheta());
     EXPECT_FLOAT_EQ(error[2], myECLCluster.getUncertaintyPhi()*myECLCluster.getUncertaintyPhi());
 
-//    EXPECT_FLOAT_EQ(energy * sin(theta) * cos(phi), myECLCluster.getPx());
-//    EXPECT_FLOAT_EQ(energy * sin(theta) * sin(phi), myECLCluster.getPy());
-//    EXPECT_FLOAT_EQ(energy * cos(theta), myECLCluster.getPz());
-
     EXPECT_TRUE(myECLCluster.isTrack());
     EXPECT_FALSE(myECLCluster.isNeutral());
-
-//    double x = myECLCluster.getMomentum().X();
-//    double y = myECLCluster.getMomentum().Y();
-//    double z = myECLCluster.getMomentum().Z();
-//    EXPECT_FLOAT_EQ(energy * sin(theta) * cos(phi), x);
-//    EXPECT_FLOAT_EQ(energy * sin(theta) * sin(phi), y);
-//    EXPECT_FLOAT_EQ(energy * cos(theta), z);
-
-//    x = myECLCluster.get4Vector().X();
-//    y = myECLCluster.get4Vector().Y();
-//    z = myECLCluster.get4Vector().Z();
-//    double e = myECLCluster.get4Vector().E();
-//    EXPECT_FLOAT_EQ(energy * sin(theta) * cos(phi), x);
-//    EXPECT_FLOAT_EQ(energy * sin(theta) * sin(phi), y);
-//    EXPECT_FLOAT_EQ(energy * cos(theta), z);
-//    EXPECT_FLOAT_EQ(energy, e);
-
-//    x = myECLCluster.getClusterPosition().X();
-//    y = myECLCluster.getClusterPosition().Y();
-//    z = myECLCluster.getClusterPosition().Z();
-//    EXPECT_FLOAT_EQ(r * sin(theta) * cos(phi), x);
-//    EXPECT_FLOAT_EQ(r * sin(theta) * sin(phi), y);
-//    EXPECT_FLOAT_EQ(r * cos(theta), z);
-
-//    x = myECLCluster.getPosition().X();
-//    y = myECLCluster.getPosition().Y();
-//    z = myECLCluster.getPosition().Z();
-//    EXPECT_FLOAT_EQ(0, x);
-//    EXPECT_FLOAT_EQ(0, y);
-//    EXPECT_FLOAT_EQ(0, z);
 
     const auto error3x3 = myECLCluster.getCovarianceMatrix3x3();
     EXPECT_FLOAT_EQ(error[0], error3x3(0, 0));
@@ -283,74 +154,6 @@ namespace Belle2 {
     TMatrixDSym error4x4expected(4);
     error4x4expected = errorecl.Similarity(jacobian);
 
-//    const auto error4x4 = myECLCluster.getCovarianceMatrix4x4();
-//    EXPECT_FLOAT_EQ(error4x4expected(0, 0), error4x4(0, 0));
-//    EXPECT_FLOAT_EQ(error4x4expected(0, 1), error4x4(0, 1));
-//    EXPECT_FLOAT_EQ(error4x4expected(0, 2), error4x4(0, 2));
-//    EXPECT_FLOAT_EQ(error4x4expected(0, 3), error4x4(0, 3));
-//    EXPECT_FLOAT_EQ(error4x4expected(1, 0), error4x4(1, 0));
-//    EXPECT_FLOAT_EQ(error4x4expected(1, 1), error4x4(1, 1));
-//    EXPECT_FLOAT_EQ(error4x4expected(1, 2), error4x4(1, 2));
-//    EXPECT_FLOAT_EQ(error4x4expected(1, 3), error4x4(1, 3));
-//    EXPECT_FLOAT_EQ(error4x4expected(2, 0), error4x4(2, 0));
-//    EXPECT_FLOAT_EQ(error4x4expected(2, 1), error4x4(2, 1));
-//    EXPECT_FLOAT_EQ(error4x4expected(2, 2), error4x4(2, 2));
-//    EXPECT_FLOAT_EQ(error4x4expected(2, 3), error4x4(2, 3));
-//    EXPECT_FLOAT_EQ(error4x4expected(3, 0), error4x4(3, 0));
-//    EXPECT_FLOAT_EQ(error4x4expected(3, 1), error4x4(3, 1));
-//    EXPECT_FLOAT_EQ(error4x4expected(3, 2), error4x4(3, 2));
-//    EXPECT_FLOAT_EQ(error4x4expected(3, 3), error4x4(3, 3));
-
-//    const auto error7x7 = myECLCluster.getCovarianceMatrix7x7();
-//    EXPECT_FLOAT_EQ(error4x4expected(0, 0), error7x7(0, 0));
-//    EXPECT_FLOAT_EQ(error4x4expected(0, 1), error7x7(0, 1));
-//    EXPECT_FLOAT_EQ(error4x4expected(0, 2), error7x7(0, 2));
-//    EXPECT_FLOAT_EQ(error4x4expected(0, 3), error7x7(0, 3));
-//    EXPECT_EQ(0, error7x7(0, 4));
-//    EXPECT_EQ(0, error7x7(0, 5));
-//    EXPECT_EQ(0, error7x7(0, 6));
-//    EXPECT_FLOAT_EQ(error4x4expected(1, 0), error7x7(1, 0));
-//    EXPECT_FLOAT_EQ(error4x4expected(1, 1), error7x7(1, 1));
-//    EXPECT_FLOAT_EQ(error4x4expected(1, 2), error7x7(1, 2));
-//    EXPECT_FLOAT_EQ(error4x4expected(1, 3), error7x7(1, 3));
-//    EXPECT_EQ(0, error7x7(1, 4));
-//    EXPECT_EQ(0, error7x7(1, 5));
-//    EXPECT_EQ(0, error7x7(1, 6));
-//    EXPECT_FLOAT_EQ(error4x4expected(2, 0), error7x7(2, 0));
-//    EXPECT_FLOAT_EQ(error4x4expected(2, 1), error7x7(2, 1));
-//    EXPECT_FLOAT_EQ(error4x4expected(2, 2), error7x7(2, 2));
-//    EXPECT_FLOAT_EQ(error4x4expected(2, 3), error7x7(2, 3));
-//    EXPECT_EQ(0, error7x7(2, 4));
-//    EXPECT_EQ(0, error7x7(2, 5));
-//    EXPECT_EQ(0, error7x7(2, 6));
-//    EXPECT_FLOAT_EQ(error4x4expected(3, 0), error7x7(3, 0));
-//    EXPECT_FLOAT_EQ(error4x4expected(3, 1), error7x7(3, 1));
-//    EXPECT_FLOAT_EQ(error4x4expected(3, 2), error7x7(3, 2));
-//    EXPECT_FLOAT_EQ(error4x4expected(3, 3), error7x7(3, 3));
-//    EXPECT_EQ(0, error7x7(3, 4));
-//    EXPECT_EQ(0, error7x7(3, 5));
-//    EXPECT_EQ(0, error7x7(3, 6));
-//    EXPECT_FLOAT_EQ(0, error7x7(4, 0));
-//    EXPECT_FLOAT_EQ(0, error7x7(4, 1));
-//    EXPECT_FLOAT_EQ(0, error7x7(4, 2));
-//    EXPECT_FLOAT_EQ(0, error7x7(4, 3));
-//    EXPECT_FLOAT_EQ(1, error7x7(4, 4));
-//    EXPECT_FLOAT_EQ(0, error7x7(4, 5));
-//    EXPECT_FLOAT_EQ(0, error7x7(4, 6));
-//    EXPECT_FLOAT_EQ(0, error7x7(5, 0));
-//    EXPECT_FLOAT_EQ(0, error7x7(5, 1));
-//    EXPECT_FLOAT_EQ(0, error7x7(5, 2));
-//    EXPECT_FLOAT_EQ(0, error7x7(5, 3));
-//    EXPECT_FLOAT_EQ(0, error7x7(5, 4));
-//    EXPECT_FLOAT_EQ(1, error7x7(5, 5));
-//    EXPECT_FLOAT_EQ(0, error7x7(5, 6));
-//    EXPECT_FLOAT_EQ(0, error7x7(6, 0));
-//    EXPECT_FLOAT_EQ(0, error7x7(6, 1));
-//    EXPECT_FLOAT_EQ(0, error7x7(6, 2));
-//    EXPECT_FLOAT_EQ(0, error7x7(6, 3));
-//    EXPECT_FLOAT_EQ(0, error7x7(6, 4));
-//    EXPECT_FLOAT_EQ(0, error7x7(6, 5));
-//    EXPECT_FLOAT_EQ(1, error7x7(6, 6));
   } // default constructor
 
 

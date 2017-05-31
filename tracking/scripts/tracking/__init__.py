@@ -570,11 +570,13 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     overlap_filter = 'greedy'  # other option is  'hopfield'
     # setting different for pxd and svd:
     if is_pxd_used(components):
-        sec_map_file = Belle2.FileSystem.findFile("data/tracking/SVDPXDDefaultMap.root")
+        # sec_map_file = Belle2.FileSystem.findFile("data/tracking/SVDPXDDefaultMap.root")
+        sec_map_file = "SVDPXDDefaultMap.root"
         setup_name = "SVDPXDDefault"
         use_pxd = True
     else:
-        sec_map_file = Belle2.FileSystem.findFile("data/tracking/SVDOnlyDefaultMap.root")
+        # sec_map_file = Belle2.FileSystem.findFile("data/tracking/SVDOnlyDefaultMap.root")
+        sec_map_file = "SVDOnlyDefaultMap.root"
         setup_name = "SVDOnlyDefault"
         use_pxd = False
 
@@ -598,7 +600,8 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
 
     # SecMap Bootstrap
     secMapBootStrap = register_module('SectorMapBootstrap')
-    secMapBootStrap.param('ReadSectorMap', True)
+    secMapBootStrap.param('ReadSectorMap', False)  # read from file
+    secMapBootStrap.param('ReadSecMapFromDB', True)  # this will override ReadSectorMap
     secMapBootStrap.param('SectorMapsInputFile', sec_map_file)
     secMapBootStrap.param('SetupToRead', setup_name)
     secMapBootStrap.param('WriteSectorMap', False)

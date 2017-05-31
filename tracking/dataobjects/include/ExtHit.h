@@ -103,7 +103,16 @@ namespace Belle2 {
     void update(ExtHitStatus status, double t,
                 const G4ThreeVector& r, const G4ThreeVector& p, const G4ErrorSymMatrix& e);
 
+    //! Get the uncertainty in the azimuthal angle phi (radians)
+    double getErrorTheta() const;
+
+    //! Get the uncertainty in the azimuthal angle phi (radians)
+    double getErrorPhi() const;
+
   private:
+
+    //! Get diagonal elemment of the 3x3 position-covariance matrix in polar coordinates (r, theta, phi)
+    double getPolarCovariance(int i) const;
 
     //! PDG code
     int m_PdgCode;
@@ -130,7 +139,7 @@ namespace Belle2 {
     float m_Covariance[21];
 
     //! Needed to make the ROOT object storable
-    ClassDef(ExtHit, 4)
+    ClassDef(ExtHit, 5)
 
   };
 }

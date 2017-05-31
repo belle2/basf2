@@ -16,6 +16,9 @@ using namespace Belle2;
 
 void GblMultipleScatteringController::controlTrackSegment(TVector3 entry, TVector3 exit, genfit::GblFitter* fitter)
 {
+  (void)entry;
+  (void)exit;
+  (void)fitter;
   /*int midPointInCDC = false;
   TVector3 midPoint = (exit + entry) * 0.5;
   if (!gGeoManager) {

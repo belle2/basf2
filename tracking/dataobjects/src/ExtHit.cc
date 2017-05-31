@@ -12,6 +12,11 @@
 
 #include <framework/logging/Logger.h>
 
+#include <TMatrixD.h>
+#include <TMatrixDSym.h>
+
+#include <cmath>
+
 using namespace Belle2;
 
 // empty constructor for ROOT - do not use this
@@ -133,4 +138,43 @@ void ExtHit::update(ExtHitStatus status, double tof, const G4ThreeVector& positi
       m_Covariance[k++] = covariance[i][j];
     }
   }
+}
+
+// Get the uncertainty in the polar angle theta
+double ExtHit::getErrorTheta() const
+{
+  return sqrt(getPolarCovariance(1));
+}
+
+// Get the uncertainty in the azimuthal angle phi
+double ExtHit::getErrorPhi() const
+{
+  return sqrt(getPolarCovariance(2));
+}
+
+double ExtHit::getPolarCovariance(int i) const
+{
+
+  TMatrixDSym covariance(3);
+  covariance[0][0] = m_Covariance[0];
+  covariance[0][1] = covariance[1][0] = m_Covariance[1];
+  covariance[0][2] = covariance[2][0] = m_Covariance[2];
+  covariance[1][1] = m_Covariance[6];
+  covariance[1][2] = covariance[2][1] = m_Covariance[7];
+  covariance[2][2] = m_Covariance[11];
+  double perpSq = m_Position[0] * m_Position[0] + m_Position[1] * m_Position[1];
+  double perp = sqrt(perpSq);
+  double rSq = perpSq + m_Position[2] * m_Position[2];
+  double r = sqrt(rSq);
+  TMatrixD jacobian(3, 3);
+  jacobian[0][0] =  m_Position[0] / r;
+  jacobian[0][1] =  m_Position[1] / r;
+  jacobian[0][2] =  m_Position[2] / r;
+  jacobian[1][0] =  m_Position[0] * m_Position[2] / (perp * rSq);
+  jacobian[1][1] =  m_Position[1] * m_Position[2] / (perp * rSq);
+  jacobian[1][2] = -perp / rSq;
+  jacobian[2][0] = -m_Position[1] / perpSq;
+  jacobian[2][1] =  m_Position[0] / perpSq;
+  jacobian[2][2] =  0.0;
+  return (covariance.Similarity(jacobian))(i, i);
 }

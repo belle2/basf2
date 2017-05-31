@@ -426,16 +426,6 @@ void TrackExtrapolateG4e::event(bool byMuid)
         swim(extState, g4eState, &eclClusterInfo, &klmClusterInfo, &bklmHitUsed);
       } // Muid hypothesis loop
     } // Muid track loop
-    // START DIVOT - prevent crash in reconstruction/KLId/KLMExpert
-    StoreArray<TrackClusterSeparation> trackClusterSeparations(*m_TrackClusterSeparationsColName);
-    for (int c = 0; c < klmClusters.getEntries(); ++c) {
-      TrackClusterSeparation* tcs = klmClusters[c]->getRelatedTo<TrackClusterSeparation>();
-      if (tcs == NULL) {
-        TrackClusterSeparation* h = trackClusterSeparations.appendNew();
-        klmClusters[c]->addRelationTo(h);
-      }
-    }
-    // END DIVOT
   } else { // event() called by Ext module
     G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
     for (auto& b2track : tracks) {

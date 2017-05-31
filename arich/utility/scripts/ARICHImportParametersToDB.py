@@ -61,6 +61,11 @@ dbImporter = ARICHDatabaseImporter()
 
 # dbImporter.importSimulationParams()
 
+# import reconstruction parameters
+# at this point it only initializes "default" values, defined in ARICHReconstructionPar class itself
+
+# dbImporter.importReconstructionParams()
+
 
 # import channel mapping
 # ARICHChannelMapping is a DB class, used by ARICH simulation/reconstruction software,

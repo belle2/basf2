@@ -32,7 +32,7 @@ void ARICHReconstructionPar::initializeDefault()
   m_thcResolution->SetParameters(parsRes);
 
   m_pars = {0.18, 0.13};
-  m_flatBkgPerPad = 0.0;
+  m_flatBkgPerPad = 0.0014;
 
   m_aerogelFOM = {11.3, 13.0};
 }

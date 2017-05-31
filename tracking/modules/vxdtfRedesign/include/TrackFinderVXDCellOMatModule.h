@@ -20,6 +20,8 @@
 
 #include <tracking/trackFindingVXD/algorithms/CellularAutomaton.h>
 #include <tracking/trackFindingVXD/algorithms/PathCollectorRecursive.h>
+#include <tracking/trackFindingVXD/algorithms/NodeFamilyDefiner.h>
+
 #include <tracking/trackFindingVXD/algorithms/CALogger.h>
 #include <tracking/trackFindingVXD/algorithms/CAValidator.h>
 #include <tracking/trackFindingVXD/algorithms/NodeCompatibilityCheckerPathCollector.h>
@@ -110,7 +112,9 @@ namespace Belle2 {
     /** Regulates if every subset of sufficient length of a path shall be collected as separate path or not. */
     bool m_PARAMstoreSubsets;
 
-/// member variables
+    bool m_PARAMsetFamilies;
+
+    /// member variables
 
     /** CA algorithm */
     CellularAutomaton<Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >, Belle2::CAValidator<Belle2::CACell>, Belle2::CALogger>
@@ -126,6 +130,12 @@ namespace Belle2 {
 
     /** tool for creating SPTCs, fills storeArray directly */
     SpacePointTrackCandCreator<StoreArray<Belle2::SpacePointTrackCand>> m_sptcCreator;
+
+    NodeFamilyDefiner <
+    Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >,
+           Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>,
+           std::vector<Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>*>
+           > m_familyDefiner;
 
 
     /// input containers

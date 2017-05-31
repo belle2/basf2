@@ -268,6 +268,16 @@ namespace Belle2 {
     std::string getRefereeStatusString(std::string delimiter = " ") const;
 
     /**
+     * return family identifier
+     */
+    unsigned short getFamily() const { return m_family; }
+
+    /**
+     * assign family identifier
+     */
+    void setFamily(unsigned short family) { m_family = family; }
+
+    /**
      * set the sorting parameters
      */
     void setSortingParameters(const std::vector<double>& sortParams);
@@ -343,6 +353,12 @@ namespace Belle2 {
      */
     std::vector<double> m_sortingParameters;
 
+
+    /**
+     * identifier for tracks that share at least two SpacePoints.
+     */
+    short m_family;
+
     /**
      * PDG code of particle
      */
@@ -396,6 +412,6 @@ namespace Belle2 {
     double m_qualityIndex;
 
     // last members added: RefereeStatutsBit(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2), m_qualityIndex
-    ClassDef(SpacePointTrackCand, 8)
+    ClassDef(SpacePointTrackCand, 9)
   };
 }

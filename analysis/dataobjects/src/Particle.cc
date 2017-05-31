@@ -11,6 +11,8 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
+#include <analysis/ClusterUtility/ClusterUtils.h>
+
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -22,7 +24,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/HTML.h>
-
 
 #include <TClonesArray.h>
 #include <TDatabasePDG.h>
@@ -166,11 +167,16 @@ Particle::Particle(const ECLCluster* eclCluster) :
   m_pdgCode = 22;
   setFlavorType();
 
-  m_px = eclCluster->getPx();
-  m_py = eclCluster->getPy();
-  m_pz = eclCluster->getPz();
+  // returns default vertex from clusterutils (from beam parameters if available)
+  // leave it like that for the moment to make it transparent
+  ClusterUtils C;
+  const TVector3 clustervertex = C.GetIPPosition();
+  setVertex(clustervertex);
 
-  setVertex(eclCluster->getPosition());
+  const TLorentzVector clustermom = C.Get4MomentumFromCluster(eclCluster, clustervertex);
+  m_px = clustermom.Px();
+  m_py = clustermom.Py();
+  m_pz = clustermom.Pz();
 
   m_particleType = c_ECLCluster;
   setMdstArrayIndex(eclCluster->getArrayIndex());
@@ -179,8 +185,12 @@ Particle::Particle(const ECLCluster* eclCluster) :
   //TODO: gamma quality can be written here
   m_pValue = 1;
 
-  // set error matrix
-  storeErrorMatrix(eclCluster->getCovarianceMatrix7x7());
+  // Get covariance matrix of IP distribution.
+  const TMatrixDSym clustervertexcovmat = C.GetIPPositionCovarianceMatrix();
+
+  // Set error matrix.
+  TMatrixDSym clustercovmat = C.GetCovarianceMatrix7x7FromCluster(eclCluster, clustervertex, clustervertexcovmat);
+  storeErrorMatrix(clustercovmat);
 }
 
 Particle::Particle(const KLMCluster* klmCluster) :

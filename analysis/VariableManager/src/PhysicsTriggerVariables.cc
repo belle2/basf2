@@ -15,6 +15,9 @@
 
 #include <analysis/VariableManager/Manager.h>
 
+// ecl cluster utility
+#include <analysis/ClusterUtility/ClusterUtils.h>
+
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -357,7 +360,8 @@ namespace Belle2 {
       if (pp) {
         const ECLCluster* eclTrack = (pp->getTrack())->getRelated<ECLCluster>();
         if (eclTrack) {
-          TLorentzVector V4p1 = eclTrack->get4Vector();
+          ClusterUtils C;
+          TLorentzVector V4p1 = C.Get4MomentumFromCluster(eclTrack);
           result = (PCmsLabTransform::labToCms(V4p1)).E();
 
         }
@@ -414,7 +418,8 @@ namespace Belle2 {
       if (pp) {
         const ECLCluster* eclTrack = (pp->getTrack())->getRelated<ECLCluster>();
         if (eclTrack) {
-          TLorentzVector V4p2 = eclTrack->get4Vector();
+          ClusterUtils C;
+          TLorentzVector V4p2 = C.Get4MomentumFromCluster(eclTrack);
           result = (PCmsLabTransform::labToCms(V4p2)).E();
         }
       }
@@ -643,12 +648,13 @@ namespace Belle2 {
       const ECLCluster*  ecle = NULL;
       double E1 = -1.;
       StoreObjPtr<ParticleList> gammahlt("gamma:HLT");
+      ClusterUtils C;
       for (unsigned  int i = 0; i < gammahlt->getListSize(); i++) {
         Particle* p;
         const ECLCluster* ecle_tmp;
         p = gammahlt->getParticle(i);
         ecle_tmp = p->getECLCluster();
-        TLorentzVector V4p = ecle_tmp->get4Vector();
+        TLorentzVector V4p = C.Get4MomentumFromCluster(ecle_tmp);
         double e = (PCmsLabTransform::labToCms(V4p)).Rho();
         if (E1 < e) {E1 = e; ecle = ecle_tmp;}
       }
@@ -667,7 +673,8 @@ namespace Belle2 {
       double result = -1.;
       const ECLCluster* cc = ECLClusterNeutralLE(particle);
       if (cc) {
-        TLorentzVector VNe = cc->get4Vector();
+        ClusterUtils C;
+        TLorentzVector VNe = C.Get4MomentumFromCluster(cc);
         result = (PCmsLabTransform::labToCms(VNe)).E();
       }
       return result;
@@ -700,6 +707,7 @@ namespace Belle2 {
       double E1 = -1.;
       StoreObjPtr<ParticleList> pionshlt("pi+:HLT");
       StoreObjPtr<ParticleList> gammahlt("gamma:HLT");
+      ClusterUtils C;
       for (unsigned  int i = 0; i < (pionshlt->getListSize() + gammahlt->getListSize()); i++) {
         Particle* p;
         const ECLCluster* ecle_tmp;
@@ -713,7 +721,7 @@ namespace Belle2 {
           p = gammahlt->getParticle(i - pionshlt->getListSize());
           ecle_tmp = p->getECLCluster();
         }
-        TLorentzVector V4p1 = ecle_tmp->get4Vector();
+        TLorentzVector V4p1 = C.Get4MomentumFromCluster(ecle_tmp);
         double e = (PCmsLabTransform::labToCms(V4p1)).Rho();
         if (E1 < e) {E1 = e; ecle = ecle_tmp;}
       }
@@ -731,7 +739,8 @@ namespace Belle2 {
     {
       double result = -1.;
       if (ECLClusterC1LE(p)) {
-        TLorentzVector V4p2 = (ECLClusterC1LE(p))->get4Vector();
+        ClusterUtils C;
+        TLorentzVector V4p2 = C.Get4MomentumFromCluster(ECLClusterC1LE(p));
         result = (PCmsLabTransform::labToCms(V4p2)).Rho();
       }
       return result;
@@ -786,7 +795,8 @@ namespace Belle2 {
           p = gammahlt->getParticle(i - pionshlt->getListSize());
           ecle_tmp = p->getECLCluster();
         }
-        TLorentzVector V4p2 = ecle_tmp->get4Vector();
+        ClusterUtils C;
+        TLorentzVector V4p2 = C.Get4MomentumFromCluster(ecle_tmp);
         double e = (PCmsLabTransform::labToCms(V4p2)).Rho();
         if (e >= Ehigh) continue;
         else if (result < e) {result = e; ecle = ecle_tmp;}
@@ -808,7 +818,8 @@ namespace Belle2 {
     {
       double result = -1.;
       if (ECLClusterC2LE(p)) {
-        TLorentzVector V4p2 = (ECLClusterC2LE(p))->get4Vector();
+        ClusterUtils C;
+        TLorentzVector V4p2 = C.Get4MomentumFromCluster(ECLClusterC2LE(p));
         result = (PCmsLabTransform::labToCms(V4p2)).Rho();
       }
       return result;
@@ -847,8 +858,9 @@ namespace Belle2 {
       if (ECLClusterC1LE(particle) && ECLClusterC2LE(particle)) {
         const ECLCluster* E1 =  ECLClusterC1LE(particle);
         const ECLCluster* E2 =  ECLClusterC2LE(particle);
-        TLorentzVector V4p1 = E1->get4Vector();
-        TLorentzVector V4p2 = E2->get4Vector();
+        ClusterUtils C;
+        TLorentzVector V4p1 = C.Get4MomentumFromCluster(E1);
+        TLorentzVector V4p2 = C.Get4MomentumFromCluster(E2);
         const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
         const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
 
@@ -862,7 +874,8 @@ namespace Belle2 {
       double result = -10.;
 
       if (ECLClusterNeutralLE(particle)) {
-        TLorentzVector V4g1 = ECLClusterNeutralLE(particle)->get4Vector();
+        ClusterUtils C;
+        TLorentzVector V4g1 = C.Get4MomentumFromCluster(ECLClusterNeutralLE(particle));
         //const TVector3 V3g1 = (PCmsLabTransform::labToCms(V4g1)).Vect();
         if (T1(particle)) {
           TLorentzVector V4p1 = T1(particle)->get4Vector();
@@ -886,7 +899,8 @@ namespace Belle2 {
       double result = -10.;
 
       if (ECLClusterNeutralLE(particle)) {
-        TLorentzVector V4g1 = ECLClusterNeutralLE(particle)->get4Vector();
+        ClusterUtils C;
+        TLorentzVector V4g1 = C.Get4MomentumFromCluster(ECLClusterNeutralLE(particle));
         //const TVector3 V3g1 = (PCmsLabTransform::labToCms(V4g1)).Vect();
         if (T1(particle)) {
           TLorentzVector V4p1 = T1(particle)->get4Vector();
@@ -903,7 +917,8 @@ namespace Belle2 {
       double result = -10.;
 
       if (ECLClusterNeutralLE(particle)) {
-        TLorentzVector V4g1 = ECLClusterNeutralLE(particle)->get4Vector();
+        ClusterUtils C;
+        TLorentzVector V4g1 = C.Get4MomentumFromCluster(ECLClusterNeutralLE(particle));
         //const TVector3 V3g1 = (PCmsLabTransform::labToCms(V4g1)).Vect();
         if (T2(particle)) {
           TLorentzVector V4p2 = T2(particle)->get4Vector();
@@ -921,7 +936,8 @@ namespace Belle2 {
       double result = -10.;
       if (T1(particle) && ECLClusterC1LE(particle)) {
         TLorentzVector V4p1 = T1(particle)->get4Vector();
-        TLorentzVector V4e1 =  ECLClusterC1LE(particle)->get4Vector();
+        ClusterUtils C;
+        TLorentzVector V4e1 =  C.Get4MomentumFromCluster(ECLClusterC1LE(particle));
         //const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
         //const TVector3 V3e1 = (PCmsLabTransform::labToCms(V4e1)).Vect();
         //result = V3p1.Angle(V3e1);
@@ -936,7 +952,8 @@ namespace Belle2 {
       if (T1(particle) && ECLClusterC2LE(particle)) {
         TLorentzVector V4p1 = T1(particle)->get4Vector();
         const ECLCluster* E2 =  ECLClusterC2LE(particle);
-        TLorentzVector V4e2 = E2->get4Vector();
+        ClusterUtils C;
+        TLorentzVector V4e2 = C.Get4MomentumFromCluster(E2);
 //     const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
 //    const TVector3 V3e2 = (PCmsLabTransform::labToCms(V4e2)).Vect();
         result = (V4p1.Vect()).Angle(V4e2.Vect());
@@ -950,7 +967,8 @@ namespace Belle2 {
       if (T2(particle) && ECLClusterC1LE(particle)) {
         TLorentzVector V4p2 = T2(particle)->get4Vector();
         const ECLCluster* E1 =  ECLClusterC1LE(particle);
-        TLorentzVector V4e1 = E1->get4Vector();
+        ClusterUtils C;
+        TLorentzVector V4e1 = C.Get4MomentumFromCluster(E1);
 //     const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
 //    const TVector3 V3e1 = (PCmsLabTransform::labToCms(V4e1)).Vect();
         result = (V4p2.Vect()).Angle(V4e1.Vect());
@@ -965,7 +983,8 @@ namespace Belle2 {
       if (T2(particle) && ECLClusterC2LE(particle)) {
         TLorentzVector V4p2 = T2(particle)->get4Vector();
         const ECLCluster* E2 =  ECLClusterC2LE(particle);
-        TLorentzVector V4e2 = E2->get4Vector();
+        ClusterUtils C;
+        TLorentzVector V4e2 = C.Get4MomentumFromCluster(E2);
 //     const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
 //     const TVector3 V3e2 = (PCmsLabTransform::labToCms(V4e2)).Vect();
         result = (V4p2.Vect()).Angle(V4e2.Vect());

@@ -12,6 +12,7 @@
 #include <hlt/softwaretrigger/core/utilities.h>
 // TODO: Also cache it
 #include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/ClusterUtility/ClusterUtils.h>
 
 #include <numeric>
 
@@ -80,7 +81,8 @@ namespace Belle2 {
       // AngleGTLE
       double angleGTLE = -10.;
       if (eclClusterWithMaximumRho) {
-        const TLorentzVector& V4g1 = eclClusterWithMaximumRho->get4Vector();
+        ClusterUtils C;
+        const TLorentzVector& V4g1 = C.Get4MomentumFromCluster(eclClusterWithMaximumRho);
         if (trackWithMaximumRho) {
           const TLorentzVector& V4p1 = trackWithMaximumRho->get4Vector();
           const double theta1 = (V4g1.Vect()).Angle(V4p1.Vect());

@@ -294,10 +294,10 @@ mdst_dataobjects = [
         "getEnergy", "getTheta", "getPhi", "getR", "getUncertaintyEnergy",
         "getUncertaintyTheta", "getUncertaintyPhi", "getEnergyRaw", "getTime",
         "getDeltaTime99", "getE9oE21", "getEnergyHighestCrystal", "getLAT",
-        "getNumberOfCrystals", "getStatus", "getPx", "getPy",
-        "getPz", "getMomentum", "get4Vector", "getClusterPosition",
-        "getPosition", "getCovarianceMatrix4x4", "getCovarianceMatrix7x7", "getCovarianceMatrix3x3", "isTrack",
-        "isNeutral", "getDeltaL", "getE1oE9", "getAbsZernike40", "getAbsZernike51", "getZernikeMVA", "getSecondMoment"
+        "getNumberOfCrystals", "getStatus", "getClusterPosition",
+        "getCovarianceMatrix3x3", "isTrack", "isNeutral", "getDeltaL",
+        "getE1oE9", "getAbsZernike40", "getAbsZernike51", "getZernikeMVA",
+        "getSecondMoment"
     ], {
         "getRelationsWith": ["MCParticles"],
     }),

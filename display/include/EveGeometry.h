@@ -11,7 +11,7 @@ namespace Belle2 {
       c_Simplified /**< a simplified Belle II geometry. */
     };
     /** Add TGeo geometry to Eve (only needs to be done once.) */
-    void addGeometry();
+    void addGeometry(EType visMode);
 
     /** switch to given visualisation mode. */
     void setVisualisationMode(EType visMode);

@@ -120,7 +120,6 @@ void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
       add(new NSMVHandlerROOutputPort(m_stream0[i], vname + ".output.port"));
     }
   } catch (const std::out_of_range& e) {
-    LogFile::error(e.what());
     throw (RCHandlerException(e.what()));
   }
 }

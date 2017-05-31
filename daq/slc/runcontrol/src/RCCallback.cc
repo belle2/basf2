@@ -152,7 +152,6 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
       if (cmd == RCCommand::CONFIGURE) {
         try {
           abort();
-          LogFile::info(msg.getData());
           dbload(msg.getLength(), msg.getData());
         } catch (const IOException& e) {
           throw (RCHandlerException(e.what()));
@@ -198,7 +197,7 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
           recover(m_obj);
         }
       } catch (const RCHandlerException& e) {
-        LogFile::fatal("Failed to recover/abort : %s", e.what());
+        log(LogFile::FATAL, "Failed to recover/abort : %s", e.what());
         reply(NSMMessage(NSMCommand::FATAL, e.what()));
       }
     }
@@ -207,14 +206,14 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
       setState(state);
     }
   } catch (const RCHandlerFatalException& e) {
-    LogFile::fatal(e.what());
+    log(LogFile::FATAL, e.what());
     reply(NSMMessage(NSMCommand::FATAL, e.what()));
   } catch (const RCHandlerException& e) {
-    LogFile::error(e.what());
+    log(LogFile::ERROR, e.what());
     setState(RCState::ERROR_ES);
     reply(NSMMessage(NSMCommand::ERROR, e.what()));
   } catch (const std::exception& e) {
-    LogFile::fatal("Unknown exception: %s. terminating process", e.what());
+    log(LogFile::FATAL, "Unknown exception: %s. terminating process", e.what());
   }
   return true;
 }
@@ -259,7 +258,6 @@ DBObject RCCallback::dbload(const std::string& path)
   if (path.find("db://") != std::string::npos) {
     pathin = StringUtil::replace(path, "db://", "");
     StringList s = StringUtil::split(pathin, '/');
-    LogFile::debug(pathin);
     if (s.size() > 1) {
       table = s[0];
       config = s[1];
@@ -267,8 +265,6 @@ DBObject RCCallback::dbload(const std::string& path)
       table = m_table;
       config = s[0];
     }
-    LogFile::debug(table);
-    LogFile::debug(config);
   } else if (path.find("file://") != std::string::npos) {
     pathin = StringUtil::replace(path, "file:/", "");
     return obj;

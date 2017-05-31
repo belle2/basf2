@@ -176,7 +176,6 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     m_con[0].addArgument("2");
     if (!m_con[0].load(10)) {
       std::string emsg = "storagein: Failed to connect to eb2rx";
-      LogFile::error(emsg);
       throw (RCHandlerException(emsg));
     }
     set("storagein.pid", m_con[0].getProcess().get_id());
@@ -200,7 +199,6 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     m_con[1].addArgument("3");
     if (!m_con[1].load(30)) {
       std::string emsg = "storagerecord: Failed to start";
-      LogFile::error(emsg);
       throw (RCHandlerException(emsg));
     }
     set("storagerecord.pid", m_con[1].getProcess().get_id());
@@ -242,7 +240,6 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
       m_con[i].addArgument("1");
       if (!m_con[i].load(0)) {
         std::string emsg = StringUtil::form("Failed to start %d-th basf2", i - 3);
-        LogFile::error(emsg);
         throw (RCHandlerException(emsg));
       }
       set(StringUtil::form("basf2[%d].pid", i - 3), m_con[i].getProcess().get_id());

@@ -206,14 +206,9 @@ void EB1RXCallback::monitor() throw(RCHandlerException)
     set(vname + "connection", (int)m_eb_stat->down(0).port > 0);
     double total_byte = m_eb_stat->down(0).total_byte;
     double flowrate = (m_total_byte_out[0] - total_byte) / dt;
-    //double nevent = m_eb_stat->down(0).nevent;
-    //double evtrate = (m_nevent - nevent)/ dt;
-    //set(vname + "nevent", (float)nevent);
-    //set(vname + "evtrate", (float)evtrate);
     set(vname + "total_byte", (float)total_byte);
     set(vname + "floarate", (float)flowrate);
     m_total_byte_out[0] = total_byte;
-    //m_nevent_out[0] = nevent;
     for (int i = 0; i < m_nsenders; i++) {
       std::string vname = StringUtil::form("stat.in[%d].", i);
       set(vname + "event", (int)m_eb_stat->up(i).event);
@@ -223,14 +218,9 @@ void EB1RXCallback::monitor() throw(RCHandlerException)
       set(vname + "connection", (int)m_eb_stat->up(i).port > 0);
       double total_byte = m_eb_stat->down(0).total_byte;
       double flowrate = (m_total_byte_in[i] - total_byte) / dt;
-      //double nevent = m_eb_stat->down(0).nevent;
-      //double evtrate = (m_nevent - nevent)/ dt;
-      //set(vname + "nevent", (float)nevent);
-      //set(vname + "evtrate", (float)evtrate);
       set(vname + "total_byte", (float)total_byte);
       set(vname + "floarate", (float)flowrate);
       m_total_byte_in[i] = total_byte;
-      //m_nevent_in[i] = nevent;
     }
   } else {
     std::string vname = StringUtil::form("stat.out.");
@@ -239,8 +229,6 @@ void EB1RXCallback::monitor() throw(RCHandlerException)
     set(vname + "addr", 0);
     set(vname + "port", 0);
     set(vname + "connection", 0);
-    //set(vname + "nevent", 0);
-    //set(vname + "evtrate", 0);
     set(vname + "total_byte", 0);
     set(vname + "floarate", 0);
     for (int i = 0; i < m_nsenders; i++) {
@@ -250,8 +238,6 @@ void EB1RXCallback::monitor() throw(RCHandlerException)
       set(vname + "addr", 0);
       set(vname + "port", 0);
       set(vname + "connection", 0);
-      //set(vname + "nevent", 0);
-      //set(vname + "evtrate", 0);
       set(vname + "total_byte", 0);
       set(vname + "floarate", 0);
     }

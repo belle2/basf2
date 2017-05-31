@@ -154,14 +154,13 @@ double ExtHit::getErrorPhi() const
 
 double ExtHit::getPolarCovariance(int i) const
 {
-
   TMatrixDSym covariance(3);
   covariance[0][0] = m_Covariance[0];
   covariance[0][1] = covariance[1][0] = m_Covariance[1];
-  covariance[0][2] = covariance[2][0] = m_Covariance[2];
-  covariance[1][1] = m_Covariance[6];
-  covariance[1][2] = covariance[2][1] = m_Covariance[7];
-  covariance[2][2] = m_Covariance[11];
+  covariance[1][1] = m_Covariance[2];
+  covariance[0][2] = covariance[2][0] = m_Covariance[3];
+  covariance[1][2] = covariance[2][1] = m_Covariance[4];
+  covariance[2][2] = m_Covariance[5];
   double perpSq = m_Position[0] * m_Position[0] + m_Position[1] * m_Position[1];
   double perp = sqrt(perpSq);
   double rSq = perpSq + m_Position[2] * m_Position[2];
@@ -176,5 +175,5 @@ double ExtHit::getPolarCovariance(int i) const
   jacobian[2][0] = -m_Position[1] / perpSq;
   jacobian[2][1] =  m_Position[0] / perpSq;
   jacobian[2][2] =  0.0;
-  return (covariance.Similarity(jacobian))(i, i);
+  return (covariance.Similarity(jacobian))[i][i];
 }

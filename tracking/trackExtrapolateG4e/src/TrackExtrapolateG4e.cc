@@ -604,13 +604,12 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   double mass = particle->GetPDGMass();
   double minPSq = (mass + m_MinKE) * (mass + m_MinKE) - mass * mass;
   // Create structures for ECLCluster-Track matching
-  std::vector<double> eclClusterDistance;
-  std::vector<ExtHit> eclHit;
+  std::vector<ExtHit> eclHit1, eclHit2;
   if (eclClusterInfo != NULL) {
-    eclClusterDistance.resize(eclClusterInfo->size(), 1.0E10); // "positive infinity"
-    eclHit.resize(eclClusterInfo->size(),
-                  ExtHit(extState.pdgCode, Const::EDetector::ECL, 0, EXT_ECLCROSS, 0.0,
-                         G4ThreeVector(), G4ThreeVector(), G4ErrorSymMatrix(6)));
+    ExtHit tempExtHit(extState.pdgCode, Const::EDetector::ECL, 0, EXT_FIRST, 0.0,
+                      G4ThreeVector(), G4ThreeVector(), G4ErrorSymMatrix(6));
+    eclHit1.resize(eclClusterInfo->size(), tempExtHit);
+    eclHit2.resize(eclClusterInfo->size(), tempExtHit);
   }
   // Create structures for KLMCluster-Track matching
   std::vector<TrackClusterSeparation> klmHit;
@@ -666,29 +665,44 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
       }
       if (eclClusterInfo != NULL) {
         for (unsigned int c = 0; c < eclClusterInfo->size(); ++c) {
-          if (eclClusterDistance[c] < 0.0) continue; // skip if a bona fide crossing exists
-          G4ThreeVector eclPos = (*eclClusterInfo)[c].second;
-          G4ThreeVector separation = eclPos - pos;
-          double distance = separation.mag();
-          if (distance > m_MaxECLTrackClusterDistance) continue;
-          if (distance < eclClusterDistance[c]) {
-            eclClusterDistance[c] = distance;
-            G4ErrorSymMatrix covariance(6);
-            fromG4eToPhasespace(g4eState, covariance);
-            eclHit[c].update(EXT_ECLNEAR, extState.tof, pos / CLHEP::cm, mom / CLHEP::GeV, covariance);
-          }
-          if (pos.mag2() < eclPos.mag2()) continue;
-          eclClusterDistance[c] = -1.0; // flag the bona fide crossing of the eclCluster's sphere
+          G4ThreeVector eclPos((*eclClusterInfo)[c].second);
           G4ThreeVector prePos(preStepPoint->GetPosition());
-          double r = eclPos.mag();
-          double preD = prePos.mag() - r;
-          double postD = pos.mag() - r;
-          double f = postD / (postD - preD);
-          G4ThreeVector midPos = pos + (prePos - pos) * f;
-          double tof = extState.tof + dt * f * (extState.isCosmic ? +1 : -1); // in ns, at end of step
-          G4ErrorSymMatrix covariance(6);
-          fromG4eToPhasespace(g4eState, covariance);
-          eclHit[c].update(EXT_ECLCROSS, tof, midPos / CLHEP::cm, mom / CLHEP::GeV, covariance);
+          G4ThreeVector diff(prePos - eclPos);
+          // find position of crossing of the track with the ECLCluster's sphere
+          if (eclHit1[c].getStatus() == EXT_FIRST) {
+            if (diff.mag() < m_MaxECLTrackClusterDistance) {
+              if (pos.mag2() >= eclPos.mag2()) {
+                double r = eclPos.mag();
+                double preD = prePos.mag() - r;
+                double postD = pos.mag() - r;
+                double f = postD / (postD - preD);
+                G4ThreeVector midPos = pos + (prePos - pos) * f;
+                double tof = extState.tof + dt * f * (extState.isCosmic ? +1 : -1); // in ns, at end of step
+                G4ErrorSymMatrix covariance(6);
+                fromG4eToPhasespace(g4eState, covariance);
+                eclHit1[c].update(EXT_ECLCROSS, tof, midPos / CLHEP::cm, mom / CLHEP::GeV, covariance);
+              }
+            }
+          }
+          // find closest distance to the radial line to the ECLCluster
+          if (eclHit2[c].getStatus() == EXT_FIRST) {
+            G4ThreeVector delta(pos - prePos);
+            G4ThreeVector perp(eclPos.cross(delta));
+            double perpMag2 = perp.mag2();
+            if (perpMag2 > 1.0E-10) {
+              double dist = fabs(diff * perp) / sqrt(perpMag2);
+              if (dist < m_MaxECLTrackClusterDistance) {
+                double f = eclPos * (prePos.cross(perp)) / perpMag2;
+                if ((f > -0.5) && (f <= 1.0)) {
+                  G4ThreeVector midPos(prePos + f * delta);
+                  double length = extState.length + dl * (1.0 - f) * (extState.isCosmic ? +1 : -1);
+                  G4ErrorSymMatrix covariance(6);
+                  fromG4eToPhasespace(g4eState, covariance);
+                  eclHit2[c].update(EXT_ECLDL, length, midPos / CLHEP::cm, mom / CLHEP::GeV, covariance);
+                }
+              }
+            }
+          }
         }
       }
       if (klmClusterInfo != NULL) {
@@ -728,10 +742,16 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   if (eclClusterInfo != NULL) {
     StoreArray<ExtHit> extHits(*m_ExtHitsColName);
     for (unsigned int c = 0; c < eclClusterInfo->size(); ++c) {
-      if (eclClusterDistance[c] > 1.0E9) continue;
-      ExtHit* h = extHits.appendNew(eclHit[c]);
-      (*eclClusterInfo)[c].first->addRelationTo(h);
-      extState.track->addRelationTo(h);
+      if (eclHit1[c].getStatus() != EXT_FIRST) {
+        ExtHit* h = extHits.appendNew(eclHit1[c]);
+        (*eclClusterInfo)[c].first->addRelationTo(h);
+        extState.track->addRelationTo(h);
+      }
+      if (eclHit2[c].getStatus() != EXT_FIRST) {
+        ExtHit* h = extHits.appendNew(eclHit2[c]);
+        (*eclClusterInfo)[c].first->addRelationTo(h);
+        extState.track->addRelationTo(h);
+      }
     }
   }
 

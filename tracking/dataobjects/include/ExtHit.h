@@ -21,7 +21,7 @@ namespace Belle2 {
 
   //! Define state of extrapolation for each recorded hit
   enum ExtHitStatus { EXT_FIRST = -1, EXT_ENTER, EXT_EXIT, EXT_STOP, EXT_ESCAPE,
-                      EXT_ECLCROSS, EXT_ECLNEAR
+                      EXT_ECLCROSS, EXT_ECLDL
                     };
 
   //! Store one Ext hit as a ROOT object
@@ -82,6 +82,10 @@ namespace Belle2 {
     //! @return time of flight from the point of closest approach near the origin to this hit (ns)
     double getTOF() const { return m_TOF; }
 
+    //! Get path length from start of extrapolation to closest approach to ECL cluster (for EXT_ECLDL only)
+    //! @return path length (in radiation lengths)
+    double getLength() const { return m_TOF; }
+
     //! Get position of this extrapolation hit
     //! @return position (cm) of this extrapolation hit
     TVector3 getPosition() const { return TVector3(m_Position[0], m_Position[1], m_Position[2]); }
@@ -139,7 +143,7 @@ namespace Belle2 {
     float m_Covariance[21];
 
     //! Needed to make the ROOT object storable
-    ClassDef(ExtHit, 5)
+    ClassDef(ExtHit, 6)
 
   };
 }

@@ -196,8 +196,9 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
   double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
   m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
-  double r = 400.0 * CLHEP::mm;
-  m_MinRadiusSq = r * r;
+  GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
+  double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2") * CLHEP::cm; // mm
+  m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
 
 }
 
@@ -271,12 +272,13 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
   double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
   m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
+  GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
+  double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2") * CLHEP::cm; // mm
+  m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
 
   // Set up the MUID-specific geometry
   bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();
   const EKLM::GeometryData& eklmGeometry = EKLM::GeometryData::Instance();
-  double r = bklmGeometry->getSolenoidOuterRadius() * CLHEP::cm * 0.2; // roughly 400 mm
-  m_MinRadiusSq = r * r;
   m_BarrelHalfLength = bklmGeometry->getHalfLength() * CLHEP::cm; // in G4 units (mm)
   m_EndcapHalfLength = 0.5 * eklmGeometry.getEndcapPosition()->getLength(); // in G4 units (mm)
   m_OffsetZ = bklmGeometry->getOffsetZ() * CLHEP::cm; // in G4 units (mm)

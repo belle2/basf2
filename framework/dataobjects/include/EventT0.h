@@ -86,7 +86,7 @@ namespace Belle2 {
       EventT0Component() {}
 
       /// Convenience constructor.
-      EventT0Component(IntOrDouble eventT0_, Const::EDetector detector_) :
+      EventT0Component(const IntOrDouble& eventT0_, Const::EDetector detector_) :
         eventT0(eventT0_), detector(detector_) {}
 
       /// Storage of the T0 estimation.

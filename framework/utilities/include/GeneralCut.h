@@ -94,7 +94,7 @@ namespace Belle2 {
      * @param cut the string defining the cut
      * @return std::unique_ptr<Cut>
      */
-    static std::unique_ptr<GeneralCut> compile(std::string cut)
+    static std::unique_ptr<GeneralCut> compile(const std::string& cut)
     {
       return std::unique_ptr<GeneralCut>(new GeneralCut(cut));
     }

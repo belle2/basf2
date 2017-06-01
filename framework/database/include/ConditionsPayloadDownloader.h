@@ -53,7 +53,8 @@ namespace Belle2 {
     class SessionGuard final {
     public:
       /** Constructor which makes sure there is an active session */
-      SessionGuard(ConditionsPayloadDownloader& instance): m_instance(instance), m_createdSession(instance.startSession()) {}
+      explicit SessionGuard(ConditionsPayloadDownloader& instance):
+        m_instance(instance), m_createdSession(instance.startSession()) {}
       /** disable move construction */
       SessionGuard(SessionGuard&&) = delete;
       /** disable move assignment */

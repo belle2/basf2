@@ -251,7 +251,7 @@ namespace Belle2 {
       /** Simple constructor which uses c_Info for output on stdout and c_Error for output on stderr
        * @param name name of the code causing the output, for example "ROOT", "Rave", ...
        */
-      OutputToLogMessages(const std::string& name): OutputToLogMessages(name, LogConfig::c_Info, LogConfig::c_Error)
+      explicit OutputToLogMessages(const std::string& name): OutputToLogMessages(name, LogConfig::c_Info, LogConfig::c_Error)
       {}
       /** Set the indent for each line of the output, default is the supplied name + `": "` */
       void setIndent(const std::string& indent) { m_indent = indent; }

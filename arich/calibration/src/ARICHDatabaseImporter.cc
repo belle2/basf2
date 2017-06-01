@@ -814,7 +814,7 @@ void ARICHDatabaseImporter::exportHapdQA()
   // Print serial numbers of HAPDs
   unsigned int el = 0;
   for (const auto& element : elements) {
-    B2INFO("Serial number = " << element.getHapdSerialNumber() << "; arrival date = " << element.getHapdArrivalDate());
+    B2INFO(el << ". Serial number = " << element.getHapdSerialNumber() << "; arrival date = " << element.getHapdArrivalDate());
     el++;
   }
 }
@@ -1895,7 +1895,7 @@ void ARICHDatabaseImporter::exportHapdQE()
   // Example that prints serial numbers of HAPDs and saves QE 2D histograms to root file
   unsigned int el = 0;
   for (const auto& element : elements) {
-    B2INFO("SN = " << element.getHapdSerialNumber());
+    B2INFO(el << ". SN = " << element.getHapdSerialNumber());
     TH2F* qe2d = element.getQuantumEfficiency2D();
     TFile file("QEhists.root", "update");
     qe2d->Write();

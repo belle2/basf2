@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Remnev Mikhail                                           *
+ * Contributors: Milkail Remnev, Dmitry Matvienko                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,27 +12,24 @@
 #define ECLDISPLAYMODULE_H
 
 #include <rawdata/dataobjects/RawECL.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <cstdio>
-#include <TROOT.h>
-#include <TRint.h>
-#include <TRootEmbeddedCanvas.h>
-#include <unistd.h>
-#include <fcntl.h>
-
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <ecl/utility/eclChannelMapper.h>
+#include <ecl/dataobjects/ECLDigit.h>
+
+#include <TSystem.h>
+#include <TApplication.h>
+#include <string>
+
 #include <ecl/modules/eclDisplay/EclFrame.h>
-#include <TThread.h>
+#include <ecl/modules/eclDisplay/EclData.h>
 
 namespace Belle2 {
   /**
    * Displays energy distribution in ECL.
    *
-   * This module implements multiple presentations of RawECL data in the
-   * user-defined interval.
+   * EclDisplay module implements multiple graphical views of RawECL data in the
+   * user-defined event interval.
    *
    */
   class EclDisplayModule : public Module {
@@ -42,34 +39,78 @@ namespace Belle2 {
     /**  */
     EclDisplayModule();
 
-    /**  */
+    /**
+     * @brief Module destructor. Empty because all resources are freed in
+     * terminate().
+     */
     virtual ~EclDisplayModule();
 
-    void startThread(int in);
-
-    /**  */
+    /**
+     * @brief Initialize EclChannelMapper.
+     */
     virtual void initialize();
 
-    /**  */
+    /**
+     * @brief Empty method.
+     */
     virtual void beginRun();
 
-    /**  */
+    /**
+     * @brief Handle event. Loads events into EclData and updates EclFrame
+     * if m_autoDisplay flag is set.
+     */
     virtual void event();
 
-    /**  */
+    /**
+     * @brief Empty method.
+     */
+    virtual void endRun();
+
+    /**
+     * @brief Wait till EclFrame is closed then free allocated resources.
+     */
     virtual void terminate();
 
-    virtual void serializeAndSend(int ch, int amp, int time, int evtn);
-
   private:
-    void ReadEclEvent(RawCOPPER* raw_copper, int evt_num);
-    void AddEclCluster(StoreArray<RawECL>& raw_eclarray);
+    /**
+     * @brief Initialize EclFrame.
+     */
+    void initFrame();
 
-    bool m_displayEnergy;  /**< If true, energy distribution in ECL is displayed. Frequency of events per crystal is displayed otherwise. */
-    int m_displayMode;  /**< Default display mode. Can be later changed in GUI. */
-    bool m_autoDisplay;  /**< If true, events are displayed as soon as they are loaded. */
+    /// If true, energy distribution in ECL is displayed. Frequency of events per crystal is displayed otherwise.
+    bool m_displayEnergy;
+    // TODO: List possible display mode IDs from EclPainterFactory.
+    /// Default display mode. Can be later changed in GUI.
+    int m_displayMode;
+    /// If true, events are displayed as soon as they are loaded.
+    bool m_autoDisplay;
+    /// filename to initialize ECLChannelMapper.
+    std::string m_eclMapperInitFileName;
 
-    int m_out;
+    /// Flag to check if EclFrame is closed;
+    bool m_frame_closed;
+    /// Counter of added events.
+    int m_evtNum;
+    /// Root GUI to display ECL data.
+    EclFrame* m_frame;
+    /// Application to contain EclFrame.
+    TApplication* m_app;
+    /// Class that provides interface for quick and comprehensive analysis of
+    /// large number of events.
+    EclData* m_data;
+    /// Displayed ECL events.
+    StoreArray<ECLDigit> eclarray;
+    /// Channel mapper to show channel <-> (crate, shaper) distributions.
+    ECLChannelMapper m_mapper;
+
+  public:
+    /* SLOTS */
+    /**
+     * This method is called when EclFrame is closed.
+     */
+    void handleClosedFrame();
+
+    ClassDef(EclDisplayModule, 0)
   };
 }
 

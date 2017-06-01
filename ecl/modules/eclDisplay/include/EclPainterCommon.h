@@ -8,59 +8,68 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECL_CANVAS_POLAR
-#define ECL_CANVAS_POLAR
+#ifndef ECL_PAINTER_COMMON
+#define ECL_PAINTER_COMMON
 
 #include <ecl/modules/eclDisplay/EclPainter.h>
-#include <TH2.h>
-#include <TCrown.h>
-#include <TText.h>
-#include <TAxis.h>
+#include <TH1.h>
+
+// TODO: Dynamic bin count for AMP_SUM
 
 namespace Belle2 {
   /**
-   * @brief Painter for EclData, polar energy/event_count distribution.
+   * @brief Painter for EclData that shows common event characteristics on
+   * 1D histograms.
    */
-  class EclPainterPolar : public EclPainter {
+  class EclPainterCommon : public EclPainter {
   public:
-    /**
-     * @brief Type for polar histogram.
-     */
-    enum Type {PHI, THETA};
+    /// Subtype of histogram to draw.
+    /// AMP Amplitude per channel distribution.
+    /// AMP_SUM Amplitude per event distribution.
+    enum Type {AMP, AMP_SUM, TIME};
 
     /**
      * @brief Constructor for EclPainter subclass.
      */
-    EclPainterPolar(EclData* data, Type type);
+    EclPainterCommon(EclData* data, Type type);
     /**
      * @brief Destructor for EclPainter subclass.
      */
-    ~EclPainterPolar();
+    virtual ~EclPainterCommon();
 
   private:
-    /// Type for polar histogram.
+    /// Display subtypes of this class.
     Type m_type;
-    /// Histogram that generates Z-axis.
-    TH2F* m_hist;
-    /// Phi (or theta) segments of the ECL.
-    TCrown** m_segs;
-    /// Labels for phi segments.
-    TText** m_labels;
+    /// Histogram for amplitude distribution.
+    TH1F* m_hist;
 
+    /**
+     * @brief Return number of X bins.
+     */
+    int getBinCount();
+    /**
+     * @brief Return m_x_min.
+     */
+    int getMinX();
+    /**
+     * @brief Return m_x_max.
+     */
+    int getMaxX();
     /**
      * @brief Initialize histogram.
      */
     void initHisto();
-    /**
-     * @brief Convert ECL channel id to id of the phi (theta) segment.
-     */
-    int channelToSegId(int channel);
     /**
      * @brief Update titles of the histogram.
      */
     void setTitles();
 
   public:
+    /**
+     * @brief Return subtype of ECLPainterCommon.
+     */
+    Type getType();
+
     /**
      * @brief Sets the information to be displayed in the provided
      * MultilineWidget
@@ -70,15 +79,10 @@ namespace Belle2 {
     virtual void getInformation(int px, int py, MultilineWidget* panel);
 
     /**
-     * @brief Return subtype of ECLPainterPolar.
-     */
-    Type getType();
-
-    /**
      * @brief Redraw the canvas.
      */
-    virtual void Draw();
+    void Draw();
   };
 }
 
-#endif // ECL_CANVAS_POLAR
+#endif // ECL_PAINTER_COMMON

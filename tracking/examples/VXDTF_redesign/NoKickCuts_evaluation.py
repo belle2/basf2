@@ -35,6 +35,8 @@ mctrackmatcher.param('UsePXDHits', False)
 mctrackmatcher.param('mcRecoTracksStoreArrayName', 'MCRecoTracks')
 
 NoKickCuts = register_module('NoKickCutsEval')
+NoKickCuts.param('useValidation', False)
+NoKickCuts.param('useFitMethod', False)
 
 
 main_path.add_module(rootinput)

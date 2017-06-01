@@ -63,7 +63,7 @@ RT2SPTCConverterModule::RT2SPTCConverterModule() :
 
   addParam("useSingleClusterSP", m_useSingleClusterSP, "Set to true if these SpacePoints should be used as fallback.", false);
 
-  //addParam("markRecoTracks", m_markRecoTracks, "If True RecoTracks where conversion problems occurred are marked dirty.", false);
+  addParam("markRecoTracks", m_markRecoTracks, "If True RecoTracks where conversion problems occurred are marked dirty.", false);
 
   addParam("noKickCutsFile", m_noKickCutsFile, "TFile of cuts related to NoKickCuts parameter", std::string(""));
 
@@ -109,8 +109,6 @@ void RT2SPTCConverterModule::initialize()
   m_momSel = new TH1F("m_momSel", "m_momSel", 100, 0, 4);
   m_momCut = new TH1F("m_momCut", "m_momCut", 100, 0, 4);
   m_momEff = new TH1F("m_momEff", "m_momEff", 100, 0, 4);
-
-  m_cMomentum = new TCanvas("m_cMomentum", "m_cMomentum", 800, 600);
 
 
 
@@ -385,46 +383,22 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
     finalSpacePoints.push_back(spacePointCandidates.at(0));
   } // end loop hits
 
-  delete m_trackSel;
-
   return std::make_pair(finalSpacePoints, state);
 }
 
 void RT2SPTCConverterModule::endRun()
 {
-  std::cout << "Number of Selected Tracks: " << m_npass << std::endl;
-  std::cout << "Number of Cutted Tracks: " << m_ncut << std::endl;
-
-  m_cMomentum->cd();
-  m_momSel->Draw();
-  m_momCut->Draw("SAME");
-  m_momSel->GetXaxis()->SetTitle("Momentum [Gev/c] ");
-  m_momSel->GetYaxis()->SetTitle(Form("(dN/dp)/%.4f ", m_momSel->GetXaxis()->GetBinWidth(1)));
-  m_momSel->SetTitle("Momentum distribution of selected and rejected tracks");
-  m_momCut->GetXaxis()->SetTitle("Momentum [Gev/c] ");
-  m_momCut->GetYaxis()->SetTitle(Form("(dN/dp)/%.4f ", m_momCut->GetXaxis()->GetBinWidth(1)));
-  m_momCut->SetTitle("Momentum distribution of selected and rejected tracks");
-  m_momSel->SetLineColor(2);
-  m_momCut->SetLineColor(4);
-  m_momSel->SetLineWidth(3);
-  m_momCut->SetLineWidth(3);
-  //
-  // TF1* cutfunc1 = new TF1("cutfunc1", "-7.5 * pow(10, -7) / pow(mom, 3.88) + 1",0,1);
-  // TF1* cutfunc2 = new TF1("cutfunc2", "6.3 * mom + 0.57;",0,1);
-
+  B2RESULT("Number of Selected Tracks (NoKickRTSel): " << m_npass);
+  B2RESULT("Number of Cutted Tracks (NoKickRTSel): " << m_ncut);
 
   m_momentumTFile->cd();
   m_momSel->Write();
   m_momCut->Write();
-  m_cMomentum->Write();
 
   m_momEff->Add(m_momSel, 1);
   m_momEff->Add(m_momCut, 1);
   m_momEff->Divide(m_momSel, m_momEff, 1, 1);
   m_momEff->Write();
-
-
-
 }
 
 // -------------------------------- TERMINATE --------------------------------------------------------

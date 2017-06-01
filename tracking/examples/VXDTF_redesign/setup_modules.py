@@ -13,6 +13,7 @@
 
 
 from basf2 import *
+from ROOT import Belle2
 
 
 def setup_Geometry(path=None):
@@ -209,7 +210,8 @@ def setup_RTCtoSPTCConverters(
         sptcOutput='checkedSPTCs',
         usePXD=True,
         logLevel=LogLevel.INFO,
-        debugVal=1):
+        debugVal=1,
+        useNoKick=False):
     """This function adds the modules needed to convert Reco-TCs to SpacePointTCs to given path.
 
     @param path if set to 0 (standard) the created modules will not be added, but returned.
@@ -226,6 +228,8 @@ def setup_RTCtoSPTCConverters(
     @param logLevel set to logLevel level of your choice.
 
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
+
+    @param useNoKick enable the training sample selection based on track parameters
     """
     print("setup RTCtoSPTCConverters...")
     spacePointNames = []
@@ -272,7 +276,12 @@ def setup_RTCtoSPTCConverters(
     recoTrackCandConverter.param('useSingleClusterSP', False)
     recoTrackCandConverter.param('minSP', 3)
     recoTrackCandConverter.param('skipProblematicCluster', False)
-    recoTrackCandConverter.param('noKickCutsFile', "")
+
+    NoKickCuts = Belle2.FileSystem.findFile("data/tracking/NoKickCuts.root")
+    if useNoKick:
+        recoTrackCandConverter.param('noKickCutsFile', NoKickCuts)
+    else:
+        recoTrackCandConverter.param('noKickCutsFile', "")
 
     # SpacePointTrackCand referee
     sptcReferee = register_module('SPTCReferee')

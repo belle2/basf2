@@ -151,7 +151,7 @@ bool NoKickRTSel::segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> se
         //  selCutPXD =0.3;
         break;
     }
-    //DEBUG-----------------------------------------
+
     double usedCut = 0;
     if (abs(selCut.at(0)) > abs(selCut.at(1))) {
       usedCut = abs(selCut.at(0));
@@ -161,21 +161,18 @@ bool NoKickRTSel::segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> se
     //   usedCut = selCutPXD;
     // }
 
-    //-----some debug lines ----- //
-    // if (deltaPar < -usedCut || deltaPar > usedCut) {
-    //   std::cout << "--------------------------" << std::endl;
-    //   std::cout << "lay1=" << hit1.m_sensorLayer << std::endl;
-    //   std::cout << "lay2=" << hit2.m_sensorLayer << std::endl;
-    //   std::cout << "parametro=" << par << std::endl;
-    //   std::cout << "Min=" << selCut.at(0) << std::endl;
-    //   std::cout << "Max=" << selCut.at(1) << std::endl;
-    //   std::cout << "deltapar=" << deltaPar << std::endl;
-    //   std::cout << "momentum=" << hit1.m_momentum0.Mag() << std::endl;
-    //------some debug lines ----- //
-    // }
-
     if (deltaPar > -usedCut && deltaPar < usedCut) return true;
-    else return false;
+    else {
+      B2DEBUG(75, "--------------------------");
+      B2DEBUG(75, "lay1=" << hit1.m_sensorLayer);
+      B2DEBUG(75, "lay2=" << hit2.m_sensorLayer);
+      B2DEBUG(75, "parameter=" << par);
+      B2DEBUG(75, "Min=" << selCut.at(0));
+      B2DEBUG(75, "Max=" << selCut.at(1));
+      B2DEBUG(75, "deltaPar=" << deltaPar);
+      B2DEBUG(75, "momentum=" << hit1.m_momentum0.Mag());
+      return false;
+    }
   }
 }
 

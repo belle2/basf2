@@ -104,7 +104,6 @@ namespace Belle2 {
 
     //validation NoKickCuts members
     TFile* m_momentumTFile; //validartion output TFile
-    TCanvas* m_cMomentum; //canvas of the momentum distribution in validation
     TH1F* m_momSel; //histogram of selected tracks
     TH1F* m_momCut; //histrogram of cutted tracks
     TH1F* m_momEff; //histogram for efficiency

@@ -113,7 +113,8 @@ namespace Belle2 {
     int m_pCounter = 0; //conter of hit out of range in momentum
     int m_tCounter = 0; //counter of hit out of range in theta
     int m_globCounter = 0; //counter of tracks cutted from global cuts
-    bool c_validationON = 0; //flag to activate some validation plots
+    bool c_validationON; //flag to activate some validation plots
+    bool c_fitMethod;
 
     NoKickRTSel m_trackSel; //auxiliary variable to use methods of NoKickRTSel
     TFile* m_outputFile; //output file of cuts

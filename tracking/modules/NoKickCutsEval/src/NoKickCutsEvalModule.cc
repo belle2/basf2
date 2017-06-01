@@ -44,6 +44,13 @@ REG_MODULE(NoKickCutsEval)
 NoKickCutsEvalModule::NoKickCutsEvalModule() : Module()
 {
   setDescription("This module evaluate cuts necessary for the selction of reco tracks based on Multiple Scattering, NoKickRTSel");
+
+  //write validation plots
+  addParam("useValidation", c_validationON,
+           "print in output file validation plot: track parameters distributions and cuts distributions", false);
+
+  //use fit method to evaluate cuts: DO NOT USE!
+  addParam("useFitMethod", c_fitMethod, "apply the method of double-gaussian fit to evaluate the cuts", false);
 }
 
 
@@ -186,54 +193,54 @@ void NoKickCutsEvalModule::endRun()
           std::vector<double> cut_m_theta;
           for (int p = 0; p < c_nbinp; p++) {
 
-            //--------------first method to evaluate cuts -------------------------//
-            //  TF1 *fit_2gaus  = new TF1("fit_2gaus","[0]*TMath::Gaus(x,[1],[2], kTRUE)+[3]*TMath::Gaus(x,[4],[5],kTRUE)+[6]",-limit.at(par).at(lay1).at(lay2).at(theta).at(p),limit.at(par).at(lay1).at(lay2).at(theta).at(p));
-            //
-            //  int N= m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Integral();
-            //  double integral= m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Integral();
-            //  int bin0 = c_nbin/2;
-            //  int n =m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(bin0);
-            //  double molt_sigma1=0.5;
-            //  double molt_sigma2=2;
-            //  double sigma1=(double)molt_sigma1*(m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetStdDev());
-            //  double sigma2 =(double)molt_sigma2*(m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetStdDev());
-            //  double norm1 = sigma1*sqrt(2*3.1415)*0.9*n;
-            //  double norm2 = sigma2*sqrt(2*3.1415)*0.1*n;
-            //  double mean1=(double)m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetMean();
-            //  double mean2=(double)m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetMean();
-            //  double bkg = (double)m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(2);
-            //
-            //  fit_2gaus->SetParameters(norm1,mean1,sigma1,norm2,mean2,sigma2,bkg);
-            //  m_histo.at(par).at(lay1).at(lay2).at(theta).at(p) -> Fit(fit_2gaus,"","",-limit.at(par).at(lay1).at(lay2).at(theta).at(p),limit.at(par).at(lay1).at(lay2).at(theta).at(p));
-            //  //double limit_M =3*(sqrt(fit_2gaus->GetParameter(2)*fit_2gaus->GetParameter(2))+fit_2gaus->GetParameter(1));
-            //   cut_M_theta.push_back(3*(sqrt(fit_2gaus->GetParameter(2)*fit_2gaus->GetParameter(2))));
-            //  // limit_m =3*(-sqrt(fit_2gaus->GetParameter(2)*fit_2gaus->GetParameter(2))+fit_2gaus->GetParameter(1));
-            //  cut_m_theta.push_back(3*(-sqrt(fit_2gaus->GetParameter(2)*fit_2gaus->GetParameter(2))));
+            //--------------first method to evaluate cuts, not used -------------------------//
+            if (c_fitMethod) {
+              TF1* fit_2gaus  = new TF1("fit_2gaus", "[0]*TMath::Gaus(x,[1],[2], kTRUE)+[3]*TMath::Gaus(x,[4],[5],kTRUE)+[6]",
+                                        -m_histoLim.at(par), m_histoLim.at(par));
+
+              int bin0 = c_nbin / 2;
+              int nbin0 = m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(bin0);
+              double moltSigma1 = 0.5;
+              double moltSigma2 = 2;
+              double sigma1 = (double)moltSigma1 * (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetStdDev());
+              double sigma2 = (double)moltSigma2 * (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetStdDev());
+              double norm1 = sigma1 * sqrt(2 * 3.1415) * 0.9 * nbin0;
+              double norm2 = sigma2 * sqrt(2 * 3.1415) * 0.1 * nbin0;
+              double mean1 = (double)m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetMean();
+              double mean2 = (double)m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetMean();
+              double bkg = (double)m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(2);
+
+              fit_2gaus->SetParameters(norm1, mean1, sigma1, norm2, mean2, sigma2, bkg);
+              m_histo.at(par).at(lay1).at(lay2).at(theta).at(p) -> Fit(fit_2gaus, "", "", -m_histoLim.at(par), m_histoLim.at(par));
+              cut_M_theta.push_back(3 * (sqrt(fit_2gaus->GetParameter(2)*fit_2gaus->GetParameter(2))));
+              cut_m_theta.push_back(3 * (-sqrt(fit_2gaus->GetParameter(2)*fit_2gaus->GetParameter(2))));
+            }
             //---------------END of first method ------------------------//
 
+            else {
+              //--------second method to evaluate (without fit), used-----------------//
+              double integral = m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Integral();
+              double sum_M = m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(c_nbin + 1);
+              double sum_m = m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(0);
+              double percent = 1 - cutFunction(p, c_pwidth);
 
-            //--------second method to evaluate (without fit)-----------------//
-            double integral = m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Integral();
-            double sum_M = m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(c_nbin + 1);
-            double sum_m = m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(0);
-            double percent = 1 - cutFunction(p, c_pwidth);
-
-            int bin_m = 0;
-            int bin_M = c_nbin + 1;
-            while (sum_m < integral * percent / 2) {
-              bin_m++;
-              sum_m = sum_m + m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(bin_m);
+              int bin_m = 0;
+              int bin_M = c_nbin + 1;
+              while (sum_m < integral * percent / 2) {
+                bin_m++;
+                sum_m = sum_m + m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(bin_m);
+              }
+              while (sum_M < integral * percent / 2) {
+                bin_M--;
+                sum_M = sum_M + m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(bin_M);
+              }
+              if (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetEntries() < 100) {
+                bin_m = 0;
+                bin_M = c_nbin + 1;
+              }
+              cut_M_theta.push_back(m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinCenter(bin_M));
+              cut_m_theta.push_back(m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinCenter(bin_m));
             }
-            while (sum_M < integral * percent / 2) {
-              bin_M--;
-              sum_M = sum_M + m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(bin_M);
-            }
-            if (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetEntries() < 100) {
-              bin_m = 0;
-              bin_M = c_nbin + 1;
-            }
-            cut_M_theta.push_back(m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinCenter(bin_M));
-            cut_m_theta.push_back(m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinCenter(bin_m));
             //-----------------------END of second method ------------------------//
 
           }
@@ -355,32 +362,34 @@ void NoKickCutsEvalModule::endRun()
 
 //----------------------------------------------VALIDATION PLOTS ------------------------------//
 
-  //-------------Some debugs lines-----------------//
-  // for (int g = 0; g < c_nbinp; g++) {
-  //   double p_out_mom = g * c_pwidth + c_pmin;
-  //   double t_out_theta = c_twidth + c_tmin;
-  //   std::cout << "momentum=" << p_out_mom << std::endl;
-  //   std::cout << "d0, 3-4,  Min: " << cut_m.at(1).at(3).at(4).at(1).at(g) << std::endl;
-  //   std::cout << "min cut (TH2F):" << cut_m_histo.at(1).at(3).at(4)->GetBinContent(g + 1, 2) << std::endl;
-  //   double norm_min = cut_out_norm.at(0).at(1).at(3).at(4);
-  //   double pow_min = cut_out_pow.at(0).at(1).at(3).at(4);
-  //   double bkg_min = cut_out_bkg.at(0).at(1).at(3).at(4);
-  //   std::cout << "norm par min:" << norm_min << std::endl;
-  //   std::cout << "pow par min:" << pow_min << std::endl;
-  //   std::cout << "bkg par min:" << bkg_min << std::endl;
-  //   std::cout << "evaluate min cut:" << norm_min / (sqrt(sin(t_out_theta)) * pow(p_out_mom, pow_min)) + bkg_min << std::endl;
-  //   std::cout << "d0, 3-4,  Max: " << cut_M.at(1).at(3).at(4).at(1).at(g) << std::endl;
-  //   std::cout << "max cut (TH2F):" << cut_M_histo.at(1).at(3).at(4)->GetBinContent(g + 1, 2) << std::endl;
-  //   double norm_max = cut_out_norm.at(1).at(1).at(3).at(4);
-  //   double pow_max = cut_out_pow.at(1).at(1).at(3).at(4);
-  //   double bkg_max = cut_out_bkg.at(1).at(1).at(3).at(4);
-  //   std::cout << "norm par max:" << norm_max << std::endl;
-  //   std::cout << "pow par max:" << pow_max << std::endl;
-  //   std::cout << "bkg par max:" << bkg_max << std::endl;
-  //   std::cout << "evaluate max cut:" << norm_max / (sqrt(sin(t_out_theta)) * pow(p_out_mom, pow_max)) + bkg_max << std::endl;
-  //   std::cout << "----------------------------------------" << std::endl;
-  // }
-  //-----------_END OF DEBUG LINES ------//
+//-------------Some debugs lines-----------------//
+  if (Belle2::LogSystem::Instance().isLevelEnabled(Belle2::LogConfig::c_Debug, 30, PACKAGENAME())) {
+    for (int g = 0; g < c_nbinp; g++) {
+      double p_out_mom = g * c_pwidth + c_pmin;
+      double t_out_theta = c_twidth + c_tmin;
+      B2DEBUG(30, "momentum=" << p_out_mom);
+      B2DEBUG(30, "d0, 3-4,  Min: " << cut_m.at(1).at(3).at(4).at(1).at(g));
+      B2DEBUG(30, "min cut (TH2F):" << cut_m_histo.at(1).at(3).at(4)->GetBinContent(g + 1, 2));
+      double norm_min = cut_out_norm.at(0).at(1).at(3).at(4);
+      double pow_min = cut_out_pow.at(0).at(1).at(3).at(4);
+      double bkg_min = cut_out_bkg.at(0).at(1).at(3).at(4);
+      B2DEBUG(30, "norm par min:" << norm_min);
+      B2DEBUG(30, "pow par min:" << pow_min);
+      B2DEBUG(30, "bkg par min:" << bkg_min);
+      B2DEBUG(30, "evaluate min cut:" << norm_min / (sqrt(sin(t_out_theta)) * pow(p_out_mom, pow_min)) + bkg_min);
+      B2DEBUG(30, "d0, 3-4,  Max: " << cut_M.at(1).at(3).at(4).at(1).at(g));
+      B2DEBUG(30, "max cut (TH2F):" << cut_M_histo.at(1).at(3).at(4)->GetBinContent(g + 1, 2));
+      double norm_max = cut_out_norm.at(1).at(1).at(3).at(4);
+      double pow_max = cut_out_pow.at(1).at(1).at(3).at(4);
+      double bkg_max = cut_out_bkg.at(1).at(1).at(3).at(4);
+      B2DEBUG(30, "norm par max:" << norm_max);
+      B2DEBUG(30, "pow par max:" << pow_max);
+      B2DEBUG(30, "bkg par max:" << bkg_max);
+      B2DEBUG(30, "evaluate max cut:" << norm_max / (sqrt(sin(t_out_theta)) * pow(p_out_mom, pow_max)) + bkg_max);
+      B2DEBUG(30, "----------------------------------------");
+    }
+  }
+  //-----------end of debug lines ------//
 
   if (c_validationON == 1) {
     //print on tfile distributions of DeltaX
@@ -459,9 +468,9 @@ void NoKickCutsEvalModule::endRun()
   output_bkg_m->Write();
   output_bkg_M->Write();
   //m_outputFile->Close();
-  std::cout << "number of spacepoint with theta out of limits=" << m_tCounter << std::endl;
-  std::cout << "number of spacepoint with momentum out of limits=" << m_pCounter << std::endl;
-  std::cout << "number of tracks cutted by global cuts=" << m_globCounter << std::endl;
+  B2INFO("number of spacepoint with theta out of limits=" << m_tCounter);
+  B2INFO("number of spacepoint with momentum out of limits=" << m_pCounter);
+  B2INFO("number of tracks cutted by global cuts=" << m_globCounter);
 
 
 }

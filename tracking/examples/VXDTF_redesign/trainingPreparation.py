@@ -19,6 +19,23 @@
 from basf2 import *
 from setup_modules import setup_RTCtoSPTCConverters
 from setup_modules import setup_Geometry
+import argparse
+
+# ---------------------------------------------------------------------------------------
+# Argument parser to enable training sample selection via comandline option.
+parser = argparse.ArgumentParser(description='Training sample preparation:\
+                                     Prepare a data sample to train the sector map.\n\
+                                     Usage: basf2 traininPreparation.py -i dataSample.root -- --enable_selection boolean')
+parser.add_argument(
+    '--enable_selection',
+    dest='use_NoKick',
+    action='store_const',
+    const=True,
+    default=False,
+    help='enable the selection of training sample based on track parameters')
+
+arguments = parser.parse_args()
+use_noKick = arguments.use_NoKick
 
 
 # ---------------------------------------------------------------------------------------
@@ -72,7 +89,8 @@ setup_RTCtoSPTCConverters(path=path,
                           RTCinput='MCRecoTracks',
                           sptcOutput='checkedSPTCs',
                           usePXD=usePXD,
-                          logLevel=LogLevel.ERROR)
+                          logLevel=LogLevel.ERROR,
+                          useNoKick=use_noKick)
 
 
 # SecMap BootStrap

@@ -27,12 +27,17 @@ namespace prog = boost::program_options;
 
 int main(int argc, char* argv[])
 {
+  std::string fileName;
+  std::string lfn;
+  std::vector<std::string> dataDescriptions;
   // define command line options
   prog::options_description options("Options");
   options.add_options()
   ("help,h", "print all available options")
-  ("file", prog::value<string>(), "file name")
-  ("lfn,l", prog::value<string>(), "logical file name")
+  ("file", prog::value<string>(&fileName), "file name")
+  ("lfn,l", prog::value<string>(&lfn), "logical file name")
+  ("description,d", prog::value<std::vector<std::string>>(&dataDescriptions),
+   "data description to set of the form key=value. If the argument does not contain an equal sign it's interpeted as a key to delete from the dataDescriptions")
   ;
 
   prog::positional_options_description posOptDesc;
@@ -46,25 +51,23 @@ int main(int argc, char* argv[])
   // check for help option
   if (varMap.count("help")) {
     cout << "Usage: " << argv[0] << " [OPTIONS] [FILE]\n";
-    cout << "Add/edit LFN in given file, also update file catalog.\n\n";
+    cout << "Add/edit LFN in given file or modify the data description stored in the file, also update file catalog.\n\n";
     cout << options << endl;
     return 0;
   }
 
   // check parameters
-  for (auto param : {"file", "lfn"}) {
-    if (!varMap.count(param)) {
-      B2ERROR("The " << param << " parameter is missing.");
-      return 1;
-    }
+  if (!varMap.count("file")) {
+    B2ERROR("The filename is missing.");
+    return 1;
+  }
+  if (!varMap.count("lfn") && !varMap.count("description")) {
+    B2ERROR("Neither lfn nor data descriptions to be modified, nothing to do");
+    return 1;
   }
 
-  // read parameters
-  string fileName = varMap["file"].as<string>();
-  string lfn = varMap["lfn"].as<string>();
-
   // open the root file
-  gErrorIgnoreLevel = kError;
+  //gErrorIgnoreLevel = kError;
   TFile* file = TFile::Open(fileName.c_str(), "UPDATE");
   if (!file || !file->IsOpen()) {
     B2ERROR("Failed to open the file " << fileName);
@@ -91,7 +94,20 @@ int main(int argc, char* argv[])
   }
 
   // update the IDs and write the updated FileMetaData to the file
-  fileMetaData->setLfn(lfn);
+  if (varMap.count("lfn")) fileMetaData->setLfn(lfn);
+  if (!dataDescriptions.empty()) {
+    for (const auto keyvalue : dataDescriptions) {
+      size_t pos = keyvalue.find("=");
+      if (pos == std::string::npos) {
+        // no '=' in -d argument, assume deletion
+        fileMetaData->removeDataDescription(keyvalue);
+      } else {
+        const std::string key = keyvalue.substr(0, pos);
+        const std::string value = keyvalue.substr(pos + 1);
+        fileMetaData->setDataDescription(key, value);
+      }
+    }
+  }
   if (newTree) {
     newTree->Fill();
     newTree->Write(newTree->GetName(), TObject::kWriteDelete);

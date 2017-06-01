@@ -112,8 +112,8 @@ void ECLShowerShapeModule::initialize()
 
 }
 
-MVA::GeneralOptions ECLShowerShapeModule::initilizeMVA(const std::string& identifier,
-                                                       std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>& weightFileRepresentation, std::unique_ptr<MVA::Expert>& expert)
+void ECLShowerShapeModule::initilizeMVA(const std::string& identifier,
+                                        std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>& weightFileRepresentation, std::unique_ptr<MVA::Expert>& expert)
 {
   MVA::Weightfile  weightfile;
   //Load MVA weight file
@@ -121,7 +121,9 @@ MVA::GeneralOptions ECLShowerShapeModule::initilizeMVA(const std::string& identi
     if (weightFileRepresentation->hasChanged()) {
       std::stringstream ss((*weightFileRepresentation)->m_data);
       weightfile = MVA::Weightfile::loadFromStream(ss);
-    }
+    } else //If a single conditions database source has been configured (for example only a local DB, as in when HLT is running), hasChanged() will always return false, even though the run number has changed.
+      //In that case, return without doing anything. (This is true as of 2017-06-01, functionality of hasChanged() might be changed in future)
+      return;
   } else {
     weightfile = MVA::Weightfile::loadFromFile(identifier);
   }
@@ -137,19 +139,18 @@ MVA::GeneralOptions ECLShowerShapeModule::initilizeMVA(const std::string& identi
   expert = supported_interfaces[general_options.m_method]->getExpert();
   expert->load(weightfile);
 
-  return general_options;
-
+  //create new dataset, if this is the barrel MVA (assumes FWD and BWD datasets are same size)
+  if (weightFileRepresentation == m_weightfile_representation_BRL) {
+    std::vector<float> dummy(general_options.m_variables.size(), 0);
+    m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, dummy, 0));
+  }
 }
 
 void ECLShowerShapeModule::beginRun()
 {
   initilizeMVA(m_zernike_MVAidentifier_FWD, m_weightfile_representation_FWD, m_expert_FWD);
-  MVA::GeneralOptions generalOptions = initilizeMVA(m_zernike_MVAidentifier_BRL, m_weightfile_representation_BRL, m_expert_BRL);
+  initilizeMVA(m_zernike_MVAidentifier_BRL, m_weightfile_representation_BRL, m_expert_BRL);
   initilizeMVA(m_zernike_MVAidentifier_BWD, m_weightfile_representation_BWD, m_expert_BWD);
-
-  std::vector<float> dummy;
-  dummy.resize(generalOptions.m_variables.size(), 0);
-  m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(generalOptions, dummy, 0));
 
   //This is a hack because the callback doesn't seem to be called at the begining of the run
   if (m_secondMomentCorrectionArray.hasChanged()) {

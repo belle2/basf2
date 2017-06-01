@@ -45,7 +45,7 @@ hitXPModule::~hitXPModule()
 void hitXPModule::initialize()
 {
 
-//iniziialize of useful store array and relations
+  /** iniziialize of useful store array and relations */
   StoreArray<SVDDigit> storeDigits("");
   StoreArray<SVDCluster> storeClusters("");
   StoreArray<SVDTrueHit> storeTrueHits("");
@@ -69,8 +69,9 @@ void hitXPModule::initialize()
 
 
 
-//inizialize output TFile (ttree, with own-class (hitXP) branch)
-//nb: is not possibile to completely access to entries of this tree using external scripts
+  /** inizialize output TFile (ttree, with own-class (hitXP) branch)
+  * nb: is not possibile to completely access to entries of this tree using external scripts
+  */
   m_outputFile = new TFile("TFile_hitXP.root", "RECREATE");
   m_tree = new TTree("TTree_hitXP", "TTree_hitXP");
 
@@ -110,7 +111,7 @@ void hitXPModule::initialize()
 //------------------------------------External Tree creation--------------------------------------//
 //-------------------------------------------------------------------------------------------------//
 
-//output tree for complete external use (same datas, but using only root default classes)
+  /** output tree for complete external use (same datas, but using only root default classes) */
   m_outputFileExt = new TFile("TFile_hitXP_ext.root", "RECREATE");
   m_treeExt = new TTree("TTree_hitXP_ext", "TTree_hitXP_ext");
 
@@ -292,7 +293,7 @@ void hitXPModule::event()
     //-------------------------------------------------------------------------------------------------//
     //------------------------------------Selected Tree creation--------------------------------------//
     //-------------------------------------------------------------------------------------------------//
-    //this selecation take tracks that has at least one hit on each layer, and make 4-hit-trakcs selecting first hit found on each layer.
+    /** this selecation take tracks that has at least one hit on each layer, and make 4-hit-trakcs selecting first hit found on each layer. */
     int f3 = 0, f4 = 0, f5 = 0, f6 = 0;
     int layer_flag = 0;
     int j = 0;
@@ -349,7 +350,7 @@ void hitXPModule::event()
     //-------------------------------------------------------------------------------------------------//
     //------------------------------------Tight Selected Tree creation--------------------------------------//
     //-------------------------------------------------------------------------------------------------//
-    //this selecation take tracks that has exaclty one hit on each layer, so cut away overlap from selected tree
+    /** this selecation take tracks that has exaclty one hit on each layer, so cut away overlap from selected tree */
     if (m_numberHitPerTrack == 4 && m_hitXP[0].m_sensorLayer == 3 && m_hitXP[1].m_sensorLayer == 4
         && m_hitXP[2].m_sensorLayer == 5 && m_hitXP[3].m_sensorLayer == 6) {
       int h = 0;

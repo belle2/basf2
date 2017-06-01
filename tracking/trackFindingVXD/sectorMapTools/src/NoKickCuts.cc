@@ -66,10 +66,11 @@ double NoKickCuts::getCut(int layer1, int layer2, Eparameter par, Eminmax m, Ecu
       cutVector = m_cutBkg;
       break;
   }
-  //numeration order inside vector<vector<vector<vetor<double>>>> cut:
-  //<Eminmax<Eparameters<layer_int<layer_ext>>>>
-  //Eminmax: 0=min,1=max
-  //Eparameters: 0=omega, 1=d0, 2=phi0, 3=z0, 4=tanLmabda
+  /** numeration order inside vector<vector<vector<vetor<double>>>> cut:
+  * <Eminmax<Eparameters<layer_int<layer_ext>>>>
+  * Eminmax: 0=min,1=max
+  * Eparameters: 0=omega, 1=d0, 2=phi0, 3=z0, 4=tanLmabda
+  */
 
 
   out = cutVector.at(m).at(par).at(layer1).at(layer2);

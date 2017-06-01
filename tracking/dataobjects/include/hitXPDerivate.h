@@ -29,23 +29,25 @@ namespace Belle2 {
 
   class hitXPDerivate: public hitXP {
 
-    //  This class is the derivate of HitXP, and complete it with a constructor that use
-    //  all other complex types (classes) of basf2. It is necessary to buld a hitXP object.
-
+    /**  This class is the derivate of HitXP, and complete it with a constructor that use
+    * all other complex types (classes) of basf2. It is necessary to buld a hitXP object.
+    */
 
   public:
 
-    //empy constructor
+    /** empy constructor */
     hitXPDerivate() {}
 
-    // constructor for SVD hit
-    //with arguments:  hit, cluster, particle, sensor info)
+    /** constructor for SVD hit
+    * with arguments:  hit, cluster, particle, sensor info)
+    */
     hitXPDerivate(const SVDTrueHit& hit, const SVDCluster cluster, const MCParticle& particle, const VXD::SensorInfoBase& sensor);
 
-    // constructor for PXD hit
-    //with arguments:  hit, particle, sensor info)
+    /** constructor for PXD hit
+    * with arguments:  hit, particle, sensor info)
+    */
     hitXPDerivate(const PXDTrueHit& hit, const MCParticle& particle, const VXD::SensorInfoBase& sensor);
 
     ClassDef(hitXPDerivate, 1);
   };
-} //end namespace Belle2
+} /** end namespace Belle2 */

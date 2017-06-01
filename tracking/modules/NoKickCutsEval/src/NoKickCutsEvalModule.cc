@@ -45,11 +45,11 @@ NoKickCutsEvalModule::NoKickCutsEvalModule() : Module()
 {
   setDescription("This module evaluate cuts necessary for the selction of reco tracks based on Multiple Scattering, NoKickRTSel");
 
-  //write validation plots
+  /** write validation plots */
   addParam("useValidation", c_validationON,
            "print in output file validation plot: track parameters distributions and cuts distributions", false);
 
-  //use fit method to evaluate cuts: DO NOT USE!
+  /** use fit method to evaluate cuts: DO NOT USE! */
   addParam("useFitMethod", c_fitMethod, "apply the method of double-gaussian fit to evaluate the cuts", false);
 }
 
@@ -96,7 +96,7 @@ void NoKickCutsEvalModule::initialize()
     histo_par.clear();
   }
 
-//iniziialize of useful store array and relations
+  /** iniziialize of useful store array and relations */
   StoreArray<SVDCluster> storeClusters("");
   StoreArray<SVDTrueHit> storeTrueHits("");
   StoreArray<MCParticle> storeMCParticles("");
@@ -113,7 +113,7 @@ void NoKickCutsEvalModule::initialize()
 
 
 
-//inizialize output TFile with cuts-histograms
+  /** inizialize output TFile with cuts-histograms */
   m_outputFile = new TFile("NoKickCuts.root", "RECREATE");
 
 
@@ -267,7 +267,7 @@ void NoKickCutsEvalModule::endRun()
 
   //------------------------------------------FIT THE CUTS --------------------------------//
 
-  //buld 2D histogram with cuts
+  /** buld 2D histogram with cuts */
   std::vector<std::vector<std::vector<TH2F*>>> cut_M_histo;
   std::vector<std::vector<std::vector<TH2F*>>> cut_m_histo;
 
@@ -300,7 +300,7 @@ void NoKickCutsEvalModule::endRun()
     cut_m_histo_par.clear();
   }
 
-  //Fit
+  /** Fit */
   std::vector<std::vector<std::vector<std::vector<double>>>> cut_out_norm;
   std::vector<std::vector<std::vector<std::vector<double>>>> cut_out_pow;
   std::vector<std::vector<std::vector<std::vector<double>>>> cut_out_bkg;
@@ -392,7 +392,7 @@ void NoKickCutsEvalModule::endRun()
   //-----------end of debug lines ------//
 
   if (c_validationON == 1) {
-    //print on tfile distributions of DeltaX
+    /** print on tfile distributions of DeltaX */
     m_outputFile->cd();
     for (int par = 0; par < c_nbinpar; par++) {
       for (int lay1 = 0; lay1 < c_nbinlay; lay1++) {
@@ -411,7 +411,7 @@ void NoKickCutsEvalModule::endRun()
       }
     }
 
-    //print on tfile distributions of cuts and fits
+    /** print on tfile distributions of cuts and fits */
     for (int par = 0; par < c_nbinpar; par++) {
       for (int lay1 = 0; lay1 < c_nbinlay; lay1++) {
         for (int lay2 = 0; lay2 < c_nbinlay; lay2++) {
@@ -467,7 +467,7 @@ void NoKickCutsEvalModule::endRun()
   output_pow_M->Write();
   output_bkg_m->Write();
   output_bkg_M->Write();
-  //m_outputFile->Close();
+  m_outputFile->Close();
   B2INFO("number of spacepoint with theta out of limits=" << m_tCounter);
   B2INFO("number of spacepoint with momentum out of limits=" << m_pCounter);
   B2INFO("number of tracks cutted by global cuts=" << m_globCounter);

@@ -101,7 +101,6 @@ bool LocalDatabase::readDatabase()
       if (pos == std::string::npos) {
         throw std::runtime_error("payload name must be of the form dbstore/<payloadname>");
       }
-      string package = name.substr(0, pos);
       string module = name.substr(pos + 1, name.length());
       // and add to map of payloads
       B2DEBUG(100, m_fileName << ":" << lineno << ": found payload " << boost::io::quoted(module)

@@ -67,7 +67,7 @@ namespace Belle2 {
       return rssPages * pageSizeKb;
     }
 
-    Timer::Timer(std::string text):
+    Timer::Timer(const std::string& text):
       m_startTime(getClock()),
       m_text(text)
     { }

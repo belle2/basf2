@@ -24,7 +24,7 @@ namespace {
     std::vector<LogMessage>& m_messages;
   public:
     /** remember where to put the messages */
-    LogInterceptor(std::vector<LogMessage>& messages): m_messages(messages) {}
+    explicit LogInterceptor(std::vector<LogMessage>& messages): m_messages(messages) {}
     /** always connected */
     bool isConnected() { return true; }
     /** and always sucessful in storing into buffer */

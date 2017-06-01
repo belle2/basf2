@@ -15,7 +15,7 @@ namespace Belle2 {
      * @return reduced branch
      */
     template<class T>
-    T reduceTBranch(TBranch* branch, std::function<T(T, T)> f, T reduced = T())
+    T reduceTBranch(TBranch* branch, const std::function<T(T, T)>& f, T reduced = T())
     {
       T object;
       branch->SetAddress(&object);
@@ -62,7 +62,7 @@ namespace Belle2 {
     class Timer {
     public:
       /** Constructor, with some identifying text */
-      explicit Timer(std::string text = "");
+      explicit Timer(const std::string& text = "");
       ~Timer();
     private:
       double m_startTime; /**< time at start (in ns). */

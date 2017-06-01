@@ -20,13 +20,13 @@
 #include <CLHEP/Matrix/SymMatrix.h>
 #include <CLHEP/Matrix/Matrix.h>
 
-using namespace CLHEP;
+//using namespace CLHEP;
 
 namespace TreeFitter {
 
   class RecoTrack : public RecoParticle {
   public:
-    RecoTrack(Particle* bc, const ParticleBase* mother) ;
+    RecoTrack(Belle2::Particle* bc, const ParticleBase* mother) ;
     virtual ~RecoTrack() ;
 
     virtual ErrCode initPar2(FitParams*) ;
@@ -50,11 +50,11 @@ namespace TreeFitter {
     //    const BField* m_bfield ;
     double m_bfield; //Bfield along Z
     //    const TrkFit* m_trkFit ;
-    const TrackFitResult* m_trackfit;
+    const Belle2::TrackFitResult* m_trackfit;
     bool m_cached ;
     double m_flt ;
-    HepVector    m_m ;
-    HepSymMatrix m_matrixV ;
+    CLHEP::HepVector    m_m ;
+    CLHEP::HepSymMatrix m_matrixV ;
   } ;
 
 }

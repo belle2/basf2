@@ -13,12 +13,12 @@
 
 #include <analysis/modules/TreeFitter/RecoParticle.h>
 
-using namespace CLHEP;
+//using namespace CLHEP;
 
 namespace TreeFitter {
   class RecoPhoton : public RecoParticle {
   public:
-    RecoPhoton(Particle* bc, const ParticleBase* mother) ;
+    RecoPhoton(Belle2::Particle* bc, const ParticleBase* mother) ;
     virtual ~RecoPhoton() ;
 
     virtual int dimM() const { return m_useEnergy ? 3 : 2 ; }
@@ -33,13 +33,13 @@ namespace TreeFitter {
       alist.push_back(Constraint(this, Constraint::photon, depth, dimM())) ;
     }
 
-    static bool useEnergy(Particle& cand) ;
+    static bool useEnergy(Belle2::Particle& cand) ;
 
   private:
     bool m_init ;
     bool m_useEnergy ;
-    HepVector m_m ;
-    HepSymMatrix m_matrixV ;
+    CLHEP::HepVector m_m ;
+    CLHEP::HepSymMatrix m_matrixV ;
   } ;
 
 }

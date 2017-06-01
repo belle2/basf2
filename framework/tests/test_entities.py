@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 
 from hep_ipython_tools.entities import StoreContent, StoreContentList, StatisticsColumn, Statistics
 
@@ -56,4 +56,6 @@ class TestStatistics(TestCase):
         self.assertEqual(statistics.columns, test_columns)
         self.assertEqual(statistics.modules, test_modules)
 
+if __name__ == "__main__":
+    main()
 # @endcond

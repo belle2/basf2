@@ -13,7 +13,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-//temp
 //#include <framework/datastore/RelationIndex.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
@@ -328,10 +327,8 @@ void CDCDigitizerModule::event()
       // new entry
       signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, hitdEdx)));
       B2DEBUG(150, "Creating new Signal with encoded wire number: " << m_wireID);
-
     } else {
       // ... smallest drift time has to be checked, ...
-
       if (hitDriftTime < iterSignalMap->second.m_driftTime) {
         iterSignalMap->second.m_driftTime3 = iterSignalMap->second.m_driftTime2;
         iterSignalMap->second.m_simHitIndex3 = iterSignalMap->second.m_simHitIndex2;
@@ -340,6 +337,14 @@ void CDCDigitizerModule::event()
         iterSignalMap->second.m_driftTime   = hitDriftTime;
         iterSignalMap->second.m_simHitIndex = iHits;
         B2DEBUG(250, "hitDriftTime of current Signal: " << hitDriftTime << ",  hitDriftLength: " << hitDriftLength);
+      } else if (hitDriftTime < iterSignalMap->second.m_driftTime2) {
+        iterSignalMap->second.m_driftTime3 = iterSignalMap->second.m_driftTime2;
+        iterSignalMap->second.m_simHitIndex3 = iterSignalMap->second.m_simHitIndex2;
+        iterSignalMap->second.m_driftTime2   = hitDriftTime;
+        iterSignalMap->second.m_simHitIndex2 = iHits;
+      } else if (hitDriftTime < iterSignalMap->second.m_driftTime3) {
+        iterSignalMap->second.m_driftTime3   = hitDriftTime;
+        iterSignalMap->second.m_simHitIndex3 = iHits;
       }
       // ... total charge has to be updated.
       iterSignalMap->second.m_charge += hitdEdx;
@@ -387,7 +392,6 @@ void CDCDigitizerModule::event()
     unsigned short tdcCount = static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime) *
                                                           m_tdcBinWidthInv + 0.5);
     CDCHit* firstHit = cdcHits.appendNew(tdcCount, adcCount, iterSignalMap->first);
-    //temp
     //    std::cout <<"firsthit?= " << firstHit->is2ndHit() << std::endl;
     //set a relation: CDCSimHit -> CDCHit
     cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex, iCDCHits);
@@ -408,13 +412,18 @@ void CDCDigitizerModule::event()
       if (tdcCount2 != tdcCount) {
         CDCHit* secondHit = cdcHits.appendNew(tdcCount2, adcCount, iterSignalMap->first);
         secondHit->set2ndHitFlag();
-        //temp
+        secondHit->setOtherHitIndices(firstHit);
         //  std::cout <<"2ndhit?= " << secondHit->is2ndHit() << std::endl;
+        //  std::cout <<"1st-otherhitindex= " << firstHit->getOtherHitIndex() << std::endl;
+        //  std::cout <<"2nd-otherhitindex= " << secondHit->getOtherHitIndex() << std::endl;
+        //  secondHit->setOtherHitIndex(firstHit->getArrayIndex());
+        //  firstHit->setOtherHitIndex(secondHit->getArrayIndex());
+        //  std::cout <<"1st-otherhitindex= " << firstHit->getOtherHitIndex() << std::endl;
+        //  std::cout <<"2nd-otherhitindex= " << secondHit->getOtherHitIndex() << std::endl;
 
         //set a relation: CDCSimHit -> CDCHit
         ++iCDCHits;
         cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex2, iCDCHits);
-        //temp
         //        std::cout << "settdc2 " << firstHit->getTDCCount() << " " << secondHit->getTDCCount() << std::endl;
 
         //set a relation: MCParticle -> CDCHit
@@ -426,17 +435,17 @@ void CDCDigitizerModule::event()
           mcparticle->addRelationTo(secondHit, weight);
         }
       } else { //Check the 3rd hit when tdcCount = tdcCount2
-        //temp
         //        std::cout << "tdcCount1=2" << std::endl;
         if (iterSignalMap->second.m_simHitIndex3 >= 0) {
           unsigned short tdcCount3 = static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime3) *
                                                                  m_tdcBinWidthInv + 0.5);
-          //temp
           //          std::cout << "tdcCount3= " << tdcCount3 << " " << tdcCount << std::endl;
           if (tdcCount3 != tdcCount) {
             CDCHit* secondHit = cdcHits.appendNew(tdcCount3, adcCount, iterSignalMap->first);
             secondHit->set2ndHitFlag();
-            //temp
+            secondHit->setOtherHitIndices(firstHit);
+            //      secondHit->setOtherHitIndex(firstHit->getArrayIndex());
+            //      firstHit->setOtherHitIndex(secondHit->getArrayIndex());
             //      std::cout <<"2ndhit?= " << secondHit->is2ndHit() << std::endl;
 
             //set a relation: CDCSimHit -> CDCHit
@@ -461,14 +470,6 @@ void CDCDigitizerModule::event()
     /*    unsigned short tdcInCommonStop = static_cast<unsigned short>((m_tdcOffset - iterSignalMap->second.m_driftTime) * m_tdcBinWidthInv);
     float driftTimeFromTDC = static_cast<float>(m_tdcOffset - (tdcInCommonStop + 0.5)) * m_tdcBinWidth;
     std::cout <<"driftT bf digitization, TDC in common stop, digitized driftT = " << iterSignalMap->second.m_driftTime <<" "<< tdcInCommonStop <<" "<< driftTimeFromTDC << std::endl;
-    */
-    /*
-    if (rels.size() == 0) {
-      std::cout <<"try to set null rel" << std::endl;
-      const MCParticle* mcparticle = nullptr;
-      double weight = rels.weight(0);
-      cdcHit->addRelationTo(mcparticle, weight);
-    }
     */
     ++iCDCHits;
   }
@@ -503,8 +504,7 @@ void CDCDigitizerModule::event()
   int ncdcHits = cdcHits.getEntries();
   for (int j = 0; j < ncdcHits; ++j) {
     for (const RelationElement& rel : mcp_to_hit.getElementsTo(cdcHits[j])) {
-      //      std::cout << j << " " << rel.from->getIndex() << " " << rel.weight << std::endl;
-      //      std::cout << rel.from->getWeight() << std::endl;
+      std::cout << j << " " << cdcHits[j]->is2ndHit() <<" "<< rel.from->getIndex() << " " << rel.weight << std::endl;
     }
   }
   */

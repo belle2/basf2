@@ -36,9 +36,10 @@ namespace Belle2 {
         const double lhsPhi = fromTrack.getStartTrajectory3D().getFlightDirection3DAtSupport().phi();
         const double rhsPhi = toTrack.getStartTrajectory3D().getFlightDirection3DAtSupport().phi();
 
-        const double phiDistance = std::fabs(AngleUtil::normalised(lhsPhi - rhsPhi));
+        // We do not use a abs here, as we only want to have one of the two relations in the end
+        const double phiDistance = AngleUtil::normalised(lhsPhi - rhsPhi);
 
-        if (phiDistance > m_param_maximalPhiDistance)
+        if (phiDistance > m_param_maximalPhiDistance or phiDistance < 0)
         {
           return std::nan("");
         } else {

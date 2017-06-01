@@ -168,7 +168,7 @@ namespace Belle2 {
       string title1 = str(format("TDC mean distribution for module #%1%") % (module));
       string name2 = str(format("all_TDC_RMS_%1%") % (module));
       string title2 = str(format("TDC RMS distribution for module #%1%") % (module));
-      TH1F* h = new TH1F(name.c_str(), title.c_str(), 1000, -499.5, 500.5);
+      TH1F* h = new TH1F(name.c_str(), title.c_str(), 500, -250, 250);
       TH2F* h1 = new TH2F(name1.c_str(), title1.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
       TH2F* h2 = new TH2F(name2.c_str(), title2.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
       m_all_TDC.push_back(h);
@@ -200,6 +200,12 @@ namespace Belle2 {
     StoreArray<TOPDigit> digits;
     vector<int> all_hit(16, 0), good_hit(16, 0), bad_hit(16, 0);
     vector<int> particle_hit(16, 0), laser_hit(16, 0), cal_hit(16, 0), other_hit(16, 0);
+    int m_nhits = 0;
+    map<int, double> refTdcMap;
+    vector<int> pixelHit;
+    vector<int> moduleHit;
+    vector<double> rawTimeHit;
+    vector<int> isCal;
     for (const auto& digit : digits) {
       m_all_hits->Fill(digit.getModuleID());
       int i = digit.getModuleID() - 1;
@@ -212,7 +218,19 @@ namespace Belle2 {
       all_hit[i]++;
       m_channel_all_hits[i]->Fill(digit.getPixelID());
       m_all_ADC[i]->Fill(digit.getPulseHeight());
-      m_all_TDC[i]->Fill(digit.getRawTime());
+
+      if (digit.getASICChannel() == 0) {
+        isCal.push_back(1);
+        int reducedPixelId = (digit.getPixelID() - 1) / 8 + digit.getModuleID() * 100;
+        if (refTdcMap.count(reducedPixelId) == 0)
+          refTdcMap[reducedPixelId] = digit.getRawTime();
+      } else {
+        isCal.push_back(0);
+      }
+      rawTimeHit.push_back(digit.getRawTime());
+      pixelHit.push_back(digit.getPixelID());
+      moduleHit.push_back(digit.getModuleID());
+      m_nhits++;
 
       double nhits = m_all_hits_xy[i]->GetBinContent(col, row);
       double adc_mean = m_all_ADC_mean[i]->GetBinContent(col, row);
@@ -260,6 +278,16 @@ namespace Belle2 {
         m_other_hits->Fill(digit.getModuleID());
         other_hit[i]++;
       }
+    }
+    for (int i = 0; i < m_nhits; i++) {
+      int reducedPixelId = (pixelHit[i] - 1) / 8 + moduleHit[i] * 100;
+      double refTdc;
+      if (refTdcMap.count(reducedPixelId) > 0)
+        refTdc = refTdcMap[reducedPixelId];
+      else
+        refTdc = -99999;
+      if (refTdc > 0 && isCal[i] == 0)
+        m_all_TDC[moduleHit[i] - 1]->Fill(rawTimeHit[i] - refTdc);
     }
     m_iEvent++;
     for (int i = 0; i < 16; i++) {

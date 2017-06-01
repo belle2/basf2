@@ -68,6 +68,7 @@ namespace KlIdHelpers {
       return false;
     }
   }
+
   /** checks if a cluster is signal under the mcWeightcondition (mcWeight = energy deposition) */
   bool isECLClusterSignal(const Belle2::ECLCluster& cluster, float mcWeigthCut = 0.66)
   {
@@ -81,9 +82,6 @@ namespace KlIdHelpers {
       return false;
     }
   }
-
-
-
 
 
   /** return if mc particle has a certain pdg in the decay chain*/

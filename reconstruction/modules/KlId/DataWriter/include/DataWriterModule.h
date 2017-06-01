@@ -166,8 +166,6 @@ namespace Belle2 {
     Float_t m_ECLminTrkDistance; // new
     /** distance between track entrace into cluster and cluster center */
     Float_t m_ECLdeltaL; // new
-    /** distance cluster to next track in ECL */
-    Float_t m_ECLtrackDist;
 
 
     /** Zernike moment 5,1 see Belle2 note on that */

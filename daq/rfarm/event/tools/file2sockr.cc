@@ -115,6 +115,12 @@ int main(int argc, char** argv)
         printf("Error in reading file : %d\n", is);
         exit(-1);
       }
+      // Read next record (Event)
+      is = file->read(evbuf, MAXEVTSIZE);
+      if (is < 0) {
+        printf("Error in reading file : %d\n", is);
+        exit(-1);
+      }
     }
 
     // Put the message to Socket

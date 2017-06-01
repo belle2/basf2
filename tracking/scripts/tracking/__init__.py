@@ -482,7 +482,7 @@ def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0
 
     if merge_tracks:
         # Merge tracks together if needed
-        path.add_module("TFCDC_CosmicsTrackMerger",
+        path.add_module("TFCDC_TrackLinker",
                         inputTracks="OrientedCDCTrackVector",
                         tracks="MergedCDCTrackVector",
                         filter="phi",

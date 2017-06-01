@@ -36,20 +36,6 @@ namespace Belle2 {
     };
 
     /**
-     * Module implementation using the CosmicsTrackMerger
-     */
-    class TFCDC_CosmicsTrackMergerModule : public FindletModule<CosmicsTrackMerger> {
-
-    private:
-      /// Type of the base class
-      using Super = FindletModule<CosmicsTrackMerger>;
-
-    public:
-      /// Constructor setting the default store vector names
-      TFCDC_CosmicsTrackMergerModule();
-    };
-
-    /**
      * Module implementation using the TrackQualityAsserter
      */
     class TFCDC_TrackQualityAsserterModule: public FindletModule<TrackQualityAsserter> {

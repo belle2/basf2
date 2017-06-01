@@ -66,11 +66,13 @@ def get_all_cuts_in_database(base_identifier=None, software_trigger_global_tag_n
     :return: A list of tuples (base_identifier, cut_identifier) for each cut in the database.
     """
     from conditions_db import ConditionsDB
+    from ROOT import Belle2
+    identifier = Belle2.SoftwareTrigger.SoftwareTriggerDBHandler.s_dbPackageIdentifier
 
     db = ConditionsDB()
     payloads = db.get_payloads(software_trigger_global_tag_name)
-    cuts_in_database = [tuple(cut_name.split("&")[1:]) for store_name, cut_name, checksum in payloads
-                        if "&" in cut_name and len(cut_name.split("&")) == 3]
+    cuts_in_database = [tuple(cut_name.split("&")[1:]) for cut_name, checksum in payloads
+                        if "&" in cut_name and len(cut_name.split("&")) == 3 and cut_name.startswith(identifier)]
 
     if base_identifier:
         cuts_in_database = list(filter(lambda x: x[0] == base_identifier, cuts_in_database))

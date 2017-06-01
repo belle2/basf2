@@ -273,10 +273,11 @@ TrgEclMaster::simulate01(int m_nEvent)
       boolBtoBTag  =  obj_bhabha -> GetBhabha00(phiringsum);
       vct_bhabha = obj_bhabha -> GetBhabhaComb();
     } else if (_Bhabha == 1) {
+      vct_bhabha.resize(18, 0);
       boolBtoBTag  =  obj_bhabha -> GetBhabha01();
     }
     int BtoBTag = 0;
-    if (boolBtoBTag && icn > 4) {
+    if (boolBtoBTag && icn < 4) {
       BtoBTag = 1;
     }
     //------------------------
@@ -615,10 +616,12 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
     boolBtoBTag  =  obj_bhabha -> GetBhabha00(phiringsum);
     vct_bhabha = obj_bhabha -> GetBhabhaComb();
   } else if (_Bhabha == 1) {
+    vct_bhabha.resize(18);
     boolBtoBTag  =  obj_bhabha -> GetBhabha01();
+
   }
   int BtoBTag = 0;
-  if (boolBtoBTag && icn > 4) {
+  if (boolBtoBTag && icn < 4) {
     BtoBTag = 1;
   }
   //------------------------

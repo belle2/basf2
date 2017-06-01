@@ -60,6 +60,8 @@ namespace Belle2 {
     std::vector<double> ClusterEnergy;
     /** Cluster Timing*/
     std::vector<double> ClusterTiming;
+    /** Cluster Timing*/
+    std::vector<TVector3> ClusterPosition;
 
 
   };

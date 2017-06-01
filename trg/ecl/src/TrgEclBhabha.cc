@@ -33,6 +33,7 @@ TrgEclBhabha::TrgEclBhabha()
   MaxTCId.clear();
   ClusterEnergy.clear();
   ClusterTiming.clear();
+  ClusterPosition.clear();
 
   _TCMap = new TrgEclMapping();
 
@@ -120,64 +121,141 @@ bool TrgEclBhabha::GetBhabha01()
   //-----------------------
   // 3D Bhabha veto
   //------------------------
-  bool BtoBflag = false;
+  bool BtoBFlag = false;
   bool GapFlag = false;
-  // bool ThetaBtoBFlag = false;
-  // bool PhiBtoBFlag = false;
+  bool ThetaBtoBFlag = false;
+  bool PhiBtoBFlag = false;
+  bool BhabhaFlag = false;
+
   //
   //
   // Read Cluster Table
   //
   //
+  ClusterEnergy.clear();
+  ClusterTiming.clear();
+  ClusterPosition.clear();
+  //  int EventId = 0;
   StoreArray<TRGECLCluster> trgeclClusterArray;
   for (int ii = 0; ii < trgeclClusterArray.getEntries(); ii++) {
-
     TRGECLCluster* aTRGECLCluster = trgeclClusterArray[ii];
-
+    //  EventId = aTRGECLCluster ->getEventId();
     int maxTCId    = aTRGECLCluster ->getMaxTCId();
-    double clustertiming    = aTRGECLCluster ->getEnergyDep();
-    double clusterenergy =  aTRGECLCluster -> getTimeAve();
-
+    double clusterenergy  = aTRGECLCluster ->getEnergyDep();
+    double clustertiming  =  aTRGECLCluster -> getTimeAve();
+    TVector3 clusterposition(aTRGECLCluster ->getPositionX(), aTRGECLCluster ->getPositionY(), aTRGECLCluster ->getPositionZ());
     ClusterTiming.push_back(clustertiming);
     ClusterEnergy.push_back(clusterenergy);
+    ClusterPosition.push_back(clusterposition);
     MaxTCId.push_back(maxTCId);
-
   }
-
-
   const int hit_size = ClusterEnergy.size();
   //
   //
   //
   //Find 2 energetic TCs in a event
   //
-  std::vector<double> Max2TCId;
+
+  std::vector<int> Max2TCId;
   std::vector<double> Max2Energy;
   std::vector<double> Max2Timing;
+  std::vector<double> Max2PositionR;
+  std::vector<double> Max2PositionTheta;
+  std::vector<double> Max2PositionPhi;
+  std::vector<int> Max2ThetaId;
+  std::vector<int> Max2PhiId;
+
+
   Max2TCId.clear();
   Max2Energy.clear();
   Max2Timing.clear();
+  Max2PositionR.clear();
+  Max2PositionTheta.clear();
+  Max2PositionPhi.clear();
+  Max2ThetaId.clear();
+  Max2PhiId.clear();
+
+  Max2TCId.resize(2, 0);
+  Max2ThetaId.resize(2, 0);
+  Max2PhiId.resize(2, 0);
   Max2Energy.resize(2, 0.0);
   Max2Timing.resize(2, 0.0);
+  Max2PositionR.resize(2, 0.0);
+  Max2PositionTheta.resize(2, 0.0);
+  Max2PositionPhi.resize(2, 0.0);
+
   for (int ihit = 0; ihit < hit_size; ihit ++) {
+    if (_TCMap ->getTCThetaIdFromTCId(MaxTCId[ihit]) > 8) {continue;}
     if (Max2Energy[0] < ClusterEnergy[ihit]) {
+      Max2TCId[0] = MaxTCId[ihit];
+      Max2ThetaId[0] = _TCMap ->getTCThetaIdFromTCId(Max2TCId[0]) + 1;
+      Max2PhiId[0] = _TCMap ->getTCPhiIdFromTCId(Max2TCId[0]) + 1;
       Max2Energy[0] = ClusterEnergy[ihit];
       Max2Timing[0] = ClusterTiming[ihit];
+      Max2PositionR[0] = ClusterPosition[ihit].Mag();
+      Max2PositionTheta[0] = ClusterPosition[ihit].Theta();
+      Max2PositionPhi[0] = ClusterPosition[ihit].Phi();
 
-    } else if (Max2Energy[0] > ClusterEnergy[ihit] && Max2Energy[1] < ClusterEnergy[ihit]) {
+    }
+  }
+  for (int ihit = 0; ihit < hit_size; ihit ++) {
+    if (_TCMap ->getTCThetaIdFromTCId(MaxTCId[ihit]) < 7) {continue;}
+    if (Max2Energy[1] < ClusterEnergy[ihit] && Max2TCId[0] != MaxTCId[ihit]) {
+      Max2TCId[1] = MaxTCId[ihit];
       Max2Energy[1] = ClusterEnergy[ihit];
       Max2Timing[1] = ClusterTiming[ihit];
+      Max2PositionR[1] = ClusterPosition[ihit].Mag();
+      Max2PositionTheta[1] = ClusterPosition[ihit].Theta();
+      Max2PositionPhi[1] = ClusterPosition[ihit].Phi();
+      Max2ThetaId[1] = _TCMap ->getTCThetaIdFromTCId(Max2TCId[1]) + 1;
+      Max2PhiId[1] = _TCMap ->getTCPhiIdFromTCId(Max2TCId[1]) + 1;
+
+    }
+  }
+  //
+  if (Max2Energy[0] == 0 && Max2Energy[1] == 0) {return BtoBFlag;}
+  //
+  //find Back to Back though theta direction
+  //
+  if (Max2Energy[0] != 0 && Max2Energy[0] != 0) {
+    if ((Max2ThetaId[0] + Max2ThetaId[1]) > 14 && (Max2ThetaId[0] + Max2ThetaId[1]) < 24) {
+      ThetaBtoBFlag = true;
+    }
+    // for(int iCluster= 1; iCluster<thetacomb[Max2ThetaId[0]-1][0]+1;iCluster++) {
+    //  if (abs(Max2ThetaId[1]-thetacomb[Max2ThetaId[0]-1][iCluster])<3){
+    //         ThetaBtoBFlag = true;
+    //  }
+
+    if (abs(Max2PhiId[0] - Max2PhiId[1]) > 12 && abs(Max2PhiId[0] - Max2PhiId[1]) < 22) {
+      PhiBtoBFlag = true;
     }
   }
 
-  if (Max2Energy[0] == 0 && Max2Energy[1] == 0) {return BtoBflag;}
-  else if (Max2Energy[0] != 0 && Max2Energy[1] == 0) { //Gap event
+  //Check Gap Bhabha
+  //
+  // FWD Gap :  (E1<0.1GeV or E1==0(no hit) ) && (thetaId1==3 or ThetaId1 ==4 (TC near fwdGap))  && (ThetaId2 ==15 or ThetaId2 ==16 or ThetaId2 ==17)  && E2 > 3 GeV
+  //
+  // BWD Gap : ( E2<0.1GeV or E2 ==0 ) && (thetaId2==14 or ThetaId2 ==15 (TC near bwdGap) )  && ( ThetaId1 == 2 or ThetaId1 == 3 or ThetaId1 == 4)  && E1 > 4 GeV
+  if ((Max2Energy[0] < 0.1) && (Max2ThetaId[0] == 3 || Max2ThetaId[0] == 4 || Max2Energy[0] == 0) && (Max2ThetaId[1] == 15
+      || Max2ThetaId[1] == 16 || Max2ThetaId[1] == 17) && Max2Energy[1] > 1) {
+    GapFlag = true;
+  } else if ((Max2Energy[1] < 0.1) && (Max2ThetaId[1] == 14 || Max2ThetaId[1] == 15 || Max2Energy[1] == 0) && (Max2ThetaId[0] == 2
+             || Max2ThetaId[0] == 3 || Max2ThetaId[0] == 4) && Max2Energy[0] > 1) {
     GapFlag = true;
   }
 
 
 
-  return GapFlag;
+  if (ThetaBtoBFlag && PhiBtoBFlag) {
+    BtoBFlag = true;
+  }
+  if ((BtoBFlag && (Max2Energy[0] + Max2Energy[1]) > 4 && (Max2Energy[0] > 1 && Max2Energy[1] > 1)) || GapFlag) {
+    BhabhaFlag = true;
+
+  }
+
+
+  return BhabhaFlag;
 }
 
 //

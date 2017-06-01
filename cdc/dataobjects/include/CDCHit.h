@@ -131,6 +131,13 @@ namespace Belle2 {
       m_otherHitIndex = index;
     }
 
+    /** Setter for the other hit indices. */
+    void setOtherHitIndices(CDCHit* otherHit)
+    {
+      m_otherHitIndex = otherHit->getArrayIndex();
+      otherHit->setOtherHitIndex(this->getArrayIndex());
+    }
+
     /** Setter for ADCcount at leading edge. */
     void setADCCountAtLeadingEdge(unsigned short adcCount)
     {

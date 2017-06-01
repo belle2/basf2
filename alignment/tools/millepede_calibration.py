@@ -99,7 +99,8 @@ if __name__ == '__main__':
         millepede.fixVXDid(1, 1, 1)
 
     if args.scenario == 'CDCLayerAlignment':
-        millepede = MillepedeCalibration(['CDCAlignment', 'CDCLayerAlignment'], magnet=magnet)
+        millepede = MillepedeCalibration(['CDCAlignment', 'CDCLayerAlignment'], tracks=['CosmicRecoTracks'], primary_vertices=[
+                                         'Z0:mumu'], particles=['mu+:bbmu'], magnet=magnet)
         millepede.algo.invertSign()
         millepede.fixCDCLayerX(49)
         millepede.fixCDCLayerY(49)

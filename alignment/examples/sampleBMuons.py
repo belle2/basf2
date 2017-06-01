@@ -21,7 +21,7 @@ beam.add_beamparameters(main, "Y4S")
 
 ana.loadGearbox(main)
 main.add_module('Geometry')
-main.add_module('EvtGenInput')
+main.add_module('ParticleGun', pdgCodes=[13, -13])
 
 sim.add_simulation(main)
 reco.add_reconstruction(main, pruneTracks=False)

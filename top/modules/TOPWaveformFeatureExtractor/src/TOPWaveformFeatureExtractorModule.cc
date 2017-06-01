@@ -99,11 +99,16 @@ namespace Belle2 {
       int sampleRise = rawDigit.getSampleRise();
       int sampleFall = rawDigit.getSampleFall() + 1;
       for (const auto& feature : features) {
+
+        // skip it, if hit already in rawDigits
         int sRise = feature.sampleRise;
         if (sRise >= sampleRise and sRise <= sampleFall) continue;
         int sFall = feature.sampleFall + 1;
         if (sFall >= sampleRise and sFall <= sampleFall) continue;
+
+        // if not, append it
         auto* newDigit = rawDigits.appendNew(rawDigit);
+        newDigit->setOfflineFlag();
         newDigit->setSampleRise(feature.sampleRise);
         newDigit->setDeltaSamplePeak(feature.samplePeak - feature.sampleRise);
         newDigit->setDeltaSampleFall(feature.sampleFall - feature.sampleRise);
@@ -121,8 +126,8 @@ namespace Belle2 {
     }
 
     int finalSize = rawDigits.getEntries();
-    B2INFO("TOPWaveformFeatureExtractor: appended " << finalSize - initSize
-           << " raw digits to initial " << initSize);
+    B2DEBUG(100, "TOPWaveformFeatureExtractor: appended " << finalSize - initSize
+            << " raw digits to initial " << initSize);
 
   }
 

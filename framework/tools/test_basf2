@@ -179,7 +179,7 @@ def run_test_py(argument):
                 message = skipped.group(1).decode()
             else:
                 result = False
-                message = "return code %d" % process.returncode
+                message = "exited with return code %d" % process.returncode
                 extra = format_output(name, process.stdout, process.stderr)
         else:
             log_tests = [compare_log(release_dir, name, process.stdout, 'out', 1, options.diff_lines),
@@ -350,7 +350,8 @@ if options.xml and len(all_tests):
             test_el = ET.SubElement(suite_el, "testcase", name=os.path.basename(name),
                                     classname=suite, time=str(time))
             if passed is not True:
-                failure = ET.SubElement(test_el, "failure" if passed is False else "skipped", message=message)
+                failure = ET.SubElement(test_el, "failure" if passed is False else "skipped", message=message,
+                                        type="FAILED" if passed is False else "SKIPPED")
                 if output is not None:
                     failure.text = output
 

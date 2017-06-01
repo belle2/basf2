@@ -156,8 +156,6 @@ namespace Belle2 {
       B2FATAL("Cannot intialize libcurl");
     }
     m_session->headers = curl_slist_append(nullptr, "Accept: application/json");
-    //FIXME: this will of course break any effort by the database people to get some caching in ...
-    m_session->headers = curl_slist_append(m_session->headers, "Cache-Control: no-cache");
     curl_easy_setopt(m_session->curl, CURLOPT_HTTPHEADER, m_session->headers);
     curl_easy_setopt(m_session->curl, CURLOPT_TCP_KEEPALIVE, 1L);
     curl_easy_setopt(m_session->curl, CURLOPT_CONNECTTIMEOUT, 60);
@@ -276,9 +274,10 @@ namespace Belle2 {
       return false;
     }
     // report on duplicate payloads because that should not be ...
-    if (!duplicates.empty()) {
-      B2INFO("Found more then one payload for the following keys: " << boost::algorithm::join(duplicates, ", "));
-    }
+    // FIXME: commented out until we can delete iovs ...
+    //if (!duplicates.empty()) {
+    //  B2INFO("Found more then one payload for the following keys: " << boost::algorithm::join(duplicates, ", "));
+    //}
     return true;
   }
 

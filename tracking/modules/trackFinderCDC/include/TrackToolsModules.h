@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
-#include <tracking/trackFindingCDC/findlets/minimal/CosmicsTrackMerger.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackQualityAsserter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackOrienter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>

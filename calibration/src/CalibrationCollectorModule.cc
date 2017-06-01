@@ -16,6 +16,13 @@ CalibrationCollectorModule::CalibrationCollectorModule() : Module(), m_expRunEve
            "\n\nNote that this is useful for debugging and hard limiting the number of events passed to the collected. However "
            "you should be limiting the collected data yourself! Check if your collected data object has enough entries for an algorithm "
            "to complete and then stop filling. Controlling this limit via a module param is encouraged.", int(-1));
+
+  addParam("preScale", m_preScale,
+           "This controls the rate at which events are actually passed to the collect() function. An event passing through this module "
+           "will only have the collect() function run on it it passes a random selection scaled by this parameter i.e. For preScale=1.0 "
+           "all events are collected, but for preScale=0.5 only 50\% will be. Since this is based on a random choice, you should set the "
+           "random seed to a fixed value if you want repeatable results.\n\n"
+           "Should be a float in range [0.0,1.0], default=1.0", float(1.0));
 }
 
 
@@ -33,21 +40,24 @@ void CalibrationCollectorModule::initialize()
 
 void CalibrationCollectorModule::event()
 {
-  // Should we collect data this event?
-  if (m_runCollect) {
-    collect();
-    // Since we collected, do we care about the number of events collected?
-    if (m_maxEventsPerRun > -1) {
-      (*m_eventsCollectedInRun) += 1;
-      // If so, have we exceeded our maximum collected events in this run?
-      if ((*m_eventsCollectedInRun) >= m_maxEventsPerRun) {
-        // If we have, we should skip collection until further notice
-        B2INFO("Reached maximum number of events processed by collector for this run ("
-               << (*m_eventsCollectedInRun)
-               << " >= "
-               << m_maxEventsPerRun
-               << "). Turning off collection.");
-        m_runCollect = false;
+  // Should we collect data this event based on the number collected in the run?
+  if (m_runCollectOnRun) {
+    // If yes, does our preScale return true?
+    if (getPreScaleChoice()) {
+      collect();
+      // Since we collected, do we care about incrementing the number of events collected?
+      if (m_maxEventsPerRun > -1) {
+        (*m_eventsCollectedInRun) += 1;
+        // Now that we incremented, have we exceeded our maximum collected events in this run?
+        if ((*m_eventsCollectedInRun) >= m_maxEventsPerRun) {
+          // If we have, we should skip collection until further notice
+          B2INFO("Reached maximum number of events processed by collector for this run ("
+                 << (*m_eventsCollectedInRun)
+                 << " >= "
+                 << m_maxEventsPerRun
+                 << "). Turning off collection.");
+          m_runCollectOnRun = false;
+        }
       }
     }
   }
@@ -76,14 +86,14 @@ void CalibrationCollectorModule::beginRun()
              << " < "
              << m_maxEventsPerRun
              << "). Turning on collection.");
-      m_runCollect = true;
+      m_runCollectOnRun = true;
     } else {
       B2INFO("New run has had more events than the maximum collected so far ("
              << (*m_eventsCollectedInRun)
              << " >= "
              << m_maxEventsPerRun
              << "). Turning off collection.");
-      m_runCollect = false;
+      m_runCollectOnRun = false;
     }
   }
 

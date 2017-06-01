@@ -92,7 +92,7 @@ namespace TreeFitter {
     m_init = true ;
 
     // This returns the covariance matrix assuming the photons comes from the nominal IP
-    ClusterUtils C;
+    Belle2::ClusterUtils C;
     TMatrixDSym cov_pE = C.GetCovarianceMatrix4x4FromCluster(
                            recoCalo);//FT: error on xyz is extracted from error on p (sort of backwards but ok)
 

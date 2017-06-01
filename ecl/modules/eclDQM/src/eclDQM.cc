@@ -61,8 +61,8 @@ void ECLDQMModule::defineHisto()
   h_cid_Thr10MeV = new TH1F("cid_Thr10MeV", "Crystal ID with Thr  = 10 MeV", 8736, 1, 8737);
   h_cid_Thr10MeV->GetXaxis()->SetTitle("Cell ID");
 
-  h_edep = new TH1F("edep", "Energy deposition in event", 300, 1000, 31000);
-  h_edep->GetXaxis()->SetTitle("ADC counts");
+  h_edep = new TH1F("edep", "Energy deposition in event", 500, 0, 10000);
+  h_edep->GetXaxis()->SetTitle("energy, [MeV]");
 
   h_time_barrel_Thr5MeV = new TH1F("time_barrel_Thr5MeV", "Reconstructed time for ECL barrel with Thr = 5 MeV", 206, time_min,
                                    time_max);
@@ -171,7 +171,7 @@ void ECLDQMModule::event()
 
   }
 
-  h_edep->Fill(ecletot); //get energy deposition in event
+  h_edep->Fill(float(ecletot) * 0.05); //get energy deposition in event
 
 }
 

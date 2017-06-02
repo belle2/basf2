@@ -16,52 +16,52 @@
 
 namespace Belle2 {
 
-  class hitXP: public TObject {
+  /**  This class collects some information of a TrueHit, using
+  *  SVDCLuster and MCParticle information too.
+  *  These informations are: position in local and global coordinates
+  *  at entry/middle/exit position of the sensor, momentum, analytical
+  *  track parameters (evaluated from posion and momentum), geometrical
+  *  infomations (layed,ladder,sensor) and time.
+  *
+  *  The purpose of this class is to obtain a single "hit-like object"
+  *  with all the useful information for a track-parameters study.
+  *  It is used in evaluate the NoKickCuts.
+  *
+  *  To build a hitXP object is necessary to use the constructor
+  *  of the derivate class hitXPDerivate. */
 
-    /**  This class collects some information of a TrueHit, using
-    *  SVDCLuster and MCParticle information too.
-    *  These informations are: position in local and global coordinates
-    *  at entry/middle/exit position of the sensor, momentum, analytical
-    *  track parameters (evaluated from posion and momentum), geometrical
-    *  infomations (layed,ladder,sensor) and time.
-    *
-    *  The purpose of this class is to obtain a single "hit-like object"
-    *  with all the useful information for a track-parameters study.
-    *  It is used in evaluate the NoKickCuts.
-    *
-    *  To build a hitXP object is necessary to use the constructor
-    *  of the derivate class hitXPDerivate. */
+  class hitXP: public TObject {
 
   public:
 
-    TVector3 m_positionMid; /** poition of hit at midpoint of layer */
-    TVector3 m_positionEntry; /** poition of hit at entrypoint of layer */
-    TVector3 m_positionExit; /** poition of hit at exitpoint of layer */
-    TVector3 m_momentumMid; /** momentum of hit at midpoint of layer */
-    TVector3 m_momentumEntry; /** momentum of hit at entry of layer */
-    TVector3 m_momentumExit; /** momentum of hit at exit of layer */
-    TVector3 m_positionLocalMid; /** poition of hit at midpoint of layer, local coordinate */
-    TVector3 m_positionLocalEntry; /** poition of hit at entrypoint of layer, local coordinate */
-    TVector3 m_positionLocalExit; /** poition of hit at exitpoint of layer, local coordinate */
-    TVector3 m_momentumLocalMid; /** momentum of hit at midpoint of layer, local coordinate */
-    TVector3 m_momentumLocalEntry; /** momentum of hit at entrypoint of layer, local coordinate */
-    TVector3 m_momentumLocalExit; /** momentum of hit at exitpoint of layer, local coordinate */
-    int m_PDGID; /** PDGID */
-    TVector3 m_position0; /** position at IP */
-    TVector3 m_momentum0; /** momentum at IP */
-    double m_time; /** time of the hit */
-    int m_sensorSensor; /** sensor of the hit */
-    int m_sensorLayer; /** layer of the hit */
-    int m_sensorLadder; /** ladder of the hit */
-    double m_info_d0; /** d0 from MCParticle info evaluation. DO NOT USE, use the get */
-    double m_info_z0; /** z0 from MCParticle info evaluation. DO NOT USE, use the get */
-    double m_info_phi0; /** phi0 from MCParticle info evaluation. DO NOT USE, use the get */
-    double m_info_tanlambda; /** tanlambda from MCParticle info evaluation. DO NOT USE, use the get */
-    double m_info_omega; /** omega from MCParticle info evaluation. DO NOT USE, use the get */
-    int m_clusterU; /** flag for u cluster */
-    int m_clusterV; /** flag for v cluster */
-    bool m_reconstructed; /** flag for reconstructed track */
-    double m_charge; /** charge of the track */
+    TVector3 m_positionMid; /**< poition of hit at midpoint of layer */
+    TVector3 m_positionEntry; /**< poition of hit at entrypoint of layer */
+    TVector3 m_positionExit; /**< poition of hit at exitpoint of layer */
+    TVector3 m_momentumMid; /**< momentum of hit at midpoint of layer */
+    TVector3 m_momentumEntry; /**< momentum of hit at entry of layer */
+    TVector3 m_momentumExit; /**< momentum of hit at exit of layer */
+    TVector3 m_positionLocalMid; /**< poition of hit at midpoint of layer, local coordinate */
+    TVector3 m_positionLocalEntry; /**< poition of hit at entrypoint of layer, local coordinate */
+    TVector3 m_positionLocalExit; /**< poition of hit at exitpoint of layer, local coordinate */
+    TVector3 m_momentumLocalMid; /**< momentum of hit at midpoint of layer, local coordinate */
+    TVector3 m_momentumLocalEntry; /**< momentum of hit at entrypoint of layer, local coordinate */
+    TVector3 m_momentumLocalExit; /**< momentum of hit at exitpoint of layer, local coordinate */
+    int m_PDGID; /**< PDGID */
+    TVector3 m_position0; /**< position at IP */
+    TVector3 m_momentum0; /**< momentum at IP */
+    double m_time; /**< time of the hit */
+    int m_sensorSensor; /**< sensor of the hit */
+    int m_sensorLayer; /**< layer of the hit */
+    int m_sensorLadder; /**< ladder of the hit */
+    double m_info_d0; /**< d0 from MCParticle info evaluation. DO NOT USE, use the get */
+    double m_info_z0; /**< z0 from MCParticle info evaluation. DO NOT USE, use the get */
+    double m_info_phi0; /**< phi0 from MCParticle info evaluation. DO NOT USE, use the get */
+    double m_info_tanlambda; /**< tanlambda from MCParticle info evaluation. DO NOT USE, use the get */
+    double m_info_omega; /**< omega from MCParticle info evaluation. DO NOT USE, use the get */
+    int m_clusterU; /**< flag for u cluster */
+    int m_clusterV; /**< flag for v cluster */
+    bool m_reconstructed; /**< flag for reconstructed track */
+    double m_charge; /**< charge of the track */
 
     hitXP() {} /** empty constructor of the class */
 

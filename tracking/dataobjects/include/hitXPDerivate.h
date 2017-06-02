@@ -27,11 +27,11 @@
 
 namespace Belle2 {
 
-  class hitXPDerivate: public hitXP {
+  /**  This class is the derivate of HitXP, and complete it with a constructor that use
+  * all other complex types (classes) of basf2. It is necessary to buld a hitXP object.
+  */
 
-    /**  This class is the derivate of HitXP, and complete it with a constructor that use
-    * all other complex types (classes) of basf2. It is necessary to buld a hitXP object.
-    */
+  class hitXPDerivate: public hitXP {
 
   public:
 

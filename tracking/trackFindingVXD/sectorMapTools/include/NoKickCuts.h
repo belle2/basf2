@@ -16,12 +16,12 @@
 
 namespace Belle2 {
 
+  /**  This class is an auxiliary class that implement methods to access
+  *  to a single cut, used in NoKickRTSel class.
+  */
+
+
   class NoKickCuts: public TObject {
-
-    /**  This class is an auxiliary class that implement methods to access
-    *  to a single cut, used in NoKickRTSel class.
-    */
-
 
   public:
     /** constructor of the class without arguments, used in cuts evaluations */
@@ -33,19 +33,19 @@ namespace Belle2 {
       if (m_fileName.size() != 0) FillCuts(m_fileName);
     }
 
-    std::vector<std::vector <std::vector<std::vector <double>>>> m_cutNorm; /** matrix of fit-parameter of cut, norm */
-    std::vector<std::vector <std::vector<std::vector <double>>>> m_cutPow; /** matrix of fit-parameter of cut, power */
-    std::vector<std::vector <std::vector<std::vector <double>>>> m_cutBkg; /** matrix of fit-parameter of cut, constant */
+    std::vector<std::vector <std::vector<std::vector <double>>>> m_cutNorm; /**< matrix of fit-parameter of cut, norm */
+    std::vector<std::vector <std::vector<std::vector <double>>>> m_cutPow; /**< matrix of fit-parameter of cut, power */
+    std::vector<std::vector <std::vector<std::vector <double>>>> m_cutBkg; /**< matrix of fit-parameter of cut, constant */
 
-    int m_nbinpar = 5; /** number of track parameter */
-    int m_nbinlay = 7; /** number of layers (IP too) */
+    int m_nbinpar = 5; /**< number of track parameter */
+    int m_nbinlay = 7; /**< number of layers (IP too) */
 
-    enum Eminmax { /** enum for minimum/maximum value of cuts */
+    enum Eminmax { /**< enum for minimum/maximum value of cuts */
       min,
       max
     };
 
-    enum Eparameter { /** enum for parameters name */
+    enum Eparameter { /**< enum for parameters name */
       omega,
       d0,
       phi0,
@@ -53,7 +53,7 @@ namespace Belle2 {
       tanlambda
     };
 
-    enum Ecutname { /** enum for the cuts name */
+    enum Ecutname { /**< enum for the cuts name */
       Norm,
       Pow,
       Bkg

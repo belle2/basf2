@@ -44,21 +44,21 @@
 
 namespace Belle2 {
 
+  /**  This class implement some methods useful for the application of cuts
+  *  evaluated in NoKickCutsEval module. Use and auxiliary class (NoKickCuts)
+  *  that cointains the cuts used in selection.
+  */
+
   class NoKickRTSel: public TObject {
 
-    /**  This class implement some methods useful for the application of cuts
-    *  evaluated in NoKickCutsEval module. Use and auxiliary class (NoKickCuts)
-    *  that cointains the cuts used in selection.
-    */
-
   public:
-    std::vector<hitXP> m_hitXP; /** vector of hit, to convert the track */
-    std::set<hitXP, hitXP::timeCompare> m_setHitXP; /** set of hit to order the hit in time */
-    std::vector<hitXP> m_8hitTrack; /** vector of selected hit */
-    NoKickCuts m_trackCuts; /** auxiliary member to apply the cuts */
-    double m_pmax = 2.; /** range analyzed with cuts */
+    std::vector<hitXP> m_hitXP; /**< vector of hit, to convert the track */
+    std::set<hitXP, hitXP::timeCompare> m_setHitXP; /**< set of hit to order the hit in time */
+    std::vector<hitXP> m_8hitTrack; /**< vector of selected hit */
+    NoKickCuts m_trackCuts; /**< auxiliary member to apply the cuts */
+    double m_pmax = 2.; /**< range analyzed with cuts */
 
-    enum Eparameters { /** name of the track parameters */
+    enum Eparameters { /**< name of the track parameters */
       omega,
       d0,
       phi0,

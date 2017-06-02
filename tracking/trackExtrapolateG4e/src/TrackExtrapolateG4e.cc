@@ -1022,68 +1022,67 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
                       };
   TVector3 firstPosition, firstMomentum, lastPosition, lastMomentum; // initialized to zeroes
   TMatrixDSym firstCov(6), lastCov(6);                               // initialized to zeroes
-  const genfit::MeasuredStateOnPlane& firstState = recoTrack->getMeasuredStateOnPlaneFromFirstHit(trackRep);
-  const genfit::MeasuredStateOnPlane& lastState = recoTrack->getMeasuredStateOnPlaneFromLastHit(trackRep);
   try {
+    const genfit::MeasuredStateOnPlane& firstState = recoTrack->getMeasuredStateOnPlaneFromFirstHit(trackRep);
     trackRep->getPosMomCov(firstState, firstPosition, firstMomentum, firstCov);
+    const genfit::MeasuredStateOnPlane& lastState = recoTrack->getMeasuredStateOnPlaneFromLastHit(trackRep);
     trackRep->getPosMomCov(lastState, lastPosition, lastMomentum, lastCov);
+    // in genfit units (cm, GeV/c)
+    extState.tof = lastState.getTime(); // DIVOT: must be revised when IP profile (reconstructed beam spot) become available!
+    if (lastPosition.Mag2() < firstPosition.Mag2()) {
+      firstPosition = lastPosition;
+      firstMomentum = -lastMomentum;
+      firstCov = lastCov;
+      trackRep->getPosMomCov(firstState, lastPosition, lastMomentum, lastCov);
+      lastMomentum *= -1.0; // extrapolate backwards instead of forwards
+      extState.isCosmic = true;
+      extState.tof = firstState.getTime(); // DIVOT: must be revised when IP profile (reconstructed beam spot) become available!
+    }
+
+    G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
+    if (pdgCode != trackRep->getPDG()) {
+      double pSq = lastMomentum.Mag2();
+      double mass = particle->GetPDGMass() / CLHEP::GeV;
+      extState.tof *= sqrt((pSq + mass * mass) / (pSq + lastState.getMass() * lastState.getMass()));
+    }
+
+    extState.directionAtIP.set(firstMomentum.Unit().X(), firstMomentum.Unit().Y(), firstMomentum.Unit().Z());
+    if (m_MagneticField != 0.0) { // in gauss
+      double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) / (CLHEP::c_light * charge * m_MagneticField); // in cm
+      double centerPhi = extState.directionAtIP.phi() - M_PI_2;
+      double centerX = firstPosition.X() + radius * cos(centerPhi);
+      double centerY = firstPosition.Y() + radius * sin(centerPhi);
+      double pocaPhi = atan2(charge * centerY, charge * centerX) + M_PI;
+      double ipPerp = extState.directionAtIP.perp();
+      if (ipPerp > 0.0) {
+        extState.directionAtIP.setX(+sin(pocaPhi) * ipPerp);
+        extState.directionAtIP.setY(-cos(pocaPhi) * ipPerp);
+      }
+    } else {
+      // No field: replace flaky covariance matrix with a diagonal one measured in 1.5T field
+      // for a 10 GeV/c track ... and replace momentum magnitude with fixed 10 GeV/c
+      lastCov *= 0.0;
+      lastCov[0][0] = 5.0E-5;
+      lastCov[1][1] = 1.0E-7;
+      lastCov[2][2] = 5.0E-4;
+      lastCov[3][3] = 3.5E-3;
+      lastCov[4][4] = 3.5E-3;
+      lastMomentum = lastMomentum.Unit() * 10.0;
+    }
+
+    G4ThreeVector posG4e(lastPosition.X() * CLHEP::cm, lastPosition.Y() * CLHEP::cm,
+                         lastPosition.Z() * CLHEP::cm); // in Geant4 units (mm)
+    G4ThreeVector momG4e(lastMomentum.X() * CLHEP::GeV, lastMomentum.Y() * CLHEP::GeV,
+                         lastMomentum.Z() * CLHEP::GeV);  // in Geant4 units (MeV/c)
+    G4ErrorSymMatrix covG4e; // in Geant4e units (GeV/c, cm)
+    fromPhasespaceToG4e(lastMomentum, lastCov, covG4e); // in Geant4e units (GeV/c, cm)
+    g4eState.SetData("g4e_" + particle->GetParticleName(), posG4e, momG4e);
+    g4eState.SetError(covG4e);
   } catch (genfit::Exception) {
     B2WARNING("genfit::MeasuredStateOnPlane() exception: skipping extrapolation for this track. initial momentum = ("
               << firstMomentum.X() << "," << firstMomentum.Y() << "," << firstMomentum.Z() << ")");
     extState.pdgCode = 0; // prevent start of extrapolation in swim()
-    return extState;
   }
-  // in genfit units (cm, GeV/c)
-  extState.tof = lastState.getTime(); // DIVOT: must be revised when IP profile (reconstructed beam spot) become available!
-  if (lastPosition.Mag2() < firstPosition.Mag2()) {
-    firstPosition = lastPosition;
-    firstMomentum = -lastMomentum;
-    firstCov = lastCov;
-    trackRep->getPosMomCov(firstState, lastPosition, lastMomentum, lastCov);
-    lastMomentum *= -1.0; // extrapolate backwards instead of forwards
-    extState.isCosmic = true;
-    extState.tof = firstState.getTime(); // DIVOT: must be revised when IP profile (reconstructed beam spot) become available!
-  }
-
-  G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
-  if (pdgCode != trackRep->getPDG()) {
-    double pSq = lastMomentum.Mag2();
-    double mass = particle->GetPDGMass() / CLHEP::GeV;
-    extState.tof *= sqrt((pSq + mass * mass) / (pSq + lastState.getMass() * lastState.getMass()));
-  }
-
-  extState.directionAtIP.set(firstMomentum.Unit().X(), firstMomentum.Unit().Y(), firstMomentum.Unit().Z());
-  if (m_MagneticField != 0.0) { // in gauss
-    double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) / (CLHEP::c_light * charge * m_MagneticField); // in cm
-    double centerPhi = extState.directionAtIP.phi() - M_PI_2;
-    double centerX = firstPosition.X() + radius * cos(centerPhi);
-    double centerY = firstPosition.Y() + radius * sin(centerPhi);
-    double pocaPhi = atan2(charge * centerY, charge * centerX) + M_PI;
-    double ipPerp = extState.directionAtIP.perp();
-    if (ipPerp > 0.0) {
-      extState.directionAtIP.setX(+sin(pocaPhi) * ipPerp);
-      extState.directionAtIP.setY(-cos(pocaPhi) * ipPerp);
-    }
-  } else {
-    // No field: replace flaky covariance matrix with a diagonal one measured in 1.5T field
-    // for a 10 GeV/c track ... and replace momentum magnitude with fixed 10 GeV/c
-    lastCov *= 0.0;
-    lastCov[0][0] = 5.0E-5;
-    lastCov[1][1] = 1.0E-7;
-    lastCov[2][2] = 5.0E-4;
-    lastCov[3][3] = 3.5E-3;
-    lastCov[4][4] = 3.5E-3;
-    lastMomentum = lastMomentum.Unit() * 10.0;
-  }
-
-  G4ThreeVector posG4e(lastPosition.X() * CLHEP::cm, lastPosition.Y() * CLHEP::cm,
-                       lastPosition.Z() * CLHEP::cm); // in Geant4 units (mm)
-  G4ThreeVector momG4e(lastMomentum.X() * CLHEP::GeV, lastMomentum.Y() * CLHEP::GeV,
-                       lastMomentum.Z() * CLHEP::GeV);  // in Geant4 units (MeV/c)
-  G4ErrorSymMatrix covG4e; // in Geant4e units (GeV/c, cm)
-  fromPhasespaceToG4e(lastMomentum, lastCov, covG4e); // in Geant4e units (GeV/c, cm)
-  g4eState.SetData("g4e_" + particle->GetParticleName(), posG4e, momG4e);
-  g4eState.SetError(covG4e);
 
   return extState;
 }

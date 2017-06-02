@@ -18,79 +18,81 @@
 
 namespace Belle2 {
   /**
-   * @brief Painter for EclData, 2D histograms.
+   * Painter for EclData, 2D histograms.
    */
   class EclPainter2D : public EclPainter {
   public:
-    /// CHANNEL_2D (theta_id:phi_id) histogram.
-    /// SHAPER_2D (shaper:crate) histogram.
-    enum Type {CHANNEL_2D, SHAPER_2D, NONE};
+    /**  Subtype of histogram to draw. */
+    enum Type {
+      CHANNEL_2D, /**< (theta_id:phi_id) histogram. */
+      SHAPER_2D, /**< (shaper:crate) histogram. */
+      NONE
+    };
 
     /**
-     * @brief Constructor for EclPainter subclass.
+     * Constructor for EclPainter subclass.
      */
     EclPainter2D(EclData* data, Type type);
     /**
-     * @brief Destructor for EclPainter subclass.
+     * Destructor for EclPainter subclass.
      */
     ~EclPainter2D();
 
   private:
-    /// Display subtypes of this class.
+    /**  Display subtypes of this class. */
     Type m_type;
-    /// Displayed histogram.
+    /**  Displayed histogram. */
     TH2F* m_hist;
 
-    /// The grid itself, drawn in drawGrid().
+    /**  The grid itself, drawn in drawGrid(). */
     TH2C* hgrid;
-    /// Grid pad, drawn in drawGrid().
+    /**  Grid pad, drawn in drawGrid(). */
     TPad* grid;
 
     /**
-     * @brief Update histogram titles.
+     * Update histogram titles.
      */
     void setTitles();
     /**
-     * @brief Returns number of X bins.
+     * Returns number of X bins.
      */
     int getMaxX();
     /**
-     * @brief Returns number of Y bins.
+     * Returns number of Y bins.
      */
     int getMaxY();
     /**
-     * @brief Convert channel id to X bin number.
+     * Convert channel id to X bin number.
      */
     int channelToSegIdX(int channel);
     /**
-     * @brief Convert channel id to Y bin number.
+     * Convert channel id to Y bin number.
      */
     int channelToSegIdY(int channel);
     /**
-     * @brief Initialize grid for drawGrid().
+     * Initialize grid for drawGrid().
      */
     void initGrid();
     /**
-     * @brief Draw grid over histogram. Call after initGrid().
+     * Draw grid over histogram. Call after initGrid().
      */
     void drawGrid();
 
   public:
     /**
-     * @brief Sets the information to be displayed in the provided
-     * MultilineWidget
+     * Sets the information to be displayed in the provided MultilineWidget
      * @param px X coordinate of mouse cursor.
      * @param py Y coordinate of mouse cursor.
      */
     virtual void getInformation(int px, int py, MultilineWidget* panel);
 
     /**
-     * @brief Return subtype of ECLPainter2D.
+     * Return subtype of ECLPainter2D.
      */
     Type getType();
 
     /**
-     * @brief Redraw the canvas.
+     * Redraw the canvas.
      */
     virtual void Draw();
   };

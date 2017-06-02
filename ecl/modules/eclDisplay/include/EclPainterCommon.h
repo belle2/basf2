@@ -18,60 +18,62 @@
 
 namespace Belle2 {
   /**
-   * @brief Painter for EclData that shows common event characteristics on
+   * Painter for EclData that shows common event characteristics on
    * 1D histograms.
    */
   class EclPainterCommon : public EclPainter {
   public:
-    /// Subtype of histogram to draw.
-    /// AMP Amplitude per channel distribution.
-    /// AMP_SUM Amplitude per event distribution.
-    enum Type {AMP, AMP_SUM, TIME};
+    /**  Subtype of histogram to draw. */
+    enum Type {
+      AMP, /**< Amplitude per channel distribution. */
+      AMP_SUM, /**< Amplitude per event distribution. */
+      TIME /**< Time distribution. */
+    };
 
     /**
-     * @brief Constructor for EclPainter subclass.
+     * Constructor for EclPainter subclass.
      */
     EclPainterCommon(EclData* data, Type type);
     /**
-     * @brief Destructor for EclPainter subclass.
+     * Destructor for EclPainter subclass.
      */
     virtual ~EclPainterCommon();
 
   private:
-    /// Display subtypes of this class.
+    /**  Display subtypes of this class. */
     Type m_type;
-    /// Histogram for amplitude distribution.
+    /**  Histogram for amplitude distribution. */
     TH1F* m_hist;
 
     /**
-     * @brief Return number of X bins.
+     * Return number of X bins.
      */
     int getBinCount();
     /**
-     * @brief Return m_x_min.
+     * Return m_x_min.
      */
     int getMinX();
     /**
-     * @brief Return m_x_max.
+     * Return m_x_max.
      */
     int getMaxX();
     /**
-     * @brief Initialize histogram.
+     * Initialize histogram.
      */
     void initHisto();
     /**
-     * @brief Update titles of the histogram.
+     * Update titles of the histogram.
      */
     void setTitles();
 
   public:
     /**
-     * @brief Return subtype of ECLPainterCommon.
+     * Return subtype of ECLPainterCommon.
      */
     Type getType();
 
     /**
-     * @brief Sets the information to be displayed in the provided
+     * Sets the information to be displayed in the provided
      * MultilineWidget
      * @param px X coordinate of mouse cursor.
      * @param py Y coordinate of mouse cursor.
@@ -79,7 +81,7 @@ namespace Belle2 {
     virtual void getInformation(int px, int py, MultilineWidget* panel);
 
     /**
-     * @brief Redraw the canvas.
+     * Redraw the canvas.
      */
     void Draw();
   };

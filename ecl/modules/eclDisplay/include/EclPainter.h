@@ -18,52 +18,52 @@
 
 namespace Belle2 {
   /**
-   * @brief Painter for EclData, parent class, created with EclPainterFactory.
+   * Painter for EclData, parent class, created with EclPainterFactory.
    */
   class EclPainter {
   public:
     /**
-     * @brief Default constructor.
+     * Default constructor.
      * @param data Data to display.
      */
     EclPainter(EclData* data);
     virtual ~EclPainter();
 
     /**
-     * @brief Set EclData to display in painter.
+     * Set EclData to display in painter.
      */
     void setData(EclData* data);
     /**
-     * @brief Return currently displayed EclData.
+     * Return currently displayed EclData.
      */
     EclData* getData();
 
     /**
-     * @brief Set ECLChannelMapper for CellID <-> (crate, shaper, chid) conversion.
+     * Set ECLChannelMapper for CellID <-> (crate, shaper, chid) conversion.
      */
     void setMapper(ECLChannelMapper* mapper);
     /**
-     * @brief Return currently set ECLChannelMapper
+     * Return currently set ECLChannelMapper
      */
     ECLChannelMapper* getMapper();
 
     /**
-     * @brief Change between the displayed ECL subsystem (barrel, forward and
+     * Change between the displayed ECL subsystem (barrel, forward and
      * backward endcaps).
      */
     void setDisplayedSubsystem(EclData::EclSubsystem sys);
     /**
-     * @brief Get currently displayed ECL subsystem.
+     * Get currently displayed ECL subsystem.
      */
     EclData::EclSubsystem getDisplayedSubsystem();
 
     /**
-     * @brief Return title of ECL subsystem to use in painter.
+     * Return title of ECL subsystem to use in painter.
      */
     TString getSubsystemTitle(EclData::EclSubsystem subsys);
 
     /**
-     * @brief Sets the information to be displayed in the provided
+     * Sets the information to be displayed in the provided
      * MultilineWidget
      * @param px X coordinate of mouse cursor.
      * @param py Y coordinate of mouse cursor.
@@ -71,7 +71,7 @@ namespace Belle2 {
     virtual void getInformation(int px, int py, MultilineWidget* panel);
 
     /**
-     * @brief Some EclPainters can shift to another view upon click.
+     * Some EclPainters can shift to another view upon click.
      * (For example, clicking on crate reveals histogram of shapers in
      * that crate)
      * @return EclPainter with new perspective/range.
@@ -79,30 +79,30 @@ namespace Belle2 {
     virtual EclPainter* handleClick(int px, int py);
 
     /**
-     * @brief Set XRange for histogram in EclPainter
+     * Set XRange for histogram in EclPainter
      */
     virtual void setXRange(int x1, int x2);
 
     /**
-     * @brief Redraw the canvas.
+     * Redraw the canvas.
      */
     virtual void Draw() = 0;
 
   protected:
     /**
-     * @brief Make unique name for next root object.
+     * Make unique name for next root object.
      */
     void getNewRootObjectName(char* buf, int size);
 
   private:
-    /// Counter to make unique names for new root objects.
+    /**  Counter to make unique names for new root objects. */
     static int m_obj_counter;
-    /// Data to draw.
+    /**  Data to draw. */
     EclData* m_ecl_data;
-    /// mapper for CellID <-> (crate, shaper, chid) conversion.
+    /**  mapper for CellID <-> (crate, shaper, chid) conversion. */
     ECLChannelMapper* m_mapper;
 
-    /// Identifier of displayed ECL subsystem.
+    /**  Identifier of displayed ECL subsystem. */
     EclData::EclSubsystem displayed_subsys;
   };
 }

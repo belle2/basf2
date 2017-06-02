@@ -16,53 +16,57 @@
 
 namespace Belle2 {
   /**
-   * @brief Painter for EclData, 1D histograms.
+   * Painter for EclData, 1D histograms.
    */
   class EclPainter1D : public EclPainter {
   public:
-    /// Subtype of histogram to draw.
-    enum Type {CHANNEL, SHAPER, CRATE};
+    /**  Subtype of histogram to draw. */
+    enum Type {
+      CHANNEL, /**< Events/energy per channel */
+      SHAPER, /**< Events/energy per ShaperDSP */
+      CRATE /**< Events/energy per crate/ECLCollector */
+    };
 
     /**
-     * @brief Constructor for EclPainter subclass.
+     * Constructor for EclPainter subclass.
      */
     EclPainter1D(EclData* data, Type type);
     /**
-     * @brief Destructor for EclPainter subclass.
+     * Destructor for EclPainter subclass.
      */
     virtual ~EclPainter1D();
 
   private:
-    /// Display subtypes of this class.
+    /**  Display subtypes of this class. */
     Type m_type;
-    /// Displayed histogram.
+    /**  Displayed histogram. */
     TH1F* m_hist;
 
-    /// ID of currently selected shaper.
+    /**  ID of currently selected shaper. */
     int m_shaper;
-    /// ID of currently selected crate.
+    /**  ID of currently selected crate. */
     int m_crate;
 
     /**
-     * @brief Convert channel id to X bin number.
+     * Convert channel id to X bin number.
      */
     int channelToSegId(int channel);
     /**
-     * @brief Returns number of X bins.
+     * Returns number of X bins.
      */
     int getMaxX();
     /**
-     * @brief Initialize histogram.
+     * Initialize histogram.
      */
     void initHisto();
     /**
-     * @brief Update titles of the histogram.
+     * Update titles of the histogram.
      */
     void setTitles();
 
   public:
     /**
-     * @brief Sets the information to be displayed in the provided
+     * Sets the information to be displayed in the provided
      * MultilineWidget
      * @param px X coordinate of mouse cursor.
      * @param py Y coordinate of mouse cursor.
@@ -70,35 +74,35 @@ namespace Belle2 {
     virtual void getInformation(int px, int py, MultilineWidget* panel);
 
     /**
-     * @brief Return subtype of ECLPainter1D.
+     * Return subtype of ECLPainter1D.
      */
     Type getType();
 
     /**
-     * @brief Creates sub-histogram for crates and shapers. This function is
+     * Creates sub-histogram for crates and shapers. This function is
      * called upon click in EclFrame.
      */
     virtual EclPainter* handleClick(int px, int py);
 
     /**
-     * @brief Set XRange for histogram.
+     * Set XRange for histogram.
      */
     void setXRange(int xmin, int xmax);
 
     /**
-     * @brief Show data only from specific shaper.
+     * Show data only from specific shaper.
      * Show data for all shapers if on of the arguments is negative.
      */
     void setShaper(int crate, int shaper);
 
     /**
-     * @brief Show data only from specific crate.
+     * Show data only from specific crate.
      * Show data for all crates if param 'crate' < 0.
      */
     void setCrate(int crate);
 
     /**
-     * @brief Redraw the canvas.
+     * Redraw the canvas.
      */
     void Draw();
   };

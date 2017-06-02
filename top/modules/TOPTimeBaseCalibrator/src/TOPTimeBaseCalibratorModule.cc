@@ -71,6 +71,7 @@ namespace Belle2 {
              "name (with path) of the directory for the output root files.",
              string(""));
     addParam("minHits", m_minHits, "minimal required hits per channel.", (unsigned) 1000);
+    addParam("numIterations", m_numIterations, "minimal required hits per channel.", (unsigned) 100);
     addParam("method", m_method, "method: 0 - profile histograms only, "
              "1 - matrix inversion, 2 - iterative, "
              "3 - matrix inversion w/ singular value decomposition.", (unsigned) 1);
@@ -297,8 +298,8 @@ namespace Belle2 {
         return matrixInversion(ntuple, scrodID, chan, meanTimeDifference,
                                Hchi2, Hndf, HDeltaT);
       case 2:
-        B2ERROR("Iterative method not implemented yet");
-        return false;
+        return iterativeTBC(ntuple, scrodID, chan, meanTimeDifference,
+                            Hchi2, Hndf, HDeltaT);
       case 3:
         B2ERROR("Singuler value decomposition not implemented yet");
         return false;
@@ -446,6 +447,210 @@ namespace Belle2 {
 
     return true;
   }
+
+
+  bool TOPTimeBaseCalibratorModule::iterativeTBC(const std::vector<TwoTimes>& ntuple,
+                                                 unsigned scrodID, unsigned chan,
+                                                 double meanTimeDifference,
+                                                 TH1F& Hchi2, TH1F& Hndf,
+                                                 TH1F& HDeltaT)
+  {
+    std::vector<double> xval(c_TimeAxisSize + 1, 0.0);
+    double wx = 2 * m_syncTimeBase / c_TimeAxisSize;
+    for (int i = 0; i < c_TimeAxisSize + 1; i++) xval[i] = i * wx;
+
+    B2INFO("TimeBaseCalibration starts for channel#" << chan);
+
+
+    double pre_chi2 = 10000000.0;
+    int   num_small_dev = 0;
+    float deltaChi2 = 0;
+    float this_chi2 = 0.0;
+
+    for (unsigned j = 0; j < m_numIterations; j++) {
+      Iteration(ntuple, xval);
+      this_chi2 = Chisq(ntuple, xval);
+
+      deltaChi2 = pre_chi2 - this_chi2;
+      if (deltaChi2 < -dchi2_min) break;
+      if (fabs(deltaChi2) < deltamin) num_small_dev++;
+      if (num_small_dev > conv_iter) break;
+
+      pre_chi2 = this_chi2;
+    }
+
+    // calculate chi^2
+
+    double chi2 = 0;
+    int ndf = -c_TimeAxisSize;
+
+    for (const auto& twoTimes : ntuple) {
+      if (!twoTimes.good) continue;
+
+      std::vector<double> m(c_TimeAxisSize, 0.0);
+      int i1 = int(twoTimes.t1);
+      m[i1 % c_TimeAxisSize] = 1.0 - (twoTimes.t1 - i1);
+      int i2 = int(twoTimes.t2);
+      m[i2 % c_TimeAxisSize] = twoTimes.t2 - i2;
+      i2 = i1 + (i2 - i1) % c_TimeAxisSize;
+      for (int k = i1 + 1; k < i2; k++) m[k % c_TimeAxisSize] = 1;
+      double s = -1.0;
+      for (int k = 0; k < c_TimeAxisSize; k++) s += m[k] * (xval[k + 1] - xval[k]);
+      double relSigma = twoTimes.sigma / meanTimeDifference;
+      double sig2 = relSigma * relSigma;
+      chi2 += s * s / sig2;
+      ndf++;
+    }
+    Hchi2.SetBinContent(chan + 1, chi2 / ndf);
+    Hndf.SetBinContent(chan + 1, ndf);
+
+    // constrain sum of x to 2*syncTimeBase and calculate sample times
+
+    double sum = 0;
+    for (auto xi : xval) sum += xi;
+    if (sum == 0) {
+      B2ERROR("sum == 0");
+      return false;
+    }
+
+    double DeltaT = 2 * m_syncTimeBase / xval[c_TimeAxisSize];
+    for (auto& xi : xval) xi *= DeltaT;
+    HDeltaT.SetBinContent(chan + 1, DeltaT);
+
+
+    std::vector<double> timeInterval;
+//    timeInterval.push_back(0);
+    for (int i = 0; i < c_TimeAxisSize; i++)timeInterval.push_back(xval[i + 1] - xval[i]);
+
+    // save results as histograms
+    std::string forWhat = "scrod " + to_string(scrodID) + " channel " + to_string(chan);
+
+//change to chi2 vs iterations
+//    saveAsHistogram(A, "invA_ch" + to_string(chan), "Inverted matrix for " + forWhat);
+    saveAsHistogram(timeInterval,  "dt_ch" + to_string(chan), "Sample time bins for " + forWhat,
+                    "sample number", "#Delta t [ns]");
+    saveAsHistogram(xval, "sampleTimes_ch" + to_string(chan),
+                    "Time base corrections for " + forWhat, "sample number", "t [ns]");
+
+    // calibrated cal pulse time difference
+
+    std::string name = "timeDiffcal_ch" + to_string(chan);
+    std::string title = "Calibrated cal pulse time difference vs. sample for " + forWhat;
+    TH2F Hcor(name.c_str(), title.c_str(), c_TimeAxisSize, 0, c_TimeAxisSize,
+              100, DeltaT - 0.5, DeltaT + 0.5);
+    Hcor.SetXTitle("sample number");
+    Hcor.SetYTitle("time difference [ns]");
+    Hcor.SetStats(kTRUE);
+
+    TOPSampleTimes timeBase;
+    timeBase.setTimeAxis(xval, xval.back() / 2);
+
+    for (const auto& twoTimes : ntuple) {
+      if (!twoTimes.good) continue;
+      double dt = timeBase.getDeltaTime(0, twoTimes.t2, twoTimes.t1);
+      int sample = int(twoTimes.t1) % c_TimeAxisSize;
+      Hcor.Fill(sample, dt);
+    }
+    Hcor.Write();
+
+    B2INFO("... channel " << chan << " OK (chi^2/ndf = " << chi2 / ndf
+           << ", ndf = " << ndf << ")");
+
+    return true;
+  }
+
+  void TOPTimeBaseCalibratorModule::Iteration(const std::vector<TwoTimes>& ntuple, std::vector<double>& xval)
+  {
+    std::vector<double> xxval(c_TimeAxisSize + 1, 0.0);
+    double chi2_0, chi2_ch;
+    double dr_chi2[c_TimeAxisSize + 1];
+    float  vx_it_step;
+
+    hdrsamp_try->Reset();
+
+    double wdth = 0;
+
+    for (int i = 0; i < c_TimeAxisSize; i++) {
+      wdth = xval[i + 1] - xval[i];
+      if (wdth < min_binwidth) {
+        xval[i] = xval[i] - 0.5 * fabs(wdth) - 0.5 * min_binwidth;
+        xval[i + 1] = xval[i + 1] + 0.5 * fabs(wdth) + 0.5 * min_binwidth;
+      }
+      if (wdth > max_binwidth) {
+        xval[i] = xval[i] - 0.5 * fabs(wdth) - 0.5 * max_binwidth;
+        xval[i + 1] = xval[i + 1] + 0.5 * fabs(wdth) + 0.5 * max_binwidth;
+      }
+    }
+
+    if (xval[0] != 0) {
+      B2INFO("xval[0]=" << xval[0]);
+      for (int i = 0; i < c_TimeAxisSize; i++)  xval[i] = xval[i] - xval[0];
+    }
+
+    if (xval[256] != 2 * m_syncTimeBase) {
+      B2INFO("xval[256]=" << xval[256]);
+      xval[256] = 2 * m_syncTimeBase;
+    }
+
+    for (int i = 0; i < c_TimeAxisSize + 1; i++)  xxval[i] = xval[i];
+
+    chi2_0 = Chisq(ntuple, xxval);
+
+    for (int smp = 1; smp < c_TimeAxisSize; smp++) {
+      xxval[smp] = xval[smp] + dev_step;
+      chi2_ch = Chisq(ntuple, xxval);
+
+      dr_chi2[smp] = (chi2_ch - chi2_0) / dev_step;
+      hdrsamp_try->Fill(dr_chi2[smp]);
+      xxval[smp] = xval[smp];
+    }
+
+    for (int smp = 1; smp < c_TimeAxisSize; smp++) {
+      vx_it_step = dr_chi2[smp] * xstep;
+      xval[smp] = xval[smp] - vx_it_step;
+    }
+
+    //save rms of dchi2/dxval.
+    dchi2dxv = hdrsamp_try->GetRMS();
+    //change xstep
+    if (fabs(dchi2dxv) < change_xstep) xstep = new_xstep;
+  }
+
+  double TOPTimeBaseCalibratorModule::Chisq(const std::vector<TwoTimes>& ntuple, std::vector<double>& xxval)
+  {
+    double sum1 = 0.0;
+    double sum2 = 0.0; //sum od dt and dt**2
+    double mean = 0.0;
+    double chi2 = 99999999.0;;
+    int n_good = 0;
+    for (const auto& twoTimes : ntuple) {
+      if (!twoTimes.good) continue;
+
+      std::vector<double> m(c_TimeAxisSize, 0.0);
+      int i1 = int(twoTimes.t1);
+      m[i1 % c_TimeAxisSize] = 1.0 - (twoTimes.t1 - i1);
+      int i2 = int(twoTimes.t2);
+      m[i2 % c_TimeAxisSize] = twoTimes.t2 - i2;
+      i2 = i1 + (i2 - i1) % c_TimeAxisSize;
+      for (int k = i1 + 1; k < i2; k++) m[k % c_TimeAxisSize] = 1;
+      double s = 0.0;
+      for (int k = 0; k < c_TimeAxisSize; k++) s += m[k] * (xxval[k + 1] - xxval[k]); //x[k] in mTBC
+
+//     if(s>dt_max||s<dt_min) good_ev[i]=0;// only for first cut.
+//     else {
+      if (s < dt_max && s > dt_min) {
+        sum1 += s;
+        sum2 += s * s;
+        n_good++;
+      }
+    }
+    if (n_good > 10) {
+      mean = sum1 / n_good;
+      chi2 = (sum2 - n_good * mean * mean) / n_good / sigm2_exp;
+    }
+    return chi2;
+  }
+
 
 
   void TOPTimeBaseCalibratorModule::saveAsHistogram(const std::vector<double>& vec,

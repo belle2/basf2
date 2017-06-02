@@ -17,6 +17,7 @@
 #include <TProfile.h>
 #include <TH1F.h>
 
+#define  MAX_EVENT 100000
 
 namespace Belle2 {
 
@@ -136,6 +137,24 @@ namespace Belle2 {
                          TH1F& Hchi2, TH1F& Hndf, TH1F& HDeltaT);
 
     /**
+     * Method by iteration of chi2 minimization
+     * @param ntuple ntuple data
+     * @param scrodID SCROD ID
+     * @param scrodChannel channel number within SCROD (0 - 127)
+     * @param meanTimeDifference average time difference [samples]
+     * @param Hchi2 histogram to store normalized chi^2
+     * @param Hndf histogram to store degrees of freedom
+     * @param HDeltaT histogram to store fittet double pulse delay
+     * @return true on success
+     */
+
+    bool iterativeTBC(const std::vector<TwoTimes>& ntuple,
+                      unsigned scrodID, unsigned scrodChannel,
+                      double meanTimeDifference,
+                      TH1F& Hchi2, TH1F& Hndf, TH1F& HDeltaT);
+
+
+    /**
      * Save vector to histogram and write it out
      * @param vec vector of bin values
      * @param name histogram name
@@ -180,12 +199,47 @@ namespace Belle2 {
     double m_minTimeDiff = 0;  /**< lower bound for time difference [samples] */
     double m_maxTimeDiff = 0;  /**< upper bound for time difference [samples] */
     unsigned m_minHits = 0;    /**< minimal required hits per channel */
+    unsigned m_numIterations = 100;    /**< Number of Iterations of iTBC */
     std::string m_directoryName; /**< directory name for the output root files */
     unsigned m_method = 0; /**< method to use */
 
     std::vector<TwoTimes> m_ntuples[c_NumChannels]; /**< channel wise data */
     double m_syncTimeBase = 0; /**< synchronization time (two ASIC windows) */
 
+    /**
+     * parameters for iTBC
+     *
+     */
+
+    double Chisq(const std::vector<TwoTimes>& ntuple, std::vector<double>& xxval);
+    void Iteration(const std::vector<TwoTimes>& ntuple, std::vector<double>& xval);
+
+    int      n_good = 0;      //good events used for chisq cal.
+
+    float dt_min = 20.0;
+    float dt_max = 24.0;
+//(6)An infinitesimal step to calculate a differential dchi2/dev_step
+//     double dev_step=0.002; //2ps
+    double dev_step = 0.001; //2ps 20170417
+//(7)scale of iteration for xval: delta=-(dchi2/dev_step)*xstep
+    double xstep = 0.020; //original 20170417
+    float dchi2dxv;//rms of 255 dchi2/dxval values
+    float change_xstep = 0.015; float new_xstep = 2.0 * xstep; //
+
+//(8)limits for sample bin widths
+    float min_binwidth = 0.05;
+    float max_binwidth = 2.0; //ns
+//(9)convergence of chi2 iteration
+    float dchi2_min = 0.2; //20170331 quit if chi2 increases by geater than this value
+    int   conv_iter = 100; //Number of iteration with chisq changes less than deltamin
+    float deltamin = 0.01 * 0.01; //chisq change in an iteration.
+
+//TB constnats
+    int      N_SAMPLE = 10000; //number of events
+    float  DtSigma = 0.0424; //20170331 45 in ps (30ps for a calpulse)
+    double sigm2_exp = DtSigma * DtSigma;
+
+    TH1D* hdrsamp_try = new TH1D("hdrsamp_try", "dchi2/dx distribution", 100, -0.01, 0.01);
   };
 
 } // Belle2 namespace

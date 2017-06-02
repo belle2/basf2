@@ -18,8 +18,8 @@
 # > cd release/workdir
 # > mkdir /group/belle2/users/casarosa/trackingValidation/release
 # > ln -s /group/belle2/users/casarosa/trackingValidation/release .
-# > bsub -q s -o oneshot_release_1.out basf2 \
-#    ../tracking/examples/TrackingPerformanceEvaluation_scripts/a0123_trackingEfficiency_oneshot.py seed release ROI BKG
+# > ln -s release/tracking/examples/TrackingPerformanceEvaluation_scripts/a*.py
+# > bsub -q s -o oneshot_release_1.out basf2 a0123_trackingEfficiency_oneshot.py roi bkg vxdtf
 #
 #################################################################
 

@@ -15,10 +15,10 @@
 # > mkdir /group/belle2/users/casarosa/trackingValidation/release
 # > ln -s /group/belle2/users/casarosa/trackingValidation/release .
 # > ln -s release/tracking/examples/TrackingPerformanceEvaluation_scripts/a*.py
-# > bsub -q s -o data_release_1.out basf2 a01_trackingEfficiency_createData.py
-# > bsub -q s -o reco_release_1.out basf2 a02_trackingEfficiency_simulateData.py release
-# > bsub -q s -o reco_release_1.out basf2 a03_trackingEfficiency_runTracking.p release
-# > bsub -q s -o anal_release_1.out basf2 a04_trackingEfficiency_createPlots.py 1 release
+# > bsub -q s -o data_release.out basf2 a01_trackingEfficiency_createData.py
+# > bsub -q s -o simul_roi_bkg_release.out basf2 a02_trackingEfficiency_simulateData.py roi bkg
+# > bsub -q s -o reco_roi_bkg_vxdtf_release.out basf2 a03_trackingEfficiency_runTracking.py roi bkg vxdtf
+# > bsub -q s -o anal_roi_bkg_vxdtf_release.out basf2 a04_trackingEfficiency_createPlots.py roi bkg vxdtf
 #
 #################################################################
 
@@ -53,10 +53,7 @@ beamparameters = add_beamparameters(path, "Y4S")
 
 root_output = register_module('RootOutput')
 root_output.param('outputFileName', output_filename)
-root_input = register_module('RootInput')
-root_input.param('inputFileName', input_filename)
 
-path.add_module(root_input)
 path.add_module(eventinfosetter)
 path.add_module(progress)
 path.add_module(beamparameters)

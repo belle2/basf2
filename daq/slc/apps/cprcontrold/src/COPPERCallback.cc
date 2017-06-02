@@ -6,6 +6,7 @@
 
 #include <daq/slc/database/DBObjectLoader.h>
 
+#include <daq/slc/system/File.h>
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/Time.h>
 
@@ -180,7 +181,6 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
     add(new NSMVHandlerTTRXFirmware(*this, "ttrx.firm", 0,
                                     o_ttrx.hasText("firm") ? o_ttrx.getText("firm") : ""));
     add(new NSMVHandlerFEELoadAll(*this, "loadfee"));
-    //bool bootedttrx = false;
     for (int i = 0; i < 4; i++) {
       const DBObject& o_hslb(obj("hslb", i));
       std::string vname = StringUtil::form("hslb[%d]", i);
@@ -359,7 +359,58 @@ bool COPPERCallback::feeload()
 void COPPERCallback::boot(const DBObject& obj) throw(RCHandlerException)
 {
   abort();
+
   if (!m_dummymode) {
+    const DBObject& o_ttrx(obj("ttrx"));
+    std::string firmware = o_ttrx.getText("firm");
+    if (File::exist(firmware)) {
+      set("ttrx.msg", "programing");
+      log(LogFile::INFO, "bootrx %s", firmware.c_str());
+      system(("bootrx " + firmware).c_str());
+      set("ttrx.msg", "program done");
+      log(LogFile::INFO, "bootrx done");
+    }
+    int val = 0;
+    for (int i = 0; i < 4; i++) {
+      const DBObject& o_hslb(obj("hslb", i));
+      std::string vname = StringUtil::form("hslb[%d]", i);
+      add(new NSMVHandlerHSLBUsed(*this, vname + ".used", i, !(m_dummymode || !m_fee[i] || !o_hslb.getBool("used"))));
+      if (m_dummymode || !m_fee[i] || !o_hslb.getBool("used")) continue;
+      val += (1 << i);
+    }
+    m_ttrx.write(0x130, val);
+    for (int i = 0; i < 4; i++) {
+      const DBObject& o_hslb(obj("hslb", i));
+      if (m_dummymode || !m_fee[i] || !o_hslb.getBool("used")) continue;
+      HSLB& hslb(m_hslb[i]);
+      firmware = o_hslb.getText("firm");
+      if (File::exist(firmware)) {
+        log(LogFile::INFO, "booths -%c %s", ('a' + i), firmware.c_str());
+        set("hslb.msg", "programing");
+        std::string cmd = StringUtil::form("booths -%c ", ('a' + i)) + firmware;
+        system(cmd.c_str());
+        set("hslb.msg", "program done");
+        log(LogFile::INFO, "booths -%c done", ('a' + i));
+        std::string emsg = "";
+        bool success = false;
+        for (int j = 0; j < 3; j++) {
+          try {
+            log(LogFile::INFO, "test hslb-%c", i + 'a');
+            hslb.test();
+            log(LogFile::INFO, "test hslb-%c done", i + 'a');
+            set("hslb.msg", "tesths done");
+            success = true;
+            break;
+          } catch (const HSLBHandlerException& e) {
+            emsg = e.what();
+          }
+          if (!success) {
+            set("hslb.msg", "tesths failed");
+            log(LogFile::ERROR, "test hslb-%c failed %s", i + 'a', emsg.c_str());
+          }
+        }
+      }
+    }
     try {
       for (int i = 0; i < 4; i++) {
         if (!m_fee[i]) continue;
@@ -405,7 +456,15 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
           nhslb++;
         }
       }
-      m_ttrx.write(0x130, flag);
+      for (int i = 0; i < 10; i++) {
+        m_ttrx.write(0x130, flag);
+        int flag_ret = (m_ttrx.read(0x130) & 0xF);
+        if (flag == flag_ret) {
+          break;
+        }
+        log(LogFile::WARNING, "ttrx-130 is not consistent : (%x>>%x)", flag, flag_ret);
+        usleep(50000);
+      }
       for (size_t i = 0; i < o_hslbs.size(); i++) {
         if (!m_fee[i]) continue;
         const DBObject& o_hslb(obj("hslb", i));
@@ -710,7 +769,8 @@ void COPPERCallback::bootBasf2(const DBObject& obj) throw(RCHandlerException)
     }
     m_con.clearArguments();
     if (!m_dummymode) {
-      m_con.setExecutable(StringUtil::form("%s/daq/ropc/des_ser_COPPER_main", getenv("BELLE2_LOCAL_DIR")));
+      //m_con.setExecutable(StringUtil::form("%s/daq/ropc/des_ser_COPPER_main", getenv("BELLE2_LOCAL_DIR")));
+      m_con.setExecutable("/home/usr/b2daq/cprdaq/bin/des_ser_COPPER_main");
       m_con.addArgument(obj.getText("hostname"));
       std::string copperid_s = obj.getText("copperid");
       int id = atoi(copperid_s.substr(3).c_str());

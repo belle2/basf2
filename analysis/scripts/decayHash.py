@@ -53,9 +53,10 @@ class DecayHashMap(object):
     """
     DecayHashMap using the C++ implementation of DecayTree and DecayNode
     """
-    def __init__(self, rootfile):
+    def __init__(self, rootfile, removeRadiativeGammaFlag=False):
         import root_numpy
         ntuple = root_numpy.root2array(rootfile)
+        # self._removeGammaFlag = removeRadiativeGammaFlag
         #: Dict Int -> DecayStrings
         self._string = {}
         #: Dict Int -> Reconstructed DecayTree
@@ -65,7 +66,7 @@ class DecayHashMap(object):
             if decayInt in self._string:
                 continue
             self._string[decayInt] = decayString
-            self._forest[decayInt] = Belle2.DecayForest(decayString)
+            self._forest[decayInt] = Belle2.DecayForest(decayString, True, removeRadiativeGammaFlag)
 
     def get_string(self, decayHash, decayHashExtended):
         """

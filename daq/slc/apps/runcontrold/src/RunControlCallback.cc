@@ -96,7 +96,7 @@ void RunControlCallback::ok(const char* nodename, const char* data) throw()
   } catch (const std::out_of_range& e) {
     LogFile::debug(e.what());
   }
-  monitor();
+  //monitor();
 }
 
 void RunControlCallback::error(const char* nodename, const char* data) throw()
@@ -113,7 +113,7 @@ void RunControlCallback::error(const char* nodename, const char* data) throw()
   } catch (const std::out_of_range& e) {
     LogFile::warning("ERROR from unknown node %s : %s", nodename, data);
   }
-  monitor();
+  //monitor();
 }
 
 void RunControlCallback::fatal(const char* nodename, const char* data) throw()
@@ -368,7 +368,7 @@ void RunControlCallback::logging_imp(const NSMNode& node, LogFile::Priority pri,
     setState(RCState::NOTREADY_S);
   }
   if (log.getPriority() >= m_priority_global) {
-    reply(NSMMessage(log));
+    // reply(NSMMessage(log));
   }
   RCCallback::log(pri, msg);
 }

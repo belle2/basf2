@@ -8,21 +8,38 @@
 #    written by Giulia Casarosa, Pisa                           #
 #    giulia.casarosa@pi.infn.it                                 #
 #                                                               #
+# USAGE:
+#
+# reported in a01_trackingEfficiency_createData.py
+#
 #################################################################
 
 import sys
 from basf2 import *
 from ROOT import Belle2
 
-release = sys.argv[1]
-input_root_files = ['./' + release + '/TV_reco_' + release + '.root']
-root_file_name_TRK = './' + release + '/TV_TRK_analysis_' + release + '.root'
-root_file_name_V0 = './' + release + '/TV_V0_analysis_' + release + '.root'
+# roi = {noROI, vxdtf1, vxdtf2}
+# bkg = {noBkg, stdBKG, std2GBKG}
+# vxdtf = {vxdtf1, vxdtf2}
+
+roi = sys.argv[1]
+bkg = sys.argv[2]
+vxdtf = sys.argv[3]
+
+release = 'merged'
+
+input_root_files = './' + release + '/TV_reco_' + bkg + '_' + roi + '_' + vxdtf + '_' + release + '.root'
+root_file_name_TRK = './' + release + '/TV_TRK_analysis_' + bkg + '_' + roi + '_' + vxdtf + '_' + release + '.root'
+root_file_name_V0 = './' + release + '/TV_V0_analysis_' + bkg + '_' + roi + '_' + vxdtf + '_' + release + '.root'
 
 print('Tracking Validation will run over these files: ')
 print(input_root_files)
-print('(full simulation)')
+print('simulation: ' + roi + ' ' + bkg)
+print('reconstruction ' + vxdtf)
 print()
+
+# reset_database()
+# use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
 
 path = create_path()
 
@@ -34,6 +51,7 @@ gearbox = register_module('Gearbox')
 path.add_module(gearbox)
 
 geometry = register_module('Geometry')
+# geometry.param('components',['PXD','SVD','CDC'])
 path.add_module(geometry)
 
 create_plots_TRK = register_module('TrackingPerformanceEvaluation')
@@ -46,6 +64,7 @@ create_plots_V0.param('outputFileName', root_file_name_V0)
 create_plots_V0.logging.log_level = LogLevel.INFO
 path.add_module(create_plots_V0)
 
+path.add_module('Progress')
 process(path)
 
 print(statistics)

@@ -30,28 +30,34 @@ from simulation import add_simulation
 from tracking import *
 from modularAnalysis import *
 
-set_random_seed(123 + int(sys.argv[1]))
+set_random_seed(1509)
 
 particleGun = False
 
-release = sys.argv[2]
+roi = sys.argv[1]
+bkg = sys.argv[2]
+vxdtf = sys.argv[3]
 
-roi = sys.argv[3]
-bkg = sys.argv[4]
+release = 'merged'
 
-print(release)
-print(roi)
-print(bkg)
+useVXDTF2 = False
+if (vxdtf == 'vxdtf2'):
+    useVXDTF2 = True
 
-root_file_name_TRK = './' + release + '/TV_TRK_analysis_' + roi + '_' + bkg + '_' + release + '.root'
-root_file_name_V0 = './' + release + '/TV_V0_analysis_' + roi + '_' + bkg + '_' + release + '.root'
+print('Performance evaluated on: ')
+print('simulation: ' + roi + ' ' + bkg)
+print('reconstruction: ' + vxdtf)
+print()
+
+root_file_name_TRK = './' + release + '/oneshotTV_TRK_analysis_' + roi + '_' + bkg + '_' + vxdtf + '_' + release + '.root'
+root_file_name_V0 = './' + release + '/oneshotTV_V0_analysis_' + roi + '_' + bkg + '_' + vxdtf + '_' + release + '.root'
 
 bkgFiles = None
-usePXDDataReduction = False
+usePXDDataReduction = True
 mcTrackFinding = False
 
-if roi == 'wROI':
-    usePXDDataReduction = True
+if roi == 'noROI':
+    usePXDDataReduction = False
 
 if bkg == 'stdBKG':
     bkgFiles = glob.glob('/sw/belle2/bkg/*.root')
@@ -63,8 +69,7 @@ if bkg == 'std2GBKG':
     bkgFiles = bkgFiles + glob.glob('/sw/belle2/bkg.twoPhoton/*.root')
 
 print(bkgFiles)
-
-# print(input_filename)
+print(input_filename)
 
 path = create_path()
 
@@ -105,7 +110,7 @@ else:
 
 path.add_module(progress)
 
-add_simulation(path, None, bkgFiles, None, 1.0, usePXDDataReduction)
+add_simulation(path, None, bkgFiles, None, 1.0, usePXDDataReduction, useVXDTF2)
 
 add_tracking_reconstruction(
     path,
@@ -113,8 +118,10 @@ add_tracking_reconstruction(
     pruneTracks=False,
     mcTrackFinding=mcTrackFinding,
     trigger_mode="all",
-    skipGeometryAdding=False
+    skipGeometryAdding=False,
+    use_vxdtf2=useVXDTF2
 )
+
 
 modList = path.modules()
 for modItem in modList:

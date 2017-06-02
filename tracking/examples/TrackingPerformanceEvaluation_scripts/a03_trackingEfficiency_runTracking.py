@@ -8,6 +8,10 @@
 #    written by Giulia Casarosa, Pisa                           #
 #    giulia.casarosa@pi.infn.it                                 #
 #                                                               #
+# USAGE:
+#
+# reported in a01_trackingEfficiency_createData.py
+#
 #################################################################
 
 import sys
@@ -16,19 +20,30 @@ from reconstruction import add_reconstruction
 from tracking import *
 
 mcTrackFinding = False
+release = 'merged'
 
-release = sys.argv[2]
+# roi = {noROI, vxdtf1, vxdtf2}
+# bkg = {noBkg, stdBKG, std2GBKG}
+# vxdtf = {vxdtf1, vxdtf2}
 
-input_root_files = './' + release + '/TV_data_' + release + '_' + sys.argv[1] + '.root'
-output_file_name = './' + release + '/TV_reco_' + release + '_' + sys.argv[1] + '.root'
+roi = sys.argv[1]
+bkg = sys.argv[2]
+vxdtf = sys.argv[3]
+
+useVXDTF2 = False
+if (vxdtf == 'vxdtf2'):
+    useVXDTF2 = True
+
+input_root_files = './' + release + '/TV_sim_' + bkg + '_' + roi + '_' + release + '.root'
+output_file_name = './' + release + '/TV_reco_' + bkg + '_' + roi + '_' + vxdtf + '_' + release + '.root'
 
 print('Tracking will run over these files: ')
 print(input_root_files)
-print('(full simulation)')
+print('simulation: ' + roi + ' ' + bkg)
+print('reconstruction ' + vxdtf)
 print()
 
 path = create_path()
-
 
 root_input = register_module('RootInput')
 root_input.param('inputFileNames', input_root_files)
@@ -46,7 +61,8 @@ add_tracking_reconstruction(
     pruneTracks=False,
     mcTrackFinding=mcTrackFinding,
     trigger_mode="all",
-    skipGeometryAdding=False
+    skipGeometryAdding=False,
+    use_vxdtf2=useVXDTF2
 )
 
 modList = path.modules()
@@ -60,8 +76,8 @@ v0matcher.param('V0ColName', 'V0ValidationVertexs')
 v0matcher.logging.log_level = LogLevel.INFO
 path.add_module(v0matcher)
 
-progress = register_module('Progress')
-path.add_module(progress)
+
+path.add_module('Progress')
 
 root_output = register_module('RootOutput')
 root_output.param('outputFileName', output_file_name)

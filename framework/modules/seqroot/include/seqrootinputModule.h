@@ -35,9 +35,14 @@ namespace Belle2 {
   private:
     //! File name
     std::string m_inputFileName;
+    std::vector<std::string> m_filelist;
 
     //! Blocked file handler
     SeqFile* m_file;
+
+    //! File list handling
+    int m_nfile;
+    int m_fileptr;
 
     //! Total nr. of events in the file
     int m_nevt;

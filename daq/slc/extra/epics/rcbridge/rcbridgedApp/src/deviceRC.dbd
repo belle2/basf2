@@ -1,6 +1,0 @@
-device(longin,INST_IO,dev_rc_expno,"rc_bridge_expno")
-device(longin,INST_IO,dev_rc_runno,"rc_bridge_runno")
-device(longin,INST_IO,dev_rc_subno,"rc_bridge_subno")
-device(stringin,INST_IO,dev_rc_config,"rc_bridge_config")
-device(stringin,INST_IO,dev_rc_request,"rc_bridge_request")
-device(stringout,INST_IO,dev_rc_state,"rc_bridge_state")

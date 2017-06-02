@@ -1,5 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['rawdata_dataobjects', 'pxd_dataobjects', 'framework']
-
-Return('env')

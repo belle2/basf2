@@ -1,9 +1,0 @@
-device(ai,INST_IO,dev_nsm2_vget_ai,"nsm2_vget_ai")
-device(longin,INST_IO,dev_nsm2_vget_longin,"nsm2_vget_longin")
-device(stringin,INST_IO,dev_nsm2_vget_stringin,"nsm2_vget_stringin")
-device(ao,INST_IO,dev_nsm2_vset_ao,"nsm2_vset_ao")
-device(longout,INST_IO,dev_nsm2_vset_longout,"nsm2_vset_longout")
-device(stringout,INST_IO,dev_nsm2_vset_stringout,"nsm2_vset_stringout")
-device(ai,INST_IO,dev_nsm2_data_ai,"nsm2_data_ai")
-device(longin,INST_IO,dev_nsm2_data_longin,"nsm2_data_longin")
-

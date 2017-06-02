@@ -1,5 +1,0 @@
-#!/bin/bash
-
-cp $2/include/$1.h $3/include/$1.h
-cp $2/src/$1.cc $3/src/$1.cc
-

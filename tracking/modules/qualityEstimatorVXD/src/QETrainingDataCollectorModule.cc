@@ -33,7 +33,7 @@ QETrainingDataCollectorModule::QETrainingDataCollectorModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
   addParam("EstimationMethod", m_EstimationMethod,
-           "Identifier which estimation method to use. Valid identifiers are: [CircleFit, TripletFit, Random]", std::string(""));
+           "Identifier which estimation method to use. Valid identifiers are: [circleFit, tripletFit, helixFit]", std::string(""));
 
   addParam("SpacePointTrackCandsStoreArrayName", m_SpacePointTrackCandsStoreArrayName,
            "Name of StoreArray containing the SpacePointTrackCandidates to be estimated.", std::string(""));
@@ -51,21 +51,6 @@ void QETrainingDataCollectorModule::initialize()
 {
   m_spacePointTrackCands.isRequired(m_SpacePointTrackCandsStoreArrayName);
 
-  // BField is required by all QualityEstimators
-  double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
-
-  m_estimatorMC = make_unique<QualityEstimatorMC>(bFieldZ, m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
-
-  // create pointer to chosen estimator
-  if (m_EstimationMethod == "TripletFit") {
-    m_estimator = make_unique<QualityEstimatorTripletFit>(bFieldZ);
-  } else if (m_EstimationMethod == "CircleFit") {
-    m_estimator = make_unique<QualityEstimatorCircleFit>(bFieldZ);
-  } else if (m_EstimationMethod == "HelixFit") {
-    m_estimator = make_unique<QualityEstimatorRiemannHelixFit>(bFieldZ);
-  }
-  B2ASSERT("Not all QualityEstimators could be initialized!", m_estimator);
-
   // prepare recorder
   m_variableSet.setVariable("NHits", -1);
   m_variableSet.setVariable("truth", -1);
@@ -77,6 +62,24 @@ void QETrainingDataCollectorModule::initialize()
 
 void QETrainingDataCollectorModule::event()
 {
+  // BField is required by all QualityEstimators
+  double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+  m_estimatorMC = make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
+
+  m_estimatorMC->setMagneticFieldStrength(bFieldZ);
+
+  // create pointer to chosen estimator
+  if (m_EstimationMethod == "tripletFit") {
+    m_estimator = make_unique<QualityEstimatorTripletFit>();
+  } else if (m_EstimationMethod == "circleFit") {
+    m_estimator = make_unique<QualityEstimatorCircleFit>();
+  } else if (m_EstimationMethod == "helixFit") {
+    m_estimator = make_unique<QualityEstimatorRiemannHelixFit>();
+  }
+  B2ASSERT("Not all QualityEstimators could be initialized!", m_estimator);
+
+  m_estimator->setMagneticFieldStrength(bFieldZ);
+
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
 
     std::vector<SpacePoint const*> const sortedHits = aTC.getSortedHits();

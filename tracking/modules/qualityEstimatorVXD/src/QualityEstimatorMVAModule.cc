@@ -31,7 +31,7 @@ QualityEstimatorMVAModule::QualityEstimatorMVAModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("EstimationMethod", m_EstimationMethod,
-           "Identifier which estimation method to use. Valid identifiers are: [CircleFit, TripletFit, Random]", std::string(""));
+           "Identifier which estimation method to use. Valid identifiers are: [circleFit, tripletFit, helixFit]", std::string(""));
 
   addParam("SpacePointTrackCandsStoreArrayName", m_SpacePointTrackCandsStoreArrayName,
            "Name of StoreArray containing the SpacePointTrackCandidates to be estimated.", std::string(""));
@@ -43,21 +43,6 @@ QualityEstimatorMVAModule::QualityEstimatorMVAModule() : Module()
 void QualityEstimatorMVAModule::initialize()
 {
   m_spacePointTrackCands.isRequired(m_SpacePointTrackCandsStoreArrayName);
-
-  // BField is required by all QualityEstimators
-  double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
-
-  // create pointer to chosen estimator
-  if (m_EstimationMethod == "TripletFit") {
-    m_estimator = make_unique<QualityEstimatorTripletFit>(bFieldZ);
-  } else if (m_EstimationMethod == "CircleFit") {
-    m_estimator = make_unique<QualityEstimatorCircleFit>(bFieldZ);
-  } else if (m_EstimationMethod == "HelixFit") {
-    m_estimator = make_unique<QualityEstimatorRiemannHelixFit>(bFieldZ);
-  } else if (m_EstimationMethod == "Random") {
-    m_estimator = make_unique<QualityEstimatorRandom>(bFieldZ);
-  }
-  B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);
 
   // register variables
   m_variableSet.setVariable("NHits", -1);
@@ -74,6 +59,22 @@ void QualityEstimatorMVAModule::beginRun()
 
 void QualityEstimatorMVAModule::event()
 {
+
+  // BField is required by all QualityEstimators
+  double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+
+  // create pointer to chosen estimator
+  if (m_EstimationMethod == "tripletFit") {
+    m_estimator = make_unique<QualityEstimatorTripletFit>();
+  } else if (m_EstimationMethod == "circleFit") {
+    m_estimator = make_unique<QualityEstimatorCircleFit>();
+  } else if (m_EstimationMethod == "helixFit") {
+    m_estimator = make_unique<QualityEstimatorRiemannHelixFit>();
+  }
+  B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);
+
+  m_estimator->setMagneticFieldStrength(bFieldZ);
+
   // assign a QI computed using the selected QualityEstimator for each given SpacePointTrackCand
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
 

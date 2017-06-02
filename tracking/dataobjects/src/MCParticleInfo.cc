@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <mdst/dataobjects/MCParticle.h>
-//#include <tracking/modules/trackingPerformanceEvaluation/MCParticleInfo.h>
 #include <tracking/dataobjects/MCParticleInfo.h>
 
 using namespace std;

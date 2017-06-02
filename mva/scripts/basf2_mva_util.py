@@ -55,6 +55,29 @@ def calculate_roc_auc(p, t):
     return np.abs(np.trapz(purity, efficiency))
 
 
+def calculate_flatness(f, p, w=None):
+    """
+    Calculates the flatness of a feature under cuts on a signal probability
+    @param f the feature values
+    @param p the probability values
+    @param w optional weights
+    @return the mean standard deviation between the local and global cut selection efficiency
+    """
+    quantiles = list(range(101))
+    binning_feature = np.unique(np.percentile(f, q=quantiles))
+    binning_probability = np.unique(np.percentile(p, q=quantiles))
+    hist_n, _ = np.histogramdd(np.c_[p, f],
+                               bins=[binning_probability, binning_feature],
+                               weights=w)
+    hist_inc = hist_n.sum(axis=1)
+    hist_inc /= hist_inc.sum(axis=0)
+    hist_n /= hist_n.sum(axis=0)
+    hist_n = hist_n.cumsum(axis=0)
+    hist_inc = hist_inc.cumsum(axis=0)
+    diff = (hist_n.T - hist_inc)**2
+    return diff.sum() / (100*99)
+
+
 class Method(object):
     """
     Wrapper class providing an interface to the method stored under the given identifier.

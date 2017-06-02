@@ -8,7 +8,9 @@ import math
 import itertools
 
 import numpy
+import numpy as np
 import matplotlib
+import matplotlib.pyplot as plt
 import matplotlib.artist
 import matplotlib.figure
 import matplotlib.gridspec
@@ -20,6 +22,8 @@ import matplotlib.pyplot
 from . import histogram
 
 from basf2 import *
+
+import basf2_mva_util
 
 # Do not use standard backend TkAgg, because it is NOT thread-safe
 # You will get an RuntimeError: main thread is not in main loop otherwise!
@@ -890,6 +894,7 @@ class VerboseDistribution(Plotter):
         #: Show only a certain range in terms of standard deviations of the data
         self.range_in_std = range_in_std
         self.box_axes = []
+        self.distribution = Distribution(self.figure, self.axis, normed_to_all_entries=self.normed, range_in_std=self.range_in_std)
 
     def add(self, data, column, mask=None, weight_column=None, label=None):
         """
@@ -900,14 +905,10 @@ class VerboseDistribution(Plotter):
         @param mask boolean numpy.array defining which events are used for the distribution histogram
         @param weight_column column in data containing the weights for each event
         """
-        distribution = Distribution(self.figure, self.axis, normed_to_all_entries=self.normed, range_in_std=self.range_in_std)
-        distribution.set_plot_options(self.plot_kwargs)
-        distribution.set_errorbar_options(self.errorbar_kwargs)
-        distribution.set_errorband_options(self.errorband_kwargs)
-        distribution.add(data, column, mask, weight_column, label=label)
-        distribution.finish()
-        self.plots += distribution.plots
-        self.labels += distribution.labels
+        self.distribution.set_plot_options(self.plot_kwargs)
+        self.distribution.set_errorbar_options(self.errorbar_kwargs)
+        self.distribution.set_errorband_options(self.errorband_kwargs)
+        self.distribution.add(data, column, mask, weight_column, label=label)
 
         n = len(self.box_axes) + 1
         gs = matplotlib.gridspec.GridSpec(4 * n, 1)
@@ -921,7 +922,7 @@ class VerboseDistribution(Plotter):
         box = Box(self.figure, box_axis)
         box.add(data, column, mask, weight_column)
         if len(box.plots) > 0:
-            box.plots[0]['boxes'][0].set_facecolor(distribution.plots[0][0][0].get_color())
+            box.plots[0]['boxes'][0].set_facecolor(self.distribution.plots[-1][0][0].get_color())
         box.finish()
 
         self.box_axes.append(box_axis)
@@ -931,6 +932,7 @@ class VerboseDistribution(Plotter):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
+        self.distribution.finish()
         matplotlib.artist.setp(self.axis.get_xticklabels(), visible=False)
         self.axis.get_xaxis().set_label_text('')
         for box_axis in self.box_axes[:-1]:
@@ -939,16 +941,43 @@ class VerboseDistribution(Plotter):
             box_axis.get_xaxis().set_label_text('')
         self.box_axes[-1].set_title("")
         self.axis.set_title("Distribution Plot")
-        self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
+        self.axis.legend([x[0] for x in self.distribution.plots], self.distribution.labels,
+                         loc='best', fancybox=True, framealpha=0.5)
         return self
 
 
 class Correlation(Plotter):
     """
-    Plots distribution of a quantity multiple times with different cuts on the quantiles of another quantity
+    Plots change of a distribution of a quantity depending on the cut on a classifier
     """
+    #: figure which is used to draw
+    figure = None
+    #: Main axis which is used to draw
+    axis = None
+    #: Axis which shows shape of signal
+    axis_d1 = None
+    #: Axis which shows shape of background
+    axis_d2 = None
 
-    def add(self, data, column, cut_column, quantiles, mask=None, weight_column=None):
+    def __init__(self, figure=None):
+        """
+        Creates a new figure if None is given, sets the default plot parameters
+        @param figure default draw figure which is used
+        """
+        if figure is None:
+            self.figure = matplotlib.figure.Figure(figsize=(32, 18))
+            self.figure.set_tight_layout(True)
+        else:
+            self.figure = figure
+
+        gs = matplotlib.gridspec.GridSpec(3, 2)
+        self.axis = self.figure.add_subplot(gs[0, :])
+        self.axis_d1 = self.figure.add_subplot(gs[1, :], sharex=self.axis)
+        self.axis_d2 = self.figure.add_subplot(gs[2, :], sharex=self.axis)
+
+        super(Correlation, self).__init__(self.figure, self.axis)
+
+    def add(self, data, column, cut_column, quantiles, signal_mask=None, bckgrd_mask=None, weight_column=None):
         """
         Add a new correlation plot.
         @param data pandas.DataFrame containing all data
@@ -960,23 +989,36 @@ class Correlation(Plotter):
         if len(data[cut_column]) == 0:
             B2WARNING("Ignore empty Correlation.")
             return self
-        percentiles = numpy.percentile(data[cut_column], q=quantiles)
-        distribution = Distribution(self.figure, self.axis, normed_to_all_entries=False)
-        distribution.set_plot_options(self.plot_kwargs)
-        distribution.set_errorbar_options(self.errorbar_kwargs)
-        distribution.set_errorband_options(self.errorband_kwargs)
-        for p in percentiles:
-            distribution.add(data, column, data[cut_column] > p, weight_column)
-        if mask is not None:
-            self.axis.set_prop_cycle(None)
-            distribution.set_plot_options({'linestyle': '--'})
-            distribution.set_errorbar_options(None)
-            distribution.set_errorband_options(None)
-            for p in percentiles:
-                distribution.add(data, column, (data[cut_column] > p) & mask, weight_column)
-        distribution.plots = distribution.plots[:len(quantiles)]
-        distribution.labels = [str(q) + '% Quantiles' for q in quantiles]
-        distribution.finish()
+
+        axes = [self.axis, self.axis_d1, self.axis_d2]
+
+        for i, (l, m) in enumerate([('.', signal_mask | bckgrd_mask), ('S', signal_mask), ('B', bckgrd_mask)]):
+
+            if weight_column is not None:
+                weights = numpy.array(data[weight_column][m])
+            else:
+                weights = numpy.ones(len(data[column][m]))
+
+            xrange = np.percentile(data[column][m], [5, 95])
+            colormap = plt.get_cmap('coolwarm')
+            tmp, x = np.histogram(data[column][m], bins=100,
+                                  range=xrange, normed=True, weights=weights)
+            bin_center = ((x + np.roll(x, 1)) / 2)[1:]
+            axes[i].plot(bin_center, tmp, color='black', lw=1)
+
+            for quantil in np.arange(5, 100, 5):
+                cut = np.percentile(data[cut_column][m], quantil)
+                sel = data[cut_column][m] >= cut
+                y, x = np.histogram(data[column][m][sel], bins=100,
+                                    range=xrange, normed=True, weights=weights[sel])
+                bin_center = ((x + np.roll(x, 1)) / 2)[1:]
+                axes[i].fill_between(bin_center, tmp, y, color=colormap(quantil/100.0))
+                tmp = y
+
+            axes[i].set_ylim(bottom=0)
+
+            flatness_score = basf2_mva_util.calculate_flatness(data[column][m], data[cut_column][m], weights)
+            axes[i].set_title(r'Distribution for different quantiles: $\mathrm{{Flatness}}_{} = {:.3f}$'.format(l, flatness_score))
         return self
 
     def finish(self):

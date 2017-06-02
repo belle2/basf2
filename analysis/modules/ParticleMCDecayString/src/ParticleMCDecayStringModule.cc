@@ -243,8 +243,6 @@ namespace Belle2 {
 
   std::string ParticleMCDecayStringModule::buildMCDecayString(const MCParticle* mcPMother, const MCParticle* mcPMatched)
   {
-//    if (m_removeRadiativePhotons and mcPMother->getPDG() == 22 and MCMatching::isRadiativePhoton(mcPMother))
-//      return "";
 
     std::stringstream ss;
     ss << " ";

@@ -112,7 +112,7 @@ void ECLShowerShapeModule::initialize()
 
 }
 
-void ECLShowerShapeModule::initiliazeMVA(const std::string& identifier,
+void ECLShowerShapeModule::initializeMVA(const std::string& identifier,
                                          std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>& weightFileRepresentation, std::unique_ptr<MVA::Expert>& expert)
 {
   MVA::Weightfile  weightfile;
@@ -154,9 +154,9 @@ void ECLShowerShapeModule::initiliazeMVA(const std::string& identifier,
 
 void ECLShowerShapeModule::beginRun()
 {
-  initiliazeMVA(m_zernike_MVAidentifier_FWD, m_weightfile_representation_FWD, m_expert_FWD);
-  initiliazeMVA(m_zernike_MVAidentifier_BRL, m_weightfile_representation_BRL, m_expert_BRL);
-  initiliazeMVA(m_zernike_MVAidentifier_BWD, m_weightfile_representation_BWD, m_expert_BWD);
+  initializeMVA(m_zernike_MVAidentifier_FWD, m_weightfile_representation_FWD, m_expert_FWD);
+  initializeMVA(m_zernike_MVAidentifier_BRL, m_weightfile_representation_BRL, m_expert_BRL);
+  initializeMVA(m_zernike_MVAidentifier_BWD, m_weightfile_representation_BWD, m_expert_BWD);
 
   //This is a hack because the callback doesn't seem to be called at the begining of the run
   if (m_secondMomentCorrectionArray.hasChanged()) {

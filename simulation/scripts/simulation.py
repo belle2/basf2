@@ -58,8 +58,8 @@ def add_PXDDataReduction(path, components, use_vxdtf2=False):
         'sigmaSystV': 0.1,
         'numSigmaTotU': 10,
         'numSigmaTotV': 10,
-        'maxWidthU': 10,
-        'maxWidthV': 10,
+        'maxWidthU': 100,
+        'maxWidthV': 100,
     }
     pxdDataRed.param(param_pxdDataRed)
     path.add_module(pxdDataRed)

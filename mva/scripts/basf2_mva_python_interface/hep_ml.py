@@ -53,12 +53,12 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     if isinstance(parameters, collections.Mapping):
         if 'uniform_label' not in parameters:
-            parameters['uniform_label'] = 1
+            parameters['uniform_label'] = [0, 1]
         parameters['train_features'] = train_features
         parameters['uniform_features'] = uniform_features
         clf = hep_ml.uboost.uBoostClassifier(base_estimator=base_tree, **parameters)
     else:
-        clf = hep_ml.uboost.uBoostClassifier(uniform_features=uniform_features, uniform_label=1,
+        clf = hep_ml.uboost.uBoostClassifier(uniform_features=uniform_features, uniform_label=[0, 1],
                                              base_estimator=base_tree, train_features=train_features)
     return State(clf)
 

@@ -27,6 +27,9 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     z = tf.placeholder(tf.float32, [None, number_of_spectators])
     w = tf.placeholder(tf.float32, [None, 1])
 
+    if parameters['lambda'] <= 0:
+        number_of_spectators = 0
+
     def layer(x, shape, name, unit=tf.sigmoid):
         with tf.name_scope(name) as scope:
             weights = tf.Variable(tf.truncated_normal(shape, stddev=1.0 / np.sqrt(float(shape[0]))), name='weights')
@@ -34,29 +37,38 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
             layer = unit(tf.matmul(x, weights) + biases)
         return layer
 
-    inference_hidden1 = layer(x, [number_of_features, 20], 'inference_hidden1')
-    inference_hidden2 = layer(inference_hidden1, [20, 20], 'inference_hidden2')
-    inference_hidden3 = layer(inference_hidden2, [20, 20], 'inference_hidden3')
-    inference_hidden4 = layer(inference_hidden3, [20, 20], 'inference_hidden4')
-    inference_activation = layer(inference_hidden4, [20, 1], 'inference_sigmoid', unit=tf.sigmoid)
+    inference_hidden1 = layer(x, [number_of_features, number_of_features+1], 'inference_hidden1')
+    # inference_hidden2 = layer(inference_hidden1, [number_of_features+1, number_of_features+1], 'inference_hidden2')
+    # inference_hidden3 = layer(inference_hidden2, [number_of_features+1, number_of_features+1], 'inference_hidden3')
+    # inference_hidden4 = layer(inference_hidden3, [number_of_features+1, number_of_features+1], 'inference_hidden4')
+    inference_activation = layer(inference_hidden1, [number_of_features+1, 1], 'inference_sigmoid', unit=tf.sigmoid)
 
     epsilon = 1e-5
     inference_loss = -tf.reduce_sum(y * w * tf.log(inference_activation + epsilon) +
                                     (1.0 - y) * w * tf.log(1 - inference_activation + epsilon)) / tf.reduce_sum(w)
     inference_loss = tf.reduce_sum((y-inference_activation)*(y-inference_activation))
     for i in range(number_of_spectators):
-        z_single = tf.slice(z, [0, i], [-1, 1])
-        adversary_hidden1 = layer(inference_activation, [1, 20], 'adversary_hidden1_{}'.format(i), unit=tf.tanh)
-        adversary_hidden2 = layer(adversary_hidden1, [20, 20], 'adversary_hidden2_{}'.format(i), unit=tf.nn.relu)
-        adversary_means = layer(adversary_hidden2, [20, 4], 'adversary_means_{}'.format(i), unit=tf.identity)
-        adversary_widths = layer(adversary_hidden2, [20, 4], 'adversary_width_{}'.format(i), unit=tf.exp)
-        adversary_fractions_not_normed = layer(adversary_hidden2, [20, 4], 'adversary_fractions_{}'.format(i), unit=tf.identity)
-        adversary_fractions = tf.nn.softmax(adversary_fractions_not_normed)
-        adversary_activation = tf.reduce_sum(adversary_fractions *
-                                             tf.exp(-(adversary_means - z_single) * (adversary_means - z_single) /
-                                                    (2 * adversary_widths)))
-        adversary_loss = -tf.reduce_sum(w * tf.log(adversary_activation + epsilon)) / tf.reduce_sum(w)
-        tf.add_to_collection('adversary_losses', adversary_loss)
+        for c in ['signal', 'background']:
+            z_single = tf.slice(z, [0, i], [-1, 1])
+            adversary_hidden1 = layer(inference_activation, [1, number_of_features+1],
+                                      'adversary_hidden1_{}_{}'.format(i, c), unit=tf.tanh)
+            # adversary_hidden2 = layer(adversary_hidden1, [number_of_features+1, number_of_features+1],
+            #                           'adversary_hidden2_{}_{}'.format(i,c), unit=tf.nn.relu)
+            adversary_means = layer(adversary_hidden1, [number_of_features+1, 4],
+                                    'adversary_means_{}_{}'.format(i, c), unit=tf.identity)
+            adversary_widths = layer(adversary_hidden1, [number_of_features+1, 4],
+                                     'adversary_width_{}_{}'.format(i, c), unit=tf.exp)
+            adversary_fractions_not_normed = layer(adversary_hidden1, [number_of_features+1, 4],
+                                                   'adversary_fractions_{}_{}'.format(i, c), unit=tf.identity)
+            adversary_fractions = tf.nn.softmax(adversary_fractions_not_normed)
+            adversary_activation = tf.reduce_sum(adversary_fractions *
+                                                 tf.exp(-(adversary_means - z_single) * (adversary_means - z_single) /
+                                                        (2 * adversary_widths)))
+            if c == 'signal':
+                adversary_loss = -tf.reduce_sum(y * w * tf.log(adversary_activation + epsilon)) / tf.reduce_sum(y*w)
+            else:
+                adversary_loss = -tf.reduce_sum((1-y) * w * tf.log(adversary_activation + epsilon)) / tf.reduce_sum((1-y)*w)
+            tf.add_to_collection('adversary_losses', adversary_loss)
 
     if number_of_spectators > 0:
         adversary_loss = tf.add_n(tf.get_collection('adversary_losses'), name='adversary_loss')
@@ -66,16 +78,16 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         total_loss = inference_loss
 
     adversary_vars = [
-        'adversary_hidden1_{}/weights:0',
-        'adversary_hidden1_{}/biases:0',
-        'adversary_hidden2_{}/weights:0',
-        'adversary_hidden2_{}/biases:0',
-        'adversary_means_{}/weights:0',
-        'adversary_width_{}/biases:0',
-        'adversary_fractions_{}/weights:0',
-        'adversary_fractions_{}/biases:0',
+        'adversary_hidden1_{}_{}/weights:0',
+        'adversary_hidden1_{}_{}/biases:0',
+        # 'adversary_hidden2_{}_{}/weights:0',
+        # 'adversary_hidden2_{}_{}/biases:0',
+        'adversary_means_{}_{}/weights:0',
+        'adversary_width_{}_{}/biases:0',
+        'adversary_fractions_{}_{}/weights:0',
+        'adversary_fractions_{}_{}/biases:0',
     ]
-    adversary_vars = [v.format(i) for i in range(number_of_spectators) for v in adversary_vars]
+    adversary_vars = [v.format(i, c) for i in range(number_of_spectators) for c in ['signal', 'background'] for v in adversary_vars]
 
     if number_of_spectators > 0:
         adversary_optimizer = tf.train.AdamOptimizer(learning_rate=parameters.get('learning_rate', 0.001))
@@ -88,12 +100,12 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     inference_vars = [
         'inference_hidden1/weights:0',
         'inference_hidden1/biases:0',
-        'inference_hidden2/weights:0',
-        'inference_hidden2/biases:0',
-        'inference_hidden3/weights:0',
-        'inference_hidden3/biases:0',
-        'inference_hidden4/weights:0',
-        'inference_hidden4/biases:0',
+        # 'inference_hidden2/weights:0',
+        # 'inference_hidden2/biases:0',
+        # 'inference_hidden3/weights:0',
+        # 'inference_hidden3/biases:0',
+        # 'inference_hidden4/weights:0',
+        # 'inference_hidden4/biases:0',
         'inference_sigmoid/weights:0',
         'inference_sigmoid/biases:0',
     ]
@@ -152,12 +164,16 @@ if __name__ == "__main__":
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_spectators = basf2_mva.vector('daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)')
     general_options.m_target_variable = "isSignal"
-    general_options.m_identifier = "adversary"
+    general_options.m_identifier = "tensorflow"
 
     specific_options = basf2_mva.PythonOptions()
     specific_options.m_framework = "tensorflow"
-    specific_options.m_steering_file = 'mva/examples/orthogonal_discriminators/adversary.py'
+    specific_options.m_steering_file = 'mva/examples/orthogonal_discriminators/tensorflow_adversary.py'
     specific_options.m_nIterations = 400
-    specific_options.m_mini_batch_size = 100
+    specific_options.m_mini_batch_size = 400
     specific_options.m_config = '{"adversary_steps": 20, "learning_rate": 0.001, "lambda": 10}'
+    basf2_mva.teacher(general_options, specific_options)
+
+    general_options.m_identifier = "tensorflow_baseline"
+    specific_options.m_config = '{"adversary_steps": 1, "learning_rate": 0.001, "lambda": -1.0}'
     basf2_mva.teacher(general_options, specific_options)

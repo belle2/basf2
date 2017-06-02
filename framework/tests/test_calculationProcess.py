@@ -1,6 +1,6 @@
 import os
 from time import sleep
-from unittest import TestCase
+from unittest import TestCase, main
 
 from hep_ipython_tools.calculation_process import CalculationProcess
 from hep_ipython_tools.calculation_queue import CalculationQueue
@@ -149,4 +149,6 @@ class TestOngoingLoggingCalculationProcess(TestCase):
 
         self.assertEqual(self.process.get_log(), "")
 
+if __name__ == "__main__":
+    main()
 # @endcond

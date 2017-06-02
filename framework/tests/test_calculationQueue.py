@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 
 from hep_ipython_tools.calculation_queue import CalculationQueue, CalculationQueueItem
 from hep_ipython_tools.tests.fixtures import MockQueue
@@ -60,4 +60,6 @@ class TestCalculationQueue(TestCase):
         self.assertIn("TestItem", self.calculation_queue.get_keys())
         self.assertIn("TestItem2", self.calculation_queue.get_keys())
 
+if __name__ == "__main__":
+    main()
 # @endcond

@@ -156,6 +156,12 @@ namespace Belle2 {
       return WireID(m_eWire).getILayer();
     }
 
+    /** Getter for iCLayer (0-55). */
+    unsigned short getICLayer() const
+    {
+      return WireID(m_eWire).getICLayer();
+    }
+
     /** Getter for iSuperLayer. */
     unsigned short getISuperLayer() const
     {

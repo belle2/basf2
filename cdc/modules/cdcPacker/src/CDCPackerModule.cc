@@ -13,7 +13,6 @@
 #include <cdc/modules/cdcPacker/CDCChannelData.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
-#include <cdc/dataobjects/CDCRawHitWaveForm.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 
 #include <framework/datastore/DataStore.h>
@@ -53,7 +52,6 @@ CDCPackerModule::CDCPackerModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("rawCDCName", m_rawCDCName, "Name of the RawCDC List name..", string(""));
-  addParam("cdcRawHitWaveFormName", m_cdcRawHitWaveFormName, "Name of the CDCRawHit (Raw data mode).", string(""));
   addParam("cdcRawHitName", m_cdcRawHitName, "Name of the CDCRawHit (Suppressed mode).", string(""));
   addParam("cdcHitName", m_cdcHitName, "Name of the CDCHit List name..", string(""));
   addParam("fadcThreshold", m_fadcThreshold, "Threshold voltage (mV).", 10);
@@ -76,10 +74,6 @@ void CDCPackerModule::initialize()
   B2INFO("CDCPacker: initialize() Called.");
 
   StoreArray<RawCDC>::registerPersistent(m_rawCDCName);
-
-  StoreArray<CDCRawHitWaveForm> storeCDCRawHitWFs(m_cdcRawHitWaveFormName);
-
-  storeCDCRawHitWFs.registerInDataStore();
 
   StoreArray<CDCRawHit> storeCDCRawHits(m_cdcRawHitName);
 
@@ -128,8 +122,8 @@ int CDCPackerModule::getFEEID(int copper_id, int slot_id)
 
 void CDCPackerModule::event()
 {
+
   // Create Data objects.
-  StoreArray<CDCRawHitWaveForm> cdcRawHitWFs(m_cdcRawHitWaveFormName);
   StoreArray<CDCRawHit> cdcRawHits(m_cdcRawHitName);
   StoreArray<CDCHit> cdcHits(m_cdcHitName);
   //  std::vector<int> eWire_nhit(36882, 0);
@@ -139,8 +133,8 @@ void CDCPackerModule::event()
 
   const int ch_data_bytes = 8;  // 8bytes ( 1hit/ch case)
 
-  std::vector<CDCChannelData> chDatas;
-  chDatas.clear();
+  std::vector<CDCChannelData> chData;
+  chData.clear();
 
   for (const auto& hit : cdcHits) {
     int eWire = (int)(hit.getID());
@@ -160,29 +154,37 @@ void CDCPackerModule::event()
       exit(1);
     }
 
-
     if (hit.is2ndHit() == false) { // first hit timing for one cell.
       // increase 8 bytes (4 bhytes).
-      B2DEBUG(99, "CDCPacker : first hit");
       tot_chdata_bytes[ m_fee_board[ sly ][ ily ][ iwire] ] += ch_data_bytes;
-      CDCChannelData chd(m_fee_board[sly][ily][iwire], m_fee_ch[sly][ily][iwire], 8, 0, adc, tdc);
-      chDatas.push_back(chd);
+      CDCChannelData chd(m_fee_board[sly][ily][iwire], m_fee_ch[sly][ily][iwire], 8, 0xbbaa, adc, tdc);
+      chData.push_back(chd);
+    } else { // second hit timing
+      // Search ChData object for this cell.
+      const int boardId = m_fee_board[sly][ily][iwire];
+      const int channel = m_fee_ch[sly][ily][iwire];
+      auto fi = std::find_if(chData.begin(), chData.end(),
+      [&](CDCChannelData & ch) {
+        return (ch.getBoard() == boardId && ch.getChannel() == channel);
+      });
+      if (fi != chData.end()) {
+        tot_chdata_bytes[ m_fee_board[ sly ][ ily ][ iwire] ] += 2;
+        const size_t index = std::distance(chData.begin(), fi);
+        chData[index].setTDC2ndHit(tdc);
+      }
     }
 
-    /*
-    if (eWire_nhit[ eWire ] == 0) { // first hit timing for one cell.
-      // increase 8 bytes (4 bhytes).
-      //      B2INFO("CDCPacker : 1st hit");
-      tot_chdata_bytes[ m_fee_board[ sly ][ ily ][ iwire] ] += ch_data_bytes;
-      CDCChannelData chd(m_fee_board[sly][ily][iwire], m_fee_ch[sly][ily][iwire], 8, 0, adc, tdc);
-      chDatas.push_back(chd);
-    } else if (eWire_nhit[ eWire ] == 1) { // 2nd hit timings for one cell.
-      // increase another 2 bytes (1 word) for 2nd hit timing.
-      //      B2INFO("CDCPacker : 2nd hit");
-      tot_chdata_bytes[ m_fee_board[ sly ][ ily ][ iwire] ] += 2;
+  }
+
+  for (const auto& c : chData) {
+    int board = c.getBoard();
+    int ch = c.getChannel();
+    bool flag = c.is2ndHit();
+    int len = c.getDataLength();
+    if (!((len == 8 && flag == false) ||
+          (len == 10 && flag == true))) {
+      B2ERROR("inconsistent data object board : " << board << " ch " << ch);
     }
-    */
-    //    eWire_nhit[ eWire ]++; // increment the hit number.
   }
 
 
@@ -208,10 +210,11 @@ void CDCPackerModule::event()
     int* buf[4] = {0, 0, 0, 0};
 
     for (int j = 0; j < 4; j++) {
-      //      int fee_id = i * 4 + j;
       int fee_id = getFEEID(i, j);
       nwords[ j ] = ((tot_chdata_bytes[ fee_id ] + 3) / 4) + packet_header_words;
+
       buf[ j ] = new int[ nwords[ j ] ];
+
       // Store CDC header in buffer.
       const char type = 0x20; // suppressed mode.
       const char ver = 0x0; // version (always 0).
@@ -219,23 +222,47 @@ void CDCPackerModule::event()
       const short dataLength = nwords[j] * 4 - packet_header_words * 4;
       const int trigNum = m_event;
 
-      //      std::cout << "data length " << dataLength << std::endl;
-
       *(buf[j] + 0) = (type << 24) | (ver << 16) | fee_id;
       *(buf[j] + 1) = ((trigTime << 16) | dataLength);
       *(buf[j] + 2) = trigNum;
 
-      int index = 3;
-      for (auto c : chDatas) {
-        int board = c.getBoard();
-        int flag = c.getFlag2ndHit();
+      short* sbuf = (short*)(buf[j] + 3);
+
+      bool halfOffset = false;
+      short reservedValue = 0xcccc;
+      for (const auto& c : chData) {
+        const int board = c.getBoard();
+        const int ch = c.getChannel();
+        const int len = c.getDataLength();
         if (board == fee_id) {
-          *(buf[j] + index++) = c.get1stWord();
-          *(buf[j] + index++) = c.get2ndWord();
-          if (flag == true) {
-            *(buf[j] + index++) = c.get3rdWord();
+          //    printf("board %.8x ch %.8d adc %.8x tdc %.8x\n" ,board, ch, c.getADCCount(), c.getTDCCount());
+          if (halfOffset == false) {
+            *sbuf++ = c.getTOT();
+            *sbuf++ = ((ch << 8) | len);
+            *sbuf++ = c.getTDCCount();
+            *sbuf++ = c.getADCCount();
+            if (c.is2ndHit()) {
+              reservedValue = c.getTDCCount2ndHit();
+              halfOffset = true;
+            }
+          } else {
+            *sbuf++ = ((ch << 8) | len);
+            *sbuf++ = reservedValue;
+            *sbuf++ = c.getADCCount();
+            *sbuf++ = c.getTOT();
+            if (c.is2ndHit()) {
+              *sbuf++ = c.getTDCCount2ndHit();
+              *sbuf++ = c.getTDCCount();
+              halfOffset = false;
+            } else {
+              reservedValue = c.getTDCCount();
+            }
           }
         }
+      }
+      if (halfOffset == true) {
+        *sbuf++ = 0xff02;
+        *sbuf = reservedValue;
       }
     }
 
@@ -245,6 +272,7 @@ void CDCPackerModule::event()
                              buf[2], nwords[2],
                              buf[3], nwords[3],
                              rawcprpacker_info);
+
     for (int j = 0; j < 4; j++) {
       if (buf[j] != NULL) delete [] buf[j];
     }

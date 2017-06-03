@@ -15,7 +15,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
-#include <cdc/dataobjects/CDCRawHitWaveForm.h>
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 
@@ -231,11 +230,6 @@ namespace Belle2 {
        * Name of the CDCRawHit dataobject (supressed mode).
        */
       std::string m_cdcRawHitName;
-
-      /**
-       * Name of the CDCRawHit dataobject (raw data mode).
-       */
-      std::string m_cdcRawHitWaveFormName;
 
       /**
        * Tree name of the CDCHit object.

@@ -258,11 +258,11 @@ void CsiStudy_v2Module::event()
       /*cout << " thres1 " << m_Thres_hitRate[detNB][i]
       << " thres2 " << m_Thres_sumE[detNB][i]
       << " edep " << RecEdep << " true Edep " << Edep << endl;*/
-      if (RecEdep >= m_Thres_hitRate[detNB][i]) {
+      if (RecEdep >= m_Thres_hitRate[detNB][i] && m_Thres_hitRate[detNB][i] > 0) {
         h_csi_drate[i]->Fill(detNB);
         h_csi_rs_drate[i]->Fill(detNB, ring_section);
       }
-      if (RecEdep >= m_Thres_sumE[detNB][i]) {
+      if (RecEdep >= m_Thres_sumE[detNB][i] && m_Thres_sumE[detNB][i] > 0) {
         h_csi_dedep[detNB][i]->Fill(RecEdep);
         h_csi_rs_dedep[detNB][i]->Fill(RecEdep, ring_section);
 

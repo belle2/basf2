@@ -1204,6 +1204,8 @@ namespace Belle2 {
     if (I_LER < 0) I_LER = 0;
     if (P_HER < 0) P_HER = 0;
     if (P_LER < 0) P_LER = 0;
+    if (P_corrected_HER < 0) P_corrected_HER = 0;
+    if (P_corrected_LER < 0) P_corrected_LER = 0;
 
     if (m_input_data_SingleBeam == "LER") {
       I_HER = 0;

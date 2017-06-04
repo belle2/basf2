@@ -23,7 +23,13 @@ reco.add_reconstruction(main, pruneTracks=False)
 
 ana.fillParticleList('mu+:bbmu', 'muid > 0.1 and useLabFrame(p) > 0.5', True, main)
 
-main.add_module("MillepedeCollector", minPValue=0., particles=['mu+:bbmu'], tracks=[], components=['VXDAlignment'])
+main.add_module(
+    "MillepedeCollector",
+    useGblTree=False,
+    minPValue=0.,
+    particles=['mu+:bbmu'],
+    tracks=[],
+    components=['VXDAlignment'])
 
 main.add_module("Progress")
 main.add_module("RootOutput", branchNames=['EventMetaData'])

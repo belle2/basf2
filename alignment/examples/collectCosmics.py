@@ -21,7 +21,7 @@ main.add_module('SetupGenfitExtrapolation')
 main.add_module('TrackFinderMCTruthRecoTracks', WhichParticles='primary', RecoTracksStoreArrayName='CosmicRecoTracks')
 main.add_module('DAFRecoFitter', recoTracksStoreArrayName='CosmicRecoTracks')
 
-main.add_module("MillepedeCollector", minPValue=0., tracks=['CosmicRecoTracks'], components=['VXDAlignment'])
+main.add_module("MillepedeCollector", useGblTree=False, minPValue=0., tracks=['CosmicRecoTracks'], components=['VXDAlignment'])
 
 main.add_module('RootOutput', branchNames=['EventMetaData'])
 main.add_module('Progress')

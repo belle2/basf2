@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric and Xiaolong Wang                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -70,8 +70,14 @@ namespace Belle2 {
     addParam("directoryName", m_directoryName,
              "name (with path) of the directory for the output root files.",
              string(""));
-    addParam("minHits", m_minHits, "minimal required hits per channel.", (unsigned) 1000);
-    addParam("numIterations", m_numIterations, "minimal required hits per channel.", (unsigned) 100);
+    addParam("minHits", m_minHits,
+             "minimal required hits per channel.", (unsigned) 1000);
+    addParam("numIterations", m_numIterations,
+             "minimal required hits per channel.", (unsigned) 100);
+    addParam("numConvIter", m_conv_iter,
+             "Max number of iterations for conversion.", (unsigned) 50);
+    addParam("minChi2Change", m_dchi2_min,
+             "Minimal of chi2 change in iterations.",  0.2);
     addParam("method", m_method, "method: 0 - profile histograms only, "
              "1 - matrix inversion, 2 - iterative, "
              "3 - matrix inversion w/ singular value decomposition.", (unsigned) 1);
@@ -463,19 +469,19 @@ namespace Belle2 {
 
 
     double pre_chi2 = 10000000.0;
-    int   num_small_dev = 0;
-    float deltaChi2 = 0;
-    float this_chi2 = 0.0;
+    unsigned   num_small_dev = 0;
+    double deltaChi2 = 0;
+    double this_chi2 = 0.0;
 
     for (unsigned j = 0; j < m_numIterations; j++) {
+
       Iteration(ntuple, xval);
       this_chi2 = Chisq(ntuple, xval);
-
+      if (this_chi2 < 0)continue;
       deltaChi2 = pre_chi2 - this_chi2;
-      if (deltaChi2 < -dchi2_min) break;
-      if (fabs(deltaChi2) < deltamin) num_small_dev++;
-      if (num_small_dev > conv_iter) break;
-
+      if (deltaChi2 < -m_dchi2_min) break;
+      if (fabs(deltaChi2) < m_deltamin) num_small_dev++;
+      if (num_small_dev > m_conv_iter) break;
       pre_chi2 = this_chi2;
     }
 
@@ -513,7 +519,8 @@ namespace Belle2 {
       return false;
     }
 
-    double DeltaT = 2 * m_syncTimeBase / xval[c_TimeAxisSize];
+//    double DeltaT = 2 * m_syncTimeBase / xval[c_TimeAxisSize];
+    double DeltaT = meanTimeDifference;
     for (auto& xi : xval) xi *= DeltaT;
     HDeltaT.SetBinContent(chan + 1, DeltaT);
 
@@ -563,57 +570,55 @@ namespace Belle2 {
   {
     std::vector<double> xxval(c_TimeAxisSize + 1, 0.0);
     double chi2_0, chi2_ch;
-    double dr_chi2[c_TimeAxisSize + 1];
-    float  vx_it_step;
+    std::vector<double> dr_chi2(c_TimeAxisSize + 1, 0.0);
+    double  vx_it_step;
 
-    hdrsamp_try->Reset();
-
+    TH1D hdrsamp_try("hdrsamp_try", "dchi2/dx distribution", 100, -0.01, 0.01);
     double wdth = 0;
 
     for (int i = 0; i < c_TimeAxisSize; i++) {
       wdth = xval[i + 1] - xval[i];
-      if (wdth < min_binwidth) {
-        xval[i] = xval[i] - 0.5 * fabs(wdth) - 0.5 * min_binwidth;
-        xval[i + 1] = xval[i + 1] + 0.5 * fabs(wdth) + 0.5 * min_binwidth;
+      if (wdth < m_min_binwidth) {
+        xval[i] = xval[i] - 0.5 * fabs(wdth) - 0.5 * m_min_binwidth;
+        xval[i + 1] = xval[i + 1] + 0.5 * fabs(wdth) + 0.5 * m_min_binwidth;
       }
-      if (wdth > max_binwidth) {
-        xval[i] = xval[i] - 0.5 * fabs(wdth) - 0.5 * max_binwidth;
-        xval[i + 1] = xval[i + 1] + 0.5 * fabs(wdth) + 0.5 * max_binwidth;
+      if (wdth > m_max_binwidth) {
+        xval[i] = xval[i] - 0.5 * fabs(wdth) - 0.5 * m_max_binwidth;
+        xval[i + 1] = xval[i + 1] + 0.5 * fabs(wdth) + 0.5 * m_max_binwidth;
       }
     }
 
-    if (xval[0] != 0) {
-      B2INFO("xval[0]=" << xval[0]);
+    if (xval[0] != 0)
       for (int i = 0; i < c_TimeAxisSize; i++)  xval[i] = xval[i] - xval[0];
-    }
 
-    if (xval[256] != 2 * m_syncTimeBase) {
-      B2INFO("xval[256]=" << xval[256]);
-      xval[256] = 2 * m_syncTimeBase;
-    }
+//   if (xval[256] != 2 * m_syncTimeBase) {
+//     B2INFO("xval[256]=" << xval[256]);
+//      xval[c_TimeAxisSize] = 2 * m_syncTimeBase;
+//   }
 
     for (int i = 0; i < c_TimeAxisSize + 1; i++)  xxval[i] = xval[i];
 
     chi2_0 = Chisq(ntuple, xxval);
+    if (chi2_0 < 0) B2ERROR("iTBC chisq_0<0! xval has problem.");
 
     for (int smp = 1; smp < c_TimeAxisSize; smp++) {
-      xxval[smp] = xval[smp] + dev_step;
+      xxval[smp] = xval[smp] + m_dev_step;
       chi2_ch = Chisq(ntuple, xxval);
-
-      dr_chi2[smp] = (chi2_ch - chi2_0) / dev_step;
-      hdrsamp_try->Fill(dr_chi2[smp]);
+      if (chi2_ch < 0)continue;
+      dr_chi2[smp] = (chi2_ch - chi2_0) / m_dev_step;
+      hdrsamp_try.Fill(dr_chi2[smp]);
       xxval[smp] = xval[smp];
     }
 
     for (int smp = 1; smp < c_TimeAxisSize; smp++) {
-      vx_it_step = dr_chi2[smp] * xstep;
+      vx_it_step = dr_chi2[smp] * m_xstep;
       xval[smp] = xval[smp] - vx_it_step;
     }
 
     //save rms of dchi2/dxval.
-    dchi2dxv = hdrsamp_try->GetRMS();
-    //change xstep
-    if (fabs(dchi2dxv) < change_xstep) xstep = new_xstep;
+    m_dchi2dxv = hdrsamp_try.GetRMS();
+    //change m_xstep
+    if (fabs(m_dchi2dxv) < m_change_xstep) m_xstep = m_new_xstep;
   }
 
   double TOPTimeBaseCalibratorModule::Chisq(const std::vector<TwoTimes>& ntuple, std::vector<double>& xxval)
@@ -621,32 +626,48 @@ namespace Belle2 {
     double sum1 = 0.0;
     double sum2 = 0.0; //sum od dt and dt**2
     double mean = 0.0;
-    double chi2 = 99999999.0;;
-    int n_good = 0;
+    double chi2 = -1.0;
+    double fr = 0, cdt = 0;
+    int samp0, samp1;
+    double ctdc1, ctdc2;
+
+    m_good = 0;
     for (const auto& twoTimes : ntuple) {
       if (!twoTimes.good) continue;
 
       std::vector<double> m(c_TimeAxisSize, 0.0);
-      int i1 = int(twoTimes.t1);
-      m[i1 % c_TimeAxisSize] = 1.0 - (twoTimes.t1 - i1);
-      int i2 = int(twoTimes.t2);
-      m[i2 % c_TimeAxisSize] = twoTimes.t2 - i2;
-      i2 = i1 + (i2 - i1) % c_TimeAxisSize;
-      for (int k = i1 + 1; k < i2; k++) m[k % c_TimeAxisSize] = 1;
-      double s = 0.0;
-      for (int k = 0; k < c_TimeAxisSize; k++) s += m[k] * (xxval[k + 1] - xxval[k]); //x[k] in mTBC
 
-//     if(s>dt_max||s<dt_min) good_ev[i]=0;// only for first cut.
-//     else {
-      if (s < dt_max && s > dt_min) {
-        sum1 += s;
-        sum2 += s * s;
-        n_good++;
+      int i1 = int(twoTimes.t1);
+      fr = twoTimes.t1 - i1;
+      samp0 = i1 % 256;
+      ctdc1 = xxval[samp0] + fr * (xxval[samp0 + 1] - xxval[samp0]);
+      int i2 = int(twoTimes.t2);
+      fr = twoTimes.t2 - i2;
+      samp1 = i2 % 256;
+      ctdc2 = xxval[samp1] + fr * (xxval[samp1 + 1] - xxval[samp1]);
+      if (samp1 > samp0) cdt = ctdc2 - ctdc1;
+      else            cdt = ctdc2 - ctdc1 + m_syncTimeBase * 2;
+
+
+      /*
+            int i1 = int(twoTimes.t1);
+            m[i1 % c_TimeAxisSize] = 1.0 - (twoTimes.t1 - i1);
+            int i2 = int(twoTimes.t2);
+            m[i2 % c_TimeAxisSize] = twoTimes.t2 - i2;
+            i2 = i1 + (i2 - i1) % c_TimeAxisSize;
+            for (int k = i1 + 1; k < i2; k++) m[k % c_TimeAxisSize] = 1;
+            double s = 0.0;
+            for (int k = 0; k < c_TimeAxisSize; k++) s += m[k] * (xxval[k + 1] - xxval[k]); //x[k] in mTBC
+      */
+      if (cdt < m_dt_max && cdt > m_dt_min) {
+        sum1 += cdt;
+        sum2 += cdt * cdt;
+        m_good++;
       }
     }
-    if (n_good > 10) {
-      mean = sum1 / n_good;
-      chi2 = (sum2 - n_good * mean * mean) / n_good / sigm2_exp;
+    if (m_good > 10) {
+      mean = sum1 / m_good;
+      chi2 = (sum2 - m_good * mean * mean) / m_good / m_sigm2_exp;
     }
     return chi2;
   }

@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric and Xiaolong Wang                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,7 +17,6 @@
 #include <TProfile.h>
 #include <TH1F.h>
 
-#define  MAX_EVENT 100000
 
 namespace Belle2 {
 
@@ -25,9 +24,9 @@ namespace Belle2 {
    * Structure to hold calpulse raw times expressed in samples since sample 0 of window 0.
    */
   struct TwoTimes {
-    float t1 = 0; /**< time of the first pulse [samples] */
-    float t2 = 0; /**< time of the second pulse [samples] */
-    float sigma = 0; /**< uncertainty of time difference (r.m.s.) */
+    double t1 = 0; /**< time of the first pulse [samples] */
+    double t2 = 0; /**< time of the second pulse [samples] */
+    double sigma = 0; /**< uncertainty of time difference (r.m.s.) */
     bool good = false; /**< flag */
 
     /**
@@ -153,6 +152,20 @@ namespace Belle2 {
                       double meanTimeDifference,
                       TH1F& Hchi2, TH1F& Hndf, TH1F& HDeltaT);
 
+    /**
+     * Iteration function called by iterativeTBC()
+     * @param ntuple ntuple data
+     * @param xval TBC constants of 256 samples, time interval is the
+     *  difference of nearby xvals, xval[0]=0 and xval[256]=2*FTSW
+     */
+    void Iteration(const std::vector<TwoTimes>& ntuple, std::vector<double>& xval);
+
+    /**
+     * Return the chisqure of one set of TBC constants (xval) in iTBC calculaton
+     * @param ntuple ntuple data
+     * @param xxval TBC constants of 256 samples, and xxval[0]=0, xxval[256]=2*FTSW
+     */
+    double Chisq(const std::vector<TwoTimes>& ntuple, std::vector<double>& xxval);
 
     /**
      * Save vector to histogram and write it out
@@ -211,35 +224,24 @@ namespace Belle2 {
      *
      */
 
-    double Chisq(const std::vector<TwoTimes>& ntuple, std::vector<double>& xxval);
-    void Iteration(const std::vector<TwoTimes>& ntuple, std::vector<double>& xval);
 
-    int      n_good = 0;      //good events used for chisq cal.
+    int m_good = 0;   /**<   good events used for chisq cal. */
 
-    float dt_min = 20.0;
-    float dt_max = 24.0;
-//(6)An infinitesimal step to calculate a differential dchi2/dev_step
-//     double dev_step=0.002; //2ps
-    double dev_step = 0.001; //2ps 20170417
-//(7)scale of iteration for xval: delta=-(dchi2/dev_step)*xstep
-    double xstep = 0.020; //original 20170417
-    float dchi2dxv;//rms of 255 dchi2/dxval values
-    float change_xstep = 0.015; float new_xstep = 2.0 * xstep; //
+    double m_dt_min = 20.0; /**<   minimum Delta T of calpulse */
+    double m_dt_max = 24.0; /**<   maximum Delta T of calpulse */
+    double m_dev_step = 0.001; //2ps 20170417
+    double m_xstep = 0.020; /**<   for the steps of iteration */
+    double m_dchi2dxv;/**< rms of 255 dchi2/dxval values */
+    double m_change_xstep = 0.015;
+    double m_new_xstep = 2.0 * m_xstep; //
+    double m_min_binwidth = 0.05; /**<   minimum time interval of one sample */
+    double m_max_binwidth = 2.0; /**<   maximum time interval of one sample */
+    double m_dchi2_min = 0.2; /**< quit if chisq increase in iteratons is larger than this value. */
+    unsigned   m_conv_iter = 100; /**< Number of iteration with chisq changes less than deltamin. */
+    double m_deltamin = 0.01 * 0.01; /**< minumum chisq change in an iteration. */
+    double  m_DtSigma = 0.0424; /**< 45 in ps (30ps for a calpulse)*/
+    double m_sigm2_exp = m_DtSigma * m_DtSigma;
 
-//(8)limits for sample bin widths
-    float min_binwidth = 0.05;
-    float max_binwidth = 2.0; //ns
-//(9)convergence of chi2 iteration
-    float dchi2_min = 0.2; //20170331 quit if chi2 increases by geater than this value
-    int   conv_iter = 100; //Number of iteration with chisq changes less than deltamin
-    float deltamin = 0.01 * 0.01; //chisq change in an iteration.
-
-//TB constnats
-    int      N_SAMPLE = 10000; //number of events
-    float  DtSigma = 0.0424; //20170331 45 in ps (30ps for a calpulse)
-    double sigm2_exp = DtSigma * DtSigma;
-
-    TH1D* hdrsamp_try = new TH1D("hdrsamp_try", "dchi2/dx distribution", 100, -0.01, 0.01);
   };
 
 } // Belle2 namespace

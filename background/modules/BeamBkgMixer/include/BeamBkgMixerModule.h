@@ -16,6 +16,7 @@
 #include <simulation/background/BeamBGTypes.h>
 #include <background/dataobjects/BackgroundMetaData.h>
 #include <string>
+#include <map>
 
 #include "TFile.h"
 #include "TChain.h"
@@ -282,6 +283,10 @@ namespace Belle2 {
 
     background::BeamBGTypes m_bgTypes;  /**< defined BG types */
     int m_BGInfoIndex = -1; /**< index of BackgroundInfo object in the store array */
+
+    std::map<std::string, int> m_rejected; /**< messages: rejected events */
+    std::map<std::string, int> m_reused;  /**< messages: rejused events */
+    int m_rejectedCount = 0;  /**< counter for suppresing "rejected event" messages */
 
   };
 

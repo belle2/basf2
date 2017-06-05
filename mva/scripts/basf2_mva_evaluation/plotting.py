@@ -894,6 +894,7 @@ class VerboseDistribution(Plotter):
         #: Show only a certain range in terms of standard deviations of the data
         self.range_in_std = range_in_std
         self.box_axes = []
+        #: The distribution plot
         self.distribution = Distribution(self.figure, self.axis, normed_to_all_entries=self.normed, range_in_std=self.range_in_std)
 
     def add(self, data, column, mask=None, weight_column=None, label=None):

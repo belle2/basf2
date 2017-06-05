@@ -216,7 +216,8 @@ namespace Belle2 {
           bool ok = calibrateChannel(ntuple, scrodID, chan, Hchi2, Hndf, HDeltaT);
           if (ok) Hsuccess.Fill(chan);
         } else {
-          B2INFO("... channel " << chan << " statistics too low");
+          B2INFO("... channel " << chan << " statistics too low ("
+                 << ntuple.size() << " double cal pulses)");
         }
       }
 
@@ -249,6 +250,12 @@ namespace Belle2 {
     prof.SetXTitle("sample number");
     prof.SetYTitle("time difference [samples]");
 
+    name = "sampleOccup_ch" + to_string(chan);
+    title = "Occupancy for " + forWhat;
+    TH1F hist(name.c_str(), title.c_str(), c_TimeAxisSize, 0, c_TimeAxisSize);
+    hist.SetXTitle("sample number");
+    hist.SetYTitle("entries per sample");
+
     std::vector<double> profMeans(c_TimeAxisSize, (m_maxTimeDiff + m_minTimeDiff) / 2);
     double sigma = (m_maxTimeDiff - m_minTimeDiff) / 6;
 
@@ -263,6 +270,7 @@ namespace Belle2 {
         double Ddiff = diff - profMeans[sample];
         if (fabs(Ddiff) < 3 * sigma) {
           prof.Fill(sample, diff);
+          hist.Fill(sample);
           x += Ddiff;
           x2 += Ddiff * Ddiff;
           n++;
@@ -280,6 +288,7 @@ namespace Belle2 {
       sigma = sqrt(x2 - x * x);
     }
     prof.Write();
+    hist.Write();
 
     // calculate average time difference
 
@@ -292,6 +301,8 @@ namespace Belle2 {
 
     switch (m_method) {
       case 0:
+        B2INFO("... channel " << chan << ": "
+               << ntuple.size() << " double cal pulses)");
         return false;
       case 1:
         return matrixInversion(ntuple, scrodID, chan, meanTimeDifference,

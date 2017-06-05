@@ -467,7 +467,6 @@ namespace Belle2 {
 
     B2INFO("TimeBaseCalibration starts for channel#" << chan);
 
-
     double pre_chi2 = 10000000.0;
     unsigned   num_small_dev = 0;
     double deltaChi2 = 0;
@@ -487,30 +486,11 @@ namespace Belle2 {
 
     // calculate chi^2
 
-    double chi2 = 0;
-    int ndf = -c_TimeAxisSize;
+    double chi2 = Chisq(ntuple, xval);
+    Hchi2.SetBinContent(chan + 1, chi2);
+    Hndf.SetBinContent(chan + 1, m_good);
 
-    for (const auto& twoTimes : ntuple) {
-      if (!twoTimes.good) continue;
-
-      std::vector<double> m(c_TimeAxisSize, 0.0);
-      int i1 = int(twoTimes.t1);
-      m[i1 % c_TimeAxisSize] = 1.0 - (twoTimes.t1 - i1);
-      int i2 = int(twoTimes.t2);
-      m[i2 % c_TimeAxisSize] = twoTimes.t2 - i2;
-      i2 = i1 + (i2 - i1) % c_TimeAxisSize;
-      for (int k = i1 + 1; k < i2; k++) m[k % c_TimeAxisSize] = 1;
-      double s = -1.0;
-      for (int k = 0; k < c_TimeAxisSize; k++) s += m[k] * (xval[k + 1] - xval[k]);
-      double relSigma = twoTimes.sigma / meanTimeDifference;
-      double sig2 = relSigma * relSigma;
-      chi2 += s * s / sig2;
-      ndf++;
-    }
-    Hchi2.SetBinContent(chan + 1, chi2 / ndf);
-    Hndf.SetBinContent(chan + 1, ndf);
-
-    // constrain sum of x to 2*syncTimeBase and calculate sample times
+    // constrain sum of x to 2*syncTimeBase and calculate sample times, not necessary here
 
     double sum = 0;
     for (auto xi : xval) sum += xi;
@@ -520,14 +500,17 @@ namespace Belle2 {
     }
 
 //    double DeltaT = 2 * m_syncTimeBase / xval[c_TimeAxisSize];
-    double DeltaT = meanTimeDifference;
-    for (auto& xi : xval) xi *= DeltaT;
+    double DeltaT = meanTimeDifference * (2 * m_syncTimeBase / c_TimeAxisSize);
+//    for (auto& xi : xval) xi *= DeltaT;
     HDeltaT.SetBinContent(chan + 1, DeltaT);
 
 
     std::vector<double> timeInterval;
-//    timeInterval.push_back(0);
     for (int i = 0; i < c_TimeAxisSize; i++)timeInterval.push_back(xval[i + 1] - xval[i]);
+
+
+    std::vector<double> sampleTimes;
+    for (auto xi : xval) sampleTimes.push_back(xi);
 
     // save results as histograms
     std::string forWhat = "scrod " + to_string(scrodID) + " channel " + to_string(chan);
@@ -536,7 +519,7 @@ namespace Belle2 {
 //    saveAsHistogram(A, "invA_ch" + to_string(chan), "Inverted matrix for " + forWhat);
     saveAsHistogram(timeInterval,  "dt_ch" + to_string(chan), "Sample time bins for " + forWhat,
                     "sample number", "#Delta t [ns]");
-    saveAsHistogram(xval, "sampleTimes_ch" + to_string(chan),
+    saveAsHistogram(sampleTimes, "sampleTimes_ch" + to_string(chan),
                     "Time base corrections for " + forWhat, "sample number", "t [ns]");
 
     // calibrated cal pulse time difference
@@ -550,7 +533,7 @@ namespace Belle2 {
     Hcor.SetStats(kTRUE);
 
     TOPSampleTimes timeBase;
-    timeBase.setTimeAxis(xval, xval.back() / 2);
+    timeBase.setTimeAxis(sampleTimes, sampleTimes.back() / 2);
 
     for (const auto& twoTimes : ntuple) {
       if (!twoTimes.good) continue;
@@ -560,8 +543,8 @@ namespace Belle2 {
     }
     Hcor.Write();
 
-    B2INFO("... channel " << chan << " OK (chi^2/ndf = " << chi2 / ndf
-           << ", ndf = " << ndf << ")");
+    B2INFO("... channel " << chan << " OK (chi^2/ndf = " << chi2
+           << ", ndf = " << m_good << ")");
 
     return true;
   }

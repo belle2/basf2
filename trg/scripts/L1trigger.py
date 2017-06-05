@@ -10,7 +10,7 @@ from gdltrigger import add_gdl_trigger
 from effCalculation import EffCalculation
 
 
-def add_tsim(path, SimulationMode=1, minHits=4, OpenFilter=False):
+def add_tsim(path, SimulationMode=1, minHits=4, OpenFilter=False, Belle2Phase="Phase2"):
     """
     add the gdl module to path
     @param path            module is added to this path
@@ -22,10 +22,11 @@ def add_tsim(path, SimulationMode=1, minHits=4, OpenFilter=False):
     @param OpenFilter      if OpenFilter is True, the events failed to pass L1 trigger
                            will be discarded. Make sure you do need open filter before you
                            set the value to True
+    @param Belle2Phase      the trigger menu at the phase is applied. Option: Phase2, Phase3
     """
     add_cdc_trigger(path, SimulationMode, minHits)
     add_ecl_trigger(path)
     add_klm_trigger(path)
-    add_grl_trigger(path, SimulationMode)
+    add_grl_trigger(path, SimulationMode, Belle2Phase)
     add_gdl_trigger(path, SimulationMode, OpenFilter)
     EffCalculation(path)

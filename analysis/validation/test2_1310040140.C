@@ -26,7 +26,7 @@
 void plot(TFile* pfile, TTree* ptree, TFile *outputFile){
 
 
-  TString tmCuts("(B_s0__isSignal == 1)");
+  TString tmCuts("(B_s0_isSignal == 1)");
 
   TH1F* h_mbc = new TH1F("h_mbc","M_{bc}",100,5.34,5.44);
   ptree->Project("h_mbc", "B_s0_mbc", tmCuts);

@@ -297,8 +297,9 @@ void CDCUnpackerModule::event()
               } else {
                 tdc1 = trgTime - tdc1;
               }
-              cdcHits.appendNew(tdc1, fadcSum, wireId);
+              CDCHit* firstHit = cdcHits.appendNew(tdc1, fadcSum, wireId);
               CDCHit* secondHit = cdcHits.appendNew(tdc2, fadcSum, wireId);
+              secondHit->setOtherHitIndices(firstHit);
               secondHit->set2ndHitFlag();
             }
 
@@ -389,9 +390,10 @@ void CDCUnpackerModule::event()
                   // Should be modified!!!!!!!
                   //
                   //      cdcHits.appendNew(tdc1, fadcSum, wireId, tdc2);
-                  cdcHits.appendNew(tdc1, fadcSum, wireId);
+                  CDCHit* firstHit = cdcHits.appendNew(tdc1, fadcSum, wireId);
                   if (length == 5) {
                     CDCHit* secondHit = cdcHits.appendNew(tdc2, fadcSum, wireId);
+                    secondHit->setOtherHitIndices(firstHit);
                     secondHit->set2ndHitFlag();
                   }
                 }

@@ -172,7 +172,7 @@ if not os.path.isfile(fei_pickle):
 fei_path = get_path_from_file(fei_pickle)
 path.add_path(fei_path)
 
-filelist = [""]
+filelist = ["../1290310000.dst.root"]
 
 inputMdstList('default', filelist)
 
@@ -266,8 +266,8 @@ applyCuts('Upsilon(4S):BhadBtaunu', 'nAllROETracks==0')
 applyCuts('Upsilon(4S):BslBtaunu', 'nAllROETracks==0')
 
 
-buildContinuumSuppression('B+:genericRank')
-buildContinuumSuppression('B+:semileptonicRank')
+buildContinuumSuppression('B+:genericRank', '')
+buildContinuumSuppression('B+:semileptonicRank', '')
 
 
 # perform MC matching

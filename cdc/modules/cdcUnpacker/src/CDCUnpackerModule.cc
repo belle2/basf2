@@ -386,10 +386,6 @@ void CDCUnpackerModule::event()
                 if (board == m_boardIDTrig && ch == m_channelTrig) {
                   tdcCountTrig = tdc1;
                 } else {
-                  //
-                  // Should be modified!!!!!!!
-                  //
-                  //      cdcHits.appendNew(tdc1, fadcSum, wireId, tdc2);
                   CDCHit* firstHit = cdcHits.appendNew(tdc1, fadcSum, wireId);
                   if (length == 5) {
                     CDCHit* secondHit = cdcHits.appendNew(tdc2, fadcSum, wireId);

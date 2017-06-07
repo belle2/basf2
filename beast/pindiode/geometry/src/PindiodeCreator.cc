@@ -339,9 +339,14 @@ namespace Belle2 {
         */
 
         //Sensitive area
-        G4double dx_pin = 2.65 / 2.*CLHEP::mm;
-        G4double dz_pin = 2.65 / 2.*CLHEP::mm;
-        G4double dy_pin = 0.10 / 2.*CLHEP::mm;
+        G4double dx_pin = 0;
+        G4double dz_pin = 0;
+        G4double dy_pin = 0;
+        if (phase == 1) {
+          dx_pin = dx_pins;
+          dz_pin = dz_pins;
+          dy_pin = dy_pins;
+        }
         if (phase == 2) {
           dx_pin = dx_pins;
           dz_pin = dz_pins;
@@ -378,7 +383,7 @@ namespace Belle2 {
                                       z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
                         G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
                                       (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
-            new G4PVPlacement(transform, l_pin, TString::Format("p_pin_2_%d", i).Data(), &topVolume, false, detID1);
+            new G4PVPlacement(transform, l_pin, TString::Format("p_pin_2_%d", i).Data(), &topVolume, false, detID2);
             B2INFO("        PIN-" << detID2 << " placed at: " << transform.getTranslation() << " mm");
           }
           /*

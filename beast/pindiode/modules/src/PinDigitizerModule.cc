@@ -102,8 +102,8 @@ void PinDigitizerModule::event()
     int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
     double fedep = ((double) NbEle) * m_WorkFunction * 1e-3; //eV to keV
     double volt = NbEle * 1.602176565e-19 * m_CrematGain * 1e12; // volt
-    if ((fedep * 1e3) > m_WorkFunction)
-      PinHits.appendNew(PindiodeHit(fedep, volt, time, detNb, pdg));
+    //if ((fedep * 1e3) > m_WorkFunction)
+    PinHits.appendNew(PindiodeHit(fedep, volt, time, detNb, pdg));
   }
 
 }

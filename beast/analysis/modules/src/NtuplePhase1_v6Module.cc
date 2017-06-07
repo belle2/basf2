@@ -1113,8 +1113,18 @@ namespace Belle2 {
 
     double Zeff_LER = 0;
     if (m_beast.SKB_LER_Zeff_D02 != 0 && m_beast.SKB_LER_Zeff_D02->size() > 0) Zeff_LER = m_beast.SKB_LER_Zeff_D02->at(0);
-    double Zeff_LC = fctRate_LC->Eval(Zeff_LER) / fctRate_LC->Eval(7) / m_input_Z_scaling[1];
-    double Zeff_LB = fctRate_LB->Eval(Zeff_LER) / fctRate_LB->Eval(7) / m_input_Z_scaling[3];
+    cout << "Zeff_DO2 " << Zeff_LER << endl;
+    double Zeff_LC = 1;
+    double Zeff_LB = 1;
+    if (Zeff_LER == 0) {
+      Zeff_LER = 2.7;
+      //Zeff_LC = 1.0;
+      //Zeff_LB = 1.0;
+    } else if (Zeff_LER > 0 && Zeff_LER < 40) {
+      Zeff_LC = fctRate_LC->Eval(Zeff_LER) / fctRate_LC->Eval(7) / m_input_Z_scaling[1];
+      Zeff_LB = fctRate_LB->Eval(Zeff_LER) / fctRate_LB->Eval(7) / m_input_Z_scaling[3];
+    }
+    cout << "Zeff_LC  " << Zeff_LC  << " Zeff_LB " << Zeff_LB << " Zeff_LER " << Zeff_LER << endl;
 
     double I_HER = 0;
     if (m_beast.SKB_HER_current != 0 && m_beast.SKB_HER_current->size() > 0) I_HER = m_beast.SKB_HER_current->at(0);
@@ -1421,7 +1431,7 @@ namespace Belle2 {
         if (m_input_LB_DIA_dose[j].size() > 0) {
           LBG = m_input_LB_DIA_dose[j][i] + m_input_LC_DIA_dose[j][i];
           HBG = m_input_HB_DIA_dose[j][i] + m_input_HC_DIA_dose[j][i];
-          if (i == 1) LBG = m_input_LB_DIA_dose[j][i] * Zeff_LB + m_input_LC_DIA_dose[j][i] * Zeff_LC;
+          if (j == 1) LBG = m_input_LB_DIA_dose[j][i] * Zeff_LB + m_input_LC_DIA_dose[j][i] * Zeff_LC;
           /*cout << "section " << j
                << " LB " << m_input_LB_DIA_dose[j][i] << " LC " << m_input_LC_DIA_dose[j][i] << " HB " <<  m_input_HB_DIA_dose[j][i] << " HC " <<
                m_input_HC_DIA_dose[j][i] << endl;*/
@@ -1448,7 +1458,7 @@ namespace Belle2 {
         if (m_input_LB_PIN_dose[j].size() > 0) {
           LBG = m_input_LB_PIN_dose[j][i] + m_input_LC_PIN_dose[j][i];
           HBG = m_input_HB_PIN_dose[j][i] + m_input_HC_PIN_dose[j][i];
-          if (i == 1) LBG = m_input_LB_PIN_dose[j][i] * Zeff_LB + m_input_LC_PIN_dose[j][i] * Zeff_LC;
+          if (j == 1) LBG = m_input_LB_PIN_dose[j][i] * Zeff_LB + m_input_LC_PIN_dose[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1475,7 +1485,7 @@ namespace Belle2 {
         if (m_input_LB_DOSI[j].size() > 0) {
           LBG = m_input_LB_DOSI[j][i] + m_input_LC_DOSI[j][i];
           HBG = m_input_HB_DOSI[j][i] + m_input_HC_DOSI[j][i];
-          if (i == 1) LBG = m_input_LB_DOSI[j][i] * Zeff_LB + m_input_LC_DOSI[j][i] * Zeff_LC;
+          if (j == 1) LBG = m_input_LB_DOSI[j][i] * Zeff_LB + m_input_LC_DOSI[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1499,7 +1509,7 @@ namespace Belle2 {
         if (m_input_LB_BGO_dose[j].size() > 0) {
           LBG = m_input_LB_BGO_dose[j][i] + m_input_LC_BGO_dose[j][i];
           HBG = m_input_HB_BGO_dose[j][i] + m_input_HC_BGO_dose[j][i];
-          if (i == 1) LBG = m_input_LB_BGO_dose[j][i] * Zeff_LB + m_input_LC_BGO_dose[j][i] * Zeff_LC;
+          if (j == 1) LBG = m_input_LB_BGO_dose[j][i] * Zeff_LB + m_input_LC_BGO_dose[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1534,7 +1544,7 @@ namespace Belle2 {
         if (m_input_LB_HE3_rate[j].size() > 0) {
           LBG = m_input_LB_HE3_rate[j][he3order[i]] + m_input_LC_HE3_rate[j][he3order[i]];
           HBG = m_input_HB_HE3_rate[j][he3order[i]] + m_input_HC_HE3_rate[j][he3order[i]];
-          if (i == 1) LBG = m_input_LB_HE3_rate[j][he3order[i]] * Zeff_LB + m_input_LC_HE3_rate[j][he3order[i]] * Zeff_LC;
+          if (j == 1) LBG = m_input_LB_HE3_rate[j][he3order[i]] * Zeff_LB + m_input_LC_HE3_rate[j][he3order[i]] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1558,7 +1568,7 @@ namespace Belle2 {
         if (m_input_LB_TPC_rate[j].size() > 0) {
           LBG = m_input_LB_TPC_rate[j][i] + m_input_LC_TPC_rate[j][i];
           HBG = m_input_HB_TPC_rate[j][i] + m_input_HC_TPC_rate[j][i];
-          if (i == 1) LBG = m_input_LB_TPC_rate[j][i] * Zeff_LB + m_input_LC_TPC_rate[j][i] * Zeff_LC;
+          if (j == 1) LBG = m_input_LB_TPC_rate[j][i] * Zeff_LB + m_input_LC_TPC_rate[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1582,7 +1592,7 @@ namespace Belle2 {
         if (m_input_LB_TPC_dose[j].size() > 0) {
           LBG = m_input_LB_TPC_dose[j][i] + m_input_LC_TPC_dose[j][i];
           HBG = m_input_HB_TPC_dose[j][i] + m_input_HC_TPC_dose[j][i];
-          if (i == 1) LBG = m_input_LB_TPC_dose[j][i] * Zeff_LB + m_input_LC_TPC_dose[j][i] * Zeff_LC;
+          if (j == 1) LBG = m_input_LB_TPC_dose[j][i] * Zeff_LB + m_input_LC_TPC_dose[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1606,7 +1616,7 @@ namespace Belle2 {
         if (m_input_LB_TPC_angular_rate[j].size() > 0) {
           LBG = m_input_LB_TPC_angular_rate[j][i] + m_input_LC_TPC_angular_rate[j][i];
           HBG = m_input_HB_TPC_angular_rate[j][i] + m_input_HC_TPC_angular_rate[j][i];
-          if (i == 1) LBG = m_input_LB_TPC_angular_rate[j][i] * Zeff_LB + m_input_LC_TPC_angular_rate[j][i] * Zeff_LC;
+          if (j == 1) LBG = m_input_LB_TPC_angular_rate[j][i] * Zeff_LB + m_input_LC_TPC_angular_rate[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1630,7 +1640,7 @@ namespace Belle2 {
         if (m_input_LB_TPC_angular_dose[j].size() > 0) {
           LBG = m_input_LB_TPC_angular_dose[j][i] + m_input_LC_TPC_angular_dose[j][i];
           HBG = m_input_HB_TPC_angular_dose[j][i] + m_input_HC_TPC_angular_dose[j][i];
-          if (i == 1) LBG = m_input_LB_TPC_angular_dose[j][i] * Zeff_LB + m_input_LC_TPC_angular_dose[j][i] * Zeff_LC;
+          if (j == 1) LBG = m_input_LB_TPC_angular_dose[j][i] * Zeff_LB + m_input_LC_TPC_angular_dose[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1653,7 +1663,7 @@ namespace Belle2 {
         if (m_input_LB_CLAWS_rate[j].size() > 0) {
           LBG = m_input_LB_CLAWS_rate[j][i] + m_input_LC_CLAWS_rate[j][i];
           HBG = m_input_HB_CLAWS_rate[j][i] + m_input_HC_CLAWS_rate[j][i];
-          if (i == 1) LBG = m_input_LB_CLAWS_rate[j][i] * Zeff_LB + m_input_LC_CLAWS_rate[j][i] * Zeff_LC;
+          if (j == 1) LBG = m_input_LB_CLAWS_rate[j][i] * Zeff_LB + m_input_LC_CLAWS_rate[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1677,7 +1687,7 @@ namespace Belle2 {
         if (m_input_LB_QCSS_rate[j].size() > 0) {
           LBG = m_input_LB_QCSS_rate[j][i] + m_input_LC_QCSS_rate[j][i];
           HBG = m_input_HB_QCSS_rate[j][i] + m_input_HC_QCSS_rate[j][i];
-          if (i == 1) LBG = m_input_LB_QCSS_rate[j][i] * Zeff_LB + m_input_LC_QCSS_rate[j][i] * Zeff_LC;
+          if (j == 1) LBG = m_input_LB_QCSS_rate[j][i] * Zeff_LB + m_input_LC_QCSS_rate[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1701,7 +1711,7 @@ namespace Belle2 {
         if (m_input_LB_CSI_dose[j].size() > 0) {
           LBG = m_input_LB_CSI_dose[j][i] + m_input_LC_CSI_dose[j][i];
           HBG = m_input_HB_CSI_dose[j][i] + m_input_HC_CSI_dose[j][i];
-          if (i == 1) LBG = m_input_LB_CSI_dose[j][i] * Zeff_LB + m_input_LC_CSI_dose[j][i] * Zeff_LC;
+          if (j == 1) LBG = m_input_LB_CSI_dose[j][i] * Zeff_LB + m_input_LC_CSI_dose[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1723,7 +1733,7 @@ namespace Belle2 {
         if (m_input_LB_CSI_dose_binE[j].size() > 0) {
           LBG = m_input_LB_CSI_dose_binE[j][i] + m_input_LC_CSI_dose_binE[j][i];
           HBG = m_input_HB_CSI_dose_binE[j][i] + m_input_HC_CSI_dose_binE[j][i];
-          if (i == 1) LBG = m_input_LB_CSI_dose_binE[j][i] * Zeff_LB + m_input_LC_CSI_dose_binE[j][i] * Zeff_LC;
+          if (j == 1) LBG = m_input_LB_CSI_dose_binE[j][i] * Zeff_LB + m_input_LC_CSI_dose_binE[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1745,7 +1755,7 @@ namespace Belle2 {
         if (m_input_LB_CSI_rate[j].size() > 0) {
           LBG = m_input_LB_CSI_rate[j][i] + m_input_LC_CSI_rate[j][i];
           HBG = m_input_HB_CSI_rate[j][i] + m_input_HC_CSI_rate[j][i];
-          if (i == 1) LBG = m_input_LB_CSI_rate[j][i] * Zeff_LB + m_input_LC_CSI_rate[j][i] * Zeff_LC;
+          if (j == 1) LBG = m_input_LB_CSI_rate[j][i] * Zeff_LB + m_input_LC_CSI_rate[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }

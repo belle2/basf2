@@ -78,6 +78,21 @@ namespace Belle2 {
              "Max number of iTBC iterations for conversion.", (unsigned) 50);
     addParam("minChi2Change", m_dchi2_min,
              "Minimal of chi2 change in iterations.",  0.2);
+    addParam("dtMin", m_dt_min,
+             "minimum Delta T of raw calpulse in iTBC",  20.0);
+    addParam("dtMax", m_dt_max,
+             "maximum Delta T of raw calpulse in iTBC",  24.0);
+    addParam("xStep", m_xstep,
+             "unit for an interation of delta(X_s)",  0.020);
+    addParam("devStep", m_dev_step,
+             "a step size to calculate the value of d(chisq)/dxval",  0.001);
+    addParam("chgStep", m_change_xstep,
+             "update m_xstep if m_dchi2dxv < m_change_step",  0.015);
+    addParam("newStep", m_new_xstep,
+             "a new step for delta(X_s) if m_dchi2dxv < m_change_step",  2.0 * m_xstep);
+    addParam("sigm2_exp", m_sigm2_exp,
+             "(sigma_0(dT))**2 for nomarlization of chisq = sum{dT^2/sigma^2}",  0.0424 * 0.0424);
+
     addParam("method", m_method, "method: 0 - profile histograms only, "
              "1 - matrix inversion, 2 - iterative, "
              "3 - matrix inversion w/ singular value decomposition.", (unsigned) 1);

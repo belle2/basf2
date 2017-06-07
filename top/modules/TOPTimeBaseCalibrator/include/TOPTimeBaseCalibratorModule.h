@@ -24,9 +24,9 @@ namespace Belle2 {
    * Structure to hold calpulse raw times expressed in samples since sample 0 of window 0.
    */
   struct TwoTimes {
-    double t1 = 0; /**< time of the first pulse [samples] */
-    double t2 = 0; /**< time of the second pulse [samples] */
-    double sigma = 0; /**< uncertainty of time difference (r.m.s.) */
+    float t1 = 0; /**< time of the first pulse [samples] */
+    float t2 = 0; /**< time of the second pulse [samples] */
+    float sigma = 0; /**< uncertainty of time difference (r.m.s.) */
     bool good = false; /**< flag */
 
     /**
@@ -156,7 +156,7 @@ namespace Belle2 {
      * Iteration function called by iterativeTBC()
      * @param ntuple ntuple data
      * @param xval TBC constants of 256 samples, time interval is the
-     *  difference of nearby xvals, xval[0]=0 and xval[256]=2*FTSW
+     *  difference of nearby xvals, xval[0]=0 and xval[256]=2*m_syncTimeBase
      */
     void Iteration(const std::vector<TwoTimes>& ntuple, std::vector<double>& xval);
 
@@ -231,7 +231,7 @@ namespace Belle2 {
     double m_dt_max = 24.0; /**<   maximum Delta T of raw calpulse */
     double m_dev_step = 0.001; /**< a step size to calculate the value of d(chisq)/dxval*/
     double m_xstep = 0.020; /**<   unit for an interation of delta(X_s) */
-    double m_dchi2dxv;/**< rms of 255 dchi2/dxval values */
+    double m_dchi2dxv = 0.0;/**< rms of 255 dchi2/dxval values */
     double m_change_xstep = 0.015;/**< update m_xstep if m_dchi2dxv < m_change_step*/
     double m_new_xstep = 2.0 * m_xstep; /** m_xstep = m_new_xstep if m_dchi2dxv < m_change_step*/
     double m_min_binwidth = 0.05; /**<   minimum time interval of one sample */

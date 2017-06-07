@@ -305,15 +305,52 @@ namespace Belle2 {
 
     short asicChanFix = 0; // temporary fix since it's not given in FE header
 
-    while (array.getRemainingWords() > 3) {
+    while (array.getRemainingWords() > 0) {
 
       unsigned header = array.getWord(); // word 0
+
+      B2DEBUG(100, "Header: 0x" << std::hex << header);
+
+      if ((header & 0xFF) == 0xBE) { //this is a super short FE header
+        B2DEBUG(100, "Super short header detected:");
+//        B2DEBUG(100, "0b" << std::bitset<8>(header & 0xFF) << " " << std::bitset<8>((header>>8) & 0xFF) << " " << std::bitset<8>((header>>16) & 0xFF) << " " << std::bitset<8>((header>>24) & 0xFF));
+        B2DEBUG(100, "0b" << (std::bitset<8>((header >> 24) & 0xFF)));
+
+        unsigned short scrodID_SSFE;
+        unsigned short carrier_SSFE;
+        unsigned short asic_SSFE;
+        unsigned short channel_SSFE;
+        unsigned short evtNum_SSFE;
+
+        evtNum_SSFE = (header >> 8) & 0xFF;
+        scrodID_SSFE = (header >> 16) & 0x7F;
+        channel_SSFE = (header >> 24) & 0x07;
+        asic_SSFE = (header >> 27) & 0x03;
+        carrier_SSFE = (header >> 29) & 0x03;
+
+        B2DEBUG(100, scrodID_SSFE << "\t" << carrier_SSFE << "\t"  << asic_SSFE << "\t" << channel_SSFE << "\t" << evtNum_SSFE);
+
+        int channelID = carrier_SSFE * 32 + asic_SSFE * 8 + channel_SSFE;
+        channelCounter[channelID] += 1;
+        evtNumCounter[evtNum_SSFE] += 1;
+
+        info->incrementFEHeadersCount();
+        info->incrementEmptyFEHeadersCount();
+
+        continue;
+      }
+
       if (header != 0xaaaa0104 and header != 0xaaaa0103 and header != 0xaaaa0100) {
         B2ERROR("TOPUnpacker: corrupted data - invalid FE header word");
-        B2DEBUG(100, "Invalid FE header word: " << std::hex << header);
+        B2DEBUG(100, "Invalid FE header word: " << std::hex << header  << " 0b" << std::bitset<32>(header));
+        B2DEBUG(100, "SCROD ID: " << scrodID << " " << std::hex << scrodID);
+
         info->setErrorFlag(TOPInterimFEInfo::c_InvalidFEHeader);
         return array.getRemainingWords();
       }
+
+      B2DEBUG(100, "Long header detected:");
+
 
       word = array.getWord(); // word 1
       unsigned short scrodID_FE = word >> 25;
@@ -325,7 +362,7 @@ namespace Belle2 {
       if (scrodID_FE != scrodID) {
         B2ERROR("TOPUnpacker: corrupted data - different scrodID's in HLSB and FE header");
         B2DEBUG(100, "Different scrodID's in HLSB and FE header: "
-                << scrodID << " " << scrodID_FE);
+                << scrodID << " " << scrodID_FE << " word = 0x" << std::hex << word);
         info->setErrorFlag(TOPInterimFEInfo::c_DifferentScrodIDs);
         return array.getRemainingWords();
       }
@@ -339,6 +376,8 @@ namespace Belle2 {
       unsigned short carrierFE = (word >> 14) & 0x03;
       unsigned short channelID = carrierFE * 32 + asicFE * 8 + asicChannelFE;
       //B2DEBUG(100, "carrier asic chn " << carrierFE << " " << asicFE << " " << asicChannelFE << " " << channelID << " 0b" << std::bitset<32>(word) );
+
+      B2DEBUG(100, scrodID_FE << "\t" << carrierFE << "\t" << asicFE << "\t" << asicChannelFE << "\t" << evtNum_FEheader);
 
       channelCounter[channelID] += 1;
 
@@ -593,7 +632,8 @@ namespace Belle2 {
 
       if (*it != 1) {
         channelOutputString << "carrier: " << carrier << " asic: " << asic << " chn: " << chn << " occurence: " << *it << "\n";
-        B2WARNING("carrier: " << carrier << " asic: " << asic << " chn: " << chn << " seen " << *it << " times instead of once");
+        B2WARNING("ScrodID: " << scrodID << " carrier: " << carrier << " asic: " << asic << " chn: " << chn << " seen " << *it <<
+                  " times instead of once");
       }
     }
 

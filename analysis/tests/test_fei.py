@@ -12,8 +12,9 @@ import contextlib
 import subprocess
 import ROOT
 
-from fei.config import *
 import fei
+from fei.config import *
+from fei import core
 
 import numpy as np
 
@@ -85,7 +86,7 @@ def get_small_unittest_channels():
 class TestGetStagesFromParticles(unittest.TestCase):
     def test_get_stages_from_particles(self):
         particles = fei.get_unittest_channels()
-        stages = fei.fei.get_stages_from_particles(particles)
+        stages = fei.core.get_stages_from_particles(particles)
         self.assertEqual(len(stages), 7)
         self.assertEqual(len(stages[0]), 4)
         self.assertEqual(stages[0][0].identifier, 'gamma:generic')
@@ -111,7 +112,7 @@ class TestTrainingDataInformation(unittest.TestCase):
 
     def test_reconstruct(self):
         particles = fei.get_unittest_channels()
-        x = fei.fei.TrainingDataInformation(particles)
+        x = fei.core.TrainingDataInformation(particles)
 
         path = basf2.create_path()
         path.add_module('VariablesToHistogram', fileName='mcParticlesCount.root',
@@ -128,7 +129,7 @@ class TestTrainingDataInformation(unittest.TestCase):
 
     def test_available(self):
         particles = fei.get_unittest_channels()
-        x = fei.fei.TrainingDataInformation(particles)
+        x = fei.core.TrainingDataInformation(particles)
         self.assertEqual(x.available(), False)
         f = ROOT.TFile('mcParticlesCount.root', 'RECREATE')
         self.assertEqual(x.available(), True)
@@ -183,7 +184,7 @@ class TestTrainingDataInformation(unittest.TestCase):
         f.Write("NumberOfMCParticlesInEvent__bo421__bc")
 
         particles = fei.get_unittest_channels()
-        x = fei.fei.TrainingDataInformation(particles)
+        x = fei.core.TrainingDataInformation(particles)
 
         mcCounts = {
                 211: {'max': 5.0, 'min': 3.0, 'sum': 79.0, 'avg': 4.3888888888888893, 'std': 0.7556372504852998},
@@ -201,7 +202,7 @@ class TestFSPLoader(unittest.TestCase):
     def test_belle2_without_monitoring(self):
         particles = get_small_unittest_channels()
         config = fei.config.FeiConfiguration(monitor=False)
-        x = fei.fei.FSPLoader(particles, config)
+        x = fei.core.FSPLoader(particles, config)
 
         path = basf2.create_path()
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
@@ -215,7 +216,7 @@ class TestFSPLoader(unittest.TestCase):
     def test_belle2_with_monitoring(self):
         particles = get_small_unittest_channels()
         config = fei.config.FeiConfiguration(monitor=True)
-        x = fei.fei.FSPLoader(particles, config)
+        x = fei.core.FSPLoader(particles, config)
 
         path = basf2.create_path()
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
@@ -234,7 +235,7 @@ class TestFSPLoader(unittest.TestCase):
     def test_belle1_without_monitoring(self):
         particles = get_small_unittest_channels()
         config = fei.config.FeiConfiguration(monitor=False, b2bii=True)
-        x = fei.fei.FSPLoader(particles, config)
+        x = fei.core.FSPLoader(particles, config)
 
         path = basf2.create_path()
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
@@ -255,7 +256,7 @@ class TestFSPLoader(unittest.TestCase):
     def test_belle1_with_monitoring(self):
         particles = get_small_unittest_channels()
         config = fei.config.FeiConfiguration(monitor=True, b2bii=True)
-        x = fei.fei.FSPLoader(particles, config)
+        x = fei.core.FSPLoader(particles, config)
 
         path = basf2.create_path()
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
@@ -291,7 +292,7 @@ class TestTrainingData(unittest.TestCase):
     def test_without_monitoring(self):
         particles = get_small_unittest_channels()
         config = fei.config.FeiConfiguration(monitor=False)
-        x = fei.fei.TrainingData(particles, config, self.mc_counts)
+        x = fei.core.TrainingData(particles, config, self.mc_counts)
 
         path = basf2.create_path()
         path.add_module('VariablesToNtuple', fileName='pi+:generic ==> pi+:FSP.root', treeName='variables',
@@ -312,7 +313,7 @@ class TestTrainingData(unittest.TestCase):
     def test_with_monitoring(self):
         particles = get_small_unittest_channels()
         config = fei.config.FeiConfiguration(monitor=True)
-        x = fei.fei.TrainingData(particles, config, self.mc_counts)
+        x = fei.core.TrainingData(particles, config, self.mc_counts)
 
         path = basf2.create_path()
         path.add_module('VariablesToHistogram', particleList='pi+:generic_0',
@@ -352,7 +353,7 @@ class TestPreReconstruction(unittest.TestCase):
     def test_without_monitoring(self):
         particles = get_small_unittest_channels()
         config = fei.config.FeiConfiguration(monitor=False)
-        x = fei.fei.PreReconstruction(particles, config)
+        x = fei.core.PreReconstruction(particles, config)
 
         path = basf2.create_path()
         path.add_module('ParticleListManipulator', inputListNames=['pi+:FSP'], outputListName='pi+:generic_0',
@@ -391,7 +392,7 @@ class TestPreReconstruction(unittest.TestCase):
     def test_with_monitoring(self):
         particles = get_small_unittest_channels()
         config = fei.config.FeiConfiguration(monitor=True)
-        x = fei.fei.PreReconstruction(particles, config)
+        x = fei.core.PreReconstruction(particles, config)
 
         path = basf2.create_path()
         path.add_module('ParticleListManipulator', inputListNames=['pi+:FSP'], outputListName='pi+:generic_0',
@@ -530,7 +531,7 @@ class TestPostReconstruction(unittest.TestCase):
         D0.addChannel(['K-:unittest', 'pi+:unittest'])
         D0.addChannel(['pi-:unittest', 'pi+:unittest'])
         config = fei.config.FeiConfiguration(monitor=False, prefix="UNITTEST")
-        x = fei.fei.PostReconstruction([pion, D0], config)
+        x = fei.core.PostReconstruction([pion, D0], config)
 
         self.assertEqual(x.get_missing_channels(), ['pi+:unittest ==> pi+:FSP', 'D0:unittest ==> K-:unittest pi+:unittest',
                                                     'D0:unittest ==> pi-:unittest pi+:unittest'])
@@ -591,7 +592,7 @@ class TestPostReconstruction(unittest.TestCase):
     def test_without_monitoring(self):
         particles = get_small_unittest_channels()
         config = fei.config.FeiConfiguration(monitor=False, prefix='UNITTEST')
-        x = fei.fei.PostReconstruction(particles, config)
+        x = fei.core.PostReconstruction(particles, config)
 
         path = basf2.create_path()
 
@@ -638,7 +639,7 @@ class TestPostReconstruction(unittest.TestCase):
     def test_without_monitoring_training_mode(self):
         particles = get_small_unittest_channels()
         config = fei.config.FeiConfiguration(monitor=False, prefix='UNITTEST', training=True)
-        x = fei.fei.PostReconstruction(particles, config)
+        x = fei.core.PostReconstruction(particles, config)
 
         path = basf2.create_path()
 
@@ -685,7 +686,7 @@ class TestPostReconstruction(unittest.TestCase):
     def test_with_monitoring(self):
         particles = get_small_unittest_channels()
         config = fei.config.FeiConfiguration(monitor=True, prefix='UNITTEST')
-        x = fei.fei.PostReconstruction(particles, config)
+        x = fei.core.PostReconstruction(particles, config)
 
         path = basf2.create_path()
 
@@ -877,8 +878,8 @@ class TestPostReconstruction(unittest.TestCase):
 
 class TestTeacher(unittest.TestCase):
     def setUp(self):
-        fei.fei.Teacher.MaximumNumberOfMVASamples = int(1e7)
-        fei.fei.Teacher.MinimumNumberOfMVASamples = int(10)
+        fei.core.Teacher.MaximumNumberOfMVASamples = int(1e7)
+        fei.core.Teacher.MinimumNumberOfMVASamples = int(10)
 
         f = ROOT.TFile('pi+:generic ==> pi+:FSP.root', 'RECREATE')
         f.cd()
@@ -955,15 +956,15 @@ class TestTeacher(unittest.TestCase):
     def test_create_fake_weightfile(self):
         self.assertEqual(os.path.isfile('UNITTEST_pi+:generic ==> pi+:FSP.xml'), False)
         self.assertEqual(basf2_mva.available('UNITTEST_pi+:generic ==> pi+:FSP.xml'), False)
-        fei.fei.Teacher.create_fake_weightfile('UNITTEST_pi+:generic ==> pi+:FSP')
+        fei.core.Teacher.create_fake_weightfile('UNITTEST_pi+:generic ==> pi+:FSP')
         self.assertEqual(os.path.isfile('UNITTEST_pi+:generic ==> pi+:FSP.xml'), True)
         self.assertEqual(basf2_mva.available('UNITTEST_pi+:generic ==> pi+:FSP.xml'), True)
 
     def test_upload(self):
         particles = get_small_unittest_channels()
         config = fei.config.FeiConfiguration(monitor=False, prefix='UNITTEST', externTeacher='basf2_mva_teacher')
-        x = fei.fei.Teacher(particles, config)
-        fei.fei.Teacher.create_fake_weightfile('TEACHER')
+        x = fei.core.Teacher(particles, config)
+        fei.core.Teacher.create_fake_weightfile('TEACHER')
         self.assertEqual(basf2_mva.available('UNITTEST_TEACHER'), False)
         x.upload('TEACHER')
         self.assertEqual(basf2_mva.available('UNITTEST_TEACHER'), True)
@@ -971,7 +972,7 @@ class TestTeacher(unittest.TestCase):
     def test_without_monitoring(self):
         particles = get_small_unittest_channels()
         config = fei.config.FeiConfiguration(monitor=False, prefix='UNITTEST', externTeacher='basf2_mva_teacher')
-        x = fei.fei.Teacher(particles, config)
+        x = fei.core.Teacher(particles, config)
 
         self.assertEqual(basf2_mva.available('UNITTEST_pi+:generic ==> pi+:FSP'), False)
         self.assertEqual(basf2_mva.available('UNITTEST_K+:generic ==> K+:FSP'), False)
@@ -1013,78 +1014,78 @@ class TestGetPath(unittest.TestCase):
 
     def test_get_path(self):
         particles = fei.get_unittest_channels()
-        config = fei.config.FeiConfiguration(training=True)
-        x = fei.fei.Teacher(particles, config)
+        config = fei.config.FeiConfiguration(cache=-1, training=True)
+        x = fei.core.Teacher(particles, config)
 
         # Should try to create mcParticlesCount
         # -> Returns at stage 0
-        feistate = fei.fei.get_path(particles, config)
+        feistate = fei.core.get_path(particles, config)
         self.assertEqual(feistate.stage, 0)
 
         # Should try to create training data for FSPs
         # -> Returns at stage 1
         config = fei.config.FeiConfiguration(cache=0, training=True)
-        feistate = fei.fei.get_path(particles, config)
+        feistate = fei.core.get_path(particles, config)
         self.assertEqual(feistate.stage, 1)
 
         # No weightfiles were created, hence the algorithm
         # cannot go forward and tries to create the training data again
         config = fei.config.FeiConfiguration(cache=1, training=True)
-        feistate = fei.fei.get_path(particles, config)
+        feistate = fei.core.get_path(particles, config)
         self.assertEqual(feistate.stage, 1)
 
         # We create the FSP weightfiles by hand
-        fei.fei.Teacher.create_fake_weightfile('pi+:generic ==> pi+:FSP')
-        fei.fei.Teacher.create_fake_weightfile('K+:generic ==> K+:FSP')
-        fei.fei.Teacher.create_fake_weightfile('mu+:generic ==> mu+:FSP')
-        fei.fei.Teacher.create_fake_weightfile('gamma:generic ==> gamma:FSP')
-        fei.fei.Teacher.create_fake_weightfile('gamma:generic ==> gamma:V0')
+        fei.core.Teacher.create_fake_weightfile('pi+:generic ==> pi+:FSP')
+        fei.core.Teacher.create_fake_weightfile('K+:generic ==> K+:FSP')
+        fei.core.Teacher.create_fake_weightfile('mu+:generic ==> mu+:FSP')
+        fei.core.Teacher.create_fake_weightfile('gamma:generic ==> gamma:FSP')
+        fei.core.Teacher.create_fake_weightfile('gamma:generic ==> gamma:V0')
 
         # Should try to create training data for pi0
         # -> Returns at stage 2
         config = fei.config.FeiConfiguration(cache=1, training=True)
-        feistate = fei.fei.get_path(particles, config)
+        feistate = fei.core.get_path(particles, config)
         self.assertEqual(feistate.stage, 2)
 
         # No weightfiles were created, hence the algorithm
         # cannot go forward and tries to create the training data again
         config = fei.config.FeiConfiguration(cache=2, training=True)
-        feistate = fei.fei.get_path(particles, config)
+        feistate = fei.core.get_path(particles, config)
         self.assertEqual(feistate.stage, 2)
 
         # No weightfiles were created, hence the algorithm
         # cannot go forward and tries to create the training data again
         # This applies as well if the stage is even bigger
         config = fei.config.FeiConfiguration(cache=4, training=True)
-        feistate = fei.fei.get_path(particles, config)
+        feistate = fei.core.get_path(particles, config)
         self.assertEqual(feistate.stage, 2)
 
         # We create the pi0 weightfile by hand
-        fei.fei.Teacher.create_fake_weightfile('pi0:generic ==> gamma:generic gamma:generic')
+        fei.core.Teacher.create_fake_weightfile('pi0:generic ==> gamma:generic gamma:generic')
 
         # Should try to create training data for D0
         # -> Returns stage 4 (stage 3 is skipped because it only contains K_S0)
         config = fei.config.FeiConfiguration(cache=2, training=True)
-        feistate = fei.fei.get_path(particles, config)
+        feistate = fei.core.get_path(particles, config)
         self.assertEqual(feistate.stage, 4)
 
         # We create the D0 weightfiles by hand
-        fei.fei.Teacher.create_fake_weightfile('D0:generic ==> K-:generic pi+:generic')
-        fei.fei.Teacher.create_fake_weightfile('D0:generic ==> K-:generic pi+:generic pi0:generic')
-        fei.fei.Teacher.create_fake_weightfile('D0:generic ==> pi-:generic pi+:generic')
-        fei.fei.Teacher.create_fake_weightfile('D0:semileptonic ==> K-:generic mu+:generic')
-        fei.fei.Teacher.create_fake_weightfile('D0:semileptonic ==> K-:generic pi0:generic mu+:generic')
+        fei.core.Teacher.create_fake_weightfile('D0:generic ==> K-:generic pi+:generic')
+        fei.core.Teacher.create_fake_weightfile('D0:generic ==> K-:generic pi+:generic pi0:generic')
+        fei.core.Teacher.create_fake_weightfile('D0:generic ==> pi-:generic pi+:generic')
+        fei.core.Teacher.create_fake_weightfile('D0:semileptonic ==> K-:generic mu+:generic')
+        fei.core.Teacher.create_fake_weightfile('D0:semileptonic ==> K-:generic pi0:generic mu+:generic')
 
         # Unittest channels do not contain anymore stages,
         # -> Returns last stage + 1
         config = fei.config.FeiConfiguration(cache=4, training=True)
-        feistate = fei.fei.get_path(particles, config)
+        feistate = fei.core.get_path(particles, config)
         self.assertEqual(feistate.stage, 7)
 
         # If we start at 0, we should be get the whole path
         # -> Returns last stage + 1
         config = fei.config.FeiConfiguration(cache=0, training=True)
-        feistate = fei.fei.get_path(particles, config)
+        feistate = fei.core.get_path(particles, config)
         self.assertEqual(feistate.stage, 7)
 
         # If training is False we should get the whole path without
@@ -1102,7 +1103,7 @@ class TestGetPath(unittest.TestCase):
         os.remove('D0:semileptonic ==> K-:generic pi0:generic mu+:generic.xml')
 
         config = fei.config.FeiConfiguration(cache=0, training=False)
-        feistate = fei.fei.get_path(particles, config)
+        feistate = fei.core.get_path(particles, config)
         self.assertEqual(feistate.stage, 7)
 
 

@@ -128,17 +128,30 @@ class Statistic(object):
 
 
 class MonitoringHist(object):
+    """
+    Reads all TH1F and TH2F from a ROOT file
+    and puts them into a more accesable format.
+    """
 
     def __init__(self, filename):
-        filename = removeJPsiSlash(filename)
+        """
+        Reads histograms from the given file
+        @param filename the name of the ROOT file
+        """
+        #: Dictionary of bin-contents for each histogram
+        self.values = {}
+        #: Dictionary of bin-centers for each histogram
+        self.centers = {}
+        #: Dictionary of number of bins for each histogram
+        self.nbins = {}
+        #: Indicates if the histograms were successfully read
         self.valid = os.path.isfile(filename)
+
         if not self.valid:
             return
 
         f = ROOT.TFile(filename)
-        self.values = {}
-        self.centers = {}
-        self.nbins = {}
+
         for key in f.GetListOfKeys():
             name = Belle2.invertMakeROOTCompatible(key.GetName())
             hist = key.ReadObj()
@@ -158,18 +171,39 @@ class MonitoringHist(object):
                 self.values[name] = np.array([hist.GetBinContent(i) for i in range(nbins + 2)])
                 self.nbins[name] = nbins
 
+    def sum(self, name):
+        """
+        Calculates the sum of a given histogram (== sum of all entries)
+        @param name key of the histogram
+        """
+        if name not in self.centers:
+            return np.nan
+        return np.sum(self.values[name])
+
     def mean(self, name):
+        """
+        Calculates the mean of a given histogram
+        @param name key of the histogram
+        """
         if name not in self.centers:
             return np.nan
         return np.average(self.centers[name], weights=self.values[name])
 
     def std(self, name):
+        """
+        Calculates the standard deviation of a given histogram
+        @param name key of the histogram
+        """
         if name not in self.centers:
             return np.nan
         avg = np.average(self.centers[name], weights=self.values[name])
         return np.sqrt(np.average((self.centers[name] - avg)**2, weights=self.values[name]))
 
     def min(self, name):
+        """
+        Calculates the minimum of a given histogram
+        @param name key of the histogram
+        """
         if name not in self.centers:
             return np.nan
         nonzero = np.nonzero(self.values[name])[0]
@@ -178,6 +212,10 @@ class MonitoringHist(object):
         return self.centers[name][nonzero[0]]
 
     def max(self, name):
+        """
+        Calculates the maximum of a given histogram
+        @param name key of the histogram
+        """
         if name not in self.centers:
             return np.nan
         nonzero = np.nonzero(self.values[name])[0]
@@ -187,49 +225,34 @@ class MonitoringHist(object):
 
 
 class MonitoringNTuple(object):
-
+    """
+    Reads the ntuple named variables from a ROOT file
+    """
     def __init__(self, filename):
-        filename = removeJPsiSlash(filename)
+        """
+        Reads ntuple from the given file
+        @param filename the name of the ROOT file
+        """
+        #: Indicates if the ntuple were successfully read
         self.valid = os.path.isfile(filename)
         if not self.valid:
             return
+        #: Reference to the ROOT file, so it isn't closed
         self.f = ROOT.TFile(filename)
+        #: Reference to the tree named variables inside the ROOT file
         self.tree = self.f.variables
 
 
-class MonitoringMVARanking(object):
-
-    def __init__(self, tmvaPrefix):
-        if tmvaPrefix is None:
-            self.valid = False
-            return
-        logfile = tmvaPrefix + '.log'
-        logfile = removeJPsiSlash(logfile)
-        self.valid = os.path.isfile(logfile)
-        if not self.valid:
-            return
-        self.ranking = []
-        ranking_mode = 0
-        with open(logfile, 'r') as f:
-            for line in f:
-                if 'Variable Importance' in line:
-                    ranking_mode = 1
-                elif ranking_mode == 1:
-                    ranking_mode = 2
-                elif ranking_mode == 2 and '-------' in line:
-                    ranking_mode = 0
-                elif ranking_mode == 2:
-                    v = line.split(':')
-                    if int(v[1]) - 1 != len(self.ranking):
-                        B2WARNING("Error during read out of TMVA ranking from " + logfile)
-                    oldname = Belle2.invertMakeROOTCompatible(v[2].strip())
-                    self.ranking.append((oldname, float(v[3])))
-
-
 class MonitoringModuleStatistics(object):
-
-    def __init__(self, particle, particle2list, channel2lists):
-
+    """
+    Reads the module statistics for a single particle from the outputted root file
+    and puts them into a more accesable format
+    """
+    def __init__(self, particle):
+        """
+        Reads the module statistics from the file named Monitor_ModuleStatistics.root
+        @param particle the particle for which the statistics are read
+        """
         root_file = ROOT.TFile('Monitor_ModuleStatistics.root')
         persistentTree = root_file.Get('persistent')
         persistentTree.GetEntry(0)
@@ -248,37 +271,30 @@ class MonitoringModuleStatistics(object):
         self.channel_time = {}
         self.channel_time_per_module = {}
         for channel in particle.channels:
-            if channel.name not in self.channel_time:
-                self.channel_time[channel.name] = 0.0
-                self.channel_time_per_module[channel.name] = {'ParticleCombiner': 0.0,
-                                                              'BestCandidateSelection': 0.0,
-                                                              'PListCutAndCopy': 0.0,
-                                                              'VariablesToExtraInfo': 0.0,
-                                                              'MCMatch': 0.0,
-                                                              'ParticleSelector': 0.0,
-                                                              'TMVAExpert': 0.0,
-                                                              'TMVATeacher': 0.0,
-                                                              'ParticleVertexFitter': 0.0,
-                                                              'TagUniqueSignal': 0.0,
-                                                              'VariablesToHistogram': 0.0,
-                                                              'VariablesToNtuple': 0.0}
-            if channel.name in channel2lists:
-                lists = channel2lists[channel.name]
-                for key, time in statistic.items():
-                    if(channel.name in key or
-                       (lists[0] is not None and lists[0] in key) or
-                       (lists[1] is not None and lists[1] in key) or
-                       (lists[2] is not None and lists[2] in key)):
-                        self.channel_time[channel.name] += time
-                        for k in self.channel_time_per_module[channel.name]:
-                            if k in key:
-                                self.channel_time_per_module[channel.name][k] += time
+            if channel.label not in self.channel_time:
+                self.channel_time[channel.label] = 0.0
+                self.channel_time_per_module[channel.label] = {'ParticleCombiner': 0.0,
+                                                               'BestCandidateSelection': 0.0,
+                                                               'PListCutAndCopy': 0.0,
+                                                               'VariablesToExtraInfo': 0.0,
+                                                               'MCMatch': 0.0,
+                                                               'ParticleSelector': 0.0,
+                                                               'MVAExpert': 0.0,
+                                                               'ParticleVertexFitter': 0.0,
+                                                               'TagUniqueSignal': 0.0,
+                                                               'VariablesToHistogram': 0.0,
+                                                               'VariablesToNtuple': 0.0}
+            for key, time in statistic.items():
+                if(channel.decayString in key or channel.name in key):
+                    self.channel_time[channel.label] += time
+                    for k in self.channel_time_per_module[channel.label]:
+                        if k in key:
+                            self.channel_time_per_module[channel.label][k] += time
 
         self.particle_time = 0
         for key, time in statistic.items():
-            if particle.identifier in particle2list:
-                if particle2list[particle.identifier] in key:
-                    self.particle_time += time
+            if particle.identifier in key:
+                self.particle_time += time
 
 
 def MonitorCosBDLPlot(particle, filename):
@@ -301,7 +317,8 @@ def MonitorCosBDLPlot(particle, filename):
             first_plot = False
 
             ntuple.SetLineStyle(ROOT.kDotted)
-            ntuple.Draw('cosThetaBetweenParticleAndTrueB', common + str(cut) + ' && !' + particle.mvaConfig.target, 'same')
+            ntuple.Draw('cosThetaBetweenParticleAndTrueB',
+                        common + str(cut) + ' && !' + particle.particle.mvaConfig.target, 'same')
             color -= 1
 
         l = canvas.GetListOfPrimitives()
@@ -335,7 +352,7 @@ def MonitorMbcPlot(particle, filename):
             first_plot = False
 
             ntuple.SetLineStyle(ROOT.kDotted)
-            ntuple.Draw('Mbc', common + str(cut) + ' && !' + particle.mvaConfig.target, 'same')
+            ntuple.Draw('Mbc', common + str(cut) + ' && !' + particle.particle.mvaConfig.target, 'same')
             color -= 1
 
         l = canvas.GetListOfPrimitives()
@@ -366,10 +383,11 @@ def MonitorROCPlot(particle, filename):
         uniqueSignalHist = ROOT.TH1D('ROCuniqueSignal', 'signal', nbins, 0.0, 1.0)
 
         probabilityVar = 'extraInfo__boSignalProbability__bc'
-        ntuple.Project('ROCbackground', probabilityVar, '!' + particle.mvaConfig.target)
-        ntuple.Project('ROCsignal', probabilityVar, particle.mvaConfig.target)
-        ntuple.Project('ROCuniqueBackground', probabilityVar, '!' + particle.mvaConfig.target)
-        ntuple.Project('ROCuniqueSignal', probabilityVar, particle.mvaConfig.target + '  && extraInfo__bouniqueSignal__bc == 1')
+        ntuple.Project('ROCbackground', probabilityVar, '!' + particle.particle.mvaConfig.target)
+        ntuple.Project('ROCsignal', probabilityVar, particle.particle.mvaConfig.target)
+        ntuple.Project('ROCuniqueBackground', probabilityVar, '!' + particle.particle.mvaConfig.target)
+        ntuple.Project('ROCuniqueSignal', probabilityVar,
+                       particle.particle.mvaConfig.target + '  && extraInfo__bouniqueSignal__bc == 1')
 
         for i, (signal, bckgrd) in enumerate([(signalHist, bckgrdHist)]):  # , (uniqueSignalHist, uniqueBckgrdHist)]):
             x = array.array('d')
@@ -417,8 +435,8 @@ def MonitorDiagPlot(particle, filename):
         bgHist = ROOT.TH1D('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
         signalHist = ROOT.TH1D('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
 
-        ntuple.Project('background' + probabilityVar, probabilityVar, '!' + particle.mvaConfig.target)
-        ntuple.Project('signal' + probabilityVar, probabilityVar, particle.mvaConfig.target)
+        ntuple.Project('background' + probabilityVar, probabilityVar, '!' + particle.particle.mvaConfig.target)
+        ntuple.Project('signal' + probabilityVar, probabilityVar, particle.particle.mvaConfig.target)
 
         import array
         x = array.array('d')
@@ -453,21 +471,27 @@ def MonitorDiagPlot(particle, filename):
     canvas.SaveAs(filename)
 
 
-def MonitoringMCCount(particle, summary):
-    root_file = ROOT.TFile('Monitor_MCCounts.root')
+def MonitoringMCCount(particle):
+    """
+    Reads the MC Counts for a given particle from the ROOT file mcParticlesCount.root
+    @param particle the particle for which the MC counts are read
+    @return dictionary with 'sum', 'std', 'avg', 'max', and 'min'
+    """
+    root_file = ROOT.TFile('mcParticlesCount.root')
 
     key = 'NumberOfMCParticlesInEvent({})'.format(abs(pdg.from_name(particle.name)))
     Belle2.Variable.Manager
     key = Belle2.makeROOTCompatible(key)
     hist = root_file.Get(key)
 
-    mc_counts = {}
-    mc_counts['sum'] = sum(hist.GetXaxis().GetBinCenter(bin + 1) * hist.GetBinContent(bin + 1)
-                           for bin in range(hist.GetNbinsX()))
-    mc_counts['std'] = hist.GetStdDev()
-    mc_counts['avg'] = hist.GetMean()
-    mc_counts['max'] = hist.GetXaxis().GetBinCenter(hist.FindLastBinAbove(0.0))
-    mc_counts['min'] = hist.GetXaxis().GetBinCenter(hist.FindFirstBinAbove(0.0))
+    mc_counts = {'sum': 0, 'std': 0, 'avg': 0, 'min': 0, 'max': 0}
+    if hist:
+        mc_counts['sum'] = sum(hist.GetXaxis().GetBinCenter(bin + 1) * hist.GetBinContent(bin + 1)
+                               for bin in range(hist.GetNbinsX()))
+        mc_counts['std'] = hist.GetStdDev()
+        mc_counts['avg'] = hist.GetMean()
+        mc_counts['max'] = hist.GetXaxis().GetBinCenter(hist.FindLastBinAbove(0.0))
+        mc_counts['min'] = hist.GetXaxis().GetBinCenter(hist.FindFirstBinAbove(0.0))
     return mc_counts
 
 
@@ -490,7 +514,7 @@ class MonitoringBranchingFractions(object):
         return self.getBranchingFraction(particle, self.inclusive_branching_fractions)
 
     def getBranchingFraction(self, particle, branching_fractions):
-        result = {c.name: 0.0 for c in particle.channels}
+        result = {c.label: 0.0 for c in particle.channels}
         name = particle.name
         channels = [tuple(sorted(d.split(':')[0] for d in channel.daughters)) for channel in particle.channels]
         if name not in branching_fractions:
@@ -500,7 +524,7 @@ class MonitoringBranchingFractions(object):
                 return result
         for c, key in zip(particle.channels, channels):
             if key in branching_fractions[name]:
-                result[c.name] = branching_fractions[name][key]
+                result[c.label] = branching_fractions[name][key]
         return result
 
     def loadExclusiveBranchingFractions(self, filename):
@@ -588,87 +612,87 @@ class MonitoringBranchingFractions(object):
 
 
 class MonitoringParticle(object):
-
-    def __init__(self, particle, summary):
-        particle2list = {k: v for k, v in summary['particle2list'].items() if v is not None}
-        channel2lists = {k: v for k, v in summary['channel2lists'].items() if v is not None}
-
-        self.identifier = particle.identifier
-        self.name = particle.name
-        self.label = particle.label
-        self.channels = particle.channels
-        self.preCutConfig = particle.preCutConfig
-        self.postCutConfig = particle.postCutConfig
-        self.mvaConfig = particle.mvaConfig
-
-        self.mc_count = MonitoringMCCount(particle, summary)
-
-        self.module_statistic = MonitoringModuleStatistics(particle, particle2list, channel2lists)
+    """
+    Monitoring object containing all the monitoring information
+    about a single particle
+    """
+    def __init__(self, particle):
+        """
+        Read the monitoring information of the given particle
+        @param particle the particle for which the information is read
+        """
+        #: Particle containing its configuration
+        self.particle = particle
+        #: Dictionary with 'sum', 'std', 'mean', 'min' and 'max' of the MC counts
+        self.mc_count = MonitoringMCCount(particle)
+        #: Module statistics
+        self.module_statistic = MonitoringModuleStatistics(particle)
         self.time_per_channel = self.module_statistic.channel_time
         self.time_per_channel_per_module = self.module_statistic.channel_time_per_module
         self.total_time = self.module_statistic.particle_time + sum(self.time_per_channel.values())
 
-        self.total_number_of_channels = len(self.channels)
+        #: Total number of channels
+        self.total_number_of_channels = len(self.particle.channels)
         self.reconstructed_number_of_channels = 0
 
+        #: Branching fractions
         self.branching_fractions = MonitoringBranchingFractions()
+        # Exclusive branching fractions per channel
         self.exc_br_per_channel = self.branching_fractions.getExclusive(particle)
+        #: Inclusive branching fraction per channel
         self.inc_br_per_channel = self.branching_fractions.getInclusive(particle)
 
+        #: Monitoring histogram in PreReconstruction before the ranking-cut
         self.before_ranking = {}
+        #: Monitoring histogram in PreReconstruction after the ranking-cut
         self.after_ranking = {}
-        self.after_match = {}
-        self.before_vertex = {}
+        #: Monitoring histogram in PreReconstruction after the vertex fit
         self.after_vertex = {}
+        #: Monitoring histogram in PostReconstruction after the mva application
         self.after_classifier = {}
+        #: Monitoring histogram for TrainingData Generation only available if Monitoring runs on the training monitoring data
         self.training_data = {}
-        self.feature_importance = {}
-
+        #: Dictionary containing whether the channel reconstructed at least one candidate or not
         self.ignored_channels = {}
 
-        for channel in self.channels:
-            clist = channel2lists[channel.name] if channel.name in channel2lists else ('IGNORED', 'IGNORED', 'IGNORED')
-            hist = MonitoringHist('Monitor_MakeParticleList_BeforeRanking_{}.root'.format(clist[0]))
-            self.before_ranking[channel.name] = self.calculateStatistic(hist, channel.mvaConfig.target)
-            hist = MonitoringHist('Monitor_MakeParticleList_AfterRanking_{}.root'.format(clist[0]))
-            self.after_ranking[channel.name] = self.calculateStatistic(hist, channel.mvaConfig.target)
-            hist = MonitoringHist('Monitor_MatchParticleList_AfterMatch_{}.root'.format(clist[0]))
-            self.after_match[channel.name] = self.calculateStatistic(hist, channel.mvaConfig.target)
-            hist = MonitoringHist('Monitor_FitVertex_Before_{}.root'.format(clist[0]))
-            self.before_vertex[channel.name] = self.calculateStatistic(hist, channel.mvaConfig.target)
-            hist = MonitoringHist('Monitor_FitVertex_After_{}.root'.format(clist[0]))
-            self.after_vertex[channel.name] = self.calculateStatistic(hist, channel.mvaConfig.target)
-            hist = MonitoringHist('Monitor_SignalProbability_{}.root'.format(clist[0]))
-            if hist.valid:
+        for channel in self.particle.channels:
+            hist = MonitoringHist('Monitor_PreReconstruction_BeforeRanking_{}.root'.format(channel.label))
+            self.before_ranking[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
+            hist = MonitoringHist('Monitor_PreReconstruction_AfterRanking_{}.root'.format(channel.label))
+            self.after_ranking[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
+            hist = MonitoringHist('Monitor_MatchParticleList_AfterVertex_{}.root'.format(channel.label))
+            self.after_vertex[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
+            hist = MonitoringHist('Monitor_PostReconstruction_AfterMVA_{}.root'.format(channel.label))
+            self.after_classifier[channel.label] = self.calculateStatistic(hist, channel.mvaConfig.target)
+            if hist.valid and hist.sum(channel.mvaConfig.target) > 0:
                 self.reconstructed_number_of_channels += 1
-                self.ignored_channels[channel.name] = False
+                self.ignored_channels[channel.label] = False
             else:
-                self.ignored_channels[channel.name] = True
-            self.after_classifier[channel.name] = self.calculateStatistic(hist, channel.mvaConfig.target)
-            hist = MonitoringHist('Monitor_GenerateTrainingData_{}.root'.format(clist[0]))
-            self.training_data[channel.name] = hist
-            self.feature_importance[channel.name] = MonitoringMVARanking(clist[2])
+                self.ignored_channels[channel.label] = True
+            hist = MonitoringHist('Monitor_TrainingData_{}.root'.format(channel.label))
+            self.training_data[channel.label] = hist
 
-        nTrueSig = self.mc_count['sum']
-        for x in [self.before_ranking, self.after_ranking, self.after_match, self.before_vertex, self.after_vertex,
-                  self.after_classifier]:
-            if not x:
-                x['dummy'] = Statistic(nTrueSig, 0, 0)
-
-        plist = particle2list[self.identifier] if self.identifier in particle2list else 'IGNORED'
-        hist = MonitoringHist('Monitor_TagUniqueSignal_{}.root'.format(plist))
-        self.before_tag = self.calculateStatistic(hist, self.mvaConfig.target)
+        plist = removeJPsiSlash(particle.identifier)
+        hist = MonitoringHist('Monitor_PostReconstruction_BeforePostCut_{}.root'.format(plist))
+        #: Monitoring histogram in PostReconstruction before the postcut
+        self.before_postcut = self.calculateStatistic(hist, self.particle.mvaConfig.target)
+        hist = MonitoringHist('Monitor_PostReconstruction_BeforeRanking_{}.root'.format(plist))
+        #: Monitoring histogram in PostReconstruction before the ranking postcut
+        self.before_ranking_postcut = self.calculateStatistic(hist, self.particle.mvaConfig.target)
+        hist = MonitoringHist('Monitor_PostReconstruction_AfterRanking_{}.root'.format(plist))
+        #: Monitoring histogram in PostReconstruction after the ranking postcut
+        self.after_ranking_postcut = self.calculateStatistic(hist, self.particle.mvaConfig.target)
+        #: Statistic object before unique tagging of signals
+        self.before_tag = self.calculateStatistic(hist, self.particle.mvaConfig.target)
+        #: Statistic object after unique tagging of signals
         self.after_tag = self.calculateUniqueStatistic(hist)
-        hist = MonitoringHist('Monitor_CopyParticleList_BeforeCut_{}.root'.format(plist))
-        self.before_postcut = self.calculateStatistic(hist, self.mvaConfig.target)
-        hist = MonitoringHist('Monitor_CopyParticleList_BeforeRanking_{}.root'.format(plist))
-        self.after_abs_postcut = self.calculateStatistic(hist, self.mvaConfig.target)
-        hist = MonitoringHist('Monitor_CopyParticleList_AfterRanking_{}.root'.format(plist))
-        self.after_ranking_postcut = self.calculateStatistic(hist, self.mvaConfig.target)
-
-        self.final_ntuple = MonitoringNTuple('Monitor_Final_{}.root'.format(self.identifier))
+        #: Reference to the final ntuple
+        self.final_ntuple = MonitoringNTuple('Monitor_Final_{}.root'.format(plist))
 
     def calculateStatistic(self, hist, target):
+        """
+        Calculate Statistic object where all signal candidates are considered signal
+        """
         nTrueSig = self.mc_count['sum']
         if not hist.valid:
             return Statistic(nTrueSig, 0, 0)
@@ -679,6 +703,9 @@ class MonitoringParticle(object):
         return Statistic(nTrueSig, nSig, nBg)
 
     def calculateUniqueStatistic(self, hist):
+        """
+        Calculate Static object where only unique signal candidates are considered signal
+        """
         nTrueSig = self.mc_count['sum']
         if not hist.valid:
             return Statistic(nTrueSig, 0, 0)

@@ -25,7 +25,7 @@ import basf2_mva
 # Should come after basf2 import
 import pdg
 
-import fei.config as config
+from fei import config
 
 # Standard python modules
 import collections
@@ -37,6 +37,7 @@ import re
 import functools
 import subprocess
 import multiprocessing
+import pickle
 
 # Simple object containing the output of fei
 FeiState = collections.namedtuple('FeiState', 'path, stage, plists')
@@ -618,6 +619,8 @@ def do_trainings(particles: typing.Sequence[config.Particle], configuration: con
     @param particles list of config.Particle objects
     @param config config.FeiConfiguration object
     """
+    # TODO Read particles and configuration from Summary.pickle!
+    # So user does not have to provide two steering files
     teacher = Teacher(particles, configuration)
     teacher.do_all_trainings()
 
@@ -636,12 +639,16 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     Please cite my PhD thesis
     """)
 
-    # If cache is a string, we assume it is a file containing the current stage,
-    # if it is none we search in the environment variable FEI_STAGE
     if configuration.cache is None:
-        cache = int(os.environ.get("FEI_STAGE", 0))
-    elif isinstance(configuration.cache, str):
-        cache = pickle.load(open(configuration.cache, 'rb'))
+        if os.path.isfile('Summary.pickle'):
+            print("Cache: Replaced particles and configuration with the ones from Summary.pickle!")
+            particles, configuration = pickle.load(open('Summary.pickle', 'rb'))
+            configuration = config.FeiConfiguration(configuration.prefix, configuration.cache + 1, configuration.b2bii,
+                                                    configuration.monitor, configuration.legacy, configuration.externTeacher,
+                                                    configuration.training)
+            cache = configuration.cache
+        else:
+            cache = 0
     else:
         cache = configuration.cache
 
@@ -656,6 +663,8 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
         print("Stage 0: Run over all files to count the number of events and McParticles")
         path.add_path(training_data_information.reconstruct())
         return FeiState(path, 0, [])
+    elif not configuration.training and configuration.monitor:
+        path.add_path(training_data_information.reconstruct())
 
     loader = FSPLoader(particles, configuration)
     if cache < 1:
@@ -688,5 +697,8 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
         output.param('branchNamesPersistent', ['ProcessStatistics'])
         output.param('ignoreCommandLineOverride', True)
         path.add_module(output)
+
+    if configuration.training:
+        pickle.dump((particles, configuration), open('Summary.pickle', 'wb'))
 
     return FeiState(path, stage+1, plists=used_lists)

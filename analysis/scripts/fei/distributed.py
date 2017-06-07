@@ -10,6 +10,9 @@ import glob
 import time
 import stat
 import shutil
+import pickle
+
+import fei
 
 
 def getCommandLineOptions():
@@ -17,8 +20,6 @@ def getCommandLineOptions():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--steeringFile', dest='steering', type=str, required=True,
                         help='Steering file. Calls fei.get_path()')
-    parser.add_argument('-t', '--trainingFile', dest='training', type=str, required=True,
-                        help='Training file. Calls fei.do_trainings() with correct configuration')
     parser.add_argument('-w', '--workingDirectory', dest='directory', type=str, required=True,
                         help='Working directory for basf2 jobs. On KEKCC, this must NOT be on HSM!')
     parser.add_argument('-l', '--largeDirectory', dest='large_dir', type=str, default='',
@@ -44,7 +45,6 @@ def get_job_script(args, i):
         else
           INPUT="{d}/input_*.root"
         fi
-        export FEI_STAGE=$(python3 -c 'import pickle; print(pickle.load(open("{d}/collection/stage_cache", "rb")))')
         time basf2 -l error {d}/collection/basf2_steering_file.py -i "$INPUT" -o {d}/jobs/{i}/basf2_output.root {pipes}
         touch basf2_finished_successfully
     """.format(d=args.directory, i=str(i), pipes="&> my_output_hack.log || touch basf2_job_error")
@@ -71,7 +71,6 @@ def setup(args):
     os.mkdir('collection')
     os.mkdir('collection/localdb')
     os.mkdir('collection/B2BII_MC_database')
-    pickle.dump(0, open(args.directory + '/collection/stage_cache', 'wb'))
     os.mkdir('jobs')
     if args.large_dir:
         os.mkdir(args.large_dir)
@@ -94,12 +93,14 @@ def setup(args):
         os.symlink(args.directory + '/collection/B2BII_MC_database', 'jobs/{}/B2BII_MC_database'.format(i))
 
 
-def create_report(args, summary_file):
+def create_report(args):
     os.chdir(args.directory + '/collection')
-    if len(summary_file) > 1:
-        raise RuntimeError('Need exactly one summary file to procede found {}'.format(len(summary_file)))
-    ret = subprocess.call('basf2 fei/printReporting.py {} > ../summary.txt'.format(summary_file[0]), shell=True)
-    ret = subprocess.call('basf2 fei/latexReporting.py {} ../summary.tex'.format(summary_file[0]), shell=True)
+    ret = subprocess.call('basf2 fei/printReporting.py > ../summary.txt', shell=True)
+    ret = subprocess.call('basf2 fei/latexReporting.py ../summary.tex', shell=True)
+    for i in glob.glob("*.xml"):
+        subprocess.call("basf2_mva_evaluate.py -id '{i}.xml' -data '{i}.root' "
+                        "--treename variables -o '../{i}.pdf'".format(i=i[:-4]),
+                        shell=True)
     os.chdir(args.directory)
     return ret == 0
 
@@ -123,12 +124,12 @@ def submit_job(args, i):
 
 def do_trainings(args):
     os.chdir(args.directory + '/collection')
-    ret = subprocess.call('basf2 basf2_do_trainings.py', shell=True)
+    particles, configuration = pickle.load(open('Summary.pickle', 'rb'))
+    fei.do_trainings(particles, configuration)
     os.chdir(args.directory)
 
 
 def jobs_finished(args):
-
     finished = glob.glob(args.directory + '/jobs/*/basf2_finished_successfully')
     failed = glob.glob(args.directory + '/jobs/*/basf2_job_error')
 
@@ -173,9 +174,7 @@ def update_input_files(args):
             os.symlink(real_input_file, input_file)
         else:
             shutil.move(output_file, input_file)
-
-    stage = pickle.load(open(args.directory + '/collection/stage_cache', 'rb'))
-    pickle.dump(stage+1, open(args.directory + '/collection/stage_cache', 'wb'))
+    shutil.copyfile(args.directory + '/jobs/1/Summary.pickle', args.directory + '/collection/Summary.pickle')
 
 
 def clean_job_directory(args):
@@ -186,6 +185,15 @@ def clean_job_directory(args):
         os.remove(f)
 
 
+def is_still_training(args):
+    os.chdir(args.directory + '/collection')
+    if not os.path.isfile('Summary.pickle'):
+        return True
+    particles, configuration = pickle.load(open('Summary.pickle', 'rb'))
+    os.chdir(args.directory)
+    return configuration.cache != 7
+
+
 if __name__ == '__main__':
     args = getCommandLineOptions()
 
@@ -193,7 +201,6 @@ if __name__ == '__main__':
 
     print("Copy steering file into collection directory")
     shutil.copyfile(args.steering, 'collection/basf2_steering_file.py')
-    shutil.copyfile(args.training, 'collection/basf2_do_trainings.py')
 
     if args.skip:
         print('Skipping setup')
@@ -252,19 +259,14 @@ if __name__ == '__main__':
     else:
         setup(args)
 
-    while True:
+    while is_still_training():
         print('Do available trainings')
         do_trainings(args)
-
-        summary_file = glob.glob(args.directory + '/collection/Summary_*.pickle')
-        if len(summary_file) > 0:
-            create_report(args, summary_file)
-            break
 
         print('Submitting jobs')
         for i in range(args.nJobs):
             if not submit_job(args, i):
-                raise RuntimeError('Error during submiting job')
+                raise RuntimeError('Error during submitting jobs')
 
         print('Wait for jobs to end')
         while not jobs_finished(args):
@@ -281,3 +283,5 @@ if __name__ == '__main__':
 
         if args.once:
             break
+    else:
+        create_report(args)

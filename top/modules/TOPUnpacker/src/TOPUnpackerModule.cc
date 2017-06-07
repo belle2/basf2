@@ -309,12 +309,8 @@ namespace Belle2 {
 
       unsigned header = array.getWord(); // word 0
 
-      B2DEBUG(100, "Header: 0x" << std::hex << header);
-
       if ((header & 0xFF) == 0xBE) { //this is a super short FE header
-        B2DEBUG(100, "Super short header detected:");
 //        B2DEBUG(100, "0b" << std::bitset<8>(header & 0xFF) << " " << std::bitset<8>((header>>8) & 0xFF) << " " << std::bitset<8>((header>>16) & 0xFF) << " " << std::bitset<8>((header>>24) & 0xFF));
-        B2DEBUG(100, "0b" << (std::bitset<8>((header >> 24) & 0xFF)));
 
         unsigned short scrodID_SSFE;
         unsigned short carrier_SSFE;
@@ -348,8 +344,6 @@ namespace Belle2 {
         info->setErrorFlag(TOPInterimFEInfo::c_InvalidFEHeader);
         return array.getRemainingWords();
       }
-
-      B2DEBUG(100, "Long header detected:");
 
 
       word = array.getWord(); // word 1

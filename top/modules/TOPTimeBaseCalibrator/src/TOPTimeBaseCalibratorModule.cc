@@ -73,9 +73,9 @@ namespace Belle2 {
     addParam("minHits", m_minHits,
              "minimal required hits per channel.", (unsigned) 1000);
     addParam("numIterations", m_numIterations,
-             "minimal required hits per channel.", (unsigned) 100);
+             "number of iTBC iterations", (unsigned) 100);
     addParam("numConvIter", m_conv_iter,
-             "Max number of iterations for conversion.", (unsigned) 50);
+             "Max number of iTBC iterations for conversion.", (unsigned) 50);
     addParam("minChi2Change", m_dchi2_min,
              "Minimal of chi2 change in iterations.",  0.2);
     addParam("method", m_method, "method: 0 - profile histograms only, "

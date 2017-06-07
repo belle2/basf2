@@ -68,6 +68,7 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("subtractTrigTiming", m_subtractTrigTiming, "Enable to subtract the trigger timing from TDCs.", false);
   addParam("tdcOffset", m_tdcOffset, "TDC offset (in TDC count).", 0);
   addParam("enableDatabase", m_enableDatabase, "Enable database to read the channel map.", true);
+  addParam("enable2ndHit", m_enable2ndHit, "Enable 2nd hit timing as a individual CDCHit object.", false);
 
   m_channelMapFromDB.addCallback(this, &CDCUnpackerModule::loadMap);
 }
@@ -298,9 +299,11 @@ void CDCUnpackerModule::event()
                 tdc1 = trgTime - tdc1;
               }
               CDCHit* firstHit = cdcHits.appendNew(tdc1, fadcSum, wireId);
-              CDCHit* secondHit = cdcHits.appendNew(tdc2, fadcSum, wireId);
-              secondHit->setOtherHitIndices(firstHit);
-              secondHit->set2ndHitFlag();
+              if (m_enable2ndHit == true) {
+                CDCHit* secondHit = cdcHits.appendNew(tdc2, fadcSum, wireId);
+                secondHit->setOtherHitIndices(firstHit);
+                secondHit->set2ndHitFlag();
+              }
             }
 
 
@@ -388,9 +391,11 @@ void CDCUnpackerModule::event()
                 } else {
                   CDCHit* firstHit = cdcHits.appendNew(tdc1, fadcSum, wireId);
                   if (length == 5) {
-                    CDCHit* secondHit = cdcHits.appendNew(tdc2, fadcSum, wireId);
-                    secondHit->setOtherHitIndices(firstHit);
-                    secondHit->set2ndHitFlag();
+                    if (m_enable2ndHit == true) {
+                      CDCHit* secondHit = cdcHits.appendNew(tdc2, fadcSum, wireId);
+                      secondHit->setOtherHitIndices(firstHit);
+                      secondHit->set2ndHitFlag();
+                    }
                   }
                 }
 

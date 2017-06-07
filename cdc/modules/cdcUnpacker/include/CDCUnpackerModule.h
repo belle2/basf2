@@ -297,9 +297,17 @@ namespace Belle2 {
       bool m_enableDatabase;
 
       /**
+       * Enable/Disable to 2nd hit output.
+       *
+       */
+      bool m_enable2ndHit;
+
+      /**
        * Channel map retrieved from DB.
        */
       DBArray<CDCChannelMap> m_channelMapFromDB;
+
+
     };//end class declaration
 
 

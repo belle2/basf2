@@ -29,7 +29,10 @@ use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
 use_central_database("cdc_cr_test1", LogLevel.WARNING)
 
 
-def main(input, output):
+def main(input, output, topInCounter=True):
+
+    print('topInCounter' + str(topInCounter))
+
     main_path = basf2.create_path()
     logging.log_level = LogLevel.INFO
 
@@ -62,7 +65,9 @@ def main(input, output):
     set_cdc_cr_parameters(data_period)
 
     # Add CDC CR reconstruction.
-    add_cdc_cr_reconstruction(main_path, eventTimingExtraction=False)
+    add_cdc_cr_reconstruction(main_path,
+                              eventTimingExtraction=False,
+                              topInCounter=topInCounter)
 
     # Simple analysi module.
     output = "/".join(['output', output])
@@ -82,4 +87,4 @@ if __name__ == "__main__":
     parser.add_argument('input', help='Input file to be processed (unpacked CDC data).')
     parser.add_argument('output', help='Output file you want to store the results.')
     args = parser.parse_args()
-    main(args.input, args.output)
+    main(args.input, args.output, topInCounter=True)

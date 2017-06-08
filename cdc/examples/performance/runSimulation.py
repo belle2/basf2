@@ -30,7 +30,7 @@ use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
 use_central_database("cdc_cr_test1", LogLevel.WARNING)
 
 
-def main(exp, run, evt, st):
+def main(exp, run, evt, st, topInCounter=True):
     '''
     exp : Experimental number
     run : Run number
@@ -39,7 +39,6 @@ def main(exp, run, evt, st):
     '''
 
     main_path = create_path()
-    emptyPath = create_path()
 
     main_path.add_module('EventInfoSetter',
                          expList=[int(exp)],
@@ -66,7 +65,7 @@ def main(exp, run, evt, st):
                          components=['CDC']
                          )
 
-    add_cdc_cr_simulation(main_path, emptyPath)
+    add_cdc_cr_simulation(main_path, topInCounter=topInCounter)
 
     output = register_module('RootOutput',
                              outputFileName='gcr.cdc.{0:04d}.{1:06d}.{2:04d}.root'.format(int(exp), int(run), int(st)))
@@ -85,4 +84,4 @@ if __name__ == "__main__":
     parser.add_argument('st', help='Stream ID')
 
     args = parser.parse_args()
-    main(args.exp, args.run, args.evt, args.st)
+    main(args.exp, args.run, args.evt, args.st, topInCounter=True)

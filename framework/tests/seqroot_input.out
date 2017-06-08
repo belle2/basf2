@@ -961,6 +961,7 @@ Trying 04-2+1b.sroot ...
 truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
 truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
 [ERROR] SeqFile::read() basic_ios::clear: couldn't read next record size
+[ERROR] SeqRootInput : file read error
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
 [INFO] ========================================================================
@@ -987,6 +988,7 @@ Trying 05-2+5b.sroot ...
 truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
 truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
 [ERROR] SeqFile::read() basic_ios::clear: could only read 1 bytes, expected 3882
+[ERROR] SeqRootInput : file read error
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
 [INFO] ========================================================================
@@ -2126,6 +2128,7 @@ truehit 1 => hits 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50
 truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
 truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
 [ERROR] SeqFile::read() gzip error: could only read 0 bytes, expected 6819
+[ERROR] SeqRootInput : file read error
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
 [INFO] ========================================================================

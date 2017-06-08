@@ -139,7 +139,7 @@ def add_cdc_cr_reconstruction(path, eventTimingExtraction=False):
     """
 
     # Add cdc track finder
-    add_cdc_cr_track_finding(path)
+    add_cdc_cr_track_finding(path, merge_tracks=False)
 
     # Setup Genfit extrapolation
     path.add_module("SetupGenfitExtrapolation")

@@ -86,6 +86,7 @@ namespace Belle2 {
     int m_TDC_particle_low = -999, m_TDC_particle_high = -999; /**< hit cut for particle TDC */
     int m_TDC_cal_low = -999, m_TDC_cal_high = -999; /**< hit cut for calibration TDC */
     int m_TDC_laser_low = -999, m_TDC_laser_high = -999; /**< hit cut for laser TDC */
+    int m_numModules = -1; /**< number of all modules */
 
     TH1F* m_all_hits = nullptr; /**< Histogram for number of accumulated hits */
     TH1F* m_good_hits = nullptr; /**< Histogram for number of accumulated good hits */

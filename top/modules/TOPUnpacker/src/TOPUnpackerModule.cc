@@ -295,7 +295,7 @@ namespace Belle2 {
     DataArray array(buffer, bufferSize, m_swapBytes);
 
     map<unsigned short, int> evtNumCounter; //counts the occurence of carrier-generated event numbers.
-    std::array<unsigned short, 128> channelCounter = {0}; //counts occurence of carrier/asic/channel combinations
+    std::vector<unsigned short> channelCounter(128, 0); //counts occurence of carrier/asic/channel combinations
 
     unsigned word = array.getWord(); // header word 0
     unsigned short scrodID = word & 0x0FFF;
@@ -303,7 +303,6 @@ namespace Belle2 {
 
     word = array.getWord(); // header word 1 (what it contains?)
 
-    short asicChanFix = 0; // temporary fix since it's not given in FE header
 
     while (array.getRemainingWords() > 0) {
 
@@ -323,6 +322,13 @@ namespace Belle2 {
         channel_SSFE = (header >> 24) & 0x07;
         asic_SSFE = (header >> 27) & 0x03;
         carrier_SSFE = (header >> 29) & 0x03;
+
+        if (scrodID_SSFE != scrodID) {
+          B2ERROR("TOPUnpacker: corrupted data - different scrodID's in HLSB and super short FE header");
+          B2DEBUG(100, "Different scrodID's in HLSB and FE header: " << scrodID << " " << scrodID_SSFE << " word = 0x" << std::hex << word);
+          info->setErrorFlag(TOPInterimFEInfo::c_DifferentScrodIDs);
+          return array.getRemainingWords();
+        }
 
         B2DEBUG(100, scrodID_SSFE << "\t" << carrier_SSFE << "\t"  << asic_SSFE << "\t" << channel_SSFE << "\t" << evtNum_SSFE);
 
@@ -374,11 +380,6 @@ namespace Belle2 {
       B2DEBUG(100, scrodID_FE << "\t" << carrierFE << "\t" << asicFE << "\t" << asicChannelFE << "\t" << evtNum_FEheader);
 
       channelCounter[channelID] += 1;
-
-      // temporary fix since it's not given in FE
-      //asicChannelFE = asicChanFix % 8;
-      asicChanFix++;
-      // end fix
 
       std::vector<TOPRawDigit*> digits; // needed for creating relations to waveforms
 
@@ -599,44 +600,47 @@ namespace Belle2 {
 
     int nASICs = 0;
 
-    stringstream evtNumOutputString;
-    evtNumOutputString << "Carrier event numbers and their counts for SCROD ID " << scrodID << ":\n";
+    string evtNumOutputString;
+    evtNumOutputString += "Carrier event numbers and their counts for SCROD ID " + std::to_string(scrodID) + ":\n";
     for (auto const& it : evtNumCounter) {
       nASICs += it.second;
-      evtNumOutputString << it.first << ":\t" << it.second << "\n";
+      evtNumOutputString += std::to_string(it.first) + ":\t" + std::to_string(it.second) + "\n";
     }
-    evtNumOutputString << "Total:\t" << nASICs;
-    B2DEBUG(100, evtNumOutputString.str());
+    evtNumOutputString += "Total:\t" + std::to_string(nASICs);
+    B2DEBUG(100, evtNumOutputString);
 
     int nChannels = 0;
     int nChannelsDiff = 0;
 
-    stringstream channelOutputString;
-    channelOutputString << "Detected channels and their counts for SCROD ID (channels with count == 1 are omitted)" << scrodID << ":\n";
-    for (auto it = channelCounter.begin(); it != channelCounter.end(); ++it) {
-      if (*it > 0) {
+    string channelOutputString;
+    channelOutputString += "Detected channels and their counts for SCROD ID (channels with count == 1 are omitted)" + std::to_string(
+                             scrodID) + ":\n";
+
+    int channelIndex(0);
+    for (auto const& it : channelCounter) {
+      if (it > 0) {
         nChannelsDiff += 1;
       }
-      nChannels += *it;
+      nChannels += it;
 
-      int channelID = it - channelCounter.begin();
+      int channelID = channelIndex;
       int carrier = channelID / 32;
       int asic = (channelID % 32) / 8;
       int chn = channelID % 8;
 
-      if (*it != 1) {
-        channelOutputString << "carrier: " << carrier << " asic: " << asic << " chn: " << chn << " occurence: " << *it << "\n";
-        B2WARNING("ScrodID: " << scrodID << " carrier: " << carrier << " asic: " << asic << " chn: " << chn << " seen " << *it <<
+      if (it != 1) {
+        channelOutputString += "carrier: " + std::to_string(carrier) + " asic: " + std::to_string(asic) + " chn: " + std::to_string(
+                                 chn) + " occurence: " + std::to_string(it) + "\n";
+        B2WARNING("ScrodID: " << scrodID << " carrier: " << carrier << " asic: " << asic << " chn: " << chn << " seen " << it <<
                   " times instead of once");
       }
+      channelIndex += 1;
     }
 
     m_channelStatistics[nChannels] += 1;
 
-    channelOutputString << "Total:\t" << nChannels << " " << nChannelsDiff;
-    B2DEBUG(100, channelOutputString.str());
-
-
+    channelOutputString += "Total:\t" + std::to_string(nChannels) + " " + std::to_string(nChannelsDiff);
+    B2DEBUG(100, channelOutputString);
 
     return array.getRemainingWords();
 
@@ -778,15 +782,11 @@ namespace Belle2 {
 
   void TOPUnpackerModule::endRun()
   {
-    stringstream channelStatOutputString;
-    //channelStatOutputString << "nChn\tcount" << std::endl;
     B2INFO("TOPUnpacker: Channels seen per event statistics:");
     B2INFO("TOPUnpacker: nChn\tcount");
     for (auto& entry : m_channelStatistics) {
-      //channelStatOutputString << entry.first << "\t" << entry.second << std::endl;
       B2INFO("TOPUnpacker: " << entry.first << "\t\t" << entry.second);
     }
-    //B2INFO(channelStatOutputString.str());
   }
 
   void TOPUnpackerModule::terminate()

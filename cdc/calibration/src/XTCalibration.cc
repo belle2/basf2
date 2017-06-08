@@ -94,7 +94,7 @@ void XTCalibration::CreateHisto()
   int al = 0;
   int th = 0;
   int lr = 0;
-  Long64_t nbytes;
+  Long64_t nbytes = 0;
   int nEntries = tree->GetEntries();
   cout << "Number of Hit: " << nEntries << endl;
 

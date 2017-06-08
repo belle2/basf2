@@ -5,8 +5,6 @@
 #include "Math/ChebyshevPol.h"
 #include "iostream"
 
-using namespace std;
-
 Double_t pol5pol1(Double_t* x, Double_t* par)
 {
   Double_t xx = x[0];
@@ -43,12 +41,8 @@ Double_t Cheb5pol1(Double_t* x, Double_t* par)
 
 class XT {
 public:
-  TProfile* m_h1;
-  TF1* xtpol5 = new TF1("xtpol5", pol5pol1, 0.0, 400, 8);
-  TF1* xtCheb5 = new TF1("xtCheb5", Cheb5pol1, 0.0, 400, 8);
-  //  TF1* xtCheb5 = (TF1*)gROOT->GetFunction("Chebyshev5");
 
-  XT(TProfile* h1)
+  explicit XT(TProfile* h1)
   {
     m_h1 = (TProfile*)h1->Clone();
     m_h1->SetDirectory(0);
@@ -151,12 +145,17 @@ public:
   void FitPol5();
   void FitChebyshev();
 private:
+
+  TProfile* m_h1;
+  TF1* xtpol5 = new TF1("xtpol5", pol5pol1, 0.0, 400, 8);
+  TF1* xtCheb5 = new TF1("xtCheb5", Cheb5pol1, 0.0, 400, 8);
+
   int m_mode = 1; //0: Poly5, 1:Chebyshev
   bool m_debug = true;
   bool m_draw = false;
   int m_minRequiredEntry = 800;
-  double m_XTParam[8];
-  double m_FittedXTParams[8];
+  double m_XTParam[8] = {};
+  double m_FittedXTParams[8] = {};
   int m_fitflag = 0;
   double m_Prob = 0;;
   double m_tmin = 20;
@@ -189,7 +188,7 @@ void XT::FitPol5()
   //  xtpol5->SetParLimits(6, p6default - 30,  p6default + 30);
   for (int i = 0; i < 10; ++i) {
     m_fitflag = 1;
-    cout << "Fitting" << endl;
+    std::cout << "Fitting" << std::endl;
     double stat = m_h1->Fit(xtpol5, "M", "0", m_tmin, m_tmax);
     xtpol5->GetParameters(par);
 
@@ -210,26 +209,26 @@ void XT::FitPol5()
     /* compare p0 of linear fit vs p0 of xtfun fit and eval point t=10)*/
     if (fabs(par[0] - p0) > max_dif || fabs(f10 - xtpol5->Eval(10)) > max_dif2) {
       m_fitflag = 3;
-      if (i == 9) cout << "ERROR XT FIT inner part" << endl;
+      if (i == 9) std::cout << "ERROR XT FIT inner part" << std::endl;
       in += 1;
       xtpol5->SetParameters(p0, p1, 0, 0, 0, 0, p6default, 0);
       xtpol5->SetParLimits(1, 0, 0.08);
       m_tmin -= 0.5;
 
       if (m_tmin < 14) {
-        m_tmin = 14; cout << "ERROR: tmin so small, fit iter: " << endl;
+        m_tmin = 14; std::cout << "ERROR: tmin so small, fit iter: " << std::endl;
       }
     }
 
     if (stat == 0) {
       m_fitflag = 0;
-      if (m_debug) {cout << "FIT Failure; Layer: " << endl;}
+      if (m_debug) {std::cout << "FIT Failure; Layer: " << std::endl;}
     }
 
     if (m_debug) {printf("P6default= %3.2f, p6 fit = %3.2f", p6default, par[6]);}
 
     if (m_fitflag == 1) {
-      if (m_debug) cout << "Fit success" << endl;
+      if (m_debug) std::cout << "Fit success" << std::endl;
       xtpol5->GetParameters(m_FittedXTParams);
       m_Prob = xtpol5->GetProb();
       break;

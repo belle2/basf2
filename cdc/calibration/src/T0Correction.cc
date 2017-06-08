@@ -86,10 +86,9 @@ void T0Correction::CreateHisto()
   }
   //read data
   B2INFO("number of entry: " << tree->GetEntries());
-  double xmax;
   for (int i = 0; i < tree->GetEntries(); ++i) {
     tree->GetEntry(i);
-    xmax = halfCSize[lay] - 0.1;
+    double xmax = halfCSize[lay] - 0.1;
     if ((fabs(x) < m_xmin) || (fabs(x) > xmax)
         || (ndf < m_ndfmin)
         || (Pval < m_Pvalmin)) continue; /*select good region*/

@@ -11,6 +11,7 @@ from B2Tools import format
 
 import pickle
 import sys
+import glob
 
 
 if __name__ == '__main__':
@@ -130,7 +131,6 @@ if __name__ == '__main__':
 
     for p in monitoringParticle:
         print(p.particle.identifier)
-        # TODO Print config
 
         o += b2latex.Section(format.decayDescriptor(p.particle.identifier)).finish()
         string = b2latex.String(r"In the reconstruction of {name} {nChannels} out of {max_nChannels} possible channels were used. "
@@ -145,20 +145,29 @@ if __name__ == '__main__':
                            eff=p.after_tag.efficiency,
                            pur=p.after_tag.purity)
 
-        roc_plot_filename = monitoring.removeJPsiSlash(p.particle.identifier + '_ROC.png')
+        roc_plot_filename = monitoring.removeJPsiSlash(p.particle.identifier + '_ROC')
         monitoring.MonitorROCPlot(p, roc_plot_filename)
-        diag_plot_filename = monitoring.removeJPsiSlash(p.particle.identifier + '_Diag.png')
+        o += b2latex.Graphics().add(roc_plot_filename + '.png', width=0.8).finish()
+
+        diag_plot_filename = monitoring.removeJPsiSlash(p.particle.identifier + '_Diag')
         monitoring.MonitorDiagPlot(p, diag_plot_filename)
-        o += b2latex.Graphics().add(diag_plot_filename, width=0.49).add(roc_plot_filename, width=0.49).finish()
+        o += b2latex.Graphics().add(diag_plot_filename + '.png', width=0.8).finish()
 
         if p.particle.identifier in ['B+:generic', 'B0:generic']:
-            money_plot_filename = monitoring.removeJPsiSlash(p.particle.identifier + '_Money.png')
+            money_plot_filename = monitoring.removeJPsiSlash(p.particle.identifier + '_Money')
             monitoring.MonitorMbcPlot(p, money_plot_filename)
-            o += b2latex.Graphics().add(money_plot_filename, width=0.8).finish()
+            g = b2latex.Graphics()
+            for filename in glob.glob(money_plot_filename + '_*.png'):
+                g.add(filename, width=0.49)
+            o += g.finish()
+
         if p.particle.identifier in ['B+:semileptonic', 'B0:semileptonic']:
-            money_plot_filename = monitoring.removeJPsiSlash(p.particle.identifier + '_Money.png')
+            money_plot_filename = monitoring.removeJPsiSlash(p.particle.identifier + '_Money')
             monitoring.MonitorCosBDLPlot(p, money_plot_filename)
-            o += b2latex.Graphics().add(money_plot_filename, width=0.8).finish()
+            g = b2latex.Graphics()
+            for filename in glob.glob(money_plot_filename + '_*.png'):
+                g.add(filename, width=0.49)
+            o += g.finish()
 
         table = b2latex.LongTable(columnspecs=r'c|rr|rrr',
                                   caption='Per-channel efficiency before and after the applied pre-cut.',

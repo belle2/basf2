@@ -17,44 +17,8 @@ import functools
 import copy
 import pdb
 
-
-def purity(nSig, nBg):
-    if nSig == 0:
-        return 0.0
-    if nSig + nBg == 0:
-        return 0.0
-    return nSig / float(nSig + nBg)
-
-
-def efficiency(nSig, nTrueSig):
-    if nSig == 0:
-        return 0.0
-    if nTrueSig == 0:
-        return float('inf')
-    return nSig / float(nTrueSig)
-
-
-def efficiencyError(nSig, nTrueSig):
-    """
-    for an efficiency eps = nSig/nTrueSig, this function calculates the
-    standard deviation according to http://arxiv.org/abs/physics/0701199 .
-    """
-    if nTrueSig == 0:
-        return float('inf')
-
-    k = float(nSig)
-    n = float(nTrueSig)
-    variance = (k + 1) * (k + 2) / ((n + 2) * (n + 3)) - (k + 1) ** 2 / ((n + 2) ** 2)
-    if variance <= 0:
-        return 0.0
-    return math.sqrt(variance)
-
-
-def purityError(nSig, nBg):
-    nTot = nSig + nBg
-    if nTot == 0:
-        return 0.0
-    return efficiencyError(nSig, nTot)
+import basf2_mva_util
+from basf2_mva_evaluation import plotting
 
 
 def removeJPsiSlash(string):
@@ -241,6 +205,8 @@ class MonitoringNTuple(object):
         self.f = ROOT.TFile(filename)
         #: Reference to the tree named variables inside the ROOT file
         self.tree = self.f.variables
+        #: Filename so we can use it later
+        self.filename = filename
 
 
 class MonitoringModuleStatistics(object):
@@ -298,177 +264,67 @@ class MonitoringModuleStatistics(object):
 
 
 def MonitorCosBDLPlot(particle, filename):
-    ROOT.gROOT.SetBatch(True)
-    ROOT.gStyle.SetOptStat(0)
-    canvas = ROOT.TCanvas(filename, 'Cosine of Theta between B and Dl system', 1600, 1200)
-    canvas.cd()
-
-    if particle.final_ntuple.valid and particle.mc_count['sum'] > 0:
-        ntuple = particle.final_ntuple.tree
-
-        color = ROOT.kRed + 4
-        first_plot = True
-        common = 'extraInfo__bouniqueSignal__bc == 1 && abs(cosThetaBetweenParticleAndTrueB) < 10'
-        common += ' && extraInfo__boSignalProbability__bc > '
-        for cut in [0.01, 0.1, 0.5]:
-            ntuple.SetLineColor(int(color))
-            ntuple.SetLineStyle(ROOT.kSolid)
-            ntuple.Draw('cosThetaBetweenParticleAndTrueB', common + str(cut), '' if first_plot else 'same')
-            first_plot = False
-
-            ntuple.SetLineStyle(ROOT.kDotted)
-            ntuple.Draw('cosThetaBetweenParticleAndTrueB',
-                        common + str(cut) + ' && !' + particle.particle.mvaConfig.target, 'same')
-            color -= 1
-
-        l = canvas.GetListOfPrimitives()
-        for i in range(l.GetEntries()):
-            hist = l[i]
-            if isinstance(hist, ROOT.TH1D):
-                hist.GetXaxis().SetRangeUser(-10, 10)
-                break
-
-        legend = canvas.BuildLegend(0.1, 0.65, 0.6, 0.9)
-        legend.SetFillStyle(0)
-    canvas.SaveAs(filename)
+    if not particle.final_ntuple.valid:
+        return
+    df = basf2_mva_util.tree2dict(particle.final_ntuple.tree,
+                                  ['extraInfo__bouniqueSignal__bc', 'cosThetaBetweenParticleAndTrueB',
+                                   'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
+                                  ['unique', 'cosThetaBDl', 'probability', 'signal'])
+    for i, cut in enumerate([0.0, 0.01, 0.05, 0.1, 0.2, 0.5]):
+        p = plotting.VerboseDistribution()
+        common = (df['unique'] == 1) & (np.abs(df['cosThetaBDl']) < 10) & (df['probability'] >= cut)
+        p.add(df, 'cosThetaBDl', common & (df['signal'] == 1), label="Signal")
+        p.add(df, 'cosThetaBDl', common & (df['signal'] == 0), label="Background")
+        p.finish()
+        p.axis.set_title("Cosine of Theta between B and Dl system for signal probability >= {:.2f}".format(cut))
+        p.axis.set_xlabel("CosThetaBDl")
+        p.save('{}_{}.png'.format(filename, i))
 
 
 def MonitorMbcPlot(particle, filename):
-    ROOT.gROOT.SetBatch(True)
-    ROOT.gStyle.SetOptStat(0)
-    canvas = ROOT.TCanvas(filename, 'Beam constrained Mass', 1600, 1200)
-    canvas.cd()
-
-    if particle.final_ntuple.valid and particle.mc_count['sum'] > 0:
-        ntuple = particle.final_ntuple.tree
-
-        color = ROOT.kRed + 4
-        first_plot = True
-        for cut in [0.01, 0.1, 0.5]:
-            ntuple.SetLineColor(int(color))
-            ntuple.SetLineStyle(ROOT.kSolid)
-            common = 'Mbc > 5.23 && extraInfo__boSignalProbability__bc > '
-            ntuple.Draw('Mbc', common + str(cut), '' if first_plot else 'same')
-            first_plot = False
-
-            ntuple.SetLineStyle(ROOT.kDotted)
-            ntuple.Draw('Mbc', common + str(cut) + ' && !' + particle.particle.mvaConfig.target, 'same')
-            color -= 1
-
-        l = canvas.GetListOfPrimitives()
-        for i in range(l.GetEntries()):
-            hist = l[i]
-            if isinstance(hist, ROOT.TH1D):
-                hist.GetXaxis().SetRangeUser(5.24, 5.29)
-                break
-
-        legend = canvas.BuildLegend(0.1, 0.65, 0.6, 0.9)
-        legend.SetFillStyle(0)
-    canvas.SaveAs(filename)
+    if not particle.final_ntuple.valid:
+        return
+    df = basf2_mva_util.tree2dict(particle.final_ntuple.tree,
+                                  ['extraInfo__bouniqueSignal__bc', 'Mbc',
+                                   'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
+                                  ['unique', 'Mbc', 'probability', 'signal'])
+    for i, cut in enumerate([0.0, 0.01, 0.05, 0.1, 0.2, 0.5]):
+        p = plotting.VerboseDistribution()
+        common = (df['unique'] == 1) & (df['Mbc'] > 5.23) & (df['probability'] >= cut)
+        p.add(df, 'Mbc', common & (df['signal'] == 1), label="Signal")
+        p.add(df, 'Mbc', common & (df['signal'] == 0), label="Background")
+        p.finish()
+        p.axis.set_title("Beam constrained mass for signal probability >= {:.2f}".format(cut))
+        p.axis.set_xlabel("Mbc")
+        p.save('{}_{}.png'.format(filename, i))
 
 
 def MonitorROCPlot(particle, filename):
-    ROOT.gROOT.SetBatch(True)
-    canvas = ROOT.TCanvas(filename, "ROC curve", 1600, 1200)
-    canvas.cd()
-
-    if particle.final_ntuple.valid and particle.mc_count['sum'] > 0:
-        ntuple = particle.final_ntuple.tree
-
-        nbins = 100
-        import array
-        bckgrdHist = ROOT.TH1D('ROCbackground', 'background', nbins, 0.0, 1.0)
-        signalHist = ROOT.TH1D('ROCsignal', 'signal', nbins, 0.0, 1.0)
-        uniqueBckgrdHist = ROOT.TH1D('ROCuniqueBackground', 'background', nbins, 0.0, 1.0)
-        uniqueSignalHist = ROOT.TH1D('ROCuniqueSignal', 'signal', nbins, 0.0, 1.0)
-
-        probabilityVar = 'extraInfo__boSignalProbability__bc'
-        ntuple.Project('ROCbackground', probabilityVar, '!' + particle.particle.mvaConfig.target)
-        ntuple.Project('ROCsignal', probabilityVar, particle.particle.mvaConfig.target)
-        ntuple.Project('ROCuniqueBackground', probabilityVar, '!' + particle.particle.mvaConfig.target)
-        ntuple.Project('ROCuniqueSignal', probabilityVar,
-                       particle.particle.mvaConfig.target + '  && extraInfo__bouniqueSignal__bc == 1')
-
-        for i, (signal, bckgrd) in enumerate([(signalHist, bckgrdHist)]):  # , (uniqueSignalHist, uniqueBckgrdHist)]):
-            x = array.array('d')
-            y = array.array('d')
-            xerr = array.array('d')
-            yerr = array.array('d')
-
-            for cutBin in range(nbins + 1):
-                nSignal = signal.Integral(cutBin, nbins + 1)
-                nBckgrd = bckgrd.Integral(cutBin, nbins + 1)
-
-                eff = efficiency(nSignal, particle.mc_count['sum'])
-                effErr = efficiencyError(nSignal, particle.mc_count['sum'])
-                pur = purity(nSignal, nBckgrd)
-                purErr = purityError(nSignal, nBckgrd)
-
-                x.append(100 * pur)
-                y.append(100 * eff)
-                xerr.append(100 * purErr)
-                yerr.append(100 * effErr)
-
-            rocgraph = ROOT.TGraphErrors(len(x), x, y, xerr, yerr)
-            rocgraph.SetLineColor(ROOT.kBlue - 2 - i)
-            rocgraph.SetTitle(';purity (%);efficiency (%)')
-            rocgraph.GetXaxis().SetTitleSize(0.05)
-            rocgraph.GetXaxis().SetLabelSize(0.05)
-            rocgraph.GetYaxis().SetTitleSize(0.05)
-            rocgraph.GetYaxis().SetLabelSize(0.05)
-            rocgraph.Draw('ALPZ')
-
-    canvas.SaveAs(filename)
+    if not particle.final_ntuple.valid:
+        return
+    df = basf2_mva_util.tree2dict(particle.final_ntuple.tree,
+                                  ['extraInfo__bouniqueSignal__bc',
+                                   'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
+                                  ['unique', 'probability', 'signal'])
+    p = plotting.RejectionOverEfficiency()
+    p.add(df, 'probability', df['signal'] == 1, df['signal'] == 0, label='All')
+    p.add(df, 'probability', (df['signal'] == 1) & (df['unique'] == 1), (df['signal'] == 0) & (df['unique'] == 1), label='Unique')
+    p.finish()
+    p.save(filename + '.png')
 
 
 def MonitorDiagPlot(particle, filename):
-    ROOT.gROOT.SetBatch(True)
-    nbins = 100
-    probabilityVar = ROOT.Belle2.makeROOTCompatible('extraInfo(SignalProbability)')
-
-    canvas = ROOT.TCanvas(filename, 'Diagonal plot', 1600, 1200)
-    canvas.cd()
-
-    if particle.final_ntuple.valid and particle.mc_count['sum'] > 0:
-        ntuple = particle.final_ntuple.tree
-
-        bgHist = ROOT.TH1D('background' + probabilityVar, 'background', nbins, 0.0, 1.0)
-        signalHist = ROOT.TH1D('signal' + probabilityVar, 'signal', nbins, 0.0, 1.0)
-
-        ntuple.Project('background' + probabilityVar, probabilityVar, '!' + particle.particle.mvaConfig.target)
-        ntuple.Project('signal' + probabilityVar, probabilityVar, particle.particle.mvaConfig.target)
-
-        import array
-        x = array.array('d')
-        y = array.array('d')
-        xerr = array.array('d')
-        yerr = array.array('d')
-
-        for i in range(1, nbins + 1):  # no under/overflow bins
-            nSig = 1.0 * signalHist.GetBinContent(i)
-            nBg = 1.0 * bgHist.GetBinContent(i)
-            binCenter = signalHist.GetXaxis().GetBinCenter(i)
-            x.append(binCenter)
-            y.append(purity(nSig, nBg))
-            xerr.append(signalHist.GetXaxis().GetBinWidth(i) / 2)
-            yerr.append(purityError(nSig, nBg))
-
-        purityPerBin = ROOT.TGraphErrors(len(x), x, y, xerr, yerr)
-
-        plotLabel = ';classifier output;purity per bin'
-        purityPerBin.SetTitle(plotLabel)
-        purityPerBin.GetXaxis().SetRangeUser(0.0, 1.0)
-        purityPerBin.GetYaxis().SetRangeUser(0.0, 1.0)
-        purityPerBin.GetXaxis().SetTitleSize(0.05)
-        purityPerBin.GetXaxis().SetLabelSize(0.05)
-        purityPerBin.GetYaxis().SetTitleSize(0.05)
-        purityPerBin.GetYaxis().SetLabelSize(0.05)
-        purityPerBin.Draw('APZ')
-        diagonal = ROOT.TLine(0.0, 0.0, 1.0, 1.0)
-        diagonal.SetLineColor(ROOT.kAzure)
-        diagonal.SetLineWidth(2)
-        diagonal.Draw()
-    canvas.SaveAs(filename)
+    if not particle.final_ntuple.valid:
+        return
+    df = basf2_mva_util.tree2dict(particle.final_ntuple.tree,
+                                  ['extraInfo__bouniqueSignal__bc',
+                                   'extraInfo__boSignalProbability__bc', particle.particle.mvaConfig.target],
+                                  ['unique', 'probability', 'signal'])
+    p = plotting.Diagonal()
+    p.add(df, 'probability', df['signal'] == 1, df['signal'] == 0)
+    # p.add(df, 'probability', (df['signal'] == 1) & (df['unique'] == 1), (df['signal'] == 0) & (df['unique'] == 1))
+    p.finish()
+    p.save(filename + '.png')
 
 
 def MonitoringMCCount(particle):

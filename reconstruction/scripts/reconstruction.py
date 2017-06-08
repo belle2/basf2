@@ -20,7 +20,7 @@ from softwaretrigger import (
 
 
 def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False,
-                       additionalTrackFitHypotheses=None, addClusterExpertModules=True, use_vxdtf2=False):
+                       additionalTrackFitHypotheses=[], addClusterExpertModules=True, use_vxdtf2=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -44,8 +44,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
         determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
         all (but you will have to add it on your own then).
-    :param additionalTrackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
-        the additional fitted hypotheses are muon, kaon and proton, i.e. [13, 321, 2212].
+    :param additionalTrackFitHypotheses: Change the additional fitted track fit hypotheses. If 'None' is given,
+        the additional fitted hypotheses are muon, kaon and proton, i.e. [13, 321, 2212]. If the empty set, [], is
+        given, only the pion hypothesis is fitted (default).
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
     :param use_vxdtf2: if true the VXDTF version 2 will be used if false (default) verion 1 of the VXDTF will be used.

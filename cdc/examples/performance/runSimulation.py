@@ -30,7 +30,7 @@ use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
 use_central_database("cdc_cr_test1", LogLevel.WARNING)
 
 
-def main(exp, run, evt, st, topInCounter=True):
+def sim(exp, run, evt, st, topInCounter=True, magneticField=False):
     '''
     exp : Experimental number
     run : Run number
@@ -61,9 +61,12 @@ def main(exp, run, evt, st, topInCounter=True):
                               ])
     main_path.add_module(gearbox)
 
-    main_path.add_module('Geometry',
-                         components=['CDC']
-                         )
+    if magneticField is False:
+        main_path.add_module('Geometry',
+                             components=['CDC'])
+    else:
+        main_path.add_module('Geometry',
+                             components=['CDC', 'MagneticFieldConstant4LimitedRCDC'])
 
     add_cdc_cr_simulation(main_path, topInCounter=topInCounter)
 
@@ -84,4 +87,4 @@ if __name__ == "__main__":
     parser.add_argument('st', help='Stream ID')
 
     args = parser.parse_args()
-    main(args.exp, args.run, args.evt, args.st, topInCounter=True)
+    sim(args.exp, args.run, args.evt, args.st, topInCounter=True, magneticField=False)

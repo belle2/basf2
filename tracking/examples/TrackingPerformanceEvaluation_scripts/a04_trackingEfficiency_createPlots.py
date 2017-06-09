@@ -18,15 +18,16 @@ import sys
 from basf2 import *
 from ROOT import Belle2
 
+release = sys.argv.argv[1]
+
 # roi = {noROI, vxdtf1, vxdtf2}
 # bkg = {noBkg, stdBKG, std2GBKG}
 # vxdtf = {vxdtf1, vxdtf2}
 
-roi = sys.argv[1]
-bkg = sys.argv[2]
-vxdtf = sys.argv[3]
+roi = sys.argv[2]
+bkg = sys.argv[3]
+vxdtf = sys.argv[4]
 
-release = 'merged'
 
 input_root_files = './' + release + '/TV_reco_' + bkg + '_' + roi + '_' + vxdtf + '_' + release + '.root'
 root_file_name_TRK = './' + release + '/TV_TRK_analysis_' + bkg + '_' + roi + '_' + vxdtf + '_' + release + '.root'

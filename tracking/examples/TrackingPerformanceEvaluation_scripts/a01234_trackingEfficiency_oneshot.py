@@ -34,9 +34,15 @@ set_random_seed(1509)
 
 particleGun = False
 
-roi = sys.argv[1]
-bkg = sys.argv[2]
-vxdtf = sys.argv[3]
+release = sys.argv[1]
+
+# roi = {noROI, vxdtf1, vxdtf2}
+# bkg = {noBkg, stdBKG, std2GBKG}
+# vxdtf = {vxdtf1, vxdtf2}
+
+roi = sys.argv[2]
+bkg = sys.argv[3]
+vxdtf = sys.argv[4]
 
 release = 'merged'
 

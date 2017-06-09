@@ -104,7 +104,7 @@ void RunControlCallback::error(const char* nodename, const char* data) throw()
   //log(LogFile::DEBUG, "ERROR from %s (state = %s)", nodename, data);
   try {
     RCNode& node(findNode(nodename));
-    logging(node, LogFile::ERROR, data);
+    logging(node, LogFile::ERROR, "%s : %s", nodename, data);
     //reply(NSMMessage(RCCommand::STOP, "Error due to error on " + node.getName()));
     //stop();
     setState(RCState::ERROR_ES);

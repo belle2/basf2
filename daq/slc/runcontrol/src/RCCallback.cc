@@ -161,7 +161,8 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
         reply(NSMMessage(NSMCommand::OK, state.getLabel()));
       } else if (cmd == RCCommand::BOOT) {
         get(m_obj);
-        boot(m_obj);
+        std::string opt = msg.getLength() > 0 ? msg.getData() : "";
+        boot(opt, m_obj);
       } else if (cmd == RCCommand::LOAD) {
         get(m_obj);
         load(m_obj);

@@ -17,14 +17,25 @@
 #include <framework/dataobjects/DigitBase.h>
 
 namespace Belle2 {
-  /** Class that is the result of the unpacker in raw data and the result of the Digitizer in simulation.
+  /** Class containing the result of the unpacker in raw data and the result of the digitizer in simulation.
    *
-   *  This class is optimized for low disc usage. For reconstruction purposes use the corresponding
-   *  CDCRecoHit class or create your own class. <br>
+   *  This class is optimized for low disc usage. <br>
+   *  For reconstruction purposes, use the corresponding CDCRecoHit class or create your own class. <br>
    *
    *  It stores the TDC count (timing information of the hit),<br>
    *  the accumulated ADC count of the charge in the hit cell,<br>
    *  and the WireID.
+   *
+   *  Regarding the treatment of 2nd fastest hit timing recorded by the front end, if it exists, <br>
+   *  the unpacker creates another individual CDCHit object for the 2nd hit in addition to the CDCHit for the 1st hit. <br>
+   *  In both case, the hit timing is stored as the TDC count. <br>
+   *  To identify if the CDCHit is 1st hit or 2nd hit, the first bit of member variable, m_status, is assigned. <br>
+   *  If such bit is 0(1), The CDCHit belongs to the 1st (2nd) hit. <br>
+   *  The method CDCHit::is2ndHit() has to be used for this purpose.
+   *
+   *  The relastion between the 1st hit object and the 2nd hit object is established with the variable, m_otherHitIndex.<br>
+   *  Users can call the CDCHit::getOtherHitIndex() to obtain the index of CDCHit array for the other hit.
+   *
    */
   class CDCHit : public DigitBase {
   public:

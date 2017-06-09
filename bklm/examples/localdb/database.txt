@@ -1,1 +1,3 @@
 dbstore/BKLMElectronicMapping 6 0,0,-1,-1
+dbstore/BKLMAlignment 1 0,0,-1,-1
+dbstore/BKLMMisAlignment 1 0,0,-1,-1

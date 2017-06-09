@@ -11,6 +11,8 @@
 #include <top/reconstruction/TOPalign.h>
 #include <framework/logging/Logger.h>
 
+#include <iostream>
+
 extern "C" {
   void data_clear_();
   void data_put_(int*, int*, int*, float*, int*);
@@ -46,12 +48,13 @@ namespace Belle2 {
       data_clear_();
     }
 
-    int TOPalign::addData(int moduleID, int pixelID, int TDC, double time)
+    int TOPalign::addData(int moduleID, int pixelID, double time)
     {
       int status = 0;
       moduleID--; // 0-based ID used in fortran
       pixelID--;   // 0-based ID used in fortran
       float t = (float) time;
+      int TDC = 0; // not used in Fortran code
       data_put_(&moduleID, &pixelID, &TDC, &t, &status);
       return status;
     }
@@ -64,7 +67,7 @@ namespace Belle2 {
     }
 
 
-    int TOPalign::iterate(const TOPtrack& track, const Const::ChargedStable& hypothesis)
+    int TOPalign::iterate(const TOPtrack& track, const Const::ChargedStable& hypothesis, const float hitTime)
     {
       if (track.getModuleID() != m_moduleID) return -3;
 
@@ -72,7 +75,8 @@ namespace Belle2 {
       float x = track.getX();
       float y = track.getY();
       float z = track.getZ();
-      float t = track.getTrackLength() / Const::speedOfLight;
+      //float t = track.getTrackLength() / Const::speedOfLight;
+      float t = hitTime;
       float px = track.getPx();
       float py = track.getPy();
       float pz = track.getPz();

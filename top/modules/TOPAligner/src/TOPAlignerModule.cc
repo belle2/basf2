@@ -29,6 +29,9 @@
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPLikelihood.h>
+#include <top/dataobjects/TOPBarHit.h>
+#include <top/dataobjects/TOPPull.h>
 
 using namespace std;
 
@@ -106,8 +109,7 @@ namespace Belle2 {
     StoreArray<TOPDigit> digits;
     for (const auto& digit : digits) {
       if (digit.getHitQuality() == TOPDigit::EHitQuality::c_Good)
-        TOPalign::addData(digit.getModuleID(), digit.getPixelID(), digit.getTDC(),
-                          digit.getTime());
+        TOPalign::addData(digit.getModuleID(), digit.getPixelID(), digit.getTime());
     }
 
     TOPalign::setPhotonYields(m_minBkgPerBar, m_scaleN0);
@@ -121,11 +123,16 @@ namespace Belle2 {
       TOPtrack trk(&track);
       if (!trk.isValid()) continue;
 
+      // get top likelihood and related ExtHit
+      const TOPLikelihood* topLike = track.getRelated<TOPLikelihood>();
+      const ExtHit* extHit = topLike->getRelated<ExtHit>();
+
       // do iteration
       unsigned i = trk.getModuleID() - 1;
       if (i < m_align.size()) {
         auto& align = m_align[i];
-        int err = align.iterate(trk, Const::muon);
+        //int err = align.iterate(trk, Const::muon);
+        int err = align.iterate(trk, Const::muon, extHit->getTOF());
 
         cout << "M=" << align.getModuleID() << " ";
         cout << "ntr=" << align.getNumTracks() << " ";

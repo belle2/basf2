@@ -237,6 +237,10 @@ namespace Belle2 {
     m_tree->SetBranchAddress("SKB_HER_pressures_local_corrected", &(m_beast.SKB_HER_pressures_local_corrected));
     m_tree->SetBranchAddress("SKB_LER_Zeff_D02", &(m_beast.SKB_LER_Zeff_D02));
     m_tree->SetBranchAddress("SKB_LER_Zeff_D06", &(m_beast.SKB_LER_Zeff_D06));
+    m_tree->SetBranchAddress("CSI_sumE", &(m_beast.CSI_data_sumE));
+    m_tree->SetBranchAddress("BGO_dose", &(m_beast.BGO_data_dose));
+    m_tree->SetBranchAddress("PIN_dose", &(m_beast.PIN_data_dose));
+    m_tree->SetBranchAddress("DIA_dose", &(m_beast.DIA_data_dose));
 
     if (m_numEvents > 0) {
       m_tree->GetEntry(0);
@@ -701,97 +705,6 @@ namespace Belle2 {
       iter++;
     }
     dirh->cd();
-    /*
-    // expand possible wildcards
-    m_inputFileNames = expandWordExpansions(m_inputFileNames);
-    if (m_inputFileNames.empty()) {
-      B2FATAL("No valid files specified!");
-    }
-
-    // check files
-    TDirectory* dir = gDirectory;
-    for (const string& fileName : m_inputFileNames) {
-      TFile* f = TFile::Open(fileName.c_str(), "READ");
-      if (!f or !f->IsOpen()) {
-        B2FATAL("Couldn't open input file " + fileName);
-      }
-      delete f;
-    }
-
-    dir->cd();
-
-    // get event TTree
-    //m_tree = new TChain(c_treeNames[DataStore::c_Event].c_str());
-    m_tree = new TChain("tout");
-    for (const string& fileName : m_inputFileNames) {
-      m_tree->AddFile(fileName.c_str());
-    }
-    m_numEvents = m_tree->GetEntries();
-    if (m_numEvents == 0) B2ERROR(c_treeNames[DataStore::c_Event] << " has no entires");
-    m_eventCount = 0;
-
-    m_tree->SetBranchAddress("ts", &(m_beast.ts));
-    m_tree->SetBranchAddress("event", &(m_beast.event));
-    m_tree->SetBranchAddress("run", &(m_beast.run));
-    m_tree->SetBranchAddress("subrun", &(m_beast.subrun));
-    m_tree->SetBranchAddress("SKB_HER_injectionFlag", &(m_beast.SKB_HER_injectionFlag));
-    m_tree->SetBranchAddress("SKB_LER_injectionFlag", &(m_beast.SKB_LER_injectionFlag));
-    m_tree->SetBranchAddress("SKB_HER_injectionFlag_safe", &(m_beast.SKB_HER_injectionFlag_safe));
-    m_tree->SetBranchAddress("SKB_LER_injectionFlag_safe", &(m_beast.SKB_LER_injectionFlag_safe));
-    m_tree->SetBranchAddress("SKB_HER_abortFlag", &(m_beast.SKB_HER_abortFlag));
-    m_tree->SetBranchAddress("SKB_LER_abortFlag", &(m_beast.SKB_LER_abortFlag));
-    m_tree->SetBranchAddress("SKB_HER_abortFlag_safe", &(m_beast.SKB_HER_abortFlag_safe));
-    m_tree->SetBranchAddress("SKB_LER_abortFlag_safe", &(m_beast.SKB_LER_abortFlag_safe));
-    m_tree->SetBranchAddress("SKB_Status", &(m_beast.SKB_Status));
-    m_tree->SetBranchAddress("SKB_HER_injectionRate", &(m_beast.SKB_HER_injectionRate));
-    m_tree->SetBranchAddress("SKB_LER_injectionRate", &(m_beast.SKB_LER_injectionRate));
-    m_tree->SetBranchAddress("SKB_HER_lifetime", &(m_beast.SKB_HER_lifetime));
-    m_tree->SetBranchAddress("SKB_LER_lifetime", &(m_beast.SKB_LER_lifetime));
-    m_tree->SetBranchAddress("SKB_LER_current", &(m_beast.SKB_LER_current));
-    m_tree->SetBranchAddress("SKB_HER_current", &(m_beast.SKB_HER_current));
-    m_tree->SetBranchAddress("SKB_LER_injectionEfficiency", &(m_beast.SKB_LER_injectionEfficiency));
-    m_tree->SetBranchAddress("SKB_HER_injectionEfficiency", &(m_beast.SKB_HER_injectionEfficiency));
-    m_tree->SetBranchAddress("SKB_beamLoss_ionChambers_mean", &(m_beast.SKB_beamLoss_ionChambers_mean));
-    m_tree->SetBranchAddress("SKB_beamLoss_PINdiodes_mean", &(m_beast.SKB_beamLoss_PINdiodes_mean));
-    m_tree->SetBranchAddress("SKB_beamLoss_nearCollimators", &(m_beast.SKB_beamLoss_nearCollimators));
-    m_tree->SetBranchAddress("SKB_beamLoss_aroundMasks", &(m_beast.SKB_beamLoss_aroundMasks));
-    m_tree->SetBranchAddress("SKB_LER_injectionCharge", &(m_beast.SKB_LER_injectionCharge));
-    m_tree->SetBranchAddress("SKB_HER_injectionCharge", &(m_beast.SKB_HER_injectionCharge));
-    m_tree->SetBranchAddress("SKB_LER_injectionRepetitionRate", &(m_beast.SKB_LER_injectionRepetitionRate));
-    m_tree->SetBranchAddress("SKB_HER_injectionRepetitionRate", &(m_beast.SKB_HER_injectionRepetitionRate));
-    m_tree->SetBranchAddress("SKB_LER_injectionNumberOfBunches", &(m_beast.SKB_LER_injectionNumberOfBunches));
-    m_tree->SetBranchAddress("SKB_HER_injectionNumberOfBunches", &(m_beast.SKB_HER_injectionNumberOfBunches));
-    m_tree->SetBranchAddress("SKB_LER_pressures", &(m_beast.SKB_LER_pressures));
-    m_tree->SetBranchAddress("SKB_HER_pressures", &(m_beast.SKB_HER_pressures));
-    m_tree->SetBranchAddress("SKB_LER_pressure_average", &(m_beast.SKB_LER_pressure_average));
-    m_tree->SetBranchAddress("SKB_HER_pressure_average", &(m_beast.SKB_HER_pressure_average));
-    m_tree->SetBranchAddress("SKB_HER_collimatorPositions_mm", &(m_beast.SKB_HER_collimatorPositions_mm));
-    m_tree->SetBranchAddress("SKB_HER_collimatorPositions_DMM", &(m_beast.SKB_HER_collimatorPositions_DMM));
-    m_tree->SetBranchAddress("SKB_HER_collimatorPositions_inX", &(m_beast.SKB_HER_collimatorPositions_inX));
-    m_tree->SetBranchAddress("SKB_HER_collimatorPositions_inY", &(m_beast.SKB_HER_collimatorPositions_inY));
-    m_tree->SetBranchAddress("SKB_HER_collimatorPositions_fromBeam", &(m_beast.SKB_HER_collimatorPositions_fromBeam));
-    m_tree->SetBranchAddress("SKB_LER_collimatorPositions_mm", &(m_beast.SKB_LER_collimatorPositions_mm));
-    m_tree->SetBranchAddress("SKB_LER_collimatorPositions_X", &(m_beast.SKB_LER_collimatorPositions_X));
-    m_tree->SetBranchAddress("SKB_LER_collimatorPositions_Y", &(m_beast.SKB_LER_collimatorPositions_Y));
-    m_tree->SetBranchAddress("SKB_LER_collimatorPositions_fromBeam", &(m_beast.SKB_LER_collimatorPositions_fromBeam));
-    m_tree->SetBranchAddress("SKB_HER_beamSize_xray_X", &(m_beast.SKB_HER_beamSize_xray_X));
-    m_tree->SetBranchAddress("SKB_HER_beamSize_xray_Y", &(m_beast.SKB_HER_beamSize_xray_Y));
-    m_tree->SetBranchAddress("SKB_HER_correctedBeamSize_xray_Y", &(m_beast.SKB_HER_correctedBeamSize_xray_Y));
-    m_tree->SetBranchAddress("SKB_LER_beamSize_xray_X", &(m_beast.SKB_LER_beamSize_xray_X));
-    m_tree->SetBranchAddress("SKB_LER_beamSize_xray_Y", &(m_beast.SKB_LER_beamSize_xray_Y));
-    m_tree->SetBranchAddress("SKB_LER_correctedBeamSize_xray_Y", &(m_beast.SKB_LER_correctedBeamSize_xray_Y));
-    m_tree->SetBranchAddress("SKB_LER_beamSize_SR_X", &(m_beast.SKB_LER_beamSize_SR_X));
-    m_tree->SetBranchAddress("SKB_LER_beamSize_SR_Y", &(m_beast.SKB_LER_beamSize_SR_Y));
-    m_tree->SetBranchAddress("SKB_HER_beamSize_SR_X", &(m_beast.SKB_HER_beamSize_SR_X));
-    m_tree->SetBranchAddress("SKB_HER_beamSize_SR_Y", &(m_beast.SKB_HER_beamSize_SR_Y));
-    m_tree->SetBranchAddress("SKB_HER_integratedCurrent", &(m_beast.SKB_HER_integratedCurrent));
-    m_tree->SetBranchAddress("SKB_LER_integratedCurrent", &(m_beast.SKB_LER_integratedCurrent));
-    m_tree->SetBranchAddress("SKB_LER_partialPressures_D06", &(m_beast.SKB_LER_partialPressures_D06));
-    m_tree->SetBranchAddress("SKB_LER_partialPressures_D02", &(m_beast.SKB_LER_partialPressures_D02));
-    m_tree->SetBranchAddress("SKB_LER_pressures_local", &(m_beast.SKB_LER_pressures_local));
-    m_tree->SetBranchAddress("SKB_LER_Zeff_D02", &(m_beast.SKB_LER_Zeff_D02));
-    m_tree->SetBranchAddress("SKB_LER_Zeff_D06", &(m_beast.SKB_LER_Zeff_D06));
-    */
     dir->cd();
     m_numEntries = m_tree->GetEntries();
     cout << "m_numEntries " << m_numEntries << endl;
@@ -876,6 +789,12 @@ namespace Belle2 {
     m_treeBEAST->Branch("SKB_HER_pressures_local_corrected", &(m_beast.SKB_HER_pressures_local_corrected));
     m_treeBEAST->Branch("SKB_LER_Zeff_D02", &(m_beast.SKB_LER_Zeff_D02));
     m_treeBEAST->Branch("SKB_LER_Zeff_D06", &(m_beast.SKB_LER_Zeff_D06));
+
+    m_treeBEAST->Branch("CSI_data_sumE", &(m_beast.CSI_data_sumE));
+    m_treeBEAST->Branch("BGO_data_dose", &(m_beast.BGO_data_dose));
+    m_treeBEAST->Branch("PIN_data_dose", &(m_beast.PIN_data_dose));
+    m_treeBEAST->Branch("DIA_data_dose", &(m_beast.DIA_data_dose));
+
     m_treeBEAST->Branch("PIN_dose", &(m_beast.PIN_dose));
     m_treeBEAST->Branch("BGO_energy", &(m_beast.BGO_energy));
     m_treeBEAST->Branch("HE3_rate", &(m_beast.HE3_rate));

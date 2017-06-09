@@ -24,6 +24,7 @@ BKLMTrackFinder::BKLMTrackFinder()
 BKLMTrackFinder::BKLMTrackFinder(BKLMTrackFitter* fitter)
 {
   m_Fitter = fitter;
+  //m_Fitter->setGlobalFit(m_globalFit);
 }
 
 //! Destructor
@@ -35,6 +36,7 @@ BKLMTrackFinder::~BKLMTrackFinder()
 void BKLMTrackFinder::registerFitter(BKLMTrackFitter* fitter)
 {
   m_Fitter = fitter;
+  m_Fitter->setGlobalFit(m_globalFit);
 }
 
 //! find associated hits and do fit
@@ -52,7 +54,7 @@ bool BKLMTrackFinder::filter(std::list<BKLMHit2d*>& seed,
     return (false);
   }
 
-  m_Fitter->fit(track);
+  m_Fitter->fit(track);//fit seed
 
   for (i = hits.begin(); i != hits.end(); ++i) {
 
@@ -66,7 +68,8 @@ bool BKLMTrackFinder::filter(std::list<BKLMHit2d*>& seed,
 
     if ((*i)->isOnStaTrack() == false) {
       double error, sigma;
-      m_Fitter->distanceToHit(*i, error, sigma);
+      if (m_globalFit) m_Fitter->globalDistanceToHit(*i, error, sigma);
+      else m_Fitter->distanceToHit(*i, error, sigma);
       //B2INFO("BKLMTrackFinder" << " Error: " << error << " Sigma: " << sigma);
       if (sigma < 5.0) {
         track.push_back(*i);

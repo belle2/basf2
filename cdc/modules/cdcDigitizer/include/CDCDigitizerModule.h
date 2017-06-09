@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao, Martin Heck                                   *
+ * Contributors: Guofu Cao, Martin Heck, CDC group                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -24,6 +24,7 @@
 #include <vector>
 #include <queue>
 #include <map>
+#include <limits>
 
 namespace Belle2 {
 
@@ -144,6 +145,7 @@ namespace Belle2 {
     bool m_addInWirePropagationDelay4Bg; /**< A switch used to control adding propagation delay into the total drift time or not for beam bg. */
     bool m_addTimeOfFlight4Bg;     /**< A switch used to control adding time of flight into the total drift time or not for beam bg. */
     bool m_outputNegativeDriftTime;     /**< A switch to output negative drift time to CDCHit */
+    bool m_output2ndHit;         /**< A switch to output 2nd hit */
     bool m_misalign;             /**< A switch to control misalignment */
     bool m_correctForWireSag;    /**< A switch to control wire sag */
 //    float m_eventTime;         /**< It is a timing of event, which includes a time jitter due to the trigger system */
@@ -151,11 +153,17 @@ namespace Belle2 {
     /** Structure for saving the signal information. */
     struct SignalInfo {
       /** Constructor that initializes all members. */
-      SignalInfo(int simHitIndex = 0, float driftTime = 0, float charge = 0) :
-        m_simHitIndex(simHitIndex), m_driftTime(driftTime), m_charge(charge) {}
+      SignalInfo(int simHitIndex = 0, float driftTime = 0, float charge = 0, int simHitIndex2 = -1,
+                 float driftTime2 = std::numeric_limits<float>::max(), int simHitIndex3 = -1, float driftTime3 = std::numeric_limits<float>::max()) :
+        m_simHitIndex(simHitIndex), m_driftTime(driftTime), m_charge(charge), m_simHitIndex2(simHitIndex2), m_driftTime2(driftTime2),
+        m_simHitIndex3(simHitIndex3), m_driftTime3(driftTime3) {}
       int            m_simHitIndex;   /**< SimHit Index number. */
       float          m_driftTime;     /**< Shortest drift time of any SimHit in the cell. */
       float          m_charge;        /**< Sum of charge for all SimHits in the cell. */
+      int            m_simHitIndex2;   /**< SimHit index for 2nd drift time. */
+      float          m_driftTime2;     /**< 2nd-shortest drift time in the cell. */
+      int            m_simHitIndex3;   /**< SimHit index for 3rd drift time. */
+      float          m_driftTime3;     /**< 3rd-shortest drift time in the cell. */
     };
   };
 

@@ -62,7 +62,7 @@ namespace Belle2 {
       bool m_debug;   /**< debug. */
       bool m_storeHisto; /**< store histo or not*/
       bool m_useDB; /**< use DB or text mode*/
-      std::string m_OutputT0FileName = "t0.dat"; /**<output t0 file name for text file*/
+      std::string m_OutputT0FileName = "t0_new_b2cal.dat"; /**<output t0 file name for text file*/
       std::string m_InputRootFileName = "rootfile/output*"; /**< input file names*/
       //      DBObjPtr<TimeZeros> *m_DBT0;
       int m_firstExperiment; /**< First experiment. */

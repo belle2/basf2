@@ -63,7 +63,9 @@ public:
     m_mode = mode;
   }
 
-  /*Set Parameter 6 for polynomia fit*/
+  /**
+   * Set Parameter 6 for polynomia fit.
+   */
   void  setP6(double p6)
   {
     m_XTParam[6] = p6;
@@ -72,7 +74,9 @@ public:
   {
     m_mode = mode;
   }
-  /*SetParamerters for fit*/
+  /**
+   * Set Paramerters for fit.
+   */
   void  setXTParams(double p[8])
   {
     for (int i = 0; i < 8; ++i) {m_XTParam[i] = p[i];}
@@ -88,55 +92,81 @@ public:
     m_tmax = p6 + 50;
   }
 
-  /*Set Fit range*/
+  /**
+   * Set Fit range.
+   */
   void  setFitRange(double tmin, double tmax)
   {
     m_tmin = tmin;
     m_tmax = tmax;
   }
-  /*Set minimum number of entry required for fit*/
+  /**
+   * Set minimum number of entry required for fit.
+   */
   void setSmallestEntryRequired(int min)
   {
     m_minRequiredEntry = min;
   }
-  /*Set Debug*/
+  /**
+   * Set Debug.
+   */
   void setDebug(bool debug)
   {
     m_debug = debug;
   }
-  /* get fitted flag*/
+  /**
+   * get fitted flag.
+   */
   int getFitStatus()
   {
     return m_fitflag;
   }
+
+  /**
+   * Get the chi2 probability.
+   */
   double getProb()
   {
     return m_Prob;
   }
-  /*get fit params*/
+  /**
+   * get fit parameters.
+   */
   void  getFittedXTParams(double pa[8])
   {
     for (int i = 0; i < 8; ++i) {pa[i] = m_FittedXTParams[i];}
   }
-  /*getXTFunction*/
+  /**
+   * Get XT function.
+   */
   TF1* getXTFunction(int mode)
   {
     if (mode == 0) return xtpol5;
     else return xtCheb5;
-  };
+  }
+  /**
+   * Get XT function.
+   */
   TF1* getXTFunction()
   {
     if (m_mode == 0) return xtpol5;
     else return xtCheb5;
   };
-  /*get histo*/
+  /**
+   * Get histogram.
+   */
   TProfile* getFittedHisto() {return m_h1;}
-  /*do fitting*/
+  /**
+   * Do fitting.
+   */
   void FitXT()
   {
     if (m_mode == 0) FitPol5();
     else FitChebyshev();
   }
+  /**
+   * Do fitting.
+   */
   void FitXT(int mode)
   {
     if (mode == 0) FitPol5();
@@ -164,12 +194,6 @@ private:
 
 void XT::FitPol5()
 {
-  /*
-  if(m_h1->GetEntries() <m_minRequiredEntry){
-    m_fitflag = -1;
-    return;
-  }
-  */
   double max_dif = 0.12;
   double max_dif2 = 0.05;
   double par[8];

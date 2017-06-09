@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Hiromichi Kichimi and Xiaolong Wang        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -136,6 +136,38 @@ namespace Belle2 {
                          TH1F& Hchi2, TH1F& Hndf, TH1F& HDeltaT);
 
     /**
+     * Method by iteration of chi2 minimization
+     * @param ntuple ntuple data
+     * @param scrodID SCROD ID
+     * @param scrodChannel channel number within SCROD (0 - 127)
+     * @param meanTimeDifference average time difference [samples]
+     * @param Hchi2 histogram to store normalized chi^2
+     * @param Hndf histogram to store degrees of freedom
+     * @param HDeltaT histogram to store fittet double pulse delay
+     * @return true on success
+     */
+
+    bool iterativeTBC(const std::vector<TwoTimes>& ntuple,
+                      unsigned scrodID, unsigned scrodChannel,
+                      double meanTimeDifference,
+                      TH1F& Hchi2, TH1F& Hndf, TH1F& HDeltaT);
+
+    /**
+     * Iteration function called by iterativeTBC()
+     * @param ntuple ntuple data
+     * @param xval TBC constants of 256 samples, time interval is the
+     *  difference of nearby xvals, xval[0]=0 and xval[256]=2*m_syncTimeBase
+     */
+    void Iteration(const std::vector<TwoTimes>& ntuple, std::vector<double>& xval);
+
+    /**
+     * Return the chisqure of one set of TBC constants (xval) in iTBC calculaton
+     * @param ntuple ntuple data
+     * @param xxval TBC constants of 256 samples, and xxval[0]=0, xxval[256]=2*FTSW
+     */
+    double Chisq(const std::vector<TwoTimes>& ntuple, std::vector<double>& xxval);
+
+    /**
      * Save vector to histogram and write it out
      * @param vec vector of bin values
      * @param name histogram name
@@ -180,11 +212,35 @@ namespace Belle2 {
     double m_minTimeDiff = 0;  /**< lower bound for time difference [samples] */
     double m_maxTimeDiff = 0;  /**< upper bound for time difference [samples] */
     unsigned m_minHits = 0;    /**< minimal required hits per channel */
+    unsigned m_numIterations = 100;    /**< Number of Iterations of iTBC */
     std::string m_directoryName; /**< directory name for the output root files */
     unsigned m_method = 0; /**< method to use */
 
     std::vector<TwoTimes> m_ntuples[c_NumChannels]; /**< channel wise data */
     double m_syncTimeBase = 0; /**< synchronization time (two ASIC windows) */
+
+    /**
+     * parameters for iTBC
+     *
+     */
+
+
+    int m_good = 0;   /**<   good events used for chisq cal. */
+
+    double m_dt_min = 20.0; /**<   minimum Delta T of raw calpulse */
+    double m_dt_max = 24.0; /**<   maximum Delta T of raw calpulse */
+    double m_dev_step = 0.001; /**< a step size to calculate the value of d(chisq)/dxval*/
+    double m_xstep = 0.020; /**<   unit for an interation of delta(X_s) */
+    double m_dchi2dxv = 0.0;/**< rms of 255 dchi2/dxval values */
+    double m_change_xstep = 0.015;/**< update m_xstep if m_dchi2dxv < m_change_step*/
+    double m_new_xstep = 2.0 * m_xstep; /** m_xstep = m_new_xstep if m_dchi2dxv < m_change_step*/
+    double m_min_binwidth = 0.05; /**<   minimum time interval of one sample */
+    double m_max_binwidth = 2.0; /**<   maximum time interval of one sample */
+    double m_dchi2_min = 0.2; /**< quit if chisq increase in iteratons is larger than this value. */
+    unsigned   m_conv_iter = 100; /**< Number of iteration with chisq changes less than deltamin. */
+    double m_deltamin = 0.01 * 0.01; /**< minumum chisq change in an iteration. */
+    double  m_DtSigma = 0.0424; /**< a reference resolution of sigma_0(dT)=42.4 ps from Run3524*/
+    double m_sigm2_exp = m_DtSigma * m_DtSigma;/**< (sigma_0(dT))**2 for nomarlization of chisq = sum{dT^2/sigma^2}*/
 
   };
 

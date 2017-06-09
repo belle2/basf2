@@ -185,7 +185,19 @@ def do_trainings(args):
     if not os.path.isfile('Summary.pickle'):
         return
     particles, configuration = pickle.load(open('Summary.pickle', 'rb'))
-    fei.do_trainings(particles, configuration)
+    weightfiles = fei.do_trainings(particles, configuration)
+    for i in range(args.nJobs):
+        for weightfile_on_disk, _ in weightfiles:
+            os.symlink(args.directory + '/collection/' + weightfile_on_disk,
+                       'jobs/{}/'.format(i) + weightfile_on_disk)
+    # Check if some xml files are missing
+    xmlfiles = glob.glob("*.xml")
+    for i in range(args.nJobs):
+        for xmlfile in xmlfiles:
+            if not os.path.isfile(args.directory + '/jobs/{}/'.format(i) + xmlfile):
+                print("Added missing symlink to ", xmlfile, " in job directory ", i)
+                os.symlink(args.directory + '/collection/' + xmlfile,
+                           args.directory + '/jobs/{}/'.format(i) + xmlfile)
     os.chdir(args.directory)
 
 

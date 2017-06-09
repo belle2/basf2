@@ -966,8 +966,9 @@ class TestTeacher(unittest.TestCase):
         x = fei.core.Teacher(particles, config)
         fei.core.Teacher.create_fake_weightfile('TEACHER')
         self.assertEqual(basf2_mva.available('UNITTEST_TEACHER'), False)
-        x.upload('TEACHER')
+        r = x.upload('TEACHER')
         self.assertEqual(basf2_mva.available('UNITTEST_TEACHER'), True)
+        self.assertEqual(r, ('TEACHER.xml', 'UNITTEST_TEACHER'))
 
     def test_without_monitoring(self):
         particles = get_small_unittest_channels()
@@ -1011,6 +1012,95 @@ class TestGetPath(unittest.TestCase):
     def tearDown(self):
         if os.path.isfile('mcParticlesCount.root'):
             os.remove('mcParticlesCount.root')
+        if os.path.isfile('Summary.pickle'):
+            os.remove('Summary.pickle')
+
+    def test_get_path_default_cache(self):
+        particles = fei.get_unittest_channels()
+        config = fei.config.FeiConfiguration(training=True)
+        x = fei.core.Teacher(particles, config)
+
+        # Should try to create mcParticlesCount
+        # -> Returns at stage 0
+        feistate = fei.core.get_path(particles, config)
+        self.assertEqual(feistate.stage, 0)
+
+        # Should try to create training data for FSPs
+        # -> Returns at stage 1
+        config = fei.config.FeiConfiguration(training=True)
+        feistate = fei.core.get_path(particles, config)
+        self.assertEqual(feistate.stage, 1)
+
+        # No weightfiles were created, hence the algorithm
+        # cannot go forward and tries to create the training data again
+        config = fei.config.FeiConfiguration(training=True)
+        feistate = fei.core.get_path(particles, config)
+        self.assertEqual(feistate.stage, 1)
+
+        # We create the FSP weightfiles by hand
+        fei.core.Teacher.create_fake_weightfile('pi+:generic ==> pi+:FSP')
+        fei.core.Teacher.create_fake_weightfile('K+:generic ==> K+:FSP')
+        fei.core.Teacher.create_fake_weightfile('mu+:generic ==> mu+:FSP')
+        fei.core.Teacher.create_fake_weightfile('gamma:generic ==> gamma:FSP')
+        fei.core.Teacher.create_fake_weightfile('gamma:generic ==> gamma:V0')
+
+        # Should try to create training data for pi0
+        # -> Returns at stage 2
+        config = fei.config.FeiConfiguration(training=True)
+        feistate = fei.core.get_path(particles, config)
+        self.assertEqual(feistate.stage, 2)
+
+        # No weightfiles were created, hence the algorithm
+        # cannot go forward and tries to create the training data again
+        config = fei.config.FeiConfiguration(training=True)
+        feistate = fei.core.get_path(particles, config)
+        self.assertEqual(feistate.stage, 2)
+
+        # We create the pi0 weightfile by hand
+        fei.core.Teacher.create_fake_weightfile('pi0:generic ==> gamma:generic gamma:generic')
+
+        # Should try to create training data for D0
+        # -> Returns stage 4 (stage 3 is skipped because it only contains K_S0)
+        config = fei.config.FeiConfiguration(training=True)
+        feistate = fei.core.get_path(particles, config)
+        self.assertEqual(feistate.stage, 4)
+
+        # We create the D0 weightfiles by hand
+        fei.core.Teacher.create_fake_weightfile('D0:generic ==> K-:generic pi+:generic')
+        fei.core.Teacher.create_fake_weightfile('D0:generic ==> K-:generic pi+:generic pi0:generic')
+        fei.core.Teacher.create_fake_weightfile('D0:generic ==> pi-:generic pi+:generic')
+        fei.core.Teacher.create_fake_weightfile('D0:semileptonic ==> K-:generic mu+:generic')
+        fei.core.Teacher.create_fake_weightfile('D0:semileptonic ==> K-:generic pi0:generic mu+:generic')
+
+        # Unittest channels do not contain anymore stages,
+        # -> Returns last stage + 1
+        config = fei.config.FeiConfiguration(training=True)
+        feistate = fei.core.get_path(particles, config)
+        self.assertEqual(feistate.stage, 7)
+
+        # If we start at 0, we should be get the whole path
+        # -> Returns last stage + 1
+        config = fei.config.FeiConfiguration(cache=0, training=True)
+        feistate = fei.core.get_path(particles, config)
+        self.assertEqual(feistate.stage, 7)
+
+        # If training is False we should get the whole path without
+        # checking if weightfiles exist.
+        os.remove('pi+:generic ==> pi+:FSP.xml')
+        os.remove('K+:generic ==> K+:FSP.xml')
+        os.remove('mu+:generic ==> mu+:FSP.xml')
+        os.remove('gamma:generic ==> gamma:FSP.xml')
+        os.remove('gamma:generic ==> gamma:V0.xml')
+        os.remove('pi0:generic ==> gamma:generic gamma:generic.xml')
+        os.remove('D0:generic ==> K-:generic pi+:generic.xml')
+        os.remove('D0:generic ==> K-:generic pi+:generic pi0:generic.xml')
+        os.remove('D0:generic ==> pi-:generic pi+:generic.xml')
+        os.remove('D0:semileptonic ==> K-:generic mu+:generic.xml')
+        os.remove('D0:semileptonic ==> K-:generic pi0:generic mu+:generic.xml')
+
+        config = fei.config.FeiConfiguration(cache=0, training=False)
+        feistate = fei.core.get_path(particles, config)
+        self.assertEqual(feistate.stage, 7)
 
     def test_get_path(self):
         particles = fei.get_unittest_channels()

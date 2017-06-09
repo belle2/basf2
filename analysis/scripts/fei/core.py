@@ -553,6 +553,7 @@ class Teacher(object):
         # Hence we upload our weightfile multiple times, to make sure that it is always found.
         # subprocess.call("basf2_mva_upload --identifier '{disk}' --db_identifier '{db}'".format(disk=disk, db=dbase), shell=True)
         basf2_mva.upload(disk, dbase)
+        return (disk, dbase)
 
     def do_all_trainings(self):
         """
@@ -613,11 +614,13 @@ class Teacher(object):
         p.close()
         p.join()
 
+        weightfiles = []
         for name, _ in job_list:
             if not basf2_mva.available(name + '.xml'):
                 B2WARNING("Training of MVC failed. For unknown reasons, check the logfile")
                 self.create_fake_weightfile(name)
-            self.upload(name)
+            weightfiles.append(self.upload(name))
+        return weightfiles
 
 
 def convert_legacy_training(particles: typing.Sequence[config.Particle], configuration: config.FeiConfiguration):
@@ -677,9 +680,10 @@ def do_trainings(particles: typing.Sequence[config.Particle], configuration: con
     or (more likely) is called by the distributed.py script after  merging the outputs of all jobs,
     @param particles list of config.Particle objects
     @param config config.FeiConfiguration object
+    @return list of tuple with weightfile on disk and identifier in database for all trained classifiers
     """
     teacher = Teacher(particles, configuration)
-    teacher.do_all_trainings()
+    return teacher.do_all_trainings()
 
 
 def save_summary(particles: typing.Sequence[config.Particle], configuration: config.FeiConfiguration, cache: int):

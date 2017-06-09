@@ -3,7 +3,7 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
+ * Contributors: Martin Heck, CDC group                                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,13 +14,15 @@ using namespace std;
 using namespace Belle2;
 
 CDCHit::CDCHit(unsigned short tdcCount, unsigned short charge,
-               unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, unsigned short tdcCount2ndHit, unsigned short status)
+               unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, unsigned short status, signed short otherHitIndex,
+               unsigned short leadingEdgeCharge)
 {
   setTDCCount(tdcCount);
   setADCCount(charge);
   setWireID(iSuperLayer, iLayer, iWire);
-  setTDCCount2ndHit(tdcCount2ndHit);
   setStatus(status);
+  setOtherHitIndex(otherHitIndex);
+  setADCCountAtLeadingEdge(leadingEdgeCharge);
 }
 
 

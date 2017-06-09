@@ -62,9 +62,18 @@ namespace Belle2 {
       }
 
       /**
+       * Set 2nd hit timing.
+       */
+      inline void setTDC2ndHit(int tdc)
+      {
+        m_length += 2;
+        m_tdc2 = tdc;
+        m_f2ndHit = true;
+      }
+      /**
        * Get the channel ID.
        */
-      inline int getChannel() const
+      inline unsigned short getChannel() const
       {
         return m_channel;
       }
@@ -72,42 +81,56 @@ namespace Belle2 {
       /**
        * Get the board ID.
        */
-      inline int getBoard() const
+      inline unsigned short getBoard() const
       {
         return m_board;
       }
 
+
       /**
-       * Get 1st word for this channel data.
+       * Get the TDC.
        */
-      inline int get1stWord() const
+      inline unsigned short getTDCCount() const
       {
-        return ((m_channel << 24) | (m_length << 16) | m_tot);
+        return m_tdc;
       }
 
       /**
-       * Get 2nd word for this channel data.
+       * Get the 2nd TDC.
        */
-      inline int get2ndWord() const
+      inline unsigned short getTDCCount2ndHit() const
       {
-        return ((m_adc << 16) | (m_tdc));
+        return m_tdc2;
       }
 
       /**
-       * Get 3rd word for this channel data.
+       * Get the ADC.
        */
-      inline int get3rdWord() const
+      inline unsigned short getADCCount() const
       {
-        return ((m_tdc2 << 16) | (0x0000));
+        return m_adc;
       }
 
       /**
        * Get the flag of 2nd hit.
        * true : 2 hit event, false : 1 hit event.
        */
-      inline bool getFlag2ndHit() const
+      inline bool is2ndHit() const
       {
         return m_f2ndHit;
+      }
+
+      /**
+       * Get data length.
+       */
+      inline unsigned short getDataLength() const
+      {
+        return m_length;
+      }
+
+      inline unsigned short getTOT() const
+      {
+        return m_tot;
       }
 
     private:
@@ -115,37 +138,37 @@ namespace Belle2 {
       /**
        * Board ID (0-300).
        */
-      int m_board;
+      unsigned short m_board;
 
       /**
        * Channel ID (0-47).
        */
-      int m_channel;
+      unsigned short m_channel;
 
       /**
        * Data length.
        */
-      int m_length;
+      unsigned short m_length;
 
       /**
        * Time over threshold.
        */
-      int m_tot;
+      unsigned short m_tot;
 
       /**
        * FADC count.
        */
-      int m_adc;
+      unsigned short m_adc;
 
       /**
        * TDC count.
        */
-      int m_tdc;
+      unsigned short m_tdc;
 
       /**
        * TDC count of 2nd hit.
        */
-      int m_tdc2;
+      unsigned short m_tdc2;
 
       /**
        * Flag for 2nd hit.

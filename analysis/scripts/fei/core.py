@@ -1,7 +1,41 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+#
 # Thomas Keck 2017
+#
+# The Full Event Interpretation Algorithm
+#
+# Some basic facts:
+#  - The algorithm will automatically reconstruct B mesons and calculate a signal probability for each candidate.
+#  - It can be used for hadronic and semileptonic tagging.
+#  - The algorithm has to be trained on MC, and can afterwards be applied on data.
+#  - The training requires O(100) million MC events
+#  - The weightfiles are stored in the Belle 2 Condition database
+#
+# Read this file if you want to understand the technical details of the FEI.
+#
+# The FEI follows a hierarchical approach.
+# There are 7 stages:
+#   (Stage -1: Write out information about the provided data sample)
+#   Stage 0: Final State Particles (FSP)
+#   Stage 1: pi0, J/Psi
+#   Stage 2: K_S0
+#   Stage 3: D mesons
+#   Stage 4: D* mesons
+#   Stage 5: B mesons
+#   Stage 6: Finish
+#
+# Most stages consists of:
+#   - Create Particle Candidates
+#   - Apply Cuts
+#   - Do vertex Fitting
+#   - Apply a multivariate classification method
+#   - Apply more Cuts
+#
+# The FEI will reconstruct these 7 stages during the training phase,
+# since the stages depend on one another, you have to run basf2 multiple (7) times on the same data
+# to train all the necssary multivariate classifiers.
+#
 
 # FEI defines own command line options, therefore we disable
 # the ROOT command line options, which otherwise interfere sometimes.
@@ -45,7 +79,13 @@ FeiState = collections.namedtuple('FeiState', 'path, stage, plists')
 
 class TrainingDataInformation(object):
     """
-    Contains the relevant information about the used training data
+    Contains the relevant information about the used training data.
+    Basically we write out the number of MC particles in the whole dataset.
+    This numbers we can use to calculate what fraction of candidates we have to write
+    out as TrainingData to get a reasonable amount of candidates to train on
+    (too few candidates will lead to heavy overtraining, to many won't fit into memory).
+    Secondly we can use this information for the generation of the monitoring pdfs,
+    where we calculate reconstruction efficiencies.
     """
     def __init__(self, particles: typing.Sequence[config.Particle]):
         """
@@ -106,7 +146,10 @@ class TrainingDataInformation(object):
 
 class FSPLoader(object):
     """
-    Steers the loading of FSP particles
+    Steers the loading of FSP particles.
+    This does NOT include RootInput, Geometry or anything required before loading FSPs,
+    the user has to add this himself (because it depends on the MC campaign and if you want
+    to use Belle 1 or Belle 2).
     """
     def __init__(self, particles: typing.Sequence[config.Particle], config: config.FeiConfiguration):
         """
@@ -147,6 +190,9 @@ class FSPLoader(object):
 class TrainingData(object):
     """
     Steers the creation of the training data.
+    The training data is used to train a multivariate classifier for each channel.
+    The training of the FEI at its core is just generating this training data for each channel.
+    After we created the training data for a stage, we have to train the classifiers (see Teacher class further down).
     """
     def __init__(self, particles: typing.Sequence[config.Particle], config: config.FeiConfiguration,
                  mc_counts: typing.Mapping[int, typing.Mapping[str, float]]):
@@ -213,11 +259,14 @@ class TrainingData(object):
 
 class PreReconstruction(object):
     """
-    Steers the reconstruction before the mva method of all particles in one stage.
-    Includes:
-        - Particle combination
+    Steers the reconstruction phase before the mva method was applied
+    It Includes:
+        - The ParticleCombination (for each particle and channel we create candidates using
+                                   the daughter candidates from the previous stages)
         - MC Matching
-        - Vertex Fitting
+        - Vertex Fitting (this is the slowest part of the whole FEI, KFit is used by default,
+                          but you can use fastFit as a drop-in replacement https://github.com/thomaskeck/FastFit/,
+                          this will speed up the whole FEI by a factor 2-3)
     """
     def __init__(self, particles: typing.Sequence[config.Particle], config: config.FeiConfiguration):
         """
@@ -314,11 +363,11 @@ class PreReconstruction(object):
 
 class PostReconstruction(object):
     """
-    Steers the reconstruction using the mva method and everything after it of all particles in one stage.
-    Includes:
-        - MVA
-        - Copy all particle lists in a common one
-        - Tag unique signal
+    Steers the reconstruction phase after the mva method was applied
+    It Includes:
+        - The application of the mva method itself.
+        - Copying all channel lists in a common one for each particle defined in particles
+        - Tag unique signal candidates, to avoid double counting of channels with overlap
     """
     def __init__(self, particles: typing.Sequence[config.Particle], config: config.FeiConfiguration):
         """
@@ -442,8 +491,12 @@ class PostReconstruction(object):
 
 class Teacher(object):
     """
-    Performs all necessary trainings for all training data files which are available but
-    without a weightfile.
+    Performs all necessary trainings for all training data files which are available but where there is no weightfile avaiable yet.
+    This class is usually used by the do_trainings function below, to perform the necessary trainings after each stage.
+    The trainings are run in parallel using multi-threading of python.
+    Each training is done by a subprocess call, the training command (passed by config.externTeacher) can be either
+      * basf2_mva_teacher, the training will be done directly on the machine
+      * externClustTeacher, the training will be submitted to the batch system of KEKCC
     """
     #: Maximum number of events per class,
     #: the sampling rates are chosen so that the training data does not exceed this number
@@ -569,11 +622,11 @@ class Teacher(object):
 
 def convert_legacy_training(particles: typing.Sequence[config.Particle], configuration: config.FeiConfiguration):
     """
-    Convert an old FEI training into the new format
+    Convert an old FEI training into the new format.
+    The old format used hashes for the weightfiles, the hashes can be converted to the new naming scheme
+    using the Summary.pickle file outputted by the FEIv3. This file must be passes by the parameter configuration.legacy.
     @param particles list of config.Particle objects
     @param config config.FeiConfiguration object
-    @param old_prefix old database prefix
-    @param summary_file contains the configuration of the revious FEI algorithm
     """
     summary = pickle.load(open(configuration.legacy, 'rb'))
     channel2lists = {k: v[2] for k, v in summary['channel2lists'].items()}
@@ -595,6 +648,9 @@ def convert_legacy_training(particles: typing.Sequence[config.Particle], configu
 
 def get_stages_from_particles(particles: typing.Sequence[config.Particle]):
     """
+    Returns the hierarchical structure of the FEI.
+    Each stage depends on the particles in the previous stage.
+    The final stage is empty (meaning everything is done, and the training is finished at this point).
     @param particles list of config.Particle objects
     """
     stages = [
@@ -616,17 +672,57 @@ def get_stages_from_particles(particles: typing.Sequence[config.Particle]):
 
 def do_trainings(particles: typing.Sequence[config.Particle], configuration: config.FeiConfiguration):
     """
+    Performs the training of mva classifiers for all available training data,
+    this function must be either called by the user after each stage of the FEI during training,
+    or (more likely) is called by the distributed.py script after  merging the outputs of all jobs,
     @param particles list of config.Particle objects
     @param config config.FeiConfiguration object
     """
-    # TODO Read particles and configuration from Summary.pickle!
-    # So user does not have to provide two steering files
     teacher = Teacher(particles, configuration)
     teacher.do_all_trainings()
 
 
+def save_summary(particles: typing.Sequence[config.Particle], configuration: config.FeiConfiguration, cache: int):
+    """
+    Creates the Summary.pickle, which is used to keep track of the stage during the training,
+    and can be used later to investigate which configuration was used exactly to create the training.
+    @param particles list of config.Particle objects
+    @param config config.FeiConfiguration object
+    @param cache current cache level
+    """
+    configuration = config.FeiConfiguration(configuration.prefix, cache, configuration.b2bii,
+                                            configuration.monitor, configuration.legacy, configuration.externTeacher,
+                                            configuration.training)
+    pickle.dump((particles, configuration), open('Summary.pickle', 'wb'))
+
+
 def get_path(particles: typing.Sequence[config.Particle], configuration: config.FeiConfiguration) -> FeiState:
     """
+    The most important function of the FEI.
+    This creates the FEI path for training/fitting (both terms are equal), and application/inference (both terms are equal).
+    The whole FEI is defined by the particles which are reconstructed (see default_channels.py)
+    and the configuration (see config.py).
+
+    TRAINING
+    For training this function is called multiple times, each time the FEI reconstructs one more stage in the hierarchical structure
+    i.e. we start with FSP, pi0, KS_0, D, D*, and with B mesons. You have to set configuration.training to True for training mode.
+    All weightfiles created during the training will be strored in your local database.
+    If you want to use the FEI training everywhere without copying this database by hand, you have to upload your local database
+    to the central database first (see documentation for the Belle2 Condition Database).
+
+    APPLICATION
+    For application you call this function once, and it returns the whole path which will reconstruct B mesons
+    with an associated signal probability. You have to set configuration.training to False for application mode.
+
+    MONITORING
+    You can always turn on the monitoring (configuration.monitor = True),
+    to write out ROOT Histograms of many quantities for each stage,
+    using these histograms you can use the printReporting.py or latexReporting.py scripts to automatically create pdf files.
+
+    LEGACY
+    This function can also use old FEI trainings (version 3), just pass the Summary.pickle file of the old training,
+    and the weightfiles will be automatically converted to the new nameing scheme.
+
     @param particles list of config.Particle objects
     @param config config.FeiConfiguration object
     """
@@ -639,38 +735,84 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     Please cite my PhD thesis
     """)
 
+    # The cache parameter of the configuration object is used during training to keep track,
+    # which reconstruction steps are already performed.
+    # For fitting/training we start by default with -1, meaning we still have to create the TrainingDataInformation,
+    # which is used to determine the number of candidates we have to write out for the FSP trainings in stage 0.
+    # For inference/application we start by default with 0, because we don't need the TrainingDataInformation in stage 0.
+    # During the training we save the particles and configuration (including the current cache stage) in the Summary.pickle object.
     if configuration.cache is None:
         if os.path.isfile('Summary.pickle'):
             print("Cache: Replaced particles and configuration with the ones from Summary.pickle!")
             particles, configuration = pickle.load(open('Summary.pickle', 'rb'))
-            configuration = config.FeiConfiguration(configuration.prefix, configuration.cache + 1, configuration.b2bii,
-                                                    configuration.monitor, configuration.legacy, configuration.externTeacher,
-                                                    configuration.training)
             cache = configuration.cache
         else:
-            cache = 0
+            if configuration.training:
+                cache = -1
+            else:
+                cache = 0
     else:
         cache = configuration.cache
 
+    # Now we start building the training or application path
     path = basf2.create_path()
+
+    # There are in total 7 stages.
+    # For training we start with -1 and go to 7 one stage at a time
+    # For application we can run tage 0 to 7 at once
     stages = get_stages_from_particles(particles)
 
+    # If the user provided a Summary.pickle file of a FEIv3 training we
+    # convert the old weightfiles (with hashes), to the new naming scheme.
+    # Afterwards the algorithm runs as usual
     if configuration.legacy is not None:
         convert_legacy_training(particles, configuration)
 
+    # During the training we require the number of MC particles in the whole processed
+    # data sample, because we don't want to write out billions of e.g. pion candidates.
+    # Knowing the total amount of MC particles we can write out only every e.g. 10th candidate
+    # That's why we have to write out the TrainingDataInformation before doing anything during the training phase.
+    # During application we only need this if we run in monitor mode, and want to write out a summary in the end,
+    # the summary contains efficiency, and the efficiency calculation requires the total number of MC particles.
     training_data_information = TrainingDataInformation(particles)
     if cache < 0 and configuration.training:
         print("Stage 0: Run over all files to count the number of events and McParticles")
         path.add_path(training_data_information.reconstruct())
+        if configuration.training:
+            save_summary(particles, configuration, 0)
         return FeiState(path, 0, [])
     elif not configuration.training and configuration.monitor:
         path.add_path(training_data_information.reconstruct())
 
+    # We load the Final State particles
+    # It is assumed that the user takes care of adding RootInput, Geometry, and everything
+    # which is required to read in data, so we directly start to load the FSP particles
+    # used by the FEI.
     loader = FSPLoader(particles, configuration)
     if cache < 1:
         print("Stage 0: Load FSP particles")
         path.add_path(loader.reconstruct())
 
+    # Now we reconstruct each stage one after another.
+    # Each stage consists of two parts:
+    # PreReconstruction (before the mva method was applied):
+    #   - Particle combination
+    #   - Do vertex fitting
+    #   - Some simple cuts and best candidate selection
+    # PostReconstruction (after the mva method was applied):
+    #   - Apply the mva method
+    #   - Apply cuts on the mva output and best candidate selection
+    #
+    # If the weightfiles for the PostReconstruction are not available for the current stage and we are in training mode,
+    # we have to create the training data. The training itself is done by the do_trainings function which is called
+    # either by the user after each step, or by the distributed.py script
+    #
+    # If the weightfiles for the PostReconstruction are not available for the current stage and we are not in training mode,
+    # we keep going, as soon as the user will call process on the produced path he will get an error message that the
+    # weightfiles are missing.
+    #
+    # Finally we keep track of the ParticleLists we use, so the user ca run the RemoveParticles module to reduce the size of the
+    # intermediate output of RootOutput.
     used_lists = []
     for stage, stage_particles in enumerate(stages):
         pre_reconstruction = PreReconstruction(stage_particles, configuration)
@@ -690,6 +832,8 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
             path.add_path(post_reconstruction.reconstruct())
         used_lists += [particle.identifier for particle in stage_particles]
 
+    # If we run in monitor mode we are insterested in the ModuleStatistics,
+    # these statistics contain the runtime for each module which was run.
     if configuration.monitor:
         output = register_module('RootOutput')
         output.param('outputFileName', 'Monitor_ModuleStatistics.root')
@@ -698,7 +842,10 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
         output.param('ignoreCommandLineOverride', True)
         path.add_module(output)
 
+    # As metioned above the FEI keeps track of the stages which are already reconstructed during the training
+    # so we write out the Summary.pickle here, and increase the stage by one.
     if configuration.training:
-        pickle.dump((particles, configuration), open('Summary.pickle', 'wb'))
+        save_summary(particles, configuration, stage+1)
 
+    # Finally we return the path, the stage and the used lists to the user.
     return FeiState(path, stage+1, plists=used_lists)

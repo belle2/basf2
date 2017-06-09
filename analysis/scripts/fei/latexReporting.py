@@ -1,5 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+#
+# Thomas Keck 2017
+#
+# Call this "python3 fei/latexReporting.py summary.tex"
+# in a directory containing the monitoring output of the FEI
+# It will create a latex document containing a summary and plots
+# and tries to compile this summary.tex into a PDF file summary.pdf
+#
+# You can improvide modify this script
+# E.g. If you want to add new plots:
+# Add your plot in the monitoring.py file
+# Add your plot below using b2latex.Graphics
+
 
 import ROOT
 from ROOT import Belle2

@@ -1,5 +1,34 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+#
+# Thomas Keck 2017
+#
+# This script can be used to train the FEI on a cluster like available at KEKCC
+# All you need is a basf2 steering file (see analysis/examples/FEI/ ) and some MC O(100) million
+# The script will automatically create some directories
+#  - collection containing weightfiles, monitoring files and other stuff
+#  - jobs containing temporary files during the training (can be deleted afterwards)
+#
+# The distributed script automatically spawns jobs on the cluster (or local machine),
+# and runs the steering file on the provided MC.
+# Since a FEI training requires multiple runs over the same MC, it does so multiple times.
+# The output of a run is passed as input to the next run (so your script has to use RootInput and RootOutput).
+#
+# In between it calls the do_trainings function of the FEI, to train the mutlivariate classifiers of the FEI
+# at each stage.
+#
+# At the end it produces summary outputs using printReporting.py and latexReporting.py
+# (this will only work of you use the monitoring mode)
+# And a summary file for each mva training using basf2_mva_evaluate
+#
+# If your training fails for some reason (e.g. a job fails on the cluster),
+# the FEI will stop, you can fix the problem and resume the training using the -x option.
+# This requires some expert knowledge, because you have to know howto fix the occured problem
+# and at which step you have to resume the training.
+#
+# After the training the weightfiles will be stored in the localdb in the collection directory
+# You have to upload these local database to the Belle 2 Condition Database if you want to use the FEI everywhere.
+# Alternatively you can just copy the localdb to somehwere and use it directly.
 
 import shutil
 import subprocess
@@ -39,11 +68,16 @@ def getCommandLineOptions():
 
 
 def get_job_script(args, i):
+    """
+    Create a bash file which will be dispatched to the batch system.
+    The file will run basf2 on the provided MC or the previous output
+    using the provided steering file.
+    """
     job_script = """
-        if [ -f "{d}/basf2_input.root" ]; then
-          INPUT="{d}/basf2_input.root"
+        if [ -f "{d}/jobs/{i}/basf2_input.root" ]; then
+          INPUT="{d}/jobs/{i}/basf2_input.root"
         else
-          INPUT="{d}/input_*.root"
+          INPUT="{d}/jobs/{i}/input_*.root"
         fi
         time basf2 -l error {d}/collection/basf2_steering_file.py -i "$INPUT" -o {d}/jobs/{i}/basf2_output.root {pipes}
         touch basf2_finished_successfully
@@ -52,6 +86,10 @@ def get_job_script(args, i):
 
 
 def setup(args):
+    """
+    Setup all directories, create job_scripts, split up MC into chunks
+    which are processed by each job. Create symlinks for databases.
+    """
     os.chdir(args.directory)
     # Search and partition data files into even chunks
     data_files = []
@@ -75,15 +113,13 @@ def setup(args):
     if args.large_dir:
         os.mkdir(args.large_dir)
 
+    shutil.copyfile(args.steering, 'collection/basf2_steering_file.py')
+
     for i in range(args.nJobs):
         # Create job directory
         os.mkdir('jobs/{}'.format(i))
-        # Create job script
-        with open('jobs/{}/basf2_steering_file.py'.format(i), 'w') as f:
-            f.write(get_steering_file(args, i))
-            os.chmod(f.fileno(), stat.S_IXUSR | stat.S_IRUSR)
         with open('jobs/{}/basf2_script.sh'.format(i), 'w') as f:
-            f.write(get_job_script())
+            f.write(get_job_script(args, i))
             os.chmod(f.fileno(), stat.S_IXUSR | stat.S_IRUSR)
         # Symlink initial input data files
         for j, data_input in enumerate(data_chunks[i]):
@@ -94,6 +130,15 @@ def setup(args):
 
 
 def create_report(args):
+    """
+    Create all the reports for the FEI training and the individual mva trainings.
+    This will onyl work if
+      1) Monitoring mode is used (see FeiConfiguration)
+      2) Latex works on your system
+      3) The system has enough memory to hold the training data for the mva classifiers
+    If this fails you can also copy the collection directory somewhere and
+    execute the commands by hand.
+    """
     os.chdir(args.directory + '/collection')
     ret = subprocess.call('basf2 fei/printReporting.py > ../summary.txt', shell=True)
     ret = subprocess.call('basf2 fei/latexReporting.py ../summary.tex', shell=True)
@@ -106,6 +151,14 @@ def create_report(args):
 
 
 def submit_job(args, i):
+    """
+    Submits a job to the desired batch system.
+    Currently we can run on KEKCC (long queue), KEKCC (dedicated FEI queue),
+    EKP @ KIT, or your local machine
+    """
+    # Synchronize summaries
+    if os.path.isfile(args.directory + '/collection/Summary.pickle'):
+        shutil.copyfile(args.directory + '/collection/Summary.pickle', args.directory + '/jobs/{}/Summary.pickle'.format(i))
     os.chdir(args.directory + '/jobs/{}/'.format(i))
     if args.site == 'kekcc':
         ret = subprocess.call("bsub -q l -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
@@ -123,13 +176,24 @@ def submit_job(args, i):
 
 
 def do_trainings(args):
+    """
+    Trains the multivariate classifiers for all available training data in
+    the collection directory, which wasn't trained yet.
+    This is called once per iteration
+    """
     os.chdir(args.directory + '/collection')
+    if not os.path.isfile('Summary.pickle'):
+        return
     particles, configuration = pickle.load(open('Summary.pickle', 'rb'))
     fei.do_trainings(particles, configuration)
     os.chdir(args.directory)
 
 
 def jobs_finished(args):
+    """
+    Check if all jobs already finished.
+    Throws a runtime error of it detects an error in one of the jobs
+    """
     finished = glob.glob(args.directory + '/jobs/*/basf2_finished_successfully')
     failed = glob.glob(args.directory + '/jobs/*/basf2_job_error')
 
@@ -140,6 +204,13 @@ def jobs_finished(args):
 
 
 def merge_root_files(args):
+    """
+    Merges all produced ROOT files of all jobs together
+    and puts the merged ROOT files into the collection directory.
+    This affects mostly
+      - the training data for the multivariate classifiers
+      - the monitoring files
+    """
     rootfiles = []
     for f in glob.glob(args.directory + '/jobs/0/*.root'):
         f = os.path.basename(f)
@@ -163,6 +234,12 @@ def merge_root_files(args):
 
 
 def update_input_files(args):
+    """
+    Updates the input files.
+    For the first iteration the input files are the MC provided by the user.
+    After each training this function replaces the input with the output of the previous iteration.
+    Effectively this caches the whole DataStore of basf2 between the iterations.
+    """
     for i in range(args.nJobs):
         output_file = args.directory + '/jobs/' + str(i) + '/basf2_output.root'
         input_file = args.directory + '/jobs/' + str(i) + '/basf2_input.root'
@@ -174,10 +251,16 @@ def update_input_files(args):
             os.symlink(real_input_file, input_file)
         else:
             shutil.move(output_file, input_file)
-    shutil.copyfile(args.directory + '/jobs/1/Summary.pickle', args.directory + '/collection/Summary.pickle')
+    # Saves the Summary.pickle of the first job to the collection directory
+    # so we can keep track at which stage of the reconstruction the FEI is currently.
+    shutil.copyfile(args.directory + '/jobs/0/Summary.pickle', args.directory + '/collection/Summary.pickle')
 
 
 def clean_job_directory(args):
+    """
+    Cleans the job directory for the next iteration
+    Meaning we remove all logs
+    """
     files = glob.glob(args.directory + '/jobs/*/basf2_finished_successfully')
     files += glob.glob(args.directory + '/jobs/*/error.log')
     files += glob.glob(args.directory + '/jobs/*/output.log')
@@ -186,6 +269,10 @@ def clean_job_directory(args):
 
 
 def is_still_training(args):
+    """
+    Checks if the FEI training is still ongoing.
+    The training is finished if the FEI reached stage 7
+    """
     os.chdir(args.directory + '/collection')
     if not os.path.isfile('Summary.pickle'):
         return True
@@ -199,9 +286,9 @@ if __name__ == '__main__':
 
     os.chdir(args.directory)
 
-    print("Copy steering file into collection directory")
-    shutil.copyfile(args.steering, 'collection/basf2_steering_file.py')
-
+    # If the user wants resume an existing training
+    # we check at which step he wants to resume and
+    # try to perform the necessary steps to do so
     if args.skip:
         print('Skipping setup')
         start = 0
@@ -222,9 +309,13 @@ if __name__ == '__main__':
         else:
             raise RuntimeError('Unkown skip parameter {}'.format(args.skip))
 
+        # The user wants to submit the jobs again
         if start >= 5:
             print('Submitting jobs')
             for i in range(args.nJobs):
+                # The user wants to resubmit jobs, this means the training of some jobs failed
+                # We check which jobs contained an error flag, and where not successful
+                # These jobs are submitted again, other jobs are skipped (continue)
                 if start >= 6:
                     error_file = args.directory + '/jobs/{}/basf2_job_error'.format(i)
                     success_file = args.directory + '/jobs/{}/basf2_finished_successfully'.format(i)
@@ -257,9 +348,19 @@ if __name__ == '__main__':
             clean_job_directory(args)
 
     else:
+        # This is a new training
+        # So we have to setup the whole directory (this will override any existing training)
         setup(args)
 
-    while is_still_training():
+    # The main loop, which steers the whole FEI traiing on a batch system
+    # 1. We check if the FEI still requires further steps
+    # 2. We do all necessary trainings which we can perform at this point in time
+    # 3. We submit new jobs whihc will use the new trainings to reconstruct the hierarchy further
+    # 4. We wait until all jobs finished
+    # 5. We merge the output of the jobs
+    # 6. We update the inputs of the jobs (input of next stage is the output of the current stage)
+    # 7. We clean the job directories so they can be used during the enxt stage again.
+    while is_still_training(args):
         print('Do available trainings')
         do_trainings(args)
 
@@ -284,4 +385,6 @@ if __name__ == '__main__':
         if args.once:
             break
     else:
+        # This else will be called if the loop was not existed by break
+        # This means the training finished and we can create our summary reports.
         create_report(args)

@@ -8,51 +8,53 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECL_CANVAS_1D
-#define ECL_CANVAS_1D
+#ifndef ECL_PAINTER_COMMON
+#define ECL_PAINTER_COMMON
 
 #include <ecl/modules/eclDisplay/EclPainter.h>
 #include <TH1.h>
 
+// TODO: Dynamic bin count for AMP_SUM
+
 namespace Belle2 {
   /**
-   * Painter for EclData, 1D histograms.
+   * Painter for EclData that shows common event characteristics on
+   * 1D histograms.
    */
-  class EclPainter1D : public EclPainter {
+  class EclPainterCommon : public EclPainter {
   public:
     /**  Subtype of histogram to draw. */
     enum Type {
-      CHANNEL, /**< Events/energy per channel */
-      SHAPER, /**< Events/energy per ShaperDSP */
-      CRATE /**< Events/energy per crate/ECLCollector */
+      AMP, /**< Amplitude per channel distribution. */
+      AMP_SUM, /**< Amplitude per event distribution. */
+      TIME /**< Time distribution. */
     };
 
     /**
      * Constructor for EclPainter subclass.
      */
-    EclPainter1D(EclData* data, Type type);
+    EclPainterCommon(EclData* data, Type type);
     /**
      * Destructor for EclPainter subclass.
      */
-    virtual ~EclPainter1D();
+    virtual ~EclPainterCommon();
 
   private:
     /**  Display subtypes of this class. */
     Type m_type;
-    /**  Displayed histogram. */
+    /**  Histogram for amplitude distribution. */
     TH1F* m_hist;
 
-    /**  ID of currently selected shaper. */
-    int m_shaper;
-    /**  ID of currently selected crate. */
-    int m_crate;
-
     /**
-     * Convert channel id to X bin number.
+     * Return number of X bins.
      */
-    int channelToSegId(int channel);
+    int getBinCount();
     /**
-     * Returns number of X bins.
+     * Return m_x_min.
+     */
+    int getMinX();
+    /**
+     * Return m_x_max.
      */
     int getMaxX();
     /**
@@ -66,6 +68,11 @@ namespace Belle2 {
 
   public:
     /**
+     * Return subtype of ECLPainterCommon.
+     */
+    Type getType();
+
+    /**
      * Sets the information to be displayed in the provided
      * MultilineWidget
      * @param px X coordinate of mouse cursor.
@@ -74,38 +81,10 @@ namespace Belle2 {
     virtual void getInformation(int px, int py, MultilineWidget* panel);
 
     /**
-     * Return subtype of ECLPainter1D.
-     */
-    Type getType();
-
-    /**
-     * Creates sub-histogram for crates and shapers. This function is
-     * called upon click in EclFrame.
-     */
-    virtual EclPainter* handleClick(int px, int py);
-
-    /**
-     * Set XRange for histogram.
-     */
-    void setXRange(int xmin, int xmax);
-
-    /**
-     * Show data only from specific shaper.
-     * Show data for all shapers if on of the arguments is negative.
-     */
-    void setShaper(int crate, int shaper);
-
-    /**
-     * Show data only from specific crate.
-     * Show data for all crates if param 'crate' < 0.
-     */
-    void setCrate(int crate);
-
-    /**
      * Redraw the canvas.
      */
     void Draw();
   };
 }
 
-#endif // ECL_CANVAS_1D
+#endif // ECL_PAINTER_COMMON

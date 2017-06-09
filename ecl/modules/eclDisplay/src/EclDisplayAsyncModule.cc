@@ -8,17 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#include <ecl/modules/eclDisplay/geometry.h>
+#include <ecl/modules/eclDisplay/EclDisplayAsyncModule.h>
 
-using namespace Belle2::ECLDisplayUtility;
+using namespace Belle2;
 
-int do_energy_count = 1;
-
-void Belle2::ECLDisplayUtility::SetMode(int i)
-{
-  do_energy_count = i;
-}
-int Belle2::ECLDisplayUtility::GetMode()
-{
-  return do_energy_count;
-}
+REG_MODULE(EclDisplayAsync)

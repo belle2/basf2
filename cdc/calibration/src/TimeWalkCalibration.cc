@@ -72,10 +72,9 @@ void TimeWalkCalibration::CreateHisto()
 
   //read data
   B2INFO("Number of entry: " << tree->GetEntries());
-  double xmax;
   for (int i = 0; i < tree->GetEntries(); ++i) {
     tree->GetEntry(i);
-    xmax = halfCSize[lay] - 0.1;
+    double xmax = halfCSize[lay] - 0.1;
     if ((fabs(x) < m_xmin) || (fabs(x) > xmax)
         || (ndf < m_ndfmin)
         || (Pval < m_Pvalmin)) continue; /*select good region*/
@@ -141,12 +140,11 @@ void TimeWalkCalibration::Write()
   //for database
   B2INFO("update time walk params");
   if (m_useDB) {
-    DBObjPtr<CDCTimeWalks>* oldDB = new DBObjPtr<CDCTimeWalks>;
+    DBObjPtr<CDCTimeWalks> oldDB;
     DBImportObjPtr<CDCTimeWalks> tw;
-    double tw_old;
     tw.construct();
     for (int ib = 0; ib < 300; ++ib) {
-      tw_old = (*oldDB)->getTimeWalkParam(ib);
+      double tw_old = oldDB->getTimeWalkParam(ib);
       tw->setTimeWalkParam(ib, tw_old + m_tw[ib]);
     }
     IntervalOfValidity iov(m_firstExperiment, m_firstRun,

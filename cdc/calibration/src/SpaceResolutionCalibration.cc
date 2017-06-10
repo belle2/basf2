@@ -291,13 +291,12 @@ void SpaceResolutionCalibration::Fit()
           func->SetParLimits(5, -40, 0.);
           func->SetParLimits(6, intp6 - 0.5, intp6 + 0.2);
           B2DEBUG(199, "FITTING] layer: " << i << "lr: " << lr << " ial" << al << " ith:" << th);
-          double stat = 0;
-          int fitstatus = 0;
           if (gfit[i][lr][al][th]) { /*if graph exist, do fitting*/
+            int fitstatus = 0;
             for (int j = 0; j < 10; j++) {
               B2DEBUG(199, "loop: " << j);
               B2DEBUG(199, "Int p6: " << intp6);
-              stat = gfit[i][lr][al][th]->Fit("func", "M E Q", "", 0.05, upFit);
+              double stat = gfit[i][lr][al][th]->Fit("func", "M E Q", "", 0.05, upFit);
               B2DEBUG(199, "stat of fit" << stat);
               //      stat=gfit[i]->Fit(Form("ffit[%d]",i),"M "+Q,"",0.0,cellsize(i)+0.05+j*0.005);
               if (stat != 0) {

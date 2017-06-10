@@ -18,7 +18,7 @@ import sys
 from basf2 import *
 from ROOT import Belle2
 
-release = sys.argv.argv[1]
+release = sys.argv[1]
 
 # roi = {noROI, vxdtf1, vxdtf2}
 # bkg = {noBkg, stdBKG, std2GBKG}

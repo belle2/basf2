@@ -5,7 +5,7 @@
 #include <cdc/dataobjects/WireID.h>
 #include <TProfile.h>
 
-#include <TH1D.h>
+#include <TH1F.h>
 #include <TGraphErrors.h>
 #include <TF1.h>
 #include <TFile.h>
@@ -42,6 +42,8 @@ T0Correction::T0Correction():
 
 void T0Correction::CreateHisto()
 {
+
+  B2INFO("CreateHisto");
   //  double x_u;
   double x;
   double t_mea;
@@ -55,8 +57,7 @@ void T0Correction::CreateHisto()
 
   //  auto& tree = getObject<TTree>("cdcCalib");
   TChain* tree = new TChain("tree");
-  tree->Add(m_InputRootFileName.c_str());
-
+  tree->Add(m_inputRootFileName.c_str());
   tree->SetBranchAddress("lay", &lay);
   tree->SetBranchAddress("IWire", &IWire);
   tree->SetBranchAddress("x_u", &x);
@@ -73,26 +74,29 @@ void T0Correction::CreateHisto()
     halfCSize[i] = M_PI * R / nW;
   }
 
+  m_hTotal = new TH1F("hTotal", "hTotal", 30, -15, 15);
   //for each channel
   for (int il = 0; il < 56; il++) {
     int nW = cdcgeo.nWiresInLayer(il);
     for (int ic = 0; ic < nW; ++ic) {
-      m_h1[il][ic] = new TH1D(Form("h1%d@%d", il, ic), Form("L%d_cell%d", il, ic), 30, -15, 15);
+      m_h1[il][ic] = new TH1F(Form("h1%d@%d", il, ic), Form("L%d_cell%d", il, ic), 30, -15, 15);
     }
   }
   //for each board
   for (int ib = 0; ib < 300; ++ib) {
-    m_hT0b[ib] = new TH1D(Form("hT0b%d", ib), Form("boardID_%d", ib), 100, -20, 20);
+    m_hT0b[ib] = new TH1F(Form("hT0b%d", ib), Form("boardID_%d", ib), 100, -20, 20);
   }
   //read data
-  B2INFO("number of entry: " << tree->GetEntries());
-  for (int i = 0; i < tree->GetEntries(); ++i) {
+  const int nEntries = tree->GetEntries();
+  B2INFO("Number of entries: " << nEntries);
+  for (int i = 0; i < nEntries; ++i) {
     tree->GetEntry(i);
     double xmax = halfCSize[lay] - 0.1;
     if ((fabs(x) < m_xmin) || (fabs(x) > xmax)
         || (ndf < m_ndfmin)
         || (Pval < m_Pvalmin)) continue; /*select good region*/
     //each channel
+    m_hTotal->Fill(t_mea - t_fit);
     m_h1[lay][IWire]->Fill(t_mea - t_fit);
     //each board
     m_hT0b[cdcgeo.getBoardID(WireID(lay, IWire))]->Fill(t_mea - t_fit);
@@ -102,13 +106,10 @@ void T0Correction::CreateHisto()
 
 bool T0Correction::calibrate()
 {
+  B2INFO("Start calibration");
   CreateHisto();
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
-  //  int slay,clay;
-  //int nn;
-  double par[3];
-  //  TH1* g1;
-  //for each board
+
   TF1* g1;
   vector<double> b, db, Sb, dSb;
   vector<double> c[56];
@@ -116,8 +117,18 @@ bool T0Correction::calibrate()
   vector<double> s[56];
   vector<double> ds[56];
 
+  B2INFO("Gaus fitting for whole channel");
+  double parTotal[3];
+  m_hTotal->SetDirectory(0);
+  m_hTotal->Fit("gaus", "Q", "", -15, 15);
+  g1 = (TF1*)m_hTotal->GetFunction("gaus");
+  g1->GetParameters(parTotal);
+
+  B2INFO("Gaus fitting for each board");
   for (int ib = 1; ib < 300; ++ib) {
-    if (m_hT0b[ib]->GetEntries() < 10) continue;
+    const int n = m_hT0b[ib]->GetEntries();
+    if (n < 10) continue;
+    double par[3] = {static_cast<double>(n), parTotal[1], parTotal[2]};
     m_hT0b[ib]->SetDirectory(0);
     m_hT0b[ib]->Fit("gaus", "Q", "", -15, 15);
     g1 = (TF1*)m_hT0b[ib]->GetFunction("gaus");
@@ -130,9 +141,13 @@ bool T0Correction::calibrate()
     dtb[ib] = par[1];
     err_dtb[ib] = g1->GetParError(1);
   }
+  B2INFO("Gaus fitting for each cell");
   for (int ilay = 0; ilay < 56; ++ilay) {
     for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
-      if (m_h1[ilay][iwire]->GetEntries() < 10) continue;
+      const int n = m_h1[ilay][iwire]->GetEntries();
+      B2INFO("layer " << ilay << " wire " << iwire << " entries " << n);
+      if (n < 100) continue;
+      double par[3] = {static_cast<double>(n), parTotal[1], parTotal[2]};
       m_h1[ilay][iwire]->SetDirectory(0);
       m_h1[ilay][iwire]->Fit("gaus", "Q", "", -15, 15);
       g1 = (TF1*)m_h1[ilay][iwire]->GetFunction("gaus");
@@ -147,13 +162,24 @@ bool T0Correction::calibrate()
       err_dt[ilay][iwire] = g1->GetParError(1);
     }
   }
+
+  B2INFO("Store histo");
   if (m_storeHisto) {
     TFile* fout = new TFile("Correct_T0.root", "RECREATE");
     fout->cd();
     TGraphErrors* gr[56];
     TDirectory* top = gDirectory;
+    m_hTotal->Write();
+
+    for (int ilay = 0; ilay < 56; ++ilay) {
+      for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
+        m_h1[ilay][iwire]->Write();
+      }
+    }
+
     TDirectory* corrT0 = gDirectory->mkdir("DeltaT0");
     corrT0->cd();
+
 
     TGraphErrors* grb = new TGraphErrors(b.size(), &b.at(0), &Sb.at(0), &db.at(0), &dSb.at(0));
     grb->SetMarkerColor(2);
@@ -188,20 +214,21 @@ bool T0Correction::calibrate()
     }
     fout->Close();
   }
+  B2INFO("Write constants");
   Write();
   return true;
 }
 void T0Correction::Write()
 {
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
-  ofstream ofs(m_OutputT0FileName.c_str());
+  ofstream ofs(m_outputT0FileName.c_str());
   DBImportObjPtr<CDCTimeZeros> tz;
   tz.construct();
 
   double T0;
-  TH1D* T0B[300];
+  TH1F* T0B[300];
   for (int ib = 0; ib < 300; ++ib) {
-    T0B[ib] = new TH1D(Form("T0B%d", ib), Form("boardID_%d", ib), 9000, 0, 9000);
+    T0B[ib] = new TH1F(Form("T0B%d", ib), Form("boardID_%d", ib), 9000, 0, 9000);
   }
   //for calculate T0 mean of each board
   for (int ilay = 0; ilay < 56; ++ilay) {
@@ -217,7 +244,7 @@ void T0Correction::Write()
     for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
       WireID wireid(ilay, iwire);
       int bID = cdcgeo.getBoardID(wireid);
-      if (abs(err_dt[ilay][iwire]) > 2) {
+      if (abs(err_dt[ilay][iwire]) > 2 || abs(dt[ilay][iwire]) > 100.0) {
         T0 = T0B[bID]->GetMean();
         dt[ilay][iwire] = dtb[bID];
       } else {

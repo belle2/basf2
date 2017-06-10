@@ -134,17 +134,37 @@ TrgEclDigitizer::getTCHit(int TableFlag)
       float aveT     = aECLHit->getTimeAve(); // ns :time from  IP  to PD
       if (aveT < - TimeRange || aveT > TimeRange) {continue;} //Choose - TimeRange ~ TimeTange
       int  TimeIndex = (int)((aveT + TimeRange) / 100); //Binning : -4000 = 1st bin ~  4000 80th bin.
-      E_cell[hitCellId][TimeIndex]  = E_cell[hitCellId][TimeIndex] + hitE;
-      T_ave[hitCellId][TimeIndex]   = T_ave[hitCellId][TimeIndex] + hitE * aveT;
-      beambkg_tag[hitCellId][TimeIndex] = beambkg ;
+
+      int iTCIdm = _TCMap->getTCIdFromXtalId(hitCellId + 1) - 1;
+      TCEnergy[iTCIdm][TimeIndex] += hitE;
+      TCTiming[iTCIdm][TimeIndex] += hitE * aveT;
+      if (beambkg > 0) {TCBkgContribution[iTCIdm][TimeIndex] += hitE  ;}
+      else if (beambkg == 0) {TCSigContribution[iTCIdm][TimeIndex] += hitE;}
+
     }
-    for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
+    for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
       for (int  iTime = 0; iTime < nBinTime; iTime++) {
-        if (E_cell[iECLCell][iTime] > 0) {
-          T_ave[iECLCell][iTime]   = T_ave[iECLCell][iTime] / E_cell[iECLCell][iTime];
+        if (TCEnergy[iTCIdm][iTime] < 1e-9) {continue;}// 0.01MeV cut
+        double maxbkgE = 0;
+        int maxbkgtag = 0;
+        TCTiming[iTCIdm][iTime] /= TCEnergy[iTCIdm][iTime];
+        if (_BeambkgTag == 1) {
+          if (TCBkgContribution[iTCIdm][iTime] < TCSigContribution[iTCIdm][iTime]) {
+            TCBeambkgTag[iTCIdm][iTime] = 0; //signal Tag : 0
+          } else {
+            for (int iXtalIdm = 0; iXtalIdm < 8736; iXtalIdm++) {
+              int iTCId = _TCMap->getTCIdFromXtalId(iXtalIdm + 1) - 1;
+              if (iTCIdm != iTCId) {continue;}
+              if (maxbkgE < E_cell[iXtalIdm][iTime]) {
+                maxbkgE = E_cell[iXtalIdm][iTime];
+                maxbkgtag =  beambkg_tag[iXtalIdm][iTime];
+              }
+            }
+            TCBeambkgTag[iTCIdm][iTime] = maxbkgtag;
+          }
         }
       }
-    }//Get Energy weighted timing of each TC.
+    }
   }
 
 
@@ -199,45 +219,45 @@ TrgEclDigitizer::getTCHit(int TableFlag)
     //
     //
 
+    for (int iXtalIdm = 0; iXtalIdm < 8736; iXtalIdm++) {
+      int iTCIdm = _TCMap->getTCIdFromXtalId(iXtalIdm + 1) - 1;
+      for (int  iTime = 0; iTime < nBinTime; iTime++) {
+        if (E_cell[iXtalIdm][iTime] < 1e-9) {continue;}  // 0.01MeV cut
+        TCEnergy[iTCIdm][iTime] += E_cell[iXtalIdm][iTime];
+        TCTiming[iTCIdm][iTime] += E_cell[iXtalIdm][iTime] * (T_ave[iXtalIdm][iTime]);
+        if (beambkg_tag[iXtalIdm][iTime] > 0) {TCBkgContribution[iTCIdm][iTime] += E_cell[iXtalIdm][iTime];}
+        if (beambkg_tag[iXtalIdm][iTime] == 0) {TCSigContribution[iTCIdm][iTime] += E_cell[iXtalIdm][iTime];}
 
-  }
-
-  for (int iXtalIdm = 0; iXtalIdm < 8736; iXtalIdm++) {
-    int iTCIdm = _TCMap->getTCIdFromXtalId(iXtalIdm + 1) - 1;
-    for (int  iTime = 0; iTime < nBinTime; iTime++) {
-      if (E_cell[iXtalIdm][iTime] < 1e-9) {continue;}  // 0.01MeV cut
-      TCEnergy[iTCIdm][iTime] += E_cell[iXtalIdm][iTime];
-      TCTiming[iTCIdm][iTime] += E_cell[iXtalIdm][iTime] * (T_ave[iXtalIdm][iTime]);
-      if (beambkg_tag[iXtalIdm][iTime] > 0) {TCBkgContribution[iTCIdm][iTime] += E_cell[iXtalIdm][iTime];}
-      if (beambkg_tag[iXtalIdm][iTime] == 0) {TCSigContribution[iTCIdm][iTime] += E_cell[iXtalIdm][iTime];}
-
-    }
-  }
-
-  for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
-    for (int  iTime = 0; iTime < nBinTime; iTime++) {
-      double maxbkgE = 0;
-      int maxbkgtag = 0;
-      if (TCEnergy[iTCIdm][iTime] < 1e-9) {continue;}  // 0.01MeV cut
-      TCTiming[iTCIdm][iTime] /= TCEnergy[iTCIdm][iTime];
-      if (_BeambkgTag == 1) {
-        if (TCBkgContribution[iTCIdm][iTime] < TCSigContribution[iTCIdm][iTime]) {
-          TCBeambkgTag[iTCIdm][iTime] = 0; //signal Tag : 0
-        } else {
-          for (int iXtalIdm = 0; iXtalIdm < 8736; iXtalIdm++) {
-            int iTCId = _TCMap->getTCIdFromXtalId(iXtalIdm + 1) - 1;
-            if (iTCIdm != iTCId) {continue;}
-            if (maxbkgE < E_cell[iXtalIdm][iTime]) {
-              maxbkgE = E_cell[iXtalIdm][iTime];
-              maxbkgtag =  beambkg_tag[iXtalIdm][iTime];
-            }
-          }
-          TCBeambkgTag[iTCIdm][iTime] = maxbkgtag;
-        }
       }
     }
+    for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+      for (int  iTime = 0; iTime < nBinTime; iTime++) {
+        double maxbkgE = 0;
+        int maxbkgtag = 0;
+        if (TCEnergy[iTCIdm][iTime] < 1e-9) {continue;}  // 0.01MeV cut
+        TCTiming[iTCIdm][iTime] /= TCEnergy[iTCIdm][iTime];
+        if (_BeambkgTag == 1) {
+          if (TCBkgContribution[iTCIdm][iTime] < TCSigContribution[iTCIdm][iTime]) {
+            TCBeambkgTag[iTCIdm][iTime] = 0; //signal Tag : 0
+          } else {
+            for (int iXtalIdm = 0; iXtalIdm < 8736; iXtalIdm++) {
+              int iTCId = _TCMap->getTCIdFromXtalId(iXtalIdm + 1) - 1;
+              if (iTCIdm != iTCId) {continue;}
+              if (maxbkgE < E_cell[iXtalIdm][iTime]) {
+                maxbkgE = E_cell[iXtalIdm][iTime];
+                maxbkgtag =  beambkg_tag[iXtalIdm][iTime];
+              }
+            }
+            TCBeambkgTag[iTCIdm][iTime] = maxbkgtag;
+          }
+        }
+      }
+
+    }
 
   }
+
+
 
   //--------------------------
   // TC energy and timing in t=0-1us as true values.
@@ -294,15 +314,15 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE, std::
         double inputTiming
           = (-TCTiming[iTCIdm][iTimeBin] - TimeRange + (-nbin_pedestal + iSampling) * fam_sampling_interval) * 0.001;
         inputTiming += random_sampling_correction * 0.001;
-        if (inputTiming > 0) {
-          if (_FADC == 1) {
+        if (inputTiming < 0 || inputTiming > 2.0) {continue;} // Shaping in t0 ~t0+ 2.0 us
+        if (_FADC == 1) {
 
-            TCDigiE[iTCIdm][iSampling] += interFADC(inputTiming) * TCEnergy[iTCIdm][iTimeBin];
-          } else {
-            TCDigiE[iTCIdm][iSampling] += SimplifiedFADC(0, inputTiming) * TCEnergy[iTCIdm][iTimeBin];
-          }
+          TCDigiE[iTCIdm][iSampling] += interFADC(inputTiming) * TCEnergy[iTCIdm][iTimeBin];
+        } else {
+          TCDigiE[iTCIdm][iSampling] += SimplifiedFADC(0, inputTiming) * TCEnergy[iTCIdm][iTimeBin];
         }
       }
+
       for (int iSampling = 0; iSampling < NSampling; iSampling++) {
         TCDigiT[iTCIdm][iSampling] = (-nbin_pedestal + iSampling - TimeRange / fam_sampling_interval) * fam_sampling_interval;
         TCDigiT[iTCIdm][iSampling] += random_sampling_correction;
@@ -446,7 +466,10 @@ TrgEclDigitizer::digitization02(std::vector<std::vector<double>>& TCDigiE, std::
         // inputTiming is in [us] <-- Be careful, here is NOT [ns]
         float inputTiming
           = (-TCTiming[iTCIdm][iTimeBin] - TimeRange + (-nbin_pedestal + iSampling) * fam_sampling_interval) * 0.001;
+
         inputTiming += random_sampling_correction * 0.001;
+        if (inputTiming < 0 || inputTiming > 2.0) {continue;} // Shaping in t0 ~t0+ 2.0 us
+
         TCDigiEnergy[iTCIdm][iSampling] += FADC(0, inputTiming) * TCEnergy[iTCIdm][iTimeBin];
       }
     }

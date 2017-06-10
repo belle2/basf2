@@ -3,8 +3,9 @@
 #include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/WireID.h>
-#include <TProfile.h>
 
+#include <TError.h>
+#include <TROOT.h>
 #include <TH1F.h>
 #include <TGraphErrors.h>
 #include <TF1.h>
@@ -107,10 +108,14 @@ void T0Correction::CreateHisto()
 bool T0Correction::calibrate()
 {
   B2INFO("Start calibration");
+
+  gROOT->SetBatch(1);
+  gErrorIgnoreLevel = 3001;
+
   CreateHisto();
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
 
-  TF1* g1;
+  TF1* g1 = new TF1("g1", "gaus", -100, 100);
   vector<double> b, db, Sb, dSb;
   vector<double> c[56];
   vector<double> dc[56];
@@ -118,21 +123,18 @@ bool T0Correction::calibrate()
   vector<double> ds[56];
 
   B2INFO("Gaus fitting for whole channel");
-  double parTotal[3];
+  double par[3];
   m_hTotal->SetDirectory(0);
-  m_hTotal->Fit("gaus", "Q", "", -15, 15);
-  g1 = (TF1*)m_hTotal->GetFunction("gaus");
-  g1->GetParameters(parTotal);
+  double mm = m_hTotal->GetMean();
+  m_hTotal->Fit("g1", "Q", "", mm - 15, mm + 15);
+  g1->GetParameters(par);
 
   B2INFO("Gaus fitting for each board");
   for (int ib = 1; ib < 300; ++ib) {
-    const int n = m_hT0b[ib]->GetEntries();
-    if (n < 10) continue;
-    double par[3] = {static_cast<double>(n), parTotal[1], parTotal[2]};
+    if (m_hT0b[ib]->GetEntries() < 10) continue;
+    double mm = m_hT0b[ib]->GetMean();
     m_hT0b[ib]->SetDirectory(0);
-    m_hT0b[ib]->Fit("gaus", "Q", "", -15, 15);
-    g1 = (TF1*)m_hT0b[ib]->GetFunction("gaus");
-
+    m_hT0b[ib]->Fit("g1", "Q", "", mm - 15, mm + 15);
     g1->GetParameters(par);
     b.push_back(ib);
     db.push_back(0.0);
@@ -146,12 +148,10 @@ bool T0Correction::calibrate()
     for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
       const int n = m_h1[ilay][iwire]->GetEntries();
       B2INFO("layer " << ilay << " wire " << iwire << " entries " << n);
-      if (n < 100) continue;
-      double par[3] = {static_cast<double>(n), parTotal[1], parTotal[2]};
+      if (n < 10) continue;
+      double mm = m_h1[ilay][iwire]->GetMean();
       m_h1[ilay][iwire]->SetDirectory(0);
-      m_h1[ilay][iwire]->Fit("gaus", "Q", "", -15, 15);
-      g1 = (TF1*)m_h1[ilay][iwire]->GetFunction("gaus");
-
+      m_h1[ilay][iwire]->Fit("g1", "Q", "", mm - 15, mm + 15);
       g1->GetParameters(par);
       c[ilay].push_back(iwire);
       dc[ilay].push_back(0.0);
@@ -244,7 +244,8 @@ void T0Correction::Write()
     for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
       WireID wireid(ilay, iwire);
       int bID = cdcgeo.getBoardID(wireid);
-      if (abs(err_dt[ilay][iwire]) > 2 || abs(dt[ilay][iwire]) > 100.0) {
+      if (abs(err_dt[ilay][iwire]) > 2 || abs(dt[ilay][iwire]) > 1.e3) {
+        //      if (abs(err_dt[ilay][iwire]) > 2) {
         T0 = T0B[bID]->GetMean();
         dt[ilay][iwire] = dtb[bID];
       } else {

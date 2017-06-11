@@ -174,7 +174,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     m_con[0].addArgument("%d", isocket.getInt("port"));
     m_con[0].addArgument(nodename + "_storagein");
     m_con[0].addArgument("2");
-    if (!m_con[0].load(10)) {
+    if (!m_con[0].load(0)) {
       std::string emsg = "storagein: Failed to connect to eb2rx";
       throw (RCHandlerException(emsg));
     }
@@ -284,6 +284,7 @@ void StoragerCallback::start(int expno, int runno) throw(RCHandlerException)
 
 void StoragerCallback::stop() throw(RCHandlerException)
 {
+
   for (size_t i = 0; i < m_con.size(); i++) {
     m_con[i].stop();
   }

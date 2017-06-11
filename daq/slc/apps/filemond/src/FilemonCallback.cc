@@ -19,8 +19,6 @@ FilemonCallback::~FilemonCallback() throw()
 
 void FilemonCallback::init(NSMCommunicator&) throw()
 {
-  add(new NSMVHandlerInt("ival", true, false, 10));
-  add(new NSMVHandlerFloat("fval", true, true, 0.1));
 }
 
 void FilemonCallback::timeout(NSMCommunicator&) throw()

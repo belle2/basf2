@@ -17,6 +17,8 @@ parser.add_argument("inputFile", nargs='?', default="NoInputFile",
                     help="input sroot file name")
 parser.add_argument("--outputFile", default="NoOutputFile",
                     help="output root file name")
+parser.add_argument("--CalChannel", type=int, default=0,
+                    help="asic channel number where calibration signals are injected [0-7]")
 parser.add_argument("--NoOfflineFE", action="store_true", default=False,
                     help="Use only online FE hits, and do not use waveform data")
 parser.add_argument("--SaveWaveform", action="store_true", default=False,
@@ -33,12 +35,14 @@ if args.inputFile == "NoInputFile":
     print("Create a flat ntuple file from sroot data file(s) taken with interimFE firmware and plots for quick data quality check.")
     print("usage:")
     print("basf2 makeInterimFEDataNtuple.py (input_filename.sroot) [--arg --outputFile output_ntuple.root]")
+    print("                                  [--arg --CalChannel asicCh]")
     print("                                  [--arg --NoOfflineFE] [--arg --SaveWaveform]")
     print("                                  [--arg --GlobalDAQ] [--arg --PocketDAQ]")
     print("                                  [--arg --SkipPlot]")
     print("*Output file name is automatically set as folows if it is not specified:")
     print("  runXXXXXX_slotYY_ntuple.root (in case of local run)")
     print(" or top.XXXXX.YYYYYY_ntuple.root (in case of global run)")
+    print("*Deafult asic channel number with calibration signals is 0 (can be changed with \"--CalChannel\" option.)")
     print("*Option \"--NoOfflineFE\"  : disable offline FE from waveform data.")
     print("                             Calculation of reference timing is based on hit in calibration channel.")
     print("*       \"--SaveWaveform\" : save waveform data in the output ntuple file")
@@ -52,6 +56,12 @@ IsGlobalDAQ = False
 IsOfflineFEDisabled = args.NoOfflineFE
 IsGlobalDAQForced = args.GlobalDAQ
 IsPocketDAQForced = args.PocketDAQ
+CalCh = args.CalChannel
+if CalCh < 0 or CalCh > 7:
+    print("ERROR : invalid calibration asic channel :" + str(CalCh))
+    print("        (should be [0-7])")
+    sys.exit()
+
 if re.search(r"run[0-9]*_slot[0-1][0-9]", input_file):
     output_root = re.search(r"run[0-9]*_slot[0-1][0-9]", input_file).group() + "_ntuple.root"
 elif re.search(r"(top|cosmic|cdc)\.[0-9][0-9][0-9][0-9]\.[0-9][0-9][0-9][0-9][0-9][0-9]", input_file):
@@ -77,6 +87,7 @@ print(input_file + " --> " + output_root)
 print("Is global DAQ? : " + str(IsGlobalDAQ))
 print("OfflineFE : " + str(not IsOfflineFEDisabled))
 print("Save waveform? : " + str(args.SaveWaveform))
+print("Cal. asic ch : " + str(CalCh))
 print()
 print("start process...")
 
@@ -124,7 +135,7 @@ converter.param('useSampleTimeCalibration', False)
 converter.param('useChannelT0Calibration', False)
 converter.param('useModuleT0Calibration', False)
 converter.param('useCommonT0Calibration', False)
-converter.param('calibrationChannel', 0)  # if set, cal pulses will be flagged
+converter.param('calibrationChannel', CalCh)  # if set, cal pulses will be flagged
 converter.param('calpulseHeightMin', 450)  # in [ADC counts]
 converter.param('calpulseHeightMax', 900)  # in [ADC counts]
 converter.param('calpulseWidthMin', 2.0)  # in [ns]
@@ -134,7 +145,7 @@ main.add_module(converter)
 ntuple = register_module('MY_TOPInterimFENtupleDev')
 ntuple.param('saveWaveform', (args.SaveWaveform))
 ntuple.param('useDoublePulse', (not IsOfflineFEDisabled))
-ntuple.param('calibrationChannel', 0)
+ntuple.param('calibrationChannel', CalCh)
 ntuple.param('averageSamplingRate', 2.71394)
 ntuple.param('minHeightFirstCalPulse', 600)  # in [ADC counts]
 ntuple.param('minHeightSecondCalPulse', 450)  # in [ADC counts]

@@ -24,6 +24,7 @@ BKLMTrackFinder::BKLMTrackFinder()
 BKLMTrackFinder::BKLMTrackFinder(BKLMTrackFitter* fitter)
 {
   m_Fitter = fitter;
+  m_globalFit = false;
   //m_Fitter->setGlobalFit(m_globalFit);
 }
 

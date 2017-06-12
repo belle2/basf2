@@ -198,5 +198,14 @@ namespace Belle2 {
     std::map<std::string, std::unique_ptr<FileSystem::TemporaryFile>> m_tempfiles;
     /** Map of all existing payloads */
     std::map<std::string, PayloadInfo> m_payloads;
+
+    /** Timeout to wait for connections in seconds */
+    static unsigned int s_connectionTimeout;
+    /** Timeout to wait for stalled connections (<10KB/s) */
+    static unsigned int s_stalledTimeout;
+    /** Number of retries to perform when downloading failes with HTTP response code >=500 */
+    static unsigned int s_maxRetries;
+    /** Backoff factor for retries in seconds */
+    static unsigned int s_backoffFactor;
   };
 }

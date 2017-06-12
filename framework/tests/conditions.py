@@ -9,6 +9,7 @@ getting the payload information and payloads and then we run through different s
     - unknown host
     - connection refused
     - url not found (404)
+    - retry on (503)
     - corrupt payload information
     - incomplete payload information
     - correct payload information
@@ -91,6 +92,10 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
         if url.path.endswith("/iovPayloads/"):
             exp = params["expNumber"][0]
             run = params["runNumber"][0]
+
+            if int(exp) > 100:
+                self.send_error(int(exp))
+                return
 
             if int(run) > 1:
                 exp = None
@@ -198,6 +203,10 @@ main.add_module("PrintBeamParameters")
 for exp in range(len(SimpleConditionsDB.payloads) + 1):
     evtinfo.param({"expList": [exp, exp, exp], "runList": [0, 1, 2], "evtNumList": [1, 1, 1]})
     dbprocess(host, main)
+
+# check 503 retry
+evtinfo.param({"expList": [503], "runList": [0], "evtNumList": [1]})
+dbprocess(host, main)
 
 # the following ones fail, no need for 3 times
 evtinfo.param({"expList": [0], "runList": [0], "evtNumList": [1]})

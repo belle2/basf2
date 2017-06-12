@@ -113,6 +113,21 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=2
 [WARNING] Could not get list of payloads from database
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
 [RESULT] Starting event processing, random seed is set to 'something important'
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0 HTTP/1.1" 503 -
+[WARNING] Could not get 'http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0': The requested URL returned error: 503 Service Unavailable
+[INFO] Waiting 2.2 seconds before retry ...
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0 HTTP/1.1" 503 -
+[WARNING] Could not get 'http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0': The requested URL returned error: 503 Service Unavailable
+[INFO] Waiting 7.8 seconds before retry ...
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0 HTTP/1.1" 503 -
+[WARNING] Could not get 'http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0': The requested URL returned error: 503 Service Unavailable
+[INFO] Waiting 20 seconds before retry ...
+MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0 HTTP/1.1" 503 -
+[WARNING] Could not get 'http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=503&runNumber=0': The requested URL returned error: 503 Service Unavailable
+[WARNING] Failed 4 times, giving up
+[WARNING] Could not get list of payloads from database
+[WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
+[RESULT] Starting event processing, random seed is set to 'something important'
 [WARNING] Could not get 'http://localhost:0/v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0': Failed to connect to localhost port 0: Connection refused
 [WARNING] Could not get list of payloads from database
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.

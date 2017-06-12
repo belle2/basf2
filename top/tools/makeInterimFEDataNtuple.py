@@ -39,9 +39,9 @@ if args.inputFile == "NoInputFile":
     print("                                  [--arg --NoOfflineFE] [--arg --SaveWaveform]")
     print("                                  [--arg --GlobalDAQ] [--arg --PocketDAQ]")
     print("                                  [--arg --SkipPlot]")
-    print("*Output file name is automatically set as folows if it is not specified:")
-    print("  runXXXXXX_slotYY_ntuple.root (in case of local run)")
-    print(" or top.XXXXX.YYYYYY_ntuple.root (in case of global run)")
+    print("*Switching of local/global run and output file name is automatically given as folows if it is not specified:")
+    print("  runXXXXXX_slotYY_ntuple.root (local run with PocketDAQ)")
+    print(" or top.XXXXX.YYYYYY_ntuple.root (global run with global DAQ)")
     print("*Deafult asic channel number with calibration signals is 0 (can be changed with \"--CalChannel\" option.)")
     print("*Option \"--NoOfflineFE\"  : disable offline FE from waveform data.")
     print("                             Calculation of reference timing is based on hit in calibration channel.")
@@ -62,12 +62,12 @@ if CalCh < 0 or CalCh > 7:
     print("        (should be [0-7])")
     sys.exit()
 
-if re.search(r"run[0-9]*_slot[0-1][0-9]", input_file):
-    output_root = re.search(r"run[0-9]*_slot[0-1][0-9]", input_file).group() + "_ntuple.root"
-elif re.search(r"(top|cosmic|cdc)\.[0-9][0-9][0-9][0-9]\.[0-9][0-9][0-9][0-9][0-9][0-9]", input_file):
+if re.search(r"run[0-9]+_slot[0-1][0-9]", input_file):
+    output_root = re.search(r"run[0-9]+_slot[0-1][0-9]", input_file).group() + "_ntuple.root"
+elif re.search(r"(top|cosmic|cdc|ecl|klm|test)\.[0-9]+\.[0-9]+", input_file):
     IsGlobalDAQ = True
     output_root = re.search(
-        r"(top|cosmic|cdc)\.[0-9][0-9][0-9][0-9]\.[0-9][0-9][0-9][0-9][0-9][0-9]",
+        r"(top|cosmic|cdc|ecl|klm|test)\.[0-9]+\.[0-9]+",
         input_file).group() + "_ntuple.root"
 else:
     output_root = input + "_ntuple.root"

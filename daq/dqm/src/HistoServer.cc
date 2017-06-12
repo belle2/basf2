@@ -90,7 +90,7 @@ int HistoServer::server()
               subdir = objname.substr(lpos - 1);
               //subdir = objname.substr(lpos);
               if (subdir == "EXIT") subdir = "";
-              printf("HistoServer : subdirectory set to %s (%s)\n", subdir.c_str(), objname.c_str());
+              //              printf("HistoServer : subdirectory set to %s (%s)\n", subdir.c_str(), objname.c_str());
             } else {
               m_hman->update(subdir, strlist.at(i), fd, (TH1*)objlist.at(i));
             }

@@ -39,9 +39,6 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
     f = TFile(root_output)
     tr = f.Get("tree")
     nEntries = tr.GetEntries()
-    if nEntries == 0:
-        print("ERROR : no hits were found.")
-        return
 
     print("making summary plot for all the slots...")
     canvas.Clear()
@@ -55,6 +52,9 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
     tr.Draw("eventNum[0]>>hWfm", "(nHit>0)*(nWaveform)")
     tr.Draw("eventNum[0]>>hError", "(nHit>0)*(errorFlag>0)")
     hNHit = gROOT.FindObject("hNHit")
+    if hNHit.Integral() < 1:
+        print("ERROR : no hits were found.")
+        return
     hHeader = gROOT.FindObject("hHeader")
     hEmptyHeader = gROOT.FindObject("hEmptyHeader")
     hWfm = gROOT.FindObject("hWfm")

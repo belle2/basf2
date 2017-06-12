@@ -94,7 +94,7 @@ int main(int argc, char** argv)
       while ((dirst = readdir(dp)) != NULL) {
         std::string name = dirst->d_name;
         if (name.find(".sroot") != std::string::npos && name.find(".gz") == std::string::npos) {
-          std::string filepath = dir + "/" + name;
+          std::string filepath = dir + "/storage/" + name;
           if (names.find(name) == names.end()) {
             struct stat st;
             stat(filepath.c_str(), &st);
@@ -136,7 +136,7 @@ int main(int argc, char** argv)
           for (size_t i = 0; i < wds.size(); i++) {
             if (wd == wds[i] && it->getMask() == Inotify::FILE_CLOSE_WRITE) {
               dir = dirs[i];
-              std::string filepath = dir + "/" + name;
+              std::string filepath = dir + "/storage/" + name;
               struct stat st;
               stat(filepath.c_str(), &st);
               std::string d = Date(st.st_mtime).toString();

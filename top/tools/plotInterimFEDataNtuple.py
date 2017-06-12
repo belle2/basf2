@@ -39,7 +39,7 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
     f = TFile(root_output)
     tr = f.Get("tree")
     nEntries = tr.GetEntries()
-    if nEnries == 0:
+    if nEntries == 0:
         print("ERROR : no hits were found.")
         return
 

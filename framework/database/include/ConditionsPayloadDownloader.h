@@ -126,6 +126,23 @@ namespace Belle2 {
      */
     const PayloadInfo& get(const std::string& name);
 
+    /** Set the timeout to wait for connections in seconds */
+    static unsigned int getConnectionTimeout() { return s_connectionTimeout; }
+    /** Set the timeout to wait for stalled connections (<10KB/s) */
+    static unsigned int getStalledTimeout() { return s_stalledTimeout; }
+    /** Set the number of retries to perform when downloading failes with HTTP response code >=500 */
+    static unsigned int getMaxRetries() { return s_maxRetries; }
+    /** Set the backoff factor for retries in seconds */
+    static unsigned int getBackoffFactor() { return s_backoffFactor; }
+    /** Set the timeout to wait for connections in seconds */
+    static void setConnectionTimeout(unsigned int timeout) { s_connectionTimeout = timeout; }
+    /** Set the timeout to wait for stalled connections (<10KB/s) */
+    static void setStalledTimeout(unsigned int timeout) { s_stalledTimeout = timeout; }
+    /** Set the number of retries to perform when downloading failes with HTTP response code >=500 */
+    static void setMaxRetries(unsigned int retries) { s_maxRetries = retries; }
+    /** Set the backoff factor for retries in seconds */
+    static void setBackoffFactor(unsigned int factor) { s_backoffFactor = factor; }
+
   private:
 
     /** get an url and save the content to stream

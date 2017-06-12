@@ -168,6 +168,8 @@ def dbprocess(host, path):
         child.start()
         child.join()
 
+# keep timeouts short for testing
+set_central_database_networkparams(backoff_factor=1, connection_timeout=5, stalled_timeout=5)
 
 # set the random seed to something fixed
 set_random_seed("something important")
@@ -206,6 +208,9 @@ for exp in range(len(SimpleConditionsDB.payloads) + 1):
 
 # check 503 retry
 evtinfo.param({"expList": [503], "runList": [0], "evtNumList": [1]})
+dbprocess(host, main)
+# check again with different amount of retries
+set_central_database_networkparams(max_retries=0)
 dbprocess(host, main)
 
 # the following ones fail, no need for 3 times

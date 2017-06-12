@@ -7,6 +7,8 @@
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCXtRelations.h>
 
+#include <TError.h>
+#include <TROOT.h>
 #include <TH1D.h>
 #include <TGraphErrors.h>
 #include <TProfile.h>
@@ -184,13 +186,16 @@ void XTCalibration::readProfile()
 
 bool XTCalibration::calibrate()
 {
+
+  gROOT->SetBatch(1);
+  gErrorIgnoreLevel = 3001;
+
   CreateHisto();
   B2INFO("Start Fitting");
   for (int l = 0; l < 56; ++l) {
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nalpha; ++al) {
         for (int th = 0; th < m_ntheta; ++th) {
-          //    fitflag[l][lr][al][th]=1;
 
           if (hist2d[l][lr][al][th]->GetEntries() < m_smallestEntryRequire) {
             fitflag[l][lr][al][th] = -1;

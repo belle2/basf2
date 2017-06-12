@@ -17,6 +17,10 @@
 
 namespace Belle2 {
   namespace CDC {
+    /**
+     * Class for Time walk calibration.
+     * Time walk is calibrated for each board as function of ADC
+     */
     class TimeWalkCalibration {
     public:
       /// Constructor
@@ -57,9 +61,9 @@ namespace Belle2 {
       TH1D* m_h1[300]; /**<Mean of residual as function of ADC of each board*/
       TH2D* m_h2[300]; /**<2D histogram of residual vs ADC for each board*/
 
-      double m_xmin = 0.07;
-      double m_ndfmin = 5;
-      double m_Pvalmin = 0.;
+      double m_xmin = 0.07; /**< minimum value cut of drift length. */
+      double m_ndfmin = 5;  /**< minimum number of degree of freedom required for track. */
+      double m_Pvalmin = 0.; /**< minimum number of Prob(chi2) of fitted track. */
       double m_tw[300] = {0.}; /**< Time Walk params, result after fitting*/
       bool m_debug = false; /**< run debug or not.*/
       bool m_storeHisto = true;/**< Store all Histogram or not*/

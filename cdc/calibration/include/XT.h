@@ -5,6 +5,10 @@
 #include "Math/ChebyshevPol.h"
 #include "iostream"
 
+/**
+ * helper function to initialize xt function with 5th order polynomial + linear.
+ */
+
 Double_t pol5pol1(Double_t* x, Double_t* par)
 {
   Double_t xx = x[0];
@@ -22,6 +26,10 @@ Double_t pol5pol1(Double_t* x, Double_t* par)
   return f;
 }
 
+/**
+ * helper function to initialize xt function with 5th order Chebshev Polynomial + linear.
+ */
+
 Double_t Cheb5pol1(Double_t* x, Double_t* par)
 {
   Double_t xx = x[0];
@@ -38,17 +46,23 @@ Double_t Cheb5pol1(Double_t* x, Double_t* par)
   }
   return f;
 }
+/**
+ * Class to perform fitting for each xt function
+ */
 
 class XT {
 public:
-
+  /**
+   * Initialized with TProfile histogram
+   */
   explicit XT(TProfile* h1)
   {
     m_h1 = (TProfile*)h1->Clone();
     m_h1->SetDirectory(0);
   }
-
-
+  /**
+   * Initialized with TProfile histogram and mode
+   */
   XT(TProfile* h1, int mode)
   {
     m_h1 = (TProfile*)h1->Clone();
@@ -56,6 +70,9 @@ public:
     m_mode = mode;
   }
 
+  /**
+   * Initialized with TH1D histogram and mode
+   */
   XT(TH1D* h1, int mode)
   {
     m_h1 = (TProfile*)h1->Clone();
@@ -82,7 +99,9 @@ public:
     for (int i = 0; i < 8; ++i) {m_XTParam[i] = p[i];}
     m_tmax = p[6] + 50;
   }
-
+  /**
+   * Set Initial parameters for fitting
+   */
   void setXTParams(double p0, double p1, double p2, double p3,
                    double p4, double p5, double p6, double p7)
   {
@@ -156,6 +175,7 @@ public:
    * Get histogram.
    */
   TProfile* getFittedHisto() {return m_h1;}
+
   /**
    * Do fitting.
    */
@@ -164,6 +184,7 @@ public:
     if (m_mode == 0) FitPol5();
     else FitChebyshev();
   }
+
   /**
    * Do fitting.
    */
@@ -172,24 +193,39 @@ public:
     if (mode == 0) FitPol5();
     else FitChebyshev();
   }
+  /**
+   * Fit xt histogram incase 5th order polynomial is used.
+   */
   void FitPol5();
+  /**
+   * Fit xt histogram incase 5th order Chebeshev polynomial is used.
+   */
   void FitChebyshev();
 private:
 
-  TProfile* m_h1;
-  TF1* xtpol5 = new TF1("xtpol5", pol5pol1, 0.0, 400, 8);
-  TF1* xtCheb5 = new TF1("xtCheb5", Cheb5pol1, 0.0, 400, 8);
+  TProfile* m_h1;  /**< Histogram of xt relation. */
+  TF1* xtpol5 = new TF1("xtpol5", pol5pol1, 0.0, 400, 8);  /**< 5th order polynomial function*/
+  TF1* xtCheb5 = new TF1("xtCheb5", Cheb5pol1, 0.0, 400, 8); /**< 5th order Cheb. polynomial function*/
 
-  int m_mode = 1; //0: Poly5, 1:Chebyshev
-  bool m_debug = true;
-  bool m_draw = false;
-  int m_minRequiredEntry = 800;
-  double m_XTParam[8] = {};
-  double m_FittedXTParams[8] = {};
+  int m_mode = 1; /**< XT mode,  0 is for 5th order polynomial, 1 is Chebshev polynomial.*/
+  bool m_debug = true;  /**< Print debug durring fitting or not*/
+  bool m_draw = false;  /**< Draw and store png plot of each histo or not*/
+  int m_minRequiredEntry = 800; /** Minimum entry required for each histo. */
+  double m_XTParam[8] = {};     /**< Parameter fo xt*/
+  double m_FittedXTParams[8] = {}; /**< Fitted parameters */
+
+  /**
+   *   Fit Flag
+   * =-1: low statitic
+   * =1: good
+   * =0: Fit failure
+   * =2: Error Outer
+   * =3: Error Inner part;
+   */
   int m_fitflag = 0;
-  double m_Prob = 0;;
-  double m_tmin = 20;
-  double m_tmax = m_XTParam[6] + 50;
+  double m_Prob = 0; /**< Chi2 prob of fitting*/
+  double m_tmin = 20; /**< lower boundary of fit range*/
+  double m_tmax = m_XTParam[6] + 50; /**< upper boundary of fit range*/
 };
 
 void XT::FitPol5()

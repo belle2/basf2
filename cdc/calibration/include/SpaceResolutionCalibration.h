@@ -16,6 +16,10 @@
 
 namespace Belle2 {
   namespace CDC {
+
+    /**
+     * Class for Space resolution calibration.
+     */
     class SpaceResolutionCalibration {
       //      typedef std::array<float, 3> array3; /**< angle bin info. */
     public:

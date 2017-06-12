@@ -20,8 +20,8 @@ namespace Belle2 {
       virtual void setUseDB(bool useDB = false) {m_useDB = useDB; }
       virtual void setMinimumNDF(double minndf) {m_ndfmin = minndf;}
       virtual void setMinimumPval(double minPval) {m_Pvalmin = minPval;}
-      virtual void InputFileNames(std::string inputname) {m_InputRootFileNames.assign(inputname);}
-      virtual void ProfileFileNames(std::string profileFileName) {m_ProfileFileName.assign(profileFileName);}
+      virtual void inputFileNames(std::string inputname) {m_InputRootFileNames.assign(inputname);}
+      virtual void profileFileNames(std::string profileFileName) {m_ProfileFileName.assign(profileFileName);}
       virtual void useProfileFromInputXT(bool useProfileXTFromInputXT) {m_useProfileXTFromInputXT = useProfileXTFromInputXT;}
       virtual void setXTFileName(std::string name) {m_xtfile.assign(name);}
       virtual void setMode(unsigned short mode = 1) {m_xtmode = mode;}

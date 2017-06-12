@@ -11,6 +11,7 @@
 
 from basf2 import *
 from modularAnalysis import *
+from stdV0s import *
 from ROOT import Belle2
 from modularAnalysis import inputMdstList
 from glob import glob
@@ -22,9 +23,8 @@ fillParticleList('pi+:all', 'piid > 0.5 and d0 < 0.5 and abs(z0) < 1')
 fillParticleList('K+:all', 'Kid > 0.5 and d0 < 0.5 and abs(z0) < 1')
 
 # create Ks -> pi+ pi- list from V0
-fillParticleList('K_S0:all', '0.3 < M < 0.7')
-vertexKFit('K_S0:all', 0.0)
-applyCuts('K_S0:all', '0.45 < M < 0.55')
+stdKshorts()
+applyCuts('K_S0:all', '')
 matchMCTruth('K_S0:all')
 
 # reconstruct D0, tracks originate from the same vertex

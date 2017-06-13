@@ -27,7 +27,7 @@
 #include <framework/logging/Logger.h>
 
 // DataStore classes
-#include <framework/dataobjects/EventMetaData.h>
+//#include <framework/dataobjects/EventMetaData.h>
 #include <top/dataobjects/TOPDigit.h>
 
 // database classes
@@ -61,6 +61,7 @@ namespace Belle2 {
   {
     setDescription("T0 Calibration using the laser calibration system");
 
+    std::vector<double> frange = {100, 0., 1.};
     // Add parameters
     addParam("histogramFileName", m_histogramFileName, "Output root file for histograms",
              string("")); //output fitting results
@@ -71,7 +72,7 @@ namespace Belle2 {
              512);
     addParam("barID", m_barID, "ID of TOP module to calibrate");
     addParam("fitMethod", m_fitMethod, "gaus: single gaussian; cb: single Crystal Ball; cb2: double Crystal Ball", string("gauss"));
-    addParam("fitRange", m_fitRange, "fit range[nbins, xmin, xmax]");
+    addParam("fitRange", m_fitRange, "fit range[nbins, xmin, xmax]", frange);
 
     for (int i = 0; i < c_NumChannels; ++i) {
       m_histo[i] = 0;
@@ -84,9 +85,7 @@ namespace Belle2 {
 
   void TOPLaserCalibratorModule::initialize()
   {
-
     StoreArray<TOPDigit>::required();
-
   }
 
   void TOPLaserCalibratorModule::beginRun()
@@ -128,8 +127,8 @@ namespace Belle2 {
       auto simfile = new TFile(m_simFileName.c_str());
       TTree* tree_laser;
       simfile->GetObject("tree_laser", tree_laser);
-      double digitTime;
-      int pixelID;
+      double digitTime = 0;
+      int pixelID = 0;
       tree_laser->SetBranchAddress("digitTime", &digitTime);
       tree_laser->SetBranchAddress("pixelID", &pixelID);
 
@@ -154,7 +153,7 @@ namespace Belle2 {
       }
     }
 
-    auto t0fit = new  LaserCalibratorFit(m_barID); //class LaserCalibratorFit
+    auto t0fit = new LaserCalibratorFit(m_barID); //class LaserCalibratorFit
     t0fit->setHist(m_histo); //set time hist array including 512 channels
     t0fit->setFitMethod(m_fitMethod);
     t0fit->setFitRange(m_fitRange[1], m_fitRange[2]);

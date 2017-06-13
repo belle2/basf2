@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <string>
+#include <string>
 
 class TH1F;
 class TF1;
@@ -26,15 +27,43 @@ namespace Belle2 {
   class TOPLaserCalibratorModule : public Module {
 
   public:
+    /**
+     * Constructor
+     */
     TOPLaserCalibratorModule();
 
+    /**
+     * Destructor
+     */
     virtual ~TOPLaserCalibratorModule();
 
+    /**
+     * Initialize the Module.
+     * This method is called at the beginning of data processing.
+     */
     virtual void initialize();
+
+    /**
+     * Called when entering a new run.
+     * Set run dependent things like run header parameters, alignment, etc.
+     */
     virtual void beginRun();
+
+    /**
+     * Event processor.
+     */
     virtual void event();
+
+    /**
+     * End-of-run action.
+     * Save run-related stuff, such as statistics.
+     */
     virtual void endRun();
 
+    /**
+     * Termination action.
+     * Do fits , clean-up, close files, summarize statistics, etc.
+     */
     virtual void terminate();
 
   private:
@@ -48,11 +77,11 @@ namespace Belle2 {
 
     std::string m_histogramFileName; /**< output file name for histograms */
     std::string m_simFileName; /**< input sim file name */
-    int m_barID;                     /**< ID of TOP module to calibrate */
-    //int m_fitFunc;       /**< fitting function flag: if true fit single gaussian */
-    int m_fitPixelID; /** set 0 - 511 to a specific pixelID in the fit; set 512 to fit all pixels in one slot */
-    std::string m_fitMethod; /** < gauss: single gaussian; cb: single Crystal Ball; cb2: double Crystal Ball */
-    std::vector<double> m_fitRange; /**<fit range [nbins, xmin, xmax] */
+
+    int m_barID; /**< ID of TOP module to calibrate */
+    int m_fitPixelID; /**< set 0 - 511 to a specific pixelID in the fit; set 512 to fit all pixels in one slot */
+    std::string m_fitMethod; /**< gauss: single gaussian; cb: single Crystal Ball; cb2: double Crystal Ball */
+    std::vector<double> m_fitRange; /**< fit range [nbins, xmin, xmax] */
 
     TH1F* m_histo[c_NumChannels]; /**< profile histograms */
     TTree* m_fittingParmTree; /**< tree with fitting parameters */

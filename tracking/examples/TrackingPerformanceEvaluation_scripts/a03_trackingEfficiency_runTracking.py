@@ -21,7 +21,7 @@ from tracking import *
 
 mcTrackFinding = False
 
-release = argv.sys[1]
+release = sys.argv[1]
 
 # roi = {noROI, vxdtf1, vxdtf2}
 # bkg = {noBkg, stdBKG, std2GBKG}

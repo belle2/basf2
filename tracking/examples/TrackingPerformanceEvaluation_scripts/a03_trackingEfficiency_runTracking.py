@@ -20,7 +20,8 @@ from reconstruction import add_reconstruction
 from tracking import *
 
 mcTrackFinding = False
-release = 'merged'
+
+release = sys.argv[1]
 
 # roi = {noROI, vxdtf1, vxdtf2}
 # bkg = {noBkg, stdBKG, std2GBKG}

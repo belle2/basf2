@@ -13,7 +13,6 @@
 
 #include <framework/core/Module.h>
 #include <string>
-#include <string>
 
 class TH1F;
 class TF1;

@@ -143,8 +143,11 @@ namespace Belle2 {
     TH1F* m_h1_HitsMCRecoTrack;  /**< hits */
 
     TH3F* m_h3_MCParticle;  /**< efficiency*/
+    TH3F* m_h3_MCParticleswPXDHits;  /**< efficiency*/
     TH3F* m_h3_TracksPerMCParticle;  /**< efficiency*/
     TH3F* m_h3_TrackswPXDHitsPerMCParticle;  /**< efficiency*/
+    TH3F* m_h3_RecoTrackswPXDHitsPerMCParticle;  /**< efficiency*/
+    TH3F* m_h3_RecoTrackswPXDHitsPerMCParticlewPXDHits;  /**< efficiency*/
     TH3F* m_h3_MCRecoTrack;  /**< efficiency*/
     TH3F* m_h3_TracksPerMCRecoTrack;  /**< efficiency*/
 

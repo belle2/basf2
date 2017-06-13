@@ -254,6 +254,18 @@ void TrackingPerformanceEvaluationModule::initialize()
                                      "entry per Track with PXD hits connected to a MCParticle",
                                      m_h3_MCParticle /*, m_histoList*/);
 
+  m_h3_RecoTrackswPXDHitsPerMCParticle = (TH3F*)duplicateHistogram("h3RecoTrackswPXDHitsPerMCParticle",
+                                         "entry per RecoTrack with PXD hits connected to a MCParticle",
+                                         m_h3_MCParticle /*, m_histoList*/);
+
+  m_h3_RecoTrackswPXDHitsPerMCParticlewPXDHits = (TH3F*)duplicateHistogram("h3RecoTrackswPXDHitsPerMCParticlewPXDHits",
+                                                 "entry per RecoTrack with PXD hits connected to a MCParticle with PXD hits",
+                                                 m_h3_MCParticle /*, m_histoList*/);
+
+  m_h3_MCParticleswPXDHits = (TH3F*)duplicateHistogram("h3MCParticleswPXDHitsPerMCParticle",
+                                                       "entry per MCParticle with PXD hits",
+                                                       m_h3_MCParticle /*, m_histoList*/);
+
   m_h3_MCRecoTrack = (TH3F*)duplicateHistogram("h3MCRecoTrack",
                                                "entry per MCRecoTrack connected to the MCParticle",
                                                m_h3_MCParticle /*, m_histoList*/);
@@ -351,12 +363,21 @@ void TrackingPerformanceEvaluationModule::event()
     else
       continue;
 
+    if (mcParticle.hasSeenInDetector(Const::PXD))
+      m_h3_MCParticleswPXDHits->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+
     //1. retrieve all the Tracks related to the MCParticle
 
     //1.0 check if there is a RecoTrack
     RelationVector<RecoTrack> MCRecoTracks_fromMCParticle =
       DataStore::getRelationsWithObj<RecoTrack>(&mcParticle, m_MCRecoTracksName);
 
+    if (MCRecoTracks_fromMCParticle.size() > 0)
+      if (MCRecoTracks_fromMCParticle[0]->hasPXDHits()) {
+        m_h3_RecoTrackswPXDHitsPerMCParticle->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+        if (mcParticle.hasSeenInDetector(Const::PXD))
+          m_h3_RecoTrackswPXDHitsPerMCParticlewPXDHits->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+      }
     m_multiplicityMCRecoTracks->Fill(MCRecoTracks_fromMCParticle.size());
 
     RelationVector<RecoTrack> RecoTracks_fromMCParticle =
@@ -973,6 +994,17 @@ void TrackingPerformanceEvaluationModule::addMoreInefficiencyPlots(TList* histoL
 void TrackingPerformanceEvaluationModule::addMoreEfficiencyPlots(TList* histoList)
 {
 
+
+  TH1F* h_MCPwPXDhits_pt = createHistogramsRatio("hMCPwPXDhits", "fraction of MCParticles with PXD hits VS pt",
+                                                 m_h3_MCParticleswPXDHits,
+                                                 m_h3_MCParticle, true, 0);
+  histoList->Add(h_MCPwPXDhits_pt);
+
+  TH1F* h_RTwPXDhitsMCPwPXDHits_pt = createHistogramsRatio("hRecoTrkswPXDhitsMCPwPXDHits",
+                                                           "fraction of MCParticles with PXD Hits with RecoTracks with PXD hits VS pt",
+                                                           m_h3_RecoTrackswPXDHitsPerMCParticlewPXDHits,
+                                                           m_h3_MCParticleswPXDHits, true, 0);
+  histoList->Add(h_RTwPXDhitsMCPwPXDHits_pt);
 
   TH1F* h_wPXDhits_pt = createHistogramsRatio("hTrkswPXDhits", "fraction of tracks with PXD hits VS pt",
                                               m_h3_TrackswPXDHitsPerMCParticle,

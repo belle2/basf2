@@ -235,7 +235,7 @@ if phase == 2 and digitization == 'true':
     MIP_to_PE = [12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12]
     he3digi = register_module('He3Digitizer')
     he3digi.param('conversionFactor', 0.303132019)
-    he3digi.param('useMCParticles', True)
+    he3digi.param('useMCParticles', False)
     main.add_module(he3digi)
     diadigi = register_module('BeamDigitizer')
     diadigi.param('WorkFunction', 13.25)

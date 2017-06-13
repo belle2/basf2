@@ -20,7 +20,7 @@ num = argvs[2]
 
 # Set realTime you want to use
 # realTime = 1.0e4         # 10us for each  file <-- time in ns
-realTime = 20         # 20ns for each  file <-- time in ns - TEST
+# realTime = 20         # 20ns for each  file <-- time in ns - TEST
 
 outputfilename = "output/output_" + name + "_" + num + ".root"
 
@@ -56,12 +56,15 @@ hepevtreader = register_module('HepevtInput')
 # Ph2_dt_4_8LER35124M.HEPEvt
 # PHASE 2 -> HER 6148 repetitions = 1ROF = 20us | LER 3560 repet = 1ROF = 20us
 if name == "SynchRad_HER":
+    realTime = 1.0e4  # 10us per file
     FileIn = "Ph2_dt_4_8HER21445M.HEPEvt"      # data for HER Phase2  dt_4-8 6.6um -> 1.07 of bunch current 0.8A
     hepevtreader.param('inputFileList', [FileIn] * 2340)  # 2340 - 10us realTime Ph2_dt_4_8HER21445M.HEPEvt
 elif name == "SynchRad_LER":
+    realTime = 1.0e4  # 10us per file
     FileIn = "Ph2_dt_4_8LER35124M.HEPEvt"  # data for LERPhase2  dt_4-8 6.6um -> 1.4 of bunch current 1.0A
     hepevtreader.param('inputFileList', [FileIn] * 2340)  # 2340 - 10us realTime Ph2_dt_4_8HER21445M.HEPEvt
 elif name == "test":
+    realTime = 20  # 20ns per file
     FileIn = "Ph2_dt_4_8HER21445MK2M.HEPEvt"   # data HER KeV -> MeV,is used for test to be sure that code works or for cross-check.
     hepevtreader.param('inputFileList', [FileIn] * 5)    # - for quick TEST 5 ->~ 20nsec
     name = "ynchRad_HER"

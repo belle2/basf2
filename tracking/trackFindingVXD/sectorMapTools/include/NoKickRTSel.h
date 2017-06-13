@@ -58,13 +58,13 @@ namespace Belle2 {
     NoKickCuts m_trackCuts; /**< auxiliary member to apply the cuts */
     double m_pmax = 2.; /**< range analyzed with cuts */
 
-    enum Eparameters { /**< name of the track parameters */
-      omega,
-      d0,
-      phi0,
-      z0,
-      tanlambda
-    };
+    // enum Eparameters { /**< name of the track parameters */
+    //   omega,
+    //   d0,
+    //   phi0,
+    //   z0,
+    //   tanlambda
+    // };
 
     /** Constructor with input file for use specific cuts file */
     NoKickRTSel(std::string fileName) :
@@ -111,7 +111,7 @@ namespace Belle2 {
     /**  This method return true if a couple of hits resects the cuts constraints.
     * input (first hit, second hit, selected cut to apply, track parameter, it is first hit the IP?)
     */
-    bool segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> selCut, Eparameters par, bool is0 = false);
+    bool segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> selCut, NoKickCuts::EParameters par, bool is0 = false);
 
     /**  This method make some global cuts on the tracks (layer 3 and 6 required, d0 and z0 inside beam pipe).
     * Return false if this filter fails.

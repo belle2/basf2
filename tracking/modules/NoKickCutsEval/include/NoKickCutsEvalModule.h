@@ -65,13 +65,13 @@ namespace Belle2 {
     virtual void terminate() override;
 
     /** enum for the track-parameters */
-    enum Eparameters {
-      omega,
-      d0,
-      phi0,
-      z0,
-      tanlambda
-    };
+    // enum EParameters {
+    //   omega,
+    //   d0,
+    //   phi0,
+    //   z0,
+    //   tanlambda
+    // };
 
     /**   this method evaluate the difference of a required track parameter "par"
     *   between 2 hit. If is0 is set to true is evaluated the difference between
@@ -79,7 +79,7 @@ namespace Belle2 {
     * input: (first hit, second hit, track parameter, first hit is IP?)
     * output: Delta(par)
     */
-    double deltaParEval(hitXP hit1, hitXP hit2, Eparameters par, bool is0 = false);
+    double deltaParEval(hitXP hit1, hitXP hit2, NoKickCuts::EParameters par, bool is0 = false);
 
 
     /** This is the funcion that select the percentage that has to be cut away from

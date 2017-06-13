@@ -8,10 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
+
 #include <mdst/dataobjects/MCParticle.h>
 #include <TObject.h>
 
-#pragma once
 
 
 namespace Belle2 {

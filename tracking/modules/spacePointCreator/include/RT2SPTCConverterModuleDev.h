@@ -99,6 +99,8 @@ namespace Belle2 {
     /** NoKickCuts members */
     NoKickRTSel* m_trackSel; /**< member to call method of NoKickCuts selection */
     std::string m_noKickCutsFile; /**< name of TFile of the cuts */
+    bool m_noKickOutput; /**< true=produce TFile with effects of NoKickCuts on tracks */
+
     int m_ncut = 0; /**< counter of the cuttet tracks */
     int m_npass = 0; /**< counter of the selected tracks */
 

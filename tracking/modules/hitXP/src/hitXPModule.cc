@@ -70,7 +70,8 @@ void hitXPModule::initialize()
 
 
   /** inizialize output TFile (ttree, with own-class (hitXP) branch)
-  * nb: is not possibile to completely access to entries of this tree using external scripts
+  * nb: is not possibile to completely access to entries of this tree using
+  * external (out of basf2) scripts
   */
   m_outputFile = new TFile("TFile_hitXP.root", "RECREATE");
   m_tree = new TTree("TTree_hitXP", "TTree_hitXP");
@@ -377,7 +378,7 @@ void hitXPModule::endRun()
   m_outputFile->Close();
 
   //-------------------------------------------------------------------------------------------------//
-  //------------------------------------selected Tree creation--------------------------------------//
+  //------------------------------------selected Tree storage--------------------------------------//
   //-------------------------------------------------------------------------------------------------//
   m_outputFileSel->cd();
   m_treeSel->Write();
@@ -385,7 +386,7 @@ void hitXPModule::endRun()
 
 
   //-------------------------------------------------------------------------------------------------//
-  //------------------------------------tight selected Tree creation--------------------------------------//
+  //------------------------------------tight selected Tree storage--------------------------------------//
   //-------------------------------------------------------------------------------------------------//
   m_outputFileTiSel->cd();
   m_treeTiSel->Write();
@@ -393,7 +394,7 @@ void hitXPModule::endRun()
 
 
   //-------------------------------------------------------------------------------------------------//
-  //------------------------------------external Tree creation--------------------------------------//
+  //------------------------------------external Tree storage--------------------------------------//
   //-------------------------------------------------------------------------------------------------//
   m_outputFileExt->cd();
   m_treeExt->Write();

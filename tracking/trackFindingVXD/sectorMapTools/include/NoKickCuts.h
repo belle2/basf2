@@ -30,33 +30,28 @@ namespace Belle2 {
     /** constructor with name of the CutFile, used in cuts application */
     NoKickCuts(std::string m_fileName)
     {
-      if (m_fileName.size() != 0) FillCuts(m_fileName);
+      if (m_fileName.size() != 0) FillCuts(m_fileName); //else cuts not applied
     }
 
-    std::vector<std::vector <std::vector<std::vector <double>>>> m_cutNorm; /**< matrix of fit-parameter of cut, norm */
-    std::vector<std::vector <std::vector<std::vector <double>>>> m_cutPow; /**< matrix of fit-parameter of cut, power */
-    std::vector<std::vector <std::vector<std::vector <double>>>> m_cutBkg; /**< matrix of fit-parameter of cut, constant */
 
-    int m_nbinpar = 5; /**< number of track parameter */
-    int m_nbinlay = 7; /**< number of layers (IP too) */
 
-    enum Eminmax { /**< enum for minimum/maximum value of cuts */
-      min,
-      max
+    enum EMinMax { /**< enum for minimum/maximum value of cuts */
+      c_Min,
+      c_Max
     };
 
-    enum Eparameter { /**< enum for parameters name */
-      omega,
-      d0,
-      phi0,
-      z0,
-      tanlambda
+    enum EParameters { /**< enum for parameters name */
+      c_Omega,
+      c_D0,
+      c_Phi0,
+      c_Z0,
+      c_Tanlambda
     };
 
-    enum Ecutname { /**< enum for the cuts name */
-      Norm,
-      Pow,
-      Bkg
+    enum ECutName { /**< enum for the cuts name */
+      c_Norm,
+      c_Pow,
+      c_Bkg
     };
 
     /**  This methods selects 2 cuts (minimum and maximum inside a vector) from
@@ -67,22 +62,30 @@ namespace Belle2 {
     **  input: (sin(angle), momentum, first layer, second layer, track parameter)
     **  output: evaluated cut value
     */
-    std::vector<double> cutSelector(double sintheta, double momentum, int layer1, int layer2, Eparameter par);
+    std::vector<double> cutSelector(double sintheta, double momentum, int layer1, int layer2, EParameters par);
 
     /*  This methods select the cuts as function parameters from TH3F cointained
-    *  in cutfile in function of track parameter and layer only. Eminmax represent
-    *  if you want the maximum or minimum cut, instead Ecutname are the three
+    *  in cutfile in function of track parameter and layer only. EMinMax represent
+    *  if you want the maximum or minimum cut, instead ECutName are the three
     *  parameters of the theta-p parametrization of the cuts (see the enum type)
     * input: (first layer, second layer, track parameter, min/max value, fit parameter)
     * output: (value of the fit parameter of a specific cut)
     */
-    double getCut(int layer1, int layer2, Eparameter par, Eminmax m, Ecutname cut);
+    double getCut(int layer1, int layer2, EParameters par, EMinMax m, ECutName cut);
 
     /**  This method fill the cuts (used in NoKickCutsEval method) to create the
     *  cutfile.
     *input: (name of the cutFile)
     */
     void FillCuts(std::string m_fileName);
+
+  private:
+    std::vector<std::vector <std::vector<std::vector <double>>>> m_cutNorm; /**< matrix of fit-parameter of cut, norm */
+    std::vector<std::vector <std::vector<std::vector <double>>>> m_cutPow; /**< matrix of fit-parameter of cut, power */
+    std::vector<std::vector <std::vector<std::vector <double>>>> m_cutBkg; /**< matrix of fit-parameter of cut, constant */
+
+    int m_nbinpar = 5; /**< number of track parameter */
+    int m_nbinlay = 7; /**< number of layers (IP too) */
 
     ClassDef(NoKickCuts, 1);
   };

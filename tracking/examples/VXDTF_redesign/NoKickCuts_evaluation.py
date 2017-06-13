@@ -31,7 +31,7 @@ progressbar = register_module('ProgressBar')
 mctrackmatcher = register_module('MCRecoTracksMatcher')
 mctrackmatcher.param('UseCDCHits', False)
 mctrackmatcher.param('UseSVDHits', True)
-mctrackmatcher.param('UsePXDHits', False)
+mctrackmatcher.param('UsePXDHits', True)
 mctrackmatcher.param('mcRecoTracksStoreArrayName', 'MCRecoTracks')
 
 NoKickCuts = register_module('NoKickCutsEval')

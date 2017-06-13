@@ -229,7 +229,7 @@ def setup_RTCtoSPTCConverters(
 
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
 
-    @param useNoKick enable the training sample selection based on track parameters
+    @param useNoKick enable the training sample selection based on track parameters (and produce a TFile of its effect)
     """
     print("setup RTCtoSPTCConverters...")
     spacePointNames = []
@@ -279,9 +279,10 @@ def setup_RTCtoSPTCConverters(
 
     NoKickCuts = Belle2.FileSystem.findFile("data/tracking/NoKickCuts.root")
     if useNoKick:
-        recoTrackCandConverter.param('noKickCutsFile', NoKickCuts)
+        recoTrackCandConverter.param('noKickCutsFile', NoKickCuts)  # NoKickCuts applied
+        recoTrackCandConverter.param('noKickOutput', True)  # produce output TFile of NoKickCuts
     else:
-        recoTrackCandConverter.param('noKickCutsFile', "")
+        recoTrackCandConverter.param('noKickCutsFile', "")  # NoKickCuts not applied
 
     # SpacePointTrackCand referee
     sptcReferee = register_module('SPTCReferee')

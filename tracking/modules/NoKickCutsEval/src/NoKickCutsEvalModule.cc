@@ -153,11 +153,11 @@ void NoKickCutsEvalModule::event()
             m_tCounter++;
             continue;
           }
-          double deltaPar = deltaParEval(XP8.at(i), XP8.at(i + 1), (Eparameters)par);
+          double deltaPar = deltaParEval(XP8.at(i), XP8.at(i + 1), (NoKickCuts::EParameters)par);
           if (deltaPar == c_over) continue;
           m_histo.at(par).at(XP8.at(i).m_sensorLayer).at(XP8.at(i + 1).m_sensorLayer).at(t).at(p)->Fill(deltaPar);
           if (i == 0) {
-            deltaPar = deltaParEval(XP8.at(i), XP8.at(i), (Eparameters)par, true);
+            deltaPar = deltaParEval(XP8.at(i), XP8.at(i), (NoKickCuts::EParameters)par, true);
             if (deltaPar == c_over)continue;
             m_histo.at(par).at(0).at(XP8.at(i).m_sensorLayer).at(t).at(p)->Fill(deltaPar);
           }
@@ -468,6 +468,8 @@ void NoKickCutsEvalModule::endRun()
   output_bkg_m->Write();
   output_bkg_M->Write();
   m_outputFile->Close();
+  delete m_outputFile;
+
   B2INFO("number of spacepoint with theta out of limits=" << m_tCounter);
   B2INFO("number of spacepoint with momentum out of limits=" << m_pCounter);
   B2INFO("number of tracks cutted by global cuts=" << m_globCounter);
@@ -478,7 +480,7 @@ void NoKickCutsEvalModule::endRun()
 void NoKickCutsEvalModule::terminate() {}
 
 
-double NoKickCutsEvalModule::deltaParEval(hitXP hit1, hitXP hit2, Eparameters par, bool is0)
+double NoKickCutsEvalModule::deltaParEval(hitXP hit1, hitXP hit2, NoKickCuts::EParameters par, bool is0)
 {
   double out = c_over;
   int layer1 = hit1.m_sensorLayer;
@@ -486,27 +488,27 @@ double NoKickCutsEvalModule::deltaParEval(hitXP hit1, hitXP hit2, Eparameters pa
   double layerdiff = layer2 - layer1;
   if (layerdiff >= 0 && (layerdiff < 3 || (layer1 == 0 && layer2 == 3))) {
     switch (par) {
-      case 0:
+      case NoKickCuts::c_Omega:
         out = abs(hit1.getOmegaEntry() - hit2.getOmegaEntry());
         if (is0) out = abs(hit1.getOmega0() - hit2.getOmegaEntry());
         break;
 
-      case 1:
+      case NoKickCuts::c_D0:
         out = hit1.getD0Entry() - hit2.getD0Entry();
         if (is0) out = hit1.getD00() - hit2.getD0Entry();
         break;
 
-      case 2:
+      case NoKickCuts::c_Phi0:
         out = asin(sin(hit1.getPhi0Entry())) - asin(sin(hit2.getPhi0Entry()));
         if (is0) out = asin(sin(hit1.getPhi00())) - asin(sin(hit2.getPhi0Entry()));
         break;
 
-      case 3:
+      case NoKickCuts::c_Z0:
         out = hit1.getZ0Entry() - hit2.getZ0Entry();
         if (is0) out = hit1.getZ00() - hit2.getZ0Entry();
         break;
 
-      case 4:
+      case NoKickCuts::c_Tanlambda:
         out = hit1.getTanLambdaEntry() - hit2.getTanLambdaEntry();
         if (is0) out = hit1.getTanLambda0() - hit2.getTanLambdaEntry();
         break;

@@ -36,40 +36,40 @@
 
 using namespace Belle2;
 
-std::vector<double> NoKickCuts::cutSelector(double sinTheta, double momentum, int layer1, int layer2, Eparameter par)
+std::vector<double> NoKickCuts::cutSelector(double sinTheta, double momentum, int layer1, int layer2, EParameters par)
 {
   std::vector<double> out;
-  for (int i = 0; i < 2; i++) {
-    double cut = getCut(layer1, layer2, par, (Eminmax)i, Norm) /
-                 (sqrt(sinTheta) * pow(momentum, getCut(layer1, layer2, par, (Eminmax)i, Pow)))
-                 + getCut(layer1, layer2, par, (Eminmax)i, Bkg);
+  for (int i = c_Min; i <= c_Max; i++) {
+    double cut = getCut(layer1, layer2, par, (EMinMax)i, c_Norm) /
+                 (sqrt(sinTheta) * pow(momentum, getCut(layer1, layer2, par, (EMinMax)i, c_Pow)))
+                 + getCut(layer1, layer2, par, (EMinMax)i, c_Bkg);
     out.push_back(cut);
   }
   return out;
 }
 
-double NoKickCuts::getCut(int layer1, int layer2, Eparameter par, Eminmax m, Ecutname cut)
+double NoKickCuts::getCut(int layer1, int layer2, EParameters par, EMinMax m, ECutName cut)
 {
   std::vector<std::vector <std::vector <std::vector<double>>>> cutVector;
   double out;
 
   switch (cut) {
-    case 0:
+    case c_Norm:
       cutVector = m_cutNorm;
       break;
 
-    case 1:
+    case c_Pow:
       cutVector = m_cutPow;
       break;
 
-    case 2:
+    case c_Bkg:
       cutVector = m_cutBkg;
       break;
   }
   /** numeration order inside vector<vector<vector<vetor<double>>>> cut:
-  * <Eminmax<Eparameters<layer_int<layer_ext>>>>
-  * Eminmax: 0=min,1=max
-  * Eparameters: 0=omega, 1=d0, 2=phi0, 3=z0, 4=tanLmabda
+  * <EMinMax<EParameters<layer_int<layer_ext>>>>
+  * EMinMax: 0=min,1=max
+  * EParameters: 0=omega, 1=d0, 2=phi0, 3=z0, 4=tanLmabda
   */
 
 
@@ -139,6 +139,7 @@ void NoKickCuts::FillCuts(std::string m_fileName)
     m_cutBkg_minmax.clear();
   }
   file->Close();
+  delete file;
 
 
 }

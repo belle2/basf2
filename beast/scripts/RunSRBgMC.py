@@ -6,7 +6,7 @@ import string
 argvs = sys.argv
 argc = len(argvs)
 
-print("The input HEPEvt files needed to run SR MC sim are located in ~igal/src/beast/SR")
+print("The input HEPEvt files needed to run SR MC sim are located in @kekcc:~igal/src/beast/SR")
 
 if len(sys.argv) != 3:
     print(

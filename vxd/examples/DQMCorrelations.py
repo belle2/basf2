@@ -111,7 +111,7 @@ SVDDigitSorter = register_module('SVDDigitSorter')
 output = register_module('RootOutput')
 # output.param('branchNames', ['EventMetaData'])  # cannot be removed, but of only small effect on file size
 
-set_random_seed(1028307)
+# set_random_seed(1028307)
 eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 if (args.magnet_off is True):
     geometry.param('components', ['PXD', 'SVD'])

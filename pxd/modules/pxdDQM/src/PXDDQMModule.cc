@@ -30,7 +30,9 @@
 
 #include "TVector3.h"
 #include "TDirectory.h"
+#include "TFile.h"
 
+using namespace std;
 using namespace std;
 using boost::format;
 using namespace Belle2;
@@ -56,6 +58,10 @@ PXDDQMModule::PXDDQMModule() : HistoModule()
            "flag <0,1> for creation of advance plots, default = 0 ", m_SaveOtherHistos);
   addParam("CutPXDCharge", m_CutPXDCharge,
            "cut for accepting to hitmap histogram, using strips only, default = 22 ", m_CutPXDCharge);
+  addParam("ReferenceHistosFileName", m_RefHistFileName,
+           "Name of file contain reference histograms, default=PXD-ReferenceHistos", m_RefHistFileName);
+  addParam("OutputFlagsFileName", m_OutFlagsFileName,
+           "Name of file contain output flag histograms, default=PXD-FlagHistos", m_OutFlagsFileName);
 
 }
 
@@ -466,6 +472,111 @@ void PXDDQMModule::endRun()
     //m_averageSeedByU[i]->Divide(m_seedCountsByU[i]);
     //m_averageSeedByV[i]->Divide(m_seedCountsByV[i]);
   }
+  // Create flag histograms:
+  TFile* f_OutFlagsFile = new TFile(m_OutFlagsFileName.c_str(), "RECREATE");
+  if (!f_OutFlagsFile->IsOpen()) {
+    B2INFO("File of flag histograms: " << m_OutFlagsFileName.c_str() << " is cannot be create, please check it!");
+    return;
+  }
+  TDirectory* oldDir = gDirectory;
+  TDirectory* DirPXDFlags = NULL;
+  f_OutFlagsFile->cd();
+  DirPXDFlags = f_OutFlagsFile->mkdir("PXD_Flags");
+//  DirPXDFlags = oldDir->mkdir("PXD_ClusterShapeCorrections");
+  DirPXDFlags->cd();
+  TH2F* hf_hitMap = new TH2F("PixelHitmapFlags", "PXD Pixel Hitmaps Flags",
+                             c_nPXDSensors, 0, c_nPXDSensors, 24, 0, 24);
+  TH2F* hf_hitMapCl = new TH2F("ClusterHitmapFlags", "PXD Cluster Hitmaps Flags",
+                               c_nPXDSensors, 0, c_nPXDSensors, 24, 0, 24);
+
+  //oldDir->cd();
+
+  // Load reference file of histograms:
+  TH2F** r_hitMap = new TH2F*[c_nPXDSensors];
+  TH2F** r_hitMapCl = new TH2F*[c_nPXDSensors];
+
+  TFile* f_RefHistFile = new TFile(m_RefHistFileName.c_str(), "read");
+  if (f_RefHistFile->IsOpen()) {
+    B2INFO("Reference file name: " << m_RefHistFileName.c_str());
+    for (int i = 0; i < c_nPXDSensors; i++) {
+      r_hitMap[i] = NULL;
+      r_hitMapCl[i] = NULL;
+      int iLayer = 0;
+      int iLadder = 0;
+      int iSensor = 0;
+      getIDsFromIndex(i, &iLayer, &iLadder, &iSensor);
+      string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
+      string name = str(format("PXD_Advance/PXD_%1%_PixelHitmap;1") % sensorDescr);
+      f_RefHistFile->GetObject(name.c_str(), r_hitMap[i]);
+      if (r_hitMap[i] == NULL) {
+        B2INFO("There is missing histogram in reference file: " << name.c_str());
+        return;
+      }
+      name = str(format("PXD_Basic/PXD_%1%_HitmapClst") % sensorDescr);
+      f_RefHistFile->GetObject(name.c_str(), r_hitMapCl[i]);
+      if (r_hitMapCl[i] == NULL) {
+        B2INFO("There is missing histogram in reference file: " << name.c_str());
+        return;
+      }
+    }
+    // f_RefHistFile->Close();
+  } else {
+    B2INFO("File of reference histograms: " << m_RefHistFileName.c_str() << " is not available, please check it!");
+    return;
+  }
+  // Compare histograms with reference histograms and create flags:
+  int nSw = 6;
+  int nADC = 4;
+  int cSw = 128;
+  int cADC = 63;
+  TH2F* temp1 = new TH2F("temp1", "temp1", cADC, 0, cADC, cSw, 0, cSw);
+  TH2F* temp2 = new TH2F("temp2", "temp2", cADC, 0, cADC, cSw, 0, cSw);
+  for (int i = 0; i < c_nPXDSensors; i++) {
+    for (int iADC = 0; iADC < nADC; iADC++) {
+      for (int iSw = 0; iSw < nSw; iSw++) {
+        temp1->Reset();
+        temp2->Reset();
+        for (int jADC = 0; jADC < cADC; jADC++) {
+          for (int jSw = 0; jSw < cSw; jSw++) {
+            double value = m_hitMap[i]->GetBinContent(iADC * cADC + jADC + 1, iSw * cSw + jSw + 1);
+            temp1->SetBinContent(jADC + 1, jSw + 1, value);
+            value = r_hitMap[i]->GetBinContent(iADC * cADC + jADC + 1, iSw * cSw + jSw + 1);
+            temp2->SetBinContent(jADC + 1, jSw + 1, value);
+          }
+        }
+        double flag  = temp1->Chi2Test(temp2);
+        hf_hitMap->SetBinContent(i + 1, iADC * nSw + iSw + 1, flag);
+        temp1->Reset();
+        temp2->Reset();
+        for (int jADC = 0; jADC < cADC; jADC++) {
+          for (int jSw = 0; jSw < cSw; jSw++) {
+            double value = m_hitMapCl[i]->GetBinContent(iADC * cADC + jADC + 1, iSw * cSw + jSw + 1);
+            temp1->SetBinContent(jADC + 1, jSw + 1, value);
+            value = r_hitMapCl[i]->GetBinContent(iADC * cADC + jADC + 1, iSw * cSw + jSw + 1);
+            temp2->SetBinContent(jADC + 1, jSw + 1, value);
+          }
+        }
+        flag  = temp1->Chi2Test(temp2);
+        hf_hitMapCl->SetBinContent(i + 1, iADC * nSw + iSw + 1, flag);
+      }
+    }
+  }
+
+  // Save histograms to flag file:
+  f_OutFlagsFile->cd();
+  printf("----> kuk9\n");
+  DirPXDFlags->cd();
+  printf("----> kuk10\n");
+  hf_hitMap->Write();
+  printf("----> kuk11\n");
+  hf_hitMapCl->Write();
+  printf("----> kuk12\n");
+
+  // Close flag file:
+  f_OutFlagsFile->Close();
+  printf("----> kuk13\n");
+  oldDir->cd();
+  printf("----> kuk14\n");
 }
 
 

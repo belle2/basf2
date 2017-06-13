@@ -62,6 +62,11 @@ namespace Belle2 {
     std::string m_relPXDClusterDigitName;  /**< PXDClustersToPXDDigits RelationArray name */
     std::string m_storeFramesName;         /**< Frames StoreArray name */
 
+    /** Name of file contain reference histograms, default=PXD-ReferenceHistos */
+    std::string m_RefHistFileName = "PXD-ReferenceHistos.root";
+    /** Name of file contain output flag histograms, default=PXD-FlagHistos */
+    std::string m_OutFlagsFileName = "PXD-FlagHistos.root";
+
     TH1F** m_fired;          /**< Fired pixels per event */
     TH1F** m_clusters;       /**< Clusters per event */
     TH1F** m_hitMapU;        /**< Hitmaps pixels for u */

@@ -128,6 +128,9 @@ namespace Belle2 {
         return m_length;
       }
 
+      /**
+       * Get time over threshold.
+       */
       inline unsigned short getTOT() const
       {
         return m_tot;

@@ -2012,7 +2012,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("DeltaB", particleDeltaB, "Boost direction: Brec - Btag");
 
     VARIABLE_GROUP("Miscellaneous");
-    //FIXME put to correct place
     REGISTER_VARIABLE("KlId", particleKlId, "KlId from KLMcluster classifier.");
 
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,

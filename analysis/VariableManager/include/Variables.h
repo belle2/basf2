@@ -724,6 +724,9 @@ namespace Belle2 {
      */
     double eclClusterHypothesisId(const Particle* particle);
 
+    /** return particles Klong id*/
+    double particleKlId(const Particle* particle);
+
     /**
      * return always zero
      */

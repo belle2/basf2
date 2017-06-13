@@ -35,6 +35,8 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
+#include <reconstruction/dataobjects/KlId.h>
+
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
@@ -1831,6 +1833,18 @@ namespace Belle2 {
       return gRandom->Uniform(0, 1);
     }
 
+    double particleKlId(const Particle* particle)
+    {
+      double result = -999;
+      const KlId* klid = particle->getKLMCluster()->getRelatedTo<KlId>();
+      if (klid) {
+        result = klid->getKlId();
+      }
+      return result;
+    }
+
+
+
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
@@ -1998,6 +2012,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("DeltaB", particleDeltaB, "Boost direction: Brec - Btag");
 
     VARIABLE_GROUP("Miscellaneous");
+    //FIXME put to correct place
+    REGISTER_VARIABLE("KlId", particleKlId, "KlId from KLMcluster classifier.");
+
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
                       "Number of tracks in the event - Number of tracks( = charged FSPs) of particle.");
     REGISTER_VARIABLE("chiProb", particlePvalue, "chi ^ 2 probability of the fit");

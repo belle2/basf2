@@ -21,7 +21,7 @@ EKLM::TransformDataGlobalDisplaced::Instance()
 }
 
 EKLM::TransformDataGlobalDisplaced::TransformDataGlobalDisplaced() :
-  EKLM::TransformData(true, true)
+  EKLM::TransformData(true, EKLM::TransformData::c_Alignment)
 {
 }
 

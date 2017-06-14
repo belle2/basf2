@@ -9,23 +9,23 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <eklm/geometry/TransformDataGlobalDisplaced.h>
+#include <eklm/geometry/TransformDataGlobalAligned.h>
 
 using namespace Belle2;
 
-const EKLM::TransformDataGlobalDisplaced&
-EKLM::TransformDataGlobalDisplaced::Instance()
+const EKLM::TransformDataGlobalAligned&
+EKLM::TransformDataGlobalAligned::Instance()
 {
-  static EKLM::TransformDataGlobalDisplaced t;
+  static EKLM::TransformDataGlobalAligned t;
   return t;
 }
 
-EKLM::TransformDataGlobalDisplaced::TransformDataGlobalDisplaced() :
+EKLM::TransformDataGlobalAligned::TransformDataGlobalAligned() :
   EKLM::TransformData(true, EKLM::TransformData::c_Alignment)
 {
 }
 
-EKLM::TransformDataGlobalDisplaced::~TransformDataGlobalDisplaced()
+EKLM::TransformDataGlobalAligned::~TransformDataGlobalAligned()
 {
 }
 

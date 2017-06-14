@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLM_TRANSFORMDATAGLOBALDISPLACED_H
-#define EKLM_TRANSFORMDATAGLOBALDISPLACED_H
+#ifndef EKLM_TRANSFORMDATAGLOBALALIGNED_H
+#define EKLM_TRANSFORMDATAGLOBALALIGNED_H
 
 /* Belle2 headers. */
 #include <eklm/geometry/TransformData.h>
@@ -19,28 +19,28 @@ namespace Belle2 {
   namespace EKLM {
 
     /**
-     * Transformation data (global, displaced): singleton version.
+     * Transformation data (global, aligned): singleton version.
      */
-    class TransformDataGlobalDisplaced : public TransformData {
+    class TransformDataGlobalAligned : public TransformData {
 
     public:
 
       /**
        * Instantiation.
        */
-      static const TransformDataGlobalDisplaced& Instance();
+      static const TransformDataGlobalAligned& Instance();
 
     private:
 
       /**
        * Constructor.
        */
-      TransformDataGlobalDisplaced();
+      TransformDataGlobalAligned();
 
       /**
        * Destructor.
        */
-      ~TransformDataGlobalDisplaced();
+      ~TransformDataGlobalAligned();
 
     };
 

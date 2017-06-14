@@ -57,9 +57,12 @@ namespace Belle2 {
     MultilineWidget* m_frame1;
     /**  Event range subframe */
     TGGroupFrame* m_frame2;
+
     /**  Optional subframe, crate/shaper select. */
     TGGroupFrame* m_frame3;
+    /** Tree GUI of crates/shapers */
     TGListTree* m_list_tree;
+
     /**  Channel exclusion subframe */
     TGGroupFrame* m_frame4;
     /**  Energy threshold subframe */
@@ -77,6 +80,7 @@ namespace Belle2 {
 
     /**  EclData, class containing data to display. */
     EclData* m_ecl_data;
+    /** Slider to set the time range */
     TGDoubleHSlider* m_time_slider;
 
     /**  Slider for choosing events range. */
@@ -169,10 +173,10 @@ namespace Belle2 {
     void updateCanvas();
 
   private:
+    /** Initialize GUI */
     void initGUI(int w, int h);
+    /** Initialize data */
     void initData();
-
-    void MapSubwindows();
 
   public:
     /*   SLOTS   */

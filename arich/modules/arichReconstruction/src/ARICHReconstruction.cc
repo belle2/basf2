@@ -601,6 +601,10 @@ namespace Belle2 {
       exppho[iHyp] = nSig_w_acc[iHyp][m_nAerogelLayers] * (1 - wideGaussFract) + wideGaussFract * 0.7 *
                      nSig_wo_accInt[iHyp][m_nAerogelLayers] + nBgr[iHyp];
       logL[iHyp] -= exppho[iHyp];
+      if (isnan(logL[iHyp]) || isinf(logL[iHyp])) {
+        B2WARNING("ARICHReconstruction: log likelihood value infinite! Flat background hit probability is " << ebgri[iHyp] << "!");
+        logL[iHyp] = 0;
+      }
     }
 
     //******************************************

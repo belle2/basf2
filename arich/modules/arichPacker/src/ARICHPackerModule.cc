@@ -96,10 +96,8 @@ namespace Belle2 {
       sortedDigits[moduleID - 1].push_back(&digit);
       nPacked++;
     }
-
-    int bufferDim = 3 + 33 + 6 * 36; // 3 merger header words + 5.5 FEB header words / FEB + 36 data words per / FEB
-
-    int buffer[4][bufferDim];
+    const int buffer_nwords = 252; // 3 + 33 + 6 * 36; 3 merger header words + 5.5 FEB header words / FEB + 36 data words per / FEB
+    int buffer[4][buffer_nwords];
 
     for (const auto& copperID : m_copperMap->getCopperIDs()) {
 
@@ -108,7 +106,7 @@ namespace Belle2 {
 
         unsigned ibyte = 0;
 
-        for (int j = 0; j < bufferDim; j++) {
+        for (int j = 0; j < buffer_nwords; j++) {
           buffer[finesse][j] = 0;
         }
 

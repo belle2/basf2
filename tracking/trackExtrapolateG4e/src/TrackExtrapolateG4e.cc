@@ -1009,17 +1009,22 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
 
 ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G4ErrorFreeTrajState& g4eState)
 {
+  ExtState extState = {&b2track, pdgCode, false, 0.0, 0.0,                               // for EXT and MUID
+                       G4ThreeVector(0, 0, 1), 0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, false // for MUID only
+                      };
   RecoTrack* recoTrack = b2track.getRelatedTo<RecoTrack>();
+  if (recoTrack == NULL) {
+    B2WARNING("Track without associated RecoTrack: skipping extrapolation for this track.");
+    extState.pdgCode = 0; // prevent start of extrapolation in swim()
+    return extState;
+  }
   const genfit::AbsTrackRep* trackRep = recoTrack->getCardinalRepresentation();
   int charge = int(trackRep->getPDGCharge());
   if (charge != 0) {
-    pdgCode *= charge;
+    extState.pdgCode *= charge;
   } else {
     charge = 1; // should never happen but persist if it does
   }
-  ExtState extState = { &b2track, pdgCode, false, 0.0, 0.0,                             // for EXT and MUID
-                        G4ThreeVector(0, 0, 1), 0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, false // for MUID only
-                      };
   TVector3 firstPosition, firstMomentum, lastPosition, lastMomentum; // initialized to zeroes
   TMatrixDSym firstCov(6), lastCov(6);                               // initialized to zeroes
   try {
@@ -1039,8 +1044,8 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
       extState.tof = firstState.getTime(); // DIVOT: must be revised when IP profile (reconstructed beam spot) become available!
     }
 
-    G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
-    if (pdgCode != trackRep->getPDG()) {
+    G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(extState.pdgCode);
+    if (extState.pdgCode != trackRep->getPDG()) {
       double pSq = lastMomentum.Mag2();
       double mass = particle->GetPDGMass() / CLHEP::GeV;
       extState.tof *= sqrt((pSq + mass * mass) / (pSq + lastState.getMass() * lastState.getMass()));

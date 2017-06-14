@@ -32,6 +32,9 @@ REG_MODULE(EKLMAlignment)
 EKLMAlignmentModule::EKLMAlignmentModule() : Module()
 {
   setDescription("Module for generation of EKLM displacement data.");
+  addParam("PayloadName", m_PayloadName,
+           "Payload name ('EKLMDisplacement' or 'EKLMAlignment')",
+           std::string("EKLMDisplacement"));
   addParam("Mode", m_Mode,
            "Mode ('Zero', 'FixedSector', 'Random' or 'Limits').",
            std::string("Zero"));
@@ -63,7 +66,7 @@ void EKLMAlignmentModule::generateZeroDisplacement()
   EKLMAlignment alignment;
   EKLM::fillZeroDisplacements(&alignment);
   saveDisplacement(&alignment);
-  Database::Instance().storeData("EKLMDisplacement", (TObject*)&alignment, iov);
+  Database::Instance().storeData(m_PayloadName, (TObject*)&alignment, iov);
 }
 
 void EKLMAlignmentModule::generateFixedSectorDisplacement(
@@ -84,7 +87,7 @@ void EKLMAlignmentModule::generateFixedSectorDisplacement(
     }
   }
   saveDisplacement(&alignment);
-  Database::Instance().storeData("EKLMDisplacement", (TObject*)&alignment, iov);
+  Database::Instance().storeData(m_PayloadName, (TObject*)&alignment, iov);
 }
 
 void EKLMAlignmentModule::generateRandomDisplacement(
@@ -189,7 +192,7 @@ sector:
     }
   }
   saveDisplacement(&alignment);
-  Database::Instance().storeData("EKLMDisplacement", (TObject*)&alignment, iov);
+  Database::Instance().storeData(m_PayloadName, (TObject*)&alignment, iov);
 }
 
 void EKLMAlignmentModule::studySectorAlignmentLimits(TFile* f)
@@ -369,6 +372,10 @@ void EKLMAlignmentModule::saveDisplacement(EKLMAlignment* alignment)
 void EKLMAlignmentModule::initialize()
 {
   m_GeoDat = &(EKLM::GeometryData::Instance());
+  if (!((m_PayloadName == "EKLMDisplacement") ||
+        (m_PayloadName == "EKLMAlignment")))
+    B2FATAL("Incorrect payload name. Only 'EKLMDisplacement' and "
+            "'EKLMAlignment' are allowed.");
   if (m_Mode == "Zero")
     generateZeroDisplacement();
   else if (m_Mode == "FixedSector")

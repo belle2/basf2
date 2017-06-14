@@ -62,6 +62,9 @@ namespace Belle2 {
 
   private:
 
+    /** Payload name. */
+    std::string m_PayloadName;
+
     /** Mode. */
     std::string m_Mode;
 

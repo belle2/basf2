@@ -71,10 +71,10 @@ void WireHitCreator::exposeParameters(ModuleParamList* moduleParamList, const st
                                 "List of super layers to be used - mostly for debugging",
                                 m_param_useSuperLayers);
 
-  moduleParamList->addParameter(prefixed(prefix, "useSecondHit"),
-                                m_param_useSecondHit,
+  moduleParamList->addParameter(prefixed(prefix, "useSecondHits"),
+                                m_param_useSecondHits,
                                 "Use the second hit information in the track finding.",
-                                m_param_useSecondHit);
+                                m_param_useSecondHits);
 
 }
 
@@ -157,7 +157,7 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
   for (const CDCHit& hit : hits) {
 
     // ignore this hit if it contains the information of a 2nd hit
-    if (!m_param_useSecondHit && hit.is2ndHit()) {
+    if (!m_param_useSecondHits && hit.is2ndHit()) {
       continue;
     }
 

@@ -73,7 +73,7 @@ namespace Belle2 {
       std::vector<int> m_param_useSuperLayers;
 
       /// Parameter : If true, the second hit information will be used to create Wire Hits
-      bool m_param_useSecondHit = false;
+      bool m_param_useSecondHits = false;
 
     private: // Prepared variables
       /// Geometry set to be used.

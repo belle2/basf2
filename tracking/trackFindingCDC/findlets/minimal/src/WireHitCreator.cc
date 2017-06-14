@@ -155,6 +155,12 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
 
   outputWireHits.reserve(nHits);
   for (const CDCHit& hit : hits) {
+
+    // ignore this hit if it contains the information of a 2nd hit
+    if (!m_param_useSecondHit && hit.is2ndHit()) {
+      continue;
+    }
+
     WireID wireID(hit.getID());
     if (not wireTopology.isValidWireID(wireID)) {
       B2WARNING("Skip invalid wire id " << hit.getID());

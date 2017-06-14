@@ -368,7 +368,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False, use_sec
 
     # Init the geometry for cdc tracking and the hits
     path.add_module("TFCDC_WireHitPreparer",
-                    useSecondHit=use_second_hits,
+                    useSecondHits=use_second_hits,
                     flightTimeEstimation="outwards")
 
     # Constructs clusters and reduce background hits
@@ -451,7 +451,7 @@ def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0
 
     # Init the geometry for cdc tracking and the hits
     path.add_module("TFCDC_WireHitPreparer",
-                    useSecondHit=use_second_hits,
+                    useSecondHits=use_second_hits,
                     flightTimeEstimation="downwards",
                     triggerPoint=trigger_point)
 

@@ -112,9 +112,9 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
     canvas.cd(3)
     gPad.SetFrameFillStyle(0)
     gPad.SetFillStyle(0)
-    hSlotNumAll = TH1F("hSlotNumAll", "", 16, 0.5, 16.5)
-    hSlotNumNoCalCh = TH1F("hSlotNumNoCalCh", "", 16, 0.5, 16.5)
-    basicHitSelection = "hitQuality>0 && hitQuality<50 && hitQuality%10!=4"
+    hSlotNumAll = TH1F("hSlotNumAll", "", 17, -0.5, 16.5)
+    hSlotNumNoCalCh = TH1F("hSlotNumNoCalCh", "", 17, -0.5, 16.5)
+    basicHitSelection = "hitQuality>0"  # && hitQuality<50 && hitQuality%10!=4"
     basicHitSelectionSingle = basicHitSelection + "&& offlineFlag<=0"
     tr.Draw("Sum$(" + basicHitSelectionSingle + ")>>hNHitAllSlots(100,-0.5,499.5)")
     tr.Draw("Sum$(" + basicHitSelectionSingle + "&&!isCalCh)>>hNHitAllSlotsNoCalCh(100,-0.5,499.5)")
@@ -127,6 +127,7 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
     nHitMeanAll = []
     nHitMeanNoCalCh = []
     nHitMeanLaser = []
+    strMultiplicity = "0"
     for slot in range(1, 17):
         slotCut = " && slotNum==" + str(slot)
         tr.Draw("Sum$(" + basicHitSelectionSingle + slotCut + ")>>hNHitAll" + str(slot) + "(100,-0.5,99.5)")
@@ -148,6 +149,7 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
         nHitMeanAll.append(hNHitAllTmp.GetMean())
         nHitMeanNoCalCh.append(hNHitNoCalChTmp.GetMean())
         nHitMeanLaser.append(-1)  # defined later
+        strMultiplicity += (" + (Sum$(" + basicHitSelectionSingle + slotCut + ")>=3)")
         print(".", end="")
 
     hSlotNumAll.SetLineColor(1)
@@ -157,18 +159,23 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
     hSlotNumAll.SetStats(False)
     hSlotNumAll.Draw()
     hSlotNumAll.GetYaxis().SetRangeUser(0, nEntries * 1.2)
-    hSlotNumAll.SetTitle("# of hits for each slot (nHit>=3)")
+    hSlotNumAll.SetTitle("hit event number (nHit>=3) for each slot and multiplicity")
     hSlotNumAll.GetXaxis().SetTitle("slot number")
     line = TLine()
     line.SetLineColor(4)
     line.SetLineStyle(2)
     line.DrawLine(0.5, nEntries, 16.5, nEntries)
     hSlotNumNoCalCh.Draw("same")
+    tr.Draw(strMultiplicity + ">>hMultiplicity", "", "same")
+    hMultiplicity = gROOT.FindObject("hMultiplicity")
+    hMultiplicity.SetFillStyle(0)
+    hMultiplicity.SetLineColor(3)
     legendSlot = TLegend(0.6, 0.75, 0.875, 0.875)
     legendSlot.SetFillStyle(0)
     legendSlot.SetBorderSize(0)
     legendSlot.AddEntry(hSlotNumAll, "all channels, single hit")
     legendSlot.AddEntry(hSlotNumNoCalCh, "w/o cal. channels, single hit")
+    legendSlot.AddEntry(hMultiplicity, "# of hit modules")
     legendSlot.Draw()
     print(".", end="")
 

@@ -239,7 +239,7 @@ def add_mc_matcher(path, components=None, reco_tracks="RecoTracks", use_second_c
     path.add_module('TrackFinderMCTruthRecoTracks',
                     RecoTracksStoreArrayName='MCRecoTracks',
                     WhichParticles=[],
-                    UseSecondCDCHit=use_second_cdc_hits,
+                    UseSecondCDCHits=use_second_cdc_hits,
                     UsePXDHits=is_pxd_used(components),
                     UseSVDHits=is_svd_used(components),
                     UseCDCHits=is_cdc_used(components))
@@ -275,7 +275,8 @@ def add_track_finding(
         trigger_mode="all",
         reco_tracks="RecoTracks",
         keep_temporary_tracks=False,
-        use_vxdtf2=False):
+        use_vxdtf2=False,
+        use_second_cdc_hits=False):
     """
     Adds the realistic track finding to the path.
     The result is a StoreArray 'RecoTracks' full of RecoTracks (not TrackCands any more!).
@@ -307,7 +308,7 @@ def add_track_finding(
 
     # CDC track finder
     if use_cdc and trigger_mode in ["fast_reco", "all"]:
-        add_cdc_track_finding(path, reco_tracks=cdc_reco_tracks)
+        add_cdc_track_finding(path, reco_tracks=cdc_reco_tracks, use_second_hits=use_second_cdc_hits)
 
     # VXD track finder
     if use_svd and trigger_mode in ["hlt", "all"]:

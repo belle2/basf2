@@ -33,7 +33,6 @@ using namespace std;
 
 namespace Belle2 {
 
-#define ARICH_BUFFER_NWORDS 252 // arich number of words (ints) in buffer;  3 + 33 + 6 * 36; 3 merger header words + 5.5 FEB header words / FEB + 36 data words per / FEB
   //-----------------------------------------------------------------
   //                 Register module
   //-----------------------------------------------------------------
@@ -97,8 +96,8 @@ namespace Belle2 {
       sortedDigits[moduleID - 1].push_back(&digit);
       nPacked++;
     }
-
-    int buffer[4][ARICH_BUFFER_NWORDS];
+    const int buffer_nwords = 252; // 3 + 33 + 6 * 36; 3 merger header words + 5.5 FEB header words / FEB + 36 data words per / FEB
+    int buffer[4][buffer_nwords];
 
     for (const auto& copperID : m_copperMap->getCopperIDs()) {
 
@@ -107,7 +106,7 @@ namespace Belle2 {
 
         unsigned ibyte = 0;
 
-        for (int j = 0; j < ARICH_BUFFER_NWORDS; j++) {
+        for (int j = 0; j < buffer_nwords; j++) {
           buffer[finesse][j] = 0;
         }
 

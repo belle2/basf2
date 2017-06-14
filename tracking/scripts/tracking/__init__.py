@@ -7,7 +7,8 @@ from ROOT import Belle2
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trigger_mode="all", additionalTrackFitHypotheses=None,
-                                reco_tracks="RecoTracks", keep_temporary_tracks=False, use_vxdtf2=False):
+                                reco_tracks="RecoTracks", keep_temporary_tracks=False, use_vxdtf2=False,
+                                use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.
@@ -24,6 +25,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param keep_temporary_tracks: If true, store all information of the single CDC and VXD tracks before merging.
         If false, prune them.
+    :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
 
     if not is_svd_used(components) and not is_cdc_used(components):
@@ -39,13 +41,15 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
     if mcTrackFinding:
         # Always add the MC finder in all trigger modes.
-        add_mc_track_finding(path, components=components, reco_tracks=reco_tracks)
+        add_mc_track_finding(path, components=components, reco_tracks=reco_tracks,
+                             use_second_cdc_hits=use_second_cdc_hits)
     else:
         add_track_finding(path, components=components, trigger_mode=trigger_mode, reco_tracks=reco_tracks,
-                          keep_temporary_tracks=keep_temporary_tracks, use_vxdtf2=use_vxdtf2)
+                          keep_temporary_tracks=keep_temporary_tracks, use_vxdtf2=use_vxdtf2,
+                          use_second_cdc_hits=use_second_cdc_hits)
 
     if trigger_mode in ["hlt", "all"]:
-        add_mc_matcher(path, components=components, reco_tracks=reco_tracks)
+        add_mc_matcher(path, components=components, reco_tracks=reco_tracks, use_second_cdc_hits=use_second_cdc_hits)
         add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
                                         additionalTrackFitHypotheses=additionalTrackFitHypotheses,
                                         reco_tracks=reco_tracks)
@@ -53,7 +57,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
 def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False,
                                    skipGeometryAdding=False, eventTimingExtraction=False,
-                                   merge_tracks=True):
+                                   merge_tracks=True, use_second_cdc_hits=False):
     """
     This function adds the reconstruction modules for cr tracking to a path.
 
@@ -67,6 +71,7 @@ def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False,
     :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
         FullGridTrackTimeExtraction modules.
     :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
+    :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
 
     # make sure CDC is used
@@ -82,7 +87,7 @@ def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False,
         path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
 
     # track finding
-    add_cdc_cr_track_finding(path, merge_tracks=merge_tracks)
+    add_cdc_cr_track_finding(path, merge_tracks=merge_tracks, use_second_cdc_hits=use_second_cdc_hits)
 
     # track fitting
     add_cdc_cr_track_fit_and_track_creator(path, components, pruneTracks, eventTimingExtraction)
@@ -221,7 +226,7 @@ def add_cdc_cr_track_fit_and_track_creator(
         add_prune_tracks(path, components)
 
 
-def add_mc_matcher(path, components=None, reco_tracks="RecoTracks"):
+def add_mc_matcher(path, components=None, reco_tracks="RecoTracks", use_second_cdc_hits=False):
     """
     Match the tracks to the MC truth. The matching works based on
     the output of the TrackFinderMCTruthRecoTracks.
@@ -229,10 +234,12 @@ def add_mc_matcher(path, components=None, reco_tracks="RecoTracks"):
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
+    :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
     path.add_module('TrackFinderMCTruthRecoTracks',
                     RecoTracksStoreArrayName='MCRecoTracks',
                     WhichParticles=[],
+                    UseSecondCDCHit=use_second_cdc_hits,
                     UsePXDHits=is_pxd_used(components),
                     UseSVDHits=is_svd_used(components),
                     UseCDCHits=is_cdc_used(components))
@@ -327,24 +334,26 @@ def add_track_finding(
                 path.add_module('PruneRecoTracks', storeArrayName=vxd_reco_tracks)
 
 
-def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks"):
+def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_second_cdc_hits=False):
     """
     Add the MC based TrackFinder to the path.
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
+    :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
     if is_cdc_used(components) or is_pxd_used(components) or is_svd_used(components):
         # find MCTracks in CDC, SVD and PXD (or a subset of it)
         path.add_module('TrackFinderMCTruthRecoTracks',
                         RecoTracksStoreArrayName=reco_tracks,
+                        UseSecondCDCHits=use_second_cdc_hits,
                         UsePXDHits=is_pxd_used(components),
                         UseSVDHits=is_svd_used(components),
                         UseCDCHits=is_cdc_used(components))
 
 
-def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
+def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False, use_second_hits=False):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -354,10 +363,12 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
 
     :param path: basf2 path
     :param reco_tracks: Name of the output RecoTracks. Defaults to RecoTracks.
+    :param use_second_hits: If true, the second hit information will be used in the CDC track finding.
     """
 
     # Init the geometry for cdc tracking and the hits
     path.add_module("TFCDC_WireHitPreparer",
+                    useSecondHit=use_second_hits,
                     flightTimeEstimation="outwards")
 
     # Constructs clusters and reduce background hits
@@ -418,7 +429,8 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
                     recoTracksStoreArrayName=reco_tracks)
 
 
-def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0, 0), merge_tracks=True):
+def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0, 0), merge_tracks=True,
+                             use_second_hits=False):
     """
     Convenience function for adding all cdc track finder modules currently dedicated for the CDC-TOP testbeam
     to the path.
@@ -433,10 +445,13 @@ def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0
        Name of the output RecoTracks. Defaults to RecoTracks.
     merge_tracks: bool
        The upper and lower half of the tracks should be merged together in one track
+    use_second_hits: bool
+       If true, the second hit information will be used in the CDC track finding.
     """
 
     # Init the geometry for cdc tracking and the hits
     path.add_module("TFCDC_WireHitPreparer",
+                    useSecondHit=use_second_hits,
                     flightTimeEstimation="downwards",
                     triggerPoint=trigger_point)
 

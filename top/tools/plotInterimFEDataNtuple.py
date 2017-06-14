@@ -164,7 +164,7 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
     line = TLine()
     line.SetLineColor(4)
     line.SetLineStyle(2)
-    line.DrawLine(0.5, nEntries, 16.5, nEntries)
+    line.DrawLine(-0.5, nEntries, 16.5, nEntries)
     hSlotNumNoCalCh.Draw("same")
     tr.Draw(strMultiplicity + ">>hMultiplicity", "", "same")
     hMultiplicity = gROOT.FindObject("hMultiplicity")

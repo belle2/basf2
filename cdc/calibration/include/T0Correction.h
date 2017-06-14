@@ -74,7 +74,7 @@ namespace Belle2 {
       int m_firstRun; /**< First run. */
       int m_lastExperiment; /**< Last experiment */
       int m_lastRun; /**< Last run. */
-      ClassDef(T0Correction, 0); /**< Test class implementing calibration algorithm */
+      ClassDef(T0Correction, 0); /**< class implementing T0 correction algorithm */
     };
   }// name space CDC
 } // namespace Belle2

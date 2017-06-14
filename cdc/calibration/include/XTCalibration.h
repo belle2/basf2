@@ -142,7 +142,7 @@ namespace Belle2 {
                            231, 243, 246, 256, 263, 300
                           };
 
-      ClassDef(XTCalibration, 0);
+      ClassDef(XTCalibration, 0); /**< class implementing XT correction algorithm */
     };
   }
 }

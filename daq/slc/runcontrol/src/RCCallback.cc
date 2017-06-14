@@ -151,7 +151,7 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
       setState(tstate);
       if (cmd == RCCommand::CONFIGURE) {
         try {
-          abort();
+          //abort();
           dbload(msg.getLength(), msg.getData());
         } catch (const IOException& e) {
           throw (RCHandlerException(e.what()));

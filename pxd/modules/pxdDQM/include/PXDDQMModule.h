@@ -66,6 +66,8 @@ namespace Belle2 {
     std::string m_RefHistFileName = "PXD-ReferenceHistos.root";
     /** Name of file contain output flag histograms, default=PXD-FlagHistos */
     std::string m_OutFlagsFileName = "PXD-FlagHistos.root";
+    int m_NoOfEvents;        /** Number of events */
+    int m_NoOfEventsRef;     /** Number of events in reference histogram */
 
     TH1F** m_fired;          /**< Fired pixels per event */
     TH1F** m_clusters;       /**< Clusters per event */

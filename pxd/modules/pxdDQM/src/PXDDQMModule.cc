@@ -31,6 +31,8 @@
 #include "TVector3.h"
 #include "TDirectory.h"
 #include "TFile.h"
+#include "TVectorD.h"
+#include "TF1.h"
 
 using namespace std;
 using namespace std;
@@ -359,6 +361,7 @@ void PXDDQMModule::beginRun()
     if (m_chargStartRow[i] != NULL) m_chargStartRow[i]->Reset();
     if (m_StartRowCount[i] != NULL) m_StartRowCount[i]->Reset();
   }
+  m_NoOfEvents = 0;
 }
 
 
@@ -368,6 +371,8 @@ void PXDDQMModule::event()
   const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
   const RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits, m_relPXDClusterDigitName);
   const StoreArray<PXDFrame> storeFrames(m_storeFramesName);
+
+  m_NoOfEvents++;
 
   // If there are no digits, leave
   if (!storePXDDigits || !storePXDDigits.getEntries()) return;
@@ -472,7 +477,17 @@ void PXDDQMModule::endRun()
     //m_averageSeedByU[i]->Divide(m_seedCountsByU[i]);
     //m_averageSeedByV[i]->Divide(m_seedCountsByV[i]);
   }
+  TVectorD* NoOfEvents;
+  NoOfEvents = new TVectorD(1);
+  double fNoOfEvents[1];
+  fNoOfEvents[0] = m_NoOfEvents;
+  NoOfEvents->SetElements(fNoOfEvents);
+  TString nameBS = Form("NoOfEvents");
+  NoOfEvents->Write(nameBS.Data());
+
   // Create flag histograms:
+  int nSw = 6;
+  int nADC = 4;
   TFile* f_OutFlagsFile = new TFile(m_OutFlagsFileName.c_str(), "RECREATE");
   if (!f_OutFlagsFile->IsOpen()) {
     B2INFO("File of flag histograms: " << m_OutFlagsFileName.c_str() << " is cannot be create, please check it!");
@@ -481,13 +496,26 @@ void PXDDQMModule::endRun()
   TDirectory* oldDir = gDirectory;
   TDirectory* DirPXDFlags = NULL;
   f_OutFlagsFile->cd();
+
   DirPXDFlags = f_OutFlagsFile->mkdir("PXD_Flags");
 //  DirPXDFlags = oldDir->mkdir("PXD_ClusterShapeCorrections");
   DirPXDFlags->cd();
+  TH2F* hf_hitMapCounts = new TH2F("PixelHitmapCounts", "PXD Pixel Hitmaps Counts",
+                                   c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
+  TH2F* hf_hitMapClCounts = new TH2F("ClusterHitmapCounts", "PXD Cluster Hitmaps Counts",
+                                     c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
+  TH2F* hf_hitMapCountsRef = new TH2F("PixelHitmapCountsRef", "PXD Pixel Hitmaps Counts Reference",
+                                      c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
+  TH2F* hf_hitMapClCountsRef = new TH2F("ClusterHitmapCountsRef", "PXD Cluster Hitmaps Counts Reference",
+                                        c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
+  TH2F* hf_hitMapCountsDiff = new TH2F("PixelHitmapCountsDiff", "PXD Pixel Hitmaps Counts Difference",
+                                       c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
+  TH2F* hf_hitMapClCountsDiff = new TH2F("ClusterHitmapCountsDiff", "PXD Cluster Hitmaps Counts Difference",
+                                         c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
   TH2F* hf_hitMap = new TH2F("PixelHitmapFlags", "PXD Pixel Hitmaps Flags",
-                             c_nPXDSensors, 0, c_nPXDSensors, 24, 0, 24);
+                             c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
   TH2F* hf_hitMapCl = new TH2F("ClusterHitmapFlags", "PXD Cluster Hitmaps Flags",
-                               c_nPXDSensors, 0, c_nPXDSensors, 24, 0, 24);
+                               c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
 
   //oldDir->cd();
 
@@ -498,6 +526,10 @@ void PXDDQMModule::endRun()
   TFile* f_RefHistFile = new TFile(m_RefHistFileName.c_str(), "read");
   if (f_RefHistFile->IsOpen()) {
     B2INFO("Reference file name: " << m_RefHistFileName.c_str());
+    TVectorD* NoOfEventsRef = NULL;
+    f_RefHistFile->GetObject("NoOfEvents", NoOfEventsRef);
+    m_NoOfEventsRef = (int)NoOfEventsRef->GetMatrixArray()[0];
+//    m_NoOfEventsRef = 2;
     for (int i = 0; i < c_nPXDSensors; i++) {
       r_hitMap[i] = NULL;
       r_hitMapCl[i] = NULL;
@@ -525,10 +557,9 @@ void PXDDQMModule::endRun()
     return;
   }
   // Compare histograms with reference histograms and create flags:
-  int nSw = 6;
-  int nADC = 4;
   int cSw = 128;
   int cADC = 63;
+  TF1* fa = new TF1("fa", "1", 0, 1000);
   TH2F* temp1 = new TH2F("temp1", "temp1", cADC, 0, cADC, cSw, 0, cSw);
   TH2F* temp2 = new TH2F("temp2", "temp2", cADC, 0, cADC, cSw, 0, cSw);
   for (int i = 0; i < c_nPXDSensors; i++) {
@@ -540,10 +571,14 @@ void PXDDQMModule::endRun()
           for (int jSw = 0; jSw < cSw; jSw++) {
             double value = m_hitMap[i]->GetBinContent(iADC * cADC + jADC + 1, iSw * cSw + jSw + 1);
             temp1->SetBinContent(jADC + 1, jSw + 1, value);
+            hf_hitMapCounts->Fill(i, iADC * nSw + iSw, value);
             value = r_hitMap[i]->GetBinContent(iADC * cADC + jADC + 1, iSw * cSw + jSw + 1);
             temp2->SetBinContent(jADC + 1, jSw + 1, value);
+            hf_hitMapCountsRef->Fill(i, iADC * nSw + iSw, value);
           }
         }
+        temp2->Multiply(fa, (float)m_NoOfEvents / m_NoOfEventsRef);
+        // temp2->Multiply(fa,(float)1.5);
         double flag  = temp1->Chi2Test(temp2);
         hf_hitMap->SetBinContent(i + 1, iADC * nSw + iSw + 1, flag);
         temp1->Reset();
@@ -552,31 +587,59 @@ void PXDDQMModule::endRun()
           for (int jSw = 0; jSw < cSw; jSw++) {
             double value = m_hitMapCl[i]->GetBinContent(iADC * cADC + jADC + 1, iSw * cSw + jSw + 1);
             temp1->SetBinContent(jADC + 1, jSw + 1, value);
+            hf_hitMapClCounts->Fill(i, iADC * nSw + iSw, value);
             value = r_hitMapCl[i]->GetBinContent(iADC * cADC + jADC + 1, iSw * cSw + jSw + 1);
             temp2->SetBinContent(jADC + 1, jSw + 1, value);
+            hf_hitMapClCountsRef->Fill(i, iADC * nSw + iSw, value);
           }
         }
+        temp2->Multiply(fa, (float)m_NoOfEvents / m_NoOfEventsRef);
+        // temp2->Multiply(fa,(float)1.5);
         flag  = temp1->Chi2Test(temp2);
         hf_hitMapCl->SetBinContent(i + 1, iADC * nSw + iSw + 1, flag);
       }
     }
   }
+  delete fa;
+  delete temp1;
+  delete temp2;
+  for (int i = 0; i < c_nPXDSensors; i++) {
+    for (int iADC = 0; iADC < nADC; iADC++) {
+      for (int iSw = 0; iSw < nSw; iSw++) {
+        double val1 = 0;
+        double val2 = 0;
+        val1 = hf_hitMapCounts->GetBinContent(i + 1, iADC * nSw + iSw + 1);
+        val2 = hf_hitMapCountsRef->GetBinContent(i + 1, iADC * nSw + iSw + 1);
+        double diffval = 0;
+        if (abs(val1 - val2) > 3 * (sqrt(val1) + sqrt(val2))) diffval = 1;
+        hf_hitMapCountsDiff->SetBinContent(i + 1, iADC * nSw + iSw + 1, diffval);
+
+        val1 = hf_hitMapClCounts->GetBinContent(i + 1, iADC * nSw + iSw + 1);
+        val2 = hf_hitMapClCountsRef->GetBinContent(i + 1, iADC * nSw + iSw + 1);
+        diffval = 0;
+        if (abs(val1 - val2) > 3 * (sqrt(val1) + sqrt(val2))) diffval = 1;
+        hf_hitMapClCountsDiff->SetBinContent(i + 1, iADC * nSw + iSw + 1, diffval);
+      }
+    }
+  }
+
 
   // Save histograms to flag file:
   f_OutFlagsFile->cd();
-  printf("----> kuk9\n");
+  NoOfEvents->Write(nameBS.Data());
   DirPXDFlags->cd();
-  printf("----> kuk10\n");
+  hf_hitMapCounts->Write();
+  hf_hitMapClCounts->Write();
+  hf_hitMapCountsRef->Write();
+  hf_hitMapClCountsRef->Write();
+  hf_hitMapCountsDiff->Write();
+  hf_hitMapClCountsDiff->Write();
   hf_hitMap->Write();
-  printf("----> kuk11\n");
   hf_hitMapCl->Write();
-  printf("----> kuk12\n");
 
   // Close flag file:
   f_OutFlagsFile->Close();
-  printf("----> kuk13\n");
   oldDir->cd();
-  printf("----> kuk14\n");
 }
 
 

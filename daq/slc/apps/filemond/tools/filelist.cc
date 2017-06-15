@@ -54,8 +54,8 @@ int main(int argc, char** argv)
           std::string size = records[i].get("size");
           std::string nevents = records[i].get("nevents");
           std::string chksum = records[i].get("chksum");
-          fout << path << " " << expno << " " << runno << " " << fileno << " " <<
-               size << " " << nevents << " " << chksum << " " << std::endl;
+          fout << path << " " << expno << " " << runno << " " << fileno << " "
+               << size << " " << nevents << " " << std::hex << chksum << " " << std::dec << std::endl;
         }
       }
       sleep(30);

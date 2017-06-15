@@ -69,9 +69,14 @@ int main(int argc, char** argv)
                            config.get("database.user"),
                            config.get("database.password"),
                            config.getInt("database.port"));
-    db.connect();
-    db.execute("select * from %s where host = '%s' order by time_close ",
-               table.c_str(), host.c_str());
+    try {
+      db.connect();
+      db.execute("select * from %s where host = '%s' order by time_close ",
+                 table.c_str(), host.c_str());
+    } catch (const DBHandlerException& e) {
+      LogFile::fatal(e.what());
+      return 1;
+    }
     DBRecordList records(db.loadRecords());
     std::vector<fileinfo_t> infos;
     std::map<std::string, std::string> names;
@@ -87,33 +92,37 @@ int main(int argc, char** argv)
     time(&t0);
     for (std::vector<std::string>::const_iterator it = dirs.begin();
          it != dirs.end(); it++) {
-      std::string dir = *it;
+      std::string dir = *it + "/storage/";
       wds.push_back(inotify.add(dir, Inotify::FILE_CLOSE_WRITE));
       DIR* dp = opendir(dir.c_str());
       struct dirent* dirst;
       while ((dirst = readdir(dp)) != NULL) {
         std::string name = dirst->d_name;
         if (name.find(".sroot") != std::string::npos && name.find(".gz") == std::string::npos) {
-          std::string filepath = dir + "/storage/" + name;
+          std::string filepath = dir + name;
           if (names.find(name) == names.end()) {
             struct stat st;
             stat(filepath.c_str(), &st);
             if ((t0 - st.st_mtime) > 60 * 3) {
               std::string d = Date(st.st_mtime).toString();
               try {
-                unsigned long long chksum, nevents, size;
                 StringList s = StringUtil::split(name, '.');
                 std::string label = StringUtil::join(s, ".", 0, s.size() - 3);
                 int expno = atoi(s[s.size() - 3].c_str());
                 int runno = atoi(s[s.size() - 2].c_str());
                 StringList ss = StringUtil::split(s[s.size() - 1], '-');
                 int fileno = (ss.size() > 1) ? atoi(ss[1].c_str()) : 0;
-                size = cal_chksum(filepath.c_str(), chksum, nevents);
-                db.execute("insert into %s (name, path, host, time_close, label, expno, "
-                           "runno, fileno, chksum, nevents, size) "
-                           "values ('%s', '%s', '%s', '%s', '%s', %d, %d, %d, %lu, %lu, %lu);",
-                           table.c_str(), name.c_str(), filepath.c_str(), host.c_str(), d.c_str(),
-                           label.c_str(), expno, runno, fileno, chksum, nevents, size);
+                //unsigned long long chksum, nevents, size;
+                //size = cal_chksum(filepath.c_str(), chksum, nevents);
+                //db.execute("insert into %s (name, path, host, time_close, label, expno, "
+                //            "runno, fileno, chksum, nevents, size) "
+                //           "values ('%s', '%s', '%s', '%s', '%s', %d, %d, %d, %lu, %lu, %lu);",
+                //           table.c_str(), name.c_str(), filepath.c_str(), host.c_str(), d.c_str(),
+                //           label.c_str(), expno, runno, fileno, chksum, nevents, size);
+                db.execute("insert into %s (name, path, host, label, expno, runno, fileno) "
+                           "values ('%s', '%s', '%s', '%s', %d, %d, %d);",
+                           table.c_str(), name.c_str(), filepath.c_str(), host.c_str(),
+                           label.c_str(), expno, runno, fileno);
                 LogFile::info("new file: %s (%s)", name.c_str(), d.c_str());
               } catch (const DBHandlerException& e) {
                 LogFile::error(e.what());
@@ -140,19 +149,23 @@ int main(int argc, char** argv)
               struct stat st;
               stat(filepath.c_str(), &st);
               std::string d = Date(st.st_mtime).toString();
-              unsigned long long chksum, nevents, size;
               StringList s = StringUtil::split(name, '.');
               std::string label = StringUtil::join(s, ".", 0, s.size() - 3);
               int expno = atoi(s[s.size() - 3].c_str());
               int runno = atoi(s[s.size() - 2].c_str());
               StringList ss = StringUtil::split(s[s.size() - 1], '-');
               int fileno = (ss.size() > 1) ? atoi(ss[1].c_str()) : 0;
-              size = cal_chksum(filepath.c_str(), chksum, nevents);
-              db.execute("insert into %s (name, path, host, time_close, label, expno, runno, "
-                         "fileno, chksum, nevents, size) "
-                         "values ('%s', '%s', '%s', '%s', '%s', %d, %d, %d, %lu, %lu, %lu);",
-                         table.c_str(), name.c_str(), filepath.c_str(), host.c_str(), d.c_str(),
-                         label.c_str(), expno, runno, fileno, chksum, nevents, size);
+              //unsigned long long chksum, nevents, size;
+              //size = cal_chksum(filepath.c_str(), chksum, nevents);
+              //db.execute("insert into %s (name, path, host, time_close, label, expno, "
+              //            "runno, fileno, chksum, nevents, size) "
+              //           "values ('%s', '%s', '%s', '%s', '%s', %d, %d, %d, %lu, %lu, %lu);",
+              //           table.c_str(), name.c_str(), filepath.c_str(), host.c_str(), d.c_str(),
+              //           label.c_str(), expno, runno, fileno, chksum, nevents, size);
+              db.execute("insert into %s (name, path, host, label, expno, runno, fileno) "
+                         "values ('%s', '%s', '%s', '%s', %d, %d, %d);",
+                         table.c_str(), name.c_str(), filepath.c_str(), host.c_str(),
+                         label.c_str(), expno, runno, fileno);
               LogFile::info("new file: %s (%s)", name.c_str(), d.c_str());
               break;
             }

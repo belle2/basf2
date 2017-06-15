@@ -128,18 +128,13 @@ public:
       B2FATAL("No disk available for writing");
       exit(1);
     }
-    if (m_fileid > 0) {
-      sprintf(filename, "%s%02d/storage/%s.%4.4d.%5.5d.sroot-%d",
-              dir.c_str(), m_diskid, m_runtype.c_str(), expno, runno, m_fileid);
-      m_filename = StringUtil::form("%s.%4.4d.%5.5d.sroot-%d", m_runtype.c_str(), expno, runno, m_fileid);
-    } else if (m_fileid == 0) {
-      sprintf(filename, "%s%02d/storage/%s.%4.4d.%5.5d.sroot",
-              dir.c_str(), m_diskid, m_runtype.c_str(), expno, runno);
-      m_filename = StringUtil::form("%s.%4.4d.%5.5d.sroot", m_runtype.c_str(), expno, runno);
-    }
-    m_file = ::open(filename,  O_WRONLY | O_CREAT | O_EXCL, 0664);
-
-    m_path = filename;
+    std::string filedir = StringUtil::form("%s%02d/storage/%4.4d/%5.5d/",
+                                           dir.c_str(), m_diskid, expno, runno);
+    system(("mkdir -p " + filedir).c_str());
+    m_filename = StringUtil::form("%s.%4.4d.%5.5d.sroot", m_runtype.c_str(), expno, runno)
+                 + ((m_fileid > 0) ? StringUtil::form("-%d", m_fileid) : "");
+    m_path = dir + m_filename;
+    m_file = ::open(m_path.c_str(),  O_WRONLY | O_CREAT | O_EXCL, 0664);
     if (m_file < 0) {
       B2FATAL("Failed to open file : " << filename);
       exit(1);

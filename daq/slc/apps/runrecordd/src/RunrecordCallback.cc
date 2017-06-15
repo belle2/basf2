@@ -21,12 +21,13 @@ RunrecordCallback::RunrecordCallback(const std::string& name, ConfigFile& config
   setNode(NSMNode(name));
   setTimeout(timeout);
   m_rcnode = NSMNode(config.get("rcnode"));
-  m_objs = (DBObjectLoader::load(config.get("file"))).getObjects("vars");
+  //m_objs = (DBObjectLoader::load(config.get("file"))).getObjects("vars");
   m_db = new PostgreSQLInterface(config.get("database.host"),
                                  config.get("database.dbname"),
                                  config.get("database.user"),
                                  config.get("database.password"),
                                  config.getInt("database.port"));
+  m_objs = (DBObjectLoader::load(*m_db, config.get("dbtable"), config.get("rcconfig"))).getObjects("vars");
 }
 
 RunrecordCallback::~RunrecordCallback() throw()

@@ -52,8 +52,10 @@
 #pragma link C++ namespace Belle2::VXDTFRawSecMapTypedef+; //implicit
 #pragma link C++ namespace Belle2::VXDTFSecMapTypedef+; //implicit
 
-// ---------------------------------------------------------------------------- // Muid evolution
-// In version 5 (-4),
+// ----------------------------------------------------------------------------
+
+// Muid evolution
+// In version 5- (-4),
 //   o   m_Momentum is not stored (stored in a TVector)
 //   o   m_MuonPDFValue is stored in a float (double)
 //   o   (ditto for m_PionPDFValue, m_KaonPDFValue, m_ProtonPDFValue,
@@ -117,7 +119,7 @@
   targetClass="Belle2::Muid" target="m_ChiSquared" \
   code = "{ m_ChiSquared = onfile.m_ChiSquared; }"
 // MuidHit evolution
-// In version 2 (1),
+// In version 2- (1),
 //   o   m_ExtPosition is stored in a float[3] (TVector)
 //   o   m_HitPosition is stored in a float[3] (TVector)
 //   o   m_ExtTime is stored in a float (double)
@@ -152,7 +154,7 @@
   targetClass="Belle2::MuidHit" target="m_ChiSquared" \
   code = "{ m_ChiSquared = onfile.m_ChiSquared; }"
 // ExtHit evolution
-// In version 4 (3 or earlier),
+// In version 4- (3 or earlier),
 //   o   m_TOF is stored in a float (double)
 //   o   m_Position is stored in a float[3] (TVector)
 //   o   m_Momentum is stored in a float[3] (TVector)
@@ -191,7 +193,7 @@
             } \
           }"
 // TrackClusterSeparation evolution
-// In version 3 (-2),
+// In version 3- (-2),
 //   o   m_TrackIndex is not stored (stored in an int)
 //   o   m_Direction is not stored (stored in a TVector3)
 //   o   m_Distance is stored in a float (double)

@@ -606,8 +606,10 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   double mass = particle->GetPDGMass();
   double minPSq = (mass + m_MinKE) * (mass + m_MinKE) - mass * mass;
   // Create structures for ECLCluster-Track matching
+  std::vector<double> eclClusterDistance;
   std::vector<ExtHit> eclHit1, eclHit2;
   if (eclClusterInfo != NULL) {
+    eclClusterDistance.resize(eclClusterInfo->size(), 1.0E10); // "positive infinity"
     ExtHit tempExtHit(extState.pdgCode, Const::EDetector::ECL, 0, EXT_FIRST, 0.0,
                       G4ThreeVector(), G4ThreeVector(), G4ErrorSymMatrix(6));
     eclHit1.resize(eclClusterInfo->size(), tempExtHit);
@@ -671,8 +673,16 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
           G4ThreeVector prePos(preStepPoint->GetPosition());
           G4ThreeVector diff(prePos - eclPos);
           // find position of crossing of the track with the ECLCluster's sphere
-          if (eclHit1[c].getStatus() == EXT_FIRST) {
-            if (diff.mag() < m_MaxECLTrackClusterDistance) {
+          if (eclHit1[c].getStatus() != EXT_ECLCROSS) {
+            double distance = diff.mag();
+            if (distance < m_MaxECLTrackClusterDistance) {
+              // fallback ECLNEAR in case no ECLCROSS is found
+              if (distance < eclClusterDistance[c]) {
+                eclClusterDistance[c] = distance;
+                G4ErrorSymMatrix covariance(6);
+                fromG4eToPhasespace(g4eState, covariance);
+                eclHit1[c].update(EXT_ECLNEAR, extState.tof, pos / CLHEP::cm, mom / CLHEP::GeV, covariance);
+              }
               if (pos.mag2() >= eclPos.mag2()) {
                 double r = eclPos.mag();
                 double preD = prePos.mag() - r;

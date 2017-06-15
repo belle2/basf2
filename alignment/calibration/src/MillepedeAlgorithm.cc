@@ -177,12 +177,8 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     newBKLM.insert({to_string(getIovFromData()), new BKLMAlignment()});
   }
 
-  if (newEKLM.empty() && nEKLMparams) {
-    B2INFO("No previous EKLMAlignment found. First update from nominal.");
-    EKLMAlignment* alignment = new EKLMAlignment();
-    EKLM::fillZeroDisplacements(alignment);
-    newEKLM.insert({to_string(getIovFromData()), alignment});
-  }
+  if (newEKLM.empty())
+    B2FATAL("No EKLM alignment data.");
 
   double maxCorrectionPull = 0.;
   int maxCorrectionPullLabel = 0;

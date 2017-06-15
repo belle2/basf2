@@ -36,7 +36,7 @@ throw(RCHandlerException)
   }
 }
 
-void ECLShaperControllerCallback::boot(const std::string& opt, const DBObject& obj)
+void ECLShaperControllerCallback::boot(const DBObject& obj)
 throw(RCHandlerException)
 {
   if (obj.hasObject("cols")) {
@@ -113,7 +113,7 @@ void ECLShaperControllerCallback::recover(const DBObject& obj)
 throw(RCHandlerException)
 {
   m_forced = true;
-  boot("", obj);
+  boot(obj);
   load(obj);
 }
 

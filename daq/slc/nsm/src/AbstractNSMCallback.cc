@@ -160,11 +160,8 @@ bool AbstractNSMCallback::get(const NSMNode& node, NSMVHandler* handler,
           handler->setNode(node.getName());
           return handler->handleSet(var);
         }
-      } else if (cmd == NSMCommand::VGET || cmd == NSMCommand::VLISTGET) {
-        perform(com);
-      } else {
-        com.pushQueue(msg);
       }
+      com.pushQueue(msg);
       t = Time().get();
     }
   }
@@ -200,11 +197,8 @@ bool AbstractNSMCallback::get(const NSMNode& node, NSMVar& var,
             return handler->handleSet(var);
           }
         }
-      } if (cmd == NSMCommand::VGET || cmd == NSMCommand::VLISTGET) {
-        perform(com);
-      } else {
-        com.pushQueue(msg);
       }
+      com.pushQueue(msg);
       t = Time().get();
     }
   }
@@ -226,11 +220,8 @@ bool AbstractNSMCallback::set(const NSMNode& node, const NSMVar& var,
       NSMCommand cmd(msg.getRequestName());
       if (cmd == NSMCommand::VREPLY && var.getName() == msg.getData()) {
         return msg.getParam(0) > 0;
-      } if (cmd == NSMCommand::VGET || cmd == NSMCommand::VLISTGET) {
-        perform(com);
-      } else {
-        com.pushQueue(msg);
       }
+      com.pushQueue(msg);
       t = Time().get();
     }
   }

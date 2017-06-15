@@ -63,7 +63,7 @@ bool initialized = false;
 namespace Belle2 {
   class FEELoad {
   public:
-    FEELoad(COPPERCallback& callback, FEE& fee, HSLB& hslb, DBObject& obj)
+    FEELoad(COPPERCallback& callback, FEE& fee, HSLB& hslb, const DBObject& obj)
       : m_callback(callback), m_fee(fee), m_hslb(hslb), m_obj(obj) {}
   public:
     void run()
@@ -74,7 +74,22 @@ namespace Belle2 {
     COPPERCallback& m_callback;
     FEE& m_fee;
     HSLB& m_hslb;
-    DBObject& m_obj;
+    const DBObject& m_obj;
+  };
+  class FEEBoot {
+  public:
+    FEEBoot(COPPERCallback& callback, FEE& fee, HSLB& hslb, const DBObject& obj)
+      : m_callback(callback), m_fee(fee), m_hslb(hslb), m_obj(obj) {}
+  public:
+    void run()
+    {
+      m_fee.boot(m_callback, m_hslb, m_obj);
+    }
+  private:
+    COPPERCallback& m_callback;
+    FEE& m_fee;
+    HSLB& m_hslb;
+    const DBObject& m_obj;
   };
 }
 
@@ -362,6 +377,7 @@ void COPPERCallback::boot(const std::string& opt, const DBObject& obj) throw(RCH
   abort();
   if (!m_dummymode) {
     std::string firmware;
+
     if (opt.find("ttrx") != std::string::npos) {
       const DBObject& o_ttrx(obj("ttrx"));
       firmware = o_ttrx.getText("firm");
@@ -390,35 +406,38 @@ void COPPERCallback::boot(const std::string& opt, const DBObject& obj) throw(RCH
       log(LogFile::WARNING, "ttrx-130 is not consistent : (%x>>%x)", val, ret);
       usleep(50000);
     }
+
+    bool success[4] = {false, false, false, false};
     for (int i = 0; i < 4; i++) {
       const DBObject& o_hslb(obj("hslb", i));
       if (m_dummymode || !m_fee[i] || !o_hslb.getBool("used")) continue;
       HSLB& hslb(m_hslb[i]);
       firmware = o_hslb.getText("firm");
-      if (File::exist(firmware)) {
-        log(LogFile::INFO, "booths -%c %s", ('a' + i), firmware.c_str());
-        set("hslb.msg", "programing");
-        std::string cmd = StringUtil::form("booths -%c ", ('a' + i)) + firmware;
-        system(cmd.c_str());
-        set("hslb.msg", "program done");
-        log(LogFile::INFO, "booths -%c done", ('a' + i));
-        std::string emsg = "";
-        bool success = false;
-        for (int j = 0; j < 3; j++) {
-          try {
-            log(LogFile::INFO, "test hslb-%c", i + 'a');
-            hslb.test();
-            log(LogFile::INFO, "test hslb-%c done", i + 'a');
-            set("hslb.msg", "tesths done");
-            success = true;
-            break;
-          } catch (const HSLBHandlerException& e) {
-            emsg = e.what();
-          }
-          if (!success) {
-            set("hslb.msg", "tesths failed");
-            log(LogFile::ERROR, "test hslb-%c failed %s", i + 'a', emsg.c_str());
-          }
+      if (opt.find("hslb") != std::string::npos) {
+        if (File::exist(firmware)) {
+          log(LogFile::INFO, "booths -%c %s", ('a' + i), firmware.c_str());
+          set("hslb.msg", "programing");
+          std::string cmd = StringUtil::form("booths -%c ", ('a' + i)) + firmware;
+          system(cmd.c_str());
+          set("hslb.msg", "program done");
+          log(LogFile::INFO, "booths -%c done", ('a' + i));
+        }
+      }
+      std::string emsg = "";
+      for (int j = 0; j < 3; j++) {
+        try {
+          log(LogFile::INFO, "test hslb-%c", i + 'a');
+          hslb.test();
+          log(LogFile::INFO, "test hslb-%c done", i + 'a');
+          set("hslb.msg", "tesths done");
+          success[i] = true;
+          break;
+        } catch (const HSLBHandlerException& e) {
+          emsg = e.what();
+        }
+        if (!success[i]) {
+          set("hslb.msg", "tesths failed");
+          log(LogFile::ERROR, "test hslb-%c failed %s", i + 'a', emsg.c_str());
         }
       }
     }
@@ -430,10 +449,14 @@ void COPPERCallback::boot(const std::string& opt, const DBObject& obj) throw(RCH
           const DBObject& o_fee(m_o_fee[i]);
           HSLB& hslb(m_hslb[i]);
           hslb.open(i);
-          if (!m_disablefeconf) {
+          if (!m_disablefeconf && success[i]) {
             FEE& fee(*m_fee[i]);
             try {
-              fee.boot(*this, hslb, o_fee);
+              PThread th(new FEELoad(*this, fee, hslb, o_fee));
+              while (th.is_alive()) {
+                wait(1);
+              }
+              //fee.boot(*this, hslb, o_fee);
             } catch (const IOException& e) {
               throw (RCHandlerException(e.what()));
             }
@@ -484,12 +507,24 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
         if (!m_fee[i]) continue;
         if (!obj.hasObject("fee")) continue;
         std::string vname = StringUtil::form("hslb[%d]", i);
-        try {
-          hslb.test();
+        int count = 0;
+        std::string emsg;
+        int feehw, feeserial, feetype, feever;
+        for (count = 0; count < 10; count++) {
+          try {
+            hslb.test();
+            getfee(hslb, feehw, feeserial, feetype, feever);
+            count = 0;
+            break;
+          } catch (const HSLBHandlerException& e) {
+            count++;
+            emsg = e.what();
+            usleep(500);
+          }
+        }
+        if (count == 0) {
           set(vname + ".hslbhw", hslb.readfn(HSLBHW));
           set(vname + ".hslbfw", hslb.readfn(HSLBFW));
-          int feehw, feeserial, feetype, feever;
-          getfee(hslb, feehw, feeserial, feetype, feever);
           set(vname + ".feename", ::feename(feehw, feetype));
           set(vname + ".feehw", feehw);
           set(vname + ".feeserial", feeserial);
@@ -499,7 +534,7 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
           set(vname + ".type", hslb.readfn(TYPE_L) | (hslb.readfn(TYPE_H) >> 8));
           set(vname + ".hslbid", hslb.readfn(HSLBID));
           set(vname + ".hslbver", hslb.readfn(HSLBVER));
-        } catch (const HSLBHandlerException& e) {
+        } else {
           set(vname + ".hslbhw", -1);
           set(vname + ".hslbfw", -1);
           set(vname + ".feename", "LinkDown");
@@ -511,7 +546,7 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
           set(vname + ".type", -1);
           set(vname + ".hslbid", -1);
           set(vname + ".hslbver", -1);
-          log(LogFile::ERROR, "tesths -%c failed : %s", ('a' + i), e.what());
+          log(LogFile::ERROR, "tesths -%c failed : %s", ('a' + i), emsg.c_str());
           done_tesths = false;
           continue;
         }
@@ -519,11 +554,18 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
           FEE& fee(*m_fee[i]);
           try {
             const DBObject& o_fee(m_o_fee[i]);
-            fee.load(*this, hslb, o_fee);
+            PThread th(new FEELoad(*this, fee, hslb, o_fee));
+            while (th.is_alive()) {
+              wait(1);
+            }
+            //fee.load(*this, hslb, o_fee);
           } catch (const std::out_of_range& e) {
             LogFile::error("Error in HSLB-%c", (i + 'a'));
             throw (RCHandlerException(e.what()));
           } catch (const IOException& e) {
+            LogFile::error("Error in HSLB-%c", (i + 'a'));
+            throw (RCHandlerException(e.what()));
+          } catch (const std::exception& e) {
             LogFile::error("Error in HSLB-%c", (i + 'a'));
             throw (RCHandlerException(e.what()));
           }

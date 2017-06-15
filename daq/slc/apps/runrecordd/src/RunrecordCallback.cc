@@ -38,25 +38,25 @@ void RunrecordCallback::init(NSMCommunicator& com) throw()
   std::string rcstate;
   int runno = 0, expno = 0;
   try {
-    get(m_rcnode, "rcstate", rcstate, 10);
+    get(m_rcnode, "rcstate", rcstate);
     LogFile::info("%s>>%s", m_rcnode.getName().c_str(), rcstate.c_str());
-    get(m_rcnode, "expno", expno, 10);
-    get(m_rcnode, "runno", runno, 10);
+    get(m_rcnode, "expno", expno);
+    get(m_rcnode, "runno", runno);
   } catch (const TimeoutException& e) {
   }
   std::stringstream ss;
   ss << "config : " << getNode().getName()
-     << StringUtil::form(":%04d:%05d:", expno, runno)
+     << StringUtil::form(":%04d:%06d:", expno, runno)
      << (rcstate == "STARTING" ? "s" : "e") << std::endl;
   ss << "DAQ.Date.S :" << Date().toString() << std::endl;
   ss << "DAQ.ExpNumber.I :" << expno << std::endl;
-  ss << "DAQ.RunNumber.I :" << runno << std::endl;
+  ss << "DAQ.RunNumber.I :" << expno << std::endl;
   for (size_t i = 0; i < m_objs.size(); i++) {
     const DBObject obj(m_objs[i]);
     obj.print();
     NSMVar var(obj.getText("var"));
     try {
-      get(NSMNode(obj.getText("node")), var, 10);
+      get(NSMNode(obj.getText("node")), var);
       std::string name = obj.getText("name");
       ss << name << " : ";
       switch (var.getType()) {
@@ -67,10 +67,9 @@ void RunrecordCallback::init(NSMCommunicator& com) throw()
           ss << "float(" << var.getFloat() << ")" <<  std::endl;
           break;
         case NSMVar::TEXT:
-          ss << "\"" << StringUtil::replace(var.getText(), "\n", "\\n") << "\"" << std::endl;
+          ss << var.getText() <<  std::endl;
           break;
         case NSMVar::NONE:
-          ss << "null" <<  std::endl;
           break;
       }
     } catch (const TimeoutException& e) {
@@ -78,14 +77,14 @@ void RunrecordCallback::init(NSMCommunicator& com) throw()
     }
     m_vars.push_back(var);
   }
-  std::cout << ss.str() << std::endl;
+  LogFile::info(ss.str());
   m_rcstate = rcstate;
   //update(rcstate);
 }
 
 void RunrecordCallback::timeout(NSMCommunicator&) throw()
 {
-  update(m_rcstate);
+
 }
 
 void RunrecordCallback::vset(NSMCommunicator& com, const NSMVar& v) throw()
@@ -114,20 +113,17 @@ void RunrecordCallback::update(const std::string& rcstate)
 {
   int runno = 0, expno = 0;
   try {
-    get(m_rcnode, "expno", expno, 10);
-  } catch (const TimeoutException& e) {
-  }
-  try {
-    get(m_rcnode, "runno", runno, 10);
+    get(m_rcnode, "expno", expno);
+    get(m_rcnode, "runno", runno);
   } catch (const TimeoutException& e) {
   }
   std::stringstream ss;
   ss << "config : " << getNode().getName()
-     << StringUtil::form(":%04d:%05d:", expno, runno)
+     << StringUtil::form(":%04d:%06d:", expno, runno)
      << (rcstate == "STARTING" ? "s" : "e") << std::endl;
   ss << "DAQ.Date.S :" << Date().toString() << std::endl;
   ss << "DAQ.ExpNumber.I :" << expno << std::endl;
-  ss << "DAQ.RunNumber.I :" << runno << std::endl;
+  ss << "DAQ.RunNumber.I :" << expno << std::endl;
   for (size_t i = 0; i < m_objs.size(); i++) {
     const DBObject obj(m_objs[i]);
     NSMVar& var(m_vars[i]);
@@ -141,20 +137,14 @@ void RunrecordCallback::update(const std::string& rcstate)
         ss << "float(" << var.getFloat() << ")" <<  std::endl;
         break;
       case NSMVar::TEXT:
-        ss << "\"" << StringUtil::replace(StringUtil::replace(var.getText(), "\n", "\\n") , "%", "\%") << "\"" << std::endl;
+        ss << var.getText() << std::endl;
         break;
       case NSMVar::NONE:
-        ss << "null" <<  std::endl;
         break;
     }
   }
   std::string s = ss.str();
-  //LogFile::info(s);
-  std::cout << s << std::endl;
+  LogFile::info(s);
   ConfigFile conf(ss);
-  DBObject obj = DBObjectLoader::load(conf);
-  try {
-    DBObjectLoader::createDB(*m_db, "runrecord", obj);
-  } catch (const DBHandlerException& e) {
-  }
+  DBObjectLoader::createDB(*m_db, "runrecord", DBObjectLoader::load(conf));
 }

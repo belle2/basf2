@@ -51,10 +51,6 @@ void TOPFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 void TOPFEE::boot(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
   //only know how to call this from command line
-}
-
-void TOPFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
-{
   hslb.writefn32(HSREGL_RESET, 0xffffff);
   //not sure if initial configuration should already be done in Init function
   if (!m_initialConfigurationDone) {
@@ -70,6 +66,10 @@ void TOPFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 
   callback.log(LogFile::DEBUG, "Load: Starting Prep Data");
   PrepBoardstackData::PrepareBoardStack(hslb, callback);
+}
+
+void TOPFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
+{
 }
 
 void TOPFEE::monitor(RCCallback& callback, HSLB& hslb)

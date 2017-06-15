@@ -185,10 +185,12 @@ namespace ConfigBoardstack {
     char filename[128];
     sprintf(filename, "logs/BS%d_log_%d%d%d.txt", hslb.get_finid(), ltm->tm_hour, ltm->tm_mon, 1900 + ltm->tm_year);
     externalLogFile.open(filename, std::fstream::out);
+    /*
     if (!externalLogFile.is_open()) {
       printf("error opening log file\n");
       return;
     }
+    */
     externalLogFile << "Boardstack " << hslb.get_finid() << endl;
     Belle2::RCCallback dummyCallback;
     /*take care that map always exists for standalone applications
@@ -204,10 +206,12 @@ namespace ConfigBoardstack {
     unsigned numberOfCarriers = GetNumberOfCarriers(hslb.get_finid());
     //read threshold and feadback data file to maps
     int scrod_id = Read_Register(hslb, SCROD_AxiVersion_UserID, 0, 0) >> 8;
-    string thresholdfile = ConstructFilePathString("/home/webert/uh-svn-repo/trunk/software/b2l/scripts_dev/thresholds/SCROD", ".dat",
+    //string thresholdfile = ConstructFilePathString("/home/webert/uh-svn-repo/trunk/software/b2l/scripts_dev/thresholds/SCROD", ".dat",
+    string thresholdfile = ConstructFilePathString("/home/usr/b2daq/b2top/thresholds/SCROD", ".dat",
                                                    scrod_id);
     thresholdData = ReadThreshold(thresholdfile);
-    string FBFile = ConstructFilePathString("/home/webert/uh-svn-repo/trunk/software/b2l/scripts_dev/sstoutFB/SCROD", ".fb", scrod_id);
+    //string FBFile = ConstructFilePathString("/home/webert/uh-svn-repo/trunk/software/b2l/scripts_dev/sstoutFB/SCROD", ".fb", scrod_id);
+    string FBFile = ConstructFilePathString("/home/usr/b2daq/b2top/sstoutFB/SCROD", ".fb", scrod_id);
     feadbackData = ReadFeadbackValue(FBFile);
     //configure the carriers
     for (unsigned carrier = 0; carrier < numberOfCarriers; ++carrier) {
@@ -228,7 +232,7 @@ namespace ConfigBoardstack {
       externalLogFile << "ASICs power status for carrier " << carrier << " is " << status << endl;
     } else {
       callback.log(LogFile::DEBUG, "power status for carrier %d is %d", carrier, status);
-      if (status != 0) callback.log(LogFile::ERROR, "Error during powering of carrier %d", carrier);
+      if (status != 0) callback.log(LogFile::WARNING, "Error during powering of carrier %d", carrier);
     }
 
     //set vPed values
@@ -461,9 +465,9 @@ namespace ConfigBoardstack {
 
     if (bitslip == -1) {
       if (useExternalLogFile) {
-        externalLogFile << "ERROR: No valid bitslip found!" << endl;
+        externalLogFile << "WARNING: No valid bitslip found!" << endl;
       } else {
-        callback.log(LogFile::ERROR, "No valid bitslip found!");
+        callback.log(LogFile::WARNING, "No valid bitslip found!");
       }
     } else {
       cout << "--> God eye align bitslip found at " << bitslip << endl;
@@ -502,9 +506,9 @@ namespace ConfigBoardstack {
 
     if (bitslip == -1) {
       if (useExternalLogFile) {
-        externalLogFile << "ERROR: No valid data align bitslip found!" << endl;
+        externalLogFile << "WARNING: No valid data align bitslip found!" << endl;
       } else {
-        callback.log(LogFile::ERROR, "No valid data algin bitslip found!");
+        callback.log(LogFile::WARNING, "No valid data algin bitslip found!");
       }
     } else {
       cout << "--> Good bitslip found at " << bitslip << ", adjusting by 12 to align with data" << endl;
@@ -612,7 +616,7 @@ namespace ConfigBoardstack {
     }
 
     if (retry_count == 0) {
-      printf("ERROR: DLL failed to lock on carrier %d asic %d\n", carrier, asic);
+      printf("WARNING: DLL failed to lock on carrier %d asic %d\n", carrier, asic);
     } else {
       printf("DLL locked\n");
     }
@@ -635,7 +639,7 @@ namespace ConfigBoardstack {
       callback.set(vname + "lockedDLL", 1);
     } else {
       callback.set(vname + "lockedDLL", 0);
-      callback.log(LogFile::ERROR, StringUtil::form("DLL on scrod %d carrier %d asic %d did not lock", scrod, carrier, asic));
+      callback.log(LogFile::WARNING, StringUtil::form("DLL on scrod %d carrier %d asic %d did not lock", scrod, carrier, asic));
     }
   }
 
@@ -721,15 +725,17 @@ namespace ConfigBoardstack {
     string line;
     map<int, ThresholdData> ret;
     fstream fin(thresholdFilePath.c_str());
-    if (!fin.is_open()) {
+    /*if (!fin.is_open()) {
       throw runtime_error("threshold file not found " + thresholdFilePath);
-    }
+      }*/
     while (getline(fin, line)) {
       stringstream ss;
       ss << line;
       int asicID[3];
       float threshold[3];
       ss >> asicID[0] >> asicID[1] >> asicID[2] >> threshold[0] >> threshold[1] >> threshold[2];
+      std::cout << " " <<  asicID[0] << " " <<  asicID[1] << " " <<  asicID[2] << " " <<  threshold[0] << " " <<  threshold[1] << " " <<
+                threshold[2] << std::endl;
       int lookupValue = LookupValue(asicID[0], asicID[1], asicID[2]);
       ThresholdData data(threshold[0], threshold[1], threshold[2]);
       ret.insert(pair<int, ThresholdData>(lookupValue, data));
@@ -743,12 +749,15 @@ namespace ConfigBoardstack {
     string line;
     unsigned values[3] = {0, 0, 0};
     std::map<int, int> ret;
+    /*
     if (!fin.is_open()) {
       throw runtime_error("feadback file not found " + fbFilePath);
     }
+    */
     while (getline(fin, line)) {
       stringstream ss(line);
       ss >> values[0] >> values[1] >> values[2];
+      std::cout << " " <<  values[0] << " " <<  values[1] << " " <<  values[2] << std::endl;
       int lookupValue = LookupValue(values[0], values[1]);
       ret.insert(std::pair<int, int>(lookupValue, values[2]));
     }

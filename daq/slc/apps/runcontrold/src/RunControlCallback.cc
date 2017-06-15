@@ -104,7 +104,7 @@ void RunControlCallback::error(const char* nodename, const char* data) throw()
   //log(LogFile::DEBUG, "ERROR from %s (state = %s)", nodename, data);
   try {
     RCNode& node(findNode(nodename));
-    logging(node, LogFile::ERROR, data);
+    logging(node, LogFile::ERROR, "%s : %s", nodename, data);
     //reply(NSMMessage(RCCommand::STOP, "Error due to error on " + node.getName()));
     //stop();
     setState(RCState::ERROR_ES);
@@ -133,10 +133,10 @@ void RunControlCallback::fatal(const char* nodename, const char* data) throw()
   //monitor();
 }
 
-void RunControlCallback::boot(const DBObject& obj) throw(RCHandlerException)
+void RunControlCallback::boot(const std::string& opt, const DBObject& obj) throw(RCHandlerException)
 {
   m_runno.setConfig(obj.getName());
-  distribute(NSMMessage(RCCommand::BOOT));
+  distribute(NSMMessage(RCCommand::BOOT, opt));
 }
 
 void RunControlCallback::load(const DBObject& obj) throw(RCHandlerException)
@@ -210,21 +210,6 @@ void RunControlCallback::abort() throw(RCHandlerException)
   m_starttime = -1;
 }
 
-void RunControlCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
-{
-  if (var.getName() == "rcstate" &&
-      var.getType() == NSMVar::TEXT) {
-    for (size_t i = 0; i < m_node_v.size(); i++) {
-      RCNode& node(m_node_v[i]);
-      if (var.getNode() == node.getName()) {
-        setState(node, var.getText());
-        return;
-      }
-    }
-  }
-  NSMCallback::vset(com, var);
-}
-
 void RunControlCallback::monitor() throw(RCHandlerException)
 {
   RCState state(getNode().getState());
@@ -238,13 +223,10 @@ void RunControlCallback::monitor() throw(RCHandlerException)
     try {
       NSMCommunicator::connected(node.getName());
       try {
-        if (cstate == Enum::UNKNOWN || cstate.isError() /*|| state.isStable()*/) {
-          NSMCommunicator::send(NSMMessage(node, NSMCommand::VGET, "rcstate"));
-          /*
-                std::string s;
-                get(node, "rcstate", s, 1);
-                cstate_new = RCState(s);
-          */
+        if (cstate == Enum::UNKNOWN || cstate.isError() || state.isStable()) {
+          std::string s;
+          get(node, "rcstate", s, 5);
+          cstate_new = RCState(s);
         } else {
           cstate_new = cstate;
         }
@@ -257,12 +239,15 @@ void RunControlCallback::monitor() throw(RCHandlerException)
           setState(node, cstate);
         }
       } catch (const TimeoutException& e) {
-        //LogFile::debug("%s timeout", node.getName().c_str());
+        LogFile::debug("%s timeout", node.getName().c_str());
       }
     } catch (const NSMNotConnectedException&) {
       if (cstate != Enum::UNKNOWN) {
         log(LogFile::ERROR, "%s got down.", node.getName().c_str());
         setState(node, Enum::UNKNOWN);
+        if (state == RCState::RUNNING_S) {
+          //stop();
+        }
         setState(RCState::ERROR_ES);
         failed = true;
       }

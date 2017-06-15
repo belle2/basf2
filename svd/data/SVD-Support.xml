@@ -660,7 +660,7 @@
 	<CoolingPipes>
 		<Material>Fe</Material>
 		<outerDiameter unit="mm">1.500</outerDiameter>
-		<wallThickness unit="mm">0.050</wallThickness>
+		<wallThickness unit="mm">0.100</wallThickness>
 		<Layer id="4">
 			<!-- number of pipes for this layer/halfshell -->
 			<nPipes>6</nPipes>

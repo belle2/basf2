@@ -13,11 +13,11 @@
 using namespace Belle2;
 using namespace std;
 
-const float vRAW_low_margin = 0.050;
-const float vRAW_high_margin = 0.150;
-const float vRAW1_nominal = 1.715;
-const float vRAW2_nominal = 3.049;
-const float vRAW3_nominal = 4.374;
+const float vRAW_low_margin = 0.00;
+const float vRAW_high_margin = 0.275;
+const float vRAW1_nominal = 1.765;
+const float vRAW2_nominal = 3.099;
+const float vRAW3_nominal = 4.424;
 const float fpgaTempHigh = 85;
 const float walltempHigh = 80;
 const float asictempHigh = 80;

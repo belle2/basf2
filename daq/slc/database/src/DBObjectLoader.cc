@@ -346,7 +346,7 @@ bool DBObjectLoader::createDB(DBInterface& db,
       db.execute("update configlist set lastupdate = current_timestamp where name = '%s';",
                  tablename.c_str());
     }
-    db.execute(ss.str().c_str());
+    db.execute(ss.str());
   } catch (const DBHandlerException& e) {
     LogFile::error(e.what());
     return false;

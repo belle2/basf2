@@ -289,6 +289,19 @@
 		<width  unit="mm"> 20.546</width>
 		<length unit="mm">124.080</length>
 		<Component type="APV25">
+			<u unit="mm">  6.245</u> <v unit="mm">-57.885</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm">-50.385</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm">-42.885</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm">-34.785</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm">-11.595</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm"> 11.595</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm"> 34.785</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm"> 42.885</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm"> 50.385</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm"> 57.885</v><woffset unit="mm">0.009</woffset>
+		</Component>
+
+		<Component type="APV25_copper layer">
 			<u unit="mm">  6.245</u> <v unit="mm">-57.885</v>
 			<u unit="mm">  6.245</u> <v unit="mm">-50.385</v>
 			<u unit="mm">  6.245</u> <v unit="mm">-42.885</v>
@@ -300,6 +313,18 @@
 			<u unit="mm">  6.245</u> <v unit="mm"> 50.385</v>
 			<u unit="mm">  6.245</u> <v unit="mm"> 57.885</v>
 		</Component>
+
+		<Component type="Keratherm">
+			<u unit="mm">  5.170</u> <v unit="mm">-46.0</v><woffset unit="mm">0.109</woffset>
+			<u unit="mm">  5.170</u> <v unit="mm">46.0</v><woffset unit="mm">0.109</woffset>
+		</Component>
+
+		<Component type="Clamp">
+			<u unit="mm">  5.570</u> <v unit="mm">28.760</v>
+			<u unit="mm">  5.570</u> <v unit="mm">0.0</v>
+			<u unit="mm">  5.570</u> <v unit="mm">-28.760</v>
+		</Component>
+
 		<!-- Add the top part of the Origami pitch adapter -->
 		<Component name="TopLongOrigamiPitchAdapter">
 			<Color>#cc9933</Color>
@@ -328,6 +353,33 @@
 		<width  unit="mm">8.055</width>
 		<length unit="mm">7.100</length>
 		<height unit="mm">0.100</height>
+	</Component>
+
+	<Component name="APV25_copper layer">
+		<Color>#42342B</Color>
+		<Material>Cu</Material>
+		<activeChipID>1</activeChipID>
+		<width  unit="mm">8.055</width>
+		<length unit="mm">7.100</length>
+		<height unit="mm">0.009</height>	
+	</Component>
+
+       <Component name="Keratherm">
+		<Color>#42342B</Color>
+		<Material>SVD-Keratherm</Material>
+		<activeChipID>1</activeChipID>
+		<width  unit="mm">4</width>
+		<length unit="mm">31.500</length>
+		<height unit="mm">0.291</height>
+	</Component>
+
+	<Component name="Clamp">
+		<Color>#42342B</Color>
+		<Material>SVD-Peek</Material>
+		<activeChipID>1</activeChipID>
+		<width  unit="mm">8.0</width>
+		<length unit="mm">1.75</length>
+		<height unit="mm">0.400</height>
 	</Component>
 
 	<!-- Origami flexes on bottom of sensors. The real shape is kind of

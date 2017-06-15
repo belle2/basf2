@@ -10,6 +10,25 @@
       <Element fraction="0.1282">N</Element>
     </Components>
   </Material>
+  <Material name="SVD-Keratherm">
+    <state>Solid</state>
+    <density unit="g/cm3">4.0</density>
+    <Components>
+      <Element fraction="0.2564">H</Element>
+      <Element fraction="0.5641">C</Element>
+      <Element fraction="0.0513">O</Element>
+      <Element fraction="0.1282">N</Element>
+    </Components>
+  </Material>
+ <Material name="SVD-Peek">
+    <state>Solid</state>
+    <density unit="g/cm3">2.1</density>
+    <Components>
+      <Element fraction="0.01">H</Element>
+      <Element fraction="0.04">C</Element>
+      <Element fraction="0.95">O</Element>
+    </Components>
+  </Material>
   <Material name="SVD-Glue">
     <state>Solid</state>
     <Components>

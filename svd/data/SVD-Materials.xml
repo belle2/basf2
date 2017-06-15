@@ -12,7 +12,7 @@
   </Material>
   <Material name="SVD-Keratherm">
     <state>Solid</state>
-    <density unit="g/cm3">4.0</density>
+    <density unit="g/cm3">1.79</density>
     <Components>
       <Element fraction="0.2564">H</Element>
       <Element fraction="0.5641">C</Element>

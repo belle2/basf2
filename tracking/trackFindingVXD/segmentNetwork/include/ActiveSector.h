@@ -34,18 +34,20 @@ namespace Belle2 {
     /** stores indices of all associated Hits */
     std::vector<HitType*> m_hits;
 
+    std::string m_name;
+
 
   public:
     /** ************************* CONSTRUCTORS ************************* */
 
     /** Default constructor for root compatibility */
-    ActiveSector(): m_staticSector(NULL) {}
+    ActiveSector(): m_staticSector(NULL), m_name("") {}
 
     /** Constructor.
     *      //      * @param staticSector pointer to static sector associated with this one.
      *      //      */
     ActiveSector(const StaticSectorType* staticSector):
-      m_staticSector(staticSector) {}
+      m_staticSector(staticSector), m_name(staticSector->getFullSecID().getFullSecString()) {}
 
 
     /** ************************* OPERATORS ************************* */
@@ -70,16 +72,11 @@ namespace Belle2 {
       return (getFullSecID() > b.getFullSecID());
     }
 
-
-    /** overloaded '<<' stream operator. Print secID to stream by converting it to string */
-    friend std::ostream& operator<< (std::ostream& out, const ActiveSector& aSector) { out << aSector.getName(); return out; }
-
-
     /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
 /// getters:
 
     /** returns secID of this sector */
-    std::string getName() const {return getFullSecID().getFullSecString(); }
+    std::string getName() const {return m_name; }
 
 
     /** returns all indices of attached Hits */

@@ -23,7 +23,7 @@ REG_MODULE(TFCDC_SegmentOrienter);
 REG_MODULE(TFCDC_SegmentCreatorMCTruth);
 
 TFCDC_SegmentFinderFacetAutomatonModule::TFCDC_SegmentFinderFacetAutomatonModule()
-  : Super( {"CDCWireHitVector", "CDCSegment2DVector"})
+  : Super( {"CDCWireHitClusterVector", "CDCSegment2DVector"})
 {
 }
 

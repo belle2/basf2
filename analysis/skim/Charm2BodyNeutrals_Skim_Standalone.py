@@ -53,7 +53,6 @@ filelist = ccbar_noBG
 inputMdstList('default', filelist)
 
 stdFSParticles()
-loadStdCharged()
 loadStdKS()
 loadStdPi0()
 

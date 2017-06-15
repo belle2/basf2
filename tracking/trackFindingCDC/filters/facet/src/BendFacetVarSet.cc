@@ -67,8 +67,6 @@ bool BendFacetVarSet::extract(const CDCFacet* ptrFacet)
   const double middlePhi = startToMiddleTangentialVector.angleWith(middleToEndTangentialVector);
   const double endPhi = startToEndTangentialVector.angleWith(middleToEndTangentialVector);
 
-  const double alpha = startToEndLine.at(0.5).angleWith(startToEndTangentialVector);
-
   const double startToMiddleSigmaPhi = startDriftLengthSigma / startToMiddleLength;
   const double startToEndSigmaPhi = startDriftLengthSigma / startToEndLength;
 
@@ -117,7 +115,6 @@ bool BendFacetVarSet::extract(const CDCFacet* ptrFacet)
   var<named("end_chi2")>() = endChi2;
 
   var<named("s")>() = startToEndLength;
-  var<named("alpha")>() = alpha;
 
   var<named("curv")>() = curv;
   var<named("curv_sigma")>() = curvSigma;

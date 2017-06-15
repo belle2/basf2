@@ -3,7 +3,7 @@
 
 from basf2 import *
 
-nevents = 10000000
+nevents = 1000000000
 set_log_level(LogLevel.INFO)
 
 main = create_path()

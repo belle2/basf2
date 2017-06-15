@@ -127,17 +127,42 @@ void SeqRootInputModule::event()
   if (m_nevt == 0) return;
 
   // Get a SeqRoot record from the file
-  char* evtbuf = new char[EvtMessage::c_MaxEventSize];
-  EvtMessage* evtmsg = NULL;
-  int size = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
-  if (size <= 0) {
-    delete m_file;
-    m_file = 0;
-    delete[] evtbuf;
-    return;
-  } else {
-    //    printf("SeqRootInput : read = %d\n", size);
-    evtmsg = new EvtMessage(evtbuf);
+  int size = 0;
+  int info_cnt = 0;
+  while (true) {
+    char* evtbuf = new char[EvtMessage::c_MaxEventSize];
+    EvtMessage* evtmsg = NULL;
+    size = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
+    if (size <= 0) {
+      delete m_file;
+      m_file = 0;
+      delete[] evtbuf;
+      return;
+    } else {
+      evtmsg = new EvtMessage(evtbuf);
+      if (evtmsg->type() == MSG_STREAMERINFO) {
+        // StreamerInfo is skipped except for the first .sroot file
+        //
+        // If you want to read StreamerInfo in every file, probably adding "m_streamer->restoreDataStore(evtmsg);" is fine. But not tested.
+        //
+
+        B2DEBUG(1, "Skipping StreamerInfo. The StreamerInfo of the first file is used. : m_nevt " << m_nevt);
+        if (info_cnt != 0) B2FATAL("SeqRootInput : Reading StreamerInfos twice");
+        info_cnt++;
+
+
+        // Delete buffers and read again
+        delete[] evtbuf;
+        delete evtmsg;
+      } else {
+        // Read an event
+        // Delete buffers
+        m_streamer->restoreDataStore(evtmsg);
+        delete[] evtbuf;
+        delete evtmsg;
+        break;
+      }
+    }
   }
 
   // Statistics
@@ -145,17 +170,7 @@ void SeqRootInputModule::event()
   m_size += dsize;
   m_size2 += dsize * dsize;
 
-  if (evtmsg->type() == MSG_STREAMERINFO) {
-    B2FATAL("SeqRootInput : StreamerInfo is found in the middle of *.sroot-* files");
-  }
 
-  // Restore objects in DataStore
-  m_streamer->restoreDataStore(evtmsg);
-
-
-  // Delete buffers
-  delete[] evtbuf;
-  delete evtmsg;
 }
 
 void SeqRootInputModule::endRun()

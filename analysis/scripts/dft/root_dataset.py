@@ -1,74 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Jochen Gemmler 2016
-try:
-    from pylearn2.datasets.dense_design_matrix import DenseDesignMatrix
-except ImportError:
-    print('DenseDesignMatrix is not available.')
+# Jochen Gemmler 2016 - 2017
 
 from dft import root_to_array as rta
 from dft import root_to_numpy as rtn
 
 import numpy as np
-
-
-def get_train_sets(f_name, train_vars=None, ignore_vars=None, target_var='qrCombined', fraction=.92, shuffle=True):
-    """
-    :param f_name:
-    :param train_vars:
-    :param ignore_vars:
-    :param target_var:
-    :param v_fraction: determines the number of events used for training only,
-    fraction x train, (1 - fraction)/2 x valid, (1 - fraction)/2 x test
-    :return: pylearn2 dense design matrix and transformation dictionary for variables (with bins)
-    """
-
-    if ignore_vars is None:
-        ignore_vars = ['__weight__']
-    else:
-        if '__weight__' not in ignore_vars:
-            ignore_vars += ['__weight__']
-
-    if train_vars is None:
-        arr = rta.read_root_to_array(f_name, ignore=ignore_vars, start=0, stop=1)
-        variables = arr.dtype.names
-        train_vars = [var for var in variables if var not in ignore_vars]
-        if target_var in train_vars:
-            train_vars.remove(target_var)
-
-    arr = rta.read_root_to_array(f_name, ignore=ignore_vars)
-
-    esb_trafo = rtn.transform_array(arr, ignore=target_var)
-
-    total_entries = arr.shape[0]
-
-    if shuffle:
-        np.random.shuffle(arr)
-
-    valid_end = .5 * (1 + fraction)
-
-    dataset_train = DenseDesignMatrix(
-        X=rtn.to_numpy(arr[:int(fraction * total_entries)][train_vars]),
-        y=rtn.to_numpy(arr[:int(fraction * total_entries)][target_var])
-    )
-
-    dataset_valid = DenseDesignMatrix(
-        X=rtn.to_numpy(arr[int(fraction * total_entries):int(valid_end * total_entries)][train_vars]),
-        y=rtn.to_numpy(arr[int(fraction * total_entries):int(valid_end * total_entries)][target_var])
-    )
-
-    a_test_X = rtn.to_numpy(arr[int(valid_end * total_entries):][train_vars])
-    a_test_y = rtn.to_numpy(arr[int(valid_end * total_entries):][target_var])
-
-    print("Train vars:")
-    for var in train_vars:
-        print(var)
-
-    print("Target var:")
-    print(target_var)
-
-    return dataset_train, dataset_valid, a_test_X, a_test_y, esb_trafo
 
 
 def get_train_sets_numpy(f_name, train_vars=None, ignore_vars=None, target_var='qrCombined', fraction=.92,

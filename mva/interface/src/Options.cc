@@ -34,7 +34,7 @@ namespace Belle2 {
       ("weight_variable", po::value<std::string>(&m_weight_variable), "weight variable used to weight each event")
       ("max_events", po::value<unsigned int>(&m_max_events), "maximum number of events to process, 0 means all")
       ("method", po::value<std::string>(&m_method)->required(),
-       "MVA Method [FastBDT|TMVA|XGBoost|Theano|Tensorflow|FANN|SKLearn]");
+       "MVA Method [FastBDT|TMVAClassification|TMVARegression|Python|FANN|]");
       return description;
     }
 

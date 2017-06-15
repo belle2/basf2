@@ -44,7 +44,6 @@ void RunControlCallback::initialize(const DBObject& obj) throw(RCHandlerExceptio
   if (!addAll(obj)) {
     throw (RCHandlerException("Failed to initialize (config=%s)", obj.getName().c_str()));
   }
-  //distribute_r(NSMMessage(RCCommand::ABORT));
   for (size_t i = 0; i < m_lrc_v.size(); i++) {
     try {
       set(m_lrc_v[i], "used", 0);
@@ -79,26 +78,6 @@ void RunControlCallback::setState(NSMNode& node, const RCState& state) throw()
   }
 }
 
-/*
-void RunControlCallback::setConfig(RCNode& node, const std::string& config) throw()
-{
-  node.setConfig(config);
-  DBObjectList& objs(getDBObject().getObjects("node"));
-  for (size_t i = 0; i < objs.size(); i++) {
-    DBObject& o_node(objs[i]);
-    if (node.getName() == o_node.getText("name")) {
-      o_node.addText("config", config);
-      std::string vname = StringUtil::form("node[%d]", (int)i);
-      set(vname + ".rcconfig", config);
-      vname = StringUtil::tolower(node.getName());
-      set(vname + ".rcconfig", config);
-      log(LogFile::DEBUG, "%s config : %s", node.getName().c_str(), config.c_str());
-      return;
-    }
-  }
-}
-*/
-
 void RunControlCallback::ok(const char* nodename, const char* data) throw()
 {
   log(LogFile::DEBUG, "OK from %s (state = %s)", nodename, data);
@@ -117,12 +96,12 @@ void RunControlCallback::ok(const char* nodename, const char* data) throw()
   } catch (const std::out_of_range& e) {
     LogFile::debug(e.what());
   }
-  monitor();
+  //monitor();
 }
 
 void RunControlCallback::error(const char* nodename, const char* data) throw()
 {
-  log(LogFile::DEBUG, "ERROR from %s (state = %s)", nodename, data);
+  //log(LogFile::DEBUG, "ERROR from %s (state = %s)", nodename, data);
   try {
     RCNode& node(findNode(nodename));
     logging(node, LogFile::ERROR, data);
@@ -134,7 +113,7 @@ void RunControlCallback::error(const char* nodename, const char* data) throw()
   } catch (const std::out_of_range& e) {
     LogFile::warning("ERROR from unknown node %s : %s", nodename, data);
   }
-  monitor();
+  //monitor();
 }
 
 void RunControlCallback::fatal(const char* nodename, const char* data) throw()
@@ -142,13 +121,16 @@ void RunControlCallback::fatal(const char* nodename, const char* data) throw()
   try {
     RCNode& node(findNode(nodename));
     logging(node, LogFile::FATAL, data);
-    setState(RCState::ABORTING_RS);
-    reply(NSMMessage(RCCommand::ABORT, "Aborting due to error on " + node.getName()));
-    abort();
+    setState(RCState::ERROR_ES);
+    m_starttime = -1;
+    m_restarting = false;
+    //setState(RCState::ABORTING_RS);
+    //reply(NSMMessage(RCCommand::ABORT, "Aborting due to error on " + node.getName()));
+    //abort();
   } catch (const std::out_of_range& e) {
     LogFile::warning("ERROR from unknown node %s : %s", nodename, data);
   }
-  monitor();
+  //monitor();
 }
 
 void RunControlCallback::boot(const DBObject& obj) throw(RCHandlerException)
@@ -166,10 +148,7 @@ void RunControlCallback::load(const DBObject& obj) throw(RCHandlerException)
 void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
 {
   try {
-    DBObject& obj(getDBObject());
-    bool ismaster = false;
     if (expno == 0 || runno == 0) {
-      ismaster = true;
       if (getDB()) {
         DBInterface& db(*getDB());
         if (!db.isConnected()) db.connect();
@@ -179,45 +158,13 @@ void RunControlCallback::start(int expno, int runno) throw(RCHandlerException)
         runno = m_runno.getRunNumber();
         setRunNumbers(expno, runno);
         set("tstart", (int)m_runno.getRecordTime());
-        obj.addInt("tstart", (int)m_runno.getRecordTime());
         set("ismaster", (int)true);
-        obj.addBool("ismaster", true);
-        std::string comment;
-        get("comment", comment);
-        obj.addText("comment", comment);
-        std::string operators;
-        get("operators", operators);
-        obj.addText("opeeators", operators);
-        obj.addInt("expno", expno);
-        obj.addInt("runno", runno);
       } else {
         throw (RCHandlerException("DB is not available"));
       }
     } else {
       set("ismaster", (int)false);
-      obj.addBool("ismaster", false);
     }
-    DBObjectList& objs(obj.getObjects("node"));
-    for (size_t i = 0; i < m_node_v.size(); i++) {
-      DBObject& o_node(objs[i]);
-      RCNode& node(m_node_v[i]);
-      if (node.isUsed()) {
-        std::string vname = StringUtil::form("node[%d]", i);
-        try {
-          std::string rcconfig;
-          std::string dbtable;
-          get(node, "dbtable", dbtable);
-          rcconfig = StringUtil::form("%04d:%06d:s", expno, runno);
-          o_node.addText("rcconfig", rcconfig);
-          o_node.addText("dbtable", dbtable + "_log");
-        } catch (const TimeoutException& e) {
-          LogFile::error(e.what());
-        }
-      }
-    }
-
-    if (ismaster) dbrecord(obj, expno, runno, true);
-
     set("expno", expno);
     set("runno", runno);
     int pars[2] = {expno, runno};
@@ -263,6 +210,21 @@ void RunControlCallback::abort() throw(RCHandlerException)
   m_starttime = -1;
 }
 
+void RunControlCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
+{
+  if (var.getName() == "rcstate" &&
+      var.getType() == NSMVar::TEXT) {
+    for (size_t i = 0; i < m_node_v.size(); i++) {
+      RCNode& node(m_node_v[i]);
+      if (var.getNode() == node.getName()) {
+        setState(node, var.getText());
+        return;
+      }
+    }
+  }
+  NSMCallback::vset(com, var);
+}
+
 void RunControlCallback::monitor() throw(RCHandlerException)
 {
   RCState state(getNode().getState());
@@ -276,10 +238,13 @@ void RunControlCallback::monitor() throw(RCHandlerException)
     try {
       NSMCommunicator::connected(node.getName());
       try {
-        if (cstate == Enum::UNKNOWN || cstate.isError() || state.isStable()) {
-          std::string s;
-          get(node, "rcstate", s, 1);
-          cstate_new = RCState(s);
+        if (cstate == Enum::UNKNOWN || cstate.isError() /*|| state.isStable()*/) {
+          NSMCommunicator::send(NSMMessage(node, NSMCommand::VGET, "rcstate"));
+          /*
+                std::string s;
+                get(node, "rcstate", s, 1);
+                cstate_new = RCState(s);
+          */
         } else {
           cstate_new = cstate;
         }
@@ -292,15 +257,12 @@ void RunControlCallback::monitor() throw(RCHandlerException)
           setState(node, cstate);
         }
       } catch (const TimeoutException& e) {
-        LogFile::debug("%s timeout", node.getName().c_str());
+        //LogFile::debug("%s timeout", node.getName().c_str());
       }
     } catch (const NSMNotConnectedException&) {
       if (cstate != Enum::UNKNOWN) {
         log(LogFile::ERROR, "%s got down.", node.getName().c_str());
         setState(node, Enum::UNKNOWN);
-        if (state == RCState::RUNNING_S) {
-          //stop();
-        }
         setState(RCState::ERROR_ES);
         failed = true;
       }
@@ -313,31 +275,33 @@ void RunControlCallback::monitor() throw(RCHandlerException)
       state_new = RCState::UNKNOWN;
     }
   }
-  if (failed) state_new = RCState::NOTREADY_S;
-  if (state_new != RCState::UNKNOWN && state != state_new) {
-    setState(state_new);
-  }
-  const std::string nodename = m_node_v[m_node_v.size() - 1].getName();
-  if (getNode().getState() != RCState::NOTREADY_S &&
-      checkAll(nodename, RCState::NOTREADY_S)) {
-    setState(RCState::NOTREADY_S);
-  }
-  if (getNode().getState() != RCState::READY_S &&
-      checkAll(nodename, RCState::READY_S)) {
-    setState(RCState::READY_S);
-  }
-  if (getNode().getState() != RCState::PAUSED_S &&
-      checkAll(nodename, RCState::PAUSED_S)) {
-    setState(RCState::PAUSED_S);
-  }
-  if (getNode().getState() != RCState::RUNNING_S &&
-      checkAll(nodename, RCState::RUNNING_S)) {
-    setState(RCState::RUNNING_S);
-  }
-  if (getNode().getState() == RCState::RUNNING_S &&
-      !checkAll(nodename, RCState::RUNNING_S)) {
-    setState(RCState::ERROR_ES);
-    stop();
+  if (getNode().getState() != RCState::ERROR_ES) {
+    if (failed) state_new = RCState::NOTREADY_S;
+    if (state_new != RCState::UNKNOWN && state != state_new) {
+      setState(state_new);
+    }
+    const std::string nodename = m_node_v[m_node_v.size() - 1].getName();
+    if (getNode().getState() != RCState::NOTREADY_S &&
+        checkAll(nodename, RCState::NOTREADY_S)) {
+      setState(RCState::NOTREADY_S);
+    }
+    if (getNode().getState() != RCState::READY_S &&
+        checkAll(nodename, RCState::READY_S)) {
+      setState(RCState::READY_S);
+    }
+    if (getNode().getState() != RCState::PAUSED_S &&
+        checkAll(nodename, RCState::PAUSED_S)) {
+      setState(RCState::PAUSED_S);
+    }
+    if (getNode().getState() != RCState::RUNNING_S &&
+        checkAll(nodename, RCState::RUNNING_S)) {
+      setState(RCState::RUNNING_S);
+    }
+    if (getNode().getState() == RCState::RUNNING_S &&
+        !checkAll(nodename, RCState::RUNNING_S)) {
+      setState(RCState::ERROR_ES);
+      stop();
+    }
   }
 }
 
@@ -354,25 +318,6 @@ void RunControlCallback::distribute_r(NSMMessage msg) throw()
 void RunControlCallback::postRun() throw()
 {
   try {
-    int expno = getExpNumber(), runno = getRunNumber();
-    DBObjectList& objs(getDBObject().getObjects("node"));
-    for (size_t i = 0; i < m_node_v.size(); i++) {
-      DBObject& o_node(objs[i]);
-      RCNode& node(m_node_v[i]);
-      if (node.isUsed()) {
-        std::string vname = StringUtil::form("node[%d]", i);
-        try {
-          std::string rcconfig;
-          std::string dbtable;
-          get(node, "dbtable", dbtable);
-          rcconfig = StringUtil::form("%04d:%06d:e", expno, runno);
-          o_node.addText("rcconfig", rcconfig);
-          o_node.addText("dbtable", dbtable + "_log");
-        } catch (const TimeoutException& e) {
-          LogFile::error(e.what());
-        }
-      }
-    }
     int ismaster = 0;
     get("ismaster", ismaster);
     if (ismaster && m_runno.isStart() && getDB()) {
@@ -380,6 +325,7 @@ void RunControlCallback::postRun() throw()
       db.connect();
       m_runno.setStart(false);
       RunNumberTable(db).add(m_runno);
+      db.close();
     }
   } catch (const std::exception& e) {
     log(LogFile::ERROR, e.what());
@@ -439,7 +385,7 @@ void RunControlCallback::logging_imp(const NSMNode& node, LogFile::Priority pri,
     setState(RCState::NOTREADY_S);
   }
   if (log.getPriority() >= m_priority_global) {
-    reply(NSMMessage(log));
+    //  reply(NSMMessage(log));
   }
   RCCallback::log(pri, msg);
 }

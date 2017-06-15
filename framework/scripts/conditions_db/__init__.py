@@ -283,6 +283,22 @@ class ConditionsDB:
         return result
 
 
+def require_database_for_test(timeout=60, base_url=ConditionsDB.BASE_URL):
+    """Make sure that the database is available and skip the test if not.
+
+    This function should be called in test scripts if they are expected to fail
+    if the database is down. It either returns when the database is ok or it
+    will signal test_basf2 that the test should be skipped and exit
+    """
+    import sys
+    condb = ConditionsDB(base_url=base_url, max_connections=1)
+    try:
+        condb.request("HEAD", "/globalTags", timeout=timeout)
+    except ConditionsDB.RequestError as e:
+        print("TEST SKIPPED: Database problem: %s" % e, file=sys.stderr)
+        sys.exit(1)
+
+
 def enable_debugging():
     """Enable verbose output of python-requests to be able to debug http connections"""
     # These two lines enable debugging at httplib level (requests->urllib3->http.client)

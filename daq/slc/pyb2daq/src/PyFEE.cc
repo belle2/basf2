@@ -47,9 +47,7 @@ PyFEE::~PyFEE() throw()
 void PyFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
   try {
-    PyNSMCallback::setCallback(&callback);
-    m_init(hslb, DAQDBObject(obj));
-    PyNSMCallback::setCallback(NULL);
+    m_init(callback, hslb, DAQDBObject(obj));
   } catch (const IOException& e) {
     throw (RCHandlerException(e.what()));
   } catch (...) {
@@ -63,9 +61,7 @@ void PyFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 void PyFEE::boot(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
   try {
-    PyNSMCallback::setCallback(&callback);
-    m_boot(hslb, DAQDBObject(obj));
-    PyNSMCallback::setCallback(NULL);
+    m_boot(callback, hslb, DAQDBObject(obj));
   } catch (const IOException& e) {
     throw (RCHandlerException(e.what()));
   } catch (...) {
@@ -79,9 +75,7 @@ void PyFEE::boot(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 void PyFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
   try {
-    PyNSMCallback::setCallback(&callback);
-    m_load(hslb, DAQDBObject(obj));
-    PyNSMCallback::setCallback(NULL);
+    m_load(callback, hslb, DAQDBObject(obj));
   } catch (const IOException& e) {
     throw (RCHandlerException(e.what()));
   } catch (...) {
@@ -95,9 +89,7 @@ void PyFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 void PyFEE::monitor(RCCallback& callback, HSLB& hslb)
 {
   try {
-    PyNSMCallback::setCallback(&callback);
-    m_monitor(hslb);
-    PyNSMCallback::setCallback(NULL);
+    m_monitor(callback, hslb);
   } catch (const IOException& e) {
     throw (RCHandlerException(e.what()));
   } catch (...) {

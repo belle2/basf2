@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 from hep_ipython_tools.calculation_list import create_every_parameter_combination, create_all_calculations
 
 # @cond internal_test
@@ -112,4 +112,6 @@ class TestCalculationList(TestCase):
             else:
                 self.assertEqual(all_calculation_kwargs[index], None)
 
+if __name__ == "__main__":
+    main()
 # @endcond

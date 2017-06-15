@@ -111,6 +111,18 @@ namespace Belle2 {
     //! @return whether this 2D hit is deemed inefficient (true) or not (false)
     bool isInefficient() { return (m_ModuleID & BKLM_INEFFICIENT_MASK) != 0; }
 
+    //! Get 3D hit position's x coordinate in global coordinates
+    //! @return 3D hit position's x coordinate in global coordinates (cm)
+    float getGlobalPositionX(void) const { return m_GlobalPosition[0]; }
+
+    //! Get 3D hit position's y coordinate in global coordinates
+    //! @return 3D hit position's y coordinate in global coordinates (cm)
+    float getGlobalPositionY(void) const { return m_GlobalPosition[1]; }
+
+    //! Get 3D hit position's z coordinate in global coordinates
+    //! @return 3D hit position's z coordinate in global coordinates (cm)
+    float getGlobalPositionZ(void) const { return m_GlobalPosition[2]; }
+
     //! Get 3D hit position in global coordinates
     //! @return 3D hit position in global coordinates (cm)
     TVector3 getGlobalPosition(void) const { return TVector3(m_GlobalPosition[0], m_GlobalPosition[1], m_GlobalPosition[2]); }
@@ -163,7 +175,7 @@ namespace Belle2 {
     float m_EDep;
 
     //! Needed to make the ROOT object storable
-    ClassDef(BKLMHit2d, 4)
+    ClassDef(BKLMHit2d, 5)
 
   };
 

@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -58,24 +60,32 @@ namespace Belle2 {
       /// Parameter : Geometry set to be used. Either "base", "misalign" or " aligned"
       std::string m_param_wirePosSet = "base";
 
-      /// Geometry set to be used.
-      CDC::CDCGeometryPar::EWirePosition m_wirePosSet = CDC::CDCGeometryPar::c_Base;
-
       /// Parameter : Switch to deactivate the sag of the wires for the concerns of the track finders.
       bool m_param_ignoreWireSag = false;
 
       /// Parameter : Method for the initial time of flight estimation as string
       std::string m_param_flightTimeEstimation = "none";
 
-      /// Method for the initial time of flight estimation
-      EPreferredDirection m_flightTimeEstimation = EPreferredDirection::c_None;
-
       /// Parameter : Location of the flight time zero
       std::tuple<double, double, double> m_param_triggerPoint = {0.0, 0.0, 0.0};
+
+      /// Parameter : List of super layers to be used - mostly for debugging
+      std::vector<int> m_param_useSuperLayers;
+
+    private: // Prepared variables
+      /// Geometry set to be used.
+      CDC::CDCGeometryPar::EWirePosition m_wirePosSet = CDC::CDCGeometryPar::c_Base;
+
+      /// Method for the initial time of flight estimation
+      EPreferredDirection m_flightTimeEstimation = EPreferredDirection::c_None;
 
       /// Central location of the flight time zero position. Usually the location of the trigger.
       Vector3D m_triggerPoint = Vector3D(0.0, 0.0, 0.0);
 
+      /// Bits for the used super layers
+      std::array<bool, ISuperLayerUtil::c_N> m_useSuperLayers{};
+
+    private: // Translators
       /// TDC Count translator to be used to calculate the initial dirft length estiamtes
       std::unique_ptr<CDC::TDCCountTranslatorBase> m_tdcCountTranslator = nullptr;
 

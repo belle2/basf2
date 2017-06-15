@@ -12,7 +12,8 @@
 #include <hlt/softwaretrigger/core/utilities.h>
 // TODO: Also cache it
 #include <analysis/utility/PCmsLabTransform.h>
-
+#include <analysis/ClusterUtility/ClusterUtils.h>
+#include <mdst/dataobjects/KLMCluster.h>
 #include <numeric>
 
 namespace Belle2 {
@@ -26,7 +27,9 @@ namespace Belle2 {
     void HLTCalculator::doCalculation(SoftwareTriggerObject& calculationResult) const
     {
       // Prefetch some later needed objects/values
-      const ECLCluster* eclClusterWithMaximumRho = getElementWithMaximumRho<ECLCluster>(m_gammaParticles);
+      const Particle* gammaWithMaximumRho = getElementWithMaximumRho<Particle>(m_gammaParticles);
+      const Particle* gammaWithSecondMaximumRho = getElementWithMaximumRhoBelow<Particle>(m_gammaParticles,
+                                                  getRho(gammaWithMaximumRho));
       const Particle* trackWithMaximumRho = getElementWithMaximumRho<Particle>(m_pionParticles);
       const Particle* trackWithSecondMaximumRho = getElementWithMaximumRhoBelow<Particle>(m_pionParticles,
                                                   getRho(trackWithMaximumRho));
@@ -38,6 +41,9 @@ namespace Belle2 {
 
       const double& rhoOfTrackWithMaximumRho = getRho(trackWithMaximumRho);
       const double& rhoOfTrackWithSecondMaximumRho = getRho(trackWithSecondMaximumRho);
+      const double& rhoOfGammaWithMaximumRho = getRho(gammaWithMaximumRho);
+      const double& rhoOfGammaWithSecondMaximumRho = getRho(gammaWithSecondMaximumRho);
+
 
       // Simple to calculate variables
       // EC1CMSLE
@@ -52,19 +58,44 @@ namespace Belle2 {
       // nTracksLE
       calculationResult["nTracksLE"] = m_pionParticles->getListSize();
 
+      // nTracksLE
+      calculationResult["nGammasLE"] = m_gammaParticles->getListSize();
+
       // P1CMSBhabhaLE
       calculationResult["P1CMSBhabhaLE"] = rhoOfTrackWithMaximumRho;
+
+      // P1CMSBhabhaLE/E_beam
+      calculationResult["P1OEbeamCMSBhabhaLE"] = rhoOfTrackWithMaximumRho / BeamEnergyCMS();
 
       // P2CMSBhabhaLE
       calculationResult["P2CMSBhabhaLE"] = rhoOfTrackWithSecondMaximumRho;
 
+      // P2CMSBhabhaLE/E_beam
+      calculationResult["P2OEbeamCMSBhabhaLE"] = rhoOfTrackWithSecondMaximumRho / BeamEnergyCMS();
+
       // P12CMSBhabhaLE
       calculationResult["P12CMSBhabhaLE"] = rhoOfTrackWithMaximumRho + rhoOfTrackWithSecondMaximumRho;
 
+      //G1CMSLE, the largest energy of gamma in CMS
+      calculationResult["G1CMSBhabhaLE"] = rhoOfGammaWithMaximumRho;
+      //G1OEbeamCMSLE, the largest energy of gamma in CMS over beam energy
+      calculationResult["G1OEbeamCMSBhabhaLE"] = rhoOfGammaWithMaximumRho / BeamEnergyCMS();
+
+      //G2CMSLE, the secondary largest energy of gamma in CMS
+      calculationResult["G2CMSBhabhaLE"] = rhoOfGammaWithSecondMaximumRho;
+      //G2OEbeamCMSLE, the largest energy of gamma in CMS over beam energy
+      calculationResult["G2OEbeamCMSBhabhaLE"] = rhoOfGammaWithSecondMaximumRho / BeamEnergyCMS();
+
+      //G12CMSLE, the secondary largest energy of gamma in CMS
+      calculationResult["G12CMSBhabhaLE"] = rhoOfGammaWithMaximumRho + rhoOfGammaWithSecondMaximumRho;
+      //G12CMSLE, the secondary largest energy of gamma in CMS over beam energy
+      calculationResult["G12OEbeamCMSBhabhaLE"] = (rhoOfGammaWithMaximumRho + rhoOfGammaWithSecondMaximumRho) / BeamEnergyCMS();
+
+
       // Medium hard to calculate variables
       // ENeutralLE
-      if (eclClusterWithMaximumRho) {
-        calculationResult["ENeutralLE"] = eclClusterWithMaximumRho->getEnergy();
+      if (gammaWithMaximumRho) {
+        calculationResult["ENeutralLE"] = getRho(gammaWithMaximumRho);
       } else {
         calculationResult["ENeutralLE"] = -1;
       }
@@ -76,11 +107,22 @@ namespace Belle2 {
       });
       calculationResult["nECLMatchTracksLE"] = numberOfTracksWithECLMatch;
 
+      //nECLClustersLE
+      double neclClusters = -1.;
+      StoreArray<ECLCluster> eclClusters;
+      if (eclClusters.isValid()) {
+        const unsigned int numberOfECLClusters = std::count_if(eclClusters.begin(), eclClusters.end(),
+        [](const ECLCluster & eclcluster) {
+          return eclcluster.getEnergy() > 0.1;
+        });
+        neclClusters = numberOfECLClusters;
+      }
+      calculationResult["nECLClustersLE"] = neclClusters;
 
       // AngleGTLE
       double angleGTLE = -10.;
-      if (eclClusterWithMaximumRho) {
-        const TLorentzVector& V4g1 = eclClusterWithMaximumRho->get4Vector();
+      if (gammaWithMaximumRho) {
+        const TLorentzVector& V4g1 = gammaWithMaximumRho->get4Vector();
         if (trackWithMaximumRho) {
           const TLorentzVector& V4p1 = trackWithMaximumRho->get4Vector();
           const double theta1 = (V4g1.Vect()).Angle(V4p1.Vect());
@@ -92,8 +134,23 @@ namespace Belle2 {
           if (angleGTLE < theta2) angleGTLE = theta2;
         }
       }
+
       calculationResult["AngleGTLE"] = angleGTLE;
 
+
+      // AngleG1G2LE
+      double angleG1G2CMSLE = -10.;
+      if (gammaWithMaximumRho) {
+        const TLorentzVector& V4p1 = gammaWithMaximumRho->get4Vector();
+        if (gammaWithSecondMaximumRho) {
+          const TLorentzVector& V4p2 = gammaWithSecondMaximumRho->get4Vector();
+          const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
+          const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
+          angleG1G2CMSLE = V3p1.Angle(V3p2);
+        }
+      }
+
+      calculationResult["AngleG1G2CMSLE"] = angleG1G2CMSLE;
 
       // maxAngleTTLE
       double maxAngleTTLE = -10.;
@@ -114,14 +171,35 @@ namespace Belle2 {
 
       calculationResult["maxAngleTTLE"] = maxAngleTTLE;
 
+      //maxAngleGGLE
+
+      double maxAngleGGLE = -10.;
+      if (m_gammaParticles->getListSize() >= 2) {
+        for (unsigned int i = 0; i < m_gammaParticles->getListSize() - 1; i++) {
+          Particle* par1 = m_gammaParticles->getParticle(i);
+          for (unsigned int j = i + 1; j < m_gammaParticles->getListSize(); j++) {
+            Particle* par2 = m_gammaParticles->getParticle(j);
+            TLorentzVector V4p1 = par1->get4Vector();
+            TLorentzVector V4p2 = par2->get4Vector();
+            const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
+            const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
+            const double temp = V3p1.Angle(V3p2);
+            if (maxAngleGGLE < temp) maxAngleGGLE = temp;
+          }
+        }
+      }
+
+      calculationResult["maxAngleGGLE"] = maxAngleGGLE;
+
       // nEidLE
       const unsigned int nEidLE = std::count_if(m_pionParticles->begin(), m_pionParticles->end(), [](const Particle & p) {
         const double& momentum  = p.getMomentumMagnitude();
-        const double& rho = getRho(&p);
+        const double& r_rho = getRho(&p);
         const ECLCluster* eclTrack = getECLCluster(p, true);
         if (eclTrack) {
           const double& energyOverMomentum = eclTrack->getEnergy() / momentum;
-          return rho > 5.0 && energyOverMomentum > 0.8;
+          double r_rhotoebeam = r_rho / BeamEnergyCMS();
+          return (r_rhotoebeam) > 0.35 && energyOverMomentum > 0.8;
         }
         return false;
       });
@@ -159,8 +237,49 @@ namespace Belle2 {
       [](const double & eTot, const Particle & p) {
         return eTot + p.getEnergy();
       });
+      double Etot = eTotTracks + eTotGammas;
+      calculationResult["EtotLE"] = Etot;
 
-      calculationResult["EtotLE"] = eTotTracks + eTotGammas;
+      //KLM inforamtion
+      // The clusters with the largest pentrate layers in KLM.
+      double numMaxLayerKLM = -1.;
+      double numSecMaxLayerKLM = -1.;
+      StoreArray<KLMCluster> klmClusters;
+      if (klmClusters.isValid()) {
+        for (const auto& klmCluster : klmClusters) {
+          double klmClusterLayer = klmCluster.getLayers();
+          if (numMaxLayerKLM < klmClusterLayer) {
+            numSecMaxLayerKLM = numMaxLayerKLM;
+            numMaxLayerKLM = klmClusterLayer;
+          } else if (numSecMaxLayerKLM < klmClusterLayer)
+            numSecMaxLayerKLM = klmClusterLayer;
+        }
+      }
+      calculationResult["N1KLMLayer"] = numMaxLayerKLM;
+      calculationResult["N2KLMLayer"] = numSecMaxLayerKLM;
+
+      //define bhabha_2trk, bhabha_1trk, eclbhabha
+      double Bhabha2Trk = 0.;
+      int ntrk_bha = m_pionParticles->getListSize();
+      double rp1ob = rhoOfTrackWithMaximumRho / BeamEnergyCMS();
+      double rp2ob = rhoOfTrackWithSecondMaximumRho / BeamEnergyCMS();
+      bool bhabha2trk_tag = ntrk_bha >= 2 && maxAngleTTLE > 2.88 && nEidLE >= 1 && rp1ob > 0.35 && rp2ob > 0.35 && (Etot) > 4.0;
+      if (bhabha2trk_tag) Bhabha2Trk = 1;
+      calculationResult["Bhabha2Trk"] = Bhabha2Trk;
+
+      double Bhabha1Trk = 0.;
+      double rc1ob = rhoOfGammaWithMaximumRho / BeamEnergyCMS();
+      double rc2ob = rhoOfGammaWithSecondMaximumRho / BeamEnergyCMS();
+      bool bhabha1trk_tag = ntrk_bha == 1 && rp1ob > 0.35 && rc1ob > 0.35 && angleGTLE > 2.618;
+      if (bhabha1trk_tag) Bhabha1Trk = 1;
+      calculationResult["Bhabha1Trk"] = Bhabha1Trk;
+
+      double ggSel = 0.;
+      bool gg_tag = ntrk_bha <= 1 && nEidLE == 0 && rc1ob > 0.35 && rc2ob > 0.2 && Etot > 4.0 && maxAngleGGLE > 2.618;
+      if (gg_tag) ggSel = 1;
+      calculationResult["GG"] = ggSel;
+
+
     }
   }
 }

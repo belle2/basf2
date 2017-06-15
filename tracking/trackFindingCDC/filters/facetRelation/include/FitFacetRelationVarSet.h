@@ -25,6 +25,8 @@ namespace Belle2 {
       "from_middle_cos_delta",
       "to_middle_cos_delta",
 
+
+      "alpha_0",
       "chi2_0",
       "chi2_0_per_s",
       "erf_0",

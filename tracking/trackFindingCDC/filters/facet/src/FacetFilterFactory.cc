@@ -19,6 +19,8 @@
 #include <tracking/trackFindingCDC/filters/facet/UnionRecordingFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/MVAFacetFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
@@ -50,6 +52,7 @@ std::map<std::string, std::string> FacetFilterFactory::getValidFilterNamesAndDes
     {"realistic", "mc free with realistic criteria"},
     {"realistic_loss", "mc with realistice criteria but losser cut"},
     {"chi2", "mc free based on chi2 fitting"},
+    {"chi2_old", "old based on chi2 fitting with single cut regardless of superlayer"},
     {"unionrecording", "record many multiple choosable variable set"},
     {"mva", "filter facets with a mva method"},
   };
@@ -58,7 +61,7 @@ std::map<std::string, std::string> FacetFilterFactory::getValidFilterNamesAndDes
 std::unique_ptr<BaseFacetFilter> FacetFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<BaseFacetFilter>();
+    return makeUnique<NoneFilter<BaseFacetFilter>>();
   } else if (filterName == "all") {
     return makeUnique<AllFacetFilter>();
   } else if (filterName == "truth") {
@@ -73,6 +76,8 @@ std::unique_ptr<BaseFacetFilter> FacetFilterFactory::create(const std::string& f
     return makeUnique<RealisticFacetFilter>(25);
   } else if (filterName == "chi2") {
     return makeUnique<Chi2FacetFilter>();
+  } else if (filterName == "chi2_old") {
+    return makeUnique<Chi2FacetFilter>(75.0, 120.0);
   } else if (filterName == "unionrecording") {
     return makeUnique<UnionRecordingFacetFilter>();
   } else if (filterName == "mva") {

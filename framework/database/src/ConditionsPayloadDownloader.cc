@@ -155,7 +155,12 @@ namespace Belle2 {
     if (!m_session->curl) {
       B2FATAL("Cannot intialize libcurl");
     }
+    m_session->headers = curl_slist_append(nullptr, "Accept: application/json");
     curl_easy_setopt(m_session->curl, CURLOPT_HTTPHEADER, m_session->headers);
+    curl_easy_setopt(m_session->curl, CURLOPT_TCP_KEEPALIVE, 1L);
+    curl_easy_setopt(m_session->curl, CURLOPT_CONNECTTIMEOUT, 60);
+    curl_easy_setopt(m_session->curl, CURLOPT_LOW_SPEED_LIMIT, 10 * 1024); //10 kB/s
+    curl_easy_setopt(m_session->curl, CURLOPT_LOW_SPEED_TIME, 60);
     curl_easy_setopt(m_session->curl, CURLOPT_WRITEFUNCTION, write_function);
     curl_easy_setopt(m_session->curl, CURLOPT_VERBOSE, 1);
     curl_easy_setopt(m_session->curl, CURLOPT_NOPROGRESS, 0);
@@ -164,7 +169,6 @@ namespace Belle2 {
     curl_easy_setopt(m_session->curl, CURLOPT_XFERINFODATA, m_session.get());
     curl_easy_setopt(m_session->curl, CURLOPT_FAILONERROR, true);
     curl_easy_setopt(m_session->curl, CURLOPT_ERRORBUFFER, m_session->errbuf);
-    m_session->headers = curl_slist_append(nullptr, "Accept: application/json");
     return true;
   }
 
@@ -270,9 +274,10 @@ namespace Belle2 {
       return false;
     }
     // report on duplicate payloads because that should not be ...
-    if (!duplicates.empty()) {
-      B2INFO("Found more then one payload for the following keys: " << boost::algorithm::join(duplicates, ", "));
-    }
+    // FIXME: commented out until we can delete iovs ...
+    //if (!duplicates.empty()) {
+    //  B2INFO("Found more then one payload for the following keys: " << boost::algorithm::join(duplicates, ", "));
+    //}
     return true;
   }
 

@@ -173,7 +173,6 @@ void HVControlCallback::monitor() throw()
                     (channel.isTurnOn() && state != HVMessage::ON)) {
           isstable = false;
         }
-        LogFile::debug("istrunon = %s state = %s", (channel.isTurnOn() ? "ON" : "OFF"), state_s.c_str());
         if (m_mon_tmp[crateid][i].state != state) {
           set(vname + "state", state_s);
           m_mon_tmp[crateid][i].state = state;

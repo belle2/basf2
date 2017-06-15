@@ -65,6 +65,11 @@ void WireHitCreator::exposeParameters(ModuleParamList* moduleParamList, const st
                                 m_param_triggerPoint,
                                 "Point relative to which the flight times are calculated",
                                 m_param_triggerPoint);
+
+  moduleParamList->addParameter(prefixed(prefix, "useSuperLayers"),
+                                m_param_useSuperLayers,
+                                "List of super layers to be used - mostly for debugging",
+                                m_param_useSuperLayers);
 }
 
 void WireHitCreator::initialize()
@@ -108,6 +113,14 @@ void WireHitCreator::initialize()
     FlightTimeEstimator::instance(makeUnique<BeamEventFlightTimeEstimator>());
   }
 
+  if (not m_param_useSuperLayers.empty()) {
+    for (const ISuperLayer& iSL : m_param_useSuperLayers) {
+      m_useSuperLayers.at(iSL) = true;
+    }
+  } else {
+    m_useSuperLayers.fill(true);
+  }
+
   Super::initialize();
 }
 
@@ -141,6 +154,10 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
       B2WARNING("Skip invalid wire id " << hit.getID());
       continue;
     }
+
+    ISuperLayer iSL = wireID.getISuperLayer();
+    if (not m_useSuperLayers[iSL]) continue;
+
     const CDCWire& wire = wireTopology.getWire(wireID);
 
     const Vector2D& pos2D = wire.getRefPos2D();

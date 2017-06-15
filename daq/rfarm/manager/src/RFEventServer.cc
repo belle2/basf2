@@ -161,6 +161,9 @@ int RFEventServer::UnConfigure(NSMmsg*, NSMcontext*)
   // Clear RingBuffer
   m_rbufin->forceClear();
 
+  // Clear process list
+  m_flow->fillProcessStatus(GetNodeInfo());
+
   printf("Unconfigure : done\n");
   return 0;
 }
@@ -208,7 +211,26 @@ int RFEventServer::Restart(NSMmsg*, NSMcontext*)
 void RFEventServer::server()
 {
   //  int nevt = 0;
+  m_flow->fillProcessStatus(GetNodeInfo());
+
   while (true) {
+    int sender_id = 0;
+    pid_t pid = m_proc->CheckProcess();
+    if (pid > 0) {
+      printf("RFEventServer : process dead. pid = %d\n", pid);
+      if (pid == m_pid_recv) {
+        m_log->Fatal("RFEventServer : receiver process dead. pid=%d\n", pid);
+        m_pid_recv = 0;
+      } else {
+        for (int i = 0; i < m_nnodes; i++) {
+          if (pid == m_pid_sender[i]) {
+            m_log->Fatal("RFEventServer : sender process (%d) dead. pid=%d\n", i, m_pid_sender[i]);
+            m_pid_sender[i] = 0;
+            sender_id = i;
+          }
+        }
+      }
+    }
     int st = m_proc->CheckOutput();
     if (st < 0) {
       perror("RFEventServer::server");
@@ -217,6 +239,7 @@ void RFEventServer::server()
       m_log->ProcessLog(m_proc->GetFd());
     }
     m_flow->fillNodeInfo(RF_INPUT_ID, GetNodeInfo(), false);
+    m_flow->fillProcessStatus(GetNodeInfo(), m_pid_recv, m_pid_sender[sender_id]);
     //    m_flow->fillNodeInfo(0, GetNodeInfo(), false);
     // Debug
     //    RfNodeInfo* info = GetNodeInfo();

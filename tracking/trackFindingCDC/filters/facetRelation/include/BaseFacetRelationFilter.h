@@ -51,7 +51,7 @@ namespace Belle2 {
       virtual Weight operator()(const CDCFacet& from  __attribute__((unused)),
                                 const CDCFacet& to  __attribute__((unused)))
       {
-        return NAN;
+        return 1;
       }
 
       /**
@@ -64,7 +64,7 @@ namespace Belle2 {
         const CDCFacet* ptrFrom(relation.getFrom());
         const CDCFacet* ptrTo(relation.getTo());
         if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
-        return operator()(*ptrFrom, *ptrTo);
+        return this->operator()(*ptrFrom, *ptrTo);
       }
     };
   }

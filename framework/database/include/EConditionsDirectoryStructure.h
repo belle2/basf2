@@ -24,7 +24,7 @@ namespace Belle2 {
     c_logicalSubdirectories,
     /** directories contains all payloads in subdirectories starting with the
      * hash values. i.e. if payload has checksum 0123456789ABCDEF it would be
-     * stored in 0/12/<filename> to evenly distribute all payloads across
+     * stored in 0/12/$filename to evenly distribute all payloads across
      * subdirectories. This is the same scheme used for git objects
      */
     c_digestSubdirectories,

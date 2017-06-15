@@ -515,7 +515,7 @@ void TTCtrlCallback::monitor() throw(RCHandlerException)
   g_mutex.unlock();
 }
 
-void TTCtrlCallback::boot(const DBObject& obj) throw(RCHandlerException)
+void TTCtrlCallback::boot(const std::string& opt, const DBObject& obj) throw(RCHandlerException)
 {
   resetft();
   abort();

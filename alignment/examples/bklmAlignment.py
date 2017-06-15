@@ -10,14 +10,19 @@ import numpy as np
 main = create_path()
 
 input = register_module('RootInput')
-input.param('inputFileName', 'RootOutput.root')
-input.initialize()
+input.param('inputFileName', sys.argv[1])
+# input.initialize()
 
 gear = register_module('Gearbox')
-gear.initialize()
+# gear.initialize()
 geom = register_module('Geometry')
-geom.param('components', ['PXD', 'SVD'])
-geom.initialize()
+# geom.param('components', ['PXD', 'SVD'])
+# geom.initialize()
+
+main.add_module(input)
+main.add_module(gear)
+main.add_module(geom)
+process(main)
 
 # Create the algorithm
 algo = Belle2.MillepedeAlgorithm()
@@ -61,7 +66,7 @@ for sector in range(1, 9):
             for ipar in [1, 2, 3, 4, 5, 6]:
 
                 # For U=1 or V=2 do not fix param
-                if ipar in [1, 2]:
+                if ipar in [1, 2, 3, 4, 5, 6]:
                     continue
 
                 bklmid = Belle2.BKLMElementID()
@@ -100,6 +105,8 @@ for payload in payloads:
 
 
 # Profile plot for all determined parameters
+bklmfile = ROOT.TFile('bklm_P123456.root', 'recreate')
+
 profile = ROOT.TH1F(
     "profile",
     "correction & errors",
@@ -180,18 +187,24 @@ pval = Belle2.PyStoreObj('MillepedeCollector_pval', 1).obj().getObject('1.1')
 # Skip into interactive environment
 # You can draw something in the trees or the profile
 # Exit with Ctrl+D
-print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-print(' You are now in interactive environment. You can still access the algorithm')
-print(' or the DataStore. Try e.g.:')
-print('')
-print(' >>> pval.Draw()')
-print(' >>> bklmtree.Draw("value:layer")')
-print(' >>> bklm.dump()')
-print(' >>> profile.Draw()')
-print('')
-print(' Look into this script and use TAB or python ? help to play more...')
-print(' Exit with [Ctrl] + [D] and then [Enter]')
-print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+# print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+# print(' You are now in interactive environment. You can still access the algorithm')
+# print(' or the DataStore. Try e.g.:')
+# print('')
+# print(' >>> pval.Draw()')
+# print(' >>> bklmtree.Draw("value:layer")')
+# print(' >>> bklm.dump()')
+# print(' >>> profile.Draw()')
+# print('')
+# print(' Look into this script and use TAB or python ? help to play more...')
+# print(' Exit with [Ctrl] + [D] and then [Enter]')
+# print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+# #import interactive
+# interactive.embed()
 
-import interactive
-interactive.embed()
+profile.Write()
+bklmtree.Write()
+bklmfile.Write()
+
+# import interactive
+# interactive.embed()

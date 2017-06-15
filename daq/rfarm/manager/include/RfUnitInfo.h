@@ -19,7 +19,12 @@ namespace Belle2 {
       int nevent_out;
       int nqueue_out;
       int error;
-      int i_reserved[9];
+      int pid_input;
+      int pid_output;
+      int pid_basf2;
+      int pid_hserver;
+      int pid_hrelay;
+      int i_reserved[4];
       float flowrate_in;
       float flowrate_out;
       float avesize_in;

@@ -51,6 +51,20 @@ TH1F*  PerformanceEvaluationBaseClass::createHistogram1D(const char* name, const
   return h;
 }
 
+TH1F*  PerformanceEvaluationBaseClass::createHistogram1D(const char* name, const char* title,
+                                                         Int_t nbins, Double_t* bins,
+                                                         const char* xtitle, TList* histoList)
+{
+
+  TH1F* h = new TH1F(name, title, nbins, bins);
+
+  h->GetXaxis()->SetTitle(xtitle);
+
+  if (histoList)
+    histoList->Add(h);
+
+  return h;
+}
 
 TH2F*  PerformanceEvaluationBaseClass::createHistogram2D(const char* name, const char* title,
                                                          Int_t nbinsX, Double_t minX, Double_t maxX,
@@ -60,6 +74,25 @@ TH2F*  PerformanceEvaluationBaseClass::createHistogram2D(const char* name, const
 {
 
   TH2F* h = new TH2F(name, title, nbinsX, minX, maxX, nbinsY, minY, maxY);
+
+  h->GetXaxis()->SetTitle(titleX);
+  h->GetYaxis()->SetTitle(titleY);
+
+  if (histoList)
+    histoList->Add(h);
+
+  return h;
+}
+
+TH2F*  PerformanceEvaluationBaseClass::createHistogram2D(const char* name, const char* title,
+                                                         Int_t nbinsX, Double_t* binsX,
+                                                         const char* titleX,
+                                                         Int_t nbinsY, Double_t* binsY,
+                                                         const char* titleY,
+                                                         TList* histoList)
+{
+
+  TH2F* h = new TH2F(name, title, nbinsX, binsX, nbinsY, binsY);
 
   h->GetXaxis()->SetTitle(titleX);
   h->GetYaxis()->SetTitle(titleY);
@@ -203,7 +236,6 @@ TH1F*  PerformanceEvaluationBaseClass::createHistogramsRatio(const char* name, c
   Int_t bin = 0;
   Int_t nBins = 0;
 
-
   for (int the_bin = 1; the_bin < the_axis->GetNbins() + 1; the_bin++) {
 
     num = 0;
@@ -225,7 +257,6 @@ TH1F*  PerformanceEvaluationBaseClass::createHistogramsRatio(const char* name, c
         den += hden->GetBinContent(bin);
 
         nBins++;
-
       }
 
     double eff = 0;
@@ -243,7 +274,6 @@ TH1F*  PerformanceEvaluationBaseClass::createHistogramsRatio(const char* name, c
       h->SetBinContent(the_bin, 1 - eff);
       h->SetBinError(the_bin, err);
     }
-
   }
 
   return h;
@@ -299,7 +329,7 @@ void  PerformanceEvaluationBaseClass::addPurityPlots(TList* histoList, TH3F* h3_
   if ((h3_X == NULL) || (h3_MCParticlesPerX == NULL))
     return;
 
-//purity histograms
+  //purity histograms
   TH1F* h_pur_pt = createHistogramsRatio("hpurpt", "purity VS pt", h3_MCParticlesPerX, h3_X, true, 0);
   histoList->Add(h_pur_pt);
 
@@ -311,4 +341,330 @@ void  PerformanceEvaluationBaseClass::addPurityPlots(TList* histoList, TH3F* h3_
 
 }
 
+TH1F* PerformanceEvaluationBaseClass::effPlot1D(TH1F* h1_den, TH1F* h1_num, const char* name, const char* title,
+                                                bool geo_accettance, TList* histoList)
+{
+
+  const char* name1 = "_noGeoAcc";
+  const char* name2 = "_withGeoAcc";
+
+  std::string total;
+  std::string trueTitle;
+
+  if (geo_accettance == false) {
+    total = std::string(name) + std::string(name1);
+    trueTitle = std::string(title) + std::string(name1);
+  }
+
+  else {
+    total = std::string(name) + std::string(name2);
+    trueTitle = std::string(title) + std::string(name2);
+  }
+
+  TH1F* h = (TH1F*)duplicateHistogram(total.c_str(), trueTitle.c_str(), h1_den, histoList);
+  h->GetYaxis()->SetRangeUser(0., 1);
+
+  for (int bin = 0; bin < h->GetXaxis()->GetNbins(); bin++) {
+    float num = h1_num->GetBinContent(bin + 1);
+    float den = h1_den->GetBinContent(bin + 1);
+    double eff = 0.;
+    double err = 0.;
+
+    if (den > 0) {
+      eff = (double)num / den;
+      err = sqrt(eff * (1 - eff)) / sqrt(den);
+    }
+    h->SetBinContent(bin + 1, eff);
+    h->SetBinError(bin + 1, err);
+  }
+
+
+  if (histoList)
+    histoList->Add(h);
+
+  return h;
+}
+
+TH1F* PerformanceEvaluationBaseClass::effPlot1D(TH1F* h1_MC, TH1F* h1_RecoTrack, TH1F* h1_Track, const char* name,
+                                                const char* title, TList* histoList)
+{
+  if (h1_Track == NULL) B2INFO("h_Track missing");
+
+  const char* name1 = "_noGeoAcc";
+  const char* name2 = "_withGeoAcc";
+
+  std::string total1 = std::string(name) + std::string(name1);
+  std::string total2 = std::string(name) + std::string(name2);
+
+  std::string title1 = std::string(title) + std::string(name1);
+  std::string title2 = std::string(title) + std::string(name2);
+
+  TH1F* h[2];
+
+  h[0] = (TH1F*)duplicateHistogram(total2.c_str(), title2.c_str(), h1_RecoTrack, histoList);
+  h[0]->GetYaxis()->SetRangeUser(0., 1);
+
+  for (int bin = 0; bin < h[0]->GetXaxis()->GetNbins(); bin++) {
+    float num = h1_Track->GetBinContent(bin + 1);
+    float den = h1_RecoTrack->GetBinContent(bin + 1);
+    double eff = 0.;
+    double err = 0.;
+
+    if (den > 0) {
+      eff = (double)num / den;
+      err = sqrt(eff * (1 - eff)) / sqrt(den);
+    }
+    h[0]->SetBinContent(bin + 1, eff);
+    h[0]->SetBinError(bin + 1, err);
+  }
+
+  h[1] = (TH1F*)duplicateHistogram(total1.c_str(), title1.c_str(), h1_MC, histoList);
+  h[1]->GetYaxis()->SetRangeUser(0., 1);
+
+  for (int bin = 0; bin < h[1]->GetXaxis()->GetNbins(); bin++) {
+    float num = h1_Track->GetBinContent(bin + 1);
+    float den = h1_MC->GetBinContent(bin + 1);
+    double eff = 0.;
+    double err = 0.;
+
+    if (den > 0) {
+      eff = (double)num / den;
+      err = sqrt(eff * (1 - eff)) / sqrt(den);
+    }
+    h[1]->SetBinContent(bin + 1, eff);
+    h[1]->SetBinError(bin + 1, err);
+  }
+
+  if (histoList) {
+    histoList->Add(h[0]);
+    histoList->Add(h[1]);
+  }
+
+  return *h;
+}
+
+TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_den, TH2F* h2_num,
+                                                const char* name, const char* title, bool geo_accettance, TList* histoList)
+{
+  const char* name1 = "_noGeoAcc";
+  const char* name2 = "_withGeoAcc";
+  const char* err = "_error_";
+  const char* addTitle = "Errors, ";
+
+  std::string total;
+  std::string error;
+  std::string trueTitle;
+
+  std::string titleErr = std::string(addTitle) + std::string(title);
+
+  if (geo_accettance == false) {
+    total = std::string(name) + std::string(name1);
+    trueTitle = std::string(title) + std::string(name1);
+    error = std::string(name) + std::string(err) + std::string(name1);
+  }
+
+  else {
+    total = std::string(name) + std::string(name2);
+    trueTitle = std::string(title) + std::string(name2);
+    error = std::string(name) + std::string(err) + std::string(name2);
+  }
+
+  TH2F* h2[2];
+  h2[0] = (TH2F*)duplicateHistogram(total.c_str(), trueTitle.c_str(), h2_den, histoList);
+  h2[1] = (TH2F*)duplicateHistogram(error.c_str(), titleErr.c_str(), h2_den, histoList);
+
+  for (int binX = 0; binX < h2[0]->GetXaxis()->GetNbins(); binX++) {
+    for (int binY = 0; binY < h2[0]->GetYaxis()->GetNbins(); binY++) {
+      float num = h2_num->GetBinContent(binX + 1, binY + 1);
+      float den = h2_den->GetBinContent(binX + 1, binY + 1);
+      double eff = 0.;
+      double err = 0.;
+
+      if (den > 0) {
+        eff = (double)num / den;
+        err = sqrt(eff * (1 - eff)) / sqrt(den);
+      }
+
+      h2[0]->SetBinContent(binX + 1, binY + 1, eff);
+      h2[0]->SetBinError(binX + 1, binY + 1, err);
+      h2[1]->SetBinContent(binX + 1, binY + 1, err);
+    }
+  }
+
+
+  if (histoList) {
+    histoList->Add(h2[0]);
+    histoList->Add(h2[1]);
+  }
+
+  return *h2;
+
+}
+
+TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_MC, TH2F* h2_RecoTrack, TH2F* h2_Track, const char* name,
+                                                const char* title, TList* histoList)
+{
+  if (h2_Track == NULL) B2INFO("h_Track missing");
+
+  const char* name1 = "_noGeoAcc";
+  const char* name2 = "_withGeoAcc";
+  const char* err = "_error_";
+  const char* addTitle = "Errors, ";
+
+  std::string total1 = std::string(name) + std::string(name1);
+  std::string total2 = std::string(name) + std::string(name2);
+
+  std::string title1 = std::string(title) + std::string(name1);
+  std::string title2 = std::string(title) + std::string(name2);
+
+  std::string error1 = std::string(name) + std::string(err) + std::string(name1);
+  std::string error2 = std::string(name) + std::string(err) + std::string(name2);
+  std::string titleErr = std::string(addTitle) + std::string(title);
+
+  TH2F* h2[4];
+
+  h2[0] = (TH2F*)duplicateHistogram(total2.c_str(), title2.c_str(), h2_RecoTrack, histoList);
+  h2[1] = (TH2F*)duplicateHistogram(error2.c_str(), titleErr.c_str(), h2_RecoTrack, histoList);
+
+  for (int binX = 0; binX < h2[0]->GetXaxis()->GetNbins(); binX++) {
+    for (int binY = 0; binY < h2[0]->GetYaxis()->GetNbins(); binY++) {
+      float num = h2_Track->GetBinContent(binX + 1, binY + 1);
+      float den = h2_RecoTrack->GetBinContent(binX + 1, binY + 1);
+      double eff = 0.;
+      double err = 0.;
+
+      if (den > 0) {
+        eff = num / den;
+        err = sqrt(eff * (1 - eff)) / sqrt(den);
+      }
+
+      h2[0]->SetBinContent(binX + 1, binY + 1, eff);
+      h2[0]->SetBinError(binX + 1, binY + 1, err);
+      h2[1]->SetBinContent(binX + 1, binY + 1, err);
+    }
+  }
+
+  h2[2] = (TH2F*)duplicateHistogram(total1.c_str(), title1.c_str(), h2_MC, histoList);
+  h2[3] = (TH2F*)duplicateHistogram(error1.c_str(), titleErr.c_str(), h2_MC, histoList);
+
+  for (int binX = 0; binX < h2[2]->GetXaxis()->GetNbins(); binX++) {
+    for (int binY = 0; binY < h2[2]->GetYaxis()->GetNbins(); binY++) {
+      float num = h2_Track->GetBinContent(binX + 1, binY + 1);
+      float den = h2_MC->GetBinContent(binX + 1, binY + 1);
+      double eff = 0.;
+      double err = 0.;
+
+      if (den > 0) {
+        eff = num / den;
+        err = sqrt(eff * (1 - eff)) / sqrt(den);
+      }
+
+      h2[2]->SetBinContent(binX + 1, binY + 1, eff);
+      h2[2]->SetBinError(binX + 1, binY + 1, err);
+      h2[3]->SetBinContent(binX + 1, binY + 1, err);
+    }
+  }
+
+  if (histoList) {
+    histoList->Add(h2[0]);
+    histoList->Add(h2[1]);
+    histoList->Add(h2[2]);
+    histoList->Add(h2[3]);
+  }
+
+  return *h2;
+}
+
+TH1F* PerformanceEvaluationBaseClass::geoAcc1D(TH1F* h1_den, TH1F* h1_num, const char* name, const char* title, TList* histoList)
+{
+  TH1F* h = (TH1F*)duplicateHistogram(name, title, h1_den, histoList);
+  h->GetYaxis()->SetRangeUser(0., 1);
+
+  for (int bin = 0; bin < h->GetXaxis()->GetNbins(); bin++) {
+    float num = h1_num->GetBinContent(bin + 1);
+    float den = h1_den->GetBinContent(bin + 1);
+    double eff = 0.;
+    double err = 0.;
+
+    if (den > 0) {
+      eff = (double)num / den;
+      err = sqrt(eff * (1 - eff)) / sqrt(den);
+    }
+    h->SetBinContent(bin + 1, eff);
+    h->SetBinError(bin + 1, err);
+  }
+
+  if (histoList)
+    histoList->Add(h);
+
+  return h;
+}
+
+TH2F* PerformanceEvaluationBaseClass::geoAcc2D(TH2F* h2_den, TH2F* h2_num,
+                                               const char* name, const char* title, TList* histoList)
+{
+  const char* err = "_err";
+  const char* addTitle = "Errors, ";
+
+  std::string error = std::string(name) + std::string(err);
+  std::string titleErr = std::string(addTitle) + std::string(title);
+
+  TH2F* h2[2];
+  h2[0] = (TH2F*)duplicateHistogram(name, title, h2_den, histoList);
+  h2[1] = (TH2F*)duplicateHistogram(error.c_str(), titleErr.c_str(), h2_den, histoList);
+
+  for (int binX = 0; binX < h2[0]->GetXaxis()->GetNbins(); binX++) {
+    for (int binY = 0; binY < h2[0]->GetYaxis()->GetNbins(); binY++) {
+      float num = h2_num->GetBinContent(binX + 1, binY + 1);
+      float den = h2_den->GetBinContent(binX + 1, binY + 1);
+      double eff = 0.;
+      double err = 0.;
+
+      if (den > 0) {
+        eff = (double)num / den;
+        err = sqrt(eff * (1 - eff)) / sqrt(den);
+      }
+      h2[0]->SetBinContent(binX + 1, binY + 1, eff);
+      h2[0]->SetBinError(binX + 1, binY + 1, err);
+      h2[1]->SetBinContent(binX + 1, binY + 1, err);
+    }
+  }
+
+  if (histoList) {
+    histoList->Add(h2[0]);
+    histoList->Add(h2[1]);
+  }
+
+  return *h2;
+
+}
+
+TH1F* PerformanceEvaluationBaseClass::V0FinderEff(TH1F* h1_dau0, TH1F* h1_dau1, TH1F* h1_Mother,
+                                                  const char* name, const char* title, TList* histoList)
+{
+
+  TH1F* h = (TH1F*)duplicateHistogram(name, title, h1_Mother, histoList);
+  h->GetYaxis()->SetRangeUser(0., 1);
+
+  for (int bin = 0; bin < h->GetXaxis()->GetNbins(); bin++) {
+    double dau0 = h1_dau0->GetBinContent(bin);
+    double dau1 = h1_dau1->GetBinContent(bin);
+    double Mother = h1_Mother->GetBinContent(bin);
+    double dau0Err = h1_dau0->GetBinError(bin);
+    double dau1Err = h1_dau1->GetBinError(bin);
+    double MotherErr = h1_Mother->GetBinError(bin);
+
+    double binCont = 1. * Mother / dau0 / dau1;
+    double binErr = binCont * sqrt((dau0Err / dau0) * (dau0Err / dau0) + (dau1Err / dau1) * (dau1Err / dau1) * (MotherErr / Mother) *
+                                   (MotherErr / Mother));
+
+    h->SetBinContent(bin, binCont);
+    h->SetBinError(bin, binErr);
+  }
+
+  if (histoList)
+    histoList->Add(h);
+
+  return h;
+}
 

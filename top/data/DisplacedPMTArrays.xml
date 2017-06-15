@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<DisplacedPMTArrays descr="displacement parameters of PMT arrays">
+
+  <!-- initializers for class TOPGeoPMTArrayDisplacement -->
+  <!-- see: top/dbobjects/include/TOPGeoPMTArrayDisplacement.h -->
+  <!-- below only an example for slot 1 -->
+  <!-- add as many slots as needed. To activate, set SwitchON to 1 -->
+  <!-- before running simulation check for possible overlaps -->
+
+  <SwitchON descr="set to 1 to enable">0</SwitchON>
+  
+  <Slot ID="1">
+    <x unit="mm">0.0</x>
+    <y unit="mm">0.0</y>
+    <alpha unit="deg">0.0</alpha>
+  </Slot>
+  
+</DisplacedPMTArrays>

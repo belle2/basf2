@@ -183,7 +183,7 @@ namespace Belle2 {
      * @param factory Pointer to the factory function which will return an
      *               instance of the handler
      */
-    static void registerInputHandler(std::string prefix, gearbox::InputHandler::Factory* factory)
+    static void registerInputHandler(const std::string& prefix, gearbox::InputHandler::Factory* factory)
     {
       getInstance().m_registeredHandlers[prefix] = factory;
     }

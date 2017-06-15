@@ -33,7 +33,7 @@ namespace Belle2 {
     {
       for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) m_logL[i] = 0;
       for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) m_expPhot[i] = 0;
-      for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) m_detPhot[i] = 0;
+      m_detPhot = 0;
     }
 
     /*!
@@ -45,7 +45,7 @@ namespace Belle2 {
      */
     void setValues(int flag,
                    const double* logL,
-                   const int* detPhot,
+                   int detPhot,
                    const double* expPhot
                   )
     {
@@ -54,8 +54,8 @@ namespace Belle2 {
         m_logL[i] = logL[i];
       for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++)
         m_expPhot[i] = expPhot[i];
-      for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++)
-        m_detPhot[i] = detPhot[i];
+
+      m_detPhot = detPhot;
     }
 
     /*! Get reconstruction flag
@@ -75,12 +75,11 @@ namespace Belle2 {
 
     /*!
      * Return number of detected photons for a given particle
-     * @param part charged stable particle
      * @return detected photon number
      */
-    float getDetPhot(const Const::ChargedStable& part) const
+    float getDetPhot() const
     {
-      return m_detPhot[part.getIndex()];
+      return m_detPhot;
     }
 
     /*!
@@ -119,30 +118,6 @@ namespace Belle2 {
      */
     double getLogL_p() const {return m_logL[Const::proton.getIndex()];}
 
-    /*! Get number of detected photons in electron expected ring
-     * @return number of detected photons  in electron expected ring
-     */
-    int getNphotD_e() const {return m_detPhot[Const::electron.getIndex()];}
-
-    /*! Get number of detected photons in muon expected ring
-     * @return number of detected photons in muon expected ring
-     */
-    int getNphotD_mu() const {return m_detPhot[Const::muon.getIndex()];}
-
-    /*! Get number of detected photons in pion expected ring
-     * @return number of detected photons in pion expected ring
-     */
-    int getNphotD_pi() const {return m_detPhot[Const::pion.getIndex()];}
-
-    /*! Get number of detected photons in kaon expected ring
-     * @return number of detected photons in kaon expected ring
-     */
-    int getNphotD_K() const {return m_detPhot[Const::kaon.getIndex()];}
-
-    /*! Get number of detected photons in proton expected ring
-     * @return number of detected photons in proton expected ring
-     */
-    int getNphotD_p() const {return m_detPhot[Const::proton.getIndex()];}
 
     /*! Get number of expected photons for electron
      * @return number of expected photons for electron
@@ -173,9 +148,9 @@ namespace Belle2 {
     int m_flag;          /**< reconstruction flag */
     float m_logL[Const::ChargedStable::c_SetSize]; /**< log likelihoods */
     float m_expPhot[Const::ChargedStable::c_SetSize]; /**< expected number of photons */
-    int m_detPhot[Const::ChargedStable::c_SetSize]; /**< detected number of photons */
+    int m_detPhot; /**< detected number of photons */
 
-    ClassDef(ARICHLikelihood, 2); /**< the class title */
+    ClassDef(ARICHLikelihood, 3); /**< the class title */
 
   };
 

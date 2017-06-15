@@ -115,7 +115,7 @@ int ECLChannelMapper::getCrateID(int iCOPPERNode, int iFINESSE)
 
   } else if ((iCOPPERNode & EECL_ID) == EECL_ID) {
 
-    iCrate = ECL_BARREL_CRATES + (iCOPPERNode - EECL_ID - 1) * ECL_FINESSES_IN_COPPER + iFINESSE + 1;
+    iCrate = ECL_BARREL_CRATES + iFINESSE * ECL_FWD_CRATES + (iCOPPERNode - EECL_ID - 1) + 1;
 
   } else {
 

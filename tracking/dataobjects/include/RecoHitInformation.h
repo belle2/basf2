@@ -245,18 +245,25 @@ namespace Belle2 {
       m_useInFit = useInFit;
     }
 
-    /** Get a pointer to the TrackPoint that was created from this hit. Can be a nullptr if no measurement was already created.
-     * Please be aware that refitting may or may not recreate the track points and older pointers can be invalidated.
-     * Also, pruning a RecoTrack will also delete most of the TrackPoints. */
-    const genfit::TrackPoint* getCreatedTrackPoint() const
+    /**
+     * Set the id of the created track point to the one from the genfit::Track.
+     * This should only be used, if you really know what you are doing.
+     */
+    void setCreatedTrackPointID(int trackPointID)
     {
-      return m_createdTrackPoint;
+      m_createdTrackPointID = trackPointID;
     }
 
-    /** Set the pointer of the created track point related to this hit. */
-    void setCreatedTrackPoint(const genfit::TrackPoint* createdTrackPoint)
+    /**
+     * Get the id of the TrackPoint related to this reco hit information
+     * in the genfit::Track.
+     * Do not use this method unless you really know what you are doing.
+     * Better, use the methods of the RecoTrack itself to retrieve
+     * the TrackPoint directly.
+     */
+    int getCreatedTrackPointID() const
     {
-      m_createdTrackPoint = createdTrackPoint;
+      return m_createdTrackPointID;
     }
 
   private:
@@ -274,9 +281,12 @@ namespace Belle2 {
     RecoHitFlag m_flag = RecoHitFlag::c_undefinedRecoHitFlag;
     /// Set this flag to falso to not create a measurement out of this hit
     bool m_useInFit = true;
-    /// A pointer to the TrackPoint for this hit.
-    /// do not store to ROOT file, otherwise the *RecoHits get created when reading in the file
-    const genfit::TrackPoint* m_createdTrackPoint = nullptr; //! -> this is the marker for ROOT I/O to ignore this pointer
+    /**
+     * The index for the created TrackPoint in the genfit::Track of the related RecoTrack.
+     * Do not use this id, if you do not really know the consequences, but let the
+     * RecoTrack handle the internals.
+     */
+    int m_createdTrackPointID = -1;
 
     /**
      * Create hit information for a generic hit with the given information. Adds the relation to the hit automatically.
@@ -301,6 +311,6 @@ namespace Belle2 {
       addRelationTo(hit);
     }
 
-    ClassDef(RecoHitInformation, 5); /**< This class implements additional information for hits */
+    ClassDef(RecoHitInformation, 6); /**< This class implements additional information for hits */
   };
 }

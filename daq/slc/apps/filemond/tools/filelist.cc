@@ -47,9 +47,15 @@ int main(int argc, char** argv)
       if (!File::exist(list_send.c_str())) {
         std::ofstream fout(list_send.c_str());
         for (size_t i = 0; i < records.size(); i++) {
-          std::string path = records[i].get("dir") + "/" + records[i].get("name");
-          LogFile::debug(path);
-          fout << path << std::endl;
+          std::string path = records[i].get("path");
+          std::string expno = records[i].get("expno");
+          std::string runno = records[i].get("runno");
+          std::string fileno = records[i].get("fileno");
+          std::string size = records[i].get("size");
+          std::string nevents = records[i].get("nevents");
+          std::string chksum = records[i].get("chksum");
+          fout << path << " " << expno << " " << runno << " " << fileno << " "
+               << size << " " << nevents << " " << std::hex << chksum << " " << std::dec << std::endl;
         }
       }
       sleep(30);

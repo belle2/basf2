@@ -101,7 +101,6 @@ bool LocalDatabase::readDatabase()
       if (pos == std::string::npos) {
         throw std::runtime_error("payload name must be of the form dbstore/<payloadname>");
       }
-      string package = name.substr(0, pos);
       string module = name.substr(pos + 1, name.length());
       // and add to map of payloads
       B2DEBUG(100, m_fileName << ":" << lineno << ": found payload " << boost::io::quoted(module)
@@ -143,11 +142,11 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::getData(const EventMetaData& e
   result.first = 0;
 
   // find the entry for package and module in the maps
-  const auto& entry = m_database.find(name);
-  if (entry == m_database.end()) return tryDefault(name);
+  const auto& databaseEntry = m_database.find(name);
+  if (databaseEntry == m_database.end()) return tryDefault(name);
 
   // find the payload whose IoV contains the current event and load it
-  for (auto& entry : boost::adaptors::reverse(entry->second)) {
+  for (auto& entry : boost::adaptors::reverse(databaseEntry->second)) {
     if (entry.second.contains(event)) {
       int revision = entry.first;
       result.first = readPayload(payloadFileName(m_payloadDir, name, revision), name);
@@ -170,6 +169,12 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::getData(const EventMetaData& e
 bool LocalDatabase::storeData(const std::string& name, TObject* object,
                               const IntervalOfValidity& iov)
 {
+  if (iov.empty()) {
+    B2ERROR("IoV is empty, refusing to store '" << name << "' in local database: "
+            "Please provide a valid experiment/run range for the data, for example "
+            "using IntervalOfValidity::always() to store data which is always valid");
+    return false;
+  }
   if (m_readOnly) {
     B2ERROR("Database file " << m_fileName << " is opened in read-only mode.");
     return false;

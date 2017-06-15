@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitVarSet.h>
 
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RandomFilter.h>
 #include <tracking/trackFindingCDC/filters/base/NamedChoosableVarSetFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
@@ -29,6 +30,7 @@ using namespace TrackFindingCDC;
 
 namespace {
   using AllStereoHitFilter = AllFilter<BaseStereoHitFilter>;
+  using NoneStereoHitFilter = NoneFilter<BaseStereoHitFilter>;
   using RandomStereoHitFilter = RandomFilter<BaseStereoHitFilter>;
   using MCStereoHitFilter = MCFilter<VariadicUnionVarSet<StereoHitTruthVarSet, StereoHitVarSet>>;
   using SimpleStereoHitFilter = NamedChoosableVarSetFilter<StereoHitVarSet>;
@@ -70,7 +72,7 @@ std::unique_ptr<BaseStereoHitFilter>
 StereoHitFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<BaseStereoHitFilter>();
+    return makeUnique<NoneStereoHitFilter>();
   } else if (filterName == "all") {
     return makeUnique<AllStereoHitFilter>();
   } else if (filterName == "random") {

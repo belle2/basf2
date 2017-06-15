@@ -26,9 +26,30 @@
 
 #include <TFile.h>
 
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string.hpp>
+#include <cstdlib>
+
 using namespace std;
 using namespace Belle2;
 
+namespace {
+  /** Small helper to get a value from environment or fall back to a default
+   * @param envName name of the environment variable to look for
+   * @param fallback value to return in case environment variable is not set
+   * @return whitespace trimmed value of the environment variable if set, otherwise the fallback value
+   */
+  std::string getFromEnvironment(const std::string& envName, const std::string& fallback)
+  {
+    char* envValue = std::getenv(envName.c_str());
+    if (envValue != nullptr) {
+      std::string val(envValue);
+      boost::trim(val);
+      return envValue;
+    }
+    return fallback;
+  }
+}
 
 std::unique_ptr<Database> Database::s_instance{nullptr};
 
@@ -36,8 +57,22 @@ Database& Database::Instance()
 {
   if (!s_instance) {
     DatabaseChain::createInstance(true);
-    LocalDatabase::createInstance(FileSystem::findFile("data/framework/database.txt"), "", true, LogConfig::c_Error);
-    ConditionsDatabase::createDefaultInstance("production", LogConfig::c_Warning);
+    const std::string fallbackFilename = getFromEnvironment("BELLE2_CONDB_FALLBACK", "data/framework/database.txt");
+    const std::string globalTag = getFromEnvironment("BELLE2_CONDB_GLOBALTAG", "production");
+    // OK, add a fallback database unless empty location is specified
+    if (!fallbackFilename.empty()) {
+      LocalDatabase::createInstance(FileSystem::findFile(fallbackFilename), "", true, LogConfig::c_Error);
+    }
+    // and add access to the central database unless we have an empty global tag
+    // in which case we disable access to the database
+    if (!globalTag.empty()) {
+      typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
+      // add all global tags which are separated by whitespace as conditions database
+      for (auto token : tokenizer(globalTag, boost::char_separator<char> {" \t\n\r"})) {
+        B2DEBUG(100, "Adding central database for global tag " << token);
+        ConditionsDatabase::createDefaultInstance(token, LogConfig::c_Warning);
+      }
+    }
     LocalDatabase::createInstance("localdb/database.txt", "", false, LogConfig::c_Warning, true);
   }
   return *s_instance;

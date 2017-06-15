@@ -50,9 +50,6 @@ namespace Belle2 {
     /** carries all links to outer nodes */
     std::vector<DirectedNode<EntryType, MetaInfoType>*> m_outerNodes;
 
-    /** is the index position of this node in the network */
-    unsigned int m_index;
-
     /** contains a MetaInfo for doing extra-stuff (whatever you need) */
     MetaInfoType m_metaInfo;
 
@@ -60,40 +57,27 @@ namespace Belle2 {
     /** ************************* CONSTRUCTORS ************************* */
 
     /** protected constructor. accepts an entry which can not be changed any more */
-    DirectedNode(EntryType& entry, unsigned int index) : m_entry(entry), m_index(index), m_metaInfo(MetaInfoType()) {}
+    DirectedNode(EntryType& entry) : m_entry(entry), m_metaInfo(MetaInfoType()) {}
 
 
     /** copy constructor */
     DirectedNode(const DirectedNode& node) : m_entry(node.m_entry), m_innerNodes(node.m_innerNodes), m_outerNodes(node.m_outerNodes),
-      m_index(node.m_index), m_metaInfo(node.m_metaInfo)
+      m_metaInfo(node.m_metaInfo)
     { B2ERROR("DirectedNode-copy-constructor has been called!"); }
 
     /** ************************* INTERNAL MEMBER FUNCTIONS ************************* */
 
     /** adds new links to the inward direction */
-    //  void addInnerNode(std::shared_ptr<DirectedNode<EntryType, MetaInfoType> > newNode)
     void addInnerNode(DirectedNode<EntryType, MetaInfoType>& newNode)
     {
-      B2DEBUG(10, "DirectedNode::addInnerNode(): was called! OwnIndex/newInnerNodeIndex: " << m_index << "/" << newNode.getIndex() <<
-              " and innerNodesSize: " << m_innerNodes.size() << ")!");
       m_innerNodes.push_back(&newNode);
-//    auto* newPtr(&newNode);
-//    B2WARNING("newPtr = " << newPtr << " and newPtr->getIndex: " << newPtr->getIndex())
-//    m_innerNodes.push_back(newPtr); // WARNING ERROR does not work...
-
-//    m_innerNodes.push_back(newNode.getIndex());
-      B2DEBUG(250, "push_back of nodeIndex: " << m_index << " is over and has now innerNodesSize: " << m_innerNodes.size());
     }
 
 
     /** adds new links to the outward direction */
     void addOuterNode(DirectedNode<EntryType, MetaInfoType>& newNode)
     {
-      B2DEBUG(10, "DirectedNode::addOuterNode(): was called! OwnIndex/outerNodeIndex: " << m_index << "/" << newNode.getIndex() <<
-              " and outerNodesSize: " << m_outerNodes.size() << ")!");
-      B2DEBUG(10, "m_index is: " << m_index);
       m_outerNodes.push_back(&newNode);
-      B2DEBUG(250, "push_back of nodeIndex: " << m_index << " is over and has now innerNodesSize: " << m_outerNodes.size());
     }
 
 
@@ -121,8 +105,6 @@ namespace Belle2 {
 
     /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
 /// getters
-    /** returns the index position of this node in the network */
-    unsigned int getIndex() const { return m_index; }
 
     /** returns links to all inner nodes attached to this one */
     std::vector<DirectedNode<EntryType, MetaInfoType>*>& getInnerNodes() { return m_innerNodes; }

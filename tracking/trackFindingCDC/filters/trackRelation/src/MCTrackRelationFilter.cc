@@ -39,6 +39,11 @@ Weight MCTrackRelationFilter::operator()(const CDCTrack& fromTrack,
 
     if (fromNPassedSuperLayers == toNPassedSuperLayers) return NAN;
 
+    // Limit loops to be merged to one
+    Index fromNLoops = mcTrackLookUp.getLastNLoops(&fromTrack);
+    Index toNLoops = mcTrackLookUp.getFirstNLoops(&toTrack);
+    if (fromNLoops != toNLoops) return NAN;
+
     return fromTrack.size() + toTrack.size();
   }
 

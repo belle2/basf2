@@ -62,7 +62,10 @@ void SegmentOrienter::apply(const std::vector<CDCSegment2D>& inputSegments,
     outputSegments.reserve(2 * inputSegments.size());
     for (const CDCSegment2D& segment : inputSegments) {
       outputSegments.push_back(segment);
+      if (segment->hasReverseFlag()) continue; // Already a reverse found in the facet ca
+      outputSegments.back()->setReverseFlag();
       outputSegments.push_back(segment.reversed());
+      outputSegments.back()->setReverseFlag();
     }
 
   } else if (m_segmentOrientation == EPreferredDirection::c_Curling) {
@@ -70,6 +73,10 @@ void SegmentOrienter::apply(const std::vector<CDCSegment2D>& inputSegments,
     // Others fix to flighing outwards
     outputSegments.reserve(1.5 * inputSegments.size());
     for (const CDCSegment2D& segment : inputSegments) {
+      if (segment->hasReverseFlag()) {
+        outputSegments.push_back(segment);
+        continue; // Already a reverse found in the facet ca
+      }
       const CDCTrajectory2D& trajectory2D = segment.getTrajectory2D();
       bool isFitted = trajectory2D.isFitted();
       bool isCurler = trajectory2D.isCurler(1.1);
@@ -88,7 +95,9 @@ void SegmentOrienter::apply(const std::vector<CDCSegment2D>& inputSegments,
       } else {
         // Ambigious keep both options
         outputSegments.push_back(segment);
+        outputSegments.back()->setReverseFlag();
         outputSegments.push_back(segment.reversed());
+        outputSegments.back()->setReverseFlag();
       }
     }
 

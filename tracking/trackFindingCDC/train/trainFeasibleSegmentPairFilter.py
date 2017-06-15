@@ -17,14 +17,25 @@ class FeasibleSegmentPairFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEvent
 
     truth = "truth_positive"
 
+    @property
+    def identifier(self):
+        """Database identifier of the filter being trained"""
+        return "trackfindingcdc_FeasibleSegmentPairFilter.xml"
+
     def create_path(self):
         """Setup the recording path after the simulation"""
         path = super().create_path()
 
         # In contrast to other training use only the first *half* loop for more aggressive training
         path.add_module("TFCDC_WireHitPreparer",
-                        flightTimeEstimation="outwards",
-                        UseNLoops=0.5)
+                        flightTimeEstimation="outwards")
+
+        path.add_module('TFCDC_ClusterPreparer',
+                        SuperClusterDegree=3,
+                        SuperClusterExpandOverApogeeGap=True)
+
+        # Also fix the segment orientation to outwards to make training additionally aggressive
+        path.add_module("TFCDC_SegmentFinderFacetAutomaton")
 
         if self.task == "train":
             varSets = [
@@ -56,9 +67,7 @@ class FeasibleSegmentPairFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEvent
         else:
             raise ValueError("Unknown task " + self.task)
 
-        # Also fix the segment orientation to outwards to make training additionally aggressive
-        path.add_module("TFCDC_TrackFinderAutomaton",
-                        SegmentOrientation="outwards",
+        path.add_module("TFCDC_TrackFinderSegmentPairAutomaton",
                         SegmentPairFilter="unionrecording",
                         SegmentPairFilterParameters={
                             "rootFileName": self.sample_file_name,

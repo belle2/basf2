@@ -12,9 +12,15 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+REG_MODULE(TFCDC_ClusterPreparer);
 REG_MODULE(TFCDC_SuperClusterCreator);
 REG_MODULE(TFCDC_ClusterRefiner);
 REG_MODULE(TFCDC_ClusterBackgroundDetector);
+
+TFCDC_ClusterPreparerModule::TFCDC_ClusterPreparerModule()
+  : Super( {"CDCWireHitVector", "CDCWireHitClusterVector", "CDCWireHitSuperClusterVector"})
+{
+}
 
 TFCDC_SuperClusterCreatorModule::TFCDC_SuperClusterCreatorModule()
   : Super( {"CDCWireHitVector", "CDCWireHitSuperClusterVector"})

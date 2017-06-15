@@ -23,9 +23,11 @@ def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
     - 'tupleStyle': 'Default' (default) or 'Laconic'
       o) defines the style of the branch name in the ntuple
 
-    - 'mcMatchingVersion': 'BelleII' (default), 'MC5' and 'Belle'
-      o) Specifies what version of mc matching algorithm is going to be used
-         Use 'MC5' for analysis of BelleII MC5, 'Belle' for analaysis of Belle MC and 'BelleII' for the rest.
+    - 'mcMatchingVersion': Specifies what version of mc matching algorithm is going to be used:
+
+          - 'MC5' - analysis of BelleII MC5
+          - 'Belle' - analaysis of Belle MC
+          - 'BelleII' (default) - all other cases
 
     @param configParametersAndValues dictionary of parameters and their values of the form {param1: value, param2: value, ...)
     @param modules are added to this path
@@ -150,7 +152,7 @@ def outputMdst(filename, path=analysis_main):
     reconstruction.add_mdst_output(path, mc=True, filename=filename)
 
 
-def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main):
+def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main, dataDescription=None):
     """
     Save uDST (micro-Data Summary Tables) = MDST + Particles + ParticleLists
     The charge-conjugate lists of those given in particleLists are also stored.
@@ -172,11 +174,21 @@ def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main)
     partBranches = ['Particles', 'ParticlesToMCParticles',
                     'ParticlesToPIDLikelihoods', 'ParticleExtraInfoMap',
                     'EventExtraInfo'] + includeArrays + list(plSet)
-    reconstruction.add_mdst_output(path, mc=True, filename=filename,
-                                   additionalBranches=partBranches)
+
+    # set dataDescription: dictionary is mutable and thus not a good
+    # default argument.
+    if dataDescription is None:
+        dataDescription = {}
+
+    dataDescription.setdefault("dataLevel", "udst")
+
+    return reconstruction.add_mdst_output(path, mc=True, filename=filename,
+                                          additionalBranches=partBranches,
+                                          dataDescription=dataDescription)
 
 
-def skimOutputUdst(skimname, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main):
+def skimOutputUdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main, *,
+                   outputFile=None, dataDescription=None):
     """
     Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
     Write the accepted events as a udst file, saving only particles from skimParticleLists
@@ -184,12 +196,30 @@ def skimOutputUdst(skimname, skimParticleLists=[], outputParticleLists=[], inclu
     Additional Store Arrays and Relations to be stored can be specified via includeArrays
     list argument.
 
-    Currently mdst are also written. This is for testing purposes
-    and will be removed in the future.
+    :param str skimDecayMode: Name of the skim. If no outputFile is given this is
+        also the name of the output filename. This name will be added to the
+        FileMetaData as an extra data description "skimDecayMode"
+    :param list(str) skimParticleLists: Names of the particle lists to skim for.
+        An event will be accepted if at least one of the particle lists is not empty
+    :param list(str) outputParticleLists: Names of the particle lists to store in
+        the output in addition to the ones in skimParticleLists
+    :param list(str) includeArrays: datastore arrays/objects to write to the output
+        file in addition to mdst and particle information
+    :param basf2.Path path: Path to add the skim output to. Defaults to the default analysis path
+    :param str outputFile: Name of the output file if different from the skim name
+    :param dict dataDescription: Additional data descriptions to add to the output file. For example {"mcEventType":"mixed"}
     """
 
+    # if no outputfile is specified, set it to the skim name
+    if outputFile is None:
+        outputFile = skimDecayMode
+
+    # make sure the output filename has the correct extension
+    if not outputFile.endswith(".udst.root"):
+        outputFile += ".udst.root"
+
     skimfilter = register_module('SkimFilter')
-    skimfilter.set_name('SkimFilter_' + skimname)
+    skimfilter.set_name('SkimFilter_' + skimDecayMode)
     skimfilter.param('particleLists', skimParticleLists)
     path.add_module(skimfilter)
     filter_path = create_path()
@@ -199,9 +229,16 @@ def skimOutputUdst(skimname, skimParticleLists=[], outputParticleLists=[], inclu
     skim_path = create_path()
     saveParticleLists = skimParticleLists + outputParticleLists
     removeParticlesNotInLists(saveParticleLists, path=skim_path)
-    outputUdst(skimname + '.udst.root', saveParticleLists, includeArrays, path=skim_path)
-    outputMdst(skimname + '.mdst.root', path=skim_path)
-    filter_path.add_independent_path(skim_path, "skim_" + skimname)
+
+    # set dataDescription: dictionary is mutable and thus not a good
+    # default argument.
+    if dataDescription is None:
+        dataDescription = {}
+
+    dataDescription.setdefault("skimDecayMode", skimDecayMode)
+    outputUdst(outputFile, saveParticleLists, includeArrays, path=skim_path,
+               dataDescription=dataDescription)
+    filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
 
 
 def generateY4S(noEvents, decayTable=None, path=analysis_main):
@@ -565,6 +602,31 @@ def fillParticleList(
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
     pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('writeOut', writeOut)
+    path.add_module(pload)
+
+
+def fillParticleListWithTrackHypothesis(
+    decayString,
+    cut,
+    hypothesis,
+    writeOut=False,
+    path=analysis_main,
+):
+    """
+    As fillParticleList, but if used for a charged FSP, loads the particle with the requested hypothesis if available
+
+    @param decayString   specifies type of Particles and determines the name of the ParticleList
+    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
+    @param hypothesis    the PDG code of the desired track hypothesis
+    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param path          modules are added to this path
+    """
+
+    pload = register_module('ParticleLoader')
+    pload.set_name('ParticleLoader_' + decayString)
+    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('trackHypothesis', hypothesis)
     pload.param('writeOut', writeOut)
     path.add_module(pload)
 
@@ -1024,7 +1086,6 @@ def variablesToDaughterExtraInfo(
     For each daughter particle specified via decay string the selected variables (estimated for the mother particle)
     are saved in an extra-info field with the given name. In other words, the property of mother is saved as extra-info
     to specified daughter particle.
-    Should only be used in ROE path, that is path executed for each ROE object in an event.
 
     It is possible to overwrite if lower / don't overwrite / overwrite if higher, in case if extra info with given name
     already exists (-1/0/1)
@@ -1187,6 +1248,7 @@ def looseMCTruth(list_name, path=analysis_main):
     particles while the normal algorithm finds the common mother of all daughters.
     The results of loose mc matching algorithm are stored to the following extraInfo
     items:
+
       - looseMCMotherPDG: PDG code of most common mother
       - looseMCMotherIndex: 1-based StoreArray<MCParticle> index of most common mother
       - looseMCWrongDaughterN: number of daughters that don't originate from the most

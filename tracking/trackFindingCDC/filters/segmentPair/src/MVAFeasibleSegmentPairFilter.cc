@@ -13,6 +13,6 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 MVAFeasibleSegmentPairFilter::MVAFeasibleSegmentPairFilter()
-  : Super("trackfindingcdc_FeasibleSegmentPairFilter", 0.004)
+  : Super("tracking/data/trackfindingcdc_FeasibleSegmentPairFilter.xml", 0.004)
 {
 }

@@ -101,8 +101,6 @@ void DisplayModule::initialize()
   m_display = new DisplayUI(m_automatic);
   if (hasCondition())
     m_display->allowFlaggingEvents(getCondition()->getPath()->getPathString());
-  //pass some parameters to DisplayUI to be able to change them at run time
-  m_display->addParameter("Show full geometry", getParam<bool>("fullGeometry"), 0);
   m_display->addParameter("Show MC info", getParam<bool>("showMCInfo"), 0);
   {
     //MC-specific parameters
@@ -115,10 +113,6 @@ void DisplayModule::initialize()
   m_display->addParameter("Show candidates and rec. hits", getParam<bool>("showRecoTracks"), 0);
   m_display->addParameter("Show tracks, vertices, gammas", getParam<bool>("showTrackLevelObjects"), 0);
 
-  EveGeometry::addGeometry();
-  m_visualizer = new EVEVisualization();
-  m_visualizer->setOptions(m_options);
-
   if (!m_fullGeometry and Gearbox::getInstance().exists("Detector/Name")) {
     std::string detectorName = Gearbox::getInstance().getString("Detector/Name");
     if (detectorName != "Belle2Detector") {
@@ -126,7 +120,14 @@ void DisplayModule::initialize()
       m_fullGeometry = true;
     }
   }
+  if (m_fullGeometry) {
+    //pass some parameters to DisplayUI to be able to change them at run time
+    m_display->addParameter("Show full geometry", getParam<bool>("fullGeometry"), 0);
+  }
 
+  EveGeometry::addGeometry(m_fullGeometry ? EveGeometry::c_Full : EveGeometry::c_Simplified);
+  m_visualizer = new EVEVisualization();
+  m_visualizer->setOptions(m_options);
   m_display->hideObjects(m_hideObjects);
 }
 

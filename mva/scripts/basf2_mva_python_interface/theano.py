@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*
 
-import theano
-import theano.tensor
+try:
+    import theano
+    import theano.tensor
+except ImportError:
+    print("Please install theano: pip3 install theano")
+    import sys
+    sys.exit(1)
 
 import numpy
 from collections import namedtuple

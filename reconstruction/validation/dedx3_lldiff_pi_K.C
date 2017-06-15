@@ -79,5 +79,5 @@ void dedx3_lldiff_pi_K()
 {
   gROOT->SetStyle("Plain");
 
-  plot("EvtGenSimRec_dedx.root");
+  plot("../EvtGenSimRec_dedx.root");
 }

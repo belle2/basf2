@@ -21,6 +21,7 @@ namespace Belle2 {
     /// Names of the variables to be generated
     constexpr
     static char const* const basicFacetRelationVarNames[] = {
+      "superlayer_id",
       "from_middle_phi",
       "to_middle_phi",
     };

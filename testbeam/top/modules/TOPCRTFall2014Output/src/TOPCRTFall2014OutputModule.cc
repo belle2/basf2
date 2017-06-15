@@ -158,7 +158,7 @@ namespace Belle2 {
 
       int ich = getOldNumbering(digi->getPixelID()) - 1;
 
-      float tdc(digi->getTDC());
+      float tdc = digi->getRawTime();
       if (m_randomize) {tdc += gRandom->Rndm();}
 
       if (m_multipleHits) {

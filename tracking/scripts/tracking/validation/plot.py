@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
 import math
 import itertools
 import collections
@@ -416,9 +417,15 @@ class ValidationPlot(object):
                outlier_z_score=(None, None),
                include_exceptionals=(True, True),
                allow_discrete=(False, False),
+               quantiles=None,
                is_expert=True):
         """Fill the plot with a two dimensional histogram"""
+
         name = self.name
+        # Introduce a dummy name for the temporary two dimensional histogram
+        if quantiles is not None:
+            name = "_" + self.name
+
         is_expert = self.is_expert
 
         x_bins, y_bins = self.unpack_2d_param(bins)
@@ -427,6 +434,10 @@ class ValidationPlot(object):
         x_outlier_z_score, y_outlier_z_score = self.unpack_2d_param(outlier_z_score)
         x_include_exceptionals, y_include_exceptionals = self.unpack_2d_param(include_exceptionals)
         x_allow_discrete, y_allow_discrete = self.unpack_2d_param(allow_discrete)
+
+        if quantiles is not None:
+            y_include_exceptionals = True
+            y_allow_discrete = False
 
         x_bin_edges, x_bin_labels = self.determine_bin_edges(xs,
                                                              stackbys=stackby,
@@ -481,6 +492,31 @@ class ValidationPlot(object):
             self.add_stats_entry(histogram, "dy", y_bin_width)
 
         self.create(histogram, xs, ys=ys, weights=weights, stackby=stackby)
+
+        if quantiles is not None:
+            self.name = self.name[1:]
+            profiles = []
+            for histogram in self.histograms:
+                for quantile in quantiles:
+                    profile = histogram.QuantilesX(quantile, histogram.GetName()[1:] + '_' + str(quantile))
+
+                    # Manually copy labels grumble grumble
+                    x_taxis = histogram.GetXaxis()
+                    new_x_taxis = profile.GetXaxis()
+                    for i_bin in range(x_taxis.GetNbins() + 2):
+                        label = x_taxis.GetBinLabel(i_bin)
+                        if label != "":
+                            new_x_taxis.SetBinLabel(i_bin, label)
+
+                    # Remove faulty error values)
+                    epsilon = sys.float_info.epsilon
+                    for i_bin in range(0, profile.GetNbinsX() + 2):
+                        profile.SetBinError(i_bin, epsilon)
+
+                    profiles.append(profile)
+
+            self.histograms = profiles
+            self.plot = self.create_stack(profiles, name=self.plot.GetName()[1:], reverse_stack=False, force_graph=True)
 
         # Adjust the discrete bins after the filling to be equidistant
         if x_bin_labels:
@@ -968,11 +1004,11 @@ class ValidationPlot(object):
         self.attach_attributes()
 
     @classmethod
-    def create_stack(cls, histograms, name, reverse_stack):
+    def create_stack(cls, histograms, name, reverse_stack, force_graph=False):
         if len(histograms) == 1:
             plot = histograms[0]
         else:
-            if isinstance(histograms[0], (ROOT.TProfile, ROOT.TGraph)):
+            if isinstance(histograms[0], (ROOT.TProfile, ROOT.TGraph)) or force_graph:
                 plot = ROOT.TMultiGraph()
             else:
                 plot = ROOT.THStack()
@@ -983,14 +1019,14 @@ class ValidationPlot(object):
             # that the signal usually is on the bottom an well visible
             if reverse_stack:
                 for histogram in reversed(histograms):
-                    if isinstance(histogram, ROOT.TProfile):
+                    if isinstance(histogram, ROOT.TProfile) or (isinstance(histogram, ROOT.TH1) and force_graph):
                         histogram = cls.convert_tprofile_to_tgrapherrors(histogram)
                         plot.Add(histogram, "APZ")
                     else:
                         plot.Add(histogram)
             else:
                 for histogram in histograms:
-                    if isinstance(histogram, ROOT.TProfile):
+                    if isinstance(histogram, ROOT.TProfile) or (isinstance(histogram, ROOT.TH1) and force_graph):
                         histogram = cls.convert_tprofile_to_tgrapherrors(histogram)
                         plot.Add(histogram, "APZ")
                     else:
@@ -1430,7 +1466,7 @@ class ValidationPlot(object):
         # Manually copy labels grumble grumble
         x_taxis = th2.GetXaxis()
         new_x_taxis = th1_means.GetXaxis()
-        for i_bin in range(x_taxis.GetNbins()):
+        for i_bin in range(x_taxis.GetNbins() + 2):
             label = x_taxis.GetBinLabel(i_bin)
             if label != "":
                 new_x_taxis.SetBinLabel(i_bin, label)
@@ -1594,7 +1630,11 @@ class ValidationPlot(object):
         debug = get_logger().debug
         debug('Determine binning for plot named %s', self.name)
 
-        if isinstance(bins, collections.Iterable):
+        if bins == 'flat':
+            # Special value for the flat distribution binning
+            n_bins = None
+
+        elif isinstance(bins, collections.Iterable):
             # Bins is considered as an array
             # Construct a float array forwardable to root.
             bin_edges = bins
@@ -1603,7 +1643,7 @@ class ValidationPlot(object):
             return bin_edges, bin_labels
 
         # If bins is not an iterable assume it is the number of bins or None
-        if bins is None:
+        elif bins is None:
             n_bins = None
         else:
             # Check that bins can be coerced to an integer.
@@ -1678,9 +1718,14 @@ class ValidationPlot(object):
 
         n_bin_edges = n_bins + 1
         if lower_bound != upper_bound:
-            # Correct the upper bound such that all values are strictly smaller than the upper bound
-            # Make one step in single precision in the positive direction
-            bin_edges = np.linspace(lower_bound, upper_bound, n_bin_edges)
+            if bins == "flat":
+                debug("Creating flat distribution binning")
+                precentiles = np.linspace(0.0, 100.0, n_bin_edges)
+                bin_edges = np.unique(np.nanpercentile(xs[(lower_bound <= xs) & (xs <= upper_bound)], precentiles))
+            else:
+                # Correct the upper bound such that all values are strictly smaller than the upper bound
+                # Make one step in single precision in the positive direction
+                bin_edges = np.linspace(lower_bound, upper_bound, n_bin_edges)
 
             # Reinforce the upper and lower bound to be exact
             # Also expand the upper bound by an epsilon
@@ -1772,7 +1817,6 @@ class ValidationPlot(object):
 
                 stack_ranges.append([stack_lower_bound, stack_upper_bound])
 
-            print(stack_ranges)
             lower_bound = np.nanmin([lwb for lwb, upb in stack_ranges])
             upper_bound = np.nanmax([upb for lwb, upb in stack_ranges])
 
@@ -2115,6 +2159,22 @@ class ValidationPlot(object):
         self.xlabel = self.xlabel
         self.ylabel = self.ylabel
         self.title = self.title
+
+    def set_maximum(self, maximum):
+        """Sets the maximum of the vertical plotable range"""
+        for histogram in self.histograms:
+            if isinstance(histogram, ROOT.TH1):
+                histogram.SetMaximum(histogram.GetMaximum(maximum))
+            else:
+                histogram.SetMaximum(maximum)
+
+    def set_minimum(self, minimum):
+        """Sets the minimum of the vertical plotable range"""
+        for histogram in self.histograms:
+            if isinstance(histogram, ROOT.TH1):
+                histogram.SetMinimum(histogram.GetMinimum(minimum))
+            else:
+                histogram.SetMinimum(minimum)
 
     @classmethod
     def set_tstyle(cls):

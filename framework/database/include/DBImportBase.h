@@ -25,7 +25,7 @@ namespace Belle2 {
      * Constructor
      * @param name  Name under which the object will be stored in the database
      */
-    DBImportBase(const std::string& name): m_name(name) {}
+    explicit DBImportBase(const std::string& name): m_name(name) {}
 
     /**
      * Destructor

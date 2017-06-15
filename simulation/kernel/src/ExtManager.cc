@@ -34,9 +34,12 @@
 #include <G4FieldManager.hh>
 #include <G4CachedMagneticField.hh>
 #include <G4Mag_UsualEqRhs.hh>
+#include <G4ErrorMag_UsualEqRhs.hh>
+#include <G4MagIntegratorStepper.hh>
 #include <G4NystromRK4.hh>
 #include <G4HelixExplicitEuler.hh>
 #include <G4HelixSimpleRunge.hh>
+#include <G4EquationOfMotion.hh>
 #include <G4ChordFinder.hh>
 #include <G4HadronicProcessStore.hh>
 #include <G4LossTableManager.hh>
@@ -86,6 +89,9 @@ ExtManager::ExtManager() :
   m_MagFldEquation(NULL),
   m_Stepper(NULL),
   m_ChordFinder(NULL),
+  m_StdStepper(NULL),
+  m_ForwardEquationOfMotion(NULL),
+  m_BackwardEquationOfMotion(NULL),
   m_VisManager(NULL)
 {
   // This flag will be PreInit if FullSimModule is not present
@@ -108,6 +114,9 @@ ExtManager::ExtManager(ExtManager& e) :
   m_MagFldEquation(e.m_MagFldEquation),
   m_Stepper(e.m_Stepper),
   m_ChordFinder(e.m_ChordFinder),
+  m_StdStepper(e.m_StdStepper),
+  m_ForwardEquationOfMotion(e.m_ForwardEquationOfMotion),
+  m_BackwardEquationOfMotion(e.m_BackwardEquationOfMotion),
   m_VisManager(e.m_VisManager)
 {
 }
@@ -118,11 +127,16 @@ ExtManager::~ExtManager()
   if (m_Propagator) { delete m_Propagator; m_Propagator = NULL; }
 }
 
-void ExtManager::InitTrackPropagation()
+void ExtManager::InitTrackPropagation(G4ErrorMode mode)
 {
   if (m_G4RunMgr) {
     m_G4RunMgr->SetUserAction((G4UserTrackingAction*)NULL);
     m_G4RunMgr->SetUserAction((G4UserSteppingAction*)NULL);
+  }
+  if (mode == G4ErrorMode_PropBackwards) {
+    if (m_StdStepper) {
+      m_StdStepper->SetEquationOfMotion(m_BackwardEquationOfMotion);
+    }
   }
   if (m_Propagator == NULL) m_Propagator = new G4ErrorPropagator();
   m_Propagator->SetStepN(0);
@@ -143,12 +157,17 @@ G4int ExtManager::PropagateOneStep(G4ErrorTrajState* currentTS, G4ErrorMode mode
   return result;
 }
 
-void ExtManager::EventTermination()
+void ExtManager::EventTermination(G4ErrorMode mode)
 {
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetState(G4ErrorState_Init);
   if (m_G4RunMgr) {
     m_G4RunMgr->SetUserAction(m_TrackingAction);
     m_G4RunMgr->SetUserAction(m_SteppingAction);
+  }
+  if (mode == G4ErrorMode_PropBackwards) {
+    if (m_StdStepper) {
+      m_StdStepper->SetEquationOfMotion(m_ForwardEquationOfMotion);
+    }
   }
 }
 
@@ -174,6 +193,7 @@ void ExtManager::RunTermination()
     if (m_UncachedField) delete m_UncachedField;
     if (m_MagneticField) delete m_MagneticField;
   }
+  if (m_BackwardEquationOfMotion) delete m_BackwardEquationOfMotion;
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetState(G4ErrorState_PreInit);
 }
 
@@ -197,6 +217,7 @@ void ExtManager::Initialize(const char caller[], const std::string& magneticFiel
     return;
   }
 
+  G4FieldManager* fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
   if (status == 2) {
     m_G4RunMgr = G4RunManager::GetRunManager();
     m_TrackingAction = const_cast<G4UserTrackingAction*>(m_G4RunMgr->GetUserTrackingAction());
@@ -215,7 +236,6 @@ void ExtManager::Initialize(const char caller[], const std::string& magneticFiel
         m_UncachedField = m_MagneticField;
         m_MagneticField = new G4CachedMagneticField(m_UncachedField, magneticCacheDistance);
       }
-      G4FieldManager* fieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
       fieldManager->SetDetectorField(m_MagneticField);
       if (magneticFieldName != "default") {
 
@@ -244,7 +264,6 @@ void ExtManager::Initialize(const char caller[], const std::string& magneticFiel
       B2INFO("Geant4 default deltaChord = " << chordFinder->GetDeltaChord());
       chordFinder->SetDeltaChord(deltaChordInMagneticField * CLHEP::mm);
       B2INFO("DeltaChord after reset = " << chordFinder->GetDeltaChord());
-
       //This might be a good place to optimize the Integration parameters (DeltaOneStep, DeltaIntersection, MinEpsilon, MaxEpsilon)
     }
 
@@ -287,6 +306,14 @@ void ExtManager::Initialize(const char caller[], const std::string& magneticFiel
     B2INFO("ExtManager::Initialize(): done, Geant4 ready (for extrapolation only)");
     G4StateManager::GetStateManager()->SetNewState(G4State_Idle);
   }
+
+  // Prepare for the possibility of back-extrapolation
+  if (m_MagneticField != NULL) {
+    m_StdStepper = const_cast<G4MagIntegratorStepper*>(fieldManager->GetChordFinder()->GetIntegrationDriver()->GetStepper());
+    m_ForwardEquationOfMotion = m_StdStepper->GetEquationOfMotion();
+    m_BackwardEquationOfMotion = new G4ErrorMag_UsualEqRhs(m_MagneticField);
+  }
+
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetState(G4ErrorState_Init);
   if (status == 0) {
     B2INFO("ExtManager::Initialize(): " << caller << " will run without FullSim and has initialized the extrapolator");

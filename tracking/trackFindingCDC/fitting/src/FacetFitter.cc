@@ -264,6 +264,7 @@ UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
   }
 
   UncertainParameterLine2D fitLine{ ::fit(std::move(xyl), std::move(w), nSteps) };
+  fitLine.passiveMoveBy(-support);
   return fitLine;
 }
 

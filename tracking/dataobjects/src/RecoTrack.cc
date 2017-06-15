@@ -255,7 +255,7 @@ void RecoTrack::prune()
   // "Prune" all RecoHitInformation but the first and the last.
   for (unsigned int i = 1; i < relatedRecoHitInformations.size() - 1; ++i) {
     dynamic_cast<RecoHitInformation*>(relatedRecoHitInformations[i].object)->setFlag(RecoHitInformation::RecoHitFlag::c_pruned);
-    dynamic_cast<RecoHitInformation*>(relatedRecoHitInformations[i].object)->setCreatedTrackPoint(nullptr);
+    dynamic_cast<RecoHitInformation*>(relatedRecoHitInformations[i].object)->setCreatedTrackPointID(-1);
   }
 
 

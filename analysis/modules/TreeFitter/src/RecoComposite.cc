@@ -22,11 +22,12 @@
 namespace TreeFitter {
   extern int vtxverbose ;
 
-  RecoComposite::RecoComposite(Particle* particle, const ParticleBase* mother)
+  RecoComposite::RecoComposite(Belle2::Particle* particle, const ParticleBase* mother)
     : ParticleBase(particle, mother), m_m(), m_matrixV(), m_hasEnergy(true)
   {
-    //    bool massconstraint = particle && particle->constraint(BtaConstraint::Mass) ;//FT: this requires the ability to flag a vertex for mass constraining, which we can't easily do right now
-    //    m_hasEnergy = !massconstraint ;                                              //
+    //FT: this requires the ability to flag a vertex for mass constraining, which we can't easily do right now
+    //    bool massconstraint = particle && particle->constraint(BtaConstraint::Mass) ;
+    //    m_hasEnergy = !massconstraint ;
     updCache() ;
   }
 
@@ -35,12 +36,13 @@ namespace TreeFitter {
     // cache par7 (x,y,z,px,py,pz,E) cov7
     // the simplest is
     //    const FitParams particlefitparams = particle()->fitParams() ;
-    //    HepPoint pos = particlefitparams.pos() ;
+    //    CLHEP::HepPoint pos = particlefitparams.pos() ;
     TVector3 pos = particle()->getVertex();
-    //    HepLorentzVector mom = particlefitparams.p4() ;
+    //    CLHEP::HepLorentzVector mom = particlefitparams.p4() ;
     TVector3 mom = particle()->getMomentum();
     double energy = particle()->getEnergy();
-    m_m = HepVector(dimM()); //FT: note that Belle2 variables are ordered (p,E,x) while the treefitter internal logic uses (x,p,E)
+    m_m = CLHEP::HepVector(
+            dimM()); //FT: note that Belle2 variables are ordered (p,E,x) while the treefitter internal logic uses (x,p,E)
     m_m(1) = pos.X() ;
     m_m(2) = pos.Y() ;
     m_m(3) = pos.Z() ;
@@ -52,7 +54,7 @@ namespace TreeFitter {
     //FT: this part will need to be reviewed;
     //    m_matrixV = particlefitparams.cov7().sub(1,dimM()) ; // so either 7 or 6, depending on mass constraint
     TMatrixFSym cov7in = particle()->getMomentumVertexErrorMatrix(); //this is (p,E,x)
-    HepSymMatrix cov7out(7, 0); //this has to be (x,p,E)
+    CLHEP::HepSymMatrix cov7out(7, 0); //this has to be (x,p,E)
     for (int row = 1; row <= 4; ++row) { //first the p,E block
       for (int col = 1; col <= row; ++col) {
         cov7out(3 + row, 3 + col) = cov7in[row - 1][col - 1];

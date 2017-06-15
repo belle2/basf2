@@ -6,13 +6,13 @@
 
 #include <daq/slc/base/StringUtil.h>
 
-int cprtop01[] = { 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008 };
-int cprtop02[] = { 2061 };
-int cprtop03[] = { 3009, 3010, 3011, 3012, 3013, 3014, 3015, 3016 };
+int cprtop01[] = { 3001, 3002, 3003, 3004, 3005 };
+int cprtop02[] = { 3006, 3007, 3008, 3009, 3010 };
+int cprtop03[] = { 3011, 3012, 3013, 3014, 3015, 3016 };
 
 int* getcopper(const char* hostname, int& ncpr, std::string& ropcname)
 {
-  ropcname = Belle2::StringUtil::replace(hostname, "top0", "ropc20");
+  ropcname = Belle2::StringUtil::replace(hostname, "top0", "ropc30");
   if (strcmp(hostname, "top01") == 0) {
     ncpr = sizeof(cprtop01) / sizeof(int);
     return cprtop01;
@@ -75,11 +75,11 @@ int main(int argc, char** argv)
   }
   if (cpr) {
     if (nsm) sleep(1);
-    sprintf(s, "killall runcontrold rocontrold");
+    sprintf(s, "killall runcontrold rocontrold des_ser_ROPC_main eb0");
     printf("%s\n", s);
     system(s);
     for (int i = 0; i < ncpr; i++) {
-      sprintf(s, "ssh cpr%d \"killall -9 cprcontrold basf2;\" ", cprtop[i]);
+      sprintf(s, "ssh cpr%d \"killall -9 cprcontrold des_ser_COPPER_main;\" ", cprtop[i]);
       printf("%s\n", s);
       system(s);
     }

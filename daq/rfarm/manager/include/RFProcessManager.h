@@ -18,6 +18,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+#include <vector>
+
 
 namespace Belle2 {
 
@@ -39,9 +41,13 @@ namespace Belle2 {
 
     int GetFd();
 
+    // Check process status
+    pid_t CheckProcess();
+
   private:
     int m_iopipe[2];
     int m_fdout;
+    std::vector<pid_t> m_pidlist;
 
   };
 }

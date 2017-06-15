@@ -53,7 +53,6 @@ KKGenInputModule::KKGenInputModule() : Module(), m_initial(BeamParameters::c_sme
            FileSystem::findFile("/data/generators/kkmc/KK2f_defaults.dat"));
   addParam("taudecaytableFile", m_taudecaytableFileName, "tau-decay-table file name",
            FileSystem::findFile("/data/generators/kkmc/tau.input.dat"));
-  addParam("evtpdlfilename", m_EvtPDLFileName, "EvtPDL filename. This parameter is deprecated and will be ignored", string(""));
   addParam("kkmcoutputfilename", m_KKMCOutputFileName, "KKMC output filename", string(""));
 }
 
@@ -119,9 +118,6 @@ void KKGenInputModule::terminate()
 void KKGenInputModule::initializeGenerator()
 {
   FILE* fp;
-  if (getParam<std::string>("evtpdlfilename").isSetInSteering()) {
-    B2ERROR("KKGenInputModule::initializeGenerator(): The 'pdlFile' parameter is deprecated and will be ignored. Use \"import pdg; pdg.read('pdlFile')\" instead.");
-  }
 
   if (m_KKMCOutputFileName.empty()) {
     m_KKMCOutputFileName = boost::filesystem::unique_path("KKMC-%%%%%%%%%%.txt").native();

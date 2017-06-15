@@ -10,8 +10,7 @@ import math
 
 # local database with Kichimi-san TBC and T0 constants
 reset_database()
-pathTo = '/ghi/fs01/belle2/bdata/group/detector/TOP/DB_TBT0_20170212/'  # on KEKCC
-# pathTo = '../Kichimi/'
+pathTo = '/ghi/fs01/belle2/bdata/group/detector/TOP/DB_TBT0_20170421/'  # on KEKCC
 use_local_database(pathTo + "localDB/localDB.txt", pathTo + "localDB")
 
 # Create path
@@ -39,6 +38,7 @@ calpulse.param('moduleIDs', [1])
 # intervals = intervals + intervals
 # calpulse.param('sampleTimeIntervals', intervals)
 calpulse.param('useDatabase', True)
+calpulse.param('outputFileName', 'usedSampleTimes.root')
 main.add_module(calpulse)
 
 # output

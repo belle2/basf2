@@ -116,3 +116,14 @@ def is_discrete_series(xs, max_n_unique=None):
             return True
 
     return False
+
+
+def is_single_value_series(xs):
+    """Determine if a series contains only a single value
+
+    Parameters
+    ----------
+    xs : np.array (1d)
+        Data series
+    """
+    return np.all(xs == xs[0]) or np.all(np.isnan(xs))

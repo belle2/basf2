@@ -39,7 +39,8 @@ using namespace analysis;
 
 
 RaveKinematicVertexFitter::RaveKinematicVertexFitter(): m_useBeamSpot(false), m_motherParticlePtr(NULL), m_raveAlgorithm(""),
-  m_massConstFit(false), m_vertFit(true)
+  m_massConstFit(false), m_vertFit(true),
+  m_logCapture("Rave", LogConfig::c_Debug, LogConfig::c_Debug)
 {
   if (RaveSetup::getRawInstance() == NULL) {
     B2FATAL("RaveSetup::initialize was not called. It has to be called before RaveSetup or RaveKinematicVertexFitter are used");
@@ -99,7 +100,7 @@ void RaveKinematicVertexFitter::addTrack(const Particle* aParticlePtr)
   // 1 and 1 are dummy values for chi2 and ndf. the are not used for the vertex fit
 
   m_inputParticles.push_back(aRaveParticle);
-
+  m_belleDaughters.push_back(const_cast<Particle*>(aParticlePtr));
 
 }
 
@@ -130,6 +131,7 @@ void RaveKinematicVertexFitter::setMother(const Particle* aMotherParticlePtr)
 int RaveKinematicVertexFitter::fit()
 {
 
+  m_logCapture.start();
 
   int ndf = 0;
 
@@ -322,6 +324,7 @@ int RaveKinematicVertexFitter::fit()
     }
   }
 
+  m_logCapture.finish();
   return 1;
 
 }
@@ -336,7 +339,7 @@ void RaveKinematicVertexFitter::updateDaughters()
 
   m_fittedResult.topParticle();
   std::vector< rave::KinematicParticle > rDau = m_fittedResult.daughterParticles();
-  std::vector<Belle2::Particle*> bDau = m_motherParticlePtr->getDaughters();
+  std::vector<Belle2::Particle*> bDau = m_belleDaughters;
   if (rDau.size() == bDau.size()) {
     for (unsigned ii = 0; ii < bDau.size(); ii++) {
       rave::Vector7D fittedState;

@@ -64,5 +64,10 @@ bool BasicFacetVarSet::extract(const CDCFacet* ptrFacet)
   var<named("twist")>() = stableTwist;
   var<named("cell_extend")>() = cellExtend;
   var<named("n_crossing")>() = startToMiddleIsCrossing + middleToEndIsCrossing;
+
+  facet.adjustFitLine();
+  UncertainParameterLine2D fitLine = facet.getFitLine();
+  double alpha = fitLine->at(0.5).angleWith(fitLine->tangential());
+  var<named("alpha")>() = alpha;
   return true;
 }

@@ -11,7 +11,13 @@
 
 #include <tracking/trackFindingCDC/display/EventDataPlotter.h>
 #include <tracking/trackFindingCDC/sim/CDCSimpleSimulation.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <tracking/trackFindingCDC/geometry/Helix.h>
 

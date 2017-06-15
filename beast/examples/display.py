@@ -29,7 +29,8 @@ else:
 
 # create geometry
 gearbox = register_module('Gearbox')
-gearbox.param('fileName', '/geometry/Beast2_phase1.xml')
+# gearbox.param('fileName', '/geometry/Beast2_phase1.xml')
+gearbox.param('fileName', 'beast/microtpc/detector.xml')
 geometry = register_module('Geometry')
 # new ECL geometry contains custom objects that cannot be converted to TGeo
 # add MagneticField off B-field (also greatly speeds up startup)

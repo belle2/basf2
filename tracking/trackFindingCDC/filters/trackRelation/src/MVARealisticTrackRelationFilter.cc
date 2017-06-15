@@ -14,9 +14,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 MVARealisticTrackRelationFilter::MVARealisticTrackRelationFilter()
-  : Super(makeUnique<VarSet>(),
-          "trackfindingcdc_RealisticTrackRelationFilter",
-          0.80)
+  : Super(makeUnique<VarSet>(), "tracking/data/trackfindingcdc_RealisticTrackRelationFilter.xml", 0.80)
 {
   this->addProcessingSignalListener(&m_feasibleTrackRelationFilter);
 }

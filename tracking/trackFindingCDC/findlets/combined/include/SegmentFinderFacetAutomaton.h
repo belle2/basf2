@@ -9,9 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/minimal/SuperClusterCreator.h>
-#include <tracking/trackFindingCDC/findlets/minimal/ClusterBackgroundDetector.h>
-#include <tracking/trackFindingCDC/findlets/minimal/ClusterRefiner.h>
 #include <tracking/trackFindingCDC/findlets/minimal/FacetCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorFacetAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentLinker.h>
@@ -20,8 +17,8 @@
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentAliasResolver.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentOrienter.h>
 
-#include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/facetRelation/ChooseableFacetRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
@@ -37,11 +34,11 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Findlet implementing the segment finding part of the full track finder
-    class SegmentFinderFacetAutomaton : public Findlet<CDCWireHit&, CDCSegment2D> {
+    class SegmentFinderFacetAutomaton : public Findlet<CDCWireHitCluster&, CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCWireHit&, CDCSegment2D>;
+      using Super = Findlet<CDCWireHitCluster&, CDCSegment2D>;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
@@ -57,19 +54,10 @@ namespace Belle2 {
       void beginEvent() final;
 
       /// Generates the segment from wire hits
-      void apply(std::vector<CDCWireHit>& inputWireHits, std::vector<CDCSegment2D>& outputSegments) final;
+      void apply(std::vector<CDCWireHitCluster>& clusters, std::vector<CDCSegment2D>& outputSegments) final;
 
     private:
       // Findlets
-      /// Composes the super clusters.
-      SuperClusterCreator m_superClusterCreator;
-
-      /// Creates the clusters from super clusters
-      ClusterRefiner<BridgingWireHitRelationFilter> m_clusterRefiner;
-
-      /// Marks the clusters as background
-      ClusterBackgroundDetector m_clusterBackgroundDetector;
-
       /// Creates the facet (hit triplet) cells of the cellular automaton
       FacetCreator m_facetCreator;
 
@@ -91,26 +79,10 @@ namespace Belle2 {
       /// Link segments with closeby segments of the same super cluster
       SegmentLinker m_segmentLinker;
 
-      /// Puts the internal super clusters on the DataStore
-      StoreVectorSwapper<CDCWireHitCluster> m_superClusterSwapper{
-        "CDCWireHitSuperClusterVector",
-        "superCluster",
-        "wire hit super cluster"
-      };
-
-      /// Puts the internal clusters on the DataStore
-      StoreVectorSwapper<CDCWireHitCluster> m_clusterSwapper{"CDCWireHitClusterVector"};
-
-      /// Puts the internal clusters on the DataStore
+      /// Puts the internal facets on the DataStore
       StoreVectorSwapper<CDCFacet> m_facetSwapper{"CDCFacetVector"};
 
       // Object pools
-      /// Memory for the wire hit clusters
-      std::vector<CDCWireHitCluster> m_clusters;
-
-      /// Memory for the wire hit super cluster
-      std::vector<CDCWireHitCluster> m_superClusters;
-
       /// Memory for the generated facets
       std::vector<CDCFacet> m_facets;
 

@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['belle_legacy', 'pq', 'readline', 'termcap', 'z']
+env['LIBS'] = ['belle_legacy']
 env['CONTINUE'] = True
 
 Return('env')

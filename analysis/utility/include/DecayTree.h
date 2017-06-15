@@ -34,7 +34,7 @@ namespace Belle2 {
     /**
      * Create a new Decay tree from a decaystring
      */
-    DecayTree(const std::string& decaystring);
+    DecayTree(const std::string& decaystring, bool removeRadiativeGammaFlag = false);
 
     /**
      * Copy constructor
@@ -51,8 +51,10 @@ namespace Belle2 {
     /**
      * Recursively build a new tree
      * @param decaystring as outputted by the ParticleMCDecayString module (after splitting by | )
+     * @param removeRadiativeGammaFlag remove radiative photons from decay string. Handle with care:
+     * In the decay B+ --> e+ nu_e gamma, the gamma would be removed although this might be your signal.
      */
-    std::vector<DecayNode> build_tree(const std::string& decaystring);
+    std::vector<DecayNode> build_tree(const std::string& decaystring, bool removeRadiativeGammaFlag);
 
     /**
      * Check if the decay tree contains the given decay tree.

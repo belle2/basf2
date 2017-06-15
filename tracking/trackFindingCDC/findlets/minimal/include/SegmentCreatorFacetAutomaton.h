@@ -56,6 +56,9 @@ namespace Belle2 {
       /// Parameter : Switch to relax the alias and reverse search for segments contained in a single layer
       bool m_param_relaxSingleLayerSearch = true;
 
+      /// Paraneter : Switch to activate the write out of all available orientations of single facet segments
+      bool m_param_allSingleAliases = false;
+
     private: // cellular automaton
       /// Instance of the cellular automaton path finder
       MultipassCellularPathFinder<const CDCFacet> m_cellularPathFinder;

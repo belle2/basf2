@@ -343,7 +343,7 @@ namespace Belle2 {
     template <class HitType>
     TrackingDetector getTrackingDetector(const HitType* hit) const
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSafely(hit);
       return recoHitInformation->getTrackingDetector();
     }
 
@@ -351,7 +351,7 @@ namespace Belle2 {
     template <class HitType>
     RightLeftInformation getRightLeftInformation(const HitType* hit) const
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSafely(hit);
       return recoHitInformation->getRightLeftInformation();
     }
 
@@ -359,7 +359,7 @@ namespace Belle2 {
     template <class HitType>
     OriginTrackFinder getFoundByTrackFinder(const HitType* hit) const
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSafely(hit);
       return recoHitInformation->getFoundByTrackFinder();
     }
 
@@ -367,7 +367,7 @@ namespace Belle2 {
     template <class HitType>
     unsigned int getSortingParameter(const HitType* hit) const
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSafely(hit);
       return recoHitInformation->getSortingParameter();
     }
 
@@ -375,7 +375,7 @@ namespace Belle2 {
     template <class HitType>
     void setRightLeftInformation(const HitType* hit, RightLeftInformation rightLeftInformation)
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSafely(hit);
       recoHitInformation->setRightLeftInformation(rightLeftInformation);
       setDirtyFlag();
     }
@@ -384,7 +384,7 @@ namespace Belle2 {
     template <class HitType>
     void setFoundByTrackFinder(const HitType* hit, OriginTrackFinder originTrackFinder)
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSafely(hit);
       recoHitInformation->setFoundByTrackFinder(originTrackFinder);
     }
 
@@ -392,9 +392,23 @@ namespace Belle2 {
     template <class HitType>
     void setSortingParameter(const HitType* hit, unsigned int sortingParameter)
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSafely(hit);
       recoHitInformation->setSortingParameter(sortingParameter);
       setDirtyFlag();
+    }
+
+    /** Get a pointer to the TrackPoint that was created from this hit. Can be a nullptr if no measurement was already created.
+     * Please be aware that refitting may or may not recreate the track points and older pointers can be invalidated.
+     * Also, pruning a RecoTrack will also delete most of the TrackPoints.
+     */
+    const genfit::TrackPoint* getCreatedTrackPoint(const RecoHitInformation* recoHitInformation) const
+    {
+      int createdTrackPointID = recoHitInformation->getCreatedTrackPointID();
+      if (createdTrackPointID == -1) {
+        return nullptr;
+      }
+
+      return m_genfitTrack.getPoint(createdTrackPointID);
     }
 
     // Hits Added Questioning
@@ -650,7 +664,7 @@ namespace Belle2 {
         B2FATAL("MeasuredStateOnPlane cannot be provided for RecoHit which was not used in the fit.");
       }
 
-      const auto hitTrackPoint = recoHitInfo->getCreatedTrackPoint();
+      const auto hitTrackPoint = getCreatedTrackPoint(recoHitInfo);
       if (hitTrackPoint == nullptr) {
         B2FATAL("TrackPoint was requested which has not been created");
       }
@@ -890,7 +904,7 @@ namespace Belle2 {
 
     /// Returns the reco hit information for a given hit or throws an exception if the hit is not related to the track.
     template <class HitType>
-    RecoHitInformation* getRecoHitInformationSavely(HitType* hit) const
+    RecoHitInformation* getRecoHitInformationSafely(HitType* hit) const
     {
       RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
       if (recoHitInformation == nullptr) {

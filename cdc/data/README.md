@@ -16,8 +16,10 @@ Format: super layerID (0-8), layerID in the super-layer (0-), wireID(0-), boardI
  - sort in order of alpha
  (- Unit: cm and nsec).
  (- unsigned driftL).
-* xt_v3.dat       : created from xt_v2.1.
-* xt_noB_v1.dat   : created from xt_noB_v0.3. 
+* xt_v3_chebyshev.dat.gz     : created from xt_v3.
+* xt_v3.dat                  : created from xt_v2.1 <- obsolete.
+* xt_noB_v1_chebyshev.dat.gz : created from xt_noB_v1.
+* xt_noB_v1.dat              : created from xt_noB_v0.3 <- obsolete.
 
 # xt-relation in old format
 
@@ -60,7 +62,8 @@ Unit: cm and microsec.
    mode=0: default;
        =1: add 2 params. to describe sigma better near a cell boundary;
        =2: similar to mode=1 but slightly-different parameterization.
-* sigma_v1.dat       : created from sigma_v0.1.dat.
+* sigma_v2.dat       : Sep.2016 cosmic data (see Apr.12.2017 meeting)
+* sigma_v1.dat       : created from sigma_v0.1.dat <- obsolete.
 
 
 # sigma in old format
@@ -98,7 +101,8 @@ The file contains the constants related to trigger-signal delay (or event time).
 
 Format: layerID (0-55), wireID(0-), t0 [ns]
 
-* t0.dat: Set t0=8192 ns for all wires.
+* t0_v1.dat: Set t0=4900 ns for all wires.
+* t0.dat   : Set t0=8192 ns for all wires <- obsolete.
 
 # badwire
 

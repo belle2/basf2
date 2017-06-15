@@ -63,7 +63,7 @@ void DQMHistAnalysisInputModule::event()
   resetHist();
   for (size_t i = 0; i < h.size(); i++) {
     addHist("", h[i]->GetName(), h[i]);
-    B2DEBUG(2, "Found : " << h[i]->GetName() << " : " << h[i]->GetEntries());
+    B2INFO("Found : " << h[i]->GetName() << " : " << h[i]->GetEntries());
     std::string vname = h[i]->GetName();
     setFloatValue(vname + ".entries", h[i]->GetEntries());
     if (h[i]->GetDimension() == 1) {

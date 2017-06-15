@@ -16,18 +16,19 @@ dbstore/ARICHGeometryConfig 1 0,0,-1,-1
 dbstore/ARICHMergerMapping 1 0,0,-1,-1			    
 dbstore/ARICHModulesInfo 1 0,0,-1,-1			    
 dbstore/ARICHSimulationPar 1 0,0,-1,-1
+dbstore/ARICHReconstructionPar 1 0,0,-1,-1
 dbstore/ecl_showershape_zernike_mva_fwd 1 0,0,-1,-1
 dbstore/ecl_showershape_zernike_mva_brl 1 0,0,-1,-1
 dbstore/ecl_showershape_zernike_mva_bwd 1 0,0,-1,-1
 dbstore/ecl_shower_shape_second_moment_corrections 1 0,0,-1,-1
 dbstore/ecl_shower_corrector_leakage_corrections 2 0,0,-1,-1
 dbstore/CDCChannelMaps 1 0,0,-1,-1
-dbstore/CDCTimeZeros 1 0,0,-1,-1
+dbstore/CDCTimeZeros 2 0,0,-1,-1
 dbstore/CDCBadWires 1 0,0,-1,-1
 dbstore/CDCPropSpeeds 1 0,0,-1,-1
 dbstore/CDCTimeWalks 1 0,0,-1,-1
-dbstore/CDCXtRelations 1 0,0,-1,-1
-dbstore/CDCSpaceResols 1 0,0,-1,-1
+dbstore/CDCXtRelations 2 0,0,-1,-1
+dbstore/CDCSpaceResols 2 0,0,-1,-1
 dbstore/CDCDisplacements 1 0,0,-1,-1
 dbstore/CDCAlignment 1 0,0,-1,-1
 dbstore/CDCMisalignment 1 0,0,-1,-1
@@ -60,5 +61,6 @@ dbstore/software_trigger_cut&calib&accept_dqm_Jpsimumu 3 0,0,-1,-1
 dbstore/trackfindingcdc_BackgroundClusterFilter 4 0,0,-1,-1
 dbstore/trackfindingcdc_FeasibleSegmentRelationFilter 1 0,0,-1,-1
 dbstore/trackfindingcdc_RealisticSegmentRelationFilter 1 0,0,-1,-1
+dbstore/TOPCalChannelMask 1 0,0,-1,-1
 
 

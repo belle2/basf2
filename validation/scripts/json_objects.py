@@ -153,6 +153,26 @@ class NTuple(JsonBase):
         self.check = check
 
 
+class HtmlContent(JsonBase):
+
+    """
+    Wrapper for user HTML Content. This is not a graphical plot but HTML code which
+    will be directly output on the validation website.
+    """
+
+    def __init__(self, is_expert=False, description=None, check=None):
+        """
+        Create a new NTuple object and fill all members
+        """
+
+        #: true if this is marked as an expert-only HTML code
+        self.is_expert = is_expert
+        #: telling description for this HTML code
+        self.description = description
+        #: what should be checked for in this HTML code
+        self.check = check
+
+
 class Package(JsonBase):
 
     """
@@ -224,7 +244,7 @@ class ComparisonPlotFile(PlotFile):
     been performed for the content of this file
     """
 
-    def __init__(self, package, title, rootfile, compared_revisions=None, plots=[], ntuples=[]):
+    def __init__(self, package, title, rootfile, compared_revisions=None, plots=[], ntuples=[], html_content=[]):
         """
         Create a new ComparisonPlotFile object and fill all members
         """
@@ -234,6 +254,8 @@ class ComparisonPlotFile(PlotFile):
         self.compared_revision = compared_revisions
         #: the ntuples which were compared
         self.ntuples = ntuples
+        #: user's html content
+        self.html_content = html_content
 
         #: the number of failed comparisons in this file
         self.comparison_error = len([plt for plt in self.plots if plt.comparison_result == "error"])
@@ -317,6 +339,34 @@ class ComparisonNTuple(NTuple):
         self.contact = contact
         #: path to the json file which contains the individual numbers of the ntuple
         self.json_file_path = json_file_path
+
+
+class ComparisonHtmlContent(HtmlContent):
+
+    """
+    Compiled HTLM Content
+    """
+
+    def __init__(
+            self,
+            title,
+            contact=None,
+            description=None,
+            check=None,
+            is_expert=None,
+            html_content=None):
+        """
+        Create a new ComparisonNTuple object and fill all members
+        """
+
+        # todo: move more into the base class
+        super().__init__(is_expert=is_expert, description=description, check=check)
+        #: Text used as title for the ntuple item
+        self.title = title
+        #: name of contact person
+        self.contact = contact
+        #: path to the json file which contains the individual numbers of the ntuple
+        self.html_content = html_content
 
 
 class ComparisonPackage(Package):

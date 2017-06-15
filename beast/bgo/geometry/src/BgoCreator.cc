@@ -36,6 +36,7 @@
 #include <G4UserLimits.hh>
 #include <G4RegionStore.hh>
 #include "G4Tubs.hh"
+#include "G4NistManager.hh"
 
 using namespace std;
 using namespace boost;
@@ -61,6 +62,22 @@ namespace Belle2 {
 
     void BgoCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+      // **Materials from the NIST database**
+      G4NistManager* man = G4NistManager::Instance();
+
+      G4bool isotopes = false;
+
+      G4Element*  O = man->FindOrBuildElement("O" , isotopes);
+      G4Element* Bi = man->FindOrBuildElement("Bi", isotopes);
+      G4Element* Ge = man->FindOrBuildElement("Ge", isotopes);
+
+      G4Material* BGO_BGO = new G4Material("BGO_BGO",//name
+                                           7.13 * CLHEP::g / CLHEP::cm3, //density
+                                           3);//number of elements
+      BGO_BGO->AddElement(O, 12);
+      BGO_BGO->AddElement(Bi, 4);
+      BGO_BGO->AddElement(Ge, 3);
+
       //lets get the stepsize parameter with a default value of 5 µm
       double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 
@@ -87,7 +104,8 @@ namespace Belle2 {
                                    activeParams.getLength("cDx4") / 2.*CLHEP::cm ,
                                    activeParams.getLength("cDx3") / 2.*CLHEP::cm , 0);
 
-        G4LogicalVolume* l_BGO = new G4LogicalVolume(s_BGO, geometry::Materials::get("BGO"), "l_BGO", 0, m_sensitive);
+        //G4LogicalVolume* l_BGO = new G4LogicalVolume(s_BGO, geometry::Materials::get("BGO"), "l_BGO", 0, m_sensitive);
+        G4LogicalVolume* l_BGO = new G4LogicalVolume(s_BGO, BGO_BGO, "l_BGO", 0, m_sensitive);
 
         //cout << "BGO volume " << s_BGO->GetCubicVolume() / CLHEP::cm / CLHEP::cm / CLHEP::cm
         //<< " density " << geometry::Materials::get("BGO")->GetDensity() / CLHEP::g * CLHEP::cm * CLHEP::cm * CLHEP::cm << endl;

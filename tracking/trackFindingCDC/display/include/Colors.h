@@ -35,6 +35,13 @@ namespace Belle2 {
        *  @return Array containing rgb-values in the order red, green, blue.
        */
       static std::array<double, 3> hlsToRgb(double h, double l, double s);
+
+      /**
+       *  Get a color from the wheel of colors
+       *
+       *  @param degree the degree viewed form the center of the color wheel (greater 0)
+       */
+      static std::string getWheelColor(int degree);
     };
   }
 }

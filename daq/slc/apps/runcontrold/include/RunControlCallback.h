@@ -41,6 +41,7 @@ namespace Belle2 {
     virtual bool pause() throw(RCHandlerException);
     virtual void abort() throw(RCHandlerException);
     virtual void monitor() throw(RCHandlerException);
+    virtual void vset(NSMCommunicator& com, const NSMVar& var) throw();
 
   public:
     void setPriorityToDB(LogFile::Priority pri) { m_priority_db = pri; }

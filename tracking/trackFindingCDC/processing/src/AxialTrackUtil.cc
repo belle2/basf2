@@ -16,6 +16,8 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+
 #include <boost/range/algorithm/stable_partition.hpp>
 #include <boost/range/algorithm_ext/is_sorted.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>

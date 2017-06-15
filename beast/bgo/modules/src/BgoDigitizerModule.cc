@@ -99,10 +99,10 @@ void BgoDigitizerModule::event()
     double m_energyDeposit = aHit->getEnergyDep();
     double erecdep = m_energyDeposit;
     erecdep += gRandom->Gaus(0, GetEnergyResolutionGeV(m_energyDeposit, m_cellID));
-    if (m_Threshold[m_cellID] <= erecdep && erecdep <= m_Range[m_cellID]) {
-      BgoHits.appendNew(BgoHit(m_cellID, m_trackID, pdgCode, m_Time * m_energyDeposit / erecdep, m_energyDeposit, m_Mom,
-                               m_Pos * (m_energyDeposit / erecdep), erecdep));
-    }
+    //if (m_Threshold[m_cellID] <= erecdep && erecdep <= m_Range[m_cellID]) {
+    BgoHits.appendNew(BgoHit(m_cellID, m_trackID, pdgCode, m_Time * m_energyDeposit / erecdep, m_energyDeposit, m_Mom,
+                             m_Pos * (m_energyDeposit / erecdep), erecdep));
+    //}
   }
 
 }

@@ -25,6 +25,8 @@ DQMHistAnalysisExampleModule::DQMHistAnalysisExampleModule()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
+  addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));
+  addParam("Function", m_function, "Fit function definition", std::string("gaus"));
   B2DEBUG(1, "DQMHistAnalysisExample: Constructor done.");
 }
 
@@ -34,7 +36,10 @@ DQMHistAnalysisExampleModule::~DQMHistAnalysisExampleModule() { }
 void DQMHistAnalysisExampleModule::initialize()
 {
   B2INFO("DQMHistAnalysisExample: initialized.");
-  m_f = new TF1("f1", "gaus(0)", -20, 20);
+  TString a = m_histoname;
+  a.ReplaceAll("/", "_");
+  m_c = new TCanvas("c_" + a);
+  m_f = new TF1("f_" + a, TString(m_function), -100, 100);
 }
 
 
@@ -45,14 +50,27 @@ void DQMHistAnalysisExampleModule::beginRun()
 
 void DQMHistAnalysisExampleModule::event()
 {
-  TH1* h = findHist("FirstDet/h_HitXPositionCh01");
+  TH1* h = findHist(m_histoname);
   if (h != NULL) {
-    h->Fit("f1");
-    setFloatValue("firstdet.fit.mean", m_f->GetParameter(1));
-    setFloatValue("firstdet.fit.sigma", m_f->GetParameter(2));
+    m_c->Clear();
+    m_c->cd();
+    h->Draw();
+
+    TString a = m_histoname;
+    std::string vname = a.Data();
+    a.ReplaceAll("/", "_");
+    //h->Fit(Form("f_"+a), "");
+    h->Fit(m_f);
+    //h->Draw();
+    //m_f->Draw("same");
+    m_c->Modified();
+    //m_c->Update();
+    a = m_histoname;
+    a.ReplaceAll("/", ".");
+    setFloatValue(vname + ".mean", m_f->GetParameter(1));
+    setFloatValue(vname + ".sigma", m_f->GetParameter(2));
   } else {
-    setFloatValue("firstdet.fit.mean", 0);
-    setFloatValue("firstdet.fit.sigma", 0);
+    B2INFO("Histo " << m_histoname << " not found");
   }
 }
 

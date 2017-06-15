@@ -87,7 +87,8 @@ namespace Belle2 {
       std::vector<int> getTrackIdsForOneVertex(VecSize vertexId = 0) const;
 
       /** Overwrite the global option in ReveSetup that tells the fitter if beam spot info should be used or not. The beam spot pos and cov must still be set in the RaveSetup class if you what to use it */
-      void useBeamSpot(bool beamSpot = true) {
+      void useBeamSpot(bool beamSpot = true)
+      {
         if (beamSpot == true) {
           if (RaveSetup::getRawInstance()->m_useBeamSpot == false) {
             B2ERROR("Beam spot information cannot be used because the beam spot position and covariance was not set in RaveSetup");
@@ -100,22 +101,28 @@ namespace Belle2 {
       }
 
       /** Delete all information of previously added tracks and fitted results*/
-      void clearTracks() {
+      void clearTracks()
+      {
         m_raveTracks.clear();
       }
 
 
       /** Print all attributes of this object to terminal*/
-      void Print() const {
+      void Print() const
+      {
         std::cout << "useBeamSpot: " << m_useBeamSpot << std::endl;
         std::cout << "number of rave::Tracks: " << m_raveTracks.size() << std::endl;
         std::cout << "number of fitted  rave::Vertices: " << m_raveVertices.size() << std::endl;
 
       }
       /** return the number of tracks that where added via addTrack or addMother*/
-      int getNTracks() const {
+      int getNTracks() const
+      {
         return m_raveTracks.size();
       }
+
+      /** update the Daughters particles */
+      void updateDaughters();
 
 
     protected:
@@ -141,6 +148,10 @@ namespace Belle2 {
 
       /** holds the fitted vertices after fit() was called in the format used by Rave*/
       std::vector < rave::Vertex > m_raveVertices;
+
+      /** Belle Particle pointers input */
+      std::vector<Particle*> m_belleDaughters;
+
 
     };
   }

@@ -20,17 +20,14 @@ def main(argv):
     if len(argv) == 1:
         data_dir = argv[0]
     else:
-        print("Usage: basf2 CAF_multiple_options.py <data directory>")
+        print("Usage: basf2 caf_multiple_options.py <data directory>")
         sys.exit(1)
 
     ###################################################
     # Input Data
     # This part assumes that you've created the data using the calibration/examples/1_create_sample_DSTs.sh
     # We'll use the same data for all calibrations but this is not a requirement in general.
-    input_files_test = []
-    for run in range(1, 5):
-        cosmics_file_path = os.path.abspath(os.path.join(data_dir, 'DST_exp1_run{0}.root'.format(run)))
-        input_files_test.append(cosmics_file_path)
+    input_files_test = [os.path.join(os.path.abspath(data_dir), '*.root')]
 
     ###################################################
     # Test Calibration Setup
@@ -48,8 +45,10 @@ def main(argv):
     for i in range(1, 5):
         col_test = register_module('CaTest')
         col_test.set_name('Test{}'.format(i))   # Sets the prefix of the collected data in the datastore.
-        col_test.param('granularity', 'all')    # Allows us to execute algorithm over all data, in one big IoV.
-        col_test.param('spread', 15)            # Proportional to the probability of algorithm requesting iteration.
+        # Allows us to execute algorithm over all input data, in one big IoV.
+        col_test.param('granularity', 'all')
+        # Specific parameter to our test collector, proportional to the probability of algorithm requesting iteration.
+        col_test.param('spread', 15)
         # Allows us to force the test collector to wait before starting its event loop (microseconds).
         # Nice for slowing everything down to a human pace.
         col_test.param('wait', 1000000)
@@ -65,9 +64,8 @@ def main(argv):
                                algorithms=alg_test,
                                input_files=input_files_test)
         cal_test.pre_algorithms = pre_alg_test
-        cal_test.output_patterns.append('Belle2FileCatalog.xml')
-        cal_test.output_patterns.append('*.mille')
 
+        cal_test.max_files_per_collector_job = 1
         calibrations.append(cal_test)
 
     # Define dependencies. In this case the classic diamond e.g.
@@ -88,7 +86,11 @@ def main(argv):
     # Add in our list of calibrations
     for cal in calibrations:
         cal_fw.add_calibration(cal)
-    cal_fw.backend = backends.Local(max_processes=2)  # Should run Calibrations 1 and 2 at the same time if you have enough cores.
+    # Subjobs from collector jobs being split over input files can be paralellized.
+    # Also Calibrations 1 and 2, can be run at the same time.
+    # If you have 4 cores this backend will run them whenever one of the 4 processes becomes available
+    # For larger data or more calibrations, consider using the LSF or PBS batch system backends at your site
+    cal_fw.backend = backends.Local(max_processes=4)
     cal_fw.output_dir = 'cal_test_results'  # Can change where your calibration runs
     # Start her up!
     cal_fw.run()

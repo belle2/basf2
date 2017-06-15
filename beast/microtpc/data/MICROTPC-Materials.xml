@@ -20,23 +20,38 @@
     </Components>
   </Material>
 
-  <Material name="ScaleGas">
-     <density unit="g/cm3">6.69081e-4</density>
-     <state>Gas</state>
-     <Components>
-        <Element fraction="0.7">He</Element>
-        <Element fraction="0.1">C</Element>
-        <Element fraction="0.2">O</Element>
-     </Components>
+  <Material name="TPC_Al6061">
+    <density unit="g/cm3">2.7</density>
+    <Components>
+       <Element fraction="0.004">Si</Element>
+       <Element fraction="0.007">Fe</Element>
+       <Element fraction="0.004">Cu</Element>
+       <Element fraction="0.015">Mn</Element>
+       <Element fraction="0.008">Mg</Element>
+       <Element fraction="0.0035">Cr</Element>
+       <Element fraction="0.0025">Zn</Element>
+       <Element fraction="0.0015">Ti</Element>
+       <Element fraction="0.0005">Pb</Element>
+       <Element fraction="0.0015">Zr</Element>
+       <Element fraction="0.9525">Al</Element>
+    </Components>
   </Material>
-
-  <Material name="ParylenC">
-     <density unit="g/cm3">1.298</density>
-     <state>Gas</state>
-     <Components>
-        <Element fraction="0.050908">H</Element>
-        <Element fraction="0.693276">C</Element>
-        <Element fraction="0.255816">Cl</Element>
-     </Components>
+  
+  <Material name="TPC_Kovar">
+    <density unit="g/cm3">8.36</density>
+    <Components>
+       <Element fraction="0.536">Fe</Element>
+       <Element fraction="0.29">Ni</Element>
+       <Element fraction="0.17">Co</Element>
+       <Element fraction="0.003">Mn</Element>
+       <Element fraction="0.001">Si</Element>
+    </Components>
   </Material>
+  
+  <Material name="TPC_Kapton">
+    <Components>
+      <Material>Kapton</Material>
+    </Components>
+  </Material>
+    
 </Materials>

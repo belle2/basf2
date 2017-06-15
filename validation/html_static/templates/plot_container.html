@@ -29,6 +29,15 @@
     <h2>Result File: {{rootfile}} <a href="../results/{{newest_revision}}/{{package}}/{{rootfile}}.root">download {{newest_revision}}</a></h2>
     <br>
 
+    {{#html_content}}
+    <div class="wrap_boxes">
+    <h2 class="persistent-header">HTML Content: {{title}}</h2>
+    <div>
+        {{{html_content}}}
+    </div>
+    </div>
+    {{/html_content}}
+
     {{#ntuples}}
     <div class="wrap_boxes">
     <h2 class="persistent-header">NTuple: {{title}}</h2>

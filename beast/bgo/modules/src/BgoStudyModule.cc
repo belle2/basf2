@@ -162,8 +162,22 @@ void BgoStudyModule::event()
     h_bgo_Evtof[detNB]->Fill(tof, Edep);
     if (pdg == 22) h_bgo_Evtof1[detNB]->Fill(tof, Edep);
     else if (fabs(pdg) == 11) h_bgo_Evtof2[detNB]->Fill(tof, Edep);
+    double RecEdep = Edep;
+    h_bgo_rate[0]->Fill(detNB);
+    h_bgo_rate[1]->Fill(detNB, rate);
+    h_bgo_edep1[detNB]->Fill(Edep);
+    h_bgo_edep2[detNB]->Fill(RecEdep);
+    h_bgo_edep1Weight[detNB]->Fill(Edep, rate);
+    h_bgo_edep2Weight[detNB]->Fill(RecEdep, rate);
+    h_bgo_Evtof3[detNB]->Fill(tof, RecEdep);
+    h_bgo_rs_rate[0]->Fill(detNB, ring_section);
+    h_bgo_rs_rate[1]->Fill(detNB, ring_section, rate);
+    h_bgo_rs_edep1[detNB]->Fill(Edep, ring_section);
+    h_bgo_rs_edep2[detNB]->Fill(RecEdep, ring_section);
+    h_bgo_rs_edep1Weight[detNB]->Fill(Edep, ring_section, rate);
+    h_bgo_rs_edep2Weight[detNB]->Fill(RecEdep, ring_section, rate);
   }
-
+  /*
   //Loop over DigiHit
   for (const auto& Hit : Hits) {
     int detNB = Hit.getCellId();
@@ -184,7 +198,7 @@ void BgoStudyModule::event()
     h_bgo_rs_edep1Weight[detNB]->Fill(Edep, ring_section, rate);
     h_bgo_rs_edep2Weight[detNB]->Fill(RecEdep, ring_section, rate);
   }
-
+  */
 }
 /*
 //read tube centers, impulse response, and garfield drift data filename from BGO.xml

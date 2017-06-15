@@ -33,6 +33,8 @@ namespace Belle2 {
     /** pointer to spacePoint */
     SpacePoint* spacePoint;
 
+    std::string m_name;
+
     /** overloaded '=='-operator
      * TODO JKL: pretty ugly operator overload, should be fixed ASAP! (solution for null-ptr-issue needed)
      * WARNING TODO write a test for that one!
@@ -74,14 +76,6 @@ namespace Belle2 {
     }
 
 
-    /** overloaded '<<' stream operator. Print secID to stream by converting it to string */
-    friend std::ostream& operator<< (std::ostream& out, const TrackNode& aNode)
-    {
-      out << aNode.getName();
-      return out;
-    }
-
-
     /** returns reference to hit. */
     const SpacePoint& getHit() const
     {
@@ -113,7 +107,13 @@ namespace Belle2 {
 
 
     /** constructor WARNING: sector-pointing has still to be decided! */
-    TrackNode() : sector(nullptr), spacePoint(nullptr) {}
+    TrackNode() : sector(nullptr), spacePoint(nullptr), m_name("SP: missing") {}
+
+    TrackNode(SpacePoint* spacePoint) :
+      sector(nullptr), spacePoint(spacePoint)
+    {
+      m_name = "SP: " + spacePoint->getName();
+    }
 
 
     /** destructor */
@@ -123,10 +123,7 @@ namespace Belle2 {
     /** returns secID of this sector */
     std::string getName() const
     {
-      std::string out;
-      if (sector != nullptr) { out += "Sec: " + sector->getName(); } else {out += "no sector attached "; }
-      if (spacePoint != nullptr) { out += ", SP: " + spacePoint->getName(); } else {out += "no hit attached"; }
-      return out;
+      return m_name;
     }
   };
 

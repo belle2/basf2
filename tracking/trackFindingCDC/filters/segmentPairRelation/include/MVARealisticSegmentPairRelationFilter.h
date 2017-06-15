@@ -37,9 +37,6 @@ namespace Belle2 {
     public:
       /// Constructor initialising the MVAFilter with standard training name for this filter.
       MVARealisticSegmentPairRelationFilter();
-
-      /// Function to object for its signalness
-      Weight operator()(const Relation<const CDCSegmentPair>& relation) final;
     };
   }
 }

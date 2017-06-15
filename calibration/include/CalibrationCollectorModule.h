@@ -20,6 +20,7 @@
 
 #include <TH1.h>
 #include <TTree.h>
+#include <TRandom.h>
 #include <alignment/dataobjects/MilleData.h>
 
 namespace Belle2 {
@@ -38,12 +39,16 @@ namespace Belle2 {
     void initialize() final;
     /// Check current experiment and run and update if needed, fill into RunRange and collect()
     void event() final;
+    /// Reset the m_runCollectOnRun flag, if necessary, to begin collection again
+    void beginRun() final;
 
   protected:
     /// Replacement for initialize(). Register calibration dataobjects here as well
     virtual void prepare() {}
     /// Replacement for event(). Fill you calibration data objects here
     virtual void collect() {}
+    /// Replacement for beginRun(). Do anything you would normally do in beginRun here
+    virtual void startRun() {}
 
     /// Register object with name, takes ownership, do not access the pointer beyond prepare()
     template <class T>
@@ -75,8 +80,37 @@ namespace Belle2 {
     /// Current exp, run for correct object retrieval/creation
     std::pair<int, int> m_currentExpRun = { -999, -999};
 
+    /****** Module Parameters *******/
     /// Granularity of data collection = run|all(= no granularity, exp,run=-1,-1)
     std::string m_granularity;
+    /// Maximum number of events to be collected at the start of each run (-1 = no maximum)
+    int m_maxEventsPerRun;
+    /// Prescale module parameter, this fraction of events will have collect() run on them [0.0 -> 1.0]
+    float m_preScale;
+    /********************************/
+
+    /// Whether or not we will run the collect() at all this run, basically skips the event() function if false
+    bool m_runCollectOnRun = true;
+    /// How many events processed for each ExpRun so far, stops counting up once max is hit
+    /// Only used/incremented if m_maxEventsPerRun > -1
+    std::map<std::pair<int, int>, int> m_expRunEvents;
+    /// Will point at correct value in m_expRunEvents
+    int* m_eventsCollectedInRun;
+
+    /// I'm a little worried about floating point precision when comparing to 0.0 and 1.0 as special values.
+    /// But since a user will have set them (or left them as default) as exactly equal to 0.0 or 1.0 rather
+    /// than calculating them in almost every case, I think we can assume that the equalities hold.
+    bool getPreScaleChoice()
+    {
+      if (m_preScale == 1.) {
+        return true;
+      } else if (m_preScale == 0.) {
+        return false;
+      } else {
+        const double randomNumber = gRandom->Uniform();
+        return randomNumber < m_preScale;
+      }
+    }
   };
 } // Belle2 namespace
 

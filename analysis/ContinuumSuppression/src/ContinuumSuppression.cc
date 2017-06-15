@@ -231,6 +231,7 @@ namespace Belle2 {
     }
 
     // Fill ContinuumSuppression with content
+    qqVars->addThrustB(thrustB);
     qqVars->addThrustO(thrustO);
     qqVars->addThrustBm(thrustBm);
     qqVars->addThrustOm(thrustOm);

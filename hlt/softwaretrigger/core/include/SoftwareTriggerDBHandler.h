@@ -34,6 +34,9 @@ namespace Belle2 {
      */
     class SoftwareTriggerDBHandler {
     public:
+      /// Common suffix to identify all software trigger cuts in the database.
+      static const std::string s_dbPackageIdentifier;
+
       /**
        * Helper function to compile the full identifier from the base an the specific cut name.
        * The full name is then created as:
@@ -85,9 +88,6 @@ namespace Belle2 {
 
       /// Delete the assignment constructror
       SoftwareTriggerDBHandler& operator=(SoftwareTriggerDBHandler& rhs) = delete;
-
-      /// Common suffix to identify all software trigger cuts in the database.
-      static const std::string s_dbPackageIdentifier;
 
       /// Database entries of the cuts, which where created in the initialize function.
       std::vector<DBObjPtr<DBRepresentationOfSoftwareTriggerCut>> m_databaseObjects;

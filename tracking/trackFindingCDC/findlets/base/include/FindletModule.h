@@ -211,8 +211,8 @@ namespace Belle2 {
       }
 
       /** Get parameter name for the StoreVector at index I */
-      template<std::size_t I>
-      std::string getStoreVectorParameterName()
+      template <std::size_t I>
+      std::string getStoreVectorParameterName() const
       {
         bool primary = I == GetIndexInTuple<IOType<I>, IOTypes>::value;
         int order = primary ? 1 : 2;
@@ -225,7 +225,7 @@ namespace Belle2 {
 
       /** Get parameter description for the StoreVector at index I */
       template<std::size_t I>
-      std::string getStoreVectorParameterDescription()
+      std::string getStoreVectorParameterDescription() const
       {
         bool primary = I == GetIndexInTuple<IOType<I>, IOTypes>::value;
         int order = primary ? 1 : 2;
@@ -241,7 +241,8 @@ namespace Belle2 {
        *  @param order In case of mulitple occurances of the same type which occurance is it. 1 and 2  are supported.
        *  @param input Should the parameter name state that this is an input.
        */
-      std::string getStoreVectorParameterName(std::string classMnenomic, int order, bool input)
+      std::string
+      getStoreVectorParameterName(std::string classMnenomic, int order, bool input) const
       {
         std::string orderPrefix;
         if (order == 1) {
@@ -256,7 +257,7 @@ namespace Belle2 {
         if (input or order > 1) {
           classMnenomic[0] = ::toupper(classMnenomic.at(0));
         }
-        if (order > 1) {
+        if (input and order > 1) {
           inputPrefix[0] = ::toupper(inputPrefix.at(0));
         }
 
@@ -268,7 +269,7 @@ namespace Belle2 {
        *  @param order In case of mulitple occurances of the same type which occurance is it. 1 and 2 are supported.
        *  @param input Should the parameter name state that this is an input.
        */
-      std::string getStoreVectorParameterDescription(const std::string classMnenomic, int order, bool input)
+      std::string getStoreVectorParameterDescription(const std::string classMnenomic, int order, bool input) const
       {
         std::string orderPrefix;
         if (order == 1) {

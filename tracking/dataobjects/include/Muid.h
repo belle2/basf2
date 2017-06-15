@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 
@@ -32,9 +31,6 @@ namespace Belle2 {
 
     //! @return PDG code of the hypothesis used for this extrapolation
     int getPDGCode() const { return m_PDGCode; }
-
-    //! @return initial reconstructed momentum (GeV/c) used for this extrapolation
-    TVector3 getMomentum() const { return m_Momentum; }
 
     //! @return muon PDF value for this extrapolation (normalized with all others)
     double getMuonPDFValue() const { return m_MuonPDFValue; }
@@ -110,16 +106,6 @@ namespace Belle2 {
 
     //! @return matching-hit bit pattern
     unsigned int getHitLayerPattern() const { return m_HitLayerPattern; }
-
-    //! assign PDG code of the hypothesis used for this extrapolation
-    //! @param pdgCode PDG code for this extrapolation
-    void setPDGCode(int pdgCode) { m_PDGCode = pdgCode; }
-
-    //! assign initial momentum (MeV/c) used for this extrapolation
-    //! @param px initial momentum's x component (GeV/c)
-    //! @param py initial momentum's y component (GeV/c)
-    //! @param pz initial momentum's z component (GeV/c)
-    void setMomentum(double px, double py, double pz) { m_Momentum.SetX(px); m_Momentum.SetY(py); m_Momentum.SetZ(pz); }
 
     //! assign muon PDF value for this extrapolation
     //! @param pdfValue muon PDF value (normalized) for this extrapolation
@@ -226,53 +212,50 @@ namespace Belle2 {
     //! PDG particleID hypothesis used for this extrapolation (typically muon)
     int m_PDGCode;
 
-    //! initial reconstructed momentum (MeV/c) used for this extrapolation
-    TVector3 m_Momentum;
-
     //! Muon PDF value for this extrapolation (normalized with all others)
-    double m_MuonPDFValue;
+    float m_MuonPDFValue;
 
     //! Pion PDF value for this extrapolation (normalized with all others)
-    double m_PionPDFValue;
+    float m_PionPDFValue;
 
     //! Kaon PDF value for this extrapolation (normalized with all others)
-    double m_KaonPDFValue;
+    float m_KaonPDFValue;
 
     //! Proton PDF value for this extrapolation (normalized with all others)
-    double m_ProtonPDFValue;
+    float m_ProtonPDFValue;
 
     //! Deuteron PDF value for this extrapolation (normalized with all others)
-    double m_DeuteronPDFValue;
+    float m_DeuteronPDFValue;
 
     //! Electron PDF value for this extrapolation (normalized with all others)
-    double m_ElectronPDFValue;
+    float m_ElectronPDFValue;
 
     //! Junk flag for this extrapolation (0 if not junk, 1 if junk)
-    double m_JunkPDFValue;
+    float m_JunkPDFValue;
 
     //! Muon log-likelihood for this extrapolation (not normalized)
-    double m_LogL_mu;
+    float m_LogL_mu;
 
     //! Pion log-likelihood for this extrapolation (not normalized)
-    double m_LogL_pi;
+    float m_LogL_pi;
 
     //! Kaon log-likelihood for this extrapolation (not normalized)
-    double m_LogL_K;
+    float m_LogL_K;
 
     //! Proton log-likelihood for this extrapolation (not normalized)
-    double m_LogL_p;
+    float m_LogL_p;
 
     //! Deuteron log-likelihood for this extrapolation (not normalized)
-    double m_LogL_d;
+    float m_LogL_d;
 
     //! Electron log-likelihood for this extrapolation (not normalized)
-    double m_LogL_e;
+    float m_LogL_e;
 
     //! Status word (bit pattern) for this extrapolation
     unsigned int m_Status;
 
     //! Chi-squared for this extrapolation
-    double m_ChiSquared;
+    float m_ChiSquared;
 
     //! number of degrees of freedom used in chi-squared calculation
     int m_DegreesOfFreedom;
@@ -314,7 +297,7 @@ namespace Belle2 {
     unsigned int m_HitLayerPattern;
 
     //! Needed to make the ROOT object storable
-    ClassDef(Muid, 4)
+    ClassDef(Muid, 5)
 
   };
 }

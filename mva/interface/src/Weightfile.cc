@@ -205,6 +205,10 @@ namespace Belle2 {
 
       DatabaseRepresentationOfWeightfile* database_representation_of_weightfile = nullptr;
       file.GetObject("Weightfile", database_representation_of_weightfile);
+
+      if (database_representation_of_weightfile == nullptr) {
+        throw std::runtime_error("The provided ROOT file " + filename + " does not contain a valid MVA weightfile.");
+      }
       std::stringstream ss(database_representation_of_weightfile->m_data);
       delete database_representation_of_weightfile;
       return Weightfile::loadFromStream(ss);

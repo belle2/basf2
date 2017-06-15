@@ -55,7 +55,8 @@ class ClassificationAnalysis(object):
     def analyse(
         self,
         estimates,
-        truths
+        truths,
+        auxiliaries={}
     ):
         """Compares the concrete estimate to the truth and efficiency, purity and background rejection
         as figure of merit and plots the selection as a stacked plot over the truths.
@@ -74,11 +75,13 @@ class ClassificationAnalysis(object):
         plot_name = "{quantity_name}_{subplot_name}"
         plot_name = formatter.format(plot_name, quantity_name=quantity_name)
 
+        signals = truths != 0
+
         # Some different things become presentable depending on the estimates
         estimate_is_binary = statistics.is_binary_series(estimates)
 
         if estimate_is_binary:
-            binary_estimates = estimates
+            binary_estimates = estimates != 0
             cut_value = 0.5
             cut_direction = -1  # reject low values
 
@@ -93,7 +96,7 @@ class ClassificationAnalysis(object):
                 cut_classifier = cut_classifier.clone()
 
             cut_classifier.fit(estimates, truths)
-            binary_estimates = cut_classifier.predict(estimates)
+            binary_estimates = cut_classifier.predict(estimates) != 0
             cut_direction = cut_classifier.cut_direction
             cut_value = cut_classifier.cut_value
 
@@ -157,20 +160,6 @@ class ClassificationAnalysis(object):
                 print("Determined cut direction", 1)
                 cut_direction = +1  # reject high values
 
-        cut_abs = False
-        if cut_direction is None:
-            purity_grapherrors = ValidationPlot.convert_tprofile_to_tgrapherrors(purity_profile.plot,
-                                                                                 abs_x=True)
-            correlation = purity_grapherrors.GetCorrelationFactor()
-            if correlation > 0.1:
-                print("Determined absolute cut direction", -1)
-                cut_direction = -1  # reject low values
-                cut_abs = True
-            elif correlation < -0.1:
-                print("Determined absolute cut direction", 1)
-                cut_direction = +1  # reject high values
-                cut_abs = True
-
         # Figures of merit
         if cut_value is not None:
             fom_name = formatter.format(plot_name, subplot_name="classification_figures_of_merits")
@@ -203,25 +192,151 @@ class ClassificationAnalysis(object):
             classification_fom['background_rejection'] = background_rejection
 
             self.fom = classification_fom
+        # Auxiliary hists
+        for aux_name, aux_values in auxiliaries.items():
+            if statistics.is_single_value_series(aux_values) or aux_name == quantity_name:
+                continue
 
+            aux_axis_label = compose_axis_label(aux_name)
+
+            # Signal + bkg distribution over estimate and auxiliary variable #
+            # ############################################################## #
+            signal_bkg_aux_hist2d_name = formatter.format(plot_name, subplot_name=aux_name + '_signal_bkg_aux2d')
+            signal_bkg_aux_hist2d = ValidationPlot(signal_bkg_aux_hist2d_name)
+            signal_bkg_aux_hist2d.hist2d(
+                aux_values,
+                estimates,
+                stackby=truths,
+                lower_bound=(None, lower_bound),
+                upper_bound=(None, upper_bound),
+                outlier_z_score=self.outlier_z_score,
+                allow_discrete=self.allow_discrete,
+            )
+
+            aux_lower_bound = signal_bkg_aux_hist2d.lower_bound[0]
+            aux_upper_bound = signal_bkg_aux_hist2d.upper_bound[0]
+
+            signal_bkg_aux_hist2d.xlabel = aux_axis_label
+            signal_bkg_aux_hist2d.ylabel = axis_label
+            self.plots[signal_bkg_aux_hist2d_name] = signal_bkg_aux_hist2d
+
+            # Figures of merit as function of the auxiliary variables
+            if cut_value is not None:
+
+                # Auxiliary purity profile #
+                # ######################## #
+                aux_purity_profile_name = formatter.format(plot_name, subplot_name=aux_name + "_aux_purity_profile")
+                aux_purity_profile = ValidationPlot(aux_purity_profile_name)
+                aux_purity_profile.profile(
+                    aux_values[binary_estimates],
+                    truths[binary_estimates],
+                    outlier_z_score=self.outlier_z_score,
+                    allow_discrete=self.allow_discrete,
+                    lower_bound=aux_lower_bound,
+                    upper_bound=aux_upper_bound,
+                )
+
+                aux_purity_profile.xlabel = aux_axis_label
+                aux_purity_profile.ylabel = 'purity'
+                self.plots[aux_purity_profile_name] = aux_purity_profile
+
+                # Auxiliary efficiency profile #
+                # ############################ #
+                aux_efficiency_profile_name = formatter.format(plot_name, subplot_name=aux_name + "_aux_efficiency_profile")
+                aux_efficiency_profile = ValidationPlot(aux_efficiency_profile_name)
+                aux_efficiency_profile.profile(
+                    aux_values[signals],
+                    binary_estimates[signals],
+                    outlier_z_score=self.outlier_z_score,
+                    allow_discrete=self.allow_discrete,
+                    lower_bound=aux_lower_bound,
+                    upper_bound=aux_upper_bound,
+                )
+
+                aux_efficiency_profile.xlabel = aux_axis_label
+                aux_efficiency_profile.ylabel = 'efficiency'
+                self.plots[aux_efficiency_profile_name] = aux_efficiency_profile
+
+                # Auxiliary bkg rejection profile #
+                # ############################### #
+                aux_bkg_rejection_profile_name = formatter.format(plot_name, subplot_name=aux_name + "_aux_bkg_rejection_profile")
+                aux_bkg_rejection_profile = ValidationPlot(aux_bkg_rejection_profile_name)
+                aux_bkg_rejection_profile.profile(
+                    aux_values[~signals],
+                    ~binary_estimates[~signals],
+                    outlier_z_score=self.outlier_z_score,
+                    allow_discrete=self.allow_discrete,
+                    lower_bound=aux_lower_bound,
+                    upper_bound=aux_upper_bound,
+                )
+
+                aux_bkg_rejection_profile.xlabel = aux_axis_label
+                aux_bkg_rejection_profile.ylabel = 'bkg rejection'
+                self.plots[aux_bkg_rejection_profile_name] = aux_bkg_rejection_profile
+
+        cut_abs = False
+        if cut_direction is None:
+            purity_grapherrors = ValidationPlot.convert_tprofile_to_tgrapherrors(purity_profile.plot,
+                                                                                 abs_x=True)
+            correlation = purity_grapherrors.GetCorrelationFactor()
+            if correlation > 0.1:
+                print("Determined absolute cut direction", -1)
+                cut_direction = -1  # reject low values
+                cut_abs = True
+            elif correlation < -0.1:
+                print("Determined absolute cut direction", 1)
+                cut_direction = +1  # reject high values
+                cut_abs = True
+
+        if cut_abs:
+            estimates = np.abs(estimates)
+            cut_x_label = "cut " + compose_axis_label("abs(" + quantity_name + ")", self.unit)
+            lower_bound = 0
+        else:
+            cut_x_label = "cut " + axis_label
+
+        # Quantile plots
         if not estimate_is_binary and cut_direction is not None:
-            if cut_abs:
-                estimates = np.abs(estimates)
-                cut_x_label = "cut " + compose_axis_label("abs(" + quantity_name + ")", self.unit)
-                lower_bound = 0
+            # Signal estimate quantiles over auxiliary variable #
+            # ################################################# #
+            if cut_direction > 0:
+                quantiles = [0.5, 0.90, 0.99]
             else:
-                cut_x_label = "cut " + axis_label
+                quantiles = [0.01, 0.10, 0.5]
 
+            for aux_name, aux_values in auxiliaries.items():
+                if statistics.is_single_value_series(aux_values) or aux_name == quantity_name:
+                    continue
+
+                aux_axis_label = compose_axis_label(aux_name)
+
+                signal_quantile_aux_profile_name = formatter.format(plot_name, subplot_name=aux_name + '_signal_quantiles_aux2d')
+                signal_quantile_aux_profile = ValidationPlot(signal_quantile_aux_profile_name)
+                signal_quantile_aux_profile.hist2d(
+                    aux_values[signals],
+                    estimates[signals],
+                    quantiles=quantiles,
+                    bins=('flat', None),
+                    lower_bound=(None, lower_bound),
+                    upper_bound=(None, upper_bound),
+                    outlier_z_score=self.outlier_z_score,
+                    allow_discrete=self.allow_discrete,
+                )
+                signal_quantile_aux_profile.xlabel = aux_axis_label
+                signal_quantile_aux_profile.ylabel = cut_x_label
+                self.plots[signal_quantile_aux_profile_name] = signal_quantile_aux_profile
+
+        # ROC plots
+        if not estimate_is_binary and cut_direction is not None:
             n_data = len(estimates)
             n_signals = scores.signal_amount(truths, estimates)
             n_bkgs = n_data - n_signals
 
-            # work around for numpy sorting nan values as high but we want it as low
-            reverse_sorting_indices = np.argsort(-estimates)
+            # work around for numpy sorting nan values as high but we want it as low depending on the cut direction
             if cut_direction < 0:  # reject low
-                sorting_indices = reverse_sorting_indices
+                sorting_indices = np.argsort(-estimates)
             else:
-                sorting_indices = reverse_sorting_indices[::-1]
+                sorting_indices = np.argsort(estimates)
 
             sorted_truths = truths[sorting_indices]
             sorted_estimates = estimates[sorting_indices]
@@ -286,6 +401,44 @@ class ClassificationAnalysis(object):
             purity_over_efficiency_profile.ylabel = 'purity'
 
             self.plots["purity_over_efficiency"] = purity_over_efficiency_profile
+
+            # Cut over efficiency #
+            # ################### #
+            cut_over_efficiency_profile_name = formatter.format(plot_name, subplot_name="cut_over_efficiency")
+            cut_over_efficiency_profile = ValidationPlot(cut_over_efficiency_profile_name)
+            cut_over_efficiency_profile.profile(
+                sorted_efficiencies,
+                sorted_estimates,
+                lower_bound=0,
+                upper_bound=1,
+                outlier_z_score=self.outlier_z_score,
+                allow_discrete=self.allow_discrete,
+            )
+            cut_over_efficiency_profile.set_minimum(lower_bound)
+            cut_over_efficiency_profile.set_maximum(upper_bound)
+            cut_over_efficiency_profile.xlabel = 'efficiency'
+            cut_over_efficiency_profile.ylabel = cut_x_label
+
+            self.plots["cut_over_efficiency"] = cut_over_efficiency_profile
+
+            # Cut over bkg_rejection #
+            # ###################### #
+            cut_over_bkg_rejection_profile_name = formatter.format(plot_name, subplot_name="cut_over_bkg_rejection")
+            cut_over_bkg_rejection_profile = ValidationPlot(cut_over_bkg_rejection_profile_name)
+            cut_over_bkg_rejection_profile.profile(
+                sorted_bkg_rejections,
+                sorted_estimates,
+                lower_bound=0,
+                upper_bound=1,
+                outlier_z_score=self.outlier_z_score,
+                allow_discrete=self.allow_discrete,
+            )
+            cut_over_bkg_rejection_profile.set_minimum(lower_bound)
+            cut_over_bkg_rejection_profile.set_maximum(upper_bound)
+            cut_over_bkg_rejection_profile.xlabel = 'bkg_rejection'
+            cut_over_bkg_rejection_profile.ylabel = cut_x_label
+
+            self.plots["cut_over_bkg_rejection"] = cut_over_bkg_rejection_profile
 
             # Efficiency over background rejection #
             # #################################### #

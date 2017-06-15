@@ -209,6 +209,8 @@ FullGridTrackTimeExtractionModule::FullGridTrackTimeExtractionModule() : Module(
            m_param_minimalT0Shift);
   addParam("maximalT0Shift", m_param_maximalT0Shift, "Maximal shift of the event time which is allowed.",
            m_param_maximalT0Shift);
+  addParam("numberOfGrids", m_param_numberOfGrids, "Number of shifts to try out.",
+           m_param_numberOfGrids);
 
   addParam("t0Uncertainty", m_param_t0Uncertainty, "Use this as sigma t0.",
            m_param_t0Uncertainty);
@@ -246,16 +248,12 @@ void FullGridTrackTimeExtractionModule::event()
   std::vector<T0Try> tries;
   std::vector<T0Try> convergedTries;
 
-  const double deltaT0 = 0.2 * (m_param_maximalT0Shift - m_param_minimalT0Shift);
+  const double deltaT0 = 1 / m_param_numberOfGrids * (m_param_maximalT0Shift - m_param_minimalT0Shift);
 
-  extractTrackTimeFrom(recoTracks, m_param_minimalT0Shift + 1 * deltaT0, 2, tries, convergedTries, m_param_minimalT0Shift,
-                       m_param_maximalT0Shift);
-  extractTrackTimeFrom(recoTracks, m_param_minimalT0Shift + 2 * deltaT0, 2, tries, convergedTries, m_param_minimalT0Shift,
-                       m_param_maximalT0Shift);
-  extractTrackTimeFrom(recoTracks, m_param_minimalT0Shift + 3 * deltaT0, 2, tries, convergedTries, m_param_minimalT0Shift,
-                       m_param_maximalT0Shift);
-  extractTrackTimeFrom(recoTracks, m_param_minimalT0Shift + 4 * deltaT0, 2, tries, convergedTries, m_param_minimalT0Shift,
-                       m_param_maximalT0Shift);
+  for (double i = 1; i < m_param_numberOfGrids; i++) {
+    extractTrackTimeFrom(recoTracks, m_param_minimalT0Shift + i * deltaT0, 2, tries, convergedTries,
+                         m_param_minimalT0Shift, m_param_maximalT0Shift);
+  }
 
   if (not convergedTries.empty()) {
     // If we have found some "converging" extracted t0s, use the one with the lowest chi2.

@@ -118,6 +118,45 @@ namespace {
   /** instantiate tests for all the parameters */
   INSTANTIATE_TEST_CASE_P(Params, IOInterceptParamTest, ::testing::ValuesIn(logconvert_params));
 
+  /** test that capturing works if finish is not called */
+  TEST_F(IOInterceptTest, LogMessagesNoFinish)
+  {
+    {
+      IOIntercept::OutputToLogMessages logmessages("capture_name");
+      logmessages.setIndent("-");
+      logmessages.start();
+      std::cout << "this is my message";
+    }
+    ASSERT_EQ(m_messages.size(), 1);
+    LogMessage& msg = m_messages.front();
+    ASSERT_EQ(msg.getLogLevel(), LogConfig::c_Info);
+    ASSERT_EQ(msg.getMessage(), "Output from capture_name:\n-this is my message");
+  }
+
+  /** check intercept guard */
+  TEST_F(IOInterceptTest, InterceptGuard)
+  {
+    IOIntercept::OutputToLogMessages logmessages("capture_name");
+    logmessages.setIndent("-");
+    {
+      IOIntercept::InterceptorScopeGuard<IOIntercept::OutputToLogMessages> guard{logmessages};
+      std::cout << "this is my message";
+    }
+    std::cout << "this will not be captured" << std::endl;
+    {
+      auto guard = IOIntercept::start_intercept(logmessages);
+      std::cerr << "this is my error";
+    }
+    std::cerr << "this will not be captured" << std::endl;
+    ASSERT_EQ(m_messages.size(), 2);
+    LogMessage& msg = m_messages.front();
+    ASSERT_EQ(msg.getLogLevel(), LogConfig::c_Info);
+    ASSERT_EQ(msg.getMessage(), "Output from capture_name:\n-this is my message");
+    LogMessage& err = m_messages.back();
+    ASSERT_EQ(err.getLogLevel(), LogConfig::c_Error);
+    ASSERT_EQ(err.getMessage(), "Output from capture_name:\n-this is my error");
+  }
+
   /** check that the indentation is applied for all lines */
   TEST_F(IOInterceptTest, ConvertCheckIndent)
   {
@@ -194,7 +233,6 @@ namespace {
     write(fileno(stderr), "this is a test", 14);
     ASSERT_TRUE(capture.finish());
     ASSERT_EQ(capture.getStdErr(), "this is a test");
-
   }
 
   /** test if capturing large output works as expected */

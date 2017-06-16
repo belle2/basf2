@@ -269,5 +269,81 @@ namespace Belle2 {
       /** debug level for the log message to be emitted for output on stderr if m_stderrLevel is c_Debug */
       int m_stderrDebugLevel;
     };
+
+    /** Simple RAII guard for output interceptor
+     *
+     * In case you have one of the IOIntercept classes as member and want to
+     * enable it in a function with multiple return paths this class makes sure
+     * that the interceptor is properly finished on exiting the function/scope.
+     *
+     * \code{.cc}
+       struct example {
+         OutputToLogMessages m_interceptor{"examplestruct"};
+         int sign(int number) {
+           // this starts interception which will last until the
+           // InterceptorGuard is destructed so no matter which return is taken
+           // the intercept will always be properly finished()
+           InteceptorGuard<> guard(m_interceptor);
+           if(number<0) {
+             return -1;
+           } else if(number>0) {
+             return 1;
+           }
+           return 0;
+         }
+       };
+       \endcode
+     *
+     * \sa start_intercept for a convenience wrapper for this class
+     */
+    template<class T> class InterceptorScopeGuard {
+    public:
+      /** Construct a new instance for a given interceptor object and start intercepting io
+       * @param interceptor the interceptor object to use, must stay valid
+       *        during the lifetime of this object.
+       */
+      explicit InterceptorScopeGuard(T&
+                                     interceptor): m_interceptor(&interceptor)
+      {
+        m_interceptor->start();
+      }
+      /** Move constructor which will take over the interception state */
+      InterceptorScopeGuard(InterceptorScopeGuard<T>&& b): m_interceptor(b.m_interceptor)
+      {
+        b.m_interceptor = nullptr;
+      }
+      /** We don't want copying */
+      InterceptorScopeGuard(const InterceptorScopeGuard<T>&) = delete;
+      /** Also no assignment */
+      InterceptorScopeGuard& operator=(const InterceptorScopeGuard&) = delete;
+      /** Finish interception on cleanup */
+      ~InterceptorScopeGuard()
+      {
+        if (m_interceptor) m_interceptor->finish();
+      }
+    private:
+      /** pointer to the interceptor we guard */
+      T* m_interceptor;
+    };
+
+    /** Convenience wrapper to simplify use of InterceptorScopeGuard<T>.
+     * This function will return the correct scope guard without the need to
+     * specify the template parameter.
+     * \code{.cc}
+       IOIntercept::OutputToLogMessages iointercept("myinterceptor");
+       if(needIntercept){
+         auto guard = start_intercept(iointercept);
+         // while the variable guard is in scope the intercept will be active
+       }
+       // intercept will be disabled here
+       \endcode
+
+     * @param interceptor the interceptor object to use, must stay valid
+     *        during the lifetime of the returned object.
+     */
+    template<class T> InterceptorScopeGuard<T> start_intercept(T& interceptor)
+    {
+      return InterceptorScopeGuard<T> {interceptor};
+    }
   }
 }

@@ -25,8 +25,8 @@ TOPFEE::TOPFEE()
 
 void TOPFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
-  int hslblist[1] = {hslb.get_finid()};
-  Bring_Up_B2L_Wherever_Possible(hslblist, 1);
+  int csr = 0;
+  hslb.reset_b2l(csr);
 
   int numberOfCarriers = GetNumberOfCarriers(hslb.get_finid());
   m_numberOfCarriers[hslb.get_finid()] = numberOfCarriers;

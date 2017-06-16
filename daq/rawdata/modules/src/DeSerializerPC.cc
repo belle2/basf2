@@ -149,7 +149,7 @@ int DeSerializerPCModule::recvFD(int sock, char* buf, int data_size_byte, int fl
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "[ERROR] recv() returned error; ret = %d. : %s %s %d",
+        sprintf(err_buf, "[WARNING] recv() returned error; ret = %d. : %s %s %d",
                 read_size, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
         g_run_error = 1;
@@ -162,7 +162,7 @@ int DeSerializerPCModule::recvFD(int sock, char* buf, int data_size_byte, int fl
       }
     } else if (read_size == 0) {
       char err_buf[500];
-      sprintf(err_buf, "[ERROR] Connection is closed by peer(%s).:  %s %s %d",
+      sprintf(err_buf, "[WARNING] Connection is closed by peer(%s).:  %s %s %d",
               strerror(errno), __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
       g_run_error = 1;

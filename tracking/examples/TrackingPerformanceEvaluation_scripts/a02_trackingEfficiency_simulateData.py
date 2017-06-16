@@ -23,11 +23,13 @@ from simulation import add_simulation
 
 set_random_seed(1509)
 
+release = sys.argv[1]
+
 # roi = {noROI, vxdtf1, vxdtf2}
 # bkg = {noBkg, stdBKG, std2GBKG}
 
-roi = sys.argv[1]
-bkg = sys.argv[2]
+roi = sys.argv[2]
+bkg = sys.argv[3]
 
 usePXDDataReduction = True
 use_vxdtf2 = False
@@ -38,8 +40,6 @@ if (roi == 'noROI'):
 if (roi == 'vxdtf2'):
     use_vxdtf2 = True
 
-
-release = 'merged'
 
 bkgFiles = None
 
@@ -64,7 +64,7 @@ else:
 
 print(release)
 
-input_filename = './' + release + '/TV_data_' + release + '.root'
+input_filename = './' + release + '/TV_data_' + release + '_1509.root'
 output_filename = './' + release + '/TV_sim_' + bkg + '_' + roi + '_' + release + '.root'
 
 print(output_filename)

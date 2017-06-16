@@ -14,7 +14,11 @@ env['LIBS'] = [
     'fann',
     'analysis_utility',
     'analysis_ContinuumSuppression',
+<<<<<<< HEAD
     'reconstruction_dataobjects'
+=======
+    'analysis_ClusterUtility'
+>>>>>>> f0d70f70a15048476f02083fd1e5e79d47878f54
 ]
 
 

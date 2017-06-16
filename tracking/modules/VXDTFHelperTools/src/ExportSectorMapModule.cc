@@ -505,8 +505,8 @@ std::pair<int, int> ExportSectorMapModule::importROOTMap()
 
     m_importedSectorMaps.push_back(newMap);
 
-    string fileName = newMap.getMapName() + string(".xml");
-    std::ofstream file(fileName.c_str());
+    string fileNameXml = newMap.getMapName() + string(".xml");
+    std::ofstream file(fileNameXml.c_str());
 
     string  tagName = "<" + newMap.getMapName() + ">\n";
     string  endTagName = "\n</" + newMap.getMapName() + ">\n";

@@ -27,6 +27,9 @@ BKLMTrackingModule::BKLMTrackingModule() : Module()
   addParam("MatchToRecoTrack", m_MatchToRecoTrack, "[bool], whether match BKLMTrack to RecoTrack; (default is false)", false);
   addParam("MaxAngleRequired", m_maxAngleRequired,
            "[degree], match BKLMTrack to RecoTrack; angle between them is required to be smaller than (default 10)", double(10.0));
+  addParam("fitGlobalBKLMTrack", m_globalFit,
+           "[bool], do the BKLMTrack fitting in global system (multi-sectors track) or local system (sector by sector) (default is false, local sys.)",
+           false);
 }
 
 BKLMTrackingModule::~BKLMTrackingModule()
@@ -68,6 +71,7 @@ void BKLMTrackingModule::event()
   std::list<BKLMTrack*> tracks;
   BKLMTrackFitter* m_fitter = new BKLMTrackFitter();
   BKLMTrackFinder*  m_finder = new BKLMTrackFinder();
+  m_finder->setGlobalFit(m_globalFit);
   m_finder->registerFitter(m_fitter);
 
   //if (hits2D.getEntries() < 1) return;
@@ -80,8 +84,8 @@ void BKLMTrackingModule::event()
 
       if (hits2D[hj]->isOnStaTrack()) { continue; }
       if ((hits2D[hj]->getTime() - m_MeanDt) > m_MaxDt) continue;
-      if (!sameSector(hits2D[hi], hits2D[hj])) { continue; }
-      if (abs(hits2D[hi]->getLayer() - hits2D[hj]->getLayer()) < 3) { continue;}
+      if (!m_globalFit && !sameSector(hits2D[hi], hits2D[hj])) { continue; }
+      if (sameSector(hits2D[hi], hits2D[hj]) && abs(hits2D[hi]->getLayer() - hits2D[hj]->getLayer()) < 3) { continue;}
 
       std::list<BKLMHit2d*> sectorHitList;
       //sectorHitList.push_back(hits2D[hi]);
@@ -95,7 +99,7 @@ void BKLMTrackingModule::event()
 
         if (ho == hi || ho == hj) continue; //exclude seed hits
         if (hits2D[ho]->isOnStaTrack()) continue;
-        if (!sameSector(hits2D[ho], hits2D[hi])) continue;
+        if (!m_globalFit && !sameSector(hits2D[ho], hits2D[hi])) continue;
         // if (hits2D[ho]->getLayer() == hits2D[hi]->getLayer() || hits2D[ho]->getLayer() == hits2D[hj]->getLayer()) continue;
         if ((hits2D[ho]->getTime() - m_MeanDt) > m_MaxDt) continue;
         sectorHitList.push_back(hits2D[ho]);
@@ -108,6 +112,7 @@ void BKLMTrackingModule::event()
 
       std::list<BKLMHit2d*> m_hits;
       if (m_finder->filter(seed, sectorHitList, m_hits)) {
+        //B2INFO("BKLMTrackingModule::stand-alone BKLMTrack fitted success.");
         BKLMTrack* m_track = m_storeTracks.appendNew();
         m_track->setTrackParam(m_fitter->getTrackParam());
         m_track->setTrackParamErr(m_fitter->getTrackParamErr());
@@ -130,6 +135,7 @@ void BKLMTrackingModule::event()
         RecoTrack* closestTrack = nullptr;
         if (m_MatchToRecoTrack) {
           if (findClosestRecoTrack(m_track, closestTrack)) {
+            //B2INFO("BKLMTrackingModule::matched RecoTrack found.");
             m_track->addRelationTo(closestTrack);
             for (j = m_hits.begin(); j != m_hits.end(); ++j) {
               unsigned int sortingParameter = closestTrack->getNumberOfTotalHits();
@@ -185,11 +191,13 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
   for (RecoTrack& track : recoTracks) {
     try {
       genfit::MeasuredStateOnPlane state = track.getMeasuredStateOnPlaneFromLastHit();
-      state.extrapolateToPoint(firstBKLMHitPosition);
       //! Translates MeasuredStateOnPlane into 3D position, momentum and 6x6 covariance.
       state.getPosMomCov(pos, mom, cov);
+      if (mom.Y() * pos.Y() < 0)
+      { state = track.getMeasuredStateOnPlaneFromFirstHit(); }
       //pos.Print(); mom.Print();
       const TVector3& distanceVec = firstBKLMHitPosition - pos;
+      state.extrapolateToPoint(firstBKLMHitPosition);
       double newDistance = distanceVec.Mag2();
       // two points on the track, (x1,TrkParam[0]+TrkParam[1]*x1, TrkParam[2]+TrkParam[3]*x1),
       // and (x2,TrkParam[0]+TrkParam[1]*x2, TrkParam[2]+TrkParam[3]*x2),

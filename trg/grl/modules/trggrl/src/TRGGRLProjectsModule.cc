@@ -159,6 +159,13 @@ namespace Belle2 {
     //...GDL config. name...
     string cfn = m_configFilename;
 
+    if (m_belle2phase == "Phase3") {
+      B2INFO("L1 Trigger Menu at Phase 3 is applied");
+    } else if (m_belle2phase == "Phase2") {
+      B2INFO("L1 Trigger Menu at Phase 2 is applied");
+    } else {
+      B2ERROR("The setting phase is not Phase2 or Phase3, L1 Trigger Menu at Phase 3 is applied forcedly");
+    }
 
     if (TRGDebug::level()) {
       cout << "TRGGDLModule ... beginRun called " << endl;
@@ -234,13 +241,10 @@ namespace Belle2 {
     double SinglePhotonRegion[2];
     for (int i = 0; i < 2; i++) {
       if (m_belle2phase == "Phase3") {
-        B2INFO("L1 Trigger Menu at Phase 3 is applied");
         SinglePhotonRegion[i] = SinglePhotonRegion_phase3[i];
       } else if (m_belle2phase == "Phase2") {
-        B2INFO("L1 Trigger Menu at Phase 2 is applied");
         SinglePhotonRegion[i] = SinglePhotonRegion_phase2[i];
       } else {
-        B2ERROR("The setting phase is not Phase2 or Phase3, L1 Trigger Menu at Phase 3 is applied forcedly");
         SinglePhotonRegion[i] = SinglePhotonRegion_phase3[i];
       }
     }
@@ -281,15 +285,12 @@ namespace Belle2 {
     double Bhabha_cut[6], eclBhabha_cut[6];
     for (int i = 0; i < 6; i++) {
       if (m_belle2phase == "Phase2") {
-        B2INFO("L1 Trigger Menu at Phase 2 is applied");
         Bhabha_cut[i] = Bhabha_phase2[i];
         eclBhabha_cut[i] = eclBhabha_phase2[i];
       } else if (m_belle2phase == "Phase3") {
-        B2INFO("L1 Trigger Menu at Phase 3 is applied");
         Bhabha_cut[i] = Bhabha_phase3[i];
         eclBhabha_cut[i] = eclBhabha_phase3[i];
       } else {
-        B2ERROR("The setting phase is not Phase2 or Phase3, L1 Trigger Menu at Phase 3 is applied forcedly");
         Bhabha_cut[i] = Bhabha_phase3[i];
         eclBhabha_cut[i] = eclBhabha_phase3[i];
       }

@@ -31,6 +31,8 @@ void SockmemCallback::tx_t::update(SockmemCallback& callback, std::string state,
     m_rate = rate;
   }
   m_bytes = bytes;
+  m_nrxq = nrxq;
+  m_ntxq = ntxq;
 }
 
 StringList SockmemCallback::popen(const std::string& cmd)
@@ -58,11 +60,17 @@ SockmemCallback::SockmemCallback(const std::string& name, int timeout, ConfigFil
   setTimeout(timeout);
   for (int i = 0; true ; i++) {
     std::string vname = StringUtil::form("tx[%d].", i);
-    std::string host = conf.get(vname + "host");
-    if (host.size() == 0) break;
     std::string local = conf.get(vname + "local");
     std::string remote = conf.get(vname + "remote");
-    tx_t tx = {host, conf.get(vname + ".type"), local, remote, 0, 0, 0, 0, false};
+    std::string host;// = conf.get(vname + "host");
+    if (local.size() > 0) {
+      host = StringUtil::split(local, ':')[0];
+    } else if (remote.size() > 0) {
+      host = StringUtil::split(remote, ':')[0];
+    } else {
+      break;
+    }
+    tx_t tx = {host, local, remote, 0, 0, 0, 0, false};
     m_tx.insert(std::map<std::string, tx_t>::value_type((local.size() > 0 ? local : remote), tx));
   }
 }

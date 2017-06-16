@@ -23,7 +23,7 @@ namespace Belle2 {
    *   isForward[0,1], 0 is backward, 1 is forward
    *   sector[1-8], 1 is on +x axis, 2 is on +y axis
    *   layer[1-15], 1 is the innemost
-   *   plane[0, 1], 0 phiReadout plane, not always the inner plane according to the real detector geometry
+   *   plane[0, 1], 0 zReadout plane, not always the inner plane according to the real detector geometry
    *   strip[1-48]
    */
 

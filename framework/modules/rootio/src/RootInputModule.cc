@@ -535,8 +535,8 @@ bool RootInputModule::readParentTrees()
     }
 
     // get entry number in parent tree
-    long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
-    if (entry < 0) {
+    long entryNumber = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
+    if (entryNumber < 0) {
       B2ERROR("No event " << experiment << "/" << run << "/" << event << " in parent file " << parentPfn);
       return false;
     }
@@ -544,7 +544,7 @@ bool RootInputModule::readParentTrees()
     // read the tree and mark the data read in the data store
     EventMetaData* parentMetaData = nullptr;
     tree->SetBranchAddress("EventMetaData", &parentMetaData);
-    tree->GetEntry(entry);
+    tree->GetEntry(entryNumber);
     for (auto entry : m_parentStoreEntries[level]) {
       entry->ptr = entry->object;
     }

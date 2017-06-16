@@ -188,8 +188,8 @@ bool TrgEclBhabha::GetBhabha01()
     if (_TCMap ->getTCThetaIdFromTCId(MaxTCId[ihit]) > 8) {continue;}
     if (Max2Energy[0] < ClusterEnergy[ihit]) {
       Max2TCId[0] = MaxTCId[ihit];
-      Max2ThetaId[0] = _TCMap ->getTCThetaIdFromTCId(Max2TCId[0]) + 1;
-      Max2PhiId[0] = _TCMap ->getTCPhiIdFromTCId(Max2TCId[0]) + 1;
+      Max2ThetaId[0] = _TCMap ->getTCThetaIdFromTCId(Max2TCId[0]);
+      Max2PhiId[0] = _TCMap ->getTCPhiIdFromTCId(Max2TCId[0]) ;
       Max2Energy[0] = ClusterEnergy[ihit];
       Max2Timing[0] = ClusterTiming[ihit];
       Max2PositionR[0] = ClusterPosition[ihit].Mag();
@@ -207,8 +207,8 @@ bool TrgEclBhabha::GetBhabha01()
       Max2PositionR[1] = ClusterPosition[ihit].Mag();
       Max2PositionTheta[1] = ClusterPosition[ihit].Theta();
       Max2PositionPhi[1] = ClusterPosition[ihit].Phi();
-      Max2ThetaId[1] = _TCMap ->getTCThetaIdFromTCId(Max2TCId[1]) + 1;
-      Max2PhiId[1] = _TCMap ->getTCPhiIdFromTCId(Max2TCId[1]) + 1;
+      Max2ThetaId[1] = _TCMap ->getTCThetaIdFromTCId(Max2TCId[1]);
+      Max2PhiId[1] = _TCMap ->getTCPhiIdFromTCId(Max2TCId[1]) ;
 
     }
   }

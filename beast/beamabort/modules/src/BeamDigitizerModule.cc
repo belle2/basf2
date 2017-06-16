@@ -101,8 +101,8 @@ void BeamDigitizerModule::event()
     int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
     double fedep = ((double) NbEle) * m_WorkFunction * 1e-3; //eV to keV
     double Amp = NbEle / (6.25 * 1e18); // A x s
-    if ((fedep * 1e3) > m_WorkFunction)
-      BeamHits.appendNew(BeamabortHit(fedep, Amp, time, detNb, pdg));
+    //if ((fedep * 1e3) > m_WorkFunction)
+    BeamHits.appendNew(BeamabortHit(fedep, Amp, time, detNb, pdg));
   }
 
 }

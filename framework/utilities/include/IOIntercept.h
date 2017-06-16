@@ -253,6 +253,8 @@ namespace Belle2 {
        */
       explicit OutputToLogMessages(const std::string& name): OutputToLogMessages(name, LogConfig::c_Info, LogConfig::c_Error)
       {}
+      /** Destructor to make sure that output is converted to messages on destruction */
+      ~OutputToLogMessages() { finish(); }
       /** Set the indent for each line of the output, default is the supplied name + `": "` */
       void setIndent(const std::string& indent) { m_indent = indent; }
       /** Finish the capture and emit the message if output has appeard on stdout or stderr */

@@ -99,6 +99,9 @@ namespace Belle2 {
 
     CaptureStream::~CaptureStream()
     {
+      // the base destructor is called after this one so we need to make sure
+      // everything is finished before we close the pipe.
+      finish();
       // no need to close the write part, done by base class
       if (m_pipeReadFD >= 0) close(m_pipeReadFD);
     }

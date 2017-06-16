@@ -54,12 +54,12 @@ def add_PXDDataReduction(path, components, use_vxdtf2=False):
         'ROIListName': 'ROIs',
         'tolerancePhi': 0.15,
         'toleranceZ': 0.5,
-        'sigmaSystU': 0.1,
-        'sigmaSystV': 0.1,
+        'sigmaSystU': 0.02,
+        'sigmaSystV': 0.02,
         'numSigmaTotU': 10,
         'numSigmaTotV': 10,
-        'maxWidthU': 100,
-        'maxWidthV': 100,
+        'maxWidthU': 0.5,
+        'maxWidthV': 0.5,
     }
     pxdDataRed.param(param_pxdDataRed)
     path.add_module(pxdDataRed)

@@ -4,7 +4,7 @@ INCDIR=$(BELLE2_DAQ_SLC)/include/daq/slc/
 
 copyinc:
 	@ mkdir -p $(INCDIR)/apps/nsmtemplated
-	@ ln -sf $(BELLE2_DAQ_SLC)/apps/nsmtemplated/include/* $(INCDIR)/apps/nsmtemplated/
+	@ ln -s $(BELLE2_DAQ_SLC)/apps/nsmtemplated/include/* $(INCDIR)/apps/nsmtemplated/
 #	@ install -m 644 -p $(BELLE2_DAQ_SLC)/apps/nsmtemplated/include/* $(INCDIR)/apps/nsmtemplated
 
 apps/nsmtemplated: %:

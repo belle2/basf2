@@ -322,7 +322,6 @@ throw(IOException)
       table = m_table;
       config = s[0];
     }
-    LogFile::debug(config);
     if (table.size() == 0) {
       throw (DBHandlerException("Empty DB table name"));
     }
@@ -335,6 +334,7 @@ throw(IOException)
     m_table = table;
     set("dbtable", table);
   }
+  log(LogFile::DEBUG, "Loading config : %s", config.c_str());
   if (m_table.size() > 0 && m_rcconfig.size() > 0) {
     if (getDB()) {
       DBInterface& db(*getDB());
@@ -348,6 +348,11 @@ throw(IOException)
           m_rcconfig = config;
           remove(m_obj);
           addDB(m_obj);
+          //LogFile::debug("New config found: %s",
+          //         config.c_str());
+        } else {
+          LogFile::warning("No config found: %s@%s",
+                           getNode().getName().c_str(), config.c_str());
         }
       } catch (const DBHandlerException& e) {
         db.close();
@@ -371,6 +376,9 @@ throw(IOException)
           m_rcconfig = config;
           remove(m_obj);
           addDB(m_obj);
+        } else {
+          LogFile::warning("No config found: %s@%s",
+                           getNode().getName().c_str(), config.c_str());
         }
       } catch (const IOException& e) {
         socket.close();

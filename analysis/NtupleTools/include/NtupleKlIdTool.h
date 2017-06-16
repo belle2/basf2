@@ -22,8 +22,31 @@ namespace Belle2 {
   /** NtupleTool to write the KlId variables to a flat ntuple. */
   class NtupleKlIdTool : public NtupleFlatTool {
   private:
-    /** PID. */
-    float* m_KlId;
+
+
+    float* m_KlId     ;
+    /** is Forward EKLM. */
+    float* m_isFEKLM  ;
+    /** is Backweard EKLM. */
+    float* m_isBEKLM  ;
+    /** is BKLM. */
+    float* m_isBKLM   ;
+    /** timeing of KLMcluster. */
+    float* m_Time     ;
+    /** index of innermost layer. */
+    float* m_innerMost;
+    /** number of layers. */
+    float* m_NLayer   ;
+    /** trackFlag. */
+    float* m_trackFlag;
+    /** ECLFlag. */
+    float* m_ECLFlag  ;
+    /** energy. */
+    float* m_Energy   ;
+
+
+
+
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:

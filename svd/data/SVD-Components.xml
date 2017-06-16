@@ -196,6 +196,9 @@
 			<Component type="BarrelPitchAdapter"><w>bottom</w></Component>
 			<Component type="BarrelHybrid1"><w>top</w></Component>
 		</Component>
+		<Component type="BarrelClamps">
+			<u unit="mm">  14.0 </u> <v unit="mm"> 60.0 </v> <w unit="mm"> above </w> <woffset unit="mm">1.3</woffset>
+		</Component>
 	</Sensor>
 
 	<Sensor type="Barrel3">
@@ -208,6 +211,9 @@
 			<height unit="mm">1.500</height>
 			<Component type="BarrelPitchAdapter"><w>bottom</w></Component>
 			<Component type="BarrelHybrid2"><w>top</w></Component>
+		</Component>
+		<Component type="BarrelClamps">
+			<u unit="mm">  14.0 </u> <v unit="mm"> 60.0 </v> <w unit="mm"> above </w> <woffset unit="mm">1.5</woffset>
 		</Component>
 	</Sensor>
 
@@ -282,6 +288,14 @@
 		<Material>SVD-KaptonHybrid</Material>
 		<xi:include xpointer="xpointer(//KaptonBase[@type='Barrel']/*)" />
 		<height unit="mm">0.400</height>
+	</Component>
+
+	<!-- Clamp holding the cooling pipe -->
+	<Component name="BarrelClamps">
+		<Component type="Clamp">
+			<u unit="mm">  0.0</u> <v unit="mm">55.0</v>
+			<u unit="mm">  0.0</u> <v unit="mm">-55.0</v>
+		</Component>
 	</Component>
 
 	<!-- APV layout -->

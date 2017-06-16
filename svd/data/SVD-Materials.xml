@@ -22,7 +22,7 @@
   </Material>
  <Material name="SVD-Peek">
     <state>Solid</state>
-    <density unit="g/cm3">2.1</density>
+    <density unit="g/cm3">1.32</density>
     <Components>
       <Element fraction="0.01">H</Element>
       <Element fraction="0.04">C</Element>

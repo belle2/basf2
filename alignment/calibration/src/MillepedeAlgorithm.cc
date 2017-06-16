@@ -245,12 +245,6 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 
   }
 
-  if (newEKLM.size() > 0) {
-    EKLM::AlignmentChecker alignmentChecker(true);
-    for (auto& eklm : newEKLM)
-      alignmentChecker.restoreAlignment(eklm.second, previousEKLM[eklm.first]);
-  }
-
   // Save (possibly updated) objects
   for (auto& beam : newBeam)
     saveCalibration(beam.second, "BeamParameters", to_IOV(beam.first).overlap(getIovFromData()));

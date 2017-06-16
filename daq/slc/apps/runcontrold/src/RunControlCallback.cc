@@ -96,41 +96,36 @@ void RunControlCallback::ok(const char* nodename, const char* data) throw()
   } catch (const std::out_of_range& e) {
     LogFile::debug(e.what());
   }
-  //monitor();
 }
 
 void RunControlCallback::error(const char* nodename, const char* data) throw()
 {
-  //log(LogFile::DEBUG, "ERROR from %s (state = %s)", nodename, data);
   try {
     RCNode& node(findNode(nodename));
-    logging(node, LogFile::ERROR, "%s : %s", nodename, data);
-    //reply(NSMMessage(RCCommand::STOP, "Error due to error on " + node.getName()));
-    //stop();
+    //logging(node, LogFile::ERROR, "%s : %s", nodename, data);
     setState(RCState::ERROR_ES);
     m_starttime = -1;
     m_restarting = false;
+    reply(NSMMessage(RCCommand::STOP, "Error from " + node.getName()));
+    stop();
   } catch (const std::out_of_range& e) {
     LogFile::warning("ERROR from unknown node %s : %s", nodename, data);
   }
-  //monitor();
 }
 
 void RunControlCallback::fatal(const char* nodename, const char* data) throw()
 {
   try {
     RCNode& node(findNode(nodename));
-    logging(node, LogFile::FATAL, data);
+    //logging(node, LogFile::FATAL, data);
     setState(RCState::ERROR_ES);
     m_starttime = -1;
     m_restarting = false;
-    //setState(RCState::ABORTING_RS);
-    //reply(NSMMessage(RCCommand::ABORT, "Aborting due to error on " + node.getName()));
-    //abort();
+    reply(NSMMessage(RCCommand::STOP, "Fatal from " + node.getName()));
+    stop();
   } catch (const std::out_of_range& e) {
     LogFile::warning("ERROR from unknown node %s : %s", nodename, data);
   }
-  //monitor();
 }
 
 void RunControlCallback::boot(const std::string& opt, const DBObject& obj) throw(RCHandlerException)
@@ -225,7 +220,7 @@ void RunControlCallback::monitor() throw(RCHandlerException)
       try {
         if (cstate == Enum::UNKNOWN || cstate.isError() || state.isStable()) {
           std::string s;
-          get(node, "rcstate", s, 5);
+          get(node, "rcstate", s, 2);
           cstate_new = RCState(s);
         } else {
           cstate_new = cstate;
@@ -239,14 +234,15 @@ void RunControlCallback::monitor() throw(RCHandlerException)
           setState(node, cstate);
         }
       } catch (const TimeoutException& e) {
-        LogFile::debug("%s timeout", node.getName().c_str());
+        LogFile::debug("%s timeout %s:%d", node.getName().c_str(), __FILE__, __LINE__);
       }
     } catch (const NSMNotConnectedException&) {
       if (cstate != Enum::UNKNOWN) {
         log(LogFile::ERROR, "%s got down.", node.getName().c_str());
         setState(node, Enum::UNKNOWN);
         if (state == RCState::RUNNING_S) {
-          //stop();
+          reply(NSMMessage(RCCommand::STOP, node.getName() + " got down"));
+          stop();
         }
         setState(RCState::ERROR_ES);
         failed = true;
@@ -369,9 +365,6 @@ void RunControlCallback::logging_imp(const NSMNode& node, LogFile::Priority pri,
        getNode().getState() == RCState::STARTING_TS) && pri >= LogFile::ERROR) {
     setState(RCState::NOTREADY_S);
   }
-  if (log.getPriority() >= m_priority_global) {
-    //  reply(NSMMessage(log));
-  }
   RCCallback::log(pri, msg);
 }
 
@@ -460,21 +453,16 @@ void RunControlCallback::Distributor::operator()(RCNode& node) throw()
           while (node.isSequential() &&
                  !m_callback.check(node.getName(), RCState::READY_S)) {
             try {
-              //NSMCommunicator& com(m_callback.wait(node, RCCommand::OK, 1));
               NSMCommunicator& com(m_callback.wait(NSMNode(), RCCommand::UNKNOWN, 1));
               NSMMessage msg = com.getMessage();
               RCCommand cmd2(msg.getRequestName());
               if (cmd2 == NSMCommand::OK) {
                 m_callback.ok(msg.getNodeName(), msg.getData());
                 continue;
-              } else if (cmd2 == NSMCommand::VSET) {
-                m_callback.perform(com);
-                continue;
-              } else if (cmd2 == NSMCommand::VGET) {
+              } else if (cmd2 == NSMCommand::VSET || cmd2 == NSMCommand::VGET) {
                 m_callback.perform(com);
                 continue;
               } else if (cmd2 == RCCommand::ABORT) {
-                LogFile::debug("ABORTING");
                 m_callback.setState(RCState::ABORTING_RS);
                 m_callback.abort();
                 m_enabled = false;

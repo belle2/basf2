@@ -46,6 +46,13 @@ void TOPFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
   //callbacks to directly change registers on the board stacks
   callback.add(new TOPHandlerLookback(StringUtil::form("top[%d].Lookback", hslb.get_finid()), callback, hslb, *this, 44));
   callback.add(new TOPHandlerFEMode(StringUtil::form("top[%d].ScrodfeMode", hslb.get_finid()), callback, hslb, *this, 3));
+
+  //callback to enable/disable configuration of this boardstack
+  callback.add(new NSMVHandlerInt(StringUtil::form("top[%d].useBoardstack", hslb.get_finid()), true, true, 1));
+  //callbacks restarting different configuration steps if needed
+  callback.add(new TOPConfigureBS(StringUtil::form("top[%d].startBSConfigure", hslb.get_finid()), callback, hslb, *this, 0));
+  callback.add(new TOPPrepareData(StringUtil::form("top[%d].prepareData", hslb.get_finid()), callback, hslb, *this, 0));
+  callback.add(new TOPPrepareFE(StringUtil::form("top[%d].prepareFE", hslb.get_finid()), callback, hslb, *this, 0));
 }
 
 void TOPFEE::boot(RCCallback& callback, HSLB& hslb, const DBObject& obj)

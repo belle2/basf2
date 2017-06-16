@@ -55,18 +55,18 @@ namespace Belle2 {
     int  fitAllPixels(); /**< fit all pixels in on slot */
     void writeFile(std::string outfile); /**< write fitting results to a root file */
 
-    int getModuleID() {return m_moduleID;} /**< get moduleID in the fit */
+    int getModuleID() const {return m_moduleID;} /**< get moduleID in the fit */
     double getPixelChisq(int pixelID); /**< get fit chi^2 for a pixel */
-    std::string getFitMethod() {return m_fitMethod;} /**< get fitting method in the fit */
+    std::string getFitMethod() const {return m_fitMethod;} /**< get fitting method in the fit */
 
   private:
     TH1F* m_hist[512]; /**< time hist of 512 pixels */
-    int m_moduleID; /**< one moduleID/slot */
+    int m_moduleID = 0; /**< one moduleID/slot */
     TF1* m_func[512]; /**< fitting function */
     std::string m_fitMethod; /**< fitting method */
 
-    double m_xmin; /**< fitting low-edge */
-    double m_xmax; /**< fitting upper-edge */
+    double m_xmin = 0; /**< fitting low-edge */
+    double m_xmax = 0; /**< fitting upper-edge */
 
     /**
      * Fit process using single gaussian function

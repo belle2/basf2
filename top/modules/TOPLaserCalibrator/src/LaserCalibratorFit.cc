@@ -58,7 +58,8 @@ namespace Belle2 {
   {
     for (int i = 0; i < 512; i++) {
       if (hist[i]) {
-        m_hist[i] = hist[i];
+        //m_hist[i] = hist[i];
+        m_hist[i] = (TH1F*)hist[i]->Clone();
       } else {
         m_hist[i] = 0;
       }

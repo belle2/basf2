@@ -171,19 +171,19 @@ void BoardStackStatus::UpdateNSMCallbacksSCROD(Belle2::HSLB& hslb, Belle2::RCCal
     callback.log(LogFile::WARNING, "RAW1 voltage unnecessarily high " + str);
   }
   if (m_boardstackObservables.sVoltageRaw1 < vRAW1_nominal - vRAW_low_margin) {
-    callback.log(LogFile::ERROR, "RAW1 voltage too low! " + str);
+    callback.log(LogFile::WARNING, "RAW1 voltage too low! " + str);
   }
   if (vRAW2_nominal + vRAW_high_margin < m_boardstackObservables.sVoltageRaw2) {
     callback.log(LogFile::WARNING, "RAW2 voltage unnecessarily high " + str);
   }
   if (m_boardstackObservables.sVoltageRaw2 < vRAW2_nominal - vRAW_low_margin) {
-    callback.log(LogFile::ERROR, "RAW2 voltage too low! " + str);
+    callback.log(LogFile::WARNING, "RAW2 voltage too low! " + str);
   }
   if (vRAW3_nominal + vRAW_high_margin < m_boardstackObservables.sVoltageRaw3) {
     callback.log(LogFile::WARNING, "RAW3 voltage unnecessarily high " + str);
   }
   if (m_boardstackObservables.sVoltageRaw3 < vRAW3_nominal - vRAW_low_margin) {
-    callback.log(LogFile::ERROR, "RAW3 voltage too low!" + str);
+    callback.log(LogFile::WARNING, "RAW3 voltage too low!" + str);
   }
 }
 

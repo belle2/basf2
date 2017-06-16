@@ -18,10 +18,34 @@ namespace Belle2 {
   namespace Variable {
 
     /** particle Klid. -999 if error */
-    double particleKlId(const Particle* particle);
+    double particleKLMKlId(const Particle* particle);
 
+    /**get Belle stle track flag */
+    int particleKLMBelleTrackFlag(const Particle* particle);
 
+    /**get Belle stle ECL flag */
+    int particleKLMBelleECLFlag(const Particle* particle);
 
+    /** is particle formard EKLM */
+    int particleKLMisForwardEKLM(const Particle* particle);
+
+    /** is particle backward EKLM */
+    int particleKLMisBackwardEKLM(const Particle* particle);
+
+    /** is particle BKLM */
+    int particleKLMisBKLM(const Particle* particle);
+
+    /**get number of layers */
+    float particleKLMgetNLayers(const Particle* particle);
+
+    /** get index of innermost layer*/
+    float particleKLMgetInnermostLayer(const Particle* particle);
+
+    /** get energy */
+    float particleKLMgetEnergy(const Particle* particle);
+
+    /** get timing */
+    float particleKLMgetTime(const Particle* particle);
 
   }
 }

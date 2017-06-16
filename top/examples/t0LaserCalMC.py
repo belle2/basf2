@@ -95,7 +95,7 @@ lasercalib = register_module('TOPLaserCalibrator')
 lasercalib.param('histogramFileName', 't0LaserCalMC.root')
 # lasercalib.param('simFileName', 'ana_opticalGun.root')
 lasercalib.param('barID', 0)  # if barID==0, use all the bars for MC test
-# lasercalib.param('fitPixelID', 142)
+# lasercalib.param('fitChannel', 142)
 lasercalib.param('fitMethod', 'cb')  # gaus: single gaussian; cb: single Crystal Ball(for MC test); cb2: double Crystal Ball
 lasercalib.param('fitRange', [100, 0.2, 1.0])  # fit range[nbins, xmin, xmax]
 main.add_module(lasercalib)

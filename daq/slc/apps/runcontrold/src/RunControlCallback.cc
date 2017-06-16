@@ -89,6 +89,7 @@ void RunControlCallback::ok(const char* nodename, const char* data) throw()
         LogFile::warning("got unknown state (%s) from %s", data, nodename);
       } else {
         setState(node, state);
+        check();
       }
     } else {
       LogFile::debug("node used");
@@ -205,33 +206,33 @@ void RunControlCallback::abort() throw(RCHandlerException)
   m_starttime = -1;
 }
 
+void RunControlCallback::vset(NSMCommunicator& com, const NSMVar& v) throw()
+{
+  if (v.getName() == "rcstate") {
+    for (size_t i = 0; i < m_node_v.size(); i++) {
+      RCNode& node(m_node_v[i]);
+      if (v.getNode() == node.getName()) {
+        setState(node, v.getText());
+        check();
+        return ;
+      }
+    }
+  }
+  NSMCallback::vset(com, v);
+}
+
 void RunControlCallback::monitor() throw(RCHandlerException)
 {
   RCState state(getNode().getState());
-  RCState state_new = state.next();
-  bool failed = false;
   for (size_t i = 0; i < m_node_v.size(); i++) {
     RCNode& node(m_node_v[i]);
     if (!node.isUsed()) continue;
     RCState cstate(node.getState());
-    RCState cstate_new;
     try {
       NSMCommunicator::connected(node.getName());
       try {
         if (cstate == Enum::UNKNOWN || cstate.isError() || state.isStable()) {
-          std::string s;
-          get(node, "rcstate", s, 2);
-          cstate_new = RCState(s);
-        } else {
-          cstate_new = cstate;
-        }
-        if (cstate_new != cstate) {
-          if (cstate == Enum::UNKNOWN) {
-            log(LogFile::INFO, "%s got up (state=%s).",
-                node.getName().c_str(), cstate_new.getLabel());
-          }
-          cstate = cstate_new;
-          setState(node, cstate);
+          NSMCommunicator::send(NSMMessage(node, NSMCommand::VGET, "rcstate"));
         }
       } catch (const TimeoutException& e) {
         LogFile::debug("%s timeout %s:%d", node.getName().c_str(), __FILE__, __LINE__);
@@ -245,9 +246,20 @@ void RunControlCallback::monitor() throw(RCHandlerException)
           stop();
         }
         setState(RCState::ERROR_ES);
-        failed = true;
       }
     }
+  }
+}
+
+void RunControlCallback::check() throw(RCHandlerException)
+{
+  RCState state(getNode().getState());
+  RCState state_new = state.next();
+  bool failed = false;
+  for (size_t i = 0; i < m_node_v.size(); i++) {
+    RCNode& node(m_node_v[i]);
+    if (!node.isUsed()) continue;
+    RCState cstate(node.getState());
     if (state.isStable() && state != cstate) {
       if (cstate.isStable() && state_new.getId() > cstate.getId())
         state_new = cstate;
@@ -256,30 +268,26 @@ void RunControlCallback::monitor() throw(RCHandlerException)
       state_new = RCState::UNKNOWN;
     }
   }
-  if (getNode().getState() != RCState::ERROR_ES) {
+  if (state != RCState::ERROR_ES) {
     if (failed) state_new = RCState::NOTREADY_S;
     if (state_new != RCState::UNKNOWN && state != state_new) {
       setState(state_new);
     }
+    state = getNode().getState();
     const std::string nodename = m_node_v[m_node_v.size() - 1].getName();
-    if (getNode().getState() != RCState::NOTREADY_S &&
-        checkAll(nodename, RCState::NOTREADY_S)) {
+    if (state != RCState::NOTREADY_S && checkAll(nodename, RCState::NOTREADY_S)) {
       setState(RCState::NOTREADY_S);
     }
-    if (getNode().getState() != RCState::READY_S &&
-        checkAll(nodename, RCState::READY_S)) {
+    if (state != RCState::READY_S && checkAll(nodename, RCState::READY_S)) {
       setState(RCState::READY_S);
     }
-    if (getNode().getState() != RCState::PAUSED_S &&
-        checkAll(nodename, RCState::PAUSED_S)) {
+    if (state != RCState::PAUSED_S && checkAll(nodename, RCState::PAUSED_S)) {
       setState(RCState::PAUSED_S);
     }
-    if (getNode().getState() != RCState::RUNNING_S &&
-        checkAll(nodename, RCState::RUNNING_S)) {
+    if (state != RCState::RUNNING_S && checkAll(nodename, RCState::RUNNING_S)) {
       setState(RCState::RUNNING_S);
     }
-    if (getNode().getState() == RCState::RUNNING_S &&
-        !checkAll(nodename, RCState::RUNNING_S)) {
+    if (state == RCState::RUNNING_S && !checkAll(nodename, RCState::RUNNING_S)) {
       setState(RCState::ERROR_ES);
       stop();
     }

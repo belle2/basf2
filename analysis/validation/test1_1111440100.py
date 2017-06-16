@@ -37,9 +37,10 @@ inputMdst('default', '../1111440100.dst.root')
 
 do_KS0_reco = False
 loadStdCharged()
+stdLooseMu()
 
-
-reconstructDecay('J/psi -> mu+:all mu-:all', '2.8 < M < 3.3')
+cutAndCopyList('mu+:Jp', 'mu+:loose', '')
+reconstructDecay('J/psi -> mu+:Jp mu-:Jp', '2.8 < M < 3.3')
 matchMCTruth('J/psi')
 
 if(do_KS0_reco):
@@ -49,7 +50,7 @@ else:
 matchMCTruth('K_S0')
 
 # Prepare the B candidates
-reconstructDecay('B0 -> [J/psi -> ^mu+:all ^mu-:all] K_S0', '5.2 < M < 5.4')
+reconstructDecay('B0 -> [J/psi -> ^mu+:Jp ^mu-:Jp] K_S0', '5.2 < M < 5.4')
 # vertexRave('B0', 0.0, 'B0 -> [J/psi -> ^mu+:all ^mu-:all] ^K_S0','iptube')
 matchMCTruth('B0')
 
@@ -58,9 +59,9 @@ ntupleFile('../1111440100.ntup.root')
 # ----> NtupleMaker module
 tools = ['EventMetaData', 'B0']
 tools += ['RecoStats', 'B0']
-tools += ['Kinematics', '^B0 -> [^J/psi -> ^mu+:all ^mu-:all] [^K_S0 -> ^pi+ ^pi-]']
-tools += ['DeltaEMbc', '^B0 -> [J/psi -> mu+:all mu-:all] [K_S0 -> pi+ pi-]']
-tools += ['PID', 'B0 -> [J/psi -> ^mu+:all ^mu-:all] [K_S0 -> ^pi+ ^pi-]']
+tools += ['Kinematics', '^B0 -> [^J/psi -> ^mu+:Jp ^mu-:Jp] [^K_S0 -> ^pi+ ^pi-]']
+tools += ['DeltaEMbc', '^B0 -> [J/psi -> mu+:Jp mu-:Jp] [K_S0 -> pi+ pi-]']
+tools += ['PID', 'B0 -> [J/psi -> ^mu+:Jp ^mu-:Jp] [K_S0 -> ^pi+ ^pi-]']
 # tools += ['Vertex', '^B0 -> [J/psi -> mu+:all mu-:all] [K_S0 -> pi+ pi-]']
 # tools += ['DeltaT', '^B0']
 

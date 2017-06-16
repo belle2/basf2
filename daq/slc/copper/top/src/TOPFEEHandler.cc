@@ -45,7 +45,7 @@ bool TOPConfigureBS::handleGetInt(int& value)
 bool TOPConfigureBS::handleSetInt(const int val)
 {
   int useBoardStack = 0;
-  m_callback.get(StringUtil::form("top[%d].useBoardstack", m_hslb.get_finid()), useBoardStack);
+  m_callback.get(StringUtil::form("hslb[%d].used", m_hslb.get_finid()), useBoardStack);
 
   if (useBoardStack != 0 && val == 1) {
     m_callback.log(LogFile::DEBUG, StringUtil::form("Starting Configuration on %d", m_hslb.get_finid()));
@@ -64,7 +64,7 @@ bool TOPPrepareData::handleGetInt(int& value)
 bool TOPPrepareData::handleSetInt(const int val)
 {
   int useBoardStack = 0;
-  m_callback.get(StringUtil::form("top[%d].useBoardstack", m_hslb.get_finid()), useBoardStack);
+  m_callback.get(StringUtil::form("hslb[%d].used", m_hslb.get_finid()), useBoardStack);
   if (useBoardStack != 0 && val == 1) {
     m_callback.log(LogFile::DEBUG, StringUtil::form("Starting Data Taking Preparation for BS %d", m_hslb.get_finid()));
     PrepBoardstackData::PrepareBoardStack(m_hslb, m_callback);
@@ -82,7 +82,7 @@ bool TOPPrepareFE::handleGetInt(int& value)
 bool TOPPrepareFE::handleSetInt(const int val)
 {
   int useBoardStack = 0;
-  m_callback.get(StringUtil::form("top[%d].useBoardstack", m_hslb.get_finid()), useBoardStack);
+  m_callback.get(StringUtil::form("hslb[%d].used", m_hslb.get_finid()), useBoardStack);
   if (useBoardStack != 0 && val == 1) {
     m_callback.log(LogFile::DEBUG, StringUtil::form("Starting Feature Extraction Preparation for BS %d", m_hslb.get_finid()));
     PrepBoardstackFE::PrepareBoardStack(m_hslb, m_callback);

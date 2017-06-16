@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Roberto Stroili, Wenlong Yuan                            *
@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPLASERCALIBRATORMODULE_H
-#define TOPLASERCALIBRATORMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -19,74 +18,71 @@ class TF1;
 class TTree;
 
 namespace Belle2 {
-  namespace TOP {
+  /**
+   * T0 Laser calibration module
+   * (under development)
+   */
+  class TOPLaserCalibratorModule : public Module {
+
+  public:
     /**
-     * T0 Laser calibration module
-     * (under development)
+     * Constructor
      */
-    class TOPLaserCalibratorModule : public Module {
+    TOPLaserCalibratorModule();
 
-    public:
-      /**
-       * Constructor
-       */
-      TOPLaserCalibratorModule();
+    /**
+     * Destructor
+     */
+    virtual ~TOPLaserCalibratorModule();
 
-      /**
-       * Destructor
-       */
-      virtual ~TOPLaserCalibratorModule();
+    /**
+     * Initialize the Module.
+     * This method is called at the beginning of data processing.
+     */
+    virtual void initialize();
 
-      /**
-       * Initialize the Module.
-       * This method is called at the beginning of data processing.
-       */
-      virtual void initialize();
+    /**
+     * Called when entering a new run.
+     * Set run dependent things like run header parameters, alignment, etc.
+     */
+    virtual void beginRun();
 
-      /**
-       * Called when entering a new run.
-       * Set run dependent things like run header parameters, alignment, etc.
-       */
-      virtual void beginRun();
+    /**
+     * Event processor.
+     */
+    virtual void event();
 
-      /**
-       * Event processor.
-       */
-      virtual void event();
+    /**
+     * End-of-run action.
+     * Save run-related stuff, such as statistics.
+     */
+    virtual void endRun();
 
-      /**
-       * End-of-run action.
-       * Save run-related stuff, such as statistics.
-       */
-      virtual void endRun();
+    /**
+     * Termination action.
+     * Do fits , clean-up, close files, summarize statistics, etc.
+     */
+    virtual void terminate();
 
-      /**
-       * Termination action.
-       * Do fits , clean-up, close files, summarize statistics, etc.
-       */
-      virtual void terminate();
+  private:
 
-    private:
+    /**
+     * number of channels per module, storage windows per channel
+     */
+    enum {c_NumChannels = 512,
+          c_maxLaserFibers = 9
+         };
 
-      /**
-       * number of channels per module, storage windows per channel
-       */
-      enum {c_NumChannels = 512,
-            c_maxLaserFibers = 9
-           };
+    std::string m_histogramFileName; /**< output file name for histograms */
+    std::string m_simFileName; /**< input sim file name */
 
-      std::string m_histogramFileName; /**< output file name for histograms */
-      std::string m_simFileName; /**< input sim file name */
+    int m_barID; /**< ID of TOP module to calibrate */
+    int m_fitChannel; /**< set 0 - 511 to a specific pixelID in the fit; set 512 to fit all pixels in one slot */
+    std::string m_fitMethod; /**< gauss: single gaussian; cb: single Crystal Ball; cb2: double Crystal Ball */
+    std::vector<double> m_fitRange; /**< fit range [nbins, xmin, xmax] */
 
-      int m_barID; /**< ID of TOP module to calibrate */
-      int m_fitPixelID; /**< set 0 - 511 to a specific pixelID in the fit; set 512 to fit all pixels in one slot */
-      std::string m_fitMethod; /**< gauss: single gaussian; cb: single Crystal Ball; cb2: double Crystal Ball */
-      std::vector<double> m_fitRange; /**< fit range [nbins, xmin, xmax] */
-
-      TH1F* m_histo[c_NumChannels]; /**< profile histograms */
-      TTree* m_fittingParmTree; /**< tree with fitting parameters */
-    };
-  }// TOP namespace
+    TH1F* m_histo[c_NumChannels] = {0}; /**< profile histograms */
+    //TTree* m_fittingParmTree = 0; /**< tree with fitting parameters */
+  };
 } // Belle2 namespace
 
-#endif

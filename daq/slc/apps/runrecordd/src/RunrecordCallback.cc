@@ -129,8 +129,7 @@ void RunrecordCallback::vset(NSMCommunicator& com, const NSMVar& v) throw()
   if (v.getNode() == m_rcnode.getName() && v.getName() == "rcstate") {
     std::string rcstate = v.getText();
     if ((m_rcstate == "READY" && rcstate == "STARTING") ||
-        ((m_rcstate == "STARTING" || m_rcstate == "RUNNING" || m_rcstate == "ERROR") &&
-         (rcstate == "ABORTING" || rcstate == "STOPPING"))) {
+        rcstate == "ABORTING" || rcstate == "STOPPING") {
       update(rcstate);
     }
     m_rcstate = rcstate;

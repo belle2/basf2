@@ -212,9 +212,11 @@ void RunControlCallback::vset(NSMCommunicator& com, const NSMVar& v) throw()
     for (size_t i = 0; i < m_node_v.size(); i++) {
       RCNode& node(m_node_v[i]);
       if (v.getNode() == node.getName()) {
-        setState(node, v.getText());
-        check();
-        return ;
+        if (node.isUsed()) {
+          setState(node, v.getText());
+          check();
+        }
+        return;
       }
     }
   }

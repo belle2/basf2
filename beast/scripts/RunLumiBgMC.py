@@ -11,10 +11,14 @@ from background import add_output
 d = datetime.datetime.today()
 print(d.strftime('job start: %Y-%m-%d %H:%M:%S\n'))
 
-if len(sys.argv) != 6:
-    print("Usage: {}[bbbrem | bhwide | bhwide_largeangle | aafh | koralw]
-          [seednumber][sampletype][phasenumber | 1 | 2 | 3]
-          [digitization true | false]".format(sys.argv[0]), file=sys.stderr)
+if len(sys.argv) != 7:
+    print("Usage: requires 5 arguments")
+    print("Argument 1: (bbbrem | bhwide | bhwide_largeangle | aafh | koralw)")
+    print("Argument 2: seed number")
+    print("Argument 3: (study | usual | ECL | PXD)")
+    print("Argument 4: phase ( 2 | 3)")
+    print("Argument 5: ROOT output directory path")
+    print("Argument 6: digitization (true | false)")
     sys.exit(1)
 
 # read parameters
@@ -22,14 +26,15 @@ argvs = sys.argv
 argc = len(argvs)
 generator = sys.argv[1].lower()
 num = argvs[2]
-sampleType = sys.argv[3].lower()
+sampleType = sys.argv[3]
 phase = int(argvs[4])
-digitization = sys.argv[5].lower()
+output_dir = argvs[5]
+digitization = sys.argv[6]
 
 if phase == 2:
     sampleType = 'usual'
 
-outputfilename = 'output/output_phase_' + argvs[4] + '_' + generator + '_' + num + '.root'
+outputfilename = output_dir + '/output_phase_' + argvs[4] + '_' + generator + '_' + num + '.root'
 
 # set random seed
 seed = str(1234567 + int(num))

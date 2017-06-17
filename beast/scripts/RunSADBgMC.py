@@ -20,15 +20,15 @@ print("Make a link to the input SAD files before running this steering script:")
 print("ln -s ~login_name/[FIXME -> ask your-self where did I put it] input")
 
 if len(sys.argv) != 9:
-    print("Usage: requires 7 arguments")
+    print("Usage: requires 8 arguments")
     print("Argument 1: SAD input directory path")
-    print("Argument 2: Touschek,Coulomb,Brens)_(HER,LER)(,_far)")
+    print("Argument 2: (Touschek | Coulomb | Brens)_(HER | LER)(,_far)")
     print("Argument 3: file number")
-    print("Argument 4: (study,usual,ECL,PXD")
+    print("Argument 4: (study | usual | ECL | PXD)")
     print("Argument 5: time-eqv in ns")
     print("Argument 6: phase 1 | 2 |3")
     print("Argument 7: ROOT output directory path")
-    print("Argument 8: digitization true or false")
+    print("Argument 8: digitization (true | false)")
     sys.exit(1)
 
 # read parameters

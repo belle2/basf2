@@ -3,14 +3,51 @@ set_log_level(LogLevel.INFO)
 
 import sys
 import ROOT
+import basf2
 from ROOT import Belle2
 from caf.framework import Calibration
+
+from collections import OrderedDict
+
+UVWABC = [1, 2, 3, 4, 5, 6]
+
+
+def collect(calibration, basf2_args=[]):
+    import pickle
+    import subprocess
+
+    main = create_path()
+    main.add_module('RootInput', inputFileNames=calibration.input_files)
+    main.add_path(calibration.pre_collector_path)
+    main.add_module(calibration.collector)
+    main.add_module('RootOutput', branchNames=['EventMetaData'])
+
+    path_file_name = calibration.name + '.path'
+    with open(path_file_name, 'bw') as serialized_path_file:
+        pickle.dump(serialize_path(main), serialized_path_file)
+
+    subprocess.call(["basf2", "--execute-path", path_file_name] + basf2_args)
+
+
+def calibrate(calibration, input_file='RootOutput.root'):
+    input = register_module('RootInput', inputFileName=input_file)
+    input.initialize()
+
+    for algo in calibration.algorithms:
+        algo.algorithm.execute()
+        algo.algorithm.commit()
 
 
 class MillepedeCalibration():
     """ The generic Millepede calibration collector+algorithm """
 
-    def __init__(self, components, tracks=None, particles=None, vertices=None, primary_vertices=None, magnet=True):
+    def __init__(self,
+                 components=None,
+                 tracks=None,
+                 particles=None,
+                 vertices=None,
+                 primary_vertices=None,
+                 path=None):
         """
         components are the names of DB obejcts to calibrate (BeamParameters etc.)
         tracks are collections of RecoTracks of fitted charged tracks (usually cosmic rays, no associated particle)
@@ -19,8 +56,12 @@ class MillepedeCalibration():
         primary_vertices are names of ParticleLists with at least two body decays fitted with beam+vertex constraint
         """
 
+        if components is None:
+            components = []
+
+        # By default, at least the raw RecoTracks are fitted (let's specify its name explicitly here)
         if (tracks is None) and (particles is None) and (vertices is None) and (primary_vertices is None):
-            tracks = ['']
+            tracks = ['RecoTracks']
 
         if particles is None:
             particles = []
@@ -31,55 +72,71 @@ class MillepedeCalibration():
         if primary_vertices is None:
             primary_vertices = []
 
-        self.components = components
-        self.parameters = []
+        if path is None:
+            path = create_path()
+            path.add_module('Gearbox')
+            path.add_module('Geometry')
+            path.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
 
         self.algo = Belle2.MillepedeAlgorithm()
+        self.path = path
+        self.collector = register_module('MillepedeCollector')
+        self.parameters = OrderedDict()
+        self.commands = OrderedDict()
+
+        self.set_components(components)
+
+        self.collector.param('tracks', tracks)
+        self.collector.param('particles', particles)
+        self.collector.param('vertices', vertices)
+        self.collector.param('primaryVertices', primary_vertices)
+        self.collector.param('minPValue', 0.)
+        self.collector.param('useGblTree', False)
+
+        self.set_command('method diagonalization 3 0.1')
+        self.set_command('skipemptycons')
+        self.set_command('entries 10')
+        self.set_command('hugecut 50')
+        self.set_command('chiscut 30. 6.')
+        self.set_command('outlierdownweighting 3')
+        self.set_command('dwfractioncut 0.1')
+
+    def set_components(self, components):
+        self.components = components
+        calibrate_vertex = ((components == []) or ('BeamParameters' in components))
+
         std_components = ROOT.vector('string')()
         for component in components:
             std_components.push_back(component)
+
         self.algo.setComponents(std_components)
-
-        self.algo.steering().command('method diagonalization 3 0.1')
-        self.algo.steering().command('skipemptycons')
-        self.algo.steering().command('entries 10')
-        self.algo.steering().command('hugecut 50')
-        self.algo.steering().command('chiscut 30. 6.')
-        self.algo.steering().command('outlierdownweighting 3')
-        self.algo.steering().command('dwfractioncut 0.1')
-
-        calibrate_vertex = ((components == []) or ('BeamParameters' in components))
-
-        self.collector = register_module('MillepedeCollector',
-                                         minPValue=0.,
-                                         useGblTree=False,
-                                         tracks=tracks,
-                                         particles=particles,
-                                         vertices=vertices,
-                                         primaryVertices=primary_vertices,
-                                         calibrateVertex=calibrate_vertex)
         self.collector.param('components', components)
+        self.collector.param('calibrateVertex', calibrate_vertex)
 
-        self.path = create_path()
-        self.path.add_module('Progress')
-        self.path.add_module('Gearbox')
+    def set_command(self, cmd_name, command=''):
+        if command is None:
+            self.commands[cmd_name] = ''
+            return
 
-        if magnet:
-            self.path.add_module('Geometry')
+        if command == '':
+            command = cmd_name
         else:
-            self.path.add_module('Geometry', excludedComponents=['MagneticField'])
+            command = cmd_name + ' ' + str(command)
 
-        self.path.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
-        # self.path.add_module('DAFRecoFitter')
-
-        self.has_collected_in_this_job = False
+        cmd_words = str(command).split(' ')
+        self.commands[cmd_words[0]] = command
 
     def pre_algo(self, algorithm, iteration):
         pass
 
     def create(self, name, input_files):
+        # We keep steering options for pede in python
+        # as long as possible for the user before passing to algo
+        for command in self.commands.values():
+            self.algo.steering().command(command)
+        # Add parameter fixing/setting
         self.algo.steering().command('Parameters')
-        for command in self.parameters:
+        for command in self.parameters.values():
             self.algo.steering().command(command)
 
         cal = Calibration(name, self.collector, self.algo, input_files)
@@ -92,69 +149,114 @@ class MillepedeCalibration():
 
         return cal
 
-    def collect(self):
-        main = create_path()
-        main.add_module('RootInput')
-        main.add_path(self.path)
-        main.add_module(self.collector)
-        main.add_module('RootOutput', branchNames=['EventMetaData'])
-        process(main)
-        self.has_collected_in_this_job = True
-        print(statistics)
+    def get_param(self, param, module=None):
+        module = self.get_module(module)
+        for mpi in module.available_params():
+            if mpi.name == param:
+                return mpi.values
+        return None
 
-    def calibrate(self):
-        self.algo.steering().command('Parameters')
-        for command in self.parameters:
-            self.algo.steering().command(command)
+    def set_param(self, value, param, module=None):
+        module = self.get_module(module)
+        if module is not None:
+            module.param(param, value)
 
-        if not self.has_collected_in_this_job:
-            input = register_module('RootInput', inputFileName='RootOutput.root')
-            input.initialize()
+    def get_module(self, module=None):
+        if module is None or module == self.collector.name() or module == self.collector:
+            module = self.collector
+        else:
+            for mod in self.path.modules():
+                if mod.name() == module:
+                    module = mod
+                    break
+        if isinstance(module, basf2.Module):
+            return module
+        return None
 
-        self.algo.execute()
-        self.algo.commit()
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state['path'] = serialize_path(self.path)
+        state['collector'] = serialize_module(self.collector)
+        return state
 
-    def fixCDCLayerX(self, layer):
-        self._fixGlobalParam(Belle2.CDCLayerAlignment.getGlobalUniqueID(), layer, Belle2.CDCLayerAlignment.layerX)
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.collector = deserialize_module(state['collector'])
+        self.path = deserialize_path(state['path'])
 
-    def fixCDCLayerY(self, layer):
-        self._fixGlobalParam(Belle2.CDCLayerAlignment.getGlobalUniqueID(), layer, Belle2.CDCLayerAlignment.layerY)
-
-    def fixCDCLayerRot(self, layer):
-        self._fixGlobalParam(Belle2.CDCLayerAlignment.getGlobalUniqueID(), layer, Belle2.CDCLayerAlignment.layerPhi)
-
-    def fixCDCTimeWalk(self, board_id):
-        self._fixGlobalParam(Belle2.CDCTimeWalks.getGlobalUniqueID(), board_id, 0)
-
-    def fixCDCTimeZero(self, wire_id):
-        self._fixGlobalParam(Belle2.CDCTimeZeros.getGlobalUniqueID(), wire_id, 0)
-
-    def fixVXDid(self, layer, ladder, sensor, segment=0):
-        for param in range(1, 7):
-            self._fixGlobalParam(
-                Belle2.VXDAlignment.getGlobalUniqueID(), Belle2.VxdID(
-                    layer, ladder, sensor, segment).getID(), param)
-
-    """
-        {{"PXD.Ying"}, {Belle2::VxdID(1, 0, 0, 1)}},
-        {{"PXD.Yang"}, {Belle2::VxdID(1, 0, 0, 2)}},
-        {{"SVD.Pat"}, {Belle2::VxdID(3, 0, 0, 1)}},
-        {{"SVD.Mat"}, {Belle2::VxdID(3, 0, 0, 2)}}
-    """
-
-    def fixPXDYing(self):
-        self.fixVXDid(1, 0, 0, 1)
-
-    def fixPXDYang(self):
-        self.fixVXDid(1, 0, 0, 2)
-
-    def fixSVDPat(self):
-        self.fixVXDid(3, 0, 0, 1)
-
-    def fixSVDMat(self):
-        self.fixVXDid(3, 0, 0, 2)
-
-    def _fixGlobalParam(self, uid, element, param):
+    def fixGlobalParam(self, uid, element, param, value=0.):
         label = Belle2.GlobalLabel()
         label.construct(uid, element, param)
-        self.parameters.append(str(label.label()) + ' 0.0 -1.')
+        self.parameters[str(label.label())] = (str(label.label()) + ' ' + str(value) + ' -1.')
+
+    # CDC helpers --------------------------------------------------------------------------------------------------
+    def fixCDCLayerX(self, layer):
+        self.fixGlobalParam(Belle2.CDCLayerAlignment.getGlobalUniqueID(), layer, Belle2.CDCLayerAlignment.layerX)
+
+    def fixCDCLayerY(self, layer):
+        self.fixGlobalParam(Belle2.CDCLayerAlignment.getGlobalUniqueID(), layer, Belle2.CDCLayerAlignment.layerY)
+
+    def fixCDCLayerRot(self, layer):
+        self.fixGlobalParam(Belle2.CDCLayerAlignment.getGlobalUniqueID(), layer, Belle2.CDCLayerAlignment.layerPhi)
+
+    def fixCDCTimeWalk(self, board_id):
+        self.fixGlobalParam(Belle2.CDCTimeWalks.getGlobalUniqueID(), board_id, 0)
+
+    def fixCDCTimeZero(self, wire_id):
+        self.fixGlobalParam(Belle2.CDCTimeZeros.getGlobalUniqueID(), wire_id, 0)
+
+    # VXD helpers --------------------------------------------------------------------------------------------------
+    def fixVXDid(self, layer, ladder, sensor, segment=0, parameters=[1, 2, 3, 4, 5, 6]):
+        for param in parameters:
+            self.fixGlobalParam(Belle2.VXDAlignment.getGlobalUniqueID(), Belle2.VxdID(
+                layer, ladder, sensor, segment).getID(), param)
+        """
+            {{"PXD.Ying"}, {Belle2::VxdID(1, 0, 0, 1)}},
+            {{"PXD.Yang"}, {Belle2::VxdID(1, 0, 0, 2)}},
+            {{"SVD.Pat"}, {Belle2::VxdID(3, 0, 0, 1)}},
+            {{"SVD.Mat"}, {Belle2::VxdID(3, 0, 0, 2)}}
+        """
+
+    def fixPXDYing(self, parameters=UVWABC):
+        self.fixVXDid(1, 0, 0, 1, parameters)
+
+    def fixPXDYang(self, parameters=UVWABC):
+        self.fixVXDid(1, 0, 0, 2, parameters)
+
+    def fixSVDPat(self, parameters=UVWABC):
+        self.fixVXDid(3, 0, 0, 1, parameters)
+
+    def fixSVDMat(self, parameters=UVWABC):
+        self.fixVXDid(3, 0, 0, 2, parameters)
+
+    # EKLM helpers --------------------------------------------------------------------------------------------------
+    def fixEKLMModule(self, endcap, layer, sector, plane, segment, parameters=[1, 2, 6]):
+        for ipar in parameters:
+            self.fixGlobalParam(Belle2.EKLMAlignment.getGlobalUniqueID(),
+                                Belle2.EKLMSegmentID(endcap, layer, sector, plane, segment).getSegmentGlobalNumber(),
+                                ipar)
+
+    def fixEKLM(self, endcaps=range(1, 3), layers={1: 12, 2: 14}, sectors=range(1, 5), planes=range(1, 3), segments=range(1, 6)):
+        for endcap in endcaps:
+            for layer in range(1, layers[endcap] + 1):
+                for sector in sectors:
+                    for plane in planes:
+                        for segment in segments:
+                            self.fixEKLMModule(endcap, layer, sector, plane, segment)
+
+    # BKLM helpers --------------------------------------------------------------------------------------------------
+    def fixBKLMModule(self, sector, layer, forward, parameters=UVWABC):
+        for ipar in parameters:
+            self.fixGlobalParam(
+                Belle2.BKLMAlignment.getGlobalUniqueID(),
+                Belle2.BKLMElementID(
+                    forward,
+                    sector,
+                    layer).getID(),
+                ipar)
+
+    def fixBKLM(self, sectors=range(1, 9), layers=range(1, 16), forbackwards=[0, 1]):
+        for sector in sectors:
+            for layer in layers:
+                for forward in forbackwards:
+                    self.fixBKLMModule(forward, sector, layer)

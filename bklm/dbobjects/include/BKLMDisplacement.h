@@ -15,7 +15,8 @@
  * constructor.                                                           *
  **************************************************************************/
 
-#pragma once
+#ifndef BKLMDISPLACEMENT_H
+#define BKLMDISPLACEMENT_H
 
 //#include <bklm/dataobjects/BKLMElementID.h>
 #include <TObject.h>
@@ -95,3 +96,4 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
+#endif

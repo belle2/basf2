@@ -304,9 +304,9 @@ void BKLMDatabaseImporter::importBklmDisplacement()
   }
 
   IntervalOfValidity Iov(0, 0, -1, -1);
-  auto IoV = IntervalOfValidity(0, 0, -1, -1);
+  //auto IoV = IntervalOfValidity(0, 0, -1, -1);
   m_displacement.import(Iov);
-//Database::Instance().storeData(mal, IoV);
+  //Database::Instance().storeData(mal, Iov); // *not* IoV);
 
 }
 

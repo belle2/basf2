@@ -55,7 +55,7 @@ def wf_display(waveform, run, event, suffix=""):
     numSamples = waveform.getSize()
     hist.SetBins(numSamples, 0.0, float(numSamples))
     title = 'chan ' + str(chan) + ' win'
-    for window in waveform.getReferenceWindows():
+    for window in waveform.getStorageWindows():
         title += ' ' + str(window)
     hist.SetTitle(title)
     hist.SetStats(False)
@@ -150,8 +150,8 @@ class WaveformDumper(Module):
             chan = waveform.getChannel()
             self.nWaveForms += 1
             # waveform.areWindowsInOrder is a bit too strict at the moment
-            wins = np.array(waveform.getReferenceWindows())
-            if not np.all(wins[:-1] <= wins[1:]):
+            wins = np.array(waveform.getStorageWindows())
+            if False and not np.all(wins[:-1] <= wins[1:]):
                 self.nWaveFormsOutOfOrder += 1
                 wf_display(waveform, run, event, "windowOrder")
                 self.plotCounter += 1
@@ -164,7 +164,7 @@ class WaveformDumper(Module):
             nPyPeaks = len(indexes)
             if len(rawDigits) != 1:
                 print("Warning: #TOPRawDigits is not 1, but", len(rawDigits))
-            if True and nPyPeaks > 3:
+            if False and nPyPeaks > 3:
                 wf_display(waveform, run, event, "tooManyPeaks")
                 self.plotCounter += 1
             raw = rawDigits[0]

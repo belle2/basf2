@@ -42,22 +42,17 @@ def stdPhotons(listtype='loose', path=analysis_main):
 # Used in skimming code
 
 
+def loadStdPhoton(listtype='loose', path=analysis_main):
+    stdPhotons(listtype, path)
+
+
 def loadStdAllPhoton(path=analysis_main):
-    fillParticleList('gamma:all', 'clusterHypothesis == 5', True, path)
-
-
-def loadStdPhoton(path=analysis_main):
-    loadStdAllPhoton(path)
+    stdPhotons('all', path)
 
 
 def loadStdGoodPhoton(path=analysis_main):
     loadStdAllPhoton(path)
     cutAndCopyList('gamma:good', 'gamma:all', '0.5 < goodGamma < 1.5', True, path)
-
-
-def loadStdGoodBellePhoton(path=analysis_main):
-    loadStdAllPhoton(path)
-    cutAndCopyList('gamma:goodBelle', 'gamma:all', '0.5 < goodBelleGamma < 1.5', True, path)
 
 
 def loadStdPhotonE12(path=analysis_main):
@@ -68,3 +63,10 @@ def loadStdPhotonE12(path=analysis_main):
 def loadStdPhotonE15(path=analysis_main):
     loadStdAllPhoton(path)
     cutAndCopyList('gamma:E15', 'gamma:all', '1.5 < E < 100', True, path)
+
+# Only used for Belle via b2bii
+
+
+def loadStdGoodBellePhoton(path=analysis_main):
+    loadStdAllPhoton(path)
+    cutAndCopyList('gamma:goodBelle', 'gamma:all', '0.5 < goodBelleGamma < 1.5', True, path)

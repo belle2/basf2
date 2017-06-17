@@ -27,6 +27,15 @@ def stdPi0s(listtype='veryLoose', path=analysis_main):
         reconstructDecay('pi0:looseFit -> gamma:pi0highE gamma:pi0highE', '0.1 < M < 0.160', 1, True, path)
         massKFit('pi0:looseFit', 0.0, '', path)
         matchMCTruth('pi0:looseFit', path)
+    elif listtype == 'all':
+        fillParticleList('gamma:all', '', True, path)
+        reconstructDecay('pi0:all -> gamma:all gamma:all', '0.09 < M < 0.165', 1, True, path)
+        matchMCTruth('pi0:all', path)
+    elif listtype == 'allFit':
+        fillParticleList('gamma:all', '', True, path)
+        reconstructDecay('pi0:allFit -> gamma:all gamma:all', '0.09 < M < 0.165', 1, True, path)
+        massKFit('pi0:allFit', 0.0, '', path)
+        matchMCTruth('pi0:allFit', path)
     else:
         fillParticleList('gamma:pi0', '', True, path)
         reconstructDecay('pi0:veryLooseFit -> gamma:pi0 gamma:pi0', '0.09 < M < 0.165', 1, True, path)
@@ -34,16 +43,14 @@ def stdPi0s(listtype='veryLoose', path=analysis_main):
         matchMCTruth('pi0:veryLooseFit', path)
 
 
-def loadStdPi0(path=analysis_main):
-    loadStdAllPi0(path)
+def loadStdPi0(listtype='veryLoose', path=analysis_main):
+    stdPi0s(listtype, path)
 
 
 def loadStdAllPi0(path=analysis_main):
-    loadStdGoodPhoton(path)
-    reconstructDecay('pi0:all -> gamma:good gamma:good', '0.11 < M < 0.16', 1,
-                     True, path)
-    massKFit('pi0:all', 0.0, '', path)
-    matchMCTruth('pi0:all', path)
+    stdPi0s('all', path)
+
+# not recommended! only here for backwards compatibility
 
 
 def loadStdLoosePi0(path=analysis_main):

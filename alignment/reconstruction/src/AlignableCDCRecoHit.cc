@@ -42,7 +42,7 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
   // Time-walk calibration (per board) TODO checksign!!!
   globals.add(
     GlobalLabel::construct<CDCTimeWalks>(CDCGeometryPar::Instance().getBoardID(getWireID()), 0),
-    sqrt(getCDCHit()->getADCCount()) * double(int(m_leftRight))
+    -1. * sqrt(m_adcCount) * double(int(m_leftRight))
   );
 
   // CDC Alignment ---------------------------------------------------

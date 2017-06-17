@@ -364,7 +364,10 @@ void MillepedeCollectorModule::collect()
           // Add derivatives for vertex calibration to first point of first trajectory
           // NOTE: use GlobalDerivatives operators vector<int> and TMatrixD which filter
           // the derivatives to not pass those with zero labels (usefull to get rid of some params)
-          daughters[0].first[0].addGlobals(globals, globals);
+          std::vector<int> lab(globals); TMatrixD der(globals);
+
+          if (!lab.empty())
+            daughters[0].first[0].addGlobals(lab, der);
         }
 
         gbl::GblTrajectory combined(daughters);

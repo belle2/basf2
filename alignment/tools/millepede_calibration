@@ -1,15 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import os
+import sys
+import inspect
+from basf2 import *    
+from ROOT import Belle2 
 
-from basf2 import *
-set_log_level(LogLevel.INFO)
+import alignment
+import alignment.setups as setups
+
+import pprint
 
 if __name__ == '__main__':
-    import os
-    import sys
-
-    import ROOT
-    from ROOT import Belle2
+    scenarios = dict()  
+    for (name, scenario) in inspect.getmembers(setups, inspect.isfunction):
+        prefix = 'setup_'
+        if scenario.__name__[:len(prefix)] == prefix and len(prefix) < len(scenario.__name__):
+            scenarios[scenario.__name__[len(prefix):]] = scenario    
 
     reset_database()
     use_database_chain()
@@ -19,114 +26,73 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(
         description="Universal tool to run Millepede collection and calibration (outside CAF, but easily portable)")
-    parser.add_argument('action', action='store', type=str, help='What to do? full (collect + calibrate) / collect / calibrate')
-    parser.add_argument(
-        'scenario',
-        action='store',
-        type=str,
-        help='Name of the scenario: global | CDCLayerAlignment | ... ')
+    
+    # Basic commands for the tool
+    parser.add_argument('scenario', action='store', choices=[name for name in scenarios], help='Name of the scenario/configuration to run/show.')            
+    parser.add_argument('action', action='store', help='Task to perform. Option "show" will display '
+                        'scenario config details and exit. "full" will run both collection and calibration.', default='info', choices=['show', 'collect', 'calibrate', 'full'])        
+    # Optional config to override that in scenario or build own scenario
+    parser.add_argument('--components', nargs='*', type=str, help='DB objects for calibration', dest='components', default=None)    
+    parser.add_argument('--tracks', nargs='*', type=str, help='Input RecoTrack collections', dest='tracks', default=None)
+    parser.add_argument('--particles', nargs='*', type=str, help='Input ParticleList objects', dest='particles', default=None)
+    parser.add_argument('--vertices', nargs='*', type=str, help='Input ParticleList objects with vertex-constrained fitted decays', dest='vertices', default=None)
+    parser.add_argument('--primary-vertices', nargs='*', type=str, help='Input ParticleList objects with vertex+beam-constrained fitted decays', dest='primary_vertices', default=None)
+    # Path configuration
+    parser.add_argument('--geometry', action='store', type=str, help='Geometry xml for Gearbox', dest='gearbox_file', default=None)
+    parser.add_argument('--geo-components', nargs='+', type=str, help='Set components of geometry module, std_reco... If None, full Belle2 geometry is used', dest='geometry_components', default=None)
+    parser.add_argument('--reco', dest='do_reconstruction', action='store_const', const=True,
+                        default=None, help='Add reconstruction modules to pre colletor path')
+    parser.add_argument('--ana', dest='do_analysis', action='store_const', const=True,
+                        default=None, help='Add analysis modules to pre colletor path')
     parser.add_argument('--magnet-off', dest='magnet_off', action='store_const', const=True,
-                        default=False, help='Special switch to collect sample with no magnetic field')
+                        default=None, help='Switch to exclude magnetic field from geometry')
+    # Allow to change calibration input file name      
+    parser.add_argument('-i', '--input', action='store', type=str, help='Input file for calibration (not basf2 option!) if output of collection is not RootOutput.root', dest='input', default='RootOutput.root')
+    
+    args, basf2_args = parser.parse_known_args()
+    # arguments for basf2 collection job
+    if basf2_args and basf2_args[0] == "--":
+        del basf2_args[0]
+    
+    # First load default settings of the scenario
+    millepede = scenarios[args.scenario]()      
+    
+    # Now update params according to program arguments
+    if args.components is not None:
+        millepede.set_components(args.components)
+    if args.tracks is not None:
+        millepede.set_param(args.tracks, 'tracks')
+    if args.particles is not None:
+        millepede.set_param(args.particles, 'particles')
+    if args.vertices is not None: 
+        millepede.set_param(args.vertices, 'vertices')
+    if args.primary_vertices is not None:
+        millepede.set_param(args.primary_vertices, 'primaryVertices')        
+    
+    # Re-setup path with modules with default configs...
+    if args.do_reconstruction is not None or args.do_analysis is not None:
+        millepede.path = setups.get_path(doReconstruction=args.do_reconstruction, doAnalysis=args.do_analysis)          
+    
+    # Simple in-place module modifications .. no need to construct path again
+    if args.gearbox_file is not None:
+          millepede.set_param(args.gearbox_file, 'fileName', 'Gearbox')
+    if args.geometry_components is not None:
+          millepede.set_param(args.geometry_components, 'components', 'Geometry')
+    if args.magnet_off is not None:
+          excludedComponents = ['MagneticField'] if args.magnet_off else []
+          millepede.set_param(excludedComponents, 'excludedComponents', 'Geometry')
 
-    args = parser.parse_args()
 
-    magnet = not bool(args.magnet_off)
-
-    from alignment import MillepedeCalibration
-
-    millepede = None
-
-    if args.scenario == 'global':
-        # Default global config:
-        millepede = MillepedeCalibration([], magnet=magnet)
-        # For mis-alignment/mis-calibration done by using "wrong" constants during collection in MC
-        millepede.algo.invertSign()
-        millepede.algo.steering().command('Fortranfiles')
-        millepede.algo.steering().command('constraints.txt')
-
-    if args.scenario == 'BeamParameters':
-        print('For the BeamParameters scenario you need ParticleList named "Z0:mumu" with')
-        print('vertex+beam constrained decays (with updated daughters) in your input DST for collection')
-
-        millepede = MillepedeCalibration(['BeamParameters'], primary_vertices=['Z0:mumu'], magnet=magnet)
-        millepede.algo.invertSign()
-
-    if args.scenario == 'VXDHalfShellsAlignment':
-        millepede = MillepedeCalibration(['VXDAlignment'], magnet=magnet)
-        millepede.algo.invertSign()
-        millepede.fixSVDPat()
-        for layer in range(1, 7):
-            for ladder in range(1, 17):
-                # Fix also all ladders
-                millepede.fixVXDid(layer, ladder, 0)
-                for sensor in range(1, 6):
-                    # Fix all sensors
-                    millepede.fixVXDid(layer, ladder, sensor)
-                    pass
-
-    if args.scenario == 'VXDAlignmentFullHierarchy':
-        millepede = MillepedeCalibration(
-            ['VXDAlignment'],
-            magnet=magnet,
-            primary_vertices=['Z0:mumu'],
-            particles=['mu+:bbmu'],
-            tracks=['CosmicRecoTracks'])
-        millepede.algo.invertSign()
-        millepede.algo.steering().command('Fortranfiles')
-        millepede.algo.steering().command('constraints.txt')
-
-    if args.scenario == 'VXDAlignment':
-        millepede = MillepedeCalibration(
-            ['VXDAlignment'],
-            magnet=magnet,
-            primary_vertices=['Z0:mumu'],
-            particles=['mu+:bbmu'],
-            tracks=['CosmicRecoTracks'])
-        millepede.algo.invertSign()
-
-        millepede.fixSVDPat()
-        millepede.fixSVDMat()
-        millepede.fixPXDYing()
-        millepede.fixPXDYang()
-        for layer in range(1, 7):
-            for ladder in range(1, 17):
-                # Fix also all ladders
-                millepede.fixVXDid(layer, ladder, 0)
-                for sensor in range(1, 6):
-                    # Fix all sensors
-                    # millepede.fixVXDid(layer, ladder, sensor)
-                    pass
-        millepede.fixVXDid(1, 1, 1)
-
-    if args.scenario == 'CDCLayerAlignment':
-        millepede = MillepedeCalibration(['CDCAlignment', 'CDCLayerAlignment'], tracks=['CosmicRecoTracks'], primary_vertices=[
-                                         'Z0:mumu'], particles=['mu+:bbmu'], magnet=magnet)
-        millepede.algo.invertSign()
-        millepede.fixCDCLayerX(49)
-        millepede.fixCDCLayerY(49)
-        millepede.fixCDCLayerRot(49)
-        millepede.fixCDCLayerX(55)
-        millepede.fixCDCLayerY(55)
-        millepede.fixCDCLayerRot(55)
-
-    if args.scenario == 'CDCTimeWalks':
-        millepede = MillepedeCalibration(['CDCTimeWalks'], magnet=magnet)
-        millepede.algo.invertSign()
-        millepede.fixCDCTimeWalk(1)
-
-    if args.scenario == 'BKLMAlignment':
-        millepede = MillepedeCalibration(['BKLMAlignment'], magnet=magnet)
-        millepede.algo.invertSign()
-
-    if args.scenario == 'EKLMAlignment':
-        millepede = MillepedeCalibration(['EKLMAlignment'], magnet=magnet)
-        millepede.algo.invertSign()
-
-    if not millepede:
-        print('You have to select some scenario, e.g. global')
-        sys.exit(1)
-
+    if args.action in ['show']:        
+        print('\n', 'Scenario: ', args.scenario, '\n')
+        pp = pprint.PrettyPrinter(depth=10)
+        pp.pprint(millepede.__getstate__())        
+        sys.exit(0)
+    
+    calibration = millepede.create(args.scenario, [])
+    
     if args.action in ['full', 'collect']:
-        millepede.collect()
+        alignment.collect(calibration, basf2_args)
+        
     if args.action in ['full', 'calibrate']:
-        millepede.calibrate()
+        alignment.calibrate(calibration, args.input)

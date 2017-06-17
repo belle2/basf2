@@ -278,12 +278,12 @@ namespace Belle2 {
      *
      * \code{.cc}
        struct example {
-         OutputToLogMessages m_interceptor{"examplestruct"};
+         IOIntercept::OutputToLogMessages m_interceptor{"examplestruct"};
          int sign(int number) {
            // this starts interception which will last until the
            // InterceptorGuard is destructed so no matter which return is taken
            // the intercept will always be properly finished()
-           InteceptorGuard<> guard(m_interceptor);
+           IOIntercept::InteceptorGuard<IOIntercept::OutputToLogMessages> guard(m_interceptor);
            if(number<0) {
              return -1;
            } else if(number>0) {
@@ -302,8 +302,7 @@ namespace Belle2 {
        * @param interceptor the interceptor object to use, must stay valid
        *        during the lifetime of this object.
        */
-      explicit InterceptorScopeGuard(T&
-                                     interceptor): m_interceptor(&interceptor)
+      explicit InterceptorScopeGuard(T& interceptor): m_interceptor(&interceptor)
       {
         m_interceptor->start();
       }
@@ -332,7 +331,7 @@ namespace Belle2 {
      * \code{.cc}
        IOIntercept::OutputToLogMessages iointercept("myinterceptor");
        if(needIntercept){
-         auto guard = start_intercept(iointercept);
+         auto guard = IOIntercept::start_intercept(iointercept);
          // while the variable guard is in scope the intercept will be active
        }
        // intercept will be disabled here

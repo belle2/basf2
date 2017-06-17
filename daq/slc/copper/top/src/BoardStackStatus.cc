@@ -142,6 +142,7 @@ void BoardStackStatus::InitNSMCallbacksCarrier(Belle2::HSLB& hslb, Belle2::RCCal
   callback.add(new NSMVHandlerFloat(vname + "tempWall", true, false, 0));
   callback.add(new NSMVHandlerFloat(vname + "tempASIC01", true, false, 0));
   callback.add(new NSMVHandlerFloat(vname + "tempASIC23", true, false, 0));
+  callback.add(new NSMVHandlerFloat(vname + "lookbackGet", true, false, 0));
 }
 
 void BoardStackStatus::UpdateNSMCallbacksSCROD(Belle2::HSLB& hslb, Belle2::RCCallback& callback)
@@ -200,6 +201,8 @@ void BoardStackStatus::UpdateNSMCallbacksCarrier(Belle2::HSLB& hslb, Belle2::RCC
   callback.set(vname + "tempWall", m_boardstackObservables.cWallTemperature.at(carrier));
   callback.set(vname + "tempASIC01", m_boardstackObservables.cASIC01Temperature.at(carrier));
   callback.set(vname + "tempASIC23", m_boardstackObservables.cASIC23Temperature.at(carrier));
+  //lookback window setting
+  callback.set(vname + "lookbackGet", Read_Register(hslb, CARRIER_IRSX_readoutLookback, carrier, 0));
 }
 
 void BoardStackStatus::PrintSCRODStatus()

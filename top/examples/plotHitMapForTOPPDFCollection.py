@@ -9,7 +9,7 @@ from matplotlib.colors import LogNorm
 import ROOT
 import progressbar
 
-f = ROOT.TFile.Open("TOPOutput.root")
+f = ROOT.TFile.Open("TOPOutputOne.root")
 t = f.Get("tree")
 gcmap = 'plasma'
 

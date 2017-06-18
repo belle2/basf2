@@ -96,6 +96,7 @@ if not os.path.exists(outdir):
 
 # log message
 B2RESULT('Output file: ' + outputFile)
+B2RESULT('Corresponds to ' + equivTime + ' us of running phase ' + str(phase))
 
 # Suppress messages and warnings during processing:
 set_log_level(LogLevel.RESULT)

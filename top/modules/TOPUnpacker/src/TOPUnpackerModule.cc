@@ -30,6 +30,7 @@
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPSlowData.h>
 #include <top/dataobjects/TOPInterimFEInfo.h>
+#include <top/dataobjects/TOPTemplateFitResult.h>
 
 #include <bitset>
 
@@ -64,6 +65,8 @@ namespace Belle2 {
              "name of TOPRawWaveform store array", string(""));
     addParam("outputRawDigitsName", m_outputRawDigitsName,
              "name of TOPRawDigit store array", string(""));
+    addParam("outputTemplateFitResultName", m_templateFitResultName,
+             "name of TOPTemplateFitResult", string(""));
     addParam("swapBytes", m_swapBytes, "if true, swap bytes", false);
     addParam("dataFormat", m_dataFormat,
              "data format as defined in top/include/RawDataTypes.h, 0 = auto detect", 0);
@@ -99,7 +102,11 @@ namespace Belle2 {
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.registerInDataStore(DataStore::c_DontWriteOut);
 
+    StoreArray<TOPTemplateFitResult> templateFitResults(m_templateFitResultName);
+    templateFitResults.registerInDataStore(DataStore::c_DontWriteOut);
+
     rawDigits.registerRelationTo(waveforms, DataStore::c_Event, DataStore::c_DontWriteOut);
+    rawDigits.registerRelationTo(templateFitResults, DataStore::c_Event, DataStore::c_DontWriteOut);
     rawDigits.registerRelationTo(info, DataStore::c_Event, DataStore::c_DontWriteOut);
     waveforms.registerRelationTo(info, DataStore::c_Event, DataStore::c_DontWriteOut);
 
@@ -129,6 +136,8 @@ namespace Belle2 {
     rawDigits.clear();
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.clear();
+    StoreArray<TOPTemplateFitResult> templateFitResults(m_templateFitResultName);
+    templateFitResults.clear();
     StoreArray<TOPSlowData> slowData;
     slowData.clear();
 
@@ -150,10 +159,10 @@ namespace Belle2 {
             unpackType0Ver16(buffer, bufferSize, rawDigits, slowData);
             break;
           case static_cast<int>(TOP::RawDataType::c_Type2Ver1):
-            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, false);
+            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, templateFitResults, false);
             break;
           case static_cast<int>(TOP::RawDataType::c_Type3Ver1):
-            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, true);
+            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, templateFitResults, true);
             break;
           case static_cast<int>(TOP::RawDataType::c_Draft):
             unpackProductionDraft(buffer, bufferSize, digits);
@@ -287,6 +296,7 @@ namespace Belle2 {
   int TOPUnpackerModule::unpackInterimFEVer01(const int* buffer, int bufferSize,
                                               StoreArray<TOPRawDigit>& rawDigits,
                                               StoreArray<TOPRawWaveform>& waveforms,
+                                              StoreArray<TOPTemplateFitResult>& templateFits,
                                               bool pedestalSubtracted)
   {
 
@@ -429,7 +439,7 @@ namespace Belle2 {
 
         word = array.getWord(); // word 14
         short integral_n = word & 0xFFFF;
-        //      short qualityFlags_n = (word >> 16) & 0xFFFF;
+        short qualityFlags_n = (word >> 16) & 0xFFFF;
 
         if (abs(valuePeak_p) != 9999) {
           auto* digit = rawDigits.appendNew(scrodID);
@@ -450,6 +460,15 @@ namespace Belle2 {
           //        digit->setErrorFlags(qualityFlags_p); // not good solution !
           digit->addRelationTo(info);
           digits.push_back(digit);
+          //template fit result is saved in negative pulse fe data
+          if (valuePeak_p < 150) {
+            auto* tlpfResult = templateFits.appendNew();
+            tlpfResult->setBackgroundOffset(samplePeak_n);
+            tlpfResult->setAmplitude(valuePeak_n);
+            tlpfResult->setChisquare(qualityFlags_n);
+            tlpfResult->setRisingEdge(integral_n);
+            digit->addRelationTo(tlpfResult);
+          }
         }
         if (abs(valuePeak_n) != 9999) {
           auto* digit = rawDigits.appendNew(scrodID);

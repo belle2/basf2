@@ -113,6 +113,13 @@ main.add_module(topdqm)
 # Output
 output = register_module('RootOutput')
 output.param('outputFileName', 'TOPOutput.root')
+branches = [
+    'TOPDigits',
+    'TOPRawWaveforms',
+    'TOPPDFCollections',
+    'TOPSmallestPullCollections'
+]
+output.param('branchNames', branches)
 main.add_module(output)
 
 # Show progress of processing

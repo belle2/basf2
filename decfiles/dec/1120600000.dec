@@ -15,8 +15,7 @@ Decay Upsilon(4S)
 Enddecay
 #
 Decay B0sig
-#1.000		tau+		tau-		BTOSLLBALL;
-1.000		tau+		tau-		PHSP;
+1.000		tau+		tau-		SLL;
 Enddecay
 CDecay anti-B0sig
 #

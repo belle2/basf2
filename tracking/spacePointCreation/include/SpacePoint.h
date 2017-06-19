@@ -394,11 +394,11 @@ namespace Belle2 {
     static void boundaryCheck(SpBaseType& value, SpBaseType lower = 0, SpBaseType higher = 1)
     {
       if (value < lower) {
-        B2WARNING("SpacePoint::boundaryCheck: value had to be moved (lowerCheck)! old: " << value << ", new: " << lower);
+        B2DEBUG(1, "SpacePoint::boundaryCheck: value had to be moved (lowerCheck)! old: " << value << ", new: " << lower);
         value = lower;
       }
       if (value > higher) {
-        B2WARNING("SpacePoint::boundaryCheck: value had to be moved (higherCheck)! old: " << value << ", new: " << higher);
+        B2DEBUG(1, "SpacePoint::boundaryCheck: value had to be moved (higherCheck)! old: " << value << ", new: " << higher);
         value = higher;
       }
 

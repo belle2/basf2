@@ -4,6 +4,50 @@ File for summarizing all default generator settings.
 from ROOT import Belle2
 
 
+def add_babayaganlo_generator(path, finalstate='ee'):
+    """
+    Add the high precision QED generator BABAYAGA.NLO to the path. Settings correspond to cross sections in BELLE2-NOTE-PH-2015-006
+    :param path: Add the modules to this path
+    :param finalstate: ee or gg
+    """
+
+    babayaganlo = path.add_module("BabayagaNLOInput")
+
+    if finalstate == 'ee':
+        babayaganlo.param('FinalState', 'ee')
+        babayaganlo.param('ScatteringAngleRange', [10.0, 170.0])
+        babayaganlo.param('MinEnergy', 0.15)
+        babayaganlo.param('FMax', 1.e5)
+
+
+def add_phokhara_generator(path, finalstate='mu+mu-'):
+    """
+    Add the high precision QED generator PHOKHARA to the path. Almost full acceptance settings for photons and hadrons/muons.
+    :param path: Add the modules to this path
+    :param finalstate: One of the possible final states using the PHOKHARA particle naming
+    """
+
+    phokhara = path.add_module('PhokharaInput')
+
+    if finalstate == 'mu+mu-':
+        phokhara.param('FinalState', 0)
+        phokhara.param('LO', 0)  # force ISR production, no non-radiative production
+        phokhara.param('NLO', 1)  # use full two loop corrections
+        phokhara.param('QED', 0)  # use ISR only, no FSR, no interference
+
+    elif finalstate == 'pi+pi-':
+        phokhara.param('FinalState', 1)
+        phokhara.param('LO', 0)  # force ISR production, no non-radiative production
+        phokhara.param('NLO', 1)  # use full two loop corrections
+        phokhara.param('QED', 0)  # use ISR only, no FSR, no interference
+
+    elif finalstate == 'pi+pi-pi0':
+        phokhara.param('FinalState', 8)
+        phokhara.param('LO', 0)  # force ISR production, no non-radiative production
+        phokhara.param('NLO', 0)  # no two loop corrections
+        phokhara.param('QED', 0)  # use ISR only, no FSR, no interference
+
+
 def add_cosmics_generator(path, components=None, global_box_size=None, accept_box=None,
                           keep_box=None,
                           cosmics_data_dir='data/generators/modules/cryinput/',

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# The VariablesToHistogram module saves variables from the VariableManager to TH1F and TH2F
+
 from basf2 import *
 from modularAnalysis import *
-from beamparameters import add_beamparameters
 
 inputMdstList('default', ['/local/scratch/MC/MC5/Charged00/mdst_000001_prod00000002_task02000001.root'])
 

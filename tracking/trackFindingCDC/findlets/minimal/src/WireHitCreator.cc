@@ -70,6 +70,12 @@ void WireHitCreator::exposeParameters(ModuleParamList* moduleParamList, const st
                                 m_param_useSuperLayers,
                                 "List of super layers to be used - mostly for debugging",
                                 m_param_useSuperLayers);
+
+  moduleParamList->addParameter(prefixed(prefix, "useSecondHits"),
+                                m_param_useSecondHits,
+                                "Use the second hit information in the track finding.",
+                                m_param_useSecondHits);
+
 }
 
 void WireHitCreator::initialize()
@@ -149,6 +155,12 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
 
   outputWireHits.reserve(nHits);
   for (const CDCHit& hit : hits) {
+
+    // ignore this hit if it contains the information of a 2nd hit
+    if (!m_param_useSecondHits && hit.is2ndHit()) {
+      continue;
+    }
+
     WireID wireID(hit.getID());
     if (not wireTopology.isValidWireID(wireID)) {
       B2WARNING("Skip invalid wire id " << hit.getID());

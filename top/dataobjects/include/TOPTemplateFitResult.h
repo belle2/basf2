@@ -65,6 +65,12 @@ namespace Belle2 {
     double getRisingEdge() const {return m_risingEdge;}
 
     /**
+     * Get rising Edge Raw
+     * @return rising edge raw
+     */
+    unsigned getRisingEdgeRaw() const {return m_risingEdgeRaw;}
+
+    /**
      * Get background offset
      * @return background offset
      */
@@ -111,6 +117,7 @@ namespace Belle2 {
     double risingEdgeShortToRisingEdgeDouble(unsigned short risingEdgeS) const;
 
     double m_risingEdge;/**< template fit rising edge position*/
+    unsigned m_risingEdgeRaw;/**< template fit rising edge position received from FEE*/
     short m_backgroundOffset;/**< background offset from fit*/
     short m_amplitude;/**< amplitude from fit*/
     unsigned short m_chisquare;/**< chi square value of template fit */

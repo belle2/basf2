@@ -19,6 +19,7 @@ TOPTemplateFitResult::TOPTemplateFitResult() {}
 TOPTemplateFitResult::TOPTemplateFitResult(unsigned short risingEdge, short backgroundOffset,
                                            short amplitude, unsigned short chisquare)
 {
+  m_risingEdgeRaw = risingEdge;
   m_risingEdge = risingEdgeShortToRisingEdgeDouble(risingEdge);
   m_backgroundOffset = backgroundOffset;
   m_amplitude = amplitude;
@@ -27,6 +28,7 @@ TOPTemplateFitResult::TOPTemplateFitResult(unsigned short risingEdge, short back
 
 void TOPTemplateFitResult::setRisingEdge(unsigned short risingEdge)
 {
+  m_risingEdgeRaw = risingEdge;
   m_risingEdge = risingEdgeShortToRisingEdgeDouble(risingEdge);
 }
 

@@ -47,8 +47,8 @@ VariablesToTreeModule::VariablesToTreeModule() :
            "List of variables to save for eac event. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. Only event-based variables are allowed here.",
            emptylist);
 
-  addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToNtuple.root"));
-  addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("ntuple"));
+  addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToTree.root"));
+  addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("tree"));
   addParam("maxCandidates", m_maxCandidates, "The maximum number of candidates in the ParticleList per entry of the Tree.", 100u);
 
   std::tuple<std::string, std::map<int, unsigned int>> default_sampling{"", {}};

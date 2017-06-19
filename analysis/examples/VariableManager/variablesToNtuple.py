@@ -6,7 +6,7 @@
 from basf2 import *
 from modularAnalysis import *
 
-inputMdstList('default', ['/local/scratch/MC/MC5/Charged00/mdst_000001_prod00000002_task02000001.root'])
+inputMdstList('MC7', ['/storage/jbod/tkeck/MC7/evtgen-charged/sub00/mdst_000240_prod00000788_task00000685.root'])
 
 fillParticleLists([('K-', 'Kid > 0.2'), ('pi+', 'piid > 0.2')])
 reconstructDecay('D0 -> K- pi+', '1.750 < M < 1.95')
@@ -23,7 +23,7 @@ analysis_main.add_module('VariablesToNtuple',
 # but all the variables to specify have to be event-based
 analysis_main.add_module('VariablesToNtuple',
                          particleList='',
-                         variables=['nTracks', 'evtNum', 'runNum', 'expNum']
+                         variables=['nTracks', 'evtNum', 'runNum', 'expNum'],
                          fileName='EventVariables.root')
 
 process(analysis_main)

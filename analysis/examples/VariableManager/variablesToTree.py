@@ -6,7 +6,7 @@
 from basf2 import *
 from modularAnalysis import *
 
-inputMdstList('default', ['/local/scratch/MC/MC5/Charged00/mdst_000001_prod00000002_task02000001.root'])
+inputMdstList('MC7', ['/storage/jbod/tkeck/MC7/evtgen-charged/sub00/mdst_000240_prod00000788_task00000685.root'])
 
 fillParticleLists([('K-', 'Kid > 0.2'), ('pi+', 'piid > 0.2')])
 reconstructDecay('D0 -> K- pi+', '1.750 < M < 1.95')

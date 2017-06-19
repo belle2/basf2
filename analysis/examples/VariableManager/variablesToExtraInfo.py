@@ -6,7 +6,7 @@
 from basf2 import *
 from modularAnalysis import *
 
-inputMdstList('default', ['/local/scratch/MC/MC5/Charged00/mdst_000001_prod00000002_task02000001.root'])
+inputMdstList('MC7', ['/storage/jbod/tkeck/MC7/evtgen-charged/sub00/mdst_000240_prod00000788_task00000685.root'])
 
 fillParticleLists([('K-', 'Kid > 0.2'), ('pi+', 'piid > 0.2')])
 reconstructDecay('D0 -> K- pi+', '1.750 < M < 1.95')
@@ -17,11 +17,11 @@ analysis_main.add_module('VariablesToExtraInfo',
                          particleList='D0',
                          variables={'M': 'M_before_vertex_fit'})
 
-fitVertex('D0')
+fitVertex('D0', -2.0)
 
 analysis_main.add_module('VariablesToNtuple',
                          particleList='D0',
-                         variables=['M', 'exraInfo(M_before_vertex_fit)'])
+                         variables=['M', 'extraInfo(M_before_vertex_fit)'])
 
 process(analysis_main)
 print(statistics)

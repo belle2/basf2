@@ -33,15 +33,20 @@ namespace Belle2 {
 
       /// Implementation of the phi calculation.
       Weight operator()(const CDCTrack& fromTrack, const CDCTrack& toTrack) final {
+        // Make sure we only have one relation out of A -> B and B -> A
+        if (fromTrack.getStartRecoPos3D().y() < toTrack.getStartRecoPos3D().y())
+        {
+          return NAN;
+        }
+
         const double lhsPhi = fromTrack.getStartTrajectory3D().getFlightDirection3DAtSupport().phi();
         const double rhsPhi = toTrack.getStartTrajectory3D().getFlightDirection3DAtSupport().phi();
 
-        // We do not use a abs here, as we only want to have one of the two relations in the end
-        const double phiDistance = AngleUtil::normalised(lhsPhi - rhsPhi);
+        const double phiDistance = std::fabs(AngleUtil::normalised(lhsPhi - rhsPhi));
 
-        if (phiDistance > m_param_maximalPhiDistance or phiDistance < 0)
+        if (phiDistance > m_param_maximalPhiDistance)
         {
-          return std::nan("");
+          return NAN;
         } else {
           return phiDistance;
         }

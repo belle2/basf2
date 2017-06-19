@@ -10,18 +10,23 @@
 # the branch-names outputted by modules like VariablesToHistogram, VariablesToNtuple and VariablesToTree
 # using the makeROOTCompatible function
 
-import variables as v
+import variables
+from variables import variables as v
 
-var = v.variables.getVariable('M')
+var = v.getVariable('M')
 print("Name and Description of Variable M")
 print(var.name)
 print(var.description)
 
-v.variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
-var = v.variables.getVariable('sigProb')
+v.addAlias('sigProb', 'extraInfo(SignalProbability)')
+var = v.getVariable('sigProb')
 print("Real name of sigProb: ", var.name)
 
-result = v.variables.evaluate('constant(123)', None)
+v.addCollection('Kinematics', variables.std_vector('px', 'py', 'pz'))
+var = v.getCollection('Kinematics')
+print("Collection named Kinematics: ", list(var))
+
+result = v.evaluate('constant(123)', None)
 print("Result of evaluating the variable 'constant(123)' ", result)
 
 import ROOT

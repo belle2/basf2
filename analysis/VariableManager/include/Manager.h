@@ -1,5 +1,7 @@
 #pragma once
 
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
+
 #include <string>
 #include <map>
 #include <vector>
@@ -142,9 +144,24 @@ namespace Belle2 {
       std::vector<const Belle2::Variable::Manager::Var*> getVariables(const std::vector<std::string>& variables);
 
       /** Add alias
-       * Return tru if the alias was successfully added
+       * Return true if the alias was successfully added
        */
       bool addAlias(const std::string& alias, const std::string& variable);
+
+      /** Add collection
+       * Return true if the collection was successfully added
+       */
+      bool addCollection(const std::string& collection, const std::vector<std::string>& variables);
+
+      /** Get Collection
+       * Returns variable names corresponding to the given collection
+       */
+      std::vector<std::string> getCollection(const std::string& collection);
+
+      /** Resolve Collection
+       * Returns variable names corresponding to the given collection or if it is not a collection just the variable itself
+       */
+      std::vector<std::string> resolveCollections(const std::vector<std::string>& variables);
 
       /** Return list of all variables (in order registered). */
       std::vector<const Belle2::Variable::Manager::VarBase*> getVariables() const { return m_variablesInRegistrationOrder; }
@@ -189,13 +206,15 @@ namespace Belle2 {
       /** List of variables in registration order. */
       std::vector<const VarBase*> m_variablesInRegistrationOrder;
 
-      /** List of registered variables. */
+      /** List of registered aliases. */
       std::map<std::string, std::string> m_alias;
+      /** List of registered collections. */
+      std::map<std::string, std::vector<std::string>> m_collection;
       /** List of registered variables. */
       std::map<std::string, std::shared_ptr<Var>> m_variables;
-      /** List of registered variables. */
+      /** List of registered parameter variables. */
       std::map<std::string, std::shared_ptr<ParameterVar>> m_parameter_variables;
-      /** List of registered variables. */
+      /** List of registered meta variables. */
       std::map<std::string, std::shared_ptr<MetaVar>> m_meta_variables;
     };
 

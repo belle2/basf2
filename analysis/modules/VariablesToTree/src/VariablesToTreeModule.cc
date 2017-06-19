@@ -40,11 +40,11 @@ VariablesToTreeModule::VariablesToTreeModule() :
            "Name of particle list with reconstructed particles. An empty ParticleList is not supported. Use the VariablesToNtupleModule for this use-case",
            std::string(""));
   addParam("variables", m_variables,
-           "List of variables to save for each candidate. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
+           "List of variables (or collections) to save for each candidate. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
            emptylist);
 
   addParam("event_variables", m_event_variables,
-           "List of variables to save for eac event. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. Only event-based variables are allowed here.",
+           "List of variables (or collections) to save for each event. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. Only event-based variables are allowed here.",
            emptylist);
 
   addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToTree.root"));
@@ -77,6 +77,9 @@ void VariablesToTreeModule::initialize()
     B2WARNING("Tree with this name already exists: " << m_fileName);
     return;
   }
+
+  m_variables = Variable::Manager::Instance().resolveCollections(m_variables);
+  m_event_variables = Variable::Manager::Instance().resolveCollections(m_event_variables);
 
   m_tree.registerInDataStore(m_fileName + m_treeName, DataStore::c_DontWriteOut);
   m_tree.construct(m_treeName.c_str(), "");

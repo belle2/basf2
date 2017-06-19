@@ -41,7 +41,7 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
            "Name of particle list with reconstructed particles. If no list is provided the variables are saved once per event (only possible for event-type variables)",
            std::string(""));
   addParam("variables", m_variables,
-           "List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
+           "List of variables (or collections) to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
            emptylist);
 
   addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToNtuple.root"));
@@ -74,6 +74,8 @@ void VariablesToNtupleModule::initialize()
     B2WARNING("Tree with this name already exists: " << m_fileName);
     return;
   }
+
+  m_variables = Variable::Manager::Instance().resolveCollections(m_variables);
 
   // root wants var1:var2:...
   string varlist = "__weight__";

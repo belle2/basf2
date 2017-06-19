@@ -77,6 +77,52 @@ bool Variable::Manager::addAlias(const std::string& alias, const std::string& va
   return true;
 }
 
+bool Variable::Manager::addCollection(const std::string& collection, const std::vector<std::string>& variables)
+{
+
+  assertValidName(collection);
+
+  if (m_collection.find(collection) != m_collection.end()) {
+    B2WARNING("Another collection with the name'" << collection << "' is already set! I overwrite it!");
+    m_collection[collection] = variables;
+    return true;
+  }
+
+  if (m_variables.find(collection) != m_variables.end()) {
+    B2ERROR("Variable with the name '" << collection << "' exists already, won't add it as an collection!");
+    return false;
+  }
+
+  m_collection.insert(std::make_pair(collection, variables));
+  return true;
+}
+
+
+std::vector<std::string> Variable::Manager::getCollection(const std::string& collection)
+{
+
+  return m_collection[collection];
+
+}
+
+std::vector<std::string> Variable::Manager::resolveCollections(const std::vector<std::string>& variables)
+{
+
+  std::vector<std::string> temp;
+
+  for (const auto& var : variables) {
+    auto it = m_collection.find(var);
+    if (it != m_collection.end()) {
+      temp.insert(temp.end(), it->second.begin(), it->second.end());
+    } else {
+      temp.push_back(var);
+    }
+  }
+  return temp;
+
+}
+
+
 void Variable::Manager::assertValidName(const std::string& name)
 {
   const static boost::regex allowedNameRegex("^[a-zA-Z0-9_]*$");

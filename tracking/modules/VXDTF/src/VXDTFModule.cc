@@ -4179,12 +4179,12 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
     try {
       accepted = threeHitFilterBox.checkPt(FilterID::pTHighOccupancy);
     } catch (FilterExceptions::Straight_Line& anException) {
-      B2WARNING("Exception caught: " << FilterID::pTHighOccupancy << " failed with exception: " << anException.what() <<
-                " test-result is set negative...");
+      B2DEBUG(1, "Exception caught: " << FilterID::pTHighOccupancy << " failed with exception: " << anException.what() <<
+              " test-result is set negative...");
       accepted = false;
     } catch (FilterExceptions::Circle_too_small& anException) {
-      B2WARNING("Exception caught: " << FilterID::pTHighOccupancy << " failed with exception: " << anException.what() <<
-                " test-result is set negative...");
+      B2DEBUG(1, "Exception caught: " << FilterID::pTHighOccupancy << " failed with exception: " << anException.what() <<
+              " test-result is set negative...");
       accepted = false;
     } catch (...) {
       // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
@@ -4210,12 +4210,12 @@ bool VXDTFModule::SegFinderHighOccupancy(PassData* currentPass, NbFinderFilters&
     try {
       accepted = threeHitFilterBox.checkHelixParameterFit(FilterID::helixParameterHighOccupancyFit);
     } catch (FilterExceptions::Straight_Line& anException) {
-      B2WARNING("Exception caught: " << FilterID::helixParameterHighOccupancyFit << " failed with exception: " << anException.what() <<
-                " test-result is set negative...");
+      B2DEBUG(1, "Exception caught: " << FilterID::helixParameterHighOccupancyFit << " failed with exception: " << anException.what() <<
+              " test-result is set negative...");
       accepted = false;
     } catch (FilterExceptions::Circle_too_small& anException) {
-      B2WARNING("Exception caught: helixParameterHighOccupancyFit failed with exception: " << anException.what() <<
-                " test-result is set negative...");
+      B2DEBUG(1, "Exception caught: helixParameterHighOccupancyFit failed with exception: " << anException.what() <<
+              " test-result is set negative...");
       accepted = false;
     } catch (...) {
       // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
@@ -4390,12 +4390,12 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           try {
             accepted = currentPass->threeHitFilterBox.checkCircleDist2IP(FilterID::distance2IP);
           } catch (FilterExceptions::Straight_Line& anException) {
-            B2WARNING("Exception caught: " << FilterID::distance2IP << " failed with exception: " << anException.what() <<
-                      " test-result is set negative...");
+            B2DEBUG(1, "Exception caught: " << FilterID::distance2IP << " failed with exception: " << anException.what() <<
+                    " test-result is set negative...");
             accepted = false;
           } catch (FilterExceptions::Circle_too_small& anException) {
-            B2WARNING("Exception caught: " << FilterID::distance2IP << " failed with exception: " << anException.what() <<
-                      " test-result is set negative...");
+            B2DEBUG(1, "Exception caught: " << FilterID::distance2IP << " failed with exception: " << anException.what() <<
+                    " test-result is set negative...");
             accepted = false;
           } catch (...) {
             // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
@@ -4438,12 +4438,12 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           try {
             accepted = currentPass->threeHitFilterBox.checkPt(FilterID::pT);
           } catch (FilterExceptions::Straight_Line& anException) {
-            B2WARNING("Exception caught: " << FilterID::pT << " failed with exception: " << anException.what() <<
-                      " test-result is set negative...");
+            B2DEBUG(1, "Exception caught: " << FilterID::pT << " failed with exception: " << anException.what() <<
+                    " test-result is set negative...");
             accepted = false;
           } catch (FilterExceptions::Circle_too_small& anException) {
-            B2WARNING("Exception caught: " << FilterID::pT << " failed with exception: " << anException.what() <<
-                      " test-result is set negative...");
+            B2DEBUG(1, "Exception caught: " << FilterID::pT << " failed with exception: " << anException.what() <<
+                    " test-result is set negative...");
             accepted = false;
           } catch (...) {
             // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
@@ -4469,12 +4469,12 @@ int VXDTFModule::neighbourFinder(PassData* currentPass)
           try {
             accepted = currentPass->threeHitFilterBox.checkHelixParameterFit(FilterID::helixParameterFit);
           } catch (FilterExceptions::Straight_Line& anException) {
-            B2WARNING("Exception caught: " << FilterID::helixParameterFit << " failed with exception: " << anException.what() <<
-                      " test-result is set negative...");
+            B2DEBUG(1, "Exception caught: " << FilterID::helixParameterFit << " failed with exception: " << anException.what() <<
+                    " test-result is set negative...");
             accepted = false;
           } catch (FilterExceptions::Circle_too_small& anException) {
-            B2WARNING("Exception caught: " << FilterID::helixParameterFit << " failed with exception: " << anException.what() <<
-                      " test-result is set negative...");
+            B2DEBUG(1, "Exception caught: " << FilterID::helixParameterFit << " failed with exception: " << anException.what() <<
+                    " test-result is set negative...");
             accepted = false;
           } catch (...) {
             // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
@@ -4818,12 +4818,12 @@ bool VXDTFModule::NbFinderHighOccupancy(PassData* currentPass, TcFourHitFilters&
     try {
       accepted = fourHitFilterBox.checkDeltaDistCircleCenter(FilterID::deltaDistanceHighOccupancy2IP);
     } catch (FilterExceptions::Straight_Line& anException) {
-      B2WARNING("Exception caught: " << FilterID::deltaDistanceHighOccupancy2IP << " failed with exception: " << anException.what() <<
-                " test-result is set negative...");
+      B2DEBUG(1, "Exception caught: " << FilterID::deltaDistanceHighOccupancy2IP << " failed with exception: " << anException.what() <<
+              " test-result is set negative...");
       accepted = false;
     } catch (FilterExceptions::Circle_too_small& anException) {
-      B2WARNING("Exception caught: " << FilterID::deltaDistanceHighOccupancy2IP << " failed with exception: " << anException.what() <<
-                " test-result is set negative...");
+      B2DEBUG(1, "Exception caught: " << FilterID::deltaDistanceHighOccupancy2IP << " failed with exception: " << anException.what() <<
+              " test-result is set negative...");
       accepted = false;
     } catch (...) {
       // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
@@ -4849,12 +4849,12 @@ bool VXDTFModule::NbFinderHighOccupancy(PassData* currentPass, TcFourHitFilters&
     try {
       accepted = fourHitFilterBox.checkDeltapT(FilterID::deltapTHighOccupancy);
     } catch (FilterExceptions::Straight_Line& anException) {
-      B2WARNING("Exception caught: " << FilterID::deltapTHighOccupancy << " failed with exception: " << anException.what() <<
-                " test-result is set negative...");
+      B2DEBUG(1, "Exception caught: " << FilterID::deltapTHighOccupancy << " failed with exception: " << anException.what() <<
+              " test-result is set negative...");
       accepted = false;
     } catch (FilterExceptions::Circle_too_small& anException) {
-      B2WARNING("Exception caught: " << FilterID::deltapTHighOccupancy << " failed with exception: " << anException.what() <<
-                " test-result is set negative...");
+      B2DEBUG(1, "Exception caught: " << FilterID::deltapTHighOccupancy << " failed with exception: " << anException.what() <<
+              " test-result is set negative...");
       accepted = false;
     } catch (...) {
       // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
@@ -5255,13 +5255,13 @@ int VXDTFModule::tcFilter(PassData* currentPass, int passNumber)
         succeeded = doTheCircleFit(currentPass, (*currentTC), nCurrentHits, tcCtr);
       } catch (FilterExceptions::Calculating_Curvature_Failed& anException) {
         succeeded = false;
-        B2WARNING("tcFilter:doTheCircleFit failed, reason: " << anException.what());
+        B2DEBUG(1, "tcFilter:doTheCircleFit failed, reason: " << anException.what());
       } catch (FilterExceptions::Center_Is_Origin& anException) {
         succeeded = false;
-        B2WARNING("tcFilter:doTheCircleFit failed, reason: " << anException.what());
+        B2DEBUG(1, "tcFilter:doTheCircleFit failed, reason: " << anException.what());
       }  catch (FilterExceptions::Circle_too_small& anException) {
         succeeded = false;
-        B2WARNING("tcFilter:doTheCircleFit failed, reason: " << anException.what());
+        B2DEBUG(1, "tcFilter:doTheCircleFit failed, reason: " << anException.what());
       } catch (...) {
         // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
         succeeded = false;
@@ -6320,10 +6320,10 @@ bool VXDTFModule::baselineTF(vector<ClusterInfo>& clusters, PassData* passInfo)
       }
     } catch (FilterExceptions::Center_Is_Origin& anException) {
       survivedCF = false;
-      B2WARNING("baselineTF:doTheCircleFit failed, reason: " << anException.what());
+      B2DEBUG(1, "baselineTF:doTheCircleFit failed, reason: " << anException.what());
     }  catch (FilterExceptions::Circle_too_small& anException) {
       survivedCF = false;
-      B2WARNING("baselineTF:doTheCircleFit failed, reason: " << anException.what());
+      B2DEBUG(1, "baselineTF:doTheCircleFit failed, reason: " << anException.what());
     } catch (...) {
       // B2ERROR( "Unexpected exception thown by Jakob and catched by Eugenio" );
       survivedCF = false;

@@ -450,7 +450,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False, use_sec
 
 
 def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0, 0), merge_tracks=True,
-                             use_second_hits=False):
+                             use_second_cdc_hits=False):
     """
     Convenience function for adding all cdc track finder modules currently dedicated for the CDC-TOP testbeam
     to the path.
@@ -471,7 +471,7 @@ def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0
 
     # Init the geometry for cdc tracking and the hits
     path.add_module("TFCDC_WireHitPreparer",
-                    useSecondHits=use_second_hits,
+                    useSecondHits=use_second_cdc_hits,
                     flightTimeEstimation="downwards",
                     triggerPoint=trigger_point)
 

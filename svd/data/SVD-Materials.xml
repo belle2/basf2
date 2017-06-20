@@ -12,7 +12,7 @@
   </Material>
   <Material name="SVD-Keratherm">
     <state>Solid</state>
-    <density unit="g/cm3">1.79</density>
+    <density unit="g/cm3">1.9</density>
     <Components>
       <Element fraction="0.2564">H</Element>
       <Element fraction="0.5641">C</Element>
@@ -22,11 +22,11 @@
   </Material>
  <Material name="SVD-Peek">
     <state>Solid</state>
-    <density unit="g/cm3">1.32</density>
+    <density unit="g/cm3">1.31</density>
     <Components>
-      <Element fraction="0.01">H</Element>
-      <Element fraction="0.04">C</Element>
-      <Element fraction="0.95">O</Element>
+      <Element fraction="0.25">H</Element>
+      <Element fraction="0.60">C</Element>
+      <Element fraction="0.15">O</Element>
     </Components>
   </Material>
   <Material name="SVD-Glue">

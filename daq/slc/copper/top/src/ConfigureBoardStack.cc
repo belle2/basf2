@@ -269,7 +269,7 @@ namespace ConfigBoardstack {
     }
 
     Write_Register(hslb, CARRIER_IRSX_regLoadPeriod, 0, carrier, asic);
-    Write_Register(hslb, CARRIER_IRSX_regLatchPeriod, 0, carrier, asic);
+    Write_Register(hslb, CARRIER_IRSX_regLatchPeriod, 4, carrier, asic);
     JuiceASIC(hslb, carrier, asic, true);
     //set dt Values
     for (unsigned i = 0; i < 128; ++i) {

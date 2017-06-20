@@ -16,7 +16,7 @@ ifneq ($(NOT_USE_PSQL),yes)
 LIBS    += -L$(LIBDIR) -ldaq_slc_psql -L$(PGSQL_LIB_PATH) -lpq
 endif
 
-CFLAGS   = -g -Wall -fPIC -D_REENTRANT
+CFLAGS   = -g -Wall -fPIC -D_REENTRANT -Wno-deprecated
 CFLAGS  += -I$(BELLE2_DAQ_SLC)/include -I.
 ifneq ($(NOT_USE_PSQL),yes)
 CFLAGS  += -L$(PGSQL_INC_PATH) -lpq
@@ -43,6 +43,7 @@ clean:
 
 $(TARGETS): $(BINDIR)/% : %.cc $(OBJS)
 	@ echo '<< creating executable $@ >>'
+	@ if [ ! -f $(LIBDIR)"/libvxi11.so" ]; then make -C ../vxilib lib && mv ../vxilib/libvxi11.so $(LIBDIR); fi
 	@ $(CXX) $(CFLAGS) $(LIBS)  $^ -o $@ $(GLIBS) $(LOADLIBES)
 	@ $(RM) *~ */*~ \#*\#* */\#*\#*
 	@ echo '<< compiling succeded!! >>'
@@ -51,7 +52,7 @@ $(OBJS): $(TMPDIR)/%.o : $(SRCDIR)/%.cc $(INCDIR)/%.h
 	@ echo '<< compiling $@ >>'
 	@ $(CXX) -c $(CFLAGS) $< -o  $@
 
-$(DEPS) : $(TMPDIR)/%.d: $(SRCDIR)/%.cc $(INCDIR)/%.h
+$(DEPS) : $(TMPDIR)/%.d: $(SRCDIR)/%.cc $(INCDIR)/%.h 
 	@ if [ ! -d $(TMPDIR) ];then mkdir $(TMPDIR) ;fi
 	@ echo '<< making dipendency $@ >>'
 	@ $(CXX) $(CFLAGS) -MM -MT $(basename $@).o $< -o $@

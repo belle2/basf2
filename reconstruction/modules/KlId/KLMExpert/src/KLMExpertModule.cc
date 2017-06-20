@@ -177,13 +177,9 @@ void KLMExpertModule::event()
     m_KLMnextCluster = get<1>(closestKLMAndDist);
     m_KLMavInterClusterDist = get<2>(closestKLMAndDist);
 
-
-
-//    TrackClusterSeparation* trackSep = cluster.getRelatedTo<TrackClusterSeparation>();
-
     auto trackSeperations = cluster.getRelationsTo<TrackClusterSeparation>();
     TrackClusterSeparation* trackSep;
-    float best_dist = 10000000000000;
+    float best_dist = 100000000;
     float dist;
     for (auto trackSeperation :  trackSeperations) {
       dist = trackSeperation.getDistance();
@@ -200,11 +196,11 @@ void KLMExpertModule::event()
       m_KLMTrackRotationAngle   = trackSep->getTrackRotationAngle();
       m_KLMTrackClusterSepAngle = trackSep->getTrackClusterSeparationAngle();
     } else {
-      m_KLMTrackSepDist         = 100000000;
-      m_KLMTrackSepAngle        = 100000000;
-      m_KLMInitialTrackSepAngle = 100000000;
-      m_KLMTrackRotationAngle   = 100000000;
-      m_KLMTrackClusterSepAngle = 100000000;
+      m_KLMTrackSepDist         = -999;
+      m_KLMTrackSepAngle        = -999;
+      m_KLMInitialTrackSepAngle = -999;
+      m_KLMTrackRotationAngle   = -999;
+      m_KLMTrackClusterSepAngle = -999;
     }
 
 

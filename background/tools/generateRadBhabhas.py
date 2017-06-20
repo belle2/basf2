@@ -68,7 +68,7 @@ else:
 
 if generator == 'bbbrem':
     bgType = 'RBB'
-    crossect = 524e6  # nb
+    crossect = 524e6 * 2  # nb (factor of two: gamma emission by e- and by e+)
 elif generator == 'bhwide':
     bgType = 'BHWide'
     crossect = 123e3  # nb
@@ -96,7 +96,7 @@ if numEvents == 0:
     B2ERROR('number of events is 0 -> increase equivTime_us')
     sys.exit()
 
-# make output directory if doesn't exists
+# make output directory if it doesn't exist
 
 if not os.path.exists(outdir):
     os.makedirs(outdir)

@@ -22,7 +22,7 @@
  * The author's email address is steve.sharples@nottingham.ac.uk
  */
 
-#include "daq/slc/apps/toppulserd/vxi11_user.h"
+#include "vxi11_user.h"
 
 /*****************************************************************************
  * GENERAL NOTES

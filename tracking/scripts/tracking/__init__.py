@@ -91,7 +91,7 @@ def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False,
     if merge_tracks:
         # Do also fit the not merged tracks
         add_cdc_cr_track_fit_and_track_creator(path, components, pruneTracks=pruneTracks,
-                                               eventTimingExtraction=eventTimingExtraction,
+                                               eventTimingExtraction=False,
                                                reco_tracks="NonMergedRecoTracks", tracks="NonMergedTracks")
 
 

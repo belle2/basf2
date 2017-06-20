@@ -92,7 +92,7 @@ def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False,
         # Do also fit the not merged tracks
         add_cdc_cr_track_fit_and_track_creator(path, components, pruneTracks=pruneTracks,
                                                eventTimingExtraction=eventTimingExtraction,
-                                               reco_tracks="NonMergedRecoTracks")
+                                               reco_tracks="NonMergedRecoTracks", tracks="NonMergedTracks")
 
 
 def add_geometry_modules(path, components=None):
@@ -158,7 +158,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, ad
 
 def add_cdc_cr_track_fit_and_track_creator(
         path, components=None, pruneTracks=False, eventTimingExtraction=False,
-        reco_tracks="RecoTracks",
+        reco_tracks="RecoTracks", tracks="",
         lightPropSpeed=12.9925, triggerPos=[0, 0, 0],
         normTriggerPlaneDirection=[0, 1, 0],
         readOutPos=[0, 0, -50.0]):
@@ -168,6 +168,8 @@ def add_cdc_cr_track_fit_and_track_creator(
 
     :param path: The path to which to add the tracking reconstruction modules
     :param components: the list of geometry components in use or None for all components.
+    :param reco_tracks: The name of the reco tracks to use
+    :param tracks: the name of the output Bellle tracks
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
     :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
         FullGridTrackTimeExtraction modules.
@@ -226,6 +228,7 @@ def add_cdc_cr_track_fit_and_track_creator(
     # Create Belle2 Tracks from the genfit Tracks
     path.add_module('TrackCreator',
                     recoTrackColName=reco_tracks,
+                    trackColName=tracks,
                     defaultPDGCode=13,
                     useClosestHitToIP=True
                     )

@@ -1,0 +1,218 @@
+------------------------------------------------------------------------------
+vxi11_1.10 - 9/09/2010
+
+Bug fix (thanks to Stephan Mahr): in vxi11_close(), remove the IP address
+from the global array that keeps track of them so that if the same device
+is opened again, then a new client is created, rather than it attempting 
+to use the old one (which was destroyed on the previous close).
+
+------------------------------------------------------------------------------
+vxi11_1.09 - 7/06/2010
+
+Moved over to bazaar VCS (from RCS).
+
+Makefile cleanups. Fixed signed/unsigned comparisons. Use consistent (and 
+sane) struct separator spacing in code.
+
+Fix int casting on printf statements to fix new compiler warnings/errors 
+(thanks to Shouri Chatterjee for pointing this out).
+
+------------------------------------------------------------------------------
+vxi11_1.08 - 3/09/2009
+
+Added a sanity check for link->maxRecvSize to make sure it's >0. This gets 
+around a bug in some versions of the Agilent Infiniium scope software.
+
+Changed the erroneous strncpy() to memcpy() in vxi11_send, as we could be
+sending binary data (not just strings).
+
+Changed a lot of char *'s to const char *'s in an attempt to get rid of
+pedantic gcc compiler warnings.
+
+------------------------------------------------------------------------------
+vxi11_1.07 - 9/10/2007
+
+Minor change to vxi11_receive_data_block(), this fn now copes with instruments
+that return just "#0" (for whatever reason). Suggestion by Jarek Sadowski,
+gratefully received.
+
+------------------------------------------------------------------------------
+vxi11_1.06 - 31/08/2007
+
+Bug fix in vxi11_receive(), to ensure that no more than "len" bytes are ever 
+received (and so avoiding a segmentation fault). This was a bug introduced in 
+release 1.04 whilst making some other changes to the vxi11_receive() fn.
+
+Many thanks to Rob Penny for spotting the bug and providing a patch.
+
+------------------------------------------------------------------------------
+vxi11_1.05 - 11/07/2007
+
+Added the ability to specify a "device name" when calling vxi11_open_device().
+For regular VXI11-based instruments, such as scopes and AFGs, the device name
+is usually "hard wired" to be "inst0", and up to now this has been hard wired
+into the vxi11_user code. However, devices such as LAN to GPIB gateways need
+some way of distinguishing between different devices... they are a single
+client (one IP address), with multiple devices.
+
+The vxi11_user fn, vxi11_open_device(), now takes a third argument
+(char *device).
+This gets passed to the core vxi11_open_device() fn (the one that deals with
+separate clients and links), and the core vxi11_open_link() fn; these two
+core functions have also had an extra parameter added accordingly. In order
+to not break the API, a wrapper function is provided in the form of the
+original vxi11_open_device() fn, that just takes 2 arguments
+(char *ip, CLINK *clink), this then passes "inst0" as the device argument.
+Backwards-compatible wrappers for the core functions have NOT been provided.
+These are generally not used from userland anyway. Hopefully this won't
+upset anyone!
+
+vxi11_cmd, the simple test utility, has also been updated. You can now,
+optionally, pass the device_name as a second argument (after the ip
+address). The source has been renamed to vxi11_cmd.cc (from vxi11_cmd.c), as
+it is C++ code not C.
+
+Some minor tidying up in vxi11_user.h
+
+With thanks to Oliver Schulz for bringing LAN to GPIB gateways to my
+attention, for suggesting changes to the vxi11_user library to allow them to
+be accommodated, and for tidying some things up.
+
+------------------------------------------------------------------------------
+vxi11_1.04 - 10/07/2007
+
+Patch applied, which was kindly provided by Robert Larice. This sorts out
+the confusion (on my part) about the structures returned by the rpcgen
+generated *_1() functions... these are statically allocated temporary structs,
+apparently. In the words of Robert Larice:
+
+******
+Hello Dr. Sharples,
+
+  I'm sending some patches for your nice gem "vxi11_1.03"
+
+  In the source code there were some strange comments, concerning
+   a commented free() around ... Manfred S. ...
+  and some notes, suggesting you had trouble to get more than one link
+    working.
+
+  I think thats caused by some misuse of the rpcgen generated subroutines.
+  1) those rpcgen generated *_1 functions returned pointers to
+       statically allocated temporary structs.
+     those where meant to be instantly copied to the user's space,
+       which wasn't done
+     thus instead of
+       Device_ReadResp  *read_resp;
+       read_resp = device_read_1(...)
+     one should have written someting like:
+       Device_ReadResp  *read_resp;
+       read_resp = malloc(...)
+       memcpy(read_resp, device_read_1(...), ...)
+  2) but a better fix is to use the rpcgen -M Flag
+       which allows to pass the memory space as a third argument
+     so one can write
+       Device_ReadResp  *read_resp;
+       read_resp = malloc(...)
+       device_read_1(..., read_resp, ...)
+     furthermore this is now automatically thread save
+  3) the rpcgen function device_read_1
+       expects a target buffer to be passed via read_resp
+     which was not done.
+  4) the return value of vxi11_receive() was computed incorrectly
+  5) minor,  Makefile typo's
+      CFLAGS versus
+      CLFAGS
+
+******
+
+Robert didn't have more than one device to try the patch with, but I've just
+tried it and everything seems fine. So I've removed all references to the
+VXI11_ENABLE_MULTIPLE_CLIENTS global variable, and removed the call to
+vxi11_open_link() from the vxi11_send() fn. There has been an associated
+tidying of functions, and removal of some comments.
+
+Thanks once again to Robert Larice for the patch and the explanation!
+
+------------------------------------------------------------------------------
+vxi11_1.03 - 29/01/2007
+
+Some bug-fixes (thanks to Manfred S.), and extra awareness of the
+possibility that instruments could time out after receiving a query WITHOUT
+causing an error condition. In some cases (prior to these changes) this
+could have resulted in a segmentation fault.
+
+Specifically:
+
+(1) removed call to ANSI free() fn in vxi11_receive, which according to
+    Manfred S. "is not necessary and wrong (crashes)".
+
+(2) added extra check in vxi11_receive() to see if read_resp==NULL.
+    read_resp can apparently be NULL if (eg) you send an instrument a
+    query, but the instrument is so busy with something else for so long
+    that it forgets the original query. So this extra check is for that
+    situation, and vxi11_receive returns -VXI11_NULL_READ_RESP to the
+    calling function.
+
+(3) vxi11_send_and_receive() is now aware of the possibility of being
+    returned -VXI11_NULL_READ_RESP. If so, it re-sends the query, until
+    either getting a "regular" read error (read_resp->error!=0) or a
+    successful read.
+
+(4) Similar to (2)... added extra check in vxi11_send() to see if
+    write_resp==NULL. If so, return -VXI11_NULL_WRITE_RESP. As with (3),
+    send_and_receive() is now aware of this possibility.
+
+------------------------------------------------------------------------------
+vxi11_1.02 - 25/08/2006
+
+Important changes to the core vxi11_send() function, which should be
+invisible to the user.
+
+For those interested, the function now takes note of the value of
+link->maxRecvSize, which is the maximum number of bytes that the vxi11
+intrument you're talking to can receive in one go. For many instruments
+this may be a few kB, which isn't a problem for sending short commands;
+however, sending large chunks of data (for example sending waveforms
+to instruments) may exceed this maxRecvSize. The core vxi11_send() function
+has been re-written to ensure that only a maximum of [maxRecvSize] bytes are
+written in one go... the function sits in a loop until all the message/
+data is written.
+
+Also tidied up some of the return values (specifically with regard to
+vxi11_send() and vxi11_send_data_block() ).
+
+------------------------------------------------------------------------------
+vxi11_1.01 - 06/07/2006
+
+Fair few changes since v1.00, all in vxi11_user.c and vxi11_user.h
+
+Found I was having problems talking to multiple links on the same
+client, if I created a different client for each one. So introduced
+a few global variables to keep track of all the ip addresses of
+clients that the library is asked to create, and only creating new
+clients if the ip address is different. This puts a limit of how
+many unique ip addresses (clients) a single process can connect to.
+Set this value at 256 (should hopefully be enough!).
+
+Next I found that talking to different clients on different ip
+addresses didn't work. It turns out that create_link_1() creates
+a static structure. This this link is associated with a given
+client (and hence a given IP address), then the only way I could
+think of making things work was to add a call to an
+vxi11_open_link() function before each send command (no idea what
+this adds to overheads and it's very messy!) - at least I was
+able to get this to only happen when we are using more than one
+client/ip address.
+
+Also, while I was at it, I re-ordered the functions a little -
+starts with core user functions, extra user functions, then core
+library functions at the end. Added a few more comments. Tidied
+up. Left some debugging info in, but commented out.
+
+------------------------------------------------------------------------------
+vxi11_1.00 - 23/06/2006
+
+Initial release.
+
+------------------------------------------------------------------------------
+

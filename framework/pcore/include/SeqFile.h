@@ -21,9 +21,13 @@ namespace Belle2 {
     /** Constructor.
      *
      * @param rwflag should probably be r or rw
+     * @param filenameIsPattern if true interpret the filename as a
+     *     boost::format pattern which takes the sequence number as argument
+     *     instead of producing .sroot-N files
      */
     SeqFile(const std::string& filename, const std::string& rwflag,
-            char* streamerinfo = NULL, int streamerinfo_size = 0);
+            char* streamerinfo = NULL, int streamerinfo_size = 0,
+            bool filenameIsPattern = false);
     /** Destructor */
     ~SeqFile();
     /** Returns status after constructor call. If success, fd is returned. If not, -1 */
@@ -43,6 +47,7 @@ namespace Belle2 {
     const static int c_MaxFileSize {512000000 * 4};
 
     std::string m_filename; /**< Name of the opened file. */
+    std::string m_filenamePattern; /**< Pattern for creating the file from the sequence number */
     int m_fd{ -1}; /**< file descriptor. */
     int m_nb{0}; /**< when saving a file, the total number of bytes written, 0 when reading. */
     int m_nfile{0}; /**< file counter, starting at 0 (files are split after c_MaxFileSize bytes). */

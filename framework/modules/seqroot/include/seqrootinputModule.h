@@ -36,6 +36,9 @@ namespace Belle2 {
     //! File name
     std::string m_inputFileName;
 
+    //! If true the output filename will be interpreted as a boost::format pattern
+    bool m_fileNameIsPattern;
+
     //! Blocked file handler
     SeqFile* m_file;
 

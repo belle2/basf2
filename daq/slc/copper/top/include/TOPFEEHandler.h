@@ -33,6 +33,9 @@ namespace Belle2 {
 
   TOP_HANDLER_INT(TOPHandlerLookback);
   TOP_HANDLER_INT(TOPHandlerFEMode);
+  TOP_HANDLER_INT(TOPConfigureBS);
+  TOP_HANDLER_INT(TOPPrepareData);
+  TOP_HANDLER_INT(TOPPrepareFE);
 }
 
 #endif

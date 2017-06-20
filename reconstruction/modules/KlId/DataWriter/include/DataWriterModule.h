@@ -1,4 +1,3 @@
-
 /***************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
@@ -91,7 +90,7 @@ namespace Belle2 {
     /** angle between trach momentum and cluster (measured from ip) */
     Float_t m_KLMTrackClusterSepAngle;
     /** angle between KLMcluster and Mcparticle */
-    Float_t m_KLMAngleToMC    ;
+    Float_t m_KLMAngleToMC;
 
 
     // variables of closest ECL cluster with respect to KLM cluster
@@ -150,6 +149,13 @@ namespace Belle2 {
     Float_t m_KLMECLUncertaintyTheta;
     /** mc weight */
     Float_t m_KLMMCWeight;
+    /** distance calculated by genfit */
+    Float_t m_KLMgenfitDist;
+    /** track flag for belle comparision */
+    Float_t m_KLMtrackFlag;
+    /** ecl flag for belle comparision */
+    Float_t m_KLMeclFlag;
+
 
     // ECL cluster variables for pure ECL Klongs
     /** measured energy */
@@ -233,6 +239,13 @@ namespace Belle2 {
     TTree* m_treeECLhadron = nullptr;
     /** tree containing ntuples for ECL cluster with N1 (photon hypothesis) */
     TTree* m_treeECLgamma = nullptr;
+
+    /** write out KLM data */
+    bool m_useKLM;
+
+    /** write out KLM data */
+    bool m_useECL;
+
 
   }; // end class
 } // end namespace Belle2

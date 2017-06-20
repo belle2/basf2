@@ -41,7 +41,7 @@ def add_kkmc_generator(path, finalstate='tau+tau-'):
     )
 
 
-def add_continuum_generator(path, finalstate='uubar', emptypathname='generator_emptypath'):
+def add_continuum_generator(path, finalstate='uubar'):
     """
     Add the default continuum generators KKMC + PYTHIA including their default decfiles and OPYTHIA settings
     :param finalstate: uubar, ddbar, ssbar, ccbar
@@ -99,8 +99,8 @@ def add_continuum_generator(path, finalstate='uubar', emptypathname='generator_e
 
     # branch to an empty path if PYTHIA failed, this will change the number of events
     # but the file meta data will contain the total number of generated events
-    emptypath = create_path()
-    fragmentation.if_value('<1', emptypath)
+    generator_emptypath = create_path()
+    fragmentation.if_value('<1', generator_emptypath)
 
 
 def add_babayaganlo_generator(path, finalstate='ee'):

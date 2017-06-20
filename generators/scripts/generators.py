@@ -1,7 +1,106 @@
 '''
 File for summarizing all default generator settings.
+Contact: Torben Ferber (ferber@physics.ubc.ca)
 '''
+
+from basf2 import *
 from ROOT import Belle2
+import os
+
+
+def add_kkmc_generator(path, finalstate='tau+tau-'):
+    """
+    Add the default muon pair and tau pair generator KKMC
+    :param finalstate: mu+mu-, tau+tau-
+    """
+
+    #: kkmc input file
+    kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau.input.dat')
+
+    #: kkmc file that will hold cross section and other information
+    kkmc_logfile = 'kkmc_tautau.txt'
+
+    #: kkmc configuration file, should be fine as is
+    kkmc_config = Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat')
+
+    #: tau config file (empty for mu+mu-)
+    kkmc_tauconfigfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau_decaytable.dat')
+
+    if finalstate == 'mu+mu-':
+        kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat')
+        kkmc_logfile = 'kkmc_mumu.txt'
+        kkmc_tauconfigfile = ''
+
+    # use KKMC to generate lepton pairs
+    kkgeninput = path.add_module(
+        'KKGenInput',
+        tauinputFile=kkmc_inputfile,
+        KKdefaultFile=kkmc_config,
+        taudecaytableFile=kkmc_tauconfigfile,
+        kkmcoutputfilename=kkmc_logfile,
+    )
+
+
+def add_continuum_generator(path, finalstate='uubar', emptypathname='generator_emptypath'):
+    """
+    Add the default continuum generators KKMC + PYTHIA including their default decfiles and OPYTHIA settings
+    :param finalstate: uubar, ddbar, ssbar, ccbar
+    :param emptypathname branch to reject events where PYTHIA failed to fragment
+    """
+
+    #: kkmc input file, one for each qqbar mode
+    kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/uubar_nohadronization.input.dat')
+
+    #: kkmc file that will hold cross section and other information
+    kkmc_logfile = 'kkmc_uubar.txt'
+
+    #: pythia configuration, different for ccbar
+    pythia_config = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/pythia_belle2.dat')
+
+    #: user decay file
+    decay_user = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/dec_belle2_qqbar.dec')
+
+    #: kkmc configuration file, should be fine as is
+    kkmc_config = Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat')
+
+    #: global decay file, should be fine as is
+    decay_file = os.path.expandvars('$BELLE2_EXTERNALS_DIR/share/evtgen/DECAY_2010.DEC')
+
+    if finalstate == 'ddbar':
+        kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/ddbar_nohadronization.input.dat')
+        kkmc_logfile = 'kkmc_ddbar.txt'
+    elif finalstate == 'ssbar':
+        kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/ssbar_nohadronization.input.dat')
+        kkmc_logfile = 'kkmc_ssbar.txt'
+    elif finalstate == 'ccbar':
+        kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/ccbar_nohadronization.input.dat')
+        pythia_config = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/pythia_belle2_charm.dat')
+        kkmc_logfile = 'kkmc_ccbar.txt'
+
+    # use KKMC to generate qqbar events (no fragmentation at this stage)
+    kkgeninput = path.add_module(
+        'KKGenInput',
+        tauinputFile=kkmc_inputfile,
+        KKdefaultFile=kkmc_config,
+        taudecaytableFile='',
+        kkmcoutputfilename=kkmc_logfile,
+    )
+
+    # add the fragmentation module to fragment the generated quarks into hadrons
+    # using PYTHIA8
+    fragmentation = path.add_module(
+        'Fragmentation',
+        ParameterFile=pythia_config,
+        ListPYTHIAEvent=0,
+        UseEvtGen=1,
+        DecFile=decay_file,
+        UserDecFile=decay_user,
+    )
+
+    # branch to an empty path if PYTHIA failed, this will change the number of events
+    # but the file meta data will contain the total number of generated events
+    emptypath = create_path()
+    fragmentation.if_value('<1', emptypath)
 
 
 def add_babayaganlo_generator(path, finalstate='ee'):

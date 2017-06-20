@@ -19,6 +19,12 @@ def add_babayaganlo_generator(path, finalstate='ee'):
         babayaganlo.param('MinEnergy', 0.15)
         babayaganlo.param('FMax', 1.e5)
 
+    elif finalstate == 'gg':
+        babayaganlo.param('FinalState', 'gg')
+        babayaganlo.param('ScatteringAngleRange', [10.0, 170.0])
+        babayaganlo.param('MinEnergy', 0.15)
+        babayaganlo.param('FMax', 1.e4)
+
 
 def add_phokhara_generator(path, finalstate='mu+mu-'):
     """

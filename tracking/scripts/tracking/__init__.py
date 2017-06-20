@@ -57,6 +57,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
 def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False,
                                    skipGeometryAdding=False, eventTimingExtraction=False,
+                                   use_readout_position=True,
                                    merge_tracks=True, use_second_cdc_hits=False):
     """
     This function adds the reconstruction modules for cr tracking to a path.
@@ -72,6 +73,7 @@ def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False,
         FullGridTrackTimeExtraction modules.
     :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
+    :param use_readout_position: flag to turn off the usage of the readout position in the track time estimator
     """
 
     # make sure CDC is used
@@ -91,12 +93,14 @@ def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False,
 
     # track fitting
     add_cdc_cr_track_fit_and_track_creator(path, components, pruneTracks=pruneTracks,
-                                           eventTimingExtraction=eventTimingExtraction)
+                                           eventTimingExtraction=eventTimingExtraction,
+                                           use_readout_position=use_readout_position)
 
     if merge_tracks:
         # Do also fit the not merged tracks
         add_cdc_cr_track_fit_and_track_creator(path, components, pruneTracks=pruneTracks,
                                                eventTimingExtraction=False,
+                                               use_readout_position=use_readout_position,
                                                reco_tracks="NonMergedRecoTracks", tracks="NonMergedTracks")
 
 
@@ -167,7 +171,7 @@ def add_cdc_cr_track_fit_and_track_creator(
         lightPropSpeed=12.9925, triggerPos=[0, 0, 0],
         normTriggerPlaneDirection=[0, 1, 0],
         readOutPos=[0, 0, -50.0],
-        useReadoutPosition=True):
+        use_readout_position=True):
     """
     Helper function to add the modules performing the cdc cr track fit
     and track creation to the path.
@@ -179,7 +183,7 @@ def add_cdc_cr_track_fit_and_track_creator(
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
     :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
         FullGridTrackTimeExtraction modules.
-    :param useReadoutPosition: flag to turn off the usage of the readout position in the track time estimator
+    :param use_readout_position: flag to turn off the usage of the readout position in the track time estimator
     """
 
     # Time seed
@@ -204,7 +208,7 @@ def add_cdc_cr_track_fit_and_track_creator(
                     triggerPlanePosition=triggerPos,
                     triggerPlaneDirection=normTriggerPlaneDirection,
                     useFittedInformation=True,
-                    useReadoutPosition=useReadoutPosition,
+                    useReadoutPosition=use_readout_position,
                     readoutPosition=readOutPos,
                     readoutPositionPropagationSpeed=lightPropSpeed
                     )

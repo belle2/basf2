@@ -57,7 +57,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
 def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False,
                                    skipGeometryAdding=False, eventTimingExtraction=False,
-                                   use_readout_position=True,
+                                   use_readout_position=False,
                                    merge_tracks=True, use_second_cdc_hits=False):
     """
     This function adds the reconstruction modules for cr tracking to a path.
@@ -171,7 +171,7 @@ def add_cdc_cr_track_fit_and_track_creator(
         lightPropSpeed=12.9925, triggerPos=[0, 0, 0],
         normTriggerPlaneDirection=[0, 1, 0],
         readOutPos=[0, 0, -50.0],
-        use_readout_position=True):
+        use_readout_position=False):
     """
     Helper function to add the modules performing the cdc cr track fit
     and track creation to the path.

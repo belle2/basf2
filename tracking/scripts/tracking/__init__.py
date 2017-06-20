@@ -487,8 +487,18 @@ def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0
                         tracks="MergedCDCTrackVector",
                         filter="phi",
                         )
-
         output_tracks = "MergedCDCTrackVector"
+
+        # However, we also want to export the non merged tracks
+        # Correct time seed - assumes velocity near light speed
+        path.add_module("TFCDC_TrackFlightTimeAdjuster",
+                        inputTracks="OrientedCDCTrackVector",
+                        )
+
+        # Export CDCTracks to RecoTracks representation
+        path.add_module("TFCDC_TrackExporter",
+                        inputTracks="OrientedCDCTrackVector",
+                        RecoTracksStoreArrayName="NonMergedRecoTracks")
 
     # Correct time seed - assumes velocity near light speed
     path.add_module("TFCDC_TrackFlightTimeAdjuster",

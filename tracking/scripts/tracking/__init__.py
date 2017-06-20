@@ -85,7 +85,14 @@ def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False,
     add_cdc_cr_track_finding(path, merge_tracks=merge_tracks)
 
     # track fitting
-    add_cdc_cr_track_fit_and_track_creator(path, components, pruneTracks, eventTimingExtraction)
+    add_cdc_cr_track_fit_and_track_creator(path, components, pruneTracks=pruneTracks,
+                                           eventTimingExtraction=eventTimingExtraction)
+
+    if merge_tracks:
+        # Do also fit the not merged tracks
+        add_cdc_cr_track_fit_and_track_creator(path, components, pruneTracks=pruneTracks,
+                                               eventTimingExtraction=eventTimingExtraction,
+                                               reco_tracks="NonMergedRecoTracks")
 
 
 def add_geometry_modules(path, components=None):
@@ -150,10 +157,11 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, ad
 
 
 def add_cdc_cr_track_fit_and_track_creator(
-    path, components=None, pruneTracks=False, eventTimingExtraction=False, lightPropSpeed=12.9925, triggerPos=[
-        0, 0, 0], normTriggerPlaneDirection=[
-            0, 1, 0], readOutPos=[
-                0, 0, -50.0]):
+        path, components=None, pruneTracks=False, eventTimingExtraction=False,
+        reco_tracks="RecoTracks",
+        lightPropSpeed=12.9925, triggerPos=[0, 0, 0],
+        normTriggerPlaneDirection=[0, 1, 0],
+        readOutPos=[0, 0, -50.0]):
     """
     Helper function to add the modules performing the cdc cr track fit
     and track creation to the path.
@@ -167,6 +175,7 @@ def add_cdc_cr_track_fit_and_track_creator(
 
     # Time seed
     path.add_module("PlaneTriggerTrackTimeEstimator",
+                    recoTracksStoreArrayName=reco_tracks,
                     pdgCodeToUseForEstimation=13,
                     triggerPlanePosition=triggerPos,
                     triggerPlaneDirection=normTriggerPlaneDirection,
@@ -174,12 +183,14 @@ def add_cdc_cr_track_fit_and_track_creator(
 
     # Initial track fitting
     path.add_module("DAFRecoFitter",
+                    recoTracksStoreArrayName=reco_tracks,
                     probCut=0.00001,
                     pdgCodesToUseForFitting=13,
                     )
 
     # Correct time seed
     path.add_module("PlaneTriggerTrackTimeEstimator",
+                    recoTracksStoreArrayName=reco_tracks,
                     pdgCodeToUseForEstimation=13,
                     triggerPlanePosition=triggerPos,
                     triggerPlaneDirection=normTriggerPlaneDirection,
@@ -191,6 +202,7 @@ def add_cdc_cr_track_fit_and_track_creator(
 
     # Track fitting
     path.add_module("DAFRecoFitter",
+                    recoTracksStoreArrayName=reco_tracks,
                     # probCut=0.00001,
                     pdgCodesToUseForFitting=13,
                     )
@@ -198,7 +210,7 @@ def add_cdc_cr_track_fit_and_track_creator(
     if eventTimingExtraction is True:
         # Extract the time
         path.add_module("FullGridTrackTimeExtraction",
-                        recoTracksStoreArrayName="RecoTracks",
+                        recoTracksStoreArrayName=reco_tracks,
                         maximalT0Shift=70,
                         minimalT0Shift=-70,
                         numberOfGrids=6
@@ -207,18 +219,20 @@ def add_cdc_cr_track_fit_and_track_creator(
         # Track fitting
         path.add_module("DAFRecoFitter",
                         # probCut=0.00001,
+                        recoTracksStoreArrayName=reco_tracks,
                         pdgCodesToUseForFitting=13,
                         )
 
     # Create Belle2 Tracks from the genfit Tracks
     path.add_module('TrackCreator',
+                    recoTrackColName=reco_tracks,
                     defaultPDGCode=13,
                     useClosestHitToIP=True
                     )
 
     # Prune genfit tracks
     if pruneTracks:
-        add_prune_tracks(path, components)
+        add_prune_tracks(path=path, components=components, reco_tracks=reco_tracks)
 
 
 def add_mc_matcher(path, components=None, reco_tracks="RecoTracks"):

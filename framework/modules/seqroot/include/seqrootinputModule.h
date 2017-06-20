@@ -38,6 +38,9 @@ namespace Belle2 {
     //! List of all file names to read
     std::vector<std::string> m_filelist;
 
+    //! If true the output filename will be interpreted as a boost::format pattern
+    bool m_fileNameIsPattern;
+
     //! Blocked file handler
     SeqFile* m_file;
 

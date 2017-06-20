@@ -44,6 +44,8 @@ SeqRootInputModule::SeqRootInputModule() : Module(), m_streamer(nullptr), m_size
   addParam("inputFileName"  , m_inputFileName,
            "Input file name. Can also be a gzip-compressed file (with suffix .gz). Parameter can be overridden using the -i argument to basf2.",
            string("SeqRootInput.sroot"));
+  addParam("fileNameIsPattern", m_fileNameIsPattern, "If true interpret the output filename as a boost::format pattern "
+           "instead of the standard where subsequent files are named .sroot-N. For example 'myfile-f%08d.sroot'", false);
 }
 
 
@@ -73,7 +75,7 @@ void SeqRootInputModule::initialize()
 
   EvtMessage* evtmsg = NULL;
   // Open input file
-  m_file = new SeqFile(m_inputFileName.c_str(), "r");
+  m_file = new SeqFile(m_inputFileName.c_str(), "r", nullptr, 0, m_fileNameIsPattern);
   if (m_file->status() <= 0)
     B2FATAL("SeqRootInput : Error in opening input file : " << m_inputFileName);
 

@@ -1,5 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['framework','topcaf_dataobjects']
-	
-Return('env')

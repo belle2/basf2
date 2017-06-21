@@ -4,9 +4,11 @@ CFLAGS   = -g -O3 -Wall -fPIC -I ${INCDIR}
 #LOCALLIB  = CPRROPCDAQ
 LIBFLAG = -lrt -lpthread#-l${LOCALLIB}
 
-RAWDATAPATH=${BELLE2_LOCAL_DIR}/rawdata/src:${BELLE2_LOCAL_DIR}/rawdata/dataobjects/src
-DAQPATH=${BELLE2_LOCAL_DIR}/daq/dataobjects/src:${BELLE2_LOCAL_DIR}/daq/rawdata/src
-SLCPATH=${BELLE2_LOCAL_DIR}/daq/slc/readout/src:${BELLE2_LOCAL_DIR}/daq/slc/system/src:${BELLE2_LOCAL_DIR}/daq/slc/base/src
+TEMP_LOCAL_DIR=$(PWD)/../../
+
+RAWDATAPATH=${TEMP_LOCAL_DIR}/rawdata/src:${TEMP_LOCAL_DIR}/rawdata/dataobjects/src
+DAQPATH=${TEMP_LOCAL_DIR}/daq/dataobjects/src:${TEMP_LOCAL_DIR}/daq/rawdata/src
+SLCPATH=${TEMP_LOCAL_DIR}/daq/slc/readout/src:${TEMP_LOCAL_DIR}/daq/slc/system/src:${TEMP_LOCAL_DIR}/daq/slc/base/src
 VPATH = ${RAWDATAPATH}:${DAQPATH}:${SLCPATH}
 
 RAWDATAOBJS = RawDataBlockFormat.o RawCOPPERFormat.o RawCOPPERFormat_latest.o PreRawCOPPERFormat_latest.o PostRawCOPPERFormat_latest.o RawHeader_latest.o RawTrailer_latest.o RawTLUFormat.o RawFTSWFormat.o CRCCalculator.o 
@@ -54,14 +56,14 @@ link:
 	mkdir -p include/rawdata/dataobjects ; \
 	mkdir -p include/daq/rawdata/modules ; \
 	mkdir -p include/daq/dataobjects ; \
-	ln -s ${BELLE2_LOCAL_DIR}/rawdata/dataobjects/include/*.h ./include/rawdata/dataobjects/ ; \
-	ln -s ${BELLE2_LOCAL_DIR}/rawdata/include/*.h ./include/rawdata/ ; \
-	ln -s ${BELLE2_LOCAL_DIR}/daq/rawdata/include/*.h ./include/daq/rawdata/ ; \
-	ln -s ${BELLE2_LOCAL_DIR}/daq/rawdata/modules/include/*.h ./include/daq/rawdata/modules/ ; \
-	ln -s ${BELLE2_LOCAL_DIR}/daq/dataobjects/include/*.h ./include/daq/dataobjects/ ; \
-	ln -s ${BELLE2_LOCAL_DIR}/daq/slc/system/include/*.h ./include/daq/slc/system/ ; \
-	ln -s ${BELLE2_LOCAL_DIR}/daq/slc/readout/include/*.h ./include/daq/slc/readout/ ; \
-	ln -s ${BELLE2_LOCAL_DIR}/daq/slc/base/include/*.h ./include/daq/slc/base/ ; \
+	ln -s ${TEMP_LOCAL_DIR}/rawdata/dataobjects/include/*.h ./include/rawdata/dataobjects/ ; \
+	ln -s ${TEMP_LOCAL_DIR}/rawdata/include/*.h ./include/rawdata/ ; \
+	ln -s ${TEMP_LOCAL_DIR}/daq/rawdata/include/*.h ./include/daq/rawdata/ ; \
+	ln -s ${TEMP_LOCAL_DIR}/daq/rawdata/modules/include/*.h ./include/daq/rawdata/modules/ ; \
+	ln -s ${TEMP_LOCAL_DIR}/daq/dataobjects/include/*.h ./include/daq/dataobjects/ ; \
+	ln -s ${TEMP_LOCAL_DIR}/daq/slc/system/include/*.h ./include/daq/slc/system/ ; \
+	ln -s ${TEMP_LOCAL_DIR}/daq/slc/readout/include/*.h ./include/daq/slc/readout/ ; \
+	ln -s ${TEMP_LOCAL_DIR}/daq/slc/base/include/*.h ./include/daq/slc/base/ ; \
 	fi
 
 .PHONY:	clean

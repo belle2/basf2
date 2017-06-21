@@ -65,14 +65,14 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
 #endif
         continue;
       } else {
-        perror("ERRNOUM");
+        perror("[WARNING]");
         char err_buf[500];
         sprintf(err_buf, "recv() returned error; ret = %d. : %s %s %d",
                 read_size, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
         m_run_error = 1;
         //        B2ERROR(err_buf);
-        printf("[ERROR] %s\n", err_buf); fflush(stdout);
+        printf("[WARNING] %s\n", err_buf); fflush(stdout);
         string err_str = "RUN_ERROR";
         printf("AIUEO********************\n"); fflush(stdout);
         throw (err_str);
@@ -83,7 +83,7 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
     } else if (read_size == 0) {
       // Connection is closed ( error )
       char err_buf[500];
-      sprintf(err_buf, "[ERROR] Connection is closed by peer(%s). readsize = %d %d. : %s %s %d",
+      sprintf(err_buf, "[WARNING] Connection is closed by peer(%s). readsize = %d %d. : %s %s %d",
               strerror(errno), read_size, errno, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
       m_run_error = 1;

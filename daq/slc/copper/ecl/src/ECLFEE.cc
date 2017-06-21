@@ -57,6 +57,8 @@ void ECLFEE::boot(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 
 void ECLFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
+  callback.log(LogFile::INFO, "Load ECL config");
+  /*
   hslb.writefee32(0x00B0, (obj.getInt("reg_num") << 16) & obj.getInt("reg_wdata"));
   hslb.writefee32(0x00B2, obj.getInt("sh_mask"));
   hslb.writefee32(0x00B8, 0x4);
@@ -69,19 +71,26 @@ void ECLFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
   if (er_code != 00000000) {
     LogFile::error("Failed to set sh_wreg");
   }
+  */
 
   hslb.writefee8(0x20, obj.getInt("shaper_mask_low"));
   hslb.writefee8(0x21, obj.getInt("shaper_mask_high"));
+  callback.log(LogFile::INFO, "write fee-8 %x << %x", 0x38, obj.getInt("ttd_trg_rare_factor"));
   hslb.writefee8(0x38, obj.getInt("ttd_trg_rare_factor"));
+  callback.log(LogFile::INFO, "read fee-8 %x >> %x", 0x38, hslb.readfee8(0x38));
+  callback.log(LogFile::INFO, "write fee-8 %x << %x", 0x39, obj.getInt("ttd_trg_type"));
   hslb.writefee8(0x39, obj.getInt("ttd_trg_type"));
+  callback.log(LogFile::INFO, "read fee-8 %x >> %x", 0x39, hslb.readfee8(0x39));
   hslb.writefee8(0x40, obj.getInt("calib_ampl0_low"));
   hslb.writefee8(0x41, obj.getInt("calib_ampl0_high"));
-  hslb.writefee8(0x42, obj.getInt("calib_ampl_step_high"));
+  hslb.writefee8(0x42, obj.getInt("calib_ampl_step_low"));
   hslb.writefee8(0x43, obj.getInt("calib_ampl_step_high"));
 
+  hslb.writefee8(0x45, obj.getInt("calib_delay0_low"));
   hslb.writefee8(0x45, obj.getInt("calib_delay0_high"));
   hslb.writefee8(0x46, obj.getInt("calib_delay_step_low"));
   hslb.writefee8(0x47, obj.getInt("calib_delay_step_high"));
+
   hslb.writefee8(0x48, obj.getInt("calib_events_per_step"));
 
   hslb.writefee8(0x30, 0x0D);

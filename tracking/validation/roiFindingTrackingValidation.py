@@ -245,6 +245,7 @@ if not CREATE_INPUT:
     pxd_digifilter.param('ROIidsName', 'ROIs')
     pxd_digifilter.param('PXDDigitsName', pxd_unfiltered_digits)
     pxd_digifilter.param('PXDDigitsInsideROIName', pxd_filtered_digits)
+    pxd_digifilter.param('PXDDigitsOutsideROIName', 'PXDDigitsOutside')
     path.add_module(pxd_digifilter)
 
     ROIValidationPlots = ROIFindingTrackingValidationPlots()

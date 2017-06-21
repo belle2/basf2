@@ -823,14 +823,13 @@ namespace Belle2 {
 
 
       /**
-       * Return the resolution of drift length.
-       * @param dist Drift length.
+       * Return the resolution of drift length (cm).
+       * @param dist Drift length (cm); negative dist is treated as |dist|.
        * @param layer Layer id.
        * @param lr Left/Right.
        * @param alpha incident angle (in rphi plane) w.r.t. the cell (rad).
        * @param theta incident angle (polar angle) (rad).
        */
-
       double getSigma(double dist, unsigned short layer, unsigned short lr, double alpha = 0., double theta = 0.5 * M_PI) const;
       /**
        * Returns old left/right.

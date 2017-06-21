@@ -12,7 +12,7 @@ from fnmatch import fnmatch
 set_log_level(LogLevel.INFO)
 
 # use_local_database()
-use_local_database("test_bklm.txt", "test_payloads")
+use_local_database("localdb/database.txt", "localdb")
 # use use_central_database for uploading data to PNNL
 # use_central_database("test_bklm", LogLevel.WARNING);
 
@@ -45,7 +45,13 @@ dbImporter = BKLMDatabaseImporter()
 # dbImporter.importBklmGeometryPar()
 # dbImporter.importBklmSimulationPar()
 # dbImporter.importBklmBadChannels()
+# dbImporter.importBklmAlignment()
+# dbImporter.importBklmMisAlignment()
+# dbImporter.importBklmDisplacement()
 # dbImporter.exportBklmElectronicMapping()
 # dbImporter.exportBklmGeometryPar()
 # dbImporter.exportBklmSimulationPar()
 # dbImporter.exportBklmBadChannels()
+# dbImporter.exportBklmAlignment()
+# dbImporter.exportBklmMisAlignment()
+# dbImporter.exportBklmDisplacement()

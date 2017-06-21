@@ -155,6 +155,18 @@ class Calibration():
         #: jobs are submitted to e.g. cal.backend_args = {"queue":"short"}
         self.backend_args = {}
 
+        self._local_database_chain = []
+
+        import ROOT
+        config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
+        if config_file_path:
+            import configparser
+            config = configparser.ConfigParser()
+            config.read(config_file_path)
+            self.use_central_database(config["CAF_DEFAULTS"]["GlobalTag"])
+        else:
+            B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
+
     def _apply_calibration_defaults(self, defaults):
         """
         We pass in default calibration options from the `CAF` instance here if called.
@@ -178,6 +190,25 @@ class Calibration():
                     return False
             else:
                 return True
+
+    def use_central_database(self, global_tag):
+        """
+        Central database global tag to use for this calibration. Default is set from data/caf.cfg
+        If this is set manually it will override the default. To turn off central database usage you
+        should set this global tag to an empty string.
+        """
+        self._global_tag = global_tag
+
+    def use_local_database(self, filename, directory=""):
+        """
+        Append a local database to the chain for this calibration. You can call this function multiple times and
+        each database will be added to the chain IN ORDER. The databases are applied to this calibration ONLY.
+
+        They are applied to the collector job and algorithm step as a database chain of the form:
+
+        central DB Global tag (if used) -> these local databases -> CAF created local database constants
+        """
+        self._local_database_chain.append((filename, directory))
 
     def depends_on(self, calibration):
         """Adds dependency of this calibration on another i.e. This calibration
@@ -392,7 +423,7 @@ class Algorithm():
         load_data.add_module('RootInput',
                              inputFileNames=input_file_paths,
                              ignoreCommandLineOverride=True,
-                             entrySequences=["0"]*len(input_file_paths))
+                             entrySequences=["0"] * len(input_file_paths))
         process(load_data)
 
 

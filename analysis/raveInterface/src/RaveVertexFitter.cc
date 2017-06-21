@@ -302,7 +302,7 @@ void RaveVertexFitter::updateDaughters()
   }
 
   if (!m_raveVertices[0].hasRefittedTracks()) {
-    B2WARNING("RaveVertexFitter: Fiited vertex has no refitted tracks");
+    B2WARNING("RaveVertexFitter: Fitted vertex has no refitted tracks");
     return;
   }
 

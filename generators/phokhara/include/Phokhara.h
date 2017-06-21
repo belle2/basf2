@@ -131,8 +131,8 @@ namespace Belle2 {
     */
     void setEpsilon(double epsilon) { m_epsilon = epsilon; }
 
-    /** Sets final state,.
-     * @param finalState Minimum energy for leptons/photons in the final state, in GeV
+    /** Sets final state.
+     * @param finalState Final state code.
      */
     void setFinalState(int finalState) { m_finalState = finalState; }
 

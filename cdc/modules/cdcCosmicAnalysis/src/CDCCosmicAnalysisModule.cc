@@ -48,7 +48,6 @@ CDCCosmicAnalysisModule::CDCCosmicAnalysisModule() : Module()
   addParam("RecoTracksColName", m_recoTrackArrayName, "Name of collectrion hold genfit::Track", std::string(""));
   addParam("Output", m_OutputFileName, "xt file name", string("xt.root"));
   addParam("noBFit", m_noBFit, "If true -> #Params ==4, #params ==5 for calculate P-Val", true);
-  //  addParam("TriggerPos", m_TriggerPos, "Trigger position use for cut and reconstruct Trigger image", std::vector<double> { -0.6, -13.25, 17.3});
 }
 
 CDCCosmicAnalysisModule::~CDCCosmicAnalysisModule()
@@ -127,8 +126,11 @@ void CDCCosmicAnalysisModule::event()
       continue;
     }
     double ndf;
-    if (m_noBFit) {ndf = fs->getNdf() + 1;} // incase no Magnetic field, NDF=4;
-    else {ndf = fs->getNdf();}
+    if (m_noBFit) { // in case of no magnetic field, NDF=4 instead of 5.
+      ndf = fs->getNdf() + 1;
+    } else {
+      ndf = fs->getNdf();
+    }
     double Chi2 = fs->getChi2();
     double TrPval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
     double Phi0 = fitresult->getPhi0();

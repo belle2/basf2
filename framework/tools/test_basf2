@@ -31,29 +31,39 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 print_lock = threading.Lock()
 
 
-def compare_log(template_file, log, ignore_lines=0, diff_lines=10):
-    """Compare the log output to the content of a template file"""
+def compare_log(release, name, log, logtype, ignore_lines=0, diff_lines=10):
+    """Compare the log output to the content of a template file
 
+    :param release: release directory in which test is found
+    :param name: name of the test
+    :param log: output of the test
+    :param logtype: which type of output? should be "out" or "err"
+    :param ignore_lines: how many lines to ignore at the beginning when
+        comparing to the template.  Used to strip of steering file name
+    :param diff_lines: how many lines of the diff to print on the console
+    """
+
+    template = name[:-2] + logtype
+    template_file = os.path.join(release, template)
     if os.path.isfile(template_file):
         diff = list(difflib.diff_bytes(
             difflib.unified_diff,
             open(template_file, "rb").read().splitlines()[ignore_lines:],
             log.splitlines()[ignore_lines:],
-            fromfile=b'template',
-            tofile=b'current',
+            fromfile=template.encode(),
+            tofile=("std%s of 'basf2 %s'" % (logtype, name)).encode(),
             lineterm=b'',
             n=0,
             ))
-        if len(diff) > 0:
-            if diff_lines > 0:
-                # print directly to the raw buffer object as bytes, don't
-                # decode/encode first
-                sys.stdout.buffer.write(b"\n".join(diff[2:2 + diff_lines]))
-                sys.stdout.buffer.write(b"\n")
-                sys.stdout.buffer.flush()
-            return False
-        else:
-            return True
+        if len(diff) > 0 and diff_lines > 0:
+            # print directly to the raw buffer object as bytes, don't
+            # decode/encode first
+            sys.stdout.buffer.write(b"\n".join(diff[2:2 + diff_lines]))
+            sys.stdout.buffer.write(b"\n")
+            sys.stdout.buffer.flush()
+
+        # return the full diff to be included in the xml report as string
+        return "\n".join(e.decode(errors="replace") for e in diff)
 
     return None
 
@@ -64,9 +74,9 @@ def format_output(name, out, err):
         return ""
     output = []
     if out.strip():
-        output += ["=== stdout of %s ===\n" % name, out.decode()]
+        output += ["=== stdout of %s ===\n" % name, out.decode(errors="replace")]
     if err.strip():
-        output += ["=== stderr of %s ===\n" % name, err.decode()]
+        output += ["=== stderr of %s ===\n" % name, err.decode(errors="replace")]
     if len(output):
         output.append("=== end %s ===\n" % name)
     return "".join(output)
@@ -112,7 +122,7 @@ def run_test_ipynb(argument):
             nb = nbformat.read(f, as_version=4)
             # wait 30 seconds for each cell executing before timing out
             ep = ExecutePreprocessor(timeout=30, kernel_name='python3')
-            ep.preprocess(nb, resources = {})
+            ep.preprocess(nb, resources={})
             result = True
             message = "finished successfully"
     # execution errors within the notebook will throw this exception
@@ -121,11 +131,12 @@ def run_test_ipynb(argument):
         message = "Error while executing cell: {}".format(ce)
 
     time = timeit.default_timer() - time_start
-        
+
     with print_lock:
         report_test_result(result, extra, name, message)
 
-    return (result, message, time)
+    return (result, message, time, None)
+
 
 def run_test_py(argument):
     """Run the test for the given steering file"""
@@ -141,6 +152,7 @@ def run_test_py(argument):
     steering = os.path.join(release_dir, name)
     result = None
     message = None
+    output_diff = None
     extra = ""
     time_start = timeit.default_timer()
     try:
@@ -167,23 +179,31 @@ def run_test_py(argument):
                 message = skipped.group(1).decode()
             else:
                 result = False
-                message = "return code %d" % process.returncode
+                message = "exited with return code %d" % process.returncode
                 extra = format_output(name, process.stdout, process.stderr)
         else:
-            log_tests = [compare_log(steering[:-2] + 'out', process.stdout, 1, options.diff_lines),
-                         compare_log(steering[:-2] + 'err', process.stderr, 0, options.diff_lines)]
+            log_tests = [compare_log(release_dir, name, process.stdout, 'out', 1, options.diff_lines),
+                         compare_log(release_dir, name, process.stderr, 'err', 0, options.diff_lines)]
+            logs_failed = sum(0 if e is None else len(e) for e in log_tests)
             if log_tests[0] is None and log_tests[1] is None:
                 result = True
                 message = "finished successfully"
-            elif not (log_tests[0] is False or log_tests[1] is False):
+            elif logs_failed == 0:
                 result = True
                 message = "logs ok"
             else:
                 result = False
-                message = "logs differ"
+                message = "logs differ from expectation"
+                # Format diff of output
+                output_diff = "\n".join(e for e in log_tests if e is not None)
 
         report_test_result(result, extra, name, message)
-    return (result, message, time)
+
+    # we didn't want to print the diff in full but we want to return it if it
+    # exists so let's replace the extra
+    if output_diff is not None:
+        extra = output_diff
+    return (result, message, time, extra)
 
 
 def process_dir(dir, release_dir):
@@ -257,7 +277,6 @@ if "BELLE2_RELEASE_DIR" in os.environ:
     all_tests += process_top_dir(os.environ['BELLE2_RELEASE_DIR'], options.directories, processed_dirs)
 
 if options.filter is not None:
-    import re
     try:
         re_filter = re.compile(options.filter)
     except Exception as e:
@@ -293,10 +312,10 @@ class TestSuite(list):
         #: time in seconds needed for test execution
         self.time = 0
 
-    def add(self, name, passed, message, time):
+    def add(self, name, passed, message, time, output):
         """Add a new test to the suite. Return True if test was successful or
         skipped, False if it failed"""
-        self.append((name, passed, message, time))
+        self.append((name, passed, message, time, output))
         self.time += time
         if passed is True:
             self.passed += 1
@@ -305,6 +324,7 @@ class TestSuite(list):
         else:
             self.skipped += 1
         return (passed is not False)
+
 
 # and present the results
 test_results = TestSuite()
@@ -326,11 +346,14 @@ if options.xml and len(all_tests):
     for suite, tests in sorted(test_suites.items()):
         suite_el = ET.SubElement(root_el, "testsuite", name=suite, tests=str(len(tests)),
                                  failures=str(tests.failed), skipped=str(tests.skipped), time=str(tests.time))
-        for name, passed, message, time in tests:
+        for name, passed, message, time, output in tests:
             test_el = ET.SubElement(suite_el, "testcase", name=os.path.basename(name),
                                     classname=suite, time=str(time))
             if passed is not True:
-                ET.SubElement(test_el, "failure" if passed is False else "skipped", message=message)
+                failure = ET.SubElement(test_el, "failure" if passed is False else "skipped", message=message,
+                                        type="FAILED" if passed is False else "SKIPPED")
+                if output is not None:
+                    failure.text = output
 
     tree = ET.ElementTree(root_el)
     tree.write(options.xml, encoding="UTF-8", xml_declaration=True)

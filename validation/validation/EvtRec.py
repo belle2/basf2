@@ -7,39 +7,35 @@
   <output>EvtRec.root,EvtRec_mdst.root</output>
   <cacheable/>
   <contact>tkuhr</contact>
-  <description>This steering file run the standard reconstruction on an input file with generic BBbar events.</description>
+  <description>This steering file runs the standard reconstruction on an input file with generic BBbar events.</description>
 </header>
 """
 
 from basf2 import *
 from reconstruction import add_reconstruction, add_mdst_output
-import glob
+from validation import statistics_plots, event_timing_plot
 
 set_random_seed(12345)
 
 main = create_path()
 
 # read file of simulated events
-input = register_module('RootInput')
-input.param('inputFileName', '../EvtGenSim.root')
-main.add_module(input)
+main.add_module('RootInput', inputFileName='../EvtGenSim.root')
 
 # geometry parameter database
-main.add_module(register_module('Gearbox'))
+main.add_module('Gearbox')
 
 # detector geometry
-main.add_module(register_module('Geometry'))
+main.add_module('Geometry')
 
 # reconstruction
 add_reconstruction(main)
 
 # memory profile
-main.add_module(register_module('Profile'))
+main.add_module('Profile')
 
 # output
-output = register_module('RootOutput')
-output.param('outputFileName', '../EvtRec.root')
-main.add_module(output)
+main.add_module('RootOutput', outputFileName='../EvtRec.root')
 add_mdst_output(main, True, '../EvtRec_mdst.root')
 
 process(main)
@@ -47,13 +43,9 @@ process(main)
 # Print call statistics
 print(statistics)
 
-from validation import *
 statistics_plots('EvtRec_statistics.root', contact='tkuhr',
                  jobDesc='a standard reconstruction job with generic EvtGen events',
-                 prefix='EvtRec'
-                 )
-event_timing_plot('../EvtRec.root', 'EvtRec_statistics.root',
-                  contact='tkuhr',
+                 prefix='EvtRec')
+event_timing_plot('../EvtRec.root', 'EvtRec_statistics.root', contact='tkuhr',
                   jobDesc='a standard reconstruction job with generic EvtGen events',
-                  prefix='EvtRec'
-                  )
+                  prefix='EvtRec')

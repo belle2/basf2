@@ -210,7 +210,7 @@ void CsiStudy_v2Module::event()
   /*
   //Loop over SimHit
   for (const auto& SimHit : SimHits) {
-    int detNB = SimHit.getCellId();
+      int detNB = SimHit.getCellId();
     int pdg = SimHit.getPDGCode();
     double Edep = SimHit.getEnergyDep() * 1e3; //GeV -> MeV
     double tof = SimHit.getFlightTime(); //ns
@@ -228,8 +228,8 @@ void CsiStudy_v2Module::event()
   //Loop over DigiHit
   for (const auto& Hit : Hits) {
     int detNB = Hit.getCellId();
-    //double Edep = Hit.getEnergyDep() * 1e3; //GeV -> MeV
-    double RecEdep = Hit.getEnergyRecDep() * 1e3; //GeV -> MeV
+    double Edep = Hit.getEnergyDep() * 1e3; //GeV -> MeV
+    double RecEdep = Edep;//Hit.getEnergyRecDep() * 1e3; //GeV -> MeV
     //double tof = Hit.getFlightTime(); //ns
     /*
     h_csi_rate[0]->Fill(detNB);
@@ -255,11 +255,14 @@ void CsiStudy_v2Module::event()
     h_csi_energyVrs3W[detNB]->Fill(log10(RecEdep), ring_section, rate);
     */
     for (int i = 0; i < 153; i ++) {
-      if (m_Thres_hitRate[detNB][i] >= RecEdep) {
+      /*cout << " thres1 " << m_Thres_hitRate[detNB][i]
+      << " thres2 " << m_Thres_sumE[detNB][i]
+      << " edep " << RecEdep << " true Edep " << Edep << endl;*/
+      if (RecEdep >= m_Thres_hitRate[detNB][i] && m_Thres_hitRate[detNB][i] > 0) {
         h_csi_drate[i]->Fill(detNB);
         h_csi_rs_drate[i]->Fill(detNB, ring_section);
       }
-      if (m_Thres_sumE[detNB][i] >= RecEdep) {
+      if (RecEdep >= m_Thres_sumE[detNB][i] && m_Thres_sumE[detNB][i] > 0) {
         h_csi_dedep[detNB][i]->Fill(RecEdep);
         h_csi_rs_dedep[detNB][i]->Fill(RecEdep, ring_section);
 

@@ -147,31 +147,55 @@ namespace Belle2 {
           if (particlePDG != 11 and particlePDG != 13 and particlePDG != 211 and particlePDG != 321 and particlePDG != 2212
               and particlePDG != 1000010020)
             particlePDG = Const::pion.getPDGCode();
-          Particle p(track, Const::ChargedStable(particlePDG));
-          Particle* tempPart = &p;
 
-          // Is it a new mask?
-          if (std::find(allMaskNames.begin(), allMaskNames.end(), maskName) == allMaskNames.end()) {
-            std::pair<intAndBoolMap::iterator, bool> ret;
-            if (m_trackCuts.at(maskName)->check(tempPart))
-              ret = trackMask.insert(intAndBoolMap::value_type(track->getArrayIndex(), true));
-            else
+          // Skip tracks with charge 0
+          Const::ChargedStable type(particlePDG);
+          const TrackFitResult* trackFit = track->getTrackFitResult(type);
+
+          if (!trackFit)
+            continue;
+
+          int charge = trackFit->getChargeSign();
+
+          if (charge == 0) {
+            B2WARNING("Track with charge=0, this track will always be ignored in ROE!");
+
+            // If it's a new mask, set to zero, otherwise leave unchanged
+            if (std::find(allMaskNames.begin(), allMaskNames.end(), maskName) == allMaskNames.end()) {
+              std::pair<intAndBoolMap::iterator, bool> ret;
               ret = trackMask.insert(intAndBoolMap::value_type(track->getArrayIndex(), false));
 
-            if (!ret.second)
-              B2FATAL("Failed to add Track with ID '" << track->getArrayIndex() << "' to this Track mask! Something is wrong.");
-          }
-          // Or does it already exist?
-          else if (std::find(allMaskNames.begin(), allMaskNames.end(), maskName) != allMaskNames.end()) {
-            // If updating set to true OK, otherwise fatal
-            if (m_update) {
-              intAndBoolMap existingTrackMask = roe->getTrackMask(maskName);
-              if (!m_trackCuts.at(maskName)->check(tempPart))
-                existingTrackMask.at(track->getArrayIndex()) = false;
-              roe->updateTrackMask(maskName, existingTrackMask);
-            } else
-              B2FATAL("ROE mask with name \'" << maskName <<
-                      "\' already exists! If you want to update with new cuts, use updateROEMask- python functions!");
+              if (!ret.second)
+                B2FATAL("Failed to add Track with ID '" << track->getArrayIndex() << "' to this Track mask! Something is wrong.");
+            }
+          } else {
+
+            Particle p(track, type);
+            Particle* tempPart = &p;
+
+            // Is it a new mask?
+            if (std::find(allMaskNames.begin(), allMaskNames.end(), maskName) == allMaskNames.end()) {
+              std::pair<intAndBoolMap::iterator, bool> ret;
+              if (m_trackCuts.at(maskName)->check(tempPart))
+                ret = trackMask.insert(intAndBoolMap::value_type(track->getArrayIndex(), true));
+              else
+                ret = trackMask.insert(intAndBoolMap::value_type(track->getArrayIndex(), false));
+
+              if (!ret.second)
+                B2FATAL("Failed to add Track with ID '" << track->getArrayIndex() << "' to this Track mask! Something is wrong.");
+            }
+            // Or does it already exist?
+            else if (std::find(allMaskNames.begin(), allMaskNames.end(), maskName) != allMaskNames.end()) {
+              // If updating set to true OK, otherwise fatal
+              if (m_update) {
+                intAndBoolMap existingTrackMask = roe->getTrackMask(maskName);
+                if (!m_trackCuts.at(maskName)->check(tempPart))
+                  existingTrackMask.at(track->getArrayIndex()) = false;
+                roe->updateTrackMask(maskName, existingTrackMask);
+              } else
+                B2FATAL("ROE mask with name \'" << maskName <<
+                        "\' already exists! If you want to update with new cuts, use updateROEMask- python functions!");
+            }
           }
         }
 

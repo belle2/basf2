@@ -20,4 +20,3 @@ ParticleDecays:FSRinDecays=on
 
 ## QED radiation of quarks (FSR)
 TimeShower:QEDshowerByQ=on
-

@@ -50,7 +50,7 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   ParticleVertexFitterModule::ParticleVertexFitterModule() : Module(),
-    m_Bfield(0)
+    m_Bfield(0), m_logCapture("Rave", LogConfig::c_Debug, LogConfig::c_Debug)
   {
     // set module description (e.g. insert text)
     setDescription("Vertex fitter for modular analysis");
@@ -225,13 +225,15 @@ namespace Belle2 {
           && m_fitType != "massvertex"
           && m_fitType != "mass"
           && m_fitType != "fourC")
-        B2FATAL("ParticleVertexFitter: " << m_fitType << " ***invalid fit type for the Kfitter ");
+        B2FATAL("ParticleVertexFitter: " << m_fitType << " ***invalid fit type for the vertex fitter ");
     }
 
     // fits using Rave
     if (m_vertexFitter == "rave") {
       try {
+        m_logCapture.start();
         ok = doRaveFit(mother);
+        m_logCapture.finish();
       } catch (rave::CheckedFloatException) {
         B2ERROR("Invalid inputs (nan/inf)?");
         ok = false;

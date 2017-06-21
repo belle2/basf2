@@ -72,6 +72,8 @@ namespace Belle2 {
     TH2F* h_decavtx[10];
     /** kin v z */
     TH2F* h_kineticvz[10];
+    TH2F* h_kineticvz1[10];
+    TH2F* h_kineticvz2[10];
     /** kin v z */
     TH2F* h_kineticvz_zoom[10];
     /** kin v z */
@@ -82,6 +84,8 @@ namespace Belle2 {
     TH2F* h_thetavz[10];
     /** phi v z */
     TH2F* h_phivz[10];
+    TH2F* h_phive[10];
+    TH2F* h_rve[10];
     /** sad xy */
     TH2F* h_sad_xy[2];
     /** g4 xy */

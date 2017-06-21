@@ -1970,11 +1970,13 @@ double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLa
 
 }
 
-double CDCGeometryPar::getSigma(const double driftL, const unsigned short iCLayer, const unsigned short lr, const double alpha,
+double CDCGeometryPar::getSigma(const double DriftL0, const unsigned short iCLayer, const unsigned short lr, const double alpha,
                                 const double theta) const
 {
 
   double sigma = 0.;
+  //DriftL0 < 0 for the hit w/driftTime < 0; use |DriftL0| to avoid sigma=nan
+  const double driftL = fabs(DriftL0);
 
   //convert incoming- to outgoing-lr
   unsigned short lro = getOutgoingLR(lr, alpha);

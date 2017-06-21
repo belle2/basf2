@@ -757,6 +757,9 @@ def reconstructDecay(
                        the number of candidates is exceeded no candidate will be
                        reconstructed for that event and a Warning will be
                        printed.
+                       If no value is given the amount is limited to a sensible
+                       default. A value <=0 will disable this limit and can
+                       cause huge memory amounts so be careful.
     """
 
     pmake = register_module('ParticleCombiner')
@@ -821,6 +824,9 @@ def reconstructRecoil(
                        the number of candidates is exceeded no candidate will be
                        reconstructed for that event and a Warning will be
                        printed.
+                       If no value is given the amount is limited to a sensible
+                       default. A value <=0 will disable this limit and can
+                       cause huge memory amounts so be careful.
     """
 
     pmake = register_module('ParticleCombiner')
@@ -863,6 +869,9 @@ def reconstructRecoilDaughter(
                        the number of candidates is exceeded no candidate will be
                        reconstructed for that event and a Warning will be
                        printed.
+                       If no value is given the amount is limited to a sensible
+                       default. A value <=0 will disable this limit and can
+                       cause huge memory amounts so be careful.
     """
 
     pmake = register_module('ParticleCombiner')

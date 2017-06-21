@@ -1,11 +1,54 @@
 '''
-File for summarizing all default generator settings.
+File  summarizing all default generator settings.
+More information: BELLE2-NOTE-PH-2015-006
 Contact: Torben Ferber (ferber@physics.ubc.ca)
 '''
 
 from basf2 import *
 from ROOT import Belle2
 import os
+
+
+def add_aafh_generator(path, finalstate='e+e-e+e-', preselection=False):
+    """
+    Add the default two photon generator for four fermion final states
+    :param finalstate: e+e-e+e-, e+e-mu+mu-
+    :param preselection: if true, select events with at least one medium pt particle in the CDC acceptance
+    """
+
+    aafh = register_module('AafhInput')
+    aafh_mode = 5
+    aafh_subgeneratorWeights = [1.0, 7.986e+01, 5.798e+04, 3.898e+05, 1.0, 1.664e+00, 2.812e+00, 7.321e-01]
+    aafh_maxSubgeneratorWeight = 1.0
+    aafh_maxFinalWeight = 3.0
+
+    if finalstate == 'e+e-mu+mu-':
+        aafh_mode = 3
+        aafh_subgeneratorWeights = [1.000e+00, 1.520e+01, 3.106e+03, 6.374e+03, 1.000e+00, 1.778e+00, 6.075e+00, 6.512e+00]
+        aafh_maxSubgeneratorWeight = 1.0
+
+    aafh = path.add_module(
+        'AafhInput',
+        mode=aafh_mode,
+        rejection=2,
+        maxSubgeneratorWeight=aafh_maxSubgeneratorWeight,
+        maxFinalWeight=aafh_maxFinalWeight,
+        subgeneratorWeights=aafh_subgeneratorWeights,
+        suppressionLimits=[1e100] * 4,
+        minMass=0.50
+    )
+
+    if preselection:
+        generatorpreselection = path.add_module(
+            'GeneratorPreselection',
+            nChargedMin=1,
+            MinChargedPt=0.1,
+            MinChargedTheta=17.0,
+            MaxChargedTheta=150.0
+        )
+
+        generator_emptypath = create_path()
+        generatorpreselection.if_value('!=11', generator_emptypath)
 
 
 def add_kkmc_generator(path, finalstate='tau+tau-'):
@@ -39,6 +82,25 @@ def add_kkmc_generator(path, finalstate='tau+tau-'):
         taudecaytableFile=kkmc_tauconfigfile,
         kkmcoutputfilename=kkmc_logfile,
     )
+
+
+def add_evtgen_generator(path, finalstate='charged'):
+    """
+    Add EvtGen for mixed and charged BB
+    """
+    evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/charged.dec')
+
+    if finalstate == 'mixed':
+        evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/mixed.dec')
+
+    # use EvtGen
+    print(evtgen_userdecfile)
+    evtgen = path.add_module(
+        'EvtGenInput',
+        userDECFile=evtgen_userdecfile
+    )
+
+    print_params(evtgen)
 
 
 def add_continuum_generator(path, finalstate='uubar'):

@@ -96,8 +96,6 @@ ntupleTree('B0', 'B0', tools)
 # dump all event summary information
 # eventtools = ['EventMetaData','B0']
 # eventtools += ['RecoStats','B0']
-# eventtools += ['DetectorStatsRec', 'B0']
-# eventtools += ['DetectorStatsSim','B0']
 
 # ntupleTree('eventtuple', 'B0', eventtools)
 

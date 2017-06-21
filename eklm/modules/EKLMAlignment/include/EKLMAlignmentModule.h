@@ -92,6 +92,9 @@ namespace Belle2 {
     /** Sector dalpha. */
     double m_SectorDalpha;
 
+    /** Name of input file. */
+    std::string m_InputFile;
+
     /** Name of output file. */
     std::string m_OutputFile;
 
@@ -117,6 +120,11 @@ namespace Belle2 {
      * @param[in] displaceSegment Whether segments should be displaced.
      */
     void generateRandomDisplacement(bool displaceSector, bool displaceSegment);
+
+    /**
+     * Read displacement from ROOT file.
+     */
+    void readDisplacementFromROOTFile();
 
     /**
      * Generate random sector displacements and check if they are correct

@@ -15,6 +15,7 @@ namespace Belle2 {
       {
         m_data = new T;
         *m_data = *obj.m_data;
+        m_ncols = obj.m_ncols;
       }
 
       ~WrapArray2D()

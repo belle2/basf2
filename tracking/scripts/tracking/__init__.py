@@ -168,7 +168,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, ad
 def add_cdc_cr_track_fit_and_track_creator(
         path, components=None, pruneTracks=False, eventTimingExtraction=False,
         reco_tracks="RecoTracks", tracks="",
-        lightPropSpeed=12.9925, triggerPos=[0, 0, 0],
+        lightPropSpeed=12.9925, trigger_point=[0, 0, 0],
         normTriggerPlaneDirection=[0, 1, 0],
         readOutPos=[0, 0, -50.0],
         use_readout_position=False):
@@ -179,7 +179,7 @@ def add_cdc_cr_track_fit_and_track_creator(
     :param path: The path to which to add the tracking reconstruction modules
     :param components: the list of geometry components in use or None for all components.
     :param reco_tracks: The name of the reco tracks to use
-    :param tracks: the name of the output Bellle tracks
+    :param tracks: the name of the output Belle tracks
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
     :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
         FullGridTrackTimeExtraction modules.
@@ -190,7 +190,7 @@ def add_cdc_cr_track_fit_and_track_creator(
     path.add_module("PlaneTriggerTrackTimeEstimator",
                     recoTracksStoreArrayName=reco_tracks,
                     pdgCodeToUseForEstimation=13,
-                    triggerPlanePosition=triggerPos,
+                    triggerPlanePosition=trigger_point,
                     triggerPlaneDirection=normTriggerPlaneDirection,
                     useFittedInformation=False)
 
@@ -205,7 +205,7 @@ def add_cdc_cr_track_fit_and_track_creator(
     path.add_module("PlaneTriggerTrackTimeEstimator",
                     recoTracksStoreArrayName=reco_tracks,
                     pdgCodeToUseForEstimation=13,
-                    triggerPlanePosition=triggerPos,
+                    triggerPlanePosition=trigger_point,
                     triggerPlaneDirection=normTriggerPlaneDirection,
                     useFittedInformation=True,
                     useReadoutPosition=use_readout_position,

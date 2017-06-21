@@ -82,7 +82,6 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   m_StripV.SetY(v.unit().y());
   genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin2, u2, v2, 0));
   setPlane(detPlane, m_Segment.getGlobalNumber());
-  /* Projection onto hit plane - only need to change Z. */
   rawHitCoords_[0] = geoDat->getStripGeometry()->getWidth() *
                      ((eklmDigits[digit]->getStrip() - 1) %
                       geoDat->getNStripsSegment()) / CLHEP::cm * Unit::cm;

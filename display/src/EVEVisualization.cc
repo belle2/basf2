@@ -720,10 +720,7 @@ TEveBox* EVEVisualization::boxCreator(const TVector3& o, TVector3 u, TVector3 v,
   TEveBox* box = new TEveBox;
   box->SetPickable(true);
 
-  //std::cout<<"o "<<o[0]<<", "<<o[1]<<", "<<o[2]<<std::endl;
   TVector3 norm = u.Cross(v);
-  //std::cout<<"u "<<u[0]<<", "<<u[1]<<", "<<u[2]<<std::endl;
-  //std::cout<<"v "<<v[0]<<", "<<v[1]<<", "<<v[2]<<std::endl;
   u *= (0.5 * ud);
   v *= (0.5 * vd);
   norm *= (0.5 * depth);

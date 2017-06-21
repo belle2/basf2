@@ -27,6 +27,10 @@ def stdPi0s(listtype='veryLoose', path=analysis_main):
         reconstructDecay('pi0:looseFit -> gamma:pi0highE gamma:pi0highE', '0.1 < M < 0.160', 1, True, path)
         massKFit('pi0:looseFit', 0.0, '', path)
         matchMCTruth('pi0:looseFit', path)
+    elif listtype = 'skim':  # the same as veryLoose
+        fillParticleList('gamma:pi0', '', True, path)
+        reconstructDecay('pi0:skim -> gamma:pi0 gamma:pi0', '0.09 < M < 0.165', 1, True, path)
+        matchMCTruth('pi0:skim', path)
     elif listtype == 'all':
         fillParticleList('gamma:all', '', True, path)
         reconstructDecay('pi0:all -> gamma:all gamma:all', '0.09 < M < 0.165', 1, True, path)
@@ -41,6 +45,14 @@ def stdPi0s(listtype='veryLoose', path=analysis_main):
         reconstructDecay('pi0:veryLooseFit -> gamma:pi0 gamma:pi0', '0.09 < M < 0.165', 1, True, path)
         massKFit('pi0:veryLooseFit', 0.0, '', path)
         matchMCTruth('pi0:veryLooseFit', path)
+
+# pi0 list for skims (and ONLY for skims)
+
+
+def loadStdSkimPi0(path=analysis_main):
+    stdPi0s('skim', path)
+
+# deprecated
 
 
 def loadStdPi0(listtype='veryLoose', path=analysis_main):

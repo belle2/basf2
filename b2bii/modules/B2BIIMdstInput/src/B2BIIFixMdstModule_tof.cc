@@ -53,11 +53,11 @@ namespace Belle2 {
 //======================================================
 //Check existence of belle_event
 
-    Belle_event_Manager& evtmgr = Belle_event_Manager::get_manager();
-    if (evtmgr.count() == 0) return;  //do nothing if no Belle_Event
+    Belle::Belle_event_Manager& evtmgr = Belle::Belle_event_Manager::get_manager();
+    if (evtmgr.count() == 0) return;  //do nothing if no Belle::Belle_Event
 
-    Mdst_event_add_Manager& addmgr = Mdst_event_add_Manager::get_manager();
-    if (addmgr.count() == 0) return;  //do nothing if no Mdst_Event_Add
+    Belle::Mdst_event_add_Manager& addmgr = Belle::Mdst_event_add_Manager::get_manager();
+    if (addmgr.count() == 0) return;  //do nothing if no Belle::Mdst_Event_Add
     if (addmgr[0].flag(4) != 0) return; //do nothing if already shifted
 
 //check mode
@@ -77,13 +77,13 @@ namespace Belle2 {
 
     // Loop over all charged tracks
 
-    Mdst_charged_Manager& ChgMgr = Mdst_charged_Manager::get_manager();
-    for (std::vector<Mdst_charged>::iterator it = ChgMgr.begin();
+    Belle::Mdst_charged_Manager& ChgMgr = Belle::Mdst_charged_Manager::get_manager();
+    for (std::vector<Belle::Mdst_charged>::iterator it = ChgMgr.begin();
          it != ChgMgr.end(); it++) {
-      Mdst_charged& Chg = *it;
+      Belle::Mdst_charged& Chg = *it;
       if (Chg) {
         // Get mdst_tof table for the track
-        Mdst_tof& Tof = Chg.tof();
+        Belle::Mdst_tof& Tof = Chg.tof();
         if (Tof) {
           // Get momentum and charge of track
           TVector3 Mom(Chg.px(), Chg.py(), Chg.pz());

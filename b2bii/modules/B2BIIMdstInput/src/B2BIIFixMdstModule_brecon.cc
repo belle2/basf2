@@ -24,11 +24,11 @@ namespace Belle2 {
 // momenta will NOT be modified
   void B2BIIFixMdstModule::fix_pi0_brecon(void)
   {
-    Brecon_Manager& breconmgr = Brecon_Manager::get_manager();
+    Belle::Brecon_Manager& breconmgr = Belle::Brecon_Manager::get_manager();
     if (!breconmgr.count()) return;
-    Mdst_pi0_Manager& pi0mgr = Mdst_pi0_Manager::get_manager();
+    Belle::Mdst_pi0_Manager& pi0mgr = Belle::Mdst_pi0_Manager::get_manager();
 
-    for (std::vector<Brecon>::iterator it = breconmgr.begin();
+    for (std::vector<Belle::Brecon>::iterator it = breconmgr.begin();
          it != breconmgr.end(); it++) {
 
       // select the table of pi0->gamma gamma
@@ -37,18 +37,18 @@ namespace Belle2 {
       const int da_last((*it).daLast());
       if (da_first < 1 || da_last < 1) continue;
       if (da_last - da_first != 1) continue;
-      const Brecon& gamma1(breconmgr[da_first - 1]);
-      const Brecon& gamma2(breconmgr[da_last - 1]);
+      const Belle::Brecon& gamma1(breconmgr[da_first - 1]);
+      const Belle::Brecon& gamma2(breconmgr[da_last - 1]);
       if (gamma1.stable() != 2 || gamma2.stable() != 2) continue;
 
       // find corresponding Mdst_pi0
       int pi0_ID(-1);
-      const Panther_ID g1(gamma1.idmdst());
-      const Panther_ID g2(gamma2.idmdst());
-      for (std::vector<Mdst_pi0>::const_iterator it2 = pi0mgr.begin();
+      const Belle::Panther_ID g1(gamma1.idmdst());
+      const Belle::Panther_ID g2(gamma2.idmdst());
+      for (std::vector<Belle::Mdst_pi0>::const_iterator it2 = pi0mgr.begin();
            it2 != pi0mgr.end(); it2++) {
-        const Panther_ID da1((*it2).gamma_ID(0));
-        const Panther_ID da2((*it2).gamma_ID(1));
+        const Belle::Panther_ID da1((*it2).gamma_ID(0));
+        const Belle::Panther_ID da2((*it2).gamma_ID(1));
         if ((g1 == da1 && g2 == da2) || (g1 == da2 && g2 == da1)) {
           pi0_ID = (int)(*it2).get_ID();
           break;

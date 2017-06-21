@@ -33,6 +33,7 @@
 #include "TFile.h"
 #include "TVectorD.h"
 #include "TF1.h"
+#include "TRandom3.h"
 
 using namespace std;
 using namespace std;
@@ -622,20 +623,150 @@ void PXDDQMModule::endRun()
       }
     }
   }
-
+// START DEMO histogram creation to check filesize for ExpresReco:
+  int DoDemo = 0;
+  // PXD: 4x40=160(100) + 6(40) = 166
+  // SVD: 6x172=1032(100) + 10(172) = 1042
+  // VXD+rest: 10(100x100) + 10(100)
+  int nPXD_Demo1 = 160;
+  int nPXD_Demo2 = 6;
+  // nPXD_Demo1 += 40;
+  // nPXD_Demo1 *= 24;
+  // nPXD_Demo2 *= 24;
+  int nSVD_Demo1 = 1032;
+  int nSVD_Demo2 = 10;
+  // nSVD_Demo1 += 172;
+  int nVXD_Demo1 = 20;
+  int nSamples = 20000;
+  TH1F** PXD_Demo1;
+  TH1F** PXD_Demo2;
+  TH1F** SVD_Demo1;
+  TH1F** SVD_Demo2;
+  TH1F** VXD_Demo1;
+  TH2F** VXD_Demo2;
+  PXD_Demo1 = new TH1F*[nPXD_Demo1];
+  PXD_Demo2 = new TH1F*[nPXD_Demo2];
+  SVD_Demo1 = new TH1F*[nSVD_Demo1];
+  SVD_Demo2 = new TH1F*[nSVD_Demo2];
+  VXD_Demo1 = new TH1F*[nVXD_Demo1];
+  VXD_Demo2 = new TH2F*[nVXD_Demo1];
+  for (int i = 0; i < nPXD_Demo1; i++) {
+    PXD_Demo1[i] = NULL;
+  }
+  for (int i = 0; i < nPXD_Demo2; i++) {
+    PXD_Demo2[i] = NULL;
+  }
+  for (int i = 0; i < nSVD_Demo1; i++) {
+    SVD_Demo1[i] = NULL;
+  }
+  for (int i = 0; i < nSVD_Demo2; i++) {
+    SVD_Demo2[i] = NULL;
+  }
+  for (int i = 0; i < nVXD_Demo1; i++) {
+    VXD_Demo1[i] = NULL;
+    VXD_Demo2[i] = NULL;
+  }
+  if (DoDemo) {
+    for (int i = 0; i < nPXD_Demo1; i++) {
+      PXD_Demo1[i] = NULL;
+      string name = str(format("PXD_DUMMY1_%1%") % i);
+      string title = str(format("PXD DUMMY1 %1%") % i);
+      PXD_Demo1[i] = new TH1F(name.c_str(), title.c_str(), 150, 0, 50);
+      PXD_Demo1[i]->GetXaxis()->SetTitle("x - axis");
+      PXD_Demo1[i]->GetYaxis()->SetTitle("counts");
+    }
+    for (int i = 0; i < nPXD_Demo2; i++) {
+      PXD_Demo2[i] = NULL;
+      string name = str(format("PXD_DUMMY2_%1%") % i);
+      string title = str(format("PXD DUMMY 2 %1%") % i);
+      PXD_Demo2[i] = new TH1F(name.c_str(), title.c_str(), 40, 0, 50);
+      PXD_Demo2[i]->GetXaxis()->SetTitle("x - axis");
+      PXD_Demo2[i]->GetYaxis()->SetTitle("counts");
+    }
+    for (int i = 0; i < nSVD_Demo1; i++) {
+      SVD_Demo1[i] = NULL;
+      string name = str(format("SVD_DUMMY1_%1%") % i);
+      string title = str(format("SVD DUMMY 1 %1%") % i);
+      SVD_Demo1[i] = new TH1F(name.c_str(), title.c_str(), 150, 0, 50);
+      SVD_Demo1[i]->GetXaxis()->SetTitle("x - axis");
+      SVD_Demo1[i]->GetYaxis()->SetTitle("counts");
+    }
+    for (int i = 0; i < nSVD_Demo2; i++) {
+      SVD_Demo2[i] = NULL;
+      string name = str(format("SVD_DUMMY2_%1%") % i);
+      string title = str(format("SVD DUMMY 2 %1%") % i);
+      SVD_Demo2[i] = new TH1F(name.c_str(), title.c_str(), 172, 0, 50);
+      SVD_Demo2[i]->GetXaxis()->SetTitle("x - axis");
+      SVD_Demo2[i]->GetYaxis()->SetTitle("counts");
+    }
+    for (int i = 0; i < nVXD_Demo1; i++) {
+      VXD_Demo1[i] = NULL;
+      string name = str(format("VXD_DUMMY_%1%") % i);
+      string title = str(format("VXD DUMMY %1%") % i);
+      VXD_Demo1[i] = new TH1F(name.c_str(), title.c_str(), 150, 0, 150);
+      VXD_Demo1[i]->GetXaxis()->SetTitle("x - axis");
+      VXD_Demo1[i]->GetYaxis()->SetTitle("counts");
+      VXD_Demo2[i] = NULL;
+      name = str(format("VXD_DUMMY2_%1%") % i);
+      title = str(format("VXD DUMMY 2 %1%") % i);
+      VXD_Demo2[i] = new TH2F(name.c_str(), title.c_str(), 450, 0, 150, 450, 0, 150);
+      VXD_Demo2[i]->GetXaxis()->SetTitle("x - axis");
+      VXD_Demo2[i]->GetYaxis()->SetTitle("y - axis");
+      VXD_Demo2[i]->GetZaxis()->SetTitle("counts");
+    }
+    TRandom3 r(0);
+    for (int j = 0; j < nSamples; j++) {
+      for (int i = 0; i < nPXD_Demo1; i++) {
+        PXD_Demo1[i]->Fill(r.Gaus(15, 5));
+      }
+      for (int i = 0; i < nPXD_Demo2; i++) {
+        PXD_Demo2[i]->Fill(r.Gaus(25, 5));
+      }
+      for (int i = 0; i < nSVD_Demo1; i++) {
+        SVD_Demo1[i]->Fill(r.Gaus(35, 5));
+      }
+      for (int i = 0; i < nSVD_Demo2; i++) {
+        SVD_Demo2[i]->Fill(r.Gaus(15, 15));
+      }
+      for (int i = 0; i < nVXD_Demo1; i++) {
+        VXD_Demo1[i]->Fill(r.Gaus(15, 5));
+        VXD_Demo2[i]->Fill(r.Gaus(75, 15), r.Gaus(75, 15));
+      }
+    }
+  }
+// END DEMO histogram creation to check filesize for ExpresReco:
 
   // Save histograms to flag file:
   f_OutFlagsFile->cd();
   NoOfEvents->Write(nameBS.Data());
   DirPXDFlags->cd();
-  hf_hitMapCounts->Write();
-  hf_hitMapClCounts->Write();
-  hf_hitMapCountsRef->Write();
-  hf_hitMapClCountsRef->Write();
-  hf_hitMapCountsDiff->Write();
-  hf_hitMapClCountsDiff->Write();
-  hf_hitMap->Write();
-  hf_hitMapCl->Write();
+  if (DoDemo) {
+    for (int i = 0; i < nPXD_Demo1; i++) {
+      PXD_Demo1[i]->Write();
+    }
+    for (int i = 0; i < nPXD_Demo2; i++) {
+      PXD_Demo2[i]->Write();
+    }
+    for (int i = 0; i < nSVD_Demo1; i++) {
+      SVD_Demo1[i]->Write();
+    }
+    for (int i = 0; i < nSVD_Demo2; i++) {
+      SVD_Demo2[i]->Write();
+    }
+    for (int i = 0; i < nVXD_Demo1; i++) {
+      VXD_Demo1[i]->Write();
+      VXD_Demo2[i]->Write();
+    }
+  } else {
+    hf_hitMapCounts->Write();
+    hf_hitMapClCounts->Write();
+    hf_hitMapCountsRef->Write();
+    hf_hitMapClCountsRef->Write();
+    hf_hitMapCountsDiff->Write();
+    hf_hitMapClCountsDiff->Write();
+    hf_hitMap->Write();
+    hf_hitMapCl->Write();
+  }
 
   // Close flag file:
   f_OutFlagsFile->Close();

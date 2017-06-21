@@ -169,7 +169,7 @@
 		</Component>
         <!-- There are is a single clamp on the modules in the slanted region -->
 		<Component type="SlantedClamps">
-			<u unit="mm">  14.0 </u> <v unit="mm"> 3.0 </v> <w unit="mm"> above </w> <woffset unit="mm">0.3</woffset>
+			<u unit="mm">  14.31 </u> <v unit="mm"> 1.25 </v> <w unit="mm"> above </w> <woffset unit="mm">0.3</woffset>
 		</Component>
 	</Sensor>
 
@@ -183,6 +183,9 @@
 			<xi:include xpointer="xpointer(//KaptonBase[@type='Slanted']/*)" />
 			<height unit="mm">0.300</height>
 			<Component type="KaptonSlanted1"><w>bottom</w></Component>
+		</Component>
+		<Component type="SlantedClamps">
+			<u unit="mm">  14.31 </u> <v unit="mm"> 1.25 </v> <w unit="mm"> above </w> <woffset unit="mm">0.3</woffset>
 		</Component>
 	</Sensor>
 
@@ -219,7 +222,7 @@
 		</Component>
         <!-- There are two clamps on the modules in the barrel region -->
 		<Component type="BarrelClamps">
-			<u unit="mm">  13.75 </u> <v unit="mm"> 60.0 </v> <w unit="mm"> above </w> <woffset unit="mm">1.5</woffset>
+			<u unit="mm">  13.75 </u> <v unit="mm"> 69.47 </v> <w unit="mm"> above </w> <woffset unit="mm">1.5</woffset>
 		</Component>
 	</Sensor>
 
@@ -299,8 +302,8 @@
 	<!-- Clamp holding the cooling pipe in the barrel region -->
 	<Component name="BarrelClamps">
 		<Component type="Clamp">
-			<u unit="mm">  0.0</u> <v unit="mm">55.0</v>
-			<u unit="mm">  0.0</u> <v unit="mm">-55.0</v>
+			<u unit="mm">  0.0</u> <v unit="mm">48.6</v>
+			<u unit="mm">  0.0</u> <v unit="mm">-48.6</v>
 		</Component>
 	</Component>
 
@@ -347,9 +350,9 @@
 		</Component>
 
 		<Component type="Clamp">
-			<u unit="mm">  5.170</u> <v unit="mm">28.760</v>
-			<u unit="mm">  5.170</u> <v unit="mm">0.0</v>
-			<u unit="mm">  5.170</u> <v unit="mm">-28.760</v>
+			<u unit="mm">  5.310</u> <v unit="mm">23.030</v>
+			<u unit="mm">  5.310</u> <v unit="mm">0.06</v>
+			<u unit="mm">  5.310</u> <v unit="mm">-22.910</v>
 		</Component>
 
 		<!-- Add the top part of the Origami pitch adapter -->

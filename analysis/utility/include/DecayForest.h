@@ -24,6 +24,9 @@
 namespace Belle2 {
 
 
+  /**
+   * Contains several DecayTree objects, which belong all to the same candidate
+   */
   class DecayForest {
   public:
     /**
@@ -65,8 +68,8 @@ namespace Belle2 {
     unsigned int getOriginalTreeNumber() const { return m_first_valid_original; }
 
   private:
-    std::vector<DecayTree> forest;
-    size_t m_first_valid_original;
+    std::vector<DecayTree> forest; /**< vector of DecayTrees */
+    size_t m_first_valid_original; /**< The first valid DecayTree */
   };
 
 

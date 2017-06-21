@@ -1,5 +1,5 @@
 '''
-File  summarizing all default generator settings.
+File summarizing all default generator settings.
 More information: BELLE2-NOTE-PH-2015-006
 Contact: Torben Ferber (ferber@physics.ubc.ca)
 '''
@@ -105,7 +105,7 @@ def add_evtgen_generator(path, finalstate='charged'):
 
 def add_continuum_generator(path, finalstate='uubar'):
     """
-    Add the default continuum generators KKMC + PYTHIA including their default decfiles and OPYTHIA settings
+    Add the default continuum generators KKMC + PYTHIA including their default decfiles and PYTHIA settings
     :param finalstate: uubar, ddbar, ssbar, ccbar
     :param emptypathname branch to reject events where PYTHIA failed to fragment
     """

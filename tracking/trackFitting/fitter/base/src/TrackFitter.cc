@@ -95,6 +95,7 @@ bool TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresenta
   gErrorIgnoreLevel = m_gErrorIgnoreLevel; // Set the log level defined in the TrackFitter
   auto fitWithoutCheckResult = fitWithoutCheck(recoTrack, *trackRepresentation);
   gErrorIgnoreLevel = previousSetting; // Restore previous setting
+  return fitWithoutCheckResult;
 }
 
 void TrackFitter::resetFitterToDefaultSettings()

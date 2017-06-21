@@ -1,7 +1,168 @@
 '''
-File for summarizing all default generator settings.
+File summarizing all default generator settings.
+More information: BELLE2-NOTE-PH-2015-006
+Contact: Torben Ferber (ferber@physics.ubc.ca)
 '''
+
+from basf2 import *
 from ROOT import Belle2
+import os
+
+
+def add_aafh_generator(path, finalstate='e+e-e+e-', preselection=False):
+    """
+    Add the default two photon generator for four fermion final states
+    :param finalstate: e+e-e+e-, e+e-mu+mu-
+    :param preselection: if true, select events with at least one medium pt particle in the CDC acceptance
+    """
+
+    aafh = register_module('AafhInput')
+    aafh_mode = 5
+    aafh_subgeneratorWeights = [1.0, 7.986e+01, 5.798e+04, 3.898e+05, 1.0, 1.664e+00, 2.812e+00, 7.321e-01]
+    aafh_maxSubgeneratorWeight = 1.0
+    aafh_maxFinalWeight = 3.0
+
+    if finalstate == 'e+e-mu+mu-':
+        aafh_mode = 3
+        aafh_subgeneratorWeights = [1.000e+00, 1.520e+01, 3.106e+03, 6.374e+03, 1.000e+00, 1.778e+00, 6.075e+00, 6.512e+00]
+        aafh_maxSubgeneratorWeight = 1.0
+
+    aafh = path.add_module(
+        'AafhInput',
+        mode=aafh_mode,
+        rejection=2,
+        maxSubgeneratorWeight=aafh_maxSubgeneratorWeight,
+        maxFinalWeight=aafh_maxFinalWeight,
+        subgeneratorWeights=aafh_subgeneratorWeights,
+        suppressionLimits=[1e100] * 4,
+        minMass=0.50
+    )
+
+    if preselection:
+        generatorpreselection = path.add_module(
+            'GeneratorPreselection',
+            nChargedMin=1,
+            MinChargedPt=0.1,
+            MinChargedTheta=17.0,
+            MaxChargedTheta=150.0
+        )
+
+        generator_emptypath = create_path()
+        generatorpreselection.if_value('!=11', generator_emptypath)
+
+
+def add_kkmc_generator(path, finalstate='tau+tau-'):
+    """
+    Add the default muon pair and tau pair generator KKMC
+    :param finalstate: mu+mu-, tau+tau-
+    """
+
+    #: kkmc input file
+    kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau.input.dat')
+
+    #: kkmc file that will hold cross section and other information
+    kkmc_logfile = 'kkmc_tautau.txt'
+
+    #: kkmc configuration file, should be fine as is
+    kkmc_config = Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat')
+
+    #: tau config file (empty for mu+mu-)
+    kkmc_tauconfigfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau_decaytable.dat')
+
+    if finalstate == 'mu+mu-':
+        kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat')
+        kkmc_logfile = 'kkmc_mumu.txt'
+        kkmc_tauconfigfile = ''
+
+    # use KKMC to generate lepton pairs
+    kkgeninput = path.add_module(
+        'KKGenInput',
+        tauinputFile=kkmc_inputfile,
+        KKdefaultFile=kkmc_config,
+        taudecaytableFile=kkmc_tauconfigfile,
+        kkmcoutputfilename=kkmc_logfile,
+    )
+
+
+def add_evtgen_generator(path, finalstate='charged'):
+    """
+    Add EvtGen for mixed and charged BB
+    """
+    evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/charged.dec')
+
+    if finalstate == 'mixed':
+        evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/mixed.dec')
+
+    # use EvtGen
+    print(evtgen_userdecfile)
+    evtgen = path.add_module(
+        'EvtGenInput',
+        userDECFile=evtgen_userdecfile
+    )
+
+    print_params(evtgen)
+
+
+def add_continuum_generator(path, finalstate='uubar'):
+    """
+    Add the default continuum generators KKMC + PYTHIA including their default decfiles and PYTHIA settings
+    :param finalstate: uubar, ddbar, ssbar, ccbar
+    :param emptypathname branch to reject events where PYTHIA failed to fragment
+    """
+
+    #: kkmc input file, one for each qqbar mode
+    kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/uubar_nohadronization.input.dat')
+
+    #: kkmc file that will hold cross section and other information
+    kkmc_logfile = 'kkmc_uubar.txt'
+
+    #: pythia configuration, different for ccbar
+    pythia_config = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/pythia_belle2.dat')
+
+    #: user decay file
+    decay_user = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/dec_belle2_qqbar.dec')
+
+    #: kkmc configuration file, should be fine as is
+    kkmc_config = Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat')
+
+    #: global decay file, should be fine as is
+    decay_file = os.path.expandvars('$BELLE2_EXTERNALS_DIR/share/evtgen/DECAY_2010.DEC')
+
+    if finalstate == 'ddbar':
+        kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/ddbar_nohadronization.input.dat')
+        kkmc_logfile = 'kkmc_ddbar.txt'
+    elif finalstate == 'ssbar':
+        kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/ssbar_nohadronization.input.dat')
+        kkmc_logfile = 'kkmc_ssbar.txt'
+    elif finalstate == 'ccbar':
+        kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/ccbar_nohadronization.input.dat')
+        pythia_config = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/pythia_belle2_charm.dat')
+        kkmc_logfile = 'kkmc_ccbar.txt'
+
+    # use KKMC to generate qqbar events (no fragmentation at this stage)
+    kkgeninput = path.add_module(
+        'KKGenInput',
+        tauinputFile=kkmc_inputfile,
+        KKdefaultFile=kkmc_config,
+        taudecaytableFile='',
+        kkmcoutputfilename=kkmc_logfile,
+    )
+
+    # add the fragmentation module to fragment the generated quarks into hadrons
+    # using PYTHIA8
+    fragmentation = path.add_module(
+        'Fragmentation',
+        ParameterFile=pythia_config,
+        ListPYTHIAEvent=0,
+        UseEvtGen=1,
+        DecFile=decay_file,
+        UserDecFile=decay_user,
+    )
+
+    # branch to an empty path if PYTHIA failed, this will change the number of events
+    # but the file meta data will contain the total number of generated events
+    generator_emptypath = create_path()
+    fragmentation.if_value('<1', generator_emptypath)
 
 
 def add_babayaganlo_generator(path, finalstate='ee'):

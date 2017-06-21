@@ -83,8 +83,6 @@ void VariablesToTreeModule::initialize()
 
   m_tree.registerInDataStore(m_fileName + m_treeName, DataStore::c_DontWriteOut);
   m_tree.construct(m_treeName.c_str(), "");
-  m_tree->get().SetBasketSize("*", 1600);
-  m_tree->get().SetCacheSize(100000);
 
   m_values.resize(m_variables.size());
   m_event_values.resize(m_event_variables.size());

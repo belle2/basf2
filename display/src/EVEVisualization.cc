@@ -25,6 +25,8 @@
 
 #include <vxd/geometry/GeoCache.h>
 #include <bklm/dataobjects/BKLMSimHitPosition.h>
+#include <bklm/dataobjects/BKLMHit2d.h>
+#include <bklm/geometry/GeometryPar.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
@@ -718,7 +720,10 @@ TEveBox* EVEVisualization::boxCreator(const TVector3& o, TVector3 u, TVector3 v,
   TEveBox* box = new TEveBox;
   box->SetPickable(true);
 
+  //std::cout<<"o "<<o[0]<<", "<<o[1]<<", "<<o[2]<<std::endl;
   TVector3 norm = u.Cross(v);
+  //std::cout<<"u "<<u[0]<<", "<<u[1]<<", "<<u[2]<<std::endl;
+  //std::cout<<"v "<<v[0]<<", "<<v[1]<<", "<<v[2]<<std::endl;
   u *= (0.5 * ud);
   v *= (0.5 * vd);
   norm *= (0.5 * depth);
@@ -1339,6 +1344,49 @@ void EVEVisualization::addKLMCluster(const KLMCluster* cluster)
     addToGroup(std::string("KLMClusters/") + ObjectInfo::getIdentifier(cluster).Data(), layer);
     addObject(cluster, layer);
   }
+}
+
+void EVEVisualization::addBKLMHit2d(const BKLMHit2d* bklm2dhit)
+{
+  //TVector3 globalPosition=  bklm2dhit->getGlobalPosition();
+  bklm::GeometryPar*  m_GeoPar = Belle2::bklm::GeometryPar::instance();
+  const bklm::Module* module = m_GeoPar->findModule(bklm2dhit->isForward(), bklm2dhit->getSector(), bklm2dhit->getLayer());
+
+  CLHEP::Hep3Vector global;
+  //+++ global coordinates of the hit
+  global[0] = bklm2dhit->getGlobalPosition()[0];
+  global[1] = bklm2dhit->getGlobalPosition()[1];
+  global[2] = bklm2dhit->getGlobalPosition()[2];
+
+  //+++ local coordinates of the hit
+  CLHEP::Hep3Vector local = module->globalToLocal(global);
+  //double localU = local[1]; //phi
+  //double localV = local[2]; //z
+  int Nphistrip = bklm2dhit->getPhiStripMax() - bklm2dhit->getPhiStripMin() + 1;
+  int Nztrip = bklm2dhit->getZStripMax() - bklm2dhit->getZStripMin() + 1;
+  double du = module->getPhiStripWidth() * Nphistrip;
+  double dv = module->getZStripWidth() * Nztrip;
+
+  //Let's do some simple thing
+  CLHEP::Hep3Vector localU(local[0], local[1] + 1.0, local[2]);
+  CLHEP::Hep3Vector localV(local[0], local[1], local[2] + 1.0);
+
+  CLHEP::Hep3Vector globalU = module->localToGlobal(localU);
+  CLHEP::Hep3Vector globalV = module->localToGlobal(localV);
+
+  TVector3 o(global[0], global[1], global[2]);
+  TVector3 u(globalU[0], globalU[1], globalU[2]);
+  TVector3 v(globalV[0], globalV[1], globalV[2]);
+
+  //Lest's just assign the depth is 1.0 cm (thickness of a layer), better to update
+  TEveBox* bklmbox = boxCreator(o, u - o, v - o, du, dv, 1.0);
+
+  bklmbox->SetMainColor(kGreen);
+  //bklmbox->SetName((std::to_string(hitModule)).c_str());
+  bklmbox->SetName("BKLMHit2d");
+
+  addToGroup("BKLM2dHits", bklmbox);
+  addObject(bklm2dhit, bklmbox);
 }
 
 void EVEVisualization::addROI(const ROIid* roi)

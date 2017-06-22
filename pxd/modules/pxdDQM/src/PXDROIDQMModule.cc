@@ -107,10 +107,10 @@ void PXDROIDQMModule::beginRun()
 
 void PXDROIDQMModule::event()
 {
+  int nr_HLT = 0;
+  int nr_DC = 0;
   for (auto& it : m_storeROIs) {
     int nr;
-    int nr_HLT = 0;
-    int nr_DC = 0;
     nr = it.getNrROIs();
     //it.dump();
     hrawROIcount->Fill(nr);
@@ -148,19 +148,17 @@ void PXDROIDQMModule::event()
       }
     }
     hrawROINrDCvsNrHLT->Fill(nr_HLT, nr_DC);
-    if (nr_DC == 0 && nr_HLT == 0) {
-      hrawROIEVTsWithOneSource->Fill(nr_HLT, nr_DC);
-    }
-    if (nr_DC == 0 && nr_HLT != 0) {
-      hrawROIEVTsWithOneSource->Fill(1, nr_DC);
-    }
-    if (nr_DC != 0 && nr_HLT == 0) {
-      hrawROIEVTsWithOneSource->Fill(nr_HLT, 1);
-    }
-    if (nr_DC != 0 && nr_HLT != 0) {
-      hrawROIEVTsWithOneSource->Fill(1, 1);
-    }
-    nr_HLT = 0;
-    nr_DC = 0;
+  }
+  if (nr_DC == 0 && nr_HLT == 0) {
+    hrawROIEVTsWithOneSource->Fill(nr_HLT, nr_DC);
+  }
+  if (nr_DC == 0 && nr_HLT != 0) {
+    hrawROIEVTsWithOneSource->Fill(1, nr_DC);
+  }
+  if (nr_DC != 0 && nr_HLT == 0) {
+    hrawROIEVTsWithOneSource->Fill(nr_HLT, 1);
+  }
+  if (nr_DC != 0 && nr_HLT != 0) {
+    hrawROIEVTsWithOneSource->Fill(1, 1);
   }
 }

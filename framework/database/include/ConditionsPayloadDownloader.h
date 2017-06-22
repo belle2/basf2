@@ -126,22 +126,22 @@ namespace Belle2 {
      */
     const PayloadInfo& get(const std::string& name);
 
-    /** Set the timeout to wait for connections in seconds */
+    /** Get the timeout to wait for connections in seconds, 0 means built in default */
     static unsigned int getConnectionTimeout() { return s_connectionTimeout; }
-    /** Set the timeout to wait for stalled connections (<10KB/s) */
+    /** Get the timeout to wait for stalled connections (<10KB/s), 0 means no timeout */
     static unsigned int getStalledTimeout() { return s_stalledTimeout; }
-    /** Set the number of retries to perform when downloading failes with HTTP response code >=500 */
+    /** Get the number of retries to perform when downloading failes with HTTP response code >=500, 0 means no retries*/
     static unsigned int getMaxRetries() { return s_maxRetries; }
-    /** Set the backoff factor for retries in seconds */
+    /** Get the backoff factor for retries in seconds */
     static unsigned int getBackoffFactor() { return s_backoffFactor; }
-    /** Set the timeout to wait for connections in seconds */
+    /** Set the timeout to wait for connections in seconds, 0 means built in default */
     static void setConnectionTimeout(unsigned int timeout) { s_connectionTimeout = timeout; }
-    /** Set the timeout to wait for stalled connections (<10KB/s) */
+    /** Set the timeout to wait for stalled connections (<10KB/s), 0 disables timeout */
     static void setStalledTimeout(unsigned int timeout) { s_stalledTimeout = timeout; }
-    /** Set the number of retries to perform when downloading failes with HTTP response code >=500 */
+    /** Set the number of retries to perform when downloading failes with HTTP response code >=500, 0 disables retry */
     static void setMaxRetries(unsigned int retries) { s_maxRetries = retries; }
-    /** Set the backoff factor for retries in seconds */
-    static void setBackoffFactor(unsigned int factor) { s_backoffFactor = factor; }
+    /** Set the backoff factor for retries in seconds. Minimum is 1 and 0 will be silently converted to 1 */
+    static void setBackoffFactor(unsigned int factor) { s_backoffFactor = std::max(1u, factor); }
 
   private:
 

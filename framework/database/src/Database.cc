@@ -231,8 +231,19 @@ namespace {
       const std::string n = names[i];
       if (kwargs.has_key(n)) {
         setters[i](extract<unsigned int>(kwargs[n]));
+        boost::python::api::delitem(kwargs, n);
       }
       result[n] = getters[i]();
+    }
+    if (len(kwargs) > 0) {
+      std::string message = "Unrecognized keyword arguments: ";
+      auto keys = kwargs.keys();
+      for (int i = 0; i < len(keys); ++i) {
+        if (i > 0) message += ", ";
+        message += extract<std::string>(keys[i]);
+      }
+      PyErr_SetString(PyExc_TypeError, message.c_str());
+      throw_error_already_set();
     }
     return result;
   }
@@ -357,11 +368,11 @@ function will return a dictionary containing the new settings.
     {'backoff_factor': 5, 'connection_timeout': 5, 'max_retries': 1, 'stalled_timeout': 60}
 
 :param int connection_timeout: timeout in seconds before connection should be
-    aborted.
+    aborted. 0 sets the timeout to the default (300s)
 :param int stalled_timeout: timeout in seconds before a download should be
-    aborted if the speed stays below 10 KB/s
+    aborted if the speed stays below 10 KB/s, 0 disables this timeout
 :param int max_retries: maximum amount of retries if the server responded with
-    an HTTP response of 500 or more.
+    an HTTP response of 500 or more. 0 disables retrying
 :param int backoff_factor: backoff factor for retries in seconds. Retries are
    performed using something similar to binary backoff: For retry :math:`n` and
    a `backoff_factor` :math:`f` we wait for a random time chosen uniformely

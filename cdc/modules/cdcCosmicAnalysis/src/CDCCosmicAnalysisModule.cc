@@ -74,6 +74,8 @@ void CDCCosmicAnalysisModule::initialize()
   tree->Branch("tanLambda1", &tanLambda1, "tanLambda1/D");
   tree->Branch("D01", &D01, "D01/D");
   tree->Branch("Z01", &Z01, "Z01/D");
+  tree->Branch("Omega1", &Omega1, "Omega1/D");
+  tree->Branch("Mom1", "TVector3", &Mom1);
   tree->Branch("posSeed1", "TVector3", &posSeed1);
 
   tree->Branch("Pval2", &Pval2, "Pval2/D");
@@ -82,6 +84,8 @@ void CDCCosmicAnalysisModule::initialize()
   tree->Branch("tanLambda2", &tanLambda2, "tanLambda2/D");
   tree->Branch("D02", &D02, "D02/D");
   tree->Branch("Z02", &Z02, "Z02/D");
+  tree->Branch("Omega2", &Omega2, "Omega2/D");
+  tree->Branch("Mom2", "TVector3", &Mom2);
   tree->Branch("posSeed2", "TVector3", &posSeed2);
 
 }
@@ -143,17 +147,22 @@ void CDCCosmicAnalysisModule::event()
       tanLambda1 = fitresult->getTanLambda();
       Z01 = fitresult->getZ0();
       D01 = fitresult->getD0();
+      Omega1 = fitresult->getOmega();
+      Mom1 = fitresult->getMomentum();
+
       ndf1 = ndf;
       Pval1 = TrPval;
       n += 1;
     }
-    if (nfitted > 1 && posSeed1.Y()*posSeed.Y() < 0) {
+    if (nfitted == 2) {
       posSeed2 = posSeed;
       Phi02 = Phi0;
       tanLambda2 = fitresult->getTanLambda();
       Z02 = fitresult->getZ0();
       D02 = fitresult->getD0();
       ndf2 = ndf;
+      Omega2 = fitresult->getOmega();
+      Mom2 = fitresult->getMomentum();
       Pval2 = TrPval;
       n += 1;
     }

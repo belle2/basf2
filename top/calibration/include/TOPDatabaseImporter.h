@@ -70,6 +70,13 @@ namespace Belle2 {
     void generateFakeChannelMask(double fractionDead, double fractionHot);
 
     /**
+     * Generate and import a channel mask of all but one module (for probability
+     * distrubtion debugging)
+     * @param moduleToKeep the module not to be removed (all others are masked)
+     */
+    void maskAllButOneModule(int moduleToKeep);
+
+    /**
      * for testing purposes only! - will be removed ...
      */
     void importTest(int runNumber, double syncTimeBase);

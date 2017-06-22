@@ -15,6 +15,9 @@ from tracking import add_tracking_reconstruction
 # Suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
 
+# channel mask
+use_local_database("localDB/localDB.txt", "localDB", False)
+
 # Create path
 main = create_path()
 
@@ -49,6 +52,19 @@ particlegun = register_module('ParticleGun')
 particlegun.param('pdgCodes', [13])  # , -211, 321, -321])
 particlegun.param('nTracks', 1)
 particlegun.param('varyNTracks', False)
+
+particlegun.param('momentumGeneration', 'uniform')
+particlegun.param('momentumParams', [2, 2])
+particlegun.param('thetaGeneration', 'uniformCos')
+particlegun.param('thetaParams', [-80, -80])
+particlegun.param('phiGeneration', 'uniform')
+particlegun.param('phiParams', [270, 270])
+particlegun.param('vertexGeneration', 'fixed')
+particlegun.param('xVertexParams', [10])
+particlegun.param('yVertexParams', [136.5])
+particlegun.param('zVertexParams', [0])
+
+'''
 particlegun.param('momentumGeneration', 'uniform')
 particlegun.param('momentumParams', [2, 2])
 particlegun.param('thetaGeneration', 'uniformCos')
@@ -59,6 +75,7 @@ particlegun.param('vertexGeneration', 'fixed')
 particlegun.param('xVertexParams', [0])
 particlegun.param('yVertexParams', [0])
 particlegun.param('zVertexParams', [0])
+'''
 particlegun.param('independentVertices', False)
 main.add_module(particlegun)
 
@@ -94,6 +111,8 @@ ext = register_module('Ext')
 main.add_module(ext)
 
 # TOP reconstruction
+top_cm = register_module('TOPChannelMasker')
+main.add_module(top_cm)
 topreco = register_module('TOPReconstructorPDF')
 topreco.logging.log_level = LogLevel.DEBUG  # remove or comment to suppress printout
 topreco.logging.debug_level = 2  # or set level to 0 to suppress printout

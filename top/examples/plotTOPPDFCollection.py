@@ -31,7 +31,7 @@ def PDF(listOfGaussians, x):
     return sum(g(x) for g in listOfGaussians)
 
 if __name__ == "__main__":
-    f = ROOT.TFile.Open("TOPOutput.root")
+    f = ROOT.TFile.Open("TOPOutput_InwardMuon4.root")
     t = f.Get("tree")
     gcmap = 'plasma'  # color map
 
@@ -53,6 +53,12 @@ if __name__ == "__main__":
                 lOG.append(Gaussian(peak, width, norm))
             Z[:, pixel] = np.array([PDF(lOG, x) for x in np.linspace(10, 60, 150)])
         zarrays.append(Z)
+
+        plt.figure(num=None, figsize=(8, 4), facecolor='w', edgecolor='k')
+        times = np.linspace(10, 60, 150)
+        plt.plot(times, Z[:, 500])
+        plt.savefig('single.pdf')
+        plt.clf()
         plt.pcolor(X, Y, Z, cmap=gcmap)
 
         ch = []

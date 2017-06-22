@@ -36,6 +36,7 @@ for i in range(t.GetEntries()):
 
     digits = t.TOPDigits
     for d in digits:
+        # print(d.getModuleID())
         ch.append(d.getPixelID())  # actually the same as pdf channel
         times.append(d.getTime())
 
@@ -82,6 +83,7 @@ if args.debug:
 # as occupancy of hitmap may be zero, add machine level epsilon to take sqrt
 eps = np.finfo(np.float32).eps
 matrix_of_pulls = (hits - Z) / np.sqrt(hits + eps)
+matrix_of_diffs = (hits - Z)
 pulls = matrix_of_pulls.reshape(np.prod(matrix_of_pulls.shape))  # flattens to 1D list
 
 # plot pulls
@@ -94,4 +96,10 @@ plt.clf()
 plt.pcolor(X, Y, matrix_of_pulls, cmap=gcmap)
 plt.colorbar()
 plt.savefig("matrix_of_pulls.pdf")
+
+plt.clf()
+plt.pcolor(X, Y, matrix_of_diffs, cmap=gcmap)
+plt.colorbar()
+plt.savefig("matrix_of_diffs.pdf")
+
 f.Close()

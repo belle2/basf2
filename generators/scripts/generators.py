@@ -165,6 +165,11 @@ def add_continuum_generator(path, finalstate='uubar'):
     fragmentation.if_value('<1', generator_emptypath)
 
 
+def get_default_decayfile():
+    """Return the default DECAY.dec for Belle2"""
+    return Belle2.FileSystem.findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC")
+
+
 def add_babayaganlo_generator(path, finalstate='ee'):
     """
     Add the high precision QED generator BABAYAGA.NLO to the path. Settings correspond to cross sections in BELLE2-NOTE-PH-2015-006

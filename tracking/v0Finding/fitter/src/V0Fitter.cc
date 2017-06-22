@@ -64,20 +64,18 @@ bool V0Fitter::fitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, ge
   VertexVector vertexVector;
   std::vector<genfit::Track*> trackPair {&trackPlus, &trackMinus};
 
-  IOIntercept::OutputToLogMessages
-  logCapture("V0Fitter GFRaveVertexFactory", LogConfig::c_Debug, LogConfig::c_Debug);
-  logCapture.start();
 
   try {
+    IOIntercept::OutputToLogMessages
+    logCapture("V0Fitter GFRaveVertexFactory", LogConfig::c_Debug, LogConfig::c_Debug);
+    logCapture.start();
+
     genfit::GFRaveVertexFactory vertexFactory;
     vertexFactory.findVertices(&vertexVector.v, trackPair);
   } catch (...) {
-    logCapture.finish();
     B2ERROR("Exception during vertex fit.");
     return false;
   }
-
-  logCapture.finish();
 
   if (vertexVector.size() != 1) {
     B2DEBUG(150, "Vertex fit failed. Size of vertexVector not 1, but: " << vertexVector.size());

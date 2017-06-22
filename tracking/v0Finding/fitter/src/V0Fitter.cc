@@ -63,6 +63,10 @@ bool V0Fitter::fitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, ge
   std::vector<genfit::Track*> trackPair {&trackPlus, &trackMinus};
 
   try {
+    IOIntercept::OutputToLogMessages
+    logCapture("V0Fitter GFRaveVertexFactory", LogConfig::c_Debug, LogConfig::c_Debug);
+    logCapture.start();
+
     genfit::GFRaveVertexFactory vertexFactory;
     vertexFactory.findVertices(&vertexVector.v, trackPair);
   } catch (...) {

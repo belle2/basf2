@@ -393,11 +393,15 @@ namespace Belle2 {
      * */
     static void boundaryCheck(SpBaseType& value, SpBaseType lower = 0, SpBaseType higher = 1)
     {
-      if (value < lower) {
+      // Times to times there are normalized coordinates that are out of the boundaries.
+      // We do apply a smal sloppyness here
+
+      static SpBaseType sloppyTerm = 1e-3;
+      if (value < lower - sloppyTerm) {
         B2WARNING("SpacePoint::boundaryCheck: value had to be moved (lowerCheck)! old: " << value << ", new: " << lower);
         value = lower;
       }
-      if (value > higher) {
+      if (value > higher + sloppyTerm) {
         B2WARNING("SpacePoint::boundaryCheck: value had to be moved (higherCheck)! old: " << value << ", new: " << higher);
         value = higher;
       }

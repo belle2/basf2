@@ -299,4 +299,21 @@ namespace {
     // verify that stderr of child process matches what we expect
     EXPECT_EXIT(generateStdErr(), ::testing::ExitedWithCode(0), "^start-><-end$");
   }
+
+  /** this function captures some output and aborts before finishing the
+   * capture. The abort handler should recover and print the message */
+  void generateAbort()
+  {
+    IOIntercept::CaptureStdErr output;
+    std::cerr << "start->";
+    output.start();
+    std::cerr << "now we abort" << std::endl;
+    std::abort();
+  }
+
+  /** Test that aborting during capture will print the message correctly */
+  TEST_F(IOInterceptDeathTest, HandleAbort)
+  {
+    EXPECT_EXIT(generateAbort(), ::testing::ExitedWithCode(1), "^start->now we abort\nabort\\(\\) called, exiting\n$");
+  }
 }

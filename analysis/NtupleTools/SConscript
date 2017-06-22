@@ -1,22 +1,7 @@
 Import('env')
 env['SUBLIB'] = True
-env['LIBS'] = [
-       	      'framework', 
-	      	  'analysis',
-	      	  'analysis_utility',
-	          'analysis_dataobjects',
-	          'analysis_DecayDescriptor', 
-	          'arich_dataobjects',
-              'cdc_dataobjects',
-              'ecl_dataobjects',
-              'eklm_dataobjects',
-              'mdst_dataobjects',
-              'reconstruction_dataobjects',
-              'top_dataobjects',
-	      'pxd_dataobjects',
-	      'svd_dataobjects',
-	          'genfit2',
-              'hlt_L1Emulator_dataobjects'
-	          ]
+env['LIBS'] = ['framework', 'analysis', 'analysis_utility', 'analysis_dataobjects', 'analysis_DecayDescriptor', 
+	       'hlt_L1Emulator_dataobjects']
+
 Return('env')
 

@@ -15,46 +15,46 @@ class TfDataBasf2():
         """
         declaration of class variables
         """
-        # training features
+        #: training features
         self.train_x = train_x
-        # training targets
+        #: training targets
         self.train_y = train_y
-        # validation features
+        #: validation features
         self.valid_x = valid_x
-        # validation targets
+        #: validation targets
         self.valid_y = valid_y
 
-        # batch size
+        #: batch size
         self.batch_size = batch_size
-        # random generator seed
+        #: random generator seed
         self.seed = seed
-        # bool, enables shuffling
+        #: bool, enables shuffling
         self.epoch_random_shuffle = epoch_random_shuffle
 
-        # number of training events
+        #: number of training events
         self.train_events = self.train_x.shape[0]
-        # number of validation events
+        #: number of validation events
         self.valid_events = self.valid_x.shape[0]
 
-        # number of features
+        #: number of features
         self.feature_number = self.train_x.shape[1]
 
-        # number of batches
+        #: number of batches
         self.batches = self.train_x.shape[0] // self.batch_size
 
-        # idices required for shuffling
+        #: idices required for shuffling
         self.train_idx = np.zeros((self.train_x.shape[0]))
 
-        # np ndarray for training batch features
+        #: np ndarray for training batch features
         self.batch_train_x = np.zeros((self.feature_number, self.batch_size))
 
-        # np ndarray for training batch of targets
+        #: np ndarray for training batch of targets
         self.batch_train_y = np.zeros(self.batch_size)
 
-        # set random generator
+        #: set random generator
         np.random.seed(seed)
 
-        # sanitize labels
+        #: sanitize labels
         self.sanitize_labels()
 
     def sanitize_labels(self):
@@ -106,17 +106,17 @@ class TfDataBasf2Stub():
         """
         declare for initialization required batch parameters
         """
-        # batch size
+        #: batch size
         self.batch_size = batch_size
 
-        # feature number
+        #: feature number
         self.feature_number = feature_number
 
-        # number of batches
+        #: number of batches
         self.batches = (event_number * train_fraction) // self.batch_size
 
-        # number of training training events
+        #: number of training training events
         self.train_events = int(train_fraction * event_number)
 
-        # number of validation events
+        #: number of validation events
         self.valid_events = int((1 - train_fraction) * event_number)

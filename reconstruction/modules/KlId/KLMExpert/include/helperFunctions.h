@@ -222,8 +222,6 @@ namespace KlIdHelpers {
 
     for (Belle2::RecoTrack& track : genfitTracks) {
 
-
-
       try {
         genfit::MeasuredStateOnPlane state;
         genfit::MeasuredStateOnPlane state_for_cut;
@@ -231,8 +229,6 @@ namespace KlIdHelpers {
 
         // only use tracks that are close cos the extrapolation takes ages
         if (clusterPosition.Angle(state_for_cut.getPos()) < cutAngle) {
-
-
           state = track.getMeasuredStateOnPlaneFromLastHit();
           state.extrapolateToPoint(clusterPosition);
           const TVector3& trackPos = state.getPos();

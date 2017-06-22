@@ -52,8 +52,8 @@ void XTCalibration::CreateHisto()
   readProfile();
   /* read data from tree, make histo for fit*/
   TChain* tree = new TChain("tree");
-  tree->Add(m_InputRootFileNames.c_str());
-  B2INFO("Open Files: " << m_InputRootFileNames);
+  tree->Add(m_inputRootFileNames.c_str());
+  B2INFO("Open Files: " << m_inputRootFileNames);
   if (!tree->GetBranch("ndf")) {
     cout << "input data do not exits, please check!" << endl;
     B2FATAL("echo rootfile do not exits or something wrong");
@@ -155,9 +155,9 @@ void XTCalibration::readProfile()
     }
   } else {
     B2INFO("use XT bining from profile file");
-    ifstream proxt(m_ProfileFileName.c_str());
+    ifstream proxt(m_profileFileName.c_str());
     if (!proxt) {
-      B2FATAL("file not found: " << m_ProfileFileName);
+      B2FATAL("file not found: " << m_profileFileName);
     }
     double dumy1, dumy2, dumy3;
     proxt >> m_nalpha;
@@ -186,7 +186,6 @@ void XTCalibration::readProfile()
 
 bool XTCalibration::calibrate()
 {
-
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
 
@@ -368,7 +367,7 @@ void XTCalibration::readXT()
 {
   if (m_useDB) {
     B2INFO("reading xt from DB");
-    dbXT_old = new DBObjPtr<CDCXtRelations>;
+
     /*
     ReadXT:readXTFromDB(&xtold,dbXT_old,
        &nalpha_old,l_alpha_old,u_alpha_old,ialpha_old,
@@ -489,34 +488,25 @@ void XTCalibration::readXTFromText()
   */
   //  return true;
 }
-/*
-void ReadXT::readXTFromDB(double m_XT[56][2][18][7][8],DBObjPtr<CDCXtRelations> *m_xtRelFromDB,
-         int nalpha, double m_alphaPoints[18],
-         double bl_alpha[18],double bu_alpha[18],
-         int ntheta, double m_thetaPoints[7],
-         double bl_theta[7],double bu_theta[7])
-{*/
 void XTCalibration::readXTFromDB()
 {
-  //  unsigned m_xtParamMode;
-  //  std::cout <<"setXtRelation called" << std::endl;
-  nalpha_old = (*dbXT_old)->getNoOfAlphaBins();
-  B2INFO("Nalpha" << nalpha_old);
+  DBObjPtr<CDCXtRelations> dbXT_old;
+  nalpha_old = dbXT_old->getNoOfAlphaBins();
+  B2INFO("Number of alpha" << nalpha_old);
   double rad2deg = 180 / M_PI;
   for (unsigned short i = 0; i < nalpha_old; ++i) {
-    //    m_alphaPoints[i] = (*dbXT_old)->getAlphaPoint(i);
-    array3 alpha = (*dbXT_old)->getAlphaBin(i);
+    array3 alpha = dbXT_old->getAlphaBin(i);
     l_alpha_old[i] = alpha[0] * rad2deg;
     u_alpha_old[i] = alpha[1] * rad2deg;
     ialpha_old[i] = alpha[2] * rad2deg;
     //    std::cout << m_alphaPoints[i]*180./M_PI << std::endl;
   }
 
-  ntheta_old = (*dbXT_old)->getNoOfThetaBins();
+  ntheta_old = dbXT_old->getNoOfThetaBins();
   B2INFO("Ntheta: " << ntheta_old);
   for (unsigned short i = 0; i < ntheta_old; ++i) {
     //    m_thetaPoints[i] = (*dbXT_old).getThetaPoint(i);
-    array3 theta = (*dbXT_old)->getThetaBin(i);
+    array3 theta = dbXT_old->getThetaBin(i);
     l_theta_old[i] = theta[0] * rad2deg;
     u_theta_old[i] = theta[1] * rad2deg;
     itheta_old[i] = theta[2] * rad2deg;
@@ -525,13 +515,13 @@ void XTCalibration::readXTFromDB()
     //    std::cout << m_thetaPoints[i]*180./M_PI << std::endl;
   }
 
-  xtmode_old = (*dbXT_old)->getXtParamMode();
+  xtmode_old = dbXT_old->getXtParamMode();
 
   for (unsigned short iCL = 0; iCL < 56; ++iCL) {
     for (unsigned short iLR = 0; iLR < 2; ++iLR) {
       for (unsigned short iA = 0; iA < nalpha_old; ++iA) {
         for (unsigned short iT = 0; iT < ntheta_old; ++iT) {
-          const std::vector<float> params = (*dbXT_old)->getXtParams(iCL, iLR, iA, iT);
+          const std::vector<float> params = dbXT_old->getXtParams(iCL, iLR, iA, iT);
           unsigned short np = params.size();
           //    std::cout <<"np4xt= " << np << std::endl;
           for (unsigned short i = 0; i < np; ++i) {

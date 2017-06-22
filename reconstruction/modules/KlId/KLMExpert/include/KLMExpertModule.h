@@ -139,9 +139,10 @@ namespace Belle2 {
 
     /** mva identifier. no ending means its loaded from the database  */
     std::string m_identifier =
-//      "KLM_fBDT_1.0xbkg100krelease9";
-      FileSystem::findFile("reconstruction/data/weights/KLM_fBDT_1.0xbkg10krelease9.xml") ; /** weight file  */
+      "KLM_fBDT_10xbkg100kpastr9";
+//      FileSystem::findFile("reconstruction/data/weights/KLM_fBDT_1.0xbkg10krelease9.xml") ; /** weight file  */
 
+    //FileSystem::findFile("reconstruction/data/weights/KLM_fBDT_10xbkg100kpastr9.xml") ; /** weight file  */
 
     /** Database pointer to the Database representation of the weightfile */
     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>

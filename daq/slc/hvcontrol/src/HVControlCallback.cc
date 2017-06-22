@@ -122,14 +122,14 @@ throw(HVHandlerException)
 
 void HVControlCallback::init(NSMCommunicator&) throw()
 {
-  getNode().setState(HVState::OFF_S);
+  getNode().setState(HVState::UNKNOWN);
   dbload(m_config_standby, m_configname_standby);
   dbload(m_config_shoulder, m_configname_shoulder);
   dbload(m_config_peak, m_configname_peak);
   m_config = FLAG_STANDBY;
   addAll(getConfig());
-  configure(getConfig());
   initialize(getConfig());
+  configure(getConfig());
   PThread(new HVNodeMonitor(this));
 }
 

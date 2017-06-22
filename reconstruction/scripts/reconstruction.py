@@ -20,7 +20,8 @@ from softwaretrigger import (
 
 
 def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False,
-                       additionalTrackFitHypotheses=None, addClusterExpertModules=True, use_vxdtf2=False):
+                       additionalTrackFitHypotheses=None, addClusterExpertModules=True, use_vxdtf2=False,
+                       use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -49,6 +50,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
     :param use_vxdtf2: if true the VXDTF version 2 will be used if false (default) verion 1 of the VXDTF will be used.
+    :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
 
     # Add tracking reconstruction modules
@@ -59,7 +61,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                 trigger_mode=trigger_mode,
                                 skipGeometryAdding=skipGeometryAdding,
                                 additionalTrackFitHypotheses=additionalTrackFitHypotheses,
-                                use_vxdtf2=use_vxdtf2)
+                                use_vxdtf2=use_vxdtf2,
+                                use_second_cdc_hits=use_second_cdc_hits)
 
     # Add further reconstruction modules
     add_posttracking_reconstruction(path,
@@ -83,7 +86,8 @@ def add_cosmics_reconstruction(
         skipGeometryAdding=False,
         eventTimingExtraction=False,
         addClusterExpertModules=True,
-        merge_tracks=True):
+        merge_tracks=True,
+        use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -101,6 +105,7 @@ def add_cosmics_reconstruction(
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
     :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
+    :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
 
     # Add cdc tracking reconstruction modules
@@ -109,7 +114,8 @@ def add_cosmics_reconstruction(
                                    pruneTracks=False,
                                    skipGeometryAdding=skipGeometryAdding,
                                    eventTimingExtraction=eventTimingExtraction,
-                                   merge_tracks=merge_tracks)
+                                   merge_tracks=merge_tracks,
+                                   use_second_cdc_hits=use_second_cdc_hits)
 
     # Add further reconstruction modules
     add_posttracking_reconstruction(path,
@@ -119,18 +125,21 @@ def add_cosmics_reconstruction(
                                     trigger_mode="all")
 
 
-def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True):
+def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
+                          use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules with MC tracking
     to a path.
 
     @param components list of geometry components to include reconstruction for, or None for all components.
+    @param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
 
     # tracking
     add_mc_tracking_reconstruction(path,
                                    components=components,
-                                   pruneTracks=False)
+                                   pruneTracks=False,
+                                   use_second_cdc_hits=use_second_cdc_hits)
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path,

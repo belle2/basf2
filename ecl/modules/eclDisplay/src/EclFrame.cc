@@ -261,20 +261,6 @@ void EclFrame::initData()
   updateEventRange();
 }
 
-void EclFrame::MapSubwindows()
-{
-  TGMainFrame::MapSubwindows();
-//  switch (m_painter_type) {
-//    case PAINTER_CHANNEL:
-//    case PAINTER_SHAPER:
-//    case PAINTER_COLLECTOR:
-//      break;
-//    default:
-//      m_settings->HideFrame(m_frame3);
-//      break;
-//  }
-}
-
 void EclFrame::handleMenu(int id)
 {
   static TString dir(".");

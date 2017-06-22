@@ -142,7 +142,7 @@ converter.param('calpulseWidthMin', 2.0)  # in [ns]
 converter.param('calpulseWidthMax', 6.0)  # in [ns]
 main.add_module(converter)
 
-ntuple = register_module('MY_TOPInterimFENtupleDev')
+ntuple = register_module('TOPInterimFENtuple')
 ntuple.param('saveWaveform', (args.SaveWaveform))
 ntuple.param('useDoublePulse', (not IsOfflineFEDisabled))
 ntuple.param('calibrationChannel', CalCh)

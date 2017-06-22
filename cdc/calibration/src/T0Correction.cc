@@ -145,7 +145,7 @@ bool T0Correction::calibrate()
   for (int ilay = 0; ilay < 56; ++ilay) {
     for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
       const int n = m_h1[ilay][iwire]->GetEntries();
-      B2INFO("layer " << ilay << " wire " << iwire << " entries " << n);
+      B2DEBUG(99, "layer " << ilay << " wire " << iwire << " entries " << n);
       if (n < 10) continue;
       const double mean = m_h1[ilay][iwire]->GetMean();
       m_h1[ilay][iwire]->SetDirectory(0);

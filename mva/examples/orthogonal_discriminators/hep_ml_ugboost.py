@@ -59,6 +59,6 @@ if __name__ == "__main__":
 
     # Set the parameters of the uBoostClassifier
     import json
-    specific_options.m_config = json.dumps({'uniform_rate': 10.0})
+    specific_options.m_config = json.dumps({'uniform_rate': 100.0})
     general_options.m_identifier = "hep_ml"
     basf2_mva.teacher(general_options, specific_options)

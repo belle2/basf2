@@ -75,6 +75,7 @@ int main(int argc, char** argv)
         for (std::vector<std::string>::const_iterator it = m_dirs.begin();
              it != m_dirs.end(); it++) {
           std::string file = *it + "/storage/" + m_list_sent;
+          //std::string file = m_list_sent;
           std::string path;
           std::ifstream fin(file.c_str());
           while (fin >> path) {
@@ -105,53 +106,39 @@ int main(int argc, char** argv)
       }
 
       try {
-        db.connect();
-        db.execute("select * from %s where host = '%s' "
-                   "and time_close is null and (expno <=%d or runno <= %d)",
-                   m_table.c_str(), m_host.c_str(), expno, runno);
-        std::map<std::string, int> names;
-        DBRecordList records(db.loadRecords());
-        if (records.size() > 0) {
-          for (size_t i = 0; i < records.size(); i++) {
-            names.insert(std::pair<std::string, int>(records[i].get("name"),
-                                                     records[1].getInt("fileno")));
-          }
-          int nrecords = records.size();
-          for (std::vector<std::string>::const_iterator it = m_dirs.begin();
-               it != m_dirs.end(); it++) {
-            std::string dir = *it + "/storage/";
-            DIR* dp = opendir(dir.c_str());
-            struct dirent* dirst;
-            while ((dirst = readdir(dp)) != NULL) {
-              std::string name = dirst->d_name;
-              if (name.find(".sroot") != std::string::npos && name.find(".gz") == std::string::npos) {
-                std::string filepath = dir + name;
-                std::map<std::string, int>::iterator it = names.find(name);
-                if (it != names.end()) {
-                  while (true) {
-                    struct stat st;
-                    stat(filepath.c_str(), &st);
-                    time_t t;
-                    time(&t);
-                    if ((t - st.st_mtime) > 60) {
-                      std::string d = Date(st.st_mtime).toString();
-                      unsigned long long chksum, nevents, size;
-                      size = cal_chksum(filepath.c_str(), chksum, nevents);
-                      if (it->second == 0) nevents--;
-                      db.execute("update %s set time_close='%s', chksum=%lu, nevents=%lu, size=%lu "
-                                 "where name='%s' and host='%s';",
-                                 m_table.c_str(), d.c_str(), chksum, nevents, size,
-                                 name.c_str(), m_host.c_str());
-                      LogFile::info("new file: %s (%s)", name.c_str(), d.c_str());
-                      nrecords--;
-                      break;
-                    } else {
-                      sleep(t - st.st_mtime + 5);
-                    }
-                  }
+        for (std::vector<std::string>::const_iterator it = m_dirs.begin();
+             it != m_dirs.end(); it++) {
+          std::string dir = *it + "/storage/";
+          db.connect();
+          db.execute("select * from %s where host = '%s' and path like '%s%s' "
+                     "and time_close is null and (expno <=%d or runno <= %d)",
+                     m_table.c_str(), m_host.c_str(), dir.c_str(), "_%", expno, runno);
+          DBRecordList records(db.loadRecords());
+          if (records.size() > 0) {
+            for (size_t i = 0; i < records.size(); i++) {
+              std::string name = records[i].get("name");
+              int fileno = records[1].getInt("fileno");
+              std::string filepath = dir + name;
+              while (true) {
+                struct stat st;
+                stat(filepath.c_str(), &st);
+                time_t t;
+                time(&t);
+                if ((t - st.st_mtime) > 60) {
+                  std::string d = Date(st.st_mtime).toString();
+                  unsigned long long chksum, nevents, size;
+                  size = cal_chksum(filepath.c_str(), chksum, nevents);
+                  if (fileno == 0) nevents--;
+                  db.execute("update %s set time_close='%s', chksum=%lu, nevents=%lu, size=%lu "
+                             "where name='%s' and host='%s';",
+                             m_table.c_str(), d.c_str(), chksum, nevents, size,
+                             name.c_str(), m_host.c_str());
+                  LogFile::info("new file: %s (%s)", name.c_str(), d.c_str());
+                  break;
+                } else {
+                  sleep(t - st.st_mtime + 5);
                 }
               }
-              closedir(dp);
             }
           }
         }
@@ -161,25 +148,30 @@ int main(int argc, char** argv)
       }
 
       try {
-        for (std::vector<std::string>::const_iterator it = m_dirs.begin();
-             it != m_dirs.end(); it++) {
-          std::string dir = *it;
+        for (size_t j = 0; j < m_dirs.size(); j++) {
+          std::string dir = m_dirs[j] + "/storage/";
           db.execute("select * from %s where host = '%s' and time_sent is null "
-                     "and (expno <=%d or runno <= %d) amd path like '%s/_%'order by time_close ",
-                     m_table.c_str(), m_host.c_str(), expno, runno, dir.c_str());
+                     "and (expno <=%d or runno <= %d) and path like '%s%s' order by time_close ",
+                     m_table.c_str(), m_host.c_str(), expno, runno, dir.c_str(), "_%");
           DBRecordList records(db.loadRecords());
-          if (records.size() > 0 && !File::exist(m_list_send.c_str())) {
-            std::ofstream fout((dir + "/" + m_list_send).c_str());
+          std::string file = dir + m_list_send;
+          //std::string file = dir+StringUtil::form("%s.disk%02d", m_list_send.c_str(), j+1);
+          LogFile::info("create send list " + file);
+          if (records.size() > 0 && !File::exist(file.c_str())) {
+            std::ofstream fout(file.c_str());
             for (size_t i = 0; i < records.size(); i++) {
-              std::string path = records[i].get("path");
-              std::string expno = records[i].get("expno");
-              std::string runno = records[i].get("runno");
-              std::string fileno = records[i].get("fileno");
+              std::string name = records[i].get("name");
+              int expno = records[i].getInt("expno");
+              int runno = records[i].getInt("runno");
+              int fileno = records[i].getInt("fileno");
               std::string size = records[i].get("size");
               std::string nevents = records[i].get("nevents");
-              std::string chksum = records[i].get("chksum");
-              fout << path << "," << expno << "," << runno << "," << fileno << ","
-                   << size << "," << nevents << "," << chksum << "" << std::endl;
+              int chksum = records[i].getInt("chksum");
+              std::string s_chksum = StringUtil::form("%x", chksum);
+              fout << StringUtil::form("%4.4d/%5.5d/", expno, runno) << name << "," << expno << "," << runno << "," << fileno << ","
+                   << size << "," << nevents << "," << s_chksum << "" << std::endl;
+              std::cout << StringUtil::form("%4.4d/%5.5d/", expno, runno) << name << "," << expno << "," << runno << "," << fileno << ","
+                        << size << "," << nevents << "," << s_chksum << "" << std::endl;
             }
             fout.close();
           }
@@ -188,6 +180,7 @@ int main(int argc, char** argv)
         LogFile::fatal(e.what());
         return 1;
       }
+      sleep(60);
     }
   }
 

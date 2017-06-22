@@ -23,7 +23,7 @@ from simulation import add_simulation
 
 set_random_seed(1509)
 
-release = argv[1]
+release = sys.argv[1]
 
 # roi = {noROI, vxdtf1, vxdtf2}
 # bkg = {noBkg, stdBKG, std2GBKG}
@@ -64,7 +64,7 @@ else:
 
 print(release)
 
-input_filename = './' + release + '/TV_data_' + release + '.root'
+input_filename = './' + release + '/TV_data_' + release + '_1509.root'
 output_filename = './' + release + '/TV_sim_' + bkg + '_' + roi + '_' + release + '.root'
 
 print(output_filename)

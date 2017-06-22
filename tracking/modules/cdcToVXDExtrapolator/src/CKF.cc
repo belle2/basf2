@@ -178,16 +178,16 @@ genfit::Track* CKF::processTrack()
   }
 }
 
-bool CKF::passPreUpdateTrim(CKFPartialTrack* track, unsigned step)
+bool CKF::passPreUpdateTrim(CKFPartialTrack* track, unsigned currentStep)
 {
   // Check for holes
   int nadded = track->getNumPointsWithMeasurement() - seedTrack->getNumPointsWithMeasurement();
-  int nholes = step - nadded;
+  int nholes = currentStep - nadded;
   if (nholes != (int) track->totalHoles())
     B2WARNING("Number of holes from CKFPartialTrack: " << track->totalHoles() << ", differs from what I think it should be: " <<
               nholes);
   if (nholes > maxHoles) {
-    B2DEBUG(70, "--- In CKF::preUpdateTrim(): Filtering track with nholes " << nholes << "{" << step << " " <<
+    B2DEBUG(70, "--- In CKF::preUpdateTrim(): Filtering track with nholes " << nholes << "{" << currentStep << " " <<
             track->getNumPointsWithMeasurement() << " " << seedTrack->getNumPointsWithMeasurement() << " " << nadded << "}");
     return false;
   }

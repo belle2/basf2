@@ -56,7 +56,7 @@ namespace Belle2 {
 
     public:
       ShaperDSP_t() { init(_defs); }
-      ShaperDSP_t(const std::vector<double>& s) { init(s); }
+      explicit ShaperDSP_t(const std::vector<double>& s) { init(s); }
       ShaperDSP_t(const std::vector<double>& s, double u) { init(s, u); }
       ~ShaperDSP_t() {}
 

@@ -94,13 +94,10 @@ def add_evtgen_generator(path, finalstate='charged'):
         evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/mixed.dec')
 
     # use EvtGen
-    print(evtgen_userdecfile)
     evtgen = path.add_module(
         'EvtGenInput',
         userDECFile=evtgen_userdecfile
     )
-
-    print_params(evtgen)
 
 
 def add_continuum_generator(path, finalstate='uubar'):

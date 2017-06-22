@@ -24,7 +24,7 @@
     12586191e477aef7 5321514edf23d1a0 39fc05782c5ef830 35902de3347b9b6d
     01ab0223e608d0c7 b77a4eb2b50d7fb5 e811981f8f7987aa 250f1b03882698ec
 [INFO] The random number seed is set to "this is the seed"
-[RESULT] Starting event processing, random seed is set to 'this is the seed'
+[INFO] Starting event processing, random seed is set to 'this is the seed'
 [DEBUG] Successfully registered object 'ProcessStatistics' (durability: persistent)
 [DEBUG] Successfully registered object 'EventMetaData' (durability: event)
 [DEBUG] EventInfoSetter: will process 12 events in total.

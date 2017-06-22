@@ -1,7 +1,7 @@
 [INFO] Steering file: framework/tests/seqroot_input.py
 [INFO] The random number seed is set to "something important"
 Trying 01-ok.sroot ...
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -931,15 +931,15 @@ truehit 1 => hits 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 Trying 02-1+1b.sroot ...
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [ERROR] SeqFile::read() basic_ios::clear: couldn't read next record size
 [FATAL] SeqRootInput : Error in reading first event
 Trying 03-1+5b.sroot ...
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [ERROR] SeqFile::read() basic_ios::clear: could only read 1 bytes, expected 3971
 [FATAL] SeqRootInput : Error in reading first event
 Trying 04-2+1b.sroot ...
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -965,7 +965,7 @@ truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 Trying 05-2+5b.sroot ...
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -991,7 +991,7 @@ truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 Trying 05-ok.sroot.gz ...
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -1921,19 +1921,19 @@ truehit 1 => hits 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 Trying 06-1+1b.sroot.gz ...
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [ERROR] SeqFile::read() basic_ios::clear: couldn't read next record size
 [FATAL] SeqRootInput : Error in reading first event
 Trying 07-1+5b.sroot.gz ...
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [ERROR] SeqFile::read() basic_ios::clear: could only read 1 bytes, expected 3971
 [FATAL] SeqRootInput : Error in reading first event
 Trying 08-nogz.sroot.gz ...
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [ERROR] SeqFile::read() cannot read file: gzip error
 [FATAL] SeqRootInput : Error in reading first event
 Trying 09-cut.sroot.gz ...
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -2130,6 +2130,6 @@ truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 Trying 10-max.sroot ...
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [ERROR] SeqFile::read() buffer too small, need at least 2147483647 bytes
 [FATAL] SeqRootInput : Error in reading first event

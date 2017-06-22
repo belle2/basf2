@@ -1,7 +1,7 @@
 [INFO] Steering file: framework/tests/evtmetadata.py
 [INFO] The random number seed is set to "something important"
 [INFO] event	run	exp
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
 [INFO] 1	0	0
@@ -25,7 +25,7 @@
 [INFO] ================================================================================
 
 [INFO] event	run	exp
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
@@ -49,7 +49,7 @@
 [INFO] ================================================================================
 
 [INFO] event	run	exp
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
@@ -70,7 +70,7 @@
 [INFO] ================================================================================
 
 [INFO] event	run	exp
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
@@ -90,7 +90,7 @@
 [INFO] ================================================================================
 
 [INFO] event	run	exp
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
@@ -107,7 +107,7 @@
 [INFO] ================================================================================
 
 [INFO] event	run	exp
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
@@ -123,7 +123,7 @@
 [INFO] ================================================================================
 
 [INFO] event	run	exp
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
@@ -138,7 +138,7 @@
 [INFO] ================================================================================
 
 [INFO] event	run	exp
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
@@ -152,7 +152,7 @@
 [INFO] ================================================================================
 
 [INFO] event	run	exp
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
@@ -160,13 +160,13 @@
 [INFO] EvtMetaDataTest::endRun()
 [INFO] EvtMetaDataTest::terminate()
 [INFO] event	run	exp
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::terminate()
 [INFO] skipping to exp=0, run=0, evt=1
 [INFO] event	run	exp
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
@@ -192,7 +192,7 @@
 [INFO] EvtMetaDataTest::terminate()
 [INFO] skipping to exp=0, run=0, evt=3
 [INFO] event	run	exp
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
@@ -216,7 +216,7 @@
 [INFO] EvtMetaDataTest::terminate()
 [INFO] skipping to exp=0, run=1, evt=1
 [INFO] event	run	exp
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
@@ -237,7 +237,7 @@
 [INFO] EvtMetaDataTest::terminate()
 [INFO] skipping to exp=0, run=1, evt=6
 [INFO] event	run	exp
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
@@ -253,7 +253,7 @@
 [INFO] EvtMetaDataTest::terminate()
 [INFO] skipping to exp=0, run=2, evt=3
 [INFO] event	run	exp
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
@@ -267,7 +267,7 @@
 [INFO] EvtMetaDataTest::terminate()
 [INFO] skipping to exp=1, run=0, evt=1
 [INFO] event	run	exp
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::beginRun()
@@ -278,7 +278,7 @@
 [INFO] EvtMetaDataTest::terminate()
 [INFO] skipping to exp=2, run=0, evt=1
 [INFO] event	run	exp
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
 [INFO] EvtMetaDataTest::initialize()
 [INFO] EvtMetaDataTest::terminate()

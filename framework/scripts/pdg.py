@@ -130,8 +130,8 @@ def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifet
     particle = _database.AddParticle(name, name, mass, False, width, charge * 3, "userdefined",
                                      pdgCode, 0, 0, lifetime, spin, max_width, pythiaID)
     if particle:
-        basf2.INFO("Adding new particle '%s' (pdg=%d, mass=%.3g GeV, width=%.3g GeV, charge=%d, spin=%d)" %
-                   (name, pdgCode, mass, width, charge, spin))
+        basf2.B2INFO("Adding new particle '%s' (pdg=%d, mass=%.3g GeV, width=%.3g GeV, charge=%d, spin=%d)" %
+                     (name, pdgCode, mass, width, charge, spin))
         return True
 
     return False

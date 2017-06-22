@@ -400,7 +400,7 @@
 		<activeChipID>1</activeChipID>
 		<width  unit="mm">4</width>
 		<length unit="mm">31.500</length>
-		<height unit="mm">0.291</height>
+		<height unit="mm">0.491</height>
 	</Component>
 
 	<Component name="Clamp">
@@ -409,7 +409,7 @@
 		<activeChipID>1</activeChipID>
 		<width  unit="mm">8.0</width>
 		<length unit="mm">2.5</length>
-		<height unit="mm">0.400</height>
+		<height unit="mm">0.800</height>
 	</Component>
 
 	<!-- Origami flexes on bottom of sensors. The real shape is kind of

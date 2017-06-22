@@ -990,6 +990,7 @@ class CDCSVGDisplayModule(basf2.Module):
                         tMomentum = recotrack.getMomentumSeed()
                         charge = recotrack.getChargeSeed()
                         tPosition = recotrack.getPositionSeed()
+                        time = recotrack.getTimeSeed()
 
                         momentum = Belle2.TrackFindingCDC.Vector2D(tMomentum.X(),
                                                                    tMomentum.Y())
@@ -997,7 +998,7 @@ class CDCSVGDisplayModule(basf2.Module):
                                                                    tPosition.Y())
 
                         trajectory = \
-                            Belle2.TrackFindingCDC.CDCTrajectory2D(position,
+                            Belle2.TrackFindingCDC.CDCTrajectory2D(position, time,
                                                                    momentum, charge)
                         trajectories.append(trajectory)
 

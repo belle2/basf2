@@ -17,7 +17,7 @@
 namespace Belle2 {
 
   /**
-   * EKLM segment identifier.
+   * EKLM element identifier.
    */
   class EKLMElementID {
 

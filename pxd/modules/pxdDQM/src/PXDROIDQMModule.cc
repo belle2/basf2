@@ -62,6 +62,11 @@ void PXDROIDQMModule::defineHisto()
   hrawROIDCcol1 = new TH1F("hrawROIDCcol1", "DATCON ROI col1;column", 250, 0, 250);
   hrawROIDCcol2 = new TH1F("hrawROIDCcol2", "DATCON ROI col2;column", 250, 0, 250);
 
+  hrawROINrDCvsNrHLT = new TH2F("hrawROINrDCvsNrHLT", "Nr DATCON ROI vs Nr HLT ROI; Nr HLT ROI;Nr DATCON ROI", 100, 0, 100, 100, 0,
+                                100);
+  hrawROIEVTsWithOneSource = new TH2F("hrawROIEVTsWithOneSource", "Events with only one ROI source; HLT ROI;DATCON ROI", 2, 0, 2, 2,
+                                      0, 2);
+
   // cd back to root directory
   oldDir->cd();
 }
@@ -96,12 +101,16 @@ void PXDROIDQMModule::beginRun()
   hrawROIDCcol1->Reset();
   hrawROIDCcol2->Reset();
 
+  hrawROINrDCvsNrHLT->Reset();
+  hrawROIEVTsWithOneSource->Reset();
 }
 
 void PXDROIDQMModule::event()
 {
   for (auto& it : m_storeROIs) {
     int nr;
+    int nr_HLT = 0;
+    int nr_DC = 0;
     nr = it.getNrROIs();
     //it.dump();
     hrawROIcount->Fill(nr);
@@ -117,6 +126,7 @@ void PXDROIDQMModule::event()
       cs = c2 - c1;
       cm = (c1 + c2) / 2;
       if (it.getType(j)) {
+        nr_DC++;
         hrawROIDC_DHHID->Fill(it.getDHHID(j));
         hrawROIDCmap->Fill(cm, rm);
         hrawROIDCsize->Fill(cs, rs);
@@ -125,6 +135,7 @@ void PXDROIDQMModule::event()
         hrawROIDCcol1->Fill(c1);
         hrawROIDCcol2->Fill(c2);
       } else {
+        nr_HLT++;
         hrawROIHLT_DHHID->Fill(it.getDHHID(j));
         hrawROIHLTmap->Fill(cm, rm);
         hrawROIHLTsize->Fill(cs, rs);
@@ -136,5 +147,20 @@ void PXDROIDQMModule::event()
         hrawROIHLTcolSize->Fill(cs);
       }
     }
+    hrawROINrDCvsNrHLT->Fill(nr_HLT, nr_DC);
+    if (nr_DC == 0 && nr_HLT == 0) {
+      hrawROIEVTsWithOneSource->Fill(nr_HLT, nr_DC);
+    }
+    if (nr_DC == 0 && nr_HLT != 0) {
+      hrawROIEVTsWithOneSource->Fill(1, nr_DC);
+    }
+    if (nr_DC != 0 && nr_HLT == 0) {
+      hrawROIEVTsWithOneSource->Fill(nr_HLT, 1);
+    }
+    if (nr_DC != 0 && nr_HLT != 0) {
+      hrawROIEVTsWithOneSource->Fill(1, 1);
+    }
+    nr_HLT = 0;
+    nr_DC = 0;
   }
 }

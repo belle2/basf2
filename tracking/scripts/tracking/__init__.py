@@ -113,7 +113,7 @@ def add_geometry_modules(path, components=None):
         path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
 
 
-def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False):
+def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules for MC tracking
     to a path.
@@ -121,11 +121,13 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False):
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
+    :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
     add_tracking_reconstruction(path,
                                 components=components,
                                 pruneTracks=pruneTracks,
-                                mcTrackFinding=True)
+                                mcTrackFinding=True,
+                                use_second_cdc_hits=use_second_cdc_hits)
 
 
 def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, additionalTrackFitHypotheses=None,

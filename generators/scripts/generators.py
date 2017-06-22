@@ -214,7 +214,7 @@ def add_phokhara_generator(path, finalstate='mu+mu-'):
 
 def add_cosmics_generator(path, components=None, global_box_size=None, accept_box=None,
                           keep_box=None,
-                          geometry_xml_file='geometry/GCR_Summer2017.xml'
+                          geometry_xml_file='geometry/GCR_Summer2017.xml',
                           cosmics_data_dir='data/generators/modules/cryinput/',
                           setup_file='simulation/scripts/cry.setup'):
     """

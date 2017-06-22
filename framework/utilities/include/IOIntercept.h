@@ -55,7 +55,6 @@ namespace Belle2 {
        * @param out string to be replaced with all the bytes read from fd
        */
       static void readFD(int fd, std::string& out);
-    private:
       /** Replace the file descriptor of m_fileObject with the one passed
        * @param fileDescriptor file descriptor to be set for m_fileObject using dup2()
        */
@@ -107,20 +106,17 @@ namespace Belle2 {
       ~CaptureStream();
       /** Get the output, only set after finish() */
       const std::string& getOutput() const { return m_outputStr; }
+      /** Start intercepting the output */
+      bool start();
       /** Restore the stream and get the output from the pipe */
-      bool finish()
-      {
-        if (StreamInterceptor::finish()) {
-          readFD(m_pipeReadFD, m_outputStr);
-          return true;
-        }
-        return false;
-      }
+      bool finish();
     private:
       /** file descriptor of the read end of the pipe */
       int m_pipeReadFD{ -1};
       /** string with the output, only filled after finish() */
       std::string m_outputStr;
+      /** allow handling of SIGABRT */
+      friend class CaptureStreamAbortHandler;
     };
 
 

@@ -12365,26 +12365,35 @@ c
         BNHAD = 2
         
       elseif(pion.eq.6)then
+C       Kevin Varvell - Create a phi as parent to the kaons 
 	do ii=0,3
-	  BP2(0,ii) = momenta(6,ii)
-	  BP2(1,ii) = momenta(7,ii)
+	  BP2(0,ii) = momenta(6,ii) + momenta(7,ii)
+	  BP2(1,ii) = momenta(6,ii)
+	  BP2(2,ii) = momenta(7,ii)
         enddo
-        BP2(0,4) = 321  !K+
-	BP2(1,4) = -321 !K-
+        BP2(0,4) = 333  !Phi
+        BP2(1,4) = 321  !K+
+	BP2(2,4) = -321 !K-
         BP2(0,5) = -1
-	BP2(1,5) = -1
-        BNHAD = 2
+        BP2(1,5) = 0
+	BP2(2,5) = 0
+        BNHAD = 3
 
       elseif(pion.eq.7)then
+C       Kevin Varvell - Create a phi as parent to the kaons 
+C                     - Output KL and KS rather than K0 K0bar
 	do ii=0,3
-	  BP2(0,ii) = momenta(6,ii)
-	  BP2(1,ii) = momenta(7,ii)
+	  BP2(0,ii) = momenta(6,ii) + momenta(7,ii)
+	  BP2(1,ii) = momenta(6,ii)
+	  BP2(2,ii) = momenta(7,ii)
         enddo
-        BP2(0,4) = 311  !K0
-	BP2(1,4) = -311 !K0bar
+        BP2(0,4) = 333  !Phi
+        BP2(1,4) = 130  !KL
+	BP2(2,4) = 310  !KS
         BP2(0,5) = -1
-	BP2(1,5) = -1
-        BNHAD = 2
+	BP2(1,5) = 0
+	BP2(2,5) = 0
+        BNHAD = 3
         
       elseif(pion.eq.8)then
 	do ii=0,3

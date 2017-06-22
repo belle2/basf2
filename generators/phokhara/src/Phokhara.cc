@@ -158,7 +158,7 @@ void Phokhara::init(const std::string& paramFile)
   B2INFO("Phokhara::init, using paramater file: " << paramFile);
 
   if (paramFile.empty()) B2FATAL("Phokhara: The specified param file is empty!");
-    size_t fileLength = paramFile.size();
+  size_t fileLength = paramFile.size();
   phokhara_setparamfile_(paramFile.c_str(), &fileLength);
 
 //   if (inputFile.empty()) B2FATAL("Phokhara: The specified input file is empty!")
@@ -197,6 +197,19 @@ void Phokhara::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentz
   }
 
   //some PHOKHARA final states contain unstable particle
+  // Kevin Varvell - handle introduction of Phi parent to kaons
+  if (m_finalState == 6 || m_finalState == 7) { //Phi
+    int id = 2 + momset_.bnphot;
+
+    //get Phi -> K K (KL KS or K+ K-)
+    MCParticleGraph::GraphParticle* phi = &mcGraph[id];
+    MCParticleGraph::GraphParticle* daughter1 = &mcGraph[id + 1];
+    daughter1->comesFrom(*phi);
+    MCParticleGraph::GraphParticle* daughter2 = &mcGraph[id + 2];
+    daughter2->comesFrom(*phi);
+
+    phi->removeStatus(MCParticle::c_StableInGenerator);
+  }
   if (m_finalState == 9) { //Lambda, Lambdabar
     int id = 2 + momset_.bnphot;
 
@@ -319,6 +332,13 @@ void Phokhara::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pd
   part.setMomentum(TVector3(mom[0], mom[1], mom[2]));
   part.setMass(TDatabasePDG::Instance()->GetParticle(pdg)->Mass());
   part.setEnergy(mom[3]);
+  // Kevin Varvell - handle introduction of Phi parent to kaons
+  // Include code below if Phi has been added in Phokhara code
+  // Override for Phi, so that finite width is preserved
+  if (333 == pdg) {
+    TLorentzVector phi4(mom[0], mom[1], mom[2], mom[3]);
+    part.setMass(phi4.M());
+  }
 
   //boost
   TLorentzVector p4 = part.get4Vector();

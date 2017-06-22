@@ -214,6 +214,7 @@ def add_phokhara_generator(path, finalstate='mu+mu-'):
 
 def add_cosmics_generator(path, components=None, global_box_size=None, accept_box=None,
                           keep_box=None,
+                          geometry_xml_file='geometry/GCR_Summer2017.xml'
                           cosmics_data_dir='data/generators/modules/cryinput/',
                           setup_file='simulation/scripts/cry.setup'):
     """
@@ -225,6 +226,7 @@ def add_cosmics_generator(path, components=None, global_box_size=None, accept_bo
     :param accept_box: sets the size of the accept box. As a default it is
            set to 8.0 m as Belle2 detector size.
     :param keep_box: sets the size of the keep box (keep box >= accept box).
+    :param geometry_xml_file: Name of the xml file to use for the geometry.
     :param cosmics_data_dir: parameter CosmicDataDir for the cry module (absolute or relative to the basf2 repo).
     :param setup_file: location of the cry.setup file (absolute or relative to the basf2 repo)
     """
@@ -239,7 +241,8 @@ def add_cosmics_generator(path, components=None, global_box_size=None, accept_bo
         path.add_module('Gearbox', override=[
             ("/Global/length", str(global_box_size[0]), "m"),
             ("/Global/width", str(global_box_size[1]), "m"),
-            ("/Global/height", str(global_box_size[2]), "m")]
+            ("/Global/height", str(global_box_size[2]), "m")],
+            fileName=geometry_xml_file,
         )
 
     # detector geometry

@@ -98,7 +98,8 @@ namespace Belle2 {
     return m_types;
   }
 
-  ParticleGenerator::ParticleGenerator(std::string decayString) : m_iParticleType(0), m_listIndexGenerator(),
+  ParticleGenerator::ParticleGenerator(std::string decayString, std::string cutParameter) : m_iParticleType(0),
+    m_listIndexGenerator(),
     m_particleIndexGenerator()
   {
 
@@ -118,6 +119,8 @@ namespace Belle2 {
       StoreObjPtr<ParticleList> list(daughter->getFullName());
       m_plists.push_back(list);
     }
+
+    m_cut = Variable::Cut::compile(cutParameter);
 
     m_isSelfConjugated = decaydescriptor.isSelfConjugated();
 
@@ -292,6 +295,11 @@ namespace Belle2 {
         }
 
         if (not currentCombinationHasDifferentSources()) continue;
+
+        m_current_particle = createCurrentParticle();
+        if (!m_cut->check(&m_current_particle))
+          continue;
+
         if (not currentCombinationIsUnique()) continue;
         return true;
       }
@@ -326,6 +334,11 @@ namespace Belle2 {
         }
 
         if (not currentCombinationHasDifferentSources()) continue;
+
+        m_current_particle = createCurrentParticle();
+        if (!m_cut->check(&m_current_particle))
+          continue;
+
         if (not currentCombinationIsUnique()) continue;
         return true;
       }
@@ -335,8 +348,7 @@ namespace Belle2 {
 
   }
 
-
-  Particle ParticleGenerator::getCurrentParticle() const
+  Particle ParticleGenerator::createCurrentParticle() const
   {
     //TLorentzVector performance is quite horrible, do it ourselves.
     double px = 0;
@@ -361,6 +373,11 @@ namespace Belle2 {
     }
 
     return Particle(); // This should never happen
+  }
+
+  Particle ParticleGenerator::getCurrentParticle() const
+  {
+    return m_current_particle;
   }
 
   bool ParticleGenerator::currentCombinationHasDifferentSources()
@@ -392,7 +409,8 @@ namespace Belle2 {
   {
     std::set<int> indexSet;
     if (not m_inputListsCollide)
-      indexSet.insert(m_indices.begin(), m_indices.end());
+      for (unsigned int i = 0; i < m_numberOfLists; i++)
+        indexSet.insert(m_indices[i]);
     else
       for (unsigned int i = 0; i < m_numberOfLists; i++)
         indexSet.insert(m_indicesToUniqueIDs.at(m_indices[i]));

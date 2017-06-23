@@ -112,7 +112,7 @@ algo.execute()
 payloads = list(algo.getPayloads())
 eklm = None
 for payload in payloads:
-    if payload.name == 'EKLMDisplacement':
+    if payload.name == 'EKLMAlignment':
         eklm = payload.object.IsA().DynamicCast(Belle2.EKLMAlignment().IsA(), payload.object, False)
 
 # Profile plot for all determined parameters

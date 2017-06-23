@@ -70,6 +70,9 @@ namespace Belle2 {
       TH1F* hrawROIDCcol1; /** Histogram  */
       TH1F* hrawROIDCcol2; /** Histogram  */
 
+      TH2F* hrawROINrDCvsNrHLT; /** Histogram  */
+      TH2F* hrawROIEVTsWithOneSource; /** Histogram  */
+
       //map<int,int> sensor_to_histindex;
 
       virtual void defineHisto();

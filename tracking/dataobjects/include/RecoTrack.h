@@ -664,11 +664,17 @@ namespace Belle2 {
         B2FATAL("MeasuredStateOnPlane cannot be provided for RecoHit which was not used in the fit.");
       }
 
-      const auto hitTrackPoint = getCreatedTrackPoint(recoHitInfo);
-      if (hitTrackPoint == nullptr) {
+      const auto* hitTrackPoint = getCreatedTrackPoint(recoHitInfo);
+      if (not hitTrackPoint) {
         B2FATAL("TrackPoint was requested which has not been created");
       }
-      return hitTrackPoint->getFitterInfo(representation)->getFittedState();
+
+      const auto* fittedResult = hitTrackPoint->getFitterInfo(representation);
+      if (not fittedResult) {
+        B2FATAL("No fit result for the given point");
+      }
+
+      return fittedResult->getFittedState();
     }
 
     /** Return genfit's MasuredStateOnPlane, that is closest to the given point

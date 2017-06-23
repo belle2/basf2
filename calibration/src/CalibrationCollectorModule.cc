@@ -20,7 +20,7 @@ CalibrationCollectorModule::CalibrationCollectorModule() : Module(), m_expRunEve
   addParam("preScale", m_preScale,
            "This controls the rate at which events are actually passed to the collect() function. An event passing through this module "
            "will only have the collect() function run on it it passes a random selection scaled by this parameter i.e. For preScale=1.0 "
-           "all events are collected, but for preScale=0.5 only 50\% will be. Since this is based on a random choice, you should set the "
+           "all events are collected, but for preScale=0.5 only 50 percent will be. Since this is based on a random choice, you should set the "
            "random seed to a fixed value if you want repeatable results.\n\n"
            "Should be a float in range [0.0,1.0], default=1.0", float(1.0));
 }

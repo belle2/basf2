@@ -10,8 +10,6 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdPhotons import *
-stdPhotons('loose')
 
 set_log_level(LogLevel.ERROR)
 

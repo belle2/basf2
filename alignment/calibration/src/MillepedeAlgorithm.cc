@@ -8,7 +8,6 @@
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <alignment/GlobalLabel.h>
 
-#include <eklm/alignment/AlignmentTools.h>
 #include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/geometry/AlignmentChecker.h>
 

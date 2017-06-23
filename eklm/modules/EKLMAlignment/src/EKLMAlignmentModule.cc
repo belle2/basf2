@@ -13,7 +13,6 @@
 #include <TTree.h>
 
 /* Belle2 headers. */
-#include <eklm/alignment/AlignmentTools.h>
 #include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/geometry/AlignmentChecker.h>
 #include <eklm/geometry/GeometryData.h>
@@ -62,11 +61,34 @@ EKLMAlignmentModule::~EKLMAlignmentModule()
 {
 }
 
+void EKLMAlignmentModule::fillZeroDisplacements(EKLMAlignment* alignment)
+{
+  EKLMAlignmentData alignmentData(0., 0., 0.);
+  const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
+  int iEndcap, iLayer, iSector, iPlane, iSegment, segment, sector;
+  for (iEndcap = 1; iEndcap <= geoDat->getNEndcaps(); iEndcap++) {
+    for (iLayer = 1; iLayer <= geoDat->getNDetectorLayers(iEndcap);
+         iLayer++) {
+      for (iSector = 1; iSector <= geoDat->getNSectors(); iSector++) {
+        sector = geoDat->sectorNumber(iEndcap, iLayer, iSector);
+        alignment->setSectorAlignment(sector, &alignmentData);
+        for (iPlane = 1; iPlane <= geoDat->getNPlanes(); iPlane++) {
+          for (iSegment = 1; iSegment <= geoDat->getNSegments(); iSegment++) {
+            segment = geoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
+                                            iSegment);
+            alignment->setSegmentAlignment(segment, &alignmentData);
+          }
+        }
+      }
+    }
+  }
+}
+
 void EKLMAlignmentModule::generateZeroDisplacement()
 {
   IntervalOfValidity iov(0, 0, -1, -1);
   EKLMAlignment alignment;
-  EKLM::fillZeroDisplacements(&alignment);
+  fillZeroDisplacements(&alignment);
   saveDisplacement(&alignment);
   Database::Instance().storeData(m_PayloadName, (TObject*)&alignment, iov);
 }
@@ -78,7 +100,7 @@ void EKLMAlignmentModule::generateFixedSectorDisplacement(
   EKLMAlignment alignment;
   EKLMAlignmentData sectorAlignment(dx, dy, dalpha);
   int iEndcap, iLayer, iSector, sector;
-  EKLM::fillZeroDisplacements(&alignment);
+  fillZeroDisplacements(&alignment);
   for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
     for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
          iLayer++) {
@@ -113,7 +135,7 @@ void EKLMAlignmentModule::generateRandomDisplacement(
   EKLM::AlignmentChecker alignmentChecker(false);
   int iEndcap, iLayer, iSector, iPlane, iSegment, sector, segment;
   double d;
-  EKLM::fillZeroDisplacements(&alignment);
+  fillZeroDisplacements(&alignment);
   for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
     for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
          iLayer++) {
@@ -206,7 +228,7 @@ void EKLMAlignmentModule::readDisplacementFromROOTFile()
   TTree* t_sector, *t_segment;
   EKLMAlignment alignment;
   EKLMAlignmentData* alignmentData;
-  EKLM::fillZeroDisplacements(&alignment);
+  fillZeroDisplacements(&alignment);
   f = new TFile(m_InputFile.c_str());
   t_sector = (TTree*)f->Get("eklm_sector");
   t_sector->SetBranchAddress("endcap", &iEndcap);
@@ -280,7 +302,7 @@ void EKLMAlignmentModule::studySectorAlignmentLimits(TFile* f)
   t->Branch("dalpha", &dalpha, "dalpha/F");
   t->Branch("status", &alignmentStatus, "status/I");
   for (i = 0; i < nPoints; i++) {
-    EKLM::fillZeroDisplacements(&alignment);
+    fillZeroDisplacements(&alignment);
     dx = gRandom->Uniform(minDx, maxDx);
     dy = gRandom->Uniform(minDy, maxDy);
     dalpha = gRandom->Uniform(minDalpha, maxDalpha);
@@ -334,7 +356,7 @@ void EKLMAlignmentModule::studySegmentAlignmentLimits(TFile* f)
     for (jSegment = 1; jSegment <= m_GeoDat->getNSegments(); jSegment++) {
       printf("Segment %d\n", jSegment);
       for (i = 0; i < nPoints; i++) {
-        EKLM::fillZeroDisplacements(&alignment);
+        fillZeroDisplacements(&alignment);
         dx = gRandom->Uniform(minDx, maxDx);
         dy = gRandom->Uniform(minDy, maxDy);
         dalpha = gRandom->Uniform(minDalpha, maxDalpha);

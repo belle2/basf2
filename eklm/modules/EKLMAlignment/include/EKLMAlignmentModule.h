@@ -102,6 +102,12 @@ namespace Belle2 {
     const EKLM::GeometryData* m_GeoDat;
 
     /**
+     * Fill EKLMAlignment with zero displacements.
+     * @param[in,out] alignment EKLMAlignment dbobject.
+     */
+    void fillZeroDisplacements(EKLMAlignment* alignment);
+
+    /**
      * Generation of zero displacements.
      */
     void generateZeroDisplacement();

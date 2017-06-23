@@ -9,7 +9,7 @@ from ROOT import Belle2
 import os
 
 
-def add_aafh_generator(path, finalstate='e+e-e+e-', preselection=False):
+def add_aafh_generator(path, finalstate='', preselection=False):
     """
     Add the default two photon generator for four fermion final states
     :param finalstate: e+e-e+e-, e+e-mu+mu-
@@ -22,10 +22,14 @@ def add_aafh_generator(path, finalstate='e+e-e+e-', preselection=False):
     aafh_maxSubgeneratorWeight = 1.0
     aafh_maxFinalWeight = 3.0
 
-    if finalstate == 'e+e-mu+mu-':
+    if finalstate == 'e+e-e+e-':
+        pass
+    elif finalstate == 'e+e-mu+mu-':
         aafh_mode = 3
         aafh_subgeneratorWeights = [1.000e+00, 1.520e+01, 3.106e+03, 6.374e+03, 1.000e+00, 1.778e+00, 6.075e+00, 6.512e+00]
         aafh_maxSubgeneratorWeight = 1.0
+    else:
+        B2FATAL("add_aafh_generator final state not supported: ", finalstate)
 
     aafh = path.add_module(
         'AafhInput',
@@ -51,7 +55,7 @@ def add_aafh_generator(path, finalstate='e+e-e+e-', preselection=False):
         generatorpreselection.if_value('!=11', generator_emptypath)
 
 
-def add_kkmc_generator(path, finalstate='tau+tau-'):
+def add_kkmc_generator(path, finalstate=''):
     """
     Add the default muon pair and tau pair generator KKMC
     :param finalstate: mu+mu-, tau+tau-
@@ -69,10 +73,14 @@ def add_kkmc_generator(path, finalstate='tau+tau-'):
     #: tau config file (empty for mu+mu-)
     kkmc_tauconfigfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau_decaytable.dat')
 
-    if finalstate == 'mu+mu-':
+    if finalstate == 'tau+tau-':
+        pass
+    elif finalstate == 'mu+mu-':
         kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat')
         kkmc_logfile = 'kkmc_mumu.txt'
         kkmc_tauconfigfile = ''
+    else:
+        B2FATAL("add_kkmc_generator final state not supported: ", finalstate)
 
     # use KKMC to generate lepton pairs
     kkgeninput = path.add_module(
@@ -84,14 +92,18 @@ def add_kkmc_generator(path, finalstate='tau+tau-'):
     )
 
 
-def add_evtgen_generator(path, finalstate='charged'):
+def add_evtgen_generator(path, finalstate=''):
     """
     Add EvtGen for mixed and charged BB
     """
     evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/charged.dec')
 
-    if finalstate == 'mixed':
+    if finalstate == 'charged':
+        pass
+    elif finalstate == 'mixed':
         evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/mixed.dec')
+    else:
+        B2FATAL("add_evtgen_generator final state not supported: ", finalstate)
 
     # use EvtGen
     evtgen = path.add_module(
@@ -100,7 +112,7 @@ def add_evtgen_generator(path, finalstate='charged'):
     )
 
 
-def add_continuum_generator(path, finalstate='uubar'):
+def add_continuum_generator(path, finalstate=''):
     """
     Add the default continuum generators KKMC + PYTHIA including their default decfiles and PYTHIA settings
     :param finalstate: uubar, ddbar, ssbar, ccbar
@@ -125,7 +137,9 @@ def add_continuum_generator(path, finalstate='uubar'):
     #: global decay file, should be fine as is
     decay_file = os.path.expandvars('$BELLE2_EXTERNALS_DIR/share/evtgen/DECAY_2010.DEC')
 
-    if finalstate == 'ddbar':
+    if finalstate == 'uubar':
+        pass
+    elif finalstate == 'ddbar':
         kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/ddbar_nohadronization.input.dat')
         kkmc_logfile = 'kkmc_ddbar.txt'
     elif finalstate == 'ssbar':
@@ -135,6 +149,8 @@ def add_continuum_generator(path, finalstate='uubar'):
         kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/ccbar_nohadronization.input.dat')
         pythia_config = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/pythia_belle2_charm.dat')
         kkmc_logfile = 'kkmc_ccbar.txt'
+    else:
+        B2FATAL("add_continuum_generator final state not supported: ", finalstate)
 
     # use KKMC to generate qqbar events (no fragmentation at this stage)
     kkgeninput = path.add_module(
@@ -162,7 +178,7 @@ def add_continuum_generator(path, finalstate='uubar'):
     fragmentation.if_value('<1', generator_emptypath)
 
 
-def add_babayaganlo_generator(path, finalstate='ee'):
+def add_babayaganlo_generator(path, finalstate=''):
     """
     Add the high precision QED generator BABAYAGA.NLO to the path. Settings correspond to cross sections in BELLE2-NOTE-PH-2015-006
     :param path: Add the modules to this path
@@ -183,15 +199,18 @@ def add_babayaganlo_generator(path, finalstate='ee'):
         babayaganlo.param('MinEnergy', 0.15)
         babayaganlo.param('FMax', 1.e4)
 
+    else:
+        B2FATAL("add_babayaganlo_generator final state not supported: ", finalstate)
 
-def add_phokhara_generator(path, finalstate='mu+mu-'):
+
+def add_phokhara_generator(path, finalstate=''):
     """
     Add the high precision QED generator PHOKHARA to the path. Almost full acceptance settings for photons and hadrons/muons.
     :param path: Add the modules to this path
     :param finalstate: One of the possible final states using the PHOKHARA particle naming
     """
 
-    phokhara = path.add_module('PhokharaInput')
+    phokhara = path.add_module('')
 
     if finalstate == 'mu+mu-':
         phokhara.param('FinalState', 0)
@@ -210,10 +229,13 @@ def add_phokhara_generator(path, finalstate='mu+mu-'):
         phokhara.param('LO', 0)  # force ISR production, no non-radiative production
         phokhara.param('NLO', 0)  # no two loop corrections
         phokhara.param('QED', 0)  # use ISR only, no FSR, no interference
+    else:
+        B2FATAL("add_phokhara_generator final state not supported: ", finalstate)
 
 
 def add_cosmics_generator(path, components=None, global_box_size=None, accept_box=None,
                           keep_box=None,
+                          geometry_xml_file='geometry/GCR_Summer2017.xml',
                           cosmics_data_dir='data/generators/modules/cryinput/',
                           setup_file='simulation/scripts/cry.setup'):
     """
@@ -225,6 +247,7 @@ def add_cosmics_generator(path, components=None, global_box_size=None, accept_bo
     :param accept_box: sets the size of the accept box. As a default it is
            set to 8.0 m as Belle2 detector size.
     :param keep_box: sets the size of the keep box (keep box >= accept box).
+    :param geometry_xml_file: Name of the xml file to use for the geometry.
     :param cosmics_data_dir: parameter CosmicDataDir for the cry module (absolute or relative to the basf2 repo).
     :param setup_file: location of the cry.setup file (absolute or relative to the basf2 repo)
     """
@@ -239,7 +262,8 @@ def add_cosmics_generator(path, components=None, global_box_size=None, accept_bo
         path.add_module('Gearbox', override=[
             ("/Global/length", str(global_box_size[0]), "m"),
             ("/Global/width", str(global_box_size[1]), "m"),
-            ("/Global/height", str(global_box_size[2]), "m")]
+            ("/Global/height", str(global_box_size[2]), "m")],
+            fileName=geometry_xml_file,
         )
 
     # detector geometry

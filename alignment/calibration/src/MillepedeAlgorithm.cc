@@ -9,7 +9,6 @@
 #include <alignment/GlobalLabel.h>
 
 #include <eklm/dbobjects/EKLMAlignment.h>
-#include <eklm/geometry/AlignmentChecker.h>
 
 #include <framework/dbobjects/BeamParameters.h>
 

@@ -1159,8 +1159,7 @@ c Mode    p + pbar (pion=4)         |   q1 - four momentum of pi^+
 c Mode    n + nbar (pion=5)         |   q2 - four momentum of pi^-
 c Mode    K^+ + K^-(pion=6)         |   q3 - four momentum of pi^0
 c Mode    K^0 + K^0bar (pion=7)
-c         Kevin Varvell: note that 6: phi -> K+ K- is written out
-c                        note that 7: phi -> KL KS is written out
+c                        note that for 7: KL KS is written out
 c
 c Mode  lambda (-> pi^- p) lambda bar (-> pi^+ pbar) (pion=9)
 c Mode eta pi+  pi-  (pion=10)
@@ -12367,35 +12366,27 @@ c
         BNHAD = 2
         
       elseif(pion.eq.6)then
-C       Kevin Varvell - Create a phi as parent to the kaons 
         do ii=0,3
-          BP2(0,ii) = momenta(6,ii) + momenta(7,ii)
-          BP2(1,ii) = momenta(6,ii)
-          BP2(2,ii) = momenta(7,ii)
+          BP2(0,ii) = momenta(6,ii)
+          BP2(1,ii) = momenta(7,ii)
         enddo
-        BP2(0,4) = 333  !Phi
-        BP2(1,4) = 321  !K+
-        BP2(2,4) = -321 !K-
+        BP2(0,4) = 321  !K+
+        BP2(1,4) = -321 !K-
         BP2(0,5) = -1
-        BP2(1,5) = 0
-        BP2(2,5) = 0
-        BNHAD = 3
+        BP2(1,5) = -1
+        BNHAD = 2
 
       elseif(pion.eq.7)then
-C       Kevin Varvell - Create a phi as parent to the kaons 
-C                     - Output KL and KS rather than K0 K0bar
+C       Kevin Varvell - Output KL and KS rather than K0 K0bar
         do ii=0,3
-          BP2(0,ii) = momenta(6,ii) + momenta(7,ii)
-          BP2(1,ii) = momenta(6,ii)
-          BP2(2,ii) = momenta(7,ii)
+          BP2(0,ii) = momenta(6,ii)
+          BP2(1,ii) = momenta(7,ii)
         enddo
-        BP2(0,4) = 333  !Phi
-        BP2(1,4) = 130  !KL
-        BP2(2,4) = 310  !KS
+        BP2(0,4) = 130  !KL
+        BP2(1,4) = 310  !KS
         BP2(0,5) = -1
-        BP2(1,5) = 0
-        BP2(2,5) = 0
-        BNHAD = 3
+        BP2(1,5) = -1
+        BNHAD = 2
         
       elseif(pion.eq.8)then
 	do ii=0,3

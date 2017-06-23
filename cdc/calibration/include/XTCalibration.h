@@ -93,7 +93,7 @@ namespace Belle2 {
       =3: Error Inner part;
       **********************************/
 
-      std::string m_OutputXTFileName = "xt.dat"; /**< Out put xt filename*/
+      std::string m_OutputXTFileName = "xt_new.dat"; /**< Out put xt filename*/
       std::string m_inputRootFileNames = "rootfile/output*"; /**< input root filename*/
       std::string m_profileFileName = "xt_profile";      /**<profile file name*/
       std::string m_xtfile = "cdc/data/xt.dat";          /**< Input xt file name, incase text mode*/

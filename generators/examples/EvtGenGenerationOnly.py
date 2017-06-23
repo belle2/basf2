@@ -20,7 +20,6 @@ main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
 
 # EvtGen
 evtgen = register_module('EvtGenInput')
-# evtgen.param('userDECFile', os.path.join(basf2datadir,'generators/belle/MIX.DEC'))
 evtgen.set_log_level(LogLevel.INFO)
 
 # run

@@ -9,6 +9,11 @@ from ROOT import Belle2
 import os
 
 
+def get_default_decayfile():
+    """Return the default DECAY.dec for Belle2"""
+    return Belle2.FileSystem.findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC")
+
+
 def add_aafh_generator(path, finalstate='', preselection=False):
     """
     Add the default two photon generator for four fermion final states

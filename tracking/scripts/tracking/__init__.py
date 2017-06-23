@@ -57,6 +57,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
 def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False,
                                    skipGeometryAdding=False, eventTimingExtraction=False,
+                                   use_readout_position=False,
                                    merge_tracks=True, use_second_cdc_hits=False):
     """
     This function adds the reconstruction modules for cr tracking to a path.
@@ -72,6 +73,7 @@ def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False,
         FullGridTrackTimeExtraction modules.
     :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
+    :param use_readout_position: flag to turn off the usage of the readout position in the track time estimator
     """
 
     # make sure CDC is used
@@ -90,7 +92,16 @@ def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False,
     add_cdc_cr_track_finding(path, merge_tracks=merge_tracks, use_second_cdc_hits=use_second_cdc_hits)
 
     # track fitting
-    add_cdc_cr_track_fit_and_track_creator(path, components, pruneTracks, eventTimingExtraction)
+    add_cdc_cr_track_fit_and_track_creator(path, components, pruneTracks=pruneTracks,
+                                           eventTimingExtraction=eventTimingExtraction,
+                                           use_readout_position=use_readout_position)
+
+    if merge_tracks:
+        # Do also fit the not merged tracks
+        add_cdc_cr_track_fit_and_track_creator(path, components, pruneTracks=pruneTracks,
+                                               eventTimingExtraction=False,
+                                               use_readout_position=use_readout_position,
+                                               reco_tracks="NonMergedRecoTracks", tracks="NonMergedTracks")
 
 
 def add_geometry_modules(path, components=None):
@@ -157,48 +168,56 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, ad
 
 
 def add_cdc_cr_track_fit_and_track_creator(
-    path, components=None, pruneTracks=False, eventTimingExtraction=False, lightPropSpeed=12.9925, triggerPos=[
-        0, 0, 0], normTriggerPlaneDirection=[
-            0, 1, 0], readOutPos=[
-                0, 0, -50.0], useReadoutPosition=True):
+        path, components=None, pruneTracks=False, eventTimingExtraction=False,
+        reco_tracks="RecoTracks", tracks="",
+        lightPropSpeed=12.9925, trigger_point=[0, 0, 0],
+        normTriggerPlaneDirection=[0, 1, 0],
+        readOutPos=[0, 0, -50.0],
+        use_readout_position=False):
     """
     Helper function to add the modules performing the cdc cr track fit
     and track creation to the path.
 
     :param path: The path to which to add the tracking reconstruction modules
     :param components: the list of geometry components in use or None for all components.
+    :param reco_tracks: The name of the reco tracks to use
+    :param tracks: the name of the output Belle tracks
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
     :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
         FullGridTrackTimeExtraction modules.
-    :param useReadoutPosition: flag to turn off the usage of the readout position in the track time estimator
+    :param use_readout_position: flag to turn off the usage of the readout position in the track time estimator
     """
 
     # Time seed
     path.add_module("PlaneTriggerTrackTimeEstimator",
+                    recoTracksStoreArrayName=reco_tracks,
                     pdgCodeToUseForEstimation=13,
-                    triggerPlanePosition=triggerPos,
+                    triggerPlanePosition=trigger_point,
                     triggerPlaneDirection=normTriggerPlaneDirection,
                     useFittedInformation=False)
 
     # Initial track fitting
     path.add_module("DAFRecoFitter",
+                    recoTracksStoreArrayName=reco_tracks,
                     probCut=0.00001,
                     pdgCodesToUseForFitting=13,
                     )
 
     # Correct time seed
     path.add_module("PlaneTriggerTrackTimeEstimator",
+                    recoTracksStoreArrayName=reco_tracks,
                     pdgCodeToUseForEstimation=13,
-                    triggerPlanePosition=triggerPos,
+                    triggerPlanePosition=trigger_point,
                     triggerPlaneDirection=normTriggerPlaneDirection,
                     useFittedInformation=True,
-                    useReadoutPosition=useReadoutPosition,
+                    useReadoutPosition=use_readout_position,
                     readoutPosition=readOutPos,
                     readoutPositionPropagationSpeed=lightPropSpeed
                     )
 
     # Track fitting
     path.add_module("DAFRecoFitter",
+                    recoTracksStoreArrayName=reco_tracks,
                     # probCut=0.00001,
                     pdgCodesToUseForFitting=13,
                     )
@@ -206,7 +225,7 @@ def add_cdc_cr_track_fit_and_track_creator(
     if eventTimingExtraction is True:
         # Extract the time
         path.add_module("FullGridTrackTimeExtraction",
-                        recoTracksStoreArrayName="RecoTracks",
+                        recoTracksStoreArrayName=reco_tracks,
                         maximalT0Shift=70,
                         minimalT0Shift=-70,
                         numberOfGrids=6
@@ -215,18 +234,21 @@ def add_cdc_cr_track_fit_and_track_creator(
         # Track fitting
         path.add_module("DAFRecoFitter",
                         # probCut=0.00001,
+                        recoTracksStoreArrayName=reco_tracks,
                         pdgCodesToUseForFitting=13,
                         )
 
     # Create Belle2 Tracks from the genfit Tracks
     path.add_module('TrackCreator',
+                    recoTrackColName=reco_tracks,
+                    trackColName=tracks,
                     defaultPDGCode=13,
                     useClosestHitToIP=True
                     )
 
     # Prune genfit tracks
     if pruneTracks:
-        add_prune_tracks(path, components)
+        add_prune_tracks(path=path, components=components, reco_tracks=reco_tracks)
 
 
 def add_mc_matcher(path, components=None, reco_tracks="RecoTracks", use_second_cdc_hits=False):
@@ -506,8 +528,18 @@ def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0
                         tracks="MergedCDCTrackVector",
                         filter="phi",
                         )
-
         output_tracks = "MergedCDCTrackVector"
+
+        # However, we also want to export the non merged tracks
+        # Correct time seed - assumes velocity near light speed
+        path.add_module("TFCDC_TrackFlightTimeAdjuster",
+                        inputTracks="OrientedCDCTrackVector",
+                        )
+
+        # Export CDCTracks to RecoTracks representation
+        path.add_module("TFCDC_TrackExporter",
+                        inputTracks="OrientedCDCTrackVector",
+                        RecoTracksStoreArrayName="NonMergedRecoTracks")
 
     # Correct time seed - assumes velocity near light speed
     path.add_module("TFCDC_TrackFlightTimeAdjuster",

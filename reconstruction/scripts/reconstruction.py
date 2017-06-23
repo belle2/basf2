@@ -87,6 +87,7 @@ def add_cosmics_reconstruction(
         eventTimingExtraction=False,
         addClusterExpertModules=True,
         merge_tracks=True,
+        use_readout_position=False,
         use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
@@ -106,6 +107,7 @@ def add_cosmics_reconstruction(
         execution time.
     :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
+    :param use_readout_position: flag to turn off the usage of the readout position in the track time estimator
     """
 
     # Add cdc tracking reconstruction modules
@@ -115,6 +117,7 @@ def add_cosmics_reconstruction(
                                    skipGeometryAdding=skipGeometryAdding,
                                    eventTimingExtraction=eventTimingExtraction,
                                    merge_tracks=merge_tracks,
+                                   use_readout_position=use_readout_position,
                                    use_second_cdc_hits=use_second_cdc_hits)
 
     # Add further reconstruction modules

@@ -95,7 +95,7 @@ class WFDisplay(Module):
         windows = waveform.getStorageWindows()
         i0 = windows.size()
         for i in range(1, windows.size()):
-            diff = windows[i] - windows[i-1]
+            diff = windows[i] - windows[i - 1]
             if diff < 0:
                 diff += 512
             if diff != 1:
@@ -105,9 +105,9 @@ class WFDisplay(Module):
         self.gpaint[k].Set(n)
         low = i0 * 64
         for i in range(low, self.hist[k].GetNbinsX()):
-            x = self.hist[k].GetBinCenter(i+1)
-            dx = self.hist[k].GetBinWidth(i+1) / 2
-            y = self.hist[k].GetBinContent(i+1)
+            x = self.hist[k].GetBinCenter(i + 1)
+            dx = self.hist[k].GetBinWidth(i + 1) / 2
+            y = self.hist[k].GetBinContent(i + 1)
             ii = (i - low) * 2
             self.gpaint[k].SetPoint(ii, x - dx, y)
             self.gpaint[k].SetPoint(ii + 1, x + dx, y)
@@ -131,7 +131,9 @@ class WFDisplay(Module):
         for waveform in waveforms:
             slot = waveform.getModuleID()
             chan = waveform.getChannel()
-            self.pdfFile = self.pdfFile + '-S' + str(slot) + '_' + str(chan)
+            if(chan % 8 == 0):
+                continue
+            self.pdfFile = self.pdfFile + '-' + str(chan)
             wf = waveform.getWaveform()
             self.hist[k].Reset()
             numSamples = waveform.getSize()
@@ -170,6 +172,13 @@ class WFDisplay(Module):
                 else:
                     graph.SetMarkerColor(4)
                 self.graphs[k].append(graph)
+
+            tlpfResults = waveform.getRelationsWith("TOPTemplateFitResult")
+            print(len(tlpfResults))
+            for result in tlpfResults:
+                print(result.getAmplitude())
+                print(result.getBackgroundOffset())
+                print(result.getChisquare())
 
             k = k + 1
             if k == 4:

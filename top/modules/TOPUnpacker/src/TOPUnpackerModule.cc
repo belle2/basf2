@@ -418,6 +418,7 @@ namespace Belle2 {
 
         // feature-extracted data (negative signal)
         word = array.getWord(); // word 9
+        short n_samp_i = (word >> 16) & 0xFFFF;
         word = array.getWord(); // word 10
         short samplePeak_n = word & 0xFFFF;
         short valuePeak_n = (word >> 16) & 0xFFFF;
@@ -467,7 +468,7 @@ namespace Belle2 {
             digit->addRelationTo(tlpfResult);
           }
         }
-        if (abs(valuePeak_n) != 9999) {
+        /*if (abs(valuePeak_n) != 9999) {
           auto* digit = rawDigits.appendNew(scrodID);
           digit->setCarrierNumber(carrierFE);
           digit->setASICNumber(asicFE);
@@ -486,7 +487,7 @@ namespace Belle2 {
           //        digit->setErrorFlags(qualityFlags_n); // not good solution !
           digit->addRelationTo(info);
           digits.push_back(digit);
-        }
+        }*/
       }
 
       // magic word

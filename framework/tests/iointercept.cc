@@ -11,7 +11,7 @@
 #include <iostream>
 #include <framework/utilities/IOIntercept.h>
 #include <framework/logging/LogSystem.h>
-#include <framework/logging/LogConnectionIOStream.h>
+#include <framework/logging/LogConnectionBase.h>
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -51,10 +51,7 @@ namespace {
     /** And try to reset logging system to default */
     void TearDown()
     {
-      LogSystem::Instance().resetLogConnections();
-      bool useColor = LogConnectionIOStream::terminalSupportsColors();
-      LogSystem::Instance().addLogConnection(new LogConnectionIOStream(std::cout, useColor));
-      LogSystem::Instance().resetMessageCounter();
+      LogSystem::Instance().resetLogging();
     }
   };
 

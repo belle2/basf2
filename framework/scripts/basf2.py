@@ -37,7 +37,7 @@ ROOT_kIsConstMethod = 0x10000000
 def _avoidPyRootHang():
     """
     workaround for possible hang with PyROOT on SL5
-    see https://belle2.cc.kek.jp/redmine/issues/1236
+    see https://agira.desy.de/browse/BII-976
     note: platform.libc_ver() is _really_ broken, so i'm checking the
     version via ldd (ships with libc)
     """

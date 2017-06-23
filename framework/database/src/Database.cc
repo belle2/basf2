@@ -58,7 +58,7 @@ Database& Database::Instance()
   if (!s_instance) {
     DatabaseChain::createInstance(true);
     const std::string fallbackFilename = getFromEnvironment("BELLE2_CONDB_FALLBACK", "data/framework/database.txt");
-    const std::string globalTag = getFromEnvironment("BELLE2_CONDB_GLOBALTAG", "GT_gen_prod_002.07_prerelease-00-09-00a");
+    const std::string globalTag = getFromEnvironment("BELLE2_CONDB_GLOBALTAG", "GT_gen_prod_002.10_release-00-09-00");
     // OK, add a fallback database unless empty location is specified
     if (!fallbackFilename.empty()) {
       LocalDatabase::createInstance(FileSystem::findFile(fallbackFilename), "", true, LogConfig::c_Error);

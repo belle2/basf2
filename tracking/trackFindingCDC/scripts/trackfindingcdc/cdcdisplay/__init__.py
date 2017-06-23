@@ -221,8 +221,11 @@ class CDCSVGDisplayModule(basf2.Module):
         #: Draw the MC reference RecoTracks pattern recognition matching status
         self.draw_mcrecotrack_matching = False
 
-        #: Draw the output Genfit track trajectories
-        self.draw_recotrack_trajectories = False
+        #: Draw the output track seed trajectories
+        self.draw_recotrack_seed_trajectories = False
+
+        #: Draw the output trackpoint trajectories
+        self.draw_recotrack_fit_trajectories = False
 
         #: Draw a red cdc hit of the rl info of the segment reco hits is wrong, else a green one
         self.draw_wrong_rl_infos_in_segments = False
@@ -286,7 +289,8 @@ class CDCSVGDisplayModule(basf2.Module):
             'draw_mcrecotracks',
             'draw_recotrack_matching',
             'draw_mcrecotrack_matching',
-            'draw_recotrack_trajectories',
+            'draw_recotrack_seed_trajectories',
+            'draw_recotrack_fit_trajectories',
             # Specialised options to be used in the CDC local tracking context
             # obtain them from the all_drawoptions property
             # 'draw_takenflag',
@@ -972,9 +976,7 @@ class CDCSVGDisplayModule(basf2.Module):
                     plotter.draw_iterable(iterTrajectories, **styleDict)
 
         # Draw the trajectories of the reco tracks
-        if self.draw_recotrack_trajectories:
-            if self.use_cpp:
-                cppplotter.drawRecoTrackTrajectories(self.reco_tracks_store_array_name, '', '')
+        if self.draw_recotrack_seed_trajectories:
             if self.use_python:
                 recotrack_storearray = Belle2.PyStoreArray(self.reco_tracks_store_array_name)
                 if recotrack_storearray:
@@ -1003,6 +1005,16 @@ class CDCSVGDisplayModule(basf2.Module):
                         trajectories.append(trajectory)
 
                     plotter.draw_iterable(trajectories, **styleDict)
+
+            if self.use_cpp:
+                raise NotImplementedError
+
+        if self.draw_recotrack_fit_trajectories:
+            if self.use_cpp:
+                cppplotter.drawRecoTrackTrajectories(self.reco_tracks_store_array_name, '', '')
+
+            if self.use_python:
+                raise NotImplementedError
 
         fileName = self.new_output_filename()
         cppfileName = self.new_output_filename()

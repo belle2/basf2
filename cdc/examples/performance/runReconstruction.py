@@ -70,7 +70,7 @@ def rec(input, output, topInCounter=True, magneticField=False):
 
     # Add CDC CR reconstruction.
     add_cdc_cr_reconstruction(main_path,
-                              eventTimingExtraction=True,
+                              eventTimingExtraction=False,
                               topInCounter=topInCounter)
 
     # Simple analysi module.
@@ -92,4 +92,4 @@ if __name__ == "__main__":
     parser.add_argument('input', help='Input file to be processed (unpacked CDC data).')
     parser.add_argument('output', help='Output file you want to store the results.')
     args = parser.parse_args()
-    rec(args.input, args.output, topInCounter=False, magneticField=True)
+    rec(args.input, args.output, topInCounter=True, magneticField=False)

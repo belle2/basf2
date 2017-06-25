@@ -11,18 +11,7 @@
     c3d0485d4fbd1829 e2dc541dc570e8c0 c6b79e71d605e7f5 acad7927cf4eb495
     12586191e477aef7 5321514edf23d1a0 39fc05782c5ef830 35902de3347b9b6d
     01ab0223e608d0c7 b77a4eb2b50d7fb5 e811981f8f7987aa 250f1b03882698ec
-[DEBUG] Random Generator State info:
-  seed (16):
-    74 68 69 73 20 69 73 20 74 68 65 20 73 65 65 64 
-  event info (mode=0): 
-    barrier:0
-  event bytes (4):
-    00 00 00 00 
-  state (index=0): 
-    50660c5d4af97405 383c1a95ff621534 b78b83daff779d4a 63af5d85a64ce92e
-    c3d0485d4fbd1829 e2dc541dc570e8c0 c6b79e71d605e7f5 acad7927cf4eb495
-    12586191e477aef7 5321514edf23d1a0 39fc05782c5ef830 35902de3347b9b6d
-    01ab0223e608d0c7 b77a4eb2b50d7fb5 e811981f8f7987aa 250f1b03882698ec
+ ... message repeated 1 times
 [INFO] The random number seed is set to "this is the seed"
 [INFO] Starting event processing, random seed is set to 'this is the seed'
 [DEBUG] Successfully registered object 'ProcessStatistics' (durability: persistent)
@@ -704,7 +693,7 @@
   3FE53653EE6BD9E6, 3FE8A1D8B762E262, 3FE028969541E8F0, 3FC79562F1709A80
   3FBAA7552FB76AF0, 3FD5ED1340EE3AB4, 3FE7F0B536B8CE5C, 3FE6E3BF2742E8BA
 [DEBUG] Invalidating objects for durability 0
-[DEBUG] Invalidating objects for durability 0
+ ... message repeated 1 times
 [DEBUG] Random Generator State info:
   seed (16):
     74 68 69 73 20 69 73 20 74 68 65 20 73 65 65 64 

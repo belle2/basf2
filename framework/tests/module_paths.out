@@ -59,7 +59,7 @@
 
 [INFO] second process() call follows...
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] Begin of new run
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1

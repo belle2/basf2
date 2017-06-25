@@ -29,30 +29,21 @@ namespace Belle2 {
    *
    * will look for xml files in the data directory (local or central release) and
    *
-   * "sqlite:data/belle2.sqlite"
-   *
-   * will read all parameters from the sqlite database belle2.sqlite in the
-   * data directory while
-   *
    * "string:<Detector>..</Detector>"
    *
    * can be used to feed a custom xml document to the gearbox.
    *
-   * Currently defined backends are file, string and sqlite:
+   * Currently defined backends are file and string
    *
    * - file: will use normal file access to read the xml files.
    *   Empty path (just 'file:') will use data/
    * - string: will treat everything after the : as the data, no xincludes are
    *   supported with this backend
-   * - sqlite: will look for the xml files in the sqlite database specified
-   *   after the colon
    *
    * Parameters are always read from the first available backend.  So if you
    * want to override only a subset of Parameters you can prepend the list of
    * backends with one backend which only contains the information you want to
    * override.
-   *
-   * >>> gearbox.set
    */
   class GearboxModule : public Module {
 

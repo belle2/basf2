@@ -38,7 +38,7 @@ namespace Belle2 {
      * @param line The line number in the source code where the message was sent from.
      */
     LogMessage(LogConfig::ELogLevel logLevel, const std::string& message, const char* package,
-               const std::string& function, const std::string& file, unsigned int line);
+               const std::string& function, const std::string& file, unsigned int line, int debugLevel = 0);
 
     /**
      * Compares two messages.
@@ -98,6 +98,7 @@ namespace Belle2 {
     std::string m_function;   /**< The function name where the message was sent from. */
     std::string m_file;       /**< The file name where the message was sent from. */
     unsigned int m_line;      /**< The line number in the source code where the message was sent from. */
+    int m_debugLevel;         /**< The debug level for messages with level=c_Debug */
 
     unsigned int m_logInfo;   /**< kind of information to show (ORed combination of LogConfig::ELogInfo flags). */
 

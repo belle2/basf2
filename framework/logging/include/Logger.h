@@ -48,7 +48,7 @@
 /** send generic log message. */
 #define _B2LOGMESSAGE(loglevel, debuglevel, streamText, package, function, file, line) { \
     std::ostringstream stringBuffer; stringBuffer << streamText; \
-    Belle2::LogSystem::Instance().sendMessage(Belle2::LogMessage(loglevel, stringBuffer.rdbuf()->str(), package, function, file, line)); \
+    Belle2::LogSystem::Instance().sendMessage(Belle2::LogMessage(loglevel, stringBuffer.str(), package, function, file, line, debuglevel)); \
   }
 
 /** send generic log message if the log level is enabled. */

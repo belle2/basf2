@@ -224,6 +224,27 @@ namespace {
 
   }
 
+  TEST(WeightfileTest, StaticDatabaseBadSymbols)
+  {
+
+    TestHelpers::TempDirCreator tmp_dir;
+    LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+
+    MVA::Weightfile weightfile;
+    weightfile.addElement("Test", "a");
+
+    std::string evilIdentifier = "==> *+:";
+    MVA::Weightfile::saveToDatabase(weightfile, evilIdentifier);
+
+    auto loaded = MVA::Weightfile::loadFromDatabase(evilIdentifier);
+
+    EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
+
+    boost::filesystem::remove_all("testPayloads");
+    Database::reset();
+
+  }
+
   TEST(WeightfileTest, StaticXMLFile)
   {
 

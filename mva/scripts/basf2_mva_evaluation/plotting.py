@@ -201,16 +201,15 @@ class Plotter(object):
         if errorband_kwargs is not None and yerr is not None:
             if 'color' not in errorband_kwargs:
                 errorband_kwargs['color'] = color
-            x1 = x
-            y1 = y - yerr
-            y2 = y + yerr
             if xerr is not None:
-                boundaries = numpy.r_[numpy.c_[x - xerr, y1, y2], numpy.c_[x + xerr, y1, y2]]
-                boundaries = boundaries[boundaries[:, 0].argsort()]
-                x1 = boundaries[:, 0]
-                y1 = boundaries[:, 1]
-                y2 = boundaries[:, 2]
-            f = axis.fill_between(x1, y1, y2, interpolate=True, **errorband_kwargs)
+                # Ensure that xerr and yerr are iterable numpy arrays
+                xerr = x + xerr - x
+                yerr = y + yerr - y
+                for _x, _y, _xe, _ye in zip(x, y, xerr, yerr):
+                    axis.add_patch(matplotlib.patches.Rectangle((_x - _xe, _y - _ye), 2*_xe, 2*_ye,
+                                                                **errorband_kwargs))
+            else:
+                f = axis.fill_between(x, y - yerr, y + yerr, interpolate=True, **errorband_kwargs)
 
         if fill_kwargs is not None:
             axis.fill_between(x, y, 0, **fill_kwargs)

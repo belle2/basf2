@@ -244,7 +244,7 @@ def add_cosmics_generator(path, components=None,
                           geometry_xml_file='geometry/GCR_Summer2017.xml',
                           cosmics_data_dir='data/generators/modules/cryinput/',
                           setup_file='generators/scripts/cry.setup',
-                          pre_general_run_setup=None):
+                          pre_general_run_setup=None, top_in_counter=True):
     """
     Add the cosmics generator CRY with the default parameters to the path.
     :param path: Add the modules to this path.
@@ -260,9 +260,13 @@ def add_cosmics_generator(path, components=None,
     :param pre_general_run_setup: If set to a string, the cosmics selector module will be added using the
            parameters, that where used in this period of data taking. The periods can be found in cdc/cr/__init__.py.
            If not set, the method will assume a general cosmics run without the need for any selection (no trigger).
+    :param top_in_counter: TOP from hit point to pmt in trigger counter is subtracted
+           (assuming PMT is put at -z end of counter). Has only an effect when pre_general_run_setup is set.
 
     Please remember to also change the reconstruction accordingly, if you set "special" parameters here!
     """
+    import cdc.cr as cosmics_setup
+
     if global_box_size is None:
         global_box_size = [20, 20, 9]
     if accept_box is None:
@@ -275,13 +279,18 @@ def add_cosmics_generator(path, components=None,
                 "for the general cosmics run, and not the one for the cosmics test. "
                 "This is probably not what you want.", )
 
+    if pre_general_run_setup:
+        cosmics_setup.set_cdc_cr_parameters(pre_general_run_setup)
+
     if 'Gearbox' not in path:
-        path.add_module('Gearbox', override=[
-            ("/Global/length", str(global_box_size[0]), "m"),
-            ("/Global/width", str(global_box_size[1]), "m"),
-            ("/Global/height", str(global_box_size[2]), "m")],
-            fileName=geometry_xml_file,
-        )
+        override = [("/Global/length", str(global_box_size[0]), "m"),
+                    ("/Global/width", str(global_box_size[1]), "m"),
+                    ("/Global/height", str(global_box_size[2]), "m")]
+
+        if pre_general_run_setup:
+            override += [("/DetectorComponent[@name='CDC']//GlobalPhiRotation", str(cosmics_setup.globalPhi), "deg")]
+
+        path.add_module('Gearbox', override=override, fileName=geometry_xml_file,)
 
     # detector geometry
     if 'Geometry' not in path:
@@ -313,9 +322,6 @@ def add_cosmics_generator(path, components=None,
     cry.param('kineticEnergyThreshold', 0.01)
 
     if pre_general_run_setup:
-        import cdc.cr as cosmics_setup
-        cosmics_setup.set_cdc_cr_parameters(pre_general_run_setup)
-
         # Selector module.
         cosmics_selector = register_module('CDCCosmicSelector',
                                            lOfCounter=cosmics_setup.lengthOfCounter,
@@ -324,7 +330,7 @@ def add_cosmics_generator(path, components=None,
                                            yOfCounter=cosmics_setup.triggerPos[1],
                                            zOfCounter=cosmics_setup.triggerPos[2],
                                            phiOfCounter=0.,
-                                           TOP=True,  # Do we need to have this configurable?
+                                           TOP=top_in_counter,
                                            propSpeed=cosmics_setup.lightPropSpeed,
                                            TOF=1,
                                            cryGenerator=True

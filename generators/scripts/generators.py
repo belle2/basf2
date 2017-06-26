@@ -238,11 +238,12 @@ def add_phokhara_generator(path, finalstate=''):
         B2FATAL("add_phokhara_generator final state not supported: ", finalstate)
 
 
-def add_cosmics_generator(path, components=None, global_box_size=None, accept_box=None,
-                          keep_box=None,
+def add_cosmics_generator(path, components=None,
+                          global_box_size=None, accept_box=None, keep_box=None,
                           geometry_xml_file='geometry/GCR_Summer2017.xml',
                           cosmics_data_dir='data/generators/modules/cryinput/',
-                          setup_file='simulation/scripts/cry.setup'):
+                          setup_file='simulation/scripts/cry.setup',
+                          pre_general_run_setup=None):
     """
     Add the cosmics generator CRY with the default parameters to the path.
     :param path: Add the modules to this path.
@@ -255,6 +256,11 @@ def add_cosmics_generator(path, components=None, global_box_size=None, accept_bo
     :param geometry_xml_file: Name of the xml file to use for the geometry.
     :param cosmics_data_dir: parameter CosmicDataDir for the cry module (absolute or relative to the basf2 repo).
     :param setup_file: location of the cry.setup file (absolute or relative to the basf2 repo)
+    :param pre_general_run_setup: If set to a string, the cosmics selector module will be added using the
+           parameters, that where used in this period of data taking. The periods can be found in cdc/cr/__init__.py.
+           If not set, the method will assume a general cosmics run without the need for any selection (no trigger).
+
+    Please remember to also change the reconstruction accordingly, if you set "special" parameters here!
     """
     if global_box_size is None:
         global_box_size = [20, 20, 9]
@@ -299,3 +305,26 @@ def add_cosmics_generator(path, components=None, global_box_size=None, accept_bo
 
     # minimal kinetic energy - all particles below that energy are ignored
     cry.param('kineticEnergyThreshold', 0.01)
+
+    if pre_general_run_setup:
+        import cdc.cr as cosmics_setup
+        cosmics_setup.set_cdc_cr_parameters(pre_general_run_setup)
+
+        # Selector module.
+        cosmics_selector = register_module('CDCCosmicSelector',
+                                           lOfCounter=cosmics_setup.lengthOfCounter,
+                                           wOfCounter=cosmics_setup.widthOfCounter,
+                                           xOfCounter=cosmics_setup.triggerPos[0],
+                                           yOfCounter=cosmics_setup.triggerPos[1],
+                                           zOfCounter=cosmics_setup.triggerPos[2],
+                                           phiOfCounter=0.,
+                                           TOP=True,  # Do we need to have this configurable?
+                                           propSpeed=cosmics_setup.lightPropSpeed,
+                                           TOF=1,
+                                           cryGenerator=True
+                                           )
+
+        path.add_module(cosmics_selector)
+
+        empty_path = create_path()
+        cosmics_selector.if_false(empty_path)

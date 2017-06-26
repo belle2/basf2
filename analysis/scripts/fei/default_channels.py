@@ -2,20 +2,21 @@
 # -*- coding: utf-8 -*-
 #
 # Thomas Keck 2017
-#
-# Contains some example configurations of the FEI
-# Mostly you want to use get_default_channels,
-# which can return the configuration for common use-cases
-#   - Hadronic tagging (hadronic = True)
-#   - Semileptonic tagging (semileptonic = True)
-#   - B+/B- (chargedB = True)
-#   - B0/anti-B0 (neutralB = True)
-#   - running on Belle 1 MC/data (convertedFromBelle = True)
-#   - running a specific FEI which is optimized for a signal selection and uses ROEs (specific = True)
-#
-# Another interesting configuration is given by get_fr_channels,
-# which will return a configuration which is equivalent to the original Full Reconstruction algorithm used by Belle
 
+"""
+ Contains some example configurations of the FEI
+ Mostly you want to use get_default_channels,
+ which can return the configuration for common use-cases
+   - Hadronic tagging (hadronic = True)
+   - Semileptonic tagging (semileptonic = True)
+   - B+/B- (chargedB = True)
+   - B0/anti-B0 (neutralB = True)
+   - running on Belle 1 MC/data (convertedFromBelle = True)
+   - running a specific FEI which is optimized for a signal selection and uses ROEs (specific = True)
+
+ Another interesting configuration is given by get_fr_channels,
+ which will return a configuration which is equivalent to the original Full Reconstruction algorithm used by Belle
+"""
 
 import sys
 from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration

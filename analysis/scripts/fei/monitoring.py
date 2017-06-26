@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 #
 # Thoms Keck 2017
-#
-# Contains classes to read in the monitoring output
-# and some simple plotting routines.
-#
-# This is used by printReporting.py and latexReporting.py
-# to create summaries for a FEI training or application.
+
+"""
+ Contains classes to read in the monitoring output
+ and some simple plotting routines.
+
+ This is used by printReporting.py and latexReporting.py
+ to create summaries for a FEI training or application.
+"""
 
 
 import ROOT

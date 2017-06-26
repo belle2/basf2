@@ -2,17 +2,19 @@
 # -*- coding: utf-8 -*-
 
 # Thomas Keck 2016
-#
-# Configuration classes
-#
-# The classes defined here are used to uniquely define a FEI training.
-# Meaning:
-#  - The global configuration like database prefix, cache mode, monitoring, ... (FeiConfiguration)
-#  - The reconstructed Particles (Particle)
-#  - The reconstructed Channels of each particle (DecayChannel)
-#  - The MVA configuration for each channel (MVAConfiguration)
-#  - The Cut definitions of each channel (PreCutConfiguration)
-#  - The Cut definitions of each particle (PostCutConfiguration)
+
+"""
+ Configuration classes
+
+ The classes defined here are used to uniquely define a FEI training.
+ Meaning:
+  - The global configuration like database prefix, cache mode, monitoring, ... (FeiConfiguration)
+  - The reconstructed Particles (Particle)
+  - The reconstructed Channels of each particle (DecayChannel)
+  - The MVA configuration for each channel (MVAConfiguration)
+  - The Cut definitions of each channel (PreCutConfiguration)
+  - The Cut definitions of each particle (PostCutConfiguration)
+"""
 
 import collections
 import copy

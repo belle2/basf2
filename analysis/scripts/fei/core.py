@@ -2,40 +2,41 @@
 # -*- coding: utf-8 -*-
 #
 # Thomas Keck 2017
-#
-# The Full Event Interpretation Algorithm
-#
-# Some basic facts:
-#  - The algorithm will automatically reconstruct B mesons and calculate a signal probability for each candidate.
-#  - It can be used for hadronic and semileptonic tagging.
-#  - The algorithm has to be trained on MC, and can afterwards be applied on data.
-#  - The training requires O(100) million MC events
-#  - The weightfiles are stored in the Belle 2 Condition database
-#
-# Read this file if you want to understand the technical details of the FEI.
-#
-# The FEI follows a hierarchical approach.
-# There are 7 stages:
-#   (Stage -1: Write out information about the provided data sample)
-#   Stage 0: Final State Particles (FSP)
-#   Stage 1: pi0, J/Psi
-#   Stage 2: K_S0
-#   Stage 3: D mesons
-#   Stage 4: D* mesons
-#   Stage 5: B mesons
-#   Stage 6: Finish
-#
-# Most stages consists of:
-#   - Create Particle Candidates
-#   - Apply Cuts
-#   - Do vertex Fitting
-#   - Apply a multivariate classification method
-#   - Apply more Cuts
-#
-# The FEI will reconstruct these 7 stages during the training phase,
-# since the stages depend on one another, you have to run basf2 multiple (7) times on the same data
-# to train all the necssary multivariate classifiers.
-#
+
+"""
+ The Full Event Interpretation Algorithm
+
+ Some basic facts:
+  - The algorithm will automatically reconstruct B mesons and calculate a signal probability for each candidate.
+  - It can be used for hadronic and semileptonic tagging.
+  - The algorithm has to be trained on MC, and can afterwards be applied on data.
+  - The training requires O(100) million MC events
+  - The weightfiles are stored in the Belle 2 Condition database
+
+ Read this file if you want to understand the technical details of the FEI.
+
+ The FEI follows a hierarchical approach.
+ There are 7 stages:
+   (Stage -1: Write out information about the provided data sample)
+   Stage 0: Final State Particles (FSP)
+   Stage 1: pi0, J/Psi
+   Stage 2: K_S0
+   Stage 3: D mesons
+   Stage 4: D* mesons
+   Stage 5: B mesons
+   Stage 6: Finish
+
+ Most stages consists of:
+   - Create Particle Candidates
+   - Apply Cuts
+   - Do vertex Fitting
+   - Apply a multivariate classification method
+   - Apply more Cuts
+
+ The FEI will reconstruct these 7 stages during the training phase,
+ since the stages depend on one another, you have to run basf2 multiple (7) times on the same data
+ to train all the necssary multivariate classifiers.
+"""
 
 # FEI defines own command line options, therefore we disable
 # the ROOT command line options, which otherwise interfere sometimes.

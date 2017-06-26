@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 #
 # Thomas Keck 2017
-#
-# Call this "python3 fei/printReporting.py"
-# in a directory containing the monitoring output of the FEI
-# It will print out a summary and create some plots
+
+"""
+ Call this "python3 fei/printReporting.py"
+ in a directory containing the monitoring output of the FEI
+ It will print out a summary and create some plots
+"""
 
 
 import fei.monitoring as monitoring

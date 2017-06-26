@@ -2,33 +2,36 @@
 # -*- coding: utf-8 -*-
 #
 # Thomas Keck 2017
-#
-# This script can be used to train the FEI on a cluster like available at KEKCC
-# All you need is a basf2 steering file (see analysis/examples/FEI/ ) and some MC O(100) million
-# The script will automatically create some directories
-#  - collection containing weightfiles, monitoring files and other stuff
-#  - jobs containing temporary files during the training (can be deleted afterwards)
-#
-# The distributed script automatically spawns jobs on the cluster (or local machine),
-# and runs the steering file on the provided MC.
-# Since a FEI training requires multiple runs over the same MC, it does so multiple times.
-# The output of a run is passed as input to the next run (so your script has to use RootInput and RootOutput).
-#
-# In between it calls the do_trainings function of the FEI, to train the mutlivariate classifiers of the FEI
-# at each stage.
-#
-# At the end it produces summary outputs using printReporting.py and latexReporting.py
-# (this will only work of you use the monitoring mode)
-# And a summary file for each mva training using basf2_mva_evaluate
-#
-# If your training fails for some reason (e.g. a job fails on the cluster),
-# the FEI will stop, you can fix the problem and resume the training using the -x option.
-# This requires some expert knowledge, because you have to know howto fix the occured problem
-# and at which step you have to resume the training.
-#
-# After the training the weightfiles will be stored in the localdb in the collection directory
-# You have to upload these local database to the Belle 2 Condition Database if you want to use the FEI everywhere.
-# Alternatively you can just copy the localdb to somehwere and use it directly.
+
+"""
+ This script can be used to train the FEI on a cluster like available at KEKCC
+ All you need is a basf2 steering file (see analysis/examples/FEI/ ) and some MC O(100) million
+ The script will automatically create some directories
+  - collection containing weightfiles, monitoring files and other stuff
+  - jobs containing temporary files during the training (can be deleted afterwards)
+
+ The distributed script automatically spawns jobs on the cluster (or local machine),
+ and runs the steering file on the provided MC.
+ Since a FEI training requires multiple runs over the same MC, it does so multiple times.
+ The output of a run is passed as input to the next run (so your script has to use RootInput and RootOutput).
+
+ In between it calls the do_trainings function of the FEI, to train the mutlivariate classifiers of the FEI
+ at each stage.
+
+ At the end it produces summary outputs using printReporting.py and latexReporting.py
+ (this will only work of you use the monitoring mode)
+ And a summary file for each mva training using basf2_mva_evaluate
+
+ If your training fails for some reason (e.g. a job fails on the cluster),
+ the FEI will stop, you can fix the problem and resume the training using the -x option.
+ This requires some expert knowledge, because you have to know howto fix the occured problem
+ and at which step you have to resume the training.
+
+ After the training the weightfiles will be stored in the localdb in the collection directory
+ You have to upload these local database to the Belle 2 Condition Database if you want to use the FEI everywhere.
+ Alternatively you can just copy the localdb to somehwere and use it directly.
+"""
+
 
 import shutil
 import subprocess

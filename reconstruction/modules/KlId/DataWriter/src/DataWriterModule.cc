@@ -253,7 +253,7 @@ void DataWriterModule::event()
     m_KLMTrackClusterSepAngle = -999;
     auto trackSeperations = cluster.getRelationsTo<TrackClusterSeparation>();
     TrackClusterSeparation* trackSep;
-    float best_dist = 10000000000000;
+    float best_dist = 100000000;
     float dist;
     for (auto trackSeperation :  trackSeperations) {
       dist = trackSeperation.getDistance();

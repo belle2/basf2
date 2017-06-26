@@ -12,8 +12,6 @@
 #include <string>
 #include <memory>
 
-using namespace std;
-
 namespace Belle2 {
 
   class AnalysisConfiguration
@@ -50,7 +48,7 @@ namespace Belle2 {
    *
    */
   {
-    string m_tupleStyle;
+    std::string m_tupleStyle;
     bool m_legacyMCMatching; /**< specifies the version of MC matching algorithm to be used */
 
     static AnalysisConfiguration* s_instance;
@@ -65,14 +63,14 @@ namespace Belle2 {
   public:
 
     /*Configurable-specific function to obtain value*/
-    const string getTupleStyle()
+    const std::string getTupleStyle()
     {
       //B2INFO("Returning style '"<<m_tupleStyle<<"'");
       return m_tupleStyle;
     }
 
     /*Configurable-specific function to set value*/
-    void setTupleStyle(string v)
+    void setTupleStyle(std::string v)
     {
       //B2INFO("Setting style '"<<v<<"'");
       m_tupleStyle = v;

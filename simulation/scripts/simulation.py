@@ -54,12 +54,12 @@ def add_PXDDataReduction(path, components, use_vxdtf2=False):
         'ROIListName': 'ROIs',
         'tolerancePhi': 0.15,
         'toleranceZ': 0.5,
-        'sigmaSystU': 0.1,
-        'sigmaSystV': 0.1,
+        'sigmaSystU': 0.02,
+        'sigmaSystV': 0.02,
         'numSigmaTotU': 10,
         'numSigmaTotV': 10,
-        'maxWidthU': 10,
-        'maxWidthV': 10,
+        'maxWidthU': 0.5,
+        'maxWidthV': 0.5,
     }
     pxdDataRed.param(param_pxdDataRed)
     path.add_module(pxdDataRed)
@@ -79,7 +79,8 @@ def add_simulation(
         bkgcomponents=None,
         bkgscale=1.0,
         usePXDDataReduction=True,
-        use_vxdtf2=False):
+        use_vxdtf2=False,
+        generate_2nd_cdc_hits=False):
     """
     This function adds the standard simulation modules to a path.
     """
@@ -129,6 +130,7 @@ def add_simulation(
     # CDC digitization
     if components is None or 'CDC' in components:
         cdc_digitizer = register_module('CDCDigitizer')
+        cdc_digitizer.param("Output2ndHit", generate_2nd_cdc_hits)
         path.add_module(cdc_digitizer)
 
     # PXD digitization
@@ -170,7 +172,8 @@ def add_simulation(
 
 
 def add_cosmics_simulation(path, components=None, globalBoxSize=["20", "20", "9"], acceptBox=[8, 8, 8],
-                           keepBox=[8, 8, 8], usePXDDataReduction=False, use_vxdtf2=False):
+                           keepBox=[8, 8, 8], usePXDDataReduction=False, use_vxdtf2=False,
+                           generate_2nd_cdc_hits=False):
     """
     This function adds the cosmic simulation modules to a path.
     CRY generator is used to generate cosmic rays.
@@ -246,6 +249,7 @@ def add_cosmics_simulation(path, components=None, globalBoxSize=["20", "20", "9"
     # CDC digitization
     if components is None or 'CDC' in components:
         cdc_digitizer = register_module('CDCDigitizer')
+        cdc_digitizer.param("Output2ndHit", generate_2nd_cdc_hits)
         path.add_module(cdc_digitizer)
 
     # PXD digitization

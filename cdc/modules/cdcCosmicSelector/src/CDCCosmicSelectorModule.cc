@@ -165,8 +165,16 @@ void CDCCosmicSelectorModule::event()
       }
 
       const double tofToCounter = fl / (c * beta);
-      const double topToPMT = m_top ? (zi - (m_zOfCounter - 0.5 * m_lOfCounter)) / m_propSpeed : 0.;
-      //      std::cout << "topToPMT= " << topToPMT << std::endl;
+      const double topToPMT = m_top ? hypot(xi - xOfCounter, zi - (m_zOfCounter - 0.5 * m_lOfCounter)) / m_propSpeed : 0.;
+      /*
+      std::cout << "xi          = " << xi << std::endl;
+      std::cout << "xOfCounter  = " << xOfCounter << std::endl;
+      std::cout << "zi          = " << zi << std::endl;
+      std::cout << "m_zOfCounter= " << m_zOfCounter << std::endl;
+      std::cout << "m_lOfCounter= " << m_lOfCounter << std::endl;
+      std::cout << "m_propSpeed = " << m_propSpeed  << std::endl;
+      std::cout << "topToPMT    = " << topToPMT << std::endl;
+      */
       m_P->setProductionTime(pTime - tofToCounter - topToPMT);
       //      std::cout <<"org,mod= " << pTimeOrg << m_P->getProductionTime() << std::endl;
       //if not hit, reverse the momentum vector so that the particle will not be simulated

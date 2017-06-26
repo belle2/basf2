@@ -125,14 +125,14 @@ namespace Belle2 {
   void B2BIIFixMdstModule::Muid_event(void)
   {
 
-    Mdst_klm_mu_ex_Manager& muexMgr = Mdst_klm_mu_ex_Manager::get_manager();
+    Belle::Mdst_klm_mu_ex_Manager& muexMgr = Belle::Mdst_klm_mu_ex_Manager::get_manager();
     // In well formed C++ references must always be legal but panther sometimes
     // returns references to NULL. To catch this reliably we check the address
     // of the reference and to make sure the compiler does not optimize this
     // away we cast to a void pointer first so he doesn't know it's the address
     // of a reference anymore.
     if ((void*)&muexMgr == NULL) {
-      B2ERROR("%B2BIIFixMdst muid did not find Mdst_klm_mu_ex table "
+      B2ERROR("%B2BIIFixMdst muid did not find Belle::Mdst_klm_mu_ex table "
               << "in this event, which implies" << std::endl
               << "   that muid_set and muid_dec were not run yet. "
               << "Required order of modules is " << std::endl
@@ -140,21 +140,21 @@ namespace Belle2 {
               << std::endl << "   This program is terminated.");
       exit(-1);
     }
-    Mdst_ecl_trk_Manager& eclTrkMgr = Mdst_ecl_trk_Manager::get_manager();
-    Mdst_ecl_trk_Index eclTrkIdx = eclTrkMgr.index("trk");
+    Belle::Mdst_ecl_trk_Manager& eclTrkMgr = Belle::Mdst_ecl_trk_Manager::get_manager();
+    Belle::Mdst_ecl_trk_Index eclTrkIdx = eclTrkMgr.index("trk");
     eclTrkIdx.update();
 
-// For each Mdst_klm_mu_ex, refigure the likelihoods by using the
+// For each Belle::Mdst_klm_mu_ex, refigure the likelihoods by using the
 // most up-to-date probability density functions of muons, pions, and
 // kaons for the KLM range and reduced chi-squared.  Optionally, fold
 // in the probability density function of muons, pions, and kaons for
 // the ECL energy associated with the corresponding charged track.
 // The chain of pointers among panther tables is a little byzantine.
 
-    for (std::vector<Mdst_klm_mu_ex>::iterator iMuex = muexMgr.begin();
+    for (std::vector<Belle::Mdst_klm_mu_ex>::iterator iMuex = muexMgr.begin();
          iMuex < muexMgr.end(); ++iMuex) {
-      Mdst_charged& chg      = iMuex->pMDST_Charged();
-      Mdst_muid&    muid     = chg.muid();
+      Belle::Mdst_charged& chg      = iMuex->pMDST_Charged();
+      Belle::Mdst_muid&    muid     = chg.muid();
       int ECMaxLyr = (muid.quality() & 0x400000) ? 1 : 0;
       if (m_eklm_max_layer == 11) {
         ECMaxLyr = 1;
@@ -215,11 +215,11 @@ namespace Belle2 {
         kaon /= denom;
       }
       if (m_use_ecl) {
-        Mdst_trk& trk = chg.trk();
-        std::vector<Mdst_ecl_trk> eclTrk = point_from(trk.get_ID(), eclTrkIdx);
-        std::vector<Mdst_ecl_trk>::iterator iEclTrk = eclTrk.begin();
+        Belle::Mdst_trk& trk = chg.trk();
+        std::vector<Belle::Mdst_ecl_trk> eclTrk = point_from(trk.get_ID(), eclTrkIdx);
+        std::vector<Belle::Mdst_ecl_trk>::iterator iEclTrk = eclTrk.begin();
         if (iEclTrk != eclTrk.end()) {
-          Mdst_ecl& ecl = iEclTrk->ecl();
+          Belle::Mdst_ecl& ecl = iEclTrk->ecl();
           if (ecl) {
             if (ecl.match() >= 1) {
               eEcl  = ecl.energy();
@@ -299,14 +299,14 @@ namespace Belle2 {
 
     char dbname[] = "muid_xxxx_e000000.dat";
     std::string pathname = "";
-    bool tmp = set_belfnm_verbose(false);
+    bool tmp = Belle::set_belfnm_verbose(false);
     while ((pathname == "") && (expNo >= 5)) {
       std::sprintf(dbname, "%s%s%s%06d%s", "muid_", dbtemplate,
                    "_e", expNo, ".dat");
-      pathname = belfnm(dbname, 0, "share/belle_legacy/data-files/muid");
+      pathname = Belle::belfnm(dbname, 0, "share/belle_legacy/data-files/muid");
       expNo -= 2;
     }
-    (void)set_belfnm_verbose(tmp);
+    (void)Belle::set_belfnm_verbose(tmp);
     expNo += 2;
     if (pathname == "") {
       B2ERROR("%MuidProb: Failed to open database file."

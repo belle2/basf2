@@ -28,6 +28,7 @@ import pdb
 
 import basf2_mva_util
 from basf2_mva_evaluation import plotting
+from generators import get_default_decayfile
 
 
 def removeJPsiSlash(string):
@@ -365,7 +366,7 @@ class MonitoringBranchingFractions(object):
 
     def __init__(self):
         if MonitoringBranchingFractions._shared is None:
-            decay_file = os.getenv('BELLE2_EXTERNALS_DIR') + '/share/evtgen/DECAY.DEC'
+            decay_file = get_default_decayfile()
             self.exclusive_branching_fractions = self.loadExclusiveBranchingFractions(decay_file)
             self.inclusive_branching_fractions = self.loadInclusiveBranchingFractions(self.exclusive_branching_fractions)
             MonitoringBranchingFractions._shared = (self.exclusive_branching_fractions, self.inclusive_branching_fractions)

@@ -76,7 +76,7 @@ bool V0Fitter::fitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, ge
   }
 
   if ((*vertexVector[0]).getNTracks() != 2) {
-    B2ERROR("Wrong number of tracks in vertex.");
+    B2DEBUG(100, "Wrong number of tracks in vertex.");
     return false;
   }
 
@@ -96,7 +96,7 @@ bool V0Fitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit:
     // code trying several windings before giving up, so this
     // happens occasionally.  Something more stable would perhaps
     // be desirable.
-    B2WARNING("Could not extrapolate track to vertex.");
+    B2DEBUG(200, "Could not extrapolate track to vertex.");
     return false;
   }
   return true;

@@ -1,33 +1,24 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Milkail Remnev, Dmitry Matvienko                         *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ ***************************************************************************/
+
 #include <ecl/modules/eclDisplay/geometry.h>
 
-using namespace Belle2;
+using namespace Belle2::ECLDisplayUtility;
 
-int Belle2::GetCrateId(int ch_num)
-{
-  return ch_num / 192;
-}
-// Identical to GetCrateId
-int Belle2::GetCollectorId(int ch_num)
-{
-  return GetCrateId(ch_num);
-}
+int do_energy_count = 1;
 
-int Belle2::GetCrateChannelId(int ch_num)
+void Belle2::ECLDisplayUtility::SetMode(int i)
 {
-  return ch_num % 192;
+  do_energy_count = i;
 }
-
-int Belle2::GetShaperId(int ch_num)
+int Belle2::ECLDisplayUtility::GetMode()
 {
-  return GetCrateChannelId(ch_num) / 16;
-}
-
-int Belle2::GetShaperChannelId(int ch_num)
-{
-  return GetCrateChannelId(ch_num) % 16;
-}
-
-int Belle2::GetChannelCount()
-{
-  return 6912;
+  return do_energy_count;
 }

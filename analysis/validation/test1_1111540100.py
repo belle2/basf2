@@ -38,9 +38,10 @@ inputMdst('default', '../1111540100.dst.root')
 
 do_KS0_reco = False
 loadStdCharged()
+stdLooseE()
+cutAndCopyList('e+:Jp', 'e+:loose', '')
 
-
-reconstructDecay('J/psi -> e-:all e+:all', '2.8 < M < 3.3')
+reconstructDecay('J/psi -> e-:Jp e+:Jp', '2.8 < M < 3.3')
 matchMCTruth('J/psi')
 
 if(do_KS0_reco):
@@ -60,7 +61,7 @@ ntupleFile('../1111540100.ntup.root')
 tools = ['EventMetaData', 'B0']
 tools += ['RecoStats', 'B0']
 tools += ['Kinematics', '^B0 -> [^J/psi -> ^e+ ^e-] [^K_S0 -> ^pi+ ^pi-]']
-tools += ['DeltaEMbc', '^B0 -> [J/psi -> e+ e-] [K_S0 -> pi+ pi-]']
+tools += ['DeltaEMbc', '^B0 -> [J/psi -> e+:Jp e-:Jp] [K_S0 -> pi+ pi-]']
 tools += ['PID', 'B0 -> [J/psi -> ^e+ ^e-] [K_S0 -> ^pi+ ^pi-]']
 # tools += ['Vertex', '^B0 -> [J/psi -> e+ e-] [K_S0 -> pi+ pi-]']
 # tools += ['DeltaT', '^B0']
@@ -95,8 +96,6 @@ ntupleTree('B0', 'B0', tools)
 # dump all event summary information
 # eventtools = ['EventMetaData','B0']
 # eventtools += ['RecoStats','B0']
-# eventtools += ['DetectorStatsRec', 'B0']
-# eventtools += ['DetectorStatsSim','B0']
 
 # ntupleTree('eventtuple', 'B0', eventtools)
 

@@ -33,7 +33,7 @@ using std::vector;
 namespace TreeFitter {
 
   extern int vtxverbose ;
-
+  extern std::vector<int> massConstraintList ;
   /*
   void Fitter::printDaughters(Particle* mother)
   {
@@ -47,7 +47,7 @@ namespace TreeFitter {
   }
   */
 
-  Fitter::Fitter(Particle* particle, double prec)
+  Fitter::Fitter(Belle2::Particle* particle, double prec)
     : m_particle(particle), m_decaychain(0), m_fitparams(0), m_status(VertexStatus::UnFitted),
       m_chiSquare(-1), m_niter(-1), m_prec(prec)
   {
@@ -94,7 +94,7 @@ namespace TreeFitter {
       bool finished = false ;
       B2DEBUG(80, "Fitter: Begin Iterations");
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
-        HepVector prevpar = m_fitparams->par() ;
+        CLHEP::HepVector prevpar = m_fitparams->par() ;
         bool firstpass = m_niter == 0 ;
         m_errCode = m_decaychain->filter(*m_fitparams, firstpass) ;
         double chisq = m_fitparams->chiSquare() ;
@@ -197,22 +197,22 @@ namespace TreeFitter {
     m_decaychain->printConstraints(os) ;
   }
 
-  const HepSymMatrix& Fitter::cov() const
+  const CLHEP::HepSymMatrix& Fitter::cov() const
   {
     return m_fitparams->cov() ;
   }
 
-  const HepVector& Fitter::par() const
+  const CLHEP::HepVector& Fitter::par() const
   {
     return m_fitparams->par() ;
   }
 
-  HepSymMatrix Fitter::cov(const vector<int>& indexVec) const
+  CLHEP::HepSymMatrix Fitter::cov(const vector<int>& indexVec) const
   {
     return m_fitparams->cov(indexVec) ;
   }
 
-  HepVector Fitter::par(const vector<int>& indexVec) const
+  CLHEP::HepVector Fitter::par(const vector<int>& indexVec) const
   {
     return m_fitparams->par(indexVec) ;
   }
@@ -222,22 +222,22 @@ namespace TreeFitter {
     return m_fitparams->nDof() ;
   }
 
-  int Fitter::posIndex(Particle* particle) const
+  int Fitter::posIndex(Belle2::Particle* particle) const
   {
     return m_decaychain->posIndex(particle) ;
   }
 
-  int Fitter::momIndex(Particle* particle) const
+  int Fitter::momIndex(Belle2::Particle* particle) const
   {
     return m_decaychain->momIndex(particle) ;
   }
 
-  int Fitter::tauIndex(Particle* particle) const
+  int Fitter::tauIndex(Belle2::Particle* particle) const
   {
     return m_decaychain->tauIndex(particle) ;
   }
 
-  double Fitter::add(Particle& cand)
+  double Fitter::add(Belle2::Particle& cand)
   {
     ParticleBase* bp = m_decaychain->mother()->addDaughter(&cand) ;
     int offset = m_fitparams->dim() ;
@@ -272,7 +272,7 @@ namespace TreeFitter {
     return deltachisq ;
   }
 
-  double Fitter::remove(Particle& cand)
+  double Fitter::remove(Belle2::Particle& cand)
   {
     ParticleBase* pb = const_cast<ParticleBase*>(m_decaychain->locate(&cand)) ;
     ErrCode status ;
@@ -310,7 +310,7 @@ namespace TreeFitter {
   //FT: this used to be btaFitParams, but since we don't use BtaFitParams and pass everything individually
   //it now only does only the one complicated part, i.e. building cov7
 
-  HepSymMatrix Fitter::extractCov7(const ParticleBase* pb) const
+  CLHEP::HepSymMatrix Fitter::extractCov7(const ParticleBase* pb) const
   //FT: having a matrix as an output is incredibly slow for allocation reasons, this must change;
   //also this needs to output a TMatrixFSym because it's only used to feed back into the Belle2::Particle
   {
@@ -319,7 +319,7 @@ namespace TreeFitter {
     if (posindex < 0 && pb->mother()) posindex = pb->mother()->posIndex() ;
     int momindex = pb->momIndex() ;
 
-    HepSymMatrix cov7(7, 0) ; //very important! Belle2 uses p,E,x! Change order here!
+    CLHEP::HepSymMatrix cov7(7, 0) ; //very important! Belle2 uses p,E,x! Change order here!
     if (pb->hasEnergy()) {
       // if particle has energy, get full p4 from fitparams
       int parmap[7] ;
@@ -331,7 +331,7 @@ namespace TreeFitter {
     } else {
       // if not, use the pdttable mass
 
-      HepSymMatrix cov6(6, 0) ;
+      CLHEP::HepSymMatrix cov6(6, 0) ;
       int parmap[6] ;
       for (int i = 0; i < 3; ++i) parmap[i] = momindex + i ; //energy should be after this
       for (int i = 0; i < 3; ++i) parmap[i + 3]   = posindex + i ;
@@ -348,7 +348,7 @@ namespace TreeFitter {
       }
       double energy = sqrt(energy2) ;
       //
-      HepMatrix jacobian(7, 6, 0);
+      CLHEP::HepMatrix jacobian(7, 6, 0);
       for (int col = 1; col <= 3; ++col) {
         jacobian(col, col) = 1; // don't modify momentum
         jacobian(4, col) = m_fitparams->par()(momindex + col) / energy ; //add energy row
@@ -375,17 +375,17 @@ namespace TreeFitter {
   }
   */
 
-  Particle Fitter::getFitted()
+  Belle2::Particle Fitter::getFitted()
   {
-    Particle thecand = *particle() ; //fishy use of pointers...
+    Belle2::Particle thecand = *particle() ; //fishy use of pointers...
     updateCand(thecand) ;
     B2DEBUG(80, "Fitter::getFitted()");
     return thecand ;
   }
 
-  Particle Fitter::getFitted(Particle& cand)
+  Belle2::Particle Fitter::getFitted(Belle2::Particle& cand)
   {
-    Particle thecand = cand ;
+    Belle2::Particle thecand = cand ;
     updateCand(thecand) ;
     return thecand ;
   }
@@ -403,14 +403,14 @@ namespace TreeFitter {
   }
   */
 
-  Particle Fitter::getFittedTree()
+  Belle2::Particle Fitter::getFittedTree()
   {
-    Particle cand = *particle() ;
+    Belle2::Particle cand = *particle() ;
     updateTree(cand) ;
     return cand ;
   }
 
-  bool Fitter::updateCand(Particle& cand) const
+  bool Fitter::updateCand(Belle2::Particle& cand) const
   {
     // assigns fitted parameters to a candidate
     const ParticleBase* pb = m_decaychain->locate(&cand) ;
@@ -420,14 +420,15 @@ namespace TreeFitter {
       // this error message does not make sense, because it is also
       // triggered for daughters that were simply not refitted. we
       // have to do something about that.
-      std::cout << "Can't find candidate " << cand.getName() << std::endl
-                << "in tree " << m_particle->getName() << std::endl;
+
+      B2ERROR("Can't find candidate " << cand.getName() << "in tree " << m_particle->getName());
     }
     return pb != 0 ;
   }
 
 
-  void Fitter::updateCand(const ParticleBase& pb, Particle& cand) const //FT: this is very delicate, come back here in case of errors
+  void Fitter::updateCand(const ParticleBase& pb,
+                          Belle2::Particle& cand) const //FT: this is very delicate, come back here in case of errors
   {
     B2DEBUG(80, "Updating the candidate " << cand.getName());
     //    assert( pb->particle()->getPDGCode() == cand.getPDGCode() ) ; //sanity check
@@ -462,7 +463,7 @@ namespace TreeFitter {
       p.SetE(p.Vect()*p.Vect() + mass * mass); //I risk rounding errors for no benefit
       cand.set4Vector(p);
     }
-    HepSymMatrix cov7 = extractCov7(&pb);
+    CLHEP::HepSymMatrix cov7 = extractCov7(&pb);
     //    B2DEBUG(80,"Fitter::updateCand - extracted cov7 matrix is " << cov7.num_row() << "x" << cov7.num_col() << ".");
     TMatrixFSym cov7b2(7);
     //FT: this can be improved
@@ -477,7 +478,7 @@ namespace TreeFitter {
 
     cand.setMomentumVertexErrorMatrix(cov7b2);
 
-    //FT: save lifetime and decay length as ExtraInfo
+    //FT: save lifetime and decay length as ExtraInfo. This is must be interfaced with the FlightInfo NtupleTool.
     TVector2 tau  = decayLength(cand);
     TVector2 life = lifeTime(cand);
     if (cand.hasExtraInfo("decayLength")) {
@@ -517,7 +518,7 @@ namespace TreeFitter {
     }
   }
 
-  void Fitter::updateTree(Particle& cand) const
+  void Fitter::updateTree(Belle2::Particle& cand) const
   {
     B2DEBUG(80, "Fitter::fit: Updating tree " << cand.getName());
     // assigns fitted parameters to all candidates in a decay tree
@@ -528,7 +529,7 @@ namespace TreeFitter {
     if (updateCand(cand)) { // if the mother can be updated, update the daughters
 
       int ndaughters = cand.getNDaughters();
-      Particle* daughter;
+      Belle2::Particle* daughter;
       for (int i = 0; i < ndaughters; i++) {
         daughter = const_cast<Belle2::Particle*>(cand.getDaughter(i));
         updateTree(*daughter);
@@ -536,7 +537,7 @@ namespace TreeFitter {
     }
   }
 
-  TVector2 Fitter::lifeTime(Particle& cand) const
+  TVector2 Fitter::lifeTime(Belle2::Particle& cand) const
   {
     // returns the lifetime in the rest frame of the candidate
     TVector2 rc;
@@ -546,7 +547,7 @@ namespace TreeFitter {
       double tau    = m_fitparams->par()(tauindex + 1) ;
       double taucov = m_fitparams->cov()(tauindex + 1, tauindex + 1) ;
       double mass   = pb->pdgMass() ;
-      double convfac = mass / Const::speedOfLight;
+      double convfac = mass / Belle2::Const::speedOfLight;
       rc = {convfac * tau, convfac* convfac * taucov} ;
     }
     return rc ;
@@ -585,7 +586,7 @@ namespace TreeFitter {
       indexvec.push_back(momindex + 1) ;
       indexvec.push_back(momindex + 2) ;
 
-      HepVector jacobian(4) ;
+      CLHEP::HepVector jacobian(4) ;
       jacobian[0] = mom ;
       jacobian[1] = tau * fitparams->par()(momindex + 1) / mom ;
       jacobian[2] = tau * fitparams->par()(momindex + 2) / mom ;
@@ -597,7 +598,7 @@ namespace TreeFitter {
     return rc ; //returns (0,0) if the particle has no decay length
   }
 
-  TVector2 Fitter::decayLength(Particle& cand) const //FT: are all these instances of decayLength required?
+  TVector2 Fitter::decayLength(Belle2::Particle& cand) const //FT: are all these instances of decayLength required?
   {
     TVector2 rc;
     const ParticleBase* pb = m_decaychain->locate(&cand) ;
@@ -641,7 +642,7 @@ namespace TreeFitter {
       indexvec.push_back(tauindexB);
       for (int i = 0; i < 3; ++i) indexvec.push_back(momindexB + i) ;
 
-      HepVector jacobian(8) ;
+      CLHEP::HepVector jacobian(8) ;
       jacobian(1) = momA ;
       for (int irow = 1; irow <= 3; ++irow)
         jacobian(irow + 1) = tauA * m_fitparams->par()(momindexA + irow) / momA ;
@@ -655,7 +656,7 @@ namespace TreeFitter {
     return rc ;
   }
 
-  TVector2 Fitter::decayLengthSum(Particle& candA, Particle& candB) const
+  TVector2 Fitter::decayLengthSum(Belle2::Particle& candA, Belle2::Particle& candB) const
   {
     TVector2 rc;
     const ParticleBase* pbA = m_decaychain->locate(&candA) ;

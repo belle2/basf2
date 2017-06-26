@@ -115,7 +115,7 @@ namespace {
       }
 
       bool
-      isPresentRelationTo(string toSetName, KeyElementType to) const
+      isPresentRelationTo(const string& toSetName, KeyElementType to) const
       {
         auto toRelations = getConstSetOfToRelations(toSetName);
         if (toRelations == m_allRelations.end())

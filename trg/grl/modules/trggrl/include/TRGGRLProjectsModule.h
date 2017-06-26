@@ -62,6 +62,9 @@ namespace Belle2 {
     /// Debug level.
     int _debugLevel;
 
+    /**choose the corresponding trigger menu of Belle2 phase*/
+    std::string m_belle2phase;
+
     /// Config. file name.
     std::string m_configFilename;
 

@@ -189,16 +189,18 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
   // Store the address of the ExtManager (used later)
   m_ExtMgr = Simulation::ExtManager::GetManager();
 
-  // Set up the EXT-specific geometry
-  GearDir coilContent = GearDir("Detector/DetectorComponent[@name=\"COIL\"]/Content/");
-  double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
-  double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
-  double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
-  m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
-  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
-  GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
-  double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2") * CLHEP::cm; // mm
-  m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
+  // Set up the EXT-specific geometry (might have already been done by MUID)
+  if (m_TargetExt == NULL) {
+    GearDir coilContent = GearDir("Detector/DetectorComponent[@name=\"COIL\"]/Content/");
+    double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
+    double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
+    double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
+    m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
+    G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
+    GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
+    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2") * CLHEP::cm; // mm
+    m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
+  }
 
 }
 
@@ -266,15 +268,17 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   // Store the address of the ExtManager (used later)
   m_ExtMgr = Simulation::ExtManager::GetManager();
 
-  // Set up the EXT-specific geometry
-  GearDir coilContent = GearDir("Detector/DetectorComponent[@name=\"COIL\"]/Content/");
-  double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
-  double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
-  double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
-  m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
-  GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
-  double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2") * CLHEP::cm; // mm
-  m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
+  // Set up the EXT-specific geometry (might have already been done by EXT)
+  if (m_TargetExt == NULL) {
+    GearDir coilContent = GearDir("Detector/DetectorComponent[@name=\"COIL\"]/Content/");
+    double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
+    double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
+    double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
+    m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
+    GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
+    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2") * CLHEP::cm; // mm
+    m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
+  }
 
   // Set up the MUID-specific geometry
   bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();
@@ -467,8 +471,10 @@ void TrackExtrapolateG4e::terminate(bool byMuid)
     delete m_AntideuteronPar;
     delete m_ElectronPar;
     delete m_PositronPar;
-  } else {
+  }
+  if (m_TargetExt != NULL) {
     delete m_TargetExt;
+    m_TargetExt = NULL;
   }
   if (m_EnterExit != NULL) {
     delete m_EnterExit;
@@ -606,12 +612,15 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   double mass = particle->GetPDGMass();
   double minPSq = (mass + m_MinKE) * (mass + m_MinKE) - mass * mass;
   // Create structures for ECLCluster-Track matching
-  std::vector<ExtHit> eclHit1, eclHit2;
+  std::vector<double> eclClusterDistance;
+  std::vector<ExtHit> eclHit1, eclHit2, eclHit3;
   if (eclClusterInfo != NULL) {
+    eclClusterDistance.resize(eclClusterInfo->size(), 1.0E10); // "positive infinity"
     ExtHit tempExtHit(extState.pdgCode, Const::EDetector::ECL, 0, EXT_FIRST, 0.0,
                       G4ThreeVector(), G4ThreeVector(), G4ErrorSymMatrix(6));
     eclHit1.resize(eclClusterInfo->size(), tempExtHit);
     eclHit2.resize(eclClusterInfo->size(), tempExtHit);
+    eclHit3.resize(eclClusterInfo->size(), tempExtHit);
   }
   // Create structures for KLMCluster-Track matching
   std::vector<TrackClusterSeparation> klmHit;
@@ -670,9 +679,17 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
           G4ThreeVector eclPos((*eclClusterInfo)[c].second);
           G4ThreeVector prePos(preStepPoint->GetPosition());
           G4ThreeVector diff(prePos - eclPos);
-          // find position of crossing of the track with the ECLCluster's sphere
-          if (eclHit1[c].getStatus() == EXT_FIRST) {
-            if (diff.mag() < m_MaxECLTrackClusterDistance) {
+          double distance = diff.mag();
+          if (distance < m_MaxECLTrackClusterDistance) {
+            // fallback ECLNEAR in case no ECLCROSS is found
+            if (distance < eclClusterDistance[c]) {
+              eclClusterDistance[c] = distance;
+              G4ErrorSymMatrix covariance(6);
+              fromG4eToPhasespace(g4eState, covariance);
+              eclHit3[c].update(EXT_ECLNEAR, extState.tof, pos / CLHEP::cm, mom / CLHEP::GeV, covariance);
+            }
+            // find position of crossing of the track with the ECLCluster's sphere
+            if (eclHit1[c].getStatus() == EXT_FIRST) {
               if (pos.mag2() >= eclPos.mag2()) {
                 double r = eclPos.mag();
                 double preD = prePos.mag() - r;
@@ -751,6 +768,11 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
       }
       if (eclHit2[c].getStatus() != EXT_FIRST) {
         ExtHit* h = extHits.appendNew(eclHit2[c]);
+        (*eclClusterInfo)[c].first->addRelationTo(h);
+        extState.track->addRelationTo(h);
+      }
+      if (eclHit3[c].getStatus() != EXT_FIRST) {
+        ExtHit* h = extHits.appendNew(eclHit3[c]);
         (*eclClusterInfo)[c].first->addRelationTo(h);
         extState.track->addRelationTo(h);
       }
@@ -854,6 +876,8 @@ void TrackExtrapolateG4e::registerVolumes()
   if (pvStore->size() == 0) {
     B2FATAL("No geometry defined. Please create the geometry first.");
   }
+
+  if (m_EnterExit != NULL) { return; } // Only do this once
 
   m_EnterExit = new map<G4VPhysicalVolume*, enum VolTypes>;
   m_BKLMVolumes = new vector<G4VPhysicalVolume*>;
@@ -1009,81 +1033,85 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
 
 ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G4ErrorFreeTrajState& g4eState)
 {
+  ExtState extState = {&b2track, pdgCode, false, 0.0, 0.0,                               // for EXT and MUID
+                       G4ThreeVector(0, 0, 1), 0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, false // for MUID only
+                      };
   RecoTrack* recoTrack = b2track.getRelatedTo<RecoTrack>();
+  if (recoTrack == NULL) {
+    B2WARNING("Track without associated RecoTrack: skipping extrapolation for this track.");
+    extState.pdgCode = 0; // prevent start of extrapolation in swim()
+    return extState;
+  }
   const genfit::AbsTrackRep* trackRep = recoTrack->getCardinalRepresentation();
   int charge = int(trackRep->getPDGCharge());
   if (charge != 0) {
-    pdgCode *= charge;
+    extState.pdgCode *= charge;
   } else {
     charge = 1; // should never happen but persist if it does
   }
-  ExtState extState = { &b2track, pdgCode, false, 0.0, 0.0,                             // for EXT and MUID
-                        G4ThreeVector(0, 0, 1), 0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, false // for MUID only
-                      };
   TVector3 firstPosition, firstMomentum, lastPosition, lastMomentum; // initialized to zeroes
   TMatrixDSym firstCov(6), lastCov(6);                               // initialized to zeroes
-  const genfit::MeasuredStateOnPlane& firstState = recoTrack->getMeasuredStateOnPlaneFromFirstHit(trackRep);
-  const genfit::MeasuredStateOnPlane& lastState = recoTrack->getMeasuredStateOnPlaneFromLastHit(trackRep);
   try {
+    const genfit::MeasuredStateOnPlane& firstState = recoTrack->getMeasuredStateOnPlaneFromFirstHit(trackRep);
     trackRep->getPosMomCov(firstState, firstPosition, firstMomentum, firstCov);
+    const genfit::MeasuredStateOnPlane& lastState = recoTrack->getMeasuredStateOnPlaneFromLastHit(trackRep);
     trackRep->getPosMomCov(lastState, lastPosition, lastMomentum, lastCov);
+    // in genfit units (cm, GeV/c)
+    extState.tof = lastState.getTime(); // DIVOT: must be revised when IP profile (reconstructed beam spot) become available!
+    if (lastPosition.Mag2() < firstPosition.Mag2()) {
+      firstPosition = lastPosition;
+      firstMomentum = -lastMomentum;
+      firstCov = lastCov;
+      trackRep->getPosMomCov(firstState, lastPosition, lastMomentum, lastCov);
+      lastMomentum *= -1.0; // extrapolate backwards instead of forwards
+      extState.isCosmic = true;
+      extState.tof = firstState.getTime(); // DIVOT: must be revised when IP profile (reconstructed beam spot) become available!
+    }
+
+    G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(extState.pdgCode);
+    if (extState.pdgCode != trackRep->getPDG()) {
+      double pSq = lastMomentum.Mag2();
+      double mass = particle->GetPDGMass() / CLHEP::GeV;
+      extState.tof *= sqrt((pSq + mass * mass) / (pSq + lastState.getMass() * lastState.getMass()));
+    }
+
+    extState.directionAtIP.set(firstMomentum.Unit().X(), firstMomentum.Unit().Y(), firstMomentum.Unit().Z());
+    if (m_MagneticField != 0.0) { // in gauss
+      double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) / (CLHEP::c_light * charge * m_MagneticField); // in cm
+      double centerPhi = extState.directionAtIP.phi() - M_PI_2;
+      double centerX = firstPosition.X() + radius * cos(centerPhi);
+      double centerY = firstPosition.Y() + radius * sin(centerPhi);
+      double pocaPhi = atan2(charge * centerY, charge * centerX) + M_PI;
+      double ipPerp = extState.directionAtIP.perp();
+      if (ipPerp > 0.0) {
+        extState.directionAtIP.setX(+sin(pocaPhi) * ipPerp);
+        extState.directionAtIP.setY(-cos(pocaPhi) * ipPerp);
+      }
+    } else {
+      // No field: replace flaky covariance matrix with a diagonal one measured in 1.5T field
+      // for a 10 GeV/c track ... and replace momentum magnitude with fixed 10 GeV/c
+      lastCov *= 0.0;
+      lastCov[0][0] = 5.0E-5;
+      lastCov[1][1] = 1.0E-7;
+      lastCov[2][2] = 5.0E-4;
+      lastCov[3][3] = 3.5E-3;
+      lastCov[4][4] = 3.5E-3;
+      lastMomentum = lastMomentum.Unit() * 10.0;
+    }
+
+    G4ThreeVector posG4e(lastPosition.X() * CLHEP::cm, lastPosition.Y() * CLHEP::cm,
+                         lastPosition.Z() * CLHEP::cm); // in Geant4 units (mm)
+    G4ThreeVector momG4e(lastMomentum.X() * CLHEP::GeV, lastMomentum.Y() * CLHEP::GeV,
+                         lastMomentum.Z() * CLHEP::GeV);  // in Geant4 units (MeV/c)
+    G4ErrorSymMatrix covG4e; // in Geant4e units (GeV/c, cm)
+    fromPhasespaceToG4e(lastMomentum, lastCov, covG4e); // in Geant4e units (GeV/c, cm)
+    g4eState.SetData("g4e_" + particle->GetParticleName(), posG4e, momG4e);
+    g4eState.SetError(covG4e);
   } catch (genfit::Exception) {
     B2WARNING("genfit::MeasuredStateOnPlane() exception: skipping extrapolation for this track. initial momentum = ("
               << firstMomentum.X() << "," << firstMomentum.Y() << "," << firstMomentum.Z() << ")");
     extState.pdgCode = 0; // prevent start of extrapolation in swim()
-    return extState;
   }
-  // in genfit units (cm, GeV/c)
-  extState.tof = lastState.getTime(); // DIVOT: must be revised when IP profile (reconstructed beam spot) become available!
-  if (lastPosition.Mag2() < firstPosition.Mag2()) {
-    firstPosition = lastPosition;
-    firstMomentum = -lastMomentum;
-    firstCov = lastCov;
-    trackRep->getPosMomCov(firstState, lastPosition, lastMomentum, lastCov);
-    lastMomentum *= -1.0; // extrapolate backwards instead of forwards
-    extState.isCosmic = true;
-    extState.tof = firstState.getTime(); // DIVOT: must be revised when IP profile (reconstructed beam spot) become available!
-  }
-
-  G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
-  if (pdgCode != trackRep->getPDG()) {
-    double pSq = lastMomentum.Mag2();
-    double mass = particle->GetPDGMass() / CLHEP::GeV;
-    extState.tof *= sqrt((pSq + mass * mass) / (pSq + lastState.getMass() * lastState.getMass()));
-  }
-
-  extState.directionAtIP.set(firstMomentum.Unit().X(), firstMomentum.Unit().Y(), firstMomentum.Unit().Z());
-  if (m_MagneticField != 0.0) { // in gauss
-    double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) / (CLHEP::c_light * charge * m_MagneticField); // in cm
-    double centerPhi = extState.directionAtIP.phi() - M_PI_2;
-    double centerX = firstPosition.X() + radius * cos(centerPhi);
-    double centerY = firstPosition.Y() + radius * sin(centerPhi);
-    double pocaPhi = atan2(charge * centerY, charge * centerX) + M_PI;
-    double ipPerp = extState.directionAtIP.perp();
-    if (ipPerp > 0.0) {
-      extState.directionAtIP.setX(+sin(pocaPhi) * ipPerp);
-      extState.directionAtIP.setY(-cos(pocaPhi) * ipPerp);
-    }
-  } else {
-    // No field: replace flaky covariance matrix with a diagonal one measured in 1.5T field
-    // for a 10 GeV/c track ... and replace momentum magnitude with fixed 10 GeV/c
-    lastCov *= 0.0;
-    lastCov[0][0] = 5.0E-5;
-    lastCov[1][1] = 1.0E-7;
-    lastCov[2][2] = 5.0E-4;
-    lastCov[3][3] = 3.5E-3;
-    lastCov[4][4] = 3.5E-3;
-    lastMomentum = lastMomentum.Unit() * 10.0;
-  }
-
-  G4ThreeVector posG4e(lastPosition.X() * CLHEP::cm, lastPosition.Y() * CLHEP::cm,
-                       lastPosition.Z() * CLHEP::cm); // in Geant4 units (mm)
-  G4ThreeVector momG4e(lastMomentum.X() * CLHEP::GeV, lastMomentum.Y() * CLHEP::GeV,
-                       lastMomentum.Z() * CLHEP::GeV);  // in Geant4 units (MeV/c)
-  G4ErrorSymMatrix covG4e; // in Geant4e units (GeV/c, cm)
-  fromPhasespaceToG4e(lastMomentum, lastCov, covG4e); // in Geant4e units (GeV/c, cm)
-  g4eState.SetData("g4e_" + particle->GetParticleName(), posG4e, momG4e);
-  g4eState.SetError(covG4e);
 
   return extState;
 }
@@ -1530,7 +1558,7 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
       if (track != NULL) {
         track->addRelationTo(hit);
         RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
-        recoTrack->addBKLMHit(hit, 0);
+        recoTrack->addBKLMHit(hit, recoTrack->getNumberOfTotalHits() + 1);
       }
     }
   }
@@ -1583,7 +1611,7 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
         track->addRelationTo(hit);
         RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
         for (unsigned int i = 0; i < eklmAlignmentHits.size(); ++i) {
-          recoTrack->addEKLMHit(eklmAlignmentHits[i], 0);
+          recoTrack->addEKLMHit(eklmAlignmentHits[i], recoTrack->getNumberOfTotalHits() + 1);
         }
       }
     }

@@ -20,7 +20,7 @@ from softwaretrigger.path_functions import (
 )
 
 # Create a path to generate some raw-data samples and then use the software trigger path(s) to reconstruct them.
-setup_softwaretrigger_database_access()
+# setup_softwaretrigger_database_access()
 
 # You could use your own components here or just use the default for the HLT (everything except PXD)
 # e.g. without SVD

@@ -3,7 +3,7 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
+ * Contributors: Martin Heck, CDC group                                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,24 +14,34 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <cdc/dataobjects/WireID.h>
-// #include <framework/datastore/RelationsObject.h>
 #include <framework/dataobjects/DigitBase.h>
 
 namespace Belle2 {
-  /** Class that is the result of the unpacker in raw data and the result of the Digitizer in simulation.
+  /** Class containing the result of the unpacker in raw data and the result of the digitizer in simulation.
    *
-   *  This class is optimized for low disc usage. For reconstruction purposes use the corresponding
-   *  CDCRecoHit class or create your own class. <br>
+   *  This class is optimized for low disc usage. <br>
+   *  For reconstruction purposes, use the corresponding CDCRecoHit class or create your own class. <br>
    *
    *  It stores the TDC count (timing information of the hit),<br>
    *  the accumulated ADC count of the charge in the hit cell,<br>
    *  and the WireID.
+   *
+   *  Regarding the treatment of 2nd fastest hit timing recorded by the front end, if it exists, <br>
+   *  the unpacker creates another individual CDCHit object for the 2nd hit in addition to the CDCHit for the 1st hit. <br>
+   *  In both case, the hit timing is stored as the TDC count. <br>
+   *  To identify if the CDCHit is 1st hit or 2nd hit, the first bit of member variable, m_status, is assigned. <br>
+   *  If such bit is 0(1), The CDCHit belongs to the 1st (2nd) hit. <br>
+   *  The method CDCHit::is2ndHit() has to be used for this purpose.
+   *
+   *  The relastion between the 1st hit object and the 2nd hit object is established with the variable, m_otherHitIndex.<br>
+   *  Users can call the CDCHit::getOtherHitIndex() to obtain the index of CDCHit array for the other hit.
+   *
    */
   class CDCHit : public DigitBase {
   public:
     /** Empty constructor for ROOT IO. */
     CDCHit() :
-      m_eWire(65535), m_tdcCount(0), m_adcCount(0), m_tdcCount2ndHit(0), m_status(0)
+      m_eWire(65535), m_tdcCount(0), m_adcCount(0), m_status(0), m_otherHitIndex(-1), m_adcCountAtLeadingEdge(0)
     {
       B2DEBUG(250, "Empty CDCHit Constructor called.");
     }
@@ -46,22 +56,24 @@ namespace Belle2 {
      *  @param iSuperLayer Super Layer of the wire.
      *  @param iLayer      Layer number inside the Super Layer.
      *  @param iWire       Wire number in the Layer.
-     *  @param tdcCount2ndHit 2nd timing measurement.
      *  @param status         Status of the hit.
+     *  @param otherHitIndex  Index to the other hit.
+     *  @param leadingEdgeADC ADCcount for a narrow gate at the leading edge.
      */
     CDCHit(unsigned short tdcCount, unsigned short adcCount,
-           unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, unsigned short tdcCont2ndHit = 0,
-           unsigned short status = 0);
+           unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, unsigned short status = 0, signed short otherHitIndex = -1,
+           unsigned short leadingEdgeADC = 0);
 
     /** Constructor using the WireID object. */
-    CDCHit(unsigned short tdcCount, unsigned short adcCount, const WireID& wireID, unsigned short tdcCount2ndHit = 0,
-           unsigned short status = 0)
+    CDCHit(unsigned short tdcCount, unsigned short adcCount, const WireID& wireID, unsigned short status = 0,
+           signed short otherHitIndex = -1, unsigned short leadingEdgeADC = 0)
     {
       setTDCCount(tdcCount);
       setADCCount(adcCount);
       setWireID(wireID);
-      setTDCCount2ndHit(tdcCount2ndHit);
       setStatus(status);
+      setOtherHitIndex(otherHitIndex);
+      setADCCountAtLeadingEdge(leadingEdgeADC);
     }
 
     /** Setter for Wire ID.
@@ -96,6 +108,18 @@ namespace Belle2 {
       m_status = status;
     }
 
+    /** Setter for 2nd hit flag. */
+    void set2ndHitFlag()
+    {
+      m_status |= 0x01;
+    }
+
+    /** Setter for already-checked flag. */
+    void setAlreadyCheckedFlag()
+    {
+      m_status |= 0x02;
+    }
+
     /** Setter for TDC count.
      *
      *  @param tdcCount  Information for timing of the hit.
@@ -106,17 +130,29 @@ namespace Belle2 {
       m_tdcCount = tdcCount;
     }
 
-    /** Setter for 2nd TDC count. */
-    void setTDCCount2ndHit(short tdc)
-    {
-      B2DEBUG(250, "setTDCCount2ndHit called with " << tdc);
-      m_tdcCount2ndHit = tdc;
-    }
-
     /** Setter for ADC count. */
     void setADCCount(unsigned short adcCount)
     {
       m_adcCount = adcCount;
+    }
+
+    /** Setter for the other hit index. */
+    void setOtherHitIndex(signed short index)
+    {
+      m_otherHitIndex = index;
+    }
+
+    /** Setter for the other hit indices. */
+    void setOtherHitIndices(CDCHit* otherHit)
+    {
+      m_otherHitIndex = otherHit->getArrayIndex();
+      otherHit->setOtherHitIndex(this->getArrayIndex());
+    }
+
+    /** Setter for ADCcount at leading edge. */
+    void setADCCountAtLeadingEdge(unsigned short adcCount)
+    {
+      m_adcCountAtLeadingEdge = adcCount;
     }
 
     /** Getter for iWire. */
@@ -129,6 +165,12 @@ namespace Belle2 {
     unsigned short getILayer() const
     {
       return WireID(m_eWire).getILayer();
+    }
+
+    /** Getter for iCLayer (0-55). */
+    unsigned short getICLayer() const
+    {
+      return WireID(m_eWire).getICLayer();
     }
 
     /** Getter for iSuperLayer. */
@@ -152,16 +194,24 @@ namespace Belle2 {
       return m_status;
     }
 
+    /** Getter for 2nd hit flag. */
+    bool is2ndHit() const
+    {
+      bool tOrf = (m_status & 0x01) ? true : false;
+      return tOrf;
+    }
+
+    /** Getter for already-checked flag. */
+    bool isAlreadyChecked() const
+    {
+      bool tOrf = (m_status & 0x02) ? true : false;
+      return tOrf;
+    }
+
     /** Getter for TDC count. */
     short getTDCCount() const
     {
       return m_tdcCount;
-    }
-
-    /** Getter for TDC count of 2nd hit. */
-    short getTDCCount2ndHit() const
-    {
-      return m_tdcCount2ndHit;
     }
 
     /** Getter for integrated charge.
@@ -175,6 +225,17 @@ namespace Belle2 {
       return m_adcCount;
     }
 
+    /** Getter for otherHitIndex. */
+    signed short getOtherHitIndex() const
+    {
+      return m_otherHitIndex;
+    }
+
+    /** Getter for adcCountAtLeadingEdge. */
+    unsigned short getADCCountAtLeadingEdge() const
+    {
+      return m_adcCountAtLeadingEdge;
+    }
 
     /**
      * Implementation of the base class function.
@@ -207,16 +268,19 @@ namespace Belle2 {
     /** ADC count of the integrated charge in the cell. */
     unsigned short m_adcCount;
 
-    /** TDC count in ns (2nd hit). */
-    unsigned short  m_tdcCount2ndHit;
-
     /** Status of CDCHit. */
     unsigned short  m_status;
+
+    /** Index to the other hit. */
+    signed short  m_otherHitIndex;
+
+    /** ADC count at leading edge. */
+    unsigned short  m_adcCountAtLeadingEdge;
 
 
   private:
     /** ROOT Macro.*/
-    ClassDef(CDCHit, 6);
+    ClassDef(CDCHit, 7);
   };
 } // end namespace Belle2
 

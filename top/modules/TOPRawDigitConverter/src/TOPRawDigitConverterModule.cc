@@ -73,6 +73,8 @@ namespace Belle2 {
     addParam("pedestalRMS", m_pedestalRMS,
              "r.m.s of pedestals [ADC counts], "
              "if positive, timeError will be estimated from FE data", 9.0);
+    addParam("maxPulseWidth", m_maxPulseWidth,
+             "maximal pulse width [ns] to flag digit as good", 10.0);
     addParam("calibrationChannel", m_calibrationChannel,
              "calpulse selection: ASIC channel (use -1 to turn off the selection)", -1);
     addParam("calpulseWidthMin", m_calpulseWidthMin,
@@ -80,9 +82,9 @@ namespace Belle2 {
     addParam("calpulseWidthMax", m_calpulseWidthMax,
              "calpulse selection: maximal width [ns]", 0.0);
     addParam("calpulseHeightMin", m_calpulseHeightMin,
-             "calpulse selection: minimal height [ns]", 0);
+             "calpulse selection: minimal height [ADC counts]", 0);
     addParam("calpulseHeightMax", m_calpulseHeightMax,
-             "calpulse selection: maximal height [ns]", 0);
+             "calpulse selection: maximal height [ADC counts]", 0);
   }
 
 
@@ -161,6 +163,7 @@ namespace Belle2 {
   {
 
     // get mappers
+
     const auto& feMapper = TOPGeometryPar::Instance()->getFrontEndMapper();
     const auto& chMapper = TOPGeometryPar::Instance()->getChannelMapper();
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
@@ -169,8 +172,21 @@ namespace Belle2 {
     StoreArray<TOPDigit> digits(m_outputDigitsName);
     digits.clear();
 
+    // set storage windows in RawDigits if not already done in unpacker
+
+    for (auto& rawDigit : rawDigits) {
+      const auto* waveform = rawDigit.getRelated<TOPRawWaveform>();
+      if (waveform and rawDigit.getStorageWindows().empty()) {
+        rawDigit.setStorageWindows(waveform->getStorageWindows());
+      }
+    }
+
+    // convert to TOPDigits
+
     for (const auto& rawDigit : rawDigits) {
+
       if (rawDigit.getErrorFlags() != 0) continue;
+
       auto scrodID = rawDigit.getScrodID();
       const auto* feemap = feMapper.getMap(scrodID);
       if (!feemap) {
@@ -220,16 +236,17 @@ namespace Belle2 {
       digit->setChannel(channel);
       digit->setFirstWindow(window);
       digit->addRelationTo(&rawDigit);
+
       if (!rawDigit.isFEValid() or rawDigit.isPedestalJump())
         digit->setHitQuality(TOPDigit::c_Junk);
-      const auto* waveform = rawDigit.getRelated<TOPRawWaveform>();
-      if (waveform) {
-        if (!waveform->areWindowsInOrder(rawDigit.getSampleFall() + 1))
-          digit->setHitQuality(TOPDigit::c_Junk);
-      }
+      if (!rawDigit.areWindowsInOrder())
+        digit->setHitQuality(TOPDigit::c_Junk);
+      if (digit->getPulseWidth() > m_maxPulseWidth)
+        digit->setHitQuality(TOPDigit::c_Junk);
     }
 
-    // select and flag calpulses, if calibration channel given
+    // if calibration channel given, select and flag cal pulses
+
     unsigned calibrationChannel = m_calibrationChannel;
     if (calibrationChannel < 8) {
       for (auto& digit : digits) {

@@ -65,10 +65,13 @@ void compare2Tracks(string name = "output"){
 
   TH1D* htanLambda1 = new TH1D("htanLambda1","tan#lambda;tan#lambda;#tracks",100,-5,5);
   TH1D* htanLambda2 = new TH1D("htanLambda2","tan#lambda;tan#lambda;#tracks",100,-5,5);
-  TH1D* hD01 = new TH1D("hD01","D0",200,-10,10);
-  TH1D* hD02 = new TH1D("hD02","D0",200,-10,10);
-  TH1D* hZ01 = new TH1D("hZ01","Z0",200,-40,100);
-  TH1D* hZ02 = new TH1D("hZ02","Z0",200,-40,100);
+  TH1D* hD01 = new TH1D("hD01","d_{0};d_{0} [cm]",200,-100,100);
+  TH1D* hD02 = new TH1D("hD02","d_{0};d_{0} [cm]",200,-100,100);
+  TH1D* hZ01 = new TH1D("hZ01","z_{0};z_{0} [cm]",200,-200,200);
+  TH1D* hZ02 = new TH1D("hZ02","z_{0};z_{0} [cm]",200,-200,200);
+  //  TH1D* hpt01 = new TH1D("hpt01","pt1",200,0,5);
+  //  TH1D* hpt02 = new TH1D("hpt02","pt2",200,0,5);
+  //  TH1D* hdpt = new TH1D("hdpt","dpt",200,-1,1);
 
   /**Different of track param Histogram*/
   TH1D* hdD0 = new TH1D("hdD0","D01-D02;#Delta d_{0} [cm]",100,-0.2,0.2);
@@ -117,7 +120,8 @@ void compare2Tracks(string name = "output"){
     //    if(abs(tanLambda1)>0.1  || abs(tanLambda2)>0.1  ) continue;
     hNDF1->Fill(ndf1);   hPval1->Fill(Pval1); hPhi01->Fill(Phi01);  hD01->Fill(D01); hZ01->Fill(Z01); htanLambda1->Fill(tanLambda1);
     hNDF2->Fill(ndf2);   hPval2->Fill(Pval2); hPhi02->Fill(Phi02);  hD02->Fill(D02); hZ02->Fill(Z02); htanLambda2->Fill(tanLambda2);
-
+    //    hpt01->Fill();
+    //    hpt02->Fill();
     //    if(abs(D01)>1  || abs(D02)>1  ) continue;
     //    if(abs(abs(Z01)-abs(Z02))>0.5) continue;
     if(ndf1<25||ndf2<25) continue;
@@ -126,8 +130,8 @@ void compare2Tracks(string name = "output"){
     double dZ0 = Z01-Z02;
     double dPhi0=Phi01-Phi02;
     double dtanLambda = tanLambda1-tanLambda2;
-    if(fabs(dPhi0)>0.15) continue;
-    if(fabs(dtanLambda)>0.01) continue;
+    //    if(fabs(dPhi0)>0.15) continue;
+    //    if(fabs(dtanLambda)>0.01) continue;
 
     hdD0->Fill(dD0);
     hdZ0->Fill(dZ0);

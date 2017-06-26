@@ -14,13 +14,10 @@
 /* External headers. */
 #include <TObject.h>
 
-/* Belle2 headers. */
-#include <eklm/dataobjects/ElementNumbersSingleton.h>
-
 namespace Belle2 {
 
   /**
-   * EKLM segment identifier.
+   * EKLM element identifier.
    */
   class EKLMElementID {
 
@@ -157,9 +154,6 @@ namespace Belle2 {
     int getGlobalNumber() const;
 
   private:
-
-    /** Element numbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
 
     /** Element type. */
     ElementType m_Type;

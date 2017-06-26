@@ -1,5 +1,6 @@
-#ifndef ECLELECTRONPDF_H
-#define ECLELECTRONPDF_H
+#pragma once
+
+#include <vector>
 
 #include <ecl/electronId/ECLAbsPdf.h>
 
@@ -8,8 +9,9 @@ namespace Belle2 {
   public:
     double pdf(double eop, double p, double costheta) const;
     void init(const char* parametersFileName);
-    ~ECLElectronPdf();
+
   private:
+
     struct Parameters {
       double mu1;
       double sigma1;
@@ -20,10 +22,9 @@ namespace Belle2 {
       double nn;
     };
 
-    Parameters* m_params;
-    double* m_integral1;
-    double* m_integral2;
+    std::vector<Parameters> m_params;
+    std::vector<double> m_integral1;
+    std::vector<double> m_integral2;
 
   };
 }
-#endif

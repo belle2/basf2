@@ -55,7 +55,6 @@ namespace Belle2 {
        * @param out string to be replaced with all the bytes read from fd
        */
       static void readFD(int fd, std::string& out);
-    private:
       /** Replace the file descriptor of m_fileObject with the one passed
        * @param fileDescriptor file descriptor to be set for m_fileObject using dup2()
        */
@@ -107,20 +106,17 @@ namespace Belle2 {
       ~CaptureStream();
       /** Get the output, only set after finish() */
       const std::string& getOutput() const { return m_outputStr; }
+      /** Start intercepting the output */
+      bool start();
       /** Restore the stream and get the output from the pipe */
-      bool finish()
-      {
-        if (StreamInterceptor::finish()) {
-          readFD(m_pipeReadFD, m_outputStr);
-          return true;
-        }
-        return false;
-      }
+      bool finish();
     private:
       /** file descriptor of the read end of the pipe */
       int m_pipeReadFD{ -1};
       /** string with the output, only filled after finish() */
       std::string m_outputStr;
+      /** allow handling of SIGABRT */
+      friend class CaptureStreamAbortHandler;
     };
 
 
@@ -251,8 +247,10 @@ namespace Belle2 {
       /** Simple constructor which uses c_Info for output on stdout and c_Error for output on stderr
        * @param name name of the code causing the output, for example "ROOT", "Rave", ...
        */
-      OutputToLogMessages(const std::string& name): OutputToLogMessages(name, LogConfig::c_Info, LogConfig::c_Error)
+      explicit OutputToLogMessages(const std::string& name): OutputToLogMessages(name, LogConfig::c_Info, LogConfig::c_Error)
       {}
+      /** Destructor to make sure that output is converted to messages on destruction */
+      ~OutputToLogMessages() { finish(); }
       /** Set the indent for each line of the output, default is the supplied name + `": "` */
       void setIndent(const std::string& indent) { m_indent = indent; }
       /** Finish the capture and emit the message if output has appeard on stdout or stderr */
@@ -271,5 +269,80 @@ namespace Belle2 {
       /** debug level for the log message to be emitted for output on stderr if m_stderrLevel is c_Debug */
       int m_stderrDebugLevel;
     };
+
+    /** Simple RAII guard for output interceptor
+     *
+     * In case you have one of the IOIntercept classes as member and want to
+     * enable it in a function with multiple return paths this class makes sure
+     * that the interceptor is properly finished on exiting the function/scope.
+     *
+     * \code{.cc}
+       struct example {
+         IOIntercept::OutputToLogMessages m_interceptor{"examplestruct"};
+         int sign(int number) {
+           // this starts interception which will last until the
+           // InterceptorGuard is destructed so no matter which return is taken
+           // the intercept will always be properly finished()
+           IOIntercept::InteceptorGuard<IOIntercept::OutputToLogMessages> guard(m_interceptor);
+           if(number<0) {
+             return -1;
+           } else if(number>0) {
+             return 1;
+           }
+           return 0;
+         }
+       };
+       \endcode
+     *
+     * \sa start_intercept for a convenience wrapper for this class
+     */
+    template<class T> class InterceptorScopeGuard {
+    public:
+      /** Construct a new instance for a given interceptor object and start intercepting io
+       * @param interceptor the interceptor object to use, must stay valid
+       *        during the lifetime of this object.
+       */
+      explicit InterceptorScopeGuard(T& interceptor): m_interceptor(&interceptor)
+      {
+        m_interceptor->start();
+      }
+      /** Move constructor which will take over the interception state */
+      InterceptorScopeGuard(InterceptorScopeGuard<T>&& b): m_interceptor(b.m_interceptor)
+      {
+        b.m_interceptor = nullptr;
+      }
+      /** We don't want copying */
+      InterceptorScopeGuard(const InterceptorScopeGuard<T>&) = delete;
+      /** Also no assignment */
+      InterceptorScopeGuard& operator=(const InterceptorScopeGuard&) = delete;
+      /** Finish interception on cleanup */
+      ~InterceptorScopeGuard()
+      {
+        if (m_interceptor) m_interceptor->finish();
+      }
+    private:
+      /** pointer to the interceptor we guard */
+      T* m_interceptor;
+    };
+
+    /** Convenience wrapper to simplify use of InterceptorScopeGuard<T>.
+     * This function will return the correct scope guard without the need to
+     * specify the template parameter.
+     * \code{.cc}
+       IOIntercept::OutputToLogMessages iointercept("myinterceptor");
+       if(needIntercept){
+         auto guard = IOIntercept::start_intercept(iointercept);
+         // while the variable guard is in scope the intercept will be active
+       }
+       // intercept will be disabled here
+       \endcode
+
+     * @param interceptor the interceptor object to use, must stay valid
+     *        during the lifetime of the returned object.
+     */
+    template<class T> InterceptorScopeGuard<T> start_intercept(T& interceptor)
+    {
+      return InterceptorScopeGuard<T> {interceptor};
+    }
   }
 }

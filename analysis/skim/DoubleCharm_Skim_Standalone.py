@@ -37,6 +37,14 @@ from DoubleCharm_List import *
 DCList = DoubleCharmList()
 skimOutputUdst('DC_Standalone', DCList)
 summaryOfLists(DCList)
+
+# make sure memory consumption is limited by restricting the amount of
+# candidates to be reconstructed
+for module in analysis_main.modules():
+    if module.type() == "ParticleCombiner":
+        print("Adjusting maximum of candidates for " + module.name())
+        module.param("maximumNumberOfCandidates", 1000)
+
 process(analysis_main)
 
 # print out the summary

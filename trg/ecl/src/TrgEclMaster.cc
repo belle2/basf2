@@ -808,10 +808,10 @@ TrgEclMaster::setRS(std::vector<int> TCId, std::vector<double> TCHit, std::vecto
   for (int iHit = 0; iHit < size_hit; iHit++) {
     int iTCId = TCId[iHit] - 1;
     if (TCHit[iHit] > 0) {
-      int iTCThetaId = obj_map ->getTCThetaIdFromTCId(iTCId + 1) ;
-      int iTCPhiId = obj_map ->getTCPhiIdFromTCId(iTCId + 1) ;
+      int iTCThetaId = obj_map ->getTCThetaIdFromTCId(iTCId + 1) - 1 ;
+      int iTCPhiId = obj_map ->getTCPhiIdFromTCId(iTCId + 1) - 1 ;
       phiringsum[iTCThetaId] += TCHit[iHit];
-      if (iTCThetaId < 3) { //fwd
+      if (iTCThetaId - 1 < 3) { //fwd
         thetaringsum[0][iTCPhiId] += TCHit[iHit];
       } else if (iTCThetaId > 14) { //bwd
         thetaringsum[2][iTCPhiId] += TCHit[iHit];

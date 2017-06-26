@@ -30,6 +30,7 @@ using std::vector;
 namespace TreeFitter {
 
   extern int vtxverbose ;
+  extern std::vector<int> massConstraintList ;
 
   inline bool sortByType(const ParticleBase* lhs, const ParticleBase* rhs)
   {
@@ -58,11 +59,11 @@ namespace TreeFitter {
     return rc ;
   }
 
-  InternalParticle::InternalParticle(Particle* particle, const ParticleBase* mother,
+  InternalParticle::InternalParticle(Belle2::Particle* particle, const ParticleBase* mother,
                                      bool forceFitAll)
     : ParticleBase(particle, mother), m_massconstraint(false), m_lifetimeconstraint(false)
   {
-    BOOST_FOREACH(Particle * daughter, particle->getDaughters())
+    BOOST_FOREACH(Belle2::Particle * daughter, particle->getDaughters())
     addDaughter(daughter, forceFitAll) ;
 
     //FT: old version
@@ -86,11 +87,18 @@ namespace TreeFitter {
     //    m_isconversion = m_massconstraint && m_daughters.size()==2 && particle && (particle->getPDGCode() == PDGCode::gamma);
     // this will do for now
 
-    //FT: Need a method to flag these individually for each particle. Currently unavailable.
+    //FT: Need a method to flag these individually for each particle. Currently I use the PDG code, but I want to switch to DecayDescriptors
     m_massconstraint     = false;
+    int pdgcode = particle->getPDGCode();
+    if (std::find(massConstraintList.begin(), massConstraintList.end(), pdgcode) != massConstraintList.end()) {
+      m_massconstraint = true;
+      B2DEBUG(80, "We constrain the mass of the " << particle->getName() << " (PDGCode = " << pdgcode << ")");
+    }
+    //
+
+    //FT: These aren't available yet
     m_lifetimeconstraint = false;
     m_isconversion = false;
-
   }
 
   InternalParticle::~InternalParticle()
@@ -241,9 +249,9 @@ namespace TreeFitter {
           RecoTrack* dau1 = trkdaughters[0] ;
           RecoTrack* dau2 = trkdaughters[1] ;
           //FT: this once again has to use pions
-          std::vector<float> tmphelix1 = dau1->particle()->getTrack()->getTrackFitResult(Const::pion)->getTau();
-          std::vector<float> tmphelix2 = dau2->particle()->getTrack()->getTrackFitResult(Const::pion)->getTau();
-          HepVector helix1(5), helix2(5);
+          std::vector<float> tmphelix1 = dau1->particle()->getTrack()->getTrackFitResult(Belle2::Const::pion)->getTau();
+          std::vector<float> tmphelix2 = dau2->particle()->getTrack()->getTrackFitResult(Belle2::Const::pion)->getTau();
+          CLHEP::HepVector helix1(5), helix2(5);
           for (int i = 1; i <= 5; ++i) {
             helix1(i) = tmphelix1[i - 1];
             helix2(i) = tmphelix2[i - 1];
@@ -254,9 +262,10 @@ namespace TreeFitter {
           //    HepPoint v ;
           TVector3 v ;
           HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion) ;
-          fitparams->par()(posindex + 1) = v.x() ;
-          fitparams->par()(posindex + 2) = v.y() ;
-          fitparams->par()(posindex + 3) = v.z() ;
+          fitparams->par()(posindex + 1) = -v.x() ;//FT changed sign; this is not justified by the algebra, but gets the correct
+          fitparams->par()(posindex + 2) = -v.y() ;//initialisation... helixPoca function must be checked
+          fitparams->par()(posindex + 3) = -v.z() ;//
+
           dau1->setFlightLength(flt1) ;
           dau2->setFlightLength(flt2) ;
 

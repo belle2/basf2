@@ -110,6 +110,8 @@ namespace Belle2 {
              "The time window of the signal eclclusters",
              100.0);
     addParam("ClusEngThreshold", m_energythreshold, "The energy threshold of clusters", {0.1, 0.3, 1.0, 2.0});
+    addParam("Belle2Phase", m_belle2phase,
+             "This parameter choose the L1 trigger menu corresponding to the Belle2 Phase, options: Phase2, Phase3", string("Phase2"));
 
     if (TRGDebug::level())
       cout << "TRGGRLProjectsModule ... created" << endl;
@@ -157,6 +159,13 @@ namespace Belle2 {
     //...GDL config. name...
     string cfn = m_configFilename;
 
+    if (m_belle2phase == "Phase3") {
+      B2INFO("L1 Trigger Menu at Phase 3 is applied");
+    } else if (m_belle2phase == "Phase2") {
+      B2INFO("L1 Trigger Menu at Phase 2 is applied");
+    } else {
+      B2ERROR("The setting phase is not Phase2 or Phase3, L1 Trigger Menu at Phase 3 is applied forcedly");
+    }
 
     if (TRGDebug::level()) {
       cout << "TRGGDLModule ... beginRun called " << endl;
@@ -202,6 +211,8 @@ namespace Belle2 {
 
     TRGDebug::leaveStage("TRGGRLProjectsModule event");
 
+
+
     //get the clusters list in Time Window to reduce beam induced background
     std::vector<TRGECLCluster*> clustersinwindow;
     ///get event time for ECL firstly
@@ -222,6 +233,22 @@ namespace Belle2 {
     }
     //get the number of clusers with specific threshold in the time window
     int nclus[5] = {0, 0, 0, 0, 0};
+    //region requirement for single photon trigger
+    //phase3, exclude the TC close to beam pipe.
+    double SinglePhotonRegion_phase3[2] = {30.0, 140.0};
+    //phase2, trigger eclclusters in all region
+    double SinglePhotonRegion_phase2[2] = {0.0, 180.0};
+    double SinglePhotonRegion[2];
+    for (int i = 0; i < 2; i++) {
+      if (m_belle2phase == "Phase3") {
+        SinglePhotonRegion[i] = SinglePhotonRegion_phase3[i];
+      } else if (m_belle2phase == "Phase2") {
+        SinglePhotonRegion[i] = SinglePhotonRegion_phase2[i];
+      } else {
+        SinglePhotonRegion[i] = SinglePhotonRegion_phase3[i];
+      }
+    }
+
     if (!clustersinwindow.empty()) {
       for (unsigned int i = 0; i < clustersinwindow.size(); i++) {
         double energy_clu = clustersinwindow[i]->getEnergyDep();
@@ -233,7 +260,7 @@ namespace Belle2 {
         double  z1 = clustersinwindow[i]->getPositionZ();
         TVector3 vec1(x1, y1, z1);
         double  theta1 = vec1.Theta() * m_RtD;
-        if (energy_clu > m_energythreshold[2] && theta1 > 30. && theta1 < 140.)nclus[2]++;
+        if (energy_clu > m_energythreshold[2] && theta1 > SinglePhotonRegion[0] && theta1 < SinglePhotonRegion[1])nclus[2]++;
         if (energy_clu > m_energythreshold[3]) nclus[3]++;
         if (energy_clu > m_energythreshold[3] && (theta1 < 20. || theta1 > 140.)) nclus[4]++;
 
@@ -245,6 +272,29 @@ namespace Belle2 {
     trgInfo->setNhighcluster4(nclus[4]);
     trgInfo->setNneucluster(nclus[0]);
     trgInfo->setNcluster(clustersinwindow.size());
+
+    //set the cut thresholds of bhabha veto for phase2 and phase3
+    //Bhabha [delta_phi, delta_theta_down, delta_theta_up, e1, e2, e1+e2]
+    //Phase3
+    double Bhabha_phase3[6] = {20.0, 10.0, 50.0, 3.0, 2.0, 6.0};
+    double eclBhabha_phase3[6] = {50.0, 0.0, 50.0, 3.0, 2.0, 6.0};
+    //Phase2, more strict criteria is used.
+    double Bhabha_phase2[6] = {20.0, 10.0, 50.0, 4.0, 3.0, 8.0};
+    double eclBhabha_phase2[6] = {30.0, 0.0, 40.0, 4.0, 3.0, 8.0};
+
+    double Bhabha_cut[6], eclBhabha_cut[6];
+    for (int i = 0; i < 6; i++) {
+      if (m_belle2phase == "Phase2") {
+        Bhabha_cut[i] = Bhabha_phase2[i];
+        eclBhabha_cut[i] = eclBhabha_phase2[i];
+      } else if (m_belle2phase == "Phase3") {
+        Bhabha_cut[i] = Bhabha_phase3[i];
+        eclBhabha_cut[i] = eclBhabha_phase3[i];
+      } else {
+        Bhabha_cut[i] = Bhabha_phase3[i];
+        eclBhabha_cut[i] = eclBhabha_phase3[i];
+      }
+    }
 
     //Bhabha----------------begin
     int bhabha_bit = 0;
@@ -270,8 +320,8 @@ namespace Belle2 {
           double theta2 = acos(tanLam2 / sqrt(1. + tanLam2 * tanLam2)) * m_RtD;
           double deltphi = fabs(fabs(phi1 - phi2) - 180.);
           double delttheta = fabs(theta1 + theta2 - 180.);
-          bool ang = (deltphi < 20. && delttheta > 10. && delttheta < 50.);
-          bool eng = ((e1 > 3.0 && e2 > 2.0) || (e1 > 2.0 && e2 > 3.0)) && (e1 + e2 > 6.0);
+          bool ang = (deltphi < Bhabha_cut[0] && delttheta > Bhabha_cut[1] && delttheta < Bhabha_cut[2]);
+          bool eng = ((e1 > Bhabha_cut[3] && e2 > Bhabha_cut[4]) || (e1 > Bhabha_cut[4] && e2 > Bhabha_cut[3])) && (e1 + e2 > Bhabha_cut[5]);
           if (ang && eng)bhabha_bit = 1;
         }
       }
@@ -283,6 +333,7 @@ namespace Belle2 {
 //count the back-to-back cluster pair here as well
     int eclbhabha_bit = 0;
     int nbb_cluster = 0;
+
     if (clustersinwindow.size() >= 2) {
       for (unsigned i = 0; i < clustersinwindow.size() - 1; i++) {
         TRGECLCluster* cluster1 = clustersinwindow[i];
@@ -309,8 +360,9 @@ namespace Belle2 {
           double etot = e1 + e2;
           double deltphi = fabs(fabs(phi1 - phi2) - 180);
           double delttheta = fabs(theta1 + theta2 - 180);
-          bool ang = (delttheta < 50. && deltphi < 50.);
-          bool eng = (etot > 6.0 && (e1 > 3.0 || e2 > 3.0) && (e1 > 2.0 && e2 > 2.0));
+          bool ang = (delttheta < eclBhabha_cut[2] && deltphi < eclBhabha_cut[0]);
+          bool eng = (etot > eclBhabha_cut[5] && (e1 > eclBhabha_cut[3] || e2 > eclBhabha_cut[3]) && (e1 > eclBhabha_cut[4]
+                      && e2 > eclBhabha_cut[4]));
           if (ang && eng) eclbhabha_bit = 1;
 
           if (deltphi < 100. && delttheta < 100.) nbb_cluster++;

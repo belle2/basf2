@@ -64,9 +64,9 @@ namespace Belle2 {
     CKFPartialTrack* bestTrack(std::vector<CKFPartialTrack*>*);
 
     /// after adding an additional hit but before updating, check that the track passes some selections (e.g. check for holes)
-    bool passPreUpdateTrim(CKFPartialTrack*, unsigned step);
+    bool passPreUpdateTrim(CKFPartialTrack*, unsigned currentStep);
     /// after adding an additional hit and updating, check that the track passes some selections (e.g. check the updates chi2 increment)
-    bool passPostUpdateTrim(genfit::Track*, unsigned step);
+    bool passPostUpdateTrim(genfit::Track*, unsigned currentStep);
 
     /// keep only the top Nmax tracks
     void orderTracksAndTrim(std::vector<CKFPartialTrack*>*&);

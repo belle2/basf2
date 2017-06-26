@@ -257,15 +257,15 @@ void RawSecMapMergerModule::printData(
     auto thisEntry = chain->LoadTree(i);
 
     string out;
-    for (unsigned i = 0 ; i < sectorBranches.size(); i++) {
-      sectorBranches[i].branch->GetEntry(thisEntry);
-      out += sectorBranches[i].name + ": " + FullSecID(sectorBranches[i].value).getFullSecString() + ". ";
+    for (unsigned k = 0 ; k < sectorBranches.size(); k++) {
+      sectorBranches[k].branch->GetEntry(thisEntry);
+      out += sectorBranches[k].name + ": " + FullSecID(sectorBranches[k].value).getFullSecString() + ". ";
     }
     out += "\n";
 
-    for (unsigned i = 0 ; i < filterBranches.size(); i++) {
-      filterBranches[i].branch->GetEntry(thisEntry);
-      out += filterBranches[i].name + ": " + to_string(filterBranches[i].value) + ". ";
+    for (unsigned k = 0 ; k < filterBranches.size(); k++) {
+      filterBranches[k].branch->GetEntry(thisEntry);
+      out += filterBranches[k].name + ": " + to_string(filterBranches[k].value) + ". ";
     }
     B2INFO(out << "\n");
   }

@@ -73,7 +73,7 @@ if __name__ == "__main__":
     xgboost_options.m_config = param
 
     stats = []
-    test_data = ["test.root"] * 10
+    test_data = ["validation.root"]
     for label, options in [("DataLoading", data_options), ("FastBDT", fastbdt_options), ("FANN", fann_options),
                            ("TMVA-BDT", tmva_bdt_options), ("TMVA-NN", tmva_nn_options),
                            ("SKLearn-BDT", sklearn_bdt_options), ("XGBoost", xgboost_options), ("Trivial", trivial_options)]:

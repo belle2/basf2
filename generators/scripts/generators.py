@@ -274,13 +274,13 @@ def add_cosmics_generator(path, components=None,
     if keep_box is None:
         keep_box = [8, 8, 8]
 
-    if pre_general_run_setup and geometry_xml_file == 'geometry/CDCcosmicTests.xml':
+    if pre_general_run_setup:
+        cosmics_setup.set_cdc_cr_parameters(pre_general_run_setup)
+
+    if cosmics_setup.cosmics_period and geometry_xml_file == 'geometry/CDCcosmicTests.xml':
         B2ERROR("You have set the 'pre_general_run_setup' variable, but are still using the geometry setup "
                 "for the general cosmics run, and not the one for the cosmics test. "
                 "This is probably not what you want.", )
-
-    if pre_general_run_setup:
-        cosmics_setup.set_cdc_cr_parameters(pre_general_run_setup)
 
     if 'Gearbox' not in path:
         override = [("/Global/length", str(global_box_size[0]), "m"),
@@ -321,7 +321,7 @@ def add_cosmics_generator(path, components=None,
     # minimal kinetic energy - all particles below that energy are ignored
     cry.param('kineticEnergyThreshold', 0.01)
 
-    if pre_general_run_setup:
+    if cosmics_setup.cosmics_period:
         # Selector module.
         cosmics_selector = register_module('CDCCosmicSelector',
                                            lOfCounter=cosmics_setup.lengthOfCounter,

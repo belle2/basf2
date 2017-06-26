@@ -66,6 +66,7 @@ triggerPos = []
 normTriggerPlaneDirection = []
 readOutPos = []
 globalPhi = 0.0
+cosmics_period = None
 
 
 def set_cdc_cr_parameters(period):
@@ -76,6 +77,7 @@ def set_cdc_cr_parameters(period):
     global normTriggerPlaneDirection
     global readOutPos
     global globalPhi
+    global cosmics_period
 
     lengthOfCounter = triggerSize[period][0]
     widthOfCounter = triggerSize[period][1]
@@ -83,6 +85,7 @@ def set_cdc_cr_parameters(period):
     normTriggerPlaneDirection = triggerPlaneDirection[period]
     readOutPos = pmtPosition[period]
     globalPhi = globalPhiRotation[period]
+    cosmics_period = period
 
 
 def add_cdc_cr_reconstruction(path, eventTimingExtraction=False, topInCounter=True):

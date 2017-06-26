@@ -63,20 +63,46 @@ Database& Database::Instance()
 {
   if (!s_instance) {
     DatabaseChain::createInstance(true);
-    const std::string fallbackFilename = getFromEnvironment("BELLE2_CONDB_FALLBACK", "data/framework/database.txt");
+    const std::string fallback = getFromEnvironment("BELLE2_CONDB_FALLBACK",
+                                                    "/cvmfs/belle.cern.ch/conditions data/framework/database.txt");
     const std::string globalTag = getFromEnvironment("BELLE2_CONDB_GLOBALTAG", "production");
-    // OK, add a fallback database unless empty location is specified
-    if (!fallbackFilename.empty()) {
-      LocalDatabase::createInstance(FileSystem::findFile(fallbackFilename), "", true, LogConfig::c_Error);
+    typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
+    std::vector<string> tags;
+    boost::split(tags, globalTag, boost::is_any_of(" \t\n\r"));
+    // OK, add fallback databases unless empty location is specified
+    if (!fallback.empty()) {
+      for (auto localdb : tokenizer(fallback, boost::char_separator<char> {" \t\n\r"})) {
+        if (FileSystem::isFile(FileSystem::findFile(localdb, true))) {
+          // If a file name is given use it as local DB
+          B2DEBUG(10, "Adding fallback database " << FileSystem::findFile(localdb));
+          LocalDatabase::createInstance(FileSystem::findFile(localdb), "", true, LogConfig::c_Error);
+        } else if (FileSystem::isDir(localdb)) {
+          // If a directory is given append the database file name
+          if (globalTag.empty()) {
+            // Default name if no tags given
+            std::string fileName = FileSystem::findFile(localdb) + "/database.txt";
+            B2DEBUG(10, "Adding fallback database " << fileName);
+            LocalDatabase::createInstance(fileName, "", true, LogConfig::c_Error);
+          } else {
+            // One local DB for each global tag
+            for (auto tag : tags) {
+              std::string fileName = localdb + "/" + tag + ".txt";
+              if (FileSystem::isFile(fileName)) {
+                B2DEBUG(10, "Adding fallback database " << fileName);
+                LocalDatabase::createInstance(fileName, "", true, LogConfig::c_Error);
+              }
+            }
+          }
+        }
+      }
     }
     // and add access to the central database unless we have an empty global tag
     // in which case we disable access to the database
     if (!globalTag.empty()) {
-      typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
       // add all global tags which are separated by whitespace as conditions database
-      for (auto token : tokenizer(globalTag, boost::char_separator<char> {" \t\n\r"})) {
-        B2DEBUG(100, "Adding central database for global tag " << token);
-        ConditionsDatabase::createDefaultInstance(token, LogConfig::c_Warning);
+      for (auto tag : tags) {
+        B2DEBUG(10, "Adding central database for global tag " << tag);
+        ConditionsDatabase::createDefaultInstance(tag, LogConfig::c_Warning);
       }
     }
     LocalDatabase::createInstance("localdb/database.txt", "", false, LogConfig::c_Warning, true);

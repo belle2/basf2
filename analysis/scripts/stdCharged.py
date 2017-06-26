@@ -26,13 +26,13 @@ def stdPi(listtype='95eff', path=analysis_main):
     if listtype == 'all':
         fillParticleList('pi+:all', '', True, path)
     elif listtype == '99eff':
-        fillParticleList('pi+:99eff', 'piid > 0.009 and chiProb > 0.001', True, path)
+        fillParticleList('pi+:99eff', 'piid > 0.037 and chiProb > 0.001', True, path)
     elif listtype == '95eff':
-        fillParticleList('pi+:95eff', 'piid > 0.046 and chiProb > 0.001', True, path)
+        fillParticleList('pi+:95eff', 'piid > 0.429 and chiProb > 0.001', True, path)
     elif listtype == '90eff':
-        fillParticleList('pi+:90eff', 'piid > 0.426 and chiProb > 0.001', True, path)
+        fillParticleList('pi+:90eff', 'piid > 0.722 and chiProb > 0.001', True, path)
     elif listtype == '85eff':
-        fillParticleList('pi+:85eff', 'piid > 0.658 and chiProb > 0.001', True, path)
+        fillParticleList('pi+:85eff', 'piid > 0.918 and chiProb > 0.001', True, path)
     else:
         fillParticleList('pi+:all', '', True, path)
 
@@ -56,13 +56,13 @@ def stdK(listtype='95eff', path=analysis_main):
     if listtype == 'all':
         fillParticleList('K+:all', '', True, path)
     elif listtype == '99eff':
-        fillParticleList('K+:99eff', 'Kid > 0.010 and chiProb > 0.001', True, path)
+        fillParticleList('K+:99eff', 'Kid > 0.022 and chiProb > 0.001', True, path)
     elif listtype == '95eff':
-        fillParticleList('K+:95eff', 'Kid > 0.048 and chiProb > 0.001', True, path)
+        fillParticleList('K+:95eff', 'Kid > 0.315 and chiProb > 0.001', True, path)
     elif listtype == '90eff':
-        fillParticleList('K+:90eff', 'Kid > 0.332 and chiProb > 0.001', True, path)
+        fillParticleList('K+:90eff', 'Kid > 0.655 and chiProb > 0.001', True, path)
     elif listtype == '85eff':
-        fillParticleList('K+:85eff', 'Kid > 0.674 and chiProb > 0.001', True, path)
+        fillParticleList('K+:85eff', 'Kid > 0.865 and chiProb > 0.001', True, path)
     else:
         fillParticleList('K+:all', '', True, path)
 

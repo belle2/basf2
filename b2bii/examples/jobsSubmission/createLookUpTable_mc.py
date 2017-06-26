@@ -18,6 +18,10 @@ if len(sys.argv) == 1:
 thresholdEventsNo, expNoList, eventTypeList, dataTypeList, belleLevelList =\
     readConfigFile_mc()
 
+# create output directory for tables if it doesn't exist
+if not os.path.exists('tables'):
+        os.makedirs('tables')
+
 # open table and write in it
 # table name contains threshold for events number of each job
 tableName = 'tables/lookUpTable_mc_' + str(int(thresholdEventsNo / 1000)) + 'k.txt'
@@ -27,7 +31,7 @@ f = open(tableName, 'w')
 # grouping the smallest set of runs that has more than Nthreshold events
 for expNo in expNoList:
 
-    absMaxRunNo = getMaxRunNo(expNo)
+    absMaxRunNo = getMaxRunNo_mc(expNo)
     if absMaxRunNo is None:
         sys.exit('ExpNo ' + str(expNo) + ' not found. Does it exist ?')
 

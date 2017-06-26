@@ -4,7 +4,7 @@
 * Copyright(C) 2013 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Christian Pulvermacher                                   *
+* Contributors: Thomas Keck                                              *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -22,14 +22,13 @@
 namespace Belle2 {
 
   /** Module to calculate variables specified by the user for a given ParticleList
-   *  and save them into an Ntuple.
-   *  The Ntuple is candidate-based, meaning the variables of each candidate are saved in a separate
-   *  row of the Ntuple
+   *  and save them into a TTree. The Tree is event-based, meaning that the variables of each candidate for each event
+   *  are saved in an array in a branch of the Tree.
    */
-  class VariablesToNtupleModule : public Module {
+  class VariablesToEventBasedTreeModule : public Module {
   public:
     /** Constructor. */
-    VariablesToNtupleModule();
+    VariablesToEventBasedTreeModule();
 
     /** Initialises the module.
      *
@@ -45,12 +44,16 @@ namespace Belle2 {
     /**
      * Calculate inverse sampling rate weight. Event is skipped if returned weight is 0.
      */
-    float getInverseSamplingRateWeight(const Particle* particle);
+    float getInverseSamplingRateWeight();
 
     /** Name of particle list with reconstructed particles. */
     std::string m_particleList;
     /** List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
     std::vector<std::string> m_variables;
+    /** List of event variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
+    std::vector<std::string> m_event_variables;
+    /** maximum number of candidates which is written out */
+    unsigned int m_maxCandidates;
     /** Name of ROOT file for output. */
     std::string m_fileName;
     /** Name of the TTree. */
@@ -59,9 +62,19 @@ namespace Belle2 {
     /** ROOT file for output. */
     TFile* m_file;
     /** The ROOT TNtuple for output. */
-    StoreObjPtr<RootMergeable<TNtuple>> m_tree;
+    StoreObjPtr<RootMergeable<TTree>> m_tree;
     /** List of function pointers corresponding to given variables. */
     std::vector<Variable::Manager::FunctionPtr> m_functions;
+    /** List of function pointers corresponding to given event variables. */
+    std::vector<Variable::Manager::FunctionPtr> m_event_functions;
+    /** number of candidates in this event */
+    unsigned int m_ncandidates;
+    /** weight of this event */
+    float m_weight;
+    /** Values corresponding to given variables. */
+    std::vector<std::vector<float>> m_values;
+    /** Values corresponding to given event variables. */
+    std::vector<float> m_event_values;
 
     /** Tuple of variable name and a map of integer values and inverse sampling rate. E.g. (signal, {1: 0, 0:10}) selects all signal candidates and every 10th background candidate. */
     std::tuple<std::string, std::map<int, unsigned int>> m_sampling;

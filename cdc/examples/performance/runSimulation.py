@@ -14,10 +14,12 @@ st: Stream ID
 from basf2 import *
 from ROOT import Belle2
 import datetime
+from generators import add_cosmics_generator
+
 from tracking import add_cdc_cr_track_finding
 import os.path
 import sys
-from cdc.cr import *
+from cdc.cr import getDataPeriod
 
 
 # Set the global log level
@@ -31,12 +33,12 @@ use_central_database("cdc_cr_test1", LogLevel.WARNING)
 
 
 def sim(exp, run, evt, st, topInCounter=True, magneticField=False):
-    '''
+    """
     exp : Experimental number
     run : Run number
     evt : Number of events to be generated
     st : stream ID
-    '''
+    """
 
     main_path = create_path()
 
@@ -48,27 +50,13 @@ def sim(exp, run, evt, st, topInCounter=True, magneticField=False):
     main_path.add_module('Progress')
 
     period = getDataPeriod(int(run))
-    set_cdc_cr_parameters(period)
 
-    phi = getPhiRotation()
-
-    gearbox = register_module('Gearbox',
-                              override=[
-                                  ("/Global/length", "8.", "m"),
-                                  ("/Global/width", "8.", "m"),
-                                  ("/Global/height", "1.5", "m"),
-                                  ("/DetectorComponent[@name='CDC']//GlobalPhiRotation", str(phi), "deg"),
-                              ])
-    main_path.add_module(gearbox)
-
-    if magneticField is False:
-        main_path.add_module('Geometry',
-                             components=['CDC'])
+    if not magneticField:
+        components = ['CDC']
     else:
-        main_path.add_module('Geometry',
-                             components=['CDC', 'MagneticFieldConstant4LimitedRCDC'])
+        components = ['CDC', 'MagneticFieldConstant4LimitedRCDC']
 
-    add_cdc_cr_simulation(main_path, topInCounter=topInCounter)
+    add_cosmics_generator(main_path, components=components, pre_general_run_setup=period, top_in_counter=topInCounter)
 
     output = register_module('RootOutput',
                              outputFileName='gcr.cdc.{0:04d}.{1:06d}.{2:04d}.root'.format(int(exp), int(run), int(st)))

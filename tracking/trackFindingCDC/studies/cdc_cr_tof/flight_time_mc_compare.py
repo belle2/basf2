@@ -1,6 +1,8 @@
 import basf2
 from ROOT import Belle2
 from ROOT import gSystem
+from generators import add_cosmics_generator
+
 gSystem.Load('libcdc')
 gSystem.Load('libtracking')
 gSystem.Load('libtracking_trackFindingCDC')
@@ -77,28 +79,7 @@ def main():
     # generator_module = "particle_gun"
 
     if generator_module == "cry":
-        # Register the CRY generator
-        path.add_module('CRYInput',
-                        # cosmic data input
-                        CosmicDataDir=Belle2.FileSystem.findFile('data/generators/modules/cryinput/'),
-                        # CosmicDataDir='.'
-                        # user input file
-                        SetupFile='cry.setup',
-
-                        # acceptance half-lengths - at least one particle has to enter that box to use that event
-                        acceptLength=0.5,
-                        acceptWidth=0.5,
-                        acceptHeight=0.5,
-                        maxTrials=10000,
-
-                        # keep half-lengths - all particles that do not enter the box are removed (keep box >= accept box)
-                        keepLength=0.5,
-                        keepWidth=0.5,
-                        keepHeight=0.5,
-
-                        # minimal kinetic energy - all particles below that energy are ignored
-                        kineticEnergyThreshold=0.01,
-                        )
+        add_cosmics_generator(path, accept_box=[0.5, 0.5, 0.5], keep_box=[0.5, 0.5, 0.5])
 
     elif generator_module == "cosmics":
         path.add_module("Cosmics",

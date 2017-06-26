@@ -68,7 +68,7 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [WARNING] Given sequence contains entry numbers which are out of range. I won't add any further events to the EventList for the current file.  { module: RootInput }
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
@@ -112,7 +112,7 @@
 [INFO] ================================================================================
 
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -124,7 +124,7 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -135,7 +135,7 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -145,7 +145,7 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -154,9 +154,9 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [ERROR] Couldn't find entry (5, 1, 0) in file! Loading entry 0 instead.  { module: RootInput }
-[FATAL] 1 ERROR(S) occurred! The processing of events will not be started.  { module: -global- }
+[FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
 [INFO] ================================================================================
 [INFO] Error summary: 1 errors and 0 warnings occurred.
 [ERROR] Couldn't find entry (5, 1, 0) in file! Loading entry 0 instead.
@@ -164,7 +164,7 @@
 [INFO] ================================================================================
 
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [WARNING] Given sequence contains entry numbers which are out of range. I won't add any further events to the EventList for the current file.  { module: RootInput }
 [INFO] ================================================================================
 [INFO] Error summary: 0 errors and 1 warnings occurred.

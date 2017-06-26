@@ -4,8 +4,8 @@
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0 HTTP/1.1" 200 -
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=1 HTTP/1.1" 200 -
-[WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=2 HTTP/1.1" 404 -
+ ... message repeated 1 times
 [WARNING] Could not get 'http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=2': The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
@@ -43,15 +43,8 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
    CovLER=diag(5.64063e-06, 0, 0)
    CovVTX=[(4.10916e-07, 0, -2.64802e-06), (0, 1.7405e-11, 0), (-2.64802e-06, 0, 0.000237962)]
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=1 HTTP/1.1" 200 -
-[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
-   HER=(0.290583, 0, 6.99797, 7.004), 
-   LER=(0.166035, 0, -3.99855, 4.002), 
-   CMS=(0.456618, 0, 2.99942, 11.006), 
-   VTX=(0, 0, 0), 
-   CovHER=diag(2.63169e-05, 0, 0)
-   CovLER=diag(5.64063e-06, 0, 0)
-   CovVTX=[(4.10916e-07, 0, -2.64802e-06), (0, 1.7405e-11, 0), (-2.64802e-06, 0, 0.000237962)]
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=2 HTTP/1.1" 404 -
+ ... message repeated 1 times
 [WARNING] Could not get 'http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=2': The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
@@ -87,15 +80,8 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_3.root HTTP/1.1" 200 -
    CovLER=diag(5.64063e-06, 0, 0)
    CovVTX=[(4.10916e-07, 0, -2.64802e-06), (0, 1.7405e-11, 0), (-2.64802e-06, 0, 0.000237962)]
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=1 HTTP/1.1" 200 -
-[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
-   HER=(0.290583, 0, 6.99797, 7.004), 
-   LER=(0.166035, 0, -3.99855, 4.002), 
-   CMS=(0.456618, 0, 2.99942, 11.006), 
-   VTX=(0, 0, 0), 
-   CovHER=diag(2.63169e-05, 0, 0)
-   CovLER=diag(5.64063e-06, 0, 0)
-   CovVTX=[(4.10916e-07, 0, -2.64802e-06), (0, 1.7405e-11, 0), (-2.64802e-06, 0, 0.000237962)]
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=2 HTTP/1.1" 404 -
+ ... message repeated 1 times
 [WARNING] Could not get 'http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=2': The requested URL returned error: 404 Not Found
 [WARNING] Could not get list of payloads from database
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.

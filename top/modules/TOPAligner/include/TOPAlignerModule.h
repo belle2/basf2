@@ -14,6 +14,9 @@
 #include <top/reconstruction/TOPalign.h>
 #include <string>
 
+#include "TFile.h"
+#include "TTree.h"
+
 namespace Belle2 {
 
   /**
@@ -66,8 +69,21 @@ namespace Belle2 {
 
     double m_minBkgPerBar = 0;    /**< minimal assumed background photons per module */
     double m_scaleN0 = 0;         /**< scale factor for figure-of-merit N0 */
+    int m_targetMid = 1;          /**< target module to align. Must be 1 <= Mid <= 16 */
+    int m_maxFails = 100;         /**< maximum allowed number of failed iterations */
+    int m_countFails = 0;         /**< counter for failed iterations */
 
     std::vector<TOP::TOPalign> m_align; /**< alignment objects (one per module) */
+
+    // output file
+
+    std::string m_outFileName = "TopAlignPars.root";     /**< Root output file name containing alignment results */
+    TFile* m_file = 0;                 /**< TFile */
+    TTree* m_alignTree = 0;            /**< TTree containing alignment parameters */
+
+    int m_ntrk = 0;                    /**< track number of the iterative procedure */
+    int m_errorCode = 0;               /**< error code of the alignment procedure */
+    std::vector<float> m_vAlignPars;   /**< alignment parameters, to be saved at each iteration */
 
   };
 

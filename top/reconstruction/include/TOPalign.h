@@ -88,10 +88,9 @@ namespace Belle2 {
        * Run a single iteration
        * @param track track parameters
        * @param hypothesis particle hypothesis
-       * @param hitTime ExtHit time
        * @return error status (0 = OK, < 0 no track hit, > 0 matrix not pos. definite)
        */
-      int iterate(const TOPtrack& track, const Const::ChargedStable& hypothesis, const float hitTime);
+      int iterate(const TOPtrack& track, const Const::ChargedStable& hypothesis);
 
       /**
        * Returns module ID

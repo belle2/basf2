@@ -11,8 +11,6 @@
 #include <top/reconstruction/TOPalign.h>
 #include <framework/logging/Logger.h>
 
-#include <iostream>
-
 extern "C" {
   void data_clear_();
   void data_put_(int*, int*, int*, float*, int*);
@@ -67,7 +65,7 @@ namespace Belle2 {
     }
 
 
-    int TOPalign::iterate(const TOPtrack& track, const Const::ChargedStable& hypothesis, const float hitTime)
+    int TOPalign::iterate(const TOPtrack& track, const Const::ChargedStable& hypothesis)
     {
       if (track.getModuleID() != m_moduleID) return -3;
 
@@ -75,8 +73,7 @@ namespace Belle2 {
       float x = track.getX();
       float y = track.getY();
       float z = track.getZ();
-      //float t = track.getTrackLength() / Const::speedOfLight;
-      float t = hitTime;
+      float t = track.getTrackLength() / Const::speedOfLight;
       float px = track.getPx();
       float py = track.getPy();
       float pz = track.getPz();

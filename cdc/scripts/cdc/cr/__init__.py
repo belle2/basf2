@@ -85,57 +85,6 @@ def set_cdc_cr_parameters(period):
     globalPhi = globalPhiRotation[period]
 
 
-def add_cdc_cr_simulation(path, topInCounter=True):
-    """
-    Add CDC CR simulation.
-
-    """
-    # Create empty path
-    emptyPath = create_path()
-
-    # Register the CRY module
-    cry = register_module('CRYInput')
-    # cosmic data input
-    cry.param('CosmicDataDir', Belle2.FileSystem.findFile('data/generators/modules/cryinput/'))
-    # user input file
-    cry.param('SetupFile', 'cry.setup')
-    # acceptance half-lengths - at least one particle has to enter that box to use that event
-    cry.param('acceptLength', 0.6)
-    cry.param('acceptWidth', 0.2)
-    cry.param('acceptHeight', 0.2)
-    cry.param('maxTrials', 10000)
-    # keep half-lengths - all particles that do not enter the box are removed
-    # (keep box >= accept box)
-    cry.param('keepLength', 0.6)
-    cry.param('keepWidth', 0.2)
-    cry.param('keepHeight', 0.2)
-    # minimal kinetic energy - all particles below that energy are ignored
-    cry.param('kineticEnergyThreshold', 0.01)
-    path.add_module(cry)
-
-    # Selector module.
-    sel = register_module('CDCCosmicSelector',
-                          lOfCounter=lengthOfCounter,
-                          wOfCounter=widthOfCounter,
-                          xOfCounter=triggerPos[0],
-                          yOfCounter=triggerPos[1],
-                          zOfCounter=triggerPos[2],
-                          phiOfCounter=0.,
-                          TOP=topInCounter,
-                          propSpeed=lightPropSpeed,
-                          TOF=1,
-                          cryGenerator=True
-                          )
-
-    path.add_module(sel)
-    sel.if_false(emptyPath)
-    path.add_module('FullSim',
-                    # Uncomment if you want to disable secondaries.
-                    ProductionCut=1000000.)
-    #    path.add_module(RandomizeTrackTimeModule(8.0))
-    path.add_module('CDCDigitizer')
-
-
 def add_cdc_cr_reconstruction(path, eventTimingExtraction=False, topInCounter=True):
     """
     Add CDC CR reconstruction

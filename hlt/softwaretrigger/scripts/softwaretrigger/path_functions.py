@@ -127,15 +127,10 @@ def add_softwaretrigger_reconstruction(
         if softwaretrigger_mode in ['fast_reco_filter', 'hlt_filter']:
             # There are three possibilities for the output of this module
             # (1) the event is dismissed -> only store the metadata
-            fast_reco_cut_module.if_value("==-1", store_only_metadata_path, basf2.AfterConditionPath.CONTINUE)
-            # (2) we do not know what to do or the event is accepted -> go on with the hlt reconstruction
-            fast_reco_cut_module.if_value("!=-1", hlt_reconstruction_path, basf2.AfterConditionPath.CONTINUE)
+            fast_reco_cut_module.if_value("==0", store_only_metadata_path, basf2.AfterConditionPath.CONTINUE)
+            # (2) the event is accepted -> go on with the hlt reconstruction
+            fast_reco_cut_module.if_value("==1", hlt_reconstruction_path, basf2.AfterConditionPath.CONTINUE)
 
-            # second possibility
-            # # (2) the event is immediately accepted -> store everything
-            # fast_reco_cut_module.if_value("==1", store_only_rawdata_path, basf2.AfterConditionPath.CONTINUE)
-            # # (3) we do not know what to do -> go on with the reconstruction
-            # fast_reco_cut_module.if_value("==0", hlt_reconstruction_path, basf2.AfterConditionPath.CONTINUE)
         elif softwaretrigger_mode == 'monitoring':
             fast_reco_reconstruction_path.add_path(hlt_reconstruction_path)
 
@@ -149,10 +144,10 @@ def add_softwaretrigger_reconstruction(
         calibration_and_store_only_rawdata_path.add_path(get_store_only_rawdata_path())
         if softwaretrigger_mode == 'hlt_filter':
             # There are two possibilities for the output of this module
-            # (1) the event is accepted -> store everything
+            # (1) the event is rejected -> only store the metadata
+            hlt_cut_module.if_value("==0", store_only_metadata_path, basf2.AfterConditionPath.CONTINUE)
+            # (2) the event is accepted -> go on with the calibration
             hlt_cut_module.if_value("==1", calibration_and_store_only_rawdata_path, basf2.AfterConditionPath.CONTINUE)
-            # (2) we do not know what to do or the event is rejected -> only store the metadata
-            hlt_cut_module.if_value("!=1", store_only_metadata_path, basf2.AfterConditionPath.CONTINUE)
         elif softwaretrigger_mode in ['monitoring', 'fast_reco_filter']:
             hlt_reconstruction_path.add_path(calibration_and_store_only_rawdata_path)
 

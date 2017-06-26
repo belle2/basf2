@@ -409,8 +409,7 @@ namespace Belle2 {
   {
     std::set<int> indexSet;
     if (not m_inputListsCollide)
-      for (unsigned int i = 0; i < m_numberOfLists; i++)
-        indexSet.insert(m_indices[i]);
+      indexSet.insert(m_indices.begin(), m_indices.end());
     else
       for (unsigned int i = 0; i < m_numberOfLists; i++)
         indexSet.insert(m_indicesToUniqueIDs.at(m_indices[i]));

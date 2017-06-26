@@ -277,7 +277,7 @@ def add_cosmics_generator(path, components=None,
     if pre_general_run_setup:
         cosmics_setup.set_cdc_cr_parameters(pre_general_run_setup)
 
-    if cosmics_setup.cosmics_period and geometry_xml_file == 'geometry/CDCcosmicTests.xml':
+    if cosmics_setup.cosmics_period and geometry_xml_file != 'geometry/CDCcosmicTests.xml':
         B2ERROR("You have set the 'pre_general_run_setup' variable, but are still using the geometry setup "
                 "for the general cosmics run, and not the one for the cosmics test. "
                 "This is probably not what you want.", )

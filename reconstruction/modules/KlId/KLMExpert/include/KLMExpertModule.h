@@ -139,7 +139,7 @@ namespace Belle2 {
 
     /** mva identifier. no ending means its loaded from the database  */
     std::string m_identifier =
-      "KLM_fBDT_10xbkg100k23Jun17";
+      "KLM_fBDT_10xbkg";
 
     /** Database pointer to the Database representation of the weightfile */
     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>

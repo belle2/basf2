@@ -14,9 +14,31 @@ namespace Belle2 {
   namespace SoftwareTrigger {
     const std::string SoftwareTriggerDBHandler::s_dbPackageIdentifier = "software_trigger_cut";
 
-    /// Helper function to check for changes in the DB of all cuts registered in the initialize function.
-    void SoftwareTriggerDBHandler::checkForChangedDBEntries()
+    std::string SoftwareTriggerDBHandler::makeFullCutName(const std::string& baseCutIdentifier,
+                                                          const std::string& cutIdentifier)
     {
+      assert(baseCutIdentifier.find("&") == std::string::npos);
+      assert(cutIdentifier.find("&") == std::string::npos);
+
+      return s_dbPackageIdentifier + "&" + baseCutIdentifier + "&" + cutIdentifier;
+    }
+
+    std::string SoftwareTriggerDBHandler::makeFullTriggerMenuName(const std::string& baseIdentifier)
+    {
+      assert(baseIdentifier.find("&") == std::string::npos);
+
+      return s_dbPackageIdentifier + "&" + baseIdentifier;
+    }
+
+    void SoftwareTriggerDBHandler::checkForChangedDBEntries(const std::string& baseIdentifier)
+    {
+      // In case the whole trigger menu has changed, we start from scratch and reload all triggers.
+      if (m_softwareTriggerMenu.hasChanged()) {
+        initialize(baseIdentifier);
+        return;
+      }
+
+      // In all other cases we just check each downloaded cut, if it has changed.
       for (auto& databaseCutEntry : m_databaseObjects) {
         if (databaseCutEntry.hasChanged()) {
           B2ASSERT("The name of the database entry changed! This is not handled properly by the module.",
@@ -26,20 +48,22 @@ namespace Belle2 {
       }
     }
 
-    void SoftwareTriggerDBHandler::initialize(const std::string& baseIdentifier, const std::vector<std::string>& cutIdentifiers)
+    void SoftwareTriggerDBHandler::initialize(const std::string& baseIdentifier)
     {
       m_databaseObjects.clear();
       m_cutsWithIdentifier.clear();
 
+      m_softwareTriggerMenu = DBObjPtr<SoftwareTriggerMenu>(makeFullTriggerMenuName(baseIdentifier));
+
+      const auto& cutIdentifiers = m_softwareTriggerMenu->getCutIdentifiers();
       m_databaseObjects.reserve(cutIdentifiers.size());
 
       B2DEBUG(100, "Initializing SoftwareTrigger DB with baseIdentifier " << baseIdentifier << " and " << cutIdentifiers.size() <<
               " cutIdentifiers");
-      for (auto const& ci : cutIdentifiers) {
-        B2DEBUG(100, "-> with CutIndentifier " << ci);
-      }
 
       for (const std::string& cutIdentifier : cutIdentifiers) {
+        B2DEBUG(100, "-> with CutIndentifier " << cutIdentifier);
+
         const std::string& fullIdentifier = makeFullCutName(baseIdentifier, cutIdentifier);
         m_databaseObjects.emplace_back(fullIdentifier);
         if (m_databaseObjects.back()) {
@@ -50,13 +74,9 @@ namespace Belle2 {
       }
     }
 
-    std::string SoftwareTriggerDBHandler::makeFullCutName(const std::string& baseCutIdentifier,
-                                                          const std::string& cutIdentifier)
+    bool SoftwareTriggerDBHandler::getAcceptOverridesReject() const
     {
-      assert(baseCutIdentifier.find("&") == std::string::npos);
-      assert(cutIdentifier.find("&") == std::string::npos);
-
-      return s_dbPackageIdentifier + "&" + baseCutIdentifier + "&" + cutIdentifier;
+      return m_softwareTriggerMenu->isAcceptMode();
     }
 
     void SoftwareTriggerDBHandler::upload(const std::unique_ptr<SoftwareTriggerCut>& cut, const std::string& baseCutIdentifier,
@@ -66,6 +86,17 @@ namespace Belle2 {
       DBImportObjPtr<DBRepresentationOfSoftwareTriggerCut> cutToUpload(fullCutName);
       cutToUpload.construct(cut);
       cutToUpload.import(iov);
+    }
+
+    void SoftwareTriggerDBHandler::uploadTriggerMenu(const std::string& baseCutIdentifier,
+                                                     const std::vector<std::string>& cutIdentifiers,
+                                                     bool acceptMode,
+                                                     const IntervalOfValidity& iov)
+    {
+      const std::string& fullMenuName = makeFullTriggerMenuName(baseCutIdentifier);
+      DBImportObjPtr<SoftwareTriggerMenu> menuToUpload(fullMenuName);
+      menuToUpload.construct(cutIdentifiers, acceptMode);
+      menuToUpload.import(iov);
     }
 
     std::unique_ptr<SoftwareTriggerCut> SoftwareTriggerDBHandler::download(const std::string& baseCutIdentifier,

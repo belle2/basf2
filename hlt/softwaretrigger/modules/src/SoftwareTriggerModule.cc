@@ -71,7 +71,7 @@ void SoftwareTriggerModule::initialize()
 
 void SoftwareTriggerModule::beginRun()
 {
-  m_dbHandler.checkForChangedDBEntries();
+  m_dbHandler.checkForChangedDBEntries(m_param_baseIdentifier);
 }
 
 void SoftwareTriggerModule::terminate()

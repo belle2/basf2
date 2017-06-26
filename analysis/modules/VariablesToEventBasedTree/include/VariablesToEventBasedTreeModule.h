@@ -25,10 +25,10 @@ namespace Belle2 {
    *  and save them into a TTree. The Tree is event-based, meaning that the variables of each candidate for each event
    *  are saved in an array in a branch of the Tree.
    */
-  class VariablesToTreeModule : public Module {
+  class VariablesToEventBasedTreeModule : public Module {
   public:
     /** Constructor. */
-    VariablesToTreeModule();
+    VariablesToEventBasedTreeModule();
 
     /** Initialises the module.
      *

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# The VariablesToTree module saves variables from the VariableManager to an event-based TTree
+# The VariablesToEventBasedTree module saves variables from the VariableManager to an event-based TTree
 
 from basf2 import *
 from modularAnalysis import *
@@ -16,7 +16,7 @@ matchMCTruth('D0')
 # The branches of the TTree are arrays containing the variables for each D0 candidate in the event
 # The event_variables are handled differently, the branches of these event_variables are just floats,
 # you can use this to write out candidate independent information (aka event-based variables)
-analysis_main.add_module('VariablesToTree',
+analysis_main.add_module('VariablesToEventBasedTree',
                          particleList='D0',
                          variables=['dM', 'isSignal', 'mcErrors', 'p', 'E',
                                     'daughter(0, Kid)', 'daughter(1, piid)'],

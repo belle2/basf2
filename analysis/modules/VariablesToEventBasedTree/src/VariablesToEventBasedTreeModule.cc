@@ -8,7 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <analysis/modules/VariablesToTree/VariablesToTreeModule.h>
+#include <analysis/modules/VariablesToEventBasedTree/VariablesToEventBasedTreeModule.h>
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
@@ -24,10 +24,10 @@ using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
-REG_MODULE(VariablesToTree)
+REG_MODULE(VariablesToEventBasedTree)
 
 
-VariablesToTreeModule::VariablesToTreeModule() :
+VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
   Module(),
   m_tree("", DataStore::c_Persistent)
 {
@@ -47,7 +47,7 @@ VariablesToTreeModule::VariablesToTreeModule() :
            "List of variables (or collections) to save for each event. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. Only event-based variables are allowed here.",
            emptylist);
 
-  addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToTree.root"));
+  addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToEventBasedTree.root"));
   addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("tree"));
   addParam("maxCandidates", m_maxCandidates, "The maximum number of candidates in the ParticleList per entry of the Tree.", 100u);
 
@@ -59,7 +59,7 @@ VariablesToTreeModule::VariablesToTreeModule() :
   m_file = nullptr;
 }
 
-void VariablesToTreeModule::initialize()
+void VariablesToEventBasedTreeModule::initialize()
 {
   StoreObjPtr<ParticleList>::required(m_particleList);
 
@@ -135,7 +135,7 @@ void VariablesToTreeModule::initialize()
 }
 
 
-float VariablesToTreeModule::getInverseSamplingRateWeight()
+float VariablesToEventBasedTreeModule::getInverseSamplingRateWeight()
 {
 
   if (m_sampling_variable == nullptr)
@@ -155,7 +155,7 @@ float VariablesToTreeModule::getInverseSamplingRateWeight()
   return 1.0;
 }
 
-void VariablesToTreeModule::event()
+void VariablesToEventBasedTreeModule::event()
 {
 
   StoreObjPtr<ParticleList> particlelist(m_particleList);
@@ -168,7 +168,7 @@ void VariablesToTreeModule::event()
     for (unsigned int iPart = 0; iPart < m_ncandidates; iPart++) {
 
       if (iPart >= m_maxCandidates) {
-        B2WARNING("Maximum number of candidates exceeded in VariablesToTree module. I will skip additional candidates");
+        B2WARNING("Maximum number of candidates exceeded in VariablesToEventBasedTree module. I will skip additional candidates");
         break;
       }
 
@@ -181,7 +181,7 @@ void VariablesToTreeModule::event()
   }
 }
 
-void VariablesToTreeModule::terminate()
+void VariablesToEventBasedTreeModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     B2INFO("Writing TTree " << m_treeName);

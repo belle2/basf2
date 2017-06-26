@@ -87,7 +87,7 @@ namespace Belle2 {
                                                          const std::vector<unsigned int>& prescaleFactor = {1},
                                                          const bool rejectCut = false);
 
-      /** Shortcut constructor to not use a list of preScaleFactors. The rest is the same as in the normal costructor. */
+      /** Shortcut constructor to not use a list of preScaleFactors. The rest is the same as in the normal constructor. */
       static std::unique_ptr<SoftwareTriggerCut> compile(const std::string& cut_string,
                                                          const unsigned int prescaleFactor,
                                                          const bool rejectCut = false)

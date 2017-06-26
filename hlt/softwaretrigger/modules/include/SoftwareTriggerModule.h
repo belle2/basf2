@@ -81,7 +81,7 @@ namespace Belle2 {
       /// Store Object for storing the trigger decision.
       StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
       /// Internal handler object for the DB interface.
-      SoftwareTriggerDBHandler m_dbHandler;
+      std::unique_ptr<SoftwareTriggerDBHandler> m_dbHandler;
       /// Internal handler for the Calculations (will be set in initialize to the correct one).
       std::unique_ptr<SoftwareTriggerCalculation> m_calculation;
       /// TFile to store the debug TTree (or a nullptr if we do not save the debug output).

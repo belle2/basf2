@@ -63,7 +63,7 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
 void SoftwareTriggerModule::initialize()
 {
   m_resultStoreObjectPointer.registerInDataStore(m_param_resultStoreArrayName);
-  m_dbHandler.initialize(m_param_baseIdentifier);
+  m_dbHandler.reset(new SoftwareTriggerDBHandler(m_param_baseIdentifier));
 
   initializeCalculation();
   initializeDebugOutput();
@@ -71,7 +71,7 @@ void SoftwareTriggerModule::initialize()
 
 void SoftwareTriggerModule::beginRun()
 {
-  m_dbHandler.checkForChangedDBEntries(m_param_baseIdentifier);
+  m_dbHandler->checkForChangedDBEntries();
 }
 
 void SoftwareTriggerModule::terminate()
@@ -143,7 +143,7 @@ void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject
   bool hasOneAcceptCut = false;
   bool hasOneRejectCut = false;
 
-  for (const auto& cutWithName : m_dbHandler.getCutsWithNames()) {
+  for (const auto& cutWithName : m_dbHandler->getCutsWithNames()) {
     const std::string& cutIdentifier = cutWithName.first;
     const auto& cut = cutWithName.second;
     B2DEBUG(100, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << ")");
@@ -159,7 +159,7 @@ void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject
 
   SoftwareTriggerCutResult totalResult;
 
-  if (m_dbHandler.getAcceptOverridesReject()) {
+  if (m_dbHandler->getAcceptOverridesReject()) {
     if (hasOneAcceptCut or (not hasOneRejectCut)) {
       totalResult = SoftwareTriggerCutResult::c_accept;
     } else {

@@ -54,7 +54,6 @@ namespace Belle2 {
     /** Download from the DB */
     TEST_F(SoftwareTriggerDBHandlerTest, downloadAndChanged)
     {
-      SoftwareTriggerDBHandler dbHandler;
       SoftwareTriggerObject preFilledObject;
 
       IntervalOfValidity iov(0, 0, -1, -1);
@@ -66,10 +65,13 @@ namespace Belle2 {
       SoftwareTriggerDBHandler::upload(cutOne, "test", "cutOne", iov);
 
       // Try to download a missing cut.
-      EXPECT_B2FATAL(dbHandler.initialize("test", {"cutOne", "cutTwo"}));
+      SoftwareTriggerDBHandler::uploadTriggerMenu("test", {"cutOne", "cutTwo"}, true, iov);
+      EXPECT_B2FATAL(SoftwareTriggerDBHandler("test"));
 
       // Download and test the single uploaded cut.
-      dbHandler.initialize("test", {"cutOne"});
+      SoftwareTriggerDBHandler::uploadTriggerMenu("test", {"cutOne"}, true, iov);
+
+      SoftwareTriggerDBHandler dbHandler("test");
       const auto& cutsWithNames = dbHandler.getCutsWithNames();
       EXPECT_EQ(SoftwareTriggerCutResult::c_accept,
                 cutsWithNames.at("software_trigger_cut&test&cutOne")->checkPreScaled(preFilledObject));
@@ -79,16 +81,19 @@ namespace Belle2 {
       const auto& cutTwo = SoftwareTriggerCut::compile("1 == 2", 1);
 
       // Upload the second cut
-      SoftwareTriggerDBHandler::upload(cutTwo, "test", "cutTwo", iov);
+      SoftwareTriggerDBHandler::upload(cutOne, "test2", "cutOne", iov);
+      SoftwareTriggerDBHandler::upload(cutTwo, "test2", "cutTwo", iov);
 
       // Initialize with both cuts uploaded (should not fail)
-      dbHandler.initialize("test", {"cutOne", "cutTwo"});
+      SoftwareTriggerDBHandler::uploadTriggerMenu("test2", {"cutOne", "cutTwo"}, true, iov);
 
+      SoftwareTriggerDBHandler otherDBHandler("test2");
+      const auto& otherCutsWithNames = otherDBHandler.getCutsWithNames();
       // Try out both cuts
       EXPECT_EQ(SoftwareTriggerCutResult::c_accept,
-                cutsWithNames.at("software_trigger_cut&test&cutOne")->checkPreScaled(preFilledObject));
+                otherCutsWithNames.at("software_trigger_cut&test2&cutOne")->checkPreScaled(preFilledObject));
       EXPECT_EQ(SoftwareTriggerCutResult::c_noResult,
-                cutsWithNames.at("software_trigger_cut&test&cutTwo")->checkPreScaled(preFilledObject));
+                otherCutsWithNames.at("software_trigger_cut&test2&cutTwo")->checkPreScaled(preFilledObject));
 
     }
 

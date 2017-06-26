@@ -30,55 +30,6 @@ namespace Belle2 {
       return s_dbPackageIdentifier + "&" + baseIdentifier;
     }
 
-    void SoftwareTriggerDBHandler::checkForChangedDBEntries(const std::string& baseIdentifier)
-    {
-      // In case the whole trigger menu has changed, we start from scratch and reload all triggers.
-      if (m_softwareTriggerMenu.hasChanged()) {
-        initialize(baseIdentifier);
-        return;
-      }
-
-      // In all other cases we just check each downloaded cut, if it has changed.
-      for (auto& databaseCutEntry : m_databaseObjects) {
-        if (databaseCutEntry.hasChanged()) {
-          B2ASSERT("The name of the database entry changed! This is not handled properly by the module.",
-                   m_cutsWithIdentifier.find(databaseCutEntry.getName()) != m_cutsWithIdentifier.end());
-          m_cutsWithIdentifier[databaseCutEntry.getName()] = databaseCutEntry->getCut();
-        }
-      }
-    }
-
-    void SoftwareTriggerDBHandler::initialize(const std::string& baseIdentifier)
-    {
-      m_databaseObjects.clear();
-      m_cutsWithIdentifier.clear();
-
-      m_softwareTriggerMenu = DBObjPtr<SoftwareTriggerMenu>(makeFullTriggerMenuName(baseIdentifier));
-
-      const auto& cutIdentifiers = m_softwareTriggerMenu->getCutIdentifiers();
-      m_databaseObjects.reserve(cutIdentifiers.size());
-
-      B2DEBUG(100, "Initializing SoftwareTrigger DB with baseIdentifier " << baseIdentifier << " and " << cutIdentifiers.size() <<
-              " cutIdentifiers");
-
-      for (const std::string& cutIdentifier : cutIdentifiers) {
-        B2DEBUG(100, "-> with CutIndentifier " << cutIdentifier);
-
-        const std::string& fullIdentifier = makeFullCutName(baseIdentifier, cutIdentifier);
-        m_databaseObjects.emplace_back(fullIdentifier);
-        if (m_databaseObjects.back()) {
-          m_cutsWithIdentifier[fullIdentifier] = m_databaseObjects.back()->getCut();
-        } else {
-          B2FATAL("There is no DB object with the name " << fullIdentifier);
-        }
-      }
-    }
-
-    bool SoftwareTriggerDBHandler::getAcceptOverridesReject() const
-    {
-      return m_softwareTriggerMenu->isAcceptMode();
-    }
-
     void SoftwareTriggerDBHandler::upload(const std::unique_ptr<SoftwareTriggerCut>& cut, const std::string& baseCutIdentifier,
                                           const std::string& cutIdentifier, const IntervalOfValidity& iov)
     {
@@ -109,6 +60,53 @@ namespace Belle2 {
       } else {
         return std::unique_ptr<SoftwareTriggerCut>();
       }
+    }
+
+    void SoftwareTriggerDBHandler::checkForChangedDBEntries()
+    {
+      // In case the whole trigger menu has changed, we start from scratch and reload all triggers.
+      if (m_softwareTriggerMenu.hasChanged()) {
+        initialize();
+        return;
+      }
+
+      // In all other cases we just check each downloaded cut, if it has changed.
+      for (auto& databaseCutEntry : m_databaseObjects) {
+        if (databaseCutEntry.hasChanged()) {
+          B2ASSERT("The name of the database entry changed! This is not handled properly by the module.",
+                   m_cutsWithIdentifier.find(databaseCutEntry.getName()) != m_cutsWithIdentifier.end());
+          m_cutsWithIdentifier[databaseCutEntry.getName()] = databaseCutEntry->getCut();
+        }
+      }
+    }
+
+    void SoftwareTriggerDBHandler::initialize()
+    {
+      m_databaseObjects.clear();
+      m_cutsWithIdentifier.clear();
+
+      const auto& cutIdentifiers = m_softwareTriggerMenu->getCutIdentifiers();
+      m_databaseObjects.reserve(cutIdentifiers.size());
+
+      B2DEBUG(100, "Initializing SoftwareTrigger DB with baseIdentifier " << m_baseIdentifier << " and " << cutIdentifiers.size() <<
+              " cutIdentifiers");
+
+      for (const std::string& cutIdentifier : cutIdentifiers) {
+        B2DEBUG(100, "-> with CutIndentifier " << cutIdentifier);
+
+        const std::string& fullIdentifier = makeFullCutName(m_baseIdentifier, cutIdentifier);
+        m_databaseObjects.emplace_back(fullIdentifier);
+        if (m_databaseObjects.back()) {
+          m_cutsWithIdentifier[fullIdentifier] = m_databaseObjects.back()->getCut();
+        } else {
+          B2FATAL("There is no DB object with the name " << fullIdentifier);
+        }
+      }
+    }
+
+    bool SoftwareTriggerDBHandler::getAcceptOverridesReject() const
+    {
+      return m_softwareTriggerMenu->isAcceptMode();
     }
 
     const std::map<std::string, std::unique_ptr<const SoftwareTriggerCut>>& SoftwareTriggerDBHandler::getCutsWithNames() const

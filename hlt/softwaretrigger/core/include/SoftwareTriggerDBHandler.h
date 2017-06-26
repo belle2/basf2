@@ -88,7 +88,12 @@ namespace Belle2 {
       static std::unique_ptr<SoftwareTriggerCut> download(const std::string& baseCutIdentifier, const std::string& cutIdentifier);
 
       /** Use the default constructor (needed as we delete the copy constructor) */
-      SoftwareTriggerDBHandler() = default;
+      SoftwareTriggerDBHandler(const std::string& baseIdentifier) :
+        m_baseIdentifier(baseIdentifier),
+        m_softwareTriggerMenu(makeFullTriggerMenuName(baseIdentifier))
+      {
+        initialize();
+      }
 
       /**
        * Download the trigger menu and afterwards the cuts with the given base name and
@@ -97,10 +102,10 @@ namespace Belle2 {
        *
        * To get the cuts with their identifiers, call the getCutsWithNames function.
        */
-      void initialize(const std::string& baseIdentifier);
+      void initialize();
 
       /// Helper function to check for changes in the DB of all cuts registered in the initialize function.
-      void checkForChangedDBEntries(const std::string& baseIdentifier);
+      void checkForChangedDBEntries();
 
       /// Get the already downloaded list of constant cuts with their identifiers.
       const std::map<std::string, std::unique_ptr<const SoftwareTriggerCut>>& getCutsWithNames() const;
@@ -115,6 +120,8 @@ namespace Belle2 {
       /// Delete the assignment constructror
       SoftwareTriggerDBHandler& operator=(SoftwareTriggerDBHandler& rhs) = delete;
 
+      /// Base identifier
+      std::string m_baseIdentifier = "";
       /// Database entry of the software trigger menu.
       DBObjPtr<SoftwareTriggerMenu> m_softwareTriggerMenu;
       /// Database entries of the cuts, which where created in the initialize function.

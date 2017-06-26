@@ -1,8 +1,8 @@
-'''
+"""
 File summarizing all default generator settings.
 More information: BELLE2-NOTE-PH-2015-006
 Contact: Torben Ferber (ferber@physics.ubc.ca)
-'''
+"""
 
 from basf2 import *
 from ROOT import Belle2
@@ -31,7 +31,8 @@ def add_aafh_generator(path, finalstate='', preselection=False):
         pass
     elif finalstate == 'e+e-mu+mu-':
         aafh_mode = 3
-        aafh_subgeneratorWeights = [1.000e+00, 1.520e+01, 3.106e+03, 6.374e+03, 1.000e+00, 1.778e+00, 6.075e+00, 6.512e+00]
+        aafh_subgeneratorWeights = [1.000e+00, 1.520e+01, 3.106e+03, 6.374e+03, 1.000e+00, 1.778e+00, 6.075e+00,
+                                    6.512e+00]
         aafh_maxSubgeneratorWeight = 1.0
     else:
         B2FATAL("add_aafh_generator final state not supported: ", finalstate)

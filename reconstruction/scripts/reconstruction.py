@@ -87,7 +87,7 @@ def add_cosmics_reconstruction(
         eventTimingExtraction=False,
         addClusterExpertModules=True,
         merge_tracks=True,
-        use_readout_position=False,
+        pre_general_run_setup=None,
         use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
@@ -107,17 +107,19 @@ def add_cosmics_reconstruction(
         execution time.
     :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
-    :param use_readout_position: flag to turn off the usage of the readout position in the track time estimator
+    :param pre_general_run_setup: If set to a string, the cosmics selector module will be added using the
+           parameters, that where used in this period of data taking. The periods can be found in cdc/cr/__init__.py.
+           If not set, the method will assume a general cosmics run without the need for any selection (no trigger).
     """
 
     # Add cdc tracking reconstruction modules
     add_cr_tracking_reconstruction(path,
                                    components=components,
-                                   pruneTracks=False,
-                                   skipGeometryAdding=skipGeometryAdding,
-                                   eventTimingExtraction=eventTimingExtraction,
+                                   prune_tracks=False,
+                                   skip_geometry_adding=skipGeometryAdding,
+                                   event_time_extraction=eventTimingExtraction,
                                    merge_tracks=merge_tracks,
-                                   use_readout_position=use_readout_position,
+                                   pre_general_run_setup=pre_general_run_setup,
                                    use_second_cdc_hits=use_second_cdc_hits)
 
     # Add further reconstruction modules

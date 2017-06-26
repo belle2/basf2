@@ -67,6 +67,8 @@ Database& Database::Instance()
                                                     "/cvmfs/belle.cern.ch/conditions data/framework/database.txt");
     const std::string globalTag = getFromEnvironment("BELLE2_CONDB_GLOBALTAG", "production");
     typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
+    std::vector<string> tags;
+    boost::split(tags, globalTag, boost::is_any_of(" \t\n\r"));
     // OK, add fallback databases unless empty location is specified
     if (!fallback.empty()) {
       for (auto localdb : tokenizer(fallback, boost::char_separator<char> {" \t\n\r"})) {
@@ -83,7 +85,7 @@ Database& Database::Instance()
             LocalDatabase::createInstance(fileName, "", true, LogConfig::c_Error);
           } else {
             // One local DB for each global tag
-            for (auto tag : tokenizer(globalTag, boost::char_separator<char> {" \t\n\r"})) {
+            for (auto tag : tags) {
               std::string fileName = localdb + "/" + tag + ".txt";
               if (FileSystem::isFile(fileName)) {
                 B2DEBUG(10, "Adding fallback database " << fileName);
@@ -98,7 +100,7 @@ Database& Database::Instance()
     // in which case we disable access to the database
     if (!globalTag.empty()) {
       // add all global tags which are separated by whitespace as conditions database
-      for (auto tag : tokenizer(globalTag, boost::char_separator<char> {" \t\n\r"})) {
+      for (auto tag : tags) {
         B2DEBUG(10, "Adding central database for global tag " << tag);
         ConditionsDatabase::createDefaultInstance(tag, LogConfig::c_Warning);
       }

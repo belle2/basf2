@@ -243,7 +243,7 @@ def add_cosmics_generator(path, components=None,
                           global_box_size=None, accept_box=None, keep_box=None,
                           geometry_xml_file='geometry/GCR_Summer2017.xml',
                           cosmics_data_dir='data/generators/modules/cryinput/',
-                          setup_file='simulation/scripts/cry.setup',
+                          setup_file='generators/scripts/cry.setup',
                           pre_general_run_setup=None):
     """
     Add the cosmics generator CRY with the default parameters to the path.

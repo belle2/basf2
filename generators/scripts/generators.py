@@ -270,6 +270,11 @@ def add_cosmics_generator(path, components=None,
     if keep_box is None:
         keep_box = [8, 8, 8]
 
+    if pre_general_run_setup and geometry_xml_file == 'geometry/CDCcosmicTests.xml':
+        B2ERROR("You have set the 'pre_general_run_setup' variable, but are still using the geometry setup "
+                "for the general cosmics run, and not the one for the cosmics test. "
+                "This is probably not what you want.", )
+
     if 'Gearbox' not in path:
         path.add_module('Gearbox', override=[
             ("/Global/length", str(global_box_size[0]), "m"),

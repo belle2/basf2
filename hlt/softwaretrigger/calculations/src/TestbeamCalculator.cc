@@ -34,6 +34,9 @@ namespace Belle2 {
           continue;
 
         auto fitRes = t.getTrackFitResult(Const::electron);
+        if (not fitRes) {
+          continue;
+        }
         ptMax = std::max(ptMax, fitRes->getTransverseMomentum());
       }
 

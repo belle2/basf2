@@ -134,7 +134,7 @@ void V0FinderModule::event()
   tracksMinus.reserve(nTracks);
 
   for (const auto& track : tracks) {
-    const TrackFitResult* tfr = track.getTrackFitResult(Const::pion);
+    const TrackFitResult* tfr = track.getFirstValidTrackFitResult();
 
     if (!tfr) {
       B2WARNING("No TrackFitResult for track");

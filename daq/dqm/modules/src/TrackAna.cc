@@ -74,6 +74,7 @@ void TrackAnaModule::event()
   for (int i = 0; i < ntrk; i++) {
     Track* trk = trklist[i];
     const TrackFitResult* fit = trk->getTrackFitResult(Const::pion);
+    B2ASSERT("The pion fit assumed by this script failed.", fit);
     TLorentzVector p4 = fit->get4Momentum();
     for (int j = 0; j < 4; j++) {
       h_p[j]->Fill(p4[j]);

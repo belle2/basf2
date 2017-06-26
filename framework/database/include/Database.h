@@ -35,11 +35,12 @@ namespace Belle2 {
   public:
 
     /**
-     * Get the default global tag for the central database.
+     * Get the default global tags for the central database.
+     * Multiple global tags are separated by spaces.
      *
-     * @return           The default global tag
+     * @return           The default global tags
      */
-    static std::string defaultGlobalTag();
+    static std::string getDefaultGlobalTags();
 
     /**
      * Instance of a singleton Database.

@@ -77,6 +77,7 @@ Database
 .. autofunction:: basf2.use_local_database
 .. autofunction:: basf2.reset_database
 .. autofunction:: basf2.set_central_database_networkparams
+.. autofunction:: basf2.get_default_global_tags
 
 
 Utilities

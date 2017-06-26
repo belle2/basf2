@@ -59,7 +59,7 @@ namespace {
 
 std::unique_ptr<Database> Database::s_instance{nullptr};
 
-std::string Database::defaultGlobalTag()
+std::string Database::getDefaultGlobalTags()
 {
   return getFromEnvironment("BELLE2_CONDB_GLOBALTAG", "production");
 }
@@ -69,7 +69,7 @@ Database& Database::Instance()
   if (!s_instance) {
     DatabaseChain::createInstance(true);
     const std::string fallbackFilename = getFromEnvironment("BELLE2_CONDB_FALLBACK", "data/framework/database.txt");
-    const std::string globalTag = defaultGlobalTag();
+    const std::string globalTag = getDefaultGlobalTags();
     // OK, add a fallback database unless empty location is specified
     if (!fallbackFilename.empty()) {
       LocalDatabase::createInstance(FileSystem::findFile(fallbackFilename), "", true, LogConfig::c_Error);
@@ -286,7 +286,7 @@ void Database::exposePythonAPI()
   //don't show c++ signature in python doc to keep it simple
   docstring_options options(true, true, false);
 
-  def("default_global_tag", &Database::defaultGlobalTag, "Get the default global tag for the central database");
+  def("get_default_global_tags", &Database::getDefaultGlobalTags, "Get the default global tags for the central database");
   def("set_experiment_name", &Database_addExperimentName, args("experiment", "name"), R"DOCSTRING(
 Set a name for the given experiment number when looking up payloads in the
 central database. Thisf function is deprecated and any calls to it are ignored.)DOCSTRING");

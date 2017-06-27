@@ -15,6 +15,7 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
@@ -135,7 +136,7 @@ void SoftwareTriggerDQMModule::event()
     }
 
     // todo: support override rejects option
-    m_totalResultHistogram->Fill(triggerResult->getTotalResult());
+    m_totalResultHistogram->Fill(FinalTriggerDecisionCalculator::getFinalTriggerDecision(*triggerResult));
   }
 
   /*

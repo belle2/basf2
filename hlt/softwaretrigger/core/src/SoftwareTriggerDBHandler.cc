@@ -94,6 +94,9 @@ namespace Belle2 {
 
     void SoftwareTriggerDBHandler::initialize()
     {
+      B2ASSERT("Could not find a valid trigger name with this "
+               "base identifier (" << m_baseIdentifier << ") in the database.", m_softwareTriggerMenu);
+
       m_databaseObjects.clear();
       m_cutsWithIdentifier.clear();
 

@@ -1,5 +1,6 @@
 #include <hlt/softwaretrigger/modules/SoftwareTriggerModule.h>
 #include <hlt/softwaretrigger/core/utilities.h>
+#include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 #include <TFile.h>
 
 using namespace Belle2;
@@ -176,7 +177,7 @@ void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject
   const std::string& totalResultIdentifier = SoftwareTriggerDBHandler::makeTotalCutName(m_param_baseIdentifier);
   m_resultStoreObjectPointer->addResult(totalResultIdentifier, moduleResult);
 
-  bool totalResult = getFinalTriggerDecision(*m_resultStoreObjectPointer);
+  bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
   setReturnValue(totalResult);
 }
 

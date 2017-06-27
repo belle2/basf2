@@ -7,16 +7,23 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
-
-#include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
+#include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 
 namespace Belle2 {
   namespace SoftwareTrigger {
-    /// Helper function to do a prescaling using a random integer number and the prescaling factor from the object.
-    bool makePreScale(const unsigned int& preScaleFactor);
+    bool FinalTriggerDecisionCalculator::getFinalTriggerDecision(const SoftwareTriggerResult& result)
+    {
+      for (const auto& cutResultWithName : result.getResults()) {
+        const std::string& resultName = cutResultWithName.first;
+        const SoftwareTriggerCutResult& cutResult = static_cast<SoftwareTriggerCutResult>(cutResultWithName.second);
 
-    /// Helper function to do a prescaling using a random integer number and the list of prescaling factors from the object.
-    bool makePreScale(const std::vector<unsigned int>& preScaleFactors);
+        if (SoftwareTriggerDBHandler::isTotalCutName(resultName) and cutResult == SoftwareTriggerCutResult ::c_reject) {
+          return false;
+        }
+      }
+
+      return true;
+    }
   }
 }

@@ -83,19 +83,5 @@ namespace Belle2 {
         return makePreScale(preScaleFactors[index]);
       }
     }
-
-    bool getFinalTriggerDecision(const SoftwareTriggerResult& result)
-    {
-      for (const auto& cutResultWithName : result.getResults()) {
-        const std::string& resultName = cutResultWithName.first;
-        const SoftwareTriggerCutResult& cutResult = static_cast<SoftwareTriggerCutResult>(cutResultWithName.second);
-
-        if (SoftwareTriggerDBHandler::isTotalCutName(resultName) and cutResult == SoftwareTriggerCutResult ::c_reject) {
-          return false;
-        }
-      }
-
-      return true;
-    }
   }
 }

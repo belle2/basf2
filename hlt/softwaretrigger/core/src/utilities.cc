@@ -8,6 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <hlt/softwaretrigger/core/utilities.h>
+#include <hlt/softwaretrigger/calculations/utilities.h>
+#include <analysis/dataobjects/ParticleList.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <TRandom.h>
 
 namespace Belle2 {
@@ -30,64 +33,10 @@ namespace Belle2 {
             }
           }
         }
-
         return -1;
       } else {
         B2FATAL("You are using a list of pre scales although the pion list is not present! This is currently not possible.");
       }
-
-    }
-
-    const ECLCluster* getECLCluster(const Particle& particle, const bool fromTrack)
-    {
-      if (fromTrack) {
-        return particle.getTrack()->getRelated<ECLCluster>();
-      } else {
-        return particle.getECLCluster();
-      }
-    }
-
-    double getRhoOfECLClusterWithMaximumRhoBelow(const StoreObjPtr<ParticleList>& pions,
-                                                 const StoreObjPtr<ParticleList>& gammas,
-                                                 const double belowLimit)
-    {
-      double maximumRho = -1.;
-
-      for (const Particle& particle : *pions) {
-        const ECLCluster* tmpCluster = getECLCluster(particle, true);
-        if (not tmpCluster) {
-          continue;
-        }
-
-        const double& currentRho = getRho(tmpCluster);
-
-        if (currentRho >= belowLimit) {
-          continue;
-        }
-
-        if (currentRho > maximumRho) {
-          maximumRho = currentRho;
-        }
-      }
-
-      for (const Particle& particle : *gammas) {
-        const ECLCluster* tmpCluster = getECLCluster(particle, false);
-        if (not tmpCluster) {
-          continue;
-        }
-
-        const double& currentRho = getRho(tmpCluster);
-
-        if (currentRho >= belowLimit) {
-          continue;
-        }
-
-        if (currentRho > maximumRho) {
-          maximumRho = currentRho;
-        }
-      }
-
-      return maximumRho;
     }
 
     bool makePreScale(const unsigned int& preScaleFactor)

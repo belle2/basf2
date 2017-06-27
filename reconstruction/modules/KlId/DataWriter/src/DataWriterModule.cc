@@ -47,6 +47,8 @@ DataWriterModule::DataWriterModule(): Module()
   setDescription("Used to write flat ntuple for KlId classifier trainings for both ECL and KLM KlID. Output is a root file.");
 
   addParam("outPath", m_outPath, "Output path - where you want your root files to be placed.", m_outPath);
+  addParam("useKLM", m_useKLM, "Write KLM data.", m_useKLM);
+  addParam("useECL", m_useECL, "Write ECL data.", m_useECL);
 }
 
 
@@ -71,130 +73,139 @@ void DataWriterModule::initialize()
   klmClusters.registerRelationTo(eclClusters);
 
   m_f = new TFile(m_outPath.c_str(), "recreate");
-  m_treeKLM = new TTree("KLMdata", "KLMdata");
+
   m_treeECLhadron = new TTree("ECLdataHadron", "ECLdataHadron");
   m_treeECLgamma = new TTree("ECLdataGamma", "ECLdataGamma");
 
   // KLM
-  m_treeKLM -> Branch("KLMMCMom",                 & m_KLMMCMom);
-  m_treeKLM -> Branch("KLMMCPhi",                 & m_KLMMCPhi);
-  m_treeKLM -> Branch("KLMMCTheta",               & m_KLMMCTheta);
-  m_treeKLM -> Branch("KLMMom",                   & m_KLMMom);
-  m_treeKLM -> Branch("KLMPhi",                   & m_KLMPhi);
-  m_treeKLM -> Branch("KLMTheta",                 & m_KLMTheta);
-  m_treeKLM -> Branch("KLMMCLifetime",            & m_KLMMCLifetime);
-  m_treeKLM -> Branch("KLMMCPDG",                 & m_KLMMCPDG);
-  m_treeKLM -> Branch("KLMMCPrimaryPDG",          & m_KLMMCPrimaryPDG);
-  m_treeKLM -> Branch("KLMMCStatus",              & m_KLMMCStatus);
-  m_treeKLM -> Branch("KLMnCluster",                & m_KLMnCluster);
-  m_treeKLM -> Branch("KLMnLayer",                  & m_KLMnLayer);
-  m_treeKLM -> Branch("KLMnInnermostlayer",         & m_KLMnInnermostLayer);
-  m_treeKLM -> Branch("KLMglobalZ",                 & m_KLMglobalZ);
-  m_treeKLM -> Branch("KLMtime",                    & m_KLMtime);
-  m_treeKLM -> Branch("KLMinvM",                    & m_KLMinvM);
-  m_treeKLM -> Branch("KLMTruth",                   & m_KLMTruth);
-  m_treeKLM -> Branch("KLMdistToNextCl",            & m_KLMnextCluster);
-  m_treeKLM -> Branch("KLMenergy",                  & m_KLMenergy);
-  m_treeKLM -> Branch("KLMaverageInterClusterDist", & m_KLMavInterClusterDist);
-  m_treeKLM -> Branch("KLMhitDepth",                & m_KLMhitDepth);
+  if (m_useKLM) {
+    m_treeKLM = new TTree("KLMdata", "KLMdata");
+    m_treeKLM -> Branch("KLMMCMom",                 & m_KLMMCMom);
+    m_treeKLM -> Branch("KLMMCPhi",                 & m_KLMMCPhi);
+    m_treeKLM -> Branch("KLMMCTheta",               & m_KLMMCTheta);
+    m_treeKLM -> Branch("KLMMom",                   & m_KLMMom);
+    m_treeKLM -> Branch("KLMPhi",                   & m_KLMPhi);
+    m_treeKLM -> Branch("KLMTheta",                 & m_KLMTheta);
+    m_treeKLM -> Branch("KLMMCLifetime",            & m_KLMMCLifetime);
+    m_treeKLM -> Branch("KLMMCPDG",                 & m_KLMMCPDG);
+    m_treeKLM -> Branch("KLMMCPrimaryPDG",          & m_KLMMCPrimaryPDG);
+    m_treeKLM -> Branch("KLMMCStatus",              & m_KLMMCStatus);
+    m_treeKLM -> Branch("KLMnCluster",                & m_KLMnCluster);
+    m_treeKLM -> Branch("KLMnLayer",                  & m_KLMnLayer);
+    m_treeKLM -> Branch("KLMnInnermostlayer",         & m_KLMnInnermostLayer);
+    m_treeKLM -> Branch("KLMglobalZ",                 & m_KLMglobalZ);
+    m_treeKLM -> Branch("KLMtime",                    & m_KLMtime);
+    m_treeKLM -> Branch("KLMinvM",                    & m_KLMinvM);
+    m_treeKLM -> Branch("KLMTruth",                   & m_KLMTruth);
+    m_treeKLM -> Branch("KLMdistToNextCl",            & m_KLMnextCluster);
+    m_treeKLM -> Branch("KLMenergy",                  & m_KLMenergy);
+    m_treeKLM -> Branch("KLMaverageInterClusterDist", & m_KLMavInterClusterDist);
+    m_treeKLM -> Branch("KLMhitDepth",                & m_KLMhitDepth);
 
-  m_treeKLM -> Branch("KLMECLHypo",              & m_KLMECLHypo);
-  m_treeKLM -> Branch("KLMECLZMVA",              & m_KLMECLZMVA);
-  m_treeKLM -> Branch("KLMECLZ40",               & m_KLMECLZ40);
-  m_treeKLM -> Branch("KLMECLZ51",               & m_KLMECLZ51);
-  m_treeKLM -> Branch("KLMECLUncertaintyPhi",    & m_KLMECLUncertaintyPhi);
-  m_treeKLM -> Branch("KLMECLUncertaintyTheta",  & m_KLMECLUncertaintyTheta);
-  m_treeKLM -> Branch("KLMdistToNextECL",        & m_KLMECLDist);
-  m_treeKLM -> Branch("KLMtrackToECL",           & m_KLMtrackToECL);
-  m_treeKLM -> Branch("KLMECLEerror",            & m_KLMECLEerror);
-  m_treeKLM -> Branch("KLMECLenergy",            & m_KLMECLE);
-  m_treeKLM -> Branch("KLMECLE9oE25",            & m_KLMECLE9oE25);
-  m_treeKLM -> Branch("KLMECLtiming",            & m_KLMECLTiming);
-  m_treeKLM -> Branch("KLMECLTerror",            & m_KLMECLTerror);
-  m_treeKLM -> Branch("KLMECLdeltaL",            & m_KLMECLdeltaL);
-  m_treeKLM -> Branch("KLMECLmintrackDist",      & m_KLMECLminTrackDist);
-  m_treeKLM -> Branch("KLMTrackSepDist",         & m_KLMTrackSepDist);
-  m_treeKLM -> Branch("KLMTrackSepAngle",        & m_KLMTrackSepAngle);
-  m_treeKLM -> Branch("KLMInitialtrackSepAngle", & m_KLMInitialTrackSepAngle);
-  m_treeKLM -> Branch("KLMTrackRotationAngle",   & m_KLMTrackRotationAngle);
-  m_treeKLM -> Branch("KLMTrackClusterSepAngle", & m_KLMTrackClusterSepAngle);
-  m_treeKLM -> Branch("isBeamBKG",               & m_isBeamBKG);
-  m_treeKLM -> Branch("KLMKlId",                 & m_KLMKLid);
-  m_treeKLM -> Branch("KLMAngleToMC",                 & m_KLMAngleToMC);
-  m_treeKLM -> Branch("KLMMCWeight",                 & m_KLMMCWeight);
-  m_treeKLM -> Branch("isSignal",                 & m_isSignal);
-
+    m_treeKLM -> Branch("KLMECLHypo",              & m_KLMECLHypo);
+    m_treeKLM -> Branch("KLMECLZMVA",              & m_KLMECLZMVA);
+    m_treeKLM -> Branch("KLMECLZ40",               & m_KLMECLZ40);
+    m_treeKLM -> Branch("KLMECLZ51",               & m_KLMECLZ51);
+    m_treeKLM -> Branch("KLMECLUncertaintyPhi",    & m_KLMECLUncertaintyPhi);
+    m_treeKLM -> Branch("KLMECLUncertaintyTheta",  & m_KLMECLUncertaintyTheta);
+    m_treeKLM -> Branch("KLMdistToNextECL",        & m_KLMECLDist);
+    m_treeKLM -> Branch("KLMtrackToECL",           & m_KLMtrackToECL);
+    m_treeKLM -> Branch("KLMECLEerror",            & m_KLMECLEerror);
+    m_treeKLM -> Branch("KLMECLenergy",            & m_KLMECLE);
+    m_treeKLM -> Branch("KLMECLE9oE25",            & m_KLMECLE9oE25);
+    m_treeKLM -> Branch("KLMECLtiming",            & m_KLMECLTiming);
+    m_treeKLM -> Branch("KLMECLTerror",            & m_KLMECLTerror);
+    m_treeKLM -> Branch("KLMECLdeltaL",            & m_KLMECLdeltaL);
+    m_treeKLM -> Branch("KLMECLmintrackDist",      & m_KLMECLminTrackDist);
+    m_treeKLM -> Branch("KLMTrackSepDist",         & m_KLMTrackSepDist);
+    m_treeKLM -> Branch("KLMTrackSepAngle",        & m_KLMTrackSepAngle);
+    m_treeKLM -> Branch("KLMInitialtrackSepAngle", & m_KLMInitialTrackSepAngle);
+    m_treeKLM -> Branch("KLMTrackRotationAngle",   & m_KLMTrackRotationAngle);
+    m_treeKLM -> Branch("KLMTrackClusterSepAngle", & m_KLMTrackClusterSepAngle);
+    m_treeKLM -> Branch("isBeamBKG",               & m_isBeamBKG);
+    m_treeKLM -> Branch("KLMKlId",                 & m_KLMKLid);
+    m_treeKLM -> Branch("KLMAngleToMC",            & m_KLMAngleToMC);
+    m_treeKLM -> Branch("KLMMCWeight",             & m_KLMMCWeight);
+    m_treeKLM -> Branch("KLMgenfitDist",           & m_KLMgenfitDist);
+    m_treeKLM -> Branch("KLMtrackFlag",            & m_KLMtrackFlag);
+    m_treeKLM -> Branch("KLMeclFlag",              & m_KLMeclFlag);
+    m_treeKLM -> Branch("isSignal",                & m_isSignal);
+  }//useKLM
 
   //ECL
-  m_treeECLhadron -> Branch("ECLMCMom",             & m_ECLMCMom);
-  m_treeECLhadron -> Branch("ECLMCPhi",             & m_ECLMCPhi);
-  m_treeECLhadron -> Branch("ECLMCLifetime",        & m_ECLMCLifetime);
-  m_treeECLhadron -> Branch("ECLMCPDG",             & m_ECLMCPDG);
-  m_treeECLhadron -> Branch("ECLMCTheta",           & m_ECLMCTheta);
-  m_treeECLhadron -> Branch("ECLMCLifetime",        & m_ECLMCLifetime);
-  m_treeECLhadron -> Branch("ECLMCPDG",             & m_ECLMCPDG);
-  m_treeECLhadron -> Branch("ECLMCStatus",          & m_ECLMCStatus);
-  m_treeECLhadron -> Branch("ECLMCPrimaryPDG",      & m_ECLMCPrimaryPDG);
-  m_treeECLhadron -> Branch("ECLUncertaintyEnergy", & m_ECLUncertaintyEnergy);
-  m_treeECLhadron -> Branch("ECLUncertaintyTheta",  & m_ECLUncertaintyTheta);
-  m_treeECLhadron -> Branch("ECLUncertaintyPhi",    & m_ECLUncertaintyPhi);
-  m_treeECLhadron -> Branch("ECLMom",               & m_ECLMom);
-  m_treeECLhadron -> Branch("ECLPhi",               & m_ECLPhi);
-  m_treeECLhadron -> Branch("ECLTheta",             & m_ECLTheta);
-  m_treeECLhadron -> Branch("ECLZ",                 & m_ECLZ);
-  m_treeECLhadron -> Branch("ECLenergy",            & m_ECLE);
-  m_treeECLhadron -> Branch("ECLE9oE25",            & m_ECLE9oE25);
-  m_treeECLhadron -> Branch("ECLtiming",            & m_ECLTiming);
-  m_treeECLhadron -> Branch("ECLR",                 & m_ECLR);
-  m_treeECLhadron -> Branch("ECLTruth",             & m_ECLTruth);
-  m_treeECLhadron -> Branch("ECLZ51",               & m_ECLZ51);
-  m_treeECLhadron -> Branch("ECLZ40",               & m_ECLZ40);
-  m_treeECLhadron -> Branch("ECLE1oE9",             & m_ECLE1oE9);
-  m_treeECLhadron -> Branch("ECL2ndMom",            & m_ECL2ndMom);
-  m_treeECLhadron -> Branch("ECLnumChrystals",      & m_ECLnumChrystals);
-  m_treeECLhadron -> Branch("ECLLAT",               & m_ECLLAT);
-  m_treeECLhadron -> Branch("ECLZMVA",              & m_ECLZMVA);
-  m_treeECLhadron -> Branch("ECLKlId",              & m_ECLKLid);
-  m_treeECLhadron -> Branch("ECLdeltaL",            & m_ECLdeltaL);
-  m_treeECLhadron -> Branch("ECLmintrackDist",      & m_ECLminTrkDistance);
-  m_treeECLhadron -> Branch("isBeamBKG",            & m_isBeamBKG);
-  m_treeECLhadron -> Branch("ECLMCWeight",          & m_ECLMCWeight);
-  m_treeECLhadron -> Branch("isSignal",                 & m_isSignal);
+  if (m_useECL) {
+    m_treeECLhadron = new TTree("ECLdataHadron", "ECLdataHadron");
+    m_treeECLgamma = new TTree("ECLdataGamma", "ECLdataGamma");
+
+    m_treeECLhadron -> Branch("ECLMCMom",             & m_ECLMCMom);
+    m_treeECLhadron -> Branch("ECLMCPhi",             & m_ECLMCPhi);
+    m_treeECLhadron -> Branch("ECLMCLifetime",        & m_ECLMCLifetime);
+    m_treeECLhadron -> Branch("ECLMCPDG",             & m_ECLMCPDG);
+    m_treeECLhadron -> Branch("ECLMCTheta",           & m_ECLMCTheta);
+    m_treeECLhadron -> Branch("ECLMCLifetime",        & m_ECLMCLifetime);
+    m_treeECLhadron -> Branch("ECLMCPDG",             & m_ECLMCPDG);
+    m_treeECLhadron -> Branch("ECLMCStatus",          & m_ECLMCStatus);
+    m_treeECLhadron -> Branch("ECLMCPrimaryPDG",      & m_ECLMCPrimaryPDG);
+    m_treeECLhadron -> Branch("ECLUncertaintyEnergy", & m_ECLUncertaintyEnergy);
+    m_treeECLhadron -> Branch("ECLUncertaintyTheta",  & m_ECLUncertaintyTheta);
+    m_treeECLhadron -> Branch("ECLUncertaintyPhi",    & m_ECLUncertaintyPhi);
+    m_treeECLhadron -> Branch("ECLMom",               & m_ECLMom);
+    m_treeECLhadron -> Branch("ECLPhi",               & m_ECLPhi);
+    m_treeECLhadron -> Branch("ECLTheta",             & m_ECLTheta);
+    m_treeECLhadron -> Branch("ECLZ",                 & m_ECLZ);
+    m_treeECLhadron -> Branch("ECLenergy",            & m_ECLE);
+    m_treeECLhadron -> Branch("ECLE9oE25",            & m_ECLE9oE25);
+    m_treeECLhadron -> Branch("ECLtiming",            & m_ECLTiming);
+    m_treeECLhadron -> Branch("ECLR",                 & m_ECLR);
+    m_treeECLhadron -> Branch("ECLTruth",             & m_ECLTruth);
+    m_treeECLhadron -> Branch("ECLZ51",               & m_ECLZ51);
+    m_treeECLhadron -> Branch("ECLZ40",               & m_ECLZ40);
+    m_treeECLhadron -> Branch("ECLE1oE9",             & m_ECLE1oE9);
+    m_treeECLhadron -> Branch("ECL2ndMom",            & m_ECL2ndMom);
+    m_treeECLhadron -> Branch("ECLnumChrystals",      & m_ECLnumChrystals);
+    m_treeECLhadron -> Branch("ECLLAT",               & m_ECLLAT);
+    m_treeECLhadron -> Branch("ECLZMVA",              & m_ECLZMVA);
+    m_treeECLhadron -> Branch("ECLKlId",              & m_ECLKLid);
+    m_treeECLhadron -> Branch("ECLdeltaL",            & m_ECLdeltaL);
+    m_treeECLhadron -> Branch("ECLmintrackDist",      & m_ECLminTrkDistance);
+    m_treeECLhadron -> Branch("isBeamBKG",            & m_isBeamBKG);
+    m_treeECLhadron -> Branch("ECLMCWeight",          & m_ECLMCWeight);
+    m_treeECLhadron -> Branch("isSignal",             & m_isSignal);
 
 
-  m_treeECLgamma -> Branch("ECLMCMom",             & m_ECLMCMom);
-  m_treeECLgamma -> Branch("ECLMCPhi",             & m_ECLMCPhi);
-  m_treeECLgamma -> Branch("ECLMCTheta",           & m_ECLMCTheta);
-  m_treeECLgamma -> Branch("ECLMCLifetime",        & m_ECLMCLifetime);
-  m_treeECLgamma -> Branch("ECLMCPDG",             & m_ECLMCPDG);
-  m_treeECLgamma -> Branch("ECLMCStatus",          & m_ECLMCStatus);
-  m_treeECLgamma -> Branch("ECLMCPrimaryPDG",      & m_ECLMCPrimaryPDG);
-  m_treeECLgamma -> Branch("ECLUncertaintyEnergy", & m_ECLUncertaintyEnergy);
-  m_treeECLgamma -> Branch("ECLUncertaintyTheta",  & m_ECLUncertaintyTheta);
-  m_treeECLgamma -> Branch("ECLUncertaintyPhi",    & m_ECLUncertaintyPhi);
-  m_treeECLgamma -> Branch("ECLMom",               & m_ECLMom);
-  m_treeECLgamma -> Branch("ECLPhi",               & m_ECLPhi);
-  m_treeECLgamma -> Branch("ECLTheta",             & m_ECLTheta);
-  m_treeECLgamma -> Branch("ECLZ",                 & m_ECLZ);
-  m_treeECLgamma -> Branch("ECLenergy",            & m_ECLE);
-  m_treeECLgamma -> Branch("ECLE9oE25",            & m_ECLE9oE25);
-  m_treeECLgamma -> Branch("ECLtiming",            & m_ECLTiming);
-  m_treeECLgamma -> Branch("ECLR",                 & m_ECLR);
-  m_treeECLgamma -> Branch("ECLTruth",             & m_ECLTruth);
-  m_treeECLgamma -> Branch("ECLZ51",               & m_ECLZ51);
-  m_treeECLgamma -> Branch("ECLZ40",               & m_ECLZ40);
-  m_treeECLgamma -> Branch("ECLE1oE9",             & m_ECLE1oE9);
-  m_treeECLgamma -> Branch("ECL2ndMom",            & m_ECL2ndMom);
-  m_treeECLgamma -> Branch("ECLnumChrystals",      & m_ECLnumChrystals);
-  m_treeECLgamma -> Branch("ECLLAT",               & m_ECLLAT);
-  m_treeECLgamma -> Branch("ECLZMVA",              & m_ECLZMVA);
-  m_treeECLgamma -> Branch("ECLKlId",              & m_ECLKLid);
-  m_treeECLgamma -> Branch("ECLdeltaL",            & m_ECLdeltaL);
-  m_treeECLgamma -> Branch("ECLmintrackDist",      & m_ECLminTrkDistance);
-  m_treeECLgamma -> Branch("isBeamBKG",            & m_isBeamBKG);
-  m_treeECLgamma -> Branch("ECLMCWeight",          & m_ECLMCWeight);
-  m_treeECLgamma -> Branch("isSignal",                 & m_isSignal);
-
+    m_treeECLgamma -> Branch("ECLMCMom",             & m_ECLMCMom);
+    m_treeECLgamma -> Branch("ECLMCPhi",             & m_ECLMCPhi);
+    m_treeECLgamma -> Branch("ECLMCTheta",           & m_ECLMCTheta);
+    m_treeECLgamma -> Branch("ECLMCLifetime",        & m_ECLMCLifetime);
+    m_treeECLgamma -> Branch("ECLMCPDG",             & m_ECLMCPDG);
+    m_treeECLgamma -> Branch("ECLMCStatus",          & m_ECLMCStatus);
+    m_treeECLgamma -> Branch("ECLMCPrimaryPDG",      & m_ECLMCPrimaryPDG);
+    m_treeECLgamma -> Branch("ECLUncertaintyEnergy", & m_ECLUncertaintyEnergy);
+    m_treeECLgamma -> Branch("ECLUncertaintyTheta",  & m_ECLUncertaintyTheta);
+    m_treeECLgamma -> Branch("ECLUncertaintyPhi",    & m_ECLUncertaintyPhi);
+    m_treeECLgamma -> Branch("ECLMom",               & m_ECLMom);
+    m_treeECLgamma -> Branch("ECLPhi",               & m_ECLPhi);
+    m_treeECLgamma -> Branch("ECLTheta",             & m_ECLTheta);
+    m_treeECLgamma -> Branch("ECLZ",                 & m_ECLZ);
+    m_treeECLgamma -> Branch("ECLenergy",            & m_ECLE);
+    m_treeECLgamma -> Branch("ECLE9oE25",            & m_ECLE9oE25);
+    m_treeECLgamma -> Branch("ECLtiming",            & m_ECLTiming);
+    m_treeECLgamma -> Branch("ECLR",                 & m_ECLR);
+    m_treeECLgamma -> Branch("ECLTruth",             & m_ECLTruth);
+    m_treeECLgamma -> Branch("ECLZ51",               & m_ECLZ51);
+    m_treeECLgamma -> Branch("ECLZ40",               & m_ECLZ40);
+    m_treeECLgamma -> Branch("ECLE1oE9",             & m_ECLE1oE9);
+    m_treeECLgamma -> Branch("ECL2ndMom",            & m_ECL2ndMom);
+    m_treeECLgamma -> Branch("ECLnumChrystals",      & m_ECLnumChrystals);
+    m_treeECLgamma -> Branch("ECLLAT",               & m_ECLLAT);
+    m_treeECLgamma -> Branch("ECLZMVA",              & m_ECLZMVA);
+    m_treeECLgamma -> Branch("ECLKlId",              & m_ECLKLid);
+    m_treeECLgamma -> Branch("ECLdeltaL",            & m_ECLdeltaL);
+    m_treeECLgamma -> Branch("ECLmintrackDist",      & m_ECLminTrkDistance);
+    m_treeECLgamma -> Branch("isBeamBKG",            & m_isBeamBKG);
+    m_treeECLgamma -> Branch("ECLMCWeight",          & m_ECLMCWeight);
+    m_treeECLgamma -> Branch("isSignal",                 & m_isSignal);
+  }//useECL
 }//init
 
 
@@ -217,6 +228,8 @@ void DataWriterModule::event()
 
   for (const KLMCluster& cluster : klmClusters) {
 
+    if (!m_useKLM) {continue;}
+
     const TVector3& clusterPos = cluster.getClusterPosition();
 
     m_KLMPhi                         = clusterPos.Phi();
@@ -230,25 +243,33 @@ void DataWriterModule::event()
     m_KLMinvM                        = cluster.getMomentum().M2();
     m_KLMenergy                      = cluster.getEnergy();
     m_KLMhitDepth                    = cluster.getClusterPosition().Mag2();
+    m_KLMtrackFlag                   = cluster.getAssociatedTrackFlag();
+    m_KLMeclFlag                     = cluster.getAssociatedEclClusterFlag();
 
-
-    TrackClusterSeparation* trackSep = cluster.getRelatedTo<TrackClusterSeparation>();
-    if (trackSep) {
-      m_KLMTrackSepDist                = trackSep->getDistance();
-      m_KLMTrackSepAngle               = trackSep->getTrackClusterAngle();
-
-      m_KLMInitialTrackSepAngle        = trackSep->getTrackClusterInitialSeparationAngle();
-      m_KLMTrackRotationAngle          = trackSep->getTrackRotationAngle();
-      m_KLMTrackClusterSepAngle        = trackSep->getTrackClusterSeparationAngle();
-    } else {
-      m_KLMTrackSepDist         = -999;
-      m_KLMTrackSepAngle        = -999;
-      m_KLMInitialTrackSepAngle = -999;
-      m_KLMTrackRotationAngle   = -999;
-      m_KLMTrackClusterSepAngle = -999;
+    m_KLMTrackSepDist         = -999;
+    m_KLMTrackSepAngle        = -999;
+    m_KLMInitialTrackSepAngle = -999;
+    m_KLMTrackRotationAngle   = -999;
+    m_KLMTrackClusterSepAngle = -999;
+    auto trackSeperations = cluster.getRelationsTo<TrackClusterSeparation>();
+    TrackClusterSeparation* trackSep;
+    float best_dist = 100000000;
+    float dist;
+    for (auto trackSeperation :  trackSeperations) {
+      dist = trackSeperation.getDistance();
+      if (dist < best_dist) {
+        best_dist = dist;
+        trackSep = &trackSeperation;
+        m_KLMTrackSepDist                = trackSep->getDistance();
+        m_KLMTrackSepAngle               = trackSep->getTrackClusterAngle();
+        m_KLMInitialTrackSepAngle        = trackSep->getTrackClusterInitialSeparationAngle();
+        m_KLMTrackRotationAngle          = trackSep->getTrackRotationAngle();
+        m_KLMTrackClusterSepAngle        = trackSep->getTrackClusterSeparationAngle();
+      }
     }
 
-
+    std::tuple < RecoTrack*, double, std::unique_ptr<const TVector3> > closestTrack = findClosestTrack(clusterPos, 3.14);
+    m_KLMgenfitDist = get<1>(closestTrack);
 
 
     if (isnan(m_KLMglobalZ))              { m_KLMglobalZ              = -999;}
@@ -363,6 +384,7 @@ void DataWriterModule::event()
 // ---------------   ECL CLUSTERS
   for (const ECLCluster& cluster : eclClusters) {
 
+    if (!m_useECL) {continue;}
 
     m_ECLminTrkDistance = cluster.getMinTrkDistance();
     m_ECLdeltaL         = cluster.getDeltaL();
@@ -455,9 +477,11 @@ void DataWriterModule::terminate()
 {
   // close root files
   m_f                 -> cd();
-  m_treeKLM           -> Write();
-  m_treeECLhadron     -> Write();
-  m_treeECLgamma      -> Write();
+  if (m_useKLM) { m_treeKLM -> Write();}
+  if (m_useECL) {
+    m_treeECLhadron     -> Write();
+    m_treeECLgamma      -> Write();
+  }
   m_f                 -> Close();
 }
 

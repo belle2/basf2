@@ -59,7 +59,7 @@ def upload_trigger_menu_to_db(base_identifier, cut_identifiers, accept_mode=Fals
     db_handler.uploadTriggerMenu(base_identifier, cut_identifiers, accept_mode, iov)
 
 
-def download_cut_from_db(base_name, cut_name, not_set_event_number=False):
+def download_cut_from_db(base_name, cut_name, do_set_event_number=True):
     """
     Python function to download a cut from the database. As each cut is uniquely identified by a
     base and a cut name, you have to give in both here.
@@ -68,12 +68,12 @@ def download_cut_from_db(base_name, cut_name, not_set_event_number=False):
     python file to set the event number correctly nevertheless.
     :param base_name: the base name of the cut
     :param cut_name: the specific name of the cut
-    :param not_set_event_number: it is important to always have a proper event number set for the database to work.
+    :param do_set_event_number: it is important to always have a proper event number set for the database to work.
         This is why this functions sets the event number in all cases to (1, 0, 0). If you want to prevent this
-        (because you maybe want to use another event number), set this flag to True.
+        (because you maybe want to use another event number), set this flag to False.
     :return: the downloaded cut or None, if the name can not be found.
     """
-    if not not_set_event_number:
+    if do_set_event_number:
         set_event_number(1, 0, 0)
 
     db_handler = Belle2.SoftwareTrigger.SoftwareTriggerDBHandler
@@ -83,7 +83,7 @@ def download_cut_from_db(base_name, cut_name, not_set_event_number=False):
     return result
 
 
-def download_trigger_menu_from_db(base_name, not_set_event_number=False):
+def download_trigger_menu_from_db(base_name, do_set_event_number=True):
     """
     Python function to download a trigger menu from the database. As each trigger menu is uniquely identified by a
     base name, you have to give here.
@@ -91,12 +91,12 @@ def download_trigger_menu_from_db(base_name, not_set_event_number=False):
     this function in a basf2 module environment, you can use the set_event_number function in this
     python file to set the event number correctly nevertheless.
     :param base_name: the base name of the menu
-    :param not_set_event_number: it is important to always have a proper event number set for the database to work.
+    :param do_set_event_number: it is important to always have a proper event number set for the database to work.
         This is why this functions sets the event number in all cases to (1, 0, 0). If you want to prevent this
-        (because you maybe want to use another event number), set this flag to True.
+        (because you maybe want to use another event number), set this flag to False.
     :return: the downloaded cut or None, if the name can not be found.
     """
-    if not not_set_event_number:
+    if do_set_event_number:
         set_event_number(1, 0, 0)
 
     db_handler = Belle2.SoftwareTrigger.SoftwareTriggerDBHandler

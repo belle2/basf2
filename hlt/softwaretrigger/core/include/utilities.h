@@ -18,5 +18,14 @@ namespace Belle2 {
 
     /// Helper function to do a prescaling using a random integer number and the list of prescaling factors from the object.
     bool makePreScale(const std::vector<unsigned int>& preScaleFactors);
+
+    /**
+     * Calculate the final cut decision using all "total_results" of all sub triggers in the software trigger
+     * (fast reco and HLT). The return value is a bool, which has the values accept (true) and reject (false):
+     * * accept if and only if both the fast_reco and the HLT has accepted the event or (in the case HLT was not
+     *   already evaluated) fast_reco accepted the event. The event is also accepted if none of the triggers have run.
+     * * reject if fast_reco or HLT rejected the event
+     */
+    bool getFinalTriggerDecision(const SoftwareTriggerResult& result);
   }
 }

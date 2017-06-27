@@ -12,6 +12,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <TRandom.h>
+#include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 
 namespace Belle2 {
   namespace SoftwareTrigger {
@@ -81,6 +82,20 @@ namespace Belle2 {
 
         return makePreScale(preScaleFactors[index]);
       }
+    }
+
+    bool getFinalTriggerDecision(const SoftwareTriggerResult& result)
+    {
+      for (const auto& cutResultWithName : result.getResults()) {
+        const std::string& resultName = cutResultWithName.first;
+        const SoftwareTriggerCutResult& cutResult = static_cast<SoftwareTriggerCutResult>(cutResultWithName.second);
+
+        if (SoftwareTriggerDBHandler::isTotalCutName(resultName) and cutResult == SoftwareTriggerCutResult ::c_reject) {
+          return false;
+        }
+      }
+
+      return true;
     }
   }
 }

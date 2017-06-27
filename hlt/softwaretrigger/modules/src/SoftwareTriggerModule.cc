@@ -157,31 +157,27 @@ void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject
     }
   }
 
-  SoftwareTriggerCutResult totalResult;
+  SoftwareTriggerCutResult moduleResult;
 
   if (m_dbHandler->getAcceptOverridesReject()) {
     if (hasOneAcceptCut or (not hasOneRejectCut)) {
-      totalResult = SoftwareTriggerCutResult::c_accept;
+      moduleResult = SoftwareTriggerCutResult::c_accept;
     } else {
-      totalResult = SoftwareTriggerCutResult::c_reject;
+      moduleResult = SoftwareTriggerCutResult::c_reject;
     }
   } else {
     if (hasOneAcceptCut and (not hasOneRejectCut)) {
-      totalResult = SoftwareTriggerCutResult::c_accept;
+      moduleResult = SoftwareTriggerCutResult::c_accept;
     } else {
-      totalResult = SoftwareTriggerCutResult::c_reject;
+      moduleResult = SoftwareTriggerCutResult::c_reject;
     }
   }
 
-  const std::string& totalResultIdentifier = SoftwareTriggerDBHandler::makeFullCutName(m_param_baseIdentifier,
-                                             "total_result");
-  m_resultStoreObjectPointer->addResult(totalResultIdentifier, totalResult);
+  const std::string& totalResultIdentifier = SoftwareTriggerDBHandler::makeTotalCutName(m_param_baseIdentifier);
+  m_resultStoreObjectPointer->addResult(totalResultIdentifier, moduleResult);
 
-  if (totalResult == SoftwareTriggerCutResult::c_reject) {
-    setReturnValue(0);
-  } else {
-    setReturnValue(1);
-  }
+  bool totalResult = getFinalTriggerDecision(*m_resultStoreObjectPointer);
+  setReturnValue(totalResult);
 }
 
 void SoftwareTriggerModule::makeDebugOutput()

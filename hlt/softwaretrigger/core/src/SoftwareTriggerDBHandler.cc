@@ -10,6 +10,8 @@
 #include <framework/database/DBImportObjPtr.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 
+#include <boost/algorithm/string/predicate.hpp>
+
 namespace Belle2 {
   namespace SoftwareTrigger {
     const std::string SoftwareTriggerDBHandler::s_dbPackageIdentifier = "software_trigger_cut";
@@ -21,6 +23,16 @@ namespace Belle2 {
       assert(cutIdentifier.find("&") == std::string::npos);
 
       return s_dbPackageIdentifier + "&" + baseCutIdentifier + "&" + cutIdentifier;
+    }
+
+    std::string SoftwareTriggerDBHandler::makeTotalCutName(const std::string& baseIdentifier)
+    {
+      return makeFullCutName(baseIdentifier, "total_result");
+    }
+
+    bool SoftwareTriggerDBHandler::isTotalCutName(const std::string& name)
+    {
+      return boost::algorithm::ends_with(name, "total_result");
     }
 
     std::string SoftwareTriggerDBHandler::makeFullTriggerMenuName(const std::string& baseIdentifier)

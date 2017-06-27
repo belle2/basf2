@@ -49,6 +49,26 @@ namespace Belle2 {
                                          const std::string& cutIdentifier);
 
       /**
+       * Handy function to create the cut name related to the total cut result of a specific
+       * trigger stage (either fast_reco, hlt or calib) in the stored results. It is in the form
+       *   <package_identifier>&<base_name>&total_result
+       *
+       * @param baseIdentifier The baseIdentifier (either fast_reco, calib or hlt)
+       * @return then name.
+       */
+      static std::string makeTotalCutName(const std::string& baseIdentifier);
+
+      /**
+       * Returns true, of the given name (in the form <package_identifier>&<base_name>&<cut_name>)
+       * is a total result name, as it would be produced with the function makeTotalCutName.
+       *
+       * In principle, it just tests if the form is correct and the cut name is total_result.
+       * @param name The name to test
+       * @return true, if the cut is a total result cut
+       */
+      static bool isTotalCutName(const std::string& name);
+
+      /**
        * Helper function to compile the full menu identifier from the base name.
        * The full name is then created as:
        *  <package_identifier>&<base_name>

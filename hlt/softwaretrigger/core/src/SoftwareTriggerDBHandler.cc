@@ -15,6 +15,7 @@
 namespace Belle2 {
   namespace SoftwareTrigger {
     const std::string SoftwareTriggerDBHandler::s_dbPackageIdentifier = "software_trigger_cut";
+    const std::string SoftwareTriggerDBHandler::s_totalResultIdentifier = "total_result";
 
     std::string SoftwareTriggerDBHandler::makeFullCutName(const std::string& baseCutIdentifier,
                                                           const std::string& cutIdentifier)
@@ -27,12 +28,12 @@ namespace Belle2 {
 
     std::string SoftwareTriggerDBHandler::makeTotalCutName(const std::string& baseIdentifier)
     {
-      return makeFullCutName(baseIdentifier, "total_result");
+      return makeFullCutName(baseIdentifier, s_totalResultIdentifier);
     }
 
     bool SoftwareTriggerDBHandler::isTotalCutName(const std::string& name)
     {
-      return boost::algorithm::ends_with(name, "total_result");
+      return boost::algorithm::ends_with(name, s_totalResultIdentifier);
     }
 
     std::string SoftwareTriggerDBHandler::makeFullTriggerMenuName(const std::string& baseIdentifier)
@@ -45,8 +46,8 @@ namespace Belle2 {
     void SoftwareTriggerDBHandler::upload(const std::unique_ptr<SoftwareTriggerCut>& cut, const std::string& baseCutIdentifier,
                                           const std::string& cutIdentifier, const IntervalOfValidity& iov)
     {
-      B2ASSERT("The name total_result is already used for the total result of each trigger stage. "
-               "You can not create a cut with the same name.", cutIdentifier != "total_result");
+      B2ASSERT("The name " << s_totalResultIdentifier << " is already used for the total result of each trigger stage. "
+               "You can not create a cut with the same name.", cutIdentifier != s_totalResultIdentifier);
       const std::string& fullCutName = makeFullCutName(baseCutIdentifier, cutIdentifier);
       DBImportObjPtr<DBRepresentationOfSoftwareTriggerCut> cutToUpload(fullCutName);
       cutToUpload.construct(cut);

@@ -35,8 +35,10 @@ namespace Belle2 {
      */
     class SoftwareTriggerDBHandler {
     public:
-      /// Common suffix to identify all software trigger cuts in the database.
+      /// Common prefix to identify all software trigger cuts in the database.
       static const std::string s_dbPackageIdentifier;
+      /// Common suffix to identify all total results in the stored results.
+      static const std::string s_totalResultIdentifier;
 
       /**
        * Helper function to compile the full identifier from the base and the specific cut name.

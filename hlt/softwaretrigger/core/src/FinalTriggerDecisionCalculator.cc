@@ -14,11 +14,15 @@ namespace Belle2 {
   namespace SoftwareTrigger {
     bool FinalTriggerDecisionCalculator::getFinalTriggerDecision(const SoftwareTriggerResult& result)
     {
+      const std::string& fastRecoTotalResultName = SoftwareTriggerDBHandler::makeTotalCutName("fast_reco");
+      const std::string& hltTotalResultName = SoftwareTriggerDBHandler::makeTotalCutName("hlt");
+
       for (const auto& cutResultWithName : result.getResults()) {
         const std::string& resultName = cutResultWithName.first;
         const SoftwareTriggerCutResult& cutResult = static_cast<SoftwareTriggerCutResult>(cutResultWithName.second);
 
-        if (SoftwareTriggerDBHandler::isTotalCutName(resultName) and cutResult == SoftwareTriggerCutResult ::c_reject) {
+        if ((resultName == fastRecoTotalResultName or resultName == hltTotalResultName)
+            and cutResult == SoftwareTriggerCutResult::c_reject) {
           return false;
         }
       }

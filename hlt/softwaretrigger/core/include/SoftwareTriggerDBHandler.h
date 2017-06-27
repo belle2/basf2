@@ -61,16 +61,6 @@ namespace Belle2 {
       static std::string makeTotalCutName(const std::string& baseIdentifier);
 
       /**
-       * Returns true, of the given name (in the form <package_identifier>&<base_name>&<cut_name>)
-       * is a total result name, as it would be produced with the function makeTotalCutName.
-       *
-       * In principle, it just tests if the form is correct and the cut name is total_result.
-       * @param name The name to test
-       * @return true, if the cut is a total result cut
-       */
-      static bool isTotalCutName(const std::string& name);
-
-      /**
        * Helper function to compile the full menu identifier from the base name.
        * The full name is then created as:
        *  <package_identifier>&<base_name>

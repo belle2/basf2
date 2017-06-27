@@ -31,11 +31,6 @@ namespace Belle2 {
       return makeFullCutName(baseIdentifier, s_totalResultIdentifier);
     }
 
-    bool SoftwareTriggerDBHandler::isTotalCutName(const std::string& name)
-    {
-      return boost::algorithm::ends_with(name, s_totalResultIdentifier);
-    }
-
     std::string SoftwareTriggerDBHandler::makeFullTriggerMenuName(const std::string& baseIdentifier)
     {
       assert(baseIdentifier.find("&") == std::string::npos);

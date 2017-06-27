@@ -400,7 +400,7 @@
 		<activeChipID>1</activeChipID>
 		<width  unit="mm">4</width>
 		<length unit="mm">31.500</length>
-		<height unit="mm">0.491</height>
+		<height unit="mm">0.691</height>
 	</Component>
 
 	<Component name="Clamp">

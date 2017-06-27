@@ -2,7 +2,28 @@ from ROOT import Belle2
 from softwaretrigger import SOFTWARE_TRIGGER_GLOBAL_TAG_NAME
 
 
-def upload_cut_to_db(software_trigger_cut, base_identifier, cut_identifier, iov=None):
+def list_to_vector(l):
+    """
+    Helper function to convert a python list into a std::vector of the same type.
+    Is not a very general and good method, but works for the different use cases in
+    the STM.
+    :param l: The list to convert
+    :return: A std::vector with the same content as the input list.
+    """
+    from ROOT import std
+    type_of_first_element = type(l[0]).__name__
+    if type_of_first_element == "str":
+        type_of_first_element = "string"
+
+    vec = std.vector(type_of_first_element)()
+
+    for x in l:
+        vec.push_back(x)
+
+    return vec
+
+
+def upload_cut_to_db(base_identifier, cut_identifier, cut_string, prescale_factor=1, reject_cut=False, iov=None):
     """
     Python function to upload the given software trigger cut to the database.
     Additional to the software trigger cut, the base- as well as the cut identifier
@@ -12,7 +33,13 @@ def upload_cut_to_db(software_trigger_cut, base_identifier, cut_identifier, iov=
     if not iov:
         iov = Belle2.IntervalOfValidity(0, 0, -1, -1)
 
-    db_handler = Belle2.SoftwareTrigger.SoftwareTriggerDBHandler()
+    if isinstance(prescale_factor, list):
+        prescale_factor = list_to_vector(prescale_factor)
+
+    db_handler = Belle2.SoftwareTrigger.SoftwareTriggerDBHandler
+    software_trigger_cut = Belle2.SoftwareTrigger.SoftwareTriggerCut.compile(
+        cut_string, prescale_factor, reject_cut)
+
     db_handler.upload(software_trigger_cut, base_identifier, cut_identifier, iov)
 
 
@@ -33,7 +60,7 @@ def download_cut_from_db(base_name, cut_name, not_set_event_number=False):
     if not not_set_event_number:
         set_event_number(1, 0, 0)
 
-    db_handler = Belle2.SoftwareTrigger.SoftwareTriggerDBHandler()
+    db_handler = Belle2.SoftwareTrigger.SoftwareTriggerDBHandler
     return db_handler.download(base_name, cut_name)
 
 

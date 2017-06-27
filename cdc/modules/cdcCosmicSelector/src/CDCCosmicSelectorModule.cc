@@ -72,7 +72,9 @@ void CDCCosmicSelectorModule::event()
   for (int iMCPs = 0; iMCPs < nMCPs; ++iMCPs) {
     MCParticle* m_P = mcParticles[iMCPs];
 
-    if (abs(m_P->getPDG()) != 13) B2FATAL("Not muon !");
+    if (abs(m_P->getPDG()) != 13) {
+      break;
+    }
 
     const TVector3 vertex = m_P->getProductionVertex();
     const double vX0 = vertex.X();

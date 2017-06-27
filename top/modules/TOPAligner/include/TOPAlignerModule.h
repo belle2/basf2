@@ -73,7 +73,7 @@ namespace Belle2 {
     int m_maxFails = 100;         /**< maximum allowed number of failed iterations */
     int m_countFails = 0;         /**< counter for failed iterations */
 
-    std::vector<TOP::TOPalign> m_align; /**< alignment objects (one per module) */
+    TOP::TOPalign m_align = TOP::TOPalign(m_targetMid);       /**< alignment object (consider just one module at a time) */
 
     // output file
 

@@ -41,6 +41,7 @@ namespace Belle2 {
 
   REG_MODULE(TOPAligner)
 
+
   //-----------------------------------------------------------------
   //                 Implementation
   //-----------------------------------------------------------------
@@ -68,6 +69,8 @@ namespace Belle2 {
 
   TOPAlignerModule::~TOPAlignerModule()
   {
+    if (m_file) delete m_file;
+    if (m_alignTree) delete m_alignTree;
   }
 
   void TOPAlignerModule::initialize()
@@ -77,6 +80,15 @@ namespace Belle2 {
 
     if (m_targetMid < 1 || m_targetMid > 16)
       B2FATAL("Target ModuleId is not correctly set, use targetModule in [1, 16]. Exiting...");
+
+
+    // check if target module ID is valid
+
+    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+    if (!geo->isModuleIDValid(m_targetMid))
+      B2FATAL("Target module " << m_targetMid << " is invalid. Exiting...");
+
+    m_align = TOPalign(m_targetMid);
 
 
     // input
@@ -89,17 +101,6 @@ namespace Belle2 {
 
     StoreArray<ExtHit> extHits;
     extHits.isRequired();
-
-    // Configure TOP detector
-
-    TOPconfigure config;
-
-    // Construct alignment objects (vector index == moduleID - 1)
-
-    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-    for (unsigned i = 0; i < geo->getNumModules(); i++) {
-      m_align.push_back(TOPalign(i + 1));
-    }
 
 
     // set counter for failed iterations:
@@ -154,48 +155,41 @@ namespace Belle2 {
       if (!trk.isValid()) continue;
 
       // do iteration
-      unsigned i = trk.getModuleID() - 1;
+      int i = trk.getModuleID() - 1;
 
       // skip if moduleID != target module
       if (m_targetMid != (i + 1)) continue;
 
-      if (i < m_align.size()) {
-        auto& align = m_align[i];
-        int err = align.iterate(trk, Const::muon);
+      auto& align = m_align;
+      int err = align.iterate(trk, Const::muon);
 
-        // check number of consecutive failures, and in case reset
+      // check number of consecutive failures, and in case reset
 
-        if (err == 0) m_countFails = 0;
-        else if (m_countFails <= m_maxFails) m_countFails++;
-        else {
-          B2INFO("Reached maximum allowed number of failed iterations. Resetting TOPalign object(s)");
-
-          const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-          for (unsigned i = 0; i < geo->getNumModules(); i++) {
-            m_align.at(i) = TOPalign(i + 1);
-          }
-          m_countFails = 0;
-        }
-
-        const std::vector<float>& curPars = align.getParameters();
-
-        m_ntrk = align.getNumTracks();
-        m_errorCode = err;
-        m_vAlignPars = curPars;
-
-        B2INFO("M=" << align.getModuleID() << " ntr=" << m_ntrk << " err=" << m_errorCode << " v=" << align.isValid()
-               << " " << curPars.at(0)
-               << " " << curPars.at(1)
-               << " " << curPars.at(2)
-               << " " << curPars.at(3)
-               << " " << curPars.at(4)
-               << " " << curPars.at(5)
-               << " " << curPars.at(6));
-
-        // fill output tree
-        m_alignTree->Fill();
-
+      if (err == 0) m_countFails = 0;
+      else if (m_countFails <= m_maxFails) m_countFails++;
+      else {
+        B2INFO("Reached maximum allowed number of failed iterations. Resetting TOPalign object(s)");
+        m_align = TOPalign(m_targetMid);
+        m_countFails = 0;
       }
+
+      const std::vector<float>& curPars = align.getParameters();
+
+      m_ntrk = align.getNumTracks();
+      m_errorCode = err;
+      m_vAlignPars = curPars;
+
+      B2INFO("M=" << align.getModuleID() << " ntr=" << m_ntrk << " err=" << m_errorCode << " v=" << align.isValid()
+             << " " << curPars.at(0)
+             << " " << curPars.at(1)
+             << " " << curPars.at(2)
+             << " " << curPars.at(3)
+             << " " << curPars.at(4)
+             << " " << curPars.at(5)
+             << " " << curPars.at(6));
+
+      // fill output tree
+      m_alignTree->Fill();
 
     }
 

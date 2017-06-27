@@ -268,7 +268,7 @@ def add_cosmics_generator(path, components=None,
     import cdc.cr as cosmics_setup
 
     if global_box_size is None:
-        global_box_size = [20, 20, 9]
+        global_box_size = [100, 100, 100]
     if accept_box is None:
         accept_box = [8, 8, 8]
     if keep_box is None:

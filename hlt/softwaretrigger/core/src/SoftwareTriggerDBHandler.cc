@@ -62,6 +62,18 @@ namespace Belle2 {
       }
     }
 
+    std::unique_ptr<SoftwareTriggerMenu>
+    SoftwareTriggerDBHandler::downloadTriggerMenu(const std::string& baseCutIdentifier)
+    {
+      const std::string& fullMenuName = makeFullTriggerMenuName(baseCutIdentifier);
+      DBObjPtr<SoftwareTriggerMenu> downloadedMenu(fullMenuName);
+      if (downloadedMenu) {
+        return std::unique_ptr<SoftwareTriggerMenu>(&(*downloadedMenu));
+      } else {
+        return std::unique_ptr<SoftwareTriggerMenu>();
+      }
+    }
+
     void SoftwareTriggerDBHandler::checkForChangedDBEntries()
     {
       // In case the whole trigger menu has changed, we start from scratch and reload all triggers.

@@ -1,4 +1,4 @@
-#include "ecl/utility/eclChannelMapper.h"
+#include "ecl/utility/ECLChannelMapper.h"
 #include <iostream>
 
 #include <fstream>

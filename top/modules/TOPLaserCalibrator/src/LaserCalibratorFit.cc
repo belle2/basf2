@@ -53,6 +53,15 @@ namespace Belle2 {
 
     LaserCalibratorFit::~LaserCalibratorFit()
     {
+      for (auto f : m_func) {
+        delete f;
+      }
+      m_func.clear();
+
+      for (auto h : m_hist) {
+        delete h;
+      }
+      m_hist.clear();
     }
 
 //initial TF1 of all channels in one slot
@@ -174,7 +183,9 @@ namespace Belle2 {
         }
       }
       otree->Write();
+      delete otree;
       file->Close();
+      delete file;
     }
 
 // single Gaussian fit

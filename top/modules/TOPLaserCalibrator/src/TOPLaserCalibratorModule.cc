@@ -151,6 +151,8 @@ namespace Belle2 {
           histo->Fill(digitTime);
         }
       }
+      simfile->Close();
+      delete simfile;
     }
 
     std::vector<TH1F*> v_histo;
@@ -158,7 +160,6 @@ namespace Belle2 {
       v_histo.push_back(m_histo[i]);
     }
 
-    //auto t0fit = new TOP::LaserCalibratorFit(m_barID); //class LaserCalibratorFit
     TOP::LaserCalibratorFit t0fit(m_barID);
     t0fit.setHist(v_histo); //set time hist vector
     t0fit.setFitMethod(m_fitMethod);

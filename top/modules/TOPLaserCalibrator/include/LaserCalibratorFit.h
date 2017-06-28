@@ -52,17 +52,50 @@ namespace Belle2 {
       ~LaserCalibratorFit();
 
       /**
-       * set hist and get fit results
+       * set time hist of all channels in one moduleID
+       * @param hist  time hist vector
        */
+      void setHist(std::vector<TH1F*> hist);
 
-      void setHist(std::vector<TH1F*> hist); /**< set time hist of all channels in one moduleID */
-      void setFitMethod(std::string method = "gauss") {m_fitMethod = method;} /**< gauss: single gaussian; cb: single Crystal Ball; cb2: double Crystal Ball */
-      void setFitRange(double xmin = -200, double xmax = 200) {m_xmin = xmin; m_xmax = xmax;} /**< fit range [xmin, xmax] */
-      int  fitChannel(unsigned channel); /**< fit a specific channel (0 - 511) */
+      /**
+      * set time fit function
+      * @param method  gauss: single gaussian; cb: single Crystal Ball; cb2: double Crystal Ball
+      */
+      void setFitMethod(std::string method = "gauss") {m_fitMethod = method;}
+
+      /**
+      * set x range in the fit
+      * @param xmin  lower x
+      * @param xmax  upper x
+      */
+      void setFitRange(double xmin = -200, double xmax = 200) {m_xmin = xmin; m_xmax = xmax;}
+
+      /**
+      * fit for a specific channel
+      * @param channel  a specific channel (0 - 511)
+      */
+      int  fitChannel(unsigned channel);
+
+      /**
+      * write fit result to a root file
+      * @param outfile  output file name
+      */
       void writeFile(std::string outfile); /**< write fitting results to a root file */
 
+      /**
+       * get the module ID in the fit
+       */
       int getModuleID() const {return m_moduleID;} /**< get moduleID in the fit */
+
+      /**
+       * get chi^2 in the fit
+       * @param channel  chi^2 for a channel
+       */
       double getFitChisq(unsigned channel); /**< get fit chi^2 for a channel */
+
+      /**
+       * get the fit method used in recent module
+       */
       std::string getFitMethod() const {return m_fitMethod;} /**< get fitting method */
 
     private:

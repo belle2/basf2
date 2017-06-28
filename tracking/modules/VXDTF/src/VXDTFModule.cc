@@ -2263,7 +2263,7 @@ void VXDTFModule::event()
     CALLGRIND_STOP_INSTRUMENTATION;
 #endif
   } catch (...) {
-    B2ERROR("Unexpected exception thown by Jakob and catched by Eugenio");
+    B2ERROR("VXDTF exception catched, skipping VXD track finding for this event.");
     //doing some cleanup
     B2DEBUG(1, "Doing some clean up!");
     for (PassData* currentPass : m_passSetupVector) {

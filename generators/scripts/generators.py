@@ -134,8 +134,9 @@ def add_continuum_generator(path, finalstate='', userdecfile=''):
     pythia_config = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/pythia_belle2.dat')
 
     #: user decay file
+    decay_user = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/dec_belle2_qqbar.dec')
     if userdecfile == '':
-        decay_user = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/dec_belle2_qqbar.dec')
+        pass
     else:
         B2INFO('Replacing default user decfile: ', userdecfile)
         decay_user = userdecfile

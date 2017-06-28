@@ -46,7 +46,7 @@ namespace Belle2 {
   public:
 
     //! Default constructor
-    BKLMGeometryPar() {}
+    BKLMGeometryPar() : TObject() {}
 
     //! Constructor using Gearbox
     explicit BKLMGeometryPar(const GearDir&);

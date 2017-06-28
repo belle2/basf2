@@ -33,15 +33,19 @@ namespace Belle2 {
      * Default constructor
      */
 
-    BKLMElectronicMapping(): m_version(0.0), m_copperId(0), m_slotId(0), m_laneId(0), m_axisId(0), m_isForward(0), m_sector(0),
-      m_layer(0), m_plane(0) {};
+    BKLMElectronicMapping(): TObject(), m_version(0.0), m_copperId(0), m_slotId(0), m_laneId(0), m_axisId(0),
+      m_isForward(0), m_sector(0), m_layer(0), m_plane(0) {};
 
     /**
      * Constructor
      */
 
     BKLMElectronicMapping(int version, int copperId, int slotId, int laneId, int axisId, int isForward, int sector, int layer,
-                          int plane) {m_version = version; m_copperId = copperId; m_slotId = slotId; m_laneId = laneId; m_axisId = axisId; m_isForward = isForward; m_sector = sector; m_layer = layer; m_plane = plane; };
+                          int plane)
+    {
+      TObject(), m_version = version; m_copperId = copperId; m_slotId = slotId; m_laneId = laneId; m_axisId = axisId;
+      m_isForward = isForward; m_sector = sector; m_layer = layer; m_plane = plane;
+    };
 
     /**
      * Destructor

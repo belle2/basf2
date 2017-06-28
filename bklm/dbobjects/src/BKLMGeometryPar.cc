@@ -16,7 +16,7 @@
 using namespace Belle2;
 using namespace std;
 
-BKLMGeometryPar::BKLMGeometryPar(const GearDir& content)
+BKLMGeometryPar::BKLMGeometryPar(const GearDir& content) : TObject()
 {
   read(content);
 }

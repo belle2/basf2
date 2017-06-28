@@ -17,6 +17,8 @@ from bitstring import BitArray
 import sys
 from operator import itemgetter
 import itertools
+import ast
+import operator as op
 
 if sys.version_info[0] < 3:
     from itertools import izip as zip
@@ -74,6 +76,26 @@ TSF{sl:d}_input({high2:d} downto {low2:d}) &
 signalsall = signalsnk + signalstsf2
 
 
+# supported operators
+operators = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul,
+             ast.Div: op.truediv, ast.Pow: op.pow, ast.USub: op.neg}
+
+
+def eval_expr(expr):
+    return eval_(ast.parse(expr, mode='eval').body)
+
+
+def eval_(node):
+    if isinstance(node, ast.Num):  # <number>
+        return node.n
+    elif isinstance(node, ast.BinOp):  # <left> <operator> <right>
+        return operators[type(node.op)](eval_(node.left), eval_(node.right))
+    elif isinstance(node, ast.UnaryOp):  # <operator> <operand> e.g., -1
+        return operators[type(node.op)](eval_(node.operand))
+    else:
+        raise TypeError(node)
+
+
 def makeAtlas(signals, evtsize):
     """
     Make bitmap from VHDL signal assignments.
@@ -93,8 +115,8 @@ def makeAtlas(signals, evtsize):
             if not dummy:
                 sig = re.match(r'(.+)\s*\((.+) downto (.+)\)', item.strip())
                 print('signal: ' + item.strip())
-                start = eval(sig.group(2))
-                stop = eval(sig.group(3))
+                start = eval_expr(sig.group(2))
+                stop = eval_expr(sig.group(3))
                 size = start - stop + 1
                 if size < 1:
                     raise ValueError('Vector size cannot be 0 or negative.')
@@ -142,9 +164,9 @@ def unpack(triggers, atlas, writer):
             for i, sig in enumerate(atlas):
                 if isUnamed(sig):
                     if dummycheck and '1' in values[i] and '0' in values[i]:
-                            print('[Warning] non-uniform dummy value detected at {}ns: {}'.format(
-                                    timestamp, sig[3] % sum(evtsize)))
-                            print(values[i])
+                        print('[Warning] non-uniform dummy value detected at {}ns: {}'.format(
+                            timestamp, sig[3] % sum(evtsize)))
+                        print(values[i])
                     continue
                 if values[i] != lastvalues[i]:
                     writer.change(vcdVars[i], timestamp, values[i])

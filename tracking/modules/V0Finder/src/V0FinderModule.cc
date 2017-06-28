@@ -134,14 +134,14 @@ void V0FinderModule::event()
   tracksMinus.reserve(nTracks);
 
   for (const auto& track : tracks) {
-    const TrackFitResult* tfr = track.getFirstValidTrackFitResult();
+    const RecoTrack* recoTrack = track.getRelated<RecoTrack>();
 
-    if (!tfr) {
-      B2WARNING("No TrackFitResult for track");
+    if (!recoTrack) {
+      B2WARNING("No RecoTrack for this track");
       continue;
     }
 
-    const double charge = tfr->getChargeSign();
+    const double charge = recoTrack->getChargeSeed();
     if (charge == +1) {
       tracksPlus.push_back(&track);
     } else {

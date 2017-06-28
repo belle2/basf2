@@ -168,8 +168,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   } catch (genfit::Exception) {
     B2DEBUG(100, "Hypotheses " << trackHypotheses.first.getPDGCode() << " not available. Taking default instead.");
     try {
-      stPlusPtr = &recoTrackPlus->getMeasuredStateOnPlaneFromFirstHit(recoTrackPlus->getCardinalRepresentation(),
-                  *recoTrackPlus));
+      stPlusPtr = &recoTrackPlus->getMeasuredStateOnPlaneFromFirstHit(recoTrackPlus->getCardinalRepresentation());
     } catch (genfit::Exception) {
       B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
       return false;
@@ -183,8 +182,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   } catch (genfit::Exception) {
     B2DEBUG(100, "Hypotheses " << trackHypotheses.second.getPDGCode() << " not available. Taking default instead.");
     try {
-      stMinusPtr = &recoTrackMinus->getMeasuredStateOnPlaneFromFirstHit(recoTrackMinus->getCardinalRepresentation(),
-                   *recoTrackMinus));
+      stMinusPtr = &recoTrackMinus->getMeasuredStateOnPlaneFromFirstHit(recoTrackMinus->getCardinalRepresentation());
     } catch (genfit::Exception) {
       B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
       return false;

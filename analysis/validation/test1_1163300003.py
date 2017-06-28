@@ -128,6 +128,8 @@ variables.addAlias('d1_d0_d0_mcPDG', 'daughter(1,daughter(0,daughter(0,mcPDG)))'
 variables.addAlias('d1_d0_d1_mcPDG', 'daughter(1,daughter(0,daughter(1,mcPDG)))')
 
 
+variables.addAlias('tau_eid', 'daughter(1,daughter(0,eid))')
+variables.addAlias('tau_muid', 'daughter(1,daughter(0,muid))')
 outputRootFile = 'dstarptaunuOutput.root'
 
 
@@ -297,8 +299,6 @@ tools4SB0Had += ['CustomFloats[ROE_eextraSel]', '^Upsilon(4S)']
 tools4SB0Had += ['CustomFloats[d0_Mbc:d0_deltaE:d1_Mbc:d1_deltaE]', '^Upsilon(4S)']
 tools4SB0Had += ['CustomFloats[R2:cosTBTO:cosTBz]', 'Upsilon(4S) -> ^B0:genericRank anti-B0:all']
 tools4SB0Had += ['CustomFloats[sigProb:rank]', 'Upsilon(4S) -> ^B0:genericRank anti-B0:all']
-
-
 tools4SB0Had += ['CustomFloats[d0_d0_E:d0_d1_E]', 'Upsilon(4S) ->  B0:genericRank ^anti-B0:all']
 tools4SB0Had += ['CustomFloats[d0_M:d0_d0_M:d0_d1_M]', 'Upsilon(4S) ->  ^B0:genericRank ^anti-B0:all']
 tools4SB0Had += ['CustomFloats[d0_p:d0_pCMS:d0_d0_p:d0_d0_pCMS:d0_d1_pCMS:d0_d1_d0_pCMS:d0_d1_d1_pCMS]',
@@ -310,7 +310,7 @@ tools4SB0Had += ['CustomFloats[dmID:d0_dmID:d1_dmID:d0_d0_dmID:d0_d1_dmID:d1_d0_
 tools4SB0Had += ['CustomFloats[isSignal:isExtendedSignal:isSignalAcceptMissingNeutrino]',
                  'Upsilon(4S) ->  ^B0:genericRank ^anti-B0:all']
 tools4SB0Had += ['MCTruth', 'Upsilon(4S) ->  ^B0:genericRank ^anti-B0:all']
-
+tools4SB0Had += ['CustomFloats[tau_eid:tau_muid]', 'Upsilon(4S) -> B0:genericRank ^anti-B0:all']
 
 tools4SB0SL = ['EventMetaData', '^Upsilon(4S)']
 tools4SB0SL += ['CustomFloats[ROE_eextraSel]', '^Upsilon(4S)']
@@ -330,6 +330,7 @@ tools4SB0SL += ['CustomFloats[dmID:d0_dmID:d1_dmID:d0_d0_dmID:d0_d1_dmID:d1_d0_d
 tools4SB0SL += ['CustomFloats[isSignal:isExtendedSignal:isSignalAcceptMissingNeutrino]',
                 'Upsilon(4S) ->  ^B0:semileptonicRank ^anti-B0:all']
 tools4SB0SL += ['MCTruth', 'Upsilon(4S) ->  ^B0:semileptonicRank ^anti-B0:all']
+tools4SB0SL += ['CustomFloats[tau_eid:tau_muid]', 'Upsilon(4S) -> B0:semileptonicRank ^anti-B0:all']
 
 
 # write out the flat ntuple

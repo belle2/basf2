@@ -125,7 +125,8 @@ variables.addAlias('d1_mcPDG', 'daughter(1,mcPDG)')
 variables.addAlias('d1_d0_mcPDG', 'daughter(1,daughter(0,mcPDG))')
 variables.addAlias('d1_d0_d0_mcPDG', 'daughter(1,daughter(0,daughter(0,mcPDG)))')
 variables.addAlias('d1_d0_d1_mcPDG', 'daughter(1,daughter(0,daughter(1,mcPDG)))')
-
+variables.addAlias('d1_eid', 'daughter(1,eid)')
+variables.addAlias('d1_muid', 'daughter(1,muid)')
 
 outputRootFile = 'dstarlnuOutput.root'
 
@@ -303,9 +304,7 @@ tools4SBplusHad += ['CustomFloats[dmID:d0_dmID:d1_dmID:d0_d0_dmID:d0_d1_dmID:d1_
 tools4SBplusHad += ['CustomFloats[isSignal:isExtendedSignal:isSignalAcceptMissingNeutrino]',
                     'Upsilon(4S) ->  ^B+:genericRank ^B-:all']
 tools4SBplusHad += ['MCTruth', 'Upsilon(4S) ->  ^B+:genericRank ^B-:all']
-tools4SBplusHad += ['PID', 'Upsilon(4S) -> B+:genericRank [B-:ch1 -> D*0:all ^e-:highP] ']
-tools4SBplusHad += ['PID', 'Upsilon(4S) -> B+:genericRank [B-:ch2 -> D*0:all ^mu-:highP] ']
-
+tools4SBplusHad += ['CustomFloats[d1_eid:d1_muid]', 'Upsilon(4S) -> B+:genericRank ^B-:all']
 
 tools4SBplusSL = ['EventMetaData', '^Upsilon(4S)']
 tools4SBplusSL += ['CustomFloats[ROE_eextraSel]', '^Upsilon(4S)']
@@ -323,8 +322,6 @@ tools4SBplusSL += ['CustomFloats[dmID:d0_dmID:d1_dmID:d0_d0_dmID:d0_d1_dmID:d1_d
 tools4SBplusSL += ['CustomFloats[isSignal:isExtendedSignal:isSignalAcceptMissingNeutrino]',
                    'Upsilon(4S) ->  ^B+:semileptonicRank ^B-:all']
 tools4SBplusSL += ['MCTruth', 'Upsilon(4S) ->  ^B+:semileptonicRank ^B-:all']
-tools4SBplusSL += ['PID', 'Upsilon(4S) -> B+:semileptonicRank [B-:ch1 -> D*0:all ^e-:highP] ']
-tools4SBplusSL += ['PID', 'Upsilon(4S) -> B+:semileptonicRank [B-:ch2 -> D*0:all ^mu-:highP] ']
 
 
 # Make lists and outptu to mdst and udst files.

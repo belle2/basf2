@@ -142,11 +142,9 @@ def unpack(triggers, atlas, writer):
             for i, sig in enumerate(atlas):
                 if isUnamed(sig):
                     if dummycheck and '1' in values[i] and '0' in values[i]:
-                        with sys.stderr as fout:
-                            fout.write(
-                                '[Warning] non-uniform dummy value detected at {}ns: {}'.format(
+                            print('[Warning] non-uniform dummy value detected at {}ns: {}'.format(
                                     timestamp, sig[3] % sum(evtsize)))
-                            fout.write(values[i])
+                            print(values[i])
                     continue
                 if values[i] != lastvalues[i]:
                     writer.change(vcdVars[i], timestamp, values[i])

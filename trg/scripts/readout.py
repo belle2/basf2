@@ -14,9 +14,17 @@ import sys
 # from testpkg.bitstring import BitArray
 from bitstring import BitArray
 import pickle
+import re
 
-[steering, srootFile, pickleSigFile] = sys.argv[:3]
-pickleIt = pickleSigFile[pickleSigFile.rfind('.'):] == '.p'
+[steering, srootFile] = sys.argv[:2]
+if len(sys.argv) >= 3:
+    pickleSigFile = sys.argv[2]
+    isPickleFile = pickleSigFile[pickleSigFile.rfind('.'):] == '.p'
+else:
+    pickleSigFile = None
+    isPickleFile = False
+
+pickleIt = len(sys.argv) == 2 or isPickleFile
 
 
 def join(ary):
@@ -36,10 +44,9 @@ def printHex(evt, wordwidth=32, linewidth=8, paraheight=4):
     paras = (['\n'.join(lines[n:n + paraheight]) for n in range(0, len(lines), paraheight)])
     print('\n\n'.join(paras))
 
-# pica = 'data-2d-0003.p'
 data = []
 if pickleIt:
-    pica = pickleSigFile
+    pica = pickleSigFile if isPickleFile else re.sub(r'.+/', '', re.sub(r'sroot', 'p', srootFile))
     wfp = open(pica, 'wb')
     pickle.dump(data, wfp, protocol=2)
     wfp.close()
@@ -126,16 +133,19 @@ main.add_module(input)
 main.add_module(prog)
 main.add_module(MinModule())
 
+# check signal file before processing
+if not pickleIt:
+    import b2vcd
+    vcdFile = sys.argv[3] if len(sys.argv) >= 4 else re.sub(r'.+/', '', re.sub(r'sroot', 'vcd', srootFile))
+    with open(pickleSigFile) as fin:
+        evtsize = [int(width) for width in fin.readline().split()]
+        B2INFO('Interpreting B2L data format with dimension ' + str(evtsize))
+        atlas = b2vcd.makeAtlas(fin.read(), evtsize)
+
 # Process all events
 process(main)
 
 if pickleIt:
     B2INFO('Output pickle file ' + pica + ' saved.')
 else:
-    import b2vcd
-    vcdFile = sys.argv[3]
-    with open(pickleSigFile) as fin:
-        evtsize = [int(width) for width in fin.readline().split()]
-        B2INFO('interpreting B2L data with dimension ' + str(evtsize))
-        atlas = b2vcd.makeAtlas(fin.read(), evtsize)
     b2vcd.writeVCD(data, atlas, vcdFile, evtsize)

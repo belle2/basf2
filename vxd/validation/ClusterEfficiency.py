@@ -45,12 +45,12 @@ class ClusterEfficiency(Module):
         #: layer/momentum hierachy of all profiles
         self.eff = {}
 
-        def profile(name, title, text):
+        def profile(name, title, text, contact):
             """small helper function to create a phi profile and set the names
             and descriptions"""
             prof = ROOT.TProfile(name, title, 60, -180, 180)
             prof.GetListOfFunctions().Add(ROOT.TNamed("Description", text))
-            prof.GetListOfFunctions().Add(ROOT.TNamed("Contact", "martin.ritter@lmu.de"))
+            prof.GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
             prof.GetListOfFunctions().Add(ROOT.TNamed("Check", "Should be close to 1 everywhere"))
             # make a list of all profiles
             self.profiles.append(prof)
@@ -64,6 +64,11 @@ class ClusterEfficiency(Module):
             + "in layer {layer} when simulation muons with p={p:.1f} GeV uniformly "\
             + "in phi and theta={theta[0]}+-{theta[1]} degree. phi is the angle "\
             + "of the generated particle, not the truehit position."
+        # contact person for PXD (layer<3 = True) or SVD (layer<3 = False)
+        prof_contact = {
+            True: "Benjamin Schwenker <Benjamin.Schwenker@phys.uni-goettingen.de>",
+            False: "Andrzej Bozek <bozek@belle2.ifj.edu.pl>",
+        }
 
         # create all profiles
         for layer in range(1, 7):
@@ -72,7 +77,7 @@ class ClusterEfficiency(Module):
                 name = prof_name.format(p=p, layer=layer)
                 title = prof_title.format(p=p, layer=layer)
                 text = prof_text.format(p=p, layer=layer, theta=theta_params)
-                self.eff[layer][p] = profile(name, title, text)
+                self.eff[layer][p] = profile(name, title, text, prof_contact[layer < 3])
 
     def terminate(self):
         """

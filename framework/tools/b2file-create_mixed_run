@@ -94,7 +94,7 @@ if __name__ == "__main__":
     if args.seed is not None:
         basf2.set_random_seed(args.seed)
 
-    # open all output files
+    # open all input files
     inputfiles = [open_rootfile(e) for e in args.inputfile]
     if None in inputfiles:
         basf2.B2FATAL("Errors while opening input files, giving up")

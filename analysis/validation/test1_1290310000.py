@@ -44,8 +44,6 @@ from ROOT import Belle2
 # at KEKCC /home/belle2/tkeck/fei/Belle2_Generic_2017_Track14_1/ )
 use_central_database('test_merola', LogLevel.WARNING, 'fei_database')
 
-gb2_setuprel = "release-00-08-00"
-
 from variables import variables
 
 variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
@@ -172,7 +170,7 @@ if not os.path.isfile(fei_pickle):
 fei_path = get_path_from_file(fei_pickle)
 path.add_path(fei_path)
 
-filelist = [""]
+filelist = ["../1290310000.dst.root"]
 
 inputMdstList('default', filelist)
 
@@ -266,8 +264,8 @@ applyCuts('Upsilon(4S):BhadBtaunu', 'nAllROETracks==0')
 applyCuts('Upsilon(4S):BslBtaunu', 'nAllROETracks==0')
 
 
-buildContinuumSuppression('B+:genericRank')
-buildContinuumSuppression('B+:semileptonicRank')
+buildContinuumSuppression('B+:genericRank', '')
+buildContinuumSuppression('B+:semileptonicRank', '')
 
 
 # perform MC matching

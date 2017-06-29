@@ -48,7 +48,6 @@ CDCCosmicAnalysisModule::CDCCosmicAnalysisModule() : Module()
   addParam("RecoTracksColName", m_recoTrackArrayName, "Name of collectrion hold genfit::Track", std::string(""));
   addParam("Output", m_OutputFileName, "xt file name", string("xt.root"));
   addParam("noBFit", m_noBFit, "If true -> #Params ==4, #params ==5 for calculate P-Val", true);
-  //  addParam("TriggerPos", m_TriggerPos, "Trigger position use for cut and reconstruct Trigger image", std::vector<double> { -0.6, -13.25, 17.3});
 }
 
 CDCCosmicAnalysisModule::~CDCCosmicAnalysisModule()
@@ -75,6 +74,8 @@ void CDCCosmicAnalysisModule::initialize()
   tree->Branch("tanLambda1", &tanLambda1, "tanLambda1/D");
   tree->Branch("D01", &D01, "D01/D");
   tree->Branch("Z01", &Z01, "Z01/D");
+  tree->Branch("Omega1", &Omega1, "Omega1/D");
+  tree->Branch("Mom1", "TVector3", &Mom1);
   tree->Branch("posSeed1", "TVector3", &posSeed1);
 
   tree->Branch("Pval2", &Pval2, "Pval2/D");
@@ -83,6 +84,8 @@ void CDCCosmicAnalysisModule::initialize()
   tree->Branch("tanLambda2", &tanLambda2, "tanLambda2/D");
   tree->Branch("D02", &D02, "D02/D");
   tree->Branch("Z02", &Z02, "Z02/D");
+  tree->Branch("Omega2", &Omega2, "Omega2/D");
+  tree->Branch("Mom2", "TVector3", &Mom2);
   tree->Branch("posSeed2", "TVector3", &posSeed2);
 
 }
@@ -127,8 +130,11 @@ void CDCCosmicAnalysisModule::event()
       continue;
     }
     double ndf;
-    if (m_noBFit) {ndf = fs->getNdf() + 1;} // incase no Magnetic field, NDF=4;
-    else {ndf = fs->getNdf();}
+    if (m_noBFit) { // in case of no magnetic field, NDF=4 instead of 5.
+      ndf = fs->getNdf() + 1;
+    } else {
+      ndf = fs->getNdf();
+    }
     double Chi2 = fs->getChi2();
     double TrPval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
     double Phi0 = fitresult->getPhi0();
@@ -141,17 +147,22 @@ void CDCCosmicAnalysisModule::event()
       tanLambda1 = fitresult->getTanLambda();
       Z01 = fitresult->getZ0();
       D01 = fitresult->getD0();
+      Omega1 = fitresult->getOmega();
+      Mom1 = fitresult->getMomentum();
+
       ndf1 = ndf;
       Pval1 = TrPval;
       n += 1;
     }
-    if (nfitted > 1 && posSeed1.Y()*posSeed.Y() < 0) {
+    if (nfitted == 2) {
       posSeed2 = posSeed;
       Phi02 = Phi0;
       tanLambda2 = fitresult->getTanLambda();
       Z02 = fitresult->getZ0();
       D02 = fitresult->getD0();
       ndf2 = ndf;
+      Omega2 = fitresult->getOmega();
+      Mom2 = fitresult->getMomentum();
       Pval2 = TrPval;
       n += 1;
     }

@@ -19,7 +19,7 @@
 
 #include <string.h> //fix for memset (FT)
 
-using namespace CLHEP;
+//using namespace CLHEP;
 //using CLHEP::HepVector;
 //using CLHEP::HepSymMatrix;
 //using CLHEP::HepMatrix;
@@ -32,8 +32,8 @@ namespace TreeFitter {
     Projection(int dimP, int dimC) : m_matrixH(dimC, dimP), m_r(dimC), m_matrixV(dimC), m_offset(0) {}
 
     // accessors to the projection matrix
-    const HepMatrix& H() const { return m_matrixH;}
-    //HepMatrix& H() { return _matrixH ; }
+    const CLHEP::HepMatrix& H() const { return m_matrixH;}
+    //CLHEP::HepMatrix& H() { return _matrixH ; }
     double& H(int row, int col)
     {
       //#ifdef VTK_BOUNDSCHECKING
@@ -43,8 +43,8 @@ namespace TreeFitter {
     }
 
     // accessors to the residual (or the 'value' of the constraint)
-    const HepVector& r() const { return m_r ; }
-    HepVector& r() { return m_r ; }
+    const CLHEP::HepVector& r() const { return m_r ; }
+    CLHEP::HepVector& r() { return m_r ; }
     double& r(int row)
     {
       //#ifdef VTK_BOUNDSCHECKING
@@ -54,8 +54,8 @@ namespace TreeFitter {
     }
 
     // accessors to the covariance matrix
-    const HepSymMatrix& V() const { return m_matrixV ; }
-    //HepSymMatrix& V() { return m_matrixV ; }
+    const CLHEP::HepSymMatrix& V() const { return m_matrixV ; }
+    //CLHEP::HepSymMatrix& V() { return m_matrixV ; }
     double& V(int row, int col) { return m_matrixV(m_offset + row, m_offset + col); }
 
     double& Vfast(int row, int col)
@@ -85,7 +85,7 @@ namespace TreeFitter {
     // globalChisq
     double chiSquare() const
     {
-      HepSymMatrix W = m_matrixV ;
+      CLHEP::HepSymMatrix W = m_matrixV ;
       int ierr;  W.inverse(ierr) ;
       return W.similarity(m_r) ;
     }
@@ -94,9 +94,9 @@ namespace TreeFitter {
     unsigned int offset() const { return m_offset ; }
 
   private:
-    HepMatrix m_matrixH ;    // projection matrix
-    HepVector m_r ;    // constraint residual
-    HepSymMatrix m_matrixV ; // constraint variance (zero for lagrange constraints)
+    CLHEP::HepMatrix m_matrixH ;    // projection matrix
+    CLHEP::HepVector m_r ;    // constraint residual
+    CLHEP::HepSymMatrix m_matrixV ; // constraint variance (zero for lagrange constraints)
     unsigned int m_offset ; // offset for constraint index. only non-zero for merged constraints.
   } ;
 }

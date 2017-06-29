@@ -67,6 +67,9 @@ namespace Belle2 {
     //! angle required between RecoTrack and BKLMTrack, if openangle is larger than m_maxAngleRequired, they don't match
     double m_maxAngleRequired = 10;
 
+    //! do the BKLMTrack fitting in global system (multi-sectors track) or local system (sector by sector)
+    bool m_globalFit;
+
   private:
 
     //! my defined sort function using layer number

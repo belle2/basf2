@@ -4,7 +4,7 @@ INCDIR=$(BELLE2_DAQ_SLC)/include/daq/slc/
 
 copyinc:
 	@ mkdir -p $(INCDIR)/apps/runcontrold
-	@ ln -s $(BELLE2_DAQ_SLC)/apps/runcontrold/include/* $(INCDIR)/apps/runcontrold/
+	@ ln -sf $(BELLE2_DAQ_SLC)/apps/runcontrold/include/* $(INCDIR)/apps/runcontrold/
 #	@ install -m 644 -p $(BELLE2_DAQ_SLC)/apps/runcontrold/include/* $(INCDIR)/apps/runcontrold
 
 apps/runcontrold: %:

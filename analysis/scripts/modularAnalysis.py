@@ -1648,10 +1648,9 @@ def calibratePhotonEnergy(list_name, energy_bias=0.030, path=analysis_main):
     @param path      modules are added to this path
     """
 
-    gammacal = register_module('GammaEnergyCalibration')
-    gammacal.param('gammaListName', list_name)
-    gammacal.param('energyBias', energy_bias)
-    path.add_module(gammacal)
+    B2ERROR('The photon energy calibration should not be done by the user any more.'
+            'The module was removed and this function performs nothing!'
+            'Remove calibratePhotonEnergy(...) from your script')
 
 
 def removeParticlesNotInLists(lists_to_keep, path=analysis_main):

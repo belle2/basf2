@@ -33,10 +33,15 @@ void plot_dembc(TFile* pfile, TTree* ptree, TFile *outputFile){
   ptree->Project("h_deltae", "B0_deltae", "1==1");
   h_deltae->GetXaxis()->SetTitle("#DeltaE (GeV)");
 
+  TH1F* h_egam = new TH1F("h_egam","E_{lab}(#gamma)",250,1.5,4.0);
+  ptree->Project("h_egam", "B0_gamma_P", "1==1");
+  h_egam->GetXaxis()->SetTitle("E_{lab}(#gamma) (GeV)");
+
   outputFile->cd();
 
   h_mbc->Write();
   h_deltae->Write();
+  h_egam->Write();
 }
 
 void test2_1110021001(){

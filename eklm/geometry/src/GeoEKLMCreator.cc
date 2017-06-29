@@ -1939,7 +1939,8 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
   (void)type;
   m_GeoDat = &(EKLM::GeometryData::Instance(GeometryData::c_Gearbox));
   try {
-    m_TransformData = new EKLM::TransformData(false, true);
+    m_TransformData =
+      new EKLM::TransformData(false, EKLM::TransformData::c_Displacement);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -1956,7 +1957,8 @@ void EKLM::GeoEKLMCreator::createFromDB(const std::string& name,
   (void)type;
   m_GeoDat = &(EKLM::GeometryData::Instance(GeometryData::c_Database));
   try {
-    m_TransformData = new EKLM::TransformData(false, true);
+    m_TransformData =
+      new EKLM::TransformData(false, EKLM::TransformData::c_Displacement);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -1971,7 +1973,8 @@ void EKLM::GeoEKLMCreator::createPayloads(const GearDir& content,
   (void)content;
   m_GeoDat = &(EKLM::GeometryData::Instance(GeometryData::c_Gearbox));
   try {
-    m_TransformData = new EKLM::TransformData(false, true);
+    m_TransformData =
+      new EKLM::TransformData(false, EKLM::TransformData::c_Displacement);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }

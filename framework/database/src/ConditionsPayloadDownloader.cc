@@ -13,8 +13,11 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/utilities/Utils.h>
 #include <framework/utilities/FileSystem.h>
+#include <TRandom.h>
 #include <iostream>
 #include <set>
+#include <chrono>
+#include <thread>
 
 #include <curl/curl.h>
 #include <cstring>
@@ -41,6 +44,15 @@ namespace Belle2 {
     /** last time we printed the status (in ns) */
     double lasttime{0};
   };
+
+  /** Timeout to wait for connections in seconds */
+  unsigned int ConditionsPayloadDownloader::s_connectionTimeout{60};
+  /** Timeout to wait for stalled connections (<10KB/s) */
+  unsigned int ConditionsPayloadDownloader::s_stalledTimeout{60};
+  /** Number of retries to perform when downloading failes with HTTP response code >=500 */
+  unsigned int ConditionsPayloadDownloader::s_maxRetries{3};
+  /** Backoff factor for retries in seconds */
+  unsigned int ConditionsPayloadDownloader::s_backoffFactor{5};
 }
 
 namespace {
@@ -156,13 +168,11 @@ namespace Belle2 {
       B2FATAL("Cannot intialize libcurl");
     }
     m_session->headers = curl_slist_append(nullptr, "Accept: application/json");
-    //FIXME: this will of course break any effort by the database people to get some caching in ...
-    m_session->headers = curl_slist_append(m_session->headers, "Cache-Control: no-cache");
     curl_easy_setopt(m_session->curl, CURLOPT_HTTPHEADER, m_session->headers);
     curl_easy_setopt(m_session->curl, CURLOPT_TCP_KEEPALIVE, 1L);
-    curl_easy_setopt(m_session->curl, CURLOPT_CONNECTTIMEOUT, 60);
+    curl_easy_setopt(m_session->curl, CURLOPT_CONNECTTIMEOUT, s_connectionTimeout);
     curl_easy_setopt(m_session->curl, CURLOPT_LOW_SPEED_LIMIT, 10 * 1024); //10 kB/s
-    curl_easy_setopt(m_session->curl, CURLOPT_LOW_SPEED_TIME, 60);
+    curl_easy_setopt(m_session->curl, CURLOPT_LOW_SPEED_TIME, s_stalledTimeout);
     curl_easy_setopt(m_session->curl, CURLOPT_WRITEFUNCTION, write_function);
     curl_easy_setopt(m_session->curl, CURLOPT_VERBOSE, 1);
     curl_easy_setopt(m_session->curl, CURLOPT_NOPROGRESS, 0);
@@ -276,9 +286,10 @@ namespace Belle2 {
       return false;
     }
     // report on duplicate payloads because that should not be ...
-    if (!duplicates.empty()) {
-      B2INFO("Found more then one payload for the following keys: " << boost::algorithm::join(duplicates, ", "));
-    }
+    // FIXME: commented out until we can delete iovs ...
+    //if (!duplicates.empty()) {
+    //  B2INFO("Found more then one payload for the following keys: " << boost::algorithm::join(duplicates, ", "));
+    //}
     return true;
   }
 
@@ -421,35 +432,59 @@ namespace Belle2 {
     //make sure we have an active curl session ...
     SessionGuard session(*this);
     B2DEBUG(50, "Download of " << url << " started ...");
-    //rewind the stream to the beginning
-    buffer.clear();
-    buffer.seekp(0, std::ios::beg);
-    if (!buffer.good()) {
-      B2ERROR("Cannot write to stream when downloading " << url);
-      return false;
-    }
-    // Set the exception flags to notify us of any problem during writing
-    auto oldExceptionMask = buffer.exceptions();
-    buffer.exceptions(std::ios::failbit | std::ios::badbit);
-    // build the request ...
-    CURLcode res{CURLE_FAILED_INIT};
-    // and set all the curl options
-    curl_easy_setopt(m_session->curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(m_session->curl, CURLOPT_WRITEDATA, &buffer);
-    // perform the request ...
-    res = curl_easy_perform(m_session->curl);
-    // flush output
-    buffer.exceptions(oldExceptionMask);
-    buffer.flush();
-    // and check for errors which occured during download ...
-    if (res != CURLE_OK) {
-      size_t len = strlen(m_session->errbuf);
-      if (len) {
-        B2WARNING("Could not get '" << url << "': " << m_session->errbuf);
-      } else {
-        B2WARNING("Could not get '" << url << "': " << curl_easy_strerror(res));
+    // we might need to try a few times in case of HTTP>=500
+    for (unsigned int retry{1};; ++retry) {
+      //rewind the stream to the beginning
+      buffer.clear();
+      buffer.seekp(0, std::ios::beg);
+      if (!buffer.good()) {
+        B2ERROR("Cannot write to stream when downloading " << url);
+        return false;
       }
-      return false;
+      // Set the exception flags to notify us of any problem during writing
+      auto oldExceptionMask = buffer.exceptions();
+      buffer.exceptions(std::ios::failbit | std::ios::badbit);
+      // build the request ...
+      CURLcode res{CURLE_FAILED_INIT};
+      // and set all the curl options
+      curl_easy_setopt(m_session->curl, CURLOPT_URL, url.c_str());
+      curl_easy_setopt(m_session->curl, CURLOPT_WRITEDATA, &buffer);
+      // perform the request ...
+      res = curl_easy_perform(m_session->curl);
+      // flush output
+      buffer.exceptions(oldExceptionMask);
+      buffer.flush();
+      // and check for errors which occured during download ...
+      if (res != CURLE_OK) {
+        size_t len = strlen(m_session->errbuf);
+        if (len) {
+          B2WARNING("Could not get '" << url << "': " << m_session->errbuf);
+        } else {
+          B2WARNING("Could not get '" << url << "': " << curl_easy_strerror(res));
+        }
+        if (s_maxRetries > 0) {
+          if (retry > s_maxRetries) {
+            B2WARNING("Failed " << retry << " times, giving up");
+          } else if (res == CURLE_HTTP_RETURNED_ERROR) {
+            // we treat everything below 500 as permanent error with the request,
+            // only retry on 500.
+            long responseCode{0};
+            curl_easy_getinfo(m_session->curl, CURLINFO_RESPONSE_CODE, &responseCode);
+            if (responseCode >= 500) {
+              // use exponential backoff but don't restrict to exact slots like
+              // Ethernet, just use a random wait time between 1s and maxDelay =
+              // 2^(retry)-1 * backoffFactor
+              double maxDelay = (std::pow(2, retry) - 1) * s_backoffFactor;
+              double seconds = gRandom->Uniform(1., maxDelay);
+              B2INFO("Waiting " << std::setprecision(2) << seconds << " seconds before retry ...");
+              std::this_thread::sleep_for(std::chrono::milliseconds((int)(seconds * 1e3)));
+              continue;
+            }
+          }
+        }
+        return false;
+      }
+      break;
     }
     // all fine
     B2DEBUG(50, "Download of " << url << " finished succesfully.");

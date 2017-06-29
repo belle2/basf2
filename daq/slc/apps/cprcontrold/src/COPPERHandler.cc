@@ -267,9 +267,9 @@ bool NSMVHandlerFEELoad::handleSetText(const std::string& val)
 bool NSMVHandlerFEELoadAll::handleSetInt(int val)
 {
   if (val > 0) {
-    return m_callback.feeload();
+    //return m_callback.feeload();
   }
-  return false;
+  return true;
 }
 
 bool NSMVHandlerHSLBRegValue::handleSetInt(int val)

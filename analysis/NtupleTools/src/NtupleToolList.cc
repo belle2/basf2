@@ -18,8 +18,6 @@
 #include <analysis/NtupleTools/NtupleTrackHitsTool.h>
 #include <analysis/NtupleTools/NtupleClusterTool.h>
 #include <analysis/NtupleTools/NtupleRecoStatsTool.h>
-#include <analysis/NtupleTools/NtupleDetectorStatsRecTool.h>
-#include <analysis/NtupleTools/NtupleDetectorStatsSimTool.h>
 #include <analysis/NtupleTools/NtupleMCReconstructibleTool.h>
 #include <analysis/NtupleTools/NtupleVertexTool.h>
 #include <analysis/NtupleTools/NtupleMCVertexTool.h>
@@ -104,8 +102,6 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "PID") return new NtuplePIDTool(tree, d);
   else if (strToolName == "DeltaLogL") return new NtupleDeltaLogLTool(tree, d);
   else if (strToolName == "RecoStats") return new NtupleRecoStatsTool(tree, d);
-  else if (strToolName == "DetectorStatsRec") return new NtupleDetectorStatsRecTool(tree, d);
-  else if (strToolName == "DetectorStatsSim") return new NtupleDetectorStatsSimTool(tree, d);
   else if (strToolName == "MCReconstructible") return new NtupleMCReconstructibleTool(tree, d);
   else if (strToolName == "Track") return new NtupleTrackTool(tree, d);
   else if (strToolName == "TrackHits") return new NtupleTrackHitsTool(tree, d);

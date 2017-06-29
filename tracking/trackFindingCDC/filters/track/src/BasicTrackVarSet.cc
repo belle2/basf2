@@ -44,7 +44,7 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   double empty_s_max = 0;
   double empty_s_min = 0;
 
-  double last_perp_s = std::nan("");
+  double last_perp_s = NAN;
 
   for (const CDCRecoHit3D& recoHit : *track) {
     // Drift circle information

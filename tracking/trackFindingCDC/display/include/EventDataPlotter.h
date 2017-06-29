@@ -292,7 +292,8 @@ namespace Belle2 {
         if (n == 0) return;
         float opacityFactor = std::pow(endOpacity / opacity, 1.0 / (n - 1));
         for (const auto& element : range) {
-          AttributeMap elementAttributeMap{{"opacity", std::to_string(opacity)}};
+          const auto opacity_str = std::to_string(opacity);
+          AttributeMap elementAttributeMap{{"opacity", opacity_str}};
           draw(element, elementAttributeMap);
           opacity *= opacityFactor;
         }

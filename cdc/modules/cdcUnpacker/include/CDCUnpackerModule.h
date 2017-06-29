@@ -218,12 +218,6 @@ namespace Belle2 {
 
 
       /**
-       * Set/unset relation between CDCHit and CDCRawHit(WaveForm).
-       */
-
-      bool m_setRelationRaw2Hit;
-
-      /**
        * Name of the RawCDC dataobject (suppressed mode).
        */
       std::string m_rawCDCName;
@@ -303,9 +297,17 @@ namespace Belle2 {
       bool m_enableDatabase;
 
       /**
+       * Enable/Disable to 2nd hit output.
+       *
+       */
+      bool m_enable2ndHit;
+
+      /**
        * Channel map retrieved from DB.
        */
       DBArray<CDCChannelMap> m_channelMapFromDB;
+
+
     };//end class declaration
 
 

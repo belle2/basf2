@@ -44,14 +44,22 @@ namespace Belle2 {
       return m_Instance;
     }
 
-    GeometryPar::GeometryPar(const GearDir& content)
+    GeometryPar::GeometryPar(const GearDir& content) :
+      m_DoBeamBackgroundStudy(false),
+      m_BkgSensitiveDetector(NULL),
+      m_NSector(8),
+      m_NLayer(15)
     {
       clear();
       read(content);
       calculate();
     }
 
-    GeometryPar::GeometryPar(const BKLMGeometryPar& element)
+    GeometryPar::GeometryPar(const BKLMGeometryPar& element) :
+      m_DoBeamBackgroundStudy(false),
+      m_BkgSensitiveDetector(NULL),
+      m_NSector(8),
+      m_NLayer(15)
     {
       clear();
       readFromDB(element);

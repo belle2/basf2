@@ -25,7 +25,7 @@ namespace TreeFitter {
 
   class RecoParticle : public ParticleBase {
   public:
-    RecoParticle(Particle* bc, const ParticleBase* mother) ;
+    RecoParticle(Belle2::Particle* bc, const ParticleBase* mother) ;
     virtual ~RecoParticle() ;
 
     virtual int dimM() const = 0; // dimension of the measurement

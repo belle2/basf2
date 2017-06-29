@@ -69,15 +69,24 @@ void AnalysisPhase1StudyModule::defineHisto()
     h_prodvtx[i] = new TH2F(TString::Format("h_prodvtx_%d", i), "", 200, -400., 400., 200, 0., 400.);
     h_decavtx[i] = new TH2F(TString::Format("h_decavtx_%d", i), "", 200, -400., 400., 200, 0., 400.);
     h_kineticvz[i] = new TH2F(TString::Format("h_kineticvz_%d", i), "", 200, -400., 400., 1000, 0., 10.);
+    h_kineticvz1[i] = new TH2F(TString::Format("h_kineticvz1_%d", i), "", 200, -400., 400., 1000, 0., 10.);
+    h_kineticvz2[i] = new TH2F(TString::Format("h_kineticvz2_%d", i), "", 200, -400., 400., 1000, 0., 10.);
     h_kineticvz_zoom[i] = new TH2F(TString::Format("h_kineticvz_zoom_%d", i), "", 200, -400., 400., 1000, 0., 0.01);
     h_Wkineticvz[i] = new TH2F(TString::Format("h_Wkineticvz_%d", i), "", 200, -400., 400., 1000, 0., 10.);
     h_Wkineticvz_zoom[i] = new TH2F(TString::Format("h_Wkineticvz_zoom_%d", i), "", 200, -400., 400., 1000, 0., 0.01);
+    h_phive[i] = new TH2F(TString::Format("h_phive_%d", i), "", 360, -180., 180., 1000, 0., 10.);
     h_phivz[i] = new TH2F(TString::Format("h_phivz_%d", i), "", 200, -400., 400., 360, -180., 180.);
+    h_rve[i] = new TH2F(TString::Format("h_rve_%d", i), "", 200, 0., 200., 1000, 0., 10.);
     h_thetavz[i] = new TH2F(TString::Format("h_thetavz_%d", i), "", 200, -400., 400., 180, 0., 180.);
     h_kineticvz[i]->Sumw2();
+    h_kineticvz1[i]->Sumw2();
+    h_kineticvz2[i]->Sumw2();
     h_kineticvz_zoom[i]->Sumw2();
     h_Wkineticvz[i]->Sumw2();
     h_Wkineticvz_zoom[i]->Sumw2();
+    h_phive[i]->Sumw2();
+    h_phivz[i]->Sumw2();
+    h_rve[i]->Sumw2();
   }
   h_g4_xy = new TH2F("h_g4_xy", "", 100, -5.99, 5.99, 100, -5.99, 5.99);
   for (int i = 0; i < 2; i++) {
@@ -203,6 +212,14 @@ void AnalysisPhase1StudyModule::event()
         h_Wkineticvz_zoom[i]->Fill(prodvtx[2], Kinetic, rate);
         h_thetavz[i]->Fill(prodvtx[2], theta);
         h_phivz[i]->Fill(prodvtx[2], phi);
+        h_phive[i]->Fill(phi, Kinetic);
+        h_rve[i]->Fill(prodr, Kinetic);
+        if (theta == 0) {
+          h_kineticvz1[i]->Fill(prodvtx[2], Kinetic);
+        }
+        if (phi == 0) {
+          h_kineticvz2[i]->Fill(prodvtx[2], Kinetic);
+        }
       }
     }
 
@@ -215,7 +232,14 @@ void AnalysisPhase1StudyModule::event()
     h_Wkineticvz_zoom[8]->Fill(prodvtx[2], Kinetic, rate);
     h_thetavz[8]->Fill(prodvtx[2], theta);
     h_phivz[8]->Fill(prodvtx[2], phi);
-
+    h_phive[8]->Fill(phi, Kinetic);
+    h_rve[8]->Fill(prodr, Kinetic);
+    if (theta == 0) {
+      h_kineticvz1[8]->Fill(prodvtx[2], Kinetic);
+    }
+    if (phi == 0) {
+      h_kineticvz2[8]->Fill(prodvtx[2], Kinetic);
+    }
     if (counter == 0) {
       h_count->Fill(9);
       h_prodvtx[9]->Fill(prodvtx[2], prodr);

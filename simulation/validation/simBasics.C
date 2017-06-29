@@ -70,6 +70,7 @@ void numberOfParticles(TTree* tree)
   h->GetYaxis()->SetTitle("Entries/bin");
 
   tree->Draw("MCParticles.m_pdg >> hLepton", leptons);
+  h->SetBins(nbins, xbins[0], xbins[nbins]);
 
   h->GetListOfFunctions()->Add(new TNamed("Description",
     "No. of leptons: Names a la PDG scheme"));
@@ -97,6 +98,7 @@ void numberOfParticles(TTree* tree)
   h->GetYaxis()->SetTitle("Entries/bin");
 
   tree->Draw("MCParticles.m_pdg >> hStableMeson", stableMesons);
+  h->SetBins(nbins2, xbins2[0], xbins2[nbins2]);
 
   h->GetListOfFunctions()->Add(new TNamed("Description",
     "Number of stable mesons such as charged pions, K Longs, and charged kaons.\n We do not have anti-K Long's."));
@@ -124,6 +126,7 @@ void numberOfParticles(TTree* tree)
   h->GetYaxis()->SetTitle("Entries/bin");
 
   tree->Draw("MCParticles.m_pdg >> hStableBaryon", stableBaryons);
+  h->SetBins(nbins3, xbins3[0], xbins3[nbins3]);
 
   h->GetListOfFunctions()->Add(new TNamed("Description",
     "Number of stable baryons such as protons and neutrons"));

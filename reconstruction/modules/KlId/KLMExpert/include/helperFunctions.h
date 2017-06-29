@@ -55,7 +55,7 @@ namespace KlIdHelpers {
     return 0;
   }
 
-
+  /** checks if a cluster is signal under the mcWeightcondition (mcWeight = energy deposition) */
   bool isKLMClusterSignal(const Belle2::KLMCluster& cluster, float mcWeigthCut = 0.66)
   {
     const auto mcParticleWeightPair = cluster.getRelatedToWithWeight<Belle2::MCParticle>();
@@ -68,6 +68,8 @@ namespace KlIdHelpers {
       return false;
     }
   }
+
+  /** checks if a cluster is signal under the mcWeightcondition (mcWeight = energy deposition) */
   bool isECLClusterSignal(const Belle2::ECLCluster& cluster, float mcWeigthCut = 0.66)
   {
     const auto mcParticleWeightPair = cluster.getRelatedToWithWeight<Belle2::MCParticle>();
@@ -80,9 +82,6 @@ namespace KlIdHelpers {
       return false;
     }
   }
-
-
-
 
 
   /** return if mc particle has a certain pdg in the decay chain*/
@@ -223,8 +222,6 @@ namespace KlIdHelpers {
 
     for (Belle2::RecoTrack& track : genfitTracks) {
 
-
-
       try {
         genfit::MeasuredStateOnPlane state;
         genfit::MeasuredStateOnPlane state_for_cut;
@@ -232,8 +229,6 @@ namespace KlIdHelpers {
 
         // only use tracks that are close cos the extrapolation takes ages
         if (clusterPosition.Angle(state_for_cut.getPos()) < cutAngle) {
-
-
           state = track.getMeasuredStateOnPlaneFromLastHit();
           state.extrapolateToPoint(clusterPosition);
           const TVector3& trackPos = state.getPos();

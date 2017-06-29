@@ -5,9 +5,9 @@ run in default settings
 [FATAL] fatal error  { module: FatalError package: steering }
 [INFO] ================================================================================
 [INFO] Error summary: 1 errors and 1 warnings occurred.
-[WARNING] warning
-[ERROR] error
-[FATAL] fatal error
+[WARNING] warning  { module: FatalError }
+[ERROR] error  { module: FatalError }
+[FATAL] fatal error  { module: FatalError }
 [INFO] ================================================================================
 
 run with no warnings
@@ -15,8 +15,8 @@ run with no warnings
 [FATAL] fatal error  { module: FatalError package: steering }
 [INFO] ================================================================================
 [INFO] Error summary: 1 errors and 0 warnings occurred.
-[ERROR] error
-[FATAL] fatal error
+[ERROR] error  { module: FatalError }
+[FATAL] fatal error  { module: FatalError }
 [INFO] ================================================================================
 
 run with no framework warnings
@@ -25,9 +25,9 @@ run with no framework warnings
 [FATAL] fatal error  { module: FatalError package: steering }
 [INFO] ================================================================================
 [INFO] Error summary: 1 errors and 1 warnings occurred.
-[WARNING] warning
-[ERROR] error
-[FATAL] fatal error
+[WARNING] warning  { module: FatalError }
+[ERROR] error  { module: FatalError }
+[FATAL] fatal error  { module: FatalError }
 [INFO] ================================================================================
 
 run with no module warnings
@@ -35,8 +35,8 @@ run with no module warnings
 [FATAL] fatal error  { module: FatalError package: steering }
 [INFO] ================================================================================
 [INFO] Error summary: 1 errors and 0 warnings occurred.
-[ERROR] error
-[FATAL] fatal error
+[ERROR] error  { module: FatalError }
+[FATAL] fatal error  { module: FatalError }
 [INFO] ================================================================================
 
 run without summary

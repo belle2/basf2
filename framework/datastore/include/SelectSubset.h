@@ -317,7 +317,7 @@ namespace Belle2 {
      *  @param f the pointer to the function (or a nameless lambda expression) returning
      *  true for the elements to be selected and false for the others.
      */
-    void select(std::function<bool (const StoredClass*)> f);
+    void select(const std::function<bool (const StoredClass*)>& f);
 
     /** Get accessor for original set. */
     StoreAccessorBase* getSet() override { return m_set; }
@@ -408,7 +408,7 @@ namespace Belle2 {
 
   template < class StoredClass>
   void
-  SelectSubset< StoredClass >::select(std::function<bool (const StoredClass*)> f)
+  SelectSubset< StoredClass >::select(const std::function<bool (const StoredClass*)>& f)
   {
     copySetWithRelations(f);
 

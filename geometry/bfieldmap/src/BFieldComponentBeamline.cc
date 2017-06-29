@@ -322,13 +322,13 @@ namespace Belle2 {
 
       m_rmax = validRadius;
 
-      B2INFO("Delaunay triangulation of the beamline field map: " << l_interpolname);
-      B2INFO("Beamline field map: " << l_fieldmapname);
+      B2DEBUG(50, "Delaunay triangulation of the beamline field map: " << l_interpolname);
+      B2DEBUG(50, "Beamline field map: " << l_fieldmapname);
 
       // load interpolation triangles
       ifstream INd(l_interpolname);
       int nts; INd >> nts;
-      B2INFO("Total number of triangles: " << nts);
+      B2DEBUG(50, "Total number of triangles: " << nts);
       vector<triangle_t> ts;
       ts.reserve(nts);
 
@@ -441,8 +441,8 @@ namespace Belle2 {
           }
         }
 
-        B2INFO("Reduce map size to cover only region R<" << m_rmax << " cm: Ntriangles=" << rnt << " Nxypoints = " << rnp << " Nzslices=" <<
-               m_nz << " NBpoints = " << rnp * m_nz);
+        B2DEBUG(50, "Reduce map size to cover only region R<" << m_rmax << " cm: Ntriangles=" << rnt << " Nxypoints = " << rnp <<
+                " Nzslices=" << m_nz << " NBpoints = " << rnp * m_nz);
         std::swap(rpc, pc);
         std::swap(rts, ts);
       } else {

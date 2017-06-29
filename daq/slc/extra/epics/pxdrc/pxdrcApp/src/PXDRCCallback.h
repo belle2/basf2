@@ -33,6 +33,12 @@ namespace Belle2 {
     virtual ~PXDRCCallback() throw() {}
 
   public:
+    static const char* pvPScur;
+    static const char* pvPSreq;
+    static const char* pvRCcur;
+    static const char* pvRCreq;
+
+  public:
     virtual void boot(const DBObject&) throw(RCHandlerException) {}
     virtual void load(const DBObject&) throw(RCHandlerException);
     virtual void abort() throw(RCHandlerException);
@@ -53,6 +59,7 @@ namespace Belle2 {
     chid m_RC_req;
     chid m_RC_cur;
     RCState m_state_req;
+    RCState m_state_cur;
 
   };
 

@@ -273,10 +273,11 @@ TrgEclMaster::simulate01(int m_nEvent)
       boolBtoBTag  =  obj_bhabha -> GetBhabha00(phiringsum);
       vct_bhabha = obj_bhabha -> GetBhabhaComb();
     } else if (_Bhabha == 1) {
+      vct_bhabha.resize(18, 0);
       boolBtoBTag  =  obj_bhabha -> GetBhabha01();
     }
     int BtoBTag = 0;
-    if (boolBtoBTag && icn > 4) {
+    if (boolBtoBTag && icn < 4) {
       BtoBTag = 1;
     }
     //------------------------
@@ -615,10 +616,12 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
     boolBtoBTag  =  obj_bhabha -> GetBhabha00(phiringsum);
     vct_bhabha = obj_bhabha -> GetBhabhaComb();
   } else if (_Bhabha == 1) {
+    vct_bhabha.resize(18);
     boolBtoBTag  =  obj_bhabha -> GetBhabha01();
+
   }
   int BtoBTag = 0;
-  if (boolBtoBTag && icn > 4) {
+  if (boolBtoBTag && icn < 4) {
     BtoBTag = 1;
   }
   //------------------------
@@ -805,10 +808,10 @@ TrgEclMaster::setRS(std::vector<int> TCId, std::vector<double> TCHit, std::vecto
   for (int iHit = 0; iHit < size_hit; iHit++) {
     int iTCId = TCId[iHit] - 1;
     if (TCHit[iHit] > 0) {
-      int iTCThetaId = obj_map ->getTCThetaIdFromTCId(iTCId + 1) ;
-      int iTCPhiId = obj_map ->getTCPhiIdFromTCId(iTCId + 1) ;
+      int iTCThetaId = obj_map ->getTCThetaIdFromTCId(iTCId + 1) - 1 ;
+      int iTCPhiId = obj_map ->getTCPhiIdFromTCId(iTCId + 1) - 1 ;
       phiringsum[iTCThetaId] += TCHit[iHit];
-      if (iTCThetaId < 3) { //fwd
+      if (iTCThetaId - 1 < 3) { //fwd
         thetaringsum[0][iTCPhiId] += TCHit[iHit];
       } else if (iTCThetaId > 14) { //bwd
         thetaringsum[2][iTCPhiId] += TCHit[iHit];

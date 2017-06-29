@@ -18,12 +18,13 @@
 
 using namespace Belle2;
 
-DecayTree::DecayTree(const std::string& decaystring) : m_i(0), m_token_count(0), m_match_symbol_position(-1)
+DecayTree::DecayTree(const std::string& decaystring, bool removeRadiativeGammaFlag) : m_i(0), m_token_count(0),
+  m_match_symbol_position(-1)
 {
 
   m_valid = decaystring.find("No match") == std::string::npos;
   if (m_valid) {
-    const auto& root_nodes = this->build_tree(decaystring);
+    const auto& root_nodes = this->build_tree(decaystring, removeRadiativeGammaFlag);
     if (root_nodes.size() == 1)
       m_root_node = root_nodes[0];
     else
@@ -74,7 +75,7 @@ void DecayTree::build_cache(DecayNode& node)
 }
 
 
-std::vector<DecayNode> DecayTree::build_tree(const std::string& decaystring)
+std::vector<DecayNode> DecayTree::build_tree(const std::string& decaystring, bool removeRadiativeGammaFlag)
 {
 
   const unsigned int N = decaystring.size();
@@ -97,7 +98,7 @@ std::vector<DecayNode> DecayTree::build_tree(const std::string& decaystring)
     // Handle start of subdecay of the form X ( ... )
     if (decaystring[m_i] == '(') {
       m_i++;
-      nodes.back().daughters = this->build_tree(decaystring);
+      nodes.back().daughters = this->build_tree(decaystring, removeRadiativeGammaFlag);
       continue;
     }
 
@@ -116,8 +117,15 @@ std::vector<DecayNode> DecayTree::build_tree(const std::string& decaystring)
     // Parse token and add it as new node
     try {
       const int pdg = std::stoi(decaystring.substr(m_i, j - m_i));
-      nodes.emplace_back(pdg);
-      m_token_count++;
+      if (removeRadiativeGammaFlag) {
+        if (nodes.size() < 2 or pdg != 22) {
+          nodes.emplace_back(pdg);
+          m_token_count++;
+        }
+      } else {
+        nodes.emplace_back(pdg);
+        m_token_count++;
+      }
       m_i = j - 1;
     } catch (const std::invalid_argument&) {
       // We ignore if the token cannot be parsed

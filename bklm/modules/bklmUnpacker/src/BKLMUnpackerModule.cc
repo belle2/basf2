@@ -401,7 +401,7 @@ unsigned short BKLMUnpackerModule::getChannel(int sector, int layer, int axis, u
 {
 
   if (layer == 1) {
-    if (axis == 0) { //phi strips
+    if (axis == 1) { //phi strips
       if (channel > 0 && channel < 5) channel = 0;
       //else channel = channel - 4;
       if (channel > 4 && channel < 42) channel = channel - 4;
@@ -409,7 +409,7 @@ unsigned short BKLMUnpackerModule::getChannel(int sector, int layer, int axis, u
       if (channel > 41) channel = channel - 4;
     }
 
-    if (axis == 1) { //z strips
+    if (axis == 0) { //z strips
       //if (channel > 0 && channel < 10) channel = channel;
       if (channel > 9 && channel < 16) channel = 0;
       if (channel > 15 && channel < 61) channel = channel - 6;
@@ -417,12 +417,12 @@ unsigned short BKLMUnpackerModule::getChannel(int sector, int layer, int axis, u
     }
   }
   if (layer == 2) {
-    if (axis == 0) { //phi
+    if (axis == 1) { //phi
       if (channel > 0 && channel < 3) channel = 0;
       if (channel > 2 && channel < 45) channel = channel - 2;
       if (channel > 44) channel = channel - 2;;
     }
-    if (axis == 1) {
+    if (axis == 0) {
       //if (channel > 0 && channel < 10) channel = channel;
       if (channel > 9 && channel < 16) channel = 0;
       if (channel > 15 && channel < 61) channel = channel - 6;
@@ -460,7 +460,8 @@ unsigned short BKLMUnpackerModule::flipChannel(int isForward, int sector, int la
     if (layer > 2 && plane == 0) MaxiChannel = 48;
   }
 
-  if (!(isForward && sector == 7 && layer > 2 && plane == 1)) channel = MaxiChannel - channel + 1;
+  if (!(isForward && (sector == 7 || sector == 8 || sector == 1 || sector == 2) && layer > 2
+        && plane == 1)) channel = MaxiChannel - channel + 1;
 
   if (channel < 1 || channel > MaxiChannel) isOutRange = true;
 

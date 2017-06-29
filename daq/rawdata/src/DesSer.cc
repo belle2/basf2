@@ -255,7 +255,7 @@ int DesSer::sendByWriteV(RawDataBlockFormat* rawdblk)
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "[ERROR] WRITEV error.(%s) : sent %d bytes, header %d bytes body %d trailer %d\n" ,
+        sprintf(err_buf, "[WARNING] WRITEV error.(%s) : sent %d bytes, header %d bytes body %d trailer %d\n" ,
                 strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len);
 #ifdef NONSTOP
         m_run_error = 1;
@@ -333,7 +333,7 @@ int DesSer::Send(int socket, char* buf, int size_bytes)
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "[ERROR] SEND ERROR.(%s)", strerror(errno));
+        sprintf(err_buf, "[WARNING] SEND ERROR.(%s)", strerror(errno));
 #ifdef NONSTOP
         m_run_error = 1;
         //        B2ERROR(err_buf);

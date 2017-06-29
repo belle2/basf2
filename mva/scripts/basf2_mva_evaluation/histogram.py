@@ -75,7 +75,11 @@ class Histograms(object):
             isfinite = isfinite & (data[column] > (mean - range_in_std * std)) & (data[column] < (mean + range_in_std * std))
 
         if equal_frequency:
-            bins = numpy.percentile(data[column][isfinite], q=range(bins + 1))
+            bins = numpy.unique(numpy.percentile(data[column][isfinite], q=range(bins + 1)))
+            # If all values are unique, we make at least one bin
+            if len(bins) == 1:
+                bins = numpy.array([bins[0]-1, bins[0]+1])
+
         self.hist, self.bins = numpy.histogram(data[column][isfinite], bins=bins,
                                                weights=None if weight_column is None else data[weight_column])
         self.bin_centers = (self.bins + numpy.roll(self.bins, 1))[1:] / 2.0

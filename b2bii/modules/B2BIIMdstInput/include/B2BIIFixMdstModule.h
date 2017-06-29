@@ -62,10 +62,7 @@
 #include "CLHEP/Matrix/SymMatrix.h"
 #include "CLHEP/Geometry/Point3D.h"
 
-using namespace Belle;
-using namespace CLHEP;
-using namespace HepGeom;
-typedef Point3D<double> HepPoint3D;
+typedef HepGeom::Point3D<double> HepPoint3D;
 
 namespace Belle {
 
@@ -196,7 +193,7 @@ namespace Belle2 {
     void scale_momenta_set_v1(const int, const int, const int, double&);
     void scale_momenta_set_v2(const int, const int, const int, double&);
 
-    double vee_mass_nofit(const Mdst_vee2& vee2, float scale = 1.0);
+    double vee_mass_nofit(const Belle::Mdst_vee2& vee2, float scale = 1.0);
 
     //  Author:  J.Tanaka (+T.Higuchi/2002,2003)
     void scale_error(const int message_level = 0);
@@ -212,12 +209,12 @@ namespace Belle2 {
     void make_pi0(int, double, double);
     void correct_ecl(int, int);
 
-    int set_primary_vertex(HepPoint3D& v, HepSymMatrix& ve);
+    int set_primary_vertex(HepPoint3D& v, CLHEP::HepSymMatrix& ve);
 
     void make_pi0_primary_vertex(int, double, double, const HepPoint3D&,
-                                 const HepSymMatrix&);
+                                 const CLHEP::HepSymMatrix&);
     void correct_ecl_primary_vertex(const HepPoint3D&,
-                                    const HepSymMatrix&);
+                                    const CLHEP::HepSymMatrix&);
     // Treat pi0 mass width as a func. of pi0 momentum.
     static double pi0resol(double, double, const char*, bool, int, int);
 

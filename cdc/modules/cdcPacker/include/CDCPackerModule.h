@@ -15,7 +15,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
-#include <cdc/dataobjects/CDCRawHitWaveForm.h>
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 
@@ -233,11 +232,6 @@ namespace Belle2 {
       std::string m_cdcRawHitName;
 
       /**
-       * Name of the CDCRawHit dataobject (raw data mode).
-       */
-      std::string m_cdcRawHitWaveFormName;
-
-      /**
        * Tree name of the CDCHit object.
        */
       std::string m_cdcHitName;
@@ -246,17 +240,6 @@ namespace Belle2 {
        * Name of the assignment map of FE board channel to the cell.
        */
       std::string m_xmlMapFileName;
-
-      /**
-       * Relation name between CDCRawHit and CDCHit.
-       */
-      std::string m_relCDCRawHitToCDCHitName;
-
-      /**
-       * Relation name between CDCRawHitWaveForm and CDCHit.
-       */
-
-      std::string m_relCDCRawHitWFToCDCHitName;
 
       /**
        * Short ward buffer of CDC event block.
@@ -284,11 +267,6 @@ namespace Belle2 {
        * 3rd column : Wire ID (phi).
        */
       int m_fee_ch[9][8][384];
-
-      /**
-       * Number of hits in the cell.
-       */
-      int m_eWire_nhit[36882];
 
       /**
        * Enable/Disable to read the channel map

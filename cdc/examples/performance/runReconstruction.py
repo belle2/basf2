@@ -26,10 +26,12 @@ from cdc.cr import *
 reset_database()
 use_database_chain()
 use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
-use_central_database("cdc_cr_test1", LogLevel.WARNING)
+use_local_database("cdc_crt/database.txt", "cdc_crt")
+# use_central_database("cdc_cr_test1", LogLevel.WARNING)
 
 
-def main(input, output):
+def rec(input, output, topInCounter=True, magneticField=False):
+
     main_path = basf2.create_path()
     logging.log_level = LogLevel.INFO
 
@@ -54,22 +56,30 @@ def main(input, output):
                              ("/DetectorComponent[@name='CDC']//GlobalPhiRotation", str(globalPhiRotation), "deg")
                          ])
     #
-    main_path.add_module('Geometry',
-                         components=['CDC'])
+    if magneticField is False:
+        main_path.add_module('Geometry',
+                             components=['CDC'])
+    else:
+        main_path.add_module('Geometry',
+                             components=['CDC', 'MagneticFieldConstant4LimitedRCDC'])
+
     main_path.add_module('Progress')
 
     # Set CDC CR parameters.
     set_cdc_cr_parameters(data_period)
 
     # Add CDC CR reconstruction.
-    add_cdc_cr_reconstruction(main_path, eventTimingExtraction=False)
+    add_cdc_cr_reconstruction(main_path,
+                              eventTimingExtraction=False,
+                              topInCounter=topInCounter)
 
     # Simple analysi module.
     output = "/".join(['output', output])
     main_path.add_module('CDCCosmicAnalysis',
+                         noBFit=not magneticField,
                          Output=output)
 
-    # main_path.add_module("RootOutput", outputFileName=output)
+    #    main_path.add_module("RootOutput", outputFileName='full.root')
     basf2.print_path(main_path)
     basf2.process(main_path)
     print(basf2.statistics)
@@ -82,4 +92,4 @@ if __name__ == "__main__":
     parser.add_argument('input', help='Input file to be processed (unpacked CDC data).')
     parser.add_argument('output', help='Output file you want to store the results.')
     args = parser.parse_args()
-    main(args.input, args.output)
+    rec(args.input, args.output, topInCounter=True, magneticField=False)

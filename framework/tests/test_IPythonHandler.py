@@ -1,5 +1,5 @@
 import os
-from unittest import TestCase
+from unittest import TestCase, main
 
 from hep_ipython_tools.calculation_process import CalculationProcess
 from hep_ipython_tools.calculation import Calculation
@@ -187,4 +187,6 @@ class TestIPythonHandler(TestCase):
         assert_is_in_processes(2, "bc")
         assert_is_in_processes(3, "bc")
 
+if __name__ == "__main__":
+    main()
 # @endcond

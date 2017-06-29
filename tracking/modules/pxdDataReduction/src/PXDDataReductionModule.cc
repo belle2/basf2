@@ -88,6 +88,16 @@ void PXDDataReductionModule::initialize()
 void PXDDataReductionModule::beginRun()
 {
 
+  B2INFO("||| PXDDataReduction Parameters:");
+  B2INFO("    tolerance: phi = " << m_tolerancePhi);
+  B2INFO("                z = " << m_toleranceZ);
+  B2INFO("    n sigma:    u = " << m_numSigmaTotU);
+  B2INFO("                v = " << m_numSigmaTotV);
+  B2INFO("    systematic: u = " << m_sigmaSystU);
+  B2INFO("                v = " << m_sigmaSystV);
+  B2INFO("    max width:  u = " << m_maxWidthU);
+  B2INFO("                v = " << m_maxWidthV);
+
   m_ROIinfo.sigmaSystU = m_sigmaSystU;
   m_ROIinfo.sigmaSystV = m_sigmaSystV;
   m_ROIinfo.numSigmaTotU = m_numSigmaTotU;

@@ -61,7 +61,7 @@ void MVAExpert::beginRun()
 
         if (itNamedVariable == m_allNamedVariables.end()) {
           B2ERROR("Variable name " << iVar << " mismatch for FastBDT. " <<
-                  "Could not fing expected variable '" << expectedName << "'");
+                  "Could not find expected variable '" << expectedName << "'");
         }
         m_selectedNamedVariables.push_back(*itNamedVariable);
       }

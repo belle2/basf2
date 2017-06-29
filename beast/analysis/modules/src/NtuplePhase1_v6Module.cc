@@ -204,6 +204,10 @@ namespace Belle2 {
     m_tree->SetBranchAddress("SKB_HER_pressures", &(m_beast.SKB_HER_pressures));
     m_tree->SetBranchAddress("SKB_LER_pressure_average", &(m_beast.SKB_LER_pressure_average));
     m_tree->SetBranchAddress("SKB_HER_pressure_average", &(m_beast.SKB_HER_pressure_average));
+    m_tree->SetBranchAddress("SKB_LER_pressures_corrected", &(m_beast.SKB_LER_pressures_corrected));
+    m_tree->SetBranchAddress("SKB_HER_pressures_corrected", &(m_beast.SKB_HER_pressures_corrected));
+    m_tree->SetBranchAddress("SKB_LER_pressure_average_corrected", &(m_beast.SKB_LER_pressure_average_corrected));
+    m_tree->SetBranchAddress("SKB_HER_pressure_average_corrected", &(m_beast.SKB_HER_pressure_average_corrected));
     m_tree->SetBranchAddress("SKB_HER_collimatorPositions_mm", &(m_beast.SKB_HER_collimatorPositions_mm));
     m_tree->SetBranchAddress("SKB_HER_collimatorPositions_DMM", &(m_beast.SKB_HER_collimatorPositions_DMM));
     m_tree->SetBranchAddress("SKB_HER_collimatorPositions_inX", &(m_beast.SKB_HER_collimatorPositions_inX));
@@ -228,8 +232,15 @@ namespace Belle2 {
     m_tree->SetBranchAddress("SKB_LER_partialPressures_D06", &(m_beast.SKB_LER_partialPressures_D06));
     m_tree->SetBranchAddress("SKB_LER_partialPressures_D02", &(m_beast.SKB_LER_partialPressures_D02));
     m_tree->SetBranchAddress("SKB_LER_pressures_local", &(m_beast.SKB_LER_pressures_local));
+    m_tree->SetBranchAddress("SKB_HER_pressures_local", &(m_beast.SKB_HER_pressures_local));
+    m_tree->SetBranchAddress("SKB_LER_pressures_local_corrected", &(m_beast.SKB_LER_pressures_local_corrected));
+    m_tree->SetBranchAddress("SKB_HER_pressures_local_corrected", &(m_beast.SKB_HER_pressures_local_corrected));
     m_tree->SetBranchAddress("SKB_LER_Zeff_D02", &(m_beast.SKB_LER_Zeff_D02));
     m_tree->SetBranchAddress("SKB_LER_Zeff_D06", &(m_beast.SKB_LER_Zeff_D06));
+    m_tree->SetBranchAddress("CSI_sumE", &(m_beast.CSI_data_sumE));
+    m_tree->SetBranchAddress("BGO_dose", &(m_beast.BGO_data_dose));
+    m_tree->SetBranchAddress("PIN_dose", &(m_beast.PIN_data_dose));
+    m_tree->SetBranchAddress("DIA_dose", &(m_beast.DIA_data_dose));
 
     if (m_numEvents > 0) {
       m_tree->GetEntry(0);
@@ -694,97 +705,6 @@ namespace Belle2 {
       iter++;
     }
     dirh->cd();
-    /*
-    // expand possible wildcards
-    m_inputFileNames = expandWordExpansions(m_inputFileNames);
-    if (m_inputFileNames.empty()) {
-      B2FATAL("No valid files specified!");
-    }
-
-    // check files
-    TDirectory* dir = gDirectory;
-    for (const string& fileName : m_inputFileNames) {
-      TFile* f = TFile::Open(fileName.c_str(), "READ");
-      if (!f or !f->IsOpen()) {
-        B2FATAL("Couldn't open input file " + fileName);
-      }
-      delete f;
-    }
-
-    dir->cd();
-
-    // get event TTree
-    //m_tree = new TChain(c_treeNames[DataStore::c_Event].c_str());
-    m_tree = new TChain("tout");
-    for (const string& fileName : m_inputFileNames) {
-      m_tree->AddFile(fileName.c_str());
-    }
-    m_numEvents = m_tree->GetEntries();
-    if (m_numEvents == 0) B2ERROR(c_treeNames[DataStore::c_Event] << " has no entires");
-    m_eventCount = 0;
-
-    m_tree->SetBranchAddress("ts", &(m_beast.ts));
-    m_tree->SetBranchAddress("event", &(m_beast.event));
-    m_tree->SetBranchAddress("run", &(m_beast.run));
-    m_tree->SetBranchAddress("subrun", &(m_beast.subrun));
-    m_tree->SetBranchAddress("SKB_HER_injectionFlag", &(m_beast.SKB_HER_injectionFlag));
-    m_tree->SetBranchAddress("SKB_LER_injectionFlag", &(m_beast.SKB_LER_injectionFlag));
-    m_tree->SetBranchAddress("SKB_HER_injectionFlag_safe", &(m_beast.SKB_HER_injectionFlag_safe));
-    m_tree->SetBranchAddress("SKB_LER_injectionFlag_safe", &(m_beast.SKB_LER_injectionFlag_safe));
-    m_tree->SetBranchAddress("SKB_HER_abortFlag", &(m_beast.SKB_HER_abortFlag));
-    m_tree->SetBranchAddress("SKB_LER_abortFlag", &(m_beast.SKB_LER_abortFlag));
-    m_tree->SetBranchAddress("SKB_HER_abortFlag_safe", &(m_beast.SKB_HER_abortFlag_safe));
-    m_tree->SetBranchAddress("SKB_LER_abortFlag_safe", &(m_beast.SKB_LER_abortFlag_safe));
-    m_tree->SetBranchAddress("SKB_Status", &(m_beast.SKB_Status));
-    m_tree->SetBranchAddress("SKB_HER_injectionRate", &(m_beast.SKB_HER_injectionRate));
-    m_tree->SetBranchAddress("SKB_LER_injectionRate", &(m_beast.SKB_LER_injectionRate));
-    m_tree->SetBranchAddress("SKB_HER_lifetime", &(m_beast.SKB_HER_lifetime));
-    m_tree->SetBranchAddress("SKB_LER_lifetime", &(m_beast.SKB_LER_lifetime));
-    m_tree->SetBranchAddress("SKB_LER_current", &(m_beast.SKB_LER_current));
-    m_tree->SetBranchAddress("SKB_HER_current", &(m_beast.SKB_HER_current));
-    m_tree->SetBranchAddress("SKB_LER_injectionEfficiency", &(m_beast.SKB_LER_injectionEfficiency));
-    m_tree->SetBranchAddress("SKB_HER_injectionEfficiency", &(m_beast.SKB_HER_injectionEfficiency));
-    m_tree->SetBranchAddress("SKB_beamLoss_ionChambers_mean", &(m_beast.SKB_beamLoss_ionChambers_mean));
-    m_tree->SetBranchAddress("SKB_beamLoss_PINdiodes_mean", &(m_beast.SKB_beamLoss_PINdiodes_mean));
-    m_tree->SetBranchAddress("SKB_beamLoss_nearCollimators", &(m_beast.SKB_beamLoss_nearCollimators));
-    m_tree->SetBranchAddress("SKB_beamLoss_aroundMasks", &(m_beast.SKB_beamLoss_aroundMasks));
-    m_tree->SetBranchAddress("SKB_LER_injectionCharge", &(m_beast.SKB_LER_injectionCharge));
-    m_tree->SetBranchAddress("SKB_HER_injectionCharge", &(m_beast.SKB_HER_injectionCharge));
-    m_tree->SetBranchAddress("SKB_LER_injectionRepetitionRate", &(m_beast.SKB_LER_injectionRepetitionRate));
-    m_tree->SetBranchAddress("SKB_HER_injectionRepetitionRate", &(m_beast.SKB_HER_injectionRepetitionRate));
-    m_tree->SetBranchAddress("SKB_LER_injectionNumberOfBunches", &(m_beast.SKB_LER_injectionNumberOfBunches));
-    m_tree->SetBranchAddress("SKB_HER_injectionNumberOfBunches", &(m_beast.SKB_HER_injectionNumberOfBunches));
-    m_tree->SetBranchAddress("SKB_LER_pressures", &(m_beast.SKB_LER_pressures));
-    m_tree->SetBranchAddress("SKB_HER_pressures", &(m_beast.SKB_HER_pressures));
-    m_tree->SetBranchAddress("SKB_LER_pressure_average", &(m_beast.SKB_LER_pressure_average));
-    m_tree->SetBranchAddress("SKB_HER_pressure_average", &(m_beast.SKB_HER_pressure_average));
-    m_tree->SetBranchAddress("SKB_HER_collimatorPositions_mm", &(m_beast.SKB_HER_collimatorPositions_mm));
-    m_tree->SetBranchAddress("SKB_HER_collimatorPositions_DMM", &(m_beast.SKB_HER_collimatorPositions_DMM));
-    m_tree->SetBranchAddress("SKB_HER_collimatorPositions_inX", &(m_beast.SKB_HER_collimatorPositions_inX));
-    m_tree->SetBranchAddress("SKB_HER_collimatorPositions_inY", &(m_beast.SKB_HER_collimatorPositions_inY));
-    m_tree->SetBranchAddress("SKB_HER_collimatorPositions_fromBeam", &(m_beast.SKB_HER_collimatorPositions_fromBeam));
-    m_tree->SetBranchAddress("SKB_LER_collimatorPositions_mm", &(m_beast.SKB_LER_collimatorPositions_mm));
-    m_tree->SetBranchAddress("SKB_LER_collimatorPositions_X", &(m_beast.SKB_LER_collimatorPositions_X));
-    m_tree->SetBranchAddress("SKB_LER_collimatorPositions_Y", &(m_beast.SKB_LER_collimatorPositions_Y));
-    m_tree->SetBranchAddress("SKB_LER_collimatorPositions_fromBeam", &(m_beast.SKB_LER_collimatorPositions_fromBeam));
-    m_tree->SetBranchAddress("SKB_HER_beamSize_xray_X", &(m_beast.SKB_HER_beamSize_xray_X));
-    m_tree->SetBranchAddress("SKB_HER_beamSize_xray_Y", &(m_beast.SKB_HER_beamSize_xray_Y));
-    m_tree->SetBranchAddress("SKB_HER_correctedBeamSize_xray_Y", &(m_beast.SKB_HER_correctedBeamSize_xray_Y));
-    m_tree->SetBranchAddress("SKB_LER_beamSize_xray_X", &(m_beast.SKB_LER_beamSize_xray_X));
-    m_tree->SetBranchAddress("SKB_LER_beamSize_xray_Y", &(m_beast.SKB_LER_beamSize_xray_Y));
-    m_tree->SetBranchAddress("SKB_LER_correctedBeamSize_xray_Y", &(m_beast.SKB_LER_correctedBeamSize_xray_Y));
-    m_tree->SetBranchAddress("SKB_LER_beamSize_SR_X", &(m_beast.SKB_LER_beamSize_SR_X));
-    m_tree->SetBranchAddress("SKB_LER_beamSize_SR_Y", &(m_beast.SKB_LER_beamSize_SR_Y));
-    m_tree->SetBranchAddress("SKB_HER_beamSize_SR_X", &(m_beast.SKB_HER_beamSize_SR_X));
-    m_tree->SetBranchAddress("SKB_HER_beamSize_SR_Y", &(m_beast.SKB_HER_beamSize_SR_Y));
-    m_tree->SetBranchAddress("SKB_HER_integratedCurrent", &(m_beast.SKB_HER_integratedCurrent));
-    m_tree->SetBranchAddress("SKB_LER_integratedCurrent", &(m_beast.SKB_LER_integratedCurrent));
-    m_tree->SetBranchAddress("SKB_LER_partialPressures_D06", &(m_beast.SKB_LER_partialPressures_D06));
-    m_tree->SetBranchAddress("SKB_LER_partialPressures_D02", &(m_beast.SKB_LER_partialPressures_D02));
-    m_tree->SetBranchAddress("SKB_LER_pressures_local", &(m_beast.SKB_LER_pressures_local));
-    m_tree->SetBranchAddress("SKB_LER_Zeff_D02", &(m_beast.SKB_LER_Zeff_D02));
-    m_tree->SetBranchAddress("SKB_LER_Zeff_D06", &(m_beast.SKB_LER_Zeff_D06));
-    */
     dir->cd();
     m_numEntries = m_tree->GetEntries();
     cout << "m_numEntries " << m_numEntries << endl;
@@ -836,6 +756,10 @@ namespace Belle2 {
     m_treeBEAST->Branch("SKB_HER_pressures", &(m_beast.SKB_HER_pressures));
     m_treeBEAST->Branch("SKB_LER_pressure_average", &(m_beast.SKB_LER_pressure_average));
     m_treeBEAST->Branch("SKB_HER_pressure_average", &(m_beast.SKB_HER_pressure_average));
+    m_treeBEAST->Branch("SKB_LER_pressures_corrected", &(m_beast.SKB_LER_pressures_corrected));
+    m_treeBEAST->Branch("SKB_HER_pressures_corrected", &(m_beast.SKB_HER_pressures_corrected));
+    m_treeBEAST->Branch("SKB_LER_pressure_average_corrected", &(m_beast.SKB_LER_pressure_average_corrected));
+    m_treeBEAST->Branch("SKB_HER_pressure_average_corrected", &(m_beast.SKB_HER_pressure_average_corrected));
     m_treeBEAST->Branch("SKB_HER_collimatorPositions_mm", &(m_beast.SKB_HER_collimatorPositions_mm));
     m_treeBEAST->Branch("SKB_HER_collimatorPositions_DMM", &(m_beast.SKB_HER_collimatorPositions_DMM));
     m_treeBEAST->Branch("SKB_HER_collimatorPositions_inX", &(m_beast.SKB_HER_collimatorPositions_inX));
@@ -860,8 +784,17 @@ namespace Belle2 {
     m_treeBEAST->Branch("SKB_LER_partialPressures_D06", &(m_beast.SKB_LER_partialPressures_D06));
     m_treeBEAST->Branch("SKB_LER_partialPressures_D02", &(m_beast.SKB_LER_partialPressures_D02));
     m_treeBEAST->Branch("SKB_LER_pressures_local", &(m_beast.SKB_LER_pressures_local));
+    m_treeBEAST->Branch("SKB_HER_pressures_local", &(m_beast.SKB_HER_pressures_local));
+    m_treeBEAST->Branch("SKB_LER_pressures_local_corrected", &(m_beast.SKB_LER_pressures_local_corrected));
+    m_treeBEAST->Branch("SKB_HER_pressures_local_corrected", &(m_beast.SKB_HER_pressures_local_corrected));
     m_treeBEAST->Branch("SKB_LER_Zeff_D02", &(m_beast.SKB_LER_Zeff_D02));
     m_treeBEAST->Branch("SKB_LER_Zeff_D06", &(m_beast.SKB_LER_Zeff_D06));
+
+    m_treeBEAST->Branch("CSI_data_sumE", &(m_beast.CSI_data_sumE));
+    m_treeBEAST->Branch("BGO_data_dose", &(m_beast.BGO_data_dose));
+    m_treeBEAST->Branch("PIN_data_dose", &(m_beast.PIN_data_dose));
+    m_treeBEAST->Branch("DIA_data_dose", &(m_beast.DIA_data_dose));
+
     m_treeBEAST->Branch("PIN_dose", &(m_beast.PIN_dose));
     m_treeBEAST->Branch("BGO_energy", &(m_beast.BGO_energy));
     m_treeBEAST->Branch("HE3_rate", &(m_beast.HE3_rate));
@@ -1097,6 +1030,21 @@ namespace Belle2 {
 
     m_tree->GetEntry(m_eventCount);
 
+    double Zeff_LER = 0;
+    if (m_beast.SKB_LER_Zeff_D02 != 0 && m_beast.SKB_LER_Zeff_D02->size() > 0) Zeff_LER = m_beast.SKB_LER_Zeff_D02->at(0);
+    cout << "Zeff_DO2 " << Zeff_LER << endl;
+    double Zeff_LC = 1;
+    double Zeff_LB = 1;
+    if (Zeff_LER == 0) {
+      Zeff_LER = 2.7;
+      //Zeff_LC = 1.0;
+      //Zeff_LB = 1.0;
+    } else if (Zeff_LER > 0 && Zeff_LER < 40) {
+      Zeff_LC = fctRate_LC->Eval(Zeff_LER) / fctRate_LC->Eval(7) / m_input_Z_scaling[1];
+      Zeff_LB = fctRate_LB->Eval(Zeff_LER) / fctRate_LB->Eval(7) / m_input_Z_scaling[3];
+    }
+    cout << "Zeff_LC  " << Zeff_LC  << " Zeff_LB " << Zeff_LB << " Zeff_LER " << Zeff_LER << endl;
+
     double I_HER = 0;
     if (m_beast.SKB_HER_current != 0 && m_beast.SKB_HER_current->size() > 0) I_HER = m_beast.SKB_HER_current->at(0);
     if (m_input_I_HER[1] > 0) I_HER += gRandom->Gaus(0, m_input_I_HER[1]);
@@ -1113,6 +1061,17 @@ namespace Belle2 {
         && m_beast.SKB_LER_pressure_average->size() > 0) P_LER = m_beast.SKB_LER_pressure_average->at(
                 0) * 0.00750062 * 1e9 * m_input_GasCorrection[1];
     if (m_input_P_LER[1] > 0) P_LER += gRandom->Gaus(0, m_input_P_LER[1]);
+    double P_corrected_HER = 0;
+    if (m_beast.SKB_HER_pressure_average_corrected != 0
+        && m_beast.SKB_HER_pressure_average_corrected->size() > 0) P_corrected_HER = m_beast.SKB_HER_pressure_average_corrected->at(
+                0) * 0.00750062 * 1e9;
+    if (m_input_P_HER[1] > 0) P_corrected_HER += gRandom->Gaus(0, m_input_P_HER[1]);
+    double P_corrected_LER = 0;
+    if (m_beast.SKB_LER_pressure_average_corrected != 0
+        && m_beast.SKB_LER_pressure_average_corrected->size() > 0) P_corrected_LER = m_beast.SKB_LER_pressure_average_corrected->at(
+                0) * 0.00750062 * 1e9;
+    if (m_input_P_LER[1] > 0) P_corrected_LER += gRandom->Gaus(0, m_input_P_LER[1]);
+
     double sigma_y_HER = 0;
     double sigma_x_HER = 0;
     if (m_beast.SKB_HER_correctedBeamSize_xray_Y != 0
@@ -1174,13 +1133,17 @@ namespace Belle2 {
     if (I_LER < 0) I_LER = 0;
     if (P_HER < 0) P_HER = 0;
     if (P_LER < 0) P_LER = 0;
+    if (P_corrected_HER < 0) P_corrected_HER = 0;
+    if (P_corrected_LER < 0) P_corrected_LER = 0;
 
     if (m_input_data_SingleBeam == "LER") {
       I_HER = 0;
       P_HER = 0;
+      P_corrected_HER = 0;
     } else if (m_input_data_SingleBeam == "HER") {
       I_LER = 0;
       P_LER = 0;
+      P_corrected_LER = 0;
     }
 
     double Ib_HER = 0;
@@ -1209,6 +1172,7 @@ namespace Belle2 {
     //                       solution 1: Beam Gas \propo I x P => (I_bP)^data / (I_bP)^simu where I_b = current / #bunch
     double ScaleFacBGav_HER = 0;
     double ScaleFacBGav_LER = 0;
+    /*
     if (I_LER > 0 && P_LER > 0) {
       if (m_input_BGSol == 0
           && bunch_nb_LER > 0) ScaleFacBGav_LER = I_LER * P_LER / (m_input_I_LER[0] * m_input_P_LER[0]) / bunch_nb_LER *
@@ -1221,10 +1185,24 @@ namespace Belle2 {
                                                     m_input_bunchNb_HER[0];
       if (m_input_BGSol == 1 && bunch_nb_HER > 0) ScaleFacBGav_HER = I_HER * P_HER / (m_input_I_HER[0] * m_input_P_HER[0]);
     }
+    */
+    if (I_LER > 0 && P_corrected_LER > 0) {
+      if (m_input_BGSol == 0
+          && bunch_nb_LER > 0) ScaleFacBGav_LER = I_LER * P_corrected_LER / (m_input_I_LER[0] * m_input_P_LER[0]) / bunch_nb_LER *
+                                                    m_input_bunchNb_LER[0];
+      if (m_input_BGSol == 1 && bunch_nb_LER > 0) ScaleFacBGav_LER = I_LER * P_corrected_LER / (m_input_I_LER[0] * m_input_P_LER[0]);
+    }
+    if (I_HER > 0 && P_corrected_HER > 0) {
+      if (m_input_BGSol == 0
+          && bunch_nb_HER > 0) ScaleFacBGav_HER = I_HER * P_corrected_HER / (m_input_I_HER[0] * m_input_P_HER[0]) / bunch_nb_HER *
+                                                    m_input_bunchNb_HER[0];
+      if (m_input_BGSol == 1 && bunch_nb_HER > 0) ScaleFacBGav_HER = I_HER * P_corrected_HER / (m_input_I_HER[0] * m_input_P_HER[0]);
+    }
 
     //Calculate Beam Gas scaling factor: Beam Gas \propo I x P => (IP)^data / (IP)^simu
     double ScaleFacBG_HER[12];
     double ScaleFacBG_LER[12];
+    /*
     if (m_beast.SKB_HER_pressures != 0) {
       for (int i = 0; i < (int)m_beast.SKB_HER_pressures->size(); i++) {
         ScaleFacBG_HER[i] = 0;
@@ -1255,7 +1233,37 @@ namespace Belle2 {
         }
       }
     }
-
+    */
+    if (m_beast.SKB_HER_pressures_corrected != 0) {
+      for (int i = 0; i < (int)m_beast.SKB_HER_pressures_corrected->size(); i++) {
+        ScaleFacBG_HER[i] = 0;
+        double iP_HER = 0;
+        iP_HER = m_beast.SKB_HER_pressures_corrected->at(i) * 0.00750062 * 1e9 * m_input_GasCorrection[0];
+        if (m_input_P_HER[1] > 0) iP_HER += gRandom->Gaus(0, m_input_P_HER[1]);
+        if (iP_HER < 0 || iP_HER > 260.) iP_HER = 0;
+        if (I_HER > 0 && iP_HER > 0) {
+          if (m_input_BGSol == 0
+              && bunch_nb_HER > 0) ScaleFacBG_HER[i] = I_HER * iP_HER / (m_input_I_HER[0] * m_input_P_HER[0]) / bunch_nb_HER *
+                                                         m_input_bunchNb_HER[0];
+          if (m_input_BGSol == 1 && bunch_nb_HER > 0) ScaleFacBG_HER[i] = I_HER * iP_HER / (m_input_I_HER[0] * m_input_P_HER[0]);
+        }
+      }
+    }
+    if (m_beast.SKB_LER_pressures_corrected != 0) {
+      for (int i = 0; i < (int)m_beast.SKB_LER_pressures_corrected->size(); i++) {
+        ScaleFacBG_LER[i] = 0;
+        double iP_LER = 0;
+        iP_LER = m_beast.SKB_LER_pressures_corrected->at(i) * 0.00750062 * 1e9 * m_input_GasCorrection[1];
+        if (m_input_P_LER[1] > 0) iP_LER += gRandom->Gaus(0, m_input_P_LER[1]);
+        if (iP_LER < 0 || iP_LER > 260.) iP_LER = 0;
+        if (I_LER > 0 && iP_LER > 0) {
+          if (m_input_BGSol == 0
+              && bunch_nb_LER > 0) ScaleFacBG_LER[i] = I_LER * iP_LER / (m_input_I_LER[0] * m_input_P_LER[0]) / bunch_nb_LER *
+                                                         m_input_bunchNb_LER[0];
+          if (m_input_BGSol == 1 && bunch_nb_LER > 0) ScaleFacBG_LER[i] = I_LER * iP_LER / (m_input_I_LER[0] * m_input_P_LER[0]);
+        }
+      }
+    }
     //Calculate Touschek scaling factor: Touschek \propo I^2 / (bunch_nb x sigma_y) => (I^2/(bunch_nb x sigma_y))^data / (I^2/(bunch_nb x sigma_y))^simu
     double ScaleFacTo_HER = 0;
     double ScaleFacTo_LER = 0;
@@ -1342,6 +1350,7 @@ namespace Belle2 {
         if (m_input_LB_DIA_dose[j].size() > 0) {
           LBG = m_input_LB_DIA_dose[j][i] + m_input_LC_DIA_dose[j][i];
           HBG = m_input_HB_DIA_dose[j][i] + m_input_HC_DIA_dose[j][i];
+          if (j == 1) LBG = m_input_LB_DIA_dose[j][i] * Zeff_LB + m_input_LC_DIA_dose[j][i] * Zeff_LC;
           /*cout << "section " << j
                << " LB " << m_input_LB_DIA_dose[j][i] << " LC " << m_input_LC_DIA_dose[j][i] << " HB " <<  m_input_HB_DIA_dose[j][i] << " HC " <<
                m_input_HC_DIA_dose[j][i] << endl;*/
@@ -1368,6 +1377,7 @@ namespace Belle2 {
         if (m_input_LB_PIN_dose[j].size() > 0) {
           LBG = m_input_LB_PIN_dose[j][i] + m_input_LC_PIN_dose[j][i];
           HBG = m_input_HB_PIN_dose[j][i] + m_input_HC_PIN_dose[j][i];
+          if (j == 1) LBG = m_input_LB_PIN_dose[j][i] * Zeff_LB + m_input_LC_PIN_dose[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1394,6 +1404,7 @@ namespace Belle2 {
         if (m_input_LB_DOSI[j].size() > 0) {
           LBG = m_input_LB_DOSI[j][i] + m_input_LC_DOSI[j][i];
           HBG = m_input_HB_DOSI[j][i] + m_input_HC_DOSI[j][i];
+          if (j == 1) LBG = m_input_LB_DOSI[j][i] * Zeff_LB + m_input_LC_DOSI[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1417,6 +1428,7 @@ namespace Belle2 {
         if (m_input_LB_BGO_dose[j].size() > 0) {
           LBG = m_input_LB_BGO_dose[j][i] + m_input_LC_BGO_dose[j][i];
           HBG = m_input_HB_BGO_dose[j][i] + m_input_HC_BGO_dose[j][i];
+          if (j == 1) LBG = m_input_LB_BGO_dose[j][i] * Zeff_LB + m_input_LC_BGO_dose[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1451,6 +1463,7 @@ namespace Belle2 {
         if (m_input_LB_HE3_rate[j].size() > 0) {
           LBG = m_input_LB_HE3_rate[j][he3order[i]] + m_input_LC_HE3_rate[j][he3order[i]];
           HBG = m_input_HB_HE3_rate[j][he3order[i]] + m_input_HC_HE3_rate[j][he3order[i]];
+          if (j == 1) LBG = m_input_LB_HE3_rate[j][he3order[i]] * Zeff_LB + m_input_LC_HE3_rate[j][he3order[i]] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1474,6 +1487,7 @@ namespace Belle2 {
         if (m_input_LB_TPC_rate[j].size() > 0) {
           LBG = m_input_LB_TPC_rate[j][i] + m_input_LC_TPC_rate[j][i];
           HBG = m_input_HB_TPC_rate[j][i] + m_input_HC_TPC_rate[j][i];
+          if (j == 1) LBG = m_input_LB_TPC_rate[j][i] * Zeff_LB + m_input_LC_TPC_rate[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1497,6 +1511,7 @@ namespace Belle2 {
         if (m_input_LB_TPC_dose[j].size() > 0) {
           LBG = m_input_LB_TPC_dose[j][i] + m_input_LC_TPC_dose[j][i];
           HBG = m_input_HB_TPC_dose[j][i] + m_input_HC_TPC_dose[j][i];
+          if (j == 1) LBG = m_input_LB_TPC_dose[j][i] * Zeff_LB + m_input_LC_TPC_dose[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1520,6 +1535,7 @@ namespace Belle2 {
         if (m_input_LB_TPC_angular_rate[j].size() > 0) {
           LBG = m_input_LB_TPC_angular_rate[j][i] + m_input_LC_TPC_angular_rate[j][i];
           HBG = m_input_HB_TPC_angular_rate[j][i] + m_input_HC_TPC_angular_rate[j][i];
+          if (j == 1) LBG = m_input_LB_TPC_angular_rate[j][i] * Zeff_LB + m_input_LC_TPC_angular_rate[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1543,6 +1559,7 @@ namespace Belle2 {
         if (m_input_LB_TPC_angular_dose[j].size() > 0) {
           LBG = m_input_LB_TPC_angular_dose[j][i] + m_input_LC_TPC_angular_dose[j][i];
           HBG = m_input_HB_TPC_angular_dose[j][i] + m_input_HC_TPC_angular_dose[j][i];
+          if (j == 1) LBG = m_input_LB_TPC_angular_dose[j][i] * Zeff_LB + m_input_LC_TPC_angular_dose[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1565,6 +1582,7 @@ namespace Belle2 {
         if (m_input_LB_CLAWS_rate[j].size() > 0) {
           LBG = m_input_LB_CLAWS_rate[j][i] + m_input_LC_CLAWS_rate[j][i];
           HBG = m_input_HB_CLAWS_rate[j][i] + m_input_HC_CLAWS_rate[j][i];
+          if (j == 1) LBG = m_input_LB_CLAWS_rate[j][i] * Zeff_LB + m_input_LC_CLAWS_rate[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1588,6 +1606,7 @@ namespace Belle2 {
         if (m_input_LB_QCSS_rate[j].size() > 0) {
           LBG = m_input_LB_QCSS_rate[j][i] + m_input_LC_QCSS_rate[j][i];
           HBG = m_input_HB_QCSS_rate[j][i] + m_input_HC_QCSS_rate[j][i];
+          if (j == 1) LBG = m_input_LB_QCSS_rate[j][i] * Zeff_LB + m_input_LC_QCSS_rate[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1611,6 +1630,7 @@ namespace Belle2 {
         if (m_input_LB_CSI_dose[j].size() > 0) {
           LBG = m_input_LB_CSI_dose[j][i] + m_input_LC_CSI_dose[j][i];
           HBG = m_input_HB_CSI_dose[j][i] + m_input_HC_CSI_dose[j][i];
+          if (j == 1) LBG = m_input_LB_CSI_dose[j][i] * Zeff_LB + m_input_LC_CSI_dose[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1632,6 +1652,7 @@ namespace Belle2 {
         if (m_input_LB_CSI_dose_binE[j].size() > 0) {
           LBG = m_input_LB_CSI_dose_binE[j][i] + m_input_LC_CSI_dose_binE[j][i];
           HBG = m_input_HB_CSI_dose_binE[j][i] + m_input_HC_CSI_dose_binE[j][i];
+          if (j == 1) LBG = m_input_LB_CSI_dose_binE[j][i] * Zeff_LB + m_input_LC_CSI_dose_binE[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
@@ -1653,6 +1674,7 @@ namespace Belle2 {
         if (m_input_LB_CSI_rate[j].size() > 0) {
           LBG = m_input_LB_CSI_rate[j][i] + m_input_LC_CSI_rate[j][i];
           HBG = m_input_HB_CSI_rate[j][i] + m_input_HC_CSI_rate[j][i];
+          if (j == 1) LBG = m_input_LB_CSI_rate[j][i] * Zeff_LB + m_input_LC_CSI_rate[j][i] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }

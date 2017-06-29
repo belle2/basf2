@@ -14,7 +14,7 @@
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/geometry/GeometryData.h>
-#include <eklm/geometry/TransformDataGlobalDisplaced.h>
+#include <eklm/geometry/TransformDataGlobalAligned.h>
 
 using namespace Belle2;
 
@@ -33,11 +33,10 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   CLHEP::Hep3Vector origin;
   CLHEP::Hep3Vector u(1, 0, 0);
   CLHEP::Hep3Vector v(0, 1, 0);
-  TVector3 origin2, u2, v2, globalPosition;
-  TVector2 localPosition;
+  TVector3 origin2, u2, v2;
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
-  const EKLM::TransformDataGlobalDisplaced* transformData =
-    &(EKLM::TransformDataGlobalDisplaced::Instance());
+  const EKLM::TransformDataGlobalAligned* transformData =
+    &(EKLM::TransformDataGlobalAligned::Instance());
   RelationVector<EKLMHit2d> hit2ds = hit->getRelationsTo<EKLMHit2d>();
   if (hit2ds.size() != 1)
     B2FATAL("Incorrect number of related EKLMHit2ds.");
@@ -83,11 +82,9 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   m_StripV.SetY(v.unit().y());
   genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin2, u2, v2, 0));
   setPlane(detPlane, m_Segment.getGlobalNumber());
-  globalPosition = hit2ds[0]->getPosition();
-  /* Projection onto hit plane - only need to change Z. */
-  globalPosition.SetZ(origin2.Z());
-  localPosition = detPlane->LabToPlane(globalPosition);
-  rawHitCoords_[0] = localPosition.Y();
+  rawHitCoords_[0] = geoDat->getStripGeometry()->getWidth() *
+                     ((eklmDigits[digit]->getStrip() - 1) %
+                      geoDat->getNStripsSegment()) / CLHEP::cm * Unit::cm;
   rawHitCov_[0][0] = pow(geoDat->getStripGeometry()->getWidth() /
                          CLHEP::cm * Unit::cm, 2) / 12;
   setStripV();
@@ -124,8 +121,8 @@ TMatrixD AlignableEKLMRecoHit::derivatives(const genfit::StateOnPlane* sop)
   /* Local position in sector coordinates. */
   HepGeom::Point3D<double> globalPos;
   HepGeom::Transform3D t;
-  const EKLM::TransformDataGlobalDisplaced* transformData =
-    &(EKLM::TransformDataGlobalDisplaced::Instance());
+  const EKLM::TransformDataGlobalAligned* transformData =
+    &(EKLM::TransformDataGlobalAligned::Instance());
   t = (*transformData->getSectorTransform(m_Sector.getEndcap(),
                                           m_Sector.getLayer(),
                                           m_Sector.getSector())).inverse();

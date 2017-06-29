@@ -37,7 +37,7 @@ ROOT_kIsConstMethod = 0x10000000
 def _avoidPyRootHang():
     """
     workaround for possible hang with PyROOT on SL5
-    see https://belle2.cc.kek.jp/redmine/issues/1236
+    see https://agira.desy.de/browse/BII-976
     note: platform.libc_ver() is _really_ broken, so i'm checking the
     version via ldd (ships with libc)
     """
@@ -333,7 +333,7 @@ def process(path, max_event=0):
         else:
             B2FATAL("Couldn't open path-file '" + pickle_path + "' and no steering file provided.")
 
-    B2RESULT("Starting event processing, random seed is set to '" + get_random_seed() + "'")
+    B2INFO("Starting event processing, random seed is set to '" + get_random_seed() + "'")
 
     if max_event != 0:
         fw.process(path, max_event)

@@ -150,7 +150,7 @@ namespace Belle2 {
         B2ERROR("Material with name " << parameters.getName() << " already existing");
         return oldmat;
       }
-      B2INFO("Creating Material " << parameters.getName());
+      B2DEBUG(10, "Creating Material " << parameters.getName());
       //If density is negative or smaller than epsilon we should calculate the
       //density from the used materials
       double density = parameters.getDensity() * CLHEP::g / CLHEP::cm3;
@@ -207,7 +207,7 @@ namespace Belle2 {
     {
       //Get straightforward parameters from gearbox
       string name = parameters.getString("@name");
-      B2INFO("Creating Material Config " << name);
+      B2DEBUG(10, "Creating Material Config " << name);
       string stateStr = parameters.getString("state", "undefined");
       double density = parameters.getDensity("density", 0); // * CLHEP::g / CLHEP::cm3;
       double temperature = parameters.getDouble("temperature", CLHEP::STP_Temperature);

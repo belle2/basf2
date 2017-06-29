@@ -105,7 +105,7 @@ void RootOutputModule::initialize()
 
   setOutputFile();
   TDirectory* dir = gDirectory;
-  m_file = new TFile(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
+  m_file = TFile::Open(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
   if (m_file->IsZombie()) {
     //try creating necessary directories
     boost::filesystem::path dirpath(m_outputFileName);

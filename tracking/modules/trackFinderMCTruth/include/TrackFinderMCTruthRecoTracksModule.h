@@ -64,6 +64,7 @@ namespace Belle2 {
     bool m_useOnlyBeforeTOP;                                    /**< Boolean to select if CDC hits after TOP detector are discarded*/
     float m_useNLoops;                                          /**< Number of loops to include in the MC tracks - effects only CDC.*/
     bool m_useReassignedHits;                                   /**< Boolean to select the inclusion of hits form discarded secondary daughters*/
+    bool m_useSecondCDCHits;                  /**< Also includes the CDC 2nd hit information in the mc tracks.*/
 
     bool m_enforceTrueHit;                                      /**< If set true only cluster hits that have a relation to a TrueHit will be included in the track candidate */
     std::vector<std::string>

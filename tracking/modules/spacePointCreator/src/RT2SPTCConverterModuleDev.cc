@@ -26,7 +26,9 @@ using ConversionState = std::bitset<2>;
 REG_MODULE(RT2SPTCConverter)
 
 RT2SPTCConverterModule::RT2SPTCConverterModule() :
-  Module()
+  Module(),
+  m_trackSel(nullptr)
+
 {
   setDescription("Module for converting RecoTracks (e.g. from TrackFinderMCTruth) to SpacePointTrackCands.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -62,6 +64,13 @@ RT2SPTCConverterModule::RT2SPTCConverterModule() :
   addParam("useSingleClusterSP", m_useSingleClusterSP, "Set to true if these SpacePoints should be used as fallback.", false);
 
   addParam("markRecoTracks", m_markRecoTracks, "If True RecoTracks where conversion problems occurred are marked dirty.", false);
+
+  addParam("noKickCutsFile", m_noKickCutsFile,
+           "TFile that contains the list of cuts to select trainins sample. If parameter left empty NoKickCuts are not applied",
+           std::string(""));
+
+  addParam("noKickOutput", m_noKickOutput,
+           "If true produce a TFile with some histograms useful to understand behaviour of training sample selection", false);
 
   addParam("ignorePXDHits", m_ignorePXDHits, "If true no PXD hits will be used when creating the SpacePointTrackCand", bool(false));
 
@@ -99,6 +108,17 @@ void RT2SPTCConverterModule::initialize()
   // register Relation to RecoTrack
   spTrackCand.registerRelationTo(recoTracks);
 
+  m_trackSel = new NoKickRTSel(m_noKickCutsFile);
+
+  if (m_noKickOutput) {
+    m_momentumTFile = new TFile("TrackSelection_NoKick.root", "RECREATE");
+    m_momSel = new TH1F("m_momSel", "m_momSel", 100, 0, 4);
+    m_momCut = new TH1F("m_momCut", "m_momCut", 100, 0, 4);
+    m_momEff = new TH1F("m_momEff", "m_momEff", 100, 0, 4);
+  }
+
+
+
 }
 
 // ------------------------------------- EVENT -------------------------------------------------------
@@ -115,6 +135,17 @@ void RT2SPTCConverterModule::event()
 
   for (auto& recoTrack : m_recoTracks) {
 
+    if (m_noKickCutsFile.size() != 0) {
+      bool passCut = m_trackSel->trackSelector(recoTrack);
+      if (!passCut) {
+        m_ncut++;
+        if (m_noKickOutput) m_momCut->Fill(recoTrack.getMomentumSeed().Mag());
+        continue; //exclude tracks with catastrophic multiple scattering interactions
+      } else {
+        m_npass++;
+        if (m_noKickOutput) m_momSel->Fill(recoTrack.getMomentumSeed().Mag());
+      }
+    }
     std::pair<std::vector<const SpacePoint*>, ConversionState> spacePointStatePair;
 
     // the hit informations from the recotrack, the option "true" will result in a sorted vector
@@ -362,6 +393,25 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
   return std::make_pair(finalSpacePoints, state);
 }
 
+void RT2SPTCConverterModule::endRun()
+{
+  B2RESULT("Number of Selected Tracks (NoKickRTSel): " << m_npass);
+  B2RESULT("Number of Cutted Tracks (NoKickRTSel): " << m_ncut);
+
+  if (m_noKickOutput) {
+    m_momentumTFile->cd();
+    m_momSel->Write();
+    m_momCut->Write();
+
+    m_momEff->Add(m_momSel, 1);
+    m_momEff->Add(m_momCut, 1);
+    m_momEff->Divide(m_momSel, m_momEff, 1, 1);
+    m_momEff->Write();
+
+    delete m_momentumTFile;
+  }
+}
+
 // -------------------------------- TERMINATE --------------------------------------------------------
 void RT2SPTCConverterModule::terminate()
 {
@@ -371,4 +421,3 @@ void RT2SPTCConverterModule::terminate()
            << m_minSPCtr <<  " Tracks were skipped because they didn't contain enough SpacePoints and for "
            << m_undefinedErrorCtr << " Tracks occurred an undefined error.");
 }
-

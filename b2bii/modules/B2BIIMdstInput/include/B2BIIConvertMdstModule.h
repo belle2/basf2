@@ -44,10 +44,7 @@
 #include "CLHEP/Matrix/SymMatrix.h"
 #include "CLHEP/Geometry/Point3D.h"
 
-using namespace CLHEP;
-using namespace HepGeom;
-
-typedef Point3D<double> HepPoint3D;
+typedef HepGeom::Point3D<double> HepPoint3D;
 
 #include <string>
 #include <map>
@@ -201,9 +198,9 @@ namespace Belle2 {
     /**
      * Creates TrackFitResult and fills it.
      */
-    TrackFitResult createTrackFitResult(const HepLorentzVector& momentum,
+    TrackFitResult createTrackFitResult(const CLHEP::HepLorentzVector& momentum,
                                         const HepPoint3D&              position,
-                                        const HepSymMatrix&     error,
+                                        const CLHEP::HepSymMatrix&     error,
                                         const short int charge,
                                         const Const::ParticleType& pType,
                                         const float pValue,
@@ -217,16 +214,16 @@ namespace Belle2 {
                            const double mass,
                            const HepPoint3D& newPivot,
                            std::vector<float>& helixParams,
-                           HepSymMatrix& error5x5,
-                           HepLorentzVector& momentum,
+                           CLHEP::HepSymMatrix& error5x5,
+                           CLHEP::HepLorentzVector& momentum,
                            HepPoint3D& position,
-                           HepSymMatrix& error7x7,
+                           CLHEP::HepSymMatrix& error7x7,
                            const double dPhi = 0.0);
 
     /**
      * Converts Belle's Helix parameters and it's covariance matrix to Belle II's version.
      */
-    void convertHelix(Belle::Helix& helix, std::vector<float>& helixParams, HepSymMatrix& error5x5);
+    void convertHelix(Belle::Helix& helix, std::vector<float>& helixParams, CLHEP::HepSymMatrix& error5x5);
 
     /**
      * Converts Belle's Helix parameters and it's covariance matrix to Belle II's version.
@@ -238,7 +235,7 @@ namespace Belle2 {
      * Fills 4-momentum, position and 7x7 error matrix from Belle Helix stored in Mdst_trk_fit.
      */
     int belleHelixToCartesian(const Belle::Mdst_trk_fit& trk_fit, const double mass, const HepPoint3D& newPivot,
-                              HepLorentzVector& momentum, HepPoint3D& position, HepSymMatrix& error, double dPhi = 0.0);
+                              CLHEP::HepLorentzVector& momentum, HepPoint3D& position, CLHEP::HepSymMatrix& error, double dPhi = 0.0);
 
     /**
      * obtains the helix parameters from trk_fit and moves the pivot to 0,0,0
@@ -250,7 +247,7 @@ namespace Belle2 {
      * Fills 4-momentum, position and 7x7 error matrix from Belle Vee daughter.
      */
     void belleVeeDaughterToCartesian(const Belle::Mdst_vee2& vee, const int charge, const Const::ParticleType& pType,
-                                     HepLorentzVector& momentum, HepPoint3D& position, HepSymMatrix& error);
+                                     CLHEP::HepLorentzVector& momentum, HepPoint3D& position, CLHEP::HepSymMatrix& error);
 
     /**
      * obtains the helix parameters of the vee daughters

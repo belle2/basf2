@@ -112,16 +112,24 @@ void ECLShowerShapeModule::initialize()
 
 }
 
-MVA::GeneralOptions ECLShowerShapeModule::initilizeMVA(const std::string& identifier,
-                                                       std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>& weightFileRepresentation, std::unique_ptr<MVA::Expert>& expert)
+void ECLShowerShapeModule::initializeMVA(const std::string& identifier,
+                                         std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>& weightFileRepresentation, std::unique_ptr<MVA::Expert>& expert)
 {
   MVA::Weightfile  weightfile;
   //Load MVA weight file
   if (weightFileRepresentation) {
+
+    //If multiple sources of conditions DB have been configured (the regular case), then the IOV of each payload will be "artificially" set to the current run only.
+    //This is so that in the next run, the payload can be taken from a different DB source.
+    //For example, payload of current run will be taken from central DB and payload of next run will be taken from local DB, if it appears there.
+    //In this case weightFileRepresentation->hasChanged() will be true at the beginning of each run, even though the IOV of the payload is greater than a single run.
+    //This is true as of 2017-06-01, functionality of hasChanged() might be changed in future.
+
     if (weightFileRepresentation->hasChanged()) {
       std::stringstream ss((*weightFileRepresentation)->m_data);
       weightfile = MVA::Weightfile::loadFromStream(ss);
-    }
+    } else
+      return;
   } else {
     weightfile = MVA::Weightfile::loadFromFile(identifier);
   }
@@ -137,19 +145,18 @@ MVA::GeneralOptions ECLShowerShapeModule::initilizeMVA(const std::string& identi
   expert = supported_interfaces[general_options.m_method]->getExpert();
   expert->load(weightfile);
 
-  return general_options;
-
+  //create new dataset, if this is the barrel MVA (assumes FWD and BWD datasets are same size)
+  if (weightFileRepresentation == m_weightfile_representation_BRL) {
+    std::vector<float> dummy(general_options.m_variables.size(), 0);
+    m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, dummy, 0));
+  }
 }
 
 void ECLShowerShapeModule::beginRun()
 {
-  initilizeMVA(m_zernike_MVAidentifier_FWD, m_weightfile_representation_FWD, m_expert_FWD);
-  MVA::GeneralOptions generalOptions = initilizeMVA(m_zernike_MVAidentifier_BRL, m_weightfile_representation_BRL, m_expert_BRL);
-  initilizeMVA(m_zernike_MVAidentifier_BWD, m_weightfile_representation_BWD, m_expert_BWD);
-
-  std::vector<float> dummy;
-  dummy.resize(generalOptions.m_variables.size(), 0);
-  m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(generalOptions, dummy, 0));
+  initializeMVA(m_zernike_MVAidentifier_FWD, m_weightfile_representation_FWD, m_expert_FWD);
+  initializeMVA(m_zernike_MVAidentifier_BRL, m_weightfile_representation_BRL, m_expert_BRL);
+  initializeMVA(m_zernike_MVAidentifier_BWD, m_weightfile_representation_BWD, m_expert_BWD);
 
   //This is a hack because the callback doesn't seem to be called at the begining of the run
   if (m_secondMomentCorrectionArray.hasChanged()) {

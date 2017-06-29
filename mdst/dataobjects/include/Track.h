@@ -23,6 +23,13 @@ namespace Belle2 {
    */
   class Track : public RelationsObject {
   public:
+
+    /**
+    * Pair to hold the particle hypothesis used for the fit as first entry and
+    * the result of the track fit as second.
+    */
+    typedef std::pair< Const::ChargedStable, const TrackFitResult*> ChargedStableTrackFitResultPair;
+
     /** Constructor without arguments; needed for I/O.
      *
      *  The array with the indices for the TrackFitResults is initialized with -1,
@@ -47,6 +54,14 @@ namespace Belle2 {
      */
     const TrackFitResult* getTrackFitResult(const Const::ChargedStable& chargedStable) const;
 
+
+    /** Access to all track fit results at the same time
+     *
+     * Returns a vector of pair of all track fit results which have been set and the respective particle
+     * hypothesis they have been fitted with.
+     */
+    std::vector<ChargedStableTrackFitResultPair> getTrackFitResults() const;
+
     /** Set an index (for positive values) or unavailability-code (with negative values) for a specific mass hypothesis.
      *
      *  The TrackFitResult itself should be saved separately in the DataStore.
@@ -64,6 +79,12 @@ namespace Belle2 {
   private:
     /** Index list of the TrackFitResults associated with this Track. */
     short int m_trackFitIndices[Const::ChargedStable::c_SetSize];
+
+    /**
+     * Returns a vector of all fit hypothesis indices in m_trackFitIndices
+     * which have been set (meaning are not -1)
+     */
+    std::vector < short int > getValidIndices() const;
 
     ClassDef(Track, 3); // Class that bundles various TrackFitResults.
   };

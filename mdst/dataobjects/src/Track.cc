@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
 #include <mdst/dataobjects/Track.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
@@ -27,11 +28,39 @@ const TrackFitResult* Track::getTrackFitResult(const Const::ChargedStable& charg
 
 unsigned int Track::getNumberOfFittedHypotheses() const
 {
-  unsigned int fittedHypothesis = 0;
+  return getValidIndices().size();
+}
+
+
+std::vector<Track::ChargedStableTrackFitResultPair> Track::getTrackFitResults() const
+{
+  StoreArray<TrackFitResult> trackFitResults;
+  std::vector<Track::ChargedStableTrackFitResultPair> result;
+
+  const auto validParticleIndices = getValidIndices();
+
+  // extract the particle class and trackfitresult pointer for each
+  // stored hypothesis
+  for (auto  particleIndex : validParticleIndices) {
+    const auto indexInStoreArray = m_trackFitIndices[particleIndex];
+    result.emplace_back(std::make_pair(Const::ChargedStable(Const::chargedStableSet.at(particleIndex)),
+                                       trackFitResults[indexInStoreArray]));
+  }
+
+  return result;
+}
+
+std::vector < short int> Track::getValidIndices() const
+{
+  std::vector <short int> resultParticleIndex;
+
+  short int i = 0;
   for (const auto& hyp : m_trackFitIndices) {
     if (hyp != -1) {
-      ++fittedHypothesis;
+      resultParticleIndex.push_back(i);
     }
+    i++;
   }
-  return fittedHypothesis;
+
+  return resultParticleIndex;
 }

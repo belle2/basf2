@@ -28,7 +28,7 @@ namespace Belle2 {
   public:
 
     //! default constructor
-    BKLMSimulationPar() : TObject() {};
+    BKLMSimulationPar() {};
 
     //! constructor
     explicit BKLMSimulationPar(const GearDir&);

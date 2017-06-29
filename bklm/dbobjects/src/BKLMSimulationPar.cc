@@ -19,7 +19,7 @@
 using namespace std;
 using namespace Belle2;
 
-BKLMSimulationPar::BKLMSimulationPar(const GearDir& content) : TObject()
+BKLMSimulationPar::BKLMSimulationPar(const GearDir& content)
 {
   read(content);
 }

@@ -35,7 +35,7 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    BKLMBadChannels(): TObject(), m_DeadChannels(), m_HotChannels(), m_comment() {};
+    BKLMBadChannels(): m_DeadChannels(), m_HotChannels(), m_comment() {};
 
     /**
      * Default destructor

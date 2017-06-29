@@ -170,7 +170,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     try {
       stPlusPtr = &recoTrackPlus->getMeasuredStateOnPlaneFromFirstHit(recoTrackPlus->getCardinalRepresentation());
     } catch (genfit::Exception) {
-      B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
+      B2ERROR("Default track hypothesis not available. Should never happen, but I can continue safely anyway.");
       return false;
     }
   }

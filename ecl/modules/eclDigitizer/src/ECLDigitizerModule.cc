@@ -15,6 +15,7 @@
 #include <ecl/digitization/shaperdsp.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/dataobjects/ECLWaveformDigit.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
@@ -71,6 +72,9 @@ void ECLDigitizerModule::initialize()
   m_adc.resize(EclConfiguration::m_nch);
 
   EclConfiguration::get().setBackground(m_background);
+
+  StoreArray<ECLWaveformDigit> bgDigits("ECLWaveformDigit_BG");
+  bgDigits.registerInDataStore();
 }
 
 void ECLDigitizerModule::beginRun()
@@ -172,10 +176,38 @@ int ECLDigitizerModule::shapeSignals()
   return ttrig;
 }
 
+void ECLDigitizerModule::makeWaveforms()
+{
+  const EclConfiguration& ec = EclConfiguration::get();
+  unsigned int FitA[ec.m_nsmp]; // buffer for the waveform fitter
+  float z[ec.m_nsmp], AdcNoise[ec.m_nsmp]; // buffers with electronic noise
+  unsigned int wform[18]; // packed waveform
+  // loop over entire calorimeter
+  for (int j = 0; j < ec.m_nch; j++) {
+    adccounts_t& a = m_adc[j];
+
+    //Noise generation
+    for (int i = 0; i < ec.m_nsmp; i++) z[i] = gRandom->Gaus(0, 1);
+    m_noise[m_tbl[j].inoise].generateCorrelatedNoise(z, AdcNoise);
+
+    for (int  i = 0; i < ec.m_nsmp; i++) {
+      int A = 20 * (1000 * a.c[i] + AdcNoise[i]) + 3000;
+      FitA[i] = max(0, min(A, (1 << 18) - 1));
+    }
+    ec.pack(wform, j + 1, FitA);
+    auto d = m_eclWaveformDigits.appendNew();
+    d->fill(wform);
+  }
+}
+
 void ECLDigitizerModule::event()
 {
   const EclConfiguration& ec = EclConfiguration::get();
   const int ttrig = shapeSignals();
+
+  // We want to produce background waveforms in simulation first than
+  // dump to a disk, read from the disk to test before real data
+  if (m_waveformMaker) { makeWaveforms(); return; }
 
   // make relation between cellid and eclhits
   struct ch_t {int cell, id;};
@@ -186,6 +218,10 @@ void ECLDigitizerModule::event()
     //    cout<<"C:"<<hit.getBackgroundTag()<<" "<<hit.getCellId()<<" "<<hit.getEnergyDep()<<" "<<hit.getTimeAve()<<endl;
   }
 
+  // check validity and waveform storage size
+  bool isBGOverlay = m_eclWaveformDigits.isValid() && m_eclWaveformDigits.getEntries() == ec.m_nch;
+  int pos = 0; //position in background buffer assuming it is ordered by the channel number
+
   int FitA[ec.m_nsmp]; // buffer for the waveform fitter
   float z[ec.m_nsmp], AdcNoise[ec.m_nsmp]; // buffers with electronic noise
 
@@ -193,17 +229,39 @@ void ECLDigitizerModule::event()
   for (int j = 0; j < ec.m_nch; j++) {
     adccounts_t& a = m_adc[j];
 
+    bool isWave = false;
+
+    if (isBGOverlay) {
+      while (pos < ec.m_nch && j != static_cast<int>(m_eclWaveformDigits[pos]->getUniqueChannelID() - 1)) ++pos;
+      int cellId = ec.unpack(FitA, m_eclWaveformDigits[pos]->data()) - 1;
+      if (cellId != j) {
+        B2WARNING("ECLDigitizerModule: Waveform for background overlay is not found for channel " << j + 1);
+        pos = 0; // reset position and hope that the next channel will be found
+        memset(FitA, 0, sizeof FitA);
+      } else
+        isWave = true;
+    }
+
     // amplitude of background waveform should be always above of so
     // low threshold thus perform the waveform fitting anyway.
-    if (a.total < 0.0001) continue;
+    if (!isWave && a.total < 0.0001) continue;
 
-    //Noise generation
-    for (int i = 0; i < ec.m_nsmp; i++) z[i] = gRandom->Gaus(0, 1);
-    m_noise[m_tbl[j].inoise].generateCorrelatedNoise(z, AdcNoise);
-    for (int  i = 0; i < ec.m_nsmp; i++) {
-      // add noise and then clip
-      int A = 20 * (1000 * a.c[i] + AdcNoise[i]) + 3000;
-      FitA[i] = max(0, min(A, (1 << 18) - 1));
+    // if background waveform is here there is no need to generate
+    // electronic noise since it is already in the waveform
+    if (isWave) {
+      for (int  i = 0; i < ec.m_nsmp; i++) {
+        int A = 20000 * a.c[i] + FitA[i];
+        FitA[i] = max(0, min(A, (1 << 18) - 1));
+      }
+    } else {
+      //Noise generation
+      for (int i = 0; i < ec.m_nsmp; i++) z[i] = gRandom->Gaus(0, 1);
+      m_noise[m_tbl[j].inoise].generateCorrelatedNoise(z, AdcNoise);
+      for (int  i = 0; i < ec.m_nsmp; i++) {
+        // add noise and then clip
+        int A = 20 * (1000 * a.c[i] + AdcNoise[i]) + 3000;
+        FitA[i] = max(0, min(A, (1 << 18) - 1));
+      }
     }
 
     int  energyFit = 0; // fit output : Amplitude 18 bits

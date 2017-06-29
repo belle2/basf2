@@ -1,0 +1,46 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
+ *                                                                        *
+ * General DB object to store one calibration number per ECL crystal      *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christopher Hearty                                       *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#pragma once
+#include <TObject.h>
+
+namespace Belle2 {
+
+  /** General DB object to store one calibration number per ECL crystal. */
+  class ECLCrystalCalib: public TObject {
+
+  public:
+
+    /** Constructor. */
+    ECLCrystalCalib() : m_CalibConst(), m_CalibConstUnc() { };
+
+    /** Get vector of calibration constants. One entry per crystal. */
+    std::vector<float> getCalibVector() {return m_CalibConst;};
+
+    /** Get vector of uncertainties on calibration constants. */
+    std::vector<float> getCalibUncVector() {return m_CalibConstUnc;};
+
+    /** Upload vector of constants with uncertainties. One entry per crystal */
+    void setCalibVector(std::vector<float> CalibConst, std::vector<float> CalibConstUnc)
+    {
+      if (CalibConst.size() != 8736 || CalibConstUnc.size() != 8736) {B2FATAL("ECLCrystalCalib: wrong size vector uploaded, " << CalibConst.size() << " " << CalibConstUnc.size() << " instead of 8736");}
+      m_CalibConst = CalibConst;
+      m_CalibConstUnc = CalibConstUnc;
+    };
+
+  private:
+    std::vector<float> m_CalibConst; /**< Calibration constants */
+    std::vector<float> m_CalibConstUnc; /**< Uncertainty on constants */
+
+    ClassDef(ECLCrystalCalib, 1);
+  };
+}

@@ -542,6 +542,18 @@ class Teacher(object):
         with open(channel + ".xml", "w") as f:
             f.write(content)
 
+    @staticmethod
+    def check_if_weightfile_is_fake(filename: str):
+        """
+        Checks if the provided filename is a fake-weightfile or not
+        @param filename the filename of the weightfile
+        """
+        try:
+            return '<method>Trivial</method>' in open(filename, 'r').readlines()[2]
+        except:
+            return True
+        return True
+
     def upload(self, channel: str):
         """
         Upload the weightfile into the condition database

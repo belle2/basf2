@@ -47,22 +47,22 @@ namespace Belle2 {
     TVector3 m_momentumLocalMid; /**< momentum of hit at midpoint of layer, local coordinate */
     TVector3 m_momentumLocalEntry; /**< momentum of hit at entrypoint of layer, local coordinate */
     TVector3 m_momentumLocalExit; /**< momentum of hit at exitpoint of layer, local coordinate */
-    int m_PDGID; /**< PDGID */
+    int m_PDGID = 0; /**< PDGID */
     TVector3 m_position0; /**< position at IP */
     TVector3 m_momentum0; /**< momentum at IP */
-    double m_time; /**< time of the hit */
-    int m_sensorSensor; /**< sensor of the hit */
-    int m_sensorLayer; /**< layer of the hit */
-    int m_sensorLadder; /**< ladder of the hit */
-    double m_info_d0; /**< d0 from MCParticle info evaluation. DO NOT USE, use the get */
-    double m_info_z0; /**< z0 from MCParticle info evaluation. DO NOT USE, use the get */
-    double m_info_phi0; /**< phi0 from MCParticle info evaluation. DO NOT USE, use the get */
-    double m_info_tanlambda; /**< tanlambda from MCParticle info evaluation. DO NOT USE, use the get */
-    double m_info_omega; /**< omega from MCParticle info evaluation. DO NOT USE, use the get */
-    int m_clusterU; /**< flag for u cluster */
-    int m_clusterV; /**< flag for v cluster */
-    bool m_reconstructed; /**< flag for reconstructed track */
-    double m_charge; /**< charge of the track */
+    double m_time = 0; /**< time of the hit */
+    int m_sensorSensor = 0; /**< sensor of the hit */
+    int m_sensorLayer = 0; /**< layer of the hit */
+    int m_sensorLadder = 0; /**< ladder of the hit */
+    double m_info_d0 = 0; /**< d0 from MCParticle info evaluation. DO NOT USE, use the get */
+    double m_info_z0 = 0; /**< z0 from MCParticle info evaluation. DO NOT USE, use the get */
+    double m_info_phi0 = 0; /**< phi0 from MCParticle info evaluation. DO NOT USE, use the get */
+    double m_info_tanlambda = 0; /**< tanlambda from MCParticle info evaluation. DO NOT USE, use the get */
+    double m_info_omega = 0; /**< omega from MCParticle info evaluation. DO NOT USE, use the get */
+    int m_clusterU = 0; /**< flag for u cluster */
+    int m_clusterV = 0; /**< flag for v cluster */
+    bool m_reconstructed = 0; /**< flag for reconstructed track */
+    double m_charge = 0; /**< charge of the track */
 
     hitXP() {} /** empty constructor of the class */
 

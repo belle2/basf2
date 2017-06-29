@@ -9,12 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/CompositeProcessingSignalListener.h>
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 
 #include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
-#include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointMatcher.h>
 #include <tracking/ckf/filters/base/LayerToggledFilter.h>
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCTrackSpacePointCombinationFilterFactory.h>
 #include <tracking/ckf/findlets/cdcToSpacePoint/SpacePointAdvanceAlgorithm.h>
@@ -25,8 +24,7 @@ namespace Belle2 {
    * Main findlet for the CKF for CDC RecoTracks and SpacePoints from the VXD (SVD).
    *
    * For a given state on a given number (~ layer), a list of child states (one for each next hit = space point in the track
-   * candidate) is returned. This is done in several steps:
-   * * select all hits on the next geometrical layer using the CDCToSpacePointMatcher
+   * candidate) is filtered. This is done in several steps:
    * * filter out only the best 2 * N candidates using a configurable filter based on this geometrical information
    * * extrapolate the mSoP in each state to its corresponding hit
    * * filter again using the best N candidates
@@ -39,22 +37,16 @@ namespace Belle2 {
    * The states are actually constructed in the subfindlet CDCToSpacePointMatcher and are kept as
    * long as needed. This means the ownership still belongs to this module.
    */
-  class CDCToSpacePointHitSelector : public TrackFindingCDC::CompositeProcessingSignalListener {
+  class CDCToSpacePointHitSelector : public TrackFindingCDC::Findlet<CKFCDCToVXDStateObject*> {
   public:
     /// Constructor adding the subfindlets as listeners
     CDCToSpacePointHitSelector();
 
     /// Expose the parameters of the filters and our own parameters
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
     /// Main function of this findlet: return a range of selected child states for a given current state
-    std::vector<CKFCDCToVXDStateObject*> getChildStates(CKFCDCToVXDStateObject& currentState);
-
-    /// Initialize the cache of the hit matcher with the hits to be used in this event
-    void initializeEventCache(std::vector<RecoTrack*>& seedsVector, std::vector<const SpacePoint*>& filteredHitVector)
-    {
-      m_hitMatcher.initializeEventCache(seedsVector, filteredHitVector);
-    }
+    void apply(std::vector<CKFCDCToVXDStateObject*>& resultStates) override;
 
   private:
     /// Parameter: do the advance step
@@ -64,8 +56,6 @@ namespace Belle2 {
     /// Parameter: use only the best N results
     unsigned int m_param_useNResults = 5;
 
-    /// Subfindlet: Hit Matcher
-    CDCToSpacePointMatcher m_hitMatcher;
     /// Subfindlet: Filter 1
     LayerToggledFilter<CDCTrackSpacePointCombinationFilterFactory> m_firstFilter;
     /// Subfindlet: Filter 2

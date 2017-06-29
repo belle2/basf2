@@ -13,9 +13,8 @@
 
 using namespace Belle2;
 
-CDCToSpacePointHitSelector::CDCToSpacePointHitSelector() : TrackFindingCDC::CompositeProcessingSignalListener()
+CDCToSpacePointHitSelector::CDCToSpacePointHitSelector() : TrackFindingCDC::Findlet<CKFCDCToVXDStateObject * >()
 {
-  addProcessingSignalListener(&m_hitMatcher);
   addProcessingSignalListener(&m_firstFilter);
   addProcessingSignalListener(&m_secondFilter);
   addProcessingSignalListener(&m_thirdFilter);
@@ -25,8 +24,6 @@ CDCToSpacePointHitSelector::CDCToSpacePointHitSelector() : TrackFindingCDC::Comp
 
 void CDCToSpacePointHitSelector::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  m_hitMatcher.exposeParameters(moduleParamList, prefix);
-
   m_firstFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "first"));
   m_secondFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "second"));
   m_thirdFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "third"));
@@ -42,13 +39,9 @@ void CDCToSpacePointHitSelector::exposeParameters(ModuleParamList* moduleParamLi
                                 "Do only use the best N results.", m_param_useNResults);
 }
 
-/// Main function of this findlet: return a range of selected child states for a given current state.
-std::vector<CKFCDCToVXDStateObject*> CDCToSpacePointHitSelector::getChildStates(
-  CKFCDCToVXDStateObject& currentState)
+void CDCToSpacePointHitSelector::apply(std::vector<CKFCDCToVXDStateObject*>& childStates)
 {
-  auto childStates = m_hitMatcher.getChildStates(currentState);
-  B2DEBUG(50, "Matcher has found " << childStates.size() << " states");
-
+  // TODO: Also make those a findlet!
   applyAndFilter(childStates, m_firstFilter, 2 * m_param_useNResults);
   B2DEBUG(50, "First filter has found " << childStates.size() << " states");
 
@@ -67,6 +60,4 @@ std::vector<CKFCDCToVXDStateObject*> CDCToSpacePointHitSelector::getChildStates(
 
   applyAndFilter(childStates, m_thirdFilter, m_param_useNResults);
   B2DEBUG(50, "Third filter has found " << childStates.size() << " states");
-
-  return childStates;
 }

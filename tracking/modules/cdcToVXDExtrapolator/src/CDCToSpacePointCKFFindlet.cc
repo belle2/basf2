@@ -48,12 +48,19 @@ void CDCToSpacePointCKFFindlet::apply()
   m_cdcTracksLoader.apply(m_cdcRecoTrackVector);
   m_hitsLoader.apply(m_spacePointVector);
 
+  // Remove all non-fitted tracks
+  const auto& cdcTrackWasNotFitted = [](const RecoTrack * recoTrack) {
+    return not recoTrack->wasFitSuccessful();
+  };
+  erase_remove_if(m_cdcRecoTrackVector, cdcTrackWasNotFitted);
+
   m_treeSearchFindlet.apply(m_cdcRecoTrackVector, m_spacePointVector, m_results);
 
   // Remove all empty results
-  erase_remove_if(m_results, [](const CKFCDCToVXDStateObject::ResultObject & result) {
+  const auto& resultIsEmpty = [](const CKFCDCToVXDStateObject::ResultObject & result) {
     return result.second.empty();
-  });
+  };
+  erase_remove_if(m_results, resultIsEmpty);
 
   B2INFO("Found " << m_results.size() << " tracks");
 

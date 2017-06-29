@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
+#include <tracking/ckf/findlets/base/StateTransformer.h>
+
 namespace Belle2 {
   /**
    * General implementation of a tree search algorithm using a given class as states
@@ -33,7 +35,7 @@ namespace Belle2 {
    * In the end, the result object needs to return a copy of the objects, as the state objects
    * will be reused afterwards.
    */
-  template<class AStateObject, class AHitSelector>
+  template<class AStateObject, class AHitFinder, class AHitSelector>
   class TreeSearchFindlet : public TrackFindingCDC::Findlet <
     typename AStateObject::SeedObject*,
     const typename AStateObject::HitObject*,
@@ -43,13 +45,9 @@ namespace Belle2 {
     using SeedPtr = typename AStateObject::SeedObject*;
     /// The class of the hit
     using HitPtr = const typename AStateObject::HitObject*;
-    /// A C++ array of states
-    using StateArray = typename std::array < AStateObject, AStateObject::N + 1 >;
-    /// An iterator through the states in the pool array
-    using StateIterator = typename StateArray::iterator;
     /// The returned objects after tree traversal.
     using ResultObject = typename AStateObject::ResultObject ;
-
+    /// Parent class
     using Super = TrackFindingCDC::Findlet<SeedPtr, HitPtr, ResultObject>;
 
     /// Construct this findlet and add the subfindlet as listener
@@ -61,6 +59,7 @@ namespace Belle2 {
     /// Expose the parameters of the subfindlet
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
       m_hitSelector.exposeParameters(moduleParamList, prefix);
+      m_hitFinder.exposeParameters(moduleParamList, prefix);
     }
 
     /**
@@ -73,50 +72,63 @@ namespace Belle2 {
     void apply(std::vector<SeedPtr>& seedsVector, std::vector<HitPtr>& hitVector,
                std::vector<ResultObject>& results) override
     {
-      m_hitSelector.initializeEventCache(seedsVector, hitVector);
+      m_hitFinder.initializeEventCache(seedsVector, hitVector);
 
       for (SeedPtr seed : seedsVector) {
         B2DEBUG(50, "Starting with new seed...");
-        StateIterator firstStateIterator = m_states.begin();
-        firstStateIterator->initialize(seed);
 
-        traverseTree(firstStateIterator, results);
+        AStateObject firstState(seed);
+        traverseTree(&firstState, results);
         B2DEBUG(50, "... finished with seed");
+
       }
     }
 
   private:
-    /// Object pool for states
-    StateArray m_states{};
-
     /// Subfindlet: hit selector
     AHitSelector m_hitSelector;
 
+    /// Subfindlet: hit finder
+    AHitFinder m_hitFinder;
+
+    /// Subfindlet: state transformer
+    StateTransformer<AStateObject> m_stateTransformer;
+
     /// Implementation of the traverseTree function
-    void traverseTree(StateIterator currentState, std::vector<ResultObject>& resultsVector)
-    {
-      B2DEBUG(50, "Now on number " << currentState->getNumber());
-      StateIterator nextState = std::next(currentState);
-
-      if (nextState == m_states.end()) {
-        B2DEBUG(50, "Giving up this route, as this is the last possible state.");
-        resultsVector.emplace_back(currentState->finalize());
-        return;
-      }
-
-      const auto& childStates = m_hitSelector.getChildStates(*currentState);
-
-      if (childStates.empty()) {
-        B2DEBUG(50, "Giving up this route, as there are no possible child states.");
-        resultsVector.emplace_back(currentState->finalize());
-        return;
-      }
-
-      B2DEBUG(50, "Having found " << childStates.size() << " child states.");
-      for (AStateObject* childState : childStates) {
-        *nextState = *childState;
-        traverseTree(nextState, resultsVector);
-      }
-    }
+    void traverseTree(AStateObject* currentState, std::vector<ResultObject>& resultsVector);
   };
+
+  template<class AStateObject, class AHitFinder, class AHitSelector>
+  void TreeSearchFindlet<AStateObject, AHitFinder, AHitSelector>::traverseTree(AStateObject* currentState,
+      std::vector<ResultObject>& resultsVector)
+  {
+    B2DEBUG(50, "Now on number " << currentState->getNumber());
+
+    if (currentState->getNumber() == 0) {
+      B2DEBUG(50, "Giving up this route, as this is the last possible state.");
+      resultsVector.emplace_back(currentState->finalize());
+      return;
+    }
+
+    // Ask hit finder, which hits are possible (in principle)
+    const auto& matchingHits = m_hitFinder.getMatchingHits(*currentState);
+
+    // Transform the hits into states
+    std::vector<AStateObject*> childStates;
+    m_stateTransformer.transform(matchingHits, childStates, currentState);
+
+    // Filter out bad states
+    m_hitSelector.apply(childStates);
+
+    if (childStates.empty()) {
+      B2DEBUG(50, "Giving up this route, as there are no possible child states.");
+      resultsVector.emplace_back(currentState->finalize());
+      return;
+    }
+
+    B2DEBUG(50, "Having found " << childStates.size() << " child states.");
+    for (AStateObject* childState : childStates) {
+      traverseTree(childState, resultsVector);
+    }
+  }
 }

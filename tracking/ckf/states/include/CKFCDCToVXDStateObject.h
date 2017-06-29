@@ -39,25 +39,18 @@ namespace Belle2 {
     /// The class of the object returned by finalize()
     using ResultObject = TrackFindingCDC::WithWeight<std::pair<RecoTrack*, std::vector<const HitObject*>>>;
 
+    CKFCDCToVXDStateObject() = default;
+    CKFCDCToVXDStateObject(CKFCDCToVXDStateObject&&) = default;
+    CKFCDCToVXDStateObject(const CKFCDCToVXDStateObject&) = delete;
+    CKFCDCToVXDStateObject& operator=(const CKFCDCToVXDStateObject&) = delete;
+
     /**
      * Initialize the state as a root without a related space point (but with a reco track)
      */
-    void initialize(RecoTrack* seed)
+    CKFCDCToVXDStateObject(RecoTrack* seed) :
+      m_seedRecoTrack(seed)
     {
-      m_seedRecoTrack = seed;
       setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
-
-      // Reset other state to default.
-      m_hitObject = nullptr;
-      m_number = N;
-      m_parent = nullptr;
-
-      m_chi2 = 0;
-
-      m_isFitted = false;
-      m_isAdvanced = false;
-
-      m_weight = 0;
     }
 
     /**

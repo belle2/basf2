@@ -69,8 +69,6 @@ namespace Belle2 {
 
   TOPAlignerModule::~TOPAlignerModule()
   {
-    if (m_file) delete m_file;
-    if (m_alignTree) delete m_alignTree;
   }
 
   void TOPAlignerModule::initialize()

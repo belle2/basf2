@@ -14,6 +14,7 @@
 #include <ecl/digitization/algorithms.h>
 #include <ecl/digitization/shaperdsp.h>
 #include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/dataobjects/ECLWaveformDigit.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
@@ -70,6 +71,8 @@ void ECLDigitizerModule::initialize()
 
   EclConfiguration::get().setBackground(m_background);
 
+  StoreArray<ECLWaveformDigit> bgDigits("ECLWaveformDigit_BG");
+  bgDigits.registerInDataStore();
 }
 
 void ECLDigitizerModule::beginRun()
@@ -105,6 +108,15 @@ void ECLDigitizerModule::event()
 
   // clear the storage for the event
   memset(m_adc.data(), 0, m_adc.size()*sizeof(adccounts_t));
+
+  // first -- add background waveform digits
+  StoreArray<ECLWaveformDigit> bgDigits("ECLWaveformDigit_BG");
+  if (bgDigits.isValid()) {
+    for (const auto& bgDigit : bgDigits) {
+      unsigned id = bgDigit.getUniqueChannelID() - 1;
+      bgDigit.unpack(m_adc[id]);
+    }
+  }
 
   // emulate response for ECL hits after ADC measurements
   for (const auto& hit : m_eclSimHits) {
@@ -202,6 +214,27 @@ void ECLDigitizerModule::event()
         if (hit.cell == j) eclDigit->addRelationTo(m_eclHits[hit.id]);
     }
   } //store each crystal hit
+
+
+  for (int j = 0; j < ec.m_nch; j++) {
+    adccounts_t& a = m_adc[j];
+    if (a.total < 0.001) continue;
+    const auto f = bgDigits.appendNew();
+    f->pack(j + 1, a);
+  }
+
+  // first -- add background waveform digits
+  if (bgDigits.isValid()) {
+    for (const auto& bgDigit : bgDigits) {
+      unsigned id = bgDigit.getUniqueChannelID() - 1;
+      adccounts_t a;
+      bgDigit.unpack(a);
+      cout << id << " : ";
+      for (int i = 0; i < 31; i++) cout << a.c[i] << ":" << m_adc[id].c[i] << " "; cout << endl;
+    }
+  }
+
+
 }
 
 void ECLDigitizerModule::endRun()

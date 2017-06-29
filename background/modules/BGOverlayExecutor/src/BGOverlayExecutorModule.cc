@@ -27,7 +27,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <arich/dataobjects/ARICHDigit.h>
-#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLWaveforms.h>
 #include <bklm/dataobjects/BKLMDigit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <background/dataobjects/BackgroundInfo.h>
@@ -64,7 +64,7 @@ namespace Belle2 {
              "name of TOP collection to overlay with BG", string(""));
     addParam("ARICHDigitsName", m_ARICHDigitsName,
              "name of ARICH collection to overlay with BG", string(""));
-    addParam("ECLDspsName", m_ECLDspsName,
+    addParam("ECLWaveformsName", m_ECLWaveformsName,
              "name of ECL collection to overlay with BG", string(""));
     addParam("BKLMDigitsName", m_BKLMDigitsName,
              "name of BKLM collection to overlay with BG", string(""));
@@ -97,7 +97,7 @@ namespace Belle2 {
     registerDigits<CDCHit>(m_CDCHitsName);
     registerDigits<TOPDigit>(m_TOPDigitsName);
     registerDigits<ARICHDigit>(m_ARICHDigitsName);
-    registerDigits<ECLDsp>(m_ECLDspsName);
+    registerDigits<ECLWaveforms>(m_ECLWaveformsName);
     registerDigits<BKLMDigit>(m_BKLMDigitsName);
     registerDigits<EKLMDigit>(m_EKLMDigitsName);
 

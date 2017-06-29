@@ -72,9 +72,6 @@ void ECLDigitizerModule::initialize()
   m_adc.resize(EclConfiguration::m_nch);
 
   EclConfiguration::get().setBackground(m_background);
-
-  StoreArray<ECLWaveformDigit> bgDigits("ECLWaveformDigit_BG");
-  bgDigits.registerInDataStore();
 }
 
 void ECLDigitizerModule::beginRun()

@@ -70,9 +70,6 @@ void ECLDigitizerModule::initialize()
   m_adc.resize(EclConfiguration::m_nch);
 
   EclConfiguration::get().setBackground(m_background);
-
-  StoreArray<ECLWaveformDigit> bgDigits("ECLWaveformDigit_BG");
-  bgDigits.registerInDataStore();
 }
 
 void ECLDigitizerModule::beginRun()
@@ -214,27 +211,6 @@ void ECLDigitizerModule::event()
         if (hit.cell == j) eclDigit->addRelationTo(m_eclHits[hit.id]);
     }
   } //store each crystal hit
-
-
-  for (int j = 0; j < ec.m_nch; j++) {
-    adccounts_t& a = m_adc[j];
-    if (a.total < 0.001) continue;
-    const auto f = bgDigits.appendNew();
-    f->pack(j + 1, a);
-  }
-
-  // first -- add background waveform digits
-  if (bgDigits.isValid()) {
-    for (const auto& bgDigit : bgDigits) {
-      unsigned id = bgDigit.getUniqueChannelID() - 1;
-      adccounts_t a;
-      bgDigit.unpack(a);
-      cout << id << " : ";
-      for (int i = 0; i < 31; i++) cout << a.c[i] << ":" << m_adc[id].c[i] << " "; cout << endl;
-    }
-  }
-
-
 }
 
 void ECLDigitizerModule::endRun()

@@ -29,7 +29,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <arich/dataobjects/ARICHDigit.h>
-#include <ecl/dataobjects/ECLDigit.h> // or waveform, not yet clear
+#include <ecl/dataobjects/ECLWaveformDigit.h>
 #include <bklm/dataobjects/BKLMDigit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
 
@@ -71,7 +71,7 @@ namespace Belle2 {
     registerDigits<CDCHit>();
     registerDigits<TOPDigit>();
     registerDigits<ARICHDigit>();
-    registerDigits<ECLDigit>(); // not yet clear which one
+    registerDigits<ECLWaveformDigit>();
     registerDigits<BKLMDigit>();
     registerDigits<EKLMDigit>();
 
@@ -90,7 +90,7 @@ namespace Belle2 {
     addBGDigits<CDCHit>();
     addBGDigits<TOPDigit>();
     addBGDigits<ARICHDigit>();
-    //    addBGDigits<ECLDigit>(); // not yet clear which one
+    //  add ECLWaveformDigit in ECLDigitizerModule so addBGDigits<ECLWaveformDigit>() is not invoked here
     addBGDigits<BKLMDigit>();
     addBGDigits<EKLMDigit>();
 

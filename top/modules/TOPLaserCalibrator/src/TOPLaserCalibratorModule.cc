@@ -64,9 +64,6 @@ namespace Belle2 {
     // Add parameters
     addParam("histogramFileName", m_histogramFileName, "Output root file for histograms",
              string("")); //output fitting results
-    addParam("simFileName", m_simFileName, "Input simulation root file ",
-             string("")); //a sim root file as input for a local test
-
     addParam("fitChannel", m_fitChannel, "set 0 - 511 to a specific channel; set 0 to all channels in the fit",
              512);
     addParam("barID", m_barID, "ID of TOP module to calibrate");

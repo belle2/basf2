@@ -74,7 +74,6 @@ namespace Belle2 {
          };
 
     std::string m_histogramFileName; /**< output file name for histograms */
-    std::string m_simFileName; /**< input sim file name */
 
     int m_barID; /**< ID of TOP module to calibrate */
     int m_fitChannel; /**< set 0 - 511 to a specific pixelID in the fit; set 512 to fit all pixels in one slot */

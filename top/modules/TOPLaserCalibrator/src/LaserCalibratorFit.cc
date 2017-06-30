@@ -67,7 +67,7 @@ namespace Belle2 {
     }
 
 //initial TF1 of all channels in one slot
-    void LaserCalibratorFit::setHist(std::vector<TH1F*>& hist)
+    void LaserCalibratorFit::setHist(const std::vector<TH1F*>& hist)
     {
       m_hist = hist;
       for (unsigned i = 0; i < hist.size(); i++) {
@@ -114,7 +114,7 @@ namespace Belle2 {
       return 1;
     }
 
-    void LaserCalibratorFit::writeFile(std::string& outfile)
+    void LaserCalibratorFit::writeFile(const std::string& outfile)
     {
       auto file = new TFile(outfile.c_str(), "RECREATE");
       auto otree = new TTree("fits", "fitted times");

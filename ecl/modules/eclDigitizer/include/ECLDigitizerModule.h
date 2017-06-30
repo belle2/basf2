@@ -21,6 +21,7 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/dataobjects/ECLWaveformDigit.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <vector>
@@ -125,6 +126,7 @@ namespace Belle2 {
       /** read Shaper-DSP data from root file */
       void readDSPDB();
       int shapeSignals();
+      void makeWaveforms();
       void repack(const ECLWFAlgoParams&, algoparams_t&);
       void getfitparams(const ECLWaveformData&, const ECLWFAlgoParams&, fitparams_t&);
 
@@ -132,6 +134,7 @@ namespace Belle2 {
       StoreArray<ECLHit>    m_eclHits;  /**< hits array  */
       StoreArray<ECLHit>    m_eclDiodeHits;
       StoreArray<ECLSimHit> m_eclSimHits;
+      StoreArray<ECLWaveformDigit> m_eclWaveformDigits;
       /** Output Arrays */
       StoreArray<ECLDigit>  m_eclDigits;
       StoreArray<ECLDsp>    m_eclDsps;
@@ -141,6 +144,7 @@ namespace Belle2 {
       bool m_background;  /**< background flag */
       bool m_calibration;  /**< calibration flag */
       bool m_inter; /**< internuclear counter effect */
+      bool m_waveformMaker; /**< produce only waveform digits */
     };
   }//ECL
 }//Belle2

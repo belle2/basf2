@@ -15,7 +15,7 @@
 #include <ecl/digitization/shaperdsp.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/dataobjects/ECLWaveformDigit.h>
+#include <ecl/dataobjects/ECLWaveforms.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
@@ -51,6 +51,8 @@ ECLDigitizerModule::ECLDigitizerModule() : Module()
            false);
   addParam("DiodeDeposition", m_inter,
            "Flag to take into account energy deposition in photodiodes; Default diode is not sensitive detector", false);
+  addParam("WavefromMaker", m_waveformMaker,
+           "Flag to produce background waveform digits", false);
 }
 
 ECLDigitizerModule::~ECLDigitizerModule()
@@ -66,6 +68,9 @@ void ECLDigitizerModule::initialize()
   m_eclDiodeHits.registerInDataStore("ECLDiodeHits");
 
   m_eclDigits.registerRelationTo(m_eclHits);
+
+  m_eclWaveformDigits.registerInDataStore("ECLWaveformDigit_BG");
+  m_eclWaveformDigits.isOptional();
 
   readDSPDB();
 

@@ -41,6 +41,43 @@ namespace {
 
   /// Filter using a trained MVA method
   using MVACDCVXDTrackCombinationFilter = MVAFilter<CDCVXDTrackCombinationVarSet>;
+
+  /// Filter using a trained MVA method for skimming, but returns the number of hits
+  class MVASkimmedCDCVXDTrackCombinationFilter : public MVACDCVXDTrackCombinationFilter {
+  private:
+    using Super = MVACDCVXDTrackCombinationFilter;
+
+  public:
+    using Super::Super;
+
+    /// Initialisation method sets up a reference to the value in the variable set to be returned.
+    void initialize() override
+    {
+      Super::initialize();
+      MayBePtr<Float_t> foundVariable = Super::getVarSet().find(m_param_varName);
+      if (not foundVariable) {
+        B2ERROR("Could not find request variable name " << m_param_varName << " in variable set");
+      }
+      m_variable = foundVariable;
+    }
+
+    Weight operator()(const MVACDCVXDTrackCombinationFilter::Object& obj) override
+    {
+      Weight prediction = Super::operator()(obj);
+      if (std::isnan(prediction)) {
+        return NAN;
+      } else {
+        return *m_variable;
+      }
+    }
+
+  private:
+    /// Memory for the name of the variable selected as the return value of the filter.
+    std::string m_param_varName = "number_of_hits";
+
+    /// Reference to the location of the value in the variable set to be returned
+    Float_t* m_variable = nullptr;
+  };
 }
 
 CDCVXDTrackCombinationFilterFactory::CDCVXDTrackCombinationFilterFactory(const std::string& defaultFilterName)
@@ -65,6 +102,8 @@ CDCVXDTrackCombinationFilterFactory::getValidFilterNamesAndDescriptions() const
     {"none", "no track combination is valid"},
     {"all", "set all track combinations as good"},
     {"recording", "record variables to a TTree"},
+    {"mva", "filter based on the trained MVA method"},
+    {"mva_skimmed", "filter based on the trained MVA method for skimming, bur returns the number of hits"},
     {"truth", "monte carlo truth"},
     {"truth_number", "monte carlo truth returning the number of correct hits"},
     {"simple", "simple filter based on simple parameters"},
@@ -83,6 +122,8 @@ CDCVXDTrackCombinationFilterFactory::create(const std::string& filterName) const
     return makeUnique<RecordingCDCVXDTrackCombinationFilter>();
   } else if (filterName == "mva") {
     return makeUnique<MVACDCVXDTrackCombinationFilter>("tracking/data/ckf_CDCVXDTrackCombination.xml");
+  } else if (filterName == "mva_skimmed") {
+    return makeUnique<MVASkimmedCDCVXDTrackCombinationFilter>("tracking/data/ckf_CDCVXDTrackCombination.xml");
   } else if (filterName == "truth") {
     return makeUnique<MCCDCVXDTrackCombinationFilter >();
   } else if (filterName == "truth_number") {

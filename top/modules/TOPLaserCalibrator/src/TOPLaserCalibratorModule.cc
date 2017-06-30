@@ -93,9 +93,6 @@ namespace Belle2 {
 
   void TOPLaserCalibratorModule::event()
   {
-
-    if (!m_simFileName.empty()) return;
-
     StoreArray<TOPDigit> digits;
     for (auto& digit : digits) {
       if (m_barID != 0 && digit.getModuleID() != m_barID) continue; //if m_barID == 0, use all 16 slots(for MC test)
@@ -123,38 +120,6 @@ namespace Belle2 {
 
   void TOPLaserCalibratorModule::terminate()
   {
-    if (!m_simFileName.empty()) {  //get Time from input root file, for local test
-      auto simfile = new TFile(m_simFileName.c_str());
-      TTree* tree_laser;
-      simfile->GetObject("tree_laser", tree_laser);
-      double digitTime = 0;
-      int channel = 0;
-      tree_laser->SetBranchAddress("digitTime", &digitTime);
-      tree_laser->SetBranchAddress("channel", &channel);
-
-      int nevt = tree_laser->GetEntries();
-
-      for (int i = 0; i < nevt; i++) {
-        tree_laser->GetEntry(i);
-        if (digitTime < m_fitRange[1] || digitTime > m_fitRange[2]) continue;
-        if ((channel - 1) < c_NumChannels) {
-          auto histo = m_histo[channel - 1];
-          if (!histo) {
-            stringstream ss;
-            ss << "channel" << channel - 1 ;
-            string name;
-            ss >> name;
-            string title = "Times " + name;
-            histo = new TH1F(name.c_str(), title.c_str(), (int)m_fitRange[0], m_fitRange[1], m_fitRange[2]);
-            m_histo[channel - 1] = histo;
-          }
-          histo->Fill(digitTime);
-        }
-      }
-      simfile->Close();
-      delete simfile;
-    }
-
     std::vector<TH1F*> v_histo;
     for (int i = 0; i < c_NumChannels; ++i) {
       v_histo.push_back(m_histo[i]);
@@ -173,6 +138,7 @@ namespace Belle2 {
     }
     //cout<<"chisq=\t"<<t0fit.getFitChisq(6)<<endl;
     t0fit.writeFile(m_histogramFileName); //write to root file
+
     // ...
     // write to database; next to do ...
     // ...

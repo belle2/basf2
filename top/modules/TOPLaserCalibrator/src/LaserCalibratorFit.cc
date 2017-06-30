@@ -36,13 +36,15 @@ namespace Belle2 {
     {
       double m1 = par[1];
       double s1 = par[2];
-      double a = par[3];
-      double n = par[4];
+      double a1 = par[3];
+      double n1 = par[4];
       double m2 = m1 - par[6];
       double s2 = par[7];
+      double a2 = par[8];
+      double n2 = par[9];
 
-      double f1 = ROOT::Math::crystalball_pdf(x[0], a, n, s1, m1);
-      double f2 = ROOT::Math::crystalball_pdf(x[0], a, n, s2, m2);
+      double f1 = ROOT::Math::crystalball_pdf(x[0], a1, n1, s1, m1);
+      double f2 = ROOT::Math::crystalball_pdf(x[0], a2, n2, s2, m2);
       return par[0] * f1 + par[5] * f2;
     }
 
@@ -65,7 +67,7 @@ namespace Belle2 {
     }
 
 //initial TF1 of all channels in one slot
-    void LaserCalibratorFit::setHist(std::vector<TH1F*> hist)
+    void LaserCalibratorFit::setHist(std::vector<TH1F*>& hist)
     {
       m_hist = hist;
       for (unsigned i = 0; i < hist.size(); i++) {
@@ -112,7 +114,7 @@ namespace Belle2 {
       return 1;
     }
 
-    void LaserCalibratorFit::writeFile(std::string outfile = "laserfit.root")
+    void LaserCalibratorFit::writeFile(std::string& outfile)
     {
       auto file = new TFile(outfile.c_str(), "RECREATE");
       auto otree = new TTree("fits", "fitted times");
@@ -201,7 +203,6 @@ namespace Belle2 {
       func->SetNpx(1000);
       h->Fit("gaus", "Q", "", m - w, m + w);
       func = h->GetFunction("gaus");
-      func->GetParameters(parms);
 
       return func;
     }
@@ -234,7 +235,6 @@ namespace Belle2 {
       func->SetParLimits(4, 0, 10);
 
       h->Fit(func, "Q", "");
-      func->GetParameters(parms);
       return func;
     }
 
@@ -263,17 +263,21 @@ namespace Belle2 {
       func->SetParName(0, "norm1");
       func->SetParName(1, "time1");
       func->SetParName(2, "sigma1");
-      func->SetParName(3, "alpha_CB");
-      func->SetParName(4, "n_CB");
+      func->SetParName(3, "alpha1_CB");
+      func->SetParName(4, "n1_CB");
       func->SetParName(5, "norm2");
       func->SetParName(6, "dt12");
       func->SetParName(7, "sigma2");
+      func->SetParName(8, "alpha2_CB");
+      func->SetParName(9, "n2_CB");
 
       func->SetParLimits(1, parms[1] - 0.25, parms[1] + 0.15);
       //func->SetParLimits(2,par[2]-0.02,par[2]+0.08);
       func->SetParLimits(3, -5, 0);
       func->SetParLimits(4, 0, 10);
       func->SetParLimits(6, parms[6] * 0.7, parms[6] * 1.5);
+      func->SetParLimits(8, -5, 0);
+      func->SetParLimits(9, 0, 10);
 
       ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls(50000); //set to a large number for a test
       if (minOut) {
@@ -281,7 +285,6 @@ namespace Belle2 {
       } else {
         h->Fit(func);
       }
-      func->GetParameters(parms);
       return func;
     }
   } // TOP namespace

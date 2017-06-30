@@ -3,14 +3,14 @@
 
 from basf2 import *
 
-gb2_setuprel = 'build-2014-10-22'
+gb2_setuprel = 'build-2017-06-14'
 
 # ---------------------------------------------------------------
 # example of using OpticalGun to simulate laser light sources
 # two sources at the left and right side of prism, outside quartz
 # ---------------------------------------------------------------
 
-# Usage: basf2 laserCalMC.py -n 10000
+# Usage: basf2 t0laserCalMC.py -n 10000
 
 # Create path
 main = create_path()

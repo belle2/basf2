@@ -55,7 +55,7 @@ namespace Belle2 {
        * set time hist of all channels in one moduleID
        * @param hist  time hist vector
        */
-      void setHist(std::vector<TH1F*> hist);
+      void setHist(std::vector<TH1F*>& hist);
 
       /**
       * set time fit function
@@ -80,23 +80,23 @@ namespace Belle2 {
       * write fit result to a root file
       * @param outfile  output file name
       */
-      void writeFile(std::string outfile); /**< write fitting results to a root file */
+      void writeFile(std::string& outfile);
 
       /**
        * get the module ID in the fit
        */
-      int getModuleID() const {return m_moduleID;} /**< get moduleID in the fit */
+      int getModuleID() const {return m_moduleID;}
 
       /**
        * get chi^2 in the fit
        * @param channel  chi^2 for a channel
        */
-      double getFitChisq(unsigned channel); /**< get fit chi^2 for a channel */
+      double getFitChisq(unsigned channel);
 
       /**
        * get the fit method used in recent module
        */
-      std::string getFitMethod() const {return m_fitMethod;} /**< get fitting method */
+      std::string getFitMethod() const {return m_fitMethod;}
 
     private:
 

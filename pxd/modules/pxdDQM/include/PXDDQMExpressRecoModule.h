@@ -23,6 +23,7 @@
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vector>
+#include "TH1I.h"
 #include "TH1F.h"
 #include "TH2F.h"
 
@@ -119,6 +120,44 @@ namespace Belle2 {
        * @param Sensor return Sensor position of sensor
        */
     void getIDsFromIndex(int Index, int* Layer, int* Ladder, int* Sensor);
+    /**< Function return flag histogram filled based on condition.
+       * @param Type Set type of condition for flag calculation.
+       * 1: use counts, mean and RMS.
+       * 2: use counts only.
+       * 3: use mean only.
+       * 4: use RMS only.
+       * 5: use counts and mean.
+       * 9: use bin content only.
+       * 10: use Chi2 condition and pars[0] and pars[1].
+       * 100: nothing do just fill flags as OK.
+       * @param bin bin which is fill in flag histogram.
+       * @param pars array of parameters need for condition.
+       * @param ratio Ratio of acquired events to reference events.
+       * @param hist Histogram of sources.
+       * @param refhist Reference histogram.
+       * @param flag Histogram of flags.
+       * @return Indication of succes of realizing of condition, 1: OK.
+       */
+    int SetFlag(int Type, int bin, double* pars, double ratio, TH1F* hist, TH1F* refhist, TH1I* flaghist);
+    /**< Function return flag histogram filled based on condition.
+       * @param Type Set type of condition for flag calculation.
+       * 1: use counts, mean and RMS.
+       * 2: use counts only.
+       * 3: use mean only.
+       * 4: use RMS only.
+       * 5: use counts and mean.
+       * 9: use bin content only.
+       * 10: use Chi2 condition and pars[0] and pars[1].
+       * 100: nothing do just fill flags as OK.
+       * @param bin bin which is fill in flag histogram.
+       * @param pars array of parameters need for condition.
+       * @param ratio Ratio of acquired events to reference events.
+       * @param hist Histogram of sources.
+       * @param refhist Reference histogram.
+       * @param flag Histogram of flags.
+       * @return Indication of succes of realizing of condition, 1: OK.
+       */
+    int SetFlag(int Type, int bin, double* pars, double ratio, TH1I* hist, TH1I* refhist, TH1I* flaghist);
 
   };
 

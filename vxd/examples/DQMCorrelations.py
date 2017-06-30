@@ -159,7 +159,7 @@ if (args.SkipPXDSVD is False):
     # pxddqm.param('UseDigits', args.UseDigits)
     # pxddqm.param('SaveOtherHistos', args.SaveOtherHistos)
 
-    svddqmExpReco = register_module('SVDDQM')
+    svddqmExpReco = register_module('SVDDQMExpressReco')
     svddqmChips = register_module('SVDDQM')
     svddqmDetails = register_module('SVDDQM')
     # svddqm.param('UseDigits', args.UseDigits)

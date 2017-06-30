@@ -556,146 +556,35 @@ void PXDDQMExpressRecoModule::endRun()
 
   // Compare histograms with reference histograms and create flags:
   for (int i = 0; i < c_nPXDSensors; i++) {
-    double val1 = m_hitMapCounts->GetBinContent(i + 1);
-    val1 = val1 * m_NoOfEventsRef / m_NoOfEvents;
-    double val2 = r_hitMapCounts->GetBinContent(i + 1);
-    double diffval = 0;
-    if (abs(val1 - val2) > 5 * (sqrt(val1) + sqrt(val2))) diffval = 1;
-    m_fHitMapCountsFlag->SetBinContent(i + 1, diffval);
+    double pars[2];
+    pars[0] = 0.01;
+    pars[1] = 0.05;
+    SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+            m_hitMapCounts, r_hitMapCounts, m_fHitMapCountsFlag);
+    SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+            m_hitMapClCounts, r_hitMapClCounts, m_fHitMapClCountsFlag);
+    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+            m_fired[i], r_fired[i], m_fFiredFlag);
+    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+            m_clusters[i], r_clusters[i], m_fClustersFlag);
+    SetFlag(100, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+            m_startRow[i], r_startRow[i], m_fStartRowFlag);
+    SetFlag(100, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+            m_chargStartRow[i], r_chargStartRow[i], m_fChargStartRowFlag);
+    SetFlag(100, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+            m_startRowCount[i], r_startRowCount[i], m_fStartRowCountFlag);
+    SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+            m_clusterCharge[i], r_clusterCharge[i], m_fClusterChargeFlag);
+    SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+            m_pixelSignal[i], r_pixelSignal[i], m_fPixelSignalFlag);
+    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+            m_clusterSizeU[i], r_clusterSizeU[i], m_fClusterSizeUFlag);
+    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+            m_clusterSizeV[i], r_clusterSizeV[i], m_fClusterSizeVFlag);
+    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+            m_clusterSizeUV[i], r_clusterSizeUV[i], m_fClusterSizeUVFlag);
   }
-  for (int i = 0; i < c_nPXDSensors; i++) {
-    double val1 = m_hitMapClCounts->GetBinContent(i + 1);
-    val1 = val1 * m_NoOfEventsRef / m_NoOfEvents;
-    double val2 = r_hitMapClCounts->GetBinContent(i + 1);
-    double diffval = 0;
-    if (abs(val1 - val2) > 5 * (sqrt(val1) + sqrt(val2))) diffval = 1;
-    m_fHitMapClCountsFlag->SetBinContent(i + 1, diffval);
-  }
-
-  TH1F* temp1 = new TH1F("temp1", "temp1", 50, 0, 50);
-  TH1F* temp2 = new TH1F("temp2", "temp2", 20, 0, 20);
-  TH1F* temp3 = new TH1F("temp3", "temp3", m_nPixels / 4, 0.0, m_nPixels);
-  TH1F* tempch = new TH1F("tempch", "tempch", 256, 0, 256);
-  TH1F* tempcs = new TH1F("tempcs", "tempcs", 10, 0, 10);
-  for (int i = 0; i < c_nPXDSensors; i++) {
-    temp1->Reset();
-    temp2->Reset();
-    temp3->Reset();
-    tempch->Reset();
-    tempcs->Reset();
-    for (int j = 0; j < 50; j++) {
-      double val1 = m_fired[i]->GetBinContent(j + 1);
-      val1 = val1 * m_NoOfEventsRef / m_NoOfEvents;
-      temp1->SetBinContent(j + 1, val1);
-    }
-    double flag  = r_fired[i]->Chi2Test(temp1);
-    printf("m_fFiredFlag---> %f\n", flag);
-    m_fFiredFlag->SetBinContent(i + 1, 0);
-    if (flag > 0.1)
-      m_fFiredFlag->SetBinContent(i + 1, 1);
-    for (int j = 0; j < 20; j++) {
-      double val1 = m_clusters[i]->GetBinContent(j + 1);
-      val1 = val1 * m_NoOfEventsRef / m_NoOfEvents;
-      temp2->SetBinContent(j + 1, val1);
-    }
-    flag  = r_clusters[i]->Chi2Test(temp2);
-    printf("m_fClustersFlag---> %f\n", flag);
-    m_fClustersFlag->SetBinContent(i + 1, 0);
-    if (flag > 0.1)
-      m_fClustersFlag->SetBinContent(i + 1, 1);
-    for (int j = 0; j < m_nPixels / 4; j++) {
-      double val1 = m_startRow[i]->GetBinContent(j + 1);
-      val1 = val1 * m_NoOfEventsRef / m_NoOfEvents;
-      temp3->SetBinContent(j + 1, val1);
-    }
-    flag  = r_startRow[i]->Chi2Test(temp3);
-    printf("startRow---> %f\n", flag);
-    m_fStartRowFlag->SetBinContent(i + 1, 0);
-    if (flag > 0.1)
-      m_fStartRowFlag->SetBinContent(i + 1, 1);
-    temp3->Reset();
-    for (int j = 0; j < m_nPixels / 4; j++) {
-      double val1 = m_chargStartRow[i]->GetBinContent(j + 1);
-      val1 = val1 * m_NoOfEventsRef / m_NoOfEvents;
-      temp3->SetBinContent(j + 1, val1);
-    }
-    flag  = r_chargStartRow[i]->Chi2Test(temp3);
-    printf("chargStartRow---> %f\n", flag);
-    m_fChargStartRowFlag->SetBinContent(i + 1, 0);
-    if (flag > 0.1)
-      m_fChargStartRowFlag->SetBinContent(i + 1, 1);
-    temp3->Reset();
-    for (int j = 0; j < m_nPixels / 4; j++) {
-      double val1 = m_startRowCount[i]->GetBinContent(j + 1);
-      val1 = val1 * m_NoOfEventsRef / m_NoOfEvents;
-      temp3->SetBinContent(j + 1, val1);
-    }
-    flag  = r_startRowCount[i]->Chi2Test(temp3);
-    printf("startRowCount---> %f\n", flag);
-    m_fStartRowCountFlag->SetBinContent(i + 1, 0);
-    if (flag > 0.1)
-      m_fStartRowCountFlag->SetBinContent(i + 1, 1);
-    for (int j = 0; j < 256; j++) {
-      double val1 = m_clusterCharge[i]->GetBinContent(j + 1);
-      val1 = val1 * m_NoOfEventsRef / m_NoOfEvents;
-      tempch->SetBinContent(j + 1, val1);
-    }
-    flag  = r_clusterCharge[i]->Chi2Test(tempch);
-    printf("clusterCharge---> %f\n", flag);
-    m_fClusterChargeFlag->SetBinContent(i + 1, 0);
-    if (flag > 0.1)
-      m_fClusterChargeFlag->SetBinContent(i + 1, 1);
-    tempch->Reset();
-    for (int j = 0; j < 256; j++) {
-      double val1 = m_pixelSignal[i]->GetBinContent(j + 1);
-      val1 = val1 * m_NoOfEventsRef / m_NoOfEvents;
-      tempch->SetBinContent(j + 1, val1);
-    }
-    flag  = r_pixelSignal[i]->Chi2Test(tempch);
-    printf("pixelSignal---> %f\n", flag);
-    m_fPixelSignalFlag->SetBinContent(i + 1, 0);
-    if (flag > 0.1)
-      m_fStartRowCountFlag->SetBinContent(i + 1, 1);
-    for (int j = 0; j < 10; j++) {
-      double val1 = m_clusterSizeU[i]->GetBinContent(j + 1);
-      val1 = val1 * m_NoOfEventsRef / m_NoOfEvents;
-      tempcs->SetBinContent(j + 1, val1);
-    }
-    flag  = r_clusterSizeU[i]->Chi2Test(tempcs);
-    printf("clusterSizeU---> %f\n", flag);
-    m_fClusterSizeUFlag->SetBinContent(i + 1, 0);
-    if (flag > 0.1)
-      m_fClusterSizeUFlag->SetBinContent(i + 1, 1);
-    tempcs->Reset();
-    for (int j = 0; j < 10; j++) {
-      double val1 = m_clusterSizeV[i]->GetBinContent(j + 1);
-      val1 = val1 * m_NoOfEventsRef / m_NoOfEvents;
-      tempcs->SetBinContent(j + 1, val1);
-    }
-    flag  = r_clusterSizeV[i]->Chi2Test(tempcs);
-    printf("clusterSizeV---> %f\n", flag);
-    m_fClusterSizeVFlag->SetBinContent(i + 1, 0);
-    if (flag > 0.1)
-      m_fClusterSizeVFlag->SetBinContent(i + 1, 1);
-    tempcs->Reset();
-    for (int j = 0; j < 10; j++) {
-      double val1 = m_clusterSizeUV[i]->GetBinContent(j + 1);
-      val1 = val1 * m_NoOfEventsRef / m_NoOfEvents;
-      tempcs->SetBinContent(j + 1, val1);
-    }
-    flag  = r_clusterSizeUV[i]->Chi2Test(tempcs);
-    printf("clusterSizeUV---> %f\n", flag);
-    m_fClusterSizeUVFlag->SetBinContent(i + 1, 0);
-    if (flag > 0.1)
-      m_fClusterSizeUVFlag->SetBinContent(i + 1, 1);
-  }
-  delete temp1;
-  delete temp2;
-  delete temp3;
-  delete tempch;
-  delete tempcs;
 }
-
 
 void PXDDQMExpressRecoModule::terminate()
 {
@@ -722,7 +611,6 @@ int PXDDQMExpressRecoModule::getSensorIndex(int Layer, int Ladder, int Sensor)
     }
     if (tempend == 1) break;
   }
-  // printf("  --> PXD uvnitr sensor %i: %i_%i_%i\n", tempcounter, Layer, Ladder, Sensor);
   return tempcounter;
 }
 
@@ -748,5 +636,143 @@ void PXDDQMExpressRecoModule::getIDsFromIndex(int Index, int* Layer, int* Ladder
     }
     if (tempend == 1) break;
   }
-  // printf("  --> PXD sensor %i: %i_%i_%i\n", Index, *Layer, *Ladder, *Sensor);
+}
+
+int PXDDQMExpressRecoModule::SetFlag(int Type, int bin, double* pars, double ratio, TH1F* hist, TH1F* refhist, TH1I* flaghist)
+{
+  int iret = 0;
+  float WarningLevel = 6.0;
+  float ErrorLevel = 10.0;
+  TH1F* temp = new TH1F("temp", "temp", hist->GetNbinsX(), hist->GetXaxis()->GetXmin(), hist->GetXaxis()->GetXmax());
+  double NEvents = 0;
+  double flagInt = 0;
+  double flagrInt = 0;
+  for (int j = 0; j < hist->GetNbinsX(); j++) {
+    double val = hist->GetBinContent(j + 1);
+    NEvents += val;
+    val = val / ratio;
+    temp->SetBinContent(j + 1, val);
+    flagInt += temp->GetBinContent(j + 1);
+    flagrInt += refhist->GetBinContent(j + 1);
+  }
+  if (NEvents < 100) {  // not enough information for comparition
+    delete temp;
+    iret = -1;
+    flaghist->SetBinContent(bin + 1, -1);
+    return iret;
+  }
+  double flag  = temp->GetMean();
+  double flagErr  = temp->GetMeanError();
+  double flagRMS  = temp->GetRMS();
+  double flagRMSErr  = temp->GetRMSError();
+  double flagr  = refhist->GetMean();
+  double flagrErr  = refhist->GetMeanError();
+  double flagrRMS  = refhist->GetRMS();
+  double flagrRMSErr  = refhist->GetRMSError();
+  TString strDebugInfo = Form("Conditions for Flag--->\n   source %f %f+-%f %f+-%f\n  referen %f %f+-%f %f+-%f\n",
+                              flagInt, flag, flagErr, flagRMS, flagRMSErr,
+                              flagrInt, flagr, flagrErr, flagrRMS, flagrRMSErr
+                             );
+  B2DEBUG(130, strDebugInfo.Data());
+  if (Type == 1) {  // counts+mean+RMS use
+    if ((fabs(flag - flagr) > ErrorLevel * (flagErr + flagrErr)) ||
+        (fabs(flagRMS - flagrRMS) > ErrorLevel * (flagRMSErr + flagrRMSErr)) ||
+        (fabs(flagInt - flagrInt) > ErrorLevel * (sqrt(flagInt) + sqrt(flagrInt)))
+       ) {
+      flaghist->SetBinContent(bin + 1, 2);
+    } else if ((fabs(flag - flagr) > WarningLevel * (flagErr + flagrErr)) ||
+               (fabs(flagRMS - flagrRMS) > WarningLevel * (flagRMSErr + flagrRMSErr)) ||
+               (fabs(flagInt - flagrInt) > WarningLevel * (sqrt(flagInt) + sqrt(flagrInt)))
+              ) {
+      flaghist->SetBinContent(bin + 1, 1);
+    } else {
+      flaghist->SetBinContent(bin + 1, 0);
+    }
+    iret = 1;
+  } else if (Type == 2) { // counts use
+    if (fabs(flagInt - flagrInt) > ErrorLevel * (sqrt(flagInt) + sqrt(flagrInt))) {
+      flaghist->SetBinContent(bin + 1, 2);
+    } else if (fabs(flagInt - flagrInt) > WarningLevel * (sqrt(flagInt) + sqrt(flagrInt))) {
+      flaghist->SetBinContent(bin + 1, 1);
+    } else {
+      flaghist->SetBinContent(bin + 1, 0);
+    }
+    iret = 1;
+  } else if (Type == 3) { // mean use
+    if (fabs(flag - flagr) > ErrorLevel * (flagErr + flagrErr)) {
+      flaghist->SetBinContent(bin + 1, 2);
+    } else if (fabs(flag - flagr) > WarningLevel * (flagErr + flagrErr)) {
+      flaghist->SetBinContent(bin + 1, 1);
+    } else {
+      flaghist->SetBinContent(bin + 1, 0);
+    }
+    iret = 1;
+  } else if (Type == 4) { // RMS use
+    if (fabs(flagRMS - flagrRMS) > ErrorLevel * (flagRMSErr + flagrRMSErr)) {
+      flaghist->SetBinContent(bin + 1, 2);
+    } else if (fabs(flagRMS - flagrRMS) > WarningLevel * (flagRMSErr + flagrRMSErr)) {
+      flaghist->SetBinContent(bin + 1, 1);
+    } else {
+      flaghist->SetBinContent(bin + 1, 0);
+    }
+    iret = 1;
+  } else if (Type == 5) { // counts+mean use
+    if ((fabs(flag - flagr) > ErrorLevel * (flagErr + flagrErr)) ||
+        (fabs(flagInt - flagrInt) > ErrorLevel * (sqrt(flagInt) + sqrt(flagrInt)))
+       ) {
+      flaghist->SetBinContent(bin + 1, 2);
+    } else if ((fabs(flag - flagr) > WarningLevel * (flagErr + flagrErr)) ||
+               (fabs(flagInt - flagrInt) > WarningLevel * (sqrt(flagInt) + sqrt(flagrInt)))
+              ) {
+      flaghist->SetBinContent(bin + 1, 1);
+    } else {
+      flaghist->SetBinContent(bin + 1, 0);
+    }
+    iret = 1;
+  } else if (Type == 9) { // bin content use
+    flagInt = temp->GetBinContent(bin + 1);
+    flagrInt = refhist->GetBinContent(bin + 1);
+    if (fabs(flagInt - flagrInt) > ErrorLevel * (sqrt(flagInt) + sqrt(flagrInt))) {
+      flaghist->SetBinContent(bin + 1, 2);
+    } else if (fabs(flagInt - flagrInt) > WarningLevel * (sqrt(flagInt) + sqrt(flagrInt))) {
+      flaghist->SetBinContent(bin + 1, 1);
+    } else {
+      flaghist->SetBinContent(bin + 1, 0);
+    }
+    iret = 1;
+  } else if (Type == 10) {
+    float flag  = refhist->Chi2Test(temp);
+    flaghist->SetBinContent(bin + 1, 0);
+    if (flag > pars[1])
+      flaghist->SetBinContent(bin + 1, 2);
+    if (flag > pars[0])
+      flaghist->SetBinContent(bin + 1, 1);
+    iret = 1;
+  } else if (Type == 100) {
+    flaghist->SetBinContent(bin + 1, 0);
+    iret = 1;
+  } else {
+    flaghist->SetBinContent(bin + 1, -1);
+    iret = -1;
+  }
+  delete temp;
+  strDebugInfo = Form("SetFlag---> %f, type %i\n", flaghist->GetBinContent(bin + 1), Type);
+  B2DEBUG(130, strDebugInfo.Data());
+  return iret;
+}
+
+int PXDDQMExpressRecoModule::SetFlag(int Type, int bin, double* pars, double ratio, TH1I* hist, TH1I* refhist, TH1I* flaghist)
+{
+
+  TH1F* histF = new TH1F("histF", "histF", hist->GetNbinsX(), hist->GetXaxis()->GetXmin(), hist->GetXaxis()->GetXmax());
+  TH1F* refhistF = new TH1F("refhistF", "refhistF", refhist->GetNbinsX(), refhist->GetXaxis()->GetXmin(),
+                            refhist->GetXaxis()->GetXmax());
+  for (int j = 0; j < hist->GetNbinsX(); j++) {
+    histF->SetBinContent(j + 1, hist->GetBinContent(j + 1));
+    refhistF->SetBinContent(j + 1, refhist->GetBinContent(j + 1));
+  }
+  int ret = SetFlag(Type, bin, pars, ratio, histF, refhistF, flaghist);
+  delete histF;
+  delete refhistF;
+  return ret;
 }

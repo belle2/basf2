@@ -16,6 +16,7 @@
 
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapResolverNodeInfo.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/HopfieldNetwork.h>
+#include <tracking/trackFindingVXD/trackSetEvaluator/Scrooge.h>
 
 namespace Belle2 {
   /**
@@ -54,7 +55,10 @@ namespace Belle2 {
 
       m_qualityFilter.exposeParameters(moduleParamList, prefix);
 
-      moduleParamList->addParameter("minimalActivityState", m_param_minimalActivityState, "", m_param_minimalActivityState);
+      moduleParamList->addParameter("minimalActivityState", m_param_minimalActivityState,
+                                    "Minimal activation state below which the node is not accepted.", m_param_minimalActivityState);
+      moduleParamList->addParameter("useGreedyAlgorithm", m_param_useGreedyAlgorithm, "Use the greedy algorithm"
+                                    "instead of the hopfield algorithm.", m_param_useGreedyAlgorithm);
       moduleParamList->addParameter("enableOverlapResolving", m_param_enableOverlapResolving,
                                     "Enable the overlap resolving.", m_param_enableOverlapResolving);
     }
@@ -131,8 +135,11 @@ namespace Belle2 {
 
       if (m_overlapResolverInfos.size() > 1)
       {
-        // do hopfield
-        m_hopfieldNetwork.doHopfield(m_overlapResolverInfos);
+        if (m_param_useGreedyAlgorithm) {
+          m_greedyAlgorithm.performSelection(m_overlapResolverInfos);
+        } else {
+          m_hopfieldNetwork.doHopfield(m_overlapResolverInfos);
+        }
       }
 
       // copy results
@@ -153,12 +160,16 @@ namespace Belle2 {
     /// Sub algorithm: the hopfield algorithm class
     // TODO: export parameters
     HopfieldNetwork m_hopfieldNetwork;
+    /// Sub algorithm: the greedy algorithm
+    Scrooge m_greedyAlgorithm;
 
     // Parameters
     /// Parameter: Minimal activity state above a node is seen as active.
     double m_param_minimalActivityState = 0.75;
     /// Parameter: Enable overlap
     bool m_param_enableOverlapResolving = true;
+    /// Parameter: Use Greedy Algorithm
+    bool m_param_useGreedyAlgorithm = false;
 
     // Object Pools
     /// Overlap resolver infos as input to the hopfield network.

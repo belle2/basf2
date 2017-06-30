@@ -63,8 +63,8 @@ namespace Belle2 {
 
     TDirectory* m_oldDir;                  /**< Basic Directory in output file */
 
-    /** Name of file contain reference histograms, default=PXD-ReferenceHistos */
-    std::string m_RefHistFileName = "PXD-ReferenceHistos.root";
+    /** Name of file contain reference histograms, default=VXD-ReferenceHistos */
+    std::string m_RefHistFileName = "vxd/data/VXD-DQMReferenceHistos.root";
     int m_NoOfEvents;        /** Number of events */
     int m_NoOfEventsRef;     /** Number of events in reference histogram */
 
@@ -81,8 +81,8 @@ namespace Belle2 {
     TH1I* m_fClusterSizeVFlag;    /**< Flags of v cluster size */
     TH1I* m_fClusterSizeUVFlag;   /**< Flags of Cluster size */
 
-    TH1I* m_hitMapCounts;        /**< Hitmaps of Digits */
-    TH1I* m_hitMapClCounts;      /**< Hitmaps of Clusters*/
+    TH1I* m_hitMapCounts;         /**< Hitmaps of Digits */
+    TH1I* m_hitMapClCounts;       /**< Hitmaps of Clusters*/
     TH1F** m_fired;               /**< Fired pixels per event */
     TH1F** m_clusters;            /**< Clusters per event */
     TH1F** m_startRow;            /**< Start row distribution */

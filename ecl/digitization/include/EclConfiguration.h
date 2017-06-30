@@ -12,6 +12,19 @@ namespace Belle2 {
     bool background() const { return m_background; }
     void setBackground(bool val) { m_background = val; }
 
+    /**
+     * unpack waveform for simulation from buffer in to buffer out
+     *
+     * return cellId
+     */
+    static int unpack(int* out, const unsigned int* in);
+
+    /**
+     * Pack simulated waveform
+     * assuming 18 bit ADC precision
+     */
+    static void pack(unsigned int* out, int cellid, const unsigned int* in);
+
     static constexpr int        m_nch = 8736; // total number of electronic channels (crystals) in calorimeter
     static constexpr double    m_rf = 508.887; // accelerating RF, http://ptep.oxfordjournals.org/content/2013/3/03A006.full.pdf
     static constexpr double    m_tick = 24.*12. / m_rf; // == 72/127 digitization clock tick (in microseconds ???)

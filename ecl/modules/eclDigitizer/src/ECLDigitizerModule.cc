@@ -14,7 +14,6 @@
 #include <ecl/digitization/algorithms.h>
 #include <ecl/digitization/shaperdsp.h>
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/dataobjects/ECLWaveformDigit.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
@@ -49,6 +48,8 @@ ECLDigitizerModule::ECLDigitizerModule() : Module()
            false);
   addParam("DiodeDeposition", m_inter,
            "Flag to take into account energy deposition in photodiodes; Default diode is not sensitive detector", false);
+  addParam("WavefromMaker", m_waveformMaker,
+           "Flag to produce background waveform digits", false);
 }
 
 ECLDigitizerModule::~ECLDigitizerModule()
@@ -64,6 +65,9 @@ void ECLDigitizerModule::initialize()
   m_eclDiodeHits.registerInDataStore("ECLDiodeHits");
 
   m_eclDigits.registerRelationTo(m_eclHits);
+
+  m_eclWaveformDigits.registerInDataStore("ECLWaveformDigit_BG");
+  m_eclWaveformDigits.isOptional();
 
   readDSPDB();
 
@@ -89,7 +93,7 @@ void ECLDigitizerModule::shapeFitterWrapper(const int j, const int* FitA, const 
               &m_lar, &m_ltr, &m_lq , &m_chi);
 }
 
-void ECLDigitizerModule::event()
+int ECLDigitizerModule::shapeSignals()
 {
   const EclConfiguration& ec = EclConfiguration::get();
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();
@@ -106,15 +110,6 @@ void ECLDigitizerModule::event()
   // clear the storage for the event
   memset(m_adc.data(), 0, m_adc.size()*sizeof(adccounts_t));
 
-  // first -- add background waveform digits
-  StoreArray<ECLWaveformDigit> bgDigits("ECLWaveformDigit_BG");
-  if (bgDigits.isValid()) {
-    for (const auto& bgDigit : bgDigits) {
-      unsigned id = bgDigit.getUniqueChannelID() - 1;
-      bgDigit.unpack(m_adc[id]);
-    }
-  }
-
   // emulate response for ECL hits after ADC measurements
   for (const auto& hit : m_eclSimHits) {
     int j = hit.getCellId() - 1; //0~8735
@@ -130,15 +125,6 @@ void ECLDigitizerModule::event()
     double hitE       = hit.getEnergyDep() / Unit::GeV;
     double hitTimeAve = hit.getTimeAve() / Unit::us;
     m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
-  }
-
-  // make relation between cellid and eclhits
-  struct ch_t {int cell, id;};
-  vector<ch_t> hitmap;
-  for (const auto& hit : m_eclHits) {
-    int j = hit.getCellId() - 1; //0~8735
-    if (hit.getBackgroundTag() == ECLHit::bg_none) hitmap.push_back({j, hit.getArrayIndex()});
-    //    cout<<"C:"<<hit.getBackgroundTag()<<" "<<hit.getCellId()<<" "<<hit.getEnergyDep()<<" "<<hit.getTimeAve()<<endl;
   }
 
   // internuclear counter effect -- charged particle crosses diode and produces signal
@@ -160,32 +146,103 @@ void ECLDigitizerModule::event()
     }
   }
 
+  if (m_calibration) {
+    // This has been added by Alex Bobrov for calibration
+    // of covariance matrix artificially generate 100 MeV in time for each crystal
+    double hitE = 0.1, hitTimeAve = 0.0;
+    for (int j = 0; j < ec.m_nch; j++)
+      m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
+  }
+
+  return ttrig;
+}
+
+void ECLDigitizerModule::makeWaveforms()
+{
+  const EclConfiguration& ec = EclConfiguration::get();
+  unsigned int FitA[ec.m_nsmp]; // buffer for the waveform fitter
+  float z[ec.m_nsmp], AdcNoise[ec.m_nsmp]; // buffers with electronic noise
+  unsigned int wform[18]; // packed waveform
   // loop over entire calorimeter
   for (int j = 0; j < ec.m_nch; j++) {
     adccounts_t& a = m_adc[j];
 
-    if (m_calibration) {
-      // This has been added by Alex Bobrov for calibration
-      // of covariance matrix artificially generate 100 MeV in time for each crystal
-      double hitE = 0.1, hitTimeAve = 0.0;
-      a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
-    } else if (a.total < 0.0001)
-      continue;
-
     //Noise generation
-    float z[ec.m_nsmp];
-    for (int i = 0; i < ec.m_nsmp; i++)
-      z[i] = gRandom->Gaus(0, 1);
-
-    float AdcNoise[ec.m_nsmp];
+    for (int i = 0; i < ec.m_nsmp; i++) z[i] = gRandom->Gaus(0, 1);
     m_noise[m_tbl[j].inoise].generateCorrelatedNoise(z, AdcNoise);
 
-    int FitA[ec.m_nsmp];
     for (int  i = 0; i < ec.m_nsmp; i++) {
-      // first clip and then add noise
-      // FitA[i] = 20 * (1000 * max(0.0, a.c[i]) + AdcNoise[i]) + 3000;
-      // or add noise and then clip?
-      FitA[i] = max(0.0, 20 * (1000 * a.c[i] + AdcNoise[i]) + 3000);
+      int A = 20 * (1000 * a.c[i] + AdcNoise[i]) + 3000;
+      FitA[i] = max(0, min(A, (1 << 18) - 1));
+    }
+    ec.pack(wform, j + 1, FitA);
+    auto d = m_eclWaveformDigits.appendNew();
+    d->fill(wform);
+  }
+}
+
+void ECLDigitizerModule::event()
+{
+  const EclConfiguration& ec = EclConfiguration::get();
+  const int ttrig = shapeSignals();
+
+  // We want to produce background waveforms in simulation first than
+  // dump to a disk, read from the disk to test before real data
+  if (m_waveformMaker) { makeWaveforms(); return; }
+
+  // make relation between cellid and eclhits
+  struct ch_t {int cell, id;};
+  vector<ch_t> hitmap;
+  for (const auto& hit : m_eclHits) {
+    int j = hit.getCellId() - 1; //0~8735
+    if (hit.getBackgroundTag() == ECLHit::bg_none) hitmap.push_back({j, hit.getArrayIndex()});
+    //    cout<<"C:"<<hit.getBackgroundTag()<<" "<<hit.getCellId()<<" "<<hit.getEnergyDep()<<" "<<hit.getTimeAve()<<endl;
+  }
+
+  // check validity and waveform storage size
+  bool isBGOverlay = m_eclWaveformDigits.isValid() && m_eclWaveformDigits.getEntries() == ec.m_nch;
+  int pos = 0; //position in background buffer assuming it is ordered by the channel number
+
+  int FitA[ec.m_nsmp]; // buffer for the waveform fitter
+  float z[ec.m_nsmp], AdcNoise[ec.m_nsmp]; // buffers with electronic noise
+
+  // loop over entire calorimeter
+  for (int j = 0; j < ec.m_nch; j++) {
+    adccounts_t& a = m_adc[j];
+
+    bool isWave = false;
+
+    if (isBGOverlay) {
+      while (pos < ec.m_nch && j != static_cast<int>(m_eclWaveformDigits[pos]->getUniqueChannelID() - 1)) ++pos;
+      int cellId = ec.unpack(FitA, m_eclWaveformDigits[pos]->data()) - 1;
+      if (cellId != j) {
+        B2WARNING("ECLDigitizerModule: Waveform for background overlay is not found for channel " << j + 1);
+        pos = 0; // reset position and hope that the next channel will be found
+        memset(FitA, 0, sizeof FitA);
+      } else
+        isWave = true;
+    }
+
+    // amplitude of background waveform should be always above of so
+    // low threshold thus perform the waveform fitting anyway.
+    if (!isWave && a.total < 0.0001) continue;
+
+    // if background waveform is here there is no need to generate
+    // electronic noise since it is already in the waveform
+    if (isWave) {
+      for (int  i = 0; i < ec.m_nsmp; i++) {
+        int A = 20000 * a.c[i] + FitA[i];
+        FitA[i] = max(0, min(A, (1 << 18) - 1));
+      }
+    } else {
+      //Noise generation
+      for (int i = 0; i < ec.m_nsmp; i++) z[i] = gRandom->Gaus(0, 1);
+      m_noise[m_tbl[j].inoise].generateCorrelatedNoise(z, AdcNoise);
+      for (int  i = 0; i < ec.m_nsmp; i++) {
+        // add noise and then clip
+        int A = 20 * (1000 * a.c[i] + AdcNoise[i]) + 3000;
+        FitA[i] = max(0, min(A, (1 << 18) - 1));
+      }
     }
 
     int  energyFit = 0; // fit output : Amplitude 18 bits

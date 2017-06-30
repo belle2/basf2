@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
-"""
-Make sure the default decay files works fine
-"""
+# Make sure the default decay files works fine
 
 import basf2
 from beamparameters import add_beamparameters

@@ -29,7 +29,7 @@ namespace Belle2 {
     /** Get vector of uncertainties on calibration constants. */
     std::vector<float> getCalibUncVector() {return m_CalibConstUnc;};
 
-    /** Upload vector of constants with uncertainties. One entry per crystal */
+    /** Set vector of constants with uncertainties. One entry per crystal */
     void setCalibVector(std::vector<float> CalibConst, std::vector<float> CalibConstUnc)
     {
       if (CalibConst.size() != 8736 || CalibConstUnc.size() != 8736) {B2FATAL("ECLCrystalCalib: wrong size vector uploaded, " << CalibConst.size() << " " << CalibConstUnc.size() << " instead of 8736");}

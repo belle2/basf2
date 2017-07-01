@@ -41,6 +41,7 @@ namespace Belle2 {
 
   REG_MODULE(TOPAligner)
 
+
   //-----------------------------------------------------------------
   //                 Implementation
   //-----------------------------------------------------------------
@@ -57,7 +58,12 @@ namespace Belle2 {
              "Minimal number of background photons per module", 0.0);
     addParam("scaleN0", m_scaleN0,
              "Scale factor for figure-of-merit N0", 1.0);
-
+    addParam("targetModule", m_targetMid,
+             "Module to be aligned. Must be 1 <= Mid <= 16.", 1);
+    addParam("maxFails", m_maxFails,
+             "Maximum number of consecutive failed iterations before resetting the procedure", 100);
+    addParam("outFileName", m_outFileName,
+             "Root output file name containing alignment results", std::string("TopAlignPars.root"));
 
   }
 
@@ -67,6 +73,21 @@ namespace Belle2 {
 
   void TOPAlignerModule::initialize()
   {
+
+    // check if the target module is correctly set
+
+    if (m_targetMid < 1 || m_targetMid > 16)
+      B2FATAL("Target ModuleId is not correctly set, use targetModule in [1, 16]. Exiting...");
+
+
+    // check if target module ID is valid
+
+    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+    if (!geo->isModuleIDValid(m_targetMid))
+      B2FATAL("Target module " << m_targetMid << " is invalid. Exiting...");
+
+    m_align = TOPalign(m_targetMid);
+
 
     // input
 
@@ -79,16 +100,27 @@ namespace Belle2 {
     StoreArray<ExtHit> extHits;
     extHits.isRequired();
 
-    // Configure TOP detector
 
-    TOPconfigure config;
+    // set counter for failed iterations:
 
-    // Construct alignment objects (vector index == moduleID - 1)
+    m_countFails = 0;
 
-    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-    for (unsigned i = 0; i < geo->getNumModules(); i++) {
-      m_align.push_back(TOPalign(i + 1));
+
+    // output file
+
+    m_file = new TFile(m_outFileName.c_str(), "RECREATE");
+    if (m_file->IsZombie()) {
+      B2FATAL("Couldn't open file '" << m_outFileName << "' for writing!");
+      return;
     }
+
+
+    m_alignTree = new TTree("alignTree", "TOP alignment results");
+
+    m_alignTree->Branch("ModuleId", &m_targetMid);
+    m_alignTree->Branch("ntrk", &m_ntrk);
+    m_alignTree->Branch("errorCode", &m_errorCode);
+    m_alignTree->Branch("iterPars", &m_vAlignPars);
 
   }
 
@@ -121,19 +153,41 @@ namespace Belle2 {
       if (!trk.isValid()) continue;
 
       // do iteration
-      unsigned i = trk.getModuleID() - 1;
-      if (i < m_align.size()) {
-        auto& align = m_align[i];
-        int err = align.iterate(trk, Const::muon);
+      int i = trk.getModuleID() - 1;
 
-        cout << "M=" << align.getModuleID() << " ";
-        cout << "ntr=" << align.getNumTracks() << " ";
-        cout << "err=" << err << " ";
-        cout << "v=" << align.isValid() << " ";
-        for (const auto& par : align.getParameters()) cout << " " << par;
-        cout << endl;
+      // skip if moduleID != target module
+      if (m_targetMid != (i + 1)) continue;
 
+      auto& align = m_align;
+      int err = align.iterate(trk, Const::muon);
+
+      // check number of consecutive failures, and in case reset
+
+      if (err == 0) m_countFails = 0;
+      else if (m_countFails <= m_maxFails) m_countFails++;
+      else {
+        B2INFO("Reached maximum allowed number of failed iterations. Resetting TOPalign object(s)");
+        m_align = TOPalign(m_targetMid);
+        m_countFails = 0;
       }
+
+      const std::vector<float>& curPars = align.getParameters();
+
+      m_ntrk = align.getNumTracks();
+      m_errorCode = err;
+      m_vAlignPars = curPars;
+
+      B2INFO("M=" << align.getModuleID() << " ntr=" << m_ntrk << " err=" << m_errorCode << " v=" << align.isValid()
+             << " " << curPars.at(0)
+             << " " << curPars.at(1)
+             << " " << curPars.at(2)
+             << " " << curPars.at(3)
+             << " " << curPars.at(4)
+             << " " << curPars.at(5)
+             << " " << curPars.at(6));
+
+      // fill output tree
+      m_alignTree->Fill();
 
     }
 
@@ -146,6 +200,11 @@ namespace Belle2 {
 
   void TOPAlignerModule::terminate()
   {
+
+    m_file->cd();
+    m_alignTree->Write();
+    m_file->Close();
+
   }
 
 

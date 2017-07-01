@@ -115,7 +115,7 @@ public:
     std::string filedir = dir + StringUtil::form("%02d/storage/%4.4d/%5.5d/",
                                                  m_diskid, expno, runno);
     system(("mkdir -p " + filedir).c_str());
-    m_filename = StringUtil::form("%s.%s.%4.4d.%5.5d.f%5.5dsroot", m_host.c_str(),
+    m_filename = StringUtil::form("%s.%s.%4.4d.%5.5d.f%5.5d.sroot", m_host.c_str(),
                                   m_runtype.c_str(), expno, runno, m_fileid);
     m_path = filedir + m_filename;
     m_file = ::open(m_path.c_str(),  O_WRONLY | O_CREAT | O_EXCL, 0664);
@@ -125,8 +125,8 @@ public:
     }
     try {
       m_db->connect();
-      m_db->execute("insert into %s (name, path, host, label, expno, runno, fileno) "
-                    "values ('%s', '%s', '%s', '%s', %d, %d, %d);",
+      m_db->execute("insert into %s (name, path, host, label, expno, runno, fileno, nevents, chksum, size) "
+                    "values ('%s', '%s', '%s', '%s', %d, %d, %d, 0, 0, 0);",
                     g_table, m_filename.c_str(), m_path.c_str(), m_host.c_str(),
                     m_runtype.c_str(), m_expno, m_runno, m_fileid);
     } catch (const DBHandlerException& e) {

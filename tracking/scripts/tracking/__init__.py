@@ -596,7 +596,7 @@ def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None, suffi
                     recoTracksStoreArrayName=reco_tracks, recreateSortingParameters=True)
 
 
-def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None, suffix=""):
+def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None, suffix="", read_sectormap_from_db=True):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -608,8 +608,10 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     :param reco_tracks: Name of the output RecoTracks, Defaults to RecoTracks.
     :param components: List of the detector components to be used in the reconstruction. Defaults to None which means all
                        components.
-    :param suffix: all names of intermediate Storearrays will have the suffix appended. Useful in cases someone needs to put several
-                   instances of track finding in one path.
+    :param suffix: all names of intermediate Storearrays will have the suffix appended. Useful in cases someone needs to
+                   put several instances of track finding in one path.
+    :param read_sectormap_from_db: if set to False, a file called 'SVDPXDDefaultMap.root' or 'SVDOnlyDefaultMap.root'
+                                   will be used instead of the sectormap in the database.
     """
     ##########################
     # some setting for VXDTF2
@@ -651,8 +653,8 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
 
     # SecMap Bootstrap
     secMapBootStrap = register_module('SectorMapBootstrap')
-    secMapBootStrap.param('ReadSectorMap', False)  # read from file
-    secMapBootStrap.param('ReadSecMapFromDB', True)  # this will override ReadSectorMap
+    secMapBootStrap.param('ReadSectorMap', not read_sectormap_from_db)  # read from file
+    secMapBootStrap.param('ReadSecMapFromDB', read_sectormap_from_db)  # this will override ReadSectorMap
     secMapBootStrap.param('SectorMapsInputFile', sec_map_file)
     secMapBootStrap.param('SetupToRead', setup_name)
     secMapBootStrap.param('WriteSectorMap', False)

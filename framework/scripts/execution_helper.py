@@ -163,6 +163,8 @@ class Study:
 
     @classmethod
     def run(cls, create_path, **kwargs):
+        output_folders = []
+
         parameter_names = kwargs.keys()
         parameter_values = kwargs.values()
 
@@ -194,9 +196,11 @@ class Study:
 
             pool.start_job(env)
 
+            output_folders.append(env.get_output_folder())
+
         pool.join()
 
-        return pool
+        return output_folders
 
 
 class Basf2GitSnapshot(GitSnapshot):

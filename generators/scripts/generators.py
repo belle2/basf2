@@ -108,7 +108,7 @@ def add_evtgen_generator(path, finalstate=''):
     elif finalstate == 'mixed':
         evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/mixed.dec')
     else:
-        B2FATAL("add_evtgen_generator final state not supported: ", finalstate)
+        B2FATAL("add_evtgen_generator final state not supported: " + str(finalstate))
 
     # use EvtGen
     evtgen = path.add_module(

@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/Chi2CDCVXDTrackCombinationFilter.h>
-#include <tracking/ckf/findlets/cdcToSpacePoint/SpacePointKalmanUpdateFitter.h>
-#include <tracking/ckf/findlets/cdcToSpacePoint/SpacePointAdvanceAlgorithm.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/findlets/cdcToSpacePoint/SpacePointKalmanUpdateFitter.h>
+#include <tracking/ckf/findlets/base/KalmanUpdateFitter.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 
@@ -23,8 +23,8 @@ namespace Eigen {
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-double SpacePointKalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
-                                                const SpacePoint* spacePoint) const
+double KalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                                      const SpacePoint* spacePoint) const
 {
   double chi2 = 0;
 

@@ -10,8 +10,8 @@
 #pragma once
 
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/BaseCDCTrackSpacePointCombinationFilter.h>
-#include <tracking/ckf/findlets/cdcToSpacePoint/SpacePointAdvanceAlgorithm.h>
-#include <tracking/ckf/findlets/cdcToSpacePoint/SpacePointKalmanUpdateFitter.h>
+#include <tracking/ckf/findlets/base/AdvanceAlgorithm.h>
+#include <tracking/ckf/findlets/base/KalmanUpdateFitter.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
@@ -68,7 +68,7 @@ namespace Belle2 {
     bool extract(const BaseCDCVXDTrackCombinationFilter::Object* object) final;
 
   private:
-    SpacePointAdvanceAlgorithm m_advanceAlgorithm;
-    SpacePointKalmanUpdateFitter m_kalmanAlgorithm;
+    AdvanceAlgorithm m_advanceAlgorithm;
+    KalmanUpdateFitter m_kalmanAlgorithm;
   };
 }

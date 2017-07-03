@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/findlets/cdcToSpacePoint/SpacePointAdvanceAlgorithm.h>
+#include <tracking/ckf/findlets/base/AdvanceAlgorithm.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <genfit/MaterialEffects.h>
 #include <svd/reconstruction/SVDRecoHit.h>
@@ -17,7 +17,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool SpacePointAdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint* spacePoint) const
+bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint* spacePoint) const
 {
   // We always use the first cluster here to create the plane. Should not make much difference?
   SVDRecoHit recoHit(spacePoint->getRelated<SVDCluster>());

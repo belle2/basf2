@@ -22,7 +22,7 @@ namespace Belle2 {
   /**
    * Algorithm class to extrapolate a state onto the plane of its related space point.
    */
-  class SpacePointAdvanceAlgorithm : public TrackFindingCDC::ProcessingSignalListener {
+  class AdvanceAlgorithm : public TrackFindingCDC::ProcessingSignalListener {
   public:
     /**
      * Reusable extrapolate function to extrapolate a mSoP to the plane of the first SVD cluster
@@ -43,10 +43,10 @@ namespace Belle2 {
     {
       B2ASSERT("Encountered invalid state", not currentState.isFitted() and not currentState.isAdvanced());
 
-      const SpacePoint* spacePoint = currentState.getHit();
+      const auto* hit = currentState.getHit();
 
-      if (not spacePoint) {
-        // If we do not have a space point, we do not need to do anything here.
+      if (not hit) {
+        // If we do not have a hit, we do not need to do anything here.
         currentState.setAdvanced();
         return 1;
       }
@@ -54,7 +54,7 @@ namespace Belle2 {
       // This is the mSoP we will edit.
       genfit::MeasuredStateOnPlane measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
 
-      if (not extrapolate(measuredStateOnPlane, spacePoint)) {
+      if (not extrapolate(measuredStateOnPlane, hit)) {
         return NAN;
       }
 

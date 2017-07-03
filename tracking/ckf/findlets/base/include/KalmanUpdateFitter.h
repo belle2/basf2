@@ -24,7 +24,7 @@ namespace Belle2 {
    *
    * For this, the state has to be already extrapolated to the plane of the space point.
    */
-  class SpacePointKalmanUpdateFitter : public TrackFindingCDC::CompositeProcessingSignalListener {
+  class KalmanUpdateFitter : public TrackFindingCDC::CompositeProcessingSignalListener {
   public:
     /// Reusable function to do the kalman update of a mSoP with the information in the clusters of the SP.
     double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint* spacePoint) const;
@@ -39,9 +39,9 @@ namespace Belle2 {
     {
       B2ASSERT("Encountered invalid state", not currentState.isFitted() and currentState.isAdvanced());
 
-      const SpacePoint* spacePoint = currentState.getHit();
+      const auto* hit = currentState.getHit();
 
-      if (not spacePoint) {
+      if (not hit) {
         // If we do not have a space point, we do not need to do anything here.
         currentState.setFitted();
         return 1;
@@ -49,7 +49,7 @@ namespace Belle2 {
 
       genfit::MeasuredStateOnPlane measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
 
-      const double chi2 = kalmanStep(measuredStateOnPlane, spacePoint);
+      const double chi2 = kalmanStep(measuredStateOnPlane, hit);
 
       currentState.setMeasuredStateOnPlane(measuredStateOnPlane);
       currentState.setChi2(chi2);

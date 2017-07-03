@@ -13,11 +13,12 @@
 
 #include <tracking/ckf/findlets/cdcToSpacePoint/CDCTrackSpacePointStoreArrayHandler.h>
 #include <tracking/ckf/findlets/base/TreeSearchFindlet.h>
-#include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointHitSelector.h>
+#include <tracking/ckf/findlets/base/HitSelector.h>
 #include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointMatcher.h>
 #include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
 #include <tracking/ckf/findlets/base/OverlapResolverFindlet.h>
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCVXDTrackCombinationFilterFactory.h>
+#include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCTrackSpacePointCombinationFilterFactory.h>
 
 #include <tracking/ckf/utilities/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/findlets/base/StoreArrayLoader.h>
@@ -61,6 +62,9 @@ namespace Belle2 {
     void beginEvent() override;
 
   private:
+    // Some typedefs
+    using CDCToSpacePointHitSelector = HitSelector<CDCTrackSpacePointCombinationFilterFactory>;
+
     // Findlets
     /// Findlet for retrieving the cdc tracks
     TrackFindingCDC::StoreArrayLoader<RecoTrack> m_cdcTracksLoader;

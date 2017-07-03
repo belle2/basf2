@@ -64,7 +64,7 @@ void PXDROIDQMModule::defineHisto()
 
   hrawROINrDCvsNrHLT = new TH2F("hrawROINrDCvsNrHLT", "Nr DATCON ROI vs Nr HLT ROI; Nr HLT ROI;Nr DATCON ROI", 100, 0, 100, 100, 0,
                                 100);
-  hrawROIEVTsWithOneSource = new TH2F("hrawROIEVTsWithOneSource", "Events with only one ROI source; HLT ROI;DATCON ROI", 2, 0, 2, 2,
+  hrawROIEVTsWithOneSource = new TH2F("hrawROIEVTsWithOneSource", "ROI sources in events; HLT;DATCON", 2, 0, 2, 2,
                                       0, 2);
 
   // cd back to root directory
@@ -147,18 +147,18 @@ void PXDROIDQMModule::event()
         hrawROIHLTcolSize->Fill(cs);
       }
     }
-    hrawROINrDCvsNrHLT->Fill(nr_HLT, nr_DC);
   }
+  hrawROINrDCvsNrHLT->Fill(nr_HLT, nr_DC);
   if (nr_DC == 0 && nr_HLT == 0) {
-    hrawROIEVTsWithOneSource->Fill(nr_HLT, nr_DC);
+    hrawROIEVTsWithOneSource->Fill("NO", "NO", 1);
   }
   if (nr_DC == 0 && nr_HLT != 0) {
-    hrawROIEVTsWithOneSource->Fill(1, nr_DC);
+    hrawROIEVTsWithOneSource->Fill("YES", "NO", 1);
   }
   if (nr_DC != 0 && nr_HLT == 0) {
-    hrawROIEVTsWithOneSource->Fill(nr_HLT, 1);
+    hrawROIEVTsWithOneSource->Fill("NO", "YES", 1);
   }
   if (nr_DC != 0 && nr_HLT != 0) {
-    hrawROIEVTsWithOneSource->Fill(1, 1);
+    hrawROIEVTsWithOneSource->Fill("YES", "YES", 1);
   }
 }

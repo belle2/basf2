@@ -8,9 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/findlets/cdcToSpacePoint/SpacePointAdvanceAlgorithm.h>
-
+#include <tracking/spacePointCreation/SpacePoint.h>
 #include <genfit/MaterialEffects.h>
 #include <svd/reconstruction/SVDRecoHit.h>
+
+#include <genfit/Exception.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -33,28 +35,4 @@ bool SpacePointAdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measu
   }
 
   return true;
-}
-
-Weight SpacePointAdvanceAlgorithm::operator()(CKFCDCToVXDStateObject& currentState) const
-{
-  B2ASSERT("Encountered invalid state", not currentState.isFitted() and not currentState.isAdvanced());
-
-  const SpacePoint* spacePoint = currentState.getHit();
-
-  if (not spacePoint) {
-    // If we do not have a space point, we do not need to do anything here.
-    currentState.setAdvanced();
-    return 1;
-  }
-
-  // This is the mSoP we will edit.
-  genfit::MeasuredStateOnPlane measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
-
-  if (not extrapolate(measuredStateOnPlane, spacePoint)) {
-    return NAN;
-  }
-
-  currentState.setMeasuredStateOnPlane(measuredStateOnPlane);
-  currentState.setAdvanced();
-  return 1;
 }

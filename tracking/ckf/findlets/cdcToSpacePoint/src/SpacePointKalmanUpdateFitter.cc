@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/findlets/cdcToSpacePoint/SpacePointKalmanUpdateFitter.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 
 #include <Eigen/Dense>
@@ -61,26 +62,4 @@ double SpacePointKalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& me
   measuredStateOnPlane.setCov(TMatrixDSym(5, C_k_old.data()));
 
   return chi2;
-}
-
-Weight SpacePointKalmanUpdateFitter::operator()(CKFCDCToVXDStateObject& currentState) const
-{
-  B2ASSERT("Encountered invalid state", not currentState.isFitted() and currentState.isAdvanced());
-
-  const SpacePoint* spacePoint = currentState.getHit();
-
-  if (not spacePoint) {
-    // If we do not have a space point, we do not need to do anything here.
-    currentState.setFitted();
-    return 1;
-  }
-
-  genfit::MeasuredStateOnPlane measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
-
-  const double chi2 = kalmanStep(measuredStateOnPlane, spacePoint);
-
-  currentState.setMeasuredStateOnPlane(measuredStateOnPlane);
-  currentState.setChi2(chi2);
-  currentState.setFitted();
-  return 1;
 }

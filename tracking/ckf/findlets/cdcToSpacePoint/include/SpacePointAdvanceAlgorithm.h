@@ -12,11 +12,9 @@
 #include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
 #include <framework/core/ModuleParamList.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
-#include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
 
-namespace genfit {
-  class MeasuredStateOnPlane;
-}
+#include <genfit/MeasuredStateOnPlane.h>
+
 
 namespace Belle2 {
   class SpacePoint;
@@ -40,7 +38,30 @@ namespace Belle2 {
     }
 
     /// Main function: extrapolate the state to its related space point. Returns NAN, if the extrapolation fails.
-    TrackFindingCDC::Weight operator()(CKFCDCToVXDStateObject& currentState) const;
+    template <class AStateObject>
+    TrackFindingCDC::Weight operator()(AStateObject& currentState) const
+    {
+      B2ASSERT("Encountered invalid state", not currentState.isFitted() and not currentState.isAdvanced());
+
+      const SpacePoint* spacePoint = currentState.getHit();
+
+      if (not spacePoint) {
+        // If we do not have a space point, we do not need to do anything here.
+        currentState.setAdvanced();
+        return 1;
+      }
+
+      // This is the mSoP we will edit.
+      genfit::MeasuredStateOnPlane measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
+
+      if (not extrapolate(measuredStateOnPlane, spacePoint)) {
+        return NAN;
+      }
+
+      currentState.setMeasuredStateOnPlane(measuredStateOnPlane);
+      currentState.setAdvanced();
+      return 1;
+    }
 
   private:
     /// Parameter: use material effects during extrapolation.

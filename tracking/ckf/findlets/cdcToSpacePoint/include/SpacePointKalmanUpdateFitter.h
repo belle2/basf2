@@ -12,11 +12,9 @@
 #include <tracking/trackFindingCDC/utilities/CompositeProcessingSignalListener.h>
 #include <framework/core/ModuleParamList.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
-#include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
 
-namespace genfit {
-  class MeasuredStateOnPlane;
-}
+#include <genfit/MeasuredStateOnPlane.h>
+
 
 namespace Belle2 {
   class SpacePoint;
@@ -36,6 +34,27 @@ namespace Belle2 {
     {}
 
     /// Main function: update the parameters stored in the mSoP of the state using the SP related to this state.
-    TrackFindingCDC::Weight operator()(CKFCDCToVXDStateObject& currentState) const;
+    template <class AStateObject>
+    TrackFindingCDC::Weight operator()(AStateObject& currentState) const
+    {
+      B2ASSERT("Encountered invalid state", not currentState.isFitted() and currentState.isAdvanced());
+
+      const SpacePoint* spacePoint = currentState.getHit();
+
+      if (not spacePoint) {
+        // If we do not have a space point, we do not need to do anything here.
+        currentState.setFitted();
+        return 1;
+      }
+
+      genfit::MeasuredStateOnPlane measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
+
+      const double chi2 = kalmanStep(measuredStateOnPlane, spacePoint);
+
+      currentState.setMeasuredStateOnPlane(measuredStateOnPlane);
+      currentState.setChi2(chi2);
+      currentState.setFitted();
+      return 1;
+    }
   };
 }

@@ -277,8 +277,9 @@ void FullSimModule::initialize()
     }
   }
 
-  // Remove Cerenkov and Scintillation secondary processes for g4e particles that were
-  // inserted by G4OpticalPhysics
+  // Inactivate all secondary-generating processes for g4e particles. This comprises
+  // Cerenkov and Scintillation that were inserted by G4OpticalPhysics and the
+  // CaptureAtRest process for g4e anti-deuteron.
   partIter->reset();
   while ((*partIter)()) {
     G4ParticleDefinition* currParticle = partIter->value();
@@ -287,15 +288,10 @@ void FullSimModule::initialize()
       if (processManager) {
         G4ProcessVector* processList = processManager->GetProcessList();
         for (int i = 0; i < processList->size(); ++i) {
-          if ((*processList)[i]->GetProcessName() == "Cerenkov") {
-            processList->removeAt(i);
-            break;
-          }
-        }
-        for (int i = 0; i < processList->size(); ++i) {
-          if ((*processList)[i]->GetProcessName() == "Scintillation") {
-            processList->removeAt(i);
-            break;
+          if (((*processList)[i]->GetProcessName() == "Cerenkov") ||
+              ((*processList)[i]->GetProcessName() == "Scintillation") ||
+              ((*processList)[i]->GetProcessName() == "hFritiofCaptureAtRest")) {
+            processManager->SetProcessActivation(i, false);
           }
         }
       }

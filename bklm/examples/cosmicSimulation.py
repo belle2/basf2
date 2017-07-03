@@ -44,10 +44,10 @@ main.add_module(progress)
 
 add_cosmics_generator(main,
                       global_box_size=[50, 50, 50], accept_box=[6, 6, 6],
-                      keep_box=[6, 6, 6], components=["BKLM"],
+                      keep_box=[6, 6, 6],
                       setup_file='generators/examples/cry.setup')
 
-add_simulation(main, components=["BKLM"])
+add_simulation(main)
 
 # uncomment the following line if you want event by event info
 # main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)

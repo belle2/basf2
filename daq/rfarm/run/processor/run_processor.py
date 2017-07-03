@@ -10,8 +10,9 @@ global proc
 
 # Signal Handler
 def cleanup(num, frame):
-    os.kill(proc.pid, signal.SIGKILL)
-#    os.kill(proc.pid, signal.SIGINT)
+    #    os.kill(proc.pid, signal.SIGKILL)
+    os.kill(proc.pid, signal.SIGINT)
+    os.kill(proc.pid, signal.SIGINT)
     exit()
 
 # main

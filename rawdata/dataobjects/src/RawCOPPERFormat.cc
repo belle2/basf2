@@ -148,14 +148,14 @@ unsigned int RawCOPPERFormat::GetB2LHeaderWord(int n, int finesse_buffer_pos)
 
   if (flag == 0) {
     char err_buf[500];
-    sprintf(err_buf, "[FATAL] No HSLB data in COPPER data. Exiting...\n %s %s %d\n",
+    sprintf(err_buf, "[FATAL] ERROR_EVENT : No HSLB data in COPPER data. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
   }
 
   if (err_flag == 1) {
     char err_buf[500];
-    sprintf(err_buf, "[FATAL] CORRUPTED DATA: Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n %s %s %d\n",
+    sprintf(err_buf, "[FATAL] ERROR_EVENT : Different event number over HSLBs : slot A 0x%x : B 0x%x :C 0x%x : D 0x%x\n %s %s %d\n",
             word[ 0 ], word[ 1 ], word[ 2 ], word[ 3 ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("[DEBUG] %s\n", err_buf);

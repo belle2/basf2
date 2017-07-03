@@ -1,24 +1,32 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import variables as v
+import variables
+from variables import variables as v
 
 # some variables should be there
-assert len(v.variables.getVariables()) > 0
+assert len(v.getVariables()) > 0
 
-v.printVars()
+variables.printVars()
 
-var = v.variables.getVariable('M')
+var = v.getVariable('M')
 assert 'M' == var.name
 print(var.description)
 
-v.variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
-var = v.variables.getVariable('sigProb')
+v.addAlias('sigProb', 'extraInfo(SignalProbability)')
+var = v.getVariable('sigProb')
 assert 'extraInfo(SignalProbability)' == var.name
 
-assert (v.variables.evaluate('constant(123)', None) - 123) < 0.001
+assert (v.evaluate('constant(123)', None) - 123) < 0.001
 
 # used in FEI
 import ROOT
 assert 'extraInfo__boSignalProbability__bc' == ROOT.Belle2.makeROOTCompatible('extraInfo(SignalProbability)')
 assert 'extraInfo(SignalProbability)' == ROOT.Belle2.invertMakeROOTCompatible('extraInfo__boSignalProbability__bc')
+
+v.addCollection('kin', variables.std_vector('p', 'px', 'py', 'pz'))
+vec = v.getCollection('kin')
+assert vec[0] == 'p'
+assert vec[1] == 'px'
+assert vec[2] == 'py'
+assert vec[3] == 'pz'

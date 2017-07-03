@@ -29,7 +29,7 @@ set_log_level(LogLevel.INFO)
 reset_database()
 use_database_chain()
 use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
-use_central_database("cdc_cr_test1", LogLevel.WARNING)
+use_central_database("GT_gen_data_002.11_gcr2017-07", LogLevel.WARNING)
 
 
 def sim(exp, run, evt, st, topInCounter=True, magneticField=False):
@@ -75,4 +75,4 @@ if __name__ == "__main__":
     parser.add_argument('st', help='Stream ID')
 
     args = parser.parse_args()
-    sim(args.exp, args.run, args.evt, args.st, topInCounter=True, magneticField=False)
+    sim(args.exp, args.run, args.evt, args.st, topInCounter=False, magneticField=True)

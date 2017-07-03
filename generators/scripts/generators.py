@@ -118,7 +118,7 @@ def add_evtgen_generator(path, finalstate=''):
     )
 
 
-def add_continuum_generator(path, finalstate=''):
+def add_continuum_generator(path, finalstate='', userdecfile=''):
     """
     Add the default continuum generators KKMC + PYTHIA including their default decfiles and PYTHIA settings
     :param finalstate: uubar, ddbar, ssbar, ccbar
@@ -136,6 +136,11 @@ def add_continuum_generator(path, finalstate=''):
 
     #: user decay file
     decay_user = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/dec_belle2_qqbar.dec')
+    if userdecfile == '':
+        pass
+    else:
+        B2INFO('Replacing default user decfile: ', userdecfile)
+        decay_user = userdecfile
 
     #: kkmc configuration file, should be fine as is
     kkmc_config = Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat')

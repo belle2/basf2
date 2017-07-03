@@ -18,6 +18,8 @@ from softwaretrigger import (
     add_calibration_software_trigger,
 )
 
+import mdst
+
 
 def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False,
                        additionalTrackFitHypotheses=None, addClusterExpertModules=True, use_vxdtf2=False,
@@ -213,38 +215,7 @@ def add_mdst_output(
            fields to the output FileMetaData
     """
 
-    output = register_module('RootOutput')
-    output.param('outputFileName', filename)
-    branches = [
-        'Tracks',
-        'V0s',
-        'TrackFitResults',
-        'PIDLikelihoods',
-        'TracksToPIDLikelihoods',
-        'ECLClusters',
-        'ECLClustersToTracks',
-        'KLMClusters',
-        'KLMClustersToTracks',
-        'TRGSummary',
-        'SoftwareTriggerResult',
-    ]
-    persistentBranches = ['FileMetaData']
-    if mc:
-        branches += ['MCParticles', 'TracksToMCParticles',
-                     'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
-        persistentBranches += ['BackgroundInfos']
-    branches += additionalBranches
-    output.param('branchNames', branches)
-    output.param('branchNamesPersistent', persistentBranches)
-    # set dataDescription correctly
-    if dataDescription is None:
-        dataDescription = {}
-    # set dataLevel to mdst if it's not already set to something else (which
-    # might happen for udst output since that calls this function)
-    dataDescription.setdefault("dataLevel", "mdst")
-    output.param("additionalDataDescription", dataDescription)
-    path.add_module(output)
-    return output
+    return mdst.add_mdst_output(path, mc, filename, additionalBranches, dataDescription)
 
 
 def add_arich_modules(path, components=None):

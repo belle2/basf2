@@ -157,8 +157,8 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
           throw (RCHandlerException(e.what()));
         }
         configure(m_obj);
-        setState(state);
-        reply(NSMMessage(NSMCommand::OK, state.getLabel()));
+        //setState(state);
+        //reply(NSMMessage(NSMCommand::OK, state.getLabel()));
       } else if (cmd == RCCommand::BOOT) {
         get(m_obj);
         std::string opt = msg.getLength() > 0 ? msg.getData() : "";

@@ -65,14 +65,22 @@ void RunControlCallback::configure(const DBObject& obj) throw(RCHandlerException
 
 void RunControlCallback::setState(NSMNode& node, const RCState& state) throw()
 {
-  node.setState(state);
   std::string vname = StringUtil::tolower(node.getName()) + ".rcstate";
-  set(vname, state.getLabel());
+  if (node.isUsed()) {
+    node.setState(state);
+    set(vname, state.getLabel());
+  } else {
+    set(vname, "OFF");
+  }
   for (size_t i = 0; i < m_node_v.size(); i++) {
     RCNode& rcnode(m_node_v[i]);
     if (rcnode.getName() == node.getName()) {
       std::string vname = StringUtil::form("node[%d].rcstate", (int)i);
-      set(vname, state.getLabel());
+      if (node.isUsed()) {
+        set(vname, state.getLabel());
+      } else {
+        set(vname, "OFF");
+      }
       return;
     }
   }
@@ -93,6 +101,7 @@ void RunControlCallback::ok(const char* nodename, const char* data) throw()
       }
     } else {
       LogFile::debug("node used");
+      setState(node, "OFF");
     }
   } catch (const std::out_of_range& e) {
     LogFile::debug(e.what());
@@ -215,6 +224,8 @@ void RunControlCallback::vset(NSMCommunicator& com, const NSMVar& v) throw()
         if (node.isUsed()) {
           setState(node, v.getText());
           check();
+        } else {
+          setState(node, "OFF");
         }
         return;
       }

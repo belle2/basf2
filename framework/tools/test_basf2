@@ -1,2 +1,2 @@
 #!/bin/bash
-b2test $*
+b2test-scripts "$@"

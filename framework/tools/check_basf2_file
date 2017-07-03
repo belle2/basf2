@@ -1,2 +1,2 @@
 #!/bin/bash
-b2check $*
+b2file-check "$@"

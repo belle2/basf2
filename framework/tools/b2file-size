@@ -30,8 +30,8 @@ import ROOT as root
 root.gErrorIgnoreLevel = root.kWarning + 1
 
 parser = argparse.ArgumentParser(
-    description="Create bar graphs of the disk space requirements for basf2" +
-    " events stored in\nroot files",
+    description="Print and create bar graphs of the disk space requirements" +
+    " for basf2 events\nstored in root files",
     formatter_class=argparse.RawDescriptionHelpFormatter,
     epilog="""examples:
   create eventsize.pdf with a bar chart showing the kb/event required for each
@@ -115,6 +115,8 @@ parser.add_argument("-f", nargs="+", dest="filename", action="append",
                     file give the -f option multiple times, e.g. %(prog)s -f
                     file1.root label1 -f file2.root label2 """,
                     metavar=("filename", "label"))
+parser.add_argument("-n", "--no-plot", dest="noplot", default=False, action="store_true",
+                    help="""if give, no plot is created""")
 # allow one file to be given without -f
 parser.add_argument("filename", nargs="*", default=[], action="append",
                     help=argparse.SUPPRESS)
@@ -288,6 +290,42 @@ def plot_sizes(pdf, files, skip=args.skip_object, branch=None):
         # and plot again
         create_plot(pdf, labels, legend, reduction, title, "reduction factor")
 
+def convert_bytes(bytes):
+    bytes = float(bytes)
+    if bytes >= 1099511627776:
+        terabytes = bytes / 1099511627776
+        size = '\033[35m%.2fT' % terabytes
+    elif bytes >= 1073741824:
+        gigabytes = bytes / 1073741824
+        size = '\033[31m%.2fG' % gigabytes
+    elif bytes >= 1048576:
+        megabytes = bytes / 1048576
+        size = '\033[33m%.2fM' % megabytes
+    elif bytes >= 1024:
+        kilobytes = bytes / 1024
+        size = '\033[32m%.2fK' % kilobytes
+    else:
+        size = '%.2fb' % bytes
+    return size + '\033[39m'
+
+def print_tree(tree, filename):
+    branchesList = tree.GetListOfBranches()
+    branchesList.Sort()
+
+    tot = tree.GetTotBytes()
+    totzip = tree.GetZipBytes()
+    nentries = tree.GetEntries()
+    print("'%s' contains %d entries." % (filename, nentries))
+    print("\t%30s\t%7s\t%7s" % ("Total", convert_bytes(tot), convert_bytes(totzip)))
+    print("\t%30s\t%7s\t%7s" % ("Per entry", convert_bytes(tot / nentries), convert_bytes(totzip / nentries)))
+    print("%s:\t%30s\t%7s\t%7s" % ("#", "Branch Name", "Size", "Compressed Size"))
+    print("--------------------------------------------------------------------")
+    for index, branch in enumerate(branchesList):
+        size = convert_bytes(branch.GetTotBytes('*'))
+        comp_size = convert_bytes(branch.GetZipBytes('*'))
+        print("%i:\t%30s\t%7s\t%7s" % (index + 1, branch.GetName(), size, comp_size))
+    print("====================================================================")
+
 rootfiles = []
 trees = []
 
@@ -328,11 +366,15 @@ for item in args.filename:
 if not trees:
     parser.error("No files given, supply at least one filename to analyze")
 
-try:
-    pdf = PdfPages(args.output)
-except IOError as e:
-    print("Could not open output file:", e)
-    sys.exit(1)
+for (tree, filename, compressed) in trees:
+    print_tree(tree, filename)
 
-plot_sizes(pdf, trees)
-pdf.close()
+if not args.noplot:
+    try:
+        pdf = PdfPages(args.output)
+    except IOError as e:
+        print("Could not open output file:", e)
+        sys.exit(1)
+
+    plot_sizes(pdf, trees)
+    pdf.close()

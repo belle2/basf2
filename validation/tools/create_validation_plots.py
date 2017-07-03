@@ -1,2 +1,2 @@
 #!/bin/bash
-validation_plots $*
+validation_plots "$@"

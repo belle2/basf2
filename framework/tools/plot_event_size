@@ -1,2 +1,2 @@
 #!/bin/bash
-framework_plot_event_size $*
+b2file-size "$@"

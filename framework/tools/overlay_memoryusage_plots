@@ -1,2 +1,2 @@
 #!/bin/bash
-memoryusage_overlay_plots $*
+memoryusage_overlay_plots "$@"

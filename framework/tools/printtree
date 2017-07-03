@@ -1,2 +1,2 @@
 #!/bin/bash
-b2printtree $*
+b2file-size --no-plot "$@"

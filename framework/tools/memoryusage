@@ -1,2 +1,2 @@
 #!/bin/bash
-framework_memoryusage $*
+b2code-memoryusage "$@"

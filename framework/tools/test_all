@@ -1,2 +1,2 @@
 #!/bin/bash
-b2unittests $*
+b2test-units "$@"

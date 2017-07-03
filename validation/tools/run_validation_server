@@ -1,2 +1,2 @@
 #!/bin/bash
-b2validation_server $*
+b2validation_server "$@"

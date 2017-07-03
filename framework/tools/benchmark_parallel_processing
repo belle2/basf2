@@ -1,2 +1,2 @@
 #!/bin/bash
-framework_benchmark_parallel_processing $*
+b2code-parallel_processing-benchmark "$@"

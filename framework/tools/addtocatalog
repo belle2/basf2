@@ -1,2 +1,2 @@
 #!/bin/bash
-b2addtocatalog $*
+b2file-catalog-add "$@"

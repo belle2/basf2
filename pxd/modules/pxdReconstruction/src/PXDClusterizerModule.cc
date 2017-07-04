@@ -37,7 +37,7 @@ REG_MODULE(PXDClusterizer);
 //-----------------------------------------------------------------
 
 PXDClusterizerModule::PXDClusterizerModule() :
-  Module(), m_elNoise(150.0), m_gq(0.7), m_cutSeed(5.0), m_cutAdjacent(3.0), m_cutCluster(
+  Module(), m_elNoise(150.0), m_gq(0.6), m_cutSeed(5.0), m_cutAdjacent(3.0), m_cutCluster(
     8.0), m_sizeHeadTail(3), m_clusterCacheSize(0)
 {
   //Set module properties
@@ -52,7 +52,7 @@ PXDClusterizerModule::PXDClusterizerModule() :
            m_cutSeed);
   addParam("ClusterSN", m_cutCluster, "Minimum SN for clusters", m_cutCluster);
   addParam("Gq", m_gq, "Gq for pixels, nA/e-", m_gq);
-  addParam("ADCFineMode", m_ADCFineMode, "The slope of ADC cureve is 70 nA/ADU in fine mode and 130 in coarse mode", true);
+  addParam("ADCFineMode", m_ADCFineMode, "The slope of ADC cureve is 70 nA/ADU in fine mode and 130 in coarse mode", false);
   addParam("ClusterCacheSize", m_clusterCacheSize,
            "Maximum desired number of sensor rows", 0);
   addParam("HeadTailSize", m_sizeHeadTail,

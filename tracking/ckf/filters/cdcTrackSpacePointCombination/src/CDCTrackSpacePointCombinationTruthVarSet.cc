@@ -60,9 +60,6 @@ bool CDCTrackSpacePointCombinationTruthVarSet::extract(const BaseCDCTrackSpacePo
 
   var<named("space_point_number")>() = spacePoint->getArrayIndex();
 
-  // Next we have to get all MC tracks for the two SVD Clusters matches to the SpacePoint
-  const auto& relatedSVDClusters = spacePoint->getRelationsWith<SVDCluster>();
-
   if (not isCorrectSpacePoint(*spacePoint, *cdcMCTrack)) {
     // Keep all variables set to false and return.
     return true;
@@ -80,7 +77,14 @@ bool CDCTrackSpacePointCombinationTruthVarSet::extract(const BaseCDCTrackSpacePo
 
   const RecoHitInformation* firstCDCHitInformation = *(std::find_if(recoHitInformations.begin(), recoHitInformations.end(),
                                                        isCDCHit));
-  const RecoHitInformation* firstClusterInformation = cdcMCTrack->getRecoHitInformation(relatedSVDClusters[0]);
+
+  const RecoHitInformation* firstClusterInformation;
+  if (spacePoint->getType() == VXD::SensorInfoBase::SensorType::SVD) {
+    const auto& relatedSVDClusters = spacePoint->getRelationsWith<SVDCluster>();
+    firstClusterInformation = cdcMCTrack->getRecoHitInformation(relatedSVDClusters[0]);
+  } else {
+    firstClusterInformation = cdcMCTrack->getRecoHitInformation(spacePoint->getRelated<PXDCluster>());
+  }
 
   if (firstCDCHitInformation->getSortingParameter() < firstClusterInformation->getSortingParameter()) {
     return true;

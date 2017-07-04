@@ -44,14 +44,14 @@ TRGECLDQMModule::~TRGECLDQMModule()
 
 void TRGECLDQMModule::defineHisto()
 {
-  //  TDirectory* oldDir = gDirectory;
+  TDirectory* oldDir = gDirectory;
 
-  //  TDirectory* dirDQM = NULL;
-  //  dirDQM = oldDir->mkdir("./DQM");
-  //  dirDQM->cd();
+  TDirectory* dirDQM = NULL;
+  dirDQM = oldDir->mkdir("TRG");
+  dirDQM->cd();
   h_TCId = new TH1D("h_TCId", "Hit TC Id", 100, 0, 600);
   h_TotalEnergy = new TH1D("h_TotalEnergy", "Total TC Energy(GeV)", 100, 0, 3000);
-  //  oldDir->cd();
+  oldDir->cd();
 }
 
 
@@ -115,5 +115,4 @@ void TRGECLDQMModule::event()
 
 
 
-  usleep(100);
 }

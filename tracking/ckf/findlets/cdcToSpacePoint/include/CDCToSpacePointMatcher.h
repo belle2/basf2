@@ -50,6 +50,7 @@ namespace Belle2 {
     if (currentNumber == AStateObject::N or currentState.isOnOverlapLayer()) {
       // next layer is not an overlap one, so we can just return all hits of this layer.
       const unsigned int nextLayer = currentState.extractGeometryLayer() - 1;
+      B2DEBUG(100, "Will return all hits from layer " << nextLayer << ", which are " << m_cachedHitMap[nextLayer].size());
       return m_cachedHitMap[nextLayer];
     } else {
       // next layer is an overlap one, so lets return all hits from the same layer, that are on a

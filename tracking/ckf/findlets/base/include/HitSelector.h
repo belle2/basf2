@@ -104,6 +104,8 @@ namespace Belle2 {
   template <class AFilterFactory>
   void HitSelector<AFilterFactory>::apply(std::vector<typename AFilterFactory::CreatedFilter::Object*>& childStates)
   {
+    B2DEBUG(50, "Starting with " << childStates.size() << " states");
+
     applyAndFilter(childStates, m_firstFilter, 2 * m_param_useNResults);
     B2DEBUG(50, "First filter has found " << childStates.size() << " states");
 

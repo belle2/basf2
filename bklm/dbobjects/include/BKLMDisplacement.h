@@ -28,13 +28,15 @@ namespace Belle2 {
 
   public:
     //! Constructor
-    BKLMDisplacement() : m_elementID(65535), m_uShift(0), m_vShift(0), m_wShift(0), m_alphaRotation(0), m_betaRotation(0),
-      m_gammaRotation(0) {}
+    BKLMDisplacement() : m_elementID(65535),
+      m_uShift(0), m_vShift(0), m_wShift(0),
+      m_alphaRotation(0), m_betaRotation(0), m_gammaRotation(0) {}
 
     //! Constructor
-    BKLMDisplacement(const unsigned short elementID, float dU, float dV, float dW, float dAlpha,  float dBeta,  float dGamma) :
-      m_elementID(elementID), m_uShift(dU), m_vShift(dV), m_wShift(dW), m_alphaRotation(dAlpha), m_betaRotation(dBeta),
-      m_gammaRotation(dGamma)
+    BKLMDisplacement(const unsigned short elementID, float dU, float dV, float dW, float dAlpha, float dBeta, float dGamma) :
+      m_elementID(elementID),
+      m_uShift(dU), m_vShift(dV), m_wShift(dW),
+      m_alphaRotation(dAlpha), m_betaRotation(dBeta), m_gammaRotation(dGamma)
     {
     }
 

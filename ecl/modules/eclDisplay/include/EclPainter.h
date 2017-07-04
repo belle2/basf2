@@ -13,7 +13,7 @@
 
 #include <ecl/modules/eclDisplay/EclData.h>
 #include <ecl/modules/eclDisplay/MultilineWidget.h>
-#include <ecl/utility/eclChannelMapper.h>
+#include <ecl/utility/ECLChannelMapper.h>
 #include <TString.h>
 
 namespace Belle2 {

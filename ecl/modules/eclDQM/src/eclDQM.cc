@@ -24,7 +24,7 @@
 //ECL
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/utility/eclChannelMapper.h>
+#include <ecl/utility/ECLChannelMapper.h>
 
 //ROOT
 #include "TH1F.h"

@@ -63,7 +63,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
             adversary_fractions = tf.nn.softmax(adversary_fractions_not_normed)
             adversary_activation = tf.reduce_sum(adversary_fractions *
                                                  tf.exp(-(adversary_means - z_single) * (adversary_means - z_single) /
-                                                        (2 * adversary_widths)))
+                                                        (2 * adversary_widths)) / tf.sqrt(2*np.pi*adversary_widths), axis=1)
             if c == 'signal':
                 adversary_loss = -tf.reduce_sum(y * w * tf.log(adversary_activation + epsilon)) / tf.reduce_sum(y*w)
             else:

@@ -43,14 +43,14 @@ short  int bit_val(double f, int idd, short int bit, int a, int b, int lim)
   short int i;
   i = bit;
 
-  int val;
-  int R;
   int flag;
   flag = 0;
-  if (i < 11) {i = 11;}
+  if (i < 11)
+    i = 11;
+
   do {
-    R = myPow(2, i);
-    val = (int)(a * R * f / idd / b + R + 0.5) - R;
+    const int R(myPow(2, i));
+    const int val((int)(a * R * f / idd / b + R + 0.5) - R);
 
     if ((val < lim && val > -lim)) {
       flag = 1;
@@ -117,18 +117,16 @@ int Rest1(int k)
 int ThetR(int k)
 {
   int R;
-  int l;
-  int b;
 
   if (k > -1 && k < 8736) {
-    l = Rest(k);
-    b = PhiC(k);
+    const int l = Rest(k);
+    const int b = PhiC(k);
     R = (k - l) / b + Rest1(k);
 
-  } else {R = -1;}
+  } else
+    R = -1;
+
   return R;
-
-
 }
 
 
@@ -148,7 +146,7 @@ void bit(int num, char* inputPath)
   int ChN;
 
 
-  double  g1g1[192], gg[192], gg1[192], dgg[192];
+  double  g1g1[192], gg[192], gg1[192];//, dgg[192]; dgg is never used (AH)
   WrapArray2D<double>  sg1(16, 192), sg(16, 192), sg2(16, 192);
   double  gg2[192], g1g2[192], g2g2[192];
   double  dgg1[192], dgg2[192];
@@ -178,7 +176,7 @@ void bit(int num, char* inputPath)
   memset(g1g1, 0, sizeof(g1g1));
   memset(gg, 0, sizeof(gg));
   memset(gg1, 0, sizeof(gg1));
-  memset(dgg, 0, sizeof(dgg));
+//   memset(dgg, 0, sizeof(dgg)); dgg is never used (AH)
   memset(sg1, 0, sizeof(sg1));
   memset(sg, 0, sizeof(sg));
   memset(sg2, 0, sizeof(sg2));
@@ -190,21 +188,18 @@ void bit(int num, char* inputPath)
 
 
   double dt;
-  double ts0;
-  double del;
 
   double fdd;
 
 
-  int j1, endc, j, i;
-  double ndt;
-  double adt, dt0, t0, ddt, tc1, tin;
-  double t, tmd, tpd, ssssj, ssssj1, ssssi, ssssi1;
+  int j1, j, i;
+  double adt, ddt, tc1;
+  double tmd, tpd, ssssj, ssssj1, ssssi, ssssi1;
   double svp, svm;
 
 
-  int ibb, iaa, idd, icc;
-  int ia, ib, ic, i16, ilim;
+  int idd;
+  int ia, i16;
   int mxf, mxf1, mxfg31, mxfg32, mxfg33, mxfg41, mxfg43;
   mxf = 0;
   mxf1 = 0;
@@ -214,11 +209,6 @@ void bit(int num, char* inputPath)
   mxfg41 = 0;
   mxfg43 = 0;
 
-
-  int ipardsp13;
-  int ipardsp14;
-
-  int n16;
   int k;
 
   short int bitf;
@@ -304,19 +294,16 @@ void bit(int num, char* inputPath)
   cf41 = 12;
   cf43 = 12;
 
-
-  del = 0.;
-  ts0 = 0.5;
   dt = 0.5;
 
 
-  ndt = 96.;
+  const double ndt = 96.;
   adt = 1. / ndt;
-  endc = 2 * ndt;
+  const int endc = 2 * ndt;
 
 
-  dt0 = adt * dt;
-  t0 = -dt0 * ndt;
+  const double dt0 = adt * dt;
+  double t0 = -dt0 * ndt;
 
 
 
@@ -324,26 +311,16 @@ void bit(int num, char* inputPath)
   //%%%%%%%%%%%%%%%%%%%%%%%%%55
 
 
-  del = 0.;
-  ts0 = 0.5;
+  const double del = 0.;
+  const double ts0 = 0.5;
   dt = 0.5;
-
-
-  ndt = 96.;
-  adt = 1. / ndt;
-  endc = 2 * ndt;
-
-
-  dt0 = adt * dt;
-  t0 = -dt0 * ndt;
-
 
   for (j1 = 0; j1 < endc; j1++) {
     t0 = t0 + dt0;
-    t = t0 - dt - del;
+    double t = t0 - dt - del;
 
-    tin = t + dt;
-    cout << "tin set but unused. Fix me. tin = " << tin << endl;
+//     const double tin(t + dt); //tin value unused (AH)
+
     for (j = 0; j < 16; j++) {
       t = t + dt;
 
@@ -403,7 +380,7 @@ void bit(int num, char* inputPath)
     if (ChN % (mapsize / 50) == 0) {printf("CnN=%d badN=%d \n", ChN, badN);}
     //read matrix
 
-    if (0 == 0) {
+    {
       string filename(inputPath);
       //filename += "/corr";
       filename += to_string(num);
@@ -477,7 +454,7 @@ void bit(int num, char* inputPath)
 
       } //for j
 
-      dgg[j1] = gg[j1] * g1g1[j1] - gg1[j1] * gg1[j1];
+//       dgg[j1] = gg[j1] * g1g1[j1] - gg1[j1] * gg1[j1]; dgg is never used (AH)
       dgg1[j1] = gg[j1] * g2g2[j1] - gg2[j1] * gg2[j1];
       dgg2[j1] = gg[j1] * g1g1[j1] * g2g2[j1] - gg1[j1] * gg1[j1] * g2g2[j1] + 2 * gg1[j1] * g1g2[j1] * gg2[j1] - gg2[j1] * gg2[j1] *
                  g1g1[j1] - g1g2[j1] * g1g2[j1] * gg[j1];
@@ -522,30 +499,27 @@ void bit(int num, char* inputPath)
 
     //%%%%%%%%%%%%%%%%%%%adduction to integer
 
-    n16 = 16;
+    constexpr int n16 = 16;
 
 
-    ipardsp13 = 14 + 14 * 256;
-    ipardsp14 = 0 * 256 + 17;
+    const int ipardsp13 = 14 + 14 * 256;
+    const int ipardsp14 = 0 * 256 + 17;
 
-    ibb = ipardsp13 / 256;
-    iaa = ipardsp13 - ibb * 256;
+    const int ibb = ipardsp13 / 256;
+    const int iaa = ipardsp13 - ibb * 256;
     idd = ipardsp14 / 256;
-    icc = ipardsp14 - idd * 256;
+//     const int icc = ipardsp14 - idd * 256; //Value never used (AH)
 
 
 
 
 
     ia = myPow(2, iaa);
-    ib = myPow(2, ibb);
-    cout << "ib set but unused. Fix me. ib = " << ib << endl;
+//     const int ib = myPow(2, ibb); //ib value unused (AH)
 
-    ic = myPow(2, icc);
-    cout << "ic set but unused. Fix me. ic = " << ic << endl;
+//     const int ic = myPow(2, icc); //ic value unused (AH)
     i16 = myPow(2, 15);
-    ilim = myPow(2, 15);
-    cout << "ilim set but unused. Fix me. ilim = " << ilim << endl;
+//     const int ilim = myPow(2, 15); //ilim value unused (AH)
 
     for (i = 0; i < 16; i++) {
       if (i == 0) {
@@ -886,12 +860,12 @@ void bit(int num, char* inputPath)
 
   printf("badN=%d \n", badN);
 
-  int RF[69];
-  int RF1[69];
+//   int RF[69]; RF is never used (AH)
+//   int RF1[69]; RF1 is never used (AH)
   int RFG31[69];
   int RFG32[69];
   int RFG33[69];
-  int RFG41[69];
+//   int RFG41[69]; RFG41 is never used (AH)
   int RFG43[69];
 
 
@@ -914,8 +888,8 @@ void bit(int num, char* inputPath)
       BFG43[i] = 0;
     }
 
-    RF[i] = 0;
-    RF1[i] = 0;
+//     RF[i] = 0; RF is never used (AH)
+//     RF1[i] = 0; RF is never used (AH)
     RFG31[i] = 0;
     RFG32[i] = 0;
     RFG32[i] = 0;
@@ -958,15 +932,6 @@ void bit(int num, char* inputPath)
              BFG41[i], BFG43[i]);
     }
 
-  }
-
-
-  printf("\n");
-  for (i = 0; i < 69; i++) {
-    if (RF[i] > 0 || RF1[i] > 0 || RFG31[i] > 0 || RFG32[i] > 0 || RFG33[i] > 0 || RFG41[i] > 0 || RFG43[i] > 0) {
-//  printf("ring=%d BF=%d BF1=%d BFG31=%d BFG32=%d BFG33=%d BFG41=%d BFG43=%d\n",i,RF[i],RF1[i],RFG31[i],RFG32[i],RFG33[i],RFG41[i],RFG43[i]);
-
-    }
   }
 
   char BMin[256];

@@ -105,7 +105,7 @@ void SockmemCallback::timeout(NSMCommunicator&) throw()
     tx.m_rate = 0;
   }
   double t = Time().get();
-  StringList lines = popen("ss -ntr4i");
+  StringList lines = popen("/usr/sbin/ss -ntr4i");
   for (size_t i = 1; i < lines.size(); i++) {
     {
       std::stringstream ss;

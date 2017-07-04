@@ -55,8 +55,9 @@ void ECLTrackShowerMatchModule::event()
   StoreArray<ECLCalDigit> eclDigits;
 
   Const::EDetector myDetID = Const::EDetector::ECL;
-  const int pdgCodePiPlus = Const::pion.getPDGCode();
-  const int pdgCodePiMinus = -1 * Const::pion.getPDGCode();
+  Const::ChargedStable hypothesis = Const::pion;
+  int pdgCode = abs(hypothesis.getPDGCode());
+
   for (const Track& track : tracks) {
 
     //Unique shower ids related to this track
@@ -67,7 +68,7 @@ void ECLTrackShowerMatchModule::event()
     // note that more than on crystal belonging to more than one shower
     // can be found
     for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
-      if (extHit.getPdgCode() != pdgCodePiPlus && extHit.getPdgCode() != pdgCodePiMinus) continue;
+      if (abs(extHit.getPdgCode()) != pdgCode) continue;
       if ((extHit.getDetectorID() != myDetID)) continue;
       if (extHit.getStatus() != EXT_ENTER) continue;
       int copyid =  extHit.getCopyID();
@@ -136,12 +137,13 @@ double ECLTrackShowerMatchModule::computeTrkMinDistance(const ECLShower& shower,
   double minDist(10000);
   TVector3 cryCenter;
   cryCenter.SetMagThetaPhi(shower.getR(), shower.getTheta(), shower.getPhi());
-
+  Const::ChargedStable hypothesis = Const::pion;
+  int pdgCode = abs(hypothesis.getPDGCode());
   for (const auto& track : tracks) {
     TVector3 trkpos(0, 0, 0);
     bool found(false);
     for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
-      if (extHit.getPdgCode() != Const::pion.getPDGCode() && extHit.getPdgCode() != -Const::pion.getPDGCode()) continue;
+      if (abs(extHit.getPdgCode()) != pdgCode) continue;
       if ((extHit.getDetectorID() !=  Const::EDetector::ECL)) continue;
       if (extHit.getStatus() != EXT_ENTER) continue;
       if (extHit.getCopyID() == -1) continue;
@@ -184,8 +186,10 @@ void ECLTrackShowerMatchModule::computeDepth(const ECLShower& shower, double& lT
   lShower = 0;
   if (selectedTrk == nullptr) return;
   bool found(false);
+  Const::ChargedStable hypothesis = Const::pion;
+  int pdgCode = abs(hypothesis.getPDGCode());
   for (const auto& extHit : selectedTrk->getRelationsTo<ExtHit>()) {
-    if (extHit.getPdgCode() != Const::pion.getPDGCode() && extHit.getPdgCode() != -Const::pion.getPDGCode()) continue;
+    if (abs(extHit.getPdgCode()) != pdgCode) continue;
     if ((extHit.getDetectorID() !=  Const::EDetector::ECL)) continue;
     if (extHit.getStatus() != EXT_ENTER) continue;
     if (extHit.getCopyID() == -1) continue;

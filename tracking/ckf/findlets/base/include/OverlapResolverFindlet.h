@@ -97,7 +97,11 @@ namespace Belle2 {
       {
         // normalize the weight
         double weight = m_resultsWithWeight[resultIndex].getWeight();
-        weight = (weight - minimalWeight) / (maximalWeight - minimalWeight);
+        if (minimalWeight == maximalWeight) {
+          weight = 1;
+        } else {
+          weight = (weight - minimalWeight) / (maximalWeight - minimalWeight);
+        }
 
         // activity state has no meaning here -> set to 1.
         // the overlap will be set later on.

@@ -28,9 +28,9 @@ namespace Belle2 {
     /**
      * How many states we need to describe the whole track.
      *
-     * 8 = 2 * (SVD layers = 4)
+     * 10 = 2 * (SVD layers = 4) + (PXD layers = 2)
      */
-    static constexpr unsigned int N = 8;
+    static constexpr unsigned int N = 10;
 
     /// The class of the seed track
     using SeedObject = RecoTrack;
@@ -133,14 +133,21 @@ namespace Belle2 {
     /// Calculate the VXD layer this state is located on.
     unsigned int extractGeometryLayer() const
     {
-      // Plus 3, because we only describe SVD layers, but start counting at 0.
-      return static_cast<unsigned int>((static_cast<double>(m_number) / 2) + 3);
+      if (m_number < 2) {
+        return m_number - 1;
+      } else {
+        return static_cast<unsigned int>((static_cast<double>(m_number) / 2) + 3);
+      }
     }
 
     /// Check if this state should describe an overlap hit.
     bool isOnOverlapLayer() const
     {
-      return m_number % 2 == 0;
+      if (m_number < 2) {
+        return false;
+      } else {
+        return m_number % 2 == 0;
+      }
     }
 
     /// Return the number of times no SP is attached to the track in all parents until the root.

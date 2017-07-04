@@ -13,7 +13,6 @@
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 
-#include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
 #include <tracking/ckf/filters/base/LayerToggledFilter.h>
 #include <tracking/ckf/findlets/base/AdvanceAlgorithm.h>
 #include <tracking/ckf/findlets/base/KalmanUpdateFitter.h>

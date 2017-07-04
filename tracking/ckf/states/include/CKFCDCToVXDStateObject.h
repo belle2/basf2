@@ -293,7 +293,7 @@ namespace Belle2 {
     /**
      * Where on the hierarchy this state is located.
      *
-     * Each SVD layer is split into two numbers (so basically layer = number / 2),
+     * Each layer is split into two numbers (so basically layer = number / 2),
      * the second number for each layer is to handle overlaps (two space points on the same layer).
      */
     unsigned int m_number = N;

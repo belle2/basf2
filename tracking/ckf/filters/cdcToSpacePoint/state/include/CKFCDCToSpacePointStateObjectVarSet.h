@@ -112,15 +112,7 @@ namespace Belle2 {
     "state_1",
     "state_2",
     "state_3",
-    "state_4",
-
-    "m_0_state",
-    "m_0_cov",
-    "m_1_state",
-    "m_1_cov",
-
-    "is_u_0",
-    "is_u_1"
+    "state_4"
   };
 
   /// Vehicle class to transport the variable names

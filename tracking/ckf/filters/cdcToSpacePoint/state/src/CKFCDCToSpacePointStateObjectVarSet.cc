@@ -13,8 +13,6 @@
 
 #include <TMath.h>
 
-#include <svd/reconstruction/SVDRecoHit.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -143,30 +141,6 @@ bool CKFCDCToSpacePointStateObjectVarSet::extract(const BaseCKFCDCToSpacePointSt
   var<named("state_2")>() = state(2);
   var<named("state_3")>() = state(3);
   var<named("state_4")>() = state(4);
-
-  unsigned int clusterNumber = 0;
-  for (const SVDCluster& relatedCluster : spacePoint->getRelationsTo<SVDCluster>()) {
-    SVDRecoHit clusterMeasurement(&relatedCluster);
-    const std::vector<genfit::MeasurementOnPlane*> measurementsOnPlane = clusterMeasurement.constructMeasurementsOnPlane(
-          firstMeasurement);
-
-    const genfit::MeasurementOnPlane& measurementOnPlane = *(measurementsOnPlane.front());
-
-    const auto& m_k = measurementOnPlane.getState();
-    const auto& V_k = measurementOnPlane.getCov();
-
-    if (clusterNumber == 0) {
-      var<named("m_0_state")>() = m_k(0);
-      var<named("m_0_cov")>() = V_k(0, 0);
-      var<named("is_u_0")>() = clusterMeasurement.isU();
-    } else {
-      var<named("m_1_state")>() = m_k(0);
-      var<named("m_1_cov")>() = V_k(0, 0);
-      var<named("is_u_1")>() = clusterMeasurement.isU();
-    }
-
-    clusterNumber++;
-  }
 
   var<named("ladder")>() = sensorInfo.getLadderNumber();
   var<named("sensor")>() = sensorInfo.getSensorNumber();

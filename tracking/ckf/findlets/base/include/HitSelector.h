@@ -22,7 +22,7 @@
 
 namespace Belle2 {
   /**
-   * Main findlet for the CKF for CDC RecoTracks and SpacePoints from the VXD (SVD).
+   * Main findlet for the CKF for CDC RecoTracks and SpacePoints from the VXD.
    *
    * For a given state on a given number (~ layer), a list of child states (one for each next hit = space point in the track
    * candidate) is filtered. This is done in several steps:

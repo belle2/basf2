@@ -92,7 +92,7 @@ std::string CDCVXDTrackCombinationFilterFactory::getIdentifier() const
 
 std::string CDCVXDTrackCombinationFilterFactory::getFilterPurpose() const
 {
-  return "Filter out relations between CDC Reco Tracks and Space Points from the SVD on very easy criteria";
+  return "Filter out relations between CDC Reco Tracks and Space Points on very easy criteria";
 }
 
 std::map<std::string, std::string>

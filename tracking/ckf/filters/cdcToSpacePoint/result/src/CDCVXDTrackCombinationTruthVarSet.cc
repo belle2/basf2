@@ -40,11 +40,11 @@ bool CDCVXDTrackCombinationTruthVarSet::extract(const BaseCDCVXDTrackCombination
     return true;
   }
 
-  // Count the number of times the CDC-related MC-track is also related to the SVD cluster.
+  // Count the number of times the CDC-related MC-track is also related to the clusters.
   const unsigned int numberOfCorrectHits = getNumberOfCorrectHits(cdcMCTrack, result->second);
 
   var<named("truth_number_of_correct_hits")>() = numberOfCorrectHits;
-  var<named("truth_number_of_mc_hits")>() = cdcMCTrack->getNumberOfSVDHits();
+  var<named("truth_number_of_mc_hits")>() = cdcMCTrack->getNumberOfSVDHits() + cdcMCTrack->getNumberOfPXDHits();
   var<named("truth")>() = numberOfCorrectHits == 2 * result->second.size() and numberOfCorrectHits > 0;
 
   return true;

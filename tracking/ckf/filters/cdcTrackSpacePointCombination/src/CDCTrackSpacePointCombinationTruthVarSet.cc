@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCTrackSpacePointCombinationTruthVarSet.h>
+#include <tracking/ckf/utilities/CKFMCUtils.h>
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 #include <framework/dataobjects/EventMetaData.h>
 
@@ -62,25 +63,15 @@ bool CDCTrackSpacePointCombinationTruthVarSet::extract(const BaseCDCTrackSpacePo
   // Next we have to get all MC tracks for the two SVD Clusters matches to the SpacePoint
   const auto& relatedSVDClusters = spacePoint->getRelationsWith<SVDCluster>();
 
-  B2ASSERT("SpacePoint is related to more than two SVDClusters!", relatedSVDClusters.size() == 2);
-
-  for (const auto& relatedSVDCluster : relatedSVDClusters) {
-    const auto& relatedMCRecoTracksToOneCluster = relatedSVDCluster.getRelationsWith<RecoTrack>("MCRecoTracks");
-
-    bool cdcTrackMatchedToCluster = std::any_of(relatedMCRecoTracksToOneCluster.begin(),
-    relatedMCRecoTracksToOneCluster.end(), [cdcMCTrack](const RecoTrack & mcRecoTrack) {
-      return &mcRecoTrack == cdcMCTrack;
-    });
-
-    if (not cdcTrackMatchedToCluster) {
-      return true;
-    }
+  if (not isCorrectSpacePoint(*spacePoint, *cdcMCTrack)) {
+    // Keep all variables set to false and return.
+    return true;
   }
 
   var<named("truth_no_curler")>() = true;
 
   // Test if these clusters are on the first half of the track
-  // The track needs to have some SVD hits, so we can savely access the first element
+  // The track needs to have some hits, so we can savely access the first element
   const auto& recoHitInformations = cdcMCTrack->getRecoHitInformations(true);
 
   const auto& isCDCHit = [](RecoHitInformation * recoHitInformation) {

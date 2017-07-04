@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCVXDTrackCombinationTruthVarSet.h>
+#include <tracking/ckf/utilities/CKFMCUtils.h>
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 #include <framework/dataobjects/EventMetaData.h>
 
@@ -40,22 +41,7 @@ bool CDCVXDTrackCombinationTruthVarSet::extract(const BaseCDCVXDTrackCombination
   }
 
   // Count the number of times the CDC-related MC-track is also related to the SVD cluster.
-  unsigned int numberOfCorrectHits = 0;
-
-  for (const SpacePoint* spacePoint : result->second) {
-    for (const SVDCluster& relatedCluster : spacePoint->getRelationsWith<SVDCluster>()) {
-      const auto& relatedMCRecoTracksToOneCluster = relatedCluster.getRelationsWith<RecoTrack>("MCRecoTracks");
-
-      bool cdcTrackMatchedToCluster = std::any_of(relatedMCRecoTracksToOneCluster.begin(),
-      relatedMCRecoTracksToOneCluster.end(), [cdcMCTrack](const RecoTrack & mcRecoTrack) {
-        return &mcRecoTrack == cdcMCTrack;
-      });
-
-      if (cdcTrackMatchedToCluster) {
-        numberOfCorrectHits++;
-      }
-    }
-  }
+  const unsigned int numberOfCorrectHits = getNumberOfCorrectHits(cdcMCTrack, result->second);
 
   var<named("truth_number_of_correct_hits")>() = numberOfCorrectHits;
   var<named("truth_number_of_mc_hits")>() = cdcMCTrack->getNumberOfSVDHits();

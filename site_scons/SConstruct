@@ -287,9 +287,9 @@ global_env.Alias('lib', lib)
 
 # build global test executable
 if len(global_env['TEST_FILES']) > 0:
-    test = global_env.Program(os.path.join(global_env['BINDIR'], 'b2unittests'),
+    test = global_env.Program(os.path.join(global_env['BINDIR'], 'b2test-units'),
                               global_env['TEST_FILES'], LIBS=global_env['TEST_LIBS'])
-    global_env.Alias('b2unittests', test)
+    global_env.Alias('b2test-units', test)
     global_env.Alias('tests', test)
 
 # build sphinx documentation if the --sphinx option is used

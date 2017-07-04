@@ -9,30 +9,44 @@
  **************************************************************************/
 #include <tracking/ckf/findlets/base/AdvanceAlgorithm.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <genfit/MaterialEffects.h>
 #include <svd/reconstruction/SVDRecoHit.h>
+#include <pxd/reconstruction/PXDRecoHit.h>
 
 #include <genfit/Exception.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint* spacePoint) const
+template <>
+bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint& spacePoint) const
 {
-  // We always use the first cluster here to create the plane. Should not make much difference?
-  SVDRecoHit recoHit(spacePoint->getRelated<SVDCluster>());
-
-  // The mSoP plays no role here (it is unused in the function)
-  const genfit::SharedPlanePtr& plane = recoHit.constructPlane(measuredStateOnPlane);
-
-  try {
-    genfit::MaterialEffects::getInstance()->setNoEffects(not m_param_useMaterialEffects);
-    measuredStateOnPlane.extrapolateToPlane(plane);
-    genfit::MaterialEffects::getInstance()->setNoEffects(false);
-  } catch (genfit::Exception e) {
-    B2WARNING(e.what());
-    return false;
+  if (spacePoint.getType() == VXD::SensorInfoBase::SensorType::SVD) {
+    // We always use the first cluster here to create the plane. Should not make much difference?
+    return extrapolate(measuredStateOnPlane, *(spacePoint.getRelated<SVDCluster>()));
+  } else if (spacePoint.getType() == VXD::SensorInfoBase::SensorType::PXD) {
+    return extrapolate(measuredStateOnPlane, *(spacePoint.getRelated<PXDCluster>()));
+  } else {
+    B2FATAL("Can not extrapolate unknown type " << spacePoint.getType() << "!");
   }
+}
 
-  return true;
+template <>
+bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, SVDCluster& svdCluster) const
+{
+  SVDRecoHit recoHit(&svdCluster);
+  return extrapolate(measuredStateOnPlane, recoHit);
+}
+
+template <>
+bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, PXDCluster& pxdCluster) const
+{
+  PXDRecoHit recoHit(&pxdCluster);
+  return extrapolate(measuredStateOnPlane, recoHit);
+}
+
+/// Expose the useMaterialEffects parameter.
+void AdvanceAlgorithm::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter("useMaterialEffects", m_param_useMaterialEffects,
+                                "Use material effects during extrapolation.", m_param_useMaterialEffects);
 }

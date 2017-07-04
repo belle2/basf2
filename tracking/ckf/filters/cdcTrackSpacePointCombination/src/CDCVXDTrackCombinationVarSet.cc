@@ -35,7 +35,7 @@ bool CDCVXDTrackCombinationVarSet::extract(const BaseCDCVXDTrackCombinationFilte
   for (const SpacePoint* spacePoint : spacePoints) {
     layerUsed[spacePoint->getVxdID().getLayerNumber()] = true;
 
-    if (not m_advanceAlgorithm.extrapolate(mSoP, spacePoint)) {
+    if (not m_advanceAlgorithm.extrapolate(mSoP, *spacePoint)) {
       return std::nan("");
     }
     const double chi2 = m_kalmanAlgorithm.kalmanStep(mSoP, spacePoint);

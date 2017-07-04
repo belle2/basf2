@@ -73,9 +73,9 @@ class Calculation:
         Please keep in mind that you can not execute cells in the notebook when having called wait_for_end
         (but before - although a calculation is running.).
 
-        :param display_bar If true, the display bar is used to show in the notebook that the computation
+        :param display_bar: If true, the display bar is used to show in the notebook that the computation
                            is complete.
-        :param send_notification If true, the notify2 library will be used to notify the user if the
+        :param send_notification: If true, the notify2 library will be used to notify the user if the
                                  computation is complete. This will only work if the jupyter notebook
                                  is hosted on the local desktop machine.
         """

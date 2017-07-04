@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCVXDTrackCombinationTruthVarSet.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/result/CDCVXDTrackCombinationTruthVarSet.h>
 #include <tracking/ckf/utilities/CKFMCUtils.h>
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 #include <framework/dataobjects/EventMetaData.h>

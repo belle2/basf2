@@ -15,9 +15,11 @@
 #include <tracking/ckf/findlets/base/TreeSearchFindlet.h>
 #include <tracking/ckf/findlets/base/HitSelector.h>
 #include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointMatcher.h>
-#include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
 #include <tracking/ckf/findlets/base/OverlapResolverFindlet.h>
-#include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCVXDTrackCombinationFilterFactory.h>
+
+#include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
+
+#include <tracking/ckf/filters/cdcToSpacePoint/result/CDCVXDTrackCombinationFilterFactory.h>
 #include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectFilterFactory.h>
 
 #include <tracking/ckf/utilities/ClassMnemomics.h>

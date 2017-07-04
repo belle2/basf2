@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/filters/cdcTrackSpacePointCombination/BaseCDCTrackSpacePointCombinationFilter.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/result/BaseCDCVXDTrackCombinationFilter.h>
 #include <tracking/ckf/findlets/base/AdvanceAlgorithm.h>
 #include <tracking/ckf/findlets/base/KalmanUpdateFitter.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>

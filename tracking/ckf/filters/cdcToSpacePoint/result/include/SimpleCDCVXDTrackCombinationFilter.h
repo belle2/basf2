@@ -7,12 +7,15 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/filters/cdcTrackSpacePointCombination/Chi2CDCVXDTrackCombinationFilter.h>
+#pragma once
 
-using namespace Belle2;
-using namespace TrackFindingCDC;
+#include <tracking/ckf/filters/cdcToSpacePoint/result/BaseCDCVXDTrackCombinationFilter.h>
 
-Weight Chi2CDCVXDTrackCombinationFilter::operator()(const BaseCDCVXDTrackCombinationFilter::Object& pair)
-{
-  return -pair.getWeight();
+#include <tracking/trackFindingCDC/numerics/Weight.h>
+
+namespace Belle2 {
+  class SimpleCDCVXDTrackCombinationFilter : public BaseCDCVXDTrackCombinationFilter {
+  public:
+    TrackFindingCDC::Weight operator()(const BaseCDCVXDTrackCombinationFilter::Object& currentState) final;
+  };
 }

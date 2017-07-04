@@ -77,16 +77,18 @@ namespace Belle2 {
       TH1F* h_e_eclcluster;
 
       //KLM
-      /**number of KLM clusters*/
-      TH1F* h_nklmcluster;
-      /**KLMCluster's x, y, z positions*/
-      TH1F* h_pos_klmcluster[3];
-      /**KLMCluster's number of the innermost layer with hits*/
-      TH1F* h_innermost_klmcluster;
-      /**KLMCluster's number of layers with hits*/
-      TH1F* h_nlayer_klmcluster;
-      /**KLMCluster's Time*/
-      TH1F* h_Time_klmcluster;
+      /**number of bKLM Hit*/
+      TH1F* h_nbklmhit;
+      /**layer ID of hits in bKLM*/
+      TH1F* h_layerId_bklmhit;
+      /**sector ID of hits in bKLM*/
+      TH1F* h_sectorId_bklmhit;
+      /**number of eKLM Hit*/
+      TH1F* h_neklmhit;
+      /**layer ID of hits in eKLM*/
+      TH1F* h_layerId_eklmhit;
+      /**sector ID of hits in eKLM*/
+      TH1F* h_sectorId_eklmhit;
 
 
     };

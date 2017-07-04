@@ -5,7 +5,7 @@
 // Author : Chunhua LI
 // Date : 19 - May - 2017
 //-
-#include <hlt/softwaretrigger/modules/CosmicRayHLTDQMModule.h>
+#include <hlt/softwaretrigger/modules/HLTDQM/CosmicRayHLTDQMModule.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <hlt/softwaretrigger/dataobjects/SoftwareTriggerVariables.h>
 
@@ -18,6 +18,8 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
+#include <bklm/dataobjects/BKLMHit2d.h>
+#include <eklm/dataobjects/EKLMHit2d.h>
 
 #include <TDirectory.h>
 
@@ -61,34 +63,57 @@ void CosmicRayHLTDQMModule::defineHisto()
   oldDir->mkdir(m_param_histogramDirectoryName.c_str())->cd();
   //CDC
   h_d0 = new TH1F("r0", "Signed distance to the POCA in the r-phi plane", 100, -100, 100);
+  h_d0->SetXTitle("r0 (cm)");
   h_z0 = new TH1F("z0", "z coordinate of the POCA", 100, -500, 500);
+  h_z0->SetXTitle("z0 (cm)");
   h_phi0 = new TH1F("phi0", "Angle of the transverse momentum in the r-phi plane", 100, -1, 1);
+  h_phi0->SetXTitle("#phi0 (rad.)");
   h_ncdchits = new TH1F("ncdchits", "Number of CDC hits associated to CDC track", 100, 0, 100);
-  h_pValue = new TH1F("pValue", "chi2 probalility of the track fit", 100, 0, 1);
+  h_ncdchits->SetXTitle("#phi0 (rad.)");
+  h_pValue = new TH1F("pValue", "chi2 probability of the track fit", 100, 0, 1);
+  h_pValue->SetXTitle("chi2 Probability");
   h_ntrk = new TH1F("ntrk", "number of charged tracks", 10, 0, 10);
+  h_ntrk->SetXTitle("Ntrk");
   h_p[0] = new TH1F("px", "track momentum in X direction", 100, -10, 10);
+  h_p[0]->SetXTitle("Px (GeV)");
   h_p[1] = new TH1F("py", "track momentum in Y direction", 100, -10, 10);
+  h_p[1]->SetXTitle("Py (GeV)");
   h_p[2] = new TH1F("pz", "track momentum in Z direction", 100, -10, 10);
+  h_p[2]->SetXTitle("Pz (GeV)");
   h_p[3] = new TH1F("p", "track momentum", 100, 0, 20);
+  h_p[3]->SetXTitle("P (GeV)");
   h_p[4] = new TH1F("pt", "transverse momentum of track", 100, 0, 20);
+  h_p[4]->SetXTitle("Pt (GeV)");
   h_charge = new TH1F("charge", "the charge of track", 8, -1.5, 2.5);
+  h_charge->SetXTitle("Charge");
 
   //ECL
   h_ncluster = new TH1F("neclcluster", "number of ECL cluster", 30, 0, 30);
+  h_ncluster->SetXTitle("Neclcluster (GeV)");
   h_e_eclcluster = new TH1F("e_ecluster", "energy of ECL cluster", 100, 0, 1.0);
+  h_e_eclcluster->SetXTitle("E (GeV)");
   h_phi_eclcluster = new TH1F("phi_eclcluster", "phi angle of ECLCluster position", 100, -3.2, 3.2);
+  h_phi_eclcluster->SetXTitle("#phi (rad.)");
   h_theta_eclcluster = new TH1F("theta_eclcluster", "theta angle of ECLCluster position", 100, 0, 3.2);
-  h_E1oE9_eclcluster = new TH1F("e1v8_eclcluster", "the E1/E9 energy ratio", 100, 0., 1.);
+  h_theta_eclcluster->SetXTitle("#theta (rad.)");
+  h_E1oE9_eclcluster = new TH1F("e1v9_eclcluster", "the E1/E9 energy ratio", 100, 0., 1.);
+  h_E1oE9_eclcluster->SetXTitle("E1/E9");
   h_Time_eclcluster = new TH1F("Time_eclcluster", "the ecl cluster time", 100, -1000., 1000.);
+  h_Time_eclcluster->SetXTitle("Time (ns)");
 
   //KLM
-  h_nklmcluster = new TH1F("nklmcluster", "number of KLM Cluster", 10, 0, 10);
-  h_pos_klmcluster[0] = new TH1F("posX", "KLMCluster's x position", 100, -100., 100);
-  h_pos_klmcluster[1] = new TH1F("posY", "KLMCluster's y position", 100, -100., 100);
-  h_pos_klmcluster[2] = new TH1F("posZ", "KLMCluster's z position", 100, -100., 100);
-  h_innermost_klmcluster = new TH1F("innermost_klmcluster", "KLMCluster's the innermost layer with hits", 20, 0, 20);
-  h_nlayer_klmcluster = new TH1F("nlayer_klmcluster", "KLMCluster's number of layers with hits", 20, 0, 20);
-
+  h_nbklmhit = new TH1F("nbklmhit", "number of 2D hits on barrel KLM", 30, 0, 30);
+  h_nbklmhit->SetXTitle("Nhits (bKLM)");
+  h_layerId_bklmhit = new TH1F("layerId_bklmhit", "layer ID of 2D hits on barrel KLM", 18, 0, 18);
+  h_layerId_bklmhit->SetXTitle("Layer ID (bKLM)");
+  h_sectorId_bklmhit = new TH1F("sectorId_bklmhit", "sector ID of 2D hits on barrel KLM", 10, 0, 10);
+  h_sectorId_bklmhit->SetXTitle("Sector ID (bKLM)");
+  h_neklmhit = new TH1F("neklmhit", "number of 2D hits on endcap KLM", 30, 0, 30);
+  h_neklmhit->SetXTitle("Nhits (eKLM)");
+  h_layerId_eklmhit = new TH1F("layerId_eklmhit", "layer ID of 2D hits on endcap KLM", 18, 0, 18);
+  h_layerId_eklmhit->SetXTitle("Layer ID (eKLM)");
+  h_sectorId_eklmhit = new TH1F("sectorId_eklmhit", "sector ID of 2D hits on endcap KLM", 10, 0, 10);
+  h_sectorId_eklmhit->SetXTitle("Sector ID (eKLM)");
   oldDir->cd();
 }
 
@@ -136,19 +161,23 @@ void CosmicRayHLTDQMModule::event()
     }
   }
 
-//Monitor KLM Cluster
-  StoreArray<KLMCluster> klmClusters;
-  if (klmClusters.isValid()) {
-    h_nklmcluster->Fill(klmClusters.getEntries());
-    for (const auto& klmCluster : klmClusters) {
-      h_pos_klmcluster[0]->Fill(klmCluster.getClusterPosition().x());
-      h_pos_klmcluster[1]->Fill(klmCluster.getClusterPosition().y());
-      h_pos_klmcluster[2]->Fill(klmCluster.getClusterPosition().z());
-      h_innermost_klmcluster->Fill(klmCluster.getInnermostLayer());
-      h_nlayer_klmcluster->Fill(klmCluster.getLayers());
-      h_Time_klmcluster->Fill(klmCluster.getTime());
+//Monitor KLM
+  StoreArray<BKLMHit2d> bklmhits;
+  if (bklmhits.isValid()) {
+    h_nbklmhit->Fill(bklmhits.getEntries());
+    for (const auto& bklmhit : bklmhits) {
+      h_layerId_bklmhit->Fill(bklmhit.getLayer());
+      h_sectorId_bklmhit->Fill(bklmhit.getSector());
     }
   }
-
-
+  /*
+  StoreArray<EKLMHit2d> eklmhits;
+  if (eklmhits.isValid()) {
+    h_neklmhit->Fill(eklmhits.getEntries());
+    for (const auto& eklmhit : eklmhits) {
+      h_layerId_eklmhit->Fill(eklmhit.getLayer());
+      h_sectorId_eklmhit->Fill(eklmhit.getSector());
+    }
+  }
+  */
 }

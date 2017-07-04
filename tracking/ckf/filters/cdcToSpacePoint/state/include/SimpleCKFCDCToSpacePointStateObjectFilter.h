@@ -9,12 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/filters/cdcTrackSpacePointCombination/BaseCDCTrackSpacePointCombinationFilter.h>
-
+#include <tracking/ckf/filters/cdcToSpacePoint/state/BaseCKFCDCToSpacePointStateObjectFilter.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 namespace Belle2 {
-  class SimpleCDCTrackSpacePointCombinationFilter : public BaseCDCTrackSpacePointCombinationFilter {
+  class SimpleCKFCDCToSpacePointStateObjectFilter : public BaseCKFCDCToSpacePointStateObjectFilter {
   public:
     void exposeParameters(ModuleParamList* moduleParamList,
                           const std::string& prefix) final;
@@ -25,7 +24,7 @@ namespace Belle2 {
     /// Set the cached B field
     void beginRun() final;
 
-    TrackFindingCDC::Weight operator()(const BaseCDCTrackSpacePointCombinationFilter::Object& currentState) final;
+    TrackFindingCDC::Weight operator()(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState) final;
 
   private:
     std::vector<double> m_param_maximumHelixChi2XYZ {10000, 10000, 10000, 10000};

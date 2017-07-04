@@ -18,7 +18,7 @@
 #include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
 #include <tracking/ckf/findlets/base/OverlapResolverFindlet.h>
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCVXDTrackCombinationFilterFactory.h>
-#include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCTrackSpacePointCombinationFilterFactory.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectFilterFactory.h>
 
 #include <tracking/ckf/utilities/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/findlets/base/StoreArrayLoader.h>
@@ -63,7 +63,7 @@ namespace Belle2 {
 
   private:
     // Some typedefs
-    using CDCToSpacePointHitSelector = HitSelector<CDCTrackSpacePointCombinationFilterFactory>;
+    using CDCToSpacePointHitSelector = HitSelector<CKFCDCToSpacePointStateObjectFilterFactory>;
 
     // Findlets
     /// Findlet for retrieving the cdc tracks

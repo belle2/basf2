@@ -10,19 +10,19 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
-#include <tracking/ckf/filters/cdcTrackSpacePointCombination/BaseCDCTrackSpacePointCombinationFilter.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/state/BaseCKFCDCToSpacePointStateObjectFilter.h>
 
 namespace Belle2 {
   /// Filter factory for detector track combination filters.
-  class CDCTrackSpacePointCombinationFilterFactory : public TrackFindingCDC::FilterFactory<BaseCDCTrackSpacePointCombinationFilter> {
+  class CKFCDCToSpacePointStateObjectFilterFactory : public TrackFindingCDC::FilterFactory<BaseCKFCDCToSpacePointStateObjectFilter> {
 
   private:
     /// Type of the base class
-    typedef TrackFindingCDC::FilterFactory<BaseCDCTrackSpacePointCombinationFilter> Super;
+    typedef TrackFindingCDC::FilterFactory<BaseCKFCDCToSpacePointStateObjectFilter> Super;
 
   public:
     /// Constructor forwarding the default filter name
-    CDCTrackSpacePointCombinationFilterFactory(const std::string& defaultFilterName = "all");
+    CKFCDCToSpacePointStateObjectFilterFactory(const std::string& defaultFilterName = "all");
 
     /// Getter for a short identifier for the factory
     std::string getIdentifier() const override;
@@ -34,6 +34,6 @@ namespace Belle2 {
     std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
 
     /// Create a filter with the given name.
-    std::unique_ptr<BaseCDCTrackSpacePointCombinationFilter> create(const std::string& filterName) const override;
+    std::unique_ptr<BaseCKFCDCToSpacePointStateObjectFilter> create(const std::string& filterName) const override;
   };
 }

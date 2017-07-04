@@ -9,14 +9,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/filters/cdcTrackSpacePointCombination/BaseCDCTrackSpacePointCombinationFilter.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/state/BaseCKFCDCToSpacePointStateObjectFilter.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
 namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
-  static char const* const cdcTrackSpacePointCombinationVarNames[] = {
+  static char const* const ckfCDCToSpacePointStateObjectVarNames[] = {
     "track_position_x",
     "track_position_y",
     "track_position_z",
@@ -124,27 +124,27 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  class CDCTrackSpacePointCombinationVarNames : public TrackFindingCDC::VarNames<BaseCDCTrackSpacePointCombinationFilter::Object> {
+  class CKFCDCToSpacePointStateObjectVarNames : public TrackFindingCDC::VarNames<BaseCKFCDCToSpacePointStateObjectFilter::Object> {
 
   public:
     /// Number of variables to be generated.
-    static const size_t nVars = TrackFindingCDC::size(cdcTrackSpacePointCombinationVarNames);
+    static const size_t nVars = TrackFindingCDC::size(ckfCDCToSpacePointStateObjectVarNames);
 
     /// Get the name of the column.
     constexpr
     static char const* getName(int iName)
     {
-      return cdcTrackSpacePointCombinationVarNames[iName];
+      return ckfCDCToSpacePointStateObjectVarNames[iName];
     }
   };
 
   /**
    * Var set used in the VXD-CDC-Merger for calculating the probability of a VXD-CDC-track match.
    */
-  class CDCTrackSpacePointCombinationVarSet : public TrackFindingCDC::VarSet<CDCTrackSpacePointCombinationVarNames> {
+  class CKFCDCToSpacePointStateObjectVarSet : public TrackFindingCDC::VarSet<CKFCDCToSpacePointStateObjectVarNames> {
 
   public:
     /// Generate and assign the variables from the VXD-CDC object.
-    virtual bool extract(const BaseCDCTrackSpacePointCombinationFilter::Object* object) override;
+    virtual bool extract(const BaseCKFCDCToSpacePointStateObjectFilter::Object* object) override;
   };
 }

@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/filters/cdcTrackSpacePointCombination/SimpleCDCTrackSpacePointCombinationFilter.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/state/SimpleCKFCDCToSpacePointStateObjectFilter.h>
 #include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointMatcher.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
@@ -28,7 +28,7 @@ namespace {
   }
 }
 
-void SimpleCDCTrackSpacePointCombinationFilter::exposeParameters(ModuleParamList* moduleParamList,
+void SimpleCKFCDCToSpacePointStateObjectFilter::exposeParameters(ModuleParamList* moduleParamList,
     const std::string& prefix)
 {
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHelixChi2XYZ"),
@@ -42,21 +42,21 @@ void SimpleCDCTrackSpacePointCombinationFilter::exposeParameters(ModuleParamList
                                 "", m_param_hitJumpingUpTo);
 }
 
-void SimpleCDCTrackSpacePointCombinationFilter::initialize()
+void SimpleCKFCDCToSpacePointStateObjectFilter::initialize()
 {
-  BaseCDCTrackSpacePointCombinationFilter::initialize();
+  BaseCKFCDCToSpacePointStateObjectFilter::initialize();
 
   B2ASSERT("You need to provide exactly 4 maximal norms (for four layers).", m_param_maximumHelixChi2XYZ.size() == 4);
   B2ASSERT("You need to provide exactly 4 maximal norms (for four layers).", m_param_maximumChi2XY.size() == 4);
   B2ASSERT("You need to provide exactly 4 maximal norms (for four layers).", m_param_maximumChi2.size() == 4);
 }
 
-void SimpleCDCTrackSpacePointCombinationFilter::beginRun()
+void SimpleCKFCDCToSpacePointStateObjectFilter::beginRun()
 {
   m_cachedBField = TrackFindingCDC::CDCBFieldUtil::getBFieldZ();
 }
 
-Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackSpacePointCombinationFilter::Object& currentState)
+Weight SimpleCKFCDCToSpacePointStateObjectFilter::operator()(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState)
 {
   const SpacePoint* spacePoint = currentState.getHit();
 

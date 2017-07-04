@@ -38,7 +38,7 @@ bool CDCVXDTrackCombinationVarSet::extract(const BaseCDCVXDTrackCombinationFilte
     if (not m_advanceAlgorithm.extrapolate(mSoP, *spacePoint)) {
       return std::nan("");
     }
-    const double chi2 = m_kalmanAlgorithm.kalmanStep(mSoP, spacePoint);
+    const double chi2 = m_kalmanAlgorithm.kalmanStep(mSoP, *spacePoint);
 
     chi2_vxd_full += chi2;
 

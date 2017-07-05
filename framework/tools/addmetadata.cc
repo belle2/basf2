@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
   }
 
   // open the root file
-  //gErrorIgnoreLevel = kError;
+  gErrorIgnoreLevel = kError;
   TFile* file = TFile::Open(fileName.c_str(), "UPDATE");
   if (!file || !file->IsOpen()) {
     B2ERROR("Failed to open the file " << fileName);

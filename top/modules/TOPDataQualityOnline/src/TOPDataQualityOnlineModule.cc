@@ -32,18 +32,19 @@ namespace Belle2 {
   TOPDataQualityOnlineModule::TOPDataQualityOnlineModule() : HistoModule(), m_iEvent(0)
   {
     setDescription("TOP online monitoring module");
+    setPropertyFlags(c_ParallelProcessingCertified);
     addParam("histogramDirectoryName", m_histogramDirectoryName,
              "histogram directory in ROOT file", string("TOP"));
     addParam("ADCCutLow", m_ADC_cut_low, "lower bound of ADC cut", 100);
     addParam("ADCCutHigh", m_ADC_cut_high, "higher bound of ADC cut", 2048);
     addParam("PulseWidthCutLow",  m_PulseWidth_cut_low, "lower bound of PulseWidth cut", 3);
     addParam("PulseWidthCutHigh", m_PulseWidth_cut_high, "higher bound of PulseWidth cut", 10);
-    addParam("TDCParticleLow", m_TDC_particle_low, "lower bound of particle TDC", -300);
-    addParam("TDCParticleHigh", m_TDC_particle_high, "Higher bound of particle TDC", -250);
-    addParam("TDCCalLow", m_TDC_cal_low, "lower bound of cal TDC", -50);
-    addParam("TDCCalHigh", m_TDC_cal_high, "Higher bound of cal TDC", 50);
-    addParam("TDCLaserLow", m_TDC_laser_low, "lower bound of laser TDC", 50);
-    addParam("TDCLaserHigh", m_TDC_laser_high, "Higher bound of laser TDC", 100);
+    addParam("TDCParticleLow", m_TDC_particle_low, "lower bound of particle TDC", -50);
+    addParam("TDCParticleHigh", m_TDC_particle_high, "Higher bound of particle TDC", 50);
+    addParam("TDCCalLow", m_TDC_cal_low, "lower bound of cal TDC", 0);
+    addParam("TDCCalHigh", m_TDC_cal_high, "Higher bound of cal TDC", 0);
+    addParam("TDCLaserLow", m_TDC_laser_low, "lower bound of laser TDC", -200);
+    addParam("TDCLaserHigh", m_TDC_laser_high, "Higher bound of laser TDC", -50);
   }
 
 
@@ -51,7 +52,9 @@ namespace Belle2 {
   {
     // Create a separate histogram directory and cd into it.
     TDirectory* oldDir = gDirectory;
-    oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
+    TDirectory* newDir = NULL;
+    newDir = oldDir->mkdir(m_histogramDirectoryName.c_str());
+    newDir->cd();
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_numModules = geo->getNumModules();
@@ -68,18 +71,30 @@ namespace Belle2 {
     m_laser_hits = new TH1F("laser_hits", "Number of laser hits per bar", m_numModules, 0.5, m_numModules + 0.5);
     m_cal_hits = new TH1F("cal_hits", "Number of cal hits per bar", m_numModules, 0.5, m_numModules + 0.5);
     m_other_hits = new TH1F("other_hits", "Number of other hits per bar", m_numModules, 0.5, m_numModules + 0.5);
+    m_particle_hits->SetOption("LIVE");
+    m_laser_hits->SetOption("LIVE");
+    m_cal_hits->SetOption("LIVE");
+    m_other_hits->SetOption("LIVE");
 
     m_particle_hits_mean = new TH1F("particle_hits_mean", "Mean of number of particle hits per bar", m_numModules, 0.5,
                                     m_numModules + 0.5);
     m_laser_hits_mean = new TH1F("laser_hits_mean", "Mean of number of laser hits per bar", m_numModules, 0.5, m_numModules + 0.5);
     m_cal_hits_mean = new TH1F("cal_hits_mean", "Mean of number of cal hits per bar", m_numModules, 0.5, m_numModules + 0.5);
     m_other_hits_mean = new TH1F("other_hits_mean", "Mean of number of other hits per bar", m_numModules, 0.5, m_numModules + 0.5);
+    m_particle_hits_mean->SetOption("LIVE");
+    m_laser_hits_mean->SetOption("LIVE");
+    m_cal_hits_mean->SetOption("LIVE");
+    m_other_hits_mean->SetOption("LIVE");
 
     m_particle_hits_rms = new TH1F("particle_hits_rms", "RMS of number of particle hits per bar", m_numModules, 0.5,
                                    m_numModules + 0.5);
     m_laser_hits_rms = new TH1F("laser_hits_rms", "RMS of number of laser hits per bar", m_numModules, 0.5, m_numModules + 0.5);
     m_cal_hits_rms = new TH1F("cal_hits_rms", "RMS of number of cal hits per bar", m_numModules, 0.5, m_numModules + 0.5);
     m_other_hits_rms = new TH1F("other_hits_rms", "RMS of number of other hits per bar", m_numModules, 0.5, m_numModules + 0.5);
+    m_particle_hits_rms->SetOption("LIVE");
+    m_laser_hits_rms->SetOption("LIVE");
+    m_cal_hits_rms->SetOption("LIVE");
+    m_other_hits_rms->SetOption("LIVE");
 
     for (int i = 0; i < m_numModules; i++) {
       int module = i + 1;
@@ -129,6 +144,7 @@ namespace Belle2 {
       TH1F* h1 = new TH1F(name1.c_str(), title1.c_str(), 512, 0.5, 512.5);
       TH1F* h2 = new TH1F(name2.c_str(), title2.c_str(), 512, 0.5, 512.5);
       TH1F* h3 = new TH1F(name3.c_str(), title2.c_str(), 512, 0.5, 512.5);
+      h3->SetOption("LIVE");
       m_channel_all_hits.push_back(h);
       m_channel_good_hits.push_back(h1);
       m_channel_bad_hits.push_back(h2);
@@ -149,6 +165,7 @@ namespace Belle2 {
       string title1 = str(format("Number of laser hits in x-y for module #%1%") % (module));
       TH2F* h = new TH2F(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
       TH2F* h1 = new TH2F(name1.c_str(), title1.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
+      h1->SetOption("LIVE");
       m_all_hits_xy.push_back(h);
       m_laser_hits_xy.push_back(h1);
     }
@@ -178,10 +195,12 @@ namespace Belle2 {
       TH1F* h = new TH1F(name.c_str(), title.c_str(), 500, -250, 250);
       TH2F* h1 = new TH2F(name1.c_str(), title1.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
       TH2F* h2 = new TH2F(name2.c_str(), title2.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
+      h->SetOption("LIVE");
       m_all_TDC.push_back(h);
       m_all_TDC_mean.push_back(h1);
       m_all_TDC_RMS.push_back(h2);
     }
+    oldDir->cd();
   }
 
   void TOPDataQualityOnlineModule::initialize()
@@ -211,6 +230,8 @@ namespace Belle2 {
     map<int, double> refTdcMap;
     vector<int> pixelHit;
     vector<int> moduleHit;
+    vector<int> colHit;
+    vector<int> rowHit;
     vector<double> rawTimeHit;
     vector<int> isCal;
     for (const auto& digit : digits) {
@@ -237,6 +258,8 @@ namespace Belle2 {
       rawTimeHit.push_back(digit.getRawTime());
       pixelHit.push_back(digit.getPixelID());
       moduleHit.push_back(digit.getModuleID());
+      colHit.push_back(digit.getPixelCol());
+      rowHit.push_back(digit.getPixelRow());
       m_nhits++;
 
       double nhits = m_all_hits_xy[i]->GetBinContent(col, row);
@@ -269,22 +292,6 @@ namespace Belle2 {
         m_channel_bad_hits[i]->Fill(digit.getPixelID());
         m_hit_quality[i]->Fill(flag);
       }
-      double digit_tdc = digit.getRawTime();
-      if (digit_tdc > m_TDC_particle_low && digit_tdc < m_TDC_particle_high) { // particle hits
-        m_particle_hits->Fill(digit.getModuleID());
-        particle_hit[i]++;
-        m_channel_particle_hits[i]->Fill(digit.getPixelID());
-      } else if (digit_tdc > m_TDC_laser_low && digit_tdc < m_TDC_laser_high) { // laser hits
-        m_laser_hits->Fill(digit.getModuleID());
-        laser_hit[i]++;
-        m_laser_hits_xy[i]->Fill(col, row);
-      } else if (digit_tdc > m_TDC_cal_low && digit_tdc < m_TDC_cal_high) { // cal hits
-        m_cal_hits->Fill(digit.getModuleID());
-        cal_hit[i]++;
-      } else {
-        m_other_hits->Fill(digit.getModuleID());
-        other_hit[i]++;
-      }
     }
     for (int i = 0; i < m_nhits; i++) {
       int reducedPixelId = (pixelHit[i] - 1) / 8 + moduleHit[i] * 100;
@@ -295,6 +302,23 @@ namespace Belle2 {
         refTdc = -99999;
       if (refTdc > 0 && isCal[i] == 0)
         m_all_TDC[moduleHit[i] - 1]->Fill(rawTimeHit[i] - refTdc);
+
+      double digit_tdc = rawTimeHit[i] - refTdc;
+      if (isCal[i] == 0 && digit_tdc > m_TDC_particle_low && digit_tdc < m_TDC_particle_high) { // particle hits
+        m_particle_hits->Fill(moduleHit[i]);
+        particle_hit[moduleHit[i] - 1]++;
+        m_channel_particle_hits[moduleHit[i] - 1]->Fill(pixelHit[i]);
+      } else if (isCal[i] == 0 && digit_tdc > m_TDC_laser_low && digit_tdc < m_TDC_laser_high) { // laser hits
+        m_laser_hits->Fill(moduleHit[i]);
+        laser_hit[moduleHit[i] - 1]++;
+        m_laser_hits_xy[moduleHit[i] - 1]->Fill(colHit[i], rowHit[i]);
+      } else if (isCal[i] == 1) { // cal hits
+        m_cal_hits->Fill(moduleHit[i]);
+        cal_hit[moduleHit[i] - 1]++;
+      } else {
+        m_other_hits->Fill(moduleHit[i]);
+        other_hit[moduleHit[i] - 1]++;
+      }
     }
     m_iEvent++;
     for (int i = 0; i < m_numModules; i++) {

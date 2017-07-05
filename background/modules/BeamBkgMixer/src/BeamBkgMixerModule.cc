@@ -105,7 +105,7 @@ namespace Belle2 {
              "(0 means accept all events)", 1.0);
 
     addParam("cacheSize", m_cacheSize,
-             "file cache size in Mbytes. If negative, use root default", 5);
+             "file cache size in Mbytes. If negative, use root default", 0);
   }
 
   BeamBkgMixerModule::~BeamBkgMixerModule()

@@ -1,9 +1,9 @@
 //+
 // File : StatisticsTimingHLTDQMModule.cc
-// Description : Module to monitor Cosmic Ray on HLT
+// Description : Module to monitor process timing on HLT
 //
 // Author : Chunhua LI
-// Date : 19 - May - 2017
+// Date : 04 - July - 2017
 //-
 #include <hlt/softwaretrigger/modules/HLTDQM/StatisticsTimingHLTDQMModule.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>

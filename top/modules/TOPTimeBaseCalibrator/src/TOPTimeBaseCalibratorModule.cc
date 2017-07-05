@@ -173,8 +173,14 @@ namespace Belle2 {
 
       // open output root file
 
-      std::string fileName = m_directoryName + "/tbcScrod" +
-                             std::to_string(scrodID) + ".root";
+      std::string fileName = m_directoryName + "/tbcSlot";
+      if (m_moduleID < 10) {
+        fileName += "0" + std::to_string(m_moduleID);
+      } else {
+        fileName += std::to_string(m_moduleID);
+      }
+      fileName += "_" + std::to_string(bs) + "-scrod" +
+                  std::to_string(scrodID) + ".root";
       TFile* fout = TFile::Open(fileName.c_str(), "recreate");
       if (!fout) {
         B2ERROR("Can't open the output file " << fileName);

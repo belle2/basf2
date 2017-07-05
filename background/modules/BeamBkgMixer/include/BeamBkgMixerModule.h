@@ -111,7 +111,6 @@ namespace Belle2 {
       unsigned numEvents;      /**< number of events (tree entries) in the sample */
       unsigned eventCount;     /**< current event (tree entry) */
       double rate;             /**< background rate of the sample */
-      BkgHits simHits;         /**< input event buffer */
       unsigned index;          /**< index of this element in the std::vector */
 
       /**
@@ -270,6 +269,7 @@ namespace Belle2 {
     int m_cacheSize;  /**< file cache size in Mbytes */
 
     std::vector<BkgFiles> m_backgrounds;  /**< container for background samples */
+    BkgHits m_simHits;         /**< input event buffer */
 
     bool m_PXD = false; /**< true if found in m_components */
     bool m_SVD = false; /**< true if found in m_components */

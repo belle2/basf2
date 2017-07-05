@@ -15,6 +15,7 @@ from basf2 import *
 from ROOT import Belle2
 import datetime
 from generators import add_cosmics_generator
+from simulation import add_simulation
 
 from tracking import add_cdc_cr_track_finding
 import os.path
@@ -57,6 +58,7 @@ def sim(exp, run, evt, st, topInCounter=True, magneticField=False):
         components = ['CDC', 'MagneticFieldConstant4LimitedRCDC']
 
     add_cosmics_generator(main_path, components=components, pre_general_run_setup=period, top_in_counter=topInCounter)
+    add_simulation(main_path, components=components)
 
     output = register_module('RootOutput',
                              outputFileName='gcr.cdc.{0:04d}.{1:06d}.{2:04d}.root'.format(int(exp), int(run), int(st)))

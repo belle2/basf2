@@ -145,7 +145,7 @@ def command_download(args, db=None):
                 download_list.append(payload)
 
         # parse the payload list and do the downloading
-        dbfile = []
+        full_iovlist = []
         failed = 0
         with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
             for iovlist in pool.map(lambda x: download_payload(args.destination, db, x), download_list):
@@ -153,13 +153,15 @@ def command_download(args, db=None):
                     failed += 1
                     continue
 
-                for iov in iovlist:
-                    dbfile.append("dbstore/{} {} {},{},{},{}\n".format(*iov))
+                full_iovlist += iovlist
 
         if args.create_dbfile:
+            dbfile = []
+            for iov in sorted(full_iovlist):
+                dbfile.append("dbstore/{} {} {},{},{},{}\n".format(*iov))
             dbfilename = tagname if (args.tag_pattern or args.tag_regex) else "database"
             with open(os.path.join(args.destination, dbfilename + ".txt"), "w") as txtfile:
-                txtfile.writelines(sorted(dbfile))
+                txtfile.writelines(dbfile)
 
     if failed > 0:
         B2ERROR("{} out of {} payloads could not be downloaded".format(failed, len(download_list)))

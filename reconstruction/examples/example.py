@@ -8,23 +8,22 @@
 # Usage: basf2 example.py
 #
 # Input: None
-# Output: output.root
+# Output: output.root, mdst.root
 #
-# Example steering file - 2011 Belle II Collaboration
+# Example steering file - 2017 Belle II Collaboration
 #############################################################
 
 from basf2 import *
 from simulation import add_simulation
 from L1trigger import add_tsim
-from reconstruction import add_reconstruction, add_mdst_output
+from reconstruction import add_reconstruction
+from mdst import add_mdst_output
 
 # create path
 main = create_path()
 
 # specify number of events to be generated
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [10])  # we want to process 10 events
-main.add_module(eventinfosetter)
+main.add_module('EventInfoSetter', evtNumList=[10])
 
 # generate BBbar events
 main.add_module('EvtGenInput')
@@ -44,7 +43,7 @@ add_reconstruction(main)
 main.add_module('RootOutput', outputFileName='output.root')
 
 # mdst output
-add_mdst_output(main)
+add_mdst_output(main, additionalBranches=['TRGGDLResults', 'KlIds', 'KLMClustersToKlIds'])
 
 # display a progress bar while running
 main.add_module('ProgressBar')

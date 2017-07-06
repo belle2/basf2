@@ -76,9 +76,9 @@ namespace Belle2 {
     double m_cmsEnergy; /**< CMS energy. */
     std::vector<double> m_ScatteringAngleRangePhoton; /**< Minimal/Maximal photon angle/missing momentum angle. */
     std::vector<double> m_ScatteringAngleRangeFinalStates; /**< Minimal/Maximal pions(muons,nucleons,kaons) momentum angle. */
-    double m_MinInvMassHadronsGamma; /**< m_MinInvMassHadronsGamma [GeV]. */
-    double m_MinInvMassHadrons; /**< m_MinInvMassHadrons [GeV]. */
-    double m_MaxInvMassHadrons; /**< m_MaxInvMassHadrons [GeV] */
+    double m_MinInvMassHadronsGamma; /**< m_MinInvMassHadronsGamma [GeV^2]. */
+    double m_MinInvMassHadrons; /**< m_MinInvMassHadrons [GeV^2]. */
+    double m_MaxInvMassHadrons; /**< m_MaxInvMassHadrons [GeV^2] */
     double m_MinEnergyGamma; /**< m_MinEnergyGamma [GeV]. */
 
 //     int m_finalState; /**< Final state: mu+mu-(0), pi+pi-(1), 2pi0pi+pi-(2), 2pi+2pi-(3), ppbar(4), nnbar(5), K+K-(6), K0K0bar(7), pi+pi-pi0(8), lamb(->pi-p)lambbar(->pi+pbar)(9), eta pi+ pi- (10) */

@@ -197,9 +197,9 @@ namespace Belle2 {
 
     std::pair<double, double> m_ScatteringAngleRangePhoton; /**< Minimal/Maximal photon angle/missing momentum angle. */
     std::pair<double, double> m_ScatteringAngleRangeFinalStates; /**< Minimal/Maximal pions(muons,nucleons,kaons) momentum angle. */
-    double m_MinInvMassHadronsGamma; /**< minimum mass of the hadron-gamma system [GeV] */
-    double m_MinInvMassHadrons; /**< minimum mass of the hadron system [GeV] */
-    double m_MaxInvMassHadrons; /**< maximum mass of the hadron system [GeV] */
+    double m_MinInvMassHadronsGamma; /**< minimum mass of the hadron-gamma system [GeV^2] */
+    double m_MinInvMassHadrons; /**< minimum mass of the hadron system [GeV^2] */
+    double m_MaxInvMassHadrons; /**< maximum mass of the hadron system [GeV^2] */
     double m_MinEnergyGamma; /**< minimum gamma energy [GeV] */
 
     /**

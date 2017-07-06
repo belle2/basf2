@@ -61,7 +61,7 @@ namespace Belle2 {
 
   private:
     std::vector<int> n; /**< number of entries */
-    std::vector<double> mean; /**< mean of variables */
-    std::vector<double> mean2; /**< mean^2 of variables */
+    std::vector<double> sum; /**< sum of variables */
+    std::vector<double> sum2; /**< sum^2 of variables */
   };
 } //namespace Belle2

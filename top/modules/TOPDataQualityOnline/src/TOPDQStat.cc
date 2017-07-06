@@ -20,37 +20,39 @@ namespace Belle2 {
   {
     for (int i = 0; i < v_size; i++) {
       n.push_back(0);
-      mean.push_back(0.);
-      mean2.push_back(0.);
+      sum.push_back(0.);
+      sum2.push_back(0.);
     }
   }
 
   void TOPDQStat::SetSize(int v_size)
   {
     n.clear();
-    mean.clear();
-    mean2.clear();
+    sum.clear();
+    sum2.clear();
     for (int i = 0; i < v_size; i++) {
       n.push_back(0);
-      mean.push_back(0.);
-      mean2.push_back(0.);
+      sum.push_back(0.);
+      sum2.push_back(0.);
     }
   }
 
   void TOPDQStat::Add(int idx, double val)
   {
-    mean[idx] = (n[idx] * mean[idx] + val) / (n[idx] + 1);
-    mean2[idx] = (n[idx] * mean2[idx] + val * val) / (n[idx] + 1);
+    sum[idx] += val;
+    sum2[idx] += val * val;
     n[idx] += 1;
   }
 
   double TOPDQStat::GetMean(int idx)
   {
-    return mean[idx];
+    if (n[idx] == 0) return 0;
+    else return sum[idx] / n[idx];
   }
 
   double TOPDQStat::GetRMS(int idx)
   {
-    return sqrt(mean2[idx] - mean[idx] * mean[idx]);
+    if (n[idx] == 0) return 0;
+    else return sqrt(sum2[idx] / n[idx] - pow(sum[idx] / n[idx], 2));
   }
 } // end Belle2 namespace

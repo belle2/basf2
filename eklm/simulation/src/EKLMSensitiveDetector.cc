@@ -46,6 +46,9 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   HepGeom::Point3D<double> gpos, lpos;
   G4TouchableHandle hist = aStep->GetPreStepPoint()->GetTouchableHandle();
   const G4double eDep = aStep->GetTotalEnergyDeposit();
+  /* Do not record hits without deposited energy. */
+  if (eDep <= 0)
+    return false;
   const G4Track& track = * aStep->GetTrack();
   const G4double hitTime = track.GetGlobalTime();
   /* No time cut for background studies. */

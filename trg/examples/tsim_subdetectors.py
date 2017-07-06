@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# The example of running simulation of L1 trigger
+# The example of running simulation of subdetectors trigger.
+# basf2 tsim_subdetectors.py -o outputrootfile
 
 import os
 from basf2 import *
 from simulation import add_simulation
-from L1trigger import add_tsim
+from L1trigger import add_subdetector_tsim
 from modularAnalysis import *
 
 import glob
@@ -27,17 +28,28 @@ babayaganlo.param('SearchMax', 10000)
 babayaganlo.param('VPUncertainty', True)
 main.add_module(babayaganlo)
 
-# generateY4S(10, "mixed.dec", main)
-
+# add simulation
 add_simulation(main)
 
-# add trigger
-add_tsim(main)
+# add trigger simlation of sub detectors (CDC, ECL, and bKLM are included currently)
+add_subdetector_tsim(main)
 
+branches = [
+    'EventMetaData',
+    'TRGCDC2DFinderTracks',
+    'TRGCDC2DFitterTracks',
+    'TRGCDC3DFitterTracks',
+    'TRGCDCNeuroTracks',
+    'TRGECLClusters',
+    'TRGECLClustersToTRGCDC2DFinderTracks',
+    'TRGECLClustersToTRGCDCNeuroTracks',
+    'TRGECLTrgs',
+    'TRGKLMHits',
+    'TRGKLMTracks'
+]
+branches += ['MCParticles']
 # output
-rootoutput = register_module('RootOutput')
-rootoutput.param('outputFileName', "test.root")
-main.add_module(rootoutput)
+main.add_module('RootOutput', branchNames=branches)
 
 
 # main

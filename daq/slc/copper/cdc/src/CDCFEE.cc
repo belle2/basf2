@@ -62,7 +62,6 @@ void CDCFEE::boot(RCCallback& callback, HSLB& hslb,  const DBObject& obj)
 void CDCFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
   // setting CDC control (data format, window and delay)
-  LogFile::debug("%s:%d", __FILE__, __LINE__);
   int val = 0;
   std::string mode = StringUtil::tolower(obj.getText("mode"));
   if (mode == "suppress") {
@@ -78,21 +77,17 @@ void CDCFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
     LogFile::warning("no readout");
     val = 0;
   }
-  LogFile::debug("%s:%d", __FILE__, __LINE__);
   val |= (obj("window").getInt("val") & 0xFF) << 8;
   val |= obj("delay").getInt("val") & 0xFF;
   hslb.writefee32(0x0012, val);
-  LogFile::debug("%s:%d", __FILE__, __LINE__);
 
   // setting ADC threshold
   val = obj("adcth").getInt("val") & 0xFFFF;
   hslb.writefee32(0x0013, val);
-  LogFile::debug("%s:%d", __FILE__, __LINE__);
 
   // setting DAC control
   val = obj("tdcth").getInt("val") & 0x7FFF;
   hslb.writefee32(0x0015, val);
-  LogFile::debug("%s:%d", __FILE__, __LINE__);
 
   // setting Pedestals
   const DBObjectList o_ped(obj.getObjects("ped"));

@@ -12,6 +12,7 @@
 #include <map>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <cstdio>
 #include <algorithm>
 
@@ -98,13 +99,15 @@ int main(int argc, char** argv)
           expno = records[0].getInt("expno");
           runno = records[0].getInt("runno");
         } else {
-          return 0;
+          sleep(60);
+          continue;
         }
       } catch (const DBHandlerException& e) {
         LogFile::fatal(e.what());
         return 1;
       }
 
+      /*
       try {
         for (std::vector<std::string>::const_iterator it = m_dirs.begin();
              it != m_dirs.end(); it++) {
@@ -117,8 +120,8 @@ int main(int argc, char** argv)
           if (records.size() > 0) {
             for (size_t i = 0; i < records.size(); i++) {
               std::string name = records[i].get("name");
-              int fileno = records[1].getInt("fileno");
-              std::string filepath = dir + name;
+              int fileno = records[i].getInt("fileno");
+              std::string filepath = records[i].get("path");//dir+ name;
               while (true) {
                 struct stat st;
                 stat(filepath.c_str(), &st);
@@ -127,13 +130,14 @@ int main(int argc, char** argv)
                 if ((t - st.st_mtime) > 60) {
                   std::string d = Date(st.st_mtime).toString();
                   unsigned long long chksum, nevents, size;
+                  LogFile::info("new file: %s (%s)", filepath.c_str(), d.c_str());
                   size = cal_chksum(filepath.c_str(), chksum, nevents);
                   if (fileno == 0) nevents--;
+      LogFile::info("%s nevents=%d=?%d", filepath.c_str(), records[i].getInt("nevents"), nevents);
                   db.execute("update %s set time_close='%s', chksum=%lu, nevents=%lu, size=%lu "
                              "where name='%s' and host='%s';",
                              m_table.c_str(), d.c_str(), chksum, nevents, size,
                              name.c_str(), m_host.c_str());
-                  LogFile::info("new file: %s (%s)", name.c_str(), d.c_str());
                   break;
                 } else {
                   sleep(t - st.st_mtime + 5);
@@ -146,23 +150,64 @@ int main(int argc, char** argv)
         LogFile::fatal(e.what());
         return 1;
       }
+      */
 
       try {
         for (size_t j = 0; j < m_dirs.size(); j++) {
           std::string dir = m_dirs[j] + "/storage/";
           db.execute("select * from %s where host = '%s' and time_sent is null "
-                     "and (expno <=%d or runno <= %d) and path like '%s%s' order by time_close ",
-                     m_table.c_str(), m_host.c_str(), expno, runno, dir.c_str(), "_%");
+                     "and (expno < %d or (expno = %d and runno <= %d)) and path like '%s%s' order by time_close ",
+                     m_table.c_str(), m_host.c_str(), expno, expno, runno, dir.c_str(), "_%");
           DBRecordList records(db.loadRecords());
+          struct exp_run {
+            int exp;
+            int run;
+          };
+          std::vector<exp_run> masks;
+          for (size_t i = 0; i < records.size(); i++) {
+            int expno = records[i].getInt("expno");
+            int runno = records[i].getInt("runno");
+            std::string time_close = records[i].get("time_close");
+            if (time_close.size() == 0) {
+              exp_run mask = {expno, runno};
+              masks.push_back(mask);
+            }
+          }
+          unsigned int nfiles = records.size();
+          for (size_t i = 0; i < records.size(); i++) {
+            std::string name = records[i].get("name");
+            int expno = records[i].getInt("expno");
+            int runno = records[i].getInt("runno");
+            for (size_t j = 0; j < masks.size(); j++) {
+              if (expno == masks[j].exp && runno == masks[j].run) {
+                nfiles--;
+                continue;
+              }
+            }
+          }
           std::string file = dir + m_list_send;
+          //LogFile::info("creating send list " + file);
           //std::string file = dir+StringUtil::form("%s.disk%02d", m_list_send.c_str(), j+1);
-          LogFile::info("create send list " + file);
-          if (records.size() > 0 && !File::exist(file.c_str())) {
+          if (nfiles > 0 && !File::exist(file.c_str())) {
+            LogFile::info("created send list " + file);
+            LogFile::info("select files expno==%d, runno<=%d", expno, runno);
             std::ofstream fout(file.c_str());
             for (size_t i = 0; i < records.size(); i++) {
               std::string name = records[i].get("name");
               int expno = records[i].getInt("expno");
               int runno = records[i].getInt("runno");
+              bool masked = false;
+              for (size_t j = 0; j < masks.size(); j++) {
+                if (expno == masks[j].exp && runno == masks[j].run) {
+                  masked = true;
+                }
+              }
+              if (masked) {
+                LogFile::info("Masked " + name);
+                continue;
+              }
+              std::string host = records[i].get("host");
+              std::string label = records[i].get("label");
               int fileno = records[i].getInt("fileno");
               std::string size = records[i].get("size");
               std::string nevents = records[i].get("nevents");
@@ -170,8 +215,10 @@ int main(int argc, char** argv)
               std::string s_chksum = StringUtil::form("%x", chksum);
               fout << StringUtil::form("%4.4d/%5.5d/", expno, runno) << name << "," << expno << "," << runno << "," << fileno << ","
                    << size << "," << nevents << "," << s_chksum << "" << std::endl;
-              std::cout << StringUtil::form("%4.4d/%5.5d/", expno, runno) << name << "," << expno << "," << runno << "," << fileno << ","
-                        << size << "," << nevents << "," << s_chksum << "" << std::endl;
+              std::stringstream ss;
+              ss << StringUtil::form("%4.4d/%5.5d/", expno, runno) << name << "," << expno << "," << runno << "," << fileno << ","
+                 << size << "," << nevents << "," << s_chksum << "";
+              LogFile::info(ss.str());
             }
             fout.close();
           }

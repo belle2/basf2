@@ -2,9 +2,19 @@
 # -*- coding: utf-8 -*-
 
 # Thomas Keck 2016
-#
-# Configuration classes
-#
+
+"""
+ Configuration classes
+
+ The classes defined here are used to uniquely define a FEI training.
+ Meaning:
+  - The global configuration like database prefix, cache mode, monitoring, ... (FeiConfiguration)
+  - The reconstructed Particles (Particle)
+  - The reconstructed Channels of each particle (DecayChannel)
+  - The MVA configuration for each channel (MVAConfiguration)
+  - The Cut definitions of each channel (PreCutConfiguration)
+  - The Cut definitions of each particle (PostCutConfiguration)
+"""
 
 import collections
 import copy
@@ -13,6 +23,21 @@ import typing
 
 # Define classes at top level to make them pickable
 # Creates new classs via namedtuple, which are like a struct in C
+
+FeiConfiguration = collections.namedtuple('FeiConfiguration', 'prefix, cache, b2bii, monitor, legacy, externTeacher, training')
+FeiConfiguration.__new__.__defaults__ = ('FEI_TEST', None, False, True, None, 'basf2_mva_teacher', False)
+FeiConfiguration.__doc__ = "Fei Global Configuration class"
+FeiConfiguration.prefix.__doc__ = "The database prefix used for all weightfiles"
+FeiConfiguration.cache.__doc__ = "The stage which is passed as input, it is assumed that all previous stages"\
+                                 "do not have to be reconstructed again. Can be either a number or"\
+                                 " a filename containing a pickled number or"\
+                                 " None in this case the environment variable FEI_STAGE is used."
+FeiConfiguration.b2bii.__doc__ = "If true, it is assumed that we run on converted Belle MC or data"
+FeiConfiguration.monitor.__doc__ = "If true, monitor histograms are created"
+FeiConfiguration.legacy.__doc__ = "Pass the summary file of a legacy FEI training,"\
+                                  "and the algorithm will be able to apply this training."
+FeiConfiguration.externTeacher.__doc__ = "Teacher command e.g. basf2_mva_teacher, externClusterTeacher"
+FeiConfiguration.training.__doc__ = "If you train the FEI set this to True, otherwise to False"
 
 MVAConfiguration = collections.namedtuple('MVAConfiguration', 'method, config, variables, target, sPlotVariable')
 MVAConfiguration.__new__.__defaults__ = ('FastBDT',
@@ -44,9 +69,12 @@ PostCutConfiguration.__doc__ = "PostCut configuration class. This cut is employe
 PostCutConfiguration.value.__doc__ = "Absolute value used to cut on the SignalProbability of each candidate."
 PostCutConfiguration.bestCandidateCut.__doc__ = "Number of best-candidates to keep, ranked by SignalProbability."
 
-DecayChannel = collections.namedtuple('DecayChannel', 'name, daughters, mvaConfig, preCutConfig, decayModeID')
+DecayChannel = collections.namedtuple('DecayChannel', 'name, label, decayString, daughters, mvaConfig, preCutConfig, decayModeID')
+DecayChannel.__new__.__defaults__ = (None, None, None, None, None, None, None)
 DecayChannel.__doc__ = "Decay channel of a Particle."
-DecayChannel.name.__doc__ = "DecayDescriptor of the channel e.g. D0 ==> K+ pi-"
+DecayChannel.name.__doc__ = "Name of the channel e.g. D0:generic_0"
+DecayChannel.label.__doc__ = "Label used to identify the decay channel e.g. for weightfiles independent of decayModeID"
+DecayChannel.decayString.__doc__ = "DecayDescriptor of the channel e.g. D0 ==> K+ pi-"
 DecayChannel.daughters.__doc__ = "List of daughter particles of the decay channel e.g. [K+, pi-]"
 DecayChannel.mvaConfig.__doc__ = "MVAConfiguration object which is used for this channel."
 DecayChannel.preCutConfig.__doc__ = "PreCutConfiguration object which is used for this channel."
@@ -97,6 +125,13 @@ def variables2binnings_2d(variables):
         b2 = MonitoringVariableBinning[v2] if v2 in MonitoringVariableBinning else (v2, 100, -10.0, 10.0)
         result.append(b1 + b2)
     return result
+
+
+def removeJPsiSlash(string: str) -> str:
+    """
+    Remove the / in the J/psi particle name
+    """
+    return string.replace('/', '')
 
 
 class Particle(object):
@@ -179,9 +214,12 @@ class Particle(object):
                 mvaVars += [v.format(*c) for c in itertools.combinations(list(range(0, len(daughters))), v.count('{}'))]
         mvaConfig = mvaConfig._replace(variables=mvaVars)
         # Add new channel
-        self.channels.append(DecayChannel(name=self.identifier + ' ==> ' + ' '.join(daughters),
+        decayModeID = len(self.channels)
+        self.channels.append(DecayChannel(name=self.identifier + '_' + str(decayModeID),
+                                          label=removeJPsiSlash(self.identifier + ' ==> ' + ' '.join(daughters)),
+                                          decayString=self.identifier + '_' + str(decayModeID) + ' ==> ' + ' '.join(daughters),
                                           daughters=daughters,
                                           mvaConfig=mvaConfig,
                                           preCutConfig=preCutConfig,
-                                          decayModeID=len(self.channels)))
+                                          decayModeID=decayModeID))
         return self

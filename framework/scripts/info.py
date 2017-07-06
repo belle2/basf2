@@ -56,6 +56,7 @@ for var in ["RELEASE", "RELEASE_DIR", "LOCAL_DIR", "SUBDIR", "EXTERNALS_VERSION"
     name = "BELLE2_" + var
     print((name + ":").ljust(25), os.environ.get(name, ''))
 
+print('Default global tags:'.ljust(25), get_default_global_tags())
 print('Kernel version:'.ljust(25), os.uname()[2])
 python_version = sys.version_info[:3]
 print('Python version:'.ljust(25), '.'.join(str(ver) for ver in python_version))

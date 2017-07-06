@@ -80,6 +80,8 @@ namespace Belle2 {
     bool m_subtractOffset;             /**< if true, subtract offset of nominal TDC */
     double m_pedestalRMS;              /**< r.m.s of pedestals [ADC counts] */
     double m_maxPulseWidth;            /**< max pulse width to set digit as good [ns] */
+    unsigned m_storageDepth;           /**< ASIC analog storage depth */
+    int m_lookBackWindows;             /**< number of "look back" windows */
 
     int m_calibrationChannel;   /**< ASIC channel number with calibration pulse */
     double m_calpulseWidthMin;  /**< minimal width of calibration pulse */

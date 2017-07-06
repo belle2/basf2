@@ -44,24 +44,8 @@ using namespace Belle2;
 const unsigned long long GB = 1000 * 1024 * 1024;
 const unsigned long long MAX_FILE_SIZE = 2 * GB;
 const char* g_table = "datafiles";
-
-std::string popen(const std::string& cmd)
-{
-  char buf[1000];
-  FILE* fp;
-  if ((fp = ::popen(cmd.c_str(), "r")) == NULL) {
-    perror("can not exec commad");
-    exit(EXIT_FAILURE);
-  }
-  std::stringstream ss;
-  while (!feof(fp)) {
-    memset(buf, 0, 1000);
-    fgets(buf, sizeof(buf), fp);
-    ss << buf << std::endl;
-  }
-  pclose(fp);
-  return ss.str();
-}
+unsigned int g_streamersize = 0;
+char* g_streamerinfo = new char[1000000];
 
 class FileHandler {
 
@@ -131,8 +115,8 @@ public:
     std::string filedir = dir + StringUtil::form("%02d/storage/%4.4d/%5.5d/",
                                                  m_diskid, expno, runno);
     system(("mkdir -p " + filedir).c_str());
-    m_filename = StringUtil::form("%s.%4.4d.%5.5d.sroot", m_runtype.c_str(), expno, runno)
-                 + ((m_fileid > 0) ? StringUtil::form("-%d", m_fileid) : "");
+    m_filename = StringUtil::form("%s.%s.%4.4d.%5.5d.f%5.5d.sroot", m_host.c_str(),
+                                  m_runtype.c_str(), expno, runno, m_fileid);
     m_path = filedir + m_filename;
     m_file = ::open(m_path.c_str(),  O_WRONLY | O_CREAT | O_EXCL, 0664);
     if (m_file < 0) {
@@ -141,14 +125,16 @@ public:
     }
     try {
       m_db->connect();
-      m_db->execute("insert into %s (name, path, host, label, expno, runno, fileno) "
-                    "values ('%s', '%s', '%s', '%s', %d, %d, %d);",
+      m_db->execute("insert into %s (name, path, host, label, expno, runno, fileno, nevents, chksum, size) "
+                    "values ('%s', '%s', '%s', '%s', %d, %d, %d, 0, 0, 0);",
                     g_table, m_filename.c_str(), m_path.c_str(), m_host.c_str(),
                     m_runtype.c_str(), m_expno, m_runno, m_fileid);
     } catch (const DBHandlerException& e) {
       B2WARNING(e.what());
     }
-    std::cout << "[DEBUG] New file " << m_path << " is opened" << std::endl;
+    write(g_streamerinfo, g_streamersize, true);
+    B2INFO("New file " << m_path << " is opened");
+
     return m_id;
   }
 
@@ -174,11 +160,13 @@ public:
     }
   }
 
-  int write(char* evtbuf, int nbyte)
+  int write(char* evtbuf, int nbyte, bool isstreamer = false)
   {
     int ret = ::write(m_file, evtbuf, nbyte);
     m_filesize += nbyte;
-    m_nevents++;
+    if (!isstreamer) {
+      m_nevents++;
+    }
     m_chksum = adler32(m_chksum, (unsigned char*)evtbuf, nbyte);
     return ret;
   }
@@ -294,8 +282,12 @@ int main(int argc, char** argv)
       if (file) {
         file.close();
       }
+      memcpy(g_streamerinfo, evtbuf, nbyte);
+      g_streamersize = nbyte;
       file.open(path, ndisks, expno, runno, fileid);
+      nbyte_out += nbyte;
       fileid++;
+      continue;
     }
     if (use_info) {
       info.addInputCount(1);

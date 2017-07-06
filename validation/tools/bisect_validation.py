@@ -1,2 +1,2 @@
 #!/bin/bash
-validation_bisect "$@"
+b2validation-bisect "$@"

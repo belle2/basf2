@@ -121,9 +121,9 @@ namespace Belle2 {
     std::vector<TH1F*> m_channelGoodHits; /**< Histograms for good channel hits per module*/
     std::vector<TH1F*> m_channelBadHits; /**< Histograms for bad channel hits per module*/
     std::vector<TH1F*> m_channelParticleHits; /**< Histograms for particle channel hits per module*/
-    std::vector<TH1F*> m_hitQuality; /**< Histograms for hit quality per module*/
-    std::vector<TH2F*> m_allHitsXy; /**< Histograms (2D) for channel hits per module*/
-    std::vector<TH2F*> m_laserHitsXy; /**< Histograms (2D) for laser channel hits per module*/
+    std::vector<TH1F*> m_hitFlag; /**< Histograms for hit flag per module*/
+    std::vector<TH2F*> m_allHitsXY; /**< Histograms (2D) for channel hits per module*/
+    std::vector<TH2F*> m_laserHitsXY; /**< Histograms (2D) for laser channel hits per module*/
     std::vector<TH1F*> m_allAdc; /**< Histograms for ADC distribution per module*/
     std::vector<TH2F*> m_allAdcMean; /**< Histograms (2D) for ADC mean distribution per module*/
     std::vector<TH2F*> m_allAdcRMS; /**< Histograms (2D) for ADC RMS distribution per module*/

@@ -120,10 +120,10 @@ namespace Belle2 {
       string title1 = str(format("Number of laser hits in x-y for module #%1%") % (module));
       TH2F* h1 = new TH2F(name1.c_str(), title1.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
       h1->SetOption("LIVE");
-      m_laserHitsXy.push_back(h1);
+      m_laserHitsXY.push_back(h1);
       if (m_verbose == 1) { // in verbose mode
         TH2F* h = new TH2F(name.c_str(), title.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
-        m_allHitsXy.push_back(h);
+        m_allHitsXY.push_back(h);
       }
     }
     for (int i = 0; i < m_numModules; i++) {
@@ -175,7 +175,7 @@ namespace Belle2 {
         string name = str(format("hit_quality_%1%") % (module));
         string title = str(format("Hit quality of module #%1%") % (module));
         TH1F* h = new TH1F(name.c_str(), title.c_str(), 8, 0.5, 8.5);
-        m_hitQuality.push_back(h);
+        m_hitFlag.push_back(h);
       }
 
       for (int i = 0; i < m_numModules; i++) {
@@ -275,7 +275,7 @@ namespace Belle2 {
         m_allHits->Fill(digit.getModuleID());
         m_channelAllHits[i]->Fill(digit.getPixelID());
         m_allAdc[i]->Fill(digit.getPulseHeight());
-        double nhits = m_allHitsXy[i]->GetBinContent(col, row);
+        double nhits = m_allHitsXY[i]->GetBinContent(col, row);
         double adc_mean = m_allAdcMean[i]->GetBinContent(col, row);
         double adc_rms = m_allAdcRMS[i]->GetBinContent(col, row);
         double adc_mean2 = adc_rms * adc_rms + adc_mean * adc_mean;
@@ -292,7 +292,7 @@ namespace Belle2 {
         m_allAdcRMS[i]->SetBinContent(col, row, sqrt(adc_mean2 - adc_mean * adc_mean));
         m_allTdcMean[i]->SetBinContent(col, row, tdc_mean);
         m_allTdcRMS[i]->SetBinContent(col, row, sqrt(tdc_mean2 - tdc_mean * tdc_mean));
-        m_allHitsXy[i]->Fill(col, row);
+        m_allHitsXY[i]->Fill(col, row);
         int flag = flagHit(digit);
         if (flag == 0) { // good hit
           m_goodHits->Fill(digit.getModuleID());
@@ -300,7 +300,7 @@ namespace Belle2 {
         } else { // bad hit
           m_badHits->Fill(digit.getModuleID());
           m_channelBadHits[i]->Fill(digit.getPixelID());
-          m_hitQuality[i]->Fill(flag);
+          m_hitFlag[i]->Fill(flag);
         }
       }
 
@@ -326,7 +326,7 @@ namespace Belle2 {
       } else if (isCal[i] == 0 && digit_tdc > m_TDCLaserLow && digit_tdc < m_TDCLaserHigh) { // laser hits
         m_laserHits->Fill(moduleHit[i]);
         laser_hit[moduleHit[i] - 1]++;
-        m_laserHitsXy[moduleHit[i] - 1]->Fill(colHit[i], rowHit[i]);
+        m_laserHitsXY[moduleHit[i] - 1]->Fill(colHit[i], rowHit[i]);
       } else if (isCal[i] == 1) { // cal hits
         m_calHits->Fill(moduleHit[i]);
         cal_hit[moduleHit[i] - 1]++;

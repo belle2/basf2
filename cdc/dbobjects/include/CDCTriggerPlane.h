@@ -27,21 +27,32 @@ namespace Belle2 {
      */
     CDCTriggerPlane() {}
 
+    /**
+     * Getter for the center posotion of the trigger plane.
+     */
     const TVector3& getTriggerPosition() const
     {
       return m_position;
     }
-
+    /**
+     * Getter for the normal vector to the trigger plane.
+     */
     const TVector3& getTriggerDirection() const
     {
       return m_direction;
     }
 
+    /**
+     * Getter for the pmt position.
+     */
     const TVector3& getPmtPosition() const
     {
       return m_pmtPosition;
     }
 
+    /**
+     * Getter for the light speed in the scintillator.
+     */
     double getLightPropSpeed() const
     {
       return m_lightPropSpeed;

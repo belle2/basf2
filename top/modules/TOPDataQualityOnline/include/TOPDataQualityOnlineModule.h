@@ -24,6 +24,7 @@
 #include <vector>
 #include <deque>
 #include <utility>
+#include <top/modules/TOPDataQualityOnline/TOPDQStat.h>
 
 namespace Belle2 {
   /**
@@ -129,6 +130,11 @@ namespace Belle2 {
     std::vector<TH1F*> m_all_TDC; /**< Histograms for TDC distribution per module*/
     std::vector<TH2F*> m_all_TDC_mean; /**< Histograms (2D) for TDC mean distribution per module*/
     std::vector<TH2F*> m_all_TDC_RMS; /**< Histograms (2D) for TDC RMS distribution per module*/
+
+    TOPDQStat m_particle_hits_counter; /**< counter for particle hits */
+    TOPDQStat m_laser_hits_counter; /**< counter for lawer hits */
+    TOPDQStat m_cal_hits_counter; /**< counter for calibration hits */
+    TOPDQStat m_other_hits_counter; /**< counter for other hits */
   };
 
 } //namespace Belle2

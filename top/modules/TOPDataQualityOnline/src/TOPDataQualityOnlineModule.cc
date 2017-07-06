@@ -29,7 +29,8 @@ namespace Belle2 {
   using namespace TOP;
   REG_MODULE(TOPDataQualityOnline)
 
-  TOPDataQualityOnlineModule::TOPDataQualityOnlineModule() : HistoModule(), m_iEvent(0)
+  TOPDataQualityOnlineModule::TOPDataQualityOnlineModule() : HistoModule(), m_iEvent(0), m_particle_hits_counter(16),
+    m_laser_hits_counter(16), m_cal_hits_counter(16), m_other_hits_counter(16)
   {
     setDescription("TOP online monitoring module");
     setPropertyFlags(c_ParallelProcessingCertified);
@@ -60,56 +61,6 @@ namespace Belle2 {
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_numModules = geo->getNumModules();
 
-    if (m_verbose == 1) { // in verbose mode
-      m_all_hits = new TH1F("all_hits", "Number of all hits per bar", m_numModules, 0.5, m_numModules + 0.5);
-      m_good_hits = new TH1F("good_hits", "Number of good hits per bar", m_numModules, 0.5, m_numModules + 0.5);
-      m_bad_hits = new TH1F("bad_hits", "Number of bad hits per bar", m_numModules, 0.5, m_numModules + 0.5);
-      m_good_hits_mean = new TH1F("good_hits_mean", "Mean of number of good hits per bar", m_numModules, 0.5, m_numModules + 0.5);
-      m_bad_hits_mean = new TH1F("bad_hits_mean", "Mean of number of bad hits per bar", m_numModules, 0.5, m_numModules + 0.5);
-      m_good_hits_rms = new TH1F("good_hits_rms", "RMS of number of good hits per bar", m_numModules, 0.5, m_numModules + 0.5);
-      m_bad_hits_rms = new TH1F("bad_hits_rms", "RMS of number of bad hits per bar", m_numModules, 0.5, m_numModules + 0.5);
-
-      for (int i = 0; i < m_numModules; i++) {
-        int module = i + 1;
-        string name = str(format("all_hits_%1%") % (module));
-        string title = str(format("Number of all hits per event of module #%1%") % (module));
-        string name1 = str(format("good_hits_%1%") % (module));
-        string title1 = str(format("Number of good hits per event of module #%1%") % (module));
-        string name2 = str(format("bad_hits_%1%") % (module));
-        string title2 = str(format("Number of bad hits per event of module #%1%") % (module));
-        TH1F* h = new TH1F(name.c_str(), title.c_str(), 200, 0, 400);
-        TH1F* h1 = new TH1F(name1.c_str(), title1.c_str(), 200, 0, 400);
-        TH1F* h2 = new TH1F(name2.c_str(), title2.c_str(), 200, 0, 400);
-        m_slot_all_hits.push_back(h);
-        m_slot_good_hits.push_back(h1);
-        m_slot_bad_hits.push_back(h2);
-      }
-
-      for (int i = 0; i < m_numModules; i++) {
-        int module = i + 1;
-        string name = str(format("hit_quality_%1%") % (module));
-        string title = str(format("Hit quality of module #%1%") % (module));
-        TH1F* h = new TH1F(name.c_str(), title.c_str(), 8, 0.5, 8.5);
-        m_hit_quality.push_back(h);
-      }
-
-      for (int i = 0; i < m_numModules; i++) {
-        int module = i + 1;
-        string name = str(format("all_ADC_%1%") % (module));
-        string title = str(format("ADC distribution for module #%1%") % (module));
-        string name1 = str(format("all_ADC_mean_%1%") % (module));
-        string title1 = str(format("ADC mean distribution for module #%1%") % (module));
-        string name2 = str(format("all_ADC_RMS_%1%") % (module));
-        string title2 = str(format("ADC RMS distribution for module #%1%") % (module));
-        TH1F* h = new TH1F(name.c_str(), title.c_str(), 1000, 0.5, 1000.5);
-        TH2F* h1 = new TH2F(name1.c_str(), title1.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
-        TH2F* h2 = new TH2F(name2.c_str(), title2.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
-        m_all_ADC.push_back(h);
-        m_all_ADC_mean.push_back(h1);
-        m_all_ADC_RMS.push_back(h2);
-      }
-    }
-
     m_particle_hits = new TH1F("particle_hits", "Number of particle hits per bar", m_numModules, 0.5, m_numModules + 0.5);
     m_laser_hits = new TH1F("laser_hits", "Number of laser hits per bar", m_numModules, 0.5, m_numModules + 0.5);
     m_cal_hits = new TH1F("cal_hits", "Number of cal hits per bar", m_numModules, 0.5, m_numModules + 0.5);
@@ -139,25 +90,6 @@ namespace Belle2 {
     m_cal_hits_rms->SetOption("LIVE");
     m_other_hits_rms->SetOption("LIVE");
 
-    for (int i = 0; i < m_numModules; i++) {
-      int module = i + 1;
-      string name = str(format("particle_hits_%1%") % (module));
-      string title = str(format("Number of particle hits per event of module #%1%") % (module));
-      string name1 = str(format("laser_hits_%1%") % (module));
-      string title1 = str(format("Number of laser hits per event of module #%1%") % (module));
-      string name2 = str(format("cal_hits_%1%") % (module));
-      string title2 = str(format("Number of cal hits per event of module #%1%") % (module));
-      string name3 = str(format("other_hits_%1%") % (module));
-      string title3 = str(format("Number of other hits per event of module #%1%") % (module));
-      TH1F* h = new TH1F(name.c_str(), title.c_str(), 200, 0, 400);
-      TH1F* h1 = new TH1F(name1.c_str(), title1.c_str(), 200, 0, 400);
-      TH1F* h2 = new TH1F(name2.c_str(), title2.c_str(), 200, 0, 400);
-      TH1F* h3 = new TH1F(name3.c_str(), title3.c_str(), 200, 0, 400);
-      m_slot_particle_hits.push_back(h);
-      m_slot_laser_hits.push_back(h1);
-      m_slot_cal_hits.push_back(h2);
-      m_slot_other_hits.push_back(h3);
-    }
     for (int i = 0; i < m_numModules; i++) {
       int module = i + 1;
       string name = str(format("all_channel_hits_%1%") % (module));
@@ -212,6 +144,76 @@ namespace Belle2 {
         m_all_TDC_RMS.push_back(h2);
       }
     }
+
+    if (m_verbose == 1) { // in verbose mode
+      m_all_hits = new TH1F("all_hits", "Number of all hits per bar", m_numModules, 0.5, m_numModules + 0.5);
+      m_good_hits = new TH1F("good_hits", "Number of good hits per bar", m_numModules, 0.5, m_numModules + 0.5);
+      m_bad_hits = new TH1F("bad_hits", "Number of bad hits per bar", m_numModules, 0.5, m_numModules + 0.5);
+      m_good_hits_mean = new TH1F("good_hits_mean", "Mean of number of good hits per bar", m_numModules, 0.5, m_numModules + 0.5);
+      m_bad_hits_mean = new TH1F("bad_hits_mean", "Mean of number of bad hits per bar", m_numModules, 0.5, m_numModules + 0.5);
+      m_good_hits_rms = new TH1F("good_hits_rms", "RMS of number of good hits per bar", m_numModules, 0.5, m_numModules + 0.5);
+      m_bad_hits_rms = new TH1F("bad_hits_rms", "RMS of number of bad hits per bar", m_numModules, 0.5, m_numModules + 0.5);
+
+      for (int i = 0; i < m_numModules; i++) {
+        int module = i + 1;
+        string name = str(format("all_hits_%1%") % (module));
+        string title = str(format("Number of all hits per event of module #%1%") % (module));
+        string name1 = str(format("good_hits_%1%") % (module));
+        string title1 = str(format("Number of good hits per event of module #%1%") % (module));
+        string name2 = str(format("bad_hits_%1%") % (module));
+        string title2 = str(format("Number of bad hits per event of module #%1%") % (module));
+        TH1F* h = new TH1F(name.c_str(), title.c_str(), 200, 0, 400);
+        TH1F* h1 = new TH1F(name1.c_str(), title1.c_str(), 200, 0, 400);
+        TH1F* h2 = new TH1F(name2.c_str(), title2.c_str(), 200, 0, 400);
+        m_slot_all_hits.push_back(h);
+        m_slot_good_hits.push_back(h1);
+        m_slot_bad_hits.push_back(h2);
+      }
+
+      for (int i = 0; i < m_numModules; i++) {
+        int module = i + 1;
+        string name = str(format("hit_quality_%1%") % (module));
+        string title = str(format("Hit quality of module #%1%") % (module));
+        TH1F* h = new TH1F(name.c_str(), title.c_str(), 8, 0.5, 8.5);
+        m_hit_quality.push_back(h);
+      }
+
+      for (int i = 0; i < m_numModules; i++) {
+        int module = i + 1;
+        string name = str(format("all_ADC_%1%") % (module));
+        string title = str(format("ADC distribution for module #%1%") % (module));
+        string name1 = str(format("all_ADC_mean_%1%") % (module));
+        string title1 = str(format("ADC mean distribution for module #%1%") % (module));
+        string name2 = str(format("all_ADC_RMS_%1%") % (module));
+        string title2 = str(format("ADC RMS distribution for module #%1%") % (module));
+        TH1F* h = new TH1F(name.c_str(), title.c_str(), 1000, 0.5, 1000.5);
+        TH2F* h1 = new TH2F(name1.c_str(), title1.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
+        TH2F* h2 = new TH2F(name2.c_str(), title2.c_str(), 64, 0.5, 64.5, 8, 0.5, 8.5);
+        m_all_ADC.push_back(h);
+        m_all_ADC_mean.push_back(h1);
+        m_all_ADC_RMS.push_back(h2);
+      }
+      for (int i = 0; i < m_numModules; i++) {
+        int module = i + 1;
+        string name = str(format("particle_hits_%1%") % (module));
+        string title = str(format("Number of particle hits per event of module #%1%") % (module));
+        string name1 = str(format("laser_hits_%1%") % (module));
+        string title1 = str(format("Number of laser hits per event of module #%1%") % (module));
+        string name2 = str(format("cal_hits_%1%") % (module));
+        string title2 = str(format("Number of cal hits per event of module #%1%") % (module));
+        string name3 = str(format("other_hits_%1%") % (module));
+        string title3 = str(format("Number of other hits per event of module #%1%") % (module));
+        TH1F* h = new TH1F(name.c_str(), title.c_str(), 200, 0, 400);
+        TH1F* h1 = new TH1F(name1.c_str(), title1.c_str(), 200, 0, 400);
+        TH1F* h2 = new TH1F(name2.c_str(), title2.c_str(), 200, 0, 400);
+        TH1F* h3 = new TH1F(name3.c_str(), title3.c_str(), 200, 0, 400);
+        m_slot_particle_hits.push_back(h);
+        m_slot_laser_hits.push_back(h1);
+        m_slot_cal_hits.push_back(h2);
+        m_slot_other_hits.push_back(h3);
+      }
+    }
+
     oldDir->cd();
   }
 
@@ -238,14 +240,12 @@ namespace Belle2 {
     StoreArray<TOPDigit> digits;
     vector<int> all_hit(m_numModules, 0), good_hit(m_numModules, 0), bad_hit(m_numModules, 0);
     vector<int> particle_hit(m_numModules, 0), laser_hit(m_numModules, 0), cal_hit(m_numModules, 0), other_hit(m_numModules, 0);
+
     int m_nhits = 0;
     map<int, double> refTdcMap;
-    vector<int> pixelHit;
-    vector<int> moduleHit;
-    vector<int> colHit;
-    vector<int> rowHit;
+    vector<int> pixelHit, moduleHit, colHit, rowHit, isCal;
     vector<double> rawTimeHit;
-    vector<int> isCal;
+
     for (const auto& digit : digits) {
       int i = digit.getModuleID() - 1;
       int col = digit.getPixelCol();
@@ -335,33 +335,36 @@ namespace Belle2 {
         other_hit[moduleHit[i] - 1]++;
       }
     }
-    m_iEvent++;
     for (int i = 0; i < m_numModules; i++) {
       if (m_verbose == 1) { // in verbose mode
         if (all_hit[i] > 0) m_slot_all_hits[i]->Fill(all_hit[i]);
         if (good_hit[i] > 0) m_slot_good_hits[i]->Fill(good_hit[i]);
         if (bad_hit[i] > 0) m_slot_bad_hits[i]->Fill(bad_hit[i]);
+        if (particle_hit[i] > 0) m_slot_particle_hits[i]->Fill(particle_hit[i]);
+        if (laser_hit[i] > 0) m_slot_laser_hits[i]->Fill(laser_hit[i]);
+        if (cal_hit[i] > 0) m_slot_cal_hits[i]->Fill(cal_hit[i]);
+        if (other_hit[i] > 0) m_slot_other_hits[i]->Fill(other_hit[i]);
         m_good_hits_mean->SetBinContent(i + 1, m_slot_good_hits[i]->GetMean());
         m_bad_hits_mean->SetBinContent(i + 1, m_slot_bad_hits[i]->GetMean());
-
         m_good_hits_rms->SetBinContent(i + 1, m_slot_good_hits[i]->GetRMS());
         m_bad_hits_rms->SetBinContent(i + 1, m_slot_bad_hits[i]->GetRMS());
       }
-      if (particle_hit[i] > 0) m_slot_particle_hits[i]->Fill(particle_hit[i]);
-      if (laser_hit[i] > 0) m_slot_laser_hits[i]->Fill(laser_hit[i]);
-      if (cal_hit[i] > 0) m_slot_cal_hits[i]->Fill(cal_hit[i]);
-      if (other_hit[i] > 0) m_slot_other_hits[i]->Fill(other_hit[i]);
+      if (particle_hit[i] > 0) m_particle_hits_counter.Add(i, particle_hit[i]);
+      if (laser_hit[i] > 0) m_laser_hits_counter.Add(i, laser_hit[i]);
+      if (cal_hit[i] > 0) m_cal_hits_counter.Add(i, cal_hit[i]);
+      if (other_hit[i] > 0) m_other_hits_counter.Add(i, other_hit[i]);
 
-      m_particle_hits_mean->SetBinContent(i + 1, m_slot_particle_hits[i]->GetMean());
-      m_laser_hits_mean->SetBinContent(i + 1, m_slot_laser_hits[i]->GetMean());
-      m_cal_hits_mean->SetBinContent(i + 1, m_slot_cal_hits[i]->GetMean());
-      m_other_hits_mean->SetBinContent(i + 1, m_slot_other_hits[i]->GetMean());
+      m_particle_hits_mean->SetBinContent(i + 1, m_particle_hits_counter.GetMean(i));
+      m_laser_hits_mean->SetBinContent(i + 1, m_laser_hits_counter.GetMean(i));
+      m_cal_hits_mean->SetBinContent(i + 1, m_cal_hits_counter.GetMean(i));
+      m_other_hits_mean->SetBinContent(i + 1, m_other_hits_counter.GetMean(i));
 
-      m_particle_hits_rms->SetBinContent(i + 1, m_slot_particle_hits[i]->GetRMS());
-      m_laser_hits_rms->SetBinContent(i + 1, m_slot_laser_hits[i]->GetRMS());
-      m_cal_hits_rms->SetBinContent(i + 1, m_slot_cal_hits[i]->GetRMS());
-      m_other_hits_rms->SetBinContent(i + 1, m_slot_other_hits[i]->GetRMS());
+      m_particle_hits_rms->SetBinContent(i + 1, m_particle_hits_counter.GetRMS(i));
+      m_laser_hits_rms->SetBinContent(i + 1, m_laser_hits_counter.GetRMS(i));
+      m_cal_hits_rms->SetBinContent(i + 1, m_cal_hits_counter.GetRMS(i));
+      m_other_hits_rms->SetBinContent(i + 1, m_other_hits_counter.GetRMS(i));
     }
+    m_iEvent++;
     return;
   }
 

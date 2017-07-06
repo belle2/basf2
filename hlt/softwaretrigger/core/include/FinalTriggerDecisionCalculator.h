@@ -23,6 +23,14 @@ namespace Belle2 {
        * * reject if fast_reco or HLT rejected the event
        */
       static bool getFinalTriggerDecision(const SoftwareTriggerResult& result);
+
+      /**
+       * Calculate the "total_result" for a given base identifier by looping through all results with the given
+       * base identifier. The result of the function then depends on the setting of accept overrides
+       * reject. Please see the SoftwareTriggerModule description, for more information.
+       */
+      static SoftwareTriggerCutResult getModuleResult(const SoftwareTriggerResult& result, const std::string& baseIdentifier,
+                                                      bool acceptOverridesReject);
     };
   }
 }

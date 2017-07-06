@@ -141,42 +141,23 @@ void SoftwareTriggerModule::initializeDebugOutput()
 
 void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject)
 {
-  bool hasOneAcceptCut = false;
-  bool hasOneRejectCut = false;
-
+  // Check all cuts with the prefilled object and write them back into the data store.
   for (const auto& cutWithName : m_dbHandler->getCutsWithNames()) {
     const std::string& cutIdentifier = cutWithName.first;
     const auto& cut = cutWithName.second;
     B2DEBUG(100, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << ")");
     const SoftwareTriggerCutResult& cutResult = cut->checkPreScaled(prefilledObject);
     m_resultStoreObjectPointer->addResult(cutIdentifier, cutResult);
-
-    if (cutResult == SoftwareTriggerCutResult::c_accept) {
-      hasOneAcceptCut = true;
-    } else if (cutResult == SoftwareTriggerCutResult::c_reject) {
-      hasOneRejectCut = true;
-    }
   }
 
-  SoftwareTriggerCutResult moduleResult;
-
-  if (m_dbHandler->getAcceptOverridesReject()) {
-    if (hasOneAcceptCut or (not hasOneRejectCut)) {
-      moduleResult = SoftwareTriggerCutResult::c_accept;
-    } else {
-      moduleResult = SoftwareTriggerCutResult::c_reject;
-    }
-  } else {
-    if (hasOneAcceptCut and (not hasOneRejectCut)) {
-      moduleResult = SoftwareTriggerCutResult::c_accept;
-    } else {
-      moduleResult = SoftwareTriggerCutResult::c_reject;
-    }
-  }
-
+  // Also add the module result ( = the result of all cuts with this basename) for later reference.
+  const SoftwareTriggerCutResult& moduleResult =
+    FinalTriggerDecisionCalculator::getModuleResult(*m_resultStoreObjectPointer, m_param_baseIdentifier,
+                                                    m_dbHandler->getAcceptOverridesReject());
   const std::string& totalResultIdentifier = SoftwareTriggerDBHandler::makeTotalCutName(m_param_baseIdentifier);
   m_resultStoreObjectPointer->addResult(totalResultIdentifier, moduleResult);
 
+  // Return the trigger decision up to here
   bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
   setReturnValue(totalResult);
 }

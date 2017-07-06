@@ -109,9 +109,9 @@ void CDCCosmicSelectorAfterFullSimModule::event()
              (zi4cry - vZ0)); // fl to y=0 plane
     */
 
-    //try to calculate cdc hit with y_up and y_dn
-    double y_up = 9999.;
-    double y_dn = -9999.;
+    //try to calculate cdc hit with tof_up and tof_dn
+    double tof_up = -9999.;
+    double tof_dn =  9999.;
     double ihit_up = -1;
     double ihit_dn = -1;
     RelationIndex<MCParticle, CDCSimHit> mcp_to_hit(mcParticles, simHits);
@@ -123,14 +123,16 @@ void CDCCosmicSelectorAfterFullSimModule::event()
       for (const RelationElement& rel : mcp_to_hit.getElementsTo(simHits[iHit])) {
         //  std::cout <<"iHit,iMCP,rfromindex= " << iHit <<" "<< iMCP <<" "<< rel.from->getIndex()-1 << std::endl;
         if ((rel.from->getIndex() - 1) != iMCP) continue;
-        double y = simHits[iHit]->getPosTrack().Y();
+        const double y = simHits[iHit]->getPosTrack().Y();
+        const double tof = simHits[iHit]->getFlightTime();
+        const double py = simHits[iHit]->getMomentum().Y();
         //  std::cout <<"y= " << y << std::endl;
-        if (y > 0. && y < y_up) {
-          y_up = y;
+        if (y > 0. && py < 0. && tof > tof_up) {
+          tof_up = tof;
           ihit_up = iHit;
         }
-        if (y < 0. && y > y_dn) {
-          y_dn = y;
+        if (y < 0. && py < 0. && tof < tof_dn) {
+          tof_dn = tof;
           ihit_dn = iHit;
         }
       }
@@ -144,8 +146,7 @@ void CDCCosmicSelectorAfterFullSimModule::event()
     const TVector3 pos_dn = simHits[ihit_dn]->getPosTrack();
     const TVector3 mom_up = simHits[ihit_up]->getMomentum();
     const TVector3 mom_dn = simHits[ihit_dn]->getMomentum();
-    const double tof_up   = simHits[ihit_up]->getFlightTime();
-    const double tof_dn   = simHits[ihit_dn]->getFlightTime();
+    //    std::cout <<"tof_up,tof_dn= " << tof_up <<" "<< tof_dn << std::endl;
 
     const TVector3 mom_mean = 0.5 * (mom_up + mom_dn);
     const TVector3 dpos = pos_dn - pos_up;

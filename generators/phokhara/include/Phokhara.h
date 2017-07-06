@@ -106,6 +106,13 @@ namespace Belle2 {
      */
     void setm_MinInvMassHadrons(double MinInvMassHadrons) { m_MinInvMassHadrons = MinInvMassHadrons; }
 
+    /** Sets whether to force the minimal invariant mass squared cut.
+     *  This cut is ignored by PHOKHARA with LO = 1, NLO = 1.
+     * @param[in] forceMinInvMassHadronsCut Whether to force the cut or not.
+     */
+    void setForceMinInvMassHadronsCut(bool forceMinInvMassHadronsCut)
+    { m_ForceMinInvMassHadronsCut = forceMinInvMassHadronsCut; }
+
     /** Sets the maximal inv. mass squared of the hadrons(muons)
      * @param MaxInvMassHadrons maximal inv. mass squared of the hadrons(muons) in [GeV^2].
      */
@@ -199,6 +206,7 @@ namespace Belle2 {
     std::pair<double, double> m_ScatteringAngleRangeFinalStates; /**< Minimal/Maximal pions(muons,nucleons,kaons) momentum angle. */
     double m_MinInvMassHadronsGamma; /**< minimum mass of the hadron-gamma system [GeV^2] */
     double m_MinInvMassHadrons; /**< minimum mass of the hadron system [GeV^2] */
+    bool m_ForceMinInvMassHadronsCut; /**< Force application of the above cut. */
     double m_MaxInvMassHadrons; /**< maximum mass of the hadron system [GeV^2] */
     double m_MinEnergyGamma; /**< minimum gamma energy [GeV] */
 

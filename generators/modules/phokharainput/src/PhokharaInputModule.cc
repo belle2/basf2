@@ -70,6 +70,10 @@ PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters:
 
   addParam("MinInvMassHadronsGamma", m_MinInvMassHadronsGamma, "Minimal hadrons/muons-gamma invariant mass squared [GeV^2]", 0.0);
   addParam("MinInvMassHadrons", m_MinInvMassHadrons, "Minimal hadrons/muons invariant mass squared [GeV^2]", 0.2);
+  addParam("ForceMinInvMassHadronsCut", m_ForceMinInvMassHadronsCut,
+           "Force application of the MinInvMassHadrons cut "
+           "It is ignored by PHOKHARA with LO = 1, NLO = 1.",
+           false);
   addParam("MaxInvMassHadrons", m_MaxInvMassHadrons, "Maximal hadrons/muons invariant mass squared [GeV^2]", 0.5);
   addParam("MinEnergyGamma", m_MinEnergyGamma, "Minimal photon energy/missing energy, >0.01 CMS energy [GeV]", 5.0);
 
@@ -165,6 +169,7 @@ void PhokharaInputModule::initializeGenerator()
 
   m_generator.setMinInvMassHadronsGamma(m_MinInvMassHadronsGamma);
   m_generator.setm_MinInvMassHadrons(m_MinInvMassHadrons);
+  m_generator.setForceMinInvMassHadronsCut(m_ForceMinInvMassHadronsCut);
   m_generator.setm_MaxInvMassHadrons(m_MaxInvMassHadrons);
   m_generator.setMinEnergyGamma(m_MinEnergyGamma);
   m_generator.setScatteringAngleRangePhoton(vectorToPair(m_ScatteringAngleRangePhoton, "ScatteringAngleRangePhoton"));

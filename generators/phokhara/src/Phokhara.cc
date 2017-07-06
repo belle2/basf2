@@ -122,6 +122,7 @@ void Phokhara::setDefaultSettings()
 
   m_cmsEnergy = 0.0;
   m_finalState = -1;
+  m_replaceMuonsByVirtualPhoton = false;
   m_nMaxTrials = -1;
   m_nSearchMax = -1;
   m_epsilon = 1.e-4;
@@ -139,6 +140,7 @@ void Phokhara::setDefaultSettings()
   m_ScatteringAngleRangeFinalStates = make_pair(0.0, 180.0); //in [deg]
   m_MinInvMassHadronsGamma = -1;
   m_MinInvMassHadrons = 0.;
+  m_ForceMinInvMassHadronsCut = false;
   m_MaxInvMassHadrons = 0.;
   m_MinEnergyGamma = 0.;
 
@@ -174,7 +176,21 @@ void Phokhara::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentz
 
   //Generate event
   int mode = 1;
-  phokhara_(&mode, m_xpar, m_npar);
+  if (m_ForceMinInvMassHadronsCut) {
+    while (1) {
+      phokhara_(&mode, m_xpar, m_npar);
+      double partMom[4] = {0, 0, 0, 0};
+      for (int iPart = 0; iPart < momset_.bnhad; ++iPart) {
+        for (int j = 0; j < 4; ++j)
+          partMom[j] += momset_.bp2[j][iPart];
+      }
+      double m2 = partMom[0] * partMom[0] - partMom[1] * partMom[1]
+                  - partMom[2] * partMom[2] - partMom[3] * partMom[3];
+      if (m2 > m_MinInvMassHadrons)
+        break;
+    }
+  } else
+    phokhara_(&mode, m_xpar, m_npar);
 
   //Store the initial particles as virtual particles into the MCParticleGraph
   double eMom[4] = {momset_.bp1[1], momset_.bp1[2], momset_.bp1[3], momset_.bp1[0]};

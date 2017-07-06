@@ -78,6 +78,7 @@ namespace Belle2 {
     std::vector<double> m_ScatteringAngleRangeFinalStates; /**< Minimal/Maximal pions(muons,nucleons,kaons) momentum angle. */
     double m_MinInvMassHadronsGamma; /**< m_MinInvMassHadronsGamma [GeV^2]. */
     double m_MinInvMassHadrons; /**< m_MinInvMassHadrons [GeV^2]. */
+    bool m_ForceMinInvMassHadronsCut; /**< Force application of the above cut. */
     double m_MaxInvMassHadrons; /**< m_MaxInvMassHadrons [GeV^2] */
     double m_MinEnergyGamma; /**< m_MinEnergyGamma [GeV]. */
 

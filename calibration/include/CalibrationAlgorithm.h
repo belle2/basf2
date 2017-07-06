@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <TClonesArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
@@ -155,11 +156,11 @@ namespace Belle2 {
     /// Get the interval of validity from minimum and maximum experiment and run of data in requested calibration range
     IntervalOfValidity getIovFromData();
 
-    /// Store DB payload with default name and default IOV
-    void saveCalibration(TObject* data);
+    /// Store DBArray payload with given name with default IOV
+    void saveCalibration(TClonesArray* data, const std::string& name);
 
-    /// Store DB payload with default name and custom IOV
-    void saveCalibration(TObject* data, const IntervalOfValidity& iov);
+    /// Store DBArray with given name and custom IOV
+    void saveCalibration(TClonesArray* data, const std::string& name, const IntervalOfValidity& iov);
 
     /// Store DB payload with given name with default IOV
     void saveCalibration(TObject* data, const std::string& name);

@@ -80,7 +80,7 @@ global_env = Environment(
     LINK='g++',
     SHLINK='g++',
     CCFLAGS=['-Wall', '-isystem$EXTINCDIR'],
-    CXXFLAGS=['-std=c++11'],
+    CXXFLAGS=['-std=c++14'],
     # disable warnings when compiling dictionaries, too much root problems
     # involved
     ROOTCLING_EXTRA_CCFLAGS=["-w"],

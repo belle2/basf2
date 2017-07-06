@@ -38,6 +38,14 @@ namespace Belle2 {
       return s_dbPackageIdentifier + "&" + baseIdentifier;
     }
 
+    bool SoftwareTriggerDBHandler::hasBaseIdentifier(const std::string& cutName, const std::string& baseIdentifier)
+    {
+      assert(baseIdentifier.find("&") == std::string::npos);
+      assert(std::count(cutName.begin(), cutName.end(), '&') == 2);
+
+      return boost::starts_with(cutName, makeFullCutName(baseIdentifier, ""));
+    }
+
     void SoftwareTriggerDBHandler::upload(const std::unique_ptr<SoftwareTriggerCut>& cut, const std::string& baseCutIdentifier,
                                           const std::string& cutIdentifier, const IntervalOfValidity& iov)
     {

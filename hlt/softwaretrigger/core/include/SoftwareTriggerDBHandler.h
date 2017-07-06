@@ -70,6 +70,13 @@ namespace Belle2 {
       static std::string makeFullTriggerMenuName(const std::string& baseIdentifier);
 
       /**
+       * Check if a given cut name in the form
+       *  <package_identifier>&<base_name>&<cut_name>
+       * has the given base name.
+       */
+      static bool hasBaseIdentifier(const std::string& cutName, const std::string& baseIdentifier);
+
+      /**
        * Upload a new (or replace an old version) cut with the given base and specific name. Neither the base nor the
        * cut name are allowed to have '&' in it. Please make sure that the base name must correspond to the identifiers
        * of the calculation objects created in the SoftwareTriggerModule.

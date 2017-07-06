@@ -137,29 +137,10 @@ namespace Belle2 {
     /** Return energy smearing of the CMS */
     //double getEnergySmearingCMS() const;
 
-    // ------------- Interface to global Millepede calibration ----------------
+
+    /// Interface to global Millepede calibration ----------------
     /// Get global unique id
-    static unsigned short getGlobalUniqueID() {return 1;}
-    /// Get global parameter: 1 = vertex X, 2 = vertex Y, 3 = vertex Z
-    double getGlobalParam(unsigned short, unsigned short param)
-    {
-      if (param > 3) return 0.;
-      return getVertex()[param - 1];
-    }
-    /// Set global parameter: 1 = vertex X, 2 = vertex Y, 3 = vertex Z
-    void setGlobalParam(double value, unsigned short, unsigned short param)
-    {
-      if (param > 3) return;
-      TVector3 vertex = getVertex();
-      vertex[param - 1] = value;
-      setVertex(vertex);
-    }
-    /// list stored global parameters: 1, 2, 3 (vertex X, Y, Z)
-    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()
-    {
-      return {{0, 1}, {0, 2}, {0, 3}};
-    }
-    // ------------------------------------------------------------------------
+    static unsigned short getGlobalUniqueID() { return 1; }
 
   private:
     /** Calculate FourVector of a beam from energy and angle wrt the z-axis.

@@ -21,6 +21,7 @@
 
 #include <framework/database/DBObjPtr.h>
 #include <alignment/GlobalLabel.h>
+#include <framework/dbobjects/BeamParameters.h>
 
 namespace Belle2 {
   namespace alignment {
@@ -268,6 +269,25 @@ namespace Belle2 {
       /// Function to construct the object if not already done
       void ensureConstructed() {if (!m_object) construct();}
     };
+
+    template <>
+    unsigned short GlobalParamSet<BeamParameters>::getGlobalUniqueID() const;
+    /// The DB object unique id in global calibration
+    template <>
+    unsigned short GlobalParamSet<BeamParameters>::getGlobalUniqueID() const;
+    /// Get global parameter of the DB object by its element and parameter number
+    /// Note this is not const, it might need to construct the object
+    template <>
+    double GlobalParamSet<BeamParameters>::getGlobalParam(unsigned short element, unsigned short param);
+    /// Set global parameter of the DB object by its element and parameter number
+    template <>
+    void GlobalParamSet<BeamParameters>::setGlobalParam(double value, unsigned short element, unsigned short param);
+    /// List global parameters in this DB object
+    template <>
+    std::vector<std::pair<unsigned short, unsigned short>> GlobalParamSet<BeamParameters>::listGlobalParams();
+
+
+
 
     /// The central user class to manipulate any global constant in any DB object
     /// Used to retrieve global parameters from database and access the for update.

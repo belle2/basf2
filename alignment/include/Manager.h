@@ -285,5 +285,6 @@ namespace Belle2 {
       /// Vector of EventMetaData containing the time slicing of the calibration job
       std::vector<EventMetaData> m_dbTimeSlicing {};
     };
+
   }
 }

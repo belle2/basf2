@@ -25,6 +25,47 @@
 
 namespace Belle2 {
   namespace alignment {
+
+    /// The DB object unique id in global calibration
+    template <>
+    unsigned short GlobalParamSet<BeamParameters>::getGlobalUniqueID() const { return 1; }
+    /// Get global parameter of the DB object by its element and parameter number
+    /// Note this is not const, it might need to construct the object
+    template <>
+    double GlobalParamSet<BeamParameters>::getGlobalParam(unsigned short element, unsigned short param)
+    {
+      if (element != 0 or param > 3) {
+        B2ERROR("Invalid global BeamParameters id");
+        return 0;
+      }
+
+      if (auto bp = dynamic_cast<BeamParameters*>(GlobalParamSet<BeamParameters>::getDBObj()))
+        return bp->getVertex()[param - 1];
+
+      return 0.;
+    }
+    /// Set global parameter of the DB object by its element and parameter number
+    template <>
+    void GlobalParamSet<BeamParameters>::setGlobalParam(double value, unsigned short element, unsigned short param)
+    {
+      if (element != 0 or param > 3) {
+        B2ERROR("Invalid global BeamParameters id");
+        return;
+      }
+      if (auto bp = dynamic_cast<BeamParameters*>(GlobalParamSet<BeamParameters>::getDBObj())) {
+        TVector3 vertex = bp->getVertex();
+        vertex[param - 1] = value;
+        bp->setVertex(vertex);
+      }
+    }
+    /// List global parameters in this DB object
+    template <>
+    std::vector<std::pair<unsigned short, unsigned short>> GlobalParamSet<BeamParameters>::listGlobalParams()
+    {
+      return {{0, 1}, {0, 2}, {0, 3}};
+    }
+
+
     GlobalParamVector::GlobalParamVector(std::vector< std::string > components) : m_components(components) {}
 
     void GlobalParamVector::updateGlobalParam(double difference, short unsigned int uniqueID, short unsigned int element,

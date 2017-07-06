@@ -232,7 +232,7 @@ namespace Belle2 {
     bool    isEKLM()         const {return (eid >= eklmOffset && eid < maxEID);}
 
     //! Is this Beam label?
-    bool    isBeam()         const {return (eid >= 0 && eid < vxdOffset);}
+    bool    isBeam()         const {return (eid > 0 && eid < vxdOffset);}
 
     //TODO
     gidTYPE getUniqueId() const {return eid / 100000;}

@@ -85,7 +85,6 @@ namespace Belle2 {
      */
     void set(EKLMElementID element, int parameter, double value);
 
-    /*
     // ------------- Interface to global Millepede calibration ----------------
     /// Get global unique id
     static unsigned short getGlobalUniqueID() {return 40;}
@@ -93,7 +92,7 @@ namespace Belle2 {
     double getGlobalParam(unsigned short element, unsigned short param)
     {
 
-      auto adata = getAlignmentData(element);
+      auto adata = getSectorAlignment(element);
       if (!adata)
         return 0.;
       if (param == 1) return adata->getDx();
@@ -106,7 +105,7 @@ namespace Belle2 {
     void setGlobalParam(double value, unsigned short element, unsigned short param)
     {
 
-      auto adata = getAlignmentData(element);
+      auto adata = getSectorAlignment(element);
       if (!adata)
         return;
       if (param == 1) adata->setDx(value);
@@ -116,17 +115,9 @@ namespace Belle2 {
     }
     /// TODO: list stored global parameters
     std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()
-    {
-      std::vector<std::pair<unsigned short, unsigned short>> result;
-      for (auto data : m_Data) {
-        result.push_back({data.first, 1});
-        result.push_back({data.first, 2});
-        result.push_back({data.first, 6});
-      }
-      return result;
-    }
+    {return {};}
     // ------------------------------------------------------------------------
-    */
+
   private:
 
     /** Sector alignment. */

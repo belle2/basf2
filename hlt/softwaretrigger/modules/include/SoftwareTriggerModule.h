@@ -21,6 +21,11 @@ namespace Belle2 {
      *
      * The return value of this module is a bool, which is either true (accept the event) or false (reject it).
      *
+     * This return value is defined by all trigger decision up to now. It is true, if both the fast_reco and hlt
+     * accepted the event and false in all other cases.
+     *
+     * The result for fast_reco and hlt and calculated within each module (depending on the base name):
+     *
      * It is defined from the results of the cuts in the given trigger menu, which are all evaluated
      * and the trigger mode (accept mode or not).
      * if not in accept mode (= reject mode):

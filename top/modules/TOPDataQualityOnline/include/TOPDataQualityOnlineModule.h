@@ -81,14 +81,19 @@ namespace Belle2 {
 
   private:
     std::string m_histogramDirectoryName; /**< histogram directory in ROOT file */
-    int m_iEvent = -1; /**< Number of events that has been processed */
-    int m_ADCCutLow = -1, m_ADCCutHigh = -1; /**< hit cut for ADC */
-    int m_PulseWidthCutLow = -1, m_PulseWidthCutHigh = -1; /**< hit cut for PulseWidth */
-    int m_TDCParticleLow = -999, m_TDCParticleHigh = -999; /**< hit cut for particle TDC */
-    int m_TDCCalLow = -999, m_TDCCalHigh = -999; /**< hit cut for calibration TDC */
-    int m_TDCLaserLow = -999, m_TDCLaserHigh = -999; /**< hit cut for laser TDC */
-    int m_numModules = -1; /**< number of all modules */
-    int m_verbose = -1; /**< flag for verbose mode */
+    int m_iEvent = 0; /**< Number of events that has been processed */
+    int m_ADCCutLow = 0; /**< lower cut for ADC */
+    int m_ADCCutHigh = 0; /**< upper cut for ADC */
+    int m_PulseWidthCutLow = 0; /**< lower cut for PulseWidth */
+    int m_PulseWidthCutHigh = 0; /**< upper cut for PulseWidth */
+    int m_TDCParticleLow = 0; /**< lower cut for particle TDC */
+    int m_TDCParticleHigh = 0; /**< upper cut for particle TDC */
+    int m_TDCCalLow = 0; /**< lower cut for calibration TDC */
+    int m_TDCCalHigh = 0; /**< upper cut for calibration TDC */
+    int m_TDCLaserLow = 0; /**< lower cut for laser TDC */
+    int m_TDCLaserHigh = 0; /**< upper cut for laser TDC */
+    int m_numModules = 0; /**< number of all modules */
+    int m_verbose = 0; /**< flag for verbose mode */
 
     TH1F* m_allHits = nullptr; /**< Histogram for number of accumulated hits */
     TH1F* m_goodHits = nullptr; /**< Histogram for number of accumulated good hits */
@@ -131,10 +136,10 @@ namespace Belle2 {
     std::vector<TH2F*> m_allTdcMean; /**< Histograms (2D) for TDC mean distribution per module*/
     std::vector<TH2F*> m_allTdcRMS; /**< Histograms (2D) for TDC RMS distribution per module*/
 
-    TOPDQStat m_particleHitsCounter; /**< counter for particle hits */
-    TOPDQStat m_laserHitsCounter; /**< counter for lawer hits */
-    TOPDQStat m_calHitsCounter; /**< counter for calibration hits */
-    TOPDQStat m_otherHitsCounter; /**< counter for other hits */
+    TOPDQStat m_particleHitsCounter = TOPDQStat(16); /**< counter for particle hits */
+    TOPDQStat m_laserHitsCounter = TOPDQStat(16); /**< counter for lawer hits */
+    TOPDQStat m_calHitsCounter = TOPDQStat(16); /**< counter for calibration hits */
+    TOPDQStat m_otherHitsCounter = TOPDQStat(16); /**< counter for other hits */
   };
 
 } //namespace Belle2

@@ -29,8 +29,7 @@ namespace Belle2 {
   using namespace TOP;
   REG_MODULE(TOPDataQualityOnline)
 
-  TOPDataQualityOnlineModule::TOPDataQualityOnlineModule() : HistoModule(), m_iEvent(0), m_particleHitsCounter(16),
-    m_laserHitsCounter(16), m_calHitsCounter(16), m_otherHitsCounter(16)
+  TOPDataQualityOnlineModule::TOPDataQualityOnlineModule() : HistoModule()
   {
     setDescription("TOP online monitoring module");
     setPropertyFlags(c_ParallelProcessingCertified);

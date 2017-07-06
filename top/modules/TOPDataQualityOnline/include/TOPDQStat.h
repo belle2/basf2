@@ -27,7 +27,7 @@ namespace Belle2 {
      * Constructor
     * @param v_size number of variables
      */
-    TOPDQStat(int v_size);
+    explicit TOPDQStat(int v_size);
 
     /**
      * Destructor

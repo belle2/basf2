@@ -1,11 +1,11 @@
 //+
-// File : SoftwareTriggerDQMModule.cc
+// File : SoftwareTriggerHLTDQMModule.cc
 // Description : Module to monitor physics trigger on HLT
 //
 // Author : Chunhua LI, Thomas Hauth
 // Date : 13 - Oct - 2016
 //-
-#include <hlt/softwaretrigger/modules/SoftwareTriggerDQMModule.h>
+#include <hlt/softwaretrigger/modules/HLTDQM/SoftwareTriggerHLTDQMModule.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <hlt/softwaretrigger/dataobjects/SoftwareTriggerVariables.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -24,13 +24,13 @@ using namespace SoftwareTrigger;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SoftwareTriggerDQM)
+REG_MODULE(SoftwareTriggerHLTDQM)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-SoftwareTriggerDQMModule::SoftwareTriggerDQMModule() : HistoModule()
+SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
 {
   //Set module properties
 
@@ -51,7 +51,7 @@ SoftwareTriggerDQMModule::SoftwareTriggerDQMModule() : HistoModule()
 
 }
 
-void SoftwareTriggerDQMModule::defineHisto()
+void SoftwareTriggerHLTDQMModule::defineHisto()
 {
   // move to the specified folder
   TDirectory* oldDir = nullptr;
@@ -85,13 +85,13 @@ void SoftwareTriggerDQMModule::defineHisto()
 }
 
 
-void SoftwareTriggerDQMModule::initialize()
+void SoftwareTriggerHLTDQMModule::initialize()
 {
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 }
 
-void SoftwareTriggerDQMModule::event()
+void SoftwareTriggerHLTDQMModule::event()
 {
   // load and plot the output of the variable computation
   StoreObjPtr<SoftwareTriggerVariables> variables;

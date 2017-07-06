@@ -1,7 +1,7 @@
-#ifndef SOFTWARETRIGGERDQMMODULE_H
-#define SOFTWARETRIGGERDQMMODULE_H
+#ifndef SOFTWARETRIGGERHLTDQMMODULE_H
+#define SOFTWARETRIGGERHLTDQMMODULE_H
 //+
-// File : SoftwareTriggerDQMModule.h
+// File : SoftwareTriggerHLTDQMModule.h
 // Description : Module to monitor raw data accumulating histos
 //
 // Author : Chunhua LI, the University of Melbourne
@@ -23,14 +23,14 @@ namespace Belle2 {
 
     /*! A class definition of an input module for Sequential ROOT I/O */
 
-    class SoftwareTriggerDQMModule : public HistoModule {
+    class SoftwareTriggerHLTDQMModule : public HistoModule {
 
       // Public functions
     public:
 
       //! Constructor / Destructor
-      SoftwareTriggerDQMModule();
-      virtual ~SoftwareTriggerDQMModule() = default;
+      SoftwareTriggerHLTDQMModule();
+      virtual ~SoftwareTriggerHLTDQMModule() = default;
 
       //! Module functions to be called from main process
       virtual void initialize() override;

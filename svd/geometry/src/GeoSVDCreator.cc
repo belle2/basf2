@@ -483,7 +483,11 @@ namespace Belle2 {
 
       //Create diamond radiation sensors if defined and in background mode
       if (m_activeChips) {
-        createDiamonds(parameters.getRadiationSensors(), topVolume, *envelope);
+        if (parameters.getRadiationSensors().getSubDetector() == "") {
+          B2DEBUG(10, "Apparently no radiation sensors defined, skipping");
+        } else {
+          createDiamonds(parameters.getRadiationSensors(), topVolume, *envelope);
+        }
       }
     }
 

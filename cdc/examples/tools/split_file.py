@@ -17,6 +17,9 @@ Dir = 'GCR2017_unpacked/'
 
 
 class Split(Module):
+    """
+    Class to split one file to multi files with small data size.
+    """
 
     def event(self):
         """reimplementation of Module::event()."""

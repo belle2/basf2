@@ -362,6 +362,10 @@ void TOPDatabaseImporter::importChannelT0CalibrationKichimi(string fNames)
 void TOPDatabaseImporter::getSampleTimeCalibrationInfo()
 {
   DBObjPtr<TOPCalTimebase> timeBase;
+  if (!timeBase.isValid()) {
+    B2ERROR("No time base calibration available");
+    return;
+  }
 
   const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
   int numModules = geo->getNumModules();
@@ -398,6 +402,10 @@ void TOPDatabaseImporter::printSampleTimeCalibration()
 {
 
   DBObjPtr<TOPCalTimebase> timeBase;
+  if (!timeBase.isValid()) {
+    B2ERROR("No time base calibration available");
+    return;
+  }
 
   for (const auto& sampleTimes : timeBase->getSampleTimes()) {
     cout << sampleTimes.getScrodID() << " " << sampleTimes.getChannel() << endl;

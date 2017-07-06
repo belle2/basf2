@@ -154,7 +154,7 @@ void SeqRootInputModule::event()
     delete m_file;
     m_file = 0;
     m_fileptr++;
-    if (m_fileptr == m_nfile) {
+    if (m_fileptr >= m_nfile) {
       delete[] evtbuf;
       evtbuf = NULL;
       return;

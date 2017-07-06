@@ -136,6 +136,12 @@ namespace Belle2 {
      */
     void setFinalState(int finalState) { m_finalState = finalState; }
 
+    /** Sets whether to replace muons by a virtual photon.
+     * @param replaceMuonsByVirtualPhoton If true, perform the replacement.
+     */
+    void setReplaceMuonsByVirtualPhoton(bool replaceMuonsByVirtualPhoton)
+    { m_replaceMuonsByVirtualPhoton = replaceMuonsByVirtualPhoton; }
+
     /** Sets number of trials per event.
     * @param nMaxTrials PHOKHARA is very ineffienct when using NLO corrections, adjust number of trials to >1000 per event!
     */
@@ -173,6 +179,7 @@ namespace Belle2 {
 
     //PHOKHARA
     int m_finalState;  /**< final state, called 'pion' in Phokhara, dont get confused. */
+    bool m_replaceMuonsByVirtualPhoton; /**< Replace muons by a virtual photon. */
     int m_nMaxTrials;  /**< Events before loop is aborted. */
     int m_nSearchMax;  /**< Events used to search maximum of differential cross section. */
     double m_cmsEnergy;         /**< CMS Energy = 2*Ebeam [GeV]. */

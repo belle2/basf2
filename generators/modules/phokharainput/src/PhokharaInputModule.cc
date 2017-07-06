@@ -41,6 +41,9 @@ PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters:
   addParam("FinalState", m_finalState,
            "Final state: mu+mu-(0, default), pi+pi-(1), 2pi0pi+pi-(2), 2pi+2pi-(3), ppbar(4), nnbar(5), K+K-(6), K0K0bar(7), pi+pi-pi0(8), lamb(->pi-p)lambbar(->pi+pbar)(9), eta pi+ pi- (10)",
            1);
+  addParam("ReplaceMuonsByVirtualPhoton", m_replaceMuonsByVirtualPhoton,
+           "Replace muons by a virtual photon (for FinalState == 0 only).",
+           false);
   addParam("SearchMax", m_nSearchMax, "Number of events used to search for maximum of differential cross section", 100000);
   addParam("Epsilon", m_epsilon, "Soft/hard photon separator", 0.0001);
   addParam("nMaxTrials", m_nMaxTrials, "Maximum trials per event", 10000);
@@ -146,6 +149,7 @@ void PhokharaInputModule::initializeGenerator()
 
   m_generator.setNSearchMax(m_nSearchMax);
   m_generator.setFinalState(m_finalState);
+  m_generator.setReplaceMuonsByVirtualPhoton(m_replaceMuonsByVirtualPhoton);
   m_generator.setNMaxTrials(m_nMaxTrials);
   m_generator.setEpsilon(m_epsilon);
   m_generator.setLO(m_LO);

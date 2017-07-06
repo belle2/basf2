@@ -58,6 +58,7 @@ namespace Belle2 {
 
     /** Module parameters */
     int m_finalState; /**< Final state: mu+mu-(0), pi+pi-(1), 2pi0pi+pi-(2), 2pi+2pi-(3), ppbar(4), nnbar(5), K+K-(6), K0K0bar(7), pi+pi-pi0(8), lamb(->pi-p)lambbar(->pi+pbar)(9), eta pi+ pi- (10) */
+    bool m_replaceMuonsByVirtualPhoton; /**< Replace muons by a virtual photon. */
     int m_nMaxTrials; /**< Events before loop is aborted. */
     int m_nSearchMax; /**< Events used to search maximum of differential cross section. */
 

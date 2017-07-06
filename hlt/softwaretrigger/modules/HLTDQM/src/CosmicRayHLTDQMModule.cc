@@ -150,15 +150,19 @@ void CosmicRayHLTDQMModule::event()
 
 //Monitor ECL Clusters
   StoreArray<ECLCluster> eclClusters;
+  int nECLClusters = 0;
   if (eclClusters.isValid()) {
-    h_ncluster->Fill(eclClusters.getEntries());
     for (const auto& eclCluster : eclClusters) {
-      h_e_eclcluster->Fill(eclCluster.getEnergy());
-      h_phi_eclcluster->Fill(eclCluster.getPhi());
-      h_theta_eclcluster->Fill(eclCluster.getTheta());
-      h_E1oE9_eclcluster->Fill(eclCluster.getE1oE9());
-      h_Time_eclcluster->Fill(eclCluster.getTime());
+      if (eclCluster.getHypothesisId() == 5) {
+        h_e_eclcluster->Fill(eclCluster.getEnergy());
+        h_phi_eclcluster->Fill(eclCluster.getPhi());
+        h_theta_eclcluster->Fill(eclCluster.getTheta());
+        h_E1oE9_eclcluster->Fill(eclCluster.getE1oE9());
+        h_Time_eclcluster->Fill(eclCluster.getTime());
+        nECLClusters++;
+      }
     }
+    h_ncluster->Fill(nECLClusters);
   }
 
 //Monitor KLM

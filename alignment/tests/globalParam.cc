@@ -115,7 +115,7 @@ namespace {
       vect->addDBObj<CDCTimeWalks>();
       vect->addDBObj<CDCXtRelations>();
       vect->addDBObj<BKLMAlignment>();
-      vect->addDBObj<EKLMAlignment>();
+      //vect->addDBObj<EKLMAlignment>();
 
       vect->addSubDetectorInterface(iptr3);
       vect->addSubDetectorInterface(iptr3);

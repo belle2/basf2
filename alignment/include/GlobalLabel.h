@@ -22,6 +22,31 @@
 
 namespace Belle2 {
 
+  /// Class to identify beam parameters
+  class BeamID {
+
+  public:
+
+    /// Primary vertex x-position
+    static const int vertexX = 1;
+
+    /// Primary vertex y-position
+    static const int vertexY = 2;
+
+    /// Primary vertex z-position
+    static const int vertexZ = 3;
+
+    /// Constructor
+    explicit BeamID() {}
+
+    /// convert to int, returns 0 as there are no elements of beam, only parameters
+    operator int() {return 0;}
+
+    /// convert to unsigned int, returns 0 as there are no elements of beam, only parameters
+    operator unsigned int() {return 0;}
+
+  };
+
   /**
    * @brief Class to convert to/from global labels
    * for Millepede II to/from detector & parameter
@@ -205,6 +230,9 @@ namespace Belle2 {
 
     //! Is this EKLM label?
     bool    isEKLM()         const {return (eid >= eklmOffset && eid < maxEID);}
+
+    //! Is this Beam label?
+    bool    isBeam()         const {return (eid >= 0 && eid < vxdOffset);}
 
     //TODO
     gidTYPE getUniqueId() const {return eid / 100000;}

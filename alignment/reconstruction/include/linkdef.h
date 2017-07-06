@@ -12,6 +12,6 @@
 #pragma link C++ class Belle2::BKLMRecoHit+;
 #pragma link C++ class Belle2::AlignableEKLMRecoHit+;
 
-#pragma link C++ class Belle2::GblMultipleScatteringController+;
+//#pragma link C++ class Belle2::GblMultipleScatteringController+;
 
 #endif

@@ -85,6 +85,7 @@ namespace Belle2 {
      */
     void set(EKLMElementID element, int parameter, double value);
 
+    /*
     // ------------- Interface to global Millepede calibration ----------------
     /// Get global unique id
     static unsigned short getGlobalUniqueID() {return 40;}
@@ -125,7 +126,7 @@ namespace Belle2 {
       return result;
     }
     // ------------------------------------------------------------------------
-
+    */
   private:
 
     /** Sector alignment. */

@@ -7,13 +7,13 @@ from basf2 import *
 import ROOT
 from ROOT import Belle2
 
-filepath = 'analysis/tests/mdst5.root'
+filepath = 'analysis/tests/mdst7.root'
 inputFile = Belle2.FileSystem.findFile(filepath)
 if len(inputFile) == 0:
     sys.stderr.write(
         "TEST SKIPPED: input file " +
         filepath +
-        " not found. You can retrieve it via 'wget http://www-ekp.physik.uni-karlsruhe.de/~cpulvermacher/mdst5.root'\n")
+        " not found. You can retrieve it via 'wget http://www-ekp.physik.uni-karlsruhe.de/~tkeck/mdst7.root'\n")
     sys.exit(-1)
 
 path = create_path()

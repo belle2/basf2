@@ -2,10 +2,11 @@ from basf2 import *
 from ROOT import Belle2
 from tracking import add_cdc_cr_track_finding
 from tracking import add_cdc_track_finding
+from tracking import add_cdc_cr_track_fit_and_track_creator
+from time_extraction_helper_modules import *
 
 # Propagation velocity of the light in the scinti.
 lightPropSpeed = 12.9925
-
 
 # Run range.
 run_range = {'201607': [787, 833],
@@ -62,7 +63,7 @@ globalPhiRotation = {'201607': 1.875,
 lengthOfCounter = 100.0
 widthOfCounter = 8.0
 triggerPos = []
-normTriggerPlanDirection = []
+normTriggerPlaneDirection = []
 readOutPos = []
 globalPhi = 0.0
 
@@ -72,23 +73,26 @@ def set_cdc_cr_parameters(period):
     global lengthOfCounter
     global widthOfCounter
     global triggerPos
-    global normTriggerPlanDirection
+    global normTriggerPlaneDirection
     global readOutPos
     global globalPhi
 
     lengthOfCounter = triggerSize[period][0]
     widthOfCounter = triggerSize[period][1]
     triggerPos = triggerPosition[period]
-    normTriggerPlanDirection = triggerPlaneDirection[period]
+    normTriggerPlaneDirection = triggerPlaneDirection[period]
     readOutPos = pmtPosition[period]
     globalPhi = globalPhiRotation[period]
 
 
-def add_cdc_cr_simulation(path, empty_path):
+def add_cdc_cr_simulation(path, topInCounter=True):
     """
-    Add cdc cr simulation.
+    Add CDC CR simulation.
 
     """
+    # Create empty path
+    emptyPath = create_path()
+
     # Register the CRY module
     cry = register_module('CRYInput')
     # cosmic data input
@@ -117,81 +121,109 @@ def add_cdc_cr_simulation(path, empty_path):
                           yOfCounter=triggerPos[1],
                           zOfCounter=triggerPos[2],
                           phiOfCounter=0.,
-                          TOP=True,
+                          TOP=topInCounter,
                           propSpeed=lightPropSpeed,
                           TOF=1,
                           cryGenerator=True
                           )
 
     path.add_module(sel)
-    sel.if_false(empty_path)
+    sel.if_false(emptyPath)
     path.add_module('FullSim',
                     # Uncomment if you want to disable secondaries.
                     ProductionCut=1000000.)
+    #    path.add_module(RandomizeTrackTimeModule(8.0))
     path.add_module('CDCDigitizer')
 
 
-def add_cdc_cr_reconstruction(path, eventTimingExtraction=False):
+def add_cdc_cr_reconstruction(path, eventTimingExtraction=False, topInCounter=True):
+    """
+    Add CDC CR reconstruction
+    """
 
     # Add cdc track finder
-    add_cdc_cr_track_finding(path)
+    add_cdc_cr_track_finding(path, merge_tracks=False)
 
+    # Setup Genfit extrapolation
     path.add_module("SetupGenfitExtrapolation")
+
+    # Time seed
     path.add_module("PlaneTriggerTrackTimeEstimator",
                     pdgCodeToUseForEstimation=13,
                     triggerPlanePosition=triggerPos,
-                    triggerPlaneDirection=normTriggerPlanDirection,
+                    triggerPlaneDirection=normTriggerPlaneDirection,
                     useFittedInformation=False)
 
+    # Initial track fitting
     path.add_module("DAFRecoFitter",
                     probCut=0.00001,
                     pdgCodesToUseForFitting=13,
                     )
 
-    path.add_module("PlaneTriggerTrackTimeEstimator",
-                    pdgCodeToUseForEstimation=13,
-                    triggerPlanePosition=triggerPos,
-                    triggerPlaneDirection=normTriggerPlanDirection,
-                    useFittedInformation=True,
-                    useReadoutPosition=True,
-                    readoutPosition=readOutPos,
-                    readoutPositionPropagationSpeed=lightPropSpeed
-                    )
+    if topInCounter is True:
+        # Correct time seed with TOP in counter.
+        path.add_module("PlaneTriggerTrackTimeEstimator",
+                        pdgCodeToUseForEstimation=13,
+                        triggerPlanePosition=triggerPos,
+                        triggerPlaneDirection=normTriggerPlaneDirection,
+                        useFittedInformation=True,
+                        useReadoutPosition=True,
+                        readoutPosition=readOutPos,
+                        readoutPositionPropagationSpeed=lightPropSpeed
+                        )
 
-    path.add_module("DAFRecoFitter",
-                    # probCut=0.00001,
-                    pdgCodesToUseForFitting=13,
-                    )
-    if eventTimingExtraction is True:
-        # Select the tracks for the time extraction.
-        path.add_module("SelectionForTrackTimeExtraction")
-
-        # Extract the time: either with the TrackTimeExtraction or the FullGridTrackTimeExtraction module.
-        path.add_module("FullGridTrackTimeExtraction")
-
+        # Track fitting
         path.add_module("DAFRecoFitter",
                         # probCut=0.00001,
                         pdgCodesToUseForFitting=13,
                         )
+
+    if eventTimingExtraction is True:
+        # Extract the time
+        path.add_module("FullGridTrackTimeExtraction",
+                        recoTracksStoreArrayName="RecoTracks",
+                        maximalT0Shift=70,
+                        minimalT0Shift=-70,
+                        numberOfGrids=6
+                        )
+
+        # Track fitting
+        path.add_module("DAFRecoFitter",
+                        # probCut=0.00001,
+                        pdgCodesToUseForFitting=13,
+                        )
+
+    # Create Belle2 Tracks from the genfit Tracks
     path.add_module('TrackCreator',
                     defaultPDGCode=13,
                     useClosestHitToIP=True
                     )
 
 
-def getRunNumber(fname):
-    run = int((fname.split('/')[-1]).split('.')[3])
-    return run
-
-
 def getExpNumber(fname):
+    """
+    Get expperimental number from file name.
+    """
     exp = int((fname.split('/')[-1]).split('.')[2])
     return exp
 
 
+def getRunNumber(fname):
+    """
+    Get run number from file name.
+    """
+    run = int(((fname.split('/')[-1]).split('.')[3]).split('_')[0])
+    return run
+
+
 def getDataPeriod(run):
+    """
+    Get data period from run number
+    It should be replaced the argument from run to (exp, run)!
+    """
     period = None
     global run_range
+
     for key in run_range:
         if run_range[key][0] <= run <= run_range[key][1]:
             period = key
@@ -199,7 +231,9 @@ def getDataPeriod(run):
             break
 
     if period is None:
-        B2ERROR("No valid data period is specified.")
+        B2WARNING("No valid data period is specified.")
+        B2WARNING("Default configuration is loaded.")
+        period = 'normal'
     return period
 
 

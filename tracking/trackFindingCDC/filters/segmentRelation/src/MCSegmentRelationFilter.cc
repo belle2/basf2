@@ -11,6 +11,8 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
+#include <framework/core/ModuleParamList.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -19,13 +21,28 @@ MCSegmentRelationFilter::MCSegmentRelationFilter(bool allowReverse)
 {
 }
 
+void MCSegmentRelationFilter::exposeParameters(ModuleParamList* moduleParamList,
+                                               const std::string& prefix)
+{
+  Super::exposeParameters(moduleParamList, prefix);
+  moduleParamList->addParameter(prefixed(prefix, "requireRLPure"),
+                                m_param_requireRLPure,
+                                "Switch to require the segment combination contain mostly correct rl information",
+                                m_param_requireRLPure);
+
+}
+
 Weight MCSegmentRelationFilter::operator()(const CDCSegment2D& fromSegment,
                                            const CDCSegment2D& toSegment)
 {
   const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
 
   // Check if the segments are aligned correctly along the Monte Carlo track
-  EForwardBackward pairFBInfo = mcSegmentLookUp.areAlignedInMCTrack(&fromSegment, &toSegment);
+  EForwardBackward pairFBInfo =
+    m_param_requireRLPure
+    ? mcSegmentLookUp.areAlignedInMCTrackWithRLCheck(&fromSegment, &toSegment)
+    : mcSegmentLookUp.areAlignedInMCTrack(&fromSegment, &toSegment);
+
   if (pairFBInfo == EForwardBackward::c_Invalid) return NAN;
 
   if (pairFBInfo == EForwardBackward::c_Forward or

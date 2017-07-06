@@ -5,9 +5,9 @@
 #include <framework/gearbox/Unit.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <framework/dataobjects/EventT0.h>
 
 #include <cmath>
 #include <TFile.h>
@@ -291,24 +291,13 @@ NeuroTrigger::selectMLP(const CDCTriggerTrack& track)
 }
 
 vector<int>
-NeuroTrigger::selectMLPs(const CDCTriggerTrack& track,
-                         const MCParticle& mcparticle, bool selectByMC)
+NeuroTrigger::selectMLPs(float phi0, float invpt, float theta)
 {
   vector<int> indices = {};
 
   if (m_MLPs.size() == 0) {
     B2WARNING("Trying to select MLP before initializing MLPs.");
     return indices;
-  }
-
-  float phi0 = track.getPhi0();
-  float invpt = track.getKappa(1.5);
-  float theta = atan2(1., track.getCotTheta());
-
-  if (selectByMC) {
-    phi0 = mcparticle.getMomentum().Phi();
-    invpt = mcparticle.getCharge() / mcparticle.getMomentum().Pt();
-    theta = mcparticle.getMomentum().Theta();
   }
 
   // find all matching sectors
@@ -387,22 +376,25 @@ NeuroTrigger::getRelId(const CDCTriggerSegmentHit& hit)
 unsigned long
 NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track)
 {
-  StoreArray<CDCTriggerSegmentHit> hits;
+  StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
+  StoreObjPtr<EventT0> eventTime(m_eventTimeName);
+  bool hasT0 = eventTime->hasBinnedEventT0(Const::CDC);
+  int T0 = (hasT0) ? eventTime->getBinnedEventT0(Const::CDC) : 0;
   CDCTriggerMLP& expert = m_MLPs[isector];
   unsigned long hitPattern = 0;
   vector<unsigned> nHits;
   nHits.assign(9, 0);
   // loop over axial hits related to input track
   RelationVector<CDCTriggerSegmentHit> axialHits =
-    track.getRelationsTo<CDCTriggerSegmentHit>();
+    track.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
   for (unsigned ihit = 0; ihit < axialHits.size(); ++ ihit) {
     // skip hits with negative relation weight (not selected in finder)
     if (axialHits.weight(ihit) < 0) continue;
     unsigned short iSL = axialHits[ihit]->getISuperLayer();
     // skip stereo hits (should not be related to track, but check anyway)
     if (iSL % 2 == 1) continue;
-    // get priority time (TODO: get event time)
-    int t = axialHits[ihit]->priorityTime();
+    // get priority time
+    int t = (hasT0) ? axialHits[ihit]->priorityTime() - T0 : 0;
     if (t < 0 || t > expert.getTMax()) continue;
     double relId = getRelId(*axialHits[ihit]);
     if (expert.isRelevant(relId, iSL)) {
@@ -420,8 +412,8 @@ NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track)
     unsigned short iSL = hits[ihit]->getISuperLayer();
     // skip axial hits
     if (iSL % 2 == 0) continue;
-    // get priority time (TODO: get event time)
-    int t = hits[ihit]->priorityTime();
+    // get priority time
+    int t = (hasT0) ? hits[ihit]->priorityTime() - T0 : 0;
     if (t < 0 || t > expert.getTMax()) continue;
     double relId = getRelId(*hits[ihit]);
     if (expert.isRelevant(relId, iSL)) {
@@ -442,7 +434,10 @@ vector<unsigned>
 NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
                          bool returnAllRelevant)
 {
-  StoreArray<CDCTriggerSegmentHit> hits;
+  StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
+  StoreObjPtr<EventT0> eventTime(m_eventTimeName);
+  bool hasT0 = eventTime->hasBinnedEventT0(Const::CDC);
+  int T0 = (hasT0) ? eventTime->getBinnedEventT0(Const::CDC) : 0;
   CDCTriggerMLP& expert = m_MLPs[isector];
   vector<unsigned> selectedHitIds = {};
   // prepare vectors to keep best drift times, left/right and selected hit IDs
@@ -457,7 +452,7 @@ NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
 
   // loop over axial hits related to input track
   RelationVector<CDCTriggerSegmentHit> axialHits =
-    track.getRelationsTo<CDCTriggerSegmentHit>();
+    track.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
   B2DEBUG(250, "start axial hit loop");
   for (unsigned ihit = 0; ihit < axialHits.size(); ++ihit) {
     // skip hits with negative relation weight (not selected in finder)
@@ -470,8 +465,8 @@ NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
       B2DEBUG(250, "skipping hit in SL " << iSL);
       continue;
     }
-    // get priority time (TODO: get event time) and apply time window cut
-    int t = axialHits[ihit]->priorityTime();
+    // get priority time and apply time window cut
+    int t = (hasT0) ? axialHits[ihit]->priorityTime() - T0 : 0;
     if (t < 0 || t > expert.getTMax()) continue;
     double relId = getRelId(*axialHits[ihit]);
     if (expert.isRelevant(relId, iSL)) {
@@ -520,8 +515,8 @@ NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
       B2DEBUG(250, "skipping hit in SL " << iSL);
       continue;
     }
-    // get priority time (TODO: get event time) and apply time window cut
-    int t = hits[ihit]->priorityTime();
+    // get priority time and apply time window cut
+    int t = (hasT0) ? hits[ihit]->priorityTime() - T0 : 0;
     if (t < 0 || t > expert.getTMax()) continue;
     double relId = getRelId(*hits[ihit]);
     if (expert.isRelevant(relId, iSL)) {
@@ -571,7 +566,10 @@ NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
 vector<float>
 NeuroTrigger::getInputVector(unsigned isector, const vector<unsigned>& hitIds)
 {
-  StoreArray<CDCTriggerSegmentHit> hits;
+  StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
+  StoreObjPtr<EventT0> eventTime(m_eventTimeName);
+  bool hasT0 = eventTime->hasBinnedEventT0(Const::CDC);
+  int T0 = (hasT0) ? eventTime->getBinnedEventT0(Const::CDC) : 0;
   CDCTriggerMLP& expert = m_MLPs[isector];
   // prepare empty input vector and vectors to keep best drift times
   vector<float> inputVector;
@@ -584,7 +582,7 @@ NeuroTrigger::getInputVector(unsigned isector, const vector<unsigned>& hitIds)
     unsigned short iSL = hits[ihit]->getISuperLayer();
     unsigned short iRef = iSL + 9 * nHits[iSL];
     ++nHits[iSL];
-    int t = hits[ihit]->priorityTime();
+    int t = (hasT0) ? hits[ihit]->priorityTime() - T0 : 0;
     int LR = hits[ihit]->getLeftRight();
     double relId = getRelId(*hits[ihit]);
     int priority = hits[ihit]->getPriorityPosition();

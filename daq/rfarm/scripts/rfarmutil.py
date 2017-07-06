@@ -173,7 +173,7 @@ def stop_eventserver(conffile):
     rbufname = unit + ':' + ringbuf
     shmname = unit + ':distributor'
     p = subprocess.Popen('rfcommand ' + conffile +
-                         ' distributor RF_UNCONFIGURE', shell=True)
+                         ' distributor RC_ABORT', shell=True)
     p.wait()
     pidfile = basedir + '/distributor/pid.data'
     for pid in open(pidfile, 'r'):
@@ -211,7 +211,7 @@ def stop_outputserver(conffile):
     rbufinname = unit + ':' + rbufin
     rbufoutname = unit + ':' + rbufout
     shmname = unit + ':collector'
-    p = subprocess.Popen('rfcommand ' + conffile + ' collector RF_UNCONFIGURE', shell=True)
+    p = subprocess.Popen('rfcommand ' + conffile + ' collector RC_ABORT', shell=True)
     p.wait()
     pidfile = basedir + '/collector/pid.data'
     for pid in open(pidfile, 'r'):
@@ -276,7 +276,7 @@ def stop_eventprocessor(conffile):
             shmname = unit + ':' + nodename
             print shmname
             p = subprocess.Popen('rfcommand ' + conffile + ' ' + nodename +
-                                 ' RF_UNCONFIGURE', shell=True)
+                                 ' RC_ABORT', shell=True)
             p.wait()
             pidfile = basedir + '/' + nodename + '/pid.data'
             for pid in open(pidfile, 'r'):
@@ -311,7 +311,7 @@ def run_dqmserver(conffile):
 def stop_dqmserver(conffile):
     dqmhost = get_rfgetconf(conffile, 'dqmserver', 'ctlhost')
     basedir = get_rfgetconf(conffile, 'system', 'execdir_base')
-    p = subprocess.Popen('rfcommand ' + conffile + ' dqmserver RF_UNCONFIGURE', shell=True)
+    p = subprocess.Popen('rfcommand ' + conffile + ' dqmserver RC_ABORT', shell=True)
     p.wait()
     pidfile = basedir + '/dqmserver/pid.data'
     for pid in open(pidfile, 'r'):
@@ -344,7 +344,7 @@ def stop_roisender(conffile):
     basedir = get_rfgetconf(conffile, 'system', 'execdir_base')
     unit = get_rfgetconf(conffile, 'system', 'unitname')
     shmname = unit + ':roisender'
-    p = subprocess.Popen('rfcommand ' + conffile + ' roisender RF_UNCONFIGURE', shell=True)
+    p = subprocess.Popen('rfcommand ' + conffile + ' roisender RC_ABORT', shell=True)
     p.wait()
     pidfile = basedir + '/roisender/pid.data'
     for pid in open(pidfile, 'r'):

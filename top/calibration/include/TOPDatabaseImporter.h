@@ -39,9 +39,10 @@ namespace Belle2 {
 
     /**
      * Import sample time calibration constants to database
-     * @param fileName text file name with calibration constants
+     * Output of TOPTimeBaseCalibrator (root files with histograms)
+     * @param fileNames file names separated by space (since vector doesn't work!)
      */
-    void importSampleTimeCalibration(std::string fileName);
+    void importSampleTimeCalibration(std::string fileNames);
 
     /**
      * Import sample time calibration constants to database
@@ -58,9 +59,21 @@ namespace Belle2 {
     void importChannelT0CalibrationKichimi(std::string fileNames);
 
     /**
+     * Prints sample time calibration info about constants stored in database
+     */
+    void getSampleTimeCalibrationInfo();
+
+    /**
      * Print sample time calibration constants stored in database
      */
     void printSampleTimeCalibration();
+
+    /**
+     * Generate and import a (random, fake) channel mask for testing
+     * @param fractionDead the fraction of dead PMs to randomly assign
+     * @param fractionHot the fraction of noisy PMs to randomly assign
+     */
+    void generateFakeChannelMask(double fractionDead, double fractionHot);
 
     /**
      * for testing purposes only! - will be removed ...

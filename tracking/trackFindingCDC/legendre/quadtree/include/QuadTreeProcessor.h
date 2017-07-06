@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeNode.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
 
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+
 #include <algorithm>
 #include <functional>
 #include <map>

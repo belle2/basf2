@@ -54,7 +54,7 @@ class ConditionsDB:
         #: session object to get keep-alive support and connection pooling
         self._session = requests.Session()
         # change the api to return json instead of xml, much easier in python
-        self._session.headers.update({"Accept": "application/json"})
+        self._session.headers.update({"Accept": "application/json", "Cache-Control": "no-cache"})
         # add a http adapter to honour our max_connections and retries settings
         self._session.mount(self._base_url, requests.adapters.HTTPAdapter(
             pool_connections=max_connections, pool_maxsize=max_connections,
@@ -281,6 +281,22 @@ class ConditionsDB:
                 result[(payloadId, firstExp, firstRun, finalExp, finalRun)] = iovId
 
         return result
+
+
+def require_database_for_test(timeout=60, base_url=ConditionsDB.BASE_URL):
+    """Make sure that the database is available and skip the test if not.
+
+    This function should be called in test scripts if they are expected to fail
+    if the database is down. It either returns when the database is ok or it
+    will signal test_basf2 that the test should be skipped and exit
+    """
+    import sys
+    condb = ConditionsDB(base_url=base_url, max_connections=1)
+    try:
+        condb.request("HEAD", "/globalTags", timeout=timeout)
+    except ConditionsDB.RequestError as e:
+        print("TEST SKIPPED: Database problem: %s" % e, file=sys.stderr)
+        sys.exit(1)
 
 
 def enable_debugging():

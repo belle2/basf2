@@ -362,6 +362,23 @@ namespace Belle2 {
     int m_ftswid;
   };
 
+  std::string popen(const std::string& cmd)
+  {
+    char buf[1000];
+    FILE* fp;
+    if ((fp = ::popen(cmd.c_str(), "r")) == NULL) {
+      perror("can not exec commad");
+      exit(EXIT_FAILURE);
+    }
+    std::stringstream ss;
+    while (!feof(fp)) {
+      memset(buf, 0, 1000);
+      fgets(buf, sizeof(buf), fp);
+      ss << buf;
+    }
+    pclose(fp);
+    return ss.str();
+  }
 }
 
 using namespace Belle2;
@@ -573,7 +590,7 @@ void TTCtrlCallback::start(int expno, int runno) throw(RCHandlerException)
 
 void TTCtrlCallback::stop() throw(RCHandlerException)
 {
-  if (m_ttdnode.getName().size() > 0) {
+  if (m_ttdnode.getName().size() > 0 && m_ttdnode.getState() == RCState::RUNNING_S) {
     send(NSMMessage(m_ttdnode, NSMCommand(13, "STOP")));
   } else {
     std::string cmd = StringUtil::form("trigft -%d reset", m_ftswid);
@@ -786,7 +803,8 @@ void TTCtrlCallback::statftx(ftsw_t* ftsw, int ftswid)
     set("tstart", (int)u.rstutim);
     set("trun", (int)(u.utime - u.rstutim));
     set("ftstate", fstate);
-    set("statft", ss);
+    //set("statft", ss);
+    set("statft", popen(StringUtil::form("statft -%d", ftswid)));
     const DBObject& o_port(getDBObject()("port"));
     if (o_port.hasObject("fee")) {
       const DBObjectList& o_fees(o_port.getObjects("fee"));
@@ -794,8 +812,9 @@ void TTCtrlCallback::statftx(ftsw_t* ftsw, int ftswid)
         std::string vname = StringUtil::form("link.o[%d].", i);
         int up = B(u.linkup, i);
         set(vname + "linkup", up);
-        if (up) {
-          set(vname + "mask", (int)B(u.omask, i));
+        int mask = (int)B(u.omask, i);
+        set(vname + "mask", mask);
+        if (up && (!mask)) {
           if (B(u.odata[i], 1)) {
             set(vname + "ttlost", (int)B(u.odata[i], 10));
             set(vname + "ttldn", 0);
@@ -895,7 +914,7 @@ void TTCtrlCallback::statftx(ftsw_t* ftsw, int ftswid)
     set("tstart", (int)p.rstutim);
     set("trun", (int)(p.utime - p.rstutim));
     set("ftstate", fstate);
-    set("statft", ss);
+    set("statft", popen(StringUtil::form("statft -%d", ftswid)));
     const DBObject& o_port(getDBObject()("port"));
     if (o_port.hasObject("fee")) {
       const DBObjectList& o_fees(o_port.getObjects("fee"));
@@ -903,11 +922,12 @@ void TTCtrlCallback::statftx(ftsw_t* ftsw, int ftswid)
         std::string vname = StringUtil::form("link.o[%d].", i);
         int up = B(p.oalive, i);
         set(vname + "linkup", up);
-        if (up) {
+        int mask = (int)B(p.omask, i);
+        set(vname + "mask", mask);
+        if (up && !mask) {
           int fa = p.odata[i];
           int fb = p.odatb[i];
           //int fc = p.odatc[i];
-          set(vname + "mask", (int)B(p.omask, i));
           if (B(fa, 1)) {
             set(vname + "ttlost", (int)B(fa, 10));
             set(vname + "ttldn", 0);

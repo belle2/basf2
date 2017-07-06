@@ -37,23 +37,116 @@ namespace KlIdHelpers {
     }
   }
 
-
-  /** return if mc particle is a K_long */
+  /** return the mc hirachy of the klong 0:not a klong 1:final particle, 2: klong is mother etc */
   int mcParticleIsKlong(Belle2::MCParticle* part)
   {
-
+    unsigned int hirachy_counter = 0;
     if (mcParticleIsBeamBKG(part)) {
       return 0;
     }
 
     while (!(part -> getMother() == nullptr)) {
+      ++hirachy_counter;
       if (part -> getPDG() == 130) {
-        return 1;
+        return hirachy_counter;
       }
       part = part -> getMother();
     }
     return 0;
   }
+
+  /** checks if a cluster is signal under the mcWeightcondition (mcWeight = energy deposition) */
+  bool isKLMClusterSignal(const Belle2::KLMCluster& cluster, float mcWeigthCut = 0.66)
+  {
+    const auto mcParticleWeightPair = cluster.getRelatedToWithWeight<Belle2::MCParticle>();
+    Belle2::MCParticle* part        = mcParticleWeightPair.first;
+    if (!part) {return false; }
+    float mcWeight = mcParticleWeightPair.second;
+    if (mcParticleIsKlong(part) && (mcWeight > mcWeigthCut)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /** checks if a cluster is signal under the mcWeightcondition (mcWeight = energy deposition) */
+  bool isECLClusterSignal(const Belle2::ECLCluster& cluster, float mcWeigthCut = 0.66)
+  {
+    const auto mcParticleWeightPair = cluster.getRelatedToWithWeight<Belle2::MCParticle>();
+    Belle2::MCParticle* part        = mcParticleWeightPair.first;
+    if (!part) {return false; }
+    float mcWeight = mcParticleWeightPair.second;
+    if (mcParticleIsKlong(part) && (mcWeight > mcWeigthCut)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
+  /** return if mc particle has a certain pdg in the decay chain*/
+  int isMCParticlePDG(Belle2::MCParticle* part, int pdg)
+  {
+    while (!(part -> getMother() == nullptr)) {
+      if (std::abs(part -> getPDG()) == pdg) {
+        return true;
+      }
+      part = part -> getMother();
+    }
+    return false;
+  }
+
+
+  /** return if mc particles primary pdg.
+   *  this is very imprecise but sufficient
+   *  to understand if the backgrounds are charged,
+   *  hadronic or gammas which is whats relevant
+   *  for klid investigations.
+   * */
+  int getPrimaryPDG(Belle2::MCParticle* part)
+  {
+
+    if (mcParticleIsBeamBKG(part)) {
+      return -999;
+    }
+    while (!(part -> getMother() == nullptr)) {
+      if (isMCParticlePDG(part, 130)) {
+        return 130;
+      }
+      if (isMCParticlePDG(part, 310)) {
+        return 310;
+      }
+      if (isMCParticlePDG(part, 321)) {
+        return 321;
+      }
+      if (isMCParticlePDG(part, 2112)) {
+        return 2112;
+      }
+      if (isMCParticlePDG(part, 2212)) {
+        return 2212;
+      }
+      if (isMCParticlePDG(part, 211)) {
+        return 211;
+      }
+      if (isMCParticlePDG(part, 111)) {
+        return 111;
+      }
+      if (isMCParticlePDG(part, 13)) {
+        return 13;
+      }
+      if (isMCParticlePDG(part, 11)) {
+        return 11;
+      }
+      if (isMCParticlePDG(part, 22)) {
+        return 22;
+      }
+      part = part -> getMother();
+    }
+    return 0;
+  }
+
+
+
 
 
   /** find closest ECL Cluster and its distance */
@@ -118,31 +211,38 @@ namespace KlIdHelpers {
 
 
   /** find nearest genfit track and return it and its distance  */
-  std::tuple<Belle2::RecoTrack*, double, std::unique_ptr<const TVector3> > findClosestTrack(const TVector3& clusterPosition)
+  std::tuple<Belle2::RecoTrack*, double, std::unique_ptr<const TVector3> > findClosestTrack(const TVector3& clusterPosition,
+      float cutAngle)
   {
     Belle2::StoreArray<Belle2::RecoTrack> genfitTracks;
-    double oldDistance = INFINITY;
+    double oldDistance = 10000000;//dont wanna use infty cos that kills tmva...
     Belle2::RecoTrack* closestTrack = nullptr;
     TVector3 poca = TVector3(0, 0, 0);
 
 
     for (Belle2::RecoTrack& track : genfitTracks) {
+
       try {
         genfit::MeasuredStateOnPlane state;
-        state = track.getMeasuredStateOnPlaneFromLastHit();
-        state.extrapolateToPoint(clusterPosition);
-        const TVector3& trackPos = state.getPos();
+        genfit::MeasuredStateOnPlane state_for_cut;
+        state_for_cut = track.getMeasuredStateOnPlaneFromFirstHit();
 
-        const TVector3& distanceVecCluster = clusterPosition - trackPos;
-        double newDistance = distanceVecCluster.Mag2();
+        // only use tracks that are close cos the extrapolation takes ages
+        if (clusterPosition.Angle(state_for_cut.getPos()) < cutAngle) {
+          state = track.getMeasuredStateOnPlaneFromLastHit();
+          state.extrapolateToPoint(clusterPosition);
+          const TVector3& trackPos = state.getPos();
 
-        // overwrite old distance
-        if (newDistance < oldDistance) {
-          oldDistance = newDistance;
-          closestTrack = &track;
-          poca = trackPos;
+          const TVector3& distanceVecCluster = clusterPosition - trackPos;
+          double newDistance = distanceVecCluster.Mag2();
+
+          // overwrite old distance
+          if (newDistance < oldDistance) {
+            oldDistance = newDistance;
+            closestTrack = &track;
+            poca = trackPos;
+          }
         }
-
       } catch (genfit::Exception& e) {
       }// try
     }// for gftrack

@@ -55,8 +55,14 @@ void TrackCreatorSingleSegments::apply(const std::vector<CDCSegment2D>& segments
 
   if (not m_param_minimalHitsBySuperLayerId.empty()) {
     for (const CDCSegment2D& segment : segments) {
-      if (segment->hasMaskedFlag()) continue;
-
+      if (segment->hasMaskedFlag()) {
+        int nMasked = 0;
+        for (const CDCRecoHit2D& recoHit2D : segment) {
+          if (recoHit2D.getWireHit()->hasMaskedFlag()) ++nMasked;
+        }
+        // Relaxed requirement of only 20% of hits masked by other tracks
+        if (nMasked > segment.size() * 0.2) continue;
+      }
       ISuperLayer iSuperLayer = segment.getISuperLayer();
       if (m_param_minimalHitsBySuperLayerId.count(iSuperLayer) and
           segment.size() >= m_param_minimalHitsBySuperLayerId[iSuperLayer]) {

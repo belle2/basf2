@@ -156,6 +156,8 @@ class SegmentPairFitValidationRun(HarvestingRun):
                         UseNLoops=0.5
                         )
 
+        path.add_module("TFCDC_ClusterPreparer")
+
         if self.monte_carlo == "no":
             # MC free - default
             path.add_module("TFCDC_SegmentFinderFacetAutomaton",

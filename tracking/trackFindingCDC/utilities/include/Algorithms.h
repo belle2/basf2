@@ -117,6 +117,46 @@ namespace Belle2 {
     }
 
     /**
+     *  Counts the number of repetitions for each unique value in a range. Unique values must be adjacent.
+     */
+    template <class It>
+    std::vector<Range<It> > unique_ranges(It itBegin, It itEnd)
+    {
+      std::vector<std::pair<It, It> > result;
+      if (itBegin == itEnd) return result;
+      It it1 = itBegin;
+      It it2 = itBegin + 1;
+      result.emplace_back(it1, it2);
+      for (; it2 != itEnd; ++it1, ++it2) {
+        if (not(*it1 == *it2)) {
+          result.emplace_back(it2, it2);
+        }
+        ++result.back().second;
+      }
+      return result;
+    }
+
+    /**
+     *  Counts the number of repetitions for each unique value in a range. Unique values must be adjacent.
+     */
+    template <class It, class AEqual>
+    std::vector<Range<It> > unique_ranges(It itBegin, It itEnd, const AEqual& equal)
+    {
+      std::vector<Range<It> > result;
+      if (itBegin == itEnd) return result;
+      It it1 = itBegin;
+      It it2 = itBegin + 1;
+      result.emplace_back(it1, it2);
+      for (; it2 != itEnd; ++it1, ++it2) {
+        if (not equal(*it1, *it2)) {
+          result.emplace_back(it2, it2);
+        }
+        ++result.back().second;
+      }
+      return result;
+    }
+
+    /**
      *  Chunks a range of values into adjacent sub ranges that belong to the same category.
      */
     template <class It, class ACategoryFunction>
@@ -199,5 +239,14 @@ namespace Belle2 {
     {
       return std::any_of(std::begin(ts), std::end(ts), comparator);
     }
+
+    /**
+     * Shortcut for applying std::find(..) != end.
+     */
+    template <class Ts, class AItem>
+    bool is_in(const AItem& item, const Ts& ts)
+    {
+      return std::find(std::begin(ts), std::end(ts), item) != std::end(ts);
+    };
   }
 }

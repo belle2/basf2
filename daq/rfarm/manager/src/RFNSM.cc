@@ -57,35 +57,44 @@ RFNSM::RFNSM(char* nodename, RFServerBase* server)
   g_nsmserver = server;
 
   // Hook server functions to NSM
-  if (b2nsm_callback("RF_CONFIGURE", m_Configure) < 0) {
+  //  if (b2nsm_callback("RF_CONFIGURE", m_Configure) < 0) {
+  if (b2nsm_callback("RC_LOAD", m_Configure) < 0) {
     fprintf(stderr, "RFNSM : %s hooking CONFIGURE failed, %s\n",
             m_nodename.c_str(), b2nsm_strerror());
   }
-  if (b2nsm_callback("RF_UNCONFIGURE", m_UnConfigure) < 0) {
+  //  if (b2nsm_callback("RF_UNCONFIGURE", m_UnConfigure) < 0) {
+  if (b2nsm_callback("RC_ABORT", m_UnConfigure) < 0) {
     fprintf(stderr, "RFNSM : %s hooking UNCONFIGURE failed, %s\n",
             m_nodename.c_str(), b2nsm_strerror());
   }
-  if (b2nsm_callback("RF_START", m_Start) < 0) {
+  //  if (b2nsm_callback("RF_START", m_Start) < 0) {
+  if (b2nsm_callback("RC_START", m_Start) < 0) {
     fprintf(stderr, "RFNSM : %s hooking START failed, %s\n",
             m_nodename.c_str(), b2nsm_strerror());
   }
-  if (b2nsm_callback("RF_STOP", m_Stop) < 0) {
+  //  if (b2nsm_callback("RF_STOP", m_Stop) < 0) {
+  if (b2nsm_callback("RC_STOP", m_Stop) < 0) {
     fprintf(stderr, "RFNSM : %s hooking STOP failed, %s\n",
             m_nodename.c_str(), b2nsm_strerror());
   }
-  if (b2nsm_callback("RF_PAUSE", m_Pause) < 0) {
+  //  if (b2nsm_callback("RF_PAUSE", m_Pause) < 0) {
+  if (b2nsm_callback("RC_PAUSE", m_Pause) < 0) {
     fprintf(stderr, "RFNSM : %s hooking PAUSE failed, %s\n",
             m_nodename.c_str(), b2nsm_strerror());
   }
-  if (b2nsm_callback("RF_RESUME", m_Resume) < 0) {
+  //  if (b2nsm_callback("RF_RESUME", m_Resume) < 0) {
+  if (b2nsm_callback("RC_RESUME", m_Resume) < 0) {
     fprintf(stderr, "RFNSM : %s hooking RESUME failed, %s\n",
             m_nodename.c_str(), b2nsm_strerror());
   }
-  if (b2nsm_callback("RF_RESTART", m_Restart) < 0) {
+  //  if (b2nsm_callback("RF_RESTART", m_Restart) < 0) {
+  if (b2nsm_callback("RC_RECOVER", m_Restart) < 0) {
     fprintf(stderr, "RFNSM : %s hooking RESTART failed, %s\n",
             m_nodename.c_str(), b2nsm_strerror());
   }
-  if (b2nsm_callback("RF_STATUS", m_Status) < 0) {
+
+  // Status function
+  if (b2nsm_callback("RC_STATUS", m_Status) < 0) {
     fprintf(stderr, "RFNSM : %s hooking STATUS failed, %s\n",
             m_nodename.c_str(), b2nsm_strerror());
   }

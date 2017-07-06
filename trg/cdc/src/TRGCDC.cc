@@ -21,6 +21,7 @@
 #include "framework/datastore/RelationArray.h"
 #include "rawdata/dataobjects/RawDataBlock.h"
 #include "rawdata/dataobjects/RawCOPPER.h"
+#include <rawdata/dataobjects/RawTRG.h>
 #include "cdc/geometry/CDCGeometryPar.h"
 #include "cdc/dataobjects/CDCHit.h"
 #include "cdc/dataobjects/CDCSimHit.h"
@@ -597,7 +598,6 @@ namespace Belle2 {
                                  *layer,
                                  w,
                                  _clockD,
-                                 _eventTime.back(),
                                  _outerTSLUTFilename,
                                  cells);
         } else {
@@ -605,7 +605,6 @@ namespace Belle2 {
                                  *layer,
                                  w,
                                  _clockD,
-                                 _eventTime.back(),
                                  _innerTSLUTFilename,
                                  cells);
         }
@@ -1293,6 +1292,40 @@ namespace Belle2 {
         inBinaryData.push_back(t_feData);
       }
       inBinaryData.push_back(rawBinaryData[2]);
+      //// Print data of inBinaryData
+      //for(unsigned iBoard=0; iBoard<inBinaryData.size(); iBoard++){
+      // cout<<"Board"<<iBoard<<endl;
+      // for(unsigned iWord=0; iWord<inBinaryData[iBoard].size(); iWord++){
+      // cout<<setfill('0')<<setw(8)<<hex<<inBinaryData[iBoard][iWord];
+      // }
+      // cout<<dec<<endl;
+      //}
+    } else if (inputMode == 2) {
+      // get data from Belle2Link
+      StoreArray<RawTRG> raw_trgarray;
+      for (int i = 0; i < raw_trgarray.getEntries(); i++) {
+        cout << "\n===== DataBlock(RawTRG) : Block # " << i << endl;
+        for (int j = 0; j < raw_trgarray[ i ]->GetNumEntries(); j++) {
+          RawCOPPER* raw_copper = raw_trgarray[ i ];
+          vector<vector<unsigned> > rawBinaryData;
+          // Loop over 4 FINESSEs
+          for (int iFinesse = 0; iFinesse < 4; iFinesse++) {
+            int bufferNwords = raw_copper->GetDetectorNwords(j, iFinesse);
+            if (bufferNwords > 0) {
+              printf("===== Detector Buffer(FINESSE # %i) 0x%x words \n", iFinesse, bufferNwords);
+              vector<unsigned> t_copperData(raw_copper->GetDetectorNwords(j, iFinesse));
+              // Loop over all the words for board data
+              for (int iWord = 0; iWord < bufferNwords; iWord++) {
+                t_copperData[iWord] = (raw_copper->GetDetectorBuffer(j, iFinesse))[iWord];
+              }
+              rawBinaryData.push_back(t_copperData);
+              inBinaryData.push_back(t_copperData);
+
+            }
+          }
+        }
+      }
+
       //// Print data of inBinaryData
       //for(unsigned iBoard=0; iBoard<inBinaryData.size(); iBoard++){
       // cout<<"Board"<<iBoard<<endl;
@@ -2294,7 +2327,7 @@ namespace Belle2 {
       const TCTrack* track3D = _trackList3D[itr];
       if (!track3D->fitted()) continue;
       double phi0 = remainder(track3D->helix().phi0() + M_PI_2, 2. * M_PI);
-      double omega = track3D->charge() / track3D->helix().radius();
+      double omega = 1. / track3D->helix().radius();
       double chi2 = track3D->get2DFitChi2();
       double z = track3D->helix().dz();
       double cot = track3D->helix().tanl();

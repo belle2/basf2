@@ -43,6 +43,10 @@
 #include <iostream>
 #include <fstream>
 
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/device/file.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+
 using namespace std;
 using namespace Belle2;
 
@@ -237,8 +241,13 @@ void CDCDatabaseImporter::importXT(std::string fileName)
   xt.construct();
 
   //read alpha bins
-  std::ifstream ifs;
-  ifs.open(fileName.c_str());
+  //  std::ifstream ifs;
+  //  ifs.open(fileName.c_str());
+  boost::iostreams::filtering_istream ifs;
+  if ((fileName.rfind(".gz") != string::npos) && (fileName.length() - fileName.rfind(".gz") == 3)) {
+    ifs.push(boost::iostreams::gzip_decompressor());
+  }
+  ifs.push(boost::iostreams::file_source(fileName));
   if (!ifs) {
     B2FATAL("openFile: " << fileName << " *** failed to open");
   }
@@ -338,6 +347,8 @@ void CDCDatabaseImporter::importXT(std::string fileName)
     xt->setXtParams(iCL, iLR, ialpha, itheta, xtbuff);
   }
 
+  //  ifs.close();
+  boost::iostreams::close(ifs);
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
@@ -444,6 +455,7 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
     sg->setSigmaParams(iCL, iLR, ialpha, itheta, sgbuff);
   }
 
+  ifs.close();
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);

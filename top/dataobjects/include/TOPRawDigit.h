@@ -17,7 +17,7 @@ namespace Belle2 {
 
   /**
    * Class to store unpacked raw data (hits in feature-extraction format)
-   * It provides also calculation of 50% CFD leading and falling edge times
+   * It provides also calculation of 50% CFD leading and falling edge times and errors
    */
 
   class TOPRawDigit : public RelationsObject {
@@ -31,6 +31,12 @@ namespace Belle2 {
                       c_HitMagic = 0x0004,   /**< if magic number not 0xB */
                       c_HitChecksum = 0x0008 /**< if sum of 16-bit words not zero */
                     };
+
+    /**
+     * Various constants
+     */
+    enum {c_WindowSize = 64 /**< number of samples per window */
+         };
 
     /**
      * Default constructor
@@ -64,10 +70,19 @@ namespace Belle2 {
     void setASICChannel(unsigned short channel) {m_channel = channel;}
 
     /**
-     * Sets storage window number
+     * Sets first storage window number
      * @param window number
      */
     void setASICWindow(unsigned short window) {m_window = window;}
+
+    /**
+     * Sets storage windows of waveform segments
+     * @param windows window numbers
+     */
+    void setStorageWindows(const std::vector<unsigned short>& windows)
+    {
+      m_windows = windows;
+    }
 
     /**
      * Sets current (reference) window number
@@ -143,6 +158,11 @@ namespace Belle2 {
     void setErrorFlags(unsigned short flags) {m_errorFlags = flags;}
 
     /**
+     * Sets offline flag: telling that this digit was extracted offline in basf2
+     */
+    void setOfflineFlag() {m_offline = true;}
+
+    /**
      * Returns SCROD ID
      * @return SCROD ID
      */
@@ -171,6 +191,12 @@ namespace Belle2 {
      * @return window number
      */
     unsigned getASICWindow() const {return m_window;}
+
+    /**
+     * Returns storage window numbers of waveform segments (not always available!)
+     * @return window numbers
+     */
+    const std::vector<unsigned short>& getStorageWindows() const {return m_windows;}
 
     /**
      * Returns current (reference) ASIC window number
@@ -270,7 +296,7 @@ namespace Belle2 {
 
     /**
      * Returns leading edge CFD time
-     * @return time [samples] (not in [ns], conversion factor is ~0.368 ns / sample)
+     * @return time [samples] (not in [ns]!)
      */
     double getCFDLeadingTime() const
     {
@@ -279,7 +305,7 @@ namespace Belle2 {
 
     /**
      * Returns falling edge CFD time
-     * @return time [samples] (not in [ns], conversion factor is ~0.368 ns / sample)
+     * @return time [samples] (not in [ns]!)
      */
     double getCFDFallingTime() const
     {
@@ -287,8 +313,28 @@ namespace Belle2 {
     }
 
     /**
+     * Returns leading edge CFD time uncertainty (assuming uncorrelated noise)
+     * @param rmsNoise r.m.s of the pedestal fluctuations [ADC counts]
+     * @return time uncertainty [samples] (not in [ns]!)
+     */
+    double getCFDLeadingTimeError(double rmsNoise) const
+    {
+      return rmsNoise * timeErrorCoefficient(m_VRise0, m_VRise1);
+    }
+
+    /**
+     * Returns falling edge CFD time uncertainty (assuming uncorrelated noise)
+     * @param rmsNoise r.m.s of the pedestal fluctuations [ADC counts]
+     * @return time uncertainty [samples] (not in [ns]!)
+     */
+    double getCFDFallingTimeError(double rmsNoise) const
+    {
+      return rmsNoise * timeErrorCoefficient(m_VFall0, m_VFall1);
+    }
+
+    /**
      * Returns signal full width half maximum
-     * @return FWHM [samples] (not in [ns], conversion factor is ~0.368 ns / sample)
+     * @return FWHM [samples] (not in [ns]!)
      */
     double getFWHM() const {return getCFDFallingTime() - getCFDLeadingTime();}
 
@@ -304,42 +350,63 @@ namespace Belle2 {
      */
     bool isFallingEdgeValid() const {return checkEdge(m_VFall1, m_VFall0, m_VPeak);}
 
-
     /**
      * Checks if feature extraction points make sense
      * @return true if consistent
      */
     bool isFEValid() const
     {
-      if (m_VPeak > 0) {
-        if (m_VRise0 > m_VRise1) return false;
-        if (m_VRise1 > m_VPeak) return false;
-        if (m_VFall0 > m_VPeak) return false;
-        if (m_VFall1 > m_VFall0) return false;
-      } else {
-        if (m_VRise0 < m_VRise1) return false;
-        if (m_VRise1 < m_VPeak) return false;
-        if (m_VFall0 < m_VPeak) return false;
-        if (m_VFall1 < m_VFall0) return false;
-      }
-      return true;
+      return isLeadingEdgeValid() and isFallingEdgeValid();
     }
-
 
     /**
      * Checks if feature extraction finds a pedestal jump
      * @return true if pedestal jump
      */
-    bool isPedestalJump() const
+    bool isPedestalJump() const;
+
+    /**
+     * Checks if feature extraction points are at window discontinuity
+     * (e.g. discontinuity happens between sampleRise and sampleFall+1)
+     * NOTE: always false if m_windows is empty
+     * @param storageDepth storage depth
+     * @return true if window discontinuity is found between sampleRise and sampleFall+1
+     */
+    bool isAtWindowDiscontinuity(unsigned short storageDepth = 512) const;
+
+    /**
+     * Checks if storage windows come in the consecutive order before the last sample
+     * (no gaps before the last sample)
+     * Note: returns true if m_windows is empty
+     * @param storageDepth storage depth
+     * @return true, if no gaps before the last sample or m_windows is empty
+     */
+    bool areWindowsInOrder(unsigned short storageDepth = 512) const;
+
+    /**
+     * Corrects time after window discontinuity by adding missing samples
+     * @param time leading or falling edge time [samples]
+     * @param storageDepth storage depth
+     * @return time corrected for missing samples if any, otherwise returns input value [samples]
+     */
+    double correctTime(double time, unsigned short storageDepth = 512) const;
+
+    /**
+     * Checks if the first window number is the same as the first one in m_windows
+     * Note: returns true if m_windows is empty
+     * @return true, if window numbers are the same or m_windows is empty
+     */
+    bool isWindowConsistent() const
     {
-      if (m_sampleRise == 0) {
-        if ((m_dSampleFall + 1) % 64 == 0) return true;
-      } else if ((m_sampleRise + 1) % 64 == 0) {
-        if (m_dSampleFall % 64 == 0) return true;
-      }
-      return false;
+      if (m_windows.empty()) return true;
+      return m_windows[0] == m_window;
     }
 
+    /**
+     * Returns offline flag
+     * @return true, if digit was extracted from waveform offline (in basf2)
+     */
+    bool isMadeOffline() const {return m_offline;}
 
   private:
 
@@ -357,18 +424,27 @@ namespace Belle2 {
     }
 
     /**
-     * Checks if values v0, v1 and vp are consistent
+     * Calculate the coefficient of time error
+     * @param y1 first value (e.g. VRise0 or VFall0)
+     * @param y2 second value (e.g. VRise1 or VFall1)
+     * @return coefficient of time error
      */
-    bool checkEdge(int v0, int v1, int vp) const
+    double timeErrorCoefficient(double y1, double y2) const;
+
+    /**
+     * Checks if values v1, v2 and vp are consistent
+     */
+    bool checkEdge(int v1, int v2, int vp) const
     {
-      return (v1 > v0 and vp > 0) or (v1 < v0 and vp < 0);
+      return (vp > 0 and v1 < v2 and 2 * v1 <= vp and v2 <= vp)
+             or (vp < 0 and v1 > v2 and 2 * v1 >= vp and v2 >= vp);
     }
 
     unsigned short m_scrodID = 0; /**< SCROD ID */
     unsigned short m_carrier = 0; /**< carrier board number */
     unsigned short m_asic = 0;    /**< ASIC number */
     unsigned short m_channel = 0; /**< ASIC channel number */
-    unsigned short m_window = 0;  /**< storage window number */
+    unsigned short m_window = 0;  /**< first ASIC storage window number */
     unsigned short m_TFine = 0; /**< fine timing for 50% CFD (within two samples) */
     unsigned short m_sampleRise = 0;  /**< sample number just before 50% CFD crossing */
     unsigned short m_dSamplePeak = 0; /**< peak position relative to m_sampleRise */
@@ -381,8 +457,10 @@ namespace Belle2 {
     short m_integral = 0;     /**< integral of a pulse (e.g. \propto charge) */
     unsigned short m_errorFlags = 0; /**< feature extraction error flags (see enum) */
     unsigned short m_lastWriteAddr = 0; /**< current (reference) window number */
+    std::vector<unsigned short> m_windows; /**< storage windows of waveform segments */
+    bool m_offline = false; /**< feature extraction flag: by firmware or software */
 
-    ClassDef(TOPRawDigit, 2); /**< ClassDef */
+    ClassDef(TOPRawDigit, 3); /**< ClassDef */
 
   };
 

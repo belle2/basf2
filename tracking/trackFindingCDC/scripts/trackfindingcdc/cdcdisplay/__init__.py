@@ -17,7 +17,7 @@ import math
 
 import subprocess
 from datetime import datetime
-
+import itertools
 from . import svgdrawing
 from .svgdrawing import attributemaps
 
@@ -57,6 +57,9 @@ class CDCSVGDisplayModule(basf2.Module):
         # the wires in this case to reduce the rendering load.
         #: Switch to make an animated event display by means of animated SVG.
         self.animate = False
+
+        #: Switch to make the color of segments and tracks fade out in the forward direction
+        self.forward_fade = False
 
         # The following options can be used independent of the track finder
         # to view Monte Carlo information after the simulation is done
@@ -117,6 +120,9 @@ class CDCSVGDisplayModule(basf2.Module):
 
         #: Switch to draw the CDCSimHits red for getBackgroundTag() != bg_none. Default: inactive
         self.draw_simhit_isbkg = False
+
+        #: Switch to draw the CDCHit colored by the number of loops passed
+        self.draw_nloops = False
 
         #: Switch to draw the CDCSimHits connected in the order of their getFlightTime
         #: for each Monte Carlo particle.
@@ -215,8 +221,11 @@ class CDCSVGDisplayModule(basf2.Module):
         #: Draw the MC reference RecoTracks pattern recognition matching status
         self.draw_mcrecotrack_matching = False
 
-        #: Draw the output Genfit track trajectories
-        self.draw_recotrack_trajectories = False
+        #: Draw the output track seed trajectories
+        self.draw_recotrack_seed_trajectories = False
+
+        #: Draw the output trackpoint trajectories
+        self.draw_recotrack_fit_trajectories = False
 
         #: Draw a red cdc hit of the rl info of the segment reco hits is wrong, else a green one
         self.draw_wrong_rl_infos_in_segments = False
@@ -240,7 +249,7 @@ class CDCSVGDisplayModule(basf2.Module):
         self.cdc_segment_vector_store_obj_name = 'CDCSegment2DVector'
 
         #: Current file's number (used for making output filename)
-        self.file_number = 1
+        self.file_number = 0
 
         #: Filename prefix
         self.filename_prefix = "CDCDisplay"
@@ -257,6 +266,7 @@ class CDCSVGDisplayModule(basf2.Module):
         """
         result = [
             'animate',
+            'forward_fade',
             'draw_superlayer_boundaries',
             'draw_walls',
             'draw_interaction_point',
@@ -271,6 +281,7 @@ class CDCSVGDisplayModule(basf2.Module):
             'draw_simhit_pdgcode',
             'draw_simhit_bkgtag',
             'draw_simhit_isbkg',
+            'draw_nloops',
             'draw_connect_tof',
             'draw_rlinfo',
             'draw_reassigned',
@@ -278,7 +289,8 @@ class CDCSVGDisplayModule(basf2.Module):
             'draw_mcrecotracks',
             'draw_recotrack_matching',
             'draw_mcrecotrack_matching',
-            'draw_recotrack_trajectories',
+            'draw_recotrack_seed_trajectories',
+            'draw_recotrack_fit_trajectories',
             # Specialised options to be used in the CDC local tracking context
             # obtain them from the all_drawoptions property
             # 'draw_takenflag',
@@ -303,7 +315,6 @@ class CDCSVGDisplayModule(basf2.Module):
             # 'draw_tracks',
             # 'draw_track_trajectories',
         ]
-
         for name in result:
             if not hasattr(self, name):
                 raise NameError('%s is not a valid draw option. Fix the misspelling.'
@@ -369,7 +380,7 @@ class CDCSVGDisplayModule(basf2.Module):
             self.use_cpp = True
 
         if self.use_cpp:
-            cppplotter = Belle2.TrackFindingCDC.CDCSVGPlotter(self.animate)
+            cppplotter = Belle2.TrackFindingCDC.CDCSVGPlotter(self.animate, self.forward_fade)
         if self.use_python:
             plotter = svgdrawing.CDCSVGPlotter(animate=self.animate)
 
@@ -390,6 +401,9 @@ class CDCSVGDisplayModule(basf2.Module):
         if self.use_python:
             self.prefilled_plotter = plotter
 
+        segment_relation_filter = Belle2.TrackFindingCDC.MVAFeasibleSegmentRelationFilter()
+        segment_relation_filter.initialize()
+
     def beginRun(self):
         """
         Begin run method of the module. Empty here.
@@ -407,6 +421,8 @@ class CDCSVGDisplayModule(basf2.Module):
             cppplotter = self.prefilled_cppplotter.clone()
         if self.use_python:
             plotter = self.prefilled_plotter.clone()
+
+        self.file_number += 1
 
         # if self.draw_wires:
         #    theCDCWireTopology = \
@@ -541,6 +557,14 @@ class CDCSVGDisplayModule(basf2.Module):
                 styleDict = {'stroke': color_map}
                 plotter.draw_storearray(self.cdc_hits_store_array_name, **styleDict)
 
+        # Draw background tag != bg_none of related simhits
+        if self.draw_nloops:
+            if self.use_cpp:
+                Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
+                cppplotter.drawHits(self.cdc_hits_store_array_name, 'NLoops', '')
+            if self.use_python:
+                print('No Python-function defined')
+
         if self.draw_connect_tof:
             if self.use_cpp:
                 cppplotter.drawSimHitsConnectByToF(self.cdc_hits_store_array_name, "black", ".2")
@@ -609,7 +633,7 @@ class CDCSVGDisplayModule(basf2.Module):
         if self.draw_superclusters:
             if self.use_cpp:
                 cppplotter.drawClusters('CDCWireHitSuperClusterVector',
-                                        'ListColors', '')
+                                        '', '')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.listColors}
                 plotter.draw_storevector('CDCWireHitSuperClusterVector', **styleDict)
@@ -618,7 +642,7 @@ class CDCSVGDisplayModule(basf2.Module):
         if self.draw_clusters:
             if self.use_cpp:
                 cppplotter.drawClusters(self.cdc_wire_hit_cluster_store_obj_name,
-                                        'ListColors', '')
+                                        '', '')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.listColors}
                 plotter.draw_storevector(self.cdc_wire_hit_cluster_store_obj_name, **styleDict)
@@ -669,6 +693,7 @@ class CDCSVGDisplayModule(basf2.Module):
                 plotter.draw_storevector(self.cdc_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segment_firstNPassedSuperLayers:
+            Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
             if self.use_cpp:
                 cppplotter.drawSegments(self.cdc_segment_vector_store_obj_name,
                                         "SegmentFirstNPassedSuperLayersColorMap", "")
@@ -678,6 +703,7 @@ class CDCSVGDisplayModule(basf2.Module):
                 plotter.draw_storevector(self.cdc_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segment_lastNPassedSuperLayers:
+            Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
             if self.use_cpp:
                 cppplotter.drawSegments(self.cdc_segment_vector_store_obj_name,
                                         "SegmentLastNPassedSuperLayersColorMap", "")
@@ -818,7 +844,8 @@ class CDCSVGDisplayModule(basf2.Module):
         # Wrong RL Info
         if self.draw_wrong_rl_infos_in_tracks:
             if self.use_cpp:
-                print('No CPP-function defined')
+                Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
+                cppplotter.drawWrongRLHitsInTracks('CDCTrackVector')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.WrongRLColorMap()}
                 pystoreobj = Belle2.PyStoreObj('CDCTrackVector')
@@ -833,7 +860,8 @@ class CDCSVGDisplayModule(basf2.Module):
 
         if self.draw_wrong_rl_infos_in_segments:
             if self.use_cpp:
-                print('No CPP-function defined')
+                Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
+                cppplotter.drawWrongRLHitsInSegments(self.cdc_segment_vector_store_obj_name)
             if self.use_python:
                 styleDict = {'stroke': attributemaps.WrongRLColorMap()}
                 pystoreobj = Belle2.PyStoreObj(self.cdc_segment_vector_store_obj_name)
@@ -948,9 +976,7 @@ class CDCSVGDisplayModule(basf2.Module):
                     plotter.draw_iterable(iterTrajectories, **styleDict)
 
         # Draw the trajectories of the reco tracks
-        if self.draw_recotrack_trajectories:
-            if self.use_cpp:
-                cppplotter.drawRecoTrackTrajectories(self.reco_tracks_store_array_name, '', '')
+        if self.draw_recotrack_seed_trajectories:
             if self.use_python:
                 recotrack_storearray = Belle2.PyStoreArray(self.reco_tracks_store_array_name)
                 if recotrack_storearray:
@@ -966,6 +992,7 @@ class CDCSVGDisplayModule(basf2.Module):
                         tMomentum = recotrack.getMomentumSeed()
                         charge = recotrack.getChargeSeed()
                         tPosition = recotrack.getPositionSeed()
+                        time = recotrack.getTimeSeed()
 
                         momentum = Belle2.TrackFindingCDC.Vector2D(tMomentum.X(),
                                                                    tMomentum.Y())
@@ -973,11 +1000,21 @@ class CDCSVGDisplayModule(basf2.Module):
                                                                    tPosition.Y())
 
                         trajectory = \
-                            Belle2.TrackFindingCDC.CDCTrajectory2D(position,
+                            Belle2.TrackFindingCDC.CDCTrajectory2D(position, time,
                                                                    momentum, charge)
                         trajectories.append(trajectory)
 
                     plotter.draw_iterable(trajectories, **styleDict)
+
+            if self.use_cpp:
+                raise NotImplementedError
+
+        if self.draw_recotrack_fit_trajectories:
+            if self.use_cpp:
+                cppplotter.drawRecoTrackTrajectories(self.reco_tracks_store_array_name, '', '')
+
+            if self.use_python:
+                raise NotImplementedError
 
         fileName = self.new_output_filename()
         cppfileName = self.new_output_filename()
@@ -1004,8 +1041,6 @@ class CDCSVGDisplayModule(basf2.Module):
             # '-flatten',fileName])
             # procConverter = subprocess.Popen(['rsvg', root + '.svg', root + '.png'])
             input('Hit enter for next event')
-
-        self.file_number += 1
 
     def endRun(self):
         """

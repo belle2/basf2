@@ -84,7 +84,7 @@ void DBStore::updateEntry(DBEntry& dbEntry, const std::pair<TObject*, IntervalOf
   if (objectIov.first && objectIov.first->InheritsFrom(IntraRunDependency::Class())) {
     dbEntry.intraRunDependency = static_cast<IntraRunDependency*>(objectIov.first);
     dbEntry.object = dbEntry.intraRunDependency->getObject(*m_event);
-    m_intraRunDependencies.push_back(&dbEntry);
+    m_intraRunDependencies.insert(&dbEntry);
   } else {
     dbEntry.object = objectIov.first;
   }
@@ -129,13 +129,14 @@ DBEntry* DBStore::getEntry(const std::string& name, const TClass* objClass, bool
 
 void DBStore::update()
 {
-  m_intraRunDependencies.clear();
-
   // Get list of objects that are outside their interval of validity
   list<Database::DBQuery> invalidEntries;
   for (auto& entry : m_dbEntries) {
     if (!entry.second.iov.contains(*m_event)) {
+      //it's no longer valid, request update and remove from intrarun
+      //dependency handling
       invalidEntries.push_back(Database::DBQuery(entry.first));
+      m_intraRunDependencies.erase(&entry.second);
     }
   }
 
@@ -222,12 +223,7 @@ void DBStore::addConstantOverride(const std::string& name, TObject* obj, bool on
   // Otherwise it will reset the object on the next event call
   delete dbEntry.intraRunDependency;
   dbEntry.intraRunDependency = nullptr;
-  for (auto it = m_intraRunDependencies.begin(); it != m_intraRunDependencies.end(); ++it) {
-    if (*it == &dbEntry) {
-      m_intraRunDependencies.erase(it);
-      break;
-    }
-  }
+  m_intraRunDependencies.erase(&dbEntry);
   B2WARNING("An override for DBEntry " << name << " was created.");
   // run callbacks
   for (auto& callback : dbEntry.callbackFunctions) {

@@ -52,6 +52,8 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
     int nSteps = 0;
     UncertainParameterLine2D fitLine = FacetFitter::fit(*fromFacet, *toFacet, nSteps);
     double s = fitLine->lengthOnCurve(frontWirePos2D, backWirePos2D);
+    double alpha = fitLine->support().angleWith(fitLine->tangential());
+    var<named("alpha_0")>() = alpha;
     var<named("chi2_0")>() = fitLine.chi2();
     var<named("chi2_0_per_s")>() = fitLine.chi2() / s;
     var<named("erf_0")>() = std::erf(fitLine.chi2() / 800);

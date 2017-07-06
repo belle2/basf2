@@ -40,6 +40,8 @@ namespace Belle2 {
     /** iD of sector carrying inner hit */
     FullSecID::BaseType m_innerSector;
 
+    std::string m_name;
+
 
   public:
     /** ************************* CONSTRUCTORS ************************* */
@@ -49,7 +51,8 @@ namespace Belle2 {
       m_outerHit(NULL),
       m_innerHit(NULL),
       m_outerSector(FullSecID()),
-      m_innerSector(FullSecID()) {}
+      m_innerSector(FullSecID()),
+      m_name("Out: missing,\nin: missing") {}
 
 
     /** Constructor.
@@ -62,7 +65,10 @@ namespace Belle2 {
       m_outerHit(outerNode),
       m_innerHit(innerNode),
       m_outerSector(outerSector),
-      m_innerSector(innerSector) {}
+      m_innerSector(innerSector)
+    {
+      m_name = "Out: " + m_outerHit->getName() + ")" + ",\nin: " + m_innerHit->getName();
+    }
 
 
     /** ************************* OPERATORS ************************* */
@@ -73,27 +79,13 @@ namespace Belle2 {
       return (*getInnerHit() == *b.getInnerHit() and * getOuterHit() == *b.getOuterHit());
     }
 
-
-    /** overloaded '<<' stream operator. Print secID to stream by converting it to string */
-    friend std::ostream& operator<< (std::ostream& out, const Segment& aSegment)
-    {
-      out << aSegment.getName();
-      return out;
-    }
-
     /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
 /// getters:
 
     /** returns secID of this sector */
     std::string getName() const
     {
-      return  "Out: " + m_outerHit->getName()
-              //              + "(inSector: " + std::string(FullSecID(m_outerSector))
-              //              + ")"
-              + ",\nin: " + m_innerHit->getName()
-//             +   "(inSector: " + std::string(FullSecID(m_innerSector)) +
-//        +")"
-              ;
+      return  m_name;
     }
 
 

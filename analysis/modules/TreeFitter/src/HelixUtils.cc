@@ -22,6 +22,8 @@
 #include <TVector3.h>
 #include "analysis/modules/TreeFitter/HelixUtils.h"
 
+#include <framework/dataobjects/Helix.h>
+
 using std::cout;
 using std::endl;
 
@@ -29,8 +31,8 @@ namespace TreeFitter {
 
   extern int vtxverbose ;
 
-  void HelixUtils::vertexFromHelix(const HepVector& helixpar, double Bz,
-                                   HepVector& vertexpar, int& charge)
+  void HelixUtils::vertexFromHelix(const CLHEP::HepVector& helixpar, double Bz,
+                                   CLHEP::HepVector& vertexpar, int& charge)
   {
     double d0     = helixpar[ex_d0]     ;
     double phi0   = helixpar[ex_phi0]   ;
@@ -54,7 +56,7 @@ namespace TreeFitter {
     double py = pt * sin(phi) ;
     double pz = pt * tandip ;
 
-    if (vertexpar.num_row() != 6)  vertexpar = HepVector(6) ;
+    if (vertexpar.num_row() != 6)  vertexpar = CLHEP::HepVector(6) ;
     vertexpar[in_x]  = x  ;
     vertexpar[in_y]  = y  ;
     vertexpar[in_z]  = z  ;
@@ -63,8 +65,8 @@ namespace TreeFitter {
     vertexpar[in_pz] = pz ;
   }
 
-  void HelixUtils::helixFromVertex(const HepVector& vertexpar, int charge,
-                                   double Bz, HepVector& helixpar, HepMatrix& jacobian)
+  void HelixUtils::helixFromVertex(const CLHEP::HepVector& vertexpar, int charge,
+                                   double Bz, CLHEP::HepVector& helixpar, CLHEP::HepMatrix& jacobian)
   {
     // first copy
     double x  = vertexpar[in_x] ;
@@ -75,7 +77,14 @@ namespace TreeFitter {
     double pz = vertexpar[in_pz] ;
 
     const double a  = Bz * Belle2::Unit::T * Belle2::Const::speedOfLight; //FT: a>0 for in Belle2 unlike BaBar
-
+    /*
+    //Compare to (eventually replace with) Belle algebra:
+    cout<<"a(BaBar) = " << a <<endl;
+    TVector3 position(x,y,z);
+    TVector3 momentum(px,py,pz);
+    Helix hx(position, momentum,charge,Bz);
+    cout<<"alpha(Belle) = " << hx.getAlpha(Bz);
+    */
     // omega
     double aq    = a * charge ;
     double pt2   = px * px + py * py ;
@@ -94,7 +103,7 @@ namespace TreeFitter {
     // now d0
     double pt02 = px0 * px0 + py0 * py0 ;
     double pt0 = sqrt(pt02) ;
-    double d0 = (pt0 - pt) / aq ;
+    double d0 = -(pt0 - pt) / aq ;//FT changed sign temporarily
 
     // now z0
     double deltaphi = phi - phi0 ;
@@ -130,10 +139,10 @@ namespace TreeFitter {
     double dphi0dx  = -aq * dphi0dpy ;
     double dphi0dy  = aq * dphi0dpx ;
 
-    double dd0dpx = (dpt0dpx - dptdpx) / aq ;
-    double dd0dpy = (dpt0dpy - dptdpy) / aq ;
-    double dd0dx  = dpt0dx / aq ;
-    double dd0dy  = dpt0dy / aq ;
+    double dd0dpx = -(dpt0dpx - dptdpx) / aq ; //FT also changed sign to all derivatives
+    double dd0dpy = -(dpt0dpy - dptdpy) / aq ;
+    double dd0dx  = -dpt0dx / aq ;
+    double dd0dy  = -dpt0dy / aq ;
 
     double dldx  = -dphi0dx / omega ;
     double dldy  = -dphi0dy / omega ;
@@ -160,7 +169,7 @@ namespace TreeFitter {
     double dz0dpz = -l * dtandipdpz ;
 
     //now copy everything back
-    if (helixpar.num_row() != 6) helixpar = HepVector(6) ;
+    if (helixpar.num_row() != 6) helixpar = CLHEP::HepVector(6) ;
     helixpar[ex_d0]     = d0 ;
     helixpar[ex_phi0]   = phi0 ;
     helixpar[ex_omega]  = omega ;
@@ -170,7 +179,7 @@ namespace TreeFitter {
 
     // the row is helixpar, the column the vertexpar
     //if(jacobian.num_col()!=6 || jacobian.num_row()!=6)
-    //jacobian = HepMatrix(6,6) ;
+    //jacobian = CLHEP::HepMatrix(6,6) ;
 
     if (jacobian.num_col() == 6 && jacobian.num_row() == 6) {
       for (int row = 0; row < 6; ++row)
@@ -249,31 +258,31 @@ namespace TreeFitter {
     return rc ;
   }
 
-  void HelixUtils::printHelixPar(const HepVector& helixpar)
+  void HelixUtils::printHelixPar(const CLHEP::HepVector& helixpar)
   {
     for (int i = 0; i < 6; ++i)
       cout << helixParName(i + 1).c_str() << helixpar[i] << endl ;
   }
 
-  void HelixUtils::printVertexPar(const HepVector& vertexpar, int charge)
+  void HelixUtils::printVertexPar(const CLHEP::HepVector& vertexpar, int charge)
   {
     for (int i = 0; i < 6; ++i)
       cout << vertexParName(i + 1).c_str() << vertexpar[i] << endl ;
     cout << "charge:    " << charge << endl ;
   }
 
-  void HelixUtils::helixFromVertexNumerical(const HepVector& vertexpar, int charge,
+  void HelixUtils::helixFromVertexNumerical(const CLHEP::HepVector& vertexpar, int charge,
                                             double Bz,
-                                            HepVector& helixpar, HepMatrix& jacobian)
+                                            CLHEP::HepVector& helixpar, CLHEP::HepMatrix& jacobian)
   {
     // first call with dummy jacobian
-    HepMatrix dummy ;
+    CLHEP::HepMatrix dummy ;
     HelixUtils::helixFromVertex(vertexpar, charge, Bz, helixpar, dummy) ;
 
     // numeric calculation of the jacobian
-    HepVector vertexpartmp(6) ;
-    HepVector helixpartmp(6) ;
-    HepMatrix jacobiantmp(6, 6) ;
+    CLHEP::HepVector vertexpartmp(6) ;
+    CLHEP::HepVector helixpartmp(6) ;
+    CLHEP::HepMatrix jacobiantmp(6, 6) ;
 
     for (int jin = 0; jin < 6; ++jin) {
       //double delta = 0.001*abs(vertexpar[jin]) ;
@@ -298,8 +307,8 @@ namespace TreeFitter {
     return rc ;
   }
 
-  double HelixUtils::helixPoca(const HepVector& helixpar1,
-                               const HepVector& helixpar2,
+  double HelixUtils::helixPoca(const CLHEP::HepVector& helixpar1,
+                               const CLHEP::HepVector& helixpar2,
                                double& flt1, double& flt2,
                                TVector3& vertex, bool parallel)
   {
@@ -414,12 +423,12 @@ namespace TreeFitter {
     vertex.SetX(0.5 * (x1 + x2));
     vertex.SetY(0.5 * (y1 + y2));
     vertex.SetZ(0.5 * (z1 + z2));
-    //    vertex = HepPoint( 0.5*(x1+x2), 0.5*(y1+y2), 0.5*(z1+z2) ) ;
+    //    vertex = CLHEP::HepPoint( 0.5*(x1+x2), 0.5*(y1+y2), 0.5*(z1+z2) ) ;
     return sqrt(sqr(x2 - x1) + sqr(y2 - y1) + sqr(z2 - z1)) ;
   }
 
 
-  double HelixUtils::helixPoca(const HepVector& helixpar,
+  double HelixUtils::helixPoca(const CLHEP::HepVector& helixpar,
                                const TVector3& point,
                                double& flt)
   {

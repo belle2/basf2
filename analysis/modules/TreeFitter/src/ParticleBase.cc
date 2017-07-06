@@ -31,9 +31,10 @@
 namespace TreeFitter {
 
   int vtxverbose = 0;
+  std::vector<int> massConstraintList;//FT: this is not the best place to place this, but that's where the other extern goes.
 
   // Default constructor
-  ParticleBase::ParticleBase(Particle* particle, const ParticleBase* mother)
+  ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother)
     : m_particle(particle), m_mother(mother), m_index(0), m_pdgMass(0), m_pdgWidth(0), m_pdgLifeTime(0), m_charge(0), m_name("Unknown")
   {
     if (particle) {
@@ -63,7 +64,7 @@ namespace TreeFitter {
     m_daughters.clear() ;
   } ;
 
-  ParticleBase* ParticleBase::addDaughter(Particle* cand, bool forceFitAll)
+  ParticleBase* ParticleBase::addDaughter(Belle2::Particle* cand, bool forceFitAll)
   {
     m_daughters.push_back(ParticleBase::createParticle(cand, this, forceFitAll)) ;
     return m_daughters.back() ;
@@ -90,7 +91,7 @@ namespace TreeFitter {
     offset += dim() ;
   }
 
-  ParticleBase* ParticleBase::createParticle(Particle* particle, const ParticleBase* mother, bool forceFitAll)
+  ParticleBase* ParticleBase::createParticle(Belle2::Particle* particle, const ParticleBase* mother, bool forceFitAll)
   {
     // This routine interpretes a Particle dataobject as a 'Particle' used by the fitter.
     if (vtxverbose >= 2)
@@ -128,7 +129,7 @@ namespace TreeFitter {
     //    }
 
     // FT:leave this one for now
-    if (Const::ParticleType(pdgcode) == Const::pi0 && validfit) {
+    if (Belle2::Const::ParticleType(pdgcode) == Belle2::Const::pi0 && validfit) {
       static int printit = 10 ;
       if (--printit >= 0)
         B2ERROR("ParticleBase::createParticle: found pi0 with valid fit. This is likely a configuration error.") ;
@@ -215,19 +216,19 @@ namespace TreeFitter {
   }
   */
 
-  double ParticleBase::pdgLifeTime(Particle* particle) //FT: This is actually the decay length in cm (in the CMS)
+  double ParticleBase::pdgLifeTime(Belle2::Particle* particle) //FT: This is actually the decay length in cm (in the CMS)
   {
     int pdgcode = particle->getPDGCode();
     double lifetime = 0;
     double decaylen = 0;
     if (pdgcode)
       lifetime = TDatabasePDG::Instance()->GetParticle(pdgcode)->Lifetime();
-    decaylen = Const::speedOfLight * lifetime * Unit::s;
+    decaylen = Belle2::Const::speedOfLight * lifetime * Belle2::Unit::s;
     return decaylen ;
   }
 
 
-  bool ParticleBase::isAResonance(Particle* particle)
+  bool ParticleBase::isAResonance(Belle2::Particle* particle)
   {
     bool rc = false ;
     const int pdgcode = particle->getPDGCode();
@@ -246,7 +247,7 @@ namespace TreeFitter {
           break ;
         default: // this should take care of the pi0
           //  rc = particle->isAResonance() || (pdgcode && pdgLifeTime(particle)<1.e-8) ;
-          double ctau = pdgLifeTime(particle) / Unit::um; //ctau in [um]
+          double ctau = pdgLifeTime(particle) / Belle2::Unit::um; //ctau in [um]
           //    B2DEBUG(80, "Particle code is " << pdgcode << " with a lifetime of " << TDatabasePDG::Instance()->GetParticle(
           //    pdgcode)->Lifetime() << " seconds and a decay lenght of " << ctau << " um.");
           rc = (pdgcode && ctau < 1); //FT: this cut comes from the article
@@ -260,8 +261,8 @@ namespace TreeFitter {
   {
     // collect all particles emitted from vertex with position posindex
     if (mother() && mother()->posIndex() == posindex)
-      particles.push_back(
-        this);  //FT: this recursively adds everything that has a vertex reconstructed to the intended vertex, very weird implementation
+      //FT: this recursively adds everything that has a vertex reconstructed to the intended vertex, very weird implementation
+      particles.push_back(this);
     for (daucontainer::const_iterator idau = daughters().begin() ;
          idau != daughters().end() ; ++idau)
       (*idau)->collectVertexDaughters(particles, posindex) ;
@@ -344,8 +345,8 @@ namespace TreeFitter {
       double mass2 = E * E - px * px - py * py - pz * pz ;
       double mass = mass2 > 0 ? sqrt(mass2) : -sqrt(-mass2) ;
 
-      HepSymMatrix cov = fitpar->cov().sub(momindex + 1, momindex + 4) ;
-      HepVector G(4, 0) ;
+      CLHEP::HepSymMatrix cov = fitpar->cov().sub(momindex + 1, momindex + 4) ;
+      CLHEP::HepVector G(4, 0) ;
       G(1) = -px / mass ;
       G(2) = -py / mass ;
       G(3) = -pz / mass ;
@@ -363,7 +364,7 @@ namespace TreeFitter {
     //
   }
 
-  const ParticleBase* ParticleBase::locate(Particle* aparticle) const
+  const ParticleBase* ParticleBase::locate(Belle2::Particle* aparticle) const
   {
     //    const ParticleBase* rc = 0;
     //    if( particle() && ( particle()==aparticle || particle()->isCloneOf(*aparticle,true) ) ) rc = this ;
@@ -499,7 +500,7 @@ namespace TreeFitter {
     // but is badly named as units are mm, ns, MeV, T
     // this is all very confusing, but we try to get it right
     // Conversion from Tesla to Belle2 units is already done, so no need for Unit::T (unlike in RecoTrack)
-    static const double Bz  = BFieldManager::getField(TVector3(0, 0, 0)).Z() * Const::speedOfLight;
+    static const double Bz  = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() * Belle2::Const::speedOfLight;
     B2DEBUG(80, "ParticleBase::bFieldOverC = " << Bz);
     return Bz;
   }
@@ -516,7 +517,7 @@ namespace TreeFitter {
       //assert(fitparams->par(momposindex+1)!=0 ||fitparams->par(momposindex+2)!=0
       //       ||fitparams->par(momposindex+3)!=0) ; // mother must be initialized
 
-      HepVector dX(3), mom(3);
+      CLHEP::HepVector dX(3), mom(3);
       double mom2 = 0;
       for (int irow = 1; irow <= 3; ++irow) {
         dX(irow)  = fitparams->par(posindex + irow) - fitparams->par(momposindex + irow) ;

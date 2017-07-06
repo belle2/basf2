@@ -14,6 +14,17 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+namespace {
+  std::array<int, 8> getNHitsByILayer(const CDCSegment2D& segment)
+  {
+    std::array<int, 8> result{};
+    for (const CDCRecoHit2D& recoHit2D : segment) {
+      ++result[recoHit2D.getWire().getILayer()];
+    }
+    return result;
+  }
+}
+
 bool BasicSegmentRelationVarSet::extract(const Relation<const CDCSegment2D>* ptrSegmentRelation)
 {
   if (not ptrSegmentRelation) return false;
@@ -31,5 +42,12 @@ bool BasicSegmentRelationVarSet::extract(const Relation<const CDCSegment2D>* ptr
 
   var<named("from_size")>() = fromSegment.size();
   var<named("to_size")>() = toSegment.size();
+
+  std::array<int, 8> fromNHitsByILayer = getNHitsByILayer(fromSegment);
+  std::array<int, 8> toNHitsByILayer = getNHitsByILayer(toSegment);
+
+  var<named("from_n_layers")>() = std::count_if(fromNHitsByILayer.begin(), fromNHitsByILayer.end(), Id() > 0);;
+  var<named("to_n_layers")>() = std::count_if(toNHitsByILayer.begin(), toNHitsByILayer.end(), Id() > 0);
+
   return true;
 }

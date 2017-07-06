@@ -72,6 +72,13 @@ namespace Belle2 {
       std::vector<float>*   SKB_HER_pressures;/** */
       std::vector<float>*   SKB_LER_pressures;/** */
       std::vector<float>*   SKB_LER_pressures_local;/** */
+      std::vector<float>*   SKB_HER_pressures_local;/** */
+      std::vector<double>*  SKB_HER_pressure_average_corrected;/** */
+      std::vector<double>*  SKB_LER_pressure_average_corrected;/** */
+      std::vector<float>*   SKB_HER_pressures_corrected;/** */
+      std::vector<float>*   SKB_LER_pressures_corrected;/** */
+      std::vector<float>*   SKB_LER_pressures_local_corrected;/** */
+      std::vector<float>*   SKB_HER_pressures_local_corrected;/** */
       std::vector<float>*   SKB_HER_collimatorPositions_inX;/** */
       std::vector<float>*   SKB_HER_collimatorPositions_inY;/** */
       std::vector<float>*   SKB_HER_collimatorPositions_mm;/** */
@@ -153,11 +160,15 @@ namespace Belle2 {
       std::vector<float> BGO_energy;/** */
       std::vector<float> CSI_hitRate;/** */
       std::vector<float> CSI_sumE;/** */
+      std::vector<float>* CSI_data_sumE;/** */
       std::vector<float> CSI_Ebin;/** */
       std::vector<float> HE3_rate;/** */
       std::vector<float> CLAWS_rate;/** */
       std::vector<float> QCSS_rate;/** */
       std::vector<float> DIA_dose; /** */
+      std::vector<float>* DIA_data_dose; /** */
+      std::vector<float>* PIN_data_dose; /** */
+      std::vector<float>* BGO_data_dose; /** */
       std::vector<float> BGO_energy_av;/** */
       std::vector<float> CSI_hitRate_av;/** */
       std::vector<float> CSI_sumE_av;/** */
@@ -233,6 +244,10 @@ namespace Belle2 {
         SKB_HER_pressures = 0;
         SKB_LER_pressure_average = 0;
         SKB_HER_pressure_average = 0;
+        SKB_LER_pressures_corrected = 0;
+        SKB_HER_pressures_corrected = 0;
+        SKB_LER_pressure_average_corrected = 0;
+        SKB_HER_pressure_average_corrected = 0;
         SKB_HER_collimatorPositions_mm = 0;
         SKB_HER_collimatorPositions_DMM = 0;
         SKB_HER_collimatorPositions_inX = 0;
@@ -258,8 +273,15 @@ namespace Belle2 {
         SKB_LER_partialPressures_D06 = 0;
         SKB_LER_partialPressures_D02 = 0;
         SKB_LER_pressures_local = 0;
+        SKB_HER_pressures_local = 0;
+        SKB_LER_pressures_local_corrected = 0;
+        SKB_HER_pressures_local_corrected = 0;
         SKB_LER_Zeff_D02 = 0;
         SKB_LER_Zeff_D06 = 0;
+        PIN_data_dose = 0;
+        DIA_data_dose = 0;
+        BGO_data_dose = 0;
+        CSI_data_sumE = 0;
 
         PIN_dose.clear();
         BGO_energy.clear();

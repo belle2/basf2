@@ -314,6 +314,10 @@ namespace {
     DBStore::Instance().updateEvent();
     EXPECT_TRUE(strcmp(intraRun->GetName(), "B") == 0);
 
+    //let's run an update in between and make sure intra run continues to work
+    DBStore::Instance().update();
+    EXPECT_TRUE(strcmp(intraRun->GetName(), "B") == 0);
+
     evtPtr->setEvent(50);
     DBStore::Instance().updateEvent();
     EXPECT_TRUE(strcmp(intraRun->GetName(), "C") == 0);

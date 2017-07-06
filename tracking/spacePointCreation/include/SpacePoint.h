@@ -409,7 +409,7 @@ namespace Belle2 {
 // setter:
 
     /** sets the state of assignment - set true if it is assigned and therefore blocked for reuse. */
-    void setAssignmentState(bool newState) { m_isAssigned = newState; }
+    void setAssignmentState(bool newState) const { m_isAssigned = newState; }
 
 
 
@@ -502,7 +502,7 @@ namespace Belle2 {
 
 
     /** stores whether this spacePoint has already been assigned or not */
-    bool m_isAssigned;
+    mutable bool m_isAssigned;
 
 
 

@@ -19,6 +19,8 @@ xmldata = register_module('Gearbox')
 
 # EKLM alignment
 eklmalignment = register_module('EKLMAlignment')
+# Uncomment to generate alignment data instead of displacement data.
+# eklmalignment.param('PayloadName', 'EKLMAlignment')
 
 # Create main path
 main = create_path()

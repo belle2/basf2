@@ -13,7 +13,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 MVARealisticSegmentPairFilter::MVARealisticSegmentPairFilter()
-  : Super("trackfindingcdc_RealisticSegmentPairFilter", 0.02)
+  : Super("tracking/data/trackfindingcdc_RealisticSegmentPairFilter.xml", 0.02)
 {
   this->addProcessingSignalListener(&m_feasibleSegmentPairFilter);
 }

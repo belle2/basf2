@@ -100,7 +100,7 @@ namespace Belle2 {
     m_tree->Branch("phiDec", &m_arich.phiDec, "phiDec/F");
     m_tree->Branch("status", &m_arich.status, "status/I");
 
-    m_tree->Branch("detPhot",  &m_arich.detPhot,  "e/F:mu:pi:K:p:d");
+    m_tree->Branch("detPhot",  &m_arich.detPhot,  "detPhot/I");
     m_tree->Branch("numBkg",  &m_arich.numBkg,  "e/F:mu:pi:K:p:d");
     m_tree->Branch("expPhot",  &m_arich.expPhot,  "e/F:mu:pi:K:p:d");
     m_tree->Branch("logL",  &m_arich.logL,  "e/F:mu:pi:K:p:d");
@@ -163,12 +163,7 @@ namespace Belle2 {
       m_arich.expPhot.p = lkh->getExpPhot(Const::proton);
       m_arich.expPhot.d = lkh->getExpPhot(Const::deuteron);
 
-      m_arich.detPhot.e = lkh->getDetPhot(Const::electron);
-      m_arich.detPhot.mu = lkh->getDetPhot(Const::muon);
-      m_arich.detPhot.pi = lkh->getDetPhot(Const::pion);
-      m_arich.detPhot.K = lkh->getDetPhot(Const::kaon);
-      m_arich.detPhot.p = lkh->getDetPhot(Const::proton);
-      m_arich.detPhot.d = lkh->getDetPhot(Const::deuteron);
+      m_arich.detPhot = lkh->getDetPhot();
 
       m_arich.status = 1;
       const MCParticle* particle = 0;
@@ -183,12 +178,11 @@ namespace Belle2 {
           m_arich.d0 = (trkPos.XYvector()).Mod();
         }
         m_arich.status += 10;
-
+        int fromARICHMCP = 0;
         particle = mdstTrack->getRelated<MCParticle>();
+        if (!particle) { particle = mdstTrack->getRelated<MCParticle>("arichMCParticles"); fromARICHMCP = 1;}
         if (particle) {
           m_arich.PDG = particle->getPDG();
-          MCParticle* mother = particle->getMother();
-          if (mother) m_arich.motherPDG = mother->getPDG();
           m_arich.primary = particle->getStatus(MCParticle::c_PrimaryParticle);
           m_arich.seen = particle->hasSeenInDetector(Const::ARICH);
           TVector3 prodVertex = particle->getProductionVertex();
@@ -200,9 +194,14 @@ namespace Belle2 {
           m_arich.zDec = decVertex.Z();
           m_arich.phiDec = decVertex.Phi();
 
-          std::vector<Belle2::MCParticle*> daughs =  particle->getDaughters();
-          for (const auto daugh : daughs) {
-            if (daugh->getPDG() == particle->getPDG()) m_arich.scatter = 1;
+          if (!fromARICHMCP) {
+            MCParticle* mother = particle->getMother();
+            if (mother) m_arich.motherPDG = mother->getPDG();
+            std::vector<Belle2::MCParticle*> daughs =  particle->getDaughters();
+            for (const auto daugh : daughs) {
+              if (daugh == NULL) continue;
+              if (daugh->getPDG() == particle->getPDG()) m_arich.scatter = 1;
+            }
           }
         }
       }

@@ -36,12 +36,21 @@ namespace Belle2 {
     public:
 
       /**
-       * Constructor.
-       * @param[in] global          If true, load global transformations
-       *                            (false - local).
-       * @param[in] useDisplacement Whether to use EKLMDisplacement or not.
+       * Source of displacement (alignment) data.
        */
-      TransformData(bool global, bool useDisplacement);
+      enum Displacement {
+        c_None,         /**< Displacement is not used. */
+        c_Displacement, /**< Use displacement data (for geometry). */
+        c_Alignment,    /**< Use alignment data (for everything else). */
+      };
+
+      /**
+       * Constructor.
+       * @param[in] global           If true, load global transformations
+       *                             (false - local).
+       * @param[in] displacementType Displacement type.
+       */
+      TransformData(bool global, Displacement displacementType);
 
       /**
        * Destructor.
@@ -80,6 +89,16 @@ namespace Belle2 {
        */
       const HepGeom::Transform3D*
       getPlaneTransform(int endcap, int layer, int sector, int plane) const;
+
+      /**
+       * Get additional displacement for plane internal volumes.
+       * @param[in] endcap Endcap number.
+       * @param[in] layer  Layer number.
+       * @param[in] sector Sector number.
+       * @param[in] plane  Plane number.
+       */
+      const HepGeom::Transform3D*
+      getPlaneDisplacement(int endcap, int layer, int sector, int plane) const;
 
       /**
        * Get segment transformation.
@@ -157,6 +176,9 @@ namespace Belle2 {
 
       /** Plane transformations. */
       HepGeom::Transform3D**** m_Plane;
+
+      /** Plane internal volumes displacements. */
+      HepGeom::Transform3D**** m_PlaneDisplacement;
 
       /** Segment transformations. */
       HepGeom::Transform3D***** m_Segment;

@@ -84,6 +84,8 @@ ChooseableHitStyling::createMapping(const std::string& mappingName)
     return makeUnique<SimHitPDGCodeColorMap>();
   } else if (mappingName == "SimHitIsBkgColorMap") {
     return makeUnique<SimHitIsBkgColorMap>();
+  } else if (mappingName == "NLoops") {
+    return makeUnique<NLoopsColorMap>();
   } else {
     return Super::createMapping(mappingName);
   }

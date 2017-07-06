@@ -10,3 +10,5 @@
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireLayer-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireSuperLayer-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireTopology-;
+
+#pragma link C++ class Belle2::TrackFindingCDC::CDCGeometryLoader-;

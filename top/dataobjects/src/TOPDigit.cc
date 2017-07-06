@@ -18,28 +18,43 @@ using namespace Belle2;
 float TOPDigit::s_doubleHitResolution = 0;
 float TOPDigit::s_pileupTime = 0;
 
+int TOPDigit::getModulo256Sample() const
+{
+  int sample = int(m_rawTime);
+  if (m_rawTime < 0) sample--;
+  sample += (int) m_firstWindow * 64;
+  if (sample < 0) return 256 + sample % 256;
+  return sample % 256;
+}
+
 
 DigitBase::EAppendStatus TOPDigit::addBGDigit(const DigitBase* bg)
 {
   const auto* bgDigit = static_cast<const TOPDigit*>(bg);
-  float diff = m_time - bgDigit->getTime();
+  double diff = m_time - bgDigit->getTime();
 
   if (fabs(diff) > s_doubleHitResolution) return DigitBase::c_Append; // no pile-up
 
   if (fabs(diff) < s_pileupTime) { // pile-up results in time averaging
-    float time[2] = {(float) m_time, (float) bgDigit->getTime()};
-    float tdc[2] = {(float) m_TDC, (float) bgDigit->getTDC()};
-    float adc[2] = {(float) m_ADC, (float) bgDigit->getADC()};
-    float sum = adc[0] + adc[1];
+    double time[2] = {m_time, bgDigit->getTime()};
+    double rawTime[2] = {m_rawTime, bgDigit->getRawTime()};
+    int pulseHeight[2] = {m_pulseHeight, bgDigit->getPulseHeight()};
+    double sum = pulseHeight[0] + pulseHeight[1];
     if (sum > 0) {
-      m_time = (time[0] * adc[0] + time[1] * adc[1]) / sum;
-      m_TDC = int((tdc[0] * adc[0] + tdc[1] * adc[1]) / sum);
+      m_time = (time[0] * pulseHeight[0] + time[1] * pulseHeight[1]) / sum;
+      m_rawTime = (rawTime[0] * pulseHeight[0] + rawTime[1] * pulseHeight[1]) / sum;
+      // m_timeError =
+      // m_pulseWidth =
+      // m_integral =
     } else {
       m_time = (time[0] + time[1]) / 2;
-      m_TDC = int((tdc[0] + tdc[1]) / 2);
+      m_rawTime = (rawTime[0] + rawTime[1]) / 2;
+      // m_timeError =
+      // m_pulseWidth =
+      // m_integral =
     }
-    m_ADC = int(sum);
-    // double reweight = sum > 0 ? adc[0]/sum : 0.5;
+    m_pulseHeight = int(sum);
+    // double reweight = sum > 0 ? pulseHeight[0]/sum : 0.5;
     // this->modifyRelationsTo<TOPSimHit>(reweight);
     // this->modifyRelationsTo<MCParticle>(reweight);
   } else { // pile-up results in discarding the second-in-time hit

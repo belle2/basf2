@@ -171,19 +171,19 @@ namespace Belle2 {
         rawDigit->setValuePeak(vPeak);
         rawDigit->setIntegral(integral);
 
-        double cfdTime = rawDigit->getCFDLeadingTime() * tdc.getSampleWidth()
-                         - tdc.getOffset();
+        double rawTime = rawDigit->getCFDLeadingTime();
+        double cfdTime = rawTime * tdc.getSampleWidth() - tdc.getOffset();
         double cfdWidth = rawDigit->getFWHM() * tdc.getSampleWidth();
-        int TDCcount = tdc.getTDCcount(cfdTime);
-        unsigned tfine = TDCcount % (0x1 << tdc.getSubBits());
+        int sampleDivisions = 0x1 << tdc.getSubBits();
+        unsigned tfine = int(rawTime * sampleDivisions) % sampleDivisions; // TODO rawTime<0 ?
         rawDigit->setTFine(tfine);
 
         // append new digit
 
-        auto* digit = digits.appendNew(m_moduleID, m_pixelID, TDCcount);
+        auto* digit = digits.appendNew(m_moduleID, m_pixelID, rawTime);
         digit->setTime(cfdTime);
-        // digit->setTimeError(timeError); TODO!
-        digit->setADC(rawDigit->getValuePeak());
+        digit->setTimeError(timeJitter);
+        digit->setPulseHeight(rawDigit->getValuePeak());
         digit->setIntegral(rawDigit->getIntegral());
         digit->setPulseWidth(cfdWidth);
         digit->setChannel(m_channel);
@@ -228,11 +228,11 @@ namespace Belle2 {
       std::vector<unsigned short> windowNumbers;
       windowNumbers.push_back(m_window);
       for (unsigned i = 1; i < tdc.getNumWindows(); i++) {
-        windowNumbers.push_back(windowNumbers.back() + 1);
+        windowNumbers.push_back((windowNumbers.back() + 1) % 512); // TODO: rpl hardcoded
       }
       std::vector<double> baselines(windowNumbers.size(), 0);
-      double rms = m_pulseHeightGenerator.getPedestalRMS();
-      std::vector<double> rmsNoises(windowNumbers.size(), rms);
+      double rmsNoise = m_pulseHeightGenerator.getPedestalRMS();
+      std::vector<double> rmsNoises(windowNumbers.size(), rmsNoise);
       double averagePedestal = tdc.getAveragePedestal();
       std::vector<double> pedestals(windowNumbers.size(), averagePedestal);
       int adcRange = tdc.getADCRange();
@@ -269,9 +269,9 @@ namespace Belle2 {
         rawDigit->setValuePeak(feature.vPeak);
         rawDigit->setIntegral(feature.integral);
         double rawTime = rawDigit->getCFDLeadingTime(); // time in [samples]
+        double rawTimeErr = rawDigit->getCFDLeadingTimeError(rmsNoise); // in [samples]
         int sampleDivisions = 0x1 << tdc.getSubBits();
-        int tdcCount = int(rawTime * sampleDivisions);
-        unsigned tfine = tdcCount % sampleDivisions;
+        unsigned tfine = int(rawTime * sampleDivisions) % sampleDivisions; // TODO rawTime<0 ?
         rawDigit->setTFine(tfine);
         rawDigit->addRelationTo(waveform);
 
@@ -280,12 +280,14 @@ namespace Belle2 {
         double width = m_sampleTimes->getDeltaTime(m_window,
                                                    rawDigit->getCFDFallingTime(),
                                                    rawDigit->getCFDLeadingTime());
+        double timeError = rawTimeErr * m_sampleTimes->getTimeBin(m_window,
+                                                                  feature.sampleRise);
 
         // append new digit and set it
-        auto* digit = digits.appendNew(m_moduleID, m_pixelID, tdcCount);
+        auto* digit = digits.appendNew(m_moduleID, m_pixelID, rawTime);
         digit->setTime(cfdTime);
-        // digit->setTimeError(timeError); TODO!
-        digit->setADC(rawDigit->getValuePeak());
+        digit->setTimeError(timeError);
+        digit->setPulseHeight(rawDigit->getValuePeak());
         digit->setIntegral(rawDigit->getIntegral());
         digit->setPulseWidth(width);
         digit->setChannel(m_channel);

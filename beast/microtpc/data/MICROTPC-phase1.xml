@@ -16,6 +16,7 @@ whitespace, comma or semi-colon -->
 <bar unit="mm">1 2 3 4
 </bar>
 <!-- Lets define 3 sensitive Boxes at different z positions and with different sizes -->
+<Phase>1</Phase>
 <LookAtRec>0</LookAtRec>
 <GEMGain1>30</GEMGain1>
 <GEMGain2>50</GEMGain2>
@@ -58,10 +59,6 @@ whitespace, comma or semi-colon -->
 <v_CG>0.00390826</v_CG>
 <!-- Position 1 prot # 2 -->    
 <Active>
-<MaterialVessel>MICROTPC-Material</MaterialVessel>
-<MaterialGas>MICROTPC-Material</MaterialGas>
-<ScaleGas>MICROTPC-Material</ScaleGas>
-<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
 <Material>MICROTPC-Material</Material>
 <dx_Vessel unit="cm">12.7</dx_Vessel>
 <dy_Vessel unit="cm">10.16</dy_Vessel>
@@ -71,13 +68,12 @@ whitespace, comma or semi-colon -->
 <TPCpos_x unit="cm">43.70000</TPCpos_x>
 <TPCpos_y unit="cm">-7.30000</TPCpos_y>
 <TPCpos_z unit="cm">32.50000</TPCpos_z>
+<SensVol_x unit="cm">43.7</SensVol_x>
+<SensVol_y unit="cm">-7.3</SensVol_y>
+<SensVol_z unit="cm">33.0715</SensVol_z>
 </Active>
 <!-- Position 2 TPC # 2 -->
 <Active>
-<MaterialVessel>MICROTPC-Material</MaterialVessel>
-<MaterialGas>MICROTPC-Material</MaterialGas>
-<ScaleGas>MICROTPC-Material</ScaleGas>
-<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
 <Material>MICROTPC-Material</Material>
 <dx_Vessel unit="cm">15.0</dx_Vessel>
 <dy_Vessel unit="cm">10.4</dy_Vessel>
@@ -87,13 +83,12 @@ whitespace, comma or semi-colon -->
 <TPCpos_x unit="cm">3.50000</TPCpos_x>
 <TPCpos_y unit="cm">46.6000</TPCpos_y>
 <TPCpos_z unit="cm">34.4000</TPCpos_z>
+<SensVol_x unit="cm">3.5</SensVol_x>
+<SensVol_y unit="cm">46.6</SensVol_y>
+<SensVol_z unit="cm">34.9715</SensVol_z>
 </Active>
 <!-- Position 3 TPC # 1 -->
 <Active>
-<MaterialVessel>MICROTPC-Material</MaterialVessel>
-<MaterialGas>MICROTPC-Material</MaterialGas>
-<ScaleGas>MICROTPC-Material</ScaleGas>
-<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
 <Material>MICROTPC-Material</Material>
 <dx_Vessel unit="cm">15.0</dx_Vessel>
 <dy_Vessel unit="cm">10.4</dy_Vessel>
@@ -103,13 +98,12 @@ whitespace, comma or semi-colon -->
 <TPCpos_x unit="cm">-47.70000</TPCpos_x>
 <TPCpos_y unit="cm">6.20000</TPCpos_y>
 <TPCpos_z unit="cm">34.20000</TPCpos_z>
+<SensVol_x unit="cm">-47.7</SensVol_x>
+<SensVol_y unit="cm">6.2</SensVol_y>
+<SensVol_z unit="cm">34.7715</SensVol_z>
 </Active>
 <!-- Position 4 prot # 1 -->
 <Active>
-<MaterialVessel>MICROTPC-Material</MaterialVessel>
-<MaterialGas>MICROTPC-Material</MaterialGas>
-<ScaleGas>MICROTPC-Material</ScaleGas>
-<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
 <Material>MICROTPC-Material</Material>
 <dx_Vessel unit="cm">12.7</dx_Vessel>
 <dy_Vessel unit="cm">10.16</dy_Vessel>
@@ -119,6 +113,9 @@ whitespace, comma or semi-colon -->
 <TPCpos_x unit="cm">-6.6000</TPCpos_x>
 <TPCpos_y unit="cm">-45.000</TPCpos_y>
 <TPCpos_z unit="cm">38.80000</TPCpos_z>
+<SensVol_x unit="cm">-6.6</SensVol_x>
+<SensVol_y unit="cm">-45.0</SensVol_y>
+<SensVol_z unit="cm">39.3715</SensVol_z>
 </Active>
 </Content>
 </DetectorComponent>

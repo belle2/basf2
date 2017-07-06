@@ -60,7 +60,8 @@ namespace Belle2 {
 
     private:
       std::string m_recoTrackArrayName ;                  /**< Belle2::RecoTrack StoreArray name */
-      std::vector<unsigned short> m_excludeSLayer;        /**< Super layers not used in the track fitting. */
+      std::vector<unsigned short> m_excludeSLayer;        /**< Super layers (0-8) not used in the track fitting. */
+      std::vector<unsigned short> m_excludeICLayer;        /**< IClayers (0-55) not used in the track fitting. */
     };
   }
 }

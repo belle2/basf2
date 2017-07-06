@@ -15,6 +15,9 @@
 #include <tracking/trackFindingCDC/filters/trackRelation/UnionRecordingTrackRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/MVAFeasibleTrackRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/MVARealisticTrackRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/trackRelation/PhiTrackRelationFilter.h>
+
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
 
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
@@ -44,6 +47,7 @@ TrackRelationFilterFactory::getValidFilterNamesAndDescriptions() const
     {"all", "accepts everything"},
     {"truth", "accepts based on monte carlo information"},
     {"unionrecording", "record multiple choosable variable set"},
+    {"phi", "filter just based on the phi distance"},
     {"feasible", "a rough efficient compatibility check"},
     {"realistic", "an expensive pure compatibility check"},
   };
@@ -53,7 +57,7 @@ std::unique_ptr<BaseTrackRelationFilter>
 TrackRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<BaseTrackRelationFilter>();
+    return makeUnique<NoneFilter<BaseTrackRelationFilter>>();
   } else if (filterName == "all") {
     return makeUnique<AllTrackRelationFilter>();
   } else if (filterName == "truth") {
@@ -64,6 +68,8 @@ TrackRelationFilterFactory::create(const std::string& filterName) const
     return makeUnique<MVAFeasibleTrackRelationFilter>();
   } else if (filterName == "realistic") {
     return makeUnique<MVARealisticTrackRelationFilter>();
+  } else if (filterName == "phi") {
+    return makeUnique<PhiTrackRelationFilter>();
   } else {
     return Super::create(filterName);
   }

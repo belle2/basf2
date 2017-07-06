@@ -142,6 +142,19 @@ namespace Belle2 {
     }
 
     /**
+     * Returns time bin of a given sample number and window
+     * (e.g. time interval to the next sample)
+     * @param window ASIC window number
+     * @param sampleNumber sample number counted from begin of the specified ASIC window
+     * @return time bin in [ns]
+     */
+    double getTimeBin(unsigned window, unsigned sampleNumber) const
+    {
+      unsigned i = (window * c_WindowSize + sampleNumber) % c_TimeAxisSize;
+      return m_timeAxis[i + 1] - m_timeAxis[i];
+    }
+
+    /**
      * Returns sample in respect to sample 0 of the specified ASIC window
      * (inverse of getTime).
      *

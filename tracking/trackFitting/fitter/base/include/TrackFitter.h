@@ -15,6 +15,8 @@
 #include <string>
 #include <memory>
 
+#include <TError.h>
+
 namespace genfit {
   class AbsFitter;
   class AbsTrackRep;
@@ -116,10 +118,9 @@ namespace Belle2 {
                 const std::string& storeArrayNameOfCDCHits = "",
                 const std::string& storeArrayNameOfBKLMHits = "",
                 const std::string& storeArrayNameOfEKLMHits = "",
-                const bool& cosmicsTemporaryFix = false,
                 const bool initializeCDCTranslators = true):
       m_measurementAdder(storeArrayNameOfPXDHits, storeArrayNameOfSVDHits, storeArrayNameOfCDCHits,
-                         storeArrayNameOfBKLMHits, storeArrayNameOfEKLMHits, cosmicsTemporaryFix, initializeCDCTranslators)
+                         storeArrayNameOfBKLMHits, storeArrayNameOfEKLMHits, initializeCDCTranslators)
     {
       resetFitterToDefaultSettings();
     }
@@ -283,6 +284,11 @@ namespace Belle2 {
                                                                 additionalMeasurementCreators);
     }
 
+    /// Set the gErrorIgnoreLevel for the fitter.
+    void setgErrorIgnoreLevel(Int_t errorIgnoreLevel) { m_gErrorIgnoreLevel = errorIgnoreLevel; }
+    /// Return the currently set gErrorIgnoreLevel for the fitter.
+    Int_t getgErrorIgnoreLevel() { return m_gErrorIgnoreLevel; }
+
   private:
     /// The internal storage of the used fitting algorithms.
     std::shared_ptr<genfit::AbsFitter> m_fitter;
@@ -296,6 +302,9 @@ namespace Belle2 {
 
     /// The measurement adder algorithm class
     MeasurementAdder m_measurementAdder;
+
+    /// Control the output level of the ROOT functions used by the GenFit fitter. Default is increased from kError to kFatal;
+    Int_t m_gErrorIgnoreLevel = kFatal;
 
     /**
      * Helper function to do the fit.

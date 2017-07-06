@@ -20,6 +20,7 @@ void EB0Controller::readDB(const DBObject& obj, int& port,
   const DBObjectList& objs(obj.getObjects("stream0"));
   used = obj("stream0").getBool("used");
   nsenders = (int)objs.size();
+  m_eb_stat = NULL;
 }
 
 void EB0Controller::initArguments(const DBObject& obj)
@@ -64,12 +65,10 @@ void EB0Controller::initArguments(const DBObject& obj)
 
 bool EB0Controller::loadArguments(const DBObject& obj)
 {
-  /*
   if (obj("eb0").getBool("xinetd")) {
     setUsed(false);
     return false;
   }
-  */
   setUsed(true);
   int port = 0;
   m_nsenders = 0;
@@ -77,6 +76,14 @@ bool EB0Controller::loadArguments(const DBObject& obj)
   bool stream0_used = false;
   readDB(obj, port, executable, stream0_used, m_nsenders);
   m_con.setExecutable(executable);
+  std::string upname = std::string("/dev/shm/") + "eb0_up";
+  std::string downname = std::string("/dev/shm/") + "eb0_down";
+  if (m_eb_stat) delete m_eb_stat;
+  m_eb_stat = new eb_statistics(upname.c_str(), m_nsenders, downname.c_str(), 1);
+  m_con.addArgument("-u");
+  m_con.addArgument(upname);
+  m_con.addArgument("-d");
+  m_con.addArgument(downname);
   m_con.addArgument("-l");
   m_con.addArgument(port);
   for (int i = 0; i < m_nsenders; i++) {
@@ -94,16 +101,6 @@ bool EB0Controller::loadArguments(const DBObject& obj)
       m_con.addArgument("%s:%d", (stream0_used ? "localhost" : nodename.c_str()), port);
     }
   }
-  std::string upname = std::string("/dev/shm/") + "eb0_up";
-  std::string downname = std::string("/dev/shm/") + "eb0_down";
-  //if (m_eb_stat) delete m_eb_stat;
-  //m_eb_stat = new eb_statistics(upname.c_str(), m_nsenders, downname.c_str(), 1);
-  ///*
-  m_con.addArgument("-u");
-  m_con.addArgument(upname);
-  m_con.addArgument("-d");
-  m_con.addArgument(downname);
-  //*/
   memset(m_nevent_in, 0, sizeof(m_nevent_in));
   memset(m_nevent_in, 0, sizeof(m_nevent_out));
   memset(m_total_byte_in, 0, sizeof(m_total_byte_in));

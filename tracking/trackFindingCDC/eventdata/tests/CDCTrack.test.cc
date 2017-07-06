@@ -21,7 +21,7 @@ TEST_F(TrackFindingCDCTestWithTopology, eventdata_tracks_CDCTrack_modifyable)
   // Create a track and add one hit
   CDCTrack track;
   {
-    CDCRLWireHit rlWireHit(&wireHit, ERightLeft::c_Right, wireHit.getRefDriftLength());
+    CDCRLWireHit rlWireHit(&wireHit, ERightLeft::c_Right);
     double perpS = 0;
     CDCRecoHit3D recoHit3D(rlWireHit, wireHit.getRefPos3D(), perpS);
     track.push_back(recoHit3D);

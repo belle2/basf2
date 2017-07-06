@@ -246,5 +246,31 @@ namespace {
 
   }
 
+  TEST(DecayForestTest, RemoveRadiativePhotons)
+  {
+    DecayForest B("521 (--> -421 (--> 325 (--> 321 111 (--> 22 22)) -211) -13 14 22)", false, true);
+    DecayForest B2("521 (--> -11 12 22)", false, true);
+    DecayForest B3("521 (--> -11 12 22)", false, false);
+
+    DecayTree case1(" 521 (--> -421 (-->  325 (--> 321 111 (--> 22 22)) -211) -13 14)", true);
+    DecayTree case2(" 521 (--> -11 12 22)", true);
+    DecayTree case3(" 521 (--> -11 12 22)", false);
+    DecayTree case4(" 521 (--> -11 12)", false);
+
+
+    DecayTree case5(" 521 (--> -11 12 22)", false);
+    DecayTree case6(" 521 (--> -11 12 22)", true);
+    DecayTree case7(" 521 (--> -11 12)", false);
+
+    EXPECT_TRUE(B.getOriginalTree().find_decay(case1));
+
+    EXPECT_TRUE(B2.getOriginalTree().find_decay(case2));
+    EXPECT_FALSE(B2.getOriginalTree().find_decay(case3));
+    EXPECT_TRUE(B2.getOriginalTree().find_decay(case4));
+
+    EXPECT_TRUE(B3.getOriginalTree().find_decay(case5));
+    EXPECT_FALSE(B3.getOriginalTree().find_decay(case6));
+    EXPECT_FALSE(B3.getOriginalTree().find_decay(case7));
+  }
 
 }  // namespace

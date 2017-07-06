@@ -14,12 +14,19 @@
 using namespace Belle2;
 
 namespace {
-  /** get stream of /proc/PID/statm (kept open between calls)
+  /** get the Virtual and Resident memory size in KB
+   *
+   * This is done by reading /proc/PID/statm (kept open between calls)
    *
    * this is significantly faster than using TSystem::GetProcInfo()
+   *
+   * @return pair with virtual memory size in the first and resident memory
+   *         size in the second entry.
    */
-  FILE* getStatm()
+  std::pair<unsigned long, unsigned long> getStatmSize()
   {
+    /** page size of system */
+    const static long pageSizeKb = sysconf(_SC_PAGESIZE) / 1024;
     static FILE* stream = nullptr;
     static int pid = 0;
     int currentPid = getpid();
@@ -27,12 +34,16 @@ namespace {
       pid = currentPid;
       std::string statm = "/proc/" + std::to_string(pid) + "/statm";
       stream = fopen(statm.c_str(), "r");
+      // If we use buffering we might get the same value each time we read so
+      // disable buffering
+      setvbuf(stream, NULL, _IONBF, 0);
     }
+    unsigned long vmSizePages{0};
+    unsigned long rssPages{0};
     rewind(stream);
-    return stream;
+    fscanf(stream, "%lu %lu", &vmSizePages, &rssPages);
+    return std::make_pair(vmSizePages * pageSizeKb, rssPages * pageSizeKb);
   }
-  //page size of system
-  const static int pageSizeKb = sysconf(_SC_PAGESIZE) / 1024;
 }
 
 namespace Belle2 {
@@ -53,21 +64,15 @@ namespace Belle2 {
 
     unsigned long getVirtualMemoryKB()
     {
-      unsigned long int vmSizePages = 0;
-      long rssPages = 0;
-      fscanf(getStatm(), "%lu %ld", &vmSizePages, &rssPages);
-      return vmSizePages * pageSizeKb;
+      return getStatmSize().first;
     }
 
     unsigned long getRssMemoryKB()
     {
-      unsigned long int vmSizePages = 0;
-      long rssPages = 0;
-      fscanf(getStatm(), "%lu %ld", &vmSizePages, &rssPages);
-      return rssPages * pageSizeKb;
+      return getStatmSize().second;
     }
 
-    Timer::Timer(std::string text):
+    Timer::Timer(const std::string& text):
       m_startTime(getClock()),
       m_text(text)
     { }

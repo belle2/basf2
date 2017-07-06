@@ -23,7 +23,7 @@ from reconstruction import add_reconstruction, add_mdst_output
 main = create_path()
 
 # event info setter
-main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
+main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=10000)
 
 # add the BABAYAGA.NLO module
 babayaganlo = register_module('BabayagaNLOInput')
@@ -43,6 +43,8 @@ rootoutput = register_module('RootOutput')
 rootoutput.param('outputFileName', 'B2Electrons.root')
 rootoutput.param('branchNames', ['CDCDedxTracks', 'EventMetaData'])
 main.add_module(rootoutput)
+
+main.add_module('ProgressBar')
 
 # generate events
 process(main)

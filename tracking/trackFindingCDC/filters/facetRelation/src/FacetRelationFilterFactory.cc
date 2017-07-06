@@ -17,6 +17,8 @@
 #include <tracking/trackFindingCDC/filters/facetRelation/UnionRecordingFacetRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/facetRelation/MVAFacetRelationFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
@@ -46,6 +48,7 @@ FacetRelationFilterFactory::getValidFilterNamesAndDescriptions() const
     {"truth", "facet relations from monte carlo truth"},
     {"simple", "mc free with simple criteria"},
     {"chi2", "mc free based on chi2 fitting"},
+    {"chi2_old", "old based on chi2 fitting with single cut regardless of superlayer"},
     {"unionrecording", "record multiple choosable variable sets"},
     {"mva", "filter facets with a mva method"},
   };
@@ -55,7 +58,7 @@ std::unique_ptr<BaseFacetRelationFilter >
 FacetRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<BaseFacetRelationFilter>();
+    return makeUnique<NoneFilter<BaseFacetRelationFilter>>();
   } else if (filterName == "all") {
     return makeUnique<AllFacetRelationFilter>();
   } else if (filterName == "truth") {
@@ -64,6 +67,8 @@ FacetRelationFilterFactory::create(const std::string& filterName) const
     return makeUnique<SimpleFacetRelationFilter>();
   } else if (filterName == "chi2") {
     return makeUnique<Chi2FacetRelationFilter>();
+  } else if (filterName == "chi2_old") {
+    return makeUnique<Chi2FacetRelationFilter>(130.0, 200.0);
   } else if (filterName == "unionrecording") {
     return makeUnique<UnionRecordingFacetRelationFilter>();
   } else if (filterName == "mva") {

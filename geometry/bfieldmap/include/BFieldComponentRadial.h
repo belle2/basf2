@@ -119,18 +119,22 @@ namespace Belle2 {
   private:
 
     std::string m_mapFilename{""}; /**< The filename of the magnetic field map. */
-    BFieldPoint** m_mapBuffer{nullptr}; /**< The memory buffer for the magnetic field map. */
+    std::vector<BFieldPoint> m_mapBuffer; /**< The memory buffer for the magnetic field map. */
     int m_mapSize[2] {0};         /**< The size of the map in r and z. */
     double m_mapRegionZ[2] {0};   /**< The min and max boundaries of the map region in z. */
     double m_mapOffset{0};        /**< Offset required because the accelerator group defines the Belle center as zero. */
     double m_mapRegionR[2] {0};   /**< The min and max boundaries of the map region in r. */
     double m_gridPitchR{0};       /**< The grid pitch in r. */
     double m_gridPitchZ{0};       /**< The grid pitch in z. */
+    double m_igridPitchR{0};       /**< The reciprocal of grid pitch in r. */
+    double m_igridPitchZ{0};       /**< The reciprocal of grid pitch in z. */
 
     double m_slotRMin{0};          /**< minimum radius for the gap in endyoke */
     double m_endyokeZMin{0};       /**< minimum Z of endyoke */
     double m_gapHeight{0};         /**< height of the gap in endyoke */
     double m_ironPlateThickness{0};/**< thickness of iron plate in endyoke */
+    double m_Layer{0};            /**< height of the layer (gap + iron plate) in endyoke */
+    double m_iLayer{0};           /**< reciprocal of height of the layer (gap + iron plate) in endyoke */
   };
 
 } //end of namespace Belle2

@@ -63,6 +63,24 @@ namespace Belle2 {
     //! Export BKLM bad channels from the database
     void exportBklmBadChannels();
 
+    //! Import BKLM Misalignment parameters into the database
+    void importBklmMisAlignment();
+
+    //! Export BKLM Misalignment parameters from the database
+    void exportBklmMisAlignment();
+
+    //! Import BKLM Alignment parameters into the database
+    void importBklmAlignment();
+
+    //! Export BKLM Alignment parameters from the database
+    void exportBklmAlignment();
+
+    //! Import BKLM displaced-geometry parameters into the database
+    void importBklmDisplacement();
+
+    //! Export BKLM displaced-geometry parameters from the database
+    void exportBklmDisplacement();
+
   private:
 
     ClassDef(BKLMDatabaseImporter, 0); /**< ClassDef */

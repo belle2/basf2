@@ -21,7 +21,7 @@ class CDCDebugDisplayRun(CDCDisplayRun):
     #     "FacetRelationFilter": "none",
     # })
 
-    finder_module = ["TFCDC_WireHitPreparer", finder_module, "PrintCollections"]
+    finder_module = ["TFCDC_WireHitPreparer", "TFCDC_ClusterPreparer", finder_module, "PrintCollections"]
     finder_module = basf2.register_module("TFCDC_WireHitPreparer")
 
     show_all_drawoptions = True

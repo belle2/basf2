@@ -8,7 +8,7 @@ namespace Belle2 {
   class CDCTriggerMLP : public TObject {
 
     // weights etc. are set only by the trainer
-    friend class NeuroTriggerTrainerModule;
+    friend class CDCTriggerNeuroTrainerModule;
 
   public:
     /** default constructor. */

@@ -46,6 +46,11 @@ namespace Belle2 {
   bool almostEqualFloat(const float& a, const float& b);
 
   /**
+   * Helper function to test if two doubles are almost equal.
+   */
+  bool almostEqualDouble(const double& a, const double& b);
+
+  /**
    * This class implements a common way to implement cut/selection functionality for arbitrary objects.
    * Every module which wants to perform cuts should use this object.
    * As a parameter the module requires a std::string with the written cut.
@@ -94,7 +99,7 @@ namespace Belle2 {
      * @param cut the string defining the cut
      * @return std::unique_ptr<Cut>
      */
-    static std::unique_ptr<GeneralCut> compile(std::string cut)
+    static std::unique_ptr<GeneralCut> compile(const std::string& cut)
     {
       return std::unique_ptr<GeneralCut>(new GeneralCut(cut));
     }
@@ -123,9 +128,9 @@ namespace Belle2 {
         case GE:
           return m_left->get(p) >= m_right->get(p);
         case EQ:
-          return almostEqualFloat(m_left->get(p), m_right->get(p));
+          return almostEqualDouble(m_left->get(p), m_right->get(p));
         case NE:
-          return not almostEqualFloat(m_left->get(p), m_right->get(p));
+          return not almostEqualDouble(m_left->get(p), m_right->get(p));
       }
       throw std::runtime_error("Cut string has an invalid format: Invalid operation");
       return false;
@@ -227,7 +232,7 @@ namespace Belle2 {
           if (not processBinaryNumericConditions(str)) {
             m_operation = NONE;
             try {
-              m_number = Belle2::convertString<float>(str);
+              m_number = Belle2::convertString<double>(str);
               m_isNumeric = true;
             } catch (std::invalid_argument&) {
               m_isNumeric = false;
@@ -378,7 +383,7 @@ namespace Belle2 {
     /**
      * Returns stored number or Variable value for the given object.
      */
-    float get(const Object* p) const
+    double get(const Object* p) const
     {
       if (m_isNumeric) {
         return m_number;
@@ -405,7 +410,7 @@ namespace Belle2 {
       NE,
     } m_operation; /**< Operation which connects left and right cut */
     const Var* m_var; /**< set if there was a valid variable in this cut */
-    float m_number; /**< literal number contained in the cut */
+    double m_number; /**< literal number contained in the cut */
     bool m_isNumeric; /**< if there was a literal number in this cut */
     std::unique_ptr<GeneralCut> m_left; /**< Left-side cut */
     std::unique_ptr<GeneralCut> m_right; /**< Right-side cut */

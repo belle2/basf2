@@ -70,7 +70,7 @@ RFOutputServer::~RFOutputServer()
 
 // Functions hooked up by NSM2
 
-int RFOutputServer::Configure(NSMmsg*, NSMcontext*)
+int RFOutputServer::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
 {
   // Start processes from down stream
 
@@ -120,6 +120,10 @@ int RFOutputServer::Configure(NSMmsg*, NSMcontext*)
 
   // 4. Run basf2
   char* basf2 = m_conf->getconf("collector", "basf2", "script");
+  if (nsmm->len > 0) {
+    basf2 = (char*) nsmm->datap;
+    printf("Configure: basf2 script overridden : %s\n", basf2);
+  }
   m_pid_basf2 = m_proc->Execute(basf2, (char*)rbufin.c_str(), (char*)rbufout.c_str(), hport);
 
   // 5. Run receiver
@@ -182,6 +186,9 @@ int RFOutputServer::UnConfigure(NSMmsg*, NSMcontext*)
   m_rbufin->forceClear();
   m_rbufout->forceClear();
 
+  // Clear process list
+  m_flow->fillProcessStatus(GetNodeInfo());
+
   printf("Unconfigure done\n");
   fflush(stdout);
   return 0;
@@ -223,7 +230,29 @@ int RFOutputServer::Restart(NSMmsg*, NSMcontext*)
 
 void RFOutputServer::server()
 {
+  m_flow->fillProcessStatus(GetNodeInfo());
   while (true) {
+    int recv_id = 0;
+    pid_t pid = m_proc->CheckProcess();
+    if (pid > 0) {
+      printf("RFOutputServer : process dead. pid=%d\n", pid);
+      if (pid == m_pid_sender) {
+        m_log->Fatal("RFOutputServer : sender process dead. pid=%d\n", pid);
+        m_pid_sender = 0;
+      } else if (pid == m_pid_basf2) {
+        m_log->Fatal("RFOutputServer : basf2 process dead. pid=%d\n", pid);
+        m_pid_basf2 = 0;
+      } else {
+        for (int i = 0; i < m_nnodes; i++) {
+          if (pid == m_pid_receiver[i]) {
+            m_log->Fatal("RFOutputServer : receiver process %d dead. pid=%d\n", i, pid);
+            m_pid_receiver[i] = 0;
+            recv_id = i;
+          }
+        }
+      }
+    }
+
     int st = m_proc->CheckOutput();
     if (st < 0) {
       perror("RFOutputServer::server");
@@ -232,6 +261,8 @@ void RFOutputServer::server()
       m_log->ProcessLog(m_proc->GetFd());
     }
     m_flow->fillNodeInfo(RF_OUTPUT_ID, GetNodeInfo(), true);
+    m_flow->fillProcessStatus(GetNodeInfo(), m_pid_receiver[recv_id], m_pid_sender,
+                              m_pid_basf2);
   }
 }
 

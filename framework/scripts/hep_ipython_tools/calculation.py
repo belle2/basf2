@@ -66,12 +66,18 @@ class Calculation:
 
         self.map_on_processes(f, index)
 
-    def wait_for_end(self, display_bar=True):
+    def wait_for_end(self, display_bar=True, send_notification=False):
         """
         Send the calculation into the foreground by halting the notebook as long as the process is running.
         Shows a progress bar with the number of processed events.
         Please keep in mind that you can not execute cells in the notebook when having called wait_for_end
         (but before - although a calculation is running.).
+
+        :param display_bar: If true, the display bar is used to show in the notebook that the computation
+                           is complete.
+        :param send_notification: If true, the notify2 library will be used to notify the user if the
+                                 computation is complete. This will only work if the jupyter notebook
+                                 is hosted on the local desktop machine.
         """
 
         if display_bar:
@@ -108,18 +114,34 @@ class Calculation:
                 # Check if there are news from the process python module (a new percentage)
                 elif process.progress_queue_local.poll():
                     result = process.progress_queue_local.recv()
-                    if result == "end":
-                        process.join()
-
-                    elif display_bar:
+                    if result != "end" and display_bar:
                         process_bar = process_bars[process]
                         process_bar.update(result)
+
+                else:
+                    process.result_queue.fill_results()
+                    process.join(timeout=0.01)
 
             time.sleep(0.01)
 
         if display_bar:
             for process in self.process_list:
                 self.show_end_result(process, process_bars)
+
+        # send notification if requested and notify2 library is available
+        if send_notification:
+            try:
+                import notify2
+
+                notify2.init("basf2")
+                n = notify2.Notification("basf2",  # head line
+                                         "Calculation finished",  # Description text
+                                         "notification-message-im"   # Icon name
+                                         )
+                n.show()
+            except ImportError:
+                # re-throw with more useful message
+                raise ImportError("notify2 library must be installed to show Desktop notifications.")
 
     def show_end_result(self, process, process_bars):
         """

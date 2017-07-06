@@ -1,20 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Thomas Keck 2014
+# Thomas Keck 2017
 
-from fei import *
 from basf2 import *
 from modularAnalysis import *
 
-particles = get_default_channels()
-
 path = create_path()
-path.add_module('RootInput')
-path.add_module('Gearbox')
-path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
+inputMdstList('MC7', [], path)
 
-feistate = fullEventInterpretation(None, path, particles, 'FEI_Belle2_Generic_2016_1')
+import fei
+particles = fei.get_default_channels()
+configuration = fei.config.FeiConfiguration(prefix='FEI_TEST', training=True)
+feistate = fei.get_path(particles, configuration)
+path.add_path(feistate.path)
 
-print(feistate.path)
-process(feistate.path)
+if feistate.stage > 0:
+    path.add_module("RemoveParticlesNotInLists", particleLists=feistate.plists)
+if feistate.stage >= 0:
+    path.add_module('RootOutput')
+
+print(path)
+process(path)

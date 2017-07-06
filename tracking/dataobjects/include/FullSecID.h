@@ -44,6 +44,11 @@ namespace Belle2 {
     /** overloaded '=='-operator for sorting algorithms */
     bool operator==(const FullSecID& secID) const { return m_fullSecID == secID.m_fullSecID; }
 
+    /** comparison which ignores the sublayer ID */
+    bool equalIgnoreSubLayerID(const FullSecID& secID)
+    {
+      return ((~FullSecID::SubLayerMask)&m_fullSecID) == ((~FullSecID::SubLayerMask)&secID.m_fullSecID);
+    }
 
     /** overloaded assignment operator */
     FullSecID& operator=(const FullSecID& secID) { m_fullSecID = secID.m_fullSecID; return *this; }
@@ -145,7 +150,6 @@ namespace Belle2 {
 
     /** returns the FullSecID coded as string compatible to secIDs stored in the xml-sectormaps */
     std::string getFullSecString() const;
-
 
   protected:
     /** Number of bits available to represent a layer */

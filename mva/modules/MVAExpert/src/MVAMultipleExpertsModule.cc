@@ -68,7 +68,7 @@ namespace Belle2 {
     for (unsigned int i = 0; i < m_identifiers.size(); ++i) {
       if (not(boost::ends_with(m_identifiers[i], ".root") or boost::ends_with(m_identifiers[i], ".xml"))) {
         m_weightfile_representations[i] = (std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
-                                           DBObjPtr<DatabaseRepresentationOfWeightfile>(m_identifiers[i])));
+                                           DBObjPtr<DatabaseRepresentationOfWeightfile>(MVA::makeSaveForDatabase(m_identifiers[i]))));
       }
     }
 

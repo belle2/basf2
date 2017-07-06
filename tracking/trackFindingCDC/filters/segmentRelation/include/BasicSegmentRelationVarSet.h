@@ -24,6 +24,8 @@ namespace Belle2 {
       "stereo_kind",
       "from_size",
       "to_size",
+      "from_n_layers",
+      "to_n_layers",
       "sl_id",
     };
 

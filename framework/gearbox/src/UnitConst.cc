@@ -40,6 +40,7 @@ namespace Belle2 {
 // standard units
   DEFINE_UNIT(cm    , 1.); /**< Standard of [length] */
   DEFINE_UNIT(ns    , 1.); /**< Standard of [time] */
+  DEFINE_UNIT(GHz   , 1.); /**< Standard of [frequency] */
   DEFINE_UNIT(rad   , 1.); /**< Standard of [angle] */
   DEFINE_UNIT(GeV   , 1.); /**< Standard of [energy, momentum, mass] */
   DEFINE_UNIT(K     , 1.); /**< Standard of [temperature] */
@@ -79,6 +80,12 @@ namespace Belle2 {
   DEFINE_UNIT(us  , Unit::s  * 1e-6);  /**< [microsecond] */
   DEFINE_UNIT(ps  , Unit::s  * 1e-12); /**< [picosecond] */
   DEFINE_UNIT(fs  , Unit::s  * 1e-15); /**< [femtosecond] */
+
+// frequency units
+  DEFINE_UNIT(Hz,   Unit::GHz * 1e-9);        /**< [Hertz] */
+  DEFINE_UNIT(kHz,  Unit::GHz * 1e-6);        /**< [Kilohertz] */
+  DEFINE_UNIT(MHz,  Unit::GHz * 1e-3);        /**< [Megahertz] */
+  DEFINE_UNIT(mHz,  Unit::GHz * 1e-12);       /**< [Millihertz] */
 
 // angle units
   DEFINE_UNIT(mrad , Unit::rad * 1e-3);  /**< [millirad] */

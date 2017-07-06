@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Pablo Goldenzweig                                        *
+ * Contributors: Pablo Goldenzweig, Dennis Weyland                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -66,6 +66,11 @@ namespace Belle2 {
      * Second (third) argument is the lower (upper) cut on the network output.
      */
     Manager::FunctionPtr transformedNetworkOutputNB(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns the variable in respect to rotated coordinates, in which z lies on the specified thrust axis.
+     */
+    Manager::FunctionPtr useThrustFrame(const std::vector<std::string>& arguments);
 
   }
 }

@@ -67,22 +67,25 @@ namespace Belle2 {
     double energy() const { return m_energy; } /**< Cluster energy*/
     double eop() const { return m_eop; } /**< E/p ratio for cluster */
     double e9e25() const { return m_e9e25; } /**< Ratio of energies of the (central) 3x3 crystal matrix and outermost 5x5 matrix */
-    float lat() const { return m_lat; }
-    float dist() const { return m_dist; }
-    float trkDepth() const { return m_trkDepth; }
-    float shDepth() const { return m_shDepth; }
+    float lat() const { return m_lat; } /**< Cluster LAT */
+    float dist() const { return m_dist; } /**< Cluster-Shower distance */
+    float trkDepth() const { return m_trkDepth; } /**< Track Depth*/
+    float shDepth() const { return m_shDepth; } /**< Cluster Depth */
     int nCrystals() const { return m_nCrystals; } /**< Number of crystals per candidate */
     int nClusters() const { return m_nClusters; } /**< Number of clusters per candidate */
 
   private:
     float m_logl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
 
-    float m_energy;
-    float m_eop;
-    float m_e9e25;
-    int m_nCrystals;
-    int m_nClusters;
-    float m_lat, m_dist, m_trkDepth, m_shDepth;
+    float m_energy;  /**< Cluster Energy */
+    float m_eop; /**< E/p ratio for cluster */
+    float m_e9e25; /**< Ratio of energy in 3x3 matrix over energy in 5x5 matrix (should now be called E9oE21) for cluster */
+    int m_nCrystals; /**< Number of crystals per candidate */
+    int m_nClusters;/**< Number of clusters per candidate */
+    float m_lat; /**< Cluster LAT */
+    float m_dist; /**< Cluster-Shower distance */
+    float m_trkDepth;  /**< Track Depth */
+    float m_shDepth;  /**< Cluster Depth */
 
     // 3: Added DeltaL track match variable (GDN, increment by TF)
     ClassDef(ECLPidLikelihood, 3); /**< Build ROOT dictionary */

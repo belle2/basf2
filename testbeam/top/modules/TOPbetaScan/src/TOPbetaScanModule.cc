@@ -126,7 +126,7 @@ namespace Belle2 {
     int nHits = topDigits.getEntries();
     for (int i = 0; i < nHits; ++i) {
       TOPDigit* data = topDigits[i];
-      reco.addData(data->getModuleID(), data->getPixelID(), data->getTDC());
+      reco.addData(data->getModuleID(), data->getPixelID(), data->getTime());
     }
 
     // collect extrapolated tracks

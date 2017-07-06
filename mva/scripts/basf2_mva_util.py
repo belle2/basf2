@@ -55,6 +55,33 @@ def calculate_roc_auc(p, t):
     return np.abs(np.trapz(purity, efficiency))
 
 
+def calculate_flatness(f, p, w=None):
+    """
+    Calculates the flatness of a feature under cuts on a signal probability
+    @param f the feature values
+    @param p the probability values
+    @param w optional weights
+    @return the mean standard deviation between the local and global cut selection efficiency
+    """
+    quantiles = list(range(101))
+    binning_feature = np.unique(np.percentile(f, q=quantiles))
+    binning_probability = np.unique(np.percentile(p, q=quantiles))
+    if len(binning_feature) < 2:
+        binning_feature = np.array([np.min(f)-1, np.max(f)+1])
+    if len(binning_probability) < 2:
+        binning_probability = np.array([np.min(p)-1, np.max(p)+1])
+    hist_n, _ = np.histogramdd(np.c_[p, f],
+                               bins=[binning_probability, binning_feature],
+                               weights=w)
+    hist_inc = hist_n.sum(axis=1)
+    hist_inc /= hist_inc.sum(axis=0)
+    hist_n /= hist_n.sum(axis=0)
+    hist_n = hist_n.cumsum(axis=0)
+    hist_inc = hist_inc.cumsum(axis=0)
+    diff = (hist_n.T - hist_inc)**2
+    return np.sqrt(diff.sum() / (100*99))
+
+
 class Method(object):
     """
     Wrapper class providing an interface to the method stored under the given identifier.
@@ -134,6 +161,8 @@ class Method(object):
         @param general_options general options given to basf2_mva.teacher (if None the options of this method are used)
         @param specific_options specific options given to basf2_mva.teacher (if None the options of this method are used)
         """
+        if isinstance(datafiles, str):
+            datafiles = [datafiles]
         if general_options is None:
             general_options = self.general_options
         if specific_options is None:
@@ -156,6 +185,8 @@ class Method(object):
         @param datafiles the datafiles
         @param treename the name of the tree containing the data
         """
+        if isinstance(datafiles, str):
+            datafiles = [datafiles]
         with tempfile.TemporaryDirectory() as tempdir:
             identifier = tempdir + "/weightfile.xml"
             basf2_mva.Weightfile.save(self.weightfile, identifier)

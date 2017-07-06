@@ -1,0 +1,27 @@
+# EventType: 1150720000
+# Descriptor: [B0 -> pi l nu ]cc
+# NickName: Bd_pilnu
+# Documentation: B0->pi l nu process
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Matic Lubej, Mario Merola
+# Email: matic.lubej@ijs.si, mario.merola@na.infn.it
+# Cuts: None
+# Date: 20170410
+#
+#
+
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0			VSS_BMIX dm;
+Enddecay
+#
+
+Decay B0sig
+0.5 pi+     e-      anti-nu_e            PHOTOS   ISGW2; #[Reconstructed PDG2011]
+0.5 pi+     mu-     anti-nu_mu           PHOTOS   ISGW2; #[Reconstructed PDG2011]
+Enddecay
+
+CDecay anti-B0sig
+
+#
+End

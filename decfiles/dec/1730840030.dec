@@ -1,0 +1,38 @@
+# EventType: 1730840030
+# Descriptor: [Upsilon3S pi+pi- Y(1S)] 
+# NickName: Upsilon3S_pipiY1S 
+# Documentation: Upsilon(3S) pi+pi- Y(1S)
+# Tested: Yes 
+# PhysicsWG: Y(nS) and Quarkonium(like)
+# Responsible: Bryan Fulsom, Umberto Tamponi
+# Email: bryan.fulsom@pnnl.gov, tamponi@to.infn.it
+# Cuts: None 
+# Date: 20170411
+# 
+# 
+# Description: [Upsilon3S pi+pi- Y(1S)] 
+# 
+# Author: B. Fulsom, U. Tamponi
+# 
+# Date: 20170411
+# 
+
+Decay  Upsilon(3S)
+0.043700000 Upsilon pi+     pi-                             YMSTOYNSPIPICLEOBOOST -2.523 1.189; #[Reconstructed PDG2014]
+0.028200000 Upsilon(2S) pi+     pi-                         YMSTOYNSPIPICLEOBOOST -0.395 0.001; #[Reconstructed PDG2014]
+Enddecay
+
+
+Decay  Upsilon(2S)
+0.5 e+      e-                                      PHOTOS  VLL; #[Reconstructed PDG2011]
+0.5 mu+     mu-                                     PHOTOS  VLL; #[Reconstructed PDG2011]
+Enddecay
+
+
+Decay  Upsilon
+0.5 e+      e-                                      PHOTOS  VLL; #[Reconstructed PDG2011]
+0.5 mu+     mu-                                     PHOTOS  VLL; #[Reconstructed PDG2011]
+Enddecay
+
+
+End

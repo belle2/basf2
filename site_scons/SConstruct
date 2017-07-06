@@ -226,7 +226,7 @@ if (not global_env.GetOption('clean')) and (not global_env.GetOption('help')):
 global_env['CLINGFLAGS'] = [s.replace('-isystem', '-I') for s in global_env['CCFLAGS']
                             if not (s.startswith("-Wstack-usage") or s.startswith('-wd'))]
 
-special_targets = ['tests', 'test_all', 'include', 'lib', 'bin', 'modules', 'data', 'scripts']
+special_targets = ['tests', 'b2test-units', 'include', 'lib', 'bin', 'modules', 'data', 'scripts']
 explicit_package_targets = [p.rstrip('/') for p in COMMAND_LINE_TARGETS if p.rstrip('/') not in special_targets and
                             '/' not in p.rstrip('/') and os.path.isdir(p)]
 
@@ -287,9 +287,9 @@ global_env.Alias('lib', lib)
 
 # build global test executable
 if len(global_env['TEST_FILES']) > 0:
-    test = global_env.Program(os.path.join(global_env['BINDIR'], 'test_all'),
+    test = global_env.Program(os.path.join(global_env['BINDIR'], 'b2test-units'),
                               global_env['TEST_FILES'], LIBS=global_env['TEST_LIBS'])
-    global_env.Alias('test_all', test)
+    global_env.Alias('b2test-units', test)
     global_env.Alias('tests', test)
 
 # build sphinx documentation if the --sphinx option is used
@@ -334,7 +334,7 @@ Targets:
   bin                           Build only executables.
   modules                       Build only modules.
   tests                         Build only tests.
-  test_all                      Build only the overall test executable.
+  b2unittests                   Build only the overall test executable.
   data                          Build only data files
                                   (copy them to the data directory).
   include                       Build only header files

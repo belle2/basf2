@@ -85,8 +85,9 @@ namespace Belle2 {
 //line 11
     if (objects[0] == 0 && objects[4] >= 1) trgres.push_back(doprescale(scalef[11]));
     else trgres.push_back(0);
-//add new trigger line here
-
+//add new trigger line by users here, e.g.
+    //if(objects[0]==0)trgres.push_back(doprescale(1));
+    //else trgres.push_back(0);
 
   }
 

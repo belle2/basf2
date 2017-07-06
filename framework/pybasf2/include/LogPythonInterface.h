@@ -129,11 +129,16 @@ namespace Belle2 {
     void addLogFile(const std::string& filename, bool append = true);
 
     /**
+     * Add the console as output connection. Color will be used automatically if supported
+     */
+    void addLogConsole();
+
+    /**
      * Add the console as output connection
      *
      * @param color Flag whether color should be used
      */
-    void addLogConsole(bool color = false);
+    void addLogConsole(bool color);
 
     /**
      * Reset logging connections

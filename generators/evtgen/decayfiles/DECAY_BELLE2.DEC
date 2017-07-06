@@ -263,7 +263,7 @@ Decay anti-B0
 0.0013   D_1+   tau- anti-nu_tau                 LLSW 0.71 -1.6 -0.5 2.9;
 0.0013   D_0*+   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
 0.0020   D'_1+   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
-0.0020   D_2*+   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3
+0.0020   D_2*+   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
 #
 #                    b -> u l nu
 #
@@ -295,8 +295,8 @@ Decay anti-B0
 # NOTE: Do NOT CHANGE any BFs without using the corresponding set of
 #       hybrid weights (and vice versa).
 
-0.000134000 pi+     e-      anti-nu_e                       PHOTOS   ISGW2; #[Reconstructed PDG2011]
-0.000247000 rho+    e-      anti-nu_e                       PHOTOS   ISGW2; #[Reconstructed PDG2011]
+0.000134000 pi+     e-      anti-nu_e   PHOTOS   ISGW2; #[Reconstructed PDG2011]
+0.000247000 rho+    e-      anti-nu_e   PHOTOS   ISGW2; #[Reconstructed PDG2011]
 0.000000   D(2S)+ e-   anti-nu_e        PHOTOS   ISGW2;
 0.000000   D*(2S)+ e-   anti-nu_e       PHOTOS   ISGW2;
 0.001892   Xu+  e-  anti-nu_e         PHOTOS    VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00;

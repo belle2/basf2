@@ -53,10 +53,14 @@ RFRoiSender::~RFRoiSender()
 
 // Functions hooked up by NSM2
 
-int RFRoiSender::Configure(NSMmsg*, NSMcontext*)
+int RFRoiSender::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
 {
   // 0. Do you need RoI sender?
   char* roisw = m_conf->getconf("roisender", "enabled");
+  if (nsmm->len > 0) {
+    roisw = (char*) nsmm->datap;
+    printf("Configure: roisender enable flag is overridden : %s\n", roisw);
+  }
   if (strstr(roisw, "yes") == 0) return 0;
 
   // 1. Run merger first
@@ -149,6 +153,15 @@ int RFRoiSender::Restart(NSMmsg*, NSMcontext*)
 void RFRoiSender::server()
 {
   while (true) {
+    pid_t pid = m_proc->CheckProcess();
+    if (pid > 0) {
+      printf("RFRoiSender : process dead. pid=%d\n", pid);
+      if (pid == m_pid_sender)
+        m_log->Fatal("RFRoiSender : hltout2merger dead. pid = %d\n", pid);
+      else if (pid == m_pid_merger)
+        m_log->Fatal("RFRoiSender : merger2merge dead. pid = %d\n", pid);
+    }
+
     int st = m_proc->CheckOutput();
     if (st < 0) {
       perror("RFRoiSender::server");

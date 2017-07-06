@@ -21,6 +21,7 @@
 #include "trg/ecl/TrgEclTiming.h"
 #include "trg/ecl/TrgEclBhabha.h"
 #include "trg/ecl/TrgEclBeamBKG.h"
+#include "trg/ecl/TrgEclMapping.h"
 
 //
 //
@@ -140,7 +141,8 @@ namespace Belle2 {
 
     /** ecl object */
     static TrgEclMaster* _ecl;
-
+    /** Mapping object */
+    TrgEclMapping* obj_map ;
     /**  Cluster object */
     TrgEclCluster* obj_cluster;
     /**  EventTiming object */

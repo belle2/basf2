@@ -21,7 +21,6 @@
 #include <string>
 #include <vector>
 
-#include <TFile.h>
 
 
 
@@ -72,6 +71,9 @@ namespace Belle2 {
 
     /** Name of storeArray containing the spacePointTrackCands. */
     std::string m_PARAMSpacePointTrackCandsName;
+
+    /** Name tag that will be attached to the output file*/
+    std::string m_PARAMNameTag;
 
     /** Names of the variables to be produced and collected */
     std::vector <

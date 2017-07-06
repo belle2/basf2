@@ -175,7 +175,7 @@ namespace Belle2 {
 
 
 //==========================================================
-  double B2BIIFixMdstModule::vee_mass_nofit(const Mdst_vee2& vee2, float scale)
+  double B2BIIFixMdstModule::vee_mass_nofit(const Belle::Mdst_vee2& vee2, float scale)
   {
 //==========================================================
 // Calculates V^0 mass with non-constraint fit results.
@@ -207,55 +207,55 @@ namespace Belle2 {
     //  if(BsCouTab(MDST_VEE_DAUGHTERS)) {
     if (vee2.daut()) {
 
-      Mdst_vee_daughters& vdau = vee2.daut();
+      Belle::Mdst_vee_daughters& vdau = vee2.daut();
 
-      HepVector a(5);
+      CLHEP::HepVector a(5);
       a[0] = vdau.helix_p(0); a[1] = vdau.helix_p(1);
       a[2] = vdau.helix_p(2) / scale;
       a[3] = vdau.helix_p(3); a[4] = vdau.helix_p(4);
-      Helix  helixp(vtx, a);
+      Belle::Helix  helixp(vtx, a);
 
       a[0] = vdau.helix_m(0); a[1] = vdau.helix_m(1);
       a[2] = vdau.helix_m(2) / scale;
       a[3] = vdau.helix_m(3); a[4] = vdau.helix_m(4);
-      Helix  helixm(vtx, a);
+      Belle::Helix  helixm(vtx, a);
       // dout(Debugout::DDEBUG,"B2BIIFixMdst_trk") << "outside bp" << std::endl;
-      HepLorentzVector v0 = helixp.momentum(0., massp) + helixm.momentum(0., massm);
+      CLHEP::HepLorentzVector v0 = helixp.momentum(0., massp) + helixm.momentum(0., massm);
       return v0.mag();
 
 //in case where decay vtx is inside of beam pipe
     } else {
 
-      Mdst_charged& chargedp = vee2.chgd(0);
-      Mdst_trk&      trkp     = chargedp.trk();
-      Mdst_trk_fit& trkfp    = trkp.mhyp(2);
+      Belle::Mdst_charged& chargedp = vee2.chgd(0);
+      Belle::Mdst_trk&      trkp     = chargedp.trk();
+      Belle::Mdst_trk_fit& trkfp    = trkp.mhyp(2);
       HepPoint3D pvtp(trkfp.pivot_x(), trkfp.pivot_y(), trkfp.pivot_z());
-      HepVector a(5);
+      CLHEP::HepVector a(5);
       a[0] = trkfp.helix(0); a[1] = trkfp.helix(1);
       a[2] = trkfp.helix(2);
       a[3] = trkfp.helix(3); a[4] = trkfp.helix(4);
-      Helix  helixp(pvtp, a);
+      Belle::Helix  helixp(pvtp, a);
       helixp.bFieldZ(14.6);
       helixp.pivot(vtx);
       a = helixp.a();
       a[2] = a[2] / scale;
       helixp.a(a);
 
-      Mdst_charged& chargedm = vee2.chgd(1);
-      Mdst_trk&      trkm     = chargedm.trk();
-      Mdst_trk_fit& trkfm    = trkm.mhyp(2);
+      Belle::Mdst_charged& chargedm = vee2.chgd(1);
+      Belle::Mdst_trk&      trkm     = chargedm.trk();
+      Belle::Mdst_trk_fit& trkfm    = trkm.mhyp(2);
       HepPoint3D pvtm(trkfm.pivot_x(), trkfm.pivot_y(), trkfm.pivot_z());
       a[0] = trkfm.helix(0); a[1] = trkfm.helix(1);
       a[2] = trkfm.helix(2);
       a[3] = trkfm.helix(3); a[4] = trkfm.helix(4);
-      Helix  helixm(pvtm, a);
+      Belle::Helix  helixm(pvtm, a);
       helixm.bFieldZ(14.6);
       helixm.pivot(vtx);
       a = helixm.a();
       a[2] = a[2] / scale;
       helixm.a(a);
       // dout(Debugout::DDEBUG,"B2BIIFixMdst_trk") << "inside bp" << std::endl;
-      HepLorentzVector v0 = helixp.momentum(0., massp) + helixm.momentum(0., massm);
+      CLHEP::HepLorentzVector v0 = helixp.momentum(0., massp) + helixm.momentum(0., massm);
       return v0.mag();
 
     }
@@ -273,12 +273,12 @@ namespace Belle2 {
     // dout(Debugout::DDEBUG,"B2BIIFixMdst_trk") << "sacel momenta is called" << std::endl;
 
 //Check existence of belle_event
-    Belle_event_Manager& evtmgr = Belle_event_Manager::get_manager();
+    Belle::Belle_event_Manager& evtmgr = Belle::Belle_event_Manager::get_manager();
     // dout(Debugout::DDEBUG,"B2BIIFixMdst_trk") << evtmgr.count() << std::endl;
     if (0 == evtmgr.count()) return; //do nothing if not exist
     // dout(Debugout::DDEBUG,"B2BIIFixMdst_trk") << "after check" << std::endl;
 
-    Mdst_event_add_Manager& mevtmgr = Mdst_event_add_Manager::get_manager();
+    Belle::Mdst_event_add_Manager& mevtmgr = Belle::Mdst_event_add_Manager::get_manager();
     if (mevtmgr.count() > 0 && 1 == mevtmgr[0].flag_scale()) return; //do nothing if already scaled
 
 //check mode
@@ -317,7 +317,7 @@ namespace Belle2 {
       mevtmgr[0].flag_scale(1);
       mevtmgr[0].scale(scale);
     } else {
-      Mdst_event_add& meadd = mevtmgr.add();
+      Belle::Mdst_event_add& meadd = mevtmgr.add();
       meadd.flag_scale(1);
       meadd.scale(scale);
     }
@@ -326,20 +326,20 @@ namespace Belle2 {
 
 
 //Scale momenta in mdst_charged
-    Mdst_charged_Manager& chgmgr = Mdst_charged_Manager::get_manager();
-    for (std::vector<Mdst_charged>::iterator it = chgmgr.begin();
+    Belle::Mdst_charged_Manager& chgmgr = Belle::Mdst_charged_Manager::get_manager();
+    for (std::vector<Belle::Mdst_charged>::iterator it = chgmgr.begin();
          it != chgmgr.end(); ++it) {
-      Mdst_charged& charged = *it;
+      Belle::Mdst_charged& charged = *it;
       charged.px(scale * charged.px());
       charged.py(scale * charged.py());
       charged.pz(scale * charged.pz());
     }
 
 //Scale momenta in mdst_vee2
-    Mdst_vee2_Manager& vee2mgr = Mdst_vee2_Manager::get_manager();
-    for (std::vector<Mdst_vee2>::iterator it = vee2mgr.begin();
+    Belle::Mdst_vee2_Manager& vee2mgr = Belle::Mdst_vee2_Manager::get_manager();
+    for (std::vector<Belle::Mdst_vee2>::iterator it = vee2mgr.begin();
          it != vee2mgr.end(); ++it) {
-      Mdst_vee2& vee2 = *it;
+      Belle::Mdst_vee2& vee2 = *it;
       double v0mass_scale = vee_mass_nofit(vee2, scale);
       double v0mass_noscl = vee_mass_nofit(vee2);
       double esq_scale =
@@ -358,10 +358,10 @@ namespace Belle2 {
     double scalei = 1. / scale;
     double scalei2 = scalei / scale;
 
-    Mdst_trk_fit_Manager& trkfmgr = Mdst_trk_fit_Manager::get_manager();
-    for (std::vector<Mdst_trk_fit>::iterator it = trkfmgr.begin();
+    Belle::Mdst_trk_fit_Manager& trkfmgr = Belle::Mdst_trk_fit_Manager::get_manager();
+    for (std::vector<Belle::Mdst_trk_fit>::iterator it = trkfmgr.begin();
          it != trkfmgr.end(); ++it) {
-      Mdst_trk_fit& trkf = *it;
+      Belle::Mdst_trk_fit& trkf = *it;
       trkf.helix(2, scalei * trkf.helix(2));
       trkf.error(3, scalei * trkf.error(3));
       trkf.error(4, scalei * trkf.error(4));
@@ -371,10 +371,10 @@ namespace Belle2 {
     }
 
 //Scale error matrices in mdst_daughters
-    Mdst_vee_daughters_Manager& vdaumgr = Mdst_vee_daughters_Manager::get_manager();
-    for (std::vector<Mdst_vee_daughters>::iterator it = vdaumgr.begin();
+    Belle::Mdst_vee_daughters_Manager& vdaumgr = Belle::Mdst_vee_daughters_Manager::get_manager();
+    for (std::vector<Belle::Mdst_vee_daughters>::iterator it = vdaumgr.begin();
          it != vdaumgr.end(); ++it) {
-      Mdst_vee_daughters& vdau = *it;
+      Belle::Mdst_vee_daughters& vdau = *it;
       vdau.helix_p(2, scalei * vdau.helix_p(2));
       vdau.error_p(3, scalei * vdau.error_p(3));
       vdau.error_p(4, scalei * vdau.error_p(4));
@@ -1472,7 +1472,7 @@ namespace Belle2 {
   static bool
   is_already_scaled(void)
   {
-    Mdst_event_add_Manager& addmgr = Mdst_event_add_Manager::get_manager();
+    Belle::Mdst_event_add_Manager& addmgr = Belle::Mdst_event_add_Manager::get_manager();
     if (addmgr.count() >= 1) {
 
       if (addmgr[0].flag_error() == 1) {
@@ -2717,9 +2717,9 @@ namespace Belle2 {
 
 
     // scale error matrices in mdst_trk_fit
-    Mdst_trk_fit_Manager& fitmgr = Mdst_trk_fit_Manager::get_manager();
-    for (std::vector<Mdst_trk_fit>::iterator it = fitmgr.begin(); it != fitmgr.end(); it++) {
-      Mdst_trk_fit& fit = *it;
+    Belle::Mdst_trk_fit_Manager& fitmgr = Belle::Mdst_trk_fit_Manager::get_manager();
+    for (std::vector<Belle::Mdst_trk_fit>::iterator it = fitmgr.begin(); it != fitmgr.end(); it++) {
+      Belle::Mdst_trk_fit& fit = *it;
       if (fit.helix(2) == 0.) continue;
 
       const double pt   = 1. / fabs(fit.helix(2));
@@ -2746,9 +2746,9 @@ namespace Belle2 {
 
 
     // scale error matrices in mdst_daughters
-    Mdst_vee_daughters_Manager& daumgr = Mdst_vee_daughters_Manager::get_manager();
-    for (std::vector<Mdst_vee_daughters>::iterator it = daumgr.begin(); it != daumgr.end(); it++) {
-      Mdst_vee_daughters& dau = *it;
+    Belle::Mdst_vee_daughters_Manager& daumgr = Belle::Mdst_vee_daughters_Manager::get_manager();
+    for (std::vector<Belle::Mdst_vee_daughters>::iterator it = daumgr.begin(); it != daumgr.end(); it++) {
+      Belle::Mdst_vee_daughters& dau = *it;
       if (dau.helix_p(2) == 0. || dau.helix_m(2) == 0.) continue;
 
       // positive track
@@ -2843,15 +2843,15 @@ namespace Belle2 {
 
 
   int B2BIIFixMdstModule::set_primary_vertex(HepPoint3D& epvtx,
-                                             HepSymMatrix& epvtx_err)
+                                             CLHEP::HepSymMatrix& epvtx_err)
   {
 
-    Evtvtx_primary_vertex_Manager& evtvtx_mgr
-      = Evtvtx_primary_vertex_Manager::get_manager();
+    Belle::Evtvtx_primary_vertex_Manager& evtvtx_mgr
+      = Belle::Evtvtx_primary_vertex_Manager::get_manager();
 
-    Evtvtx_trk_Manager& evttrk_mgr = Evtvtx_trk_Manager::get_manager();
+    Belle::Evtvtx_trk_Manager& evttrk_mgr = Belle::Evtvtx_trk_Manager::get_manager();
 
-    Evtvtx_primary_vertex_Manager::iterator itvtx = evtvtx_mgr.begin();
+    Belle::Evtvtx_primary_vertex_Manager::iterator itvtx = evtvtx_mgr.begin();
     if (itvtx == evtvtx_mgr.end()) return 4;
 
     if (!(itvtx->quality() == 2 || itvtx->quality() == 3)) return 3;
@@ -2864,9 +2864,9 @@ namespace Belle2 {
     kv.setInitialVertex(pvtx);
 
     unsigned int nchrgd(0);
-    for (Evtvtx_trk_Manager::iterator i = evttrk_mgr.begin(); i != evttrk_mgr.end(); ++i) {
+    for (Belle::Evtvtx_trk_Manager::iterator i = evttrk_mgr.begin(); i != evttrk_mgr.end(); ++i) {
 
-      const Mdst_charged& p = i->charged();
+      const Belle::Mdst_charged& p = i->charged();
       if (p.trk().mhyp(2).nhits(3) < 2) continue;
       if (p.trk().mhyp(2).nhits(4) < 2) continue;
 
@@ -2874,13 +2874,13 @@ namespace Belle2 {
       const HepPoint3D pivot(p.trk().mhyp(hyp).pivot_x(),
                              p.trk().mhyp(hyp).pivot_y(),
                              p.trk().mhyp(hyp).pivot_z());
-      HepVector  a(5);
+      CLHEP::HepVector  a(5);
       a[0] = p.trk().mhyp(hyp).helix(0);
       a[1] = p.trk().mhyp(hyp).helix(1);
       a[2] = p.trk().mhyp(hyp).helix(2);
       a[3] = p.trk().mhyp(hyp).helix(3);
       a[4] = p.trk().mhyp(hyp).helix(4);
-      HepSymMatrix Ea(5, 0);
+      CLHEP::HepSymMatrix Ea(5, 0);
       Ea[0][0] = p.trk().mhyp(hyp).error(0);
       Ea[1][0] = p.trk().mhyp(hyp).error(1);
       Ea[1][1] = p.trk().mhyp(hyp).error(2);
@@ -2896,9 +2896,9 @@ namespace Belle2 {
       Ea[4][2] = p.trk().mhyp(hyp).error(12);
       Ea[4][3] = p.trk().mhyp(hyp).error(13);
       Ea[4][4] = p.trk().mhyp(hyp).error(14);
-      Helix helix(pivot, a, Ea);
+      Belle::Helix helix(pivot, a, Ea);
 
-      HepLorentzVector mom;
+      CLHEP::HepLorentzVector mom;
       CLHEP::HepSymMatrix err(7, 0);
       HepPoint3D pos(0, 0, 0);
       if (pivot.x() != 0. ||
@@ -2914,15 +2914,15 @@ namespace Belle2 {
       ++nchrgd;
     }
 
-    if (IpProfile::usable()) {
+    if (Belle::IpProfile::usable()) {
       // event depend. IP position and error matrix
-      HepPoint3D ip_position = IpProfile::e_position();
-      HepSymMatrix ip_err = IpProfile::e_position_err();
+      HepPoint3D ip_position = Belle::IpProfile::e_position();
+      CLHEP::HepSymMatrix ip_err = Belle::IpProfile::e_position_err();
       kv.setIpProfile(ip_position, ip_err);
     }
     // Fit
     unsigned int err(1);
-    if (nchrgd > 2 || (nchrgd > 0 && IpProfile::usable())) err = kv.doFit();
+    if (nchrgd > 2 || (nchrgd > 0 && Belle::IpProfile::usable())) err = kv.doFit();
     if (err == 0) {
       epvtx = kv.getVertex();
       epvtx_err = kv.getVertexError();
@@ -2940,7 +2940,7 @@ namespace Belle2 {
     Ptype ptype_pi_minus("PI-");
 
     unsigned int nchrgd(0);
-    for(Evtvtx_trk_Manager::iterator i = evttrk_mgr.begin();
+    for(Belle::Evtvtx_trk_Manager::iterator i = evttrk_mgr.begin();
     i != evttrk_mgr.end(); ++i){
       //      if(!good_charged(i->charged())) continue;
 
@@ -2953,19 +2953,19 @@ namespace Belle2 {
       ++nchrgd;
     }
 
-    if(IpProfile::usable()){
+    if(Belle::IpProfile::usable()){
 
       // event depend. IP position and error matrix
-      HepPoint3D ip_position = IpProfile::e_position();
-      HepSymMatrix ip_err = IpProfile::e_position_err();
-      //    HepSymMatrix m_ip_err_b = IpProfile::e_position_err_b_life_smeared();
+      HepPoint3D ip_position = Belle::IpProfile::e_position();
+      HepSymMatrix ip_err = Belle::IpProfile::e_position_err();
+      //    HepSymMatrix m_ip_err_b = Belle::IpProfile::e_position_err_b_life_smeared();
 
       // Add IP profile information
       addBeam2fit(kv, ip_position, ip_err);
     }
     // Fit
     unsigned int err(1);
-    if(nchrgd>2||(nchrgd>0&&IpProfile::usable())) err = kv.fit();
+    if(nchrgd>2||(nchrgd>0&&Belle::IpProfile::usable())) err = kv.fit();
     if(err==0) {
       epvtx = kv.get_vertex();
       epvtx_err = kv.get_err_vertex();
@@ -2987,27 +2987,27 @@ namespace Belle2 {
   int
   B2BIIFixMdstModule::add_extra_trk_vee2()
   {
-    Mdst_event_add_Manager& mevtmgr = Mdst_event_add_Manager::get_manager();
-    if (mevtmgr.count() == 0) { // no Mdst_event_add table
+    Belle::Mdst_event_add_Manager& mevtmgr = Belle::Mdst_event_add_Manager::get_manager();
+    if (mevtmgr.count() == 0) { // no Belle::Mdst_event_add table
       return -2;
-    } else if (mevtmgr.count() == 1) { // no second entity in Mdst_event_add table
+    } else if (mevtmgr.count() == 1) { // no second entity in Belle::Mdst_event_add table
       mevtmgr.add();
     }
     unsigned flag(mevtmgr[1].flag(0));
     if (flag != 0) return -1;  // do nothing if already added
-    Mdst_trk_extra_Manager& teMgr(Mdst_trk_extra_Manager::get_manager());
-    Mdst_trk_Manager& tMgr(Mdst_trk_Manager::get_manager());
-    Mdst_charged_Manager& chMgr(Mdst_charged_Manager::get_manager());
+    Belle::Mdst_trk_extra_Manager& teMgr(Belle::Mdst_trk_extra_Manager::get_manager());
+    Belle::Mdst_trk_Manager& tMgr(Belle::Mdst_trk_Manager::get_manager());
+    Belle::Mdst_charged_Manager& chMgr(Belle::Mdst_charged_Manager::get_manager());
     const int i_ch(chMgr.count() + 1);
     const int i_trk(tMgr.count() + 1);
-    for (std::vector<Mdst_trk_extra>::const_iterator i = teMgr.begin();
+    for (std::vector<Belle::Mdst_trk_extra>::const_iterator i = teMgr.begin();
          i != teMgr.end(); i++) {
-      Mdst_trk& trk(tMgr.add());
+      Belle::Mdst_trk& trk(tMgr.add());
       trk.quality((*i).quality());
       for (int j = 0; j < 5; j++) trk.mhyp(j, (*i).mhyp(j));
 
       // Commented out by A. Zupanc: see below
-      // Mdst_trk_fit& tf(trk.mhyp(2));
+      // Belle::Mdst_trk_fit& tf(trk.mhyp(2));
       if (!(trk.quality() & 15u)) {
         B2FATAL("recsim_mdst_propgt_ is missing");
 
@@ -3015,7 +3015,7 @@ namespace Belle2 {
         Commented by A.Zupanc: the recsim_mdst_propgt_ is missing therefore this part of the code
         can not be executed
 
-              Mdst_charged& ch(chMgr.add());
+              Belle::Mdst_charged& ch(chMgr.add());
               ch.charge((tf.helix(2) >= 0) ? 1. : -1.);
 
               float pivot[3], helix[5], error[15], helix0[5], error0[15];
@@ -3039,19 +3039,19 @@ namespace Belle2 {
               ch.trk(trk);
         */
       } else {
-        B2ERROR("Warning from B2BIIFixMdst: strange track in Mdst_trk_extra: quality="
+        B2ERROR("Warning from B2BIIFixMdst: strange track in Belle::Mdst_trk_extra: quality="
                 << trk.quality());
       }
     }
 
 
-    Mdst_sim_trk_extra_Manager& steMgr
-    (Mdst_sim_trk_extra_Manager::get_manager());
-    Mdst_sim_trk_Manager& stMgr(Mdst_sim_trk_Manager::get_manager());
+    Belle::Mdst_sim_trk_extra_Manager& steMgr
+    (Belle::Mdst_sim_trk_extra_Manager::get_manager());
+    Belle::Mdst_sim_trk_Manager& stMgr(Belle::Mdst_sim_trk_Manager::get_manager());
     int ist(0);
-    for (std::vector<Mdst_sim_trk_extra>::const_iterator i = steMgr.begin();
+    for (std::vector<Belle::Mdst_sim_trk_extra>::const_iterator i = steMgr.begin();
          i != steMgr.end(); i++) {
-      Mdst_sim_trk& strk(stMgr.add());
+      Belle::Mdst_sim_trk& strk(stMgr.add());
       int argn = tMgr.count() - teMgr.count() + ist;
       if (argn < tMgr.count()) {
         strk.trk(tMgr[argn]);
@@ -3064,13 +3064,13 @@ namespace Belle2 {
     }
 
 
-    Mdst_svd_hit_extra_Manager& sheMgr
-    (Mdst_svd_hit_extra_Manager::get_manager());
-    Mdst_svd_hit_Manager& shMgr(Mdst_svd_hit_Manager::get_manager());
-    for (std::vector<Mdst_svd_hit_extra>::iterator it = sheMgr.begin();
+    Belle::Mdst_svd_hit_extra_Manager& sheMgr
+    (Belle::Mdst_svd_hit_extra_Manager::get_manager());
+    Belle::Mdst_svd_hit_Manager& shMgr(Belle::Mdst_svd_hit_Manager::get_manager());
+    for (std::vector<Belle::Mdst_svd_hit_extra>::iterator it = sheMgr.begin();
          it != sheMgr.end(); it++) {
-      Mdst_svd_hit_extra& she = *it;
-      Mdst_svd_hit& sh(shMgr.add());
+      Belle::Mdst_svd_hit_extra& she = *it;
+      Belle::Mdst_svd_hit& sh(shMgr.add());
       sh.lsa(she.lsa());
       sh.width(she.width());
       sh.electrons(she.electrons());
@@ -3083,23 +3083,23 @@ namespace Belle2 {
     }
 
 
-    Mdst_vee2_Manager& vMgr(Mdst_vee2_Manager::get_manager());
-    Mdst_vee2_extra_Manager& veMgr(Mdst_vee2_extra_Manager::get_manager());
+    Belle::Mdst_vee2_Manager& vMgr(Belle::Mdst_vee2_Manager::get_manager());
+    Belle::Mdst_vee2_extra_Manager& veMgr(Belle::Mdst_vee2_extra_Manager::get_manager());
     const int i_vee2(vMgr.count() + 1);
-    for (std::vector<Mdst_vee2_extra>::const_iterator i = veMgr.begin();
+    for (std::vector<Belle::Mdst_vee2_extra>::const_iterator i = veMgr.begin();
          i != veMgr.end(); i++) {
-      Mdst_vee2& vee(vMgr.add());
+      Belle::Mdst_vee2& vee(vMgr.add());
       vee.kind((*i).kind());
 
       if ((*i).extra_ID(0)) {
-        Mdst_charged& tmp(chMgr[(*i).extra_ID(0) + i_ch - 2]);
+        Belle::Mdst_charged& tmp(chMgr[(*i).extra_ID(0) + i_ch - 2]);
         vee.chgd(0, tmp);
       } else {
         vee.chgd(0, (*i).chgd());
       }
 
       if ((*i).extra_ID(1)) {
-        Mdst_charged& tmp(chMgr[(*i).extra_ID(1) + i_ch - 2]);
+        Belle::Mdst_charged& tmp(chMgr[(*i).extra_ID(1) + i_ch - 2]);
         vee.chgd(1, tmp);
       } else {
         vee.chgd(1, (*i).chgd());
@@ -3134,18 +3134,18 @@ namespace Belle2 {
   int
   B2BIIFixMdstModule::remove_extra_trk_vee2()
   {
-    Mdst_event_add_Manager& mevtmgr = Mdst_event_add_Manager::get_manager();
-    if (mevtmgr.count() <= 1) { // no Mdst_event_add table
+    Belle::Mdst_event_add_Manager& mevtmgr = Belle::Mdst_event_add_Manager::get_manager();
+    if (mevtmgr.count() <= 1) { // no Belle::Mdst_event_add table
       return -2;
     }
     unsigned flag(mevtmgr[1].flag(0));
-    if (0 == flag) return -1;  // do nothing if no extra tracks in Mdst_charged etc.
+    if (0 == flag) return -1;  // do nothing if no extra tracks in Belle::Mdst_charged etc.
     const int i_ch(flag & 0xff);
     const int i_trk((flag >> 8) & 0xff);
     const int i_vee2((flag >> 16) & 0xff);
-    Mdst_charged_Manager& chMgr(Mdst_charged_Manager::get_manager());
-    Mdst_trk_Manager& tMgr(Mdst_trk_Manager::get_manager());
-    Mdst_vee2_Manager& veeMgr(Mdst_vee2_Manager::get_manager());
+    Belle::Mdst_charged_Manager& chMgr(Belle::Mdst_charged_Manager::get_manager());
+    Belle::Mdst_trk_Manager& tMgr(Belle::Mdst_trk_Manager::get_manager());
+    Belle::Mdst_vee2_Manager& veeMgr(Belle::Mdst_vee2_Manager::get_manager());
     if (i_ch) {
       while (chMgr.count() >= i_ch) chMgr.remove(chMgr[chMgr.count() - 1]);
     }
@@ -3163,48 +3163,48 @@ namespace Belle2 {
   int
   B2BIIFixMdstModule::remove_extra_trk_vee2()
   {
-    Mdst_event_add_Manager& mevtmgr = Mdst_event_add_Manager::get_manager();
-    if (mevtmgr.count() <= 1) { // no Mdst_event_add table
+    Belle::Mdst_event_add_Manager& mevtmgr = Belle::Mdst_event_add_Manager::get_manager();
+    if (mevtmgr.count() <= 1) { // no Belle::Mdst_event_add table
       return -2;
     }
     unsigned flag(mevtmgr[1].flag(0));
-    if (0 == flag) return -1;  // do nothing if no extra tracks in Mdst_charged etc.
+    if (0 == flag) return -1;  // do nothing if no extra tracks in Belle::Mdst_charged etc.
     const int i_ch(flag & 0xff);
     const int i_trk((flag >> 8) & 0xff);
     const int i_vee2((flag >> 16) & 0xff);
-    //Mdst_charged_Manager////& chMgr(Mdst_charged_Manager::get_manager());
-    Mdst_trk_Manager& tMgr(Mdst_trk_Manager::get_manager());
-    Mdst_vee2_Manager& veeMgr(Mdst_vee2_Manager::get_manager());
-    Mdst_trk_extra_Manager& teMgr(Mdst_trk_extra_Manager::get_manager());
-    Mdst_vee2_extra_Manager& veeeMgr(Mdst_vee2_extra_Manager::get_manager());
+    //Belle::Mdst_charged_Manager////& chMgr(Belle::Mdst_charged_Manager::get_manager());
+    Belle::Mdst_trk_Manager& tMgr(Belle::Mdst_trk_Manager::get_manager());
+    Belle::Mdst_vee2_Manager& veeMgr(Belle::Mdst_vee2_Manager::get_manager());
+    Belle::Mdst_trk_extra_Manager& teMgr(Belle::Mdst_trk_extra_Manager::get_manager());
+    Belle::Mdst_vee2_extra_Manager& veeeMgr(Belle::Mdst_vee2_extra_Manager::get_manager());
     if (i_trk) {
       std::vector<int> extra_ID;
       if (teMgr.count()) teMgr.remove();
-      for (std::vector<Mdst_trk>::iterator i = tMgr.begin();
+      for (std::vector<Belle::Mdst_trk>::iterator i = tMgr.begin();
            i != tMgr.end(); i++) {
         if ((*i).get_ID() < i_trk) {
           extra_ID.push_back(0);
           continue;
         }
         if (!((*i).quality() & 16u)) {
-          B2ERROR("Warning from B2BIIFixMdst: inconsistency between Mdst_trk and Mdst_evet_add"
+          B2ERROR("Warning from B2BIIFixMdst: inconsistency between Belle::Mdst_trk and Belle::Mdst_evet_add"
                  );
         }
-        Mdst_trk_extra& trk(teMgr.add());
+        Belle::Mdst_trk_extra& trk(teMgr.add());
         for (int j = 0; j < 5; j++) trk.mhyp(j, (*i).mhyp(j));
         trk.quality((*i).quality());
         extra_ID.push_back(trk.get_ID());
       }
       if (i_vee2) {
         if (veeeMgr.count()) veeeMgr.remove();
-        for (std::vector<Mdst_vee2>::iterator i = veeMgr.begin();
+        for (std::vector<Belle::Mdst_vee2>::iterator i = veeMgr.begin();
              i != veeMgr.end(); i++) {
           if ((*i).get_ID() < i_vee2) continue;
           if (!((*i).chgd(0).trk().quality() & 16u) && !((*i).chgd(1).trk().quality() & 16u)) {
-            B2ERROR("Warning from B2BIIFixMdst: inconsistency between Mdst_vee2 and Mdst_evet_add"
+            B2ERROR("Warning from B2BIIFixMdst: inconsistency between Belle::Mdst_vee2 and Belle::Mdst_evet_add"
                    );
           }
-          Mdst_vee2_extra& vee(veeeMgr.add());
+          Belle::Mdst_vee2_extra& vee(veeeMgr.add());
           vee.kind((*i).kind());
           const int extra_id0(extra_ID[(*i).chgd(0).trk_ID() - 1]);
           const int extra_id1(extra_ID[(*i).chgd(1).trk_ID() - 1]);
@@ -3217,7 +3217,7 @@ namespace Belle2 {
             vee.extra(1, teMgr[extra_id1 - 1]);
           } else {
             if (vee.chgd_ID()) {
-              B2ERROR("Warning from B2BIIFixMdst: both tracks of Mdst_vee2_extra are good track"
+              B2ERROR("Warning from B2BIIFixMdst: both tracks of Belle::Mdst_vee2_extra are good track"
                      );
             }
             vee.chgd((*i).chgd(1));
@@ -3255,8 +3255,8 @@ namespace Belle2 {
 //from the module smear_trk originally coded by Marko Staric.
 //=======================================================================
 
-  static void scale_err_ms(Mdst_trk_fit& fit, double scale[]);
-  static void smear_trk_ms(Mdst_trk_fit& fit, double scale[]);
+  static void scale_err_ms(Belle::Mdst_trk_fit& fit, double scale[]);
+  static void smear_trk_ms(Belle::Mdst_trk_fit& fit, double scale[]);
   static void smear_charged();
 
 //==========================
@@ -3264,7 +3264,7 @@ namespace Belle2 {
   {
 //==========================
     int expNo = 0, runNo = 0, expmc = 1;
-    Belle_event_Manager& evtMgr = Belle_event_Manager::get_manager();
+    Belle::Belle_event_Manager& evtMgr = Belle::Belle_event_Manager::get_manager();
     if (evtMgr.count()) {
       expNo  = evtMgr[0].ExpNo();
       runNo  = evtMgr[0].RunNo();
@@ -3272,9 +3272,9 @@ namespace Belle2 {
     }
     if (expmc == 1) return; // nothing done for real data
 
-    Mdst_event_add_Manager& addmgr = Mdst_event_add_Manager::get_manager();
+    Belle::Mdst_event_add_Manager& addmgr = Belle::Mdst_event_add_Manager::get_manager();
     if (addmgr.count() == 0) {
-      B2ERROR("No Mdst_event_add table -> kill the job");
+      B2ERROR("No Belle::Mdst_event_add table -> kill the job");
       exit(-1);
     } else if (addmgr.count() >= 2) {
       if (addmgr[1].flag(1) != 0) return;  //do nothing if already smeared
@@ -3292,9 +3292,9 @@ namespace Belle2 {
     double scale_rd[5] = {1, 1, 1, 1, 1};
     double scale[5];
 
-    Mdst_trk_fit_Manager& fitmgr = Mdst_trk_fit_Manager::get_manager();
-    for (std::vector<Mdst_trk_fit>::iterator it = fitmgr.begin(); it != fitmgr.end(); it++) {
-      Mdst_trk_fit& fit = *it;
+    Belle::Mdst_trk_fit_Manager& fitmgr = Belle::Mdst_trk_fit_Manager::get_manager();
+    for (std::vector<Belle::Mdst_trk_fit>::iterator it = fitmgr.begin(); it != fitmgr.end(); it++) {
+      Belle::Mdst_trk_fit& fit = *it;
       if (fit.helix(2) == 0.) continue;
 
       double pt = 1. / fabs(fit.helix(2));
@@ -3316,7 +3316,7 @@ namespace Belle2 {
 
     //set flag indicating already-smeared
     if (addmgr.count() == 1) {
-      Mdst_event_add& meadd = addmgr.add();
+      Belle::Mdst_event_add& meadd = addmgr.add();
       meadd.flag(1, 1);
     } else if (addmgr.count() >= 2) {
       addmgr[1].flag(1, 1);
@@ -3325,7 +3325,7 @@ namespace Belle2 {
   }
 
 //====================================================
-  void scale_err_ms(Mdst_trk_fit& fit, double scale[])
+  void scale_err_ms(Belle::Mdst_trk_fit& fit, double scale[])
   {
 //====================================================
     fit.error(0, scale[0]*scale[0]*fit.error(0));
@@ -3347,7 +3347,7 @@ namespace Belle2 {
   }
 
 //====================================================
-  void smear_trk_ms(Mdst_trk_fit& fit, double scale[])
+  void smear_trk_ms(Belle::Mdst_trk_fit& fit, double scale[])
   {
 //====================================================
     const int n = 5;
@@ -3397,10 +3397,10 @@ namespace Belle2 {
   void smear_charged()
   {
 //====================
-    Mdst_charged_Manager& chgmgr = Mdst_charged_Manager::get_manager();
-    for (std::vector<Mdst_charged>::iterator it = chgmgr.begin(); it != chgmgr.end(); it++) {
-      Mdst_charged& c = *it;
-      Mdst_trk_fit& t = c.trk().mhyp(2);
+    Belle::Mdst_charged_Manager& chgmgr = Belle::Mdst_charged_Manager::get_manager();
+    for (std::vector<Belle::Mdst_charged>::iterator it = chgmgr.begin(); it != chgmgr.end(); it++) {
+      Belle::Mdst_charged& c = *it;
+      Belle::Mdst_trk_fit& t = c.trk().mhyp(2);
 
       double kp = std::abs(t.helix(2));
       kp = std::max(kp, 1.e-10);

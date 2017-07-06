@@ -68,7 +68,7 @@ void SecMapTrainerBaseModule::initialize()
   FiltersContainer<SpacePoint>& filtersContainer = Belle2::FiltersContainer<SpacePoint>::getInstance();
   for (auto setup : filtersContainer.getAllSetups()) {
     auto config = setup.second->getConfig();
-    SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit> > newMap(setup.first, rngAppendix());
+    SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit> > newMap(setup.first, std::to_string(rngAppendix()));
     m_secMapTrainers.push_back(std::move(newMap));
   }
 

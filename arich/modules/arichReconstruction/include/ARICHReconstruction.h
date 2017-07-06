@@ -12,6 +12,7 @@
 #define ARICHRECONSTRUCTION_H
 
 #include <arich/dbobjects/ARICHGeometryConfig.h>
+#include <arich/dbobjects/ARICHReconstructionPar.h>
 #include "framework/datastore/StoreArray.h"
 #include "arich/dataobjects/ARICHHit.h"
 #include "arich/dataobjects/ARICHTrack.h"
@@ -61,16 +62,11 @@ namespace Belle2 {
 
     //! Computes the value of identity likelihood function for different particle hypotheses.
     int likelihood2(ARICHTrack& arichTrack, StoreArray<ARICHHit>& arichHits, ARICHLikelihood& arichLikelihood);
-    //! Sets detector background level (photon hits / m^2)
-    void setBackgroundLevel(double nbkg);
+
     //! Sets track position resolution (from tracking)
     void setTrackPositionResolution(double pRes);
     //! Sets track direction resolution (from tracking)
     void setTrackAngleResolution(double aRes);
-    //! Sets single photon emission angle resolution (without detctor pad)
-    void setSinglePhotonResolution(double sRes);
-    //! Sets aerogel layer figure of merit
-    void setAerogelFigureOfMerit(std::vector<double>& merit);
 
   private:
 
@@ -79,12 +75,11 @@ namespace Belle2 {
     double p_mass[Const::ChargedStable::c_SetSize];  /**< particle masses */
 
     DBObjPtr<ARICHGeometryConfig> m_arichgp; /**< geometry configuration parameters from the DB */
+    DBObjPtr<ARICHReconstructionPar> m_recPars; /**< reconstruction parameters from the DB */
 
-    double m_bkgLevel; /**< detector photon background level */
     double m_trackPosRes; /**< track position resolution (from tracking) */
     double m_trackAngRes; /**< track direction resolution (from tracking) */
-    double m_singleRes;   /**< single photon emission angle resolution */
-    std::vector<double> m_aeroMerit; /**< aerogel layer figure of merit */
+
     unsigned int m_nAerogelLayers; /**< number of aerogel layers */
     double  m_refractiveInd[c_noOfAerogels]; /**< refractive indices of aerogel layers */
     double  m_zaero[c_noOfAerogels]; /**< z-positions of aerogel layers */

@@ -160,6 +160,8 @@ class SegmentFitValidationRun(HarvestingRun):
                         UseNLoops=1
                         )
 
+        path.add_module("TFCDC_ClusterPreparer")
+
         if self.monte_carlo == "no":
             # MC free - default
             path.add_module(

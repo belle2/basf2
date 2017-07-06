@@ -723,13 +723,13 @@ void FilterCalculatorModule::event()
           m_badTrackletCounter++;
         } else {
           B2DEBUG(20, " tracklet passed bad-tracklet-filters");
-          int chosenSecMap = -1;
+          int chosenSecMapPassedFilter = -1;
           for (double ptCutoff : m_PARAMpTcuts) {
             if (mcMomValue > ptCutoff) {
-              chosenSecMap++;
+              chosenSecMapPassedFilter++;
             } else { break; }
           }
-          m_trackletMomentumCounter.at(chosenSecMap)++;
+          m_trackletMomentumCounter.at(chosenSecMapPassedFilter)++;
           newTracklet.addHit(newVirtualHit); /// adding virtual hit to tracklet!
 
           B2DEBUG(20, "adding tracklet to list");

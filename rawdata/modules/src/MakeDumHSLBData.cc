@@ -166,7 +166,7 @@ void MakeDumHSLBDataModule::event()
   StoreArray<RawTRG> raw_trgarray;
   for (int i = 0; i < raw_trgarray.getEntries(); i++) {
     for (int j = 0; j < raw_trgarray[ i ]->GetNumEntries(); j++) {
-      printf("\n===== DataBlock(RawARICH) : Block # %d ", i);
+      printf("\n===== DataBlock(RawTRG) : Block # %d ", i);
       writeData(raw_trgarray[ i ], j);
     }
   }

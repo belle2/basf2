@@ -13,6 +13,10 @@
 #include <bklm/dbobjects/BKLMGeometryPar.h>
 #include <bklm/dbobjects/BKLMSimulationPar.h>
 #include <bklm/dbobjects/BKLMBadChannels.h>
+#include <bklm/dbobjects/BKLMMisAlignment.h>
+#include <bklm/dbobjects/BKLMDisplacement.h>
+#include <alignment/dbobjects/BKLMAlignment.h>
+#include <bklm/dataobjects/BKLMElementID.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -21,6 +25,8 @@
 #include <framework/database/Database.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/database/DBImportObjPtr.h>
+#include <framework/database/DBImportArray.h>
 
 #include <string>
 #include <vector>
@@ -186,4 +192,139 @@ void BKLMDatabaseImporter::exportBklmBadChannels()
   B2INFO("is (1,1,1,0,20) dead ? " << element->isDeadChannel(1, 1, 1, 0, 20) << "; is (1,1,1,0,21) hot ? " << element->isHotChannel(1,
          1, 1, 0, 21));
 
+}
+
+void BKLMDatabaseImporter::importBklmMisAlignment()
+{
+
+  //auto bklm = new BKLMMisAlignment;
+  DBImportObjPtr<BKLMMisAlignment> mal;
+  mal.construct();
+  for (int i = 0; i < 2; i++) {
+    for (int j = 0; j < 8; j++) {
+      for (int k = 0; k < 15; k++) {
+        BKLMElementID bklmid(i, j, k);
+        mal->set(bklmid, 1, 0.);
+        mal->set(bklmid, 2, 0.);
+        mal->set(bklmid, 3, 0.);
+        mal->set(bklmid, 4, 0.);
+        mal->set(bklmid, 5, 0.);
+        mal->set(bklmid, 6, 0.);
+      }
+    }
+  }
+
+  IntervalOfValidity Iov(0, 0, -1, -1);
+//auto IoV = IntervalOfValidity(0, 0, -1, -1);
+  mal.import(Iov);
+//Database::Instance().storeData(mal, IoV);
+
+}
+
+void BKLMDatabaseImporter::exportBklmMisAlignment()
+{
+
+  DBObjPtr<BKLMMisAlignment> element("BKLMMisAlignment");
+
+  for (int i = 0; i < 2; i++) {
+    for (int j = 0; j < 8; j++) {
+      for (int k = 0; k < 15; k++) {
+        B2INFO("bklm misalignment parameter of isForward " << i << ", sector " << j + 1 << ", layer " << k + 1);
+        for (int p = 1; p < 7; p++) { //six parameter
+          BKLMElementID bklmid(i, j, k);
+          double par = element->get(bklmid, p);
+          B2INFO(" p [" << p << "] : " << par);
+        }
+        //B2INFO(" " << endl);
+      }//end loop layer
+    }//end loop sector
+  }
+}
+
+void BKLMDatabaseImporter::importBklmAlignment()
+{
+
+  //auto bklm = new BKLMAlignment;
+  DBImportObjPtr<BKLMAlignment> al;
+  al.construct();
+  for (int i = 0; i < 2; i++) {
+    for (int j = 0; j < 8; j++) {
+      for (int k = 0; k < 15; k++) {
+        BKLMElementID bklmid(i, j, k);
+        al->set(bklmid, 1, 0.);
+        al->set(bklmid, 2, 0.);
+        al->set(bklmid, 3, 0.);
+        al->set(bklmid, 4, 0.);
+        al->set(bklmid, 5, 0.);
+        al->set(bklmid, 6, 0.);
+      }
+    }
+  }
+
+  IntervalOfValidity Iov(0, 0, -1, -1);
+//auto IoV = IntervalOfValidity(0, 0, -1, -1);
+  al.import(Iov);
+//Database::Instance().storeData(mal, IoV);
+
+}
+
+void BKLMDatabaseImporter::exportBklmAlignment()
+{
+
+  DBObjPtr<BKLMAlignment> element("BKLMAlignment");
+
+  for (int i = 0; i < 2; i++) {
+    for (int j = 0; j < 8; j++) {
+      for (int k = 0; k < 15; k++) {
+        B2INFO("bklm alignment parameter of isForward " << i << ", sector " << j + 1 << ", layer " << k + 1);
+        for (int p = 1; p < 7; p++) { //six parameter
+          BKLMElementID bklmid(i, j, k);
+          double par = element->get(bklmid, p);
+          B2INFO(" p [" << p << "] : " << par);
+        }
+        //B2INFO(" " << endl);
+      }//end loop layer
+    }//end loop sector
+  }
+}
+
+
+void BKLMDatabaseImporter::importBklmDisplacement()
+{
+
+  //DBImportObjPtr<BKLMDisplacement> dis;
+  DBImportArray<BKLMDisplacement> m_displacement;
+  for (int i = 0; i < 2; i++) {
+    for (int j = 0; j < 8; j++) {
+      for (int k = 0; k < 15; k++) {
+        BKLMElementID bklmid(i, j, k);
+        m_displacement.appendNew(bklmid, 0, 0, 0, 0, 0, 0);
+      }
+    }
+  }
+
+  IntervalOfValidity Iov(0, 0, -1, -1);
+  //auto IoV = IntervalOfValidity(0, 0, -1, -1);
+  m_displacement.import(Iov);
+  //Database::Instance().storeData(mal, Iov); // *not* IoV);
+
+}
+
+void BKLMDatabaseImporter::exportBklmDisplacement()
+{
+
+  //DBObjPtr<BKLMDisplacement> element("BKLMDisplacement");
+  DBArray<BKLMDisplacement> displacements;
+
+  for (const auto& disp : displacements) {
+    unsigned short bklmElementID = disp.getElementID();
+    BKLMElementID bklmid(bklmElementID);
+    unsigned short isForward = bklmid.getIsForward();
+    unsigned short sector = bklmid.getSectorNumber();
+    unsigned short layer = bklmid.getLayerNumber();
+    B2INFO("displacement of " << isForward << ", " << sector << ", " << layer << ": " << disp.getUShift() << ", " << disp.getVShift() <<
+           ", " <<
+           disp.getWShift() << ", " << disp.getAlphaRotation() << ", " << disp.getBetaRotation() << ", " << disp.getGammaRotation());
+    //B2INFO(" " << endl);
+  }//end loop layer
 }

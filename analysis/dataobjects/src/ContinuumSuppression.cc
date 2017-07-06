@@ -16,6 +16,11 @@
 
 using namespace Belle2;
 
+void ContinuumSuppression::addThrustB(TVector3 thrustB)
+{
+  m_thrustB = thrustB;
+}
+
 void ContinuumSuppression::addThrustO(TVector3 thrustO)
 {
   m_thrustO = thrustO;

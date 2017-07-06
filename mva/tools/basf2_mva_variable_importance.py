@@ -95,6 +95,10 @@ def get_importances_recursive(method, train_datfiles, test_datafiles, treename, 
 
 if __name__ == '__main__':
 
+    print("WARNING This tool is deprecated, use mva/examples/advanced/variable_importance.py instead and adapt it to your needs.")
+    print("In fact adapting the example is easier than using this general tool, and it is also easier to automatise")
+    print("Therefore this tool will be removed in the future")
+
     old_cwd = os.getcwd()
     args = getCommandLineOptions()
 

@@ -43,7 +43,6 @@ MeasurementAdder::MeasurementAdder(
   const std::string& storeArrayNameOfCDCHits,
   const std::string& storeArrayNameOfBKLMHits,
   const std::string& storeArrayNameOfEKLMHits,
-  const bool& cosmicsTemporaryFix,
   const bool initializeCDCTranslators) :
   m_param_storeArrayNameOfPXDHits(storeArrayNameOfPXDHits),
   m_param_storeArrayNameOfSVDHits(storeArrayNameOfSVDHits),
@@ -59,7 +58,7 @@ MeasurementAdder::MeasurementAdder(
     CDCRecoHit::setTranslators(new CDC::LinearGlobalADCCountTranslator(),
                                new CDC::RealisticCDCGeometryTranslator(true),
                                new CDC::RealisticTDCCountTranslator(true),
-                               true, cosmicsTemporaryFix);
+                               true);
   }
   createGenfitMeasurementFactory();
   resetMeasurementCreatorsToDefaultSettings();

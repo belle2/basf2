@@ -98,7 +98,7 @@ namespace Belle2 {
       B2DEBUG(10, "SecMapTrainer::acceptHit: the TC has layerID: " << layerID << " and allowd layers: " << ids << " and was " <<
               (found ? "accepted" : "rejected"));
 
-      return true;
+      return found;
     }
 
 
@@ -294,7 +294,7 @@ namespace Belle2 {
   public:
 
     /** constructor. */
-    SecMapTrainer(std::string setupName , int rngAppendix = 0) :
+    SecMapTrainer(std::string setupName , std::string appendix = "") :
       m_nameSetup(setupName),
       m_config(m_filtersContainer.getFilters(m_nameSetup)->getConfig()),
       m_factory(
@@ -303,7 +303,7 @@ namespace Belle2 {
         m_config.vIP.Z(),
         m_config.mField),
       m_filterMill(),
-      m_rootInterface(m_config.secMapName, rngAppendix),
+      m_rootInterface(m_config.secMapName, appendix),
       m_expNo(std::numeric_limits<unsigned>::max()),
       m_runNo(std::numeric_limits<unsigned>::max()),
       m_evtNo(std::numeric_limits<unsigned>::max())

@@ -11,20 +11,25 @@ namespace Belle2 {
 
   struct rfunitinfo {
     struct rfnodeinfo {
-      int32 state;
+      int32 sysstate;
       int32 nevent_in;
       int32 nqueue_in;
       int32 nevent_out;
       int32 nqueue_out;
-      int32 eflag;
-      int32 i_reserved[9];
+      int32 error;
+      int32 pid_input;
+      int32 pid_output;
+      int32 pid_basf2;
+      int32 pid_hserver;
+      int32 pid_hrelay;
+      int32 i_reserved[4];
       float flowrate_in;
       float flowrate_out;
-      float evtsize_in;
-      float evtsize_out;
+      float avesize_in;
+      float avesize_out;
       float evtrate_in;
       float evtrate_out;
-      float loadavg;
+      float loadave;
       float r_reserved[9];
     } nodeinfo[24];
     uint32 nnodes;

@@ -11,6 +11,8 @@
 
 #include <tracking/trackFindingCDC/utilities/Range.h>
 
+#include <vector>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 

@@ -61,7 +61,7 @@ std::string MCRecoTrackMatchingStatusColorMap::map(int index __attribute__((unus
   TrackMatchLookUp trackMatchLookUp(mcRecoTrackStoreArrayName);
   using MCToPRMatchInfo = TrackMatchLookUp::MCToPRMatchInfo;
   MCToPRMatchInfo mcMatchInfo = trackMatchLookUp.getMCToPRMatchInfo(recoTrack);
-  MCParticle* mcParticle = recoTrack.getRelated<MCParticle>();
+  MCParticle* mcParticle = recoTrack.getRelatedTo<MCParticle>();
   bool isPrimary = mcParticle->isPrimaryParticle();
   switch (mcMatchInfo) {
     case MCToPRMatchInfo::c_Matched:

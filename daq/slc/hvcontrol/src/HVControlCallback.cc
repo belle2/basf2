@@ -122,14 +122,14 @@ throw(HVHandlerException)
 
 void HVControlCallback::init(NSMCommunicator&) throw()
 {
-  getNode().setState(HVState::OFF_S);
+  getNode().setState(HVState::UNKNOWN);
   dbload(m_config_standby, m_configname_standby);
   dbload(m_config_shoulder, m_configname_shoulder);
   dbload(m_config_peak, m_configname_peak);
   m_config = FLAG_STANDBY;
   addAll(getConfig());
-  configure(getConfig());
   initialize(getConfig());
+  configure(getConfig());
   PThread(new HVNodeMonitor(this));
 }
 
@@ -173,7 +173,6 @@ void HVControlCallback::monitor() throw()
                     (channel.isTurnOn() && state != HVMessage::ON)) {
           isstable = false;
         }
-        LogFile::debug("istrunon = %s state = %s", (channel.isTurnOn() ? "ON" : "OFF"), state_s.c_str());
         if (m_mon_tmp[crateid][i].state != state) {
           set(vname + "state", state_s);
           m_mon_tmp[crateid][i].state = state;

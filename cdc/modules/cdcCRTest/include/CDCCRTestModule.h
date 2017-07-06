@@ -25,6 +25,7 @@
 #include <genfit/DetPlane.h>
 #include <genfit/StateOnPlane.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <framework/dataobjects/EventT0.h>
 #include "TH1.h"
 #include "TH2.h"
 #include "TFile.h"
@@ -194,6 +195,11 @@ namespace Belle2 {
       }
 
       const Belle2::TrackFitResult* fitresult;/**< Track fit result. */
+
+      /**
+       * Event timing. The event time is fetched from the data store using this pointer.
+       */
+      StoreObjPtr<EventT0> m_eventTimeStoreObject;
       std::string m_trackArrayName;           /**< Belle2::Track StoreArray name. */
       std::string m_cdcHitArrayName ;         /**< Belle2::CDCHit StoreArray name. */
       std::string m_recoTrackArrayName ;      /**< Belle2::RecoTrack StoreArray nam.e */
@@ -250,6 +256,7 @@ namespace Belle2 {
       double dt_flight;         /**< Time of flight. */
       double dt_flight_sim;     /**< Time of flight (Simulation). */
       double dt_prop;           /**< Time of propagation. */
+      double evtT0;             /**< Event time*/
 
       double x_mea;             /**< measure drift length (signed by left right).*/
       double x_u;               /**< X_fit for unbiased track fit.*/

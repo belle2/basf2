@@ -241,16 +241,15 @@ double ECLCrystalData::EvalR()
 //Get CellID from theta and phi IDs
 int ECLCrystalData::GetCellID(int ThetaId, int PhiId)
 {
-  int forwRing[13] = {0, 3, 6, 10, 14, 18, 24, 30, 36, 42, 48, 54, 63 };
-  int backRing[10] = {0, 9, 18, 24, 30, 36, 42, 48, 52, 56} ;
-
   /// 0-12  forward
   /// 13-58 barrel
   /// 59-68 backward
   if (ThetaId < 13) {
+    int forwRing[13] = {0, 3, 6, 10, 14, 18, 24, 30, 36, 42, 48, 54, 63 };
     return forwRing[ThetaId] * 16 + PhiId;
 
   } else if (ThetaId > 58) {
+    int backRing[10] = {0, 9, 18, 24, 30, 36, 42, 48, 52, 56} ;
     return 7776 + backRing[ThetaId - 59] * 16 + PhiId;
 
   } else if (ThetaId > 12 && ThetaId < 59) {

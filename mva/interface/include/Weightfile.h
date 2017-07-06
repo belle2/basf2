@@ -30,6 +30,8 @@ namespace Belle2 {
 
   namespace MVA {
 
+    std::string makeSaveForDatabase(std::string str);
+
     /**
      * The Weightfile class serializes all information about a training into an xml tree.
      * It can save and load this information from: a stream, a file, the database

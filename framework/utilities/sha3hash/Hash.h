@@ -31,6 +31,9 @@ namespace Belle2 {
     };
     /** Constructor initializing the hash structure with a given output size */
     explicit SHA3Hash(EHashMode length);
+    /** No copying */
+    SHA3Hash(const SHA3Hash&) = delete;
+    /** destructor freeing the memory */
     ~SHA3Hash();
     /** reinit the hash structure to create a new hash sum */
     void clear();
@@ -61,6 +64,8 @@ namespace Belle2 {
     };
     /** constructor initializing the hash structure */
     explicit ShakeHash(EHashMode mode);
+    /** No copying */
+    ShakeHash(const ShakeHash&) = delete;
     /** destructor freeing the memory */
     ~ShakeHash();
     /** reinit the hash structure to create a new hash sum */

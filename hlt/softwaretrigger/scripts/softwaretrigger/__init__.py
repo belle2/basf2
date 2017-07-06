@@ -6,8 +6,8 @@ SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "production"
 
 FAST_RECO_CUTS = ["reject_ee", "accept_ee", "reject_bkg"]
 
-HLT_CUTS = ["accept_hadron", "accept_bhabha", "accept_tau_tau", "accept_2_tracks", "accept_1_track1_cluster",
-            "accept_mu_mu", "accept_gamma_gamma"]
+HLT_CUTS = ["accept_hadron", "accept_tau_tau", "accept_2_tracks", "accept_1_track1_cluster",
+            "accept_mumu_2trk", "accept_mumu_1trk", "accept_single_photon"]
 
 CALIB_CUTS = ["accept_ee", "accept_gee", "accept_mumu", "accept_gmumu", "accept_gg_ee", "accept_gg_4pi",
               "accept_D0_Kpi", "accept_Dstar", "accept_Xi_piLambda", "accept_test",
@@ -48,7 +48,7 @@ def add_hlt_software_trigger(path, store_array_debug_prescale=None):
      cut calculations in the data store.
     :return: the software trigger module
     """
-    modularAnalysis.fillParticleList("pi+:HLT", 'pt>0.2', path=path)
+    modularAnalysis.fillParticleList("pi+:HLT", 'pt>0.2 and d0 < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("gamma:HLT", 'E>0.1', path=path)
 
     # Add fast reco cuts

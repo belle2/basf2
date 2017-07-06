@@ -14,32 +14,6 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 MVARealisticSegmentPairRelationFilter::MVARealisticSegmentPairRelationFilter()
-  : Super(makeUnique<VarSet>(),
-          "trackfindingcdc_RealisticSegmentPairRelationFilter",
-          0.08)
+  : Super(makeUnique<VarSet>(), "tracking/data/trackfindingcdc_RealisticSegmentPairRelationFilter.xml", 0.22)
 {
-}
-
-Weight MVARealisticSegmentPairRelationFilter::operator()(const Relation<const CDCSegmentPair>& relation)
-{
-  double mvaResult = Super::operator()(relation);
-
-  const CDCSegmentPair& fromSegmentPair = *relation.getFrom();
-  const CDCSegmentPair& toSegmentPair = *relation.getTo();
-
-  size_t fromOverlapSize = fromSegmentPair.getToSegment()->size();
-  size_t fromSize = fromOverlapSize + fromSegmentPair.getFromSegment()->size();
-  Weight fromWeight = fromSegmentPair.getAutomatonCell().getCellWeight();
-
-  size_t toOverlapSize = toSegmentPair.getFromSegment()->size();
-  size_t toSize = toOverlapSize + toSegmentPair.getToSegment()->size();
-  Weight toWeight = toSegmentPair.getAutomatonCell().getCellWeight();
-
-  // if (std::isnan(mvaResult)) {
-  //   return NAN;
-  // } else {
-  //   return (fromWeight * fromOverlapSize / fromSize + toWeight * toOverlapSize / toSize) / 2.0;
-  // }
-  // return mvaResult;
-  return mvaResult * (fromWeight * fromOverlapSize / fromSize + toWeight * toOverlapSize / toSize) / 2.0;
 }

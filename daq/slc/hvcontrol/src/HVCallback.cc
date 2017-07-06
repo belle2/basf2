@@ -20,7 +20,6 @@ HVCallback::HVCallback() throw() : NSMCallback()
 {
   reg(HVCommand::CONFIGURE);
   reg(HVCommand::STANDBY);
-  reg(HVCommand::SHOULDER);
   reg(HVCommand::PEAK);
   reg(HVCommand::TURNON);
   reg(HVCommand::TURNOFF);

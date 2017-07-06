@@ -8,6 +8,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventT0.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
 #include <iostream>
@@ -33,6 +35,7 @@ namespace TrgTest {
       evtPtr.registerInDataStore();
       StoreArray<CDCTriggerSegmentHit>::registerPersistent("CDCTriggerSegmentHits");
       StoreArray<CDCTriggerTrack>::registerPersistent("CDCTriggerTracks");
+      StoreObjPtr<EventT0>::registerPersistent("EventT0");
       StoreArray<CDCTriggerSegmentHit> hits;
       StoreArray<CDCTriggerTrack> tracks;
       tracks.registerRelationTo(hits);
@@ -107,6 +110,11 @@ namespace TrgTest {
       tsHitList.push_back(tsHitListSL);
       nTS += cdc.nWiresInLayer(iW.getICLayer());
     }
+
+    // dummy event time
+    StoreObjPtr<EventT0> T0("EventT0");
+    T0.create();
+    T0->addEventT0(0, Const::CDC);
 
     // define different hit numbers to test
     // the basis is a combination that should pass all requirements,

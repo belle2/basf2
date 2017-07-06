@@ -16,6 +16,8 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+
 #include <boost/range/algorithm/stable_partition.hpp>
 #include <boost/range/algorithm_ext/is_sorted.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
@@ -234,7 +236,7 @@ bool AxialTrackUtil::isBack2BackTrack(CDCTrack& track)
 {
   Vector2D center = track.getStartTrajectory3D().getGlobalCenter();
   int armSignVote = getArmSignVote(track, center);
-  if (std::abs(armSignVote) < track.size() and std::fabs(center.cylindricalR()) > 60.) {
+  if (std::abs(armSignVote) < int(track.size()) and std::fabs(center.cylindricalR()) > 60.) {
     return true;
   }
   return false;

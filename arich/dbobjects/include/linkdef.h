@@ -41,6 +41,7 @@
 #pragma link C++ class Belle2::ARICHMergerMapping+;
 #pragma link C++ class Belle2::ARICHCopperMapping+;
 #pragma link C++ class Belle2::ARICHSimulationPar+;
+#pragma link C++ class Belle2::ARICHReconstructionPar+;
 #pragma link C++ class Belle2::ARICHChannelMask+;
 #pragma link C++ class Belle2::ARICHModuleTest+;
 #pragma link C++ class Belle2::ARICHMagnetTest+;

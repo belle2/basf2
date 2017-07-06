@@ -37,6 +37,7 @@ bool BasicFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetR
   const double fromMiddlePhi = acos(fromMiddleCos);
   const double toMiddlePhi = acos(toMiddleCos);
 
+  var<named("superlayer_id")>() = fromFacet.getISuperLayer();
   var<named("from_middle_phi")>() = fromMiddlePhi;
   var<named("to_middle_phi")>() = toMiddlePhi;
 

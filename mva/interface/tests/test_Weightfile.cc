@@ -15,6 +15,8 @@
 #include <framework/database/LocalDatabase.h>
 #include <boost/filesystem/operations.hpp>
 
+#include <TFile.h>
+
 #include <fstream>
 
 #include <gtest/gtest.h>
@@ -222,6 +224,27 @@ namespace {
 
   }
 
+  TEST(WeightfileTest, StaticDatabaseBadSymbols)
+  {
+
+    TestHelpers::TempDirCreator tmp_dir;
+    LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+
+    MVA::Weightfile weightfile;
+    weightfile.addElement("Test", "a");
+
+    std::string evilIdentifier = "==> *+:";
+    MVA::Weightfile::saveToDatabase(weightfile, evilIdentifier);
+
+    auto loaded = MVA::Weightfile::loadFromDatabase(evilIdentifier);
+
+    EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
+
+    boost::filesystem::remove_all("testPayloads");
+    Database::reset();
+
+  }
+
   TEST(WeightfileTest, StaticXMLFile)
   {
 
@@ -249,6 +272,10 @@ namespace {
     auto loaded = MVA::Weightfile::loadFromROOTFile("MVAInterfaceTest.root");
 
     EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
+
+    TFile file("invalid_weightfile.root", "RECREATE");
+    file.Close();
+    EXPECT_THROW(MVA::Weightfile::loadFromROOTFile("invalid_weightfile.root"), std::runtime_error);
 
   }
 

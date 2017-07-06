@@ -114,7 +114,7 @@ def draw_exthits(file_chain):
     tofKLM.Write()
 
     r = TH1F('r', 'r for non-KLM ExtHits', 40, 0.0, 200.0)
-    file_chain.Draw('ExtHits.m_Position.Perp()>>r', 'ExtHits.m_DetectorID!=7')
+    file_chain.Draw('ExtHits.getPosition().Perp()>>r', 'ExtHits.m_DetectorID!=7')
     r.GetXaxis().SetTitle('r (cm)')
     r.GetListOfFunctions().Add(TNamed('Description', "Radial position in transverse plane of each ExtHit"))
     r.GetListOfFunctions().Add(TNamed('Check', "Peaks at 120 cm and 170 cm"))
@@ -123,7 +123,7 @@ def draw_exthits(file_chain):
     r.Write()
 
     z = TH1F('z', 'z for non-KLM ExtHits', 100, -200.0, 300.0)
-    file_chain.Draw('ExtHits.m_Position.Z()>>z', 'ExtHits.m_DetectorID!=7')
+    file_chain.Draw('ExtHits.getPosition().Z()>>z', 'ExtHits.m_DetectorID!=7')
     z.GetXaxis().SetTitle('z (cm)')
     z.GetListOfFunctions().Add(TNamed('Description', "Axial position of each ExtHit"))
     z.GetListOfFunctions().Add(TNamed('Check', "Broad peak centered at 0 cm"))
@@ -132,7 +132,7 @@ def draw_exthits(file_chain):
     z.Write()
 
     rKLM = TH1F('rKLM', 'r for KLM ExtHits', 50, 100.0, 350.0)
-    file_chain.Draw('ExtHits.m_Position.Perp()>>rKLM', 'ExtHits.m_DetectorID==7')
+    file_chain.Draw('ExtHits.getPosition().Perp()>>rKLM', 'ExtHits.m_DetectorID==7')
     rKLM.GetXaxis().SetTitle('r (cm)')
     rKLM.GetListOfFunctions().Add(TNamed('Description', "Radial position in transverse plane of each ExtHit"))
     rKLM.GetListOfFunctions().Add(TNamed('Check', "Low shoulder below 200 cm (EKLM); comb-like pattern above 200 cm (BKLM)"))
@@ -141,7 +141,7 @@ def draw_exthits(file_chain):
     rKLM.Write()
 
     zKLM = TH1F('zKLM', 'z for KLM ExtHits', 140, -300.0, 400.0)
-    file_chain.Draw('ExtHits.m_Position.Z()>>zKLM', 'ExtHits.m_DetectorID==7')
+    file_chain.Draw('ExtHits.getPosition().Z()>>zKLM', 'ExtHits.m_DetectorID==7')
     zKLM.GetXaxis().SetTitle('z (cm)')
     zKLM.GetListOfFunctions().Add(TNamed('Description', "Axial position of each ExtHit"))
     zKLM.GetListOfFunctions().Add(TNamed('Check', "Comb-like pattern at z<-180 and z>280 cm (EKLM); broad peak at 0 (BKLM)"))
@@ -150,7 +150,7 @@ def draw_exthits(file_chain):
     zKLM.Write()
 
     xy = TH2F('xy', 'y vs x for non-KLM ExtHits', 100, -200.0, 200.0, 100, -200.0, 200.0)
-    file_chain.Draw('ExtHits.m_Position.Y():ExtHits.m_Position.X()>>xy', 'ExtHits.m_DetectorID!=7')
+    file_chain.Draw('ExtHits.getPosition().Y():ExtHits.getPosition().X()>>xy', 'ExtHits.m_DetectorID!=7')
     xy.GetXaxis().SetTitle('x (cm)')
     xy.GetYaxis().SetTitle('y (cm)')
     xy.GetListOfFunctions().Add(TNamed('Description', "Position projected into transverse plane of each ExtHit"))
@@ -160,7 +160,7 @@ def draw_exthits(file_chain):
     xy.Write()
 
     xz = TH2F('xz', 'x vs z for non-KLM ExtHits', 125, -200.0, 300.0, 100, -200.0, 200.0)
-    file_chain.Draw('ExtHits.m_Position.X():ExtHits.m_Position.Z()>>xz', 'ExtHits.m_DetectorID!=7')
+    file_chain.Draw('ExtHits.getPosition().X():ExtHits.getPosition().Z()>>xz', 'ExtHits.m_DetectorID!=7')
     xz.GetXaxis().SetTitle('z (cm)')
     xz.GetYaxis().SetTitle('x (cm)')
     xz.GetListOfFunctions().Add(TNamed('Description', "Position projected into x-z plane of each ExtHit"))
@@ -170,7 +170,7 @@ def draw_exthits(file_chain):
     xz.Write()
 
     yz = TH2F('yz', 'y vs z for non-KLM ExtHits', 125, -200.0, 300.0, 100, -200.0, 200.0)
-    file_chain.Draw('ExtHits.m_Position.Y():ExtHits.m_Position.Z()>>yz', 'ExtHits.m_DetectorID!=7')
+    file_chain.Draw('ExtHits.getPosition().Y():ExtHits.getPosition().Z()>>yz', 'ExtHits.m_DetectorID!=7')
     yz.GetXaxis().SetTitle('z (cm)')
     yz.GetYaxis().SetTitle('y (cm)')
     yz.GetListOfFunctions().Add(TNamed('Description', "Position projected into y-z plane of each ExtHit"))
@@ -180,7 +180,7 @@ def draw_exthits(file_chain):
     yz.Write()
 
     xyKLM = TH2F('xyKLM', 'y vs x for KLM ExtHits', 140, -350.0, 350.0, 140, -350.0, 350.0)
-    file_chain.Draw('ExtHits.m_Position.Y():ExtHits.m_Position.X()>>xyKLM', 'ExtHits.m_DetectorID==7')
+    file_chain.Draw('ExtHits.getPosition().Y():ExtHits.getPosition().X()>>xyKLM', 'ExtHits.m_DetectorID==7')
     xyKLM.GetXaxis().SetTitle('x (cm)')
     xyKLM.GetYaxis().SetTitle('y (cm)')
     xyKLM.GetListOfFunctions().Add(TNamed('Description', "Position projected into transverse plane of each ExtHit"))
@@ -190,7 +190,7 @@ def draw_exthits(file_chain):
     xyKLM.Write()
 
     xzKLM = TH2F('xzKLM', 'x vs z for KLM ExtHits', 140, -300.0, 400.0, 140, -350.0, 350.0)
-    file_chain.Draw('ExtHits.m_Position.X():ExtHits.m_Position.Z()>>xzKLM', 'ExtHits.m_DetectorID==7')
+    file_chain.Draw('ExtHits.getPosition().X():ExtHits.getPosition().Z()>>xzKLM', 'ExtHits.m_DetectorID==7')
     xzKLM.GetXaxis().SetTitle('z (cm)')
     xzKLM.GetYaxis().SetTitle('x (cm)')
     xzKLM.GetListOfFunctions().Add(TNamed('Description', "Position projected into x-z plane of each ExtHit"))
@@ -200,7 +200,7 @@ def draw_exthits(file_chain):
     xzKLM.Write()
 
     yzKLM = TH2F('yzKLM', 'y vs z for KLM ExtHits', 140, -300.0, 400.0, 140, -350.0, 350.0)
-    file_chain.Draw('ExtHits.m_Position.Y():ExtHits.m_Position.Z()>>yzKLM', 'ExtHits.m_DetectorID==7')
+    file_chain.Draw('ExtHits.getPosition().Y():ExtHits.getPosition().Z()>>yzKLM', 'ExtHits.m_DetectorID==7')
     yzKLM.GetXaxis().SetTitle('z (cm)')
     yzKLM.GetYaxis().SetTitle('y (cm)')
     yzKLM.GetListOfFunctions().Add(TNamed('Description', "Position projected into y-z plane of each ExtHit"))
@@ -224,8 +224,8 @@ def draw_likelihoods(file_chain):
     llMu_pi = TH1F('LLmu-pions', 'logL(mu) for true pions', llBins, llMin, llMax)
     llPi_mu = TH1F('LLpi-muons', 'logL(pi) for true muons', llBins, llMin, llMax)
     llPi_pi = TH1F('LLpi-pions', 'logL(pi) for true pions', llBins, llMin, llMax)
-    llDiff_mu = TH1F('LLdiff-muons', 'logL(mu)-logL(pi) for true muons', llBins*2, llMin, -llMin)
-    llDiff_pi = TH1F('LLdiff-pions', 'logL(mu)-logL(pi) for true pions', llBins*2, llMin, -llMin)
+    llDiff_mu = TH1F('LLdiff-muons', 'logL(mu)-logL(pi) for true muons', llBins * 2, llMin, -llMin)
+    llDiff_pi = TH1F('LLdiff-pions', 'logL(mu)-logL(pi) for true pions', llBins * 2, llMin, -llMin)
 
     layerBins = 15
     layerMin = -0.5
@@ -258,41 +258,31 @@ def draw_likelihoods(file_chain):
     momentumMin = 0.0
     momentumMax = 5.0
     efficiency_momentum = TH1F('Eff-momentum', 'Muon efficiency vs momentum', momentumBins, momentumMin, momentumMax)
-    efficiency_momentum.Sumw2(1)
     efficiency_momentum_denom = TH1F('Eff-momentum-denom', 'Muon efficiency vs momentum', momentumBins, momentumMin, momentumMax)
-    efficiency_momentum_denom.Sumw2(1)
     fakerate_momentum = TH1F('FakeRate-momentum', 'Pion fake rate vs momentum', momentumBins2, momentumMin, momentumMax)
-    fakerate_momentum.Sumw2(1)
     fakerate_momentum_denom = TH1F('FakeRate-momentum-denom', 'Pion fake rate vs momentum', momentumBins2, momentumMin, momentumMax)
-    fakerate_momentum_denom.Sumw2(1)
 
     thetaBins = 35  # for efficiency
     thetaBins2 = 7  # for fake rate (low statistics)
     thetaMin = 10.0
     thetaMax = 150.0
     efficiency_theta = TH1F('Eff-theta', 'Muon efficiency vs theta', thetaBins, thetaMin, thetaMax)
-    efficiency_theta.Sumw2(1)
     efficiency_theta_denom = TH1F('Eff-theta-denom', 'Muon efficiency vs theta', thetaBins, thetaMin, thetaMax)
-    efficiency_theta_denom.Sumw2(1)
     fakerate_theta = TH1F('FakeRate-theta', 'Pion fake rate vs theta', thetaBins2, thetaMin, thetaMax)
-    fakerate_theta.Sumw2(1)
     fakerate_theta_denom = TH1F('FakeRate-theta-denom', 'Pion fake rate vs theta', thetaBins2, thetaMin, thetaMax)
-    fakerate_theta_denom.Sumw2(1)
 
     phiBins = 36  # for efficiency
     phiBins2 = 8  # for fake rate (low statistics)
     phiMin = 0.0
     phiMax = 360.0
     efficiency_phi = TH1F('Eff-phi', 'Muon efficiency vs phi', phiBins, phiMin, phiMax)
-    efficiency_phi.Sumw2(1)
     efficiency_phi_denom = TH1F('Eff-phi-denom', 'Muon efficiency vs phi', phiBins, phiMin, phiMax)
-    efficiency_phi_denom.Sumw2(1)
     fakerate_phi = TH1F('FakeRate-phi', 'Pion fake rate vs phi', phiBins2, phiMin, phiMax)
-    fakerate_phi.Sumw2(1)
     fakerate_phi_denom = TH1F('FakeRate-phi-denom', 'Pion fake rate vs phi', phiBins2, phiMin, phiMax)
-    fakerate_phi_denom.Sumw2(1)
 
     for entry in file_chain:
+        mcps = entry.MCParticles
+        momentum = mcps[0].getMomentum()
         muids = entry.Muids
         for i in range(muids.GetEntriesFast()):
             outcome.Fill(muids[i].getOutcome())
@@ -307,8 +297,7 @@ def draw_likelihoods(file_chain):
                 rchisq = -1.0
                 if ndof > 0:
                     rchisq = chisq / ndof
-                momentum = muids[i].getMomentum()
-                p = momentum.Mag() / 1000.0
+                p = momentum.Mag()
                 theta = momentum.Theta() * 180.0 / np.pi
                 phi = momentum.Phi() * 180.0 / np.pi
                 if phi < 0.0:
@@ -346,12 +335,42 @@ def draw_likelihoods(file_chain):
                         fakerate_theta.Fill(theta)
                         fakerate_phi.Fill(phi)
 
-    efficiency_momentum.Divide(efficiency_momentum_denom)
-    efficiency_theta.Divide(efficiency_theta_denom)
-    efficiency_phi.Divide(efficiency_phi_denom)
-    fakerate_momentum.Divide(fakerate_momentum_denom)
-    fakerate_theta.Divide(fakerate_theta_denom)
-    fakerate_phi.Divide(fakerate_phi_denom)
+    for j in range(efficiency_momentum_denom.GetNbinsX()):
+        num = efficiency_momentum.GetBinContent(j + 1)
+        denom = efficiency_momentum_denom.GetBinContent(j + 1)
+        if denom > 0:
+            efficiency_momentum.SetBinContent(j + 1, num / denom)
+            efficiency_momentum.SetBinError(j + 1, math.sqrt(num * (denom - num) / (denom * denom * denom)))
+    for j in range(efficiency_theta_denom.GetNbinsX()):
+        num = efficiency_theta.GetBinContent(j + 1)
+        denom = efficiency_theta_denom.GetBinContent(j + 1)
+        if denom > 0:
+            efficiency_theta.SetBinContent(j + 1, num / denom)
+            efficiency_theta.SetBinError(j + 1, math.sqrt(num * (denom - num) / (denom * denom * denom)))
+    for j in range(efficiency_phi_denom.GetNbinsX()):
+        num = efficiency_phi.GetBinContent(j + 1)
+        denom = efficiency_phi_denom.GetBinContent(j + 1)
+        if denom > 0:
+            efficiency_phi.SetBinContent(j + 1, num / denom)
+            efficiency_phi.SetBinError(j + 1, math.sqrt(num * (denom - num) / (denom * denom * denom)))
+    for j in range(fakerate_momentum_denom.GetNbinsX()):
+        num = fakerate_momentum.GetBinContent(j + 1)
+        denom = fakerate_momentum_denom.GetBinContent(j + 1)
+        if denom > 0:
+            fakerate_momentum.SetBinContent(j + 1, num / denom)
+            fakerate_momentum.SetBinError(j + 1, math.sqrt(num * (denom - num) / (denom * denom * denom)))
+    for j in range(fakerate_theta_denom.GetNbinsX()):
+        num = fakerate_theta.GetBinContent(j + 1)
+        denom = fakerate_theta_denom.GetBinContent(j + 1)
+        if denom > 0:
+            fakerate_theta.SetBinContent(j + 1, num / denom)
+            fakerate_theta.SetBinError(j + 1, math.sqrt(num * (denom - num) / (denom * denom * denom)))
+    for j in range(fakerate_phi_denom.GetNbinsX()):
+        num = fakerate_phi.GetBinContent(j + 1)
+        denom = fakerate_phi_denom.GetBinContent(j + 1)
+        if denom > 0:
+            fakerate_phi.SetBinContent(j + 1, num / denom)
+            fakerate_phi.SetBinError(j + 1, math.sqrt(num * (denom - num) / (denom * denom * denom)))
 
     # NOTE: *.Fill() must precede *.GetListOfFunctions().Add() or the latter will be discarded!
     outcome.GetListOfFunctions().Add(TNamed('Description', "0=not in KLM, 1/2=barrel/endcap stop, 3/4=barrel/endcap exit"))

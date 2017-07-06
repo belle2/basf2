@@ -11,7 +11,7 @@ class MockQueue:
     def __init__(self):
         self.internal_storage = []
 
-    def put(self, item):
+    def put(self, item, block=True):
         self.internal_storage.append(item)
 
     def get_nowait(self):

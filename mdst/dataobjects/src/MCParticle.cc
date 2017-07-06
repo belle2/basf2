@@ -123,6 +123,10 @@ std::string MCParticle::getInfoHTML() const
   out << ", <b>PDG</b>=" << getPDG();
   out << " (" << getName() << ")";
   out << "<br>";
+  out << "<b>isPrimaryParticle</b>=" << isPrimaryParticle();
+  out << ",<b>isInitial</b>=" << isInitial();
+  out << ",<b>isVirtual</b>=" << isVirtual();
+  out << "<br>";
 
   out << "<b>pT</b>=" << getMomentum().Pt();
   out << ", <b>pZ</b>=" << m_momentum_z;

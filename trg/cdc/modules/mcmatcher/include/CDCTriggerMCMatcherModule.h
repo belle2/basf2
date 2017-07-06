@@ -28,6 +28,8 @@ namespace Belle2 {
     std::string m_TrgTrackCollectionName;
     /** Name of a new StoreArray holding MCParticles considered as trackable */
     std::string m_MCTrackableCollectionName;
+    /** Name of the StoreArray containing the hits that are used for the matching. */
+    std::string m_hitCollectionName;
     /** minimum number of axial hits to consider a MCParticle as trackable */
     int m_minAxial;
     /** minimum number of stereo hits to consider a MCParticle as trackable */

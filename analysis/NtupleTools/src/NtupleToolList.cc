@@ -18,13 +18,12 @@
 #include <analysis/NtupleTools/NtupleTrackHitsTool.h>
 #include <analysis/NtupleTools/NtupleClusterTool.h>
 #include <analysis/NtupleTools/NtupleRecoStatsTool.h>
-#include <analysis/NtupleTools/NtupleDetectorStatsRecTool.h>
-#include <analysis/NtupleTools/NtupleDetectorStatsSimTool.h>
 #include <analysis/NtupleTools/NtupleMCReconstructibleTool.h>
 #include <analysis/NtupleTools/NtupleVertexTool.h>
 #include <analysis/NtupleTools/NtupleMCVertexTool.h>
 #include <analysis/NtupleTools/NtupleCustomFloatsTool.h>
 #include <analysis/NtupleTools/NtupleROEMultiplicitiesTool.h>
+#include <analysis/NtupleTools/NtupleROEGammasTool.h>
 #include <analysis/NtupleTools/NtupleRecoilKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleExtraEnergyTool.h>
 #include <analysis/NtupleTools/NtupleTagVertexTool.h>
@@ -103,8 +102,6 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "PID") return new NtuplePIDTool(tree, d);
   else if (strToolName == "DeltaLogL") return new NtupleDeltaLogLTool(tree, d);
   else if (strToolName == "RecoStats") return new NtupleRecoStatsTool(tree, d);
-  else if (strToolName == "DetectorStatsRec") return new NtupleDetectorStatsRecTool(tree, d);
-  else if (strToolName == "DetectorStatsSim") return new NtupleDetectorStatsSimTool(tree, d);
   else if (strToolName == "MCReconstructible") return new NtupleMCReconstructibleTool(tree, d);
   else if (strToolName == "Track") return new NtupleTrackTool(tree, d);
   else if (strToolName == "TrackHits") return new NtupleTrackHitsTool(tree, d);
@@ -113,6 +110,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "MCVertex") return new NtupleMCVertexTool(tree, d);
   else if (strToolName == "CustomFloats") return new NtupleCustomFloatsTool(tree, d, strOption);
   else if (strToolName == "ROEMultiplicities") return new NtupleROEMultiplicitiesTool(tree, d);
+  else if (strToolName == "ROEGammas") return new NtupleROEGammasTool(tree, d);
   else if (strToolName == "RecoilKinematics") return new NtupleRecoilKinematicsTool(tree, d);
   else if (strToolName == "ExtraEnergy") return new NtupleExtraEnergyTool(tree, d);
   else if (strToolName == "TagVertex") return new NtupleTagVertexTool(tree, d);

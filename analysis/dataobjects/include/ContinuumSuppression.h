@@ -53,6 +53,13 @@ namespace Belle2 {
     /**
      * Add ROE thrust axis.
      *
+     * @param TVector3 B thrust axis
+     */
+    void addThrustB(TVector3 thrustB);
+
+    /**
+     * Add ROE thrust axis.
+     *
      * @param TVector3 ROE thrust axis
      */
     void addThrustO(TVector3 thrustO);
@@ -121,6 +128,16 @@ namespace Belle2 {
     void addCleoConesROE(std::vector<float> cleoConesROE);
 
     // getters
+    /**
+     * Get B thrust axis.
+     *
+     * @return TVector3 ROE thrust axis
+     */
+    TVector3 getThrustB(void) const
+    {
+      return m_thrustB;
+    }
+
     /**
      * Get ROE thrust axis.
      *
@@ -226,6 +243,7 @@ namespace Belle2 {
 
     // persistent data members
     TVector3 m_thrustO; /**< ROE thrust axis */
+    TVector3 m_thrustB; /**< B thrust axis */
 
     float m_thrustBm;   /**< magnitude of B thrust axis */
     float m_thrustOm;   /**< magnitude of ROE thrust axis */

@@ -32,7 +32,7 @@ print_params(beamparameters)
 
 # generate Bd->J/psi(-> mu mu) KS0 events
 evtgeninput = register_module('EvtGenInput')
-evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('/generators/evtgen/decayfiles/Bd_JpsiKS,mumu.dec'))
+evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('/decfiles/dec/1111440100.dec'))
 
 main.add_module(evtgeninput)
 

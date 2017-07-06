@@ -19,17 +19,14 @@ def main(argv):
     if len(argv) == 1:
         data_dir = argv[0]
     else:
-        print("Usage: basf2 CAF_simplest.py <data directory>")
+        print("Usage: basf2 caf_lsf_backend.py <data directory>")
         sys.exit(1)
 
     ###################################################
     # Input Data
     # This part assumes that you've created the data using the calibration/examples/1_create_sample_DSTs.sh
     # We'll use the same data for all calibrations but this is not a requirement in general.
-    input_files_test = []
-    for run in range(1, 5):
-        cosmics_file_path = os.path.join(data_dir, 'DST_exp1_run{0}.root'.format(run))
-        input_files_test.append(cosmics_file_path)
+    input_files_test = [os.path.join(os.path.abspath(data_dir), '*.root')]
 
     ###################################################
     # Test Calibration Setup
@@ -51,38 +48,22 @@ def main(argv):
                                collector=col_test,
                                algorithms=alg_test,
                                input_files=input_files_test)
-        cal_test.output_patterns.append('Belle2FileCatalog.xml')
-        cal_test.output_patterns.append('*.mille')
 
+        cal_test.max_files_per_collector_job = 1
+        cal_test.backend_args = {"queue": "s"}
         calibrations.append(cal_test)
 
     ###################################################
     # Create a CAF instance
     cal_fw = CAF()
-    cal_fw.heartbeat = 15
     # Add in our list of calibrations
     for cal in calibrations:
         cal_fw.add_calibration(cal)
-
-    # Use the default LSF backend setup, can view the default options in calibration/data/caf.cfg
+    # Use the default LSF backend setup, can view the default options in calibration/data/backends.cfg
     cal_fw.backend = backends.LSF()
-
-    # You could specify a local/different release e.g. the head
-#    cal_fw.backend.release = "/data/ddossett/software/release"
-    # Or specify a different queue to submit to
-#    cal_fw.backend.queue = "long"
-    # Or specify a config file to load all options at once (Uses Python ConfigParser)
-#    cal_fw.backend.load_from_config("file/path/to/config.cfg", "YourLSFSetupSection")
-
-    # Can override the basf2 setup for the batch jobs directly if you have something weird
-#    cal_fw.backend.basf2_setup = [export "VO_BELLE2_SW_DIR=/cvmfs/belle.cern.ch/sl6\n",
-#                            "SETUPBELLE2_CVMFS=/cvmfs/belle.cern.ch/tools.new/setup_belle2\n",
-#                            "CAF_RELEASE_LOCATION=/cvmfs/belle.cern.ch/sl6/releases/build-2016-09-09\n",
-#                            "source $SETUPBELLE2_CVMFS\n",
-#                            "pushd $CAF_RELEASE_LOCATION > /dev/null\n",
-#                            "setuprel\n",
-#                            "popd > /dev/null\n"]
-
+    # Since we're using the LSF batch system we'll up the heartbeat from the default to query for when the jobs are all finished
+    # No point spamming it
+    cal_fw.heartbeat = 15
     # Start running
     cal_fw.run()
     print("End of CAF processing.")

@@ -50,6 +50,9 @@ namespace Belle2 {
       std::string m_PXDDigitsName;  /**< The name of the StoreArray of PXDDigits to be processed */
       std::string m_RawPXDsName;  /**< The name of the StoreArray of generated RawPXDs */
 
+      unsigned int dhe_byte_count;/**< Byte count in current DHE package */
+      unsigned int dhc_byte_count;/**< Byte count in current DHC package */
+
       /** Parameter dhc<->dhe list, mapping from steering file */
       std::vector< std::vector<int >> m_dhe_to_dhc;
 

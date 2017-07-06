@@ -44,6 +44,8 @@ SeqRootInputModule::SeqRootInputModule() : Module(), m_streamer(nullptr), m_size
   addParam("inputFileName"  , m_inputFileName,
            "Input file name. Can also be a gzip-compressed file (with suffix .gz). Parameter can be overridden using the -i argument to basf2.",
            string("SeqRootInput.sroot"));
+  vector<string> empty;
+  addParam("inputFileNames", m_filelist, "List of input files", empty);
 }
 
 
@@ -55,14 +57,22 @@ void SeqRootInputModule::initialize()
 {
   RootIOUtilities::loadDictionaries();
 
+  // Specify input file(list)
+  if (!m_inputFileName.empty() && !m_filelist.empty()) {
+    B2FATAL("Cannot specifye both 'inputFileName' and 'inputFileNames'");
+  }
   const std::vector<std::string>& inputFiles = Environment::Instance().getInputFilesOverride();
-  if (!inputFiles.empty()) {
+  if (!inputFiles.empty()) {  // Override parameter specification
     if (inputFiles.size() > 1) {
-      B2FATAL("SeqRootInput only accepts a single input file.");
-      return;
+      m_filelist = inputFiles;
     }
     m_inputFileName = inputFiles[0];
-  }
+    m_nfile = m_filelist.size();
+  } else if (m_filelist.size() > 0) {
+    m_nfile = m_filelist.size();
+    m_inputFileName = m_filelist[0];
+  } else
+    m_nfile = 1;
 
   // Initialize DataStoreStreamer
   m_streamer = new DataStoreStreamer();
@@ -76,6 +86,8 @@ void SeqRootInputModule::initialize()
   m_file = new SeqFile(m_inputFileName.c_str(), "r");
   if (m_file->status() <= 0)
     B2FATAL("SeqRootInput : Error in opening input file : " << m_inputFileName);
+
+  B2INFO("SeqRootInput : Open " << m_inputFileName);
 
   //Read StreamerInfo and the first event
   int info_cnt = 0;
@@ -103,7 +115,7 @@ void SeqRootInputModule::initialize()
       B2FATAL("SeqRootInput : Error in reading first event");
     }
   }
-
+  m_fileptr = 0;
 
 
   B2INFO("SeqRootInput: initialized.");
@@ -130,11 +142,41 @@ void SeqRootInputModule::event()
   char* evtbuf = new char[EvtMessage::c_MaxEventSize];
   EvtMessage* evtmsg = NULL;
   int size = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
-  if (size <= 0) {
+  if (size < 0) {
+    B2ERROR("SeqRootInput : file read error");
     delete m_file;
     m_file = 0;
     delete[] evtbuf;
+    evtbuf = NULL;
     return;
+  } else if (size == 0) {
+    B2INFO("SeqRootInput : EOF detected");
+    delete m_file;
+    m_file = 0;
+    m_fileptr++;
+    if (m_fileptr >= m_nfile) {
+      delete[] evtbuf;
+      evtbuf = NULL;
+      return;
+    }
+    printf("fileptr = %d ( of %d )\n", m_fileptr, m_nfile);
+    fflush(stdout);
+    m_inputFileName = m_filelist[m_fileptr];
+    m_file = new SeqFile(m_inputFileName, "r");
+    if (m_file->status() <= 0)
+      B2FATAL("SeqRootInput : Error in opening input file : " << m_inputFileName);
+    B2INFO("SeqRootInput : Open " << m_inputFileName);
+    evtmsg = new EvtMessage(evtbuf);
+    // Skip the first record (StreamerInfo)
+    int is = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
+    if (is <= 0) {
+      B2FATAL("SeqRootInput : Error in reading file. error code = " << is);
+    }
+    // Read next record
+    is = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
+    if (is <= 0) {
+      B2FATAL("SeqRootInput : Error in reading file. error code = " << is);
+    }
   } else {
     //    printf("SeqRootInput : read = %d\n", size);
     evtmsg = new EvtMessage(evtbuf);
@@ -152,10 +194,11 @@ void SeqRootInputModule::event()
   // Restore objects in DataStore
   m_streamer->restoreDataStore(evtmsg);
 
-
   // Delete buffers
   delete[] evtbuf;
+  evtbuf = NULL;
   delete evtmsg;
+  evtmsg = NULL;
 }
 
 void SeqRootInputModule::endRun()

@@ -11,7 +11,7 @@
 #include <generators/modules/evtgeninput/EvtGenInputModule.h>
 #include <generators/evtgen/EvtGenInterface.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
-#include <framework/core/Environment.h>
+#include <framework/utilities/FileSystem.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -39,9 +39,8 @@ EvtGenInputModule::EvtGenInputModule() : Module(),
 
   //Parameter definition
   addParam("userDECFile", m_userDECFileName, "user DECfile name", string(""));
-  addParam("DECFile", m_DECFileName, "standard DECfile name should be provided: default file is in externals/share/evtgen/DECAY.DEC",
-           Environment::Instance().getExternalsPath() + "/share/evtgen/DECAY.DEC");
-  addParam("pdlFile", m_pdlFileName, "this used to be a parameter to choose the evt.pdl file. This is deprecated", std::string(""));
+  addParam("DECFile", m_DECFileName, "global DECfile to be used",
+           FileSystem::findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC", true));
   addParam("ParentParticle", m_parentParticle, "Parent Particle Name", string("Upsilon(4S)"));
   addParam("InclusiveType", m_inclusiveType, "inclusive decay type (0: generic, 1: inclusive, 2: inclusive (charge conjugate)", 0);
   addParam("InclusiveParticle", m_inclusiveParticle, "Inclusive Particle Name", string(""));
@@ -56,6 +55,16 @@ EvtGenInputModule::EvtGenInputModule() : Module(),
 
 void EvtGenInputModule::initialize()
 {
+  const std::string defaultDecFile = FileSystem::findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC", true);
+  if (m_DECFileName.empty()) {
+    B2ERROR("No global decay file defined, please make sure the parameter 'DECFile' is set correctly");
+    return;
+  }
+  if (defaultDecFile.empty()) {
+    B2WARNING("Cannot find default decay file");
+  } else if (defaultDecFile != m_DECFileName) {
+    B2INFO("Using non-standard DECAY file \"" << m_DECFileName << "\"");
+  }
   //Initialize MCParticle collection
   StoreArray<MCParticle>::registerPersistent();
 
@@ -133,11 +142,6 @@ void EvtGenInputModule::event()
 void EvtGenInputModule::initializeGenerator()
 {
 
-  B2DEBUG(10, "starting initialisation of EvtGen Input Module. ");
-  if (getParam<std::string>("pdlFile").isSetInSteering()) {
-    B2ERROR("The 'pdlFile' parameter is deprecated and will be ignored. Use \"import pdg; pdg.read('pdlFile')\" instead.");
-  }
-
   //setup the DECAY files:
   m_Ievtgen.setup(m_DECFileName, m_parentParticle, m_userDECFileName);
 
@@ -155,5 +159,3 @@ void EvtGenInputModule::initializeGenerator()
   m_initialized = true;
 
 }
-
-

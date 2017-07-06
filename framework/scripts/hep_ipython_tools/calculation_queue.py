@@ -34,7 +34,7 @@ class CalculationQueue:
         Put an item on the queue with the given name. Please keep that adding two items with the same name
         overrides one of them!
         """
-        self.queue.put(CalculationQueueItem(name, item), **kwargs)
+        self.queue.put(CalculationQueueItem(name, item), block=True, **kwargs)
 
     def fill_results(self):
         """

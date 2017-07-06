@@ -175,6 +175,42 @@ int EKLMElementNumbers::stripLocalNumber(int strip) const
   return (strip - 1) % m_MaximalStripNumber + 1;
 }
 
+int EKLMElementNumbers::getMaximalEndcapNumber() const
+{
+  return m_MaximalEndcapNumber;
+}
+
+int EKLMElementNumbers::getMaximalLayerNumber() const
+{
+  return m_MaximalLayerNumber;
+}
+
+int EKLMElementNumbers::getMaximalDetectorLayerNumber(int endcap) const
+{
+  checkEndcap(endcap);
+  return m_MaximalDetectorLayerNumber[endcap - 1];
+}
+
+int EKLMElementNumbers::getMaximalSectorNumber() const
+{
+  return m_MaximalSectorNumber;
+}
+
+int EKLMElementNumbers::getMaximalPlaneNumber() const
+{
+  return m_MaximalPlaneNumber;
+}
+
+int EKLMElementNumbers::getMaximalSegmentNumber() const
+{
+  return m_MaximalSegmentNumber;
+}
+
+int EKLMElementNumbers::getMaximalStripNumber() const
+{
+  return m_MaximalStripNumber;
+}
+
 int EKLMElementNumbers::getMaximalLayerGlobalNumber() const
 {
   return detectorLayerNumber(

@@ -27,6 +27,16 @@ bool FitSegmentRelationVarSet::extract(const Relation<const CDCSegment2D>* ptrSe
 
   CDCTrajectory2D commonTrajectory2D = riemannFitter.fit(*fromSegment, *toSegment);
 
+  double noRLChi2 = 0;
+  for (const CDCRecoHit2D& recoHit2D : *fromSegment) {
+    double dist = std::fabs(commonTrajectory2D.getDist2D(recoHit2D.getRefPos2D())) - recoHit2D.getRefDriftLength();
+    noRLChi2 += dist * dist / recoHit2D.getRefDriftLengthVariance();
+  }
+  for (const CDCRecoHit2D& recoHit2D : *toSegment) {
+    double dist = std::fabs(commonTrajectory2D.getDist2D(recoHit2D.getRefPos2D())) - recoHit2D.getRefDriftLength();
+    noRLChi2 += dist * dist / recoHit2D.getRefDriftLengthVariance();
+  }
+
   finitevar<named("is_fitted")>() = commonTrajectory2D.isFitted();
   finitevar<named("curv")>() = commonTrajectory2D.getCurvature();
 
@@ -34,7 +44,9 @@ bool FitSegmentRelationVarSet::extract(const Relation<const CDCSegment2D>* ptrSe
   finitevar<named("curv_var")>() = commonTrajectory2D.getLocalVariance(c_Curv);
 
   finitevar<named("chi2")>() = std::fabs(commonTrajectory2D.getChi2());
+  finitevar<named("chi2_no_rl")>() = noRLChi2;
   finitevar<named("chi2_per_ndf")>() = std::fabs(commonTrajectory2D.getChi2() / commonTrajectory2D.getNDF());
+  finitevar<named("chi2_no_rl_per_ndf")>() = noRLChi2 / commonTrajectory2D.getNDF();
   finitevar<named("ndf")>() = commonTrajectory2D.getNDF();
   finitevar<named("p_value")>() =  commonTrajectory2D.getPValue();
   return true;

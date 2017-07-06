@@ -16,7 +16,6 @@ output : Output root file, which contains helix parameters.
 import basf2
 from basf2 import *
 import ROOT
-import datetime
 import os
 import os.path
 import argparse
@@ -27,10 +26,12 @@ from cdc.cr import *
 reset_database()
 use_database_chain()
 use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
-use_central_database("cdc_cr_test1", LogLevel.WARNING)
+# use_local_database("cdc_crt/database.txt", "cdc_crt")
+use_central_database("GT_gen_data_002.11_gcr2017-07", LogLevel.WARNING)
 
 
-def main(input, output):
+def rec(input, output, topInCounter=True, magneticField=False):
+
     main_path = basf2.create_path()
     logging.log_level = LogLevel.INFO
 
@@ -42,8 +43,8 @@ def main(input, output):
 
     globalPhiRotation = getPhiRotation()
 
-    if os.path.exists(data_period) is False:
-        os.mkdir(data_period)
+    if os.path.exists('output') is False:
+        os.mkdir('output')
 
     # RootInput
     main_path.add_module('RootInput',
@@ -55,22 +56,30 @@ def main(input, output):
                              ("/DetectorComponent[@name='CDC']//GlobalPhiRotation", str(globalPhiRotation), "deg")
                          ])
     #
-    main_path.add_module('Geometry',
-                         components=['CDC'])
+    if magneticField is False:
+        main_path.add_module('Geometry',
+                             components=['CDC'])
+    else:
+        main_path.add_module('Geometry',
+                             components=['CDC', 'MagneticFieldConstant4LimitedRCDC'])
+
     main_path.add_module('Progress')
 
     # Set CDC CR parameters.
     set_cdc_cr_parameters(data_period)
 
     # Add CDC CR reconstruction.
-    add_cdc_cr_reconstruction(main_path, eventTimingExtraction=False)
+    add_cdc_cr_reconstruction(main_path,
+                              eventTimingExtraction=True,
+                              topInCounter=topInCounter)
 
     # Simple analysi module.
-    output = "/".join([data_period, output])
+    output = "/".join(['output', output])
     main_path.add_module('CDCCosmicAnalysis',
+                         noBFit=not magneticField,
                          Output=output)
 
-    # main_path.add_module("RootOutput", outputFileName=output)
+#    main_path.add_module("RootOutput", outputFileName='full.root')
     basf2.print_path(main_path)
     basf2.process(main_path)
     print(basf2.statistics)
@@ -83,9 +92,4 @@ if __name__ == "__main__":
     parser.add_argument('input', help='Input file to be processed (unpacked CDC data).')
     parser.add_argument('output', help='Output file you want to store the results.')
     args = parser.parse_args()
-
-    date = datetime.datetime.today()
-    print(date.strftime('Start at : %d-%m-%y %H:%M:%S\n'))
-    main(args.input, args.output)
-    date = datetime.datetime.today()
-    print(date.strftime('End at : %y-%m-%d %H:%M:%S\n'))
+    rec(args.input, args.output, topInCounter=False, magneticField=True)

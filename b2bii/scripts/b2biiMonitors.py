@@ -12,7 +12,7 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 
 from vertex import vertexKFit
-from vertex import massVertexKFit
+from vertex import massKFit
 
 
 def addBeamParamsConversionMonitors(outputRootFile='b2biiBeamParamsConversionMonitors.root', path=analysis_main):
@@ -593,7 +593,7 @@ def addNeutralsConversionMonitors(gammaOutputRootFile='b2biiGammaConversionMonit
     # load gammas and pi0, copy pi0s from 'pi0:mdst' list. We don't want to mess with them.
     copyList('gamma:b2bii_monitor', 'gamma:mdst', False, path)
     copyParticles('pi0:b2bii_monitor', 'pi0:mdst', False, path)
-    massVertexKFit('pi0:b2bii_monitor', 0, '', path)
+    massKFit('pi0:b2bii_monitor', -1, '', path)
     matchMCTruth('gamma:b2bii_monitor', path)
     matchMCTruth('pi0:b2bii_monitor', path)
 

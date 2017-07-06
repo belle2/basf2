@@ -151,6 +151,9 @@ namespace Belle2 {
     /** Vector of parent file LFNs. */
     std::vector<std::string> m_parentLfns;
 
+    /** Map of additional metadata to be added to the output file */
+    std::map<std::string, std::string> m_additionalDataDescription;
+
     /** Lowest experiment number.
      */
     unsigned long m_experimentLow;

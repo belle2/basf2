@@ -59,18 +59,14 @@ namespace Belle2 {
 
   public:
     HVConfig& getConfigStandby() throw() { return m_config_standby; }
-    HVConfig& getConfigShoulder() throw() { return m_config_shoulder; }
     HVConfig& getConfigPeak() throw() { return m_config_peak; }
     const HVConfig& getConfigStandby() const throw() { return m_config_standby; }
-    const HVConfig& getConfigShoulder() const throw() { return m_config_shoulder; }
     const HVConfig& getConfigPeak() const throw() { return m_config_peak; }
     HVConfig& getConfig() throw();
     const HVConfig& getConfig() const throw();
     void setStandbyConfig(const HVConfig& config) throw() { m_config_standby = config; }
-    void setShoulderConfig(const HVConfig& config) throw() { m_config_shoulder = config; }
     void setPeakConfig(const HVConfig& config) throw() { m_config_peak = config; }
     void setStandbyConfig(const std::string& name) throw() { m_configname_standby = name; }
-    void setShoulderConfig(const std::string& name) throw() { m_configname_shoulder = name; }
     void setPeakConfig(const std::string& name) throw() { m_configname_peak = name; }
 
   public:

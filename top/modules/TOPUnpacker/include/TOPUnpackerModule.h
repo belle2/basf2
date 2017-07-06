@@ -60,6 +60,17 @@ namespace Belle2 {
       }
 
       /**
+       * Returns next data word without incrementing the memory pointer
+       * @return data word
+       */
+      int peekWord()
+      {
+        int peek = getWord();
+        m_i--;
+        return peek;
+      }
+
+      /**
        * Returns last data word
        * @return last data word
        */
@@ -231,6 +242,9 @@ namespace Belle2 {
     std::string m_outputDigitsName;  /**< name of TOPDigit store array */
     std::string m_outputRawDigitsName;  /**< name of TOPRawDigit store array */
     std::string m_outputWaveformsName;  /**< name of TOPRawWaveform store array */
+
+    std::map<int, int> m_channelStatistics; /**<counts how many different channels have been parsed in a given SCROD packet */
+
     bool m_swapBytes = false;     /**< if true, swap bytes */
     int m_dataFormat = 0;         /**< data format */
 

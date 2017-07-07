@@ -1448,7 +1448,7 @@ void EVEVisualization::addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines)
 
 }
 
-void EVEVisualization::addCDCHit(const CDCHit* hit)
+void EVEVisualization::addCDCHit(const CDCHit* hit, bool showTriggerHits)
 {
   static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
   const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));
@@ -1482,10 +1482,23 @@ void EVEVisualization::addCDCHit(const CDCHit* hit)
   TGeoCombiTrans det_trans(midPoint(0), midPoint(1), midPoint(2), &det_rot);
   cov_shape->SetTransMatrix(det_trans);
 
+  // get relation to trigger track segments
+  bool isPartOfTS = false;
+  const auto segments = hit->getRelationsFrom<CDCTriggerSegmentHit>();
+  if (showTriggerHits && segments.size() > 0) {
+    isPartOfTS = true;
+  }
+
   if (hit->getISuperLayer() % 2 == 0) {
-    cov_shape->SetMainColor(kCyan);
+    if (isPartOfTS)
+      cov_shape->SetMainColor(kCyan + 3);
+    else
+      cov_shape->SetMainColor(kCyan);
   } else {
-    cov_shape->SetMainColor(kPink + 7);
+    if (isPartOfTS)
+      cov_shape->SetMainColor(kPink + 6);
+    else
+      cov_shape->SetMainColor(kPink + 7);
   }
 
   cov_shape->SetMainTransparency(50);
@@ -1495,6 +1508,12 @@ void EVEVisualization::addCDCHit(const CDCHit* hit)
 
   addToGroup("CDCHits", cov_shape);
   addObject(hit, cov_shape);
+  if (isPartOfTS) {
+    addToGroup("CDCTriggerSegmentHits", cov_shape);
+    for (auto rel : segments.relations()) {
+      addObject(rel.object, cov_shape);
+    }
+  }
 }
 
 void EVEVisualization::addARICHHit(const ARICHHit* hit)

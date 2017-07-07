@@ -10,6 +10,7 @@
 #include <simulation/dataobjects/MCParticleTrajectory.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDSimHit.h>
@@ -205,7 +206,7 @@ namespace Belle2 {
     }
 
     /** show CDCHits directly. */
-    void addCDCHit(const CDCHit* hit);
+    void addCDCHit(const CDCHit* hit, bool showTriggerHits = false);
 
     /** Add TOPDigits (shown aggregated per module). */
     void addTOPDigits(const StoreArray<TOPDigit>& digits);

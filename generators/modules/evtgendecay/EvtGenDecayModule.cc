@@ -8,6 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* External headers. */
+#include <EvtGenBase/EvtPDL.hh>
+#include <EvtGenBase/EvtDecayTable.hh>
+
 /* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -64,6 +68,9 @@ void EvtGenDecayModule::beginRun()
 
 void EvtGenDecayModule::event()
 {
+  int i, n;
+  bool decay;
+  StoreArray<MCParticle> mcParticles(m_MCParticleColName);
   if (m_BeamParameters.hasChanged()) {
     if (!m_Initialized) {
       initializeGenerator();
@@ -73,7 +80,21 @@ void EvtGenDecayModule::event()
     }
   }
   m_Graph.clear();
-  m_Graph.loadList(m_MCParticleColName);
+  n = mcParticles.getEntries();
+  for (i = 0; i < n; i++) {
+    decay = true;
+    if (mcParticles[i]->isInitial())
+      decay = false;
+    else if (mcParticles[i]->getNDaughters() > 0)
+      decay = false;
+    else if (m_DecayableParticles.find(mcParticles[i]->getPDG()) ==
+             m_DecayableParticles.end())
+      decay = false;
+    MCParticleGraph::GraphParticle& graphParticle = m_Graph.addParticle();
+    graphParticle = *mcParticles[i];
+    if (decay)
+      m_EvtGenInterface.simulateDecay(m_Graph, graphParticle);
+  }
   m_Graph.generateList(
     m_MCParticleColName,
     MCParticleGraph::c_clearParticles | MCParticleGraph::c_setDecayInfo |
@@ -90,6 +111,16 @@ void EvtGenDecayModule::terminate()
 
 void EvtGenDecayModule::initializeGenerator()
 {
+  int i, n;
+  EvtId id;
+  EvtDecayTable* decayTable;
   m_EvtGenInterface.setup(m_DecFile, "", m_UserDecFile);
+  decayTable = EvtDecayTable::getInstance();
+  n = EvtPDL::entries();
+  for (i = 0; i < n; i++) {
+    id = EvtPDL::getEntry(i);
+    if (decayTable->getNModes(id) > 0)
+      m_DecayableParticles.insert(EvtPDL::getStdHep(id));
+  }
 }
 

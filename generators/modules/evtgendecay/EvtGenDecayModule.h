@@ -91,6 +91,9 @@ namespace Belle2 {
     /** Whether the generator is initialized or not. */
     bool m_Initialized;
 
+    /** Monte-Carlo codes of particles that can be decayed by EvtGen. */
+    std::set<int> m_DecayableParticles;
+
     /** Beam parameters. */
     DBObjPtr<BeamParameters> m_BeamParameters;
 

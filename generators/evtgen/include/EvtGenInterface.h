@@ -58,9 +58,14 @@ namespace Belle2 {
     int simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle,
                       TVector3 pPrimaryVertex, int inclusiveType, const std::string& inclusiveParticle);
 
+    /** Simulate a particle decay. */
+    int simulateDecay(MCParticleGraph& graph,
+                      MCParticleGraph::GraphParticle& parent);
+
   private:
     /** Convert EvtParticle structure to flat MCParticle list */
-    int addParticles2Graph(EvtParticle* particle, MCParticleGraph& graph, TVector3 pPrimaryVertex);
+    int addParticles2Graph(EvtParticle* particle, MCParticleGraph& graph, TVector3 pPrimaryVertex,
+                           MCParticleGraph::GraphParticle* parent);
 
     /** Copy parameters from EvtParticle to MCParticle */
     void updateGraphParticle(EvtParticle* eParticle,

@@ -14,9 +14,6 @@
 
 #include <iostream>
 
-//only used for debugging!
-#include <genfit/TrackCand.h>
-
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -37,12 +34,14 @@ PXDEfficiencyModule::PXDEfficiencyModule() : HistoModule(), m_vxdGeometry(VXD::G
   addParam("pxdclustersname", m_pxdclustersname, "name of StoreArray with PXD cluster", std::string(""));
   addParam("pxddigitsname", m_pxddigitsname, "name of StoreArray with PXD digits", std::string(""));
   addParam("eventmetadataname", m_eventmetadataname, "name of StoreObjPtr to event meta data", std::string(""));
-  addParam("tracksname", m_tracksname, "name of StoreArray with genfit::Tracks", std::string(""));
+  addParam("tracksname", m_tracksname, "name of StoreArray with RecoTracks", std::string(""));
 
   addParam("distCut", m_distcut, "max distance in [cm] for cluster/digit to be counted to a track", double(0.0500));
+  addParam("otherLayerDistCut", m_otherdistcut,
+           "max distance in [cm] for cluster/digit on the other layer to be associated to a track", double(0.0500));
 
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(false));
-  addParam("writeTree", m_writeTree, "if true a tree with usefull info will be filled", bool(false));
+  addParam("writeTree", m_writeTree, "if true a tree with useful info will be filled", bool(false));
 
 }
 
@@ -71,7 +70,8 @@ void PXDEfficiencyModule::event()
   //std::cout << "n digits " << m_pxddigits.getEntries() << std::endl;
   //std::cout << "n tracks " << m_tracks.getEntries() << std::endl;
 
-  StoreArray<genfit::Track> tracks(m_tracksname);
+  StoreArray<RecoTrack> tracks(m_tracksname);
+
   //std::cout << "n track " << m_tracks.getEntries() << std::endl;
   //std::cout << m_tracksname << std::endl;
   //hard cut on the number of tracks as more tracks will complicate things
@@ -79,10 +79,11 @@ void PXDEfficiencyModule::event()
 
   //not sure at which position that is but the correct momentum is not really needed
   genfit::MeasuredStateOnPlane trackstate;
-  genfit::FitStatus* fitstatus = NULL;
+  const genfit::FitStatus* fitstatus = NULL;
   try {
-    fitstatus = tracks[0]->getFitStatus(); //(const AbsTrackRep* rep = NULL)
-    trackstate = tracks[0]->getFittedState(false); //bool for biased or not
+    fitstatus = tracks[0]->getTrackFitStatus(); //(const AbsTrackRep* rep = NULL)
+    trackstate = tracks[0]->getMeasuredStateOnPlaneFromHit(
+                   0); //Argument was false to take unbiased, but due to wrong ordering in the genfit::Track function it actually meant taking sensorID 0, and it stayed biased. Recreating this here...
   } catch (...) {
     return;
   }
@@ -97,14 +98,23 @@ void PXDEfficiencyModule::event()
   std::map<VxdID, int> best_clusindex;
   std::map<VxdID, bool> isgoodintersec;
   std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
+
   bool foundL1 = false;
   bool foundL2 = false;
   //WARNING: if there are multiple intersections on one layer (which should not be the case) only the last one will be considered!
+  //WARNING2: If there are multiple sensors on one layer, as in all Testbeam 2017 geometries, only the last sensor on each layer is considered!
+  //Sensor IDs are hardcoded further down anyway, so only take the first sensor in the geometry-file, which is the one actually in the beam.
+
+  int last_layer = 999;
   for (VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
 
     int layer = aVxdID.getLayerNumber();
+
+    //Only use first module on each layer
+    if (layer == last_layer) continue;
+    else last_layer = layer;
 
     bool isgood = false;
     double sigu(-9999);
@@ -222,7 +232,9 @@ void PXDEfficiencyModule::event()
   if (dist_clus_L1.Mag() <= m_distcut) {
     int iu = m_vxdGeometry.getSensorInfo(L2id).getUCellID(m_u_fit[L2id]);
     int iv = m_vxdGeometry.getSensorInfo(L2id).getVCellID(m_v_fit[L2id]);
-    m_otherpxd_cluster_matched[L2id] = 0;
+
+
+    if (dist_clus_L1.Mag() <= m_otherdistcut) m_otherpxd_cluster_matched[L2id] = 0;
     m_h_trackscluster[L2id]->Fill(iu, iv);
     if (dist_clus_L2.Mag() <= m_distcut) m_h_cluster[L2id]->Fill(iu, iv);
   }
@@ -230,7 +242,9 @@ void PXDEfficiencyModule::event()
   if (dist_clus_L2.Mag() <= m_distcut) {
     int iu = m_vxdGeometry.getSensorInfo(L1id).getUCellID(m_u_fit[L1id]);
     int iv = m_vxdGeometry.getSensorInfo(L1id).getVCellID(m_v_fit[L1id]);
-    m_otherpxd_cluster_matched[L1id] = 0;
+
+
+    if (dist_clus_L2.Mag() <= m_otherdistcut) m_otherpxd_cluster_matched[L1id] = 0;
     m_h_trackscluster[L1id]->Fill(iu, iv);
     if (dist_clus_L1.Mag() <= m_distcut) m_h_cluster[L1id]->Fill(iu, iv);
   }
@@ -270,7 +284,7 @@ void PXDEfficiencyModule::event()
 }
 
 
-TVector3 PXDEfficiencyModule::getTrackInterSec(VXD::SensorInfoBase& svdSensorInfo, const genfit::Track* aTrack, bool& isgood,
+TVector3 PXDEfficiencyModule::getTrackInterSec(VXD::SensorInfoBase& svdSensorInfo, const RecoTrack* aTrack, bool& isgood,
                                                double& du, double& dv)
 {
   //will be set true if the intersect was found
@@ -278,7 +292,7 @@ TVector3 PXDEfficiencyModule::getTrackInterSec(VXD::SensorInfoBase& svdSensorInf
 
   TVector3 intersec(99999999, 9999999, 0); //point outside the sensor
 
-  genfit::MeasuredStateOnPlane gfTrackState = aTrack->getFittedState();
+  genfit::MeasuredStateOnPlane gfTrackState = aTrack->getMeasuredStateOnPlaneFromHit(0);
 
   //adopted (aka stolen) from tracking/modules/pxdClusterRescue/PXDClusterRescueROIModule
   try {
@@ -346,6 +360,7 @@ void PXDEfficiencyModule::defineHisto()
   m_tree->Branch("fit_ndf", &m_fit_ndf, "fit_ndf/I");
 
   std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
+
   for (VxdID& avxdid : sensors) {
     VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(avxdid);
 

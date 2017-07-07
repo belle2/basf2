@@ -22,7 +22,7 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
-#include <genfit/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 //root stuff
 #include "TTree.h"
@@ -76,7 +76,7 @@ namespace Belle2 {
       isgood: flag which is false if some error occured (do not use the point if false)
       du and dv are the uncertainties in u and v on the sensor plane of the fit (local coordinates)
      */
-    TVector3 getTrackInterSec(VXD::SensorInfoBase& svdSensorInfo, const genfit::Track* aTrack, bool& isgood, double& du, double& dv);
+    TVector3 getTrackInterSec(VXD::SensorInfoBase& svdSensorInfo, const RecoTrack* aTrack, bool& isgood, double& du, double& dv);
 
     int findClosestDigit(VxdID& vxdid, TVector3 intersection);
     int findClosestCluster(VxdID& vxdid, TVector3 intersection);
@@ -88,6 +88,7 @@ namespace Belle2 {
     bool m_useAlignment;
 
     double m_distcut; //distance cut in cm!
+    double m_otherdistcut; //distance cut for otherpxd-hit in cm!
 
     //if true a tree with lots of info will be filled if false only the histograms are filled
     bool m_writeTree;
@@ -102,7 +103,7 @@ namespace Belle2 {
     StoreArray<PXDDigit> m_pxddigits;
     StoreArray<PXDCluster> m_pxdclusters;
     StoreObjPtr<EventMetaData> storeEventMetaData;
-    //StoreArray<genfit::Track> m_tracks;
+    //StoreArray<RecoTrack> m_tracks;
 
     //tree to store needed information
     TTree* m_tree;

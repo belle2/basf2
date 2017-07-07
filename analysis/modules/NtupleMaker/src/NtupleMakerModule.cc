@@ -55,7 +55,7 @@ void NtupleMakerModule::initialize()
   // Initializing the output root file
   if (!m_file) m_file = new TFile(m_fileName.c_str(), "RECREATE");
   if (!m_file->IsOpen()) {
-    B2WARNING("Could not create file " << m_fileName);
+    B2FATAL("Could not create file " << m_fileName << ". Please set a vaild root output file name (fileName)");
     return;
   }
 

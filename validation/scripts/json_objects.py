@@ -244,7 +244,16 @@ class ComparisonPlotFile(PlotFile):
     been performed for the content of this file
     """
 
-    def __init__(self, package, title, rootfile, compared_revisions=None, plots=[], ntuples=[], html_content=[]):
+    def __init__(
+            self,
+            package,
+            title,
+            rootfile,
+            compared_revisions=None,
+            plots=[],
+            has_reference=False,
+            ntuples=[],
+            html_content=[]):
         """
         Create a new ComparisonPlotFile object and fill all members
         """
@@ -256,6 +265,9 @@ class ComparisonPlotFile(PlotFile):
         self.ntuples = ntuples
         #: user's html content
         self.html_content = html_content
+
+        #: true if a reference file is available for this plot file
+        self.has_reference = has_reference
 
         #: the number of failed comparisons in this file
         self.comparison_error = len([plt for plt in self.plots if plt.comparison_result == "error"])

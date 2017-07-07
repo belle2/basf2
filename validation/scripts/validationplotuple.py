@@ -166,6 +166,12 @@ class Plotuple:
         # Create the actual plot or n-tuple-table
         self.create_plotuple()
 
+    def has_reference(self):
+        """!
+        @return True if a reference file is found for this plotuple
+        """
+        return self.reference is not None
+
     def create_plotuple(self):
         """!
         Creates the histogram/table/image that belongs to this Plotuble-object.
@@ -189,6 +195,9 @@ class Plotuple:
                      'but received invalid type')
 
     def is_expert(self):
+        """!
+        @return Returns true if this plotuple has the expert option
+        """
         mop = metaoptions.MetaOptionParser(self.metaoptions)
         return mop.has_option("expert")
 

@@ -8,7 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#pragma once
+#ifndef BKLMBADCHANNELS_DB_H
+#define BKLMBADCHANNELS_DB_H
 
 #include <TObject.h>
 #include <vector>
@@ -34,7 +35,7 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    BKLMBadChannels(): m_DeadChannels(), m_HotChannels() {};
+    BKLMBadChannels(): m_DeadChannels(), m_HotChannels(), m_comment() {};
 
     /**
      * Default destructor
@@ -119,3 +120,5 @@ namespace Belle2 {
   };
 
 }// end namespace Belle2
+
+#endif

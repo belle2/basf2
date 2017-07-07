@@ -47,6 +47,8 @@ SeqRootOutputModule::SeqRootOutputModule() : Module(), m_nevt(0), m_streamer(nul
            "Compression Level: 0 for no, 1 for low, 9 for high compression. Level 1 usually reduces size by 50%, higher levels have no noticable effect. NOTE: Because of a ROOT bug ( https://sft.its.cern.ch/jira/browse/ROOT-4550 ), this option currently causes memory leaks and is disabled.",
            0);
   addParam("saveObjs", m_saveObjs, "List of objects/arrays to be saved", emptyvector);
+  addParam("fileNameIsPattern", m_fileNameIsPattern, "If true interpret the output filename as a boost::format pattern "
+           "instead of the standard where subsequent files are named .sroot-N. For example 'myfile-f%08d.sroot'", false);
 }
 
 
@@ -74,7 +76,7 @@ void SeqRootOutputModule::initialize()
   //Write StreamerInfo at the beginning of a file
   getStreamerInfos();
 
-  m_file = new SeqFile(m_outputFileName.c_str(), "w", m_streamerinfo, m_streamerinfo_size);
+  m_file = new SeqFile(m_outputFileName.c_str(), "w", m_streamerinfo, m_streamerinfo_size, m_fileNameIsPattern);
 
   B2INFO("SeqRootOutput: initialized.");
 }

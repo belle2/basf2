@@ -147,7 +147,7 @@ namespace Belle2 {
     bool m_writeOut;  /**< toggle particle list btw. transient/persistent */
     bool m_addDaughters; /**< toggle addition of the bottom part of the particle's decay chain */
 
-    int m_trackHypothesis; /** pdg code for track hypothesis **/
+    int m_trackHypothesis; /**< pdg code for track hypothesis that should be used to create the particle */
 
   };
 

@@ -12,8 +12,10 @@ import sys
 import os
 import requests
 import shutil
+import fnmatch
+import re
 from urllib.parse import urljoin
-from . import calculate_checksum, encode_name
+from . import ConditionsDB, calculate_checksum, encode_name
 from .cli_utils import ItemFilter
 from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging
 from concurrent.futures import ThreadPoolExecutor
@@ -88,6 +90,17 @@ def command_download(args, db=None):
         args.add_argument("--retries", type=int, default=3,
                           help="Number of retries on connection problems (default: "
                           "%(default)s)")
+        group = args.add_mutually_exclusive_group()
+        group.add_argument("--tag-pattern", default=False, action="store_true",
+                           help="if given, all global tags which match the shell-style "
+                           "pattern TAGNAME will be downloaded: `*` stands for anything, "
+                           "`?` stands for a single character."
+                           "If -c is given as well the database files will be DIR/TAGNAME.txt")
+        group.add_argument("--tag-regex", default=False, action="store_true",
+                           help="if given, all global tags matching the regular "
+                           "expression given by TAGNAME will be downloaded (see "
+                           "https://docs.python.org/3/library/re.html)"
+                           "If -c is given as well the database files will be DIR/TAGNAME.txt")
         return
 
     try:
@@ -103,31 +116,52 @@ def command_download(args, db=None):
     for level in LogLevel.values.values():
         logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE | LogInfo.TIMESTAMP)
 
-    req = db.request("GET", "/globalTag/{}/globalTagPayloads".format(encode_name(args.tag)),
-                     "Downloading list of payloads for {tag} tag{}".format(payloadfilter, **vars(args)))
-    B2INFO("Done")
+    tagnames = [args.tag]
 
-    download_list = []
-    for payload in req.json():
-        name = payload["payloadId"]["basf2Module"]["name"]
-        if payloadfilter.check(name):
-            download_list.append(payload)
+    if args.tag_pattern or args.tag_regex:
+        all_tags = db.get_globalTags()
+        if args.tag_pattern:
+            tagnames = fnmatch.filter(all_tags, args.tag)
+        else:
+            try:
+                tagname_regex = re.compile(args.tag, re.IGNORECASE)
+            except Exception as e:
+                B2ERROR("--tag-regex: '{}' is not a valid regular expression: {}'".format(args.tag, e))
+                return False
+            tagnames = (e for e in all_tags if tagname_regex.search(e))
 
-    # parse the payload list and do the downloading
-    dbfile = []
-    failed = 0
-    with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
-        for iovlist in pool.map(lambda x: download_payload(args.destination, db, x), download_list):
-            if iovlist is None:
-                failed += 1
-                continue
+    for tagname in sorted(tagnames):
+        try:
+            req = db.request("GET", "/globalTag/{}/globalTagPayloads".format(encode_name(tagname)),
+                             "Downloading list of payloads for {} tag{}".format(tagname, payloadfilter))
+        except ConditionsDB.RequestError as e:
+            B2ERROR(str(e))
+            continue
 
-            for iov in iovlist:
+        download_list = []
+        for payload in req.json():
+            name = payload["payloadId"]["basf2Module"]["name"]
+            if payloadfilter.check(name):
+                download_list.append(payload)
+
+        # parse the payload list and do the downloading
+        full_iovlist = []
+        failed = 0
+        with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
+            for iovlist in pool.map(lambda x: download_payload(args.destination, db, x), download_list):
+                if iovlist is None:
+                    failed += 1
+                    continue
+
+                full_iovlist += iovlist
+
+        if args.create_dbfile:
+            dbfile = []
+            for iov in sorted(full_iovlist):
                 dbfile.append("dbstore/{} {} {},{},{},{}\n".format(*iov))
-
-    if args.create_dbfile:
-        with open(os.path.join(args.destination, "database.txt"), "w") as txtfile:
-            txtfile.writelines(sorted(dbfile))
+            dbfilename = tagname if (args.tag_pattern or args.tag_regex) else "database"
+            with open(os.path.join(args.destination, dbfilename + ".txt"), "w") as txtfile:
+                txtfile.writelines(dbfile)
 
     if failed > 0:
         B2ERROR("{} out of {} payloads could not be downloaded".format(failed, len(download_list)))

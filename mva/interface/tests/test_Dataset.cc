@@ -944,6 +944,15 @@ namespace {
       general_options.m_max_events = 0;
     }
 
+    // If a file exists with the specified expansion
+    // the file takes precedence over the expansion
+    boost::filesystem::copy_file("datafile.root", "datafile*.root");
+    {
+      general_options.m_max_events = 0;
+      MVA::ROOTDataset chain_test(general_options);
+      EXPECT_EQ(chain_test.getNumberOfEvents(), 5);
+    }
+
   }
 
 

@@ -92,7 +92,7 @@ bool HistoManager::merge()
     map<string, map<int, TH1*>>& dirlist = is->second;
     map<string, TH1*>& mergelist = m_mergedir[is->first];
     // Move to the root directory of TMapFile
-    printf("TMemFile = %8.8x\n", m_memfile->GetMemFile());
+    //    printf("TMemFile = %8.8x\n", m_memfile->GetMemFile());
     if (m_memfile->GetMemFile() == NULL) exit(-99);
     (m_memfile->GetMemFile())->cd();
     // cd to subdirectory if defined

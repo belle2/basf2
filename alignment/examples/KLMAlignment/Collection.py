@@ -11,7 +11,7 @@ from ROOT import Belle2
 
 main = create_path()
 
-main.add_module('RootInput', inputFileName=sys.argv[1], excludeBranchNames=['GF2TracksToMCParticles', 'TrackCandsToGF2Tracks'])
+main.add_module('RootInput', inputFileName=sys.argv[1])
 main.add_module('Gearbox')
 geometry = register_module('Geometry', excludedComponents=['MagneticField'],
                            additionalComponents=["MagneticField2d"])

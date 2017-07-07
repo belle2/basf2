@@ -1,0 +1,51 @@
+StringFlav:etaSup=0.27
+StringFlav:etaPrimeSup=0.12
+StringFragmentation:stopMass=0.3
+StringZ:aLund=0.32
+StringZ:bLund=0.62
+StringZ:usePetersonC=off
+StringZ:usePetersonB=off
+StringZ:usePetersonH=off
+StringZ:rFactC=1.0
+
+ParticleDecays:multIncrease=4.5
+ParticleDecays:multIncreaseWeak=2.0
+
+###################
+#control radiation
+###################
+
+## QCD showers on PartonLevel
+ParticleDecays:FSRinDecays=on
+
+## QED radiation of quarks (FSR)
+TimeShower:QEDshowerByQ=on
+
+###################################################################
+## modifications to restore excited D states
+## 
+## December 2016
+## contact: Jake Bennett
+
+###################
+# new charm pars
+###################
+StringFlav:mesonCL1S0J1=0.06
+StringFlav:mesonCL1S1J0=0.1775
+StringFlav:mesonCL1S1J1=0.1868
+StringFlav:mesonCL1S1J2=0.1836
+StringFlav:mesonCvector=2.8
+
+###################
+# new strange pars
+###################
+StringFlav:probStoUD=0.286
+StringFlav:probSQtoQQ=0.323
+
+###################
+# new baryon pars
+###################
+StringFlav:probQQtoQ=0.133
+StringFlav:probQQ1toQQ0=0.0468
+
+###################################################################

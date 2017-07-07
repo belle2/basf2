@@ -93,7 +93,7 @@ class SVDValidationTTree(Module):
                 # Let's store some data
                 # Sensor identification
                 sensorID = cluster.getSensorID()
-                self.data.sensor_id = sensorID
+                self.data.sensor_id = int(sensorID)
                 sensorNum = sensorID.getSensorNumber()
                 self.data.sensor = sensorNum
                 layerNum = sensorID.getLayerNumber()

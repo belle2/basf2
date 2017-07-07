@@ -277,6 +277,27 @@ void FullSimModule::initialize()
     }
   }
 
+  // Inactivate all secondary-generating processes for g4e particles. This comprises
+  // Cerenkov and Scintillation that were inserted by G4OpticalPhysics and the
+  // CaptureAtRest process for g4e anti-deuteron.
+  partIter->reset();
+  while ((*partIter)()) {
+    G4ParticleDefinition* currParticle = partIter->value();
+    if (currParticle->GetParticleName().compare(0, 4, "g4e_") == 0) {
+      G4ProcessManager* processManager = currParticle->GetProcessManager();
+      if (processManager) {
+        G4ProcessVector* processList = processManager->GetProcessList();
+        for (int i = 0; i < processList->size(); ++i) {
+          if (((*processList)[i]->GetProcessName() == "Cerenkov") ||
+              ((*processList)[i]->GetProcessName() == "Scintillation") ||
+              ((*processList)[i]->GetProcessName() == "hFritiofCaptureAtRest")) {
+            processManager->SetProcessActivation(i, false);
+          }
+        }
+      }
+    }
+  }
+
   //Set the verbosity level of Geant4 according to the logging settings of the module
   //int g4VerboseLevel = 0;
   //switch (LogSystem::Instance().getCurrentLogLevel()) {

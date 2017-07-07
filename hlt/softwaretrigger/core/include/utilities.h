@@ -94,6 +94,13 @@ namespace Belle2 {
       return particle.getECLCluster();
     }
 
+    /// Helper function to extract Beam Energy in CMS frame.
+    inline double BeamEnergyCMS()
+    {
+      PCmsLabTransform T;
+      return T.getCMSEnergy() / 2.0;
+    }
+
     /// Helper function to extract rho = momentum magnitude in the CMS frame from an entity (ECLCLuster or Particle).
     template<class AnEntity>
     inline double getRho(const AnEntity* entity)

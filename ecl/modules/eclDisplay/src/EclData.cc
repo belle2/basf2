@@ -21,12 +21,21 @@ EclData::EclData()
   m_tree->Branch("evtn", &evtn, "evtn/I");
 
   initVariables();
-  // initEventRanges();
+  initEventRanges();
 }
 
 EclData::EclData(const EclData& data)
 {
+  initVariables();
+  initEventRanges();
+
   m_tree = data.m_tree->CloneTree();
+
+  m_tree = new TTree("tree", "tree");
+  m_tree->Branch("ch", &ch, "ch/I");
+  m_tree->Branch("amp", &amp, "amp/I");
+  m_tree->Branch("time", &time, "time/I");
+  m_tree->Branch("evtn", &evtn, "evtn/I");
 
   m_last_event_id = data.m_last_event_id;
   m_time_max = data.m_time_max;
@@ -35,9 +44,6 @@ EclData::EclData(const EclData& data)
 
   m_event_count_max = data.m_event_count_max;
   m_energy_total = data.m_energy_total;
-
-  m_event_counts = new int[getCrystalCount() + 1];
-  m_energy_sums = new float[getCrystalCount() + 1];
 
   for (int i = 0; i < getCrystalCount() + 1; i++) {
     m_event_counts[i] = data.m_event_counts[i];
@@ -68,11 +74,17 @@ EclData::~EclData()
 
 void EclData::initVariables()
 {
+  // Setting
+  amp = ch = time = evtn = 0;
+
   m_event_counts = new int[getCrystalCount() + 1];
   m_energy_sums = new float[getCrystalCount() + 1];
 
+  m_event_count_max = 0;
+  m_energy_sums_max = 0;
+  m_energy_total = 0;
+
   m_last_event_id = -1;
-  m_en_range_max = -1;
 
   m_time_max = 0;
 
@@ -81,6 +93,7 @@ void EclData::initVariables()
 
 void EclData::initEventRanges()
 {
+  m_en_range_min = 0;
   m_en_range_max = -1;
 
   m_time_range_min = -2048;

@@ -160,10 +160,9 @@ class WFDisplay(Module):
                 graph.SetPoint(2, raw.getSamplePeak() + 0.5, raw.getValuePeak())
                 graph.SetPoint(3, raw.getSampleFall() + 0.5, raw.getValueFall0())
                 graph.SetPoint(4, raw.getSampleFall() + 1.5, raw.getValueFall1())
-                print(raw.isFEValid(), raw.isPedestalJump(), raw.areWindowsInOrder())
                 if raw.isMadeOffline():
                     graph.SetMarkerStyle(5)
-                if raw.isFEValid() and raw.areWindowsInOrder():
+                if raw.isFEValid() and not raw.isAtWindowDiscontinuity():
                     graph.SetMarkerColor(2)
                     if raw.isPedestalJump():
                         graph.SetMarkerColor(3)

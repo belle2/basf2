@@ -224,8 +224,8 @@ def draw_likelihoods(file_chain):
     llMu_pi = TH1F('LLmu-pions', 'logL(mu) for true pions', llBins, llMin, llMax)
     llPi_mu = TH1F('LLpi-muons', 'logL(pi) for true muons', llBins, llMin, llMax)
     llPi_pi = TH1F('LLpi-pions', 'logL(pi) for true pions', llBins, llMin, llMax)
-    llDiff_mu = TH1F('LLdiff-muons', 'logL(mu)-logL(pi) for true muons', llBins*2, llMin, -llMin)
-    llDiff_pi = TH1F('LLdiff-pions', 'logL(mu)-logL(pi) for true pions', llBins*2, llMin, -llMin)
+    llDiff_mu = TH1F('LLdiff-muons', 'logL(mu)-logL(pi) for true muons', llBins * 2, llMin, -llMin)
+    llDiff_pi = TH1F('LLdiff-pions', 'logL(mu)-logL(pi) for true pions', llBins * 2, llMin, -llMin)
 
     layerBins = 15
     layerMin = -0.5
@@ -258,39 +258,27 @@ def draw_likelihoods(file_chain):
     momentumMin = 0.0
     momentumMax = 5.0
     efficiency_momentum = TH1F('Eff-momentum', 'Muon efficiency vs momentum', momentumBins, momentumMin, momentumMax)
-    efficiency_momentum.Sumw2(1)
     efficiency_momentum_denom = TH1F('Eff-momentum-denom', 'Muon efficiency vs momentum', momentumBins, momentumMin, momentumMax)
-    efficiency_momentum_denom.Sumw2(1)
     fakerate_momentum = TH1F('FakeRate-momentum', 'Pion fake rate vs momentum', momentumBins2, momentumMin, momentumMax)
-    fakerate_momentum.Sumw2(1)
     fakerate_momentum_denom = TH1F('FakeRate-momentum-denom', 'Pion fake rate vs momentum', momentumBins2, momentumMin, momentumMax)
-    fakerate_momentum_denom.Sumw2(1)
 
     thetaBins = 35  # for efficiency
     thetaBins2 = 7  # for fake rate (low statistics)
     thetaMin = 10.0
     thetaMax = 150.0
     efficiency_theta = TH1F('Eff-theta', 'Muon efficiency vs theta', thetaBins, thetaMin, thetaMax)
-    efficiency_theta.Sumw2(1)
     efficiency_theta_denom = TH1F('Eff-theta-denom', 'Muon efficiency vs theta', thetaBins, thetaMin, thetaMax)
-    efficiency_theta_denom.Sumw2(1)
     fakerate_theta = TH1F('FakeRate-theta', 'Pion fake rate vs theta', thetaBins2, thetaMin, thetaMax)
-    fakerate_theta.Sumw2(1)
     fakerate_theta_denom = TH1F('FakeRate-theta-denom', 'Pion fake rate vs theta', thetaBins2, thetaMin, thetaMax)
-    fakerate_theta_denom.Sumw2(1)
 
     phiBins = 36  # for efficiency
     phiBins2 = 8  # for fake rate (low statistics)
     phiMin = 0.0
     phiMax = 360.0
     efficiency_phi = TH1F('Eff-phi', 'Muon efficiency vs phi', phiBins, phiMin, phiMax)
-    efficiency_phi.Sumw2(1)
     efficiency_phi_denom = TH1F('Eff-phi-denom', 'Muon efficiency vs phi', phiBins, phiMin, phiMax)
-    efficiency_phi_denom.Sumw2(1)
     fakerate_phi = TH1F('FakeRate-phi', 'Pion fake rate vs phi', phiBins2, phiMin, phiMax)
-    fakerate_phi.Sumw2(1)
     fakerate_phi_denom = TH1F('FakeRate-phi-denom', 'Pion fake rate vs phi', phiBins2, phiMin, phiMax)
-    fakerate_phi_denom.Sumw2(1)
 
     for entry in file_chain:
         mcps = entry.MCParticles
@@ -347,12 +335,42 @@ def draw_likelihoods(file_chain):
                         fakerate_theta.Fill(theta)
                         fakerate_phi.Fill(phi)
 
-    efficiency_momentum.Divide(efficiency_momentum_denom)
-    efficiency_theta.Divide(efficiency_theta_denom)
-    efficiency_phi.Divide(efficiency_phi_denom)
-    fakerate_momentum.Divide(fakerate_momentum_denom)
-    fakerate_theta.Divide(fakerate_theta_denom)
-    fakerate_phi.Divide(fakerate_phi_denom)
+    for j in range(efficiency_momentum_denom.GetNbinsX()):
+        num = efficiency_momentum.GetBinContent(j + 1)
+        denom = efficiency_momentum_denom.GetBinContent(j + 1)
+        if denom > 0:
+            efficiency_momentum.SetBinContent(j + 1, num / denom)
+            efficiency_momentum.SetBinError(j + 1, math.sqrt(num * (denom - num) / (denom * denom * denom)))
+    for j in range(efficiency_theta_denom.GetNbinsX()):
+        num = efficiency_theta.GetBinContent(j + 1)
+        denom = efficiency_theta_denom.GetBinContent(j + 1)
+        if denom > 0:
+            efficiency_theta.SetBinContent(j + 1, num / denom)
+            efficiency_theta.SetBinError(j + 1, math.sqrt(num * (denom - num) / (denom * denom * denom)))
+    for j in range(efficiency_phi_denom.GetNbinsX()):
+        num = efficiency_phi.GetBinContent(j + 1)
+        denom = efficiency_phi_denom.GetBinContent(j + 1)
+        if denom > 0:
+            efficiency_phi.SetBinContent(j + 1, num / denom)
+            efficiency_phi.SetBinError(j + 1, math.sqrt(num * (denom - num) / (denom * denom * denom)))
+    for j in range(fakerate_momentum_denom.GetNbinsX()):
+        num = fakerate_momentum.GetBinContent(j + 1)
+        denom = fakerate_momentum_denom.GetBinContent(j + 1)
+        if denom > 0:
+            fakerate_momentum.SetBinContent(j + 1, num / denom)
+            fakerate_momentum.SetBinError(j + 1, math.sqrt(num * (denom - num) / (denom * denom * denom)))
+    for j in range(fakerate_theta_denom.GetNbinsX()):
+        num = fakerate_theta.GetBinContent(j + 1)
+        denom = fakerate_theta_denom.GetBinContent(j + 1)
+        if denom > 0:
+            fakerate_theta.SetBinContent(j + 1, num / denom)
+            fakerate_theta.SetBinError(j + 1, math.sqrt(num * (denom - num) / (denom * denom * denom)))
+    for j in range(fakerate_phi_denom.GetNbinsX()):
+        num = fakerate_phi.GetBinContent(j + 1)
+        denom = fakerate_phi_denom.GetBinContent(j + 1)
+        if denom > 0:
+            fakerate_phi.SetBinContent(j + 1, num / denom)
+            fakerate_phi.SetBinError(j + 1, math.sqrt(num * (denom - num) / (denom * denom * denom)))
 
     # NOTE: *.Fill() must precede *.GetListOfFunctions().Add() or the latter will be discarded!
     outcome.GetListOfFunctions().Add(TNamed('Description', "0=not in KLM, 1/2=barrel/endcap stop, 3/4=barrel/endcap exit"))

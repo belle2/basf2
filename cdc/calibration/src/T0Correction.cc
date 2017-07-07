@@ -123,14 +123,14 @@ bool T0Correction::calibrate()
   B2INFO("Gaus fitting for whole channel");
   double par[3];
   m_hTotal->SetDirectory(0);
-  double mean = m_hTotal->GetMean();
+  const double mean = m_hTotal->GetMean();
   m_hTotal->Fit("g1", "Q", "", mean - 15, mean + 15);
   g1->GetParameters(par);
 
   B2INFO("Gaus fitting for each board");
   for (int ib = 1; ib < 300; ++ib) {
     if (m_hT0b[ib]->GetEntries() < 10) continue;
-    double mean = m_hT0b[ib]->GetMean();
+    const double mean = m_hT0b[ib]->GetMean();
     m_hT0b[ib]->SetDirectory(0);
     m_hT0b[ib]->Fit("g1", "Q", "", mean - 15, mean + 15);
     g1->GetParameters(par);
@@ -147,7 +147,7 @@ bool T0Correction::calibrate()
       const int n = m_h1[ilay][iwire]->GetEntries();
       B2DEBUG(99, "layer " << ilay << " wire " << iwire << " entries " << n);
       if (n < 10) continue;
-      double mean = m_h1[ilay][iwire]->GetMean();
+      const double mean = m_h1[ilay][iwire]->GetMean();
       m_h1[ilay][iwire]->SetDirectory(0);
       m_h1[ilay][iwire]->Fit("g1", "Q", "", mean - 15, mean + 15);
       g1->GetParameters(par);
@@ -161,22 +161,26 @@ bool T0Correction::calibrate()
     }
   }
 
-  B2INFO("Store histo");
+
   if (m_storeHisto) {
+    B2INFO("Store histo");
     TFile* fout = new TFile("Correct_T0.root", "RECREATE");
     fout->cd();
     TGraphErrors* gr[56];
     TDirectory* top = gDirectory;
     m_hTotal->Write();
-
+    TDirectory* subDir[56];
     for (int ilay = 0; ilay < 56; ++ilay) {
+      subDir[ilay] = top ->mkdir(Form("lay_%d", ilay));
+      subDir[ilay]->cd();
       for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
         m_h1[ilay][iwire]->Write();
       }
     }
-
-    TDirectory* corrT0 = gDirectory->mkdir("DeltaT0");
+    top->cd();
+    TDirectory* corrT0 = top->mkdir("DeltaT0");
     corrT0->cd();
+
 
     TGraphErrors* grb = new TGraphErrors(b.size(), &b.at(0), &Sb.at(0), &db.at(0), &dSb.at(0));
     grb->SetMarkerColor(2);
@@ -197,17 +201,6 @@ bool T0Correction::calibrate()
       gr[sl]->SetMinimum(-10);
       gr[sl]->SetName(Form("lay%d", sl));
       gr[sl]->Write();
-    }
-    if (m_debug) {
-      TDirectory* Direct[56];
-      for (int il = 0; il < 56; ++il) {
-        top->cd();
-        Direct[il] = gDirectory->mkdir(Form("lay_%d", il));
-        Direct[il]->cd();
-        for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
-          m_h1[il][w]->Write();
-        }
-      }
     }
     fout->Close();
   }
@@ -239,9 +232,10 @@ void T0Correction::Write()
   //correct T0 and write
   for (int ilay = 0; ilay < 56; ++ilay) {
     for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
-      const WireID wireid(ilay, iwire);
-      const int bID = cdcgeo.getBoardID(wireid);
-      if (abs(err_dt[ilay][iwire]) > 2 || abs(dt[ilay][iwire]) > 100.0) {
+      WireID wireid(ilay, iwire);
+      int bID = cdcgeo.getBoardID(wireid);
+      if (abs(err_dt[ilay][iwire]) > 2 || abs(dt[ilay][iwire]) > 1.e3) {
+        //      if (abs(err_dt[ilay][iwire]) > 2) {
         T0 = T0B[bID]->GetMean();
         dt[ilay][iwire] = dtb[bID];
       } else {

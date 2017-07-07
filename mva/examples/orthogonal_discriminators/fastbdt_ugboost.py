@@ -6,7 +6,7 @@
 import basf2_mva
 
 if __name__ == "__main__":
-    variables = ['p', 'pt', 'pz', 'phi',
+    variables = ['p', 'pt', 'pz', 'phi', 'M',
                  'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)', 'daughter(0, phi)',
                  'daughter(1, p)', 'daughter(1, pz)', 'daughter(1, pt)', 'daughter(1, phi)',
                  'daughter(2, p)', 'daughter(2, pz)', 'daughter(2, pt)', 'daughter(2, phi)',
@@ -20,15 +20,16 @@ if __name__ == "__main__":
                  'daughter(2, daughter(0, clusterTiming))', 'daughter(2, daughter(1, clusterTiming))',
                  'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
                  'daughter(2, daughter(0, minC2HDist))', 'daughter(2, daughter(1, minC2HDist))',
-                 'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
+                 # 'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)',
+                 'daughterInvariantMass(1, 2)']
 
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train2.root")
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
     # Spectators are the variables for which the selection should be uniform
-    # general_options.m_spectators = basf2_mva.vector('daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)')
-    general_options.m_spectators = basf2_mva.vector('M')
+    general_options.m_spectators = basf2_mva.vector('daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)')
+    # general_options.m_spectators = basf2_mva.vector('M')
     general_options.m_target_variable = "isSignal"
     general_options.m_identifier = "fastbdt"
 

@@ -19,6 +19,18 @@ gSystem.Load('libanalysis.so')
 from ROOT import Belle2
 variables = Belle2.Variable.Manager.Instance()
 
+import ROOT
+
+
+def std_vector(*args):
+    """
+    Creates an std::vector which can be passed to pyROOT
+    """
+    v = ROOT.std.vector(type(args[0]))()
+    for x in args:
+        v.push_back(x)
+    return v
+
 
 def getCommandLineOptions():
     """ Parses the command line options of the fei and returns the corresponding arguments. """

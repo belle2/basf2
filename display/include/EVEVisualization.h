@@ -17,6 +17,7 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
+#include <bklm/dataobjects/BKLMHit2d.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <top/dataobjects/TOPDigit.h>
@@ -173,6 +174,9 @@ namespace Belle2 {
 
     /** Add a reconstructed cluster in the KLM. */
     void addKLMCluster(const KLMCluster* cluster);
+
+    /** Add a reconstructed 2d hit in the BKLM. */
+    void addBKLMHit2d(const BKLMHit2d* bklm2dhit);
 
     /** Add recontructed hit in ARICH */
     void addARICHHit(const ARICHHit* hit);

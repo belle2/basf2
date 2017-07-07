@@ -13,7 +13,7 @@
 
 #include <ecl/modules/eclDisplay/EclData.h>
 #include <ecl/modules/eclDisplay/MultilineWidget.h>
-#include <ecl/utility/eclChannelMapper.h>
+#include <ecl/utility/ECLChannelMapper.h>
 #include <TString.h>
 
 namespace Belle2 {
@@ -26,7 +26,7 @@ namespace Belle2 {
      * Default constructor.
      * @param data Data to display.
      */
-    EclPainter(EclData* data);
+    explicit EclPainter(EclData* data);
     virtual ~EclPainter();
 
     /**

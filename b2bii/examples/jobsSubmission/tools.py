@@ -27,13 +27,13 @@ def readConfigFile_data():
     config = configparser.ConfigParser()
     config.read(sys.argv[1])
 
-    thresholdEventsNo = int(config['Config']['thresholdEventsNo'])
+    runsPerJob = int(config['Config']['runsPerJob'])
     expNoList = list(map(int, config['Config']['expNo'].split(',')))
     skimTypeList = list(map(str, config['Config']['skimType'].split(',')))
     dataTypeList = list(map(str, config['Config']['dataType'].split(',')))
     belleLevelList = list(map(str, config['Config']['belleLevel'].split(',')))
 
-    return thresholdEventsNo, expNoList, skimTypeList, dataTypeList, belleLevelList
+    return runsPerJob, expNoList, skimTypeList, dataTypeList, belleLevelList
 
 
 def countEventsInUrl(link):
@@ -80,7 +80,7 @@ def addLine(tableFile, aList):
     print('Added line to table: ' + writeStr)
 
 
-def getMaxRunNo(expNo):
+def getMaxRunNo_mc(expNo):
 
     maxRunNoDict = {
         65: 900,
@@ -109,5 +109,44 @@ def getMaxRunNo(expNo):
         11: 1400,
         9: 1300,
         7: 2900}
+
+    return int(maxRunNoDict.get(expNo))
+
+
+def getMaxRunNo_data(expNo):
+
+    maxRunNoDict = {
+
+        7: 2865,
+        9: 1220,
+        11: 1367,
+        13: 1627,
+        15: 1437,
+        17: 937,
+        19: 1709,
+        21: 324,
+        23: 607,
+        25: 2122,
+        27: 1632,
+        31: 1715,
+        33: 870,
+        35: 687,
+        37: 1913,
+        39: 1357,
+        41: 1261,
+        43: 1149,
+        45: 450,
+        47: 881,
+        49: 1227,
+        51: 1805,
+        53: 272,
+        55: 1749,
+        61: 1373,
+        63: 783,
+        65: 1232,
+        67: 1123,
+        69: 1397,
+        71: 2292,
+        73: 916}
 
     return int(maxRunNoDict.get(expNo))

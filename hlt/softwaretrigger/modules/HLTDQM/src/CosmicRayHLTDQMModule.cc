@@ -14,6 +14,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <mdst/dataobjects/Track.h>
+#include <ecl/dataobjects/ECLShower.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -87,9 +88,9 @@ void CosmicRayHLTDQMModule::defineHisto()
   h_charge = new TH1F("charge", "the charge of track", 8, -1.5, 2.5);
   h_charge->SetXTitle("Charge");
 
-  //ECL
+  //ECL Clusters
   h_ncluster = new TH1F("neclcluster", "number of ECL cluster", 30, 0, 30);
-  h_ncluster->SetXTitle("Neclcluster (GeV)");
+  h_ncluster->SetXTitle("Number of ECL N1 Clusters");
   h_e_eclcluster = new TH1F("e_ecluster", "energy of ECL cluster", 100, 0, 1.0);
   h_e_eclcluster->SetXTitle("E (GeV)");
   h_phi_eclcluster = new TH1F("phi_eclcluster", "phi angle of ECLCluster position", 100, -3.2, 3.2);
@@ -100,6 +101,14 @@ void CosmicRayHLTDQMModule::defineHisto()
   h_E1oE9_eclcluster->SetXTitle("E1/E9");
   h_Time_eclcluster = new TH1F("Time_eclcluster", "the ecl cluster time", 100, -1000., 1000.);
   h_Time_eclcluster->SetXTitle("Time (ns)");
+
+  // ECL Showers
+  h_nshower = new TH1F("neclshower", "number of ECL showers", 30, 0, 30);
+  h_nshower->SetXTitle("Number of ECL N1 Showers");
+  h_time_eclshower = new TH1F("time_eclshoer", "the ECL shower time", 100, -1000., 1000.);
+  h_time_eclshower->SetXTitle("Time (ns)");
+  h_e_eclshower = new TH1F("e_eshower", "energy of ECL shower", 100, 0, 1.0);
+  h_e_eclshower->SetXTitle("E (GeV)");
 
   //KLM
   h_nbklmhit = new TH1F("nbklmhit", "number of 2D hits on barrel KLM", 30, 0, 30);
@@ -148,7 +157,7 @@ void CosmicRayHLTDQMModule::event()
     }
   }
 
-//Monitor ECL Clusters
+  //Monitor ECL N1 Clusters
   StoreArray<ECLCluster> eclClusters;
   int nECLClusters = 0;
   if (eclClusters.isValid()) {
@@ -164,6 +173,21 @@ void CosmicRayHLTDQMModule::event()
     }
     h_ncluster->Fill(nECLClusters);
   }
+
+  // Monitor ECL N1 Showers (without timing and energy cut)
+  StoreArray<ECLShower> eclShowers;
+  int nECLShowers = 0;
+  if (eclShowers.isValid()) {
+    for (const auto& eclShower : eclShowers) {
+      if (eclShower.getHypothesisId() == 5) {
+        h_e_eclshower->Fill(eclShower.getEnergy());
+        h_time_eclshower->Fill(eclShower.getTime());
+        nECLShowers++;
+      }
+    }
+    h_nshower->Fill(nECLShowers);
+  }
+
 
 //Monitor KLM
   StoreArray<BKLMHit2d> bklmhits;

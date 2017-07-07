@@ -129,13 +129,14 @@ class WFDisplay(Module):
         fname = 'waveforms_run' + str(run) + '_event' + str(event) + '_chan'
         self.pdfFile = fname
         for waveform in waveforms:
+            slot = waveform.getModuleID()
             chan = waveform.getChannel()
-            self.pdfFile = self.pdfFile + '-' + str(chan)
+            self.pdfFile = self.pdfFile + '-S' + str(slot) + '_' + str(chan)
             wf = waveform.getWaveform()
             self.hist[k].Reset()
             numSamples = waveform.getSize()
             self.hist[k].SetBins(numSamples, 0.0, float(numSamples))
-            title = 'chan ' + str(chan) + ' win'
+            title = 'S' + str(slot) + ' chan ' + str(chan) + ' win'
             for window in waveform.getStorageWindows():
                 title += ' ' + str(window)
             self.hist[k].SetTitle(title)

@@ -190,7 +190,12 @@ void SeqRootInputModule::event()
   m_size2 += dsize * dsize;
 
   if (evtmsg->type() == MSG_STREAMERINFO) {
-    B2FATAL("SeqRootInput : StreamerInfo is found in the middle of *.sroot-* files");
+    B2WARNING("SeqRootInput : StreamerInfo is found in the middle of *.sroot-* files. Skip record");
+    int is = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
+    if (is <= 0) {
+      B2FATAL("SeqRootInput : Error in reading file. error code = " << is);
+    }
+    evtmsg = new EvtMessage(evtbuf);
   }
 
   // Restore objects in DataStore

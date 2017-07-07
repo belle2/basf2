@@ -78,7 +78,7 @@ int HistoServer::server()
           int narys = (hmsg->header())->reserved[2];
           //    string subdir = "ROOT";
           string subdir = "";
-          printf("HistServer : recieved nobjs = %d\n", nobjs);
+          printf("HistoServer : received nobjs = %d\n", nobjs);
           for (int i = 0; i < nobjs; i++) {
             //      printf ( "Object : %s received, class = %s\n", (strlist.at(i)).c_str(),
             //                     (objlist.at(i))->ClassName() );

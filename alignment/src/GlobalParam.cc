@@ -25,6 +25,7 @@
 
 namespace Belle2 {
   namespace alignment {
+    //std::tuple<BeamParameters, VXDAlignment, CDCAlignment, CDCLayerAlignment, CDCTimeWalks, CDCTimeZeros, CDCXtRelations, BKLMAlignment, EKLMAlignment> dbvector = {};
 
     /// The DB object unique id in global calibration
     template <>
@@ -34,29 +35,35 @@ namespace Belle2 {
     template <>
     double GlobalParamSet<BeamParameters>::getGlobalParam(unsigned short element, unsigned short param)
     {
+      this->ensureConstructed();
       if (element != 0 or param > 3) {
-        B2ERROR("Invalid global BeamParameters id");
+        B2ERROR("Invalid global BeamParameters parameter id");
         return 0;
       }
 
-      if (auto bp = dynamic_cast<BeamParameters*>(GlobalParamSet<BeamParameters>::getDBObj()))
+      if (auto bp = dynamic_cast<BeamParameters*>(this->getDBObj()))
         return bp->getVertex()[param - 1];
 
+      B2ERROR("Could not get value for BeamParameters");
       return 0.;
     }
     /// Set global parameter of the DB object by its element and parameter number
     template <>
     void GlobalParamSet<BeamParameters>::setGlobalParam(double value, unsigned short element, unsigned short param)
     {
+      this->ensureConstructed();
       if (element != 0 or param > 3) {
         B2ERROR("Invalid global BeamParameters id");
         return;
       }
-      if (auto bp = dynamic_cast<BeamParameters*>(GlobalParamSet<BeamParameters>::getDBObj())) {
+      if (auto bp = dynamic_cast<BeamParameters*>(this->getDBObj())) {
         TVector3 vertex = bp->getVertex();
         vertex[param - 1] = value;
         bp->setVertex(vertex);
+      } else {
+        B2ERROR("Could not set value for BeamParameters");
       }
+
     }
     /// List global parameters in this DB object
     template <>

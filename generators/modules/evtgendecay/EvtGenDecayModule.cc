@@ -70,6 +70,10 @@ void EvtGenDecayModule::event()
 {
   int i, n;
   bool decay;
+  const MCParticle* mother;
+  MCParticleGraph::GraphParticle* graphParticle;
+  std::map<MCParticle*, MCParticleGraph::GraphParticle*> particleMap;
+  std::map<MCParticle*, MCParticleGraph::GraphParticle*>::iterator it;
   StoreArray<MCParticle> mcParticles(m_MCParticleColName);
   if (m_BeamParameters.hasChanged()) {
     if (!m_Initialized) {
@@ -90,10 +94,21 @@ void EvtGenDecayModule::event()
     else if (m_DecayableParticles.find(mcParticles[i]->getPDG()) ==
              m_DecayableParticles.end())
       decay = false;
-    MCParticleGraph::GraphParticle& graphParticle = m_Graph.addParticle();
-    graphParticle = *mcParticles[i];
+    graphParticle = &m_Graph.addParticle();
+    *graphParticle = *mcParticles[i];
+    particleMap.insert(std::pair<MCParticle*, MCParticleGraph::GraphParticle*>(
+                         &(*mcParticles[i]), graphParticle));
+    mother = mcParticles[i]->getMother();
+    if (mother != NULL) {
+      it = particleMap.find((MCParticle*)mother);
+      if (it == particleMap.end())
+        B2FATAL("MCParticle collection \"" << m_MCParticleColName <<
+                "\" not sorted correctly: mother index larger than daughter. "
+                "Cannot load into Graph");
+      graphParticle->comesFrom(*(it->second));
+    }
     if (decay)
-      m_EvtGenInterface.simulateDecay(m_Graph, graphParticle);
+      m_EvtGenInterface.simulateDecay(m_Graph, *graphParticle);
   }
   m_Graph.generateList(
     m_MCParticleColName,

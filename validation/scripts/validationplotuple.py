@@ -260,6 +260,9 @@ class Plotuple:
                 canvas.SetFillColor(ROOT.kOrange)
             else:
                 self.comparison_result = "equal"
+                # use light green to show that the plot was compared and
+                # that the result was equal
+                canvas.SetFillColor(ROOT.kGreen - 3)
 
             self.chi2test_result = ('Performed Chi^2-Test between '
                                     'reference and {} (Chi^2 = {} NDF = {} Chi^2/NDF = {})'

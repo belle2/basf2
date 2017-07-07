@@ -71,7 +71,6 @@ namespace Belle2 {
     bool m_isSelfConjugatedParticle; /**< flag that indicates whether an anti-particle mother does not exist and should not be reconstructed as well*/
 
     std::string m_cutParameter;  /**< selection criteria */
-    std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
 
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
 

@@ -75,7 +75,10 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
   }
 
   // Setup Parent Particle in rest frame
-  m_ParentParticle = EvtPDL::getId(parentParticle);
+  if (parentParticle != "") {
+    m_ParentInitialized = true;
+    m_ParentParticle = EvtPDL::getId(parentParticle);
+  }
   initLogCapture.finish();
 
   B2INFO("End initialisation of EvtGen Interface.");
@@ -87,6 +90,8 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
 int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle, TVector3 pPrimaryVertex,
                                    int inclusiveType, const std::string& inclusiveParticle)
 {
+  if (!m_ParentInitialized)
+    B2FATAL("Parent particle is not initialized.");
   //Init evtgen
   m_pinit.set(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
 

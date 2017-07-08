@@ -115,8 +115,8 @@ public:
     std::string filedir = dir + StringUtil::form("%02d/storage/%4.4d/%5.5d/",
                                                  m_diskid, expno, runno);
     system(("mkdir -p " + filedir).c_str());
-    m_filename = StringUtil::form("%s.%s.%4.4d.%5.5d.f%5.5d.sroot", m_host.c_str(),
-                                  m_runtype.c_str(), expno, runno, m_fileid);
+    m_filename = StringUtil::form("%s.%4.4d.%5.5d.%s.f%5.5d.sroot",
+                                  m_runtype.c_str(), expno, runno, m_host.c_str(), m_fileid);
     m_path = filedir + m_filename;
     m_file = ::open(m_path.c_str(),  O_WRONLY | O_CREAT | O_EXCL, 0664);
     if (m_file < 0) {

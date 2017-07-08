@@ -144,6 +144,8 @@ void CDCCosmicSelectorAfterFullSimModule::event()
       for (const RelationElement& rel : mcp_to_hit.getElementsTo(simHits[iHit])) {
         //  std::cout <<"iHit,iMCP,rfromindex= " << iHit <<" "<< iMCP <<" "<< rel.from->getIndex()-1 << std::endl;
         if ((rel.from->getIndex() - 1) != iMCP) continue;
+        //  std::cout << "weight,pdginsimhit= " << rel.weight <<" "<< simHits[iHit]->getPDGCode() << std::endl;
+        if (rel.weight < 0.) continue;  //reject 2ndary particle
         const double y = simHits[iHit]->getPosTrack().Y();
         const double tof = simHits[iHit]->getFlightTime();
         const double py = simHits[iHit]->getMomentum().Y();

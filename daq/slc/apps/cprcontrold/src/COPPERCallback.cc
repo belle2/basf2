@@ -205,7 +205,7 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       add(new NSMVHandlerText(vname + "staths", true, false, ""));
       add(new NSMVHandlerInt(vname + "b2lerr", true, false, 0));
       if (m_fee[i] && o_hslb.getBool("used")) {
-        const DBObject& o_fee(m_o_fee[i]);
+        //const DBObject& o_fee(m_o_fee[i]);
         //m_fee[i]->readback(*this, hslb, o_fee);
         add(new NSMVHandlerText(vname + "name", true, false, m_fee[i]->getName()));
         vname = StringUtil::form("fee[%d].", i);

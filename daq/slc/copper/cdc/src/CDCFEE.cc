@@ -53,10 +53,6 @@ void CDCFEE::boot(RCCallback& callback, HSLB& hslb,  const DBObject& obj)
     LogFile::debug("CDC FEE firmware not exists : %s", firmware.c_str());
   }
   */
-  int err = 0;
-  if ((err = hslb.test()) > 0) {
-    LogFile::error("Test HSLB failed");
-  }
 }
 
 void CDCFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)

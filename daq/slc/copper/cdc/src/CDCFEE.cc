@@ -12,7 +12,7 @@
 
 using namespace Belle2;
 
-CDCFEE::CDCFEE()
+CDCFEE::CDCFEE() : FEE("cdc")
 {
 }
 

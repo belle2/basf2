@@ -57,12 +57,16 @@ void NsmbridgeCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
   if (s.size() < 2) {
     NSMMessage& msg(com.getMessage());
     std::string vname = StringUtil::form("%s@", msg.getNodeName()) + var.getName();
+    NSMVar var_out;
+    var_out = var;
+    var_out.setNode(getNode().getName());
+    var_out.setName(vname);
     for (std::map<std::string, NodeVlist>::iterator it = m_vlists.begin();
          it != m_vlists.end(); it++) {
       NSMNode node(it->first);
       NodeVlist& list(it->second);
       if (list.find(vname) != list.end()) {
-        NSMCommunicator::send(NSMMessage(node, var));
+        NSMCommunicator::send(NSMMessage(node, var_out));
       }
     }
   } else {
@@ -72,6 +76,7 @@ void NsmbridgeCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
     NSMNode node(s[0]);
     std::string name = s[1];
     NSMVar var_out = var;
+    var_out.setNode(node.getName());
     var_out.setName(name);
     if (m_vlists.find(nodename) == m_vlists.end()) {
       m_vlists.insert(std::pair<std::string, NodeVlist>(nodename, NodeVlist()));
@@ -83,6 +88,6 @@ void NsmbridgeCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
     if (m_vars.find(vname) != m_vars.end()) {
       m_vars.insert(std::pair<std::string, NSMVar>(vname, var_out));
     }
-    NSMCommunicator::send(NSMMessage(node, var));
+    NSMCommunicator::send(NSMMessage(node, var_out));
   }
 }

@@ -39,11 +39,12 @@ StringList SockmemCallback::popen(const std::string& cmd)
 {
   char buf[10000];
   FILE* fp;
-  if ((fp = ::popen(cmd.c_str(), "r")) == NULL) {
-    perror("can not exec commad");
-    exit(EXIT_FAILURE);
-  }
   StringList ss;
+  if ((fp = ::popen(cmd.c_str(), "r")) == NULL) {
+    LogFile::error("can not exec commad");
+    return ss;
+    //exit(EXIT_FAILURE);
+  }
   while (!feof(fp)) {
     memset(buf, 0, 1000);
     fgets(buf, sizeof(buf), fp);
@@ -106,6 +107,7 @@ void SockmemCallback::timeout(NSMCommunicator&) throw()
   }
   double t = Time().get();
   StringList lines = popen("/usr/sbin/ss -ntr4i");
+  if (lines.size() == 0) return;
   for (size_t i = 1; i < lines.size(); i++) {
     {
       std::stringstream ss;

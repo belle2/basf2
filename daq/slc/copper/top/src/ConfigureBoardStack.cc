@@ -771,9 +771,11 @@ namespace ConfigBoardstack {
     string vname = StringUtil::form("top[%d].", scrod);
     callback.add(new NSMVHandlerInt(vname + "configured", true, false, 0));
     unsigned connectedCarriers = GetNumberOfCarriers(scrod);
+    LogFile::debug("%s:%d %u", __FILE__, __LINE__, connectedCarriers);
     for (unsigned carrier = 0; carrier < connectedCarriers; ++carrier) {
       InitCarrierCallbacks(hslb, callback, carrier);
     }
+    LogFile::debug("%s:%d", __FILE__, __LINE__);
   }
 
   void InitCarrierCallbacks(Belle2::HSLB& hslb, Belle2::RCCallback& callback, const unsigned carrier)
@@ -781,9 +783,11 @@ namespace ConfigBoardstack {
     int scrod = hslb.get_finid();
     string vname = StringUtil::form("top[%d].carrier[%d].", scrod, carrier);
     callback.add(new NSMVHandlerInt(vname + "configured", true, false, 0));
+    //LogFile::debug("%s:%d", __FILE__, __LINE__);
     for (unsigned asic = 0; asic < 4; ++asic) {
       InitASICCallbacks(hslb, callback, carrier, asic);
     }
+    //LogFile::debug("%s:%d", __FILE__, __LINE__);
   }
 
   void InitASICCallbacks(Belle2::HSLB& hslb, Belle2::RCCallback& callback, const unsigned carrier,
@@ -791,8 +795,10 @@ namespace ConfigBoardstack {
   {
     int scrod = hslb.get_finid();
     string vname = StringUtil::form("top[%d].carrier[%d].asic[%d].", scrod, carrier, asic);
+    //LogFile::debug("%s:%d", __FILE__, __LINE__);
     callback.add(new NSMVHandlerInt(vname + "configured", true, false, 0));
     callback.add(new NSMVHandlerInt(vname + "lockedDLL", true, false, 0));
+    //LogFile::debug("%s:%d", __FILE__, __LINE__);
   }
 
 }

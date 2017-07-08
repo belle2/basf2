@@ -206,7 +206,7 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       add(new NSMVHandlerInt(vname + "b2lerr", true, false, 0));
       if (m_fee[i] && o_hslb.getBool("used")) {
         const DBObject& o_fee(m_o_fee[i]);
-        m_fee[i]->readback(*this, hslb, o_fee);
+        //m_fee[i]->readback(*this, hslb, o_fee);
         add(new NSMVHandlerText(vname + "name", true, false, m_fee[i]->getName()));
         vname = StringUtil::form("fee[%d].", i);
         add(new NSMVHandlerFEEBoot(*this, vname + "boot", i, ""));
@@ -268,6 +268,7 @@ void COPPERCallback::boot(const std::string& opt, const DBObject& obj) throw(RCH
   for (int i = 0; i < 4; i++) {
     const DBObject& o_hslb(obj("hslb", i));
     if (!m_fee[i] || !o_hslb.getBool("used")) continue;
+    if (m_fee[i]->getName() == "dummy") continue;
     HSLB& hslb(m_hslb[i]);
     firmware = o_hslb.getText("firm");
     if (opt.find("hslb") != std::string::npos) {
@@ -301,6 +302,7 @@ void COPPERCallback::boot(const std::string& opt, const DBObject& obj) throw(RCH
   try {
     for (int i = 0; i < 4; i++) {
       if (!m_fee[i]) continue;
+      if (m_fee[i]->getName() == "dummy") continue;
       const DBObject& o_hslb(obj("hslb", i));
       if (o_hslb.getBool("used") && obj.hasObject("fee")) {
         const DBObject& o_fee(m_o_fee[i]);
@@ -359,6 +361,7 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
       HSLB& hslb(m_hslb[i]);
       hslb.open(i);
       if (!m_fee[i]) continue;
+      if (m_fee[i]->getName() == "dummy") continue;
       if (!obj.hasObject("fee")) continue;
       std::string vname = StringUtil::form("hslb[%d]", i);
       int count = 0;
@@ -518,6 +521,7 @@ void COPPERCallback::monitor() throw(RCHandlerException)
     set("copper.ffull", m_copper.isFifoFull());
     for (int i = 0; i < 4; i++) {
       if (!m_fee[i]) continue;
+      if (m_fee[i]->getName() == "dummy") continue;
       int used = 0;
       get(StringUtil::form("hslb[%d].used", i), used);
       if (used) {

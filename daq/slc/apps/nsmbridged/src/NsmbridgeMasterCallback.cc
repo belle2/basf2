@@ -10,7 +10,6 @@ using namespace Belle2;
 NsmbridgeMasterCallback::NsmbridgeMasterCallback(NsmbridgeCallback* callback)
 {
   m_callback = callback;
-  LogFile::debug(callback->getNode().getName());
   setNode(callback->getNode());
   callback->setCallback(this);
 }

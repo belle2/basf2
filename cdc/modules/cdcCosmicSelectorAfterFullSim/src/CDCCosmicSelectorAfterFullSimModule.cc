@@ -28,7 +28,7 @@ REG_MODULE(CDCCosmicSelectorAfterFullSim)
 CDCCosmicSelectorAfterFullSimModule::CDCCosmicSelectorAfterFullSimModule() : Module()
 {
   // Set description
-  setDescription("Modify CDCSimHits and MCParticles for cosmics so that the global time to (approximately) zero at y=0 using FullSim output. And select cosmics passing through the user-specified region at y=0.");
+  setDescription("Modify CDCSimHits and MCParticles for cosmics so that the global time to (approximately) zero at y=0 using FullSim output (=CDCSimHits). And select cosmics passing through a user-specified region at y=0. This module works only for the event with the no. of primary charged MC particles=1. Please place this module after FullSim and before CDCDigitizer.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("xOfRegion", m_xOfRegion, "x of center position of region at y=0 (cm)", 0.);
@@ -55,8 +55,8 @@ void CDCCosmicSelectorAfterFullSimModule::event()
 
   bool returnVal = false;
 
-  const double mass = 0.1056583715; //muon mass (GeV)
   const double c = 29.9792458; //light speed (cm/ns)
+  double mass = 0.1056583715;
 
   int nHits = simHits.getEntries();
   if (nHits == 0) {
@@ -66,7 +66,6 @@ void CDCCosmicSelectorAfterFullSimModule::event()
     return;
   }
 
-  // Loop over all particles
   int nMCPs = mcParticles.getEntries();
   if (nMCPs == 0) {
     B2ERROR("No. of MCParticles=0 in the current event.");
@@ -74,13 +73,35 @@ void CDCCosmicSelectorAfterFullSimModule::event()
     return;
   }
 
+  // Loop over prim. charged MC particle
+  unsigned nPrimChgds = 0;
   for (int iMCP = 0; iMCP < nMCPs; ++iMCP) {
     MCParticle* m_P = mcParticles[iMCP];
-    if (abs(m_P->getPDG()) != 13) {
-      B2WARNING("Does nothing for non-muon !");
+
+    //    B2INFO("isPrimaryParticle= " << m_P->isPrimaryParticle());
+    if (!m_P->isPrimaryParticle()) continue;
+
+    unsigned pid = abs(m_P->getPDG());
+    if (pid ==   13) {
+      ++nPrimChgds;
+    } else if (pid ==   11) {
+      ++nPrimChgds;
+      mass = 0.000510998928;
+    } else if (pid ==  211) {
+      ++nPrimChgds;
+      mass = 0.13957018;
+    } else if (pid ==  321) {
+      ++nPrimChgds;
+      mass = 0.493677;
+    } else if (pid == 2212) {
+      ++nPrimChgds;
+      mass = 0.938272046;
+    } else {
       continue;
     }
 
+    //    B2INFO("No .of prim. charged MC particles= " << nPrimChgds);
+    if (nPrimChgds > 1) continue;
     /*
     const TVector3 vertex = m_P->getProductionVertex();
     const double vX0 = vertex.X();
@@ -139,14 +160,13 @@ void CDCCosmicSelectorAfterFullSimModule::event()
     }
 
     //calculate flight time from y_up to y=0 plane (linear approx.)
-    //    std::cout <<"ihit_up= " << ihit_up << std::endl;
-    //    std::cout <<"ihit_dn= " << ihit_dn << std::endl;
+    //    std::cout <<"ihit_up,dn= " << ihit_up <<" "<< ihit_dn << std::endl;
     if (ihit_up < 0 || ihit_dn < 0) continue;
     const TVector3 pos_up = simHits[ihit_up]->getPosTrack();
     const TVector3 pos_dn = simHits[ihit_dn]->getPosTrack();
     const TVector3 mom_up = simHits[ihit_up]->getMomentum();
     const TVector3 mom_dn = simHits[ihit_dn]->getMomentum();
-    //    std::cout <<"tof_up,tof_dn= " << tof_up <<" "<< tof_dn << std::endl;
+    //    std::cout <<"tof_up,dn= " << tof_up <<" "<< tof_dn << std::endl;
 
     const TVector3 mom_mean = 0.5 * (mom_up + mom_dn);
     const TVector3 dpos = pos_dn - pos_up;
@@ -169,8 +189,7 @@ void CDCCosmicSelectorAfterFullSimModule::event()
 
     bool hitRegion = (fabs(xi - m_xOfRegion) < 0.5 * m_wOfRegion && fabs(zi - m_zOfRegion) <  0.5 * m_lOfRegion) ? true : false;
 
-    //    std::cout <<"xi= " << xi << std::endl;
-    //    std::cout <<"zi= " << zi << std::endl;
+    //    std::cout <<"xi,zi= " << xi <<" "<< zi << std::endl;
 
     if (hitRegion) {
       returnVal = true;

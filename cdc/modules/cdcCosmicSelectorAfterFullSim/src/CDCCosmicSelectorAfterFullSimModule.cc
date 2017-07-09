@@ -33,8 +33,8 @@ CDCCosmicSelectorAfterFullSimModule::CDCCosmicSelectorAfterFullSimModule() : Mod
 
   addParam("xOfRegion", m_xOfRegion, "x of center position of region at y=0 (cm)", 0.);
   addParam("zOfRegion", m_zOfRegion, "z of center position of region at y=0 (cm)", 0.);
-  addParam("wOfRegion", m_wOfRegion, "full-width  of region at y=0 (cm)",  10.);
-  addParam("lOfRegion", m_lOfRegion, "full-length of region at y=0 (cm)", 100.);
+  addParam("wOfRegion", m_wOfRegion, "full-width  (x-direction) of region at y=0 (cm)",  10.);
+  addParam("lOfRegion", m_lOfRegion, "full-length (z-direction) of region at y=0 (cm)", 100.);
 }
 
 void CDCCosmicSelectorAfterFullSimModule::initialize()
@@ -55,12 +55,12 @@ void CDCCosmicSelectorAfterFullSimModule::event()
 
   bool returnVal = false;
 
-  const double c = 29.9792458; //light speed (cm/ns)
-  double mass = 0.1056583715;
+  //  const double c = 29.9792458; //light speed (cm/ns)
+  //  double mass = 0.1056583715;
 
   int nHits = simHits.getEntries();
-  if (nHits == 0) {
-    B2DEBUG(250, "No .of CDCSimHits=0 in the current event.");
+  if (nHits <= 1) {
+    B2DEBUG(250, "No .of CDCSimHits <= 1 in the current event.");
     //    B2WARNING("No .of CDCSimHits=0 in the current event= " << nHits);
     setReturnValue(returnVal);
     return;
@@ -86,16 +86,16 @@ void CDCCosmicSelectorAfterFullSimModule::event()
       ++nPrimChgds;
     } else if (pid ==   11) {
       ++nPrimChgds;
-      mass = 0.000510998928;
+      //      mass = 0.000510998928;
     } else if (pid ==  211) {
       ++nPrimChgds;
-      mass = 0.13957018;
+      //      mass = 0.13957018;
     } else if (pid ==  321) {
       ++nPrimChgds;
-      mass = 0.493677;
+      //      mass = 0.493677;
     } else if (pid == 2212) {
       ++nPrimChgds;
-      mass = 0.938272046;
+      //      mass = 0.938272046;
     } else {
       continue;
     }
@@ -140,24 +140,54 @@ void CDCCosmicSelectorAfterFullSimModule::event()
     typedef RelationIndex<MCParticle, CDCSimHit>::Element RelationElement;
     //    std::cout <<" "<< std::endl;
 
+    unsigned ntry = 0;
+    double   yold    = 0.;
+    double   tofold  = 0.;
+    unsigned iHitold = 0 ;
+    bool crossfind = false;
+
     for (int iHit = 0; iHit < nHits; ++iHit) {
+      if (crossfind) break;
       for (const RelationElement& rel : mcp_to_hit.getElementsTo(simHits[iHit])) {
         //  std::cout <<"iHit,iMCP,rfromindex= " << iHit <<" "<< iMCP <<" "<< rel.from->getIndex()-1 << std::endl;
         if ((rel.from->getIndex() - 1) != iMCP) continue;
         //  std::cout << "weight,pdginsimhit= " << rel.weight <<" "<< simHits[iHit]->getPDGCode() << std::endl;
         if (rel.weight < 0.) continue;  //reject 2ndary particle
-        const double y = simHits[iHit]->getPosTrack().Y();
+        const double y   = simHits[iHit]->getPosTrack().Y();
         const double tof = simHits[iHit]->getFlightTime();
-        const double py = simHits[iHit]->getMomentum().Y();
-        //  std::cout <<"y= " << y << std::endl;
-        if (y > 0. && py < 0. && tof > tof_up) {
-          tof_up = tof;
-          ihit_up = iHit;
+        //        const double py  = simHits[iHit]->getMomentum().Y();
+
+        ++ntry;
+
+        if (ntry == 1) {
+          yold    = y;
+          tofold  = tof;
+          iHitold = iHit;
+        } else {
+          //    std::cout <<"yold,y= " << yold<<" "<< y << std::endl;
+          if (y * yold >= 0.) {
+            yold    = y;
+            tofold  = tof;
+            iHitold = iHit;
+          } else {
+            tof_up = tofold;
+            ihit_up = iHitold;
+            tof_dn = tof;
+            ihit_dn = iHit;
+            crossfind = true;
+            break;
+          }
         }
-        if (y < 0. && py < 0. && tof < tof_dn) {
-          tof_dn = tof;
-          ihit_dn = iHit;
-        }
+        /*
+          if (y > 0. && py < 0. && tof > tof_up) {
+                tof_up = tof;
+                ihit_up = iHit;
+          }
+          if (y < 0. && py < 0. && tof < tof_dn) {
+                tof_dn = tof;
+                ihit_dn = iHit;
+          }
+        */
       }
     }
 
@@ -168,23 +198,32 @@ void CDCCosmicSelectorAfterFullSimModule::event()
     const TVector3 pos_dn = simHits[ihit_dn]->getPosTrack();
     const TVector3 mom_up = simHits[ihit_up]->getMomentum();
     const TVector3 mom_dn = simHits[ihit_dn]->getMomentum();
+    if (tof_up > tof_dn) B2WARNING("tof_up > tof_dn " << tof_up << " " << tof_dn);
     //    std::cout <<"tof_up,dn= " << tof_up <<" "<< tof_dn << std::endl;
 
-    const TVector3 mom_mean = 0.5 * (mom_up + mom_dn);
+    //    const TVector3 mom_mean = 0.5 * (mom_up + mom_dn);
     const TVector3 dpos = pos_dn - pos_up;
-    const double cx = dpos.X() / dpos.Mag();
-    const double cy = dpos.Y() / dpos.Mag();
-    const double cz = dpos.Z() / dpos.Mag();
-    const double vx = pos_up.X();
-    const double vy = pos_up.Y();
-    const double vz = pos_up.Z();
+    double cx = dpos.X() / dpos.Mag();
+    double cy = dpos.Y() / dpos.Mag();
+    double cz = dpos.Z() / dpos.Mag();
+    double vx = pos_up.X();
+    double vy = pos_up.Y();
+    double vz = pos_up.Z();
+    if (tof_up > tof_dn) {
+      cx *= -1.;
+      cy *= -1.;
+      cz *= -1.;
+      vx = pos_dn.X();
+      vy = pos_dn.Y();
+      vz = pos_dn.Z();
+    }
 
     const double yi = 0.;
     double xi = 0.;
     double zi = 0.;
     if (cy != 0.) {
-      xi = (0. - vy) * (cx / cy) + vx;
-      zi = (0. - vy) * (cz / cy) + vz;
+      xi = (yi - vy) * (cx / cy) + vx;
+      zi = (yi - vy) * (cz / cy) + vz;
     } else {
       zi = -vx * (cz / cx) + vz;
     }
@@ -197,28 +236,32 @@ void CDCCosmicSelectorAfterFullSimModule::event()
       returnVal = true;
       double fl = (xi - vx) * (xi - vx) + (yi - vy) * (yi - vy) + (zi - vz) * (zi - vz);
       fl = sqrt(fl);
-      const double beta_mean = mom_mean.Mag() / sqrt(mom_mean.Mag2() + mass * mass);
-      const double tofToxyPlane = fl / (c * beta_mean);
+      //      const double beta_mean = mom_mean.Mag() / sqrt(mom_mean.Mag2() + mass * mass);
+      //      const double tofToxyPlane = fl / (c * beta_mean);
 
-      if ((tof_up + tofToxyPlane) > tof_dn) {
-        B2WARNING("TOF corr. stragne: " << tof_up << " " << tof_dn << " " << tofToxyPlane);
-        continue;
-      }
+      //      if ((tof_up + tofToxyPlane) > tof_dn) {
+      //        B2WARNING("TOF corr. stragne: " << tof_up << " " << tof_dn << " " << tofToxyPlane);
+      //      continue;
+      //      }
 
       //      const double deltaT4cry = fl4cry / (c * beta);
       //      double deltaT = tof_up + deltaT4cry + tofToxyPlane;
-      const double dT = tof_up + tofToxyPlane;
+      //      const double dT = tof_up + tofToxyPlane;
+      double               dT = tof_up + (tof_dn - tof_up) * fl / dpos.Mag();
+      if (tof_up > tof_dn) dT = tof_dn + (tof_up - tof_dn) * fl / dpos.Mag();
+
+      //      const double dT = tof_up + (tof_dn - tof_up) * fl / dpos.Mag();
       //      std::cout <<"deltaT4cry,tof_up,tofToxyPlane,corrt= "<< deltaT4cry <<" "<< tof_up <<" "<< tofToxyPlane <<" "<< deltaT4cry - deltaT << std::endl;
       const double pTime = m_P->getProductionTime();
       m_P->setProductionTime(pTime - dT);
 
       for (int iHit = 0; iHit < nHits; ++iHit) {
-        for (const RelationElement& rel : mcp_to_hit.getElementsTo(simHits[iHit])) {
-          if ((rel.from->getIndex() - 1) != iMCP) continue;
-          const double oldtof = simHits[iHit]->getFlightTime();
-          simHits[iHit]->setFlightTime(oldtof - dT);
-          simHits[iHit]->setGlobalTime(oldtof - dT);
-        }
+        //  for (const RelationElement& rel : mcp_to_hit.getElementsTo(simHits[iHit])) {
+        //        if ((rel.from->getIndex() - 1) != iMCP) continue;
+        const double oldgtime = simHits[iHit]->getGlobalTime();
+        simHits[iHit]->setFlightTime(oldgtime - dT);
+        simHits[iHit]->setGlobalTime(oldgtime - dT);
+        //        }
       }
     } //end of hitRegion
   } //end of mcp loop

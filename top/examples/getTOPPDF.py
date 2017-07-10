@@ -53,6 +53,23 @@ particlegun.param('pdgCodes', [13])  # , -211, 321, -321])
 particlegun.param('nTracks', 1)
 particlegun.param('varyNTracks', False)
 
+'''
+# from left to right
+particlegun.param('momentumGeneration', 'uniform')
+particlegun.param('momentumParams', [2, 2])
+particlegun.param('thetaGeneration', 'uniformCos')
+#particlegun.param('thetaParams', [-80, -80])
+particlegun.param('thetaParams', [-70, -70])
+particlegun.param('phiGeneration', 'uniform')
+#particlegun.param('phiParams', [9,9])
+particlegun.param('phiParams', [8,8])
+particlegun.param('vertexGeneration', 'fixed')
+particlegun.param('xVertexParams', [-130])
+particlegun.param('yVertexParams', [-25])
+particlegun.param('zVertexParams', [0])
+'''
+
+# from above downwards at some angle
 particlegun.param('momentumGeneration', 'uniform')
 particlegun.param('momentumParams', [2, 2])
 particlegun.param('thetaGeneration', 'uniformCos')
@@ -65,6 +82,7 @@ particlegun.param('yVertexParams', [136.5])
 particlegun.param('zVertexParams', [0])
 
 '''
+# from the IP up and at 45 degrees
 particlegun.param('momentumGeneration', 'uniform')
 particlegun.param('momentumParams', [2, 2])
 particlegun.param('thetaGeneration', 'uniformCos')

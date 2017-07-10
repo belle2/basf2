@@ -31,7 +31,7 @@ def PDF(listOfGaussians, x):
     return sum(g(x) for g in listOfGaussians)
 
 if __name__ == "__main__":
-    f = ROOT.TFile.Open("TOPOutput_InwardMuon4.root")
+    f = ROOT.TFile.Open("TOPOutput.root")
     t = f.Get("tree")
     gcmap = 'plasma'  # color map
 

@@ -36,17 +36,23 @@ for i in range(t.GetEntries()):
 
     digits = t.TOPDigits
     for d in digits:
-        # print(d.getModuleID())
-        ch.append(d.getPixelID())  # actually the same as pdf channel
-        times.append(d.getTime())
+        # if d.getHitQuality() == 1: # c_Good == 1
+        print(d.getModuleID(), d.getHitQuality())
+        if (d.getModuleID() == 4):
+            ch.append(d.getPixelID())  # actually the same as pdf channel
+            times.append(d.getTime())
 
 # get array as return from histpgram function
-(hits, xs, ys, _) = plt.hist2d(ch, times, bins=(512, 200), cmap=gcmap)
+xbins = np.linspace(0, 512, 513)
+ybins = np.linspace(0, 1.1 * max(times), 201)
+(hits, xs, ys, _) = plt.hist2d(ch, times, bins=(xbins, ybins), cmap=gcmap)
 
 # for some reason this needs to be transposed to be compatible with meshgrids
 hits = hits.T
-xcentres = xs[1:] - 0.5 * (xs[1] - xs[0])
-ycentres = ys[1:] - 0.5 * (ys[1] - ys[0])
+xcentres = xs[0:-1] + 0.5 * (xs[1:] - xs[:-1])
+ycentres = ys[0:-1] + 0.5 * (ys[1:] - ys[:-1])
+# xcentres = xs[1:] - 0.5 * (xs[1] - xs[0])
+# ycentres = ys[1:] - 0.5 * (ys[1] - ys[0])
 
 # make the pdf from the first datum (FIXME: make this be truth momentum)
 t.GetEntry(0)
@@ -78,6 +84,7 @@ if args.debug:
     plt.colorbar()
     plt.savefig('debug_pdf.pdf')
     plt.clf()
+    input()
 
 
 # as occupancy of hitmap may be zero, add machine level epsilon to take sqrt

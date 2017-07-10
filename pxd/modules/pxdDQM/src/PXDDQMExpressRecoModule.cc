@@ -25,7 +25,6 @@
 
 #include <vxd/geometry/SensorInfoBase.h>
 
-//#include <set>
 #include <boost/format.hpp>
 
 #include "TVector3.h"
@@ -33,9 +32,7 @@
 #include "TFile.h"
 #include "TVectorD.h"
 #include "TF1.h"
-#include "TRandom3.h"
 
-using namespace std;
 using namespace std;
 using boost::format;
 using namespace Belle2;
@@ -58,7 +55,7 @@ PXDDQMExpressRecoModule::PXDDQMExpressRecoModule() : HistoModule()
   addParam("CutPXDCharge", m_CutPXDCharge,
            "cut for accepting to hitmap histogram, using strips only, default = 0.0 ", m_CutPXDCharge);
   addParam("ReferenceHistosFileName", m_RefHistFileName,
-           "Name of file contain reference histograms, default=PXD-ReferenceHistos", m_RefHistFileName);
+           "Name of file contain reference histograms, default=vxd/data/VXD-DQMReferenceHistos.root", m_RefHistFileName);
 
 }
 
@@ -379,7 +376,7 @@ void PXDDQMExpressRecoModule::event()
   }
 
   vector< set<int> > counts(c_nPXDSensors);
-  // Hitmaps, Charge, Seed, Size, Time, ...
+  // Hitmaps, Charge, Seed, Size, ...
   for (const PXDCluster& cluster : storePXDClusters) {
     int iLayer = cluster.getSensorID().getLayerNumber();
     if ((iLayer < c_firstPXDLayer) || (iLayer > c_lastPXDLayer)) continue;

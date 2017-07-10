@@ -491,6 +491,25 @@ void SVDDQMExpressRecoModule::endRun()
   TH1F** r_clusterTimeU = new TH1F*[c_nSVDSensors];
   TH1F** r_clusterTimeV = new TH1F*[c_nSVDSensors];
 
+  r_hitMapCountsU = NULL;
+  r_hitMapCountsV = NULL;
+  r_hitMapClCountsU = NULL;
+  r_hitMapClCountsV = NULL;
+  for (int i = 0; i < c_nSVDSensors; i++) {
+    r_firedU[i] = NULL;
+    r_firedV[i] = NULL;
+    r_clustersU[i] = NULL;
+    r_clustersV[i] = NULL;
+    r_clusterChargeU[i] = NULL;
+    r_clusterChargeV[i] = NULL;
+    r_stripSignalU[i] = NULL;
+    r_stripSignalV[i] = NULL;
+    r_clusterSizeU[i] = NULL;
+    r_clusterSizeV[i] = NULL;
+    r_clusterTimeU[i] = NULL;
+    r_clusterTimeV[i] = NULL;
+  }
+
   if (m_NotUseDB == 1) {
     TFile* f_RefHistFile = new TFile(m_RefHistFileName.c_str(), "read");
     if (f_RefHistFile->IsOpen()) {

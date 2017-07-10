@@ -52,7 +52,6 @@ PXDBackgroundModule::PXDBackgroundModule() :
   m_nfluxReportingLevel(c_reportNTuple),
   m_occupancyReportingLevel(c_reportNTuple),
   m_componentName(""), m_componentTime(0),
-  m_triggerWidth(5), m_acceptanceWidth(2.5), // keeps 99%
   m_nielNeutrons(new TNiel(c_niel_neutronFile)),
   m_nielProtons(new TNiel(c_niel_protonFile)),
   m_nielPions(new TNiel(c_niel_pionFile)),
@@ -64,9 +63,6 @@ PXDBackgroundModule::PXDBackgroundModule() :
   // FIXME: This information can in principle be extracted from bg files, though not trivially.
   addParam("componentName", m_componentName, "Background component name to process", m_componentName);
   addParam("componentTime", m_componentTime, "Background component time", m_componentTime);
-  addParam("triggerWidth", m_triggerWidth, "RMS of trigger time estimate in ns", m_triggerWidth);
-  addParam("acceptanceWidth", m_acceptanceWidth,
-           "A hit is accepted if arrived within +/- accpetanceWidth * RMS(hit time - trigger time) of trigger; in ns", m_acceptanceWidth);
   addParam("doseReportingLevel", m_doseReportingLevel, "0 - no data, 1 - summary only, 2 - summary + ntuple", m_doseReportingLevel);
   addParam("nfluxReportingLevel", m_nfluxReportingLevel, "0 - no data, 1 - summary only, 2 - summary + ntuple",
            m_nfluxReportingLevel);
@@ -136,8 +132,6 @@ void PXDBackgroundModule::initialize()
   m_storeNeutronFluxesName = storeNeutronFluxes.getName();
 
   m_componentTime *= Unit::us;
-  m_acceptanceWidth *= Unit::ns;
-  m_triggerWidth *= Unit::ns;
 }
 
 void PXDBackgroundModule::beginRun()

@@ -85,38 +85,29 @@ namespace Belle2 {
      */
     void set(EKLMElementID element, int parameter, double value);
 
-    // ------------- Interface to global Millepede calibration ----------------
-    /// Get global unique id
-    static unsigned short getGlobalUniqueID() {return 40;}
-    /// Get global parameter
-    double getGlobalParam(unsigned short element, unsigned short param)
-    {
+    /* Interface to global Millepede calibration. */
 
-      auto adata = getSectorAlignment(element);
-      if (!adata)
-        return 0.;
-      if (param == 1) return adata->getDx();
-      if (param == 2) return adata->getDy();
-      if (param == 6) return adata->getDalpha();
+    /**
+     * Get global unique identifier.
+     * @return Global unique identifier.
+     */
+    static unsigned short getGlobalUniqueID() { return 40; }
 
-      return 0.;
-    }
-    /// Set global parameter
-    void setGlobalParam(double value, unsigned short element, unsigned short param)
-    {
+    /**
+     * Get global parameter.
+     * @return Global parameter value.
+     */
+    double getGlobalParam(unsigned short element, unsigned short param);
 
-      auto adata = getSectorAlignment(element);
-      if (!adata)
-        return;
-      if (param == 1) adata->setDx(value);
-      if (param == 2) adata->setDy(value);
-      if (param == 6) adata->setDalpha(value);
-
-    }
-    /// TODO: list stored global parameters
-    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()
-    {return {};}
-    // ------------------------------------------------------------------------
+    /**
+     * Set global parameter.
+     */
+    void setGlobalParam(double value, unsigned short element,
+                        unsigned short param);
+    /**
+     * Get a list of stored global parameters.
+     */
+    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams();
 
   private:
 

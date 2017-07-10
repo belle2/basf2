@@ -208,6 +208,9 @@ namespace Belle2 {
     /** show CDCHits directly. */
     void addCDCHit(const CDCHit* hit, bool showTriggerHits = false);
 
+    /** show outline of track segments. */
+    void addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit);
+
     /** Add TOPDigits (shown aggregated per module). */
     void addTOPDigits(const StoreArray<TOPDigit>& digits);
 

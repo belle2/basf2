@@ -1516,6 +1516,79 @@ void EVEVisualization::addCDCHit(const CDCHit* hit, bool showTriggerHits)
   }
 }
 
+void EVEVisualization::addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit)
+{
+  static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
+  TEveStraightLineSet* shape = new TEveStraightLineSet();
+
+  // get center wire
+  unsigned iL = WireID(hit->getID()).getICLayer();
+  if (hit->getPriorityPosition() < 3) iL -= 1;
+  unsigned nWires = cdcgeo.nWiresInLayer(iL);
+  unsigned iCenter = hit->getIWire();
+  if (hit->getPriorityPosition() == 1) iCenter += 1;
+
+  // get segment shape (depends on super layer)
+  std::vector<int> layershift = { -2, -1, 0, 1, 2};
+  std::vector<std::vector<float>> cellshift = {
+    { -1, 0, 1},
+    { -0.5, 0.5},
+    { 0},
+    { -0.5, 0.5},
+    { -1, 0, 1}
+  };
+  if (hit->getISuperLayer() == 0) {
+    layershift = { 0, 1, 2, 3, 4};
+    cellshift = {
+      { 0},
+      { -0.5, 0.5},
+      { -1, 0, 1},
+      { -1.5, -0.5, 0.5, 1.5},
+      { -2, -1, 0, 1, 2}
+    };
+  }
+
+  // draw all cells in segment
+  for (unsigned il = 0; il < layershift.size(); ++il) {
+    for (unsigned ic = 0; ic < cellshift[il].size(); ++ic) {
+      TVector3 corners[2][2];
+      for (unsigned ir = 0; ir < 2; ++ir) {
+        double r = cdcgeo.fieldWireR(iL + layershift[il] - ir);
+        double fz = cdcgeo.fieldWireFZ(iL + layershift[il] - ir);
+        double bz = cdcgeo.fieldWireBZ(iL + layershift[il] - ir);
+        for (unsigned iphi = 0; iphi < 2; ++iphi) {
+          double phib = (iCenter + cellshift[il][ic] + iphi - 0.5) * 2 * M_PI / nWires;
+          double phif = phib + cdcgeo.nShifts(iL + layershift[il]) * M_PI / nWires;
+
+          TVector3 pos_f = TVector3(cos(phif) * r, sin(phif) * r, fz);
+          TVector3 pos_b = TVector3(cos(phib) * r, sin(phib) * r, bz);
+          TVector3 zaxis = pos_b - pos_f;
+          corners[ir][iphi] = pos_f - zaxis * (pos_f.z() / zaxis.z());
+        }
+      }
+
+      shape->AddLine(corners[0][0].x(), corners[0][0].y(), 0,
+                     corners[0][1].x(), corners[0][1].y(), 0);
+      shape->AddLine(corners[0][1].x(), corners[0][1].y(), 0,
+                     corners[1][1].x(), corners[1][1].y(), 0);
+      shape->AddLine(corners[1][1].x(), corners[1][1].y(), 0,
+                     corners[1][0].x(), corners[1][0].y(), 0);
+      shape->AddLine(corners[1][0].x(), corners[1][0].y(), 0,
+                     corners[0][0].x(), corners[0][0].y(), 0);
+    }
+  }
+
+  if (hit->getISuperLayer() % 2 == 0) {
+    shape->SetMainColor(kCyan + 3);
+  } else {
+    shape->SetMainColor(kPink + 6);
+  }
+
+  shape->SetName(ObjectInfo::getIdentifier(hit));
+  addToGroup("CDCTriggerSegmentHits", shape);
+  addObject(hit, shape);
+}
+
 void EVEVisualization::addARICHHit(const ARICHHit* hit)
 {
   DBObjPtr<ARICHGeometryConfig> arichGeo;

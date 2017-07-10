@@ -229,6 +229,12 @@ void DisplayModule::event()
       m_visualizer->addCDCHit(&hit, m_showTriggerObjects);
   }
 
+  if (m_showTriggerObjects) {
+    StoreArray<CDCTriggerSegmentHit> tshits;
+    for (auto& hit : tshits)
+      m_visualizer->addCDCTriggerSegmentHit(&hit);
+  }
+
   if (m_showBKLM2dHits) {
     StoreArray<BKLMHit2d> bklmhits;
     for (auto& hit : bklmhits)

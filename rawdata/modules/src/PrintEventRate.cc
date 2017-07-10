@@ -78,8 +78,8 @@ void PrintEventRateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i, int bl
   unsigned int error_flag = 0;
   error_flag = (unsigned int)(raw_copper->GetDataType(i));
   if (error_flag) {
-    printf("!!!!!!!!! ERROR (RawCOPPER hdr) !!!!!!!!!! : event %d errflag %.8x nodeID %.8x\n", m_cur_event, error_flag ,
-           raw_copper->GetNodeID(i));
+    printf("!!!!!!!!! ERROR (RawCOPPER hdr) !!!!!!!!!! : run %d sub %d event %d errflag %.8x nodeID %.8x\n",
+           m_run, m_subrun, m_cur_event, error_flag , raw_copper->GetNodeID(i));
     m_errcpr++;
   }
 
@@ -292,8 +292,9 @@ void PrintEventRateModule::event()
   }
 
   if (m_eventMetaDataPtr->getErrorFlag()) {
-    printf("!!!!!!!!! ERROR (EventMetaData) !!!!!!!!!! : event %d errflag %.8x\n", m_eventMetaDataPtr->getEvent(),
-           m_eventMetaDataPtr->getErrorFlag());
+    printf("!!!!!!!!! ERROR (EventMetaData) !!!!!!!!!! : run %d sub %d event %d errflag %.8x\n",
+           m_eventMetaDataPtr->getRun(), m_eventMetaDataPtr->getSubrun(),
+           m_eventMetaDataPtr->getEvent(), m_eventMetaDataPtr->getErrorFlag());
     m_erreve++;
   }
 

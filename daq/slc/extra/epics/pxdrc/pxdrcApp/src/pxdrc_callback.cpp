@@ -119,13 +119,6 @@ void eventCallback(struct event_handler_args eha)
 	} else if (val == "ERROR") {
 	  g_callback->setStateRequest(RCState::ERROR_ES);
 	}
-	if (val == "NOTREADY") {
-	  g_callback->setStateRequest(RCState::NOTREADY_S);
-	} else if (val == "READY") {
-	  g_callback->setStateRequest(RCState::READY_S);
-	} else if (val == "RUNNING") {
-	  g_callback->setStateRequest(RCState::RUNNING_S);
-	}
       }
     } else {
       LogFile::warning("Unknown PV (chid=%d)", eha.chid);

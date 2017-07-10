@@ -98,6 +98,21 @@ void PhokharaInputModule::initialize()
 {
   StoreArray<MCParticle>::registerPersistent();
 
+  if (m_replaceMuonsByVirtualPhoton) {
+    if (m_QED != 0) {
+      B2FATAL("You requested to replace muons by a virtual photon. In this "
+              "mode, PHOKHARA works as an ISR generator. The parameter QED "
+              "should be set to 0 (ISR only). If FSR is taken into account "
+              "(QED = 1 or 2), the results will be incorrect.");
+    }
+    if (m_NLOIFI != 0) {
+      B2FATAL("You requested to replace muons by a virtual photon. In this "
+              "mode, PHOKHARA works as an ISR generator. The parameter NLOIFI "
+              "should be set to 0 (off). If simultaneous emission of initial "
+              "and final-state photons is taken into account (NLOIFI = 1), "
+              "the results will be incorrect.");
+    }
+  }
   //Beam Parameters, initial particle - PHOKHARA cannot handle beam energy spread
   m_initial.initialize();
 

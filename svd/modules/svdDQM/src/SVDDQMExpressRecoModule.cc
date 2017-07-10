@@ -32,6 +32,10 @@
 #include "TVectorD.h"
 #include "TF1.h"
 
+#include <framework/database/DBImportObjPtr.h>
+#include <framework/database/DBImportArray.h>
+#include <framework/database/IntervalOfValidity.h>
+
 using namespace std;
 using boost::format;
 using namespace Belle2;
@@ -56,6 +60,10 @@ SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
            "cut for accepting to hitmap histogram, using strips only, default = 22 ", m_CutSVDCharge);
   addParam("ReferenceHistosFileName", m_RefHistFileName,
            "Name of file contain reference histograms, default=vxd/data/VXD-DQMReferenceHistos.root", m_RefHistFileName);
+  addParam("NotUseDB", m_NotUseDB,
+           "Using local files instead of DataBase for reference histogram, default=0 ", m_NotUseDB);
+  addParam("CreateDB", m_CreateDB,
+           "Create and fill reference histograms in DataBase, default=0 ", m_CreateDB);
 }
 
 
@@ -101,19 +109,19 @@ void SVDDQMExpressRecoModule::defineHisto()
 
   // Create basic histograms:
   DirSVDBasic->cd();
-  m_hitMapCountsU = new TH1I("SVDStripHitmapCountsU", "SVD U Strip Hitmaps Counts",
+  m_hitMapCountsU = new TH1I("DQMER_SVD_StripHitmapCountsU", "DQM ER SVD U Strip Hitmaps Counts",
                              c_nSVDSensors, 0, c_nSVDSensors);
   m_hitMapCountsU->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapCountsU->GetYaxis()->SetTitle("counts");
-  m_hitMapCountsV = new TH1I("SVDStripHitmapCountsV", "SVD V Strip Hitmaps Counts",
+  m_hitMapCountsV = new TH1I("DQMER_SVD_StripHitmapCountsV", "DQM ER SVD V Strip Hitmaps Counts",
                              c_nSVDSensors, 0, c_nSVDSensors);
   m_hitMapCountsV->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapCountsV->GetYaxis()->SetTitle("counts");
-  m_hitMapClCountsU = new TH1I("SVDClusterHitmapCountsU", "SVD U Cluster Hitmaps Counts",
+  m_hitMapClCountsU = new TH1I("DQMER_SVD_ClusterHitmapCountsU", "DQM ER SVD U Cluster Hitmaps Counts",
                                c_nSVDSensors, 0, c_nSVDSensors);
   m_hitMapClCountsU->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapClCountsU->GetYaxis()->SetTitle("counts");
-  m_hitMapClCountsV = new TH1I("SVDClusterHitmapCountsV", "SVD V Cluster Hitmaps Counts",
+  m_hitMapClCountsV = new TH1I("DQMER_SVD_ClusterHitmapCountsV", "DQM ER SVD V Cluster Hitmaps Counts",
                                c_nSVDSensors, 0, c_nSVDSensors);
   m_hitMapClCountsV->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapClCountsV->GetYaxis()->SetTitle("counts");
@@ -144,78 +152,78 @@ void SVDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     // Number of fired strips per frame
     //----------------------------------------------------------------
-    string name = str(format("SVD_%1%_FiredU") % sensorDescr);
-    string title = str(format("SVD Sensor %1% Fired strips in U") % sensorDescr);
+    string name = str(format("DQMER_SVD_%1%_FiredU") % sensorDescr);
+    string title = str(format("DQM ER SVD Sensor %1% Fired strips in U") % sensorDescr);
     m_firedU[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
     m_firedU[i]->GetXaxis()->SetTitle("# of fired u strips");
     m_firedU[i]->GetYaxis()->SetTitle("count");
-    name = str(format("SVD_%1%_FiredV") % sensorDescr);
-    title = str(format("SVD Sensor %1% Fired strips in V") % sensorDescr);
+    name = str(format("DQMER_SVD_%1%_FiredV") % sensorDescr);
+    title = str(format("DQM ER SVD Sensor %1% Fired strips in V") % sensorDescr);
     m_firedV[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
     m_firedV[i]->GetXaxis()->SetTitle("# of fired v strips");
     m_firedV[i]->GetYaxis()->SetTitle("count");
     //----------------------------------------------------------------
     // Number of clusters per frame
     //----------------------------------------------------------------
-    name = str(format("SVD_%1%_ClustersU") % sensorDescr);
-    title = str(format("SVD Sensor %1% Number of clusters in U") % sensorDescr);
+    name = str(format("DQMER_SVD_%1%_ClustersU") % sensorDescr);
+    title = str(format("DQM ER SVD Sensor %1% Number of clusters in U") % sensorDescr);
     m_clustersU[i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
     m_clustersU[i]->GetXaxis()->SetTitle("# of u clusters");
     m_clustersU[i]->GetYaxis()->SetTitle("count");
-    name = str(format("SVD_%1%_ClustersV") % sensorDescr);
-    title = str(format("SVD Sensor %1% Number of clusters in V") % sensorDescr);
+    name = str(format("DQMER_SVD_%1%_ClustersV") % sensorDescr);
+    title = str(format("DQM ER SVD Sensor %1% Number of clusters in V") % sensorDescr);
     m_clustersV[i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
     m_clustersV[i]->GetXaxis()->SetTitle("# of v clusters");
     m_clustersV[i]->GetYaxis()->SetTitle("count");
     //----------------------------------------------------------------
     // Charge of clusters
     //----------------------------------------------------------------
-    name = str(format("SVD_%1%_ClusterChargeU") % sensorDescr);
-    title = str(format("SVD Sensor %1% Cluster charge in U") % sensorDescr);
+    name = str(format("DQMER_SVD_%1%_ClusterChargeU") % sensorDescr);
+    title = str(format("DQM ER SVD Sensor %1% Cluster charge in U") % sensorDescr);
     m_clusterChargeU[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 600);
     m_clusterChargeU[i]->GetXaxis()->SetTitle("charge of u clusters [ADU]");
     m_clusterChargeU[i]->GetYaxis()->SetTitle("count");
-    name = str(format("SVD_%1%_ClusterChargeV") % sensorDescr);
-    title = str(format("SVD Sensor %1% Cluster charge in V") % sensorDescr);
+    name = str(format("DQMER_SVD_%1%_ClusterChargeV") % sensorDescr);
+    title = str(format("DQM ER SVD Sensor %1% Cluster charge in V") % sensorDescr);
     m_clusterChargeV[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 600);
     m_clusterChargeV[i]->GetXaxis()->SetTitle("charge of v clusters [ADU]");
     m_clusterChargeV[i]->GetYaxis()->SetTitle("count");
     //----------------------------------------------------------------
     // Charge of strips
     //----------------------------------------------------------------
-    name = str(format("SVD_%1%_StripChargeU") % sensorDescr);
-    title = str(format("SVD Sensor %1% Strip charge in U") % sensorDescr);
+    name = str(format("DQMER_SVD_%1%_StripChargeU") % sensorDescr);
+    title = str(format("DQM ER SVD Sensor %1% Strip charge in U") % sensorDescr);
     m_stripSignalU[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 600);
     m_stripSignalU[i]->GetXaxis()->SetTitle("charge of u clusters [ADU]");
     m_stripSignalU[i]->GetYaxis()->SetTitle("count");
-    name = str(format("SVD_%1%_StripChargeV") % sensorDescr);
-    title = str(format("SVD Sensor %1% Strip charge in V") % sensorDescr);
+    name = str(format("DQMER_SVD_%1%_StripChargeV") % sensorDescr);
+    title = str(format("DQM ER SVD Sensor %1% Strip charge in V") % sensorDescr);
     m_stripSignalV[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 600);
     m_stripSignalV[i]->GetXaxis()->SetTitle("charge of v clusters [ADU]");
     m_stripSignalV[i]->GetYaxis()->SetTitle("count");
     //----------------------------------------------------------------
     // Cluster size distribution
     //----------------------------------------------------------------
-    name = str(format("SVD_%1%_ClusterSizeU") % sensorDescr);
-    title = str(format("SVD Sensor %1% Cluster size in U") % sensorDescr);
+    name = str(format("DQMER_SVD_%1%_ClusterSizeU") % sensorDescr);
+    title = str(format("DQM ER SVD Sensor %1% Cluster size in U") % sensorDescr);
     m_clusterSizeU[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
     m_clusterSizeU[i]->GetXaxis()->SetTitle("size of u clusters");
     m_clusterSizeU[i]->GetYaxis()->SetTitle("count");
-    name = str(format("SVD_%1%_ClusterSizeV") % sensorDescr);
-    title = str(format("SVD Sensor %1% Cluster size in V") % sensorDescr);
+    name = str(format("DQMER_SVD_%1%_ClusterSizeV") % sensorDescr);
+    title = str(format("DQM ER SVD Sensor %1% Cluster size in V") % sensorDescr);
     m_clusterSizeV[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
     m_clusterSizeV[i]->GetXaxis()->SetTitle("size of v clusters");
     m_clusterSizeV[i]->GetYaxis()->SetTitle("count");
     //----------------------------------------------------------------
     // Cluster time distribution
     //----------------------------------------------------------------
-    name = str(format("SVD_%1%_ClusterTimeU") % sensorDescr);
-    title = str(format("SVD Sensor %1% Cluster time in U") % sensorDescr);
+    name = str(format("DQMER_SVD_%1%_ClusterTimeU") % sensorDescr);
+    title = str(format("DQM ER SVD Sensor %1% Cluster time in U") % sensorDescr);
     m_clusterTimeU[i] = new TH1F(name.c_str(), title.c_str(), 50, -50, 150);
     m_clusterTimeU[i]->GetXaxis()->SetTitle("time of u clusters [ns]");
     m_clusterTimeU[i]->GetYaxis()->SetTitle("count");
-    name = str(format("SVD_%1%_ClusterTimeV") % sensorDescr);
-    title = str(format("SVD Sensor %1% Cluster time in V") % sensorDescr);
+    name = str(format("DQMER_SVD_%1%_ClusterTimeV") % sensorDescr);
+    title = str(format("DQM ER SVD Sensor %1% Cluster time in V") % sensorDescr);
     m_clusterTimeV[i] = new TH1F(name.c_str(), title.c_str(), 50, -50, 150);
     m_clusterTimeV[i]->GetXaxis()->SetTitle("time of v clusters [ns]");
     m_clusterTimeV[i]->GetYaxis()->SetTitle("count");
@@ -223,67 +231,67 @@ void SVDDQMExpressRecoModule::defineHisto()
 
   // Create flag histograms:
   DirSVDFlags->cd();
-  m_fHitMapCountsUFlag = new TH1I("SVDStripHitmapCountsUFlag", "PXD Strip Hitmaps Counts U Flag",
+  m_fHitMapCountsUFlag = new TH1I("DQMER_SVD_StripHitmapCountsUFlag", "PXD Strip Hitmaps Counts U Flag",
                                   c_nSVDSensors, 0, c_nSVDSensors);
   m_fHitMapCountsUFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fHitMapCountsUFlag->GetYaxis()->SetTitle("flag");
-  m_fHitMapCountsVFlag = new TH1I("SVDStripHitmapCountsVFlag", "PXD Strip Hitmaps Counts V Flag",
+  m_fHitMapCountsVFlag = new TH1I("DQMER_SVD_StripHitmapCountsVFlag", "PXD Strip Hitmaps Counts V Flag",
                                   c_nSVDSensors, 0, c_nSVDSensors);
   m_fHitMapCountsVFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fHitMapCountsVFlag->GetYaxis()->SetTitle("flag");
-  m_fHitMapClCountsUFlag = new TH1I("SVDClusterHitmapCountsUFlag", "PXD Cluster Hitmaps Counts U Flag",
+  m_fHitMapClCountsUFlag = new TH1I("DQMER_SVD_ClusterHitmapCountsUFlag", "PXD Cluster Hitmaps Counts U Flag",
                                     c_nSVDSensors, 0, c_nSVDSensors);
   m_fHitMapClCountsUFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fHitMapClCountsUFlag->GetYaxis()->SetTitle("flag");
-  m_fHitMapClCountsVFlag = new TH1I("SVDClusterHitmapCountsVFlag", "PXD Cluster Hitmaps Counts V Flag",
+  m_fHitMapClCountsVFlag = new TH1I("DQMER_SVD_ClusterHitmapCountsVFlag", "PXD Cluster Hitmaps Counts V Flag",
                                     c_nSVDSensors, 0, c_nSVDSensors);
   m_fHitMapClCountsVFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fHitMapClCountsVFlag->GetYaxis()->SetTitle("flag");
-  m_fFiredUFlag = new TH1I("SVDFiredUFlag", "SVD Fired U Flag",
+  m_fFiredUFlag = new TH1I("DQMER_SVD_FiredUFlag", "DQM ER SVD Fired U Flag",
                            c_nSVDSensors, 0, c_nSVDSensors);
   m_fFiredUFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fFiredUFlag->GetYaxis()->SetTitle("flag");
-  m_fFiredVFlag = new TH1I("SVDFiredVFlag", "SVD Fired V Flag",
+  m_fFiredVFlag = new TH1I("DQMER_SVD_FiredVFlag", "DQM ER SVD Fired V Flag",
                            c_nSVDSensors, 0, c_nSVDSensors);
   m_fFiredVFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fFiredVFlag->GetYaxis()->SetTitle("flag");
-  m_fClustersUFlag = new TH1I("SVDClustersUFlag", "SVD Clusters U Flag",
+  m_fClustersUFlag = new TH1I("DQMER_SVD_ClustersUFlag", "DQM ER SVD Clusters U Flag",
                               c_nSVDSensors, 0, c_nSVDSensors);
   m_fClustersUFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClustersUFlag->GetYaxis()->SetTitle("flag");
-  m_fClustersVFlag = new TH1I("SVDClustersVFlag", "SVD Clusters V Flag",
+  m_fClustersVFlag = new TH1I("DQMER_SVD_ClustersVFlag", "DQM ER SVD Clusters V Flag",
                               c_nSVDSensors, 0, c_nSVDSensors);
   m_fClustersVFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClustersVFlag->GetYaxis()->SetTitle("flag");
-  m_fClusterChargeUFlag = new TH1I("SVDClusterChargeUFlag", "SVD Cluster Charge U Flag",
+  m_fClusterChargeUFlag = new TH1I("DQMER_SVD_ClusterChargeUFlag", "DQM ER SVD Cluster Charge U Flag",
                                    c_nSVDSensors, 0, c_nSVDSensors);
   m_fClusterChargeUFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClusterChargeUFlag->GetYaxis()->SetTitle("flag");
-  m_fClusterChargeVFlag = new TH1I("SVDClusterChargeVFlag", "SVD Cluster Charge V Flag",
+  m_fClusterChargeVFlag = new TH1I("DQMER_SVD_ClusterChargeVFlag", "DQM ER SVD Cluster Charge V Flag",
                                    c_nSVDSensors, 0, c_nSVDSensors);
   m_fClusterChargeVFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClusterChargeVFlag->GetYaxis()->SetTitle("flag");
-  m_fStripSignalUFlag = new TH1I("SVDStripSignalUFlag", "SVD Strip Signal U Flag",
+  m_fStripSignalUFlag = new TH1I("DQMER_SVD_StripSignalUFlag", "DQM ER SVD Strip Signal U Flag",
                                  c_nSVDSensors, 0, c_nSVDSensors);
   m_fStripSignalUFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fStripSignalUFlag->GetYaxis()->SetTitle("flag");
-  m_fStripSignalVFlag = new TH1I("SVDStripSignalVFlag", "SVD Strip Signal V Flag",
+  m_fStripSignalVFlag = new TH1I("DQMER_SVD_StripSignalVFlag", "DQM ER SVD Strip Signal V Flag",
                                  c_nSVDSensors, 0, c_nSVDSensors);
   m_fStripSignalVFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fStripSignalVFlag->GetYaxis()->SetTitle("flag");
-  m_fClusterSizeUFlag = new TH1I("SVDClasterSizeUFlag", "SVD Cluster Size U Flag",
+  m_fClusterSizeUFlag = new TH1I("DQMER_SVD_ClasterSizeUFlag", "DQM ER SVD Cluster Size U Flag",
                                  c_nSVDSensors, 0, c_nSVDSensors);
   m_fClusterSizeUFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClusterSizeUFlag->GetYaxis()->SetTitle("flag");
-  m_fClusterSizeVFlag = new TH1I("SVDClasterSizeVFlag", "SVD Cluster Size V Flag",
+  m_fClusterSizeVFlag = new TH1I("DQMER_SVD_ClasterSizeVFlag", "DQM ER SVD Cluster Size V Flag",
                                  c_nSVDSensors, 0, c_nSVDSensors);
   m_fClusterSizeVFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClusterSizeVFlag->GetYaxis()->SetTitle("flag");
-  m_fClusterTimeUFlag = new TH1I("SVDClasterTimeUFlag", "SVD Cluster Time U Flag",
+  m_fClusterTimeUFlag = new TH1I("DQMER_SVD_ClasterTimeUFlag", "DQM ER SVD Cluster Time U Flag",
                                  c_nSVDSensors, 0, c_nSVDSensors);
   m_fClusterTimeUFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClusterTimeUFlag->GetYaxis()->SetTitle("flag");
-  m_fClusterTimeVFlag = new TH1I("SVDClasterTimeVFlag", "SVD Cluster Time V Flag",
+  m_fClusterTimeVFlag = new TH1I("DQMER_SVD_ClasterTimeVFlag", "DQM ER SVD Cluster Time V Flag",
                                  c_nSVDSensors, 0, c_nSVDSensors);
   m_fClusterTimeVFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClusterTimeVFlag->GetYaxis()->SetTitle("flag");
@@ -483,161 +491,304 @@ void SVDDQMExpressRecoModule::endRun()
   TH1F** r_clusterTimeU = new TH1F*[c_nSVDSensors];
   TH1F** r_clusterTimeV = new TH1F*[c_nSVDSensors];
 
-  TFile* f_RefHistFile = new TFile(m_RefHistFileName.c_str(), "read");
-  if (f_RefHistFile->IsOpen()) {
-    B2INFO("Reference file name: " << m_RefHistFileName.c_str());
-    TVectorD* NoOfEventsRef = NULL;
-    f_RefHistFile->GetObject("NoOfEvents", NoOfEventsRef);
-    m_NoOfEventsRef = (int)NoOfEventsRef->GetMatrixArray()[0];
-//    m_NoOfEventsRef = 2;
-    string name = str(format("SVDExpReco/SVDStripHitmapCountsU;1"));
-    f_RefHistFile->GetObject(name.c_str(), r_hitMapCountsU);
-    if (r_hitMapCountsU == NULL) {
-      B2INFO("There is missing histogram in reference file: " << name.c_str());
+  if (m_NotUseDB == 1) {
+    TFile* f_RefHistFile = new TFile(m_RefHistFileName.c_str(), "read");
+    if (f_RefHistFile->IsOpen()) {
+      B2INFO("Reference file name: " << m_RefHistFileName.c_str());
+      TVectorD* NoOfEventsRef = NULL;
+      f_RefHistFile->GetObject("NoOfEvents", NoOfEventsRef);
+      m_NoOfEventsRef = (int)NoOfEventsRef->GetMatrixArray()[0];
+      //    m_NoOfEventsRef = 2;
+      string name = str(format("SVDExpReco/DQMER_SVD_StripHitmapCountsU;1"));
+      f_RefHistFile->GetObject(name.c_str(), r_hitMapCountsU);
+      if (r_hitMapCountsU == NULL) {
+        B2INFO("There is missing histogram in reference file: " << name.c_str());
+        return;
+      }
+      name = str(format("SVDExpReco/DQMER_SVD_StripHitmapCountsV;1"));
+      f_RefHistFile->GetObject(name.c_str(), r_hitMapCountsV);
+      if (r_hitMapCountsV == NULL) {
+        B2INFO("There is missing histogram in reference file: " << name.c_str());
+        return;
+      }
+      name = str(format("SVDExpReco/DQMER_SVD_ClusterHitmapCountsU;1"));
+      f_RefHistFile->GetObject(name.c_str(), r_hitMapClCountsU);
+      if (r_hitMapClCountsU == NULL) {
+        B2INFO("There is missing histogram in reference file: " << name.c_str());
+        return;
+      }
+      name = str(format("SVDExpReco/DQMER_SVD_ClusterHitmapCountsV;1"));
+      f_RefHistFile->GetObject(name.c_str(), r_hitMapClCountsV);
+      if (r_hitMapClCountsV == NULL) {
+        B2INFO("There is missing histogram in reference file: " << name.c_str());
+        return;
+      }
+      for (int i = 0; i < c_nSVDSensors; i++) {
+        int iLayer = 0;
+        int iLadder = 0;
+        int iSensor = 0;
+        getIDsFromIndex(i, &iLayer, &iLadder, &iSensor);
+        string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
+        name = str(format("SVDExpReco/DQMER_SVD_%1%_FiredU") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_firedU[i]);
+        if (r_firedU[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("SVDExpReco/DQMER_SVD_%1%_FiredV") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_firedV[i]);
+        if (r_firedV[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("SVDExpReco/DQMER_SVD_%1%_ClustersU") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_clustersU[i]);
+        if (r_clustersU[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("SVDExpReco/DQMER_SVD_%1%_ClustersV") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_clustersV[i]);
+        if (r_clustersV[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("SVDExpReco/DQMER_SVD_%1%_ClusterChargeU") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_clusterChargeU[i]);
+        if (r_clusterChargeU[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("SVDExpReco/DQMER_SVD_%1%_ClusterChargeV") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_clusterChargeV[i]);
+        if (r_clusterChargeV[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("SVDExpReco/DQMER_SVD_%1%_StripChargeU") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_stripSignalU[i]);
+        if (r_stripSignalU[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("SVDExpReco/DQMER_SVD_%1%_StripChargeV") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_stripSignalV[i]);
+        if (r_stripSignalV[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("SVDExpReco/DQMER_SVD_%1%_ClusterSizeU") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_clusterSizeU[i]);
+        if (r_clusterSizeU[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("SVDExpReco/DQMER_SVD_%1%_ClusterSizeV") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_clusterSizeV[i]);
+        if (r_clusterSizeV[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("SVDExpReco/DQMER_SVD_%1%_ClusterTimeU") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_clusterTimeU[i]);
+        if (r_clusterTimeU[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("SVDExpReco/DQMER_SVD_%1%_ClusterTimeV") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_clusterTimeV[i]);
+        if (r_clusterTimeV[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+      }
+    } else {
+      B2INFO("File of reference histograms: " << m_RefHistFileName.c_str() << " is not available, please check it!");
       return;
-    }
-    name = str(format("SVDExpReco/SVDStripHitmapCountsV;1"));
-    f_RefHistFile->GetObject(name.c_str(), r_hitMapCountsV);
-    if (r_hitMapCountsV == NULL) {
-      B2INFO("There is missing histogram in reference file: " << name.c_str());
-      return;
-    }
-    name = str(format("SVDExpReco/SVDClusterHitmapCountsU;1"));
-    f_RefHistFile->GetObject(name.c_str(), r_hitMapClCountsU);
-    if (r_hitMapClCountsU == NULL) {
-      B2INFO("There is missing histogram in reference file: " << name.c_str());
-      return;
-    }
-    name = str(format("SVDExpReco/SVDClusterHitmapCountsV;1"));
-    f_RefHistFile->GetObject(name.c_str(), r_hitMapClCountsV);
-    if (r_hitMapClCountsV == NULL) {
-      B2INFO("There is missing histogram in reference file: " << name.c_str());
-      return;
-    }
-    for (int i = 0; i < c_nSVDSensors; i++) {
-      int iLayer = 0;
-      int iLadder = 0;
-      int iSensor = 0;
-      getIDsFromIndex(i, &iLayer, &iLadder, &iSensor);
-      string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
-      name = str(format("SVDExpReco/SVD_%1%_FiredU") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_firedU[i]);
-      if (r_firedU[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("SVDExpReco/SVD_%1%_FiredV") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_firedV[i]);
-      if (r_firedV[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("SVDExpReco/SVD_%1%_ClustersU") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_clustersU[i]);
-      if (r_clustersU[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("SVDExpReco/SVD_%1%_ClustersV") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_clustersV[i]);
-      if (r_clustersV[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("SVDExpReco/SVD_%1%_ClusterChargeU") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_clusterChargeU[i]);
-      if (r_clusterChargeU[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("SVDExpReco/SVD_%1%_ClusterChargeV") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_clusterChargeV[i]);
-      if (r_clusterChargeV[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("SVDExpReco/SVD_%1%_StripChargeU") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_stripSignalU[i]);
-      if (r_stripSignalU[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("SVDExpReco/SVD_%1%_StripChargeV") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_stripSignalV[i]);
-      if (r_stripSignalV[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("SVDExpReco/SVD_%1%_ClusterSizeU") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_clusterSizeU[i]);
-      if (r_clusterSizeU[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("SVDExpReco/SVD_%1%_ClusterSizeV") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_clusterSizeV[i]);
-      if (r_clusterSizeV[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("SVDExpReco/SVD_%1%_ClusterTimeU") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_clusterTimeU[i]);
-      if (r_clusterTimeU[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("SVDExpReco/SVD_%1%_ClusterTimeV") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_clusterTimeV[i]);
-      if (r_clusterTimeV[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
     }
   } else {
-    B2INFO("File of reference histograms: " << m_RefHistFileName.c_str() << " is not available, please check it!");
-    return;
+    if (m_CreateDB == 1) {
+      IntervalOfValidity iov(0, 0, -1, -1);
+      TString Name = Form("DQMER_SVD_NoOfEvents");
+      DBImportObjPtr<TVectorD> DQMER_SVD_NoOfEvents(Name.Data());
+      DQMER_SVD_NoOfEvents.construct(1);
+      DQMER_SVD_NoOfEvents->SetElements(fNoOfEvents);
+      DQMER_SVD_NoOfEvents.import(iov);
+
+      CreateDBHisto(m_hitMapCountsU);
+      CreateDBHisto(m_hitMapCountsV);
+      CreateDBHisto(m_hitMapClCountsU);
+      CreateDBHisto(m_hitMapClCountsV);
+      for (int i = 0; i < c_nSVDSensors; i++) {
+        CreateDBHisto(m_firedU[i]);
+        CreateDBHisto(m_firedV[i]);
+        CreateDBHisto(m_clustersU[i]);
+        CreateDBHisto(m_clustersV[i]);
+        CreateDBHisto(m_clusterChargeU[i]);
+        CreateDBHisto(m_clusterChargeV[i]);
+        CreateDBHisto(m_stripSignalU[i]);
+        CreateDBHisto(m_stripSignalV[i]);
+        CreateDBHisto(m_clusterSizeU[i]);
+        CreateDBHisto(m_clusterSizeV[i]);
+        CreateDBHisto(m_clusterTimeU[i]);
+        CreateDBHisto(m_clusterTimeV[i]);
+      }
+    } else {
+      /*
+            B2INFO("Reference file name: " << m_RefHistFileName.c_str());
+            TVectorD* NoOfEventsRef = NULL;
+            f_RefHistFile->GetObject("NoOfEvents", NoOfEventsRef);
+            m_NoOfEventsRef = (int)NoOfEventsRef->GetMatrixArray()[0];
+        //    m_NoOfEventsRef = 2;
+            string name = str(format("SVDExpReco/SVDStripHitmapCountsU;1"));
+            f_RefHistFile->GetObject(name.c_str(), r_hitMapCountsU);
+            if (r_hitMapCountsU == NULL) {
+              B2INFO("There is missing histogram in reference file: " << name.c_str());
+              return;
+            }
+            name = str(format("SVDExpReco/SVDStripHitmapCountsV;1"));
+            f_RefHistFile->GetObject(name.c_str(), r_hitMapCountsV);
+            if (r_hitMapCountsV == NULL) {
+              B2INFO("There is missing histogram in reference file: " << name.c_str());
+              return;
+            }
+            name = str(format("SVDExpReco/SVDClusterHitmapCountsU;1"));
+            f_RefHistFile->GetObject(name.c_str(), r_hitMapClCountsU);
+            if (r_hitMapClCountsU == NULL) {
+              B2INFO("There is missing histogram in reference file: " << name.c_str());
+              return;
+            }
+            name = str(format("SVDExpReco/SVDClusterHitmapCountsV;1"));
+            f_RefHistFile->GetObject(name.c_str(), r_hitMapClCountsV);
+            if (r_hitMapClCountsV == NULL) {
+              B2INFO("There is missing histogram in reference file: " << name.c_str());
+              return;
+            }
+            for (int i = 0; i < c_nSVDSensors; i++) {
+              int iLayer = 0;
+              int iLadder = 0;
+              int iSensor = 0;
+              getIDsFromIndex(i, &iLayer, &iLadder, &iSensor);
+              string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
+              name = str(format("SVDExpReco/SVD_%1%_FiredU") % sensorDescr);
+              f_RefHistFile->GetObject(name.c_str(), r_firedU[i]);
+              if (r_firedU[i] == NULL) {
+                B2INFO("There is missing histogram in reference file: " << name.c_str());
+                return;
+              }
+              name = str(format("SVDExpReco/SVD_%1%_FiredV") % sensorDescr);
+              f_RefHistFile->GetObject(name.c_str(), r_firedV[i]);
+              if (r_firedV[i] == NULL) {
+                B2INFO("There is missing histogram in reference file: " << name.c_str());
+                return;
+              }
+              name = str(format("SVDExpReco/SVD_%1%_ClustersU") % sensorDescr);
+              f_RefHistFile->GetObject(name.c_str(), r_clustersU[i]);
+              if (r_clustersU[i] == NULL) {
+                B2INFO("There is missing histogram in reference file: " << name.c_str());
+                return;
+              }
+              name = str(format("SVDExpReco/SVD_%1%_ClustersV") % sensorDescr);
+              f_RefHistFile->GetObject(name.c_str(), r_clustersV[i]);
+              if (r_clustersV[i] == NULL) {
+                B2INFO("There is missing histogram in reference file: " << name.c_str());
+                return;
+              }
+              name = str(format("SVDExpReco/SVD_%1%_ClusterChargeU") % sensorDescr);
+              f_RefHistFile->GetObject(name.c_str(), r_clusterChargeU[i]);
+              if (r_clusterChargeU[i] == NULL) {
+                B2INFO("There is missing histogram in reference file: " << name.c_str());
+                return;
+              }
+              name = str(format("SVDExpReco/SVD_%1%_ClusterChargeV") % sensorDescr);
+              f_RefHistFile->GetObject(name.c_str(), r_clusterChargeV[i]);
+              if (r_clusterChargeV[i] == NULL) {
+                B2INFO("There is missing histogram in reference file: " << name.c_str());
+                return;
+              }
+              name = str(format("SVDExpReco/SVD_%1%_StripChargeU") % sensorDescr);
+              f_RefHistFile->GetObject(name.c_str(), r_stripSignalU[i]);
+              if (r_stripSignalU[i] == NULL) {
+                B2INFO("There is missing histogram in reference file: " << name.c_str());
+                return;
+              }
+              name = str(format("SVDExpReco/SVD_%1%_StripChargeV") % sensorDescr);
+              f_RefHistFile->GetObject(name.c_str(), r_stripSignalV[i]);
+              if (r_stripSignalV[i] == NULL) {
+                B2INFO("There is missing histogram in reference file: " << name.c_str());
+                return;
+              }
+              name = str(format("SVDExpReco/SVD_%1%_ClusterSizeU") % sensorDescr);
+              f_RefHistFile->GetObject(name.c_str(), r_clusterSizeU[i]);
+              if (r_clusterSizeU[i] == NULL) {
+                B2INFO("There is missing histogram in reference file: " << name.c_str());
+                return;
+              }
+              name = str(format("SVDExpReco/SVD_%1%_ClusterSizeV") % sensorDescr);
+              f_RefHistFile->GetObject(name.c_str(), r_clusterSizeV[i]);
+              if (r_clusterSizeV[i] == NULL) {
+                B2INFO("There is missing histogram in reference file: " << name.c_str());
+                return;
+              }
+              name = str(format("SVDExpReco/SVD_%1%_ClusterTimeU") % sensorDescr);
+              f_RefHistFile->GetObject(name.c_str(), r_clusterTimeU[i]);
+              if (r_clusterTimeU[i] == NULL) {
+                B2INFO("There is missing histogram in reference file: " << name.c_str());
+                return;
+              }
+              name = str(format("SVDExpReco/SVD_%1%_ClusterTimeV") % sensorDescr);
+              f_RefHistFile->GetObject(name.c_str(), r_clusterTimeV[i]);
+              if (r_clusterTimeV[i] == NULL) {
+                B2INFO("There is missing histogram in reference file: " << name.c_str());
+                return;
+              }
+            }
+      */
+
+    }
   }
 
   // Compare histograms with reference histograms and create flags:
-  for (int i = 0; i < c_nSVDSensors; i++) {
-    double pars[2];
-    pars[0] = 0.01;
-    pars[1] = 0.05;
-    SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-            m_hitMapCountsU, r_hitMapCountsU, m_fHitMapCountsUFlag);
-    SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-            m_hitMapCountsV, r_hitMapCountsV, m_fHitMapCountsVFlag);
-    SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-            m_hitMapClCountsU, r_hitMapClCountsU, m_fHitMapClCountsUFlag);
-    SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-            m_hitMapClCountsV, r_hitMapClCountsV, m_fHitMapClCountsVFlag);
-    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-            m_firedU[i], r_firedU[i], m_fFiredUFlag);
-    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-            m_firedV[i], r_firedV[i], m_fFiredVFlag);
-    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-            m_clustersU[i], r_clustersU[i], m_fClustersUFlag);
-    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-            m_clustersV[i], r_clustersV[i], m_fClustersVFlag);
-    SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-            m_clusterChargeU[i], r_clusterChargeU[i], m_fClusterChargeUFlag);
-    SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-            m_clusterChargeV[i], r_clusterChargeV[i], m_fClusterChargeVFlag);
-    SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-            m_stripSignalU[i], r_stripSignalU[i], m_fStripSignalUFlag);
-    SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-            m_stripSignalV[i], r_stripSignalV[i], m_fStripSignalVFlag);
-    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-            m_clusterSizeU[i], r_clusterSizeU[i], m_fClusterSizeUFlag);
-    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-            m_clusterSizeV[i], r_clusterSizeV[i], m_fClusterSizeVFlag);
-    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-            m_clusterTimeU[i], r_clusterTimeU[i], m_fClusterTimeUFlag);
-    SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-            m_clusterTimeV[i], r_clusterTimeV[i], m_fClusterTimeVFlag);
+  if (m_CreateDB == 0) {
+    for (int i = 0; i < c_nSVDSensors; i++) {
+      double pars[2];
+      pars[0] = 0.01;
+      pars[1] = 0.05;
+      SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+              m_hitMapCountsU, r_hitMapCountsU, m_fHitMapCountsUFlag);
+      SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+              m_hitMapCountsV, r_hitMapCountsV, m_fHitMapCountsVFlag);
+      SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+              m_hitMapClCountsU, r_hitMapClCountsU, m_fHitMapClCountsUFlag);
+      SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+              m_hitMapClCountsV, r_hitMapClCountsV, m_fHitMapClCountsVFlag);
+      SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+              m_firedU[i], r_firedU[i], m_fFiredUFlag);
+      SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+              m_firedV[i], r_firedV[i], m_fFiredVFlag);
+      SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+              m_clustersU[i], r_clustersU[i], m_fClustersUFlag);
+      SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+              m_clustersV[i], r_clustersV[i], m_fClustersVFlag);
+      SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+              m_clusterChargeU[i], r_clusterChargeU[i], m_fClusterChargeUFlag);
+      SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+              m_clusterChargeV[i], r_clusterChargeV[i], m_fClusterChargeVFlag);
+      SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+              m_stripSignalU[i], r_stripSignalU[i], m_fStripSignalUFlag);
+      SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+              m_stripSignalV[i], r_stripSignalV[i], m_fStripSignalVFlag);
+      SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+              m_clusterSizeU[i], r_clusterSizeU[i], m_fClusterSizeUFlag);
+      SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+              m_clusterSizeV[i], r_clusterSizeV[i], m_fClusterSizeVFlag);
+      SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+              m_clusterTimeU[i], r_clusterTimeU[i], m_fClusterTimeUFlag);
+      SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+              m_clusterTimeV[i], r_clusterTimeV[i], m_fClusterTimeVFlag);
+    }
   }
 }
-
 
 void SVDDQMExpressRecoModule::terminate()
 {
@@ -830,4 +981,32 @@ int SVDDQMExpressRecoModule::SetFlag(int Type, int bin, double* pars, double rat
   delete histF;
   delete refhistF;
   return ret;
+}
+
+void SVDDQMExpressRecoModule::CreateDBHisto(TH1I* HistoBD)
+{
+  IntervalOfValidity iov(0, 0, -1, -1);
+  TString Name = Form("%s", HistoBD->GetName());
+  TString Title = Form("%s", HistoBD->GetTitle());
+  DBImportObjPtr<TH1I> DBHisto(Name.Data());
+  DBHisto.construct(Name.Data(), Title.Data(), HistoBD->GetNbinsX(),
+                    HistoBD->GetXaxis()->GetXmin(), HistoBD->GetXaxis()->GetXmax());
+  for (int i = 0; i < HistoBD->GetNbinsX(); i++) {
+    DBHisto->SetBinContent(i + 1, HistoBD->GetBinContent(i + 1));
+  }
+  DBHisto.import(iov);
+}
+
+void SVDDQMExpressRecoModule::CreateDBHisto(TH1F* HistoBD)
+{
+  IntervalOfValidity iov(0, 0, -1, -1);
+  TString Name = Form("%s", HistoBD->GetName());
+  TString Title = Form("%s", HistoBD->GetTitle());
+  DBImportObjPtr<TH1I> DBHisto(Name.Data());
+  DBHisto.construct(Name.Data(), Title.Data(), HistoBD->GetNbinsX(),
+                    HistoBD->GetXaxis()->GetXmin(), HistoBD->GetXaxis()->GetXmax());
+  for (int i = 0; i < HistoBD->GetNbinsX(); i++) {
+    DBHisto->SetBinContent(i + 1, HistoBD->GetBinContent(i + 1));
+  }
+  DBHisto.import(iov);
 }

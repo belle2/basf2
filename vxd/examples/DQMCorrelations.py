@@ -87,6 +87,8 @@ parser.add_argument('--SkipDQMChips', dest='SkipDQMChips', action='store_const',
                     help='Skip production of chips DQM plots')
 parser.add_argument('--SkipDQMDetail', dest='SkipDQMDetail', action='store_const', const=True, default=False,
                     help='Skip production of detail DQM plots')
+parser.add_argument('--CreateDB', dest='CreateDB', action='store', default=0, type=int,
+                    help='Create DataBase references, default = 0')
 
 args = parser.parse_args()
 
@@ -111,10 +113,12 @@ print("                    SkipDQM: ", args.SkipDQM)
 print("         SkipDQMExpressReco: ", args.SkipDQMExpressReco)
 print("               SkipDQMChips: ", args.SkipDQMChips)
 print("              SkipDQMDetail: ", args.SkipDQMDetail)
+print("                   CreateDB: ", args.CreateDB)
 
 # setup_database(args.local_db, args.global_tag)
-reset_database()
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True, LogLevel.ERROR)
+if (args.CreateDB == 0):
+    reset_database()
+    use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True, LogLevel.ERROR)
 
 if (args.UseRealdata is True):
     # Limit branches use - necessary minimum (removes MC info if input is from simulation, HLT output)
@@ -154,12 +158,14 @@ else:
 
 if (args.SkipPXDSVD is False):
     pxddqmExpReco = register_module('PXDDQMExpressReco')
+    # pxddqmExpReco.param('CreateDB', args.CreateDB)
     pxddqmChips = register_module('PXDDQM')
     pxddqmDetails = register_module('PXDDQM')
     # pxddqm.param('UseDigits', args.UseDigits)
     # pxddqm.param('SaveOtherHistos', args.SaveOtherHistos)
 
     svddqmExpReco = register_module('SVDDQMExpressReco')
+    svddqmExpReco.param('CreateDB', args.CreateDB)
     svddqmChips = register_module('SVDDQM')
     svddqmDetails = register_module('SVDDQM')
     # svddqm.param('UseDigits', args.UseDigits)
@@ -180,6 +186,7 @@ param_vxddqm2 = {'CorrelationGranulation': args.CorrelationGranulation,
                  }
 
 vxddqmExpReco = register_module('VXDDQM')
+# vxddqmExpReco.param('CreateDB', args.CreateDB)
 vxddqmChips = register_module('VXDDQM')
 vxddqmDetails = register_module('VXDDQM')
 

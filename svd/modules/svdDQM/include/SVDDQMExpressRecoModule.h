@@ -67,6 +67,9 @@ namespace Belle2 {
     int m_NoOfEvents;        /** Number of events */
     int m_NoOfEventsRef;     /** Number of events in reference histogram */
 
+    int m_NotUseDB = 0;      /** Using local files instead of DataBase for reference histogram, default=0 */
+    int m_CreateDB = 0;      /** Create and fill reference histograms in DataBase, default=0 */
+
     TH1I* m_fHitMapCountsUFlag;    /**< Flags of u Hitmaps of Digits */
     TH1I* m_fHitMapCountsVFlag;    /**< Flags of v Hitmaps of Digits */
     TH1I* m_fHitMapClCountsUFlag;  /**< Flags of u Hitmaps of Clusters*/
@@ -164,6 +167,16 @@ namespace Belle2 {
        * @return Indication of succes of realizing of condition, 1: OK.
        */
     int SetFlag(int Type, int bin, double* pars, double ratio, TH1I* hist, TH1I* refhist, TH1I* flaghist);
+
+    /**< Function for filling of TH1F histogram to database.
+       * @param HistoBD Histogram for DB.
+       */
+    void CreateDBHisto(TH1F* HistoBD);
+    /**< Function for filling of TH1I histogram to database.
+       * @param HistoBD Histogram for DB.
+       */
+    void CreateDBHisto(TH1I* HistoBD);
+
 
   };
 

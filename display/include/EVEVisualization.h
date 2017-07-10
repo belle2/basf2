@@ -11,6 +11,7 @@
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDSimHit.h>
@@ -122,6 +123,10 @@ namespace Belle2 {
     /** Add a RecoTrack, to evaluate track finding. */
     void addTrackCandidate(const std::string& collectionName,
                            const RecoTrack& recoTrack);
+
+    /** Add a CDCTriggerTrack. */
+    void addCDCTriggerTrack(const std::string& collectionName,
+                            const CDCTriggerTrack& track);
 
     /** Add VXDTF track candidate. */
     void addTrackCandidateTFInfo(TrackCandidateTFInfo* info);
@@ -339,6 +344,9 @@ namespace Belle2 {
 
     /** Track propagator for genfit::Tracks (different mainly because of drawing options) */
     TEveTrackPropagator* m_gftrackpropagator;
+
+    /** Track propagator for CDCTriggerTracks (uses constant B field)*/
+    TEveTrackPropagator* m_consttrackpropagator;
 
     /** ECL cluster data. */
     TEveCaloDataVec* m_eclData;

@@ -151,6 +151,11 @@ EVEVisualization::EVEVisualization():
   m_gftrackpropagator->SetMagFieldObj(m_bfield, false);
   m_gftrackpropagator->SetMaxOrbs(0.5); //stop after track markers
 
+  m_consttrackpropagator = new TEveTrackPropagator();
+  m_consttrackpropagator->IncDenyDestroy();
+  m_consttrackpropagator->SetMagField(0, 0, -1.5);
+  m_consttrackpropagator->SetMaxR(EveGeometry::getMaxR());
+
   m_calo3d = new TEveCalo3D(NULL, "ECLClusters");
   m_calo3d->SetBarrelRadius(125.80); //inner radius of ECL barrel
   m_calo3d->SetForwardEndCapPos(196.5); //inner edge of forward endcap
@@ -181,6 +186,7 @@ EVEVisualization::~EVEVisualization()
   destroyEveElement(m_tracklist);
   destroyEveElement(m_trackpropagator);
   destroyEveElement(m_gftrackpropagator);
+  destroyEveElement(m_consttrackpropagator);
   destroyEveElement(m_calo3d);
   delete m_bfield;
 }
@@ -242,6 +248,37 @@ void EVEVisualization::addTrackCandidate(const std::string& collectionName,
   track_lines->AddElement(lines);
   addToGroup(collectionName, track_lines);
   addObject(&recoTrack, track_lines);
+}
+
+void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,
+                                          const CDCTriggerTrack& trgTrack)
+{
+  const TString label = ObjectInfo::getIdentifier(&trgTrack);
+
+  TVector3 track_pos = TVector3(0, 0, trgTrack.getZ0());
+  TVector3 track_mom = (trgTrack.getChargeSign() == 0) ?
+                       trgTrack.getDirection() * 1000 :
+                       trgTrack.getMomentum(1.5);
+
+  TEveRecTrack rectrack;
+  rectrack.fP.Set(track_mom);
+  rectrack.fV.Set(track_pos);
+
+  TEveTrack* track_lines = new TEveTrack(&rectrack, m_consttrackpropagator);
+  track_lines->SetName(label); //popup label set at end of function
+  track_lines->SetPropagator(m_consttrackpropagator);
+  track_lines->SetLineColor(kOrange + 2);
+  track_lines->SetLineWidth(1);
+  track_lines->SetTitle(ObjectInfo::getTitle(&trgTrack));
+
+  track_lines->SetCharge(trgTrack.getChargeSign());
+
+  // show 2D tracks with dashed lines
+  if (trgTrack.getZ0() == 0 && trgTrack.getCotTheta() == 0)
+    track_lines->SetLineStyle(2);
+
+  addToGroup(collectionName, track_lines);
+  addObject(&trgTrack, track_lines);
 }
 
 void EVEVisualization::addTrack(const Belle2::Track* belle2Track)

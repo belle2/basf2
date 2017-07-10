@@ -233,6 +233,15 @@ void DisplayModule::event()
     StoreArray<CDCTriggerSegmentHit> tshits;
     for (auto& hit : tshits)
       m_visualizer->addCDCTriggerSegmentHit(&hit);
+
+    //add all possible track candidate arrays
+    const auto trgTrackArrays = StoreArray<CDCTriggerTrack>::getArrayList();
+    for (std::string colName : trgTrackArrays) {
+      StoreArray<CDCTriggerTrack> trgTracks(colName);
+      for (const CDCTriggerTrack& trgTrack : trgTracks) {
+        m_visualizer->addCDCTriggerTrack(colName, trgTrack);
+      }
+    }
   }
 
   if (m_showBKLM2dHits) {

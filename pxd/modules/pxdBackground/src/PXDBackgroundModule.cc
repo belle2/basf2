@@ -378,7 +378,7 @@ void PXDBackgroundModule::terminate()
           << "expo\t"
           << "neutronFlux\t"
           << "fired\t"
-          << "occupancy\t"
+          << "occupancy"
           << endl;
   double componentTime = m_componentTime / Unit::us;
   for (auto vxdSensor : m_sensorData) {

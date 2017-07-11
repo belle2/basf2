@@ -890,7 +890,7 @@ namespace Belle2 {
 
       const unsigned nd = daughters.size();
       unsigned l = 0;
-      std::vector<unsigned> u[nd];
+      std::vector<std::vector<unsigned>> u(nd);
       for (unsigned ichild = 0; ichild < nd; ichild++) {
         const Particle* daughter = mother->getDaughter(ichild);
         if (daughter->getNDaughters() > 0) {

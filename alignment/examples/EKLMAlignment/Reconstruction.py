@@ -11,7 +11,7 @@ main = create_path()
 
 main.add_module('RootInput', inputFileName=sys.argv[1])
 main.add_module('Gearbox')
-add_reconstruction(main)
+add_reconstruction(main, pruneTracks=False)
 main.add_module('RootOutput', outputFileName=sys.argv[2])
 main.add_module('Progress')
 process(main)

@@ -23,7 +23,6 @@ main.add_module('MillepedeCollector', components='EKLMAlignment',
                 useGblTree=False)
 
 main.add_module('Progress')
-# main.add_module('GBLdiagnostics')
 main.add_module('RootOutput', outputFileName=sys.argv[2], branchNames=['EventMetaData'])
 process(main)
 

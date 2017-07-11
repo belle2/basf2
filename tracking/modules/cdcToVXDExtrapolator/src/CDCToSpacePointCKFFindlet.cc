@@ -20,6 +20,7 @@ CDCToSpacePointCKFFindlet::CDCToSpacePointCKFFindlet()
   addProcessingSignalListener(&m_hitsLoader);
   addProcessingSignalListener(&m_treeSearchFindlet);
   addProcessingSignalListener(&m_storeArrayHandler);
+  addProcessingSignalListener(&m_overlapTeacher);
   addProcessingSignalListener(&m_overlapResolver);
 }
 
@@ -31,6 +32,7 @@ void CDCToSpacePointCKFFindlet::exposeParameters(ModuleParamList* moduleParamLis
   m_hitsLoader.exposeParameters(moduleParamList, prefix);
   m_treeSearchFindlet.exposeParameters(moduleParamList, prefix);
   m_storeArrayHandler.exposeParameters(moduleParamList, prefix);
+  m_overlapTeacher.exposeParameters(moduleParamList, prefix);
   m_overlapResolver.exposeParameters(moduleParamList, prefix);
 }
 
@@ -64,6 +66,7 @@ void CDCToSpacePointCKFFindlet::apply()
 
   B2INFO("Found " << m_results.size() << " tracks");
 
+  m_overlapTeacher.apply(m_results);
   m_overlapResolver.apply(m_results);
   B2INFO("After overlap resolving: Found " << m_results.size() << " tracks");
 

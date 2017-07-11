@@ -15,10 +15,12 @@
 #include <tracking/ckf/findlets/base/TreeSearchFindlet.h>
 #include <tracking/ckf/findlets/base/HitSelector.h>
 #include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointMatcher.h>
+#include <tracking/ckf/findlets/base/OverlapTeacher.h>
 #include <tracking/ckf/findlets/base/OverlapResolverFindlet.h>
 
 #include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
 
+#include <tracking/ckf/filters/cdcToSpacePoint/result/CDCVXDTrackCombinationTruthVarSet.h>
 #include <tracking/ckf/filters/cdcToSpacePoint/result/CDCVXDTrackCombinationFilterFactory.h>
 #include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectFilterFactory.h>
 
@@ -74,6 +76,8 @@ namespace Belle2 {
     TrackFindingCDC::StoreArrayLoader<const SpacePoint> m_hitsLoader;
     /// Findlet doing the main work: the tree finding
     TreeSearchFindlet<CKFCDCToVXDStateObject, CDCToSpacePointMatcher, CDCToSpacePointHitSelector> m_treeSearchFindlet;
+    /// Findlet for adding truth information before the overlap finder
+    OverlapTeacher<CDCVXDTrackCombinationTruthVarSet> m_overlapTeacher;
     /// Findlet for resolving overlaps
     OverlapResolverFindlet<TrackFindingCDC::ChooseableFilter<CDCVXDTrackCombinationFilterFactory>> m_overlapResolver;
     /// Findlet for handling the store array write out

@@ -21,7 +21,8 @@ namespace Belle2 {
     "truth_number_of_correct_hits",
     "truth_number_of_mc_hits",
     "truth_event_number",
-    "truth_cdc_number"
+    "truth_cdc_number",
+    "truth_teacher"
   };
 
   /// Vehicle class to transport the variable names

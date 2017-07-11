@@ -106,6 +106,7 @@ CDCVXDTrackCombinationFilterFactory::getValidFilterNamesAndDescriptions() const
     {"mva_skimmed", "filter based on the trained MVA method for skimming, bur returns the number of hits"},
     {"truth", "monte carlo truth"},
     {"truth_number", "monte carlo truth returning the number of correct hits"},
+    {"truth_teacher", "monte carlo truth returning the result of the teacher"},
     {"simple", "simple filter based on simple parameters"},
     {"chi2", "filter based on a chi2 calculation"},
   };
@@ -128,6 +129,8 @@ CDCVXDTrackCombinationFilterFactory::create(const std::string& filterName) const
     return makeUnique<MCCDCVXDTrackCombinationFilter >();
   } else if (filterName == "truth_number") {
     return makeUnique<MCCTruthNumberCDCVXDTrackCombinationFilter>("truth_number_of_correct_hits");
+  } else if (filterName == "truth_teacher") {
+    return makeUnique<MCCTruthNumberCDCVXDTrackCombinationFilter>("truth_teacher");
   } else if (filterName == "simple") {
     return makeUnique<SimpleCDCVXDTrackCombinationFilter>();
   } else if (filterName == "chi2") {

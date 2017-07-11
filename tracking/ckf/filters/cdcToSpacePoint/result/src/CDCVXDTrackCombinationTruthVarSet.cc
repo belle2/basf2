@@ -24,6 +24,7 @@ bool CDCVXDTrackCombinationTruthVarSet::extract(const BaseCDCVXDTrackCombination
   StoreObjPtr<EventMetaData> eventMetaData;
   var<named("truth_event_number")>() = eventMetaData->getEvent();
   var<named("truth_cdc_number")>() = cdcTrack->getArrayIndex();
+  var<named("truth_teacher")>() = result->getWeight();
 
   const std::string& cdcTrackStoreArrayName = cdcTrack->getArrayName();
 

@@ -230,19 +230,33 @@ class MillepedeCalibration():
         self.fixVXDid(3, 0, 0, 2, parameters)
 
     # EKLM helpers --------------------------------------------------------------------------------------------------
-    def fixEKLMModule(self, endcap, layer, sector, plane, segment, parameters=[1, 2, 6]):
+    def fixEKLMSector(self, endcap, layer, sector, parameters=[1, 2, 6]):
         for ipar in parameters:
             self.fixGlobalParam(Belle2.EKLMAlignment.getGlobalUniqueID(),
-                                Belle2.EKLMSegmentID(endcap, layer, sector, plane, segment).getSegmentGlobalNumber(),
+                                Belle2.EKLMElementID(endcap, layer, sector).getGlobalNumber(),
                                 ipar)
 
-    def fixEKLM(self, endcaps=range(1, 3), layers={1: 12, 2: 14}, sectors=range(1, 5), planes=range(1, 3), segments=range(1, 6)):
+    def fixEKLMSectors(self, endcaps=range(1, 3), layers={1: 12, 2: 14}, sectors=range(1, 5)):
+        for endcap in endcaps:
+            for layer in range(1, layers[endcap] + 1):
+                for sector in sectors:
+                    self.fixEKLMSector(endcap, layer, sector)
+
+    def fixEKLMSegment(self, endcap, layer, sector, plane, segment, parameters=[1, 2, 6]):
+        for ipar in parameters:
+            self.fixGlobalParam(Belle2.EKLMAlignment.getGlobalUniqueID(),
+                                Belle2.EKLMElementID(endcap, layer, sector, plane, segment).getGlobalNumber(),
+                                ipar)
+
+    def fixEKLMSegments(self, endcaps=range(1, 3), layers={1: 12, 2: 14},
+                        sectors=range(1, 5), planes=range(1, 3),
+                        segments=range(1, 6)):
         for endcap in endcaps:
             for layer in range(1, layers[endcap] + 1):
                 for sector in sectors:
                     for plane in planes:
                         for segment in segments:
-                            self.fixEKLMModule(endcap, layer, sector, plane, segment)
+                            self.fixEKLMSegment(endcap, layer, sector, plane, segment)
 
     # BKLM helpers --------------------------------------------------------------------------------------------------
     def fixBKLMModule(self, sector, layer, forward, parameters=UVWABC):

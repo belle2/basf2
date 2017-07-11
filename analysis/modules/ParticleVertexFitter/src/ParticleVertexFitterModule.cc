@@ -50,7 +50,7 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   ParticleVertexFitterModule::ParticleVertexFitterModule() : Module(),
-    m_Bfield(0), m_logCapture("Rave", LogConfig::c_Debug, LogConfig::c_Debug)
+    m_Bfield(0)
   {
     // set module description (e.g. insert text)
     setDescription("Vertex fitter for modular analysis");
@@ -231,9 +231,7 @@ namespace Belle2 {
     // fits using Rave
     if (m_vertexFitter == "rave") {
       try {
-        m_logCapture.start();
         ok = doRaveFit(mother);
-        m_logCapture.finish();
       } catch (rave::CheckedFloatException) {
         B2ERROR("Invalid inputs (nan/inf)?");
         ok = false;

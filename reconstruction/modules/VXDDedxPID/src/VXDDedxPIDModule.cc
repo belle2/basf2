@@ -55,7 +55,7 @@ VXDDedxPIDModule::VXDDedxPIDModule() : Module(), m_pdfs()
 
   //Parameter definitions
   addParam("useIndividualHits", m_useIndividualHits,
-           "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", true);
+           "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", false);
   addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded", double(0.05));
   addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded", double(0.25));
 

@@ -16,6 +16,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/ReferenceFrame.h>
+#include <analysis/ClusterUtility/ClusterUtils.h>
 #include <analysis/ContinuumSuppression/FoxWolfram.h>
 
 #include <framework/logging/Logger.h>
@@ -65,7 +66,8 @@ namespace Belle2 {
             eclClusters[i]->getHypothesisId() != 5)
           continue;
 
-        TLorentzVector momECLCluster = eclClusters[i] -> get4Vector();
+        ClusterUtils C;
+        TLorentzVector momECLCluster = C.Get4MomentumFromCluster(eclClusters[i]);
         if (momECLCluster == momECLCluster) {
           if (eclClusters[i]->isNeutral()) {
             Particle particle(eclClusters[i]);

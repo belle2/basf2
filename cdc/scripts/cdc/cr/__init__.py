@@ -85,11 +85,14 @@ def set_cdc_cr_parameters(period):
     globalPhi = globalPhiRotation[period]
 
 
-def add_cdc_cr_simulation(path, empty_path, topInCounter=True):
+def add_cdc_cr_simulation(path, topInCounter=True):
     """
     Add CDC CR simulation.
 
     """
+    # Create empty path
+    emptyPath = create_path()
+
     # Register the CRY module
     cry = register_module('CRYInput')
     # cosmic data input
@@ -125,7 +128,7 @@ def add_cdc_cr_simulation(path, empty_path, topInCounter=True):
                           )
 
     path.add_module(sel)
-    sel.if_false(empty_path)
+    sel.if_false(emptyPath)
     path.add_module('FullSim',
                     # Uncomment if you want to disable secondaries.
                     ProductionCut=1000000.)
@@ -133,25 +136,68 @@ def add_cdc_cr_simulation(path, empty_path, topInCounter=True):
     path.add_module('CDCDigitizer')
 
 
-def add_cdc_cr_reconstruction(path, eventTimingExtraction=False):
+def add_cdc_cr_reconstruction(path, eventTimingExtraction=False, topInCounter=True):
     """
     Add CDC CR reconstruction
     """
 
     # Add cdc track finder
-    add_cdc_cr_track_finding(path)
+    add_cdc_cr_track_finding(path, merge_tracks=False)
 
     # Setup Genfit extrapolation
     path.add_module("SetupGenfitExtrapolation")
 
-    # Add cdc track fitter
-    add_cdc_cr_track_fit_and_track_creator(path,
-                                           eventTimingExtraction=eventTimingExtraction,
-                                           lightPropSpeed=lightPropSpeed,
-                                           triggerPos=triggerPos,
-                                           normTriggerPlaneDirection=normTriggerPlaneDirection,
-                                           readOutPos=readOutPos
-                                           )
+    # Time seed
+    path.add_module("PlaneTriggerTrackTimeEstimator",
+                    pdgCodeToUseForEstimation=13,
+                    triggerPlanePosition=triggerPos,
+                    triggerPlaneDirection=normTriggerPlaneDirection,
+                    useFittedInformation=False)
+
+    # Initial track fitting
+    path.add_module("DAFRecoFitter",
+                    probCut=0.00001,
+                    pdgCodesToUseForFitting=13,
+                    )
+
+    if topInCounter is True:
+        # Correct time seed with TOP in counter.
+        path.add_module("PlaneTriggerTrackTimeEstimator",
+                        pdgCodeToUseForEstimation=13,
+                        triggerPlanePosition=triggerPos,
+                        triggerPlaneDirection=normTriggerPlaneDirection,
+                        useFittedInformation=True,
+                        useReadoutPosition=True,
+                        readoutPosition=readOutPos,
+                        readoutPositionPropagationSpeed=lightPropSpeed
+                        )
+
+        # Track fitting
+        path.add_module("DAFRecoFitter",
+                        # probCut=0.00001,
+                        pdgCodesToUseForFitting=13,
+                        )
+
+    if eventTimingExtraction is True:
+        # Extract the time
+        path.add_module("FullGridTrackTimeExtraction",
+                        recoTracksStoreArrayName="RecoTracks",
+                        maximalT0Shift=70,
+                        minimalT0Shift=-70,
+                        numberOfGrids=6
+                        )
+
+        # Track fitting
+        path.add_module("DAFRecoFitter",
+                        # probCut=0.00001,
+                        pdgCodesToUseForFitting=13,
+                        )
+
+    # Create Belle2 Tracks from the genfit Tracks
+    path.add_module('TrackCreator',
+                    defaultPDGCode=13,
+                    useClosestHitToIP=True
+                    )
 
 
 def getExpNumber(fname):

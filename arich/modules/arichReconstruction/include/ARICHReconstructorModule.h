@@ -89,9 +89,6 @@ namespace Belle2 {
     ARICHReconstruction* m_ana;      /**< Class with reconstruction tools */
     double m_trackPositionResolution;/**< Track position resolution; simulation smearing. */
     double m_trackAngleResolution;   /**< Track direction resolution; simulation smearing. */
-    double m_backgroundLevel;        /**< Photon background level. */
-    double m_singleResolution;       /**< Resolution of single photon emission angle. */
-    std::vector<double> m_aerogelMerit; /**< Vector of aerogel layer figures of merit. */
     int m_inputTrackType;            /**< Input tracks from the tracking (0) or from MCParticles>AeroHits (1). */
     int    m_storePhot;              /**< If == 1 individual reconstruced photon information (cherenkov angle,...) is stored in ARICHTrack */
     bool m_align;                    /** If==1 alignment constants are used for global->local track transformation */

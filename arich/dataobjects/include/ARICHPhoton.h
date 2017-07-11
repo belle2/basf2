@@ -27,9 +27,7 @@ namespace Belle2 {
     /**
      * default constructor
      */
-    ARICHPhoton(): m_hitID(0), m_thetaCer(0), m_phiCer(0),  m_mirror(0), m_sigExpPi(0), m_bkgExpPi(0), m_sigExpK(0),
-      m_bkgExpK(0)
-    {};
+    ARICHPhoton() {};
 
     /**
      * Constructor to allow initialization
@@ -40,61 +38,61 @@ namespace Belle2 {
      */
     ARICHPhoton(int hitID, float thetaCer, float phiCer, int mirror): m_hitID(hitID), m_thetaCer(thetaCer),
       m_phiCer(phiCer),
-      m_mirror(mirror), m_sigExpPi(0), m_bkgExpPi(0), m_sigExpK(0), m_bkgExpK(0) {};
+      m_mirror(mirror) {};
 
 
     /**
-     * Set expected signal contribution for pion and kaon hypothesis
-     * @param pi signal contribution for pion hypothesis
-     * @param k signal contribution for kaon hypothesis
+     * Set expected signal contribution
+     * @param sigExp array of expected signal photons on pad for all pid hypotheses
      */
-    void setSigExp(double pi, double k)
+    void setSigExp(const double* sigExp)
     {
-      m_sigExpPi = pi;
-      m_sigExpK = k;
+      m_sigExp_e = (float)sigExp[0];
+      m_sigExp_mu = (float)sigExp[1];
+      m_sigExp_pi = (float)sigExp[2];
+      m_sigExp_K = (float)sigExp[3];
+      m_sigExp_p = (float)sigExp[4];
     }
 
     /**
-     * Set expected background contribution for pion and kaon hypothesis
-     * @param pi background contribution for pion hypothesis
-     * @param k background contribution for kaon hypothesis
+     * Set expected background contribution
+     * @param bkgExp array of expected background photons on pad for all pid hypotheses
      */
-    void setBkgExp(double pi, double k)
+    void setBkgExp(const double* bkgExp)
     {
-      m_bkgExpPi = pi;
-      m_bkgExpK = k;
+      m_bkgExp_e = (float)bkgExp[0];
+      m_bkgExp_mu = (float)bkgExp[1];
+      m_bkgExp_pi = (float)bkgExp[2];
+      m_bkgExp_K = (float)bkgExp[3];
+      m_bkgExp_p = (float)bkgExp[4];
     }
 
     /**
-     * Get expected signal contribution for pion hypothesis
+     * Get expected signal contribution for given pid hypothesis
+     * @param part pid hypothesis
      */
-    float getSigExpPi() const
+    float getSigExp(const Const::ChargedStable& part) const
     {
-      return m_sigExpPi;
+      if (part == Const::electron) return m_sigExp_e;
+      if (part == Const::muon) return m_sigExp_mu;
+      if (part == Const::pion) return m_sigExp_pi;
+      if (part == Const::kaon) return m_sigExp_K;
+      if (part == Const::proton) return m_sigExp_p;
+      else return 0;
     }
 
     /**
-     * Get expected signal contribution for kaon hypothesis
+     * Get expected background  contribution for given pid hypothesis
+     * @param part pid hypothesis
      */
-    float getSigExpK() const
+    float getBkgExp(const Const::ChargedStable& part) const
     {
-      return m_sigExpK;
-    }
-
-    /**
-     * Get expected background contribution for pion hypothesis
-     */
-    float getBkgExpPi() const
-    {
-      return m_bkgExpPi;
-    }
-
-    /**
-     * Get expected background contribution for kaon hypothesis
-     */
-    float getBkgExpK() const
-    {
-      return m_bkgExpK;
+      if (part == Const::electron) return m_bkgExp_e;
+      if (part == Const::muon) return m_bkgExp_mu;
+      if (part == Const::pion) return m_bkgExp_pi;
+      if (part == Const::kaon) return m_bkgExp_K;
+      if (part == Const::proton) return m_bkgExp_p;
+      else return 0;
     }
 
     /**
@@ -130,16 +128,25 @@ namespace Belle2 {
     }
 
   private:
-    int m_hitID;       /**< id of corresponding ARICHHit */
-    float m_thetaCer;  /**< reconstructed theta angle */
-    float m_phiCer;    /**< reconstructed phi angle */
-    int m_mirror;      /**< assumed reflection of mirror plate (0 for no reflection) */
-    float m_sigExpPi;  /**< expected signal contribution for pion hypothesis */
-    float m_bkgExpPi;  /**< expected background contribution for pion hypothesis */
-    float m_sigExpK;   /**< expected signal contribution for kaon hypothesis */
-    float m_bkgExpK;   /**< expected background contribution for kaon hypothesis */
 
-    ClassDef(ARICHPhoton, 2); /**< ClassDef */
+    int m_hitID = 0;     /**< id of corresponding ARICHHit */
+    float m_thetaCer = 0.; /**< reconstructed theta angle */
+    float m_phiCer = 0.;  /**< reconstructed phi angle */
+    int m_mirror = 0;    /**< assumed reflection of mirror plate (0 for no reflection) */
+    float m_sigExp_e = 0.; /**< number of expected signal photons on pad for e hypotheses */
+    float m_bkgExp_e = 0.; /**< number of expected background photons on pad for e hypotheses */
+    float m_sigExp_mu = 0.; /**< number of expected signal photons on pad for mu hypotheses */
+    float m_bkgExp_mu = 0.; /**< number of expected background photons on pad for mu hypotheses */
+    float m_sigExp_pi = 0.; /**< number of expected signal photons on pad for pi hypotheses */
+    float m_bkgExp_pi = 0.; /**< number of expected background photons on pad for pi hypotheses */
+    float m_sigExp_K = 0.; /**< number of expected signal photons on pad for K hypotheses */
+    float m_bkgExp_K = 0.; /**< number of expected background photons on pad for K hypotheses */
+    float m_sigExp_p = 0.; /**< number of expected signal photons on pad for p hypotheses */
+    float m_bkgExp_p = 0.; /**< number of expected background photons on pad for p hypotheses */
+
+
+
+    ClassDef(ARICHPhoton, 3); /**< ClassDef */
 
   };
 } //Belle2 namespace

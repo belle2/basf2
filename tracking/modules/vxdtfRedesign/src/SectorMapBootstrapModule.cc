@@ -32,6 +32,9 @@
 #include "framework/gearbox/Const.h"
 #include "framework/datastore/StoreObjPtr.h"
 
+// DB access:
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/PayloadFile.h>
 
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -76,13 +79,18 @@ at endRun write the SectorMaps to SectorMapsOutputFile.", m_writeSectorMap);
            " from the from the root file. All other will be ignored. If empty \"\" (default) all setups are read. Will "
            "only used if sectormap is retrieved from root file. Case will be ignored!",
            std::string(""));
+
+  addParam("ReadSecMapFromDB", m_readSecMapFromDB, "If set to true the sector map will be read from the Data Base. NOTE: this will "
+           "override the parameter ReadSectorMap (reading sector map from file)!!!", m_readSecMapFromDB);
 }
 
 void
 SectorMapBootstrapModule::initialize()
 {
 
-  if (m_readSectorMap)
+  if (m_readSecMapFromDB)
+    retrieveSectorMapFromDB();
+  else if (m_readSectorMap)
     retrieveSectorMap();
   else
     bootstrapSectorMap();
@@ -450,7 +458,69 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
   if (!read_something) B2WARNING("No setup was read from the root file! The requested setup name was: " << m_setupToRead);
 
   rootFile.Close();
+}
 
+/// Retrieve the whole sector map from the data base
+void
+SectorMapBootstrapModule::retrieveSectorMapFromDB(void)
+{
+  B2INFO("Retrieving sectormap from DB. Filename: " << m_sectorMapsInputFile.c_str());
 
+  DBObjPtr<PayloadFile> sectorMapsInputFile(m_sectorMapsInputFile.c_str());
+  TFile rootFile(sectorMapsInputFile->getFileName().c_str());
+
+  // some cross check that the file is open
+  if (!rootFile.IsOpen()) B2FATAL("The Payload file: " << sectorMapsInputFile->getFileName().c_str() << " not found in the DB");
+
+  TTree* tree = NULL;
+  rootFile.GetObject(c_setupKeyNameTTreeName.c_str(), tree);
+
+  // test if the tree was found
+  if (!tree) B2FATAL("Did not found the setup tree: " << c_setupKeyNameTTreeName.c_str());
+
+  TString* setupKeyName = NULL;
+  tree->SetBranchAddress(c_setupKeyNameBranchName.c_str(),
+                         & setupKeyName);
+
+  // ignore case, so only upper case
+  TString setupToRead_upper = m_setupToRead;
+  setupToRead_upper.ToUpper();
+  // to monitor if anything was read from the root files
+  bool read_something = false;
+
+  FiltersContainer<SpacePoint>& filtersContainer = FiltersContainer<SpacePoint>::getInstance();
+  auto nEntries = tree->GetEntriesFast();
+  for (int i = 0;  i < nEntries ; i++) {
+    tree->GetEntry(i);
+
+    // if a setup name is specified only read that one
+    if (setupToRead_upper != "") {
+      TString buff = setupKeyName->Data();
+      buff.ToUpper();
+      if (buff != setupToRead_upper) continue;
+    }
+
+    rootFile.cd(setupKeyName->Data());
+
+    B2DEBUG(1, "Retrieving SectorMap with name " << setupKeyName->Data());
+
+    VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
+
+    string setupKeyNameStd = string(setupKeyName->Data());
+    segmentFilters->retrieveFromRootFile(setupKeyName);
+
+    B2DEBUG(1, "Retrieved map with name: " << setupKeyNameStd << " from rootfie.");
+    filtersContainer.assignFilters(setupKeyNameStd, segmentFilters);
+
+    rootFile.cd("..");
+
+    setupKeyName->Clear();
+
+    read_something = true;
+  }
+
+  if (!read_something) B2WARNING("No setup was read from the root file! The requested setup name was: " << m_setupToRead);
+
+  rootFile.Close();
 }
 

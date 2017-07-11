@@ -62,9 +62,10 @@ int RCCommand::isAvailable(const RCState& state) const throw()
   if ((cmd == LOAD || cmd == CONFIGURE) &&
       state == RCState::NOTREADY_S) {
     return SUGGESTED;
-  } else if ((cmd == LOAD || cmd == CONFIGURE) &&
+    /*  } else if ((cmd == LOAD || cmd == CONFIGURE) &&
              state == RCState::READY_S) {
     return ENABLED;
+    */
   } else if (cmd == START && state == RCState::READY_S) {
     return SUGGESTED;
   } else if (cmd == STOP && (state == RCState::RUNNING_S ||

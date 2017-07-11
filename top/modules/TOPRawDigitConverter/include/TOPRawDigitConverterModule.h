@@ -78,7 +78,9 @@ namespace Belle2 {
     bool m_useModuleT0Calibration;     /**< if true, use module T0 calibration */
     bool m_useCommonT0Calibration;     /**< if true, use common T0 calibration */
     bool m_subtractOffset;             /**< if true, subtract offset of nominal TDC */
-    double m_pedestalRMS = 0;      /**< r.m.s of pedestals [ADC counts] */
+    double m_pedestalRMS;              /**< r.m.s of pedestals [ADC counts] */
+    double m_maxPulseWidth;            /**< max pulse width to set digit as good [ns] */
+
     int m_calibrationChannel;   /**< ASIC channel number with calibration pulse */
     double m_calpulseWidthMin;  /**< minimal width of calibration pulse */
     double m_calpulseWidthMax;  /**< maximal width of calibration pulse */

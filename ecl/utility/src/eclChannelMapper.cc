@@ -115,7 +115,7 @@ int ECLChannelMapper::getCrateID(int iCOPPERNode, int iFINESSE)
 
   } else if ((iCOPPERNode & EECL_ID) == EECL_ID) {
 
-    iCrate = ECL_BARREL_CRATES + (iCOPPERNode - EECL_ID - 1) * ECL_FINESSES_IN_COPPER + iFINESSE + 1;
+    iCrate = ECL_BARREL_CRATES + iFINESSE * ECL_FWD_CRATES + (iCOPPERNode - EECL_ID - 1) + 1;
 
   } else {
 
@@ -138,7 +138,7 @@ int ECLChannelMapper::getCellId(int iCrate, int iShaper, int iChannel)
   // iCrate = 1  - 36  -- Barrel
   //          37 - 44  -- Forward
   //          45 - 52  -- Backward
-  int thetaID = 0, phiID = 0, cellID = 0;
+  int cellID = 0;
   int arrayIndex = 0;
 
   if (iCrate   < 1 || iCrate   > 52) return -1;
@@ -146,9 +146,9 @@ int ECLChannelMapper::getCellId(int iCrate, int iShaper, int iChannel)
   if (iChannel < 1 || iChannel > 16) return -1;
 
   if (iCrate >= 1 && iCrate <= 36) {
-    thetaID = 1 + (iShaper - 1) * 4 + (iChannel - 1) % 4;
-    phiID   = 1 + (iCrate  - 1) * 4 + (iChannel - 1) / 4;
-    cellID  = 1 + ECL_FWD_CHANNELS + (phiID - 1) + (thetaID - 1) * 144;
+    //int thetaID = 1 + (iShaper - 1) * 4 + (iChannel - 1) % 4;
+    //int phiID   = 1 + (iCrate  - 1) * 4 + (iChannel - 1) / 4;
+    //cellID  = 1 + ECL_FWD_CHANNELS + (phiID - 1) + (thetaID - 1) * 144;
 
     arrayIndex = (iCrate - 1) * ECL_BARREL_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER
                  + (iShaper - 1) * ECL_CHANNELS_IN_SHAPER + (iChannel - 1);

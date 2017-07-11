@@ -29,7 +29,7 @@ using namespace Belle2;
 REG_MODULE(TreeFitter)
 
 // Constructor
-TreeFitterModule::TreeFitterModule() : Module()//,  m_Bfield(0) //(FT) not used anymore
+TreeFitterModule::TreeFitterModule() : Module()
 {
   setDescription("Tree Fitter module. Performs simultaneous fit of all vertices in a decay chain.");
   //module parameters
@@ -37,6 +37,7 @@ TreeFitterModule::TreeFitterModule() : Module()//,  m_Bfield(0) //(FT) not used 
   addParam("confidenceLevel", m_confidenceLevel, "Confidence level to accept fitted decay tree. -1.0 for failed fits.", 0.0);
   addParam("convergencePrecision", m_precision, "Upper limit for chi2 fluctuations to accept result.", 1.0); //large value for now
   addParam("verbose", m_verbose, "BaBar verbosity (to be phased out in the future)", 5);
+  addParam("massConstraintList", m_massConstraintList, "List of particles to mass constrain");
 }
 
 // Destructor
@@ -45,13 +46,10 @@ TreeFitterModule::~TreeFitterModule() {}
 // Initializer
 void TreeFitterModule::initialize()
 {
-  // get magnetic field
-  // Commented for now, since it's used by each particle individually (FT)
-  //m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
   //Make sure we have a particle list
   StoreObjPtr<ParticleList>::required(m_particleList);
   //Also make sure we have actual particles
-  StoreArray<Particle> particles;
+  StoreArray<Belle2::Particle> particles;
   particles.isRequired();
 }
 
@@ -70,7 +68,7 @@ void TreeFitterModule::event()
   std::vector<unsigned int> toRemove;
   unsigned int n = plist->getListSize();
   for (unsigned i = 0; i < n; i++) {
-    Particle* particle = plist->getParticle(i);
+    Belle2::Particle* particle = plist->getParticle(i);
     bool ok = doTreeFit(particle);
     if (!ok) particle->setPValue(-1);
     if (particle->getPValue() < m_confidenceLevel) {
@@ -87,10 +85,11 @@ void TreeFitterModule::endRun() {}
 void TreeFitterModule::terminate() {}
 
 //Actual Fit Call
-bool TreeFitterModule::doTreeFit(Particle* head)
+bool TreeFitterModule::doTreeFit(Belle2::Particle* head)
 {
   TreeFitter::Fitter* TreeFitObject = new TreeFitter::Fitter(head, m_precision);
   TreeFitObject->setVerbose(m_verbose);
+  TreeFitObject->setMassConstraintList(m_massConstraintList);
   bool rc = TreeFitObject->fit();
   delete TreeFitObject; //clean up statement, consider using unique_ptr<TreeFitter::Fitter> in the future
   return rc;

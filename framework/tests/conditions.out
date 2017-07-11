@@ -77,7 +77,6 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_2.root HTTP/1.1" 404 -
 [FATAL] 2 ERROR(S) occurred! The processing of events will not be started.
 [RESULT] Starting event processing, random seed is set to 'something important'
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=0 HTTP/1.1" 200 -
-[INFO] Found more then one payload for the following keys: BeamParameters
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_3.root HTTP/1.1" 200 -
 [INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
    HER=(0.290583, 0, 6.99797, 7.004), 
@@ -88,7 +87,6 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_3.root HTTP/1.1" 200 -
    CovLER=diag(5.64063e-06, 0, 0)
    CovVTX=[(4.10916e-07, 0, -2.64802e-06), (0, 1.7405e-11, 0), (-2.64802e-06, 0, 0.000237962)]
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=1 HTTP/1.1" 200 -
-[INFO] Found more then one payload for the following keys: BeamParameters
 [INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
    HER=(0.290583, 0, 6.99797, 7.004), 
    LER=(0.166035, 0, -3.99855, 4.002), 

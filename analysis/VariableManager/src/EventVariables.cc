@@ -27,7 +27,9 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
-//
+// cluster utils
+#include <analysis/ClusterUtility/ClusterUtils.h>
+
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/dbobjects/BeamParameters.h>
 
@@ -134,7 +136,9 @@ namespace Belle2 {
         TLorentzVector momtrack(iTrack->getMomentum(), 0);
         if (momtrack == momtrack) totalMomChargedtracks += momtrack;
       }
+
       StoreArray<ECLCluster> eclClusters;
+      ClusterUtils C;
       for (int i = 0; i < eclClusters.getEntries(); ++i) {
         // sum only momentum of T1 (1) and N1 (5) ECLClusters
         // other clusters are duplicates
@@ -142,7 +146,7 @@ namespace Belle2 {
             eclClusters[i]->getHypothesisId() != 5)
           continue;
 
-        TLorentzVector iMomECLCluster = eclClusters[i] -> get4Vector();
+        TLorentzVector iMomECLCluster = C.Get4MomentumFromCluster(eclClusters[i]);
         if (iMomECLCluster == iMomECLCluster) {
           if (eclClusters[i]->isNeutral()) momNeutralClusters += iMomECLCluster;
           else if (!(eclClusters[i]->isNeutral())) totalMomChargedclusters += iMomECLCluster;

@@ -328,6 +328,9 @@ namespace Belle2 {
     //! Coincidence window half-width for in-time KLM hits (ns)
     double m_MaxDt;
 
+    //! Magnetic field z component (gauss) at origin
+    double m_MagneticField;
+
     //! user-defined maximum squared-distance (#variances) for matching hit to extrapolation
     double m_MaxDistSqInVariances;
 

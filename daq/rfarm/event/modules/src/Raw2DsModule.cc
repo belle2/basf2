@@ -100,7 +100,7 @@ void Raw2DsModule::registerRawCOPPERs()
 
 
   // Get a record from ringbuf
-  int error_flag = 0;
+  unsigned int error_flag = 0;
   int size;
   int* evtbuf = new int[MAXEVTSIZE];
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
@@ -133,6 +133,7 @@ void Raw2DsModule::registerRawCOPPERs()
   unsigned int utime = 0;
   unsigned int ctime = 0;
   unsigned long long int mtime = 0;
+
   // Store data contents in Corresponding RawXXXX
   for (int cprid = 0; cprid < ncprs * npackedevts; cprid++) {
     // Pick up one COPPER and copy data in a temporary buffer
@@ -154,14 +155,12 @@ void Raw2DsModule::registerRawCOPPERs()
       continue;
     }
 
+    // Set one block to RawCOPPER
     RawCOPPER tempcpr;
-    //    tempcpr.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);  -> bug. If RawFTSW is stored in bufbody, tempcpr's version becomes 0 and getNodeID fails.
     tempcpr.SetBuffer(cprbuf, nwds_buf, false, 1, 1);
-
-    //    int subsysid = ((RawCOPPER&)tempdblk).GetNodeID(cprid);
-    //    int subsysid = tempcpr.GetNodeID(cprid);
     int subsysid = tempcpr.GetNodeID(0);
-    if (tempcpr.GetEventCRCError(0) != 0) error_flag = 1;
+    //    if (tempcpr.GetEventCRCError(0) != 0) error_flag = 1;
+    error_flag |= (unsigned int)(tempcpr.GetDataType(0));
 
     // Switch to each detector and register RawXXX
     if ((subsysid & DETECTOR_MASK) == CDC_ID) {
@@ -206,7 +205,8 @@ void Raw2DsModule::registerRawCOPPERs()
   evtmetadata->setEvent(sndhdr.GetEventNumber());
   evtmetadata->setTime(mtime);  //time(NULL));
   //  evtmetadata->setTime((unsigned long long int) utime);//time(NULL));
-  if (error_flag) evtmetadata->addErrorFlag(EventMetaData::c_B2LinkEventCRCError);
+
+  if (error_flag) setErrorFlag(error_flag, evtmetadata);
 
   delete[] evtbuf;
 
@@ -227,3 +227,17 @@ void Raw2DsModule::terminate()
   B2INFO("Raw2Ds: terminate called");
 }
 
+void Raw2DsModule::setErrorFlag(unsigned int error_flag, StoreObjPtr<EventMetaData> evtmetadata)
+{
+  //  RawHeader_latest raw_hdr;
+  int error_set = 0;
+  if (error_flag & RawHeader_latest::B2LINK_PACKET_CRC_ERROR) {
+    evtmetadata->addErrorFlag(EventMetaData::c_B2LinkPacketCRCError);
+    error_set = 1;
+  }
+  if (error_flag & RawHeader_latest::B2LINK_EVENT_CRC_ERROR) {
+    evtmetadata->addErrorFlag(EventMetaData::c_B2LinkEventCRCError);
+    error_set = 1;
+  }
+  if (error_set)  B2INFO("Raw2Ds: Error flag was set in EventMetaData.");
+}

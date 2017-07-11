@@ -11,6 +11,8 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <TError.h>
+
 #include <genfit/AbsTrackRep.h>
 #include <genfit/FitStatus.h>
 #include <genfit/AbsFitter.h>
@@ -89,8 +91,10 @@ bool TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresenta
       return recoTrack.wasFitSuccessful(trackRepresentation);
     }
   }
-
-  return fitWithoutCheck(recoTrack, *trackRepresentation);
+  const auto previousSetting = gErrorIgnoreLevel; // Save current log level
+  gErrorIgnoreLevel = m_gErrorIgnoreLevel; // Set the log level defined in the TrackFitter
+  auto fitWithoutCheckResult = fitWithoutCheck(recoTrack, *trackRepresentation);
+  gErrorIgnoreLevel = previousSetting; // Restore previous setting
 }
 
 void TrackFitter::resetFitterToDefaultSettings()

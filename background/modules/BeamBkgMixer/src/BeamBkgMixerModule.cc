@@ -390,14 +390,24 @@ namespace Belle2 {
                           m_minTime, m_maxTime);
         } else {
           iev--;
-          B2INFO("BeamBkgMixer: event " << bkg.eventCount <<
-                 " of " << bkg.type << " rejected due to large energy deposit in ECL");
+          std::string message = "BeamBkgMixer: event " + to_string(bkg.eventCount)
+                                + " of " + bkg.type + " rejected due to large energy deposit in ECL";
+          m_rejected[message] += 1;
+          m_rejectedCount++;
+          if (m_rejectedCount < 10) {
+            B2INFO("BeamBkgMixer: event rejected due to large energy deposit in ECL");
+          } else if (m_rejectedCount == 10) {
+            B2INFO("BeamBkgMixer: event rejected due to large energy deposit in ECL "
+                   << "(message will be suppressed now)");
+          }
         }
 
         bkg.eventCount++;
         if (bkg.eventCount >= bkg.numEvents) {
           bkg.eventCount = 0;
-          B2INFO("BeamBkgMixer: events of " << bkg.type << " will be re-used");
+          std::string message = "BeamBkgMixer: events of " + bkg.type + " will be re-used";
+          m_reused[message] += 1;
+          if (m_reused[message] == 1) B2INFO(message);
           StoreArray<BackgroundInfo> bkgInfos("", DataStore::c_Persistent);
           if (m_BGInfoIndex >= 0 and m_BGInfoIndex < bkgInfos.getEntries())
             bkgInfos[m_BGInfoIndex]->incrementReusedCounter(bkg.index);
@@ -429,14 +439,24 @@ namespace Belle2 {
           addSimHits(eclHits, bkg.simHits.ECL, timeShift, minTime, maxTime);
         } else {
           iev--;
-          B2INFO("BeamBkgMixer: event " << bkg.eventCount <<
-                 " of " << bkg.type << " rejected due to large energy deposit in ECL");
+          std::string message = "BeamBkgMixer: event " + to_string(bkg.eventCount)
+                                + " of " + bkg.type + " rejected due to large energy deposit in ECL";
+          m_rejected[message] += 1;
+          m_rejectedCount++;
+          if (m_rejectedCount < 10) {
+            B2INFO("BeamBkgMixer: event rejected due to large energy deposit in ECL");
+          } else if (m_rejectedCount == 10) {
+            B2INFO("BeamBkgMixer: event rejected due to large energy deposit in ECL "
+                   << "(message will be suppressed now)");
+          }
         }
 
         bkg.eventCount++;
         if (bkg.eventCount >= bkg.numEvents) {
           bkg.eventCount = 0;
-          B2INFO("BeamBkgMixer: events of " << bkg.type << " will be re-used");
+          std::string message = "BeamBkgMixer: events of " + bkg.type + " will be re-used";
+          m_reused[message] += 1;
+          if (m_reused[message] == 1) B2INFO(message);
           StoreArray<BackgroundInfo> bkgInfos("", DataStore::c_Persistent);
           if (m_BGInfoIndex >= 0 and m_BGInfoIndex < bkgInfos.getEntries())
             bkgInfos[m_BGInfoIndex]->incrementReusedCounter(bkg.index);
@@ -470,7 +490,9 @@ namespace Belle2 {
         bkg.eventCount++;
         if (bkg.eventCount >= bkg.numEvents) {
           bkg.eventCount = 0;
-          B2INFO("BeamBkgMixer: events of " << bkg.type << " will be re-used");
+          std::string message = "BeamBkgMixer: events of " + bkg.type + " will be re-used";
+          m_reused[message] += 1;
+          if (m_reused[message] == 1) B2INFO(message);
           StoreArray<BackgroundInfo> bkgInfos("", DataStore::c_Persistent);
           if (m_BGInfoIndex >= 0 and m_BGInfoIndex < bkgInfos.getEntries())
             bkgInfos[m_BGInfoIndex]->incrementReusedCounter(bkg.index);
@@ -488,6 +510,15 @@ namespace Belle2 {
 
   void BeamBkgMixerModule::terminate()
   {
+
+    B2INFO("BeamBkgMixer - reused samples:");
+    for (const auto& message : m_reused) {
+      B2INFO(message.first << "(occured " << message.second << " times)");
+    }
+    B2INFO("BeamBkgMixer - rejected events:");
+    for (const auto& message : m_rejected) {
+      B2INFO(message.first << "(occured " << message.second << " times)");
+    }
 
     for (auto& bkg : m_backgrounds) {
       delete bkg.tree;

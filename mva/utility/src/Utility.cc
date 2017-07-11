@@ -158,6 +158,9 @@ namespace Belle2 {
         GeneralOptions general_options;
         weightfile.getOptions(general_options);
         general_options.m_treename = treename;
+        // Override possible restritction of number of evetns in training
+        // otherwise this would apply to the expert as well.
+        general_options.m_max_events = 0;
 
         auto expert = supported_interfaces[general_options.m_method]->getExpert();
         expert->load(weightfile);

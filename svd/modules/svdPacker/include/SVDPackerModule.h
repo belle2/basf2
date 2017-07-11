@@ -13,7 +13,8 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -99,7 +100,9 @@ namespace Belle2 {
 
       struct MainHeader {
         unsigned int trgNumber : 8; //LSB
-        unsigned int trgTiming : 8;
+        unsigned int trgType : 4;
+        unsigned int trgTiming : 3;
+        unsigned int onebit : 1;
         unsigned int FADCnum : 8;
         unsigned int evtType : 3;
         unsigned int runType : 2;
@@ -109,10 +112,12 @@ namespace Belle2 {
 
       struct APVHeader {
         unsigned int CMC1 : 8; //LSB
-
         unsigned int CMC2 : 4;
-        unsigned int reserved : 3;
-        unsigned int errorBit : 1;
+
+        unsigned int FIFOfullErr: 1;
+        unsigned int FrameErr: 1;
+        unsigned int DetectErr: 1;
+        unsigned int APVErr : 1;
 
         unsigned int pipelineAddr : 8;
 
@@ -120,7 +125,6 @@ namespace Belle2 {
         unsigned int check : 2; //MSB
       };
 
-      // to zmieniam
       struct data_A {
         unsigned int sample1 : 8; //LSB
         unsigned int sample2 : 8;
@@ -168,7 +172,8 @@ namespace Belle2 {
         FTBTrailer m_FTBTrailer;
       };
 
-
+      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+      int m_FADCTriggerNumberOffset;
 
     };
   } //SVD

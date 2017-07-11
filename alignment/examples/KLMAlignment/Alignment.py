@@ -84,12 +84,12 @@ for endcap in range(1, 3):
         maxlayer = 14
     for layer in range(1, maxlayer + 1):
         for sector in range(1, 5):
-            for ipar in range(3, 4):
+            for ipar in range(1, 4):
                 eklmid = Belle2.EKLMElementID(endcap, layer, sector)
                 label = Belle2.GlobalLabel(eklmid, ipar)
                 cmd = str(label.label()) + ' 0. -1.'
                 # Uncomment to fix EKLM parameters.
-                algo.steering().command(cmd)
+                # algo.steering().command(cmd)
             for plane in range(1, 3):
                 for segment in range(1, 6):
                     for ipar in range(1, 3):

@@ -1,15 +1,16 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Oliver Frost                                             *
+ * Contributors: Oliver Frost, Nils Braun                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
+#include <tracking/trackFindingCDC/findlets/minimal/CosmicsTrackMerger.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackQualityAsserter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackOrienter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
@@ -32,6 +33,20 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       TFCDC_TrackRejecterModule();
+    };
+
+    /**
+     * Module implementation using the CosmicsTrackMerger
+     */
+    class TFCDC_CosmicsTrackMergerModule : public FindletModule<CosmicsTrackMerger> {
+
+    private:
+      /// Type of the base class
+      using Super = FindletModule<CosmicsTrackMerger>;
+
+    public:
+      /// Constructor setting the default store vector names
+      TFCDC_CosmicsTrackMergerModule();
     };
 
     /**

@@ -66,11 +66,13 @@ void BFieldComponentRadial::initialize()
 }
 
 namespace Belle2 {
+  /** multiply a radial bfield point by a real number */
   inline BFieldComponentRadial::BFieldPoint operator*(const BFieldComponentRadial::BFieldPoint& v, double a)
   {
     return {v.r * a, v.z * a};
   }
 
+  /** Add two radial bfield points together */
   inline BFieldComponentRadial::BFieldPoint operator+(const BFieldComponentRadial::BFieldPoint& u,
                                                       const BFieldComponentRadial::BFieldPoint& v)
   {

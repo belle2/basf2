@@ -645,30 +645,46 @@ class CalibrationMachine(Machine):
 
         # Want to figure out which local databases are required for this job and their paths
         list_dependent_databases = []
+
+        # Here we add the finished databases of previous calibrations that we depend on.
+        # We can assume that the databases exist as we can't be here until they have returned
+        for dependency in self.calibration.dependencies:
+            database_dir = os.path.join(os.getcwd(), dependency.name, 'outputdb')
+            B2INFO('Adding local database from {0} for use by {1}'.format(dependency.name, self.calibration.name))
+            list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
+
         # Add previous iteration databases from this calibration
         if self.iteration > 0:
             previous_iteration_dir = os.path.join(self.root_dir, str(self.iteration - 1))
             for algorithm in self.calibration.algorithms:
                 algorithm_name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
                 database_dir = os.path.join(previous_iteration_dir, AlgorithmMachine.alg_output_dir, 'outputdb')
-                list_dependent_databases.append(database_dir)
+                list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
                 B2INFO('Adding local database from previous iteration of {0} for use by {1}'.format(algorithm_name,
                                                                                                     self.calibration.name))
 
-        # Here we add the finished databases of previous calibrations that we depend on.
-        # We can assume that the databases exist as we can't be here until they have returned
-        # (THIS MAY CHANGE!)
-        for dependency in self.calibration.dependencies:
-            database_dir = os.path.join(os.getcwd(), dependency.name, 'outputdb')
-            B2INFO('Adding local database from {0} for use by {1}'.format(dependency.name, self.calibration.name))
-            list_dependent_databases.append(database_dir)
+        # Let's make a directory to store some files later to the collector jobs
+        input_data_directory = os.path.join(self.root_dir, str(self.iteration), 'collector_input')
+        os.mkdir(input_data_directory)
 
-        # Set the location where we will store the merged set of databases.
-        dependent_database_dir = os.path.join(iteration_dir, 'inputdb')
-        # Merge all of the local databases that are required for this calibration into a single directory
-        if list_dependent_databases:
-            merge_local_databases(list_dependent_databases, dependent_database_dir)
-        job.input_sandbox_files.append(dependent_database_dir)
+        # Need to pass setup info to collector which would be tricky as arguments
+        # We make a dictionary and pass it in as json
+        job_config = {}
+        # Pass in the central database global tag
+        job_config['global_tag'] = self.calibration._global_tag
+        # Add chain of local databases to be used
+        job_config['local_database_chain'] = []
+        # User defined ones
+        job_config['local_database_chain'].extend(self.calibration._local_database_chain)
+        # CAF created ones for dependent calibrations and previous iteratioons of this calibration
+        job_config['local_database_chain'].extend(list_dependent_databases)
+
+        import json
+        job_config_file_path = os.path.join(input_data_directory, 'collector_config.json')
+        with open(job_config_file_path, 'w') as job_config_file:
+            json.dump(job_config, job_config_file)
+        job.input_sandbox_files.append(job_config_file_path)
+
         # Define the input file list
         input_data_files = self.calibration.input_files
         # Reduce the input data files to only those that overlap with the optionally requested IoV
@@ -973,8 +989,12 @@ class AlgorithmMachine(Machine):
         reset_database()
         # Fall back to previous databases if no payloads are found
         use_database_chain(True)
-        # Use the central database with production global tag as the ultimate fallback
-        use_central_database('production')
+        # Use the central database with global tag if requested
+        if self.cal_machine.calibration._global_tag:
+            use_central_database(self.cal_machine.calibration._global_tag)
+        # Add any user defined local database chain for thi calibration
+        for filename, directory in self.cal_machine.calibration._local_database_chain:
+            use_local_database(filename, directory)
         # Here we add the finished databases of previous calibrations that we depend on.
         # We can assume that the databases exist as we can't be here until they have returned
         # with OK status.
@@ -986,6 +1006,8 @@ class AlgorithmMachine(Machine):
 
         # Here we add the previous iteration's database
         if self.iteration > 0:
+            B2INFO("Adding local database from previous iteration for use by {1}::{2}".format(
+                   self.cal_machine.calibration.name, self.name))
             use_local_database(os.path.abspath(os.path.join(self.cal_machine.root_dir,
                                                             str(self.iteration - 1),
                                                             self.alg_output_dir,
@@ -1002,6 +1024,10 @@ class AlgorithmMachine(Machine):
         # Create a directory to store the payloads of this algorithm
         os.mkdir('outputdb')
         # add local database to save payloads
+        B2INFO("Output local database for {}::{} stored at {}".format(
+               self.cal_machine.calibration.name,
+               self.name,
+               os.path.abspath('outputdb')))
         use_local_database(os.path.abspath("outputdb/database.txt"), os.path.abspath('outputdb'), False, LogLevel.INFO)
 
     def _setup_logging(self):

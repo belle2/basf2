@@ -33,8 +33,7 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   CLHEP::Hep3Vector origin;
   CLHEP::Hep3Vector u(1, 0, 0);
   CLHEP::Hep3Vector v(0, 1, 0);
-  TVector3 origin2, u2, v2, globalPosition;
-  TVector2 localPosition;
+  TVector3 origin2, u2, v2;
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
   const EKLM::TransformDataGlobalDisplaced* transformData =
     &(EKLM::TransformDataGlobalDisplaced::Instance());
@@ -83,11 +82,10 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   m_StripV.SetY(v.unit().y());
   genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin2, u2, v2, 0));
   setPlane(detPlane, m_Segment.getGlobalNumber());
-  globalPosition = hit2ds[0]->getPosition();
   /* Projection onto hit plane - only need to change Z. */
-  globalPosition.SetZ(origin2.Z());
-  localPosition = detPlane->LabToPlane(globalPosition);
-  rawHitCoords_[0] = localPosition.Y();
+  rawHitCoords_[0] = geoDat->getStripGeometry()->getWidth() *
+                     ((eklmDigits[digit]->getStrip() - 1) %
+                      geoDat->getNStripsSegment()) / CLHEP::cm * Unit::cm;
   rawHitCov_[0][0] = pow(geoDat->getStripGeometry()->getWidth() /
                          CLHEP::cm * Unit::cm, 2) / 12;
   setStripV();

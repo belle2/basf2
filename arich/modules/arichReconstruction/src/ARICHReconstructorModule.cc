@@ -60,18 +60,11 @@ namespace Belle2 {
     // Set property flags
     setPropertyFlags(c_ParallelProcessingCertified);
 
-    std::vector<double> defMerit;
-    defMerit.push_back(8.0);
-    defMerit.push_back(8.0);
-    defMerit.push_back(8.0);
     // Add parameters
     addParam("trackPositionResolution", m_trackPositionResolution,
              "Resolution of track position on aerogel plane (for additional smearing of MC tracks)", 1.0 * Unit::mm);
     addParam("trackAngleResolution", m_trackAngleResolution,
              "Resolution of track direction angle on aerogel plane (for additional smearing of MC tracks)", 2.0 * Unit::mrad);
-    addParam("backgroundLevel", m_backgroundLevel, "Background level in photon hits per m^2", 50.0);
-    addParam("singleResolution", m_singleResolution, "Single photon resolution without pad", 0.010 * Unit::rad);
-    addParam("aerogelMerit", m_aerogelMerit, "Aerogel figure of merit", defMerit);
     addParam("inputTrackType", m_inputTrackType, "Input tracks switch: tracking (0), from AeroHits - MC info (1)", 0);
     addParam("storePhotons", m_storePhot, "Set to 1 to store reconstructed photon information (Ch. angle,...)", 0);
     addParam("useAlignment", m_align, "Use ARICH position alignment constatns", false);
@@ -87,11 +80,8 @@ namespace Belle2 {
     // Initialize variables
 
     m_ana = new ARICHReconstruction(m_storePhot);
-    m_ana->setBackgroundLevel(m_backgroundLevel);
     m_ana->setTrackPositionResolution(m_trackPositionResolution);
     m_ana->setTrackAngleResolution(m_trackAngleResolution);
-    m_ana->setSinglePhotonResolution(m_singleResolution);
-    m_ana->setAerogelFigureOfMerit(m_aerogelMerit);
     m_ana->initialize();
 
 

@@ -29,7 +29,7 @@ std::pair<double, double> EventT0::getEventT0WithUncertainty(const Const::Detect
     }
   }
 
-  if (not found) {
+  if (!found) {
     B2ERROR("No double EventT0 available for the given detector set. Returning 0, 0.");
     return std::make_pair(0, 0);
   }

@@ -15,6 +15,7 @@
 
 #pragma link C++ class Belle2::Helix+;
 #pragma link C++ class Belle2::UncertainHelix+;
+#pragma link C++ class Belle2::EventT0::IntOrDouble+;
 #pragma link C++ class Belle2::EventT0+;
 
 #pragma read sourceClass="Belle2::FileMetaData" version="[-3]" \

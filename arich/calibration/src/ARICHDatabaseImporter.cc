@@ -28,6 +28,7 @@
 #include <arich/dbobjects/ARICHMergerMapping.h>
 #include <arich/dbobjects/ARICHCopperMapping.h>
 #include <arich/dbobjects/ARICHSimulationPar.h>
+#include <arich/dbobjects/ARICHReconstructionPar.h>
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 
 // channel histogram
@@ -244,6 +245,18 @@ void ARICHDatabaseImporter::importChannelMask()
 
 }
 
+
+void ARICHDatabaseImporter::importReconstructionParams()
+{
+  ARICHReconstructionPar recPar;
+  recPar.initializeDefault();
+
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  DBImportObjPtr<ARICHReconstructionPar> importObj;
+  importObj.construct(recPar);
+  importObj.import(iov);
+
+}
 
 void ARICHDatabaseImporter::importSimulationParams()
 {
@@ -801,7 +814,7 @@ void ARICHDatabaseImporter::exportHapdQA()
   // Print serial numbers of HAPDs
   unsigned int el = 0;
   for (const auto& element : elements) {
-    B2INFO("Serial number = " << element.getHapdSerialNumber() << "; arrival date = " << element.getHapdArrivalDate());
+    B2INFO(el << ". Serial number = " << element.getHapdSerialNumber() << "; arrival date = " << element.getHapdArrivalDate());
     el++;
   }
 }
@@ -1882,7 +1895,7 @@ void ARICHDatabaseImporter::exportHapdQE()
   // Example that prints serial numbers of HAPDs and saves QE 2D histograms to root file
   unsigned int el = 0;
   for (const auto& element : elements) {
-    B2INFO("SN = " << element.getHapdSerialNumber());
+    B2INFO(el << ". SN = " << element.getHapdSerialNumber());
     TH2F* qe2d = element.getQuantumEfficiency2D();
     TFile file("QEhists.root", "update");
     qe2d->Write();

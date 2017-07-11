@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 from hep_ipython_tools.calculation import Calculation
 from hep_ipython_tools.calculation_process import CalculationProcess
 from hep_ipython_tools.calculation_queue import CalculationQueue
@@ -56,4 +56,6 @@ class TestCalculation(TestCase):
 
         return calculations, process2
 
+if __name__ == "__main__":
+    main()
 # @endcond

@@ -1368,7 +1368,7 @@ namespace Belle2 {
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
         /// TODO: check if ECLCluster will provide this on its own
-        float theta = shower->getMomentum().Theta();
+        float theta = shower->getTheta();
         if (theta < 0.555) {
           result = 1.0;
         } else if (theta < 2.26) {

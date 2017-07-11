@@ -19,14 +19,14 @@
 using namespace Belle2;
 
 
-DecayForest::DecayForest(const std::string& full_decaystring, bool save_memory)
+DecayForest::DecayForest(const std::string& full_decaystring, bool save_memory, bool removeRadiativeGammaFlag)
 {
 
   m_first_valid_original = 0;
   unsigned int start = 0;
   for (unsigned int i = 0; i < full_decaystring.size(); ++i) {
     if (full_decaystring[i] == '|') {
-      forest.emplace_back(full_decaystring.substr(start, i - start));
+      forest.emplace_back(full_decaystring.substr(start, i - start), removeRadiativeGammaFlag);
       start = i + 1;
       if (save_memory and forest.back().isValid() and forest.size() > 1)
         break;
@@ -34,7 +34,7 @@ DecayForest::DecayForest(const std::string& full_decaystring, bool save_memory)
   }
 
   if (not(save_memory and forest.back().isValid() and forest.size() > 1))
-    forest.emplace_back(full_decaystring.substr(start, full_decaystring.size() - start));
+    forest.emplace_back(full_decaystring.substr(start, full_decaystring.size() - start), removeRadiativeGammaFlag);
 
   for (unsigned int j = 1; j < forest.size(); ++j) {
     if (forest[j].isValid()) {

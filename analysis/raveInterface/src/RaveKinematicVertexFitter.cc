@@ -39,7 +39,8 @@ using namespace analysis;
 
 
 RaveKinematicVertexFitter::RaveKinematicVertexFitter(): m_useBeamSpot(false), m_motherParticlePtr(NULL), m_raveAlgorithm(""),
-  m_massConstFit(false), m_vertFit(true)
+  m_massConstFit(false), m_vertFit(true),
+  m_logCapture("Rave", LogConfig::c_Debug, LogConfig::c_Debug)
 {
   if (RaveSetup::getRawInstance() == NULL) {
     B2FATAL("RaveSetup::initialize was not called. It has to be called before RaveSetup or RaveKinematicVertexFitter are used");
@@ -130,6 +131,7 @@ void RaveKinematicVertexFitter::setMother(const Particle* aMotherParticlePtr)
 int RaveKinematicVertexFitter::fit()
 {
 
+  m_logCapture.start();
 
   int ndf = 0;
 
@@ -322,6 +324,7 @@ int RaveKinematicVertexFitter::fit()
     }
   }
 
+  m_logCapture.finish();
   return 1;
 
 }

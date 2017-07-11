@@ -4,9 +4,10 @@
 from basf2 import *
 from ROOT import Belle2
 from simulation import add_simulation
-import os
-import numpy
+from conditions_db import require_database_for_test
 
+# Make sure database is available for the test
+require_database_for_test()
 
 set_random_seed(321)
 set_log_level(LogLevel.INFO)

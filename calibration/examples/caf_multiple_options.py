@@ -66,6 +66,10 @@ def main(argv):
         cal_test.pre_algorithms = pre_alg_test
 
         cal_test.max_files_per_collector_job = 1
+        # If you have some local databases or want to override the default global tag for this calibration you can do that
+        # with these functions
+#        cal_test.use_local_database("mylocaldb/database.txt")
+#        cal_test.use_central_database("BelleII_GlobalTag_Tutorial")
         calibrations.append(cal_test)
 
     # Define dependencies. In this case the classic diamond e.g.

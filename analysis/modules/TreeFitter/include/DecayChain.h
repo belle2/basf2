@@ -26,7 +26,7 @@ namespace TreeFitter {
   class DecayChain {
   public:
     DecayChain() : m_dim(0), m_mother(0), m_cand(0), m_isOwner(true) {} //Default constructor (actually never used)
-    DecayChain(Particle* bc, bool forceFitAll = false)  ;
+    DecayChain(Belle2::Particle* bc, bool forceFitAll = false)  ;
     ~DecayChain() ;
 
     int dim() const { return m_dim ; }
@@ -40,12 +40,12 @@ namespace TreeFitter {
     ParticleBase* mother() { return m_mother ; }
     const ParticleBase* cand() { return m_cand ; }
     const ParticleBase* mother() const { return m_mother ; }
-    const ParticleBase* locate(Particle* bc) const ;
+    const ParticleBase* locate(Belle2::Particle* bc) const ;
 
-    int index(Particle* bc) const ;
-    int posIndex(Particle* bc) const ;
-    int momIndex(Particle* bc) const ;
-    int tauIndex(Particle* bc) const ;
+    int index(Belle2::Particle* bc) const ;
+    int posIndex(Belle2::Particle* bc) const ;
+    int momIndex(Belle2::Particle* bc) const ;
+    int tauIndex(Belle2::Particle* bc) const ;
     void setOwner(bool b) { m_isOwner = b ;}
     int momIndex() const ;
 
@@ -58,7 +58,7 @@ namespace TreeFitter {
     ParticleBase::constraintlist m_constraintlist ;
     std::vector<Constraint*> m_mergedconstraintlist ;
     MergedConstraint mergedconstraint ;
-    typedef std::map<Particle*, const ParticleBase*> ParticleMap ;
+    typedef std::map<Belle2::Particle*, const ParticleBase*> ParticleMap ;
     ParticleMap m_particleMap ;
     bool m_isOwner ;
   } ;

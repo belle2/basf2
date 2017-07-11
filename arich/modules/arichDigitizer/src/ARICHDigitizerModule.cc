@@ -59,7 +59,7 @@ namespace Belle2 {
 
     // Add parameters
     addParam("TimeWindow", m_timeWindow, "Readout time window width in ns", 250.0);
-    addParam("BackgroundHits", m_bkgLevel, "Number of background hits per hapd per readout (electronics noise)", 0.4);
+    addParam("BackgroundHits", m_bkgLevel, "Number of background hits per hapd per readout (electronics noise)", 0.2);
 
   }
 

@@ -41,7 +41,7 @@ void plot(TFile* pfile, TTree* ptree, TFile *outputFile){
   ptree->Project("h_MKs", "B_D0_K_S0_M", tmCuts);
   h_MKs->GetXaxis()->SetTitle("M_{Ks} (GeV/c^{2})");
 
-  TH1F* h_Mpi0 = new TH1F("h_Mpi0","M_{pi0}",100,0.13494,0.13508);
+  TH1F* h_Mpi0 = new TH1F("h_Mpi0","M_{pi0}",100,0.096,0.164);
   ptree->Project("h_Mpi0", "B_D0_pi0_M", tmCuts);
   h_Mpi0->GetXaxis()->SetTitle("M_{pi0} (GeV/c^{2})");
 

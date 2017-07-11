@@ -10,6 +10,9 @@
 
 #include <hlt/softwaretrigger/core/utilities.h>
 #include <hlt/softwaretrigger/calculations/FastRecoCalculator.h>
+
+#include <analysis/ClusterUtility/ClusterUtils.h>
+
 #include <TVector3.h>
 #include <numeric>
 
@@ -65,7 +68,8 @@ namespace Belle2 {
       if (m_eclClusters.getEntries() > 0) {
         visibleEnergy = std::accumulate(std::begin(m_eclClusters), std::end(m_eclClusters), visibleEnergy,
         [](const double & value, const ECLCluster & eclCluster) {
-          return value + eclCluster.getMomentum().Mag();
+          ClusterUtils C;
+          return value + C.Get4MomentumFromCluster(&eclCluster).Vect().Mag();
         });
       }
 

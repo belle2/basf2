@@ -74,7 +74,7 @@ void ViewAlignment(const char *fname)
         hDy[endcap - 1][sector - 1]->SetBinError(layer, error);
         hDy0[endcap - 1][sector - 1]->SetBinContent(layer, value0);
         break;
-      case 3:
+      case 6:
         hDalpha[endcap - 1][sector - 1]->SetBinContent(layer, value);
         hDalpha[endcap - 1][sector - 1]->SetBinError(layer, error);
         hDalpha0[endcap - 1][sector - 1]->SetBinContent(layer, value0);

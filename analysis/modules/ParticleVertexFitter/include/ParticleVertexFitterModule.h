@@ -33,9 +33,6 @@
 #include <analysis/raveInterface/RaveVertexFitter.h>
 #include <analysis/raveInterface/RaveKinematicVertexFitter.h>
 
-// for intercepting rave output
-#include <framework/utilities/IOIntercept.h>
-
 namespace Belle2 {
 
   class Particle;
@@ -83,7 +80,6 @@ namespace Belle2 {
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamParameters> m_beamParams;/**< Beam parameters */
-    IOIntercept::OutputToLogMessages m_logCapture; /**< Rave Capture evtgen log and transform into basf2 logging. */
 
     /**
      * Main steering routine

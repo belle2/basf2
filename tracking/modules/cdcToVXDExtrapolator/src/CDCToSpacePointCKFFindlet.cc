@@ -58,7 +58,7 @@ void CDCToSpacePointCKFFindlet::apply()
 
   // Remove all empty results
   const auto& resultIsEmpty = [](const CKFCDCToVXDStateObject::ResultObject & result) {
-    return result.second.empty();
+    return result.getHits().empty();
   };
   erase_remove_if(m_results, resultIsEmpty);
 

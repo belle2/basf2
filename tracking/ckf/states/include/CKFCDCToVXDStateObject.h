@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+#include <tracking/ckf/states/CKFResultObject.h>
 
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <tracking/dataobjects/RecoTrack.h>
@@ -37,7 +38,7 @@ namespace Belle2 {
     /// The class of the hits
     using HitObject = SpacePoint;
     /// The class of the object returned by finalize()
-    using ResultObject = TrackFindingCDC::WithWeight<std::pair<RecoTrack*, std::vector<const HitObject*>>>;
+    using ResultObject = CKFResultObject<CKFCDCToVXDStateObject>;
 
     CKFCDCToVXDStateObject() = default;
     CKFCDCToVXDStateObject(CKFCDCToVXDStateObject&&) = default;
@@ -103,7 +104,7 @@ namespace Belle2 {
       };
       walk(chi2Adder);
 
-      return ResultObject(std::make_pair(getSeedRecoTrack(), hits), chi2);
+      return ResultObject(getSeedRecoTrack(), hits, chi2);
     }
 
     /// Return the parent state.

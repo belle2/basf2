@@ -76,12 +76,12 @@ namespace Belle2 {
 
       // Create new VXD tracks out of the found VXD space points and store them into a store array
       for (const auto& cdcTrackWithMatchedSpacePoints : cdcTracksWithMatchedSpacePoints) {
-        RecoTrack* cdcRecoTrack = cdcTrackWithMatchedSpacePoints.first;
+        RecoTrack* cdcRecoTrack = cdcTrackWithMatchedSpacePoints.getSeed();
         if (not cdcRecoTrack) {
           continue;
         }
 
-        const std::vector<const SpacePoint*> matchedSpacePoints = cdcTrackWithMatchedSpacePoints.second;
+        const std::vector<const SpacePoint*> matchedSpacePoints = cdcTrackWithMatchedSpacePoints.getHits();
         if (matchedSpacePoints.empty()) {
           continue;
         }

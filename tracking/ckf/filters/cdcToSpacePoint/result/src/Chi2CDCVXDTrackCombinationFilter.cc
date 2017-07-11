@@ -14,5 +14,5 @@ using namespace TrackFindingCDC;
 
 Weight Chi2CDCVXDTrackCombinationFilter::operator()(const BaseCDCVXDTrackCombinationFilter::Object& pair)
 {
-  return -pair.getWeight();
+  return -pair.getChi2();
 }

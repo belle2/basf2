@@ -15,12 +15,12 @@ using namespace TrackFindingCDC;
 
 bool CDCVXDTrackCombinationVarSet::extract(const BaseCDCVXDTrackCombinationFilter::Object* result)
 {
-  RecoTrack* cdcTrack = result->first;
+  RecoTrack* cdcTrack = result->getSeed();
   if (not cdcTrack) return false;
 
   B2ASSERT("RecoTrack should be fitted at this stage!", cdcTrack->wasFitSuccessful());
 
-  const std::vector<const SpacePoint*> spacePoints = result->second;
+  const std::vector<const SpacePoint*> spacePoints = result->getHits();
 
   genfit::MeasuredStateOnPlane mSoP = cdcTrack->getMeasuredStateOnPlaneFromFirstHit();
 
@@ -51,7 +51,7 @@ bool CDCVXDTrackCombinationVarSet::extract(const BaseCDCVXDTrackCombinationFilte
     }
   }
 
-  var<named("state_weight")>() = result->getWeight();
+  var<named("state_weight")>() = result->getChi2();
   var<named("chi2_vxd_full")>() = chi2_vxd_full;
   var<named("chi2_vxd_max")>() = chi2_vxd_max;
   var<named("chi2_vxd_min")>() = chi2_vxd_min;

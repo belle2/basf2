@@ -18,7 +18,7 @@ using namespace TrackFindingCDC;
 
 bool CDCVXDTrackCombinationTruthVarSet::extract(const BaseCDCVXDTrackCombinationFilter::Object* result)
 {
-  RecoTrack* cdcTrack = result->first;
+  RecoTrack* cdcTrack = result->getSeed();
   if (not cdcTrack) return false;
 
   StoreObjPtr<EventMetaData> eventMetaData;
@@ -41,11 +41,11 @@ bool CDCVXDTrackCombinationTruthVarSet::extract(const BaseCDCVXDTrackCombination
   }
 
   // Count the number of times the CDC-related MC-track is also related to the clusters.
-  const unsigned int numberOfCorrectHits = getNumberOfCorrectHits(cdcMCTrack, result->second);
+  const unsigned int numberOfCorrectHits = getNumberOfCorrectHits(cdcMCTrack, result->getHits());
 
   var<named("truth_number_of_correct_hits")>() = numberOfCorrectHits;
   var<named("truth_number_of_mc_hits")>() = cdcMCTrack->getNumberOfSVDHits() + cdcMCTrack->getNumberOfPXDHits();
-  var<named("truth")>() = numberOfCorrectHits == 2 * result->second.size() and numberOfCorrectHits > 0;
+  var<named("truth")>() = numberOfCorrectHits == 2 * result->getHits().size() and numberOfCorrectHits > 0;
 
   return true;
 }

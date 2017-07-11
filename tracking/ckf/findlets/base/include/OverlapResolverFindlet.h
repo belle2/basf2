@@ -123,13 +123,13 @@ namespace Belle2 {
 
           const ResultPair* loopResultPair = m_resultsWithWeight[loopResolverInfo.trackIndex];
 
-          if (loopResultPair->first == resultPair->first) {
+          if (loopResultPair->getSeed() == resultPair->getSeed()) {
             overlaps.push_back(loopResolverInfo.trackIndex);
             continue;
           }
 
-          for (const auto& hit : resultPair->second) {
-            if (TrackFindingCDC::is_in(hit, loopResultPair->second)) {
+          for (const auto& hit : resultPair->getHits()) {
+            if (TrackFindingCDC::is_in(hit, loopResultPair->getHits())) {
               overlaps.push_back(loopResolverInfo.trackIndex);
               break;
             }

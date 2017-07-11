@@ -161,7 +161,9 @@ void EKLMAlignment::set(EKLMElementID element, int parameter, double value)
 double EKLMAlignment::getGlobalParam(unsigned short element,
                                      unsigned short param)
 {
-  EKLMAlignmentData* alignmentData = getSectorAlignment(element);
+  EKLMAlignmentData* alignmentData;
+  EKLMElementID id(element);
+  alignmentData = getSectorAlignment(id.getSectorNumber());
   if (alignmentData == NULL)
     return 0;
   switch (param) {
@@ -180,7 +182,9 @@ double EKLMAlignment::getGlobalParam(unsigned short element,
 void EKLMAlignment::setGlobalParam(double value, unsigned short element,
                                    unsigned short param)
 {
-  EKLMAlignmentData* alignmentData = getSectorAlignment(element);
+  EKLMAlignmentData* alignmentData;
+  EKLMElementID id(element);
+  alignmentData = getSectorAlignment(id.getSectorNumber());
   if (alignmentData == NULL)
     return;
   switch (param) {

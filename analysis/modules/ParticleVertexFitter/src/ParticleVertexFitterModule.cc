@@ -50,7 +50,7 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   ParticleVertexFitterModule::ParticleVertexFitterModule() : Module(),
-    m_Bfield(0), m_logCapture("Rave", LogConfig::c_Debug, LogConfig::c_Debug)
+    m_Bfield(0)
   {
     // set module description (e.g. insert text)
     setDescription("Vertex fitter for modular analysis");
@@ -231,9 +231,7 @@ namespace Belle2 {
     // fits using Rave
     if (m_vertexFitter == "rave") {
       try {
-        m_logCapture.start();
         ok = doRaveFit(mother);
-        m_logCapture.finish();
       } catch (rave::CheckedFloatException) {
         B2ERROR("Invalid inputs (nan/inf)?");
         ok = false;
@@ -892,7 +890,7 @@ namespace Belle2 {
 
       const unsigned nd = daughters.size();
       unsigned l = 0;
-      std::vector<unsigned> u[nd];
+      std::vector<std::vector<unsigned>> u(nd);
       for (unsigned ichild = 0; ichild < nd; ichild++) {
         const Particle* daughter = mother->getDaughter(ichild);
         if (daughter->getNDaughters() > 0) {

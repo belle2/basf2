@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/filters/cdcToSpacePoint/result/CDCVXDTrackCombinationVarSet.h>
+#include <cdc/dataobjects/CDCRecoHit.h>
 
 using namespace std;
 using namespace Belle2;
@@ -28,15 +29,15 @@ bool CDCVXDTrackCombinationVarSet::extract(const BaseCDCVXDTrackCombinationFilte
   double chi2_vxd_max = std::nan("");
   double chi2_vxd_min = std::nan("");
 
+  std::vector<unsigned int> layerUsed;
+  layerUsed.resize(7, 0);
 
-  std::vector<bool> layerUsed;
-  layerUsed.resize(7, false);
-
-  for (const SpacePoint* spacePoint : spacePoints) {
-    layerUsed[spacePoint->getVxdID().getLayerNumber()] = true;
+  for (auto spacePointIterator = spacePoints.rbegin(); spacePointIterator != spacePoints.rend(); spacePointIterator++) {
+    const SpacePoint* spacePoint = *spacePointIterator;
+    layerUsed[spacePoint->getVxdID().getLayerNumber()] += 1;
 
     if (not m_advanceAlgorithm.extrapolate(mSoP, *spacePoint)) {
-      return std::nan("");
+      return false;
     }
     const double chi2 = m_kalmanAlgorithm.kalmanStep(mSoP, *spacePoint);
 
@@ -51,7 +52,7 @@ bool CDCVXDTrackCombinationVarSet::extract(const BaseCDCVXDTrackCombinationFilte
     }
   }
 
-  var<named("state_weight")>() = result->getChi2();
+  var<named("chi2")>() = result->getChi2();
   var<named("chi2_vxd_full")>() = chi2_vxd_full;
   var<named("chi2_vxd_max")>() = chi2_vxd_max;
   var<named("chi2_vxd_min")>() = chi2_vxd_min;
@@ -60,7 +61,7 @@ bool CDCVXDTrackCombinationVarSet::extract(const BaseCDCVXDTrackCombinationFilte
   var<named("prob")>() = 0; // TODO
   var<named("pt")>() = mSoP.getMom().Pt();
   var<named("chi2_cdc")>() = cdcTrack->getTrackFitStatus()->getChi2();
-  var<named("number_of_holes")>() = std::count(layerUsed.begin(), layerUsed.end(), false) - 3;
+  var<named("number_of_holes")>() = std::count(layerUsed.begin(), layerUsed.end(), 0);
 
   if (spacePoints.empty()) {
     var<named("last_hit_layer")>() = -1;
@@ -69,6 +70,24 @@ bool CDCVXDTrackCombinationVarSet::extract(const BaseCDCVXDTrackCombinationFilte
     var<named("last_hit_layer")>() = spacePoints.front()->getVxdID().getLayerNumber();
     var<named("first_hit_layer")>() = spacePoints.back()->getVxdID().getLayerNumber();
   }
+
+  var<named("has_missing_layer_1")>() = layerUsed[1] == 0;
+  var<named("has_missing_layer_2")>() = layerUsed[2] == 0;
+  var<named("has_missing_layer_3")>() = layerUsed[3] == 0;
+  var<named("has_missing_layer_4")>() = layerUsed[4] == 0;
+  var<named("has_missing_layer_5")>() = layerUsed[5] == 0;
+  var<named("has_missing_layer_6")>() = layerUsed[6] == 0;
+
+  var<named("number_of_overlap_hits")>() = std::count(layerUsed.begin(), layerUsed.end(), 2);
+
+  var<named("theta")>() = mSoP.getMom().Theta();
+
+  const genfit::MeasuredStateOnPlane& firstCDCHit = cdcTrack->getMeasuredStateOnPlaneFromFirstHit();
+  m_advanceAlgorithm.extrapolate(mSoP, firstCDCHit);
+
+  const auto& distance = mSoP.getPos() - firstCDCHit.getPos();
+  var<named("distance_to_cdc_track")>() = distance.Mag();
+  var<named("distance_to_cdc_track_xy")>() = distance.Pt();
 
   return true;
 }

@@ -30,7 +30,17 @@ namespace Belle2 {
     "number_of_holes",
     "last_hit_layer",
     "first_hit_layer",
-    "state_weight"
+    "chi2",
+    "has_missing_layer_1",
+    "has_missing_layer_2",
+    "has_missing_layer_3",
+    "has_missing_layer_4",
+    "has_missing_layer_5",
+    "has_missing_layer_6",
+    "number_of_overlap_hits",
+    "theta",
+    "distance_to_cdc_track",
+    "distance_to_cdc_track_xy"
   };
 
   /// Vehicle class to transport the variable names

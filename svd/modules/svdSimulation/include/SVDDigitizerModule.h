@@ -113,6 +113,18 @@ namespace Belle2 {
       /** Name of the relation between SVDDigits and SVDTrueHits */
       std::string m_relDigitTrueHitName;
 
+      // 1* Production of SVDShaperDigits
+      /** Whether or not to generate compound SVDShaperDigits */
+      bool m_generateShaperDigits;
+      /** Name of the (optional) collection for the SVDShaperDigits */
+      std::string m_storeShaperDigitsName;
+      /** Name of the relation between SVDShaperDigits and MCParticles */
+      std::string m_relShaperDigitMCParticleName;
+      /** Name of the relation between SVDShaperDigits and SVDTrueHits */
+      std::string m_relShaperDigitTrueHitName;
+      /** Name of the relation between SVDShaperDigits and SVDDigits */
+      std::string m_relShaperDigitDigitName;
+
       // 2. Physics
       /** Max. Segment length to use for charge drifting */
       double m_segmentLength;

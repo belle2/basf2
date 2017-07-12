@@ -55,7 +55,7 @@ namespace {
     {
       auto findresult = m_data.find(index);
       if (findresult != m_data.end())
-        findresult->second += weight;
+        findresult->second = weight;
       else
         m_data.insert(make_pair(index, weight));
     }

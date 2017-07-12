@@ -131,9 +131,10 @@ void SVDDigitMergerModule::fillRelationMap(const RelationLookup& lookup,
     //Add all Relations to the map
     for (unsigned int i = 0; i < size; ++i) {
       //negative weights are from ignored particles, we don't like them and
-      //thus ignore them :D
+      //thus ignore them. We replace rather than add weights, since the
+      //relation content of digits on the same strip is the same.
       if (element.getWeight(i) < 0) continue;
-      relation[element.getToIndex(i)] += element.getWeight(i);
+      relation[element.getToIndex(i)] = element.getWeight(i);
     }
   }
 }

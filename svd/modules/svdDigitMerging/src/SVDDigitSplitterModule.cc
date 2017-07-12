@@ -122,7 +122,7 @@ void SVDDigitSplitterModule::createRelationLookup(const RelationArray& relation,
 }
 
 void SVDDigitSplitterModule::fillRelationMap(const RelationLookup& lookup,
-                                             std::map<unsigned int, float>& relation, unsigned int index, double weight)
+                                             std::map<unsigned int, float>& relation, unsigned int index)
 {
   //If the lookup table is not empty and the element is set
   if (!lookup.empty() && lookup[index]) {
@@ -131,9 +131,10 @@ void SVDDigitSplitterModule::fillRelationMap(const RelationLookup& lookup,
     //Add all Relations to the map
     for (unsigned int i = 0; i < size; ++i) {
       //negative weights are from ignored particles, we don't like them and
-      //thus ignore them :D
+      //thus ignore them. We replace weights rather than add, since the
+      //relation content of SVDDigits from the same strip is the same.
       if (element.getWeight(i) < 0) continue;
-      relation[element.getToIndex(i)] += weight * element.getWeight(i);
+      relation[element.getToIndex(i)] = element.getWeight(i);
     }
   }
 }
@@ -187,12 +188,11 @@ void SVDDigitSplitterModule::event()
     size_t stripNo = shaperDigit.getCellID();
     float position = 0;
     const SVDShaperDigit::APVFloatSamples& samples = shaperDigit.getSamples();
-    float oneweight = 1.0 / SVDShaperDigit::c_nAPVSamples;
     //Obtain relations from MCParticles and TrueHits
     map<unsigned int, float> mc_relations;
     map<unsigned int, float> truehit_relations;
-    fillRelationMap(m_mcRelation, mc_relations, sixIndex, oneweight);
-    fillRelationMap(m_trueRelation, truehit_relations, sixIndex, oneweight);
+    fillRelationMap(m_mcRelation, mc_relations, sixIndex);
+    fillRelationMap(m_trueRelation, truehit_relations, sixIndex);
     vector<pair<unsigned int, float> > digit_weights;
     digit_weights.reserve(SVDShaperDigit::c_nAPVSamples);
 

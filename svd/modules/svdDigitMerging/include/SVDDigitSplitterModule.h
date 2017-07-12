@@ -64,10 +64,9 @@ namespace Belle2 {
        * @param lookup Lookuptable to use for the relation
        * @param relation map to add the entries to
        * @param index index of the SVDDigit
-       * @weight samples are wieghted proportional to their charge
        */
       void fillRelationMap(const RelationLookup& lookup, std::map<unsigned int, float>&
-                           relation, unsigned int index, double weight = 1);
+                           relation, unsigned int index);
 
       // Data members
       /** Name of the collection to use for the SVDDigits */

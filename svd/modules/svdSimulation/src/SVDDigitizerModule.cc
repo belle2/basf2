@@ -22,6 +22,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDDigit.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 #include <boost/tuple/tuple.hpp>
 #include <algorithm>
 #include <numeric>
@@ -54,8 +55,8 @@ REG_MODULE(SVDDigitizer)
 //-----------------------------------------------------------------
 
 SVDDigitizerModule::SVDDigitizerModule() :
-  Module(), m_rootFile(0), m_histDiffusion_u(0), m_histDiffusion_v(0), m_histLorentz_u(
-    0), m_histLorentz_v(0), m_signalDist_u(0), m_signalDist_v(0)
+  Module(), m_generateShaperDigits(false), m_rootFile(0), m_histDiffusion_u(0), m_histDiffusion_v(0),
+  m_histLorentz_u(0), m_histLorentz_v(0), m_signalDist_u(0), m_signalDist_v(0)
 {
   //Set module properties
   setDescription("Create SVDDigits from SVDSimHits");
@@ -71,6 +72,8 @@ SVDDigitizerModule::SVDDigitizerModule() :
            string(""));
   addParam("TrueHits", m_storeTrueHitsName, "TrueHit collection name",
            string(""));
+  addParam("GenerateShaperDigits", m_generateShaperDigits, "Generate SVDShaperDigits", bool(false));
+  addParam("ShaperDigits", m_storeShaperDigitsName, "ShaperDigits collection name", string(""));
 
   // 2. Physics
   addParam("SegmentLength", m_segmentLength,
@@ -139,6 +142,24 @@ void SVDDigitizerModule::initialize()
   m_relDigitTrueHitName = DataStore::relationName(
                             DataStore::arrayName<SVDDigit>(m_storeDigitsName),
                             DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
+
+  if (m_generateShaperDigits) {
+    StoreArray<SVDShaperDigit>storeShaperDigits(m_storeShaperDigitsName);
+    storeShaperDigits.registerInDataStore();
+    storeShaperDigits.registerRelationTo(storeMCParticles);
+    storeShaperDigits.registerRelationTo(storeTrueHits);
+    storeShaperDigits.registerRelationTo(storeDigits);
+
+    m_relShaperDigitMCParticleName = DataStore::relationName(
+                                       DataStore::arrayName<SVDShaperDigit>(m_storeShaperDigitsName),
+                                       DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
+    m_relShaperDigitTrueHitName = DataStore::relationName(
+                                    DataStore::arrayName<SVDShaperDigit>(m_storeShaperDigitsName),
+                                    DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
+    m_relShaperDigitDigitName = DataStore::relationName(
+                                  DataStore::arrayName<SVDShaperDigit>(m_storeShaperDigitsName),
+                                  DataStore::arrayName<SVDDigit>(m_storeDigitsName));
+  }
 
   //Convert parameters to correct units
   m_segmentLength *= Unit::mm;
@@ -272,7 +293,6 @@ void SVDDigitizerModule::event()
   RelationArray relDigitMCParticle(storeDigits, storeMCParticles, m_relDigitMCParticleName);
 
   RelationArray relDigitTrueHit(storeDigits, storeTrueHits, m_relDigitTrueHitName);
-
 
   unsigned int nSimHits = storeSimHits.getEntries();
   if (nSimHits == 0)
@@ -590,12 +610,22 @@ void SVDDigitizerModule::saveDigits()
   RelationArray relDigitTrueHit(storeDigits, storeTrueHits,
                                 m_relDigitTrueHitName);
 
+  StoreArray<SVDShaperDigit> storeShaperDigits(m_storeShaperDigitsName);
+  RelationArray relShaperDigitMCParticle(storeShaperDigits, storeMCParticles,
+                                         m_relShaperDigitMCParticleName);
+  RelationArray relShaperDigitTrueHit(storeShaperDigits, storeTrueHits,
+                                      m_relShaperDigitTrueHitName);
+  RelationArray relShaperDigitDigits(storeShaperDigits, storeDigits,
+                                     m_relShaperDigitDigitName);
 
   //Set time of the first sample
   double initTime = m_startSampling;
   if (m_randomPhaseSampling) {
     initTime = gRandom->Uniform(0.0, m_samplingTime);
   }
+
+  // ... to store digit-digit relations
+  vector<pair<unsigned int, float> > digit_weights;
 
   // Take samples at the desired times, add noise, zero-suppress and save digits.
 
@@ -622,6 +652,9 @@ void SVDDigitizerModule::saveDigits()
       SVDSignal& s = stripSignal.second;
       // Now generate samples in time and save as digits.
       vector<double> samples;
+      // ... to store digit-digit relations
+      digit_weights.clear();
+      digit_weights.reserve(SVDShaperDigit::c_nAPVSamples);
       // For noise digits, just generate random variates on randomly selected samples
       if (s.isNoise()) {
         double pSelect = 1.0 / m_nAPV25Samples;
@@ -654,6 +687,7 @@ void SVDDigitizerModule::saveDigits()
           sampleCharge = eToADU(sampleCharge);
         // Save as a new digit
         int digIndex = storeDigits.getEntries();
+        digit_weights.emplace_back(digIndex, sampleCharge);
         storeDigits.appendNew(
           SVDDigit(sensorID, true, iStrip,
                    info.getUCellPosition(iStrip), sampleCharge, iSample));
@@ -679,7 +713,31 @@ void SVDDigitizerModule::saveDigits()
           } // if m_signalDist_u
         } // if truehits.size()
       } // for iSample
+      // Save SVDShaperDigits if required
+      if (m_generateShaperDigits) {
+        if (m_applyADC)
+          transform(samples.begin(), samples.end(), samples.begin(),
+                    [this](double x)->double { return eToADU(x); });
+        SVDShaperDigit::APVRawSamples rawSamples;
+        std::transform(samples.begin(), samples.end(), rawSamples.begin(),
+        [](double x)->SVDShaperDigit::APVRawSampleType {
+          return static_cast<SVDShaperDigit::APVRawSampleType>(x);
+        });
+        // Save as a new digit
+        int digIndex = storeShaperDigits.getEntries();
+        storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples));
+        //If the digit has any relations to MCParticles, add the Relation
+        if (particles.size() > 0) {
+          relShaperDigitMCParticle.add(digIndex, particles.begin(), particles.end());
+        }
+        //If the digit has any relations to truehits, add the Relations.
+        if (truehits.size() > 0) {
+          relShaperDigitTrueHit.add(digIndex, truehits.begin(), truehits.end());
+        }
+        relShaperDigitDigits.add(digIndex, digit_weights.begin(), digit_weights.end());
+      } // generate SVDShaperDigits
     } // for stripSignals
+
     // v-side digits:
     double elNoiseV = info.getElectronicNoiseV();
     double charge_thresholdV = m_SNAdjacent * elNoiseV;
@@ -699,6 +757,9 @@ void SVDDigitizerModule::saveDigits()
       SVDSignal& s = stripSignal.second;
       // Now generate samples in time and save as digits.
       vector<double> samples;
+      // ... to store digit-digit relations
+      digit_weights.clear();
+      digit_weights.reserve(SVDShaperDigit::c_nAPVSamples);
       // For noise digits, just generate random variates on randomly selected samples
       if (s.isNoise()) {
         double pSelect = 1.0 / m_nAPV25Samples;
@@ -731,6 +792,7 @@ void SVDDigitizerModule::saveDigits()
           sampleCharge = eToADU(sampleCharge);
         // Save as a new digit
         int digIndex = storeDigits.getEntries();
+        digit_weights.emplace_back(digIndex, sampleCharge);
         storeDigits.appendNew(
           SVDDigit(sensorID, false, iStrip,
                    info.getVCellPosition(iStrip), sampleCharge, iSample));
@@ -756,6 +818,29 @@ void SVDDigitizerModule::saveDigits()
           } // if m_signalDist_v
         } // if truehits.size()
       } // for iSample
+      // Save SVDShaperDigits if required
+      if (m_generateShaperDigits) {
+        if (m_applyADC)
+          transform(samples.begin(), samples.end(), samples.begin(),
+                    [this](double x)->double { return eToADU(x); });
+        SVDShaperDigit::APVRawSamples rawSamples;
+        std::transform(samples.begin(), samples.end(), rawSamples.begin(),
+        [](double x)->SVDShaperDigit::APVRawSampleType {
+          return static_cast<SVDShaperDigit::APVRawSampleType>(x);
+        });
+        // Save as a new digit
+        int digIndex = storeShaperDigits.getEntries();
+        storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples));
+        //If the digit has any relations to MCParticles, add the Relation
+        if (particles.size() > 0) {
+          relShaperDigitMCParticle.add(digIndex, particles.begin(), particles.end());
+        }
+        //If the digit has any relations to truehits, add the Relations.
+        if (truehits.size() > 0) {
+          relShaperDigitTrueHit.add(digIndex, truehits.begin(), truehits.end());
+        }
+        relShaperDigitDigits.add(digIndex, digit_weights.begin(), digit_weights.end());
+      } // generate SVDShaperDigits
     } // for stripSignals
   } // FOREACH sensor
 }

@@ -66,6 +66,7 @@ triggerPos = []
 normTriggerPlaneDirection = []
 readOutPos = []
 globalPhi = 0.0
+cosmics_period = None
 
 
 def set_cdc_cr_parameters(period):
@@ -76,6 +77,7 @@ def set_cdc_cr_parameters(period):
     global normTriggerPlaneDirection
     global readOutPos
     global globalPhi
+    global cosmics_period
 
     lengthOfCounter = triggerSize[period][0]
     widthOfCounter = triggerSize[period][1]
@@ -83,121 +85,7 @@ def set_cdc_cr_parameters(period):
     normTriggerPlaneDirection = triggerPlaneDirection[period]
     readOutPos = pmtPosition[period]
     globalPhi = globalPhiRotation[period]
-
-
-def add_cdc_cr_simulation(path, topInCounter=True):
-    """
-    Add CDC CR simulation.
-
-    """
-    # Create empty path
-    emptyPath = create_path()
-
-    # Register the CRY module
-    cry = register_module('CRYInput')
-    # cosmic data input
-    cry.param('CosmicDataDir', Belle2.FileSystem.findFile('data/generators/modules/cryinput/'))
-    # user input file
-    cry.param('SetupFile', 'cry.setup')
-    # acceptance half-lengths - at least one particle has to enter that box to use that event
-    cry.param('acceptLength', 0.6)
-    cry.param('acceptWidth', 0.2)
-    cry.param('acceptHeight', 0.2)
-    cry.param('maxTrials', 10000)
-    # keep half-lengths - all particles that do not enter the box are removed
-    # (keep box >= accept box)
-    cry.param('keepLength', 0.6)
-    cry.param('keepWidth', 0.2)
-    cry.param('keepHeight', 0.2)
-    # minimal kinetic energy - all particles below that energy are ignored
-    cry.param('kineticEnergyThreshold', 0.01)
-    path.add_module(cry)
-
-    # Selector module.
-    sel = register_module('CDCCosmicSelector',
-                          lOfCounter=lengthOfCounter,
-                          wOfCounter=widthOfCounter,
-                          xOfCounter=triggerPos[0],
-                          yOfCounter=triggerPos[1],
-                          zOfCounter=triggerPos[2],
-                          phiOfCounter=0.,
-                          TOP=topInCounter,
-                          propSpeed=lightPropSpeed,
-                          TOF=1,
-                          cryGenerator=True
-                          )
-
-    path.add_module(sel)
-    sel.if_false(emptyPath)
-    path.add_module('FullSim',
-                    # Uncomment if you want to disable secondaries.
-                    ProductionCut=1000000.)
-    #    path.add_module(RandomizeTrackTimeModule(8.0))
-    path.add_module('CDCDigitizer')
-
-
-def add_cdc_cr_reconstruction(path, eventTimingExtraction=False, topInCounter=True):
-    """
-    Add CDC CR reconstruction
-    """
-
-    # Add cdc track finder
-    add_cdc_cr_track_finding(path, merge_tracks=False)
-
-    # Setup Genfit extrapolation
-    path.add_module("SetupGenfitExtrapolation")
-
-    # Time seed
-    path.add_module("PlaneTriggerTrackTimeEstimator",
-                    pdgCodeToUseForEstimation=13,
-                    triggerPlanePosition=triggerPos,
-                    triggerPlaneDirection=normTriggerPlaneDirection,
-                    useFittedInformation=False)
-
-    # Initial track fitting
-    path.add_module("DAFRecoFitter",
-                    probCut=0.00001,
-                    pdgCodesToUseForFitting=13,
-                    )
-
-    if topInCounter is True:
-        # Correct time seed with TOP in counter.
-        path.add_module("PlaneTriggerTrackTimeEstimator",
-                        pdgCodeToUseForEstimation=13,
-                        triggerPlanePosition=triggerPos,
-                        triggerPlaneDirection=normTriggerPlaneDirection,
-                        useFittedInformation=True,
-                        useReadoutPosition=True,
-                        readoutPosition=readOutPos,
-                        readoutPositionPropagationSpeed=lightPropSpeed
-                        )
-
-        # Track fitting
-        path.add_module("DAFRecoFitter",
-                        # probCut=0.00001,
-                        pdgCodesToUseForFitting=13,
-                        )
-
-    if eventTimingExtraction is True:
-        # Extract the time
-        path.add_module("FullGridTrackTimeExtraction",
-                        recoTracksStoreArrayName="RecoTracks",
-                        maximalT0Shift=70,
-                        minimalT0Shift=-70,
-                        numberOfGrids=6
-                        )
-
-        # Track fitting
-        path.add_module("DAFRecoFitter",
-                        # probCut=0.00001,
-                        pdgCodesToUseForFitting=13,
-                        )
-
-    # Create Belle2 Tracks from the genfit Tracks
-    path.add_module('TrackCreator',
-                    defaultPDGCode=13,
-                    useClosestHitToIP=True
-                    )
+    cosmics_period = period
 
 
 def getExpNumber(fname):

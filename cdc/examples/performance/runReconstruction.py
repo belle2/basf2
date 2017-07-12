@@ -19,6 +19,8 @@ import ROOT
 import os
 import os.path
 import argparse
+
+from reconstruction import add_cosmics_reconstruction
 from tracking import add_cdc_cr_track_finding
 from ROOT import Belle2
 from cdc.cr import *
@@ -30,7 +32,7 @@ use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
 use_central_database("GT_gen_data_002.11_gcr2017-07", LogLevel.WARNING)
 
 
-def rec(input, output, topInCounter=True, magneticField=False):
+def rec(input, output, magneticField=False):
 
     main_path = basf2.create_path()
     logging.log_level = LogLevel.INFO
@@ -65,13 +67,9 @@ def rec(input, output, topInCounter=True, magneticField=False):
 
     main_path.add_module('Progress')
 
-    # Set CDC CR parameters.
-    set_cdc_cr_parameters(data_period)
-
     # Add CDC CR reconstruction.
-    add_cdc_cr_reconstruction(main_path,
-                              eventTimingExtraction=True,
-                              topInCounter=topInCounter)
+    add_cosmics_reconstruction(main_path, pre_general_run_setup=data_period,
+                               eventTimingExtraction=True)
 
     # Simple analysi module.
     output = "/".join(['output', output])
@@ -92,4 +90,4 @@ if __name__ == "__main__":
     parser.add_argument('input', help='Input file to be processed (unpacked CDC data).')
     parser.add_argument('output', help='Output file you want to store the results.')
     args = parser.parse_args()
-    rec(args.input, args.output, topInCounter=False, magneticField=True)
+    rec(args.input, args.output, magneticField=True)

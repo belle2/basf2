@@ -178,6 +178,18 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         upper_bound=3.27,
     )
 
+    save_fake_rate_by_seed_pt_profile = refiners.save_profiles(
+        select={
+            'is_fake': 'fake rate',
+            'seed_pt_estimate': 'seed p_{t}',
+        },
+        y='fake rate',
+        y_binary=True,
+        outlier_z_score=5.0,
+        lower_bound=0,
+        upper_bound=1.7,
+    )
+
     # Hit counts in each sub detector by the true pt value
     save_hit_counts_by_pt_profile = refiners.save_profiles(
         filter_on="is_matched",

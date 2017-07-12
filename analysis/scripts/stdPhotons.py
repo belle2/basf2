@@ -54,14 +54,6 @@ def loadStdSkimPhoton(path=analysis_main):
 # old, will be removed/replaced
 
 
-def loadStdPhoton(listtype='loose', path=analysis_main):
-    stdPhotons(listtype, path)
-
-
-def loadStdAllPhoton(path=analysis_main):
-    stdPhotons('all', path)
-
-
 def loadStdPhotonE12(path=analysis_main):
     loadStdAllPhoton(path)
     cutAndCopyList('gamma:E12', 'gamma:all', '1.2 < E < 100', True, path)

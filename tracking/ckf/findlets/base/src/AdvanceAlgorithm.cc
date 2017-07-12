@@ -44,6 +44,28 @@ bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOn
   return extrapolate(measuredStateOnPlane, recoHit);
 }
 
+template <>
+bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                                   const genfit::MeasuredStateOnPlane& plane) const
+{
+  return extrapolate(measuredStateOnPlane, plane.getPlane());
+}
+
+template <>
+bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const genfit::SharedPlanePtr& plane) const
+{
+  try {
+    genfit::MaterialEffects::getInstance()->setNoEffects(not m_param_useMaterialEffects);
+    measuredStateOnPlane.extrapolateToPlane(plane);
+    genfit::MaterialEffects::getInstance()->setNoEffects(false);
+  } catch (genfit::Exception e) {
+    B2WARNING(e.what());
+    return false;
+  }
+
+  return true;
+}
+
 /// Expose the useMaterialEffects parameter.
 void AdvanceAlgorithm::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {

@@ -73,17 +73,7 @@ namespace Belle2 {
   {
     // The mSoP plays no role here (it is unused in the function)
     const genfit::SharedPlanePtr& plane = recoHit.constructPlane(measuredStateOnPlane);
-
-    try {
-      genfit::MaterialEffects::getInstance()->setNoEffects(not m_param_useMaterialEffects);
-      measuredStateOnPlane.extrapolateToPlane(plane);
-      genfit::MaterialEffects::getInstance()->setNoEffects(false);
-    } catch (genfit::Exception e) {
-      B2WARNING(e.what());
-      return false;
-    }
-
-    return true;
+    return extrapolate(measuredStateOnPlane, plane);
   }
 
   template <>
@@ -92,4 +82,9 @@ namespace Belle2 {
   bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, SVDCluster& svdCluster) const;
   template <>
   bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, PXDCluster& pxdCluster) const;
+  template <>
+  bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const genfit::SharedPlanePtr& plane) const;
+  template <>
+  bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                                     const genfit::MeasuredStateOnPlane& plane) const;
 }

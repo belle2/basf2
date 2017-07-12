@@ -349,6 +349,11 @@
 			<u unit="mm">  5.170</u> <v unit="mm">46.0</v><woffset unit="mm">0.109</woffset>
 		</Component>
 
+		<Component type="Keratherm_Pad">
+			<u unit="mm">  5.170</u> <v unit="mm">+11.595</v><woffset unit="mm">0.109</woffset>
+			<u unit="mm">  5.170</u> <v unit="mm">-11.595</v><woffset unit="mm">0.109</woffset>
+		</Component>
+
 		<Component type="Clamp">
 			<u unit="mm">  5.310</u> <v unit="mm">23.030</v>
 			<u unit="mm">  5.310</u> <v unit="mm">0.06</v>
@@ -394,13 +399,22 @@
 		<height unit="mm">0.009</height>	
 	</Component>
 
-       <Component name="Keratherm">
+    <Component name="Keratherm">
 		<Color>#42342B</Color>
 		<Material>SVD-Keratherm</Material>
 		<activeChipID>1</activeChipID>
 		<width  unit="mm">4</width>
 		<length unit="mm">31.500</length>
-		<height unit="mm">0.691</height>
+		<height unit="mm">0.680</height>
+	</Component>
+
+    <Component name="Keratherm_Pad">
+		<Color>#42342B</Color>
+		<Material>SVD-Keratherm</Material>
+		<activeChipID>1</activeChipID>
+		<width  unit="mm">4</width>
+		<length unit="mm">8.190</length>
+		<height unit="mm">0.680</height>
 	</Component>
 
 	<Component name="Clamp">
@@ -409,7 +423,7 @@
 		<activeChipID>1</activeChipID>
 		<width  unit="mm">8.0</width>
 		<length unit="mm">2.5</length>
-		<height unit="mm">0.800</height>
+		<height unit="mm">0.789</height>
 	</Component>
 
 	<!-- Origami flexes on bottom of sensors. The real shape is kind of

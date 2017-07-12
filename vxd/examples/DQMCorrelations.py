@@ -158,7 +158,7 @@ else:
 
 if (args.SkipPXDSVD is False):
     pxddqmExpReco = register_module('PXDDQMExpressReco')
-    # pxddqmExpReco.param('CreateDB', args.CreateDB)
+    pxddqmExpReco.param('CreateDB', args.CreateDB)
     pxddqmChips = register_module('PXDDQM')
     pxddqmDetails = register_module('PXDDQM')
     # pxddqm.param('UseDigits', args.UseDigits)

@@ -33,6 +33,11 @@
 #include "TVectorD.h"
 #include "TF1.h"
 
+#include <framework/database/DBImportObjPtr.h>
+// #include <framework/database/DBImportArray.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/database/DBObjPtr.h>
+
 using namespace std;
 using boost::format;
 using namespace Belle2;
@@ -50,12 +55,16 @@ REG_MODULE(PXDDQMExpressReco)
 PXDDQMExpressRecoModule::PXDDQMExpressRecoModule() : HistoModule()
 {
   //Set module properties
-  setDescription("PXD DQM module for ExpressReco");
+  setDescription("PXD DQM module for Express Reco");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("CutPXDCharge", m_CutPXDCharge,
            "cut for accepting to hitmap histogram, using strips only, default = 0.0 ", m_CutPXDCharge);
   addParam("ReferenceHistosFileName", m_RefHistFileName,
            "Name of file contain reference histograms, default=vxd/data/VXD-DQMReferenceHistos.root", m_RefHistFileName);
+  addParam("NotUseDB", m_NotUseDB,
+           "Using local files instead of DataBase for reference histogram, default=0 ", m_NotUseDB);
+  addParam("CreateDB", m_CreateDB,
+           "Create and fill reference histograms in DataBase, default=0 ", m_CreateDB);
 
 }
 
@@ -102,11 +111,11 @@ void PXDDQMExpressRecoModule::defineHisto()
 
   // Create basic histograms:
   DirPXDBasic->cd();
-  m_hitMapCounts = new TH1I("PixelHitmapCounts", "PXD Pixel Hitmaps Counts",
+  m_hitMapCounts = new TH1I("DQMER_PXD_PixelHitmapCounts", "PXD Pixel Hitmaps Counts",
                             c_nPXDSensors, 0, c_nPXDSensors);
   m_hitMapCounts->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapCounts->GetYaxis()->SetTitle("counts");
-  m_hitMapClCounts = new TH1I("ClusterHitmapCounts", "PXD Cluster Hitmaps Counts",
+  m_hitMapClCounts = new TH1I("DQMER_PXD_ClusterHitmapCounts", "PXD Cluster Hitmaps Counts",
                               c_nPXDSensors, 0, c_nPXDSensors);
   m_hitMapClCounts->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapClCounts->GetYaxis()->SetTitle("counts");
@@ -132,8 +141,8 @@ void PXDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     // Number of fired pixels per frame
     //----------------------------------------------------------------
-    string name = str(format("PXD_%1%_Fired") % sensorDescr);
-    string title = str(format("PXD Sensor %1% Fired pixels") % sensorDescr);
+    string name = str(format("DQMER_PXD_%1%_Fired") % sensorDescr);
+    string title = str(format("DQM ER PXD Sensor %1% Fired pixels") % sensorDescr);
     m_fired[i] = NULL;
     m_fired[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
     m_fired[i]->GetXaxis()->SetTitle("# of fired u pixels");
@@ -141,8 +150,8 @@ void PXDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     // Number of clusters per frame
     //----------------------------------------------------------------
-    name = str(format("PXD_%1%_Clusters") % sensorDescr);
-    title = str(format("PXD Sensor %1% Number of clusters") % sensorDescr);
+    name = str(format("DQMER_PXD_%1%_Clusters") % sensorDescr);
+    title = str(format("DQM ER PXD Sensor %1% Number of clusters") % sensorDescr);
     m_clusters[i] = NULL;
     m_clusters[i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
     m_clusters[i]->GetXaxis()->SetTitle("# of u clusters");
@@ -150,8 +159,8 @@ void PXDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     // Start row distribution
     //----------------------------------------------------------------
-    name = str(format("PXD_%1%_StartRow") % sensorDescr);
-    title = str(format("PXD Sensor %1% Start row distribution") % sensorDescr);
+    name = str(format("DQMER_PXD_%1%_StartRow") % sensorDescr);
+    title = str(format("DQM ER PXD Sensor %1% Start row distribution") % sensorDescr);
     m_nPixels = SensorInfo.getVCells();
     m_startRow[i] = new TH1F(name.c_str(), title.c_str(), m_nPixels / 4, 0.0, m_nPixels);
     m_startRow[i]->GetXaxis()->SetTitle("start row [pitch units]");
@@ -159,53 +168,53 @@ void PXDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     // Cluster seed charge by distance from the start row
     //----------------------------------------------------------------
-    name = str(format("PXD_%1%_AverageSeedByStartRow") % sensorDescr);
-    title = str(format("PXD Sensor %1% Average seed charge by distance from the start row") % sensorDescr);
+    name = str(format("DQMER_PXD_%1%_AverageSeedByStartRow") % sensorDescr);
+    title = str(format("DQM ER PXD Sensor %1% Average seed charge by distance from the start row") % sensorDescr);
     m_chargStartRow[i] = new TH1F(name.c_str(), title.c_str(), m_nPixels / 4, 0.0, m_nPixels);
     m_chargStartRow[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
     m_chargStartRow[i]->GetYaxis()->SetTitle("average seed [ADU]");
-    name = str(format("PXD_%1%_SeedCountsByStartRow") % sensorDescr);
-    title = str(format("PXD Sensor %1% Seed charge count by distance from the start row") % sensorDescr);
+    name = str(format("DQMER_PXD_%1%_SeedCountsByStartRow") % sensorDescr);
+    title = str(format("DQM ER PXD Sensor %1% Seed charge count by distance from the start row") % sensorDescr);
     m_startRowCount[i] = new TH1F(name.c_str(), title.c_str(), m_nPixels / 4, 0.0, m_nPixels);
     m_startRowCount[i]->GetXaxis()->SetTitle("distance from the start row [pitch units]");
     m_startRowCount[i]->GetYaxis()->SetTitle("count");
     //----------------------------------------------------------------
     // Cluster Charge
     //----------------------------------------------------------------
-    name = str(format("PXD_%1%_ClusterCharge") % sensorDescr);
-    title = str(format("PXD Sensor %1% Cluster Charge") % sensorDescr);
+    name = str(format("DQMER_PXD_%1%_ClusterCharge") % sensorDescr);
+    title = str(format("DQM ER PXD Sensor %1% Cluster Charge") % sensorDescr);
     m_clusterCharge[i] = new TH1F(name.c_str(), title.c_str(), 256, 0, 256);
     m_clusterCharge[i]->GetXaxis()->SetTitle("charge of clusters [ADU]");
     m_clusterCharge[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
     // Pixel Signal
     //----------------------------------------------------------------
-    name = str(format("PXD_%1%_PixelSignal") % sensorDescr);
-    title = str(format("PXD Sensor %1% Pixel Signal") % sensorDescr);
+    name = str(format("DQMER_PXD_%1%_PixelSignal") % sensorDescr);
+    title = str(format("DQM ER PXD Sensor %1% Pixel Signal") % sensorDescr);
     m_pixelSignal[i] = new TH1F(name.c_str(), title.c_str(), 256, 0, 256);
     m_pixelSignal[i]->GetXaxis()->SetTitle("signal of pixels [ADU]");
     m_pixelSignal[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
     // Cluster Size in U
     //----------------------------------------------------------------
-    name = str(format("PXD_%1%_ClusterSizeU") % sensorDescr);
-    title = str(format("PXD Sensor %1% Cluster Size U") % sensorDescr);
+    name = str(format("DQMER_PXD_%1%_ClusterSizeU") % sensorDescr);
+    title = str(format("DQM ER PXD Sensor %1% Cluster Size U") % sensorDescr);
     m_clusterSizeU[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
     m_clusterSizeU[i]->GetXaxis()->SetTitle("size of u clusters");
     m_clusterSizeU[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
     // Cluster Size in V
     //----------------------------------------------------------------
-    name = str(format("PXD_%1%_ClusterSizeV") % sensorDescr);
-    title = str(format("PXD Sensor %1% Cluster Size V") % sensorDescr);
+    name = str(format("DQMER_PXD_%1%_ClusterSizeV") % sensorDescr);
+    title = str(format("DQM ER PXD Sensor %1% Cluster Size V") % sensorDescr);
     m_clusterSizeV[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
     m_clusterSizeV[i]->GetXaxis()->SetTitle("size of v clusters");
     m_clusterSizeV[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
     // Cluster Size in U+V
     //----------------------------------------------------------------
-    name = str(format("PXD_%1%_ClusterSizeUV") % sensorDescr);
-    title = str(format("PXD Sensor %1% Cluster Size U+V") % sensorDescr);
+    name = str(format("DQMER_PXD_%1%_ClusterSizeUV") % sensorDescr);
+    title = str(format("DQM ER PXD Sensor %1% Cluster Size U+V") % sensorDescr);
     m_clusterSizeUV[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
     m_clusterSizeUV[i]->GetXaxis()->SetTitle("size of u+v clusters");
     m_clusterSizeUV[i]->GetYaxis()->SetTitle("counts");
@@ -213,51 +222,51 @@ void PXDDQMExpressRecoModule::defineHisto()
 
   // Create flag histograms:
   DirPXDFlags->cd();
-  m_fFiredFlag = new TH1I("FiredFlag", "PXD Fired Flag",
+  m_fFiredFlag = new TH1I("DQMER_PXD_FiredFlag", "DQM ER PXD Fired Flag",
                           c_nPXDSensors, 0, c_nPXDSensors);
   m_fFiredFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fFiredFlag->GetYaxis()->SetTitle("flag");
-  m_fClustersFlag = new TH1I("ClustersFlag", "PXD Clusters Flag",
+  m_fClustersFlag = new TH1I("DQMER_PXD_ClustersFlag", "DQM ER PXD Clusters Flag",
                              c_nPXDSensors, 0, c_nPXDSensors);
   m_fClustersFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClustersFlag->GetYaxis()->SetTitle("flag");
-  m_fStartRowFlag = new TH1I("StartRowFlag", "PXD Start Row Flag",
+  m_fStartRowFlag = new TH1I("DQMER_PXD_StartRowFlag", "DQM ER PXD Start Row Flag",
                              c_nPXDSensors, 0, c_nPXDSensors);
   m_fStartRowFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fStartRowFlag->GetYaxis()->SetTitle("flag");
-  m_fChargStartRowFlag = new TH1I("ChargStartRowFlag", "PXD Charg Start Row Flag",
+  m_fChargStartRowFlag = new TH1I("DQMER_PXD_ChargStartRowFlag", "DQM ER PXD Charg Start Row Flag",
                                   c_nPXDSensors, 0, c_nPXDSensors);
   m_fChargStartRowFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fChargStartRowFlag->GetYaxis()->SetTitle("flag");
-  m_fStartRowCountFlag = new TH1I("StartRowCountFlag", "PXD Row Count Flag",
+  m_fStartRowCountFlag = new TH1I("DQMER_PXD_StartRowCountFlag", "DQM ER PXD Row Count Flag",
                                   c_nPXDSensors, 0, c_nPXDSensors);
   m_fStartRowCountFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fStartRowCountFlag->GetYaxis()->SetTitle("flag");
-  m_fHitMapCountsFlag = new TH1I("PixelHitmapCountsFlag", "PXD Pixel Hitmaps Counts Flag",
+  m_fHitMapCountsFlag = new TH1I("DQMER_PXD_PixelHitmapCountsFlag", "DQM ER PXD Pixel Hitmaps Counts Flag",
                                  c_nPXDSensors, 0, c_nPXDSensors);
   m_fHitMapCountsFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fHitMapCountsFlag->GetYaxis()->SetTitle("flag");
-  m_fHitMapClCountsFlag = new TH1I("ClusterHitmapCountsFlag", "PXD Cluster Hitmaps Counts Flag",
+  m_fHitMapClCountsFlag = new TH1I("DQMER_PXD_ClusterHitmapCountsFlag", "DQM ER PXD Cluster Hitmaps Counts Flag",
                                    c_nPXDSensors, 0, c_nPXDSensors);
   m_fHitMapClCountsFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fHitMapClCountsFlag->GetYaxis()->SetTitle("flag");
-  m_fClusterChargeFlag = new TH1I("ClusterChargeFlag", "PXD Cluster Charge Flag",
+  m_fClusterChargeFlag = new TH1I("DQMER_PXD_ClusterChargeFlag", "DQM ER PXD Cluster Charge Flag",
                                   c_nPXDSensors, 0, c_nPXDSensors);
   m_fClusterChargeFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClusterChargeFlag->GetYaxis()->SetTitle("flag");
-  m_fPixelSignalFlag = new TH1I("PixelSignalFlag", "PXD Pixel Signal Flag",
+  m_fPixelSignalFlag = new TH1I("DQMER_PXD_PixelSignalFlag", "DQM ER PXD Pixel Signal Flag",
                                 c_nPXDSensors, 0, c_nPXDSensors);
   m_fPixelSignalFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fPixelSignalFlag->GetYaxis()->SetTitle("flag");
-  m_fClusterSizeUFlag = new TH1I("ClasterSizeUFlag", "PXD Cluster Size U Flag",
+  m_fClusterSizeUFlag = new TH1I("DQMER_PXD_ClasterSizeUFlag", "DQM ER PXD Cluster Size U Flag",
                                  c_nPXDSensors, 0, c_nPXDSensors);
   m_fClusterSizeUFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClusterSizeUFlag->GetYaxis()->SetTitle("flag");
-  m_fClusterSizeVFlag = new TH1I("ClasterSizeVFlag", "PXD Cluster Size V Flag",
+  m_fClusterSizeVFlag = new TH1I("DQMER_PXD_ClasterSizeVFlag", "DQM ER PXD Cluster Size V Flag",
                                  c_nPXDSensors, 0, c_nPXDSensors);
   m_fClusterSizeVFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClusterSizeVFlag->GetYaxis()->SetTitle("flag");
-  m_fClusterSizeUVFlag = new TH1I("ClasterSizeUVFlag", "PXD Cluster Size UV Flag",
+  m_fClusterSizeUVFlag = new TH1I("DQMER_PXD_ClasterSizeUVFlag", "DQM ER PXD Cluster Size UV Flag",
                                   c_nPXDSensors, 0, c_nPXDSensors);
   m_fClusterSizeUVFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClusterSizeUVFlag->GetYaxis()->SetTitle("flag");
@@ -441,9 +450,17 @@ void PXDDQMExpressRecoModule::endRun()
   double fNoOfEvents[1];
   fNoOfEvents[0] = m_NoOfEvents;
   NoOfEvents->SetElements(fNoOfEvents);
-  TString nameBS = Form("NoOfEvents");
+  TString nameBS = Form("DQMER_PXD_NoOfEvents");
   m_oldDir->cd();
   NoOfEvents->Write(nameBS.Data());
+
+  TDirectory* DirPXDRefs = NULL;
+  DirPXDRefs = m_oldDir->mkdir("PXDExpReco_Refs");
+  DirPXDRefs->cd();
+  // Load reference file of histograms:
+  TVectorD* NoOfEventsRef;
+  NoOfEventsRef = new TVectorD(1);
+  double fNoOfEventsRef[1];
 
   // Load reference file of histograms:
   TH1I* r_hitMapCounts;
@@ -459,97 +476,191 @@ void PXDDQMExpressRecoModule::endRun()
   TH1F** r_clusterSizeV = new TH1F*[c_nPXDSensors];
   TH1F** r_clusterSizeUV = new TH1F*[c_nPXDSensors];
 
-  TFile* f_RefHistFile = new TFile(m_RefHistFileName.c_str(), "read");
-  if (f_RefHistFile->IsOpen()) {
-    B2INFO("Reference file name: " << m_RefHistFileName.c_str());
-    TVectorD* NoOfEventsRef = NULL;
-    f_RefHistFile->GetObject("NoOfEvents", NoOfEventsRef);
-    m_NoOfEventsRef = (int)NoOfEventsRef->GetMatrixArray()[0];
-//    m_NoOfEventsRef = 2;
-    string name = str(format("PXDExpReco/PixelHitmapCounts;1"));
-    f_RefHistFile->GetObject(name.c_str(), r_hitMapCounts);
-    if (r_hitMapCounts == NULL) {
-      B2INFO("There is missing histogram in reference file: " << name.c_str());
-      return;
-    }
-    name = str(format("PXDExpReco/ClusterHitmapCounts;1"));
-    f_RefHistFile->GetObject(name.c_str(), r_hitMapClCounts);
-    if (r_hitMapClCounts == NULL) {
-      B2INFO("There is missing histogram in reference file: " << name.c_str());
-      return;
-    }
-    for (int i = 0; i < c_nPXDSensors; i++) {
-      int iLayer = 0;
-      int iLadder = 0;
-      int iSensor = 0;
-      getIDsFromIndex(i, &iLayer, &iLadder, &iSensor);
-      string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
-      name = str(format("PXDExpReco/PXD_%1%_Fired") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_fired[i]);
-      if (r_fired[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("PXDExpReco/PXD_%1%_Clusters") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_clusters[i]);
-      if (r_clusters[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("PXDExpReco/PXD_%1%_StartRow") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_startRow[i]);
-      if (r_startRow[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("PXDExpReco/PXD_%1%_AverageSeedByStartRow") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_chargStartRow[i]);
-      if (r_chargStartRow[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("PXDExpReco/PXD_%1%_SeedCountsByStartRow") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_startRowCount[i]);
-      if (r_startRowCount[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("PXDExpReco/PXD_%1%_ClusterCharge") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_clusterCharge[i]);
-      if (r_clusterCharge[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("PXDExpReco/PXD_%1%_PixelSignal") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_pixelSignal[i]);
-      if (r_pixelSignal[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("PXDExpReco/PXD_%1%_ClusterSizeU") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_clusterSizeU[i]);
-      if (r_clusterSizeU[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("PXDExpReco/PXD_%1%_ClusterSizeV") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_clusterSizeV[i]);
-      if (r_clusterSizeV[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-      name = str(format("PXDExpReco/PXD_%1%_ClusterSizeUV") % sensorDescr);
-      f_RefHistFile->GetObject(name.c_str(), r_clusterSizeUV[i]);
-      if (r_clusterSizeUV[i] == NULL) {
-        B2INFO("There is missing histogram in reference file: " << name.c_str());
-        return;
-      }
-    }
-    // f_RefHistFile->Close();
-  } else {
-    B2INFO("File of reference histograms: " << m_RefHistFileName.c_str() << " is not available, please check it!");
-    return;
+  r_hitMapCounts = NULL;
+  r_hitMapCounts = new TH1I(*m_hitMapCounts);
+  r_hitMapCounts->Reset();
+  r_hitMapClCounts = NULL;
+  r_hitMapClCounts = new TH1I(*m_hitMapClCounts);
+  r_hitMapClCounts->Reset();
+  for (int i = 0; i < c_nPXDSensors; i++) {
+    r_fired[i] = NULL;
+    r_fired[i] = new TH1F(*m_fired[i]);
+    r_fired[i]->Reset();
+    r_clusters[i] = NULL;
+    r_clusters[i] = new TH1F(*m_clusters[i]);
+    r_clusters[i]->Reset();
+    r_startRow[i] = NULL;
+    r_startRow[i] = new TH1F(*m_startRow[i]);
+    r_startRow[i]->Reset();
+    r_chargStartRow[i] = NULL;
+    r_chargStartRow[i] = new TH1F(*m_chargStartRow[i]);
+    r_chargStartRow[i]->Reset();
+    r_startRowCount[i] = NULL;
+    r_startRowCount[i] = new TH1F(*m_startRowCount[i]);
+    r_startRowCount[i]->Reset();
+    r_clusterCharge[i] = NULL;
+    r_clusterCharge[i] = new TH1F(*m_clusterCharge[i]);
+    r_clusterCharge[i]->Reset();
+    r_pixelSignal[i] = NULL;
+    r_pixelSignal[i] = new TH1F(*m_pixelSignal[i]);
+    r_pixelSignal[i]->Reset();
+    r_clusterSizeU[i] = NULL;
+    r_clusterSizeU[i] = new TH1F(*m_clusterSizeU[i]);
+    r_clusterSizeU[i]->Reset();
+    r_clusterSizeV[i] = NULL;
+    r_clusterSizeV[i] = new TH1F(*m_clusterSizeV[i]);
+    r_clusterSizeV[i]->Reset();
+    r_clusterSizeUV[i] = NULL;
+    r_clusterSizeUV[i] = new TH1F(*m_clusterSizeUV[i]);
+    r_clusterSizeUV[i]->Reset();
   }
+
+  if (m_NotUseDB == 1) {
+    TFile* f_RefHistFile = new TFile(m_RefHistFileName.c_str(), "read");
+    if (f_RefHistFile->IsOpen()) {
+      B2INFO("Reference file name: " << m_RefHistFileName.c_str());
+      TVectorD* NoOfEventsRef = NULL;
+      f_RefHistFile->GetObject("NoOfEvents", NoOfEventsRef);
+      m_NoOfEventsRef = (int)NoOfEventsRef->GetMatrixArray()[0];
+      //    m_NoOfEventsRef = 2;
+      string name = str(format("PXDExpReco/PixelHitmapCounts;1"));
+      f_RefHistFile->GetObject(name.c_str(), r_hitMapCounts);
+      if (r_hitMapCounts == NULL) {
+        B2INFO("There is missing histogram in reference file: " << name.c_str());
+        return;
+      }
+      name = str(format("PXDExpReco/ClusterHitmapCounts;1"));
+      f_RefHistFile->GetObject(name.c_str(), r_hitMapClCounts);
+      if (r_hitMapClCounts == NULL) {
+        B2INFO("There is missing histogram in reference file: " << name.c_str());
+        return;
+      }
+      for (int i = 0; i < c_nPXDSensors; i++) {
+        int iLayer = 0;
+        int iLadder = 0;
+        int iSensor = 0;
+        getIDsFromIndex(i, &iLayer, &iLadder, &iSensor);
+        string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
+        name = str(format("PXDExpReco/PXD_%1%_Fired") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_fired[i]);
+        if (r_fired[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("PXDExpReco/PXD_%1%_Clusters") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_clusters[i]);
+        if (r_clusters[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("PXDExpReco/PXD_%1%_StartRow") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_startRow[i]);
+        if (r_startRow[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("PXDExpReco/PXD_%1%_AverageSeedByStartRow") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_chargStartRow[i]);
+        if (r_chargStartRow[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("PXDExpReco/PXD_%1%_SeedCountsByStartRow") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_startRowCount[i]);
+        if (r_startRowCount[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("PXDExpReco/PXD_%1%_ClusterCharge") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_clusterCharge[i]);
+        if (r_clusterCharge[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("PXDExpReco/PXD_%1%_PixelSignal") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_pixelSignal[i]);
+        if (r_pixelSignal[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("PXDExpReco/PXD_%1%_ClusterSizeU") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_clusterSizeU[i]);
+        if (r_clusterSizeU[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("PXDExpReco/PXD_%1%_ClusterSizeV") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_clusterSizeV[i]);
+        if (r_clusterSizeV[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+        name = str(format("PXDExpReco/PXD_%1%_ClusterSizeUV") % sensorDescr);
+        f_RefHistFile->GetObject(name.c_str(), r_clusterSizeUV[i]);
+        if (r_clusterSizeUV[i] == NULL) {
+          B2INFO("There is missing histogram in reference file: " << name.c_str());
+          return;
+        }
+      }
+      // f_RefHistFile->Close();
+    } else {
+      B2INFO("File of reference histograms: " << m_RefHistFileName.c_str() << " is not available, please check it!");
+      return;
+    }
+  } else {
+    if (m_CreateDB == 1) {
+      IntervalOfValidity iov(0, 0, -1, -1);
+      TString Name = Form("DQMER_PXD_NoOfEvents_Ref");
+      DBImportObjPtr<TVectorD> DQMER_PXD_NoOfEvents(Name.Data());
+      DQMER_PXD_NoOfEvents.construct(1);
+      DQMER_PXD_NoOfEvents->SetElements(fNoOfEvents);
+      DQMER_PXD_NoOfEvents.import(iov);
+
+      CreateDBHisto(m_hitMapCounts);
+      CreateDBHisto(m_hitMapClCounts);
+      CreateDBHistoGroup(m_fired, c_nPXDSensors);
+      CreateDBHistoGroup(m_clusters, c_nPXDSensors);
+      CreateDBHistoGroup(m_startRow, c_nPXDSensors);
+      CreateDBHistoGroup(m_chargStartRow, c_nPXDSensors);
+      CreateDBHistoGroup(m_startRowCount, c_nPXDSensors);
+      CreateDBHistoGroup(m_clusterCharge, c_nPXDSensors);
+      CreateDBHistoGroup(m_pixelSignal, c_nPXDSensors);
+      CreateDBHistoGroup(m_clusterSizeU, c_nPXDSensors);
+      CreateDBHistoGroup(m_clusterSizeV, c_nPXDSensors);
+      CreateDBHistoGroup(m_clusterSizeUV, c_nPXDSensors);
+    } else {
+      TString Name = Form("DQMER_PXD_NoOfEvents_Ref");
+      DBObjPtr<TVectorD> DQMER_PXD_NoOfEvents_Ref(Name.Data());
+      if (DQMER_PXD_NoOfEvents_Ref.isValid()) {
+        m_NoOfEventsRef = (int)DQMER_PXD_NoOfEvents_Ref->GetMatrixArray()[0];
+      } else {
+        B2INFO("ERROR to open reference counter: DQMER_PXD_NoOfEvents_Ref");
+        return;
+      }
+
+      int load = 1;
+      if (!LoadDBHisto(r_hitMapCounts)) load = 0;
+      if (!LoadDBHisto(r_hitMapClCounts)) load = 0;
+      if (!LoadDBHistoGroup(r_fired, c_nPXDSensors)) load = 0;
+      if (!LoadDBHistoGroup(r_clusters, c_nPXDSensors)) load = 0;
+      if (!LoadDBHistoGroup(r_startRow, c_nPXDSensors)) load = 0;
+      if (!LoadDBHistoGroup(r_chargStartRow, c_nPXDSensors)) load = 0;
+      if (!LoadDBHistoGroup(r_startRowCount, c_nPXDSensors)) load = 0;
+      if (!LoadDBHistoGroup(r_clusterCharge, c_nPXDSensors)) load = 0;
+      if (!LoadDBHistoGroup(r_pixelSignal, c_nPXDSensors)) load = 0;
+      if (!LoadDBHistoGroup(r_clusterSizeU, c_nPXDSensors)) load = 0;
+      if (!LoadDBHistoGroup(r_clusterSizeV, c_nPXDSensors)) load = 0;
+      if (!LoadDBHistoGroup(r_clusterSizeUV, c_nPXDSensors)) load = 0;
+      if (!load) {
+        B2INFO("ERROR to open of reference information");
+        return;
+      }
+    }
+  }
+
+  fNoOfEventsRef[0] = m_NoOfEventsRef;
+  NoOfEventsRef->SetElements(fNoOfEventsRef);
+  NoOfEventsRef->Write("DQMER_PXD_NoOfEvents_Ref");
 
   // Compare histograms with reference histograms and create flags:
   for (int i = 0; i < c_nPXDSensors; i++) {
@@ -771,5 +882,170 @@ int PXDDQMExpressRecoModule::SetFlag(int Type, int bin, double* pars, double rat
   int ret = SetFlag(Type, bin, pars, ratio, histF, refhistF, flaghist);
   delete histF;
   delete refhistF;
+  return ret;
+}
+
+
+void PXDDQMExpressRecoModule::CreateDBHisto(TH1I* HistoDB)
+{
+  IntervalOfValidity iov(0, 0, -1, -1);
+  TString Name = Form("%s_Ref", HistoDB->GetName());
+  DBImportObjPtr<TVectorD> DBHisto(Name.Data());
+  DBHisto.construct(HistoDB->GetNbinsX() + 3);
+  double* Content = new double[HistoDB->GetNbinsX() + 3];
+  Content[0] = HistoDB->GetNbinsX();
+  Content[1] = HistoDB->GetXaxis()->GetXmin();
+  Content[2] = HistoDB->GetXaxis()->GetXmax();
+  for (int i = 0; i < HistoDB->GetNbinsX(); i++) {
+    Content[i + 3] = HistoDB->GetBinContent(i + 1);
+  }
+  DBHisto->SetElements(Content);
+  DBHisto.import(iov);
+  delete [] Content;
+}
+
+void PXDDQMExpressRecoModule::CreateDBHisto(TH1F* HistoDB)
+{
+  IntervalOfValidity iov(0, 0, -1, -1);
+  TString Name = Form("%s_Ref", HistoDB->GetName());
+  DBImportObjPtr<TVectorD> DBHisto(Name.Data());
+  DBHisto.construct(HistoDB->GetNbinsX() + 3);
+  double* Content = new double[HistoDB->GetNbinsX() + 3];
+  Content[0] = HistoDB->GetNbinsX();
+  Content[1] = HistoDB->GetXaxis()->GetXmin();
+  Content[2] = HistoDB->GetXaxis()->GetXmax();
+  for (int i = 0; i < HistoDB->GetNbinsX(); i++) {
+    Content[i + 3] = HistoDB->GetBinContent(i + 1);
+  }
+  DBHisto->SetElements(Content);
+  DBHisto.import(iov);
+  delete [] Content;
+}
+
+void PXDDQMExpressRecoModule::CreateDBHistoGroup(TH1I** HistoDB, int Number)
+{
+  IntervalOfValidity iov(0, 0, -1, -1);
+  TString Name = Form("%s_Ref", HistoDB[0]->GetName());
+  DBImportObjPtr<TVectorD> DBHisto(Name.Data());
+  DBHisto.construct(Number * HistoDB[0]->GetNbinsX() + 3);
+  double* Content = new double[Number * HistoDB[0]->GetNbinsX() + 3];
+  Content[0] = HistoDB[0]->GetNbinsX();
+  Content[1] = HistoDB[0]->GetXaxis()->GetXmin();
+  Content[2] = HistoDB[0]->GetXaxis()->GetXmax();
+  for (int j = 0; j < Number; j++) {
+    for (int i = 0; i < HistoDB[j]->GetNbinsX(); i++) {
+      Content[j * HistoDB[j]->GetNbinsX() + i + 3] = HistoDB[j]->GetBinContent(i + 1);
+    }
+  }
+  DBHisto->SetElements(Content);
+  DBHisto.import(iov);
+  delete [] Content;
+}
+
+void PXDDQMExpressRecoModule::CreateDBHistoGroup(TH1F** HistoDB, int Number)
+{
+  IntervalOfValidity iov(0, 0, -1, -1);
+  TString Name = Form("%s_Ref", HistoDB[0]->GetName());
+  DBImportObjPtr<TVectorD> DBHisto(Name.Data());
+  DBHisto.construct(Number * HistoDB[0]->GetNbinsX() + 3);
+  double* Content = new double[Number * HistoDB[0]->GetNbinsX() + 3];
+  Content[0] = HistoDB[0]->GetNbinsX();
+  Content[1] = HistoDB[0]->GetXaxis()->GetXmin();
+  Content[2] = HistoDB[0]->GetXaxis()->GetXmax();
+  for (int j = 0; j < Number; j++) {
+    for (int i = 0; i < HistoDB[j]->GetNbinsX(); i++) {
+      Content[j * HistoDB[j]->GetNbinsX() + i + 3] = HistoDB[j]->GetBinContent(i + 1);
+    }
+  }
+  DBHisto->SetElements(Content);
+  DBHisto.import(iov);
+  delete [] Content;
+}
+
+int PXDDQMExpressRecoModule::LoadDBHisto(TH1I* HistoDB)
+{
+  TString Name = Form("%s_Ref", HistoDB->GetName());
+  DBObjPtr<TVectorD> DBHisto(Name.Data());
+  int ret = 0;
+  if (DBHisto.isValid()) {
+    ret = 1;
+    if (HistoDB->GetNbinsX() != (int)DBHisto->GetMatrixArray()[0]) ret = 0;
+    if (HistoDB->GetXaxis()->GetXmin() != DBHisto->GetMatrixArray()[1]) ret = 0;
+    if (HistoDB->GetXaxis()->GetXmax() != DBHisto->GetMatrixArray()[2]) ret = 0;
+    if (ret) {
+      for (int i = 0; i < HistoDB->GetNbinsX(); i++) {
+        HistoDB->SetBinContent(i + 1, (int)DBHisto->GetMatrixArray()[i + 3]);
+      }
+    }
+  }
+  if (!ret) {
+    B2INFO("ERROR to open reference histogram: " << Name.Data());
+  }
+  return ret;
+}
+
+int PXDDQMExpressRecoModule::LoadDBHisto(TH1F* HistoDB)
+{
+  TString Name = Form("%s_Ref", HistoDB->GetName());
+  DBObjPtr<TVectorD> DBHisto(Name.Data());
+  int ret = 0;
+  if (DBHisto.isValid()) {
+    ret = 1;
+    if (HistoDB->GetNbinsX() != (int)DBHisto->GetMatrixArray()[0]) ret = 0;
+    if (HistoDB->GetXaxis()->GetXmin() != DBHisto->GetMatrixArray()[1]) ret = 0;
+    if (HistoDB->GetXaxis()->GetXmax() != DBHisto->GetMatrixArray()[2]) ret = 0;
+    if (ret) {
+      for (int i = 0; i < HistoDB->GetNbinsX(); i++) {
+        HistoDB->SetBinContent(i + 1, (int)DBHisto->GetMatrixArray()[i + 3]);
+      }
+    }
+  }
+  if (!ret) {
+    B2INFO("ERROR to open reference histogram: " << Name.Data());
+  }
+  return ret;
+}
+
+int PXDDQMExpressRecoModule::LoadDBHistoGroup(TH1I** HistoDB, int Number)
+{
+  TString Name = Form("%s_Ref", HistoDB[0]->GetName());
+  DBObjPtr<TVectorD> DBHisto(Name.Data());
+  int ret = 0;
+  if (DBHisto.isValid()) {
+    ret = 1;
+    if (HistoDB[0]->GetNbinsX() != (int)DBHisto->GetMatrixArray()[0]) ret = 0;
+    if (HistoDB[0]->GetXaxis()->GetXmin() != DBHisto->GetMatrixArray()[1]) ret = 0;
+    if (HistoDB[0]->GetXaxis()->GetXmax() != DBHisto->GetMatrixArray()[2]) ret = 0;
+    for (int j = 0; j < Number; j++) {
+      for (int i = 0; i < HistoDB[j]->GetNbinsX(); i++) {
+        HistoDB[j]->SetBinContent(i + 1, DBHisto->GetMatrixArray()[j * HistoDB[j]->GetNbinsX() + i + 3]);
+      }
+    }
+  }
+  if (!ret) {
+    B2INFO("ERROR to open reference histogram: " << Name.Data());
+  }
+  return ret;
+}
+
+int PXDDQMExpressRecoModule::LoadDBHistoGroup(TH1F** HistoDB, int Number)
+{
+  TString Name = Form("%s_Ref", HistoDB[0]->GetName());
+  DBObjPtr<TVectorD> DBHisto(Name.Data());
+  int ret = 0;
+  if (DBHisto.isValid()) {
+    ret = 1;
+    if (HistoDB[0]->GetNbinsX() != (int)DBHisto->GetMatrixArray()[0]) ret = 0;
+    if (HistoDB[0]->GetXaxis()->GetXmin() != DBHisto->GetMatrixArray()[1]) ret = 0;
+    if (HistoDB[0]->GetXaxis()->GetXmax() != DBHisto->GetMatrixArray()[2]) ret = 0;
+    for (int j = 0; j < Number; j++) {
+      for (int i = 0; i < HistoDB[j]->GetNbinsX(); i++) {
+        HistoDB[j]->SetBinContent(i + 1, DBHisto->GetMatrixArray()[j * HistoDB[j]->GetNbinsX() + i + 3]);
+      }
+    }
+  }
+  if (!ret) {
+    B2INFO("ERROR to open reference histogram: " << Name.Data());
+  }
   return ret;
 }

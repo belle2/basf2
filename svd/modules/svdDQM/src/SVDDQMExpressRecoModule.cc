@@ -31,8 +31,6 @@
 #include "TFile.h"
 #include "TVectorD.h"
 #include "TF1.h"
-#include "TH1I.h"
-#include "TH1F.h"
 
 #include <framework/database/DBImportObjPtr.h>
 // #include <framework/database/DBImportArray.h>

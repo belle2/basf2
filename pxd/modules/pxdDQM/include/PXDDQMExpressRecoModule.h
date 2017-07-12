@@ -68,6 +68,9 @@ namespace Belle2 {
     int m_NoOfEvents;        /** Number of events */
     int m_NoOfEventsRef;     /** Number of events in reference histogram */
 
+    int m_NotUseDB = 0;      /** Using local files instead of DataBase for reference histogram, default=0 */
+    int m_CreateDB = 0;      /** Create and fill reference histograms in DataBase, default=0 */
+
     TH1I* m_fHitMapCountsFlag;    /**< Flags of Hitmaps of Digits */
     TH1I* m_fHitMapClCountsFlag;  /**< Flags of Hitmaps of Clusters*/
     TH1I* m_fFiredFlag;           /**< Flags of Hitmaps of Digits */
@@ -158,6 +161,50 @@ namespace Belle2 {
        * @return Indication of succes of realizing of condition, 1: OK.
        */
     int SetFlag(int Type, int bin, double* pars, double ratio, TH1I* hist, TH1I* refhist, TH1I* flaghist);
+
+    /**< Function for filling of TH1F histogram to database.
+       * @param HistoBD Histogram for DB.
+       */
+    void CreateDBHisto(TH1F* HistoBD);
+    /**< Function for filling of TH1I histogram to database.
+       * @param HistoBD Histogram for DB.
+       */
+    void CreateDBHisto(TH1I* HistoBD);
+
+    /**< Function for filling of group of TH1F histogram to database.
+       * @param HistoBD Histogram for DB.
+       * @param Number Number of histograms to glue to one.
+       */
+    void CreateDBHistoGroup(TH1F** HistoBD, int Number);
+    /**< Function for filling of group of TH1I histogram to database.
+       * @param HistoBD Histogram for DB.
+       * @param Number Number of histograms to glue to one.
+       */
+    void CreateDBHistoGroup(TH1I** HistoBD, int Nomber);
+
+    /**< Function for loading of TH1F histogram from database.
+       * @param HistoBD Histogram for DB.
+       * @return Indication of succes of realizing of condition, 1: OK.
+       */
+    int LoadDBHisto(TH1F* HistoBD);
+    /**< Function for loading of TH1I histogram from database.
+       * @param HistoBD Histogram for DB.
+       * @return Indication of succes of realizing of condition, 1: OK.
+       */
+    int LoadDBHisto(TH1I* HistoBD);
+
+    /**< Function for loading of group of TH1F histogram from database.
+       * @param HistoBD Histogram for DB.
+       * @param Number Number of histograms to extract from DB.
+       * @return Indication of succes of realizing of condition, 1: OK.
+       */
+    int LoadDBHistoGroup(TH1F** HistoBD, int Number);
+    /**< Function for loading of group of TH1I histogram from database.
+       * @param HistoBD Histogram for DB.
+       * @param Number Number of histograms to extract from DB.
+       * @return Indication of succes of realizing of condition, 1: OK.
+       */
+    int LoadDBHistoGroup(TH1I** HistoBD, int Nomber);
 
   };
 

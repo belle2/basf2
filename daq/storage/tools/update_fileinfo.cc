@@ -20,41 +20,47 @@ const char* g_table = "fileinfo";
 
 int main(int argc, char** argv)
 {
-  if (argc < 3 || strcmp(argv[1], "-help") == 0) {
-    printf("%s : id filepath \n", argv[0]);
-    return 1;
-  }
-  int id = atoi(argv[1]);
-  const std::string filepath = argv[2];
-  bool failed = std::string(argv[2]) == "-f";
   ConfigFile config("slowcontrol");
   PostgreSQLInterface db(config.get("database.host"),
                          config.get("database.dbname"),
                          config.get("database.user"),
                          config.get("database.password"),
                          config.getInt("database.port"));
-  std::stringstream ss;
-  if (!failed) {
-    ss << "update " << g_table << " set time_convert = current_timestamp, path_root = '"
-       << filepath << "' where id = " << id << " and time_convert is null;";
-    try {
-      db.connect();
-      db.execute(ss.str().c_str());
-      db.close();
-    } catch (const DBHandlerException& e) {
-      LogFile::error("Failed to update : %s", e.what());
-      return 1;
+  //  id  |             name             |                         path                         |         host          | label  | expno | runno | fileno |    size    | nevents |   chksum   |       time_close
+  //    | time_sent | time_remove
+  try {
+    db.connect();
+    db.execute("select * from datafiles where path like '/rawdata/disk01/storage/%s.%_' order by time_close;", argv[1]);
+    DBRecordList record_v(db.loadRecords());
+    for (size_t i = 0; i < record_v.size(); i++) {
+      DBRecord& record(record_v[i]);
+      std::string name = record.get("name");
+      std::string path = record.get("path");
+      std::string host = "HLT1";
+      std::string label = record.get("label");
+      unsigned int id = record.getInt("id");
+      unsigned int expno = record.getInt("expno");
+      unsigned int runno = record.getInt("runno");
+      unsigned int fileno = record.getInt("fileno");
+      int diskid = 1;
+      std::string dir = "/rawdata/disk";
+      std::string filedir = dir + StringUtil::form("%02d/storage/%4.4d/%5.5d/",
+                                                   diskid, expno, runno);
+      name = StringUtil::form("%s.%s.%4.4d.%5.5d.f%5.5d.sroot", host.c_str(),
+                              label.c_str(), expno, runno, fileno);
+      std::string path_out = filedir + name;
+      std::cout << "mkdir -p " << filedir << std::endl;
+      system(("mkdir -p " + filedir).c_str());
+      std::cout << "mv " << path << " " << path_out << std::endl;
+      system((("mv " + path) + (" " + path_out)).c_str());
+      db.execute("update datafiles set name = '%s', path = '%s' where id = %d",
+                 name.c_str(), path_out.c_str(), id);
     }
-  } else {
-    ss << "update " << g_table << " set time_process = null where id = " << id << " and time_convert is null;";
-    try {
-      db.connect();
-      db.execute(ss.str().c_str());
-      db.close();
-    } catch (const DBHandlerException& e) {
-      LogFile::error("Failed to update : %s", e.what());
-      return 1;
-    }
+    //db.execute(ss.str().c_str());
+    db.close();
+  } catch (const DBHandlerException& e) {
+    LogFile::error("Failed to update : %s", e.what());
+    return 1;
   }
   return 0;
 }

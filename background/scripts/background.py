@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+from basf2 import create_path, B2ERROR
 
 
 def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.root'):
@@ -75,20 +75,16 @@ def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.roo
                 % sampleType)
 
     # Set background tag in SimHits and add BackgroundMetaData into persistent tree
-    tagSetter = register_module('BeamBkgTagSetter')
-    tagSetter.param('backgroundType', bgType)
-    tagSetter.param('realTime', realTime)
-    tagSetter.param('specialFor', madeFor)
-    tagSetter.param('Phase', phase)
-    path.add_module(tagSetter)
+    tagSetter = path.add_module('BeamBkgTagSetter', backgroundType=bgType, realTime=realTime,
+                                specialFor=madeFor, Phase=phase)
 
     # Write out only non-empty events when producing samples for BG mixer
     if sampleType != 'study':
         emptyPath = create_path()
         tagSetter.if_false(emptyPath)
 
-    # Output to file
-    output = register_module('RootOutput')
-    output.param('outputFileName', fileName)
-    output.param('branchNames', branches)
-    path.add_module(output)
+    # Output to file. We don't need a TTreeIndex for background files and memory
+    # consumption can be improved by setting a lower autoFlushSize so that
+    # fewer and or smaller amounts of data have to be read for each GetEntry()
+    path.add_module('RootOutput', outputFileName=fileName, branchNames=branches,
+                    buildIndex=False, autoFlushSize=-500000)

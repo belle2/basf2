@@ -69,7 +69,7 @@ namespace Belle2 {
       bool m_storeHisto = true;/**< Store all Histogram or not*/
       bool m_useDB = false;     /**< flag to switch btw text mode and database. */
       std::string m_InputTWFileName = "tw.dat";  /**< Input tw file name for time walk. */
-      std::string m_OutputTWFileName = "tw.dat";  /**< Output tw file name for time walk. */
+      std::string m_OutputTWFileName = "tw_new.dat";  /**< Output tw file name for time walk. */
       std::string m_InputRootFileName = "rootfile/output*"; /**<root input file name. */
       int m_firstExperiment = 0; /**< First experiment. */
       int m_firstRun = 0; /**< First run. */

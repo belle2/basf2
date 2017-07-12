@@ -112,6 +112,12 @@ namespace Belle2 {
 
     int m_first_evt;
 
+    int m_erreve;
+    int m_errcpr;
+
+    //! Event Meta Data
+    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+
   };
 
 } // end namespace Belle2

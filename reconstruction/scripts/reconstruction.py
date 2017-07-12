@@ -18,6 +18,8 @@ from softwaretrigger import (
     add_calibration_software_trigger,
 )
 
+import mdst
+
 
 def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False,
                        additionalTrackFitHypotheses=None, addClusterExpertModules=True, use_vxdtf2=False,
@@ -87,6 +89,7 @@ def add_cosmics_reconstruction(
         eventTimingExtraction=False,
         addClusterExpertModules=True,
         merge_tracks=True,
+        use_readout_position=False,
         use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
@@ -106,6 +109,7 @@ def add_cosmics_reconstruction(
         execution time.
     :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
+    :param use_readout_position: flag to turn off the usage of the readout position in the track time estimator
     """
 
     # Add cdc tracking reconstruction modules
@@ -115,6 +119,7 @@ def add_cosmics_reconstruction(
                                    skipGeometryAdding=skipGeometryAdding,
                                    eventTimingExtraction=eventTimingExtraction,
                                    merge_tracks=merge_tracks,
+                                   use_readout_position=use_readout_position,
                                    use_second_cdc_hits=use_second_cdc_hits)
 
     # Add further reconstruction modules
@@ -208,38 +213,7 @@ def add_mdst_output(
            fields to the output FileMetaData
     """
 
-    output = register_module('RootOutput')
-    output.param('outputFileName', filename)
-    branches = [
-        'Tracks',
-        'V0s',
-        'TrackFitResults',
-        'PIDLikelihoods',
-        'TracksToPIDLikelihoods',
-        'ECLClusters',
-        'ECLClustersToTracks',
-        'KLMClusters',
-        'KLMClustersToTracks',
-        'TRGSummary',
-        'SoftwareTriggerResult',
-    ]
-    persistentBranches = ['FileMetaData']
-    if mc:
-        branches += ['MCParticles', 'TracksToMCParticles',
-                     'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
-        persistentBranches += ['BackgroundInfos']
-    branches += additionalBranches
-    output.param('branchNames', branches)
-    output.param('branchNamesPersistent', persistentBranches)
-    # set dataDescription correctly
-    if dataDescription is None:
-        dataDescription = {}
-    # set dataLevel to mdst if it's not already set to something else (which
-    # might happen for udst output since that calls this function)
-    dataDescription.setdefault("dataLevel", "mdst")
-    output.param("additionalDataDescription", dataDescription)
-    path.add_module(output)
-    return output
+    return mdst.add_mdst_output(path, mc, filename, additionalBranches, dataDescription)
 
 
 def add_arich_modules(path, components=None):

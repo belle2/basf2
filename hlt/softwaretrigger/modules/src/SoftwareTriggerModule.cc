@@ -1,5 +1,6 @@
 #include <hlt/softwaretrigger/modules/SoftwareTriggerModule.h>
 #include <hlt/softwaretrigger/core/utilities.h>
+#include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 #include <TFile.h>
 
 using namespace Belle2;
@@ -11,21 +12,23 @@ REG_MODULE(SoftwareTrigger)
 /// Create a new module instance and set the parameters.
 SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPointer("", DataStore::c_Event)
 {
-  setDescription("Module to perform cuts on various variables in the event. The cuts can be defined"
-                 "by elements loaded from the database. Each cut is executed and its result stored."
-                 "The return value of this module is an integer, which is:\n"
-                 "if reject is more important than accept:"
+  setDescription("Module to perform cuts on various variables in the event. The cuts can be defined\n"
+                 "by elements loaded from the database. Each cut is executed and its result stored.\n"
+                 "The return value of this module is a bool, which is either true (accept the event) or false (reject it).\n"
+                 "It is defined from the results of the cuts in the given trigger menu, which are all evaluated\n"
+                 "and the trigger mode (accept mode or not).\n"
+                 "if not in accept mode (= reject mode):\n"
                  "* 1: if one of the accept cuts has a true result and none of the reject cuts is false ( = accepted)\n"
-                 "* 0: if neither one of the accept cuts is true nor one of the reject cuts false ( = don't know)\n"
-                 "* -1: if one of the reject cuts is false ( = rejected)\n"
+                 "* 0: if neither one of the accept cuts is true nor one of the reject cuts false ( = don't know) or\n"
+                 "*    if one of the reject cuts is false ( = rejected)\n"
+                 "In short: event accepted <=> (#true accept cuts > 0) && (#false reject cuts == 0)\n"
                  "Please note that the reject cuts override the accept cuts decision in this case!\n"
-                 "if accept is more important than reject:\n"
-                 "* 1: if one of the accept cuts has a true result. ( = accepted)\n"
-                 "* 0: if neither one of the accept cuts is true nor one of the reject cuts false ( = don't know)\n"
-                 "* -1: if one of the reject cuts is false and none of the accept cuts is true ( = rejected)\n"
-                 "Please note that the accept cuts override the reject cuts decision in this case!"
-                 "What is more important can be controlled by the flag acceptOverridesReject, which is off by default "
-                 "(so reject is more important than accept by default).");
+                 "if in accept mode\n"
+                 "* 1: if one of the accept cuts has a true result. ( = accepted) or\n"
+                 "*    if neither one of the accept cuts is true nor one of the reject cuts false ( = don't know)\n"
+                 "* 0: if one of the reject cuts is false and none of the accept cuts is true ( = rejected)\n"
+                 "Please note that the accept cuts override the reject cuts decision in this case!\n"
+                 "In short: event accepted <=> (#true accept cuts > 0) || (#false reject cuts == 0)");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -33,14 +36,6 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
            "The full db name of the cuts will be <base_identifier>/<cut_identifier>. You can only choose one identifier "
            "to make clear that all chosen cuts belong together (and should be calculated together).",
            m_param_baseIdentifier);
-
-  addParam("cutIdentifiers", m_param_cutIdentifiers, "List of identifiers for the different cuts. The module will "
-           "look for database entries with the form <base_identifier>/<cut_identifier> for each cut_identifier in the "
-           "list of strings you provide here. Make sure to choose those wisely as the modules return value depends "
-           "on these cuts.");
-
-  addParam("acceptOverridesReject", m_param_acceptOverridesReject, "Flag to control which class of cuts is "
-           "more \"important\": accept cuts or reject cuts.", m_param_acceptOverridesReject);
 
   addParam("resultStoreArrayName", m_param_resultStoreArrayName, "Store Object Pointer name for storing the "
            "trigger decision.", m_param_resultStoreArrayName);
@@ -69,17 +64,15 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
 void SoftwareTriggerModule::initialize()
 {
   m_resultStoreObjectPointer.registerInDataStore(m_param_resultStoreArrayName);
+  m_dbHandler.reset(new SoftwareTriggerDBHandler(m_param_baseIdentifier));
 
   initializeCalculation();
-
-  m_dbHandler.initialize(m_param_baseIdentifier, m_param_cutIdentifiers);
-
   initializeDebugOutput();
 }
 
 void SoftwareTriggerModule::beginRun()
 {
-  m_dbHandler.checkForChangedDBEntries();
+  m_dbHandler->checkForChangedDBEntries();
 }
 
 void SoftwareTriggerModule::terminate()
@@ -148,7 +141,8 @@ void SoftwareTriggerModule::initializeDebugOutput()
 
 void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject)
 {
-  for (const auto& cutWithName : m_dbHandler.getCutsWithNames()) {
+  // Check all cuts with the prefilled object and write them back into the data store.
+  for (const auto& cutWithName : m_dbHandler->getCutsWithNames()) {
     const std::string& cutIdentifier = cutWithName.first;
     const auto& cut = cutWithName.second;
     B2DEBUG(100, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << ")");
@@ -156,7 +150,16 @@ void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject
     m_resultStoreObjectPointer->addResult(cutIdentifier, cutResult);
   }
 
-  setReturnValue(m_resultStoreObjectPointer->getTotalResult(m_param_acceptOverridesReject));
+  // Also add the module result ( = the result of all cuts with this basename) for later reference.
+  const SoftwareTriggerCutResult& moduleResult =
+    FinalTriggerDecisionCalculator::getModuleResult(*m_resultStoreObjectPointer, m_param_baseIdentifier,
+                                                    m_dbHandler->getAcceptOverridesReject());
+  const std::string& totalResultIdentifier = SoftwareTriggerDBHandler::makeTotalCutName(m_param_baseIdentifier);
+  m_resultStoreObjectPointer->addResult(totalResultIdentifier, moduleResult);
+
+  // Return the trigger decision up to here
+  bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
+  setReturnValue(totalResult);
 }
 
 void SoftwareTriggerModule::makeDebugOutput()

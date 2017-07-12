@@ -27,4 +27,5 @@
 #pragma link C++ class Belle2::CDCGeometry::OuterWall+;
 #pragma link C++ class Belle2::CDCGeometry::SenseLayer+;
 #pragma link C++ class Belle2::CDCGeometry::FieldLayer+;
+#pragma link C++ class Belle2::CDCTriggerPlane+;
 #endif

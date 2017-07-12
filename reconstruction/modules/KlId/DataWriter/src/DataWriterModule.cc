@@ -246,6 +246,11 @@ void DataWriterModule::event()
     m_KLMtrackFlag                   = cluster.getAssociatedTrackFlag();
     m_KLMeclFlag                     = cluster.getAssociatedEclClusterFlag();
 
+    m_KLMTrackSepDist         = -999;
+    m_KLMTrackSepAngle        = -999;
+    m_KLMInitialTrackSepAngle = -999;
+    m_KLMTrackRotationAngle   = -999;
+    m_KLMTrackClusterSepAngle = -999;
     auto trackSeperations = cluster.getRelationsTo<TrackClusterSeparation>();
     TrackClusterSeparation* trackSep;
     float best_dist = 10000000000000;
@@ -255,22 +260,12 @@ void DataWriterModule::event()
       if (dist < best_dist) {
         best_dist = dist;
         trackSep = &trackSeperation;
+        m_KLMTrackSepDist                = trackSep->getDistance();
+        m_KLMTrackSepAngle               = trackSep->getTrackClusterAngle();
+        m_KLMInitialTrackSepAngle        = trackSep->getTrackClusterInitialSeparationAngle();
+        m_KLMTrackRotationAngle          = trackSep->getTrackRotationAngle();
+        m_KLMTrackClusterSepAngle        = trackSep->getTrackClusterSeparationAngle();
       }
-    }
-
-    if (trackSep) {
-      m_KLMTrackSepDist                = trackSep->getDistance();
-      m_KLMTrackSepAngle               = trackSep->getTrackClusterAngle();
-
-      m_KLMInitialTrackSepAngle        = trackSep->getTrackClusterInitialSeparationAngle();
-      m_KLMTrackRotationAngle          = trackSep->getTrackRotationAngle();
-      m_KLMTrackClusterSepAngle        = trackSep->getTrackClusterSeparationAngle();
-    } else {
-      m_KLMTrackSepDist         = -999;
-      m_KLMTrackSepAngle        = -999;
-      m_KLMInitialTrackSepAngle = -999;
-      m_KLMTrackRotationAngle   = -999;
-      m_KLMTrackClusterSepAngle = -999;
     }
 
     std::tuple < RecoTrack*, double, std::unique_ptr<const TVector3> > closestTrack = findClosestTrack(clusterPos, 3.14);

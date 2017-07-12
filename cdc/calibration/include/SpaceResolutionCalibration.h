@@ -1,5 +1,5 @@
-#include <TH1D.h>
-#include <TH2D.h>
+#include <TH1F.h>
+#include <TH2F.h>
 #include <TGraphErrors.h>
 #include <TProfile.h>
 #include <TF1.h>
@@ -38,9 +38,9 @@ namespace Belle2 {
       ///Bin width of each slide
       virtual void setBinWidth(double bw) {m_binWidth = bw;}
       /// Input root file names, results of collector module
-      virtual void InputFileNames(std::string inputname)
+      virtual void inputFileNames(std::string inputname)
       {
-        m_InputRootFileNames.assign(inputname);
+        m_inputRootFileNames.assign(inputname);
       }
       /// Store histograms durring the calibration or not
       virtual void setStoreHisto(bool storeHist = false) {m_storeHisto = storeHist;}
@@ -65,11 +65,7 @@ namespace Belle2 {
 
     protected:
       /// Run algo on data
-      virtual bool calibrate()
-      {
-        Fit();
-        return true;
-      }
+      virtual bool calibrate();
       /// create histogram
       virtual void createHisto();
       /// read sigma bining (alpha, theta bining)
@@ -80,8 +76,6 @@ namespace Belle2 {
       virtual void readSigmaFromDB();
       /// read sigma from text file
       virtual void readSigmaFromText();
-      /// do fit for sigma as function of drift length
-      virtual void Fit();
       /// store histogram
       virtual void storeHisto();
       /// save calibration, in text file or db
@@ -105,15 +99,15 @@ namespace Belle2 {
       TF1* ffit[56][2][18][7];           /**< fitting function*/
       TGraphErrors* gfit[56][2][18][7];  /**< sigma*sigma graph for fit*/
       TGraphErrors* gr[56][2][18][7];    /**< sigma graph.*/
-      TH2D* hist_b[56][2][Max_nalpha][Max_ntheta]; /**< 2D histogram of biased residual */
-      TH2D* hist_u[56][2][Max_nalpha][Max_ntheta]; /**< 2D histogram of unbiased residual */
-      TH1D* hu_m[56][2][Max_nalpha][Max_ntheta]; /**<  mean histogram biased residual*/
-      TH1D* hu_s[56][2][Max_nalpha][Max_ntheta]; /**<  sigma histogram of biased residual*/
-      TH1D* hb_m[56][2][Max_nalpha][Max_ntheta]; /**<  mean histogram of unbiased residual*/
-      TH1D* hb_s[56][2][Max_nalpha][Max_ntheta]; /**<  sigma histogram of ubiased residual*/
+      TH2F* hist_b[56][2][Max_nalpha][Max_ntheta]; /**< 2D histogram of biased residual */
+      TH2F* hist_u[56][2][Max_nalpha][Max_ntheta]; /**< 2D histogram of unbiased residual */
+      TH1F* hu_m[56][2][Max_nalpha][Max_ntheta]; /**<  mean histogram biased residual*/
+      TH1F* hu_s[56][2][Max_nalpha][Max_ntheta]; /**<  sigma histogram of biased residual*/
+      TH1F* hb_m[56][2][Max_nalpha][Max_ntheta]; /**<  mean histogram of unbiased residual*/
+      TH1F* hb_s[56][2][Max_nalpha][Max_ntheta]; /**<  sigma histogram of ubiased residual*/
 
-      std::string m_OutputSigmaFileName = "sigma.dat"; /**< Output sigma file name */
-      std::string m_InputRootFileNames = "rootfile/output*"; /**<  Input root file names*/
+      std::string m_outputSigmaFileName = "sigma_new.dat"; /**< Output sigma file name */
+      std::string m_inputRootFileNames = "rootfile/output*"; /**<  Input root file names*/
       std::string m_ProfileFileName = "sigma_profile"; /**<  Profile file name*/
       DBObjPtr<CDCSpaceResols>* m_sResolFromDB ;         /**<  Database for sigma*/
       std::string m_sigmafile = "cdc/data/sigma.dat";    /**<  Sigma file name, for text mode*/

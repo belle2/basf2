@@ -378,7 +378,7 @@ class DefaultModel(object):
             loss += sum(wd)
 
         with tf.name_scope('loss_function'):
-            # cross entropy with weight decay
+            #: cross entropy with weight decay
             self.loss = loss
             tf.summary.scalar('loss', loss)
 
@@ -576,8 +576,9 @@ class Trainer(object):
         """
         checking dataset sizes for evaluation
         """
-
+        #: train_monitor
         self.train_monitor = -1
+        #: valid monitor
         self.valid_monitor = -1
         if self.data_set.train_events > self.monitoring_size:
             self.train_monitor = self.monitoring_size
@@ -592,10 +593,12 @@ class Trainer(object):
         log_dir_train = os.path.join(log_dir, 'train')
         log_dir_test = os.path.join(log_dir, 'test')
 
+        #: train writer
         self.train_writer = tf.summary.FileWriter(log_dir_train, self.sess.graph)
+        #: test writer
         self.test_writer = tf.summary.FileWriter(log_dir_test, self.sess.graph)
 
-        # summary
+        #: summary
         self.merged_summary = tf.summary.merge_all()
 
     def _add_to_basf2_collections(self):
@@ -669,6 +672,7 @@ class Trainer(object):
             summary = self.sess.run(self.merged_summary, feed_dict=train_mon_dict)
             self.train_writer.add_summary(summary, current_epoch)
 
+            #: epoch parameters
             self.epoch_parameters = self.sess.run(self.monitoring_params + [self.merged_summary],
                                                   feed_dict=valid_dict)
             # merged summary will be at last position

@@ -30,6 +30,10 @@ void EB1RXCallback::initialize(const DBObject& obj) throw(RCHandlerException)
   for (size_t i = 0; i < o_txs.size(); i++) {
     const DBObject& o_tx(o_txs[i]);
     bool used = o_tx.getBool("used");
+    std::string vname = o_tx.getText("name") + ".";
+    std::string rname = StringUtil::form("tx[%d].", m_nsenders);
+    add(new NSMVHandlerRef(*this, vname + "used", rname + "used"));
+    add(new NSMVHandlerRef(*this, vname + "connection", rname + "connection"));
     if (used) {
       std::string vname = StringUtil::form("stat.in[%d].", m_nsenders);
       add(new NSMVHandlerInt(vname + "addr", true, false, 0));
@@ -91,7 +95,6 @@ void EB1RXCallback::load(const DBObject& obj) throw(RCHandlerException)
     m_nsenders = 0;
     for (size_t i = 0; i < o_txs.size(); i++) {
       const DBObject& o_tx(o_txs[i]);
-      std::string name = o_tx.getText("name");
       bool used = o_tx.getBool("used");
       if (!used) continue;
       bool isftsw = o_tx.getBool("ftsw");

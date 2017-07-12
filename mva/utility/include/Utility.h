@@ -17,6 +17,12 @@
 namespace Belle2 {
   namespace MVA {
 
+    /**
+     * Convenience function which does nothing.
+     * The only purpose of this function is to be called so that ROOT loads the dictionaries belonging to the mva package
+     * This is necessary if you change the working directory in your python steering file after you import basf2_mva.
+     */
+    void loadRootDictionary();
 
     /**
      * Convenience function which downloads a given weightfile from the database

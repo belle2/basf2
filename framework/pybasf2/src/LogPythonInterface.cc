@@ -15,7 +15,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConnectionFilter.h>
 #include <framework/logging/LogConnectionTxtFile.h>
-#include <framework/logging/LogConnectionIOStream.h>
+#include <framework/logging/LogConnectionFileDescriptor.h>
 
 #include <framework/core/Environment.h>
 
@@ -84,9 +84,14 @@ void LogPythonInterface::addLogFile(const std::string& filename, bool append)
   LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionTxtFile(filename, append)));
 }
 
+void LogPythonInterface::addLogConsole()
+{
+  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionFileDescriptor(STDOUT_FILENO)));
+}
+
 void LogPythonInterface::addLogConsole(bool color)
 {
-  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionIOStream(std::cout, color)));
+  LogSystem::Instance().addLogConnection(new LogConnectionFilter(new LogConnectionFileDescriptor(STDOUT_FILENO, color)));
 }
 
 void LogPythonInterface::reset()
@@ -116,18 +121,25 @@ dict LogPythonInterface::getLogStatistics()
   return returnDict;
 }
 
+namespace {
 #if !defined(__GNUG__) || defined(__ICC)
 #else
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #endif
-/** Create overloads since default arguments are lost in C++ */
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addLogFile_overloads, addLogFile, 1, 2)
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addLogConsole_overloads, addLogConsole, 0, 1)
+  /** Create overloads since default arguments are lost in C++ */
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addLogFile_overloads, addLogFile, 1, 2)
+  BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addLogConsole_overloads, addLogConsole, 0, 1)
 #if !defined(__GNUG__) || defined(__ICC)
 #else
 #pragma GCC diagnostic pop
 #endif
+
+  bool terminalSupportsColors()
+  {
+    return LogConnectionFileDescriptor::terminalSupportsColors(STDOUT_FILENO);
+  }
+}
 
 /** Expose python api */
 void LogPythonInterface::exposePythonAPI()
@@ -175,6 +187,7 @@ void LogPythonInterface::exposePythonAPI()
   ;
 
   docstring_options options(true, true, false); //userdef, py sigs, c++ sigs
+  void (LogPythonInterface::*addLogConsole)(bool) = &LogPythonInterface::addLogConsole;
 
   //Interface the Interface class :)
   class_<LogPythonInterface, boost::noncopyable>("LogPythonInterface",
@@ -217,9 +230,9 @@ For all features, see b2logging.py in the framework/examples folder)")
   .def("get_info", &LogPythonInterface::getLogInfo, "Get info to print for given log level.")
   .def("add_file", &LogPythonInterface::addLogFile,
        addLogFile_overloads("Write log output to given file. (In addition to existing outputs)"))
-  .def("add_console", &LogPythonInterface::addLogConsole,
+  .def("add_console", addLogConsole,
        addLogConsole_overloads("Write log output to console. (In addition to existing outputs)"))
-  .def("terminal_supports_colors", &LogConnectionIOStream::terminalSupportsColors)
+  .def("terminal_supports_colors", &terminalSupportsColors, "Returns true if the terminal supports colored output")
   .staticmethod("terminal_supports_colors")
   .def("reset", &LogPythonInterface::reset,
        "Remove all configured logging outputs. You can then configure your own via `add_file() <basf2.LogPythonInterface.add_file>` or `add_console() <basf2.LogPythonInterface.add_console>`")

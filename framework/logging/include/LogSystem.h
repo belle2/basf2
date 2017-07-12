@@ -67,6 +67,9 @@ namespace Belle2 {
      */
     void resetLogConnections();
 
+    /** Reset logging system to defaults: empty all log messages and reset connections to the default */
+    void resetLogging();
+
     /**
      * Returns global log system configuration.
      */
@@ -167,7 +170,7 @@ namespace Belle2 {
      *                        Set to NULL to use the global log configuration.
      * @param moduleName Name of the module.
      */
-    void updateModule(const LogConfig* moduleLogConfig = nullptr, const std::string& moduleName = "-global-") { m_moduleLogConfig = moduleLogConfig; m_moduleName = moduleName; }
+    void updateModule(const LogConfig* moduleLogConfig = nullptr, const std::string& moduleName = "") { m_moduleLogConfig = moduleLogConfig; m_moduleName = moduleName; }
 
   private:
     std::vector<LogConnectionBase*> m_logConnections;     /**< Stores the pointers to the log connection objects. (owned by us) */

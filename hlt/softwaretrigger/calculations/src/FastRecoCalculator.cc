@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <hlt/softwaretrigger/core/utilities.h>
+#include <hlt/softwaretrigger/calculations/utilities.h>
 #include <hlt/softwaretrigger/calculations/FastRecoCalculator.h>
 
 #include <analysis/ClusterUtility/ClusterUtils.h>

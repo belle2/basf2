@@ -254,7 +254,15 @@ namespace Belle2 {
             throw std::runtime_error("Interface doesn't support variable more then one time in either spectators, variables or target variable");
           }
 
-      auto filenames = RootIOUtilities::expandWordExpansions(m_general_options.m_datafiles);
+      std::vector<std::string> filenames;
+      for (const auto& filename : m_general_options.m_datafiles) {
+        if (boost::filesystem::exists(filename)) {
+          filenames.push_back(filename);
+        } else {
+          auto temp = RootIOUtilities::expandWordExpansions(m_general_options.m_datafiles);
+          filenames.insert(filenames.end(), temp.begin(), temp.end());
+        }
+      }
       if (filenames.empty()) {
         B2ERROR("Found no valid filenames in GeneralOptions");
         throw std::runtime_error("Found no valid filenames in GeneralOptions");

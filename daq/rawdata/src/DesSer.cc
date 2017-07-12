@@ -31,7 +31,7 @@ DesSer::DesSer()
 #endif
 
   //  B2INFO("DeSerializerPrePC: Constructor done.");
-  printf("[INFO] DesSer: Constructor done.\n"); fflush(stdout);
+  printf("[DEBUG] DesSer: Constructor done.\n"); fflush(stdout);
 }
 
 
@@ -88,10 +88,9 @@ int* DesSer::getNewBuffer(int nwords, int* delete_flag)
 
 void DesSer::initialize(bool close_listen)
 {
-  printf("[INFO] DesSer: initialize() started.\n"); fflush(stdout);
-  //  B2INFO("DesSer: initialize() started.");
-
+  printf("[DEBUG] DesSer: initialize() started.\n"); fflush(stdout);
   signal(SIGPIPE , SIG_IGN);
+
   //
   // initialize Rx part from DeSerializer**.cc
   //
@@ -109,7 +108,6 @@ void DesSer::initialize(bool close_listen)
 
   // Open message handler
   clearNumUsedBuf();
-
   // Shared memory
   if (m_shmflag > 0) {
     if (m_nodename.size() == 0 || m_nodeid < 0) {
@@ -136,9 +134,7 @@ void DesSer::initialize(bool close_listen)
 #ifdef DUMMY
   m_buffer = new int[ BUF_SIZE_WORD ];
 #endif
-
   Accept(close_listen);
-
 #ifdef NONSTOP
   openRunPauseNshm();
 #endif
@@ -149,9 +145,8 @@ void DesSer::initialize(bool close_listen)
     m_status.setOutputNBytes(0);
     m_status.setOutputCount(0);
   }
-
   //  B2INFO("DesSer: initialize() was done.");
-  printf("[INFO] DesSer: initialize() was done.\n"); fflush(stdout);
+  printf("[DEBUG] DesSer: initialize() was done.\n"); fflush(stdout);
 
 }
 
@@ -364,7 +359,6 @@ void DesSer::Accept(bool close_listen)
     sprintf(temp_buf, "[FATAL] hostname(%s) cannot be resolved(%s). Check /etc/hosts. Exiting...\n",
             m_hostname_local.c_str(), strerror(errno));
     print_err.PrintError(temp_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    sleep(1234567);
     exit(1);
   }
 
@@ -387,9 +381,13 @@ void DesSer::Accept(bool close_listen)
   }
 
   if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
+    printf("[FATAL] Failed to bind. Maybe other programs have already occupied this port(%d). Exiting...",
+           m_port_to); fflush(stdout);
+
     char temp_char[500];
     sprintf(temp_char, "[FATAL] Failed to bind.(%s) Maybe other programs have already occupied this port(%d). Exiting...",
             strerror(errno), m_port_to);
+    printf("%s", temp_char);
     print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
@@ -409,7 +407,7 @@ void DesSer::Accept(bool close_listen)
   //
   int fd_accept;
   struct sockaddr_in sock_accept;
-  printf("[INFO] Accepting... : port %d server %s\n", m_port_to, m_hostname_local.c_str());
+  printf("[DEBUG] Accepting... : port %d server %s\n", m_port_to, m_hostname_local.c_str());
   fflush(stdout);
 
   if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
@@ -419,7 +417,7 @@ void DesSer::Accept(bool close_listen)
     exit(-1);
   } else {
     //    B2INFO("Done.");
-    printf("[INFO] Done.\n"); fflush(stdout);
+    printf("[DEBUG] Done.\n"); fflush(stdout);
 
     //    set timepout option
     struct timeval timeout;

@@ -104,7 +104,8 @@ namespace Belle2 {
         m_decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList>::required(daughter->getFullName());
     }
-    m_generator = std::unique_ptr<ParticleGenerator>(new ParticleGenerator(m_decayString));
+
+    m_generator = std::unique_ptr<ParticleGenerator>(new ParticleGenerator(m_decayString, m_cutParameter));
 
     StoreObjPtr<ParticleList> particleList(m_listName);
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
@@ -113,8 +114,6 @@ namespace Belle2 {
       StoreObjPtr<ParticleList> antiParticleList(m_antiListName);
       antiParticleList.registerInDataStore(flags);
     }
-
-    m_cut = Variable::Cut::compile(m_cutParameter);
 
     if (m_recoilParticleType != 0 && m_recoilParticleType != 1 && m_recoilParticleType != 2)
       B2FATAL("Invalid recoil particle type = " << m_recoilParticleType <<
@@ -171,9 +170,6 @@ namespace Belle2 {
         TLorentzVector mom = daughters[0]->get4Vector() - pDaughters;
         particle.set4Vector(mom);
       }
-
-      if (!m_cut->check(&particle))
-        continue;
 
       numberOfCandidates++;
 

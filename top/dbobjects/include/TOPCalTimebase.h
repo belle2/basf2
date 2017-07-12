@@ -55,27 +55,15 @@ namespace Belle2 {
     }
 
     /**
-     * Appends calibration of a single ASIC channel - sets equidistant time axis
-     * @param scrodID SCROD ID
-     * @param channel channel number within SCROD (0 - 127)
-     */
-    void append(unsigned scrodID, unsigned channel)
-    {
-      m_sampleTimes.push_back(TOPSampleTimes(scrodID, channel, m_syncTimeBase));
-    }
-
-    /**
      * Appends calibration of a single ASIC channel
      * @param scrodID SCROD ID
      * @param channel channel number within SCROD (0 - 127)
-     * @param sampleTimes vector of 256 elements defining time axis
+     * @param sampleTimes vector of 256 elements (at least) defining time axis
+     * @param replace replace or not if constants for this scrod/channel are already in
      */
     void append(unsigned scrodID, unsigned channel,
-                const std::vector<double>& sampleTimes)
-    {
-      m_sampleTimes.push_back(TOPSampleTimes(scrodID, channel, m_syncTimeBase));
-      m_sampleTimes.back().setTimeAxis(sampleTimes, m_syncTimeBase);
-    }
+                const std::vector<double>& sampleTimes,
+                bool replace = true);
 
     /**
      * Returns sinchronization time base (width of 2 ASIC windows)
@@ -91,12 +79,22 @@ namespace Belle2 {
 
     /**
      * Returns calibration constants for given SCROD and channel.
-     * If calibration doesn't exist, return equidistant sample times.
+     * If calibration is not available, return equidistant sample times.
      * @param scrodID SCROD ID
      * @param channel channel number (within SCROD or within module)
      * @return calibration constants (always valid pointer)
      */
     const TOPSampleTimes* getSampleTimes(unsigned scrodID, unsigned channel) const;
+
+
+    /**
+     * Checks if calibration is available
+     * @param scrodID SCROD ID
+     * @param channel channel number (within SCROD or within module)
+     * @return true if available
+     */
+    bool isAvailable(unsigned scrodID, unsigned channel) const;
+
 
   private:
 

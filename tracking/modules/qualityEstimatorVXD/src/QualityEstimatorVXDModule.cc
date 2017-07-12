@@ -50,15 +50,15 @@ void QualityEstimatorVXDModule::initialize()
 
   // create pointer to chosen estimator
   if (m_EstimationMethod == "mcInfo") {
-    m_estimator = make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
+    m_estimator = in_hopes_for_cpp14_make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
   } else if (m_EstimationMethod == "tripletFit") {
-    m_estimator = make_unique<QualityEstimatorTripletFit>();
+    m_estimator = in_hopes_for_cpp14_make_unique<QualityEstimatorTripletFit>();
   } else if (m_EstimationMethod == "circleFit") {
-    m_estimator = make_unique<QualityEstimatorCircleFit>();
+    m_estimator = in_hopes_for_cpp14_make_unique<QualityEstimatorCircleFit>();
   } else if (m_EstimationMethod == "helixFit") {
-    m_estimator = make_unique<QualityEstimatorRiemannHelixFit>();
+    m_estimator = in_hopes_for_cpp14_make_unique<QualityEstimatorRiemannHelixFit>();
   } else if (m_EstimationMethod == "random") {
-    m_estimator = make_unique<QualityEstimatorRandom>();
+    m_estimator = in_hopes_for_cpp14_make_unique<QualityEstimatorRandom>();
   }
   B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);
 }

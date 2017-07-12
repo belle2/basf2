@@ -12,7 +12,7 @@
 
 using namespace Belle2;
 
-CDCFEE::CDCFEE()
+CDCFEE::CDCFEE() : FEE("cdc")
 {
 }
 
@@ -42,27 +42,11 @@ void CDCFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& /*obj*/)
 
 void CDCFEE::boot(RCCallback& callback, HSLB& hslb,  const DBObject& obj)
 {
-  const std::string firmware = obj.getText("firm");
-  /*
-  if (File::exist(firmware)) {
-    LogFile::info("Loading CDC FEE firmware: %s", firmware.c_str());
-    std::string cmd = "ssh ropc01 \"cd ~b2daq/run/cdc/; sh impact-batch.sh " +
-                      firmware + "\"";
-    system(cmd.c_str());
-  } else {
-    LogFile::debug("CDC FEE firmware not exists : %s", firmware.c_str());
-  }
-  */
-  int err = 0;
-  if ((err = hslb.test()) > 0) {
-    LogFile::error("Test HSLB failed");
-  }
 }
 
 void CDCFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
   // setting CDC control (data format, window and delay)
-  LogFile::debug("%s:%d", __FILE__, __LINE__);
   int val = 0;
   std::string mode = StringUtil::tolower(obj.getText("mode"));
   if (mode == "suppress") {
@@ -78,21 +62,17 @@ void CDCFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
     LogFile::warning("no readout");
     val = 0;
   }
-  LogFile::debug("%s:%d", __FILE__, __LINE__);
   val |= (obj("window").getInt("val") & 0xFF) << 8;
   val |= obj("delay").getInt("val") & 0xFF;
   hslb.writefee32(0x0012, val);
-  LogFile::debug("%s:%d", __FILE__, __LINE__);
 
   // setting ADC threshold
   val = obj("adcth").getInt("val") & 0xFFFF;
   hslb.writefee32(0x0013, val);
-  LogFile::debug("%s:%d", __FILE__, __LINE__);
 
   // setting DAC control
   val = obj("tdcth").getInt("val") & 0x7FFF;
   hslb.writefee32(0x0015, val);
-  LogFile::debug("%s:%d", __FILE__, __LINE__);
 
   // setting Pedestals
   const DBObjectList o_ped(obj.getObjects("ped"));

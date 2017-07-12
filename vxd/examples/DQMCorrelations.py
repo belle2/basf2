@@ -88,7 +88,7 @@ parser.add_argument('--SkipDQMChips', dest='SkipDQMChips', action='store_const',
 parser.add_argument('--SkipDQMDetail', dest='SkipDQMDetail', action='store_const', const=True, default=False,
                     help='Skip production of detail DQM plots')
 parser.add_argument('--CreateDB', dest='CreateDB', action='store', default=0, type=int,
-                    help='Create DataBase references, default = 0')
+                    help='Create DataBase references for SVD DQM Express Reco, default = 0')
 
 args = parser.parse_args()
 

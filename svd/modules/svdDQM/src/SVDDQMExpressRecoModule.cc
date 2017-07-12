@@ -1167,6 +1167,17 @@ int SVDDQMExpressRecoModule::LoadDBHisto(TH1F* HistoBD)
 
 int SVDDQMExpressRecoModule::LoadDBHistoGroup(TH1I** HistoBD, int Number)
 {
+  IntervalOfValidity iov(0, 0, -1, -1);
+  DBImportObjPtr<TH2I> DBHisto(HistoBD[0]->GetName());
+  DBHisto.construct(HistoBD[0]->GetName(), HistoBD[0]->GetName(),
+                    Number, 0, Number, HistoBD[0]->GetNbinsX(),
+                    HistoBD[0]->GetXaxis()->GetXmin(), HistoBD[0]->GetXaxis()->GetXmax());
+  for (int j = 0; j < Number; j++) {
+    for (int i = 0; i < HistoBD[j]->GetNbinsX(); i++) {
+      DBHisto->SetBinContent(j + 1, i + 1, HistoBD[j]->GetBinContent(i + 1));
+    }
+  }
+  DBHisto.import(iov);
   return 1;
 }
 

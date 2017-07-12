@@ -224,6 +224,56 @@ namespace Belle2 {
 
   void TOPDataQualityOnlineModule::beginRun()
   {
+    m_particleHits->Reset();
+    m_laserHits->Reset();
+    m_calHits->Reset();
+    m_otherHits->Reset();
+
+    m_particleHitsMean->Reset();
+    m_laserHitsMean->Reset();
+    m_calHitsMean->Reset();
+    m_otherHitsMean->Reset();
+
+    m_particleHitsRMS->Reset();
+    m_laserHitsRMS->Reset();
+    m_calHitsRMS->Reset();
+    m_otherHitsRMS->Reset();
+
+    for (int i = 0; i < m_numModules; i++) {
+      m_channelParticleHits[i]->Reset();
+      m_laserHitsXY[i]->Reset();
+      m_allTdc[i]->Reset();
+    }
+
+    if (m_verbose == 1) { // in verbose mode
+      m_allHits->Reset();
+      m_goodHits->Reset();
+      m_badHits->Reset();
+      m_goodHitsMean->Reset();
+      m_badHitsMean->Reset();
+      m_goodHitsRMS->Reset();
+      m_badHitsRMS->Reset();
+
+      for (int i = 0; i < m_numModules; i++) {
+        m_channelAllHits[i]->Reset();
+        m_channelGoodHits[i]->Reset();
+        m_channelBadHits[i]->Reset();
+        m_allHitsXY[i]->Reset();
+        m_allTdcMean[i]->Reset();
+        m_allTdcRMS[i]->Reset();
+        m_slotAllHits[i]->Reset();
+        m_slotGoodHits[i]->Reset();
+        m_slotBadHits[i]->Reset();
+        m_hitFlag[i]->Reset();
+        m_allAdc[i]->Reset();
+        m_allAdcMean[i]->Reset();
+        m_allAdcRMS[i]->Reset();
+        m_slotParticleHits[i]->Reset();
+        m_slotLaserHits[i]->Reset();
+        m_slotCalHits[i]->Reset();
+        m_slotOtherHits[i]->Reset();
+      }
+    }
   }
 
   int TOPDataQualityOnlineModule::flagHit(const TOPDigit& digit)

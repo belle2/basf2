@@ -13,7 +13,6 @@ from modularAnalysis import *
 from stdCharged import *
 from stdPi0s import *
 from stdV0s import *
-from stdCharm import *
 from stdLightMesons import *
 from stdPhotons import *
 set_log_level(LogLevel.INFO)
@@ -43,17 +42,16 @@ if len(sys.argv) > 1:
     inputMdstList('default', fileList[:-1])
 elif len(sys.argv) == 1:
     inputMdstList('default', fileList)
-
-
 loadStdCharged()
 stdPi0s('loose')
-loadStdPi0()
+stdPhotons('loose')
 stdKshorts()
 loadStdLightMesons()
-loadStdPhoton()
+loadStdSkimPi0()
+
 loadStdPhotonE15()
 # EWP Skim
-from EWP_List import *
+from BtoXll_List import *
 
 XllList = B2XllList()
 skimOutputUdst('outputFiles/BtoXll_' + bkgType, XllList)

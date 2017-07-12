@@ -4,23 +4,21 @@
 #######################################################
 #
 # Charm skims
-# P. Urquijo, 6/Jan/2015
 # G. Casarosa, 7/Oct/2016
+#
+######################################################
 
-# deprecated
-# decided to split the many charm skims in more than one file
-
+from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
-from stdPhotons import *
+from stdV0s import *
 from stdPi0s import *
-set_log_level(LogLevel.INFO)
 
 
-import sys
-import os
-import glob
+ccbar_wBG = \
+    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-07-00/DBxxxxxxxx/MC6/prod00000198/s00/e0000/4S/r00000/ccbar/sub00/' +
+     'mdst_00051*_prod00000198_task0000051*.root']
 
 if len(sys.argv) > 1:
     bkgType = sys.argv[1]
@@ -31,12 +29,8 @@ if len(sys.argv) > 1:
         sys.exit('Could not find root file : ' + fileList[:-1])
     print('Running over file ' + fileList[:-1])
 elif len(sys.argv) == 1:
-    fileList = \
-        ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000001/s00/e0001/4S/r00001/mixed/sub00/' +
-         'mdst_000001_prod00000001_task00000001.root'
-
-         ]
-    bkgType = 'old'
+    fileList = ccbar_wBG
+    bkgType = 'notSpecified'
 
 
 if len(sys.argv) > 1:
@@ -45,15 +39,21 @@ elif len(sys.argv) == 1:
     inputMdstList('default', fileList)
 
 
-loadStdSkimPhoton()
+loadStdCharged()
+loadStdKS()
 loadStdSkimPi0()
-stdLooseE()
-stdLooseMu()
-stdPi0s('loose')
-from CharmRare_List import *
-CharmRareList = CharmRareList()
-skimOutputUdst('outputFiles/Charm_' + bkgType, CharmRareList)
-summaryOfLists(CharmRareList)
+
+from Charm2BodyNeutralsD0_List import *
+
+D0ToNeutralsList = D0ToNeutrals()
+skimOutputUdst('outputFiles/Charm2BodyNeutralsD0_' + bkgType, D0ToNeutralsList)
+summaryOfLists(D0ToNeutralsList)
+
+'''
+DstToD0NeutralsList = DstToD0NeutralsList()
+skimOutputUdst('DstToD0Neutrals_Standalone_'+filelist, DstToD0NeutralsList)
+summaryOfLists(DstToD0NeutralsList)
+'''
 
 process(analysis_main)
 

@@ -39,7 +39,7 @@ elif len(sys.argv) == 1:
     inputMdstList('default', fileList)
 
 loadStdCharged()
-loadStdPi0()
+loadStdAllPi0()  # for stdCharm.py
 loadStdKS()
 
 loadStdD0()
@@ -48,7 +48,7 @@ loadStdDstar0()
 loadStdDstarPlus()
 
 # SL Skim
-from Semileptonic_List import *
+from LeptonicUntagged_List import *
 
 lepList = LeptonicList()
 skimOutputUdst('outputFiles/LeptonicUntagged_' + bkgType, lepList)

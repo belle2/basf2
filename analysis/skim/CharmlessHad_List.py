@@ -15,7 +15,7 @@ from modularAnalysis import *
 
 def CharmlessHadList():
     btocharmlesscuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
-    bd_PPChannels = ['pi0:all pi0:all',
+    bd_PPChannels = ['pi0:skim pi0:skim',
                      'pi+:loose pi-:loose',
                      'K+:loose pi-:loose',
                      'pi+:loose K-:loose'
@@ -25,20 +25,20 @@ def CharmlessHadList():
                      'rho-:loose pi+:loose',
                      'K+:loose rho-:loose',
                      'rho+:loose K-:loose',
-                     'rho0:loose pi0:all',
-                     'pi+:all pi-:all pi0:all'
+                     'rho0:loose pi0:skim',
+                     'pi+:loose pi-:loose pi0:skim'
                      ]
 
     bd_VVChannels = ['rho+:loose rho-:loose',
                      'rho0:loose rho0:loose',
                      ]
 
-    bu_PPChannels = ['pi-:loose pi0:all',
-                     'K-:loose pi0:all'
+    bu_PPChannels = ['pi-:loose pi0:skim',
+                     'K-:loose pi0:skim'
                      ]
 
-    bu_PVChannels = ['rho0:loose pi-:all',
-                     'rho-:loose pi0:all'
+    bu_PVChannels = ['rho0:loose pi-:loose',
+                     'rho-:loose pi0:skim'
                      ]
 
     bu_VVChannels = ['rho0:loose rho-:loose',
@@ -49,7 +49,7 @@ def CharmlessHadList():
                       'K+:loose K-:loose K-:loose',
                       'K+:loose pi-:loose pi-:loose',
                       'K-:loose pi+:loose pi-:loose',
-                      'pi-:loose pi0:all pi0:all'
+                      'pi-:loose pi0:skim pi0:skim'
                       ]
 
     bdPPList = []

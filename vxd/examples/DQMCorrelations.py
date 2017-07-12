@@ -116,9 +116,9 @@ print("              SkipDQMDetail: ", args.SkipDQMDetail)
 print("                   CreateDB: ", args.CreateDB)
 
 # setup_database(args.local_db, args.global_tag)
-if (args.CreateDB == 0):
-    reset_database()
-    use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True, LogLevel.ERROR)
+# if (args.CreateDB == 0):
+# reset_database()
+# use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True, LogLevel.ERROR)
 
 if (args.UseRealdata is True):
     # Limit branches use - necessary minimum (removes MC info if input is from simulation, HLT output)

@@ -177,6 +177,40 @@ namespace Belle2 {
        */
     void CreateDBHisto(TH1I* HistoBD);
 
+    /**< Function for filling of group of TH1F histogram to database.
+       * @param HistoBD Histogram for DB.
+       * @param Number Number of histograms to glue to one.
+       */
+    void CreateDBHistoGroup(TH1F** HistoBD, int Number);
+    /**< Function for filling of group of TH1I histogram to database.
+       * @param HistoBD Histogram for DB.
+       * @param Number Number of histograms to glue to one.
+       */
+    void CreateDBHistoGroup(TH1I** HistoBD, int Nomber);
+
+    /**< Function for loading of TH1F histogram from database.
+       * @param HistoBD Histogram for DB.
+       * @return Indication of succes of realizing of condition, 1: OK.
+       */
+    int LoadDBHisto(TH1F* HistoBD);
+    /**< Function for loading of TH1I histogram from database.
+       * @param HistoBD Histogram for DB.
+       * @return Indication of succes of realizing of condition, 1: OK.
+       */
+    int LoadDBHisto(TH1I* HistoBD);
+
+    /**< Function for loading of group of TH1F histogram from database.
+       * @param HistoBD Histogram for DB.
+       * @param Number Number of histograms to extract from DB.
+       * @return Indication of succes of realizing of condition, 1: OK.
+       */
+    int LoadDBHistoGroup(TH1F** HistoBD, int Number);
+    /**< Function for loading of group of TH1I histogram from database.
+       * @param HistoBD Histogram for DB.
+       * @param Number Number of histograms to extract from DB.
+       * @return Indication of succes of realizing of condition, 1: OK.
+       */
+    int LoadDBHistoGroup(TH1I** HistoBD, int Nomber);
 
   };
 

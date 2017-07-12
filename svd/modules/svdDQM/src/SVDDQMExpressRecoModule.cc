@@ -31,10 +31,13 @@
 #include "TFile.h"
 #include "TVectorD.h"
 #include "TF1.h"
+#include "TH1I.h"
+#include "TH1F.h"
 
 #include <framework/database/DBImportObjPtr.h>
-#include <framework/database/DBImportArray.h>
+// #include <framework/database/DBImportArray.h>
 #include <framework/database/IntervalOfValidity.h>
+#include <framework/database/DBObjPtr.h>
 
 using namespace std;
 using boost::format;
@@ -492,9 +495,15 @@ void SVDDQMExpressRecoModule::endRun()
   TH1F** r_clusterTimeV = new TH1F*[c_nSVDSensors];
 
   r_hitMapCountsU = NULL;
+  r_hitMapCountsU = new TH1I(*m_hitMapCountsU);
+  r_hitMapCountsU->Reset();
   r_hitMapCountsV = NULL;
+  r_hitMapCountsV = new TH1I(*m_hitMapCountsV);
+  r_hitMapCountsV->Reset();
   r_hitMapClCountsU = NULL;
+  r_hitMapClCountsU = new TH1I(*m_hitMapClCountsU);
   r_hitMapClCountsV = NULL;
+  r_hitMapClCountsV = new TH1I(*m_hitMapClCountsV);
   for (int i = 0; i < c_nSVDSensors; i++) {
     r_firedU[i] = NULL;
     r_firedV[i] = NULL;
@@ -628,7 +637,7 @@ void SVDDQMExpressRecoModule::endRun()
   } else {
     if (m_CreateDB == 1) {
       IntervalOfValidity iov(0, 0, -1, -1);
-      TString Name = Form("DQMER_SVD_NoOfEvents");
+      TString Name = Form("DQMER_SVD_NoOfEventsRef");
       DBImportObjPtr<TVectorD> DQMER_SVD_NoOfEvents(Name.Data());
       DQMER_SVD_NoOfEvents.construct(1);
       DQMER_SVD_NoOfEvents->SetElements(fNoOfEvents);
@@ -638,21 +647,69 @@ void SVDDQMExpressRecoModule::endRun()
       CreateDBHisto(m_hitMapCountsV);
       CreateDBHisto(m_hitMapClCountsU);
       CreateDBHisto(m_hitMapClCountsV);
-      for (int i = 0; i < c_nSVDSensors; i++) {
-        CreateDBHisto(m_firedU[i]);
-        CreateDBHisto(m_firedV[i]);
-        CreateDBHisto(m_clustersU[i]);
-        CreateDBHisto(m_clustersV[i]);
-        CreateDBHisto(m_clusterChargeU[i]);
-        CreateDBHisto(m_clusterChargeV[i]);
-        CreateDBHisto(m_stripSignalU[i]);
-        CreateDBHisto(m_stripSignalV[i]);
-        CreateDBHisto(m_clusterSizeU[i]);
-        CreateDBHisto(m_clusterSizeV[i]);
-        CreateDBHisto(m_clusterTimeU[i]);
-        CreateDBHisto(m_clusterTimeV[i]);
-      }
+      CreateDBHistoGroup(m_firedU, c_nSVDSensors);
+      CreateDBHistoGroup(m_firedV, c_nSVDSensors);
+      CreateDBHistoGroup(m_clustersU, c_nSVDSensors);
+      CreateDBHistoGroup(m_clustersV, c_nSVDSensors);
+      CreateDBHistoGroup(m_clusterChargeU, c_nSVDSensors);
+      CreateDBHistoGroup(m_clusterChargeV, c_nSVDSensors);
+      CreateDBHistoGroup(m_stripSignalU, c_nSVDSensors);
+      CreateDBHistoGroup(m_stripSignalV, c_nSVDSensors);
+      CreateDBHistoGroup(m_clusterSizeU, c_nSVDSensors);
+      CreateDBHistoGroup(m_clusterSizeV, c_nSVDSensors);
+      CreateDBHistoGroup(m_clusterTimeU, c_nSVDSensors);
+      CreateDBHistoGroup(m_clusterTimeV, c_nSVDSensors);
     } else {
+      TString Name = Form("DQMER_SVD_NoOfEventsRef");
+      /*
+            DBObjPtr<TVectorD> DQMER_SVD_NoOfEventsRef(Name.Data());
+            if (DQMER_SVD_NoOfEventsRef.isValid()) {
+              m_NoOfEventsRef = (int)DQMER_SVD_NoOfEventsRef->GetMatrixArray()[0];
+            } else {
+              B2INFO("ERROR to open reference counter: DQMER_SVD_NoOfEventsRef");
+              return;
+            }
+      */
+      for (int i = 0; i < m_hitMapCountsU->GetNbinsX(); i++) {
+        printf(" %f", m_hitMapCountsU->GetBinContent(i + 1));
+        printf(" %f --", r_hitMapCountsU->GetBinContent(i + 1));
+      }
+
+      printf("-----> kuk1 %i\n", m_NoOfEventsRef);
+      Name = Form("%s_Ref", r_hitMapCountsU->GetName());
+      Name = Form("%s_Ref", m_firedU[0]->GetName());
+//  DBObjPtr<TH1I> DBHisto(Name.Data());
+//  DBObjPtr<TH1I> DBHistoDBHisto("DQMER_SVD_StripHitmapCountsU_Ref");
+      DBObjPtr<TH1F> DBHistoDBHisto(Name.Data());
+      printf("-----> kuk2 %s\n", Name.Data());
+      if (DBHistoDBHisto.isValid()) {
+        printf("-----> kuk3 %i\n", r_hitMapCountsU->GetNbinsX());
+// printf("-----> kuk3 %i\n", DBHisto.GetNbinsX());
+        printf("-----> kuk3 %i\n", DBHistoDBHisto->GetNbinsX());
+        for (int i = 0; i < r_hitMapCountsU->GetNbinsX(); i++) {
+          //    printf("-----> kuk3a %i %f\n", i, DBHisto->GetBinContent(i + 1));
+          r_hitMapCountsU->SetBinContent(i + 1, 2);
+//      printf("-----> kuk3a %i %f\n", i, DBHisto->GetBinContent(i + 1));
+//      HistoBD->SetBinContent(i + 1, DBHisto->GetBinContent(i + 1));
+        }
+        printf("-----> kuk4\n");
+      } else {
+        B2INFO("ERROR to open reference histogram: " << Name.Data());
+        return;
+      }
+      printf("-----> kuk5\n");
+
+
+//      if (!LoadDBHisto(r_hitMapCountsU)) return;
+      for (int i = 0; i < m_hitMapCountsU->GetNbinsX(); i++) {
+        printf(" %f", m_hitMapCountsU->GetBinContent(i + 1));
+        printf(" %f --", r_hitMapCountsU->GetBinContent(i + 1));
+      }
+
+//      if (!LoadDBHisto(r_hitMapCountsV)) return;
+//      if (!LoadDBHisto(r_hitMapClCountsU)) return;
+//      if (!LoadDBHisto(r_hitMapClCountsV)) return;
+//     return;
       /*
             B2INFO("Reference file name: " << m_RefHistFileName.c_str());
             TVectorD* NoOfEventsRef = NULL;
@@ -766,47 +823,49 @@ void SVDDQMExpressRecoModule::endRun()
 
     }
   }
-
-  // Compare histograms with reference histograms and create flags:
-  if (m_CreateDB == 0) {
-    for (int i = 0; i < c_nSVDSensors; i++) {
-      double pars[2];
-      pars[0] = 0.01;
-      pars[1] = 0.05;
-      SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-              m_hitMapCountsU, r_hitMapCountsU, m_fHitMapCountsUFlag);
-      SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-              m_hitMapCountsV, r_hitMapCountsV, m_fHitMapCountsVFlag);
-      SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-              m_hitMapClCountsU, r_hitMapClCountsU, m_fHitMapClCountsUFlag);
-      SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-              m_hitMapClCountsV, r_hitMapClCountsV, m_fHitMapClCountsVFlag);
-      SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-              m_firedU[i], r_firedU[i], m_fFiredUFlag);
-      SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-              m_firedV[i], r_firedV[i], m_fFiredVFlag);
-      SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-              m_clustersU[i], r_clustersU[i], m_fClustersUFlag);
-      SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-              m_clustersV[i], r_clustersV[i], m_fClustersVFlag);
-      SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-              m_clusterChargeU[i], r_clusterChargeU[i], m_fClusterChargeUFlag);
-      SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-              m_clusterChargeV[i], r_clusterChargeV[i], m_fClusterChargeVFlag);
-      SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-              m_stripSignalU[i], r_stripSignalU[i], m_fStripSignalUFlag);
-      SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-              m_stripSignalV[i], r_stripSignalV[i], m_fStripSignalVFlag);
-      SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-              m_clusterSizeU[i], r_clusterSizeU[i], m_fClusterSizeUFlag);
-      SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-              m_clusterSizeV[i], r_clusterSizeV[i], m_fClusterSizeVFlag);
-      SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-              m_clusterTimeU[i], r_clusterTimeU[i], m_fClusterTimeUFlag);
-      SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
-              m_clusterTimeV[i], r_clusterTimeV[i], m_fClusterTimeVFlag);
+  /*
+    // Compare histograms with reference histograms and create flags:
+    if (m_CreateDB == 0) {
+      for (int i = 0; i < c_nSVDSensors; i++) {
+        double pars[2];
+        pars[0] = 0.01;
+        pars[1] = 0.05;
+        SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+                m_hitMapCountsU, r_hitMapCountsU, m_fHitMapCountsUFlag);
+        SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+                m_hitMapCountsV, r_hitMapCountsV, m_fHitMapCountsVFlag);
+        SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+                m_hitMapClCountsU, r_hitMapClCountsU, m_fHitMapClCountsUFlag);
+        SetFlag(9, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+                m_hitMapClCountsV, r_hitMapClCountsV, m_fHitMapClCountsVFlag);
+        SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+                m_firedU[i], r_firedU[i], m_fFiredUFlag);
+        SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+                m_firedV[i], r_firedV[i], m_fFiredVFlag);
+        SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+                m_clustersU[i], r_clustersU[i], m_fClustersUFlag);
+        SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+                m_clustersV[i], r_clustersV[i], m_fClustersVFlag);
+        SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+                m_clusterChargeU[i], r_clusterChargeU[i], m_fClusterChargeUFlag);
+        SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+                m_clusterChargeV[i], r_clusterChargeV[i], m_fClusterChargeVFlag);
+        SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+                m_stripSignalU[i], r_stripSignalU[i], m_fStripSignalUFlag);
+        SetFlag(5, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+                m_stripSignalV[i], r_stripSignalV[i], m_fStripSignalVFlag);
+        SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+                m_clusterSizeU[i], r_clusterSizeU[i], m_fClusterSizeUFlag);
+        SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+                m_clusterSizeV[i], r_clusterSizeV[i], m_fClusterSizeVFlag);
+        SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+                m_clusterTimeU[i], r_clusterTimeU[i], m_fClusterTimeUFlag);
+        SetFlag(2, i, pars, (double)m_NoOfEvents / m_NoOfEventsRef,
+                m_clusterTimeV[i], r_clusterTimeV[i], m_fClusterTimeVFlag);
+      }
     }
-  }
+
+    */
 }
 
 void SVDDQMExpressRecoModule::terminate()
@@ -988,7 +1047,6 @@ int SVDDQMExpressRecoModule::SetFlag(int Type, int bin, double* pars, double rat
 
 int SVDDQMExpressRecoModule::SetFlag(int Type, int bin, double* pars, double ratio, TH1I* hist, TH1I* refhist, TH1I* flaghist)
 {
-
   TH1F* histF = new TH1F("histF", "histF", hist->GetNbinsX(), hist->GetXaxis()->GetXmin(), hist->GetXaxis()->GetXmax());
   TH1F* refhistF = new TH1F("refhistF", "refhistF", refhist->GetNbinsX(), refhist->GetXaxis()->GetXmin(),
                             refhist->GetXaxis()->GetXmax());
@@ -1005,7 +1063,7 @@ int SVDDQMExpressRecoModule::SetFlag(int Type, int bin, double* pars, double rat
 void SVDDQMExpressRecoModule::CreateDBHisto(TH1I* HistoBD)
 {
   IntervalOfValidity iov(0, 0, -1, -1);
-  TString Name = Form("%s", HistoBD->GetName());
+  TString Name = Form("%s_Ref", HistoBD->GetName());
   TString Title = Form("%s", HistoBD->GetTitle());
   DBImportObjPtr<TH1I> DBHisto(Name.Data());
   DBHisto.construct(Name.Data(), Title.Data(), HistoBD->GetNbinsX(),
@@ -1019,7 +1077,7 @@ void SVDDQMExpressRecoModule::CreateDBHisto(TH1I* HistoBD)
 void SVDDQMExpressRecoModule::CreateDBHisto(TH1F* HistoBD)
 {
   IntervalOfValidity iov(0, 0, -1, -1);
-  TString Name = Form("%s", HistoBD->GetName());
+  TString Name = Form("%s_Ref", HistoBD->GetName());
   TString Title = Form("%s", HistoBD->GetTitle());
   DBImportObjPtr<TH1I> DBHisto(Name.Data());
   DBHisto.construct(Name.Data(), Title.Data(), HistoBD->GetNbinsX(),
@@ -1028,4 +1086,102 @@ void SVDDQMExpressRecoModule::CreateDBHisto(TH1F* HistoBD)
     DBHisto->SetBinContent(i + 1, HistoBD->GetBinContent(i + 1));
   }
   DBHisto.import(iov);
+}
+
+void SVDDQMExpressRecoModule::CreateDBHistoGroup(TH1I** HistoBD, int Number)
+{
+  IntervalOfValidity iov(0, 0, -1, -1);
+  TString Name = Form("%s_Ref", HistoBD[0]->GetName());
+  DBImportObjPtr<TH2I> DBHisto(Name.Data());
+  DBHisto.construct(Name.Data(), HistoBD[0]->GetTitle(),
+                    Number, 0, Number, HistoBD[0]->GetNbinsX(),
+                    HistoBD[0]->GetXaxis()->GetXmin(), HistoBD[0]->GetXaxis()->GetXmax());
+  for (int j = 0; j < Number; j++) {
+    for (int i = 0; i < HistoBD[j]->GetNbinsX(); i++) {
+      DBHisto->SetBinContent(j + 1, i + 1, HistoBD[j]->GetBinContent(i + 1));
+    }
+  }
+  DBHisto.import(iov);
+}
+
+void SVDDQMExpressRecoModule::CreateDBHistoGroup(TH1F** HistoBD, int Number)
+{
+  IntervalOfValidity iov(0, 0, -1, -1);
+  TString Name = Form("%s_Ref", HistoBD[0]->GetName());
+  DBImportObjPtr<TH2F> DBHisto(Name.Data());
+  DBHisto.construct(Name.Data(), HistoBD[0]->GetTitle(),
+                    Number, 0, Number, HistoBD[0]->GetNbinsX(),
+                    HistoBD[0]->GetXaxis()->GetXmin(), HistoBD[0]->GetXaxis()->GetXmax());
+  for (int j = 0; j < Number; j++) {
+    for (int i = 0; i < HistoBD[j]->GetNbinsX(); i++) {
+      DBHisto->SetBinContent(j + 1, i + 1, HistoBD[j]->GetBinContent(i + 1));
+    }
+  }
+  DBHisto.import(iov);
+}
+
+int SVDDQMExpressRecoModule::LoadDBHisto(TH1I* HistoBD)
+{
+//DBObjPtr<TH1F> myHisto("myHistoUniqueName")
+//if (myHisto.isValid()) {
+//...
+//myHisto->GetBinContent(...);//
+//}
+
+  printf("-----> kuk1\n");
+  TString Name = Form("%s_Ref", HistoBD->GetName());
+  DBObjPtr<TH1I> DBHisto(Name.Data());
+  printf("-----> kuk2\n");
+  if (DBHisto.isValid()) {
+    printf("-----> kuk3 %i\n", HistoBD->GetNbinsX());
+// printf("-----> kuk3 %i\n", DBHisto.GetNbinsX());
+    printf("-----> kuk3 %i\n", DBHisto->GetNbinsX());
+    for (int i = 0; i < HistoBD->GetNbinsX(); i++) {
+      //    printf("-----> kuk3a %i %f\n", i, DBHisto->GetBinContent(i + 1));
+      HistoBD->SetBinContent(i + 1, 2);
+//      printf("-----> kuk3a %i %f\n", i, DBHisto->GetBinContent(i + 1));
+//      HistoBD->SetBinContent(i + 1, DBHisto->GetBinContent(i + 1));
+    }
+    printf("-----> kuk4\n");
+  } else {
+    B2INFO("ERROR to open reference histogram: " << Name.Data());
+    return 0;
+  }
+  printf("-----> kuk5\n");
+  return 1;
+}
+
+int SVDDQMExpressRecoModule::LoadDBHisto(TH1F* HistoBD)
+{
+  DBObjPtr<TH1F> DBHisto(HistoBD->GetName());
+  if (DBHisto.isValid()) {
+    for (int i = 0; i < HistoBD->GetNbinsX(); i++) {
+      HistoBD->SetBinContent(i + 1, DBHisto->GetBinContent(i + 1));
+    }
+  } else {
+    B2INFO("ERROR to open reference counter: " << HistoBD->GetName());
+    return 0;
+  }
+  return 1;
+}
+
+int SVDDQMExpressRecoModule::LoadDBHistoGroup(TH1I** HistoBD, int Number)
+{
+  return 1;
+}
+
+int SVDDQMExpressRecoModule::LoadDBHistoGroup(TH1F** HistoBD, int Number)
+{
+  IntervalOfValidity iov(0, 0, -1, -1);
+  DBImportObjPtr<TH2F> DBHisto(HistoBD[0]->GetName());
+  DBHisto.construct(HistoBD[0]->GetName(), HistoBD[0]->GetName(),
+                    Number, 0, Number, HistoBD[0]->GetNbinsX(),
+                    HistoBD[0]->GetXaxis()->GetXmin(), HistoBD[0]->GetXaxis()->GetXmax());
+  for (int j = 0; j < Number; j++) {
+    for (int i = 0; i < HistoBD[j]->GetNbinsX(); i++) {
+      DBHisto->SetBinContent(j + 1, i + 1, HistoBD[j]->GetBinContent(i + 1));
+    }
+  }
+  DBHisto.import(iov);
+  return 1;
 }

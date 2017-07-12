@@ -40,15 +40,23 @@ if __name__ == "__main__":
                  'daughter(2, daughter(0, clusterTiming))', 'daughter(2, daughter(1, clusterTiming))',
                  'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
                  'daughter(2, daughter(0, minC2HDist))', 'daughter(2, daughter(1, minC2HDist))',
-                 'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
+                 'M']
+
+    variables2 = ['p', 'pt', 'pz', 'phi',
+                  'chiProb', 'dr', 'dz', 'dphi',
+                  'daughter(2, chiProb)',
+                  'daughter(0, Kid)', 'daughter(0, piid)', 'daughter(1, Kid)', 'daughter(1, piid)',
+                  'daughter(2, daughter(0, E))', 'daughter(2, daughter(1, E))',
+                  'daughter(2, daughter(0, clusterTiming))', 'daughter(2, daughter(1, clusterTiming))',
+                  'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
+                  'daughter(2, daughter(0, minC2HDist))', 'daughter(2, daughter(1, minC2HDist))']
 
     general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector("train2.root")
+    general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
     # Spectators are the variables for which the selection should be uniform
-    # general_options.m_spectators = basf2_mva.vector('daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)')
-    general_options.m_spectators = basf2_mva.vector('M')
+    general_options.m_spectators = basf2_mva.vector('daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)')
     general_options.m_target_variable = "isSignal"
     general_options.m_identifier = "hep_ml_baseline"
 
@@ -59,6 +67,13 @@ if __name__ == "__main__":
 
     # Set the parameters of the uBoostClassifier
     import json
-    specific_options.m_config = json.dumps({'uniform_rate': 100.0})
+    specific_options.m_config = json.dumps({'uniform_rate': 10.0})
     general_options.m_identifier = "hep_ml"
+    basf2_mva.teacher(general_options, specific_options)
+
+    specific_options = basf2_mva.PythonOptions()
+    general_options.m_identifier = "hep_ml_feature_drop"
+    specific_options.m_framework = 'hep_ml'
+    specific_options.m_steering_file = 'mva/examples/orthogonal_discriminators/hep_ml_ugboost.py'
+    general_options.m_variables = basf2_mva.vector(*variables2)
     basf2_mva.teacher(general_options, specific_options)

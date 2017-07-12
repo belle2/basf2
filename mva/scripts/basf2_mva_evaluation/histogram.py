@@ -161,6 +161,21 @@ class Histograms(object):
         purity_error = binom_error(cumsignal, cumsignal + cumbckgrd)
         return purity, purity_error
 
+    def get_signal_to_noise(self, signal_names, bckgrd_names):
+        """
+        Return the cumulative signal to noise ratio in each bin of the sum of the histograms with the given names.
+        @param names names of the histograms
+        @return numpy.array with hist data, numpy.array with corresponding binomial errors
+        """
+        signal, _ = self.get_summed_hist(signal_names)
+        bckgrd, _ = self.get_summed_hist(bckgrd_names)
+        cumsignal = (signal.sum() - signal.cumsum()).astype('float')
+        cumbckgrd = (bckgrd.sum() - bckgrd.cumsum()).astype('float')
+
+        signal2noise = cumsignal / (cumsignal + cumbckgrd)**0.5
+        signal2noise_error = numpy.sqrt(cumsignal / (cumsignal + cumbckgrd) + (cumsignal / (2 * (cumsignal + cumbckgrd)))**2)
+        return signal2noise, signal2noise_error
+
     def get_purity_per_bin(self, signal_names, bckgrd_names):
         """
         Return the purity in each bin of the sum of the histograms with the given names.

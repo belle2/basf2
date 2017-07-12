@@ -42,6 +42,7 @@ REG_MODULE(SVDUnpacker)
 //-----------------------------------------------------------------
 
 SVDUnpackerModule::SVDUnpackerModule() : Module(),
+  m_generateShaperDigts(false),
   m_shutUpFTBError(0),
   m_FADCTriggerNumberOffset(0)
 {
@@ -51,6 +52,8 @@ SVDUnpackerModule::SVDUnpackerModule() : Module(),
 
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
   addParam("svdDigitListName", m_svdDigitListName, "Name of the SVD Digits List", string(""));
+  addParam("GenerateShaperDigts", m_generateShaperDigts, "Generate SVDShaperDigits", bool(false));
+  addParam("svdShaperDigitListName", m_svdShaperDigitListName, "Name of the SVDShaperDigits list", string(""));
   addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", FileSystem::findFile("data/svd/svd_mapping.xml"));
   addParam("shutUpFTBError", m_shutUpFTBError,
            "if >0 is the number of reported FTB header ERRORs before quiet operations. If <0 full log produced.", -1);
@@ -67,6 +70,12 @@ void SVDUnpackerModule::initialize()
   m_eventMetaDataPtr.required();
   StoreArray<RawSVD>::required(m_rawSVDListName);
   StoreArray<SVDDigit>::registerPersistent(m_svdDigitListName);
+
+  if (m_generateShaperDigts) {
+    StoreArray<SVDShaperDigit> storeShaperDigits(m_svdShaperDigitListName);
+    storeShaperDigits.registerInDataStore();
+    m_svdShaperDigitListName = storeShaperDigits.getName();
+  }
 
   loadMap();
 }
@@ -85,6 +94,7 @@ void SVDUnpackerModule::event()
 {
   StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
   StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
+  StoreArray<SVDShaperDigit> shaperDigits(m_svdShaperDigitListName);
 
   if (!m_eventMetaDataPtr.isValid()) {  // give up...
     B2ERROR("Missing valid EventMetaData." << std::endl <<
@@ -220,6 +230,10 @@ void SVDUnpackerModule::event()
               delete newDigit;
             }
 
+            if (m_generateShaperDigts) {
+              SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample);
+              shaperDigits.appendNew(*newShaperDigit);
+            }
 
           }  //is data frame
 

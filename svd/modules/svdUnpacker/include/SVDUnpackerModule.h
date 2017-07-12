@@ -20,6 +20,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawSVD.h>
 #include <svd/dataobjects/SVDDigit.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDTransparentDigit.h>
 
 #include <svd/online/SVDOnlineToOfflineMap.h>
@@ -60,6 +61,9 @@ namespace Belle2 {
       std::string m_rawSVDListName;
       std::string m_svdDigitListName;
       std::string m_xmlMapFileName;
+
+      bool m_generateShaperDigts;
+      std::string m_svdShaperDigitListName;
 
       int m_wrongFTBcrc;
 

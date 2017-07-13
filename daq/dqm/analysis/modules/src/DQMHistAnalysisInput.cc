@@ -9,6 +9,8 @@
 
 #include <daq/dqm/analysis/modules/DQMHistAnalysisInput.h>
 
+#include <daq/slc/base/StringUtil.h>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -60,15 +62,28 @@ void DQMHistAnalysisInputModule::event()
     TH1* h = (TH1*)key->ReadObj();
     hs.push_back(h);
     TString a = h->GetName();
+    StringList s = StringUtil::split(a.Data(), '/');
     a.ReplaceAll("/", "_");
     std::string name = a.Data();
     if (m_cs.find(name) == m_cs.end()) {
-      TCanvas* c = new TCanvas("c_" + a);
-      m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+      if (s.size() > 1) {
+        std::string dirname = s[0];
+        std::string hname = s[1];
+        TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
+        m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+      } else {
+        std::string hname = a.Data();
+        TCanvas* c = new TCanvas(("c_" + hname).c_str(), ("c_" + hname).c_str());
+        m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+      }
     }
     TCanvas* c = m_cs[name];
     c->cd();
-    h->Draw();
+    if (h->GetDimension() == 1) {
+      h->Draw("hist");
+    } else if (h->GetDimension() == 2) {
+      h->Draw("colz");
+    }
     c->Update();
   }
   resetHist();

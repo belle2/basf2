@@ -1,8 +1,21 @@
+/*
+std::vector<std::string> split(const std::string &str, char sep)
+{
+  std::vector<std::string> v;
+  std::stringstream ss(str);
+  std::string buffer;
+  while( std::getline(ss, buffer, sep) ) {
+    v.push_back(buffer);
+  }
+  return v;
+}
+*/
+
 {
    // Open a server socket looking for connections on a named service or
    // on a specified port.
    //TServerSocket *ss = new TServerSocket("rootserv", kTRUE);
-   TServerSocket *ss = new TServerSocket(9090, kTRUE);
+   TServerSocket *ss = new TServerSocket(9191, kTRUE);
    THttpServer *m_serv = new THttpServer("http:8081");
    TMonitor *fMon = new TMonitor;
    TList    *fSockets = new TList;   // list of open spy sockets
@@ -45,10 +58,22 @@
         auto a=mess->ReadObject(mess->GetClass());
         if(mess->GetClass()->InheritsFrom("TCanvas")){
           h=(TCanvas *)a;
-          if(h) printf("===== recv object %s ====\n",h->GetName());
-          gROOT->GetListOfCanvases()->ls();
           if (h) {           
-              h->Draw();  // draw canvas
+	    printf("hname = %s\n", h->GetName());
+	    std::string name = h->GetName();
+	    //std::vector<std::string> s = split(name, '/');
+	    std::vector<std::string> v;
+	    std::stringstream ss(name);
+	    std::string buffer;
+	    while( std::getline(ss, buffer, '/') ) {
+	      v.push_back(buffer);
+	    }
+	    std::vector<std::string> s = v;
+	    if (s.size() > 1) {
+	      h->SetName(s[1].c_str());
+	      m_serv->Register(s[0].c_str(), h);
+	    }
+	    h->Draw();  // draw canvas
           }
         }
       } else {
@@ -60,5 +85,5 @@
    fSockets->Delete();
    delete fSockets;
    delete ss;
-   delete fMon
+   delete fMon;
 }

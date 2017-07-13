@@ -55,32 +55,34 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                         reco_tracks=reco_tracks)
 
 
-def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False,
-                                   skipGeometryAdding=False, eventTimingExtraction=False,
-                                   use_readout_position=False,
+def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
+                                   skip_geometry_adding=False, event_time_extraction=False,
+                                   pre_general_run_setup=None,
                                    merge_tracks=True, use_second_cdc_hits=False):
     """
     This function adds the reconstruction modules for cr tracking to a path.
 
     :param path: The path to which to add the tracking reconstruction modules
     :param components: the list of geometry components in use or None for all components.
-    :param pruneTracks: Delete all hits except the first and the last in the found tracks.
-    :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
+    :param prune_tracks: Delete all hits except the first and the last in the found tracks.
+    :param skip_geometry_adding: Advanced flag: The tracking modules need the geometry module and will add it,
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it cannot
         determine if the geometry is already loaded. This flag can be used to just turn off the geometry adding
         (but you will have to add it on your own).
-    :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
+    :param event_time_extraction: extract time with either the TrackTimeExtraction or
         FullGridTrackTimeExtraction modules.
     :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
-    :param use_readout_position: flag to turn off the usage of the readout position in the track time estimator
+    :param pre_general_run_setup: If set to a string, the cosmics selector module will be added using the
+           parameters, that where used in this period of data taking. The periods can be found in cdc/cr/__init__.py.
+           If not set, the method will assume a general cosmics run without the need for any selection (no trigger).
     """
 
     # make sure CDC is used
     if not is_cdc_used(components):
         return
 
-    if not skipGeometryAdding:
+    if not skip_geometry_adding:
         # Add the geometry in all trigger modes if not already in the path
         add_geometry_modules(path, components)
 
@@ -92,15 +94,15 @@ def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False,
     add_cdc_cr_track_finding(path, merge_tracks=merge_tracks, use_second_cdc_hits=use_second_cdc_hits)
 
     # track fitting
-    add_cdc_cr_track_fit_and_track_creator(path, components, pruneTracks=pruneTracks,
-                                           eventTimingExtraction=eventTimingExtraction,
-                                           use_readout_position=use_readout_position)
+    add_cdc_cr_track_fit_and_track_creator(path, components, prune_tracks=prune_tracks,
+                                           event_timing_extraction=event_time_extraction,
+                                           pre_general_run_setup=pre_general_run_setup)
 
     if merge_tracks:
         # Do also fit the not merged tracks
-        add_cdc_cr_track_fit_and_track_creator(path, components, pruneTracks=pruneTracks,
-                                               eventTimingExtraction=False,
-                                               use_readout_position=use_readout_position,
+        add_cdc_cr_track_fit_and_track_creator(path, components, prune_tracks=prune_tracks,
+                                               event_timing_extraction=False,
+                                               pre_general_run_setup=pre_general_run_setup,
                                                reco_tracks="NonMergedRecoTracks", tracks="NonMergedTracks")
 
 
@@ -167,13 +169,10 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, ad
         add_prune_tracks(path, components=components, reco_tracks=reco_tracks)
 
 
-def add_cdc_cr_track_fit_and_track_creator(
-        path, components=None, pruneTracks=False, eventTimingExtraction=False,
-        reco_tracks="RecoTracks", tracks="",
-        lightPropSpeed=12.9925, trigger_point=[0, 0, 0],
-        normTriggerPlaneDirection=[0, 1, 0],
-        readOutPos=[0, 0, -50.0],
-        use_readout_position=False):
+def add_cdc_cr_track_fit_and_track_creator(path, components=None,
+                                           pre_general_run_setup=None,
+                                           prune_tracks=False, event_timing_extraction=False,
+                                           reco_tracks="RecoTracks", tracks=""):
     """
     Helper function to add the modules performing the cdc cr track fit
     and track creation to the path.
@@ -182,47 +181,57 @@ def add_cdc_cr_track_fit_and_track_creator(
     :param components: the list of geometry components in use or None for all components.
     :param reco_tracks: The name of the reco tracks to use
     :param tracks: the name of the output Belle tracks
-    :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
-    :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
+    :param prune_tracks: Delete all hits expect the first and the last from the found tracks.
+    :param event_timing_extraction: extract time with either the TrackTimeExtraction or
         FullGridTrackTimeExtraction modules.
-    :param use_readout_position: flag to turn off the usage of the readout position in the track time estimator
+    :param pre_general_run_setup: If set to a string, the cosmics selector module will be added using the
+           parameters, that where used in this period of data taking. The periods can be found in cdc/cr/__init__.py.
+           If not set, the method will assume a general cosmics run without the need for any selection (no trigger).
     """
 
-    # Time seed
-    path.add_module("PlaneTriggerTrackTimeEstimator",
-                    recoTracksStoreArrayName=reco_tracks,
-                    pdgCodeToUseForEstimation=13,
-                    triggerPlanePosition=trigger_point,
-                    triggerPlaneDirection=normTriggerPlaneDirection,
-                    useFittedInformation=False)
+    import cdc.cr as cosmics_setup
+    if pre_general_run_setup:
+        cosmics_setup.set_cdc_cr_parameters(pre_general_run_setup)
 
-    # Initial track fitting
-    path.add_module("DAFRecoFitter",
-                    recoTracksStoreArrayName=reco_tracks,
-                    probCut=0.00001,
-                    pdgCodesToUseForFitting=13,
-                    )
+    if cosmics_setup.cosmics_period:
+        # Time seed
+        path.add_module("PlaneTriggerTrackTimeEstimator",
+                        recoTracksStoreArrayName=reco_tracks,
+                        pdgCodeToUseForEstimation=13,
+                        triggerPlanePosition=cosmics_setup.triggerPos,
+                        triggerPlaneDirection=cosmics_setup.normTriggerPlaneDirection,
+                        useFittedInformation=False)
 
-    # Correct time seed
-    path.add_module("PlaneTriggerTrackTimeEstimator",
-                    recoTracksStoreArrayName=reco_tracks,
-                    pdgCodeToUseForEstimation=13,
-                    triggerPlanePosition=trigger_point,
-                    triggerPlaneDirection=normTriggerPlaneDirection,
-                    useFittedInformation=True,
-                    useReadoutPosition=use_readout_position,
-                    readoutPosition=readOutPos,
-                    readoutPositionPropagationSpeed=lightPropSpeed
-                    )
+        # Initial track fitting
+        path.add_module("DAFRecoFitter",
+                        recoTracksStoreArrayName=reco_tracks,
+                        probCut=0.00001,
+                        pdgCodesToUseForFitting=13,
+                        )
 
+        # Correct time seed
+        path.add_module("PlaneTriggerTrackTimeEstimator",
+                        recoTracksStoreArrayName=reco_tracks,
+                        pdgCodeToUseForEstimation=13,
+                        triggerPlanePosition=cosmics_setup.triggerPos,
+                        triggerPlaneDirection=cosmics_setup.normTriggerPlaneDirection,
+                        useFittedInformation=True,
+                        useReadoutPosition=True,
+                        readoutPosition=cosmics_setup.readOutPos,
+                        readoutPositionPropagationSpeed=cosmics_setup.lightPropSpeed
+                        )
+
+    else:
+        path.add_module("IPTrackTimeEstimator",
+                        useFittedInformation=False,
+                        recoTracksStoreArrayName=reco_tracks)
     # Track fitting
     path.add_module("DAFRecoFitter",
                     recoTracksStoreArrayName=reco_tracks,
-                    # probCut=0.00001,
                     pdgCodesToUseForFitting=13,
                     )
 
-    if eventTimingExtraction is True:
+    if event_timing_extraction is True:
         # Extract the time
         path.add_module("FullGridTrackTimeExtraction",
                         recoTracksStoreArrayName=reco_tracks,
@@ -247,7 +256,7 @@ def add_cdc_cr_track_fit_and_track_creator(
                     )
 
     # Prune genfit tracks
-    if pruneTracks:
+    if prune_tracks:
         add_prune_tracks(path=path, components=components, reco_tracks=reco_tracks)
 
 

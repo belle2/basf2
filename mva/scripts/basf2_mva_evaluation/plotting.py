@@ -301,6 +301,53 @@ class PurityAndEfficiencyOverCut(Plotter):
         return self
 
 
+class SignalToNoiseOverCut(Plotter):
+    """
+    Plots the signal to noise ratio over the cut value (for cut choosing)
+    """
+    #: @var xmax
+    #: Maximum x value
+    #: @var ymax
+    #: Maximum y value
+
+    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, normed=True):
+        """
+        Add a new curve to the plot
+        @param data pandas.DataFrame containing all data
+        @param column which is used to calculate signal to noise ratio for different cuts
+        @param signal_mask boolean numpy.array defining which events are signal events
+        @param bckgrd_mask boolean numpy.array defining which events are background events
+        @param weight_column column in data containing the weights for each event
+        """
+
+        hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
+
+        signal2noise, signal2noise_error = hists.get_signal_to_noise(['Signal'], ['Background'])
+
+        cuts = hists.bin_centers
+
+        self.xmin, self.xmax = numpy.nanmin([numpy.nanmin(cuts), self.xmin]), numpy.nanmax([numpy.nanmax(cuts), self.xmax])
+        self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(signal2noise), self.ymin]), \
+            numpy.nanmax([numpy.nanmax(signal2noise), self.ymax])
+
+        self.plots.append(self._plot_datapoints(self.axis, cuts, signal2noise, xerr=0, yerr=signal2noise_error))
+
+        self.labels.append(column)
+
+        return self
+
+    def finish(self):
+        """
+        Sets limits, title, axis-labels and legend of the plot
+        """
+        self.axis.set_xlim((self.xmin, self.xmax))
+        self.axis.set_ylim((self.ymin, self.ymax))
+        self.axis.set_title("Signal to Noise Plot")
+        self.axis.get_xaxis().set_label_text('Cut Value')
+        self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
+        return self
+
+
 class PurityOverEfficiency(Plotter):
     """
     Plots the purity over the efficiency also known as ROC curve

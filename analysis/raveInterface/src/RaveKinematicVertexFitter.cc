@@ -39,8 +39,7 @@ using namespace analysis;
 
 
 RaveKinematicVertexFitter::RaveKinematicVertexFitter(): m_useBeamSpot(false), m_motherParticlePtr(NULL), m_raveAlgorithm(""),
-  m_massConstFit(false), m_vertFit(true),
-  m_logCapture("Rave", LogConfig::c_Debug, LogConfig::c_Debug)
+  m_massConstFit(false), m_vertFit(true)
 {
   if (RaveSetup::getRawInstance() == NULL) {
     B2FATAL("RaveSetup::initialize was not called. It has to be called before RaveSetup or RaveKinematicVertexFitter are used");
@@ -48,6 +47,11 @@ RaveKinematicVertexFitter::RaveKinematicVertexFitter(): m_useBeamSpot(false), m_
   m_useBeamSpot = RaveSetup::getRawInstance()->m_useBeamSpot;
 }
 
+IOIntercept::InterceptorScopeGuard<IOIntercept::OutputToLogMessages> RaveKinematicVertexFitter::captureOutput()
+{
+  static IOIntercept::OutputToLogMessages s_captureOutput("Rave", LogConfig::c_Debug, LogConfig::c_Debug);
+  return IOIntercept::start_intercept(s_captureOutput);
+}
 
 
 RaveKinematicVertexFitter::~RaveKinematicVertexFitter()
@@ -130,8 +134,8 @@ void RaveKinematicVertexFitter::setMother(const Particle* aMotherParticlePtr)
 
 int RaveKinematicVertexFitter::fit()
 {
-
-  m_logCapture.start();
+  // make sure all output in this function is converted to log messages
+  auto output_capture = captureOutput();
 
   int ndf = 0;
 
@@ -324,9 +328,7 @@ int RaveKinematicVertexFitter::fit()
     }
   }
 
-  m_logCapture.finish();
   return 1;
-
 }
 
 void RaveKinematicVertexFitter::updateMother()

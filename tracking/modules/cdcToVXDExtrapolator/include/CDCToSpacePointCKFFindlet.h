@@ -17,6 +17,7 @@
 #include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointMatcher.h>
 #include <tracking/ckf/findlets/base/OverlapTeacher.h>
 #include <tracking/ckf/findlets/base/OverlapResolverFindlet.h>
+#include <tracking/ckf/findlets/cdcToSpacePoint/SpacePointTagger.h>
 
 #include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
 
@@ -82,6 +83,8 @@ namespace Belle2 {
     OverlapResolverFindlet<TrackFindingCDC::ChooseableFilter<CDCVXDTrackCombinationFilterFactory>> m_overlapResolver;
     /// Findlet for handling the store array write out
     CDCTrackSpacePointStoreArrayHandler<CKFCDCToVXDStateObject::ResultObject> m_storeArrayHandler;
+    /// Findlet for tagging the used space points
+    SpacePointTagger<CKFCDCToVXDStateObject::ResultObject, SVDCluster> m_svdSpacePointTagger;
 
     // Object pools
     /// Pointers to the CDC Reco tracks as a vector

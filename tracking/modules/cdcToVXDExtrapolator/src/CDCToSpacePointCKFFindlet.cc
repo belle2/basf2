@@ -22,6 +22,7 @@ CDCToSpacePointCKFFindlet::CDCToSpacePointCKFFindlet()
   addProcessingSignalListener(&m_storeArrayHandler);
   addProcessingSignalListener(&m_overlapTeacher);
   addProcessingSignalListener(&m_overlapResolver);
+  addProcessingSignalListener(&m_svdSpacePointTagger);
 }
 
 void CDCToSpacePointCKFFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -34,6 +35,7 @@ void CDCToSpacePointCKFFindlet::exposeParameters(ModuleParamList* moduleParamLis
   m_storeArrayHandler.exposeParameters(moduleParamList, prefix);
   m_overlapTeacher.exposeParameters(moduleParamList, prefix);
   m_overlapResolver.exposeParameters(moduleParamList, prefix);
+  m_svdSpacePointTagger.exposeParameters(moduleParamList, prefix);
 }
 
 void CDCToSpacePointCKFFindlet::beginEvent()
@@ -64,11 +66,9 @@ void CDCToSpacePointCKFFindlet::apply()
   };
   erase_remove_if(m_results, resultIsEmpty);
 
-  B2INFO("Found " << m_results.size() << " tracks");
-
   m_overlapTeacher.apply(m_results);
   m_overlapResolver.apply(m_results);
-  B2INFO("After overlap resolving: Found " << m_results.size() << " tracks");
 
   m_storeArrayHandler.apply(m_results);
+  m_svdSpacePointTagger.apply(m_results, m_spacePointVector);
 }

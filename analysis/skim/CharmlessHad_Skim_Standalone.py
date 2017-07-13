@@ -11,27 +11,48 @@
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
-from stdPi0s import *
-from stdV0s import *
 from stdLightMesons import *
+from stdV0s import *
+from stdPi0s import *
+import sys
+import os
+import glob
 
-set_log_level(LogLevel.INFO)
+if len(sys.argv) > 1:
+    bkgType = sys.argv[1]
+    f = open('inputFiles/' + bkgType + '.txt', 'r')
+    fileList = f.read()
+    f.close()
+    if not os.path.isfile(fileList[:-1]):
+        sys.exit('Could not find root file : ' + fileList[:-1])
+    print('Running over file ' + fileList[:-1])
+elif len(sys.argv) == 1:
+    fileList = \
+        ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000001/s00/e0001/4S/r00001/mixed/sub00/' +
+         'mdst_000001_prod00000001_task00000001.root'
 
-filelist = \
-    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000001/s00/e0001/4S/r00001/mixed/sub00/' +
-     'mdst_000001_prod00000001_task00000001.root'
-     ]
-inputMdstList("default", filelist)
+         ]
+    bkgType = 'old'
 
+
+if len(sys.argv) > 1:
+    inputMdstList('default', fileList[:-1])
+elif len(sys.argv) == 1:
+    inputMdstList('default', fileList)
+
+
+loadStdAllPi0()
+stdPi0s('loose')
+loadStdPhoton()
+stdPhotons('loose')
 loadStdCharged()
-loadStdPi0()
 loadStdKS()
 loadStdLightMesons()
-
+loadStdSkimPi0()
 # Had Skim
 from CharmlessHad_List import *
 HadList = CharmlessHadList()
-skimOutputUdst('CharmlessHad_Standalone', HadList)
+skimOutputUdst('outputFiles/CharmlessHad_' + bkgType, HadList)
 summaryOfLists(HadList)
 
 process(analysis_main)

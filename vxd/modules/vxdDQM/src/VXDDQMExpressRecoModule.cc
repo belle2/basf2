@@ -66,14 +66,6 @@ VXDDQMExpressRecoModule::VXDDQMExpressRecoModule() : HistoModule()
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("UseDigits", m_UseDigits,
            "flag <0,1> for using digits only, no cluster information will be required, default = 0 ", m_UseDigits);
-//  addParam("Reduce1DCorrelHistos", m_Reduce1DCorrelHistos,
-//           "flag <0,1> for removing of 1D correlation plots from output, default = 0 ", m_Reduce1DCorrelHistos);
-//  addParam("Reduce2DCorrelHistos", m_Reduce2DCorrelHistos,
-//           "flag <0,1> for removing of 2D correlation plots from output, default = 0 ", m_Reduce2DCorrelHistos);
-//  addParam("Only23LayersHistos", m_Only23LayersHistos,
-//           "flag <0,1> for to keep only correlation plots between layer 2 and 3 (between PXD and SVD), default = 0 ", m_Only23LayersHistos);
-//  addParam("SaveOtherHistos", m_SaveOtherHistos,
-//           "flag <0,1> for creation of correlation plots for non-neighboar layers, default = 0 ", m_SaveOtherHistos);
   addParam("CorrelationGranulation", m_CorrelationGranulation,
            "Set granulation of histogram plots, default is 1 degree, min = 0.02 degree, max = 1 degree ", m_CorrelationGranulation);
   addParam("SwapPXD", m_SwapPXD, "flag <0,1> very special case for swap of phi-theta coordinates, default = 0 ", m_SwapPXD);

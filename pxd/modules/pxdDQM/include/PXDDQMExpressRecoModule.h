@@ -123,7 +123,14 @@ namespace Belle2 {
        * @param Sensor return Sensor position of sensor
        */
     void getIDsFromIndex(int Index, int* Layer, int* Ladder, int* Sensor);
-    /**< Function return flag histogram filled based on condition.
+    /**< Function return flag histogram filled based on condition from TH1F source.
+       * Flag values:
+       * -3: nonexisting Type
+       * -2: histogram is missing or masked
+       * -1: less than 100 samles, skip comparition
+       *  0: good much with reference
+       *  1: warning level = diff > 6 * sigma and < error level
+       *  2: error level = diff > 10 * sigma
        * @param Type Set type of condition for flag calculation.
        * 1: use counts, mean and RMS.
        * 2: use counts only.
@@ -142,7 +149,14 @@ namespace Belle2 {
        * @return Indication of succes of realizing of condition, 1: OK.
        */
     int SetFlag(int Type, int bin, double* pars, double ratio, TH1F* hist, TH1F* refhist, TH1I* flaghist);
-    /**< Function return flag histogram filled based on condition.
+    /**< Function return flag histogram filled based on condition from TH1I source.
+       * Flag values:
+       * -3: nonexisting Type
+       * -2: histogram is missing or masked
+       * -1: less than 100 samles, skip comparition
+       *  0: good much with reference
+       *  1: warning level = diff > 6 * sigma and < error level
+       *  2: error level = diff > 10 * sigma
        * @param Type Set type of condition for flag calculation.
        * 1: use counts, mean and RMS.
        * 2: use counts only.

@@ -55,7 +55,10 @@ REG_MODULE(PXDDQMExpressReco)
 PXDDQMExpressRecoModule::PXDDQMExpressRecoModule() : HistoModule()
 {
   //Set module properties
-  setDescription("PXD DQM module for Express Reco");
+  setDescription("PXD DQM module for Express Reco "
+                 "Recommended Number of events for monito is 40 kEvents or more to fill all histograms "
+                );
+
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("CutPXDCharge", m_CutPXDCharge,
            "cut for accepting to hitmap histogram, using strips only, default = 0.0 ", m_CutPXDCharge);
@@ -860,7 +863,7 @@ int PXDDQMExpressRecoModule::SetFlag(int Type, int bin, double* pars, double rat
     flaghist->SetBinContent(bin + 1, 0);
     iret = 1;
   } else {
-    flaghist->SetBinContent(bin + 1, -1);
+    flaghist->SetBinContent(bin + 1, -3);
     iret = -1;
   }
   delete temp;

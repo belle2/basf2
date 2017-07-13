@@ -54,7 +54,10 @@ REG_MODULE(SVDDQMExpressReco)
 SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
 {
   //Set module properties
-  setDescription("SVD DQM module for Express Reco");
+  setDescription("SVD DQM module for Express Reco"
+                 "Recommended Number of events for monito is 40 kEvents or more to fill all histograms "
+                );
+
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
 
   addParam("CutSVDCharge", m_CutSVDCharge,
@@ -938,7 +941,7 @@ int SVDDQMExpressRecoModule::SetFlag(int Type, int bin, double* pars, double rat
     flaghist->SetBinContent(bin + 1, 0);
     iret = 1;
   } else {
-    flaghist->SetBinContent(bin + 1, -1);
+    flaghist->SetBinContent(bin + 1, -3);
     iret = -1;
   }
   delete temp;

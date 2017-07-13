@@ -185,8 +185,8 @@ param_vxddqm2 = {'CorrelationGranulation': args.CorrelationGranulation,
                  'SwapPXD': 0
                  }
 
-vxddqmExpReco = register_module('VXDDQM')
-# vxddqmExpReco.param('CreateDB', args.CreateDB)
+vxddqmExpReco = register_module('VXDDQMExpressReco')
+vxddqmExpReco.param('CreateDB', args.CreateDB)
 vxddqmChips = register_module('VXDDQM')
 vxddqmDetails = register_module('VXDDQM')
 

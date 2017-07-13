@@ -642,19 +642,21 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     # VXDTF2 Step 0
     # Preparation
     #################
-    nameSPs = 'SpacePoints' + suffix
-    if use_pxd:
-        spCreatorPXD = register_module('SpacePointCreatorPXD')
-        spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
-        spCreatorPXD.param('SpacePoints', nameSPs)
-        path.add_module(spCreatorPXD)
+    if 'SpacePointCreatorPXD' not in path:
+        nameSPs = 'SpacePoints' + suffix
+        if use_pxd:
+            spCreatorPXD = register_module('SpacePointCreatorPXD')
+            spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
+            spCreatorPXD.param('SpacePoints', nameSPs)
+            path.add_module(spCreatorPXD)
 
-    # always use svd!
-    spCreatorSVD = register_module('SpacePointCreatorSVD')
-    spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
-    spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
-    spCreatorSVD.param('SpacePoints', nameSPs)
-    path.add_module(spCreatorSVD)
+    if 'SpacePointCreatorSVD' not in path:
+        # always use svd!
+        spCreatorSVD = register_module('SpacePointCreatorSVD')
+        spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
+        spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
+        spCreatorSVD.param('SpacePoints', nameSPs)
+        path.add_module(spCreatorSVD)
 
     # SecMap Bootstrap
     secMapBootStrap = register_module('SectorMapBootstrap')

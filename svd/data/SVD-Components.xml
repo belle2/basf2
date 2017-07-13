@@ -417,6 +417,9 @@
 		<height unit="mm">0.680</height>
 	</Component>
 
+    <!-- The PEEK material has a increased density in order to compensate
+         the reduced height, which is necessary, because of overlaps with
+         the cooling pipe -->
 	<Component name="Clamp">
 		<Color>#42342B</Color>
 		<Material>SVD-Peek</Material>

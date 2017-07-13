@@ -12,11 +12,6 @@
 __authors__ = ['Sam Cunliffe', 'Jan Strube']
 
 import numpy as np
-import matplotlib
-matplotlib.use('pdf')
-import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
-import ROOT
 
 
 def Gaussian(mean, width, norm):
@@ -31,49 +26,65 @@ def PDF(listOfGaussians, x):
     return sum(g(x) for g in listOfGaussians)
 
 if __name__ == "__main__":
-    f = ROOT.TFile.Open("TOPOutput.root")
+    # all the graphical imports are only necessary
+    # if this script gets run, not if it's only imported
+    import matplotlib
+    matplotlib.use('pdf')
+    import matplotlib.pyplot as plt
+    from matplotlib.colors import LogNorm
+    import ROOT
+    import sys
+
+    f = ROOT.TFile.Open(sys.argv[1])
     t = f.Get("tree")
     gcmap = 'plasma'  # color map
 
+    xbins = np.linspace(0, 512, 513)
+    ybins = np.linspace(0, 80, 201)
+    xcentres = xbins[0:-1] + 0.5 * (xbins[1:] - xbins[:-1])
+    ycentres = ybins[0:-1] + 0.5 * (ybins[1:] - ybins[:-1])
     # create the image from the channels (int64) on X, and time bins (float64) on Y
-    X, Y = np.meshgrid(range(512), np.linspace(10, 60, 150))
+    X, Y = np.meshgrid(xcentres, ycentres)
     zarrays = []
 
     # one track per event (particle gun)
     for i in range(t.GetEntries()):
         t.GetEntry(i)
+        """
         # one collection per track
         x = t.TOPPDFCollections[0]
-        # x.m_data is a map of hypotheses to a 2D PDF which is a sum of Gaussians
 
         Z = np.zeros_like(X, dtype=np.float32)
+        # x.m_data is a map of hypotheses to a 2D PDF which is a sum of Gaussians
         for pixel, pxData in enumerate(x.m_data[13]):
             lOG = []  # list of Gaussians
             for peak, width, norm in pxData:
                 lOG.append(Gaussian(peak, width, norm))
-            Z[:, pixel] = np.array([PDF(lOG, x) for x in np.linspace(10, 60, 150)])
+            Z[:, pixel] = np.array([PDF(lOG, x) for x in ycentres])
         zarrays.append(Z)
 
-        plt.figure(num=None, figsize=(8, 4), facecolor='w', edgecolor='k')
-        times = np.linspace(10, 60, 150)
-        plt.plot(times, Z[:, 500])
+        plt.plot(ycentres, Z[:, 500])
         plt.savefig('single.pdf')
         plt.clf()
         plt.pcolor(X, Y, Z, cmap=gcmap)
+"""
 
         ch = []
         times = []
         digits = t.TOPDigits
         for d in digits:
+            # only run over good hits. 1 == c_Good
+            if d.getHitQuality() != 1:
+                continue
             ch.append(d.getPixelID())  # this is the same as channel in the pdf
             times.append(d.getTime())
+        print(times)
 
         plt.plot(ch, times, 'ro', markersize=5)
-
         plt.colorbar()
         plt.xlim(-5, 515)
         # plt.ylim(10, 59)
-        plt.xlabel('channel, $i_{ch}$')
+        plt.xlabel('pixel number')
         plt.ylabel('time of propagation, $t_{TOP}$ (ns)')
         plt.savefig("pdf_%i.pdf" % i)
         plt.clf()
@@ -81,10 +92,10 @@ if __name__ == "__main__":
         # log z axis
         plt.pcolor(X, Y, Z, cmap=gcmap, norm=LogNorm())
         plt.plot(ch, times, 'ro', markersize=5)
-        plt.colorbar()
+        # plt.colorbar()
         plt.xlim(-5, 515)
         # plt.ylim(10, 59)
-        plt.xlabel('channel, $i_{ch}$')
+        plt.xlabel('pixel number')
         plt.ylabel('time of propagation, $t_{TOP}$ (ns)')
         plt.savefig("pdf_%i_logz.pdf" % i)
         plt.clf()

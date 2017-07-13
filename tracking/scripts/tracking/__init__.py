@@ -642,8 +642,9 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     # VXDTF2 Step 0
     # Preparation
     #################
+    nameSPs = 'SpacePoints' + suffix
+
     if 'SpacePointCreatorPXD' not in path:
-        nameSPs = 'SpacePoints' + suffix
         if use_pxd:
             spCreatorPXD = register_module('SpacePointCreatorPXD')
             spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
@@ -662,7 +663,7 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     secMapBootStrap = register_module('SectorMapBootstrap')
     secMapBootStrap.param('ReadSectorMap', sectormap_file is not None)  # read from file
     secMapBootStrap.param('ReadSecMapFromDB', sectormap_file is None)  # this will override ReadSectorMap
-    secMapBootStrap.param('SectorMapsInputFile', sectormap_file)
+    secMapBootStrap.param('SectorMapsInputFile', sectormap_file or "")
     secMapBootStrap.param('SetupToRead', setup_name)
     secMapBootStrap.param('WriteSectorMap', False)
     path.add_module(secMapBootStrap)

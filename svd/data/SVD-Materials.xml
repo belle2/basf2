@@ -14,19 +14,19 @@
     <state>Solid</state>
     <density unit="g/cm3">1.9</density>
     <Components>
-      <Element fraction="0.2564">H</Element>
-      <Element fraction="0.5641">C</Element>
-      <Element fraction="0.0513">O</Element>
-      <Element fraction="0.1282">N</Element>
+      <Element fraction="0.30">H</Element>
+      <Element fraction="0.20">Si</Element>
+      <Element fraction="0.30">O</Element>
+      <Element fraction="0.20">N</Element>
     </Components>
   </Material>
  <Material name="SVD-Peek">
     <state>Solid</state>
-    <density unit="g/cm3">1.31</density>
+    <density unit="g/cm3">1.4</density>
     <Components>
-      <Element fraction="0.25">H</Element>
-      <Element fraction="0.60">C</Element>
-      <Element fraction="0.15">O</Element>
+      <Element fraction="0.08">H</Element>
+      <Element fraction="0.76">C</Element>
+      <Element fraction="0.16">O</Element>
     </Components>
   </Material>
   <Material name="SVD-Glue">

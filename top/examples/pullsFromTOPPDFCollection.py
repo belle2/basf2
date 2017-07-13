@@ -17,7 +17,7 @@ from plotTOPPDFCollection import Gaussian, PDF
 parser = ap.ArgumentParser('plot pulls from the pdf and many topdigits')
 parser.add_argument('--input', '-i', default='TOPOutput.root',
                     help='file containing toppdfcollection and topdigits')
-parser.add_argument('--debug', help='run in debug', action='store_true')
+parser.add_argument('--debug', help='run in debug', default=True)
 args = parser.parse_args()
 
 # file
@@ -30,21 +30,21 @@ bar = pb.ProgressBar(max_value=t.GetEntries())
 ch = []
 times = []
 for i in range(t.GetEntries()):
-    if i % 100 == 0:
-        bar.update(i)
+    # if i % 100 == 0:
+        # bar.update(i)
+    bar.update(i)
     t.GetEntry(i)
 
     digits = t.TOPDigits
+    print(len(digits))
     for d in digits:
-        # if d.getHitQuality() == 1: # c_Good == 1
-        print(d.getModuleID(), d.getHitQuality())
-        if (d.getModuleID() == 4):
+        if d.getHitQuality() == 1:  # c_Good == 1
             ch.append(d.getPixelID())  # actually the same as pdf channel
             times.append(d.getTime())
 
 # get array as return from histpgram function
 xbins = np.linspace(0, 512, 513)
-ybins = np.linspace(0, 1.1 * max(times), 201)
+ybins = np.linspace(-5, 1.1 * max(times), 201)
 (hits, xs, ys, _) = plt.hist2d(ch, times, bins=(xbins, ybins), cmap=gcmap)
 
 # for some reason this needs to be transposed to be compatible with meshgrids
@@ -84,7 +84,7 @@ if args.debug:
     plt.colorbar()
     plt.savefig('debug_pdf.pdf')
     plt.clf()
-    input()
+    # input()
 
 
 # as occupancy of hitmap may be zero, add machine level epsilon to take sqrt

@@ -633,9 +633,11 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     # setting different for pxd and svd:
     if is_pxd_used(components):
         setup_name = "SVDPXDDefault"
+        db_sec_map_file = "SVDPXDDefaultMap.root"
         use_pxd = True
     else:
         setup_name = "SVDOnlyDefault"
+        db_sec_map_file = "SVDOnlyDefaultMap.root"
         use_pxd = False
 
     #################
@@ -663,7 +665,7 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     secMapBootStrap = register_module('SectorMapBootstrap')
     secMapBootStrap.param('ReadSectorMap', sectormap_file is not None)  # read from file
     secMapBootStrap.param('ReadSecMapFromDB', sectormap_file is None)  # this will override ReadSectorMap
-    secMapBootStrap.param('SectorMapsInputFile', sectormap_file or "")
+    secMapBootStrap.param('SectorMapsInputFile', sectormap_file or db_sec_map_file)
     secMapBootStrap.param('SetupToRead', setup_name)
     secMapBootStrap.param('WriteSectorMap', False)
     path.add_module(secMapBootStrap)

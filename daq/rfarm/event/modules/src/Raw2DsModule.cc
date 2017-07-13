@@ -10,11 +10,23 @@
 #include <TSystem.h>
 #include <stdlib.h>
 #include <time.h>
+#include <signal.h>
 
 #include "framework/datastore/StoreObjPtr.h"
 #include "framework/dataobjects/EventMetaData.h"
+#include "framework/core/Environment.h"
 
 // #define DESY
+
+namespace {
+// Signal Handler
+  static int signalled = 0;
+  static void signalHandler(int sig)
+  {
+    signalled = sig;
+    printf("Raw2Ds : Signal received\n");
+  }
+}
 
 using namespace std;
 using namespace Belle2;
@@ -82,6 +94,16 @@ void Raw2DsModule::initialize()
 
 void Raw2DsModule::beginRun()
 {
+  if (Environment::Instance().getNumberProcesses() != 0) {
+    struct sigaction s;
+    memset(&s, '\0', sizeof(s));
+    s.sa_handler = signalHandler;
+    sigemptyset(&s.sa_mask);
+    if (sigaction(SIGINT, &s, NULL) != 0) {
+      B2FATAL("Rbuf2Ds: Error to connect signal handler");
+    }
+    printf("Raw2Ds : Signal Handler installed.\n");
+  }
   B2INFO("beginRun called.");
 }
 
@@ -106,6 +128,7 @@ void Raw2DsModule::registerRawCOPPERs()
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
     //    usleep(100);
     //    usleep(20);
+    if (signalled != 0) break;
     usleep(5);
   }
   //  B2INFO("Raw2Ds: got an event from RingBuffer, size=" << size <<

@@ -16,7 +16,7 @@
 using namespace Belle2;
 using namespace std;
 
-TOPFEE::TOPFEE()
+TOPFEE::TOPFEE() : FEE("top")
 {
   m_numberOfCarriers.clear();
   m_statusMonitor.clear();

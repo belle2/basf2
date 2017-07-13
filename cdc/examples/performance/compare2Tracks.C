@@ -28,7 +28,7 @@ void compare2Tracks(){
   TGaxis::SetMaxDigits(4);
   double binWidth=45;
   int ndfmin=25;
-  double D0min = 10;
+  //  double D0min = 10;
   int nbin = floor(180/binWidth);
   string filename = "output/output_*";
   TChain *tree = new TChain("tree");
@@ -46,7 +46,7 @@ void compare2Tracks(){
   double Omega1, Omega2;
 
 
-  double binwidth_phi0 = 45;
+  //  double binwidth_phi0 = 45;
   tree->SetBranchAddress("ndf1",&ndf1);
   tree->SetBranchAddress("Pval1",&Pval1);
   tree->SetBranchAddress("Phi01",&Phi01);

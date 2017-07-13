@@ -2,7 +2,7 @@
 #define _Belle2_ArichlvControlCallback_h
 
 #include <daq/slc/hvcontrol/HVControlCallback.h>
-#include <daq/slc/hvcontrol/arichlv/ArichlvConfig.h>
+//#include <daq/slc/hvcontrol/arichlv/ArichlvConfig.h>
 
 #include <vector>
 

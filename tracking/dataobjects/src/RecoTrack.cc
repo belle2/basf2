@@ -232,6 +232,8 @@ bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) cons
   if (not fs->isFitConverged()) {
     return false;
   }
+
+  // make sure we only consider fitted if the Kalman method was used
   const genfit::KalmanFitStatus* kfs = dynamic_cast<const genfit::KalmanFitStatus*>(fs);
   if (not kfs) {
     return false;

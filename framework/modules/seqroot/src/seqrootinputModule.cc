@@ -46,6 +46,8 @@ SeqRootInputModule::SeqRootInputModule() : Module(), m_streamer(nullptr), m_size
            string("SeqRootInput.sroot"));
   vector<string> empty;
   addParam("inputFileNames", m_filelist, "List of input files", empty);
+  addParam("fileNameIsPattern", m_fileNameIsPattern, "If true interpret the output filename as a boost::format pattern "
+           "instead of the standard where subsequent files are named .sroot-N. For example 'myfile-f%08d.sroot'", false);
 }
 
 
@@ -83,7 +85,7 @@ void SeqRootInputModule::initialize()
 
   EvtMessage* evtmsg = NULL;
   // Open input file
-  m_file = new SeqFile(m_inputFileName.c_str(), "r");
+  m_file = new SeqFile(m_inputFileName.c_str(), "r", nullptr, 0, m_fileNameIsPattern);
   if (m_file->status() <= 0)
     B2FATAL("SeqRootInput : Error in opening input file : " << m_inputFileName);
 
@@ -154,7 +156,7 @@ void SeqRootInputModule::event()
     delete m_file;
     m_file = 0;
     m_fileptr++;
-    if (m_fileptr == m_nfile) {
+    if (m_fileptr >= m_nfile) {
       delete[] evtbuf;
       evtbuf = NULL;
       return;
@@ -188,7 +190,12 @@ void SeqRootInputModule::event()
   m_size2 += dsize * dsize;
 
   if (evtmsg->type() == MSG_STREAMERINFO) {
-    B2FATAL("SeqRootInput : StreamerInfo is found in the middle of *.sroot-* files");
+    B2WARNING("SeqRootInput : StreamerInfo is found in the middle of *.sroot-* files. Skip record");
+    int is = m_file->read(evtbuf, EvtMessage::c_MaxEventSize);
+    if (is <= 0) {
+      B2FATAL("SeqRootInput : Error in reading file. error code = " << is);
+    }
+    evtmsg = new EvtMessage(evtbuf);
   }
 
   // Restore objects in DataStore

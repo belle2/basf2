@@ -4,18 +4,8 @@ import vertex
 
 SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "production"
 
-FAST_RECO_CUTS = ["reject_ee", "accept_ee", "reject_bkg"]
 
-HLT_CUTS = ["accept_hadron", "accept_tau_tau", "accept_2_tracks", "accept_1_track1_cluster",
-            "accept_mumu_2trk", "accept_mumu_1trk", "accept_single_photon"]
-
-CALIB_CUTS = ["accept_ee", "accept_gee", "accept_mumu", "accept_gmumu", "accept_gg_ee", "accept_gg_4pi",
-              "accept_D0_Kpi", "accept_Dstar", "accept_Xi_piLambda", "accept_test",
-              "accept_dqm_D0", "accept_dqm_Dplus", "accept_dqm_Dstar",
-              "accept_dqm_Jpsiee", "accept_dqm_Jpsimumu"]
-
-
-def add_fast_reco_software_trigger(path, store_array_debug_prescale=None):
+def add_fast_reco_software_trigger(path, store_array_debug_prescale=0):
     """
     Add the SoftwareTrigger for the fast reco cuts to the given path.
 
@@ -23,20 +13,17 @@ def add_fast_reco_software_trigger(path, store_array_debug_prescale=None):
     using the module return value.
 
     :param path: The path to which the module should be added.
-    :param store_array_debug_prescale: When not None, store each N events the content of the variables needed for the
+    :param store_array_debug_prescale: When not 0, store each N events the content of the variables needed for the
      cut calculations in the data store.
     :return: the software trigger module
     """
     fast_reco_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="fast_reco",
-                                           cutIdentifiers=FAST_RECO_CUTS,
-                                           acceptOverridesReject=True)
-    if store_array_debug_prescale is not None:
-        fast_reco_cut_module.param("preScaleStoreDebugOutputToDataStore", store_array_debug_prescale)
+                                           preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
 
     return fast_reco_cut_module
 
 
-def add_hlt_software_trigger(path, store_array_debug_prescale=None):
+def add_hlt_software_trigger(path, store_array_debug_prescale=0):
     """
     Add the SoftwareTrigger for the HLT cuts to the given path.
 
@@ -44,7 +31,7 @@ def add_hlt_software_trigger(path, store_array_debug_prescale=None):
     using the module return value.
 
     :param path: The path to which the module should be added.
-    :param store_array_debug_prescale: When not None, store each N events the content of the variables needed for the
+    :param store_array_debug_prescale: When not 0, store each N events the content of the variables needed for the
      cut calculations in the data store.
     :return: the software trigger module
     """
@@ -53,22 +40,19 @@ def add_hlt_software_trigger(path, store_array_debug_prescale=None):
 
     # Add fast reco cuts
     hlt_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="hlt",
-                                     cutIdentifiers=HLT_CUTS)
-
-    if store_array_debug_prescale is not None:
-        hlt_cut_module.param("preScaleStoreDebugOutputToDataStore", store_array_debug_prescale)
+                                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
 
     return hlt_cut_module
 
 
-def add_calibration_software_trigger(path, store_array_debug_prescale=None):
+def add_calibration_software_trigger(path, store_array_debug_prescale=0):
     """
     Add the SoftwareTrigger for the calibration (after HLT) to the given path.
 
     Only the calculation of the cuts is implemented here - the cut logic has to be done
 
     :param path: The path to which the module should be added.
-    :param store_array_debug_prescale: When not None, store each N events the content of the variables needed for the
+    :param store_array_debug_prescale: When not 0, store each N events the content of the variables needed for the
      cut calculations in the data store.
     :return: the software trigger module
     """
@@ -159,8 +143,7 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=None):
     modularAnalysis.variablesToExtraInfo('J/psi:dqm_mumu', {'M': 'dqm_Jpsimumu_M'}, path=path)
     calib_particle_list.append('J/psi:dqm_mumu')
     calib_extraInfo_list.append('dqm_Jpsimumu_M')
-    calibration_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="calib", cutIdentifiers=CALIB_CUTS,
-                                             calibParticleListName=calib_particle_list, calibExtraInfoName=calib_extraInfo_list)
-
-    if store_array_debug_prescale is not None:
-        calibration_cut_module.param("preScaleStoreDebugOutputToDataStore", store_array_debug_prescale)
+    calibration_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="calib",
+                                             preScaleStoreDebugOutputToDataStore=store_array_debug_prescale,
+                                             calibParticleListName=calib_particle_list,
+                                             calibExtraInfoName=calib_extraInfo_list)

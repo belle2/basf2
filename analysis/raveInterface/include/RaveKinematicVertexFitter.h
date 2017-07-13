@@ -179,8 +179,10 @@ namespace Belle2 {
       /** Convert the error matrix from P-E to P-M. It Requires an input error matrit in the form X,P,E */
       TMatrixDSym ErrorMatrixEnergyToMass(TLorentzVector p4, TMatrixDSym EnergyErr);
 
-      IOIntercept::OutputToLogMessages m_logCapture; /**< Rave Capture evtgen log and transform into basf2 logging. */
-
+      /** Start capturing the output of rave and divert it to log messages.
+       * Capturing will finish as soon as the returned object goes out of scope
+       */
+      IOIntercept::InterceptorScopeGuard<IOIntercept::OutputToLogMessages> captureOutput();
     };
   }
 

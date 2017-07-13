@@ -28,6 +28,9 @@ add_raw_output(main, 'raw.root')
 # sroot raw data output
 add_raw_seqoutput(main, 'raw.sroot')
 
+# sroot raw data output with computing group preferred naming
+add_raw_seqoutput(main, "raw.f%05d.sroot", fileNameIsPattern=True)
+
 # process events and print call statistics
 process(main)
 print(statistics)

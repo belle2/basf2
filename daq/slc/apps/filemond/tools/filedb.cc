@@ -63,6 +63,7 @@ int main(int argc, char** argv)
     const std::string m_host = config.get("host");
     const std::string m_list_send = config.get("list.send");
     const std::string m_list_sent = config.get("list.sent");
+    const std::string m_homedir = config.get("homedir");
     const std::vector<std::string> m_dirs = StringUtil::split(config.get("dirs"), ',');
 
     PostgreSQLInterface db(config.get("database.host"),
@@ -75,14 +76,32 @@ int main(int argc, char** argv)
         std::string d = Date().toString();
         for (std::vector<std::string>::const_iterator it = m_dirs.begin();
              it != m_dirs.end(); it++) {
-          std::string file = *it + "/storage/" + m_list_sent;
-          //std::string file = m_list_sent;
-          std::string path;
-          std::ifstream fin(file.c_str());
-          while (fin >> path) {
-            db.connect();
-            db.execute("update %s set time_sent='%s' where host='%s' and path='%s';",
-                       m_table.c_str(), d.c_str(), m_host.c_str(), path.c_str());
+          std::string dir = *it;
+          std::string file = m_list_sent + dir;
+          if (File::exist(file.c_str())) {
+            std::ifstream fin(file.c_str());
+            int count = 0;
+            std::string s;
+            while (fin && getline(fin, s)) {
+              StringList ss = StringUtil::split(s, ',');
+              std::string path = ss[0];
+              ss = StringUtil::split(path, '/');
+              std::string name = ss[ss.size() - 1];
+              name = StringUtil::replace(name, ".root", ".sroot");
+              db.connect();
+              db.execute("update %s set time_sent='%s' where host='%s' and name='%s' and time_sent is null returning id;",
+                         m_table.c_str(), d.c_str(), m_host.c_str(), name.c_str());
+              DBRecordList records(db.loadRecords());
+              if (records.size() > 0) {
+                LogFile::info("Done " + name);
+                count++;
+              }
+            }
+            file = m_homedir + dir + "/storage/" + m_list_send;
+            if (count > 0 && File::exist(file.c_str())) {
+              LogFile::info("unlink file : " + file);
+              ::unlink(file.c_str());
+            }
           }
         }
       } catch (const DBHandlerException& e) {
@@ -107,54 +126,9 @@ int main(int argc, char** argv)
         return 1;
       }
 
-      /*
-      try {
-        for (std::vector<std::string>::const_iterator it = m_dirs.begin();
-             it != m_dirs.end(); it++) {
-          std::string dir = *it + "/storage/";
-          db.connect();
-          db.execute("select * from %s where host = '%s' and path like '%s%s' "
-                     "and time_close is null and (expno <=%d or runno <= %d)",
-                     m_table.c_str(), m_host.c_str(), dir.c_str(), "_%", expno, runno);
-          DBRecordList records(db.loadRecords());
-          if (records.size() > 0) {
-            for (size_t i = 0; i < records.size(); i++) {
-              std::string name = records[i].get("name");
-              int fileno = records[i].getInt("fileno");
-              std::string filepath = records[i].get("path");//dir+ name;
-              while (true) {
-                struct stat st;
-                stat(filepath.c_str(), &st);
-                time_t t;
-                time(&t);
-                if ((t - st.st_mtime) > 60) {
-                  std::string d = Date(st.st_mtime).toString();
-                  unsigned long long chksum, nevents, size;
-                  LogFile::info("new file: %s (%s)", filepath.c_str(), d.c_str());
-                  size = cal_chksum(filepath.c_str(), chksum, nevents);
-                  if (fileno == 0) nevents--;
-      LogFile::info("%s nevents=%d=?%d", filepath.c_str(), records[i].getInt("nevents"), nevents);
-                  db.execute("update %s set time_close='%s', chksum=%lu, nevents=%lu, size=%lu "
-                             "where name='%s' and host='%s';",
-                             m_table.c_str(), d.c_str(), chksum, nevents, size,
-                             name.c_str(), m_host.c_str());
-                  break;
-                } else {
-                  sleep(t - st.st_mtime + 5);
-                }
-              }
-            }
-          }
-        }
-      } catch (const DBHandlerException& e) {
-        LogFile::fatal(e.what());
-        return 1;
-      }
-      */
-
       try {
         for (size_t j = 0; j < m_dirs.size(); j++) {
-          std::string dir = m_dirs[j] + "/storage/";
+          std::string dir = m_homedir + m_dirs[j] + "/storage/";
           db.execute("select * from %s where host = '%s' and time_sent is null "
                      "and (expno < %d or (expno = %d and runno <= %d)) and path like '%s%s' order by time_close ",
                      m_table.c_str(), m_host.c_str(), expno, expno, runno, dir.c_str(), "_%");
@@ -162,14 +136,16 @@ int main(int argc, char** argv)
           struct exp_run {
             int exp;
             int run;
+            std::string label;
           };
           std::vector<exp_run> masks;
           for (size_t i = 0; i < records.size(); i++) {
             int expno = records[i].getInt("expno");
             int runno = records[i].getInt("runno");
+            std::string label = records[i].get("label");
             std::string time_close = records[i].get("time_close");
             if (time_close.size() == 0) {
-              exp_run mask = {expno, runno};
+              exp_run mask = {expno, runno, label};
               masks.push_back(mask);
             }
           }
@@ -178,8 +154,9 @@ int main(int argc, char** argv)
             std::string name = records[i].get("name");
             int expno = records[i].getInt("expno");
             int runno = records[i].getInt("runno");
+            std::string label = records[i].get("label");
             for (size_t j = 0; j < masks.size(); j++) {
-              if (expno == masks[j].exp && runno == masks[j].run) {
+              if (label == masks[j].label && expno == masks[j].exp && runno == masks[j].run) {
                 nfiles--;
                 continue;
               }
@@ -196,9 +173,10 @@ int main(int argc, char** argv)
               std::string name = records[i].get("name");
               int expno = records[i].getInt("expno");
               int runno = records[i].getInt("runno");
+              std::string label = records[i].get("label");
               bool masked = false;
               for (size_t j = 0; j < masks.size(); j++) {
-                if (expno == masks[j].exp && runno == masks[j].run) {
+                if (label == masks[j].label && expno == masks[j].exp && runno == masks[j].run) {
                   masked = true;
                 }
               }
@@ -207,7 +185,6 @@ int main(int argc, char** argv)
                 continue;
               }
               std::string host = records[i].get("host");
-              std::string label = records[i].get("label");
               int fileno = records[i].getInt("fileno");
               std::string size = records[i].get("size");
               std::string nevents = records[i].get("nevents");

@@ -53,7 +53,8 @@ namespace Belle2 {
     double m_TimeTrig; /**< Trig Time */
 
 
-    ClassDef(ECLTrig, 1);/**< ClassDef */
+//    ClassDef(ECLTrig, 1);/**< ClassDef */
+    ClassDef(ECLTrig, 2); // CellId -> TrigId
 
   };
 } // end namespace Belle2

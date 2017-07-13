@@ -605,7 +605,8 @@ def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None, suffi
                     recoTracksStoreArrayName=reco_tracks, recreateSortingParameters=True)
 
 
-def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None, suffix="", read_sectormap_from_db=True):
+def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None, suffix="",
+                                 sectormap_file=None):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -619,8 +620,7 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
                        components.
     :param suffix: all names of intermediate Storearrays will have the suffix appended. Useful in cases someone needs to
                    put several instances of track finding in one path.
-    :param read_sectormap_from_db: if set to False, a file called 'SVDPXDDefaultMap.root' or 'SVDOnlyDefaultMap.root'
-                                   will be used instead of the sectormap in the database.
+    :param sectormap_file: if set to a finite value, a file will be used instead of the sectormap in the database.
     """
     ##########################
     # some setting for VXDTF2
@@ -632,13 +632,9 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     overlap_filter = 'greedy'  # other option is  'hopfield'
     # setting different for pxd and svd:
     if is_pxd_used(components):
-        # sec_map_file = Belle2.FileSystem.findFile("data/tracking/SVDPXDDefaultMap.root")
-        sec_map_file = "SVDPXDDefaultMap.root"
         setup_name = "SVDPXDDefault"
         use_pxd = True
     else:
-        # sec_map_file = Belle2.FileSystem.findFile("data/tracking/SVDOnlyDefaultMap.root")
-        sec_map_file = "SVDOnlyDefaultMap.root"
         setup_name = "SVDOnlyDefault"
         use_pxd = False
 
@@ -662,9 +658,9 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
 
     # SecMap Bootstrap
     secMapBootStrap = register_module('SectorMapBootstrap')
-    secMapBootStrap.param('ReadSectorMap', not read_sectormap_from_db)  # read from file
-    secMapBootStrap.param('ReadSecMapFromDB', read_sectormap_from_db)  # this will override ReadSectorMap
-    secMapBootStrap.param('SectorMapsInputFile', sec_map_file)
+    secMapBootStrap.param('ReadSectorMap', sectormap_file is not None)  # read from file
+    secMapBootStrap.param('ReadSecMapFromDB', sectormap_file is None)  # this will override ReadSectorMap
+    secMapBootStrap.param('SectorMapsInputFile', sectormap_file)
     secMapBootStrap.param('SetupToRead', setup_name)
     secMapBootStrap.param('WriteSectorMap', False)
     path.add_module(secMapBootStrap)

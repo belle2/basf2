@@ -247,6 +247,10 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
     // match all SpacePoints with the sectors:
     for (SpacePoint& aSP : storeArray) {
 
+      if (aSP.getAssignmentState()) {
+        continue;
+      }
+
       const StaticSectorType* sectorFound = findSectorForSpacePoint(aSP);
 
       if (sectorFound == nullptr) {

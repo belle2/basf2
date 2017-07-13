@@ -10,6 +10,8 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
+#include <vector>
+#include <limits>
 #include <gtest/gtest.h>
 
 namespace Belle2 {
@@ -30,22 +32,22 @@ namespace Belle2 {
       for (auto sample : samples)
         EXPECT_EQ(SVDShaperDigit::APVFloatSampleType(0), sample);
       EXPECT_EQ(0.0, digit.getTime());
-      EXPECT_EQ(100.0, digit.getTimeError());
+      EXPECT_EQ(0, digit.getPipelineAddress());
     }
 
     /**
-     * Check standard object creation and data getters.
+     * Check object creation and data getters using a stl container of samples.
      */
-    TEST(SVDShaperDigit, ConstructStandard)
+    TEST(SVDShaperDigit, ConstructFromContainer)
     {
       // Create an arbitrary 6-digit
       VxdID sensorID(3, 4, 1);
       short int cellID = 132;
-      float digitTime = -16.22;
-      float digitTimeError = 5.0;
+      char digitTime(-16);
+      unsigned char digitPipelineAddress(3);
 
-      SVDShaperDigit::APVRawSamples init_samples({0, 5, 10, 9, 6, 5});
-      SVDShaperDigit digit(sensorID, false, cellID, init_samples, digitTime, digitTimeError);
+      std::vector<int> init_samples({0, 5, 10, 9, 6, 5});
+      SVDShaperDigit digit(sensorID, false, cellID, init_samples, digitTime, digitPipelineAddress);
       // Test getters
       EXPECT_EQ(sensorID, digit.getSensorID());
       EXPECT_FALSE(digit.isUStrip());
@@ -54,11 +56,39 @@ namespace Belle2 {
       for (size_t isample = 0; isample < SVDShaperDigit::c_nAPVSamples; ++isample)
         EXPECT_EQ(static_cast<SVDShaperDigit::APVFloatSampleType>(init_samples[isample]),
                   samples[isample]);
-      EXPECT_EQ(digitTime, digit.getTime());
-      EXPECT_EQ(digitTimeError, digit.getTimeError());
+      EXPECT_EQ(static_cast<float>(digitTime), digit.getTime());
+      EXPECT_EQ(static_cast<unsigned short>(digitPipelineAddress), digit.getPipelineAddress());
+    }
+
+    /**
+     * Check object creation and data getters using a c-array of samples.
+     */
+    TEST(SVDShaperDigit, ConstructFromCArray)
+    {
+      // Create an arbitrary 6-digit
+      VxdID sensorID(3, 4, 1);
+      short int cellID = 132;
+      char digitTime(-16);
+      unsigned char digitPipelineAddress(3);
+
+      // floats must work, too.
+      float init_samples[SVDShaperDigit::c_nAPVSamples] = {0, 5, 10, 9, 6, 5};
+      SVDShaperDigit digit(
+        sensorID, false, cellID, init_samples, digitTime, digitPipelineAddress
+      );
+      // Test getters
+      EXPECT_EQ(sensorID, digit.getSensorID());
+      EXPECT_FALSE(digit.isUStrip());
+      EXPECT_EQ(cellID, digit.getCellID());
+      const SVDShaperDigit::APVFloatSamples& samples = digit.getSamples();
+      for (size_t isample = 0; isample < SVDShaperDigit::c_nAPVSamples; ++isample)
+        EXPECT_EQ(static_cast<SVDShaperDigit::APVFloatSampleType>(init_samples[isample]),
+                  samples[isample]);
+      EXPECT_EQ(static_cast<float>(digitTime), digit.getTime());
+      EXPECT_EQ(static_cast<unsigned short>(digitPipelineAddress), digit.getPipelineAddress());
     }
     /**
-     * Check standard object creation without FADC time/error.
+     * Check standard object creation without FADC time and pipeline addresss.
      */
     TEST(SVDShaperDigit, ConstructWoTime)
     {
@@ -66,11 +96,32 @@ namespace Belle2 {
       VxdID sensorID(3, 4, 1);
       short int cellID = 132;
 
-      SVDShaperDigit::APVRawSamples init_samples({0, 5, 10, 9, 6, 5});
+      double init_samples[6] = {0, 5, 10, 9, 6, 5};
       SVDShaperDigit digit(sensorID, false, cellID, init_samples);
       // Test that time and error are set correctly.
       EXPECT_EQ(0.0, digit.getTime());
-      EXPECT_EQ(100.0, digit.getTimeError());
+      EXPECT_EQ(0, digit.getPipelineAddress());
+    }
+
+    TEST(SVDShaperDigit, SampleTrimming)
+    {
+
+      // Create an arbitrary 6-digit
+      VxdID sensorID(3, 4, 1);
+      short int cellID = 132;
+
+      auto sampleMin =
+        static_cast<SVDShaperDigit::APVFloatSampleType>(std::numeric_limits<SVDShaperDigit::APVRawSampleType>::lowest());
+      auto sampleMax =
+        static_cast<SVDShaperDigit::APVFloatSampleType>(std::numeric_limits<SVDShaperDigit::APVRawSampleType>::max());
+
+      std::vector<float> init_samples({0, -10, 255, 256, 500, -1});
+      SVDShaperDigit digit(sensorID, false, cellID, init_samples);
+      const auto& samples = digit.getSamples();
+      for (size_t isample = 0; isample < SVDShaperDigit::c_nAPVSamples; ++isample) {
+        auto trimmedSample = std::max(sampleMin, std::min(sampleMax, init_samples[isample]));
+        EXPECT_EQ(trimmedSample, samples[isample]);
+      }
     }
   } // namespace SVD
 }  // namespace Belle2

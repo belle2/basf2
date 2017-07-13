@@ -233,6 +233,7 @@ void SVDUnpackerModule::event()
             if (m_generateShaperDigts) {
               SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample);
               shaperDigits.appendNew(*newShaperDigit);
+              delete newShaperDigit;
             }
 
           }  //is data frame

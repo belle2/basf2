@@ -18,6 +18,7 @@
 #include <string>
 #include <algorithm>
 #include <functional>
+#include <limits>
 
 namespace Belle2 {
 
@@ -38,31 +39,59 @@ namespace Belle2 {
      * An integer type is sufficient for storage, but getters will return array
      * of doubles suitable for computing.
      */
-    typedef short int APVRawSampleType;
+    typedef short APVRawSampleType;
     typedef std::array<APVRawSampleType, c_nAPVSamples> APVRawSamples;
 
     /** Types for array of samples for processing.
      */
-    typedef short int APVFloatSampleType;
+    typedef float APVFloatSampleType;
     typedef std::array<APVFloatSampleType, c_nAPVSamples> APVFloatSamples;
 
-    /** Useful Constructor.
+    /** Constructor using c-array of samples.
      * @param sensorID Sensor VXD ID.
-     * @param isU True if v strip, false if v.
+     * @param isU True if u strip, false if v.
      * @param cellID Strip ID.
      * @param samples std::array of 6 APV raw samples.
      * @param time Time estimate from FADC
-     * @param timeError Time error estimate from FADC
+     * @param pipelineAddress APV pipeline address
      */
-    SVDShaperDigit(VxdID sensorID, bool isU, short cellID, const APVRawSamples& samples,
-                   float time = 0.0, float timeError = 100.0):
-      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_time(time), m_timeError(timeError)
+    template<typename T>
+    SVDShaperDigit(VxdID sensorID, bool isU, short cellID,
+                   T samples[c_nAPVSamples], char time = 0,
+                   unsigned char pipelineAddress = 0):
+      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_time(time),
+      m_pipelineAddress(pipelineAddress)
     {
-      std::copy(samples.begin(), samples.end(), m_samples.begin());
+      std::transform(samples, samples + c_nAPVSamples, m_samples.begin(),
+                     [this](T x)->APVRawSampleType { return trimToSampleRange(x); }
+                    );
+    }
+
+    /** Constructor using a stl container of samples.
+     * @param sensorID Sensor VXD ID.
+     * @param isU True if u strip, false if v.
+     * @param cellID Strip ID.
+     * @param samples std::array of 6 APV raw samples.
+     * @param time Time estimate from FADC
+     * @param pipelineAddress APV pipeline address
+     */
+    template<typename T>
+    SVDShaperDigit(VxdID sensorID, bool isU, short cellID,
+                   T samples, char time = 0,
+                   unsigned char pipelineAddress = 0):
+      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_time(time),
+      m_pipelineAddress(pipelineAddress)
+    {
+      std::transform(samples.begin(), samples.end(), m_samples.begin(),
+                     [this](typename T::value_type x)->APVRawSampleType
+      { return trimToSampleRange(x); }
+                    );
     }
 
     /** Default constructor for the ROOT IO. */
-    SVDShaperDigit() : SVDShaperDigit(0, true, 0, {{0, 0, 0, 0, 0, 0}}, 0.0, 100.0)
+    SVDShaperDigit() : SVDShaperDigit(
+        0, true, 0, APVRawSamples( {0, 0, 0, 0, 0, 0}), 0, 0
+    )
     { }
 
     /** Get the sensor ID.
@@ -100,12 +129,13 @@ namespace Belle2 {
     /** Get digit time estimate
      * @return digit time estimate from FADC
      */
-    float getTime() const { return m_time; }
+    float getTime() const { return static_cast<float>(m_time); }
 
-    /** Get error of digit time estimate
-     * @return error of digit time estimate
+    /** Get pipeline address
+     * @return APV pipeline address of the digit
      */
-    float getTimeError() const { return m_timeError; }
+    unsigned short getPipelineAddress() const
+    { return static_cast<unsigned short>(m_pipelineAddress);}
 
     /** Display main parameters in this object */
     std::string print() const
@@ -117,7 +147,7 @@ namespace Belle2 {
          << ((m_isU) ? "U-" : "V-") << m_cellID << " samples: ";
       std::copy(m_samples.begin(), m_samples.end(),
                 std::ostream_iterator<APVRawSampleType>(os, " "));
-      os << "Time: " << m_time << " +/- " << m_timeError << std::endl;
+      os << "FADC time: " << m_time << " PA: " << m_pipelineAddress << std::endl;
       return os.str();
     }
 
@@ -141,24 +171,42 @@ namespace Belle2 {
     DigitBase::EAppendStatus addBGDigit(const DigitBase* bg)
     {
       const auto& bgSamples = dynamic_cast<const SVDShaperDigit*>(bg)->getSamples();
+      // Add background samples to the digit's and trim back to range
       std::transform(m_samples.begin(), m_samples.end(), bgSamples.begin(),
-                     m_samples.begin(), std::plus<APVRawSampleType>());
+                     m_samples.begin(),
+                     [this](APVRawSampleType x, APVFloatSampleType y)->APVRawSampleType
+      { return trimToSampleRange(x + y); }
+                    );
       return DigitBase::c_DontAppend;
     }
 
   private:
 
+    /**
+     * Convert a value to sample range.
+     * @param value to be converted
+     * @result APVRawSampleType representation of x
+     */
+    template<typename T> APVRawSampleType trimToSampleRange(T x) const
+    {
+      T trimmedX = std::min(
+                     static_cast<T>(std::numeric_limits<APVRawSampleType>::max()),
+                     std::max(
+                       static_cast<T>(std::numeric_limits<APVRawSampleType>::lowest()),
+                       x));
+      return static_cast<APVRawSampleType>(trimmedX);
+    }
+
     VxdID::baseType m_sensorID; /**< Compressed sensor identifier.*/
     bool m_isU;                /**< True if U, false if V. */
     short m_cellID;            /**< Strip coordinate in pitch units. */
     APVRawSamples m_samples;      /**< 6 APV signals from the strip. */
-    float m_time;              /**< digit time estimate from the FADC */
-    float m_timeError;         /**< digit time error estiamte from the FADC */
+    char m_time;              /**< digit time estimate from the FADC, in ns */
+    unsigned char m_pipelineAddress;   /**< APV pipeline addressC */
 
     ClassDef(SVDShaperDigit, 1)
 
   }; // class SVDShaperDigit
-
 
 } // end namespace Belle2
 

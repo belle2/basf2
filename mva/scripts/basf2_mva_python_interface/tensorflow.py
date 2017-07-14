@@ -14,7 +14,7 @@ class State(object):
     Tensorflow state
     """
 
-    def __init__(self, x=None, y=None, activation=None, cost=None, optimizer=None, session=None):
+    def __init__(self, x=None, y=None, activation=None, cost=None, optimizer=None, session=None, collection_keys=None, **kwargs):
         """ Constructor of the state object """
         #: feature matrix placeholder
         self.x = x
@@ -28,6 +28,16 @@ class State(object):
         self.optimizer = optimizer
         #: tensorflow session
         self.session = session
+        #: array tto save keys for collection
+        if collection_keys is None:
+            self.collection_keys = ['x', 'y', 'activation', 'cost', 'optimizer']
+        else:
+            self.collection_keys = collection_keys
+
+        #: other possible things to save into a tensorflow collection
+        for key, value in kwargs.items():
+            self.collection_keys.append(key)
+            setattr(self, key, value)
 
     def add_to_collection(self):
         """ Add the stored members to the current tensorflow collection """
@@ -37,11 +47,10 @@ class State(object):
             print("Please install tensorflow: pip3 install tensorflow")
             sys.exit(1)
 
-        tf.add_to_collection('x', self.x)
-        tf.add_to_collection('y', self.y)
-        tf.add_to_collection('activation', self.activation)
-        tf.add_to_collection('cost', self.cost)
-        tf.add_to_collection('optimizer', self.optimizer)
+        for key in self.collection_keys:
+            tf.add_to_collection(key, getattr(self, key))
+
+        return self.collection_keys
 
     def get_from_collection(self):
         """ Get members from the current tensorflow collection """
@@ -51,11 +60,8 @@ class State(object):
             print("Please install tensorflow: pip3 install tensorflow")
             sys.exit(1)
 
-        self.x = tf.get_collection('x')[0]
-        self.y = tf.get_collection('y')[0]
-        self.activation = tf.get_collection('activation')[0]
-        self.cost = tf.get_collection('cost')[0]
-        self.optimizer = tf.get_collection('optimizer')[0]
+        for key in self.collection_keys:
+            setattr(self, key, tf.get_collection(key)[0])
 
 
 def feature_importance(state):
@@ -125,7 +131,7 @@ def load(obj):
             file2.write(bytes(obj[3]))
         tf.train.update_checkpoint_state(path, obj[1])
         saver.restore(session, os.path.join(path, obj[1]))
-    state = State(session=session)
+    state = State(session=session, collection_keys=obj[4])
     state.get_from_collection()
     return state
 
@@ -168,7 +174,7 @@ def end_fit(state):
         print("Please install tensorflow: pip3 install tensorflow")
         sys.exit(1)
 
-    state.add_to_collection()
+    keys = state.add_to_collection()
     saver = tf.train.Saver()
     with tempfile.TemporaryDirectory() as path:
         filename = saver.save(state.session, os.path.join(path, 'mymodel'))
@@ -177,4 +183,4 @@ def end_fit(state):
             data2 = file2.read()
     meta_graph = saver.export_meta_graph()
     del state
-    return [meta_graph, os.path.basename(filename), data1, data2]
+    return [meta_graph, os.path.basename(filename), data1, data2, keys]

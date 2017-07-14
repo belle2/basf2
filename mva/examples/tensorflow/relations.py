@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Dennis Weyland 2017
+
 import tensorflow as tf
 from basf2_mva_python_interface.tensorflow import State
 import numpy as np

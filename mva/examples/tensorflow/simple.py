@@ -26,8 +26,8 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
             layer = unit(tf.matmul(x, weights) + biases)
         return layer
 
-    inference_hidden1 = layer(x, [number_of_features, number_of_features+1], 'inference_hidden1')
-    inference_activation = layer(inference_hidden1, [number_of_features+1, 1], 'inference_sigmoid', unit=tf.sigmoid)
+    inference_hidden1 = layer(x, [number_of_features, number_of_features + 1], 'inference_hidden1')
+    inference_activation = layer(inference_hidden1, [number_of_features + 1, 1], 'inference_sigmoid', unit=tf.sigmoid)
 
     epsilon = 1e-5
     inference_loss = -tf.reduce_sum(y * tf.log(inference_activation + epsilon) +
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     specific_options = basf2_mva.PythonOptions()
     specific_options.m_framework = "tensorflow"
     specific_options.m_steering_file = 'mva/examples/tensorflow/simple.py'
-    specific_options.m_nIterations = 100
+    specific_options.m_nIterations = 10
     specific_options.m_mini_batch_size = 100
     specific_options.m_normalize = True
     training_start = time.time()

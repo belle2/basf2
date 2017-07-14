@@ -3,20 +3,30 @@
 
 # Dennis Weyland 2017
 
+# This example serves as a basic example of implementing Relational networks into basf2 with tensorflow.
+# As a toy example it will try to tell if 2 out of multiple lines are hitting each other in three dimensional space.
+# Relevant Paper: https://arxiv.org/abs/1706.01427
+
 import tensorflow as tf
 from basf2_mva_python_interface.tensorflow import State
 import numpy as np
 
 
 class early_stopping():
+    """ Using class to stop training early if it's not getting better"""
 
     def __init__(self):
-        # counts how many times check ist called from last best result
+        """ init class """
+        # counts how many times training is not getting better
         self.counter = 0
         # saves best training result
         self.best_result = np.inf
 
     def check(self, cost):
+        """
+        Check if validation result is better than the best validation result.
+        Decide if training should be continued.
+        """
         if cost < self.best_result:
             self.counter = 0
             self.best_result = cost
@@ -30,12 +40,15 @@ EARLY_STOPPER = early_stopping()
 
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
+    """Building Graph inside tensorflow"""
     tf.reset_default_graph()
     x = tf.placeholder(tf.float32, [None, number_of_features])
     y = tf.placeholder(tf.float32, [None, 1])
+    # Used as input for pre training data set.
     z = tf.placeholder(tf.float32, [None, number_of_spectators])
 
     def layer(x, shape, name, unit=tf.sigmoid):
+        """Build one hidden layer in feed forward net"""
         with tf.name_scope(name) as scope:
             weights = tf.Variable(tf.truncated_normal(shape, stddev=1.0 / np.sqrt(float(shape[0]))), name='weights')
             biases = tf.Variable(tf.constant(0.0, shape=[shape[1]]), name='biases')
@@ -43,6 +56,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         return layer
 
     def build_relation_net_variables(shape, name):
+        """Build the variables(not the net itself), who will be shared between multiple relations"""
         variables = []
         with tf.name_scope(name), tf.variable_scope(name):
             for i in range(len(shape) - 1):
@@ -54,6 +68,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         return variables
 
     def relation_net(x, variables):
+        """Build one relation net between 2 object using pre-build variables"""
         net = [x]
         for layer in variables:
             if len(variables) != len(net):
@@ -62,22 +77,27 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
                 return tf.nn.sigmoid(tf.matmul(net[-1], layer[0]) + layer[1])
 
     if parameters['use_relations']:
-        # group features according to relations
+        # Group input according to relations.
         tracks = []
         [tracks.append(tf.slice(x, [0, i * 6], [-1, 6])) for i in range(int(number_of_features / 6))]
 
-        # build relational nets between tracks
+        # Number of features per reation. Each feature is a net with shared variables across all combinations.
+        # Number of Features is also the number of different set of variables for relational nets.
         number_of_features_per_relation = 1
         relations = []
         pre_training_relations = []
         for feature_number in range(number_of_features_per_relation):
+            # Build the variables, which will be shared across all combinations
             relational_variables = build_relation_net_variables([12, 50, 50, 1],
                                                                 'tracks_relational_{}'.format(feature_number))
+            # Loop over everx combination of input groups.
             for counter, track1 in enumerate(tracks):
                 for track2 in tracks[counter + 1:]:
+                    # Build the net wit pre-build variables.
                     relations.append(relation_net(tf.concat([track1, track2], 1), relational_variables))
 
             if parameters['pre_training_epochs'] > 0:
+                # build net for pre-training with the same shared variables.
                 pre_training_relations.append(relation_net(z, relational_variables))
 
         new_x = tf.concat(relations, 1)
@@ -109,6 +129,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     state = State(x, y, inference_activation, inference_loss, inference_minimize, session)
 
     if parameters['pre_training_epochs'] > 0:
+        # define training ops for pre-training and save them into state
         new_z = tf.concat(pre_training_relations, 1)
         pre_activation = layer(new_z, [int(new_z.get_shape()[1]), 1], 'pre_output')
         state.pre_loss = -tf.reduce_sum(y * tf.log(pre_activation + epsilon) +
@@ -125,10 +146,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
 
 def begin_fit(state, Xtest, Stest, ytest, wtest):
-    """
-    Returns just the state object
-    """
-
+    """Saves the training validation set for monitoring."""
     state.val_x = Xtest
     state.val_y = ytest
     state.val_z = Stest
@@ -137,16 +155,19 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
 
 
 def partial_fit(state, X, S, y, w, epoch):
-    """
-    Pass received data to tensorflow session
-    """
+    """Pass received data to tensorflow session"""
     feed_dict = {state.x: X, state.y: y, state.z: S}
+
+    # pre training trains shared variables on only 2 lines.
+    # In this case there is no relation net which have to compare two lines not hitting each other in a signal event.
     if state.pre_training_epochs > epoch:
         state.session.run(state.pre_minimize, feed_dict=feed_dict)
         if epoch % 1000 == 0:
             avg_cost = state.session.run(state.pre_loss, feed_dict={state.y: state.val_y, state.z: state.val_z})
             print("Pre-Training: Epoch:", '%04d' % (epoch), "cost=", "{:.9f}".format(avg_cost))
             return True
+
+    # Training of the whole network.
     else:
         state.session.run(state.optimizer, feed_dict=feed_dict)
         if epoch % 1000 == 0:
@@ -168,17 +189,28 @@ if __name__ == "__main__":
     import basf2_mva_util
 
     # ##############Building Data samples ###########################
+    # This is  a dataset for testing relational nets.
+    # It consists of number_total_lines lines in 3 dimensional space.
+    # Each line has 6 variables.
+    # In apprx. half of the cases, two lines are hitting each other.
+    # This is considered a signal event.
+    # Training results differs from the number of total lines.
+
     variables = []
     # try using 10 lines and see what happens
     number_total_lines = 5
+    # Names for the training data set
     for i in range(number_total_lines):
         variables += ['px_' + str(i), 'py_' + str(i), 'pz_' + str(i), 'dx_' + str(i), 'dy_' + str(i),
                       'dz_' + str(i)]
-
+    # Names for the spectator variables.
+    # Used as input variables for pre-training.
     spectators = ['Spx1', 'Spy1', 'Spz1', 'Sdx1', 'Sdy1', 'Sdz1', 'Spx2', 'Spy2', 'Spz2', 'Sdx2', 'Sdy2', 'Sdz2']
+    # Number of events in training and test root file.
     number_of_events = 1000000
 
     def build_signal_event():
+        """Building two lines which are hitting each other"""
         p_vec1, p_vec2 = np.random.normal(size=3), np.random.normal(size=3)
         v_cross = np.random.normal(size=3)
         epsilon1, epsilon2 = np.random.rand() * 2 - 1, np.random.rand() * 2 - 1
@@ -186,13 +218,16 @@ if __name__ == "__main__":
         v_vec2 = v_cross + (p_vec2 * epsilon2)
         return np.concatenate([p_vec1, v_vec1]), np.concatenate([p_vec2, v_vec2])
 
-    # this path will delete itself with all data in it after end of program
+    # This path will delete itself with all data in it after end of program.
     with tempfile.TemporaryDirectory() as path:
         for filename in ['train.root', 'test.root']:
             print('Building ' + filename)
+            # Use random numbers to build all training and spectator variables.
             data = np.random.normal(size=[number_of_events, number_total_lines * 6 + 12])
             target = np.zeros([number_of_events], dtype=bool)
 
+            # Overwrite for half of the variables some lines so that they are hitting each other.
+            # Write them also at the end for the spectators.
             for index, sample in enumerate(data):
                 if np.random.rand() > 0.5:
                     target[index] = True
@@ -203,6 +238,7 @@ if __name__ == "__main__":
                     data[index, i2 * 6:(i2 + 1) * 6] = track2
                     data[index, number_total_lines * 6:] = np.append(track1, track2)
 
+            # Saving all variables in root files
             dic = {}
             for i, name in enumerate(variables + spectators):
                 dic.update({name: data[:, i]})
@@ -212,6 +248,7 @@ if __name__ == "__main__":
             to_root(df, os.path.join(path, filename), tree_key='variables')
 
         # ##########################Do Training#################################
+        # Do a comparison of different Nets for this task.
 
         general_options = basf2_mva.GeneralOptions()
         general_options.m_datafiles = basf2_mva.vector(os.path.join(path, 'train.root'))

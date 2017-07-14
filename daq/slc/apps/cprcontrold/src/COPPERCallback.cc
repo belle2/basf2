@@ -604,17 +604,17 @@ int COPPERCallback::tesths(HSLB& hslb) throw (HSLBHandlerException)
   if (id != 0x48534c42 && id != 0x48534c37) {
     *valp = id;
     m_errcode = EHSLB_NOTFOUND;
-    throw (HSLBHandlerException("hslb-%c not found (id=0x%08x != 0x48534c42)", 'A' + i, id));
+    throw (HSLBHandlerException("hslb-%c not found (id=0x%08x != 0x48534c42)", 'a' + i, id));
   }
   if (id == 0x48534c42 && ver < 34) {
     *valp = ver;
     m_errcode = EHSLB_TOOOLD;
-    throw (HSLBHandlerException("hslb-%c too old firmware (ver=0.%02d < 0.34)", 'A' + i, ver));
+    throw (HSLBHandlerException("hslb-%c too old firmware (ver=0.%02d < 0.34)", 'a' + i, ver));
   }
   if (id == 0x48534c37 && ver < 6) {
     *valp = ver;
     m_errcode = EHSLB7_TOOOLD;
-    throw (HSLBHandlerException("hslb-%c too old firmware (ver=0.%02d < 0.06)", 'A' + i, ver));
+    throw (HSLBHandlerException("hslb-%c too old firmware (ver=0.%02d < 0.06)", 'a' + i, ver));
   }
   if (csr & 2) {
     /*
@@ -622,7 +622,7 @@ int COPPERCallback::tesths(HSLB& hslb) throw (HSLBHandlerException)
       disabled, it makes use_slot == 0 and can be stopped.
       m_errcode = EHSLB_DISABLED; */
     m_errcode = EHSLB_DISABLED;
-    throw (HSLBHandlerException("hslb-%c is disabled, ttrx reg 130 bit%d=0", 'A' + i, i));
+    throw (HSLBHandlerException("hslb-%c is disabled, ttrx reg 130 bit%d=0", 'a' + i, i));
   }
   if (csr & 0x20000000) {
     int j;
@@ -634,13 +634,13 @@ int COPPERCallback::tesths(HSLB& hslb) throw (HSLBHandlerException)
 
     if (uptime0 == 0) {
       m_errcode = EHSLB_CLOCKNONE;
-      throw (HSLBHandlerException("hslb-%c clock is missing", 'A' + i));
+      throw (HSLBHandlerException("hslb-%c clock is missing", 'a' + i));
     } else if (uptime0 == uptime1) {
       m_errcode = EHSLB_CLOCKLOST;
-      throw (HSLBHandlerException("hslb-%c clock is lost or too slow", 'A' + i));
+      throw (HSLBHandlerException("hslb-%c clock is lost or too slow", 'a' + i));
     } else if (uptime1 > uptime0 + 1) {
       m_errcode = EHSLB_CLOCKFAST;
-      throw (HSLBHandlerException("hslb-%c clock is too fast", 'A' + i));
+      throw (HSLBHandlerException("hslb-%c clock is too fast", 'a' + i));
     }
 
     for (j = 0; j < 100; j++) {
@@ -650,11 +650,11 @@ int COPPERCallback::tesths(HSLB& hslb) throw (HSLBHandlerException)
     if (recvok < 80) {
       m_errcode = EHSLB_PLLLOST;
       throw (HSLBHandlerException("hslb-%c PLL lost and can't receive data (csr=%08x)",
-                                  'A' + i, csr));
+                                  'a' + i, csr));
     }
     m_warning = WHSLB_PLLLOST;
     log(LogFile::WARNING, "hslb-%c PLL lost (csr=%08x) is probably harmless and ignored",
-        'A' + i, csr);
+        'a' + i, csr);
     csr &= ~0x20000000;
   }
   for (j = 0; j < 100; j++) {
@@ -685,42 +685,42 @@ int COPPERCallback::tesths(HSLB& hslb) throw (HSLBHandlerException)
       *valp = csr;
       if (csr & 1) {
         m_errcode = EHSLB_B2LDOWN;
-        throw (HSLBHandlerException("hslb-%c Belle2link is down, csr=%08x", 'A' + i, csr));
+        throw (HSLBHandlerException("hslb-%c Belle2link is down, csr=%08x", 'a' + i, csr));
       } else if (csr & 0x20) {
         m_errcode = EHSLB_CLOCKBAD;
-        throw (HSLBHandlerException("hslb-%c bad clock detected, csr=%08x", 'A' + i, csr));
+        throw (HSLBHandlerException("hslb-%c bad clock detected, csr=%08x", 'a' + i, csr));
       } else if (csr & 0x80) {
         m_errcode = EHSLB_PLL2LOST;
-        throw (HSLBHandlerException("hslb-%c PLL2 lock lost, csr=%08x", 'A' + i, csr));
+        throw (HSLBHandlerException("hslb-%c PLL2 lock lost, csr=%08x", 'a' + i, csr));
       } else if (csr & 0x40) {
         m_errcode = EHSLB_GTPPLL;
-        throw (HSLBHandlerException("hslb-%c GTP PLL lock lost, csr=%08x", 'A' + i, csr));
+        throw (HSLBHandlerException("hslb-%c GTP PLL lock lost, csr=%08x", 'a' + i, csr));
       } else if (csr & 0x20000000) {
         m_errcode = EHSLB_FFCLOCK;
-        throw (HSLBHandlerException("hslb-%c FF clock is stopped, csr=%08x", 'A' + i, csr));
+        throw (HSLBHandlerException("hslb-%c FF clock is stopped, csr=%08x", 'a' + i, csr));
       }
     } else {
       *valp = count;
       if (oldcsr & 1) {
         m_warning = WHSLB_B2LDOWN;
         log(LogFile::WARNING, "hslb-%c Belle2link recovered, csr=%08x (retry %d)",
-            'A' + i, csr, count);
+            'a' + i, csr, count);
       } else if (oldcsr & 0x20) {
         m_warning = WHSLB_B2LDOWN;
         log(LogFile::WARNING, "hslb-%c bad clock recovered, csr=%08x (retry %d)",
-            'A' + i, csr, count);
+            'a' + i, csr, count);
       } else if (oldcsr & 0x80) {
         m_warning = WHSLB_PLL2LOST;
         log(LogFile::WARNING, "hslb-%c PLL2 lock recovered, csr=%08x (retry %d)",
-            'A' + i, csr, count);
+            'a' + i, csr, count);
       } else if (oldcsr & 0x40) {
         m_warning = WHSLB_GTPPLL;
         log(LogFile::WARNING, "hslb-%c GTP PLL lock recovered, csr=%08x (retry %d)",
-            'A' + i, csr, count);
+            'a' + i, csr, count);
       } else if (oldcsr & 0x20000000) {
         m_warning = WHSLB_FFCLOCK;
         log(LogFile::WARNING, "hslb-%c FF clock is recovered, csr=%08x (retry %d)",
-            'A' + i, csr, count);
+            'a' + i, csr, count);
       }
     }
   }
@@ -735,9 +735,9 @@ int COPPERCallback::tesths(HSLB& hslb) throw (HSLBHandlerException)
   if ((csr & 0x5fffeec1) != 0x18000000 && (csr & 0x200000e1) == 0) {
     m_errcode = EHSLB_BADSTATE;
     *valp = csr;
-    throw (HSLBHandlerException("hslb-%c hslb in bad state (csr=%08x)", 'A' + i, csr));
+    throw (HSLBHandlerException("hslb-%c hslb in bad state (csr=%08x)", 'a' + i, csr));
   }
-  //printf("hslb-%c 0.%02d %08x", 'A'+i, ver, csr);
+  //printf("hslb-%c 0.%02d %08x", 'a'+i, ver, csr);
   return 0;//m_errcode < 0 ? m_errcode : use_slot;
 }
 
@@ -797,7 +797,7 @@ std::string COPPERCallback::staths(HSLB& hslb) throw (HSLBHandlerException)
     set(vname + "b2lerr", 0);
     logging((getNode().getState() == RCState::RUNNING_S ||
              getNode().getState() == RCState::LOADING_TS),
-            LogFile::ERROR, "hslb-%c : %s", ss);
+            LogFile::WARNING, "hslb-%c : %s", 'a' + i, ss);
     return "unknown";
   }
 

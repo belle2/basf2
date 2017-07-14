@@ -131,6 +131,9 @@ int main(int argc, char** argv)
       sock->send(msg);
       delete msg;
       return -1;
+    } else if (msg->type() == MSG_STREAMERINFO) {
+      printf("StreamerInfo. Skipped....\n");
+      continue;
     } else {
       int is = sock->send(msg);
       delete msg;
@@ -154,6 +157,5 @@ int main(int argc, char** argv)
     }
   }
 }
-
 
 

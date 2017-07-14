@@ -14,7 +14,7 @@ class State(object):
     Tensorflow state
     """
 
-    def __init__(self, x=None, y=None, activation=None, cost=None, optimizer=None, session=None, collection_keys=None, **kwargs):
+    def __init__(self, x=None, y=None, activation=None, cost=None, optimizer=None, session=None, **kwargs):
         """ Constructor of the state object """
         #: feature matrix placeholder
         self.x = x
@@ -28,11 +28,8 @@ class State(object):
         self.optimizer = optimizer
         #: tensorflow session
         self.session = session
-        #: array tto save keys for collection
-        if collection_keys is None:
-            self.collection_keys = ['x', 'y', 'activation', 'cost', 'optimizer']
-        else:
-            self.collection_keys = collection_keys
+        #: array to save keys for collection
+        self.collection_keys = ['x', 'y', 'activation', 'cost', 'optimizer']
 
         #: other possible things to save into a tensorflow collection
         for key, value in kwargs.items():
@@ -52,13 +49,16 @@ class State(object):
 
         return self.collection_keys
 
-    def get_from_collection(self):
+    def get_from_collection(self, collection_keys=None):
         """ Get members from the current tensorflow collection """
         try:
             import tensorflow as tf
         except ImportError:
             print("Please install tensorflow: pip3 install tensorflow")
             sys.exit(1)
+
+        if collection_keys is not None:
+            self.collection_keys = collection_keys
 
         for key in self.collection_keys:
             setattr(self, key, tf.get_collection(key)[0])
@@ -131,8 +131,10 @@ def load(obj):
             file2.write(bytes(obj[3]))
         tf.train.update_checkpoint_state(path, obj[1])
         saver.restore(session, os.path.join(path, obj[1]))
-    state = State(session=session, collection_keys=obj[4])
-    state.get_from_collection()
+    state = State(session=session)
+    state.get_from_collection(obj[4])
+    for i, extra in enumerate(obj[5:]):
+        setattr(state, 'extra_{}'.format(i), extra)
     return state
 
 

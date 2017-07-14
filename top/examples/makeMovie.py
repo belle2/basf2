@@ -41,7 +41,7 @@ for i in range(MAXFRAME):
         lOG = []  # list of Gaussians
         for peak, width, norm in pxData:
             lOG.append(Gaussian(peak, width, norm))
-            Z[:, pixel] = np.array([PDF(lOG, timebin) for timebin in ycentres])
+        Z[:, pixel] = np.array([PDF(lOG, timebin) for timebin in ycentres])
     ims.append([plt.pcolor(X, Y, Z, cmap=gcmap)])
     # writer.grab_frame()
     f.Close()

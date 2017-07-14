@@ -25,9 +25,9 @@ main.add_module(input)
 output = register_module('DQMHistAnalysisOutputRelayMsg')
 main.add_module(output)
 
-# nsm = register_module('DQMHistAnalysisOutputNSM')
-# nsm.param('NSMNodeName', "DQMH1")
-# main.add_module(nsm)
+nsm = register_module('DQMHistAnalysisOutputNSM')
+nsm.param('NSMNodeName', "DQMH1")
+main.add_module(nsm)
 
 # Process all events
 process(main)

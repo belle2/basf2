@@ -30,7 +30,12 @@
 
 #include "TVector3.h"
 #include "TDirectory.h"
+#include "TFile.h"
+#include "TVectorD.h"
+#include "TF1.h"
+#include "TRandom3.h"
 
+using namespace std;
 using namespace std;
 using boost::format;
 using namespace Belle2;
@@ -56,6 +61,10 @@ PXDDQMModule::PXDDQMModule() : HistoModule()
            "flag <0,1> for creation of advance plots, default = 0 ", m_SaveOtherHistos);
   addParam("CutPXDCharge", m_CutPXDCharge,
            "cut for accepting to hitmap histogram, using strips only, default = 22 ", m_CutPXDCharge);
+  addParam("ReferenceHistosFileName", m_RefHistFileName,
+           "Name of file contain reference histograms, default=PXD-ReferenceHistos", m_RefHistFileName);
+  addParam("OutputFlagsFileName", m_OutFlagsFileName,
+           "Name of file contain output flag histograms, default=PXD-FlagHistos", m_OutFlagsFileName);
 
 }
 
@@ -353,6 +362,7 @@ void PXDDQMModule::beginRun()
     if (m_chargStartRow[i] != NULL) m_chargStartRow[i]->Reset();
     if (m_StartRowCount[i] != NULL) m_StartRowCount[i]->Reset();
   }
+  m_NoOfEvents = 0;
 }
 
 
@@ -362,6 +372,8 @@ void PXDDQMModule::event()
   const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
   const RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits, m_relPXDClusterDigitName);
   const StoreArray<PXDFrame> storeFrames(m_storeFramesName);
+
+  m_NoOfEvents++;
 
   // If there are no digits, leave
   if (!storePXDDigits || !storePXDDigits.getEntries()) return;
@@ -466,6 +478,299 @@ void PXDDQMModule::endRun()
     //m_averageSeedByU[i]->Divide(m_seedCountsByU[i]);
     //m_averageSeedByV[i]->Divide(m_seedCountsByV[i]);
   }
+  TVectorD* NoOfEvents;
+  NoOfEvents = new TVectorD(1);
+  double fNoOfEvents[1];
+  fNoOfEvents[0] = m_NoOfEvents;
+  NoOfEvents->SetElements(fNoOfEvents);
+  TString nameBS = Form("NoOfEvents");
+  NoOfEvents->Write(nameBS.Data());
+
+  // Create flag histograms:
+  int nSw = 6;
+  int nADC = 4;
+  TFile* f_OutFlagsFile = new TFile(m_OutFlagsFileName.c_str(), "RECREATE");
+  if (!f_OutFlagsFile->IsOpen()) {
+    B2INFO("File of flag histograms: " << m_OutFlagsFileName.c_str() << " is cannot be create, please check it!");
+    return;
+  }
+  TDirectory* oldDir = gDirectory;
+  TDirectory* DirPXDFlags = NULL;
+  f_OutFlagsFile->cd();
+
+  DirPXDFlags = f_OutFlagsFile->mkdir("PXD_Flags");
+//  DirPXDFlags = oldDir->mkdir("PXD_ClusterShapeCorrections");
+  DirPXDFlags->cd();
+  TH2F* hf_hitMapCounts = new TH2F("PixelHitmapCounts", "PXD Pixel Hitmaps Counts",
+                                   c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
+  TH2F* hf_hitMapClCounts = new TH2F("ClusterHitmapCounts", "PXD Cluster Hitmaps Counts",
+                                     c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
+  TH2F* hf_hitMapCountsRef = new TH2F("PixelHitmapCountsRef", "PXD Pixel Hitmaps Counts Reference",
+                                      c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
+  TH2F* hf_hitMapClCountsRef = new TH2F("ClusterHitmapCountsRef", "PXD Cluster Hitmaps Counts Reference",
+                                        c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
+  TH2F* hf_hitMapCountsDiff = new TH2F("PixelHitmapCountsDiff", "PXD Pixel Hitmaps Counts Difference",
+                                       c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
+  TH2F* hf_hitMapClCountsDiff = new TH2F("ClusterHitmapCountsDiff", "PXD Cluster Hitmaps Counts Difference",
+                                         c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
+  TH2F* hf_hitMap = new TH2F("PixelHitmapFlags", "PXD Pixel Hitmaps Flags",
+                             c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
+  TH2F* hf_hitMapCl = new TH2F("ClusterHitmapFlags", "PXD Cluster Hitmaps Flags",
+                               c_nPXDSensors, 0, c_nPXDSensors, nADC * nSw, 0, nADC * nSw);
+
+  //oldDir->cd();
+
+  // Load reference file of histograms:
+  TH2F** r_hitMap = new TH2F*[c_nPXDSensors];
+  TH2F** r_hitMapCl = new TH2F*[c_nPXDSensors];
+
+  TFile* f_RefHistFile = new TFile(m_RefHistFileName.c_str(), "read");
+  if (f_RefHistFile->IsOpen()) {
+    B2INFO("Reference file name: " << m_RefHistFileName.c_str());
+    TVectorD* NoOfEventsRef = NULL;
+    f_RefHistFile->GetObject("NoOfEvents", NoOfEventsRef);
+    m_NoOfEventsRef = (int)NoOfEventsRef->GetMatrixArray()[0];
+//    m_NoOfEventsRef = 2;
+    for (int i = 0; i < c_nPXDSensors; i++) {
+      r_hitMap[i] = NULL;
+      r_hitMapCl[i] = NULL;
+      int iLayer = 0;
+      int iLadder = 0;
+      int iSensor = 0;
+      getIDsFromIndex(i, &iLayer, &iLadder, &iSensor);
+      string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
+      string name = str(format("PXD_Advance/PXD_%1%_PixelHitmap;1") % sensorDescr);
+      f_RefHistFile->GetObject(name.c_str(), r_hitMap[i]);
+      if (r_hitMap[i] == NULL) {
+        B2INFO("There is missing histogram in reference file: " << name.c_str());
+        return;
+      }
+      name = str(format("PXD_Basic/PXD_%1%_HitmapClst") % sensorDescr);
+      f_RefHistFile->GetObject(name.c_str(), r_hitMapCl[i]);
+      if (r_hitMapCl[i] == NULL) {
+        B2INFO("There is missing histogram in reference file: " << name.c_str());
+        return;
+      }
+    }
+    // f_RefHistFile->Close();
+  } else {
+    B2INFO("File of reference histograms: " << m_RefHistFileName.c_str() << " is not available, please check it!");
+    return;
+  }
+  // Compare histograms with reference histograms and create flags:
+  int cSw = 128;
+  int cADC = 63;
+  TF1* fa = new TF1("fa", "1", 0, 1000);
+  TH2F* temp1 = new TH2F("temp1", "temp1", cADC, 0, cADC, cSw, 0, cSw);
+  TH2F* temp2 = new TH2F("temp2", "temp2", cADC, 0, cADC, cSw, 0, cSw);
+  for (int i = 0; i < c_nPXDSensors; i++) {
+    for (int iADC = 0; iADC < nADC; iADC++) {
+      for (int iSw = 0; iSw < nSw; iSw++) {
+        temp1->Reset();
+        temp2->Reset();
+        for (int jADC = 0; jADC < cADC; jADC++) {
+          for (int jSw = 0; jSw < cSw; jSw++) {
+            double value = m_hitMap[i]->GetBinContent(iADC * cADC + jADC + 1, iSw * cSw + jSw + 1);
+            temp1->SetBinContent(jADC + 1, jSw + 1, value);
+            hf_hitMapCounts->Fill(i, iADC * nSw + iSw, value);
+            value = r_hitMap[i]->GetBinContent(iADC * cADC + jADC + 1, iSw * cSw + jSw + 1);
+            temp2->SetBinContent(jADC + 1, jSw + 1, value);
+            hf_hitMapCountsRef->Fill(i, iADC * nSw + iSw, value);
+          }
+        }
+        temp2->Multiply(fa, (float)m_NoOfEvents / m_NoOfEventsRef);
+        // temp2->Multiply(fa,(float)1.5);
+        double flag  = temp1->Chi2Test(temp2);
+        hf_hitMap->SetBinContent(i + 1, iADC * nSw + iSw + 1, flag);
+        temp1->Reset();
+        temp2->Reset();
+        for (int jADC = 0; jADC < cADC; jADC++) {
+          for (int jSw = 0; jSw < cSw; jSw++) {
+            double value = m_hitMapCl[i]->GetBinContent(iADC * cADC + jADC + 1, iSw * cSw + jSw + 1);
+            temp1->SetBinContent(jADC + 1, jSw + 1, value);
+            hf_hitMapClCounts->Fill(i, iADC * nSw + iSw, value);
+            value = r_hitMapCl[i]->GetBinContent(iADC * cADC + jADC + 1, iSw * cSw + jSw + 1);
+            temp2->SetBinContent(jADC + 1, jSw + 1, value);
+            hf_hitMapClCountsRef->Fill(i, iADC * nSw + iSw, value);
+          }
+        }
+        temp2->Multiply(fa, (float)m_NoOfEvents / m_NoOfEventsRef);
+        // temp2->Multiply(fa,(float)1.5);
+        flag  = temp1->Chi2Test(temp2);
+        hf_hitMapCl->SetBinContent(i + 1, iADC * nSw + iSw + 1, flag);
+      }
+    }
+  }
+  delete fa;
+  delete temp1;
+  delete temp2;
+  for (int i = 0; i < c_nPXDSensors; i++) {
+    for (int iADC = 0; iADC < nADC; iADC++) {
+      for (int iSw = 0; iSw < nSw; iSw++) {
+        double val1 = 0;
+        double val2 = 0;
+        val1 = hf_hitMapCounts->GetBinContent(i + 1, iADC * nSw + iSw + 1);
+        val2 = hf_hitMapCountsRef->GetBinContent(i + 1, iADC * nSw + iSw + 1);
+        double diffval = 0;
+        if (abs(val1 - val2) > 3 * (sqrt(val1) + sqrt(val2))) diffval = 1;
+        hf_hitMapCountsDiff->SetBinContent(i + 1, iADC * nSw + iSw + 1, diffval);
+
+        val1 = hf_hitMapClCounts->GetBinContent(i + 1, iADC * nSw + iSw + 1);
+        val2 = hf_hitMapClCountsRef->GetBinContent(i + 1, iADC * nSw + iSw + 1);
+        diffval = 0;
+        if (abs(val1 - val2) > 3 * (sqrt(val1) + sqrt(val2))) diffval = 1;
+        hf_hitMapClCountsDiff->SetBinContent(i + 1, iADC * nSw + iSw + 1, diffval);
+      }
+    }
+  }
+// START DEMO histogram creation to check filesize for ExpresReco:
+  int DoDemo = 0;
+  // PXD: 4x40=160(100) + 6(40) = 166
+  // SVD: 6x172=1032(100) + 10(172) = 1042
+  // VXD+rest: 10(100x100) + 10(100)
+  int nPXD_Demo1 = 160;
+  int nPXD_Demo2 = 6;
+  // nPXD_Demo1 += 40;
+  // nPXD_Demo1 *= 24;
+  // nPXD_Demo2 *= 24;
+  int nSVD_Demo1 = 1032;
+  int nSVD_Demo2 = 10;
+  // nSVD_Demo1 += 172;
+  int nVXD_Demo1 = 20;
+  int nSamples = 20000;
+  TH1F** PXD_Demo1;
+  TH1F** PXD_Demo2;
+  TH1F** SVD_Demo1;
+  TH1F** SVD_Demo2;
+  TH1F** VXD_Demo1;
+  TH2F** VXD_Demo2;
+  PXD_Demo1 = new TH1F*[nPXD_Demo1];
+  PXD_Demo2 = new TH1F*[nPXD_Demo2];
+  SVD_Demo1 = new TH1F*[nSVD_Demo1];
+  SVD_Demo2 = new TH1F*[nSVD_Demo2];
+  VXD_Demo1 = new TH1F*[nVXD_Demo1];
+  VXD_Demo2 = new TH2F*[nVXD_Demo1];
+  for (int i = 0; i < nPXD_Demo1; i++) {
+    PXD_Demo1[i] = NULL;
+  }
+  for (int i = 0; i < nPXD_Demo2; i++) {
+    PXD_Demo2[i] = NULL;
+  }
+  for (int i = 0; i < nSVD_Demo1; i++) {
+    SVD_Demo1[i] = NULL;
+  }
+  for (int i = 0; i < nSVD_Demo2; i++) {
+    SVD_Demo2[i] = NULL;
+  }
+  for (int i = 0; i < nVXD_Demo1; i++) {
+    VXD_Demo1[i] = NULL;
+    VXD_Demo2[i] = NULL;
+  }
+  if (DoDemo) {
+    for (int i = 0; i < nPXD_Demo1; i++) {
+      PXD_Demo1[i] = NULL;
+      string name = str(format("PXD_DUMMY1_%1%") % i);
+      string title = str(format("PXD DUMMY1 %1%") % i);
+      PXD_Demo1[i] = new TH1F(name.c_str(), title.c_str(), 150, 0, 50);
+      PXD_Demo1[i]->GetXaxis()->SetTitle("x - axis");
+      PXD_Demo1[i]->GetYaxis()->SetTitle("counts");
+    }
+    for (int i = 0; i < nPXD_Demo2; i++) {
+      PXD_Demo2[i] = NULL;
+      string name = str(format("PXD_DUMMY2_%1%") % i);
+      string title = str(format("PXD DUMMY 2 %1%") % i);
+      PXD_Demo2[i] = new TH1F(name.c_str(), title.c_str(), 40, 0, 50);
+      PXD_Demo2[i]->GetXaxis()->SetTitle("x - axis");
+      PXD_Demo2[i]->GetYaxis()->SetTitle("counts");
+    }
+    for (int i = 0; i < nSVD_Demo1; i++) {
+      SVD_Demo1[i] = NULL;
+      string name = str(format("SVD_DUMMY1_%1%") % i);
+      string title = str(format("SVD DUMMY 1 %1%") % i);
+      SVD_Demo1[i] = new TH1F(name.c_str(), title.c_str(), 150, 0, 50);
+      SVD_Demo1[i]->GetXaxis()->SetTitle("x - axis");
+      SVD_Demo1[i]->GetYaxis()->SetTitle("counts");
+    }
+    for (int i = 0; i < nSVD_Demo2; i++) {
+      SVD_Demo2[i] = NULL;
+      string name = str(format("SVD_DUMMY2_%1%") % i);
+      string title = str(format("SVD DUMMY 2 %1%") % i);
+      SVD_Demo2[i] = new TH1F(name.c_str(), title.c_str(), 172, 0, 50);
+      SVD_Demo2[i]->GetXaxis()->SetTitle("x - axis");
+      SVD_Demo2[i]->GetYaxis()->SetTitle("counts");
+    }
+    for (int i = 0; i < nVXD_Demo1; i++) {
+      VXD_Demo1[i] = NULL;
+      string name = str(format("VXD_DUMMY_%1%") % i);
+      string title = str(format("VXD DUMMY %1%") % i);
+      VXD_Demo1[i] = new TH1F(name.c_str(), title.c_str(), 150, 0, 150);
+      VXD_Demo1[i]->GetXaxis()->SetTitle("x - axis");
+      VXD_Demo1[i]->GetYaxis()->SetTitle("counts");
+      VXD_Demo2[i] = NULL;
+      name = str(format("VXD_DUMMY2_%1%") % i);
+      title = str(format("VXD DUMMY 2 %1%") % i);
+      VXD_Demo2[i] = new TH2F(name.c_str(), title.c_str(), 450, 0, 150, 450, 0, 150);
+      VXD_Demo2[i]->GetXaxis()->SetTitle("x - axis");
+      VXD_Demo2[i]->GetYaxis()->SetTitle("y - axis");
+      VXD_Demo2[i]->GetZaxis()->SetTitle("counts");
+    }
+    TRandom3 r(0);
+    for (int j = 0; j < nSamples; j++) {
+      for (int i = 0; i < nPXD_Demo1; i++) {
+        PXD_Demo1[i]->Fill(r.Gaus(15, 5));
+      }
+      for (int i = 0; i < nPXD_Demo2; i++) {
+        PXD_Demo2[i]->Fill(r.Gaus(25, 5));
+      }
+      for (int i = 0; i < nSVD_Demo1; i++) {
+        SVD_Demo1[i]->Fill(r.Gaus(35, 5));
+      }
+      for (int i = 0; i < nSVD_Demo2; i++) {
+        SVD_Demo2[i]->Fill(r.Gaus(15, 15));
+      }
+      for (int i = 0; i < nVXD_Demo1; i++) {
+        VXD_Demo1[i]->Fill(r.Gaus(15, 5));
+        VXD_Demo2[i]->Fill(r.Gaus(75, 15), r.Gaus(75, 15));
+      }
+    }
+  }
+// END DEMO histogram creation to check filesize for ExpresReco:
+
+  // Save histograms to flag file:
+  f_OutFlagsFile->cd();
+  NoOfEvents->Write(nameBS.Data());
+  DirPXDFlags->cd();
+  if (DoDemo) {
+    for (int i = 0; i < nPXD_Demo1; i++) {
+      PXD_Demo1[i]->Write();
+    }
+    for (int i = 0; i < nPXD_Demo2; i++) {
+      PXD_Demo2[i]->Write();
+    }
+    for (int i = 0; i < nSVD_Demo1; i++) {
+      SVD_Demo1[i]->Write();
+    }
+    for (int i = 0; i < nSVD_Demo2; i++) {
+      SVD_Demo2[i]->Write();
+    }
+    for (int i = 0; i < nVXD_Demo1; i++) {
+      VXD_Demo1[i]->Write();
+      VXD_Demo2[i]->Write();
+    }
+  } else {
+    hf_hitMapCounts->Write();
+    hf_hitMapClCounts->Write();
+    hf_hitMapCountsRef->Write();
+    hf_hitMapClCountsRef->Write();
+    hf_hitMapCountsDiff->Write();
+    hf_hitMapClCountsDiff->Write();
+    hf_hitMap->Write();
+    hf_hitMapCl->Write();
+  }
+
+  // Close flag file:
+  f_OutFlagsFile->Close();
+  oldDir->cd();
 }
 
 

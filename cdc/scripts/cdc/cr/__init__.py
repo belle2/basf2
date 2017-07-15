@@ -180,8 +180,8 @@ def add_cdc_cr_reconstruction(path, eventTimingExtraction=True,
         # Extract the time
         path.add_module("FullGridTrackTimeExtraction",
                         recoTracksStoreArrayName="RecoTracks",
-                        maximalT0Shift=70,
-                        minimalT0Shift=-70,
+                        maximalT0Shift=40,
+                        minimalT0Shift=-40,
                         numberOfGrids=6
                         )
 

@@ -1,5 +1,9 @@
 /****************************************************************************
+* Copyright(C) 2010 - Belle II Collaboration                             *
+*                                                                        *
+* Author: The Belle II Collaboration                                     *
 * Contributors: Xiaolong Wang, Yinghui Guan                              *
+*
 * This software is provided "as is" without any warranty.                *
 ***************************************************************************/
 
@@ -69,7 +73,7 @@ namespace Belle2 {
     virtual float getCurrentMonitor(int crate, int slot, int channel) throw(IOException);
 
   private:
-    //! IP address, username, password
+    //! IP address, username, password for the HV crates
     char m_ipadd[30], m_userName[30], m_passwd[30];
     //! link type
     static const int m_link = LINKTYPE_TCPIP;
@@ -81,27 +85,27 @@ namespace Belle2 {
     //! return result of get functions of CAEN system.
     CAENHVRESULT m_ret;
 
-    //! for timeinfo
+    //! save log file or not
     bool m_logsave;
     // int start_s;
     // int stop_s;
     //! start time
     time_t m_start_t;
-    //! time record VoltageMonitor
+    //! the time when make record for Voltage
     time_t m_stop_t;
     //! diff between start_t and stop_t
     time_t m_diff;
-    //! record every tdiff seconds.
+    //! make a record every tdiff seconds.
     int m_tdiff;
     //! time window between each record.
     int m_tmwind;
 
-    //! for interlock
+    //! enable/disalbe interlock
     bool m_intlock;
 
     //! std::ofstream ofs;
     char m_buffer [80];
-    //! slot number, number of channels (in fact always 1) and channel number
+    //! set slot number, number of channels (in fact always 1) and channel number when talking to CAEN crate
     unsigned short m_Slot, m_ChNum, m_ChList;
     //! Val that will be set
     float m_fParVal;

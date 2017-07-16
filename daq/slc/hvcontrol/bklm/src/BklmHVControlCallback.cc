@@ -28,7 +28,6 @@
 #include <errno.h>
 //#include "daq/slc/hvcontrol/bklm/caen/MainWrapp.h"
 #include "daq/slc/hvcontrol/bklm/caen/CAENHVWrapper.h"
-//#include "daq/slc/hvcontrol/bklm/CAENHVWrapper.h"
 //#include "daq/slc/hvcontrol/bklm/caen/console.h"
 #include <ctime>
 #include <cstdlib>

@@ -43,12 +43,14 @@ BKLMUnpackerModule::BKLMUnpackerModule() : Module()
 {
   setDescription("Produce BKLMDigits from RawBKLM");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("useDefaultModuleId", m_useDefaultModuleId, "use default module id if not found in mapping", false);
+  addParam("useDefaultModuleId", m_useDefaultModuleId, "use default module id if not found in mapping", true);
   addParam("keepEvenPackages", m_keepEvenPackages, "keep packages that have even length normally indicating that data was corrupted ",
            false);
   addParam("outputDigitsName", m_outputDigitsName, "name of BKLMDigit store array", string("BKLMDigits"));
-  addParam("SciThreshold", m_scintThreshold, "scintillator strip hits with charge (~NPE) lower this value will be marked as bad",
+  addParam("SciThreshold", m_scintThreshold, "scintillator strip hits with NPE lower this value will be marked as bad",
            double(7.0));
+  addParam("SciChargeThreshold", m_scintChargeThreshold, "scintillator strip hits with charge lower this value will be marked as bad",
+           double(20.0));
   addParam("loadMapFromDB", m_loadMapFromDB, "whether load electronic map from DataBase", true);
   addParam("rawdata", m_rawdata, "is this real rawdata (true) or MC data (false)", false);
 }
@@ -150,6 +152,11 @@ void BKLMUnpackerModule::beginRun()
 
 void BKLMUnpackerModule::event()
 {
+  StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
+  unsigned long expNumber = eventMetaData->getExperiment();
+  if (expNumber > 0) m_rawdata = true;
+  else m_rawdata = false;
+
   StoreArray<RawKLM> rawKLM;
   StoreArray<BKLMDigit> bklmDigits(m_outputDigitsName);
   bklmDigits.clear();
@@ -311,6 +318,7 @@ void BKLMUnpackerModule::event()
 
           BKLMDigit digit(moduleId, ctime, tdc, charge);
           if (layer < 2 && !(charge < m_scintThreshold))  digit.isAboveThreshold(true);
+          if (m_rawdata && layer < 2 && ((m_scintADCOffset - charge) > m_scintChargeThreshold))  digit.isAboveThreshold(true);
 
           B2DEBUG(1, "BKLMUnpackerModule:: digi after Unpacker: sector: " << digit.getSector() << " isforward: " << digit.isForward() <<
                   " layer: " << digit.getLayer() << " isPhi: " << digit.isPhiReadout());
@@ -460,7 +468,10 @@ unsigned short BKLMUnpackerModule::flipChannel(int isForward, int sector, int la
     if (layer > 2 && plane == 0) MaxiChannel = 48;
   }
 
-  if (!(isForward && sector == 7 && layer > 2 && plane == 1)) channel = MaxiChannel - channel + 1;
+  bool dontFlip = false;
+  if (isForward && (sector == 7 ||  sector == 8 ||  sector == 1 ||  sector == 2)) dontFlip = true;
+  if (!isForward && (sector == 4 ||  sector == 5 ||  sector == 6 ||  sector == 7)) dontFlip = true;
+  if (!(dontFlip && layer > 2 && plane == 1)) channel = MaxiChannel - channel + 1;
 
   if (channel < 1 || channel > MaxiChannel) isOutRange = true;
 

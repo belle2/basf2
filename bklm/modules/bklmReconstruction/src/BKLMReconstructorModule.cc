@@ -102,6 +102,7 @@ void BKLMReconstructorModule::event()
   if (volIDToDigits.empty()) return;
 
   StoreArray<BKLMHit1d> hit1ds;
+  hit1ds.clear();
 
   std::vector<BKLMDigit*> cluster;
   int oldVolID = volIDToDigits.begin()->first;
@@ -123,6 +124,7 @@ void BKLMReconstructorModule::event()
   // Construct StoreArray<BKLMHit2D> from orthogonal same-module hits in StoreArray<BKLMHit1D>
 
   StoreArray<BKLMHit2d> hit2ds;
+  hit2ds.clear();
 
   for (int i = 0; i < hit1ds.getEntries(); ++i) {
     int moduleID = hit1ds[i]->getModuleID() & BKLM_MODULEID_MASK;

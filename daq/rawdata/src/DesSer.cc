@@ -392,7 +392,7 @@ void DesSer::Accept(bool close_listen)
       printf("[WARNING] Failed to run %s\n", cmdline);
     }
     while (fgets(buf, 256, fp) != NULL) {
-      printf("[DEBUG] output of ss(port %d) : %s\n", m_port_to, buf); fflush(stdout);
+      printf("[ERROR] Failed to bind. output of ss(port %d) : %s\n", m_port_to, buf); fflush(stdout);
     }
     // Error message
     fclose(fp);

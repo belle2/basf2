@@ -77,21 +77,25 @@ namespace Belle2 {
 
       TFile* tfile;  /**< Output file. */
       TTree* tree;                          /**< output tree, save info of each hit. */
-      double ndf1;                    /**< degree of freedom of first track. */
-      double ndf2;                    /**< degree of freedom of secon track. */
-      double Pval1;                   /**< Pvalue of 1st track. */
-      double Pval2;                    /**< Pvalue of 2nd track. */
+      double ndf1;                    /**< degree of freedom of 1st track. */
+      double ndf2;                    /**< degree of freedom of 2nd track. */
+      double Pval1;                   /**< P-value of 1st track. */
+      double Pval2;                    /**< P-value of 2nd track. */
       double Phi01;                    /**< Phi0 of 1st track. */
       double Phi02;                    /**< Phi0 of 2nd track. */
       double  tanLambda1;              /**< TanLambda of 1st track. */
       double  tanLambda2;              /**< Tanlambda of 2nd track. */
-      double D01;                        /**< D0 of 1st track. */
-      double D02;                        /**< D0 of 2nd track. */
-      double Z01;                        /**< Z0 of 1st track. */
-      double Z02;                        /**< Z0 of 2nd track. */
+      double D01;                        /**< d0 of 1st track. */
+      double D02;                        /**< d0 of 2nd track. */
+      double Z01;                        /**< z0 of 1st track. */
+      double Z02;                        /**< z0 of 2nd track. */
       int m_fitstatus;                  /**< fit status, 0 - nofit;1 - fit but not convergence;2-fit and convergence.*/
-      TVector3 posSeed1;                /**< seed position of first track. */
-      TVector3 posSeed2;                /**< seed position of second track. */
+      TVector3 posSeed1;                /**< seed position of 1st track. */
+      TVector3 posSeed2;                /**< seed position of 2nd track. */
+      TVector3 Mom1;                    /**< Momentum of 1st track */
+      TVector3 Mom2;                    /**< Momentum of 2nd track */
+      double Omega1;                     /**< omega of 1st track*/
+      double Omega2;                     /**< omega of 2nd track*/
       bool m_noBFit; /**< fit incase no magnetic Field of not, if true, NDF=4 in cal P-value */
 
     };

@@ -12,12 +12,82 @@
 #include <framework/logging/Logger.h>
 #include <memory>
 #include <cstring>
+#include <csignal>
+#include <set>
 #include <unistd.h>
 #include <fcntl.h>
 #include <boost/algorithm/string.hpp>
 
 namespace Belle2 {
   namespace IOIntercept {
+    /** Small class to handle std::abort() calls by external libraries
+     *
+     * External libraries like EvtGen seem to prefer calling abort() on error
+     * which means destructors are not called and so interception is never
+     * finished and thus the error message are lost.
+     *
+     * This class installs a SIGABRT handler which is the only way to do
+     * something once std::abort() is called and dump all the output
+     * intercepted so far back on the original output (stdout or stderr) to
+     * basically "reverse" the redirection.
+     *
+     * This seems like the best choice since calling abort means the user needs
+     * to be able to see the messages
+     */
+    class CaptureStreamAbortHandler {
+    public:
+      /** Return the singleton instance */
+      static CaptureStreamAbortHandler& getInstance()
+      {
+        static CaptureStreamAbortHandler instance;
+        return instance;
+      }
+      /** Add a CaptureStream object to guard against SIGABRT */
+      void addObject(CaptureStream* obj) { m_objects.emplace(obj); }
+      /** Remove a CaptureStream object to no longer guard against SIGABRT */
+      void removeObject(CaptureStream* obj) { m_objects.erase(obj); }
+    private:
+      /** Register handler */
+      CaptureStreamAbortHandler()
+      {
+        auto result = std::signal(SIGABRT, &CaptureStreamAbortHandler::handle);
+        if (result == SIG_ERR) B2FATAL("Cannot register abort handler");
+      }
+      /** Singleton, no copy construction */
+      CaptureStreamAbortHandler(const CaptureStreamAbortHandler&) = delete;
+      /** Singleton, no move construction */
+      CaptureStreamAbortHandler(CaptureStreamAbortHandler&&) = delete;
+      /** Singleton, no assignment */
+      CaptureStreamAbortHandler& operator=(const CaptureStreamAbortHandler&) = delete;
+      /** signal handler: print all pending redirection buffers and exit */
+      static void handle(int signal);
+      /** list of all active stream redirections */
+      std::set<CaptureStream*> m_objects;
+    };
+
+    void CaptureStreamAbortHandler::handle(int)
+    {
+      // move set of registered objects in here so we can call finish when
+      // looping over them without invalidating the iterators
+      std::set<CaptureStream*> objects;
+      std::swap(CaptureStreamAbortHandler::getInstance().m_objects, objects);
+      // loop over all registered instances and print the content in their
+      // buffer to the original file descriptor
+      for (CaptureStream* stream : objects) {
+        // close the write end of the pipe
+        close(stream->m_replacementFD);
+        // read all content
+        if (stream->finish()) {
+          const std::string& out = stream->getOutput();
+          // and write it to the original file descriptor
+          if (out.size()) write(stream->m_savedFD, out.c_str(), out.size());
+        }
+      }
+      // write error message and signal error
+      write(STDERR_FILENO, "abort() called, exiting\n", 24);
+      std::_Exit(EXIT_FAILURE);
+    }
+
     StreamInterceptor::StreamInterceptor(std::ostream& stream, FILE* fileObject):
       m_stream(stream), m_fileObject(fileObject), m_savedFD(dup(fileno(m_fileObject)))
     {
@@ -41,9 +111,9 @@ namespace Belle2 {
       // so then, read everything
       while (true) {
         ssize_t size = read(fd, buffer.get(), 1024);
-        if (size < 0) {
+        if (size <= 0) {
           // in case we get interrupted by signal, try again
-          if (errno == EINTR)  continue;
+          if (size < 0 && errno == EINTR)  continue;
           break;
         }
         out.append(buffer.get(), static_cast<size_t>(size));
@@ -104,6 +174,25 @@ namespace Belle2 {
       finish();
       // no need to close the write part, done by base class
       if (m_pipeReadFD >= 0) close(m_pipeReadFD);
+    }
+
+    bool CaptureStream::start()
+    {
+      if (StreamInterceptor::start()) {
+        CaptureStreamAbortHandler::getInstance().addObject(this);
+        return true;
+      }
+      return false;
+    }
+
+    bool CaptureStream::finish()
+    {
+      if (StreamInterceptor::finish()) {
+        CaptureStreamAbortHandler::getInstance().removeObject(this);
+        readFD(m_pipeReadFD, m_outputStr);
+        return true;
+      }
+      return false;
     }
 
     namespace {

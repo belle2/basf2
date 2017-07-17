@@ -389,17 +389,6 @@ int BKLMRawPackerModule::getDefaultElectId(int isForward, int sector, int layer,
 int BKLMRawPackerModule::getChannel(int isForward, int sector, int layer, int& plane, int channel)
 {
 
-  if (plane == 1) { //phi strips
-    if (layer == 1)  channel = channel + 4;
-    if (layer == 2)  channel = channel + 2;
-  }
-  if (plane == 0) { //z strips
-    if (channel > 9) channel = channel + 6;
-    if (channel > 9) channel = channel + 6;
-  }
-
-  //if (sector == 3 && layer > 2 && layer < 16) channel = channel - 1; //temporary in data
-
   //we flip channel to match raw data
   int MaxiChannel = 0;
   if (!isForward && sector == 3 && plane == 0) {
@@ -421,10 +410,17 @@ int BKLMRawPackerModule::getChannel(int isForward, int sector, int layer, int& p
   if (!isForward && (sector == 4 ||  sector == 5 ||  sector == 6 ||  sector == 7)) dontFlip = true;
   if (!(dontFlip && layer > 2 && plane == 1)) channel = MaxiChannel - channel + 1;
 
+  if (plane == 1) { //phi strips
+    if (layer == 1)  channel = channel + 4;
+    if (layer == 2)  channel = channel + 2;
+  } else if (plane == 0) { //z strips
+    if (layer < 3 && channel > 9) channel = channel + 6;
+  }
+
   //we flip plane to match raw data
   if (layer < 3) {
-    if (plane = 0) plane = 1;
-    else if (plane = 1) plane = 0;
+    if (plane == 0) plane = 1;
+    else if (plane == 1) plane = 0;
   }
   return channel;
 }

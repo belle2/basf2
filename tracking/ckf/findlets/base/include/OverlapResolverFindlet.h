@@ -80,7 +80,7 @@ namespace Belle2 {
                                     "Enable the overlap resolving.", m_param_enableOverlapResolving);
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "allowOverlapBetweenSeeds"),
                                     m_param_allowOverlapBetweenSeeds,
-                                    "Allow overlaps between results with the same seed.",
+                                    "Allow overlaps between results with different seeds.",
                                     m_param_allowOverlapBetweenSeeds);
     }
 
@@ -98,7 +98,7 @@ namespace Belle2 {
       // Sort results by seed, as it makes the next operations faster
       std::sort(resultElements.begin(), resultElements.end(), TrackFindingCDC::LessOf<SeedGetter>());
 
-      if (not m_param_allowOverlapBetweenSeeds)
+      if (m_param_allowOverlapBetweenSeeds)
       {
         groupbySeedsAndMaximize(resultElements, m_temporaryResults);
       } else {
@@ -149,6 +149,8 @@ namespace Belle2 {
     // resolve overlaps in each seed separately
     const auto& groupedBySeed = TrackFindingCDC::adjacent_groupby(resultElements.begin(), resultElements.end(), SeedGetter());
     for (const auto& resultElementsWithSameSeed : groupedBySeed) {
+
+      m_resultsWithWeight.clear();
       for (ResultPair& resultPair : resultElementsWithSameSeed) {
         TrackFindingCDC::Weight weight = m_qualityFilter(resultPair);
         if (std::isnan(weight)) {

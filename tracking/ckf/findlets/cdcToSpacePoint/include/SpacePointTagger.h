@@ -35,11 +35,18 @@ namespace Belle2 {
       moduleParamList->addParameter("singleClusterLevel", m_param_singleClusterLevel,
                                     "Mark SP as used, if the share a single cluster with the results, or if they share a whole SP.",
                                     m_param_singleClusterLevel);
+      moduleParamList->addParameter("markUsedSpacePoints", m_param_markUsedSpacePoints,
+                                    "Mark used spacepoints as assigned.",
+                                    m_param_markUsedSpacePoints);
     }
 
     /// Mark all space points as used, that they share clusters if the given kind with the results.
     void apply(const std::vector<AResultObject>& results, const std::vector<const SpacePoint*>& spacePoints) override
     {
+      if (not m_param_markUsedSpacePoints) {
+        return;
+      }
+
       for (const auto& result : results) {
         const auto& hits = result.getHits();
         for (const SpacePoint* spacePoint : hits) {
@@ -88,5 +95,7 @@ namespace Belle2 {
     // Parameters
     /// Parameter: Mark SP as used, if the share a single cluster with the results, or if they share a whole SP.
     bool m_param_singleClusterLevel = true;
+    /// Parameter: Mark used spacepoints as assigned
+    bool m_param_markUsedSpacePoints = true;
   };
 }

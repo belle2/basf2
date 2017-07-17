@@ -8,7 +8,7 @@ from ROOT import Belle2
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trigger_mode="all", additionalTrackFitHypotheses=None,
                                 reco_tracks="RecoTracks", keep_temporary_tracks=False, use_vxdtf2=False,
-                                use_second_cdc_hits=False):
+                                fit_tracks=True, use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.
@@ -25,6 +25,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param keep_temporary_tracks: If true, store all information of the single CDC and VXD tracks before merging.
         If false, prune them.
+    :param fit_tracks: If false, the final track find and the TrackCreator module will no be executed
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
 
@@ -50,9 +51,11 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
     if trigger_mode in ["hlt", "all"]:
         add_mc_matcher(path, components=components, reco_tracks=reco_tracks, use_second_cdc_hits=use_second_cdc_hits)
-        add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
-                                        additionalTrackFitHypotheses=additionalTrackFitHypotheses,
-                                        reco_tracks=reco_tracks)
+
+        if fit_tracks:
+            add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
+                                            additionalTrackFitHypotheses=additionalTrackFitHypotheses,
+                                            reco_tracks=reco_tracks)
 
 
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,

@@ -80,7 +80,8 @@ main_path.add_module(input)
 histoman = basf2.register_module('DqmHistoManager')
 histoman.param("Port", int(argvs[3]))
 histoman.param("Port", 9991)
-histoman.param("DumpInterval", 1000)
+histoman.param("DumpInterval", 180)
+histoman.param("WriteInterval", 180)
 
 # HistoManageer for offline
 # histoman = basf2.register_module('HistoManager')

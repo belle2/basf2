@@ -33,7 +33,7 @@ int main(int argc, char** argv)
           try {
             fee[i] = (FEE*)((getfee_t)dl.load(funcname))();
             LogFile::debug("loaded lib %d", i);
-            fee[i]->setName(name);
+            //fee[i]->setName(name);
           } catch (const DynamicLoadException& e) {
             LogFile::fatal("failed to dlopen(lib=%s, func=%s): %s",
                            libname.c_str(), funcname.c_str(), e.what());

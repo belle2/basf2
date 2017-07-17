@@ -61,9 +61,9 @@ def HbInclusiveList():
     applyCuts('gamma:soft', 'R2EventLevel < 0.5')
 
     fillParticleList('pi+:pi0', 'pt<0.5 and pt>0.05')
-    reconstructDecay('pi0:all -> gamma:soft gamma:soft', '0.125 < M < 0.14')
+    reconstructDecay('pi0:skim -> gamma:soft gamma:soft', '0.125 < M < 0.14')
 
-    Eta_Channels = ['pi+:pi0 pi-:pi0 pi0:all',
+    Eta_Channels = ['pi+:pi0 pi-:pi0 pi0:skim',
                     'gamma:soft gamma:soft']
 
     HbList = []
@@ -82,8 +82,8 @@ def EtabInclusiveList():
     applyCuts('gamma:hb', 'R2EventLevel < 0.5')
 
     fillParticleList('pi+:pi0', 'pt<0.5 and pt>0.05')
-    reconstructDecay('pi0:all -> gamma:soft gamma:soft', '0.125 < M < 0.14')
-    reconstructDecay('eta:3pi -> pi+:pi0 pi-:pi0 pi0:all', '0.53 < M < 0.56 and 9.85 < mRecoil < 9.9')
+    reconstructDecay('pi0:skim -> gamma:soft gamma:soft', '0.125 < M < 0.14')
+    reconstructDecay('eta:3pi -> pi+:pi0 pi-:pi0 pi0:skim', '0.53 < M < 0.56 and 9.85 < mRecoil < 9.9')
     reconstructDecay('eta:gg -> gamma:soft gamma:soft', '0.53 < M < 0.56 and 9.85 < mRecoil < 9.92')
 
     EtabInclusive_Channels = ['eta:3pi gamma:hb',

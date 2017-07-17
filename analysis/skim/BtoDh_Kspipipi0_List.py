@@ -14,7 +14,7 @@ def loadD():
     Dcuts = '1.5 < M < 2.2'
 
     D0_Channels = [
-        'K_S0:all pi+:all pi-:all pi0:all'
+        'K_S0:all pi+:all pi-:all pi0:skim'
     ]
     D0List = []
     for chID, channel in enumerate(D0_Channels):

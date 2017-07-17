@@ -381,13 +381,24 @@ void DesSer::Accept(bool close_listen)
   }
 
   if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
-    printf("[FATAL] Failed to bind. Maybe other programs have already occupied this port(%d). Exiting...",
+    printf("[FATAL] Failed to bind. Maybe other programs have already occupied this port(%d). Exiting...\n",
            m_port_to); fflush(stdout);
-
+    // Check the process occupying the port 33000.
+    FILE* fp;
+    char buf[256];
+    char cmdline[500];
+    sprintf(cmdline, "/usr/sbin/ss -ap | grep %d", m_port_to);
+    if ((fp = popen(cmdline, "r")) == NULL) {
+      printf("[WARNING] Failed to run %s\n", cmdline);
+    }
+    while (fgets(buf, 256, fp) != NULL) {
+      printf("[ERROR] Failed to bind. output of ss(port %d) : %s\n", m_port_to, buf); fflush(stdout);
+    }
+    // Error message
+    fclose(fp);
     char temp_char[500];
     sprintf(temp_char, "[FATAL] Failed to bind.(%s) Maybe other programs have already occupied this port(%d). Exiting...",
             strerror(errno), m_port_to);
-    printf("%s", temp_char);
     print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }

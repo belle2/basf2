@@ -15,45 +15,38 @@ from stdCharged import *
 from stdV0s import *
 from stdPi0s import *
 
-reset_database()
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True, LogLevel.ERROR)
-
 set_log_level(LogLevel.INFO)
+import sys
+import os
+import glob
 
 ccbar_wBG = \
-    ['/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/' +
-     'prod00000972/s00/e0000/4S/r00000/ccbar/sub00/*root']
+    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-07-00/DBxxxxxxxx/MC6/prod00000198/s00/e0000/4S/r00000/ccbar/sub00/' +
+     'mdst_00051*_prod00000198_task0000051*.root']
 
-ccbar_noBG = \
-    ['/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/' +
-     'prod00000973/s00/e0000/4S/r00000/ccbar/sub00/*root']
 
-mixed_wBG = \
-    ['/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/' +
-     'prod00000962/s00/e0000/4S/r00000/mixed/sub00/*root']
+if len(sys.argv) > 1:
+    bkgType = sys.argv[1]
+    f = open('inputFiles/' + bkgType + '.txt', 'r')
+    fileList = f.read()
+    f.close()
+    if not os.path.isfile(fileList[:-1]):
+        sys.exit('Could not find root file : ' + fileList[:-1])
+    print('Running over file ' + fileList[:-1])
+elif len(sys.argv) == 1:
+    fileList = ccbar_wBG
+    bkgType = 'ccbarRel7'
 
-charged_wBG = \
-    ['/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/' +
-     'prod00000964/s00/e0000/4S/r00000/charged/sub00/*root']
-
-uubar_wBG = \
-    ['/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/' +
-     'prod00000966/s00/e0000/4S/r00000/uubar/sub00/*root']
-
-ddbar_wBG = \
-    ['/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/' +
-     'prod00000968/s00/e0000/4S/r00000/ddbar/sub00/*root']
-
-ssbar_wBG = \
-    ['/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/' +
-     'prod00000970/s00/e0000/4S/r00000/ssbar/sub00/*root']
-
-filelist = ccbar_noBG
-inputMdstList('default', filelist)
-
+if len(sys.argv) > 1:
+    inputMdstList('default', fileList[:-1])
+elif len(sys.argv) == 1:
+    inputMdstList('default', fileList)
+loadStdSkimPi0()
 loadStdCharged()
+stdPi0s('loose')
+stdPhotons('loose')
 loadStdKS()
-loadStdLoosePi0()
+
 
 from Charm3BodyHadronic_List import *
 
@@ -62,7 +55,7 @@ from Charm3BodyHadronic_List import *
 # summaryOfLists(D0ToHpJmPi0List)
 
 DstToD0PiD0ToHpJmPi0List = DstToD0PiD0ToHpJmPi0()
-skimOutputUdst('DstToD0PiD0ToHpJmPi0_Standalone_ccbar_noBG', DstToD0PiD0ToHpJmPi0List)
+skimOutputUdst('outputFiles/Charm3BodyHadronic_' + bkgType, DstToD0PiD0ToHpJmPi0List)
 summaryOfLists(DstToD0PiD0ToHpJmPi0List)
 
 # DstToD0PiD0ToHpHmKsList = DstToD0PiD0ToHpHmKs()

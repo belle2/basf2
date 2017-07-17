@@ -49,8 +49,6 @@ BKLMUnpackerModule::BKLMUnpackerModule() : Module()
   addParam("outputDigitsName", m_outputDigitsName, "name of BKLMDigit store array", string("BKLMDigits"));
   addParam("SciThreshold", m_scintThreshold, "scintillator strip hits with NPE lower this value will be marked as bad",
            double(7.0));
-  addParam("SciChargeThreshold", m_scintChargeThreshold, "scintillator strip hits with charge lower this value will be marked as bad",
-           double(20.0));
   addParam("loadMapFromDB", m_loadMapFromDB, "whether load electronic map from DataBase", true);
   addParam("rawdata", m_rawdata, "is this real rawdata (true) or MC data (false)", false);
 }
@@ -154,8 +152,6 @@ void BKLMUnpackerModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
   unsigned long expNumber = eventMetaData->getExperiment();
-  if (expNumber > 0) m_rawdata = true;
-  else m_rawdata = false;
 
   StoreArray<RawKLM> rawKLM;
   StoreArray<BKLMDigit> bklmDigits(m_outputDigitsName);
@@ -264,7 +260,7 @@ void BKLMUnpackerModule::event()
           unsigned short charge = bword4 & 0xFFF;
           int layer = lane;
           if (flag == 1) layer = lane - 5; //layer 1-based
-          if (m_rawdata && layer < 3) { // z phi plane of sci. is flipped, may be tentative
+          if (layer < 3) { // z phi plane of sci. is flipped, may be tentative
             if (axis == 0) axis = 1;
             else if (axis == 1) axis = 0;
             else B2WARNING("BKLMUnpackerModule:: axis bit of scintillator is abnormal " << axis);
@@ -307,9 +303,9 @@ void BKLMUnpackerModule::event()
           if (layer > 14) { B2WARNING("BKLMUnpackerModule:: strange that the layer number is larger than 14 " << layer); continue;}
 
           //handle the flipped channels and out-of-range channels. This way is not good at all, but do this for a while before data format is fixed
-          if (m_rawdata) channel = getChannel(sector + 1, layer + 1, plane, channel);
+          channel = getChannel(sector + 1, layer + 1, plane, channel);
           bool outRange = false;
-          if (m_rawdata) channel = flipChannel(isForward, sector + 1, layer + 1, plane, channel, outRange);
+          channel = flipChannel(isForward, sector + 1, layer + 1, plane, channel, outRange);
           if (outRange) { B2WARNING("BKLMUnpackerModule:: channel number is out of range " << channel); continue; }
 
           //still have to add the channel and axis
@@ -317,9 +313,7 @@ void BKLMUnpackerModule::event()
           moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
 
           BKLMDigit digit(moduleId, ctime, tdc, charge);
-          if (!m_rawdata) {
-            if (layer < 2 && !(charge < m_scintThreshold))  digit.isAboveThreshold(true);
-          } else if (layer < 2 && ((m_scintADCOffset - charge) > m_scintChargeThreshold))  digit.isAboveThreshold(true);
+          if (layer < 2 && ((m_scintADCOffset - charge) > m_scintThreshold))  digit.isAboveThreshold(true);
 
           B2DEBUG(1, "BKLMUnpackerModule:: digi after Unpacker: sector: " << digit.getSector() << " isforward: " << digit.isForward() <<
                   " layer: " << digit.getLayer() << " isPhi: " << digit.isPhiReadout());
@@ -442,7 +436,7 @@ unsigned short BKLMUnpackerModule::getChannel(int sector, int layer, int axis, u
 
 
   //if (layer > 2) channel = channel + 1;
-  if (sector == 3 && layer > 2 && layer < 16) channel = channel + 1;
+  //if (sector == 3 && layer > 2 && layer < 16) channel = channel + 1;
   //if (sector == 7 && layer > 2 && layer < 16) channel = channel;
 
   return channel;

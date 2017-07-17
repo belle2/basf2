@@ -60,6 +60,9 @@ namespace Belle2 {
     //! use electronic map from DataBase or not
     bool m_loadMapFromDB = false;
 
+    //! offset of the scintillator ADC
+    const int m_scintADCOffset = 3400;
+
     //! # of events in a run
     int max_nevt;
 
@@ -120,6 +123,9 @@ namespace Belle2 {
 
     //! get the default electronic Id
     int getDefaultElectId(int isForward, int sector, int layer, int axis);
+
+    //! remap the channel ID for scitilators and RPCs
+    int getChannel(int isForward, int sector, int layer,  int& plane,  int channel);
 
   };
 

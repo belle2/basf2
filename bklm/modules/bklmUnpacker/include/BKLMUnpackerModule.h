@@ -102,9 +102,6 @@ namespace Belle2 {
     //! threshold for the scintillator NPE
     double m_scintThreshold = 7;
 
-    //! threshold for the scintillator ADC after subtracting the offset
-    double m_scintChargeThreshold = 20;
-
     //! is this real data (true) or MC data (false)
     bool m_rawdata;
 

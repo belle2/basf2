@@ -189,7 +189,6 @@ namespace Belle2 {
                     ". Created RecoTrack doesn't contain these SpacePoints!");
         }
 
-        spacePoint->setAssignmentState(true);
         sortingParameter++;
       }
 

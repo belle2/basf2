@@ -207,6 +207,10 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     return false;
   }
 
+  //bug fix: update the tracks (genfit::MeasuredStateOnPlane) after vertex
+  stPlus = gfTrackPlus.getFittedState();
+  stMinus = gfTrackMinus.getFittedState();
+
   const genfit::GFRaveTrackParameters* tr0 = vert.getParameters(0);
   const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
 
@@ -248,7 +252,10 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     return false;
   }
 
-  const double Bz = getBzAtVertex(posVert);
+  //const double Bz = getBzAtVertex(posVert);
+  //bug fix: to build the trackFitResult use the magnetic field at the origin
+  const TVector3 origin(0, 0, 0);
+  const double Bz = getBzAtVertex(origin);
 
   TrackFitResult* tfrPlusVtx = buildTrackFitResult(gfTrackPlus, stPlus, Bz, trackHypotheses.first);
   TrackFitResult* tfrMinusVtx = buildTrackFitResult(gfTrackMinus, stMinus, Bz, trackHypotheses.second);

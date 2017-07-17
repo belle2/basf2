@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import basf2
-import simulation
+from basf2 import *
+import reconstruction
 
-main = basf2.create_path()
-
-main.add_module('EventInfoSetter')
-main.add_module('Cosmics')
+main = create_path()
+main.add_module('RootInput')
 main.add_module('Gearbox')
 main.add_module('Geometry', excludedComponents=['MagneticField'])
 
-simulation.add_simulation(main)
+reconstruction.add_cosmics_reconstruction(main, pruneTracks=False)
 
 main.add_module('RootOutput')
 main.add_module('Progress')
 
-basf2.process(main)
-print(basf2.statistics)
+process(main)
+print(statistics)

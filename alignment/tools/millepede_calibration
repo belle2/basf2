@@ -18,11 +18,6 @@ if __name__ == '__main__':
         if scenario.__name__[:len(prefix)] == prefix and len(prefix) < len(scenario.__name__):
             scenarios[scenario.__name__[len(prefix):]] = scenario    
 
-    reset_database()
-    use_database_chain()
-    use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
-    use_local_database(Belle2.FileSystem.findFile("localdb/database.txt"))
-
     import argparse
     parser = argparse.ArgumentParser(
         description="Universal tool to run Millepede collection and calibration (outside CAF, but easily portable)")
@@ -42,6 +37,8 @@ if __name__ == '__main__':
     parser.add_argument('--geo-components', nargs='+', type=str, help='Set components of geometry module, std_reco... If None, full Belle2 geometry is used', dest='geometry_components', default=None)
     parser.add_argument('--reco', dest='do_reconstruction', action='store_const', const=True,
                         default=None, help='Add reconstruction modules to pre colletor path')
+    parser.add_argument('--cosmic-reco', dest='do_cosmics_reconstruction', action='store_const', const=True,
+                        default=None, help='Add cosmics reconstruction modules to pre colletor path')    
     parser.add_argument('--ana', dest='do_analysis', action='store_const', const=True,
                         default=None, help='Add analysis modules to pre colletor path')
     parser.add_argument('--magnet-off', dest='magnet_off', action='store_const', const=True,
@@ -70,8 +67,8 @@ if __name__ == '__main__':
         millepede.set_param(args.primary_vertices, 'primaryVertices')        
     
     # Re-setup path with modules with default configs...
-    if args.do_reconstruction is not None or args.do_analysis is not None:
-        millepede.path = setups.get_path(doReconstruction=args.do_reconstruction, doAnalysis=args.do_analysis)          
+    if args.do_reconstruction is not None or args.do_analysis is not None or args.do_cosmics_reconstruction is not None:
+        millepede.path = setups.get_path(doReconstruction=args.do_reconstruction, doAnalysis=args.do_analysis, doCosmicsReconstruction=args.do_cosmics_reconstruction)          
     
     # Simple in-place module modifications .. no need to construct path again
     if args.gearbox_file is not None:

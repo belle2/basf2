@@ -1,29 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import sys
-from basf2 import *
-from ROOT import Belle2
+import basf2
+import simulation
 
-reset_database()
-use_database_chain()
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
-# use_local_database('localdb/database.txt')
+main = basf2.create_path()
 
-main = create_path()
 main.add_module('EventInfoSetter')
 main.add_module('Cosmics')
 main.add_module('Gearbox')
 main.add_module('Geometry')
-main.add_module('FullSim')
-main.add_module('PXDDigitizer')
-main.add_module('SVDDigitizer')
-main.add_module('PXDClusterizer')
-main.add_module('SVDClusterizer')
-main.add_module('CDCDigitizer')
+
+simulation.add_simulation(main)
+
 main.add_module('RootOutput')
 main.add_module('Progress')
 
-process(main)
-print(statistics)
+basf2.process(main)
+print(basf2.statistics)

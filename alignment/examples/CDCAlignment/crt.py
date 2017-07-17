@@ -1,188 +1,111 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-Simple example script to reconstruct cosmics events
-Usage :
-basf2 runRec.py <run>
-run: Run number
-"""
-
 from basf2 import *
 from ROOT import Belle2
 import datetime
 from tracking import add_cdc_cr_track_finding
-from reconstruction import *
 from simulation import *
 import os.path
 import sys
 from cdc.cr import *
 
-# Set the global log level
-set_log_level(LogLevel.INFO)
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--period', dest='period', default='normal', help='Data period')
+args = parser.parse_args()
 
+main_path = create_path()
+empty_path = create_path()
 
-def main(run, period, mode):
+main_path.add_module('EventInfoSetter')
+main_path.add_module('Progress')
 
-    main_path = create_path()
-    empty_path = create_path()
+# Propagation velocity of the light in the scinti.
+lightPropSpeed = 12.9925
+# Run range.
+run_range = {'normal': [-1, -1]}
+# Size of trigger counter.
+triggerSize = {'normal': [100.0, 8.0, 10.0]}
+# Center position of trigger counter.
+triggerPosition = {'normal': [0.0, 0.0, 0.0]}
+# Normal direction of the trigger plane.
+triggerPlaneDirection = {'normal': [0, 1, 0]}
+# PMT position.
+pmtPosition = {'normal': [0, 0, -50.0]}
+lengthOfCounter = 100.0
+widthOfCounter = 8.0
+triggerPos = []
+normTriggerPlanDirection = []
+readOutPos = []
 
-    inputFilename = '/ghi/fs01/belle2/bdata/users/karim/MC_data/Cosmics_test2/rawdata_run' + run + '.root'
-    main_path.add_module('RootInput', inputFileNames=[inputFilename])
+lengthOfCounter = triggerSize[args.period][0]
+widthOfCounter = triggerSize[args.period][1]
+triggerPos = triggerPosition[args.period]
+normTriggerPlanDirection = triggerPlaneDirection[args.period]
+readOutPos = pmtPosition[args.period]
 
-    main_path.add_module('Progress')
+main_path.add_module('Gearbox',
+                     fileName="/geometry/GCR_Summer2017.xml",
+                     override=[
+                              ("/Global/length", "8.", "m"),
+                              ("/Global/width", "8.", "m"),
+                              ("/Global/height", "8.", "m"),
+                     ])
+main_path.add_module('Geometry')
 
-    # set_cdc_cr_parameters(period)
+# Register the CRY module
+cry = register_module('CRYInput')
+cry.param('CosmicDataDir', Belle2.FileSystem.findFile('data/generators/modules/cryinput/'))
+cry.param('SetupFile', 'cry.setup')
 
-    # Propagation velocity of the light in the scinti.
-    lightPropSpeed = 12.9925
+# cry.param('acceptLength', 8.0)
+# cry.param('acceptWidth', 8.0)
+# cry.param('acceptHeight', 8.0)
+# cry.param('keepLength', 8.0)
+# cry.param('keepWidth', 8.0)
+# cry.param('keepHeight', 8.0)
 
-    # Run range.
-    run_range = {'normal': [-1, -1]}
+cry.param('acceptLength', 0.6)
+cry.param('acceptWidth', 0.2)
+cry.param('acceptHeight', 0.2)
+cry.param('keepLength', 0.6)
+cry.param('keepWidth', 0.2)
+cry.param('keepHeight', 0.2)
 
-    # Size of trigger counter.
-    triggerSize = {'normal': [100.0, 8.0, 10.0]}
+cry.param('maxTrials', 10000)
+cry.param('kineticEnergyThreshold', 1.)
+main_path.add_module(cry)
 
-    # Center position of trigger counter.
-    triggerPosition = {'normal': [0.0, 0.0, 0.0]}
+# Selector module.
+#    sel = register_module('CDCCosmicSelector',
+#                          lOfCounter=lengthOfCounter,
+#                          wOfCounter=widthOfCounter,
+#                          xOfCounter=triggerPos[0],
+#                          yOfCounter=triggerPos[1],
+#                          zOfCounter=triggerPos[2],
+#                          phiOfCounter=0.,
+#                          TOP=True,
+#                          propSpeed=lightPropSpeed,
+#                          TOF=1,
+#                          cryGenerator=True
+#                          )
 
-    # Normal direction of the trigger plane.
-    triggerPlaneDirection = {'normal': [0, 1, 0]}
+#    main_path.add_module(sel)
+#    sel.if_false(empty_path)
 
-    # PMT position.
-    pmtPosition = {'normal': [0, 0, -50.0]}
+# Full simulation
+add_simulation(main_path)
 
-    # Global phi rotation.
-#    globalPhiRotation = {'normal': 0.0}
+# Overwrite default module configurations
+modules = main_path.modules()
+for m in modules:
+    if "ECLDigitizer" in m.name():
+        m.param('DiodeDeposition', True)
 
-    lengthOfCounter = 100.0
-    widthOfCounter = 8.0
-    triggerPos = []
-    normTriggerPlanDirection = []
-    readOutPos = []
-#    globalPhi = 0.0
+# Output
+main_path.add_module('RootOutput')
 
-    global lengthOfCounter
-    global widthOfCounter
-    global triggerPos
-    global normTriggerPlanDirection
-    global readOutPos
-#    global globalPhi
-
-    lengthOfCounter = triggerSize[period][0]
-    widthOfCounter = triggerSize[period][1]
-    triggerPos = triggerPosition[period]
-    normTriggerPlanDirection = triggerPlaneDirection[period]
-    readOutPos = pmtPosition[period]
-#    globalPhi = globalPhiRotation[period]
-
-#    phi = getPhiRotation()
-
-    gearbox = register_module('Gearbox')
-    """,
-                              fileName="/geometry/GCR_Summer2017.xml",
-                              override=[
-                                  ("/Global/length", "8.", "m"),
-                                  ("/Global/width", "8.", "m"),
-                                  ("/Global/height", "8.", "m"),
-                              ])
-    """
-    main_path.add_module(gearbox)
-
-    main_path.add_module('Geometry')
-
-    add_cdc_cr_track_finding(main_path)
-
-    main_path.add_module("SetupGenfitExtrapolation")
-
-    main_path.add_module("PlaneTriggerTrackTimeEstimator",
-                         pdgCodeToUseForEstimation=13,
-                         triggerPlanePosition=triggerPos,
-                         triggerPlaneDirection=normTriggerPlanDirection,
-                         useFittedInformation=False)
-
-    main_path.add_module("DAFRecoFitter",
-                         probCut=0.00001,
-                         pdgCodesToUseForFitting=13,
-                         )
-
-    main_path.add_module("PlaneTriggerTrackTimeEstimator",
-                         pdgCodeToUseForEstimation=13,
-                         triggerPlanePosition=triggerPos,
-                         triggerPlaneDirection=normTriggerPlanDirection,
-                         useFittedInformation=True,
-                         useReadoutPosition=True,
-                         readoutPosition=readOutPos,
-                         readoutPositionPropagationSpeed=lightPropSpeed
-                         )
-
-    main_path.add_module("DAFRecoFitter",
-                         # probCut=0.00001,
-                         pdgCodesToUseForFitting=13,
-                         )
-
-    # Select the tracks for the time extraction.
-    #        main_path.add_module("SelectionForTrackTimeExtraction")
-
-    # Extract the time: either with the TrackTimeExtraction or the FullGridTrackTimeExtraction module.
-    #        main_path.add_module("FullGridTrackTimeExtraction")
-
-    main_path.add_module("DAFRecoFitter",
-                         # probCut=0.00001,
-                         pdgCodesToUseForFitting=13,
-                         )
-    main_path.add_module('TrackCreator',
-                         defaultPDGCode=13,
-                         useClosestHitToIP=True
-                         )
-
-    # Add further reconstruction modules
-    # add_posttracking_reconstruction(main_path)
-
-    # I have a problem with the following line ? significantly reduced [mdst] output, why ?
-    add_dedx_modules(main_path, pruneTracks=False)
-    add_ext_module(main_path)
-
-    add_top_modules(main_path)
-    # add_arich_modules(main_path)
-
-    add_ecl_modules(main_path)
-    add_ecl_track_matcher_module(main_path)
-    add_ecl_eip_module(main_path)
-    add_ecl_mc_matcher_module(main_path)
-
-    add_klm_modules(main_path)
-    add_klm_mc_matcher_module(main_path)
-
-    add_muid_module(main_path)
-    add_pid_module(main_path)
-
-    # Add output
-    # add_mdst_output(main_path,mc=True,filename='/ghi/fs01/belle2/bdata/users/karim/MC_data/Cosmics/mdst_run' + run + '.root',
-    #                additionalBranches=['ECLDigits','ECLCalDigits','RecoTracks'])
-
-    #
-    main_path.add_module('MillepedeCollector', minPValue=0., components=['CDCAlignment'])
-    output = register_module('RootOutput')
-    outputFilename = '/ghi/fs01/belle2/bdata/users/karim/MC_data/Cosmics/dst_run' + run + '.root'
-    output.param('outputFileName', outputFilename)
-    main_path.add_module(output)
-
-    print_path(main_path)
-    process(main_path)
-    print(statistics)
-
-if __name__ == "__main__":
-
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('run', help='Run number')
-    parser.add_argument('--period', dest='period', default='normal', help='Data period')
-
-    args = parser.parse_args()
-
-    date = datetime.datetime.today()
-    print(date.strftime('Start at : %d-%m-%y %H:%M:%S\n'))
-    main(args.run, args.period, '')
-    date = datetime.datetime.today()
-    print(date.strftime('End at : %y-%m-%d %H:%M:%S\n'))
+print_path(main_path)
+process(main_path)
+print(statistics)

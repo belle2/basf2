@@ -27,7 +27,7 @@ vxd = file.Get("VXDAlignment")
 
 fileName = inputroot + '.txt'
 text_file = open(fileName, "w")
-text_file.write("layer ladder sensor value value value\n")
+text_file.write("layer ladder sensor param value\n")
 for entry in vxd.getMap():
     element_parameter = entry.first
     value = entry.second

@@ -1,27 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2
 from ROOT import Belle2
 
-import beamparameters as beam
-import simulation as sim
-import reconstruction as reco
-import modularAnalysis as ana
+import beamparameters
+import simulation
 
-reset_database()
-use_database_chain()
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
-# use_local_database('localdb/database.txt')
+main = basf2.create_path()
 
-main = create_path()
 main.add_module("EventInfoSetter")
-beam.add_beamparameters(main, "Y4S")
+# beamparameters.add_beamparameters(main, "Y4S")
 main.add_module('Gearbox')
 main.add_module('Geometry')
-main.add_module('ParticleGun', pdgCodes=[13, -13])
-sim.add_simulation(main)
-main.add_module("Progress")
+main.add_module('EvtGenInput')
+simulation.add_simulation(main)
 main.add_module("RootOutput")
-process(main)
-print(statistics)
+main.add_module("Progress")
+
+basf2.process(main)
+print(basf2.statistics)

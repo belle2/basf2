@@ -453,25 +453,33 @@ std::string MillepedeCollectorModule::getUniqueMilleName()
 
 void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* particle)
 {
-  // Do the hits synchronisation
-  auto relatedRecoHitInformation =
-    recoTrack.getRelationsTo<RecoHitInformation>(recoTrack.getStoreArrayNameOfRecoHitInformation());
+  // For already fitted tracks, try to get fitted (DAF) weights for CDC
+  if (recoTrack.getTrackFitStatus() && recoTrack.getTrackFitStatus()->isFitted()) {
+    // Do the hits synchronisation
+    auto relatedRecoHitInformation =
+      recoTrack.getRelationsTo<RecoHitInformation>(recoTrack.getStoreArrayNameOfRecoHitInformation());
 
-  for (RecoHitInformation& recoHitInformation : relatedRecoHitInformation) {
-    const genfit::TrackPoint* trackPoint = recoTrack.getCreatedTrackPoint(&recoHitInformation);
-    if (trackPoint) {
-      if (not trackPoint->hasFitterInfo(recoTrack.getCardinalRepresentation()))
-        continue;
-      auto kalmanFitterInfo = dynamic_cast<genfit::KalmanFitterInfo*>(trackPoint->getFitterInfo());
-      if (not kalmanFitterInfo) {
-        continue;
-      } else {
-        std::vector<double> weights = kalmanFitterInfo->getWeights();
-        if (weights.size() == 2) {
-          if (weights.at(0) > weights.at(1))
-            recoHitInformation.setRightLeftInformation(RecoHitInformation::c_left);
-          else if (weights.at(0) < weights.at(1))
-            recoHitInformation.setRightLeftInformation(RecoHitInformation::c_right);
+    for (RecoHitInformation& recoHitInformation : relatedRecoHitInformation) {
+
+      if (recoHitInformation.getFlag() == RecoHitInformation::c_pruned) {
+        B2FATAL("Found pruned point in RecoTrack. Pruned tracks cannot be used in MillepedeCollector.");
+      }
+
+      const genfit::TrackPoint* trackPoint = recoTrack.getCreatedTrackPoint(&recoHitInformation);
+      if (trackPoint) {
+        if (not trackPoint->hasFitterInfo(recoTrack.getCardinalRepresentation()))
+          continue;
+        auto kalmanFitterInfo = dynamic_cast<genfit::KalmanFitterInfo*>(trackPoint->getFitterInfo());
+        if (not kalmanFitterInfo) {
+          continue;
+        } else {
+          std::vector<double> weights = kalmanFitterInfo->getWeights();
+          if (weights.size() == 2) {
+            if (weights.at(0) > weights.at(1))
+              recoHitInformation.setRightLeftInformation(RecoHitInformation::c_left);
+            else if (weights.at(0) < weights.at(1))
+              recoHitInformation.setRightLeftInformation(RecoHitInformation::c_right);
+          }
         }
       }
     }
@@ -609,10 +617,10 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
       }
     }
   } catch (...) {
-    B2ERROR("SVD Cluster combination failed.");
+    B2ERROR("SVD Cluster combination failed. This is symptomatic of pruned tracks. MillepedeCollector cannot process pruned tracks.");
   }
   try {
-    gbl->processTrack(&gfTrack, true);
+    gbl->processTrackWithRep(&gfTrack, gfTrack.getCardinalRep(), true);
   } catch (...) {
     B2ERROR("GBL fit failed.");
   }
@@ -625,7 +633,7 @@ std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::
   for (auto particle : particles) {
     auto belle2Track = particle->getTrack();
     if (!belle2Track) {
-      B2INFO("No Belle2::Track for particle");
+      B2WARNING("No Belle2::Track for particle (particle->X");
       continue;
     }
 //     auto trackFitResult = belle2Track->getTrackFitResult(Const::chargedStableSet.find(abs(particle->getPDGCode())));
@@ -637,7 +645,7 @@ std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::
     auto recoTrack = belle2Track->getRelatedTo<RecoTrack>();
 
     if (!recoTrack) {
-      B2INFO("No related RecoTrack for Belle2::Track");
+      B2WARNING("No related RecoTrack for Belle2::Track (particle->Track->X)");
       continue;
     }
 
@@ -645,16 +653,16 @@ std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::
     auto& track = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
 
     if (!track.hasFitStatus()) {
-      B2INFO("Track has no fit status");
+      B2WARNING("Track has no fit status");
       continue;
     }
     genfit::GblFitStatus* fs = dynamic_cast<genfit::GblFitStatus*>(track.getFitStatus());
     if (!fs) {
-      B2INFO("Fit status is not GblFitStatus.");
+      B2WARNING("Track FitStatus is not GblFitStatus.");
       continue;
     }
     if (!fs->isFittedWithReferenceTrack()) {
-      B2INFO("Track is not fitted with reference track.");
+      B2WARNING("Track is not fitted with reference track.");
       continue;
     }
 

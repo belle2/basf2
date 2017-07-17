@@ -14,13 +14,20 @@ primary_vertices = ['Z0:mumu']
 gearbox_file = ''
 geometry_components = []
 do_reconstruction = False
+do_cosmics_reconstruction = False
 do_analysis = False
 magnet_off = False
 
 dirty_data = False
 
 
-def get_path(gearboxFile=None, geometryComponents=None, doReconstruction=None, doAnalysis=None, magnetOff=None):
+def get_path(
+        gearboxFile=None,
+        geometryComponents=None,
+        doReconstruction=None,
+        doAnalysis=None,
+        magnetOff=None,
+        doCosmicsReconstruction=None):
     if gearboxFile is None:
         gearboxFile = gearbox_file
     if geometryComponents is None:
@@ -31,6 +38,8 @@ def get_path(gearboxFile=None, geometryComponents=None, doReconstruction=None, d
         doAnalysis = do_analysis
     if magnetOff is None:
         magnetOff = magnet_off
+    if do_cosmics_reconstruction is None:
+        doCosmicsReconstruction = do_cosmics_reconstruction
 
     import modularAnalysis as ana
     import reconstruction as reco
@@ -44,6 +53,9 @@ def get_path(gearboxFile=None, geometryComponents=None, doReconstruction=None, d
 
     if doReconstruction:
         reco.add_reconstruction(path, pruneTracks=False, components=geometryComponents if geometryComponents else [])
+
+    if doCosmicsReconstruction:
+        reco.add_cosmics_reconstruction(path, pruneTracks=False, components=geometryComponents if geometryComponents else [])
 
     if 'SetupGenfitExtrapolation' not in path:
         path.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
@@ -95,6 +107,7 @@ def setup_BeamVertex():
 
 def setup_VXDHalfShells():
     millepede = setup_default()
+    millepede.set_components(['VXDAlignment'])
     millepede.fixSVDPat()
     for layer in range(1, 7):
         for ladder in range(1, 17):
@@ -176,6 +189,8 @@ def setup_EKLMAlignment():
 def setup_CDCLayers_GCR_Karim():
     geometry = '/geometry/GCR_Summer2017.xml'
     recotracks = ['RecoTracks']
+    global do_cosmics_reconstruction
+    do_cosmics_reconstruction = True
 
     # Inherit settings
     millepede = setup_CDCLayers()

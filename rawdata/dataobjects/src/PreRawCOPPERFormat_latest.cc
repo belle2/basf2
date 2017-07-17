@@ -1074,7 +1074,7 @@ int PreRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int fine
   } else {
     PrintData(m_buffer, m_nwords);
 
-    printf("Invalid B2LHSLB magic words 0x%x 0x%x. Exiting... :%s %s %d\n",
+    printf("Invalid B2LHSLB magic words : header 0x%x (= should be ffaa**** ) or trailer 0x%x (= should be ff55**** ). Exiting... :%s %s %d\n",
            finesse_buf[ POS_MAGIC_B2LHSLB ],
            finesse_buf[ finesse_nwords - SIZE_B2LHSLB_TRAILER + POS_CHKSUM_B2LHSLB ],
            __FILE__, __PRETTY_FUNCTION__, __LINE__);

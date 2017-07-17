@@ -141,8 +141,7 @@ namespace Belle2 {
 
       std::string m_componentName; /**< Name of the current bg component. */
       double m_componentTime; /**< Time of current component. */
-      double m_triggerWidth; /**< RMS of trigger time measurement.*/
-      double m_acceptanceWidth; /**< A hit is accepted if arrived within +/- m_acceptanceWidth * RMS(hit time - trigger time). */
+      double m_integrationTime; /**< Integration time of PXD. */
 
       std::map<VxdID, SensorData> m_sensorData; /**< Struct to hold sensor-wise background data. */
 

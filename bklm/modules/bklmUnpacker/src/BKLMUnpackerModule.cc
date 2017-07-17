@@ -310,7 +310,7 @@ void BKLMUnpackerModule::event()
           if (layer > 1) moduleId |= BKLM_INRPC_MASK;
           moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
 
-          BKLMDigit digit(moduleId, ctime, tdc, charge);
+          BKLMDigit digit(moduleId, ctime, tdc, m_scintADCOffset - charge);
           if (layer < 2 && !((m_scintADCOffset - charge) < m_scintThreshold))  digit.isAboveThreshold(true);
 
           B2DEBUG(1, "BKLMUnpackerModule:: digi after Unpacker: sector: " << digit.getSector() << " isforward: " << digit.isForward() <<

@@ -161,7 +161,7 @@ void SVDCheckDigitsModule::event()
     // and relations. We don't care about small deviations, so we use loose comparison
     // rather than ==.
     const SVDShaperDigit& shaperDigit = *storeShaperDigits[i];
-    B2DEBUG(99, shaperDigit.print());
+    B2DEBUG(99, shaperDigit.toString());
     const RelationVector<SVDDigit>& onedigits =
       shaperDigit.getRelationsTo<SVDDigit>(storeDigits.getName());
     // Number of related 1-digits should equal the number of non-zero samples in the 6-digit.
@@ -176,7 +176,7 @@ void SVDCheckDigitsModule::event()
       assert_eq(digit.getCellID(), shaperDigit.getCellID());
       assert_float(digit.getCharge(), sixSamples[digit.getIndex()]);
     }
-    // 6-to-1 relation weights are equal to digit signals
+    // 6-to-1 relation weights are equal to digit signals, modulo rounding error
     for (size_t i = 0; i < onedigits.size(); ++i)
       assert_float(onedigits[i]->getCharge(), onedigits.weight(i));
 

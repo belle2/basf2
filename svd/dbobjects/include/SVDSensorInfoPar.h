@@ -63,8 +63,12 @@ namespace Belle2 {
      * @param backplaneCapacitanceV Backplane capacitance/cm for V strips.
      * @param interstripCapacitanceV Interstrip capacitance/cm for V strips.
      * @param coupling capacitanceV Coupling capacitance/cm for V strips,
+     * @param AduEquivalentU Charge in electrons per 1 ADU, U strips.
+     * @param AduEquivalentV Charge in electrons per 1 ADU, V strips.
      * @param electronicNoiseU Noise on U-strips; for barrels the value for Origami,
      * @param electronicNoiseV Noise on V-strips, for barrels the value for Origami,
+     * @param AduEquivalentSbwU Charge in electrons per 1 ADU, u-strips in barrel Sbw sensors.
+     * @param AduEquivalentSbwV Charge in electrons per 1 ADU, v-strips in barrel Sbw sensors.
      * @param electronicNoiseSbwU Noise on U strips of backward barrel senosrs,
      * @param electronicNoiseSbwV Noise on V strips of backward barrel sensors
      */
@@ -74,7 +78,9 @@ namespace Belle2 {
                          double couplingCapacitanceU,
                          double backplaneCapacitanceV, double interstripCapacitanceV,
                          double couplingCapacitanceV,
+                         double AduEquivalentU, double AduEquivalentV,
                          double electronicNoiseU, double electronicNoiseV,
+                         double AduEquivalentSbwU, double AduEquivalentSbwV,
                          double electronicNoiseSbwU, double electronicNoiseSbwV)
     {
       m_stripEdgeU = stripEdgeU,
@@ -87,8 +93,12 @@ namespace Belle2 {
       m_backplaneCapacitanceV = backplaneCapacitanceV;
       m_interstripCapacitanceV = interstripCapacitanceV;
       m_couplingCapacitanceV = couplingCapacitanceV;
+      m_aduEquivalentU = AduEquivalentU;
+      m_aduEquivalentV = AduEquivalentV;
       m_electronicNoiseU = electronicNoiseU;
       m_electronicNoiseV = electronicNoiseV;
+      m_aduEquivalentSbwU = AduEquivalentSbwU;
+      m_aduEquivalentSbwV = AduEquivalentSbwV;
       m_electronicNoiseSbwU = electronicNoiseSbwU;
       m_electronicNoiseSbwV = electronicNoiseSbwV;
     }
@@ -115,10 +125,18 @@ namespace Belle2 {
     double getInterstripCapacitanceV() const { return m_interstripCapacitanceV; }
     /** Return the coupling capacitance/cm for V-side strips*/
     double getCouplingCapacitanceV() const { return m_couplingCapacitanceV; }
+    /** Return ADU equivalent for U strips */
+    double getAduEquivalentU() const {return m_aduEquivalentU;}
+    /** Return ADU equivalent for V strips */
+    double getAduEquivalentV() const {return m_aduEquivalentV; }
     /** Return electronic noise in e- for u (short) strips */
     double getElectronicNoiseU() const {return m_electronicNoiseU; }
     /** Return electronic noise in e- for v (long) strips */
     double getElectronicNoiseV() const {return m_electronicNoiseV; }
+    /** Return ADU equivalent for U strips in Sbw barrel sensor */
+    double getAduEquivalentSbwU() const {return m_aduEquivalentSbwU;}
+    /** Return ADU equivalent for V strips in Sbw barrel sensor */
+    double getAduEquivalentSbwV() const {return m_aduEquivalentSbwV; }
     /** Return electronic noise in e- for u (short) strips in bw barrel sensors */
     double getElectronicNoiseSbwU() const {return m_electronicNoiseSbwU; }
     /** Return electronic noise in e- for v (long) strips in bw barrel sensors */
@@ -147,16 +165,24 @@ namespace Belle2 {
     double m_interstripCapacitanceV;
     /** The coupling capacitance/cm for/g V-side strips. */
     double m_couplingCapacitanceV;
+    /** ADU equivalent (electrons/ADU) for U strips */
+    double m_aduEquivalentU;
+    /** ADU equivalent (electrons/ADU) for V strips */
+    double m_aduEquivalentV;
     /** The electronic noise for U (short, n-side) strips. */
     double m_electronicNoiseU;
     /** The electronic noise for V (long, p-side) strips. */
     double m_electronicNoiseV;
+    /** ADU equivalent (electrons/ADU) for U strips, Sbw barrel sensors */
+    double m_aduEquivalentSbwU;
+    /** ADU equivalent (electrons/ADU) for V strips, Sbw barrel sensors */
+    double m_aduEquivalentSbwV;
     /** The electronic noise for U strips in bw barrel (non-Origami) sensors. */
     double m_electronicNoiseSbwU;
     /** The electronic noise for V strips in bw barrel (non-Origami) sensors. */
     double m_electronicNoiseSbwV;
 
-    ClassDef(SVDSensorInfoPar, 6);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(SVDSensorInfoPar, 7);  /**< ClassDef, must be the last term before the closing {}*/
   };
 } // end of namespace Belle2
 

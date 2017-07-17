@@ -37,8 +37,6 @@ namespace Belle2 {
     /** Map of all signals in all sensors */
     typedef std::map<VxdID, Sensor> Sensors;
 
-
-
     /** The SVD Digitizer module.
      * This module is responsible for converting the simulated energy
      * deposition from Geant4 into real SVD detector response of single strips.
@@ -88,11 +86,6 @@ namespace Belle2 {
 
     protected:
 
-      /** A small helper function to convert between electons and ADU */
-      inline double eToADU(double charge) const
-      {
-        return round(std::min(m_maxADC, std::max(m_minADC, charge)) / m_unitADC);
-      }
       // Members holding module parameters:
 
       // 1. Collections
@@ -162,24 +155,11 @@ namespace Belle2 {
        * the SVD. */
       bool m_randomPhaseSampling;
 
-      // 5. Processing
-      /** Whether or not to apply discrete ADC on output values. */
-      bool   m_applyADC;
-      /** Low end of ADC range in e-. */
-      double m_minADC;
-      /** High end of ADC range in e-. */
-      double m_maxADC;
-      /** Number of ADC bits. */
-      int m_bitsADC;
-      /** adu in electrons (derived from the above). */
-      double m_unitADC;
-
-      // 6. Reporting
+      // 5. Reporting
       /** Name of the ROOT filename to output statistics */
       std::string m_rootFilename;
       /** Store waveform data in the reporting file? */
       bool m_storeWaveforms;
-
 
       // Other data members:
 
@@ -196,9 +176,8 @@ namespace Belle2 {
       Sensor*            m_currentSensor;
       /** Pointer to the SensorInfo of the current sensor */
       const SensorInfo*  m_currentSensorInfo;
-      /** Time of the current detector event, from the currently processed SimHit.. */
-      double             m_currentTime;
-
+      /** Time of the current detector event, from the SimHit.. */
+      double m_currentTime;
       /** Thickness of current sensor (read from m_currentSensorInfo).*/
       double m_sensorThickness;
       /** The depletion voltage of the Silicon sensor */
@@ -217,6 +196,10 @@ namespace Belle2 {
       double m_interstripCapacitanceV;
       /** The coupling capacitanceV for the sensor. */
       double m_couplingCapacitanceV;
+      /** ADU equivalent charge for u-strips. */
+      double m_aduEquivalentU;
+      /** ADU equivalent charge for v-strips. */
+      double m_aduEquivalentV;
       /** Electronic noise for u-strips. */
       double m_elNoiseU;
       /** Electronic noise for v-strips. */

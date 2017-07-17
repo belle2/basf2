@@ -123,5 +123,22 @@ namespace Belle2 {
         EXPECT_EQ(trimmedSample, samples[isample]);
       }
     }
+
+    TEST(SVDShaperDigit, TrimmingFunction)
+    {
+
+      // Create an arbitrary 6-digit
+      auto sampleMin =
+        static_cast<SVDShaperDigit::APVFloatSampleType>(std::numeric_limits<SVDShaperDigit::APVRawSampleType>::lowest());
+      auto sampleMax =
+        static_cast<SVDShaperDigit::APVFloatSampleType>(std::numeric_limits<SVDShaperDigit::APVRawSampleType>::max());
+
+      std::vector<float> init_samples({0, -10, 255, 256, 500, -1});
+      for (size_t isample = 0; isample < SVDShaperDigit::c_nAPVSamples; ++isample) {
+        auto trimmedSample = std::max(sampleMin, std::min(sampleMax, init_samples[isample]));
+        EXPECT_EQ(trimmedSample, SVDShaperDigit::trimToSampleRange(init_samples[isample]));
+      }
+    }
+
   } // namespace SVD
 }  // namespace Belle2

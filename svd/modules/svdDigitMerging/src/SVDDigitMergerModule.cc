@@ -228,7 +228,7 @@ void SVDDigitMergerModule::event()
           );
         relShaperDigitDigits.add(nMerged, digit_weights.begin(), digit_weights.end());
         B2DEBUG(90, "Saved ShaperDigit " << nMerged);
-        B2DEBUG(90, shaperDigit->print());
+        B2DEBUG(90, shaperDigit->toString());
         nMerged++;
       } // save if i > 0
       // Reset samples
@@ -268,7 +268,7 @@ void SVDDigitMergerModule::event()
         );
       relShaperDigitDigits.add(nMerged, digit_weights.begin(), digit_weights.end());
       B2DEBUG(90, "Saved 6-digit " << nMerged);
-      B2DEBUG(90, shaperDigit->print());
+      B2DEBUG(90, shaperDigit->toString());
       nMerged++;
     }
   } // for i in 0 to nDigits

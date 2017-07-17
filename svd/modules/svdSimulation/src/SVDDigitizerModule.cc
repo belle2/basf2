@@ -103,13 +103,7 @@ SVDDigitizerModule::SVDDigitizerModule() :
   addParam("RandomPhaseSampling", m_randomPhaseSampling,
            "Start sampling at a random time?", bool(false));
 
-  // 5. Processing
-  addParam("ADC", m_applyADC, "Simulate ADC?", bool(true));
-  addParam("ADCLow", m_minADC, "Low end of ADC range", double(-96000.0));
-  addParam("ADCHigh", m_maxADC, "High end of ADC range", double(288000.0));
-  addParam("ADCbits", m_bitsADC, "Number of ADC bits", int(10));
-
-  // 6. Reporting
+  // 5. Reporting
   addParam("statisticsFilename", m_rootFilename,
            "ROOT Filename for statistics generation. If filename is empty, no statistics will be produced",
            string(""));
@@ -164,9 +158,6 @@ void SVDDigitizerModule::initialize()
   //Convert parameters to correct units
   m_segmentLength *= Unit::mm;
   m_noiseFraction = TMath::Freq(m_SNAdjacent); // 0.9... !
-  m_minADC = m_minADC * Unit::e;
-  m_maxADC = m_maxADC * Unit::e;
-  m_unitADC = (m_maxADC - m_minADC) / (pow(2.0, m_bitsADC) - 1);
   m_samplingTime *= Unit::ns;
   m_shapingTime *= Unit::ns;
 
@@ -201,12 +192,6 @@ void SVDDigitizerModule::initialize()
   B2INFO(" -->  Number of samples:  " << m_nAPV25Samples);
   B2INFO(
     " -->  Random phase sampl.:" << (m_randomPhaseSampling ? "true" : "false"));
-  B2INFO(" PROCESSING:");
-  B2INFO(" -->  ADC:                " << (m_applyADC ? "true" : "false"));
-  B2INFO(" -->  ADC range low (e-): " << m_minADC);
-  B2INFO(" -->  ADC range high (e-):" << m_maxADC);
-  B2INFO(" -->  ADC bits:           " << m_bitsADC);
-  B2INFO(" -->  1 adu (e-)*:        " << m_unitADC);
   B2INFO(" REPORTING: ");
   B2INFO(" -->  statisticsFilename: " << m_rootFilename);
   B2INFO(
@@ -635,6 +620,7 @@ void SVDDigitizerModule::saveDigits()
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
     // u-side digits:
     double elNoiseU = info.getElectronicNoiseU();
+    double aduEquivalentU = info.getAduEquivalentU();
     double charge_thresholdU = m_SNAdjacent * elNoiseU;
     // Add noisy digits
     if (m_applyNoise) {
@@ -682,9 +668,8 @@ void SVDDigitizerModule::saveDigits()
       SVDSignal::relations_map truehits = s.getTrueHitRelations();
       for (int iSample = 0; iSample < m_nAPV25Samples; iSample++) {
         double sampleCharge = samples.at(iSample);
-        //Limit signal to ADC steps
-        if (m_applyADC)
-          sampleCharge = eToADU(sampleCharge);
+        //NB: no longer optional!!! Limit signal to ADC steps
+        sampleCharge = floor(max(0.0, min(255.0, sampleCharge / aduEquivalentU)));
         // Save as a new digit
         int digIndex = storeDigits.getEntries();
         digit_weights.emplace_back(digIndex, sampleCharge);
@@ -715,13 +700,10 @@ void SVDDigitizerModule::saveDigits()
       } // for iSample
       // Save SVDShaperDigits if required
       if (m_generateShaperDigits) {
-        if (m_applyADC)
-          transform(samples.begin(), samples.end(), samples.begin(),
-                    [this](double x)->double { return eToADU(x); });
         SVDShaperDigit::APVRawSamples rawSamples;
         std::transform(samples.begin(), samples.end(), rawSamples.begin(),
-        [](double x)->SVDShaperDigit::APVRawSampleType {
-          return static_cast<SVDShaperDigit::APVRawSampleType>(x);
+        [&](double x)->SVDShaperDigit::APVRawSampleType {
+          return SVDShaperDigit::trimToSampleRange(x / aduEquivalentU);
         });
         // Save as a new digit
         int digIndex = storeShaperDigits.getEntries();
@@ -740,6 +722,7 @@ void SVDDigitizerModule::saveDigits()
 
     // v-side digits:
     double elNoiseV = info.getElectronicNoiseV();
+    double aduEquivalentV = info.getAduEquivalentV();
     double charge_thresholdV = m_SNAdjacent * elNoiseV;
     // Add noisy digits
     if (m_applyNoise) {
@@ -787,9 +770,8 @@ void SVDDigitizerModule::saveDigits()
       SVDSignal::relations_map truehits = s.getTrueHitRelations();
       for (int iSample = 0; iSample < m_nAPV25Samples; iSample++) {
         double sampleCharge = samples.at(iSample);
-        //Limit signal to ADC steps
-        if (m_applyADC)
-          sampleCharge = eToADU(sampleCharge);
+        //NB: no longer optional!!! Limit signal to 8-bit ADC steps
+        sampleCharge = floor(max(0.0, min(255.0, sampleCharge / aduEquivalentV)));
         // Save as a new digit
         int digIndex = storeDigits.getEntries();
         digit_weights.emplace_back(digIndex, sampleCharge);
@@ -820,13 +802,10 @@ void SVDDigitizerModule::saveDigits()
       } // for iSample
       // Save SVDShaperDigits if required
       if (m_generateShaperDigits) {
-        if (m_applyADC)
-          transform(samples.begin(), samples.end(), samples.begin(),
-                    [this](double x)->double { return eToADU(x); });
         SVDShaperDigit::APVRawSamples rawSamples;
         std::transform(samples.begin(), samples.end(), rawSamples.begin(),
-        [](double x)->SVDShaperDigit::APVRawSampleType {
-          return static_cast<SVDShaperDigit::APVRawSampleType>(x);
+        [&](double x)->SVDShaperDigit::APVRawSampleType {
+          return SVDShaperDigit::trimToSampleRange(x / aduEquivalentV);
         });
         // Save as a new digit
         int digIndex = storeShaperDigits.getEntries();

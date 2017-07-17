@@ -73,6 +73,8 @@
 			<BackplaneCapacitanceV unit="pF/cm">0.42</BackplaneCapacitanceV>
 			<InterstripCapacitanceV unit="pF/cm">0.65</InterstripCapacitanceV>
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
+                        <ADUEquivalentU unit="e">375</ADUEquivalentU>
+                        <ADUEquivalentV unit="e">375</ADUEquivalentV>
                         <ElectronicNoiseU unit="e">900</ElectronicNoiseU>
                         <ElectronicNoiseV unit="e">700</ElectronicNoiseV>
 		</Active>
@@ -106,8 +108,12 @@
 			<InterstripCapacitanceV unit="pF/cm">0.65</InterstripCapacitanceV>
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
                         <!-- All except backward sensors are on Origami -->
+                        <ADUEquivalentU unit="e">375</ADUEquivalentU>
+                        <ADUEquivalentV unit="e">375</ADUEquivalentV>
                         <ElectronicNoiseU unit="e">1100</ElectronicNoiseU>
                         <ElectronicNoiseV unit="e">650</ElectronicNoiseV>
+                        <ADUEquivalentSbwU unit="e">375</ADUEquivalentSbwU>
+                        <ADUEquivalentSbwV unit="e">375</ADUEquivalentSbwV>
                         <ElectronicNoiseSbwU unit="e">950</ElectronicNoiseSbwU>
                         <ElectronicNoiseSbwV unit="e">750</ElectronicNoiseSbwV>
 		</Active>
@@ -140,6 +146,8 @@
 			<BackplaneCapacitanceV unit="pF/cm">0.26</BackplaneCapacitanceV>
 	        	<InterstripCapacitanceV unit="pF/cm">0.75</InterstripCapacitanceV>
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
+                        <ADUEquivalentU unit="e">375</ADUEquivalentU>
+                        <ADUEquivalentV unit="e">375</ADUEquivalentV>
                         <ElectronicNoiseU unit="e">1100</ElectronicNoiseU>
                         <ElectronicNoiseV unit="e">800</ElectronicNoiseV>
 		</Active>

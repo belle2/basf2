@@ -39,7 +39,7 @@ namespace Belle2 {
      * An integer type is sufficient for storage, but getters will return array
      * of doubles suitable for computing.
      */
-    typedef short APVRawSampleType;
+    typedef unsigned char APVRawSampleType;
     typedef std::array<APVRawSampleType, c_nAPVSamples> APVRawSamples;
 
     /** Types for array of samples for processing.
@@ -118,9 +118,9 @@ namespace Belle2 {
     /** Get arrray of samples.
      * @return std::array of 6 APV25 samples.
      */
-    const APVFloatSamples& getSamples() const
+    APVFloatSamples getSamples() const
     {
-      static APVFloatSamples returnSamples;
+      APVFloatSamples returnSamples;
       std::transform(m_samples.begin(), m_samples.end(), returnSamples.begin(),
       [](APVRawSampleType x) { return static_cast<APVFloatSampleType>(x); });
       return returnSamples;
@@ -137,8 +137,23 @@ namespace Belle2 {
     unsigned short getPipelineAddress() const
     { return static_cast<unsigned short>(m_pipelineAddress);}
 
+    /**
+     * Convert a value to sample range.
+     * @param value to be converted
+     * @result APVRawSampleType representation of x
+     */
+    template<typename T> static SVDShaperDigit::APVRawSampleType trimToSampleRange(T x)
+    {
+      T trimmedX = std::min(
+                     static_cast<T>(std::numeric_limits<SVDShaperDigit::APVRawSampleType>::max()),
+                     std::max(
+                       static_cast<T>(std::numeric_limits<SVDShaperDigit::APVRawSampleType>::lowest()),
+                       x));
+      return static_cast<SVDShaperDigit::APVRawSampleType>(trimmedX);
+    }
+
     /** Display main parameters in this object */
-    std::string print() const
+    std::string toString() const
     {
       VxdID thisSensorID(m_sensorID);
 
@@ -182,21 +197,6 @@ namespace Belle2 {
 
   private:
 
-    /**
-     * Convert a value to sample range.
-     * @param value to be converted
-     * @result APVRawSampleType representation of x
-     */
-    template<typename T> APVRawSampleType trimToSampleRange(T x) const
-    {
-      T trimmedX = std::min(
-                     static_cast<T>(std::numeric_limits<APVRawSampleType>::max()),
-                     std::max(
-                       static_cast<T>(std::numeric_limits<APVRawSampleType>::lowest()),
-                       x));
-      return static_cast<APVRawSampleType>(trimmedX);
-    }
-
     VxdID::baseType m_sensorID; /**< Compressed sensor identifier.*/
     bool m_isU;                /**< True if U, false if V. */
     short m_cellID;            /**< Strip coordinate in pitch units. */
@@ -207,6 +207,9 @@ namespace Belle2 {
     ClassDef(SVDShaperDigit, 1)
 
   }; // class SVDShaperDigit
+
+
+
 
 } // end namespace Belle2
 

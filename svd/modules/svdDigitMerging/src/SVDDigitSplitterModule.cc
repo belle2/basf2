@@ -181,7 +181,7 @@ void SVDDigitSplitterModule::event()
 
     size_t sixIndex = shaperDigit.getArrayIndex();
     B2DEBUG(90, "Processing shaper digit " << sixIndex);
-    B2DEBUG(90, shaperDigit.print());
+    B2DEBUG(90, shaperDigit.toString());
 
     VxdID sensorID = shaperDigit.getSensorID();
     bool uSide = shaperDigit.isUStrip();

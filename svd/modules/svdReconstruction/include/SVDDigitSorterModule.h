@@ -56,14 +56,6 @@ namespace Belle2 {
       bool m_mergeDuplicates;
       /** Minimum number of samples over threshold to accept the digit */
       int m_minSamples;
-      /** Low limit of ADC range in electrons. */
-      double m_minADC;
-      /** High limit of ADC range in electrons. */
-      double m_maxADC;
-      /** Number of ADC bits. */
-      int m_bitsADC;
-      /** Electron equivalent of 1 ADU. */
-      double m_e2ADC;
       /** Suppression threshold */
       double m_rejectionThreshold;
       /** Name of the ignored strips list xml */

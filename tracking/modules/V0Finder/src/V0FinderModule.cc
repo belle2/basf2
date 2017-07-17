@@ -166,6 +166,8 @@ void V0FinderModule::event()
     for (auto& trackMinus : tracksMinus) {
       v0Fitter.fitAndStore(trackPlus, trackMinus, Const::Kshort);
       v0Fitter.fitAndStore(trackPlus, trackMinus, Const::photon);
+      v0Fitter.fitAndStore(trackPlus, trackMinus, Const::Lambda);
+      v0Fitter.fitAndStore(trackPlus, trackMinus, Const::antiLambda);
     }
   }
 }

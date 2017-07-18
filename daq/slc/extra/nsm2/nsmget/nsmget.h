@@ -14,7 +14,7 @@
 #include <string>
 #include <map>
 
-#include "nsmparse.h"
+#include "../corelib/nsmparse.h"
 
 enum nsmget_native_t {
   INT64  = 0,
@@ -38,6 +38,11 @@ struct nsmget_entry_t {
 typedef std::map<std::string, nsmget_entry_t> nsmget_map_t;
 
 NSMparse*       nsmget_file(const std::string& format_name);
+// after nsm2-1944
+int             nsmget_path(const std::string& variable_path,
+                            std::string& data_name,
+                            std::string& variable_name);
+// until nsm2-1941
 int             nsmget_path(const std::string& variable_path,
                             std::string& data_name,
                             std::string& struct_name,

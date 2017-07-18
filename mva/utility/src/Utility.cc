@@ -9,8 +9,9 @@
  **************************************************************************/
 
 #include <mva/utility/Utility.h>
-#include <mva/utility/SPlot.h>
+#include <mva/utility/DataDriven.h>
 #include <mva/methods/PDF.h>
+#include <mva/methods/Reweighter.h>
 #include <mva/methods/Trivial.h>
 #include <mva/methods/Combination.h>
 
@@ -210,11 +211,28 @@ namespace Belle2 {
 
     void teacher(const GeneralOptions& general_options, const SpecificOptions& specific_options, const MetaOptions& meta_options)
     {
-      if (not meta_options.m_use_splot) {
+      unsigned int number_of_enabled_meta_trainings = 0;
+      if (meta_options.m_use_splot)
+        number_of_enabled_meta_trainings++;
+      if (meta_options.m_use_sideband_substraction)
+        number_of_enabled_meta_trainings++;
+      if (meta_options.m_use_reweighting)
+        number_of_enabled_meta_trainings++;
+
+      if (number_of_enabled_meta_trainings > 1) {
+        B2ERROR("You enabled more than one meta training option. You can only use one (sPlot, SidebandSubstraction or Reweighting)");
+        return;
+      }
+
+      if (meta_options.m_use_splot) {
+        teacher_splot(general_options, specific_options, meta_options);
+      } else if (meta_options.m_use_sideband_substraction) {
+        teacher_sideband_substraction(general_options, specific_options, meta_options);
+      } else if (meta_options.m_use_reweighting) {
+        teacher_reweighting(general_options, specific_options, meta_options);
+      } else {
         ROOTDataset data(general_options);
         teacher_dataset(general_options, specific_options, data);
-      } else {
-        teacher_splot(general_options, specific_options, meta_options);
       }
     }
 
@@ -313,6 +331,91 @@ namespace Belle2 {
       auto combination_expert = teacher_dataset(combination_general_options, combination_options, data_dataset);
 
       return combination_expert;
+    }
+
+    std::unique_ptr<Belle2::MVA::Expert> teacher_reweighting(const GeneralOptions& general_options,
+                                                             const SpecificOptions& specific_options,
+                                                             const MetaOptions& meta_options)
+    {
+      if (std::find(general_options.m_variables.begin(), general_options.m_variables.end(),
+                    meta_options.m_reweighting_variable) != general_options.m_variables.end()) {
+        B2ERROR("You cannot use the reweighting variable as a feature in your training");
+        return nullptr;
+      }
+
+      GeneralOptions data_general_options = general_options;
+      data_general_options.m_target_variable = "";
+      data_general_options.m_datafiles = meta_options.m_reweighting_data_files;
+      ROOTDataset data_dataset(data_general_options);
+
+      GeneralOptions mc_general_options = general_options;
+      mc_general_options.m_datafiles = meta_options.m_reweighting_mc_files;
+      ROOTDataset mc_dataset(mc_general_options);
+
+      CombinedDataset boost_dataset(general_options, data_dataset, mc_dataset);
+
+      GeneralOptions boost_general_options = general_options;
+      boost_general_options.m_identifier = general_options.m_identifier + "_boost.xml";
+      auto boost_expert = teacher_dataset(boost_general_options, specific_options, boost_dataset);
+
+      GeneralOptions reweighter_general_options = general_options;
+      reweighter_general_options.m_identifier = meta_options.m_reweighting_identifier;
+      reweighter_general_options.m_method = "Reweighter";
+      ReweighterOptions reweighter_specific_options;
+      reweighter_specific_options.m_weightfile = boost_general_options.m_identifier;
+      reweighter_specific_options.m_variable = meta_options.m_reweighting_variable;
+
+      if (meta_options.m_reweighting_variable != "") {
+        if (std::find(reweighter_general_options.m_spectators.begin(), reweighter_general_options.m_spectators.end(),
+                      meta_options.m_reweighting_variable) == reweighter_general_options.m_spectators.end() and
+            std::find(reweighter_general_options.m_variables.begin(), reweighter_general_options.m_variables.end(),
+                      meta_options.m_reweighting_variable) == reweighter_general_options.m_variables.end() and
+            reweighter_general_options.m_target_variable != meta_options.m_reweighting_variable and
+            reweighter_general_options.m_weight_variable != meta_options.m_reweighting_variable) {
+          reweighter_general_options.m_spectators.push_back(meta_options.m_reweighting_variable);
+        }
+      }
+
+      ROOTDataset dataset(reweighter_general_options);
+      auto reweight_expert = teacher_dataset(reweighter_general_options, reweighter_specific_options, dataset);
+      auto weights = reweight_expert->apply(dataset);
+      ReweightingDataset reweighted_dataset(general_options, dataset, weights);
+      auto expert = teacher_dataset(general_options, specific_options, reweighted_dataset);
+
+      return expert;
+    }
+
+    std::unique_ptr<Belle2::MVA::Expert> teacher_sideband_substraction(const GeneralOptions& general_options,
+        const SpecificOptions& specific_options,
+        const MetaOptions& meta_options)
+    {
+
+      if (std::find(general_options.m_variables.begin(), general_options.m_variables.end(),
+                    meta_options.m_sideband_variable) != general_options.m_variables.end()) {
+        B2ERROR("You cannot use the sideband variable as a feature in your training");
+        return nullptr;
+      }
+
+      GeneralOptions data_general_options = general_options;
+      if (std::find(data_general_options.m_spectators.begin(), data_general_options.m_spectators.end(),
+                    meta_options.m_sideband_variable) == data_general_options.m_spectators.end()) {
+        data_general_options.m_spectators.push_back(meta_options.m_sideband_variable);
+      }
+      ROOTDataset data_dataset(data_general_options);
+
+      GeneralOptions mc_general_options = general_options;
+      mc_general_options.m_datafiles = meta_options.m_sideband_mc_files;
+      if (std::find(mc_general_options.m_spectators.begin(), mc_general_options.m_spectators.end(),
+                    meta_options.m_sideband_variable) == mc_general_options.m_spectators.end()) {
+        mc_general_options.m_spectators.push_back(meta_options.m_sideband_variable);
+      }
+      ROOTDataset mc_dataset(mc_general_options);
+
+      GeneralOptions sideband_general_options = general_options;
+      SidebandDataset sideband_dataset(sideband_general_options, data_dataset, mc_dataset, meta_options.m_sideband_variable);
+      auto expert = teacher_dataset(general_options, specific_options, sideband_dataset);
+
+      return expert;
     }
 
 

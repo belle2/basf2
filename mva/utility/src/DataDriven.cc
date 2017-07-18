@@ -8,18 +8,96 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <mva/utility/SPlot.h>
+#include <mva/utility/DataDriven.h>
 #include <mva/utility/Utility.h>
 #include <mva/methods/PDF.h>
 #include <mva/methods/Trivial.h>
 #include <mva/methods/Combination.h>
 
 #include <framework/logging/Logger.h>
+#include <iostream>
 
 namespace Belle2 {
   namespace MVA {
 
-    SPlotDataset::SPlotDataset(GeneralOptions& general_options, Dataset& dataset, const std::vector<float>& weights,
+    ReweightingDataset::ReweightingDataset(const GeneralOptions& general_options, Dataset& dataset,
+                                           const std::vector<float>& weights) : Dataset(general_options), m_dataset(dataset), m_weights(weights) { }
+
+    void ReweightingDataset::loadEvent(unsigned int event)
+    {
+      m_dataset.loadEvent(event);
+      m_input = m_dataset.m_input;
+      m_spectators = m_dataset.m_spectators;
+      m_isSignal = m_dataset.m_isSignal;
+      m_target = m_dataset.m_target;
+      m_weight = m_weights[event] * m_dataset.m_weight;
+    }
+
+    SidebandDataset::SidebandDataset(const GeneralOptions& general_options, Dataset& dataset, Dataset& mc_dataset,
+                                     std::string sideband_variable) : Dataset(general_options), m_dataset(dataset)
+    {
+
+      m_spectator_index = mc_dataset.getSpectatorIndex(sideband_variable);
+
+      double sum_signal_sr = 0.0;
+      double sum_sr = 0.0;
+      double sum_signal_br = 0.0;
+      double sum_br = 0.0;
+      double sum_signal_nr = 0.0;
+      double sum_nr = 0.0;
+
+      for (unsigned int iEvent = 0; iEvent < mc_dataset.getNumberOfEvents(); ++iEvent) {
+        mc_dataset.loadEvent(iEvent);
+        if (mc_dataset.m_spectators[m_spectator_index] == 1.0) {
+          if (mc_dataset.m_isSignal)
+            sum_signal_sr += mc_dataset.m_weight;
+          sum_sr += mc_dataset.m_weight;
+        } else if (mc_dataset.m_spectators[m_spectator_index] == 2.0) {
+          if (mc_dataset.m_isSignal)
+            sum_signal_br += mc_dataset.m_weight;
+          sum_br += mc_dataset.m_weight;
+        } else if (mc_dataset.m_spectators[m_spectator_index] == 3.0) {
+          if (mc_dataset.m_isSignal)
+            sum_signal_nr += mc_dataset.m_weight;
+          sum_nr += mc_dataset.m_weight;
+        }
+      }
+
+      if (sum_signal_br / sum_br > 0.05) {
+        B2WARNING("The background region you defined in the sideband substraction contains more than 5% signal");
+      }
+      if (sum_signal_nr / sum_nr > 0.05) {
+        B2WARNING("The negative signal region you defined in the sideband substraction contains more than 5% signal");
+      }
+
+      m_negative_signal_weight = - sum_signal_sr / sum_nr;
+    }
+
+    void SidebandDataset::loadEvent(unsigned int event)
+    {
+      m_dataset.loadEvent(event);
+      m_input = m_dataset.m_input;
+      m_spectators = m_dataset.m_spectators;
+      m_weight = m_dataset.m_weight;
+      if (m_spectators[m_spectator_index] == 1.0) {
+        m_isSignal = true;
+        m_target = 1.0;
+      } else if (m_spectators[m_spectator_index] == 2.0) {
+        m_isSignal = false;
+        m_target = 0.0;
+      } else if (m_spectators[m_spectator_index] == 3.0) {
+        m_isSignal = true;
+        m_target = 1.0;
+        m_weight *= m_negative_signal_weight;
+      } else {
+        m_isSignal = false;
+        m_target = false;
+        m_weight = 0.0;
+      }
+    }
+
+
+    SPlotDataset::SPlotDataset(const GeneralOptions& general_options, Dataset& dataset, const std::vector<float>& weights,
                                float signalFraction) : Dataset(general_options), m_dataset(dataset), m_weights(weights), m_signalFraction(signalFraction) { }
 
 

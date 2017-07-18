@@ -7,7 +7,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <mva/utility/SPlot.h>
+#include <mva/utility/DataDriven.h>
 #include <mva/interface/Interface.h>
 #include <framework/utilities/FileSystem.h>
 #include <framework/utilities/TestHelpers.h>
@@ -66,6 +66,30 @@ namespace {
       EXPECT_FLOAT_EQ(splot_dataset.m_input[0], feature[i / 2]);
       EXPECT_FLOAT_EQ(splot_dataset.m_weight, 1.0 * i);
       EXPECT_EQ(splot_dataset.m_isSignal, (i % 2) == 0);
+    }
+
+  }
+
+  TEST(ReweightingTest, ReweightingDataset)
+  {
+
+    MVA::GeneralOptions general_options;
+    general_options.m_variables = {"A"};
+    TestDataset dataset(general_options);
+
+    std::vector<float> weights(20);
+    std::iota(weights.begin(), weights.end(), 0.0);
+    MVA::ReweightingDataset reweighting_dataset(general_options, dataset, weights);
+
+    EXPECT_EQ(reweighting_dataset.getNumberOfFeatures(), 1);
+    EXPECT_EQ(reweighting_dataset.getNumberOfEvents(), 20);
+
+    auto feature = dataset.getFeature(0);
+    for (unsigned int i = 0; i < 20; ++i) {
+      reweighting_dataset.loadEvent(i);
+      EXPECT_FLOAT_EQ(reweighting_dataset.m_input[0], feature[i]);
+      EXPECT_FLOAT_EQ(reweighting_dataset.m_weight, 1.0 * i);
+      EXPECT_EQ(reweighting_dataset.m_isSignal, (i % 2) == 1);
     }
 
   }

@@ -1,7 +1,83 @@
-#!/bin/sh
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-# install optional python packages which are required to 
+# install optional python packages which are required to
 # use ipython notebooks productively
 
-pip3 install scipy pandas widgetsnbextension sklearn seaborn root-numpy
-jupyter nbextension enable --py --sys-prefix widgetsnbextension
+import subprocess
+import site
+import os
+import argparse
+
+# the list of additional pip packages installed by this script
+optional_packages_list = ["scipy", "pandas", "widgetsnbextension", "sklearn", "seaborn", "root-numpy"]
+
+
+def can_install_sitepackages():
+    """
+    Returns true if the user can install additional packages in the default site-packages folder
+    """
+    first_site = site.getsitepackages()[0]
+    if os.access(first_site, os.W_OK):
+        print("Site package folder {} writeable. User can install additional packages.".format(first_site))
+        return True
+    else:
+        print("Site package folder {} read-only. User cannot install additional packages.".format(first_site))
+        return False
+
+
+def call_and_output(command_and_args, *args, **kwargs):
+    """
+    Call a shell command and output the stdout directly on the calling console
+    @param command_and_args: list of command and arguments
+    @param args: forwarded arguments to subprocess.check_output
+    @param kwargs: forwarded keyword arguments to subprocess.check_output
+    """
+    subprocess.check_output(command_and_args, *args, **kwargs)
+
+
+parser = argparse.ArgumentParser(description='Install optional python packages for basf2')
+
+# check if we can make the target parameter optional
+can_install = can_install_sitepackages()
+
+if can_install:
+    # if we can install into the default location, using the target parameter becomes optional
+    parser.add_argument('--target',
+                        help='Folder used as target to install additional pip packages. Must be writeable.')
+else:
+    parser.add_argument('target',
+                        help='Folder used as target to install additional pip packages. Must be writeable.')
+
+args = parser.parse_args()
+
+target_option = []
+target_pythonpath_env = os.environ.copy()
+target_path_abs = None
+if args.target:
+    print("Installing packages into target {}".format(args.target))
+    target_option = ["--target", args.target]
+
+    # add the new target folder to the python path. This is only used during the jupyter notebook
+    # setup calls
+    target_path_abs = os.path.abspath(args.target)
+    target_pythonpath_env["PYTHONPATH"] = target_path_abs + ":" + target_pythonpath_env["PYTHONPATH"]
+
+# install packages
+call_and_output(["pip3", "install"] + target_option + optional_packages_list)
+
+# various configuration settings for the newly installed packages
+# use a env containing the target path so the new packages are actually available
+call_and_output(["jupyter", "nbextension", "enable", "--py", "--sys-prefix", "widgetsnbextension"],
+                env=target_pythonpath_env)
+
+if not args.target:
+    print("All optional packages installed into the default site-packages location")
+else:
+    print("""All optional packages installed into the target folder {}
+              !!!  IMPORTANT !!!
+           In order to use the installed optional python packages, you need to add
+           the target folder to your PYTHONPATH environment variable before running basf2.
+           You can do this by executing the following command after you called setuprel:""" +
+
+          'export PYTHONPATH="' + target_path_abs + ':${PYTHONPATH}"')

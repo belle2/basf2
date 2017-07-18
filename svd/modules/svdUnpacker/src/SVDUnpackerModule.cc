@@ -280,17 +280,10 @@ void SVDUnpackerModule::endRun()
 }
 
 
-void SVDUnpackerModule::terminate()
-{
-  delete m_map;
-
-}
-
 //load the sensor MAP from xml file
 void SVDUnpackerModule::loadMap()
 {
-  m_map = new SVDOnlineToOfflineMap(m_xmlMapFileName);
-
+  m_map = unique_ptr<SVDOnlineToOfflineMap>(new SVDOnlineToOfflineMap(m_xmlMapFileName));
 }
 
 

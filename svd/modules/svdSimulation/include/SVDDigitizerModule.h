@@ -76,13 +76,13 @@ namespace Belle2 {
       void saveWaveforms();
 
       /** Initialize the module and check module parameters */
-      virtual void initialize();
+      virtual void initialize() override;
       /** Initialize the list of existing SVD Sensors */
-      virtual void beginRun();
+      virtual void beginRun() override;
       /** Digitize one event */
-      virtual void event();
+      virtual void event() override;
       /** Terminate the module */
-      virtual void terminate();
+      virtual void terminate() override;
 
     protected:
 

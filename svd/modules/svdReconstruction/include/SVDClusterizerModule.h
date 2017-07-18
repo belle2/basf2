@@ -52,10 +52,10 @@ namespace Belle2 {
       SVDClusterizerModule();
 
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /** do the clustering */
-      virtual void event();
+      virtual void event() override;
 
     protected:
 

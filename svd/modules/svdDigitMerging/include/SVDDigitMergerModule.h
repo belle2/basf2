@@ -39,10 +39,10 @@ namespace Belle2 {
       SVDDigitMergerModule();
 
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /** Merge this event's SVDDigits into SVDShaperDigits */
-      virtual void event();
+      virtual void event() override;
 
     protected:
 

@@ -170,7 +170,7 @@ void SVDCheckDigitsModule::event()
                                   [](float x)->bool {return x > -1000; });
     assert_eq(nSixSamples, onedigits.size());
     for (const SVDDigit& digit : onedigits) {
-      B2DEBUG(99, digit.print());
+      B2DEBUG(99, digit.toString());
       assert_eq(digit.getSensorID(), shaperDigit.getSensorID().getID());
       assert_eq(digit.isUStrip(), shaperDigit.isUStrip());
       assert_eq(digit.getCellID(), shaperDigit.getCellID());

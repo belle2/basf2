@@ -269,7 +269,7 @@ void SVDClusterizerModule::event()
     Sensors sensors;
     //Fill sensors
     for (int i = 0; i < nDigits; i++) {
-      B2DEBUG(3, storeDigits[i]->print());
+      B2DEBUG(3, storeDigits[i]->toString());
 
       short prev_id = storeDigits[i]->getPrevID();
       short next_id = storeDigits[i]->getNextID();
@@ -317,7 +317,7 @@ void SVDClusterizerModule::event()
     int lastTime(0);
     unsigned int lastStrip(0);
     for (int i = 0; i < nDigits; i++) {
-      B2DEBUG(3, storeDigits[i]->print());
+      B2DEBUG(3, storeDigits[i]->toString());
 
       short prev_id = storeDigits[i]->getPrevID();
       short next_id = storeDigits[i]->getNextID();

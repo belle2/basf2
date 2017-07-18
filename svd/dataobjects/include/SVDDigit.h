@@ -124,7 +124,7 @@ namespace Belle2 {
 
     /** Display main parameters in this object
      */
-    std::string print() const
+    std::string toString() const
     {
       VxdID thisSensorID = static_cast<VxdID>(m_sensorID);
       VxdID::baseType layer   = thisSensorID.getLayerNumber();

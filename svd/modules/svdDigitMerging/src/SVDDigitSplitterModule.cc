@@ -211,7 +211,7 @@ void SVDDigitSplitterModule::event()
           nDigits, truehit_relations.begin(), truehit_relations.end()
         );
       B2DEBUG(90, "Saved digit " << nDigits);
-      B2DEBUG(90, onedigit->print());
+      B2DEBUG(90, onedigit->toString());
       nDigits++;
     } // for positive samples
     // Add 6-digit -> 1-digit relation

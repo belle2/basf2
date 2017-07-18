@@ -192,7 +192,7 @@ void SVDDigitMergerModule::event()
   for (size_t i = 0; i < nDigits; i++) {
 
     B2DEBUG(90, "Processing digit " << i);
-    B2DEBUG(90, storeDigits[i]->print());
+    B2DEBUG(90, storeDigits[i]->toString());
 
     VxdID thisSensorID = storeDigits[i]->getSensorID();
     bool thisUSide = storeDigits[i]->isUStrip();

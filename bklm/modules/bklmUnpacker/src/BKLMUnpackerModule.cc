@@ -43,11 +43,11 @@ BKLMUnpackerModule::BKLMUnpackerModule() : Module()
 {
   setDescription("Produce BKLMDigits from RawBKLM");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("useDefaultModuleId", m_useDefaultModuleId, "use default module id if not found in mapping", false);
+  addParam("useDefaultModuleId", m_useDefaultModuleId, "use default module id if not found in mapping", true);
   addParam("keepEvenPackages", m_keepEvenPackages, "keep packages that have even length normally indicating that data was corrupted ",
            false);
   addParam("outputDigitsName", m_outputDigitsName, "name of BKLMDigit store array", string("BKLMDigits"));
-  addParam("SciThreshold", m_scintThreshold, "scintillator strip hits with charge (~NPE) lower this value will be marked as bad",
+  addParam("SciThreshold", m_scintThreshold, "scintillator strip hits with NPE lower this value will be marked as bad",
            double(7.0));
   addParam("loadMapFromDB", m_loadMapFromDB, "whether load electronic map from DataBase", true);
   addParam("rawdata", m_rawdata, "is this real rawdata (true) or MC data (false)", false);
@@ -150,6 +150,7 @@ void BKLMUnpackerModule::beginRun()
 
 void BKLMUnpackerModule::event()
 {
+
   StoreArray<RawKLM> rawKLM;
   StoreArray<BKLMDigit> bklmDigits(m_outputDigitsName);
   bklmDigits.clear();
@@ -257,7 +258,7 @@ void BKLMUnpackerModule::event()
           unsigned short charge = bword4 & 0xFFF;
           int layer = lane;
           if (flag == 1) layer = lane - 5; //layer 1-based
-          if (m_rawdata && layer < 3) { // z phi plane of sci. is flipped, may be tentative
+          if (layer < 3) { // z phi plane of sci. is flipped, may be tentative
             if (axis == 0) axis = 1;
             else if (axis == 1) axis = 0;
             else B2WARNING("BKLMUnpackerModule:: axis bit of scintillator is abnormal " << axis);
@@ -300,17 +301,17 @@ void BKLMUnpackerModule::event()
           if (layer > 14) { B2WARNING("BKLMUnpackerModule:: strange that the layer number is larger than 14 " << layer); continue;}
 
           //handle the flipped channels and out-of-range channels. This way is not good at all, but do this for a while before data format is fixed
-          if (m_rawdata) channel = getChannel(sector + 1, layer + 1, plane, channel);
+          channel = getChannel(layer + 1, plane, channel);
           bool outRange = false;
-          if (m_rawdata) channel = flipChannel(isForward, sector + 1, layer + 1, plane, channel, outRange);
+          channel = flipChannel(isForward, sector + 1, layer + 1, plane, channel, outRange);
           if (outRange) { B2WARNING("BKLMUnpackerModule:: channel number is out of range " << channel); continue; }
 
           //still have to add the channel and axis
           if (layer > 1) moduleId |= BKLM_INRPC_MASK;
           moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
 
-          BKLMDigit digit(moduleId, ctime, tdc, charge);
-          if (layer < 2 && !(charge < m_scintThreshold))  digit.isAboveThreshold(true);
+          BKLMDigit digit(moduleId, ctime, tdc, m_scintADCOffset - charge);
+          if (layer < 2 && !((m_scintADCOffset - charge) < m_scintThreshold))  digit.isAboveThreshold(true);
 
           B2DEBUG(1, "BKLMUnpackerModule:: digi after Unpacker: sector: " << digit.getSector() << " isforward: " << digit.isForward() <<
                   " layer: " << digit.getLayer() << " isPhi: " << digit.isPhiReadout());
@@ -397,11 +398,11 @@ int BKLMUnpackerModule::getDefaultModuleId(int copperId, int finesse, int lane, 
 
 }
 
-unsigned short BKLMUnpackerModule::getChannel(int sector, int layer, int axis, unsigned short channel)
+unsigned short BKLMUnpackerModule::getChannel(int layer, int axis, unsigned short channel)
 {
 
   if (layer == 1) {
-    if (axis == 0) { //phi strips
+    if (axis == 1) { //phi strips
       if (channel > 0 && channel < 5) channel = 0;
       //else channel = channel - 4;
       if (channel > 4 && channel < 42) channel = channel - 4;
@@ -409,7 +410,7 @@ unsigned short BKLMUnpackerModule::getChannel(int sector, int layer, int axis, u
       if (channel > 41) channel = channel - 4;
     }
 
-    if (axis == 1) { //z strips
+    if (axis == 0) { //z strips
       //if (channel > 0 && channel < 10) channel = channel;
       if (channel > 9 && channel < 16) channel = 0;
       if (channel > 15 && channel < 61) channel = channel - 6;
@@ -417,12 +418,12 @@ unsigned short BKLMUnpackerModule::getChannel(int sector, int layer, int axis, u
     }
   }
   if (layer == 2) {
-    if (axis == 0) { //phi
+    if (axis == 1) { //phi
       if (channel > 0 && channel < 3) channel = 0;
       if (channel > 2 && channel < 45) channel = channel - 2;
       if (channel > 44) channel = channel - 2;;
     }
-    if (axis == 1) {
+    if (axis == 0) {
       //if (channel > 0 && channel < 10) channel = channel;
       if (channel > 9 && channel < 16) channel = 0;
       if (channel > 15 && channel < 61) channel = channel - 6;
@@ -433,7 +434,7 @@ unsigned short BKLMUnpackerModule::getChannel(int sector, int layer, int axis, u
 
 
   //if (layer > 2) channel = channel + 1;
-  if (sector == 3 && layer > 2 && layer < 16) channel = channel + 1;
+  //if (sector == 3 && layer > 2 && layer < 16) channel = channel + 1;
   //if (sector == 7 && layer > 2 && layer < 16) channel = channel;
 
   return channel;
@@ -460,7 +461,10 @@ unsigned short BKLMUnpackerModule::flipChannel(int isForward, int sector, int la
     if (layer > 2 && plane == 0) MaxiChannel = 48;
   }
 
-  if (!(isForward && sector == 7 && layer > 2 && plane == 1)) channel = MaxiChannel - channel + 1;
+  bool dontFlip = false;
+  if (isForward && (sector == 7 ||  sector == 8 ||  sector == 1 ||  sector == 2)) dontFlip = true;
+  if (!isForward && (sector == 4 ||  sector == 5 ||  sector == 6 ||  sector == 7)) dontFlip = true;
+  if (!(dontFlip && layer > 2 && plane == 1)) channel = MaxiChannel - channel + 1;
 
   if (channel < 1 || channel > MaxiChannel) isOutRange = true;
 

@@ -57,24 +57,24 @@ void QETrainingDataCollectorModule::initialize()
   m_variableSet.setVariables(m_EstimationMethod, QualityEstimationResults());
 
 
-  m_recorder = make_unique<SimpleVariableRecorder>(m_variableSet, m_TrainingDataOutputName, "tree");
+  m_recorder = in_hopes_for_cpp14_make_unique<SimpleVariableRecorder>(m_variableSet, m_TrainingDataOutputName, "tree");
 }
 
 void QETrainingDataCollectorModule::event()
 {
   // BField is required by all QualityEstimators
   double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
-  m_estimatorMC = make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
+  m_estimatorMC = in_hopes_for_cpp14_make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
 
   m_estimatorMC->setMagneticFieldStrength(bFieldZ);
 
   // create pointer to chosen estimator
   if (m_EstimationMethod == "tripletFit") {
-    m_estimator = make_unique<QualityEstimatorTripletFit>();
+    m_estimator = in_hopes_for_cpp14_make_unique<QualityEstimatorTripletFit>();
   } else if (m_EstimationMethod == "circleFit") {
-    m_estimator = make_unique<QualityEstimatorCircleFit>();
+    m_estimator = in_hopes_for_cpp14_make_unique<QualityEstimatorCircleFit>();
   } else if (m_EstimationMethod == "helixFit") {
-    m_estimator = make_unique<QualityEstimatorRiemannHelixFit>();
+    m_estimator = in_hopes_for_cpp14_make_unique<QualityEstimatorRiemannHelixFit>();
   }
   B2ASSERT("Not all QualityEstimators could be initialized!", m_estimator);
 

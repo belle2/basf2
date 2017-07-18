@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+set_random_seed(501)
 
 
 class CountEvents(Module):
@@ -16,6 +17,8 @@ class CountEvents(Module):
 
 
 input_events = 1000
+expected_success_events = 6
+
 main = create_path()
 main.add_module("EventInfoSetter", evtNumList=[input_events], expList=[0], runList=[0])
 prescale_mod = main.add_module('Prescale', prescale=0.01)
@@ -28,5 +31,4 @@ process(main)
 
 print(statistics)
 
-# This test MAY fail simply due to random chance. It should be incredibly rare and never happen, but the chance is there
-assert success_count.num_events < input_events
+assert success_count.num_events == expected_success_events

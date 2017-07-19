@@ -26,17 +26,14 @@ namespace Belle2 {
     /* Destructor of the module. */
     virtual ~PrescaleModule() {};
 
-    /* initialization. */
+    /* No Initialization necessary */
     virtual void initialize() {};
 
-    /* Sets the return value and runs the choosing function*/
+    /* Sets the return value by running a RNG vs. the prescale value */
     virtual void event();
 
   private:
     /* Prescale module parameter, this fraction of events will return True. [0.0 -> 1.0] */
-    float m_prescale;
-
-    /* Does the random choice when called, based on the prescale value */
-    bool getPrescaleChoice();
+    double m_prescale;
   };
 }

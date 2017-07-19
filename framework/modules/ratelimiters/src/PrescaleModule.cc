@@ -31,25 +31,10 @@ PrescaleModule::PrescaleModule() : Module()
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("prescale", m_prescale, "Fraction of events that will return True from this module. Range(0.0 -> 1.0)", float(1.0));
+  addParam("prescale", m_prescale, "Fraction of events that will return True from this module. Range(0.0 -> 1.0)", double(1.0));
 }
 
 void PrescaleModule::event()
 {
-  setReturnValue(getPrescaleChoice());
-}
-
-/// I'm a little worried about floating point precision when comparing to 0.0 and 1.0 as special values.
-/// But since they are exact floats and a user will usually set them (or leave them as default) as exactly
-/// equal to 0.0 or 1.0 rather than calculating them in almost every case, I think we can assume that the equalities hold.
-bool PrescaleModule::getPrescaleChoice()
-{
-  if (m_prescale == 1.) {
-    return true;
-  } else if (m_prescale == 0.) {
-    return false;
-  } else {
-    const double randomNumber = gRandom->Uniform();
-    return randomNumber < m_prescale;
-  }
+  setReturnValue(gRandom->Uniform() < m_prescale);
 }

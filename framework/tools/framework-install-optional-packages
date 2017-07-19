@@ -35,8 +35,8 @@ def call_and_output(command_and_args, *args, **kwargs):
     """
 
     # this will output the results of the subprocess call directly to the console
-    popen = subprocess.Popen(command_and_args, *args,stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True,
-                             **kwargs)
+    popen = subprocess.Popen(command_and_args, *args,stdout=subprocess.PIPE, stderr=subprocess.STDOUT, 
+                             universal_newlines=True, **kwargs)
     for stdout_line in iter(popen.stdout.readline, ""):
         print(stdout_line, end='')
     popen.stdout.close()
@@ -52,10 +52,15 @@ can_install = can_install_sitepackages()
 
 # if we can install into the default location, using the target parameter becomes optional
 parser.add_argument('--target',
+                    required=not can_install,
                     help='Folder used as target to install additional pip packages. Must be writeable.')
 
-args = parser.parse_args()
+parser.add_argument('package',
+                    nargs="*",
+                    help='Packages to additionally install in addition to {}'.format(optional_packages_list))
 
+args = parser.parse_args()
+print (args.package)
 if not args.target and not can_install:
     print("The default installation target is read-only. Therefore you must give a target using the '--target' option.")
     sys.exit(1)
@@ -74,7 +79,7 @@ else:
     print("Installing packages -- This will take some time.")
 
 # install packages
-call_and_output(["pip3", "install", "-v"] + target_option + optional_packages_list,
+call_and_output(["pip3", "install", "-v"] + target_option + optional_packages_list + args.package,
                 env=target_pythonpath_env)
 
 # various configuration settings for the newly installed packages
@@ -85,7 +90,7 @@ if can_install:
                     env=target_pythonpath_env)
 
 if not args.target:
-    print("All optional packages installed into the default site-packages location")
+    print("All optional packages installed into the default site-packages location.")
 else:
     print("""All optional packages installed into the target folder {}
               !!!  IMPORTANT !!!

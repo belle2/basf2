@@ -100,6 +100,7 @@ namespace Belle2 {
     std::string m_pxdclustersname;
     std::string m_pxddigitsname;
     std::string m_tracksname;
+    std::string m_ROIsName;
     StoreArray<PXDDigit> m_pxddigits;
     StoreArray<PXDCluster> m_pxdclusters;
     StoreObjPtr<EventMetaData> storeEventMetaData;
@@ -143,6 +144,19 @@ namespace Belle2 {
     std::map<VxdID, TH2D*> m_h_tracksROI;
     std::map<VxdID, TH2D*> m_h_digitsROI;
     std::map<VxdID, TH2D*> m_h_clusterROI;
+
+    //ROI information
+    std::map<VxdID, int> m_roi_number_of;
+    std::map<VxdID, int> m_roi_minU;
+    std::map<VxdID, int> m_roi_minV;
+    std::map<VxdID, int> m_roi_maxU;
+    std::map<VxdID, int> m_roi_maxV;
+    std::map<VxdID, int> m_roi_widthU;
+    std::map<VxdID, int> m_roi_widthV;
+    std::map<VxdID, int> m_roi_centerU;
+    std::map<VxdID, int> m_roi_centerV;
+    std::map<VxdID, int> m_roi_area;
+
   };
 }
 

@@ -14,6 +14,8 @@
 
 #include <iostream>
 
+#include <tracking/dataobjects/ROIid.h>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -43,6 +45,7 @@ PXDEfficiencyModule::PXDEfficiencyModule() : HistoModule(), m_vxdGeometry(VXD::G
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(false));
   addParam("writeTree", m_writeTree, "if true a tree with useful info will be filled", bool(false));
 
+  addParam("ROIsName", m_ROIsName, "name of the list of HLT ROIs, if available in output", std::string(""));
 }
 
 
@@ -64,7 +67,6 @@ void PXDEfficiencyModule::initialize()
 
 void PXDEfficiencyModule::event()
 {
-
   //debug
   //std::cout << "n cluster " << m_pxdclusters.getEntries() << std::endl;
   //std::cout << "n digits " << m_pxddigits.getEntries() << std::endl;
@@ -88,7 +90,8 @@ void PXDEfficiencyModule::event()
     return;
   }
 
-
+  //TODO
+  StoreArray<ROIid> ROIs(m_ROIsName);
 
   //loop over all PXD sensors to get the intersections
   std::map<VxdID, TVector3> intersecs;
@@ -105,9 +108,11 @@ void PXDEfficiencyModule::event()
   //WARNING2: If there are multiple sensors on one layer, as in all Testbeam 2017 geometries, only the last sensor on each layer is considered!
   //Sensor IDs are hardcoded further down anyway, so only take the first sensor in the geometry-file, which is the one actually in the beam.
 
+
   int last_layer = 999;
   for (VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(aVxdID);
+
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
 
     int layer = aVxdID.getLayerNumber();
@@ -146,6 +151,17 @@ void PXDEfficiencyModule::event()
     m_clus_size[aVxdID] = -9999;
     m_clus_usize[aVxdID] = -9999;
     m_clus_vsize[aVxdID] = -9999;
+
+    m_roi_number_of[aVxdID] = 0;
+    m_roi_minU[aVxdID] = -99999;
+    m_roi_minV[aVxdID] = -99999;
+    m_roi_maxU[aVxdID] = -99999;
+    m_roi_maxV[aVxdID] = -99999;
+    m_roi_widthU[aVxdID] = -99999;
+    m_roi_widthV[aVxdID] = -99999;
+    m_roi_centerU[aVxdID] = -99999;
+    m_roi_centerV[aVxdID] = -99999;
+    m_roi_area[aVxdID] = -99999;
 
     if (isgood) {
       m_u_fit[aVxdID] = intersec_buff.X();
@@ -187,6 +203,26 @@ void PXDEfficiencyModule::event()
 
   //require that two layers have an intersection!
   if (!foundL1 || !foundL2) return;
+
+
+
+  //ROI info
+  //WARNING: Only the last ROI for each sensor is saved! Number of ROIs is correct, so use it to cut on events with multiple ROIs on a sensor if this is a problem
+  if (ROIs.getEntries() > 0) {
+    for (auto& roit : ROIs) {
+      VxdID thisSensorROI = roit.getSensorID();
+      m_roi_number_of[thisSensorROI]++;
+      m_roi_minU[thisSensorROI] = roit.getMinUid();
+      m_roi_minV[thisSensorROI] = roit.getMinVid();
+      m_roi_maxU[thisSensorROI] = roit.getMaxUid();
+      m_roi_maxV[thisSensorROI] = roit.getMaxVid();
+      m_roi_widthU[thisSensorROI] = roit.getMaxUid() - roit.getMinUid();
+      m_roi_widthV[thisSensorROI] = roit.getMaxVid() - roit.getMinVid();
+      m_roi_centerU[thisSensorROI] = (roit.getMaxUid() + roit.getMinUid()) / 2;
+      m_roi_centerV[thisSensorROI] = (roit.getMaxVid() + roit.getMinVid()) / 2;
+      m_roi_area[thisSensorROI] = (roit.getMaxUid() - roit.getMinUid()) * (roit.getMaxVid() - roit.getMinVid());
+    }
+  }
 
 
   //fill the needed track info
@@ -278,7 +314,6 @@ void PXDEfficiencyModule::event()
       m_h_digitsROI[L2id]->Fill(iu, iv);
     }
   }
-
 
   if (m_writeTree) m_tree->Fill();
 }
@@ -385,6 +420,17 @@ void PXDEfficiencyModule::defineHisto()
     m_otherpxd_digit_matched[avxdid] = -1;
     m_otherpxd_cluster_matched[avxdid] = -1;
 
+    m_roi_number_of[avxdid] = -1;
+    m_roi_minU[avxdid] = -99999;
+    m_roi_minV[avxdid] = -99999;
+    m_roi_maxU[avxdid] = -99999;
+    m_roi_maxV[avxdid] = -99999;
+    m_roi_widthU[avxdid] = -99999;
+    m_roi_widthV[avxdid] = -99999;
+    m_roi_centerU[avxdid] = -99999;
+    m_roi_centerV[avxdid] = -99999;
+    m_roi_area[avxdid] = -99999;
+
     m_tree->Branch("u_clus_" + buff, &(m_u_clus[avxdid]), "u_clus_" + buff + "/D");
     m_tree->Branch("v_clus_" + buff, &(m_v_clus[avxdid]), "v_clus_" + buff + "/D");
     m_tree->Branch("u_digi_" + buff, &(m_u_digi[avxdid]), "u_digi_" + buff + "/D");
@@ -408,6 +454,17 @@ void PXDEfficiencyModule::defineHisto()
     m_tree->Branch("otherpxd_cluster_matched_" + buff, &(m_otherpxd_cluster_matched[avxdid]),
                    "otherpxd_cluster_matched_" + buff + "/I");
 
+    //New Entries to study effect of ROI size and similar
+    m_tree->Branch("roi_number_of_" + buff, &(m_roi_number_of[avxdid]), "roi_number_of_" + buff + "/I");
+    m_tree->Branch("roi_min_u_" + buff, &(m_roi_minU[avxdid]), "roi_min_u_" + buff + "/I");
+    m_tree->Branch("roi_min_v_" + buff, &(m_roi_minV[avxdid]), "roi_min_v_" + buff + "/I");
+    m_tree->Branch("roi_max_u_" + buff, &(m_roi_maxU[avxdid]), "roi_max_u_" + buff + "/I");
+    m_tree->Branch("roi_max_v_" + buff, &(m_roi_maxV[avxdid]), "roi_max_v_" + buff + "/I");
+    m_tree->Branch("roi_width_u_" + buff, &(m_roi_widthU[avxdid]), "roi_width_u_" + buff + "/I");
+    m_tree->Branch("roi_width_v_" + buff, &(m_roi_widthV[avxdid]), "roi_width_v_" + buff + "/I");
+    m_tree->Branch("roi_center_u_" + buff, &(m_roi_centerU[avxdid]), "roi_center_u_" + buff + "/I");
+    m_tree->Branch("roi_center_v_" + buff, &(m_roi_centerV[avxdid]), "roi_center_v_" + buff + "/I");
+    m_tree->Branch("roi_area_" + buff, &(m_roi_area[avxdid]), "roi_area_" + buff + "/I");
 
     int nu = info.getUCells();
     int nv = info.getVCells();

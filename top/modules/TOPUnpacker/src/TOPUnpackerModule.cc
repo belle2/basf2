@@ -1,12 +1,12 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+* BASF2 (Belle Analysis Framework 2)                                     *
+* Copyright(C) 2014 - Belle II Collaboration                             *
+*                                                                        *
+* Author: The Belle II Collaboration                                     *
+* Contributors: Marko Staric                                             *
+*                                                                        *
+* This software is provided "as is" without any warranty.                *
+**************************************************************************/
 
 // Own include
 #include <top/modules/TOPUnpacker/TOPUnpackerModule.h>
@@ -371,7 +371,7 @@ namespace Belle2 {
 
       if (scrodID_FE != scrodID) {
         B2ERROR("TOPUnpacker: corrupted data - different scrodID's in HLSB and FE header");
-        B2DEBUG(100, "Different scrodID's in HLSB and FE header: "
+        B2ERROR("Different scrodID's in HLSB and FE header: "
                 << scrodID << " " << scrodID_FE << " word = 0x" << std::hex << word);
         info->setErrorFlag(TOPInterimFEInfo::c_DifferentScrodIDs);
         return array.getRemainingWords();

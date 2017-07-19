@@ -40,18 +40,26 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
     tr = f.Get("tree")
     nEntries = tr.GetEntries()
 
+    latex = TLatex()
+    latex.SetNDC()
+    latex.SetTextSize(0.03)
+    latex.SetTextAlign(33)
+
     print("making summary plot for all the slots...")
     canvas.Clear()
     canvas.Divide(2, 2)
     canvas.cd(1)
     gPad.SetFrameFillStyle(0)
     gPad.SetFillStyle(0)
-    tr.Draw("eventNum[0]>>hNHit", "(nHit>0)*(nHit)")
+    tr.Draw("eventNum[0]>>hNHit", "(nHit>0)*(Sum$(offlineFlag<=0))")
     tr.Draw("eventNum[0]>>hHeader", "(nHit>0)*(nFEHeader)")
     tr.Draw("eventNum[0]>>hEmptyHeader", "(nHit>0)*(nEmptyFEHeader)")
     tr.Draw("eventNum[0]>>hWfm", "(nHit>0)*(nWaveform)")
     tr.Draw("eventNum[0]>>hError", "(nHit>0)*(errorFlag>0)")
     hNHit = gROOT.FindObject("hNHit")
+    if hNHit.Integral() < 1:
+        print("ERROR : no hits were found.")
+        return
     hHeader = gROOT.FindObject("hHeader")
     hEmptyHeader = gROOT.FindObject("hEmptyHeader")
     hWfm = gROOT.FindObject("hWfm")
@@ -72,7 +80,7 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
     legend = TLegend(0.6, 0.175, 0.875, 0.4)
     legend.SetFillStyle(0)
     legend.SetBorderSize(0)
-    legend.AddEntry(hNHit, "nHit")
+    legend.AddEntry(hNHit, "nHit (no offline FE)")
     legend.AddEntry(hHeader, "# of FE headers")
     legend.AddEntry(hEmptyHeader, "# of empty FE headers")
     legend.AddEntry(hWfm, "# of waveforms")
@@ -86,6 +94,10 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
     hEmptyHeader.Draw("samehist")
     hWfm.Draw("samehist")
     legend.Draw()
+    if hWfm.Integral() > 0:
+        evtFracNoWfm = 1 - hWfm.Integral() / hNHit.Integral()
+        print("fraction of events without waveform : " + str(int(1000 * evtFracNoWfm) / 10) + "%")
+        latex.DrawLatex(0.875, 0.175, "fraction of no-waveform events : " + str(int(1000 * evtFracNoWfm) / 10) + "%")
     print(".", end="")
 
     canvas.cd(2)
@@ -99,8 +111,6 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
         hError.GetYaxis().SetTitle(ytitle)
         hError.Draw("hist")
     else:
-        latex = TLatex()
-        latex.SetNDC()
         latex.SetTextSize(0.1)
         latex.SetTextAlign(22)
         latex.DrawLatex(0.5, 0.5, "NO ERROR DETECTED")
@@ -109,14 +119,16 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
     canvas.cd(3)
     gPad.SetFrameFillStyle(0)
     gPad.SetFillStyle(0)
-    hSlotNumAll = TH1F("hSlotNumAll", "", 16, 0.5, 16.5)
-    hSlotNumNoCalCh = TH1F("hSlotNumNoCalCh", "", 16, 0.5, 16.5)
-    basicHitSelection = "hitQuality>0 && hitQuality<50 && hitQuality%10!=4"
+    hSlotNumAll = TH1F("hSlotNumAll", "", 17, -0.5, 16.5)
+    hSlotNumNoCalCh = TH1F("hSlotNumNoCalCh", "", 17, -0.5, 16.5)
+    basicHitSelection = "hitQuality>0"  # && hitQuality<50 && hitQuality%10!=4"
     basicHitSelectionSingle = basicHitSelection + "&& offlineFlag<=0"
     tr.Draw("Sum$(" + basicHitSelectionSingle + ")>>hNHitAllSlots(100,-0.5,499.5)")
     tr.Draw("Sum$(" + basicHitSelectionSingle + "&&!isCalCh)>>hNHitAllSlotsNoCalCh(100,-0.5,499.5)")
+    tr.Draw("rawTime>>hRawTimeAll(128,-128,512)", "hitQuality%10<4 && hitQuality>0")
     hNHitAll = [gROOT.FindObject("hNHitAllSlots")]
     hNHitNoCalCh = [gROOT.FindObject("hNHitAllSlotsNoCalCh")]
+    hRawTimeList = [gROOT.FindObject("hRawTimeAll")]
     nSlotEntriesAll = []
     nSlotEntriesNoCalCh = []
     nSlotEntriesCalCh = []
@@ -124,20 +136,25 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
     nHitMeanAll = []
     nHitMeanNoCalCh = []
     nHitMeanLaser = []
+    strMultiplicity = "0"
     for slot in range(1, 17):
         slotCut = " && slotNum==" + str(slot)
-        tr.Draw("Sum$(" + basicHitSelectionSingle + slotCut + ")>>hNHitAll" + str(slot) + "(100,-0.5,99.5)")
-        tr.Draw("Sum$(" + basicHitSelectionSingle + " && !isCalCh" + slotCut + ")>>hNHitNoCalCh" + str(slot) + "(100,-0.5,99.5)")
+        tr.Draw("Sum$(" + basicHitSelectionSingle + slotCut + ")>>hNHitAll" + str(slot) + "(90,2.5,92.5)")
+        tr.Draw("Sum$(" + basicHitSelectionSingle + " && !isCalCh" + slotCut + ")>>hNHitNoCalCh" + str(slot) + "(90,2.5,92.5)")
+        tr.Draw("rawTime>>hRawTime" + str(slot) + "(128,-128,512)",
+                "hitQuality>0 " + slotCut)
         hNHitAllTmp = gROOT.FindObject("hNHitAll" + str(slot))
         hNHitNoCalChTmp = gROOT.FindObject("hNHitNoCalCh" + str(slot))
+        hRawTimeTmp = gROOT.FindObject("hRawTime" + str(slot))
         hNHitAll.append(hNHitAllTmp)
         hNHitNoCalCh.append(hNHitNoCalChTmp)
+        hRawTimeList.append(hRawTimeTmp)
         nSlotEntriesAllTmp = hNHitAllTmp.Integral(hNHitAllTmp.GetXaxis().FindBin(3), hNHitAllTmp.GetXaxis().GetNbins() + 1)
         nSlotEntriesNoCalChTmp = hNHitNoCalChTmp.Integral(
             hNHitNoCalChTmp.GetXaxis().FindBin(3),
             hNHitNoCalChTmp.GetXaxis().GetNbins() + 1)
-        hSlotNumAll.SetBinContent(slot, nSlotEntriesAllTmp)
-        hSlotNumNoCalCh.SetBinContent(slot, nSlotEntriesNoCalChTmp)
+        hSlotNumAll.SetBinContent(slot + 1, nSlotEntriesAllTmp)
+        hSlotNumNoCalCh.SetBinContent(slot + 1, nSlotEntriesNoCalChTmp)
         nSlotEntriesAll.append(nSlotEntriesAllTmp)
         nSlotEntriesCalCh.append(-1)
         nSlotEntriesCalChWfm.append(-1)
@@ -145,6 +162,7 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
         nHitMeanAll.append(hNHitAllTmp.GetMean())
         nHitMeanNoCalCh.append(hNHitNoCalChTmp.GetMean())
         nHitMeanLaser.append(-1)  # defined later
+        strMultiplicity += (" + (Sum$(" + basicHitSelectionSingle + slotCut + ")>=3)")
         print(".", end="")
 
     hSlotNumAll.SetLineColor(1)
@@ -154,19 +172,25 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
     hSlotNumAll.SetStats(False)
     hSlotNumAll.Draw()
     hSlotNumAll.GetYaxis().SetRangeUser(0, nEntries * 1.2)
-    hSlotNumAll.SetTitle("# of hits for each slot (nHit>=3)")
+    hSlotNumAll.SetTitle("hit event number (nHit>=3) for each slot and multiplicity")
     hSlotNumAll.GetXaxis().SetTitle("slot number")
     line = TLine()
     line.SetLineColor(4)
     line.SetLineStyle(2)
-    line.DrawLine(0.5, nEntries, 16.5, nEntries)
+    line.DrawLine(-0.5, nEntries, 16.5, nEntries)
     hSlotNumNoCalCh.Draw("same")
-    legendSlot = TLegend(0.6, 0.75, 0.875, 0.875)
+    tr.Draw(strMultiplicity + ">>hMultiplicity", "", "same")
+    hMultiplicity = gROOT.FindObject("hMultiplicity")
+    hMultiplicity.SetFillStyle(0)
+    hMultiplicity.SetLineColor(3)
+    legendSlot = TLegend(0.5, 0.65, 0.875, 0.875)
     legendSlot.SetFillStyle(0)
     legendSlot.SetBorderSize(0)
     legendSlot.AddEntry(hSlotNumAll, "all channels, single hit")
     legendSlot.AddEntry(hSlotNumNoCalCh, "w/o cal. channels, single hit")
-    legendSlot.Draw()
+    legendSlot2 = TLegend(legendSlot)
+    legendSlot2.AddEntry(hMultiplicity, "# of hit modules")
+    legendSlot2.Draw()
     print(".", end="")
 
     canvas.cd(4)
@@ -184,6 +208,22 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
     print(".")
 
     canvas.Print(pdf_output)
+    canvas.Clear()
+
+    canvas.Divide(4, 4)
+    for slot in range(1, 17):
+        canvas.cd(slot)
+        hRawTime = hRawTimeList[slot]
+        hRawTime.SetStats(False)
+        hRawTime.SetTitle("rawTime distribution")
+        hRawTime.GetXaxis().SetTitle("rawTime")
+        ytitle = "Entries [/(" + str(hRawTime.GetXaxis().GetBinUpEdge(1) - hRawTime.GetXaxis().GetBinLowEdge(1)) + " samples)]"
+        hRawTime.GetYaxis().SetTitle(ytitle)
+        slotstr = "slot" + "{0:02d}".format(slot)
+        hRawTime.SetTitle("rawTime distribution : " + slotstr)
+        hRawTime.Draw()
+    canvas.Print(pdf_output)
+    canvas.Clear()
 
     for slot in range(1, 17):
 
@@ -196,6 +236,8 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
 
         slotstr = "slot" + "{0:02d}".format(slot)
 
+        gStyle.SetStatX(0.875)
+        gStyle.SetStatY(0.875)
         canvas.Clear()
         canvas.Divide(2, 4)
 
@@ -218,6 +260,7 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
         hCalEff = gROOT.FindObject("hCalEff" + str(slot))
         hCalEff.GetXaxis().SetTitle("# of hits identified in cal. ch.")
         hCalEff.SetTitle("# of hits in cal. ch. for each event : " + slotstr)
+        IsCosmicRayData = True if (hCalEff.GetMean() < 1.) else False
         tr.Draw("Sum$((hitQuality>=200)*(" + slotCut + "))>>hCalEffOfflineFE" + str(slot) + "(65,-0.5,64.5)", "", "same")
         hCalEffOfflineFE = gROOT.FindObject("hCalEffOfflineFE" + str(slot))
         hCalEffOfflineFE.SetLineColor(2)
@@ -240,38 +283,57 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
         gPad.SetFrameFillStyle(0)
         gPad.SetFillStyle(0)
         gPad.SetLogy()
-        cut = "refTime>0 && hitQuality<50 && " + slotCut
+        cut = "refTime>0 && hitQuality>0 && hitQuality<50 && " + slotCut
         if IsOfflineFEDisabled:
             ytitle_hLaser = "Laser timing distribution (w/o offline FE) : " + slotstr
         else:
             cut += " && hitQuality>=10"
             ytitle_hLaser = "Laser timing distribution (w/ offline FE) : " + slotstr
-        tr.Draw("time-refTime>>hLaserTime" + str(slot) + "(140,-150,-10)", cut)
+        tr.Draw("time-refTime>>hLaserTime" + str(slot) + "(180,-125,55)", cut + " && !isCalCh")
+        tr.Draw("time-refTime>>hLaserTimeCal" + str(slot) + "(180,-125,55)", cut + " && isCalCh", "same")
         hLaserTime = gROOT.FindObject("hLaserTime" + str(slot))
+        hLaserTimeCal = gROOT.FindObject("hLaserTimeCal" + str(slot))
         hLaserTime.GetXaxis().SetTitle("hit time - ref. time [ns]")
         BinWidth = hLaserTime.GetXaxis().GetBinUpEdge(1) - hLaserTime.GetXaxis().GetBinLowEdge(1)
         ytitle = "Entries[/(" + str(BinWidth) + " ns)]"
         hLaserTime.GetYaxis().SetTitle(ytitle)
         hLaserTime.SetTitle(ytitle_hLaser)
+        hLaserTimeCal.SetLineColor(2)
         cutDirectHit = cut
         cutReflHit = cut
         PeakTime = 1000000
+        legX1 = 0.3
+        legX2 = 0.475
+        if hLaserTime.Integral(1, int(hLaserTime.GetXaxis().GetNbins() / 2)) < 0.5 * hLaserTime.Integral():
+            gStyle.SetStatX(0.475)
+            gStyle.SetStatY(0.875)
+            legX1 = 0.7
+            legX2 = 0.875
+        legendTime = TLegend(legX1, 0.875, legX2, 0.7)
+        legendTime.SetFillStyle(0)
+        legendTime.SetBorderSize(0)
+        legendTime.AddEntry(hLaserTime, "non-cal. channel")
+        legendTime.AddEntry(hLaserTimeCal, "cal. channel")
+        legendTime.Draw()
         if hLaserTime.Integral() > 10:
             MaxHeight = -1
             iBin = 1
             BinTime = hLaserTime.GetXaxis().GetBinLowEdge(1)
             PeakTime = BinTime
-            while BinTime < (-11):
+            while BinTime < hLaserTime.GetXaxis().GetBinUpEdge(hLaserTime.GetXaxis().GetNbins()):
                 tmpHeight = hLaserTime.GetBinContent(iBin)
                 BinTime = hLaserTime.GetXaxis().GetBinCenter(iBin)
                 if tmpHeight > MaxHeight:
                     MaxHeight = tmpHeight
                     PeakTime = BinTime
                 iBin += 1
-            hLaserTime.Fit("gaus", "", "", PeakTime - FitWidth, PeakTime + FitWidth)
-            func = hLaserTime.GetFunction("gaus")
-            PeakTime = func.GetParameter(1)
-            PeakHeight = func.GetParameter(0)
+            hLaserTime.Fit("gaus", "+", "", PeakTime - FitWidth, PeakTime + FitWidth)
+            if hLaserTime.GetFunction("gaus"):
+                func = hLaserTime.GetFunction("gaus")
+                PeakTime = func.GetParameter(1)
+                PeakHeight = func.GetParameter(0)
+            else:
+                PeakHeight = hLaserTime.GetBinContent(hLaserTime.GetXaxis().FindBin(PeakTime))
             cutDirectHit += " && TMath::Abs(time-refTime-(" + str(PeakTime) + "))<" + str(FitWidth)
             cutReflHit += " && TMath::Abs(time-refTime-(" + str(PeakTime + DelayTimeRefl) + "))<" + str(ReflHalfTimwRange)
             line = TLine()
@@ -329,11 +391,13 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
         gPad.SetFrameFillStyle(0)
         gPad.SetFillStyle(0)
         tr.Draw("TMath::FloorNint((pixelId-1)/64+1):TMath::FloorNint((pixelId-1)%64+1)>>hLaserReflMap" +
-                str(slot) + "(64,0.5,64.5,8,0.5,8.5)", cutReflHit, "colz")
+                str(slot) + "(64,0.5,64.5,8,0.5,8.5)",
+                ("hitQuality>0 && hitQuality%10!=4 && " + slotCut if IsCosmicRayData else cutReflHit), "colz")
         hLaserReflMap = gROOT.FindObject("hLaserReflMap" + str(slot))
         hLaserReflMap.Scale(1. / tr.GetEntries())
         hLaserReflMap.SetStats(False)
-        hLaserReflMap.SetTitle(root_output + " - laser reflected hit occupancy (hits/event)")
+        hLaserReflMap.SetTitle(root_output + (" - hit map for the whole timing region (hits/event)"
+                                              if IsCosmicRayData else " - laser reflected hit occupancy (hits/event)"))
 
         # number of hits
         canvas.cd(6)
@@ -345,6 +409,10 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
         hNHitNoCalCh[slot].SetLineColor(2)
         hNHitAll[slot].Draw()
         hNHitNoCalCh[slot].Draw("same")
+        latex.SetTextSize(0.05)
+        latex.SetTextAlign(33)
+        latex.DrawLatex(0.875, 0.785, "underflow : " + str(int(hNHitAll[slot].GetBinContent(0) * 1000 / nEntries) / 10) + "%")
+        latex.DrawLatex(0.875, 0.685, "underflow : " + str(int(hNHitNoCalCh[slot].GetBinContent(0) * 1000 / nEntries) / 10) + "%")
         if PeakTime < 0:
             tr.Draw("Sum$(" + basicHitSelection + "&& " + slotCut + "&&TMath::Abs(time-refTime-(" +
                     str(PeakTime) + "))<" + str(FitWidth) + ")>>hNHitLaser" + str(slot), "", "same")
@@ -357,8 +425,9 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
                        hNHitNoCalCh[slot].GetBinContent(hNHitNoCalCh[slot].GetMaximumBin()))
             hNHitAll[slot].GetYaxis().SetRangeUser(0, 1.1 * hMax)
             if not LaserAdded:
-                legendSlot.AddEntry(hNHitLaser, "Laser direct hit (multi hit)")
-                legendSlot.SetY1(0.7)
+                legstr = "Laser direct hit (" + ("single hit" if IsOfflineFEDisabled else "multi hit") + ")"
+                legendSlot.AddEntry(hNHitLaser, legstr)
+                legendSlot.SetY1(0.55)
                 LaserAdded = True
         else:
             hMax = max(hNHitAll[slot].GetBinContent(hNHitAll[slot].GetMaximumBin()),
@@ -370,14 +439,15 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
         canvas.cd(7)
         gPad.SetFrameFillStyle(0)
         gPad.SetFillStyle(0)
-        if IsOfflineFEDisabled:
-            tr.Draw("rawTime>>hRawTime" + str(slot) + "(128,0,256)",
-                    "hitQuality%10<4 && hitQuality>0 &&" + slotCut)
-            hRawTime = gROOT.FindObject("hRawTime" + str(slot))
+        if IsOfflineFEDisabled or IsCosmicRayData:
+            hRawTime = hRawTimeList[slot]
+            hRawTime.SetStats(False)
+            hRawTime.SetTitle("rawTime distribution")
             hRawTime.GetXaxis().SetTitle("rawTime")
             ytitle = "Entries [/(" + str(hRawTime.GetXaxis().GetBinUpEdge(1) - hRawTime.GetXaxis().GetBinLowEdge(1)) + " samples)]"
             hRawTime.GetYaxis().SetTitle(ytitle)
-            hRawTime.SetTitle("time interval of double calibration pulses : " + slotstr)
+            hRawTime.SetTitle("rawTime distribution : " + slotstr)
+            hRawTime.Draw()
         else:
             tr.Draw("time-refTime:TMath::FloorNint((pixelId-1)/8)>>hCalPulseInterval" + str(slot) + "(64,-0.5,63.5,100,19,24)",
                     "hitQuality>=200 && " + slotCut, "colz")
@@ -391,13 +461,16 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
         gPad.SetFrameFillStyle(0)
         gPad.SetFillStyle(0)
         gPad.SetLogy()
-        tr.Draw("sample>>hSample" + str(slot) + "(256,-0.5,255.5)", "slotNum==" + str(slot) + "&&hitQuality>=100&&hitQuality<200")
+        tr.Draw("sample>>hSample" + str(slot) + "(256,-0.5,255.5)",
+                "slotNum==" + str(slot) + ("&&hitQuality>0&&hitQuality%10!=4" if IsCosmicRayData
+                                           else "&&hitQuality>=100&&hitQuality<200"))
         hSample = gROOT.FindObject("hSample" + str(slot))
         hSample.SetFillStyle(0)
         hSample.SetLineColor(1)
         hSample.SetStats(False)
         hSample.SetTitle("entries of each sample# for TBC : " + slotstr)
-        hSample.GetXaxis().SetTitle("Sample# of the first calibration pulse")
+        hSample.GetXaxis().SetTitle("Sample# for each hit" if IsCosmicRayData
+                                    else "Sample# of the first calibration pulse")
         line.DrawLine(
             hSample.GetXaxis().GetBinLowEdge(1),
             nEntries / 4,

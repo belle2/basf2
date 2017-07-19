@@ -389,12 +389,14 @@ void ECLDatabaseImporter::importShowerEnergyCorrectionTemporary()
 
     //    B2INFO(energy << " " << bkgFactor << " " << thetaMinInLine << " " << thetaMaxInLine << " " << correctionFactor);
 
-    //Find thetaMin and thetaMax
-    if (thetaMinInLine < thetaMin)
-      thetaMin = thetaMinInLine;
+    const double theta = 0.5 * (thetaMinInLine + thetaMaxInLine);
 
-    if (thetaMaxInLine > thetaMax)
-      thetaMax = thetaMaxInLine;
+    //Find thetaMin and thetaMax
+    if (theta < thetaMin)
+      thetaMin = theta;
+
+    if (theta > thetaMax)
+      thetaMax = theta;
 
     //Find energyMin and energyMax
     if (energy < energyMin)
@@ -403,7 +405,7 @@ void ECLDatabaseImporter::importShowerEnergyCorrectionTemporary()
     if (energy > energyMax)
       energyMax = energy;
 
-    const double theta = 0.5 * (thetaMinInLine + thetaMaxInLine);
+
 
     graph.SetPoint(graph.GetN(), theta, energy, correctionFactor);
   }
@@ -418,18 +420,18 @@ void ECLDatabaseImporter::importShowerEnergyCorrectionTemporary()
   IntervalOfValidity iov(startExp, startRun, endExp, endRun);
 
   if (std::abs(bkgFactor - 1.0) < 1e-9) { //bkgFactor == 1 -> phase 2 backgrounds
-    DBImportArray<ECLShowerEnergyCorrectionTemporary> dbArray("ECLShowerEnergyCorrectionTemporary_phase2");
-    dbArray.appendNew(graph, thetaMin, thetaMax, energyMin, energyMax);
+    DBImportObjPtr<ECLShowerEnergyCorrectionTemporary> dbPtr("ECLShowerEnergyCorrectionTemporary_phase2");
+    dbPtr.construct(graph, thetaMin, thetaMax, energyMin, energyMax);
 
     //Import into local db
-    dbArray.import(iov);
+    dbPtr.import(iov);
   }
   /*else (because currently phase_2 and phase_3 are same payload*/ if (std::abs(bkgFactor - 1.0) < 1e-9) {
-    DBImportArray<ECLShowerEnergyCorrectionTemporary> dbArray("ECLShowerEnergyCorrectionTemporary_phase3");
-    dbArray.appendNew(graph, thetaMin, thetaMax, energyMin, energyMax);
+    DBImportObjPtr<ECLShowerEnergyCorrectionTemporary> dbPtr("ECLShowerEnergyCorrectionTemporary_phase3");
+    dbPtr.construct(graph, thetaMin, thetaMax, energyMin, energyMax);
 
     //Import into local db
-    dbArray.import(iov);
+    dbPtr.import(iov);
   }
 
 

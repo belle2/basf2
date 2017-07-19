@@ -18,6 +18,10 @@
 #include <tracking/trackFindingVXD/trackSetEvaluator/HopfieldNetwork.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/Scrooge.h>
 
+#include <framework/dataobjects/EventMetaData.h>
+
+#include <fstream>
+
 namespace Belle2 {
   /**
    * Overlap check which sorts out only a non-overlapping set of states from a vector, which
@@ -82,6 +86,10 @@ namespace Belle2 {
                                     m_param_allowOverlapBetweenSeeds,
                                     "Allow overlaps between results with different seeds.",
                                     m_param_allowOverlapBetweenSeeds);
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "overlapResolverExport"),
+                                    m_param_overlapResolverExport,
+                                    "Filename to export the overlap resolver info to, if given.",
+                                    m_param_overlapResolverExport);
     }
 
     /// Main function of this findlet: find a non overlapping set of results with the best quality.
@@ -126,6 +134,8 @@ namespace Belle2 {
     bool m_param_useGreedyAlgorithm = false;
     /// Parameter: Allow overlaps between results with the same seed.
     bool m_param_allowOverlapBetweenSeeds = false;
+    /// Parameter: Filename to export the overlap resolver info to, if given
+    std::string m_param_overlapResolverExport = "";
 
     // Object Pools
     /// Overlap resolver infos as input to the hopfield network.
@@ -230,6 +240,24 @@ namespace Belle2 {
             break;
           }
         }
+      }
+    }
+
+    // Export overlap resolver information
+    if (not m_param_overlapResolverExport.empty()) {
+      StoreObjPtr<EventMetaData> eventMetaData;
+      unsigned int eventNumber = eventMetaData->getEvent();
+      std::ofstream output_file(m_param_overlapResolverExport + std::to_string(eventNumber), std::ios::trunc | std::ios::out);
+      for (const auto& resolverInfo : m_overlapResolverInfos) {
+        output_file << resolverInfo.trackIndex << "\t"
+                    << resolverInfo.qualityIndex << "\t"
+                    << m_resultsWithWeight[resolverInfo.trackIndex]->getWeight() << "\t"
+                    << m_resultsWithWeight[resolverInfo.trackIndex]->getSeed() << "\t"
+                    << m_resultsWithWeight[resolverInfo.trackIndex]->getHits().size() << "\t";
+        for (const auto& overlap : resolverInfo.overlaps) {
+          output_file << overlap << ",";
+        }
+        output_file << std::endl;
       }
     }
 

@@ -31,6 +31,12 @@ namespace Belle2 {
   public:
 
     /**
+     * Default constructor
+     *
+     */
+    ECLShowerEnergyCorrectionTemporary() {}
+
+    /**
      * Constructor
      * Theta angles are in degrees!!
      */
@@ -47,6 +53,11 @@ namespace Belle2 {
     {
 
     }
+
+    /**
+     * Destructor
+     */
+    ~ECLShowerEnergyCorrectionTemporary() {};
 
     /*! Get the TGraph2D graph
      * x - theta (degrees)

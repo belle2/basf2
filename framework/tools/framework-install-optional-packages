@@ -60,10 +60,6 @@ parser.add_argument('package',
                     help='Packages to additionally install in addition to {}'.format(optional_packages_list))
 
 args = parser.parse_args()
-print (args.package)
-if not args.target and not can_install:
-    print("The default installation target is read-only. Therefore you must give a target using the '--target' option.")
-    sys.exit(1)
 
 target_option = []
 target_pythonpath_env = os.environ.copy()

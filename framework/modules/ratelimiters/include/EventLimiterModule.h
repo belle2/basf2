@@ -10,6 +10,8 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 namespace Belle2 {
   class EventLimiterModule : public Module {
@@ -21,8 +23,8 @@ namespace Belle2 {
     /* Destructor of the module */
     virtual ~EventLimiterModule() {};
 
-    /* No initialization required */
-    virtual void initialize() {};
+    /* Initialization states required data objects (EventMetaData) */
+    virtual void initialize();
 
     /* Checks if we've reached the maximum number of events yet and sets the return value to False if we have */
     virtual void event();
@@ -31,6 +33,9 @@ namespace Belle2 {
     virtual void beginRun();
 
   private:
+    /* Datastore pointers */
+    StoreObjPtr<EventMetaData> m_eventMetaData;
+
     /* Maximum number of events to be collected at the start of each run (-1 = no maximum) */
     int m_maxEventsPerRun;
 

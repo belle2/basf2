@@ -24,7 +24,7 @@ REG_MODULE(EventLimiter)
 EventLimiterModule::EventLimiterModule() : Module()
 {
   // Set module properties
-  setDescription("Allows you to set limits on the number of events passing this module. "
+  setDescription("Allows you to set limits on the number of events per run passing this module. "
                  "It returns True until the limit is reached, after which it returns False. "
                  "basf2 conditional paths can then be used to prevent events continuing onwards from this module.");
 
@@ -32,9 +32,14 @@ EventLimiterModule::EventLimiterModule() : Module()
   addParam("maxEventsPerRun", m_maxEventsPerRun,
            "Maximum number of events that will have True returned on them per run. "
            "This module returns True until the limit in a particular run is reached, it then returns False. "
-           "It will only start returning True again once a run begins that hasn't processed the maximum number of events. "
+           "It will only start returning True again once a new run begins. "
            "The default value (-1) means that this module always returns True regardless of how many events "
            "are processed in a run.", int(-1));
+}
+
+void EventLimiterModule::initialize()
+{
+  m_eventMetaData.isRequired();
 }
 
 void EventLimiterModule::event()
@@ -44,9 +49,11 @@ void EventLimiterModule::event()
     // Have we exceeded our maximum events in this run?
     if (m_runEvents >= m_maxEventsPerRun) {
       // If we have, we should skip collection until further notice
-      B2INFO("Reached maximum number of events to process for this run ("
+      B2INFO("Reached maximum number of events ("
              << m_maxEventsPerRun
-             << "). Returning False from this event and for all events until the next run.");
+             << ") for (Experiment, Run) = ("
+             << m_eventMetaData->getExperiment() << ", "
+             << m_eventMetaData->getRun() << ")");
       m_returnValue = false;
     } else {
       m_runEvents += 1;

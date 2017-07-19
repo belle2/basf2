@@ -229,6 +229,7 @@ namespace Belle2 {
       TH1* m_hHitDistInTrCand[56];            /**< Hit Dist. Before Fit. */
       TH1* m_hHitDistInTrack[56];             /**< Hit Dist. after fit (Weight of Hit >0.5). */
       TH1* m_hResidualU[56];                  /**< Residual distribution (in cm)  */
+      TH1* m_hEvtT0;                               /**< Event T0. */
       TH2* m_hNDFResidualU[56];               /**< Residual vs. ndf. */
       TH1* m_hNormalizedResidualU[56];        /**< Residual distribution normalized with tracking error.  */
       TH2* m_hNDFNormalizedResidualU[56];     /**< Normalized residual vs. ndf. */
@@ -257,6 +258,7 @@ namespace Belle2 {
       double dt_flight_sim;     /**< Time of flight (Simulation). */
       double dt_prop;           /**< Time of propagation. */
       double evtT0;             /**< Event time*/
+      double Pt;                /**< Transverse momentum*/
 
       double x_mea;             /**< measure drift length (signed by left right).*/
       double x_u;               /**< X_fit for unbiased track fit.*/
@@ -278,6 +280,7 @@ namespace Belle2 {
       double phi0;              /**< Track Parameter, phi0. */
       double tanL;              /**< Track Parameter, tanL. */
       double omega;             /**< Track Parameter, omega. */
+      double m_MinimumPt;       /**< Minimum Transverse momentum of tracks*/
 
       TVector3 m_trigHitPos;                            /**< Trigger position. */
       std::vector<double> m_TriggerPos;                 /**< Nominal center position of trigger counter. */
@@ -301,6 +304,7 @@ namespace Belle2 {
       bool m_SmallerOutput;                    /**< make output smaller by ignore some variable. */
       bool m_StoreTrackParams;                 /**< Store Track parameter or not. */
       bool m_MakeHitDist;                      /**< Switch to make histograms of hit distribution. */
+      bool m_EventT0Extraction;                /**< use Event T0 extract t0 or not. */
     };
   }
 }

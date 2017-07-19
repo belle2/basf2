@@ -77,6 +77,8 @@ CDCCRTestModule::CDCCRTestModule() : HistoModule()
   addParam("SmallerOutput", m_SmallerOutput, "If true, trigghit position, residual cov,absRes, will not be stored", true);
   addParam("StoreTrackParams", m_StoreTrackParams, "Store Track Parameter or not, it will be multicount for each hit", true);
   addParam("StoreHitDistribution", m_MakeHitDist, "Make hit distribution or not", false);
+  addParam("EventT0Extraction", m_EventT0Extraction, "use event t0 extract t0 or not", false);
+  addParam("MinimumPt", m_MinimumPt, "Tracks with tranverse momentum small than this will not recored", 0.);
 }
 
 CDCCRTestModule::~CDCCRTestModule()
@@ -106,6 +108,7 @@ void CDCCRTestModule::defineHisto()
   m_tree->Branch("IWire", &IWire, "IWire/I");
   m_tree->Branch("Pval", &Pval, "Pval/D");
   m_tree->Branch("ndf", &ndf, "ndf/D");
+  m_tree->Branch("Pt", &Pt, "Pt/D");
   m_tree->Branch("trighit", &trighit, "trighit/I");
   if (m_StoreTrackParams) {
     m_tree->Branch("d0", &d0, "d0/D");
@@ -146,18 +149,19 @@ void CDCCRTestModule::defineHisto()
   m_hNTracks->GetXaxis()->SetBinLabel(2, "fitted, not converged");
   m_hNTracks->GetXaxis()->SetBinLabel(3, "TrackCand, but no Track");
 
-  m_hNDF = getHist("hNDF", "NDF of fitted track;NDF;Tracks", 71, -1, 70);
-  m_hNHits = getHist("hNHits", "#hit of fitted track;#hit;Tracks", 61, -1, 70);
-  m_hNHits_trackcand = getHist("hNHits_trackcand", "#hit of track candidate;#hit;Tracks", 71, -1, 70);
+  m_hNDF = getHist("hNDF", "NDF of fitted track;NDF;Tracks", 71, -1, 150);
+  m_hNHits = getHist("hNHits", "#hit of fitted track;#hit;Tracks", 61, -1, 150);
+  m_hNHits_trackcand = getHist("hNHits_trackcand", "#hit of track candidate;#hit;Tracks", 71, -1, 150);
   m_hNTracksPerEvent = getHist("hNTracksPerEvent", "#tracks/Event;#Tracks;Event", 20, 0, 20);
   m_hNTracksPerEventFitted = getHist("hNTracksPerEventFitted", "#tracks/Event After Fit;#Tracks;Event", 20, 0, 20);
-  m_hE1Dist = getHist("hE1Dist", "Energy Dist. in case 1track/evt; E(Gev);Tracks", 100, 0, 20);
-  m_hE2Dist = getHist("hE2Dist", "Energy Dist. in case 2track/evt; E(Gev);Tracks", 100, 0, 20);
+  //  m_hE1Dist = getHist("hE1Dist", "Energy Dist. in case 1track/evt; E(Gev);Tracks", 100, 0, 20);
+  //m_hE2Dist = getHist("hE2Dist", "Energy Dist. in case 2track/evt; E(Gev);Tracks", 100, 0, 20);
   m_hChi2 = getHist("hChi2", "#chi^{2} of tracks;#chi^{2};Tracks", 400, 0, 400);
   m_hPhi0 = getHist("hPhi0", "#Phi_{0} of tracks;#phi_{0} (Degree);Tracks", 400, -190, 190);
   m_hAlpha = getHist("hAlpha", "#alpha Dist.;#alpha (Degree);Hits", 360, -90, 90);
   m_hTheta = getHist("hTheta", "#theta Dist.;#theta (Degree);Hits", 360, 0, 180);
   m_hPval = getHist("hPval", "p-values of tracks;pVal;Tracks", 1000, 0, 1);
+  m_hEvtT0 = getHist("hEvtT0", "Event T0; EvtT0 (ns); #event", 200, -100, 100);
 
   m_hTriggerHitZX =  getHist("TriggerHitZX", "Hit Position on trigger counter;z(cm);x(cm)", 300, -100, 100, 120, -15, 15);
   if (m_MakeHitDist) {
@@ -248,6 +252,7 @@ void CDCCRTestModule::beginRun()
 
 void CDCCRTestModule::event()
 {
+  evtT0 = 0.;
   const StoreArray<Belle2::Track> storeTrack(m_trackArrayName);
   const StoreArray<Belle2::TrackFitResult> storeTrackFitResults(m_trackFitResultArrayName);
   const StoreArray<Belle2::CDCHit> cdcHits(m_cdcHitArrayName);
@@ -304,11 +309,17 @@ void CDCCRTestModule::event()
       continue;
     }
 
-    if (nTr == 1) m_hE1Dist->Fill(fitresult->getEnergy());
-    if (nTr == 2) m_hE2Dist->Fill(fitresult->getEnergy());
-
     if (m_noBFit) {ndf = fs->getNdf() + 1;} // incase no Magnetic field, NDF=4;
     else {ndf = fs->getNdf();}
+    if (ndf < 5) continue;
+
+    if (m_EventT0Extraction) {
+      // event with is fail to extract t0 will be exclude from analysis
+      if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasDoubleEventT0()) {
+        evtT0 =  m_eventTimeStoreObject->getEventT0();
+        m_hEvtT0->Fill(evtT0);
+      } else { continue;}
+    }
 
     double Chi2 = fs->getChi2();
     TrPval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
@@ -317,11 +328,12 @@ void CDCCRTestModule::event()
     tanL = fitresult->getTanLambda();
     omega = fitresult->getOmega();
     phi0 = fitresult->getPhi0() * 180 / M_PI;
-
+    Pt = fitresult->getMomentum().Perp();
     m_hPhi0->Fill(phi0);
     m_hPval->Fill(TrPval);
     m_hNDF->Fill(ndf);
     m_hChi2->Fill(Chi2);
+    if (Pt < m_MinimumPt) continue;
     if (m_hitEfficiency && track->getNumberOfCDCHits() > 30 && TrPval > 0.001) {
       HitEfficiency(track);
     }
@@ -457,7 +469,7 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
 
           // Second: correct for event time. If this wasn't simulated, m_eventTime can just be set to 0.
           if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasDoubleEventT0()) {
-            evtT0 =  m_eventTimeStoreObject->getEventT0();
+            //            evtT0 =  m_eventTimeStoreObject->getEventT0();
             t -= evtT0;
           }
 

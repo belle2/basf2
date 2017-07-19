@@ -15,8 +15,11 @@
 
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventT0.h>
+
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <genfit/Track.h>
+//#include <genfit/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include "TTree.h"
 #include "TFile.h"
@@ -67,6 +70,7 @@ namespace Belle2 {
 
 
     private:
+      StoreObjPtr<EventT0> m_eventTimeStoreObject; /**<Event t0 */
       const Belle2::TrackFitResult* fitresult; /**< Track fit result. */
       std::string m_trackArrayName;           /**< Belle2::Track StoreArray name. */
       std::string m_recoTrackArrayName ;       /**< Belle2::RecoTrack StoreArray nam.e */
@@ -96,7 +100,10 @@ namespace Belle2 {
       TVector3 Mom2;                    /**< Momentum of 2nd track */
       double Omega1;                     /**< omega of 1st track*/
       double Omega2;                     /**< omega of 2nd track*/
+      double evtT0;                       /* event t0*/
+      short charge;                       /* charge of track*/
       bool m_noBFit; /**< fit incase no magnetic Field of not, if true, NDF=4 in cal P-value */
+      bool m_EventT0Extraction;/**< run with event t0 extraction*/
 
     };
   }

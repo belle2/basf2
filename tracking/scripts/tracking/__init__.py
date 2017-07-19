@@ -244,8 +244,8 @@ def add_cdc_cr_track_fit_and_track_creator(path, components=None,
         # Extract the time
         path.add_module("FullGridTrackTimeExtraction",
                         recoTracksStoreArrayName=reco_tracks,
-                        maximalT0Shift=70,
-                        minimalT0Shift=-70,
+                        maximalT0Shift=40,
+                        minimalT0Shift=-40,
                         numberOfGrids=6
                         )
 

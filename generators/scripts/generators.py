@@ -249,24 +249,28 @@ def add_cosmics_generator(path, components=None,
                           geometry_xml_file='geometry/GCR_Summer2017.xml',
                           cosmics_data_dir='data/generators/modules/cryinput/',
                           setup_file='generators/scripts/cry.setup',
-                          pre_general_run_setup=None, top_in_counter=True):
+                          data_taking_period='gcr2017', top_in_counter=False):
     """
     Add the cosmics generator CRY with the default parameters to the path.
     :param path: Add the modules to this path.
+
+    :param data_taking_period: The cosmics generation will be added using the
+           parameters, that where used in this period of data taking. The periods can be found in cdc/cr/__init__.py.
+
     :param components: list of geometry components to add in the geometry module,
            or None for all components.
     :param global_box_size: sets global length, width and height.
     :param accept_box: sets the size of the accept box. As a default it is
-           set to 8.0 m as Belle2 detector size.
+           set to 8.0 m = the Belle2 detector size.
     :param keep_box: sets the size of the keep box (keep box >= accept box).
     :param geometry_xml_file: Name of the xml file to use for the geometry.
+
     :param cosmics_data_dir: parameter CosmicDataDir for the cry module (absolute or relative to the basf2 repo).
     :param setup_file: location of the cry.setup file (absolute or relative to the basf2 repo)
-    :param pre_general_run_setup: If set to a string, the cosmics selector module will be added using the
-           parameters, that where used in this period of data taking. The periods can be found in cdc/cr/__init__.py.
-           If not set, the method will assume a general cosmics run without the need for any selection (no trigger).
-    :param top_in_counter: TOP from hit point to pmt in trigger counter is subtracted
-           (assuming PMT is put at -z end of counter). Has only an effect when pre_general_run_setup is set.
+
+
+    :param top_in_counter: time of propagation from the hit point to the PMT in the trigger counter is subtracted
+           (assuming PMT is put at -z of the counter).
 
     Please remember to also change the reconstruction accordingly, if you set "special" parameters here!
     """
@@ -279,20 +283,18 @@ def add_cosmics_generator(path, components=None,
     if keep_box is None:
         keep_box = [8, 8, 8]
 
-    if pre_general_run_setup:
-        cosmics_setup.set_cdc_cr_parameters(pre_general_run_setup)
+    cosmics_setup.set_cdc_cr_parameters(data_taking_period)
 
-    if cosmics_setup.cosmics_period and geometry_xml_file != 'geometry/CDCcosmicTests.xml':
-        B2ERROR("You have set the 'pre_general_run_setup' variable, but are still using the geometry setup "
-                "for the general cosmics run, and not the one for the cosmics test. "
-                "This is probably not what you want.", )
+    if cosmics_setup.cosmics_period == "201607":
+        B2FATAL("The data taking period 201607 is very special (geometry setup, PMTs etc). This is not handled "
+                "by this script! Please ask the CDC group, if you want to simulate this.")
 
     if 'Gearbox' not in path:
         override = [("/Global/length", str(global_box_size[0]), "m"),
                     ("/Global/width", str(global_box_size[1]), "m"),
                     ("/Global/height", str(global_box_size[2]), "m")]
 
-        if pre_general_run_setup:
+        if cosmics_setup.globalPhi:
             override += [("/DetectorComponent[@name='CDC']//GlobalPhiRotation", str(cosmics_setup.globalPhi), "deg")]
 
         path.add_module('Gearbox', override=override, fileName=geometry_xml_file,)
@@ -326,7 +328,8 @@ def add_cosmics_generator(path, components=None,
     # minimal kinetic energy - all particles below that energy are ignored
     cry.param('kineticEnergyThreshold', 0.01)
 
-    if cosmics_setup.cosmics_period:
+    # TODO: I still do not fully understand, when the cosmics selector is needed and when not
+    if cosmics_setup.cosmics_period not in ["normal", "gcr2017"]:
         # Selector module.
         cosmics_selector = register_module('CDCCosmicSelector',
                                            lOfCounter=cosmics_setup.lengthOfCounter,

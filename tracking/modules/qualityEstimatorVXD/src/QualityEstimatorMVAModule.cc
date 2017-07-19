@@ -80,6 +80,9 @@ void QualityEstimatorMVAModule::event()
 
   // assign a QI computed using the selected QualityEstimator for each given SpacePointTrackCand
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
+    if (not aTC.hasRefereeStatus(SpacePointTrackCand::c_isActive)) {
+      continue;
+    }
 
     std::vector<SpacePoint const*> const sortedHits = aTC.getSortedHits();
     m_variableSet.setVariable("NHits", sortedHits.size());

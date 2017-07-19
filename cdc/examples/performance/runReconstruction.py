@@ -19,7 +19,6 @@ import ROOT
 import os
 import os.path
 import argparse
-from tracking import add_cdc_cr_track_finding
 from reconstruction import add_cosmics_reconstruction
 from ROOT import Belle2
 from cdc.cr import *
@@ -72,8 +71,8 @@ def rec(input, output, topInCounter=False, magneticField=True):
     # Add CDC CR reconstruction.
     add_cosmics_reconstruction(main_path,
                                components=['CDC'],
-                               pre_general_run_setup=data_period,
-                               eventTimingExtraction=True,
+                               top_in_counter=topInCounter,
+                               data_taking_period=data_period,
                                merge_tracks=False)
 
     # Simple analysi module.

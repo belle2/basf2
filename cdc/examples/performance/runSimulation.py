@@ -50,7 +50,8 @@ def sim(exp, run, evt, st, topInCounter=True, magneticField=False):
 
     main_path.add_module('Progress')
 
-    period = getDataPeriod(int(run))
+    period = getDataPeriod(exp=int(exp),
+                           run=int(run))
 
     if not magneticField:
         components = ['CDC']

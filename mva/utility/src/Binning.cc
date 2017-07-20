@@ -50,15 +50,16 @@ namespace Belle2 {
       m_signal_yield = 0;
       m_bckgrd_yield = 0;
 
+      // Total number of events
       for (unsigned int iBin = 0; iBin < nBins; ++iBin) {
         m_signal_yield += m_signal_pdf[iBin];
-        m_bckgrd_yield += m_signal_pdf[iBin];
-
+        m_bckgrd_yield += m_bckgrd_pdf[iBin];
       }
 
+      // Each bin is normed to its width
       for (unsigned int iBin = 0; iBin < nBins; ++iBin) {
-        m_signal_pdf[iBin] /= m_signal_yield;
-        m_bckgrd_pdf[iBin] /= m_bckgrd_yield;
+        m_signal_pdf[iBin] /= m_signal_yield * (m_boundaries[iBin + 1] - m_boundaries[iBin]) / (m_boundaries[nBins] - m_boundaries[0]);
+        m_bckgrd_pdf[iBin] /= m_bckgrd_yield * (m_boundaries[iBin + 1] - m_boundaries[iBin]) / (m_boundaries[nBins] - m_boundaries[0]);
       }
 
     }
@@ -70,6 +71,12 @@ namespace Belle2 {
 
       m_signal_cdf = m_signal_pdf;
       m_bckgrd_cdf = m_bckgrd_pdf;
+
+      for (unsigned int iBin = 0; iBin < nBins; ++iBin) {
+        m_signal_cdf[iBin] *= (m_boundaries[iBin + 1] - m_boundaries[iBin]) / (m_boundaries[nBins] - m_boundaries[0]);
+        m_bckgrd_cdf[iBin] *= (m_boundaries[iBin + 1] - m_boundaries[iBin]) / (m_boundaries[nBins] - m_boundaries[0]);
+      }
+
       for (unsigned int iBin = 1; iBin < nBins; ++iBin) {
         m_signal_cdf[iBin] += m_signal_cdf[iBin - 1];
         m_bckgrd_cdf[iBin] += m_bckgrd_cdf[iBin - 1];

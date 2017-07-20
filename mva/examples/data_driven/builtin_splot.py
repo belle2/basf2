@@ -39,13 +39,13 @@ if __name__ == "__main__":
     fastbdt_options = basf2_mva.FastBDTOptions()
     # SPlot is more stable if one doesn't use the randRatio
     # FastBDT has a special sPlot mode, but which isn't implemented yet in the mva package
-    fastbdt_options.m_nTrees = 100
+    # fastbdt_options.m_nTrees = 100
     fastbdt_options.m_randRatio = 1.0
-    basf2_mva.teacher(general_options, fastbdt_options)
+    # basf2_mva.teacher(general_options, fastbdt_options)
 
     general_options.m_identifier = "MVAOrdinary"
     general_options.m_variables = basf2_mva.vector(*variables[1:])
-    basf2_mva.teacher(general_options, fastbdt_options)
+    # basf2_mva.teacher(general_options, fastbdt_options)
 
     meta_options = basf2_mva.MetaOptions()
     meta_options.m_use_splot = True
@@ -89,9 +89,9 @@ if __name__ == "__main__":
     basf2_mva.teacher(general_options, pdf_options)
 
     # Apply the trained methods on data
-    basf2_mva.expert(basf2_mva.vector('MVAPdf', 'MVAFull', 'MVAOrdinary', 'MVASPlot',
-                                      'MVASPlotCombined', 'MVASPlotBoosted', 'MVASPlotCombinedBoosted'),
-                     basf2_mva.vector('train.root'), 'tree', 'expert.root')
+    # basf2_mva.expert(basf2_mva.vector('MVAPdf', 'MVAFull', 'MVAOrdinary', 'MVASPlot',
+    #                                  'MVASPlotCombined', 'MVASPlotBoosted', 'MVASPlotCombinedBoosted'),
+    #                 basf2_mva.vector('train.root'), 'tree', 'expert.root')
 
     """
     path = create_path()

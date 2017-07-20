@@ -147,6 +147,8 @@ namespace Belle2 {
     private:
       Dataset& m_dataset; /**< Wrapped dataset */
       int m_spectator_index; /**< spectator containing the sideband variable */
+      double m_signal_weight; /**< the weight for signal events */
+      double m_background_weight; /**< the weight for background events */
       double m_negative_signal_weight; /**< the weight for negative signal events */
     };
 

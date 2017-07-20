@@ -291,14 +291,67 @@ namespace Belle2 {
       mc_general_options.m_variables = {meta_options.m_splot_variable};
       ROOTDataset mc_dataset(mc_general_options);
 
-      Binning binning = Binning::CreateEqualFrequency(mc_dataset.getFeature(0) , mc_dataset.getWeights(), mc_dataset.getSignals(), 100);
+      auto mc_signals = mc_dataset.getSignals();
+      auto mc_weights = mc_dataset.getWeights();
+      auto mc_feature = mc_dataset.getFeature(0);
+      auto data_feature = discriminant_dataset.getFeature(0);
+      auto data_weights = discriminant_dataset.getWeights();
+
+      Binning binning = Binning::CreateEqualFrequency(mc_feature , mc_weights, mc_signals, 100);
+
+      std::cout << "PDFS" << std::endl;
+      for (unsigned int iBin = 0; iBin < 100; ++iBin) {
+        std::cout <<  binning.m_signal_pdf[iBin] << " "  << binning.m_bckgrd_pdf[iBin] << std::endl;
+      }
+
+      std::cout << "CDFS" << std::endl;
+      for (unsigned int iBin = 0; iBin < 100; ++iBin) {
+        std::cout <<  binning.m_signal_cdf[iBin] << " "  << binning.m_bckgrd_cdf[iBin] << std::endl;
+      }
 
       float signalFraction = binning.m_signal_yield / (binning.m_signal_yield + binning.m_bckgrd_yield);
 
-      // Overall normalization could be different on data
-      float yield_correction = data_dataset.getNumberOfEvents() / mc_dataset.getNumberOfEvents();
-      binning.m_signal_yield *= yield_correction;
-      binning.m_bckgrd_yield *= yield_correction;
+      std::vector<double> data(100, 0);
+      double total_data = 0.0;
+      for (unsigned int iEvent = 0; iEvent < data_dataset.getNumberOfEvents(); ++iEvent) {
+        data[binning.getBin(data_feature[iEvent])] += data_weights[iEvent];
+        total_data += data_weights[iEvent];
+      }
+
+      // We do a simple fit here to estimate the signal and backgrund yields
+      // We could use RooFit here to avoid using custom code,
+      // but I found RooFit to be difficult and unstable ...
+
+      float best_yield = 0.0;
+      double best_chi2 = 1000000000.0;
+      bool empty_bin = false;
+      for (double yield = 0; yield < total_data; yield += 1) {
+        double chi2 = 0.0;
+        for (unsigned int iBin = 0; iBin < 100; ++iBin) {
+          double deviation = (data[iBin] - (yield * binning.m_signal_pdf[iBin] + (total_data - yield) * binning.m_bckgrd_pdf[iBin]) *
+                              (binning.m_boundaries[iBin + 1] - binning.m_boundaries[iBin]) / (binning.m_boundaries[100] - binning.m_boundaries[0]));
+          if (data[iBin] > 0)
+            chi2 += deviation * deviation / data[iBin];
+          else
+            empty_bin = true;
+        }
+        if (chi2 < best_chi2) {
+          best_chi2 = chi2;
+          best_yield = yield;
+        }
+      }
+
+      if (empty_bin) {
+        B2WARNING("Encountered empty bin in data histogram during fit of the components for sPlot");
+      }
+
+      B2INFO("sPlot best yield " << best_yield);
+      B2INFO("sPlot Yields On MC " << binning.m_signal_yield << " " << binning.m_bckgrd_yield);
+
+      binning.m_signal_yield = best_yield;
+      binning.m_bckgrd_yield = (total_data - best_yield);
+
+      B2INFO("sPlot Yields Fitted On Data " << binning.m_signal_yield << " " << binning.m_bckgrd_yield);
 
       if (meta_options.m_splot_boosted) {
         GeneralOptions boost_general_options = data_general_options;

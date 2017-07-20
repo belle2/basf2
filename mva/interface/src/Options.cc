@@ -181,7 +181,7 @@ namespace Belle2 {
       }
 
       pt.put("use_reweighting", m_use_reweighting);
-      pt.put("reweighting_norm", m_reweighting_identifier);
+      pt.put("reweighting_variable", m_reweighting_variable);
       pt.put("reweighting_identifier", m_reweighting_identifier);
 
       pt.put("reweighting_number_of_mc_files", m_reweighting_mc_files.size());

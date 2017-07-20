@@ -33,66 +33,66 @@ def call_and_output(command_and_args, *args, **kwargs):
     @param args: forwarded arguments to subprocess.check_output
     @param kwargs: forwarded keyword arguments to subprocess.check_output
     """
-
-    # this will output the results of the subprocess call directly to the console
-    popen = subprocess.Popen(command_and_args, *args,stdout=subprocess.PIPE, stderr=subprocess.STDOUT, 
-                             universal_newlines=True, **kwargs)
-    for stdout_line in iter(popen.stdout.readline, ""):
-        print(stdout_line, end='')
-    popen.stdout.close()
-    return_code = popen.wait()
-    if return_code:
-        raise subprocess.CalledProcessError(return_code, command_and_args)
+    subprocess.run(command_and_args, *args, check=True, **kwargs)
 
 
-parser = argparse.ArgumentParser(description='Install optional python packages for basf2')
+def get_argument_parser():
+    """
+    Return the argument parser. For easy automatized argmunt collection of FW tools.
+    """
+    parser = argparse.ArgumentParser(description='Install optional python packages for basf2')
+    return parser
 
-# check if we can make the target parameter optional
-can_install = can_install_sitepackages()
 
-# if we can install into the default location, using the target parameter becomes optional
-parser.add_argument('--target',
-                    required=not can_install,
-                    help='Folder used as target to install additional pip packages. Must be writeable.')
-
-parser.add_argument('package',
-                    nargs="*",
-                    help='Packages to additionally install in addition to {}'.format(optional_packages_list))
-
-args = parser.parse_args()
-
-target_option = []
-target_pythonpath_env = os.environ.copy()
-target_path_abs = None
-if args.target:
-    print("Installing packages into target {} -- This will take some time.".format(args.target) )
-    target_path_abs = os.path.abspath(args.target)
-    target_option = ["--target", target_path_abs]
-
-    # add the new target folder to the python path
-    target_pythonpath_env["PYTHONPATH"] = target_path_abs + ":" + target_pythonpath_env["PYTHONPATH"]
-else:
-    print("Installing packages -- This will take some time.")
-
-# install packages
-call_and_output(["pip3", "install", "-v"] + target_option + optional_packages_list + args.package,
-                env=target_pythonpath_env)
-
-# various configuration settings for the newly installed packages
-# use a env containing the target path so the new packages are actually available
-if can_install:
-    # this is only possible if the jupyter config is writeable, in cvmfs case it is not.
-    call_and_output(["jupyter", "nbextension", "enable", "--py", "--sys-prefix", "widgetsnbextension"],
+if __name__ == "__main__":
+    parser = get_argument_parser
+    
+    # check if we can make the target parameter optional
+    can_install = can_install_sitepackages()
+    
+    # if we can install into the default location, using the target parameter becomes optional
+    parser.add_argument('--target',
+                        required=not can_install,
+                        help='Folder used as target to install additional pip packages. Must be writeable.')
+    
+    parser.add_argument('package',
+                        nargs="*",
+                        help='Packages to additionally install in addition to {}'.format(optional_packages_list))
+    
+    args = parser.parse_args()
+    
+    target_option = []
+    target_pythonpath_env = os.environ.copy()
+    target_path_abs = None
+    if args.target:
+        print("Installing packages into target {} -- This will take some time.".format(args.target) )
+        target_path_abs = os.path.abspath(args.target)
+        target_option = ["--target", target_path_abs]
+    
+        # add the new target folder to the python path
+        target_pythonpath_env["PYTHONPATH"] = target_path_abs + ":" + target_pythonpath_env["PYTHONPATH"]
+    else:
+        print("Installing packages -- This will take some time.")
+    
+    # install packages
+    call_and_output(["pip3", "install", "-v"] + target_option + optional_packages_list + args.package,
                     env=target_pythonpath_env)
-
-if not args.target:
-    print("All optional packages installed into the default site-packages location.")
-else:
-    print("""All optional packages installed into the target folder {}
-              !!!  IMPORTANT !!!
-           In order to use the installed optional python packages, you need to add
-           the target folder to your PYTHONPATH environment variable before running basf2.
-           You can do this by executing the following command after you called setuprel:""".format(target_path_abs) +
-
-          os.linesep + 'export PYTHONPATH="' + target_path_abs + ':${PYTHONPATH}"')
+    
+    # various configuration settings for the newly installed packages
+    # use a env containing the target path so the new packages are actually available
+    if can_install:
+        # this is only possible if the jupyter config is writeable, in cvmfs case it is not.
+        call_and_output(["jupyter", "nbextension", "enable", "--py", "--sys-prefix", "widgetsnbextension"],
+                        env=target_pythonpath_env)
+    
+    if not args.target:
+        print("All optional packages installed into the default site-packages location.")
+    else:
+        print("""All optional packages installed into the target folder {}
+                  !!!  IMPORTANT !!!
+               In order to use the installed optional python packages, you need to add
+               the target folder to your PYTHONPATH environment variable before running basf2.
+               You can do this by executing the following command after you called setuprel:""".format(target_path_abs) +
+    
+              os.linesep + 'export PYTHONPATH="' + target_path_abs + ':${PYTHONPATH}"')
 

@@ -6,13 +6,15 @@ set_random_seed(501)
 
 
 class CountEvents(Module):
-
     """Count the number of events passing this module"""
 
     def initialize(self):
+        """Start number of events at zero"""
+        #: Stores the total number of events passing this module
         self.num_events = 0
 
     def event(self):
+        """Increment number of events each event"""
         self.num_events += 1
 
 

@@ -12,7 +12,7 @@
 #include <framework/core/Module.h>
 
 namespace Belle2 {
-  /* The Prescale module.
+  /** The Prescale module.
    *
    * This module randomly returns true or false on each event with a fraction determined by an input parameter.
    *
@@ -20,20 +20,20 @@ namespace Belle2 {
    */
   class PrescaleModule : public Module {
   public:
-    /* Constructor of the module. Sets the description of the module and the parameters of the module. */
+    /** Constructor of the module. Sets the description of the module and the parameters of the module. */
     PrescaleModule();
 
-    /* Destructor of the module. */
+    /** Destructor of the module. */
     virtual ~PrescaleModule() {};
 
-    /* No Initialization necessary */
+    /** No Initialization necessary */
     virtual void initialize() {};
 
-    /* Sets the return value by running a RNG vs. the prescale value */
+    /** Sets the return value by running a RNG vs. the prescale value */
     virtual void event();
 
   private:
-    /* Prescale module parameter, this fraction of events will return True. [0.0 -> 1.0] */
+    /** Prescale module parameter, this fraction of events will return True. [0.0 -> 1.0] */
     double m_prescale;
   };
 }

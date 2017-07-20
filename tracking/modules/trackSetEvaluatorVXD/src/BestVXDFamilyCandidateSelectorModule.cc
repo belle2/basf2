@@ -44,7 +44,7 @@ void BestVXDFamilyCandidateSelectorModule::event()
     unsigned short family = sptc.getFamily();
     auto iter = familyToCand.find(family);
     if (iter != familyToCand.end()) {
-      auto entry = iter->second;
+      auto& entry = iter->second;
       if (entry.second < qi) {
         entry.first = sptc.getArrayIndex();
         entry.second = qi;

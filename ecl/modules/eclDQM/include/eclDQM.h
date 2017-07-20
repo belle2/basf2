@@ -64,15 +64,17 @@ namespace Belle2 {
 
       /** Histogram directory in ROOT file. */
       std::string m_histogramDirectoryName;
+      /** Upper threshold of energy deposition in event, [GeV]. */
+      double m_EnergyUpperThr;
 
       /** Histogram: Crystal Cell IDs. */
       TH1F* h_cid;
-      /** Histogram: Crystal Cell IDs above threshold = 2 MeV.  */
-      TH1F* h_cid_Thr2MeV;
       /** Histogram: Crystal Cell IDs above threshold = 5 MeV.  */
       TH1F* h_cid_Thr5MeV;
       /** Histogram: Crystal Cell IDs above threshold = 10 MeV. */
       TH1F* h_cid_Thr10MeV;
+      /** Histogram: Crystal Cell IDs above threshold = 50 MeV.  */
+      TH1F* h_cid_Thr50MeV;
       /** Histogram: Energy deposition in event. */
       TH1F* h_edep;
       /** Histogram: Reconstructed signal time for the barrel calorimeter above the threshold = 5 MeV.  */
@@ -87,7 +89,7 @@ namespace Belle2 {
       TH1F* h_time_barrel_Thr50MeV;
       /** Histogram: Reconstructed signal time for the endcap calorimeter above the threshold = 50 MeV. */
       TH1F* h_time_endcaps_Thr50MeV;
-      /** Histogram: Fit quality flag (0 - good, 1 - large amplitude, 2 - bad chi2). */
+      /** Histogram: Fit quality flag (0 - good, 1 - large amplitude, 3 - bad chi2). */
       TH1F* h_quality;
     }; // end ECL namespace
   }; // end Belle2 namespace

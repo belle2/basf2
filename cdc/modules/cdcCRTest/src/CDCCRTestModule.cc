@@ -154,8 +154,6 @@ void CDCCRTestModule::defineHisto()
   m_hNHits_trackcand = getHist("hNHits_trackcand", "#hit of track candidate;#hit;Tracks", 71, -1, 150);
   m_hNTracksPerEvent = getHist("hNTracksPerEvent", "#tracks/Event;#Tracks;Event", 20, 0, 20);
   m_hNTracksPerEventFitted = getHist("hNTracksPerEventFitted", "#tracks/Event After Fit;#Tracks;Event", 20, 0, 20);
-  //  m_hE1Dist = getHist("hE1Dist", "Energy Dist. in case 1track/evt; E(Gev);Tracks", 100, 0, 20);
-  //m_hE2Dist = getHist("hE2Dist", "Energy Dist. in case 2track/evt; E(Gev);Tracks", 100, 0, 20);
   m_hChi2 = getHist("hChi2", "#chi^{2} of tracks;#chi^{2};Tracks", 400, 0, 400);
   m_hPhi0 = getHist("hPhi0", "#Phi_{0} of tracks;#phi_{0} (Degree);Tracks", 400, -190, 190);
   m_hAlpha = getHist("hAlpha", "#alpha Dist.;#alpha (Degree);Hits", 360, -90, 90);

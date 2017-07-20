@@ -100,8 +100,8 @@ namespace Belle2 {
       TVector3 Mom2;                    /**< Momentum of 2nd track */
       double Omega1;                     /**< omega of 1st track*/
       double Omega2;                     /**< omega of 2nd track*/
-      double evtT0;                       /* event t0*/
-      short charge;                       /* charge of track*/
+      double evtT0;                       /**< event t0 */
+      short charge;                       /**< charge of track */
       bool m_noBFit; /**< fit incase no magnetic Field of not, if true, NDF=4 in cal P-value */
       bool m_EventT0Extraction;/**< run with event t0 extraction*/
 

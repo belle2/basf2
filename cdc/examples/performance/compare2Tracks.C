@@ -28,7 +28,7 @@ void compare2Tracks(){
   TGaxis::SetMaxDigits(4);
   double binWidth=45;
   int ndfmin=25;
-  double D0min = 5;
+  //  double D0min = 5;
   int nbin = floor(180/binWidth);
   string filename = "output/output_*";
   TChain *tree = new TChain("tree");
@@ -46,7 +46,7 @@ void compare2Tracks(){
   double Omega1, Omega2;
 
 
-  double binwidth_phi0 = 45;
+  //  double binwidth_phi0 = 45;
   tree->SetBranchAddress("evtT0",&evtT0);
   tree->SetBranchAddress("ndf1",&ndf1);
   tree->SetBranchAddress("Pval1",&Pval1);
@@ -126,7 +126,7 @@ void compare2Tracks(){
   TH2D* hdtanLPt = new TH2D("hdtanLPt","#Deltatan#lambda/#surd2  vs P_{t};P_{t};#Deltatan#lambda",10,0,5,100,-0.05,0.05);
   TH2D* hevtT0Pt = new TH2D("hevtT0Pt","",10,0,5,100,-10,10);
   double ndf, Phi0, tanLambda, D0,Z0, Pval, Omega;
-  TVector* Mom;
+
   hNDF1->SetLineColor(kRed);
   hPval1->SetLineColor(kRed);
   hPhi01->SetLineColor(kRed);
@@ -209,7 +209,7 @@ void compare2Tracks(){
     }
     // z0 dependence, cut d0
     if(fabs(D0m) < 5){
-      if(fabs(tanLambda1)<0.35 & fabs(tanLambda2)<0.35){
+      if(fabs(tanLambda1)<0.35 && fabs(tanLambda2)<0.35){
 	hdD0Z0->Fill(Z0m, dD0);
 	hdZ0Z0->Fill(Z0m, dZ0);    
       }

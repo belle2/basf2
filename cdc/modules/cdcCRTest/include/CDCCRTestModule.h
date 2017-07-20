@@ -213,8 +213,6 @@ namespace Belle2 {
       TH1* m_hNTracks;                        /**< Number of track fitted, Convergence, not conv, not fit. */
       TH1* m_hNTracksPerEvent;                /**< Number of TrackCand per Event. */
       TH1* m_hNTracksPerEventFitted;          /**< Number of TrackCand per Event**/
-      TH1* m_hE1Dist;                         /**< Energy distribution of 1st track. */
-      TH1* m_hE2Dist;                         /**< Energy distribution of 2nd track if it exists. */
       TH1* m_hNDF;                            /**< Number of Degree Freedom. */
       TH1* m_hNHits;                          /**< Number of Hits per track. */
       TH1* m_hNHits_trackcand;                /**< Number of Hits per trackCand. */

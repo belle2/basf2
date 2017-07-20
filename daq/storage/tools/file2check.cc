@@ -67,7 +67,7 @@ int main(int argc, char** argv)
   std::ofstream fout("list_send.retry");
   //while (fin >> path) {
   //db.execute("select * from datafiles where path = '%s' and host = 'HLT1';", path.c_str());
-  db.execute("select * from datafiles where expno=1 and runno<= 03519 and runno >= 03490 and fileno = 0 and host = 'HLT1';");
+  db.execute("select * from datafiles where expno=1 and runno<= 03519 and runno >= 03500 and fileno = 0 and host = 'HLT1';");
   DBRecordList records(db.loadRecords());
   for (size_t i = 0; i < records.size(); i++) {
     unsigned long long nevents_old = records[i].getInt("nevents");

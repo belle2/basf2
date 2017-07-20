@@ -49,16 +49,16 @@ namespace Belle2 {
       return m_chi2;
     }
 
-    /// Getter for the weight
-    TrackFindingCDC::Weight getWeight() const
+    /// Getter for the teacher information
+    TrackFindingCDC::Weight getTeacherInformation() const
     {
-      return m_weight;
+      return m_teacherInformation;
     }
 
-    /// Setter for the weight
-    void setWeight(TrackFindingCDC::Weight weight)
+    /// Setter for the teacher information
+    void setTeacherInformation(TrackFindingCDC::Weight teacherInformation)
     {
-      m_weight = weight;
+      m_teacherInformation = teacherInformation;
     }
 
   private:
@@ -68,7 +68,7 @@ namespace Belle2 {
     std::vector<const HitObject*> m_hits;
     /// The stored chi2
     double m_chi2;
-    /// A weight, which can transport any kind of information
-    TrackFindingCDC::Weight m_weight = NAN;
+    /// A weight, which transports the teacher information
+    TrackFindingCDC::Weight m_teacherInformation = NAN;
   };
 }

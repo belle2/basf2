@@ -54,9 +54,9 @@ namespace Belle2 {
         // All results, which more than 1 wrong hit are discarded
         // TODO: make this more general!
         if (2 * hits.size() - numberOfCorrectHits > 1) {
-          result.setWeight(-1);
+          result.setTeacherInformation(-1);
         } else {
-          result.setWeight(numberOfCorrectHits);
+          result.setTeacherInformation(numberOfCorrectHits);
         }
       }
 
@@ -78,19 +78,19 @@ namespace Belle2 {
 
       const auto& byWeightSorter = [&extractSeed](const ResultPair & lhs, const ResultPair & rhs)
       {
-        return lhs.getWeight() < rhs.getWeight();
+        return lhs.getTeacherInformation() < rhs.getTeacherInformation();
       };
 
       for (const auto& resultsWithSameSeed : groupedBySeeds)
       {
         const auto& maximalWeightElement = std::max_element(resultsWithSameSeed.begin(), resultsWithSameSeed.end(), byWeightSorter);
-        const auto& maximalWeight = maximalWeightElement->getWeight();
+        const auto& maximalWeight = maximalWeightElement->getTeacherInformation();
 
         for (auto& result : resultsWithSameSeed) {
-          if (result.getWeight() == maximalWeight and maximalWeight != -1) {
-            result.setWeight(1);
+          if (result.getTeacherInformation() == maximalWeight and maximalWeight != -1) {
+            result.setTeacherInformation(1);
           } else {
-            result.setWeight(0);
+            result.setTeacherInformation(0);
           }
         }
       }

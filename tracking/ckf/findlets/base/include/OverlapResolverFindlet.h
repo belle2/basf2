@@ -251,7 +251,7 @@ namespace Belle2 {
       for (const auto& resolverInfo : m_overlapResolverInfos) {
         output_file << resolverInfo.trackIndex << "\t"
                     << resolverInfo.qualityIndex << "\t"
-                    << m_resultsWithWeight[resolverInfo.trackIndex]->getWeight() << "\t"
+                    << m_resultsWithWeight[resolverInfo.trackIndex]->getTeacherInformation() << "\t"
                     << m_resultsWithWeight[resolverInfo.trackIndex]->getSeed() << "\t"
                     << m_resultsWithWeight[resolverInfo.trackIndex]->getHits().size() << "\t";
         for (const auto& overlap : resolverInfo.overlaps) {

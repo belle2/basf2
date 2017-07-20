@@ -111,16 +111,16 @@ namespace {
     EXPECT_FLOAT_EQ(binning.m_boundaries[4], 4.0);
 
     EXPECT_EQ(binning.m_signal_pdf.size(), 4);
-    EXPECT_FLOAT_EQ(binning.m_signal_pdf[0], 0.2);
-    EXPECT_FLOAT_EQ(binning.m_signal_pdf[1], 0.3);
-    EXPECT_FLOAT_EQ(binning.m_signal_pdf[2], 0.3);
-    EXPECT_FLOAT_EQ(binning.m_signal_pdf[3], 0.2);
+    EXPECT_FLOAT_EQ(binning.m_signal_pdf[0], 0.2 * 4.0);
+    EXPECT_FLOAT_EQ(binning.m_signal_pdf[1], 0.3 * 4.0);
+    EXPECT_FLOAT_EQ(binning.m_signal_pdf[2], 0.3 * 4.0);
+    EXPECT_FLOAT_EQ(binning.m_signal_pdf[3], 0.2 * 4.0);
 
     EXPECT_EQ(binning.m_bckgrd_pdf.size(), 4);
-    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[0], 0.3);
-    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[1], 0.2);
-    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[2], 0.2);
-    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[3], 0.3);
+    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[0], 0.3 * 4.0);
+    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[1], 0.2 * 4.0);
+    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[2], 0.2 * 4.0);
+    EXPECT_FLOAT_EQ(binning.m_bckgrd_pdf[3], 0.3 * 4.0);
 
     EXPECT_FLOAT_EQ(binning.m_signal_yield, 10);
     EXPECT_FLOAT_EQ(binning.m_bckgrd_yield, 10);
@@ -169,24 +169,24 @@ namespace {
 
     EXPECT_EQ(boost_weights.size(), 40);
     for (unsigned int i = 0; i < 10; i += 2) {
-      EXPECT_FLOAT_EQ(boost_weights[i], 0.2 / 0.3);
-      EXPECT_FLOAT_EQ(boost_weights[i + 1], 0.8 / 0.3);
+      EXPECT_FLOAT_EQ(boost_weights[i], 0.2 / 0.3 / 4.0);
+      EXPECT_FLOAT_EQ(boost_weights[i + 1], 0.8 / 0.3 / 4.0);
     }
     for (unsigned int i = 10; i < 20; i += 2) {
-      EXPECT_FLOAT_EQ(boost_weights[i], 0.5 / 0.2);
-      EXPECT_FLOAT_EQ(boost_weights[i + 1], 0.5 / 0.2);
+      EXPECT_FLOAT_EQ(boost_weights[i], 0.5 / 0.2 / 4.0);
+      EXPECT_FLOAT_EQ(boost_weights[i + 1], 0.5 / 0.2 / 4.0);
     }
     for (unsigned int i = 20; i < 28; i += 2) {
-      EXPECT_FLOAT_EQ(boost_weights[i], 0.8 / 0.2);
-      EXPECT_FLOAT_EQ(boost_weights[i + 1], 0.2 / 0.2);
+      EXPECT_FLOAT_EQ(boost_weights[i], 0.8 / 0.2 / 4.0);
+      EXPECT_FLOAT_EQ(boost_weights[i + 1], 0.2 / 0.2 / 4.0);
     }
-    EXPECT_FLOAT_EQ(boost_weights[28], 1.0 / 0.3);
-    EXPECT_FLOAT_EQ(boost_weights[29], 0.0 / 0.3);
-    EXPECT_FLOAT_EQ(boost_weights[30], 0.8 / 0.2);
-    EXPECT_FLOAT_EQ(boost_weights[31], 0.2 / 0.2);
+    EXPECT_FLOAT_EQ(boost_weights[28], 1.0 / 0.3 / 4.0);
+    EXPECT_FLOAT_EQ(boost_weights[29], 0.0 / 0.3 / 4.0);
+    EXPECT_FLOAT_EQ(boost_weights[30], 0.8 / 0.2 / 4.0);
+    EXPECT_FLOAT_EQ(boost_weights[31], 0.2 / 0.2 / 4.0);
     for (unsigned int i = 32; i < 40; i += 2) {
-      EXPECT_FLOAT_EQ(boost_weights[i], 1.0 / 0.3);
-      EXPECT_FLOAT_EQ(boost_weights[i + 1], 0.0 / 0.3);
+      EXPECT_FLOAT_EQ(boost_weights[i], 1.0 / 0.3 / 4.0);
+      EXPECT_FLOAT_EQ(boost_weights[i + 1], 0.0 / 0.3 / 4.0);
     }
 
   }

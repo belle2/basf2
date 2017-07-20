@@ -57,9 +57,13 @@ namespace Belle2 {
       }
 
       // Each bin is normed to its width
+      double last_valid_bound = m_boundaries[0];
       for (unsigned int iBin = 0; iBin < nBins; ++iBin) {
-        m_signal_pdf[iBin] /= m_signal_yield * (m_boundaries[iBin + 1] - m_boundaries[iBin]) / (m_boundaries[nBins] - m_boundaries[0]);
-        m_bckgrd_pdf[iBin] /= m_bckgrd_yield * (m_boundaries[iBin + 1] - m_boundaries[iBin]) / (m_boundaries[nBins] - m_boundaries[0]);
+        m_signal_pdf[iBin] /= m_signal_yield * (m_boundaries[iBin + 1] - last_valid_bound) / (m_boundaries[nBins] - m_boundaries[0]);
+        m_bckgrd_pdf[iBin] /= m_bckgrd_yield * (m_boundaries[iBin + 1] - last_valid_bound) / (m_boundaries[nBins] - m_boundaries[0]);
+        if (iBin + 1 < nBins and m_boundaries[iBin + 2] > m_boundaries[iBin + 1]) {
+          last_valid_bound = m_boundaries[iBin + 1];
+        }
       }
 
     }

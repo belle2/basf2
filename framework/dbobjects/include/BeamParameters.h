@@ -137,9 +137,7 @@ namespace Belle2 {
     /** Return energy smearing of the CMS */
     //double getEnergySmearingCMS() const;
 
-
-    /// Interface to global Millepede calibration ----------------
-    /// Get global unique id
+    /** Return unique ID of BeamParameters in global Millepede calibration (1) */
     static unsigned short getGlobalUniqueID() { return 1; }
 
   private:

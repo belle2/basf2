@@ -118,16 +118,34 @@ void StorageSerializerModule::event()
     header->expno = expno;
     header->runno = runno;
     header->subno = subno;
+    struct dataheader {
+      int nword;
+      int type;
+      unsigned int expno;
+      unsigned int runno;
+    } hd;
+    hd.nword = 4;
+    hd.type = MSG_STREAMERINFO;
+    hd.expno = expno;
+    hd.runno = runno;
+    m_obuf.write((int*)&hd, hd.nword, false, 0, true);
     m_nbyte = writeStreamerInfos();
-    m_obuf.unlock();
-    //return ;
-  } else {
-    m_obuf.unlock();
   }
-
+  m_obuf.unlock();
   EvtMessage* msg = StorageDeserializerModule::streamDataStore();
   int nword = (msg->size() - 1) / 4 + 1;
   m_obuf.lock();
+  struct dataheader {
+    int nword;
+    int type;
+    unsigned int expno;
+    unsigned int runno;
+  } hd;
+  hd.nword = 4;
+  hd.type = MSG_EVENT;
+  hd.expno = expno;
+  hd.runno = runno;
+  m_obuf.write((int*)&hd, hd.nword, false, 0, true);
   m_obuf.write((int*)msg->buffer(), nword, false, 0, true);
   m_obuf.unlock();
   m_nbyte += msg->size();

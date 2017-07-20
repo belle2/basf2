@@ -173,7 +173,7 @@ int RFMaster::UnConfigure(NSMmsg* msgm, NSMcontext* msgc)
         strstr(badlist, idname) == 0) {
       sprintf(hostnode, "evp_%s%2.2d", hostbase, idbase + i);
       //      b2nsm_sendreq(hostnode, "RF_UNCONFIGURE", 0, pars);
-      b2nsm_sendreq(hostnode, "RC_STOP", 0, pars);
+      b2nsm_sendreq(hostnode, "RC_ABORT", 0, pars);
       nnodes++;
     }
   }

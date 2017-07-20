@@ -12,8 +12,10 @@
 #define SVD_SHAPERDIGIT_H
 
 #include <vxd/dataobjects/VxdID.h>
+#include <svd/dataobjects/SVDModeByte.h>
 #include <framework/dataobjects/DigitBase.h>
 
+#include <cstdint>
 #include <sstream>
 #include <string>
 #include <algorithm>
@@ -39,7 +41,7 @@ namespace Belle2 {
      * An integer type is sufficient for storage, but getters will return array
      * of doubles suitable for computing.
      */
-    typedef unsigned char APVRawSampleType;
+    typedef uint8_t APVRawSampleType;
     typedef std::array<APVRawSampleType, c_nAPVSamples> APVRawSamples;
 
     /** Types for array of samples for processing.
@@ -53,14 +55,15 @@ namespace Belle2 {
      * @param cellID Strip ID.
      * @param samples std::array of 6 APV raw samples.
      * @param time Time estimate from FADC
-     * @param pipelineAddress APV pipeline address
+     * @param mode SVDModeByte structure, packed trigger time bin and DAQ
+     * mode.
      */
     template<typename T>
     SVDShaperDigit(VxdID sensorID, bool isU, short cellID,
-                   T samples[c_nAPVSamples], char time = 0,
-                   unsigned char pipelineAddress = 0):
+                   T samples[c_nAPVSamples], int8_t time = 0,
+                   SVDModeByte mode = SVDModeByte()):
       m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_time(time),
-      m_pipelineAddress(pipelineAddress)
+      m_mode(mode.getID())
     {
       std::transform(samples, samples + c_nAPVSamples, m_samples.begin(),
                      [this](T x)->APVRawSampleType { return trimToSampleRange(x); }
@@ -76,11 +79,10 @@ namespace Belle2 {
      * @param pipelineAddress APV pipeline address
      */
     template<typename T>
-    SVDShaperDigit(VxdID sensorID, bool isU, short cellID,
-                   T samples, char time = 0,
-                   unsigned char pipelineAddress = 0):
+    SVDShaperDigit(VxdID sensorID, bool isU, short cellID, T samples,
+                   int8_t time = 0, SVDModeByte mode = SVDModeByte()):
       m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_time(time),
-      m_pipelineAddress(pipelineAddress)
+      m_mode(mode.getID())
     {
       std::transform(samples.begin(), samples.end(), m_samples.begin(),
                      [this](typename T::value_type x)->APVRawSampleType
@@ -90,7 +92,7 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     SVDShaperDigit() : SVDShaperDigit(
-        0, true, 0, APVRawSamples( {0, 0, 0, 0, 0, 0}), 0, 0
+        0, true, 0, APVRawSamples( {0, 0, 0, 0, 0, 0})
     )
     { }
 
@@ -134,8 +136,8 @@ namespace Belle2 {
     /** Get pipeline address
      * @return APV pipeline address of the digit
      */
-    unsigned short getPipelineAddress() const
-    { return static_cast<unsigned short>(m_pipelineAddress);}
+    SVDModeByte getModeByte() const
+    { return m_mode; }
 
     /**
      * Convert a value to sample range.
@@ -156,13 +158,14 @@ namespace Belle2 {
     std::string toString() const
     {
       VxdID thisSensorID(m_sensorID);
+      SVDModeByte thisMode(m_mode);
 
       std::ostringstream os;
       os << "VXDID : " << m_sensorID << " = " << std::string(thisSensorID) << " strip: "
          << ((m_isU) ? "U-" : "V-") << m_cellID << " samples: ";
       std::copy(m_samples.begin(), m_samples.end(),
                 std::ostream_iterator<APVRawSampleType>(os, " "));
-      os << "FADC time: " << m_time << " PA: " << m_pipelineAddress << std::endl;
+      os << "FADC time: " << m_time << " " << thisMode << std::endl;
       return os.str();
     }
 
@@ -201,15 +204,12 @@ namespace Belle2 {
     bool m_isU;                /**< True if U, false if V. */
     short m_cellID;            /**< Strip coordinate in pitch units. */
     APVRawSamples m_samples;      /**< 6 APV signals from the strip. */
-    char m_time;              /**< digit time estimate from the FADC, in ns */
-    unsigned char m_pipelineAddress;   /**< APV pipeline addressC */
+    int8_t m_time;              /**< digit time estimate from the FADC, in ns */
+    SVDModeByte::baseType m_mode; /**< Mode byte, trigger time + DAQ mode */
 
-    ClassDef(SVDShaperDigit, 1)
+    ClassDef(SVDShaperDigit, 2)
 
   }; // class SVDShaperDigit
-
-
-
 
 } // end namespace Belle2
 

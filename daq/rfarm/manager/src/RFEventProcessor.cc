@@ -124,6 +124,7 @@ int RFEventProcessor::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
   char* sender = m_conf->getconf("processor", "sender", "script");
   char* port = m_conf->getconf("processor", "sender", "port");
   m_pid_sender = m_proc->Execute(sender, (char*)rbufout.c_str(), port, (char*)shmname.c_str(), (char*)"1");
+  m_flow->clear(1);
 
   /*
   // 4. Run basf2
@@ -155,6 +156,7 @@ int RFEventProcessor::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
   char portchar[256];
   sprintf(portchar, "%d", rport);
   m_pid_receiver = m_proc->Execute(receiver, (char*)rbufin.c_str(), srchost, portchar, (char*)shmname.c_str(), (char*)"0");
+  m_flow->clear(0);
 
   printf("Configure : done\n");
   fflush(stdout);

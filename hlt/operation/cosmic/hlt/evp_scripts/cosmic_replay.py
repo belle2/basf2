@@ -28,16 +28,17 @@ argc = len(argvs)
 # Log level
 basf2.set_log_level(basf2.LogLevel.ERROR)
 # Components to be processed
-components = ["CDC", "ECL", "TOP", "BKLM", "TRG"]
+components = ["CDC", "ECL", "TOP", "BKLM", "EKLM", "TRG"]
 
 # Objects to be sent to storage
 saveobjs = ['EventMetaData',
-            'RawPXDs', 'RawSVDs', 'RawCDCs', 'RawTOPs',
-            'RawECLs', 'RawKLMs',
-            'RawCOPPERs', 'RawDataBlocks', 'RawFTSWs', 'RawTRGs',
+            'RawCDCs', 'RawTOPs', 'RawECLs', 'RawKLMs',
+            'RawFTSWs', 'RawTRGs',
             'SoftwareTriggerResult',
             'Tracks', 'TrackFitResults', 'CDCHits', 'TOPDigits',
-            'ECLClusters', 'BKLMDigits', 'BKLMHit1ds', 'BKLMHit2ds']
+            'ECLClusters',
+            'BKLMDigits', 'BKLMHit1ds', 'BKLMHit2ds',
+            'EKLMDigits', 'EKLMHit1ds', 'EKLMHit2ds']
 
 # Crash handler switch
 enable_graceful_crash_handling = False
@@ -46,7 +47,8 @@ enable_graceful_crash_handling = False
 # Local DB specification
 ##########
 basf2.reset_database()
-basf2.use_local_database(ROOT.Belle2.FileSystem.findFile("hlt/examples/LocalDB/database.txt"))
+# basf2.use_local_database(ROOT.Belle2.FileSystem.findFile("hlt/examples/LocalDB/database.txt"))
+basf2.use_local_database("/local/database/LocalDB/database.txt")
 
 ##########
 # Path definitions
@@ -60,12 +62,12 @@ crashsafe_path = basf2.create_path()
 # Input
 ##########
 # Input from ringbuffer (for raw data)
-input = basf2.register_module('Raw2Ds')
-input.param("RingBufferName", argvs[1])
+# input = basf2.register_module('Raw2Ds')
+# input.param("RingBufferName", argvs[1])
 
 # Input from ringbuffer (for simulated raw data in SROOT)
-# input = basf2.register_module('Rbuf2Ds')
-# input.param("RingBufferName", argvs[1])
+input = basf2.register_module('Rbuf2Ds')
+input.param("RingBufferName", argvs[1])
 
 # Input from SeqRoot file
 # input = basf2.register_module('SeqRootInput')
@@ -78,10 +80,10 @@ main_path.add_module(input)
 ##########
 # HistoManager for real HLT
 histoman = basf2.register_module('DqmHistoManager')
-histoman.param("Port", int(argvs[3]))
+# histoman.param("Port", int(argvs[3]))
 histoman.param("Port", 9991)
-histoman.param("DumpInterval", 180)
-histoman.param("WriteInterval", 180)
+histoman.param("DumpInterval", 300)
+histoman.param("WriteInterval", 300)
 
 # HistoManageer for offline
 # histoman = basf2.register_module('HistoManager')
@@ -147,6 +149,7 @@ main_path.add_module(output)
 # Other utilities
 ##########
 progress = basf2.register_module('Progress')
+progress.param('maxN', 4)
 main_path.add_module(progress)
 
 etime = basf2.register_module('ElapsedTime')

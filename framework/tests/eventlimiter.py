@@ -4,6 +4,7 @@
 from basf2 import *
 from ROOT import Belle2
 
+#: Dictionary of the number of events passing this module in each (Exp,Run)
 num_events = {}
 
 
@@ -15,9 +16,11 @@ class CountEvents(Module):
     """
 
     def initialize(self):
+        """Not implemented"""
         pass
 
     def beginRun(self):
+        """Creates an entry in the global num_events dictionary"""
         global num_events
         evtmetadata = Belle2.PyStoreObj('EventMetaData')
         run = evtmetadata.obj().getRun()
@@ -26,6 +29,7 @@ class CountEvents(Module):
             num_events[(exp, run)] = 0
 
     def event(self):
+        """Increments the right (Exp,Run) entry in the num_events dictionary"""
         global num_events
         evtmetadata = Belle2.PyStoreObj('EventMetaData')
         event = evtmetadata.obj().getEvent()

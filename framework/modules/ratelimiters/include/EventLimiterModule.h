@@ -14,29 +14,35 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 namespace Belle2 {
+  /** The EventLimiter module.
+   *
+   * This module returns true on each event until reaching the maximum number of events in a run.
+   * Can set the value of the maximum via an input parameter.
+   * This module can be used with a conditional basf2 path to control the number of events passing this module.
+   */
   class EventLimiterModule : public Module {
 
   public:
-    /* Constructor: Sets the description, the properties and the parameters of the module. */
+    /** Constructor: Sets the description, the properties and the parameters of the module. */
     EventLimiterModule();
 
-    /* Destructor of the module */
+    /** Destructor of the module */
     virtual ~EventLimiterModule() {};
 
-    /* Initialization states required data objects (EventMetaData) */
+    /** Initialization states required data objects (EventMetaData) */
     virtual void initialize();
 
-    /* Checks if we've reached the maximum number of events yet and sets the return value to False if we have */
+    /** Checks if we've reached the maximum number of events yet and sets the return value to False if we have */
     virtual void event();
 
-    /* Resets our event counter to zero and return value to True */
+    /** Resets our event counter to zero and return value to True */
     virtual void beginRun();
 
   private:
-    /* Datastore pointers */
+    /** Datastore pointers */
     StoreObjPtr<EventMetaData> m_eventMetaData;
 
-    /* Maximum number of events to be collected at the start of each run (-1 = no maximum) */
+    /** Maximum number of events to be collected at the start of each run (-1 = no maximum) */
     int m_maxEventsPerRun;
 
     /* Flag that will be returned by the module. Gets set to True at the start of the run

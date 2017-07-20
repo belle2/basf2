@@ -299,16 +299,6 @@ namespace Belle2 {
 
       Binning binning = Binning::CreateEqualFrequency(mc_feature , mc_weights, mc_signals, 100);
 
-      std::cout << "PDFS" << std::endl;
-      for (unsigned int iBin = 0; iBin < 100; ++iBin) {
-        std::cout <<  binning.m_signal_pdf[iBin] << " "  << binning.m_bckgrd_pdf[iBin] << std::endl;
-      }
-
-      std::cout << "CDFS" << std::endl;
-      for (unsigned int iBin = 0; iBin < 100; ++iBin) {
-        std::cout <<  binning.m_signal_cdf[iBin] << " "  << binning.m_bckgrd_cdf[iBin] << std::endl;
-      }
-
       float signalFraction = binning.m_signal_yield / (binning.m_signal_yield + binning.m_bckgrd_yield);
 
       std::vector<double> data(100, 0);

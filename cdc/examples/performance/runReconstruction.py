@@ -43,6 +43,7 @@ def rec(input, output, topInCounter=False, magneticField=True):
     data_period = getDataPeriod(exp=exp_number,
                                 run=run_number)
 
+    # print(data_period)
     if os.path.exists('output') is False:
         os.mkdir('output')
 

@@ -3,6 +3,10 @@
 
 import validationserver
 
+"""
+Start the server which hosts the validation result plots
+"""
+
 # Only execute if the file is not imported
 if __name__ == '__main__':
     # run validation server with default settings and 

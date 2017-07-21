@@ -48,6 +48,19 @@ namespace Belle2 {
       }
     };
 
+    /// Helper Functor to get the Number of hits of a given result
+    struct NumberOfHitsGetter {
+      /// Make it a functor
+      operator TrackFindingCDC::FunctorTag();
+
+      template<class T>
+      auto operator()(const T& t) const -> decltype(t->getHits().size())
+      {
+        return t->getHits().size();
+      }
+    };
+
+
   public:
     /// The pair of seed and hit vector to check
     using ResultPair = typename AFilter::Object;
@@ -170,9 +183,14 @@ namespace Belle2 {
       }
 
       if (not m_resultsWithWeight.empty()) {
-        const auto& bestElement = *(std::max_element(m_resultsWithWeight.begin(), m_resultsWithWeight.end(),
-                                                     TrackFindingCDC::LessWeight()));
-        outputResults.push_back(*(bestElement));
+        const unsigned int useBestNResults = std::min(m_resultsWithWeight.size(), 3ul);
+        if (useBestNResults > m_resultsWithWeight.size()) {
+          std::sort(m_resultsWithWeight.begin(), m_resultsWithWeight.end(), TrackFindingCDC::GreaterWeight());
+        }
+        const auto& lastItemToUse = std::next(m_resultsWithWeight.begin(), useBestNResults);
+        const auto& longestElement = *(std::max_element(m_resultsWithWeight.begin(), lastItemToUse,
+                                                        TrackFindingCDC::LessOf<NumberOfHitsGetter>()));
+        outputResults.push_back(*(longestElement));
       }
     }
   }

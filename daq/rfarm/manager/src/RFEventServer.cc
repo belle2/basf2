@@ -173,7 +173,7 @@ int RFEventServer::UnConfigure(NSMmsg*, NSMcontext*)
 int RFEventServer::Start(NSMmsg*, NSMcontext*)
 {
   //  m_rbufin->clear();
-  m_rbufin->forceClear();
+  //  m_rbufin->forceClear();
   return 0;
 }
 

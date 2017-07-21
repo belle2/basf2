@@ -59,6 +59,16 @@ namespace Belle2 {
     */
     void importShowerCorrectorLeakageCorrections();
 
+    /**
+    * Import ECL corrections to showers energies.
+    * Temperary - there will be additional improvements done to these corrections in the future.
+    * Input file should be .txt file and have the format:
+    * generated-energy bkg-scale-factor theta-min theta-max corr-factor.
+    * The numbers should be seperated by spaces.
+    * For each line, the theta value used is the average of theta-min and theta-max
+    */
+    void importShowerEnergyCorrectionTemporary();
+
   private:
 
     std::vector<std::string> m_inputFileNames; /**< Input file name */
@@ -111,8 +121,9 @@ namespace Belle2 {
      * 2: Added time calibration.
      * 3: Added Second moment importer.
      * 4: Added shower leakage corrections importer.
+     * 5: Added ECLShowerEnergyCorrectionTemporary importer.
      */
-    ClassDef(ECLDatabaseImporter, 4);
+    ClassDef(ECLDatabaseImporter, 5);
   };
 
 } // Belle2 namespace

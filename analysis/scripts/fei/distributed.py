@@ -255,10 +255,16 @@ def merge_root_files(args):
         print('Merge the following files', rootfiles)
         for f in rootfiles:
             output = args.directory + '/collection/' + f
-            inputs = glob.glob(args.directory + '/jobs/*/' + f)
+            inputs = [args.directory + '/jobs/{}/'.format(i) + f for i in range(args.nJobs)]
             ret = subprocess.call(['fei_merge_files', output] + inputs)
             if ret != 0:
                 raise RuntimeError('Error during merging root files')
+            # Replace mcParticlesCount.root with merged file in all directories
+            # so that the individual jobs calculate the correct mcCounts and sampling rates
+            if f == 'mcParticlesCount.root':
+                for i in inputs:
+                    os.remove(i)
+                    os.symlink(output, i)
 
 
 def update_input_files(args):
@@ -362,6 +368,8 @@ if __name__ == '__main__':
                             os.remove(success_file)
                     else:
                         continue
+                # Reset Summary file
+                shutil.copyfile(args.directory + '/collection/Summary.pickle', args.directory + '/jobs/{}/Summary.pickle'.format(i))
                 if not submit_job(args, i):
                     raise RuntimeError('Error during submiting job')
 

@@ -66,6 +66,7 @@ from fei import config
 import collections
 import argparse
 import os
+import shutil
 import typing
 import pickle
 import re
@@ -710,6 +711,12 @@ def save_summary(particles: typing.Sequence[config.Particle], configuration: con
     configuration = config.FeiConfiguration(configuration.prefix, cache, configuration.b2bii,
                                             configuration.monitor, configuration.legacy, configuration.externTeacher,
                                             configuration.training)
+    # Backup existing Summary.pickle files
+    for i in [8, 7, 6, 5, 4, 3, 2, 1, 0]:
+        if os.path.isfile('Summary.pickle.backup_{}'.format(i)):
+            shutil.copyfile('Summary.pickle.backup_{}'.format(i), 'Summary.pickle.backup_{}'.format(i+1))
+    if os.path.isfile('Summary.pickle'):
+        shutil.copyfile('Summary.pickle', 'Summary.pickle.backup_0')
     pickle.dump((particles, configuration), open('Summary.pickle', 'wb'))
 
 

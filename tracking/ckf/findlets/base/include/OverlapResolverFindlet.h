@@ -103,6 +103,10 @@ namespace Belle2 {
                                     m_param_overlapResolverExport,
                                     "Filename to export the overlap resolver info to, if given.",
                                     m_param_overlapResolverExport);
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useBestNInSeed"),
+                                    m_param_useBestNInSeed,
+                                    "In seed mode, use only the best seeds.",
+                                    m_param_useBestNInSeed);
     }
 
     /// Main function of this findlet: find a non overlapping set of results with the best quality.
@@ -133,7 +137,6 @@ namespace Belle2 {
     /// Subfindlet: The quality filter
     AFilter m_qualityFilter;
     /// Sub algorithm: the hopfield algorithm class
-    // TODO: export parameters
     HopfieldNetwork m_hopfieldNetwork;
     /// Sub algorithm: the greedy algorithm
     Scrooge m_greedyAlgorithm;
@@ -149,6 +152,8 @@ namespace Belle2 {
     bool m_param_allowOverlapBetweenSeeds = false;
     /// Parameter: Filename to export the overlap resolver info to, if given
     std::string m_param_overlapResolverExport = "";
+    /// Parameter: In seed mode, use only the best seeds
+    unsigned long m_param_useBestNInSeed = 3;
 
     // Object Pools
     /// Overlap resolver infos as input to the hopfield network.
@@ -161,7 +166,7 @@ namespace Belle2 {
     /// Resolve the overlaps in the given set of results
     void resolveOverlaps(std::vector<ResultPair>& resultElements, std::vector<ResultPair>& outputResults);
 
-    /// Group the results by their seed and handle each group seperately.
+    /// Group the results by their seed and handle each group separately.
     void groupbySeedsAndMaximize(std::vector<ResultPair>& resultElements, std::vector<ResultPair>& outputResults);
   };
 
@@ -183,8 +188,8 @@ namespace Belle2 {
       }
 
       if (not m_resultsWithWeight.empty()) {
-        const unsigned int useBestNResults = std::min(m_resultsWithWeight.size(), 3ul);
-        if (useBestNResults > m_resultsWithWeight.size()) {
+        const unsigned int useBestNResults = std::min(m_resultsWithWeight.size(), m_param_useBestNInSeed);
+        if (useBestNResults < m_resultsWithWeight.size()) {
           std::sort(m_resultsWithWeight.begin(), m_resultsWithWeight.end(), TrackFindingCDC::GreaterWeight());
         }
         const auto& lastItemToUse = std::next(m_resultsWithWeight.begin(), useBestNResults);

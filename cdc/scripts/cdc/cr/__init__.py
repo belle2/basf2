@@ -158,23 +158,22 @@ def add_cdc_cr_reconstruction(path, eventTimingExtraction=True,
                     pdgCodesToUseForFitting=13,
                     )
 
-    if topInCounter is True:
-        # Correct time seed with TOP in counter.
-        path.add_module("PlaneTriggerTrackTimeEstimator",
-                        pdgCodeToUseForEstimation=13,
-                        triggerPlanePosition=triggerPos,
-                        triggerPlaneDirection=normTriggerPlaneDirection,
-                        useFittedInformation=True,
-                        useReadoutPosition=True,
-                        readoutPosition=readOutPos,
-                        readoutPositionPropagationSpeed=lightPropSpeed
-                        )
+    # Correct time seed with TOP in counter.
+    path.add_module("PlaneTriggerTrackTimeEstimator",
+                    pdgCodeToUseForEstimation=13,
+                    triggerPlanePosition=triggerPos,
+                    triggerPlaneDirection=normTriggerPlaneDirection,
+                    useFittedInformation=True,
+                    useReadoutPosition=topInCounter,
+                    readoutPosition=readOutPos,
+                    readoutPositionPropagationSpeed=lightPropSpeed
+                    )
 
-        # Track fitting
-        path.add_module("DAFRecoFitter",
-                        # probCut=0.00001,
-                        pdgCodesToUseForFitting=13,
-                        )
+    # Track fitting
+    path.add_module("DAFRecoFitter",
+                    # probCut=0.00001,
+                    pdgCodesToUseForFitting=13,
+                    )
 
     if eventTimingExtraction is True:
         # Extract the time
@@ -225,7 +224,6 @@ def getDataPeriod(run):
     for key in run_range:
         if run_range[key][0] <= run <= run_range[key][1]:
             period = key
-            print("Data period : " + key)
             break
 
     if period is None:

@@ -66,7 +66,6 @@ void BKLMTrackingModule::event()
 
   StoreArray<BKLMHit2d> hits2D;
   StoreArray<BKLMTrack> m_storeTracks;
-  m_storeTracks.clear();
 
 
   std::list<BKLMTrack*> tracks;

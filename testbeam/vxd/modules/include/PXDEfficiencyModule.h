@@ -156,7 +156,9 @@ namespace Belle2 {
     std::map<VxdID, int> m_roi_centerU;
     std::map<VxdID, int> m_roi_centerV;
     std::map<VxdID, int> m_roi_area;
-
+    std::map<VxdID, bool> m_roi_fit_inside;
+    std::map<VxdID, bool> m_roi_clus_inside;
+    std::map<VxdID, bool> m_roi_digi_inside;
   };
 }
 

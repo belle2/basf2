@@ -90,9 +90,6 @@ void PXDEfficiencyModule::event()
     return;
   }
 
-  //TODO
-  StoreArray<ROIid> ROIs(m_ROIsName);
-
   //loop over all PXD sensors to get the intersections
   std::map<VxdID, TVector3> intersecs;
   std::map<VxdID, TVector3> best_digipos;
@@ -105,7 +102,7 @@ void PXDEfficiencyModule::event()
   bool foundL1 = false;
   bool foundL2 = false;
   //WARNING: if there are multiple intersections on one layer (which should not be the case) only the last one will be considered!
-  //WARNING2: If there are multiple sensors on one layer, as in all Testbeam 2017 geometries, only the last sensor on each layer is considered!
+  //WARNING2: If there are multiple sensors on one layer, as in all Testbeam 2017 geometries, only one sensor on each layer is considered!
   //Sensor IDs are hardcoded further down anyway, so only take the first sensor in the geometry-file, which is the one actually in the beam.
 
 
@@ -138,7 +135,6 @@ void PXDEfficiencyModule::event()
     m_sigma_u_fit[aVxdID] = -9999;
     m_sigma_v_fit[aVxdID] = -9999;
 
-
     m_ucell_fit[aVxdID] = 999999;
     m_vcell_fit[aVxdID] = 999999;
     m_digit_matched[aVxdID] = -1;
@@ -162,6 +158,9 @@ void PXDEfficiencyModule::event()
     m_roi_centerU[aVxdID] = -99999;
     m_roi_centerV[aVxdID] = -99999;
     m_roi_area[aVxdID] = -99999;
+    m_roi_fit_inside[aVxdID] = false;
+    m_roi_clus_inside[aVxdID] = false;
+    m_roi_digi_inside[aVxdID] = false;
 
     if (isgood) {
       m_u_fit[aVxdID] = intersec_buff.X();
@@ -207,10 +206,17 @@ void PXDEfficiencyModule::event()
 
 
   //ROI info
+
+  //This does not always exist (not on the root files from prague)
+  StoreArray<ROIid> ROIs(m_ROIsName);
+
   //WARNING: Only the last ROI for each sensor is saved! Number of ROIs is correct, so use it to cut on events with multiple ROIs on a sensor if this is a problem
   if (ROIs.getEntries() > 0) {
     for (auto& roit : ROIs) {
       VxdID thisSensorROI = roit.getSensorID();
+
+      VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(thisSensorROI);
+
       m_roi_number_of[thisSensorROI]++;
       m_roi_minU[thisSensorROI] = roit.getMinUid();
       m_roi_minV[thisSensorROI] = roit.getMinVid();
@@ -221,6 +227,33 @@ void PXDEfficiencyModule::event()
       m_roi_centerU[thisSensorROI] = (roit.getMaxUid() + roit.getMinUid()) / 2;
       m_roi_centerV[thisSensorROI] = (roit.getMaxVid() + roit.getMinVid()) / 2;
       m_roi_area[thisSensorROI] = (roit.getMaxUid() - roit.getMinUid()) * (roit.getMaxVid() - roit.getMinVid());
+
+      bool fit_inside = false;
+      if (m_ucell_fit[thisSensorROI] < roit.getMaxUid()
+          && m_ucell_fit[thisSensorROI] > roit.getMinUid()
+          && m_vcell_fit[thisSensorROI] < roit.getMaxVid()
+          && m_vcell_fit[thisSensorROI] > roit.getMinVid()) {
+        fit_inside = true;
+      }
+      m_roi_fit_inside[thisSensorROI] = fit_inside;
+
+      bool clus_inside = false;
+      if (info.getUCellID(m_u_clus[thisSensorROI]) < roit.getMaxUid()
+          && info.getUCellID(m_u_clus[thisSensorROI]) > roit.getMinUid()
+          && info.getUCellID(m_v_clus[thisSensorROI]) < roit.getMaxVid()
+          && info.getUCellID(m_v_clus[thisSensorROI]) > roit.getMinVid()) {
+        clus_inside = true;
+      }
+      bool digi_inside = false;
+      if (info.getUCellID(m_u_digi[thisSensorROI]) < roit.getMaxUid()
+          && info.getUCellID(m_u_digi[thisSensorROI]) > roit.getMinUid()
+          && info.getUCellID(m_v_digi[thisSensorROI]) < roit.getMaxVid()
+          && info.getUCellID(m_v_digi[thisSensorROI]) > roit.getMinVid()) {
+        digi_inside = true;
+      }
+
+      m_roi_digi_inside[thisSensorROI] = digi_inside;
+      m_roi_clus_inside[thisSensorROI] = clus_inside;
     }
   }
 
@@ -430,6 +463,9 @@ void PXDEfficiencyModule::defineHisto()
     m_roi_centerU[avxdid] = -99999;
     m_roi_centerV[avxdid] = -99999;
     m_roi_area[avxdid] = -99999;
+    m_roi_fit_inside[avxdid] = false;
+    m_roi_clus_inside[avxdid] = false;
+    m_roi_digi_inside[avxdid] = false;
 
     m_tree->Branch("u_clus_" + buff, &(m_u_clus[avxdid]), "u_clus_" + buff + "/D");
     m_tree->Branch("v_clus_" + buff, &(m_v_clus[avxdid]), "v_clus_" + buff + "/D");
@@ -465,6 +501,9 @@ void PXDEfficiencyModule::defineHisto()
     m_tree->Branch("roi_center_u_" + buff, &(m_roi_centerU[avxdid]), "roi_center_u_" + buff + "/I");
     m_tree->Branch("roi_center_v_" + buff, &(m_roi_centerV[avxdid]), "roi_center_v_" + buff + "/I");
     m_tree->Branch("roi_area_" + buff, &(m_roi_area[avxdid]), "roi_area_" + buff + "/I");
+    m_tree->Branch("roi_fit_inside_" + buff, &(m_roi_fit_inside[avxdid]), "roi_fit_inside_" + buff + "/I");
+    m_tree->Branch("roi_clus_inside_" + buff, &(m_roi_clus_inside[avxdid]), "roi_clus_inside_" + buff + "/I");
+    m_tree->Branch("roi_digi_inside_" + buff, &(m_roi_digi_inside[avxdid]), "roi_digi_inside_" + buff + "/I");
 
     int nu = info.getUCells();
     int nv = info.getVCells();

@@ -48,7 +48,7 @@
 using namespace std;
 using namespace Belle2;
 
-void TOPDatabaseImporter::importSampleTimeCalibration(std::string fNames)
+void TOPDatabaseImporter::importSampleTimeCalibration(string fNames)
 {
 
   // make vector out of files separated with space
@@ -68,7 +68,7 @@ void TOPDatabaseImporter::importSampleTimeCalibration(std::string fNames)
   DBImportObjPtr<TOPCalTimebase> timeBase;
   timeBase.construct(syncTimeBase);
 
-  std::set<int> scrodIDs;
+  set<int> scrodIDs;
 
   // read constants from files and put them to DB object
 
@@ -83,6 +83,7 @@ void TOPDatabaseImporter::importSampleTimeCalibration(std::string fNames)
     TH1F* hsuccess = (TH1F*) file->Get("success");
     if (!hsuccess) {
       B2ERROR("Fit status histogram '" << hsuccess << "' not found");
+      file->Close();
       continue;
     }
 
@@ -91,35 +92,38 @@ void TOPDatabaseImporter::importSampleTimeCalibration(std::string fNames)
     for (int channel = 0; channel < numChannels; channel++) {
       if (hsuccess->GetBinContent(channel + 1) == 0) continue;
 
-      string hname = "sampleTimes_ch" +  std::to_string(channel);
+      string hname = "sampleTimes_ch" +  to_string(channel);
 
       TH1F* hsampleTimes = (TH1F*) file->Get(hname.c_str());
       if (!hsampleTimes) {
         B2ERROR("Histogram '" << hname << "' with calibration constants not found");
+        file->Close();
         continue;
       }
       // parse scrodID from histogram title
-      std::string title = hsampleTimes->GetTitle();
+      string title = hsampleTimes->GetTitle();
       auto iscrod = title.find("scrod");
       auto ichannel = title.find("channel");
       if (iscrod == string::npos or ichannel == string::npos) {
         B2ERROR("Unsuccessful parsing of scrodID from '" << title << "'");
+        file->Close();
         continue;
       }
-      iscrod += 5;
+      iscrod += 5; // move forwards to the index of the scrod id (s-c-r-o-d)
       int len = ichannel - iscrod;
       if (len < 1) {
         B2ERROR("Unsuccessful parsing of scrodID from '" << title << "'");
+        file->Close();
         continue;
       }
-      int scrodID = std::stoi(title.substr(iscrod, len));
+      int scrodID = stoi(title.substr(iscrod, len));
       scrodIDs.insert(scrodID);
 
       double rescale = 1;
       if (hsampleTimes->GetBinContent(257) > 0)
         rescale = 2 * syncTimeBase / hsampleTimes->GetBinContent(257);
 
-      std::vector<double> sampleTimes;
+      vector<double> sampleTimes;
       for (int isamp = 0; isamp < 256; isamp++) {
         sampleTimes.push_back(hsampleTimes->GetBinContent(isamp + 1) * rescale);
       }
@@ -208,14 +212,14 @@ void TOPDatabaseImporter::importSampleTimeCalibrationKichimi(string fNames)
       continue;
     }
     string slot = fileName.substr(i + 1, 2);
-    int moduleID = std::stoi(slot);
+    int moduleID = stoi(slot);
     if (!geo->isModuleIDValid(moduleID)) {
       B2ERROR("Module ID is not valid (incorrectly parsed from file name?): " << moduleID);
       continue;
     }
     B2INFO("--> importing constats for slot " << moduleID);
 
-    string hname = "h_qasic[" +  std::to_string(moduleID) + "];1";
+    string hname = "h_qasic[" +  to_string(moduleID) + "];1";
     TH1D* quality = (TH1D*) file->Get(hname.c_str());
     if (!quality) {
       B2ERROR("Quality histogram '" << hname << "' not found");
@@ -225,14 +229,14 @@ void TOPDatabaseImporter::importSampleTimeCalibrationKichimi(string fNames)
     int goodChannels = 0;
     for (int as = 0; as < 64; as++) { // as = ASIC + carrier * 4 + BS * 16
 
-      string hname = "tbcval[" +  std::to_string(as) + "];1";
+      string hname = "tbcval[" +  to_string(as) + "];1";
       TH1D* tbcval = (TH1D*) file->Get(hname.c_str());
       if (!tbcval) {
         B2ERROR("Histogram '" << hname << "' with calibration constants not found");
         continue;
       }
 
-      std::vector<double> sampleTimes;
+      vector<double> sampleTimes;
       if (quality->GetBinContent(as + 1) == 0 and tbcval->GetEntries() > 0) {
         double rescale = 1;
         if (tbcval->GetBinContent(257) > 0)
@@ -316,21 +320,21 @@ void TOPDatabaseImporter::importChannelT0CalibrationKichimi(string fNames)
       continue;
     }
     string slot = fileName.substr(i + 1, 2);
-    int moduleID = std::stoi(slot);
+    int moduleID = stoi(slot);
     if (!geo->isModuleIDValid(moduleID)) {
       B2ERROR("Module ID is not valid (incorrectly parsed from file name?): " << moduleID);
       continue;
     }
     B2INFO("--> importing constats for slot " << moduleID);
 
-    string qname = "t0good[" +  std::to_string(moduleID) + "];1";
+    string qname = "t0good[" +  to_string(moduleID) + "];1";
     TH1D* quality = (TH1D*) file->Get(qname.c_str());
     if (!quality) {
       B2ERROR("Quality histogram '" << qname << "' not found");
       continue;
     }
 
-    string hname = "t0val[" +  std::to_string(moduleID) + "];1";
+    string hname = "t0val[" +  to_string(moduleID) + "];1";
     TH1D* t0val = (TH1D*) file->Get(hname.c_str());
     if (!t0val) {
       B2ERROR("Histogram '" << hname << "' with calibration constants not found");
@@ -473,7 +477,7 @@ void TOPDatabaseImporter::importTest(int runNumber, double syncTimeBase)
 {
 
   DBImportObjPtr<TOPCalTimebase> timeBase;
-  std::vector<double> timeAxis;
+  vector<double> timeAxis;
   for (int i = 0; i < 256; i++) {
     timeAxis.push_back(syncTimeBase / 128.0 * i);
   }

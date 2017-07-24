@@ -7,7 +7,7 @@ from ROOT import Belle2
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trigger_mode="all", additionalTrackFitHypotheses=None,
-                                reco_tracks="RecoTracks", keep_temporary_tracks=False, use_vxdtf2=False,
+                                reco_tracks="RecoTracks", prune_temporary_tracks=True, use_vxdtf2=False,
                                 fit_tracks=True, use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules for tracking
@@ -23,8 +23,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param mcTrackFinding: Use the MC track finders instead of the realistic ones.
     :param trigger_mode: For a description of the available trigger modes see add_reconstruction.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
-    :param keep_temporary_tracks: If true, store all information of the single CDC and VXD tracks before merging.
-        If false, prune them.
+    :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
+        If true, prune them.
     :param fit_tracks: If false, the final track find and the TrackCreator module will no be executed
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
@@ -46,7 +46,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                              use_second_cdc_hits=use_second_cdc_hits)
     else:
         add_track_finding(path, components=components, trigger_mode=trigger_mode, reco_tracks=reco_tracks,
-                          keep_temporary_tracks=keep_temporary_tracks, use_vxdtf2=use_vxdtf2,
+                          prune_temporary_tracks=prune_temporary_tracks, use_vxdtf2=use_vxdtf2,
                           use_second_cdc_hits=use_second_cdc_hits)
 
     if trigger_mode in ["hlt", "all"]:
@@ -311,7 +311,7 @@ def add_track_finding(
         components=None,
         trigger_mode="all",
         reco_tracks="RecoTracks",
-        keep_temporary_tracks=False,
+        prune_temporary_tracks=True,
         use_vxdtf2=False,
         use_second_cdc_hits=False):
     """
@@ -323,8 +323,8 @@ def add_track_finding(
     :param components: the list of geometry components in use or None for all components.
     :param trigger_mode: For a description of the available trigger modes see add_reconstruction.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
-    :param keep_temporary_tracks: If true, store all information of the single CDC and VXD tracks before merging.
-        If false, prune them.
+    :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
+        If true, prune them.
     """
     if not is_svd_used(components) and not is_cdc_used(components):
         return
@@ -367,7 +367,7 @@ def add_track_finding(
                             VXDRecoTrackColName=vxd_reco_tracks, MergedRecoTrackColName=reco_tracks)
 
             # Prune the temporary products if requested
-            if not keep_temporary_tracks:
+            if prune_temporary_tracks:
                 path.add_module('PruneRecoTracks', storeArrayName=cdc_reco_tracks)
                 path.add_module('PruneRecoTracks', storeArrayName=vxd_reco_tracks)
 

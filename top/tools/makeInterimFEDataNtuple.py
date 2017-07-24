@@ -81,7 +81,6 @@ elif re.search(r"(top|cosmic|cdc|ecl|klm|test)\.[0-9]+\.[0-9]+", input_file):
         input_file).group() + "_ntuple.root"
 else:
     output_root = input + "_ntuple.root"
-output_root = "data_ntuple/" + output_root
 
 if args.outputFile != "NoOutputFile":
     output_root = args.outputFile

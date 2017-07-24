@@ -14,11 +14,11 @@
 using namespace std;
 using namespace Belle2;
 
-typedef std::map<unsigned, const TOPSampleTimes*>::const_iterator Iterator;
+typedef map<unsigned, const TOPSampleTimes*>::const_iterator Iterator;
 
 
 void TOPCalTimebase::append(unsigned scrodID, unsigned channel,
-                            const std::vector<double>& sampleTimes,
+                            const vector<double>& sampleTimes,
                             bool replace)
 {
   unsigned key = (scrodID << 16) + (channel % 128);

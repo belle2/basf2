@@ -15,7 +15,7 @@ exp = 'e0001'
 # dir = '/ghi/fs01/belle2/bdata/group/detector/CDC/unpacked/'
 # files = glob.glob(dir + exp + '/gcr.cdc.*.root')
 # GCR 2017
-dir = '/hsm/belle2/bdata/Data/Raw' + exp
+dir = '/hsm/belle2/bdata/Data/Raw/' + exp
 # run list.
 runs = [3118, 3119, 3120, 3165, 3169, 3170, 3173]
 files_nested = [glob.glob(dir + '*/sub00/cosmic.*' + str(i) + '.HLT1.f*.root') for i in runs]

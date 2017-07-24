@@ -29,7 +29,7 @@ namespace Belle2 {
    * Class to store mode information in an SVDShaperDigit.
    *
    * - Mode : Zero suppressed 6- or 3- samples + unknown mode
-   * - Trigger time bin - 3 bits, correct values 0-3, otehr - error
+   * - Trigger time bin - 3 bits, correct values 0-3, other - error
    */
   class SVDModeByte {
   public:

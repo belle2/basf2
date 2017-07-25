@@ -33,7 +33,8 @@ namespace Belle2 {
     void initializeEventCache(std::vector<RecoTrack*>& seedsVector, std::vector<const SpacePoint*>& filteredHitVector);
 
     /// Expose parameters (if we would have such a thing)
-    void exposeParameters(ModuleParamList* moduleParamList,  const std::string& prefix)
+    void exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
+                          const std::string& prefix __attribute__((unused)))
     {
     }
 

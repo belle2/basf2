@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/dataobjects/Helix.h>
 #include <geometry/bfieldmap/BFieldMap.h>
@@ -29,27 +30,29 @@ namespace Belle2 {
    */
   template<class AResultObject>
   class CDCTrackSpacePointStoreArrayHandler : public TrackFindingCDC::Findlet<RecoTrack* const, const AResultObject> {
-    using Super = TrackFindingCDC::Findlet<const AResultObject>;
+    using Super = TrackFindingCDC::Findlet<RecoTrack* const, const AResultObject>;
 
   public:
     /// Expose the parameters of the findlet
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {
-      moduleParamList->addParameter("exportTracks", m_param_exportTracks, "Export the result tracks into a StoreArray.",
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "exportTracks"), m_param_exportTracks,
+                                    "Export the result tracks into a StoreArray.",
                                     m_param_exportTracks);
 
-      moduleParamList->addParameter("VXDRecoTrackStoreArrayName", m_param_vxdRecoTrackStoreArrayName,
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "VXDRecoTrackStoreArrayName"), m_param_vxdRecoTrackStoreArrayName,
                                     "StoreArray name of the VXD Track Store Array", m_param_vxdRecoTrackStoreArrayName);
 
-      moduleParamList->addParameter("MergedRecoTrackStoreArrayName", m_param_mergedRecoTrackStoreArrayName,
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "mergedRecoTrackStoreArrayName"),
+                                    m_param_mergedRecoTrackStoreArrayName,
                                     "StoreArray name of the merged Track Store Array",
                                     m_param_mergedRecoTrackStoreArrayName);
 
-      moduleParamList->addParameter("exportAlsoMergedTracks", m_param_exportAlsoMergedTracks,
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "exportAlsoMergedTracks"), m_param_exportAlsoMergedTracks,
                                     "Export also the merged tracks into a StoreArray.",
                                     m_param_exportAlsoMergedTracks);
 
-      moduleParamList->addParameter("debuggingRelationsTo", m_param_debuggingRelationsTo,
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "debuggingRelationsTo"), m_param_debuggingRelationsTo,
                                     "Add a relation to the CDC tracks given in this store array name (or none to not add relations).",
                                     m_param_debuggingRelationsTo);
     }

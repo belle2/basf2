@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
@@ -32,10 +33,10 @@ namespace Belle2 {
     /// Expose the parameters of the findlet
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {
-      moduleParamList->addParameter("singleClusterLevel", m_param_singleClusterLevel,
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "singleClusterLevel"), m_param_singleClusterLevel,
                                     "Mark SP as used, if the share a single cluster with the results, or if they share a whole SP.",
                                     m_param_singleClusterLevel);
-      moduleParamList->addParameter("markUsedSpacePoints", m_param_markUsedSpacePoints,
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "markUsedSpacePoints"), m_param_markUsedSpacePoints,
                                     "Mark used spacepoints as assigned.",
                                     m_param_markUsedSpacePoints);
     }

@@ -40,7 +40,8 @@ namespace Belle2 {
     double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, ARecoHit& recoHit) const;
 
     /// Currently, no parameters are exported.
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+    void exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
+                          const std::string& prefix __attribute__((unused)))
     {}
 
     /// Main function: update the parameters stored in the mSoP of the state using the SP related to this state.

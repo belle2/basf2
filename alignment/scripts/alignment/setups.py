@@ -55,7 +55,11 @@ def get_path(
         reco.add_reconstruction(path, pruneTracks=False, components=geometryComponents if geometryComponents else [])
 
     if doCosmicsReconstruction:
-        reco.add_cosmics_reconstruction(path, pruneTracks=False, components=geometryComponents if geometryComponents else [])
+        reco.add_cosmics_reconstruction(
+            path,
+            pruneTracks=False,
+            components=geometryComponents if geometryComponents else [],
+            merge_tracks=True)
 
     if 'SetupGenfitExtrapolation' not in path:
         path.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
@@ -187,15 +191,17 @@ def setup_EKLMAlignment():
 
 
 def setup_CDCLayers_GCR_Karim():
-    geometry = '/geometry/GCR_Summer2017.xml'
+    geometry = '/alignment/examples/GCR_Summer2017.xml'
     recotracks = ['RecoTracks']
-    global do_cosmics_reconstruction
+    global do_cosmics_reconstruction, dirty_data
     do_cosmics_reconstruction = True
+    dirty_data = True
 
     # Inherit settings
     millepede = setup_CDCLayers()
 
     millepede.set_param(recotracks, 'tracks')
     millepede.set_param(geometry, 'fileName', 'Gearbox')
+    millepede.set_param(1.e-20, 'minPValue')
 
     return millepede

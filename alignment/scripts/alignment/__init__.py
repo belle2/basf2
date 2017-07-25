@@ -91,7 +91,7 @@ class MillepedeCalibration():
         self.collector.param('vertices', vertices)
         self.collector.param('primaryVertices', primary_vertices)
         self.collector.param('minPValue', 0.)
-        self.collector.param('useGblTree', False)
+        self.collector.param('useGblTree', True)
 
         self.set_command('method diagonalization 3 0.1')
         self.set_command('skipemptycons')

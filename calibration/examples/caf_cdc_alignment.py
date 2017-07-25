@@ -10,6 +10,11 @@ from ROOT import Belle2
 from caf.framework import Calibration, CAF
 from caf import backends
 
+import basf2
+from reconstruction import add_cosmics_reconstruction
+from ROOT import Belle2
+import cdc.cr as gcr
+
 
 def main(argv):
     print('Demonstrator of Millepede alignment of CDC layers')
@@ -25,23 +30,31 @@ def main(argv):
         sys.exit(1)
     print(inputFiles)
 
+    main_path = basf2.create_path()
+    main_path.add_module('Progress')
+    main_path.add_module('Gearbox')
+    main_path.add_module('Geometry', excludedComponents=['SVD', 'PXD', 'ARICH', 'BeamPipe', 'EKLM'])
+
+    # Add CDC CR reconstruction.
+    add_cosmics_reconstruction(main_path, components=['CDC'], merge_tracks=True, pruneTracks=False)
+
     from alignment import MillepedeCalibration
+    from alignment import setups
 
-    millepede = MillepedeCalibration(['CDCAlignment', 'CDCLayerAlignment'])
-    millepede.algo.invertSign()
+    setups.dirty_data = True
+    millepede = setups.setup_CDCLayers_GCR_Karim()
+    millepede.path = main_path
+    calib = millepede.create('cdc_layer_alignment', inputFiles)
 
-    millepede.fixCDCLayerX(49)
-    millepede.fixCDCLayerY(49)
-    millepede.fixCDCLayerRot(49)
-    millepede.fixCDCLayerX(55)
-    millepede.fixCDCLayerY(55)
-    millepede.fixCDCLayerRot(55)
+    from caf.framework import CAF
 
-    from caf.framework import Calibration, CAF
+    caf = CAF()
+    # calib.use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
+    # use_local_database("cdc_crt/database.txt", "cdc_crt")
+    # use_local_database("localDB/database.txt", "localDB")
+    # calib.use_central_database("GT_gen_data_002.11_gcr2017-07")
 
-    caf = CAF(max_iterations=3)
-
-    caf.add_calibration(millepede.create('cdc_layer_alignment', inputFiles))
+    caf.add_calibration(calib)
     caf.output_dir = 'caf_output'
 
     caf.run()

@@ -366,6 +366,15 @@ namespace Belle2 {
     bool isPedestalJump() const;
 
     /**
+     * Checks if feature extraction points are at window discontinuity
+     * (e.g. discontinuity happens between sampleRise and sampleFall+1)
+     * NOTE: always false if m_windows is empty
+     * @param storageDepth storage depth
+     * @return true if window discontinuity is found between sampleRise and sampleFall+1
+     */
+    bool isAtWindowDiscontinuity(unsigned short storageDepth = 512) const;
+
+    /**
      * Checks if storage windows come in the consecutive order before the last sample
      * (no gaps before the last sample)
      * Note: returns true if m_windows is empty
@@ -373,6 +382,14 @@ namespace Belle2 {
      * @return true, if no gaps before the last sample or m_windows is empty
      */
     bool areWindowsInOrder(unsigned short storageDepth = 512) const;
+
+    /**
+     * Corrects time after window discontinuity by adding missing samples
+     * @param time leading or falling edge time [samples]
+     * @param storageDepth storage depth
+     * @return time corrected for missing samples if any, otherwise returns input value [samples]
+     */
+    double correctTime(double time, unsigned short storageDepth = 512) const;
 
     /**
      * Checks if the first window number is the same as the first one in m_windows

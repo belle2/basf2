@@ -23,11 +23,11 @@ int TOPRawWaveform::featureExtraction(int threshold, int hysteresis,
   int currentThr = threshold;
   bool lastState = false;
   int samplePeak = 0;
-  int size = m_data.size();
+  size_t size = m_data.size();
   int aboveThr = 0;
-  for (unsigned i = 0; i < m_data.size(); i++) {
+  for (size_t i = 0; i < size; i++) {
     const auto& adc = m_data[i];
-    if (adc > currentThr) {
+    if (adc > currentThr and i < size - 1) {
       currentThr = threshold - hysteresis;
       if (!lastState or adc > m_data[samplePeak]) samplePeak = i;
       lastState = true;

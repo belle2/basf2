@@ -2,11 +2,17 @@
 # -*- coding: utf-8 -*-
 
 # ---------------------------------------------------------------------------------------
-# Unpack raw data in Interim FE format v2.1 to TOPDigits
-# Usage: basf2 unpackToTOPDigits.py -i <input_file.sroot> -o <output_file.root>
+# Unpack raw data in Interim FE format v2.1 to TOPDigits using time base calibration
+# Usage: basf2 unpackToTOPDigitsWithTBC.py -i <input_file.sroot> -o <output_file.root>
+#
+# Name and location of local DB can be changed if needed
 # ---------------------------------------------------------------------------------------
 
 from basf2 import *
+
+# database
+reset_database()
+use_local_database("localDB/localDB.txt", "localDB")
 
 # Create path
 main = create_path()
@@ -41,7 +47,7 @@ main.add_module(featureExtractor)
 
 # Convert to TOPDigits
 converter = register_module('TOPRawDigitConverter')
-converter.param('useSampleTimeCalibration', False)
+converter.param('useSampleTimeCalibration', True)  # enable calibration
 converter.param('useChannelT0Calibration', False)
 converter.param('useModuleT0Calibration', False)
 converter.param('useCommonT0Calibration', False)

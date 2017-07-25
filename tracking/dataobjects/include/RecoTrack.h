@@ -308,34 +308,24 @@ namespace Belle2 {
       return addHit(eklmHit, foundByTrackFinder, sortingParameter);
     }
 
-    /// Return the reco hit information for a given cdc hit or nullptr if there is none.
-    RecoHitInformation* getRecoHitInformation(const UsedCDCHit* cdcHit) const
+    /**
+     * Return the reco hit information for a generic hit from the storeArray.
+     * @param hit the hit to look for.
+     * @return The connected RecoHitInformation or a nullptr when the hit is not connected to the track.
+     */
+    template<class HitType>
+    RecoHitInformation* getRecoHitInformation(HitType* hit) const
     {
-      return getRecoHitInformation(cdcHit, m_storeArrayNameOfCDCHits);
-    }
+      RelationVector<RecoHitInformation> relatedHitInformationToHit = hit->template getRelationsFrom<RecoHitInformation>
+      (m_storeArrayNameOfRecoHitInformation);
 
-    /// Return the reco hit information for a given svd hit or nullptr if there is none.
-    RecoHitInformation* getRecoHitInformation(const UsedSVDHit* svdHit) const
-    {
-      return getRecoHitInformation(svdHit, m_storeArrayNameOfSVDHits);
-    }
+      for (RecoHitInformation& recoHitInformation : relatedHitInformationToHit) {
+        if (recoHitInformation.getRelatedFrom<RecoTrack>(this->getArrayName()) == this) {
+          return &recoHitInformation;
+        }
+      }
 
-    /// Return the reco hit information for a given pxd hit or nullptr if there is none.
-    RecoHitInformation* getRecoHitInformation(const UsedPXDHit* pxdHit) const
-    {
-      return getRecoHitInformation(pxdHit, m_storeArrayNameOfPXDHits);
-    }
-
-    /// Return the reco hit information for a given bklm hit or nullptr if there is none.
-    RecoHitInformation* getRecoHitInformation(const UsedBKLMHit* bklmHit) const
-    {
-      return getRecoHitInformation(bklmHit, m_storeArrayNameOfBKLMHits);
-    }
-
-    /// Return the reco hit information for a given eklm hit or nullptr if there is none.
-    RecoHitInformation* getRecoHitInformation(const UsedEKLMHit* eklmHit) const
-    {
-      return getRecoHitInformation(eklmHit, m_storeArrayNameOfEKLMHits);
+      return nullptr;
     }
 
     // Hits Information Questioning
@@ -885,27 +875,6 @@ namespace Belle2 {
       addRelationTo(recoHitInformation);
 
       setDirtyFlag();
-    }
-
-    /**
-     * Return the reco hit information for a generic hit from the storeArray.
-     * @param hit the hit to look for.
-     * @param storeArrayNameOfHits The name of the StoreArray the hit belongs to.
-     * @return The connected RecoHitInformation or a nullptr when the hit is not connected to the track.
-     */
-    template<class HitType>
-    RecoHitInformation* getRecoHitInformation(HitType* hit, const std::string& storeArrayNameOfHits) const
-    {
-      RelationVector<RecoHitInformation> relatedHitInformationToHit = hit->template getRelationsFrom<RecoHitInformation>
-      (m_storeArrayNameOfRecoHitInformation);
-
-      for (RecoHitInformation& recoHitInformation : relatedHitInformationToHit) {
-        if (recoHitInformation.getRelatedFrom<RecoTrack>(this->getArrayName()) == this) {
-          return &recoHitInformation;
-        }
-      }
-
-      return nullptr;
     }
 
     /// Returns the reco hit information for a given hit or throws an exception if the hit is not related to the track.

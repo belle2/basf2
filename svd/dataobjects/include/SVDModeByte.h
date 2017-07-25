@@ -44,7 +44,7 @@ namespace Belle2 {
       Bits = TriggerBinBits + DAQModeBits,
 
       /** Maximum available trigger time ID */
-      MaxTruggerTime = (1 << TriggerBinBits) - 1,
+      MaxTriggerTime = (1 << TriggerBinBits) - 1,
       /** Maximum valid trigger time ID */
       MaxGoodTriggerBin = (1 << 2) - 1,
       /** Maximum valid DAQ mode ID */

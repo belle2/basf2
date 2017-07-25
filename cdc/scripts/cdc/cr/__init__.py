@@ -1,9 +1,6 @@
 from basf2 import *
 from ROOT import Belle2
-from tracking import add_cdc_cr_track_finding
-from tracking import add_cdc_track_finding
-from tracking import add_cdc_cr_track_fit_and_track_creator
-from time_extraction_helper_modules import *
+import ROOT
 
 # Propagation velocity of the light in the scinti.
 lightPropSpeed = 12.9925
@@ -14,7 +11,8 @@ run_range = {'201607': [787, 833],
              '201608b': [917, 924],
              '201609': [966, 973],
              '201702': [1601, 9999],
-             'noamal': [-1, -1]
+             'gcr2017': [3058, 100000],
+             'normal': [-1, -1]
              }
 # Size of trigger counter.
 triggerSize = {'201607': [20.0, 6.0, 10.0],
@@ -22,6 +20,7 @@ triggerSize = {'201607': [20.0, 6.0, 10.0],
                '201608b': [100.0, 8.0, 10.0],
                '201609': [100.0, 8.0, 10.0],
                '201702': [100.0, 8.0, 10.0],
+               'gcr2017': [100, 0, 8.0, 10.0],
                'normal': [100.0, 8.0, 10.0]
                }
 # Center position of trigger counter.
@@ -30,6 +29,7 @@ triggerPosition = {'201607': [0.3744, 0.0, -1.284],
                    '201608b': [-1.87, -1.25, 11.0],
                    '201609': [0, 0, 11.0],
                    '201702': [0., -1.5, 21.0],
+                   'gcr2017': [0.0, 0.0, 0.0],
                    'normal': [0.0, 0.0, 0.0]
                    }
 
@@ -39,6 +39,7 @@ triggerPlaneDirection = {'201607': [1, -1, 0],
                          '201608b': [0, 1, 0],
                          '201609': [0, 1, 0],
                          '201702': [0, 1, 0],
+                         'gcr2017': [0, 1, 0],
                          'normal': [0, 1, 0]
                          }
 
@@ -48,6 +49,7 @@ pmtPosition = {'201607': [0, 0, 0],
                '201608b': [-1.87, 0, -42.0],
                '201609': [0, 0, -42.0],
                '201702': [0., -1.5, -31.0],
+               'gcr2017': [0.0, 0.0, -50.0],
                'normal': [0, 0, -50.0]
                }
 
@@ -57,6 +59,7 @@ globalPhiRotation = {'201607': 1.875,
                      '201608b': 1.875,
                      '201609': 1.875,
                      '201702': 0.0,
+                     'gcr2017': 0.0,
                      'normal': 0.0
                      }
 
@@ -88,28 +91,44 @@ def set_cdc_cr_parameters(period):
     cosmics_period = period
 
 
-def getExpNumber(fname):
+def getExpRunNumber(fname):
     """
-    Get expperimental number from file name.
+    Get expperimental number and run number from file name.
     """
-    exp = int((fname.split('/')[-1]).split('.')[2])
-    return exp
+    f = ROOT.TFile(fname)
+    t = f.Get('tree')
+    t.GetEntry(0)
+    e = t.EventMetaData
+    exp = e.getExperiment()
+    run = e.getRun()
+    f.Close()
+    return [exp, run]
 
 
 def getRunNumber(fname):
     """
     Get run number from file name.
     """
-    run = int(((fname.split('/')[-1]).split('.')[3]).split('_')[0])
+    f = ROOT.TFile(fname)
+    t = f.Get('tree')
+    t.GetEntry(0)
+    e = t.EventMetaData
+    run = e.getRun()
+    f.Close()
     return run
 
 
-def getDataPeriod(run):
+def getDataPeriod(exp=0, run=0):
     """
     Get data period from run number
     It should be replaced the argument from run to (exp, run)!
     """
     period = None
+
+    if exp is 1:  # GCR2017
+        return 'gcr2017'
+
+    # Pre global cosmics until March 2017
     global run_range
 
     for key in run_range:

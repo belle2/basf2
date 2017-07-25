@@ -48,6 +48,7 @@ CDCCosmicAnalysisModule::CDCCosmicAnalysisModule() : Module()
   addParam("RecoTracksColName", m_recoTrackArrayName, "Name of collectrion hold genfit::Track", std::string(""));
   addParam("Output", m_OutputFileName, "xt file name", string("xt.root"));
   addParam("noBFit", m_noBFit, "If true -> #Params ==4, #params ==5 for calculate P-Val", true);
+  addParam("EventT0Extraction", m_EventT0Extraction, "use event t0 extract t0 or not", false);
 }
 
 CDCCosmicAnalysisModule::~CDCCosmicAnalysisModule()
@@ -68,6 +69,10 @@ void CDCCosmicAnalysisModule::initialize()
 
   tfile = new TFile(m_OutputFileName.c_str(), "RECREATE");
   tree = new TTree("tree", "tree");
+
+  tree->Branch("evtT0", &evtT0, "evtT0/D");
+  tree->Branch("charge", &charge, "charge/S");
+
   tree->Branch("Pval1", &Pval1, "Pval1/D");
   tree->Branch("ndf1", &ndf1, "ndf1/D");
   tree->Branch("Phi01", &Phi01, "Phi01/D");
@@ -101,11 +106,25 @@ void CDCCosmicAnalysisModule::event()
   const StoreArray<Belle2::RecoTrack> recoTracks(m_recoTrackArrayName);
   const RelationArray relTrackTrack(recoTracks, storeTrack, m_relRecoTrackTrackName);
 
+  //temporary add here, but should be outsidel
+  bool store = true;
+  evtT0 = 0;
+  if (m_EventT0Extraction) {
+    // event with is fail to extract t0 will be exclude from analysis
+    if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasDoubleEventT0()) {
+      evtT0 =  m_eventTimeStoreObject->getEventT0();
+    } else {
+      store = false;
+    }
+  }
 
   // Loop over Recotracks
   int nTr = recoTracks.getEntries();
   int nfitted = 0;
   int n = 0;
+  short charge2 = 0;
+  short charge1 = 0;
+
   for (int i = 0; i < nTr; ++i) {
     const RecoTrack* track = recoTracks[i];
     if (!track->getTrackFitStatus()->isFitted()) {
@@ -142,6 +161,7 @@ void CDCCosmicAnalysisModule::event()
 
     /*** Two track case.***/
     if (nfitted == 1) {
+      charge1 = fitresult->getChargeSign();
       posSeed1 = posSeed;
       Phi01 = Phi0;
       tanLambda1 = fitresult->getTanLambda();
@@ -155,6 +175,7 @@ void CDCCosmicAnalysisModule::event()
       n += 1;
     }
     if (nfitted == 2) {
+      charge2 = fitresult->getChargeSign();
       posSeed2 = posSeed;
       Phi02 = Phi0;
       tanLambda2 = fitresult->getTanLambda();
@@ -167,7 +188,10 @@ void CDCCosmicAnalysisModule::event()
       n += 1;
     }
   }
-  if (n == 2) tree->Fill();
+  if (n == 2 && store && charge1 * charge2 > 0) {
+    charge = charge1;
+    tree->Fill();
+  }
 }
 
 void CDCCosmicAnalysisModule::endRun()

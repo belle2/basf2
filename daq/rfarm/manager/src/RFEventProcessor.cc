@@ -124,7 +124,9 @@ int RFEventProcessor::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
   char* sender = m_conf->getconf("processor", "sender", "script");
   char* port = m_conf->getconf("processor", "sender", "port");
   m_pid_sender = m_proc->Execute(sender, (char*)rbufout.c_str(), port, (char*)shmname.c_str(), (char*)"1");
+  m_flow->clear(1);
 
+  /*
   // 4. Run basf2
   char* basf2 = m_conf->getconf("processor", "basf2", "script");
   if (nsmm->len > 0) {
@@ -132,6 +134,7 @@ int RFEventProcessor::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
     printf("Configure: basf2 script overridden : %s\n", basf2);
   }
   m_pid_basf2 = m_proc->Execute(basf2, (char*)rbufin.c_str(), (char*)rbufout.c_str(), hport);
+  */
 
   // 5. Run receiver
   char* receiver = m_conf->getconf("processor", "receiver", "script");
@@ -153,9 +156,15 @@ int RFEventProcessor::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
   char portchar[256];
   sprintf(portchar, "%d", rport);
   m_pid_receiver = m_proc->Execute(receiver, (char*)rbufin.c_str(), srchost, portchar, (char*)shmname.c_str(), (char*)"0");
+  m_flow->clear(0);
 
   printf("Configure : done\n");
   fflush(stdout);
+
+  // 6 Clear RingBuffers
+  m_rbufin->forceClear();
+  m_rbufout->forceClear();
+
   return 0;
 
 }
@@ -174,6 +183,7 @@ int RFEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
     printf("RFEventProcessor : killing basf2 pid=%d\n", m_pid_basf2);
     kill(m_pid_basf2, SIGINT);
     waitpid(m_pid_basf2, &status, 0);
+    m_pid_basf2 = 0;
   }
   if (m_pid_receiver != 0) {
     printf("RFEventProcessor : killing receiver pid=%d\n", m_pid_receiver);
@@ -203,19 +213,46 @@ int RFEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
   return 0;
 }
 
-int RFEventProcessor::Start(NSMmsg*, NSMcontext*)
+int RFEventProcessor::Start(NSMmsg* nsmm, NSMcontext* nsmc)
 {
+  string rbufin = string(m_conf->getconf("system", "unitname")) + ":" +
+                  string(m_conf->getconf("processor", "ringbufin"));
+  string rbufout = string(m_conf->getconf("system", "unitname")) + ":" +
+                   string(m_conf->getconf("processor", "ringbufout"));
+  char* hport = m_conf->getconf("processor", "historecv", "port");
+
+  // 1. Clear RingBuffers
+  //  m_rbufout->forceClear();
+  //  m_rbufin->forceClear();
+
+  // 2. Run basf2
+  char* basf2 = m_conf->getconf("processor", "basf2", "script");
+  if (nsmm->len > 0) {
+    basf2 = (char*) nsmm->datap;
+    printf("Configure: basf2 script overridden : %s\n", basf2);
+  }
+  m_pid_basf2 = m_proc->Execute(basf2, (char*)rbufin.c_str(), (char*)rbufout.c_str(), hport);
+
   return 0;
 }
 
 int RFEventProcessor::Stop(NSMmsg*, NSMcontext*)
 {
+  /*
   char* hcollect = m_conf->getconf("processor", "dqm", "hcollect");
   char* filename = m_conf->getconf("processor", "dqm", "file");
   char* nprocs = m_conf->getconf("processor", "basf2", "nprocs");
   int pid_hcollect = m_proc->Execute(hcollect, filename, nprocs);
   int status;
   waitpid(pid_hcollect, &status, 0);
+  */
+  int status;
+  if (m_pid_basf2 != 0) {
+    printf("RFEventProcessor : killing basf2 pid=%d\n", m_pid_basf2);
+    kill(m_pid_basf2, SIGINT);
+    waitpid(m_pid_basf2, &status, 0);
+    m_pid_basf2 = 0;
+  }
   return 0;
 }
 

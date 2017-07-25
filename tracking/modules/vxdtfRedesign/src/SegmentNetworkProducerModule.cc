@@ -120,8 +120,12 @@ SegmentNetworkProducerModule::initialize()
            filters.size());
 
     m_vxdtfFilters = &filters;
-    SecMapHelper::printStaticSectorRelations(filters, filters.getConfig().secMapName + "segNetProducer", 2, m_PARAMprintToMathematica,
-                                             true);
+
+    if (m_PARAMprintToMathematica) {
+      SecMapHelper::printStaticSectorRelations(filters, filters.getConfig().secMapName + "segNetProducer", 2, m_PARAMprintToMathematica,
+                                               true);
+    }
+
     if (m_vxdtfFilters == nullptr) B2FATAL("SegmentNetworkProducerModule::initialize(): requested secMapName '" << m_PARAMsecMapName <<
                                              "' does not exist! Can not continue...");
     break; // have found our secMap no need for further searching

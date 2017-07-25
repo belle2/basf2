@@ -17,7 +17,6 @@ import datetime
 from generators import add_cosmics_generator
 from simulation import add_simulation
 
-from tracking import add_cdc_cr_track_finding
 import os.path
 import sys
 from cdc.cr import getDataPeriod
@@ -50,7 +49,8 @@ def sim(exp, run, evt, st, topInCounter=True, magneticField=False):
 
     main_path.add_module('Progress')
 
-    period = getDataPeriod(int(run))
+    period = getDataPeriod(exp=int(exp),
+                           run=int(run))
 
     if not magneticField:
         components = ['CDC']

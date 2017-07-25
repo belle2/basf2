@@ -61,7 +61,7 @@ std::unique_ptr<Database> Database::s_instance{nullptr};
 
 std::string Database::getDefaultGlobalTags()
 {
-  return getFromEnvironment("BELLE2_CONDB_GLOBALTAG", "production");
+  return getFromEnvironment("BELLE2_CONDB_GLOBALTAG", "GT_gen_prod_003.01_Master-20170721-132500");
 }
 
 Database& Database::Instance()

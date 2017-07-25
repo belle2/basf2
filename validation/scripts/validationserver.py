@@ -298,6 +298,9 @@ def parse_cmd_line_arguments():
     parser.add_argument("-v", "--view", help="Open validation website"
                         " in the system's default browser.",
                         action='store_true')
+    parser.add_argument("--production", help="Run in production environment"
+                        "no log/error output via website and no auto-reload",
+                        action="store_true")
 
     # Return the parsed arguments!
     return parser.parse_args()
@@ -397,6 +400,7 @@ def run_server(ip='127.0.0.1', port=8000, parseCommandLine=False, openSite=False
 
     # Define the server address and port
     # only if we got some specific
+    production_env = False
     if parseCommandLine:
         # Parse command line arguments
         cmd_arguments = parse_cmd_line_arguments()
@@ -404,10 +408,14 @@ def run_server(ip='127.0.0.1', port=8000, parseCommandLine=False, openSite=False
         ip = cmd_arguments.ip
         port = int(cmd_arguments.port)
         openSite = cmd_arguments.view
+        production_env = cmd_arguments.production
 
     cherrypy.config.update({'server.socket_host': ip,
                             'server.socket_port': port,
                             })
+    if production_env:
+        cherrypy.config.update({'environment': 'production'})
+
     logging.info("Server: Starting HTTP server on {0}:{1}".format(ip, port))
 
     if openSite:

@@ -11,7 +11,7 @@ extern "C" {
 /* -- version info */
 
 #define NSM_PROTOCOL_VERSION 1944 /* protocol version */
-#define NSM_PACKAGE_VERSION  1945 /* package  version */
+#define NSM_PACKAGE_VERSION  1947 /* package  version */
 
 /*
   20120723 1900 file created
@@ -58,6 +58,8 @@ extern "C" {
   20150520 1943 destroyconn fix [for anonymous and for sys.ready]
   20150521 1944 new protocol version, master recoonect fix
   20150808 1945 updates for PNNL summer school tutorial
+  20160420 1946 suppress debug output of nsmd2 and b2lib
+  20170613 1947 nsmd2 update for USRCPYMEM protection
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */

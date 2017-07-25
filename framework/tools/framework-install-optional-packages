@@ -79,13 +79,6 @@ if __name__ == "__main__":
     call_and_output(["pip3", "install", "-v"] + target_option + optional_packages_list + args.package,
                     env=target_pythonpath_env)
     
-    # various configuration settings for the newly installed packages
-    # use a env containing the target path so the new packages are actually available
-    if can_install:
-        # this is only possible if the jupyter config is writeable, in cvmfs case it is not.
-        call_and_output(["jupyter", "nbextension", "enable", "--py", "--sys-prefix", "widgetsnbextension"],
-                        env=target_pythonpath_env)
-    
     if not args.target:
         print("All optional packages installed into the default site-packages location.")
     else:

@@ -11,7 +11,7 @@ import sys
 import argparse
 
 # the list of additional pip packages installed by this script
-optional_packages_list = ["seaborn", "root-numpy", "pandas", "scipy", "sklearn"]
+optional_packages_list = ["root-numpy"]
 
 def can_install_sitepackages():
     """

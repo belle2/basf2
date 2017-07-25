@@ -98,7 +98,7 @@ class TestingModule(Module):
         perform check
         """
         # We only want to do the check if we actually execute the process() but
-        # since this scriptset_info is called from basf2_args with --dry-run this is not
+        # since this script is called from basf2_args with --dry-run this is not
         # always the case
         assert expected_event_numbers == processed_event_numbers
 

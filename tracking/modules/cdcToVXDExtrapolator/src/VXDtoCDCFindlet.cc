@@ -78,7 +78,7 @@ void VXDtoCDCFindlet::apply()
   m_overlapTeacher.apply(m_results);
   m_overlapResolver.apply(m_results);
 
-  m_storeArrayHandler.apply(m_results);
+  m_storeArrayHandler.apply(m_cdcRecoTrackVector, m_results);
   //??
   m_svdSpacePointTagger.apply(m_results, m_vxdVector);
 }

@@ -11,6 +11,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
@@ -26,8 +27,8 @@ namespace Belle2 {
    * This findlet is responsible for the interface between the DataStore and the CKF modules:
    *  * to write back the found VXD tracks only and the merged tracks (CDC + VXD) (apply)
    */
-  template <class AResultObject>
-  class CDCTrackSpacePointStoreArrayHandler : public TrackFindingCDC::Findlet<const AResultObject> {
+  template<class AResultObject>
+  class CDCTrackSpacePointStoreArrayHandler : public TrackFindingCDC::Findlet<RecoTrack* const, const AResultObject> {
     using Super = TrackFindingCDC::Findlet<const AResultObject>;
 
   public:
@@ -41,11 +42,16 @@ namespace Belle2 {
                                     "StoreArray name of the VXD Track Store Array", m_param_vxdRecoTrackStoreArrayName);
 
       moduleParamList->addParameter("MergedRecoTrackStoreArrayName", m_param_mergedRecoTrackStoreArrayName,
-                                    "StoreArray name of the merged Track Store Array", m_param_mergedRecoTrackStoreArrayName);
+                                    "StoreArray name of the merged Track Store Array",
+                                    m_param_mergedRecoTrackStoreArrayName);
 
       moduleParamList->addParameter("exportAlsoMergedTracks", m_param_exportAlsoMergedTracks,
                                     "Export also the merged tracks into a StoreArray.",
                                     m_param_exportAlsoMergedTracks);
+
+      moduleParamList->addParameter("debuggingRelationsTo", m_param_debuggingRelationsTo,
+                                    "Add a relation to the CDC tracks given in this store array name (or none to not add relations).",
+                                    m_param_debuggingRelationsTo);
     }
 
     /// Require/register the store arrays
@@ -56,24 +62,24 @@ namespace Belle2 {
       m_vxdRecoTracks.registerInDataStore(m_param_vxdRecoTrackStoreArrayName);
       RecoTrack::registerRequiredRelations(m_vxdRecoTracks);
 
-      m_mergedRecoTracks.registerInDataStore(m_param_mergedRecoTrackStoreArrayName);
-      RecoTrack::registerRequiredRelations(m_mergedRecoTracks);
+      if (m_param_exportAlsoMergedTracks) {
+        m_mergedRecoTracks.registerInDataStore(m_param_mergedRecoTrackStoreArrayName);
+        RecoTrack::registerRequiredRelations(m_mergedRecoTracks);
+      }
 
-      // TODO: Make this general enough
-      StoreArray<RecoTrack> cdcRecoTracks("CDCRecoTracks");
-      cdcRecoTracks.registerRelationTo(m_vxdRecoTracks);
+      if (not m_param_debuggingRelationsTo.empty()) {
+        StoreArray<RecoTrack> cdcRecoTracks(m_param_debuggingRelationsTo);
+        cdcRecoTracks.registerRelationTo(m_vxdRecoTracks);
+      }
     }
 
 
     /**
      * Write back the found tracks (VXD only and the merged ones).
      */
-    void apply(const std::vector<AResultObject>& cdcTracksWithMatchedSpacePoints) override
+    void apply(const std::vector<RecoTrack*>& cdcRecoTrackVector,
+               const std::vector<AResultObject>& cdcTracksWithMatchedSpacePoints) override
     {
-      // Create a list of cdc-track - svd cluster list pairs
-      std::vector<std::pair<const RecoTrack*, std::pair<TVector3, std::vector<const SpacePoint*>>>> seedsWithPositionAndHits;
-      seedsWithPositionAndHits.reserve(cdcTracksWithMatchedSpacePoints.size());
-
       // Create new VXD tracks out of the found VXD space points and store them into a store array
       for (const auto& cdcTrackWithMatchedSpacePoints : cdcTracksWithMatchedSpacePoints) {
         RecoTrack* cdcRecoTrack = cdcTrackWithMatchedSpacePoints.getSeed();
@@ -82,10 +88,10 @@ namespace Belle2 {
         }
 
         const std::vector<const SpacePoint*> matchedSpacePoints = cdcTrackWithMatchedSpacePoints.getHits();
-        if (matchedSpacePoints.empty()) {
-          continue;
-        }
 
+        B2ASSERT("There are no SP related!", not matchedSpacePoints.empty());
+
+        // There is a related VXD track, so we add both
         const TVector3& vxdPosition = matchedSpacePoints.front()->getPosition();
 
         TVector3 trackMomentum;
@@ -94,13 +100,36 @@ namespace Belle2 {
         // Extrapolate the seed's track parameters onto the vxdPosition
         extrapolateMomentum(*cdcRecoTrack, vxdPosition, trackMomentum, trackCharge);
 
-        RecoTrack* newVXDOnlyTrack = addNewTrack(vxdPosition, trackMomentum, trackCharge, matchedSpacePoints, m_vxdRecoTracks);
-        cdcRecoTrack->addRelationTo(newVXDOnlyTrack);
+        RecoTrack* newVXDOnlyTrack = addNewTrack(vxdPosition, trackMomentum, trackCharge, matchedSpacePoints,
+                                                 m_vxdRecoTracks);
+        if (not m_param_debuggingRelationsTo.empty()) {
+          cdcRecoTrack->addRelationTo(newVXDOnlyTrack);
+        }
 
         if (m_param_exportAlsoMergedTracks) {
           // Add merged VXD-CDC-track
-          RecoTrack* newMergedTrack = addNewTrack(vxdPosition, trackMomentum, trackCharge, matchedSpacePoints, m_mergedRecoTracks);
+          RecoTrack* newMergedTrack = addNewTrack(vxdPosition, trackMomentum, trackCharge, matchedSpacePoints,
+                                                  m_mergedRecoTracks);
           newMergedTrack->addHitsFromRecoTrack(cdcRecoTrack, newMergedTrack->getNumberOfTotalHits());
+        }
+      }
+
+      if (m_param_exportAlsoMergedTracks) {
+        for (auto& cdcTrack : cdcRecoTrackVector) {
+          const auto& sameSeed = [&cdcTrack](const AResultObject & result) {
+            return result.getSeed() == cdcTrack;
+          };
+          if (not TrackFindingCDC::any(cdcTracksWithMatchedSpacePoints, sameSeed)) {
+            // This result has no matching VXD track, so we only export the CDC part
+            TVector3 cdcPosition;
+            TVector3 cdcMomentum;
+            int cdcCharge;
+
+            extractTrackState(*cdcTrack, cdcPosition, cdcMomentum, cdcCharge);
+
+            RecoTrack* newCDCOnlyTrack = addNewTrack(cdcPosition, cdcMomentum, cdcCharge, {}, m_mergedRecoTracks);
+            newCDCOnlyTrack->addHitsFromRecoTrack(cdcTrack);
+          }
         }
       }
     }
@@ -113,6 +142,8 @@ namespace Belle2 {
     std::string m_param_vxdRecoTrackStoreArrayName = "CKFVXDRecoTracks";
     /** StoreArray name of the merged Track Store Array */
     std::string m_param_mergedRecoTrackStoreArrayName = "MergedRecoTracks";
+    /** StoreArray name of the merged Track Store Array */
+    std::string m_param_debuggingRelationsTo = "CDCRecoTracks";
     /** Export also the merged tracks */
     bool m_param_exportAlsoMergedTracks = true;
 
@@ -185,8 +216,10 @@ namespace Belle2 {
             sortingParameter++;
           }
         } else {
-          B2WARNING("SPTC2RTConverter::event: SpacePointTrackCandidate containing SpacePoint of unrecognised detector ID: " << detID <<
-                    ". Created RecoTrack doesn't contain these SpacePoints!");
+          B2WARNING(
+            "SPTC2RTConverter::event: SpacePointTrackCandidate containing SpacePoint of unrecognised detector ID: "
+            << detID <<
+            ". Created RecoTrack doesn't contain these SpacePoints!");
         }
 
         sortingParameter++;

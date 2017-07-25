@@ -28,6 +28,7 @@ class CombinedTrackingValidationModule(metamodules.PathModule):
         """Constructor"""
 
         #: Output TFile to be opened in the initialize methode
+        output_file_name = output_file_name or name + 'TrackingValidation.root'
         self.output_file_name = output_file_name
 
         # First forward the output_file_name to the separate modules

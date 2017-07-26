@@ -42,7 +42,7 @@ def main():
         if not os.path.isdir(jupyter_folder):
             try:
                 check_output(['jupyter', 'notebook', '--generate-config'])
-            except:
+            except BaseException:
                 print("Could not start jupyter notebook. There are many possible reasons for this.\n"
                       "\t1) Have you installed jupyter properly?\n"
                       "\t2) Is there something like \"ImportError: No module named '_sqlite3'\" in the error message?"

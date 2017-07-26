@@ -10,8 +10,8 @@ import os
 import sys
 import argparse
 
-# the list of additional pip packages installed by this script
-optional_packages_list = ["root-numpy"]
+# the list of additional pip packages installed by this script, nothing atm
+optional_packages_list = []
 
 def can_install_sitepackages():
     """

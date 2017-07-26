@@ -20,9 +20,9 @@ def main():
     # Ask the user for a port
     while True:
         try:
-            port = int(input('port: '))
+            port = int(input('Network Port (the recommendation is a number between 8000 to 9000): '))
         except ValueError:
-            print("Please fill in a valid port.")
+            print("Please fill in a valid network port.")
             continue
         else:
             break

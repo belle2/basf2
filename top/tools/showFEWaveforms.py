@@ -35,6 +35,8 @@ class WFDisplay(Module):
     gpaint = [TGraph() for i in range(4)]
     #: graphs for FE points
     graphs = [[TGraph(5)] for i in range(4)]
+    #: graphs for template fit points
+    tlpfgraphs = [[TGraph(2)] for i in range(4)]
     #: canvas
     c1 = TCanvas('c1', 'WF event display', 800, 800)
     #: output file name
@@ -45,6 +47,7 @@ class WFDisplay(Module):
 
         self.c1.Divide(1, 4)
         self.c1.Show()
+        print('WARNING: Template Fit is still under development and currently returns wrong position for rising edge!.')
 
     def wait(self):
         ''' wait for user respond '''
@@ -82,6 +85,8 @@ class WFDisplay(Module):
                 self.gpaint[i].Draw("same")
             for graph in self.graphs[i]:
                 graph.Draw("sameP")
+            for tlpfgraph in self.tlpfgraphs[i]:
+                tlpfgraph.Draw("sameP")
         self.c1.Update()
         stat = self.wait()
         return stat
@@ -153,6 +158,7 @@ class WFDisplay(Module):
 
             rawDigits = waveform.getRelationsWith("TOPRawDigits")
             self.graphs[k].clear()
+            self.tlpfgraphs[k].clear()
             for raw in rawDigits:
                 graph = TGraph(5)
                 graph.SetMarkerStyle(24)
@@ -171,12 +177,14 @@ class WFDisplay(Module):
                     graph.SetMarkerColor(4)
                 self.graphs[k].append(graph)
 
-            tlpfResults = waveform.getRelationsWith("TOPTemplateFitResult")
-            print(len(tlpfResults))
-            for result in tlpfResults:
-                print(result.getAmplitude())
-                print(result.getBackgroundOffset())
-                print(result.getChisquare())
+                tlpfResult = raw.getRelated("TOPTemplateFitResults")
+                if tlpfResult:
+                    tlpfgraph = TGraph(2)
+                    tlpfgraph.SetMarkerStyle(25)
+                    tlpfgraph.SetPoint(0, tlpfResult.getMean(), tlpfResult.getAmplitude() + tlpfResult.getBackgroundOffset())
+                    tlpfgraph.SetPoint(1, tlpfResult.getMean(), tlpfResult.getBackgroundOffset())
+                    print('Template Fit Chisquare: ', tlpfResult.getChisquare())
+                    self.tlpfgraphs[k].append(tlpfgraph)
 
             k = k + 1
             if k == 4:

@@ -3,6 +3,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/ecl/dataobjects/TRGECLTrg.h>
 
 using namespace std;
 using namespace Belle2;
@@ -27,6 +28,7 @@ void
 TRGBackToBackModule::initialize()
 {
   StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
+  StoreArray<TRGECLTrg>::registerPersistent();
 }
 
 void
@@ -47,5 +49,16 @@ TRGBackToBackModule::event()
     BackToBack |= (TSinMerger[i] && TSinMerger[i + 6]);
   }
 
-  setReturnValue(BackToBack);
+  bool TCHit = false;
+  StoreArray<TRGECLTrg> tchit;
+  for (int itchit  = 0; itchit < tchit.getEntries(); itchit++) {
+    if ((tchit[itchit] -> getNofTCHit()) > 0) {
+      TCHit = true;
+    }
+
+  }
+
+
+
+  setReturnValue(BackToBack && TCHit);
 }

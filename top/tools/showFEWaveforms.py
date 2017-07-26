@@ -35,6 +35,8 @@ class WFDisplay(Module):
     gpaint = [TGraph() for i in range(4)]
     #: graphs for FE points
     graphs = [[TGraph(5)] for i in range(4)]
+    #: graphs for template fit points
+    tlpfgraphs = [[TGraph(2)] for i in range(4)]
     #: canvas
     c1 = TCanvas('c1', 'WF event display', 800, 800)
     #: output file name
@@ -45,6 +47,7 @@ class WFDisplay(Module):
 
         self.c1.Divide(1, 4)
         self.c1.Show()
+        print('WARNING: Template Fit is still under development and currently returns wrong position for rising edge!.')
 
     def wait(self):
         ''' wait for user respond '''
@@ -82,6 +85,8 @@ class WFDisplay(Module):
                 self.gpaint[i].Draw("same")
             for graph in self.graphs[i]:
                 graph.Draw("sameP")
+            for tlpfgraph in self.tlpfgraphs[i]:
+                tlpfgraph.Draw("sameP")
         self.c1.Update()
         stat = self.wait()
         return stat
@@ -95,7 +100,7 @@ class WFDisplay(Module):
         windows = waveform.getStorageWindows()
         i0 = windows.size()
         for i in range(1, windows.size()):
-            diff = windows[i] - windows[i-1]
+            diff = windows[i] - windows[i - 1]
             if diff < 0:
                 diff += 512
             if diff != 1:
@@ -105,9 +110,9 @@ class WFDisplay(Module):
         self.gpaint[k].Set(n)
         low = i0 * 64
         for i in range(low, self.hist[k].GetNbinsX()):
-            x = self.hist[k].GetBinCenter(i+1)
-            dx = self.hist[k].GetBinWidth(i+1) / 2
-            y = self.hist[k].GetBinContent(i+1)
+            x = self.hist[k].GetBinCenter(i + 1)
+            dx = self.hist[k].GetBinWidth(i + 1) / 2
+            y = self.hist[k].GetBinContent(i + 1)
             ii = (i - low) * 2
             self.gpaint[k].SetPoint(ii, x - dx, y)
             self.gpaint[k].SetPoint(ii + 1, x + dx, y)
@@ -153,6 +158,7 @@ class WFDisplay(Module):
 
             rawDigits = waveform.getRelationsWith("TOPRawDigits")
             self.graphs[k].clear()
+            self.tlpfgraphs[k].clear()
             for raw in rawDigits:
                 graph = TGraph(5)
                 graph.SetMarkerStyle(24)
@@ -170,6 +176,15 @@ class WFDisplay(Module):
                 else:
                     graph.SetMarkerColor(4)
                 self.graphs[k].append(graph)
+
+                tlpfResult = raw.getRelated("TOPTemplateFitResults")
+                if tlpfResult:
+                    tlpfgraph = TGraph(2)
+                    tlpfgraph.SetMarkerStyle(25)
+                    tlpfgraph.SetPoint(0, tlpfResult.getMean(), tlpfResult.getAmplitude() + tlpfResult.getBackgroundOffset())
+                    tlpfgraph.SetPoint(1, tlpfResult.getMean(), tlpfResult.getBackgroundOffset())
+                    print('Template Fit Chisquare: ', tlpfResult.getChisquare())
+                    self.tlpfgraphs[k].append(tlpfgraph)
 
             k = k + 1
             if k == 4:

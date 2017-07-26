@@ -16,7 +16,6 @@
 
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -51,13 +50,13 @@ std::unique_ptr<Filter<CDCAxialSegmentPair> >
 AxialSegmentPairFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<NoneFilter<BaseAxialSegmentPairFilter> >();
+    return std::make_unique<NoneFilter<BaseAxialSegmentPairFilter> >();
   } else if (filterName == "all") {
-    return makeUnique<AllAxialSegmentPairFilter>();
+    return std::make_unique<AllAxialSegmentPairFilter>();
   } else if (filterName == "truth") {
-    return makeUnique<MCAxialSegmentPairFilter>();
+    return std::make_unique<MCAxialSegmentPairFilter>();
   } else if (filterName == "simple") {
-    return makeUnique<SimpleAxialSegmentPairFilter>();
+    return std::make_unique<SimpleAxialSegmentPairFilter>();
   } else {
     return Super::create(filterName);
   }

@@ -9,13 +9,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facet/MVAFacetFilter.h>
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 MVAFacetFilter::MVAFacetFilter()
-  : Super(makeUnique<MVAFacetVarSet>(), "tracking/data/trackfindingcdc_FacetFilter.xml", 2.805)
+  : Super(std::make_unique<MVAFacetVarSet>(), "tracking/data/trackfindingcdc_FacetFilter.xml", 2.805)
 {
 }
 

@@ -44,13 +44,15 @@ def main(argv):
     millepede = setups.setup_CDCLayers_GCR_Karim()
     millepede.path = reco_path
     calib_init = millepede.create('cdc_layers_init', inputFiles)
-    calib_init.max_iterations = 1
+    calib_init.max_iterations = 0
+    calib_init.max_files_per_collector_job = 1
 
     setups.dirty_data = False
     millepede = setups.setup_CDCLayers_GCR_Karim()
     millepede.path = reco_path
     millepede.set_param(1.e-3, 'minPValue')
     calib_std = millepede.create('cdc_layers_std', inputFiles)
+    calib_std.max_files_per_collector_job = 1
 
     calib_std.depends_on(calib_init)
 
@@ -63,7 +65,7 @@ def main(argv):
     caf.add_calibration(calib_init)
     caf.add_calibration(calib_std)
 
-    caf.backend = backends.Local(10)
+    caf.backend = backends.Local(2)
 
     caf.output_dir = 'caf_output'
     caf.run()

@@ -56,7 +56,7 @@ namespace Belle2 {
              "Input DecayDescriptor string (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).");
     addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
     addParam("maximumNumberOfCandidates", m_maximumNumberOfCandidates,
-             "Don't reconstruct channel if more candidates than given are produced.", 1000);
+             "Don't reconstruct channel if more candidates than given are produced.", 10000);
     addParam("decayMode", m_decayModeID, "User-specified decay mode identifier (saved in 'decayModeID' extra-info for each Particle)",
              0);
     addParam("writeOut", m_writeOut,
@@ -104,7 +104,8 @@ namespace Belle2 {
         m_decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList>::required(daughter->getFullName());
     }
-    m_generator = std::unique_ptr<ParticleGenerator>(new ParticleGenerator(m_decayString));
+
+    m_generator = std::unique_ptr<ParticleGenerator>(new ParticleGenerator(m_decayString, m_cutParameter));
 
     StoreObjPtr<ParticleList> particleList(m_listName);
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
@@ -113,8 +114,6 @@ namespace Belle2 {
       StoreObjPtr<ParticleList> antiParticleList(m_antiListName);
       antiParticleList.registerInDataStore(flags);
     }
-
-    m_cut = Variable::Cut::compile(m_cutParameter);
 
     if (m_recoilParticleType != 0 && m_recoilParticleType != 1 && m_recoilParticleType != 2)
       B2FATAL("Invalid recoil particle type = " << m_recoilParticleType <<
@@ -171,9 +170,6 @@ namespace Belle2 {
         TLorentzVector mom = daughters[0]->get4Vector() - pDaughters;
         particle.set4Vector(mom);
       }
-
-      if (!m_cut->check(&particle))
-        continue;
 
       numberOfCandidates++;
 

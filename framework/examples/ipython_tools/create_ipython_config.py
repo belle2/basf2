@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Skript to create or edit your ipython config to use a port and a password and not open a browser
+# Skript to create or edit your ipython config to use a port and not open a browser window
 # when starting.
 # Please ensure you have the newest jupyter notebook version installed (greater/equal than 4.0.0).
 #
 
 from jinja2 import Template
-from IPython.lib import passwd
 import os
 from subprocess import check_output
 from ROOT import Belle2
@@ -17,9 +16,6 @@ def main():
     Main function of the script.
     '''
     print("Please fill in the options you want to use for the notebook server.")
-
-    # Ask the user for a password
-    password = passwd()
 
     # Ask the user for a port
     while True:
@@ -54,7 +50,7 @@ def main():
                       "\t3) For every other errors not listed on https://confluence.desy.de/display/BI/Software+IPython,"
                       "please feel free to contact nils.braun@kit.edu.")
 
-        config_file = template.render(port=port, password=password)
+        config_file = template.render(port=port)
         jupyter_config_file = os.path.join(jupyter_folder, 'jupyter_notebook_config.py')
 
         # Ask the user whether to override his config
@@ -78,6 +74,7 @@ def main():
 
         # Set the correct read-write-user-only permissions
         os.chmod(jupyter_config_file, 0o600)
+
 
 if __name__ == '__main__':
     main()

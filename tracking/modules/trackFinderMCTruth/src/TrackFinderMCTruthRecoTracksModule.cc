@@ -93,7 +93,10 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            m_useReassignedHits,
            "Include hits reassigned from discarded seconardy daughters in the tracks.",
            false);
-
+  addParam("UseSecondCDCHits",
+           m_useSecondCDCHits,
+           "Also includes the CDC 2nd hit information in the MC tracks.",
+           false);
   addParam("MinPXDHits",
            m_minPXDHits,
            "Minimum number of PXD hits needed to allow the created of a track candidate",
@@ -643,6 +646,11 @@ void TrackFinderMCTruthRecoTracksModule::event()
           if (!m_useReassignedHits && isReassigned) continue;  // skip hits from secondary particles
 
           const CDCHit* cdcHit = relatedHits.object(i);
+
+          // continue if this is a 2nd CDC hit information and we do not want to use it
+          if (!m_useSecondCDCHits && cdcHit->is2ndHit()) {
+            continue;
+          }
 
           auto mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderPriorityHit;
 

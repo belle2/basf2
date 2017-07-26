@@ -11,29 +11,43 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdFSParticles import *
 from stdCharged import *
 from stdPi0s import *
+from stdPhotons import *
 
 set_log_level(LogLevel.INFO)
+import sys
+import os
+import glob
 
-filelist = \
-    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-07-00/DBxxxxxxxx/MC6/prod00000198/s00/e0000/4S/r00000/ccbar/sub00/' +
-     'mdst_0005*_prod00000198_task000005*.root'
-     ]
+if len(sys.argv) > 1:
+    bkgType = sys.argv[1]
+    f = open('inputFiles/' + bkgType + '.txt', 'r')
+    fileList = f.read()
+    f.close()
+    if not os.path.isfile(fileList[:-1]):
+        sys.exit('Could not find root file: ' + fileList[:-1])
+    print('Running over file ' + fileList[:-1])
+elif len(sys.argv) == 1:
+    fileList = \
+        ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-07-00/DBxxxxxxxx/MC6/prod00000198/s00/e0000/4S/r00000/ccbar/sub00/' +
+         'mdst_0005*_prod00000198_task000005*.root'
+         ]
+    bkgType = 'ccbarOld'
 
-inputMdstList('default', filelist)
+if len(sys.argv) > 1:
+    inputMdstList('default', fileList[:-1])
+elif len(sys.argv) == 1:
+    inputMdstList('default', fileList)
 
 
-stdFSParticles()
-# cutAndCopyList('pi0:loose', 'pi0:all', '-0.6 < extraInfo(BDT) < 1.0', True)
+loadStdSkimPi0()
+loadStdSkimPhoton()
 stdLooseMu()
 stdLooseE()
-loadStdPi0()
-
 from CharmRare_List import *
 CharmRareList = CharmRareList()
-skimOutputUdst('CharmRare_Standalone', CharmRareList)
+skimOutputUdst('outputFiles/CharmRare_' + bkgType, CharmRareList)
 summaryOfLists(CharmRareList)
 
 process(analysis_main)

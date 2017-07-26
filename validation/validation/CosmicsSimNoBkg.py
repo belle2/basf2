@@ -12,47 +12,35 @@
 
 from basf2 import *
 from simulation import add_simulation
-from beamparameters import add_beamparameters
-import glob
+from validation import statistics_plots, event_timing_plot
 
 set_random_seed(12345)
 
 main = create_path()
 
 # specify number of events to be generated
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [10000])
-eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [1])
-main.add_module(eventinfosetter)
-
-# beam parameters
-beamparameters = add_beamparameters(main, "Y4S")
-# beamparameters.param("smearVertex", False)
+main.add_module('EventInfoSetter', evtNumList=[10000], runList=[1], expList=[1])
 
 # generate BBbar events
-comsics = register_module('Cosmics')
-main.add_module(comsics)
+main.add_module('Cosmics')
 
 # detector simulation
 add_simulation(main)
 
 # memory profile
-main.add_module(register_module('Profile'))
+main.add_module('Profile')
 
 # output
-output = register_module('RootOutput')
-output.param('outputFileName', '../CosmicsSimNoBkg.root')
-main.add_module(output)
+main.add_module('RootOutput', outputFileName='../CosmicsSimNoBkg.root')
 
 process(main)
 
 # Print call statistics
 print(statistics)
 
-from validation import *
 statistics_plots('CosmicsSimNoBkg_statistics.root', contact='tkuhr',
-                 jobDesc='a standard simulation job with Cosmics events', prefix='CosmicsSimNoBkg')
-event_timing_plot('../CosmicsSimNoBkg.root', 'CosmicsSimNoBkg_statistics.root',
-                  contact='tkuhr',
-                  jobDesc='a standard simulation job with Cosmics events', prefix='CosmicsSimNoBkg')
+                 jobDesc='a standard simulation job with Cosmics events',
+                 prefix='CosmicsSimNoBkg')
+event_timing_plot('../CosmicsSimNoBkg.root', 'CosmicsSimNoBkg_statistics.root', contact='tkuhr',
+                  jobDesc='a standard simulation job with Cosmics events',
+                  prefix='CosmicsSimNoBkg')

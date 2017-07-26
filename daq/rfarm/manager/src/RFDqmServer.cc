@@ -68,8 +68,32 @@ int RFDqmServer::Configure(NSMmsg*, NSMcontext*)
 
 }
 
-int RFDqmServer::UnConfigure(NSMmsg*, NSMcontext*)
+int RFDqmServer::UnConfigure(NSMmsg* nsmm, NSMcontext* nsmc)
 {
+
+  // Wait 10 sec. for basf2 completion
+  printf("DqmServer : waiting 10 sec. for basf2 completion\n");
+  sleep(10);
+
+  // Store histograms in the file (make sure all event processes are stopped already)
+  char blank[] = "";
+  char* merger = m_conf->getconf("dqmserver", "merger");
+  char* topdir = m_conf->getconf("system", "execdir_base");
+  char* nodebase = m_conf->getconf("processor", "nodebase");
+  char* nnodes = m_conf->getconf("processor", "nnodes");
+  char* startnode = m_conf->getconf("processor", "idbase");
+  char* badlist = m_conf->getconf("processor", "badlist");
+  if (badlist == NULL)
+    badlist = blank;
+
+  char outfile[1024];
+  //  sprintf(outfile, "dqm_e%4.4dr%6.6d.root", msg->pars[0], msg->pars[1]);
+  sprintf(outfile, "dqm_e%4.4dr%6.6d.root", m_expno, m_runno);
+  int pid_dqmmerge = m_proc->Execute(merger, outfile, nodebase, topdir, nnodes, startnode, badlist);
+  int status;
+  pid_t done = waitpid(pid_dqmmerge, &status, 0);
+
+  // Kill DQM hrelay and hserver
   //  system("killall hrelay hserver");
   if (m_pid_dqm != 0) {
     int status;
@@ -81,26 +105,44 @@ int RFDqmServer::UnConfigure(NSMmsg*, NSMcontext*)
     kill(m_pid_relay, SIGINT);
     waitpid(m_pid_relay, &status, 0);
   }
-  printf("Unconfigure : done\n");
+
+  printf("DqmServer : Unconfigure done\n");
   return 0;
 }
 
-int RFDqmServer::Start(NSMmsg*, NSMcontext*)
+int RFDqmServer::Start(NSMmsg* msgm, NSMcontext* msgc)
 {
+  m_expno = msgm->pars[0];
+  m_runno = msgm->pars[1];
+  printf("DqmServer : Started. Exp = %d, Run = %d\n", m_expno, m_runno);
   return 0;
 }
 
 int RFDqmServer::Stop(NSMmsg* msg, NSMcontext*)
 {
-  char* merger = m_conf->getconf("dqmserver", "merge", "script");
-  char* topdir = m_conf->getconf("system", "exec_dir_base");
-  char* infile = m_conf->getconf("processor", "dqm", "file");
+  // Wait 10 sec. for basf2 completion
+  printf("DqmServer : waiting 10 sec. for basf2 completion\n");
+  sleep(10);
+
+  // Store histogram files
+  char blank[] = "";
+  char* merger = m_conf->getconf("dqmserver", "merger");
+  char* topdir = m_conf->getconf("system", "execdir_base");
+  char* nodebase = m_conf->getconf("processor", "nodebase");
   char* nnodes = m_conf->getconf("processor", "nnodes");
   char* startnode = m_conf->getconf("processor", "idbase");
-  char outfile[1024];
-  sprintf(outfile, "dqm_%e%4.4dr%6.6d.root", msg->pars[0], msg->pars[1]);
+  char* badlist = m_conf->getconf("processor", "badlist");
+  if (badlist == NULL)
+    badlist = blank;
 
-  int pid_dqmmerge = m_proc->Execute(merger, topdir, infile, nnodes, startnode, outfile);
+  char outfile[1024];
+  //  sprintf(outfile, "dqm_e%4.4dr%6.6d.root", msg->pars[0], msg->pars[1]);
+  sprintf(outfile, "dqm_e%4.4dr%6.6d.root", m_expno, m_runno);
+  int pid_dqmmerge = m_proc->Execute(merger, outfile, nodebase, topdir, nnodes, startnode, badlist);
+  int status;
+  pid_t done = waitpid(pid_dqmmerge, &status, 0);
+
+  printf("DqmServer : Stopped.\n");
 
   return 0;
 }

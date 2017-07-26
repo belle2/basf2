@@ -13,7 +13,7 @@ import pathlib
 
 import ROOT
 
-__all__ = ['Job', 'Local', 'LSF', 'PBS']
+__all__ = ['Job', 'Local', 'LSF', 'PBS', 'Batch', 'Backend']
 
 #: default configuration file location
 default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/backends.cfg')

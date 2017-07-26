@@ -11,7 +11,8 @@
 #include <framework/logging/LogSystem.h>
 #include <framework/logging/LogMessage.h>
 #include <framework/logging/LogConnectionBase.h>
-#include <framework/logging/LogConnectionIOStream.h>
+#include <framework/logging/LogConnectionFilter.h>
+#include <framework/logging/LogConnectionFileDescriptor.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 
@@ -151,10 +152,20 @@ LogSystem::LogSystem() :
   m_moduleLogConfig(0),
   m_printErrorSummary(false)
 {
-  unsigned int logInfo = LogConfig::c_Level + LogConfig::c_Message;
-  unsigned int warnLogInfo = LogConfig::c_Level + LogConfig::c_Message + LogConfig::c_Module;
-  unsigned int debugLogInfo = LogConfig::c_Level + LogConfig::c_Message + LogConfig::c_Module + LogConfig::c_File + LogConfig::c_Line;
-  unsigned int fatalLogInfo = LogConfig::c_Level + LogConfig::c_Message + LogConfig::c_Module + LogConfig::c_Function;
+  resetLogging();
+}
+
+void LogSystem::resetLogging()
+{
+  m_logConfig.setLogLevel(LogConfig::c_Info);
+  m_logConfig.setDebugLevel(100);
+  m_moduleLogConfig = nullptr;
+  m_packageLogConfigs.clear();
+  constexpr unsigned int logInfo = LogConfig::c_Level + LogConfig::c_Message;
+  constexpr unsigned int warnLogInfo = LogConfig::c_Level + LogConfig::c_Message + LogConfig::c_Module;
+  constexpr unsigned int debugLogInfo = LogConfig::c_Level + LogConfig::c_Message + LogConfig::c_Module + LogConfig::c_File +
+                                        LogConfig::c_Line;
+  constexpr unsigned int fatalLogInfo = LogConfig::c_Level + LogConfig::c_Message + LogConfig::c_Module + LogConfig::c_Function;
   m_logConfig.setLogInfo(LogConfig::c_Debug, debugLogInfo);
   m_logConfig.setLogInfo(LogConfig::c_Info, logInfo);
   m_logConfig.setLogInfo(LogConfig::c_Result, logInfo);
@@ -163,11 +174,12 @@ LogSystem::LogSystem() :
   m_logConfig.setLogInfo(LogConfig::c_Fatal, fatalLogInfo);
 
   resetMessageCounter();
+  resetLogConnections();
+  addLogConnection(new LogConnectionFilter(new LogConnectionFileDescriptor(STDOUT_FILENO)));
 
-  bool useColor = LogConnectionIOStream::terminalSupportsColors();
-  addLogConnection(new LogConnectionIOStream(std::cout, useColor));
-
+  m_errorLog.clear();
   m_errorLog.reserve(100);
+  m_printErrorSummary = false;
 }
 
 void LogSystem::printErrorSummary()
@@ -193,10 +205,12 @@ void LogSystem::printErrorSummary()
   m_logConfig.setAbortLevel(LogConfig::c_Default);
 
   // only show level & message
-  m_logConfig.setLogInfo(LogConfig::c_Info, LogConfig::c_Level | LogConfig::c_Message);
-  m_logConfig.setLogInfo(LogConfig::c_Warning, LogConfig::c_Level | LogConfig::c_Message);
-  m_logConfig.setLogInfo(LogConfig::c_Error, LogConfig::c_Level | LogConfig::c_Message);
-  m_logConfig.setLogInfo(LogConfig::c_Fatal, LogConfig::c_Level | LogConfig::c_Message);
+  int logInfo = LogConfig::c_Level | LogConfig::c_Message;
+  m_logConfig.setLogInfo(LogConfig::c_Info, logInfo);
+  logInfo |= LogConfig::c_Module;
+  m_logConfig.setLogInfo(LogConfig::c_Warning, logInfo);
+  m_logConfig.setLogInfo(LogConfig::c_Error, logInfo);
+  m_logConfig.setLogInfo(LogConfig::c_Fatal, logInfo);
   m_logConfig.setLogLevel(LogConfig::c_Info);
 
   B2INFO("================================================================================");

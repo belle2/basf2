@@ -28,7 +28,7 @@ namespace Belle2 {
   class DecayNode {
 
   public:
-    /*
+    /**
      * Create new Decay node
      * @param _pdg code of the particle
      * @param _daughters of the particle

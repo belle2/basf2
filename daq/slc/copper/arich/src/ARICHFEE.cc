@@ -18,7 +18,7 @@
 
 using namespace Belle2;
 
-ARICHFEE::ARICHFEE()
+ARICHFEE::ARICHFEE() : FEE("arich")
 {
 }
 

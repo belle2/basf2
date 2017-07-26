@@ -25,13 +25,11 @@ eventinfo.initialize()
 # download data if it is not available locally
 # make sure you change paths
 # os.path.isfile('BKLMElectronicsMapping_test.xml'):
-#    subprocess.call(['svn', 'co', 'https://belle2.cc.kek.jp/svn/groups/arich/database/data/...'])
 
 # create a gearbox module to read the data so it can be used
 paramloader = register_module('Gearbox')
 # pathname = 'file://%s/AllData/' % (os.getcwd())
 # paramloader.param('backends', [pathname])
-# paramloader.param('fileName', 'ArichData.xml')
 # paramloader.initialize()
 
 main = create_path()
@@ -47,9 +45,11 @@ dbImporter = BKLMDatabaseImporter()
 # dbImporter.importBklmBadChannels()
 # dbImporter.importBklmAlignment()
 # dbImporter.importBklmMisAlignment()
+# dbImporter.importBklmDisplacement()
 # dbImporter.exportBklmElectronicMapping()
 # dbImporter.exportBklmGeometryPar()
 # dbImporter.exportBklmSimulationPar()
 # dbImporter.exportBklmBadChannels()
 # dbImporter.exportBklmAlignment()
 # dbImporter.exportBklmMisAlignment()
+# dbImporter.exportBklmDisplacement()

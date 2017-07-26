@@ -39,7 +39,7 @@ elif len(sys.argv) == 1:
     inputMdstList('default', fileList)
 
 loadStdCharged()
-loadStdPi0()
+loadStdAllPi0()  # for stdCharm.py
 loadStdKS()
 
 loadStdD0()
@@ -48,7 +48,7 @@ loadStdDstar0()
 loadStdDstarPlus()
 
 # SL Skim
-from Semileptonic_List import *
+from SLUntagged_List import *
 SLList = SemileptonicList()
 skimOutputUdst('outputFiles/SLUntagged_' + bkgType, SLList)
 summaryOfLists(SLList)

@@ -129,6 +129,8 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
       B2WARNING("SPTC2RTConverter::event: SpacePointTrackCandidate containing SpacePoint of unrecognised detector ID: " << detID <<
                 ". Created RecoTrack doesn't contain these SpacePoints!");
     }
+
+    spacePoint->setAssignmentState(true);
   }
 
   // Add relation to SpacePointTrackCandidate

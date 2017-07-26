@@ -37,6 +37,26 @@ nsmget_file(const std::string& struct_name)
 int
 nsmget_path(const std::string& variable_path,
             std::string& data_name,
+            std::string& variable_name)
+{
+  variable_name = variable_path;
+
+  std::size_t found1st = variable_name.find(":");
+  if (found1st == std::string::npos) {
+    std::cerr << "Error: malformed variable name" << std::endl;
+    return 1;
+  }
+
+  data_name = variable_name.substr(0, found1st);
+
+  variable_name.erase(0, found1st + 1);
+
+  return 0;
+}
+
+int
+nsmget_path(const std::string& variable_path,
+            std::string& data_name,
             std::string& struct_name,
             std::string& variable_name)
 {

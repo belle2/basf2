@@ -32,7 +32,7 @@ void HVControlCallback::turnoff() throw(HVHandlerException)
 
 void HVControlCallback::configure(const HVConfig& config) throw(HVHandlerException)
 {
-  load(config, false, true);
+  //load(config, false, true);
 }
 
 void HVControlCallback::standby() throw(HVHandlerException)
@@ -122,14 +122,14 @@ throw(HVHandlerException)
 
 void HVControlCallback::init(NSMCommunicator&) throw()
 {
-  getNode().setState(HVState::OFF_S);
+  getNode().setState(HVState::UNKNOWN);
   dbload(m_config_standby, m_configname_standby);
   dbload(m_config_shoulder, m_configname_shoulder);
   dbload(m_config_peak, m_configname_peak);
   m_config = FLAG_STANDBY;
   addAll(getConfig());
-  configure(getConfig());
   initialize(getConfig());
+  configure(getConfig());
   PThread(new HVNodeMonitor(this));
 }
 
@@ -153,6 +153,7 @@ void HVControlCallback::monitor() throw()
       const HVCrate& crate(crate_v[i]);
       const HVChannelList& channel_v(crate.getChannels());
       int crateid = crate.getId();
+      int ich = 0;
       for (HVChannelList::const_iterator ichannel = channel_v.begin();
            ichannel != channel_v.end(); ichannel++) {
         const HVChannel& channel(*ichannel);
@@ -173,19 +174,19 @@ void HVControlCallback::monitor() throw()
                     (channel.isTurnOn() && state != HVMessage::ON)) {
           isstable = false;
         }
-        if (m_mon_tmp[crateid][i].state != state) {
+        if (m_mon_tmp[crateid][ich].state != state) {
           set(vname + "state", state_s);
-          m_mon_tmp[crateid][i].state = state;
+          m_mon_tmp[crateid][ich].state = state;
         }
-        if (m_mon_tmp[crateid][i].vmon != vmon) {
+        if (m_mon_tmp[crateid][ich].vmon != vmon) {
           set(vname + "vmon", vmon);
-          m_mon_tmp[crateid][i].vmon = vmon;
+          m_mon_tmp[crateid][ich].vmon = vmon;
         }
-        if (m_mon_tmp[crateid][i].cmon != cmon) {
+        if (m_mon_tmp[crateid][ich].cmon != cmon) {
           set(vname + "cmon", cmon);
-          m_mon_tmp[crateid][i].cmon = cmon;
+          m_mon_tmp[crateid][ich].cmon = cmon;
         }
-        i++;
+        ich++;
       }
     }
     if (isstable && m_state_demand != getNode().getState()) {

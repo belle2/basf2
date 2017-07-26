@@ -47,6 +47,9 @@ namespace Belle2 {
     int m_pid_dqm;
     int m_pid_relay;
 
+    int m_expno;
+    int m_runno;
+
   };
 }
 #endif

@@ -486,8 +486,6 @@ double BKLMTrackFitter::fit1dTrack(std::list< BKLMHit2d* > hitList,
 // Fit d = a + bi, where d is dependent direction and i is independent
 // in global system we assume y = a + b*x and y = c + d*z  different from local fit
 
-  std::list< BKLMHit2d* >::iterator s;
-
   HepMatrix globalHitErr(3, 3, 0);
 
   double     indPos = 0;
@@ -509,16 +507,13 @@ double BKLMTrackFitter::fit1dTrack(std::list< BKLMHit2d* > hitList,
   // Error or correlation matrix for coefficients (2x2 matrices)
   HepSymMatrix  V_A, V_A_inverse;
 
-  s = hitList.begin();
-  BKLMHit2d* hit = *s;
-
   m_GeoPar = GeometryPar::instance();
   const Belle2::bklm::Module* corMod;
 
   int n = 0;
-  for (s = hitList.begin(); s != hitList.end(); ++s) {
+  for (std::list< BKLMHit2d* >::iterator s = hitList.begin(); s != hitList.end(); ++s) {
 
-    hit = *s;
+    BKLMHit2d* hit = *s;
 
     // m_GeoPar = GeometryPar::instance();
     //const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->isForward(), hit->getSector(), 1);

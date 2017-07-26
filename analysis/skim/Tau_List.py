@@ -16,8 +16,8 @@ from stdV0s import stdKshorts
 def TauLFVList():
     tauLFVCuts = '1.58 < Mbc < 1.98 and abs(deltaE) < 1.0'
 
-    tau_lgamma_Channels = ['e+:loose gamma:all',
-                           'mu+:loose gamma:all'
+    tau_lgamma_Channels = ['e+:loose gamma:skim',
+                           'mu+:loose gamma:skim'
                            ]
 
     tau_lll_Channels = ['e-:loose e-:loose e+:loose',
@@ -28,8 +28,8 @@ def TauLFVList():
                         'mu-:loose mu-:loose e+:loose'
                         ]
 
-    tau_lP0_Channels = ['e+:loose pi0:all',
-                        'mu+:loose pi0:all',
+    tau_lP0_Channels = ['e+:loose pi0:skim',
+                        'mu+:loose pi0:skim',
                         'e+:loose eta:loose',
                         'mu+:loose eta:loose',
                         'e+:loose eta\':loose',

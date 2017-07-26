@@ -14,7 +14,8 @@ using namespace Belle2;
 
 int EclPainter::m_obj_counter = 0;
 
-EclPainter::EclPainter(EclData* data)
+EclPainter::EclPainter(EclData* data) :
+  m_mapper(0)
 {
   setData(data);
   displayed_subsys = EclData::ALL;

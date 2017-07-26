@@ -55,18 +55,10 @@ void DQMHistAnalysisExampleModule::event()
     m_c->Clear();
     m_c->cd();
     h->Draw();
-
-    TString a = m_histoname;
-    std::string vname = a.Data();
-    a.ReplaceAll("/", "_");
-    //h->Fit(Form("f_"+a), "");
-    h->Fit(m_f);
-    //h->Draw();
-    //m_f->Draw("same");
     m_c->Modified();
-    //m_c->Update();
-    a = m_histoname;
+    TString a = m_histoname;
     a.ReplaceAll("/", ".");
+    std::string vname = a.Data();
     setFloatValue(vname + ".mean", m_f->GetParameter(1));
     setFloatValue(vname + ".sigma", m_f->GetParameter(2));
   } else {

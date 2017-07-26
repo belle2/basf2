@@ -142,11 +142,11 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::getData(const EventMetaData& e
   result.first = 0;
 
   // find the entry for package and module in the maps
-  const auto& entry = m_database.find(name);
-  if (entry == m_database.end()) return tryDefault(name);
+  const auto& databaseEntry = m_database.find(name);
+  if (databaseEntry == m_database.end()) return tryDefault(name);
 
   // find the payload whose IoV contains the current event and load it
-  for (auto& entry : boost::adaptors::reverse(entry->second)) {
+  for (auto& entry : boost::adaptors::reverse(databaseEntry->second)) {
     if (entry.second.contains(event)) {
       int revision = entry.first;
       result.first = readPayload(payloadFileName(m_payloadDir, name, revision), name);

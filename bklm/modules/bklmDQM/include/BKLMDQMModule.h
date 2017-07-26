@@ -8,7 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#pragma once
+#ifndef BKLMDQMMODULE_H
+#define BKLMDQMMODULE_H
 
 // Copied 6 lines below from PXDDQMModule.h
 #undef DQM
@@ -115,3 +116,5 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
+
+#endif

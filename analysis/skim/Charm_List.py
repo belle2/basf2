@@ -20,7 +20,7 @@ def CharmRareList():
     charmcuts = '1.78 < M < 1.94'
     D0_Channels = ['gamma:all gamma:all',
                    'e+:loose e-:loose',
-                   'mu+:loose mu-:loose pi0:all'
+                   'mu+:loose mu-:loose '
                    ]
 
     D0List = []
@@ -37,7 +37,7 @@ def CharmHadronicList():
     D0_Channels = ['K-:loose pi+:loose',
                    'pi+:loose pi-:loose',
                    'K+:loose K-:loose',
-                   'K-:loose pi+:loose pi0:all'
+                   'K-:loose pi+:loose '
                    ]
 
     D0List = []

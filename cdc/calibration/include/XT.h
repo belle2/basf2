@@ -87,6 +87,12 @@ public:
   {
     m_XTParam[6] = p6;
   }
+
+  /**
+   * Set XT mode.
+   * 1 is 5th order Chebshev polynomial.
+   * 0 is 5th order polynomial.
+   */
   void setMode(int mode)
   {
     m_mode = mode;
@@ -210,7 +216,7 @@ private:
   int m_mode = 1; /**< XT mode,  0 is for 5th order polynomial, 1 is Chebshev polynomial.*/
   bool m_debug = true;  /**< Print debug durring fitting or not*/
   bool m_draw = false;  /**< Draw and store png plot of each histo or not*/
-  int m_minRequiredEntry = 800; /** Minimum entry required for each histo. */
+  int m_minRequiredEntry = 800; /**< Minimum entry required for each histo. */
   double m_XTParam[8] = {};     /**< Parameter fo xt*/
   double m_FittedXTParams[8] = {}; /**< Fitted parameters */
 

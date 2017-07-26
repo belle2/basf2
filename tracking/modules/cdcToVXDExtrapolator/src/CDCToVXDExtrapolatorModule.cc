@@ -495,17 +495,17 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
       if (!(cluster->getSensorID() == vCluster->getSensorID())) continue;
       if (!cluster->isUCluster()) continue;
       // only hits on the same sensor
-      TVector3 svdPos = getGlobalPosition(cluster->getPosition(), vCluster->getPosition(), vSensorInfo);
+      TVector3 svdPosU = getGlobalPosition(cluster->getPosition(), vCluster->getPosition(), vSensorInfo);
       TVector3 svdPos1Sig = getGlobalPosition(cluster->getPosition() + cluster->getPositionSigma(), vCluster->getPosition(), vSensorInfo);
-      TVector3 svdErr = svdPos1Sig - svdPos;
-      double dxy = deltaXYDist(posAtLayer, svdPos);
+      TVector3 svdErr = svdPos1Sig - svdPosU;
+      double dxy = deltaXYDist(posAtLayer, svdPosU);
       if ((bestu < 0) || (dxy < bestDist)) {
         B2DEBUG(201, "Sensor Dphi " << sensorWidth << " midposphi: " << midpos.Phi() << " wposphi: " << wpos.Phi());
 
         if (m_searchSensorDimensions) {
-          B2DEBUG(220, "Looking for U cluster dphi: " << deltaXYDist(posAtLayer, svdPos));
+          B2DEBUG(220, "Looking for U cluster dphi: " << deltaXYDist(posAtLayer, svdPosU));
           if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 220, PACKAGENAME()) == true) {
-            svdPos.Print();
+            svdPosU.Print();
           }
           if (dxy < sensorWidth) {
             bestu = i;
@@ -518,21 +518,21 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
           }
         }
         // bestu = i;
-        // bestDist = deltaXYDist2(svdPos);
+        // bestDist = deltaXYDist2(svdPosU);
       }
     }
     if (bestu >= 0) {
       B2DEBUG(190, "FOUND A U CLUSTER");
       const auto uCluster = clusters[bestu];
       auto aSensorInfo = VXD::GeoCache::getInstance().getSensorInfo(uCluster->getSensorID());
-      TVector3 svdPos = getGlobalPosition(uCluster->getPosition(), vCluster->getPosition(), aSensorInfo);
+      TVector3 svdPosBestU = getGlobalPosition(uCluster->getPosition(), vCluster->getPosition(), aSensorInfo);
       TVector3 svdPos1Sig = getGlobalPosition(uCluster->getPosition() + uCluster->getPositionSigma(), vCluster->getPosition(),
                                               aSensorInfo);
-      TVector3 svdErr = svdPos1Sig - svdPos;
+      TVector3 svdErr = svdPos1Sig - svdPosBestU;
       TVector3 trkInlocal = aSensorInfo.pointToLocal(posAtLayer);
       B2DEBUG(190, "Sensor Id: " << uCluster->getSensorID() << " PosOnSensor: " << uCluster->getPosition() <<
               " PosSigma: " << uCluster->getPositionSigma() <<
-              " GloablPos: " << svdPos.X() << " " << svdPos.Y() << " " << svdPos.Z() <<
+              " GloablPos: " << svdPosBestU.X() << " " << svdPosBestU.Y() << " " << svdPosBestU.Z() <<
               " GloablPos1Sig: " << svdPos1Sig.X() << " " << svdPos1Sig.Y() << " " << svdPos1Sig.Z() <<
               " isU: " << uCluster->isUCluster() << " PosAtLayerLocal:" << trkInlocal.X() << "," << trkInlocal.Y() << "," << trkInlocal.Z());
       // this is how the error is found in the SpacePointCreator
@@ -543,7 +543,7 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
       TVector3 spErr = spPositionError.GetTVector3();
 
       TVector3 orr = TVector3(0, 0, 0);
-      B2DEBUG(190, "Errors: r:" << r << " dr:" << deltaXYDist(posAtLayer, svdPos) << " d(dr):" <<
+      B2DEBUG(190, "Errors: r:" << r << " dr:" << deltaXYDist(posAtLayer, svdPosBestU) << " d(dr):" <<
               errDeltaXYDist(posAtLayer, covAtLayer) << " d(dr)svd:" << errDeltaXYDistSVD(posAtLayer, covAtLayer, svdErr) <<
               " ddrsvdsp:" << errDeltaXYDistSVD(posAtLayer, covAtLayer, spErr) << " d(dr) from 0:" <<
               errDeltaXYDist(posAtLayer, covAtLayer) << " d(dr) from 0[corr]:" << errDeltaXYDistSVD(posAtLayer, covAtLayer, spErr));

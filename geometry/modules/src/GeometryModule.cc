@@ -55,7 +55,7 @@ void GeometryModule::initialize()
   geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
   if (geoManager.getTopVolume()) {
     if (m_ignoreIfPresent) {
-      B2INFO("Geometry already created, skipping");
+      B2DEBUG(10, "Geometry already created, skipping");
       return;
     } else {
       B2FATAL("Geometry already created, more than one Geometry module present?");

@@ -83,13 +83,13 @@ void ViewAlignment(const char *fname)
   }
   for (i = 0; i < nEndcaps; i++) {
     for (j = 0; j < nSectors; j++) {
-      hDx[i][j]->SetMinimum(-2.5);
+      hDx[i][j]->SetMinimum(-4.5);
       hDx[i][j]->SetMaximum(4.5);
       hDx[i][j]->Draw("e");
       hDx0[i][j]->Draw("same p");
       snprintf(str, 128, "alignment_dx_%d_%d.eps", i + 1, j + 1);
       c->Print(str);
-      hDy[i][j]->SetMinimum(-2.5);
+      hDy[i][j]->SetMinimum(-4.5);
       hDy[i][j]->SetMaximum(4.5);
       hDy[i][j]->Draw("e");
       hDy0[i][j]->Draw("same p");

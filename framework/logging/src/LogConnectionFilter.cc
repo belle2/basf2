@@ -41,7 +41,9 @@ bool LogConnectionFilter::sendMessage(const LogMessage& message)
 
   if (message == m_previousMessage) {
     m_repeatCounter++;
-    return false;
+    // return true anyway since we will print the repeat message later so we
+    // consider this successful
+    return true;
   }
 
   printRepetitions();
@@ -54,9 +56,8 @@ bool LogConnectionFilter::sendMessage(const LogMessage& message)
 void LogConnectionFilter::printRepetitions()
 {
   if (m_repeatCounter > 0) {
-    ostringstream message;
-    message << " ... message repeated " << m_repeatCounter << " times";
-    LogMessage repeatMessage(m_previousMessage.getLogLevel(), message.rdbuf()->str(), "", "", "", 0);
+    const std::string message{" ... message repeated " + std::to_string(m_repeatCounter) + " times"};
+    LogMessage repeatMessage(m_previousMessage.getLogLevel(), message, "", "", "", 0);
     repeatMessage.setLogInfo(LogConfig::c_Message);
     m_logConnection->sendMessage(repeatMessage);
   }

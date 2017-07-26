@@ -23,6 +23,8 @@ namespace Belle2 {
 
   /** Module to calculate variables specified by the user for a given ParticleList
    *  and save them into an Ntuple.
+   *  The Ntuple is candidate-based, meaning the variables of each candidate are saved in a separate
+   *  row of the Ntuple
    */
   class VariablesToNtupleModule : public Module {
   public:

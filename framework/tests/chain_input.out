@@ -1,6 +1,6 @@
 [INFO] Steering file: framework/tests/chain_input.py
 [INFO] The random number seed is set to "something important"
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------

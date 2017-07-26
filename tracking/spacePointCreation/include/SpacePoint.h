@@ -9,14 +9,10 @@
  **************************************************************************/
 #pragma once
 
-// tracking
-#include <framework/geometry/B2Vector3.h>
-// #include <TVector3.h>
-
 // framework
+#include <framework/geometry/B2Vector3.h>
 #include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/core/FrameworkExceptions.h>
 #include <framework/logging/Logger.h>
 // vxd
 #include <vxd/geometry/GeoCache.h>
@@ -37,77 +33,27 @@
 #include <iostream>
 
 namespace Belle2 {
-  /** The SpacePoint class.
+  /** SpacePoint typically is build from 1 PXDCluster or 1-2 SVDClusters.
    *
-   *  This class stores a global space point with its position error and some extra infos
+   *  It stores a global space point with its position error and some extra infos.
    *
-   * For SVD only:
-   *  if relations to its attached Clusters are set, these have got the following meaning:
-   *  relationweights code the type of the cluster. +1 for u and -1 for v clusters.
-   * For other detector types the default value is used
+   *  For SVD only: <br>
+   *  If relations to its attached Clusters are set, these have got the following meaning:
+   *
+   *  - relationweights code the type of the cluster. +1 for u and -1 for v clusters.
    */
   class SpacePoint: public RelationsObject {
   public:
-
-    /** setting the baseType for storing coordinate-related infos */
-    typedef double SpBaseType;
-
-    /** exception for the case that the user filled an invalid number of Clusters into the Constructor */
-    BELLE2_DEFINE_EXCEPTION(InvalidNumberOfClusters, "SpacePoint::Constructor: invalid numbers of Clusters given!");
-
-    /** exception for the case that the user filled an invalid combination of clusters into the constructor (e.g. they are not from the same sensor or both are u clusters) */
-    BELLE2_DEFINE_EXCEPTION(IncompatibleClusters, "SpacePoint::Constructor: given combination of SVDCluster is not allowed!");
-
-    /** exception for the case that the detectorType is not supported by the SpacePoint */
-    BELLE2_DEFINE_EXCEPTION(InvalidDetectorType, ("SpacePoint: the detector type given is not supported!"));
-
-
-
-    /** Default constructor for the ROOT IO. */
-    SpacePoint() :
-      m_positionError(1., 1., 1.),
-      m_clustersAssigned( {false, false}),
-                        m_vxdID(0),
-                        m_sensorType(VXD::SensorInfoBase::SensorType::VXD), // type is set to generic VXD
-                        m_qualityIndicator(0.5),
-    m_isAssigned(false) {}
-
-
-    /** Constructor for debugging or other special purposes.
+    /** Constructor SpacePoint from one PXD Hit.
      *
-     * @param pos global SP-position.
-     * @param posError error of position.
-     * @param normalizedLocal normalized (element: [0;1]) coordinates of SP on given sensorID (.first is for u, .second is for v).
-     * @param clustersAssigned sets if u (.first) or v (.second) is assigned.
-     * @param sensorID the VxdID of the sensor it shall be on.
-     * @param detID the ID of the detector-type to be used.
+     *  @param pxdCluster   Pointer to PXDCluster (typically owned by the DataStore).
+     *  @param aSensorInfo  Only for testing purposes.
      */
-    SpacePoint(B2Vector3<SpBaseType> pos, B2Vector3<SpBaseType> posError, std::pair<SpBaseType, SpBaseType> normalizedLocal,
-               std::pair<bool, bool> clustersAssigned, VxdID sensorID, Belle2::VXD::SensorInfoBase::SensorType detID) :
-      m_position(pos),
-      m_positionError(posError),
-      m_normalizedLocal(normalizedLocal),
-      m_clustersAssigned(clustersAssigned),
-      m_vxdID(sensorID),
-      m_sensorType(detID),
-      m_qualityIndicator(0.5),
-      m_isAssigned(false) {}
+    SpacePoint(const PXDCluster* pxdCluster,
+               const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
-    /** Constructor for the case of PXD Hits.
-    *
-    * For the case of TelHits, there will be a SpacePoint-Inheriting Class adding a TelCluster-feature
-     *
-     * first parameter is pointer to cluster (passing a null-pointer will throw an exception)
-     * second, a sensorInfo can be passed for testing purposes.
-     *  If no sensorInfo is passed, the constructor gets its own pointer to it.
-     */
-    SpacePoint(const Belle2::PXDCluster* pxdCluster,
-               const Belle2::VXD::SensorInfoBase* aSensorInfo = NULL);
-
-
-
-    /** Constructor for the case of SVD Hits.
+    /** Constructor SpacePoint from two SVD Hits.
     *
     * 1-2 clusters can be added this way
      *
@@ -119,8 +65,39 @@ namespace Belle2 {
      * If no sensorInfo is passed, the constructor gets its own pointer to it.
      *
      */
-    SpacePoint(std::vector<const Belle2::SVDCluster*>& clusters,
-               const Belle2::VXD::SensorInfoBase* aSensorInfo = NULL);
+    SpacePoint(std::vector<SVDCluster const*>& clusters,
+               VXD::SensorInfoBase const* aSensorInfo = NULL);
+
+
+    /** Default constructor for the ROOT IO. */
+    SpacePoint() :
+      m_positionError(1., 1., 1.),
+      m_clustersAssigned( {false, false}),
+                        m_vxdID(0),
+                        m_sensorType(VXD::SensorInfoBase::SensorType::VXD), // type is set to generic VXD
+                        m_qualityIndicator(0.5), m_isAssigned(false)
+    {}
+
+
+    /** Constructor for debugging or other special purposes.
+     *
+     * @param pos global SP-position.
+     * @param posError error of position.
+     * @param normalizedLocal normalized (element: [0;1]) coordinates of SP on given sensorID (.first is for u, .second is for v).
+     * @param clustersAssigned sets if u (.first) or v (.second) is assigned.
+     * @param sensorID the VxdID of the sensor it shall be on.
+     * @param detID the ID of the detector-type to be used.
+     */
+    SpacePoint(B2Vector3<double> pos, B2Vector3<double> posError, std::pair<double, double> normalizedLocal,
+               std::pair<bool, bool> clustersAssigned, VxdID sensorID, Belle2::VXD::SensorInfoBase::SensorType detID) :
+      m_position(pos),
+      m_positionError(posError),
+      m_normalizedLocal(normalizedLocal),
+      m_clustersAssigned(clustersAssigned),
+      m_vxdID(sensorID),
+      m_sensorType(detID),
+      m_qualityIndicator(0.5),
+      m_isAssigned(false) {}
 
 
 
@@ -199,42 +176,42 @@ namespace Belle2 {
     }
 
     /** return the x-value of the global position of the SpacePoint */
-    SpBaseType X() const { return m_position.X(); }
+    double X() const { return m_position.X(); }
 
 
 
     /** return the x-value of the global position of the SpacePoint */
-    SpBaseType x() const { return m_position.X(); }
+    double x() const { return m_position.X(); }
 
 
 
     /** return the y-value of the global position of the SpacePoint */
-    SpBaseType Y() const { return m_position.Y(); }
+    double Y() const { return m_position.Y(); }
 
 
 
     /** return the y-value of the global position of the SpacePoint */
-    SpBaseType y() const { return m_position.Y(); }
+    double y() const { return m_position.Y(); }
 
 
 
     /** return the z-value of the global position of the SpacePoint */
-    SpBaseType Z() const { return m_position.Z(); }
+    double Z() const { return m_position.Z(); }
 
 
 
     /** return the z-value of the global position of the SpacePoint */
-    SpBaseType z() const { return m_position.Z(); }
+    double z() const { return m_position.Z(); }
 
 
 
     /** return the position vector in global coordinates */
-    const B2Vector3<SpBaseType>& getPosition() const { return m_position; }
+    const B2Vector3<double>& getPosition() const { return m_position; }
 
 
 
     /** return the hitErrors in sigma of the global position */
-    const B2Vector3<SpBaseType>& getPositionError() const { return m_positionError; }
+    const B2Vector3<double>& getPositionError() const { return m_positionError; }
 
 
 
@@ -244,12 +221,12 @@ namespace Belle2 {
 
 
     /** return the normalized local coordinates of the cluster in u (0 <= posU <= 1) */
-    SpBaseType getNormalizedLocalU() const { return m_normalizedLocal.first/*m_normalizedLocal[0]*/; }
+    double getNormalizedLocalU() const { return m_normalizedLocal.first/*m_normalizedLocal[0]*/; }
 
 
 
     /** return the normalized local coordinates of the cluster in v (0 <= posV <= 1) */
-    SpBaseType getNormalizedLocalV() const { return m_normalizedLocal.second/*m_normalizedLocal[1]*/; }
+    double getNormalizedLocalV() const { return m_normalizedLocal.second/*m_normalizedLocal[1]*/; }
 
 
 
@@ -313,21 +290,21 @@ namespace Belle2 {
     /** converts a local hit on a given sensor into global coordinates.
      *
      * so this practically does what sensorInfo::pointToGlobal is doing, the difference is, that you do not need to have the sensorInfo beforehand (it will be retrieved using the VxdID)
-     * first parameter is the local hit (as provided by getU and getV!) stored as a pair of SpBaseTypes.
+     * first parameter is the local hit (as provided by getU and getV!) stored as a pair of doubles.
      * second parameter is the coded vxdID, which carries the sensorID.
      * third parameter, a sensorInfo can be passed for testing purposes.
      *  If no sensorInfo is passed, the member gets its own pointer to it.
     *
     * ATTENTION: this function assumes, that for wedged sensors, the uCoordinate is already adapted to the vCoordinate!
      */
-    static B2Vector3<SpBaseType> getGlobalCoordinates(const std::pair<SpBaseType, SpBaseType>& hitLocal, VxdID vxdID,
-                                                      const VXD::SensorInfoBase* aSensorInfo = NULL);
+    static B2Vector3<double> getGlobalCoordinates(const std::pair<double, double>& hitLocal, VxdID vxdID,
+                                                  const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
 
     /** converts a local hit into sensor-independent relative coordinates.
        *
-       * first parameter is the local hit (as provided by SpacePoint::getUWedged(...) and Cluster::getV!) stored as a pair of SpBaseTypes.
+       * first parameter is the local hit (as provided by SpacePoint::getUWedged(...) and Cluster::getV!) stored as a pair of doubles.
        * second parameter is the coded vxdID, which carries the sensorID.
        * third parameter, a sensorInfo can be passed for testing purposes.
        *  If no sensorInfo is passed, the member gets its own pointer to it.
@@ -335,7 +312,7 @@ namespace Belle2 {
      * ATTENTION: this function assumes, that for wedged sensors, the uCoordinate is already adapted to the vCoordinate!
      * The normalized coordinates are independent of wedged-sensor-issues
        */
-    static std::pair<SpBaseType, SpBaseType> convertLocalToNormalizedCoordinates(const std::pair<SpBaseType, SpBaseType>& hitLocal,
+    static std::pair<double, double> convertLocalToNormalizedCoordinates(const std::pair<double, double>& hitLocal,
         VxdID vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
@@ -350,7 +327,7 @@ namespace Belle2 {
     * third parameter, a sensorInfo can be passed for testing purposes.
     *  If no sensorInfo is passed, the member gets its own pointer to it.
     */
-    static std::pair<SpBaseType, SpBaseType> convertNormalizedToLocalCoordinates(const std::pair<SpBaseType, SpBaseType>& hitNormalized,
+    static std::pair<double, double> convertNormalizedToLocalCoordinates(const std::pair<double, double>& hitNormalized,
         Belle2::VxdID vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo = NULL);
 
 
@@ -362,8 +339,8 @@ namespace Belle2 {
      * This is only relevant for wedged/slanted sensors because of their trapezoidal shape, for rectangular shapes, the value does not change
      *
      */
-    static SpBaseType getUWedged(const std::pair<SpBaseType, SpBaseType>& hitLocalUnwedged, VxdID vxdID,
-                                 const VXD::SensorInfoBase* aSensorInfo = NULL)
+    static double getUWedged(const std::pair<double, double>& hitLocalUnwedged, VxdID vxdID,
+                             const VXD::SensorInfoBase* aSensorInfo = NULL)
     {
       if (aSensorInfo == NULL) { aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID); }
       return (aSensorInfo->getWidth(hitLocalUnwedged.second) / aSensorInfo->getWidth()) * hitLocalUnwedged.first;
@@ -377,8 +354,8 @@ namespace Belle2 {
      * The returned value shall be like the value delivered by a uCluster without information of v (== aCluster.getPosition() ).
      * This is only relevant for wedged/slanted sensors because of their trapezoidal shape, for rectangular shapes, the value does not change
      */
-    static SpBaseType getUUnwedged(const std::pair<SpBaseType, SpBaseType>& hitLocalWedged, VxdID::baseType vxdID,
-                                   const VXD::SensorInfoBase* aSensorInfo = NULL)
+    static double getUUnwedged(const std::pair<double, double>& hitLocalWedged, VxdID::baseType vxdID,
+                               const VXD::SensorInfoBase* aSensorInfo = NULL)
     {
       if (aSensorInfo == NULL) { aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID); }
       return (aSensorInfo->getWidth() / aSensorInfo->getWidth(hitLocalWedged.second)) * hitLocalWedged.first;
@@ -391,7 +368,7 @@ namespace Belle2 {
      * does take second/third argument for checking for lower/upper boundary.
      * if boundary is crossed, value gets reset to boundary value
      * */
-    static void boundaryCheck(SpBaseType& value, SpBaseType lower = 0, SpBaseType higher = 1)
+    static void boundaryCheck(double& value, double lower = 0, double higher = 1)
     {
       if (value < lower) {
         B2WARNING("SpacePoint::boundaryCheck: value had to be moved (lowerCheck)! old: " << value << ", new: " << lower);
@@ -427,7 +404,7 @@ namespace Belle2 {
      *
      * It takes care for the transformation of the local sigmas to global error values.
      */
-    void setPositionError(SpBaseType uSigma, SpBaseType vSigma, const VXD::SensorInfoBase* aSensorInfo)
+    void setPositionError(double uSigma, double vSigma, const VXD::SensorInfoBase* aSensorInfo)
     {
       //As only variances, but not the sigmas transform linearly,
       // we need to use some acrobatics
@@ -448,7 +425,7 @@ namespace Belle2 {
      *
      *  [0]: x , [1] : y, [2] : z
      */
-    B2Vector3<SpBaseType> m_position;
+    B2Vector3<double> m_position;
 
 
 
@@ -456,7 +433,7 @@ namespace Belle2 {
      *
      *  [0]: x-uncertainty , [1] : y-uncertainty, [2] : z-uncertainty
      */
-    B2Vector3<SpBaseType> m_positionError;
+    B2Vector3<double> m_positionError;
 
 
 
@@ -464,8 +441,8 @@ namespace Belle2 {
      *
      *  First entry is u, second is v
      */
-    std::pair<SpBaseType, SpBaseType> m_normalizedLocal;
-//     SpBaseType m_normalizedLocal[2];
+    std::pair<double, double> m_normalizedLocal;
+//     double m_normalizedLocal[2];
 
 
 
@@ -497,15 +474,13 @@ namespace Belle2 {
      * The value shall be between 0-1, where 1 means "good" and 0 means "bad".
      * Standard is 0.5.
      * */
-    SpBaseType m_qualityIndicator;
+    double m_qualityIndicator;
 
 
 
     /** stores whether this spacePoint has already been assigned or not */
     mutable bool m_isAssigned;
 
-
-
-    ClassDefOverride(SpacePoint, 10) // last member changed: SpBaseType float -> double!
+    ClassDefOverride(SpacePoint, 10) // last member changed: double float -> double!
   };
 }

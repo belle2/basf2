@@ -428,7 +428,7 @@ std::vector<int> GFTC2SPTCConverterModule::getClusterIndices(const Belle2::Space
 {
   std::vector<int> clusterInds;
   RelationVector<ClusterType> relClusters = spacePoint->getRelationsTo<ClusterType>(storeArrayName);
-  if (relClusters.size() > 2) throw SpacePoint::InvalidNumberOfClusters();
+  B2ASSERT("Too many clusters.", relClusters.size() < 3);
 
   stringstream clusterStream;
   for (const ClusterType& aCluster : relClusters) {

@@ -13,6 +13,7 @@
 // framework
 #include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/core/FrameworkExceptions.h>
 
 // SpacePoint
 #include <tracking/spacePointCreation/SpacePoint.h>

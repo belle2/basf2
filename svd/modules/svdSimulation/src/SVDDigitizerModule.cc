@@ -54,7 +54,7 @@ REG_MODULE(SVDDigitizer)
 //-----------------------------------------------------------------
 
 SVDDigitizerModule::SVDDigitizerModule() :
-  Module(), m_rootFile(0), m_histDiffusion_u(0), m_histDiffusion_v(0), m_histLorentz_u(
+  Module(), m_rootFile(0), m_histChargeSharing_u(0), m_histChargeSharing_v(0), m_histLorentz_u(
     0), m_histLorentz_v(0), m_signalDist_u(0), m_signalDist_v(0)
 {
   //Set module properties
@@ -194,26 +194,53 @@ void SVDDigitizerModule::initialize()
   if (!m_rootFilename.empty()) {
     m_rootFile = new TFile(m_rootFilename.c_str(), "RECREATE");
     m_rootFile->cd();
-    m_histDiffusion_v = new TH1D("h_holeDiffusion", "Diffusion distance, v",
-                                 200, -100, 100);
-    m_histDiffusion_v->GetXaxis()->SetTitle("Diffusion distance v [um]");
-    m_histDiffusion_u = new TH1D("h_electronDiffusion",
-                                 "Diffusion distance", 200, -100, 100);
-    m_histDiffusion_v->GetXaxis()->SetTitle("Diffusion distance u [um]");
-    m_histLorentz_u = new TH1D("h_LorentzAngle_u", "Lorentz angle, electrons",
-                               100, -0.25, 0.25);
+    m_histChargeSharing_v = new TH1D("h_Diffusion_v", " 'Diffusion' distance, v",
+                                     200, -500, 500);
+    m_histChargeSharing_v->GetXaxis()->SetTitle(" distance v [um]");
+    m_histChargeSharing_u = new TH1D("h_Diffusion_u",
+                                     " 'Diffusion' distance, u", 100, -200, 200);
+    m_histChargeSharing_u->GetXaxis()->SetTitle("distance u [um]");
+    m_histLorentz_u = new TH1D("h_LorentzAngle_u", "Lorentz angle, holes",
+                               100, -0.08, 0);
     m_histLorentz_u->GetXaxis()->SetTitle("Lorentz angle");
     m_histLorentz_v = new TH1D("h_LorentzAngle_v",
-                               "Lorentz angle, holes", 100, -0.002, 0.002);
+                               "Lorentz angle, electrons", 100, -0.002, 0.002);
     m_histLorentz_v->GetXaxis()->SetTitle("Lorentz angle");
     m_signalDist_u = new TH1D("h_signalDist_u",
-                              "Strip signals vs. TrueHits, electrons", 100, -400, 400);
-    m_signalDist_u->GetXaxis()->SetTitle(
-      "U strip position - TrueHit u [um]");
+                              "Strip signals vs. TrueHits, holes", 100, -400, 400);
+    m_signalDist_u->GetXaxis()->SetTitle("U strip position - TrueHit u [um]");
     m_signalDist_v = new TH1D("h_signalDist_v",
-                              "Strip signals vs. TrueHits, holes", 400, -400, 400);
-    m_signalDist_v->GetXaxis()->SetTitle(
-      "V strip position - TrueHit v [um]");
+                              "Strip signals vs. TrueHits, electrons", 100, -400, 400);
+    m_signalDist_v->GetXaxis()->SetTitle("V strip position - TrueHit v [um]");
+
+    m_histMobility_e = new TH1D("h_elecMobility", "electron Mobility",
+                                30, 900, 1200);
+    m_histMobility_e->GetXaxis()->SetTitle("Electron Mobility");
+    m_histMobility_h = new TH1D("h_holeMobility", "hole Mobility",
+                                30, 400, 500);
+    m_histMobility_h->GetXaxis()->SetTitle("Holes Mobility");
+
+    m_histDistanceToPlane_e = new TH1D("h_elecDistToPlane", "electron Distance to Plane",
+                                       50, -0.05, 0.05);
+    m_histDistanceToPlane_e->GetXaxis()->SetTitle("Electron Distance To Plane [cm]");
+    m_histDistanceToPlane_h = new TH1D("h_holeDistToPlane", "holes Distance to Plane",
+                                       50, -0.05, 0.05);
+    m_histDistanceToPlane_h->GetXaxis()->SetTitle("Holes Distance To Plane [cm]");
+
+    m_histVelocity_e = new TH1D("h_elecVelocity", "electrons Velocity (z)",
+                                100, 0.001, 0.01);
+
+    m_histVelocity_e->GetXaxis()->SetTitle("Electron Velocity [cm/s]");
+    m_histVelocity_h = new TH1D("h_holeVelocity", "holes Velocity (z)",
+                                30, -0.002, -0.0004);
+    m_histVelocity_h->GetXaxis()->SetTitle("holes Velocity [cm/s]");
+
+    m_histDriftTime_e = new TH1D("h_elecDriftTime", "electron Drift Time",
+                                 30, 0, 30);
+    m_histDriftTime_e->GetXaxis()->SetTitle("Electron Drift Time");
+    m_histDriftTime_h = new TH1D("h_holeDriftTime", "hole Drift Time",
+                                 30, 0, 30);
+    m_histDriftTime_h->GetXaxis()->SetTitle("Hole Drift Time");
 
     if (m_storeWaveforms) {
       m_waveTree = new TTree("waveTree", "SVD waveforms");
@@ -251,6 +278,7 @@ void SVDDigitizerModule::event()
 {
   //Clear sensors and process SimHits
   for (Sensors::value_type& sensor : m_sensors) {
+
     sensor.second.first.clear();  // u strips
     sensor.second.second.clear(); // v strips
   }
@@ -378,7 +406,7 @@ void SVDDigitizerModule::processHit()
     if (m_currentHit->getGlobalTime() > stopSampling)
       return;
   }
-  StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
+
   // Set time of the event
   m_currentTime = m_currentHit->getGlobalTime();
 
@@ -424,14 +452,20 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   B2DEBUG(30,
           "Drifting " << carriers << " " << carrierName << "s at position (" << position.x() << ", " << position.y() << ", " << position.z()
           << ").");
+  B2DEBUG(30, "@@@ driftCharge: drifting " << carriers << " " << carrierName << "s at position (" << position.x() << ", " <<
+          position.y() << ", " << position.z()
+          << ").");
 
   //Get references to current sensor/info for ease of use
   const SensorInfo& info = *m_currentSensorInfo;
-  StripSignals& digits = (have_electrons) ? m_currentSensor->first : m_currentSensor->second;
+  StripSignals& digits = (!have_electrons) ? m_currentSensor->first : m_currentSensor->second;
 
   double distanceToPlane = (have_electrons) ?
                            0.5 * m_sensorThickness - position.Z() :
-                           -0.5 * m_sensorThickness - position.Z();
+                           -0.5 * m_sensorThickness - position.Z(); //cm
+
+  if (m_histDistanceToPlane_e && have_electrons) m_histDistanceToPlane_e->Fill(distanceToPlane);
+  if (m_histDistanceToPlane_h && !have_electrons) m_histDistanceToPlane_h->Fill(distanceToPlane);
 
   // Approximation: calculate drift velocity at the point halfway towards
   // the respective sensor surface.
@@ -439,35 +473,56 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
 
   // Calculate drift times and widths of charge clouds.
   TVector3 v = info.getVelocity(carrierType, mean_pos);
-  double driftTime = distanceToPlane / v.Z();
-  TVector3 center = position + driftTime * v;
+  if (m_histVelocity_e && have_electrons) m_histVelocity_e->Fill(v.Z()); //Unit::cm/Unit::cm*Unit::eV/Unit::e*Unit::s);
+  if (m_histVelocity_h && !have_electrons) m_histVelocity_h->Fill(v.Z()); //Unit::cm/Unit::cm*Unit::eV/Unit::e*Unit::s);
+
+  double driftTime = distanceToPlane / v.Z(); //ns
+  if (m_histDriftTime_e && have_electrons) m_histDriftTime_e->Fill(driftTime); //ns
+  if (m_histDriftTime_h && !have_electrons) m_histDriftTime_h->Fill(driftTime); //ns
+
+  TVector3 center = position + driftTime * v; //cm
   double mobility = (have_electrons) ?
                     info.getElectronMobility(info.getEField(mean_pos).Mag()) :
                     info.getHoleMobility(info.getEField(mean_pos).Mag());
+
+  if (m_histMobility_e && have_electrons) m_histMobility_e->Fill(mobility); //cm2/V/ns
+  if (m_histMobility_h && !have_electrons) m_histMobility_h->Fill(mobility); //cm2/V/ns
+
   double D = Const::kBoltzmann * info.getTemperature() / Unit::e * mobility;
   double sigma = std::max(1.0e-4, sqrt(2.0 * D * driftTime));
-  double tanLorentz = (have_electrons) ? v.X() / v.Z() : v.Y() / v.Z();
+  double tanLorentz = (!have_electrons) ? v.X() / v.Z() : v.Y() / v.Z();
+
+  B2DEBUG(30, "velocity (" << v.X() / Unit::um << ", " << v.Y() / Unit::um << ", " << v.Z() / Unit::um << ") um/ns");
+  B2DEBUG(30, "D = " << D << ", driftTime = " << driftTime / Unit::ns << " ns");
+  B2DEBUG(30, "sigma = " << sigma / Unit::um << " um");
+  B2DEBUG(30, "tan Lorentz = " << tanLorentz);
+
   sigma *= sqrt(1.0 + tanLorentz * tanLorentz);
-  if (m_histLorentz_u && have_electrons) m_histLorentz_u->Fill(tanLorentz);
-  if (m_histLorentz_v && !have_electrons) m_histLorentz_v->Fill(tanLorentz);
+  if (m_histLorentz_u && !have_electrons) m_histLorentz_u->Fill(tanLorentz);
+  if (m_histLorentz_v && have_electrons) m_histLorentz_v->Fill(tanLorentz);
 
   //Distribute carrier cloud on strips
   int vID = info.getVCellID(center.Y(), true);
   int uID = info.getUCellID(center.X(), center.Y(), true);
-  int seedStrip = (have_electrons) ? uID : vID;
-  double seedPos = (have_electrons) ?
+  int seedStrip = (!have_electrons) ? uID : vID;
+  double seedPos = (!have_electrons) ?
                    info.getUCellPosition(seedStrip, vID) :
                    info.getVCellPosition(seedStrip);
-  double geomPitch = (have_electrons) ? 0.5 * info.getUPitch(center.Y()) : 0.5 * info.getVPitch();
-  int nCells = (have_electrons) ? info.getUCells() : info.getVCells();
+  double geomPitch = (!have_electrons) ? 0.5 * info.getUPitch(center.Y()) : 0.5 * info.getVPitch();
+  int nCells = (!have_electrons) ? info.getUCells() : info.getVCells();
   std::deque<double> stripCharges;
   std::deque<double> strips; // intermediate strips will be half-integers, like 2.5.
 #define NORMAL_CDF(z) 0.5 * std::erfc( - (z) * 0.707107)
-  double current_pos = (have_electrons) ? seedPos - center.X() : seedPos - center.Y();
+  double current_pos = (!have_electrons) ? seedPos - center.X() : seedPos - center.Y();
   double current_strip = seedStrip;
   double cdf_low = NORMAL_CDF((current_pos - 0.5 * geomPitch) / sigma);
   double cdf_high = NORMAL_CDF((current_pos + 0.5 * geomPitch) / sigma);
   double charge = carriers * (cdf_high - cdf_low);
+
+  B2DEBUG(30, "geomPitch = " << geomPitch / Unit::um << " um");
+  B2DEBUG(30, "charge = " << charge << " = " << carriers << "(carriers) * (" << cdf_high << "(cdf_high) - " << cdf_low <<
+          "(cdf_low));");
+
   stripCharges.push_back(charge);
   strips.push_back(current_strip);
   while (cdf_low > 1.0e-5) {
@@ -479,7 +534,7 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
     strips.push_front(current_strip);
     cdf_low = cdf_current;
   }
-  current_pos = (have_electrons) ? seedPos - center.X() : seedPos - center.Y();
+  current_pos = (!have_electrons) ? seedPos - center.X() : seedPos - center.Y();
   current_strip = seedStrip;
   while (cdf_high < 1.0 - 1.0e-5) {
     current_pos += geomPitch;
@@ -491,6 +546,7 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
     cdf_high = cdf_current;
   }
 #undef NORMAL_CDF
+
   // Pad with zeros for smoothing
   int npads = (strips.front() - floor(strips.front()) == 0) ? 4 : 3;
   for (int i = 0; i < npads; ++i) {
@@ -503,21 +559,30 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
     stripCharges.push_back(0);
   }
   // Cross-talk
+  B2DEBUG(30, "  --> charge sharing simulation, # strips = " << strips.size());
   std::deque<double> readoutCharges;
   std::deque<int> readoutStrips;
   for (std::size_t index = 2; index <  strips.size() - 2; index += 2) {
+    B2DEBUG(30, "  index = " << index << ", strip = " << strips[index] << ", stripCharge = " << stripCharges[index]);
     int currentStrip = static_cast<int>(strips[index]);
-    double Cc = (have_electrons) ? info.getCouplingCapacitanceU(currentStrip) :
+    double Cc = (!have_electrons) ? info.getCouplingCapacitanceU(currentStrip) :
                 info.getCouplingCapacitanceV(currentStrip);
-    double Ci = (have_electrons) ? info.getInterstripCapacitanceU(currentStrip) :
+    double Ci = (!have_electrons) ? info.getInterstripCapacitanceU(currentStrip) :
                 info.getInterstripCapacitanceV(currentStrip);
-    double Cb = (have_electrons) ? info.getBackplaneCapacitanceU(currentStrip) :
+    double Cb = (!have_electrons) ? info.getBackplaneCapacitanceU(currentStrip) :
                 info.getBackplaneCapacitanceV(currentStrip);
 
     double cNeighbour2 = 0.5 * Ci / (Ci + Cb + Cc);
     double cNeighbour1 = Ci / (2 * Ci + Cb);
     double cSelf = Cc / (Ci + Cb + Cc);
 
+    B2DEBUG(30, "  current strip = " << currentStrip);
+    B2DEBUG(30, "     index-2 = " << index - 2 << ", strip = " << strips[index - 2] << ", stripCharge = " << stripCharges[index - 2]);
+    B2DEBUG(30, "     index-1 = " << index - 1 << ", strip = " << strips[index - 1] << ", stripCharge = " << stripCharges[index - 1]);
+    B2DEBUG(30, "     index   = " << index << ", strip = " << strips[index] << ", stripCharge = " << stripCharges[index]);
+    B2DEBUG(30, "     index+1 = " << index + 1 << ", strip = " << strips[index + 1] << ", stripCharge = " << stripCharges[index + 1]);
+    B2DEBUG(30, "     index+2 = " << index + 2 << ", strip = " << strips[index + 2] << ", stripCharge = " << stripCharges[index + 2]);
+    //se index e' di readout va bene
     readoutCharges.push_back(cSelf * (
                                cNeighbour2 * stripCharges[index - 2]
                                + cNeighbour1 * stripCharges[index - 1]
@@ -526,6 +591,8 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
                                + cNeighbour2 * stripCharges[index + 2]
                              ));
     readoutStrips.push_back(currentStrip);
+    B2DEBUG(30, "    post simulation: " << index << ", strip = " << currentStrip << ", readoutCharge = " <<
+            readoutCharges[readoutCharges.size() - 1]);
   }
   // Trim at sensor edges
   double tail = 0;
@@ -546,10 +613,11 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   if (m_applyPoisson)
     for (auto& c : readoutCharges)
       c = (c <= 0) ? 0 : std::max(0.0, gRandom->Gaus(c, std::sqrt(info.c_fanoFactorSi * c)));
+
   // Fill diagnostic charts
-  if (m_histDiffusion_u && m_histDiffusion_v) {
-    TH1D* histo = (have_electrons) ? m_histDiffusion_u : m_histDiffusion_v;
-    double d = (have_electrons) ? seedPos - center.X() : seedPos - center.Y();
+  if (m_histChargeSharing_u && m_histChargeSharing_v) {
+    TH1D* histo = (!have_electrons) ? m_histChargeSharing_u : m_histChargeSharing_v;
+    double d = (!have_electrons) ? seedPos - center.X() : seedPos - center.Y();
     for (std::size_t index = 0; index < readoutStrips.size(); ++ index) {
       double dist = d + (readoutStrips[index] - seedStrip) * 2 * geomPitch;
       histo->Fill(dist / Unit::um, readoutCharges[index]);
@@ -671,9 +739,7 @@ void SVDDigitizerModule::saveDigits()
               float trueWeight = trueRel.second;
               if (iTrueHit > -1) {
                 m_signalDist_u->Fill(
-                  (info.getUCellPosition(iStrip)
-                   - storeTrueHits[iTrueHit]->getU())
-                  / Unit::um, trueWeight);
+                  (info.getUCellPosition(iStrip) - storeTrueHits[iTrueHit]->getU()) / Unit::um, trueWeight);
               } // if iTrieHit
             } // for trueRel
           } // if m_signalDist_u
@@ -748,9 +814,7 @@ void SVDDigitizerModule::saveDigits()
               float trueWeight = trueRel.second;
               if (iTrueHit > -1) {
                 m_signalDist_v->Fill(
-                  (info.getVCellPosition(iStrip)
-                   - storeTrueHits[iTrueHit]->getV())
-                  / Unit::um, trueWeight);
+                  (info.getVCellPosition(iStrip) - storeTrueHits[iTrueHit]->getV()) / Unit::um, trueWeight);
               } // if iTrieHit
             } // for trueRel
           } // if m_signalDist_v

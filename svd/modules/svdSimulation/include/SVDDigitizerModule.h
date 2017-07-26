@@ -213,10 +213,28 @@ namespace Belle2 {
       // ROOT stuff:
       /** Pointer to the ROOT filename for statistics */
       TFile* m_rootFile;
-      /** Histogram showing the diffusion cloud in u (r-phi). */
-      TH1D*  m_histDiffusion_u;
-      /** Histogram showing the diffusion cloud in v (z). */
-      TH1D*  m_histDiffusion_v;
+      /** Histogram showing the charge sharing + diffusion in u (r-phi). */
+      TH1D*  m_histChargeSharing_u;
+      /** Histogram showing the charge sharing + diffusion in v (z). */
+      TH1D*  m_histChargeSharing_v;
+
+      /** Histogram showing the mobility of e-. */
+      TH1D*  m_histMobility_e;
+      /** Histogram showing the mobility of h. */
+      TH1D*  m_histMobility_h;
+      /** Histogram showing the velocity of e-. */
+      TH1D*  m_histVelocity_e;
+      /** Histogram showing the velocity of h. */
+      TH1D*  m_histVelocity_h;
+      /** Histogram showing the distance to plane for e. */
+      TH1D*  m_histDistanceToPlane_e;
+      /** Histogram showing the distance to plane for h. */
+      TH1D*  m_histDistanceToPlane_h;
+      /** Histogram showing the drift time of e. */
+      TH1D*  m_histDriftTime_e;
+      /** Histogram showing the drift time of h. */
+      TH1D*  m_histDriftTime_h;
+
       /** Histogram showing the Lorentz angles in u (r-phi). */
       TH1D*  m_histLorentz_u;
       /** Histogram showing the Lorentz angles in v (z). */

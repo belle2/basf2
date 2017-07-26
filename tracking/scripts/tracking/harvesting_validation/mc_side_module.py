@@ -110,6 +110,7 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
         mc_reco_tracks = Belle2.PyStoreArray(self.foreach)
         multiplicity = mc_reco_tracks.getEntries()
 
+        reco_track = track_match_look_up.getRelatedPRRecoTrack(mc_reco_track)
         mc_particle = track_match_look_up.getRelatedMCParticle(mc_reco_track)
         mc_particle_crops = peelers.peel_mc_particle(mc_particle)
         hit_content_crops = peelers.peel_reco_track_hit_content(mc_reco_track)
@@ -120,12 +121,18 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
         event_meta_data = Belle2.PyStoreObj("EventMetaData")
         event_crops = peelers.peel_event_info(event_meta_data)
 
+        # Store Array for easier joining
+        store_array_crops = peelers.peel_store_array_info(reco_track, key="pr_{part_name}")
+        mc_store_array_crops = peelers.peel_store_array_info(mc_reco_track, key="mc_{part_name}")
+
         crops = dict(multiplicity=multiplicity,
                      **mc_to_pr_match_info_crops,
                      **hit_content_crops,
                      **mc_particle_crops,
                      **mc_hit_efficiencies_in_all_pr_tracks_crops,
-                     **event_crops
+                     **event_crops,
+                     **store_array_crops,
+                     **mc_store_array_crops
                      )
 
         return crops

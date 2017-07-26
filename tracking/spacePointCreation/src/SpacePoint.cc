@@ -18,8 +18,7 @@ using namespace Belle2;
 
 //---PXD related constructor---
 SpacePoint::SpacePoint(const PXDCluster* pxdCluster,
-                       const VXD::SensorInfoBase* aSensorInfo) :
-  m_clustersAssigned( {true, true}), m_vxdID(pxdCluster->getSensorID()), m_qualityIndicator(0.5)
+                       const VXD::SensorInfoBase* aSensorInfo) : m_vxdID(pxdCluster->getSensorID())
 {
   //We need some handle to translate IDs to local and global coordinates.
   //aSensorInfo exists only for testing purposes, so this is the relevant case!
@@ -40,8 +39,7 @@ SpacePoint::SpacePoint(const PXDCluster* pxdCluster,
 
 //---SVD related constructor---
 SpacePoint::SpacePoint(std::vector<const SVDCluster*>& clusters,
-                       const VXD::SensorInfoBase* aSensorInfo) :
-  m_clustersAssigned( {false, false}), m_vxdID(clusters.at(0)->getSensorID()), m_qualityIndicator(0.5)
+                       const VXD::SensorInfoBase* aSensorInfo) : m_vxdID(clusters.at(0)->getSensorID())
 {
   //---The following contains only sanity checks without effect, if nobody gave buggy information---
   //We have 1 or two SVD Clusters.
@@ -105,7 +103,7 @@ SpacePoint::SpacePoint(std::vector<const SVDCluster*>& clusters,
   setPositionError(uSigma, vSigma, aSensorInfo);
 }
 
-/*
+
 vector< genfit::PlanarMeasurement > SpacePoint::getGenfitCompatible() const
 {
   // XYRecoHit will be stored as their base-class, which is detector-independent.
@@ -136,7 +134,6 @@ vector< genfit::PlanarMeasurement > SpacePoint::getGenfitCompatible() const
 
   return collectedMeasurements;
 }
-*/
 
 
 std::pair<double, double> SpacePoint::convertLocalToNormalizedCoordinates(

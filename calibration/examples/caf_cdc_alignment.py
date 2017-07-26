@@ -20,37 +20,38 @@ from alignment import setups
 
 
 def main(argv):
-    print('Demonstrator of Millepede alignment of CDC layers')
-    print('Usage basf2 SCRIPT_NAME DST_FILE.root [DST_FILE2.root ... ]')
-    # Create a CAF instance to configure how we will run
+    print('Demonstrator of Millepede alignment of CDC layers with CAF')
 
     inputFiles = []
     for file in argv[0:]:
         inputFiles.append(os.path.abspath(file))
 
     if not len(inputFiles):
-        print('Usage basf2 SCRIPT_NAME DST_FILE.root [DST_FILE2.root ... ]')
+        print('Usage: basf2 caf_cdc_alignment DST_FILE.root [DST_FILE2.root ... ]')
         sys.exit(1)
+
+    print('Input DST files:')
     print(inputFiles)
 
-    main_path = basf2.create_path()
-    main_path.add_module('Progress')
-    main_path.add_module('Gearbox')
-    main_path.add_module('Geometry', excludedComponents=['SVD', 'PXD', 'ARICH', 'BeamPipe', 'EKLM'])
+    reco_path = basf2.create_path()
+    reco_path.add_module('Progress')
+    reco_path.add_module('Gearbox')
+    reco_path.add_module('Geometry', excludedComponents=['SVD', 'PXD', 'ARICH', 'BeamPipe', 'EKLM'])
     # Add CDC CR reconstruction.
-    add_cosmics_reconstruction(main_path, components=['CDC'], merge_tracks=True, pruneTracks=False)
+    add_cosmics_reconstruction(reco_path, components=['CDC'], merge_tracks=True, pruneTracks=False)
 
     setups.dirty_data = True
     millepede = setups.setup_CDCLayers_GCR_Karim()
-    millepede.path = main_path
+    millepede.path = reco_path
     calib_init = millepede.create('cdc_layers_init', inputFiles)
     calib_init.max_iterations = 1
 
     setups.dirty_data = False
     millepede = setups.setup_CDCLayers_GCR_Karim()
-    millepede.path = main_path
-    millepede.set_param(1.e-3, 'minPvalue')
+    millepede.path = reco_path
+    millepede.set_param(1.e-3, 'minPValue')
     calib_std = millepede.create('cdc_layers_std', inputFiles)
+
     calib_std.depends_on(calib_init)
 
     caf = CAF()
@@ -61,12 +62,14 @@ def main(argv):
 
     caf.add_calibration(calib_init)
     caf.add_calibration(calib_std)
-    caf.output_dir = 'caf_output'
 
+    caf.backend = backends.Local(10)
+
+    caf.output_dir = 'caf_output'
     caf.run()
 
     print("Finished CAF Processing")
 
 if __name__ == "__main__":
-    # Pass arguments after script name as input files
+    # Pass all arguments after script name as input files
     main(sys.argv[1:])

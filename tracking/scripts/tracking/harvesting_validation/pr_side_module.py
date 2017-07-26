@@ -75,6 +75,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         track_match_look_up = self.track_match_look_up
 
         # Matching information
+        mc_reco_track = track_match_look_up.getRelatedMCRecoTrack(reco_track)
         mc_particle = track_match_look_up.getRelatedMCParticle(reco_track)
         mc_particle_crops = peelers.peel_mc_particle(mc_particle)
 
@@ -87,10 +88,15 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
 
         fit_result = track_match_look_up.getRelatedTrackFitResult(reco_track)
         fit_crops = peelers.peel_track_fit_result(fit_result)
+        fit_status_crops = peelers.peel_fit_status(reco_track)
 
         # Event Info
         event_meta_data = Belle2.PyStoreObj("EventMetaData")
         event_crops = peelers.peel_event_info(event_meta_data)
+
+        # Store Array for easier joining
+        store_array_crops = peelers.peel_store_array_info(reco_track, key="pr_{part_name}")
+        mc_store_array_crops = peelers.peel_store_array_info(mc_reco_track, key="mc_{part_name}")
 
         return dict(
             **mc_particle_crops,
@@ -98,7 +104,10 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             **pr_to_mc_match_info_crops,
             **seed_fit_crops,
             **fit_crops,
-            **event_crops
+            **fit_status_crops,
+            **event_crops,
+            **store_array_crops,
+            **mc_store_array_crops
         )
 
     def peel_pr_to_mc_match_info(self, reco_track):

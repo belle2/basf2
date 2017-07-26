@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
@@ -106,7 +105,7 @@ SpacePoint::SpacePoint(std::vector<const SVDCluster*>& clusters,
   setPositionError(uSigma, vSigma, aSensorInfo);
 }
 
-
+/*
 vector< genfit::PlanarMeasurement > SpacePoint::getGenfitCompatible() const
 {
   // XYRecoHit will be stored as their base-class, which is detector-independent.
@@ -137,7 +136,7 @@ vector< genfit::PlanarMeasurement > SpacePoint::getGenfitCompatible() const
 
   return collectedMeasurements;
 }
-
+*/
 
 
 std::pair<double, double> SpacePoint::convertLocalToNormalizedCoordinates(

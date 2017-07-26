@@ -88,6 +88,7 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
   addParam("additionalDataDescription", m_additionalDataDescription, "Additional dictionary of "
            "name->value pairs to be added to the file metadata to describe the data",
            m_additionalDataDescription);
+  addParam("buildIndex", m_buildIndex, "Build Event Index for faster finding of events by exp/run/event number", m_buildIndex);
 }
 
 
@@ -240,12 +241,14 @@ void RootOutputModule::fillFileMetaData()
     //create an index for the event tree
     TTree* tree = m_tree[DataStore::c_Event];
     unsigned long numEntries = tree->GetEntries();
-    if (numEntries > 10000000) {
-      //10M events correspond to about 240MB for the TTreeIndex object. for more than ~45M entries this causes crashes, broken files :(
-      B2WARNING("Not building TTree index because of large number of events. The index object would conflict with ROOT limits on object size and cause problems.");
-    } else if (tree->GetBranch("EventMetaData")) {
-      tree->SetBranchAddress("EventMetaData", 0);
-      RootIOUtilities::buildIndex(tree);
+    if (m_buildIndex) {
+      if (numEntries > 10000000) {
+        //10M events correspond to about 240MB for the TTreeIndex object. for more than ~45M entries this causes crashes, broken files :(
+        B2WARNING("Not building TTree index because of large number of events. The index object would conflict with ROOT limits on object size and cause problems.");
+      } else if (tree->GetBranch("EventMetaData")) {
+        tree->SetBranchAddress("EventMetaData", 0);
+        RootIOUtilities::buildIndex(tree);
+      }
     }
 
     fileMetaDataPtr->setNEvents(numEntries);

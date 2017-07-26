@@ -15,15 +15,20 @@
 #define USE_LINUX_VME_UNIVERSE 1
 
 #include <ftprogs2/ftstat.h>
-#include <ftprogs2/pocket_ttd.h>
-#include <ftprogs2/pocket_ttd_fast.h>
+#include <ftprogs2/ft2p_fast.h>
+#include <ftprogs2/ft2p_slow.h>
 #include <ftprogs2/ft2u067.h>
 #include <ftprogs2/ft2p026.h>
 
 extern "C" {
+  //typedef ft2p_t slow_t;
+  //typedef ft2p_t fast_t;
+  typedef struct ft2p_fast fast_t;
+  typedef struct ft2p_slow slow_t;
   ft2p_t stat2p026(ftsw_t* ftsw, int ftswid, char* ss, char* fstate);
   ft2u_t stat2u067(ftsw_t* ftsw, int ftswid, char* ss, char* fstate);
-  //void stat2u067(ftsw_t *ftsw, int ftswid);
+  void summary2p026(struct timeval* tvp, fast_t* f, slow_t* s, char* ss);
+  void color2p026(fast_t* f, slow_t* s, char* ss, char* state);
 }
 
 #ifndef D
@@ -39,8 +44,8 @@ extern "C" {
 
 #define VERSION 20160330
 
-typedef struct pocket_ttd_fast fast_t;
-typedef struct pocket_ttd      slow_t;
+//typedef struct pocket_ttd_fast fast_t;
+//typedef struct pocket_ttd      slow_t;
 
 unsigned int prev_u = 0;
 unsigned int prev_c = 0;
@@ -143,14 +148,12 @@ namespace Belle2 {
     {
       unsigned int offset = m_addr >> 2;
       write_ftsw(g_ftsw, offset, val);
-      LogFile::info("0x%x<<%x", m_addr, val);
       return true;
     }
     bool handleGetInt(int& val)
     {
       unsigned int offset = m_addr >> 2;
       val = read_ftsw(g_ftsw, offset);
-      LogFile::info("0x%x>>%x", m_addr, val);
       return true;
     }
   private:
@@ -169,7 +172,6 @@ namespace Belle2 {
       int v = read_ftsw(g_ftsw, offset);
       unsigned int val = (v & 0xFF000000) | (unsigned int)(usec * 1e+3 / 7.8);
       write_ftsw(g_ftsw, offset, val);
-      LogFile::info("0x%x<<%x", 0x500, val);
       return true;
     }
     bool handleGetFloat(float& val)
@@ -178,8 +180,6 @@ namespace Belle2 {
       unsigned int offset = addr >> 2;
       int v = read_ftsw(g_ftsw, offset);
       val = (v & 0xFFFFFF) * 7.8e-3;
-      LogFile::info("0x%x>>0x%d", addr, v);
-      LogFile::info("0x%x>>%f", addr, val);
       return true;
     }
   private:
@@ -197,7 +197,6 @@ namespace Belle2 {
       int v = read_ftsw(g_ftsw, offset);
       unsigned int val = (v & 0xFFFFFF) | (maxtrg << 24);
       write_ftsw(g_ftsw, offset, val);
-      LogFile::info("0x%x<<%x", 0x500, val);
       return true;
     }
     bool handleGetInt(int& val)
@@ -206,8 +205,6 @@ namespace Belle2 {
       unsigned int offset = addr >> 2;
       int v = read_ftsw(g_ftsw, offset);
       val = v >> 24;
-      LogFile::info("0x%x>>0x%d", addr, v);
-      LogFile::info("0x%x>>%f", addr, val);
       return true;
     }
   private:
@@ -257,7 +254,6 @@ namespace Belle2 {
       }
       unsigned int offset = 0x170 >> 2;
       write_ftsw(g_ftsw, offset, val);
-      LogFile::info("0x%x<<%x", 0x170, val);
       return true;
     }
   private:
@@ -281,7 +277,6 @@ namespace Belle2 {
       }
       unsigned int offset = 0x1a0 >> 2;
       write_ftsw(g_ftsw, offset, val);
-      LogFile::info("0x%x<<%x", 0x1a0, val);
       return true;
     }
   private:
@@ -362,6 +357,23 @@ namespace Belle2 {
     int m_ftswid;
   };
 
+  std::string popen(const std::string& cmd)
+  {
+    char buf[1000];
+    FILE* fp;
+    if ((fp = ::popen(cmd.c_str(), "r")) == NULL) {
+      LogFile::warning("can not exec commad");
+      return "";
+    }
+    std::stringstream ss;
+    while (!feof(fp)) {
+      memset(buf, 0, 1000);
+      fgets(buf, sizeof(buf), fp);
+      ss << buf;
+    }
+    pclose(fp);
+    return ss.str();
+  }
 }
 
 using namespace Belle2;
@@ -386,8 +398,8 @@ void TTCtrlCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
   std::string ttdname = m_ttdnode.getName();
   if (ttdname.size() > 0) {
-    openData(ttdname + "FAST", "pocket_ttd_fast", pocket_ttd_fast_revision);
-    openData(ttdname + "SLOW", "pocket_ttd", pocket_ttd_revision);
+    openData(ttdname + "FAST", "ft2p_fast", ft2p_fast_revision);
+    openData(ttdname + "SLOW", "ft2p_slow", ft2p_slow_revision);
   }
   setAutoReply(true);
   if (g_ftsw == NULL) {
@@ -496,26 +508,13 @@ void TTCtrlCallback::monitor() throw(RCHandlerException)
 {
   g_mutex.lock();
   if (m_ttdnode.getName().size() > 0) {
-    RCState cstate(m_ttdnode.getState());
-    try {
-      NSMCommunicator::connected(m_ttdnode.getName());
-      if (cstate == Enum::UNKNOWN) {
-        NSMCommunicator::send(NSMMessage(m_ttdnode, NSMCommand(17, "STATECHECK")));
-      }
-    } catch (const NSMNotConnectedException&) {
-      if (cstate != Enum::UNKNOWN) {
-        m_ttdnode.setState(Enum::UNKNOWN);
-        setState(RCState::NOTREADY_S);
-      }
-    } catch (const NSMHandlerException& e) {
-      LogFile::error(e.what());
-    }
+    send(m_ttdnode, NSMMessage(m_ttdnode, NSMCommand(17, "STATECHECK")));
   }
   statftx(g_ftsw, m_ftswid);
   g_mutex.unlock();
 }
 
-void TTCtrlCallback::boot(const std::string& opt, const DBObject& obj) throw(RCHandlerException)
+void TTCtrlCallback::boot(const DBObject& obj) throw(RCHandlerException)
 {
   resetft();
   abort();
@@ -526,7 +525,9 @@ void TTCtrlCallback::load(const DBObject&) throw(RCHandlerException)
 {
   resetft();
   trigft();
-  send(NSMMessage(m_ttdnode, NSMCommand(13, "LOAD")));
+  if (!g_flag && m_ttdnode.getName().size() > 0) {
+    send(m_ttdnode, NSMMessage(m_ttdnode, NSMCommand(13, "LOAD")));
+  }
   setState(RCState::READY_S);
 }
 
@@ -543,10 +544,10 @@ void TTCtrlCallback::start(int expno, int runno) throw(RCHandlerException)
     pars[0] = m_trgcommands[trigger_type];
     pars[1] = dummy_rate * 1000;
     pars[2] = trigger_limit;
-    send(NSMMessage(m_ttdnode, NSMCommand(11, "TRIGFT"), 3, pars));
+    send(m_ttdnode, NSMMessage(m_ttdnode, NSMCommand(11, "TRIGFT"), 3, pars));
     pars[0] = expno;
     pars[1] = runno;
-    send(NSMMessage(m_ttdnode, NSMCommand(12, "START"), 2, pars));
+    send(m_ttdnode, NSMMessage(m_ttdnode, NSMCommand(12, "START"), 2, pars));
   } else {
     DBObject& obj(getDBObject());
     get(obj);
@@ -573,8 +574,8 @@ void TTCtrlCallback::start(int expno, int runno) throw(RCHandlerException)
 
 void TTCtrlCallback::stop() throw(RCHandlerException)
 {
-  if (m_ttdnode.getName().size() > 0) {
-    send(NSMMessage(m_ttdnode, NSMCommand(13, "STOP")));
+  if (m_ttdnode.getName().size() > 0 && m_ttdnode.getState() == RCState::RUNNING_S) {
+    send(m_ttdnode, NSMMessage(m_ttdnode, NSMCommand(13, "STOP")));
   } else {
     std::string cmd = StringUtil::form("trigft -%d reset", m_ftswid);
     LogFile::debug(cmd);
@@ -585,7 +586,7 @@ void TTCtrlCallback::stop() throw(RCHandlerException)
 bool TTCtrlCallback::pause() throw(RCHandlerException)
 {
   if (m_ttdnode.getName().size() > 0) {
-    send(NSMMessage(m_ttdnode, NSMCommand(14, "PAUSE")));
+    send(m_ttdnode, NSMMessage(m_ttdnode, NSMCommand(14, "PAUSE")));
   }
   return true;
 }
@@ -593,7 +594,7 @@ bool TTCtrlCallback::pause() throw(RCHandlerException)
 bool TTCtrlCallback::resume(int /*subno*/) throw(RCHandlerException)
 {
   if (m_ttdnode.getName().size() > 0) {
-    send(NSMMessage(m_ttdnode, NSMCommand(15, "RESUME")));
+    send(m_ttdnode, NSMMessage(m_ttdnode, NSMCommand(15, "RESUME")));
   }
   return true;
 }
@@ -601,7 +602,7 @@ bool TTCtrlCallback::resume(int /*subno*/) throw(RCHandlerException)
 void TTCtrlCallback::recover(const DBObject&) throw(RCHandlerException)
 {
   if (m_ttdnode.getName().size() > 0) {
-    send(NSMMessage(m_ttdnode, NSMCommand(16, "RECOVER")));
+    send(m_ttdnode, NSMMessage(m_ttdnode, NSMCommand(16, "RECOVER")));
   }
 }
 
@@ -627,7 +628,7 @@ void TTCtrlCallback::trigft() throw(RCHandlerException)
     pars[2] = trigger_limit;
     pars[3] = dummy_rate;
     if (!g_flag && m_ttdnode.getName().size() > 0) {
-      send(NSMMessage(m_ttdnode, NSMCommand(11, "TRIGFT"), 4, pars));
+      send(m_ttdnode, NSMMessage(m_ttdnode, NSMCommand(11, "TRIGFT"), 4, pars));
     } else {
       std::string cmd = StringUtil::form("trigft -%d reset", ftswid);
       LogFile::debug(cmd);
@@ -662,18 +663,23 @@ void TTCtrlCallback::trigio(const std::string& type) throw(RCHandlerException)
   }
 }
 
-void TTCtrlCallback::send(const NSMMessage& msg) throw(RCHandlerException)
+void TTCtrlCallback::send(RCNode& node, const NSMMessage& msg)
+throw(RCHandlerException)
 {
+  RCState cstate(node.getState());
   try {
-    if (NSMCommunicator::send(msg)) {
-      return;
+    NSMCommunicator::connected(node.getName());
+    NSMCommunicator::send(msg);
+  } catch (const NSMNotConnectedException&) {
+    if (cstate != Enum::UNKNOWN) {
+      node.setState(Enum::UNKNOWN);
+      setState(RCState::ERROR_ES);
+      throw (RCHandlerException(node.getName() + " is down"));
     }
   } catch (const NSMHandlerException& e) {
-  } catch (const TimeoutException& e) {
-
+    setState(RCState::ERROR_ES);
+    throw (RCHandlerException(e.what()));
   }
-  throw (RCHandlerException("Failed to send %s to %s",
-                            msg.getRequestName(), msg.getNodeName()));
 }
 
 void TTCtrlCallback::ok(const char* nodename, const char* data) throw()
@@ -701,7 +707,7 @@ void TTCtrlCallback::error(const char* nodename, const char* data) throw()
 {
   if (m_ttdnode.getName().size() > 0 &&
       m_ttdnode.getName() == nodename) {
-    LogFile::debug("ERROR from %s : %s", nodename, data);
+    log(LogFile::WARNING, "ERROR from %s : %s", nodename, data);
     try {
       //setState(RCState::NOTREADY_S);
     } catch (const std::out_of_range& e) {}
@@ -712,8 +718,7 @@ void TTCtrlCallback::resetft() throw()
 {
   g_mutex.lock();
   if (!g_flag && m_ttdnode.getName().size() > 0) {
-    LogFile::info("resetft");
-    send(NSMMessage(m_ttdnode, NSMCommand(17, "RESETFT")));
+    send(m_ttdnode, NSMMessage(m_ttdnode, NSMCommand(17, "RESETFT")));
   } else {
     DBObject& obj(getDBObject());
     get(obj);
@@ -759,7 +764,8 @@ void TTCtrlCallback::statftx(ftsw_t* ftsw, int ftswid)
   char fstate[100];
   if (ftidhi != 0x46543200) {
     ftidhi = 0;
-  } else if (ftidlo == 'U' && fpgaver >= 67) {   /* FTxU */
+    /*
+    } else if (ftidlo == 'U' && fpgaver >= 67) {
     ft2u_t u = stat2u067(ftsw, ftswid, ss, fstate);
     int exp = D(u.exprun, 31, 22);
     int run = D(u.exprun, 21, 8);
@@ -786,7 +792,11 @@ void TTCtrlCallback::statftx(ftsw_t* ftsw, int ftswid)
     set("tstart", (int)u.rstutim);
     set("trun", (int)(u.utime - u.rstutim));
     set("ftstate", fstate);
-    set("statft", ss);
+    //set("statft", ss);
+    std::string s_statft = popen(StringUtil::form("statft -%d", ftswid));
+    if (s_statft.size() > 0) {
+      set("statft", s_statft);
+    }
     const DBObject& o_port(getDBObject()("port"));
     if (o_port.hasObject("fee")) {
       const DBObjectList& o_fees(o_port.getObjects("fee"));
@@ -794,8 +804,9 @@ void TTCtrlCallback::statftx(ftsw_t* ftsw, int ftswid)
         std::string vname = StringUtil::form("link.o[%d].", i);
         int up = B(u.linkup, i);
         set(vname + "linkup", up);
-        if (up) {
-          set(vname + "mask", (int)B(u.omask, i));
+    int mask = (int)B(u.omask, i);
+    set(vname + "mask", mask);
+    if (up && (!mask)) {
           if (B(u.odata[i], 1)) {
             set(vname + "ttlost", (int)B(u.odata[i], 10));
             set(vname + "ttldn", 0);
@@ -852,14 +863,14 @@ void TTCtrlCallback::statftx(ftsw_t* ftsw, int ftswid)
             set(vname + "c.err", (int)B(u.xdata[i], 26));
             set(vname + "d.err", (int)B(u.xdata[i], 27));
           } else {
-            set(vname + "mask", 1);
-            set(vname + "err", 0);
-            for (int j = 0; j < 4; j++) {
-              std::string vname = StringUtil::form("link.x[%d].%c.", i, j + 'a');
-              set(vname + "enable", 0);
-              set(vname + "empty", 0);
-              set(vname + "full", 0);
-              set(vname + "err", 0);
+      set(vname + "mask", 1);
+      set(vname + "err", 0);
+      for (int j = 0; j < 4; j++) {
+        std::string vname = StringUtil::form("link.x[%d].%c.", i, j + 'a');
+        set(vname + "enable", 0);
+        set(vname + "empty", 0);
+        set(vname + "full", 0);
+        set(vname + "err", 0);
             }
           }
         }
@@ -867,47 +878,69 @@ void TTCtrlCallback::statftx(ftsw_t* ftsw, int ftswid)
     }
     prev_u = u.utime;
     prev_c = u.ctime;
-  } else if ((ftidlo == 'O' && fpgaver >= 26) ||
-             (ftidlo == 'P' && fpgaver >= 26)) {  /* FTxP */
-    ft2p_t p = stat2p026(ftsw, ftswid, ss, fstate);
-    int exp = D(p.exprun, 31, 22);
-    int run = D(p.exprun, 21, 8);
-    int sub = D(p.exprun, 7, 0);
-    double dt = p.utime;
+    } else if ((ftidlo == 'O' && fpgaver >= 26) ||
+             (ftidlo == 'P' && fpgaver >= 26)) {
+    */
+  } else {
+    std::string ttdname = m_ttdnode.getName();
+    NSMData& dfast(getData(ttdname + "FAST"));
+    NSMData& dslow(getData(ttdname + "SLOW"));
+    if (!dfast.isAvailable()) {
+      LogFile::debug(ttdname + "FAST is not available");
+      return;
+    }
+    if (!dslow.isAvailable()) {
+      LogFile::debug(ttdname + "SLOW is not available");
+      return;
+    }
+    ft2p_fast* f = (ft2p_fast*)dfast.get();
+    ft2p_slow* s = (ft2p_slow*)dslow.get();
+    struct timeval tv;
+    color2p026(f, s, ss, fstate);
+    summary2p026(&tv, f, s, ss);
+    //ft2p_t p = stat2p026(ftsw, ftswid, ss, fstate);
+    int exp = D(s->exprun, 31, 22);
+    int run = D(s->exprun, 21, 8);
+    int sub = D(s->exprun, 7, 0);
+    double dt = f->utime;
     dt -=  utime_old;
     if (dt > 0) {
-      float rateout = (double)(p.toutcnt - toutcnt_old) / dt;
-      float ratein = (double)(p.tincnt - tincnt_old) / dt;
+      float rateout = (double)(f->toutcnt - toutcnt_old) / dt;
+      float ratein = (double)(f->tincnt - tincnt_old) / dt;
       set("rateout", rateout);
       set("ratein", ratein);
-      toutcnt_old = p.toutcnt;
-      tincnt_old = p.tincnt;
-      utime_old = p.utime;
+      toutcnt_old = f->toutcnt;
+      tincnt_old = f->tincnt;
+      utime_old = f->utime;
     }
     set("expno", exp);
     set("runno", run);
     set("subno", sub);
-    set("tincnt", (int)p.tincnt);
-    set("toutcnt", (int)p.toutcnt);
-    set("tlimit", (int)p.tlimit);
-    set("tlast", (int)p.tlast);
-    set("tstart_s", Date(p.rstutim).toString());
-    set("tstart", (int)p.rstutim);
-    set("trun", (int)(p.utime - p.rstutim));
+    set("tincnt", (int)f->tincnt);
+    set("toutcnt", (int)f->toutcnt);
+    set("tlimit", (int)s->tlimit);
+    set("tlast", (int)f->tlast);
+    set("tstart_s", Date(s->rstutim).toString());
+    set("tstart", (int)s->rstutim);
+    set("trun", (int)(f->utime - s->rstutim));
     set("ftstate", fstate);
-    set("statft", ss);
+    std::string s_statft = popen(StringUtil::form("statft -%d", ftswid));
+    if (s_statft.size() > 0) {
+      set("statft", s_statft);
+    }
     const DBObject& o_port(getDBObject()("port"));
     if (o_port.hasObject("fee")) {
       const DBObjectList& o_fees(o_port.getObjects("fee"));
       for (unsigned int i = 0; i < o_fees.size(); i++) {
         std::string vname = StringUtil::form("link.o[%d].", i);
-        int up = B(p.oalive, i);
+        int up = B(f->oalive, i);
         set(vname + "linkup", up);
-        if (up) {
-          int fa = p.odata[i];
-          int fb = p.odatb[i];
-          //int fc = p.odatc[i];
-          set(vname + "mask", (int)B(p.omask, i));
+        int mask = (int)B(s->omask, i);
+        set(vname + "mask", mask);
+        if (up && !mask) {
+          int fa = f->odata[i];
+          int fb = f->odatb[i];
+          //int fc = f->odatc[i];
           if (B(fa, 1)) {
             set(vname + "ttlost", (int)B(fa, 10));
             set(vname + "ttldn", 0);
@@ -941,8 +974,8 @@ void TTCtrlCallback::statftx(ftsw_t* ftsw, int ftswid)
         }
       }
     }
-    prev_u = p.utime;
-    prev_c = p.ctime;
+    prev_u = f->utime;
+    prev_c = f->ctime;
   }
   //printf(ss);
 

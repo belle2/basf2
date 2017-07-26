@@ -56,7 +56,8 @@ FragmentationModule::FragmentationModule() : Module()
            std::string("../modules/fragmentation/data/pythia_default.dat"));
   addParam("ListPYTHIAEvent", m_listEvent, "List event record of PYTHIA after hadronization", 0);
   addParam("UseEvtGen", m_useEvtGen, "Use EvtGen for specific decays", 1);
-  addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC)", std::string(""));
+  addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC)",
+           FileSystem::findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC", true));
   addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file", std::string(""));
 
   //initialize member variables
@@ -125,6 +126,16 @@ void FragmentationModule::initialize()
 
   if (m_useEvtGen) {
     B2INFO("Using PYTHIA EvtGen Interface");
+    const std::string defaultDecFile = FileSystem::findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC", true);
+    if (m_DecFile.empty()) {
+      B2ERROR("No global decay file defined, please make sure the parameter 'DecFile' is set correctly");
+      return;
+    }
+    if (defaultDecFile.empty()) {
+      B2WARNING("Cannot find default decay file");
+    } else if (defaultDecFile != m_DecFile) {
+      B2INFO("Using non-standard DECAY file \"" << m_DecFile << "\"");
+    }
     FileSystem::TemporaryFile tmp;
     EvtGenDatabasePDG::Instance()->WriteEvtGenTable(tmp);
     evtgen = new EvtGenDecays(pythia, m_DecFile, tmp.getName(), genlist, radCorrEngine);

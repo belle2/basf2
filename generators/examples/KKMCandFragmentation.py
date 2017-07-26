@@ -38,9 +38,6 @@ decay_user = Belle2.FileSystem.findFile('data/generators/modules/fragmentation/d
 
 #: kkmc configuration file, should be fine as is
 kkmc_config = Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat')
-#: global decay file, should be fine as is
-decay_file = os.path.expandvars('$BELLE2_EXTERNALS_DIR/share/evtgen/DECAY_2010.DEC')
-
 
 main = create_path()
 # event info setter
@@ -61,7 +58,6 @@ fragmentation = main.add_module(
     ParameterFile=pythia_config,
     ListPYTHIAEvent=0,
     UseEvtGen=1,
-    DecFile=decay_file,
     UserDecFile=decay_user,
 )
 

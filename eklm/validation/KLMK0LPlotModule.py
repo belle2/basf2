@@ -250,7 +250,7 @@ class KLMK0LPlotModule(Module):
         self.hist_covmat.SetBinContent(5, cov_mat[1][2])
         self.hist_covmat.SetBinContent(6, cov_mat[2][2])
         for i in range(1, 7):
-            self.hist_covmat.SetBinError(i, 100)
+            self.hist_covmat.SetBinError(i, 300)
         for i in range(0, 4):
             for j in range(i, 4):
                 corr_mat[i][j] = cov_mat[i][j] / \

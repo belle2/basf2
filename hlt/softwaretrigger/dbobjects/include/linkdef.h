@@ -7,5 +7,6 @@
 
 #pragma link C++ class Belle2::SoftwareTriggerCutBase+;
 #pragma link C++ class Belle2::DBRepresentationOfSoftwareTriggerCut+;
+#pragma link C++ class Belle2::SoftwareTriggerMenu+;
 
 #endif

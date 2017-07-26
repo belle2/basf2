@@ -129,15 +129,14 @@ class WFDisplay(Module):
         fname = 'waveforms_run' + str(run) + '_event' + str(event) + '_chan'
         self.pdfFile = fname
         for waveform in waveforms:
+            slot = waveform.getModuleID()
             chan = waveform.getChannel()
-            if(chan % 8 == 0):
-                continue
-            self.pdfFile = self.pdfFile + '-' + str(chan)
+            self.pdfFile = self.pdfFile + '-S' + str(slot) + '_' + str(chan)
             wf = waveform.getWaveform()
             self.hist[k].Reset()
             numSamples = waveform.getSize()
             self.hist[k].SetBins(numSamples, 0.0, float(numSamples))
-            title = 'chan ' + str(chan) + ' win'
+            title = 'S' + str(slot) + ' chan ' + str(chan) + ' win'
             for window in waveform.getStorageWindows():
                 title += ' ' + str(window)
             self.hist[k].SetTitle(title)
@@ -162,10 +161,9 @@ class WFDisplay(Module):
                 graph.SetPoint(2, raw.getSamplePeak() + 0.5, raw.getValuePeak())
                 graph.SetPoint(3, raw.getSampleFall() + 0.5, raw.getValueFall0())
                 graph.SetPoint(4, raw.getSampleFall() + 1.5, raw.getValueFall1())
-                print(raw.isFEValid(), raw.isPedestalJump(), raw.areWindowsInOrder())
                 if raw.isMadeOffline():
                     graph.SetMarkerStyle(5)
-                if raw.isFEValid() and raw.areWindowsInOrder():
+                if raw.isFEValid() and not raw.isAtWindowDiscontinuity():
                     graph.SetMarkerColor(2)
                     if raw.isPedestalJump():
                         graph.SetMarkerColor(3)

@@ -15,7 +15,10 @@
 #include <daq/dqm/DqmMemFile.h>
 #include <daq/dqm/analysis/modules/DQMHistAnalysis.h>
 
+#include <TCanvas.h>
+
 #include <string>
+#include <map>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
@@ -47,6 +50,7 @@ namespace Belle2 {
     int m_interval;
 
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+    std::map<std::string, TCanvas*> m_cs;
 
     //! Exp number, Run number
     unsigned int m_expno;

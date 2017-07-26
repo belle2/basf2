@@ -63,10 +63,12 @@ void RunrecordCallback::init(NSMCommunicator& com) throw()
   ss << "DAQ.RunNumber.I :" << runno << std::endl;
   for (size_t i = 0; i < m_objs.size(); i++) {
     const DBObject obj(m_objs[i]);
-    obj.print();
-    NSMVar var(obj.getText("var"));
+    //obj.print();
+    StringList s = StringUtil::split(obj.getText("var"), '@');
+    NSMVar var(s[1]);
+    LogFile::info("%s %s", s[0].c_str(), s[1].c_str());
     try {
-      get(NSMNode(obj.getText("node")), var);
+      get(NSMNode(s[0]), var);
       std::string name = obj.getText("name");
       ss << name << " : ";
       switch (var.getType()) {
@@ -113,10 +115,11 @@ void RunrecordCallback::timeout(NSMCommunicator&) throw()
   }
   for (size_t i = 0; i < m_objs.size(); i++) {
     const DBObject obj(m_objs[i]);
-    obj.print();
-    NSMVar var(obj.getText("var"));
+    //obj.print();
+    StringList s = StringUtil::split(obj.getText("var"), '@');
+    NSMVar var(s[1]);
     try {
-      get(NSMNode(obj.getText("node")), var);
+      get(NSMNode(s[0]), var);
       m_vars[i] = var;
     } catch (const TimeoutException& e) {
 

@@ -33,7 +33,7 @@
 #include <TStyle.h>
 #include <TSystem.h>
 
-#include <ecl/utility/eclChannelMapper.h>
+#include <ecl/utility/ECLChannelMapper.h>
 
 #include <ecl/modules/eclDisplay/EclData.h>
 #include <ecl/modules/eclDisplay/geometry.h>

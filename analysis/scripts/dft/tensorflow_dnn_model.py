@@ -24,7 +24,7 @@ class Layer(object):
         :param p_w: stddev of uniform distribution to initialize
         :return:
         """
-        # layer parameters
+        #: layer parameters
         self.name = name
 
         tf_activation_dict = {
@@ -35,31 +35,31 @@ class Layer(object):
         if tf_activation_str not in tf_activation_dict:
             raise ValueError
 
-        # activation function
+        #: activation function
         self.tf_activation = tf_activation_dict[tf_activation_str]
 
-        # random seed
+        #: random seed
         self.seed = None
 
-        # layer shape
+        #: layer shape
         self.shape = [dim_input, dim_output]
 
-        # init parameters for uniform distribution
+        #: init parameters for uniform distribution
         self.w = self._init_weight(self.shape, p_w, seed)
 
-        # init parameters for bias
+        #: init parameters for bias
         self.b = self._init_bias(self.shape[1], p_bias)
 
-        # input
+        #: input
         self.input = None
 
-        # output
+        #: output
         self.output = None
 
-        # check if initialized (input and output are connected)
+        #: check if initialized (input and output are connected)
         self.is_initialized = False
 
-        # variables to summary
+        #: variables to summary
         self._add_all_to_summary()
 
     def _init_bias(self, width, init_val, name=None):
@@ -136,22 +136,22 @@ class MultilayerPerceptron(object):
         initialization
         """
 
-        # layer objs
+        #: layer objs
         self.layers = layers
 
-        # input
+        #: input
         self.input = None
 
-        # output
+        #: output
         self.output = None
 
-        # weights
+        #: weights
         self.w = None
 
-        # biases
+        #: biases
         self.b = None
 
-        # set all mlp parameters
+        #: set all mlp parameters
         self.is_initialized = False
 
     @classmethod
@@ -219,88 +219,88 @@ class DefaultModel(object):
         if wd_coeffs is not None:
             assert len(wd_coeffs) == len(mlp.layers)
 
-        # weight decay coefficients
+        #: weight decay coefficients
         self.wd_coeffs = wd_coeffs
 
-        # network model
+        #: network model
         self.mlp = mlp
 
-        # output
+        #: output
         self.output = None
 
         with tf.name_scope('global_step'):
-            # global step
+            #: global step
             self.global_step = tf.Variable(0, trainable=False)
 
         # optimizer params
-        # initial momentum
+        #: initial momentum
         self.c_mom_init = mom_init
-        # maximum momentum
+        #: maximum momentum
         self.c_mom_max = mom_max
-        # momentum epochs
+        #: momentum epochs
         self.c_mom_epochs = mom_epochs
 
-        # initial learning rate
+        #: initial learning rate
         self.c_lr_init = lr_init
-        # minimal learning rate
+        #: minimal learning rate
         self.c_lr_min = lr_min
-        # learning rate decay factor
+        #: learning rate decay factor
         self.c_lr_dec_rate = lr_dec_rate
 
-        # number of epochs until stopping
+        #: number of epochs until stopping
         self.c_stop_epochs = stop_epochs
 
-        # use staircase
+        #: use staircase
         self.c_staircase = staircase
 
-        # batches per epoch unknown. needs to be set with initialize
+        #: batches per epoch unknown. needs to be set with initialize
         self.batches_per_epoch = None
 
-        # define multiple optimizers
+        #: define multiple optimizers
         self.optimizers = []
         # list with epochs in which optimizers will be changed, if None is given, only the default optimizer will be
-        # used
+        #: used opimizers
         self.optimizer_change_epochs = change_optimizer
         if change_optimizer is not None:
             self.optimizer_change_epochs.insert(0, 0)
             self.optimizer_change_epochs.append(sys.maxsize)
 
-        # params for monitoring
+        #: params for monitoring
         self.monitoring_params = None
-        # params for labeling
+        #: params for labeling
         self.monitoring_labels = None
 
-        # further monitoring variables
+        #: further monitoring variables
         self.mon_dict = dict()
 
-        # variable space must be known
+        #: variable space must be known
         self.x = None
-        # targets
+        #: targets
         self.y_ = None
-        # weights
+        #: weights
         self.weights = None
 
-        # other variables
+        #: other variables
         self.max_epochs = max_epochs
 
         # termination criterion
-        # min epochs
+        #: min epochs
         self.min_epochs = min_epochs
 
-        # termination criterion
+        #: termination criterion
         self.termination_criterion = None
-        # recent params
+        #: recent params
         self.recent_params = []
-        # the best value will be set a default start value, then updated with the termination criterion
+        #: the best value will be set a default start value, then updated with the termination criterion
         self.best_value = numpy.inf
 
-        # step countdown
+        #: step countdown
         self.step_countdown = self.c_stop_epochs
 
-        # True for a small epsilon addition, false for a clipped network output
+        #: True for a small epsilon addition, false for a clipped network output
         self.smooth_cross_entropy = smooth_cross_entropy
 
-        # check if initialized
+        #: check if initialized
         self.is_initialized = False
 
     def _set_optimizer(self):
@@ -378,7 +378,7 @@ class DefaultModel(object):
             loss += sum(wd)
 
         with tf.name_scope('loss_function'):
-            # cross entropy with weight decay
+            #: cross entropy with weight decay
             self.loss = loss
             tf.summary.scalar('loss', loss)
 
@@ -501,48 +501,48 @@ class Trainer(object):
         :param input_placeholders: list of tf.placeholders, [features, targets]
         """
 
-        # time
+        #: time
         self._time = time.time()
-        # model
+        #: model
         self.model = model
-        # data set
+        #: data set
         self.data_set = data_set
-        # monitoring size
+        #: monitoring size
         self.monitoring_size = monitoring_size
 
-        # tf.session
+        #: tf.session
         self.sess = sess
 
-        # log directory
+        #: log directory
         self.log_dir = log_dir
 
         if input_placeholders is None:
             with tf.name_scope('input'):
-                # input placeholder features
+                #: input placeholder features
                 self.x = tf.placeholder(tf.float32, shape=[None, data_set.feature_number], name='x-input')
 
-                # input placeholder targets
+                #: input placeholder targets
                 self.y_ = tf.placeholder(tf.float32, shape=[None, 1], name="y-input")
         else:
-            # input placeholder features
+            #: input placeholder features
             self.x = input_placeholders[0]
-            # input placeholder targets
+            #: input placeholder targets
             self.y_ = input_placeholders[1]
 
         self.model.initialize(data_set, input_placeholders=[self.x, self.y_])
 
-        # monitoring params for early stopping criterion, loss function, etc
+        #: monitoring params for early stopping criterion, loss function, etc
         self.monitoring_params = self.model.monitoring_params
-        # termination criterion
+        #: termination criterion
         self.termination_criterion = self.model.termination_criterion
 
-        # global_training_parameters
+        #: global_training_parameters
         self.max_epochs = self.model.max_epochs
 
-        # current epoch
+        #: current epoch
         self.current_epoch = 0
 
-        # optimizer
+        #: optimizer
         self.minimizer = self.model.get_minimizer()
 
         self._add_to_basf2_collections()
@@ -550,10 +550,10 @@ class Trainer(object):
         if log_dir is not None:
             self._prepare_tensorboard(log_dir)
 
-        # saver
+        #: saver
         self.saver = tf.train.Saver()
 
-        # best meta graph
+        #: best meta graph
         self.best_meta_graph = None
 
         init_op = tf.global_variables_initializer()
@@ -562,12 +562,12 @@ class Trainer(object):
 
         if save_name is None:
             time_str = time.strftime("%Y%m%d-%H%M%S")
-            # save name
+            #: save name
             self.save_name = os.path.join(os.getcwd(), '_'.join([self.data_set.selection, time_str,
                                                                  'model.ckpt']))
 
         else:
-            # save name
+            #: save name
             self.save_name = save_name
 
         self._prepare_monitoring()
@@ -576,8 +576,9 @@ class Trainer(object):
         """
         checking dataset sizes for evaluation
         """
-
+        #: train_monitor
         self.train_monitor = -1
+        #: valid monitor
         self.valid_monitor = -1
         if self.data_set.train_events > self.monitoring_size:
             self.train_monitor = self.monitoring_size
@@ -592,10 +593,12 @@ class Trainer(object):
         log_dir_train = os.path.join(log_dir, 'train')
         log_dir_test = os.path.join(log_dir, 'test')
 
+        #: train writer
         self.train_writer = tf.summary.FileWriter(log_dir_train, self.sess.graph)
+        #: test writer
         self.test_writer = tf.summary.FileWriter(log_dir_test, self.sess.graph)
 
-        # summary
+        #: summary
         self.merged_summary = tf.summary.merge_all()
 
     def _add_to_basf2_collections(self):
@@ -669,6 +672,7 @@ class Trainer(object):
             summary = self.sess.run(self.merged_summary, feed_dict=train_mon_dict)
             self.train_writer.add_summary(summary, current_epoch)
 
+            #: epoch parameters
             self.epoch_parameters = self.sess.run(self.monitoring_params + [self.merged_summary],
                                                   feed_dict=valid_dict)
             # merged summary will be at last position

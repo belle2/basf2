@@ -49,12 +49,6 @@ namespace Belle2 {
       return m_results;
     };
 
-    /**
-     * Return the "total result" of this event. See the SoftwareTriggerModule for a description on
-     * when what is returned.
-     */
-    int getTotalResult(bool acceptOverridesReject = false) const;
-
     /// Clear all results
     void clear();
 

@@ -14,10 +14,10 @@ from modularAnalysis import *
 
 
 def CharmRareList():
-    charmcuts = '1.78 < M < 1.94'
-    D0_Channels = ['gamma:all gamma:all',
+    charmcuts = '1.78 < M < 1.94 and useCMSFrame(p)>2'
+    D0_Channels = ['gamma:skim gamma:skim',
                    'e+:loose e-:loose',
-                   'mu+:loose mu-:loose pi0:all'
+                   'mu+:loose mu-:loose pi0:skim'
                    ]
 
     D0List = []

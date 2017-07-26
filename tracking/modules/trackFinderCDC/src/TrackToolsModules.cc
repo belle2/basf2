@@ -19,14 +19,8 @@ REG_MODULE(TFCDC_TrackQualityAsserter);
 REG_MODULE(TFCDC_TrackOrienter);
 REG_MODULE(TFCDC_TrackFlightTimeAdjuster);
 REG_MODULE(TFCDC_TrackExporter);
-REG_MODULE(TFCDC_CosmicsTrackMerger);
 
 TFCDC_TrackRejecterModule::TFCDC_TrackRejecterModule()
-  : Super( {"CDCTrackVector"})
-{
-}
-
-TFCDC_CosmicsTrackMergerModule::TFCDC_CosmicsTrackMergerModule()
   : Super( {"CDCTrackVector"})
 {
 }

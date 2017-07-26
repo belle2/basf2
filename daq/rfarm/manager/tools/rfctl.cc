@@ -266,11 +266,13 @@ main(int argc, char** argv)
     if (strcasecmp(av[0], "q") == 0 || strcasecmp(av[0], "quit") == 0) {
       break;
     } else if (strcasecmp(av[0], "start") == 0) {
-      if (ac < 3 || ! isdigit(av[2][0])) {
-        printf("usage: start <node> <run-number>\n");
+      if (ac < 4 || ! isdigit(av[2][0])) {
+        printf("usage: start <node> <exp-number> <run-number>\n");
       } else {
-        int runno = atoi(av[2]);
-        b2nsm_sendreq(av[1], "RC_START", 1, &runno);
+        int pars[2];
+        pars[0] = atoi(av[2]);
+        pars[1] = atoi(av[3]);
+        b2nsm_sendreq(av[1], "RC_START", 2, pars);
       }
     } else if (strcasecmp(av[0], "stop") == 0) {
       if (ac < 4) {
@@ -279,7 +281,7 @@ main(int argc, char** argv)
         int pars[10];
         pars[0] = atoi(av[2]);
         pars[1] = atoi(av[3]);
-        b2nsm_sendreq(av[1], "RC_STOP", 0, pars);
+        b2nsm_sendreq(av[1], "RC_STOP", 2, pars);
       }
     } else if (strcasecmp(av[0], "config") == 0) {
       if (ac < 2) {

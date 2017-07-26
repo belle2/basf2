@@ -114,3 +114,47 @@ void EKLMAlignment::add(EKLMElementID element, int parameter,
   }
 }
 
+void EKLMAlignment::set(EKLMElementID element, int parameter, double value)
+{
+  int sector, segment;
+  EKLMAlignmentData* sectorAlignment, *segmentAlignment;
+  if (element.getType() == EKLMElementID::c_Sector) {
+    sector = element.getSectorNumber();
+    sectorAlignment = getSectorAlignment(sector);
+    if (sectorAlignment == NULL) {
+      B2FATAL("EKLM sector alignment data not found, "
+              "probable error in sector number.");
+    }
+    switch (parameter) {
+      case 1:
+        sectorAlignment->setDx(value);
+        break;
+      case 2:
+        sectorAlignment->setDy(value);
+        break;
+      case 3:
+        sectorAlignment->setDalpha(value);
+        break;
+      default:
+        B2FATAL("Incorrect EKLM alignment parameter " << parameter);
+    }
+  } else {
+    segment = element.getSegmentNumber();
+    segmentAlignment = getSegmentAlignment(segment);
+    if (segmentAlignment == NULL) {
+      B2FATAL("EKLM segment alignment data not found, "
+              "probable error in segment number.");
+    }
+    switch (parameter) {
+      case 1:
+        segmentAlignment->setDy(value);
+        break;
+      case 2:
+        segmentAlignment->setDalpha(value);
+        break;
+      default:
+        B2FATAL("Incorrect EKLM alignment parameter " << parameter);
+    }
+  }
+}
+

@@ -109,10 +109,6 @@ eventtools = [
     '^B-',
     'RecoStats',
     '^B-',
-    'DetectorStatsRec',
-    '^B-',
-    'DetectorStatsSim',
-    '^B-',
 ]
 
 ntupleTree('pituple', 'pi+:all', recoToolsPi)

@@ -27,10 +27,6 @@ PXDInterceptor::PXDInterceptor(const ROIinfo* theROIinfo, double toleranceZ, dou
   m_theROIGeometry.fillPlaneList(toleranceZ, tolerancePhi);
 }
 
-//PXDInterceptor::PXDInterceptor()
-//{
-//}
-
 PXDInterceptor::~PXDInterceptor()
 {
 }
@@ -46,6 +42,11 @@ PXDInterceptor::fillInterceptList(StoreArray<PXDIntercept>* interceptList, const
   for (int i = 0; i < trackList.getEntries(); ++i) { //loop over all tracks
 
     B2DEBUG(1, " %%%%%  track candidate Nr. : " << i + 1);
+
+    if (! trackList[i] ->wasFitSuccessful()) {
+      B2DEBUG(1, "%%%%% Fit not successful! discard this RecoTrack");
+      continue;
+    }
 
     genfit::Track gfTrack = RecoTrackGenfitAccess::getGenfitTrack(*trackList[i]);
 

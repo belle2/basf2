@@ -7,13 +7,13 @@ from basf2 import *
 import ROOT
 from ROOT import Belle2
 
-filepath = 'analysis/tests/mdst5.root'
+filepath = 'analysis/tests/mdst7.root'
 inputFile = Belle2.FileSystem.findFile(filepath)
 if len(inputFile) == 0:
     sys.stderr.write(
         "TEST SKIPPED: input file " +
         filepath +
-        " not found. You can retrieve it via 'wget http://www-ekp.physik.uni-karlsruhe.de/~cpulvermacher/mdst5.root'\n")
+        " not found. You can retrieve it via 'wget http://www-ekp.physik.uni-karlsruhe.de/~tkeck/mdst7.root'\n")
     sys.exit(-1)
 
 path = create_path()
@@ -84,7 +84,7 @@ with tempfile.TemporaryDirectory() as tempdir:
     t = f.Get('nTracksnECLClusters')
     assert bool(t), "nTracksnECLClusters 2d histogram isn't contained in file"
     ntracks_12_2d = []
-    for i in range(52):
+    for i in range(53):
         ntracks_12_2d.append(t.GetBinContent(13, i))
     assert ntracks_12_1d == sum(ntracks_12_2d),\
         "Expected same amount of events with 12 tracks in 1D and 2D histograms got {} {}".format(ntracks_12_1d, sum(ntracks_12_2d))

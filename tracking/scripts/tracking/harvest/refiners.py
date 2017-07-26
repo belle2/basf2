@@ -313,9 +313,17 @@ class Plot2DRefiner(Refiner):
                groupby_value=None,
                **kwds):
 
+        stackby = self.stackby
+        if stackby:
+            stackby_parts = crops[stackby]
+        else:
+            stackby_parts = None
+
         replacement_dict = dict(
             refiner=self,
             module=harvesting_module,
+            stackby=stackby,
+            stacked_by_indication="_" if stackby else "",
             groupby=groupby_part_name,
             groupby_value=groupby_value
         )
@@ -381,7 +389,7 @@ class Plot2DRefiner(Refiner):
                                          y_log=self.y_log,
                                          outlier_z_score=self.outlier_z_score,
                                          allow_discrete=self.allow_discrete,
-                                         stackby=self.stackby)
+                                         stackby=stackby_parts)
 
                     if self.fit:
                         if self.fit_z_score is None:

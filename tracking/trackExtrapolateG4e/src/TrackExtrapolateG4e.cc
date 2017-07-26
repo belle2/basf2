@@ -1558,7 +1558,7 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
       if (track != NULL) {
         track->addRelationTo(hit);
         RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
-        recoTrack->addBKLMHit(hit, 0);
+        recoTrack->addBKLMHit(hit, recoTrack->getNumberOfTotalHits() + 1);
       }
     }
   }
@@ -1611,7 +1611,7 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
         track->addRelationTo(hit);
         RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
         for (unsigned int i = 0; i < eklmAlignmentHits.size(); ++i) {
-          recoTrack->addEKLMHit(eklmAlignmentHits[i], 0);
+          recoTrack->addEKLMHit(eklmAlignmentHits[i], recoTrack->getNumberOfTotalHits() + 1);
         }
       }
     }

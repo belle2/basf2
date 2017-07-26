@@ -384,7 +384,7 @@ def process_dir(
 
     # combine all tests from subdirectories to a new test executable
     if len(env['TEST_FILES']) > 0:
-        test_filename = 'test_' + lib_name
+        test_filename = lib_name + '-unittests'
         test_env = env.Clone()
         test_env['LIBS'] = env['TEST_LIBS']
         test = test_env.Program(os.path.join(test_env['BINDIR'],

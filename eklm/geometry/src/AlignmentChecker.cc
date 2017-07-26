@@ -20,7 +20,7 @@ using namespace Belle2;
 EKLM::AlignmentChecker::AlignmentChecker(bool printOverlaps) :
   m_PrintOverlaps(printOverlaps)
 {
-  int iPlane;
+  int iPlane, iSegmentSupport;
   m_GeoDat = &(EKLM::GeometryData::Instance());
   const EKLMGeometry::SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
@@ -50,9 +50,10 @@ EKLM::AlignmentChecker::AlignmentChecker(bool printOverlaps) :
   for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
     m_SegmentSupport[iPlane - 1] =
       new Polygon2D*[m_GeoDat->getNSegments() + 1];
+    for (iSegmentSupport = 1; iSegmentSupport <= m_GeoDat->getNSegments() + 1;
+         iSegmentSupport++)
+      m_SegmentSupport[iPlane - 1][iSegmentSupport - 1] = NULL;
   }
-  m_LastCheckedSector = NULL;
-  m_LastSectorCheckResult = false;
 }
 
 EKLM::AlignmentChecker::~AlignmentChecker()
@@ -66,7 +67,7 @@ EKLM::AlignmentChecker::~AlignmentChecker()
   for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
     for (iSegmentSupport = 1; iSegmentSupport <= m_GeoDat->getNSegments() + 1;
          iSegmentSupport++) {
-      if (m_LastCheckedSector != NULL)
+      if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1] != NULL)
         delete m_SegmentSupport[iPlane - 1][iSegmentSupport - 1];
     }
     delete[] m_SegmentSupport[iPlane - 1];
@@ -86,8 +87,6 @@ checkSectorAlignment(int endcap, int layer, int sector,
   const EKLMGeometry::SegmentSupportGeometry* segmentSupportGeometry =
     m_GeoDat->getSegmentSupportGeometry();
   EKLMAlignmentData segmentAlignment(0, 0, 0);
-  if (sectorAlignment == m_LastCheckedSector)
-    return m_LastSectorCheckResult;
   for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
     for (iSegmentSupport = 1; iSegmentSupport <= m_GeoDat->getNSegments() + 1;
          iSegmentSupport++) {
@@ -123,7 +122,7 @@ checkSectorAlignment(int endcap, int layer, int sector,
                              CLHEP::rad / Unit::rad) * t;
       for (j = 0; j < 4; j++)
         supportRectangle[j] = t * supportRectangle[j];
-      if (m_LastCheckedSector != NULL)
+      if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1] != NULL)
         delete m_SegmentSupport[iPlane - 1][iSegmentSupport - 1];
       m_SegmentSupport[iPlane - 1][iSegmentSupport - 1] =
         new Polygon2D(supportRectangle, 4);

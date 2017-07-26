@@ -54,8 +54,7 @@ REG_MODULE(SVDDigitizer)
 //-----------------------------------------------------------------
 
 SVDDigitizerModule::SVDDigitizerModule() :
-  Module(), m_rootFile(0), m_histChargeSharing_u(0), m_histChargeSharing_v(0), m_histLorentz_u(
-    0), m_histLorentz_v(0), m_signalDist_u(0), m_signalDist_v(0)
+  Module()
 {
   //Set module properties
   setDescription("Create SVDDigits from SVDSimHits");

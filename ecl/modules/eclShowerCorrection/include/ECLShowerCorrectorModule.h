@@ -20,6 +20,7 @@
 
 #include <ecl/dataobjects/ECLEventInformation.h>
 #include <ecl/dbobjects/ECLShowerCorrectorLeakageCorrection.h>
+#include <ecl/dbobjects/ECLShowerEnergyCorrectionTemporary.h>
 
 // FRAMEWORK
 #include <framework/core/Module.h>
@@ -31,6 +32,8 @@
 // OTHER
 #include <string>
 #include <vector>
+#include <TGraph2D.h>
+
 
 namespace Belle2 {
   namespace ECL {
@@ -63,14 +66,26 @@ namespace Belle2 {
       /** Prepare correction */
       void prepareLeakageCorrections();
 
-      /** Get correction */
+      /** Get correction for BGx0*/
       double getLeakageCorrection(const double theta, const double phi, const double energy, const double background) const;
 
+      /** Get correction for BGx1 (temporary)*/
+      double getLeakageCorrectionTemporary(const double theta, const double energy, const double background);
+
     private:
-      DBObjPtr<ECLShowerCorrectorLeakageCorrection> m_leakageCorrectionPtr;  /**< Leakage corrections from DB */
+      DBObjPtr<ECLShowerCorrectorLeakageCorrection> m_leakageCorrectionPtr_bgx0;  /**< Leakage corrections from DB for BGx0 */
+      DBObjPtr<ECLShowerEnergyCorrectionTemporary>
+      m_leakageCorrectionPtr_phase2bgx1;  /**< Leakage corrections from DB for Phase2 BG15x1.0*/
+      DBObjPtr<ECLShowerEnergyCorrectionTemporary>
+      m_leakageCorrectionPtr_phase3bgx1;  /**< Leakage corrections from DB for Phase3 BG15x1.0 */
 
       const double m_fullBkgdCount = 183.0; /**< Nominal Background at BGx1.0 (MC12) */
 
+      // For temporary BGx1
+      TGraph2D m_leakage_bgx1[2]; // 0: phase2, 1: phase3
+      std::vector<double> m_leakage_bgx1_limits[2];
+
+      // For BGx0 (complicated theta and phi dependency)
       // Vectors with one entry each:
       int m_numOfBfBins; /**< number of background fraction bins; currently only two */
       int m_numOfEnergyBins; /**< number of energy bins */

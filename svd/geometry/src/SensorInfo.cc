@@ -47,14 +47,6 @@ double SensorInfo::getHoleMobility(double E) const
 const TVector3 SensorInfo::getEField(const TVector3& point) const
 {
 
-  /*
-    TVector3 E(0, 0,
-    2.0 * m_depletionVoltage / m_thickness
-    * (point.Z() + 0.5 * m_thickness)
-    - (m_biasVoltage - m_depletionVoltage) / m_thickness);
-  */
-
-
   TVector3 E(0, 0,
              - 2.0 * m_depletionVoltage / m_thickness
              * ((point.Z() + 0.5 * m_thickness) / m_thickness)

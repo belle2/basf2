@@ -213,7 +213,6 @@ void SVDDigitizerModule::initialize()
                               "Strip signals vs. TrueHits, electrons", 100, -400, 400);
     m_signalDist_v->GetXaxis()->SetTitle("V strip position - TrueHit v [um]");
 
-    //new histograms
     m_histMobility_e = new TH1D("h_elecMobility", "electron Mobility",
                                 30, 900, 1200);
     m_histMobility_e->GetXaxis()->SetTitle("Electron Mobility");
@@ -279,7 +278,7 @@ void SVDDigitizerModule::event()
 {
   //Clear sensors and process SimHits
   for (Sensors::value_type& sensor : m_sensors) {
-    //giulia
+
     sensor.second.first.clear();  // u strips
     sensor.second.second.clear(); // v strips
   }
@@ -407,7 +406,7 @@ void SVDDigitizerModule::processHit()
     if (m_currentHit->getGlobalTime() > stopSampling)
       return;
   }
-  //  StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
+
   // Set time of the event
   m_currentTime = m_currentHit->getGlobalTime();
 
@@ -459,7 +458,7 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
 
   //Get references to current sensor/info for ease of use
   const SensorInfo& info = *m_currentSensorInfo;
-  StripSignals& digits = (!have_electrons) ? m_currentSensor->first : m_currentSensor->second; //ok
+  StripSignals& digits = (!have_electrons) ? m_currentSensor->first : m_currentSensor->second;
 
   double distanceToPlane = (have_electrons) ?
                            0.5 * m_sensorThickness - position.Z() :
@@ -470,29 +469,28 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
 
   // Approximation: calculate drift velocity at the point halfway towards
   // the respective sensor surface.
-  TVector3 mean_pos = TVector3(position.X(), position.Y(), position.Z() + 0.5 * distanceToPlane);
+  TVector3 mean_pos(position.X(), position.Y(), position.Z() + 0.5 * distanceToPlane);
 
   // Calculate drift times and widths of charge clouds.
   TVector3 v = info.getVelocity(carrierType, mean_pos);
   if (m_histVelocity_e && have_electrons) m_histVelocity_e->Fill(v.Z()); //Unit::cm/Unit::cm*Unit::eV/Unit::e*Unit::s);
   if (m_histVelocity_h && !have_electrons) m_histVelocity_h->Fill(v.Z()); //Unit::cm/Unit::cm*Unit::eV/Unit::e*Unit::s);
 
-  double driftTime = distanceToPlane / v.Z(); //s
-  if (m_histDriftTime_e && have_electrons) m_histDriftTime_e->Fill(driftTime); //s
-  if (m_histDriftTime_h && !have_electrons) m_histDriftTime_h->Fill(driftTime); //s
+  double driftTime = distanceToPlane / v.Z(); //ns
+  if (m_histDriftTime_e && have_electrons) m_histDriftTime_e->Fill(driftTime); //ns
+  if (m_histDriftTime_h && !have_electrons) m_histDriftTime_h->Fill(driftTime); //ns
 
   TVector3 center = position + driftTime * v; //cm
   double mobility = (have_electrons) ?
                     info.getElectronMobility(info.getEField(mean_pos).Mag()) :
                     info.getHoleMobility(info.getEField(mean_pos).Mag());
 
-  if (m_histMobility_e && have_electrons) m_histMobility_e->Fill(mobility); //cm2/V/s
-  if (m_histMobility_h && !have_electrons) m_histMobility_h->Fill(mobility); //cm2/V/s
+  if (m_histMobility_e && have_electrons) m_histMobility_e->Fill(mobility); //cm2/V/ns
+  if (m_histMobility_h && !have_electrons) m_histMobility_h->Fill(mobility); //cm2/V/ns
 
-  //da verificare:
   double D = Const::kBoltzmann * info.getTemperature() / Unit::e * mobility;
   double sigma = std::max(1.0e-4, sqrt(2.0 * D * driftTime));
-  double tanLorentz = (!have_electrons) ? v.X() / v.Z() : v.Y() / v.Z(); //=0 because v.X() = v.Y() = 0
+  double tanLorentz = (!have_electrons) ? v.X() / v.Z() : v.Y() / v.Z();
 
   B2DEBUG(30, "velocity (" << v.X() / Unit::um << ", " << v.Y() / Unit::um << ", " << v.Z() / Unit::um << ") um/ns");
   B2DEBUG(30, "D = " << D << ", driftTime = " << driftTime / Unit::ns << " ns");
@@ -510,7 +508,7 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   double seedPos = (!have_electrons) ?
                    info.getUCellPosition(seedStrip, vID) :
                    info.getVCellPosition(seedStrip);
-  double geomPitch = (!have_electrons) ? 0.5 * info.getUPitch(center.Y()) : 0.5 * info.getVPitch(); //peter
+  double geomPitch = (!have_electrons) ? 0.5 * info.getUPitch(center.Y()) : 0.5 * info.getVPitch();
   int nCells = (!have_electrons) ? info.getUCells() : info.getVCells();
   std::deque<double> stripCharges;
   std::deque<double> strips; // intermediate strips will be half-integers, like 2.5.

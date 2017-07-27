@@ -81,7 +81,7 @@ bool SpacePointTrackCand::operator== (const SpacePointTrackCand& rhs)
 
   // compare pointers to SpacePoint, if one is not equal, return false
   for (unsigned int iSP = 0; iSP < lhsHits.size(); ++iSP) {
-    if (*lhsHits[iSP] != *rhsHits[iSP]) {
+    if (lhsHits[iSP] != rhsHits[iSP]) {
       B2DEBUG(80, "SpacePoints " << iSP << " do not match");
       return false;
     }

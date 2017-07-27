@@ -160,6 +160,8 @@ def add_unpackers(path, components=None):
     # TOP
     if components is None or 'TOP' in components:
         topunpacker = register_module('TOPUnpacker')
+        topunpacker.param('swapBytes', True)
+        topunpacker.param('dataFormat', 0x0301)
         path.add_module(topunpacker)
         topconverter = register_module('TOPRawDigitConverter')
         topconverter.param('useSampleTimeCalibration', False)

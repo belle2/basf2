@@ -14,6 +14,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
+
 namespace Belle2 {
   /**
    * State object to store one step in the CKF algorithm together with its parent (the state before), the hit

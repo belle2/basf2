@@ -1382,7 +1382,7 @@ namespace Belle2 {
     */
     //Scale LER SAD RLR
     for (int i = 0; i < (int)m_input_LT_SAD_RLR.size(); i++) {
-      float LBG = m_input_LB_SAD_RLR_av[i] + m_input_LC_SAD_RLR_av[i];
+      float LBG = m_input_LB_SAD_RLR_av[i] * Zeff_LB + m_input_LC_SAD_RLR_av[i] * Zeff_LC;
       float BG = LBG * ScaleFacBGav_LER;
       float To = ScaleFacTo_LER * m_input_LT_SAD_RLR[i];
       //if (TMath::IsNaN(To)) To = 0;
@@ -1394,7 +1394,7 @@ namespace Belle2 {
       for (int j = 0; j < 12; j++) {
         LBG = 0;
         if (m_input_LB_SAD_RLR.size() > 0) {
-          LBG = m_input_LB_SAD_RLR[j] + m_input_LC_SAD_RLR[j];
+          LBG = m_input_LB_SAD_RLR[j] * Zeff_LB + m_input_LC_SAD_RLR[j] * Zeff_LC;
           BG += LBG * ScaleFacBG_LER[j];
         }
       }

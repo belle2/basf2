@@ -5,18 +5,13 @@ from basf2 import *
 
 gb2_setuprel = 'build-2017-06-14'
 
-# ---------------------------------------------------------------
-# example of using OpticalGun to simulate laser light sources
-# two sources at the left and right side of prism, outside quartz
-# ---------------------------------------------------------------
-
-# Usage: basf2 t0laserCalMC.py -n 10000
+# Usage: basf2 t0LaserCalMC.py -n 10000
 
 # Create path
 main = create_path()
 
-
 # Optical sources
+
 
 def fiber(
     x,
@@ -84,20 +79,11 @@ main.add_module(simulation)
 topdigi = register_module('TOPDigitizer')
 main.add_module(topdigi)
 
-# Output
-# output = register_module('RootOutput')
-# output.param('outputFileName', 'opticalGun.root')
-# output.param('branchNames', ['TOPDigits', 'TOPSimHits', 'TOPSimPhotons',
-#                                 'TOPDigitsToTOPSimHits', 'TOPSimHitsToTOPSimPhotons'])
-# main.add_module(output)
-
-lasercalib = register_module('TOPLaserCalibrator')
-lasercalib.param('histogramFileName', 't0LaserCalMC.root')
-lasercalib.param('barID', 0)  # if barID==0, use all the bars for MC test
-# lasercalib.param('fitChannel', 142)
-lasercalib.param('fitMethod', 'cb')  # gaus: single gaussian; cb: single Crystal Ball(for MC test); cb2: double Crystal Ball
-lasercalib.param('fitRange', [100, 0.2, 1.0])  # fit range[nbins, xmin, xmax]
-main.add_module(lasercalib)
+# TOP Channel T0 MC
+channelt0mc = register_module('TOPChannelT0MC')
+channelt0mc.param('outputFile', "t0mc.root")
+channelt0mc.param('fitRange', [100, 0, 1])  # fit range[nbins, xmin, xmax]
+main.add_module(channelt0mc)
 
 
 # Show progress of processing

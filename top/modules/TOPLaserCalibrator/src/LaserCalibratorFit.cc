@@ -72,6 +72,7 @@ namespace Belle2 {
       m_hist = hist;
       for (unsigned i = 0; i < hist.size(); i++) {
         m_func.push_back(0);
+        m_maxpos.push_back(0);
       }
     }
 
@@ -90,22 +91,23 @@ namespace Belle2 {
         B2WARNING("Wrong channel!");
         return 0;
       }
-      int hid = channel;
-      if (!m_hist[hid]) {
+      if (!m_hist[channel]) {
         B2WARNING("No Evts. in channel " << channel);
         return 0;
       }
       //require at least 10 evts for each fit
-      if (m_hist[hid]->GetEntries() < 10) {
+      if (m_hist[channel]->GetEntries() < 10) {
         B2WARNING("Too little Evts. for fitting (Evts. < 10)!");
         return 0;
       }
+      m_maxpos[channel] = m_hist[channel]->GetXaxis()->GetBinCenter(m_hist[channel]->GetMaximumBin());
+
       if (m_fitMethod == "gauss") {
-        m_func[hid] = makeGFit(m_hist[hid]);
+        m_func[channel] = makeGFit(channel);
       } else if (m_fitMethod == "cb") {
-        m_func[hid] = makeCBFit(m_hist[hid]);
+        m_func[channel] = makeCBFit(channel);
       } else if (m_fitMethod == "cb2") {
-        m_func[hid] = makeCB2Fit(m_hist[hid], channel, 0);
+        m_func[channel] = makeCB2Fit(channel, 0);
       } else {
         B2WARNING("No matched fit method!");
         return 0;
@@ -120,6 +122,9 @@ namespace Belle2 {
       auto otree = new TTree("fits", "fitted times");
 
       unsigned channel = 0;
+      double maxpos = 0;
+
+      otree->Branch("maxpos", &maxpos, "maxpos/D");
 
       if (m_fitMethod == "gauss") {
         double parms[3];
@@ -130,10 +135,11 @@ namespace Belle2 {
         otree->Branch("reso", &(parms[2]), "reso/D");
 
         for (auto& f : m_func) {
-          channel++;
+          maxpos = m_maxpos[channel];
           if (f) {
             f->GetParameters(parms);
             otree->Fill();
+            channel++;
           }
         }
       } else if (m_fitMethod == "cb2") {
@@ -152,10 +158,11 @@ namespace Belle2 {
         otree->Branch("time2", &time2, "time2/D");
 
         for (auto& f : m_func) {
-          channel++;
+          maxpos = m_maxpos[channel];
           if (f) {
             f->GetParameters(parms);
             otree->Fill();
+            channel++;
           }
         }
       } else if (m_fitMethod == "cb") {
@@ -169,10 +176,11 @@ namespace Belle2 {
         otree->Branch("n_CB", &(parms[4]), "n_CB/D");
 
         for (auto& f : m_func) {
-          channel++;
+          maxpos = m_maxpos[channel];
           if (f) {
             f->GetParameters(parms);
             otree->Fill();
+            channel++;
           }
         }
       } else {
@@ -191,8 +199,9 @@ namespace Belle2 {
     }
 
 // single Gaussian fit
-    TF1* LaserCalibratorFit::makeGFit(TH1F* h)
+    TF1* LaserCalibratorFit::makeGFit(unsigned channel)
     {
+      TH1F* h = m_hist[channel];
       h->SetAxisRange(m_xmin, m_xmax);
       double m = h->GetMean();
       double w = h->GetRMS();
@@ -203,13 +212,14 @@ namespace Belle2 {
       func->SetNpx(1000);
       h->Fit("gaus", "Q", "", m - w, m + w);
       func = h->GetFunction("gaus");
-
+      m_fitT = parms[1];
       return func;
     }
 
 // single Crystal Ball fit
-    TF1* LaserCalibratorFit::makeCBFit(TH1F* h)
+    TF1* LaserCalibratorFit::makeCBFit(unsigned channel)
     {
+      TH1F* h = m_hist[channel];
       h->SetAxisRange(m_xmin, m_xmax);
       auto func = new TF1("fcnCB", fcnCB, m_xmin, m_xmax, 5);
 
@@ -235,12 +245,18 @@ namespace Belle2 {
       func->SetParLimits(4, 0, 10);
 
       h->Fit(func, "Q", "");
+      if (fabs(m_maxpos[channel] - parms[1]) < parms[2]) {
+        m_fitT = parms[1];
+      } else {
+        m_fitT = m_maxpos[channel];
+      }
       return func;
     }
 
 // double Crystal Ball fit
-    TF1* LaserCalibratorFit::makeCB2Fit(TH1F* h, unsigned channel, bool minOut)
+    TF1* LaserCalibratorFit::makeCB2Fit(unsigned channel, bool minOut)
     {
+      TH1F* h = m_hist[channel];
       h->SetAxisRange(m_xmin, m_xmax);
       auto func = new TF1("fcnCB2", fcnCB2, m_xmin, m_xmax, 8);
 
@@ -285,6 +301,7 @@ namespace Belle2 {
       } else {
         h->Fit(func);
       }
+      m_fitT = parms[1];
       return func;
     }
   } // TOP namespace

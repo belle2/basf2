@@ -98,19 +98,29 @@ namespace Belle2 {
        */
       std::string getFitMethod() const {return m_fitMethod;}
 
+      /**
+       * get the center positon of hist max bin
+       */
+      std::vector<double> getMaxPos()  {return m_maxpos;}
+
+      /**
+       * get the center positon of hist max bin
+       */
+      double getFitT()  {return m_fitT;}
+
     private:
 
       /**
        * Fit process using single gaussian function
        * @param h  hist in the fit
        */
-      TF1* makeGFit(TH1F* h);
+      TF1* makeGFit(unsigned channel);
 
       /**
        * Fit process using single Crystal Ball fuction
        * @param h  hist in the fit
        */
-      TF1* makeCBFit(TH1F* h);
+      TF1* makeCBFit(unsigned channel);
 
       /**
        * Fit process using double Crystal Ball fuction
@@ -118,11 +128,13 @@ namespace Belle2 {
        * @param minOut  minimum printing
        * need more studies
        */
-      TF1* makeCB2Fit(TH1F* h, unsigned channel, bool minOut);
+      TF1* makeCB2Fit(unsigned channel, bool minOut);
 
       unsigned m_moduleID = 0; /**< one moduleID/slot */
+      std::vector<double> m_maxpos; /**< center positon of hist max bin */
       double m_xmin = 0; /**< fitting low-edge */
       double m_xmax = 0; /**< fitting upper-edge */
+      double m_fitT; /**< mean position after fit */
       std::vector<TH1F*> m_hist; /**< time hist of 512 channels */
       std::vector<TF1*> m_func; /**< fitting function */
       std::string m_fitMethod; /**< fitting method */

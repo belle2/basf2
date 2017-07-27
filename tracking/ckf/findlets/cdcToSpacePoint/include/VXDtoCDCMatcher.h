@@ -19,6 +19,8 @@
 
 #include <framework/core/ModuleParamList.h>
 
+
+using namespace Belle2::TrackFindingCDC;
 namespace Belle2 {
   class VXDtoCDCMatcher : public TrackFindingCDC::ProcessingSignalListener {
   public:

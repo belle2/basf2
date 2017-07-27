@@ -39,6 +39,8 @@ namespace Belle2 {
     std::string m_vxdRecoTracksStoreArrayName;
     /// Name of the output StoreArray
     std::string m_recoTracksStoreArrayName;
+    /// Do only use fitted tracks, when no match is found
+    bool m_useOnlyFittedTracksInSingles = true;
 
     /// Store Array of the input tracks
     StoreArray<RecoTrack> m_cdcRecoTracks;

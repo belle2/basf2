@@ -64,6 +64,8 @@ RelatedTracksCombinerModule::RelatedTracksCombinerModule() :
   addParam("VXDRecoTracksStoreArrayName", m_vxdRecoTracksStoreArrayName , "Name of the input VXD StoreArray.",
            m_vxdRecoTracksStoreArrayName);
   addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "Name of the output StoreArray.", m_recoTracksStoreArrayName);
+  addParam("useOnlyFittedTracksInSingles", m_useOnlyFittedTracksInSingles, "Do only use not fitted tracks, when no match is found.",
+           m_useOnlyFittedTracksInSingles);
 }
 
 void RelatedTracksCombinerModule::initialize()
@@ -103,8 +105,10 @@ void RelatedTracksCombinerModule::event()
       newMergedTrack->addHitsFromRecoTrack(vxdRecoTrack);
       newMergedTrack->addHitsFromRecoTrack(&cdcRecoTrack, newMergedTrack->getNumberOfTotalHits());
     } else {
-      RecoTrack* newTrack = m_recoTracks.appendNew(cdcPosition, cdcMomentum, cdcCharge);
-      newTrack->addHitsFromRecoTrack(&cdcRecoTrack);
+      if (not m_useOnlyFittedTracksInSingles or cdcRecoTrack.wasFitSuccessful()) {
+        RecoTrack* newTrack = m_recoTracks.appendNew(cdcPosition, cdcMomentum, cdcCharge);
+        newTrack->addHitsFromRecoTrack(&cdcRecoTrack);
+      }
     }
   }
 
@@ -118,8 +122,10 @@ void RelatedTracksCombinerModule::event()
     extractTrackState(vxdRecoTrack, vxdPosition, vxdMomentum, vxdCharge);
 
     if (not cdcRecoTrack) {
-      RecoTrack* newTrack = m_recoTracks.appendNew(vxdPosition, vxdMomentum, vxdCharge);
-      newTrack->addHitsFromRecoTrack(&vxdRecoTrack);
+      if (not m_useOnlyFittedTracksInSingles or vxdRecoTrack.wasFitSuccessful()) {
+        RecoTrack* newTrack = m_recoTracks.appendNew(vxdPosition, vxdMomentum, vxdCharge);
+        newTrack->addHitsFromRecoTrack(&vxdRecoTrack);
+      }
     }
   }
 }

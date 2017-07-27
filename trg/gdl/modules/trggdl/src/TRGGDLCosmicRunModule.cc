@@ -28,7 +28,7 @@ void
 TRGGDLCosmicRunModule::initialize()
 {
   StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
-  StoreArray<TRGECLTrg>::registerPersistent();
+  StoreArray<TRGECLTrg>::required();
 }
 
 void

@@ -129,17 +129,17 @@ namespace Belle2 {
     double getAduEquivalentU() const {return m_aduEquivalentU;}
     /** Return ADU equivalent for V strips */
     double getAduEquivalentV() const {return m_aduEquivalentV; }
-    /** Return electronic noise in e- for u (short) strips */
+    /** Return electronic noise in e- for u strips */
     double getElectronicNoiseU() const {return m_electronicNoiseU; }
-    /** Return electronic noise in e- for v (long) strips */
+    /** Return electronic noise in e- for v strips */
     double getElectronicNoiseV() const {return m_electronicNoiseV; }
     /** Return ADU equivalent for U strips in Sbw barrel sensor */
     double getAduEquivalentSbwU() const {return m_aduEquivalentSbwU;}
     /** Return ADU equivalent for V strips in Sbw barrel sensor */
     double getAduEquivalentSbwV() const {return m_aduEquivalentSbwV; }
-    /** Return electronic noise in e- for u (short) strips in bw barrel sensors */
+    /** Return electronic noise in e- for u strips in bw barrel sensors */
     double getElectronicNoiseSbwU() const {return m_electronicNoiseSbwU; }
-    /** Return electronic noise in e- for v (long) strips in bw barrel sensors */
+    /** Return electronic noise in e- for v strips in bw barrel sensors */
     double getElectronicNoiseSbwV() const {return m_electronicNoiseSbwV; }
 
   private:
@@ -153,25 +153,25 @@ namespace Belle2 {
     double m_depletionVoltage;
     /** The bias voltage on the sensor */
     double m_biasVoltage;
-    /** The backplane capacitance/cm for/g U-side strips */
+    /** The backplane capacitance/cm for U-side strips */
     double m_backplaneCapacitanceU;
-    /** The interstrip capacitance/cm for/g U-side strips. */
+    /** The interstrip capacitance/cm for U-side strips. */
     double m_interstripCapacitanceU;
-    /** The coupling capacitance/cm for/g U-side strips. */
+    /** The coupling capacitance/cm for U-side strips. */
     double m_couplingCapacitanceU;
-    /** The backplane capacitance/cm for/g V-side strips. */
+    /** The backplane capacitance/cm for V-side strips. */
     double m_backplaneCapacitanceV;
-    /** The interstrip capacitance/cm for/g V-side strips. */
+    /** The interstrip capacitance/cm for V-side strips. */
     double m_interstripCapacitanceV;
-    /** The coupling capacitance/cm for/g V-side strips. */
+    /** The coupling capacitance/cm for V-side strips. */
     double m_couplingCapacitanceV;
     /** ADU equivalent (electrons/ADU) for U strips */
     double m_aduEquivalentU;
     /** ADU equivalent (electrons/ADU) for V strips */
     double m_aduEquivalentV;
-    /** The electronic noise for U (short, n-side) strips. */
+    /** The electronic noise for U strips. */
     double m_electronicNoiseU;
-    /** The electronic noise for V (long, p-side) strips. */
+    /** The electronic noise for V strips. */
     double m_electronicNoiseV;
     /** ADU equivalent (electrons/ADU) for U strips, Sbw barrel sensors */
     double m_aduEquivalentSbwU;
@@ -182,7 +182,7 @@ namespace Belle2 {
     /** The electronic noise for V strips in bw barrel (non-Origami) sensors. */
     double m_electronicNoiseSbwV;
 
-    ClassDef(SVDSensorInfoPar, 7);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(SVDSensorInfoPar, 7);
   };
 } // end of namespace Belle2
 

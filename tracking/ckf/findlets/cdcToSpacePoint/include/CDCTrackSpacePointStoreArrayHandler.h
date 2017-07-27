@@ -29,8 +29,8 @@ namespace Belle2 {
    *  * to write back the found VXD tracks only and the merged tracks (CDC + VXD) (apply)
    */
   template<class AResultObject>
-  class CDCTrackSpacePointStoreArrayHandler : public TrackFindingCDC::Findlet<RecoTrack* const, const AResultObject> {
-    using Super = TrackFindingCDC::Findlet<RecoTrack* const, const AResultObject>;
+  class CDCTrackSpacePointStoreArrayHandler : public TrackFindingCDC::Findlet<const AResultObject> {
+    using Super = TrackFindingCDC::Findlet<const AResultObject>;
 
   public:
     /// Expose the parameters of the findlet
@@ -41,16 +41,7 @@ namespace Belle2 {
                                     m_param_exportTracks);
 
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "VXDRecoTrackStoreArrayName"), m_param_vxdRecoTrackStoreArrayName,
-                                    "StoreArray name of the VXD Track Store Array", m_param_vxdRecoTrackStoreArrayName);
-
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "mergedRecoTrackStoreArrayName"),
-                                    m_param_mergedRecoTrackStoreArrayName,
-                                    "StoreArray name of the merged Track Store Array",
-                                    m_param_mergedRecoTrackStoreArrayName);
-
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "exportAlsoMergedTracks"), m_param_exportAlsoMergedTracks,
-                                    "Export also the merged tracks into a StoreArray.",
-                                    m_param_exportAlsoMergedTracks);
+                                    "StoreArray name of the output VXD Track Store Array", m_param_vxdRecoTrackStoreArrayName);
 
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "debuggingRelationsTo"), m_param_debuggingRelationsTo,
                                     "Add a relation to the CDC tracks given in this store array name (or none to not add relations).",
@@ -65,11 +56,6 @@ namespace Belle2 {
       m_vxdRecoTracks.registerInDataStore(m_param_vxdRecoTrackStoreArrayName);
       RecoTrack::registerRequiredRelations(m_vxdRecoTracks);
 
-      if (m_param_exportAlsoMergedTracks) {
-        m_mergedRecoTracks.registerInDataStore(m_param_mergedRecoTrackStoreArrayName);
-        RecoTrack::registerRequiredRelations(m_mergedRecoTracks);
-      }
-
       if (not m_param_debuggingRelationsTo.empty()) {
         StoreArray<RecoTrack> cdcRecoTracks(m_param_debuggingRelationsTo);
         cdcRecoTracks.registerRelationTo(m_vxdRecoTracks);
@@ -80,8 +66,7 @@ namespace Belle2 {
     /**
      * Write back the found tracks (VXD only and the merged ones).
      */
-    void apply(const std::vector<RecoTrack*>& cdcRecoTrackVector,
-               const std::vector<AResultObject>& cdcTracksWithMatchedSpacePoints) override
+    void apply(const std::vector<AResultObject>& cdcTracksWithMatchedSpacePoints) override
     {
       // Create new VXD tracks out of the found VXD space points and store them into a store array
       for (const auto& cdcTrackWithMatchedSpacePoints : cdcTracksWithMatchedSpacePoints) {
@@ -108,32 +93,6 @@ namespace Belle2 {
         if (not m_param_debuggingRelationsTo.empty()) {
           cdcRecoTrack->addRelationTo(newVXDOnlyTrack);
         }
-
-        if (m_param_exportAlsoMergedTracks) {
-          // Add merged VXD-CDC-track
-          RecoTrack* newMergedTrack = addNewTrack(vxdPosition, trackMomentum, trackCharge, matchedSpacePoints,
-                                                  m_mergedRecoTracks);
-          newMergedTrack->addHitsFromRecoTrack(cdcRecoTrack, newMergedTrack->getNumberOfTotalHits());
-        }
-      }
-
-      if (m_param_exportAlsoMergedTracks) {
-        for (auto& cdcTrack : cdcRecoTrackVector) {
-          const auto& sameSeed = [&cdcTrack](const AResultObject & result) {
-            return result.getSeed() == cdcTrack;
-          };
-          if (not TrackFindingCDC::any(cdcTracksWithMatchedSpacePoints, sameSeed)) {
-            // This result has no matching VXD track, so we only export the CDC part
-            TVector3 cdcPosition;
-            TVector3 cdcMomentum;
-            int cdcCharge;
-
-            extractTrackState(*cdcTrack, cdcPosition, cdcMomentum, cdcCharge);
-
-            RecoTrack* newCDCOnlyTrack = addNewTrack(cdcPosition, cdcMomentum, cdcCharge, {}, m_mergedRecoTracks);
-            newCDCOnlyTrack->addHitsFromRecoTrack(cdcTrack);
-          }
-        }
       }
     }
 
@@ -144,17 +103,11 @@ namespace Belle2 {
     /** StoreArray name of the VXD Track Store Array */
     std::string m_param_vxdRecoTrackStoreArrayName = "CKFVXDRecoTracks";
     /** StoreArray name of the merged Track Store Array */
-    std::string m_param_mergedRecoTrackStoreArrayName = "MergedRecoTracks";
-    /** StoreArray name of the merged Track Store Array */
     std::string m_param_debuggingRelationsTo = "CDCRecoTracks";
-    /** Export also the merged tracks */
-    bool m_param_exportAlsoMergedTracks = true;
 
     // Store Arrays
     /// VXD Reco Tracks Store Array
     StoreArray<RecoTrack> m_vxdRecoTracks;
-    /// Merged Reco Tracks Store Array
-    StoreArray<RecoTrack> m_mergedRecoTracks;
 
     /// Helper function to get the seed or the measured state on plane from a track
     void extractTrackState(const RecoTrack& recoTrack,

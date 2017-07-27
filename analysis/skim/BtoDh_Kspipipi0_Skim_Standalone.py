@@ -17,18 +17,33 @@ from stdCharm import *
 
 set_log_level(LogLevel.INFO)
 
-filelist = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/' +
-    'prod00000796/s00/e0000/4S/r00000/ccbar/sub00/mdst_0001*.root'
-]
+
+if len(sys.argv) > 1:
+    bkgType = sys.argv[1]
+    f = open('inputFiles/' + bkgType + '.txt', 'r')
+    fileList = f.read()
+    f.close()
+    if not os.path.isfile(fileList[:-1]):
+        sys.exit('Could not find root file : ' + fileList[:-1])
+    print('Running over file ' + fileList[:-1])
+elif len(sys.argv) == 1:
+    fileList = \
+        ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000001/s00/e0001/4S/r00001/mixed/sub00/' +
+         'mdst_000001_prod00000001_task00000001.root'
+
+         ]
+    bkgType = 'notSpecified'
 
 
-inputMdstList('default', filelist)
+if len(sys.argv) > 1:
+    inputMdstList('default', fileList[:-1])
+elif len(sys.argv) == 1:
+    inputMdstList('default', fileList)
+
 
 loadStdCharged()
-loadStdPi0()
 loadStdKS()
-
+loadStdSkimPi0()
 fillParticleList('pi+:all', '')
 fillParticleList('K+:all', '')
 
@@ -38,7 +53,7 @@ from BtoDh_Kspipipi0_List import *
 
 loadD()
 BtoDhList = BsigToDhToKspipipi0List()
-skimOutputUdst('BtoDh_Kspipipi0_skim_MC7_BG_PhaseIII', BtoDhList)
+skimOutputUdst('outputFiles/BtoDh_Kspipipi0_' + bkgType, BtoDhList)
 summaryOfLists(BtoDhList)
 
 process(analysis_main)

@@ -42,8 +42,10 @@
 //  20140922  1942 nodtim fix
 //  20150520  1943 destroyconn fix [for anonymous and for sys.ready]
 //  20150521  1944 new protocol version, master recoonect fix
+//  20160420  1946 suppress debug output
+//  20170613  1947 protect against bad USRCPYMEM from misconnected nodes
 
-#define NSM_DAEMON_VERSION   1944 /* daemon   version 1.9.44 */
+#define NSM_DAEMON_VERSION   1947
 // ----------------------------------------------------------------------
 
 // -- include files -----------------------------------------------------
@@ -128,6 +130,10 @@ SOCKAD_IN   nsmd_sockad;
 char        nsmd_host[1024];
 const char* nsmd_logdir = ".";
 FILE*       nsmd_logfp = stdout;
+#define NSMD_DBGAFTER 8
+#define NSMD_DBGBEFORE 16
+char        nsmd_dbgbuf[NSMD_DBGBEFORE][256];
+int         nsmd_dbgcnt = 0;
 int         nsmd_shmsysid = -1;
 int         nsmd_shmmemid = -1;
 const char* nsmd_usrnam = 0; // default is "nsm", set in nsmd_main
@@ -136,7 +142,6 @@ NSMsys*     nsmd_sysp = 0;
 NSMmem*     nsmd_memp = 0;
 
 static int nsmd_init_count = NSMD_INITCOUNT_FIRST;
-
 
 /*
   Default is to store twice the largest packet, but:
@@ -253,6 +258,8 @@ static NSMcmdtbl_t nsmd_cmdtbl[] = {
 #define WARN  nsmd_warn
 #define ERRO  nsmd_error
 #define ASRT  nsmd_assert
+
+#define lengthof(a) (sizeof(a)/sizeof((a)[0]))
 
 #define VSNPRINTF(buf, ap, fmt) \
   va_start(ap, fmt); vsnprintf(buf, sizeof(buf), fmt, ap); va_end(ap)
@@ -702,6 +709,29 @@ nsmd_print1(const char* fmt, ...)
   va_list ap;
   VFPRINTF(nsmd_logfp, ap, fmt);
 }
+// -- nsmd_flushdbg -----------------------------------------------------
+//    flushdbg
+// ----------------------------------------------------------------------
+void
+nsmd_flushdbg()
+{
+  if (nsmd_dbgcnt > NSMD_DBGAFTER) {
+    int ifirst = 0;
+    int imax = nsmd_dbgcnt - NSMD_DBGAFTER;
+    if (imax > NSMD_DBGBEFORE) {
+      fprintf(nsmd_logfp, "(skipping %d lines)\n", imax - NSMD_DBGBEFORE);
+      imax = NSMD_DBGBEFORE;
+      ifirst = (imax % NSMD_DBGAFTER);
+    }
+
+    for (int i = 0; i < imax; i++) {
+      const char* p = nsmd_dbgbuf[(ifirst + i) % NSMD_DBGAFTER];
+      fputs(p, nsmd_logfp);
+      fputc('\n', nsmd_logfp);
+    }
+  }
+  nsmd_dbgcnt = 0;
+}
 // -- nsmd_logtime ------------------------------------------------------
 //    logtime
 // ----------------------------------------------------------------------
@@ -720,6 +750,7 @@ nsmd_logtime(char* buf)
     int dver = NSM_DAEMON_VERSION;
     int pver = NSM_PROTOCOL_VERSION;
     lastday = cur->tm_yday;
+    nsmd_flushdbg();
     nsmd_reopenlog();
     nsmd_print1("%s%s\n",
                 "----------------------------------",
@@ -745,9 +776,11 @@ nsmd_logtime(char* buf)
 //    printlog
 // ----------------------------------------------------------------------
 void
-nsmd_printlog(const char* prompt, const char* str)
+nsmd_printlog(const char* prompt, const char* str, int isdbg = 0)
 {
   char datebuf[32];
+
+  if (! isdbg) nsmd_flushdbg();
 
   nsmd_logtime(datebuf);
   const char* p = str;
@@ -804,7 +837,24 @@ nsmd_dbg(const char* fmt, ...)
   char buf[4096];
   va_list ap;
   VSNPRINTF(buf, ap, fmt);
-  nsmd_printlog("DBG: ", buf);
+  if (nsmd_dbgcnt < NSMD_DBGAFTER) {
+    nsmd_printlog("DBG: ", buf, /* isdbg */ 1);
+  } else {
+    int i = (nsmd_dbgcnt - NSMD_DBGAFTER) % NSMD_DBGBEFORE;
+    char* p = nsmd_dbgbuf[i];
+    int siz = sizeof(nsmd_dbgbuf[0]);
+    // strlen(p) = 13 ("%02d:%02d:%02d.%03d ")
+    nsmd_logtime(p);
+    if (nsmd_dbgcnt == 0) {    // maybe changed by nsmd_logtime()
+      nsmd_printlog("DBG: ", buf, /* isdbg */ 1);
+      return;
+    }
+    strcpy(p + 13, "DBG: ");
+    strncpy(p + 18, buf, siz - 18);
+    p[siz - 1] = 0;                  // null-terminate if longer than siz
+    if (p = strchr(p, '\n')) * p = 0; // no multiple lines
+  }
+  nsmd_dbgcnt++;
 }
 // -- nsmd_log ----------------------------------------------------------
 //    usual log message in printf style
@@ -3323,8 +3373,46 @@ nsmd_do_usrcpymem(NSMcon& con, NSMdmsg& dmsg)
 {
   int datid  = dmsg.pars[0];
   int offset = dmsg.pars[1];
+  uint32_t fromip = dmsg.from;
+  NSMsys& sys = *nsmd_sysp;
+  int owner = -1;
+  int dtpos = -1;
+  int dtsiz = 0;
+  int badcpymem = 0;
+  int nodip = 0;
 
-  nsmd_fmtcpy((char*)dmsg.datap, datid, 1, offset, dmsg.len);
+  if (datid >= 0) {
+    NSMdat& dat = sys.dat[datid];
+    owner = (int32_t)ntohs(dat.owner);
+    dtpos = (int32_t)ntohl(dat.dtpos);
+    dtsiz = (int32_t)ntohs(dat.dtsiz);
+  }
+
+  if (owner == -1 || dtpos == -1 || dtsiz < dmsg.len + offset) {
+    badcpymem = 1;
+  } else {
+    NSMnod& nod = sys.nod[owner];
+    if (fromip != nod.ipaddr) badcpymem = 1;
+    nodip = nod.ipaddr;
+  }
+  if (badcpymem) {
+    static int nbadip = 0;
+    static uint32_t badip[256];
+    int i = 0;
+    if (nbadip < lengthof(badip)) {
+      for (i = 0; i < nbadip && fromip != badip[i]; i++)
+        ;
+      if (i == nbadip) {
+        badip[nbadip++] = fromip;
+        LOG("bad USRCPYMEM(dat=%d len=%d off=%d) from ip=%s (dbg owner=%d dtpos=%d dtsiz=%d fromip=%08x nodip=%08x)\n",
+            datid, dmsg.len, offset, ADDR_STR(fromip),
+            owner, dtpos, dtsiz, fromip, nodip
+           );
+      }
+    }
+  } else {
+    nsmd_fmtcpy((char*)dmsg.datap, datid, 1, offset, dmsg.len);
+  }
 }
 // -- nsmd_do_ackdaemon -------------------------------------------------
 //

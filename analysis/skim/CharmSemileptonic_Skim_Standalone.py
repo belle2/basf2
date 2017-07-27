@@ -12,12 +12,26 @@ from basf2 import *
 from modularAnalysis import *
 from stdFSParticles import *
 
-filelist = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/' +
-    'prod00000972/s00/e0000/4S/r00000/ccbar/sub00/mdst_001678_prod00000972_task00001680.root'
-]
 
-inputMdstList('default', filelist)
+if len(sys.argv) > 1:
+    bkgType = sys.argv[1]
+    f = open('inputFiles/' + bkgType + '.txt', 'r')
+    fileList = f.read()
+    f.close()
+    if not os.path.isfile(fileList[:-1]):
+        sys.exit('Could not find root file : ' + fileList[:-1])
+    print('Running over file ' + fileList[:-1])
+elif len(sys.argv) == 1:
+    fileList = [
+        '/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/prod00000962/s00/e0000/4S/r00000/mixed/sub00/' +
+        'mdst_001724_prod00000962_task00001729.root']
+    bkgType = 'notSpecified'
+
+if len(sys.argv) > 1:
+    inputMdstList('default', fileList[:-1])
+elif len(sys.argv) == 1:
+    inputMdstList('default', fileList)
+
 
 stdPi()
 stdK()
@@ -33,7 +47,7 @@ fillParticleList('mu+:std', 'muid > 0.1 and chiProb > 0.001 and p > 0.25', True,
 # CSL Skim
 from CharmSemileptonic_List import *
 CSLList = CharmSemileptonicList()
-skimOutputUdst('CharmSL_Standalone', CSLList)
+skimOutputUdst('outputFiles/CharmSemileptonic_' + bkgType, CSLList)
 summaryOfLists(CSLList)
 
 process(analysis_main)

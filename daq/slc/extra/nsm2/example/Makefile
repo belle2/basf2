@@ -2,7 +2,7 @@
 #  Makefile for NSM2 example clients
 #
 
-ALL = client client_wait master readdat anonymous bridge nsmget
+ALL = client client_wait master readdat anonymous bridge
 LIBS      = 
 CC        = gcc
 CXX       = g++

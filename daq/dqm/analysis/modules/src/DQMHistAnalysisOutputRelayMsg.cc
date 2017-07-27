@@ -65,9 +65,6 @@ void DQMHistAnalysisOutputRelayMsgModule::event()
   while ((obj = (TObject*)nextkey())) {
     if (obj->IsA()->InheritsFrom("TCanvas")) {
       TCanvas* c = (TCanvas*) obj;
-//       printf ( "Canvas Obj = %s\n", obj->GetName());
-//       c->ls();
-//       c->Draw();
       mess.Reset();
       mess.WriteObject(c);     // write object in message buffer
       m_sock->Send(mess);

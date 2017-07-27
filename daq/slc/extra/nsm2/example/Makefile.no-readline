@@ -2,7 +2,7 @@
 #  Makefile for NSM2 example clients without using readline library
 #
 
-ALL = client client_wait master readdat bridge
+ALL = client client_wait master readdat anonymous bridge nsmget
 LIBS      = 
 CC        = gcc
 CXX       = g++
@@ -34,6 +34,12 @@ client_wait: client_wait.o $(LIBS)
 
 readdat: readdat.o $(LIBS)
 	$(CXX) -o readdat $(CFLAGS) readdat.o $(LIBS)
+
+nsmget: nsmget.o $(LIBS) ../nsmget/libnsmget.o
+	$(CXX) -o nsmget $(CXXFLAGS) nsmget.o $(LIBS) ../nsmget/libnsmget.o
+
+anonymous: anonymous.o $(LIBS)
+	$(CXX) -o anonymous $(CFLAGS) anonymous.o $(LIBS)
 
 master: master.o $(LIBS)
 	$(CXX) -o master $(CFLAGS) master.o $(LIBS)

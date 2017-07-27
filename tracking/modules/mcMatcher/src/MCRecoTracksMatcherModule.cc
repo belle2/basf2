@@ -201,7 +201,7 @@ MCRecoTracksMatcherModule::MCRecoTracksMatcherModule()
            m_param_minimalEfficiency,
            "Minimal efficiency of a MCTrack to be considered matchable to a PRTrack. "
            "This number encodes which fraction of the true hits must at least be in the reconstructed track. "
-           "The default 0.05 suggests that at least 20% of the true hits should have been picked up.",
+           "The default 0.05 suggests that at least 5% of the true hits should have been picked up.",
            0.05);
 }
 

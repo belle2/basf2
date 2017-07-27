@@ -86,10 +86,11 @@ def add_cosmics_reconstruction(
         components=None,
         pruneTracks=True,
         skipGeometryAdding=False,
-        eventTimingExtraction=False,
+        eventTimingExtraction=True,
         addClusterExpertModules=True,
         merge_tracks=True,
-        use_readout_position=False,
+        top_in_counter=False,
+        data_taking_period='gcr2017',
         use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
@@ -97,29 +98,37 @@ def add_cosmics_reconstruction(
     plus the modules to calculate the software trigger cuts.
 
     :param path: Add the modules to this path.
+    :param data_taking_period: The cosmics generation will be added using the
+           parameters, that where used in this period of data taking. The periods can be found in cdc/cr/__init__.py.
+
     :param components: list of geometry components to include reconstruction for, or None for all components.
     :param pruneTracks: Delete all hits except the first and last of the tracks after the dEdX modules.
     :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
         determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
         all (but you will have to add it on your own then).
+
     :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
         FullGridTrackTimeExtraction modules.
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
+
     :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
-    :param use_readout_position: flag to turn off the usage of the readout position in the track time estimator
+
+    :param top_in_counter: time of propagation from the hit point to the PMT in the trigger counter is subtracted
+           (assuming PMT is put at -z of the counter).
     """
 
     # Add cdc tracking reconstruction modules
     add_cr_tracking_reconstruction(path,
                                    components=components,
-                                   pruneTracks=False,
-                                   skipGeometryAdding=skipGeometryAdding,
-                                   eventTimingExtraction=eventTimingExtraction,
+                                   prune_tracks=False,
+                                   skip_geometry_adding=skipGeometryAdding,
+                                   event_time_extraction=eventTimingExtraction,
                                    merge_tracks=merge_tracks,
-                                   use_readout_position=use_readout_position,
+                                   data_taking_period=data_taking_period,
+                                   top_in_counter=top_in_counter,
                                    use_second_cdc_hits=use_second_cdc_hits)
 
     # Add further reconstruction modules

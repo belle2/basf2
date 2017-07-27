@@ -52,6 +52,7 @@ ECLDQMModule::ECLDQMModule() : HistoModule()
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("histogramDirectoryName", m_histogramDirectoryName,
            "histogram directory in ROOT file", string("ECL"));
+  addParam("EnergyUpperThr", m_EnergyUpperThr, "Upper threshold of energy deposition in event, [GeV]", 1.5);
 
 }
 
@@ -75,45 +76,57 @@ void ECLDQMModule::defineHisto()
 
   h_cid = new TH1F("cid", "Crystal ID", 8736, 1, 8737);
   h_cid->GetXaxis()->SetTitle("Cell ID");
-
-  h_cid_Thr2MeV = new TH1F("cid_Thr2MeV", "Crystal ID (Thr = 2 MeV)", 8736, 1, 8737);
-  h_cid_Thr2MeV->GetXaxis()->SetTitle("Cell ID");
+  h_cid->SetOption("LIVE");
 
   h_cid_Thr5MeV = new TH1F("cid_Thr5MeV", "Crystal ID (Thr = 5 MeV)", 8736, 1, 8737);
   h_cid_Thr5MeV->GetXaxis()->SetTitle("Cell ID");
+  h_cid_Thr5MeV->SetOption("LIVE");
 
   h_cid_Thr10MeV = new TH1F("cid_Thr10MeV", "Crystal ID (Thr  = 10 MeV)", 8736, 1, 8737);
   h_cid_Thr10MeV->GetXaxis()->SetTitle("Cell ID");
+  h_cid_Thr10MeV->SetOption("LIVE");
 
-  h_edep = new TH1F("edep", "Energy deposition in event", 500, 0, 5);
+  h_cid_Thr50MeV = new TH1F("cid_Thr50MeV", "Crystal ID (Thr = 50 MeV)", 8736, 1, 8737);
+  h_cid_Thr50MeV->GetXaxis()->SetTitle("Cell ID");
+  h_cid_Thr50MeV->SetOption("LIVE");
+
+  h_edep = new TH1F("edep", "Energy deposition in event", 100 * m_EnergyUpperThr, 0, m_EnergyUpperThr);
   h_edep->GetXaxis()->SetTitle("energy, [GeV]");
+  h_edep->SetOption("LIVE");
 
   h_time_barrel_Thr5MeV = new TH1F("time_barrel_Thr5MeV", "Reconstructed time for ECL barrel with Thr = 5 MeV", 206, -1030,
                                    1030);
   h_time_barrel_Thr5MeV->GetXaxis()->SetTitle("time [ns]");
+  h_time_barrel_Thr5MeV->SetOption("LIVE");
 
   h_time_endcaps_Thr5MeV = new TH1F("time_endcaps_Thr5MeV", "Reconstructed time for ECL endcaps with Thr = 5 MeV", 206, -1030,
                                     1030);
   h_time_endcaps_Thr5MeV->GetXaxis()->SetTitle("time [ns]");
+  h_time_endcaps_Thr5MeV->SetOption("LIVE");
 
   h_time_barrel_Thr10MeV = new TH1F("time_barrel_Thr10MeV", "Reconstructed time for ECL barrel with Thr = 10 MeV", 206, -1030,
                                     1030);
   h_time_barrel_Thr10MeV->GetXaxis()->SetTitle("time [ns]");
+  h_time_barrel_Thr10MeV->SetOption("LIVE");
 
   h_time_endcaps_Thr10MeV = new TH1F("time_endcaps_Thr10MeV", "Reconstructed time for ECL endcaps with Thr = 10 MeV", 206, -1030,
                                      1030);
   h_time_endcaps_Thr10MeV->GetXaxis()->SetTitle("time [ns]");
+  h_time_endcaps_Thr10MeV->SetOption("LIVE");
 
   h_time_barrel_Thr50MeV = new TH1F("time_barrel_Thr50MeV", "Reconstructed time for ECL barrel with Thr = 50 MeV", 206, -1030,
                                     1030);
   h_time_barrel_Thr50MeV->GetXaxis()->SetTitle("time [ns]");
+  h_time_barrel_Thr50MeV->SetOption("LIVE");
 
   h_time_endcaps_Thr50MeV = new TH1F("time_endcaps_Thr50MeV", "Reconstructed time for ECL endcaps with Thr = 50 MeV", 206, -1030,
                                      1030);
   h_time_endcaps_Thr50MeV->GetXaxis()->SetTitle("time [ns]");
+  h_time_endcaps_Thr50MeV->SetOption("LIVE");
 
-  h_quality = new TH1F("quality", "Fit quality flag (0-good, 1- large amplitude, 2 - bad chi2)", 4, -1, 3);
+  h_quality = new TH1F("quality", "Fit quality flag (0-good, 1- large amplitude, 3 - bad chi2)", 5, -1, 4);
   h_quality->GetXaxis()->SetTitle("Flag number");
+  h_quality->SetOption("LIVE");
 
   oldDir->cd();
 }
@@ -133,6 +146,18 @@ void ECLDQMModule::initialize()
 
 void ECLDQMModule::beginRun()
 {
+  h_cid->Reset();
+  h_cid_Thr5MeV->Reset();
+  h_cid_Thr10MeV->Reset();
+  h_cid_Thr50MeV->Reset();
+  h_edep->Reset();
+  h_time_barrel_Thr5MeV->Reset();
+  h_time_endcaps_Thr5MeV->Reset();
+  h_time_barrel_Thr10MeV->Reset();
+  h_time_endcaps_Thr10MeV->Reset();
+  h_time_barrel_Thr50MeV->Reset();
+  h_time_endcaps_Thr50MeV->Reset();
+  h_quality->Reset();
 }
 
 
@@ -144,6 +169,7 @@ void ECLDQMModule::event()
   for (auto& aECLDigit : ECLDigits) {
 
     h_quality->Fill(aECLDigit.getQuality());
+
 
   }
 
@@ -158,9 +184,9 @@ void ECLDQMModule::event()
 
     h_cid->Fill(cid);   // get crystall CId
 
-    if (energy > 0.002)  h_cid_Thr2MeV->Fill(cid);
     if (energy > 0.005)  h_cid_Thr5MeV->Fill(cid);
     if (energy > 0.010)  h_cid_Thr10MeV->Fill(cid);
+    if (energy > 0.050)  h_cid_Thr50MeV->Fill(cid);
 
     if (energy > 0.005) {
 

@@ -80,7 +80,8 @@ main_path.add_module(input)
 histoman = basf2.register_module('DqmHistoManager')
 histoman.param("Port", int(argvs[3]))
 histoman.param("Port", 9991)
-histoman.param("DumpInterval", 1000)
+histoman.param("DumpInterval", 180)
+histoman.param("WriteInterval", 180)
 
 # HistoManageer for offline
 # histoman = basf2.register_module('HistoManager')
@@ -149,7 +150,8 @@ progress = basf2.register_module('Progress')
 main_path.add_module(progress)
 
 etime = basf2.register_module('ElapsedTime')
-etime.param('EventInterval', 1000)
+etime.param('EventInterval', 10000)
+etime.logging.log_level = basf2.LogLevel.INFO
 main_path.add_module(etime)
 
 
@@ -157,4 +159,6 @@ main_path.add_module(etime)
 # Start basf2 processing
 ##########
 basf2.set_nprocesses(int(argvs[4]))
+basf2.set_streamobjs(saveobjs)
+
 basf2.process(main_path)

@@ -218,7 +218,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
       err_flag = 1;
     }
   } else {
-    printf("[INFO] New run started. cur run %.8x prev. run %.8x cur eve %.8x prev eve %8.x\n",
+    printf("[DEBUG] New run started. cur run %.8x prev. run %.8x cur eve %.8x prev eve %8.x\n",
            *cur_exprunsubrun_no, prev_exprunsubrun_no , *cur_evenum_rawcprhdr, prev_evenum);
 
     // Check if the first event of a run is zero.
@@ -1074,7 +1074,7 @@ int PreRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int fine
   } else {
     PrintData(m_buffer, m_nwords);
 
-    printf("Invalid B2LHSLB magic words 0x%x 0x%x. Exiting... :%s %s %d\n",
+    printf("Invalid B2LHSLB magic words : header 0x%x (= should be ffaa**** ) or trailer 0x%x (= should be ff55**** ). Exiting... :%s %s %d\n",
            finesse_buf[ POS_MAGIC_B2LHSLB ],
            finesse_buf[ finesse_nwords - SIZE_B2LHSLB_TRAILER + POS_CHKSUM_B2LHSLB ],
            __FILE__, __PRETTY_FUNCTION__, __LINE__);

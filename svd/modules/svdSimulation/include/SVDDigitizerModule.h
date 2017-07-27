@@ -207,21 +207,39 @@ namespace Belle2 {
 
       // ROOT stuff:
       /** Pointer to the ROOT filename for statistics */
-      TFile* m_rootFile;
-      /** Histogram showing the diffusion cloud in u (r-phi). */
-      TH1D*  m_histDiffusion_u;
-      /** Histogram showing the diffusion cloud in v (z). */
-      TH1D*  m_histDiffusion_v;
+      TFile* m_rootFile = nullptr;
+      /** Histogram showing the charge sharing + diffusion in u (r-phi). */
+      TH1D*  m_histChargeSharing_u = nullptr;
+      /** Histogram showing the charge sharing + diffusion in v (z). */
+      TH1D*  m_histChargeSharing_v = nullptr;
+
+      /** Histogram showing the mobility of e-. */
+      TH1D*  m_histMobility_e = nullptr;
+      /** Histogram showing the mobility of h. */
+      TH1D*  m_histMobility_h = nullptr;
+      /** Histogram showing the velocity of e-. */
+      TH1D*  m_histVelocity_e = nullptr;
+      /** Histogram showing the velocity of h. */
+      TH1D*  m_histVelocity_h = nullptr;
+      /** Histogram showing the distance to plane for e. */
+      TH1D*  m_histDistanceToPlane_e = nullptr;
+      /** Histogram showing the distance to plane for h. */
+      TH1D*  m_histDistanceToPlane_h = nullptr;
+      /** Histogram showing the drift time of e. */
+      TH1D*  m_histDriftTime_e = nullptr;
+      /** Histogram showing the drift time of h. */
+      TH1D*  m_histDriftTime_h = nullptr;
+
       /** Histogram showing the Lorentz angles in u (r-phi). */
-      TH1D*  m_histLorentz_u;
+      TH1D*  m_histLorentz_u = nullptr;
       /** Histogram showing the Lorentz angles in v (z). */
-      TH1D*  m_histLorentz_v;
+      TH1D*  m_histLorentz_v = nullptr;
       /** Histogram showing the distribution of digit signals in u (r-phi).*/
-      TH1D*  m_signalDist_u;
+      TH1D*  m_signalDist_u = nullptr;
       /** Histogram showing the distribution of digit signals in v (z).*/
-      TH1D*  m_signalDist_v;
+      TH1D*  m_signalDist_v = nullptr;
       /** Tree for waveform storage. */
-      TTree* m_waveTree;
+      TTree* m_waveTree = nullptr;
 
     };//end class declaration
 

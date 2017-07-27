@@ -89,7 +89,7 @@ int main(int argc, char** argv)
               std::string name = ss[ss.size() - 1];
               name = StringUtil::replace(name, ".root", ".sroot");
               db.connect();
-              db.execute("update %s set time_sent='%s' where host='%s' and name='%s' and time_sent is null returning id;",
+              db.execute("update %s set time_sent='%s' where label != 'daq' and host='%s' and name='%s' and time_sent is null returning id;",
                          m_table.c_str(), d.c_str(), m_host.c_str(), name.c_str());
               DBRecordList records(db.loadRecords());
               if (records.size() > 0) {
@@ -129,7 +129,7 @@ int main(int argc, char** argv)
       try {
         for (size_t j = 0; j < m_dirs.size(); j++) {
           std::string dir = m_homedir + m_dirs[j] + "/storage/";
-          db.execute("select * from %s where host = '%s' and time_sent is null "
+          db.execute("select * from %s where label != 'daq' and host = '%s' and time_sent is null "
                      "and (expno < %d or (expno = %d and runno <= %d)) and path like '%s%s' order by time_close ",
                      m_table.c_str(), m_host.c_str(), expno, expno, runno, dir.c_str(), "_%");
           DBRecordList records(db.loadRecords());
@@ -184,11 +184,31 @@ int main(int argc, char** argv)
                 LogFile::info("Masked " + name);
                 continue;
               }
+              std::string path = records[i].get("path");
               std::string host = records[i].get("host");
               int fileno = records[i].getInt("fileno");
-              std::string size = records[i].get("size");
-              std::string nevents = records[i].get("nevents");
-              int chksum = records[i].getInt("chksum");
+              unsigned long long size = records[i].getInt("size");
+              unsigned long long nevents = records[i].getInt("nevents");
+              unsigned long long chksum = records[i].getInt("chksum");
+              /*
+                    struct stat st;
+                    stat(path.c_str(), &st);
+                    if (size != st.st_size) {
+                      std::string d = Date(st.st_mtime).toString();
+              unsigned long long chksum_new, nevents_new, size_new;
+                      size_new = cal_chksum(path.c_str(), chksum_new, nevents_new);
+                      if (fileno == 0) nevents--;
+                      db.execute("update %s set time_close='%s', chksum=%lu nevents=%lu, size=%lu "
+                                 "where name='%s' and host='%s';",
+                                 m_table.c_str(), d.c_str(), chksum_new, nevents_new, size_new,
+                                 name.c_str(), m_host.c_str());
+                      LogFile::info("update file: %s (size: %lu>>%lu, nevents: %lu>>%lu, chksum: %lu>>%lu)", name.c_str(),
+                                    size, size_new, nevents, nevents_new, chksum, chksum_new);
+                      chksum = chksum_new;
+                      size = size_new;
+                      nevents = nevents_new;
+                    }
+              */
               std::string s_chksum = StringUtil::form("%x", chksum);
               fout << StringUtil::form("%4.4d/%5.5d/", expno, runno) << name << "," << expno << "," << runno << "," << fileno << ","
                    << size << "," << nevents << "," << s_chksum << "" << std::endl;

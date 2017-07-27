@@ -1,4 +1,4 @@
-#include "trg/gdl/modules/trggdl/TRGBackToBackModule.h"
+#include "trg/gdl/modules/trggdl/TRGGDLCosmicRunModule.h"
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -10,9 +10,9 @@ using namespace Belle2;
 
 //this line registers the module with the framework and actually makes it available
 //in steering files or the the module list (basf2 -m).
-REG_MODULE(TRGBackToBack);
+REG_MODULE(TRGGDLCosmicRun);
 
-TRGBackToBackModule::TRGBackToBackModule() : Module::Module()
+TRGGDLCosmicRunModule::TRGGDLCosmicRunModule() : Module::Module()
 {
   setDescription(
     "Module that returns true, if the back-to-back condition "
@@ -25,14 +25,14 @@ TRGBackToBackModule::TRGBackToBackModule() : Module::Module()
 }
 
 void
-TRGBackToBackModule::initialize()
+TRGGDLCosmicRunModule::initialize()
 {
   StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
   StoreArray<TRGECLTrg>::registerPersistent();
 }
 
 void
-TRGBackToBackModule::event()
+TRGGDLCosmicRunModule::event()
 {
   StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
   bool TSinMerger[12] = {false};

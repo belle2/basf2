@@ -1,5 +1,5 @@
-#ifndef TRGBACKTOBACKMODULE_H
-#define TRGBACKTOBACKMODULE_H
+#ifndef TRGGDLCOSMICRUNMODULE_H
+#define TRGGDLCOSMICRUNMODULE_H
 
 #include "framework/core/Module.h"
 
@@ -7,15 +7,15 @@ namespace Belle2 {
 
   /** Module that returns true if the back-to-back condition
    *  of track segments in SL 2 is fulfilled (for 2017 cosmic test). */
-  class TRGBackToBackModule : public Module {
+  class TRGGDLCosmicRunModule : public Module {
 
   public:
 
     /** Constructor, for setting module description and parameters. */
-    TRGBackToBackModule();
+    TRGGDLCosmicRunModule();
 
     /** Destructor */
-    virtual ~TRGBackToBackModule() {}
+    virtual ~TRGGDLCosmicRunModule() {}
 
     /** Initialize the module. */
     virtual void initialize();
@@ -31,4 +31,4 @@ namespace Belle2 {
 
 } // namespace Belle2
 
-#endif // TRGBACKTOBACKMODULE_H
+#endif // TRGGDLCOSMICRUNMODULE_H

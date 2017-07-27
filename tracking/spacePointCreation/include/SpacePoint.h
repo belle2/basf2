@@ -140,6 +140,38 @@ namespace Belle2 {
     double getNormalizedLocalV() const { return m_normalizedLocal.second; }
     //-----------------------------------------------------------------------------------------------------------------
 
+    /** Returns, if u(v)-coordinate is based on cluster information.
+     *
+     * .first is true, if u-cluster information is present<br>
+     * .second is true, if v-cluster information is present.
+     */
+    std::pair<bool, bool> getIfClustersAssigned() const { return m_clustersAssigned; }
+
+    /** Returns the number of Clusters assigned to this SpacePoint.*/
+    unsigned short getNClustersAssigned() const
+    {
+      if (m_sensorType == VXD::SensorInfoBase::SensorType::SVD &&
+          m_clustersAssigned.first && m_clustersAssigned.second) {
+        return 2;
+      }
+      return 1;
+    }
+
+    /** Setter for association with a track.*/
+    void setAssignmentState(bool isAssigned) const { m_isAssigned = isAssigned; }
+
+    /** Getter for status of assignment to a track.*/
+    bool getAssignmentState() const { return m_isAssigned; }
+
+    /** Setter for the quality of this SpacePoint.*/
+    void setQualityEstimation(float qualityIndicator) {m_qualityIndicator = qualityIndicator; }
+
+    /** Getter for the quality of this SpacePoint.*/
+    float getQualityEstimation() const { return m_qualityIndicator; }
+
+//---------------------------------------------------------------------------------------------------------------------
+//TODO: Some clarification, if the following conversions and especially the staticness of the functions below is needed
+//in the version 2 of the VXDTF.
     /** returns a vector of genfit::PlanarMeasurement, which is needed for genfit::track.
     *
     * This member ensures compatibility with genfit2.
@@ -149,40 +181,6 @@ namespace Belle2 {
     * and therefore of different detector types.
     */
     virtual std::vector<genfit::PlanarMeasurement> getGenfitCompatible() const ;
-
-    /** returns the current state of assignment - returns true if it is assigned and therefore blocked for reuse. */
-    bool getAssignmentState() const {return m_isAssigned; }
-
-
-
-    /** returns which local coordinate is based on assigned Cluster (only relevant for SVD, for other types, this is always true.
-    *
-    * .first is true, if this SpacePoint has a UCluster (only relevant for SVD, PXD always true),
-    * .second is true, if this SpacePoint has a VCluster (only relevant for SVD, PXD always true),
-    */
-    std::pair<bool, bool> getIfClustersAssigned() const {return m_clustersAssigned; }
-
-
-    /** returns the number of Clusters assigned to this SpacePoint (0,1, or 2) */
-    unsigned short getNClustersAssigned() const
-    {
-      if (m_sensorType == VXD::SensorInfoBase::SensorType::SVD) {
-        unsigned short nClusters = 0;
-        nClusters += m_clustersAssigned.first;
-        nClusters += m_clustersAssigned.second;
-        return nClusters;
-      }
-      if (m_clustersAssigned.first && m_clustersAssigned.second) return 1;
-      return 0;
-    }
-
-
-    /** returns the current estimation for the quality of that spacePoint.
-     *
-     * returns value between 0-1, 1 means "good", 0 means "bad".
-     * */
-    unsigned int getQualityEstimation() const {return m_qualityIndicator; }
-
 
 
 // static converter functions:
@@ -201,7 +199,6 @@ namespace Belle2 {
                                                   const VXD::SensorInfoBase* aSensorInfo = nullptr);
 
 
-
     /** converts a local hit into sensor-independent relative coordinates.
        *
        * first parameter is the local hit (as provided by SpacePoint::getUWedged(...) and Cluster::getV!) stored as a pair of doubles.
@@ -216,10 +213,6 @@ namespace Belle2 {
         VxdID vxdID, const VXD::SensorInfoBase* aSensorInfo = nullptr);
 
 
-
-
-
-
     /** converts a hit in sensor-independent relative coordinates into local coordinate of given sensor.
     *
     * first parameter is the hit in sensor-independent normalized ! coordinates stored as a pair of floats.
@@ -229,7 +222,6 @@ namespace Belle2 {
     */
     static std::pair<double, double> convertNormalizedToLocalCoordinates(const std::pair<double, double>& hitNormalized,
         Belle2::VxdID vxdID, const Belle2::VXD::SensorInfoBase* aSensorInfo = nullptr);
-
 
 
     /** takes a general uCoordinate, and transforms it to corrected uCoordinate for wedged sensors.
@@ -280,35 +272,13 @@ namespace Belle2 {
       }
 
     }
-
-
-
-// setter:
-
-    /** sets the state of assignment - set true if it is assigned and therefore blocked for reuse. */
-    void setAssignmentState(bool newState) const { m_isAssigned = newState; }
-
-
-
-    /** sets the estimation for the quality of that spacePoint.
-     *
-     * set value between 0-1, 1 means "good", 0 means "bad".
-     * */
-    void setQualityEstimation(unsigned int newQI) {m_qualityIndicator = newQI; }
-
+//---------------------------------------------------------------------------------------------------------------------
 
   protected:
-
-
-    /** protected function to set the global position error.
-     *
-     * It takes care for the transformation of the local sigmas to global error values.
-     */
+    /** Setter for global position error from on-sensor sigmas.*/
     void setPositionError(double uSigma, double vSigma, const VXD::SensorInfoBase* aSensorInfo)
     {
-      //As only variances, but not the sigmas transform linearly,
-      // we need to use some acrobatics
-      // (and some more (abs) since we do not really transform a vector).
+      //As only variances, but not the sigmas transform linearly, we need to use some acrobatics.
       m_positionError = aSensorInfo->vectorToGlobal(
                           TVector3(
                             uSigma * uSigma,
@@ -319,32 +289,25 @@ namespace Belle2 {
       m_positionError.Sqrt();
     }
 
-
-
+    //--- Member variables --------------------------------------------------------------------------------------------
     /** Global position vector.
      *
-     *  [0]: x , [1] : y, [2] : z
+     *  [0]: x, [1] : y, [2] : z
      */
     B2Vector3<double> m_position;
 
-
-
-    /** Error "Vector" of global position in sigma.
+    /** Global position error vector in sigma.
      *
-     *  [0]: x-uncertainty , [1] : y-uncertainty, [2] : z-uncertainty
+     *  [0]: x-uncertainty, [1] : y-uncertainty, [2] : z-uncertainty
      */
     B2Vector3<double> m_positionError;
 
 
-
-    /** Position in local coordinates normalized to the sensor size between 0 and 1.
+    /** Local position vector normalized to sensor size (0 <= x <= 1).
      *
-     *  First entry is u, second is v
+     *  .first: u, .second: v
      */
     std::pair<double, double> m_normalizedLocal;
-//     double m_normalizedLocal[2];
-
-
 
     /** The bool value is true, when correct information of the coordinate exists.
      *
@@ -367,7 +330,7 @@ namespace Belle2 {
      *
      *  The value shall be between 0. and 1., where 1. means "good" and 0. means "bad".
      */
-    double m_qualityIndicator {0.5};
+    float m_qualityIndicator {0.5};
 
     /** Stores whether this SpacePoint is connected to a track.
      *
@@ -377,6 +340,6 @@ namespace Belle2 {
      */
     mutable bool m_isAssigned {false};
 
-    ClassDefOverride(SpacePoint, 10) // last member changed: double float -> double!
+    ClassDefOverride(SpacePoint, 11)
   };
 }

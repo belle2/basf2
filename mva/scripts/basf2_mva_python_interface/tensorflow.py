@@ -31,7 +31,7 @@ class State(object):
         #: array to save keys for collection
         self.collection_keys = ['x', 'y', 'activation', 'cost', 'optimizer']
 
-        #: other possible things to save into a tensorflow collection
+        # other possible things to save into a tensorflow collection
         for key, value in kwargs.items():
             self.collection_keys.append(key)
             setattr(self, key, value)
@@ -132,9 +132,13 @@ def load(obj):
         tf.train.update_checkpoint_state(path, obj[1])
         saver.restore(session, os.path.join(path, obj[1]))
     state = State(session=session)
-    state.get_from_collection(obj[4])
-    for i, extra in enumerate(obj[5:]):
-        setattr(state, 'extra_{}'.format(i), extra)
+    if len(obj) > 3:
+        state.get_from_collection(obj[4])
+        for i, extra in enumerate(obj[5:]):
+            setattr(state, 'extra_{}'.format(i), extra)
+    else:
+        state.get_from_collection()
+
     return state
 
 

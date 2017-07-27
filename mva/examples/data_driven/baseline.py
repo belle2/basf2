@@ -25,7 +25,8 @@ if __name__ == "__main__":
                  'daughter(2, daughter(0, clusterNHits))', 'daughter(2, daughter(1, clusterNHits))',
                  'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
                  'daughter(2, daughter(0, minC2HDist))', 'daughter(2, daughter(1, minC2HDist))',
-                 'daughterInvariantMass(1, 2)']
+                 'daughterInvariantMass(1, 2)', 'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)'
+                 ]
 
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train_mc.root")

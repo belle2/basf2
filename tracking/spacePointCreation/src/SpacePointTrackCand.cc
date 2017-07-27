@@ -60,39 +60,6 @@ SpacePointTrackCand::SpacePointTrackCand(const std::vector<const Belle2::SpacePo
   }
 }
 
-bool SpacePointTrackCand::checkOverlap(const SpacePointTrackCand& rhs, bool compareSPs)
-{
-  const auto& lhsHits = this->getHits();
-  const auto& rhsHits = rhs.getHits();
-
-  // if one TrackCand has no SpacePoint, equality is not possible and further comparing is not needed
-  if (lhsHits.size() == 0 || rhsHits.size() == 0) {
-    B2DEBUG(80, "At least one of the SpacePointTrackCands does not contain any SpacePoints");
-    return false;
-  }
-
-  if (compareSPs) {
-    for (unsigned int iSP = 0; iSP < lhsHits.size(); ++iSP) {
-      auto pos = std::find(rhsHits.begin(), rhsHits.end(), lhsHits[iSP]);
-      if (pos != rhsHits.end()) {
-        B2DEBUG(80, "SpacePointTrackCands are overlaping at hit number: " << iSP << "");
-        return true;
-      }
-    }
-    return false;
-  }
-
-  for (const SpacePoint* lSP : lhsHits) {
-    for (const SpacePoint* rSP : rhsHits) {
-      if (lSP->shareClusters(rSP)) {
-        B2DEBUG(80, "SpacePointTrackCands share clusters!");
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
 // 'Equal To' operator for easier comparison of SpacePointTrackCands (e.g. for testing this class)
 // bool operator== (SpacePointTrackCand& lhs, SpacePointTrackCand& rhs)
 bool SpacePointTrackCand::operator== (const SpacePointTrackCand& rhs)

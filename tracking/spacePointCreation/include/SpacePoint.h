@@ -40,6 +40,7 @@ namespace Belle2 {
   class SpacePoint: public RelationsObject {
 
   public:
+    //--- C'tors and D'tors -------------------------------------------------------------------------------------------
     /** Constructor SpacePoint from one PXD Hit.
      *
      *  @param pxdCluster   Pointer to PXDCluster (typically owned by the DataStore).
@@ -80,77 +81,34 @@ namespace Belle2 {
 
     /** Currently SpacePoint is used as base class for test beam related TBSpacePoint. */
     virtual ~SpacePoint() {}
+    //-----------------------------------------------------------------------------------------------------------------
 
-//--------------------------------------These comparison operators need to be changed in the next step.---------------
-    /** Comparison for equality with another SpacePoint.
+    /** overloaded '<<' stream operator. Print secID to stream by converting it to string */
+    friend std::ostream& operator<< (std::ostream& out, const SpacePoint& aSP) { return out << aSP.getName();}
+
+    /** Compare, if two SpacePoints are the same one.
     *
-    * no matter whether the compared SPs are actually the same SpacePoint of the same storeArray,
-    * this comparison only checks the global position and error.
-    * WARNING float/double comparison, could suffer from rounding errors. Better ideas?
-    * */
-    inline bool operator == (const SpacePoint& b) const
+    *  As SpacePoints should live in the DataStore and comparing positions doesn't guarantee,
+    *  that different underlying clusters are used, we compare here only the indices of the SpacePoint
+    *  within their StoreArray --> SpacePoints are equal, if the share the index.
+    */
+    bool operator == (const SpacePoint& b) const
     {
-      return (
-               this->getPosition() == b.getPosition() &&
-               this->getPositionError() == b.getPositionError()
-             );
+      return getArrayIndex() == b.getArrayIndex();
     }
 
-
-    /** Comparison for inequality with another SpacePoint.
-     *
-     * no matter whether the compared SPs are actually the same SpacePoint of the same storeArray,
-     * this comparison only checks the global position and error.
-     * */
-    inline bool operator != (const SpacePoint& b) const
+    /** Comparison for inequality with another SpacePoint.*/
+    bool operator != (const SpacePoint& b) const
     {
       return !(*this == b);
     }
 
-    /** overloaded '<<' stream operator. Print secID to stream by converting it to string */
-    friend std::ostream& operator<< (std::ostream& out, const SpacePoint& aSP) { out << aSP.getName(); return out; }
-
-
-    /** Comparison if SpacePoints share Clusters.
-    *
-    * no real operator but comparable.
-    * If given SP shares at least one cluster with this one, this function returns true.
-    * WARNING: Since original pointers are not stored and a relation to them can not be guaranteed, normalized local coordintes will be compared.
-    * That should work for slanted parts too, since normalized coordinates are invariant for such comparisons.
-    * */
-    inline bool shareClusters(const SpacePoint& b) const
-    {
-      return (
-               this->getVxdID() == b.getVxdID() and
-               (this->getNormalizedLocalU() == b.getNormalizedLocalU() or
-                this->getNormalizedLocalV() == b.getNormalizedLocalV())
-             );
-    }
-
-    /** Comparison if SpacePoints share Clusters.
-     *
-     * same as inline bool shareClusters (const SpacePoint& b) const
-     * */
-    inline bool shareClusters(const SpacePoint* b) const
-    {
-      return shareClusters(*b);
-    }
-//--------------------------------------------------------------------------------------------------------------------
-// getter:
-
-    /** returns secID of this sector */
+    /** Print out some info for this SpacePoint.*/
     std::string getName() const override
     {
-      // TODO revert to long version!
-      return "I: " + std::to_string(getArrayIndex());
-      /// long version
-//       return "I: " + std::to_string(getArrayIndex()) +
-//              ", VxdID: " + std::string(VxdID(m_vxdID)) +
-//              ", PosG: " + std::to_string(double(int(X()*100))*0.01) +
-//       "|" + std::to_string(double(int(Y()*100))*0.01) +
-//       "|" + std::to_string(double(int(Z()*100))*0.01);
+      return "SpacePoint with index: " + std::to_string(getArrayIndex()) +
+             "and VxdID: " + std::to_string(VxdID(m_vxdID));
     }
-//--------------------------------------------------------------------------------------------------------------------
 
     //--- Global Coordinate Getters -----------------------------------------------------------------------------------
     /** return the x-value of the global position of the SpacePoint */
@@ -182,9 +140,6 @@ namespace Belle2 {
     double getNormalizedLocalV() const { return m_normalizedLocal.second; }
     //-----------------------------------------------------------------------------------------------------------------
 
-
-
-
     /** returns a vector of genfit::PlanarMeasurement, which is needed for genfit::track.
     *
     * This member ensures compatibility with genfit2.
@@ -194,8 +149,6 @@ namespace Belle2 {
     * and therefore of different detector types.
     */
     virtual std::vector<genfit::PlanarMeasurement> getGenfitCompatible() const ;
-
-
 
     /** returns the current state of assignment - returns true if it is assigned and therefore blocked for reuse. */
     bool getAssignmentState() const {return m_isAssigned; }

@@ -60,44 +60,44 @@ if args.inputFile == "NoInputFile":
     print("*       \"--skipPlot\"     : only processing sroot data file, do not create summary plot")
     sys.exit()
 
-input_file = args.inputFile
-IsGlobalDAQ = False
-IsOfflineFEDisabled = args.noOfflineFE
-IsGlobalDAQForced = args.globalDAQ
-IsPocketDAQForced = args.pocketDAQ
-CalCh = args.calChannel
+inputFile = args.inputFile
+isGlobalDAQ = False
+isOfflineFEDisabled = args.noOfflineFE
+isGlobalDAQForced = args.globalDAQ
+isPocketDAQForced = args.pocketDAQ
+calCh = args.calChannel
 lookbackWindows = args.lookbackWindows
-if CalCh < 0 or CalCh > 7:
-    print("ERROR : invalid calibration asic channel :" + str(CalCh))
+if calCh < 0 or calCh > 7:
+    print("ERROR : invalid calibration asic channel :" + str(calCh))
     print("        (should be [0-7])")
     sys.exit()
 
-if re.search(r"run[0-9]+_slot[0-1][0-9]", input_file):
-    output_root = re.search(r"run[0-9]+_slot[0-1][0-9]", input_file).group() + "_ntuple.root"
-elif re.search(r"(top|cosmic|cdc|ecl|klm|test)\.[0-9]+\.[0-9]+", input_file):
-    IsGlobalDAQ = True
-    output_root = re.search(
+if re.search(r"run[0-9]+_slot[0-1][0-9]", inputFile):
+    outputRoot = re.search(r"run[0-9]+_slot[0-1][0-9]", inputFile).group() + "_ntuple.root"
+elif re.search(r"(top|cosmic|cdc|ecl|klm|test)\.[0-9]+\.[0-9]+", inputFile):
+    isGlobalDAQ = True
+    outputRoot = re.search(
         r"(top|cosmic|cdc|ecl|klm|test)\.[0-9]+\.[0-9]+",
-        input_file).group() + "_ntuple.root"
+        inputFile).group() + "_ntuple.root"
 else:
-    output_root = input + "_ntuple.root"
+    outputRoot = inputFile + "_ntuple.root"
 
 if args.outputFile != "NoOutputFile":
-    output_root = args.outputFile
+    outputRoot = args.outputFile
 
-if IsGlobalDAQForced and (not IsPocketDAQForced):
-    IsGlobalDAQ = True
-elif (not IsGlobalDAQForced) and IsPocketDAQForced:
-    IsGlobalDAQ = False
-elif IsGlobalDAQForced and IsPocketDAQForced:
+if isGlobalDAQForced and (not isPocketDAQForced):
+    isGlobalDAQ = True
+elif (not isGlobalDAQForced) and isPocketDAQForced:
+    isGlobalDAQ = False
+elif isGlobalDAQForced and isPocketDAQForced:
     print("ERROR : both of --GlobalDAQ or --PocketDAQ can not be given.")
     sys.exit()
 
-print(input_file + " --> " + output_root)
-print("Is global DAQ? : " + str(IsGlobalDAQ))
-print("OfflineFE : " + str(not IsOfflineFEDisabled))
-print("Save waveform? : " + str(args.saveWaveform))
-print("Cal. asic ch : " + str(CalCh))
+print(inputFile + " --> " + outputRoot)
+print("Is global DAQ?        : " + str(isGlobalDAQ))
+print("OfflineFE             : " + str(not isOfflineFEDisabled))
+print("Save waveform?        : " + str(args.saveWaveform))
+print("Cal. asic ch          : " + str(calCh))
 print("# of lookback windows : " + str(lookbackWindows))
 print()
 print("start process...")
@@ -107,16 +107,16 @@ main = create_path()
 
 roinput = register_module('SeqRootInput')
 # roinput = register_module('RootInput')
-roinput.param('inputFileName', input_file)
+roinput.param('inputFileName', inputFile)
 main.add_module(roinput)
 
 # HistoManager
 histoman = register_module('HistoManager')
-histoman.param('histoFileName', output_root)
+histoman.param('histoFileName', outputRoot)
 main.add_module(histoman)
 
 # conversion from RawCOPPER or RawDataBlock to RawDetector objects
-if not IsGlobalDAQ:
+if not isGlobalDAQ:
     converter = register_module('Convert2RawDet')
     main.add_module(converter)
 
@@ -136,7 +136,7 @@ unpack.param('dataFormat', 0x0301)
 main.add_module(unpack)
 
 # Add multiple hits by running feature extraction offline
-if not IsOfflineFEDisabled:
+if not isOfflineFEDisabled:
     featureExtractor = register_module('TOPWaveformFeatureExtractor')
     main.add_module(featureExtractor)
 
@@ -148,7 +148,7 @@ converter.param('useModuleT0Calibration', False)
 converter.param('useCommonT0Calibration', False)
 converter.param('lookBackWindows', lookbackWindows)
 converter.param('storageDepth', 510)
-converter.param('calibrationChannel', CalCh)  # if set, cal pulses will be flagged
+converter.param('calibrationChannel', calCh)  # if set, cal pulses will be flagged
 converter.param('calpulseHeightMin', 450)  # in [ADC counts]
 converter.param('calpulseHeightMax', 900)  # in [ADC counts]
 converter.param('calpulseWidthMin', 2.0)  # in [ns]
@@ -157,8 +157,8 @@ main.add_module(converter)
 
 ntuple = register_module('TOPInterimFENtuple')
 ntuple.param('saveWaveform', (args.saveWaveform))
-ntuple.param('useDoublePulse', (not IsOfflineFEDisabled))
-ntuple.param('calibrationChannel', CalCh)
+ntuple.param('useDoublePulse', (not isOfflineFEDisabled))
+ntuple.param('calibrationChannel', calCh)
 # ntuple.param('averageSamplingRate', 2.71394)
 ntuple.param('minHeightFirstCalPulse', 600)  # in [ADC counts]
 ntuple.param('minHeightSecondCalPulse', 450)  # in [ADC counts]
@@ -177,5 +177,5 @@ process(main)
 print(statistics)
 
 if not args.skipPlot:
-    plotInterimFEDataNtupleSummary(output_root, 2, IsOfflineFEDisabled)
-    # plotInterimFEDataNtupleAdvanced(output_root)
+    plotInterimFEDataNtupleSummary(outputRoot, 2, isOfflineFEDisabled)
+    # plotInterimFEDataNtupleAdvanced(outputRoot)

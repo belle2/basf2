@@ -52,7 +52,7 @@ namespace Belle2 {
       /** Maximum value for ID */
       MaxID = (1 << Bits) - 1,
 
-      /** Default / non-ifnformative id
+      /** Default / non-informative id
        * Trigger 111 = 7, mode 6 samples
        */
       DefaultID  = 62

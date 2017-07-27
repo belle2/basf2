@@ -25,9 +25,12 @@
 namespace Belle2 {
 
   /**
-   * The SVD 6-digit class.
+   * The SVD ShaperDigit class.
    *
-   * The SVDShaperDigit is a set of 6 APV25 signal samples taken on a strip.
+   * The SVDShaperDigit holds a set of 6 raw APV25 signal samples,
+   * zero-padded in 3-sample mode) taken on a strip. It also holds
+   * DAQ mode (3 or 6 samples) and trigger time information in an
+   * SVDModeByte structure, and time fit from FADC (when available).
    */
 
   class SVDShaperDigit : public DigitBase {
@@ -54,15 +57,15 @@ namespace Belle2 {
      * @param isU True if u strip, false if v.
      * @param cellID Strip ID.
      * @param samples std::array of 6 APV raw samples.
-     * @param time Time estimate from FADC
+     * @param FADCTime Time estimate from FADC
      * @param mode SVDModeByte structure, packed trigger time bin and DAQ
      * mode.
      */
     template<typename T>
     SVDShaperDigit(VxdID sensorID, bool isU, short cellID,
-                   T samples[c_nAPVSamples], int8_t time = 0,
+                   T samples[c_nAPVSamples], int8_t FADCTime = 0,
                    SVDModeByte mode = SVDModeByte()):
-      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_time(time),
+      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_FADCTime(FADCTime),
       m_mode(mode.getID())
     {
       std::transform(samples, samples + c_nAPVSamples, m_samples.begin(),
@@ -75,13 +78,13 @@ namespace Belle2 {
      * @param isU True if u strip, false if v.
      * @param cellID Strip ID.
      * @param samples std::array of 6 APV raw samples.
-     * @param time Time estimate from FADC
+     * @param FADCTime Time estimate from FADC
      * @param pipelineAddress APV pipeline address
      */
     template<typename T>
     SVDShaperDigit(VxdID sensorID, bool isU, short cellID, T samples,
-                   int8_t time = 0, SVDModeByte mode = SVDModeByte()):
-      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_time(time),
+                   int8_t FADCTime = 0, SVDModeByte mode = SVDModeByte()):
+      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_FADCTime(FADCTime),
       m_mode(mode.getID())
     {
       std::transform(samples.begin(), samples.end(), m_samples.begin(),
@@ -128,13 +131,13 @@ namespace Belle2 {
       return returnSamples;
     }
 
-    /** Get digit time estimate
+    /** Get digit FADCTime estimate
      * @return digit time estimate from FADC
      */
-    float getTime() const { return static_cast<float>(m_time); }
+    float getFADCTime() const { return static_cast<float>(m_FADCTime); }
 
-    /** Get pipeline address
-     * @return APV pipeline address of the digit
+    /** Get the SVDMOdeByte object containing information on trigger FADCTime and DAQ mode.
+     * @return the SVDModeByte object of the digit
      */
     SVDModeByte getModeByte() const
     { return m_mode; }
@@ -165,7 +168,7 @@ namespace Belle2 {
          << ((m_isU) ? "U-" : "V-") << m_cellID << " samples: ";
       std::copy(m_samples.begin(), m_samples.end(),
                 std::ostream_iterator<APVRawSampleType>(os, " "));
-      os << "FADC time: " << m_time << " " << thisMode << std::endl;
+      os << "FADC time: " << m_FADCTime << " " << thisMode << std::endl;
       return os.str();
     }
 
@@ -188,6 +191,8 @@ namespace Belle2 {
     */
     DigitBase::EAppendStatus addBGDigit(const DigitBase* bg)
     {
+      // Don't modify and don't append when bg points nowhere.
+      if (!bg) return DigitBase::c_DontAppend;
       const auto& bgSamples = dynamic_cast<const SVDShaperDigit*>(bg)->getSamples();
       // Add background samples to the digit's and trim back to range
       std::transform(m_samples.begin(), m_samples.end(), bgSamples.begin(),
@@ -195,17 +200,18 @@ namespace Belle2 {
                      [this](APVRawSampleType x, APVFloatSampleType y)->APVRawSampleType
       { return trimToSampleRange(x + y); }
                     );
+      // FIXME: Reset FADC time flag in mode byt.
       return DigitBase::c_DontAppend;
     }
 
   private:
 
     VxdID::baseType m_sensorID; /**< Compressed sensor identifier.*/
-    bool m_isU;                /**< True if U, false if V. */
-    short m_cellID;            /**< Strip coordinate in pitch units. */
-    APVRawSamples m_samples;      /**< 6 APV signals from the strip. */
-    int8_t m_time;              /**< digit time estimate from the FADC, in ns */
-    SVDModeByte::baseType m_mode; /**< Mode byte, trigger time + DAQ mode */
+    bool m_isU; /**< True if U, false if V. */
+    short m_cellID; /**< Strip coordinate in pitch units. */
+    APVRawSamples m_samples; /**< 6 APV signals from the strip. */
+    int8_t m_FADCTime; /**< digit time estimate from the FADC, in ns */
+    SVDModeByte::baseType m_mode; /**< Mode byte, trigger FADCTime + DAQ mode */
 
     ClassDef(SVDShaperDigit, 2)
 

@@ -12,10 +12,8 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-constexpr unsigned int VXDtoCDCMatcher::maximumLadderNumbers[6];
-
-void VXDtoCDCMatcher::initializeEventCache(std::vector<RecoTrack*>& seedsVector,
-                                           std::vector<const SpacePoint*>& filteredHitVector)
+void VXDtoCDCMatcher::initializeEventCache(RecoTrack*& seedsVector,
+                                           std::vector<CDCWireHit> filteredCDCHits)
 {
   m_cachedHitMap.clear();
 

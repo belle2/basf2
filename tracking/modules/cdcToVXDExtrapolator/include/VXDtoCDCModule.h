@@ -20,6 +20,7 @@ namespace Belle2 {
    */
   class VXDtoCDCModule : public TrackFindingCDC::FindletModule<VXDtoCDCFindlet> {
 
+
   public:
     /// Set description
     VXDtoCDCModule()

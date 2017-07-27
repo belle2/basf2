@@ -541,10 +541,6 @@ namespace Belle2 {
     vector<const SVDCluster*> clustersV = { &clusterV1 };
     SpacePoint testPoint1DV = SpacePoint(clustersV, &sensorInfoBase);
     EXPECT_EQ(testPoint1DV.getNClustersAssigned(), 1);
-
-    // create empty SpacePoint (via default constructor and check if it has 0 assigned Clusters)
-    SpacePoint emptyPoint = SpacePoint();
-    EXPECT_EQ(emptyPoint.getNClustersAssigned(), 0);
   }
 
 

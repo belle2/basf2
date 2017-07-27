@@ -364,13 +364,14 @@ def add_track_finding(
 
         # track merging
         if use_svd and use_cdc:
-            # Fit all reco tracks This will be unneeded once the merger is rewritten.
-            path.add_module("DAFRecoFitter", recoTracksStoreArrayName=vxd_reco_tracks).set_name("VXD_DAFRecoFitter")
-            path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks).set_name("CDC_DAFRecoFitter")
-
             # Merge CDC and CXD tracks
-            path.add_module('VXDCDCTrackMerger', CDCRecoTrackColName=cdc_reco_tracks,
-                            VXDRecoTrackColName=vxd_reco_tracks, MergedRecoTrackColName=reco_tracks)
+            path.add_module('VXDCDCTrackMerger',
+                            CDCRecoTrackColName=cdc_reco_tracks,
+                            VXDRecoTrackColName=vxd_reco_tracks)
+
+            path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=vxd_reco_tracks,
+                            CDCRecoTracksStoreArrayName=cdc_reco_tracks,
+                            recoTracksStoreArrayName=reco_tracks)
 
             # Prune the temporary products if requested
             if prune_temporary_tracks:

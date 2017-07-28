@@ -32,7 +32,7 @@ namespace Belle2 {
     /** Constructor which automatically enables color if the file descriptor is a terminal and supports colors
      * @param outputFD The output file descriptor to write to.
      */
-    LogConnectionFileDescriptor(int outputFD): LogConnectionFileDescriptor(outputFD, terminalSupportsColors(outputFD)) {}
+    explicit LogConnectionFileDescriptor(int outputFD): LogConnectionFileDescriptor(outputFD, terminalSupportsColors(outputFD)) {}
 
     /** Returns true if the given file descriptor is a tty and supports colors. */
     static bool terminalSupportsColors(int fileDescriptor);

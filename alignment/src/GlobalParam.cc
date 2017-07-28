@@ -162,27 +162,27 @@ namespace Belle2 {
       Belle2::alignment::GlobalParamVector& thisGlobalParamVector)
     {
       std::cout << "Reading from Pede result into CDCAlignment..." << std::endl;
-//       std::vector<double> dxLayer(56, 0.);
-//       std::vector<double> dyLayer(56, 0.);
-//       std::vector<double> dPhiLayer(56, 0.);
+      std::vector<double> dxLayer(56, 0.);
+      std::vector<double> dyLayer(56, 0.);
+      std::vector<double> dPhiLayer(56, 0.);
 
-//       for (auto entry : result) {
-//         unsigned short uid = std::get<0>(entry);
-//         if (uid != CDCAlignment::getGlobalUniqueID())
-//           continue;
-//
-//         unsigned short layer = std::get<1>(entry);
-//         unsigned short param = std::get<2>(entry);
-//         double correction = std::get<3>(entry);
-//
-//         if (param == 1)
-//           dxLayer[layer] = correction;
-//         if (param == 2)
-//           dyLayer[layer] = correction;
-//         if (param == 6)
-//           dPhiLayer[layer] = correction;
-//
-//       }
+      for (auto entry : result) {
+        unsigned short uid = std::get<0>(entry);
+        if (uid != CDCAlignment::getGlobalUniqueID())
+          continue;
+
+        unsigned short layer = std::get<1>(entry);
+        unsigned short param = std::get<2>(entry);
+        double correction = std::get<3>(entry);
+
+        if (param == 1)
+          dxLayer[layer] = correction;
+        if (param == 2)
+          dyLayer[layer] = correction;
+        if (param == 6)
+          dPhiLayer[layer] = correction;
+
+      }
 
 
 
@@ -238,15 +238,15 @@ namespace Belle2 {
             0., 0.5, 0., 0.5, 0.,  0.5
           };
 
-          std::vector<double> rotLayer(56, 0.);
-          std::vector<double> xLayer(56, 0.);
-          std::vector<double> yLayer(56, 0.);
-
-          for (int l = 0; l < 56; ++l) {
-            rotLayer.at(l) = cdcLayerAlignment->getGlobalParam(l, CDCLayerAlignment::layerPhi);
-            xLayer.at(l) = cdcLayerAlignment->getGlobalParam(l, CDCLayerAlignment::layerX);
-            yLayer.at(l) = cdcLayerAlignment->getGlobalParam(l, CDCLayerAlignment::layerY);
-          }
+//           std::vector<double> rotLayer(56, 0.);
+//           std::vector<double> xLayer(56, 0.);
+//           std::vector<double> yLayer(56, 0.);
+//
+//           for (int l = 0; l < 56; ++l) {
+//             rotLayer.at(l) = cdcLayerAlignment->getGlobalParam(l, CDCLayerAlignment::layerPhi);
+//             xLayer.at(l) = cdcLayerAlignment->getGlobalParam(l, CDCLayerAlignment::layerX);
+//             yLayer.at(l) = cdcLayerAlignment->getGlobalParam(l, CDCLayerAlignment::layerY);
+//           }
 
 
 
@@ -262,15 +262,15 @@ namespace Belle2 {
               PhiF = dPhi * (w + offset[l] + 0.5 * shiftHold[l]);
               double xWire = R[l] * 0.1 * cos(PhiF) + cdc->get(WireID(l, w), CDCAlignment::wireFwdX);
               double yWire = R[l] * 0.1 * sin(PhiF) + cdc->get(WireID(l, w), CDCAlignment::wireFwdY);
-              misForward[l][w][0] = xLayer[l] + (1. - cos(rotLayer[l])) * xWire + sin(rotLayer[l]) * yWire;
-              misForward[l][w][1] = yLayer[l] + (1. - cos(rotLayer[l])) * yWire - sin(rotLayer[l]) * xWire;
+              misForward[l][w][0] = dxLayer[l] + (1. - cos(dPhiLayer[l])) * xWire + sin(dPhiLayer[l]) * yWire;
+              misForward[l][w][1] = dyLayer[l] + (1. - cos(dPhiLayer[l])) * yWire - sin(dPhiLayer[l]) * xWire;
               misForward[l][w][2] = 0. ;
 
               PhiB = dPhi * (w + offset[l]);
               xWire = R[l] * 0.1 * cos(PhiB) + cdc->get(WireID(l, w), CDCAlignment::wireBwdX);
               yWire = R[l] * 0.1 * sin(PhiB) + cdc->get(WireID(l, w), CDCAlignment::wireBwdY);
-              misBackward[l][w][0] = xLayer[l] + (1. - cos(rotLayer[l])) * xWire + sin(rotLayer[l]) * yWire;
-              misBackward[l][w][1] = yLayer[l] + (1. - cos(rotLayer[l])) * yWire - sin(rotLayer[l]) * xWire;
+              misBackward[l][w][0] = dxLayer[l] + (1. - cos(dPhiLayer[l])) * xWire + sin(dPhiLayer[l]) * yWire;
+              misBackward[l][w][1] = dyLayer[l] + (1. - cos(dPhiLayer[l])) * yWire - sin(dPhiLayer[l]) * xWire;
               misBackward[l][w][2] = 0.;
 
 

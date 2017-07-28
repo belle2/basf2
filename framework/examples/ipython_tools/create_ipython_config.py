@@ -44,11 +44,8 @@ def main():
                 check_output(['jupyter', 'notebook', '--generate-config'])
             except BaseException:
                 print("Could not start jupyter notebook. There are many possible reasons for this.\n"
-                      "\t1) Have you installed jupyter properly?\n"
-                      "\t2) Is there something like \"ImportError: No module named '_sqlite3'\" in the error message?"
-                      "Then please see https://confluence.desy.de/display/BI/Software+IPython for help on that.\n"
-                      "\t3) For every other errors not listed on https://confluence.desy.de/display/BI/Software+IPython,"
-                      "please feel free to contact nils.braun@kit.edu.")
+                      "Please see https://confluence.desy.de/display/BI/Software+Jupyter+Notebooks for possible fixes \n"
+                      "and feel free to contact software@belle2.org for questions.")
 
         config_file = template.render(port=port)
         jupyter_config_file = os.path.join(jupyter_folder, 'jupyter_notebook_config.py')

@@ -50,6 +50,16 @@ namespace {
 
     return cdcHelix.getMomentumAtArcLength2D(arcLengthOfVXDPosition, bField);
   }
+
+  /// Helper function to add a new track to the store array with the given properties.
+  RecoTrack* addNewTrackFromSeed(const RecoTrack& recoTrack, StoreArray<RecoTrack>& recoTracks,
+                                 const TVector3& position, const TVector3& momentum, const int& charge)
+  {
+    RecoTrack* newTrack = recoTracks.appendNew(position, momentum, charge);
+    newTrack->setSeedCovariance(recoTrack.getSeedCovariance());
+    newTrack->setTimeSeed(recoTrack.getTimeSeed());
+    return newTrack;
+  }
 }
 
 RelatedTracksCombinerModule::RelatedTracksCombinerModule() :
@@ -100,8 +110,7 @@ void RelatedTracksCombinerModule::event()
 
       const TVector3& trackMomentum = extrapolateMomentum(cdcRecoTrack, vxdPosition);
 
-      RecoTrack* newMergedTrack = m_recoTracks.appendNew(vxdPosition, trackMomentum, cdcCharge);
-
+      RecoTrack* newMergedTrack = addNewTrackFromSeed(*vxdRecoTrack, m_recoTracks, vxdPosition, trackMomentum, cdcCharge);
       newMergedTrack->addHitsFromRecoTrack(vxdRecoTrack);
       newMergedTrack->addHitsFromRecoTrack(&cdcRecoTrack, newMergedTrack->getNumberOfTotalHits());
     } else {
@@ -123,7 +132,7 @@ void RelatedTracksCombinerModule::event()
 
     if (not cdcRecoTrack) {
       if (not m_useOnlyFittedTracksInSingles or vxdRecoTrack.wasFitSuccessful()) {
-        RecoTrack* newTrack = m_recoTracks.appendNew(vxdPosition, vxdMomentum, vxdCharge);
+        RecoTrack* newTrack = addNewTrackFromSeed(vxdRecoTrack, m_recoTracks, vxdPosition, vxdMomentum, vxdCharge);
         newTrack->addHitsFromRecoTrack(&vxdRecoTrack);
       }
     }

@@ -168,7 +168,7 @@ namespace Belle2 {
 
       for (auto entry : result) {
         unsigned short uid = std::get<0>(entry);
-        if (uid != CDCAlignment::getGlobalUniqueID())
+        if (uid != CDCLayerAlignment::getGlobalUniqueID())
           continue;
 
         unsigned short layer = std::get<1>(entry);

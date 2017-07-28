@@ -34,7 +34,7 @@ TRGGDLCosmicRunModule::initialize()
 void
 TRGGDLCosmicRunModule::event()
 {
-  StoreArray<CDCTriggerSegmentHit> tshits(m_hitCollectionName);
+  StoreArray<CDCTriggerSegmentHit> tshits(m_tsHitCollectionName);
   bool TSinMerger[12] = {false};
   for (int its = 0; its < tshits.getEntries(); ++its) {
     if (tshits[its]->getISuperLayer() == 2) {

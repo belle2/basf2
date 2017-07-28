@@ -177,3 +177,20 @@
    fun:_ZN6Belle230SetupGenfitExtrapolationModule18updateVXDAlignmentEv
    ...
 }
+
+{
+   Suppress memory leaks in TROOT::RegisterModule (BII-2159, ROOT-7593)
+   Memcheck:Leak
+   ...
+   fun:_ZN8TStorage11ObjectAllocEm
+   fun:_ZN4ROOTL15new_TProtoClassEPv
+   fun:_ZNK6TClass3NewENS_8ENewTypeEb
+   fun:_ZN11TBufferFile13ReadObjectAnyEPK6TClass
+   fun:_ZN9TObjArray8StreamerER7TBuffer
+   fun:_ZN4TKey13ReadObjectAnyEPK6TClass
+   fun:_ZN14TDirectoryFile16GetObjectCheckedEPKcPK6TClass
+   fun:_ZNK6TCling7LoadPCME7TStringPPKcPFvvE
+   fun:_ZN6TCling14RegisterModuleEPKcPS1_S2_S1_S1_PFvvERKSt6vectorISt4pairISsiESaIS7_EES2_b
+   fun:_ZN5TROOT14RegisterModuleEPKcPS1_S2_S1_S1_PFvvERKSt6vectorISt4pairISsiESaIS7_EES2_
+   ...
+}

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Thomas Keck 2017
+# Dennis Weyland 2017
 
 import numpy as np
 import tensorflow as tf

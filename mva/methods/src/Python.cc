@@ -385,9 +385,6 @@ namespace Belle2 {
       try {
         auto pickle = boost::python::import("pickle");
         auto builtins = boost::python::import("builtins");
-        auto file = builtins.attr("open")(custom_weightfile.c_str(), "rb");
-        auto unpickled_fit_object = pickle.attr("load")(file);
-
         m_framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
 
         if (weightfile.containsElement("Python_Steeringfile")) {
@@ -398,6 +395,8 @@ namespace Belle2 {
           builtins.attr("exec")(boost::python::object(source_code), boost::python::object(m_framework.attr("__dict__")));
         }
 
+        auto file = builtins.attr("open")(custom_weightfile.c_str(), "rb");
+        auto unpickled_fit_object = pickle.attr("load")(file);
         m_state = m_framework.attr("load")(unpickled_fit_object);
       } catch (...) {
         PyErr_Print();

@@ -17,10 +17,12 @@ class State(object):
     Tensorflow state
     """
 
-    def __init__(self, model=None, **kwargs):
+    def __init__(self, model=None, custom_objects=None, **kwargs):
         """ Constructor of the state object """
         #: keras model
         self.model = model
+        #: used by keras to load custom objects like custom layers
+        self.custom_objects = custom_objects
         #: list of keys to save
         self.collection_keys = []
 
@@ -60,10 +62,10 @@ def load(obj):
     with tempfile.TemporaryDirectory() as path:
         with open(os.path.join(path, 'weights.h5'), 'w+b') as file:
             file.write(bytes(obj[0]))
-        state = State(load_model(os.path.join(path, 'weights.h5')))
+        state = State(load_model(os.path.join(path, 'weights.h5'), custom_objects=obj[1]))
 
-    for index, key in enumerate(obj[1]):
-        setattr(state, obj[index + 2])
+    for index, key in enumerate(obj[2]):
+        setattr(state, obj[index + 3])
 
     return state
 
@@ -101,7 +103,7 @@ def end_fit(state):
         with open(os.path.join(path, 'weights.h5'), 'rb') as file:
             data = file.read()
 
-    obj_to_save = [data, state.collection_keys]
+    obj_to_save = [data, state.custom_objects, state.collection_keys]
     for key in state.collection_keys:
         obj_to_save.append(getattr(state, key))
     del state

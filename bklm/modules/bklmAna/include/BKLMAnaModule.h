@@ -82,7 +82,7 @@ namespace Belle2 {
 
 
     //! bklm GeometryPar
-    bklm::GeometryPar* m_GeoPar;
+    //bklm::GeometryPar* m_GeoPar;
 
     //! distribution of distance between mathced extHit and bklmHit2d
     TH1F* m_hdistance;

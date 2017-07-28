@@ -54,7 +54,7 @@ particlegun.param('pdgCodes', [-11, 11])
 particlegun.param('nTracks', 1)
 
 # Set the number of events to be processed (100 events)
-eventinfosetter.param({'evtNumList': [10000], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 
 # Set output filename
 output.param('outputFileName', 'SVDTestOutput.root')

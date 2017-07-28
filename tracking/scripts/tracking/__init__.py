@@ -398,6 +398,64 @@ def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_se
                         UseCDCHits=is_cdc_used(components))
 
 
+def add_ckf_based_track_finding(path, reco_tracks="RecoTracks",
+                                cdc_reco_tracks="CDCRecoTracks",
+                                vxd_reco_tracks="VXDRecoTracks",
+                                add_merger=False,
+                                components=None):
+    """
+    First approach to add the CKF to the path with all the track finding related and needed
+     to/for it.
+    :param path: The path to add the tracking reconstruction modules to
+    :param reco_tracks: The store array name where to output all tracks
+    :param cdc_reco_tracks: The store array name where to output the cdc tracks
+    :param vxd_reco_tracks: The store array name where to output the vxd tracks
+    :param components:  the list of geometry components in use or None for all components.
+    :return:
+    """
+    if not is_cdc_used(components) or not is_svd_used(components):
+        return
+
+    # First, start with a normal CDC track finding
+    add_cdc_track_finding(path, reco_tracks=cdc_reco_tracks)
+
+    # The CKF operates on SpacePoints
+    if is_svd_used(components):
+        path.add_module("SpacePointCreatorSVD")
+    if is_pxd_used(components):
+        path.add_module("SpacePointCreatorPXD")
+
+    # Then, add the CKF
+    # TODO: Merge this into the CKF
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
+    path.add_module("CDCToSpacePointCKF",
+                    firstHighFilter="simple",
+                    secondHighFilter="simple",
+                    thirdHighFilter="simple",
+
+                    filter="mva",
+                    filterParameters={"cut": 0.05},
+                    allowOverlapBetweenSeeds=True,
+                    useMaterialEffects=False,
+
+                    # TODO: Merge those two parameters!
+                    RecoTracksStoreArrayName=cdc_reco_tracks,
+                    debuggingRelationsTo=cdc_reco_tracks,
+                    VXDRecoTrackStoreArrayName=vxd_reco_tracks)
+
+    add_vxd_track_finding_vxdtf2(path, components=components, reco_tracks=vxd_reco_tracks,
+                                 sectormap_file="/storage/b/fs5-mirror/jowagner/masterthesis/muon_map.root")
+
+    if add_merger:
+        path.add_module('VXDCDCTrackMerger',
+                        CDCRecoTrackColName=cdc_reco_tracks,
+                        VXDRecoTrackColName=vxd_reco_tracks)
+
+    path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=vxd_reco_tracks,
+                    CDCRecoTracksStoreArrayName=cdc_reco_tracks,
+                    recoTracksStoreArrayName=reco_tracks)
+
+
 def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False, use_second_hits=False):
     """
     Convenience function for adding all cdc track finder modules

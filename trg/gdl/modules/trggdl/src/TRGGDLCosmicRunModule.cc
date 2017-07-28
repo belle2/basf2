@@ -19,7 +19,7 @@ TRGGDLCosmicRunModule::TRGGDLCosmicRunModule() : Module::Module()
     "of track segments in SL 2 is fulfilled (for 2017 cosmic test).\n"
   );
 
-  addParam("hitCollectionName", m_hitCollectionName,
+  addParam("tsHitCollectionName", m_tsHitCollectionName,
            "Name of the input StoreArray of CDCTriggerSegmentHits.",
            string(""));
 }
@@ -27,20 +27,20 @@ TRGGDLCosmicRunModule::TRGGDLCosmicRunModule() : Module::Module()
 void
 TRGGDLCosmicRunModule::initialize()
 {
-  StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
+  StoreArray<CDCTriggerSegmentHit>::required(m_tsHitCollectionName);
   StoreArray<TRGECLTrg>::required();
 }
 
 void
 TRGGDLCosmicRunModule::event()
 {
-  StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
+  StoreArray<CDCTriggerSegmentHit> tshits(m_hitCollectionName);
   bool TSinMerger[12] = {false};
-  for (int ihit = 0; ihit < hits.getEntries(); ++ihit) {
-    if (hits[ihit]->getISuperLayer() == 2) {
+  for (int its = 0; its < tshits.getEntries(); ++its) {
+    if (tshits[its]->getISuperLayer() == 2) {
       // SegmentID in SuperLayer 2 starts at 320
       // One merger corresponds to 16 segments
-      unsigned mergerID = (hits[ihit]->getSegmentID() - 320) / 16;
+      unsigned mergerID = (tshits[its]->getSegmentID() - 320) / 16;
       TSinMerger[mergerID] = true;
     }
   }
@@ -55,10 +55,7 @@ TRGGDLCosmicRunModule::event()
     if ((tchit[itchit] -> getNofTCHit()) > 0) {
       TCHit = true;
     }
-
   }
-
-
 
   setReturnValue(BackToBack && TCHit);
 }

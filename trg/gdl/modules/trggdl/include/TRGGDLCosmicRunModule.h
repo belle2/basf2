@@ -25,7 +25,7 @@ namespace Belle2 {
 
   protected:
     /** name of track segment hit list */
-    std::string m_hitCollectionName;
+    std::string m_tsHitCollectionName;
 
   };
 

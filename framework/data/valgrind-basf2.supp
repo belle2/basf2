@@ -194,3 +194,31 @@
    fun:_ZN5TROOT14RegisterModuleEPKcPS1_S2_S1_S1_PFvvERKSt6vectorISt4pairISsiESaIS7_EES2_
    ...
 }
+
+{
+   RootOutput: Syscall param write(buf) points to uninitialized bytes in TTree::Fill
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_ZN5TFile11WriteBufferEPKci
+   fun:_ZN4TKey19WriteFileKeepBufferEP5TFile
+   fun:_ZN7TBasket11WriteBufferEv
+   fun:_ZN7TBranch11WriteBasketEP7TBasketi
+   fun:_ZN7TBranch12FlushBasketsEv
+   fun:_ZN7TBranch12FlushBasketsEv
+   fun:_ZNK5TTree12FlushBasketsEv
+   fun:_ZN5TTree4FillEv
+   ...
+}
+
+{
+   DataStore: Conditional jump or move depends on uninitialized value in TClonesArray::Delete
+   Memcheck:Cond
+   fun:_ZN12TClonesArray6DeleteEPKc
+   fun:_ZN6Belle210StoreEntry16resetForGetEntryEv
+   fun:_ZN6Belle210StoreEntry8recreateEv
+   fun:_ZN6Belle210StoreEntry10invalidateEv
+   fun:_ZN6Belle29DataStore27SwitchableDataStoreContents14invalidateDataENS0_11EDurabilityE
+   fun:_ZN6Belle29DataStore14invalidateDataENS0_11EDurabilityE
+   ...
+}

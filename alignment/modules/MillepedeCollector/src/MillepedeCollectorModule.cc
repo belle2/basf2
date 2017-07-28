@@ -93,6 +93,8 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
            double(-1.));
   addParam("useGblTree", m_useGblTree, "Store GBL trajectories in a tree instead of output to binary files",
            bool(true));
+  addParam("absFilePaths", m_absFilePaths, "Use absolute paths to remember binary files. Only applies if useGblTree=False",
+           bool(false));
   addParam("components", m_components,
            "Specify which DB objects are calibrated, like ['BeamParameters', 'CDCTimeWalks'] or leave empty to use all components available.",
            m_components);
@@ -137,7 +139,7 @@ void MillepedeCollectorModule::prepare()
   }
 
   // Register Mille output
-  registerObject<MilleData>("mille", new MilleData(m_doublePrecision));
+  registerObject<MilleData>("mille", new MilleData(m_doublePrecision, m_absFilePaths));
 
   auto gblDataTree = new TTree("GblDataTree", "GblDataTree");
   gblDataTree->Branch<std::vector<gbl::GblData>>("GblData", &m_currentGblData, 32000, 99);

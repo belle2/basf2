@@ -88,12 +88,16 @@ namespace Belle2 {
     bool m_calibrateVertex;
     /** Minimum p.value for output */
     double m_minPValue;
-    /** Current vector of GBL data from trajectory to be stored in a tree */
-    std::vector<gbl::GblData> m_currentGblData{};
     /** Whether to use TTree to accumulate GBL data instead of binary files*/
-    bool m_useGblTree{true};
+    bool m_useGblTree;
+    /** Use absolute path to locate binary files in MilleData */
+    bool m_absFilePaths;
     /** Whether to use VXD alignment hierarchy*/
     std::vector<std::string> m_components{};
+
+    /** Current vector of GBL data from trajectory to be stored in a tree */
+    std::vector<gbl::GblData> m_currentGblData{};
+
   };
 }
 

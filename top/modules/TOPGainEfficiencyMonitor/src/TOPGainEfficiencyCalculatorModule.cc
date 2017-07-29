@@ -42,7 +42,7 @@ TOPGainEfficiencyCalculatorModule::TOPGainEfficiencyCalculatorModule() : HistoMo
   addParam("outputPDFFile", m_outputPDFFile, "output PDF file to store plots", std::string(""));
   addParam("targetSlotId", m_targetSlotId, "TOP module ID in slot number (1-16)", (short)0);
   addParam("targetPmtId", m_targetPmtId, "PMT number (1-32)", (short)0);
-  addParam("fitHalfWidth", m_fitHalfWidth, "half fit width for direct laser hit peak in [ns] unit", (float)2.0);
+  addParam("fitHalfWidth", m_fitHalfWidth, "half fit width for direct laser hit peak in [ns] unit", (float)1.0);
   addParam("threshold", m_threshold,
            "pulse height (or integrated charge) threshold in fitting its distribution and calculating efficiency", (float)100.);
   addParam("fracFit", m_fracFit, "fraction of events to be used in fitting. "
@@ -90,11 +90,12 @@ void TOPGainEfficiencyCalculatorModule::defineHisto()
   m_tree->Branch("pmtChId", &m_pmtChId, "pmtChId/S");
   m_tree->Branch("hitTiming", &m_hitTiming, "hitTiming/F");
   m_tree->Branch("hitTimingSigma", &m_hitTimingSigma, "hitTimingSigma/F");
+  m_tree->Branch("nEntries", &m_nEntries, "nEntries/I");
+  m_tree->Branch("meanPulseHeight", &m_meanPulseHeight, "meanPulseHeight/F");
   m_tree->Branch("threshold", &m_threshold, "threshold/F");
   m_tree->Branch("fitMax", &m_fitMax, "fitMax/F");
   m_tree->Branch("gain", &m_gain, "gain/F");
   m_tree->Branch("efficiency", &m_efficiency, "efficiency/F");
-  m_tree->Branch("nEntries", &m_nEntries, "nEntries/I");
   m_tree->Branch("p0", &m_p0, "p0/F");
   m_tree->Branch("p1", &m_p1, "p1/F");
   m_tree->Branch("p2", &m_p2, "p2/F");
@@ -104,7 +105,7 @@ void TOPGainEfficiencyCalculatorModule::defineHisto()
   m_tree->Branch("p2Error", &m_p2Error, "p2Error/F");
   m_tree->Branch("x0Error", &m_x0Error, "x0Error/F");
   m_tree->Branch("chisquare", &m_chisquare, "chisquare/F");
-  m_tree->Branch("ndf", &m_ndf, "ndf/F");
+  m_tree->Branch("ndf", &m_ndf, "ndf/I");
   m_tree->Branch("funcFullRangeIntegral", &m_funcFullRangeIntegral, "funcFullRangeIntegral/F");
   m_tree->Branch("funcFitRangeIntegral", &m_funcFitRangeIntegral, "funcFitRangeIntegral/F");
   m_tree->Branch("histoFitRangeIntegral", &m_histoFitRangeIntegral, "histoFitRangeIntegral/F");
@@ -165,7 +166,6 @@ void TOPGainEfficiencyCalculatorModule::LoadHistograms()
 
     //if the fitting is successful, create y-projection histogram with timing cut
     m_hitTiming = funcLaser->GetParameter(1);
-    m_hitTimingSigma = funcLaser->GetParameter(2);
     int binNumMin = hTime->GetXaxis()->FindBin(m_hitTiming - 2 * m_fitHalfWidth);
     int binNumMax = hTime->GetXaxis()->FindBin(m_hitTiming + 2 * m_fitHalfWidth);
     TH1D* hHeight = (TH1D*)h2D->ProjectionY(hnameProj[1].str().c_str(),
@@ -184,7 +184,7 @@ void TOPGainEfficiencyCalculatorModule::FitHistograms()
     TH1D* hHeight = m_heightHistogram[iHisto];
     if (!hHeight) continue;
 
-    std::cout << "fitting height distribution for " << hHeight->GetName() << std::endl;
+    std::cout << " ***** fitting height distribution for " << hHeight->GetName() << " *****" << std::endl;
     int nBins = hHeight->GetXaxis()->GetNbins();
     double binWidth = hHeight->GetXaxis()->GetBinUpEdge(1) - hHeight->GetXaxis()->GetBinLowEdge(1);
     double histoMax = hHeight->GetXaxis()->GetBinUpEdge(nBins);
@@ -192,6 +192,10 @@ void TOPGainEfficiencyCalculatorModule::FitHistograms()
     double wholeIntegral = hHeight->Integral(0, hHeight->GetXaxis()->GetNbins() + 1);
     while (hHeight->Integral(0, hHeight->GetXaxis()->FindBin(m_fitMax - 0.01 * binWidth)) / wholeIntegral < m_fracFit)
       m_fitMax += binWidth;
+    if (m_fitMax < m_threshold + c_NParameterGainFit * binWidth) {
+      B2WARNING("TOPGainEfficiencyCalculator : no enough entries for fitting...");
+      continue;
+    }
 
     std::ostringstream fname;
     fname << "func_" << (iHisto + 1);
@@ -213,6 +217,7 @@ void TOPGainEfficiencyCalculatorModule::FitHistograms()
     func->SetLineColor(2);
     func->SetLineWidth(1);
     hHeight->Fit(func, "R", "", m_threshold, m_fitMax);
+    if (func->GetNDF() < 2) continue;
 
     double funcFullMax = histoMax * 2;
     TF1* funcFull = new TF1((fname.str() + "_full").c_str(), TOPGainFunc, (-1)*func->GetParameter(5), funcFullMax, c_NParameterGainFit);
@@ -234,12 +239,13 @@ void TOPGainEfficiencyCalculatorModule::FitHistograms()
     //fill results to the output TTree
     m_pixelId = ((m_targetPmtId - 1) % c_NPMTPerRow) * c_NChannelPerPMTRow
                 + ((m_targetPmtId - 1) / c_NPMTPerRow) * c_NPixelPerModule / 2
-                + (iHisto / c_NChannelPerPMTRow) * c_NPixelPerRow + 1;
+                + (iHisto / c_NChannelPerPMTRow) * c_NPixelPerRow + (iHisto % c_NChannelPerPMTRow) + 1;
     m_pmtChId = (iHisto + 1);
 
-    m_gain = weightedIntegral / totalWeight;
-    m_efficiency = funcFull->Integral(m_threshold, funcFullMax) / funcFull->Integral(0, funcFullMax);
     m_nEntries = hHeight->GetEntries();
+    m_meanPulseHeight = hHeight->GetMean();
+    m_gain = weightedIntegral / totalWeight;
+    m_efficiency = funcFull->Integral(m_threshold, funcFullMax) / funcFull->Integral((-1) * func->GetParameter(5), funcFullMax);
     m_p0 = func->GetParameter(0);
     m_p1 = func->GetParameter(1);
     m_p2 = func->GetParameter(2);
@@ -255,10 +261,19 @@ void TOPGainEfficiencyCalculatorModule::FitHistograms()
     m_histoFitRangeIntegral = hHeight->Integral(hHeight->GetXaxis()->FindBin(m_threshold + 0.01 * binWidth),
                                                 hHeight->GetXaxis()->FindBin(m_fitMax - 0.01 * binWidth));
 
+    m_hitTiming = 0;
+    m_hitTimingSigma = -1;
+    TF1* funcLaser;
+    if (m_timeHistogram[iHisto] && (funcLaser = (TF1*)m_timeHistogram[iHisto]->GetFunction("gaus"))) {
+      m_hitTiming = funcLaser->GetParameter(1);
+      m_hitTimingSigma = funcLaser->GetParameter(2);
+    }
+
     m_funcForFitRange[iHisto] = func;
     m_funcForFullRange[iHisto] = funcFull;
 
     m_tree->Fill();
+    std::cout << std::endl;
   }
 
   return;
@@ -284,7 +299,7 @@ void TOPGainEfficiencyCalculatorModule::DrawResult()
   TArrow* arrow = new TArrow();
   arrow->SetLineWidth(1);
   arrow->SetLineStyle(1);
-  arrow->SetLineColor(4);
+  arrow->SetLineColor(3);
   TLatex* latex = new TLatex();
   latex->SetNDC();
   latex->SetTextFont(22);
@@ -318,6 +333,7 @@ void TOPGainEfficiencyCalculatorModule::DrawResult()
     if (hTime) {
       gPad->SetLogy();
       hTime->Draw();
+      hTime->SetLineColor(1);
       hTime->GetXaxis()->SetTitle("hit timing [ns]");
       float binWidth = hTime->GetXaxis()->GetBinUpEdge(1) - hTime->GetXaxis()->GetBinLowEdge(1);
       std::ostringstream ytitle;
@@ -332,7 +348,7 @@ void TOPGainEfficiencyCalculatorModule::DrawResult()
         float xMax = hTime->GetXaxis()->GetBinUpEdge(hTime->GetXaxis()->FindBin(peakTime + 2 * m_fitHalfWidth));
         line->DrawLine(xMin, 0.5, xMin, height * 2.);
         line->DrawLine(xMax, 0.5, xMax, height * 2.);
-        arrow->DrawArrow(xMin, height * 1.5, xMax, height * 1.5, 0.05, "<>");
+        arrow->DrawArrow(xMin, height * 1.5, xMax, height * 1.5, 0.01, "<>");
       }
     }
 
@@ -344,15 +360,16 @@ void TOPGainEfficiencyCalculatorModule::DrawResult()
     if (hHeight) {
       gPad->SetLogy();
       hHeight->Draw();
+      hHeight->SetLineColor(1);
       hHeight->GetXaxis()->SetTitle("hit timing [ADC counts]");
       float binWidth = hHeight->GetXaxis()->GetBinUpEdge(1) - hHeight->GetXaxis()->GetBinLowEdge(1);
       std::ostringstream ytitle;
       ytitle << "Entries [/(" << binWidth << " ADC counts)]";
       hHeight->GetYaxis()->SetTitle(ytitle.str().c_str());
 
-      if (m_funcForFitRange && m_funcForFullRange) {
-        m_funcForFitRange[iHisto]->Draw("same");
+      if (m_funcForFitRange[iHisto] && m_funcForFullRange[iHisto]) {
         m_funcForFullRange[iHisto]->Draw("same");
+        m_funcForFitRange[iHisto]->Draw("same");
         double height = hHeight->GetBinContent(hHeight->GetMaximumBin());
         line->DrawLine(m_threshold, 0.5, m_threshold, height * 2.);
 

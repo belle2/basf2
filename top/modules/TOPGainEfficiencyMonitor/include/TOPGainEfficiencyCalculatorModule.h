@@ -116,18 +116,19 @@ namespace Belle2 {
     TTree* m_tree = 0; /**< ntuple to store summary of gain/efficiency calculation */
     TH2F* m_timeHeightHistogram[c_NChannelPerPMT] = {}; /**< 2D histogram of hit timing and pulse height (or charge), taken from an output file of TOPLaserHitSelector */
     TH1D* m_timeHistogram[c_NChannelPerPMT] = {}; /**< hit timing distribution, extracted from m_timeHeightHistogram as a projection along its x-axis. Used to define direct laser photon hit timing */
-    TH1D* m_heightHistogram[c_NChannelPerPMT] = {};
-    TF1* m_funcForFitRange[c_NChannelPerPMT] = {};
-    TF1* m_funcForFullRange[c_NChannelPerPMT] = {};
+    TH1D* m_heightHistogram[c_NChannelPerPMT] = {}; /**< pulse height distribution, extracted from m_timeHeightHistogram as a projection along its y-axis with timing cut. Used gain/efficiency calculation. */
+    TF1* m_funcForFitRange[c_NChannelPerPMT] = {}; /**< array of TF1 pointer to store fit function for pulse height distribution, defined only for fit region */
+    TF1* m_funcForFullRange[c_NChannelPerPMT] = {}; /**< array of TF1 pointer to store fit function for pulse height distribution, defined only for full range of pulse height */
 
-    std::string m_inputFile = "";
-    std::string m_outputPDFFile = "";
-    short m_targetSlotId = 0;
-    short m_targetPmtId = 0;
+    std::string m_inputFile = ""; /**< input file containing timing vs height 2D histograms (output of TOPLaserHitSelector) */
+    std::string m_outputPDFFile =
+      ""; /**< output PDF file to store plots of 2D histogram, timing, and height distribution for each channel */
+    short m_targetSlotId = 0; /**< slot ID */
+    short m_targetPmtId = 0; /**< PMT ID */
 
-    float m_fitHalfWidth = 2.; /**< half fit width for direct laser hit peak in [ns] unit */
+    float m_fitHalfWidth = 1.; /**< half fit width for direct laser hit peak in [ns] unit */
     float m_threshold = 100; /**< pulse height threshold, which defines lower limit of fit region and efficiency calculation */
-    float m_fitMax = 0; /**<  */
+    float m_fitMax = 0; /**< upper limit of fit region for pulse height distribution */
 
     float m_fracFit = 0.99;
     float m_initialP0 = 1e-6;
@@ -141,9 +142,10 @@ namespace Belle2 {
     short m_pmtChId = 0;
     float m_hitTiming = 0;
     float m_hitTimingSigma = 0;
+    int m_nEntries = 0;
+    float m_meanPulseHeight = 0;
     float m_gain = 0;
     float m_efficiency = 0;
-    int m_nEntries = 0;
     float m_p0 = 0;
     float m_p1 = 0;
     float m_p2 = 0;

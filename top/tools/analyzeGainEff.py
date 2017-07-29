@@ -20,9 +20,9 @@ parser.add_argument("--outputRootFile", default="NoOutputRootFile",
                     help="output root file name")
 parser.add_argument("--outputPDFFile", default="NoOutputPDFFile",
                     help="output PDF file name")
-parser.add_argument("--slot", type=int, default=0,
+parser.add_argument("--slotID", type=int, default=0,
                     help="slot number [1-16]")
-parser.add_argument("--PMT", type=int, default=0,
+parser.add_argument("--PMTID", type=int, default=0,
                     help="slot number [1-32]")
 parser.add_argument("--calChannel", type=int, default=0,
                     help="asic channel number where calibration signals are injected [0-7]")
@@ -50,7 +50,7 @@ if (args.inputFile == "NoInputFile") and (args.interimRootFile == "NoInterimRoot
     print("                        [--arg --interimRootFile interim_histo_output.root]")
     print("                        [--arg --outputRootFile sumamry_tree_output.root]")
     print("                        [--arg --outputPDFFile sumamry_plot.pdf]")
-    print("                        [--arg --slot slotNum(1-16)] [--arg --PMT PMTID(1-32)]")
+    print("                        [--arg --slotID slotNum(1-16)] [--arg --PMTID PMTID(1-32)]")
     print("                        [--arg --calChannel asicCh(0-7)] [--arg --threshold threshold]")
     print("                        [--arg --globalDAQ] [--arg --pocketDAQ]")
     print("                        [--arg --noOfflineFE] [--arg --useSingleCalPulse]")
@@ -66,8 +66,8 @@ inputFile = args.inputFile
 interimRoot = args.interimRootFile
 outputRoot = args.outputRootFile
 outputPDF = args.outputPDFFile
-slotId = args.slot
-pmtId = args.PMT
+slotId = args.slotID
+pmtId = args.PMTID
 calChannel = args.calChannel
 threshold = args.threshold
 isGlobalDAQ = False
@@ -132,6 +132,7 @@ if not skipFirst:
     first = create_path()
 
     srootInput = register_module('SeqRootInput')
+    # srootInput.param('fileNameIsPattern', True)
     srootInput.param('inputFileName', inputFile)
     first.add_module(srootInput)
 
@@ -207,26 +208,6 @@ if not skipSecond:
     histoman2 = register_module('HistoManager')
     histoman2.param('histoFileName', outputRoot)
     second.add_module(histoman2)
-
-    # conversion from RawCOPPER or RawDataBlock to RawDetector objects
-    if not isGlobalDAQ:
-        converter2 = register_module('Convert2RawDet')
-        second.add_module(converter2)
-
-    # geometry parameters
-    gearbox2 = register_module('Gearbox')
-    second.add_module(gearbox2)
-
-    # Geometry (only TOP needed)
-    geometry2 = register_module('Geometry')
-    geometry2.param('components', ['TOP'])
-    second.add_module(geometry2)
-
-    # Unpacking
-    unpack2 = register_module('TOPUnpacker')
-    unpack2.param('swapBytes', True)
-    unpack2.param('dataFormat', 0x0301)
-    second.add_module(unpack2)
 
     analysis = register_module('TOPGainEfficiencyCalculator')
     analysis.param('inputFile', interimRoot)

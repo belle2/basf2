@@ -193,12 +193,12 @@ def setup_EKLMAlignment():
 def setup_CDCLayers_GCR_Karim():
     geometry = '/alignment/examples/GCR_Summer2017.xml'
     recotracks = ['RecoTracks']
-    global do_cosmics_reconstruction, dirty_data
+    global do_cosmics_reconstruction
     do_cosmics_reconstruction = True
-    dirty_data = True
 
     # Inherit settings
     millepede = setup_CDCLayers()
+    millepede.algo.invertSign(False)
 
     millepede.set_param(recotracks, 'tracks')
     millepede.set_param(geometry, 'fileName', 'Gearbox')

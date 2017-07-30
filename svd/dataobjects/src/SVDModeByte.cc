@@ -15,16 +15,55 @@ using namespace std;
 
 namespace Belle2 {
 
+  const SVDModeByte::baseType SVDModeByte::c_DefaultID = 151;
+
+  std::ostream& operator<<(std::ostream& os, SVDRunType mode)
+  {
+    switch (mode) {
+      case SVDRunType::raw:
+        os << "raw";
+        break;
+      case SVDRunType::transparent:
+        os << "transpt";
+        break;
+      case SVDRunType::zero_suppressed:
+        os << "0-suppr";
+        break;
+      case SVDRunType::zero_suppressed_timefit:
+        os << "0-suppr+tfit";
+        break;
+    }
+    return os;
+  }
+
+  std::ostream& operator<<(std::ostream& os, SVDEventType evt)
+  {
+    switch (evt) {
+      case SVDEventType::global_run:
+        os << "global";
+        break;
+      case SVDEventType::local_run:
+        os << "local";
+        break;
+    }
+    return os;
+  }
+
   std::ostream& operator<<(std::ostream& os, SVDDAQModeType mode)
   {
     switch (mode) {
-      case SVDDAQModeType::zerosupp_6samples :
-        os << "0-supp 6 samples";
+      case SVDDAQModeType::daq_1sample:
+        os << "1 sample";
         break;
-      case SVDDAQModeType::zerosupp_3samples :
-        os << "0-supp 3 samples";
+      case SVDDAQModeType::daq_3samples:
+        os << "3 samples";
         break;
-      default : os << "unknown mode";
+      case SVDDAQModeType::daq_6samples:
+        os << "6 samples";
+        break;
+      case SVDDAQModeType::daq_unknown:
+        os << "unknown";
+        break;
     }
     return os;
   }
@@ -32,12 +71,14 @@ namespace Belle2 {
   SVDModeByte::operator string() const
   {
     stringstream out;
+    out << m_id.parts.runType;
+    out << "/" << m_id.parts.eventType;
+    out << "/" << m_id.parts.daqMode;
     if (m_id.parts.triggerBin <= MaxGoodTriggerBin) {
-      out << "trg " << static_cast<int>(m_id.parts.triggerBin);
+      out << "/" << static_cast<int>(m_id.parts.triggerBin);
     } else {
-      out << "trg *";
+      out << "/???";
     }
-    out << " DAQ " << m_id.parts.daqMode;
     return out.str();
   }
 

@@ -128,37 +128,35 @@ namespace Belle2 {
 
     float m_fitHalfWidth = 1.; /**< half fit width for direct laser hit peak in [ns] unit */
     float m_threshold = 100; /**< pulse height threshold, which defines lower limit of fit region and efficiency calculation */
-    float m_fitMax = 0; /**< upper limit of fit region for pulse height distribution */
+    float m_fitMax = 0; /**< upper limit of fit region for pulse height distribution, determined based on m_fracFit value */
+    float m_fracFit = 0.99; /**< fraction of events which are covered by an area [0,m_fitMax] */
+    float m_initialP0 = 1e-6; /**< initial value of the fit parameter p0 */
+    float m_initialP1 = 3.0; /**< initial value of the fit parameter p1 */
+    float m_initialP2 = 0.5; /**< initial value of the fit parameter p2 */
+    float m_initialX0 = 0.5; /**< initial value of the fit parameter x0 */
+    float m_pedestalSigma = 10.; /**< sigma of pedestal */
 
-    float m_fracFit = 0.99;
-    float m_initialP0 = 1e-6;
-    float m_initialP1 = 3.0;
-    float m_initialP2 = 0.5;
-    float m_initialX0 = 0.5;
-    float m_pedestalSigma = 10.;
-
-    short m_pixelId = 0;
-    short m_pmtId = 0;
-    short m_pmtChId = 0;
-    float m_hitTiming = 0;
-    float m_hitTimingSigma = 0;
-    int m_nEntries = 0;
-    float m_meanPulseHeight = 0;
-    float m_gain = 0;
-    float m_efficiency = 0;
-    float m_p0 = 0;
-    float m_p1 = 0;
-    float m_p2 = 0;
-    float m_x0 = 0;
-    float m_p0Error = 0;
-    float m_p1Error = 0;
-    float m_p2Error = 0;
-    float m_x0Error = 0;
-    float m_chisquare = 0;
-    int m_ndf = 0;
-    float m_funcFullRangeIntegral = 0;
-    float m_funcFitRangeIntegral = 0;
-    float m_histoFitRangeIntegral = 0;
+    short m_pixelId = 0; /**< pixel ID, calculated from PMT ID and PMT channel ID */
+    short m_pmtChId = 0; /**< PMT channel ID */
+    float m_hitTiming = 0; /**< timing of laser direct photon hits, given by Gaussian fit mean */
+    float m_hitTimingSigma = 0; /**< Gaussian fit sigma for a peak of laser direct photons in hit timing distribution */
+    int m_nEntries = 0; /**< entries of pulse height distribution */
+    float m_meanPulseHeight = 0; /**< histogram mean of pulse height distribution */
+    float m_gain = 0; /**< calculated gain from fitting of pulse height distribution */
+    float m_efficiency = 0; /**< calculated efficiency from fitting of pulse height distribution */
+    float m_p0 = 0; /**< fit result of p0 */
+    float m_p1 = 0; /**< fit result of p1 */
+    float m_p2 = 0; /**< fit result of p2 */
+    float m_x0 = 0; /**< fit result of x0 */
+    float m_p0Error = 0; /**< fit error of p0 */
+    float m_p1Error = 0; /**< fit error of p1 */
+    float m_p2Error = 0; /**< fit error of p2 */
+    float m_x0Error = 0; /**< fit error of x0 */
+    float m_chisquare = 0; /**< chi2 of fitting */
+    int m_ndf = 0; /**< NDF of fitting */
+    float m_funcFullRangeIntegral = 0; /**< integral of fit function for its full range  */
+    float m_funcFitRangeIntegral = 0; /**< integral of fit function above threshold */
+    float m_histoFitRangeIntegral = 0; /**< integral of histogram above threshold */
   };
 
 }  //namespace Belle2

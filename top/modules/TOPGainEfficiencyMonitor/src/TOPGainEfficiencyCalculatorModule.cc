@@ -18,7 +18,6 @@
 
 #include <TROOT.h>
 #include <TObject.h>
-#include <TMath.h>
 #include <TFile.h>
 #include <TF1.h>
 #include <TCanvas.h>
@@ -27,6 +26,7 @@
 #include <TLine.h>
 #include <TArrow.h>
 #include <TLatex.h>
+#include <TMath.h>
 
 using namespace Belle2;
 
@@ -383,8 +383,8 @@ void TOPGainEfficiencyCalculatorModule::DrawResult()
                         << m_tree->GetV1()[0];
           summarystr[1] << "efficiency = " << std::setiosflags(std::ios::fixed) << std::setprecision(1)
                         << (m_tree->GetV2()[0] * 100) << " %";
-          latex->DrawLatex(0.875, 0.35, summarystr[0].str().c_str());
-          latex->DrawLatex(0.875, 0.28, summarystr[1].str().c_str());
+          latex->DrawLatex(0.875, 0.34, summarystr[0].str().c_str());
+          latex->DrawLatex(0.875, 0.29, summarystr[1].str().c_str());
         } else if (nEntries > 1) {
           B2WARNING("TOPGainEfficiencyCalculator : mutliple entries with the same channel ID ("
                     << m_pmtChId << ") in the output TTree");
@@ -411,6 +411,7 @@ void TOPGainEfficiencyCalculatorModule::DrawResult()
   delete arrow;
   delete line;
   delete canvas;
+  if ((object = gROOT->FindObject("dummy"))) delete object;
 
   return;
 }

@@ -8,18 +8,19 @@
 
 from basf2 import *
 import sys
+import os
 import argparse
 import re
 
 parser = argparse.ArgumentParser(description="analyze gain and efficiency for laser run data")
-parser.add_argument("inputFile", nargs='?', default="NoInputFile",
-                    help="input sroot file name")
+parser.add_argument("inputFile", nargs='*', default=["NoInputFile"],
+                    help="Input sroot files. Mulitple files can be given.")
 parser.add_argument("--interimRootFile", default="NoInterimRootFile",
-                    help="interim root file name")
+                    help="Interim root file name to store timing-height 2D histograms.")
 parser.add_argument("--outputRootFile", default="NoOutputRootFile",
-                    help="output root file name")
+                    help="Output root file name to save TTree containing fit results.")
 parser.add_argument("--outputPDFFile", default="NoOutputPDFFile",
-                    help="output PDF file name")
+                    help="Output PDF file name to save fitting results for each channel.")
 parser.add_argument("--slotID", type=int, default=0,
                     help="slot number [1-16]")
 parser.add_argument("--PMTID", type=int, default=0,
@@ -38,7 +39,7 @@ parser.add_argument("--useSingleCalPulse", action="store_true", default=False,
                     help="Do not require double calibration pulses, but require only the first one.")
 args = parser.parse_args()
 
-if (args.inputFile == "NoInputFile") and (args.interimRootFile == "NoInterimRootFile"):
+if (args.inputFile[0] == "NoInputFile") and (args.interimRootFile == "NoInterimRootFile"):
     print("Steering file to study gain/efficiency analysis from laser data.")
     print("In the first step, 2D histograms (hit time vs pulse height) were created for all the available channels, "
           "and saved in an interim root file.")
@@ -46,7 +47,7 @@ if (args.inputFile == "NoInputFile") and (args.interimRootFile == "NoInterimRoot
           "from the 2D histogram and fitted to evaluate gain and efficiency for each channel.")
     print("The second process is done only for one give PMT as it takes time.")
     print("usage:")
-    print("basf2 analyzeGainEff.py [input_filename.sroot]")
+    print("basf2 analyzeGainEff.py [input_filename1.sroot, input_filename2.sroot, ...]")
     print("                        [--arg --interimRootFile interim_histo_output.root]")
     print("                        [--arg --outputRootFile sumamry_tree_output.root]")
     print("                        [--arg --outputPDFFile sumamry_plot.pdf]")
@@ -62,7 +63,7 @@ if (args.inputFile == "NoInputFile") and (args.interimRootFile == "NoInterimRoot
     print()
     sys.exit()
 
-inputFile = args.inputFile
+inputFiles = args.inputFile
 interimRoot = args.interimRootFile
 outputRoot = args.outputRootFile
 outputPDF = args.outputPDFFile
@@ -75,7 +76,7 @@ isGlobalDAQForced = args.globalDAQ
 isPocketDAQForced = args.pocketDAQ
 isOfflineFEDisabled = args.noOfflineFE
 useSingleCalPulse = (True if isOfflineFEDisabled else args.useSingleCalPulse)
-skipFirst = ((inputFile == "NoInputFile") and (interimRoot != "NoInterimRootFile"))
+skipFirst = ((inputFiles[0] == "NoInputFile") and (interimRoot != "NoInterimRootFile"))
 skipSecond = ((slotId < 1) or (slotId > 16) or (pmtId < 1) or (pmtId > 32))
 pmtStr = "s" + ('%02d' % slotId) + "_PMT" + ('%02d' % pmtId)
 if isGlobalDAQForced and isPocketDAQForced:
@@ -89,15 +90,15 @@ if (calChannel < 0) or (calChannel > 7):
     print("ERROR : invalid asic channel with calibration pulses : " + str(calChannel))
     sys.exit()
 
-inputBase = inputFile if not skipFirst else interimRoot
+inputBase = inputFiles[0] if not skipFirst else interimRoot
 dotPos = inputBase.rfind('.')
 outputBase = inputBase[0:dotPos] if (dotPos > 0) else inputBase
 
-if re.search(r"run[0-9]+_slot[0-1][0-9]", inputFile):
-    outputBase = re.search(r"run[0-9]+_slot[0-1][0-9]", inputFile).group()
-elif re.search(r"(top|cosmic|cdc|ecl|klm|test)\.[0-9]+\.[0-9]+", inputFile):
+if re.search(r"run[0-9]+_slot[0-1][0-9]", inputFiles[0]):
+    outputBase = re.search(r"run[0-9]+_slot[0-1][0-9]", inputFiles[0]).group()
+elif re.search(r"(top|cosmic|cdc|ecl|klm|test)\.[0-9]+\.[0-9]+", inputFiles[0]):
     isGlobalDAQ = True
-    outputBase = re.search(r"(top|cosmic|cdc|ecl|klm|test)\.[0-9]+\.[0-9]+", inputFile).group()
+    outputBase = re.search(r"(top|cosmic|cdc|ecl|klm|test)\.[0-9]+\.[0-9]+", inputFiles[0]).group()
 
 if interimRoot is "NoInterimRootFile":
     interimRoot = outputBase + "_gain_histo.root"
@@ -112,28 +113,29 @@ elif (not isGlobalDAQForced) and isPocketDAQForced:
     isGlobalDAQ = False
 
 if not skipFirst:
-    print("*first process : " + inputFile + " --> " + interimRoot)
+    print("*first process  : " + str(inputFiles) + " --> " + interimRoot)
 else:
     print("*first process is skipped...")
 if not skipSecond:
-    print("*second process :" + interimRoot + " --> " + outputRoot + ", " + outputPDF)
+    print("*second process : " + interimRoot + " --> " + outputRoot + ", " + outputPDF)
 else:
     print("*second process is skipped")
 print("*Is global DAQ?   : " + str(isGlobalDAQ))
 print("*Offline FE       : " + ("enabled" if not isOfflineFEDisabled else "disabled"))
-print("*use double pulse : " + str(not isOfflineFEDisabled))
+print("*use double pulse : " + str(not useSingleCalPulse))
 print("*cal. asic channel: " + str(calChannel))
 print("*threshold        : " + str(threshold))
 print()
 print("start process...")
+
 
 if not skipFirst:
     # Create path
     first = create_path()
 
     srootInput = register_module('SeqRootInput')
-    # srootInput.param('fileNameIsPattern', True)
-    srootInput.param('inputFileName', inputFile)
+    srootInput.param('inputFileName', inputFiles[0])
+    # srootInput.param('inputFileNames', inputFiles)
     first.add_module(srootInput)
 
     # HistoManager
@@ -185,7 +187,7 @@ if not skipFirst:
     laserHitSelector.param('minHeightSecondCalPulse', 450)  # in [ADC counts]
     laserHitSelector.param('nominalDeltaT', 21.85)  # in [ns]
     laserHitSelector.param('nominalDeltaTRange', 2)  # in [ns]
-    # laserHitSelector.param('timeHistogramBinning', [100,-150,-50])
+    # laserHitSelector.param('timeHistogramBinning', [100,-150,-50]) # number of bins, lower limit, upper limit
     first.add_module(laserHitSelector)
 
     # Print progress
@@ -201,7 +203,7 @@ if not skipSecond:
     second = create_path()
 
     srootInput2 = register_module('SeqRootInput')
-    srootInput2.param('inputFileName', 'global/e0001/r03664/sub00/top.0001.03664.HLT1.f00000.sroot')
+    srootInput2.param('inputFileName', os.getenv('BELLE2_LOCAL_DIR') + '/top/tools/dummy.sroot')
     second.add_module(srootInput2)
 
     # HistoManager

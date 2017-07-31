@@ -19,7 +19,8 @@ using namespace CDC;
 REG_MODULE(CDCJobCntlParModifier)
 CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDCSimControlPar::getInstance()),
   m_gcp(CDCGeoControlPar::getInstance()), m_wireSag(), m_modLeftRightFlag(), m_debug4Sim(), m_thresholdEnergyDeposit(),
-  m_minTrackLength(), m_maxSpaceResol(), m_debug4Geo(), m_printMaterialTable(), m_materialDefinitionMode(), m_senseWireZposMode(),
+  m_minTrackLength(), m_maxSpaceResol(), m_mapperGeometry(), m_mapperPhiAngle(), m_debug4Geo(), m_printMaterialTable(),
+  m_materialDefinitionMode(), m_senseWireZposMode(),
   m_displacement(),
   m_alignment(),
   m_misalignment(),
@@ -126,6 +127,14 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   addParam("MaxSpaceResol", m_maxSpaceResol,
            "Maximum space resolution (cm) in CDCGeometryPar::getSigma() to avoid a too large value; from 2011 beam test; a bit larger value may be better...",
            double(2.5 * 0.0130));
+
+  //mapper geometry flag
+  addParam("MapperGeometry", m_mapperGeometry, "Define B-field mapper geometry used in GCR in 2017 summer. Tentative option.",
+           bool(false));
+
+  //mapper phi-angle
+  addParam("MapperPhiAngle", m_mapperPhiAngle, "Phi-angle (deg.) of B-field mapper used in GCR in 2017 summer. Tentative option.",
+           double(68.7));
 
 }
 
@@ -301,6 +310,16 @@ void CDCJobCntlParModifierModule::initialize()
   if (m_gcp.getMaxSpaceResolution() != m_maxSpaceResol) {
     B2INFO("CDCJobCntlParModifier: maxSpaceResol modified: " << m_gcp.getMaxSpaceResolution() << " to " << m_maxSpaceResol);
     m_gcp.setMaxSpaceResolution(m_maxSpaceResol);
+  }
+
+  if (m_gcp.getMapperGeometry() != m_mapperGeometry) {
+    B2INFO("CDCJobCntlParModifier: mapper geometry flag modified: " << m_gcp.getMapperGeometry() << " to " << m_mapperGeometry);
+    m_gcp.setMapperGeometry(m_mapperGeometry);
+  }
+
+  if (m_gcp.getMapperPhiAngle() != m_mapperPhiAngle) {
+    B2INFO("CDCJobCntlParModifier: mapper phi-angle modified: " << m_gcp.getMapperPhiAngle() << " to " << m_mapperPhiAngle);
+    m_gcp.setMapperPhiAngle(m_mapperPhiAngle);
   }
 }
 

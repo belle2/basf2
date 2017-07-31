@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/filters/cdcToSpacePoint/state/SimpleCKFCDCToSpacePointStateObjectFilter.h>
-#include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointMatcher.h>
+#include <tracking/ckf/findlets/cdcToSVDSpacePoint/CDCToSVDSpacePointMatcher.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
@@ -154,7 +154,7 @@ Weight SimpleCKFCDCToSpacePointStateObjectFilter::operator()(const BaseCKFCDCToS
 
           const int deltaSensor = lastID.getSensorNumber() - currentID.getSensorNumber();
           const int deltaLadder = mod(lastID.getLadderNumber() - currentID.getLadderNumber(),
-                                      CDCToSpacePointMatcher::maximumLadderNumbers[currentID.getLayerNumber()]);
+                                      CDCToSVDSpacePointMatcher::maximumLadderNumbers[currentID.getLayerNumber()]);
 
           if ((deltaSensor != 0 and deltaSensor != 1) or (deltaLadder > 5)) {
             return NAN;

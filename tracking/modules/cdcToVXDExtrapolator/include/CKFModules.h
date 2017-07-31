@@ -10,14 +10,14 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
-#include <tracking/modules/cdcToVXDExtrapolator/CDCToSpacePointCKFFindlet.h>
+#include <tracking/ckf/findlets/cdcToSVDSpacePoint/CDCToSVDSpacePointCKFFindlet.h>
 
 namespace Belle2 {
   /**
    * Combinatorical Kalman Filter used for extrapolating CDC tracks into SVD and create merged tracks.
    * All implementation is done in the corresponding findlet.
    */
-  class CDCToSVDSpacePointCKFModule : public TrackFindingCDC::FindletModule<CDCToSpacePointCKFFindlet> {
+  class CDCToSVDSpacePointCKFModule : public TrackFindingCDC::FindletModule<CDCToSVDSpacePointCKFFindlet> {
 
   public:
     /// Set description

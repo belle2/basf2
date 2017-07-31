@@ -11,8 +11,8 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/ckf/findlets/cdcToSpacePoint/CDCTrackSpacePointStoreArrayHandler.h>
-#include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointMatcher.h>
+#include <tracking/ckf/findlets/cdcToSVDSpacePoint/CDCTrackSpacePointStoreArrayHandler.h>
+#include <tracking/ckf/findlets/cdcToSVDSpacePoint/CDCToSVDSpacePointMatcher.h>
 #include <tracking/ckf/filters/cdcToSpacePoint/result/CDCVXDTrackCombinationFilterFactory.h>
 #include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectFilterFactory.h>
 
@@ -43,13 +43,13 @@ namespace Belle2 {
    * implement a new state class and a new hit selector (and maybe the store array handling). The rest should be taken
    * care by the framework.
    */
-  class CDCToSpacePointCKFFindlet : public TrackFindingCDC::Findlet<> {
+  class CDCToSVDSpacePointCKFFindlet : public TrackFindingCDC::Findlet<> {
     /// Parent class
     using Super = TrackFindingCDC::Findlet<>;
 
   public:
     /// Constructor, for setting module description and parameters.
-    CDCToSpacePointCKFFindlet();
+    CDCToSVDSpacePointCKFFindlet();
 
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
@@ -65,7 +65,7 @@ namespace Belle2 {
     /// Findlet for retrieving the cdc tracks
     CKFDataLoader<RecoTrack, SpacePoint> m_dataLoader;
     /// Findlet doing the main work: the tree finding
-    TreeSearchFindlet<RecoTrack, SpacePoint, CDCToSpacePointMatcher, CKFCDCToSpacePointStateObjectFilterFactory, 12>
+    TreeSearchFindlet<RecoTrack, SpacePoint, CDCToSVDSpacePointMatcher, CKFCDCToSpacePointStateObjectFilterFactory, 12>
     m_treeSearchFindlet;
     /// Findlet for resolving overlaps
     OverlapResolverFindlet<CDCVXDTrackCombinationFilterFactory> m_overlapResolver;

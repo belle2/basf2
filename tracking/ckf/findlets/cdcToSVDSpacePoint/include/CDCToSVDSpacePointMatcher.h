@@ -21,7 +21,7 @@
 #include <framework/core/ModuleParamList.h>
 
 namespace Belle2 {
-  class CDCToSpacePointMatcher : public TrackFindingCDC::ProcessingSignalListener {
+  class CDCToSVDSpacePointMatcher : public TrackFindingCDC::ProcessingSignalListener {
   public:
     /// Maximal number of ladders per layer
     constexpr static unsigned int maximumLadderNumbers[6] = {8, 12, 7, 10, 12, 16};
@@ -45,12 +45,11 @@ namespace Belle2 {
   };
 
   template<class AStateObject>
-  TrackFindingCDC::VectorRange<const SpacePoint*> CDCToSpacePointMatcher::getMatchingHits(AStateObject& currentState)
+  TrackFindingCDC::VectorRange<const SpacePoint*> CDCToSVDSpacePointMatcher::getMatchingHits(AStateObject& currentState)
   {
     const unsigned int currentNumber = currentState.getNumber();
 
-    // TODO
-    if (currentNumber == 12 or isOnOverlapLayer(currentState)) {
+    if (currentNumber == currentState.getMaximumNumber() or isOnOverlapLayer(currentState)) {
       // next layer is not an overlap one, so we can just return all hits of this layer.
       const unsigned int nextLayer = extractGeometryLayer(currentState) - 1;
       B2DEBUG(100, "Will return all hits from layer " << nextLayer << ", which are " << m_cachedHitMap[nextLayer].size());
@@ -66,7 +65,7 @@ namespace Belle2 {
 
       const unsigned int ladderNumber = lastAddedSpacePoint->getVxdID().getLadderNumber();
       const unsigned int currentLayer = extractGeometryLayer(currentState);
-      const unsigned int maximumLadderNumber = CDCToSpacePointMatcher::maximumLadderNumbers[currentLayer];
+      const unsigned int maximumLadderNumber = CDCToSVDSpacePointMatcher::maximumLadderNumbers[currentLayer];
 
       // the reason for this strange formula is the numbering scheme in the VXD.
       // we first substract 1 from the ladder number to have a ladder counting from 0 to N - 1,

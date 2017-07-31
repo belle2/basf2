@@ -8,12 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/cdcToVXDExtrapolator/CDCToSpacePointCKFFindlet.h>
+#include <tracking/ckf/findlets/cdcToSVDSpacePoint/CDCToSVDSpacePointCKFFindlet.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCToSpacePointCKFFindlet::CDCToSpacePointCKFFindlet()
+CDCToSVDSpacePointCKFFindlet::CDCToSVDSpacePointCKFFindlet()
 {
   addProcessingSignalListener(&m_dataLoader);
   addProcessingSignalListener(&m_treeSearchFindlet);
@@ -22,7 +22,7 @@ CDCToSpacePointCKFFindlet::CDCToSpacePointCKFFindlet()
   addProcessingSignalListener(&m_spacePointTagger);
 }
 
-void CDCToSpacePointCKFFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void CDCToSVDSpacePointCKFFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
 
@@ -33,7 +33,7 @@ void CDCToSpacePointCKFFindlet::exposeParameters(ModuleParamList* moduleParamLis
   m_spacePointTagger.exposeParameters(moduleParamList, prefix);
 }
 
-void CDCToSpacePointCKFFindlet::beginEvent()
+void CDCToSVDSpacePointCKFFindlet::beginEvent()
 {
   Super::beginEvent();
 
@@ -42,7 +42,7 @@ void CDCToSpacePointCKFFindlet::beginEvent()
   m_results.clear();
 }
 
-void CDCToSpacePointCKFFindlet::apply()
+void CDCToSVDSpacePointCKFFindlet::apply()
 {
   m_dataLoader.apply(m_cdcRecoTrackVector, m_spacePointVector);
 

@@ -7,15 +7,15 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointMatcher.h>
+#include <tracking/ckf/findlets/cdcToSVDSpacePoint/CDCToSVDSpacePointMatcher.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-constexpr unsigned int CDCToSpacePointMatcher::maximumLadderNumbers[6];
+constexpr unsigned int CDCToSVDSpacePointMatcher::maximumLadderNumbers[6];
 
-void CDCToSpacePointMatcher::initializeEventCache(std::vector<RecoTrack*>& seedsVector,
-                                                  std::vector<const SpacePoint*>& filteredHitVector)
+void CDCToSVDSpacePointMatcher::initializeEventCache(std::vector<RecoTrack*>& seedsVector,
+                                                     std::vector<const SpacePoint*>& filteredHitVector)
 {
   m_cachedHitMap.clear();
 

@@ -65,7 +65,7 @@ def load(obj):
         state = State(load_model(os.path.join(path, 'weights.h5'), custom_objects=obj[1]))
 
     for index, key in enumerate(obj[2]):
-        setattr(state, obj[index + 3])
+        setattr(state, key, obj[index + 3])
 
     return state
 

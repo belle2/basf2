@@ -159,6 +159,13 @@ double EnergyLossEstimator::getMomentumLossFactor(double p, int pdgCode, double 
 {
   const double eLoss = getEnergyLoss(p, pdgCode, arcLength);
   return (p - eLoss) / p;
+
+  const double mass = getMass(pdgCode);
+
+  const double eBefore = std::sqrt(p * p + mass * mass);
+  const double eAfter = eBefore - eLoss;
+  const double pAfter = std::sqrt(eAfter * eAfter - mass * mass);
+  return pAfter / p;
 }
 
 double EnergyLossEstimator::getLossDist2D(double pt, int pdgCode, double arcLength2D) const

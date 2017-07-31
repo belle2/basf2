@@ -18,48 +18,46 @@
 
 namespace Belle2 {
 
+  // NB: I replaced enums with constexpressions here, since GCC complains
+  // (falsely, clang does not) about sturcture sizes, and the warnings can
+  // not be suppressed due to an error in GCC (July 2017).
+
   /** Run time, 2-bits:
    * 00 raw,
    * 01 transparent,
    * 10 zero-suppressed,
    * 11 zero-suppressed + hit time finding
    */
-  enum class SVDRunType : uint8_t {
+  namespace SVDRunType {
+    constexpr uint8_t
     raw = 0,
     transparent = 1,
     zero_suppressed = 2,
-    zero_suppressed_timefit = 3
-  };
-
-  /** output SVDRunType data */
-  std::ostream& operator<<(std::ostream& os, SVDRunType mode);
+    zero_suppressed_timefit = 3;
+  }
 
   /** Event Type, 3 bits, separated into 1+2 bits:
    * 1. bit:
    * 0 TTD event (global run form FTSW),
    * 1 standalone event (local run)
    */
-  enum class SVDEventType : uint8_t {
+  namespace SVDEventType {
+    constexpr uint8_t
     global_run = 0,
-    local_run = 1
-  };
-
-  /** Output SVDEventType data */
-  std::ostream& operator<<(std::ostream& os, SVDEventType evt);
+    local_run = 1;
+  }
 
   /** 2+3 bit:
    * 00 1-sample,
    * 01 3-sample,
    * 10 6-sample
    */
-  enum class SVDDAQModeType : uint8_t {
+  namespace SVDDAQModeType {
+    constexpr uint8_t
     daq_1sample = 0,
     daq_3samples = 1,
-    daq_6samples = 2
-  };
-
-  /** Output SVDDAQModeType data */
-  std::ostream& operator<<(std::ostream& os, SVDDAQModeType mode);
+    daq_6samples = 2;
+  }
 
   /**
    * Class to store mode information in an SVDShaperDigit.
@@ -102,32 +100,24 @@ namespace Belle2 {
      * Run type: zero-suppressed, 2
      * Event type: global run, 0
      * DAQ mode: 6-samples, 2
-     * Trigger 111 = 7
+     * Trigger invalid 111 = 7
      */
     static const baseType c_DefaultID;
 
-    /** Constructor using the unique id.
-     */
+    /** Constructor using the unique id.  */
     // cppcheck-suppress noExplicitConstructor
     SVDModeByte(baseType id = c_DefaultID)
     {
       m_id.id = id;
     }
-    /** Constructor using triggerBin, daqMode and sensor ids */
-    SVDModeByte(SVDRunType runType, SVDEventType eventType, SVDDAQModeType daqMode, baseType triggerBin)
+    /** Constructor using triggerBin, daqMode etc.*/
+    SVDModeByte(baseType runType, baseType eventType, baseType daqMode,
+                baseType triggerBin)
     {
       m_id.parts.triggerBin   = triggerBin;
       m_id.parts.daqMode  = daqMode;
       m_id.parts.eventType = eventType;
       m_id.parts.runType = runType;
-    }
-    /** Constructor using cast of baseType values */
-    SVDModeByte(baseType runType, baseType eventType, baseType daqMode, baseType triggerBin)
-    {
-      m_id.parts.triggerBin   = triggerBin;
-      m_id.parts.daqMode  = static_cast<SVDDAQModeType>(daqMode);
-      m_id.parts.eventType = static_cast<SVDEventType>(eventType);
-      m_id.parts.runType = static_cast<SVDRunType>(runType);
     }
     /** Copy constructor */
     SVDModeByte(const SVDModeByte& b): m_id(b.m_id) {}
@@ -160,11 +150,11 @@ namespace Belle2 {
         return std::make_pair(-31.44, 0.0);
     }
     /** Get the daqMode id */
-    SVDDAQModeType getDAQMode() const { return m_id.parts.daqMode; }
+    baseType getDAQMode() const { return m_id.parts.daqMode; }
     /** Get the eventMode id */
-    SVDEventType getEventType() const { return m_id.parts.eventType; }
+    baseType getEventType() const { return m_id.parts.eventType; }
     /** Get the runMode id */
-    SVDRunType getRunType() const { return m_id.parts.runType; }
+    baseType getRunType() const { return m_id.parts.runType; }
 
     // Some useful getters
     /** Do we have time fit information? */
@@ -194,11 +184,14 @@ namespace Belle2 {
     void setTriggerBin(baseType triggerBin)
     { m_id.parts.triggerBin  = triggerBin;  }
     /** Set the daqMode id */
-    void setDAQMode(SVDDAQModeType daqMode) { m_id.parts.daqMode = daqMode; }
+    void setDAQMode(baseType daqMode)
+    { m_id.parts.daqMode = daqMode; }
     /** Set the eventType id */
-    void setEventType(SVDEventType eventType) { m_id.parts.eventType = eventType; }
+    void setEventType(baseType eventType)
+    { m_id.parts.eventType = eventType; }
     /** Set the runType id */
-    void setRunType(SVDRunType runType) { m_id.parts.runType = runType; }
+    void setRunType(baseType runType)
+    { m_id.parts.runType = runType; }
 
     /** make this type printable in python with print(vxd_id) */
     std::string __str__() const { return (std::string)(*this); }
@@ -213,11 +206,11 @@ baseType id: Bits;
         /** Trigger time id */
 baseType triggerBin: TriggerBinBits;
         /** DAQ mode id */
-SVDDAQModeType daqMode: DAQModeBits;
+baseType daqMode: DAQModeBits;
         /** Event type id */
-SVDEventType eventType: EventTypeBits;
+baseType eventType: EventTypeBits;
         /** Run type id */
-SVDRunType runType: RunTypeBits;
+baseType runType: RunTypeBits;
       } parts /**< Struct to contain all id components */;
     } m_id; /**< Union to store the ID and all components in one go. */
   };

@@ -17,9 +17,10 @@ namespace Belle2 {
 
   const SVDModeByte::baseType SVDModeByte::c_DefaultID = 151;
 
-  std::ostream& operator<<(std::ostream& os, SVDRunType mode)
+  SVDModeByte::operator string() const
   {
-    switch (mode) {
+    stringstream os;
+    switch (m_id.parts.runType) {
       case SVDRunType::raw:
         os << "raw";
         break;
@@ -33,12 +34,8 @@ namespace Belle2 {
         os << "0-suppr+tfit";
         break;
     }
-    return os;
-  }
-
-  std::ostream& operator<<(std::ostream& os, SVDEventType evt)
-  {
-    switch (evt) {
+    os << "/";
+    switch (m_id.parts.eventType) {
       case SVDEventType::global_run:
         os << "global";
         break;
@@ -46,12 +43,8 @@ namespace Belle2 {
         os << "local";
         break;
     }
-    return os;
-  }
-
-  std::ostream& operator<<(std::ostream& os, SVDDAQModeType mode)
-  {
-    switch (mode) {
+    os << "/";
+    switch (m_id.parts.daqMode) {
       case SVDDAQModeType::daq_1sample:
         os << "1 sample";
         break;
@@ -64,21 +57,13 @@ namespace Belle2 {
       default:
         os << "unknown";
     }
-    return os;
-  }
-
-  SVDModeByte::operator string() const
-  {
-    stringstream out;
-    out << m_id.parts.runType;
-    out << "/" << m_id.parts.eventType;
-    out << "/" << m_id.parts.daqMode;
+    os << "/";
     if (m_id.parts.triggerBin <= MaxGoodTriggerBin) {
-      out << "/" << static_cast<int>(m_id.parts.triggerBin);
+      os << static_cast<int>(m_id.parts.triggerBin);
     } else {
-      out << "/???";
+      os << "???";
     }
-    return out.str();
+    return os.str();
   }
 
   std::ostream& operator<<(std::ostream& out, const SVDModeByte& id)

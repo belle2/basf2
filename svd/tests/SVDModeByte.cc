@@ -28,7 +28,7 @@ namespace Belle2 {
       // Malformed
       s0.setTriggerBin(3);
       EXPECT_EQ((string)s0, "0-suppr/global/6 samples/3");
-      s0.setDAQMode(static_cast<SVDDAQModeType>(1));
+      s0.setDAQMode(1);
       EXPECT_EQ((string)s0, "0-suppr/global/3 samples/3");
     }
 

@@ -18,6 +18,7 @@ CDCToSpacePointCKFFindlet::CDCToSpacePointCKFFindlet()
 {
   addProcessingSignalListener(&m_cdcTracksLoader);
   addProcessingSignalListener(&m_hitsLoader);
+  addProcessingSignalListener(&m_trackFitter);
   addProcessingSignalListener(&m_treeSearchFindlet);
   addProcessingSignalListener(&m_storeArrayHandler);
   addProcessingSignalListener(&m_overlapTeacher);
@@ -31,6 +32,7 @@ void CDCToSpacePointCKFFindlet::exposeParameters(ModuleParamList* moduleParamLis
 
   m_cdcTracksLoader.exposeParameters(moduleParamList, prefix);
   m_hitsLoader.exposeParameters(moduleParamList, prefix);
+  m_trackFitter.exposeParameters(moduleParamList, prefix);
   m_treeSearchFindlet.exposeParameters(moduleParamList, prefix);
   m_storeArrayHandler.exposeParameters(moduleParamList, prefix);
   m_overlapTeacher.exposeParameters(moduleParamList, prefix);
@@ -52,11 +54,7 @@ void CDCToSpacePointCKFFindlet::apply()
   m_cdcTracksLoader.apply(m_cdcRecoTrackVector);
   m_hitsLoader.apply(m_spacePointVector);
 
-  // Remove all non-fitted tracks
-  const auto& cdcTrackWasNotFitted = [](const RecoTrack * recoTrack) {
-    return not recoTrack->wasFitSuccessful();
-  };
-  erase_remove_if(m_cdcRecoTrackVector, cdcTrackWasNotFitted);
+  m_trackFitter.apply(m_cdcRecoTrackVector);
 
   m_treeSearchFindlet.apply(m_cdcRecoTrackVector, m_spacePointVector, m_results);
 

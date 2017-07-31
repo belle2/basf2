@@ -79,6 +79,7 @@ namespace Belle2 {
     OverlapResolverFindlet() : Super()
     {
       Super::addProcessingSignalListener(&m_qualityFilter);
+      Super::addProcessingSignalListener(&m_overlapTeacher);
 
       m_overlapResolverInfos.reserve(100);
       m_temporaryResults.reserve(100);
@@ -91,6 +92,7 @@ namespace Belle2 {
       Super::exposeParameters(moduleParamList, prefix);
 
       m_qualityFilter.exposeParameters(moduleParamList, prefix);
+      m_overlapTeacher.exposeParameters(moduleParamList, prefix);
 
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimalActivityState"),
                                     m_param_minimalActivityState,

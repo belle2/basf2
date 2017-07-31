@@ -95,7 +95,7 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     SVDShaperDigit() : SVDShaperDigit(
-        0, true, 0, APVRawSamples( {0, 0, 0, 0, 0, 0})
+        0, true, 0, APVRawSamples( {{0, 0, 0, 0, 0, 0}})
     )
     { }
 

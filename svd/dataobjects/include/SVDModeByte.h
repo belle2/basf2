@@ -55,8 +55,7 @@ namespace Belle2 {
   enum class SVDDAQModeType : uint8_t {
     daq_1sample = 0,
     daq_3samples = 1,
-    daq_6samples = 2,
-    daq_unknown = 3
+    daq_6samples = 2
   };
 
   /** Output SVDDAQModeType data */

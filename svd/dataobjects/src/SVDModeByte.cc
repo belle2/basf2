@@ -61,9 +61,8 @@ namespace Belle2 {
       case SVDDAQModeType::daq_6samples:
         os << "6 samples";
         break;
-      case SVDDAQModeType::daq_unknown:
+      default:
         os << "unknown";
-        break;
     }
     return os;
   }

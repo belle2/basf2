@@ -47,20 +47,23 @@ EnergyLossEstimator EnergyLossEstimator::forCDC()
   double Z = 0;
 
   if (g4Mat->GetNumberOfElements() == 1) {
+    A = g4Mat->GetA() * CLHEP::mole / CLHEP::g;
     Z = g4Mat->GetZ();
-    A = g4Mat->GetA();
   } else {
     // Calculate weight-averaged A, Z
     for (unsigned i = 0; i < g4Mat->GetNumberOfElements(); ++i) {
       const G4Element* element = (*g4Mat->GetElementVector())[i];
-      Z += element->GetZ() * g4Mat->GetFractionVector()[i];
-      A += element->GetA() * g4Mat->GetFractionVector()[i];
+      const double elementA = element->GetA() * CLHEP::mole / CLHEP::g;
+      const double elementZ = element->GetZ();
+      const double frac = g4Mat->GetFractionVector()[i];
+      B2RESULT("Part " << i << " Z=" << elementZ << " A=" << elementA << " (" << frac << ")");
+      Z += elementZ * frac;
+      A += elementA * frac;
     }
   }
 
   // Make sure to translate to Belle units from the Geant4 / CLHEP units
   // Z has correct units (is unitless)
-  A *= CLHEP::mole / CLHEP::g;
   const double density = g4Mat->GetDensity() / CLHEP::g * CLHEP::cm3;
   const double radiationLength = g4Mat->GetRadlen() / CLHEP::cm;
   const double mEE = g4Mat->GetIonisation()->GetMeanExcitationEnergy() / CLHEP::GeV;

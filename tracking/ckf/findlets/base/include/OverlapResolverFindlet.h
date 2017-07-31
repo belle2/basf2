@@ -14,6 +14,9 @@
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 
+#include <tracking/ckf/findlets/base/OverlapTeacher.h>
+#include <tracking/ckf/filters/base/CKFResultTruthVarSet.h>
+
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapResolverNodeInfo.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/HopfieldNetwork.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/Scrooge.h>
@@ -21,6 +24,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <fstream>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
 
 namespace Belle2 {
   /**
@@ -34,8 +38,8 @@ namespace Belle2 {
    *
    * The implementation is based on the Hopfield network.
    */
-  template<class AFilter>
-  class OverlapResolverFindlet : public TrackFindingCDC::Findlet<typename AFilter::Object> {
+  template<class AFilterFactory>
+  class OverlapResolverFindlet : public TrackFindingCDC::Findlet<typename AFilterFactory::CreatedFilter::Object> {
     /// Helper Functor to get the Seed of a given result
     struct SeedGetter {
       /// Make it a functor
@@ -60,12 +64,16 @@ namespace Belle2 {
       }
     };
 
+    /// Copy the seed definition
+    using SeedObject = typename AFilterFactory::CreatedFilter::Object::SeedObject;
+    /// Copy the hit definition
+    using HitObject = typename AFilterFactory::CreatedFilter::Object::HitObject;
 
   public:
     /// The pair of seed and hit vector to check
-    using ResultPair = typename AFilter::Object;
+    using Result = typename AFilterFactory::CreatedFilter::Object;
     /// The parent class
-    using Super = TrackFindingCDC::Findlet<ResultPair>;
+    using Super = TrackFindingCDC::Findlet<Result>;
 
     /// Reserve space and add the filter as a listener.
     OverlapResolverFindlet() : Super()
@@ -110,7 +118,7 @@ namespace Belle2 {
     }
 
     /// Main function of this findlet: find a non overlapping set of results with the best quality.
-    void apply(std::vector<ResultPair>& resultElements) final {
+    void apply(std::vector<Result>& resultElements) final {
       if (not m_param_enableOverlapResolving or resultElements.empty())
       {
         return;
@@ -119,6 +127,9 @@ namespace Belle2 {
       m_temporaryResults.clear();
       m_resultsWithWeight.clear();
       m_overlapResolverInfos.clear();
+
+      // Apply MC teacher if enabled
+      m_overlapTeacher.apply(resultElements);
 
       // Sort results by seed, as it makes the next operations faster
       std::sort(resultElements.begin(), resultElements.end(), TrackFindingCDC::LessOf<SeedGetter>());
@@ -134,8 +145,10 @@ namespace Belle2 {
     }
 
   private:
+    /// Subfindlet for adding truth information before the overlap finder
+    OverlapTeacher<CKFResultTruthVarSet<SeedObject, HitObject>> m_overlapTeacher;
     /// Subfindlet: The quality filter
-    AFilter m_qualityFilter;
+    TrackFindingCDC::ChooseableFilter<AFilterFactory> m_qualityFilter;
     /// Sub algorithm: the hopfield algorithm class
     HopfieldNetwork m_hopfieldNetwork;
     /// Sub algorithm: the greedy algorithm
@@ -159,27 +172,27 @@ namespace Belle2 {
     /// Overlap resolver infos as input to the hopfield network.
     std::vector<OverlapResolverNodeInfo> m_overlapResolverInfos;
     /// temporary results vector, that will be swapped with the real results vector.
-    std::vector<ResultPair> m_temporaryResults;
+    std::vector<Result> m_temporaryResults;
     /// temporary results vector with weights, out of which the overlaps will be build.
-    std::vector<TrackFindingCDC::WithWeight<ResultPair*>> m_resultsWithWeight;
+    std::vector<TrackFindingCDC::WithWeight<Result*>> m_resultsWithWeight;
 
     /// Resolve the overlaps in the given set of results
-    void resolveOverlaps(std::vector<ResultPair>& resultElements, std::vector<ResultPair>& outputResults);
+    void resolveOverlaps(std::vector<Result>& resultElements, std::vector<Result>& outputResults);
 
     /// Group the results by their seed and handle each group separately.
-    void groupbySeedsAndMaximize(std::vector<ResultPair>& resultElements, std::vector<ResultPair>& outputResults);
+    void groupbySeedsAndMaximize(std::vector<Result>& resultElements, std::vector<Result>& outputResults);
   };
 
-  template<class AFilter>
-  void OverlapResolverFindlet<AFilter>::groupbySeedsAndMaximize(std::vector<ResultPair>& resultElements,
-      std::vector<ResultPair>& outputResults)
+  template<class AFilterFactory>
+  void OverlapResolverFindlet<AFilterFactory>::groupbySeedsAndMaximize(std::vector<Result>& resultElements,
+      std::vector<Result>& outputResults)
   {
     // resolve overlaps in each seed separately
     const auto& groupedBySeed = TrackFindingCDC::adjacent_groupby(resultElements.begin(), resultElements.end(), SeedGetter());
     for (const auto& resultElementsWithSameSeed : groupedBySeed) {
 
       m_resultsWithWeight.clear();
-      for (ResultPair& resultPair : resultElementsWithSameSeed) {
+      for (Result& resultPair : resultElementsWithSameSeed) {
         TrackFindingCDC::Weight weight = m_qualityFilter(resultPair);
         if (std::isnan(weight)) {
           continue;
@@ -200,14 +213,14 @@ namespace Belle2 {
     }
   }
 
-  template<class AFilter>
-  void OverlapResolverFindlet<AFilter>::resolveOverlaps(std::vector<ResultPair>& resultElements,
-                                                        std::vector<ResultPair>& outputResults)
+  template<class AFilterFactory>
+  void OverlapResolverFindlet<AFilterFactory>::resolveOverlaps(std::vector<Result>& resultElements,
+      std::vector<Result>& outputResults)
   {
     TrackFindingCDC::Weight maximalWeight = NAN;
     TrackFindingCDC::Weight minimalWeight = NAN;
 
-    for (ResultPair& resultPair : resultElements) {
+    for (Result& resultPair : resultElements) {
       TrackFindingCDC::Weight weight = m_qualityFilter(resultPair);
       if (std::isnan(weight)) {
         continue;
@@ -239,7 +252,7 @@ namespace Belle2 {
     }
 
     for (OverlapResolverNodeInfo& resolverInfo : m_overlapResolverInfos) {
-      const ResultPair* resultPair = m_resultsWithWeight[resolverInfo.trackIndex];
+      const Result* resultPair = m_resultsWithWeight[resolverInfo.trackIndex];
 
       // Find overlaps.
       auto& overlaps = resolverInfo.overlaps;
@@ -250,15 +263,15 @@ namespace Belle2 {
           continue;
         }
 
-        const ResultPair* loopResultPair = m_resultsWithWeight[loopResolverInfo.trackIndex];
+        const Result* loopResult = m_resultsWithWeight[loopResolverInfo.trackIndex];
 
-        if (loopResultPair->getSeed() == resultPair->getSeed()) {
+        if (loopResult->getSeed() == resultPair->getSeed()) {
           overlaps.push_back(loopResolverInfo.trackIndex);
           continue;
         }
 
         for (const auto& hit : resultPair->getHits()) {
-          if (TrackFindingCDC::is_in(hit, loopResultPair->getHits())) {
+          if (TrackFindingCDC::is_in(hit, loopResult->getHits())) {
             overlaps.push_back(loopResolverInfo.trackIndex);
             break;
           }

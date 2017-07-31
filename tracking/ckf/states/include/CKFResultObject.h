@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <vector>
 
 namespace Belle2 {
   /**
@@ -19,26 +20,27 @@ namespace Belle2 {
    * to the filters.
    * This object will not be stored to the DataStore, but is only for internal usage.
    */
-  template <class AStateObject>
+  template <class ASeedObject, class AHitObject>
   class CKFResultObject {
-    /// Copy the hit object definition from the state
-    using HitObject = typename AStateObject::HitObject;
-    // / Copy the seed object definition from the state
-    using SeedObject = typename AStateObject::SeedObject;
 
   public:
+    /// Copy seed definition
+    using SeedObject = ASeedObject;
+    /// Copy hit definition
+    using HitObject = AHitObject;
+
     /// Constructor
-    CKFResultObject(SeedObject* seed, const std::vector<const HitObject*> hits, double chi2) : m_seed(seed), m_hits(hits),
+    CKFResultObject(ASeedObject* seed, const std::vector<const AHitObject*> hits, double chi2) : m_seed(seed), m_hits(hits),
       m_chi2(chi2) {}
 
     /// Getter for the stored hits
-    const std::vector<const HitObject*>& getHits() const
+    const std::vector<const AHitObject*>& getHits() const
     {
       return m_hits;
     }
 
     /// Getter for the stored seeds
-    SeedObject* getSeed() const
+    ASeedObject* getSeed() const
     {
       return m_seed;
     }
@@ -63,9 +65,9 @@ namespace Belle2 {
 
   private:
     /// The stored seed
-    SeedObject* m_seed;
+    ASeedObject* m_seed;
     /// The stored hits
-    std::vector<const HitObject*> m_hits;
+    std::vector<const AHitObject*> m_hits;
     /// The stored chi2
     double m_chi2;
     /// A weight, which transports the teacher information

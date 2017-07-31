@@ -12,19 +12,25 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
+#include <tracking/ckf/findlets/base/HitSelector.h>
 #include <tracking/ckf/findlets/base/StateTransformer.h>
 
 namespace Belle2 {
   /**
-   * General implementation of a tree search algorithm using a given class as states
-   * and an algorithm class to decide, which child states should be used.
-   * All combinations of childs are returned in the form of ResultObjects.
+   * General implementation of a tree search algorithm using a given class as seeds and hits
+   * and two algorithm classes to decide, which child states should be used.
+   * All combinations of childs are returned in the form of CKFResultObjects.
    * Make sure that your return vector can hold that much results (e.g. reserve space before to save time).
    *
-   * The hit selector should return a Range/list of possible child states. The selector
-   * algorithm has to take care, that if it returns iterators to temporary objects, that these
+   * The hit finder should return a Range/list of possible hits.
+   * From each of those hits, a new state is created using the state transformator (actually, a pool
+   * of states is reused, but this is hidden to the user).
+   * The transformer algorithm has to take care, that if it returns iterators to temporary objects, that these
    * objects still live long enough (that is, they live as long as all child states of this state
    * are accessed, which is until the layer counter is increased again).
+   *
+   * The hit selector filter factory is then used to create a hit selector, to delete all states that should not
+   * be used as new children and the algorithm is advanced.
    *
    * This class is very much optimized for calculation speed and performance, which leads to some
    * "unusual" code. E.g. we try not to construct state objects again and again, so we reuse a pool of N states
@@ -35,18 +41,20 @@ namespace Belle2 {
    * In the end, the result object needs to return a copy of the objects, as the state objects
    * will be reused afterwards.
    */
-  template<class AStateObject, class AHitFinder, class AHitSelector>
+  template<class ASeedObject, class AHitObject, class AHitFinder, class AHitSelectorFilterFactory, unsigned int MaxNumber>
   class TreeSearchFindlet : public TrackFindingCDC::Findlet <
-    typename AStateObject::SeedObject*,
-    const typename AStateObject::HitObject*,
-    typename AStateObject::ResultObject > {
+    ASeedObject*,
+    const AHitObject*,
+    CKFResultObject<ASeedObject, AHitObject >> {
   public:
     /// The class of the seed
-    using SeedPtr = typename AStateObject::SeedObject*;
+    using SeedPtr = ASeedObject*;
     /// The class of the hit
-    using HitPtr = const typename AStateObject::HitObject*;
+    using HitPtr = const AHitObject*;
+    /// The class of the state
+    using StateObject = CKFStateObject<ASeedObject, AHitObject>;
     /// The returned objects after tree traversal.
-    using ResultObject = typename AStateObject::ResultObject ;
+    using ResultObject = CKFResultObject<ASeedObject, AHitObject>;
     /// Parent class
     using Super = TrackFindingCDC::Findlet<SeedPtr, HitPtr, ResultObject>;
 
@@ -77,30 +85,37 @@ namespace Belle2 {
       for (SeedPtr seed : seedsVector) {
         B2DEBUG(50, "Starting with new seed...");
 
-        AStateObject firstState(seed);
+        StateObject firstState(seed, MaxNumber);
         traverseTree(&firstState, results);
         B2DEBUG(50, "... finished with seed");
 
       }
+
+      // Remove all empty results
+      const auto& resultIsEmpty = [](const ResultObject & result) {
+        return result.getHits().empty();
+      };
+      TrackFindingCDC::erase_remove_if(results, resultIsEmpty);
     }
 
   private:
     /// Subfindlet: hit selector
-    AHitSelector m_hitSelector;
+    HitSelector<AHitSelectorFilterFactory> m_hitSelector;
 
     /// Subfindlet: hit finder
     AHitFinder m_hitFinder;
 
     /// Subfindlet: state transformer
-    StateTransformer<AStateObject> m_stateTransformer;
+    StateTransformer<StateObject, MaxNumber> m_stateTransformer;
 
     /// Implementation of the traverseTree function
-    void traverseTree(AStateObject* currentState, std::vector<ResultObject>& resultsVector);
+    void traverseTree(StateObject* currentState, std::vector<ResultObject>& resultsVector);
   };
 
-  template<class AStateObject, class AHitFinder, class AHitSelector>
-  void TreeSearchFindlet<AStateObject, AHitFinder, AHitSelector>::traverseTree(AStateObject* currentState,
-      std::vector<ResultObject>& resultsVector)
+  template<class ASeedObject, class AHitObject, class AHitFinder, class AHitSelectorFilterFactory, unsigned int MaxNumber>
+  void TreeSearchFindlet<ASeedObject, AHitObject, AHitFinder, AHitSelectorFilterFactory, MaxNumber>::traverseTree(
+    StateObject* currentState,
+    std::vector<ResultObject>& resultsVector)
   {
     B2DEBUG(50, "Now on number " << currentState->getNumber());
 
@@ -116,7 +131,7 @@ namespace Belle2 {
     B2DEBUG(50, "Having found " << matchingHits.size() << " possible hits");
 
     // Transform the hits into states
-    std::vector<AStateObject*> childStates;
+    std::vector<StateObject*> childStates;
     m_stateTransformer.transform(matchingHits, childStates, currentState);
 
     // Filter out bad states
@@ -130,7 +145,7 @@ namespace Belle2 {
 
     // Traverse the tree from each new state on
     B2DEBUG(50, "Having found " << childStates.size() << " child states.");
-    for (AStateObject* childState : childStates) {
+    for (StateObject* childState : childStates) {
       traverseTree(childState, resultsVector);
     }
   }

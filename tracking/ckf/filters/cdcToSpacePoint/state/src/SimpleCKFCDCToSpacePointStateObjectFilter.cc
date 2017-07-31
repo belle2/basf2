@@ -46,9 +46,9 @@ void SimpleCKFCDCToSpacePointStateObjectFilter::initialize()
 {
   BaseCKFCDCToSpacePointStateObjectFilter::initialize();
 
-  B2ASSERT("You need to provide exactly 4 maximal norms (for four layers).", m_param_maximumHelixChi2XYZ.size() == 4);
-  B2ASSERT("You need to provide exactly 4 maximal norms (for four layers).", m_param_maximumChi2XY.size() == 4);
-  B2ASSERT("You need to provide exactly 4 maximal norms (for four layers).", m_param_maximumChi2.size() == 4);
+  B2ASSERT("You need to provide exactly 6 maximal norms (for six layers).", m_param_maximumHelixChi2XYZ.size() == 6);
+  B2ASSERT("You need to provide exactly 6 maximal norms (for six layers).", m_param_maximumChi2XY.size() == 6);
+  B2ASSERT("You need to provide exactly 6 maximal norms (for six layers).", m_param_maximumChi2.size() == 6);
 }
 
 void SimpleCKFCDCToSpacePointStateObjectFilter::beginRun()
@@ -60,39 +60,112 @@ Weight SimpleCKFCDCToSpacePointStateObjectFilter::operator()(const BaseCKFCDCToS
 {
   const SpacePoint* spacePoint = currentState.getHit();
 
+  unsigned int numberOfHoles = 0;
+
+  currentState.walk([&numberOfHoles](const BaseCKFCDCToSpacePointStateObjectFilter::Object * walkObject) {
+    if (not walkObject->getHit() and not isOnOverlapLayer(*walkObject)) {
+      numberOfHoles++;
+    }
+  });
+
   // Allow layers to have no hit
   // TODO: do only allow this in some cases, where it is reasonable to have no hit
   if (not spacePoint) {
-    if (currentState.isOnOverlapLayer() or currentState.getNumberOfHolesOnNonOverlappingLayers() <= m_param_hitJumpingUpTo) {
+    if (isOnOverlapLayer(currentState) or numberOfHoles <= m_param_hitJumpingUpTo) {
       return 1;
     } else {
       return NAN;
     }
   }
 
-  // Check the distance (in ladders and sensors) to the last hit and only allow those, which point "more or less" to
-  // the origin
-  if (not currentState.isOnOverlapLayer()) {
-    const auto* overlappingParent = currentState.getParent();
-    if (overlappingParent) {
-      const auto* lastLayerParent = overlappingParent->getParent();
-      if (lastLayerParent and lastLayerParent->getHit()) {
-        const VxdID& currentID = spacePoint->getVxdID();
-        const VxdID& lastID = lastLayerParent->getHit()->getVxdID();
+  if (spacePoint->getType() == VXD::SensorInfoBase::PXD) {
+    if (not isOnOverlapLayer(currentState)) {
+      if (spacePoint->getVxdID().getLayerNumber() == 2) {
+        static std::map<unsigned int, std::vector<unsigned int>> ladderMapping = {
+          {1, {1,  2,  3}},
+          {2, {3,  4}},
+          {3, {4,  5,  6}},
+          {4, {6,  7,  8}},
+          {5, {8,  9}},
+          {6, {9,  10, 11, 12}},
+          {7, {11, 12, 1}},
+        };
 
-        const int deltaSensor = lastID.getSensorNumber() - currentID.getSensorNumber();
-        const int deltaLadder = mod(lastID.getLadderNumber() - currentID.getLadderNumber(),
-                                    CDCToSpacePointMatcher::maximumLadderNumbers[currentID.getLayerNumber()]);
 
-        if ((deltaSensor != 0 and deltaSensor != 1) or (deltaLadder > 5)) {
-          return NAN;
+        RecoTrack* seed = currentState.getSeedRecoTrack();
+        if (not seed->getSVDHitList().empty()) {
+          SVDCluster* firstSVDHit = seed->getSortedSVDHitList()[1];
+          const VxdID& currentID = spacePoint->getVxdID();
+          const VxdID& lastID = firstSVDHit->getSensorID();
+
+          const unsigned int lastLadder = lastID.getLadderNumber();
+          const unsigned int currentLadder = currentID.getLadderNumber();
+
+          if (lastID.getLayerNumber() == 3) {
+            if (not TrackFindingCDC::is_in(currentLadder, ladderMapping.at(lastLadder))) {
+              return NAN;
+            }
+          }
+        }
+
+      } else {
+        const auto* overlappingParent = currentState.getParent();
+        if (overlappingParent) {
+          const auto* lastLayerParent = overlappingParent->getParent();
+          if (lastLayerParent and lastLayerParent->getHit()) {
+            static std::map<unsigned int, std::vector<unsigned int>> ladderMapping = {
+              {1,  {1}},
+              {2,  {1, 2}},
+              {3,  {2, 3}},
+              {4,  {3}},
+              {5,  {3, 4}},
+              {6,  {4, 5}},
+              {7,  {5}},
+              {8,  {5, 6}},
+              {9,  {6, 7}},
+              {10, {7}},
+              {11, {7, 8}},
+              {12, {8, 1}},
+            };
+
+            const VxdID& currentID = spacePoint->getVxdID();
+            const VxdID& lastID = lastLayerParent->getHit()->getVxdID();
+
+            const unsigned int lastLadder = lastID.getLadderNumber();
+            const unsigned int currentLadder = currentID.getLadderNumber();
+
+            if (not TrackFindingCDC::is_in(currentLadder, ladderMapping.at(lastLadder))) {
+              return NAN;
+            }
+          }
+        }
+      }
+    }
+  } else {
+    // Check the distance (in ladders and sensors) to the last hit and only allow those, which point "more or less" to
+    // the origin
+    if (not isOnOverlapLayer(currentState)) {
+      const auto* overlappingParent = currentState.getParent();
+      if (overlappingParent) {
+        const auto* lastLayerParent = overlappingParent->getParent();
+        if (lastLayerParent and lastLayerParent->getHit()) {
+          const VxdID& currentID = spacePoint->getVxdID();
+          const VxdID& lastID = lastLayerParent->getHit()->getVxdID();
+
+          const int deltaSensor = lastID.getSensorNumber() - currentID.getSensorNumber();
+          const int deltaLadder = mod(lastID.getLadderNumber() - currentID.getLadderNumber(),
+                                      CDCToSpacePointMatcher::maximumLadderNumbers[currentID.getLayerNumber()]);
+
+          if ((deltaSensor != 0 and deltaSensor != 1) or (deltaLadder > 5)) {
+            return NAN;
+          }
         }
       }
     }
   }
 
   const Vector3D position(currentState.getMSoPPosition());
-  const Vector3D hitPosition(currentState.getHitPosition());
+  const Vector3D hitPosition(currentState.getHit()->getPosition());
 
   const double sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
 
@@ -101,7 +174,7 @@ Weight SimpleCKFCDCToSpacePointStateObjectFilter::operator()(const BaseCKFCDCToS
   }
 
   const TMatrixDSym& cov = currentState.getMSoPCovariance();
-  const double layer = currentState.extractGeometryLayer();
+  const double layer = extractGeometryLayer(currentState);
 
   if (not currentState.isFitted() and not currentState.isAdvanced()) {
     // Filter 1
@@ -120,7 +193,7 @@ Weight SimpleCKFCDCToSpacePointStateObjectFilter::operator()(const BaseCKFCDCToS
                                    differenceHelix.y() * differenceHelix.y() / sqrt(cov(1, 1)) +
                                    differenceHelix.z() * differenceHelix.z() / sqrt(cov(2, 2)));
 
-    if (helix_chi2_xyz > m_param_maximumHelixChi2XYZ[layer - 3]) {
+    if (helix_chi2_xyz > m_param_maximumHelixChi2XYZ[layer]) {
       return NAN;
     } else {
       return helix_chi2_xyz;
@@ -133,7 +206,7 @@ Weight SimpleCKFCDCToSpacePointStateObjectFilter::operator()(const BaseCKFCDCToS
                             difference.y() * difference.y() / sqrt(cov(1, 1)));
     const double chi2_xyz = chi2_xy + difference.z() * difference.z() / sqrt(cov(2, 2));
 
-    if (chi2_xy > m_param_maximumChi2XY[layer - 3]) {
+    if (chi2_xy > m_param_maximumChi2XY[layer]) {
       return NAN;
     } else {
       return chi2_xyz;
@@ -141,7 +214,7 @@ Weight SimpleCKFCDCToSpacePointStateObjectFilter::operator()(const BaseCKFCDCToS
   } else {
     // Filter 3
     const double chi2 = currentState.getChi2();
-    if (chi2 > m_param_maximumChi2[layer - 3]) {
+    if (chi2 > m_param_maximumChi2[layer]) {
       return NAN;
     } else {
       return chi2;

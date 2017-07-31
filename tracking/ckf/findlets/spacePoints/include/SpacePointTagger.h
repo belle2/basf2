@@ -10,6 +10,9 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
+#include <tracking/ckf/states/CKFResultObject.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
@@ -20,8 +23,8 @@
 #include <framework/core/ModuleParamList.h>
 
 namespace Belle2 {
-  template <class AResultObject, class ACluster>
-  class SpacePointTagger : public TrackFindingCDC::Findlet<const AResultObject, const SpacePoint* const> {
+  template <class ASeedObject, class AHitObject, class ACluster>
+  class SpacePointTagger : public TrackFindingCDC::Findlet<const CKFResultObject<ASeedObject, AHitObject>, const AHitObject* const> {
   public:
     /// Clear the used clusters
     void beginEvent() override
@@ -42,7 +45,8 @@ namespace Belle2 {
     }
 
     /// Mark all space points as used, that they share clusters if the given kind with the results.
-    void apply(const std::vector<AResultObject>& results, const std::vector<const SpacePoint*>& spacePoints) override
+    void apply(const std::vector<CKFResultObject<ASeedObject, AHitObject>>& results,
+               const std::vector<const AHitObject*>& spacePoints) override
     {
       if (not m_param_markUsedSpacePoints) {
         return;
@@ -57,7 +61,7 @@ namespace Belle2 {
             continue;
           }
 
-          const auto& relatedClusters = spacePoint->getRelationsWith<SVDCluster>();
+          const auto& relatedClusters = spacePoint->getRelationsWith<ACluster>();
           for (const auto& relatedCluster : relatedClusters) {
             m_usedClusters.insert(&relatedCluster);
           }
@@ -75,7 +79,7 @@ namespace Belle2 {
           continue;
         }
 
-        const auto& relatedClusters = spacePoint->getRelationsWith<SVDCluster>();
+        const auto& relatedClusters = spacePoint->getRelationsWith<ACluster>();
         for (const auto& relatedCluster : relatedClusters) {
           if (TrackFindingCDC::is_in(&relatedCluster, m_usedClusters)) {
             spacePoint->setAssignmentState(true);
@@ -91,7 +95,7 @@ namespace Belle2 {
     /// Store the used clusters in the results
     std::set<const ACluster*> m_usedClusters;
     /// Store the used space points in the results
-    std::set<const SpacePoint*> m_usedSpacePoints;
+    std::set<const AHitObject*> m_usedSpacePoints;
 
     // Parameters
     /// Parameter: Mark SP as used, if the share a single cluster with the results, or if they share a whole SP.

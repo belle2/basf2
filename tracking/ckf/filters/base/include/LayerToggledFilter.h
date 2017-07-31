@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
+#include <tracking/ckf/utilities/StateAlgorithms.h>
 
 namespace Belle2 {
   /**
@@ -38,7 +39,7 @@ namespace Belle2 {
 
     /// The weight is calculated using the subfilter based on the geometrical layer of the state.
     TrackFindingCDC::Weight operator()(const typename AFilterFactory::CreatedFilter::Object& currentState) final {
-      const unsigned int layer = currentState.extractGeometryLayer();
+      const unsigned int layer = extractGeometryLayer(currentState);
       if (layer > m_param_toggleOnLayer)
       {
         return m_highLayerFilter(currentState);

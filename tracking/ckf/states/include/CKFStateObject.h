@@ -11,46 +11,48 @@
 #include <tracking/ckf/states/CKFResultObject.h>
 
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/spacePointCreation/SpacePoint.h>
 
+#include <framework/logging/Logger.h>
+
+#include <genfit/MeasurementOnPlane.h>
+
+#include <TVector3.h>
+#include <TMatrixDSym.h>
 
 namespace Belle2 {
   /**
    * State object to store one step in the CKF algorithm together with its parent (the state before), the hit
-   * (a space point) and the seed (a cdc reco track).
+   * (e.g. a space point) and the seed (e.g. a cdc reco track).
    * The number shows, which step is stored.
    *
    * Please remember: the states are reused during the algorithm and only once constructed (in the C++ sense).
    * They are set using the "initialize" and "set" function to reuse resources. To save computation time in
    * copying, we do not set the mSoP in the set function. It is only set in the advancing step and during initialization.
    */
-  class CKFVXDtoCDCStateObject {
+  template<class ASeedObject, class AHitObject>
+  class CKFStateObject {
   public:
-    /**
-     * How many states we need to describe the whole track.
-     *
-     * 12 = 2 * (SVD layers = 4) + 2 * (PXD layers = 2)
-     */
-    static constexpr unsigned int N = 12;
-
-    /// The class of the seed track
-    using SeedObject = RecoTrack;
-    /// The class of the hits
-    using HitObject = SpacePoint;
+    /// Copy the class of the seed track
+    using SeedObject = ASeedObject;
+    /// Copy the class of the hits
+    using HitObject = AHitObject;
     /// The class of the object returned by finalize()
-    using ResultObject = CKFResultObject<CKFVXDtoCDCStateObject>;
+    using ResultObject = CKFResultObject<SeedObject, HitObject>;
 
-    CKFVXDtoCDCStateObject() = default;
-    CKFVXDtoCDCStateObject(CKFVXDtoCDCStateObject&&) = default;
-    CKFVXDtoCDCStateObject(const CKFVXDtoCDCStateObject&) = delete;
-    CKFVXDtoCDCStateObject& operator=(const CKFVXDtoCDCStateObject&) = delete;
+    /// Default constructor needed for STL containers
+    CKFStateObject() = default;
+    /// Move constructor needed for STL containers
+    CKFStateObject(CKFStateObject&&) = default;
+    /// No copy constructor
+    CKFStateObject(const CKFStateObject&) = delete;
+    /// No copy constructor
+    CKFStateObject& operator=(const CKFStateObject&) = delete;
 
     /**
      * Initialize the state as a root without a related space point (but with a reco track)
      */
-    CKFVXDtoCDCStateObject(RecoTrack* seed) :
-      m_seedRecoTrack(seed)
+    CKFStateObject(SeedObject* seed, unsigned int number) :
+      m_seedRecoTrack(seed), m_number(number)
     {
       setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
     }
@@ -62,7 +64,7 @@ namespace Belle2 {
      * as this is quite costly. This is only set in advancing and can not be accessed before (in all other cases the
      * parent's properties will be accessed).
      */
-    void set(CKFVXDtoCDCStateObject* parent, const HitObject* hitObject)
+    void set(CKFStateObject* parent, const HitObject* hitObject)
     {
       m_parent = parent;
       m_seedRecoTrack = parent->getSeedRecoTrack();
@@ -86,9 +88,8 @@ namespace Belle2 {
     ResultObject finalize() const
     {
       std::vector<const HitObject*> hits;
-      hits.reserve(N);
 
-      const auto& hitAdder = [&hits](const CKFVXDtoCDCStateObject * walkObject) {
+      const auto& hitAdder = [&hits](const CKFStateObject * walkObject) {
         const HitObject* hitObject = walkObject->getHit();
         if (hitObject) {
           hits.push_back(hitObject);
@@ -98,7 +99,7 @@ namespace Belle2 {
 
       double chi2 = 0;
 
-      const auto& chi2Adder = [&chi2](const CKFVXDtoCDCStateObject * walkObject) {
+      const auto& chi2Adder = [&chi2](const CKFStateObject * walkObject) {
         if (walkObject->isFitted()) {
           chi2 += walkObject->getChi2();
         }
@@ -109,13 +110,13 @@ namespace Belle2 {
     }
 
     /// Return the parent state.
-    const CKFVXDtoCDCStateObject* getParent() const
+    const CKFStateObject* getParent() const
     {
       return m_parent;
     }
 
     /// Return the track this state is related to.
-    RecoTrack* getSeedRecoTrack() const
+    SeedObject* getSeedRecoTrack() const
     {
       return m_seedRecoTrack;
     }
@@ -132,39 +133,13 @@ namespace Belle2 {
       return m_number;
     }
 
-    /// Calculate the VXD layer this state is located on.
-    unsigned int extractGeometryLayer() const
-    {
-      return static_cast<unsigned int>((static_cast<double>(m_number) / 2) + 1);
-    }
-
-    /// Check if this state should describe an overlap hit.
-    bool isOnOverlapLayer() const
-    {
-      return m_number % 2 == 0;
-    }
-
     /// Return the number of times no SP is attached to the track in all parents until the root.
     unsigned int getNumberOfHoles() const
     {
       unsigned int numberOfHoles = 0;
 
-      walk([&numberOfHoles](const CKFVXDtoCDCStateObject * walkObject) {
+      walk([&numberOfHoles](const CKFStateObject * walkObject) {
         if (not walkObject->getHit()) {
-          numberOfHoles++;
-        }
-      });
-
-      return numberOfHoles;
-    }
-
-    /// Return the number of times no SP is attached to the track in a non overlap layer in all parents until the root.
-    unsigned int getNumberOfHolesOnNonOverlappingLayers() const
-    {
-      unsigned int numberOfHoles = 0;
-
-      walk([&numberOfHoles](const CKFVXDtoCDCStateObject * walkObject) {
-        if (not walkObject->getHit() and not walkObject->isOnOverlapLayer()) {
           numberOfHoles++;
         }
       });
@@ -198,7 +173,7 @@ namespace Belle2 {
     }
 
     /// States can be ordered by weight (used during overlap check).
-    bool operator<(const CKFVXDtoCDCStateObject& rhs)
+    bool operator<(const CKFStateObject& rhs)
     {
       return getWeight() < rhs.getWeight();
     }
@@ -251,13 +226,6 @@ namespace Belle2 {
       }
     }
 
-    /// Shortcut to get the hit position
-    const B2Vector3<double>& getHitPosition() const
-    {
-      B2ASSERT("Hit is invalid", m_hitObject);
-      return m_hitObject->getPosition();
-    }
-
     /// Check if state was already fitted.
     bool isFitted() const
     {
@@ -282,25 +250,26 @@ namespace Belle2 {
       m_isAdvanced = true;
     }
 
-    bool mSoPSet() const
+    /// Helper function to call a function on this and all parent states until the root.
+    void walk(const std::function<void(const CKFStateObject*)> f) const
     {
-      return m_hasMSoP;
+      const CKFStateObject* walkObject = this;
+
+      while (walkObject != nullptr) {
+        f(walkObject);
+        walkObject = walkObject->getParent();
+      }
     }
 
   private:
     /// The seed reco track this state is related with.
-    RecoTrack* m_seedRecoTrack = nullptr;
+    SeedObject* m_seedRecoTrack = nullptr;
     /// The hit object this state is attached to
     const HitObject* m_hitObject = nullptr;
-    /**
-     * Where on the hierarchy this state is located.
-     *
-     * Each layer is split into two numbers (so basically layer = number / 2),
-     * the second number for each layer is to handle overlaps (two space points on the same layer).
-     */
-    unsigned int m_number = N;
+    /// Where on the hierarchy this state is located.
+    unsigned int m_number = 0;
     /// The parent state of this state
-    CKFVXDtoCDCStateObject* m_parent = nullptr;
+    CKFStateObject* m_parent = nullptr;
     /// Chi2 of this special state with this hit and this reco track. Will only be set after fitting state.
     double m_chi2 = 0;
     /// Flag, if this state was already fitted.
@@ -320,15 +289,10 @@ namespace Belle2 {
     /// Cache for the cov of the mSoP. May be invalid if the mSoP is not set
     TMatrixDSym m_mSoPCov {6};
 
-    /// Helper function to call a function on this and all parent states until the root.
-    void walk(const std::function<void(const CKFVXDtoCDCStateObject*)> f) const
+    /// Is the mSoP already set?
+    bool mSoPSet() const
     {
-      const CKFVXDtoCDCStateObject* walkObject = this;
-
-      while (walkObject != nullptr) {
-        f(walkObject);
-        walkObject = walkObject->getParent();
-      }
+      return m_hasMSoP;
     }
   };
 }

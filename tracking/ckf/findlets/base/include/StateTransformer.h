@@ -21,7 +21,7 @@ namespace Belle2 {
    * As we have to keep those states in memory until all of their children are processed, we keep
    * a separate cache for every layer.
    */
-  template<class AStateObject>
+  template<class AStateObject, unsigned int N>
   class StateTransformer {
   public:
     /// The class of the hit
@@ -34,13 +34,13 @@ namespace Belle2 {
 
   private:
     /// Temporary object pool for finding the next state
-    std::array < std::vector<AStateObject>, AStateObject::N + 1 > m_temporaryStates;
+    std::array < std::vector<AStateObject>, N + 1 > m_temporaryStates;
   };
 
-  template <class AStateObject>
+  template <class AStateObject, unsigned int N>
   template <class AHitArray>
-  void StateTransformer<AStateObject>::transform(const AHitArray& matchingHits, std::vector<AStateObject*>& childStates,
-                                                 AStateObject* currentState)
+  void StateTransformer<AStateObject, N>::transform(const AHitArray& matchingHits, std::vector<AStateObject*>& childStates,
+                                                    AStateObject* currentState)
   {
     // As we do not want to recreate the states again and again, we reuse temporary states here
     // Because those have to exist until each of them is processed, we use one vector of temporary states for each layer

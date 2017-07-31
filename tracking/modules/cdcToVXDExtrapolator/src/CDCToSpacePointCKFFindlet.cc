@@ -9,35 +9,28 @@
  **************************************************************************/
 
 #include <tracking/modules/cdcToVXDExtrapolator/CDCToSpacePointCKFFindlet.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 CDCToSpacePointCKFFindlet::CDCToSpacePointCKFFindlet()
 {
-  addProcessingSignalListener(&m_cdcTracksLoader);
-  addProcessingSignalListener(&m_hitsLoader);
-  addProcessingSignalListener(&m_trackFitter);
+  addProcessingSignalListener(&m_dataLoader);
   addProcessingSignalListener(&m_treeSearchFindlet);
   addProcessingSignalListener(&m_storeArrayHandler);
-  addProcessingSignalListener(&m_overlapTeacher);
   addProcessingSignalListener(&m_overlapResolver);
-  addProcessingSignalListener(&m_svdSpacePointTagger);
+  addProcessingSignalListener(&m_spacePointTagger);
 }
 
 void CDCToSpacePointCKFFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  m_cdcTracksLoader.exposeParameters(moduleParamList, prefix);
-  m_hitsLoader.exposeParameters(moduleParamList, prefix);
-  m_trackFitter.exposeParameters(moduleParamList, prefix);
+  m_dataLoader.exposeParameters(moduleParamList, prefix);
   m_treeSearchFindlet.exposeParameters(moduleParamList, prefix);
   m_storeArrayHandler.exposeParameters(moduleParamList, prefix);
-  m_overlapTeacher.exposeParameters(moduleParamList, prefix);
   m_overlapResolver.exposeParameters(moduleParamList, prefix);
-  m_svdSpacePointTagger.exposeParameters(moduleParamList, prefix);
+  m_spacePointTagger.exposeParameters(moduleParamList, prefix);
 }
 
 void CDCToSpacePointCKFFindlet::beginEvent()
@@ -51,22 +44,12 @@ void CDCToSpacePointCKFFindlet::beginEvent()
 
 void CDCToSpacePointCKFFindlet::apply()
 {
-  m_cdcTracksLoader.apply(m_cdcRecoTrackVector);
-  m_hitsLoader.apply(m_spacePointVector);
-
-  m_trackFitter.apply(m_cdcRecoTrackVector);
+  m_dataLoader.apply(m_cdcRecoTrackVector, m_spacePointVector);
 
   m_treeSearchFindlet.apply(m_cdcRecoTrackVector, m_spacePointVector, m_results);
 
-  // Remove all empty results
-  const auto& resultIsEmpty = [](const CKFCDCToVXDStateObject::ResultObject & result) {
-    return result.getHits().empty();
-  };
-  erase_remove_if(m_results, resultIsEmpty);
-
-  m_overlapTeacher.apply(m_results);
   m_overlapResolver.apply(m_results);
 
   m_storeArrayHandler.apply(m_results);
-  m_svdSpacePointTagger.apply(m_results, m_spacePointVector);
+  m_spacePointTagger.apply(m_results, m_spacePointVector);
 }

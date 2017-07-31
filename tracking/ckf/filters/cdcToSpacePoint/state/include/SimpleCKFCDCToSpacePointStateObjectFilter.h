@@ -27,9 +27,9 @@ namespace Belle2 {
     TrackFindingCDC::Weight operator()(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState) final;
 
   private:
-    std::vector<double> m_param_maximumHelixChi2XYZ {10000, 10000, 10000, 10000};
-    std::vector<double> m_param_maximumChi2XY {100, 100, 100, 100};
-    std::vector<double> m_param_maximumChi2 {10000, 10000, 10000, 10000};
+    std::vector<double> m_param_maximumHelixChi2XYZ {10000, 10000, 10000, 10000, 10000, 10000};
+    std::vector<double> m_param_maximumChi2XY {100, 100, 100, 100, 100, 100};
+    std::vector<double> m_param_maximumChi2 {10000, 10000, 10000, 10000, 10000, 10000};
 
     /// Parameter: make hit jumps possible (missing hits on a layer)
     int m_param_hitJumpingUpTo = 1;

@@ -10,12 +10,15 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
-#include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
+#include <tracking/ckf/states/CKFResultObject.h>
+
+#include <tracking/spacePointCreation/SpacePoint.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
   /**
    * Base filter for detector track combination filters.
    */
   using BaseCDCVXDTrackCombinationFilter =
-    TrackFindingCDC::Filter<CKFCDCToVXDStateObject::ResultObject>;
+    TrackFindingCDC::Filter<CKFResultObject<RecoTrack, SpacePoint>>;
 }

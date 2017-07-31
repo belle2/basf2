@@ -9,6 +9,7 @@
  **************************************************************************/
 #include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectTruthVarSet.h>
 #include <tracking/ckf/utilities/CKFMCUtils.h>
+#include <tracking/ckf/utilities/StateAlgorithms.h>
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 #include <framework/dataobjects/EventMetaData.h>
 
@@ -50,7 +51,7 @@ bool CKFCDCToSpacePointStateObjectTruthVarSet::extract(const BaseCKFCDCToSpacePo
 
   if (not spacePoint) {
     // on every second layer (the overlap layers) it is fine to have no space point
-    if (result->isOnOverlapLayer()) {
+    if (isOnOverlapLayer(*result)) {
       var<named("truth")>() = true;
       return true;
     } else {

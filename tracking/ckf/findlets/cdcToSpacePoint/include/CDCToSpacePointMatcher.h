@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
+#include <tracking/ckf/utilities/StateAlgorithms.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
@@ -48,9 +49,10 @@ namespace Belle2 {
   {
     const unsigned int currentNumber = currentState.getNumber();
 
-    if (currentNumber == AStateObject::N or currentState.isOnOverlapLayer()) {
+    // TODO
+    if (currentNumber == 12 or isOnOverlapLayer(currentState)) {
       // next layer is not an overlap one, so we can just return all hits of this layer.
-      const unsigned int nextLayer = currentState.extractGeometryLayer() - 1;
+      const unsigned int nextLayer = extractGeometryLayer(currentState) - 1;
       B2DEBUG(100, "Will return all hits from layer " << nextLayer << ", which are " << m_cachedHitMap[nextLayer].size());
       return m_cachedHitMap[nextLayer];
     } else {
@@ -63,7 +65,7 @@ namespace Belle2 {
       }
 
       const unsigned int ladderNumber = lastAddedSpacePoint->getVxdID().getLadderNumber();
-      const unsigned int currentLayer = currentState.extractGeometryLayer();
+      const unsigned int currentLayer = extractGeometryLayer(currentState);
       const unsigned int maximumLadderNumber = CDCToSpacePointMatcher::maximumLadderNumbers[currentLayer];
 
       // the reason for this strange formula is the numbering scheme in the VXD.

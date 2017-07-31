@@ -11,10 +11,14 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
+#include <tracking/ckf/states/CKFResultObject.h>
+
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/dataobjects/Helix.h>
 #include <geometry/bfieldmap/BFieldMap.h>
@@ -28,9 +32,9 @@ namespace Belle2 {
    * This findlet is responsible for the interface between the DataStore and the CKF modules:
    *  * to write back the found VXD tracks only and the merged tracks (CDC + VXD) (apply)
    */
-  template<class AResultObject>
-  class CDCTrackSpacePointStoreArrayHandler : public TrackFindingCDC::Findlet<const AResultObject> {
-    using Super = TrackFindingCDC::Findlet<const AResultObject>;
+  template<class ASeedObject, class AHitObject>
+  class CDCTrackSpacePointStoreArrayHandler : public TrackFindingCDC::Findlet<const CKFResultObject<ASeedObject, AHitObject>> {
+    using Super = TrackFindingCDC::Findlet<const CKFResultObject<ASeedObject, AHitObject>>;
 
   public:
     /// Expose the parameters of the findlet
@@ -66,7 +70,7 @@ namespace Belle2 {
     /**
      * Write back the found tracks (VXD only and the merged ones).
      */
-    void apply(const std::vector<AResultObject>& cdcTracksWithMatchedSpacePoints) override
+    void apply(const std::vector<CKFResultObject<ASeedObject, AHitObject>>& cdcTracksWithMatchedSpacePoints) override
     {
       // Create new VXD tracks out of the found VXD space points and store them into a store array
       for (const auto& cdcTrackWithMatchedSpacePoints : cdcTracksWithMatchedSpacePoints) {

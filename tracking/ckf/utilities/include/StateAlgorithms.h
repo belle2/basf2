@@ -9,13 +9,21 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/filters/cdcToSpacePoint/result/BaseCDCVXDTrackCombinationFilter.h>
+#include <tracking/ckf/states/CKFStateObject.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
-  class Chi2CDCVXDTrackCombinationFilter : public BaseCDCVXDTrackCombinationFilter {
-  public:
-    TrackFindingCDC::Weight operator()(const BaseCDCVXDTrackCombinationFilter::Object& currentState) final;
-  };
+  /// Calculate the layer this state is located on.
+  inline unsigned int extractGeometryLayer(const CKFStateObject<RecoTrack, SpacePoint>& stateObject)
+  {
+    return static_cast<unsigned int>((static_cast<double>(stateObject.getNumber()) / 2) + 1);
+  }
+
+  /// Check if this state should describe an overlap hit.
+  inline bool isOnOverlapLayer(const CKFStateObject<RecoTrack, SpacePoint>& stateObject)
+  {
+    return stateObject.getNumber() % 2 == 0;
+  }
 }

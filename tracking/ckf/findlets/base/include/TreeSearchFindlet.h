@@ -113,6 +113,8 @@ namespace Belle2 {
     // Ask hit finder, which hits are possible (in principle)
     const auto& matchingHits = m_hitFinder.getMatchingHits(*currentState);
 
+    B2DEBUG(50, "Having found " << matchingHits.size() << " possible hits");
+
     // Transform the hits into states
     std::vector<AStateObject*> childStates;
     m_stateTransformer.transform(matchingHits, childStates, currentState);
@@ -126,6 +128,7 @@ namespace Belle2 {
       return;
     }
 
+    // Traverse the tree from each new state on
     B2DEBUG(50, "Having found " << childStates.size() << " child states.");
     for (AStateObject* childState : childStates) {
       traverseTree(childState, resultsVector);

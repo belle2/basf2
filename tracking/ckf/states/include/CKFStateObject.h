@@ -52,7 +52,7 @@ namespace Belle2 {
      * Initialize the state as a root without a related space point (but with a reco track)
      */
     CKFStateObject(SeedObject* seed, unsigned int number) :
-      m_seedRecoTrack(seed), m_number(number)
+      m_seedRecoTrack(seed), m_number(number), m_maximumNumber(number)
     {
       setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
     }
@@ -70,6 +70,7 @@ namespace Belle2 {
       m_seedRecoTrack = parent->getSeedRecoTrack();
       m_number = parent->getNumber() - 1;
       m_hitObject = hitObject;
+      m_maximumNumber = parent->getMaximumNumber();
 
       // Reset other state
       m_chi2 = 0;
@@ -131,6 +132,12 @@ namespace Belle2 {
     unsigned int getNumber() const
     {
       return m_number;
+    }
+
+    /// Return the maximum number
+    unsigned int getMaximumNumber() const
+    {
+      return m_maximumNumber;
     }
 
     /// Return the number of times no SP is attached to the track in all parents until the root.
@@ -268,6 +275,8 @@ namespace Belle2 {
     const HitObject* m_hitObject = nullptr;
     /// Where on the hierarchy this state is located.
     unsigned int m_number = 0;
+    /// Where on the hierarchy the first state is located.
+    unsigned int m_maximumNumber = 0;
     /// The parent state of this state
     CKFStateObject* m_parent = nullptr;
     /// Chi2 of this special state with this hit and this reco track. Will only be set after fitting state.

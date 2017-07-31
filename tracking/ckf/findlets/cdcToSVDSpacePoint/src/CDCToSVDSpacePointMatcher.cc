@@ -12,8 +12,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-constexpr unsigned int CDCToSVDSpacePointMatcher::maximumLadderNumbers[6];
-
 void CDCToSVDSpacePointMatcher::initializeEventCache(std::vector<RecoTrack*>& seedsVector,
                                                      std::vector<const SpacePoint*>& filteredHitVector)
 {

@@ -154,7 +154,7 @@ Weight SimpleCKFCDCToSpacePointStateObjectFilter::operator()(const BaseCKFCDCToS
 
           const int deltaSensor = lastID.getSensorNumber() - currentID.getSensorNumber();
           const int deltaLadder = mod(lastID.getLadderNumber() - currentID.getLadderNumber(),
-                                      CDCToSVDSpacePointMatcher::maximumLadderNumbers[currentID.getLayerNumber()]);
+                                      VXD::GeoCache::getInstance().getLadders(currentID).size());
 
           if ((deltaSensor != 0 and deltaSensor != 1) or (deltaLadder > 5)) {
             return NAN;

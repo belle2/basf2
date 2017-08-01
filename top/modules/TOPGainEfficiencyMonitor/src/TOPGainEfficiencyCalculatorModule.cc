@@ -159,7 +159,8 @@ void TOPGainEfficiencyCalculatorModule::LoadHistograms()
     hnameProj[1] << "hHeight_" << pixelstr.str();
     TH1D* hTime = (TH1D*)h2D->ProjectionX(hnameProj[0].str().c_str());
     m_timeHistogram[iHisto] = hTime;
-    double peakTime = hTime->GetXaxis()->GetBinCenter(hTime->GetMaximumBin());
+    double peakTime = FindPeakForSmallerXThan(hTime, 0);
+    //double peakTime = hTime->GetXaxis()->GetBinCenter(hTime->GetMaximumBin());
     hTime->Fit("gaus", "Q", "", peakTime - m_fitHalfWidth, peakTime + m_fitHalfWidth);
     TF1* funcLaser = (TF1*)hTime->GetFunction("gaus");
     if (!funcLaser) continue;
@@ -434,4 +435,25 @@ double TOPGainEfficiencyCalculatorModule::TOPGainFunc(double* var, double* par)
   }
   //  TF1* func = new TF1( "func", "[0]*pow(x-[4],[1])*exp(-pow(x-[4],[2])/[3])",
   return par[0] * output * step;
+}
+
+double TOPGainEfficiencyCalculatorModule::FindPeakForSmallerXThan(TH1* histo, double xmax)
+{
+
+  int iBin = 1;
+  double peakPos = histo->GetXaxis()->GetBinCenter(iBin);
+  double peakHeight = histo->GetBinContent(iBin);
+  while (true) {
+    iBin++;
+    double x = histo->GetXaxis()->GetBinCenter(iBin);
+    if (x > xmax) break;
+
+    double binEntry = histo->GetBinContent(iBin);
+    if (binEntry > peakHeight) {
+      peakPos = x;
+      peakHeight = binEntry;
+    }
+  }
+
+  return peakPos;
 }

@@ -76,8 +76,6 @@ void TOPLaserHitSelectorModule::initialize()
 {
   REG_HISTOGRAM;
 
-  //StoreArray<TOPRawDigit> rawDigits;
-  //rawDigits.isRequired();
   StoreArray<TOPDigit> digits;
   digits.isRequired();
 }

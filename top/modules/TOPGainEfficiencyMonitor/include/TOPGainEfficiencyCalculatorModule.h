@@ -54,25 +54,25 @@ namespace Belle2 {
     virtual ~TOPGainEfficiencyCalculatorModule();
 
     /**
-     * Initialize the Module.
-     * This method is called at the beginning of data processing.
+     * Load time vs height 2D histogram from a given input file (paramter "inputFile")
+     * and prepare hit timing and pulse height distribution for each channel.
      */
     virtual void initialize();
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
+     * The main processes, fitting height distribution and calculating gain/efficiency,
+     * are done in this function.
      */
     virtual void beginRun();
 
     /**
-     * Event processor.
+     * This will be empty as the all the processes are done in beginRun() function
+     * thus input file can be a dummy file.
      */
     virtual void event();
 
     /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
+     * Draw plots to show fitting results for each channel and save them into a given PDF file (outputPDFFile).
      */
     virtual void endRun();
 
@@ -83,7 +83,8 @@ namespace Belle2 {
     virtual void terminate();
 
     /**
-     * Module funcions to define histograms
+     * Define TTree branches to store fit results for each channel
+     * This TTree is saved in an output file given by "histoFileName" parameter of "HistoManager" module.
      */
     virtual void defineHisto();
 
@@ -110,6 +111,11 @@ namespace Belle2 {
      * smeared by Gaussian with a constant sigma to consider baseline fluctuation
      */
     static double TOPGainFunc(double* var, double* par);
+
+    /**
+     * Find peak and return its position for a limited range of x (x smaller than the given value (xmax))
+     */
+    static double FindPeakForSmallerXThan(TH1* histo, double xmax = 0);
 
   private:
 

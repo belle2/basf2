@@ -78,7 +78,7 @@ namespace Belle2 {
     virtual void terminate();
 
     /**
-     * Module funcions to define histograms
+     * create timing-height 2D histograms for all 8192 pixels
      */
     virtual void defineHisto();
 

@@ -159,8 +159,20 @@ void BKLMAnaModule::event()
 
   //set<int> m_pointUsed;
   //m_pointUsed.clear();
-
+  //check extHits
+  //all ExtHit in bklm scope in each event, should not be many
   int nExtHit = 0;
+  for (int t = 0; t < extHits.getEntries(); t++) {
+    ExtHit* exthit =  extHits[t];
+    if (exthit->getDetectorID() != Const::EDetector::BKLM) continue;
+    m_extx[nExtHit] = exthit->getPosition()[0];
+    m_exty[nExtHit] = exthit->getPosition()[1];
+    m_extz[nExtHit] = exthit->getPosition()[2];
+    nExtHit++;
+    if (nExtHit > 199) break;
+  }
+  m_nExtHit = nExtHit;
+
 //the second way, require muid
   for (int k = 0; k < tracks.getEntries(); k++) {
     Track* track = tracks[k];
@@ -192,10 +204,6 @@ void BKLMAnaModule::event()
       }
       if (!crossed) continue;
 
-      m_extx[nExtHit] = exthit->getPosition()[0];
-      m_exty[nExtHit] = exthit->getPosition()[1];
-      m_extz[nExtHit] = exthit->getPosition()[2];
-      nExtHit++;
       TVector3 extMom = exthit->getMomentum();
       TVector3 extVec = exthit->getPosition();
       bool matched = false;
@@ -228,10 +236,8 @@ void BKLMAnaModule::event()
         m_passMom->Fill(mom);
         if (matched) break;
       }
-      if (nExtHit > 99) break;
     }//end of loop ext hit
   }//end of loop tracks
-  m_nExtHit = nExtHit;
   m_extTree->Fill();
 }
 

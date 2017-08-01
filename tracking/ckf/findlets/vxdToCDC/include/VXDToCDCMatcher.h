@@ -46,20 +46,11 @@ namespace Belle2 {
   TrackFindingCDC::VectorRange<const TrackFindingCDC::CDCRLWireHit*> VXDToCDCMatcher::getMatchingHits(AStateObject& currentState)
   {
     const unsigned int currentNumber = currentState.getNumber();
+    const unsigned int nextLayer = extractGeometryLayer(currentState) + 1;
 
-    if (currentNumber == currentState.getMaximumNumber() or isOnOverlapLayer(currentState)) {
-      // next layer is not an overlap one, so we can just return all hits of the next layer.
-      const unsigned int nextLayer = extractGeometryLayer(currentState) + 1;
-      B2DEBUG(100,
-              "Will return all hits from layer " << nextLayer << ", which are " << m_cachedHitMap[nextLayer].size());
-      return m_cachedHitMap[nextLayer];
-    } else {
-      // next layer is an overlap one, so we can just return all hits of this layer.
-      const unsigned int thisLayer = extractGeometryLayer(currentState);
-      B2DEBUG(100,
-              "Will return all hits from layer " << thisLayer << ", which are " << m_cachedHitMap[thisLayer].size());
-      return m_cachedHitMap[thisLayer];
-    }
+    B2INFO("Asked for number " << currentNumber << " for layer " << nextLayer << " which is a " << isOnOverlapLayer(currentState));
+    B2INFO("Will return all hits from layer " << nextLayer << ", which are " << m_cachedHitMap[nextLayer].size());
+    return m_cachedHitMap[nextLayer];
   }
 
   void VXDToCDCMatcher::initializeEventCache(std::vector<RecoTrack*>& seedsVector,
@@ -67,20 +58,21 @@ namespace Belle2 {
   {
     m_cachedHitMap.clear();
 
-    const auto& hitSorterByID = [](const TrackFindingCDC::CDCRLWireHit * lhs, const TrackFindingCDC::CDCRLWireHit * rhs) {
-      return lhs->getWireID() < rhs->getWireID();
+    const auto& hitSorterByLayer = [](const TrackFindingCDC::CDCRLWireHit * lhs, const TrackFindingCDC::CDCRLWireHit * rhs) {
+      return lhs->getWireID().getICLayer() < rhs->getWireID().getICLayer();
     };
 
     const auto& getLayer = [](const TrackFindingCDC::CDCRLWireHit * wireHit) {
       return wireHit->getWireID().getICLayer();
     };
 
-    std::sort(filteredHitVector.begin(), filteredHitVector.end(), hitSorterByID);
+    std::sort(filteredHitVector.begin(), filteredHitVector.end(), hitSorterByLayer);
 
     const auto& groupedByLayer = TrackFindingCDC::adjacent_groupby(filteredHitVector.begin(), filteredHitVector.end(), getLayer);
     for (const auto& group : groupedByLayer) {
       const auto& layer = getLayer(group.front());
       m_cachedHitMap.emplace(layer, group);
+      B2INFO("Storing in " << layer << " " << group.size() << " hits");
     }
   }
 }

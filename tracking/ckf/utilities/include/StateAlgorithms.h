@@ -25,13 +25,17 @@ namespace Belle2 {
   /// Calculate the layer this state is located on.
   inline unsigned int extractGeometryLayer(const CKFStateObject<RecoTrack, TrackFindingCDC::CDCRLWireHit>& stateObject)
   {
-    return 56 - static_cast<unsigned int>((static_cast<double>(stateObject.getNumber()) / 2) + 1);
+    return 56 - stateObject.getNumber();
   }
 
   /// Check if this state should describe an overlap hit.
-  template <class AStateObject>
-  bool isOnOverlapLayer(const AStateObject& stateObject)
+  inline bool isOnOverlapLayer(const CKFStateObject<RecoTrack, SpacePoint>& stateObject)
   {
     return stateObject.getNumber() % 2 == 0;
+  }
+
+  inline bool isOnOverlapLayer(const CKFStateObject<RecoTrack, TrackFindingCDC::CDCRLWireHit>& stateObject)
+  {
+    return false;
   }
 }

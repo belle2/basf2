@@ -50,12 +50,8 @@ bool CKFVXDToWireHitStateTruthVarSet::extract(const BaseCKFCKFVXDToWireHitStateF
 
   if (not wireHit) {
     // on every second layer (the overlap layers) it is fine to have no space point
-    if (isOnOverlapLayer(*result)) {
-      var<named("truth")>() = true;
-      return true;
-    } else {
-      return false;
-    }
+    var<named("truth")>() = true;
+    return true;
   }
 
   var<named("truth_cdc_hit_number")>() = wireHit->getHit()->getArrayIndex();

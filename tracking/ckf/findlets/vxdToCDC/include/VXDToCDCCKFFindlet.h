@@ -57,7 +57,7 @@ namespace Belle2 {
     /// Findlet for fitting the tracks
     TrackFitterAndDeleter m_trackFitter;
     /// Findlet doing the main work: the tree finding
-    TreeSearchFindlet<RecoTrack, TrackFindingCDC::CDCRLWireHit, VXDToCDCMatcher, CKFVXDToWireHitStateFilterFactory, 112>
+    TreeSearchFindlet<RecoTrack, TrackFindingCDC::CDCRLWireHit, VXDToCDCMatcher, CKFVXDToWireHitStateFilterFactory, 56>
     m_treeSearchFindlet;
     /// Findlet for resolving overlaps
     OverlapResolverFindlet<VXDCDCTrackCombinationFilterFactory> m_overlapResolver;

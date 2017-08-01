@@ -407,7 +407,8 @@ class Plot2DRefiner(Refiner):
                                          y_parts,
                                          lower_bound=self.lower_bound,
                                          upper_bound=self.upper_bound,
-                                         outlier_z_score=self.outlier_z_score)
+                                         outlier_z_score=self.outlier_z_score,
+                                         stackby=stackby_parts)
 
                 profile_plot.title = title
                 profile_plot.contact = contact

@@ -19,7 +19,7 @@
 #include <tracking/ckf/findlets/base/CKFDataLoader.h>
 #include <tracking/ckf/findlets/base/TreeSearchFindlet.h>
 #include <tracking/ckf/findlets/base/OverlapResolverFindlet.h>
-#include <tracking/ckf/findlets/spacePoints/SpacePointTagger.h>
+#include <tracking/ckf/findlets/base/SpacePointTagger.h>
 
 #include <tracking/ckf/states/CKFStateObject.h>
 

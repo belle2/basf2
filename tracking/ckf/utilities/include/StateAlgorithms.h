@@ -12,6 +12,7 @@
 #include <tracking/ckf/states/CKFStateObject.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
@@ -19,6 +20,12 @@ namespace Belle2 {
   inline unsigned int extractGeometryLayer(const CKFStateObject<RecoTrack, SpacePoint>& stateObject)
   {
     return static_cast<unsigned int>((static_cast<double>(stateObject.getNumber()) / 2) + 1);
+  }
+
+  /// Calculate the layer this state is located on.
+  inline unsigned int extractGeometryLayer(const CKFStateObject<RecoTrack, TrackFindingCDC::CDCRLWireHit>& stateObject)
+  {
+    return 56 - static_cast<unsigned int>((static_cast<double>(stateObject.getNumber()) / 2) + 1);
   }
 
   /// Check if this state should describe an overlap hit.

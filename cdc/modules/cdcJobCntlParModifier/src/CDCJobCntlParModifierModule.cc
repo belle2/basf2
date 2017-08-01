@@ -134,7 +134,7 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
 
   //mapper phi-angle
   addParam("MapperPhiAngle", m_mapperPhiAngle, "Phi-angle (deg.) of B-field mapper used in GCR in 2017 summer. Tentative option.",
-           double(68.7));
+           double(16.7));
 
 }
 

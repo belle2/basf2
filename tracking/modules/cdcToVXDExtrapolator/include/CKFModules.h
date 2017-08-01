@@ -12,6 +12,10 @@
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 #include <tracking/ckf/findlets/cdcToSVDSpacePoint/CDCToSVDSpacePointCKFFindlet.h>
 #include <tracking/ckf/findlets/pxdSpacePoint/PXDSpacePointCKFFindlet.h>
+#include <tracking/ckf/findlets/vxdToCDC/VXDToCDCCKFFindlet.h>
+
+#include <tracking/ckf/utilities/ClassMnemomics.h>
+#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 
 namespace Belle2 {
   /**
@@ -48,14 +52,14 @@ namespace Belle2 {
    * Combinatorical Kalman Filter used for extrapolating VXD tracks into CDC and create merged tracks.
    * All implementation is done in the corresponding findlet.
    */
-  /*class VXDToCDCSpacePointCKFModule : public TrackFindingCDC::FindletModule<CDCToPXDSpacePointCKFFindlet> {
+  class VXDToCDCWireHitCKFModule : public TrackFindingCDC::FindletModule<VXDToCDCCKFFindlet> {
 
   public:
     /// Set description
-    VXDToCDCSpacePointCKFModule()
+    VXDToCDCWireHitCKFModule()
     {
       setDescription("Combinatorical Kalman Filter used for extracting VXD tracks into "
                      "CDC and create merged tracks.");
     }
-  };*/
+  };
 }

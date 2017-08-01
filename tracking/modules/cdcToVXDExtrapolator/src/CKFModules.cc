@@ -14,4 +14,4 @@ using namespace Belle2;
 
 REG_MODULE(CDCToSVDSpacePointCKF)
 REG_MODULE(PXDSpacePointCKF)
-//REG_MODULE(VXDToCDCSpacePointCKF)
+REG_MODULE(VXDToCDCWireHitCKF)

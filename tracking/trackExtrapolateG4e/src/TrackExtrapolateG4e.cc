@@ -988,7 +988,7 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
       copyID = ECL::ECLGeometryPar::Instance()->ECLVolumeToCellID(touch());
       return;
     case VOLTYPE_BKLM1: // BKLM RPCs
-      detID = Const::EDetector::KLM;
+      detID = Const::EDetector::BKLM;
       if (touch->GetHistoryDepth() == DEPTH_RPC) {
         // int plane = touch->GetCopyNumber(0);
         int layer = touch->GetCopyNumber(4);
@@ -1002,7 +1002,7 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
       }
       return;
     case VOLTYPE_BKLM2: // BKLM scints
-      detID = Const::EDetector::KLM;
+      detID = Const::EDetector::BKLM;
       if (touch->GetHistoryDepth() == DEPTH_SCINT) {
         int scint = touch->GetCopyNumber(1);
         int plane = touch->GetCopyNumber(2);
@@ -1019,7 +1019,7 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
       }
       return;
     case VOLTYPE_EKLM:
-      detID = Const::EDetector::KLM;
+      detID = Const::EDetector::EKLM;
       copyID = EKLM::GeometryData::Instance().stripNumber(
                  touch->GetVolume(7)->GetCopyNo(),
                  touch->GetVolume(6)->GetCopyNo(),

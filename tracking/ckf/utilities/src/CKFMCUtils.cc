@@ -9,13 +9,16 @@
  **************************************************************************/
 #include <tracking/ckf/utilities/CKFMCUtils.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 namespace Belle2 {
+  using namespace TrackFindingCDC;
 
-  bool isCorrectSpacePoint(const SpacePoint& spacePoint, const RecoTrack& mcRecoTrack)
+  bool isCorrectHit(const SpacePoint& spacePoint, const RecoTrack& mcRecoTrack)
   {
     const auto& isSameMCTrack = [&mcRecoTrack](const RecoTrack & clusterRecoTrack) {
       return &clusterRecoTrack == &mcRecoTrack;
@@ -44,6 +47,11 @@ namespace Belle2 {
     return true;
   }
 
+  bool isCorrectHit(const TrackFindingCDC::CDCRLWireHit& wireHit, const RecoTrack& mcRecoTrack)
+  {
+    return mcRecoTrack.getRelated<MCParticle>() == CDCMCHitLookUp::getInstance().getMCParticle(wireHit.getHit());
+  }
+
   unsigned int getNumberOfCorrectHits(const RecoTrack* mcTrack, const std::vector<const SpacePoint*> spacePoints)
   {
     if (not mcTrack) {
@@ -53,7 +61,7 @@ namespace Belle2 {
     unsigned int numberOfCorrectHits = 0;
 
     for (const SpacePoint* spacePoint : spacePoints) {
-      if (isCorrectSpacePoint(*spacePoint, *mcTrack)) {
+      if (isCorrectHit(*spacePoint, *mcTrack)) {
         if (spacePoint->getType() == VXD::SensorInfoBase::SensorType::SVD) {
           numberOfCorrectHits += 2;
         } else {
@@ -61,7 +69,22 @@ namespace Belle2 {
         }
       }
     }
+    return numberOfCorrectHits;
+  }
 
+  unsigned int getNumberOfCorrectHits(const RecoTrack* mcTrack, const std::vector<const TrackFindingCDC::CDCRLWireHit*> wireHits)
+  {
+    if (not mcTrack) {
+      return 0;
+    }
+
+    unsigned int numberOfCorrectHits = 0;
+
+    for (const CDCRLWireHit* wireHit : wireHits) {
+      if (isCorrectHit(*wireHit, *mcTrack)) {
+        numberOfCorrectHits++;
+      }
+    }
     return numberOfCorrectHits;
   }
 }

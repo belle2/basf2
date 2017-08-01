@@ -61,7 +61,7 @@ bool CKFCDCToSpacePointStateObjectTruthVarSet::extract(const BaseCKFCDCToSpacePo
 
   var<named("space_point_number")>() = spacePoint->getArrayIndex();
 
-  if (not isCorrectSpacePoint(*spacePoint, *cdcMCTrack)) {
+  if (not isCorrectHit(*spacePoint, *cdcMCTrack)) {
     // Keep all variables set to false and return.
     return true;
   }

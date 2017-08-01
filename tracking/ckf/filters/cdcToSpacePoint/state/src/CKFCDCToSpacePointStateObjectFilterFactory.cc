@@ -12,7 +12,9 @@
 #include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectTruthVarSet.h>
 #include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectVarSet.h>
 #include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectBasicVarSet.h>
-#include <tracking/ckf/filters/cdcToSpacePoint/state/SimpleCKFCDCToSpacePointStateObjectFilter.h>
+
+#include <tracking/ckf/filters/cdcToSVDSpacePoint/SimpleCKFCDCToSVDStateFilter.h>
+#include <tracking/ckf/filters/pxdSpacePoint/SimpleCKFPXDStateFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
@@ -61,7 +63,6 @@ CKFCDCToSpacePointStateObjectFilterFactory::getValidFilterNamesAndDescriptions()
   return {
     {"none", "no track combination is valid"},
     {"all", "set all track combinations as good"},
-    {"simple", "based on non-extrapolation variables"},
     {"truth", "monte carlo truth"},
     {"recording", "record variables to a TTree"},
     {"basic_recording", "record variables to a TTree"},
@@ -75,8 +76,10 @@ CKFCDCToSpacePointStateObjectFilterFactory::create(const std::string& filterName
     return makeUnique<NoneFilter<BaseCKFCDCToSpacePointStateObjectFilter>>();
   } else if (filterName == "all") {
     return makeUnique<AllCKFCDCToSpacePointStateObjectFilter>();
-  } else if (filterName == "simple") {
-    return makeUnique<SimpleCKFCDCToSpacePointStateObjectFilter>();
+  } else if (filterName == "svd_simple") {
+    return makeUnique<SimpleCKFCDCToSVDStateFilter>();
+  } else if (filterName == "pxd_simple") {
+    return makeUnique<SimpleCKFPXDStateFilter>();
   } else if (filterName == "truth") {
     return makeUnique<MCCKFCDCToSpacePointStateObjectFilter>();
   } else if (filterName == "recording") {

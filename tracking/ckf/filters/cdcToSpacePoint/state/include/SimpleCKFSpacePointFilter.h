@@ -1,0 +1,42 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Nils Braun                                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#pragma once
+
+#include <tracking/ckf/filters/cdcToSpacePoint/state/BaseCKFCDCToSpacePointStateObjectFilter.h>
+
+namespace Belle2 {
+  /// A very simple filter for all space points. Should be overloaded for the different cases (SVD, PXD).
+  class SimpleCKFSpacePointFilter : public BaseCKFCDCToSpacePointStateObjectFilter {
+  public:
+    /// Expose the parameters to the module
+    void exposeParameters(ModuleParamList* moduleParamList,
+                          const std::string& prefix) final;
+
+    /// Set the cached B field
+    void beginRun() final;
+
+  protected:
+    /// Maximal values for the first chi2 check based on the helix calculation
+    std::vector<double> m_param_maximumHelixChi2XYZ;
+    /// Maximal values for the second chi2 check based on an extrapolation
+    std::vector<double> m_param_maximumChi2XY;
+    /// Maximal values for the third chi2 check based on a Kalman fit
+    std::vector<double> m_param_maximumChi2;
+
+    /// Parameter: make hit jumps possible (missing hits on a layer)
+    int m_param_hitJumpingUpTo = 1;
+
+    /// Cache for the B field at the IP
+    double m_cachedBField;
+
+    /// Helper function to check for the number of holes and overlap hits
+    bool checkOverlapAndHoles(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState);
+  };
+}

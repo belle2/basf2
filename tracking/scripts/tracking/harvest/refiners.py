@@ -911,7 +911,7 @@ class CdRefiner(Refiner):
                                        groupby=groupby_part_name,
                                        groupby_value=groupby_value)
 
-        folder_name = root_save_name(folder_name)
+        folder_name = '/'.join(root_save_name(name) for name in folder_name.split('/'))
 
         with root_cd(tdirectory):
             with root_cd(folder_name) as tdirectory:

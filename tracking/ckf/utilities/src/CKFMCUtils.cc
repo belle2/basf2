@@ -49,9 +49,9 @@ namespace Belle2 {
 
   bool isCorrectHit(const TrackFindingCDC::CDCRLWireHit& wireHit, const RecoTrack& mcRecoTrack)
   {
+    // TODO: also check for RL here
     return (mcRecoTrack.getRelated<MCParticle>() and
-            mcRecoTrack.getRelated<MCParticle>() == CDCMCHitLookUp::getInstance().getMCParticle(wireHit.getHit()) and
-            CDCMCHitLookUp::getInstance().getRLInfo(wireHit.getHit()) == wireHit.getRLInfo());
+            mcRecoTrack.getRelated<MCParticle>() == wireHit.getHit()->getRelated<MCParticle>());
   }
 
   unsigned int getNumberOfCorrectHits(const RecoTrack* mcTrack, const std::vector<const SpacePoint*> spacePoints)

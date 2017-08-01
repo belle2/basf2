@@ -49,7 +49,6 @@ bool CKFVXDToWireHitStateTruthVarSet::extract(const BaseCKFCKFVXDToWireHitStateF
   }
 
   if (not wireHit) {
-    // on every second layer (the overlap layers) it is fine to have no space point
     var<named("truth")>() = true;
     return true;
   }

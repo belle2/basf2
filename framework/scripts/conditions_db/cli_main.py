@@ -102,7 +102,7 @@ def command_tag_list(args, db=None):
     with Pager("List of global tags{}{}".format(tagfilter, " (detailed)" if getattr(args, "detail", False) else ""), True):
         for item in taglist:
             if getattr(args, "detail", False):
-                print_globaltag(item)
+                print_globaltag(db, item)
             else:
                 table.append([
                     item["globalTagId"],
@@ -115,27 +115,45 @@ def command_tag_list(args, db=None):
 
         if not getattr(args, "detail", False):
             table.insert(0, ["id", "name", "description", "type", "status", "# payloads"])
-            pretty_print_table(table, [-10, -30, "*", -10, -10, -10])
+            pretty_print_table(table, [-10, 0, "*", -10, -10, -10])
 
 
-def print_globaltag(info):
-    """ Print detailed global tag information for the given global tag"""
-    created = parse_date(info["dtmIns"])
-    modified = parse_date(info["dtmMod"])
-    print()
-    results = [
-        ["id", str(info["globalTagId"])],
-        ["name", info["name"]],
-        ["description", escape_ctrl_chars(info.get("description", ""))],
-        ["type", info["globalTagType"]["name"]],
-        ["status", info["globalTagStatus"]["name"]],
-        ["# payloads", info["payloadCount"]],
-        # print created and modified timestamps in local time zone
-        ["created", created.astimezone(tz=None).strftime("%Y-%m-%d %H:%M:%S local time")],
-        ["modified", modified.astimezone(tz=None).strftime("%Y-%m-%d %H:%M:%S local time")],
-        ["modified by", escape_ctrl_chars(info["modifiedBy"])],
-    ]
-    pretty_print_table(results, [-40, '*'], True)
+def print_globaltag(db, *tags):
+    """ Print detailed global tag information for the given global tags side by side"""
+    results = [["id"], ["name"], ["description"], ["type"], ["status"],
+               ["# payloads"], ["created"], ["modified"], ["modified by"]]
+    for info in tags:
+        if info is None:
+            continue
+
+        if isinstance(info, str):
+            try:
+                req = db.request("GET", "/globalTag/{}".format(encode_name(info)),
+                                 "Getting info for global tag {}".format(info))
+            except ConditionsDB.RequestError as e:
+                # ok, there's an error for this one, let's continue with the other
+                # ones
+                B2ERROR(str(e))
+                continue
+
+            info = req.json()
+
+        created = parse_date(info["dtmIns"])
+        modified = parse_date(info["dtmMod"])
+        results[0].append(str(info["globalTagId"])),
+        results[1].append(info["name"]),
+        results[2].append(escape_ctrl_chars(info.get("description", "")))
+        results[3].append(info["globalTagType"]["name"])
+        results[4].append(info["globalTagStatus"]["name"]),
+        results[5].append(info["payloadCount"]),
+        results[6].append(created.astimezone(tz=None).strftime("%Y-%m-%d %H:%M:%S local time"))
+        results[7].append(modified.astimezone(tz=None).strftime("%Y-%m-%d %H:%M:%S local time"))
+        results[8].append(escape_ctrl_chars(info["modifiedBy"]))
+
+    ntags = len(results[0]) - 1
+    if ntags > 0:
+        pretty_print_table(results, [11] + ['*']*ntags, True)
+    return ntags
 
 
 def command_tag_show(args, db=None):
@@ -154,26 +172,14 @@ def command_tag_show(args, db=None):
         args.add_argument("tag", metavar="TAGNAME", nargs="+", help="global tags to show")
         return
 
-    objects = []
-    for tag in args.tag:
-        try:
-            req = db.request("GET", "/globalTag/{}".format(encode_name(tag)),
-                             "Getting info for global tag {}".format(tag))
-        except ConditionsDB.RequestError as e:
-            # ok, there's an error for this one, let's continue with the other
-            # ones
-            B2ERROR(str(e))
-            continue
-
-        objects.append(req.json())
-
     # we retrieved all we could, print them
+    ntags = 0
     with Pager("Global tag Information", True):
-        for info in objects:
-            print_globaltag(info)
+        for tag in args.tag:
+            ntags += print_globaltag(db, tag)
 
     # return the number of tags which could not get retrieved
-    return len(args.tag) - len(objects)
+    return len(args.tag) - ntags
 
 
 def command_tag_create(args, db=None):

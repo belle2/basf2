@@ -29,7 +29,8 @@ namespace Belle2 {
   }
 
   /// Check if this state should describe an overlap hit.
-  inline bool isOnOverlapLayer(const CKFStateObject<RecoTrack, SpacePoint>& stateObject)
+  template <class AStateObject>
+  bool isOnOverlapLayer(const AStateObject& stateObject)
   {
     return stateObject.getNumber() % 2 == 0;
   }

@@ -31,6 +31,12 @@ Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStat
     return NAN;
   }
 
+  const auto* spacePoint = currentState.getHit();
+
+  if (not spacePoint) {
+    return 1;
+  }
+
   // Check the distance (in ladders and sensors) to the last hit and only allow those, which point "more or less" to
   // the origin
   if (not isOnOverlapLayer(currentState)) {
@@ -38,7 +44,6 @@ Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStat
     if (overlappingParent) {
       const auto* lastLayerParent = overlappingParent->getParent();
       if (lastLayerParent and lastLayerParent->getHit()) {
-        const auto* spacePoint = currentState.getHit();
         const VxdID& currentID = spacePoint->getVxdID();
         const VxdID& lastID = lastLayerParent->getHit()->getVxdID();
 
@@ -82,7 +87,7 @@ Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStat
                                    differenceHelix.y() * differenceHelix.y() / sqrt(cov(1, 1)) +
                                    differenceHelix.z() * differenceHelix.z() / sqrt(cov(2, 2)));
 
-    if (helix_chi2_xyz > m_param_maximumHelixChi2XYZ[layer]) {
+    if (helix_chi2_xyz > m_param_maximumHelixChi2XYZ[layer - 3]) {
       return NAN;
     } else {
       return helix_chi2_xyz;
@@ -95,7 +100,7 @@ Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStat
                             difference.y() * difference.y() / sqrt(cov(1, 1)));
     const double chi2_xyz = chi2_xy + difference.z() * difference.z() / sqrt(cov(2, 2));
 
-    if (chi2_xy > m_param_maximumChi2XY[layer]) {
+    if (chi2_xy > m_param_maximumChi2XY[layer - 3]) {
       return NAN;
     } else {
       return chi2_xyz;
@@ -103,7 +108,7 @@ Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStat
   } else {
     // Filter 3
     const double chi2 = currentState.getChi2();
-    if (chi2 > m_param_maximumChi2[layer]) {
+    if (chi2 > m_param_maximumChi2[layer - 3]) {
       return NAN;
     } else {
       return chi2;

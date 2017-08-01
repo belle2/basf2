@@ -42,6 +42,37 @@ namespace Belle2 {
     {
     }
 
+  protected:
+    /// Helper function to return the hits on the same layer, but on the next ladder
+    template<class AStateObject>
+    ReturnType getOverlappingLadder(AStateObject& currentState, int direction = +1)
+    {
+      // next layer is an overlap one, so lets return all hits from the same layer, that are on a
+      // ladder which is one below the last added hit.
+      const SpacePoint* lastAddedSpacePoint = currentState.getHit();
+      if (not lastAddedSpacePoint) {
+        // No hit was added on the layer, so no overlap can occur.
+        return {};
+      }
+
+      const auto& vxdID = lastAddedSpacePoint->getVxdID();
+      const unsigned int ladderNumber = vxdID.getLadderNumber();
+      const unsigned int currentLayer = vxdID.getLayerNumber();
+      const unsigned int maximumLadderNumber = VXD::GeoCache::getInstance().getLadders(vxdID).size();
+
+      // the reason for this strange formula is the numbering scheme in the VXD.
+      // we first substract 1 from the ladder number to have a ladder counting from 0 to N - 1,
+      // then we add/subtract one to get to the next (overlapping) ladder and % N, to also cope for the
+      // highest number. Then we add 1 again, to go from the counting from 0 .. N-1 to 1 .. N.
+      const unsigned int overlappingLadder = ((ladderNumber - 1) + direction * 1) % maximumLadderNumber + 1;
+
+      B2DEBUG(100, "Overlap check on " << ladderNumber << " using from " << overlappingLadder);
+
+      LayerAndLadder overlappingLayerAndLadder(currentLayer, overlappingLadder);
+
+      return ReturnType({m_cachedHitMapOnLadder[overlappingLayerAndLadder]});
+    }
+
   private:
     /// Cache for sorted hits, grouped by layer and ladder
     std::map<LayerAndLadder, TrackFindingCDC::VectorRange<const SpacePoint*>> m_cachedHitMapOnLadder;
@@ -182,10 +213,8 @@ namespace Belle2 {
         }
         return ReturnType(nextRanges);
       }
-
     } else {
-      // TODO: overlaps
-      return {};
+      return getOverlappingLadder(currentState);
     }
   }
 }

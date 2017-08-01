@@ -31,8 +31,14 @@ Weight SimpleCKFPXDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObje
     return NAN;
   }
 
+  const auto* spacePoint = currentState.getHit();
+
+  if (not spacePoint) {
+    return 1;
+  }
+
   const Vector3D position(currentState.getMSoPPosition());
-  const Vector3D hitPosition(currentState.getHit()->getPosition());
+  const Vector3D hitPosition(spacePoint->getPosition());
 
   const double sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
 
@@ -60,7 +66,7 @@ Weight SimpleCKFPXDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObje
                                    differenceHelix.y() * differenceHelix.y() / sqrt(cov(1, 1)) +
                                    differenceHelix.z() * differenceHelix.z() / sqrt(cov(2, 2)));
 
-    if (helix_chi2_xyz > m_param_maximumHelixChi2XYZ[layer]) {
+    if (helix_chi2_xyz > m_param_maximumHelixChi2XYZ[layer - 1]) {
       return NAN;
     } else {
       return helix_chi2_xyz;
@@ -73,7 +79,7 @@ Weight SimpleCKFPXDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObje
                             difference.y() * difference.y() / sqrt(cov(1, 1)));
     const double chi2_xyz = chi2_xy + difference.z() * difference.z() / sqrt(cov(2, 2));
 
-    if (chi2_xy > m_param_maximumChi2XY[layer]) {
+    if (chi2_xy > m_param_maximumChi2XY[layer - 1]) {
       return NAN;
     } else {
       return chi2_xyz;
@@ -81,7 +87,7 @@ Weight SimpleCKFPXDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObje
   } else {
     // Filter 3
     const double chi2 = currentState.getChi2();
-    if (chi2 > m_param_maximumChi2[layer]) {
+    if (chi2 > m_param_maximumChi2[layer - 1]) {
       return NAN;
     } else {
       return chi2;

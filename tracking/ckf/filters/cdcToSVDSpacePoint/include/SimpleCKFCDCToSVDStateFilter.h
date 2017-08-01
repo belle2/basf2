@@ -15,6 +15,13 @@
 namespace Belle2 {
   class SimpleCKFCDCToSVDStateFilter : public SimpleCKFSpacePointFilter {
   public:
+    SimpleCKFCDCToSVDStateFilter() : SimpleCKFSpacePointFilter()
+    {
+      m_param_maximumHelixChi2XYZ = {10000, 10000, 10000, 10000};
+      m_param_maximumChi2XY = {100, 100, 100, 100};
+      m_param_maximumChi2 = {10000, 10000, 10000, 10000};
+    }
+
     /// Return NAN, if this state should not be used
     TrackFindingCDC::Weight operator()(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState) final;
   };

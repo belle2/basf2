@@ -64,6 +64,8 @@ CKFCDCToSpacePointStateObjectFilterFactory::getValidFilterNamesAndDescriptions()
     {"none", "no track combination is valid"},
     {"all", "set all track combinations as good"},
     {"truth", "monte carlo truth"},
+    {"pxd_simple", "simple filter to be used in pxd"},
+    {"svd_simple", "simple filter to be used in svd"},
     {"recording", "record variables to a TTree"},
     {"basic_recording", "record variables to a TTree"},
   };

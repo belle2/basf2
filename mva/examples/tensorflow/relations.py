@@ -17,9 +17,9 @@ class early_stopping():
 
     def __init__(self):
         """ init class """
-        # counts how many times training is not getting better
+        #: counts how many times training is not getting better
         self.counter = 0
-        # saves best training result
+        #: saves best training result
         self.best_result = np.inf
 
     def check(self, cost):

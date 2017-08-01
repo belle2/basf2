@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <arich/calibration/ARICHDatabaseImporter.h>
-#include <arich/dbobjects/ARICHAerogelInfo.h>
+#include <arich/dbobjects/ARICHAerogelMap.h>
 #include <arich/dbobjects/ARICHAsicInfo.h>
 #include <arich/dbobjects/ARICHHapdQA.h>
 #include <arich/dbobjects/ARICHFebTest.h>
@@ -606,6 +606,60 @@ void ARICHDatabaseImporter::exportAerogelInfo()
 }
 
 
+void ARICHDatabaseImporter::importAerogelMap()
+{
+  GearDir content = GearDir("/ArichData/AllData/aerogelposition");
+
+  // define data array
+  TClonesArray agelMap("Belle2::ARICHAerogelMap");
+  int agel = 0;
+
+  for (int layer = 0; layer < 2; layer++) {
+    // loop over xml files and extract the data
+    for (const auto& aerogel : content.getNodes("position")) {
+      string agelserial = "";
+      int ring = aerogel.getInt("ring");
+      int phi = aerogel.getInt("phi");
+      if (layer == 1) agelserial = aerogel.getString("upaerogelserial");
+      if (layer == 0) agelserial = aerogel.getString("downaerogelserial");
+
+      // save data as an element of the array
+      new(agelMap[agel]) ARICHAerogelMap();
+      auto* agelConst = static_cast<ARICHAerogelMap*>(agelMap[agel]);
+      agelConst->setAerogelID(agelserial);
+      agelConst->setAerogelRingID(ring);
+      agelConst->setAerogelColumnID(phi);
+      agelConst->setAerogelLayer(layer, 1);
+
+      agel++;
+    }
+  }
+
+  // define interval of validity
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+
+  // store under user defined name:
+  Database::Instance().storeData("ARICHAerogelMap", &agelMap, iov);
+}
+
+
+
+void ARICHDatabaseImporter::exportAerogelMap()
+{
+
+  DBArray<ARICHAerogelMap> elements("ARICHAerogelMap");
+  elements.getEntries();
+
+  // Print aerogel info
+  for (const auto& element : elements) {
+    string layer;
+    if (element.getAerogelLayer(0) == 1) layer = "down";
+    if (element.getAerogelLayer(1) == 1) layer = "up";
+    B2INFO("ID = " << element.getAerogelID() << ", ring = " << element.getAerogelRingID() <<
+           ", column = " << element.getAerogelColumnID() << ", layer: " << layer);
+  }
+}
+
 
 void ARICHDatabaseImporter::importAerogelInfoEventDep()
 {
@@ -812,10 +866,8 @@ void ARICHDatabaseImporter::exportHapdQA()
   elements.getEntries();
 
   // Print serial numbers of HAPDs
-  unsigned int el = 0;
   for (const auto& element : elements) {
-    B2INFO(el << ". Serial number = " << element.getHapdSerialNumber() << "; arrival date = " << element.getHapdArrivalDate());
-    el++;
+    B2INFO("Serial number = " << element.getHapdSerialNumber() << "; arrival date = " << element.getHapdArrivalDate());
   }
 }
 
@@ -1498,10 +1550,10 @@ void ARICHDatabaseImporter::importHapdChipInfo()
     for (const auto& chipInfo : hapdInfo.getNodes("chipinfo")) {
       chip[chip_ABCD] = chipInfo.getString("chip");
       bias[chip_ABCD] = chipInfo.getInt("bias");
-      string badL = chipInfo.getString("deadlist");
-      string cutL = chipInfo.getString("cutlist");
-      if (badL.find("ch") != string::npos) { string badLsub = badL.substr(3); badlist[chip_ABCD] = ARICHDatabaseImporter::channelsListHapd(badLsub.c_str(), 0); }
-      if (cutL.find("ch") != string::npos) {  string cutLsub = cutL.substr(3); cutlist[chip_ABCD] = ARICHDatabaseImporter::channelsListHapd(cutLsub.c_str(), 0); }
+//      string badL = chipInfo.getString("deadlist");
+//      string cutL = chipInfo.getString("cutlist");
+//      if (badL.find("ch") != string::npos) { string badLsub = badL.substr(3); badlist[chip_ABCD] = ARICHDatabaseImporter::channelsListHapd(badLsub.c_str(), 0); }
+//      if (cutL.find("ch") != string::npos) {  string cutLsub = cutL.substr(3); cutlist[chip_ABCD] = ARICHDatabaseImporter::channelsListHapd(cutLsub.c_str(), 0); }
       string gain_str = chipInfo.getString("gain");
       gain[chip_ABCD] = atoi(gain_str.c_str());
       chip_ABCD++;
@@ -1893,14 +1945,12 @@ void ARICHDatabaseImporter::exportHapdQE()
   gROOT->SetBatch(kTRUE);
 
   // Example that prints serial numbers of HAPDs and saves QE 2D histograms to root file
-  unsigned int el = 0;
   for (const auto& element : elements) {
-    B2INFO(el << ". SN = " << element.getHapdSerialNumber());
+    B2INFO(" SN = " << element.getHapdSerialNumber());
     TH2F* qe2d = element.getQuantumEfficiency2D();
     TFile file("QEhists.root", "update");
     qe2d->Write();
     file.Close();
-    el++;
   }
 
 }

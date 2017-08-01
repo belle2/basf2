@@ -795,6 +795,55 @@ namespace Belle2 {
 
       }
 
+      //Define B-field mapper
+      if (gcp.getMapperGeometry()) {
+        //3 plates
+        const double plateWidth = 13.756 * CLHEP::cm;
+        const double plateThick =  1.203 * CLHEP::cm;
+        const double plateLength = 83.706 * CLHEP::cm;
+        const double phi = gcp.getMapperPhiAngle() * CLHEP::deg; //phi-angle in lab.
+        //  std::cout << "phi= " << phi << std::endl;
+        const double endRingRmin =  4.1135 * CLHEP::cm;
+        const double endRingRmax = 15.353 * CLHEP::cm;
+        const double endRingThick =  2.057 * CLHEP::cm;
+
+        string name = "Plate";
+        int pID = 0;
+        G4Box* plateShape = new G4Box("solid" + name, .5 * plateWidth, .5 * plateThick, .5 * plateLength);
+        G4LogicalVolume* logical0 = new G4LogicalVolume(plateShape, medAluminum, "logical" + name, 0, 0, 0);
+        logical0->SetVisAttributes(m_VisAttributes.back());
+        const double x = .5 * plateWidth;
+        const double y = endRingRmin;
+        double z = 2.871 * CLHEP::cm;
+        G4ThreeVector xyz(x, y, z);
+        G4RotationMatrix rotM3 = G4RotationMatrix();
+        xyz.rotateZ(phi);
+        rotM3.rotateZ(phi);
+        new G4PVPlacement(G4Transform3D(rotM3, xyz), logical0, "physical" + name, &topVolume, false, pID);
+
+        const double alf = 120. * CLHEP::deg;
+        xyz.rotateZ(alf);
+        rotM3.rotateZ(alf);
+        new G4PVPlacement(G4Transform3D(rotM3, xyz), logical0, "physical" + name, &topVolume, false, pID + 1);
+
+        xyz.rotateZ(alf);
+        rotM3.rotateZ(alf);
+        new G4PVPlacement(G4Transform3D(rotM3, xyz), logical0, "physical" + name, &topVolume, false, pID + 2);
+
+        //Define 2 end-rings
+        //bwd end-ring
+        name = "EndRing";
+        G4Tubs* EndRingShape = new G4Tubs("solid" + name, endRingRmin, endRingRmax, 0.5 * endRingThick, 0., 360.*CLHEP::deg);
+        G4LogicalVolume* logical1 = new G4LogicalVolume(EndRingShape, medAluminum, "logical" + name, 0, 0, 0);
+        logical1->SetVisAttributes(m_VisAttributes.back());
+        z = -40.0105 * CLHEP::cm;
+        pID = 0;
+        new G4PVPlacement(0, G4ThreeVector(0., 0., z), logical1, "physical" + name, &topVolume, false, pID);
+
+        //fwd end-ring
+        z = 45.7525 * CLHEP::cm;
+        new G4PVPlacement(0, G4ThreeVector(0., 0., z), logical1, "physical" + name, &topVolume, false, pID + 1);
+      }
     }
 
 
@@ -1035,7 +1084,3 @@ namespace Belle2 {
     }
   }
 }
-
-
-
-

@@ -18,7 +18,7 @@ namespace Belle2 {
 
     /**
      * Structure for the input of the data BEAST (TTree "Data_BEAST")
-     * https://belle2.cc.kek.jp/~twiki/bin/view/Detector/BEAST/ROOTDataFormats
+     *
      */
     struct BEASTTree_v5 {
 
@@ -178,6 +178,12 @@ namespace Belle2 {
       std::vector<float> QCSS_rate_av;/** */
       std::vector<float> DIA_dose_av; /** */
 
+      std::vector<float>* CSI_data_rate; /** */
+      std::vector<float>* HE3_data_rate; /** */
+      std::vector<float>* QCSS_data_rate; /** */
+      std::vector<float>* CLAWS_data_rate; /** */
+      std::vector<float>* CSI_data_Ebin; /** */
+
       std::vector<double> SAD_HER_lifetime;/** */
       std::vector<double> SAD_LER_lifetime;/** */
       std::vector<double> SAD_HER_lifetime_av;/** */
@@ -189,6 +195,13 @@ namespace Belle2 {
 
       std::vector<float> DOSI;/** */
       std::vector<float> DOSI_av;/** */
+
+      std::vector<double> mc_reweight_LERB;/** */
+      std::vector<double> mc_reweight_LERC;/** */
+      std::vector<double> mc_reweight_LERT;/** */
+      std::vector<double> mc_reweight_HERB;/** */
+      std::vector<double> mc_reweight_HERC;/** */
+      std::vector<double> mc_reweight_HERT;/** */
 
       //std::vector<float> TPC_rate_av[2][5];/** */
       //std::vector<float> TPC_rate[2][5];/** */
@@ -282,6 +295,13 @@ namespace Belle2 {
         DIA_data_dose = 0;
         BGO_data_dose = 0;
         CSI_data_sumE = 0;
+
+        HE3_data_rate = 0;
+        CSI_data_rate = 0;
+        QCSS_data_rate = 0;
+        CLAWS_data_rate = 0;
+        CSI_data_Ebin = 0;
+
 
         PIN_dose.clear();
         BGO_energy.clear();

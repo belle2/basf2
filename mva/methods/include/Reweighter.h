@@ -98,7 +98,7 @@ namespace Belle2 {
       ReweighterOptions m_specific_options;  /**< Method specific options */
       GeneralOptions m_expert_options;  /**< Method general options of the expert */
       std::unique_ptr<Expert> m_expert; /**< Experts used to reweight */
-      double m_norm; /**< Norm for the weights */
+      double m_norm = 0.0; /**< Norm for the weights */
     };
 
 

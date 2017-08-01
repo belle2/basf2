@@ -46,6 +46,14 @@ bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOn
 
 template <>
 bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                                   const TrackFindingCDC::CDCRLWireHit& rlWireHit) const
+{
+  // TODO: do something here
+  return false;
+}
+
+template <>
+bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
                                    const genfit::MeasuredStateOnPlane& plane) const
 {
   return extrapolate(measuredStateOnPlane, plane.getPlane());

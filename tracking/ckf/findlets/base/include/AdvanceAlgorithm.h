@@ -22,6 +22,10 @@ namespace Belle2 {
   class SVDCluster;
   class PXDCluster;
 
+  namespace TrackFindingCDC {
+    class CDCRLWireHit;
+  }
+
   /**
    * Algorithm class to extrapolate a state onto the plane of its related space point.
    */
@@ -82,6 +86,9 @@ namespace Belle2 {
   bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, SVDCluster& svdCluster) const;
   template <>
   bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, PXDCluster& pxdCluster) const;
+  template <>
+  bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                                     const TrackFindingCDC::CDCRLWireHit& rlWireHit) const;
   template <>
   bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const genfit::SharedPlanePtr& plane) const;
   template <>

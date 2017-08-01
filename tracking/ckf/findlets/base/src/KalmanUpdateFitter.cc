@@ -33,3 +33,11 @@ double KalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& measuredStat
     B2FATAL("Can not fit unknown type " << spacePoint.getType() << "!");
   }
 }
+
+template <>
+double KalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                                      const TrackFindingCDC::CDCRLWireHit& rlWireHit) const
+{
+  // TODO: Do something here
+  return -1;
+}

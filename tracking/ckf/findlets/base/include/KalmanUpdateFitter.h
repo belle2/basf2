@@ -28,6 +28,10 @@ namespace Eigen {
 namespace Belle2 {
   class SpacePoint;
 
+  namespace TrackFindingCDC {
+    class CDCRLWireHit;
+  }
+
   /**
    * Algorithm class for updating the track parameters and the covariance matrix based on the Kalman algorithm.
    *
@@ -74,6 +78,10 @@ namespace Belle2 {
 
   template <>
   double KalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint& recoHit) const;
+
+  template <>
+  double KalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                                        const TrackFindingCDC::CDCRLWireHit& rlWireHit) const;
 
   template <class ARecoHit>
   double KalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, ARecoHit& recoHit) const

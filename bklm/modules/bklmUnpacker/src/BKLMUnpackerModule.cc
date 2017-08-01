@@ -73,10 +73,10 @@ void BKLMUnpackerModule::loadMapFromDB()
   DBArray<BKLMElectronicMapping> elements("BKLMElectronicMapping");
   elements.getEntries();
   for (const auto& element : elements) {
-    B2INFO("Version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " << element.getCopperId() <<
-           ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
-           ", isForward = " << element.getIsForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
-           " plane(z/phi) = " << element.getPlane());
+    B2DEBUG(1, "Version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " << element.getCopperId() <<
+            ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
+            ", isForward = " << element.getIsForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
+            " plane(z/phi) = " << element.getPlane());
 
     int copperId = element.getCopperId();
     int slotId = element.getSlotId();
@@ -280,8 +280,8 @@ void BKLMUnpackerModule::event()
           int plane = -1;
           if (m_electIdToModuleId.find(electId) == m_electIdToModuleId.end()) {
             if (!m_useDefaultModuleId) {
-              B2WARNING("could not find copperid " << copperId << ", finesse " << finesse_num + 1 << ", lane " << lane << ", axis " << axis <<
-                        " in mapping");
+              B2DEBUG(1, "could not find copperid " << copperId << ", finesse " << finesse_num + 1 << ", lane " << lane << ", axis " << axis <<
+                      " in mapping");
               continue;
             } else {
               moduleId = getDefaultModuleId(copperId, finesse_num, layer, axis);
@@ -298,13 +298,24 @@ void BKLMUnpackerModule::event()
           isForward = (moduleId & BKLM_END_MASK) >> BKLM_END_BIT;
           plane = (moduleId & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;
 
-          if (layer > 14) { B2WARNING("BKLMUnpackerModule:: strange that the layer number is larger than 14 " << layer); continue;}
+          if (layer > 14) { B2DEBUG(1, "BKLMUnpackerModule:: strange that the layer number is larger than 14 " << layer); continue;}
 
           //handle the flipped channels and out-of-range channels. This way is not good at all, but do this for a while before data format is fixed
           channel = getChannel(layer + 1, plane, channel);
           bool outRange = false;
           channel = flipChannel(isForward, sector + 1, layer + 1, plane, channel, outRange);
-          if (outRange) { B2WARNING("BKLMUnpackerModule:: channel number is out of range " << channel); continue; }
+          if (outRange) {
+            std::string message = "BKLMUnpackerModule:: channel number is out of range ";
+            m_rejected[message] += 1;
+            m_rejectedCount++;
+            if (m_rejectedCount < 10) {
+              B2INFO("BKLMUnpackerModule:: channel number is out of range " << channel);
+            } else if (m_rejectedCount == 10) {
+              B2INFO("BKLMUnpackerModule:: channel number is out of range "
+                     << "(message will be suppressed now)");
+            }
+            continue;
+          }
 
           //still have to add the channel and axis
           if (layer > 1) moduleId |= BKLM_INRPC_MASK;
@@ -374,6 +385,9 @@ void BKLMUnpackerModule::endRun()
 void BKLMUnpackerModule::terminate()
 {
 
+  for (const auto& message : m_rejected) {
+    B2INFO(message.first << "(occured " << message.second << " times)");
+  }
 
 }
 

@@ -56,7 +56,7 @@ namespace Belle2 {
 
   public:
     /// Set description
-    VXDToCDCWireHitCKFModule()
+    VXDToCDCWireHitCKFModule() : TrackFindingCDC::FindletModule<VXDToCDCCKFFindlet>( {"CDCWireHitVector"})
     {
       setDescription("Combinatorical Kalman Filter used for extracting VXD tracks into "
                      "CDC and create merged tracks.");

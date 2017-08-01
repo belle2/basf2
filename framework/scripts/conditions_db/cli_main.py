@@ -118,7 +118,7 @@ def command_tag_list(args, db=None):
 
         if not getattr(args, "detail", False):
             table.insert(0, ["id", "name", "description", "type", "status", "# payloads"])
-            pretty_print_table(table, [-10, 0, "*", -10, -10, -10])
+            pretty_print_table(table, [-10, 0, "*", -10, -10, -10], min_flexible_width=32)
 
 
 def print_globaltag(db, *tags):
@@ -401,7 +401,7 @@ def command_diff(args, db):
         print()
         tableA = get_iovlist(args.tagA)
         tableB = get_iovlist(args.tagB)
-        diff = [["", "First Exp", "First Run", "Final Exp", "Final Run", "Name", "Rev.", "payloadId"]]
+        diff = [["", "First Exp", "First Run", "Final Exp", "Final Run", "Name", "Rev.", "PayloadId"]]
         B2INFO("Comparing contents ...")
 
         def color_row(row, widths, line):
@@ -506,9 +506,9 @@ def command_iov(args, db):
 
         if not args.detail:
             table.sort()
-            table_header = ["First Exp", "First Run", "Final Exp", "Final Run", "Name", "Rev.", "IoV id", "payload id"]
+            table_header = ["First Exp", "First Run", "Final Exp", "Final Run", "Name", "Rev.", "IovId", "PayloadId"]
             table.insert(0, table_header)
-            pretty_print_table(table, [6, 6, 6, 6, '*', -8, 6, 7])
+            pretty_print_table(table, [6, 6, 6, 6, '+', -8, 6, 9])
 
 
 class FullHelpAction(argparse._HelpAction):

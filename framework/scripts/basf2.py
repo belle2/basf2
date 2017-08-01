@@ -104,6 +104,8 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True, transfor
             n   n characters (fixed)
             *   use all available space, good for description fields.
                 If more than one column has a * they all get equal width
+            +   use all available space but at least the actual width. Only useful
+                to make the table span the full width of the terminal
 
     :param first_row_is_heading: header specifies if we should take the first row
                           as table header and offset it a bit
@@ -132,6 +134,11 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True, transfor
             # handled after other fields are set
             long_columns.append(col)
             continue
+        elif opt == "+":
+            # handled after other fields are set. Distinguish from * by using by
+            # using negative indices
+            long_columns.append(- col - 1)
+            continue
         elif isinstance(opt, int) and opt > 0:
             # fixed width
             act_column_widths[col] = opt
@@ -154,7 +161,18 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True, transfor
         # ok split the table into even parts but divide up the remainder
         col_width, remainder = divmod(remaining_space, len(long_columns))
         for i, col in enumerate(long_columns):
-            act_column_widths[col] = col_width + (1 if i < remainder else 0)
+            size = col_width + (1 if i < remainder else 0)
+            if col < 0:
+                # negative index: a '+' specifier: make column large but at
+                # least as wide as content. So convert column to positive and
+                # set the width
+                col = -1 - col
+                act_column_widths[col] = max(size, act_column_widths[col])
+                # if we are larger than we should be add the amount to the total
+                # table width
+                total_used_width += act_column_widths[col] - size
+            else:
+                act_column_widths[col] = size
 
         total_used_width += remaining_space
 

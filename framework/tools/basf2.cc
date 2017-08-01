@@ -79,7 +79,7 @@ namespace {
            main_namespace, main_namespace);
       return;
     }
-    // otherwise execute the steerinf file
+    // otherwise execute the steering file
     auto fullPath = boost::filesystem::system_complete(boost::filesystem::path(pythonFile));
     if ((!(boost::filesystem::is_directory(fullPath))) && (boost::filesystem::exists(fullPath))) {
 

@@ -10,11 +10,10 @@
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
-
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
 
 #include <genfit/TrackCand.h>
 

@@ -10,7 +10,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitMCMultiLoopBlocker.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.h>

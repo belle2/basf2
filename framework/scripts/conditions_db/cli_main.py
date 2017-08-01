@@ -11,7 +11,10 @@ separate modules named cli_*.py
 import os
 import re
 import argparse
-from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging, pretty_print_table
+import json
+import difflib
+from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging, \
+    pretty_print_table, LogPythonInterface
 from pager import Pager
 from dateutil.parser import parse as parse_date
 from . import ConditionsDB, enable_debugging, encode_name
@@ -331,6 +334,91 @@ def command_tag_invalidate(args, db):
 
     db.request("PUT", "/globalTag/{}/INVALID".format(encode_name(args.tag)),
                "invalidateing global tag {}".format(args.tag))
+
+
+def command_diff(args, db):
+    """Compare two global tags
+
+    This command allows to compare two global tags. It will show the changes in
+    a format similar to a unified diff but by default it will not show any
+    context, only the new or removed payloads. If --full is given it will show
+    all payloads, even the ones common to both global tags.
+    """
+    iovfilter = ItemFilter(args)
+    if db is None:
+        args.add_argument("--full", default=False, action="store_true",
+                          help="If given print all iovs, also those which are the same in both tags")
+        args.add_argument("--run", type=int, nargs=2, metavar="N", help="exp and run numbers "
+                          "to limit showing iovs to a ones present in a given run")
+        args.add_argument("tagA", metavar="TAGNAME", help="base for comparison")
+        args.add_argument("tagB", metavar="TAGNAME", help="tagname to compare")
+        iovfilter.add_arguments("payloads")
+        return
+
+    # check arguments
+    if not iovfilter.check_arguments():
+        return 1
+
+    def get_iovlist(tag):
+        """Return a list of minimized iov informations as json encoded strings
+        to be able to run the difflib difference finder on them"""
+        if args.run is not None:
+            msg = "Obtaining list of iovs for global tag {tag}, exp={exp}, run={run}{filter}".format(
+                tag=tag, exp=args.run[0], run=args.run[1], filter=iovfilter)
+            req = db.request("GET", "/iovPayloads", msg, params={'gtName': tag, 'expNumber': args.run[0],
+                                                                 'runNumber': args.run[1]})
+        else:
+            msg = "Obtaining list of iovs for global tag {tag}{filter}".format(tag=tag, filter=iovfilter)
+            req = db.request("GET", "/globalTag/{}/globalTagPayloads".format(encode_name(tag)), msg)
+
+        table = []
+        for item in req.json():
+            payload = item["payload" if 'payload' in item else "payloadId"]
+            if "payloadIov" in item:
+                iovs = [item['payloadIov']]
+            else:
+                iovs = item['payloadIovs']
+
+            if not iovfilter.check(payload['basf2Module']['name']):
+                continue
+
+            for iov in iovs:
+                table.append([
+                        iov["expStart"], iov["runStart"], iov["expEnd"], iov["runEnd"],
+                        payload['basf2Module']['name'], payload['revision'],
+                        payload['payloadId'],
+                    ])
+
+        table.sort()
+        return [json.dumps(e) for e in table]
+
+    with Pager("Differences between global tags {tagA} and {tagB}{}".format(iovfilter, tagA=args.tagA, tagB=args.tagB), True):
+        print("Global tags to be compated:")
+        ntags = print_globaltag(db, args.tagA, args.tagB)
+        if ntags != 2:
+            return 1
+
+        print()
+        tableA = get_iovlist(args.tagA)
+        tableB = get_iovlist(args.tagB)
+        diff = [["", "First Exp", "First Run", "Final Exp", "Final Run", "Name", "Rev.", "payloadId"]]
+        B2INFO("Comparing contents ...")
+
+        def color_row(row, widths, line):
+            if not LogPythonInterface.terminal_supports_colors():
+                return line
+            begin = {'+': '\x1b[32m', '-': '\x1b[31m'}.get(row[0], "")
+            end = '\x1b[0m'
+            return begin + line + end
+
+        for token in difflib.ndiff(tableA, tableB):
+            if token.startswith("?") or (not args.full and token.startswith(" ")):
+                continue
+            row = json.loads(token[2:])
+            diff.append([token[0]] + row)
+
+        print(f"Differences betwen {args.tagA} and {args.tagB}")
+        pretty_print_table(diff, [1, 6, 6, 6, 6, "+", -8, 10], transform=color_row)
 
 
 def command_iov(args, db):

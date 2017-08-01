@@ -543,7 +543,7 @@ namespace Belle2 {
 
       double m_maxSpaceResol = 2.5 * 0.0130; /**< Max. space resolution allowed (cm) */
       bool m_mapperGeometry = false;  /**< B-field mapper geometry flag. */
-      double m_mapperPhiAngle = 68.7; /**< B-field mapper phi-angle (deg). */
+      double m_mapperPhiAngle = 16.7; /**< B-field mapper phi-angle (deg). */
 
       std::string m_displacementFile = "displacement_v1.1.dat";  /**< Displacement file. */
       std::string m_alignmentFile = "alignment_v2.dat";  /**< Alignment file. */

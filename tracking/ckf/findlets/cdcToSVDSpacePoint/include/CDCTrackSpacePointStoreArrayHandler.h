@@ -79,7 +79,7 @@ namespace Belle2 {
           continue;
         }
 
-        const std::vector<const SpacePoint*> matchedSpacePoints = cdcTrackWithMatchedSpacePoints.getHits();
+        const std::vector<const SpacePoint*>& matchedSpacePoints = cdcTrackWithMatchedSpacePoints.getHits();
 
         B2ASSERT("There are no SP related!", not matchedSpacePoints.empty());
 

@@ -62,6 +62,12 @@ bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOn
 template <>
 bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const genfit::SharedPlanePtr& plane) const
 {
+  // Check if we are already there
+  if (*plane == *measuredStateOnPlane.getPlane()) {
+    B2INFO("Cache hit!");
+    return true;
+  }
+
   try {
     genfit::MaterialEffects::getInstance()->setNoEffects(not m_param_useMaterialEffects);
     measuredStateOnPlane.extrapolateToPlane(plane);

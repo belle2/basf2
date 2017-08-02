@@ -55,6 +55,7 @@ namespace Belle2 {
       m_seedRecoTrack(seed), m_number(number), m_maximumNumber(number)
     {
       setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
+      setCachedMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
     }
 
     /**
@@ -74,11 +75,10 @@ namespace Belle2 {
 
       // Reset other state
       m_chi2 = 0;
-
       m_isFitted = false;
       m_isAdvanced = false;
       m_hasMSoP = false;
-
+      m_hasCachedMSoP = false;
       m_weight = 0;
     }
 
@@ -186,11 +186,25 @@ namespace Belle2 {
     }
 
     /// Set the mSoP
-    void setMeasuredStateOnPlane(const genfit::MeasuredStateOnPlane& mSoP)
+    void setMeasuredStateOnPlane(const genfit::MeasuredStateOnPlane& mSoP, bool updateCache = false)
     {
       m_measuredStateOnPlane = mSoP;
       mSoP.getPosMomCov(m_mSoPPosition, m_mSoPMomentum, m_mSoPCov);
       m_hasMSoP = true;
+
+      if (updateCache) {
+        const auto* parent = getParent();
+        if (parent) {
+          parent->setCachedMeasuredStateOnPlane(mSoP);
+        }
+      }
+    }
+
+    /// Set the cached mSoP
+    void setCachedMeasuredStateOnPlane(const genfit::MeasuredStateOnPlane& mSoP) const
+    {
+      m_cachedMeasuredStateOnPlane = mSoP;
+      m_hasCachedMSoP = true;
     }
 
     /// Get the mSoP (or from the parent if not set already)
@@ -199,8 +213,16 @@ namespace Belle2 {
       if (mSoPSet()) {
         return m_measuredStateOnPlane;
       } else {
+        B2ASSERT("You are asking for a parent property without a parent!", getParent());
         return getParent()->getMeasuredStateOnPlane();
       }
+    }
+
+    /// Get the cached mSoP of the parent (not our own!)
+    const genfit::MeasuredStateOnPlane& getCachedMeasuredStateOnPlaneOfParent() const
+    {
+      B2ASSERT("You are asking for a parent property without a parent!", getParent());
+      return getParent()->getCachedMeasuredStateOnPlane();
     }
 
     /// Get the 3d position of the mSoP (cached)
@@ -218,6 +240,7 @@ namespace Belle2 {
     {
       if (mSoPSet()) {
         return m_mSoPMomentum;
+
       } else {
         return getParent()->getMSoPMomentum();
       }
@@ -278,7 +301,7 @@ namespace Belle2 {
     /// Where on the hierarchy the first state is located.
     unsigned int m_maximumNumber = 0;
     /// The parent state of this state
-    CKFStateObject* m_parent = nullptr;
+    const CKFStateObject* m_parent = nullptr;
     /// Chi2 of this special state with this hit and this reco track. Will only be set after fitting state.
     double m_chi2 = 0;
     /// Flag, if this state was already fitted.
@@ -287,8 +310,12 @@ namespace Belle2 {
     bool m_isAdvanced = false;
     /// Flag, if this state has a valid mSoP
     bool m_hasMSoP = false;
+    /// Flag, if this state has a valid cached mSoP
+    mutable bool m_hasCachedMSoP = false;
     /// MSoP after advancing. Is undetermined before extrapolating!
     genfit::MeasuredStateOnPlane m_measuredStateOnPlane;
+    /// MSoP used as a cache. It is determined while extrapolating the child states.
+    mutable genfit::MeasuredStateOnPlane m_cachedMeasuredStateOnPlane;
     /// Temporary storage for the weight (used during overlap check).
     double m_weight = 0;
     /// Cache for the position of the mSoP. May be invalid if the mSoP is not set
@@ -302,6 +329,27 @@ namespace Belle2 {
     bool mSoPSet() const
     {
       return m_hasMSoP;
+    }
+
+    /// Is cached the mSoP already set?
+    bool cachedMSoPSet() const
+    {
+      return m_hasCachedMSoP;
+    }
+
+    /// Get the cached mSoP of ourselves. If we do not have one, this is traversed up to the top - there the mSoP itself is returned.
+    const genfit::MeasuredStateOnPlane& getCachedMeasuredStateOnPlane() const
+    {
+      if (cachedMSoPSet()) {
+        return m_cachedMeasuredStateOnPlane;
+      } else {
+        const auto* parent = getParent();
+        if (parent) {
+          return parent->getCachedMeasuredStateOnPlane();
+        } else {
+          return getMeasuredStateOnPlane();
+        }
+      }
     }
   };
 }

@@ -66,8 +66,12 @@ namespace Belle2 {
       return 1;
     }
 
+    // This is the extrapolated measured state on plane, which is defined on the same plane as the hit
+    // If it would not be defined, the extrapolation would have gone wrong, so we would not end up here.
+    // Or we do not have a hit at all, which is already checked above.
     genfit::MeasuredStateOnPlane measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
 
+    // Do the kalman step and return the chi2 of this step
     const double chi2 = kalmanStep(measuredStateOnPlane, *hit);
 
     currentState.setMeasuredStateOnPlane(measuredStateOnPlane);

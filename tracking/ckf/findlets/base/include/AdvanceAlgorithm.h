@@ -45,6 +45,8 @@ namespace Belle2 {
   private:
     /// Parameter: use material effects during extrapolation.
     bool m_param_useMaterialEffects = true;
+
+    /// Cache for the mSoP for a given parent
   };
 
   template <class AStateObject>
@@ -60,14 +62,21 @@ namespace Belle2 {
       return 1;
     }
 
-    // This is the mSoP we will edit.
-    genfit::MeasuredStateOnPlane measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
+    // Get the parent to check, if we have already seem it and have something in our cache
+    B2ASSERT("How could a state without a parent end up here?", currentState.getParent());
+
+    // This is the mSoP we will edit. It is either an already extrapolated mSoP to this plane (or a plane nearby)
+    // stored in the parent state, or
+    //   (1) if there is no hit in the parents state, the cached mSoP of the parent of its parent is returned etc.
+    //   (2) if there was no extrapolation already, we get the normal measured state on plane
+    genfit::MeasuredStateOnPlane measuredStateOnPlane = currentState.getCachedMeasuredStateOnPlaneOfParent();
 
     if (not extrapolate(measuredStateOnPlane, *hit)) {
       return NAN;
     }
 
-    currentState.setMeasuredStateOnPlane(measuredStateOnPlane);
+    currentState.setMeasuredStateOnPlane(measuredStateOnPlane, true);
+
     currentState.setAdvanced();
     return 1;
   }

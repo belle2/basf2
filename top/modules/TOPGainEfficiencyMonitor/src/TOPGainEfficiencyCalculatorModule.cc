@@ -161,9 +161,14 @@ void TOPGainEfficiencyCalculatorModule::LoadHistograms()
     m_timeHistogram[iHisto] = hTime;
     double peakTime = FindPeakForSmallerXThan(hTime, 0);
     //double peakTime = hTime->GetXaxis()->GetBinCenter(hTime->GetMaximumBin());
-    hTime->Fit("gaus", "Q", "", peakTime - m_fitHalfWidth, peakTime + m_fitHalfWidth);
-    TF1* funcLaser = (TF1*)hTime->GetFunction("gaus");
-    if (!funcLaser) continue;
+    double fitMin = peakTime - m_fitHalfWidth;
+    double fitMax = peakTime + m_fitHalfWidth;
+    TF1* funcLaser = new TF1(std::string(std::string("func_") + hnameProj[1].str()).c_str(),
+                             "gaus(0)", fitMin, fitMax);
+    funcLaser->SetParameters(hTime->GetBinContent(hTime->GetXaxis()->FindBin(peakTime)), peakTime, m_fitHalfWidth);
+    funcLaser->SetParLimits(1, fitMin, fitMax);
+    hTime->Fit(funcLaser, "Q", "", fitMin, fitMax);
+    if (funcLaser->GetNDF() < 1) continue;
 
     //if the fitting is successful, create y-projection histogram with timing cut
     m_hitTiming = funcLaser->GetParameter(1);
@@ -439,6 +444,8 @@ double TOPGainEfficiencyCalculatorModule::TOPGainFunc(double* var, double* par)
 
 double TOPGainEfficiencyCalculatorModule::FindPeakForSmallerXThan(TH1* histo, double xmax)
 {
+  double histo_xmax = histo->GetXaxis()->GetBinUpEdge(histo->GetXaxis()->GetNbins() - 1);
+  if (xmax > histo_xmax) xmax = histo_xmax;
 
   int iBin = 1;
   double peakPos = histo->GetXaxis()->GetBinCenter(iBin);

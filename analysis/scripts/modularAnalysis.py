@@ -51,7 +51,7 @@ def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
     path.add_module(conf)
 
 
-def inputMdst(environmentType, filename, path=analysis_main):
+def inputMdst(environmentType, filename, path=analysis_main, skipNEvents=0, entrySequence=None):
     """
     Loads the specified ROOT (DST/mDST/muDST) file with the RootInput module.
 
@@ -71,12 +71,16 @@ def inputMdst(environmentType, filename, path=analysis_main):
     @param environmentType type of the environment to be loaded
     @param filename the name of the file to be loaded
     @param modules are added to this path
+    @param skipNEvents N events of the input file are skipped
+    @param entrySequence The number sequences (e.g. 23:42,101) defining the entries which are processed.
     """
+    if entrySequence is not None:
+        entrySequence = [entrySequence]
 
-    inputMdstList(environmentType, [filename], path)
+    inputMdstList(environmentType, [filename], path, skipNEvents, entrySequence)
 
 
-def inputMdstList(environmentType, filelist, path=analysis_main):
+def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, entrySequences=None):
     """
     Loads the specified ROOT (DST/mDST/muDST) files with the RootInput module.
 
@@ -98,10 +102,17 @@ def inputMdstList(environmentType, filelist, path=analysis_main):
     @param environmentType type of the environment to be loaded
     @param filelist the filename list of files to be loaded
     @param modules are added to this path
+    @param skipNEvents N events of the input files are skipped
+    @param entrySequences The number sequences (e.g. 23:42,101) defining the entries which are processed for
+        each inputFileName.
     """
 
     roinput = register_module('RootInput')
     roinput.param('inputFileNames', filelist)
+    roinput.param('skipNEvents', skipNEvents)
+    if entrySequences is not None:
+        roinput.param('entrySequences', entrySequences)
+
     path.add_module(roinput)
     progress = register_module('ProgressBar')
     path.add_module(progress)

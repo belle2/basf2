@@ -128,7 +128,7 @@ namespace Belle2 {
       }
       return std::make_pair(dchi2da, d2chi2da2);
     } catch (...) {
-      B2ERROR("Failed track");
+      B2DEBUG(50, "Failed time extraction - skipping track");
       return std::make_pair(std::nan(""), std::nan(""));
     }
   };

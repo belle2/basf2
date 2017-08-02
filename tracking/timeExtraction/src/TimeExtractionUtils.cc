@@ -180,7 +180,7 @@ namespace Belle2 {
       const genfit::TrackPoint* tp = hitPoints[i];
       const genfit::KalmanFitterInfo* fi = tp->getKalmanFitterInfo();
       if (!fi) {
-        B2ERROR("Missing KalmanFitterInfo");
+        B2DEBUG(50, "Missing KalmanFitterInfo - skipping track");
         return false;
       }
 
@@ -194,7 +194,7 @@ namespace Belle2 {
         const genfit::TrackPoint* tpNext = hitPoints[i + 1];
         const genfit::KalmanFitterInfo* fiNext = tpNext->getKalmanFitterInfo();
         if (!fiNext) {
-          B2ERROR("Missing next KalmanFitterInfo");
+          B2DEBUG(50, "Missing next KalmanFitterInfo - skipping track");
           return false;
         }
 

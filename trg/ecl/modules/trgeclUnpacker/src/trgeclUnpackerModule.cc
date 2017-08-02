@@ -9,6 +9,7 @@
 // Description : TRG ECL Unpacker Module
 //---------------------------------------------------------------
 // 1.00 : 2017/05/06 : First version
+// 1.01 : 2017/07/17 : Add FTSW clock from FAM, fine timing
 //---------------------------------------------------------------
 
 #include <trg/ecl/modules/trgeclUnpacker/trgeclUnpackerModule.h>
@@ -21,7 +22,7 @@ REG_MODULE(TRGECLUnpacker);
 
 string TRGECLUnpackerModule::version() const
 {
-  return string("1.00");
+  return string("1.01");
 }
 
 TRGECLUnpackerModule::TRGECLUnpackerModule()
@@ -62,16 +63,20 @@ void TRGECLUnpackerModule::event()
 {
 
   StoreArray<RawTRG> raw_trgarray;
-  unsigned int nodeid;
+  //    unsigned int nodeid;
 
   for (int i = 0; i < raw_trgarray.getEntries(); i++) {
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
-      nodeid = ((raw_trgarray[i]->GetNodeID(j)) >> 24) & 0x1F;
-      if (nodeid == 0x13) {
-
-        readCOPPEREvent(raw_trgarray[i], j);
-        n_basf2evt++;
+      //      nodeid = ((raw_trgarray[i]->GetNodeID(j)) >> 24) & 0x1F;
+      //if (nodeid == 0x13) {
+      readCOPPEREvent(raw_trgarray[i], j);
+      n_basf2evt++;
+      if (n_basf2evt % 1000 == 0) {
+        printf("%.5dK", (int)n_basf2evt / 1000);
+        fflush(stdout);
+        printf("\r");
       }
+      //      }
     }
   }
 }
@@ -123,13 +128,17 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat)
   int p_time     = 0;
   int p_peak     = 0;
 
+  int revo_trg    = ((kdat[1599] & 0xFF) << 3) + ((kdat[1598] >> 5) & 0x7);
+  int revo_fam    = (kdat[1585] >> 1) & 0x7F;
+  int fine_timing = ((kdat[1585] & 0x1) << 6) + ((kdat[1584] >> 2) & 0x3F);
+
   vector<int> tc_data;
   vector<vector<int>> evt_data;
 
   evt_data.clear();
   tc_data.clear();
 
-  for (int j = 0; j < 144; j++) {
+  for (int j = 20; j < 144; j++) {
     tmp1 = kdat[11 * j + 10] & 0xFF;
     tmp2 = kdat[11 * j +  9] & 0xFF;
     tmp3 = kdat[11 * j +  8] & 0xFC;
@@ -165,6 +174,16 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat)
 
   }
   ntc = evt_data.size();
+
+  int t_tc      = 0;
+  int t_energy  = 0;
+  int t_time    = 0;
+  int t_caltime = -999;
+
+  int t_fine_timing = -999;
+  int t_revo_fam    = -999;
+  int t_revo_trg    = -999;
+
   if (ntc != 0) {
 
     sort(evt_data.begin(), evt_data.end(),
@@ -192,16 +211,14 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat)
     sort(evt_data.begin(), evt_data.end(),
     [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[0] < aa2[0];});
 
-    int t_tc      = 0;
-    int t_energy  = 0;
-    int t_time    = 0;
-    int t_caltime = -999;
-
     for (int i = 0; i < ntc; i++) {
-      t_tc       = evt_data[i][0];
-      t_energy   = evt_data[i][1];
-      t_time     = evt_data[i][2];
-      t_caltime  = w_time - t_time;
+      t_tc          = evt_data[i][0];
+      t_energy      = evt_data[i][1];
+      t_time        = evt_data[i][2];
+      t_caltime     = w_time - t_time;
+      t_fine_timing = fine_timing;
+      t_revo_fam    = revo_fam;
+      t_revo_trg    = revo_trg;
 
       StoreArray<TRGECLUnpackerStore> TRGECLUnpackerArray;
       TRGECLUnpackerArray.appendNew();
@@ -213,44 +230,33 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat)
       TRGECLUnpackerArray[m_hitNum]->setTCEnergy(t_energy);
       TRGECLUnpackerArray[m_hitNum]->setTCTime(t_time);
       TRGECLUnpackerArray[m_hitNum]->setTCCALTime(t_caltime);
+      TRGECLUnpackerArray[m_hitNum]->setFineTime(t_fine_timing);
+      TRGECLUnpackerArray[m_hitNum]->setRevoFAM(t_revo_fam);
+      TRGECLUnpackerArray[m_hitNum]->setRevoTRG(t_revo_trg);
+
     }
+  } else {
+
+    t_tc      = 0;
+    t_energy  = 0;
+    t_time    = 0;
+    t_caltime = -999;
+    t_fine_timing = fine_timing;
+    t_revo_fam    = revo_fam;
+    t_revo_trg    = revo_trg;
+
+    StoreArray<TRGECLUnpackerStore> TRGECLUnpackerArray;
+    TRGECLUnpackerArray.appendNew();
+    m_hitNum = TRGECLUnpackerArray.getEntries() - 1;
+    TRGECLUnpackerArray[m_hitNum]->setEventId(n_basf2evt);
+    TRGECLUnpackerArray[m_hitNum]->setTCId(t_tc);
+    TRGECLUnpackerArray[m_hitNum]->setNTC(ntc);
+    TRGECLUnpackerArray[m_hitNum]->setTCEnergy(t_energy);
+    TRGECLUnpackerArray[m_hitNum]->setTCTime(t_time);
+    TRGECLUnpackerArray[m_hitNum]->setTCCALTime(t_caltime);
+    TRGECLUnpackerArray[m_hitNum]->setFineTime(t_fine_timing);
+    TRGECLUnpackerArray[m_hitNum]->setRevoFAM(t_revo_fam);
+    TRGECLUnpackerArray[m_hitNum]->setRevoTRG(t_revo_trg);
   }
   return;
-}
-
-string TRGECLUnpackerModule::u_int2string(int u_int, int u_num)
-{
-
-  string aaa = "0";
-  ostringstream bbb;
-  bbb << u_int;
-  if (u_num == 0 || u_num == 1) {
-    aaa = bbb.str();
-  } else if (u_num == 2) {
-    if (u_int < 10) { aaa = "0" + bbb.str();}
-    else          { aaa =       bbb.str(); }
-  } else if (u_num == 3) {
-    if (u_int < 10) { aaa = "00" + bbb.str(); }
-    else if (u_int < 100) { aaa =  "0" + bbb.str(); }
-    else           { aaa =        bbb.str(); }
-  } else if (u_num == 4) {
-    if (u_int <  10) { aaa = "000" + bbb.str(); }
-    else if (u_int < 100) { aaa =  "00" + bbb.str(); }
-    else if (u_int < 1000) { aaa =   "0" + bbb.str(); }
-    else            { aaa =         bbb.str(); }
-  } else if (u_num == 5) {
-    if (u_int <   10) { aaa = "0000" + bbb.str(); }
-    else if (u_int <  100) { aaa =  "000" + bbb.str(); }
-    else if (u_int < 1000) { aaa =   "00" + bbb.str(); }
-    else if (u_int < 10000) { aaa =    "0" + bbb.str(); }
-    else             { aaa =          bbb.str(); }
-  } else if (u_num == 6) {
-    if (u_int <    10) { aaa = "00000" + bbb.str(); }
-    else if (u_int <   100) { aaa =  "0000" + bbb.str(); }
-    else if (u_int <  1000) { aaa =   "000" + bbb.str(); }
-    else if (u_int < 10000) { aaa =    "00" + bbb.str(); }
-    else if (u_int < 100000) { aaa =     "0" + bbb.str(); }
-    else                   { aaa =           bbb.str(); }
-  }
-  return aaa;
 }

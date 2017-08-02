@@ -38,7 +38,7 @@ main.add_module('TRGECL',
 # add decision module and skip events that are not triggered
 not_triggered = create_path()
 
-trigger = main.add_module('TRGGDLCosmicRun')
+trigger = main.add_module('TRGGDLCosmicRun', BackToBack=True)
 trigger.if_false(not_triggered)
 
 main.add_module('RootOutput', outputFileName=filenameOut)

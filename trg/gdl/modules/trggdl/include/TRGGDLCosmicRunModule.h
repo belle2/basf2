@@ -5,8 +5,8 @@
 
 namespace Belle2 {
 
-  /** Module that returns true if the back-to-back condition
-   *  of track segments in SL 2 is fulfilled (for 2017 cosmic test). */
+  /** Module that returns true if the trigger condition
+   *  for the 2017 cosmic runs is fulfilled. */
   class TRGGDLCosmicRunModule : public Module {
 
   public:
@@ -20,12 +20,14 @@ namespace Belle2 {
     /** Initialize the module. */
     virtual void initialize();
 
-    /** Check the back-to-back condition and set return value. */
+    /** Check the trigger condition and set return value. */
     virtual void event();
 
   protected:
     /** name of track segment hit list */
     std::string m_tsHitCollectionName;
+    /** switch for back-to-back condition */
+    bool m_backToBack;
 
   };
 

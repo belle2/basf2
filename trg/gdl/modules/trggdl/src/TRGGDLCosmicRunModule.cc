@@ -15,13 +15,21 @@ REG_MODULE(TRGGDLCosmicRun);
 TRGGDLCosmicRunModule::TRGGDLCosmicRunModule() : Module::Module()
 {
   setDescription(
-    "Module that returns true, if the back-to-back condition "
-    "of track segments in SL 2 is fulfilled (for 2017 cosmic test).\n"
+    "Module that returns true, if the trigger condition "
+    "for the 2017 cosmic runs is fulfilled.\n"
+    "trigger conditions:\n"
+    "  with back-to-back: two back-to-back track segments in superlayer 2 "
+    "plus one ECL hit\n"
+    "  without back-to-back: on track segment in superlayer 2 "
+    "plus one ECL hit"
   );
 
   addParam("tsHitCollectionName", m_tsHitCollectionName,
            "Name of the input StoreArray of CDCTriggerSegmentHits.",
            string(""));
+  addParam("BackToBack", m_backToBack,
+           "Switch to turn back-to-back requirement on or off.",
+           true);
 }
 
 void
@@ -36,12 +44,14 @@ TRGGDLCosmicRunModule::event()
 {
   StoreArray<CDCTriggerSegmentHit> tshits(m_tsHitCollectionName);
   bool TSinMerger[12] = {false};
+  bool TSinSL2 = false;
   for (int its = 0; its < tshits.getEntries(); ++its) {
     if (tshits[its]->getISuperLayer() == 2) {
       // SegmentID in SuperLayer 2 starts at 320
       // One merger corresponds to 16 segments
       unsigned mergerID = (tshits[its]->getSegmentID() - 320) / 16;
       TSinMerger[mergerID] = true;
+      TSinSL2 = true;
     }
   }
   bool BackToBack = false;
@@ -57,5 +67,8 @@ TRGGDLCosmicRunModule::event()
     }
   }
 
-  setReturnValue(BackToBack && TCHit);
+  if (m_backToBack)
+    setReturnValue(BackToBack && TCHit);
+  else
+    setReturnValue(TSinSL2 && TCHit);
 }

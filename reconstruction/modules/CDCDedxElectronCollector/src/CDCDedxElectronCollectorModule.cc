@@ -8,49 +8,52 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <reconstruction/modules/CDCDedxCosineCollector/CDCDedxCosineCollectorModule.h>
+#include <reconstruction/modules/CDCDedxElectronCollector/CDCDedxElectronCollectorModule.h>
 
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCDedxCosineCollector)
+REG_MODULE(CDCDedxElectronCollector)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-CDCDedxCosineCollectorModule::CDCDedxCosineCollectorModule() : CalibrationCollectorModule()
+CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCollectorModule()
 {
   // Set module properties
-  setDescription("A collector module for CDC dE/dx cosine calibration");
+  setDescription("A collector module for CDC dE/dx electron calibrations");
 
   // Parameter definitions
-
+  addParam("maxNumHits", m_maxNumHits,
+           "Maximum number of hits per track. If there is more than this the track will not be collected. ", int(100));
 }
 
 //-----------------------------------------------------------------
 //                 Create ROOT objects
 //-----------------------------------------------------------------
 
-void CDCDedxCosineCollectorModule::prepare()
+void CDCDedxElectronCollectorModule::prepare()
 {
-  StoreObjPtr<EventMetaData>::required();
   StoreArray<CDCDedxTrack>::required();
 
   // Data object creation
-  auto ttree = new TTree("dedxTree", "Tree with dE/dx information");
-  ttree->Branch<int>("event", &m_evt);
-  ttree->Branch<int>("run", &m_run);
-  ttree->Branch<int>("exp", &m_exp);
-  ttree->Branch<int>("pid", &m_procId);
+  auto means = new TH1F("means", "CDC dE/dx truncated means", 100, 0, 2);
+  auto ttree = new TTree("tree", "Tree with dE/dx information");
 
   ttree->Branch<double>("dedx", &m_dedx);
   ttree->Branch<double>("costh", &m_costh);
-  ttree->Branch<int>("nhits", &m_nhits);
 
-  // Data object registration
+  ttree->Branch("wire", &m_wire);
+  ttree->Branch("layer", &m_layer);
+  ttree->Branch("doca", &m_doca);
+  ttree->Branch("enta", &m_enta);
+  ttree->Branch("dedxhit", &m_dedxhit);
+
+  // Collector object registration
+  registerObject<TH1F>("means", means);
   registerObject<TTree>("tree", ttree);
 }
 
@@ -58,22 +61,38 @@ void CDCDedxCosineCollectorModule::prepare()
 //                 Fill ROOT objects
 //-----------------------------------------------------------------
 
-void CDCDedxCosineCollectorModule::collect()
+void CDCDedxElectronCollectorModule::collect()
 {
-  StoreObjPtr<EventMetaData> emd;
   StoreArray<CDCDedxTrack> tracks;
 
-  m_procId = ProcHandler::EvtProcID();
-  m_evt = emd->getEvent();
-  m_run = emd->getRun();
-  m_exp = emd->getExperiment();
+  // Collector object access
+  auto& means = getObject<TH1F>("means");
+  auto& tree = getObject<TTree>("tree");
 
   for (auto track : tracks) {
+    // Make sure to remove all the data in vectors from the previous track
+    m_wire.clear();
+    m_layer.clear();
+    m_doca.clear();
+    m_enta.clear();
+    m_dedxhit.clear();
+
+    // Simple numbers don't need to be cleared
     m_dedx = track.getTruncatedMean();
     m_costh = track.getCosTheta();
-    m_nhits = track.getNLayerHits();
+    m_nhits = track.size();  // Used in loop below but not saved to TTree
 
-    // Data object access and filling
-    getObject<TTree>("tree").Fill();
+    if (m_nhits > m_maxNumHits) continue;
+    for (int i = 0; i < m_nhits; ++i) {
+      m_wire.push_back(track.getWire(i));
+      m_layer.push_back(track.getHitLayer(i));
+      m_doca.push_back(track.getDoca(i));
+      m_enta.push_back(track.getEnta(i));
+      m_dedxhit.push_back(track.getDedx(i));
+    }
+
+    // Track information filled
+    tree.Fill();
+    means.Fill(m_dedx);
   }
 }

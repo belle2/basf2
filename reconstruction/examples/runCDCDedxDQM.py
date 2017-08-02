@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+#############################################################
+#
+# Test script to produce DQM plots for CDC dE/dx
+#
+# Usage: basf2 runCDCDedxDQM.py
+#
+# Input: B2Electrons.root (from test1_generate.py)
+# Output: CDCDedxDQM.root
+#
+#
+# Example steering file - 2011 Belle II Collaboration
+#############################################################
+
+import os
+from basf2 import *
+
+use_local_database("calibration_results/CDCDedxRunGainCalibration/outputdb/database.txt",
+                   "calibration_results/CDCDedxRunGainCalibration/outputdb")
+use_local_database("calibration_results/CDCDedxWireGainCalibration/outputdb/database.txt",
+                   "calibration_results/CDCDedxWireGainCalibration/outputdb")
+use_local_database("calibration_results/CDCDedxCosineCalibration/outputdb/database.txt",
+                   "calibration_results/CDCDedxCosineCalibration/outputdb")
+
+main = create_path()
+
+# read in a sample
+main.add_module("RootInput", inputFileName="B2Electrons.root")
+
+# register the HistoManager and specify output file
+main.add_module("HistoManager", histoFileName="CDCDedxDQM.root")
+
+# run the DQM module
+main.add_module("CDCDedxDQM")
+
+# Process events
+process(main)

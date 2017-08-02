@@ -17,7 +17,7 @@ using namespace Belle2;
 //                 Implementation
 //-----------------------------------------------------------------
 
-CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() : CalibrationAlgorithm("CDCDedxWireGainCollector")
+CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() : CalibrationAlgorithm("CDCDedxElectronCollector")
 {
   // Set module properties
   setDescription("A calibration algorithm for CDC dE/dx wire gains");
@@ -36,7 +36,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   if (ttree.GetEntries() < 100)
     return c_NotEnoughData;
 
-  // You HAVE to set these pointers to 0!
+  // HAVE to set these pointers to 0!
   std::vector<int>* wire = 0;
   std::vector<double>* dedxhit = 0;
 
@@ -51,14 +51,21 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     }
   }
 
-  B2INFO("dE/dx Calibration done for " << wirededx.size() << " CDC wires");
-
-  TClonesArray* gains = new TClonesArray("Belle2::CDCDedxWireGain");
-  int counter = 0;
+  std::map<int, double> means;
   for (auto const& awire : wirededx) {
-    new((*gains)[counter++]) CDCDedxWireGain(awire.first, calculateMean(awire.second, 0.05, 0.25));
+    double mean = calculateMean(awire.second, 0.05, 0.25);
+    if (mean != 0)
+      means[awire.first] = mean;
   }
-  saveCalibration(gains, "CDCDedxWireGains");
+
+  for (unsigned int i = 0; i < 14336; ++i) {
+    if (!means[i]) means[i] = 1.0;
+  }
+
+  B2INFO("dE/dx Calibration done for " << means.size() << " CDC wires");
+
+  CDCDedxWireGain* gains = new CDCDedxWireGain(means);
+  saveCalibration(gains, "CDCDedxWireGain");
 
   // Iterate
   //  B2INFO("mean: " << mean);

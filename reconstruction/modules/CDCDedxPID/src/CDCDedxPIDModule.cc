@@ -63,7 +63,7 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
 
   //Parameter definitions
   addParam("useIndividualHits", m_useIndividualHits,
-           "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values will be used.", false);
+           "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values will be used.", true);
   addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded", double(0.05));
   addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded", double(0.25));
 
@@ -73,9 +73,6 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
   addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.",
            std::string("/data/reconstruction/dedxPID_PDFs_dd92782_500k_events.root"));
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
-
-  m_eventID = -1;
-  m_trackID = 0;
 }
 
 CDCDedxPIDModule::~CDCDedxPIDModule() { }
@@ -168,7 +165,33 @@ void CDCDedxPIDModule::initialize()
     //leaking pdfFile so I can access the histograms
   }
 
-  // load constants
+
+  // make sure the calibration constants are reasonable
+  // run gains
+  if (m_DBRunGain->getRunGain() == 0)
+    B2ERROR("Run gain is zero!");
+
+  // wire gains
+  for (unsigned int i = 0; i < 14336; ++i) {
+    if (m_DBWireGains->getWireGain(i) == 0)
+      B2ERROR("Wire gain " << i << " is zero!");
+  }
+
+  // cosine correction (store the bin edges for extrapolation)
+  m_cosbinedges = m_DBCosine->getCosThetaBins();
+  for (unsigned int i = 0; i < m_cosbinedges.size(); ++i) {
+    double gain = m_DBCosine->getMean(m_cosbinedges[i]);
+    if (gain == 0)
+      B2ERROR("Cosine gain is zero...");
+  }
+
+  // lookup table for number of wires per layer (indexed on superlayer)
+  m_nLayerWires[0] = 1280;
+  for (short i = 1; i < 9; ++i) {
+    m_nLayerWires[i] = m_nLayerWires[i - 1] + 6 * (160 + (i - 1) * 32);
+  }
+
+
   // setting these manually for now, but they should be read in from the DB
   m_curvepars[0] = 0.00392444;
   m_curvepars[1] = 26.8709;
@@ -213,8 +236,7 @@ void CDCDedxPIDModule::event()
   // get fitresult and RecoTrack and do extrapolations, save corresponding dE/dx and likelihood values
   //   get hit indices through RecoTrack::getHitPointsWithMeasurement(...)
   //   create one CDCDedxTrack per fitresult/recoTrack
-  //create one DedkLikelihood per Track (plus rel)
-  m_eventID++;
+  // create one DedkLikelihood per Track (plus rel)
 
   // inputs
   StoreArray<Track> tracks;
@@ -234,12 +256,10 @@ void CDCDedxPIDModule::event()
   //
   // **************************************************
 
+  int mtrack = 0;
   for (const auto& track : tracks) {
-    m_trackID++;
-
     std::shared_ptr<CDCDedxTrack> dedxTrack = std::make_shared<CDCDedxTrack>();
-    dedxTrack->m_eventID = m_eventID;
-    dedxTrack->m_trackID = m_trackID;
+    dedxTrack->m_track = mtrack++;
 
     // get pion fit hypothesis for now
     //  Should be ok in most cases, for MC fitting this will return the fit with the
@@ -274,13 +294,15 @@ void CDCDedxPIDModule::event()
     const TVector3& trackMom = fitResult->getMomentum();
     dedxTrack->m_p = trackMom.Mag();
     bool nomom = (dedxTrack->m_p != dedxTrack->m_p);
-    if (nomom) {
-      dedxTrack->m_cosTheta = std::cos(std::atan(1 / fitResult->getCotTheta()));
-      dedxTrack->m_charge = 1.0;
-    } else {
-      dedxTrack->m_cosTheta = trackMom.CosTheta();
-      dedxTrack->m_charge = fitResult->getChargeSign();
+    double costh = std::cos(std::atan(1 / fitResult->getCotTheta()));
+    int charge = 1;
+    if (!nomom) {
+      costh = trackMom.CosTheta();
+      charge = fitResult->getChargeSign();
     }
+    dedxTrack->m_cosTheta = costh;
+    dedxTrack->m_charge = charge;
+
     // dE/dx values will be calculated using associated RecoTrack
     const RecoTrack* recoTrack = track.getRelatedTo<RecoTrack>();
     if (!recoTrack) {
@@ -294,9 +316,28 @@ void CDCDedxPIDModule::event()
       continue;
     }
 
+    // get the cosine correction
+    // extrapolate the binned correction
+    double coscor = 1.0;
+    unsigned int cosbin = 0;
+    while (costh > m_cosbinedges[cosbin] && cosbin < m_cosbinedges.size()) cosbin++;
+    if (cosbin < m_cosbinedges.size() - 1) {
+      double frac = (costh - m_cosbinedges[cosbin]) / m_cosbinedges[cosbin + 1] - m_cosbinedges[cosbin];
+      coscor = m_DBCosine->getMean(m_cosbinedges[cosbin + 1]) - m_DBCosine->getMean(m_cosbinedges[cosbin]) * frac + m_DBCosine->getMean(
+                 m_cosbinedges[cosbin]);
+    }
+    dedxTrack->m_coscor = coscor;
+
+    // store run gains
+    dedxTrack->m_rungain = m_DBRunGain->getRunGain();
+
+    // initialize a few variables to be used in the loop over track points
     double layerdE = 0.0; // total charge in current layer
     double layerdx = 0.0; // total path length in current layer
     double cdcMom = 0.0; // momentum valid in the CDC
+    int nhitscombined = 0; // number of hits combined per layer
+    int wirelongesthit = 0; // wire number of longest hit
+    double longesthit = 0; // path length of longest hit
 
     // loop over all CDC hits from this track
     // Get the TrackPoints, which contain the hit information we need.
@@ -322,12 +363,18 @@ void CDCDedxPIDModule::event()
         continue;
       }
 
-      // get the global wire ID (between 0 and 14336) and the layer info
+      // get the wire ID (not between 0 and 14336) and the layer info
       WireID wireID = cdcRecoHit->getWireID();
-      const int wire = wireID.getEWire();
-      int layer = cdcHit->getILayer();
+      const int wire = wireID.getIWire(); // getEWire() for encoded wire number
+      int layer = cdcHit->getILayer(); // layer within superlayer
       int superlayer = cdcHit->getISuperLayer();
+
+      // continuous layer number
       int currentLayer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer);
+
+      // dense packed wire number (between 0 and 14336)
+      const int iwire = (superlayer == 0) ? 160 * layer + wire : m_nLayerWires[superlayer - 1] + (160 + 32 *
+                        (superlayer - 1)) * layer + wire;
 
       // if multiple hits in a layer, we may combine the hits
       const bool lastHit = (tp + 1 == gftrackPoints.end());
@@ -394,14 +441,14 @@ void CDCDedxPIDModule::event()
         //  B2Vector3D pocaOnWire = cdcRecoHit->constructPlane(mop)->getO();
 
         // uses the plane determined by the track fit.
-        B2Vector3D pocaOnWire = mop.getPlane()->getO();
+        B2Vector3D pocaOnWire = mop.getPlane()->getO(); // DOUBLE CHECK THIS --\/
 
         // The vector from the wire to the track.
         B2Vector3D B2WireDoca = fittedPoca - pocaOnWire;
 
         // the sign of the doca is defined here to be positive in the +x dir
         double doca = B2WireDoca.Perp();
-        if (B2WireDoca.X() < 0) doca = -1.0 * doca;
+        if (B2WireDoca.X() < 0) doca = -1.0 * doca; // FIX ME! x changes versus phi!!! We want to know which side of the wire we are on...
 
         // The opening angle of the track momentum direction
         const double px = pocaMom.x();
@@ -413,9 +460,12 @@ void CDCDedxPIDModule::event()
         double entAng = atan2(cross, dot);
 
         LinearGlobalADCCountTranslator translator;
-        double adcCount = cdcHit->getADCCount(); // pedestal subtracted?
+        int adcCount = cdcHit->getADCCount(); // pedestal subtracted?
         double hitCharge = translator.getCharge(adcCount, wireID, false, pocaOnWire.Z(), pocaMom.Phi());
         int driftT = cdcHit->getTDCCount();
+
+        // we want electrons to be one, so artificially scale the adcCount
+        //        adcCount /= 60.1; // <--------- HARD CODED FOR NOW
 
         RealisticTDCCountTranslator realistictdc;
         double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, 0, true, pocaOnWire.Z(), pocaMom.Phi(), pocaMom.Theta());
@@ -426,20 +476,33 @@ void CDCDedxPIDModule::event()
         double celldx = c.dx(doca, entAng);
         if (c.isValid()) {
 
-          layerdE += adcCount;
+          // get the wire gain constant
+          double wiregain = m_DBWireGains->getWireGain(iwire);
+
+          // apply the calibration to dE to propagate to both hit and layer measurements
+          double correction = dedxTrack->m_rungain * dedxTrack->m_coscor * wiregain;
+          //    adcCount = adcCount/correction;
+
+          layerdE += 1.0 * adcCount;
           layerdx += celldx;
 
+          if (celldx > longesthit) {
+            longesthit = celldx;
+            wirelongesthit = iwire;
+          }
+
           // save individual hits
-          double cellDedx = (adcCount / celldx);
+          double cellDedx = (1.0 * adcCount / celldx);
           if (nomom) cellDedx *= sin(std::atan(1 / fitResult->getCotTheta()));
           else  cellDedx *= sin(trackMom.Theta());
 
           if (m_enableDebugOutput)
-            dedxTrack->addHit(wire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
-                              driftDRealistic, driftDRealisticRes);
+            dedxTrack->addHit(iwire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
+                              driftDRealistic, driftDRealisticRes, wiregain);
+          nhitscombined++;
         }
       } catch (genfit::Exception) {
-        B2WARNING("Event " << m_eventID << ", Track: " << m_trackID << ": genfit::MeasuredStateOnPlane exception...");
+        B2WARNING("Track: " << mtrack << ": genfit::MeasuredStateOnPlane exception...");
         continue;
       }
 
@@ -452,7 +515,7 @@ void CDCDedxPIDModule::event()
 
         // save the information for this layer
         if (layerDedx > 0) {
-          dedxTrack->addDedx(currentLayer, totalDistance, layerDedx);
+          dedxTrack->addDedx(nhitscombined, wirelongesthit, currentLayer, totalDistance, layerDedx);
           // save the PID information if using individual hits
           if (!m_pdfFile.empty() and m_useIndividualHits) {
             // use the momentum valid in the cdc
@@ -462,10 +525,13 @@ void CDCDedxPIDModule::event()
 
         layerdE = 0;
         layerdx = 0;
+        nhitscombined = 0;
+        wirelongesthit = 0;
+        longesthit = 0;
       }
     } // end of loop over CDC hits for this track
 
-    if (dedxTrack->dedx.empty()) {
+    if (dedxTrack->l_dedx.empty()) {
       B2DEBUG(50, "Found track with no hits, ignoring.");
       continue;
     }
@@ -475,15 +541,15 @@ void CDCDedxPIDModule::event()
       calculateMeans(&(dedxTrack->m_dedx_avg),
                      &(dedxTrack->m_dedx_avg_truncated),
                      &(dedxTrack->m_dedx_avg_truncated_err),
-                     dedxTrack->dedx);
-      const int numDedx = dedxTrack->dedx.size();
-      dedxTrack->m_nLayerHits = numDedx;
+                     dedxTrack->l_dedx);
+      const int numDedx = dedxTrack->l_dedx.size();
+      dedxTrack->l_nHits = numDedx;
       // add a factor of 0.5 here to make sure we are rounding appropriately...
       const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.5);
       const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.5);
-      dedxTrack->m_nLayerHitsUsed = highEdgeTrunc - lowEdgeTrunc;
+      dedxTrack->l_nHitsUsed = highEdgeTrunc - lowEdgeTrunc;
       saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated,
-                   std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->m_nLayerHitsUsed);
+                   std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->l_nHitsUsed);
     }
 
     // save the PID information if not using individual hits
@@ -509,8 +575,7 @@ void CDCDedxPIDModule::event()
 void CDCDedxPIDModule::terminate()
 {
 
-  B2INFO("CDCDedxPIDModule exiting after processing " << m_trackID <<
-         " tracks in " << m_eventID + 1 << " events.");
+  B2INFO("CDCDedxPIDModule exiting");
 }
 
 void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr,

@@ -11,6 +11,7 @@
 #pragma once
 
 #include <TObject.h>
+#include <map>
 
 namespace Belle2 {
 
@@ -25,41 +26,30 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    CDCDedxWireGain(): m_wireID(0), m_gain(0) {};
+    CDCDedxWireGain(): m_means() {};
 
     /**
      * Constructor
      */
-    CDCDedxWireGain(int wireID, float gain): m_wireID(wireID), m_gain(gain) {};
+    CDCDedxWireGain(std::map<int, double>& means): m_means(means) {};
 
     /**
      * Destructor
      */
     ~CDCDedxWireGain() {};
 
-    /** Return wire ID
-     * @return wire ID
-     */
-    float getWireID() const {return m_wireID; };
-
     /** Return wire gain
      * @return wire gain
      */
-    float getWireGain() const {return m_gain; };
-
-    /** Set wire ID
-     * @param wire ID
-     */
-    void setWireID(int wireID) {m_wireID = wireID; };
-
-    /** Set wire gain
-     * @param wire gain
-     */
-    void setWireGain(float gain) {m_gain = gain; };
+    float getWireGain(int wire) const
+    {
+      double mean = m_means.at(wire);
+      return mean;
+    };
 
   private:
-    int m_wireID;       /**< CDC wire ID */
-    float m_gain;       /**< CDC wire gain */
+    /** dE/dx gains for each wire: key is continuous wire number (0-14336) */
+    std::map<int, double> m_means;
 
     ClassDef(CDCDedxWireGain, 1); /**< ClassDef */
   };

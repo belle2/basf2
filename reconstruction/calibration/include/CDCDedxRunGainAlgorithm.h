@@ -10,7 +10,10 @@
 
 #pragma once
 
+#include <reconstruction/dbobjects/CDCDedxRunGain.h>
 #include <calibration/CalibrationAlgorithm.h>
+#include <map>
+#include "TF1.h"
 
 namespace Belle2 {
   /**
@@ -41,6 +44,6 @@ namespace Belle2 {
 
   private:
 
-    ClassDef(CDCDedxRunGainAlgorithm, 0); /**< Class for CDC dE/dx calibration algorithm **/
+    ClassDef(CDCDedxRunGainAlgorithm, 1); /**< Class for CDC dE/dx calibration algorithm **/
   };
 } // namespace Belle2

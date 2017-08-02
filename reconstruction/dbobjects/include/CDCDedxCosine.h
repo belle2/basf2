@@ -11,6 +11,7 @@
 #pragma once
 
 #include <TObject.h>
+#include <map>
 
 namespace Belle2 {
 
@@ -25,33 +26,42 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    CDCDedxCosine(): m_nbins(30), m_costh(m_nbins, 0), m_means(m_nbins, 0) {};
+    CDCDedxCosine(): m_means() {};
 
     /**
      * Constructor
      */
-    CDCDedxCosine(int nbins, std::vector<float>& costh, std::vector<float>& means): m_nbins(nbins), m_costh(costh), m_means(means) {};
+    CDCDedxCosine(std::map<double, double>& means): m_means(means) {};
 
     /**
      * Destructor
      */
     ~CDCDedxCosine() {};
 
-    /** Return cos(theta)
-     * @return cos(theta)
+    /** Return bin centers as a function of cos(theta)
+     * @return vector of bin centers
      */
-    float getCosTheta(int bin) const {return m_costh[bin]; };
+    std::vector<double> getCosThetaBins() const
+    {
+      std::vector<double> binedges;
+      for (std::map<double, double>::const_iterator it = m_means.begin(); it != m_means.end(); ++it)
+        binedges.push_back(it->first);
+      return binedges;
+    };
 
-    /** Return dE/dx mean value
+    /** Return dE/dx mean value for given cos(theta)
      * @return dE/dx mean value
      */
-    float getCosine(int bin) const {return m_means[bin]; };
+    double getMean(double costh) const
+    {
+      double mean = m_means.at(costh);
+      return mean;
+    };
 
   private:
-    int m_nbins; /**< number of cos(theta) bins for electron saturation correction */
-    std::vector<float> m_costh; /**< central bin values for cos(theta) bins */
-    std::vector<float> m_means; /**< dE/dx means in bins of cos(theta) */
+    /** dE/dx gains in cos(theta) bins: key is low edge of bin */
+    std::map<double, double> m_means;
 
-    ClassDef(CDCDedxCosine, 1); /**< ClassDef */
+    ClassDef(CDCDedxCosine, 2); /**< ClassDef */
   };
 } // end namespace Belle2

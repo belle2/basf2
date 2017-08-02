@@ -8,17 +8,24 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDEDXPIDMODULE_H
-#define CDCDEDXPIDMODULE_H
+#pragma once
 
 #include <reconstruction/dataobjects/DedxConstants.h>
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
+
 #include <framework/datastore/StoreArray.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBArray.h>
+
+#include <reconstruction/dbobjects/CDCDedxWireGain.h>
+#include <reconstruction/dbobjects/CDCDedxRunGain.h>
+#include <reconstruction/dbobjects/CDCDedxCosine.h>
 
 #include <string>
 #include <vector>
+#include <map>
 #include <TVector3.h>
 
 class TH2F;
@@ -109,12 +116,6 @@ namespace Belle2 {
      * */
     void saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx, TH2F* const* pdf) const;
 
-    // parameters to determine the predicted means and resolutions
-    double m_curvepars[15];  /**< dE/dx curve parameters */
-    double m_sigmapars[12];  /**< dE/dx resolution parameters */
-
-    int m_eventID; /**< counter for events */
-    int m_trackID; /**< counter for tracks in this event */
     TH2F* m_pdfs[3][Const::ChargedStable::c_SetSize]; /**< dedx:momentum PDFs. */
 
     // parameters: full likelihood vs. truncated mean
@@ -131,6 +132,17 @@ namespace Belle2 {
     std::string m_pdfFile; /**< file containing the PDFs required for constructing a likelihood. */
     bool m_ignoreMissingParticles; /**< Ignore particles for which no PDFs are found. */
 
+    //parameters: calibration constants
+    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
+    DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
+    DBObjPtr<CDCDedxCosine> m_DBCosine; /**< Electron saturation correction DB object */
+    std::vector<double> m_cosbinedges;  /**< Electron saturation correction details */
+
+    short m_nLayerWires[9]; /**< number of wires per layer */
+
+    // parameters to determine the predicted means and resolutions
+    double m_curvepars[15];  /**< dE/dx curve parameters */
+    double m_sigmapars[12];  /**< dE/dx resolution parameters */
+
   };
 } // Belle2 namespace
-#endif

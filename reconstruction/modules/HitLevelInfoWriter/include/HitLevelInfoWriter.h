@@ -75,60 +75,65 @@ namespace Belle2 {
     TFile* m_file; /**< output ROOT file */
     TTree* m_tree; /**< output ROOT tree */
 
-    // event level information
+    // event level information (from emd)
+    int m_expID; /**< experiment in which this Track was found */
     int m_runID; /**< event in which this Track was found */
     int m_eventID; /**< event in which this Track was found */
-    int m_numTracks; /**< number of tracks for this event */
 
-    // track level information
+    // track level information (from tfr)
+    double m_phi;      /**< phi for the track */
+    double m_vx0; /**< X coordinate of track POCA to origin */
+    double m_vy0; /**< Y coordinate of track POCA to origin */
+    double m_vz0; /**< Z coordinate of track POCA to origin */
+    double m_d0; /**< DOCA in r-phi for track at origin */
+    double m_z0; /**< z position of track at origin */
+    double m_chi2; /**< chi^2 from track fit */
+
+    // track level information (from cdt)
     int m_trackID; /**< ID number of the Track */
-    int m_nlhits; /**< the total number of layer hits for this Track */
-    int m_nlhitsused; /**< the total number of layer hits used for this Track */
-    int m_nhits; /**< the number of good hits for this Track */
-
+    int m_charge; /**< the charge for this Track */
+    double m_cosTheta; /**< cos(theta) for the track */
+    double m_p;        /**< momentum valid in CDC */
+    double m_eopst; /**< energy over momentum in the calorimeter */
+    double m_PDG;        /**< MC PID */
+    //    double m_motherPDG; /**< MC PID of mother particle */
+    //    double m_pTrue;     /**< MC true momentum */
     //    double m_trackDist; /**< the total distance traveled by the track */
 
+    // calibration constants
+    double m_coscor;    /**< calibration cosine correction */
+    double m_coscorext;    /**< calibration cosine correction */
+    double m_rungain;   /**< calibration run gain */
+
+    // track level dE/dx measurements
     double m_mean;  /**< dE/dx averaged */
     double m_trunc; /**< dE/dx averaged, truncated mean */
     double m_error; /**< standard deviation of the truncated mean */
     double m_chipi; /**< chi value for pion hypothesis */
 
-    double m_vx0; /**< X coordinate of track POCA to origin */
-    double m_vy0; /**< Y coordinate of track POCA to origin */
-    double m_vz0; /**< Z coordinate of track POCA to origin */
-
-    double m_d0; /**< DOCA in r-phi for track at origin */
-    double m_z0; /**< z position of track at origin */
-    double m_chi2; /**< chi^2 from track fit */
-
-    double m_eopst; /**< energy over momentum in the calorimeter */
-
-    double m_p;        /**< momentum at point of closest approach to origin */
-    double m_phi;      /**< phi for the track */
-    double m_cosTheta; /**< cos(theta) for the track */
-
-    double m_PDG;        /**< MC PID */
-    //    double m_motherPDG; /**< MC PID of mother particle */
-    //    double m_pTrue;     /**< MC true momentum */
-
-    // hit level information (references on nhits)
-    static const int kMaxHits = 100; /**< default hit level index */
-
-    int m_hitlayer[kMaxHits]; /**< layer number */
-    int m_wire[kMaxHits];  /**< sense wire ID */
-
-    double m_adcraw[kMaxHits]; /**< charge per hit */
-    double m_path[kMaxHits];   /**< path length in cell */
-    double m_dedx[kMaxHits];   /**< charge per path length */
-    double m_doca[kMaxHits];   /**< distance of closest approach */
-    double m_enta[kMaxHits];   /**< entrance angle */
-    double m_driftT[kMaxHits];   /**< drift time */
+    static const int kMaxHits = 200; /**< default hit level index */
 
     // layer level information
-    double m_layer[kMaxHits];     /**< layer number */
-    double m_layerdx[kMaxHits];   /**< distance travelled in this layer */
-    double m_layerdedx[kMaxHits]; /**< dE/dx for this layer */
+    int l_nhits; /**< the total number of layer hits for this Track */
+    int l_nhitsused; /**< the total number of layer hits used for this Track */
+    int l_nhitscombined[kMaxHits]; /**< the number of hits combined this layer */
+    int l_wirelongesthit[kMaxHits]; /**< the wire number of longest hit in this layer */
+    int l_layer[kMaxHits];     /**< layer number */
+    double l_path[kMaxHits];   /**< distance travelled in this layer */
+    double l_dedx[kMaxHits]; /**< dE/dx for this layer */
 
+    // hit level information (references on nhits)
+    int h_nhits; /**< the number of good hits for this Track */
+    int h_wire[kMaxHits];  /**< sense wire ID */
+    int h_layer[kMaxHits]; /**< layer number */
+
+    double h_path[kMaxHits];   /**< path length in cell */
+    double h_dedx[kMaxHits];   /**< charge per path length */
+    double h_adcraw[kMaxHits]; /**< charge per hit */
+    double h_doca[kMaxHits];   /**< distance of closest approach */
+    double h_enta[kMaxHits];   /**< entrance angle */
+    double h_driftT[kMaxHits];   /**< drift time */
+    double h_gain[kMaxHits];   /**< calibration hit gain */
   };
 } // Belle2 namespace
 #endif

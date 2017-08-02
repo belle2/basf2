@@ -128,6 +128,11 @@ namespace Belle2 {
     {
       for (auto& stat : m_stats) stat.clear();
     }
+    /** set a given counter */
+    void set(CalcMeanCov<2, value_type>& calcMeanCov, EStatisticCounters type = c_Total)
+    {
+      m_stats[type] = calcMeanCov;
+    }
   private:
     /** display index of the module */
     int m_index;

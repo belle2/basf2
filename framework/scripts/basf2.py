@@ -313,6 +313,16 @@ def process(path, max_event=0):
                 0 for no limit
     """
 
+    # if we are running in an ipython session set the steering file to the
+    # current history
+    try:
+        ipython = get_ipython()
+        history = "\n".join(e[2] for e in ipython.history_manager.get_range())
+        from ROOT import Belle2
+        Belle2.Environment.Instance().setSteering(history)
+    except NameError:
+        pass
+
     # If a pickle path is set via  --dump-path or --execute-path we do something special
     pickle_path = fw.get_pickle_path()
     if pickle_path != '':

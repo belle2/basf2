@@ -91,6 +91,7 @@ namespace Belle2 {
 
     // track level information (from cdt)
     int m_trackID; /**< ID number of the Track */
+    double m_length; /**< total path length of the Track */
     int m_charge; /**< the charge for this Track */
     double m_cosTheta; /**< cos(theta) for the track */
     double m_p;        /**< momentum valid in CDC */

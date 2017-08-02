@@ -40,7 +40,7 @@ void CDCDedxElectronCollectorModule::prepare()
   StoreArray<CDCDedxTrack>::required();
 
   // Data object creation
-  auto means = new TH1F("means", "CDC dE/dx truncated means", 100, 0, 2);
+  auto means = new TH1F("means", "CDC dE/dx truncated means", 200, 0, 100);
   auto ttree = new TTree("tree", "Tree with dE/dx information");
 
   ttree->Branch<double>("dedx", &m_dedx);

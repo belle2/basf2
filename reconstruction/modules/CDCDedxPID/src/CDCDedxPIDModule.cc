@@ -187,7 +187,7 @@ void CDCDedxPIDModule::initialize()
 
   // lookup table for number of wires per layer (indexed on superlayer)
   m_nLayerWires[0] = 1280;
-  for (short i = 1; i < 9; ++i) {
+  for (int i = 1; i < 9; ++i) {
     m_nLayerWires[i] = m_nLayerWires[i - 1] + 6 * (160 + (i - 1) * 32);
   }
 
@@ -255,6 +255,9 @@ void CDCDedxPIDModule::event()
   //  LOOP OVER TRACKS
   //
   // **************************************************
+
+  dedxArray.clear();
+  likelihoodArray.clear();
 
   int mtrack = 0;
   for (const auto& track : tracks) {
@@ -465,7 +468,7 @@ void CDCDedxPIDModule::event()
         int driftT = cdcHit->getTDCCount();
 
         // we want electrons to be one, so artificially scale the adcCount
-        //        adcCount /= 60.1; // <--------- HARD CODED FOR NOW
+        adcCount /= 60.1; // <--------- HARD CODED FOR NOW
 
         RealisticTDCCountTranslator realistictdc;
         double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, 0, true, pocaOnWire.Z(), pocaMom.Phi(), pocaMom.Theta());

@@ -47,7 +47,7 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   TH1F* dedxcosth[nbins];
   for (unsigned int i = 0; i < nbins; ++i) {
     binedges.push_back(-1.0 + 2.0 / nbins * i);
-    dedxcosth[i] = new TH1F(TString::Format("dedxcosth%d", i), "dE/dx in bins of cosine", 100, 0, 4);
+    dedxcosth[i] = new TH1F(TString::Format("dedxcosth%d", i), "dE/dx in bins of cosine", 200, 0, 100);
   }
 
   // fill histograms, bin size may be arbitrary
@@ -56,18 +56,23 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
     if (costh < -1.0 || costh > 1.0) continue;
     auto it = std::lower_bound(binedges.begin(), binedges.end(), costh);
     int bin = std::distance(binedges.begin(), it) - 1;
+    if (bin >= nbins) continue;
     dedxcosth[bin]->Fill(dedx);
   }
 
   // fit histograms to get gains in bins of cos(theta)
   std::map<double, double> cosine;
   for (unsigned int i = 0; i < nbins; ++i) {
-    if (dedxcosth[i]->Integral() < 100)
+    if (dedxcosth[i]->Integral() < 50)
       cosine[binedges[i]] = 1.0; // FIXME! --> should return not enough data
     else {
-      dedxcosth[i]->Fit("gaus");
-      float mean = dedxcosth[i]->GetFunction("gaus")->GetParameter(1);
-      cosine[binedges[i]] = mean;
+      int status = dedxcosth[i]->Fit("gaus");
+      if (status != 0) {
+        cosine[binedges[i]] = 1.0;
+      } else {
+        float mean = dedxcosth[i]->GetFunction("gaus")->GetParameter(1);
+        cosine[binedges[i]] = mean;
+      }
     }
   }
 

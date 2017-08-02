@@ -138,7 +138,7 @@ namespace Belle2 {
     DBObjPtr<CDCDedxCosine> m_DBCosine; /**< Electron saturation correction DB object */
     std::vector<double> m_cosbinedges;  /**< Electron saturation correction details */
 
-    short m_nLayerWires[9]; /**< number of wires per layer */
+    int m_nLayerWires[9]; /**< number of wires per layer */
 
     // parameters to determine the predicted means and resolutions
     double m_curvepars[15];  /**< dE/dx curve parameters */

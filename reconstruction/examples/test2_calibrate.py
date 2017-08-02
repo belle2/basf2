@@ -21,6 +21,8 @@ import ROOT
 from ROOT.Belle2 import CDCDedxWireGainAlgorithm, CDCDedxRunGainAlgorithm, CDCDedxCosineAlgorithm
 from caf.framework import Calibration, CAF
 
+ROOT.gROOT.SetBatch(True)
+
 # Specify the input file(s)
 input_files = [os.path.abspath('B2Electrons.root')]
 

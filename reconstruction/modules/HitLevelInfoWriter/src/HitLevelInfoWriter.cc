@@ -56,6 +56,7 @@ void HitLevelInfoWriterModule::initialize()
 
   // track level information (from cdt)
   m_tree->Branch("track", &m_trackID, "track/I");
+  m_tree->Branch("length", &m_length, "length/D");
   m_tree->Branch("charge", &m_charge, "charge/I");
   m_tree->Branch("costh", &m_cosTheta, "costh/D");
   m_tree->Branch("pF", &m_p, "pF/D");
@@ -127,7 +128,7 @@ void HitLevelInfoWriterModule::event()
       continue;
     }
 
-    if (dedxTrack->size() > 200 || dedxTrack->getNLayerHits() > 200) continue;
+    if (dedxTrack->size() == 0 || dedxTrack->size() > 200) continue;
 
     // fill the TTree with the Track information
     fillTrack(fitResult);
@@ -144,6 +145,7 @@ void HitLevelInfoWriterModule::event()
     else m_coscorext = (coscor[bin + 1] - coscor[bin]) * frac + coscor[bin];
 
     m_trunc = m_trunc / m_coscor;
+    m_trunc = m_trunc / m_rungain;
 
     m_tree->Fill();
   }
@@ -184,6 +186,7 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   clearEntries();
 
   m_trackID = dedxTrack->trackID();
+  m_length = dedxTrack->getLength();
   m_charge = dedxTrack->getCharge();
   m_cosTheta = dedxTrack->getCosTheta();
   m_PDG = dedxTrack->getPDG();
@@ -201,8 +204,6 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
 
   //m_coscor = dedxTrack->getCosineCorrection();
   m_rungain = 48.0; //dedxTrack->getRunGain();  <---- temporary
-
-  m_trunc = m_trunc / m_rungain;
 
   // Get the vector of dE/dx values for all layers
   for (int il = 0; il < l_nhits; ++il) {

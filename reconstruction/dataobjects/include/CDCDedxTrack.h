@@ -105,7 +105,9 @@ namespace Belle2 {
     /** Return cos(theta) for this track */
     double getCosTheta() const { return m_cosTheta; }
     /** Return the charge for this track */
-    double getCharge() const { return m_charge; }
+    int getCharge() const { return m_charge; }
+    /** Return the total path length for this track */
+    double getLength() const { return m_length; }
 
     /** Return the cosine correction for this track */
     double getCosineCorrection() const { return m_coscor; }
@@ -183,7 +185,7 @@ namespace Belle2 {
 
     // track level information
     int m_track; /**< ID number of the Track */
-    short m_charge;    /**< particle charge from tracking (+1 or -1) */
+    int m_charge;    /**< particle charge from tracking (+1 or -1) */
     double m_cosTheta; /**< cos(theta) for the track */
     double m_p;        /**< momentum at the IP */
     double m_p_cdc;    /**< momentum at the inner layer of the CDC */
@@ -207,8 +209,8 @@ namespace Belle2 {
     double m_cdcLogl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
 
     // layer level information (just don't mix with the hit arrays)
-    short l_nHits;     /**< number of layerhits on this track */
-    short l_nHitsUsed; /**< number of hits on this track used for truncated mean */
+    int l_nHits;     /**< number of layerhits on this track */
+    int l_nHitsUsed; /**< number of hits on this track used for truncated mean */
     std::vector<int> l_nhitscombined; /**< number of hits combined in the layer */
     std::vector<int> l_wirelongesthit; /**< wire id for the longest hit in the layer */
     std::vector<int> l_layer; /**< layer id corresponding to dedx */
@@ -216,7 +218,7 @@ namespace Belle2 {
     std::vector<double> l_dedx;   /**< extracted dE/dx (arb. units, detector dependent) */
 
     // hit level information
-    short h_nHits;     /**< number of hits on this track */
+    int h_nHits;     /**< number of hits on this track */
     std::vector<int> h_wire;     /**< wire ID in the CDC */
     std::vector<int> h_layer;    /**< layer number */
     std::vector<double> h_path;    /**< path length in the CDC cell */

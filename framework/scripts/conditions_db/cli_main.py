@@ -393,7 +393,7 @@ def command_diff(args, db):
         return [json.dumps(e) for e in table]
 
     with Pager("Differences between global tags {tagA} and {tagB}{}".format(iovfilter, tagA=args.tagA, tagB=args.tagB), True):
-        print("Global tags to be compated:")
+        print("Global tags to be compared:")
         ntags = print_globaltag(db, args.tagA, args.tagB)
         if ntags != 2:
             return 1

@@ -110,7 +110,6 @@ cdcfitting = register_module('DAFRecoFitter')
 # cdcfitting.param(param_cdcfitting)
 
 # build track
-# buildtrack = register_module("TrackBuilder")
 buildtrack = register_module("TrackCreator")
 
 # output

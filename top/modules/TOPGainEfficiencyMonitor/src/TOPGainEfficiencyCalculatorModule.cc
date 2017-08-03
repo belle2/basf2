@@ -76,8 +76,6 @@ TOPGainEfficiencyCalculatorModule::~TOPGainEfficiencyCalculatorModule() {}
 void TOPGainEfficiencyCalculatorModule::initialize()
 {
   REG_HISTOGRAM;
-
-  LoadHistograms();
 }
 
 void TOPGainEfficiencyCalculatorModule::defineHisto()
@@ -113,7 +111,6 @@ void TOPGainEfficiencyCalculatorModule::defineHisto()
 
 void TOPGainEfficiencyCalculatorModule::beginRun()
 {
-  FitHistograms();
 }
 
 void TOPGainEfficiencyCalculatorModule::event()
@@ -122,12 +119,14 @@ void TOPGainEfficiencyCalculatorModule::event()
 
 void TOPGainEfficiencyCalculatorModule::endRun()
 {
-  DrawResult();
 }
 
 
 void TOPGainEfficiencyCalculatorModule::terminate()
 {
+  LoadHistograms();
+  FitHistograms();
+  DrawResult();
 }
 
 
@@ -169,6 +168,7 @@ void TOPGainEfficiencyCalculatorModule::LoadHistograms()
     funcLaser->SetParLimits(1, fitMin, fitMax);
     hTime->Fit(funcLaser, "Q", "", fitMin, fitMax);
     if (funcLaser->GetNDF() < 1) continue;
+    m_funcForLaser[iHisto] = funcLaser;
 
     //if the fitting is successful, create y-projection histogram with timing cut
     m_hitTiming = funcLaser->GetParameter(1);
@@ -269,8 +269,8 @@ void TOPGainEfficiencyCalculatorModule::FitHistograms()
 
     m_hitTiming = 0;
     m_hitTimingSigma = -1;
-    TF1* funcLaser;
-    if (m_timeHistogram[iHisto] && (funcLaser = (TF1*)m_timeHistogram[iHisto]->GetFunction("gaus"))) {
+    TF1* funcLaser = m_funcForLaser[iHisto];
+    if (m_timeHistogram[iHisto] && funcLaser) {
       m_hitTiming = funcLaser->GetParameter(1);
       m_hitTimingSigma = funcLaser->GetParameter(2);
     }
@@ -346,10 +346,10 @@ void TOPGainEfficiencyCalculatorModule::DrawResult()
       ytitle << "Entries [/(" << binWidth << " ns)]";
       hTime->GetYaxis()->SetTitle(ytitle.str().c_str());
 
-      TF1* func = (TF1*)hTime->GetFunction("gaus");
-      if (func) {
-        double height = func->GetParameter(0);
-        double peakTime = func->GetParameter(1);
+      TF1* funcLaser = m_funcForLaser[iHisto];
+      if (funcLaser) {
+        double height = funcLaser->GetParameter(0);
+        double peakTime = funcLaser->GetParameter(1);
         float xMin = hTime->GetXaxis()->GetBinLowEdge(hTime->GetXaxis()->FindBin(peakTime - 2 * m_fitHalfWidth));
         float xMax = hTime->GetXaxis()->GetBinUpEdge(hTime->GetXaxis()->FindBin(peakTime + 2 * m_fitHalfWidth));
         line->DrawLine(xMin, 0.5, xMin, height * 2.);

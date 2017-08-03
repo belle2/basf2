@@ -60,6 +60,31 @@ namespace {
       return {curv1, curv2};
     }
   }
+
+}
+
+std::vector<float> AxialHitQuadTreeProcessor::createCurvBound(YSpan curvSpan, int lastLevel)
+{
+  std::vector<YSpan> spans{{curvSpan}};
+
+  std::vector<YSpan> nextSpans;
+  for (int level = 1; level <= lastLevel; ++level) {
+    nextSpans.clear();
+    for (const YSpan& span : spans) {
+      nextSpans.push_back(splitCurvSpan(span, level, lastLevel, 0));
+      nextSpans.push_back(splitCurvSpan(span, level, lastLevel, 1));
+    }
+    spans.swap(nextSpans);
+  }
+
+  std::vector<float> bounds;
+  for (const YSpan& span : spans) {
+    bounds.push_back(span[0]);
+    bounds.push_back(span[1]);
+  }
+
+  assert(bounds.size() == std::pow(2, lastLevel));
+  return bounds;
 }
 
 const LookupTable<Vector2D>& AxialHitQuadTreeProcessor::getCosSinLookupTable()

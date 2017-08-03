@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# Example which can be used to train the FEI
+
 # Thomas Keck 2017
 
 from basf2 import *
@@ -19,14 +21,12 @@ feistate = fei.get_path(particles, configuration)
 path = create_path()
 if feistate.stage <= 0:
     b2biiConversion.convertBelleMdstToBelleIIMdst(None, applyHadronBJSkim=True, path=path)
-    setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 else:
     inputMdstList('Belle', [], path)
 
 path.add_path(feistate.path)
 
 if feistate.stage >= 0:
-    path.add_module("RemoveParticlesNotInLists", particleLists=feistate.plists)
     path.add_module('RootOutput')
 
 print(path)

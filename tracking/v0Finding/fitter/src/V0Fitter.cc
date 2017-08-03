@@ -14,6 +14,8 @@
 #include <genfit/FieldManager.h>
 #include <genfit/Exception.h>
 
+#include <framework/utilities/IOIntercept.h>
+
 #include <TVector3.h>
 
 using namespace Belle2;
@@ -62,7 +64,12 @@ bool V0Fitter::fitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, ge
   VertexVector vertexVector;
   std::vector<genfit::Track*> trackPair {&trackPlus, &trackMinus};
 
+
   try {
+    IOIntercept::OutputToLogMessages
+    logCapture("V0Fitter GFRaveVertexFactory", LogConfig::c_Debug, LogConfig::c_Debug);
+    logCapture.start();
+
     genfit::GFRaveVertexFactory vertexFactory;
     vertexFactory.findVertices(&vertexVector.v, trackPair);
   } catch (...) {

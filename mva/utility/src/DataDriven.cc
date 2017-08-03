@@ -142,7 +142,7 @@ namespace Belle2 {
         m_weight *= m_negative_signal_weight;
       } else {
         m_isSignal = false;
-        m_target = false;
+        m_target = 0.0;
         m_weight = 0.0;
       }
     }

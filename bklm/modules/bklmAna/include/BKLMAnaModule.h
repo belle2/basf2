@@ -72,17 +72,17 @@ namespace Belle2 {
     int  m_nExtHit;
 
     //! keep the global position of validated ExtHit in BKLM
-    float m_extx[100];
+    float m_extx[200];
 
     //! keep the global position of validated ExtHit in BKLM
-    float m_exty[100];
+    float m_exty[200];
 
     //! keep the global position of validated ExtHit in BKLM
-    float m_extz[100];
+    float m_extz[200];
 
 
     //! bklm GeometryPar
-    bklm::GeometryPar* m_GeoPar;
+    //bklm::GeometryPar* m_GeoPar;
 
     //! distribution of distance between mathced extHit and bklmHit2d
     TH1F* m_hdistance;

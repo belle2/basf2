@@ -99,9 +99,17 @@ namespace Belle2 {
       double sum_reweights = 0;
       unsigned long int count_reweights = 0;
 
+      auto isSignal = training_data.getSignals();
+
       if (m_specific_options.m_variable != "") {
         auto variable = training_data.getSpectator(training_data.getSpectatorIndex(m_specific_options.m_variable));
         for (unsigned int iEvent = 0; iEvent < training_data.getNumberOfEvents(); ++iEvent) {
+          // We calculate the norm only on MC events (that is background), because
+          // this is were we apply the weights in the end
+          if (isSignal[iEvent]) {
+            continue;
+          }
+
           if (variable[iEvent] == 1.0) {
             if (prediction[iEvent] > 0.995)
               prediction[iEvent] = 0.995;
@@ -115,6 +123,12 @@ namespace Belle2 {
         }
       } else {
         for (unsigned int iEvent = 0; iEvent < training_data.getNumberOfEvents(); ++iEvent) {
+          // We calculate the norm only on MC events (that is background), because
+          // this is were we apply the weights in the end
+          if (isSignal[iEvent]) {
+            continue;
+          }
+
           if (prediction[iEvent] > 0.995)
             prediction[iEvent] = 0.995;
           if (prediction[iEvent] < 0.005)

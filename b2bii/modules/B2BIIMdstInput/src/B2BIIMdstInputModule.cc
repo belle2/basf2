@@ -186,8 +186,10 @@ bool B2BIIMdstInputModule::openNextFile()
   m_current_file_entry = -1;
 
   if (m_entrySequences.size() > 0)
-    m_valid_entries_in_current_file = generate_number_sequence(m_entrySequences[m_current_file_position]);
-
+    // exclude ":" since this case is not considered in generate_number_sequence
+    if (m_entrySequences[m_current_file_position] != ":") {
+      m_valid_entries_in_current_file = generate_number_sequence(m_entrySequences[m_current_file_position]);
+    }
   return true;
 }
 
@@ -212,7 +214,8 @@ bool B2BIIMdstInputModule::readNextEvent()
     }
 
   } while (m_entrySequences.size() > 0
-           and m_valid_entries_in_current_file.find(m_current_file_entry) == m_valid_entries_in_current_file.end());
+           and (m_entrySequences[m_current_file_position] != ":"
+                and m_valid_entries_in_current_file.find(m_current_file_entry) == m_valid_entries_in_current_file.end()));
 
   return true;
 }

@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <array>
+#include <vector>
 
 #include <TF1.h>
 #include <TCanvas.h>
@@ -124,9 +125,10 @@ bool AxialHitQuadTreeProcessor::isLeaf(QuadTree* node) const
   if (node->getLevel() <= 6) return false;
   if (node->getLevel() >= getLastLevel()) return true;
 
-  double nodeResolution = fabs(node->getYMin() - node->getYMax());
+  const double nodeResolution = fabs(node->getYMin() - node->getYMax());
+  const double meanCurv = (node->getYMax() + node->getYMin()) / 2;
 
-  double resolution = m_precisionFunction(node->getYMean());
+  const double resolution = m_precisionFunction(meanCurv);
   if (resolution >= nodeResolution) return true;
 
   return false;
@@ -137,17 +139,17 @@ AxialHitQuadTreeProcessor::createChild(QuadTree* node, int i, int j) const
 {
   const int nodeLevel = node->getLevel();
   const int lastLevel = getLastLevel();
-  float meanCurv = fabs(node->getYMean());
+  const float meanCurv = std::fabs(node->getYMax() + node->getYMin()) / 2;
 
   // Expand bins for all nodes 7 levels before the last level (for lastLevel = 12 starting at 6)
   // but only in a curvature region higher than 0.005. Lower than that use always standard.
   bool standardBinning = (nodeLevel <= lastLevel - 7) or (meanCurv <= 0.005);
 
   if (standardBinning) {
-    float r1 = node->getYBinBound(j);
-    float r2 = node->getYBinBound(j + 1);
-    long theta1 = node->getXBinBound(i);
-    long theta2 = node->getXBinBound(i + 1);
+    float r1 = node->getYLowerBound(j);
+    float r2 = node->getYUpperBound(j);
+    long theta1 = node->getXLowerBound(i);
+    long theta2 = node->getXUpperBound(i);
 
     // Standard bin division
     return XYSpans({theta1, theta2}, {r1, r2});
@@ -157,32 +159,32 @@ AxialHitQuadTreeProcessor::createChild(QuadTree* node, int i, int j) const
   // For level 6 to 7 only expand 1 / 4, for higher levels expand  1 / 8.
   // (assuming last level == 12)
   if (nodeLevel < lastLevel - 5) {
-    float r1 = node->getYBinBound(j) - node->getYBinWidth(j) / 4.;
-    float r2 = node->getYBinBound(j + 1) + node->getYBinWidth(j) / 4.;
+    float r1 = node->getYLowerBound(j) - node->getYBinWidth(j) / 4.;
+    float r2 = node->getYUpperBound(j) + node->getYBinWidth(j) / 4.;
 
     // long extension = pow(2, lastLevel - nodeLevel) / 4; is same as:
     long extension = pow(2, lastLevel - nodeLevel - 2);
 
-    long theta1 = node->getXBinBound(i) - extension;
+    long theta1 = node->getXLowerBound(i) - extension;
     if (theta1 < 0) theta1 = 0;
 
-    long theta2 = node->getXBinBound(i + 1) + extension;
+    long theta2 = node->getXUpperBound(i) + extension;
     if (theta2 >= m_cosSinLookupTable->getNPoints()) {
       theta2 = m_cosSinLookupTable->getNPoints() - 1;
     }
 
     return XYSpans({theta1, theta2}, {r1, r2});
   } else {
-    float r1 = node->getYBinBound(j) - node->getYBinWidth(j) / 8.;
-    float r2 = node->getYBinBound(j + 1) + node->getYBinWidth(j) / 8.;
+    float r1 = node->getYLowerBound(j) - node->getYBinWidth(j) / 8.;
+    float r2 = node->getYUpperBound(j) + node->getYBinWidth(j) / 8.;
 
     // long extension = pow(2, lastLevel - nodeLevel) / 8; is same as
     long extension = pow(2, lastLevel - nodeLevel - 3);
 
-    long theta1 = node->getXBinBound(i) - extension;
+    long theta1 = node->getXLowerBound(i) - extension;
     if (theta1 < 0) theta1 = 0;
 
-    long theta2 = node->getXBinBound(i + 1) + extension;
+    long theta2 = node->getXUpperBound(i) + extension;
     if (theta2 >= m_cosSinLookupTable->getNPoints()) {
       theta2 = m_cosSinLookupTable->getNPoints() - 1;
     }

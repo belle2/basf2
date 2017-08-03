@@ -55,7 +55,6 @@ namespace Belle2 {
       m_seedRecoTrack(seed), m_number(number), m_maximumNumber(number)
     {
       setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
-      setCachedMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
     }
 
     /**
@@ -198,13 +197,6 @@ namespace Belle2 {
           parent->setCachedMeasuredStateOnPlane(mSoP);
         }
       }
-    }
-
-    /// Set the cached mSoP
-    void setCachedMeasuredStateOnPlane(const genfit::MeasuredStateOnPlane& mSoP) const
-    {
-      m_cachedMeasuredStateOnPlane = mSoP;
-      m_hasCachedMSoP = true;
     }
 
     /// Get the mSoP (or from the parent if not set already)
@@ -350,6 +342,13 @@ namespace Belle2 {
           return getMeasuredStateOnPlane();
         }
       }
+    }
+
+    /// Set the cached mSoP
+    void setCachedMeasuredStateOnPlane(const genfit::MeasuredStateOnPlane& mSoP) const
+    {
+      m_cachedMeasuredStateOnPlane = mSoP;
+      m_hasCachedMSoP = true;
     }
   };
 }

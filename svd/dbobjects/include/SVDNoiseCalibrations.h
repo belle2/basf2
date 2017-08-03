@@ -23,7 +23,7 @@ namespace Belle2 {
    * in ADC units.
    *
    * Currently the returned values are the default ones and they
-   * are not read from any file.
+   * are not read from anythe DB.
    *
    */
   class SVDNoiseCalibrations : public TObject {
@@ -33,6 +33,7 @@ namespace Belle2 {
     {}
 
     /** This is the method for getting the noise.
+     * Currently we return a fixed default value for every strip.
      *
      * Input:
      * @param sensor ID: identitiy of the sensor for which the
@@ -48,7 +49,7 @@ namespace Belle2 {
     }
   private:
 
-    ClassDef(SVDNoiseCalibrations, 0);
+    ClassDef(SVDNoiseCalibrations, 1);
   };
 }
 

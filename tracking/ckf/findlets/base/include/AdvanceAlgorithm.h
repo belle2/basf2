@@ -31,9 +31,17 @@ namespace Belle2 {
    */
   class AdvanceAlgorithm : public TrackFindingCDC::ProcessingSignalListener {
   public:
-    /// General extrapolate function for a templated reco hit. Further down are a few implementations.
+    /// General extrapolate function for a templated reco hit. We get the plane of this hit and extrapolate to this plane.
     template <class ARecoHit>
-    bool extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, ARecoHit& recoHit) const;
+    bool extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, ARecoHit& recoHit) const
+    {
+      const genfit::SharedPlanePtr& plane = getPlane(measuredStateOnPlane, recoHit);
+      return extrapolateToPlane(measuredStateOnPlane, plane);
+    }
+
+    /// General helper function for a templated reco hit, to return the plane this reco hit is on
+    template <class ARecoHit>
+    genfit::SharedPlanePtr getPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane, ARecoHit& recoHit) const;
 
     /// Expose the useMaterialEffects parameter.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
@@ -46,7 +54,8 @@ namespace Belle2 {
     /// Parameter: use material effects during extrapolation.
     bool m_param_useMaterialEffects = true;
 
-    /// Cache for the mSoP for a given parent
+    /// Function doing the main work: extrapolate a given mSoP to the given plane
+    bool extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const genfit::SharedPlanePtr& plane) const;
   };
 
   template <class AStateObject>
@@ -65,42 +74,50 @@ namespace Belle2 {
     // Get the parent to check, if we have already seem it and have something in our cache
     B2ASSERT("How could a state without a parent end up here?", currentState.getParent());
 
-    // This is the mSoP we will edit. It is either an already extrapolated mSoP to this plane (or a plane nearby)
-    // stored in the parent state, or
-    //   (1) if there is no hit in the parents state, the cached mSoP of the parent of its parent is returned etc.
-    //   (2) if there was no extrapolation already, we get the normal measured state on plane
-    genfit::MeasuredStateOnPlane measuredStateOnPlane = currentState.getCachedMeasuredStateOnPlaneOfParent();
+    // Normally, we would just use the (updated) mSoP of the parent and extrapolate it to the
+    // plane, this state/hit is located on. So we start with a copy of the mSoP of the parent here ...
+    genfit::MeasuredStateOnPlane measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
+    // ... however, to speed things up, we first check if the plane of the cached mSoP of the parent ...
+    const genfit::MeasuredStateOnPlane& cachedMeasuredStateOnPlane = currentState.getCachedMeasuredStateOnPlaneOfParent();
+    // ... and our own plane is the same.
+    const genfit::SharedPlanePtr& plane = getPlane(measuredStateOnPlane, *hit);
+    // If the two normals are equal, we have already calculated this! so we can just reuse the cached mSoP
+    if (plane->getNormal() == cachedMeasuredStateOnPlane.getPlane()->getNormal()) {
+      // we do not have to update the cached mSoP in this case (would not change anything anyway)
+      currentState.setMeasuredStateOnPlane(cachedMeasuredStateOnPlane);
+      currentState.setAdvanced();
+      return 1;
+    }
 
-    if (not extrapolate(measuredStateOnPlane, *hit)) {
+    // this means the two are not equal, so we have to do the extrapolation. We start with the mSoP of the
+    // parent state.
+    if (not extrapolateToPlane(measuredStateOnPlane, plane)) {
       return NAN;
     }
 
+    // we update the cache for the next hit - anticipating we will visit this sensor plane again in the next round
     currentState.setMeasuredStateOnPlane(measuredStateOnPlane, true);
-
     currentState.setAdvanced();
+
     return 1;
   }
 
   template <class ARecoHit>
-  bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, ARecoHit& recoHit) const
+  genfit::SharedPlanePtr AdvanceAlgorithm::getPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane, ARecoHit& recoHit) const
   {
-    // The mSoP plays no role here (it is unused in the function)
-    const genfit::SharedPlanePtr& plane = recoHit.constructPlane(measuredStateOnPlane);
-    return extrapolate(measuredStateOnPlane, plane);
+    return recoHit.constructPlane(measuredStateOnPlane);
   }
-
   template <>
-  bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint& spacePoint) const;
+  genfit::SharedPlanePtr AdvanceAlgorithm::getPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                                                    const SpacePoint& spacePoint) const;
   template <>
-  bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, SVDCluster& svdCluster) const;
+  genfit::SharedPlanePtr AdvanceAlgorithm::getPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane, SVDCluster& svdCluster) const;
   template <>
-  bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, PXDCluster& pxdCluster) const;
+  genfit::SharedPlanePtr AdvanceAlgorithm::getPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane, PXDCluster& pxdCluster) const;
   template <>
-  bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
-                                     const TrackFindingCDC::CDCRLWireHit& rlWireHit) const;
+  genfit::SharedPlanePtr AdvanceAlgorithm::getPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                                                    const TrackFindingCDC::CDCRLWireHit& rlWireHit) const;
   template <>
-  bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const genfit::SharedPlanePtr& plane) const;
-  template <>
-  bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
-                                     const genfit::MeasuredStateOnPlane& plane) const;
+  genfit::SharedPlanePtr AdvanceAlgorithm::getPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                                                    const genfit::MeasuredStateOnPlane& plane) const;
 }

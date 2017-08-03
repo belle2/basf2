@@ -11,7 +11,10 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+
 #include <tracking/spacePointCreation/SpacePoint.h>
+#include <cdc/dataobjects/CDCRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 
@@ -21,55 +24,53 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 template <>
-bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint& spacePoint) const
+genfit::SharedPlanePtr AdvanceAlgorithm::getPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                                                  const SpacePoint& spacePoint) const
 {
   if (spacePoint.getType() == VXD::SensorInfoBase::SensorType::SVD) {
     // We always use the first cluster here to create the plane. Should not make much difference?
-    return extrapolate(measuredStateOnPlane, *(spacePoint.getRelated<SVDCluster>()));
+    return getPlane(measuredStateOnPlane, *(spacePoint.getRelated<SVDCluster>()));
   } else if (spacePoint.getType() == VXD::SensorInfoBase::SensorType::PXD) {
-    return extrapolate(measuredStateOnPlane, *(spacePoint.getRelated<PXDCluster>()));
+    return getPlane(measuredStateOnPlane, *(spacePoint.getRelated<PXDCluster>()));
   } else {
     B2FATAL("Can not extrapolate unknown type " << spacePoint.getType() << "!");
   }
 }
 
 template <>
-bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, SVDCluster& svdCluster) const
+genfit::SharedPlanePtr AdvanceAlgorithm::getPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane, SVDCluster& svdCluster) const
 {
   SVDRecoHit recoHit(&svdCluster);
-  return extrapolate(measuredStateOnPlane, recoHit);
+  return getPlane(measuredStateOnPlane, recoHit);
 }
 
 template <>
-bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, PXDCluster& pxdCluster) const
+genfit::SharedPlanePtr AdvanceAlgorithm::getPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane, PXDCluster& pxdCluster) const
 {
   PXDRecoHit recoHit(&pxdCluster);
-  return extrapolate(measuredStateOnPlane, recoHit);
+  return getPlane(measuredStateOnPlane, recoHit);
 }
 
 template <>
-bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane __attribute__((unused)),
-                                   const TrackFindingCDC::CDCRLWireHit& rlWireHit __attribute__((unused))) const
+genfit::SharedPlanePtr AdvanceAlgorithm::getPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                                                  const TrackFindingCDC::CDCRLWireHit& rlWireHit) const
 {
-  // TODO: do something here
-  return false;
+  CDCRecoHit recoHit(rlWireHit.getHit(), nullptr);
+  // TODO: need to set RL here properly
+  // recoHit.setLeftRightResolution();
+  return getPlane(measuredStateOnPlane, recoHit);
 }
 
 template <>
-bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
-                                   const genfit::MeasuredStateOnPlane& plane) const
+genfit::SharedPlanePtr AdvanceAlgorithm::getPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane __attribute__((unused)),
+                                                  const genfit::MeasuredStateOnPlane& plane) const
 {
-  return extrapolate(measuredStateOnPlane, plane.getPlane());
+  return plane.getPlane();
 }
 
-template <>
-bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const genfit::SharedPlanePtr& plane) const
+bool AdvanceAlgorithm::extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                                          const genfit::SharedPlanePtr& plane) const
 {
-  // Check if we are already there
-  if (plane->getNormal() == measuredStateOnPlane.getPlane()->getNormal()) {
-    return true;
-  }
-
   try {
     genfit::MaterialEffects::getInstance()->setNoEffects(not m_param_useMaterialEffects);
     measuredStateOnPlane.extrapolateToPlane(plane);

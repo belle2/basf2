@@ -18,17 +18,6 @@ using namespace Belle2;
 REG_MODULE(RelatedTracksCombiner);
 
 namespace {
-  /// Helper function to get the seed or the measured state on plane from a track
-  std::tuple<const TVector3&, const TVector3&, short> extractTrackState(const RecoTrack& recoTrack)
-  {
-    if (not recoTrack.wasFitSuccessful()) {
-      return std::make_tuple(recoTrack.getPositionSeed(), recoTrack.getMomentumSeed(), recoTrack.getChargeSeed());
-    } else {
-      const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromFirstHit();
-      return std::make_tuple(measuredStateOnPlane.getPos(), measuredStateOnPlane.getMom(), measuredStateOnPlane.getCharge());
-    }
-  }
-
   /// Extract a momentum and charge from a reco track at a given position.
   TVector3 extrapolateMomentum(const RecoTrack& relatedCDCRecoTrack, const TVector3& vxdPosition)
   {
@@ -36,7 +25,7 @@ namespace {
     TVector3 cdcMomentum;
     int cdcCharge;
 
-    std::tie(cdcPosition, cdcMomentum, cdcCharge) = extractTrackState(relatedCDCRecoTrack);
+    std::tie(cdcPosition, cdcMomentum, cdcCharge) = relatedCDCRecoTrack.extractTrackState();
 
     const auto bField = BFieldMap::Instance().getBField(cdcPosition).Z();
 
@@ -44,16 +33,6 @@ namespace {
     const double arcLengthOfVXDPosition = cdcHelix.getArcLength2DAtXY(vxdPosition.X(), vxdPosition.Y());
 
     return cdcHelix.getMomentumAtArcLength2D(arcLengthOfVXDPosition, bField);
-  }
-
-  /// Helper function to add a new track to the store array with the given properties.
-  RecoTrack* addNewTrackFromSeed(const RecoTrack& recoTrack, StoreArray<RecoTrack>& recoTracks,
-                                 const TVector3& position, const TVector3& momentum, const int& charge)
-  {
-    RecoTrack* newTrack = recoTracks.appendNew(position, momentum, charge);
-    newTrack->setSeedCovariance(recoTrack.getSeedCovariance());
-    newTrack->setTimeSeed(recoTrack.getTimeSeed());
-    return newTrack;
   }
 }
 
@@ -92,30 +71,27 @@ void RelatedTracksCombinerModule::event()
   // For this, the fitted or seed state of the tracks is used - if they are already fitted or not.
   for (const RecoTrack& cdcRecoTrack : m_cdcRecoTracks) {
     const RecoTrack* vxdRecoTrack = cdcRecoTrack.getRelated<RecoTrack>(m_vxdRecoTracksStoreArrayName);
-
-    TVector3 cdcPosition;
-    TVector3 cdcMomentum;
-    short cdcCharge;
-
-    std::tie(cdcPosition, cdcMomentum, cdcCharge) = extractTrackState(cdcRecoTrack);
-
     if (vxdRecoTrack) {
       TVector3 vxdPosition;
-      TVector3 vxdMomentum;
-      short vxdCharge;
+      std::tie(vxdPosition, std::ignore, std::ignore) = vxdRecoTrack->extractTrackState();
 
-      std::tie(vxdPosition, vxdMomentum, vxdCharge) = extractTrackState(*vxdRecoTrack);
+      short cdcCharge = cdcRecoTrack.getChargeSeed();
 
       // For the combined track, we use the momentum of the CDC track
       // helix-extrapolated to the start position of the VXD track.
       const TVector3& trackMomentum = extrapolateMomentum(cdcRecoTrack, vxdPosition);
 
-      RecoTrack* newMergedTrack = addNewTrackFromSeed(*vxdRecoTrack, m_recoTracks, vxdPosition, trackMomentum, cdcCharge);
+      // We are using the basic information of the VXD track here, but copying the momentum and the charge from the
+      // cdc track.
+      // TODO: we should handle the covariance matrix properly here!
+      RecoTrack* newMergedTrack = vxdRecoTrack->copyToStoreArray(m_recoTracks);
+      newMergedTrack->setPositionAndMomentum(vxdPosition, trackMomentum);
+      newMergedTrack->setChargeSeed(cdcCharge);
       newMergedTrack->addHitsFromRecoTrack(vxdRecoTrack);
       newMergedTrack->addHitsFromRecoTrack(&cdcRecoTrack, newMergedTrack->getNumberOfTotalHits());
     } else {
       if (not m_useOnlyFittedTracksInSingles or cdcRecoTrack.wasFitSuccessful()) {
-        RecoTrack* newTrack = m_recoTracks.appendNew(cdcPosition, cdcMomentum, cdcCharge);
+        RecoTrack* newTrack = cdcRecoTrack.copyToStoreArray(m_recoTracks);
         newTrack->addHitsFromRecoTrack(&cdcRecoTrack);
       }
     }
@@ -124,16 +100,9 @@ void RelatedTracksCombinerModule::event()
   // Now we only have to add the VXD tracks without a match
   for (const RecoTrack& vxdRecoTrack : m_vxdRecoTracks) {
     const RecoTrack* cdcRecoTrack = vxdRecoTrack.getRelated<RecoTrack>(m_cdcRecoTracksStoreArrayName);
-
-    TVector3 vxdPosition;
-    TVector3 vxdMomentum;
-    short vxdCharge;
-
-    std::tie(vxdPosition, vxdMomentum, vxdCharge) = extractTrackState(vxdRecoTrack);
-
     if (not cdcRecoTrack) {
       if (not m_useOnlyFittedTracksInSingles or vxdRecoTrack.wasFitSuccessful()) {
-        RecoTrack* newTrack = addNewTrackFromSeed(vxdRecoTrack, m_recoTracks, vxdPosition, vxdMomentum, vxdCharge);
+        RecoTrack* newTrack = vxdRecoTrack.copyToStoreArray(m_recoTracks);
         newTrack->addHitsFromRecoTrack(&vxdRecoTrack);
       }
     }

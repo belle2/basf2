@@ -304,25 +304,6 @@ void RecoTrack::deleteFittedInformation()
   }
 }
 
-void RecoTrack::copyStateFromSeed()
-{
-  if (getRepresentations().empty()) {
-    B2FATAL("No representation present, so it is not possible to copy the state!");
-  }
-  const auto& measuredStateFromFirstHit = getMeasuredStateOnPlaneFromFirstHit();
-
-  const auto& position = measuredStateFromFirstHit.getPos();
-  const auto& momentum = measuredStateFromFirstHit.getMom();
-  const auto& charge = measuredStateFromFirstHit.getCharge();
-  const auto& time = measuredStateFromFirstHit.getTime();
-  const auto& covariance = measuredStateFromFirstHit.getCov();
-
-  setPositionAndMomentum(position, momentum);
-  setChargeSeed(charge);
-  setTimeSeed(time);
-  setSeedCovariance(covariance);
-}
-
 /// Helper function to get the seed or the measured state on plane from a track
 std::tuple<const TVector3&, const TVector3&, short> RecoTrack::extractTrackState() const
 {
@@ -331,5 +312,35 @@ std::tuple<const TVector3&, const TVector3&, short> RecoTrack::extractTrackState
   } else {
     const auto& measuredStateOnPlane = getMeasuredStateOnPlaneFromFirstHit();
     return std::make_tuple(measuredStateOnPlane.getPos(), measuredStateOnPlane.getMom(), measuredStateOnPlane.getCharge());
+  }
+}
+
+RecoTrack* RecoTrack::copyToStoreArrayUsing(StoreArray<RecoTrack>& storeArray,
+                                            const TVector3& position, const TVector3& momentum, short charge,
+                                            const TMatrixDSym& covariance, double timeSeed) const
+{
+  RecoTrack* newRecoTrack = storeArray.appendNew(position, momentum, charge,
+                                                 getStoreArrayNameOfCDCHits(), getStoreArrayNameOfSVDHits(), getStoreArrayNameOfPXDHits(),
+                                                 getStoreArrayNameOfBKLMHits(), getStoreArrayNameOfEKLMHits(), getStoreArrayNameOfRecoHitInformation());
+
+  newRecoTrack->setTimeSeed(timeSeed);
+  newRecoTrack->setSeedCovariance(covariance);
+
+  return newRecoTrack;
+}
+
+RecoTrack* RecoTrack::copyToStoreArrayUsingSeeds(StoreArray<RecoTrack>& storeArray) const
+{
+  return copyToStoreArrayUsing(storeArray, getPositionSeed(), getMomentumSeed(), getChargeSeed(), getSeedCovariance(), getTimeSeed());
+}
+
+RecoTrack* RecoTrack::copyToStoreArray(StoreArray<RecoTrack>& storeArray) const
+{
+  if (wasFitSuccessful()) {
+    const auto& mSoP = getMeasuredStateOnPlaneFromFirstHit();
+    return copyToStoreArrayUsing(storeArray, mSoP.getPos(), mSoP.getMom(), static_cast<short>(mSoP.getCharge()),
+                                 mSoP.getCov(), mSoP.getTime());
+  } else {
+    return copyToStoreArrayUsingSeeds(storeArray);
   }
 }

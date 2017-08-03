@@ -104,7 +104,6 @@ setupgf = register_module('SetupGenfitExtrapolation')
 # setupgf.param(param_setupgf)
 
 # fitting
-# cdcfitting = register_module('GenFitter')
 cdcfitting = register_module('DAFRecoFitter')
 # param_cdcfitting = {}
 # cdcfitting.param(param_cdcfitting)

@@ -23,7 +23,7 @@ namespace Belle2 {
    * in ADC units.
    *
    * Currently the returned values are the default ones and they
-   * are not read from anythe DB.
+   * are not read from the DB.
    *
    */
   class SVDNoiseCalibrations : public TObject {

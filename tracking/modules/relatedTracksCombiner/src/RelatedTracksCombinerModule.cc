@@ -19,18 +19,13 @@ REG_MODULE(RelatedTracksCombiner);
 
 namespace {
   /// Helper function to get the seed or the measured state on plane from a track
-  void extractTrackState(const RecoTrack& recoTrack,
-                         TVector3& position, TVector3& momentum, int& charge)
+  std::tuple<const TVector3&, const TVector3&, short> extractTrackState(const RecoTrack& recoTrack)
   {
-    if (recoTrack.getRepresentations().empty() or not recoTrack.wasFitSuccessful()) {
-      position = recoTrack.getPositionSeed();
-      momentum = recoTrack.getMomentumSeed();
-      charge = recoTrack.getChargeSeed();
+    if (not recoTrack.wasFitSuccessful()) {
+      return std::make_tuple(recoTrack.getPositionSeed(), recoTrack.getMomentumSeed(), recoTrack.getChargeSeed());
     } else {
       const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromFirstHit();
-      position = measuredStateOnPlane.getPos();
-      momentum = measuredStateOnPlane.getMom();
-      charge = measuredStateOnPlane.getCharge();
+      return std::make_tuple(measuredStateOnPlane.getPos(), measuredStateOnPlane.getMom(), measuredStateOnPlane.getCharge());
     }
   }
 
@@ -41,7 +36,7 @@ namespace {
     TVector3 cdcMomentum;
     int cdcCharge;
 
-    extractTrackState(relatedCDCRecoTrack, cdcPosition, cdcMomentum, cdcCharge);
+    std::tie(cdcPosition, cdcMomentum, cdcCharge) = extractTrackState(relatedCDCRecoTrack);
 
     const auto bField = BFieldMap::Instance().getBField(cdcPosition).Z();
 
@@ -97,16 +92,16 @@ void RelatedTracksCombinerModule::event()
 
     TVector3 cdcPosition;
     TVector3 cdcMomentum;
-    int cdcCharge;
+    short cdcCharge;
 
-    extractTrackState(cdcRecoTrack, cdcPosition, cdcMomentum, cdcCharge);
+    std::tie(cdcPosition, cdcMomentum, cdcCharge) = extractTrackState(cdcRecoTrack);
 
     if (vxdRecoTrack) {
       TVector3 vxdPosition;
       TVector3 vxdMomentum;
-      int vxdCharge;
+      short vxdCharge;
 
-      extractTrackState(*vxdRecoTrack, vxdPosition, vxdMomentum, vxdCharge);
+      std::tie(vxdPosition, vxdMomentum, vxdCharge) = extractTrackState(*vxdRecoTrack);
 
       const TVector3& trackMomentum = extrapolateMomentum(cdcRecoTrack, vxdPosition);
 
@@ -126,9 +121,9 @@ void RelatedTracksCombinerModule::event()
 
     TVector3 vxdPosition;
     TVector3 vxdMomentum;
-    int vxdCharge;
+    short vxdCharge;
 
-    extractTrackState(vxdRecoTrack, vxdPosition, vxdMomentum, vxdCharge);
+    std::tie(vxdPosition, vxdMomentum, vxdCharge) = extractTrackState(vxdRecoTrack);
 
     if (not cdcRecoTrack) {
       if (not m_useOnlyFittedTracksInSingles or vxdRecoTrack.wasFitSuccessful()) {

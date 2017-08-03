@@ -35,8 +35,8 @@ double KalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& measuredStat
 }
 
 template <>
-double KalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
-                                      const TrackFindingCDC::CDCRLWireHit& rlWireHit) const
+double KalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane __attribute__((unused)),
+                                      const TrackFindingCDC::CDCRLWireHit& rlWireHit __attribute__((unused))) const
 {
   // TODO: Do something here
   return -1;

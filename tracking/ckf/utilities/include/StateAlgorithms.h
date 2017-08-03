@@ -34,7 +34,7 @@ namespace Belle2 {
     return stateObject.getNumber() % 2 == 0;
   }
 
-  inline bool isOnOverlapLayer(const CKFStateObject<RecoTrack, TrackFindingCDC::CDCRLWireHit>& stateObject)
+  inline bool isOnOverlapLayer(const CKFStateObject<RecoTrack, TrackFindingCDC::CDCRLWireHit>& stateObject __attribute__((unused)))
   {
     return false;
   }

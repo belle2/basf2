@@ -53,7 +53,7 @@ namespace Belle2 {
     return m_cachedHitMap[nextLayer];
   }
 
-  void VXDToCDCMatcher::initializeEventCache(std::vector<RecoTrack*>& seedsVector,
+  void VXDToCDCMatcher::initializeEventCache(std::vector<RecoTrack*>& seedsVector __attribute__((unused)),
                                              std::vector<const TrackFindingCDC::CDCRLWireHit*>& filteredHitVector)
   {
     m_cachedHitMap.clear();

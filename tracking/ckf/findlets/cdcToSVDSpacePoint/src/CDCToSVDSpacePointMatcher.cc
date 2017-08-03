@@ -12,7 +12,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void CDCToSVDSpacePointMatcher::initializeEventCache(std::vector<RecoTrack*>& seedsVector,
+void CDCToSVDSpacePointMatcher::initializeEventCache(std::vector<RecoTrack*>& seedsVector __attribute__((unused)),
                                                      std::vector<const SpacePoint*>& filteredHitVector)
 {
   m_cachedHitMap.clear();

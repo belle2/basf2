@@ -39,7 +39,7 @@ namespace Belle2 {
 
     /// The weight is calculated using the subfilter based on the geometrical layer of the state.
     TrackFindingCDC::Weight operator()(const typename AFilterFactory::CreatedFilter::Object& currentState) final {
-      const unsigned int layer = extractGeometryLayer(currentState);
+      const int layer = extractGeometryLayer(currentState);
       if (layer > m_param_toggleOnLayer)
       {
         return m_highLayerFilter(currentState);

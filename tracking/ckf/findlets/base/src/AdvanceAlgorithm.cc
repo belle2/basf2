@@ -8,6 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/findlets/base/AdvanceAlgorithm.h>
+
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
@@ -45,8 +48,8 @@ bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOn
 }
 
 template <>
-bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
-                                   const TrackFindingCDC::CDCRLWireHit& rlWireHit) const
+bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane __attribute__((unused)),
+                                   const TrackFindingCDC::CDCRLWireHit& rlWireHit __attribute__((unused))) const
 {
   // TODO: do something here
   return false;
@@ -83,6 +86,6 @@ bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOn
 /// Expose the useMaterialEffects parameter.
 void AdvanceAlgorithm::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter("useMaterialEffects", m_param_useMaterialEffects,
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useMaterialEffects"), m_param_useMaterialEffects,
                                 "Use material effects during extrapolation.", m_param_useMaterialEffects);
 }

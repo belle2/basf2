@@ -12,7 +12,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void PXDSpacePointMatcher::initializeEventCache(std::vector<RecoTrack*>& seedsVector,
+void PXDSpacePointMatcher::initializeEventCache(std::vector<RecoTrack*>& seedsVector __attribute__((unused)),
                                                 std::vector<const SpacePoint*>& filteredHitVector)
 {
   m_cachedHitMapOnLadder.clear();

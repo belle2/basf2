@@ -42,7 +42,7 @@ bool SimpleCKFSpacePointFilter::checkOverlapAndHoles(const BaseCKFCDCToSpacePoin
 {
   const SpacePoint* spacePoint = currentState.getHit();
 
-  unsigned int numberOfHoles = 0;
+  int numberOfHoles = 0;
 
   currentState.walk([&numberOfHoles](const BaseCKFCDCToSpacePointStateObjectFilter::Object * walkObject) {
     if (not walkObject->getHit() and not isOnOverlapLayer(*walkObject)) {

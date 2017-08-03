@@ -80,15 +80,15 @@ class PxdROIPayloadTestModule(Module):
 
         # check all quantities between the direct and the packed/unpacked pxd digits
         # for i in range(len(orgrois)):
-        #    org = orgrois[i]
-        #    if i==0 or f(org) != f(orgrois[i-1]):
-        #        B2INFO(" Org %X %d %d %d %d" % (org.getSensorID().getID(), org.getMinUid(),
-        #           org.getMaxUid(), org.getMinVid(), org.getMaxVid()))
+            # org = orgrois[i]
+            # if i == 0 or f(org) != f(orgrois[i - 1]):
+            # B2INFO(" Org $%X %3d %3d %3d %3d" % (org.getSensorID().getID(), org.getMinUid(),
+            # org.getMaxUid(), org.getMinVid(), org.getMaxVid()))
 
         # for i in range(len(unpackedrois)):
-        #    unp = unpackedrois[i]
-        #    B2INFO(" Unp %X %d %d %d %d" % (unp.getSensorID().getID(),
-        #        unp.getMinUid(), unp.getMaxUid(), unp.getMinVid(), unp.getMaxVid()))
+            # unp = unpackedrois[i]
+            # B2INFO(" Unp $%X %3d %3d %3d %3d" % (unp.getSensorID().getID(),
+            # unp.getMinUid(), unp.getMaxUid(), unp.getMinVid(), unp.getMaxVid()))
 
         j = 0
         for i in range(len(orgrois)):
@@ -100,19 +100,42 @@ class PxdROIPayloadTestModule(Module):
 
                 unp = unpackedrois[j]
 
+                B2INFO(
+                    "Check Org $%X %3d %3d %3d %3d Unp $%X %3d %3d %3d %3d" %
+                    (org.getSensorID().getID(),
+                     org.getMinUid(),
+                        org.getMaxUid(),
+                        org.getMinVid(),
+                        org.getMaxVid(),
+                        unp.getSensorID().getID(),
+                        unp.getMinUid(),
+                        unp.getMaxUid(),
+                        unp.getMinVid(),
+                        unp.getMaxVid()))
                 # compare all available quantities
-                assert org.getSensorID() == unp.getSensorID()
-                assert org.getMinUid() == unp.getMinUid()
-                assert org.getMaxUid() == unp.getMaxUid()
-                assert org.getMinVid() == unp.getMinVid()
-                assert org.getMaxVid() == unp.getMaxVid()
-                j += 1
+                if unp.getMinUid() == 0 and unp.getMinVid() == 0 and unp.getMaxUid() == 250 - 1 and unp.getMaxVid() == 768 - 1:
+                    B2INFO("Full size ROI")
+                    if org.getSensorID().getID() != unp.getSensorID().getID():
+                        B2INFO("DHHID changed")
+                        if j == len(unpackedrois):
+                            B2FATAL("Unpacked ROIs comparison exceeds array limit!")
+                            break
+                        j += 1
+                        unp = unpackedrois[j]
+
+                if not(unp.getMinUid() == 0 and unp.getMinVid() == 0 and unp.getMaxUid() == 250 - 1 and unp.getMaxVid() == 768 - 1):
+                    assert org.getSensorID().getID() == unp.getSensorID().getID()
+                    assert org.getMinUid() == unp.getMinUid()
+                    assert org.getMaxUid() == unp.getMaxUid()
+                    assert org.getMinVid() == unp.getMinVid()
+                    assert org.getMaxVid() == unp.getMaxVid()
+                    j += 1
 
 
 # to run the framework the used modules need to be registered
 particlegun = register_module('ParticleGun')
 particlegun.param('pdgCodes', [13, -13])
-particlegun.param('nTracks', 10)
+particlegun.param('nTracks', 40)
 
 # Create Event information
 eventinfosetter = register_module('EventInfoSetter')
@@ -128,7 +151,7 @@ main.add_module(particlegun)
 simulation.add_simulation(main, components=['PXD', 'SVD'], usePXDDataReduction=True)
 
 roiPayloadAssembler = register_module('ROIPayloadAssembler')
-roiPayloadAssembler.param({"ROIListName": "ROIs", "SendAllDownscaler": 0, "SendROIsDownscaler": 0})
+roiPayloadAssembler.param({"ROIListName": "ROIs", "SendAllDownscaler": 0, "SendROIsDownscaler": 0, "CutNrROIs": 5})
 
 main.add_module(roiPayloadAssembler)
 

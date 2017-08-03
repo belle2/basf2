@@ -10,6 +10,7 @@
 
 #include <framework/modules/profile/StatisticsSummaryModule.h>
 
+#include <framework/core/ModuleStatistics.h>
 #include <framework/core/ModuleManager.h>
 
 

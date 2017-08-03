@@ -142,9 +142,8 @@ namespace Belle2 {
     {
       setCounters(m_moduleTime, m_moduleMemory,
                   m_moduleTime, m_moduleMemory);
-      if (module->getType() != "StatisticsSummary") {
-        m_stats[getIndex(module)].add(type, m_moduleTime, m_moduleMemory);
-      }
+      if (module && (module->getType() == "StatisticsSummary")) return;
+      m_stats[getIndex(module)].add(type, m_moduleTime, m_moduleMemory);
     }
 
     /** Init module statistics: Set name from module if still empty and

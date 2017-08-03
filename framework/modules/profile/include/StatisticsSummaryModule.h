@@ -14,8 +14,6 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ProcessStatistics.h>
-#include <framework/core/ModuleStatistics.h>
-#include <framework/utilities/CalcMeanCov.h>
 
 
 namespace Belle2 {
@@ -55,9 +53,6 @@ namespace Belle2 {
 
     /** process statistics pointer */
     StoreObjPtr<ProcessStatistics> m_processStatistics;
-
-    /** statistics sum */
-    CalcMeanCov<2, ModuleStatistics::value_type> m_stats[ModuleStatistics::c_Total + 1];
   };
 }
 

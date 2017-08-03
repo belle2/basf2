@@ -151,9 +151,9 @@ void ROIPayloadAssemblerModule::event()
         m_roiraw.setDHHID(it.second.begin()->getDHHID());
 
         m_roiraw.setRowMin(0);
-        m_roiraw.setRowMax(nPixelsU);
+        m_roiraw.setRowMax(nPixelsV);
         m_roiraw.setColMin(0);
-        m_roiraw.setColMax(nPixelsV);
+        m_roiraw.setColMax(nPixelsU);
 
         payload->addROIraw(m_roiraw.getBigEndian());
       }

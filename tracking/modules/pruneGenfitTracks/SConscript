@@ -1,8 +1,0 @@
-Import('env')
-
-env['LIBS'] = [
-    'genfit2',
-    'framework' ]
-
-Return('env')
-

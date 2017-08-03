@@ -27,6 +27,39 @@ namespace {
   {
     return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));
   }
+
+  using YSpan = AxialHitQuadTreeProcessor::YSpan;
+  YSpan splitCurvSpan(const YSpan& curvSpan, int nodeLevel, int lastLevel, int j)
+  {
+    const float meanCurv = curvSpan[0] + (curvSpan[1] - curvSpan[0]) / 2.0;
+    const std::array<float, 3> binBounds{curvSpan[0], meanCurv, curvSpan[1]};
+    const float binWidth = binBounds[j + 1] - binBounds[j];
+
+    const bool standardBinning = (nodeLevel <= lastLevel - 7) or (std::fabs(meanCurv) <= 0.005);
+    if (standardBinning) {
+      // B2INFO("Case 1* " << meanCurv << " " << (meanCurv <= 0.005));
+      float curv1 = binBounds[j];
+      float curv2 = binBounds[j + 1];
+
+      // Standard bin division
+      return {curv1, curv2};
+    }
+
+    // Non-standard binning
+    // For level 6 to 7 only expand 1 / 4, for higher levels expand  1 / 8.
+    // (assuming last level == 12)
+    if (nodeLevel < lastLevel - 5) {
+      // B2INFO("Case 2*");
+      float curv1 = binBounds[j] - binWidth / 4.;
+      float curv2 = binBounds[j + 1] + binWidth / 4.;
+      return {curv1, curv2};
+    } else {
+      // B2INFO("Case 3*");
+      float curv1 = binBounds[j] - binWidth / 8.;
+      float curv2 = binBounds[j + 1] + binWidth / 8.;
+      return {curv1, curv2};
+    }
+  }
 }
 
 const LookupTable<Vector2D>& AxialHitQuadTreeProcessor::getCosSinLookupTable()

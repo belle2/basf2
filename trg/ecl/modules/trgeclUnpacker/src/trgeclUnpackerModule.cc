@@ -63,20 +63,20 @@ void TRGECLUnpackerModule::event()
 {
 
   StoreArray<RawTRG> raw_trgarray;
-  //    unsigned int nodeid;
+  unsigned int nodeid;
 
   for (int i = 0; i < raw_trgarray.getEntries(); i++) {
     for (int j = 0; j < raw_trgarray[i]->GetNumEntries(); j++) {
-      //      nodeid = ((raw_trgarray[i]->GetNodeID(j)) >> 24) & 0x1F;
-      //if (nodeid == 0x13) {
-      readCOPPEREvent(raw_trgarray[i], j);
-      n_basf2evt++;
-      if (n_basf2evt % 1000 == 0) {
-        printf("%.5dK", (int)n_basf2evt / 1000);
-        fflush(stdout);
-        printf("\r");
+      nodeid = ((raw_trgarray[i]->GetNodeID(j)) >> 24) & 0x1F;
+      if (nodeid == 0x13) {
+        readCOPPEREvent(raw_trgarray[i], j);
+        n_basf2evt++;
+        if (n_basf2evt % 1000 == 0) {
+          printf("%.5dK", (int)n_basf2evt / 1000);
+          fflush(stdout);
+          printf("\r");
+        }
       }
-      //      }
     }
   }
 }

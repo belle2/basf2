@@ -322,3 +322,14 @@ void RecoTrack::copyStateFromSeed()
   setTimeSeed(time);
   setSeedCovariance(covariance);
 }
+
+/// Helper function to get the seed or the measured state on plane from a track
+std::tuple<const TVector3&, const TVector3&, short> RecoTrack::extractTrackState() const
+{
+  if (not wasFitSuccessful()) {
+    return std::make_tuple(getPositionSeed(), getMomentumSeed(), getChargeSeed());
+  } else {
+    const auto& measuredStateOnPlane = getMeasuredStateOnPlaneFromFirstHit();
+    return std::make_tuple(measuredStateOnPlane.getPos(), measuredStateOnPlane.getMom(), measuredStateOnPlane.getCharge());
+  }
+}

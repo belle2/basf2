@@ -524,6 +524,9 @@ namespace Belle2 {
     /// Return the time seed stored in the reco track. ATTENTION: This is not the fitted time.
     double getTimeSeed() const { return m_genfitTrack.getTimeSeed(); }
 
+    /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
+    std::tuple<const TVector3&, const TVector3&, short> extractTrackState() const;
+
     /// Set the position and momentum seed of the reco track. ATTENTION: This is not the fitted position or momentum.
     void setPositionAndMomentum(const TVector3& positionSeed, const TVector3& momentumSeed)
     {

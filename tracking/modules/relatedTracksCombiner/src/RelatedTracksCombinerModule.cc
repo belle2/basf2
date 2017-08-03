@@ -87,6 +87,9 @@ void RelatedTracksCombinerModule::initialize()
 
 void RelatedTracksCombinerModule::event()
 {
+  // Loop over all CDC reco tracks and add them to the store array of they do not have a match or combined them with
+  // their VXD partner if they do.
+  // For this, the fitted or seed state of the tracks is used - if they are already fitted or not.
   for (const RecoTrack& cdcRecoTrack : m_cdcRecoTracks) {
     const RecoTrack* vxdRecoTrack = cdcRecoTrack.getRelated<RecoTrack>(m_vxdRecoTracksStoreArrayName);
 
@@ -103,6 +106,8 @@ void RelatedTracksCombinerModule::event()
 
       std::tie(vxdPosition, vxdMomentum, vxdCharge) = extractTrackState(*vxdRecoTrack);
 
+      // For the combined track, we use the momentum of the CDC track
+      // helix-extrapolated to the start position of the VXD track.
       const TVector3& trackMomentum = extrapolateMomentum(cdcRecoTrack, vxdPosition);
 
       RecoTrack* newMergedTrack = addNewTrackFromSeed(*vxdRecoTrack, m_recoTracks, vxdPosition, trackMomentum, cdcCharge);
@@ -116,6 +121,7 @@ void RelatedTracksCombinerModule::event()
     }
   }
 
+  // Now we only have to add the VXD tracks without a match
   for (const RecoTrack& vxdRecoTrack : m_vxdRecoTracks) {
     const RecoTrack* cdcRecoTrack = vxdRecoTrack.getRelated<RecoTrack>(m_cdcRecoTracksStoreArrayName);
 

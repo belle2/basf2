@@ -24,7 +24,7 @@ namespace Belle2 {
    * the ADC counts, the peaking time and the width.
    *
    * Currently the returned values are the default ones and they
-   * are not read from any file.
+   * are not read from the DB.
    *
    */
   class SVDShapePulseCalibrations : public TObject {
@@ -33,10 +33,9 @@ namespace Belle2 {
     SVDShapePulseCalibrations()
     {}
 
-    /** Return the charge collected on a specific
+    /** Return the charge (number of electrons/holes) collected on a specific
      * strip, given the number of ADC counts.
-     * Currently it returns a default value for every strip,
-     * assuming a unitary ADC pulse.
+     * Currently the gain is a fixed default value for every strip.
      *
      * Input:
      * @param sensor ID: identity of the sensor for which the
@@ -44,19 +43,20 @@ namespace Belle2 {
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number
      * @param pulseADC : The ADC-pulse height is also required
-     * as input argument, otherwise the default value is 1.
+     * as input argument.
      *
      * Output: float corresponding to the charge [e] converted
      * from the read ADC pulse.
      */
     float getChargeFromADC(VxdID , bool , unsigned char,  unsigned char pulseADC)
     {
-      return (float) pulseADC * m_gain;
+      return (float) pulseADC * getGain(VxdID , bool, unsigned char);
     }
 
     /** Return an integer corresponding to the ADC pulse
      * height per strip, provided the charge [e] collected
      * on that strip.
+     * Currently the gain is a fixed default value for every strip.
      *
      * Input:
      * @param sensor ID: identity of the sensor for which the
@@ -64,8 +64,7 @@ namespace Belle2 {
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number
      * @param charge: the charge in units [e] is also
-     * required as input argument, otherwise the default value
-     * is 22500.
+     * required as input argument
      *
      * Output: an integer number representing the ADC pulse height
      * for the correponding input charge, on the given strip.
@@ -73,10 +72,11 @@ namespace Belle2 {
     // it was previously defined as unsigned char, but not working
     int getADCFromCharge(VxdID , bool, unsigned char, float charge)
     {
-      return charge / m_gain;
+      return charge / getGain(VxdID , bool, unsigned char);
     }
 
     /** Return the peaking time of the strip.
+     * Currently we return a fixed default value for every strip.
      *
      * Input:
      * @param sensorID: identity of the sensor for which the
@@ -94,6 +94,7 @@ namespace Belle2 {
     }
 
     /** Return the width of the pulse shape for a given strip.
+     * Currently we return a fixed default value for every strip.
      *
      * Input:
      * @param sensorID: identity of the sensor for which the
@@ -117,8 +118,14 @@ namespace Belle2 {
      * gain*pulseADC = charge [e]
      * charge/gain = pulse height [ADC counts]
      */
-    const float m_gain = 22500. / 60.;
-    ClassDef(SVDShapePulseCalibrations, 0);
+    float getGain(VxdID , bool, unsigned char)
+    {
+
+      const float gain = 22500. / 60.;
+      return gain;
+    }
+
+    ClassDef(SVDShapePulseCalibrations, 1);
   };
 }
 

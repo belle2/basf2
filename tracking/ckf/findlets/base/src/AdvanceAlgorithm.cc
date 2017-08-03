@@ -66,8 +66,7 @@ template <>
 bool AdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const genfit::SharedPlanePtr& plane) const
 {
   // Check if we are already there
-  if (*plane == *measuredStateOnPlane.getPlane()) {
-    B2INFO("Cache hit!");
+  if (plane->getNormal() == measuredStateOnPlane.getPlane()->getNormal()) {
     return true;
   }
 

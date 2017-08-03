@@ -23,6 +23,7 @@ StatisticsSummaryModule::StatisticsSummaryModule() : Module(), m_processStatisti
 {
   // Set module description
   setDescription("Sums up the statistics of preceeding modules. All modules until the first module or another StatisticsSummary module in the module statistics are included.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 void StatisticsSummaryModule::initialize()
@@ -43,14 +44,6 @@ void StatisticsSummaryModule::event()
 void StatisticsSummaryModule::endRun()
 {
   record(ModuleStatistics::c_EndRun);
-}
-
-void StatisticsSummaryModule::terminate()
-{
-  ModuleStatistics& thisStatistics = m_processStatistics->getStatistics(this);
-  for (int type = ModuleStatistics::c_Init; type <= ModuleStatistics::c_Total; type++) {
-    thisStatistics.set(m_stats[type], ModuleStatistics::EStatisticCounters(type));
-  }
 }
 
 void StatisticsSummaryModule::record(ModuleStatistics::EStatisticCounters type)
@@ -85,12 +78,10 @@ void StatisticsSummaryModule::record(ModuleStatistics::EStatisticCounters type)
     memory += statistics.getMemorySum(type);
   }
 
-  // add the difference
-  time -= m_stats[type].getSum<0>();
-  memory -= m_stats[type].getSum<1>();
-  m_stats[type].add(time, memory);
-  if (type != ModuleStatistics::c_Total) {
-    m_stats[ModuleStatistics::c_Total].add(time, memory);
-  }
+  // update statistics of this module
+  ModuleStatistics& thisStatistics = m_processStatistics->getStatistics(this);
+  time -= thisStatistics.getTimeSum(type);
+  memory -= thisStatistics.getMemorySum(type);
+  thisStatistics.add(type, time, memory);
 }
 

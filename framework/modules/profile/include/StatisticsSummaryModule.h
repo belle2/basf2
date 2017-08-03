@@ -49,9 +49,6 @@ namespace Belle2 {
     /** Record end run statistics sum */
     virtual void endRun();
 
-    /** Update module statistics */
-    virtual void terminate();
-
   private:
     /** Record the statistics of given type */
     void record(ModuleStatistics::EStatisticCounters type);

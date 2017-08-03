@@ -65,9 +65,9 @@ namespace Belle2 {
       if (not seedTrack) return false;
 
       StoreObjPtr<EventMetaData> eventMetaData;
-      Super::template var<Super::template named("truth_event_number")>() = eventMetaData->getEvent();
-      Super::template var<Super::template named("truth_seed_number")>() = seedTrack->getArrayIndex();
-      Super::template var<Super::template named("truth_teacher")>() = result->getTeacherInformation();
+      Super::template var<Super::named("truth_event_number")>() = eventMetaData->getEvent();
+      Super::template var<Super::named("truth_seed_number")>() = seedTrack->getArrayIndex();
+      Super::template var<Super::named("truth_teacher")>() = result->getTeacherInformation();
 
       const std::string& seedTrackStoreArrayName = seedTrack->getArrayName();
 
@@ -75,11 +75,11 @@ namespace Belle2 {
       const RecoTrack* mcTrack = mcCDCMatchLookUp.getMatchedMCRecoTrack(*seedTrack);
 
       // Default to false
-      Super::template var<Super::template named("truth_number_of_correct_hits")>() = 0;
-      Super::template var<Super::template named("truth")>() = 0;
-      Super::template var<Super::template named("truth_number_of_mc_pxd_hits")>() = 0;
-      Super::template var<Super::template named("truth_number_of_mc_svd_hits")>() = 0;
-      Super::template var<Super::template named("truth_number_of_mc_cdc_hits")>() = 0;
+      Super::template var<Super::named("truth_number_of_correct_hits")>() = 0;
+      Super::template var<Super::named("truth")>() = 0;
+      Super::template var<Super::named("truth_number_of_mc_pxd_hits")>() = 0;
+      Super::template var<Super::named("truth_number_of_mc_svd_hits")>() = 0;
+      Super::template var<Super::named("truth_number_of_mc_cdc_hits")>() = 0;
 
       if (not mcTrack)
       {
@@ -90,11 +90,11 @@ namespace Belle2 {
       // Count the number of times the related MC-track is also related to the clusters.
       const unsigned int numberOfCorrectHits = getNumberOfCorrectHits(mcTrack, result->getHits());
 
-      Super::template var<Super::template named("truth_number_of_correct_hits")>() = numberOfCorrectHits;
-      Super::template var<Super::template named("truth_number_of_mc_svd_hits")>() = mcTrack->getNumberOfSVDHits();
-      Super::template var<Super::template named("truth_number_of_mc_pxd_hits")>() = mcTrack->getNumberOfPXDHits();
-      Super::template var<Super::template named("truth_number_of_mc_cdc_hits")>() = mcTrack->getNumberOfCDCHits();
-      Super::template var<Super::template named("truth")>() = numberOfCorrectHits == 2 * result->getHits().size() and numberOfCorrectHits > 0;
+      Super::template var<Super::named("truth_number_of_correct_hits")>() = numberOfCorrectHits;
+      Super::template var<Super::named("truth_number_of_mc_svd_hits")>() = mcTrack->getNumberOfSVDHits();
+      Super::template var<Super::named("truth_number_of_mc_pxd_hits")>() = mcTrack->getNumberOfPXDHits();
+      Super::template var<Super::named("truth_number_of_mc_cdc_hits")>() = mcTrack->getNumberOfCDCHits();
+      Super::template var<Super::named("truth")>() = numberOfCorrectHits == 2 * result->getHits().size() and numberOfCorrectHits > 0;
 
       return true;
     }

@@ -372,7 +372,7 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
 
     save_histograms_stackby_charge = refiners.save_histograms(
         select=[
-            "mc_disp2D",
+            # "mc_disp2D",
             "first_disp2D",
             "charge",
         ],
@@ -385,7 +385,10 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
 
     save_scatter = refiners.save_scatters(
         x=['mc_s2D'],
-        y=['mc_disp2D', 'disp2D'],
+        y=[
+            # 'mc_disp2D',
+            'disp2D',
+        ],
         groupby=[None, "charge"],
         filter=lambda x: x == 211,
         filter_on="pdg_code",
@@ -394,7 +397,7 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
     save_profiles = refiners.save_profiles(
         x=['mc_s2D'],
         y=[
-            'mc_disp2D',
+            # 'mc_disp2D',
             'first_disp2D',
             'disp2D',
         ],
@@ -406,15 +409,13 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
         y='bz',
     )
 
+    # Loss displacement #
+    # ################# #
+
     save_cid_histogram = refiners.save_histograms(
         select=[
-            'pdg_code',
-            'mc_eloss_estimate',
-            'mc_eloss_truth',
-            'first_eloss_estimate',
-            'first_eloss_truth',
-            'mc_disp2D',
-            'mc_delossed_disp2D',
+            # 'mc_disp2D',
+            # 'mc_delossed_disp2D',
             'first_disp2D',
             'first_delossed_disp2D',
             'bz',
@@ -428,12 +429,10 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
     save_cid_profiles = refiners.save_profiles(
         x=["mc_pt"],
         y=[
-            'mc_disp2D',
-            'mc_delossed_disp2D',
+            # 'mc_disp2D',
+            # 'mc_delossed_disp2D',
             'first_disp2D',
             'first_delossed_disp2D',
-            # 'diff_pt',
-            # 'diff_pz',
         ],
         outlier_z_score=5.0,
         groupby=["layer_cid"],
@@ -443,16 +442,52 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
     save_cid_scatters = refiners.save_scatters(
         x=["mc_pt"],
         y=[
-            'mc_disp2D',
-            'mc_delossed_disp2D',
+            # 'mc_disp2D',
+            # 'mc_delossed_disp2D',
             'first_disp2D',
             'first_delossed_disp2D',
-            # 'diff_pt',
-            # 'diff_pz',
         ],
         outlier_z_score=5.0,
         groupby=["layer_cid"],
         stackby="pdg_code",
+    )
+
+    # Energy loss #
+    # ########### #
+    save_energy_cid_histogram = refiners.save_histograms(
+        select=[
+            'pdg_code',
+            'first_eloss_estimate',
+            'first_eloss_truth',
+        ],
+        outlier_z_score=5.0,
+        groupby=["layer_cid"],
+        stackby="pdg_code",
+        folder_name='energy/{groupby_addition}',
+    )
+
+    save_energy_cid_profiles = refiners.save_profiles(
+        x=["mc_pt"],
+        y=[
+            'first_eloss_truth',
+            'first_eloss_estimate',
+        ],
+        outlier_z_score=5.0,
+        groupby=["layer_cid"],
+        stackby="pdg_code",
+        folder_name='energy/{groupby_addition}',
+    )
+
+    save_energy_cid_scatters = refiners.save_scatters(
+        x=["mc_pt"],
+        y=[
+            'first_eloss_truth',
+            'first_eloss_estimate',
+        ],
+        outlier_z_score=5.0,
+        groupby=["layer_cid"],
+        stackby="pdg_code",
+        folder_name='energy/{groupby_addition}',
     )
 
 

@@ -57,6 +57,10 @@ namespace Belle2 {
     {
       Super::initialize();
 
+      if (not m_param_exportTracks) {
+        return;
+      }
+
       m_vxdRecoTracks.registerInDataStore(m_param_vxdRecoTrackStoreArrayName);
       RecoTrack::registerRequiredRelations(m_vxdRecoTracks);
 
@@ -72,6 +76,10 @@ namespace Belle2 {
      */
     void apply(const std::vector<CKFResultObject<ASeedObject, AHitObject>>& cdcTracksWithMatchedSpacePoints) override
     {
+      if (not m_param_exportTracks) {
+        return;
+      }
+
       // Create new VXD tracks out of the found VXD space points and store them into a store array
       for (const auto& cdcTrackWithMatchedSpacePoints : cdcTracksWithMatchedSpacePoints) {
         RecoTrack* cdcRecoTrack = cdcTrackWithMatchedSpacePoints.getSeed();

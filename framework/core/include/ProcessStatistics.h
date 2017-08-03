@@ -142,7 +142,7 @@ namespace Belle2 {
     {
       setCounters(m_moduleTime, m_moduleMemory,
                   m_moduleTime, m_moduleMemory);
-      if (module && (module->getType() == "StatisticsSummary")) return;
+      if (module && module->hasProperties(Module::c_DontCollectStatistics)) return;
       m_stats[getIndex(module)].add(type, m_moduleTime, m_moduleMemory);
     }
 

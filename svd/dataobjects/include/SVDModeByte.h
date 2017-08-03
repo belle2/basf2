@@ -19,10 +19,10 @@
 namespace Belle2 {
 
   // NB: I replaced enums with constexpressions here, since GCC complains
-  // (falsely, clang does not) about sturcture sizes, and the warnings can
+  // (falsely, clang does not) about structure sizes, and the warnings can
   // not be suppressed due to an error in GCC (July 2017).
 
-  /** Run time, 2-bits:
+  /** Run type, 2-bits:
    * 00 raw,
    * 01 transparent,
    * 10 zero-suppressed,
@@ -38,8 +38,8 @@ namespace Belle2 {
 
   /** Event Type, 3 bits, separated into 1+2 bits:
    * 1. bit:
-   * 0 TTD event (global run form FTSW),
-   * 1 standalone event (local run)
+   * 0 global run (TTD event),
+   * 1 local run (standalone event)
    */
   namespace SVDEventType {
     constexpr uint8_t
@@ -60,7 +60,7 @@ namespace Belle2 {
   }
 
   /**
-   * Class to store mode information in an SVDShaperDigit.
+   * Class to store SVD mode information
    *
    * - Mode : Zero suppressed 6- or 3- samples + unknown mode
    * - Trigger time bin - 3 bits, correct values 0-3, other - error
@@ -137,18 +137,6 @@ namespace Belle2 {
     baseType getID() const { return m_id.id; }
     /** Get the triggerBin id */
     baseType getTriggerBin() const { return m_id.parts.triggerBin; }
-    /** Get the triggerBin id */
-    std::pair<double, double> getTriggerInterval() const
-    {
-      baseType bin = m_id.parts.triggerBin;
-      if (bin <= MaxGoodTriggerBin) {
-        return std::make_pair(
-                 - (1.0 - bin * 0.25) * 31.44,
-                 - (0.75 - bin * 0.25) * 31.44
-               );
-      } else  // with no sensible info, return the whole interval
-        return std::make_pair(-31.44, 0.0);
-    }
     /** Get the daqMode id */
     baseType getDAQMode() const { return m_id.parts.daqMode; }
     /** Get the eventMode id */
@@ -165,16 +153,12 @@ namespace Belle2 {
      * - zero-suppressed (first bit set)
      * - 3-sample or 6-sample mode (daq mode > 0)
      */
-    bool isUsefulRun() const
+    bool isZeroSuppressedRun() const
     {
       return (
-               (
-                 (m_id.parts.runType == SVDRunType::zero_suppressed)
-                 ||
-                 (m_id.parts.runType == SVDRunType::zero_suppressed_timefit)
-               )
-               &&
-               (m_id.parts.daqMode != SVDDAQModeType::daq_1sample)
+               (m_id.parts.runType == SVDRunType::zero_suppressed)
+               ||
+               (m_id.parts.runType == SVDRunType::zero_suppressed_timefit)
              );
     }
 

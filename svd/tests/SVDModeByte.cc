@@ -38,16 +38,12 @@ namespace Belle2 {
       // Construct
       SVDModeByte s(3, 1, 1, 3);
       EXPECT_EQ(s.getTriggerBin(), 3);
-      EXPECT_EQ(s.getTriggerInterval().first, -31.44 * 0.25);
-      EXPECT_EQ(s.getTriggerInterval().second, 0);
       EXPECT_EQ(s.getDAQMode(), SVDDAQModeType::daq_3samples);
       EXPECT_EQ(s.getEventType(), SVDEventType::local_run);
       EXPECT_EQ(s.getRunType(), SVDRunType::zero_suppressed_timefit);
       // Default
       SVDModeByte s0;
       EXPECT_EQ(s0.getTriggerBin(), 7);
-      EXPECT_EQ(s0.getTriggerInterval().first, -31.44);
-      EXPECT_EQ(s0.getTriggerInterval().second, 0.0);
       EXPECT_EQ(s0.getDAQMode(), SVDDAQModeType::daq_6samples);
     }
   }

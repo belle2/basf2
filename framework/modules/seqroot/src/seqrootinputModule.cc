@@ -42,12 +42,15 @@ SeqRootInputModule::SeqRootInputModule() : Module(), m_streamer(nullptr), m_size
 
   //Parameter definition
   addParam("inputFileName"  , m_inputFileName,
-           "Input file name. Can also be a gzip-compressed file (with suffix .gz). Parameter can be overridden using the -i argument to basf2.",
-           string("SeqRootInput.sroot"));
+           "Input file name. Can also be a gzip-compressed file (with suffix .gz). "
+           "Parameter can be overridden using the -i argument to basf2.",
+           string(""));
   vector<string> empty;
   addParam("inputFileNames", m_filelist, "List of input files", empty);
-  addParam("fileNameIsPattern", m_fileNameIsPattern, "If true interpret the output filename as a boost::format pattern "
-           "instead of the standard where subsequent files are named .sroot-N. For example 'myfile-f%08d.sroot'", false);
+  addParam("fileNameIsPattern", m_fileNameIsPattern, "If true interpret the output "
+           "filename as a boost::format pattern instead of the standard where "
+           "subsequent files are named .sroot-N. For example 'myfile-f%08d.sroot'",
+           false);
 }
 
 
@@ -61,7 +64,7 @@ void SeqRootInputModule::initialize()
 
   // Specify input file(list)
   if (!m_inputFileName.empty() && !m_filelist.empty()) {
-    B2FATAL("Cannot specifye both 'inputFileName' and 'inputFileNames'");
+    B2FATAL("Cannot specify both 'inputFileName' and 'inputFileNames'");
   }
   const std::vector<std::string>& inputFiles = Environment::Instance().getInputFilesOverride();
   if (!inputFiles.empty()) {  // Override parameter specification

@@ -364,7 +364,7 @@ namespace {
 
       //test postfix
       EXPECT_TRUE((it++) == it2);
-      it2++;
+      ++it2;
 
       //test prefix
       EXPECT_TRUE(it != (++it2));

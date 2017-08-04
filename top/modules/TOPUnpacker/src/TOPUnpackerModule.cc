@@ -421,22 +421,22 @@ namespace Belle2 {
 
         // feature-extracted data (negative signal)
         word = array.getWord(); // word 9
-        short n_samp_i = (word >> 16) & 0xFFFF;
+        //short n_samp_i = (word >> 16) & 0xFFFF;
         word = array.getWord(); // word 10
         short samplePeak_n = word & 0xFFFF;
         short valuePeak_n = (word >> 16) & 0xFFFF;
 
         word = array.getWord(); // word 11
-        short sampleRise_n = word & 0xFFFF;
-        short valueRise0_n = (word >> 16) & 0xFFFF;
+        //short sampleRise_n = word & 0xFFFF;
+        //short valueRise0_n = (word >> 16) & 0xFFFF;
 
         word = array.getWord(); // word 12
-        short valueRise1_n = word & 0xFFFF;
-        short sampleFall_n = (word >> 16) & 0xFFFF;
+        //short valueRise1_n = word & 0xFFFF;
+        //short sampleFall_n = (word >> 16) & 0xFFFF;
 
         word = array.getWord(); // word 13
-        short valueFall0_n = word & 0xFFFF;
-        short valueFall1_n = (word >> 16) & 0xFFFF;
+        //short valueFall0_n = word & 0xFFFF;
+        //short valueFall1_n = (word >> 16) & 0xFFFF;
 
         word = array.getWord(); // word 14
         short integral_n = word & 0xFFFF;

@@ -10,6 +10,10 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
+
+#include <genfit/MeasurementOnPlane.h>
+#include <TVector3.h>
+
 #include <vector>
 
 namespace Belle2 {
@@ -30,8 +34,14 @@ namespace Belle2 {
     using HitObject = AHitObject;
 
     /// Constructor
-    CKFResultObject(ASeedObject* seed, const std::vector<const AHitObject*> hits, double chi2) : m_seed(seed), m_hits(hits),
-      m_chi2(chi2) {}
+    CKFResultObject(ASeedObject* seed, const std::vector<const AHitObject*> hits, const genfit::MeasuredStateOnPlane& mSoP,
+                    double chi2) :
+      m_seed(seed), m_hits(hits), m_chi2(chi2)
+    {
+      m_trackCharge = mSoP.getCharge();
+      m_trackMomentum = mSoP.getMom();
+      m_trackPosition = mSoP.getPos();
+    }
 
     /// Getter for the stored hits
     const std::vector<const AHitObject*>& getHits() const
@@ -63,6 +73,42 @@ namespace Belle2 {
       m_teacherInformation = teacherInformation;
     }
 
+    /// Get the position this track should start at
+    const TVector3& getPosition() const
+    {
+      return m_trackPosition;
+    }
+
+    /// Get the position this track should start at
+    void setPosition(const TVector3& position)
+    {
+      m_trackPosition = position;
+    }
+
+    /// Get the momentum this track should start at (defined at the position)
+    const TVector3& getMomentum() const
+    {
+      return m_trackMomentum;
+    }
+
+    /// Set the momentum this track should start at (defined at the position)
+    void setMomentum(const TVector3& momentum)
+    {
+      m_trackMomentum = momentum;
+    }
+
+    /// Set the charge of the track
+    short getCharge() const
+    {
+      return m_trackCharge;
+    }
+
+    /// Set the charge of the track
+    void setCharge(short charge)
+    {
+      m_trackCharge = charge;
+    }
+
   private:
     /// The stored seed
     ASeedObject* m_seed;
@@ -72,5 +118,11 @@ namespace Belle2 {
     double m_chi2;
     /// A weight, which transports the teacher information
     TrackFindingCDC::Weight m_teacherInformation = NAN;
+    /// The position this track should start at
+    TVector3 m_trackPosition;
+    /// The momentum this track should start at (defined at the position)
+    TVector3 m_trackMomentum;
+    /// The charge of the track
+    short m_trackCharge = 0;
   };
 }

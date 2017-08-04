@@ -76,7 +76,7 @@ bool AdvanceAlgorithm::extrapolateToPlane(genfit::MeasuredStateOnPlane& measured
     measuredStateOnPlane.extrapolateToPlane(plane);
     genfit::MaterialEffects::getInstance()->setNoEffects(false);
   } catch (genfit::Exception e) {
-    B2WARNING(e.what());
+    B2DEBUG(50, "Extrapolation failed: " << e.what());
     return false;
   }
 

@@ -106,7 +106,7 @@ namespace Belle2 {
       };
       walk(chi2Adder);
 
-      return ResultObject(getSeedRecoTrack(), hits, chi2);
+      return ResultObject(getSeedRecoTrack(), hits, getMeasuredStateOnPlane(), chi2);
     }
 
     /// Return the parent state.

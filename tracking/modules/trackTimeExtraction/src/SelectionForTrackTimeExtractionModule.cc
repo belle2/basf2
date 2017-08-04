@@ -104,12 +104,8 @@ void SelectionForTrackTimeExtractionModule::event()
     for (unsigned int trackCounter = 0;
          trackCounter < std::min(recoTracks.size(), m_param_maximalNumberOfTracks); trackCounter++) {
       RecoTrack* maximumPtRecoTrack = recoTracks[trackCounter];
-      RecoTrack* selectedRecoTrack = selectedRecoTracks.appendNew(maximumPtRecoTrack->getPositionSeed(),
-                                                                  maximumPtRecoTrack->getMomentumSeed(),
-                                                                  maximumPtRecoTrack->getChargeSeed());
 
-      // retain the seed time of the original track. Important for t0 extraction.
-      selectedRecoTrack->setTimeSeed(maximumPtRecoTrack->getTimeSeed());
+      RecoTrack* selectedRecoTrack = maximumPtRecoTrack->copyToStoreArray(selectedRecoTracks);
       selectedRecoTrack->addHitsFromRecoTrack(maximumPtRecoTrack);
     }
 

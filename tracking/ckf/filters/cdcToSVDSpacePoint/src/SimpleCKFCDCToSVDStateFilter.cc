@@ -37,27 +37,6 @@ Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStat
     return 1;
   }
 
-  // Check the distance (in ladders and sensors) to the last hit and only allow those, which point "more or less" to
-  // the origin
-  if (not isOnOverlapLayer(currentState)) {
-    const auto* overlappingParent = currentState.getParent();
-    if (overlappingParent) {
-      const auto* lastLayerParent = overlappingParent->getParent();
-      if (lastLayerParent and lastLayerParent->getHit()) {
-        const VxdID& currentID = spacePoint->getVxdID();
-        const VxdID& lastID = lastLayerParent->getHit()->getVxdID();
-
-        const int deltaSensor = lastID.getSensorNumber() - currentID.getSensorNumber();
-        const int deltaLadder = mod(lastID.getLadderNumber() - currentID.getLadderNumber(),
-                                    VXD::GeoCache::getInstance().getLadders(currentID).size());
-
-        if ((deltaSensor != 0 and deltaSensor != 1) or (deltaLadder > 5)) {
-          return NAN;
-        }
-      }
-    }
-  }
-
   const Vector3D position(currentState.getMSoPPosition());
   const Vector3D hitPosition(currentState.getHit()->getPosition());
 

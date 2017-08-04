@@ -48,9 +48,9 @@ namespace Belle2 {
      * Output: float corresponding to the charge [e] converted
      * from the read ADC pulse.
      */
-    float getChargeFromADC(VxdID , bool , unsigned char,  unsigned char pulseADC)
+    float getChargeFromADC(Belle2::VxdID sensorID, bool isU, unsigned char strip,  unsigned char pulseADC)
     {
-      return (float) pulseADC * getGain(VxdID , bool, unsigned char);
+      return (float) pulseADC * getGain(sensorID, isU, strip);
     }
 
     /** Return an integer corresponding to the ADC pulse
@@ -70,9 +70,9 @@ namespace Belle2 {
      * for the correponding input charge, on the given strip.
      */
     // it was previously defined as unsigned char, but not working
-    int getADCFromCharge(VxdID , bool, unsigned char, float charge)
+    int getADCFromCharge(Belle2::VxdID sensorID, bool isU, unsigned char strip, float charge)
     {
-      return charge / getGain(VxdID , bool, unsigned char);
+      return charge / getGain(sensorID, isU, strip);
     }
 
     /** Return the peaking time of the strip.

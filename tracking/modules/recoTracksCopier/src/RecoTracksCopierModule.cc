@@ -38,15 +38,7 @@ void RecoTracksCopierModule::initialize()
 void RecoTracksCopierModule::event()
 {
   for (const RecoTrack& recoTrack : m_inputRecoTracks) {
-    RecoTrack* newRecoTrack = m_outputRecoTracks.appendNew(recoTrack.getPositionSeed(), recoTrack.getMomentumSeed(),
-                                                           recoTrack.getChargeSeed(),
-                                                           recoTrack.getStoreArrayNameOfCDCHits(),
-                                                           recoTrack.getStoreArrayNameOfSVDHits(),
-                                                           recoTrack.getStoreArrayNameOfPXDHits(),
-                                                           recoTrack.getStoreArrayNameOfBKLMHits(),
-                                                           recoTrack.getStoreArrayNameOfEKLMHits(),
-                                                           recoTrack.getStoreArrayNameOfRecoHitInformation());
-
+    RecoTrack* newRecoTrack = recoTrack.copyToStoreArray(m_outputRecoTracks);
     newRecoTrack->addHitsFromRecoTrack(&recoTrack);
   }
 }

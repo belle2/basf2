@@ -78,6 +78,10 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
 
       // Otherwise reconstruct the position into the third dimension
       CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit, trajectory3D);
+      if (std::isnan(recoHit3D.getArcLength2D())) {
+        B2DEBUG(100, "Had to skip a NAN hit");
+        continue;
+      }
       recoHits3D.push_back(recoHit3D);
       trackHitRelations.push_back({track, weight, &recoHits3D.back()});
     }

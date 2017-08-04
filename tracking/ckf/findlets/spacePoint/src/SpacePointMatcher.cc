@@ -78,7 +78,7 @@ void SpacePointMatcher::beginRun()
 
   for (const auto& currentLayer : layers) {
     const auto& currentLayerNumber = currentLayer.getLayerNumber();
-    if (currentLayerNumber == 0) {
+    if (currentLayerNumber <= 1) {
       continue;
     }
     auto nextLayer = currentLayer;

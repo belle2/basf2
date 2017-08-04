@@ -62,6 +62,7 @@ namespace Belle2 {
     TreeSearchFindlet() : Super()
     {
       Super::addProcessingSignalListener(&m_hitSelector);
+      Super::addProcessingSignalListener(&m_hitFinder);
     }
 
     /// Expose the parameters of the subfindlet

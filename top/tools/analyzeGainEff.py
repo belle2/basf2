@@ -134,8 +134,8 @@ if not skipFirst:
     first = create_path()
 
     srootInput = register_module('SeqRootInput')
-    srootInput.param('inputFileName', inputFiles[0])
-    # srootInput.param('inputFileNames', inputFiles)
+    srootInput.param('inputFileName', "")
+    srootInput.param('inputFileNames', inputFiles)
     first.add_module(srootInput)
 
     # HistoManager

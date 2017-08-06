@@ -36,7 +36,7 @@ namespace Belle2 {
   public:
 
     /* Assign a common family identifier to all Nodes in the network that are connected.
-     * Performs a depth first flood fill algorithm.
+     * Performs a width first flood fill algorithm.
      * Returns total number of defined families.
      */
     short defineFamilies(ContainerType& aNetwork)
@@ -60,16 +60,19 @@ namespace Belle2 {
         neighbours.insert(neighbours.end(), innerNeighbours.begin(), innerNeighbours.end());
         neighbours.insert(neighbours.end(), outerNeighbours.begin(), outerNeighbours.end());
 
-        recursivlyMarkNodes(currentFamily, neighbours);
+        while (neighbours.size() != 0) {
+          neighbours = markNodes(currentFamily, neighbours);
+        }
         currentFamily++;
       }
       return currentFamily;
     }
 
   private:
-    /* Assign family recursively to all connected nodes.*/
-    void recursivlyMarkNodes(short family, NeighbourContainerType& neighbours)
+    /* Assign family to all connected nodes and return their neighbours.*/
+    NeighbourContainerType markNodes(short family, NeighbourContainerType& neighbours)
     {
+      NeighbourContainerType newNeighbours;
       B2DEBUG(1, "Mark node for family: " << family << " with " << neighbours.size() << " neighbour nodes.");
       for (auto& neighbour : neighbours) {
         auto& metaInfo = neighbour->getMetaInfo();
@@ -80,16 +83,12 @@ namespace Belle2 {
           else continue;
         }
         metaInfo.setFamily(family);
-
         NeighbourContainerType& innerNeighbours = neighbour->getInnerNodes();
         NeighbourContainerType& outerNeighbours = neighbour->getOuterNodes();
-        NeighbourContainerType newNeighbours;
-        newNeighbours.reserve(innerNeighbours.size() + outerNeighbours.size());
         newNeighbours.insert(newNeighbours.end(), innerNeighbours.begin(), innerNeighbours.end());
         newNeighbours.insert(newNeighbours.end(), outerNeighbours.begin(), outerNeighbours.end());
-
-        recursivlyMarkNodes(family, newNeighbours);
       }
+      return newNeighbours;
     }
   };
 }

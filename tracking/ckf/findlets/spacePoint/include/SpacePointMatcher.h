@@ -69,7 +69,8 @@ namespace Belle2 {
   TrackFindingCDC::ChainedArray<SpacePointMatcher::RangeType> SpacePointMatcher::getMatchingHits(AStateObject& currentState)
   {
     const unsigned int currentNumber = currentState.getNumber();
-    const unsigned int nextLayer = extractGeometryLayer(currentState) - 1;
+    const unsigned int currentLayer = extractGeometryLayer(currentState);
+    const unsigned int nextLayer = currentLayer - 1;
     const SpacePoint* lastAddedSpacePoint = currentState.getHit();
 
     std::vector<RangeType> nextRanges;
@@ -119,10 +120,11 @@ namespace Belle2 {
         // we first substract 1 from the ladder number to have a ladder counting from 0 to N - 1,
         // then we subtract one to get to the next (overlapping) ladder and % N, to also cope for the
         // highest number. Then we add 1 again, to go from the counting from 0 .. N-1 to 1 .. N.
-        const unsigned int overlappingLadder = ((ladderNumber - 1) - 1) % maximumLadderNumber + 1;
+        // The + maximumLadderNumber in between makes sure, we are not ending with negative numbers
+        const unsigned int overlappingLadder = ((ladderNumber + maximumLadderNumber - 1) - 1) % maximumLadderNumber + 1;
 
         B2DEBUG(100, "Overlap check on " << ladderNumber << " using from " << overlappingLadder);
-        fillInAllRanges(nextRanges, nextLayer, overlappingLadder);
+        fillInAllRanges(nextRanges, currentLayer, overlappingLadder);
       }
     }
 

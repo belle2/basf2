@@ -3,6 +3,10 @@
 
 # Dennis Weyland 2017
 
+# This example shows how to remove bias on one or several spectator variables.
+# Relevant paper: https://arxiv.org/abs/1611.01046
+# use basf2_mva_evaluation.py with train.root and test.root at the end to see the impact on the spectator variables.
+
 import basf2
 import basf2_mva
 from basf2_mva_python_interface.contrib_keras import State
@@ -24,6 +28,13 @@ import numpy as np
 
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
+    """
+    Building 3 keras models:
+    1. Network without adversary, used for apply data.
+    2. Freezed MLP with unfreezed Adverserial Network to train adverserial part of network.
+    3. Unfreezed MLP with freezed adverserial to train MLP part of the network,
+       combined with losses of the adverserial networks.
+    """
 
     def gaussian(input):
         z, means, widths, fractions = input
@@ -108,7 +119,8 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
 def partial_fit(state, X, S, y, w, epoch):
     """
-    Pass received data to tensorflow session
+    Fit the model.
+    For every training step of MLP. Adverserial Network will be trained K times.
     """
     if not state.use_adv:
         state.model.train_on_batch(X, y)

@@ -3,11 +3,10 @@
 
 # Dennis Weyland 2017
 
-import numpy as np
-import tensorflow as tf
+# This example shows the implementation of a simple MLP in keras.
+
 import basf2_mva
 import basf2_mva_util
-import pandas
 import time
 
 from basf2_mva_python_interface.contrib_keras import State
@@ -22,6 +21,7 @@ from keras.optimizers import adam
 from keras.losses import binary_crossentropy
 from keras.activations import sigmoid, tanh
 from keras.callbacks import Callback
+
 
 old_time = time.time()
 

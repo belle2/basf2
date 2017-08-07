@@ -3,6 +3,8 @@
 
 # Dennis Weyland 2017
 
+# This example shows how to convert a model trained with keras inside a basf2 weightfile.
+
 from basf2_mva_python_interface.contrib_keras import State
 
 import tensorflow as tf
@@ -44,6 +46,9 @@ if __name__ == "__main__":
     from keras.activations import sigmoid, tanh
 
     # ##############Building Data samples ###########################
+    # The training needs the same variables in the same orders as keras received them during training.
+    # For this example we just create some random variables.
+
     variables = ['x' + str(i) for i in range(10)]
 
     data = np.random.normal(size=[1000, 11])

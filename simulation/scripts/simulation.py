@@ -169,3 +169,6 @@ def add_simulation(
     if components is None or 'EKLM' in components:
         eklm_digitizer = register_module('EKLMDigitizer')
         path.add_module(eklm_digitizer)
+
+    # statistics summary
+    path.add_module('StatisticsSummary').set_name('Sum_Simulation')

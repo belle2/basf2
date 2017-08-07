@@ -55,11 +55,11 @@ std::unique_ptr<BaseCKFCKFVXDToWireHitStateFilter>
 CKFVXDToWireHitStateFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<NoneFilter<BaseCKFCKFVXDToWireHitStateFilter>>();
+    return std::make_unique<NoneFilter<BaseCKFCKFVXDToWireHitStateFilter>>();
   } else if (filterName == "all") {
-    return makeUnique<AllCKFVXDToWireHitStateFilter>();
+    return std::make_unique<AllCKFVXDToWireHitStateFilter>();
   } else if (filterName == "truth") {
-    return makeUnique<MCCKFVXDToWireHitStateFilter>();
+    return std::make_unique<MCCKFVXDToWireHitStateFilter>();
   } else {
     return Super::create(filterName);
   }

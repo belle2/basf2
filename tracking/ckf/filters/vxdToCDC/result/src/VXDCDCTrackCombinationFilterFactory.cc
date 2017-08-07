@@ -63,13 +63,13 @@ VXDCDCTrackCombinationFilterFactory::create(const std::string& filterName) const
 {
   // TODO: Implement a simple, recording and mva filter here (with a var set)
   if (filterName == "none") {
-    return makeUnique<NoneFilter<BaseVXDCDCTrackCombinationFilter>>();
+    return std::make_unique<NoneFilter<BaseVXDCDCTrackCombinationFilter>>();
   } else if (filterName == "all") {
-    return makeUnique<AllVXDCDCTrackCombinationFilter >();
+    return std::make_unique<AllVXDCDCTrackCombinationFilter >();
   } else if (filterName == "truth") {
-    return makeUnique<MCVXDCDCTrackCombinationFilter >();
+    return std::make_unique<MCVXDCDCTrackCombinationFilter >();
   } else if (filterName == "truth_teacher") {
-    return makeUnique<MCCTruthTeacherVXDCDCTrackCombinationFilter>("truth_teacher");
+    return std::make_unique<MCCTruthTeacherVXDCDCTrackCombinationFilter>("truth_teacher");
   } else {
     return Super::create(filterName);
   }

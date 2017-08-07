@@ -75,19 +75,19 @@ std::unique_ptr<BaseCKFCDCToSpacePointStateObjectFilter>
 CKFCDCToSpacePointStateObjectFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<NoneFilter<BaseCKFCDCToSpacePointStateObjectFilter>>();
+    return std::make_unique<NoneFilter<BaseCKFCDCToSpacePointStateObjectFilter>>();
   } else if (filterName == "all") {
-    return makeUnique<AllCKFCDCToSpacePointStateObjectFilter>();
+    return std::make_unique<AllCKFCDCToSpacePointStateObjectFilter>();
   } else if (filterName == "svd_simple") {
-    return makeUnique<SimpleCKFCDCToSVDStateFilter>();
+    return std::make_unique<SimpleCKFCDCToSVDStateFilter>();
   } else if (filterName == "pxd_simple") {
-    return makeUnique<SimpleCKFPXDStateFilter>();
+    return std::make_unique<SimpleCKFPXDStateFilter>();
   } else if (filterName == "truth") {
-    return makeUnique<MCCKFCDCToSpacePointStateObjectFilter>();
+    return std::make_unique<MCCKFCDCToSpacePointStateObjectFilter>();
   } else if (filterName == "recording") {
-    return makeUnique<RecordingCKFCDCToSpacePointStateObjectFilter>("CKFCDCToSpacePointStateObjectFilter.root");
+    return std::make_unique<RecordingCKFCDCToSpacePointStateObjectFilter>("CKFCDCToSpacePointStateObjectFilter.root");
   } else if (filterName == "basic_recording") {
-    return makeUnique<BasicRecordingCKFCDCToSpacePointStateObjectFilter>("CKFCDCToSpacePointStateObjectFilter.root");
+    return std::make_unique<BasicRecordingCKFCDCToSpacePointStateObjectFilter>("CKFCDCToSpacePointStateObjectFilter.root");
   } else {
     return Super::create(filterName);
   }

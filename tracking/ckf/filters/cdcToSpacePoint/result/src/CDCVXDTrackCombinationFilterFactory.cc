@@ -74,17 +74,17 @@ std::unique_ptr<BaseCDCVXDTrackCombinationFilter>
 CDCVXDTrackCombinationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<NoneFilter<BaseCDCVXDTrackCombinationFilter>>();
+    return std::make_unique<NoneFilter<BaseCDCVXDTrackCombinationFilter>>();
   } else if (filterName == "all") {
-    return makeUnique<AllCDCVXDTrackCombinationFilter >();
+    return std::make_unique<AllCDCVXDTrackCombinationFilter >();
   } else if (filterName == "recording") {
-    return makeUnique<RecordingCDCVXDTrackCombinationFilter>();
+    return std::make_unique<RecordingCDCVXDTrackCombinationFilter>();
   } else if (filterName == "mva") {
-    return makeUnique<MVACDCVXDTrackCombinationFilter>("tracking/data/ckf_CDCVXDTrackCombination.xml");
+    return std::make_unique<MVACDCVXDTrackCombinationFilter>("tracking/data/ckf_CDCVXDTrackCombination.xml");
   } else if (filterName == "truth") {
-    return makeUnique<MCCDCVXDTrackCombinationFilter >();
+    return std::make_unique<MCCDCVXDTrackCombinationFilter >();
   } else if (filterName == "truth_teacher") {
-    return makeUnique<MCCTruthTeacherCDCVXDTrackCombinationFilter>("truth_teacher");
+    return std::make_unique<MCCTruthTeacherCDCVXDTrackCombinationFilter>("truth_teacher");
   } else {
     return Super::create(filterName);
   }

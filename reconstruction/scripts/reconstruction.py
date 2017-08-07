@@ -66,6 +66,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                 use_vxdtf2=use_vxdtf2,
                                 use_second_cdc_hits=use_second_cdc_hits)
 
+    # Statistics summary
+    path.add_module('StatisticsSummary').set_name('Sum_Tracking')
+
     # Add further reconstruction modules
     add_posttracking_reconstruction(path,
                                     components=components,
@@ -131,6 +134,9 @@ def add_cosmics_reconstruction(
                                    top_in_counter=top_in_counter,
                                    use_second_cdc_hits=use_second_cdc_hits)
 
+    # Statistics summary
+    path.add_module('StatisticsSummary').set_name('Sum_Tracking')
+
     # Add further reconstruction modules
     add_posttracking_reconstruction(path,
                                     components=components,
@@ -154,6 +160,9 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExp
                                    components=components,
                                    pruneTracks=False,
                                    use_second_cdc_hits=use_second_cdc_hits)
+
+    # Statistics summary
+    path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path,
@@ -182,6 +191,8 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         add_top_modules(path, components)
         add_arich_modules(path, components)
 
+    path.add_module('StatisticsSummary').set_name('Sum_PID')
+
     if trigger_mode in ["fast_reco", "all"]:
         add_ecl_modules(path, components)
 
@@ -202,6 +213,8 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     if trigger_mode in ["all"] and addClusterExpertModules:
         # FIXME: Disabled for HLT until execution time bug is fixed
         add_cluster_expert_modules(path, components)
+
+    path.add_module('StatisticsSummary').set_name('Sum_Clustering')
 
 
 def add_mdst_output(

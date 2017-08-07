@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/core/Module.h>
 #include <framework/core/ProcessStatistics.h>
 
 #include <framework/logging/Logger.h>

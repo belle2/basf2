@@ -177,8 +177,7 @@ namespace {
     public:
 
 
-      void
-      print(void)
+      void print(void)
       {
         cout << "The NamedSet: "  << m_name << " contains:" << endl ;
         for (auto set : m_set) {
@@ -196,28 +195,24 @@ namespace {
       }
 
       // order relation
-      bool
-      operator()(const NamedSet& a, const NamedSet& b) const
+      bool operator()(const NamedSet& a, const NamedSet& b) const
       {
         return a.getName() < b.getName();
       }
 
       // accessors
-      const string
-      getName(void) const
+      const string getName(void) const
       {
         return m_name;
       }
 
-      StoreArray< StoredElement >&
-      storedArray(void)
+      StoreArray< StoredElement >& storedArray(void)
       {
         return m_storeArray;
       }
 
 
-      void
-      initializeDatastore(void)
+      void initializeDatastore(void)
       {
         // this method take care of the initialization of the
         // StoreArray
@@ -230,8 +225,7 @@ namespace {
         DataStore::Instance().setInitializeActive(false);
       }
 
-      void
-      initializeDatastore(string SetName)
+      void initializeDatastore(string SetName)
       {
         // this method take care of the initialization of the
         // store array and of the RelationArrays from and to
@@ -247,10 +241,9 @@ namespace {
         //TODO one of these is wrong! -> getRelationsWith() would return both directions
 
         DataStore::Instance().setInitializeActive(false);
-      };
+      }
 
-      void
-      consolidate()
+      void consolidate()
       {
         // this method consolidate the StoreArray and the RelationArrays
         // to and from the set
@@ -260,70 +253,58 @@ namespace {
           from->consolidate();
         if (to != NULL)
           to->consolidate();
-      };
+      }
 
 
-      void
-      appendNewElement(KeyElementType element)
+      void appendNewElement(KeyElementType element)
       {
         m_set.insert(pair< KeyElementType, Relations > (element, Relations(element)));
-
       }
 
-      void
-      appendNewRelationTo(KeyElementType from, const string& toName, KeyElementType to,
-                          double weight)
+      void appendNewRelationTo(KeyElementType fromKey, const string& toName, KeyElementType toKey,
+                               double weight)
       {
-        auto fromElement = m_set.find(from);
+        auto fromElement = m_set.find(fromKey);
         if (fromElement == m_set.end()) {
           cout << "??" << endl;
-          return ; // quietly skip
+          return; // quietly skip
         }
-
-        fromElement->second.appendNewRelationTo(toName, to, weight);
-
+        fromElement->second.appendNewRelationTo(toName, toKey, weight);
       }
 
-      bool
-      isPresentRelationFromTo(const KeyElementType& from, const string& otherSetName ,
-                              const KeyElementType& to) const
+      bool isPresentRelationFromTo(const KeyElementType& fromKey, const string& otherSetName ,
+                                   const KeyElementType& toKey) const
       {
-        auto fromElement = m_set.find(from);
-        if (fromElement != m_set.end())
-          return fromElement->second.isPresentRelationTo(otherSetName, to);
-        else {
+        auto fromElement = m_set.find(fromKey);
+        if (fromElement != m_set.end()) {
+          return fromElement->second.isPresentRelationTo(otherSetName, toKey);
+        } else {
           static int i(0);
           if (i ++ < 999 || (i % 100) == 0) {
-            cout << "Error: from: " << getName() << " id " <<  from  <<
-                 " -> " << otherSetName << " id " << to << endl;
+            cout << "Error: from: " << getName() << " id " <<  fromKey  <<
+                 " -> " << otherSetName << " id " << toKey << endl;
             for (auto element : m_set)
               cout << element.first << "\t";
             cout << endl;
             for (auto element : m_storeArray)
               cout << element.GetUniqueID() << "\t";
             cout << endl;
-
-
-          }
-
-          else if (i == 1000)
+          } else if (i == 1000) {
             cout << "Skipping 99% of the following errors" << endl;
+          }
           return false;
         }
-
       }
 
-      const FromTargetElementsToWeight&
-      getAllRelations(const KeyElementType& from, const string& toOtherSetName) const
+      const FromTargetElementsToWeight& getAllRelations(const KeyElementType& fromKey, const string& toOtherSetName) const
       {
-        auto fromElement = m_set.find(from);
+        auto fromElement = m_set.find(fromKey);
         return fromElement->second.getAllRelations(toOtherSetName);
       }
 
       typedef map< KeyElementType , FromTargetElementsToWeight > StlRelationArray;
 
-      StlRelationArray
-      getRestrictedDomainRelationTo(const string& toOtherSetName)const
+      StlRelationArray getRestrictedDomainRelationTo(const string& toOtherSetName)const
       {
         StlRelationArray theInducedRelation;
         for (auto element : m_set) {
@@ -335,8 +316,7 @@ namespace {
         return theInducedRelation;
       }
 
-      StlRelationArray
-      getRestrictedCodomainRelationTo(const string& setName)const
+      StlRelationArray getRestrictedCodomainRelationTo(const string& setName)const
       {
         StlRelationArray theInducedRelation;
         for (auto element : m_set) {
@@ -357,8 +337,7 @@ namespace {
         return theInducedRelation;
       }
 
-      StlRelationArray
-      getRestrictedSelfRelation(void) const
+      StlRelationArray getRestrictedSelfRelation(void) const
       {
         StlRelationArray theInducedRelation;
         for (auto element : m_set) {

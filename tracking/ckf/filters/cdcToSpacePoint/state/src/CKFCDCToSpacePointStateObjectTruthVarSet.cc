@@ -41,7 +41,6 @@ bool CKFCDCToSpacePointStateObjectTruthVarSet::extract(const BaseCKFCDCToSpacePo
   var<named("truth_momentum_y")>() = 0;
   var<named("truth_momentum_z")>() = 0;
   var<named("truth")>() = false;
-  var<named("truth_no_curler")>() = false;
   var<named("space_point_number")>() = -1;
 
   // In case the CDC track is a fake, return false always
@@ -63,31 +62,6 @@ bool CKFCDCToSpacePointStateObjectTruthVarSet::extract(const BaseCKFCDCToSpacePo
 
   if (not isCorrectHit(*spacePoint, *cdcMCTrack)) {
     // Keep all variables set to false and return.
-    return true;
-  }
-
-  var<named("truth_no_curler")>() = true;
-
-  // Test if these clusters are on the first half of the track
-  // The track needs to have some hits, so we can savely access the first element
-  const auto& recoHitInformations = cdcMCTrack->getRecoHitInformations(true);
-
-  const auto& isCDCHit = [](RecoHitInformation * recoHitInformation) {
-    return recoHitInformation->getTrackingDetector() == RecoHitInformation::RecoHitDetector::c_CDC;
-  };
-
-  const RecoHitInformation* firstCDCHitInformation = *(std::find_if(recoHitInformations.begin(), recoHitInformations.end(),
-                                                       isCDCHit));
-
-  const RecoHitInformation* firstClusterInformation;
-  if (spacePoint->getType() == VXD::SensorInfoBase::SensorType::SVD) {
-    const auto& relatedSVDClusters = spacePoint->getRelationsWith<SVDCluster>();
-    firstClusterInformation = cdcMCTrack->getRecoHitInformation(relatedSVDClusters[0]);
-  } else {
-    firstClusterInformation = cdcMCTrack->getRecoHitInformation(spacePoint->getRelated<PXDCluster>());
-  }
-
-  if (firstCDCHitInformation->getSortingParameter() < firstClusterInformation->getSortingParameter()) {
     return true;
   }
 

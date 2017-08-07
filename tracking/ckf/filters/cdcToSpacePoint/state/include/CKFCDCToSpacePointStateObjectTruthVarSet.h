@@ -18,7 +18,6 @@ namespace Belle2 {
   constexpr
   static char const* const ckfCDCToSpacePointStateObjectTruthVarNames[] = {
     "truth",
-    "truth_no_curler",
     "truth_position_x",
     "truth_position_y",
     "truth_position_z",

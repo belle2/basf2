@@ -12,6 +12,7 @@
 #include <tracking/ckf/utilities/StateAlgorithms.h>
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 using namespace std;
 using namespace Belle2;
@@ -54,7 +55,21 @@ bool CKFCDCToSpacePointStateObjectTruthVarSet::extract(const BaseCKFCDCToSpacePo
       var<named("truth")>() = true;
       return true;
     } else {
-      return false;
+      // it is also fine, if the MC track does not have this layer
+      const auto& svdHits = cdcMCTrack->getSVDHitList();
+      const auto& pxdHits = cdcMCTrack->getPXDHitList();
+
+      const bool hasLayer = TrackFindingCDC::any(svdHits, [&result](const SVDCluster * cluster) {
+        return cluster->getSensorID().getLayerNumber() == extractGeometryLayer(*result);
+      }) or TrackFindingCDC::any(pxdHits, [&result](const PXDCluster * cluster) {
+        return cluster->getSensorID().getLayerNumber() == extractGeometryLayer(*result);
+      });
+      if (hasLayer) {
+        return true;
+      } else {
+        var<named("truth")>() = true;
+        return true;
+      }
     }
   }
 

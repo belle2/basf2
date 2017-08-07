@@ -52,6 +52,17 @@ namespace Belle2 {
 
     void fillInAllRanges(std::vector<RangeType>& ranges,
                          unsigned short layer, unsigned short ladder = 0);
+
+    void fillInAllRanges(std::vector<RangeType>& ranges, const VxdID& vxdID)
+    {
+      const auto& nextSensorIDs = m_sensorMapping.equal_range(vxdID);
+      for (const auto& nextSensorIDPair : TrackFindingCDC::asRange(nextSensorIDs)) {
+        const auto& nextSensorID = nextSensorIDPair.second;
+        if (m_cachedHitMap.find(nextSensorID) != m_cachedHitMap.end()) {
+          ranges.push_back(m_cachedHitMap[nextSensorID]);
+        }
+      }
+    }
   };
 
   template<class AStateObject>
@@ -65,9 +76,20 @@ namespace Belle2 {
 
     if (currentNumber == currentState.getMaximumNumber()) {
       // we came directly from a CDC seed, here. We just return all hits on the most outer layer
-      // TODO: We can do better here!
-      // TODO: use the SVD information if present!
-      fillInAllRanges(nextRanges, nextLayer);
+      const auto* seed = currentState.getSeedRecoTrack();
+      const auto& svdHits = seed->getSortedSVDHitList();
+      if (svdHits.size() > 0) {
+        const SVDCluster* firstSVDCluster = svdHits.front();
+        const auto& currentID = firstSVDCluster->getSensorID();
+        if (currentID.getLayerNumber() == 3) {
+          fillInAllRanges(nextRanges, currentID);
+        } else {
+          fillInAllRanges(nextRanges, nextLayer);
+        }
+      } else {
+        // TODO: We can do better here, e.g use the CDC trajectory!
+        fillInAllRanges(nextRanges, nextLayer);
+      }
     } else if (isOnOverlapLayer(currentState)) {
       // next layer is not an overlap one, so we can just return all hits of the next layer,
       // that are in our sensor mapping. If there is no hit on this (overlap) layer, we use the hit
@@ -80,13 +102,7 @@ namespace Belle2 {
       // we just return all hits of the next layer.
       if (lastAddedSpacePoint) {
         const auto& currentID = lastAddedSpacePoint->getVxdID();
-        const auto& nextSensorIDs = m_sensorMapping.equal_range(currentID);
-        for (const auto& nextSensorIDPair : TrackFindingCDC::asRange(nextSensorIDs)) {
-          const auto& nextSensorID = nextSensorIDPair.second;
-          if (m_cachedHitMap.find(nextSensorID) != m_cachedHitMap.end()) {
-            nextRanges.push_back(m_cachedHitMap[nextSensorID]);
-          }
-        }
+        fillInAllRanges(nextRanges, currentID);
       } else {
         fillInAllRanges(nextRanges, nextLayer);
       }

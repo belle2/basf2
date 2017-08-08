@@ -237,6 +237,11 @@ namespace Belle2 {
 
     void finalize()
     {
+      B2WARNING("load_factor = " << m_nodeMap.load_factor());
+      B2WARNING("max_load_factor = " << m_nodeMap.max_load_factor());
+      B2WARNING("bucket_count = " << m_nodeMap.bucket_count());
+      B2WARNING("max_bucket_count = " << m_nodeMap.max_bucket_count());
+
       if (m_isFinalized) return;
       m_nodes.clear();
       m_nodes.reserve(m_nodeMap.size());

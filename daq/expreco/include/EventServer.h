@@ -1,5 +1,5 @@
-#ifndef ERECO_EVENT_SERVER_H
-#define ERECO_EVENT_SERVER_H
+#ifndef EVENT_SERVER_H
+#define EVENT_SERVER_H
 //+
 // File : ERecoEventServer.h
 // Description : Event server to provide sampled events to outside
@@ -20,10 +20,10 @@
 
 namespace Belle2 {
 
-  class ERecoEventServer {
+  class EventServer {
   public:
-    ERecoEventServer(std::string rbufname, int port);
-    ~ERecoEventServer();
+    EventServer(std::string rbufname, int port);
+    ~EventServer();
 
     int server();  // Loop
 

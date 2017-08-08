@@ -12,7 +12,7 @@
 //#include <stdlib.h>
 //#include <unistd.h>
 
-#include "daq/expreco/ERecoEventServer.h"
+#include "daq/expreco/EventServer.h"
 
 using namespace Belle2;
 using namespace std;
@@ -28,7 +28,7 @@ int main(int argc, char** argv)
   string a1(argv[1]);
   int a2 = atoi(argv[2]);
 
-  ERecoEventServer rs(a1, a2);
+  EventServer rs(a1, a2);
 
   rs.server();
 }

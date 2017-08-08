@@ -68,7 +68,7 @@ PXDInterceptor::fillInterceptList(StoreArray<PXDIntercept>* interceptList, const
       std::list<ROIDetPlane> selectedPlanes;
       B2DEBUG(1, "    append selected planes, position " << gfTrackState.getPos().X() << ", " << gfTrackState.getPos().Y() << ", " <<
               gfTrackState.getPos().Z());
-      m_theROIGeometry.appendSelectedPlanes(&selectedPlanes, gfTrackState.getPos());
+      m_theROIGeometry.appendSelectedPlanes(&selectedPlanes, gfTrackState.getPos(), pxdLayer + 1);
 
       B2DEBUG(1, "    append intercepts for track " << i);
       appendIntercepts(interceptList, selectedPlanes, trackList[i], i, recoTrackToPXDIntercepts);

@@ -27,7 +27,9 @@ old_time = time.time()
 
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
-
+    """
+    Build feed forward keras model
+    """
     input = Input(shape=(number_of_features,))
 
     net = Dense(units=number_of_features, activation=tanh)(input)

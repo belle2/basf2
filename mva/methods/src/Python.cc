@@ -221,17 +221,17 @@ namespace Belle2 {
           double wSum = 0.0;
           double wSum2 = 0.0;
           double mean = 0.0;
-          double S = 0.0;
+          double running_std = 0.0;
           auto feature = training_data.getFeature(iFeature);
           for (uint64_t i = 0; i < weights.size(); ++i) {
             wSum += weights[i];
             wSum2 += weights[i] * weights[i];
             double meanOld = mean;
             mean += (weights[i] / wSum) * (feature[i] - meanOld);
-            S += weights[i] * (feature[i] - meanOld) * (feature[i] - mean);
+            running_std += weights[i] * (feature[i] - meanOld) * (feature[i] - mean);
           }
           means[iFeature] = mean;
-          stds[iFeature] = std::sqrt(S / (wSum - 1));
+          stds[iFeature] = std::sqrt(running_std / (wSum - 1));
         }
       }
 

@@ -23,12 +23,12 @@ double KalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& measuredStat
     double chi2 = 0;
     for (const SVDCluster& relatedCluster : spacePoint.getRelationsTo<SVDCluster>()) {
       SVDRecoHit recoHit(&relatedCluster);
-      chi2 += kalmanStep(measuredStateOnPlane, recoHit);
+      chi2 += kalmanStepImplementation<SVDRecoHit, 1>(measuredStateOnPlane, recoHit);
     }
     return chi2;
   } else if (spacePoint.getType() == VXD::SensorInfoBase::SensorType::PXD) {
     PXDRecoHit recoHit(spacePoint.getRelated<PXDCluster>());
-    return kalmanStep(measuredStateOnPlane, recoHit);
+    return kalmanStepImplementation<PXDRecoHit, 2>(measuredStateOnPlane, recoHit);
   } else {
     B2FATAL("Can not fit unknown type " << spacePoint.getType() << "!");
   }

@@ -20,8 +20,6 @@
 
 namespace Eigen {
   using Vector5d = Matrix<double, 5, 1>;
-  using RowVector5d = Matrix<double, 1, 5>;
-  using Vector1d = Matrix<double, 1, 1>;
   using Matrix5d = Matrix<double, 5, 5>;
 }
 
@@ -51,6 +49,10 @@ namespace Belle2 {
     /// Main function: update the parameters stored in the mSoP of the state using the SP related to this state.
     template <class AStateObject>
     TrackFindingCDC::Weight operator()(AStateObject& currentState) const;
+
+  private:
+    template <class ARecoHit, unsigned int Dimension>
+    double kalmanStepImplementation(genfit::MeasuredStateOnPlane& measuredStateOnPlane, ARecoHit& recoHit) const;
   };
 
   template <class AStateObject>
@@ -87,12 +89,16 @@ namespace Belle2 {
   double KalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
                                         const TrackFindingCDC::CDCRLWireHit& rlWireHit) const;
 
-  template <class ARecoHit>
-  double KalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, ARecoHit& recoHit) const
+  template <class ARecoHit, unsigned int Dimension>
+  double KalmanUpdateFitter::kalmanStepImplementation(genfit::MeasuredStateOnPlane& measuredStateOnPlane, ARecoHit& recoHit) const
   {
     // We will change the state x_k, the covariance C_k and the chi2
-    Eigen::Vector5d x_k_old(measuredStateOnPlane.getState().GetMatrixArray());
-    Eigen::Matrix5d C_k_old(measuredStateOnPlane.getCov().GetMatrixArray());
+    const auto& state = measuredStateOnPlane.getState();
+    B2ASSERT("State must have 5 dimension", state.GetNrows() == 5);
+    Eigen::Vector5d x_k_old(state.GetMatrixArray());
+    const auto& cov = measuredStateOnPlane.getCov();
+    B2ASSERT("Covariance matrix must have 5x5 dimension", cov.GetNrows() == 5 && cov.GetNcols() == 5);
+    Eigen::Matrix5d C_k_old(cov.GetMatrixArray());
 
     // Important: measuredStateOnPlane must already be extrapolated to the correct plane.
     // Only the plane and the rep are accessed (but the rep has no meaningful members).
@@ -102,12 +108,20 @@ namespace Belle2 {
     B2ASSERT("There should be exactly one measurement on plane", measurementsOnPlane.size() == 1);
     const genfit::MeasurementOnPlane& measurementOnPlane = *(measurementsOnPlane.front());
 
-    Eigen::Vector1d m_k(measurementOnPlane.getState().GetMatrixArray());
-    Eigen::RowVector5d H_k(measurementOnPlane.getHMatrix()->getMatrix().GetMatrixArray());
-    Eigen::Vector5d H_k_t = H_k.transpose();
-    Eigen::Vector1d V_k(measurementOnPlane.getCov().GetMatrixArray());
+    const auto& mState = measurementOnPlane.getState();
+    B2ASSERT("Measured state must have " << std::to_string(Dimension) << " dimension", mState.GetNrows() == Dimension);
+    Eigen::Matrix<double, Dimension, 1> m_k(mState.GetMatrixArray());
+    const auto& hMatrix = measurementOnPlane.getHMatrix()->getMatrix();
+    B2ASSERT("H matrix must have 5 x " << std::to_string(Dimension) << " dimension", hMatrix.GetNcols() == 5
+             && hMatrix.GetNrows() == Dimension);
+    Eigen::Matrix<double, Dimension, 5> H_k(hMatrix.GetMatrixArray());
+    Eigen::Matrix<double, 5, Dimension> H_k_t = H_k.transpose();
+    const auto& vMatrix = measurementOnPlane.getCov();
+    B2ASSERT("V matrix must have " << std::to_string(Dimension) << " dimension", vMatrix.GetNrows() == Dimension
+             && vMatrix.GetNcols() == Dimension);
+    Eigen::Matrix<double, Dimension, Dimension> V_k(vMatrix.GetMatrixArray());
 
-    const Eigen::Vector5d& K_k = C_k_old * H_k_t * (V_k + H_k * C_k_old * H_k_t).inverse();
+    const Eigen::Matrix<double, 5, Dimension>& K_k = C_k_old * H_k_t * (V_k + H_k * C_k_old * H_k_t).inverse();
 
     C_k_old -= K_k * H_k * C_k_old;
     x_k_old += K_k * (m_k - H_k * x_k_old);
@@ -115,7 +129,7 @@ namespace Belle2 {
     measuredStateOnPlane.setState(TVectorD(5, x_k_old.data()));
     measuredStateOnPlane.setCov(TMatrixDSym(5, C_k_old.data()));
 
-    Eigen::Vector1d residual = m_k - H_k * x_k_old;
+    const Eigen::Matrix<double, Dimension, 1>& residual = m_k - H_k * x_k_old;
 
     const double chi2 = (residual.transpose() * (V_k - H_k * C_k_old * H_k_t).inverse() * residual).value();
     return chi2;

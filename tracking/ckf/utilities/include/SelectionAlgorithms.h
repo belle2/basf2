@@ -27,19 +27,14 @@ namespace Belle2 {
     }
 
     using State = typename AStateList::value_type;
-
     const auto& weightIsNan = [](const State & state) {
       return std::isnan(state->getWeight());
     };
 
     TrackFindingCDC::erase_remove_if(childStates, weightIsNan);
 
-    const auto& pointerLess = [](const State & lhs, const State & rhs) {
-      return *lhs < *rhs;
-    };
-
     if (useNResults > 0 and childStates.size() > useNResults) {
-      std::sort(childStates.begin(), childStates.end(), pointerLess);
+      std::sort(childStates.begin(), childStates.end(), TrackFindingCDC::LessOf<TrackFindingCDC::Deref>());
       childStates.resize(useNResults);
     }
   }

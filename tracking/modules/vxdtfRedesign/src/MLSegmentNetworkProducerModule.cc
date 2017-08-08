@@ -83,11 +83,11 @@ void MLSegmentNetworkProducerModule::event()
                                                                   innerHit->getEntry().sector->getFullSecID(),
                                                                   &centerHit->getEntry(),
                                                                   &innerHit->getEntry());
-        B2DEBUG(999, "buildSegmentNetwork: innerSegment: " << innerSegment->getName());
-        DirectedNode<Segment<TrackNode>, CACell>* tempInnerSegmentnode = segmentNetwork.getNode(innerSegment->getName());
+        B2DEBUG(999, "buildSegmentNetwork: innerSegment: " << innerSegment->getID());
+        DirectedNode<Segment<TrackNode>, CACell>* tempInnerSegmentnode = segmentNetwork.getNode(innerSegment->getID());
         if (tempInnerSegmentnode == nullptr) {
           segments.push_back(innerSegment);
-          segmentNetwork.addNode(innerSegment->getName(), *innerSegment);
+          segmentNetwork.addNode(innerSegment->getID(), *innerSegment);
         } else {
           delete innerSegment;
           innerSegment = &(tempInnerSegmentnode->getEntry());
@@ -99,26 +99,26 @@ void MLSegmentNetworkProducerModule::event()
                                                                     centerHit->getEntry().sector->getFullSecID(),
                                                                     &outerHit->getEntry(),
                                                                     &centerHit->getEntry());
-          B2DEBUG(999, "buildSegmentNetwork: outerSegment(freshly created): " << outerSegment->getName() <<
-                  " to be linked with inner segment: " << innerSegment->getName());
+          B2DEBUG(999, "buildSegmentNetwork: outerSegment(freshly created): " << outerSegment->getID() <<
+                  " to be linked with inner segment: " << innerSegment->getID());
 
-          DirectedNode<Segment<TrackNode>, CACell>* tempOuterSegmentnode = segmentNetwork.getNode(outerSegment->getName());
+          DirectedNode<Segment<TrackNode>, CACell>* tempOuterSegmentnode = segmentNetwork.getNode(outerSegment->getID());
           if (tempOuterSegmentnode == nullptr) {
             segments.push_back(outerSegment);
-            segmentNetwork.addNode(outerSegment->getName(), *outerSegment);
+            segmentNetwork.addNode(outerSegment->getID(), *outerSegment);
           } else {
             delete outerSegment;
             outerSegment = &(tempOuterSegmentnode->getEntry());
           }
 
-          B2DEBUG(999, "buildSegmentNetwork: outerSegment (after duplicate check): " << outerSegment->getName() <<
-                  " to be linked with inner segment: " << innerSegment->getName());
-          segmentNetwork.linkNodes(outerSegment->getName(), innerSegment->getName());
+          B2DEBUG(999, "buildSegmentNetwork: outerSegment (after duplicate check): " << outerSegment->getID() <<
+                  " to be linked with inner segment: " << innerSegment->getID());
+          segmentNetwork.linkNodes(outerSegment->getID(), innerSegment->getID());
           nLinked++;
           alreadyAdded = true;
           continue;
         }
-        segmentNetwork.addInnerToLastOuterNode(innerSegment->getName());
+        segmentNetwork.addInnerToLastOuterNode(innerSegment->getID());
       } // end inner loop
     } // end center loop
   } // end outer loop

@@ -40,8 +40,9 @@ namespace Belle2 {
     /** iD of sector carrying inner hit */
     FullSecID::BaseType m_innerSector;
 
-    std::string m_name;
-
+//    std::string m_name;
+    // Alternative method with index
+    int m_index;
 
   public:
     /** ************************* CONSTRUCTORS ************************* */
@@ -52,7 +53,9 @@ namespace Belle2 {
       m_innerHit(NULL),
       m_outerSector(FullSecID()),
       m_innerSector(FullSecID()),
-      m_name("Out: missing,\nin: missing") {}
+//      m_name("Out: missing,\nin: missing"),
+      m_index(-1) // Alternative
+    {}
 
 
     /** Constructor.
@@ -67,7 +70,9 @@ namespace Belle2 {
       m_outerSector(outerSector),
       m_innerSector(innerSector)
     {
-      m_name = "Out: " + m_outerHit->getName() + ")" + ",\nin: " + m_innerHit->getName();
+//      m_name = "Out: " + m_outerHit->getName() + ")" + ",\nin: " + m_innerHit->getName();
+      // Alternative
+      m_index = m_outerHit->getID() << 16 | m_innerHit->getID();
     }
 
 
@@ -83,11 +88,16 @@ namespace Belle2 {
 /// getters:
 
     /** returns secID of this sector */
-    std::string getName() const
-    {
-      return  m_name;
-    }
+//    std::string getName() const
+//    {
+//      return  m_name;
+//    }
 
+    /** TODO: Alternative to using long string in hashing methods... */
+    int getID() const
+    {
+      return m_index;
+    }
 
     /** returns inner hit of current Segment */
     inline const HitType* getInnerHit() const { return m_innerHit; }

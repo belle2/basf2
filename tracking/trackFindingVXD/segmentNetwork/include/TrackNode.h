@@ -33,7 +33,9 @@ namespace Belle2 {
     /** pointer to spacePoint */
     SpacePoint* spacePoint;
 
-    std::string m_name;
+//    std::string m_name;
+    // Alternative method with index
+    int m_index;
 
     /** overloaded '=='-operator
      * TODO JKL: pretty ugly operator overload, should be fixed ASAP! (solution for null-ptr-issue needed)
@@ -107,12 +109,15 @@ namespace Belle2 {
 
 
     /** constructor WARNING: sector-pointing has still to be decided! */
-    TrackNode() : sector(nullptr), spacePoint(nullptr), m_name("SP: missing") {}
+    TrackNode() : sector(nullptr), spacePoint(nullptr), m_index(-1) {} //m_name("SP: missing") {}
 
     TrackNode(SpacePoint* spacePoint) :
       sector(nullptr), spacePoint(spacePoint)
     {
-      m_name = "SP: " + spacePoint->getName();
+//      m_name = "SP: " + spacePoint->getName();
+//      m_name = std::to_string(spacePoint->getArrayIndex());
+      // Alternative
+      m_index = spacePoint->getArrayIndex();
     }
 
 
@@ -121,10 +126,17 @@ namespace Belle2 {
 
 
     /** returns secID of this sector */
-    std::string getName() const
+//    std::string getName() const
+//    {
+//      return m_name;
+//    }
+
+    /** TODO: Alternative to using long string in hashing methods... */
+    int getID() const
     {
-      return m_name;
+      return m_index;
     }
+
   };
 
 } //Belle2 namespace

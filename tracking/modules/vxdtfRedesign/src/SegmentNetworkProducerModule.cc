@@ -323,7 +323,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
   for (RawSectorData& outerSectorData : collectedData) {
     ActiveSector<StaticSectorType, TrackNode>* outerSector = new ActiveSector<StaticSectorType, TrackNode>
     (outerSectorData.staticSector);
-    std::string outerEntryID = outerSector->getName();
+    int outerEntryID = outerSector->getID();
 
     // skip double-adding of nodes into the network after first time found -> speeding up the code:
     bool wasAnythingFoundSoFar = false;
@@ -331,7 +331,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
     const std::vector<FullSecID>& innerSecIDs = outerSector->getInner2spSecIDs();
 
     for (const FullSecID innerSecID : innerSecIDs) {
-      std::string innerEntryID = innerSecID.getFullSecString();
+      int innerEntryID = innerSecID;
       vector<RawSectorData>::iterator innerRawSecPos =
         std::find_if(
           collectedData.begin(),
@@ -370,8 +370,8 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
         activeSectors.push_back(outerSector);
         activeSectorNetwork.addNode(outerEntryID, *outerSector);
 
-        B2DEBUG(5, "SegmentNetworkProducerModule::buildActiveSectorNetwork(): sector " << outerSector->getName() <<
-                " will be combined with inner sector " << innerSector->getName());
+        B2DEBUG(5, "SegmentNetworkProducerModule::buildActiveSectorNetwork(): sector " << outerSector->getID() <<
+                " will be combined with inner sector " << innerSector->getID());
 
         if (activeSectorNetwork.linkNodes(outerEntryID, innerEntryID)) {
           wasAnythingFoundSoFar = true;
@@ -440,7 +440,7 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
         bool wasAnythingFoundSoFar = false;
 
 
-        std::string outerNodeID = outerHit->getName();
+        int outerNodeID = outerHit->getID();
         hitNetwork.addNode(outerNodeID, *outerHit);
 
         for (TrackNode* innerHit : innerHits) {
@@ -454,7 +454,7 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
           nAccepted++;
 
 
-          std::string innerNodeID = innerHit->getName();
+          int innerNodeID = innerHit->getID();
           hitNetwork.addNode(innerNodeID, *innerHit);
           // store combination of hits in network:
           if (!wasAnythingFoundSoFar) {
@@ -522,15 +522,15 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         bool accepted = (filter3sp->observe(ObserverType())).accept(outerHit->getEntry().getHit(), centerHit->getEntry().getHit(),
                                                                     innerHit->getEntry().getHit());
 
-        B2DEBUG(5, "buildSegmentNetwork: outer/Center/Inner: " << outerHit->getEntry().getName() << "/" << centerHit->getEntry().getName()
-                << "/" << innerHit->getEntry().getName() << ", accepted: " << std::to_string(accepted));
+        B2DEBUG(5, "buildSegmentNetwork: outer/Center/Inner: " << outerHit->getEntry().getID() << "/" << centerHit->getEntry().getID()
+                << "/" << innerHit->getEntry().getID() << ", accepted: " << std::to_string(accepted));
 
         if (m_PARAMallFiltersOff) accepted = true; // bypass all filters
 
         if (accepted == false) { nRejected++; continue; } // skip combinations which weren't accepted
         nAccepted++;
 
-        std::string innerSegmentID = centerHit->getEntry().getName() + innerHit->getEntry().getName();
+        int innerSegmentID = centerHit->getEntry().getID() << 16 | innerHit->getEntry().getID();
         if (not segmentNetwork.isNodeInNetwork(innerSegmentID)) {
           // create innerSegment first (order of storage in vector<segments> is irrelevant):
           Segment<TrackNode>* innerSegment = new Segment<TrackNode>(
@@ -543,7 +543,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
           segmentNetwork.addNode(innerSegmentID, *innerSegment);
         }
 
-        std::string outerSegmentID = outerHit->getEntry().getName() + centerHit->getEntry().getName();
+        int outerSegmentID = outerHit->getEntry().getID() << 16 | centerHit->getEntry().getID();
         if (not segmentNetwork.isNodeInNetwork(outerSegmentID)) {
           // create innerSegment first (order of storage in vector<segments> is irrelevant):
           Segment<TrackNode>* outerSegment = new Segment<TrackNode>(

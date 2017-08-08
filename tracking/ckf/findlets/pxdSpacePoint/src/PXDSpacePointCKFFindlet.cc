@@ -45,6 +45,10 @@ void PXDSpacePointCKFFindlet::beginEvent()
 void PXDSpacePointCKFFindlet::apply()
 {
   m_dataLoader.apply(m_cdcRecoTrackVector, m_spacePointVector);
+  const auto& notFromPXD = [](const SpacePoint * spacePoint) {
+    return spacePoint->getType() != VXD::SensorInfoBase::PXD;
+  };
+  TrackFindingCDC::erase_remove_if(m_spacePointVector, notFromPXD);
 
   m_treeSearchFindlet.apply(m_cdcRecoTrackVector, m_spacePointVector, m_results);
 

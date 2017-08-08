@@ -427,21 +427,20 @@ def add_ckf_based_track_finding(path, reco_tracks="RecoTracks",
 
     # Then, add the CKF
     # TODO: Merge this into the CKF
-    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
-    path.add_module("CDCToSpacePointCKF",
-                    firstHighFilter="simple",
-                    secondHighFilter="simple",
-                    thirdHighFilter="simple",
+    path.add_module("CDCToSVDSpacePointCKF",
+                    firstHighFilter="svd_simple",
+                    secondHighFilter="svd_simple",
+                    thirdHighFilter="svd_simple",
 
                     filter="mva",
                     filterParameters={"cut": 0.05},
                     allowOverlapBetweenSeeds=True,
-                    useMaterialEffects=False,
+                    advanceUseMaterialEffects=False,
 
                     # TODO: Merge those two parameters!
                     RecoTracksStoreArrayName=cdc_reco_tracks,
                     debuggingRelationsTo=cdc_reco_tracks,
-                    VXDRecoTrackStoreArrayName=vxd_reco_tracks)
+                    outputRecoTrackStoreArrayName=vxd_reco_tracks)
 
     add_vxd_track_finding_vxdtf2(path, components=components, reco_tracks=vxd_reco_tracks,
                                  sectormap_file="/storage/b/fs5-mirror/jowagner/masterthesis/muon_map.root")

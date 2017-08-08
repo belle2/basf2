@@ -101,7 +101,7 @@ namespace Belle2 {
     bool addNode(NodeID nodeID, EntryType& newEntry)
     {
       Node* tmpNode = new Node(newEntry);
-      auto insertOp = m_nodeMap.insert({nodeID, tmpNode});
+      auto insertOp = m_nodeMap.emplace(nodeID, tmpNode);
       if (insertOp.second) {
         m_isFinalized = false;
         return true;

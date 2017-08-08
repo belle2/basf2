@@ -38,4 +38,40 @@ namespace Belle2 {
   {
     return false;
   }
+
+  /// Helper functor for extracting the hit
+  struct HitGetter {
+    /// Marker function for the isFunctor test
+    operator TrackFindingCDC::FunctorTag();
+
+    /// from a general state
+    template <class AState>
+    auto operator()(const AState& state) const -> decltype(state->getHit())
+    {
+      return state->getHit();
+    }
+  };
+
+  /// Helper functor for extrating useful ID information
+  struct HitIDExtractor {
+    /// Marker function for the isFunctor test
+    operator TrackFindingCDC::FunctorTag();
+
+    /// ... from a space point
+    VxdID operator()(const CKFStateObject<RecoTrack, SpacePoint>* state) const
+    {
+      const auto* hit = state->getHit();
+      if (hit) {
+        return hit->getVxdID();
+      } else {
+        return VxdID();
+      }
+    }
+
+    /// ... from a wire hit
+    const WireID& operator()(const CKFStateObject<RecoTrack, TrackFindingCDC::CDCRLWireHit>* state) const
+    {
+      return state->getHit()->getWireID();
+    }
+  };
 }

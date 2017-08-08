@@ -50,6 +50,10 @@ namespace Belle2 {
     template <class AStateObject>
     TrackFindingCDC::Weight operator()(AStateObject& currentState) const;
 
+    template <unsigned int Dimension>
+    std::pair<double, double> updateStateAndCovariance(const genfit::MeasurementOnPlane& measurementOnPlane,
+                                                       Eigen::Vector5d& x_k_old, Eigen::Matrix5d& C_k_old) const;
+
   private:
     template <class ARecoHit, unsigned int Dimension>
     double kalmanStepImplementation(genfit::MeasuredStateOnPlane& measuredStateOnPlane, ARecoHit& recoHit) const;
@@ -89,25 +93,10 @@ namespace Belle2 {
   double KalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
                                         const TrackFindingCDC::CDCRLWireHit& rlWireHit) const;
 
-  template <class ARecoHit, unsigned int Dimension>
-  double KalmanUpdateFitter::kalmanStepImplementation(genfit::MeasuredStateOnPlane& measuredStateOnPlane, ARecoHit& recoHit) const
+  template <unsigned int Dimension>
+  std::pair<double, double> KalmanUpdateFitter::updateStateAndCovariance(const genfit::MeasurementOnPlane& measurementOnPlane,
+      Eigen::Vector5d& x_k_old, Eigen::Matrix5d& C_k_old) const
   {
-    // We will change the state x_k, the covariance C_k and the chi2
-    const auto& state = measuredStateOnPlane.getState();
-    B2ASSERT("State must have 5 dimension", state.GetNrows() == 5);
-    Eigen::Vector5d x_k_old(state.GetMatrixArray());
-    const auto& cov = measuredStateOnPlane.getCov();
-    B2ASSERT("Covariance matrix must have 5x5 dimension", cov.GetNrows() == 5 && cov.GetNcols() == 5);
-    Eigen::Matrix5d C_k_old(cov.GetMatrixArray());
-
-    // Important: measuredStateOnPlane must already be extrapolated to the correct plane.
-    // Only the plane and the rep are accessed (but the rep has no meaningful members).
-    const std::vector<genfit::MeasurementOnPlane*> measurementsOnPlane = recoHit.constructMeasurementsOnPlane(
-          measuredStateOnPlane);
-
-    B2ASSERT("There should be exactly one measurement on plane", measurementsOnPlane.size() == 1);
-    const genfit::MeasurementOnPlane& measurementOnPlane = *(measurementsOnPlane.front());
-
     const auto& mState = measurementOnPlane.getState();
     B2ASSERT("Measured state must have " << std::to_string(Dimension) << " dimension", mState.GetNrows() == Dimension);
     Eigen::Matrix<double, Dimension, 1> m_k(mState.GetMatrixArray());
@@ -123,15 +112,42 @@ namespace Belle2 {
 
     const Eigen::Matrix<double, 5, Dimension>& K_k = C_k_old * H_k_t * (V_k + H_k * C_k_old * H_k_t).inverse();
 
+    const Eigen::Matrix<double, Dimension, 1>& residualBefore = m_k - H_k * x_k_old;
+    const double chi2Before = (residualBefore.transpose() * (V_k - H_k * C_k_old * H_k_t).inverse() * residualBefore).value();
+
     C_k_old -= K_k * H_k * C_k_old;
     x_k_old += K_k * (m_k - H_k * x_k_old);
-
-    measuredStateOnPlane.setState(TVectorD(5, x_k_old.data()));
-    measuredStateOnPlane.setCov(TMatrixDSym(5, C_k_old.data()));
 
     const Eigen::Matrix<double, Dimension, 1>& residual = m_k - H_k * x_k_old;
 
     const double chi2 = (residual.transpose() * (V_k - H_k * C_k_old * H_k_t).inverse() * residual).value();
+    return std::make_pair(chi2Before, chi2);
+  }
+
+  template <class ARecoHit, unsigned int Dimension>
+  double KalmanUpdateFitter::kalmanStepImplementation(genfit::MeasuredStateOnPlane& measuredStateOnPlane, ARecoHit& recoHit) const
+  {
+    // We will change the state x_k, the covariance C_k and the chi2
+    const auto& state = measuredStateOnPlane.getState();
+    B2ASSERT("State must have 5 dimension", state.GetNrows() == 5);
+    Eigen::Vector5d x_k_old(state.GetMatrixArray());
+    const auto& cov = measuredStateOnPlane.getCov();
+    B2ASSERT("Covariance matrix must have 5x5 dimension", cov.GetNrows() == 5 && cov.GetNcols() == 5);
+    Eigen::Matrix5d C_k_old(cov.GetMatrixArray());
+
+    // Important: measuredStateOnPlane must already be extrapolated to the correct plane.
+    // Only the plane and the rep are accessed (but the rep has no meaningful members).
+    const std::vector<genfit::MeasurementOnPlane*> measurementsOnPlane = recoHit.constructMeasurementsOnPlane(
+          measuredStateOnPlane);
+    B2ASSERT("There should be exactly one measurement on plane", measurementsOnPlane.size() == 1);
+    const genfit::MeasurementOnPlane& measurementOnPlane = *(measurementsOnPlane.front());
+
+    double chi2;
+    std::tie(std::ignore, chi2) = updateStateAndCovariance<Dimension>(measurementOnPlane, x_k_old, C_k_old);
+
+    measuredStateOnPlane.setState(TVectorD(5, x_k_old.data()));
+    measuredStateOnPlane.setCov(TMatrixDSym(5, C_k_old.data()));
+
     return chi2;
   }
 

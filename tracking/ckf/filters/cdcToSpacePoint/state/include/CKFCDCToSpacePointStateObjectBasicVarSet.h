@@ -28,6 +28,7 @@ namespace Belle2 {
 
     "layer",
     "number",
+    "overlap",
 
     "arcLengthOfHitPosition",
     "arcLengthOfCenterPosition",

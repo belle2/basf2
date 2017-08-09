@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
 #include <TMath.h>
+#include <tracking/ckf/utilities/StateAlgorithms.h>
 
 using namespace std;
 using namespace Belle2;
@@ -63,6 +64,7 @@ bool CKFCDCToSpacePointStateObjectBasicVarSet::extract(const BaseCKFCDCToSpacePo
 
   var<named("layer")>() = spacePoint->getVxdID().getLayerNumber();
   var<named("number")>() = result->getNumber();
+  var<named("overlap")>() = isOnOverlapLayer(*result);
 
   if (result->isFitted()) {
     var<named("chi2")>() = result->getChi2();

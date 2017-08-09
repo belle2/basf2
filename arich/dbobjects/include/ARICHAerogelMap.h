@@ -90,6 +90,13 @@ namespace Belle2 {
      */
     unsigned int getAerogelLayer(unsigned i) const { if (i < c_layers) { return m_layer[i]; } return 0; }
 
+    /**
+     * Set aerogel info of layer i
+     * @param i aerogel layer
+     */
+    void setAerogelLayer(unsigned int i, unsigned int layer);
+
+
     /** Return Aerogel installation date
      * @return Aerogel installation date
      */

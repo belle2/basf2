@@ -39,9 +39,10 @@ namespace Belle2 {
 
     /**
      * Import sample time calibration constants to database
-     * @param fileName text file name with calibration constants
+     * Output of TOPTimeBaseCalibrator (root files with histograms)
+     * @param fileNames file names separated by space (since vector doesn't work!)
      */
-    void importSampleTimeCalibration(std::string fileName);
+    void importSampleTimeCalibration(std::string fileNames);
 
     /**
      * Import sample time calibration constants to database
@@ -56,6 +57,11 @@ namespace Belle2 {
      * @param fileNames file names separated by space (since vector doesn't work!)
      */
     void importChannelT0CalibrationKichimi(std::string fileNames);
+
+    /**
+     * Prints sample time calibration info about constants stored in database
+     */
+    void getSampleTimeCalibrationInfo();
 
     /**
      * Print sample time calibration constants stored in database

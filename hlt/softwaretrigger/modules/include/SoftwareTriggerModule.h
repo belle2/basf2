@@ -19,23 +19,33 @@ namespace Belle2 {
      * Module to perform cuts on various variables in the event. The cuts can be defined
      * by elements loaded from the database. Each cut is executed and its result stored.
      *
-     * The return value of this module is an integer, which is:
-     * if reject is more important than accept:
+     * The return value of this module is a bool, which is either true (accept the event) or false (reject it).
+     *
+     * This return value is defined by all trigger decision up to now. It is true, if both the fast_reco and hlt
+     * accepted the event and false in all other cases.
+     *
+     * The result for fast_reco and hlt and calculated within each module (depending on the base name):
+     *
+     * It is defined from the results of the cuts in the given trigger menu, which are all evaluated
+     * and the trigger mode (accept mode or not).
+     * if not in accept mode (= reject mode):
      * * 1: if one of the accept cuts has a true result and none of the reject cuts is false ( = accepted)
-     * * 0: if neither one of the accept cuts is true nor one of the reject cuts false ( = don't know)
-     * * -1: if one of the reject cuts is false ( = rejected)
+     * * 0: if neither one of the accept cuts is true nor one of the reject cuts false ( = don't know) or
+     * *    if one of the reject cuts is false ( = rejected)
+     *
+     * In short: event accepted <=> (#true accept cuts > 0) && (#false reject cuts == 0)
      *
      * Please note that the reject cuts override the accept cuts decision in this case!
      *
-     * if accept is more important than reject:
-     * * 1: if one of the accept cuts has a true result. ( = accepted)
-     * * 0: if neither one of the accept cuts is true nor one of the reject cuts false ( = don't know)
-     * * -1: if one of the reject cuts is false and none of the accept cuts is true ( = rejected)
+     * if in accept mode:
+     * * 1: if one of the accept cuts has a true result. ( = accepted) or
+     * *    if neither one of the accept cuts is true nor one of the reject cuts false ( = don't know)
+     * * 0: if one of the reject cuts is false and none of the accept cuts is true ( = rejected)
      *
      * Please note that the accept cuts override the reject cuts decision in this case!
      *
-     * What is more important can be controlled by the flag acceptOverridesReject, which is off by default (so reject is
-     * more important than accept by default).
+     * In short: event accepted <=> (#true accept cuts > 0) || (#false reject cuts == 0)
+     *
      */
     class SoftwareTriggerModule : public Module {
     public:
@@ -61,12 +71,8 @@ namespace Belle2 {
       // Parameters
       /// Base identifier for all cuts downloaded from database.
       std::string m_param_baseIdentifier = "hlt";
-      /// List of identifiers for the different cuts.
-      std::vector<std::string> m_param_cutIdentifiers;
       /// Store Object Pointer name for storing the trigger decision.
       std::string m_param_resultStoreArrayName = "";
-      /// Flag to control which class of cuts is more "important": accept cuts or reject cuts.
-      bool m_param_acceptOverridesReject = false;
       /// Flag to also store the result of the calculations into a root file.
       bool m_param_storeDebugOutputToROOTFile = false;
       /// Prescale with which to save the results of the calculations into the DataStore.
@@ -80,7 +86,7 @@ namespace Belle2 {
       /// Store Object for storing the trigger decision.
       StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
       /// Internal handler object for the DB interface.
-      SoftwareTriggerDBHandler m_dbHandler;
+      std::unique_ptr<SoftwareTriggerDBHandler> m_dbHandler;
       /// Internal handler for the Calculations (will be set in initialize to the correct one).
       std::unique_ptr<SoftwareTriggerCalculation> m_calculation;
       /// TFile to store the debug TTree (or a nullptr if we do not save the debug output).

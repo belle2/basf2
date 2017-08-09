@@ -11,7 +11,8 @@
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/logging/Logger.h>
 
-#include "TH2D.h"
+#include "TH1F.h"
+#include "TH2F.h"
 #include "TMultiGraph.h"
 #include "TPad.h"
 #include "TCanvas.h"
@@ -42,25 +43,34 @@ SpaceResolutionCalibration::SpaceResolutionCalibration():
 
 void SpaceResolutionCalibration::createHisto()
 {
+
+  B2INFO("createHisto");
   readSigma();
   readProfile();
 
-  int m_np = 20;
-  double binwidth = 1. / m_np;
+  const int np = 20;
+  const double binwidth = 1. / np;
 
   TChain* tree = new TChain("tree");
-  tree->Add(m_InputRootFileNames.c_str());
-  cout << " Open file name: " << m_InputRootFileNames.c_str() << endl;
+  tree->Add(m_inputRootFileNames.c_str());
+  B2INFO(" Open file name: " << m_inputRootFileNames.c_str());
   if (!tree->GetBranch("ndf")) {
     B2FATAL("input data do not exits, please check!");
-    gSystem->Exec("echo rootfile do not exits or something wrong >> error");
+    //    gSystem->Exec("echo rootfile do not exits or something wrong >> error");
     return;
   }
 
   int lay;
-  double w, x_u,  x_b, x_mea, Pval; //, chi2;
-  double alpha, theta, ndf;
-  double absRes_u, absRes_b;
+  double w;
+  double x_u;
+  double x_b;
+  double x_mea;
+  double Pval;
+  double alpha;
+  double theta;
+  double ndf;
+  double absRes_u;
+  double absRes_b;
   tree->SetBranchAddress("lay", &lay);
   tree->SetBranchAddress("ndf", &ndf);
   tree->SetBranchAddress("Pval", &Pval);
@@ -83,7 +93,7 @@ void SpaceResolutionCalibration::createHisto()
   vector<double> xbin;
   xbin.push_back(0.);
   xbin.push_back(0.02);
-  for (int i = 1; i < m_np; ++i) {
+  for (int i = 1; i < np; ++i) {
     xbin.push_back(i * binwidth);
   }
 
@@ -91,10 +101,10 @@ void SpaceResolutionCalibration::createHisto()
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nalpha; ++al) {
         for (int th = 0; th < m_ntheta; ++th) {
-          hist_b[il][lr][al][th] = new TH2D(Form("hb_%d_%d_%d_%d", il, lr, al, th),
+          hist_b[il][lr][al][th] = new TH2F(Form("hb_%d_%d_%d_%d", il, lr, al, th),
                                             Form("lay_%d_lr%d_al_%3.0f_th_%3.0f;Drift Length [cm];#DeltaX", il, lr, ialpha[al], itheta[th]),
                                             xbin.size() - 1, &xbin.at(0), yb.size() - 1, &yb.at(0));
-          hist_u[il][lr][al][th] = new TH2D(Form("hu_%d_%d_%d_%d", il, lr, al, th),
+          hist_u[il][lr][al][th] = new TH2F(Form("hu_%d_%d_%d_%d", il, lr, al, th),
                                             Form("lay_%d_lr%d_al_%3.0f_th_%3.0f;Drift Length [cm];#DeltaX", il, lr, ialpha[al], itheta[th]),
                                             xbin.size() - 1, &xbin.at(0), yu.size() - 1, &yu.at(0));
         }
@@ -102,47 +112,48 @@ void SpaceResolutionCalibration::createHisto()
     }
   }
 
-  //  int id_u,id_b;
 
-  B2INFO("Number of Entries: " << tree->GetEntries());
+  const int nEntries = tree->GetEntries();
+  B2INFO("Number of entries: " << nEntries);
   int ith = -99;
   int ial = -99;
   int lr = -99;
-  for (int i = 0; i < tree->GetEntries(); ++i) {
+  for (int i = 0; i < nEntries; ++i) {
     tree->GetEntry(i);
     //cut
     if (std::fabs(x_b) < 0.02 || std::fabs(x_u) < 0.02) continue;
     if (Pval < m_Pvalmin) continue;
     if (ndf < m_ndfmin) continue;
-    //    if(std::fabs(alpha)>2.5) continue;
-    //  if(x_b>0 || x_u>0) continue;
-    // cal theta, alpha index, lr
     for (int k = 0; k < m_nalpha; ++k) {
-      if (alpha < u_alpha[k]) {ial = k; break;}
+      if (alpha < u_alpha[k]) {
+        ial = k;
+        break;
+      }
     }
 
     for (int j = 0; j < m_ntheta; ++j) {
-      if (theta < u_theta[j]) {ith = j; break;}
+      if (theta < u_theta[j]) {
+        ith = j;
+        break;
+      }
     }
 
-    if (x_u > 0)
-      lr = 1;
-    else
-      lr = 0;
+    lr = x_u > 0 ? 1 : 0;
 
     if (ial == -99 || ith == -99 || lr == -99) {
-      TString command = Form("echo error in alpha=%3.2f and theta = %3.2f>> error", alpha, theta);
-      gSystem->Exec(command);
-      B2FATAL("ERROR" << endl); return;
+      TString command = Form("Error in alpha=%3.2f and theta = %3.2f>> error", alpha, theta);
+      //      gSystem->Exec(command);
+      B2FATAL("ERROR" << command);
     }
     absRes_u = fabs(x_mea) - fabs(x_u);
     absRes_b = fabs(x_mea) - fabs(x_b);
 
     hist_u[lay][lr][ial][ith]->Fill(fabs(x_u), absRes_u, w);
     hist_b[lay][lr][ial][ith]->Fill(fabs(x_b), absRes_b, w);
-    //    if(i%1000000==0) cout<<"Entries<<"<<i<<endl;
+
   }
-  cout << "Finish read data" << endl;
+
+  B2INFO("Finish reading data");
 
   TF1* gb = new TF1("gb", "gaus", -0.05, 0.05);
   TF1* gu = new TF1("gu", "gaus", -0.06, 0.06);
@@ -160,7 +171,7 @@ void SpaceResolutionCalibration::createHisto()
   std::vector<double> dxl0;
 
   ofstream ofss("IntReso.dat");
-  int ib1 = int(0.1 / binwidth) + 1;
+  const int ib1 = int(0.1 / binwidth) + 1;
   int firstbin = 1;
   for (int il = 0; il < 56; ++il) {
     for (int lr = 0; lr < 2; ++lr) {
@@ -175,9 +186,9 @@ void SpaceResolutionCalibration::createHisto()
 
           hist_b[il][lr][al][th]->FitSlicesY(g0b, firstbin, ib1, 0);
 
-          hb_m[il][lr][al][th] = (TH1D*)gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th))->Clone(Form("hb_%d_%d_%d_%d_m", il, lr, al,
+          hb_m[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th))->Clone(Form("hb_%d_%d_%d_%d_m", il, lr, al,
                                  th));
-          hb_s[il][lr][al][th] = (TH1D*)gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th))->Clone(Form("hb_%d_%d_%d_%d_s", il, lr, al,
+          hb_s[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th))->Clone(Form("hb_%d_%d_%d_%d_s", il, lr, al,
                                  th));//sigma
 
           hb_m[il][lr][al][th]->SetDirectory(0);
@@ -185,23 +196,23 @@ void SpaceResolutionCalibration::createHisto()
 
 
           //slice other bin with full gaus func
-          hist_b[il][lr][al][th]->FitSlicesY(gb, ib1 + 1, m_np, 0);
-          hb_m[il][lr][al][th]->Add((TH1D*)gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th))); //mean
-          hb_s[il][lr][al][th]->Add((TH1D*)gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th))); //sigma
+          hist_b[il][lr][al][th]->FitSlicesY(gb, ib1 + 1, np, 0);
+          hb_m[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th))); //mean
+          hb_s[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th))); //sigma
           B2DEBUG(199, "entries (2nd): " << hb_s[il][lr][al][th]->GetEntries());
           //fit half gaus for first range near sense wire
           hist_u[il][lr][al][th]->FitSlicesY(g0u, firstbin, ib1, 0);
-          hu_m[il][lr][al][th] = (TH1D*)gDirectory->Get(Form("hu_%d_%d_%d_%d_1", il, lr, al, th))->Clone(Form("hu_%d_%d_%d_%d_m", il, lr, al,
+          hu_m[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_1", il, lr, al, th))->Clone(Form("hu_%d_%d_%d_%d_m", il, lr, al,
                                  th));//mean
-          hu_s[il][lr][al][th] = (TH1D*)gDirectory->Get(Form("hu_%d_%d_%d_%d_2", il, lr, al, th))->Clone(Form("hu_%d_%d_%d_%d_s", il, lr, al,
+          hu_s[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_2", il, lr, al, th))->Clone(Form("hu_%d_%d_%d_%d_s", il, lr, al,
                                  th));//sigma
           hu_m[il][lr][al][th]->SetDirectory(0);
           hu_s[il][lr][al][th]->SetDirectory(0);
 
           //slice other bin with full gaus func
-          hist_u[il][lr][al][th]->FitSlicesY(gu, ib1 + 1, m_np, 0);
-          hu_m[il][lr][al][th]->Add((TH1D*)gDirectory->Get(Form("hu_%d_%d_%d_%d_1", il, lr, al, th))); //mean
-          hu_s[il][lr][al][th]->Add((TH1D*)gDirectory->Get(Form("hu_%d_%d_%d_%d_2", il, lr, al, th))); //sigma
+          hist_u[il][lr][al][th]->FitSlicesY(gu, ib1 + 1, np, 0);
+          hu_m[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_1", il, lr, al, th))); //mean
+          hu_s[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_2", il, lr, al, th))); //sigma
 
           if (!hu_s[il][lr][al][th] || !hb_s[il][lr][al][th]) {B2WARNING("slice histo do not found"); continue;}
           for (Int_t j = 1; j < hu_s[il][lr][al][th]->GetNbinsX(); j++) {
@@ -256,8 +267,11 @@ void SpaceResolutionCalibration::createHisto()
   ofss.close();
 }
 
-void SpaceResolutionCalibration::Fit()
+bool SpaceResolutionCalibration::calibrate()
 {
+
+  B2INFO("calibrate");
+
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
   createHisto();
@@ -271,13 +285,18 @@ void SpaceResolutionCalibration::Fit()
   }
 
   TF1* func = new TF1("func", "[0]/(x*x + [1])+[2]* x+[3]+[4]*exp([5]*(x-[6])*(x-[6]))", 0, 1.);
-  TH1D* hprob = new TH1D("h1", "", 20, 0, 1);
+  TH1F* hprob = new TH1F("h1", "", 20, 0, 1);
   double upFit; /** Upper limit of fitting. */
   double intp6;
 
   for (int i = 0; i < 56; ++i) {
-    if (i < 8) {upFit = halfCSize[i] + 0.1; intp6 = halfCSize[i] + 0.1;}
-    else {  upFit = halfCSize[i] - 0.07; intp6 = halfCSize[i];}
+    if (i < 8) {
+      upFit = halfCSize[i] + 0.1;
+      intp6 = halfCSize[i] + 0.1;
+    } else {
+      upFit = halfCSize[i] - 0.07;
+      intp6 = halfCSize[i];
+    }
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nalpha; ++al) {
         for (int th = 0; th < m_ntheta; ++th) {
@@ -298,7 +317,6 @@ void SpaceResolutionCalibration::Fit()
               B2DEBUG(199, "Int p6: " << intp6);
               double stat = gfit[i][lr][al][th]->Fit("func", "M E Q", "", 0.05, upFit);
               B2DEBUG(199, "stat of fit" << stat);
-              //      stat=gfit[i]->Fit(Form("ffit[%d]",i),"M "+Q,"",0.0,cellsize(i)+0.05+j*0.005);
               if (stat != 0) {
                 if (fabs(func->Eval(0.3)) > 0.00035 || func->Eval(0.3) < 0) {
                   func->SetParameters(5E-6, 0.007, 1E-4, 1E-7, 0.0007, -30, intp6 + 0.05 * j);
@@ -317,7 +335,7 @@ void SpaceResolutionCalibration::Fit()
                   //      fiterror=1;
                   TString command = Form("echo error fit sigma layer %d- %d- %f- %f>> error", i, lr, ialpha[al], itheta[th]);
                   gSystem->Exec(command);
-                  B2FATAL("fit error////////////////////////////////////////");
+                  B2FATAL("fit error : " << command);
                 }
               }
             }
@@ -341,9 +359,12 @@ void SpaceResolutionCalibration::Fit()
   //  ff->Close();
   write();
   storeHisto();
+
+  return true;
 }
 void SpaceResolutionCalibration::storeHisto()
 {
+  B2INFO("storeHisto");
   TFile*  ff = new TFile("sigma_histo.root", "RECREATE");
   //  TMultiGraph* mg[56];
   //  TMultiGraph* mgfit[56];
@@ -387,7 +408,7 @@ void SpaceResolutionCalibration::storeHisto()
   }
   /*
   if(m_draw){
-    TH2D* frame[56];
+    TH2F* frame[56];
     TPad* pad[8];
     TPad* pad1[6];
     TCanvas* c3 = new TCanvas("c3","c3",1200,800);  c3->Divide(4,2);
@@ -400,7 +421,7 @@ void SpaceResolutionCalibration::storeHisto()
   pad[i]=(TPad*)(c3->GetPrimitive(Form("c3_%d",i+1)));
   pad[i]->cd();
   pad[i]->SetGrid(kTRUE);
-  frame[i] = new TH2D(Form("frame_%d",i),Form("Layer_%d;Position x (cm);#sigma[cm]",i),100,0,1.,300,0,0.04);
+  frame[i] = new TH2F(Form("frame_%d",i),Form("Layer_%d;Position x (cm);#sigma[cm]",i),100,0,1.,300,0,0.04);
   frame[i]->SetDirectory(0);
   frame[i]->Draw();
   mg[i]->Draw("APL same");
@@ -410,7 +431,7 @@ void SpaceResolutionCalibration::storeHisto()
   //cout<<"index: "<<index<<endl;
   pad1[index]->cd();
   pad1[index]->SetGrid(kTRUE);
-  frame[i] = new TH2D(Form("frame_%d",i),Form("Layer_%d;Position x (cm);#sigma[cm]",i),100,0,1.,300,0,0.04);
+  frame[i] = new TH2F(Form("frame_%d",i),Form("Layer_%d;Position x (cm);#sigma[cm]",i),100,0,1.,300,0,0.04);
   frame[i]->SetDirectory(0);
   frame[i]->Draw();
   mg[i]->Draw("same");
@@ -432,8 +453,10 @@ void SpaceResolutionCalibration::storeHisto()
 }
 void SpaceResolutionCalibration::write()
 {
+
+  B2INFO("write");
   /* Write the fit params*/
-  ofstream ofs(m_OutputSigmaFileName.c_str());
+  ofstream ofs(m_outputSigmaFileName.c_str());
   double par[7];
   ofs << m_nalpha << endl;
   for (int i = 0; i < m_nalpha; ++i) {
@@ -465,13 +488,14 @@ void SpaceResolutionCalibration::write()
   ofs.close();
   if (m_useDB) {
     CDCDatabaseImporter import(0, 0, -1, -1);
-    import.importSigma(m_OutputSigmaFileName.c_str());
+    import.importSigma(m_outputSigmaFileName.c_str());
   }
 
 
 }
 void SpaceResolutionCalibration::readSigma()
 {
+  B2INFO("readSigma");
   if (m_useDB) {
     B2INFO("reading sigma from DB");
     m_sResolFromDB = new DBObjPtr<CDCSpaceResols>;
@@ -614,6 +638,7 @@ void SpaceResolutionCalibration::readSigmaFromDB()
 }
 void SpaceResolutionCalibration::readProfile()
 {
+  B2INFO("readProfile");
   /*Read profile for xt*/
   if (m_useProfileFromInputSigma) {
     B2INFO("use Sigma bining from input Sigma");

@@ -5,6 +5,7 @@ import os
 
 import basf2
 import simulation
+import generators
 import beamparameters
 
 from . import utilities
@@ -185,6 +186,12 @@ muon_pdg_code = 13
 # PDG code of a tau
 tau_pdg_code = 15
 
+# PDG code of a pion
+pion_pdg_code = 211
+
+# PDG code of a kaon
+kaon_pdg_code = 321
+
 
 def add_single_gun_generator(path):
     """Add ParticleGun with a single muon"""
@@ -243,6 +250,27 @@ def add_gun_generator(path):
                     thetaParams=[17., 150.])
 
 
+def add_eloss_gun_generator(path):
+    """Add ParticleGun particle gun for energy loss estimations"""
+    path.add_module("ParticleGun",
+                    pdgCodes=[
+                        muon_pdg_code,
+                        -muon_pdg_code,
+                        electron_pdg_code,
+                        -electron_pdg_code,
+                        pion_pdg_code,
+                        -pion_pdg_code,
+                        kaon_pdg_code,
+                        -kaon_pdg_code,
+                    ],
+
+                    momentumParams=[0.3, 2],
+                    nTracks=10,
+                    varyNTracks=False,
+                    thetaGeneration='uniform',
+                    thetaParams=[17., 150.])
+
+
 def add_forward_gun_generator(path):
     """Add ParticleGun with one muon in rather forward direction"""
     path.add_module("ParticleGun",
@@ -265,7 +293,7 @@ def add_evtgen_generator(path, dec_file_path=None):
 
 def add_cosmics_generator(path):
     """Add simple cosmics generator"""
-    path.add_module("Cosmics")
+    generators.add_cosmics_generator(path)
 
 
 def add_sector_tb_generator(path, sector=1):
@@ -309,43 +337,9 @@ def add_cosmics_tb_generator(path):
 
 def add_cry_tb_generator(path):
     """Add cry generator resembling the test beam setup"""
-    from ROOT import Belle2
-    path.add_module('CRYInput',
-                    # cosmic data input
-                    CosmicDataDir=Belle2.FileSystem.findFile('data/generators/modules/cryinput/'),
-                    SetupFile=Belle2.FileSystem.findFile('data/tracking/muon_cry.setup'),
-                    # acceptance half-lengths - at least one particle has to enter that box to use that event
-                    acceptLength=0.7,
-                    acceptWidth=0.3,
-                    acceptHeight=0.3,
-                    maxTrials=10000,
-
-                    # keep half-lengths - all particles that do not enter the box are removed (keep box >= accept box)
-                    keepLength=0.7,
-                    keepWidth=0.3,
-                    keepHeight=0.3,
-
-                    # minimal kinetic energy - all particles below that energy are ignored
-                    kineticEnergyThreshold=0.01,
-                    )
-
-    # Use plane trigger
-    tof_mode = 2
-    # Add time of propagation in the scintilator
-    top_mode = True
-
-    cosmics_selector = path.add_module('CDCCosmicSelector',
-                                       lOfCounter=100.,
-                                       wOfCounter=10.,
-                                       xOfCounter=0.0,
-                                       yOfCounter=0.0,
-                                       zOfCounter=0.0,
-                                       TOF=tof_mode,
-                                       TOP=top_mode,
-                                       cryGenerator=True,
-                                       )
-
-    cosmics_selector.if_false(basf2.create_path())
+    generators.add_cosmics_generator(path, accept_box=[0.7, 0.3, 0.3],
+                                     keep_box=[0.7, 0.3, 0.3],
+                                     pre_general_run_setup="normal")
 
 
 def add_no_generator(path):
@@ -362,6 +356,7 @@ generators_by_short_name = {
     'low_gun': add_low_gun_generator,
     'forward_gun': add_forward_gun_generator,
     'gun': add_gun_generator,
+    'eloss_gun': add_eloss_gun_generator,
     'generic': add_evtgen_generator,
     "EvtGenInput": add_evtgen_generator,  # <- requires beam parameters
     'cosmics': add_cosmics_generator,

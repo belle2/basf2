@@ -79,6 +79,7 @@ namespace Belle2 {
       c_HistogramManager            = 8, /**< This module is used to manage histograms accumulated by other modules */
       c_InternalSerializer          = 16,  /**< This module is an internal serializer/deserializer for parallel processing */
       c_TerminateInAllProcesses     = 32,  /**< When using parallel processing, call this module's terminate() function in all processes(). This will also ensure that there is exactly one process (single-core if no parallel modules found) or at least one input, one main and one output process. */
+      c_DontCollectStatistics       = 64,  /**< No statistics is collected for this module. */
     };
 
     /// Forward the EAfterConditionPath definition from the ModuleCondition.

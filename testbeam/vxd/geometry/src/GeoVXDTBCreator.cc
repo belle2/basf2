@@ -275,8 +275,12 @@ namespace Belle2 {
           content.getDouble("BackplaneCapacitanceV") * unit_pFcm,
           content.getDouble("InterstripCapacitanceV") * unit_pFcm,
           content.getDouble("CouplingCapacitanceV") * unit_pFcm,
+          content.getWithUnit("ADUEquivalentU"),
+          content.getWithUnit("ADUEquivalentV"),
           content.getWithUnit("ElectronicNoiseU"),
           content.getWithUnit("ElectronicNoiseV"),
+          content.getWithUnit("ADUEquivalentSbwU", 0),
+          content.getWithUnit("ADUEquivalentSbwV", 0),
           content.getWithUnit("ElectronicNoiseSbwU", 0),
           content.getWithUnit("ElectronicNoiseSbwV", 0)
         );

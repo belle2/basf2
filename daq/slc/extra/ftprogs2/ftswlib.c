@@ -24,7 +24,7 @@ static char VERSION[] = "2016040800";
 #include <sys/mman.h>
 #ifdef USE_LINUX_VME_UNIVERSE
 /* #ifdef __linux__ */
-#include <asm/page.h>
+//#include <asm/page.h>
 #endif
 #include <errno.h>
 
@@ -49,6 +49,16 @@ static char VERSION[] = "2016040800";
 #define TTXX_FIFO2     FTSW_FIFO2
 #define TTXX_FIFO3     FTSW_FIFO3
 #define TTXX_FIFO4     FTSW_FIFO4
+
+#define _BYTE1(x) (  x        & 0xFF )
+#define _BYTE2(x) ( (x >>  8) & 0xFF )
+#define _BYTE3(x) ( (x >> 16) & 0xFF )
+#define _BYTE4(x) ( (x >> 24) & 0xFF )
+ 
+//#define BYTE_SWAP_16(x) (( _BYTE1(x)<<8 | _BYTE2(x) ))
+//#define BYTE_SWAP_32(x) (( _BYTE1(x)<<24 | _BYTE2(x)<<16 | _BYTE3(x)<<8 | _BYTE4(x) ))
+#define BYTE_SWAP_16(x) (x)
+#define BYTE_SWAP_32(x) (x)
 
 static int debug = 0;
 
@@ -214,9 +224,9 @@ READ_TTXX(TTXX_T *ttxx, int offset)
     int value = 0;
     if (lseek(ttxx->fd, offset, SEEK_SET) < 0) return -2;
     if (read(ttxx->fd, &value, sizeof(value)) < 0) return -1;
-    return value;
+    return BYTE_SWAP_32(value);
   } else if (ttxx->mapadrs) {
-    return ttxx->mapadrs[offset];
+    return BYTE_SWAP_32(ttxx->mapadrs[offset]);
   } else {
     return -3;
   }
@@ -259,11 +269,12 @@ WRITE_TTXX(TTXX_T *ttxx, int offset, int value)
   if (ttxx->fd > 0) {
     if (debug & 1) printf("write_ftsw: %08x <= %08x\n", offset<<2, value);
     if (lseek(ttxx->fd, offset, SEEK_SET) < 0) return -2;
+    value = BYTE_SWAP_32(value);
     if (write(ttxx->fd, &value, sizeof(value)) < 0) return -1;
     return 0;
   } else if (ttxx->mapadrs) {
     if (debug & 1) printf("write_ftsw: %08x <= %08x\n", offset<<2, value);
-    ttxx->mapadrs[offset] = value;
+    ttxx->mapadrs[offset] = BYTE_SWAP_32(value);
     return 0;
   } else {
     return -3;

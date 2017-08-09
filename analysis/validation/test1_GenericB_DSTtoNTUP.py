@@ -161,10 +161,6 @@ eventtools = [
     '^B-',
     'RecoStats',
     '^B-',
-    'DetectorStatsRec',
-    '^B-',
-    'DetectorStatsSim',
-    '^B-',
 ]
 ntupleTree('eventtuple', '', eventtools)
 

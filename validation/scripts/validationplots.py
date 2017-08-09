@@ -352,6 +352,7 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
             compare_plots = []
             compare_ntuples = []
             compare_html_content = []
+            has_reference = False
             for key in sorted(list_of_keys):
                 i_key = i_key + 1
 
@@ -367,6 +368,7 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
                 # Otherwise we can generate Plotuple object
                 plotuple = Plotuple(root_objects, list_of_revisions, work_folder)
                 list_of_plotuples.append(plotuple)
+                has_reference = plotuple.has_reference()
 
                 if (plotuple.type == 'TNtuple'):
                     compare_ntuples.append(json_objects.ComparisonNTuple(title=plotuple.get_plot_title(),
@@ -404,6 +406,7 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
                                                            rootfile=fileName,
                                                            compared_revisions=list_of_revisions,
                                                            plots=compare_plots,
+                                                           has_reference=has_reference,
                                                            ntuples=compare_ntuples,
                                                            html_content=compare_html_content)
             compare_files.append(compare_file)

@@ -75,7 +75,6 @@ if bkg == 'std2GBKG':
     bkgFiles = bkgFiles + glob.glob('/sw/belle2/bkg.twoPhoton/*.root')
 
 print(bkgFiles)
-print(input_filename)
 
 path = create_path()
 

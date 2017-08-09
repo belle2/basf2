@@ -46,10 +46,12 @@ double SensorInfo::getHoleMobility(double E) const
 
 const TVector3 SensorInfo::getEField(const TVector3& point) const
 {
+
   TVector3 E(0, 0,
-             2.0 * m_depletionVoltage / m_thickness
-             * (point.Z() + 0.5 * m_thickness)
+             - 2.0 * m_depletionVoltage / m_thickness
+             * ((point.Z() + 0.5 * m_thickness) / m_thickness)
              - (m_biasVoltage - m_depletionVoltage) / m_thickness);
+
   return E;
 }
 
@@ -106,7 +108,7 @@ const TVector3& SensorInfo::getLorentzShift(double u, double v) const
   // Calculate drift directions
   TVector3 center_e = fabs(distanceToFrontPlane / v_e.Z()) * v_e;
   TVector3 center_h = fabs(distanceToBackPlane / v_h.Z()) * v_h;
-  result.SetXYZ(center_e.X(), center_h.Y(), 0.0);
+  result.SetXYZ(center_h.X(), center_e.Y(), 0.0);
   return result;
 }
 

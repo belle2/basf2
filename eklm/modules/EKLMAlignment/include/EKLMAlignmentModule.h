@@ -62,6 +62,9 @@ namespace Belle2 {
 
   private:
 
+    /** Payload name. */
+    std::string m_PayloadName;
+
     /** Mode. */
     std::string m_Mode;
 
@@ -89,11 +92,20 @@ namespace Belle2 {
     /** Sector dalpha. */
     double m_SectorDalpha;
 
+    /** Name of input file. */
+    std::string m_InputFile;
+
     /** Name of output file. */
     std::string m_OutputFile;
 
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
+
+    /**
+     * Fill EKLMAlignment with zero displacements.
+     * @param[in,out] alignment EKLMAlignment dbobject.
+     */
+    void fillZeroDisplacements(EKLMAlignment* alignment);
 
     /**
      * Generation of zero displacements.
@@ -114,6 +126,11 @@ namespace Belle2 {
      * @param[in] displaceSegment Whether segments should be displaced.
      */
     void generateRandomDisplacement(bool displaceSector, bool displaceSegment);
+
+    /**
+     * Read displacement from ROOT file.
+     */
+    void readDisplacementFromROOTFile();
 
     /**
      * Generate random sector displacements and check if they are correct

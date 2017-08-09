@@ -61,7 +61,7 @@ int main(int argc, char** argv)
     int nobuf = obuf.size();
     for (size_t i = 0; i < ibuf.size(); i++) {
       BinData datain((evtbuf + offset));
-      ibuf[i].read((evtbuf + offset), false);
+      ibuf[i].read((evtbuf + offset), false, false);
       if (count < 10) {
         LogFile::debug("buf[%d]: %d-th event", i, count);
       }

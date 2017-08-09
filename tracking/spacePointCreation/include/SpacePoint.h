@@ -393,11 +393,15 @@ namespace Belle2 {
      * */
     static void boundaryCheck(SpBaseType& value, SpBaseType lower = 0, SpBaseType higher = 1)
     {
-      if (value < lower) {
+      // Times to times there are normalized coordinates that are out of the boundaries.
+      // We do apply a smal sloppyness here
+
+      static SpBaseType sloppyTerm = 1e-3;
+      if (value < lower - sloppyTerm) {
         B2WARNING("SpacePoint::boundaryCheck: value had to be moved (lowerCheck)! old: " << value << ", new: " << lower);
         value = lower;
       }
-      if (value > higher) {
+      if (value > higher + sloppyTerm) {
         B2WARNING("SpacePoint::boundaryCheck: value had to be moved (higherCheck)! old: " << value << ", new: " << higher);
         value = higher;
       }
@@ -409,7 +413,7 @@ namespace Belle2 {
 // setter:
 
     /** sets the state of assignment - set true if it is assigned and therefore blocked for reuse. */
-    void setAssignmentState(bool newState) { m_isAssigned = newState; }
+    void setAssignmentState(bool newState) const { m_isAssigned = newState; }
 
 
 
@@ -502,7 +506,7 @@ namespace Belle2 {
 
 
     /** stores whether this spacePoint has already been assigned or not */
-    bool m_isAssigned;
+    mutable bool m_isAssigned;
 
 
 

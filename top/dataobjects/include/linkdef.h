@@ -20,6 +20,7 @@
 #pragma link C++ class Belle2::TOPPDFCollection+;
 #pragma link C++ class Belle2::TOPPDFCollection::gaussian_t+;
 #pragma link C++ class Belle2::TOPSmallestPullCollection+;
+#pragma link C++ class Belle2::TOPTemplateFitResult+;
 
 // schema evolution rules to allow reading of old class versions
 

@@ -1,7 +1,0 @@
-Import('env')
-
-env['CONTINUE'] = False
-
-env['LIBS'] = ['framework', 'topcaf_dataobjects', 'top_dataobjects', 'top']
-
-Return('env')

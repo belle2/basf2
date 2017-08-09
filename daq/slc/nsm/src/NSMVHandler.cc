@@ -1,5 +1,7 @@
 #include "daq/slc/nsm/NSMVHandler.h"
 
+#include "daq/slc/nsm/NSMCallback.h"
+
 using namespace Belle2;
 
 NSMVHandler* NSMVHandler::create(const NSMVar& var)
@@ -155,4 +157,19 @@ bool NSMVHandlerFloatArray::handleSet(const NSMVar& var)
     }
   }
   return false;
+}
+
+bool NSMVHandlerRef::handleGet(NSMVar& var)
+{
+  //var = m_callback.getHandler(m_refname).get();
+  m_callback.get(m_refname, var);
+  return true;
+}
+
+bool NSMVHandlerRef::handleSet(const NSMVar& var)
+{
+  //NSMVar& v(m_callback.getHandler(m_refname).get());
+  //v = var;
+  m_callback.set(m_refname, var);
+  return true;
 }

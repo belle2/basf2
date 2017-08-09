@@ -128,6 +128,8 @@ class Method(object):
             self.specific_options = basf2_mva.PDFOptions()
         elif self.general_options.m_method == "Combination":
             self.specific_options = basf2_mva.CombinationOptions()
+        elif self.general_options.m_method == "Reweighter":
+            self.specific_options = basf2_mva.ReweighterOptions()
         elif self.general_options.m_method == "Trivial":
             self.specific_options = basf2_mva.TrivialOptions()
         else:

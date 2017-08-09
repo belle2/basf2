@@ -202,17 +202,6 @@ bool T0Correction::calibrate()
       gr[sl]->SetName(Form("lay%d", sl));
       gr[sl]->Write();
     }
-    if (m_debug) {
-      TDirectory* Direct[56];
-      for (int il = 0; il < 56; ++il) {
-        top->cd();
-        Direct[il] = gDirectory->mkdir(Form("lay_%d", il));
-        Direct[il]->cd();
-        for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
-          m_h1[il][w]->Write();
-        }
-      }
-    }
     fout->Close();
   }
   B2INFO("Write constants");

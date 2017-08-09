@@ -9,7 +9,8 @@
 
 #include <daq/dqm/analysis/modules/DQMHistAnalysisInput.h>
 
-using namespace std;
+#include <daq/slc/base/StringUtil.h>
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -25,7 +26,7 @@ DQMHistAnalysisInputModule::DQMHistAnalysisInputModule()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
-  addParam("HistMemoryPath", m_mempath, "Path to Input Hist memory", string(""));
+  addParam("HistMemoryPath", m_mempath, "Path to Input Hist memory", std::string(""));
   addParam("HistMemorySize", m_memsize, "Size of Input Hist memory", 10000000);
   addParam("RefreshInterval", m_interval, "Refresh interval of histograms", 10);
   B2DEBUG(1, "DQMHistAnalysisInput: Constructor done.");
@@ -52,34 +53,60 @@ void DQMHistAnalysisInputModule::beginRun()
 void DQMHistAnalysisInputModule::event()
 {
   sleep(m_interval);
-  std::vector<TH1*> h;
+  std::vector<TH1*> hs;
   TMemFile* file = m_memory->LoadMemFile();
   file->cd();
   TIter next(file->GetListOfKeys());
   TKey* key = NULL;
   while ((key = (TKey*)next())) {
-    h.push_back((TH1*)key->ReadObj());
+    TH1* h = (TH1*)key->ReadObj();
+    hs.push_back(h);
+    TString a = h->GetName();
+    StringList s = StringUtil::split(a.Data(), '/');
+    a.ReplaceAll("/", "_");
+    std::string name = a.Data();
+    if (m_cs.find(name) == m_cs.end()) {
+      if (s.size() > 1) {
+        std::string dirname = s[0];
+        std::string hname = s[1];
+        TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
+        m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+      } else {
+        std::string hname = a.Data();
+        TCanvas* c = new TCanvas(("c_" + hname).c_str(), ("c_" + hname).c_str());
+        m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+      }
+    }
+    TCanvas* c = m_cs[name];
+    c->cd();
+    if (h->GetDimension() == 1) {
+      h->Draw("hist");
+    } else if (h->GetDimension() == 2) {
+      h->Draw("colz");
+    }
+    c->Update();
   }
   resetHist();
-  for (size_t i = 0; i < h.size(); i++) {
-    addHist("", h[i]->GetName(), h[i]);
-    B2INFO("Found : " << h[i]->GetName() << " : " << h[i]->GetEntries());
-    std::string vname = h[i]->GetName();
-    setFloatValue(vname + ".entries", h[i]->GetEntries());
-    if (h[i]->GetDimension() == 1) {
-      setFloatValue(vname + ".rms", h[i]->GetRMS());
-      setFloatValue(vname + ".rmserr", h[i]->GetRMSError());
-      setFloatValue(vname + ".mean", h[i]->GetMean());
-      setFloatValue(vname + ".meanerr", h[i]->GetMeanError());
-    } else if (h[i]->GetDimension() == 2) {
-      setFloatValue(vname + ".xrms", h[i]->GetRMS(1));
-      setFloatValue(vname + ".xrmserr", h[i]->GetRMSError(1));
-      setFloatValue(vname + ".xmean", h[i]->GetMean(1));
-      setFloatValue(vname + ".xmeanerr", h[i]->GetMeanError(1));
-      setFloatValue(vname + ".yrms", h[i]->GetRMS(2));
-      setFloatValue(vname + ".yrmserr", h[i]->GetRMSError(2));
-      setFloatValue(vname + ".ymean", h[i]->GetMean(2));
-      setFloatValue(vname + ".ymeanerr", h[i]->GetMeanError(2));
+  for (size_t i = 0; i < hs.size(); i++) {
+    TH1* h = hs[i];
+    addHist("", h->GetName(), h);
+    B2INFO("Found : " << h->GetName() << " : " << h->GetEntries());
+    std::string vname = h->GetName();
+    setFloatValue(vname + ".entries", h->GetEntries());
+    if (h->GetDimension() == 1) {
+      setFloatValue(vname + ".rms", h->GetRMS());
+      setFloatValue(vname + ".rmserr", h->GetRMSError());
+      setFloatValue(vname + ".mean", h->GetMean());
+      setFloatValue(vname + ".meanerr", h->GetMeanError());
+    } else if (h->GetDimension() == 2) {
+      setFloatValue(vname + ".xrms", h->GetRMS(1));
+      setFloatValue(vname + ".xrmserr", h->GetRMSError(1));
+      setFloatValue(vname + ".xmean", h->GetMean(1));
+      setFloatValue(vname + ".xmeanerr", h->GetMeanError(1));
+      setFloatValue(vname + ".yrms", h->GetRMS(2));
+      setFloatValue(vname + ".yrmserr", h->GetRMSError(2));
+      setFloatValue(vname + ".ymean", h->GetMean(2));
+      setFloatValue(vname + ".ymeanerr", h->GetMeanError(2));
     }
   }
   m_count++;

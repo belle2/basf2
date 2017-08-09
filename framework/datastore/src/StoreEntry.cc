@@ -7,13 +7,13 @@
 
 using namespace Belle2;
 
-StoreEntry::StoreEntry(bool isArray, TClass* cl, const std::string& name, bool dontWriteOut):
-  isArray(isArray),
-  dontWriteOut(dontWriteOut),
+StoreEntry::StoreEntry(bool isArray_, TClass* cl, const std::string& name_, bool dontWriteOut_):
+  isArray(isArray_),
+  dontWriteOut(dontWriteOut_),
   objClass(cl),
   object(nullptr),
   ptr(nullptr),
-  name(name)
+  name(name_)
 {
   recoverFromNullObject();
 }

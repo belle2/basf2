@@ -91,8 +91,8 @@ namespace Belle2 {
       return description;
     }
 
-    TMVATeacher::TMVATeacher(const GeneralOptions& general_options, const TMVAOptions& specific_options) : Teacher(general_options),
-      specific_options(specific_options) { }
+    TMVATeacher::TMVATeacher(const GeneralOptions& general_options, const TMVAOptions& _specific_options) : Teacher(general_options),
+      specific_options(_specific_options) { }
 
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
     Weightfile TMVATeacher::trainFactory(TMVA::Factory& factory, TMVA::DataLoader& data_loader, std::string& jobName) const
@@ -188,8 +188,8 @@ namespace Belle2 {
 
 
     TMVATeacherClassification::TMVATeacherClassification(const GeneralOptions& general_options,
-                                                         const TMVAOptionsClassification& specific_options) : TMVATeacher(general_options, specific_options),
-      specific_options(specific_options) { }
+                                                         const TMVAOptionsClassification& _specific_options) : TMVATeacher(general_options, _specific_options),
+      specific_options(_specific_options) { }
 
     Weightfile TMVATeacherClassification::train(Dataset& training_data) const
     {
@@ -298,8 +298,8 @@ namespace Belle2 {
     }
 
     TMVATeacherRegression::TMVATeacherRegression(const GeneralOptions& general_options,
-                                                 const TMVAOptionsRegression& specific_options) : TMVATeacher(general_options, specific_options),
-      specific_options(specific_options) { }
+                                                 const TMVAOptionsRegression& _specific_options) : TMVATeacher(general_options, _specific_options),
+      specific_options(_specific_options) { }
 
     Weightfile TMVATeacherRegression::train(Dataset& training_data) const
     {

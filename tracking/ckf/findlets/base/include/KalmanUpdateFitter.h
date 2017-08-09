@@ -16,6 +16,8 @@
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/MeasurementOnPlane.h>
 
+#include <tracking/ckf/utilities/EigenHelper.h>
+
 #include <Eigen/Dense>
 
 namespace Eigen {
@@ -82,14 +84,8 @@ namespace Belle2 {
     std::pair<Eigen::Vector5d, Eigen::Matrix5d> extractMatricesFromState(const genfit::MeasuredStateOnPlane& measuredStateOnPlane)
     const
     {
-      // We will change the state x_k, the covariance C_k and the chi2
-      const auto& state = measuredStateOnPlane.getState();
-      B2ASSERT("State must have 5 dimension", state.GetNrows() == 5);
-      Eigen::Vector5d x_k(state.GetMatrixArray());
-
-      const auto& cov = measuredStateOnPlane.getCov();
-      B2ASSERT("Covariance matrix must have 5x5 dimension", cov.GetNrows() == 5 && cov.GetNcols() == 5);
-      Eigen::Matrix5d C_k(cov.GetMatrixArray());
+      const Eigen::Vector5d& x_k = convertToEigen<5>(measuredStateOnPlane.getState());
+      const Eigen::Matrix5d& C_k = convertToEigen<5, 5>(measuredStateOnPlane.getCov());
 
       return std::make_pair(x_k, C_k);
     }
@@ -106,18 +102,9 @@ namespace Belle2 {
       B2ASSERT("There should be exactly one measurement on plane", measurementsOnPlane.size() == 1);
       const genfit::MeasurementOnPlane& measurementOnPlane = *(measurementsOnPlane.front());
 
-      const auto& mState = measurementOnPlane.getState();
-      B2ASSERT("Measured state must have " << std::to_string(Dimension) << " dimension", mState.GetNrows() == Dimension);
-      Eigen::Matrix<double, Dimension, 1> m_k(mState.GetMatrixArray());
-
-      const auto& hMatrix = measurementOnPlane.getHMatrix()->getMatrix();
-      B2ASSERT("H matrix must have 5 x " << std::to_string(Dimension) << " dimension", hMatrix.GetNcols() == 5
-               && hMatrix.GetNrows() == Dimension);
-      Eigen::Matrix<double, Dimension, 5> H_k(hMatrix.GetMatrixArray());
-      const auto& vMatrix = measurementOnPlane.getCov();
-      B2ASSERT("V matrix must have " << std::to_string(Dimension) << " dimension", vMatrix.GetNrows() == Dimension
-               && vMatrix.GetNcols() == Dimension);
-      Eigen::Matrix<double, Dimension, Dimension> V_k(vMatrix.GetMatrixArray());
+      const Eigen::Matrix<double, Dimension, 1>& m_k = convertToEigen<Dimension>(measurementOnPlane.getState());
+      const Eigen::Matrix<double, Dimension, 5>& H_k = convertToEigen<Dimension, 5>(measurementOnPlane.getHMatrix()->getMatrix());
+      const Eigen::Matrix<double, Dimension, Dimension>& V_k = convertToEigen<Dimension, Dimension>(measurementOnPlane.getCov());
 
       return std::make_tuple(m_k, H_k, V_k);
     };

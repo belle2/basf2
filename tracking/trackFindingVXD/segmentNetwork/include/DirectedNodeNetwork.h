@@ -27,8 +27,7 @@ namespace Belle2 {
   public:
     /** typedef for more readable Node-Type */
     typedef DirectedNode<EntryType, MetaInfoType> Node;
-    // Old: typedef std::string NodeID;
-    typedef int NodeID; // Alternative using int instead of a long string
+    typedef int NodeID; // NodeID should be some unique integer
 
   protected:
 
@@ -101,6 +100,7 @@ namespace Belle2 {
     bool addNode(NodeID nodeID, EntryType& newEntry)
     {
       Node* tmpNode = new Node(newEntry);
+      // use the specific emplace function instead of std::unordered_map::insert
       auto insertOp = m_nodeMap.emplace(nodeID, tmpNode);
       if (insertOp.second) {
         m_isFinalized = false;
@@ -115,8 +115,8 @@ namespace Belle2 {
     /** to the last outerNode added, another innerNode will be attached */
     void addInnerToLastOuterNode(NodeID innerNodeID)
     {
+      // check if entry does not exist, constructed with ID=-1
       if (m_lastOuterNodeID < 0) { B2WARNING("addInnerToLastOuterNode() last OuterNode is not yet in this network! CurrentNetworkSize is: " << size()); return;}
-
       // check if entries are identical (catch loops):
       if (m_lastOuterNodeID == innerNodeID) {
         B2WARNING("DirectedNodeNetwork::addInnerToLastOuterNode(): lastOuterNode and innerEntry are identical! Aborting linking-process");
@@ -136,6 +136,7 @@ namespace Belle2 {
     /** to the last innerNode added, another outerNode will be attached */
     void addOuterToLastInnerNode(NodeID outerNodeID)
     {
+      // check if entry does not exist, constructed with ID=-1
       if (m_lastInnerNodeID < 0) { B2WARNING("addOuterToLastInnerNode() last InnerNode is not yet in this network! CurrentNetworkSize is: " << size()); return; }
       // check if entries are identical (catch loops):
       if (outerNodeID == m_lastInnerNodeID) {

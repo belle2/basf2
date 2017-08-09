@@ -38,13 +38,6 @@ namespace Belle2 {
      * prerequisite for NodeEntryType:
      * - std::string getName()
      */
-//    template<class NodeEntryType, class AnyMetaInfo>
-//    std::string getEntryID(DirectedNode<NodeEntryType, AnyMetaInfo>& Entry)
-//    {
-//      return std::to_string(Entry.getID());
-//    }
-
-
     template<class NodeEntryType>
     void printCANetwork(DirectedNodeNetwork<NodeEntryType, CACell>& network, std::string fName/*, bool useGetName = false*/)
     {
@@ -55,9 +48,9 @@ namespace Belle2 {
       for (auto* node : network) {
         std::stringstream  outStream;
 
-        fullOut += "\"" + std::to_string(node->getEntry().getID()) + "\"" +
+        fullOut += "\"" + node->getEntry().getName() + "\"" +
                    " [label=\"" +
-                   std::to_string(node->getEntry().getID()) +
+                   node->getEntry().getName() +
                    " State,Seed: " +
                    std::to_string(node->getMetaInfo().getState()) +
                    "," +
@@ -69,8 +62,7 @@ namespace Belle2 {
         for (auto* innerNode : node->getInnerNodes()) {
           auto innerEntry = innerNode->getEntry();
           std::string arrowStyle = (node->getMetaInfo().getState() == (innerNode->getMetaInfo().getState() + 1)) ? "" : " [style=dotted]";
-          fullOut += "\"" + std::to_string(node->getEntry().getID()) + "\" -> \"" + std::to_string(innerEntry.getID()) + "\"" + arrowStyle +
-                     ";\n";
+          fullOut += "\"" + node->getEntry().getName() + "\" -> \"" + innerEntry.getName() + "\"" + arrowStyle + ";\n";
         }
       }
       fullOut += "labelloc=\"t\";\nlabel=\"" + fName + "\";\n";
@@ -95,9 +87,9 @@ namespace Belle2 {
       // write vertices:
       for (auto* node : network) {
         std::stringstream  outStream;
-        fullOut += "\"" + std::to_string(node->getEntry().getID()) + "\"" +
+        fullOut += "\"" + node->getEntry().getName() + "\"" +
                    " [label=\"" +
-                   std::to_string(node->getEntry().getID()) +
+                   node->getEntry().getName() +
                    "\"];\n";
       }
       // write edges:
@@ -105,8 +97,7 @@ namespace Belle2 {
         for (auto* innerNode : node->getInnerNodes()) {
           auto innerEntry = innerNode->getEntry();
           std::string arrowStyle = "";
-          fullOut += "\"" + std::to_string(node->getEntry().getID()) + "\" -> \"" + std::to_string(innerEntry.getID()) + "\"" + arrowStyle +
-                     ";\n";
+          fullOut += "\"" + node->getEntry().getName() + "\" -> \"" + innerEntry.getName() + "\"" + arrowStyle + ";\n";
         }
       }
       fullOut += "labelloc=\"t\";\nlabel=\"" + fName + "\";\n";

@@ -185,27 +185,18 @@ namespace Belle2 {
 
 // getter:
 
-//    /** returns secID of this sector */
-//    std::string getName() const override
-//    {
-//      // TODO revert to long version!
-//      return "I: " + std::to_string(getArrayIndex());
-//      /// long version
-////       return "I: " + std::to_string(getArrayIndex()) +
-////              ", VxdID: " + std::string(VxdID(m_vxdID)) +
-////              ", PosG: " + std::to_string(double(int(X()*100))*0.01) +
-////       "|" + std::to_string(double(int(Y()*100))*0.01) +
-////       "|" + std::to_string(double(int(Z()*100))*0.01);
-//    }
-
-    //----------------------- New Version -----------------------------
-    /** Print out some info for this SpacePoint.*/
+    /** returns secID of this sector */
     std::string getName() const override
     {
-      return "SpacePoint with index: " + std::to_string(getArrayIndex()) +
-             "and VxdID: " + std::to_string(VxdID(m_vxdID));
+      // TODO revert to long version!
+      return "I: " + std::to_string(getArrayIndex());
+      /// long version
+//       return "I: " + std::to_string(getArrayIndex()) +
+//              ", VxdID: " + std::string(VxdID(m_vxdID)) +
+//              ", PosG: " + std::to_string(double(int(X()*100))*0.01) +
+//       "|" + std::to_string(double(int(Y()*100))*0.01) +
+//       "|" + std::to_string(double(int(Z()*100))*0.01);
     }
-    //-------------------------------------------------------------------
 
     /** return the x-value of the global position of the SpacePoint */
     SpBaseType X() const { return m_position.X(); }

@@ -83,7 +83,7 @@ void MLSegmentNetworkProducerModule::event()
                                                                   innerHit->getEntry().sector->getFullSecID(),
                                                                   &centerHit->getEntry(),
                                                                   &innerHit->getEntry());
-        B2DEBUG(999, "buildSegmentNetwork: innerSegment: " << innerSegment->getID());
+        B2DEBUG(999, "buildSegmentNetwork: innerSegment: " << innerSegment->getName());
         DirectedNode<Segment<TrackNode>, CACell>* tempInnerSegmentnode = segmentNetwork.getNode(innerSegment->getID());
         if (tempInnerSegmentnode == nullptr) {
           segments.push_back(innerSegment);
@@ -99,8 +99,8 @@ void MLSegmentNetworkProducerModule::event()
                                                                     centerHit->getEntry().sector->getFullSecID(),
                                                                     &outerHit->getEntry(),
                                                                     &centerHit->getEntry());
-          B2DEBUG(999, "buildSegmentNetwork: outerSegment(freshly created): " << outerSegment->getID() <<
-                  " to be linked with inner segment: " << innerSegment->getID());
+          B2DEBUG(999, "buildSegmentNetwork: outerSegment(freshly created): " << outerSegment->getName() <<
+                  " to be linked with inner segment: " << innerSegment->getName());
 
           DirectedNode<Segment<TrackNode>, CACell>* tempOuterSegmentnode = segmentNetwork.getNode(outerSegment->getID());
           if (tempOuterSegmentnode == nullptr) {
@@ -111,8 +111,8 @@ void MLSegmentNetworkProducerModule::event()
             outerSegment = &(tempOuterSegmentnode->getEntry());
           }
 
-          B2DEBUG(999, "buildSegmentNetwork: outerSegment (after duplicate check): " << outerSegment->getID() <<
-                  " to be linked with inner segment: " << innerSegment->getID());
+          B2DEBUG(999, "buildSegmentNetwork: outerSegment (after duplicate check): " << outerSegment->getName() <<
+                  " to be linked with inner segment: " << innerSegment->getName());
           segmentNetwork.linkNodes(outerSegment->getID(), innerSegment->getID());
           nLinked++;
           alreadyAdded = true;

@@ -40,9 +40,12 @@ namespace Belle2 {
     /** iD of sector carrying inner hit */
     FullSecID::BaseType m_innerSector;
 
-//    std::string m_name;
-    // Alternative method with index
-    int m_index;
+    /** unique integer identifier */
+    const long m_identifier;
+
+    /** longer name for debugging */
+    const std::string m_name;
+
 
   public:
     /** ************************* CONSTRUCTORS ************************* */
@@ -53,8 +56,8 @@ namespace Belle2 {
       m_innerHit(NULL),
       m_outerSector(FullSecID()),
       m_innerSector(FullSecID()),
-//      m_name("Out: missing,\nin: missing"),
-      m_index(-1) // Alternative
+      m_identifier(-1),
+      m_name("Out: missing,\nin: missing")
     {}
 
 
@@ -68,13 +71,12 @@ namespace Belle2 {
       m_outerHit(outerNode),
       m_innerHit(innerNode),
       m_outerSector(outerSector),
-      m_innerSector(innerSector)
-    {
-//      m_name = "Out: " + m_outerHit->getName() + ")" + ",\nin: " + m_innerHit->getName();
-      // Alternative
-      m_index = m_outerHit->getID() << 16 | m_innerHit->getID();
-    }
-
+      m_innerSector(innerSector),
+      // Use int (=int32) TrackNode IDs to construct long (=int64) Segment ID
+      m_identifier(long(m_outerHit->getID()) << 32 | m_innerHit->getID()),
+      // Construct debugging Segment name out of debugging TrackNode names
+      m_name("Out: " + m_outerHit->getName() + ")" + ",\nin: " + m_innerHit->getName())
+    {}
 
     /** ************************* OPERATORS ************************* */
 
@@ -87,17 +89,11 @@ namespace Belle2 {
     /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
 /// getters:
 
-    /** returns secID of this sector */
-//    std::string getName() const
-//    {
-//      return  m_name;
-//    }
+    /** return ID of this segment */
+    long getID() { return m_identifier; }
 
-    /** TODO: Alternative to using long string in hashing methods... */
-    int getID() const
-    {
-      return m_index;
-    }
+    /** returns longer debugging name of this segment */
+    const std::string& getName() const { return m_name; }
 
     /** returns inner hit of current Segment */
     inline const HitType* getInnerHit() const { return m_innerHit; }

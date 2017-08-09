@@ -15,6 +15,9 @@
 
 #include <TMath.h>
 #include <tracking/ckf/utilities/StateAlgorithms.h>
+#include <tracking/ckf/findlets/base/KalmanUpdateFitter.h>
+#include <pxd/reconstruction/PXDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit.h>
 
 using namespace std;
 using namespace Belle2;
@@ -65,6 +68,20 @@ bool CKFCDCToSpacePointStateObjectBasicVarSet::extract(const BaseCKFCDCToSpacePo
   var<named("layer")>() = spacePoint->getVxdID().getLayerNumber();
   var<named("number")>() = result->getNumber();
   var<named("overlap")>() = isOnOverlapLayer(*result);
+
+  KalmanUpdateFitter fitter;
+  double chi2 = 0;
+
+  if (spacePoint->getType() == VXD::SensorInfoBase::SVD) {
+    for (const auto& svdCluster : spacePoint->getRelationsWith<SVDCluster>()) {
+      SVDRecoHit recoHit(&svdCluster);
+      chi2 += fitter.calculateChi2<SVDRecoHit, 1>(result->getMeasuredStateOnPlane(), recoHit);
+    }
+  } else {
+    PXDRecoHit recoHit(spacePoint->getRelated<PXDCluster>());
+    chi2 = fitter.calculateChi2<PXDRecoHit, 2>(result->getMeasuredStateOnPlane(), recoHit);
+  }
+  var<named("chi2_calculated")>() = chi2;
 
   if (result->isFitted()) {
     var<named("chi2")>() = result->getChi2();

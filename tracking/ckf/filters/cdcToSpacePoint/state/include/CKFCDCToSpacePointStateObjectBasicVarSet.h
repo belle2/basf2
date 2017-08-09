@@ -35,6 +35,7 @@ namespace Belle2 {
 
     "numberOfHoles",
 
+    "chi2_calculated",
     "chi2"
   };
 

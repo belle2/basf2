@@ -32,11 +32,11 @@ namespace Belle2 {
   class AdvanceAlgorithm : public TrackFindingCDC::ProcessingSignalListener {
   public:
     /// General extrapolate function for a templated reco hit. We get the plane of this hit and extrapolate to this plane.
-    template <class ARecoHit>
+    template <class ARecoHit, short direction = 1>
     bool extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, ARecoHit& recoHit) const
     {
       const genfit::SharedPlanePtr& plane = getPlane(measuredStateOnPlane, recoHit);
-      return extrapolateToPlane(measuredStateOnPlane, plane);
+      return extrapolateToPlane<direction>(measuredStateOnPlane, plane);
     }
 
     /// General helper function for a templated reco hit, to return the plane this reco hit is on
@@ -47,6 +47,7 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 
     /// Function doing the main work: extrapolate a given mSoP to the given plane
+    template <short direction = 1>
     bool extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const genfit::SharedPlanePtr& plane) const;
   private:
     /// Parameter: use material effects during extrapolation.
@@ -71,4 +72,25 @@ namespace Belle2 {
   template <>
   genfit::SharedPlanePtr AdvanceAlgorithm::getPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
                                                     const genfit::MeasuredStateOnPlane& plane) const;
+
+  template <short direction>
+  bool AdvanceAlgorithm::extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                                            const genfit::SharedPlanePtr& plane) const
+  {
+    try {
+      genfit::MaterialEffects::getInstance()->setNoEffects(not m_param_useMaterialEffects);
+      const double extrapolatedS = measuredStateOnPlane.extrapolateToPlane(plane);
+      genfit::MaterialEffects::getInstance()->setNoEffects(false);
+
+      if (direction * extrapolatedS > 0) {
+        return false;
+      }
+    } catch (genfit::Exception e) {
+      B2DEBUG(50, "Extrapolation failed: " << e.what());
+      return false;
+    }
+
+    return true;
+  }
+
 }

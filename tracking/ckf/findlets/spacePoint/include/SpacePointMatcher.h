@@ -116,12 +116,17 @@ namespace Belle2 {
         const unsigned int ladderNumber = vxdID.getLadderNumber();
         const unsigned int maximumLadderNumber = VXD::GeoCache::getInstance().getLadders(vxdID).size();
 
+        int direction = 1;
+        if (currentLayer > 2) {
+          direction = -1;
+        }
+
         // the reason for this strange formula is the numbering scheme in the VXD.
         // we first substract 1 from the ladder number to have a ladder counting from 0 to N - 1,
-        // then we subtract one to get to the next (overlapping) ladder and % N, to also cope for the
+        // then we add (PXD)/subtract(SVD) one to get to the next (overlapping) ladder and do a % N to also cope for the
         // highest number. Then we add 1 again, to go from the counting from 0 .. N-1 to 1 .. N.
         // The + maximumLadderNumber in between makes sure, we are not ending with negative numbers
-        const unsigned int overlappingLadder = ((ladderNumber + maximumLadderNumber - 1) - 1) % maximumLadderNumber + 1;
+        const unsigned int overlappingLadder = ((ladderNumber + maximumLadderNumber - 1) + direction) % maximumLadderNumber + 1;
 
         B2DEBUG(100, "Overlap check on " << ladderNumber << " using from " << overlappingLadder);
         fillInAllRanges(nextRanges, currentLayer, overlappingLadder);

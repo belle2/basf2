@@ -27,6 +27,19 @@ namespace Belle2 {
     /// A type that is used as a key for the cache map - the normal of the plane.
     using Key = TVector3;
 
+    /// Helper functor for printing something with B2DEBUG
+    struct B2DEBUGPrinter {
+      /// Marker function for the isFunctor test
+      operator TrackFindingCDC::FunctorTag();
+
+      /// Operator for printing
+      template<class T1>
+      void operator()(const T1& t1) const
+      {
+        B2DEBUG(50, t1);
+      }
+    };
+
   public:
     /// Constructor adding the subfindlets as listeners
     CachedAdvanceFindlet();
@@ -56,6 +69,12 @@ namespace Belle2 {
         currentState->setAdvanced();
         return true;
       }
+
+      B2DEBUG(50, "Now advancing to state on " << currentState->getNumber()
+              << " which is on " << extractGeometryLayer(*currentState) << " and "
+              << isOnOverlapLayer(*currentState) << " " << HitIDExtractor()(currentState));
+      B2DEBUG(50, "Coming from:");
+      currentState->walk(TrackFindingCDC::Composition<B2DEBUGPrinter, HitIDExtractor>());
 
       // Get the parent to check, if we have already seem it and have something in our cache
       B2ASSERT("How could a state without a parent end up here?", currentState->getParent());

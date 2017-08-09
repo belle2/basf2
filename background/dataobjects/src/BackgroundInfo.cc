@@ -11,6 +11,7 @@
 #include <background/dataobjects/BackgroundInfo.h>
 #include <framework/logging/Logger.h>
 #include <iostream>
+#include <unordered_set>
 
 using namespace std;
 using namespace Belle2;
@@ -24,7 +25,26 @@ bool BackgroundInfo::canBeMerged(const BackgroundInfo* otherObj)
     return false;
   }
 
-  if (otherObj->getComponents() != m_components) { // TODO: sort & compare
+  std::unordered_set<int> bgThis;
+  for (const auto& bg : m_backgrounds) {
+    int key = bg.tag * 16 + bg.fileType;
+    bgThis.emplace(key);
+  }
+  std::unordered_set<int> bgOther;
+  for (const auto& bg : otherObj->getBackgrounds()) {
+    int key = bg.tag * 16 + bg.fileType;
+    bgOther.emplace(key);
+  }
+  if (bgOther != bgThis) {
+    B2ERROR("BackgroundInfo: objects cannot be merged (different backgrounds)");
+    return false;
+  }
+
+  auto compThis = m_components;
+  std::sort(compThis.begin(), compThis.end());
+  auto compOther = otherObj->getComponents();
+  std::sort(compOther.begin(), compOther.end());
+  if (compOther != compThis) {
     B2ERROR("BackgroundInfo: objects cannot be merged (different components)");
     return false;
   }
@@ -69,8 +89,6 @@ bool BackgroundInfo::canBeMerged(const BackgroundInfo* otherObj)
     return false;
   }
 
-  // TODO   BackgroundDescr
-
   return true;
 }
 
@@ -81,14 +99,31 @@ void BackgroundInfo::merge(const Mergeable* other)
 
   if (!canBeMerged(otherObj)) throw BackgroundInfoNotMergeable();
 
-  // TODO merge
+  for (const auto& otherBg : otherObj->getBackgrounds()) {
+    for (unsigned i = 0; i < m_backgrounds.size(); i++) {
+      auto& bg = m_backgrounds[i];
+      if (otherBg.tag != bg.tag) continue;
+      if (otherBg.fileType != bg.fileType) continue;
+      if (otherBg.fileNames == bg.fileNames) {
+        if (otherBg.scaleFactor != bg.scaleFactor) {
+          B2ERROR("BackgroundInfo: objects cannot be merged (different scaleFactor)");
+          throw BackgroundInfoNotMergeable();
+        }
+        bg.reused += otherBg.reused;
+      } else {
+        m_backgrounds.push_back(otherBg);
+      }
+    }
+  }
 
 }
 
 void BackgroundInfo::clear()
 {
 
-  // TODO: clear what's merged
+  for (auto& bg : m_backgrounds) {
+    bg.reused = 0;
+  }
 
 }
 

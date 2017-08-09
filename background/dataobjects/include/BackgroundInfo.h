@@ -159,7 +159,7 @@ namespace Belle2 {
      * Returns background descriptions
      * @return descriptions
      */
-    const std::vector<BackgroundDescr>& getBackgroundDescr() const {return m_backgrounds;}
+    const std::vector<BackgroundDescr>& getBackgrounds() const {return m_backgrounds;}
 
     /**
      * Returns included components

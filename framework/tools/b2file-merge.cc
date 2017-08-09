@@ -51,7 +51,7 @@ void printBackgroundInfo(const BackgroundInfo& a)
   B2INFO("  wrapping around: " << (a.getWrapAround() ? "enabled" : "disabled"));
   B2INFO("   ECL energy cut: " << a.getMaxEdepECL() << " GeV");
   B2INFO("Background samples: ");
-  auto da = a.getBackgroundDescr();
+  auto da = a.getBackgrounds();
   auto cmpfn = [](const BackgroundInfo::BackgroundDescr & descrA, const BackgroundInfo::BackgroundDescr & descrB) {return descrA.type < descrB.type; };
   std::sort(da.begin(), da.end(), cmpfn);
   for (const auto& d : da) {
@@ -85,8 +85,8 @@ void checkBackgroundCompatible(const BackgroundInfo& a, const BackgroundInfo& b,
   if (a.getWrapAround() != b.getWrapAround()) B2ERROR("Incompatible background WrapAround in " << boost::io::quoted(filename));
   if (a.getMaxEdepECL() != b.getMaxEdepECL()) B2ERROR("Incompatible background MaxEdepECL in " << boost::io::quoted(filename));
 
-  auto da = a.getBackgroundDescr();
-  auto db = b.getBackgroundDescr();
+  auto da = a.getBackgrounds();
+  auto db = b.getBackgrounds();
   if (da.size() != db.size()) {
     B2ERROR("Incompatible background types in " << boost::io::quoted(filename));
   } else {

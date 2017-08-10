@@ -125,7 +125,7 @@ namespace Belle2 {
     const float m_templateAlpha = -0.45;/**< template exponential tail position */
     const float m_templateN = 18.06;/**< template exponential decay constant */
 
-    ClassDef(TOPTemplateFitResult, 1);
+    ClassDef(TOPTemplateFitResult, 1); /**< ClassDef */
   };
 
 }

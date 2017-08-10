@@ -132,6 +132,7 @@ class WFDisplay(Module):
         k = 0
         nHits = 0
         fname = 'waveforms_run' + str(run) + '_event' + str(event) + '_chan'
+        #: output file name
         self.pdfFile = fname
         for waveform in waveforms:
             slot = waveform.getModuleID()

@@ -3,6 +3,7 @@
 
 from basf2 import *
 from ROOT import Belle2
+from svd import add_svd_simulation
 from tracking import add_tracking_for_PXDDataReduction_simulation
 
 
@@ -122,10 +123,7 @@ def add_simulation(
 
     # SVD digitization
     if components is None or 'SVD' in components:
-        svd_digitizer = register_module('SVDDigitizer')
-        path.add_module(svd_digitizer)
-        svd_clusterizer = register_module('SVDClusterizer')
-        path.add_module(svd_clusterizer)
+        add_svd_simulation(path)
 
     # CDC digitization
     if components is None or 'CDC' in components:

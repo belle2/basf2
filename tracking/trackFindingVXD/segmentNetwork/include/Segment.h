@@ -41,10 +41,10 @@ namespace Belle2 {
     FullSecID::BaseType m_innerSector;
 
     /** unique integer identifier */
-    const long m_identifier;
+    int m_identifier;
 
     /** longer name for debugging */
-    const std::string m_name;
+    std::string m_name;
 
 
   public:
@@ -71,12 +71,13 @@ namespace Belle2 {
       m_outerHit(outerNode),
       m_innerHit(innerNode),
       m_outerSector(outerSector),
-      m_innerSector(innerSector),
+      m_innerSector(innerSector)
+    {
       // Use int (=int32) TrackNode IDs to construct long (=int64) Segment ID
-      m_identifier(long(m_outerHit->getID()) << 32 | m_innerHit->getID()),
+      m_identifier = m_outerHit->getID() << 16 | m_innerHit->getID();
       // Construct debugging Segment name out of debugging TrackNode names
-      m_name("Out: " + m_outerHit->getName() + ")" + ",\nin: " + m_innerHit->getName())
-    {}
+      m_name = "Out: " + m_outerHit->getName() + ")" + ",\nin: " + m_innerHit->getName();
+    }
 
     /** ************************* OPERATORS ************************* */
 
@@ -90,7 +91,7 @@ namespace Belle2 {
 /// getters:
 
     /** return ID of this segment */
-    long getID() { return m_identifier; }
+    int getID() { return m_identifier; }
 
     /** returns longer debugging name of this segment */
     const std::string& getName() const { return m_name; }

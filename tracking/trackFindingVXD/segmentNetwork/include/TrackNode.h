@@ -34,10 +34,10 @@ namespace Belle2 {
     SpacePoint* spacePoint;
 
     /** unique integer identifier */
-    const int m_identifier;
+    int m_identifier;
 
     /** longer name for debugging */
-    const std::string m_name;
+    std::string m_name;
 
     /** overloaded '=='-operator
      * TODO JKL: pretty ugly operator overload, should be fixed ASAP! (solution for null-ptr-issue needed)
@@ -98,7 +98,11 @@ namespace Belle2 {
     TrackNode() : sector(nullptr), spacePoint(nullptr), m_identifier(-1), m_name("SP: missing") {}
 
     TrackNode(SpacePoint* spacePoint) :      // Get unique identifier from SP ArrayIndex, Get long debugging name from SP
-      sector(nullptr), spacePoint(spacePoint), m_identifier(spacePoint->getArrayIndex()), m_name("SP: " + spacePoint->getName()) {}
+      sector(nullptr), spacePoint(spacePoint)
+    {
+      m_identifier = spacePoint->getArrayIndex();
+      m_name = "SP: " + spacePoint->getName();
+    }
 
     /** destructor */
     ~TrackNode() {}

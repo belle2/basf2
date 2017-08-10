@@ -323,7 +323,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
   for (RawSectorData& outerSectorData : collectedData) {
     ActiveSector<StaticSectorType, TrackNode>* outerSector = new ActiveSector<StaticSectorType, TrackNode>
     (outerSectorData.staticSector);
-    const long outerEntryID = outerSector->getID();
+    int outerEntryID = outerSector->getID();
 
     // skip double-adding of nodes into the network after first time found -> speeding up the code:
     bool wasAnythingFoundSoFar = false;
@@ -331,7 +331,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
     const std::vector<FullSecID>& innerSecIDs = outerSector->getInner2spSecIDs();
 
     for (const FullSecID innerSecID : innerSecIDs) {
-      const long innerEntryID = innerSecID;
+      int innerEntryID = innerSecID;
       vector<RawSectorData>::iterator innerRawSecPos =
         std::find_if(
           collectedData.begin(),
@@ -530,7 +530,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         if (accepted == false) { nRejected++; continue; } // skip combinations which weren't accepted
         nAccepted++;
 
-        const long innerSegmentID = long(centerHit->getEntry().getID()) << 32 | innerHit->getEntry().getID();
+        int innerSegmentID = centerHit->getEntry().getID() << 16 | innerHit->getEntry().getID();
         if (not segmentNetwork.isNodeInNetwork(innerSegmentID)) {
           // create innerSegment first (order of storage in vector<segments> is irrelevant):
           Segment<TrackNode>* innerSegment = new Segment<TrackNode>(
@@ -543,7 +543,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
           segmentNetwork.addNode(innerSegmentID, *innerSegment);
         }
 
-        const long outerSegmentID = long(outerHit->getEntry().getID()) << 32 | centerHit->getEntry().getID();
+        int outerSegmentID = outerHit->getEntry().getID() << 16 | centerHit->getEntry().getID();
         if (not segmentNetwork.isNodeInNetwork(outerSegmentID)) {
           // create innerSegment first (order of storage in vector<segments> is irrelevant):
           Segment<TrackNode>* outerSegment = new Segment<TrackNode>(

@@ -39,9 +39,9 @@ TOPLaserHitSelectorModule::TOPLaserHitSelectorModule() : HistoModule()
 {
   setDescription("TOP pixel-by-pixel gain analysis - first step : create hit timing-pulse height histogram");
 
-  m_timeHistogramBinning.push_back(200);
-  m_timeHistogramBinning.push_back(-50);
-  m_timeHistogramBinning.push_back(50);
+  m_timeHistogramBinning.push_back(140);
+  m_timeHistogramBinning.push_back(-25);
+  m_timeHistogramBinning.push_back(45);
   m_heightHistogramBinning.push_back(150);
   m_heightHistogramBinning.push_back(-50);
   m_heightHistogramBinning.push_back(1450);
@@ -76,8 +76,6 @@ void TOPLaserHitSelectorModule::initialize()
 {
   REG_HISTOGRAM;
 
-  //StoreArray<TOPRawDigit> rawDigits;
-  //rawDigits.isRequired();
   StoreArray<TOPDigit> digits;
   digits.isRequired();
 }
@@ -168,7 +166,8 @@ void TOPLaserHitSelectorModule::event()
     short pixelId = digit.getPixelID();
     short globalPixelId = (slotId - 1) * c_NPixelPerModule + pixelId - 1;
     short globalAsicId = globalPixelId / c_NChannelPerAsic;
-    if (digit.getHitQuality() == TOPDigit::c_Junk) continue;
+    if (digit.getHitQuality() == TOPDigit::c_Junk
+        || digit.getHitQuality() == TOPDigit::c_CalPulse) continue;
 
     float hitTime = digit.getTime() - refTimingMap[globalAsicId];
     float pulseHeight = digit.getPulseHeight();

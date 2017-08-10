@@ -78,16 +78,19 @@ namespace Belle2 {
     virtual void terminate();
 
     /**
-     * Module funcions to define histograms
+     * create timing-height 2D histograms for all 8192 pixels
      */
     virtual void defineHisto();
 
   private:
 
-    TH2F* m_timeHeightHistogram[c_NPixelPerModule * c_NModule];
+    TH2F* m_timeHeightHistogram[c_NPixelPerModule *
+                                c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) */
 
-    std::vector<int> m_timeHistogramBinning; /**< */
-    std::vector<int> m_heightHistogramBinning; /**< */
+    std::vector<int>
+    m_timeHistogramBinning; /**< histogram binning of hit timing distribution, in the order of number of bins, lower limit, upper limit */
+    std::vector<int>
+    m_heightHistogramBinning; /**< histogram binning of pulse height distribution, in the order of number of bins, lower limit, upper limit */
 
     bool m_useDoublePulse = true; /**< set true when you require both of double calibration pulses for reference timing */
     float m_calibrationPulseThreshold1 =

@@ -54,25 +54,25 @@ namespace Belle2 {
     virtual ~TOPGainEfficiencyCalculatorModule();
 
     /**
-     * Initialize the Module.
-     * This method is called at the beginning of data processing.
+     * Load time vs height 2D histogram from a given input file (paramter "inputFile")
+     * and prepare hit timing and pulse height distribution for each channel.
      */
     virtual void initialize();
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
+     * The main processes, fitting height distribution and calculating gain/efficiency,
+     * are done in this function.
      */
     virtual void beginRun();
 
     /**
-     * Event processor.
+     * This will be empty as the all the processes are done in beginRun() function
+     * thus input file can be a dummy file.
      */
     virtual void event();
 
     /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
+     * Draw plots to show fitting results for each channel and save them into a given PDF file (outputPDFFile).
      */
     virtual void endRun();
 
@@ -83,7 +83,8 @@ namespace Belle2 {
     virtual void terminate();
 
     /**
-     * Module funcions to define histograms
+     * Define TTree branches to store fit results for each channel
+     * This TTree is saved in an output file given by "histoFileName" parameter of "HistoManager" module.
      */
     virtual void defineHisto();
 
@@ -111,52 +112,58 @@ namespace Belle2 {
      */
     static double TOPGainFunc(double* var, double* par);
 
+    /**
+     * Find peak and return its position for a limited range of x (x smaller than the given value (xmax))
+     */
+    static double FindPeakForSmallerXThan(TH1* histo, double xmax = 0);
+
   private:
 
     TTree* m_tree = 0; /**< ntuple to store summary of gain/efficiency calculation */
     TH2F* m_timeHeightHistogram[c_NChannelPerPMT] = {}; /**< 2D histogram of hit timing and pulse height (or charge), taken from an output file of TOPLaserHitSelector */
     TH1D* m_timeHistogram[c_NChannelPerPMT] = {}; /**< hit timing distribution, extracted from m_timeHeightHistogram as a projection along its x-axis. Used to define direct laser photon hit timing */
-    TH1D* m_heightHistogram[c_NChannelPerPMT] = {};
-    TF1* m_funcForFitRange[c_NChannelPerPMT] = {};
-    TF1* m_funcForFullRange[c_NChannelPerPMT] = {};
+    TH1D* m_heightHistogram[c_NChannelPerPMT] = {}; /**< pulse height distribution, extracted from m_timeHeightHistogram as a projection along its y-axis with timing cut. Used gain/efficiency calculation. */
+    TF1* m_funcForLaser[c_NChannelPerPMT] = {}; /**< array of TF1 pointer to store fit function for hit timing distribution */
+    TF1* m_funcForFitRange[c_NChannelPerPMT] = {}; /**< array of TF1 pointer to store fit function for pulse height distribution, defined only for fit region */
+    TF1* m_funcForFullRange[c_NChannelPerPMT] = {}; /**< array of TF1 pointer to store fit function for pulse height distribution, defined only for full range of pulse height */
 
-    std::string m_inputFile = "";
-    std::string m_outputPDFFile = "";
-    short m_targetSlotId = 0;
-    short m_targetPmtId = 0;
+    std::string m_inputFile = ""; /**< input file containing timing vs height 2D histograms (output of TOPLaserHitSelector) */
+    std::string m_outputPDFFile =
+      ""; /**< output PDF file to store plots of 2D histogram, timing, and height distribution for each channel */
+    short m_targetSlotId = 0; /**< slot ID */
+    short m_targetPmtId = 0; /**< PMT ID */
 
-    float m_fitHalfWidth = 2.; /**< half fit width for direct laser hit peak in [ns] unit */
+    float m_fitHalfWidth = 1.; /**< half fit width for direct laser hit peak in [ns] unit */
     float m_threshold = 100; /**< pulse height threshold, which defines lower limit of fit region and efficiency calculation */
-    float m_fitMax = 0; /**<  */
+    float m_fitMax = 0; /**< upper limit of fit region for pulse height distribution, determined based on m_fracFit value */
+    float m_fracFit = 0.99; /**< fraction of events which are covered by an area [0,m_fitMax] */
+    float m_initialP0 = 1e-6; /**< initial value of the fit parameter p0 */
+    float m_initialP1 = 3.0; /**< initial value of the fit parameter p1 */
+    float m_initialP2 = 0.5; /**< initial value of the fit parameter p2 */
+    float m_initialX0 = 0.5; /**< initial value of the fit parameter x0 */
+    float m_pedestalSigma = 10.; /**< sigma of pedestal */
 
-    float m_fracFit = 0.99;
-    float m_initialP0 = 1e-6;
-    float m_initialP1 = 3.0;
-    float m_initialP2 = 0.5;
-    float m_initialX0 = 0.5;
-    float m_pedestalSigma = 10.;
-
-    short m_pixelId = 0;
-    short m_pmtId = 0;
-    short m_pmtChId = 0;
-    float m_hitTiming = 0;
-    float m_hitTimingSigma = 0;
-    float m_gain = 0;
-    float m_efficiency = 0;
-    int m_nEntries = 0;
-    float m_p0 = 0;
-    float m_p1 = 0;
-    float m_p2 = 0;
-    float m_x0 = 0;
-    float m_p0Error = 0;
-    float m_p1Error = 0;
-    float m_p2Error = 0;
-    float m_x0Error = 0;
-    float m_chisquare = 0;
-    int m_ndf = 0;
-    float m_funcFullRangeIntegral = 0;
-    float m_funcFitRangeIntegral = 0;
-    float m_histoFitRangeIntegral = 0;
+    short m_pixelId = 0; /**< pixel ID, calculated from PMT ID and PMT channel ID */
+    short m_pmtChId = 0; /**< PMT channel ID */
+    float m_hitTiming = 0; /**< timing of laser direct photon hits, given by Gaussian fit mean */
+    float m_hitTimingSigma = 0; /**< Gaussian fit sigma for a peak of laser direct photons in hit timing distribution */
+    int m_nEntries = 0; /**< entries of pulse height distribution */
+    float m_meanPulseHeight = 0; /**< histogram mean of pulse height distribution */
+    float m_gain = 0; /**< calculated gain from fitting of pulse height distribution */
+    float m_efficiency = 0; /**< calculated efficiency from fitting of pulse height distribution */
+    float m_p0 = 0; /**< fit result of p0 */
+    float m_p1 = 0; /**< fit result of p1 */
+    float m_p2 = 0; /**< fit result of p2 */
+    float m_x0 = 0; /**< fit result of x0 */
+    float m_p0Error = 0; /**< fit error of p0 */
+    float m_p1Error = 0; /**< fit error of p1 */
+    float m_p2Error = 0; /**< fit error of p2 */
+    float m_x0Error = 0; /**< fit error of x0 */
+    float m_chisquare = 0; /**< chi2 of fitting */
+    int m_ndf = 0; /**< NDF of fitting */
+    float m_funcFullRangeIntegral = 0; /**< integral of fit function for its full range  */
+    float m_funcFitRangeIntegral = 0; /**< integral of fit function above threshold */
+    float m_histoFitRangeIntegral = 0; /**< integral of histogram above threshold */
   };
 
 }  //namespace Belle2

@@ -55,7 +55,7 @@ if (args.inputFile[0] == "NoInputFile") and (args.interimRootFile == "NoInterimR
     print("                        [--arg --calChannel asicCh(0-7)] [--arg --threshold threshold]")
     print("                        [--arg --globalDAQ] [--arg --pocketDAQ]")
     print("                        [--arg --noOfflineFE] [--arg --useSingleCalPulse]")
-    print("*When input sroot files are missing but interim root file is given, "
+    print("*When input sroot files are missing but interim root file is given,"
           " skip the first process to create 2D histogram and start fitting.")
     print("*Both the slot and PMT numbers are mandatory to proceed to the second processes.")
     print("*default calibration asic channel is " + str(args.calChannel))

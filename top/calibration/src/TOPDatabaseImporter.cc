@@ -97,7 +97,6 @@ void TOPDatabaseImporter::importSampleTimeCalibration(string fNames)
       TH1F* hsampleTimes = (TH1F*) file->Get(hname.c_str());
       if (!hsampleTimes) {
         B2ERROR("Histogram '" << hname << "' with calibration constants not found");
-        file->Close();
         continue;
       }
       // parse scrodID from histogram title
@@ -106,14 +105,12 @@ void TOPDatabaseImporter::importSampleTimeCalibration(string fNames)
       auto ichannel = title.find("channel");
       if (iscrod == string::npos or ichannel == string::npos) {
         B2ERROR("Unsuccessful parsing of scrodID from '" << title << "'");
-        file->Close();
         continue;
       }
       iscrod += 5; // move forwards to the index of the scrod id (s-c-r-o-d)
       int len = ichannel - iscrod;
       if (len < 1) {
         B2ERROR("Unsuccessful parsing of scrodID from '" << title << "'");
-        file->Close();
         continue;
       }
       int scrodID = stoi(title.substr(iscrod, len));

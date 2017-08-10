@@ -161,6 +161,10 @@ void PXDEfficiencyModule::event()
     m_roi_fit_inside[aVxdID] = false;
     m_roi_clus_inside[aVxdID] = false;
     m_roi_digi_inside[aVxdID] = false;
+    m_roi_u_residual[aVxdID] = -99999;
+    m_roi_v_residual[aVxdID] = -99999;
+    m_roi_ucell_residual[aVxdID] = -99999;
+    m_roi_vcell_residual[aVxdID] = -99999;
 
     if (isgood) {
       m_u_fit[aVxdID] = intersec_buff.X();
@@ -202,8 +206,6 @@ void PXDEfficiencyModule::event()
 
   //require that two layers have an intersection!
   if (!foundL1 || !foundL2) return;
-
-
 
   //ROI info
 
@@ -254,6 +256,11 @@ void PXDEfficiencyModule::event()
 
       m_roi_digi_inside[thisSensorROI] = digi_inside;
       m_roi_clus_inside[thisSensorROI] = clus_inside;
+
+      m_roi_u_residual[thisSensorROI] = m_u_fit[thisSensorROI] - info.getUCellPosition(m_roi_centerU[thisSensorROI]);
+      m_roi_v_residual[thisSensorROI] = m_v_fit[thisSensorROI] - info.getVCellPosition(m_roi_centerV[thisSensorROI]);
+      m_roi_ucell_residual[thisSensorROI] = m_ucell_fit[thisSensorROI] - m_roi_centerU[thisSensorROI];
+      m_roi_vcell_residual[thisSensorROI] = m_vcell_fit[thisSensorROI] - m_roi_centerV[thisSensorROI];
     }
   }
 
@@ -466,6 +473,10 @@ void PXDEfficiencyModule::defineHisto()
     m_roi_fit_inside[avxdid] = false;
     m_roi_clus_inside[avxdid] = false;
     m_roi_digi_inside[avxdid] = false;
+    m_roi_u_residual[avxdid] = -99999;
+    m_roi_v_residual[avxdid] = -99999;
+    m_roi_ucell_residual[avxdid] = -99999;
+    m_roi_vcell_residual[avxdid] = -99999;
 
     m_tree->Branch("u_clus_" + buff, &(m_u_clus[avxdid]), "u_clus_" + buff + "/D");
     m_tree->Branch("v_clus_" + buff, &(m_v_clus[avxdid]), "v_clus_" + buff + "/D");
@@ -504,6 +515,11 @@ void PXDEfficiencyModule::defineHisto()
     m_tree->Branch("roi_fit_inside_" + buff, &(m_roi_fit_inside[avxdid]), "roi_fit_inside_" + buff + "/I");
     m_tree->Branch("roi_clus_inside_" + buff, &(m_roi_clus_inside[avxdid]), "roi_clus_inside_" + buff + "/I");
     m_tree->Branch("roi_digi_inside_" + buff, &(m_roi_digi_inside[avxdid]), "roi_digi_inside_" + buff + "/I");
+    m_tree->Branch("roi_u_residual_" + buff, &(m_roi_u_residual[avxdid]), "roi_u_residual_" + buff + "/D");
+    m_tree->Branch("roi_v_residual_" + buff, &(m_roi_v_residual[avxdid]), "roi_v_residual_" + buff + "/D");
+    m_tree->Branch("roi_ucell_residual_" + buff, &(m_roi_ucell_residual[avxdid]), "roi_ucell_residual_" + buff + "/I");
+    m_tree->Branch("roi_vcell_residual_" + buff, &(m_roi_vcell_residual[avxdid]), "roi_vcell_residual_" + buff + "/I");
+
 
     int nu = info.getUCells();
     int nv = info.getVCells();

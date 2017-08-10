@@ -44,7 +44,7 @@ namespace Belle2 {
     double m_sensorPhiMax;
     double m_sensorZMin;
     double m_sensorZMax;
-    double m_layer;
+    int m_layer;
 
     VxdID m_sensorInfo; /**< the sensor ID*/
 

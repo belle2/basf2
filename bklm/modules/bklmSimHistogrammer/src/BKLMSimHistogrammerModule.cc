@@ -135,9 +135,9 @@ void BKLMSimHistogrammerModule::event()
     cout << "looking at 1DHit " << i << endl;
     int scaledTag = -1;
     RelationVector<BKLMDigit> bklmDigits = hits1D[i]->getRelationsTo<BKLMDigit>();
-    for (const auto& digit : bklmDigits) {
-      RelationVector<BKLMSimHit> simHits = digit.getRelationsWith<BKLMSimHit>();
-      for (const auto& simHit : simHits) {
+    for (const auto& bklmDigit : bklmDigits) {
+      RelationVector<BKLMSimHit> relatedSimHits = bklmDigit.getRelationsWith<BKLMSimHit>();
+      for (const auto& simHit : relatedSimHits) {
         auto bgTag = simHit.getBackgroundTag();
         scaledTag = bgTag;
         //other has numeric value of 99
@@ -235,9 +235,9 @@ void BKLMSimHistogrammerModule::event()
     RelationVector<BKLMHit1d> related1DHits = hits2D[i]->getRelationsTo<BKLMHit1d>();
     for (const auto& hit1d : related1DHits) {
       RelationVector<BKLMDigit> bklmDigits = hit1d.getRelationsTo<BKLMDigit>();
-      for (const auto& digit : bklmDigits) {
-        RelationVector<BKLMSimHit> simHits = digit.getRelationsWith<BKLMSimHit>();
-        for (const auto& simHit : simHits) {
+      for (const auto& bklmDigit : bklmDigits) {
+        RelationVector<BKLMSimHit> relatedSimHits = bklmDigit.getRelationsWith<BKLMSimHit>();
+        for (const auto& simHit : relatedSimHits) {
           auto bgTag = simHit.getBackgroundTag();
           scaledTag = bgTag;
           //other has numeric value of 99

@@ -216,8 +216,8 @@ void BKLMAnaModule::event()
       m_totalTrkThephi[layer - 1]->Fill(trkphi, trktheta);
       m_totalMom->Fill(mom);
       //look for mateched BKLM2dHit
-      for (unsigned int m = 0; m < relatedHit2D.size(); m++) {
-        BKLMHit2d* hit = relatedHit2D[m];
+      for (unsigned int mHit = 0; mHit < relatedHit2D.size(); mHit++) {
+        BKLMHit2d* hit = relatedHit2D[mHit];
         //if(!hit->inRPC()) continue;
         if (hit->isForward() != isForward) continue;
         if (hit->getSector() != sector) continue;

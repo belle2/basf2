@@ -94,9 +94,9 @@ void BKLMReconstructorModule::event()
   // sort by module+strip number
   std::map<int, int> volIDToDigits;
   for (int d = 0; d < digits.getEntries(); ++d) {
-    BKLMDigit* digit = digits[d];
-    if (digit->inRPC() || digit->isAboveThreshold()) {
-      volIDToDigits.insert(std::pair<int, int>(digit->getModuleID() & BKLM_MODULESTRIPID_MASK, d));
+    BKLMDigit* bklmDigit = digits[d];
+    if (bklmDigit->inRPC() || bklmDigit->isAboveThreshold()) {
+      volIDToDigits.insert(std::pair<int, int>(bklmDigit->getModuleID() & BKLM_MODULESTRIPID_MASK, d));
     }
   }
   if (volIDToDigits.empty()) return;
@@ -109,14 +109,14 @@ void BKLMReconstructorModule::event()
   double averageTime = digits[volIDToDigits.begin()->second]->getTime();
 
   for (std::map<int, int>::iterator iVolMap = volIDToDigits.begin(); iVolMap != volIDToDigits.end(); ++iVolMap) {
-    BKLMDigit* digit = digits[iVolMap->second];
-    if ((iVolMap->first > oldVolID + 1) || (std::fabs(digit->getTime() - averageTime) > m_DtMax)) {
+    BKLMDigit* bklmDigit = digits[iVolMap->second];
+    if ((iVolMap->first > oldVolID + 1) || (std::fabs(bklmDigit->getTime() - averageTime) > m_DtMax)) {
       hit1ds.appendNew(cluster); // also creates relation hit1d to each digit in cluster
       cluster.clear();
     }
     double n = (double)(cluster.size());
-    averageTime = (n * averageTime + digit->getTime()) / (n + 1.0);
-    cluster.push_back(digit);
+    averageTime = (n * averageTime + bklmDigit->getTime()) / (n + 1.0);
+    cluster.push_back(bklmDigit);
     oldVolID = iVolMap->first;
   }
   hit1ds.appendNew(cluster); // also creates relation hit1d to each digit in cluster

@@ -75,6 +75,9 @@ namespace Belle2 {
     template <class ARecoHit, unsigned int Dimension>
     double calculateChi2(const genfit::MeasuredStateOnPlane& measuredStateOnPlane, ARecoHit& recoHit) const;
 
+    template <class ARecoHit, unsigned int Dimension>
+    double calculateResidualDistance(const genfit::MeasuredStateOnPlane& measuredStateOnPlane, ARecoHit& recoHit) const;
+
   private:
     /// Implementation of the kalman update step for a generic hit class.
     template <class ARecoHit, unsigned int Dimension>
@@ -169,6 +172,23 @@ namespace Belle2 {
 
     return calculateChi2<Dimension>(x_k, C_k, m_k, H_k, V_k);
   }
+
+  template <class ARecoHit, unsigned int Dimension>
+  double KalmanUpdateFitter::calculateResidualDistance(const genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                                                       ARecoHit& recoHit) const
+  {
+    Eigen::Vector5d x_k;
+    Eigen::Matrix5d C_k;
+    std::tie(x_k, C_k) = extractMatricesFromState(measuredStateOnPlane);
+
+    Eigen::Matrix<double, Dimension, 1> m_k;
+    Eigen::Matrix<double, Dimension, 5> H_k;
+    Eigen::Matrix<double, Dimension, Dimension> V_k;
+    std::tie(m_k, H_k, V_k) = extractMatricesFromHit<ARecoHit, Dimension>(recoHit, measuredStateOnPlane);
+
+    const Eigen::Matrix<double, Dimension, 1>& residual = m_k - H_k * x_k;
+    return residual.norm();
+  };
 
   template <class ARecoHit, unsigned int Dimension>
   double KalmanUpdateFitter::kalmanStepImplementation(genfit::MeasuredStateOnPlane& measuredStateOnPlane, ARecoHit& recoHit) const

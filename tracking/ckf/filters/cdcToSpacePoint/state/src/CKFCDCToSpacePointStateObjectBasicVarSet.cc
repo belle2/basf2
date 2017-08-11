@@ -71,17 +71,21 @@ bool CKFCDCToSpacePointStateObjectBasicVarSet::extract(const BaseCKFCDCToSpacePo
 
   KalmanUpdateFitter fitter;
   double chi2 = 0;
+  double residual = 0;
 
   if (spacePoint->getType() == VXD::SensorInfoBase::SVD) {
     for (const auto& svdCluster : spacePoint->getRelationsWith<SVDCluster>()) {
       SVDRecoHit recoHit(&svdCluster);
       chi2 += fitter.calculateChi2<SVDRecoHit, 1>(result->getMeasuredStateOnPlane(), recoHit);
+      residual += fitter.calculateResidualDistance<SVDRecoHit, 1>(result->getMeasuredStateOnPlane(), recoHit);
     }
   } else {
     PXDRecoHit recoHit(spacePoint->getRelated<PXDCluster>());
     chi2 = fitter.calculateChi2<PXDRecoHit, 2>(result->getMeasuredStateOnPlane(), recoHit);
+    residual = fitter.calculateResidualDistance<PXDRecoHit, 2>(result->getMeasuredStateOnPlane(), recoHit);
   }
   var<named("chi2_calculated")>() = chi2;
+  var<named("residual")>() = residual;
 
   if (result->isFitted()) {
     var<named("chi2")>() = result->getChi2();

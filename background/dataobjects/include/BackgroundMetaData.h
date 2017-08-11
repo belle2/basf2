@@ -41,8 +41,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    BackgroundMetaData() : m_backgroundTag(SimHitBase::bg_other),
-      m_realTime(0.0), m_fileType(c_Usual)
+    BackgroundMetaData()
     {}
 
     /**
@@ -114,9 +113,9 @@ namespace Belle2 {
     bool canBeMerged(const BackgroundMetaData* other);
 
     std::string m_backgroundType; /**< beam background type */
-    SimHitBase::BG_TAG m_backgroundTag; /**< background tag value */
-    float m_realTime; /**< real time that corresponds to beam background sample */
-    EFileType m_fileType; /**< file type */
+    SimHitBase::BG_TAG m_backgroundTag = SimHitBase::bg_other; /**< background tag */
+    float m_realTime = 0; /**< real time that corresponds to beam background sample */
+    EFileType m_fileType = c_Usual; /**< file type */
 
     /**
      * Class definition required for creation of ROOT dictionary.

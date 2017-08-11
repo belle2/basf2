@@ -95,7 +95,16 @@ bool BackgroundInfo::canBeMerged(const BackgroundInfo* otherObj)
 
 void BackgroundInfo::merge(const Mergeable* other)
 {
+
   auto otherObj = static_cast<const BackgroundInfo*>(other);
+
+  if (otherObj->getMethod() == c_Unknown and otherObj->getBackgrounds().empty())
+    return; // no merge for empty object
+
+  if (m_method == c_Unknown and m_backgrounds.empty()) { // empty, replace it with other
+    *this = *otherObj;
+    return;
+  }
 
   if (!canBeMerged(otherObj)) throw BackgroundInfoNotMergeable();
 

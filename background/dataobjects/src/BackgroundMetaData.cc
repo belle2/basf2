@@ -41,6 +41,13 @@ void BackgroundMetaData::merge(const Mergeable* other)
 {
   auto otherObj = static_cast<const BackgroundMetaData*>(other);
 
+  if (otherObj->getBackgroundType().empty()) return; // no merge for empty object
+
+  if (m_backgroundType.empty()) { // empty, replace it with other
+    *this = *otherObj;
+    return;
+  }
+
   if (!canBeMerged(otherObj)) throw BackgroundMetaDataNotMergeable();
 
   m_realTime += otherObj->getRealTime();

@@ -139,10 +139,10 @@ namespace Belle2 {
       m_top.evt = evtMetaData->getEvent();
       m_top.run = evtMetaData->getRun();
 
-      TVector3 momentum = trackFit->getMomentum();
-      m_top.p = momentum.Mag();
-      m_top.cth = momentum.CosTheta();
-      m_top.phi = momentum.Phi();
+      TVector3 mom = trackFit->getMomentum();
+      m_top.p = mom.Mag();
+      m_top.cth = mom.CosTheta();
+      m_top.phi = mom.Phi();
       m_top.pValue = trackFit->getPValue();
 
       if (mcParticle) {

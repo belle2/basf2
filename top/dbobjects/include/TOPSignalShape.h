@@ -50,6 +50,16 @@ namespace Belle2 {
     }
 
     /**
+     * Assignment operator
+     */
+    TOPSignalShape& operator=(const TOPSignalShape& shape)
+    {
+      *this = shape;
+      m_interpolator = 0;
+      return *this;
+    }
+
+    /**
      * Destructor
      */
     ~TOPSignalShape()

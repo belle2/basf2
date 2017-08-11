@@ -58,7 +58,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
     """
 
     # add svd_reconstruction
-    add_svd_reconstruction(path)
+    if components is None or 'SVD' in components:
+        add_svd_reconstruction(path)
 
     # Add tracking reconstruction modules
     add_tracking_reconstruction(path,

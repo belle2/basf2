@@ -742,6 +742,13 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     # Analyzer
     #################
 
+    # When using PXD require at least 2 SVD SPs for the SPTCs
+    if(use_pxd):
+        pxdSVDCut = register_module('PXDSVDCut')
+        pxdSVDCut.param('minSVDSPs', 2)
+        pxdSVDCut.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
+        path.add_module(pxdSVDCut)
+
     # Quality
     qualityEstimator = register_module('QualityEstimatorVXD')
     qualityEstimator.param('EstimationMethod', quality_estimator)

@@ -85,7 +85,9 @@ namespace Belle2 {
       // ... however, to speed things up, we first check if the plane of the cached mSoP
       //  and our own plane is the same.
       const genfit::SharedPlanePtr& plane = m_advanceAlgorithm.getPlane(measuredStateOnPlane, *hit);
-      const TVector3& normal = plane->getNormal();
+
+      // TODO: Need recalculation on correct plane (in v direction), need resetting of correct plane!
+      /*const TVector3& normal = plane->getNormal();
 
       const auto& sameNormal = [&normal](const std::pair<Key, genfit::MeasuredStateOnPlane>& pair) {
         return pair.first == normal;
@@ -101,7 +103,7 @@ namespace Belle2 {
         currentState->setAdvanced();
         return true;
       }
-      B2DEBUG(50, "Extrapolation needed!");
+      B2DEBUG(50, "Extrapolation needed!");*/
 
       // this means the two are not equal, so we have to do the extrapolation. We start with the mSoP of the
       // parent state.
@@ -113,7 +115,7 @@ namespace Belle2 {
       currentState->setMeasuredStateOnPlane(measuredStateOnPlane);
       currentState->setAdvanced();
 
-      m_cachedMSoPs.emplace_back(normal, measuredStateOnPlane);
+      //m_cachedMSoPs.emplace_back(normal, measuredStateOnPlane);
 
       return true;
     }

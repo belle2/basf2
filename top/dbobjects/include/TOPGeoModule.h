@@ -59,6 +59,18 @@ namespace Belle2 {
     }
 
     /**
+     * Assignment operator
+     */
+    TOPGeoModule& operator=(const TOPGeoModule& module)
+    {
+      *this = module;
+      m_rotation = 0;
+      m_rotationInverse = 0;
+      m_translation = 0;
+      return *this;
+    }
+
+    /**
      * Destructor
      */
     ~TOPGeoModule()

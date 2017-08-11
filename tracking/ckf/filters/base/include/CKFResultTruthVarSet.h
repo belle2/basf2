@@ -94,7 +94,7 @@ namespace Belle2 {
       Super::template var<Super::named("truth_number_of_mc_svd_hits")>() = mcTrack->getNumberOfSVDHits();
       Super::template var<Super::named("truth_number_of_mc_pxd_hits")>() = mcTrack->getNumberOfPXDHits();
       Super::template var<Super::named("truth_number_of_mc_cdc_hits")>() = mcTrack->getNumberOfCDCHits();
-      Super::template var<Super::named("truth")>() = numberOfCorrectHits == 2 * result->getHits().size() and numberOfCorrectHits > 0;
+      Super::template var<Super::named("truth")>() = numberOfCorrectHits == result->getHits().size() and numberOfCorrectHits > 0;
 
       return true;
     }

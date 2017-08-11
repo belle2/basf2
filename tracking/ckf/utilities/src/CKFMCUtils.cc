@@ -65,7 +65,7 @@ namespace Belle2 {
     for (const SpacePoint* spacePoint : spacePoints) {
       if (isCorrectHit(*spacePoint, *mcTrack)) {
         if (spacePoint->getType() == VXD::SensorInfoBase::SensorType::SVD) {
-          numberOfCorrectHits += 2;
+          numberOfCorrectHits += 1;
         } else {
           numberOfCorrectHits += 1;
         }

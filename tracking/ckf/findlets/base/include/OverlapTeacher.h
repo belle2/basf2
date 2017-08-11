@@ -53,10 +53,10 @@ namespace Belle2 {
         const auto& hits = result.getHits();
         // All results, which more than 1 wrong hit are discarded
         // TODO: make this more general!
-        if (2 * hits.size() - numberOfCorrectHits > 1) {
+        if (hits.size() - numberOfCorrectHits > 1) {
           result.setTeacherInformation(-1);
         } else {
-          result.setTeacherInformation(numberOfCorrectHits);
+          result.setTeacherInformation(2 * numberOfCorrectHits - hits.size());
         }
       }
 

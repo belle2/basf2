@@ -531,7 +531,7 @@ void TrackExtrapolateG4e::extrapolate(int pdgCode, // signed for charge
   G4ThreeVector positionG4e = position * CLHEP::cm; // convert from genfit2 units (cm) to geant4 units (mm)
   G4ThreeVector momentumG4e = momentum * CLHEP::GeV; // convert from genfit2 units (GeV/c) to geant4 units (MeV/c)
   if (isCosmic) momentumG4e = -momentumG4e;
-  G4ErrorSymMatrix covarianceG4e; // in Geant4e units (GeV/c, cm)
+  G4ErrorSymMatrix covarianceG4e(5, 0); // in Geant4e units (GeV/c, cm)
   fromPhasespaceToG4e(momentum, covariance, covarianceG4e);
   G4String nameG4e("g4e_" + G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetParticleName());
   G4ErrorFreeTrajState g4eState(nameG4e, positionG4e, momentumG4e, covarianceG4e);
@@ -589,7 +589,7 @@ void TrackExtrapolateG4e::identifyMuon(int pdgCode, // signed for charge
   G4ThreeVector positionG4e = position * CLHEP::cm; // from genfit2 units (cm) to geant4 units (mm)
   G4ThreeVector momentumG4e = momentum * CLHEP::GeV; // from genfit2 units (GeV/c) to geant4 units (MeV/c)
   if (isCosmic) momentumG4e = -momentumG4e;
-  G4ErrorSymMatrix covarianceG4e; // in Geant4e units (GeV/c, cm)
+  G4ErrorSymMatrix covarianceG4e(5, 0); // in Geant4e units (GeV/c, cm)
   fromPhasespaceToG4e(momentum, covariance, covarianceG4e);
   G4String nameG4e("g4e_" + G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetParticleName());
   G4ErrorFreeTrajState g4eState(nameG4e, positionG4e, momentumG4e, covarianceG4e);
@@ -684,7 +684,7 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
             // fallback ECLNEAR in case no ECLCROSS is found
             if (distance < eclClusterDistance[c]) {
               eclClusterDistance[c] = distance;
-              G4ErrorSymMatrix covariance(6);
+              G4ErrorSymMatrix covariance(6, 0);
               fromG4eToPhasespace(g4eState, covariance);
               eclHit3[c].update(EXT_ECLNEAR, extState.tof, pos / CLHEP::cm, mom / CLHEP::GeV, covariance);
             }
@@ -697,7 +697,7 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
                 double f = postD / (postD - preD);
                 G4ThreeVector midPos = pos + (prePos - pos) * f;
                 double tof = extState.tof + dt * f * (extState.isCosmic ? +1 : -1); // in ns, at end of step
-                G4ErrorSymMatrix covariance(6);
+                G4ErrorSymMatrix covariance(6, 0);
                 fromG4eToPhasespace(g4eState, covariance);
                 eclHit1[c].update(EXT_ECLCROSS, tof, midPos / CLHEP::cm, mom / CLHEP::GeV, covariance);
               }
@@ -715,7 +715,7 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
                 if ((f > -0.5) && (f <= 1.0)) {
                   G4ThreeVector midPos(prePos + f * delta);
                   double length = extState.length + dl * (1.0 - f) * (extState.isCosmic ? +1 : -1);
-                  G4ErrorSymMatrix covariance(6);
+                  G4ErrorSymMatrix covariance(6, 0);
                   fromG4eToPhasespace(g4eState, covariance);
                   eclHit2[c].update(EXT_ECLDL, length, midPos / CLHEP::cm, mom / CLHEP::GeV, covariance);
                 }
@@ -1103,7 +1103,7 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
                          lastPosition.Z() * CLHEP::cm); // in Geant4 units (mm)
     G4ThreeVector momG4e(lastMomentum.X() * CLHEP::GeV, lastMomentum.Y() * CLHEP::GeV,
                          lastMomentum.Z() * CLHEP::GeV);  // in Geant4 units (MeV/c)
-    G4ErrorSymMatrix covG4e; // in Geant4e units (GeV/c, cm)
+    G4ErrorSymMatrix covG4e(5, 0); // in Geant4e units (GeV/c, cm)
     fromPhasespaceToG4e(lastMomentum, lastCov, covG4e); // in Geant4e units (GeV/c, cm)
     g4eState.SetData("g4e_" + particle->GetParticleName(), posG4e, momG4e);
     g4eState.SetError(covG4e);
@@ -1178,7 +1178,7 @@ void TrackExtrapolateG4e::fromPhasespaceToG4e(const TVector3& momentum, const TM
   // phi = atan( py / px )
   // lambda = asin( pz / sqrt( px^2 + py^2 + pz^2 )
 
-  G4ErrorSymMatrix temp(6);
+  G4ErrorSymMatrix temp(6, 0);
   for (int k = 0; k < 6; ++k) {
     for (int j = k; j < 6; ++j) {
       temp[j][k] = covariance[j][k];
@@ -1279,7 +1279,7 @@ void TrackExtrapolateG4e::createExtHit(ExtHitStatus status, const ExtState& extS
   G4ThreeVector pos(stepPoint->GetPosition() / CLHEP::cm);
   G4ThreeVector mom(stepPoint->GetMomentum() / CLHEP::GeV);
   if (extState.isCosmic) mom = -mom;
-  G4ErrorSymMatrix covariance(6);
+  G4ErrorSymMatrix covariance(6, 0);
   fromG4eToPhasespace(g4eState, covariance);
   StoreArray<ExtHit> extHits(*m_ExtHitsColName);
   ExtHit* extHit = extHits.appendNew(extState.pdgCode, detID, copyID, status,
@@ -1706,7 +1706,7 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
 
 // Measurement errors in the detector plane
 
-  G4ErrorSymMatrix hitCov(2); // initialized to all zeroes
+  G4ErrorSymMatrix hitCov(2, 0); // initialized to all zeroes
   hitCov[0][0] = localVariance[0];
   hitCov[1][1] = localVariance[1];
   // No magnetic field: increase the hit uncertainty

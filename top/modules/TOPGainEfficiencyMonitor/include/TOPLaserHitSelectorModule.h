@@ -86,6 +86,8 @@ namespace Belle2 {
 
     TH2F* m_timeHeightHistogram[c_NPixelPerModule *
                                 c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) */
+    TH1F* m_nCalPulseHistogram; /**< histogram to store the number of events with calibration pulse(s) identified for each asic (1,024 in total),
+         the x-axis means global asic ID, defined as (slotNum-1)*64+(pixelID-1) */
 
     std::vector<int>
     m_timeHistogramBinning; /**< histogram binning of hit timing distribution, in the order of number of bins, lower limit, upper limit */

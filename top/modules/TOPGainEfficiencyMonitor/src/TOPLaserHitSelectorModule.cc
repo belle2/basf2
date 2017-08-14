@@ -102,6 +102,10 @@ void TOPLaserHitSelectorModule::defineHisto()
                                              m_timeHistogramBinning[0], m_timeHistogramBinning[1], m_timeHistogramBinning[2],
                                              m_heightHistogramBinning[0], m_heightHistogramBinning[1], m_heightHistogramBinning[2]);
   }
+
+  const short nAsic = c_NPixelPerModule / c_NChannelPerAsic * c_NChannelPerPMT;
+  m_nCalPulseHistogram = new TH1F("hNCalPulse", "number of calibration pulses identificed for each asic",
+                                  nAsic, -0.5, nAsic - 0.5);
 }
 
 void TOPLaserHitSelectorModule::beginRun()
@@ -133,15 +137,22 @@ void TOPLaserHitSelectorModule::event()
     short globalPixelId = calPulse.first;
     short globalAsicId = globalPixelId / c_NChannelPerAsic;
     std::vector<hitInfo_t> vec = calPulse.second;
-    if (!m_useDoublePulse) {
-      if (vec.size() == 1) {
-        if (vec[0].m_height > m_calibrationPulseThreshold1)
-          refTimingMap[globalAsicId] = vec[0].m_time;
+    double calPulseTiming = 9999999;
+    unsigned nCalPulseCandidates = vec.size();
+    if (!m_useDoublePulse) { //try to find the first cal. pulse in case that both of double cal. pulses are not required (choose the largest hit)
+      double maxPulseHeight = -1;
+      double maxHeightTiming = 9999999;
+      for (unsigned iVec = 0 ; iVec < nCalPulseCandidates ; iVec++) {
+        if (maxPulseHeight < vec[iVec].m_height) {
+          maxPulseHeight = vec[iVec].m_height;
+          maxHeightTiming = vec[iVec].m_time;
+        }
       }
-    } else {
-      unsigned nCalPulseCand = vec.size();
-      for (unsigned iVec = 0 ; iVec < nCalPulseCand ; iVec++) {
-        for (unsigned jVec = 0 ; jVec < nCalPulseCand ; jVec++) {
+      if (maxPulseHeight > m_calibrationPulseThreshold1)
+        calPulseTiming = maxHeightTiming;
+    } else { //try to identify both of double cal. pulses when specified by option (default)
+      for (unsigned iVec = 0 ; iVec < nCalPulseCandidates ; iVec++) {
+        for (unsigned jVec = 0 ; jVec < nCalPulseCandidates ; jVec++) {
 
           if (iVec == jVec || vec[iVec].m_time > vec[jVec].m_time) continue;
           if (vec[iVec].m_height > m_calibrationPulseThreshold1
@@ -151,15 +162,20 @@ void TOPLaserHitSelectorModule::event()
             //in case multiple candidates of double cal. pulses are found,
             //choose a pair with the earliest 1st cal. pulse timing
             if (refTimingMap.count(globalAsicId) == 0 || refTimingMap[globalAsicId] > vec[iVec].m_time)
-              refTimingMap[globalAsicId] = vec[iVec].m_time;
+              calPulseTiming = vec[0].m_time;
           }
         }//for(jVec)
       }//for(iVec)
     }//if(m_useDoublePulse)
+
+    if (calPulseTiming < 9999998) { //when cal. pulse(s) are properly identified
+      refTimingMap[globalAsicId] = calPulseTiming;
+      m_nCalPulseHistogram->Fill(globalAsicId);
+    }
   }//for(pair)
 
 
-  //calculate hit atiming with respect to cal. pulse and fill hit info. histogram
+  //calculate hit timing with respect to cal. pulse and fill hit info. histogram
   for (const auto& digit : digits) {
 
     short slotId = digit.getModuleID();

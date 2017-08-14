@@ -89,6 +89,7 @@ void TOPGainEfficiencyCalculatorModule::defineHisto()
   m_tree->Branch("hitTiming", &m_hitTiming, "hitTiming/F");
   m_tree->Branch("hitTimingSigma", &m_hitTimingSigma, "hitTimingSigma/F");
   m_tree->Branch("nEntries", &m_nEntries, "nEntries/I");
+  m_tree->Branch("nCalPulse", &m_nCalPulse, "nCalPulse/I");
   m_tree->Branch("meanPulseHeight", &m_meanPulseHeight, "meanPulseHeight/F");
   m_tree->Branch("threshold", &m_threshold, "threshold/F");
   m_tree->Branch("fitMax", &m_fitMax, "fitMax/F");
@@ -179,6 +180,10 @@ void TOPGainEfficiencyCalculatorModule::LoadHistograms()
     m_heightHistogram[iHisto] = hHeight;
   }
 
+  m_nCalPulseHistogram = (TH1F*)f->Get("hNCalPulse");
+  if (!m_nCalPulseHistogram)
+    B2WARNING("TOPGainEfficiencyCalculator : no histogram for the number of events with calibration pulses identified in the given input file");
+
   return;
 }
 
@@ -247,8 +252,10 @@ void TOPGainEfficiencyCalculatorModule::FitHistograms()
                 + ((m_targetPmtId - 1) / c_NPMTPerRow) * c_NPixelPerModule / 2
                 + (iHisto / c_NChannelPerPMTRow) * c_NPixelPerRow + (iHisto % c_NChannelPerPMTRow) + 1;
     m_pmtChId = (iHisto + 1);
+    int globalAsicId = ((m_targetSlotId - 1) * c_NPixelPerModule + (m_pixelId - 1)) / c_NChannelPerAsic;
 
     m_nEntries = hHeight->GetEntries();
+    m_nCalPulse = (m_nCalPulseHistogram ? m_nCalPulseHistogram->GetBinContent(globalAsicId + 1) : -1);
     m_meanPulseHeight = hHeight->GetMean();
     m_gain = weightedIntegral / totalWeight;
     m_efficiency = funcFull->Integral(m_threshold, funcFullMax) / funcFull->Integral((-1) * func->GetParameter(5), funcFullMax);

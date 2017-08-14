@@ -123,6 +123,8 @@ namespace Belle2 {
     TH2F* m_timeHeightHistogram[c_NChannelPerPMT] = {}; /**< 2D histogram of hit timing and pulse height (or charge), taken from an output file of TOPLaserHitSelector */
     TH1D* m_timeHistogram[c_NChannelPerPMT] = {}; /**< hit timing distribution, extracted from m_timeHeightHistogram as a projection along its x-axis. Used to define direct laser photon hit timing */
     TH1D* m_heightHistogram[c_NChannelPerPMT] = {}; /**< pulse height distribution, extracted from m_timeHeightHistogram as a projection along its y-axis with timing cut. Used gain/efficiency calculation. */
+    TH1F* m_nCalPulseHistogram =
+      0; /**< histogram to store the number of events with calibration pulse(s) identified for each asic (1,024) in total */
     TF1* m_funcForLaser[c_NChannelPerPMT] = {}; /**< array of TF1 pointer to store fit function for hit timing distribution */
     TF1* m_funcForFitRange[c_NChannelPerPMT] = {}; /**< array of TF1 pointer to store fit function for pulse height distribution, defined only for fit region */
     TF1* m_funcForFullRange[c_NChannelPerPMT] = {}; /**< array of TF1 pointer to store fit function for pulse height distribution, defined only for full range of pulse height */
@@ -148,6 +150,7 @@ namespace Belle2 {
     float m_hitTiming = 0; /**< timing of laser direct photon hits, given by Gaussian fit mean */
     float m_hitTimingSigma = 0; /**< Gaussian fit sigma for a peak of laser direct photons in hit timing distribution */
     int m_nEntries = 0; /**< entries of pulse height distribution */
+    int m_nCalPulse = 0; /**< the number of events with calibration pulse(s) identified*/
     float m_meanPulseHeight = 0; /**< histogram mean of pulse height distribution */
     float m_gain = 0; /**< calculated gain from fitting of pulse height distribution */
     float m_efficiency = 0; /**< calculated efficiency from fitting of pulse height distribution */

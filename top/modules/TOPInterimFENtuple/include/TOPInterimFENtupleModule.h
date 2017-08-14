@@ -83,7 +83,7 @@ namespace Belle2 {
     unsigned m_calibrationChannel = 0; /**< asic channel number where the calibration pulses are routed */
     bool m_saveWaveform = false; /**< set true when you want to save waveform data */
     bool m_useDoublePulse = true; /**< set true when you require both of double calibration pulses for reference timing */
-    float m_averageSamplingRate = 2.71394; /**< sampling rate with assumption of uniform interval in a unit of GHz */
+    // float m_averageSamplingRate = 2.71394; /**< sampling rate with assumption of uniform interval in a unit of GHz */
     float m_calibrationPulseThreshold1 =
       600; /**< minimum pulse height for the first calibration pulse to be qualified as calibration signals */
     float m_calibrationPulseThreshold2 =

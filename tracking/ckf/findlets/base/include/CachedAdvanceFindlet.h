@@ -51,6 +51,8 @@ namespace Belle2 {
     void apply(std::vector<AState>& childStates) override;
 
   private:
+    /// Parametere: use caching
+    bool m_param_useCaching = true;
     /// Subfindlet: Advance Algorithm
     AdvanceAlgorithm m_advanceAlgorithm;
 
@@ -86,37 +88,41 @@ namespace Belle2 {
       //  and our own plane is the same.
       const genfit::SharedPlanePtr& plane = m_advanceAlgorithm.getPlane(measuredStateOnPlane, *hit);
 
-      // TODO: Need recalculation on correct plane (in v direction), need resetting of correct plane!
       const TVector3& normal = plane->getNormal();
 
-      const auto& sameNormal = [&normal](const std::pair<Key, genfit::MeasuredStateOnPlane>& pair) {
-        return pair.first == normal;
-      };
-      const auto& cachedItem = std::find_if(m_cachedMSoPs.begin(), m_cachedMSoPs.end(), sameNormal);
+      if (m_param_useCaching) {
 
-      if (cachedItem != m_cachedMSoPs.end()) {
-        // We have already calculated this! so we can just reuse the cached mSoP
-        B2DEBUG(50, "No extrapolation needed!");
-        const genfit::MeasuredStateOnPlane& cachedMeasuredStateOnPlane = cachedItem->second;
+        const auto& sameNormal = [&normal](const std::pair<Key, genfit::MeasuredStateOnPlane>& pair) {
+          return pair.first == normal;
+        };
+        const auto& cachedItem = std::find_if(m_cachedMSoPs.begin(), m_cachedMSoPs.end(), sameNormal);
 
-        B2ASSERT("U vector must be the same!", plane->getU() == cachedMeasuredStateOnPlane.getPlane()->getU());
-        B2ASSERT("V vector must be the same!", plane->getV() == cachedMeasuredStateOnPlane.getPlane()->getV());
+        if (cachedItem != m_cachedMSoPs.end()) {
+          // We have already calculated this! so we can just reuse the cached mSoP
+          B2DEBUG(50, "No extrapolation needed!");
+          const genfit::MeasuredStateOnPlane& cachedMeasuredStateOnPlane = cachedItem->second;
 
-        const double oldU = cachedMeasuredStateOnPlane.getState()[3];
-        const double oldV = cachedMeasuredStateOnPlane.getState()[4];
-        const TVector3& oldO = cachedMeasuredStateOnPlane.getPlane()->getO();
-        const TVector3& newO = plane->getO();
-        const double newU = (oldO - newO).Dot(plane->getU()) + oldU;
-        const double newV = (oldO - newO).Dot(plane->getV()) + oldV;
+          B2ASSERT("U vector must be the same!", plane->getU() == cachedMeasuredStateOnPlane.getPlane()->getU());
+          B2ASSERT("V vector must be the same!", plane->getV() == cachedMeasuredStateOnPlane.getPlane()->getV());
 
-        genfit::MeasuredStateOnPlane translatedCachedMeasuredStateOnPlane = cachedMeasuredStateOnPlane;
-        translatedCachedMeasuredStateOnPlane.getState()[3] = newU;
-        translatedCachedMeasuredStateOnPlane.getState()[4] = newV;
+          const double oldU = cachedMeasuredStateOnPlane.getState()[3];
+          const double oldV = cachedMeasuredStateOnPlane.getState()[4];
+          const TVector3& oldO = cachedMeasuredStateOnPlane.getPlane()->getO();
+          const TVector3& newO = plane->getO();
+          const double newU = (oldO - newO).Dot(plane->getU()) + oldU;
+          const double newV = (oldO - newO).Dot(plane->getV()) + oldV;
 
-        currentState->setMeasuredStateOnPlane(translatedCachedMeasuredStateOnPlane);
-        currentState->setAdvanced();
-        return true;
+          genfit::MeasuredStateOnPlane translatedCachedMeasuredStateOnPlane = cachedMeasuredStateOnPlane;
+          translatedCachedMeasuredStateOnPlane.getState()[3] = newU;
+          translatedCachedMeasuredStateOnPlane.getState()[4] = newV;
+          translatedCachedMeasuredStateOnPlane.setPlane(plane);
+
+          currentState->setMeasuredStateOnPlane(translatedCachedMeasuredStateOnPlane);
+          currentState->setAdvanced();
+          return true;
+        }
       }
+
       B2DEBUG(50, "Extrapolation needed!");
 
       // this means the two are not equal, so we have to do the extrapolation. We start with the mSoP of the
@@ -129,7 +135,9 @@ namespace Belle2 {
       currentState->setMeasuredStateOnPlane(measuredStateOnPlane);
       currentState->setAdvanced();
 
-      m_cachedMSoPs.emplace_back(normal, measuredStateOnPlane);
+      if (m_param_useCaching) {
+        m_cachedMSoPs.emplace_back(normal, measuredStateOnPlane);
+      }
 
       return true;
     }
@@ -147,6 +155,10 @@ namespace Belle2 {
   void CachedAdvanceFindlet<AState>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
     m_advanceAlgorithm.exposeParameters(moduleParamList, prefix);
+
+    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useCaching"), m_param_useCaching,
+                                  "Use caching during the extrapolation (handle with care).",
+                                  m_param_useCaching);
   }
 
   template <class AState>

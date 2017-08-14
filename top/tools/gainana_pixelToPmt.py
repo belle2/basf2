@@ -94,11 +94,6 @@ def gainana_pixelToPmt(inputRoot, outputRoot, maxHitTiming=-8., nMinEntries=100)
     tr_out.Write()
     f_out.Close()
 
-
-<< << << < HEAD
-
-== == == =
->>>>>> > 0cbb3403fca82c4f9d03fe0e200991d7e6ace241
 if __name__ == '__main__':
 
     args = sys.argv

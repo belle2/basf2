@@ -49,14 +49,14 @@ if (args.inputFile[0] == "NoInputFile") and (args.interimRootFile == "NoInterimR
     print("usage:")
     print("basf2 analyzeGainEff.py [input_filename1.sroot, input_filename2.sroot, ...]")
     print("                        [--arg --interimRootFile interim_histo_output.root]")
-    print("                        [--arg --outputRootFile summary_tree_output.root]")
-    print("                        [--arg --outputPDFFile summary_plot.pdf]")
+    print("                        [--arg --outputRootFile sumamry_tree_output.root]")
+    print("                        [--arg --outputPDFFile sumamry_plot.pdf]")
     print("                        [--arg --slotID slotNum(1-16)] [--arg --PMTID PMTID(1-32)]")
     print("                        [--arg --calChannel asicCh(0-7)] [--arg --threshold threshold]")
     print("                        [--arg --globalDAQ] [--arg --pocketDAQ]")
     print("                        [--arg --noOfflineFE] [--arg --useSingleCalPulse]")
-    print("*When input sroot files are missing but interim root file is given,"
-          " skip the first process to create 2D histogram and start fitting.")
+    print("*When an input sroot file is missing but interim root file is given, "
+          " skip the first process to create 2D histogram and start fitting")
     print("*Both the slot and PMT numbers are mandatory to proceed to the second processes.")
     print("*default calibration asic channel is " + str(args.calChannel))
     print("*default threshold is " + str(args.threshold))
@@ -134,6 +134,7 @@ if not skipFirst:
     first = create_path()
 
     srootInput = register_module('SeqRootInput')
+    srootInput.param('inputFileName', "")
     srootInput.param('inputFileNames', inputFiles)
     first.add_module(srootInput)
 
@@ -201,9 +202,9 @@ if not skipSecond:
     print("start the second process...")
     second = create_path()
 
-    eventinfosetter = register_module('EventInfoSetter')
-    eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
-    second.add_module(eventinfosetter)
+    srootInput2 = register_module('SeqRootInput')
+    srootInput2.param('inputFileName', os.getenv('BELLE2_LOCAL_DIR') + '/top/tools/dummy.sroot')
+    second.add_module(srootInput2)
 
     # HistoManager
     histoman2 = register_module('HistoManager')

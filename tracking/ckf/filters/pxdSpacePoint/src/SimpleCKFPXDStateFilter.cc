@@ -23,7 +23,24 @@ namespace {
   {
     return (a % b + b) % b;
   }
+
+  unsigned int getPTRange(const Vector3D& momentum)
+  {
+    const double pT = momentum.xy().norm();
+    if (pT > 0.4) {
+      return 0;
+    } else if (pT > 0.2) {
+      return 1;
+    } else {
+      return 2;
+    }
+  }
 }
+
+constexpr const double SimpleCKFPXDStateFilter::m_param_maximumHelixDistanceXY[][3];
+constexpr const double SimpleCKFPXDStateFilter::m_param_maximumDistanceXY[][3];
+constexpr const double SimpleCKFPXDStateFilter::m_param_maximumDistance[][3];
+constexpr const double SimpleCKFPXDStateFilter::m_param_maximumChi2[][3];
 
 Weight SimpleCKFPXDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState)
 {
@@ -37,23 +54,16 @@ Weight SimpleCKFPXDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObje
     return 1;
   }
 
-  const Vector3D position(currentState.getMSoPPosition());
-  const Vector3D hitPosition(spacePoint->getPosition());
-
-  const double sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
-
-  if (sameHemisphere != 1) {
-    return NAN;
-  }
-
-  const TMatrixDSym& cov = currentState.getMSoPCovariance();
-  const double layer = extractGeometryLayer(currentState);
+  const unsigned int layer = extractGeometryLayer(currentState);
+  const Vector3D momentum(currentState.getMSoPMomentum());
 
   if (not currentState.isFitted() and not currentState.isAdvanced()) {
+    // TODO: Use the sensor information here and cache this!
     // Filter 1
     const RecoTrack* cdcTrack = currentState.getSeedRecoTrack();
 
-    const Vector3D momentum(currentState.getMSoPMomentum());
+    const Vector3D position(currentState.getMSoPPosition());
+    const Vector3D hitPosition(spacePoint->getPosition());
     const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed(), m_cachedBField);
 
     const double arcLength = trajectory.calcArcLength2D(hitPosition);
@@ -62,32 +72,36 @@ Weight SimpleCKFPXDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObje
     const Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
     const Vector3D differenceHelix = trackPositionAtHit - hitPosition;
 
-    const double helix_chi2_xyz = (differenceHelix.x() * differenceHelix.x() / sqrt(cov(0, 0)) +
-                                   differenceHelix.y() * differenceHelix.y() / sqrt(cov(1, 1)) +
-                                   differenceHelix.z() * differenceHelix.z() / sqrt(cov(2, 2)));
+    const double helixDifferenceXY = differenceHelix.xy().norm();
 
-    if (helix_chi2_xyz > m_param_maximumHelixChi2XYZ[layer - 1]) {
+    if (helixDifferenceXY > m_param_maximumHelixDistanceXY[layer - 1][getPTRange(momentum)]) {
       return NAN;
     } else {
-      return helix_chi2_xyz;
+      return helixDifferenceXY;
     }
   } else if (not currentState.isFitted()) {
     // Filter 2
+    const Vector3D position(currentState.getMSoPPosition());
+    const Vector3D hitPosition(spacePoint->getPosition());
     const Vector3D& difference = position - hitPosition;
 
-    const double chi2_xy = (difference.x() * difference.x() / sqrt(cov(0, 0)) +
-                            difference.y() * difference.y() / sqrt(cov(1, 1)));
-    const double chi2_xyz = chi2_xy + difference.z() * difference.z() / sqrt(cov(2, 2));
-
-    if (chi2_xy > m_param_maximumChi2XY[layer - 1]) {
-      return NAN;
+    if (layer == 2) {
+      const double differenceXY = difference.xy().norm();
+      if (differenceXY > m_param_maximumDistanceXY[layer - 1][getPTRange(momentum)]) {
+        return NAN;
+      } else {
+        return differenceXY;
+      }
     } else {
-      return chi2_xyz;
+      if (difference.norm() > m_param_maximumDistance[layer - 1][getPTRange(momentum)]) {
+        return NAN;
+      } else {
+        return difference.norm();
+      }
     }
   } else {
-    // Filter 3
     const double chi2 = currentState.getChi2();
-    if (chi2 > m_param_maximumChi2[layer - 1]) {
+    if (chi2 > m_param_maximumChi2[layer - 1][getPTRange(momentum)]) {
       return NAN;
     } else {
       return chi2;

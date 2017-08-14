@@ -16,6 +16,7 @@
 
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 namespace Belle2 {

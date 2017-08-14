@@ -51,7 +51,8 @@ Weight SimpleCKFPXDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObje
   const auto* spacePoint = currentState.getHit();
 
   if (not spacePoint) {
-    return 1;
+    // lets use a very small number here, to always have the empty state in the game
+    return 0;
   }
 
   const unsigned int layer = extractGeometryLayer(currentState);

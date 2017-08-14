@@ -22,13 +22,6 @@ using namespace TrackFindingCDC;
 void SimpleCKFSpacePointFilter::exposeParameters(ModuleParamList* moduleParamList,
                                                  const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHelixChi2XYZ"),
-                                m_param_maximumHelixChi2XYZ, "", m_param_maximumHelixChi2XYZ);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumChi2XY"),
-                                m_param_maximumChi2XY, "", m_param_maximumChi2XY);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumChi2"),
-                                m_param_maximumChi2, "", m_param_maximumChi2);
-
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitJumpingUpTo"), m_param_hitJumpingUpTo,
                                 "", m_param_hitJumpingUpTo);
 }

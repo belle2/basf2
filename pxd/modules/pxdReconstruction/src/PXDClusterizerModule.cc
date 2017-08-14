@@ -68,8 +68,8 @@ PXDClusterizerModule::PXDClusterizerModule() :
   addParam("MCParticles", m_storeMCParticlesName, "MCParticles collection name",
            string(""));
 
-  addParam("useClusterShape", m_useClusterShape,
-           "Apply recognition of cluster shape and set it as ID", false);
+  addParam("notUseClusterShape", m_notUseClusterShape,
+           "Do not apply recognition of cluster shape and set it as ID", false);
 }
 
 void PXDClusterizerModule::initialize()
@@ -133,7 +133,7 @@ void PXDClusterizerModule::initialize()
   B2INFO(" -->  ClusterDigitRel:    " << m_relClusterDigitName);
   B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
   B2INFO(" -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
-  B2INFO(" -->  useClusterShape:    " << m_useClusterShape);
+  B2INFO(" -->  NotUseClusterShape: " << m_notUseClusterShape);
 
   /* Electron equivalent of 1 ADU is set using gq and slope of the ADC curve.*/
   m_eToADU = m_ADCFineMode ? (70.0 / m_gq) : (130.0 / m_gq);
@@ -345,7 +345,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
 
     short clsShapeID = (short)pxdClusterShapeType::no_shape_set;
     PXDClusterShape cs;
-    if (m_useClusterShape) {
+    if (!m_notUseClusterShape) {
       clsShapeID = (short)cs.setClsShape(cls, sensorID);
     }
 

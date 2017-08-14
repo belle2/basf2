@@ -37,11 +37,17 @@ namespace Belle2 {
   namespace PXD {
 
     /** The pxdApplyClusterShapeCorrection module.
-     *
-     * This module tests whether TrueHits are accessible by following the clusters-to-truehits
-     * relation.
-
-     */
+      *
+      * This module tests whether TrueHits are accessible by following the clusters-to-truehits
+      * relation.
+      *
+      * @see PXDClusterShape
+      * @see PXDClusterShapeCalibration
+      * @see PXDClusterShapeCalibrationAlgorithm
+      * @see pxdMergeClusterShapeCorrections
+      * @see PXDDQMClusterShape
+      *
+      */
     class pxdApplyClusterShapeCorrectionModule : public Module {
 
     public:

@@ -26,7 +26,7 @@
 
 namespace Belle2 {
   /**
-   * PXDRecoHit - an extended form of PXDHit containing geometry information.
+   * PXDRecoHit - an extended form of PXDCluster containing geometry information.
    *
    * To create a list of PXDRecoHits for all PXDTrueHits belonging to one MCParticle do something like:
    *
@@ -95,6 +95,7 @@ namespace Belle2 {
     genfit::AbsMeasurement* clone() const;
 
     /** Methods that actually interface to Genfit.  */
+    /* This method allows to provide hit position dependent on track direction. */
     virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
 
     /** Get the compact ID.*/

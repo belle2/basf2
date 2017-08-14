@@ -594,210 +594,211 @@ void pxdApplyClusterShapeCorrectionModule::event()
   if (m_ExistCorrectionBasic == 0) return;
   StoreArray<genfit::Track> tracks(m_storeTrackName);
   VxdID sensorID(0);
+  /*
+    for (auto track : tracks) {  // over tracks
+      for (unsigned int ipoint = 0; ipoint < track.getNumPointsWithMeasurement(); ++ipoint) {  // over track points
+        if (PXDRecoHit* pxdhit = dynamic_cast<PXDRecoHit*>(track.getPointWithMeasurement(ipoint)->getRawMeasurement(0))) { // cluster
+          //const PXDCluster& cluster = * pxdhit->getCluster();
+          //const PXDCluster* cluster = pxdhit->getCluster();
+          PXDCluster* cluster = (PXDCluster*)pxdhit->getCluster();
+          if (!m_DoExpertHistograms) if (cluster->getShape() < 0) continue;
+          //if (m_MarkOfLoopForHistogramsFile == 1) {
+          //  TString TextSh = Form("ERROR!!! - Shape should be negative - but is = %i !!!!", cluster->getShape());
+          //  B2INFO(TextSh.Data());
+          //}
+          int DoCorrection = 1;
+          if (cluster->getShape() < 0) DoCorrection = 0; // do only monitoring histograms
+          //TVectorD state = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getFittedState(true).getState();
+          //double f_TrackUIncluded;
+          //f_TrackUIncluded = state[3];
+          //double f_TrackVIncluded;
+          //f_TrackVIncluded = state[4];
+          bool biased = false; // excluded residuals
+          //biased = true;       // included residuals
+          //TVectorD residual = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, biased).getState();
+          TVectorD state2 = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getFittedState(biased).getState();
+          double f_phiTrack = state2[1];
+          double f_thetaTrack = state2[2];
+          f_phiTrack = TMath::ATan2(f_phiTrack, 1.0);
+          f_thetaTrack = TMath::ATan2(f_thetaTrack, 1.0);
+          double f_TrackU = state2[3];
+          double f_TrackV = state2[4];
 
-  for (auto track : tracks) {  // over tracks
-    for (unsigned int ipoint = 0; ipoint < track.getNumPointsWithMeasurement(); ++ipoint) {  // over track points
-      if (PXDRecoHit* pxdhit = dynamic_cast<PXDRecoHit*>(track.getPointWithMeasurement(ipoint)->getRawMeasurement(0))) { // cluster
-        //const PXDCluster& cluster = * pxdhit->getCluster();
-        //const PXDCluster* cluster = pxdhit->getCluster();
-        PXDCluster* cluster = (PXDCluster*)pxdhit->getCluster();
-        if (!m_DoExpertHistograms) if (cluster->getShape() < 0) continue;
-        //if (m_MarkOfLoopForHistogramsFile == 1) {
-        //  TString TextSh = Form("ERROR!!! - Shape should be negative - but is = %i !!!!", cluster->getShape());
-        //  B2INFO(TextSh.Data());
-        //}
-        int DoCorrection = 1;
-        if (cluster->getShape() < 0) DoCorrection = 0; // do only monitoring histograms
-        //TVectorD state = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getFittedState(true).getState();
-        //double f_TrackUIncluded;
-        //f_TrackUIncluded = state[3];
-        //double f_TrackVIncluded;
-        //f_TrackVIncluded = state[4];
-        bool biased = false; // excluded residuals
-        //biased = true;       // included residuals
-        //TVectorD residual = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, biased).getState();
-        TVectorD state2 = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getFittedState(biased).getState();
-        double f_phiTrack = state2[1];
-        double f_thetaTrack = state2[2];
-        f_phiTrack = TMath::ATan2(f_phiTrack, 1.0);
-        f_thetaTrack = TMath::ATan2(f_thetaTrack, 1.0);
-        double f_TrackU = state2[3];
-        double f_TrackV = state2[4];
+          TMatrixDSym covarianceTR = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, biased).getCov();
+          double SigmaUTrack = sqrt(covarianceTR(0, 0) - (cluster->getUSigma() * cluster->getUSigma()));
+          double SigmaVTrack = sqrt(covarianceTR(1, 1) - (cluster->getVSigma() * cluster->getVSigma()));
+          //TMatrixDSym covarianceTRIncluded = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, true).getCov();
+          //double SigmaUTrackIncl = sqrt(covarianceTRIncluded(0, 0) - cluster->getUSigma() * cluster->getUSigma());
+          //double SigmaVTrackIncl = sqrt(covarianceTRIncluded(1, 1) - cluster->getVSigma() * cluster->getVSigma());
+          //TVectorD residual = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, true).getState();
+          // m_ResidUTrack = cluster.getU() - state[3];
+          // m_ResidVTrack = cluster.getV() - state[4];
+          //ResUIncl = f_TrackUIncluded - cluster->getU();
+          //m_ResidUTrack = residual.GetMatrixArray()[0];
+          //m_ResidVTrack = residual.GetMatrixArray()[1];
+          //printf("---> %f %f --- %f %f  (Tr: excl:%f incl: %f)\n",
+          //       cluster->getU() - state[3], cluster->getV() - state[4], residual.GetMatrixArray()[0], residual.GetMatrixArray()[1],
+  //               SigmaUTrack, TMath::Sqrt(f_TrackU*f_TrackU - f_TrackUIncluded*f_TrackUIncluded)
+  //               f_TrackU, TMath::Sqrt(SigmaUTrack*SigmaUTrack + f_TrackUIncluded*f_TrackUIncluded)
+  //               f_TrackU, SigmaUTrack + f_TrackUIncluded
+  //               f_TrackU - cluster->getU(), TMath::Sqrt(SigmaUTrack*SigmaUTrack + (f_TrackUIncluded - cluster->getU())*(f_TrackUIncluded - cluster->getU()))
+          //       SigmaUTrack, SigmaUTrackIncl
+          //      );
 
-        TMatrixDSym covarianceTR = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, biased).getCov();
-        double SigmaUTrack = sqrt(covarianceTR(0, 0) - (cluster->getUSigma() * cluster->getUSigma()));
-        double SigmaVTrack = sqrt(covarianceTR(1, 1) - (cluster->getVSigma() * cluster->getVSigma()));
-        //TMatrixDSym covarianceTRIncluded = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, true).getCov();
-        //double SigmaUTrackIncl = sqrt(covarianceTRIncluded(0, 0) - cluster->getUSigma() * cluster->getUSigma());
-        //double SigmaVTrackIncl = sqrt(covarianceTRIncluded(1, 1) - cluster->getVSigma() * cluster->getVSigma());
-        //TVectorD residual = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, true).getState();
-        // m_ResidUTrack = cluster.getU() - state[3];
-        // m_ResidVTrack = cluster.getV() - state[4];
-        //ResUIncl = f_TrackUIncluded - cluster->getU();
-        //m_ResidUTrack = residual.GetMatrixArray()[0];
-        //m_ResidVTrack = residual.GetMatrixArray()[1];
-        //printf("---> %f %f --- %f %f  (Tr: excl:%f incl: %f)\n",
-        //       cluster->getU() - state[3], cluster->getV() - state[4], residual.GetMatrixArray()[0], residual.GetMatrixArray()[1],
-//               SigmaUTrack, TMath::Sqrt(f_TrackU*f_TrackU - f_TrackUIncluded*f_TrackUIncluded)
-//               f_TrackU, TMath::Sqrt(SigmaUTrack*SigmaUTrack + f_TrackUIncluded*f_TrackUIncluded)
-//               f_TrackU, SigmaUTrack + f_TrackUIncluded
-//               f_TrackU - cluster->getU(), TMath::Sqrt(SigmaUTrack*SigmaUTrack + (f_TrackUIncluded - cluster->getU())*(f_TrackUIncluded - cluster->getU()))
-        //       SigmaUTrack, SigmaUTrackIncl
-        //      );
+  //        TVectorD track = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, biased).getState();
 
-//        TVectorD track = track.getPointWithMeasurement(ipoint)->getFitterInfo()->getResidual(0, biased).getState();
+          // TODO remeove those two lines - now correction of error in input datas (slope insteed angle)
+          //f_phiTrack = TMath::ATan2(f_phiTrack, 1.0);
+          //f_thetaTrack = TMath::ATan2(f_thetaTrack, 1.0);
 
-        // TODO remeove those two lines - now correction of error in input datas (slope insteed angle)
-        //f_phiTrack = TMath::ATan2(f_phiTrack, 1.0);
-        //f_thetaTrack = TMath::ATan2(f_thetaTrack, 1.0);
+          //if ((fabs(m_phiTrack / Unit::deg) > 90.0) || (fabs(m_thetaTrack / Unit::deg) > 90.0))printf("--------------------> %f %f %f %f slope --> %f %f deg\n",m_phiTrack / Unit::deg,m_thetaTrack / Unit::deg,
+          //       TMath::Tan(TMath::ATan2(m_phiTrack,1.0)) / Unit::deg, TMath::Tan(TMath::ATan2(m_thetaTrack,1.0)) / Unit::deg,
+          //       TMath::ATan2(m_phiTrack,1.0) / Unit::deg, TMath::ATan2(m_thetaTrack,1.0) / Unit::deg );
 
-        //if ((fabs(m_phiTrack / Unit::deg) > 90.0) || (fabs(m_thetaTrack / Unit::deg) > 90.0))printf("--------------------> %f %f %f %f slope --> %f %f deg\n",m_phiTrack / Unit::deg,m_thetaTrack / Unit::deg,
-        //       TMath::Tan(TMath::ATan2(m_phiTrack,1.0)) / Unit::deg, TMath::Tan(TMath::ATan2(m_thetaTrack,1.0)) / Unit::deg,
-        //       TMath::ATan2(m_phiTrack,1.0) / Unit::deg, TMath::ATan2(m_thetaTrack,1.0) / Unit::deg );
+          //((TMath::Pi() * i_angleV) / m_anglesV) - (TMath::Pi() / 2.0)
+          int iIndexPhi = (f_phiTrack + (TMath::Pi() / 2.0)) / (TMath::Pi() / m_anglesU);
+          int iIndexTheta = (f_thetaTrack + (TMath::Pi() / 2.0)) / (TMath::Pi() / m_anglesV);
+          //printf("----> %i   %f (%f)   %i   %f (%f) \n", iIndexPhi, f_phiTrack, f_phiTrack / TMath::Pi() * 180.0, iIndexTheta, f_thetaTrack, f_thetaTrack / TMath::Pi() * 180.0);
+          //Get Geometry information
+          sensorID = cluster->getSensorID();
+          const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(
+                                          sensorID));
+          int i_layer = Info.getID().getLayerNumber();
+          int i_sensor = Info.getID().getSensorNumber();
+          //int InspectDets = 0;
+          //if ((cluster->getShape() >= 11) && (cluster->getShape() <= 14)) InspectDets = 1;
+          //if (!InspectDets) continue;
+          //if (InspectDets) printf("------->Shape %i (%s)\n",cluster->getShape(), Belle2::PXD::PXDClusterShape::pxdClusterShapeDescription[(Belle2::PXD::pxdClusterShapeType)cluster->getShape()].c_str());
+          int i_shape = cluster->getShape() - 1;
+          if (i_shape < 0) i_shape = i_shape + 100;
+          if (i_shape < 0) continue;
+          //if (i_shape >= m_shapes) continue;
 
-        //((TMath::Pi() * i_angleV) / m_anglesV) - (TMath::Pi() / 2.0)
-        int iIndexPhi = (f_phiTrack + (TMath::Pi() / 2.0)) / (TMath::Pi() / m_anglesU);
-        int iIndexTheta = (f_thetaTrack + (TMath::Pi() / 2.0)) / (TMath::Pi() / m_anglesV);
-        //printf("----> %i   %f (%f)   %i   %f (%f) \n", iIndexPhi, f_phiTrack, f_phiTrack / TMath::Pi() * 180.0, iIndexTheta, f_thetaTrack, f_thetaTrack / TMath::Pi() * 180.0);
-        //Get Geometry information
-        sensorID = cluster->getSensorID();
-        const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(
-                                        sensorID));
-        int i_layer = Info.getID().getLayerNumber();
-        int i_sensor = Info.getID().getSensorNumber();
-        //int InspectDets = 0;
-        //if ((cluster->getShape() >= 11) && (cluster->getShape() <= 14)) InspectDets = 1;
-        //if (!InspectDets) continue;
-        //if (InspectDets) printf("------->Shape %i (%s)\n",cluster->getShape(), Belle2::PXD::PXDClusterShape::pxdClusterShapeDescription[(Belle2::PXD::pxdClusterShapeType)cluster->getShape()].c_str());
-        int i_shape = cluster->getShape() - 1;
-        if (i_shape < 0) i_shape = i_shape + 100;
-        if (i_shape < 0) continue;
-        //if (i_shape >= m_shapes) continue;
+          // TODO set it more systematically? m_closeEdge values
+          int EdgePixelSizeV1 = 512;   // TODO assign correctly from geometry/design
+          int EdgePixelSizeV2 = 256;   // TODO assign correctly from geometry/design
+          int EdgePixelSizeU = 256;    // TODO assign correctly from geometry/design
+          int m_EdgeClose = 3;
+          int m_closeEdge = 0;  // 0: healthy, far from edge or masked, 1: close edge, 2: close masked pixel
+          if ((i_sensor == 2) && (abs(Info.getVCellID(cluster->getV()) - EdgePixelSizeV1) < m_EdgeClose)) m_closeEdge = 1;
+          else if ((i_sensor == 1) && (abs(Info.getVCellID(cluster->getV()) - EdgePixelSizeV2) < m_EdgeClose)) m_closeEdge = 1;
+          else if (Info.getVCellID(cluster->getV()) < m_EdgeClose) m_closeEdge = 1;
+          else if ((EdgePixelSizeV1 + EdgePixelSizeV2 - Info.getVCellID(cluster->getV())) < m_EdgeClose) m_closeEdge = 1;
+          else if (Info.getUCellID(cluster->getU()) < m_EdgeClose) m_closeEdge = 1;
+          else if (EdgePixelSizeU - Info.getUCellID(cluster->getU()) < m_EdgeClose) m_closeEdge = 1;
 
-        // TODO set it more systematically? m_closeEdge values
-        int EdgePixelSizeV1 = 512;   // TODO assign correctly from geometry/design
-        int EdgePixelSizeV2 = 256;   // TODO assign correctly from geometry/design
-        int EdgePixelSizeU = 256;    // TODO assign correctly from geometry/design
-        int m_EdgeClose = 3;
-        int m_closeEdge = 0;  // 0: healthy, far from edge or masked, 1: close edge, 2: close masked pixel
-        if ((i_sensor == 2) && (abs(Info.getVCellID(cluster->getV()) - EdgePixelSizeV1) < m_EdgeClose)) m_closeEdge = 1;
-        else if ((i_sensor == 1) && (abs(Info.getVCellID(cluster->getV()) - EdgePixelSizeV2) < m_EdgeClose)) m_closeEdge = 1;
-        else if (Info.getVCellID(cluster->getV()) < m_EdgeClose) m_closeEdge = 1;
-        else if ((EdgePixelSizeV1 + EdgePixelSizeV2 - Info.getVCellID(cluster->getV())) < m_EdgeClose) m_closeEdge = 1;
-        else if (Info.getUCellID(cluster->getU()) < m_EdgeClose) m_closeEdge = 1;
-        else if (EdgePixelSizeU - Info.getUCellID(cluster->getU()) < m_EdgeClose) m_closeEdge = 1;
-
-        int i_pixelKind = 0;  // 0: smaller pixelsize, 1: larger pixelsize TODO set it more systematically?
-        if ((i_sensor == 2) && (Info.getVCellID(cluster->getV()) < EdgePixelSizeV1)) i_pixelKind = 1;
-        else if ((i_sensor == 1) && (Info.getVCellID(cluster->getV()) >= EdgePixelSizeV2)) i_pixelKind = 1;
-        if (i_layer == 2) i_pixelKind += 2;
-        if (i_sensor == 2) i_pixelKind += 4;
+          int i_pixelKind = 0;  // 0: smaller pixelsize, 1: larger pixelsize TODO set it more systematically?
+          if ((i_sensor == 2) && (Info.getVCellID(cluster->getV()) < EdgePixelSizeV1)) i_pixelKind = 1;
+          else if ((i_sensor == 1) && (Info.getVCellID(cluster->getV()) >= EdgePixelSizeV2)) i_pixelKind = 1;
+          if (i_layer == 2) i_pixelKind += 2;
+          if (i_sensor == 2) i_pixelKind += 4;
 
 
 
-        //printf("---> %i: s %i l %i v: %i p: %4.1f, v %f uhelV %f (atan: %f)\n",
-        //       i_pixelKind,i_sensor,i_layer,Info.getVCellID(cluster->getV()),Info.getVPitch(cluster->getV()) * 10000.0, cluster->getV(),
-        //       f_thetaTrack * 180.0 / TMath::Pi(), TMath::ATan2(f_thetaTrack, 1.0) * 180.0 / TMath::Pi()
-        //      );
-        //continue;
-        //if (i_sensor == 1) continue;  // special condition to check..... TODO remove later
+          //printf("---> %i: s %i l %i v: %i p: %4.1f, v %f uhelV %f (atan: %f)\n",
+          //       i_pixelKind,i_sensor,i_layer,Info.getVCellID(cluster->getV()),Info.getVPitch(cluster->getV()) * 10000.0, cluster->getV(),
+          //       f_thetaTrack * 180.0 / TMath::Pi(), TMath::ATan2(f_thetaTrack, 1.0) * 180.0 / TMath::Pi()
+          //      );
+          //continue;
+          //if (i_sensor == 1) continue;  // special condition to check..... TODO remove later
 
-        float ResU = 0;
-        float ResV = 0;
-        float EEU = 0;
-        float EEV = 0;
-        float f_SigmaU = cluster->getUSigma();
-        float f_SigmaV = cluster->getVSigma();
-        float Clsu = cluster->getU();
-        float Clsv = cluster->getV();
-        if (m_closeEdge  == 0) {
-          NClusters++;
-          //if (InspectDets) printf("------->Not close edge\n");
-          if (m_DoExpertHistograms) {
-            ResU = f_TrackU - Clsu;
-            ResV = f_TrackV - Clsv;
-            EEU = ResU / TMath::Sqrt(f_SigmaU * f_SigmaU + SigmaUTrack * SigmaUTrack);
-            EEV = ResV / TMath::Sqrt(f_SigmaV * f_SigmaV + SigmaVTrack * SigmaVTrack);
-            //if (InspectDets) printf("------->ResU %f , ResV %f\n", 10000.0 * ResU, 10000.0 * ResV );
-            B2DEBUG(130, "--------------------------------> before: " << Clsu << ", ResU " << ResU << ", ResV " << ResV << ", ind1 "
-                    <<
-                    0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape <<
-                    ", ind2 " << 0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes);
-            m_histResidualU[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResU / Unit::um);
-            m_histResidualV[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResV / Unit::um);
-            m_histResidualUV[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResU / Unit::um, ResV / Unit::um);
-            m_histNormErrorU[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEU);
-            m_histNormErrorV[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEV);
-            m_histNormErrorUV[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEU, EEV);
+          float ResU = 0;
+          float ResV = 0;
+          float EEU = 0;
+          float EEV = 0;
+          float f_SigmaU = cluster->getUSigma();
+          float f_SigmaV = cluster->getVSigma();
+          float Clsu = cluster->getU();
+          float Clsv = cluster->getV();
+          if (m_closeEdge  == 0) {
+            NClusters++;
+            //if (InspectDets) printf("------->Not close edge\n");
+            if (m_DoExpertHistograms) {
+              ResU = f_TrackU - Clsu;
+              ResV = f_TrackV - Clsv;
+              EEU = ResU / TMath::Sqrt(f_SigmaU * f_SigmaU + SigmaUTrack * SigmaUTrack);
+              EEV = ResV / TMath::Sqrt(f_SigmaV * f_SigmaV + SigmaVTrack * SigmaVTrack);
+              //if (InspectDets) printf("------->ResU %f , ResV %f\n", 10000.0 * ResU, 10000.0 * ResV );
+              B2DEBUG(130, "--------------------------------> before: " << Clsu << ", ResU " << ResU << ", ResV " << ResV << ", ind1 "
+                      <<
+                      0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape <<
+                      ", ind2 " << 0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes);
+              m_histResidualU[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResU / Unit::um);
+              m_histResidualV[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResV / Unit::um);
+              m_histResidualUV[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResU / Unit::um, ResV / Unit::um);
+              m_histNormErrorU[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEU);
+              m_histNormErrorV[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEV);
+              m_histNormErrorUV[0 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEU, EEV);
 
-            m_histResidualU[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResU / Unit::um);
-            m_histResidualV[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResV / Unit::um);
-            m_histResidualUV[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResU / Unit::um, ResV / Unit::um);
-            m_histNormErrorU[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEU);
-            m_histNormErrorV[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEV);
-            m_histNormErrorUV[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEU, EEV);
-          }
-          if (DoCorrection) {
-            for (int i_axis = 0; i_axis < m_dimensions; i_axis++) {
-              if (TCorrection_BiasMap[0][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)] != 0.0) {  // use basic corrections:
-                NClustersBasicCorBias[i_axis]++;
-              } else {  // use simulation corrections:
-                NClustersSimulationCorBias[i_axis]++;
-              }
-              if (i_axis == 0) {
-                Clsu -= TCorrection_BiasMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
-                cluster->setU(Clsu);
-              }
-              if (i_axis == 1) {
-                Clsv -= TCorrection_BiasMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
-                cluster->setV(Clsv);
-              }
-              if (TCorrection_ErrorEstimationMap[0][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)] != 1.0) {
-                NClustersBasicCorErEst[i_axis]++;
-              } else {  // use simulation corrections:
-                NClustersSimulationCorErEst[i_axis]++;
-              }
-              if (i_axis == 0) {
-                f_SigmaU *= TCorrection_ErrorEstimationMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
-                cluster->setUSigma(f_SigmaU);
-              }
-              if (i_axis == 1) {
-                f_SigmaV *= TCorrection_ErrorEstimationMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
-                cluster->setVSigma(f_SigmaV);
+              m_histResidualU[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResU / Unit::um);
+              m_histResidualV[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResV / Unit::um);
+              m_histResidualUV[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResU / Unit::um, ResV / Unit::um);
+              m_histNormErrorU[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEU);
+              m_histNormErrorV[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEV);
+              m_histNormErrorUV[0 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEU, EEV);
+            }
+            if (DoCorrection) {
+              for (int i_axis = 0; i_axis < m_dimensions; i_axis++) {
+                if (TCorrection_BiasMap[0][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)] != 0.0) {  // use basic corrections:
+                  NClustersBasicCorBias[i_axis]++;
+                } else {  // use simulation corrections:
+                  NClustersSimulationCorBias[i_axis]++;
+                }
+                if (i_axis == 0) {
+                  Clsu -= TCorrection_BiasMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
+                  cluster->setU(Clsu);
+                }
+                if (i_axis == 1) {
+                  Clsv -= TCorrection_BiasMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
+                  cluster->setV(Clsv);
+                }
+                if (TCorrection_ErrorEstimationMap[0][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)] != 1.0) {
+                  NClustersBasicCorErEst[i_axis]++;
+                } else {  // use simulation corrections:
+                  NClustersSimulationCorErEst[i_axis]++;
+                }
+                if (i_axis == 0) {
+                  f_SigmaU *= TCorrection_ErrorEstimationMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
+                  cluster->setUSigma(f_SigmaU);
+                }
+                if (i_axis == 1) {
+                  f_SigmaV *= TCorrection_ErrorEstimationMap[5][make_tuple(i_shape, i_pixelKind, i_axis, iIndexPhi, iIndexTheta)];
+                  cluster->setVSigma(f_SigmaV);
+                }
               }
             }
-          }
-          if (m_DoExpertHistograms) {
-            ResU = f_TrackU - Clsu;
-            ResV = f_TrackV - Clsv;
-            EEU = ResU / TMath::Sqrt(f_SigmaU * f_SigmaU + SigmaUTrack * SigmaUTrack);
-            EEV = ResV / TMath::Sqrt(f_SigmaV * f_SigmaV + SigmaVTrack * SigmaVTrack);
-            //ResUIncl = f_TrackUIncluded - cluster->getU();
-            //ResVIncl = f_TrackVIncluded - cluster->getV();
-            //if (InspectDets) printf("------->ResU %f , ResV %f\n", 10000.0 * ResU, 10000.0 * ResV );
-            B2DEBUG(130, "--------------------------------> After: " << Clsu << ", ResU " << ResU << ", ResV " << ResV << ", ind1 "
-                    <<
-                    1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape <<
-                    ", ind2 " << 1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes);
-            m_histResidualU[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResU / Unit::um);
-            m_histResidualV[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResV / Unit::um);
-            m_histResidualUV[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResU / Unit::um, ResV / Unit::um);
-            m_histNormErrorU[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEU);
-            m_histNormErrorV[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEV);
-            m_histNormErrorUV[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEU, EEV);
+            if (m_DoExpertHistograms) {
+              ResU = f_TrackU - Clsu;
+              ResV = f_TrackV - Clsv;
+              EEU = ResU / TMath::Sqrt(f_SigmaU * f_SigmaU + SigmaUTrack * SigmaUTrack);
+              EEV = ResV / TMath::Sqrt(f_SigmaV * f_SigmaV + SigmaVTrack * SigmaVTrack);
+              //ResUIncl = f_TrackUIncluded - cluster->getU();
+              //ResVIncl = f_TrackVIncluded - cluster->getV();
+              //if (InspectDets) printf("------->ResU %f , ResV %f\n", 10000.0 * ResU, 10000.0 * ResV );
+              B2DEBUG(130, "--------------------------------> After: " << Clsu << ", ResU " << ResU << ", ResV " << ResV << ", ind1 "
+                      <<
+                      1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape <<
+                      ", ind2 " << 1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes);
+              m_histResidualU[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResU / Unit::um);
+              m_histResidualV[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResV / Unit::um);
+              m_histResidualUV[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(ResU / Unit::um, ResV / Unit::um);
+              m_histNormErrorU[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEU);
+              m_histNormErrorV[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEV);
+              m_histNormErrorUV[1 * (m_pixelkinds * m_shapes + 1) + i_pixelKind * m_shapes + i_shape]->Fill(EEU, EEV);
 
-            m_histResidualU[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResU / Unit::um);
-            m_histResidualV[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResV / Unit::um);
-            m_histResidualUV[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResU / Unit::um, ResV / Unit::um);
-            m_histNormErrorU[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEU);
-            m_histNormErrorV[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEV);
-            m_histNormErrorUV[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEU, EEV);
+              m_histResidualU[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResU / Unit::um);
+              m_histResidualV[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResV / Unit::um);
+              m_histResidualUV[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(ResU / Unit::um, ResV / Unit::um);
+              m_histNormErrorU[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEU);
+              m_histNormErrorV[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEV);
+              m_histNormErrorUV[1 * (m_pixelkinds * m_shapes + 1) + m_pixelkinds * m_shapes]->Fill(EEU, EEV);
+            }
           }
+          if (DoCorrection) cluster->setShape(-100 + i_shape + 1); // 1 -> -99,...
         }
-        if (DoCorrection) cluster->setShape(-100 + i_shape + 1); // 1 -> -99,...
       }
     }
-  }
+    */
 }
 
 void pxdApplyClusterShapeCorrectionModule::terminate()

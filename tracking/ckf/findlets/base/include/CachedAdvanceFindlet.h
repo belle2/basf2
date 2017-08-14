@@ -87,7 +87,7 @@ namespace Belle2 {
       const genfit::SharedPlanePtr& plane = m_advanceAlgorithm.getPlane(measuredStateOnPlane, *hit);
 
       // TODO: Need recalculation on correct plane (in v direction), need resetting of correct plane!
-      /*const TVector3& normal = plane->getNormal();
+      const TVector3& normal = plane->getNormal();
 
       const auto& sameNormal = [&normal](const std::pair<Key, genfit::MeasuredStateOnPlane>& pair) {
         return pair.first == normal;
@@ -98,12 +98,26 @@ namespace Belle2 {
         // We have already calculated this! so we can just reuse the cached mSoP
         B2DEBUG(50, "No extrapolation needed!");
         const genfit::MeasuredStateOnPlane& cachedMeasuredStateOnPlane = cachedItem->second;
-        // we do not have to update the cached mSoP in this case (would not change anything anyway)
-        currentState->setMeasuredStateOnPlane(cachedMeasuredStateOnPlane);
+
+        B2ASSERT("U vector must be the same!", plane->getU() == cachedMeasuredStateOnPlane.getPlane()->getU());
+        B2ASSERT("V vector must be the same!", plane->getV() == cachedMeasuredStateOnPlane.getPlane()->getV());
+
+        const double oldU = cachedMeasuredStateOnPlane.getState()[3];
+        const double oldV = cachedMeasuredStateOnPlane.getState()[4];
+        const TVector3& oldO = cachedMeasuredStateOnPlane.getPlane()->getO();
+        const TVector3& newO = plane->getO();
+        const double newU = (oldO - newO).Dot(plane->getU()) + oldU;
+        const double newV = (oldO - newO).Dot(plane->getV()) + oldV;
+
+        genfit::MeasuredStateOnPlane translatedCachedMeasuredStateOnPlane = cachedMeasuredStateOnPlane;
+        translatedCachedMeasuredStateOnPlane.getState()[3] = newU;
+        translatedCachedMeasuredStateOnPlane.getState()[4] = newV;
+
+        currentState->setMeasuredStateOnPlane(translatedCachedMeasuredStateOnPlane);
         currentState->setAdvanced();
         return true;
       }
-      B2DEBUG(50, "Extrapolation needed!");*/
+      B2DEBUG(50, "Extrapolation needed!");
 
       // this means the two are not equal, so we have to do the extrapolation. We start with the mSoP of the
       // parent state.
@@ -115,7 +129,7 @@ namespace Belle2 {
       currentState->setMeasuredStateOnPlane(measuredStateOnPlane);
       currentState->setAdvanced();
 
-      //m_cachedMSoPs.emplace_back(normal, measuredStateOnPlane);
+      m_cachedMSoPs.emplace_back(normal, measuredStateOnPlane);
 
       return true;
     }

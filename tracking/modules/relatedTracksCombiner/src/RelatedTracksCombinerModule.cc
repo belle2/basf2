@@ -70,10 +70,11 @@ void RelatedTracksCombinerModule::event()
   // their VXD partner if they do.
   // For this, the fitted or seed state of the tracks is used - if they are already fitted or not.
   for (const RecoTrack& cdcRecoTrack : m_cdcRecoTracks) {
-    const RecoTrack* vxdRecoTrack = cdcRecoTrack.getRelated<RecoTrack>(m_vxdRecoTracksStoreArrayName);
-    if (vxdRecoTrack) {
+    bool hasPartner = false;
+    for (const RecoTrack& vxdRecoTrack : cdcRecoTrack.getRelationsWith<RecoTrack>(m_vxdRecoTracksStoreArrayName)) {
+      hasPartner = true;
       TVector3 vxdPosition;
-      std::tie(vxdPosition, std::ignore, std::ignore) = vxdRecoTrack->extractTrackState();
+      std::tie(vxdPosition, std::ignore, std::ignore) = vxdRecoTrack.extractTrackState();
 
       short cdcCharge = cdcRecoTrack.getChargeSeed();
 
@@ -84,16 +85,16 @@ void RelatedTracksCombinerModule::event()
       // We are using the basic information of the VXD track here, but copying the momentum and the charge from the
       // cdc track.
       // TODO: we should handle the covariance matrix properly here!
-      RecoTrack* newMergedTrack = vxdRecoTrack->copyToStoreArray(m_recoTracks);
+      RecoTrack* newMergedTrack = vxdRecoTrack.copyToStoreArray(m_recoTracks);
       newMergedTrack->setPositionAndMomentum(vxdPosition, trackMomentum);
       newMergedTrack->setChargeSeed(cdcCharge);
-      newMergedTrack->addHitsFromRecoTrack(vxdRecoTrack);
+      newMergedTrack->addHitsFromRecoTrack(&vxdRecoTrack);
       newMergedTrack->addHitsFromRecoTrack(&cdcRecoTrack, newMergedTrack->getNumberOfTotalHits());
-    } else {
-      if (not m_useOnlyFittedTracksInSingles or cdcRecoTrack.wasFitSuccessful()) {
-        RecoTrack* newTrack = cdcRecoTrack.copyToStoreArray(m_recoTracks);
-        newTrack->addHitsFromRecoTrack(&cdcRecoTrack);
-      }
+    }
+
+    if (not hasPartner and (not m_useOnlyFittedTracksInSingles or cdcRecoTrack.wasFitSuccessful())) {
+      RecoTrack* newTrack = cdcRecoTrack.copyToStoreArray(m_recoTracks);
+      newTrack->addHitsFromRecoTrack(&cdcRecoTrack);
     }
   }
 

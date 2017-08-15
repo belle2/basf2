@@ -115,6 +115,10 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
         mc_particle_crops = peelers.peel_mc_particle(mc_particle)
         hit_content_crops = peelers.peel_reco_track_hit_content(mc_reco_track)
         mc_to_pr_match_info_crops = self.peel_mc_to_pr_match_info(mc_reco_track)
+
+        # Custom peel function to get single detector hit purities
+        subdetector_hit_efficiency_crops = peelers.peel_subdetector_hit_efficiency(mc_reco_track, reco_track)
+
         mc_hit_efficiencies_in_all_pr_tracks_crops = self.peel_hit_efficiencies_in_all_pr_tracks(mc_reco_track)
 
         # Event Info
@@ -129,6 +133,7 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
                      **mc_to_pr_match_info_crops,
                      **hit_content_crops,
                      **mc_particle_crops,
+                     **subdetector_hit_efficiency_crops,
                      **mc_hit_efficiencies_in_all_pr_tracks_crops,
                      **event_crops,
                      **store_array_crops,

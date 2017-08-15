@@ -78,7 +78,7 @@ ROIGeometry::fillPlaneList(double toleranceZ, double tolerancePhi)
 
 
 void
-ROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVector3 recoTrackPosition)
+ROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVector3 recoTrackPosition, int layer)
 {
 
 
@@ -88,7 +88,7 @@ ROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVecto
 
   while (itPlanes != m_planeList.end()) {
 
-    if (itPlanes->isSensorInRange(recoTrackPosition))
+    if (itPlanes->isSensorInRange(recoTrackPosition, layer))
       selectedPlanes->push_back(*itPlanes);
 
     itPlanes++;

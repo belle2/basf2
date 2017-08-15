@@ -616,7 +616,7 @@ def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None, suffi
 
 
 def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None, suffix="",
-                                 sectormap_file=None):
+                                 sectormap_file=None, PXDminSVDSPs=2):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -631,6 +631,7 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     :param suffix: all names of intermediate Storearrays will have the suffix appended. Useful in cases someone needs to
                    put several instances of track finding in one path.
     :param sectormap_file: if set to a finite value, a file will be used instead of the sectormap in the database.
+    :param PXDminSVDSPs: When using PXD require at least this number of SVD SPs for the SPTCs
     """
     ##########################
     # some setting for VXDTF2
@@ -717,10 +718,10 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     # Analyzer
     #################
 
-    # When using PXD require at least 2 SVD SPs for the SPTCs
+    # When using PXD require at least PXDminSVDSPs SVD SPs for the SPTCs
     if(use_pxd):
         pxdSVDCut = register_module('PXDSVDCut')
-        pxdSVDCut.param('minSVDSPs', 2)
+        pxdSVDCut.param('minSVDSPs', PXDminSVDSPs)
         pxdSVDCut.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
         path.add_module(pxdSVDCut)
 

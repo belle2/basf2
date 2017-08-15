@@ -637,7 +637,7 @@ def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", compo
 
 
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
-                                 sectormap_file=None):
+                                 sectormap_file=None, PXDminSVDSPs=3):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -646,12 +646,14 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     Use the GenfitTrackCandidatesCreator Module to convert back.
 
     :param path: basf2 path
+    :param svd_clusters: SVDCluster collection name
     :param reco_tracks: Name of the output RecoTracks, Defaults to RecoTracks.
     :param components: List of the detector components to be used in the reconstruction. Defaults to None which means all
                        components.
     :param suffix: all names of intermediate Storearrays will have the suffix appended. Useful in cases someone needs to
                    put several instances of track finding in one path.
     :param sectormap_file: if set to a finite value, a file will be used instead of the sectormap in the database.
+    :param PXDminSVDSPs: When using PXD require at least this number of SVD SPs for the SPTCs
     """
     ##########################
     # some setting for VXDTF2
@@ -742,10 +744,10 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     # Analyzer
     #################
 
-    # When using PXD require at least 2 SVD SPs for the SPTCs
+    # When using PXD require at least PXDminSVDSPs SVD SPs for the SPTCs
     if(use_pxd):
         pxdSVDCut = register_module('PXDSVDCut')
-        pxdSVDCut.param('minSVDSPs', 2)
+        pxdSVDCut.param('minSVDSPs', PXDminSVDSPs)
         pxdSVDCut.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
         path.add_module(pxdSVDCut)
 

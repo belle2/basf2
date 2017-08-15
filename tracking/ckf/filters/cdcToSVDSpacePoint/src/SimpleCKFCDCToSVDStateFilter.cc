@@ -34,7 +34,7 @@ Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStat
   const auto* spacePoint = currentState.getHit();
 
   if (not spacePoint) {
-    return 1;
+    return 0;
   }
 
   const Vector3D position(currentState.getMSoPPosition());

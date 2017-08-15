@@ -13,6 +13,7 @@
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <pxd/reconstruction/PXDRecoHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -38,8 +39,9 @@ namespace {
 }
 
 constexpr const double SimpleCKFPXDStateFilter::m_param_maximumHelixDistanceXY[][3];
-constexpr const double SimpleCKFPXDStateFilter::m_param_maximumDistanceXY[][3];
-constexpr const double SimpleCKFPXDStateFilter::m_param_maximumDistance[][3];
+constexpr const double SimpleCKFPXDStateFilter::m_param_maximumHelixDistance[][3];
+constexpr const double SimpleCKFPXDStateFilter::m_param_maximumResidual[][3];
+constexpr const double SimpleCKFPXDStateFilter::m_param_maximumResidualOverSigma[][3];
 constexpr const double SimpleCKFPXDStateFilter::m_param_maximumChi2[][3];
 
 Weight SimpleCKFPXDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState)
@@ -58,6 +60,9 @@ Weight SimpleCKFPXDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObje
   const unsigned int layer = extractGeometryLayer(currentState);
   const Vector3D momentum(currentState.getMSoPMomentum());
 
+  double valueToCheck;
+  const MaximalValueArray* maximumValues;
+
   if (not currentState.isFitted() and not currentState.isAdvanced()) {
     // TODO: Use the sensor information here and cache this!
     // Filter 1
@@ -73,39 +78,38 @@ Weight SimpleCKFPXDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObje
     const Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
     const Vector3D differenceHelix = trackPositionAtHit - hitPosition;
 
-    const double helixDifferenceXY = differenceHelix.xy().norm();
-
-    if (helixDifferenceXY > m_param_maximumHelixDistanceXY[layer - 1][getPTRange(momentum)]) {
-      return NAN;
+    if (layer == 2) {
+      valueToCheck = differenceHelix.xy().norm();
+      maximumValues = &m_param_maximumHelixDistanceXY;
     } else {
-      return helixDifferenceXY;
+      valueToCheck = differenceHelix.norm();
+      maximumValues = &m_param_maximumHelixDistance;
     }
   } else if (not currentState.isFitted()) {
     // Filter 2
-    const Vector3D position(currentState.getMSoPPosition());
-    const Vector3D hitPosition(spacePoint->getPosition());
-    const Vector3D& difference = position - hitPosition;
+    PXDRecoHit recoHit(spacePoint->getRelated<PXDCluster>());
+    const auto& measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
+    const double residual = m_fitter.calculateResidualDistance<PXDRecoHit, 2>(measuredStateOnPlane, recoHit);
 
     if (layer == 2) {
-      const double differenceXY = difference.xy().norm();
-      if (differenceXY > m_param_maximumDistanceXY[layer - 1][getPTRange(momentum)]) {
-        return NAN;
-      } else {
-        return differenceXY;
-      }
+      const auto& covariance = measuredStateOnPlane.getCov();
+      const double sigmaU = sqrt(covariance(3, 3));
+      const double sigmaV = sqrt(covariance(4, 4));
+      const double maximalSigma = std::max(sigmaU, sigmaV);
+      valueToCheck = residual / maximalSigma;
+      maximumValues = &m_param_maximumResidualOverSigma;
     } else {
-      if (difference.norm() > m_param_maximumDistance[layer - 1][getPTRange(momentum)]) {
-        return NAN;
-      } else {
-        return difference.norm();
-      }
+      valueToCheck = residual;
+      maximumValues = &m_param_maximumResidual;
     }
   } else {
-    const double chi2 = currentState.getChi2();
-    if (chi2 > m_param_maximumChi2[layer - 1][getPTRange(momentum)]) {
-      return NAN;
-    } else {
-      return chi2;
-    }
+    valueToCheck = currentState.getChi2();
+    maximumValues = &m_param_maximumChi2;
+  }
+
+  if (valueToCheck > *maximumValues[layer - 1][getPTRange(momentum)]) {
+    return NAN;
+  } else {
+    return valueToCheck;
   }
 }

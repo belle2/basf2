@@ -82,42 +82,42 @@ namespace Belle2 {
       return (((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH + 2 * j] & 0x3F0) >> 4;  // & 0x3F0
     }
 
-    /** Return Row 1 of ROI j
+    /** Return MinVid (Row 1) of ROI j
      * @param j Index of ROI
-     * @return  Row 1
+     * @return  MinVid
      */
-    int getRow1(int j) const
+    int getMinVid(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
       return ((((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH + 2 * j] & 0xF) << 6) | ((((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH +
              2 * j + 1] & 0xFC000000) >> 26) ;
     }
 
-    /** Return Row 2 of ROI j
+    /** Return MaxVid (Row 2) of ROI j
      * @param j Index of ROI
-     * @return Row 2
+     * @return MaxVid
      */
-    int getRow2(int j) const
+    int getMaxVid(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
       return (((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH + 2 * j + 1] & 0x3FF00) >> 8;
     }
 
-    /** Return Col 1 of ROI j
+    /** Return MinUid (Col 1) of ROI j
      * @param j Index of ROI
-     * @return Column 1
+     * @return MinUid
      */
-    int getCol1(int j) const
+    int getMinUid(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
       return (((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH + 2 * j + 1] & 0x03FC0000) >> 18;
     }
 
-    /** Return Col 1 of ROI j
+    /** Return MaxUid (Col 2) of ROI j
      * @param j Index of ROI
-     * @return Column 2
+     * @return MaxUid
      */
-    int getCol2(int j) const
+    int getMaxUid(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
       return (((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH + 2 * j + 1]) & 0xFF;

@@ -11,7 +11,18 @@
 
 __authors__ = ['Sam Cunliffe', 'Jan Strube']
 
+import argparse
 import numpy as np
+
+
+def arguments():
+    """Parse command line options to this script"""
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-i", "--input", help="Input TOPOutput file", default="TOPOutput.root")
+    ap.add_argument("-t", "--tree", help="TTree name", default="tree")
+    ap.add_argument("-c", "--colour", help="Matplotlib colourmap", default="plasma")
+    ap.add_argument("-x", "--xaxis", help="Option for x axis arrangement", default="pixel")
+    return ap.parse_args()
 
 
 def Gaussian(mean, width, norm):
@@ -25,6 +36,29 @@ def PDF(listOfGaussians, x):
     """Remake the pdf for a single pixel (a sum of many Gaussians)"""
     return sum(g(x) for g in listOfGaussians)
 
+
+def plot_single_event_hitmap(digits):
+    """Plot the hitmap for a single event"""
+    ch = []
+    times = []
+    for d in digits:
+        # only run over good hits. 1 == c_Good
+        if d.getHitQuality() != 1:
+            continue
+        ch.append(d.getPixelID())  # this is the same as channel in the pdf
+        times.append(d.getTime())
+
+    plt.plot(ch, times, 'ro', markersize=5)
+    plt.colorbar()
+    plt.xlim(-5, 515)
+    plt.xlabel('pixel number')
+    plt.ylabel('time of propagation, $t_{TOP}$ (ns)')
+    plt.savefig("pdf_%i.pdf" % i)
+    plt.clf()
+    plt.plot(ch, times, 'ro', markersize=5)
+    return
+
+
 if __name__ == "__main__":
     # all the graphical imports are only necessary
     # if this script gets run, not if it's only imported
@@ -35,14 +69,17 @@ if __name__ == "__main__":
     import ROOT
     import sys
 
-    f = ROOT.TFile.Open(sys.argv[1])
-    t = f.Get("tree")
-    gcmap = 'plasma'  # color map
+    # get input
+    args = arguments()
+    f = ROOT.TFile.Open(args.input)
+    t = f.Get(args.tree)
 
+    # if args.xaxis in ["pixel", "pixelID"]:
     xbins = np.linspace(0, 512, 513)
     ybins = np.linspace(0, 80, 201)
     xcentres = xbins[0:-1] + 0.5 * (xbins[1:] - xbins[:-1])
     ycentres = ybins[0:-1] + 0.5 * (ybins[1:] - ybins[:-1])
+
     # create the image from the channels (int64) on X, and time bins (float64) on Y
     X, Y = np.meshgrid(xcentres, ycentres)
     zarrays = []
@@ -50,7 +87,7 @@ if __name__ == "__main__":
     # one track per event (particle gun)
     for i in range(t.GetEntries()):
         t.GetEntry(i)
-        """
+
         # one collection per track
         x = t.TOPPDFCollections[0]
 
@@ -61,49 +98,61 @@ if __name__ == "__main__":
             for peak, width, norm in pxData:
                 lOG.append(Gaussian(peak, width, norm))
             Z[:, pixel] = np.array([PDF(lOG, x) for x in ycentres])
-        zarrays.append(Z)
 
         plt.plot(ycentres, Z[:, 500])
         plt.savefig('single.pdf')
         plt.clf()
-        plt.pcolor(X, Y, Z, cmap=gcmap)
-"""
 
-        ch = []
-        times = []
-        digits = t.TOPDigits
-        for d in digits:
-            # only run over good hits. 1 == c_Good
-            if d.getHitQuality() != 1:
-                continue
-            ch.append(d.getPixelID())  # this is the same as channel in the pdf
-            times.append(d.getTime())
-        print(times)
+        # optional reordering of pixels first y then x
+        if args.xaxis in ['reordered']:
+            # rearrange the x centres list
+            newIDX = np.ravel(np.column_stack(xcentres.reshape(8, 64)))
+            # make it bin edges
+            newIDX = np.array(newIDX - 0.5, dtype=np.int64)
+            # re-order the Z
+            Z = Z[:, newIDX]
 
-        plt.plot(ch, times, 'ro', markersize=5)
-        plt.colorbar()
-        plt.xlim(-5, 515)
-        # plt.ylim(10, 59)
-        plt.xlabel('pixel number')
+        zarrays.append(Z)
+
+        # factored all of this to a function for reintegration later
+        # digits = t.TOPDigits
+        # plot_single_event_hitmap(digits)
+
+        plt.pcolor(X, Y, Z, cmap=args.colour)
         plt.ylabel('time of propagation, $t_{TOP}$ (ns)')
-        plt.savefig("pdf_%i.pdf" % i)
+
+        if args.xaxis in ['reordered']:
+            # change label and hide ticks (since in this case it's meaninglesS)
+            frame = plt.gca()
+            frame.axes.get_xaxis().set_ticks([])  # empty ticks
+            plt.xlabel('reordered pixel number')  # but still title
+            plt.savefig("pdf_%i_reordered.pdf" % i)
+        else:
+            plt.xlabel('pixel number')
+            plt.savefig("pdf_%i.pdf" % i)
+
         plt.clf()
 
         # log z axis
-        plt.pcolor(X, Y, Z, cmap=gcmap, norm=LogNorm())
-        plt.plot(ch, times, 'ro', markersize=5)
-        # plt.colorbar()
+        plt.pcolor(X, Y, Z, cmap=args.colour, norm=LogNorm())
         plt.xlim(-5, 515)
-        # plt.ylim(10, 59)
-        plt.xlabel('pixel number')
         plt.ylabel('time of propagation, $t_{TOP}$ (ns)')
-        plt.savefig("pdf_%i_logz.pdf" % i)
+
+        if args.xaxis in ['reordered']:
+            frame = plt.gca()
+            frame.axes.get_xaxis().set_ticks([])  # empty ticks
+            plt.xlabel('reordered pixel number')  # but still title
+            plt.savefig("pdf_%i_logy_reordered.pdf" % i)
+        else:
+            plt.xlabel('pixel number')
+            plt.savefig("pdf_%i_logy.pdf" % i)
+
         plt.clf()
 
     if len(zarrays) > 1:
         # then we made more rthan two plots so make a diff of the first two
         diff = zarrays[0] - zarrays[1]
-        plt.pcolor(X, Y, diff, cmap=gcmap)
+        plt.pcolor(X, Y, diff, cmap=args.colour)
         plt.colorbar()
         plt.xlabel('channel, $i_{ch}$')
         plt.ylabel('time of propagation, $t_{TOP}$ (ns)')
@@ -113,7 +162,7 @@ if __name__ == "__main__":
 
         # log z axis
         plt.clf()
-        plt.pcolor(X, Y, abs(diff), cmap=gcmap, norm=LogNorm())
+        plt.pcolor(X, Y, abs(diff), cmap=args.colour, norm=LogNorm())
         plt.colorbar()
         plt.xlim(0, 512)
         plt.ylim(10, 59)

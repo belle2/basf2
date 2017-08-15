@@ -51,8 +51,8 @@ void PXDROIDQMModule::defineHisto()
   hrawROIHLTmaxV = new TH1F("hrawROIHLTmaxV", "HLT ROI maxV;V", 768, 0, 768);
   hrawROIHLTminU = new TH1F("hrawROIHLTminU", "HLT ROI minU;U", 250, 0, 250);
   hrawROIHLTmaxU = new TH1F("hrawROIHLTmaxU", "HLT ROI maxU;U", 250, 0, 250);
-  hrawROIHLTsizeV = new TH1F("hrawROIHLTsizeV", "HLT ROI size row;U", 768, 0, 768);
-  hrawROIHLTsizeU = new TH1F("hrawROIHLTsizeU", "HLT ROI size col;U", 250, 0, 250);
+  hrawROIHLTsizeV = new TH1F("hrawROIHLTsizeV", "HLT ROI size;V", 768, 0, 768);
+  hrawROIHLTsizeU = new TH1F("hrawROIHLTsizeU", "HLT ROI size;U", 250, 0, 250);
 
   hrawROIDCmap  = new TH2F("hrawROIDCmap", "DATCON ROI Middle Map ;U;V", 250 / 4, 0, 250, 768 / 4, 0, 768);
   hrawROIDCsize  = new TH2F("hrawROIDCsize", "DATCON ROI Size Map ;U;V", 250 / 4, 0, 250, 768 / 4, 0, 768);
@@ -61,6 +61,8 @@ void PXDROIDQMModule::defineHisto()
   hrawROIDCmaxV = new TH1F("hrawROIDCmaxV", "DATCON ROI maxV;V", 768, 0, 768);
   hrawROIDCminU = new TH1F("hrawROIDCminU", "DATCON ROI minU;U", 250, 0, 250);
   hrawROIDCmaxU = new TH1F("hrawROIDCmaxU", "DATCON ROI maxU;U", 250, 0, 250);
+  hrawROIDCsizeV = new TH1F("hrawROIDCsizeV", "DATCON ROI size;V", 768, 0, 768);
+  hrawROIDCsizeU = new TH1F("hrawROIDCsizeU", "DATCON ROI size;U", 250, 0, 250);
 
   hrawROINrDCvsNrHLT = new TH2F("hrawROINrDCvsNrHLT", "Nr DATCON ROI vs Nr HLT ROI; Nr HLT ROI;Nr DATCON ROI", 100, 0, 100, 100, 0,
                                 100);
@@ -100,6 +102,8 @@ void PXDROIDQMModule::beginRun()
   hrawROIDCmaxV->Reset();
   hrawROIDCminU->Reset();
   hrawROIDCmaxU->Reset();
+  hrawROIDCsizeV->Reset();
+  hrawROIDCsizeU->Reset();
 
   hrawROINrDCvsNrHLT->Reset();
   hrawROIEVTsWithOneSource->Reset();
@@ -116,35 +120,37 @@ void PXDROIDQMModule::event()
     hrawROIcount->Fill(nr);
     for (auto j = 0; j < nr; j++) {
       hrawROItype->Fill(it.getType(j));
-      int r1, r2, c1, c2, rm, cm, rs, cs;
-      r1 = it.getMinVid(j);
-      r2 = it.getMaxVid(j);
-      rs = r2 - r1;
-      rm = (r1 + r2) / 2;
-      c1 = it.getMinUid(j);
-      c2 = it.getMaxUid(j);
-      cs = c2 - c1;
-      cm = (c1 + c2) / 2;
+      int Vmin, Vmax, Umin, Umax, Vmean, Umean, Vsize, Usize;
+      Vmin = it.getMinVid(j);
+      Vmax = it.getMaxVid(j);
+      Vsize = Vmax - Vmin;
+      Vmean = (Vmin + Vmax) / 2;
+      Umin = it.getMinUid(j);
+      Umax = it.getMaxUid(j);
+      Usize = Umax - Umin;
+      Umean = (Umin + Umax) / 2;
       if (it.getType(j)) {
         nr_DC++;
         hrawROIDC_DHHID->Fill(it.getDHHID(j));
-        hrawROIDCmap->Fill(cm, rm);
-        hrawROIDCsize->Fill(cs, rs);
-        hrawROIDCminV->Fill(r1);
-        hrawROIDCmaxV->Fill(r2);
-        hrawROIDCminU->Fill(c1);
-        hrawROIDCmaxU->Fill(c2);
+        hrawROIDCmap->Fill(Umean, Vmean);
+        hrawROIDCsize->Fill(Usize, Vsize);
+        hrawROIDCminV->Fill(Vmin);
+        hrawROIDCmaxV->Fill(Vmax);
+        hrawROIDCminU->Fill(Umin);
+        hrawROIDCmaxU->Fill(Umax);
+        hrawROIDCsizeV->Fill(Vsize);
+        hrawROIDCsizeU->Fill(Usize);
       } else {
         nr_HLT++;
         hrawROIHLT_DHHID->Fill(it.getDHHID(j));
-        hrawROIHLTmap->Fill(cm, rm);
-        hrawROIHLTsize->Fill(cs, rs);
-        hrawROIHLTminV->Fill(r1);
-        hrawROIHLTmaxV->Fill(r2);
-        hrawROIHLTminU->Fill(c1);
-        hrawROIHLTmaxU->Fill(c2);
-        hrawROIHLTsizeV->Fill(rs);
-        hrawROIHLTsizeU->Fill(cs);
+        hrawROIHLTmap->Fill(Umean, Vmean);
+        hrawROIHLTsize->Fill(Usize, Vsize);
+        hrawROIHLTminV->Fill(Vmin);
+        hrawROIHLTmaxV->Fill(Vmax);
+        hrawROIHLTminU->Fill(Umin);
+        hrawROIHLTmaxU->Fill(Umax);
+        hrawROIHLTsizeV->Fill(Vsize);
+        hrawROIHLTsizeU->Fill(Usize);
       }
     }
   }

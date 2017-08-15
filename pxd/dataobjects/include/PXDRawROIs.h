@@ -68,7 +68,7 @@ namespace Belle2 {
       return ((m_rois[2 * j] << 6) & 0x3C0) | ((m_rois[2 * j + 1] >> 26) & 0x3F) ;//  & 0x00F , & 0xFC000000
     }
 
-    /** Return Row 2 of ROI j
+    /** Return MaxVid (Row 2) of ROI j
      * @param j Index of ROI
      * @return MaxVid
      */

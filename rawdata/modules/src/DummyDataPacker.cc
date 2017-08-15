@@ -124,26 +124,26 @@ void DummyDataPackerModule::event()
 
     nwords_1st_hslb = n_basf2evt % 10 + 1;
     buf_hslb1 = new int[ nwords_1st_hslb];
-    for (int i = 0; i < nwords_1st_hslb; i++) {
-      buf_hslb1[ i ] = i;
+    for (int j = 0; j < nwords_1st_hslb; j++) {
+      buf_hslb1[ j ] = i + j;
     }
 
     nwords_2nd_hslb = (n_basf2evt + 1) % 10 + 1;
     buf_hslb2 = new int[ nwords_2nd_hslb];
-    for (int i = 0; i < nwords_2nd_hslb; i++) {
-      buf_hslb2[ i ] = i + 1;
+    for (int j = 0; j < nwords_2nd_hslb; j++) {
+      buf_hslb2[ j ] = i + j + 1;
     }
 
     nwords_3rd_hslb = 3 * (n_basf2evt + 2) % 10 + 1;
     buf_hslb3 = new int[ nwords_3rd_hslb];
-    for (int i = 0; i < nwords_3rd_hslb; i++) {
-      buf_hslb3[ i ] = i + 2;
+    for (int j = 0; j < nwords_3rd_hslb; j++) {
+      buf_hslb3[ j ] = i + j + 2;
     }
 
     nwords_4th_hslb = 4 * (n_basf2evt + 3)  % 10 + 1;
     buf_hslb4 = new int[ nwords_4th_hslb];
-    for (int i = 0; i < nwords_4th_hslb; i++) {
-      buf_hslb4[ i ] = i + 3;
+    for (int j = 0; j < nwords_4th_hslb; j++) {
+      buf_hslb4[ j ] = i + j + 3;
     }
 
     raw_svd->PackDetectorBuf(buf_hslb1, nwords_1st_hslb,

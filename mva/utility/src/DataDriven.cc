@@ -200,10 +200,10 @@ namespace Belle2 {
         inverse_covariance[2] += binning.m_bckgrd_pdf[iBin] * binning.m_bckgrd_pdf[iBin] / norm;
       }
       double covariance[3] = {0};
-      double norm = (inverse_covariance[0] * inverse_covariance[2] - inverse_covariance[1] * inverse_covariance[1]);
-      covariance[0] = inverse_covariance[2] / norm;
-      covariance[1] = -inverse_covariance[1] / norm;
-      covariance[2] = inverse_covariance[0] / norm;
+      double determinante = (inverse_covariance[0] * inverse_covariance[2] - inverse_covariance[1] * inverse_covariance[1]);
+      covariance[0] = inverse_covariance[2] / determinante;
+      covariance[1] = -inverse_covariance[1] / determinante;
+      covariance[2] = inverse_covariance[0] / determinante;
 
       // Finally calculate sPlot weights
       std::vector<float> splot_weights;

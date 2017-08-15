@@ -148,7 +148,7 @@ void PXDDQMClusterShapeModule::defineHisto()
     TVectorD* Correction_BiasErr = NULL;
     TVectorD* InPixelPosition = NULL;
 
-    if (m_UseCorrectionsFromFile) {
+    if (m_UseCorrectionsFromFile == 0) {
       int isLoad = 1;
       TString Name = Form("PXDClSh_BasicSetting");
       DBObjPtr<TVectorD> BasicSetting(Name.Data());
@@ -164,34 +164,44 @@ void PXDDQMClusterShapeModule::defineHisto()
         isLoad = 0;
       }
       Name = Form("PXDClSh_Correction_Bias");
-      DBObjPtr<TVectorD> Correction_Bias(Name.Data());
-      if (!Correction_Bias.isValid()) {
+      DBObjPtr<TVectorD> Correction_BiasDB(Name.Data());
+      if (!Correction_BiasDB.isValid()) {
         isLoad = 0;
       }
       Name = Form("PXDClSh_Correction_BiasErr");
-      DBObjPtr<TVectorD> Correction_BiasErr(Name.Data());
-      if (!Correction_BiasErr.isValid()) {
+      DBObjPtr<TVectorD> Correction_BiasErrDB(Name.Data());
+      if (!Correction_BiasErrDB.isValid()) {
         isLoad = 0;
       }
       Name = Form("PXDClSh_Correction_ErrorEstimation");
-      DBObjPtr<TVectorD> Correction_ErrorEstimation(Name.Data());
-      if (!Correction_ErrorEstimation.isValid()) {
+      DBObjPtr<TVectorD> Correction_ErrorEstimationDB(Name.Data());
+      if (!Correction_ErrorEstimationDB.isValid()) {
         isLoad = 0;
       }
       Name = Form("PXDClSh_Correction_ErrorEstimationCovariance");
-      DBObjPtr<TVectorD> Correction_ErrorEstimationCovariance(Name.Data());
-      if (!Correction_ErrorEstimationCovariance.isValid()) {
+      DBObjPtr<TVectorD> Correction_ErrorEstimationCovarianceDB(Name.Data());
+      if (!Correction_ErrorEstimationCovarianceDB.isValid()) {
         isLoad = 0;
       }
       Name = Form("PXDClSh_InPixelPosition");
-      DBObjPtr<TVectorD> InPixelPosition(Name.Data());
-      if (!InPixelPosition.isValid()) {
+      DBObjPtr<TVectorD> InPixelPositionDB(Name.Data());
+      if (!InPixelPositionDB.isValid()) {
         isLoad = 0;
       }
       if (isLoad == 0) {
         B2INFO("Could not open correction in DB: Shape corrections will not be applied.");
         return;
       }
+      Correction_Bias = new TVectorD(m_shapes * m_pixelkinds * m_dimensions * m_anglesU * m_anglesV);
+      Correction_ErrorEstimation = new TVectorD(m_shapes * m_pixelkinds * m_dimensions * m_anglesU * m_anglesV);
+      Correction_ErrorEstimationCovariance = new TVectorD(m_shapes * m_pixelkinds * m_dimensions * m_anglesU * m_anglesV);
+      Correction_BiasErr = new TVectorD(m_shapes * m_pixelkinds * m_dimensions * m_anglesU * m_anglesV);
+      InPixelPosition = new TVectorD(m_shapes * m_pixelkinds * m_anglesU * m_anglesV * m_in_pixelU * m_in_pixelV);
+      *Correction_Bias = *Correction_BiasDB;
+      *Correction_BiasErr = *Correction_BiasErrDB;
+      *Correction_ErrorEstimation = *Correction_ErrorEstimationDB;
+      *Correction_ErrorEstimationCovariance = *Correction_ErrorEstimationCovarianceDB;
+      *InPixelPosition = *InPixelPositionDB;
 
       B2DEBUG(80, "HitCorrector:  ---> Field dimensions: shapes: " << m_shapes << ", pixelkinds: " << m_pixelkinds <<
               ", dimensions: " << m_dimensions <<
@@ -227,9 +237,15 @@ void PXDDQMClusterShapeModule::defineHisto()
     }
     B2DEBUG(130, "-----> try to read non-zero elements:");
     for (int i_shape = 0; i_shape < 7; i_shape++) {
+      int i_vector = i_shape * m_pixelkinds * m_dimensions * m_anglesU * m_anglesV;
+      i_vector += 3 * m_dimensions * m_anglesU * m_anglesV;
+      i_vector += 0 * m_anglesU * m_anglesV;
+      i_vector += 9 * m_anglesV;
+      i_vector += 12;
       float fDifference = 0.1 * Unit::um;
-      if (fabs(Correction_Bias->GetMatrixArray()[i_shape]) > fDifference)
-        B2DEBUG(130, "     --> " << Correction_Bias->GetMatrixArray()[i_shape] << " (" << i_shape << ")");
+      if (fabs(Correction_Bias->GetMatrixArray()[i_vector]) > fDifference) {
+        B2DEBUG(130, "     --> " << Correction_Bias->GetMatrixArray()[i_vector] << " (" << i_vector << ")");
+      }
     }
 
     TString sLogFileName = m_CalFileName.c_str();
@@ -301,8 +317,8 @@ void PXDDQMClusterShapeModule::defineHisto()
     for (int iSh = 0; iSh < m_shapes; iSh++) {
       hClSBVal[iSh] = NULL;
       hClSEEVal[iSh] = NULL;
-      TString HistoName = Form("ClSBVal_Sh%02i", iSh + 1);
-      TString HistoTitle = Form("Cluster Shape Correction, bias values, shape %02i", iSh + 1);
+      HistoName = Form("ClSBVal_Sh%02i", iSh + 1);
+      HistoTitle = Form("Cluster Shape Correction, bias values, shape %02i", iSh + 1);
       hClSBVal[iSh] = new TH1F(HistoName.Data(), HistoTitle.Data(),
                                100, -50.0, 50.0);
       hClSBVal[iSh]->GetXaxis()->SetTitle("Correction [#mum]");

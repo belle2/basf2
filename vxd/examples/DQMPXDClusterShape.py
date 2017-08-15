@@ -68,16 +68,16 @@ use_local_database(database_filename, "", LogLevel.DEBUG)
 use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True, LogLevel.ERROR)
 use_local_database('database.txt')
 use_local_database('localdb/database.txt')
+use_local_database(Belle2.FileSystem.findFile("localdb/database.txt"))
 """
 reset_database()
 use_database_chain()
 if args.global_tag is not None:
     use_central_database(args.global_tag, LogLevel.DEBUG)
-use_central_database("GT_gen_prod_003.01_Master-20170721-132500", LogLevel.DEBUG)
-if args.local_db is not None:
-    use_local_database(Belle2.FileSystem.findFile(args.local_db), "", LogLevel.DEBUG)
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
-use_local_database(Belle2.FileSystem.findFile("localdb/database.txt"))
+# use_central_database("GT_gen_prod_003.01_Master-20170721-132500", LogLevel.DEBUG)
+# if args.local_db is not None:
+#     use_local_database(Belle2.FileSystem.findFile(args.local_db), "", LogLevel.DEBUG)
+# use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
 
 # For Particle Gun:
 CommonSets = {

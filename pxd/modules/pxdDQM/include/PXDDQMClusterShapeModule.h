@@ -78,7 +78,7 @@ namespace Belle2 {
       /** Name of file contain output merged calibration, default=PXD-ClasterShapeCorrections */
       std::string m_CalFileName = "PXD-ClasterShapeCorrections.root";
 
-      int m_SeeDQMOfCalibration = 1;    /**< flag <0,1>, create DQM of calibration in detail (log file, histograms), default = 0 */
+      int m_SeeDQMOfCalibration = 0;    /**< flag <0,1>, create DQM of calibration in detail (log file, histograms), default = 0 */
 
       int m_UseRealData = 0;            /**< flag <0,1>, using of real data is skip true points availabilities, default = 0 */
 

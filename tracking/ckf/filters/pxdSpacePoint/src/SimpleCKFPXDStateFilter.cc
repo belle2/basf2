@@ -103,13 +103,14 @@ Weight SimpleCKFPXDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObje
       maximumValues = &m_param_maximumResidual;
     }
   } else {
+    // Filter 3
     valueToCheck = currentState.getChi2();
     maximumValues = &m_param_maximumChi2;
   }
 
-  if (valueToCheck > *maximumValues[layer - 1][getPTRange(momentum)]) {
+  if (valueToCheck > (*maximumValues)[layer - 1][getPTRange(momentum)]) {
     return NAN;
-  } else {
-    return valueToCheck;
   }
+
+  return valueToCheck;
 }

@@ -54,7 +54,7 @@ namespace Belle2 {
         // All results, which more than 1 wrong hit are discarded
         // TODO: make this more general!
         if (hits.size() - numberOfCorrectHits > 1) {
-          result.setTeacherInformation(-1);
+          result.setTeacherInformation(-999);
         } else {
           result.setTeacherInformation(2 * numberOfCorrectHits - hits.size());
         }
@@ -87,7 +87,7 @@ namespace Belle2 {
         const auto& maximalWeight = maximalWeightElement->getTeacherInformation();
 
         for (auto& result : resultsWithSameSeed) {
-          if (result.getTeacherInformation() == maximalWeight and maximalWeight != -1) {
+          if (result.getTeacherInformation() == maximalWeight and maximalWeight != -999) {
             result.setTeacherInformation(1);
           } else {
             result.setTeacherInformation(0);

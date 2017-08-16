@@ -51,9 +51,13 @@ namespace Belle2 {
      */
     TOPCalTimebase& operator=(const TOPCalTimebase& timeBase)
     {
-      *this = timeBase;
-      m_map.clear();
-      m_sampleTime = 0;
+      if (this != &timeBase) {
+        m_syncTimeBase = timeBase.getSyncTimeBase();
+        m_sampleTimes = timeBase.getSampleTimes();
+        m_map.clear();
+        if (m_sampleTime) delete m_sampleTime;
+        m_sampleTime = 0;
+      }
       return *this;
     }
 

@@ -49,6 +49,11 @@ void PXDSpacePointCKFFindlet::apply()
     return spacePoint->getType() != VXD::SensorInfoBase::PXD;
   };
   TrackFindingCDC::erase_remove_if(m_spacePointVector, notFromPXD);
+  const auto& hasNoSVD = [](const RecoTrack * recoTrack) {
+    const auto& svdHitList = recoTrack->getSVDHitList();
+    return svdHitList.empty() or svdHitList.front()->getSensorID().getLayerNumber() > 4;
+  };
+  TrackFindingCDC::erase_remove_if(m_cdcRecoTrackVector, hasNoSVD);
 
   m_treeSearchFindlet.apply(m_cdcRecoTrackVector, m_spacePointVector, m_results);
 

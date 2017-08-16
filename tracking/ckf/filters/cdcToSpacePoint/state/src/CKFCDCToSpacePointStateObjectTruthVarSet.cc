@@ -20,19 +20,19 @@ using namespace TrackFindingCDC;
 
 bool CKFCDCToSpacePointStateObjectTruthVarSet::extract(const BaseCKFCDCToSpacePointStateObjectFilter::Object* result)
 {
-  RecoTrack* cdcTrack = result->getSeedRecoTrack();
+  RecoTrack* seedTrack = result->getSeedRecoTrack();
   const SpacePoint* spacePoint = result->getHit();
 
-  if (not cdcTrack) return false;
+  if (not seedTrack) return false;
 
   StoreObjPtr<EventMetaData> eventMetaData;
   var<named("event_id")>() = eventMetaData->getEvent();
-  var<named("cdc_number")>() = cdcTrack->getArrayIndex();
+  var<named("seed_number")>() = seedTrack->getArrayIndex();
 
-  const std::string& cdcTrackStoreArrayName = cdcTrack->getArrayName();
+  const std::string& seedTrackStoreArrayName = seedTrack->getArrayName();
 
-  TrackMatchLookUp mcCDCMatchLookUp("MCRecoTracks", cdcTrackStoreArrayName);
-  const RecoTrack* cdcMCTrack = mcCDCMatchLookUp.getMatchedMCRecoTrack(*cdcTrack);
+  TrackMatchLookUp mcCDCMatchLookUp("MCRecoTracks", seedTrackStoreArrayName);
+  const RecoTrack* cdcMCTrack = mcCDCMatchLookUp.getMatchedMCRecoTrack(*seedTrack);
 
   // Default to 0, -1 or false (depending on context)
   var<named("truth_position_x")>() = 0;

@@ -26,7 +26,7 @@ namespace Belle2 {
     "truth_momentum_z",
     "event_id",
     "space_point_number",
-    "cdc_number"
+    "seed_number"
   };
 
   /// Vehicle class to transport the variable names

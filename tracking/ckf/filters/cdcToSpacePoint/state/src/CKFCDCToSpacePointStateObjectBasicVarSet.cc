@@ -33,6 +33,28 @@ bool CKFCDCToSpacePointStateObjectBasicVarSet::extract(const BaseCKFCDCToSpacePo
     return false;
   }
 
+  /*
+   * "seed_has_cdc",
+    "seed_has_svd",
+    "seed_lowest_svd_layer",
+   */
+
+  const auto& cdcHits = cdcTrack->getSortedCDCHitList();
+  const auto& svdHits = cdcTrack->getSortedSVDHitList();
+  var<named("seed_cdc_hits")>() = cdcHits.size();
+  var<named("seed_svd_hits")>() = svdHits.size();
+
+  if (svdHits.empty()) {
+    var<named("seed_lowest_svd_layer")>() = NAN;
+  } else {
+    var<named("seed_lowest_svd_layer")>() = svdHits.front()->getSensorID().getLayerNumber();
+  }
+  if (cdcHits.empty()) {
+    var<named("seed_lowest_cdc_layer")>() = NAN;
+  } else {
+    var<named("seed_lowest_cdc_layer")>() = cdcHits.front()->getICLayer();
+  }
+
   const auto& firstMeasurement = result->getMeasuredStateOnPlane();
   Vector3D position = Vector3D(firstMeasurement.getPos());
   Vector3D momentum = Vector3D(firstMeasurement.getMom());

@@ -39,9 +39,7 @@ namespace {
 }
 
 constexpr const double SimpleCKFPXDStateFilter::m_param_maximumHelixDistanceXY[][3];
-constexpr const double SimpleCKFPXDStateFilter::m_param_maximumHelixDistance[][3];
 constexpr const double SimpleCKFPXDStateFilter::m_param_maximumResidual[][3];
-constexpr const double SimpleCKFPXDStateFilter::m_param_maximumResidualOverSigma[][3];
 constexpr const double SimpleCKFPXDStateFilter::m_param_maximumChi2[][3];
 
 Weight SimpleCKFPXDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState)
@@ -78,30 +76,16 @@ Weight SimpleCKFPXDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObje
     const Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
     const Vector3D differenceHelix = trackPositionAtHit - hitPosition;
 
-    if (layer == 2) {
-      valueToCheck = differenceHelix.xy().norm();
-      maximumValues = &m_param_maximumHelixDistanceXY;
-    } else {
-      valueToCheck = differenceHelix.norm();
-      maximumValues = &m_param_maximumHelixDistance;
-    }
+    valueToCheck = differenceHelix.xy().norm();
+    maximumValues = &m_param_maximumHelixDistanceXY;
   } else if (not currentState.isFitted()) {
     // Filter 2
     PXDRecoHit recoHit(spacePoint->getRelated<PXDCluster>());
     const auto& measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
     const double residual = m_fitter.calculateResidualDistance<PXDRecoHit, 2>(measuredStateOnPlane, recoHit);
 
-    if (layer == 2) {
-      const auto& covariance = measuredStateOnPlane.getCov();
-      const double sigmaU = sqrt(covariance(3, 3));
-      const double sigmaV = sqrt(covariance(4, 4));
-      const double maximalSigma = std::max(sigmaU, sigmaV);
-      valueToCheck = residual / maximalSigma;
-      maximumValues = &m_param_maximumResidualOverSigma;
-    } else {
-      valueToCheck = residual;
-      maximumValues = &m_param_maximumResidual;
-    }
+    valueToCheck = residual;
+    maximumValues = &m_param_maximumResidual;
   } else {
     // Filter 3
     valueToCheck = currentState.getChi2();

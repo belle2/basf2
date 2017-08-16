@@ -62,7 +62,6 @@ namespace Belle2 {
      * Currently they are not read from any file, they are fixed to
      * default values.
      */
-
     void importSVDPulseShapeCalibrations(/*std::string fileName*/);
 
     /**
@@ -74,6 +73,17 @@ namespace Belle2 {
      */
     void importSVDNoiseCalibrations(/*std::string fileName*/);
 
+    /**
+     * This method import to the database the bad strip
+     * status as flagged during the local runs.
+     *
+     * Currently they are not read from any file, return
+     * false as default value.
+     *
+     */
+    void importSVDLocalRunBadStrips(/*std::string fileName*/);
+
+    /**********************************************/
 
     /**
      * Get from the database the local-run calibration constants
@@ -90,6 +100,15 @@ namespace Belle2 {
      * Output: none
      */
     void printSVDNoiseCalibrations();
+
+
+    /**
+     * Get from the database the status of a given strip,
+     * return 1 if the strip is flagged as a bad one.
+     * Input: none
+     * Output: none
+     */
+    void printSVDLocalRunBadStrips();
 
   private:
 

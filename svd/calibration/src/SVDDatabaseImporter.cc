@@ -26,6 +26,7 @@
 // DB objects
 #include <svd/dbobjects/SVDPulseShapeCalibrations.h>
 #include <svd/dbobjects/SVDNoiseCalibrations.h>
+#include <svd/dbobjects/SVDLocalRunBadStrips.h>
 
 #include <iostream>
 /*#include <fstream>
@@ -87,6 +88,30 @@ void SVDDatabaseImporter::importSVDNoiseCalibrations(/*std::string fileName*/)
 
 }
 
+void SVDDatabaseImporter::importSVDLocalRunBadStrips(/*std::string fileName*/)
+{
+  /* std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2ERROR("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+  */
+
+  DBImportObjPtr<SVDLocalRunBadStrips> svdbadstrips;
+
+  //stream.close();
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  svdbadstrips.construct();
+  svdbadstrips.import(iov);
+
+  B2RESULT("SVDLocalRunBadStrips imported to database.");
+
+}
+
 
 void SVDDatabaseImporter::printSVDPulseShapeCalibrations()
 {
@@ -109,6 +134,17 @@ void SVDDatabaseImporter::printSVDNoiseCalibrations()
   // float adc = static_cast<float> ( svdNoiseCal->getADCFromCharge(22500.));
 
   std::cout << "Noise: "  <<  svdNoiseCal->getNoise(1, true, 1) << " . " << std::endl;
+
+}
+
+
+void SVDDatabaseImporter::printSVDLocalRunBadStrips()
+{
+
+  DBObjPtr<SVDLocalRunBadStrips> svdBadstrips;
+  // float adc = static_cast<float> ( svdBadstrips->getADCFromCharge(22500.));
+
+  std::cout << "isBad: "  <<  svdBadstrips->isBad(1, true, 1) << " . " << std::endl;
 
 }
 

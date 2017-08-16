@@ -20,7 +20,7 @@ namespace Belle2 {
 
   /** This class defines the dbobject and the method to access the information
    * on bad strips flagged during local runs. It provides a
-   * boolean indicating whtehter the strip is bad.
+   * boolean indicating whether the strip is bad.
    *
    *
    */
@@ -32,7 +32,7 @@ namespace Belle2 {
 
     /** This is the method for knowing whether a strip is bad,
      * according to local runs results.
-     * Currently we return "false" as default (= all good strips).
+     * Currently, return "false" as default (= all good strips).
      *
      * Input:
      * @param sensor ID: identitiy of the sensor for which the

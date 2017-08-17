@@ -36,6 +36,9 @@ namespace Belle2 {
       moduleParamList->addParameter("enableOverlapTeacher", m_param_enableOverlapTeacher,
                                     "Enable adding truth information from the teacher before the overlap resolving starts.",
                                     m_param_enableOverlapTeacher);
+      moduleParamList->addParameter("maximalAllowedWrongHits", m_param_maximalAllowedWrongHits,
+                                    "Maximal number of allowed hits, before discarding the combinations.",
+                                    m_param_maximalAllowedWrongHits);
     }
 
     /// Main function of this findlet: add truth information from the passed var set
@@ -51,9 +54,8 @@ namespace Belle2 {
         const auto& numberOfCorrectHits = m_varSetFilter(result);
 
         const auto& hits = result.getHits();
-        // All results, which more than 1 wrong hit are discarded
-        // TODO: make this more general!
-        if (hits.size() - numberOfCorrectHits > 1) {
+        // All results, which more than N wrong hit are discarded
+        if (hits.size() - numberOfCorrectHits > m_param_maximalAllowedWrongHits) {
           result.setTeacherInformation(-999);
         } else {
           result.setTeacherInformation(2 * numberOfCorrectHits - hits.size());
@@ -102,6 +104,8 @@ namespace Belle2 {
 
     // Parameters
     /// Parameter: Enable adding truth information from the teacher before the overlap resolving starts.
-    double m_param_enableOverlapTeacher = false;
+    bool m_param_enableOverlapTeacher = false;
+    /// Parameter: Maximal number of allowed hits, before discarding the combinations
+    int m_param_maximalAllowedWrongHits = 1;
   };
 }

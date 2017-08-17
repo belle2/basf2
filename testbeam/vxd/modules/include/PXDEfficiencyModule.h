@@ -116,6 +116,8 @@ namespace Belle2 {
     std::map<VxdID, double> m_v_fit;
     std::map<VxdID, double> m_u_clus;
     std::map<VxdID, double> m_v_clus;
+    std::map<VxdID, int> m_ucell_clus;
+    std::map<VxdID, int> m_vcell_clus;
     std::map<VxdID, double> m_u_digi;
     std::map<VxdID, double> m_v_digi;
     std::map<VxdID, double> m_sigma_u_fit;

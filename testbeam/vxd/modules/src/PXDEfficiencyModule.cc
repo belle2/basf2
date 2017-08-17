@@ -130,6 +130,8 @@ void PXDEfficiencyModule::event()
     m_v_fit[aVxdID] = 999999;//take positive default so that the difference is not zero!
     m_u_clus[aVxdID] = -9999;
     m_v_clus[aVxdID] = -9999;
+    m_ucell_clus[aVxdID] = -9999;
+    m_vcell_clus[aVxdID] = -9999;
     m_u_digi[aVxdID] = -9999;
     m_v_digi[aVxdID] = -9999;
     m_sigma_u_fit[aVxdID] = -9999;
@@ -186,6 +188,8 @@ void PXDEfficiencyModule::event()
       if (bestcluster >= 0) {
         m_u_clus[aVxdID] = m_pxdclusters[bestcluster]->getU();
         m_v_clus[aVxdID] = m_pxdclusters[bestcluster]->getV();
+        m_ucell_clus[aVxdID] = info.getUCellID(m_u_clus[aVxdID]);
+        m_vcell_clus[aVxdID] = info.getUCellID(m_v_clus[aVxdID]);
 
         // Get cluster sizes and charge of the best cluster candidate
 
@@ -452,6 +456,8 @@ void PXDEfficiencyModule::defineHisto()
     m_sigma_v_fit[avxdid] = -99999;
     m_u_clus[avxdid] = -99999;
     m_v_clus[avxdid] = -99999;
+    m_ucell_clus[avxdid] = -99999;
+    m_vcell_clus[avxdid] = -99999;
     m_u_digi[avxdid] = -99999;
     m_v_digi[avxdid] = -99999;
 
@@ -480,6 +486,8 @@ void PXDEfficiencyModule::defineHisto()
 
     m_tree->Branch("u_clus_" + buff, &(m_u_clus[avxdid]), "u_clus_" + buff + "/D");
     m_tree->Branch("v_clus_" + buff, &(m_v_clus[avxdid]), "v_clus_" + buff + "/D");
+    m_tree->Branch("ucell_clus_" + buff, &(m_ucell_clus[avxdid]), "ucell_clus_" + buff + "/I");
+    m_tree->Branch("vcell_clus_" + buff, &(m_vcell_clus[avxdid]), "vcell_clus_" + buff + "/I");
     m_tree->Branch("u_digi_" + buff, &(m_u_digi[avxdid]), "u_digi_" + buff + "/D");
     m_tree->Branch("v_digi_" + buff, &(m_v_digi[avxdid]), "v_digi_" + buff + "/D");
 

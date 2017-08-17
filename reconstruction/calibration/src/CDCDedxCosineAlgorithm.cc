@@ -47,7 +47,7 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   TH1F* dedxcosth[nbins];
   for (unsigned int i = 0; i < nbins; ++i) {
     binedges.push_back(-1.0 + 2.0 / nbins * i);
-    dedxcosth[i] = new TH1F(TString::Format("dedxcosth%d", i), "dE/dx in bins of cosine", 200, 0, 100);
+    dedxcosth[i] = new TH1F(TString::Format("dedxcosth%d", i), "dE/dx in bins of cosine", 100, 0, 2);
   }
 
   // fill histograms, bin size may be arbitrary

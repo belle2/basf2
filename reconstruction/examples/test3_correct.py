@@ -21,8 +21,6 @@ from ROOT import Belle2
 
 main = create_path()
 
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True, LogLevel.ERROR)
-
 use_local_database("calibration_results/CDCDedxRunGainCalibration/outputdb/database.txt",
                    "calibration_results/CDCDedxRunGainCalibration/outputdb")
 use_local_database("calibration_results/CDCDedxWireGainCalibration/outputdb/database.txt",
@@ -30,11 +28,13 @@ use_local_database("calibration_results/CDCDedxWireGainCalibration/outputdb/data
 use_local_database("calibration_results/CDCDedxCosineCalibration/outputdb/database.txt",
                    "calibration_results/CDCDedxCosineCalibration/outputdb")
 
-main.add_module('RootInput', inputFileName='B2Electrons.root')
+input_file = 'B2Electrons.root'
+main.add_module('RootInput', inputFileName=input_file)
 
 main.add_module('DedxCorrection')
 
-main.add_module('RootOutput', outputFileName='NewB2Electrons.root')
+output_file = 'NewB2Electrons.root'
+main.add_module('RootOutput', outputFileName=output_file)
 
 process(main)
 print(statistics)

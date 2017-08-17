@@ -18,11 +18,10 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <genfit/Track.h>
 
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/utilities/FileSystem.h>
 
 #include <string>
 #include <vector>
@@ -108,7 +107,8 @@ namespace Belle2 {
 
     // track level dE/dx measurements
     double m_mean;  /**< dE/dx averaged */
-    double m_trunc; /**< dE/dx averaged, truncated mean */
+    double m_trunc; /**< dE/dx averaged, truncated mean, with corrections */
+    double m_truncorig; /**< dE/dx averaged, truncated mean */
     double m_error; /**< standard deviation of the truncated mean */
     double m_chipi; /**< chi value for pion hypothesis */
 
@@ -125,6 +125,7 @@ namespace Belle2 {
 
     // hit level information (references on nhits)
     int h_nhits; /**< the number of good hits for this Track */
+    int h_lwire[kMaxHits];  /**< sense wire within layer */
     int h_wire[kMaxHits];  /**< sense wire ID */
     int h_layer[kMaxHits]; /**< layer number */
 
@@ -134,7 +135,7 @@ namespace Belle2 {
     double h_doca[kMaxHits];   /**< distance of closest approach */
     double h_enta[kMaxHits];   /**< entrance angle */
     double h_driftT[kMaxHits];   /**< drift time */
-    double h_gain[kMaxHits];   /**< calibration hit gain */
+    double h_wireGain[kMaxHits];   /**< calibration hit gain */
   };
 } // Belle2 namespace
 #endif

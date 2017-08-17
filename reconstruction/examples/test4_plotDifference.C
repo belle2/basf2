@@ -8,11 +8,11 @@ void test4_plotDifference(){
   TFile* uncorrected = new TFile("B2Electrons.root");
   TTree* untree = (TTree*)uncorrected->Get("tree");
   uncorrected->cd();
-  untree->Project("unhist(100,0,200)","CDCDedxTracks.h_dedx");
+  untree->Project("unhist(100,0,4)","CDCDedxTracks.h_dedx");
   TH1F* unhist = (TH1F*)uncorrected->Get("unhist");
   unhist->SetTitle("Uncorrected;dE/dx;");
 
-  untree->Project("unhistcos(100,-1,1,100,0,200)","CDCDedxTracks.h_dedx:CDCDedxTracks.m_cosTheta");
+  untree->Project("unhistcos(100,-1,1,100,0,4)","CDCDedxTracks.h_dedx:CDCDedxTracks.m_cosTheta");
   TH2F* unhistcos = (TH2F*)uncorrected->Get("unhistcos");
   unhistcos->SetTitle("Uncorrected;dE/dx;");
 

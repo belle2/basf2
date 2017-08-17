@@ -88,11 +88,11 @@ namespace Belle2 {
     /** Store array: CDCDedxTrack */
     StoreArray<CDCDedxTrack> m_cdcDedxTracks;
 
-    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB objects */
-    DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB objects */
-
-    DBObjPtr<CDCDedxCosine> m_DBCosine; /**< Electron saturation correction DB objects */
-    std::map<double, double> m_cosineGains;  /**< Electron saturation correction constants */
+    //parameters: calibration constants
+    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
+    DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
+    DBObjPtr<CDCDedxCosine> m_DBCosine; /**< Electron saturation correction DB object */
+    std::vector<double> m_cosbinedges;  /**< Electron saturation correction details */
 
     /** Recalculate the dE/dx mean values after corrections */
     void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;

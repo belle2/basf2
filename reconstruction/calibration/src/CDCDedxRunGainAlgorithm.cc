@@ -43,10 +43,5 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
   CDCDedxRunGain* gain = new CDCDedxRunGain(rungain);
   saveCalibration(gain, "CDCDedxRunGain");
 
-  // Iterate
-  //  B2INFO("mean: " << mean);
-  //  if (mean - 42. >= 1.)
-  //    return c_Iterate;
-
   return c_OK;
 }

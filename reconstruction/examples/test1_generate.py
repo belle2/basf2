@@ -44,7 +44,7 @@ add_reconstruction(main)
 # write the results to file
 rootoutput = register_module('RootOutput')
 rootoutput.param('outputFileName', 'B2Electrons.root')
-rootoutput.param('branchNames', ['CDCDedxTracks', 'EventMetaData'])
+rootoutput.param('branchNames', ['CDCDedxTracks'])
 main.add_module(rootoutput)
 
 main.add_module('ProgressBar')

@@ -46,29 +46,25 @@ void DedxCorrectionModule::initialize()
   // register in datastore
   m_cdcDedxTracks.isRequired();
 
-  // make sure the run gain is reasonable
-  if (m_DBRunGain->getRunGain() == 0)
-    B2ERROR("Run gain is zero...");
 
-  // prepare the wire gain constants
+  // make sure the calibration constants are reasonable
+  // run gains
+  if (m_DBRunGain->getRunGain() == 0)
+    B2ERROR("Run gain is zero!");
+
+  // wire gains
   for (unsigned int i = 0; i < 14336; ++i) {
     if (m_DBWireGains->getWireGain(i) == 0)
       B2ERROR("Wire gain " << i << " is zero!");
   }
 
-  /*
-  // prepare the electron saturation constants (key is low edge of bin)
-  std::vector<double> binedges = m_DBCosine->getCosThetaBins();
-  for (unsigned int i = 0; i < binedges.size(); ++i) {
-    B2INFO(binedges[i] << " : " << m_DBCosine->getMean(binedges[i]));
-    double gain = m_DBCosine->getMean(binedges[i]) / m_DBRunGain->getRunGain();
-    if (gain == 0) {
-      B2WARNING("Cosine gain is zero...");
-      gain = 1;
-    }
-    m_cosineGains[binedges[i]] = gain;
+  // cosine correction (store the bin edges for extrapolation)
+  m_cosbinedges = m_DBCosine->getCosThetaBins();
+  for (unsigned int i = 0; i < m_cosbinedges.size(); ++i) {
+    double gain = m_DBCosine->getMean(m_cosbinedges[i]);
+    if (gain == 0)
+      B2ERROR("Cosine gain is zero...");
   }
-  */
 
   // these are arbitrary and should be extracted from the calibration
   m_alpha = 1.35630e-02;
@@ -103,12 +99,22 @@ void DedxCorrectionModule::event()
     //
     // **************************************************
 
+    // hit level
     int nhits = dedxTrack.size();
     for (int i = 0; i < nhits; ++i) {
 
       double newdedx = dedxTrack.getDedx(i);
       StandardCorrection(dedxTrack.getWire(i), dedxTrack.getCosTheta(), newdedx);
       dedxTrack.setDedx(i, newdedx);
+    } // end loop over hits
+
+    // layer level
+    int nlhits = dedxTrack.getNLayerHits();
+    for (int i = 0; i < nlhits; ++i) {
+
+      double newdedx = dedxTrack.getLayerDedx(i);
+      StandardCorrection(dedxTrack.getWireLongestHit(i), dedxTrack.getCosTheta(), newdedx);
+      dedxTrack.setLayerDedx(i, newdedx);
     } // end loop over hits
 
     calculateMeans(&(dedxTrack.m_dedx_avg),
@@ -140,19 +146,22 @@ void DedxCorrectionModule::WireGainCorrection(int wireID, double& dedx) const
     dedx = dedx / gain;
 }
 
-void DedxCorrectionModule::CosineCorrection(double costheta, double& dedx) const
+void DedxCorrectionModule::CosineCorrection(double costh, double& dedx) const
 {
 
-  std::map<double, double>::const_iterator low;
-  low = m_cosineGains.lower_bound(costheta);
-  if (low != m_cosineGains.end())
-    dedx = dedx / low->second;
+  double coscor = 1;
+  unsigned int cosbin = 0;
+  while (costh > m_cosbinedges[cosbin] && cosbin < m_cosbinedges.size()) cosbin++;
+  if (cosbin < m_cosbinedges.size() - 1) {
+    double frac = (costh - m_cosbinedges[cosbin]) / (m_cosbinedges[cosbin + 1] - m_cosbinedges[cosbin]);
+    coscor = (m_DBCosine->getMean(m_cosbinedges[cosbin + 1]) - m_DBCosine->getMean(m_cosbinedges[cosbin])) * frac + m_DBCosine->getMean(
+               m_cosbinedges[cosbin]);
+  }
+  dedx = dedx / coscor;
 }
 
 void DedxCorrectionModule::HadronCorrection(double costheta, double& dedx) const
 {
-
-  dedx = dedx / 550.00;
 
   dedx = D2I(costheta, I2D(costheta, 1.00) / 1.00 * dedx) * 550;
 }
@@ -160,11 +169,11 @@ void DedxCorrectionModule::HadronCorrection(double costheta, double& dedx) const
 void DedxCorrectionModule::StandardCorrection(int wireID, double costheta, double& dedx) const
 {
 
-  //RunGainCorrection(dedx);
+  RunGainCorrection(dedx);
 
   WireGainCorrection(wireID, dedx);
 
-  //CosineCorrection(costheta, dedx);
+  CosineCorrection(costheta, dedx);
 
   //HadronCorrection(costheta, dedx);
 }
@@ -222,16 +231,18 @@ void DedxCorrectionModule::calculateMeans(double* mean, double* truncatedMean, d
 
   double truncatedMeanTmp = 0.0;
   double meanTmp = 0.0;
-  double sum_of_squares = 0.0;
+  double sumOfSquares = 0.0;
   int numValuesTrunc = 0;
   const int numDedx = sortedDedx.size();
-  const int lowEdgeTrunc = int(numDedx * m_removeLowest);
-  const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest));
+
+  // add a factor of 0.51 here to make sure we are rounding appropriately...
+  const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.51);
+  const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.51);
   for (int i = 0; i < numDedx; i++) {
     meanTmp += sortedDedx[i];
     if (i >= lowEdgeTrunc and i < highEdgeTrunc) {
       truncatedMeanTmp += sortedDedx[i];
-      sum_of_squares += sortedDedx[i] * sortedDedx[i];
+      sumOfSquares += sortedDedx[i] * sortedDedx[i];
       numValuesTrunc++;
     }
   }
@@ -249,7 +260,7 @@ void DedxCorrectionModule::calculateMeans(double* mean, double* truncatedMean, d
   *truncatedMean = truncatedMeanTmp;
 
   if (numValuesTrunc > 1) {
-    *truncatedMeanErr = sqrt(sum_of_squares / double(numValuesTrunc) - truncatedMeanTmp * truncatedMeanTmp) / double(
+    *truncatedMeanErr = sqrt(sumOfSquares / double(numValuesTrunc) - truncatedMeanTmp * truncatedMeanTmp) / double(
                           numValuesTrunc - 1);
   } else {
     *truncatedMeanErr = 0;

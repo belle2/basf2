@@ -319,20 +319,20 @@ void CDCDedxPIDModule::event()
       continue;
     }
 
+    // store run gains
+    dedxTrack->m_rungain = m_DBRunGain->getRunGain();
+
     // get the cosine correction
     // extrapolate the binned correction
     double coscor = 1.0;
     unsigned int cosbin = 0;
     while (costh > m_cosbinedges[cosbin] && cosbin < m_cosbinedges.size()) cosbin++;
     if (cosbin < m_cosbinedges.size() - 1) {
-      double frac = (costh - m_cosbinedges[cosbin]) / m_cosbinedges[cosbin + 1] - m_cosbinedges[cosbin];
-      coscor = m_DBCosine->getMean(m_cosbinedges[cosbin + 1]) - m_DBCosine->getMean(m_cosbinedges[cosbin]) * frac + m_DBCosine->getMean(
+      double frac = (costh - m_cosbinedges[cosbin]) / (m_cosbinedges[cosbin + 1] - m_cosbinedges[cosbin]);
+      coscor = (m_DBCosine->getMean(m_cosbinedges[cosbin + 1]) - m_DBCosine->getMean(m_cosbinedges[cosbin])) * frac + m_DBCosine->getMean(
                  m_cosbinedges[cosbin]);
     }
     dedxTrack->m_coscor = coscor;
-
-    // store run gains
-    dedxTrack->m_rungain = m_DBRunGain->getRunGain();
 
     // initialize a few variables to be used in the loop over track points
     double layerdE = 0.0; // total charge in current layer
@@ -368,7 +368,7 @@ void CDCDedxPIDModule::event()
 
       // get the wire ID (not between 0 and 14336) and the layer info
       WireID wireID = cdcRecoHit->getWireID();
-      const int wire = wireID.getIWire(); // getEWire() for encoded wire number
+      const int wire = wireID.getIWire(); // use getEWire() for encoded wire number
       int layer = cdcHit->getILayer(); // layer within superlayer
       int superlayer = cdcHit->getISuperLayer();
 
@@ -483,8 +483,8 @@ void CDCDedxPIDModule::event()
           double wiregain = m_DBWireGains->getWireGain(iwire);
 
           // apply the calibration to dE to propagate to both hit and layer measurements
-          double correction = dedxTrack->m_rungain * dedxTrack->m_coscor * wiregain;
-          //    adcCount = adcCount/correction;
+          //double correction = dedxTrack->m_rungain * dedxTrack->m_coscor * wiregain;
+          //adcCount = adcCount/correction;
 
           layerdE += 1.0 * adcCount;
           layerdx += celldx;
@@ -500,7 +500,7 @@ void CDCDedxPIDModule::event()
           else  cellDedx *= sin(trackMom.Theta());
 
           if (m_enableDebugOutput)
-            dedxTrack->addHit(iwire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
+            dedxTrack->addHit(wire, iwire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
                               driftDRealistic, driftDRealisticRes, wiregain);
           nhitscombined++;
         }
@@ -595,9 +595,9 @@ void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
   int numValuesTrunc = 0;
   const int numDedx = sortedDedx.size();
 
-  // add a factor of 0.5 here to make sure we are rounding appropriately...
-  const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.5);
-  const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.5);
+  // add a factor of 0.51 here to make sure we are rounding appropriately...
+  const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.51);
+  const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.51);
   for (int i = 0; i < numDedx; i++) {
     meanTmp += sortedDedx[i];
     if (i >= lowEdgeTrunc and i < highEdgeTrunc) {
@@ -760,7 +760,7 @@ void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize
                                     double sin, int nhit) const
 {
   // account for the fact that electron truncated mean peaks near 60 units -> scale to 1
-  // this should be done via calibration
+  // this should be done via calibration eventually
   dedx = dedx / 59.267;
 
   // determine a chi value for each particle type

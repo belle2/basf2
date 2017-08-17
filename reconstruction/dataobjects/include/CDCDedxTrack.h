@@ -62,10 +62,12 @@ namespace Belle2 {
     }
 
     /** Add a single hit to the object */
-    void addHit(int wire, int layer, double doca, double enta, int adcCount, double dE, double path, double dedx, double cellHeight,
-                double cellHalfWidth, int driftT, double driftD, double driftDRes, double hitgain)
+    void addHit(int lwire, int wire, int layer, double doca, double enta, int adcCount, double dE, double path, double dedx,
+                double cellHeight,
+                double cellHalfWidth, int driftT, double driftD, double driftDRes, double wiregain)
     {
       h_nHits++;
+      h_lwire.push_back(lwire);
       h_wire.push_back(wire);
       h_layer.push_back(layer);
       h_path.push_back(path);
@@ -81,7 +83,7 @@ namespace Belle2 {
       h_driftD.push_back(driftD);
       h_driftDRes.push_back(driftDRes);
 
-      h_wiregain.push_back(hitgain);
+      h_wiregain.push_back(wiregain);
     }
 
     /** Return the track ID */
@@ -140,12 +142,17 @@ namespace Belle2 {
     /** Return the total dE/dx for this layer */
     double getLayerDedx(int i) const { return l_dedx[i]; }
 
+    /** Set the total dE/dx for this layer */
+    void setLayerDedx(int i, double dedx) { l_dedx[i] = dedx; }
+
 
     // Hit level
 
     /** Return the number of hits for this track */
     int size() const { return h_nHits; }
 
+    /** Return the sensor ID for this hit: wire number in the layer */
+    int getWireInLayer(int i) const { return h_lwire[i]; }
     /** Return the sensor ID for this hit: wire number for CDC (0-14336) */
     int getWire(int i) const { return h_wire[i]; }
     /** Return the (global) layer number for a hit */
@@ -176,7 +183,7 @@ namespace Belle2 {
     double getDriftDRes(int i) const { return h_driftDRes[i]; }
 
     /** Return the wire gain for this hit */
-    double getHitGain(int i) const { return h_wiregain[i]; }
+    double getWireGain(int i) const { return h_wiregain[i]; }
 
     /** Set the dE/dx value for this hit */
     void setDedx(int i, double dedx) { h_dedx[i] = dedx; }
@@ -219,7 +226,8 @@ namespace Belle2 {
 
     // hit level information
     int h_nHits;     /**< number of hits on this track */
-    std::vector<int> h_wire;     /**< wire ID in the CDC */
+    std::vector<int> h_lwire;     /**< wire ID within the layer */
+    std::vector<int> h_wire;     /**< continuous wire ID in the CDC */
     std::vector<int> h_layer;    /**< layer number */
     std::vector<double> h_path;    /**< path length in the CDC cell */
     std::vector<double> h_dedx;  /**< charge per path length (dE/dx) */

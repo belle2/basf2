@@ -67,9 +67,9 @@ namespace Belle2 {
              "name of TOPRawDigit store array", string(""));
     addParam("outputTemplateFitResultName", m_templateFitResultName,
              "name of TOPTemplateFitResult", string(""));
-    addParam("swapBytes", m_swapBytes, "if true, swap bytes", true);
+    addParam("swapBytes", m_swapBytes, "if true, swap bytes", false);
     addParam("dataFormat", m_dataFormat,
-             "data format as defined in top/include/RawDataTypes.h", static_cast<int>(TOP::RawDataType::c_Type3Ver1));
+             "data format as defined in top/include/RawDataTypes.h, 0 = auto detect", 0);
 
   }
 
@@ -141,6 +141,7 @@ namespace Belle2 {
     StoreArray<TOPSlowData> slowData;
     slowData.clear();
 
+    StoreObjPtr<EventMetaData> evtMetaData;
     for (auto& raw : rawData) {
       for (int finesse = 0; finesse < 4; finesse++) {
         const int* buffer = raw.GetDetectorBuffer(0, finesse);
@@ -150,6 +151,12 @@ namespace Belle2 {
         int err = 0;
         int dataFormat = m_dataFormat;
         if (dataFormat == 0) { // auto detect data format
+          if (evtMetaData->getExperiment() == 1) { // GCR data
+            dataFormat = 0x0301;
+            m_swapBytes = true;
+          }
+          // NOTE: we need to add extra clauses if there are GCR runs between
+          // phases II and III. (See pull request #644 for more details)
           DataArray array(buffer, bufferSize, m_swapBytes);
           unsigned word = array.getWord();
           dataFormat = (word >> 16);

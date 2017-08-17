@@ -93,6 +93,20 @@ class PxdROIPayloadTestModule(Module):
         j = 0
         for i in range(len(orgrois)):
             org = orgrois[i]
+            if i != 0 and f(org) == f(orgrois[i - 1]):
+                B2WARNING("Found the same ROI a second time (Double ROI)!")
+                B2WARNING(
+                    "Check Org $%X %3d %3d %3d %3d Unp $%X %3d %3d %3d %3d" %
+                    (org.getSensorID().getID(),
+                     org.getMinUid(),
+                        org.getMaxUid(),
+                        org.getMinVid(),
+                        org.getMaxVid(),
+                        unp.getSensorID().getID(),
+                        unp.getMinUid(),
+                        unp.getMaxUid(),
+                        unp.getMinVid(),
+                        unp.getMaxVid()))
             if i == 0 or f(org) != f(orgrois[i - 1]):
                 if j == len(unpackedrois):
                     B2FATAL("Unpacked ROIs comparison exceeds array limit!")

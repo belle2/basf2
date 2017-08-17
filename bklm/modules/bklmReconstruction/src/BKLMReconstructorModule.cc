@@ -55,7 +55,8 @@ BKLMReconstructorModule::BKLMReconstructorModule() : Module(), m_GeoPar(NULL)
   // MC 1 GeV/c muons: 1-sigma width is 0.15 ns
   addParam("Prompt window (ns)", m_PromptWindow,
            "Half-width of prompt window relative to PromptTime",
-           double(50.0));
+           //double(50.0));
+           double(2000.0));
 }
 
 BKLMReconstructorModule::~BKLMReconstructorModule()

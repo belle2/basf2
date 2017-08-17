@@ -10,19 +10,19 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
-#include <tracking/ckf/filters/cdcToSpacePoint/result/BaseCDCVXDTrackCombinationFilter.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/result/BaseVXDTrackCombinationFilter.h>
 
 namespace Belle2 {
   /// Filter factory for detector track combination filters.
-  class CDCVXDTrackCombinationFilterFactory : public TrackFindingCDC::FilterFactory<BaseCDCVXDTrackCombinationFilter > {
+  class VXDTrackCombinationFilterFactory : public TrackFindingCDC::FilterFactory<BaseVXDTrackCombinationFilter > {
 
   private:
     /// Type of the base class
-    typedef TrackFindingCDC::FilterFactory<BaseCDCVXDTrackCombinationFilter> Super;
+    typedef TrackFindingCDC::FilterFactory<BaseVXDTrackCombinationFilter> Super;
 
   public:
     /// Constructor forwarding the default filter name
-    CDCVXDTrackCombinationFilterFactory(const std::string& defaultFilterName = "all");
+    VXDTrackCombinationFilterFactory(const std::string& defaultFilterName = "all");
 
     /// Getter for a short identifier for the factory
     std::string getIdentifier() const override;
@@ -34,6 +34,6 @@ namespace Belle2 {
     std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
 
     /// Create a filter with the given name.
-    std::unique_ptr<BaseCDCVXDTrackCombinationFilter> create(const std::string& filterName) const override;
+    std::unique_ptr<BaseVXDTrackCombinationFilter> create(const std::string& filterName) const override;
   };
 }

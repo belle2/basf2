@@ -14,7 +14,7 @@
 <variable4>number_of_hits</variable4>
 <variable5>prob</variable5>
 <variable6>pt</variable6>
-<variable7>chi2_cdc</variable7>
+<variable7>chi2_seed</variable7>
 <variable8>number_of_holes</variable8>
 <variable9>last_hit_layer</variable9>
 <variable10>first_hit_layer</variable10>
@@ -27,8 +27,12 @@
 <variable17>has_missing_layer_6</variable17>
 <variable18>number_of_overlap_hits</variable18>
 <variable19>theta</variable19>
-<variable20>distance_to_cdc_track</variable20>
-<variable21>distance_to_cdc_track_xy</variable21>
+<variable20>distance_to_seed_track</variable20>
+<variable21>distance_to_seed_track_xy</variable21>
+<variable22>seed_svd_hits</variable22>
+<variable23>seed_lowest_svd_layer</variable23>
+<variable24>seed_cdc_hits</variable24>
+<variable25>seed_lowest_cdc_layer</variable25>
 <number_spectator_variables>0</number_spectator_variables>
 <number_data_files>1</number_data_files>
 <datafile0>OverlapRecords.root</datafile0>

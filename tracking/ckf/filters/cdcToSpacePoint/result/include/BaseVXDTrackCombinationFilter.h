@@ -19,6 +19,6 @@ namespace Belle2 {
   /**
    * Base filter for detector track combination filters.
    */
-  using BaseCDCVXDTrackCombinationFilter =
+  using BaseVXDTrackCombinationFilter =
     TrackFindingCDC::Filter<CKFResultObject<RecoTrack, SpacePoint>>;
 }

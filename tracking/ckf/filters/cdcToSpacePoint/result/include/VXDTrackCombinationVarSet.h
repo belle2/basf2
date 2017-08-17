@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/filters/cdcToSpacePoint/result/BaseCDCVXDTrackCombinationFilter.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/result/BaseVXDTrackCombinationFilter.h>
 #include <tracking/ckf/findlets/base/AdvanceAlgorithm.h>
 #include <tracking/ckf/findlets/base/KalmanUpdateFitter.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
@@ -18,7 +18,7 @@
 namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
-  static char const* const cdcVXDTrackCombinationNames[] = {
+  static char const* const vxdTrackCombinationNames[] = {
     "chi2_vxd_full",
     "chi2_vxd_max",
     "chi2_vxd_min",
@@ -26,7 +26,7 @@ namespace Belle2 {
     "number_of_hits",
     "prob",
     "pt",
-    "chi2_cdc",
+    "chi2_seed",
     "number_of_holes",
     "last_hit_layer",
     "first_hit_layer",
@@ -39,23 +39,23 @@ namespace Belle2 {
     "has_missing_layer_6",
     "number_of_overlap_hits",
     "theta",
-    "distance_to_cdc_track",
-    "distance_to_cdc_track_xy"
+    "distance_to_seed_track",
+    "distance_to_seed_track_xy",
   };
 
   /// Vehicle class to transport the variable names
-  class CDCVXDTrackCombinationVarNames : public
-    TrackFindingCDC::VarNames<BaseCDCVXDTrackCombinationFilter::Object> {
+  class VXDTrackCombinationVarNames : public
+    TrackFindingCDC::VarNames<BaseVXDTrackCombinationFilter::Object> {
 
   public:
     /// Number of variables to be generated.
-    static const size_t nVars = TrackFindingCDC::size(cdcVXDTrackCombinationNames);
+    static const size_t nVars = TrackFindingCDC::size(vxdTrackCombinationNames);
 
     /// Get the name of the column.
     constexpr
     static char const* getName(int iName)
     {
-      return cdcVXDTrackCombinationNames[iName];
+      return vxdTrackCombinationNames[iName];
     }
   };
 
@@ -63,10 +63,10 @@ namespace Belle2 {
    * Var set used in the VXD-CDC-Merger for calculating the probability of a VXD-CDC-track match,
    * which knows the truth information if two tracks belong together or not.
    */
-  class CDCVXDTrackCombinationVarSet : public TrackFindingCDC::VarSet<CDCVXDTrackCombinationVarNames> {
+  class VXDTrackCombinationVarSet : public TrackFindingCDC::VarSet<VXDTrackCombinationVarNames> {
 
   public:
-    CDCVXDTrackCombinationVarSet() : TrackFindingCDC::VarSet<CDCVXDTrackCombinationVarNames>()
+    VXDTrackCombinationVarSet() : TrackFindingCDC::VarSet<VXDTrackCombinationVarNames>()
     {
       ModuleParamList moduleParamList;
       const std::string prefix = "";
@@ -75,10 +75,12 @@ namespace Belle2 {
     }
 
     /// Generate and assign the variables from the object.
-    bool extract(const BaseCDCVXDTrackCombinationFilter::Object* object) final;
+    bool extract(const BaseVXDTrackCombinationFilter::Object* object) final;
 
   private:
+    /// Advance algorithm
     AdvanceAlgorithm m_advanceAlgorithm;
+    /// Kalman algorithm
     KalmanUpdateFitter m_kalmanAlgorithm;
   };
 }

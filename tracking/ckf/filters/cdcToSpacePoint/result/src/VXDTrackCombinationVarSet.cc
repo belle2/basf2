@@ -7,23 +7,23 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/filters/cdcToSpacePoint/result/CDCVXDTrackCombinationVarSet.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/result/VXDTrackCombinationVarSet.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool CDCVXDTrackCombinationVarSet::extract(const BaseCDCVXDTrackCombinationFilter::Object* result)
+bool VXDTrackCombinationVarSet::extract(const BaseVXDTrackCombinationFilter::Object* result)
 {
-  RecoTrack* cdcTrack = result->getSeed();
-  if (not cdcTrack) return false;
+  RecoTrack* seedTrack = result->getSeed();
+  if (not seedTrack) return false;
 
-  B2ASSERT("RecoTrack should be fitted at this stage!", cdcTrack->wasFitSuccessful());
+  B2ASSERT("RecoTrack should be fitted at this stage!", seedTrack->wasFitSuccessful());
 
   const std::vector<const SpacePoint*> spacePoints = result->getHits();
 
-  genfit::MeasuredStateOnPlane mSoP = cdcTrack->getMeasuredStateOnPlaneFromFirstHit();
+  genfit::MeasuredStateOnPlane mSoP = seedTrack->getMeasuredStateOnPlaneFromFirstHit();
 
   double chi2_vxd_full = 0;
   double chi2_vxd_max = std::nan("");
@@ -60,7 +60,7 @@ bool CDCVXDTrackCombinationVarSet::extract(const BaseCDCVXDTrackCombinationFilte
   var<named("number_of_hits")>() = spacePoints.size();
   var<named("prob")>() = 0; // TODO
   var<named("pt")>() = mSoP.getMom().Pt();
-  var<named("chi2_cdc")>() = cdcTrack->getTrackFitStatus()->getChi2();
+  var<named("chi2_seed")>() = seedTrack->getTrackFitStatus()->getChi2();
   var<named("number_of_holes")>() = std::count(layerUsed.begin(), layerUsed.end(), 0);
 
   if (spacePoints.empty()) {
@@ -82,12 +82,12 @@ bool CDCVXDTrackCombinationVarSet::extract(const BaseCDCVXDTrackCombinationFilte
 
   var<named("theta")>() = mSoP.getMom().Theta();
 
-  const genfit::MeasuredStateOnPlane& firstCDCHit = cdcTrack->getMeasuredStateOnPlaneFromFirstHit();
+  const genfit::MeasuredStateOnPlane& firstCDCHit = seedTrack->getMeasuredStateOnPlaneFromFirstHit();
   m_advanceAlgorithm.extrapolate(mSoP, firstCDCHit);
 
   const auto& distance = mSoP.getPos() - firstCDCHit.getPos();
-  var<named("distance_to_cdc_track")>() = distance.Mag();
-  var<named("distance_to_cdc_track_xy")>() = distance.Pt();
+  var<named("distance_to_seed_track")>() = distance.Mag();
+  var<named("distance_to_seed_track_xy")>() = distance.Pt();
 
   return true;
 }

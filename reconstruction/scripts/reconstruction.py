@@ -3,6 +3,8 @@
 
 from basf2 import *
 
+from svd import add_svd_reconstruction
+
 from tracking import (
     add_mc_tracking_reconstruction,
     add_tracking_reconstruction,
@@ -55,6 +57,10 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
 
+    # add svd_reconstruction
+    if components is None or 'SVD' in components:
+        add_svd_reconstruction(path)
+
     # Add tracking reconstruction modules
     add_tracking_reconstruction(path,
                                 components=components,
@@ -65,6 +71,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                 additionalTrackFitHypotheses=additionalTrackFitHypotheses,
                                 use_vxdtf2=use_vxdtf2,
                                 use_second_cdc_hits=use_second_cdc_hits)
+
+    # Statistics summary
+    path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
     # Add further reconstruction modules
     add_posttracking_reconstruction(path,
@@ -131,6 +140,9 @@ def add_cosmics_reconstruction(
                                    top_in_counter=top_in_counter,
                                    use_second_cdc_hits=use_second_cdc_hits)
 
+    # Statistics summary
+    path.add_module('StatisticsSummary').set_name('Sum_Tracking')
+
     # Add further reconstruction modules
     add_posttracking_reconstruction(path,
                                     components=components,
@@ -154,6 +166,9 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExp
                                    components=components,
                                    pruneTracks=False,
                                    use_second_cdc_hits=use_second_cdc_hits)
+
+    # Statistics summary
+    path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path,
@@ -182,6 +197,8 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         add_top_modules(path, components)
         add_arich_modules(path, components)
 
+    path.add_module('StatisticsSummary').set_name('Sum_PID')
+
     if trigger_mode in ["fast_reco", "all"]:
         add_ecl_modules(path, components)
 
@@ -202,6 +219,8 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     if trigger_mode in ["all"] and addClusterExpertModules:
         # FIXME: Disabled for HLT until execution time bug is fixed
         add_cluster_expert_modules(path, components)
+
+    path.add_module('StatisticsSummary').set_name('Sum_Clustering')
 
 
 def add_mdst_output(

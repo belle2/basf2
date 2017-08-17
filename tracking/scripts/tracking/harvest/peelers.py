@@ -277,6 +277,52 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
     return fit_crops
 
 
+# Custom peel function to get the sub detector hit efficiencies
+def peel_subdetector_hit_efficiency(mc_reco_track, reco_track):
+    def get_efficiency(detector_string):
+        mc_reco_hits = getattr(mc_reco_track, "get{}HitList".format(detector_string.upper()))()
+        mc_reco_hit_size = mc_reco_hits.size()
+
+        if not reco_track or mc_reco_hit_size == 0:
+            hit_efficiency = float('nan')
+        else:
+            hit_efficiency = 0.
+            for mc_reco_hit in mc_reco_hits:
+                for reco_hit in getattr(reco_track, "get{}HitList".format(detector_string.upper()))():
+                    if mc_reco_hit.getArrayIndex() == reco_hit.getArrayIndex():
+                        hit_efficiency += 1
+                        break
+
+            hit_efficiency /= mc_reco_hit_size
+
+        return {"{}_hit_efficiency".format(detector_string.lower()): hit_efficiency}
+
+    return dict(**get_efficiency("CDC"), **get_efficiency("SVD"), **get_efficiency("PXD"))
+
+
+# Custom peel function to get the sub detector hit purity
+def peel_subdetector_hit_purity(reco_track, mc_reco_track):
+    def get_efficiency(detector_string):
+        reco_hits = getattr(reco_track, "get{}HitList".format(detector_string.upper()))()
+        reco_hit_size = reco_hits.size()
+
+        if not mc_reco_track or reco_hit_size == 0:
+            hit_purity = float('nan')
+        else:
+            hit_purity = 0.
+            for reco_hit in reco_hits:
+                for mc_reco_hit in getattr(mc_reco_track, "get{}HitList".format(detector_string.upper()))():
+                    if mc_reco_hit.getArrayIndex() == reco_hit.getArrayIndex():
+                        hit_purity += 1
+                        break
+
+            hit_purity /= reco_hit_size
+
+        return {"{}_hit_purity".format(detector_string.lower()): hit_purity}
+
+    return dict(**get_efficiency("CDC"), **get_efficiency("SVD"), **get_efficiency("PXD"))
+
+
 def get_helix_from_mc_particle(mc_particle):
     position = mc_particle.getVertex()
     momentum = mc_particle.getMomentum()

@@ -45,7 +45,7 @@ void FilterBasedVXDCDCTrackMergerFindlet::apply()
   std::vector<RecoTrack*> cdcRecoTrackVector;
   std::vector<RecoTrack*> vxdRecoTrackVector;
 
-  m_storeArrayMerger.fetch(cdcRecoTrackVector, vxdRecoTrackVector);
+  m_storeArrayMerger.apply(cdcRecoTrackVector, vxdRecoTrackVector);
 
   // Prepare the weighted relations for later
   std::vector<TrackFindingCDC::WeightedRelation<RecoTrack*, RecoTrack* const>> weightedRelations;
@@ -88,7 +88,4 @@ void FilterBasedVXDCDCTrackMergerFindlet::apply()
 
   // Add the already found items from the filter-based decision
   m_relationAdder.apply(weightedRelations);
-
-  // Use the relations to merge the tracks and fill them into a new store array entry
-  m_storeArrayMerger.apply();
 }

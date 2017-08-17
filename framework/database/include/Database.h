@@ -178,8 +178,8 @@ namespace Belle2 {
     /** Hidden constructor, as it is a singleton. */
     Database() : m_logLevel(LogConfig::c_Warning) {};
 
-    /** Hidden copy constructor, as it is a singleton. */
-    Database(const Database&) : m_logLevel(LogConfig::c_Warning) {};
+    /** No copy constructor, as it is a singleton. */
+    Database(const Database&) = delete;
 
     /** Helper function to construct a payload file name. */
     std::string payloadFileName(const std::string& path, const std::string& name, int revision) const;

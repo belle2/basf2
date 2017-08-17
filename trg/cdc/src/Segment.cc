@@ -62,6 +62,7 @@ namespace Belle2 {
 
   TRGCDCSegment::~TRGCDCSegment()
   {
+    delete m_TSLUT;
   }
 
   void

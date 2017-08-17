@@ -52,7 +52,7 @@ void printBackgroundInfo(const BackgroundInfo& a)
   B2INFO("   ECL energy cut: " << a.getMaxEdepECL() << " GeV");
   B2INFO("Background samples: ");
   auto da = a.getBackgroundDescr();
-  auto cmpfn = [](const BackgroundInfo::BackgroundDescr & a, const BackgroundInfo::BackgroundDescr & b) {return a.type < b.type; };
+  auto cmpfn = [](const BackgroundInfo::BackgroundDescr & descrA, const BackgroundInfo::BackgroundDescr & descrB) {return descrA.type < descrB.type; };
   std::sort(da.begin(), da.end(), cmpfn);
   for (const auto& d : da) {
     B2INFO("  " << d.type << ", scale " << d.scaleFactor);
@@ -90,7 +90,7 @@ void checkBackgroundCompatible(const BackgroundInfo& a, const BackgroundInfo& b,
   if (da.size() != db.size()) {
     B2ERROR("Incompatible background types in " << boost::io::quoted(filename));
   } else {
-    auto cmpfn = [](const BackgroundInfo::BackgroundDescr & a, const BackgroundInfo::BackgroundDescr & b) {return a.type < b.type; };
+    auto cmpfn = [](const BackgroundInfo::BackgroundDescr & descrA, const BackgroundInfo::BackgroundDescr & descrB) {return descrA.type < descrB.type; };
     std::sort(da.begin(), da.end(), cmpfn);
     std::sort(db.begin(), db.end(), cmpfn);
     for (size_t i = 0; i < da.size(); ++i) {

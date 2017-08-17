@@ -9,7 +9,6 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <framework/logging/Logger.h>
 

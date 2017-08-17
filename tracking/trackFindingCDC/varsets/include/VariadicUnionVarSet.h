@@ -14,7 +14,6 @@
 
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 #include <tracking/trackFindingCDC/utilities/Named.h>
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
 #include <vector>
@@ -51,7 +50,7 @@ namespace Belle2 {
       /// Create the union variable set.
       explicit VariadicUnionVarSet()
       {
-        EvalVariadic{(m_multiVarSet.push_back(makeUnique<AVarSets>()), true)...};
+        EvalVariadic{(m_multiVarSet.push_back(std::make_unique<AVarSets>()), true)...};
         assert(m_multiVarSet.size() == sizeof...(AVarSets));
       }
 

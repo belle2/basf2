@@ -66,7 +66,7 @@ namespace Belle2 {
 
       /// Construct the varset.
       FilterVarSet(const std::string& filterName = "",
-                   std::unique_ptr<Filter> ptrFilter = makeUnique<Filter>())
+                   std::unique_ptr<Filter> ptrFilter = std::make_unique<Filter>())
         : Super()
         , m_filterName(filterName)
         , m_filterNamePrefix(filterName + '_')

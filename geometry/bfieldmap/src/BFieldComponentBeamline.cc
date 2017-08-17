@@ -331,9 +331,11 @@ namespace Belle2 {
       B2DEBUG(50, "Total number of triangles: " << nts);
       vector<triangle_t> ts;
       ts.reserve(nts);
-
-      triangle_t p;
-      while (INd >> nts >> p.j0 >> p.j1 >> p.j2 >> p.n0 >> p.n1 >> p.n2) ts.push_back(p);
+      // load triangle definitions from file
+      {
+        triangle_t p;
+        while (INd >> nts >> p.j0 >> p.j1 >> p.j2 >> p.n0 >> p.n1 >> p.n2) ts.push_back(p);
+      }
 
       //Load the map file
       io::filtering_istream IN;

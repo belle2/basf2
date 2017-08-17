@@ -47,6 +47,21 @@ namespace Belle2 {
     }
 
     /**
+     * Assignment operator
+     */
+    TOPCalTimebase& operator=(const TOPCalTimebase& timeBase)
+    {
+      if (this != &timeBase) {
+        m_syncTimeBase = timeBase.getSyncTimeBase();
+        m_sampleTimes = timeBase.getSampleTimes();
+        m_map.clear();
+        if (m_sampleTime) delete m_sampleTime;
+        m_sampleTime = 0;
+      }
+      return *this;
+    }
+
+    /**
      * Destructor
      */
     ~TOPCalTimebase()

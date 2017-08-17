@@ -18,7 +18,6 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <framework/core/ModuleParamList.h>
 
@@ -118,7 +117,7 @@ void AxialTrackCreatorSegmentHough::initialize()
                                   m_param_discreteCurvOverlap,
                                   m_param_discreteCurvWidth);
 
-  m_houghTree = makeUnique<SimpleSegmentPhi0ImpactCurvHoughTree>(m_param_maxLevel);
+  m_houghTree = std::make_unique<SimpleSegmentPhi0ImpactCurvHoughTree>(m_param_maxLevel);
   m_houghTree->assignArray<DiscretePhi0>(phi0BinsSpec.constructArray(), phi0BinsSpec.getNOverlap());
   m_houghTree->assignArray<ContinuousImpact>(impactBounds, impactBinsSpec.getOverlap()); // Continuous
   m_houghTree->assignArray<DiscreteCurv>(curvBinsSpec.constructArray(), curvBinsSpec.getNOverlap());

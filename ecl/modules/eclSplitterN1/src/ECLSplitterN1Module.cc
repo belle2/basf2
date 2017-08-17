@@ -292,12 +292,12 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
                                 neighbourId); // check if the neighbour is in the list for this CR
       if (it == m_cellIdInCR.end()) continue; // not in this CR
 
-      const int pos = m_StoreArrPosition[neighbourId];
-      digits.push_back(*m_eclCalDigits[pos]); // list of digits for position reconstruction
+      const int neighbourpos = m_StoreArrPosition[neighbourId];
+      digits.push_back(*m_eclCalDigits[neighbourpos]); // list of digits for position reconstruction
       weights.push_back(1.0); // list of weights (all 1 in this case for now)
       weightSum += 1.0;
 
-      aECLShower->addRelationTo(m_eclCalDigits[pos], 1.0); // add digits to this shower, weight = 1
+      aECLShower->addRelationTo(m_eclCalDigits[neighbourpos], 1.0); // add digits to this shower, weight = 1
     }
 
     // Get position.
@@ -351,8 +351,8 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     // Add relations of all CalDigits of the CR to the local maximum (here: all weights = 1).
     const int posLM = m_StoreArrPositionLM[locmaxcellid];
     for (const auto& aDigit : aCR.getRelationsWith<ECLCalDigit>()) {
-      const int pos = m_StoreArrPosition[aDigit.getCellId()];
-      m_eclLocalMaximums[posLM]->addRelationTo(m_eclCalDigits[pos], 1.0);
+      const int posDigit = m_StoreArrPosition[aDigit.getCellId()];
+      m_eclLocalMaximums[posLM]->addRelationTo(m_eclCalDigits[posDigit], 1.0);
     }
 
   } else { // this is the really interesing part where showers are split. this alogorithm is based on BaBar code.
@@ -392,6 +392,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       const int pos = m_StoreArrPosition[cellid];
       digitVector.push_back(*m_eclCalDigits[pos]);
     }
+
 
     // -----------------------------------------------------------------------------------------
     // The 'heart' of the splitter
@@ -580,8 +581,8 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       std::vector < double > myWeights = (*weightMap.find(locmaxcellid)).second;
 
       // Loop over all digits.
-      std::vector<ECLCalDigit> digits;
-      std::vector<double> weights;
+      std::vector<ECLCalDigit> newdigits;
+      std::vector<double> newweights;
       double highestEnergy = 0.;
       double highestEnergyTime = 0.;
       double highestEnergyTimeResolution = 0.;
@@ -589,10 +590,10 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
       for (unsigned int i = 0; i < digitVector.size(); ++i) {
 
-        const ECLCalDigit digit = digitVector[i];
+        const ECLCalDigit dig = digitVector[i];
         const double weight = myWeights[i];
 
-        const int cellid = digit.getCellId();
+        const int cellid = dig.getCellId();
         const int pos = m_StoreArrPosition[cellid];
 
         // Add weighted relations of all CalDigits to the local maximum.
@@ -605,17 +606,17 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
             aECLShower->addRelationTo(m_eclCalDigits[pos], weight);
 
-            digits.push_back(digit);
-            weights.push_back(weight);
+            newdigits.push_back(dig);
+            newweights.push_back(weight);
 
             weightSum += weight;
 
-            const double energy = digit.getEnergy();
+            const double energy = dig.getEnergy();
 
             if (energy * weight > highestEnergy) {
               highestEnergy = energy * weight;
-              highestEnergyTime = digit.getTime();
-              highestEnergyTimeResolution = digit.getTimeResolution();
+              highestEnergyTime = dig.getTime();
+              highestEnergyTimeResolution = dig.getTimeResolution();
             }
           }
         }
@@ -633,7 +634,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       // New position (with reduced number of neighbours)
       // There are some cases where high backgrounds fake local maxima and the splitted centroid position is far
       // away from the original LM cell... this will throw a (non fatal) error, and create a cluster with zero energy now).
-      B2Vector3D* showerposition = new B2Vector3D(Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters));
+      B2Vector3D* showerposition = new B2Vector3D(Belle2::ECL::computePositionLiLo(newdigits, newweights, m_liloParameters));
       aECLShower->setTheta(showerposition->Theta());
       aECLShower->setPhi(showerposition->Phi());
       aECLShower->setR(showerposition->Mag());
@@ -651,16 +652,16 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
         const unsigned int nOptimal = getOptimalNumberOfDigits(locmaxcellid, energyEstimation, backgroundLevel);
 
         std::vector < std::pair<double, double> > weighteddigits;
-        weighteddigits.resize(digits.size());
-        for (unsigned int i = 0; i < digits.size(); ++i) {
-          weighteddigits.at(i) = std::make_pair((digits.at(i)).getEnergy(), weights.at(i));
+        weighteddigits.resize(newdigits.size());
+        for (unsigned int i = 0; i < newdigits.size(); ++i) {
+          weighteddigits.at(i) = std::make_pair((newdigits.at(i)).getEnergy(), newweights.at(i));
         }
 
         showerEnergy = getEnergySum(weighteddigits, nOptimal);
         B2DEBUG(150, "Shower Energy (2): " << showerEnergy);
 
       } else {
-        showerEnergy = Belle2::ECL::computeEnergySum(digits, weights);
+        showerEnergy = Belle2::ECL::computeEnergySum(newdigits, newweights);
       }
 
       aECLShower->setEnergy(showerEnergy);

@@ -150,9 +150,19 @@ namespace Belle2 {
     void importAerogelInfo();
 
     /**
+     * Import ARICH aerogel map in the database.
+     */
+    void importAerogelMap();
+
+    /**
      * Export ARICH aerogel data from the database.
      */
     void exportAerogelInfo();
+
+    /**
+     * Export ARICH aerogel map in the database.
+     */
+    void exportAerogelMap();
 
     /**
      * Import intrarun dependant ARICH aerogel data in the database. -> Example for intrarun dependat data!

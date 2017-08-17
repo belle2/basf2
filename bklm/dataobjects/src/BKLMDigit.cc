@@ -93,6 +93,21 @@ BKLMDigit::BKLMDigit(const BKLMDigit& digit) :
 {
 }
 
+// Assignment operator
+BKLMDigit& BKLMDigit::operator=(const BKLMDigit& digit)
+{
+  m_CTime = digit.m_CTime;
+  m_ModuleID = digit.m_ModuleID;
+  m_SimTime = digit.m_SimTime;
+  m_Time = digit.m_Time;
+  m_SimEDep = digit.m_SimEDep;
+  m_EDep = digit.m_EDep;
+  m_SimNPixel = digit.m_SimNPixel;
+  m_NPixel = digit.m_NPixel;
+  m_FitStatus = digit.m_FitStatus;
+  return *this;
+}
+
 DigitBase::EAppendStatus BKLMDigit::addBGDigit(const DigitBase* bg)
 {
   const BKLMDigit* bgDigit = static_cast<const BKLMDigit*>(bg);

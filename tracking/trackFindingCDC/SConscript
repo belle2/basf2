@@ -18,8 +18,6 @@ env['LIBS'] = [
     '$ROOT_LIBS',
     ]
 
-env.Append(CXXFLAGS=['-Wshadow'])
-
 # Does not work well with cppcheck
 # option = os.environ['BELLE2_OPTION']
 # if option == "clang":

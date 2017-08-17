@@ -8,7 +8,7 @@ void fit(TH1D* h1){
   Double_t par[6];
   TF1* f1 = new TF1("f1","gaus(0)+gaus(3)",2,2);
   f1->SetLineColor(kRed);
-  f1->SetParameters(p1*0.9, 0, p3*0.7, p1*0.3, 0, p3*3);
+  f1->SetParameters(p1*0.9, 0, p3*0.7, p1*0.3, 0, p3*1.5);
   TF1* g1 =new TF1("g1","gaus",-2,2);g1->SetLineColor(kBlue);
   TF1* g2 =new TF1("g2","gaus",-2,2);g2->SetLineColor(kGreen);
   h1->Fit("f1","Q","",-3*p3,3*p3);
@@ -152,7 +152,9 @@ void compare2Tracks(){
     nbytes += tree->GetEntry(i);    
 
     //    if(posSeed1->Y() * posSeed2->Y() > 0) continue;
-    if(D01*D02 <0) continue;    
+    //    if(D01*D02 <0) continue;    
+    //    if(cos(Mom1->Angle(*Mom2))<0) continue;    
+    if(Mom1->Dot(*Mom2)<0) continue;    
     if(posSeed1->Y() <  posSeed2->Y() ){
       Phi0 = Phi01; Phi01 =Phi02; Phi02 =Phi0;
       Omega = Omega1; Omega1 = Omega2; Omega2 = Omega;

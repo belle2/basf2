@@ -45,11 +45,11 @@ namespace Belle2 {
     /** Maximum number of events to be collected at the start of each run (-1 = no maximum) */
     int m_maxEventsPerRun;
 
-    /* Flag that will be returned by the module. Gets set to True at the start of the run
+    /** Flag that will be returned by the module. Gets set to True at the start of the run
      * and False once we hit the maximum events */
     bool m_returnValue = true;
 
-    /* How many events processed for the current run so far, stops counting up once max is hit
+    /** How many events processed for the current run so far, stops counting up once max is hit
      * Only used/incremented if m_maxEventsPerRun > -1 */
     int m_runEvents = 0;
   };

@@ -1,12 +1,12 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+* BASF2 (Belle Analysis Framework 2)                                     *
+* Copyright(C) 2014 - Belle II Collaboration                             *
+*                                                                        *
+* Author: The Belle II Collaboration                                     *
+* Contributors: Marko Staric                                             *
+*                                                                        *
+* This software is provided "as is" without any warranty.                *
+**************************************************************************/
 
 // Own include
 #include <top/modules/TOPUnpacker/TOPUnpackerModule.h>
@@ -374,7 +374,7 @@ namespace Belle2 {
 
       if (scrodID_FE != scrodID) {
         B2ERROR("TOPUnpacker: corrupted data - different scrodID's in HLSB and FE header");
-        B2DEBUG(100, "Different scrodID's in HLSB and FE header: "
+        B2ERROR("Different scrodID's in HLSB and FE header: "
                 << scrodID << " " << scrodID_FE << " word = 0x" << std::hex << word);
         info->setErrorFlag(TOPInterimFEInfo::c_DifferentScrodIDs);
         return array.getRemainingWords();
@@ -421,22 +421,22 @@ namespace Belle2 {
 
         // feature-extracted data (negative signal)
         word = array.getWord(); // word 9
-        short n_samp_i = (word >> 16) & 0xFFFF;
+        //short n_samp_i = (word >> 16) & 0xFFFF;
         word = array.getWord(); // word 10
         short samplePeak_n = word & 0xFFFF;
         short valuePeak_n = (word >> 16) & 0xFFFF;
 
         word = array.getWord(); // word 11
-        short sampleRise_n = word & 0xFFFF;
-        short valueRise0_n = (word >> 16) & 0xFFFF;
+        //short sampleRise_n = word & 0xFFFF;
+        //short valueRise0_n = (word >> 16) & 0xFFFF;
 
         word = array.getWord(); // word 12
-        short valueRise1_n = word & 0xFFFF;
-        short sampleFall_n = (word >> 16) & 0xFFFF;
+        //short valueRise1_n = word & 0xFFFF;
+        //short sampleFall_n = (word >> 16) & 0xFFFF;
 
         word = array.getWord(); // word 13
-        short valueFall0_n = word & 0xFFFF;
-        short valueFall1_n = (word >> 16) & 0xFFFF;
+        //short valueFall0_n = word & 0xFFFF;
+        //short valueFall1_n = (word >> 16) & 0xFFFF;
 
         word = array.getWord(); // word 14
         short integral_n = word & 0xFFFF;

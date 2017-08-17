@@ -105,3 +105,27 @@ class TestingModule(Module):
 
 main.add_module(TestingModule())
 process(main)
+
+set_random_seed("something important")
+# make sure FATAL messages don't have the function signature as this makes
+# problems with clang printing namespaces differently
+logging.set_info(LogLevel.FATAL, logging.get_info(LogLevel.ERROR))
+
+
+# Test eventSequences parameter ':' in detail
+main = create_path()
+input = main.add_module('RootInput', inputFileNames=[
+    Belle2.FileSystem.findFile('framework/tests/chaintest_1.root'),
+    Belle2.FileSystem.findFile('framework/tests/chaintest_2.root')], logLevel=LogLevel.WARNING)
+# The first file contains the following event numbers (in this order)
+# 2, 6, 5, 9, 10, 11, 8, 12, 0, 13, 15, 16
+# We select the complete first file.
+# The second file contains the following event numbers (in this order)
+# 7, 6, 3, 8, 9, 12, 4, 11, 10, 16, 13, 17, 18, 14, 15
+input.param('entrySequences', [':', '1:2,4,12:13'])
+
+expected_event_numbers = [2, 6, 5, 9, 10, 11, 8, 12, 0, 13, 15, 16, 6, 3, 9, 18, 14]
+processed_event_numbers = []
+
+main.add_module(TestingModule())
+process(main)

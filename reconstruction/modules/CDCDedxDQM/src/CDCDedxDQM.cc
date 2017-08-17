@@ -26,27 +26,28 @@ void CDCDedxDQMModule::defineHisto()
 {
   B2INFO("Creating a ROOT file for CDC dE/dx DQM...");
 
-  // prepare the wire gain constants
+  // make sure the calibration constants are reasonable
+  // run gains
+  if (m_DBRunGain->getRunGain() == 0)
+    B2ERROR("Run gain is zero!");
+
+  // wire gains
   for (unsigned int i = 0; i < 14336; ++i) {
     if (m_DBWireGains->getWireGain(i) == 0)
       B2ERROR("Wire gain " << i << " is zero!");
   }
 
-  // prepare the electron saturation constants (key is low edge of bin)
-  std::vector<double> binedges = m_DBCosine->getCosThetaBins();
-  for (unsigned int i = 0; i < binedges.size(); ++i) {
-    B2INFO(binedges[i] << " : " << m_DBCosine->getMean(binedges[i]));
-    double gain = m_DBCosine->getMean(binedges[i]) / m_DBRunGain->getRunGain();
-    if (gain == 0) {
-      B2WARNING("Cosine gain is zero...");
-      gain = 1;
-    }
-    m_cosineGains[binedges[i]] = gain;
+  // cosine correction (store the bin edges for extrapolation)
+  m_cosbinedges = m_DBCosine->getCosThetaBins();
+  const int ncgains = m_cosbinedges.size();
+  for (unsigned int i = 0; i < ncgains; ++i) {
+    double gain = m_DBCosine->getMean(m_cosbinedges[i]);
+    if (gain == 0)
+      B2ERROR("Cosine gain is zero...");
   }
 
-  const int ncgains = m_cosineGains.size();
   m_h_rungains = new TH1F("h_rungains", "h_rungains", 100, 0, 100);
-  m_h_wiregains = new TH1F("h_wiregains", "h_wiregains", 14336, 0, 14336);
+  m_h_wiregains = new TH1F("h_wiregains", "h_wiregains", 14336, -0.5, 14335.5);
   m_h_cosinegains = new TH1F("h_cosinegains", "h_cosinegains", ncgains, -1, 1);
 }
 
@@ -60,13 +61,11 @@ void CDCDedxDQMModule::beginRun()
 
   m_h_rungains->Fill(m_DBRunGain->getRunGain());
 
-  int bin = 0;
   for (unsigned int i = 0; i < 14336; ++i)
     m_h_wiregains->SetBinContent(i, m_DBWireGains->getWireGain(i));
 
-  bin = 0;
-  for (auto& cosine : m_cosineGains)
-    m_h_cosinegains->SetBinContent(bin++, cosine.second);
+  for (unsigned int i = 0; i < m_cosbinedges.size(); ++i)
+    m_h_cosinegains->SetBinContent(i, m_DBCosine->getMean(m_cosbinedges[i]));
 }
 
 void CDCDedxDQMModule::event()

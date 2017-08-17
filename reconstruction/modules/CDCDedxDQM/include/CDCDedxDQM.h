@@ -64,11 +64,10 @@ namespace Belle2 {
     TH1F* m_h_wiregains = nullptr; /**< Histogram for wire gains */
     TH1F* m_h_cosinegains = nullptr; /**< Histogram for electron saturation constants */
 
-    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB objects */
-    DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB objects */
-
-    DBObjPtr<CDCDedxCosine> m_DBCosine; /**< Electron saturation correction DB objects */
-    std::map<double, double> m_cosineGains;  /**< Electron saturation correction constants */
+    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
+    DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
+    DBObjPtr<CDCDedxCosine> m_DBCosine; /**< Electron saturation correction DB object */
+    std::vector<double> m_cosbinedges;  /**< Electron saturation correction details */
 
   };
 } // Belle2 namespace

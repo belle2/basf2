@@ -27,7 +27,8 @@ use_local_database("calibration_results/CDCDedxCosineCalibration/outputdb/databa
 main = create_path()
 
 # read in a sample
-main.add_module("RootInput", inputFileName="B2Electrons.root")
+input_file = 'B2Electrons.root'
+main.add_module("RootInput", inputFileName=input_file)
 
 # register the HistoManager and specify output file
 main.add_module("HistoManager", histoFileName="CDCDedxDQM.root")

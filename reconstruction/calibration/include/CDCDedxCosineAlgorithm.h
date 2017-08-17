@@ -42,6 +42,6 @@ namespace Belle2 {
 
   private:
 
-    ClassDef(CDCDedxCosineAlgorithm, 1); /**< Class for CDC dE/dx calibration algorithm **/
+    ClassDef(CDCDedxCosineAlgorithm, 0); /**< Class for CDC dE/dx calibration algorithm **/
   };
 } // namespace Belle2

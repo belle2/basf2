@@ -51,6 +51,6 @@ namespace Belle2 {
     /** dE/dx gains for each wire: key is continuous wire number (0-14336) */
     std::map<int, double> m_means;
 
-    ClassDef(CDCDedxWireGain, 1); /**< ClassDef */
+    ClassDef(CDCDedxWireGain, 2); /**< ClassDef */
   };
 } // end namespace Belle2

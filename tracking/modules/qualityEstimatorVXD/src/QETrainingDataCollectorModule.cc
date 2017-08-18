@@ -14,7 +14,6 @@
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorMC.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRandom.h>
-#include <tracking/trackFindingVXD/utilities/UniquePointerHelper.h>
 #include <framework/logging/Logger.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 #include <math.h>
@@ -34,7 +33,6 @@ QETrainingDataCollectorModule::QETrainingDataCollectorModule() : Module()
 
   addParam("EstimationMethod", m_EstimationMethod,
            "Identifier which estimation method to use. Valid identifiers are: [circleFit, tripletFit, helixFit]", std::string(""));
-
   addParam("SpacePointTrackCandsStoreArrayName", m_SpacePointTrackCandsStoreArrayName,
            "Name of StoreArray containing the SpacePointTrackCandidates to be estimated.", std::string(""));
 
@@ -51,30 +49,34 @@ void QETrainingDataCollectorModule::initialize()
 {
   m_spacePointTrackCands.isRequired(m_SpacePointTrackCandsStoreArrayName);
 
-  // prepare recorder
-  m_variableSet.setVariable("NHits", -1);
-  m_variableSet.setVariable("truth", -1);
-  m_variableSet.setVariables(m_EstimationMethod, QualityEstimationResults());
+  m_qeResultsExtractor = std::make_unique<QEResultsExtractor>(m_EstimationMethod, m_variableSet);
 
+  m_variableSet.emplace_back("NSpacePoints", &m_nSpacePoints);
 
-  m_recorder = in_hopes_for_cpp14_make_unique<SimpleVariableRecorder>(m_variableSet, m_TrainingDataOutputName, "tree");
+  m_variableSet.emplace_back("truth", &m_truth);
+
+  if (m_ClusterInformation == "Average") {
+    m_clusterInfoExtractor = std::make_unique<ClusterInfoExtractor>(m_variableSet);
+  }
+
+  m_recorder = std::make_unique<SimpleVariableRecorder>(m_variableSet, m_TrainingDataOutputName, "tree");
 }
 
 void QETrainingDataCollectorModule::event()
 {
   // BField is required by all QualityEstimators
   double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
-  m_estimatorMC = in_hopes_for_cpp14_make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
+  m_estimatorMC = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
 
   m_estimatorMC->setMagneticFieldStrength(bFieldZ);
 
   // create pointer to chosen estimator
   if (m_EstimationMethod == "tripletFit") {
-    m_estimator = in_hopes_for_cpp14_make_unique<QualityEstimatorTripletFit>();
+    m_estimator = std::make_unique<QualityEstimatorTripletFit>();
   } else if (m_EstimationMethod == "circleFit") {
-    m_estimator = in_hopes_for_cpp14_make_unique<QualityEstimatorCircleFit>();
+    m_estimator = std::make_unique<QualityEstimatorCircleFit>();
   } else if (m_EstimationMethod == "helixFit") {
-    m_estimator = in_hopes_for_cpp14_make_unique<QualityEstimatorRiemannHelixFit>();
+    m_estimator = std::make_unique<QualityEstimatorRiemannHelixFit>();
   }
   B2ASSERT("Not all QualityEstimators could be initialized!", m_estimator);
 

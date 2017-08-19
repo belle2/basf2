@@ -50,6 +50,25 @@ BKLMTrack::BKLMTrack(const BKLMTrack& track) :
   }
 }
 
+//! Assignment operator
+BKLMTrack& BKLMTrack::operator=(const BKLMTrack& track)
+{
+  m_Valid = track.m_Valid;
+  m_Good = track.m_Good;
+  m_Chi2 = track.m_Chi2;
+  m_NumHit = track.m_NumHit;
+
+  for (int ii = 0 ; ii < 4; ii ++) {
+    m_TrackParam[ii] = track.m_TrackParam[ii];
+    m_LocalTrackParam[ii] = track.m_LocalTrackParam[ii];
+    for (int jj = 0 ; jj < 4; jj ++) {
+      m_TrackParamErr[ii][jj] = track.m_TrackParamErr[ii][jj];
+      m_LocalTrackParamErr[ii][jj] = track.m_LocalTrackParamErr[ii][jj];
+    }
+  }
+  return *this;
+}
+
 //! Get track parameters in the global system. y = p0 + p1 * x; z = p2 + p3 * x
 TVectorD BKLMTrack::getTrackParam()
 {

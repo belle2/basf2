@@ -71,6 +71,7 @@ class PackerUnpackerTestModule(Module):
             assert hit.getADCCount() == hitPackedUnpacked.getADCCount()
             assert hit.getStatus() == hitPackedUnpacked.getStatus()
 
+
 main = create_path()
 # Create Event information
 eventinfosetter = register_module('EventInfoSetter')

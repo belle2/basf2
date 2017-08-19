@@ -791,7 +791,7 @@ std::pair<double, double> SpacePoint2TrueHitConnectorModule::getLocalPos(Belle2:
   // NOTE: second way is to convert the global position of the SpacePoint to local position via the sensorInfoBase (yields same results)
   double normU = spacePoint->getNormalizedLocalU();
   double normV = spacePoint->getNormalizedLocalV();
-  return SpacePoint::convertNormalizedToLocalCoordinates(std::make_pair(normU, normV), spacePoint->getVxdID());
+  return spacePoint->convertNormalizedToLocalCoordinates(std::make_pair(normU, normV), spacePoint->getVxdID());
 }
 
 // =============================================================== GET TRUEHIT POSITIONS ==========================================

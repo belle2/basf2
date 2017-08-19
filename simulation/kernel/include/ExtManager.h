@@ -79,8 +79,11 @@ namespace Belle2 {
       //! constructor is hidden: user calls ExtManager::GetManager() instead
       ExtManager();
 
-      //! copy constructor is hidden; user calls ExtManager::GetManager() instead
-      ExtManager(ExtManager&);
+      //! copy constructor is undefined for singleton; user calls ExtManager::GetManager() instead
+      ExtManager(ExtManager&) = delete;
+
+      //! Assignment operator is undefined for singleton; user calls ExtManager::GetManager() instead
+      ExtManager& operator=(ExtManager&) = delete;
 
     private:
 

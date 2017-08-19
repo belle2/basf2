@@ -940,7 +940,6 @@ void PXDDQMClusterShapeModule::event()
   // If there are no digits, leave
   if (!storePXDDigits || !storePXDDigits.getEntries()) return;
 
-  printf("--->kuk1 \n");
   // Use GeoCache for sensor parameters and transforms
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
   TVector3 pos;
@@ -948,27 +947,20 @@ void PXDDQMClusterShapeModule::event()
   TMatrixDSym cov;
 
   for (auto& recoTrack : recotracks) {  // over recotracks
-    printf("--->kuk3a \n");
     if (!recoTrack.wasFitSuccessful())
       continue;
-    printf("--->kuk3b \n");
     if (!recoTrack.getTrackFitStatus())
       continue;
-    printf("--->kuk3c \n");
-    //if (!recoTrack.hasPXDHits())
-    //  continue;
-    printf("--->kuk3d \n");
+    if (!recoTrack.hasPXDHits())
+      continue;
     if ((recoTrack.getNumberOfPXDHits() != 2) || (recoTrack.getNumberOfSVDHits() != 8)) // only good quality of tracks are used
       continue;
-    printf("--->kuk3e \n");
     int iHit = 0;
     for (auto recoHitInfo : recoTrack.getRecoHitInformations()) {  // over recohits
-      printf("--->kuk3f \n");
       if (!recoHitInfo) {
         B2DEBUG(200, "No genfit::pxd recoHitInfo is missing.");
         continue;
       }
-      printf("--->kuk3g \n");
       if (!recoHitInfo->useInFit())
         continue;
       if (recoHitInfo->getTrackingDetector() != RecoHitInformation::c_PXD)
@@ -976,7 +968,6 @@ void PXDDQMClusterShapeModule::event()
       // OK so we have RecoHitInformation related to PXD.
       // First recover the RecoHit.
       const PXDRecoHit* recoHit;
-      printf("--->kuk4 \n");
       try {
         recoHit = dynamic_cast<const PXDRecoHit*>(recoTrack.getCreatedTrackPoint(recoHitInfo)->getRawMeasurement());
       } catch (genfit::Exception) {
@@ -984,7 +975,6 @@ void PXDDQMClusterShapeModule::event()
       }
       VxdID sensorID = recoHit->getSensorID();
       auto info = dynamic_cast<const PXD::SensorInfo&>(geoCache.get(sensorID));
-      printf("--->kuk3 \n");
 
       if (sensorID.getLayerNumber() > 2)
         continue;
@@ -1036,7 +1026,6 @@ void PXDDQMClusterShapeModule::event()
         m_EERecoHitV = m_EEClusterV;
       }
       // END do correcetion on cllluster repeat recohit steps
-      printf("--->kuk4 \n");
 
       // Biased position of track on the sensor and related information in local coordinates.
       bool biased = true;

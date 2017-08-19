@@ -25,6 +25,8 @@
 
 from basf2 import *
 from ROOT import Belle2
+from svd import add_svd_simulation
+from svd import add_svd_reconstruction
 from tracking import add_tracking_reconstruction
 from simulation import add_simulation
 
@@ -199,8 +201,8 @@ else:
 if (args.useShapeCorrection is True):
     main.add_module(ActivatePXDClusterShapeCorrection)
 
-# add_svd_simulation()
-# add_svd_reconstruction()
+add_svd_simulation(main)
+add_svd_reconstruction(main)
 add_tracking_reconstruction(main,
                             pruneTracks=False,
                             components=['MagneticField', 'PXD', 'SVD', 'CDC'],

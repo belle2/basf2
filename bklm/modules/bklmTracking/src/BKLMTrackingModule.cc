@@ -26,7 +26,7 @@ BKLMTrackingModule::BKLMTrackingModule() : Module()
 {
   setDescription("perform standard-alone straight line tracking for BKLM");
   addParam("MeanDt", m_MeanDt, "[ns] Mean hit-trigger time for coincident hits (default 0)", double(0.0));
-  addParam("MaxDt", m_MaxDt, "[ns] Coincidence window half-width for in-time KLM hits (default +-30)", double(30.0));
+  addParam("MaxDt", m_MaxDt, "[ns] Coincidence window half-width for in-time KLM hits (default +-2000)", double(2000.0));
   addParam("MatchToRecoTrack", m_MatchToRecoTrack, "[bool], whether match BKLMTrack to RecoTrack; (default is false)", false);
   addParam("MaxAngleRequired", m_maxAngleRequired,
            "[degree], match BKLMTrack to RecoTrack; angle between them is required to be smaller than (default 10)", double(10.0));

@@ -199,6 +199,8 @@ else:
 if (args.useShapeCorrection is True):
     main.add_module(ActivatePXDClusterShapeCorrection)
 
+# add_svd_simulation()
+# add_svd_reconstruction()
 add_tracking_reconstruction(main,
                             pruneTracks=False,
                             components=['MagneticField', 'PXD', 'SVD', 'CDC'],

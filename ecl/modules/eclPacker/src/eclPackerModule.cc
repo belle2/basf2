@@ -111,14 +111,13 @@ void ECLPackerModule::event()
   B2DEBUG(100, "EclPacker:: N_Digits    = " << nEclDigits);
   B2DEBUG(100, "EclPacker:: N_Waveforms = " << nEclWaveform);
 
-  int cid = 0, i_digit = 0, i_wf = 0;
   int iCOPPER, iFINESSE, iCrate, iShaper, iChannel, nShapers;
 
   B2DEBUG(100, "EclPacker:: Hits ======>> ");
   int tot_dsp_hits = 0;
   // fill number of hits, masks and fill correspondance between cellID and index in container
-  for (i_digit = 0; i_digit < nEclDigits; i_digit++) {
-    cid = ECLDigitData[i_digit]->getCellId();
+  for (int i_digit = 0; i_digit < nEclDigits; i_digit++) {
+    int cid = ECLDigitData[i_digit]->getCellId();
     int amp = ECLDigitData[i_digit]->getAmp();
 
     if (amp < m_ampThreshold) continue;
@@ -152,15 +151,15 @@ void ECLPackerModule::event()
   if (m_WaveformRareFactor != 0)
     if (m_EvtNum % m_WaveformRareFactor == 0) {
       B2INFO("ECL Packer:: Pack waveform data for this event: " << m_EvtNum);
-      for (i_wf = 0; i_wf < nEclWaveform; i_wf++) {
-        cid = ECLWaveformData[i_wf]->getCellId();
+      for (int i_wf = 0; i_wf < nEclWaveform; i_wf++) {
+        int cid = ECLWaveformData[i_wf]->getCellId();
         iCrate = m_eclMapper->getCrateID(cid);
         iShaper = m_eclMapper->getShaperPosition(cid);
         iChannel = m_eclMapper->getShaperChannel(cid);
 
         //check corresponding amplitude in ecl digits
         int amp = 0;
-        for (i_digit = 0; i_digit < nEclDigits; i_digit++) {
+        for (int i_digit = 0; i_digit < nEclDigits; i_digit++) {
           if (ECLDigitData[i_digit]->getCellId() == cid) {
             amp = ECLDigitData[i_digit]->getAmp();
             break;
@@ -270,11 +269,11 @@ void ECLPackerModule::event()
         // cycle over shaper channels and push DSP data to buffer
         for (iChannel = 1; iChannel <= ECL_CHANNELS_IN_SHAPER; iChannel++) {
 
-          cid = m_eclMapper->getCellId(iCrate, iShaper, iChannel);
+          int cid = m_eclMapper->getCellId(iCrate, iShaper, iChannel);
 
           if (cid < 1) continue;
 
-          i_digit = iEclDigIndices[cid - 1];
+          int i_digit = iEclDigIndices[cid - 1];
           if (i_digit < 0) continue;
           int qua = ECLDigitData[i_digit]->getQuality();
           int amp = ECLDigitData[i_digit]->getAmp();
@@ -294,9 +293,9 @@ void ECLPackerModule::event()
         resetBuffPosition();
         setBuffLength(ECL_ADC_SAMPLES_PER_CHANNEL * ECL_CHANNELS_IN_SHAPER);
         for (iChannel = 1; iChannel <= ECL_CHANNELS_IN_SHAPER; iChannel++) {
-          cid = m_eclMapper->getCellId(iCrate, iShaper, iChannel);
+          int cid = m_eclMapper->getCellId(iCrate, iShaper, iChannel);
           if (cid < 1) continue;
-          i_wf   = iEclWfIndices[cid - 1];
+          int i_wf   = iEclWfIndices[cid - 1];
           if (i_wf < 0) continue;
           B2DEBUG(200, "i_wf = " << i_wf);
           ECLWaveformData[i_wf]->getDspA(m_EclWaveformSamples); // Check this method in implementation of ECLDsp.h!!!

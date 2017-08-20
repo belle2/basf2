@@ -41,8 +41,10 @@ namespace Belle2 {
       virtual void endRun();
       virtual void terminate();
 
+      /// exception for errors during packing ADC data buffer
       BELLE2_DEFINE_EXCEPTION(Write_adc_samples_error,
                               "Error packing adc samples to buffer");
+      /// wrong indexes for ShaperDSP, channel or crate are apperared
       BELLE2_DEFINE_EXCEPTION(eclPacker_internal_error,
                               "Something wrong with ECL Packer");
 

@@ -76,8 +76,11 @@ namespace Belle2 {
       ECLChannelMapper m_eclMapper;
 
       /** Output data  */
+      /** store array for digitized gits**/
       StoreArray<ECLDigit> m_eclDigits;
+      /** store array for eclTrigs data (trigger time and tag)**/
       StoreArray<ECLTrig>  m_eclTrigs;
+      /** store array for waveforms**/
       StoreArray<ECLDsp>   m_eclDsps;
 
       /** read nex word from COPPER data, check if the end of data is reached  */

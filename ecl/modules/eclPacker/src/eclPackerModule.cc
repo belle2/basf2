@@ -117,7 +117,7 @@ void ECLPackerModule::event()
   B2DEBUG(100, "EclPacker:: Hits ======>> ");
   int tot_dsp_hits = 0;
   // fill number of hits, masks and fill correspondance between cellID and index in container
-  for (int i_digit = 0; i_digit < nEclDigits; i_digit++) {
+  for (i_digit = 0; i_digit < nEclDigits; i_digit++) {
     cid = ECLDigitData[i_digit]->getCellId();
     int amp = ECLDigitData[i_digit]->getAmp();
 
@@ -152,7 +152,7 @@ void ECLPackerModule::event()
   if (m_WaveformRareFactor != 0)
     if (m_EvtNum % m_WaveformRareFactor == 0) {
       B2INFO("ECL Packer:: Pack waveform data for this event: " << m_EvtNum);
-      for (int i_wf = 0; i_wf < nEclWaveform; i_wf++) {
+      for (i_wf = 0; i_wf < nEclWaveform; i_wf++) {
         cid = ECLWaveformData[i_wf]->getCellId();
         iCrate = m_eclMapper->getCrateID(cid);
         iShaper = m_eclMapper->getShaperPosition(cid);
@@ -160,7 +160,7 @@ void ECLPackerModule::event()
 
         //check corresponding amplitude in ecl digits
         int amp = 0;
-        for (int i_digit = 0; i_digit < nEclDigits; i_digit++) {
+        for (i_digit = 0; i_digit < nEclDigits; i_digit++) {
           if (ECLDigitData[i_digit]->getCellId() == cid) {
             amp = ECLDigitData[i_digit]->getAmp();
             break;

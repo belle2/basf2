@@ -14,6 +14,8 @@
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 #include <tracking/trackFindingVXD/mva/SimpleVariableRecorder.h>
 #include <tracking/trackFindingVXD/utilities/VariableSet.h>
+#include <tracking/trackFindingVXD/variableExtractors/ClusterInfoExtractor.h>
+#include <tracking/trackFindingVXD/variableExtractors/QEResultsExtractor.h>
 
 
 #include <framework/datastore/StoreArray.h>

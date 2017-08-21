@@ -85,10 +85,14 @@ void QualityEstimatorMVAModule::event()
     }
 
     std::vector<SpacePoint const*> const sortedHits = aTC.getSortedHits();
-    m_variableSet.setVariable("NHits", sortedHits.size());
 
-    QualityEstimationResults results = m_estimator->estimateQualityAndProperties(sortedHits);
-    m_variableSet.setVariables(m_EstimationMethod, results);
+    if (m_ClusterInformation == "Average") {
+      m_clusterInfoExtractor->extractVariables(sortedHits);
+    }
+
+    m_nSpacePoints = sortedHits.size();
+
+    m_qeResultsExtractor->extractVariables(m_estimator->estimateQualityAndProperties(sortedHits));
 
     float qi = m_mvaExpert->predict();
     aTC.setQualityIndex(qi);

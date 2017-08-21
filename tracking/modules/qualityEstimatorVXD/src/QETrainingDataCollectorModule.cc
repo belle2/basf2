@@ -84,15 +84,22 @@ void QETrainingDataCollectorModule::event()
 
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
 
+    if (not aTC.hasRefereeStatus(SpacePointTrackCand::c_isActive)) {
+      continue;
+    }
+
     std::vector<SpacePoint const*> const sortedHits = aTC.getSortedHits();
-    m_variableSet.setVariable("NHits", sortedHits.size());
 
-    float qi = m_estimatorMC->estimateQuality(sortedHits);
-    qi = qi > 0 ? 1 : 0;
-    m_variableSet.setVariable("truth", qi);
+    if (m_ClusterInformation == "Average") {
+      m_clusterInfoExtractor->extractVariables(sortedHits);
+    }
 
-    QualityEstimationResults results = m_estimator->estimateQualityAndProperties(sortedHits);
-    m_variableSet.setVariables(m_EstimationMethod, results);
+    m_nSpacePoints = sortedHits.size();
+
+    float tmp = m_estimatorMC->estimateQuality(sortedHits);
+    m_truth = tmp > 0 ? 1 : 0;
+
+    m_qeResultsExtractor->extractVariables(m_estimator->estimateQualityAndProperties(sortedHits));
 
     // record variables
     m_recorder->record();

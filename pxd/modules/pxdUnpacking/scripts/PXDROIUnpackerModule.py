@@ -32,17 +32,17 @@ class PXDRawROIUnpackerModule(Module):
                 if q.getType(i) == 0:
                     ROI = self.mHLT.appendNew()
                     ROI.setSensorID(v)
-                    ROI.setMinUid(q.getCol1(i))
-                    ROI.setMaxUid(q.getCol2(i))
-                    ROI.setMinVid(q.getRow1(i))
-                    ROI.setMaxVid(q.getRow2(i))
+                    ROI.setMinUid(q.getMinUid(i))
+                    ROI.setMaxUid(q.getMaxUid(i))
+                    ROI.setMinVid(q.getMinVid(i))
+                    ROI.setMaxVid(q.getMaxVid(i))
                 else:
                     ROI = self.mDC.appendNew()
                     ROI.setSensorID(v)
-                    ROI.setMinUid(q.getCol1(i))
-                    ROI.setMaxUid(q.getCol2(i))
-                    ROI.setMinVid(q.getRow1(i))
-                    ROI.setMaxVid(q.getRow2(i))
+                    ROI.setMinUid(q.getMinUid(i))
+                    ROI.setMaxUid(q.getMaxUid(i))
+                    ROI.setMinVid(q.getMinVid(i))
+                    ROI.setMaxVid(q.getMaxVid(i))
 
 
 class PXDPayloadROIUnpackerModule(Module):
@@ -73,14 +73,14 @@ class PXDPayloadROIUnpackerModule(Module):
             if q.getType(i) == 0:
                 ROI = self.mPHLT.appendNew()
                 ROI.setSensorID(v)
-                ROI.setMinUid(q.getCol1(i))
-                ROI.setMaxUid(q.getCol2(i))
-                ROI.setMinVid(q.getRow1(i))
-                ROI.setMaxVid(q.getRow2(i))
+                ROI.setMinUid(q.getMinUid(i))
+                ROI.setMaxUid(q.getMaxUid(i))
+                ROI.setMinVid(q.getMinVid(i))
+                ROI.setMaxVid(q.getMaxVid(i))
             else:
                 ROI = self.mPDC.appendNew()
                 ROI.setSensorID(v)
-                ROI.setMinUid(q.getCol1(i))
-                ROI.setMaxUid(q.getCol2(i))
-                ROI.setMinVid(q.getRow1(i))
-                ROI.setMaxVid(q.getRow2(i))
+                ROI.setMinUid(q.getMinUid(i))
+                ROI.setMaxUid(q.getMaxUid(i))
+                ROI.setMinVid(q.getMinVid(i))
+                ROI.setMaxVid(q.getMaxVid(i))

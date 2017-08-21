@@ -94,10 +94,10 @@ void ROIPayloadAssemblerModule::event()
     m_roiraw.setSystemFlag(0);
     m_roiraw.setDHHID(((layer) << 5) | ((ladder) << 1) | (sensor));
 
-    m_roiraw.setRowMin(iROI.getMinVid());
-    m_roiraw.setRowMax(iROI.getMaxVid());
-    m_roiraw.setColMin(iROI.getMinUid());
-    m_roiraw.setColMax(iROI.getMaxUid());
+    m_roiraw.setMinVid(iROI.getMinVid());
+    m_roiraw.setMaxVid(iROI.getMaxVid());
+    m_roiraw.setMinUid(iROI.getMinUid());
+    m_roiraw.setMaxUid(iROI.getMaxUid());
 
     // order set will drop identical ROIs automatically
     mapOrderedROIraw[iROI.getSensorID()].insert(m_roiraw);
@@ -144,16 +144,16 @@ void ROIPayloadAssemblerModule::event()
         B2INFO("Nr ROI on DHHID " << it.second.begin()->getDHHID() << endl <<
                " exceeds limit CutNrROIs, thus full sensor ROI is created.");
         const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(it.first);
-        const int nPixelsU = aSensorInfo.getUCells() - 1;
-        const int nPixelsV = aSensorInfo.getVCells() - 1;
+        const int nPixelsU = aSensorInfo.getUCells();
+        const int nPixelsV = aSensorInfo.getVCells();
 
         m_roiraw.setSystemFlag(0);
         m_roiraw.setDHHID(it.second.begin()->getDHHID());
 
-        m_roiraw.setRowMin(0);
-        m_roiraw.setRowMax(nPixelsV);
-        m_roiraw.setColMin(0);
-        m_roiraw.setColMax(nPixelsU);
+        m_roiraw.setMinVid(0);
+        m_roiraw.setMaxVid(nPixelsV - 1);
+        m_roiraw.setMinUid(0);
+        m_roiraw.setMaxUid(nPixelsU - 1);
 
         payload->addROIraw(m_roiraw.getBigEndian());
       }

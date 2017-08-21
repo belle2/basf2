@@ -153,6 +153,7 @@ PXDDataRedAnalysisModule::PXDDataRedAnalysisModule() : Module()
   , m_h2ROIvMinMax(NULL)
   , m_h1totROIs(NULL)
   , m_h1okROIs(NULL)
+  , m_h1okROIfrac(NULL)
   , m_h1redFactor(NULL)
   , m_h1redFactor_L1(NULL)
   , m_h1redFactor_L2(NULL)
@@ -351,6 +352,7 @@ void PXDDataRedAnalysisModule::initialize()
 
   m_h1totROIs = new TH1F("h1TotNROIs", "number of all ROIs", 110, 0, 110);
   m_h1okROIs = new TH1F("h1OkNROIs", "number of all ROIs containing a PXDDigit", 110, 0, 110);
+  m_h1okROIfrac = new TH1F("h1OkNROIfrac", "fraction of ROIs containing a PXDDigit", 100, 0, 1);
 
   m_h1totArea = new TH1F("h1TotArea", "Area of all ROIs", 100, 0, 2500000);
   m_h1okArea = new TH1F("h1OkArea", "Area of ROIs containing a PXDDigit", 100, 0, 75000);
@@ -488,9 +490,14 @@ void PXDDataRedAnalysisModule::event()
   int totArea_L1  = 0;
   int totArea_L2  = 0;
 
+  //MCParticles
+  StoreArray<MCParticle> mcParticles;
+
+
   //ROIs general
   StoreArray<ROIid> ROIList(m_ROIListName);
   for (int i = 0; i < (int)ROIList.getEntries(); i++) { //loop on ROIlist
+
     m_h2ROIbottomLeft->Fill(ROIList[i]->getMinUid(), ROIList[i]->getMinVid());
     m_h2ROItopRight->Fill(ROIList[i]->getMaxUid(), ROIList[i]->getMaxVid());
     m_h2ROIuMinMax->Fill(ROIList[i]->getMinUid(), ROIList[i]->getMaxUid());
@@ -500,6 +507,24 @@ void PXDDataRedAnalysisModule::event()
       totArea_L1 += tmpArea;
     else
       totArea_L2 += tmpArea;
+
+    bool isOK = false;
+
+    for (int j = 0; j < (int)mcParticles.getEntries(); j++) {
+      MCParticle* aMcParticle = mcParticles[j];
+
+      // continue only if MCParticle has a related PXDDigit and RecoTrack
+      RelationVector<PXDDigit> pxdDigits_MCParticle = aMcParticle->getRelationsFrom<PXDDigit>();
+
+      if (!isOK)
+        //loop on PXDDigits
+        for (unsigned int iPXDDigit = 0; iPXDDigit < pxdDigits_MCParticle.size(); iPXDDigit++)
+          if (ROIList[i]->Contains(*(pxdDigits_MCParticle[iPXDDigit]))) {
+            nROIs++;
+            isOK = true;
+            break;
+          }
+    }
   }
 
   m_h1totArea->Fill(totArea_L1 + totArea_L2);
@@ -526,7 +551,6 @@ void PXDDataRedAnalysisModule::event()
   //  bool hasRecoTrack = false;
 
   //loop on MCParticles
-  StoreArray<MCParticle> mcParticles;
   for (int j = 0; j < (int)mcParticles.getEntries(); j++) {
 
     MCParticle* aMcParticle = mcParticles[j];
@@ -549,8 +573,8 @@ void PXDDataRedAnalysisModule::event()
 
     Ntrack++;
 
-    B2DEBUG(1, "Number of RecoTracks = " << recoTracks_MCParticle.size() << "and PXDDigits = " << pxdDigits_MCParticle.size() <<
-            "related to this MCParticle");
+    B2DEBUG(1, "Number of RecoTracks = " << recoTracks_MCParticle.size() << " and PXDDigits = " << pxdDigits_MCParticle.size() <<
+            " related to this MCParticle");
 
     //retrieve general informations of MCParticle
     m_momXmc = (aMcParticle->getMomentum()).X();
@@ -703,8 +727,6 @@ void PXDDataRedAnalysisModule::event()
                     okArea_L1 = okArea_L1 + tmpArea;
                   if (VxdID(m_vxdIDmc).getLayerNumber() == 2) //L2
                     okArea_L2 = okArea_L2 + tmpArea;
-
-                  nROIs++;
 
 
                   hasOneDigitInROI = true;
@@ -904,11 +926,13 @@ void PXDDataRedAnalysisModule::event()
   n_tracksWithDigitsInROI += NtrackHit;
 
   m_rootEvent++;
-  B2RESULT(" o  PXDDataReduction ANALYSIS: redFactor L1 = " << redFactor_L1 << ", redFactor L2 = " << redFactor_L2);
+  B2RESULT(" o  PXDDataReduction ANALYSIS: tot ROIs = " << ROIList.getEntries() << ", ok ROIs = " << nROIs);
   B2RESULT(" o                           : NtrackHit/Ntrack = " << NtrackHit << "/ " << Ntrack << " = " <<
            (double)NtrackHit / Ntrack);
+  if (nROIs > ROIList.getEntries()) B2RESULT(" HOUSTON WE HAVE A PROBLEM!");
 
   m_h1okROIs->Fill(nROIs);
+  m_h1okROIfrac->Fill(1.*nROIs / ROIList.getEntries());
   cout << "" << endl;
 
 
@@ -1243,6 +1267,7 @@ void PXDDataRedAnalysisModule::terminate()
     m_h1totArea->Write();
     m_h1okArea->Write();
     m_h1okROIs->Write();
+    m_h1okROIfrac->Write();
     m_h1totROIs->Write();
     m_h1redFactor->Write();
     m_h1redFactor_L1->Write();

@@ -62,26 +62,10 @@ namespace Belle2 {
              "An upper limit of a fit range is given to cover this fraction of events "
              "pulse height distribution", (float)0.99);
     addParam("initialP0", m_initialP0, "initial value of the fit parameter p0 divided by histogram entries", (float)1e-6);
-    addParam("initialP1", m_initialP1, "initial value of the fit parameter p1", (float)3.0);
-    addParam("initialP2", m_initialP2, "initial value of the fit parameter p2", (float)0.5);
-    addParam("initialX0", m_initialX0, "initial value of the fit parameter x0 divided by histogram bin width", (float)0.5);
+    addParam("initialP1", m_initialP1, "initial value of the fit parameter p1", (float)1.0);
+    addParam("initialP2", m_initialP2, "initial value of the fit parameter p2", (float)1.0);
+    addParam("initialX0", m_initialX0, "initial value of the fit parameter x0 divided by histogram bin width", (float)100.);
     addParam("pedestalSigma", m_pedestalSigma, "sigma of pedestal width", (float)10.);
-
-    m_targetSlotId = 1;
-    m_targetPmtId = 1;
-    if (m_targetSlotId < 1 || m_targetSlotId > 16) {
-      B2ERROR("TOPGainEfficiencyCalculator : invalid slotID : " << m_targetSlotId);
-    }
-    if (m_targetPmtId < 1 || m_targetPmtId > 32) {
-      B2ERROR("TOPGainEfficiencyCalculator : invalid PMT ID : " << m_targetPmtId);
-    }
-
-    if (m_outputPDFFile.size() == 0) {
-      if (m_inputFile.rfind(".") == std::string::npos)
-        m_outputPDFFile = m_inputFile + "_gain.pdf";
-      else
-        m_outputPDFFile = m_inputFile.substr(0, m_inputFile.rfind(".")) + "_gain.pdf";
-    }
   }
 
   TOPGainEfficiencyCalculatorModule::~TOPGainEfficiencyCalculatorModule() {}
@@ -103,6 +87,7 @@ namespace Belle2 {
     m_tree->Branch("hitTimingSigma", &m_hitTimingSigma, "hitTimingSigma/F");
     m_tree->Branch("nEntries", &m_nEntries, "nEntries/I");
     m_tree->Branch("nCalPulse", &m_nCalPulse, "nCalPulse/I");
+    m_tree->Branch("nOverflowEvents", &m_nOverflowEvents, "nOverflowEvents/I");
     m_tree->Branch("meanPulseHeight", &m_meanPulseHeight, "meanPulseHeight/F");
     m_tree->Branch("threshold", &m_threshold, "threshold/F");
     m_tree->Branch("fitMax", &m_fitMax, "fitMax/F");
@@ -121,6 +106,7 @@ namespace Belle2 {
     m_tree->Branch("funcFullRangeIntegral", &m_funcFullRangeIntegral, "funcFullRangeIntegral/F");
     m_tree->Branch("funcFitRangeIntegral", &m_funcFitRangeIntegral, "funcFitRangeIntegral/F");
     m_tree->Branch("histoFitRangeIntegral", &m_histoFitRangeIntegral, "histoFitRangeIntegral/F");
+    m_tree->Branch("histoMeanAboveThre", &m_histoMeanAboveThre, "histoMeanAboveThre/F");
   }
 
   void TOPGainEfficiencyCalculatorModule::beginRun()
@@ -138,9 +124,38 @@ namespace Belle2 {
 
   void TOPGainEfficiencyCalculatorModule::terminate()
   {
-    LoadHistograms();
-    FitHistograms();
-    DrawResult();
+    //first, check validity of input parameters
+    bool areGoodParameters = true;
+    if (m_targetSlotId < 1 || m_targetSlotId > c_NModule) {
+      B2ERROR("TOPGainEfficiencyCalculator : invalid slotID : " << m_targetSlotId);
+      areGoodParameters = false;
+    }
+    if (m_targetPmtId < 1 || m_targetPmtId > c_NPMTPerModule) {
+      B2ERROR("TOPGainEfficiencyCalculator : invalid PMT ID : " << m_targetPmtId);
+      areGoodParameters = false;
+    }
+    if (m_initialX0 < 1e-6) {
+      B2ERROR("TOPGainEfficiencyCalculator : initial x0 value must be non-zero positive value");
+      areGoodParameters = false;
+    }
+    if (m_pedestalSigma < 1e-6) {
+      B2ERROR("TOPGainEfficiencyCalculator : pedestal sigma must be non-zero positive value");
+      areGoodParameters = false;
+    }
+
+    //do not proceed to the main process unless all the input parameters are not valid
+    if (areGoodParameters) {
+      if (m_outputPDFFile.size() == 0) {
+        if (m_inputFile.rfind(".") == std::string::npos)
+          m_outputPDFFile = m_inputFile + "_gain.pdf";
+        else
+          m_outputPDFFile = m_inputFile.substr(0, m_inputFile.rfind(".")) + "_gain.pdf";
+      }
+
+      LoadHistograms();
+      FitHistograms();
+      DrawResult();
+    }
   }
 
 
@@ -238,6 +253,7 @@ namespace Belle2 {
       func->SetParName(3, "#it{x}_{0}");
       func->SetParName(4, "pedestal");
       func->SetParName(5, "pedestal #sigma");
+      func->SetParLimits(3, 1e-6, 1e8);
       func->SetLineColor(2);
       func->SetLineWidth(1);
       hHeight->Fit(func, "R", "", m_threshold, m_fitMax);
@@ -269,6 +285,7 @@ namespace Belle2 {
 
       m_nEntries = hHeight->GetEntries();
       m_nCalPulse = (m_nCalPulseHistogram ? m_nCalPulseHistogram->GetBinContent(globalAsicId + 1) : -1);
+      m_nOverflowEvents = TMath::FloorNint(hHeight->GetBinContent(nBins + 1));
       m_meanPulseHeight = hHeight->GetMean();
       m_gain = weightedIntegral / totalWeight;
       m_efficiency = funcFull->Integral(m_threshold, funcFullMax) / funcFull->Integral((-1) * func->GetParameter(5), funcFullMax);
@@ -284,8 +301,15 @@ namespace Belle2 {
       m_ndf = func->GetNDF();
       m_funcFullRangeIntegral = funcFull->Integral((-1) * func->GetParameter(5), funcFullMax) / binWidth;
       m_funcFitRangeIntegral = funcFull->Integral(m_threshold, m_fitMax) / binWidth;
-      m_histoFitRangeIntegral = hHeight->Integral(hHeight->GetXaxis()->FindBin(m_threshold + 0.01 * binWidth),
-                                                  hHeight->GetXaxis()->FindBin(m_fitMax - 0.01 * binWidth));
+      int threBin = hHeight->GetXaxis()->FindBin(m_threshold + 0.01 * binWidth);
+      int fitMaxBin = hHeight->GetXaxis()->FindBin(m_fitMax - 0.01 * binWidth);
+      m_histoFitRangeIntegral = hHeight->Integral(threBin, fitMaxBin);
+
+      m_histoMeanAboveThre = 0;
+      for (int iBin = threBin ; iBin < nBins + 1 ; iBin++) {
+        m_histoMeanAboveThre += (hHeight->GetBinContent(iBin) * hHeight->GetXaxis()->GetBinCenter(iBin));
+      }
+      m_histoMeanAboveThre /= hHeight->Integral(threBin, nBins);
 
       m_hitTiming = 0;
       m_hitTimingSigma = -1;
@@ -297,6 +321,7 @@ namespace Belle2 {
 
       m_funcForFitRange[iHisto] = func;
       m_funcForFullRange[iHisto] = funcFull;
+
 
       m_tree->Fill();
       std::cout << std::endl;
@@ -459,6 +484,7 @@ namespace Belle2 {
       t += step;
     }
     //  TF1* func = new TF1( "func", "[0]*pow(x-[4],[1])*exp(-pow(x-[4],[2])/[3])",
+
     return par[0] * output * step;
   }
 

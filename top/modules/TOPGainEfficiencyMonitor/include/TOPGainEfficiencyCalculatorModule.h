@@ -142,7 +142,7 @@ namespace Belle2 {
     float m_initialP0 = 1e-6; /**< initial value of the fit parameter p0 */
     float m_initialP1 = 3.0; /**< initial value of the fit parameter p1 */
     float m_initialP2 = 0.5; /**< initial value of the fit parameter p2 */
-    float m_initialX0 = 0.5; /**< initial value of the fit parameter x0 */
+    float m_initialX0 = 500; /**< initial value of the fit parameter x0 */
     float m_pedestalSigma = 10.; /**< sigma of pedestal */
 
     short m_pixelId = 0; /**< pixel ID, calculated from PMT ID and PMT channel ID */
@@ -150,7 +150,8 @@ namespace Belle2 {
     float m_hitTiming = 0; /**< timing of laser direct photon hits, given by Gaussian fit mean */
     float m_hitTimingSigma = 0; /**< Gaussian fit sigma for a peak of laser direct photons in hit timing distribution */
     int m_nEntries = 0; /**< entries of pulse height distribution */
-    int m_nCalPulse = 0; /**< the number of events with calibration pulse(s) identified*/
+    int m_nCalPulse = 0; /**< the number of events with calibration pulse(s) identified */
+    int m_nOverflowEvents = 0; /**< the number of events outside histogram range */
     float m_meanPulseHeight = 0; /**< histogram mean of pulse height distribution */
     float m_gain = 0; /**< calculated gain from fitting of pulse height distribution */
     float m_efficiency = 0; /**< calculated efficiency from fitting of pulse height distribution */
@@ -165,8 +166,9 @@ namespace Belle2 {
     float m_chisquare = 0; /**< chi2 of fitting */
     int m_ndf = 0; /**< NDF of fitting */
     float m_funcFullRangeIntegral = 0; /**< integral of fit function for its full range  */
-    float m_funcFitRangeIntegral = 0; /**< integral of fit function above threshold */
-    float m_histoFitRangeIntegral = 0; /**< integral of histogram above threshold */
+    float m_funcFitRangeIntegral = 0; /**< integral of fit function for a range [threshold, fitMax] */
+    float m_histoFitRangeIntegral = 0; /**< integral of histogram for a range [threshold, fitMax] */
+    float m_histoMeanAboveThre = 0; /**< mean of histogram above threshold, ignore overflow bin */
   };
 
 }  //namespace Belle2

@@ -14,7 +14,7 @@ import h5py
 import tensorflow as tf
 import tensorflow.contrib.keras as keras
 
-from keras.layers import Input, Dense, Concatenate, Flatten, Dropout
+from keras.layers import Input, Dense, Concatenate, Flatten, Dropout, GlobalAveragePooling1D
 from keras.layers.merge import Average
 from keras.layers.core import Reshape
 from keras.layers import activations
@@ -27,7 +27,7 @@ from keras import backend as K
 from keras.callbacks import Callback, EarlyStopping
 import numpy as np
 
-from basf2_mva_extensions.keras_relational import Relations, RelationsAverage
+from basf2_mva_extensions.keras_relational import Relations
 
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
@@ -39,15 +39,17 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     net = input
 
     if parameters['use_relations']:
-        net = Relations(number_groups=parameters['number_groups'], number_features=parameters['number_features'])(net)
-        net = RelationsAverage()(net)
+        net = Reshape((number_of_features // 6, 6))(net)
+        net = Relations(number_features=parameters['number_features'])(net)
+        # average over all permutations
+        net = GlobalAveragePooling1D()(net)
     else:
         for i in range(6):
             net = Dense(units=2 * number_of_features, activation=tanh)(net)
 
     output = Dense(units=1, activation=sigmoid)(net)
 
-    state = State(Model(input, output), custom_objects={'Relations': Relations, 'RelationsAverage': RelationsAverage})
+    state = State(Model(input, output), custom_objects={'Relations': Relations})
 
     state.model.compile(optimizer=adam(lr=0.001), loss=binary_crossentropy, metrics=['accuracy'])
     state.model.summary()
@@ -175,7 +177,7 @@ if __name__ == "__main__":
         print('Train relational net ')
         general_options.m_identifier = os.path.join(path, 'relation.xml')
         specific_options.m_config = json.dumps({'use_relations': True,
-                                                'number_groups': number_total_lines, 'number_features': 3})
+                                                'number_features': 3})
         basf2_mva.teacher(general_options, specific_options)
 
         # Train normal feed forward Net:
@@ -195,5 +197,5 @@ if __name__ == "__main__":
         print('Apply feed forward net')
         p2, t2 = method2.apply_expert(test_data, general_options.m_treename)
 
-        print('Reltional Net AUC: ', basf2_mva_util.calculate_roc_auc(p1, t1))
+        print('Relational Net AUC: ', basf2_mva_util.calculate_roc_auc(p1, t1))
         print('Feed Forward Net AUC: ', basf2_mva_util.calculate_roc_auc(p2, t2))

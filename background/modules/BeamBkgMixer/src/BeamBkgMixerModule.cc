@@ -105,7 +105,7 @@ namespace Belle2 {
              "(0 means accept all events)", 1.0);
 
     addParam("cacheSize", m_cacheSize,
-             "file cache size in Mbytes. If negative, use root default", 5);
+             "file cache size in Mbytes. If negative, use root default", 0);
   }
 
   BeamBkgMixerModule::~BeamBkgMixerModule()
@@ -252,24 +252,24 @@ namespace Belle2 {
       if (m_cacheSize >= 0) bkg.tree->SetCacheSize(m_cacheSize * 1024 * 1024);
 
       if (m_PXD and bkg.tree->GetBranch("PXDSimHits"))
-        bkg.tree->SetBranchAddress("PXDSimHits", &bkg.simHits.PXD);
+        bkg.tree->SetBranchAddress("PXDSimHits", &m_simHits.PXD);
       if (m_SVD and bkg.tree->GetBranch("SVDSimHits"))
-        bkg.tree->SetBranchAddress("SVDSimHits", &bkg.simHits.SVD);
+        bkg.tree->SetBranchAddress("SVDSimHits", &m_simHits.SVD);
       if (m_CDC and bkg.tree->GetBranch("CDCSimHits"))
-        bkg.tree->SetBranchAddress("CDCSimHits", &bkg.simHits.CDC);
+        bkg.tree->SetBranchAddress("CDCSimHits", &m_simHits.CDC);
       if (m_TOP and bkg.tree->GetBranch("TOPSimHits"))
-        bkg.tree->SetBranchAddress("TOPSimHits", &bkg.simHits.TOP);
+        bkg.tree->SetBranchAddress("TOPSimHits", &m_simHits.TOP);
       if (m_ARICH and bkg.tree->GetBranch("ARICHSimHits"))
-        bkg.tree->SetBranchAddress("ARICHSimHits", &bkg.simHits.ARICH);
+        bkg.tree->SetBranchAddress("ARICHSimHits", &m_simHits.ARICH);
       if (m_ECL and bkg.tree->GetBranch("ECLHits"))
-        bkg.tree->SetBranchAddress("ECLHits", &bkg.simHits.ECL);
+        bkg.tree->SetBranchAddress("ECLHits", &m_simHits.ECL);
       if (m_BKLM and bkg.tree->GetBranch("BKLMSimHits"))
-        bkg.tree->SetBranchAddress("BKLMSimHits", &bkg.simHits.BKLM);
+        bkg.tree->SetBranchAddress("BKLMSimHits", &m_simHits.BKLM);
       if (m_EKLM and bkg.tree->GetBranch("EKLMSimHits"))
-        bkg.tree->SetBranchAddress("EKLMSimHits", &bkg.simHits.EKLM);
+        bkg.tree->SetBranchAddress("EKLMSimHits", &m_simHits.EKLM);
 
       if (m_BeamBackHits and bkg.tree->GetBranch("BeamBackHits"))
-        bkg.tree->SetBranchAddress("BeamBackHits", &bkg.simHits.BeamBackHits);
+        bkg.tree->SetBranchAddress("BeamBackHits", &m_simHits.BeamBackHits);
 
       // print INFO
       std::string unit(" ns");
@@ -377,16 +377,16 @@ namespace Belle2 {
         double timeShift = gRandom->Rndm() * (m_maxTime - m_minTime) + m_minTime;
         bkg.tree->GetEntry(bkg.eventCount);
 
-        if (acceptEvent(bkg.simHits.ECL)) {
-          addSimHits(pxdSimHits, bkg.simHits.PXD, timeShift, m_minTime, m_maxTime);
-          addSimHits(svdSimHits, bkg.simHits.SVD, timeShift, m_minTime, m_maxTime);
-          addSimHits(cdcSimHits, bkg.simHits.CDC, timeShift, m_minTime, m_maxTime);
-          addSimHits(topSimHits, bkg.simHits.TOP, timeShift, m_minTime, m_maxTime);
-          addSimHits(arichSimHits, bkg.simHits.ARICH, timeShift, m_minTime, m_maxTime);
-          addSimHits(eclHits, bkg.simHits.ECL, timeShift, m_minTime, m_maxTime);
-          addSimHits(bklmSimHits, bkg.simHits.BKLM, timeShift, m_minTime, m_maxTime);
-          addSimHits(eklmSimHits, bkg.simHits.EKLM, timeShift, m_minTime, m_maxTime);
-          addBeamBackHits(beamBackHits, bkg.simHits.BeamBackHits, timeShift,
+        if (acceptEvent(m_simHits.ECL)) {
+          addSimHits(pxdSimHits, m_simHits.PXD, timeShift, m_minTime, m_maxTime);
+          addSimHits(svdSimHits, m_simHits.SVD, timeShift, m_minTime, m_maxTime);
+          addSimHits(cdcSimHits, m_simHits.CDC, timeShift, m_minTime, m_maxTime);
+          addSimHits(topSimHits, m_simHits.TOP, timeShift, m_minTime, m_maxTime);
+          addSimHits(arichSimHits, m_simHits.ARICH, timeShift, m_minTime, m_maxTime);
+          addSimHits(eclHits, m_simHits.ECL, timeShift, m_minTime, m_maxTime);
+          addSimHits(bklmSimHits, m_simHits.BKLM, timeShift, m_minTime, m_maxTime);
+          addSimHits(eklmSimHits, m_simHits.EKLM, timeShift, m_minTime, m_maxTime);
+          addBeamBackHits(beamBackHits, m_simHits.BeamBackHits, timeShift,
                           m_minTime, m_maxTime);
         } else {
           iev--;
@@ -428,7 +428,7 @@ namespace Belle2 {
         if (timeShift > m_minTime and timeShift < m_maxTime) continue;
         bkg.tree->GetEntry(bkg.eventCount);
 
-        if (acceptEvent(bkg.simHits.ECL)) {
+        if (acceptEvent(m_simHits.ECL)) {
           double minTime = m_minTimeECL;
           double maxTime = m_maxTimeECL;
           if (timeShift <= m_minTime) {
@@ -436,7 +436,7 @@ namespace Belle2 {
           } else {
             minTime = m_maxTime;
           }
-          addSimHits(eclHits, bkg.simHits.ECL, timeShift, minTime, maxTime);
+          addSimHits(eclHits, m_simHits.ECL, timeShift, minTime, maxTime);
         } else {
           iev--;
           std::string message = "BeamBkgMixer: event " + to_string(bkg.eventCount)
@@ -485,7 +485,7 @@ namespace Belle2 {
         } else {
           minTime = m_maxTime;
         }
-        addSimHits(pxdSimHits, bkg.simHits.PXD, timeShift, minTime, maxTime);
+        addSimHits(pxdSimHits, m_simHits.PXD, timeShift, minTime, maxTime);
 
         bkg.eventCount++;
         if (bkg.eventCount >= bkg.numEvents) {

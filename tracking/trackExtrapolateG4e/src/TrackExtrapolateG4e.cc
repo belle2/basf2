@@ -198,7 +198,7 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
     m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
     G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
     GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
-    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2") * CLHEP::cm; // mm
+    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2", 1.20) * CLHEP::cm; // mm
     m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
   }
 
@@ -276,7 +276,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
     double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
     m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
     GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
-    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2") * CLHEP::cm; // mm
+    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2", 1.20) * CLHEP::cm; // mm
     m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
   }
 

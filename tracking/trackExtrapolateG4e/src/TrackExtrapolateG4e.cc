@@ -189,16 +189,18 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
   // Store the address of the ExtManager (used later)
   m_ExtMgr = Simulation::ExtManager::GetManager();
 
-  // Set up the EXT-specific geometry
-  GearDir coilContent = GearDir("Detector/DetectorComponent[@name=\"COIL\"]/Content/");
-  double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
-  double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
-  double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
-  m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
-  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
-  GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
-  double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2") * CLHEP::cm; // mm
-  m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
+  // Set up the EXT-specific geometry (might have already been done by MUID)
+  if (m_TargetExt == NULL) {
+    GearDir coilContent = GearDir("Detector/DetectorComponent[@name=\"COIL\"]/Content/");
+    double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
+    double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
+    double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
+    m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
+    G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
+    GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
+    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2", 1.20) * CLHEP::cm; // mm
+    m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
+  }
 
 }
 
@@ -266,15 +268,17 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   // Store the address of the ExtManager (used later)
   m_ExtMgr = Simulation::ExtManager::GetManager();
 
-  // Set up the EXT-specific geometry
-  GearDir coilContent = GearDir("Detector/DetectorComponent[@name=\"COIL\"]/Content/");
-  double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
-  double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
-  double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
-  m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
-  GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
-  double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2") * CLHEP::cm; // mm
-  m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
+  // Set up the EXT-specific geometry (might have already been done by EXT)
+  if (m_TargetExt == NULL) {
+    GearDir coilContent = GearDir("Detector/DetectorComponent[@name=\"COIL\"]/Content/");
+    double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
+    double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
+    double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
+    m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
+    GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
+    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2", 1.20) * CLHEP::cm; // mm
+    m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
+  }
 
   // Set up the MUID-specific geometry
   bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();

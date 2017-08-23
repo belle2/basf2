@@ -33,9 +33,12 @@ namespace Belle2 {
 
   public:
 
+    /**
+     * structure to hold hit information, used in double cal. pulse identification
+     */
     typedef struct {
-      float m_time;
-      float m_height;
+      float m_time; /**< timing of the hit */
+      float m_height; /**< pulse height of the hit */
     } hitInfo_t;
 
     /**
@@ -101,7 +104,6 @@ namespace Belle2 {
       450; /**< minimum pulse height for the secon calibration pulse to be qualified as calibration signals */
     float m_calibrationPulseInterval = 21.85; /**< nominal DeltaT value (time interval of two calibration signals) in a unit of ns */
     float m_calibrationPulseIntervalRange = 2; /**< tolerable shift of DeltaT from its nominal before calibration in a unit of ns */
-    float m_threshold = 100.; /**< pulse height threshold, which defines lower limit of fit region and efficiency calculation */
   };
 
 }  //namespace Belle2

@@ -186,10 +186,11 @@ void PXDEfficiencyModule::event()
         m_v_digi[aVxdID] = info.getVCellPosition(m_pxddigits[bestdigit]->getVCellID());
       }
       if (bestcluster >= 0) {
+
         m_u_clus[aVxdID] = m_pxdclusters[bestcluster]->getU();
         m_v_clus[aVxdID] = m_pxdclusters[bestcluster]->getV();
         m_ucell_clus[aVxdID] = info.getUCellID(m_u_clus[aVxdID]);
-        m_vcell_clus[aVxdID] = info.getUCellID(m_v_clus[aVxdID]);
+        m_vcell_clus[aVxdID] = info.getVCellID(m_v_clus[aVxdID]);
 
         // Get cluster sizes and charge of the best cluster candidate
 
@@ -246,15 +247,15 @@ void PXDEfficiencyModule::event()
       bool clus_inside = false;
       if (info.getUCellID(m_u_clus[thisSensorROI]) < roit.getMaxUid()
           && info.getUCellID(m_u_clus[thisSensorROI]) > roit.getMinUid()
-          && info.getUCellID(m_v_clus[thisSensorROI]) < roit.getMaxVid()
-          && info.getUCellID(m_v_clus[thisSensorROI]) > roit.getMinVid()) {
+          && info.getVCellID(m_v_clus[thisSensorROI]) < roit.getMaxVid()
+          && info.getVCellID(m_v_clus[thisSensorROI]) > roit.getMinVid()) {
         clus_inside = true;
       }
       bool digi_inside = false;
       if (info.getUCellID(m_u_digi[thisSensorROI]) < roit.getMaxUid()
           && info.getUCellID(m_u_digi[thisSensorROI]) > roit.getMinUid()
-          && info.getUCellID(m_v_digi[thisSensorROI]) < roit.getMaxVid()
-          && info.getUCellID(m_v_digi[thisSensorROI]) > roit.getMinVid()) {
+          && info.getVCellID(m_v_digi[thisSensorROI]) < roit.getMaxVid()
+          && info.getVCellID(m_v_digi[thisSensorROI]) > roit.getMinVid()) {
         digi_inside = true;
       }
 

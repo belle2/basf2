@@ -1,4 +1,4 @@
-/**************************************************************************
+/*************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
 * Copyright(C) 2014 - Belle II Collaboration                             *
 *                                                                        *
@@ -151,15 +151,18 @@ namespace Belle2 {
         int err = 0;
         int dataFormat = m_dataFormat;
         if (dataFormat == 0) { // auto detect data format
+          //std::cout<<"evtMetaData->getExperiment() == 1\t"<< evtMetaData->getExperiment() << std::endl;
           if (evtMetaData->getExperiment() == 1) { // GCR data
             dataFormat = 0x0301;
             m_swapBytes = true;
+          } else
+            // NOTE: we need to add extra clauses if there are GCR runs between
+            // phases II and III. (See pull request #644 for more details)
+          {
+            DataArray array(buffer, bufferSize, m_swapBytes);
+            unsigned word = array.getWord();
+            dataFormat = (word >> 16);
           }
-          // NOTE: we need to add extra clauses if there are GCR runs between
-          // phases II and III. (See pull request #644 for more details)
-          DataArray array(buffer, bufferSize, m_swapBytes);
-          unsigned word = array.getWord();
-          dataFormat = (word >> 16);
         }
         switch (dataFormat) {
           case static_cast<int>(TOP::RawDataType::c_Type0Ver16):

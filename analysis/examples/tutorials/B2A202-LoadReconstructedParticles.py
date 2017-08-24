@@ -25,7 +25,7 @@ from modularAnalysis import ntupleTree
 from modularAnalysis import analysis_main
 
 from stdV0s import stdKshorts
-from stdFSParticles import goodPi0
+from stdFSParticles import stdPi0s
 
 # check if the required input file exists (from B2A101 example)
 import os.path
@@ -43,7 +43,7 @@ printDataStore()
 
 # create and fill gamma/e/mu/pi/K/p ParticleLists
 # second argument are the selection criteria: '' means no cut, take all
-# fillParticleList('gamma:all', '')
+fillParticleList('gamma:all', '')
 fillParticleList('e-:all', '')
 fillParticleList('mu-:all', '')
 fillParticleList('pi-:all', '')
@@ -62,11 +62,9 @@ fillParticleList('p+:good', 'prid > 0.1')
 # another possibility is to use default functions
 # for example stdKshorts() from stdV0s.py that:
 # - takes all V0 candidates, performs vertex fit, and fills 'K_S0:all' ParticleList
-# or for example goodPi0() from stdFSParticles.py:
-# - that makes two-photon combinations and creates two pi0 lists with different signal efficiencies/purities
-# - the list are 'pi0:all' and 'pi0:good'
+# or for example stdPi0s() from stdFSParticles.py:
 stdKshorts()
-goodPi0()
+stdPi0s('looseFit')
 
 # print contents of the DataStore after loading Particles
 printDataStore()
@@ -85,7 +83,7 @@ printList('K-:good', False)
 printList('anti-p-:all', False)
 printList('anti-p-:good', False)
 printList('K_S0:all', False)
-printList('pi0:good', False)
+printList('pi0:looseFit', False)
 
 # define Ntuple tools for charged Particles
 toolsTrackPI = ['EventMetaData', 'pi+']
@@ -154,7 +152,7 @@ ntupleTree('kaon', 'K+:all', toolsTrackK)
 ntupleTree('elec', 'e+:all', toolsTrackE)
 ntupleTree('muon', 'mu+:all', toolsTrackMu)
 ntupleTree('phot', 'gamma:all', toolsGamma)
-ntupleTree('pi0', 'pi0:good', toolsPI0)
+ntupleTree('pi0', 'pi0:looseFit', toolsPI0)
 ntupleTree('kshort', 'K_S0:all', toolsK0)
 
 # Process the events

@@ -680,6 +680,7 @@ c--   propagate photon from emission point to detection plane
       LOGICAL TOT               ! total reflection [out]
 #include "TOP_GEO.fi" 
 #include "TOP_PIK.fi" 
+#include "TOP_TOPF.fi"
       INTEGER TYP, I, ISNX, ISNY
       REAL XM, XB, XE, YE, TL
       INTEGER LR, NX1, NY1
@@ -733,6 +734,10 @@ c--   propagate photon from emission point to detection plane
       NX(1)=NX(1)+SIGN(NX1,ISNX)
       NY(1)=NY(1)+SIGN(NY1,ISNY)
 
+      DO I=1,3
+         F_DIRB(I)=DIR(I)
+      ENDDO
+      
       IF(QBAR_EXT(LR,MDN).GT.0) THEN
          TOTX=ABS(DIR(1)).LT.PTOT
          TOTY=ABS(DIR(2)).LT.PTOT

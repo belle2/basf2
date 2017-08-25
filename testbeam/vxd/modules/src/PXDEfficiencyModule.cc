@@ -84,8 +84,9 @@ void PXDEfficiencyModule::event()
   const genfit::FitStatus* fitstatus = NULL;
   try {
     fitstatus = tracks[0]->getTrackFitStatus(); //(const AbsTrackRep* rep = NULL)
-    trackstate = tracks[0]->getMeasuredStateOnPlaneFromHit(
-                   0); //Argument was false to take unbiased, but due to wrong ordering in the genfit::Track function it actually meant taking sensorID 0, and it stayed biased. Recreating this here...
+    trackstate = tracks[0]->getMeasuredStateOnPlaneFromFirstHit();
+    //Function getMeasuredStateOnPlaneFromHit has become private, but with argument 0 this does the same
+    //Argument was false to take unbiased, but due to wrong ordering in the genfit::Track function it actually meant taking sensorID 0, and it stayed biased. Recreating this here...
   } catch (...) {
     return;
   }
@@ -372,7 +373,7 @@ TVector3 PXDEfficiencyModule::getTrackInterSec(VXD::SensorInfoBase& svdSensorInf
 
   TVector3 intersec(99999999, 9999999, 0); //point outside the sensor
 
-  genfit::MeasuredStateOnPlane gfTrackState = aTrack->getMeasuredStateOnPlaneFromHit(0);
+  genfit::MeasuredStateOnPlane gfTrackState = aTrack->getMeasuredStateOnPlaneFromFirstHit();
 
   //adopted (aka stolen) from tracking/modules/pxdClusterRescue/PXDClusterRescueROIModule
   try {

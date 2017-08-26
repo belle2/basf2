@@ -797,25 +797,37 @@ namespace Belle2 {
 
       //Define B-field mapper
       if (gcp.getMapperGeometry()) {
+        const double xc = 0.5 * (-0.0002769 +  0.0370499) * CLHEP::cm;
+        const double yc = 0.5 * (-0.0615404 + -0.108948) * CLHEP::cm;
+        const double zc = 0.5 * (-35.3      +  48.5) * CLHEP::cm;
         //3 plates
-        const double plateWidth = 13.756 * CLHEP::cm;
-        const double plateThick =  1.203 * CLHEP::cm;
-        const double plateLength = 83.706 * CLHEP::cm;
+        //        const double plateWidth = 13.756 * CLHEP::cm;
+        //        const double plateThick =  1.203 * CLHEP::cm;
+        //        const double plateLength = 83.706 * CLHEP::cm;
+        const double plateWidth  = 13.8 * CLHEP::cm;
+        const double plateThick  =  1.2 * CLHEP::cm;
+        const double plateLength = 83.8 * CLHEP::cm;
         const double phi = gcp.getMapperPhiAngle() * CLHEP::deg; //phi-angle in lab.
         //  std::cout << "phi= " << phi << std::endl;
-        const double endRingRmin =  4.1135 * CLHEP::cm;
-        const double endRingRmax = 15.353 * CLHEP::cm;
-        const double endRingThick =  2.057 * CLHEP::cm;
+        //        const double endRingRmin =  4.1135 * CLHEP::cm;
+        //        const double endRingRmax = 15.353 * CLHEP::cm;
+        //        const double endRingThick =  2.057 * CLHEP::cm;
+        const double endPlateRmin     =  4.0 * CLHEP::cm;
+        const double endPlateRmax     = 15.5 * CLHEP::cm;
+        const double bwdEndPlateThick =  1.7 * CLHEP::cm;
+        const double fwdEndPlateThick =  2.0 * CLHEP::cm;
 
         string name = "Plate";
         int pID = 0;
         G4Box* plateShape = new G4Box("solid" + name, .5 * plateWidth, .5 * plateThick, .5 * plateLength);
         G4LogicalVolume* logical0 = new G4LogicalVolume(plateShape, medAluminum, "logical" + name, 0, 0, 0);
         logical0->SetVisAttributes(m_VisAttributes.back());
-        const double x = .5 * plateWidth;
-        const double y = endRingRmin;
-        double z = 2.871 * CLHEP::cm;
-        G4ThreeVector xyz(x, y, z);
+        //        const double x = .5 * plateWidth;
+        const double x = xc + 0.5 * plateWidth;
+        //        const double y = endRingRmin;
+        const double y = yc + endPlateRmin + 0.1 * CLHEP::cm;
+        //        double z = 2.871 * CLHEP::cm;
+        G4ThreeVector xyz(x, y, zc);
         G4RotationMatrix rotM3 = G4RotationMatrix();
         xyz.rotateZ(phi);
         rotM3.rotateZ(phi);
@@ -830,19 +842,26 @@ namespace Belle2 {
         rotM3.rotateZ(alf);
         new G4PVPlacement(G4Transform3D(rotM3, xyz), logical0, "physical" + name, &topVolume, false, pID + 2);
 
-        //Define 2 end-rings
-        //bwd end-ring
-        name = "EndRing";
-        G4Tubs* EndRingShape = new G4Tubs("solid" + name, endRingRmin, endRingRmax, 0.5 * endRingThick, 0., 360.*CLHEP::deg);
-        G4LogicalVolume* logical1 = new G4LogicalVolume(EndRingShape, medAluminum, "logical" + name, 0, 0, 0);
+        //Define 2 end-plates
+        //bwd
+        name = "BwdEndPlate";
+        G4Tubs* BwdEndPlateShape = new G4Tubs("solid" + name, endPlateRmin, endPlateRmax, 0.5 * bwdEndPlateThick, 0., 360.*CLHEP::deg);
+        G4LogicalVolume* logical1 = new G4LogicalVolume(BwdEndPlateShape, medAluminum, "logical" + name, 0, 0, 0);
         logical1->SetVisAttributes(m_VisAttributes.back());
-        z = -40.0105 * CLHEP::cm;
+        //        z = -40.0105 * CLHEP::cm;
+        double z = -35.3 * CLHEP::cm - 0.5 * bwdEndPlateThick;
         pID = 0;
-        new G4PVPlacement(0, G4ThreeVector(0., 0., z), logical1, "physical" + name, &topVolume, false, pID);
+        new G4PVPlacement(0, G4ThreeVector(xc, yc, z), logical1, "physical" + name, &topVolume, false, pID);
 
-        //fwd end-ring
-        z = 45.7525 * CLHEP::cm;
-        new G4PVPlacement(0, G4ThreeVector(0., 0., z), logical1, "physical" + name, &topVolume, false, pID + 1);
+        //fwd
+        //        z = 45.7525 * CLHEP::cm;
+        //        new G4PVPlacement(0, G4ThreeVector(0., 0., z), logical1, "physical" + name, &topVolume, false, pID + 1);
+        name = "FwdEndPlate";
+        G4Tubs* FwdEndPlateShape = new G4Tubs("solid" + name, endPlateRmin, endPlateRmax, 0.5 * fwdEndPlateThick, 0., 360.*CLHEP::deg);
+        G4LogicalVolume* logical2 = new G4LogicalVolume(FwdEndPlateShape, medAluminum, "logical" + name, 0, 0, 0);
+        logical2->SetVisAttributes(m_VisAttributes.back());
+        z = 48.5 * CLHEP::cm + 0.5 * fwdEndPlateThick;
+        new G4PVPlacement(0, G4ThreeVector(xc, yc, z), logical2, "physical" + name, &topVolume, false, pID);
       }
     }
 

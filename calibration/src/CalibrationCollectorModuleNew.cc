@@ -3,12 +3,13 @@
 using namespace std;
 using namespace Belle2;
 
-CalibrationCollectorModuleNew::CalibrationCollectorModuleNew() : HistoModule()
+CalibrationCollectorModuleNew::CalibrationCollectorModuleNew() : HistoModule(), m_dir(nullptr)
 {
 }
 
 void CalibrationCollectorModuleNew::initialize()
 {
+  REG_HISTOGRAM
   prepare();
 }
 
@@ -24,7 +25,9 @@ void CalibrationCollectorModuleNew::beginRun()
   startRun();
 }
 
-void CalibrationCollectorModuleNew::defineHistos()
+void CalibrationCollectorModuleNew::defineHisto()
 {
-  ;
+  m_dir = gDirectory;
+  B2INFO("Collector Module ''" << getName() << "'' saving output to TDirectory " << m_dir->GetPath());
+  inDefineHisto();
 }

@@ -57,5 +57,7 @@ namespace Belle2 {
     /** Number of entries created in the saved tree per event. Will affect the total size of objects stored */
     int m_entriesPerEvent;
 
+    void inDefineHisto();
+
   };
 }

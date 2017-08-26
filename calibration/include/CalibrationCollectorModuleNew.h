@@ -12,6 +12,8 @@
 
 #include <framework/core/HistoModule.h>
 
+#include <TDirectory.h>
+
 namespace Belle2 {
   /**
    * Calibration collector module base class
@@ -31,7 +33,7 @@ namespace Belle2 {
     /// Reset the m_runCollectOnRun flag, if necessary, to begin collection again
     void beginRun() final;
 
-    void defineHistos();
+    void defineHisto();
 
   protected:
     /// Replacement for initialize(). Register calibration dataobjects here as well
@@ -40,5 +42,9 @@ namespace Belle2 {
     virtual void collect() {}
     /// Replacement for beginRun(). Do anything you would normally do in beginRun here
     virtual void startRun() {}
+
+    virtual void inDefineHisto() {}
+
+    TDirectory* m_dir;
   };
 } // Belle2 namespace

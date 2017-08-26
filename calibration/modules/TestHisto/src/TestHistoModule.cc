@@ -41,6 +41,16 @@ void TestHistoModule::prepare()
 {
   StoreObjPtr<EventMetaData>::required();
 
+  //registerObject("calib_tree",tree);
+}
+
+void TestHistoModule::collect()
+{
+  ;  /* code */
+}
+
+void TestHistoModule::inDefineHisto()
+{
   // Data object creation --------------------------------------------------
   TTree* tree = new TTree("MyTree", "Tree with event meta data");
   tree->Branch<int>("event", &m_evt);
@@ -55,13 +65,6 @@ void TestHistoModule::prepare()
   tree->Branch("chisq", &m_chisq);
   tree->Branch("pvalue", &m_pvalue);
   tree->Branch("dof", &m_dof);
-
-  //registerObject("calib_tree",tree);
-}
-
-void TestHistoModule::collect()
-{
-  ;  /* code */
 }
 
 //void TestHistoModule::beginRun()

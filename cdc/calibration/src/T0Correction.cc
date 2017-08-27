@@ -181,16 +181,16 @@ bool T0Correction::calibrate()
     TDirectory* corrT0 = top->mkdir("DeltaT0");
     corrT0->cd();
 
-
-    TGraphErrors* grb = new TGraphErrors(b.size(), &b.at(0), &Sb.at(0), &db.at(0), &dSb.at(0));
-    grb->SetMarkerColor(2);
-    grb->SetMarkerSize(1.0);
-    grb->SetTitle("#DeltaT0;BoardID;#DeltaT0[ns]");
-    grb->SetMaximum(10);
-    grb->SetMinimum(-10);
-    grb->SetName("Board");
-    grb->Write();
-
+    if (b.size() > 2) {
+      TGraphErrors* grb = new TGraphErrors(b.size(), &b.at(0), &Sb.at(0), &db.at(0), &dSb.at(0));
+      grb->SetMarkerColor(2);
+      grb->SetMarkerSize(1.0);
+      grb->SetTitle("#DeltaT0;BoardID;#DeltaT0[ns]");
+      grb->SetMaximum(10);
+      grb->SetMinimum(-10);
+      grb->SetName("Board");
+      grb->Write();
+    }
     for (int sl = 0; sl < 56; ++sl) {
       if (c[sl].size() < 2) continue;
       gr[sl] = new TGraphErrors(c[sl].size(), &c[sl].at(0), &s[sl].at(0), &dc[sl].at(0), &ds[sl].at(0));

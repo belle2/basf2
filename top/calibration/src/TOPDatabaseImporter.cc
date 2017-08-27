@@ -87,6 +87,7 @@ namespace Belle2 {
       TH1F* hsuccess = (TH1F*) file->Get("success");
       if (!hsuccess) {
         B2ERROR("Fit status histogram '" << hsuccess << "' not found");
+        file->Close();
         continue;
       }
 

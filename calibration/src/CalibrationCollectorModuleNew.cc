@@ -21,6 +21,11 @@ void CalibrationCollectorModuleNew::event()
 
 void CalibrationCollectorModuleNew::beginRun()
 {
+  /** It seems that the beginRun() function is called in each basf2 subprocess when the run changes in each process.
+    * This is nice because it allows us to write the new (exp,run) object creation in the beginRun function as though
+    * the other processes don't exist.
+    */
+
   // Run the user's startRun() implementation if there is one
   startRun();
 }

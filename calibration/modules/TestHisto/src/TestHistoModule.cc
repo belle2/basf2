@@ -8,6 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <string>
+
 #include <calibration/modules/TestHisto/TestHistoModule.h>
 
 #include <TTree.h>
@@ -44,53 +46,62 @@ void TestHistoModule::prepare()
   //registerObject("calib_tree",tree);
 }
 
-void TestHistoModule::collect()
-{
-  ;  /* code */
-}
-
 void TestHistoModule::inDefineHisto()
 {
+  ;
+}
+
+void TestHistoModule::startRun()
+{
+  TDirectory* currentDir = gDirectory;
+
+  m_dir->cd();
+  m_run = m_emd->getRun();
+  m_exp = m_emd->getExperiment();
+
+  std::string exprunSuffix = "_" + std::to_string(m_exp) + '.' + std::to_string(m_run);
+
+  std::string objectName = "MyTree" + exprunSuffix;
   // Data object creation --------------------------------------------------
-  TTree* tree = new TTree("MyTree", "Tree with event meta data");
+  TTree* tree = new TTree("", "");
   tree->Branch<int>("event", &m_evt);
   tree->Branch<int>("run", &m_run);
   tree->Branch<int>("exp", &m_exp);
-  tree->Branch("hitX", &m_hitX);
-  tree->Branch("hitY", &m_hitY);
-  tree->Branch("hitZ", &m_hitZ);
-  tree->Branch("trackX", &m_trackX);
-  tree->Branch("trackY", &m_trackY);
-  tree->Branch("trackZ", &m_trackZ);
-  tree->Branch("chisq", &m_chisq);
-  tree->Branch("pvalue", &m_pvalue);
-  tree->Branch("dof", &m_dof);
+  tree->Branch<double>("hitX", &m_hitX);
+  tree->Branch<double>("hitY", &m_hitY);
+  tree->Branch<double>("hitZ", &m_hitZ);
+  tree->Branch<double>("trackX", &m_trackX);
+  tree->Branch<double>("trackY", &m_trackY);
+  tree->Branch<double>("trackZ", &m_trackZ);
+  tree->Branch<double>("chisq", &m_chisq);
+  tree->Branch<double>("pvalue", &m_pvalue);
+  tree->Branch<double>("dof", &m_dof);
+
+  m_tree = new CalibRootObjNew<TTree>(tree);
+  m_tree->SetName(std::string("Help" + exprunSuffix).c_str());
+  m_dir->Add(m_tree);
+  currentDir->cd();
 }
 
-//void TestHistoModule::beginRun()
-//{
-//  m_obj->constructObject("1.1");
-//}
+void TestHistoModule::collect()
+{
+  m_evt = m_emd->getEvent();
+  m_run = m_emd->getRun();
+  m_exp = m_emd->getExperiment();
 
-//void TestHistoModule::event()
-//{
-//  m_evt = m_emd->getEvent();
-//  m_run = m_emd->getRun();
-//  m_exp = m_emd->getExperiment();
-//
-//  for(int i=0; i<m_entriesPerEvent; ++i){
-//    m_hitX = gRandom->Gaus();
-//    m_hitY = gRandom->Gaus();
-//    m_hitZ = gRandom->Gaus();
-//    m_trackX = gRandom->Gaus();
-//    m_trackY = gRandom->Gaus();
-//    m_trackZ = gRandom->Gaus();
-//    m_chisq = gRandom->Gaus();
-//    m_pvalue = gRandom->Gaus();
-//    m_dof = gRandom->Gaus();
-//    m_obj->getObject("1.1").Fill();
-//  }
-//}
+  for (int i = 0; i < m_entriesPerEvent; ++i) {
+    m_hitX = gRandom->Gaus();
+    m_hitY = gRandom->Gaus();
+    m_hitZ = gRandom->Gaus();
+    m_trackX = gRandom->Gaus();
+    m_trackY = gRandom->Gaus();
+    m_trackZ = gRandom->Gaus();
+    m_chisq = gRandom->Gaus();
+    m_pvalue = gRandom->Gaus();
+    m_dof = gRandom->Gaus();
+    m_tree->getObject()->Fill();
+  }
+}
 
 //void TestHistoModule::terminate()
 //{

@@ -13,7 +13,7 @@
 #include <calibration/CalibrationCollectorModuleNew.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
-//#include <calibration/dataobjects/CalibRootObj.h>
+#include <calibration/dataobjects/CalibRootObjNew.h>
 #include <TTree.h>
 //#include <TDirectory.h>
 
@@ -30,11 +30,12 @@ namespace Belle2 {
 
     virtual void collect();
 
+    virtual void startRun();
   private:
 
     StoreObjPtr<EventMetaData> m_emd;
 
-    TTree* m_tree;
+    CalibRootObjNew<TTree>* m_tree;
 
     /** Current event id */
     int m_evt = -1;

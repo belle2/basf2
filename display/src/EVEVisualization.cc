@@ -269,7 +269,14 @@ void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,
   track_lines->SetPropagator(m_consttrackpropagator);
   track_lines->SetLineColor(kOrange + 2);
   track_lines->SetLineWidth(1);
-  track_lines->SetTitle(ObjectInfo::getTitle(&trgTrack));
+  track_lines->SetTitle(ObjectInfo::getTitle(&trgTrack) +
+                        TString::Format("\ncharge: %d, phi: %.2fdeg, pt: %.2fGeV, theta: %.2fdeg, z: %.2fcm",
+                                        trgTrack.getChargeSign(),
+                                        trgTrack.getPhi0() * 180 / M_PI,
+                                        trgTrack.getTransverseMomentum(1.5),
+                                        trgTrack.getDirection().Theta() * 180 / M_PI,
+                                        trgTrack.getZ0()));
+
 
   track_lines->SetCharge(trgTrack.getChargeSign());
 
@@ -1624,6 +1631,9 @@ void EVEVisualization::addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit)
   }
 
   shape->SetName(ObjectInfo::getIdentifier(hit));
+  shape->SetTitle(ObjectInfo::getTitle(hit) +
+                  TString::Format("\nPriority: %d\nLeft/Right: %d",
+                                  hit->getPriorityPosition(), hit->getLeftRight()));
   addToGroup("CDCTriggerSegmentHits", shape);
   addObject(hit, shape);
 }

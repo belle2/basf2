@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Roberto Stroili, Wenlong Yuan                            *
+ * Contributors: Wenlong Yuan                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,21 +19,21 @@ class TTree;
 
 namespace Belle2 {
   /**
-   * T0 Laser calibration module
+   * TOP Channel T0 MC Extraction module
    * (under development)
    */
-  class TOPLaserCalibratorModule : public Module {
+  class TOPChannelT0MCModule : public Module {
 
   public:
     /**
      * Constructor
      */
-    TOPLaserCalibratorModule();
+    TOPChannelT0MCModule();
 
     /**
      * Destructor
      */
-    virtual ~TOPLaserCalibratorModule();
+    virtual ~TOPChannelT0MCModule();
 
     /**
      * Initialize the Module.
@@ -43,7 +43,6 @@ namespace Belle2 {
 
     /**
      * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
      */
     virtual void beginRun();
 
@@ -54,13 +53,12 @@ namespace Belle2 {
 
     /**
      * End-of-run action.
-     * Save run-related stuff, such as statistics.
      */
     virtual void endRun();
 
     /**
      * Termination action.
-     * Do fits , clean-up, close files, summarize statistics, etc.
+     * Output MC extraction
      */
     virtual void terminate();
 
@@ -73,15 +71,11 @@ namespace Belle2 {
           c_maxLaserFibers = 9
          };
 
-    std::string m_dataFitOutput; /**< output root file for data */
-    std::string m_mcInput; /**< Input root file from MC */
-    std::string m_chT0C; /**< Output of channel T0 constant */
+    TH1F* m_histo[c_NumChannels]; /**< profile histograms */
 
-    int m_barID; /**< ID of TOP module to calibrate */
-    int m_fitChannel; /**< set 0 - 511 to a specific pixelID in the fit; set 512 to fit all pixels in one slot */
-    std::string m_fitMethod; /**< gauss: single gaussian; cb: single Crystal Ball; cb2: double Crystal Ball */
     std::vector<double> m_fitRange; /**< fit range [nbins, xmin, xmax] */
-    TH1F* m_histo[c_NumChannels] = {0}; /**< profile histograms */
+    std::string m_outputFile; /**< output root file name */
   };
+
 } // Belle2 namespace
 

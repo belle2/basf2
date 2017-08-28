@@ -454,8 +454,13 @@ CDCTriggerNeuroTrainerModule::event()
 void
 CDCTriggerNeuroTrainerModule::terminate()
 {
+  // save the training data
+  saveTraindata(m_trainFilename, m_trainArrayname);
   // do training for all sectors with sufficient training samples
   for (unsigned isector = 0; isector < m_NeuroTrigger.nSectors(); ++isector) {
+    // skip sectors that have already been trained
+    if (m_NeuroTrigger[isector].isTrained())
+      continue;
     float nTrainMin = m_multiplyNTrain ? m_nTrainMin * m_NeuroTrigger[isector].nWeights() : m_nTrainMin;
     if (m_trainSets[isector].nSamples() < (nTrainMin + m_nValid + m_nTest)) {
       B2WARNING("Not enough training samples for sector " << isector << " (" << (nTrainMin + m_nValid + m_nTest)
@@ -463,6 +468,7 @@ CDCTriggerNeuroTrainerModule::terminate()
       continue;
     }
     train(isector);
+    m_NeuroTrigger[isector].trained = true;
     // set sector ranges
     vector<unsigned> indices = m_NeuroTrigger.getRangeIndices(m_parameters, isector);
     vector<float> phiRange = m_parameters.phiRange[indices[0]];
@@ -476,10 +482,9 @@ CDCTriggerNeuroTrainerModule::terminate()
     m_NeuroTrigger[isector].phiRange = phiRange;
     m_NeuroTrigger[isector].invptRange = invptRange;
     m_NeuroTrigger[isector].thetaRange = thetaRange;
+    // save all networks (including the newly trained)
+    m_NeuroTrigger.save(m_filename, m_arrayname);
   }
-  // save everything to file
-  m_NeuroTrigger.save(m_filename, m_arrayname);
-  saveTraindata(m_trainFilename, m_trainArrayname);
 }
 
 void

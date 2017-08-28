@@ -427,7 +427,7 @@ void CDCDigitizerModule::event()
         //        std::cout << "settdc2 " << firstHit->getTDCCount() << " " << secondHit->getTDCCount() << std::endl;
 
         //set a relation: MCParticle -> CDCHit
-        RelationVector<MCParticle> rels = simHits[iterSignalMap->second.m_simHitIndex2]->getRelationsFrom<MCParticle>();
+        rels = simHits[iterSignalMap->second.m_simHitIndex2]->getRelationsFrom<MCParticle>();
         if (rels.size() != 0) {
           //assumption: only one MCParticle
           const MCParticle* mcparticle = rels[0];
@@ -454,7 +454,7 @@ void CDCDigitizerModule::event()
             //            std::cout << "settdc3 " << firstHit->getTDCCount() << " " << secondHit->getTDCCount() << std::endl;
 
             //set a relation: MCParticle -> CDCHit
-            RelationVector<MCParticle> rels = simHits[iterSignalMap->second.m_simHitIndex3]->getRelationsFrom<MCParticle>();
+            rels = simHits[iterSignalMap->second.m_simHitIndex3]->getRelationsFrom<MCParticle>();
             if (rels.size() != 0) {
               //assumption: only one MCParticle
               const MCParticle* mcparticle = rels[0];

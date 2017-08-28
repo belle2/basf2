@@ -134,10 +134,10 @@ namespace Belle2 {
 
       //      if (cdcgp.getMaterialDefinitionMode() == 2) {
       if (gcp.getMaterialDefinitionMode() == 2) {
-        double density = denHelium + denEthane;
-        cdcMedGas = new G4Material("CDCRealGas", density, 2, kStateGas, realTemperture);
-        cdcMedGas->AddMaterial(medHelium, denHelium / density);
-        cdcMedGas->AddMaterial(medEthane, denEthane / density);
+        const double density2 = denHelium + denEthane;
+        cdcMedGas = new G4Material("CDCRealGas", density2, 2, kStateGas, realTemperture);
+        cdcMedGas->AddMaterial(medHelium, denHelium / density2);
+        cdcMedGas->AddMaterial(medEthane, denEthane / density2);
       }
 
       if (gcp.getPrintMaterialTable()) {
@@ -543,22 +543,22 @@ namespace Belle2 {
         //        if (cdcgp.getMaterialDefinitionMode() == 2) {
         if (gcp.getMaterialDefinitionMode() == 2) {
           G4String sName = "sWire";
-          const G4int ic = 0;
-          TVector3 wb = cdcgp.wireBackwardPosition(iSLayer, ic);
-          //    G4double rsense0 = wb.Perp();
-          TVector3 wf = cdcgp.wireForwardPosition(iSLayer, ic);
-          G4double tAtZ0 = -wb.Z() / (wf.Z() - wb.Z()); //t: param. along the wire
-          TVector3 wAtZ0 = wb + tAtZ0 * (wf - wb);
+          const G4int jc = 0;
+          TVector3 wb0 = cdcgp.wireBackwardPosition(iSLayer, jc);
+          //    G4double rsense0 = wb0.Perp();
+          TVector3 wf0 = cdcgp.wireForwardPosition(iSLayer, jc);
+          G4double tAtZ0 = -wb0.Z() / (wf0.Z() - wb0.Z()); //t: param. along the wire
+          TVector3 wAtZ0 = wb0 + tAtZ0 * (wf0 - wb0);
           //additional chop of wire; must be larger than 126um*(1/10), where 126um is the field wire diameter; 1/10: approx. stereo angle
           const G4double epsl = 25.e-4; // (in cm);
-          G4double reductionBwd = (zback_sensitive_middle + epsl) / wb.Z();
-          //chop the wire at zback_sensitive_middle for avoiding overlap; this is because the wire length defined by wb and wf is larger than the length of middle sensitive tube
-          wb = reductionBwd * (wb - wAtZ0) + wAtZ0;
+          G4double reductionBwd = (zback_sensitive_middle + epsl) / wb0.Z();
+          //chop the wire at zback_sensitive_middle for avoiding overlap; this is because the wire length defined by wb0 and wf0 is larger than the length of middle sensitive tube
+          wb0 = reductionBwd * (wb0 - wAtZ0) + wAtZ0;
           //chop wire at  zfor_sensitive_middle for avoiding overlap
-          G4double reductionFwd = (zfor_sensitive_middle - epsl) / wf.Z();
-          wf = reductionFwd * (wf - wAtZ0) + wAtZ0;
+          G4double reductionFwd = (zfor_sensitive_middle - epsl) / wf0.Z();
+          wf0 = reductionFwd * (wf0 - wAtZ0) + wAtZ0;
 
-          const G4double wireHalfLength = 0.5 * (wf - wb).Mag() * CLHEP::cm;
+          const G4double wireHalfLength = 0.5 * (wf0 - wb0).Mag() * CLHEP::cm;
           const G4double sWireRadius = 0.5 * cdcgp.senseWireDiameter() * CLHEP::cm;
           //    const G4double sWireRadius = 15.e-4 * CLHEP::cm;
           G4Tubs* middleSensitiveSwireShape = new G4Tubs(sName, 0., sWireRadius, wireHalfLength, 0., 360. * CLHEP::deg);

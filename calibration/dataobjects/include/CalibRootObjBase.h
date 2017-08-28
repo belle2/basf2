@@ -4,6 +4,7 @@
 #include <TNamed.h>
 #include <TList.h>
 #include <TCollection.h>
+#include <calibration/Utilities.h>
 
 namespace Belle2 {
 
@@ -14,8 +15,6 @@ namespace Belle2 {
   class CalibRootObjBase : public TNamed {
 
   public:
-    /// The key type in the map - IOV or other representation
-    typedef std::pair<int, int> KeyType;
 
     /// Constructor
     CalibRootObjBase() : TNamed() {};
@@ -27,15 +26,25 @@ namespace Belle2 {
     *
     * \note dictionaries containing your Mergeable class need to be loaded, so 'hadd' will not work currently.
     */
-    virtual Long64_t Merge(TCollection* hlist) {return 1;};
+    virtual Long64_t Merge(TCollection* hlist) = 0;
 
-    virtual void merge(const CalibRootObjBase* other) {};
+    //virtual void merge(const CalibRootObjBase* other) {}
 
-    KeyType getIOV() {return m_iov;}
+    virtual TNamed* Clone(const char* newname)
+    {
+      TNamed* obj = constructObject(newname);
+      return obj;
+    }
+
+    virtual TNamed* constructObject(std::string name) = 0;
+
+    Belle2::Calibration::KeyType getIOV() {return m_iov;}
+
+    void setIOV(Belle2::Calibration::KeyType expRun) {m_iov = expRun;}
 
   private:
     /** IOVs for managed object */
-    KeyType m_iov{ -1, -1};
+    Belle2::Calibration::KeyType m_iov{ -1, -1};
 
     ClassDef(CalibRootObjBase, 1) /// Run dependent mergeable wrapper
   };

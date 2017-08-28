@@ -41,29 +41,9 @@ TestHistoModule::TestHistoModule() : CalibrationCollectorModuleNew()
 
 void TestHistoModule::prepare()
 {
-  StoreObjPtr<EventMetaData>::required();
-
-  //registerObject("calib_tree",tree);
-}
-
-void TestHistoModule::inDefineHisto()
-{
-  ;
-}
-
-void TestHistoModule::startRun()
-{
-  TDirectory* currentDir = gDirectory;
-
-  m_dir->cd();
-  m_run = m_emd->getRun();
-  m_exp = m_emd->getExperiment();
-
-  std::string exprunSuffix = "_" + std::to_string(m_exp) + '.' + std::to_string(m_run);
-
-  std::string objectName = "MyTree" + exprunSuffix;
+  std::string objectName = "MyTree";
   // Data object creation --------------------------------------------------
-  TTree* tree = new TTree("", "");
+  TTree* tree = new TTree(objectName.c_str(), "");
   tree->Branch<int>("event", &m_evt);
   tree->Branch<int>("run", &m_run);
   tree->Branch<int>("exp", &m_exp);
@@ -78,7 +58,16 @@ void TestHistoModule::startRun()
   tree->Branch<double>("dof", &m_dof);
 
   registerObject<TTree>(objectName, tree);
-  currentDir->cd();
+}
+
+void TestHistoModule::inDefineHisto()
+{
+  ;
+}
+
+void TestHistoModule::startRun()
+{
+  ;
 }
 
 void TestHistoModule::collect()
@@ -87,6 +76,7 @@ void TestHistoModule::collect()
   m_run = m_emd->getRun();
   m_exp = m_emd->getExperiment();
 
+  std::string objectName = "MyTree";
   for (int i = 0; i < m_entriesPerEvent; ++i) {
     m_hitX = gRandom->Gaus();
     m_hitY = gRandom->Gaus();
@@ -97,7 +87,7 @@ void TestHistoModule::collect()
     m_chisq = gRandom->Gaus();
     m_pvalue = gRandom->Gaus();
     m_dof = gRandom->Gaus();
-    getObject<TTree>()->Fill();
+    getObject<TTree>(objectName)->Fill();
   }
 }
 

@@ -10,12 +10,19 @@
 
 #pragma once
 
+#include <memory>
+
 #include <TDirectory.h>
 #include <TNamed.h>
 
 #include <framework/core/HistoModule.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
+
 #include <calibration/dataobjects/CalibRootObjBase.h>
 #include <calibration/dataobjects/CalibRootObjNew.h>
+#include <calibration/CalibObjManager.h>
+#include <calibration/Utilities.h>
 
 namespace Belle2 {
   /**
@@ -42,16 +49,22 @@ namespace Belle2 {
     template <class T>
     void registerObject(std::string name, T* obj)
     {
-      m_object = static_cast<CalibRootObjBase*>(new CalibRootObjNew<T>(obj));
-      m_object->SetName(name.c_str());
-      m_dir->Add(m_object);
+      std::unique_ptr<CalibRootObjBase> calObj(new CalibRootObjNew<T>(obj));
+      calObj->SetName(name.c_str());
+      m_manager.addObject(name, std::move(calObj));
     }
 
     template<class T>
-    T* getObject()
+    T* getObject(std::string name)
     {
-      CalibRootObjNew<T>* calObj = static_cast<CalibRootObjNew<T>*>(m_object);
-      return static_cast<T*>(calObj->getObject());
+      Belle2::Calibration::KeyType expRun = std::make_pair(m_emd->getExperiment(), m_emd->getRun());
+      CalibRootObjNew<T>* calObj = dynamic_cast<CalibRootObjNew<T>*>(m_manager.getObject(name, expRun));
+      if (calObj) {
+        return static_cast<T*>(calObj->getObject());
+      } else {
+        B2ERROR("Failed to get a CalibRootObj from CalibObjManager for " << name);
+        return nullptr;
+      }
     }
 
   protected:
@@ -66,6 +79,8 @@ namespace Belle2 {
 
     TDirectory* m_dir;
 
-    CalibRootObjBase* m_object;
+    CalibObjManager m_manager;
+
+    StoreObjPtr<EventMetaData> m_emd;
   };
 } // Belle2 namespace

@@ -77,9 +77,7 @@ void TestHistoModule::startRun()
   tree->Branch<double>("pvalue", &m_pvalue);
   tree->Branch<double>("dof", &m_dof);
 
-  m_tree = new CalibRootObjNew<TTree>(tree);
-  m_tree->SetName(std::string("Help" + exprunSuffix).c_str());
-  m_dir->Add(m_tree);
+  registerObject<TTree>(objectName, tree);
   currentDir->cd();
 }
 
@@ -99,7 +97,7 @@ void TestHistoModule::collect()
     m_chisq = gRandom->Gaus();
     m_pvalue = gRandom->Gaus();
     m_dof = gRandom->Gaus();
-    m_tree->getObject()->Fill();
+    getObject<TTree>()->Fill();
   }
 }
 

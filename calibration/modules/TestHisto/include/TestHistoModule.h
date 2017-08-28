@@ -35,8 +35,6 @@ namespace Belle2 {
 
     StoreObjPtr<EventMetaData> m_emd;
 
-    CalibRootObjNew<TTree>* m_tree;
-
     /** Current event id */
     int m_evt = -1;
     /** Current run id */

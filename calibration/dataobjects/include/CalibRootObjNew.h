@@ -1,9 +1,9 @@
 #pragma once
 
 #include <string>
-#include <TNamed.h>
 #include <TList.h>
 #include <TCollection.h>
+#include <calibration/dataobjects/CalibRootObjBase.h>
 
 namespace Belle2 {
 
@@ -12,14 +12,14 @@ namespace Belle2 {
    * into mergeable ROOT-compatible objects.
    */
   template<class T>
-  class CalibRootObjNew : public TNamed {
+  class CalibRootObjNew : public CalibRootObjBase {
 
   public:
     /// The key type in the map - IOV or other representation
     typedef std::pair<int, int> KeyType;
 
     /// Constructor
-    CalibRootObjNew() : TNamed() {};
+    CalibRootObjNew() : CalibRootObjBase() {};
 
     /// Destructor
     virtual ~CalibRootObjNew()
@@ -65,7 +65,7 @@ namespace Belle2 {
      *
      * Takes ownership of object (do not delete it!)
      */
-    explicit CalibRootObjNew(T* object) : TNamed()
+    explicit CalibRootObjNew(T* object) : CalibRootObjBase()
     {
       if (m_object) {
         delete m_object;

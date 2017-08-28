@@ -10,9 +10,12 @@
 
 #pragma once
 
-#include <framework/core/HistoModule.h>
-
 #include <TDirectory.h>
+#include <TNamed.h>
+
+#include <framework/core/HistoModule.h>
+#include <calibration/dataobjects/CalibRootObjBase.h>
+#include <calibration/dataobjects/CalibRootObjNew.h>
 
 namespace Belle2 {
   /**
@@ -35,6 +38,22 @@ namespace Belle2 {
 
     void defineHisto();
 
+    /// Register object with a name, takes ownership, do not access the pointer beyond prepare()
+    template <class T>
+    void registerObject(std::string name, T* obj)
+    {
+      m_object = static_cast<CalibRootObjBase*>(new CalibRootObjNew<T>(obj));
+      m_object->SetName(name.c_str());
+      m_dir->Add(m_object);
+    }
+
+    template<class T>
+    T* getObject()
+    {
+      CalibRootObjNew<T>* calObj = static_cast<CalibRootObjNew<T>*>(m_object);
+      return static_cast<T*>(calObj->getObject());
+    }
+
   protected:
     /// Replacement for initialize(). Register calibration dataobjects here as well
     virtual void prepare() {}
@@ -46,5 +65,7 @@ namespace Belle2 {
     virtual void inDefineHisto() {}
 
     TDirectory* m_dir;
+
+    CalibRootObjBase* m_object;
   };
 } // Belle2 namespace

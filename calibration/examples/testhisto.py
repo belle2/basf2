@@ -18,7 +18,7 @@ def _run_child(run):
     process(main)
 
 
-for run in range(1, 3):
+for run in range(1, 2):
     child = ctx.Process(target=_run_child, args=(run,))
     child.start()
     # wait for it to finish

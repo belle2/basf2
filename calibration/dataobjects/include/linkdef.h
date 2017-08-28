@@ -5,6 +5,8 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#pragma link C++ class Belle2::CalibRootObjBase+;
+
 #pragma link C++ class Belle2::CalibRootObj<TH1F>+;
 #pragma link C++ class Belle2::CalibRootObj<TH1D>+;
 #pragma link C++ class Belle2::CalibRootObj<TH2F>+;

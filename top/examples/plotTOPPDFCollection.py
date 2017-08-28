@@ -97,7 +97,7 @@ if __name__ == "__main__":
 
         Z = np.zeros_like(X, dtype=np.float32)
         # x.m_data is a map of hypotheses to a 2D PDF which is a sum of Gaussians
-        for pixel, pxData in enumerate(x.m_data[13]):
+        for pixel, pxData in enumerate(x.m_data[321]):
             lOG = []  # list of Gaussians
             for peak, width, norm in pxData:
                 lOG.append(Gaussian(peak, width, norm))

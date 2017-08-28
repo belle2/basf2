@@ -9,11 +9,7 @@
  **************************************************************************/
 
 #include <testbeam/vxd/modules/PXDEfficiencyModule.h>
-
 #include "TMatrixDSym.h"
-
-#include <iostream>
-
 #include <tracking/dataobjects/ROIid.h>
 
 using namespace Belle2;
@@ -67,15 +63,12 @@ void PXDEfficiencyModule::initialize()
 
 void PXDEfficiencyModule::event()
 {
-  //debug
-  //std::cout << "n cluster " << m_pxdclusters.getEntries() << std::endl;
-  //std::cout << "n digits " << m_pxddigits.getEntries() << std::endl;
-  //std::cout << "n tracks " << m_tracks.getEntries() << std::endl;
-
   StoreArray<RecoTrack> tracks(m_tracksname);
 
-  //std::cout << "n track " << m_tracks.getEntries() << std::endl;
-  //std::cout << m_tracksname << std::endl;
+  B2DEBUG(1, "Number of clusters found: " << m_pxdclusters.getEntries());
+  B2DEBUG(1, "Number of digits found: " << m_pxddigits.getEntries());
+  B2DEBUG(1, "Number of tracks found: " << tracks.getEntries());
+
   //hard cut on the number of tracks as more tracks will complicate things
   if (tracks.getEntries() != 1) return;
 

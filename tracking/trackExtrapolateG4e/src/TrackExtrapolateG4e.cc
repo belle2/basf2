@@ -198,7 +198,7 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
     m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
     G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
     GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
-    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2") * CLHEP::cm; // mm
+    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2", 1.20) * CLHEP::cm; // mm
     m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
   }
 
@@ -276,7 +276,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
     double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
     m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
     GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
-    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2") * CLHEP::cm; // mm
+    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2", 1.20) * CLHEP::cm; // mm
     m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
   }
 
@@ -289,7 +289,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   double minZ = m_OffsetZ - (m_BarrelHalfLength + 2.0 * m_EndcapHalfLength);
   double maxZ = m_OffsetZ + (m_BarrelHalfLength + 2.0 * m_EndcapHalfLength);
   m_BarrelNSector = bklmGeometry->getNSector();
-  m_BarrelMaxR = bklmGeometry->getOuterRadius() * CLHEP::cm / cos(M_PI / m_BarrelNSector); // in G4 units (mm)
+  m_BarrelMaxR = bklmGeometry->getOuterRadius() * CLHEP::cm / std::cos(M_PI / m_BarrelNSector); // in G4 units (mm)
   m_TargetMuid = new Simulation::ExtCylSurfaceTarget(m_BarrelMaxR, minZ, maxZ);
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetMuid);
 
@@ -344,8 +344,8 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   }
   for (int sector = 1; sector <= 8; ++sector) {
     double phi = M_PI_4 * (sector - 1);
-    m_BarrelSectorPerp[sector - 1].set(cos(phi), sin(phi), 0.0);
-    m_BarrelSectorPhi[sector - 1].set(-sin(phi), cos(phi), 0.0);
+    m_BarrelSectorPerp[sector - 1].set(std::cos(phi), std::sin(phi), 0.0);
+    m_BarrelSectorPhi[sector - 1].set(-std::sin(phi), std::cos(phi), 0.0);
   }
 }
 
@@ -709,7 +709,7 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
             G4ThreeVector perp(eclPos.cross(delta));
             double perpMag2 = perp.mag2();
             if (perpMag2 > 1.0E-10) {
-              double dist = fabs(diff * perp) / sqrt(perpMag2);
+              double dist = std::fabs(diff * perp) / std::sqrt(perpMag2);
               if (dist < m_MaxECLTrackClusterDistance) {
                 double f = eclPos * (prePos.cross(perp)) / perpMag2;
                 if ((f > -0.5) && (f <= 1.0)) {
@@ -1072,20 +1072,20 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
     if (extState.pdgCode != trackRep->getPDG()) {
       double pSq = lastMomentum.Mag2();
       double mass = particle->GetPDGMass() / CLHEP::GeV;
-      extState.tof *= sqrt((pSq + mass * mass) / (pSq + lastState.getMass() * lastState.getMass()));
+      extState.tof *= std::sqrt((pSq + mass * mass) / (pSq + lastState.getMass() * lastState.getMass()));
     }
 
     extState.directionAtIP.set(firstMomentum.Unit().X(), firstMomentum.Unit().Y(), firstMomentum.Unit().Z());
     if (m_MagneticField != 0.0) { // in gauss
       double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) / (CLHEP::c_light * charge * m_MagneticField); // in cm
       double centerPhi = extState.directionAtIP.phi() - M_PI_2;
-      double centerX = firstPosition.X() + radius * cos(centerPhi);
-      double centerY = firstPosition.Y() + radius * sin(centerPhi);
+      double centerX = firstPosition.X() + radius * std::cos(centerPhi);
+      double centerY = firstPosition.Y() + radius * std::sin(centerPhi);
       double pocaPhi = atan2(charge * centerY, charge * centerX) + M_PI;
       double ipPerp = extState.directionAtIP.perp();
       if (ipPerp > 0.0) {
-        extState.directionAtIP.setX(+sin(pocaPhi) * ipPerp);
-        extState.directionAtIP.setY(-cos(pocaPhi) * ipPerp);
+        extState.directionAtIP.setX(+std::sin(pocaPhi) * ipPerp);
+        extState.directionAtIP.setY(-std::cos(pocaPhi) * ipPerp);
       }
     } else {
       // No field: replace flaky covariance matrix with a diagonal one measured in 1.5T field
@@ -1133,11 +1133,11 @@ void TrackExtrapolateG4e::fromG4eToPhasespace(const G4ErrorFreeTrajState& g4eSta
   double p = 1.0 / (param.GetInvP() * CLHEP::GeV);     // in GeV/c
   double pSq = p * p;
   double lambda = param.GetLambda();    // in radians
-  double sinLambda = sin(lambda);
-  double cosLambda = cos(lambda);
+  double sinLambda = std::sin(lambda);
+  double cosLambda = std::cos(lambda);
   double phi = param.GetPhi();          // in radians
-  double sinPhi = sin(phi);
-  double cosPhi = cos(phi);
+  double sinPhi = std::sin(phi);
+  double cosPhi = std::cos(phi);
 
   // Transformation Jacobian 6x5 from Geant4e 5x5 to phase-space 6x6
 
@@ -1186,13 +1186,13 @@ void TrackExtrapolateG4e::fromPhasespaceToG4e(const TVector3& momentum, const TM
   }
 
   double pInvSq = 1.0 / momentum.Mag2();
-  double pInv   = sqrt(pInvSq);
+  double pInv   = std::sqrt(pInvSq);
   double pPerpInv = 1.0 / momentum.Perp();
   double sinLambda = momentum.CosTheta();
-  double cosLambda = sqrt(1.0 - sinLambda * sinLambda);
+  double cosLambda = std::sqrt(1.0 - sinLambda * sinLambda);
   double phi = momentum.Phi();
-  double cosPhi = cos(phi);
-  double sinPhi = sin(phi);
+  double cosPhi = std::cos(phi);
+  double sinPhi = std::sin(phi);
 
   // Transformation Jacobian 5x6 from phase-space 6x6 to Geant4e 5x5
   G4ErrorMatrix jacobian(5, 6, 0); // All entries are initialized to 0
@@ -1235,13 +1235,13 @@ void TrackExtrapolateG4e::fromPhasespaceToG4e(const G4ThreeVector& momentum, con
   G4ErrorSymMatrix temp(covariance);
 
   double pInvSq = 1.0 / momentum.mag2();
-  double pInv   = sqrt(pInvSq);
+  double pInv   = std::sqrt(pInvSq);
   double pPerpInv = 1.0 / momentum.perp();
   double sinLambda = momentum.cosTheta();
-  double cosLambda = sqrt(1.0 - sinLambda * sinLambda);
+  double cosLambda = std::sqrt(1.0 - sinLambda * sinLambda);
   double phi = momentum.phi();
-  double cosPhi = cos(phi);
-  double sinPhi = sin(phi);
+  double cosPhi = std::cos(phi);
+  double sinPhi = std::sin(phi);
 
   // Transformation Jacobian 5x6 from phase-space 6x6 to Geant4e 5x5
   G4ErrorMatrix jacobian(5, 6, 0);
@@ -1304,7 +1304,7 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
   G4ThreeVector prePos = g4eState.GetG4Track()->GetStep()->GetPreStepPoint()->GetPosition() / CLHEP::cm;
   G4ThreeVector oldPosition(prePos.x(), prePos.y(), prePos.z());
   double r = intersection.position.perp();
-  double z = fabs(intersection.position.z() - m_OffsetZ);
+  double z = std::fabs(intersection.position.z() - m_OffsetZ);
 
   // Is the track in the barrel?
   if ((r > m_BarrelMinR) && (r < m_BarrelMaxR) && (z < m_BarrelHalfLength)) {
@@ -1323,7 +1323,7 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         }
         // If the updated point is outside the barrel, discard it and the Kalman-fitter adjustment
         r = intersection.position.perp();
-        z = fabs(intersection.position.z() - m_OffsetZ);
+        z = std::fabs(intersection.position.z() - m_OffsetZ);
         if ((r <= m_BarrelMinR) || (r >= m_BarrelMaxR) || (z >= m_BarrelHalfLength)) {
           intersection.chi2 = -1.0;
         }
@@ -1341,7 +1341,7 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
   }
 
   // Is the track in the endcap?
-  if ((r > m_EndcapMinR) && (fabs(z - m_EndcapMiddleZ) < m_EndcapHalfLength)) {
+  if ((r > m_EndcapMinR) && (std::fabs(z - m_EndcapMiddleZ) < m_EndcapHalfLength)) {
     // Did the track cross the inner midplane of a detector module?
     if (findEndcapIntersection(extState, oldPosition, intersection)) {
       fromG4eToPhasespace(g4eState, intersection.covariance);
@@ -1356,8 +1356,8 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         }
         // If the updated point is outside the endcap, discard it and the Kalman-fitter adjustment
         r = intersection.position.perp();
-        z = fabs(intersection.position.z() - m_OffsetZ);
-        if ((r <= m_EndcapMinR) || (r >= m_EndcapMaxR) || (fabs(z - m_EndcapMiddleZ) >= m_EndcapHalfLength)) {
+        z = std::fabs(intersection.position.z() - m_OffsetZ);
+        if ((r <= m_EndcapMinR) || (r >= m_EndcapMaxR) || (std::fabs(z - m_EndcapMiddleZ) >= m_EndcapHalfLength)) {
           intersection.chi2 = -1.0;
         }
       } else {
@@ -1412,7 +1412,7 @@ bool TrackExtrapolateG4e::findBarrelIntersection(ExtState& extState, const G4Thr
   // Be generous: allow outward-moving intersection to be in the dead space between
   // largest sensitive-volume Z and m_BarrelHalfLength, not necessarily in a geant4 sensitive volume
 
-  if (fabs(intersection.position.z() - m_OffsetZ) > m_BarrelHalfLength) return false;
+  if (std::fabs(intersection.position.z() - m_OffsetZ) > m_BarrelHalfLength) return false;
 
   double phi = intersection.position.phi();
   if (phi < 0.0) { phi += TWOPI; }
@@ -1450,8 +1450,8 @@ bool TrackExtrapolateG4e::findEndcapIntersection(ExtState& extState, const G4Thr
   if (oldPosition.perp() > m_EndcapMaxR) return false;
   if (intersection.position.perp() < m_EndcapMinR) return false;
 
-  double oldZ = fabs(oldPosition.z() - m_OffsetZ);
-  double newZ = fabs(intersection.position.z() - m_OffsetZ);
+  double oldZ = std::fabs(oldPosition.z() - m_OffsetZ);
+  double newZ = std::fabs(intersection.position.z() - m_OffsetZ);
   bool isForward = intersection.position.z() > m_OffsetZ;
   int outermostLayer = isForward ? m_OutermostActiveForwardEndcapLayer
                        : m_OutermostActiveBackwardEndcapLayer;
@@ -1494,12 +1494,12 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
     BKLMHit2d* hit = bklmHits[h];
     if (hit->getLayer() != matchingLayer) continue;
     if (hit->isOutOfTime()) continue;
-    if (fabs(hit->getTime() - m_MeanDt) > m_MaxDt) continue;
+    if (std::fabs(hit->getTime() - m_MeanDt) > m_MaxDt) continue;
     G4ThreeVector diff(hit->getGlobalPositionX() - intersection.position.x(),
                        hit->getGlobalPositionY() - intersection.position.y(),
                        hit->getGlobalPositionZ() - intersection.position.z());
     double dn = diff * n; // in cm
-    if (fabs(dn) < 2.0) {
+    if (std::fabs(dn) < 2.0) {
       // Hit and extrapolated point are in the same sector
       diff -= n * dn;
       if (diff.mag2() < diffBestMagSq) {
@@ -1509,7 +1509,7 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
       }
     } else {
       // Accept a nearby hit in adjacent sector
-      if (fabs(dn) > 50.0) continue;
+      if (std::fabs(dn) > 50.0) continue;
       int sector = hit->getSector() - 1;
       int dSector = abs(intersection.sector - sector);
       if ((dSector != +1) && (dSector != m_BarrelNSector - 1)) continue;
@@ -1518,11 +1518,11 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
       int fb = (intersection.isForward ? BKLM_FORWARD : BKLM_BACKWARD) - 1;
       double dn2 = intersection.position * nHit - m_BarrelModuleMiddleRadius[fb][sector][intersection.layer];
       dn = diff * nHit + dn2;
-      if (fabs(dn) > 1.0) continue;
+      if (std::fabs(dn) > 1.0) continue;
       // Project extrapolated track to the hit's plane in the adjacent sector
       G4ThreeVector extDir(intersection.momentum.unit());
       double extDirA = extDir * nHit;
-      if (fabs(extDirA) < 1.0E-6) continue;
+      if (std::fabs(extDirA) < 1.0E-6) continue;
       G4ThreeVector projection = extDir * (dn2 / extDirA);
       if (projection.mag() > 15.0) continue;
       diff += projection - nHit * dn;
@@ -1581,12 +1581,12 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
     if (hit->getEndcap() != matchingEndcap) continue;
     // DIVOT no such function for EKLM!
     // if (hit->isOutOfTime()) continue;
-    if (fabs(hit->getTime() - m_MeanDt) > m_MaxDt) continue;
+    if (std::fabs(hit->getTime() - m_MeanDt) > m_MaxDt) continue;
     G4ThreeVector diff(hit->getPositionX() - intersection.position.x(),
                        hit->getPositionY() - intersection.position.y(),
                        hit->getPositionZ() - intersection.position.z());
     double dn = diff * n; // in cm
-    if (fabs(dn) > 2.0) continue;
+    if (std::fabs(dn) > 2.0) continue;
     diff -= n * dn;
     if (diff.mag2() < diffBestMagSq) {
       diffBestMagSq = diff.mag2();
@@ -1676,7 +1676,7 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
 // Don't adjust the extrapolation if the track is nearly tangent to the readout plane.
 
   double extDirA = extDir * nA;
-  if (fabs(extDirA) < 1.0E-6) return;
+  if (std::fabs(extDirA) < 1.0E-6) return;
   double extDirBA = extDir * nB / extDirA;
   double extDirCA = extDir * nC / extDirA;
 

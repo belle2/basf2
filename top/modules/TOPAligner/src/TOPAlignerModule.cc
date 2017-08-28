@@ -88,6 +88,9 @@ namespace Belle2 {
 
     m_align = TOPalign(m_targetMid);
 
+    // configure detector in reconstruction code
+
+    TOPconfigure config;
 
     // input
 

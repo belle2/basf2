@@ -52,7 +52,7 @@ namespace Belle2 {
     cout << "  - sigmaAlpha: " << getSigmaAlpha() << endl;
   }
 
-  typedef std::pair<double, double> Pair;
+  typedef std::pair<double, double> Pair; /**< Shorthand for std::pair<double, double> */
 
   std::vector<std::pair<double, double> > TOPGeoBarSegment::getBrokenGlueContour() const
   {

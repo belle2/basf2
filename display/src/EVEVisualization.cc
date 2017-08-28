@@ -1186,6 +1186,8 @@ void EVEVisualization::makeTracks()
     }
   }
 
+  m_consttrackpropagator->SetMagField(0, 0, -1.5);
+
   m_eclData->DataChanged(); //update limits (Empty() won't work otherwise)
   if (!m_eclData->Empty()) {
     m_eclData->SetAxisFromBins(0.0,

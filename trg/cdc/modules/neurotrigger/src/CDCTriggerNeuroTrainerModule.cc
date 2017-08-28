@@ -306,20 +306,26 @@ CDCTriggerNeuroTrainerModule::event()
       for (unsigned irep = 0; irep < reps.size() && !foundValidRep; ++irep) {
         if (!recoTrack->wasFitSuccessful(reps[irep]))
           continue;
-        // get state (position, momentum etc.) from first hit
-        genfit::MeasuredStateOnPlane state =
-          recoTrack->getMeasuredStateOnPlaneFromFirstHit(reps[irep]);
+        // get state (position, momentum etc.) from hit closest to IP and
         // extrapolate to z-axis (may throw an exception -> continue to next representation)
         try {
+          genfit::MeasuredStateOnPlane state =
+            recoTrack->getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0), reps[irep]);
+          TVector3 closestPos = state.getPos();
           reps[irep]->extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000));
+          // flip tracks if necessary, such that all track go outward from the IP
+          if (state.getMom().Dot(closestPos - state.getPos()) < 0) {
+            state.setPosMom(state.getPos(), -state.getMom());
+            state.setChargeSign(-state.getCharge());
+          }
+          // get track parameters
+          phi0Target = state.getMom().Phi();
+          invptTarget = state.getCharge() / state.getMom().Pt();
+          thetaTarget = state.getMom().Theta();
+          zTarget = state.getPos().Z();
         } catch (...) {
           continue;
         }
-        // get track parameters
-        phi0Target = state.getMom().Phi();
-        invptTarget = reps[irep]->getCharge(state) / state.getMom().Pt();
-        thetaTarget = state.getMom().Theta();
-        zTarget = state.getPos().Z();
         // break loop
         foundValidRep = true;
       }

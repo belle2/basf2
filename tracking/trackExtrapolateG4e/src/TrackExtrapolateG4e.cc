@@ -1106,6 +1106,7 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
     G4ErrorSymMatrix covG4e(5, 0); // in Geant4e units (GeV/c, cm)
     fromPhasespaceToG4e(lastMomentum, lastCov, covG4e); // in Geant4e units (GeV/c, cm)
     g4eState.SetData("g4e_" + particle->GetParticleName(), posG4e, momG4e);
+    g4eState.SetParameters(posG4e, momG4e); // compute private-state parameters from momG4e
     g4eState.SetError(covG4e);
   } catch (genfit::Exception) {
     B2WARNING("genfit::MeasuredStateOnPlane() exception: skipping extrapolation for this track. initial momentum = ("

@@ -23,13 +23,13 @@ from sklearn.externals.joblib import Parallel, delayed
 import matplotlib.pyplot as plt
 
 
-def f(x):
+def f(x, general_options, process_number):
     """Returns the figure of merit for the optimization.
     The functions trains the classifier with the given hyperparamters on the training sample and
     calculates the AUC on the independet test sample.
     """
     g_options = general_options
-    g_options.m_identifier = "test.xml"
+    g_options.m_identifier = "test{}.xml".format(process_number)
     options = basf2_mva.FastBDTOptions()
     options.m_nTrees = int(x[0])
     options.m_nLevels = int(x[1])
@@ -50,11 +50,19 @@ if __name__ == "__main__":
     general_options.m_variables = basf2_mva.vector('p', 'pz', 'daughter(0, Kid)', 'chiProb', 'M')
     general_options.m_target_variable = "isSignal"
 
-    # Start optimization
-    res = skopt.gp_minimize(f,  # the function to minimize
-                            [(10, 1000), (2, 6)],  # the bounds on each dimension of x
-                            x0=[10, 2],  # initial guess
-                            n_calls=20)  # number of evaluations of f
+    # init optimizer
+    optimizer = skopt.Optimizer(dimensions=[Integer(10, 1000), Integer(2, 6)], n_initial_points=3)
+
+    # calculate initial guess
+    initial_guess = [10, 2]
+    initial_res = f(initial_guess, general_options, 0)
+    optimizer.tell(initial_guess, initial_res)
+
+    # optimize
+    for i in range(10):
+        x = optimizer.ask(n_points=2)  # x is a list of n_points points
+        y = Parallel()(delayed(f)(v, general_options, index) for index, v in enumerate(x))  # evaluate points in parallel
+        res = optimizer.tell(x, y)
 
     # Give some results
     print(res)

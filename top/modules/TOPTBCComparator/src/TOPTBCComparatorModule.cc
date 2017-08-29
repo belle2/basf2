@@ -11,6 +11,7 @@
 #include <framework/core/HistoModule.h>
 #include <top/modules/TOPTBCComparator/TOPTBCComparatorModule.h>
 #include <top/geometry/TOPGeometryPar.h>
+#include <top/geometry/FrontEndMapper.h>
 #include <framework/pcore/RbTuple.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <utility>
@@ -47,6 +48,10 @@ namespace Belle2 {
              bool(true));
     addParam("outputFile", m_outputFile,
              "output file containing the monitoring plots", string("TBCComparisonResults.root"));
+    addParam("minCalPulses", m_minCalPulses,
+             "minimum number of calibration pulses need to flag a sample as non-empty", short(200));
+    addParam("numSamples", m_numSamples,
+             "number of samples that have been calibrated", short(256));
 
   }
 
@@ -83,6 +88,7 @@ namespace Belle2 {
       B2WARNING("Uncaught exception in parsing the input string. Ending the parsing."); // I should never reach thispoint
       return 0;
     }
+
     return 1;
   }
 
@@ -144,41 +150,88 @@ namespace Belle2 {
       return;
     }
 
-    std::string inputString;
-    int totCalSets = 0; // counter to check how many stest are seen in the input list
-    // reads the Input file line by-line
-    while (std::getline(inputDirectoryListFile, inputString)) {
-      //  B2DEBUG("Reading string " << inputString << " for histogram initialization.");
+    // Counter to check how many stest are seen in the input list. Used only for the log output
+    int totCalSets = 0;
 
-      parseInputDirectoryLine(
-        inputString); // This initializes m_calSetDirectory and m_calSetLabel, even if now only m_calSetLabel will be used
+    std::string inputString;
+
+    // reads the Input file line by-line to initialize the correct number of histogram sets, and reat the labels..
+    // This is effectively a loop over all the calsets.
+    while (std::getline(inputDirectoryListFile, inputString)) {
+
+      // This initializes m_calSetDirectory and m_calSetLabel, even if now only m_calSetLabel will be used
+      parseInputDirectoryLine(inputString);
 
       B2INFO("Initializing histograms for Calibration set located at " << m_calSetDirectory << " with label " << m_calSetLabel);
 
+      // To be used to initialize the histograms in the following
+      std::string name;
+      std::string title;
 
-      // Initializes all the histograms
+
+      // ------
+      // Calset-by-calset histograms.
+      // initialize here all the histograms that appear once per calibration set, and not slot-by-slot
+      // ------
+
+      name = str(format("TOPAverageDeltaT_CalSet_%1%") % m_calSetLabel);
+      title = str(format("Average value of #Delta T VS global channel number. CalSet %1%") %  m_calSetLabel);
+      m_topAverageDeltaT.push_back(new TH1F(name.c_str(), title.c_str(), 512 * 16, 0., 512 * 16.));
+
+
+      name = str(format("TOPSigmaDeltaT_CalSet_%1%") % m_calSetLabel);
+      title = str(format("Sigma value of #Delta T VS global channel number. CalSet %1%") %  m_calSetLabel);
+      m_topSigmaDeltaT.push_back(new TH1F(name.c_str(), title.c_str(), 512 * 16, 0., 512 * 16.));
+
+      name = str(format("TOPSampleOccupancy_CalSet_%1%") % m_calSetLabel);
+      title = str(format("Average number of calpulses per sample VS global channel number.  CalSet %1%") %  m_calSetLabel);
+      m_topSampleOccupancy.push_back(new TH1F(name.c_str(), title.c_str(), 512 * 16, 0., 512 * 16.));
+
+
+      // ------
+      // Slot-by-slot histograms.
+      // Use this loop to initialize  all the histograms that appear once per calibration set and per each slot
+      // ------
       for (int iSlot = 0; iSlot < 16; iSlot ++) {
-        // single CalSet monitoring
-        std::string name = str(format("SlotAverageDeltaT_Slot%1%_CalSet_%2%") % (iSlot) % m_calSetLabel);
-        std::string title = str(format("Average value of #Delta T VS Channel number.  Slot %1%, CalSet %2%") % (iSlot) % m_calSetLabel);
+
+        // Average DeltaT stuff
+        name = str(format("SlotAverageDeltaT_Slot%1%_CalSet_%2%") % (iSlot) % m_calSetLabel);
+        title = str(format("Average value of #Delta T VS Channel number.  Slot %1%, CalSet %2%") % (iSlot) % m_calSetLabel);
         m_slotAverageDeltaT[iSlot].push_back(new TH1F(name.c_str(), title.c_str(), 512, 0., 512.));
 
-        name = str(format("SlotRMSDeltaT_Slot%1%_CalSet_%2%") % (iSlot) % m_calSetLabel);
-        title = str(format("RMS of #Delta T VS Channel number.  Slot %1%, CalSet %2%") % (iSlot) % m_calSetLabel);
+        name = str(format("SlotSigmaDeltaT_Slot%1%_CalSet_%2%") % (iSlot) % m_calSetLabel);
+        title = str(format("Standard deviation of #Delta T VS Channel number.  Slot %1%, CalSet %2%") % (iSlot) % m_calSetLabel);
         m_slotSigmaDeltaT[iSlot].push_back(new TH1F(name.c_str(), title.c_str(), 512, 0., 512.));
 
         name = str(format("SlotAverageDeltaTMap_Slot%1%_CalSet_%2%") % (iSlot) % m_calSetLabel);
         title = str(format("Map of the average value of #Delta T on the 256 samples.  Slot %1%, CalSet %2%") % (iSlot) % m_calSetLabel);
         m_slotAverageDeltaTMap[iSlot].push_back(new TH2F(name.c_str(), title.c_str(), 64, 0., 64., 8, 0., 8.));
 
-        name = str(format("SlotRMSDeltaTMap_Slot%1%_CalSet_%2%") % (iSlot) % m_calSetLabel);
+        name = str(format("SlotSigmaDeltaTMap_Slot%1%_CalSet_%2%") % (iSlot) % m_calSetLabel);
         title = str(format("Map of the RMS of #Delta T on the 256 samples .  Slot %1%, CalSet %2%") % (iSlot) % m_calSetLabel);
         m_slotSigmaDeltaTMap[iSlot].push_back(new TH2F(name.c_str(), title.c_str(), 64, 0., 64., 8, 0., 8.));
 
-        name = str(format("SlotDeltaTScatter_Slot%1%_CalSet_%2%") % (iSlot) % m_calSetLabel);
-        title = str(format("Mean and sigma of #DeltaT VS channel number (256 samples summed together).  Slot %1%, CalSet %2%") %
+
+        // Occupancy stuff
+        name = str(format("SlotSampleOccupancy_Slot%1%_CalSet_%2%") % (iSlot) % m_calSetLabel);
+        title = str(format("Average number of calpulses per sample used to calibrate Slot %1%, CalSet %2%") % (iSlot) % m_calSetLabel);
+        m_slotSampleOccupancy[iSlot].push_back(new TH1F(name.c_str(), title.c_str(), 512, 0., 512.));
+
+        name = str(format("SlotEmptySamples_Slot%1%_CalSet_%2%") % (iSlot) % m_calSetLabel);
+        title = str(format("Number samples with less than %3% calpulses per each slot channel. Slot %1%, CalSet %2%") %
+                    (iSlot) % m_calSetLabel % m_minCalPulses);
+        m_slotEmptySamples[iSlot].push_back(new TH1F(name.c_str(), title.c_str(), 512, 0., 512.));
+
+        name = str(format("SlotSampleOccupancyMap_Slot%1%_CalSet_%2%") % (iSlot) % m_calSetLabel);
+        title = str(format("Map of the average number of calpulses per sample used to calibrate Slot %1%, CalSet %2%") %
                     (iSlot) % m_calSetLabel);
-        m_slotDeltaTScatter[iSlot].push_back(new TH2F(name.c_str(), title.c_str(), 512, 0., 512., 1000, 15., 25.));
+        m_slotSampleOccupancyMap[iSlot].push_back(new TH2F(name.c_str(), title.c_str(), 64, 0., 64., 8, 0., 8.));
+
+        name = str(format("SlotEmptySamplesMap_Slot%1%_CalSet_%2%") % (iSlot) % m_calSetLabel);
+        title = str(format("Map of the number samples with less than %3% calpulses per each. Slot %1%, CalSet %2%") %
+                    (iSlot) % m_calSetLabel % m_minCalPulses);
+        m_slotEmptySamplesMap[iSlot].push_back(new TH2F(name.c_str(), title.c_str(), 64, 0., 64., 8, 0., 8.));
+
 
 
         // Ratios
@@ -199,6 +252,7 @@ namespace Belle2 {
         title = str(format("Map of the ratio of the RMS of #Delta T in CalSet %2% over the previous one.  Slot %1%") %
                     (iSlot) % m_calSetLabel);
         m_slotSigmaDeltaTMapComparison[iSlot].push_back(new TH2F(name.c_str(), title.c_str(), 64, 0., 64., 8, 0., 8.));
+
       }
 
       totCalSets++;
@@ -211,50 +265,97 @@ namespace Belle2 {
 
   int TOPTBCComparatorModule::analyzeCalFile()
   {
-    B2INFO(" Starting the analisys");
+    // Here the histograms are filled
+    // WARNING! What root calls "RMS" is actually a standard deviation
 
+    B2INFO(" Starting the analisys of " << m_calSetDirectory << m_calSetFile->GetName());
+
+    // Sanity check on the parsed parameters
     if (m_slotID < 0 || m_boardstackID < 0 || m_scrodID < 0) {
       B2WARNING("Negative slot, BS or scrod ID found while calling analyzeCalFile(). Looks like they have not been initialized, or that a function re-initialized them");
       return 0;
     }
 
-    // Now loops over all the histograms that should be found in the file
+    // Loop over all the histograms that should be found in the file
     for (short iChannel = 0; iChannel < 128; iChannel++) {
+
+      // Pics up one histogram just to check that the channel iChannel was actually used to calculate the calibrations
       if (!m_calSetFile->Get(str(format("timeDiff_ch%1%") % (iChannel)).c_str())) {
-        //      B2INFO("No Calibrations have been calculated slot " << m_slotID << ", BS " << m_boardstackID << " channel " << iChannel);
+        B2INFO("No Calibrations have been calculated slot " << m_slotID << ", BS " << m_boardstackID << " channel " << iChannel);
         continue;
       }
+
+
+
+      // ---------
+      // 1) Define some channel numbering quantities
+      // Watchout: m_slotID is in [1..16] so slot m_slotID is on the element m_slotID-1 of the array
+      // ---------
+
+      short hardwareChannel = iChannel + 128 * m_boardstackID; // 0-511 across the whole module, BS by BS
+      auto& chMapper = TOP::TOPGeometryPar::Instance()->getChannelMapper();
+      short pixelID = chMapper.getPixelID(hardwareChannel); // 1-512 across the whole module, in rows
+      short colNum = (pixelID - 1) % 64 + 1; // 1- 64  column ID (right to left looking from the quartz to the PMTs)
+      short rowNum = (pixelID - 1) / 64 + 1 ; // 1- 8 row ID (bottom to top looking from the quartz to the PMTs)
+      short globalChannel = hardwareChannel + 512 * (m_slotID -
+                                                     1); // channel number across the whole detector, 0-8191. Used for cal monitorin only
+
+
+      // ---------
+      // 2) Channel-by-channel DeltaT summaries (average on the 256 samples of each set)
+      // ---------
+
+      // Checks that the histogram needed here is not corrupted before using it
       if (!m_calSetFile->Get(str(format("timeDiffcal_ch%1%") % (iChannel)).c_str())) {
-        B2WARNING("Unexpoected problem in opening " << str(format("timeDiffcal_ch%1%") % (iChannel)));
-        continue;
+        B2WARNING("Error opening " << str(format("timeDiffcal_ch%1%") % (iChannel)));
+      } else {
+        TH2F* h_timeDiffcal = (TH2F*)m_calSetFile->Get(str(format("timeDiffcal_ch%1%") % (iChannel)).c_str());
+        TH1D* h_projection = h_timeDiffcal->ProjectionY("h_projection", 1, m_numSamples); // full projection
+
+        m_slotAverageDeltaT[m_slotID - 1][m_calSetID]->SetBinContent(hardwareChannel + 1, h_projection->GetMean());
+        m_slotAverageDeltaT[m_slotID - 1][m_calSetID]->SetBinError(hardwareChannel + 1,
+                                                                   h_projection->GetMeanError()); // Do we trust root on this?
+        m_slotSigmaDeltaT[m_slotID - 1][m_calSetID]->SetBinContent(hardwareChannel + 1,
+                                                                   h_projection->GetRMS()); // WARNING! What root calls "RMS" is actually a standard deviation
+        m_slotSigmaDeltaT[m_slotID - 1][m_calSetID]->SetBinError(hardwareChannel + 1,
+                                                                 h_projection->GetRMSError()); // WARNING! What root calls "RMS" is actually a standard deviation
+
+        m_slotAverageDeltaTMap[m_slotID - 1][m_calSetID]->SetBinContent(colNum, rowNum, h_projection->GetMean());
+        m_slotSigmaDeltaTMap[m_slotID - 1][m_calSetID]->SetBinContent(colNum, rowNum,
+            h_projection->GetRMS());
+
+        m_topAverageDeltaT[m_calSetID]->SetBinContent(globalChannel + 1, h_projection->GetMean());
+        m_topSigmaDeltaT[m_calSetID]->SetBinContent(globalChannel + 1, h_projection->GetRMS());
       }
 
-      // First: calulate average and RMS of the DeltaT distribution after the calibration
-      TH2F* h_timeDiffcal = (TH2F*)m_calSetFile->Get(str(format("timeDiffcal_ch%1%") % (iChannel)).c_str());
-      for (int iSample = 1; iSample < m_numSamples + 1; iSample++) {
-        TH1D* h_projection = h_timeDiffcal->ProjectionY("h_projection", iSample, iSample); // 1 bin-wide projection onto Y
-        m_slotAverageDeltaT[m_slotID][m_calSetID]->SetBinContent(iSample + 1, h_projection->GetMean());
-        m_slotAverageDeltaT[m_slotID][m_calSetID]->SetBinError(iSample + 1, h_projection->GetMeanError()); // Do we trust root on this?
-        m_slotSigmaDeltaT[m_slotID][m_calSetID]->SetBinContent(iSample + 1,
-                                                               h_projection->GetRMS()); // WARNING! What root calls "RMS" is actually a standard deviation
-        m_slotSigmaDeltaT[m_slotID][m_calSetID]->SetBinError(iSample + 1,
-                                                             h_projection->GetRMSError()); // WARNING! What root calls "RMS" is actually a standard deviation
-        delete h_projection;
+      // ---------
+      // 3) Channel-by-channel Occupancy summaries (average on the 256 samples of each set)
+      // ---------
+
+      // Checks that the histogram needed here is not corrupted before using it
+      if (!m_calSetFile->Get(str(format("sampleOccup_ch%1%") % (iChannel)).c_str())) {
+        B2WARNING("Error opening " << str(format("sampleOccup_ch%1%") % (iChannel)));
+      } else {
+        TH1F* h_sampleOccup = (TH1F*)m_calSetFile->Get(str(format("sampleOccup_ch%1%") % (iChannel)).c_str());
+
+        // reads the occupancy histogram bin-by-by to look for (almost) empty samples
+        int nEmpty = 0;
+        for (int iSample = 1; iSample < m_numSamples + 1 ; iSample++) {
+          if (h_sampleOccup->GetBinContent(iSample) < m_minCalPulses) nEmpty++;
+        }
+
+        m_slotSampleOccupancy[m_slotID - 1][m_calSetID]->SetBinContent(hardwareChannel + 1,  h_sampleOccup->Integral() / m_numSamples);
+        m_slotEmptySamples[m_slotID - 1][m_calSetID]->SetBinContent(hardwareChannel + 1,  nEmpty);
+
+        m_slotSampleOccupancyMap[m_slotID - 1][m_calSetID]->SetBinContent(colNum, rowNum,  h_sampleOccup->Integral() / m_numSamples);
+        m_slotEmptySamplesMap[m_slotID - 1][m_calSetID]->SetBinContent(colNum, rowNum,  nEmpty);
+
+        m_topSampleOccupancy[m_calSetID]->SetBinContent(globalChannel + 1, h_sampleOccup->Integral() / m_numSamples);
+
       }
 
-      // Channel-by-channel summary maps
-      short moduleChannel = iChannel + 128 * m_boardstackID; // go to the 0-511 representation of the channels
-      short colNum = (moduleChannel - 1) % 64 + 1; // 1- 64 as the map bins
-      short rowNum = (moduleChannel - 1) / 64 + 1; // 1- 8 as the map bins
 
-      TH1D* h_projection = h_timeDiffcal->ProjectionY("h_projection", 1, 256); // full projection
-      m_slotAverageDeltaTMap[m_slotID][m_calSetID]->SetBinContent(colNum, rowNum, h_projection->GetMean());
-      m_slotSigmaDeltaTMap[m_slotID][m_calSetID]->SetBinContent(colNum, rowNum,
-                                                                h_projection->GetRMS()); // WARNING! What root calls "RMS" is actually a standard deviation
 
-      m_slotDeltaTScatter[m_slotID][m_calSetID]->SetBinContent(colNum, rowNum, h_projection->GetMean());
-      m_slotDeltaTScatter[m_slotID][m_calSetID]->SetBinError(colNum, rowNum,
-                                                             h_projection->GetRMS()); // WARNING! What root calls "RMS" is actually a standard deviation
     }
     return 1;
   }
@@ -332,30 +433,37 @@ namespace Belle2 {
     B2INFO("Creating output file " << m_outputFile);
     TFile outfile(m_outputFile.c_str(), "recreate");
 
-
     B2INFO("Writing histograms ");
 
-    // Writes the single-set plots in order of calibration set
-    for (int iSet = 0; iSet < m_calSetID; iSet++) {
+    // opens the input list to retrive, one last time, the labels
+    ifstream inputDirectoryListFile(m_inputDirectoryList.c_str());
+    std::string inputString;
+    int iSet = 0;
+    while (std::getline(inputDirectoryListFile, inputString)) {
+      parseInputDirectoryLine(inputString);
+      TDirectory* dirSet = outfile.mkdir(m_calSetLabel.c_str());
+      dirSet->cd();
+
+      m_topAverageDeltaT[iSet]->Write();
+      m_topSigmaDeltaT[iSet]->Write();
+      m_topSampleOccupancy[iSet]->Write();
+
       for (int iSlot = 0; iSlot < 16; iSlot ++) {
+        TDirectory* dirSlot = dirSet->mkdir(str(format("slot%1%") % (iSlot + 1)).c_str());
+        dirSlot->cd();
+
         m_slotAverageDeltaT[iSlot][iSet]->Write();
         m_slotSigmaDeltaT[iSlot][iSet]->Write();
         m_slotAverageDeltaTMap[iSlot][iSet]->Write();
         m_slotSigmaDeltaTMap[iSlot][iSet]->Write();
-        m_slotDeltaTScatter[iSlot][iSet]->Write();
+        m_slotSampleOccupancy[iSlot][iSet]->Write();
+        m_slotEmptySamples[iSlot][iSet]->Write();
+        m_slotSampleOccupancyMap[iSlot][iSet]->Write();
+        m_slotEmptySamplesMap[iSlot][iSet]->Write();
       }
+      dirSet->cd();
+      iSet++;
     }
-
-    // Writes the comparisons for slot
-    for (int iSlot = 0; iSlot < 16; iSlot ++) {
-      for (int iSet = 0; iSet < m_calSetID; iSet++) {
-
-        // to be done!
-
-      }
-    }
-
-
   }
 
 } // end Belle2 namespace

@@ -106,22 +106,29 @@ namespace Belle2 {
 
 
   private:
+    // steering parameters
     std::string m_inputDirectoryList =
       ""; /**< List of the directories (one per IOV) in which the files with the calibration constants of the SCODS are stored (i.e. the output of the TBC production module)*/
     bool m_compareToPreviousSet =
       true; /**< Determines if the reverence set for the ratio is the first CalSet of the list (if false) or if each CalSet is compared to the previous one (if true) */
     std::string m_outputFile = ""; /**< File in which the output histograms are stored */
+    short m_minCalPulses = 200; /** < Minimum number of calpulses to declare a sample as non-empty> */
+    short m_numSamples = 256; /**< Number of samples that have been calibrated*/
 
+
+    // utilities
     std::string m_calSetDirectory; /**< Label to be used to indetify the histograms of a the calibration set*/
     TFile*  m_calSetFile =
-      nullptr; /**< File containing the calibration constants, of the SCROD being analyzed, ordered form Slot1 BS0 to Slot16 BS3.*/
-    std::string m_calSetLabel = ""; /**< Label to be used to indetify the histograms of a the calibration set*/
+      nullptr; /**< File containing the calibration constants of the SCROD being analyzed.*/
+    std::string m_calSetLabel; /**< Label to be used to identify the histograms of a the calibration set. */
     short m_slotID = -1; /**< ID of the slot whose calibrations are being analyzed*/
     short m_boardstackID = -1; /**< ID of the slot whose calibrations are being analyzed*/
     short m_scrodID = -1; /**< ID of the scrod  whose calibrations are being analyzed*/
     short m_calSetID = 0; /** < Internal ID of the calibration set that is being analyzed */
+    short m_totCalSets = 0; /** < Total number of calibration sets, as counted int defineHistos */
 
 
+    // Delta T plots, slot-by-slot
     std::vector<TH1F*>
     m_slotAverageDeltaT[16]; /**< Average of the DeltaT (time difference petween the calibraiton pulses) distribution, as function of the channel number*/
     std::vector<TH1F*>
@@ -131,9 +138,29 @@ namespace Belle2 {
     std::vector<TH2F*>
     m_slotSigmaDeltaTMap[16]; /**< Map of the Standard deviation of the  DeltaT (time difference petween the calibraiton pulses) distribution */
 
-    std::vector<TH2F*>
-    m_slotDeltaTScatter[16]; /**< Scatter plot of DeltaT (time difference petween the calibraiton pulses) versus the channel number*/
+    // Average timing plots, all the detector at once
+    std::vector<TH1F*>
+    m_topAverageDeltaT; /**< Average of the DeltaT (time difference petween the calibraiton pulses) distribution, as function of the channel number on the whole detector*/
+    std::vector<TH1F*>
+    m_topSigmaDeltaT; /**< Standard deviation of the DeltaT (time difference petween the calibraiton pulses) distribution, as function of the channel number  on the whole detector*/
 
+
+    // Occupancy plots, slot-by-slot
+    std::vector<TH1F*>
+    m_slotSampleOccupancy[16]; /**< Average number of calpulses per sample used in the minimization, as function of the channel number*/
+    std::vector<TH1F*>
+    m_slotEmptySamples[16]; /**< Number of (semi-)empty samples in each channel.*/
+    std::vector<TH2F*>
+    m_slotSampleOccupancyMap[16]; /**< Map of the average number of calpulses per sample used in the minimizat on */
+    std::vector<TH2F*>
+    m_slotEmptySamplesMap[16]; /**< Map of the number of (semi-)empty samples.*/
+
+    // Occupancy plot, all the detector at once
+    std::vector<TH1F*>
+    m_topSampleOccupancy; /**< Average number of calpulses per sample used in the minimization, as function of the channel number on the whole detector*/
+
+
+    // Delta T ratio plots, slot-by-slot
     std::vector<TH1F*>
     m_slotAverageDeltaTComparison[16]; /**< Ratio of the average of the DeltaT (time difference petween the calibraiton pulses) distribution, as function of the channel number*/
     std::vector<TH1F*>
@@ -143,8 +170,6 @@ namespace Belle2 {
     std::vector<TH2F*>
     m_slotSigmaDeltaTMapComparison[16]; /**< Map of Ratio of the Standard deviation on  DeltaT (time difference petween the calibraiton pulses) */
 
-    short m_totCalSets = 0; /** < Total number of calibration sets, as counted int defineHistos */
-    short m_numSamples = 256; /**< Number of samples that have been calibrated*/
 
 
   };

@@ -36,11 +36,13 @@ namespace Belle2 {
       return obj;
     }
 
-    virtual TNamed* constructObject(std::string name) = 0;
-
     Belle2::Calibration::KeyType getIOV() {return m_iov;}
 
     void setIOV(Belle2::Calibration::KeyType expRun) {m_iov = expRun;}
+
+  protected:
+    virtual TNamed* constructObject(std::string name) = 0;
+
 
   private:
     /** IOVs for managed object */

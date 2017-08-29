@@ -42,6 +42,8 @@ namespace Belle2 {
     void event() final;
     /// Reset the m_runCollectOnRun flag, if necessary, to begin collection again
     void beginRun() final;
+    /// Write the current collector objects to a file and clear their memory
+    void endRun() final;
 
     void defineHisto();
 
@@ -74,6 +76,8 @@ namespace Belle2 {
     virtual void collect() {}
     /// Replacement for beginRun(). Do anything you would normally do in beginRun here
     virtual void startRun() {}
+    /// Replacement for endRun(). Do anything you would normally do in endRun here.
+    virtual void closeRun() {}
 
     virtual void inDefineHisto() {}
 

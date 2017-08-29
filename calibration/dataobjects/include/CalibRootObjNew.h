@@ -27,6 +27,7 @@ namespace Belle2 {
       if (m_object) {
         m_object->SetDirectory(nullptr);
         delete m_object;
+        B2DEBUG(100, "Deleted the object stored inside " << this->GetName());
       }
     }
 
@@ -36,6 +37,7 @@ namespace Belle2 {
     */
     virtual Long64_t Merge(TCollection* hlist) override
     {
+      B2DEBUG(100, "Running Merge() on " << this->GetName());
       Long64_t nMerged = 0;
       if (hlist) {
         const CalibRootObjNew<T>* xh = 0;
@@ -46,6 +48,7 @@ namespace Belle2 {
           ++nMerged;
         }
       }
+      B2DEBUG(100, "Merged " << nMerged << " objects");
       return nMerged;
     }
 
@@ -67,6 +70,7 @@ namespace Belle2 {
      */
     explicit CalibRootObjNew(T* object) : CalibRootObjBase()
     {
+      B2DEBUG(100, "Creating CalibRootObjNew");
       if (m_object) {
         delete m_object;
       }
@@ -96,6 +100,7 @@ namespace Belle2 {
      */
     virtual TNamed* constructObject(std::string name) override
     {
+      B2DEBUG(100, "Creating new CalibRootObjNew with name " << name);
       T* newObj = new T();
       cloneObj(m_object, newObj);
 
@@ -114,6 +119,7 @@ namespace Belle2 {
       newObj->Reset();
       CalibRootObjNew<T>* newCalibObj = new CalibRootObjNew<T>(newObj);
       newCalibObj->SetName(name.c_str());
+      B2DEBUG(100, "Created CalibRootObjNew with name " << name);
       return newCalibObj;
     }
 
@@ -131,10 +137,10 @@ namespace Belle2 {
     */
     void cloneObj(TObject* source, TObject* dest)
     {
+      B2DEBUG(100, "Held object wil be treated as a generic TObject and have Copy() called.");
       // Construct the object by making a copy
       // of the source object
       source->Copy(*dest);
-      //*((T*) dest) = *((T*) source);
     }
 
     /**
@@ -150,6 +156,7 @@ namespace Belle2 {
      */
     void cloneObj(TTree* source, TTree*& dest)
     {
+      B2DEBUG(100, "Held object is a TTree which will be have CloneTree() called.");
       if (dest) {
         // Empty tree is in dest by default.
         delete dest;

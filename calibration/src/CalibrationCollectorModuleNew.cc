@@ -38,6 +38,15 @@ void CalibrationCollectorModuleNew::defineHisto()
 {
   m_dir = gDirectory->mkdir(getName().c_str());
   m_manager.setDirectory(m_dir);
-  B2INFO("Collector Module ''" << getName() << "'' saving output to TDirectory " << m_dir->GetPath());
+  B2INFO("Saving output to TDirectory " << m_dir->GetPath());
+  m_manager.createDirectories();
+  B2DEBUG(100, "Creating directories for individual collector objects.");
   inDefineHisto();
+}
+
+void CalibrationCollectorModuleNew::endRun()
+{
+  closeRun();
+  m_manager.writeCurrentObjects(*m_emd);
+  m_manager.clearCurrentObjects(*m_emd);
 }

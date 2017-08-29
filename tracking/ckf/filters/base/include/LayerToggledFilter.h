@@ -24,6 +24,7 @@ namespace Belle2 {
     LayerToggledFilter() : AFilterFactory::CreatedFilter()
     {
       AFilterFactory::CreatedFilter::addProcessingSignalListener(&m_highLayerFilter);
+      AFilterFactory::CreatedFilter::addProcessingSignalListener(&m_equalLayerFilter);
       AFilterFactory::CreatedFilter::addProcessingSignalListener(&m_lowLayerFilter);
     }
 
@@ -34,6 +35,7 @@ namespace Belle2 {
       m_param_toggleOnLayer, "", m_param_toggleOnLayer);
 
       m_highLayerFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "high"));
+      m_equalLayerFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "equal"));
       m_lowLayerFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "low"));
     }
 
@@ -43,6 +45,9 @@ namespace Belle2 {
       if (layer > m_param_toggleOnLayer)
       {
         return m_highLayerFilter(currentState);
+      } else if (layer == m_param_toggleOnLayer)
+      {
+        return m_equalLayerFilter(currentState);
       } else {
         return m_lowLayerFilter(currentState);
       }
@@ -54,6 +59,8 @@ namespace Belle2 {
 
     /// The filter to use for layers higher then the toggle layer.
     TrackFindingCDC::ChooseableFilter<AFilterFactory> m_highLayerFilter;
+    /// The filter to use for layers equal then the toggle layer.
+    TrackFindingCDC::ChooseableFilter<AFilterFactory> m_equalLayerFilter;
     /// The filter to use for layers smaller or equal then the toggle layer.
     TrackFindingCDC::ChooseableFilter<AFilterFactory> m_lowLayerFilter;
   };

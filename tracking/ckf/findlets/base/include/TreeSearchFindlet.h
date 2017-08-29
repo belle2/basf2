@@ -12,7 +12,10 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
+#include <tracking/ckf/filters/base/CKFStateTruthVarSet.h>
+
 #include <tracking/ckf/findlets/base/HitSelector.h>
+#include <tracking/ckf/findlets/base/StateTeacher.h>
 #include <tracking/ckf/findlets/base/StateTransformer.h>
 
 namespace Belle2 {
@@ -63,12 +66,14 @@ namespace Belle2 {
     {
       Super::addProcessingSignalListener(&m_hitSelector);
       Super::addProcessingSignalListener(&m_hitFinder);
+      Super::addProcessingSignalListener(&m_stateTeacher);
     }
 
     /// Expose the parameters of the subfindlet
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
       m_hitSelector.exposeParameters(moduleParamList, prefix);
       m_hitFinder.exposeParameters(moduleParamList, prefix);
+      m_stateTeacher.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "stateTeacher"));
     }
 
     /**
@@ -103,6 +108,9 @@ namespace Belle2 {
     /// Subfindlet: hit selector
     HitSelector<AHitSelectorFilterFactory> m_hitSelector;
 
+    /// Subfindlet state teacher
+    StateTeacher<CKFStateTruthVarSet<ASeedObject, AHitObject>> m_stateTeacher;
+
     /// Subfindlet: hit finder
     AHitFinder m_hitFinder;
 
@@ -134,6 +142,9 @@ namespace Belle2 {
     // Transform the hits into states
     std::vector<StateObject*> childStates;
     m_stateTransformer.transform(matchingHits, childStates, currentState);
+
+    // Add truth information
+    m_stateTeacher.apply(childStates);
 
     // Filter out bad states
     m_hitSelector.apply(childStates);

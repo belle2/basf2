@@ -107,21 +107,36 @@ namespace Belle2 {
 
     m_firstFilter.apply(childStates);
     B2DEBUG(50, "First filter has found " << childStates.size() << " states");
+    B2DEBUG(50, "Left are " << std::count_if(childStates.begin(), childStates.end(), [](const auto & childState) {
+      return childState->getTruthInformation();
+    }) << "truths");
 
     if (m_param_advance) {
       m_advanceAlgorithm.apply(childStates);
       B2DEBUG(50, "Advance has found " << childStates.size() << " states");
+      B2DEBUG(50, "Left are " << std::count_if(childStates.begin(), childStates.end(), [](const auto & childState) {
+        return childState->getTruthInformation();
+      }) << "truths");
     }
 
     m_secondFilter.apply(childStates);
     B2DEBUG(50, "Second filter has found " << childStates.size() << " states");
+    B2DEBUG(50, "Left are " << std::count_if(childStates.begin(), childStates.end(), [](const auto & childState) {
+      return childState->getTruthInformation();
+    }) << "truths");
 
     if (m_param_fit) {
       applyAndFilter(childStates, m_fitterAlgorithm);
       B2DEBUG(50, "Fit filter has found " << childStates.size() << " states");
+      B2DEBUG(50, "Left are " << std::count_if(childStates.begin(), childStates.end(), [](const auto & childState) {
+        return childState->getTruthInformation();
+      }) << "truths");
     }
 
     m_thirdFilter.apply(childStates);
     B2DEBUG(50, "Third filter has found " << childStates.size() << " states");
+    B2DEBUG(50, "Left are " << std::count_if(childStates.begin(), childStates.end(), [](const auto & childState) {
+      return childState->getTruthInformation();
+    }) << "truths");
   }
 }

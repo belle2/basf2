@@ -9,7 +9,7 @@
  **************************************************************************/
 #include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectFilterFactory.h>
 #include <tracking/ckf/filters/cdcToSpacePoint/state/BaseCKFCDCToSpacePointStateObjectFilter.h>
-#include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectTruthVarSet.h>
+#include <tracking/ckf/filters/base/CKFStateTruthVarSet.h>
 #include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectVarSet.h>
 #include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectBasicVarSet.h>
 
@@ -27,16 +27,16 @@ using namespace TrackFindingCDC;
 
 namespace {
   /// MC filter for VXD - CDC relations.
-  using MCCKFCDCToSpacePointStateObjectFilter = MCFilter<CKFCDCToSpacePointStateObjectTruthVarSet>;
+  using MCCKFCDCToSpacePointStateObjectFilter = MCFilter<CKFStateTruthVarSet<RecoTrack, SpacePoint>>;
 
   /// Recording filter for VXD - CDC relations.
   using RecordingCKFCDCToSpacePointStateObjectFilter =
-    RecordingFilter<VariadicUnionVarSet<CKFCDCToSpacePointStateObjectTruthVarSet,
+    RecordingFilter<VariadicUnionVarSet<CKFStateTruthVarSet<RecoTrack, SpacePoint>,
     CKFCDCToSpacePointStateObjectBasicVarSet, CKFCDCToSpacePointStateObjectVarSet>>;
 
   /// Basic recording filter for VXD - CDC relations.
   using BasicRecordingCKFCDCToSpacePointStateObjectFilter =
-    RecordingFilter<VariadicUnionVarSet<CKFCDCToSpacePointStateObjectTruthVarSet, CKFCDCToSpacePointStateObjectBasicVarSet>>;
+    RecordingFilter<VariadicUnionVarSet<CKFStateTruthVarSet<RecoTrack, SpacePoint>, CKFCDCToSpacePointStateObjectBasicVarSet>>;
 
   /// All filter for VXD - CDC relations.
   using AllCKFCDCToSpacePointStateObjectFilter = AllFilter<BaseCKFCDCToSpacePointStateObjectFilter>;

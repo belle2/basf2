@@ -183,6 +183,18 @@ namespace Belle2 {
       return getWeight() < rhs.getWeight();
     }
 
+    /// Set the truth information
+    void setTruthInformation(bool truthInformation)
+    {
+      m_truthInformation = truthInformation;
+    }
+
+    /// Return the truth information
+    bool getTruthInformation() const
+    {
+      return m_truthInformation;
+    }
+
     /// Set the mSoP
     void setMeasuredStateOnPlane(const genfit::MeasuredStateOnPlane& mSoP)
     {
@@ -289,8 +301,10 @@ namespace Belle2 {
     bool m_hasMSoP = false;
     /// MSoP after advancing. Is undetermined before extrapolating!
     genfit::MeasuredStateOnPlane m_measuredStateOnPlane;
-    /// Temporary storage for the weight (used during overlap check).
+    /// Temporary storage for the weight (used during filtering).
     double m_weight = 0;
+    /// Truth information given by a teacher module
+    bool m_truthInformation = false;
     /// Cache for the position of the mSoP. May be invalid if the mSoP is not set
     TVector3 m_mSoPPosition;
     /// Cache for the momentum of the mSoP. May be invalid if the mSoP is not set

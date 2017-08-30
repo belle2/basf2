@@ -32,7 +32,7 @@ namespace Belle2 {
    * Module for the comparison of different sets of time base correction (TBC) constants and to produce monitoring plots out of a given set.
    * The input constants are given in the histogram format provided by the TOPTimeCalibrator module.
    * The user can specify several calibration sets that are going to be compared each other indicating the folder in which the root files with the histograms are stored.
-   * The modules i sensitive to the name format of the input files. They must follow the standard naming tbcSlotXX_Y-scrodZZZ.root, where XX is ste slot number, Y is the BS number, and ZZZ is the scrodID.
+   * The modules si sensitive to the name format of the input files. They must follow the standard naming tbcSlotXX_Y-scrodZZZ.root, where XX is ste slot number, Y is the BS number, and ZZZ is the scrodID.
    * The list of calibration sets has to be given in a separate txt file, in the format
    *
    * CalibrationSetFolder  Label
@@ -54,6 +54,7 @@ namespace Belle2 {
 
     /**
      * Defining the histograms. Reads once the  m_inputDirectoryList to initialize the proper amount of histograms.
+     * Every new histogram added to the module has to be initialized here.
      */
     void defineHisto();
 
@@ -73,14 +74,32 @@ namespace Belle2 {
     void event();
 
     /**
-     * End-of-run action
+     * End-of-run action.
+     * The main analysis loop over the calibraitonSets happen here. This function has to be modified only if the directory structure
+     * of the TOPTimeBaseCalibrator module output is changed
+     * Both the core functions analyzeCalFile() and makeComparisons() are called here.
      */
     void endRun();
 
     /**
-     * Termination action
+     * Termination action.
+     * The historam writing takes place here
      */
     void terminate();
+
+    /**
+     * Analyzes the calibrations stored in the file m_calSetFile. This is the main function in which the analysis and the hisogram filling takes place.
+     * Every new monitoring histogram added to the module has to be filled here.
+     */
+    int analyzeCalFile();
+
+    /**
+     * Last function to be called, compared the histograms of different datasets filled by analyzeCalFile()
+     * Every new comparison histogram added to the module has to be filled here.
+     */
+    int makeComparisons();
+
+
 
     /**
      * Utility function to parse  the slot and BS id from the calibration file names
@@ -94,15 +113,18 @@ namespace Belle2 {
     int parseInputDirectoryLine(std::string);
 
     /**
-     * Analyzes the calibrations stored in the file m_calSetFile. This is the main function in which the analysy and the hisogram filling takes place.
-     * Returns an error if m_slotID, m_boardstackID or m_scrodID are not properly initialized
+     * Utility function to take the ratio of two histograms using TH1::Divide(), without overwriting the
+     * output name and title initialized in defineHisto().
      */
-    int analyzeCalFile();
+    TH1F* calculateHistoRatio(TH1F*, TH1F*, TH1F*);
 
     /**
-     * Last function to be called, compared the histograms of different datasets filled by analyzeCalFile()
+     * Utility function to take the ratio of two histograms using TH2::Divide(), without overwriting the
+     * output name and title initialized in defineHisto().
      */
-    int makeComparisons();
+    TH2F* calculateHistoRatio(TH2F*, TH2F*, TH2F*);
+
+
 
 
   private:
@@ -169,6 +191,15 @@ namespace Belle2 {
     m_slotAverageDeltaTMapComparison[16]; /**< Map of the Ratio of the  average  DeltaT (time difference petween the calibraiton pulses) */
     std::vector<TH2F*>
     m_slotSigmaDeltaTMapComparison[16]; /**< Map of Ratio of the Standard deviation on  DeltaT (time difference petween the calibraiton pulses) */
+
+
+    // Delta T ratio plots, whole detector
+    std::vector<TH1F*>
+    m_topAverageDeltaTComparison; /**< Average of the DeltaT (time difference petween the calibraiton pulses) distribution, as function of the channel number on the whole detector*/
+    std::vector<TH1F*>
+    m_topSigmaDeltaTComparison; /**< Standard deviation of the DeltaT (time difference petween the calibraiton pulses) distribution, as function of the channel number  on the whole detector*/
+
+
 
 
 

@@ -17,6 +17,7 @@
 #include <tracking/ckf/filters/pxdSpacePoint/SimpleCKFPXDStateFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
+#include <tracking/trackFindingCDC/filters/base/SloppyMCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
@@ -28,6 +29,9 @@ using namespace TrackFindingCDC;
 namespace {
   /// MC filter for VXD - CDC relations.
   using MCCKFCDCToSpacePointStateObjectFilter = MCFilter<CKFStateTruthVarSet<RecoTrack, SpacePoint>>;
+
+  /// Sloppy MC filter for VXD - CDC relations.
+  using SloppyMCCKFCDCToSpacePointStateObjectFilter = SloppyMCFilter<CKFStateTruthVarSet<RecoTrack, SpacePoint>>;
 
   /// Recording filter for VXD - CDC relations.
   using RecordingCKFCDCToSpacePointStateObjectFilter =
@@ -64,6 +68,7 @@ CKFCDCToSpacePointStateObjectFilterFactory::getValidFilterNamesAndDescriptions()
     {"none", "no track combination is valid"},
     {"all", "set all track combinations as good"},
     {"truth", "monte carlo truth"},
+    {"sloppy_truth", "sloppy monte carlo truth"},
     {"pxd_simple", "simple filter to be used in pxd"},
     {"svd_simple", "simple filter to be used in svd"},
     {"recording", "record variables to a TTree"},
@@ -84,6 +89,8 @@ CKFCDCToSpacePointStateObjectFilterFactory::create(const std::string& filterName
     return std::make_unique<SimpleCKFPXDStateFilter>();
   } else if (filterName == "truth") {
     return std::make_unique<MCCKFCDCToSpacePointStateObjectFilter>();
+  } else if (filterName == "sloppy_truth") {
+    return std::make_unique<SloppyMCCKFCDCToSpacePointStateObjectFilter>();
   } else if (filterName == "recording") {
     return std::make_unique<RecordingCKFCDCToSpacePointStateObjectFilter>("CKFCDCToSpacePointStateObjectFilter.root");
   } else if (filterName == "basic_recording") {

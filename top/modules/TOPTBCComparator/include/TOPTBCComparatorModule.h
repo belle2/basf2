@@ -11,9 +11,6 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-//#include <top/dataobjects/TOPDigit.h>
-//#include <framework/datastore/StoreObjPtr.h>
-//#include <framework/datastore/StoreArray.h>
 #include "TH1F.h"
 #include "TTree.h"
 #include "TH2F.h"
@@ -25,20 +22,54 @@
 #include <vector>
 #include <deque>
 #include <utility>
-//#include <top/modules/TOPDataQualityOnline/TOPDQStat.h>
 
 namespace Belle2 {
   /**
    * Module for the comparison of different sets of time base correction (TBC) constants and to produce monitoring plots out of a given set.
-   * The input constants are given in the histogram format provided by the TOPTimeCalibrator module.
-   * The user can specify several calibration sets that are going to be compared each other indicating the folder in which the root files with the histograms are stored.
-   * The modules si sensitive to the name format of the input files. They must follow the standard naming tbcSlotXX_Y-scrodZZZ.root, where XX is ste slot number, Y is the BS number, and ZZZ is the scrodID.
-   * The list of calibration sets has to be given in a separate txt file, in the format
    *
-   * CalibrationSetFolder  Label
+   * 1) Input format
+   * The input constants are given in the histogram format provided by the TOPTimeCalibrator module. According to the current (2017)
+   * TBC production standards, all the root files belonging to the same calibration set must be locaded in one single directory. No more than one level of subdirectory is allowed
+   * An example of a valid directory stucutre fore the input is:
    *
-   * Where CalibrationSetFolder is the absolute path to the folder containing the histograms of the calibraiton set, and Label is a string defined
-   * by the used to identify the set in the output histograms.
+   * CalibrationSetRootFolder/ - tbc_ch0/
+   *                           - tbc_ch1/
+   *                           - tbc_ch2/
+   *                           - ...
+   *                           - tbc_ch7/
+   *
+   * where the root files are located under tbc_chX/
+   * The modules is sensitive to the name format of the input files, since slot, BS and scrod ID are parted from them.
+   * The naming stantard must be tbcSlotXX_Y-scrodZZZ.root, where XX is ste slot number, Y is the BS number, and ZZZ is the scrodID. Both 2- and 3-digits scrodID are allowed
+   *
+   * To specify the calibration sets to be analyzed and compared, the used must provide a text file containing the absolute path to the CalibrationSetRootFolder, and a label to identify the calibration set.
+   * Separate sets are specified on separate lines of this configuration file:
+   *
+   * /absolute/path/to/CalibrationSetRootFolder1/  LabelSet1
+   * /absolute/path/to/CalibrationSetRootFolder2/  LabelSet2
+   * /absolute/path/to/CalibrationSetRootFolder3/  LabelSet3
+   *
+   *
+   * 2) Basic functioning
+   * - The output histograms are declared as private members, and are initialized in the defineHisto() function
+   * - The main loop that runs over all the datasets and all the rootfiles is implemented in endRun(), that calls the two main functions of this module,
+   *   analyzeCalFile() and  makeComparisons().
+   * - First all the calset-by-calset histograms are filled, then the comparisons are done by taking ratios of these histograms
+   * - The output writing is done in the terminate() function
+   * - The histogram filling is performed in the analyzeFile() function, called in the main loop inside endRun().
+   * - The histogram comparison is performed in the makeComparisons() function, called in endRun() outside the main loop.
+   *
+   *
+   * 3) How to add a new histogram
+   * - Declare it as private member
+   * - Initialize it in defineHisto()
+   * - Fill it in analyzeCalFile() (if it is a simple monitoring plot) or in  makeComparisons() (if it compares plots form different datasets)
+   * - Write it in terminate()
+   *
+   *
+   * 4) How to add a new comparison histogram
+   * - Create an histogram array (hQuantity) that saves the quantity you want calset-by-calset, and fill it in analyzeCalFile()
+   * - Create an histogram to save the comparson (hQuantityCom), and fill it in the makeComparisons() usig the hQuantity histograms. You can use the calculateHistoRatio() utility to do that.
    */
   class TOPTBCComparatorModule : public HistoModule {
   public:

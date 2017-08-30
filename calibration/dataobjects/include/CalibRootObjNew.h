@@ -5,6 +5,7 @@
 #include <TTree.h>
 #include <TObject.h>
 #include <TCollection.h>
+#include <TDirectory.h>
 #include <calibration/dataobjects/CalibRootObjBase.h>
 #include <calibration/Utilities.h>
 
@@ -80,6 +81,16 @@ namespace Belle2 {
     }
 
     T* getObject() {return m_object;}
+
+    virtual void write(TDirectory* dir)
+    {
+      dir->WriteTObject(m_object, m_object->GetName(), "Overwrite");
+    }
+
+    virtual void setObjectName(std::string name)
+    {
+      m_object->SetName(name.c_str());
+    }
 
   private:
     /** Managed object  */

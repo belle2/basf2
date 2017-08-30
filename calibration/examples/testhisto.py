@@ -9,7 +9,7 @@ ctx = multiprocessing.get_context("fork")
 if not os.path.exists("collector_output"):
     os.mkdir("collector_output")
 
-# logging.package("calibration").log_level = LogLevel.DEBUG
+logging.package("calibration").log_level = LogLevel.DEBUG
 
 
 def _create_file(num):

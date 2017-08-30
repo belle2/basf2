@@ -44,6 +44,8 @@ namespace Belle2 {
     void beginRun() final;
     /// Write the current collector objects to a file and clear their memory
     void endRun() final;
+    /// Write the final objects to the file
+    void terminate() final;
 
     void defineHisto();
 
@@ -57,16 +59,11 @@ namespace Belle2 {
     }
 
     template<class T>
-    T* getObject(std::string name)
+    T& getObject(std::string name)
     {
       Belle2::Calibration::KeyType expRun = std::make_pair(m_emd->getExperiment(), m_emd->getRun());
       CalibRootObjNew<T>* calObj = dynamic_cast<CalibRootObjNew<T>*>(m_manager.getObject(name, expRun));
-      if (calObj) {
-        return static_cast<T*>(calObj->getObject());
-      } else {
-        B2ERROR("Failed to get a CalibRootObj from CalibObjManager for " << name);
-        return nullptr;
-      }
+      return *(static_cast<T*>(calObj->getObject()));
     }
 
   protected:

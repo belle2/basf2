@@ -50,3 +50,8 @@ void CalibrationCollectorModuleNew::endRun()
   m_manager.writeCurrentObjects(*m_emd);
   m_manager.clearCurrentObjects(*m_emd);
 }
+
+void CalibrationCollectorModuleNew::terminate()
+{
+  m_manager.replaceObjects();
+}

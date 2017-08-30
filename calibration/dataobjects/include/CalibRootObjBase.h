@@ -2,6 +2,7 @@
 
 #include <string>
 #include <TNamed.h>
+#include <TDirectory.h>
 #include <TList.h>
 #include <TCollection.h>
 #include <calibration/Utilities.h>
@@ -36,17 +37,11 @@ namespace Belle2 {
       return obj;
     }
 
-    Belle2::Calibration::KeyType getIOV() {return m_iov;}
-
-    void setIOV(Belle2::Calibration::KeyType expRun) {m_iov = expRun;}
+    virtual void write(TDirectory* dir) = 0;
+    virtual void setObjectName(std::string name) = 0;
 
   protected:
     virtual TNamed* constructObject(std::string name) = 0;
-
-
-  private:
-    /** IOVs for managed object */
-    Belle2::Calibration::KeyType m_iov{ -1, -1};
 
     ClassDef(CalibRootObjBase, 1) /// Run dependent mergeable wrapper
   };

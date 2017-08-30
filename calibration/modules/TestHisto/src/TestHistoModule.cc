@@ -87,7 +87,7 @@ void TestHistoModule::collect()
     m_chisq = gRandom->Gaus();
     m_pvalue = gRandom->Gaus();
     m_dof = gRandom->Gaus();
-    getObject<TTree>(objectName)->Fill();
+    getObject<TTree>(objectName).Fill();
   }
 }
 

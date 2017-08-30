@@ -23,8 +23,8 @@
 #pragma link C++ class Belle2::CalibRootObjNew<TH2F>+;
 #pragma link C++ class Belle2::CalibRootObjNew<TH2D>+;
 #pragma link C++ class Belle2::CalibRootObjNew<TTree>+;
-#pragma link C++ class Belle2::CalibRootObjNew<Belle2::MilleData>+;
-#pragma link C++ class Belle2::CalibRootObjNew<Belle2::RunRange>+;
+//#pragma link C++ class Belle2::CalibRootObjNew<Belle2::MilleData>+;
+//#pragma link C++ class Belle2::CalibRootObjNew<Belle2::RunRange>+;
 
 #pragma link C++ class Belle2::XmlFile+;
 

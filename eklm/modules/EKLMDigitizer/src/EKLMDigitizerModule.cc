@@ -239,7 +239,6 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
       EKLMFPGAFit* fit = fpgaFits.appendNew(*fes.getFPGAFit());
       eklmDigit->addRelationTo(fit);
     }
-    /* cppcheck-suppress memleak */
   }
 }
 

@@ -44,6 +44,45 @@ namespace Belle2 {
       B2FATAL("Can not handle unknown type " << spacePoint.getType() << "!");
     }
 
+    // Test if these clusters are on the first half of the track
+    // For this, get the reco hit information of the related hit
+    const RecoHitInformation* recoHitInformationOfHit;
+    if (spacePoint.getType() == VXD::SensorInfoBase::SensorType::SVD) {
+      recoHitInformationOfHit = mcRecoTrack.getRecoHitInformation(spacePoint.getRelated<SVDCluster>());
+    } else if (spacePoint.getType() == VXD::SensorInfoBase::SensorType::PXD) {
+      recoHitInformationOfHit = mcRecoTrack.getRecoHitInformation(spacePoint.getRelated<PXDCluster>());
+    } else {
+      B2FATAL("Can not handle unknown type " << spacePoint.getType() << "!");
+    }
+
+    B2ASSERT("Invalid MC information", recoHitInformationOfHit);
+
+    // then we also need the first exit out of this detector
+    const std::vector<RecoHitInformation*> recoHitInformationList = mcRecoTrack.getRecoHitInformations(true);
+    // For this, we get an iterator into the first entry (there must be at least one hit in this detector, so we are safe)
+    const auto& detector = recoHitInformationOfHit->getTrackingDetector();
+
+    const auto& itToFirstEntryInDetector = std::find_if(recoHitInformationList.begin(), recoHitInformationList.end(),
+    [detector](RecoHitInformation * hitInformation) {
+      return hitInformation->getTrackingDetector() == detector;
+    });
+    const auto& itToFirstEntryAfterDetector = std::find_if(itToFirstEntryInDetector, recoHitInformationList.end(),
+    [detector](RecoHitInformation * hitInformation) {
+      return hitInformation->getTrackingDetector() != detector;
+    });
+
+    if (itToFirstEntryAfterDetector == recoHitInformationList.end()) {
+      // This is a really strange case: it should actually not be possible to find such a hit. Better
+      // remove it.
+      return false;
+    }
+
+    const auto* firstHitAfterDetector = *itToFirstEntryAfterDetector;
+    if (firstHitAfterDetector->getSortingParameter() < recoHitInformationOfHit->getSortingParameter()) {
+      // The found hit is a curler! Remove it
+      return false;
+    }
+
     return true;
   }
 

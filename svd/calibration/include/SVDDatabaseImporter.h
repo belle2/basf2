@@ -86,16 +86,15 @@ namespace Belle2 {
     /**********************************************/
 
     /**
-     * Get from the database the local-run calibration constants
-     * (charge, ADC pulse, peaking time and width) and
-     * print them.
+     * Print the local-run calibration constants
+     * (charge, ADC pulse, peaking time and width).
      * Input: none
      * Output: none
      */
     void printSVDPulseShapeCalibrations();
 
     /**
-     * Get from the database the strip noise and print it.
+     * Print the strip noise.
      * Input: none
      * Output: none
      */
@@ -103,7 +102,7 @@ namespace Belle2 {
 
 
     /**
-     * Get from the database the status of a given strip,
+     * Print the status of a given strip,
      * return 1 if the strip is flagged as a bad one.
      * Input: none
      * Output: none

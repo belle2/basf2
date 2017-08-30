@@ -8,13 +8,10 @@
 #include <TDirectory.h>
 #include <calibration/dataobjects/CalibRootObjBase.h>
 #include <calibration/Utilities.h>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 
-  /**
-   * @brief Class to implement run dependence
-   * into mergeable ROOT-compatible objects.
-   */
   template<class T>
   class CalibRootObjNew : public CalibRootObjBase {
 
@@ -32,10 +29,7 @@ namespace Belle2 {
       }
     }
 
-    /** Allow merging using TFileMerger if saved directly to a file.
-    *
-    * \note dictionaries containing your Mergeable class need to be loaded, so 'hadd' will not work currently.
-    */
+    /// Allow merging using TFileMerger if saved directly to a file.
     virtual Long64_t Merge(TCollection* hlist) override
     {
       B2DEBUG(100, "Running Merge() on " << this->GetName());
@@ -53,7 +47,7 @@ namespace Belle2 {
       return nMerged;
     }
 
-    virtual void merge(const CalibRootObjNew* other)
+    virtual void merge(const CalibRootObjNew<T>* other)
     {
       TList list;
       list.SetOwner(false);
@@ -100,32 +94,12 @@ namespace Belle2 {
      * @brief Construct an object for new iov.
      * The stored template object is copied and
      * new one is created for the iov.
-     *
-     * Can be called also after initialize in any
-     * process. The newly created objects are
-     * added into output object list and here objects
-     * with corresponding IOV are merged.
-     *
-     * @param iov IOV identifier of the new object
-     * @return void
      */
     virtual TNamed* constructObject(std::string name) override
     {
       B2DEBUG(100, "Creating new CalibRootObjNew with name " << name);
       T* newObj = new T();
       cloneObj(m_object, newObj);
-
-      // Get ROOT class information
-      //TClass *cl = newobj->IsA();
-      // Disconnect object from any files for ROOT objects
-      //if (cl && cl->GetMethodWithPrototype("SetDirectory", "TDirectory*"))
-      //  newobj->Execute("SetDirectory", "0");
-      // Reset contents of a ROOT object
-      //if (cl && cl->GetMethodWithPrototype("Reset", "Option_t*"))
-      //  newobj->Execute("Reset", "");
-      // Reset contents of Belle2::Mergeable object
-      //else if (cl && cl->GetMethodWithPrototype("clear", ""))
-      //  newobj->Execute("clear", "");
       newObj->SetDirectory(nullptr);
       newObj->Reset();
       CalibRootObjNew<T>* newCalibObj = new CalibRootObjNew<T>(newObj);
@@ -133,7 +107,6 @@ namespace Belle2 {
       B2DEBUG(100, "Created CalibRootObjNew with name " << name);
       return newCalibObj;
     }
-
 
     /**
     * @brief Clone "normal" TObject

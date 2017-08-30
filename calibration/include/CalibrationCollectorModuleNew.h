@@ -62,8 +62,7 @@ namespace Belle2 {
     T& getObject(std::string name)
     {
       Belle2::Calibration::KeyType expRun = std::make_pair(m_emd->getExperiment(), m_emd->getRun());
-      CalibRootObjNew<T>* calObj = dynamic_cast<CalibRootObjNew<T>*>(m_manager.getObject(name, expRun));
-      return *(static_cast<T*>(calObj->getObject()));
+      return *(m_manager.getObject<T>(name, expRun));
     }
 
   protected:

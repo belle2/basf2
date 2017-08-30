@@ -8,6 +8,10 @@
 
 #include <calibration/Utilities.h>
 #include <calibration/dataobjects/CalibRootObjBase.h>
+#include <calibration/dataobjects/CalibRootObjNew.h>
+
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 
@@ -30,120 +34,61 @@ namespace Belle2 {
     void setDirectory(TDirectory* dir) {m_dir = dir;}
 
     /** Add a new object to manage, this is used as a template for creating future/missing objects.
-      * We take ownership of this object, should be guaranteed by using unique_ptr.
+      * We take ownership of this object but cannot guarantee that a user won't alter the wrapped ROOT object :(
       */
-    void addObject(std::string name, std::unique_ptr<CalibRootObjBase> object)
-    {
-      if (m_templateObjects.find(name) != m_templateObjects.end()) {
-        m_templateObjects[name].reset();
-      }
-      m_templateObjects[name] = std::move(object);
-    }
+    void addObject(std::string name, std::unique_ptr<CalibRootObjBase> object);
 
-    void createDirectories()
-    {
-      for (auto& x : m_templateObjects) {
-        if (m_dir->GetDirectory(x.first.c_str()) == 0) {
-          m_dir->mkdir(x.first.c_str());
-          B2DEBUG(100, "Made TDirectory: " << x.first);
-        }
-      }
-    }
+    /** Each object gets its own TDirectory under the main manager directory to store its objects.
+      * We create them using this function.
+      */
+    void createDirectories();
 
-    CalibRootObjBase* getObject(std::string name, Belle2::Calibration::KeyType expRun)
-    {
-      TDirectory* objectDir = m_dir->GetDirectory(name.c_str());
-      std::string fullName = getPrefix() + name + getSuffix(expRun);
-      // Try looking in the memory resident objects only first
-      CalibRootObjBase* calObj = dynamic_cast<CalibRootObjBase*>(objectDir->FindObject(fullName.c_str()));
-      if (!calObj) {
-        // If there aren't any then either there isn't an object at all, or the only objects are file resident
-        // We'll create a new memory resident object to use now, and merge with any file resident ones later.
-        B2DEBUG(100, "No memory resident copies of the object with the name " << fullName << ". Will make one.");
-        calObj = dynamic_cast<CalibRootObjBase*>(m_templateObjects[name]->Clone(fullName.c_str()));
-        objectDir->Add(calObj);
-      }
-      return calObj;
-    }
+    /** Writes the current (exp,run) collector objects to the requested directories.
+      * We write the CalibRootObj<T> for now but will replace this in the terminate().
+      * If a file resident object of the same name already exists it means that we've
+      * run over several input files containing the same (exp,run). We merge
+      * with the file resident copy and replace it.
+      */
+    void writeCurrentObjects(const EventMetaData& emd);
 
-//        TKey* calObjKey = objectDir->FindKey(fullName.c_str());
-//        if(calObjKey) {
-//          // If there was a file resident one, read it into a memory resident object
-//          B2DEBUG(100, "Only file resisdent object exists for object with the name " << fullName << ". Making a memory resident version.");
-//          calObj = dynamic_cast<CalibRootObjBase*>(calObjKey->ReadObj());
-//        }
-//        else {
-
-    void writeCurrentObjects(const EventMetaData& emd)
-    {
-      for (auto& x : m_templateObjects) {
-        B2DEBUG(100, "We are writing the current Exp,Run object for " << getPrefix() + x.first + getSuffix(emd) << " to its TDirectory.");
-        TDirectory* objectDir = m_dir->GetDirectory(x.first.c_str());
-        CalibRootObjBase* objMemory = dynamic_cast<CalibRootObjBase*>(objectDir->FindObject((getPrefix() + x.first + getSuffix(
-                                        emd)).c_str()));
-        // An unfortunate issue is that there can be only one memory resident object in a directory with the same Key/Name.
-        // Therefore when we dir->Get("name;1") the file resident one, it has the same Key as the memory resident object which
-        // then causes the deletion of the object. To prevent this we do a quick tmp naming while checking for file resident objects,
-        // and rename back at the end.
-        objMemory->SetName("tmpCalibrationCollector");
-        CalibRootObjBase* objFile = dynamic_cast<CalibRootObjBase*>(objectDir->Get((getPrefix() + x.first + getSuffix(
-            emd) + ";1").c_str()));
-        if (objMemory && objFile) {
-          B2DEBUG(100, "Found both memory AND file resident copies of the same object with the name " << x.first
-                  << ". Merging memory resident with file resident before writing.");
-          TList* listObj = new TList();
-          listObj->Add(objFile);
-          objMemory->Merge(listObj);
-          delete listObj;
-        }
-        objMemory->SetName((getPrefix() + x.first + getSuffix(emd)).c_str());
-        objectDir->WriteTObject(objMemory, objMemory->GetName(), "Overwrite");
-      }
-    }
-
-    void clearCurrentObjects(const EventMetaData& emd)
-    {
-      for (auto& x : m_templateObjects) {
-        B2DEBUG(100, "We are deleting the current Exp,Run object for " << getPrefix() + x.first + getSuffix(emd));
-        TDirectory* objectDir = m_dir->GetDirectory(x.first.c_str());
-        // Should only delete objects that are memory resident
-        objectDir->Delete((getPrefix() + x.first + getSuffix(emd)).c_str());
-      }
-    }
+    /// Any memory resident CalibRootObj are removed from the directory
+    void clearCurrentObjects(const EventMetaData& emd);
 
     /**
       * This is a weird one. The problem is that we want to store the 'raw' ROOT objects in our final output data.
-      * This is because TChain will not work with non-TTree objects, so to avoid potentiall putting massive TTree objects into
+      * This is because TChain will not work with non-TTree objects, so to avoid potentially putting massive TTree objects into
       * memory during the Algorithm step we have to store the TTrees (and by extension everything else) 'raw'.
-      * However up until now we've been writing the 'wrapped' objects into the TDirectory. This sounds silly until you realise
+      * However up until now we've been writing the 'wrapped' CalibRootObj into the TDirectory. This sounds silly until you realise
       * that we have to be able to both write AND retrieve them from disk and then potentially call Merge on the retrieved objects.
-      * Therefore we have to able to cast to a base object that knows how to call Merge i.e. our CalibRootObj.
+      * Therefore we have to able to cast to an object that knows how to call Merge i.e. our CalibRootObj.
       *
       * The basic idea is to store CalibRootObj objects until we have finished doing ANY merging i.e. during terminate()
       * Then we retrieve the objects one by one from the TDirectory and replace them with the raw object they contain.
       */
-    void replaceObjects()
+    void replaceObjects();
+
+    /** Return the requested collector object for this (exp,run) by gettin or creating one.
+      * We wrap the object in a CalibRootObj and add it the direcotry so that the object
+      * can take advantage of any improvements we want to add to that class, and so that a
+      * Merge method is guaranteed to exist for our purposes later.
+      */
+    template<typename T>
+    T* getObject(std::string name, Belle2::Calibration::KeyType expRun)
     {
-      for (auto& x : m_templateObjects) {
-        TDirectory* objectDir = m_dir->GetDirectory(x.first.c_str());
-        objectDir->cd();
-        TKey* key = 0;
-        TIter nextkey(objectDir->GetListOfKeys());
-        while ((key = (TKey*)nextkey())) {
-          // Get the disk resident object
-          CalibRootObjBase* objFile = dynamic_cast<CalibRootObjBase*>(key->ReadObj());
-          if (objFile) {
-            B2DEBUG(100, "Found file resident copy of the object with the name " << key->GetName()
-                    << ". Replacing it with the wrapped TObject.");
-            objFile->setObjectName(removePrefix(key->GetName()).c_str());
-            objFile->write(objectDir);
-            std::string calObjName = objFile->GetName();
-            objectDir->Delete((calObjName + ";*").c_str());
-          }
-        }
-        objectDir->DeleteAll();
-        m_dir->cd();
+      TDirectory* objectDir = m_dir->GetDirectory(name.c_str());
+      std::string fullName = addPrefix(name) + getSuffix(expRun);
+      // Try looking in the memory resident objects only first
+      CalibRootObjNew<T>* calObj = dynamic_cast<CalibRootObjNew<T>*>(objectDir->FindObject(fullName.c_str()));
+      if (!calObj) {
+        // If there aren't any then either there isn't an object at all, or the only objects are file resident
+        // We'll create a new memory resident object to use for now since any file resident TTree will have lost
+        // its connection to the branch variables the user defined, We'll merge this new object with any file resident
+        // object later.
+        B2DEBUG(100, "No memory resident copies of the object with the name " << fullName << ". Will make one.");
+        calObj = dynamic_cast<CalibRootObjNew<T>*>(m_templateObjects[name]->Clone(fullName.c_str()));
+        objectDir->Add(calObj);
       }
+      return calObj->getObject();
     }
 
   private:
@@ -152,34 +97,23 @@ namespace Belle2 {
     TDirectory* m_dir;
 
     /**
-     * The object type that we are managing, this is a template object for all future objects for each (Exp,Run).
-     * This should not contain data itself.
+     * The objects that we are managing, these are template objects for all future objects for each (Exp,Run).
+     * They should not contain data themselves.
      */
     std::map<std::string, std::unique_ptr<CalibRootObjBase>> m_templateObjects;
 
     /// We rename objects based on the Exp,Run that they contain so we need to generate a nice naming convention
-    std::string getSuffix(const Belle2::Calibration::KeyType& key)
-    {
-      return "_" + std::to_string(key.first) + "." + std::to_string(key.second);
-    }
+    std::string getSuffix(const Belle2::Calibration::KeyType& key);
 
-    std::string getSuffix(const EventMetaData& emd)
-    {
-      Belle2::Calibration::KeyType key = std::make_pair(emd.getExperiment(), emd.getRun());
-      return getSuffix(key);
-    }
+    /// Sometimes it's nice to just pass in the EventMetaData instead of converting manually
+    std::string getSuffix(const EventMetaData& emd);
 
-    std::string getPrefix()
-    {
-      return "CalibRootObj_";
-    }
+    /// Our temporary CalibRootObj objects need names which won't conflict with the raw objects
+    std::string addPrefix(std::string name);
 
-    std::string removePrefix(const char* name)
-    {
-      std::string strname = name;
-      strname.erase(0, 13);
-      B2INFO("returned string was " << strname);
-      return strname;
-    }
+    /// Sometimes when retrieving CalibRootObj objects from a TDirectory we want to remove a previous prefix
+    std::string removePrefix(const char* name);
+
+    const static std::string PREFIX;
   };
 }

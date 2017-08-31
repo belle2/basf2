@@ -42,7 +42,7 @@ DesSerCOPPER::DesSerCOPPER(string host_recv, int port_recv, string host_send, in
   m_nodeid = nodeid;
 
   //  B2INFO("DeSerializerPrePC: Constructor done.");
-  printf("[INFO] DeSerializerPrePC: Constructor done.\n"); fflush(stdout);
+  printf("[DEBUG] DeSerializerPrePC: Constructor done.\n"); fflush(stdout);
 }
 
 
@@ -56,12 +56,12 @@ void DesSerCOPPER::DataAcquisition()
   // For data check
   unsigned int eve_copper_0 = 0;
   //  B2INFO("initializing...");
-  printf("[INFO] initializing...\n"); fflush(stdout);
+  printf("[DEBUG] initializing...\n"); fflush(stdout);
   initialize(false);
 
 
   //  B2INFO("Done.");
-  printf("[INFO] Done.\n"); fflush(stdout);
+  printf("[DEBUG] Done.\n"); fflush(stdout);
 
   unsigned int m_prev_ftsweve32 = 0xffffffff;
 
@@ -74,7 +74,7 @@ void DesSerCOPPER::DataAcquisition()
 
     if (m_status.isAvailable()) {
       //      B2INFO("DeSerializerPrePC: Waiting for Start...\n");
-      printf("[INFO] DeSerializerPrePC: Waiting for Start...\n"); fflush(stdout);
+      printf("[DEBUG] DeSerializerPrePC: Waiting for Start...\n"); fflush(stdout);
       m_status.reportRunning();
     }
     m_start_time = getTimeSec();
@@ -117,7 +117,7 @@ void DesSerCOPPER::DataAcquisition()
         int delete_flag = 0, m_size_word = 0;
 
         if (m_start_flag == 0) {
-          printf("[INFO] DeSerializerCOPPER: Reading the 1st event from COPPER FIFO... run %.8x eve %.8x\n", m_prev_exprunsubrun_no,
+          printf("[DEBUG] DeSerializerCOPPER: Reading the 1st event from COPPER FIFO... run %.8x eve %.8x\n", m_prev_exprunsubrun_no,
                  m_prev_ftsweve32); fflush(stdout);
         }
         int* temp_buf;
@@ -125,7 +125,7 @@ void DesSerCOPPER::DataAcquisition()
         temp_buf = readOneEventFromCOPPERFIFO(j, &delete_flag, &m_size_word);
         m_status.copyEventHeader(temp_buf);
         if (m_start_flag == 0) {
-          printf("[INFO] DeSerializerCOPPER: Done. the size of the 1st event is %d words\n", m_size_word); fflush(stdout);
+          printf("[DEBUG] DeSerializerCOPPER: Done. the size of the 1st event is %d words\n", m_size_word); fflush(stdout);
         }
         const int num_nodes = 1;
         const int num_events = 1;
@@ -176,7 +176,7 @@ void DesSerCOPPER::DataAcquisition()
     for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_PC; j++) {
       if (m_start_flag == 0) {
         //        B2INFO("SerializerPC: Sending the 1st packet...");
-        printf("[INFO] SerializerPC: Sending the 1st packet...\n"); fflush(stdout);
+        printf("[DEBUG] SerializerPC: Sending the 1st packet...\n"); fflush(stdout);
       }
       try {
         m_sent_totbytes += sendByWriteV(&(raw_datablk[ j ]));
@@ -189,7 +189,7 @@ void DesSerCOPPER::DataAcquisition()
       }
       if (m_start_flag == 0) {
         //        B2INFO("Done. ");
-        printf("[INFO] Done.\n"); fflush(stdout);
+        printf("[DEBUG] Done.\n"); fflush(stdout);
         m_start_flag = 1;
       }
     }
@@ -216,7 +216,7 @@ void DesSerCOPPER::DataAcquisition()
     if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC) % 100000 == 0) {
       double interval = cur_time - m_prev_time;
       double total_time = cur_time - m_start_time;
-      printf("[INFO] Event %12d Rate %6.2lf[kHz] Recvd %6.2lf[MB/s] sent %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s]\n",
+      printf("[DEBUG] Event %12d Rate %6.2lf[kHz] Recvd %6.2lf[MB/s] sent %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s]\n",
              n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC,
              (n_basf2evt  - m_prev_nevt)*NUM_EVT_PER_BASF2LOOP_PC / interval / 1.e3,
              (m_recvd_totbytes - m_recvd_prev_totbytes) / interval / 1.e6,
@@ -491,10 +491,10 @@ void DesSerCOPPER::initializeCOPPER()
 
 #ifndef YAMADA_DUMMY
   //  B2INFO("Opening COPPER...");  fflush(stderr);
-  printf("[INFO] Opening COPPER...\n"); fflush(stdout);
+  printf("[DEBUG] Opening COPPER...\n"); fflush(stdout);
   openCOPPER();
   //  B2INFO("Done.\n"); fflush(stderr);
-  printf("[INFO] Done.\n"); fflush(stdout);
+  printf("[DEBUG] Done.\n"); fflush(stdout);
 #endif
 }
 
@@ -533,7 +533,7 @@ void DesSerCOPPER::openCOPPER()
 
 
   //  B2INFO("DeSerializerCOPPER: openCOPPER() done.");
-  printf("[INFO] DeSerializerCOPPER: openCOPPER() done.\n"); fflush(stdout);
+  printf("[DEBUG] DeSerializerCOPPER: openCOPPER() done.\n"); fflush(stdout);
 
 }
 

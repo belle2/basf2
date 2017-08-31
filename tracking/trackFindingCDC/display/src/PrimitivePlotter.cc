@@ -9,7 +9,6 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/display/PrimitivePlotter.h>
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <algorithm>
 #include <utility>
@@ -32,7 +31,7 @@ PrimitivePlotter::~PrimitivePlotter() = default;
 
 std::unique_ptr<PrimitivePlotter> PrimitivePlotter::clone() const
 {
-  return makeUnique<PrimitivePlotter>(*this);
+  return std::make_unique<PrimitivePlotter>(*this);
 }
 
 

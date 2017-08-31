@@ -75,6 +75,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         track_match_look_up = self.track_match_look_up
 
         # Matching information
+        mc_reco_track = track_match_look_up.getRelatedMCRecoTrack(reco_track)
         mc_particle = track_match_look_up.getRelatedMCParticle(reco_track)
         mc_particle_crops = peelers.peel_mc_particle(mc_particle)
 
@@ -82,23 +83,35 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
 
         pr_to_mc_match_info_crops = self.peel_pr_to_mc_match_info(reco_track)
 
+        # Custom peel function to get hit purity of subdetectors
+        subdetector_hit_purity_crops = peelers.peel_subdetector_hit_purity(reco_track, mc_reco_track)
+
         # Get the fit results
         seed_fit_crops = peelers.peel_reco_track_seed(reco_track)
 
         fit_result = track_match_look_up.getRelatedTrackFitResult(reco_track)
         fit_crops = peelers.peel_track_fit_result(fit_result)
+        fit_status_crops = peelers.peel_fit_status(reco_track)
 
         # Event Info
         event_meta_data = Belle2.PyStoreObj("EventMetaData")
         event_crops = peelers.peel_event_info(event_meta_data)
 
+        # Store Array for easier joining
+        store_array_crops = peelers.peel_store_array_info(reco_track, key="pr_{part_name}")
+        mc_store_array_crops = peelers.peel_store_array_info(mc_reco_track, key="mc_{part_name}")
+
         return dict(
             **mc_particle_crops,
             **hit_content_crops,
             **pr_to_mc_match_info_crops,
+            **subdetector_hit_purity_crops,  # Custom
             **seed_fit_crops,
             **fit_crops,
-            **event_crops
+            **fit_status_crops,
+            **event_crops,
+            **store_array_crops,
+            **mc_store_array_crops
         )
 
     def peel_pr_to_mc_match_info(self, reco_track):
@@ -176,6 +189,18 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         outlier_z_score=5.0,
         lower_bound=-1.73,
         upper_bound=3.27,
+    )
+
+    save_fake_rate_by_seed_pt_profile = refiners.save_profiles(
+        select={
+            'is_fake': 'fake rate',
+            'seed_pt_estimate': 'seed p_{t}',
+        },
+        y='fake rate',
+        y_binary=True,
+        outlier_z_score=5.0,
+        lower_bound=0,
+        upper_bound=1.7,
     )
 
     # Hit counts in each sub detector by the true pt value

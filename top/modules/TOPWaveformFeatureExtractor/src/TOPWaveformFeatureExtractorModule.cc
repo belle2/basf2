@@ -91,7 +91,8 @@ namespace Belle2 {
     StoreArray<TOPRawDigit> rawDigits(m_inputRawDigitsName);
     int initSize = rawDigits.getEntries();
 
-    for (const auto& rawDigit : rawDigits) {
+    for (int i = 0; i < initSize; i++) {
+      const auto& rawDigit = *rawDigits[i];
       const auto* waveform = rawDigit.getRelated<TOPRawWaveform>();
       if (!waveform) continue;
       waveform->featureExtraction(m_threshold, m_hysteresis, m_thresholdCount);

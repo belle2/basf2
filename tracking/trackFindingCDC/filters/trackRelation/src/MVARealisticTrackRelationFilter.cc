@@ -8,13 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/trackRelation/MVARealisticTrackRelationFilter.h>
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 MVARealisticTrackRelationFilter::MVARealisticTrackRelationFilter()
-  : Super(makeUnique<VarSet>(), "tracking/data/trackfindingcdc_RealisticTrackRelationFilter.xml", 0.80)
+  : Super(std::make_unique<VarSet>(), "tracking/data/trackfindingcdc_RealisticTrackRelationFilter.xml", 0.80)
 {
   this->addProcessingSignalListener(&m_feasibleTrackRelationFilter);
 }

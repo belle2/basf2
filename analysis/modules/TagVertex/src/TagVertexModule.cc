@@ -426,7 +426,6 @@ namespace Belle2 {
       if (TMath::Abs(mc->getPDG()) == TMath::Abs(Breco->getPDGCode())) {
 
         if (m_useMCassociation == "breco") {
-          StoreArray<MCParticle> mcParticles;
           const MCParticle* mcBr = Breco->getRelated<MCParticle>();
           if (mcBr == mc) {
             isBreco = true;

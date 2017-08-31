@@ -72,19 +72,19 @@ std::unique_ptr<BaseStereoHitFilter>
 StereoHitFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<NoneStereoHitFilter>();
+    return std::make_unique<NoneStereoHitFilter>();
   } else if (filterName == "all") {
-    return makeUnique<AllStereoHitFilter>();
+    return std::make_unique<AllStereoHitFilter>();
   } else if (filterName == "random") {
-    return makeUnique<RandomStereoHitFilter>();
+    return std::make_unique<RandomStereoHitFilter>();
   } else if (filterName == "simple") {
-    return makeUnique<SimpleStereoHitFilter>();
+    return std::make_unique<SimpleStereoHitFilter>();
   } else if (filterName == "truth") {
-    return makeUnique<MCStereoHitFilter>();
+    return std::make_unique<MCStereoHitFilter>();
   } else if (filterName == "recording") {
-    return makeUnique<RecordingStereoHitFilter>("StereoHitFilter.root");
+    return std::make_unique<RecordingStereoHitFilter>("StereoHitFilter.root");
   } else if (filterName == "mva") {
-    return makeUnique<MVAStereoHitFilter>("tracking/data/trackfindingcdc_StereoHitFilter.xml");
+    return std::make_unique<MVAStereoHitFilter>("tracking/data/trackfindingcdc_StereoHitFilter.xml");
   } else {
     return Super::create(filterName);
   }

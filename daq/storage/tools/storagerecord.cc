@@ -115,8 +115,8 @@ public:
     std::string filedir = dir + StringUtil::form("%02d/storage/%4.4d/%5.5d/",
                                                  m_diskid, expno, runno);
     system(("mkdir -p " + filedir).c_str());
-    m_filename = StringUtil::form("%s.%s.%4.4d.%5.5d.f%5.5d.sroot", m_host.c_str(),
-                                  m_runtype.c_str(), expno, runno, m_fileid);
+    m_filename = StringUtil::form("%s.%4.4d.%5.5d.%s.f%5.5d.sroot",
+                                  m_runtype.c_str(), expno, runno, m_host.c_str(), m_fileid);
     m_path = filedir + m_filename;
     m_file = ::open(m_path.c_str(),  O_WRONLY | O_CREAT | O_EXCL, 0664);
     if (m_file < 0) {
@@ -147,7 +147,7 @@ public:
         struct stat st;
         stat(m_path.c_str(), &st);
         std::string d = Date(st.st_mtime).toString();
-        if (m_fileid == 0) m_nevents--;//1 entry for StreamerInfo
+        //if (m_fileid == 0) m_nevents--;//1 entry for StreamerInfo
         m_db->connect();
         m_db->execute("update %s set time_close = '%s', chksum = %lu, nevents = %lu, "
                       "size = %lu where name = '%s' and host = '%s';",
@@ -247,21 +247,29 @@ int main(int argc, char** argv)
   int* evtbuf = new int[10000000];
   g_file = new FileHandler(db, runtype, hostname, file_dbtmp);
   FileHandler& file(*g_file);
-  SharedEventBuffer::Header iheader;
   int ecount = 0;
   bool newrun = false;
   unsigned int fileid = 0;
+  struct dataheader {
+    int nword;
+    int type;
+    unsigned int expno;
+    unsigned int runno;
+  } hd;
   while (true) {
     if (use_info) info.reportRunning();
-    ibuf.read(evtbuf, true, &iheader);
+    ibuf.lock();
+    ibuf.read((int*)&hd, true, true);
+    ibuf.read(evtbuf, true, true);
+    ibuf.unlock();
     int nbyte = evtbuf[0];
     int nword = (nbyte - 1) / 4 + 1;
     bool isnew = false;
-    if (!newrun || expno < iheader.expno || runno < iheader.runno) {
+    if (!newrun || expno < hd.expno || runno < hd.runno) {
       newrun = true;
       isnew = true;
-      expno = iheader.expno;
-      runno = iheader.runno;
+      expno = hd.expno;
+      runno = hd.runno;
       fileid = 0;
       if (use_info) {
         info.setExpNumber(expno);
@@ -275,7 +283,7 @@ int main(int argc, char** argv)
         count_out = 0;
       }
       obuf.lock();
-      SharedEventBuffer::Header* oheader = ibuf.getHeader();
+      SharedEventBuffer::Header* oheader = obuf.getHeader();
       oheader->expno = expno;
       oheader->runno = runno;
       obuf.unlock();
@@ -315,7 +323,7 @@ int main(int argc, char** argv)
       }
     } else {
       if (!ecount) {
-        B2WARNING("no run was initialzed for recording : " << iheader.expno << "." << iheader.runno);
+        B2WARNING("no run was initialzed for recording : " << hd.expno << "." << hd.runno);
       }
       ecount = 1;
     }

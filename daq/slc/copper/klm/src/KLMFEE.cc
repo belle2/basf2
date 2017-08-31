@@ -10,7 +10,7 @@
 
 using namespace Belle2;
 
-KLMFEE::KLMFEE()
+KLMFEE::KLMFEE() : FEE("klm")
 {
 }
 

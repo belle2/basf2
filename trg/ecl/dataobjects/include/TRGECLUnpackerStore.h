@@ -40,6 +40,15 @@ namespace Belle2 {
     //! The Timing of TRG Timing
     int m_caltime;
 
+    //! The Fine Timing of TRG Timing
+    int m_finetime;
+
+    //! The revo clk of FAM
+    int m_revo_fam;
+
+    //! The revo clk of TRG
+    int m_revo_trg;
+
     //! The method to set event id
     void setEventId(int eventId) { m_eventId = eventId;}
 
@@ -57,6 +66,15 @@ namespace Belle2 {
 
     //! The method to set cal timing
     void setTCCALTime(int TCCALT) { m_caltime = TCCALT;}
+
+    //! The method to set fine timing
+    void setFineTime(int FINETIME) { m_finetime = FINETIME;}
+
+    //! The method to set revo clock of FAM
+    void setRevoFAM(int RevoFAM) { m_revo_fam = RevoFAM;}
+
+    //! The method to set revo clock of TRG
+    void setRevoTRG(int RevoTRG) { m_revo_trg = RevoTRG;}
 
     //! The method to get event id
     int getEventId() const { return m_eventId;}
@@ -76,6 +94,15 @@ namespace Belle2 {
     //! The method to get cal timing
     int getTCCALTime() const {return m_caltime;}
 
+    //! The method to get fine timing
+    int getFineTime() const {return m_finetime;}
+
+    //! The method to get revo clock of FAM
+    int getRevoFAM() const {return m_revo_fam;}
+
+    //! The method to get revo clock of TRG
+    int getRevoTRG() const {return m_revo_trg;}
+
     // Empty constructor
     // Recommended for ROOT IO
     TRGECLUnpackerStore()
@@ -86,6 +113,9 @@ namespace Belle2 {
       m_energy     = 0;
       m_timing     = 0;
       m_caltime    = 0;
+      m_finetime   = 0;
+      m_revo_fam   = 0;
+      m_revo_trg   = 0;
     }
 
     //! Useful Constructor
@@ -95,7 +125,10 @@ namespace Belle2 {
       int NTC,
       int TCE,
       int TCT,
-      int TCCALT
+      int TCCALT,
+      int FINETIME,
+      int RevoFAM,
+      int RevoTRG
     )
     {
       m_eventId    = eventId;
@@ -104,6 +137,9 @@ namespace Belle2 {
       m_energy     = TCE;
       m_timing     = TCT;
       m_caltime    = TCCALT;
+      m_finetime   = FINETIME;
+      m_revo_fam   = RevoFAM;
+      m_revo_trg   = RevoTRG;
     }
     /** the class title */
     ClassDef(TRGECLUnpackerStore, 1);

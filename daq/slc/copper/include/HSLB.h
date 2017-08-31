@@ -4,15 +4,37 @@
 #include <daq/slc/copper/HSLBHandlerException.h>
 
 #include <mgt/hslb_info.h>
+#include <mgt/hsreg.h>
 
 #include <string>
+
+#define EHSLB_NOTFOUND   (-1001)
+#define EHSLB_TOOOLD     (-1002)
+#define EHSLB7_TOOOLD    (-1003)
+#define EHSLB_CLOCKNONE  (-1004)
+#define EHSLB_CLOCKLOST  (-1005)
+#define EHSLB_CLOCKFAST  (-1006)
+#define EHSLB_PLLLOST    (-1007)
+#define EHSLB_BADSTATE   (-1008)
+#define EHSLB_DISABLED   (-1009)
+#define EHSLB_INTERNAL   (-1010)
+
+#define EHSLB_B2LDOWN    (-1011)
+#define EHSLB_CLOCKBAD   (-1012)
+#define EHSLB_PLL2LOST   (-1013)
+#define EHSLB_GTPPLL     (-1014)
+#define EHSLB_FFCLOCK    (-1015)
+
+#define WHSLB_PLLLOST    (1)
+#define WHSLB_B2LDOWN    (2)
+#define WHSLB_CLOCKBAD   (3)
+#define WHSLB_PLL2LOST   (4)
+#define WHSLB_GTPPLL     (5)
+#define WHSLB_FFCLOCK    (6)
 
 namespace Belle2 {
 
   class HSLB {
-
-  public:
-    static const char* getFEEType(int type);
 
   public:
     HSLB() { m_hslb.fd = -1; }
@@ -49,8 +71,9 @@ namespace Belle2 {
     void writefee32(int adr, int val) throw(HSLBHandlerException);
     void writestream(const char* filename) throw(HSLBHandlerException);
     void bootfpga(const std::string& firmware) throw(HSLBHandlerException);
-    int reset_b2l(int& csr);
-    int test() throw (HSLBHandlerException);
+    int reset_b2l(int& csr) throw(HSLBHandlerException);
+    int hsreg_getfee(hsreg_t& hsp) throw(HSLBHandlerException);
+    int hsreg_read(hsreg_t& hsp) throw(HSLBHandlerException);
 
   private:
     hslb_info m_hslb;

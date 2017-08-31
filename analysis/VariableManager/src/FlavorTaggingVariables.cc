@@ -742,8 +742,8 @@ namespace Belle2 {
                 if (x == nullptr) continue;
                 float iEnergy = x -> getEnergy();
                 if (iEnergy == iEnergy) {
-                  ClusterUtils C;
-                  if ((T.rotateLabToCms() * C.Get4MomentumFromCluster(x)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
+                  ClusterUtils cluster_util;
+                  if ((T.rotateLabToCms() * cluster_util.Get4MomentumFromCluster(x)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
                 }
                 //       for (auto & i : klm) {
                 //         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;
@@ -1365,19 +1365,19 @@ namespace Belle2 {
             for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
               Particle* particlei = ListOfParticles->getParticle(i);
               if (particlei != nullptr) {
-                double prob = 0;
+                double target_prob = 0;
                 if (indexRightTrack == 9) { // MaximumPstar
                   TLorentzVector momParticlei = T.rotateLabToCms() * particlei -> get4Vector();
                   if (momParticlei == momParticlei) {
-                    prob = momParticlei.P();
+                    target_prob = momParticlei.P();
                   }
                 } else {
                   if (particlei->hasExtraInfo(isRightTrack[indexRightTrack])) {
-                    prob = particlei->getExtraInfo(isRightTrack[indexRightTrack]);
+                    target_prob = particlei->getExtraInfo(isRightTrack[indexRightTrack]);
                   }
                 }
                 if (prob > maximumTargetProb) {
-                  maximumTargetProb = prob;
+                  maximumTargetProb = target_prob;
                   target = particlei;
                 }
               }

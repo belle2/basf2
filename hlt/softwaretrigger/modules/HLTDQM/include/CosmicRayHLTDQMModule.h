@@ -76,6 +76,13 @@ namespace Belle2 {
       /**energy of ECL cluster*/
       TH1F* h_e_eclcluster;
 
+      /**number of ECL showers*/
+      TH1F* h_nshower;
+      /**time of  ECL shower*/
+      TH1F* h_time_eclshower;
+      /**energy of ECL shower*/
+      TH1F* h_e_eclshower;
+
       //KLM
       /**number of bKLM Hit*/
       TH1F* h_nbklmhit;

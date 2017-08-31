@@ -30,6 +30,7 @@ def add_tsim(path, SimulationMode=1, minHits=4, OpenFilter=False, Belle2Phase="P
     add_grl_trigger(path, SimulationMode, Belle2Phase)
     add_gdl_trigger(path, SimulationMode, OpenFilter)
     EffCalculation(path)
+    path.add_module('StatisticsSummary').set_name('Sum_TriggerSimulation')
 
 
 def add_subdetector_tsim(path, SimulationMode=1, minHits=4, OpenFilter=False, Belle2Phase="Phase2"):

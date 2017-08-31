@@ -9,6 +9,7 @@
 #include <unistd.h>
 
 // 20150220
+// 20170711 Modified records snmpget/set commands into log file (T.Konno)
 
 using namespace Belle2;
 
@@ -29,9 +30,10 @@ void CdcHVControlCallback::initialize() throw()
   }
   // crate power ON
   // Mpod ON
-  //  system("snmpset -v 2c -m +WIENER-CRATE-MIB -c private 192.168.0.21 sysMainSwitch.0 i 1");
-  //  printf(" !! crate power ON !!\n");
+  // system("snmpset -v 2c -m +WIENER-CRATE-MIB -c private 192.168.0.21 sysMainSwitch.0 i 1");
+  // printf(" !! crate power ON !!\n");
   //
+  /*
   float v = 0.;
   float cur = 0.;
   int crate = 1;
@@ -47,10 +49,7 @@ void CdcHVControlCallback::initialize() throw()
   for (int i = 0; i < 5; i++) {
     nch = 100 * (slot - 1) + i;
     nch2 = 100 * (2 - 1) + i;
-
     v = getConfig().getChannel(crate, slot, channel).getVoltageDemand();
-    //    printf("get from table %f, %d\n", v, nch);
-    //  sleep(5);
     // set
     voltage = v;
     sprintf(buf, "snmpset -v 2c -m +WIENER-CRATE-MIB -c guru 192.168.0.21 outputVoltage.u%d F %f", nch, voltage);
@@ -69,7 +68,7 @@ void CdcHVControlCallback::initialize() throw()
   system(buf);
   sprintf(buf, "snmpset -v 2c -m +WIENER-CRATE-MIB -c guru 192.168.0.21 outputVoltageRiseRate.u%d F %f", 100, voltage - 15.);
   system(buf);
-
+  */
 }
 
 void CdcHVControlCallback::timeout() throw()
@@ -89,41 +88,25 @@ void CdcHVControlCallback::recall(int index) throw(IOException)
 
 void CdcHVControlCallback::setSwitch(int crate, int slot, int channel, bool switchon) throw(IOException)
 {
-  // add
-  //  system("snmpset -v 2c -m +WIENER-CRATE-MIB -c private 192.168.0.21 sysMainSwitch.0 i 1");
-  //  system("snmpset -v 2c -m +WIENER-CRATE-MIB -c guru 192.168.0.21 outputSwitch.u%d i 1", nch);
-
   char buf[256];
   memset((void*) buf, (int)'\0', sizeof(buf));
-
   int nch = 100 * (slot - 1) + (channel - 1);
-  if (switchon == true) {
-    sprintf(buf, "snmpset -v 2c -m +WIENER-CRATE-MIB -c guru 192.168.0.21 outputSwitch.u%d i 1", nch);
-    system(buf);
-  } else if (switchon == false) {
-    sprintf(buf, "snmpset -v 2c -m +WIENER-CRATE-MIB -c guru 192.168.0.21 outputSwitch.u%d i 0", nch);
-    system(buf);
-  }
-
-  LogFile::info("setswitch called : crate = %d, slot = %d, channel = %d, switch: %s",
-                crate, slot, channel, (switchon ? "ON" : "OFF"));
+  sprintf(buf, "snmpset -v 2c -m +WIENER-CRATE-MIB -c guru 192.168.0.21 outputSwitch.u%d i %d", nch, (int)switchon);
+  LogFile::info("%s", buf);
+  system(buf);
 }
 
 void CdcHVControlCallback::setRampUpSpeed(int crate, int slot, int channel, float voltage) throw(IOException)
 {
-
   char buf[256];
   memset((void*) buf, (int)'\0', sizeof(buf));
-
   //  int nch = 100*(slot-1) + (channel-1);
   int nch = 100 * (slot - 1) + (0); //.u0
   // koko
   sprintf(buf, "snmpset -v 2c -m +WIENER-CRATE-MIB -c guru 192.168.0.21 outputVoltageRiseRate.u%d F %f", nch, voltage);
   //  sprintf(buf,"snmpset -Oqv -v 2c -m +WIENER-CRATE-MIB -c guru 192.168.0.21 outputVoltageRiseRate.u%d F %f", nch, voltage);
+  LogFile::info("%s", buf);
   system(buf);
-
-  LogFile::info("setrampup called : crate = %d, slot = %d, channel = %d, voltage: %f",
-                crate, slot, channel, voltage);
 }
 
 void CdcHVControlCallback::setRampDownSpeed(int crate, int slot, int channel, float voltage) throw(IOException)
@@ -135,10 +118,8 @@ void CdcHVControlCallback::setRampDownSpeed(int crate, int slot, int channel, fl
   // koko
   sprintf(buf, "snmpset -v 2c -m +WIENER-CRATE-MIB -c guru 192.168.0.21 outputVoltageFallRate.u%d F %f", nch, voltage);
   //  sprintf(buf,"snmpset -Oqv -v 2c -m +WIENER-CRATE-MIB -c guru 192.168.0.21 outputVoltageFallRate.u%d F %f", nch, voltage);
+  LogFile::info("%s", buf);
   system(buf);
-
-  LogFile::info("setrampdown called : crate = %d, slot = %d, channel = %d, voltage: %f",
-                crate, slot, channel, voltage);
 }
 
 void CdcHVControlCallback::setVoltageDemand(int crate, int slot, int channel, float voltage) throw(IOException)
@@ -149,27 +130,22 @@ void CdcHVControlCallback::setVoltageDemand(int crate, int slot, int channel, fl
 
   int nch = 100 * (slot - 1) + (channel - 1);
   sprintf(buf, "snmpset -v 2c -m +WIENER-CRATE-MIB -c guru 192.168.0.21 outputVoltage.u%d F %f", nch, voltage);
+  LogFile::info("%s", buf);
   system(buf);
 
   // get and check
-  char bufs[256];
-  memset((void*) bufs, (int)'\0', sizeof(bufs));
-  //  int nch = 100*(slot-1) + (channel-1);
-  sprintf(bufs, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c public 192.168.0.21 outputVoltage.u%d", nch);
+  memset((void*) buf, (int)'\0', sizeof(buf));
+  sprintf(buf, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c public 192.168.0.21 outputVoltage.u%d", nch);
+  LogFile::info("%s", buf);
 
   FILE* fp;
-  fp = popen(bufs, "r");
+  fp = popen(buf, "r");
   float v = 0;
-  while (fgets(bufs, sizeof(bufs), fp) != NULL) {
-    //    sscanf(bufs, "%fV", &v );
-    sscanf(bufs, "%fV\n", &v);
+  while (fgets(buf, sizeof(buf), fp) != NULL) {
+    sscanf(buf, "%fV\n", &v);
+    LogFile::info("%s", buf);
   }
-  (void) pclose(fp);
-  //
-  printf("get set ch %f, %f, %d\n", v, voltage, nch);
-
-  LogFile::info("setvoltagedemand called : crate = %d, slot = %d, channel = %d, voltage: %f",
-                crate, slot, channel, voltage);
+  pclose(fp);
 }
 
 void CdcHVControlCallback::setVoltageLimit(int crate, int slot, int channel, float voltage) throw(IOException)
@@ -185,199 +161,190 @@ void CdcHVControlCallback::setCurrentLimit(int crate, int slot, int channel, flo
   memset((void*) buf, (int)'\0', sizeof(buf));
   int nch = 100 * (slot - 1) + (channel - 1);
   sprintf(buf, "snmpset -v 2c -m +WIENER-CRATE-MIB -c guru 192.168.0.21 outputCurrent.u%d F %f", nch, current);
+  LogFile::info("%s", buf);
   system(buf);
-
-  LogFile::info("setcurrentlimit called : crate = %d, slot = %d, channel = %d, voltage: %f",
-                crate, slot, channel, current);
 }
 
 float CdcHVControlCallback::getRampUpSpeed(int crate, int slot, int channel) throw(IOException)
 {
   // koko
-  char bufs[256];
-  memset((void*) bufs, (int)'\0', sizeof(bufs));
+  char buf[256];
+  memset((void*) buf, (int)'\0', sizeof(buf));
 
   int nch = 100 * (slot - 1) + (channel - 1);
-  sprintf(bufs, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c public 192.168.0.21 outputVoltageRiseRate.u%d", nch);
+  sprintf(buf, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c public 192.168.0.21 outputVoltageRiseRate.u%d", nch);
+  LogFile::info("%s", buf);
 
   FILE* fp;
-  fp = popen(bufs, "r");
+  fp = popen(buf, "r");
   float v = 0.;
-  while (fgets(bufs, sizeof(bufs), fp) != NULL) {
-    sscanf(bufs, "%fV", &v);
-    //    printf("getrampup, %d, %s\n", nch, bufs);
+  while (fgets(buf, sizeof(buf), fp) != NULL) {
+    sscanf(buf, "%fV", &v);
+    LogFile::info("%s", buf);
   }
-  (void) pclose(fp);
+  pclose(fp);
 
   return v;
-
-  //  return getConfig().getChannel(crate, slot, channel).getRampUpSpeed();
-
 }
 
 float CdcHVControlCallback::getRampDownSpeed(int crate, int slot, int channel) throw(IOException)
 {
 
-  char bufs[256];
-  memset((void*) bufs, (int)'\0', sizeof(bufs));
+  char buf[256];
+  memset((void*) buf, (int)'\0', sizeof(buf));
   int nch = 100 * (slot - 1) + (channel - 1);
-  sprintf(bufs, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c public 192.168.0.21 outputVoltageFallRate.u%d", nch);
+  sprintf(buf, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c public 192.168.0.21 outputVoltageFallRate.u%d", nch);
+  LogFile::info("%s", buf);
 
   FILE* fp;
-  fp = popen(bufs, "r");
+  fp = popen(buf, "r");
   float v = 0;
-  while (fgets(bufs, sizeof(bufs), fp) != NULL) {
-    sscanf(bufs, "%fV", &v);
+  while (fgets(buf, sizeof(buf), fp) != NULL) {
+    sscanf(buf, "%fV", &v);
+    LogFile::info("%s", buf);
   }
-  (void) pclose(fp);
+  pclose(fp);
 
   return v;
-
-  //  return getConfig().getChannel(crate, slot, channel).getRampDownSpeed();
 }
 
 float CdcHVControlCallback::getVoltageDemand(int crate, int slot, int channel) throw(IOException)
 {
-  char bufs[256];
-  memset((void*) bufs, (int)'\0', sizeof(bufs));
+  char buf[256];
+  memset((void*) buf, (int)'\0', sizeof(buf));
   int nch = 100 * (slot - 1) + (channel - 1);
-  sprintf(bufs, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c public 192.168.0.21 outputVoltage.u%d", nch);
+  sprintf(buf, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c public 192.168.0.21 outputVoltage.u%d", nch);
+  LogFile::info("%s", buf);
 
   FILE* fp;
-  fp = popen(bufs, "r");
+  fp = popen(buf, "r");
   float v = 0;
-  while (fgets(bufs, sizeof(bufs), fp) != NULL) {
-    sscanf(bufs, "%fV", &v);
+  while (fgets(buf, sizeof(buf), fp) != NULL) {
+    sscanf(buf, "%fV", &v);
+    LogFile::info("%s", buf);
   }
-  (void) pclose(fp);
+  pclose(fp);
 
   return v;
-
-  //  //  return getConfig().getChannel(crate, slot, channel).getVoltageDemand();
-
 }
 
 float CdcHVControlCallback::getVoltageLimit(int crate, int slot, int channel) throw(IOException)
 {
+  //??
   //  return getConfig().getChannel(crate, slot, channel).getVoltageLimit();
   return 510.;
 }
 
 float CdcHVControlCallback::getCurrentLimit(int crate, int slot, int channel) throw(IOException)
 {
-  char bufs[256];
-  memset((void*) bufs, (int)'\0', sizeof(bufs));
+  char buf[256];
+  memset((void*) buf, (int)'\0', sizeof(buf));
   int nch = 100 * (slot - 1) + (channel - 1);
-  sprintf(bufs, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c public 192.168.0.21 outputCurrent.u%d", nch);
+  sprintf(buf, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c public 192.168.0.21 outputCurrent.u%d", nch);
+  LogFile::info("%s", buf);
 
   FILE* fp;
-  fp = popen(bufs, "r");
+  fp = popen(buf, "r");
   float v = 0;
-  while (fgets(bufs, sizeof(bufs), fp) != NULL) {
-    sscanf(bufs, "%fV", &v);
+  while (fgets(buf, sizeof(buf), fp) != NULL) {
+    sscanf(buf, "%fV", &v);
+    LogFile::info("%s", buf);
   }
-  (void) pclose(fp);
-
-  //  return v;
+  pclose(fp);
   return v * 1000000.;
-
-  //  return getConfig().getChannel(crate, slot, channel).getCurrentLimit();
-
 }
 
 float CdcHVControlCallback::getVoltageMonitor(int crate, int slot, int channel) throw(IOException)
 {
   // koko
-  char bufs[256];
-  memset((void*) bufs, (int)'\0', sizeof(bufs));
+  char buf[256];
+  memset((void*) buf, (int)'\0', sizeof(buf));
 
   int nch = 100 * (slot - 1) + (channel - 1);
-  sprintf(bufs, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c public 192.168.0.21 outputMeasurementSenseVoltage.u%d", nch);
+  sprintf(buf, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c public 192.168.0.21 outputMeasurementSenseVoltage.u%d", nch);
+  LogFile::info("%s", buf);
 
   FILE* fp;
-  fp = popen(bufs, "r");
+  fp = popen(buf, "r");
   float v = 0;
-  while (fgets(bufs, sizeof(bufs), fp) != NULL) {
-    //    printf("%s\n", bufs);
-    sscanf(bufs, "%fV", &v);
+  while (fgets(buf, sizeof(buf), fp) != NULL) {
+    sscanf(buf, "%fV", &v);
+    LogFile::info("%s", buf);
   }
-  //  std::cout << "neko "<< nch << " " << v << std::endl;
-  (void) pclose(fp);
-
+  pclose(fp);
   return v;
-
-  //  return 6;
 }
 
 float CdcHVControlCallback::getCurrentMonitor(int crate, int slot, int channel) throw(IOException)
 {
 
-  char bufs[256];
-  memset((void*) bufs, (int)'\0', sizeof(bufs));
+  char buf[256];
+  memset((void*) buf, (int)'\0', sizeof(buf));
 
   int nch = 100 * (slot - 1) + (channel - 1);
-  //  sprintf(bufs,"snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c guru 192.168.0.21 outputMeasurementCurrent.u%d", nch );
-  sprintf(bufs, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c public 192.168.0.21 outputMeasurementCurrent.u%d", nch);
+  sprintf(buf, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c public 192.168.0.21 outputMeasurementCurrent.u%d", nch);
+  LogFile::info("%s", buf);
 
   FILE* fp;
-  fp = popen(bufs, "r");
+  fp = popen(buf, "r");
   float v = 0;
-  while (fgets(bufs, sizeof(bufs), fp) != NULL) {
-    //    printf("%s\n", bufs);
-    sscanf(bufs, "%fV", &v);
+  while (fgets(buf, sizeof(buf), fp) != NULL) {
+    sscanf(buf, "%fV", &v);
+    LogFile::info("%s", buf);
   }
-  //  std::cout << "neko "<< v << std::endl;
-  (void) pclose(fp);
+  pclose(fp);
 
-  //  return v;
   return v * 1000000.;
-
-  //  return 9;
 }
 
 bool CdcHVControlCallback::getSwitch(int crate, int slot, int channel) throw(IOException)
 {
-  char bufs[256];
-  memset((void*) bufs, (int)'\0', sizeof(bufs));
+  char buf[256];
+  memset((void*) buf, (int)'\0', sizeof(buf));
   int nch = 100 * (slot - 1) + (channel - 1);
   // get switch on/off
-  sprintf(bufs, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c guru 192.168.0.21 outputSwitch.u%d", nch);
+  sprintf(buf, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c guru 192.168.0.21 outputSwitch.u%d", nch);
+  LogFile::info("%s", buf);
   FILE* fp;
-  fp = popen(bufs, "r");
-  while (fgets(bufs, sizeof(bufs), fp) != NULL) {
-    std::string tmp = std::string(bufs);
+  fp = popen(buf, "r");
+  while (fgets(buf, sizeof(buf), fp) != NULL) {
+    std::string tmp = std::string(buf);
+    LogFile::info("%s", buf);
     if (strncmp(tmp.c_str(), "on", 2) == 0) {
+      pclose(fp);
       return true;
     } else if (strncmp(tmp.c_str(), "off", 3) == 0) {
+      pclose(fp);
       return false;
     }
   }
-  (void) pclose(fp);
-
+  pclose(fp);
+  return false;
 }
 
 int CdcHVControlCallback::getState(int crate, int slot, int channel) throw(IOException)
 {
   //  return HVMessage::OCP;
-  char bufs[256];
-  memset((void*) bufs, (int)'\0', sizeof(bufs));
+  char buf[256];
+  memset((void*) buf, (int)'\0', sizeof(buf));
   int nch = 100 * (slot - 1) + (channel - 1);
   // get switch on/off
-  sprintf(bufs, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c guru 192.168.0.21 outputSwitch.u%d", nch);
+  sprintf(buf, "snmpget -Oqv -v 2c -m +WIENER-CRATE-MIB -c guru 192.168.0.21 outputSwitch.u%d", nch);
+  LogFile::info("%s", buf);
   FILE* fp;
-  fp = popen(bufs, "r");
-  while (fgets(bufs, sizeof(bufs), fp) != NULL) {
-    std::string tmp = std::string(bufs);
+  fp = popen(buf, "r");
+  while (fgets(buf, sizeof(buf), fp) != NULL) {
+    std::string tmp = std::string(buf);
+    LogFile::info("%s", buf);
     if (strncmp(tmp.c_str(), "on", 2) == 0) {
+      pclose(fp);
       return HVMessage::ON;
-      //      return true;
     } else if (strncmp(tmp.c_str(), "off", 3) == 0) {
+      pclose(fp);
       return HVMessage::OFF;
-      //      return false;
     }
   }
-  (void) pclose(fp);
-
-  //  return HVMessage::neko;
+  pclose(fp);
+  return HVMessage::ERR;
 }
 

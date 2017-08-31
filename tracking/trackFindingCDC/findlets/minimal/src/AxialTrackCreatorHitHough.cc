@@ -17,7 +17,6 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <framework/core/ModuleParamList.h>
 
@@ -142,7 +141,7 @@ void AxialTrackCreatorHitHough::initialize()
 
   // Construct hough tree
   int maxTreeLevel = m_param_granularityLevel - m_param_sectorLevelSkip;
-  m_houghTree = makeUnique<SimpleRLTaggedWireHitPhi0CurvHough>(maxTreeLevel, m_curlCurv);
+  m_houghTree = std::make_unique<SimpleRLTaggedWireHitPhi0CurvHough>(maxTreeLevel, m_curlCurv);
   m_houghTree->setSectorLevelSkip(m_param_sectorLevelSkip);
   m_houghTree->assignArray<DiscretePhi0>(phi0BinsSpec.constructArray(), phi0BinsSpec.getNOverlap());
   m_houghTree->assignArray<DiscreteCurv>(m_param_curvBounds, m_param_discreteCurvOverlap);

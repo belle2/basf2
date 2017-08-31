@@ -62,9 +62,7 @@ void FittedTracksStorerModule::event()
 
   for (RecoTrack& recoTrack : inputRecoTracks) {
     if (recoTrack.wasFitSuccessful()) {
-      auto newRecoTrack = outputRecoTracks.appendNew(recoTrack.getPositionSeed(),
-                                                     recoTrack.getMomentumSeed(),
-                                                     recoTrack.getChargeSeed());
+      auto newRecoTrack = recoTrack.copyToStoreArray(outputRecoTracks);
       newRecoTrack->addHitsFromRecoTrack(&recoTrack);
 
       // Add also relations

@@ -53,18 +53,6 @@ def CheckFile(conf, dir, text=None):
     return result
 
 
-def CheckLibrary(conf, lib):
-    """check for the loading of a library"""
-
-    conf.Message('Checking for %s...' % lib)
-    process = subprocess.Popen(['ldd', lib], stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
-    output = process.communicate()[0]
-    result = process.returncode == 0 and 'not found' not in output
-    conf.Result(result)
-    return result
-
-
 def configure_belle2(conf):
     """check the Belle II environment"""
 
@@ -96,7 +84,7 @@ def configure_system(conf):
     # TEve
     conf.env['HAS_TEVE'] = False
     conf.env['TEVE_LIBS'] = []
-    if conf.CheckLibrary(os.path.join(os.environ['ROOTSYS'], 'lib', 'libEve.so')) and conf.CheckLib("GLU"):
+    if conf.CheckLibWithHeader("Eve", "TEveViewer.h", language="c++", autoadd=0, call="TEveViewer();"):
         conf.env['HAS_TEVE'] = True
         conf.env['TEVE_LIBS'] = ['Gui', 'Eve', 'Ged', 'RGL', 'TreePlayer']
 
@@ -150,7 +138,6 @@ def configure(env):
         'CheckConfigTool': CheckConfigTool,
         'CheckPackage': CheckPackage,
         'CheckFile': CheckFile,
-        'CheckLibrary': CheckLibrary,
     })
 
     if not configure_belle2(conf) or not configure_externals(conf) \

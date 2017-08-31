@@ -16,10 +16,11 @@ c--   TOP_TOPF.fi: solutions of ring image equations
       LOGICAL F_OK(2)                             ! flag
       REAL F_H(NB)                                ! step
       REAL F_DIR(3)                               ! at detection (topf_raytr only)
+      REAL F_DIRB(3)                              ! at prism-bar joint (topf_raytr only)
 
       COMMON /TOP_TOPF/ NT, F_CFIC, F_SFIC, F_KX, F_KY, F_KZ, 
      &     F_X0, F_Y0, F_Z0, F_TL, F_XD, F_YD, F_XH, F_YH, F_YB,  
      &     F_YM, F_NX, F_NY, F_NXM, F_NYM, F_NXE, F_NYE, F_OK, F_H,
-     &	   F_DIR
+     &	   F_DIR, F_DIRB
 
 

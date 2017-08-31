@@ -15,7 +15,7 @@ const int HSLB_HARDWARE_VERSION = 0xA;
 
 using namespace Belle2;
 
-ECLFEE::ECLFEE()
+ECLFEE::ECLFEE() : FEE("ecl")
 {
 }
 

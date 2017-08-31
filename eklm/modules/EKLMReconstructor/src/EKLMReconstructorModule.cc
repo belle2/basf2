@@ -175,7 +175,6 @@ void EKLMReconstructorModule::event()
           EKLMAlignmentHit* alignmentHit = alignmentHits.appendNew(i);
           alignmentHit->addRelationTo(hit2d);
         }
-        /* cppcheck-suppress memleak */
       }
     }
     it = it3;

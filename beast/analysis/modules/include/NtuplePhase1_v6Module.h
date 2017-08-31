@@ -84,6 +84,7 @@ namespace Belle2 {
     std::vector<Double_t> m_input_Z; /** input Z */
     Int_t m_input_BGSol; /**< time stamp start and stop */
     Int_t m_input_ToSol; /**< time stamp start and stop */
+    Int_t m_input_part; /**< which components to take into account */
     std::vector<Double_t> m_input_GasCorrection; /**< time stamp start and stop */
 
     std::vector<std::string> m_inputRateHistoNames; /**< list of file names */

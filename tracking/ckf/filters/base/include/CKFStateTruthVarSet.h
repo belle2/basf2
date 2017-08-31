@@ -65,7 +65,6 @@ namespace Belle2 {
     virtual bool extract(const CKFStateObject<ASeedObject, AHitObject>* result) override
     {
       RecoTrack* seedTrack = result->getSeedRecoTrack();
-      const auto* hit = result->getHit();
 
       if (not seedTrack) return false;
 
@@ -73,12 +72,7 @@ namespace Belle2 {
       Super::template var<Super::named("event_id")>() = eventMetaData->getEvent();
       Super::template var<Super::named("seed_number")>() = seedTrack->getArrayIndex();
 
-      const std::string& seedTrackStoreArrayName = seedTrack->getArrayName();
-
-      TrackMatchLookUp mcCDCMatchLookUp("MCRecoTracks", seedTrackStoreArrayName);
-      const RecoTrack* cdcMCTrack = mcCDCMatchLookUp.getMatchedMCRecoTrack(*seedTrack);
-
-      // Default to 0, -1 or false (depending on context)
+      // Default to 0 or false (depending on context)
       Super::template var<Super::named("truth_position_x")>() = 0;
       Super::template var<Super::named("truth_position_y")>() = 0;
       Super::template var<Super::named("truth_position_z")>() = 0;
@@ -87,41 +81,15 @@ namespace Belle2 {
       Super::template var<Super::named("truth_momentum_z")>() = 0;
       Super::template var<Super::named("truth")>() = false;
 
-      // In case the CDC track is a fake, return false always
-      if (not cdcMCTrack) {
-        return true;
-      }
-
-      if (not hit) {
-        // on every second layer (the overlap layers) it is fine to have no space point
-        if (isOnOverlapLayer(*result)) {
-          Super::template var<Super::named("truth")>() = true;
-          return true;
-        } else {
-          // it is also fine, if the MC track does not have this layer
-          const auto& svdHits = cdcMCTrack->getSVDHitList();
-          const auto& pxdHits = cdcMCTrack->getPXDHitList();
-
-          const bool hasSVDLayer = TrackFindingCDC::any(svdHits, [&result](const SVDCluster * cluster) {
-            return cluster->getSensorID().getLayerNumber() == extractGeometryLayer(*result);
-          });
-          const bool hasPXDLayer = TrackFindingCDC::any(pxdHits, [&result](const PXDCluster * cluster) {
-            return cluster->getSensorID().getLayerNumber() == extractGeometryLayer(*result);
-          });
-
-          if (hasSVDLayer or hasPXDLayer) {
-            return true;
-          } else {
-            Super::template var<Super::named("truth")>() = true;
-            return true;
-          }
-        }
-      }
-
-      if (not isCorrectHit(*hit, *cdcMCTrack)) {
+      if (not isStateCorrect(*result)) {
         // Keep all variables set to false and return.
         return true;
       }
+
+      const std::string& seedTrackStoreArrayName = seedTrack->getArrayName();
+
+      TrackMatchLookUp mcCDCMatchLookUp("MCRecoTracks", seedTrackStoreArrayName);
+      const RecoTrack* cdcMCTrack = mcCDCMatchLookUp.getMatchedMCRecoTrack(*seedTrack);
 
       Super::template var<Super::named("truth")>() = true;
 

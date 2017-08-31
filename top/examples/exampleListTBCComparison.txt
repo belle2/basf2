@@ -1,0 +1,2 @@
+/group/belle2/group/detector/TOP/calibration/TBC/tests/TBC2017-08-run372x-allch-6nsWidth/ 6nsCut
+/group/belle2/group/detector/TOP/calibration/TBC/tests/TBC2017-08-run372x-allch-8nsWidth/ 8nsCut

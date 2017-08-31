@@ -583,12 +583,12 @@ namespace Belle2 {
             //define sense wire
             TVector3 wb = cdcgp.wireBackwardPosition(iSLayer, ic);
             TVector3 wf = cdcgp.wireForwardPosition(iSLayer, ic);
-            G4double tAtZ0 = -wb.Z() / (wf.Z() - wb.Z());
-            TVector3 wAtZ0 = wb + tAtZ0 * (wf - wb);
-            G4double reductionBwd = (zback_sensitive_middle + epsl) / wb.Z();
-            wb = reductionBwd * (wb - wAtZ0) + wAtZ0;
-            G4double reductionFwd = (zfor_sensitive_middle - epsl) / wf.Z();
-            wf = reductionFwd * (wf - wAtZ0) + wAtZ0;
+            G4double tAtZ02 = -wb.Z() / (wf.Z() - wb.Z());
+            TVector3 wAtZ02 = wb + tAtZ02 * (wf - wb);
+            G4double reductionBwd2 = (zback_sensitive_middle + epsl) / wb.Z();
+            wb = reductionBwd2 * (wb - wAtZ02) + wAtZ02;
+            G4double reductionFwd2 = (zfor_sensitive_middle - epsl) / wf.Z();
+            wf = reductionFwd2 * (wf - wAtZ02) + wAtZ02;
 
             G4double thetaYZ = -asin((wf - wb).Y() / (wf - wb).Mag());
 

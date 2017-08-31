@@ -61,7 +61,7 @@ if __name__ == "__main__":
     # optimize
     for i in range(10):
         x = optimizer.ask(n_points=2)  # x is a list of n_points points
-        y = Parallel()(delayed(f)(v, general_options, index) for index, v in enumerate(x))  # evaluate points in parallel
+        y = Parallel(n_jobs=-1)(delayed(f)(v, general_options, index) for index, v in enumerate(x))  # evaluate points in parallel
         res = optimizer.tell(x, y)
 
     # Give some results

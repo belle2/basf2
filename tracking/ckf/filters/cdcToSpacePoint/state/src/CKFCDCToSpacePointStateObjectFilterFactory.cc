@@ -34,14 +34,17 @@ namespace {
   using SloppyMCCKFCDCToSpacePointStateObjectFilter = SloppyMCFilter<CKFStateTruthVarSet<RecoTrack, SpacePoint>>;
 
   /// Recording filter for VXD - CDC relations.
-  using RecordingCKFCDCToSpacePointStateObjectFilter =
+  class RecordingCKFCDCToSpacePointStateObjectFilter : public
     RecordingFilter<VariadicUnionVarSet<CKFStateTruthVarSet<RecoTrack, SpacePoint>,
-    CKFCDCToSpacePointStateObjectBasicVarSet, CKFCDCToSpacePointStateObjectVarSet>>;
-
-  /// Basic recording filter for VXD - CDC relations.
-  using BasicRecordingCKFCDCToSpacePointStateObjectFilter =
-    RecordingFilter<VariadicUnionVarSet<CKFStateTruthVarSet<RecoTrack, SpacePoint>, CKFCDCToSpacePointStateObjectBasicVarSet>>;
-
+    CKFCDCToSpacePointStateObjectBasicVarSet, CKFCDCToSpacePointStateObjectVarSet>> {
+    using Super = RecordingFilter<VariadicUnionVarSet<CKFStateTruthVarSet<RecoTrack, SpacePoint>,
+          CKFCDCToSpacePointStateObjectBasicVarSet, CKFCDCToSpacePointStateObjectVarSet>>;
+  public:
+    RecordingCKFCDCToSpacePointStateObjectFilter(const std::string& defaultRootFileName) : Super(defaultRootFileName)
+    {
+      setSkimFilter(std::make_unique<SloppyMCCKFCDCToSpacePointStateObjectFilter>());
+    }
+  };
   /// All filter for VXD - CDC relations.
   using AllCKFCDCToSpacePointStateObjectFilter = AllFilter<BaseCKFCDCToSpacePointStateObjectFilter>;
 }
@@ -72,7 +75,6 @@ CKFCDCToSpacePointStateObjectFilterFactory::getValidFilterNamesAndDescriptions()
     {"pxd_simple", "simple filter to be used in pxd"},
     {"svd_simple", "simple filter to be used in svd"},
     {"recording", "record variables to a TTree"},
-    {"basic_recording", "record variables to a TTree"},
   };
 }
 
@@ -92,9 +94,7 @@ CKFCDCToSpacePointStateObjectFilterFactory::create(const std::string& filterName
   } else if (filterName == "sloppy_truth") {
     return std::make_unique<SloppyMCCKFCDCToSpacePointStateObjectFilter>();
   } else if (filterName == "recording") {
-    return std::make_unique<RecordingCKFCDCToSpacePointStateObjectFilter>("CKFCDCToSpacePointStateObjectFilter.root");
-  } else if (filterName == "basic_recording") {
-    return std::make_unique<BasicRecordingCKFCDCToSpacePointStateObjectFilter>("CKFCDCToSpacePointStateObjectFilter.root");
+    return std::make_unique<RecordingCKFCDCToSpacePointStateObjectFilter>("CKFCDCToSpacePointStateObjectFilter.root");;
   } else {
     return Super::create(filterName);
   }

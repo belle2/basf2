@@ -109,7 +109,7 @@ namespace Belle2 {
     HitSelector<AHitSelectorFilterFactory> m_hitSelector;
 
     /// Subfindlet state teacher
-    StateTeacher<CKFStateTruthVarSet<ASeedObject, AHitObject>> m_stateTeacher;
+    StateTeacher<ASeedObject, AHitObject> m_stateTeacher;
 
     /// Subfindlet: hit finder
     AHitFinder m_hitFinder;

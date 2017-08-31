@@ -35,6 +35,18 @@ namespace Belle2 {
 
     if (useNResults > 0 and childStates.size() > useNResults) {
       std::sort(childStates.begin(), childStates.end(), TrackFindingCDC::LessOf<TrackFindingCDC::Deref>());
+
+
+      const auto& firstTruth = std::find_if(childStates.begin(), childStates.end(), [](const auto * state) {
+        return state->getTruthInformation();
+      });
+      if (firstTruth != childStates.end()) {
+        const auto& indexOfFirstTruth = std::distance(childStates.begin(), firstTruth);
+        if (indexOfFirstTruth > useNResults) {
+          B2WARNING("First truth is in " << indexOfFirstTruth << " of " << childStates.size() << " where limit is "
+                    << useNResults);
+        }
+      }
       childStates.resize(useNResults);
     }
   }

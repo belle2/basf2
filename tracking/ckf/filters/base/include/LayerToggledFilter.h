@@ -14,18 +14,20 @@
 
 namespace Belle2 {
   /**
-   * A special filter, which is chooseable based on a filter factory differently
-   * for layers higher than N and for the rest. The toggle layer N is also configurable.
+   * A special findlet, which is chooseable based on a given findlet
+   * for layers higher than N, N and for the rest. The toggle layer N is also configurable.
    */
-  template <class AFilterFactory>
-  class LayerToggledFilter : public AFilterFactory::CreatedFilter {
+  template <class AFindlet, class AStateObject>
+  class LayerToggledFilter : public TrackFindingCDC::Findlet<AStateObject> {
+    /// the parent class
+    using Super = TrackFindingCDC::Findlet<AStateObject>;
   public:
     /// Add the subfilters as listeners.
-    LayerToggledFilter() : AFilterFactory::CreatedFilter()
+    LayerToggledFilter() : Super()
     {
-      AFilterFactory::CreatedFilter::addProcessingSignalListener(&m_highLayerFilter);
-      AFilterFactory::CreatedFilter::addProcessingSignalListener(&m_equalLayerFilter);
-      AFilterFactory::CreatedFilter::addProcessingSignalListener(&m_lowLayerFilter);
+      Super::addProcessingSignalListener(&m_highLayerFilter);
+      Super::addProcessingSignalListener(&m_equalLayerFilter);
+      Super::addProcessingSignalListener(&m_lowLayerFilter);
     }
 
     /// Expose parameters of the subfilters and the layer to change.
@@ -40,16 +42,21 @@ namespace Belle2 {
     }
 
     /// The weight is calculated using the subfilter based on the geometrical layer of the state.
-    TrackFindingCDC::Weight operator()(const typename AFilterFactory::CreatedFilter::Object& currentState) final {
-      const int layer = extractGeometryLayer(currentState);
-      if (layer > m_param_toggleOnLayer)
-      {
-        return m_highLayerFilter(currentState);
-      } else if (layer == m_param_toggleOnLayer)
-      {
-        return m_equalLayerFilter(currentState);
+    void apply(std::vector<AStateObject>& childStates) override
+    {
+      if (childStates.empty()) {
+        return;
+      }
+
+      const auto* firstElement = childStates.front();
+      const int layer = extractGeometryLayer(*firstElement);
+
+      if (layer > m_param_toggleOnLayer) {
+        m_highLayerFilter.apply(childStates);
+      } else if (layer == m_param_toggleOnLayer) {
+        m_equalLayerFilter.apply(childStates);
       } else {
-        return m_lowLayerFilter(currentState);
+        m_lowLayerFilter.apply(childStates);
       }
     }
 
@@ -58,10 +65,10 @@ namespace Belle2 {
     int m_param_toggleOnLayer = 0;
 
     /// The filter to use for layers higher then the toggle layer.
-    TrackFindingCDC::ChooseableFilter<AFilterFactory> m_highLayerFilter;
+    AFindlet m_highLayerFilter;
     /// The filter to use for layers equal then the toggle layer.
-    TrackFindingCDC::ChooseableFilter<AFilterFactory> m_equalLayerFilter;
+    AFindlet m_equalLayerFilter;
     /// The filter to use for layers smaller or equal then the toggle layer.
-    TrackFindingCDC::ChooseableFilter<AFilterFactory> m_lowLayerFilter;
+    AFindlet m_lowLayerFilter;
   };
 }

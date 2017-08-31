@@ -63,11 +63,11 @@ namespace Belle2 {
     bool m_param_fit = true;
 
     /// Subfindlet: Filter 1
-    LimitedFilter<LayerToggledFilter<AFilterFactory>> m_firstFilter;
+    LayerToggledFilter<LimitedFilter<TrackFindingCDC::ChooseableFilter<AFilterFactory>>, State> m_firstFilter;
     /// Subfindlet: Filter 2
-    LimitedFilter<LayerToggledFilter<AFilterFactory>> m_secondFilter;
+    LayerToggledFilter<LimitedFilter<TrackFindingCDC::ChooseableFilter<AFilterFactory>>, State> m_secondFilter;
     /// Subfindlet: Filter 3
-    LimitedFilter<LayerToggledFilter<AFilterFactory>> m_thirdFilter;
+    LayerToggledFilter<LimitedFilter<TrackFindingCDC::ChooseableFilter<AFilterFactory>>, State> m_thirdFilter;
     /// Subfindlet: Advancer
     CachedAdvanceFindlet<State> m_advanceAlgorithm;
     /// Subfindlet: Fitter
@@ -104,39 +104,64 @@ namespace Belle2 {
   void HitSelector<AFilterFactory>::apply(std::vector<HitSelector::State>& childStates)
   {
     B2DEBUG(50, "Starting with " << childStates.size() << " states");
+    unsigned int numberOfCorrectStates = std::count_if(childStates.begin(), childStates.end(), [](const auto & childState) {
+      return childState->getTruthInformation();
+    });
 
     m_firstFilter.apply(childStates);
     B2DEBUG(50, "First filter has found " << childStates.size() << " states");
-    B2DEBUG(50, "Left are " << std::count_if(childStates.begin(), childStates.end(), [](const auto & childState) {
+
+    unsigned int currentNumberOfCorrectStates = std::count_if(childStates.begin(), childStates.end(), [](const auto & childState) {
       return childState->getTruthInformation();
-    }) << "truths");
+    });
+    if (currentNumberOfCorrectStates != numberOfCorrectStates) {
+      B2WARNING("First filter has lost from " << numberOfCorrectStates << " to " << currentNumberOfCorrectStates);
+      numberOfCorrectStates = currentNumberOfCorrectStates;
+    }
 
     if (m_param_advance) {
       m_advanceAlgorithm.apply(childStates);
       B2DEBUG(50, "Advance has found " << childStates.size() << " states");
-      B2DEBUG(50, "Left are " << std::count_if(childStates.begin(), childStates.end(), [](const auto & childState) {
+
+      currentNumberOfCorrectStates = std::count_if(childStates.begin(), childStates.end(), [](const auto & childState) {
         return childState->getTruthInformation();
-      }) << "truths");
+      });
+      if (currentNumberOfCorrectStates != numberOfCorrectStates) {
+        B2WARNING("Advance filter has lost from " << numberOfCorrectStates << " to " << currentNumberOfCorrectStates);
+        numberOfCorrectStates = currentNumberOfCorrectStates;
+      }
     }
 
     m_secondFilter.apply(childStates);
     B2DEBUG(50, "Second filter has found " << childStates.size() << " states");
-    B2DEBUG(50, "Left are " << std::count_if(childStates.begin(), childStates.end(), [](const auto & childState) {
+    currentNumberOfCorrectStates = std::count_if(childStates.begin(), childStates.end(), [](const auto & childState) {
       return childState->getTruthInformation();
-    }) << "truths");
+    });
+    if (currentNumberOfCorrectStates != numberOfCorrectStates) {
+      B2WARNING("Second filter has lost from " << numberOfCorrectStates << " to " << currentNumberOfCorrectStates);
+      numberOfCorrectStates = currentNumberOfCorrectStates;
+    }
 
     if (m_param_fit) {
       applyAndFilter(childStates, m_fitterAlgorithm);
       B2DEBUG(50, "Fit filter has found " << childStates.size() << " states");
-      B2DEBUG(50, "Left are " << std::count_if(childStates.begin(), childStates.end(), [](const auto & childState) {
+      currentNumberOfCorrectStates = std::count_if(childStates.begin(), childStates.end(), [](const auto & childState) {
         return childState->getTruthInformation();
-      }) << "truths");
+      });
+      if (currentNumberOfCorrectStates != numberOfCorrectStates) {
+        B2WARNING("Fit filter has lost from " << numberOfCorrectStates << " to " << currentNumberOfCorrectStates);
+        numberOfCorrectStates = currentNumberOfCorrectStates;
+      }
     }
 
     m_thirdFilter.apply(childStates);
     B2DEBUG(50, "Third filter has found " << childStates.size() << " states");
-    B2DEBUG(50, "Left are " << std::count_if(childStates.begin(), childStates.end(), [](const auto & childState) {
+    currentNumberOfCorrectStates = std::count_if(childStates.begin(), childStates.end(), [](const auto & childState) {
       return childState->getTruthInformation();
-    }) << "truths");
+    });
+    if (currentNumberOfCorrectStates != numberOfCorrectStates) {
+      B2WARNING("Third filter has lost from " << numberOfCorrectStates << " to " << currentNumberOfCorrectStates);
+      numberOfCorrectStates = currentNumberOfCorrectStates;
+    }
   }
 }

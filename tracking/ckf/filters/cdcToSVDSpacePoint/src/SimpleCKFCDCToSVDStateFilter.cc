@@ -13,6 +13,8 @@
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <svd/reconstruction/SVDRecoHit.h>
+#include <pxd/reconstruction/PXDRecoHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -23,7 +25,24 @@ namespace {
   {
     return (a % b + b) % b;
   }
+
+  unsigned int getPTRange(const Vector3D& momentum)
+  {
+    const double pT = momentum.xy().norm();
+    if (pT > 0.4) {
+      return 0;
+    } else if (pT > 0.2) {
+      return 1;
+    } else {
+      return 2;
+    }
+  }
 }
+
+constexpr const double SimpleCKFCDCToSVDStateFilter::m_param_maximumHelixDistance[][3];
+constexpr const double SimpleCKFCDCToSVDStateFilter::m_param_maximumResidual[][3];
+constexpr const double SimpleCKFCDCToSVDStateFilter::m_param_maximumResidual2[][3];
+constexpr const double SimpleCKFCDCToSVDStateFilter::m_param_maximumChi2[][3];
 
 Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState)
 {
@@ -34,26 +53,23 @@ Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStat
   const auto* spacePoint = currentState.getHit();
 
   if (not spacePoint) {
+    // lets use a very small number here, to always have the empty state in the game
     return 0;
   }
 
-  const Vector3D position(currentState.getMSoPPosition());
-  const Vector3D hitPosition(currentState.getHit()->getPosition());
+  const unsigned int layer = extractGeometryLayer(currentState);
+  const Vector3D momentum(currentState.getMSoPMomentum());
 
-  const double sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
-
-  if (sameHemisphere != 1) {
-    return NAN;
-  }
-
-  const TMatrixDSym& cov = currentState.getMSoPCovariance();
-  const double layer = extractGeometryLayer(currentState);
+  double valueToCheck;
+  const MaximalValueArray* maximumValues;
 
   if (not currentState.isFitted() and not currentState.isAdvanced()) {
     // Filter 1
     const RecoTrack* cdcTrack = currentState.getSeedRecoTrack();
 
-    const Vector3D momentum(currentState.getMSoPMomentum());
+    const Vector3D position(currentState.getMSoPPosition());
+    const Vector3D hitPosition(spacePoint->getPosition());
+
     const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed(), m_cachedBField);
 
     const double arcLength = trajectory.calcArcLength2D(hitPosition);
@@ -62,35 +78,44 @@ Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStat
     const Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
     const Vector3D differenceHelix = trackPositionAtHit - hitPosition;
 
-    const double helix_chi2_xyz = (differenceHelix.x() * differenceHelix.x() / sqrt(cov(0, 0)) +
-                                   differenceHelix.y() * differenceHelix.y() / sqrt(cov(1, 1)) +
-                                   differenceHelix.z() * differenceHelix.z() / sqrt(cov(2, 2)));
-
-    if (helix_chi2_xyz > m_param_maximumHelixChi2XYZ[layer - 3]) {
-      return NAN;
-    } else {
-      return helix_chi2_xyz;
-    }
-  } else if (not currentState.isFitted()) {
-    // Filter 2
-    const Vector3D& difference = position - hitPosition;
-
-    const double chi2_xy = (difference.x() * difference.x() / sqrt(cov(0, 0)) +
-                            difference.y() * difference.y() / sqrt(cov(1, 1)));
-    const double chi2_xyz = chi2_xy + difference.z() * difference.z() / sqrt(cov(2, 2));
-
-    if (chi2_xy > m_param_maximumChi2XY[layer - 3]) {
-      return NAN;
-    } else {
-      return chi2_xyz;
-    }
+    valueToCheck = differenceHelix.norm();
+    maximumValues = &m_param_maximumHelixDistance;
   } else {
-    // Filter 3
-    const double chi2 = currentState.getChi2();
-    if (chi2 > m_param_maximumChi2[layer - 3]) {
+    // Filter 2 + 3
+    const Vector3D position(currentState.getMSoPPosition());
+    const Vector3D hitPosition(spacePoint->getPosition());
+
+    const double sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
+    if (sameHemisphere != 1) {
       return NAN;
-    } else {
-      return chi2;
     }
+
+    const auto& measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
+    double residual = 0;
+
+    for (const auto& svdCluster : spacePoint->getRelationsWith<SVDCluster>()) {
+      SVDRecoHit recoHit(&svdCluster);
+      residual += m_fitter.calculateResidualDistance<SVDRecoHit, 1>(measuredStateOnPlane, recoHit);
+    }
+
+    valueToCheck = residual;
+    if (currentState.isFitted()) {
+      maximumValues = &m_param_maximumResidual2;
+    } else {
+      maximumValues = &m_param_maximumResidual;
+    }
+  }/* else {
+    // Filter 3
+    valueToCheck = currentState.getChi2();
+    maximumValues = &m_param_maximumChi2;
+  }*/
+
+  if (valueToCheck > (*maximumValues)[layer - 1][getPTRange(momentum)]) {
+    if (currentState.getTruthInformation()) {
+      B2WARNING("Throwing away a truth hit with " << valueToCheck << " instead of " << (*maximumValues)[layer - 1][getPTRange(momentum)]);
+    }
+    return NAN;
   }
+
+  return valueToCheck;
 }

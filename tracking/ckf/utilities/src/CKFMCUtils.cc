@@ -8,11 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/utilities/CKFMCUtils.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 namespace Belle2 {
@@ -78,12 +74,7 @@ namespace Belle2 {
     }
 
     const auto* firstHitAfterDetector = *itToFirstEntryAfterDetector;
-    if (firstHitAfterDetector->getSortingParameter() < recoHitInformationOfHit->getSortingParameter()) {
-      // The found hit is a curler! Remove it
-      return false;
-    }
-
-    return true;
+    return firstHitAfterDetector->getSortingParameter() >= recoHitInformationOfHit->getSortingParameter();
   }
 
   bool isCorrectHit(const TrackFindingCDC::CDCRLWireHit& wireHit, const RecoTrack& mcRecoTrack)
@@ -91,41 +82,5 @@ namespace Belle2 {
     // TODO: also check for RL here
     return (mcRecoTrack.getRelated<MCParticle>() and
             mcRecoTrack.getRelated<MCParticle>() == wireHit.getHit()->getRelated<MCParticle>());
-  }
-
-  unsigned int getNumberOfCorrectHits(const RecoTrack* mcTrack, const std::vector<const SpacePoint*> spacePoints)
-  {
-    if (not mcTrack) {
-      return 0;
-    }
-
-    unsigned int numberOfCorrectHits = 0;
-
-    for (const SpacePoint* spacePoint : spacePoints) {
-      if (isCorrectHit(*spacePoint, *mcTrack)) {
-        if (spacePoint->getType() == VXD::SensorInfoBase::SensorType::SVD) {
-          numberOfCorrectHits += 1;
-        } else {
-          numberOfCorrectHits += 1;
-        }
-      }
-    }
-    return numberOfCorrectHits;
-  }
-
-  unsigned int getNumberOfCorrectHits(const RecoTrack* mcTrack, const std::vector<const TrackFindingCDC::CDCRLWireHit*> wireHits)
-  {
-    if (not mcTrack) {
-      return 0;
-    }
-
-    unsigned int numberOfCorrectHits = 0;
-
-    for (const CDCRLWireHit* wireHit : wireHits) {
-      if (isCorrectHit(*wireHit, *mcTrack)) {
-        numberOfCorrectHits++;
-      }
-    }
-    return numberOfCorrectHits;
   }
 }

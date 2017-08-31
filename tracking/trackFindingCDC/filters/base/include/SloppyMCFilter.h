@@ -40,7 +40,7 @@ namespace Belle2 {
       }
 
     private:
-      unsigned int m_scaleFactor = 100;
+      unsigned int m_scaleFactor = 10;
     };
   }
 }

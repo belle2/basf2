@@ -3,12 +3,10 @@ import basf2
 from simulation import add_simulation
 import os
 
-from rawdata import add_raw_seqoutput
+from rawdata import add_raw_seqoutput, add_unpackers, add_packers
 
 from softwaretrigger.path_functions import (
     setup_softwaretrigger_database_access,
-    add_packers,
-    add_unpackers,
     add_softwaretrigger_reconstruction,
     RAW_SAVE_STORE_ARRAYS,
     DEFAULT_HLT_COMPONENTS,

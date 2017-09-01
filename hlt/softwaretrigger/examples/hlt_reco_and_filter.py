@@ -10,11 +10,10 @@
 import basf2
 
 from simulation import add_simulation
+from rawdata import add_unpackers, add_packers
 
 from softwaretrigger.path_functions import (
     setup_softwaretrigger_database_access,
-    add_packers,
-    add_unpackers,
     add_softwaretrigger_reconstruction,
     DEFAULT_HLT_COMPONENTS
 )

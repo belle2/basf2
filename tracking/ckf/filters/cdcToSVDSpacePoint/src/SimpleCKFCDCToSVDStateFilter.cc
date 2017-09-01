@@ -46,10 +46,6 @@ constexpr const double SimpleCKFCDCToSVDStateFilter::m_param_maximumChi2[][3];
 
 Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState)
 {
-  if (not checkOverlapAndHoles(currentState)) {
-    return NAN;
-  }
-
   const auto* spacePoint = currentState.getHit();
 
   if (not spacePoint) {
@@ -110,9 +106,10 @@ Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStat
     maximumValues = &m_param_maximumChi2;
   }*/
 
-  if (valueToCheck > (*maximumValues)[layer - 1][getPTRange(momentum)]) {
+  if (valueToCheck > (*maximumValues)[layer - 3][getPTRange(momentum)]) {
     if (currentState.getTruthInformation()) {
-      B2WARNING("Throwing away a truth hit with " << valueToCheck << " instead of " << (*maximumValues)[layer - 1][getPTRange(momentum)]);
+      B2WARNING("Throwing away a truth hit with " << valueToCheck << " instead of " << (*maximumValues)[layer - 3][getPTRange(momentum)]);
+      B2WARNING("on layer " << layer << " and momentum " << momentum);
     }
     return NAN;
   }

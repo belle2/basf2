@@ -55,7 +55,7 @@ def add_unpackers(path, components=DEFAULT_HLT_COMPONENTS):
 
 def add_softwaretrigger_reconstruction(
         path,
-        store_array_debug_prescale=None,
+        store_array_debug_prescale=0,
         components=DEFAULT_HLT_COMPONENTS,
         additionalTrackFitHypotheses=[],
         softwaretrigger_mode='hlt_filter'):

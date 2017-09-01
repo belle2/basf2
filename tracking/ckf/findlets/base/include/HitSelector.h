@@ -161,7 +161,6 @@ namespace Belle2 {
     });
     if (currentNumberOfCorrectStates != numberOfCorrectStates) {
       B2WARNING("Third filter has lost from " << numberOfCorrectStates << " to " << currentNumberOfCorrectStates);
-      numberOfCorrectStates = currentNumberOfCorrectStates;
     }
   }
 }

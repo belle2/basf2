@@ -68,6 +68,28 @@ namespace Belle2 {
     return isCorrectHit(*hit, *mcTrack);
   }
 
+  /// Test this and all parent states for correctness
+  template <class AHitObject>
+  bool allStatesCorrect(const CKFStateObject<RecoTrack, AHitObject>& state)
+  {
+    bool oneIsWrong = false;
+
+    const auto& findFalseHit = [&oneIsWrong](const CKFStateObject<RecoTrack, AHitObject>* walkState) {
+      if (oneIsWrong) {
+        return;
+      }
+
+      const bool stateIsCorrect = isStateCorrect(*walkState);
+      if (not stateIsCorrect) {
+        oneIsWrong = true;
+      }
+    };
+
+    state.walk(findFalseHit);
+
+    return not oneIsWrong;
+  }
+
   /// Test if a given hit is really attached to this MC track
   extern bool isCorrectHit(const SpacePoint& spacePoint, const RecoTrack& mcRecoTrack);
 

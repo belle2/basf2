@@ -39,21 +39,7 @@ namespace Belle2 {
 
       for (State* state : states)
       {
-        bool oneIsWrong = false;
-
-        const auto& findFalseHit = [this, &oneIsWrong](const State * walkState) {
-          if (oneIsWrong) {
-            return;
-          }
-
-          const bool stateIsCorrect = isStateCorrect(*walkState);
-          if (not stateIsCorrect) {
-            oneIsWrong = true;
-          }
-        };
-
-        state->walk(findFalseHit);
-        state->setTruthInformation(not oneIsWrong);
+        state->setTruthInformation(allStatesCorrect(*state));
       }
     }
 

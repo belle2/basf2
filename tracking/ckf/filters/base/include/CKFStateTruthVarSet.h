@@ -81,7 +81,7 @@ namespace Belle2 {
       Super::template var<Super::named("truth_momentum_z")>() = 0;
       Super::template var<Super::named("truth")>() = false;
 
-      if (not isStateCorrect(*result)) {
+      if (not allStatesCorrect(*result)) {
         // Keep all variables set to false and return.
         return true;
       }

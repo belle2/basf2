@@ -55,7 +55,7 @@ namespace Belle2 {
 
         const auto& hits = result.getHits();
         // All results, which more than N wrong hit are discarded
-        if (hits.size() - numberOfCorrectHits > m_param_maximalAllowedWrongHits) {
+        if (hits.size() - numberOfCorrectHits > m_param_maximalAllowedWrongHits or numberOfCorrectHits == 0) {
           result.setTeacherInformation(-999);
         } else {
           result.setTeacherInformation(2 * numberOfCorrectHits - hits.size());
@@ -106,6 +106,6 @@ namespace Belle2 {
     /// Parameter: Enable adding truth information from the teacher before the overlap resolving starts.
     bool m_param_enableOverlapTeacher = false;
     /// Parameter: Maximal number of allowed hits, before discarding the combinations
-    int m_param_maximalAllowedWrongHits = 1;
+    int m_param_maximalAllowedWrongHits = 0;
   };
 }

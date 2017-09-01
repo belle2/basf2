@@ -25,7 +25,7 @@ namespace Belle2 {
      *  (in the reference xy projection).\n
      *  Generally maximal four tangents are possible. So to uniquely define a tangent we have
      *  to give additional information how it passes relativ to the drift circles. This right left
-     *  passage inforamtion indicates if the related wire hit should lie to the right of to the left
+     *  passage information indicates if the related wire hit should lie to the right of to the left
      *  of the tangent. The four possible combinations are then\n
      *  (ERightLeft::c_Right, ERightLeft::c_Right), (ERightLeft::c_Right, ERightLeft::c_Left),\n
      *  (ERightLeft::c_Left, ERightLeft::c_Right), (ERightLeft::c_Left,ERightLeft::c_Left).\n

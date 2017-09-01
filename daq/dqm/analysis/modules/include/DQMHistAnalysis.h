@@ -40,6 +40,7 @@ namespace Belle2 {
     static HistList g_hist;
 
   public:
+    static const HistList& getHistList();
     static TH1* findHist(const std::string& histname);
     static TH1* findHist(const std::string& dirname,
                          const std::string& histname);

@@ -25,7 +25,7 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
-from stdFSParticles import stdHighEPhoton
+from stdFSParticles import stdPhotons
 from stdCharged import stdLoosePi
 
 # Run this tutorial either over signal MC or background MC (K*gamma)
@@ -48,9 +48,8 @@ inputMdstList('MC5', filelistSIG)
 
 # use standard final state particle lists
 #
-# creates "gamma:highE" ParticleList
-# contains all photon candidates with E>1.5 GeV
-stdHighEPhoton()
+# creates "gamma:tight" ParticleList
+stdPhotons('tight')
 
 # creates "pi+:loose" ParticleList (and c.c.)
 stdLoosePi()
@@ -62,7 +61,7 @@ reconstructDecay('rho0 -> pi+:loose pi-:loose', '0.6 < M < 1.0')
 # reconstruct B0 -> rho0 gamma decay
 # keep only candidates with Mbc > 5.2 GeV
 # and -2 < Delta E < 2 GeV
-reconstructDecay('B0 -> rho0 gamma:highE', '5.2 < Mbc < 5.29 and abs(deltaE) < 2.0')
+reconstructDecay('B0 -> rho0 gamma:tight', '5.2 < Mbc < 5.29 and abs(deltaE) < 2.0')
 
 # perform MC matching (MC truth asociation)
 matchMCTruth('B0')

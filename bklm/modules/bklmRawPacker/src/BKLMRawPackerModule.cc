@@ -93,25 +93,25 @@ void BKLMRawPackerModule::event()
     int* buf = new int[2];//for one hit, hit length is 2;
     buf[0] = 0;
     buf[1] = 0;
-    BKLMDigit* digit = digits[d];
+    BKLMDigit* bklmDigit = digits[d];
 
-    int iChannelNr = digit->getStrip();
-    int iAx = digit->isPhiReadout();
-    int iLayer = digit->getLayer();
-    int iSector = digit->getSector();
-    int isForward = digit->isForward();
-    float iTdc = digit->getTime();
-    float icharge = digit->getNPixel();
-    short iCTime = digit->getCTime();
-    bool isRPC = digit->inRPC();
-    bool isAboveThresh = digit->isAboveThreshold();
+    int iChannelNr = bklmDigit->getStrip();
+    int iAx = bklmDigit->isPhiReadout();
+    int iLayer = bklmDigit->getLayer();
+    int iSector = bklmDigit->getSector();
+    int isForward = bklmDigit->isForward();
+    float iTdc = bklmDigit->getTime();
+    float icharge = bklmDigit->getNPixel();
+    short iCTime = bklmDigit->getCTime();
+    bool isRPC = bklmDigit->inRPC();
+    bool isAboveThresh = bklmDigit->isAboveThreshold();
     int moduleId = (isForward ? BKLM_END_MASK : 0)
                    | ((iSector - 1) << BKLM_SECTOR_BIT)
                    | ((iLayer - 1) << BKLM_LAYER_BIT)
                    | ((iAx) << BKLM_PLANE_BIT);
     B2DEBUG(1, "BKLMRawPackerModule:: digi before packer: sector: " << iSector << " isforward: " << isForward << " layer: " << iLayer <<
             " plane: " << iAx << " icharge " << icharge << " tdc " << iTdc << " ctime " << iCTime << " isAboveThresh " << isAboveThresh <<
-            " isRPC " << isRPC << " " << moduleId << digit->getModuleID());
+            " isRPC " << isRPC << " " << moduleId << bklmDigit->getModuleID());
 
     int electId = 0;
     if (m_ModuleIdToelectId.find(moduleId) == m_ModuleIdToelectId.end()) {
@@ -144,6 +144,7 @@ void BKLMRawPackerModule::event()
     if (isRPC) flag = 2; //010
     else flag = 4; //100
     if (isRPC) lane = lane + 5;
+    iChannelNr = getChannel(isForward, iSector, iLayer, plane, iChannelNr);
     formatData(flag, iChannelNr, plane, lane, iTdc, icharge, iCTime, bword1, bword2, bword3, bword4);
     buf[0] |= bword2;
     buf[0] |= ((bword1 << 16));
@@ -244,6 +245,7 @@ void BKLMRawPackerModule::formatData(int flag, int channel, int axis, int lane, 
                                      unsigned short& bword2, unsigned short& bword3, unsigned short& bword4)
 {
 
+  charge = m_scintADCOffset - charge;
   bword1 = 0;
   bword2 = 0;
   bword3 = 0;
@@ -381,6 +383,46 @@ int BKLMRawPackerModule::getDefaultElectId(int isForward, int sector, int layer,
 
   return electCooToInt(copperId, finesse , layer, axis);
 
+}
+
+//better to put into database
+int BKLMRawPackerModule::getChannel(int isForward, int sector, int layer, int& plane, int channel)
+{
+
+  //we flip channel to match raw data
+  int MaxiChannel = 0;
+  if (!isForward && sector == 3 && plane == 0) {
+    if (plane == 0 && layer < 3) MaxiChannel = 38;
+    if (plane == 0 && layer > 2) MaxiChannel = 34;
+  } else {
+    if (layer == 1 && plane == 1) MaxiChannel = 37;
+    if (layer == 2 && plane == 1) MaxiChannel = 42;
+    if (layer > 2 && layer < 7 && plane == 1) MaxiChannel = 36;
+    if (layer > 6 && plane == 1) MaxiChannel = 48;
+
+    if (layer == 1 && plane == 0) MaxiChannel = 54;
+    if (layer == 2 && plane == 0) MaxiChannel = 54;
+    if (layer > 2 && plane == 0) MaxiChannel = 48;
+  }
+
+  bool dontFlip = false;
+  if (isForward && (sector == 7 ||  sector == 8 ||  sector == 1 ||  sector == 2)) dontFlip = true;
+  if (!isForward && (sector == 4 ||  sector == 5 ||  sector == 6 ||  sector == 7)) dontFlip = true;
+  if (!(dontFlip && layer > 2 && plane == 1)) channel = MaxiChannel - channel + 1;
+
+  if (plane == 1) { //phi strips
+    if (layer == 1)  channel = channel + 4;
+    if (layer == 2)  channel = channel + 2;
+  } else if (plane == 0) { //z strips
+    if (layer < 3 && channel > 9) channel = channel + 6;
+  }
+
+  //we flip plane to match raw data
+  if (layer < 3) {
+    if (plane == 0) plane = 1;
+    else if (plane == 1) plane = 0;
+  }
+  return channel;
 }
 
 //    void getTrack(int channel, short& bword1, short& bword2, short& bword3, short& bword4)

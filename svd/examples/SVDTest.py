@@ -34,6 +34,7 @@ simulation = register_module('FullSim')
 PXDDIGI = register_module('PXDDigitizer')
 # SVD digitization module
 SVDDIGI = register_module('SVDDigitizer')
+SVDDIGI.param('GenerateShaperDigits', True)
 # SVD clusterizer
 SVDCLUST = register_module('SVDClusterizer')
 SVDCLUST.param('digitsSorted', True)

@@ -8,21 +8,21 @@ argc = len(argvs)
 
 print("The input HEPEvt files needed to run SR MC sim are located in @kekcc:~igal/src/beast/SR")
 
-if len(sys.argv) != 3:
-    print(
-        "Usage: {} [evtgen] [file number]".format(
-            sys.argv[0]),
-        file=sys.stderr)
+if len(sys.argv) != 4:
+    print("Usage: requires 2 arguments")
+    print("Argument 1: (SynchRad_HER | SynchRad_LER | test)")
+    print("Argument 2: file number")
+    print("Argument 3: ROOT output directory path")
     sys.exit(1)
 
 name = argvs[1]
 num = argvs[2]
-
+output_dir = argvs[3]
 # Set realTime you want to use
 # realTime = 1.0e4         # 10us for each  file <-- time in ns
 # realTime = 20         # 20ns for each  file <-- time in ns - TEST
 
-outputfilename = "output/output_" + name + "_" + num + ".root"
+outputfilename = output_dir + "/output_" + name + "_" + num + ".root"
 
 # tagname = SynchRad_HER for HER and SynchRad_LER for LER
 tagname = name

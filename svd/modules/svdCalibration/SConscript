@@ -1,0 +1,5 @@
+Import('env')
+
+env['LIBS'] = [ 'svd', 'svd_dbobjects', 'framework']
+
+Return('env')

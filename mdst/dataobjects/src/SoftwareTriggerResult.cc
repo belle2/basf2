@@ -14,43 +14,6 @@ SoftwareTriggerCutResult SoftwareTriggerResult::getResult(const std::string& tri
   return static_cast<SoftwareTriggerCutResult>(m_results.at(triggerIdentifier));
 }
 
-/**
- * Return the "total result" of this event. See the SoftwareTriggerModule for a description on
- * when what is returned.
- */
-int SoftwareTriggerResult::getTotalResult(bool acceptOverridesReject) const
-{
-  bool hasOneAcceptCut = false;
-  bool hasOneRejectCut = false;
-
-  for (const auto& identifierWithResult : m_results) {
-    const auto& result = static_cast<SoftwareTriggerCutResult>(identifierWithResult.second);
-    if (result == SoftwareTriggerCutResult::c_accept) {
-      hasOneAcceptCut = true;
-    } else if (result == SoftwareTriggerCutResult::c_reject) {
-      hasOneRejectCut = true;
-    }
-  }
-
-  if (acceptOverridesReject) {
-    if (hasOneAcceptCut) {
-      return 1;
-    } else if (hasOneRejectCut) {
-      return -1;
-    } else {
-      return 0;
-    }
-  } else {
-    if (hasOneRejectCut) {
-      return -1;
-    } else if (hasOneAcceptCut) {
-      return 1;
-    } else {
-      return 0;
-    }
-  }
-}
-
 /// Clear all results
 void SoftwareTriggerResult::clear()
 {

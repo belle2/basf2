@@ -75,6 +75,10 @@ namespace Belle2 {
              "if positive, timeError will be estimated from FE data", 9.0);
     addParam("maxPulseWidth", m_maxPulseWidth,
              "maximal pulse width [ns] to flag digit as good", 10.0);
+    addParam("storageDepth", m_storageDepth, "ASIC analog storage depth", (unsigned) 512);
+    addParam("lookBackWindows", m_lookBackWindows,
+             "number of look back windows; used to set time origin correctly (only if >0)", 0);
+
     addParam("calibrationChannel", m_calibrationChannel,
              "calpulse selection: ASIC channel (use -1 to turn off the selection)", -1);
     addParam("calpulseWidthMin", m_calpulseWidthMin,
@@ -120,6 +124,10 @@ namespace Belle2 {
     if (m_useChannelT0Calibration) m_channelT0 = new DBObjPtr<TOPCalChannelT0>;
     if (m_useModuleT0Calibration) m_moduleT0 = new DBObjPtr<TOPCalModuleT0>;
     if (m_useCommonT0Calibration) m_commonT0 = new DBObjPtr<TOPCalCommonT0>;
+
+    // check validity of steering parameters
+    if (m_lookBackWindows >= (int) m_storageDepth)
+      B2ERROR("'lookBackWindows' must be less that 'storageDepth'");
 
   }
 
@@ -201,6 +209,18 @@ namespace Belle2 {
                                          rawDigit.getASICChannel());
       auto pixelID = chMapper.getPixelID(channel);
       double rawTime = rawDigit.getCFDLeadingTime(); // time in [samples]
+      rawTime = rawDigit.correctTime(rawTime, m_storageDepth); // correct time after window discontinuity
+      int window = rawDigit.getASICWindow();
+      if (m_lookBackWindows > 0) { // set time origin correctly
+        int lastWriteAddr = rawDigit.getLastWriteAddr();
+        int nback = lastWriteAddr - window;
+        if (nback < 0) nback += m_storageDepth;
+        int nwin = m_lookBackWindows - nback;
+        window -= nwin;
+        if (window < 0) window += m_storageDepth;
+        if (window >= (int) m_storageDepth) window -= m_storageDepth;
+        rawTime += nwin * TOPRawDigit::c_WindowSize;
+      }
       const auto* sampleTimes = &m_sampleTimes; // equidistant sample times
       if (m_useSampleTimeCalibration) {
         sampleTimes = (*m_timebase)->getSampleTimes(scrodID, channel % 128);
@@ -210,7 +230,6 @@ namespace Belle2 {
           continue;
         }
       }
-      auto window = rawDigit.getASICWindow();
       double time = sampleTimes->getTime(window, rawTime); // time in [ns]
       if (m_useChannelT0Calibration) time -= (*m_channelT0)->getT0(moduleID, channel);
       if (m_useModuleT0Calibration) time -= (*m_moduleT0)->getT0(moduleID);
@@ -239,7 +258,7 @@ namespace Belle2 {
 
       if (!rawDigit.isFEValid() or rawDigit.isPedestalJump())
         digit->setHitQuality(TOPDigit::c_Junk);
-      if (!rawDigit.areWindowsInOrder())
+      if (rawDigit.isAtWindowDiscontinuity(m_storageDepth))
         digit->setHitQuality(TOPDigit::c_Junk);
       if (digit->getPulseWidth() > m_maxPulseWidth)
         digit->setHitQuality(TOPDigit::c_Junk);

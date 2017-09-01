@@ -20,6 +20,7 @@
 </header>
 """
 
+import glob
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
@@ -79,7 +80,15 @@ components = [
     'EKLM',
 ]
 
-add_simulation(path, components)
+if 'BELLE2_BACKGROUND_DIR' in os.environ:
+    background_files = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+    print('Background files:')
+    print(background_files)
+    add_simulation(path, components, background_files)
+else:
+    print('Warning: variable BELLE2_BACKGROUND_DIR is not set')
+    add_simulation(path, components)
+
 add_reconstruction(path, components)
 
 output = register_module('RootOutput')

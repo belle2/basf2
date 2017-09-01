@@ -56,10 +56,7 @@ eventtools = [
     'B0',
     'RecoStats',
     'B0',
-    'DetectorStatsRec',
-    'B0',
-    'DetectorStatsSim',
-    'B0']
+]
 
 ntupleTree('eventtuple', '', eventtools)
 

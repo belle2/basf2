@@ -8,9 +8,7 @@
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <alignment/GlobalLabel.h>
 
-#include <eklm/alignment/AlignmentTools.h>
 #include <eklm/dbobjects/EKLMAlignment.h>
-#include <eklm/geometry/AlignmentChecker.h>
 
 #include <framework/dbobjects/BeamParameters.h>
 
@@ -100,7 +98,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   if (nBKLMparams)
     belle2Constants.push_back(Database::DBQuery("BKLMAlignment"));
   if (nEKLMparams)
-    belle2Constants.push_back(Database::DBQuery("EKLMDisplacement"));
+    belle2Constants.push_back(Database::DBQuery("EKLMAlignment"));
   // Maps (key is IOV of object in DB)
   std::map<string, BeamParameters*> previousBeam;
   std::map<string, VXDAlignment*> previousVXD;
@@ -177,12 +175,8 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     newBKLM.insert({to_string(getIovFromData()), new BKLMAlignment()});
   }
 
-  if (newEKLM.empty() && nEKLMparams) {
-    B2INFO("No previous EKLMAlignment found. First update from nominal.");
-    EKLMAlignment* alignment = new EKLMAlignment();
-    EKLM::fillZeroDisplacements(alignment);
-    newEKLM.insert({to_string(getIovFromData()), alignment});
-  }
+  if (newEKLM.empty())
+    B2FATAL("No EKLM alignment data.");
 
   double maxCorrectionPull = 0.;
   int maxCorrectionPullLabel = 0;
@@ -249,12 +243,6 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 
   }
 
-  if (newEKLM.size() > 0) {
-    EKLM::AlignmentChecker alignmentChecker(true);
-    for (auto& eklm : newEKLM)
-      alignmentChecker.restoreAlignment(eklm.second, previousEKLM[eklm.first]);
-  }
-
   // Save (possibly updated) objects
   for (auto& beam : newBeam)
     saveCalibration(beam.second, "BeamParameters", to_IOV(beam.first).overlap(getIovFromData()));
@@ -265,7 +253,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   for (auto& bklm : newBKLM)
     saveCalibration(bklm.second, "BKLMAlignment", to_IOV(bklm.first).overlap(getIovFromData()));
   for (auto& eklm : newEKLM)
-    saveCalibration(eklm.second, "EKLMDisplacement", to_IOV(eklm.first).overlap(getIovFromData()));
+    saveCalibration(eklm.second, "EKLMAlignment", to_IOV(eklm.first).overlap(getIovFromData()));
 
   //commit();
 

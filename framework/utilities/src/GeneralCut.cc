@@ -5,8 +5,14 @@ namespace Belle2 {
 
   bool almostEqualFloat(const float& a, const float& b)
   {
-    assert(sizeof(float) == sizeof(int));
-    return std::fabs(*(int*)&a - * (int*)&b) <= 2 or (a == b);
+    assert(sizeof(float) == sizeof(int32_t));
+    return std::fabs(*(int32_t*)&a - * (int32_t*)&b) <= 2 or (a == b);
+  }
+
+  bool almostEqualDouble(const double& a, const double& b)
+  {
+    assert(sizeof(double) == sizeof(int64_t));
+    return std::fabs(*(int64_t*)&a - * (int64_t*)&b) <= 2 or (a == b);
   }
 
   unsigned long int findMatchedParenthesis(std::string str, char open, char close)

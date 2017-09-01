@@ -19,7 +19,7 @@ namespace Belle2 {
 
     /**
      *  Class representing a two dimensional reconstructed hit in the central drift chamber.
-     *  A recohit represents a likely point where the particle went through. It is always assoziated with a
+     *  A recohit represents a likely point where the particle went through. It is always associated with a
      *  wire hit it seeks to reconstruct. The reconstructed point is stored as a displacement from the
      *  wire reference position assoziated with the hit. The displacement generally is as long as the drift length
      *  but must not.\n

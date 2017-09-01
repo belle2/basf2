@@ -243,7 +243,7 @@ namespace Belle2 {
     if (m_correct_ecl == 1) correct_ecl(m_correct_ecl_option, m_correct_ecl_version);
 
     HepPoint3D pv;
-    HepSymMatrix dpv(3, 0);
+    CLHEP::HepSymMatrix dpv(3, 0);
     int err(1);
     if (m_correct_ecl_primary_vertex == 1) {
       err = set_primary_vertex(pv, dpv);
@@ -286,8 +286,8 @@ namespace Belle2 {
     }
 
     if (m_hadron_a_only == 1) {
-      Evtcls_flag_Manager&   EvtFlagMgr  = Evtcls_flag_Manager::get_manager();
-      Evtcls_flag_Manager::iterator  it1 = EvtFlagMgr.begin();
+      Belle::Evtcls_flag_Manager&   EvtFlagMgr  = Belle::Evtcls_flag_Manager::get_manager();
+      Belle::Evtcls_flag_Manager::iterator  it1 = EvtFlagMgr.begin();
       if (it1 != EvtFlagMgr.end() && *it1) {
         if ((*it1).flag(0) < 10) {
           setReturnValue(-1);
@@ -298,9 +298,9 @@ namespace Belle2 {
     }
 
     if (m_hadron_b_only == 1) {
-      Evtcls_hadronic_flag_Manager& HadMgr
-        = Evtcls_hadronic_flag_Manager::get_manager();
-      Evtcls_hadronic_flag_Manager::iterator ith = HadMgr.begin();
+      Belle::Evtcls_hadronic_flag_Manager& HadMgr
+        = Belle::Evtcls_hadronic_flag_Manager::get_manager();
+      Belle::Evtcls_hadronic_flag_Manager::iterator ith = HadMgr.begin();
       if (ith != HadMgr.end() && *ith) {
         if ((*ith).hadronic_flag(2) <= 0) {
           setReturnValue(-1);
@@ -311,27 +311,27 @@ namespace Belle2 {
     }
 
     if (m_table_size == 1) {
-      Belle_event_Manager& bevt = Belle_event_Manager::get_manager();
+      Belle::Belle_event_Manager& bevt = Belle::Belle_event_Manager::get_manager();
       //    if( bevt[0].ExpNo() >=39 ) {
       if ((m_reprocess_version == 0 && bevt.count() > 0 && bevt[0].ExpNo() >= 39) ||
           (m_reprocess_version >= 1)) {
-        if (Mdst_ecl_trk_Manager::get_manager().count() > m_limit_mdst_ecl_trk) {
+        if (Belle::Mdst_ecl_trk_Manager::get_manager().count() > m_limit_mdst_ecl_trk) {
           setReturnValue(-1);
-          B2INFO("B2BIIFixMdst: " <<  Mdst_ecl_trk_Manager::get_manager().count() << " " << m_limit_mdst_ecl_trk);
+          B2INFO("B2BIIFixMdst: " <<  Belle::Mdst_ecl_trk_Manager::get_manager().count() << " " << m_limit_mdst_ecl_trk);
           return;
         }
-        if (Mdst_klm_cluster_hit_Manager::get_manager().count()
+        if (Belle::Mdst_klm_cluster_hit_Manager::get_manager().count()
             > m_limit_mdst_klm_cluster_hit) {
           setReturnValue(-1);
-          B2INFO("B2BIIFixMdst: " <<  Mdst_klm_cluster_hit_Manager::get_manager().count() << " " << m_limit_mdst_klm_cluster_hit);
+          B2INFO("B2BIIFixMdst: " <<  Belle::Mdst_klm_cluster_hit_Manager::get_manager().count() << " " << m_limit_mdst_klm_cluster_hit);
           return;
         }
       }
     }
 
     if (m_calib_dedx != 0) {
-      Belle_event_Manager& bevt = Belle_event_Manager::get_manager();
-      if (bevt[0].ExpMC() == 1 || m_reprocess_version == 0 || m_calib_dedx == -1) Calib_dEdx();
+      Belle::Belle_event_Manager& bevt = Belle::Belle_event_Manager::get_manager();
+      if (bevt[0].ExpMC() == 1 || m_reprocess_version == 0 || m_calib_dedx == -1) Belle::Calib_dEdx();
     }
 
     if (m_shift_tof_mode > 0) shift_tof(m_shift_tof_mode);
@@ -349,12 +349,12 @@ namespace Belle2 {
     m_reprocess_version = get_reprocess_version();
     B2INFO("reprocess version= " << m_reprocess_version);
 
-    IpProfile::begin_run();
+    Belle::IpProfile::begin_run();
 
-    if (m_benergy_db == 0) BeamEnergy::begin_run();
+    if (m_benergy_db == 0) Belle::BeamEnergy::begin_run();
 
-    Belle_runhead_Manager& evtmgr = Belle_runhead_Manager::get_manager();
-    Belle_runhead_Manager::const_iterator belleevt = evtmgr.begin();
+    Belle::Belle_runhead_Manager& evtmgr = Belle::Belle_runhead_Manager::get_manager();
+    Belle::Belle_runhead_Manager::const_iterator belleevt = evtmgr.begin();
     if (belleevt != evtmgr.end() && (*belleevt)) {
       int expmc = belleevt->ExpMC();
       int exp = belleevt->ExpNo();
@@ -373,13 +373,13 @@ namespace Belle2 {
 
       if (m_calib_dedx != 0) {
         if (expmc == 1 || m_reprocess_version == 0 || m_calib_dedx == -1)
-          Calib_dEdx_begin_run(m_reprocess_version, m_5Srun);
+          Belle::Calib_dEdx_begin_run(m_reprocess_version, m_5Srun);
       }
 
       if (m_mapped_expno > 0) Muid_begin_run(expmc, exp, run);
 
     } else {
-      B2ERROR("[B2BIIFixMdst] Error: Cannot read \"Belle_RunHead\".");
+      B2ERROR("[B2BIIFixMdst] Error: Cannot read \"Belle::Belle_RunHead\".");
     }
   }
 
@@ -388,7 +388,7 @@ namespace Belle2 {
   {
 
     int version(0);
-    Belle_version_Manager& bvmgr = Belle_version_Manager::get_manager();
+    Belle::Belle_version_Manager& bvmgr = Belle::Belle_version_Manager::get_manager();
 
     if (m_reprocess_version_specified >= 0) {
       //*** version set forcedly ***
@@ -397,9 +397,9 @@ namespace Belle2 {
 
     } else {
       //*** version set based on info. in run-header ***
-      Belle_processing_Manager& bpmgr = Belle_processing_Manager::get_manager();
-      Belle_runhead_Manager& evtmgr = Belle_runhead_Manager::get_manager();
-      Belle_runhead_Manager::const_iterator belleevt = evtmgr.begin();
+      Belle::Belle_processing_Manager& bpmgr = Belle::Belle_processing_Manager::get_manager();
+      Belle::Belle_runhead_Manager& evtmgr = Belle::Belle_runhead_Manager::get_manager();
+      Belle::Belle_runhead_Manager::const_iterator belleevt = evtmgr.begin();
 
       int expmc(0), exp(0), run(0);
       if (belleevt != evtmgr.end() && (*belleevt)) {
@@ -417,7 +417,7 @@ namespace Belle2 {
       }
 
       if (bvmgr.count() > 0) {
-        //Belle_version is in run-header: MC or (DATA with level > 20081107)
+        //Belle::Belle_version is in run-header: MC or (DATA with level > 20081107)
         //      int j = bvmgr.count() - 1;
         int j = 0;
         int chk = std::abs(bvmgr[j].SVD())
@@ -429,10 +429,10 @@ namespace Belle2 {
           version = 1;
         }
       } else {
-        //no Belle_version in run-header: DATA with level <= 20081107
+        //no Belle::Belle_version in run-header: DATA with level <= 20081107
         if (expmc == 2 || (expmc == 1
                            && B_l_d > 20081107))
-          B2ERROR("No Belle_version table in run-header for MC or (Data processed with Belle_level > 20081107). Strange !");
+          B2ERROR("No Belle::Belle_version table in run-header for MC or (Data processed with Belle_level > 20081107). Strange !");
 
         if (B_l_d == 20081107) {
           version = 1;
@@ -446,21 +446,24 @@ namespace Belle2 {
     }
 
     if (bvmgr.count() == 0) {
-      Belle_version& bv = bvmgr.add();
+      Belle::Belle_version& bv = bvmgr.add();
       bv.SVD(version);
       bv.CDC(version);
       bv.ECL(version);
     } else if (bvmgr.count() > 0) {
       if (bvmgr[0].SVD() != version) {
-        B2WARNING("Belle_version_SVD(=" << bvmgr[0].SVD() << ") is inconsistent with version(=" << version << "); replace it anyway");
+        B2WARNING("Belle::Belle_version_SVD(=" << bvmgr[0].SVD() << ") is inconsistent with version(=" << version <<
+                  "); replace it anyway");
         bvmgr[0].SVD(version);
       }
       if (bvmgr[0].CDC() != version) {
-        B2WARNING("Belle_version_CDC(=" << bvmgr[0].CDC() << ") is inconsistent with version(=" << version << "); replace it anyway");
+        B2WARNING("Belle::Belle_version_CDC(=" << bvmgr[0].CDC() << ") is inconsistent with version(=" << version <<
+                  "); replace it anyway");
         bvmgr[0].CDC(version);
       }
       if (bvmgr[0].ECL() != version) {
-        B2WARNING("Belle_version_ECL(=" << bvmgr[0].ECL() << ") is inconsistent with version(=" << version << "); replace it anyway");
+        B2WARNING("Belle::Belle_version_ECL(=" << bvmgr[0].ECL() << ") is inconsistent with version(=" << version <<
+                  "); replace it anyway");
         bvmgr[0].ECL(version);
       }
     }
@@ -473,12 +476,12 @@ namespace Belle2 {
 
     bool ret = true;
 
-    Mdst_quality_Manager& qmgr = Mdst_quality_Manager::get_manager();
+    Belle::Mdst_quality_Manager& qmgr = Belle::Mdst_quality_Manager::get_manager();
     if (0 == qmgr.count()) return ret; //do nothing if not exist
 
-    for (std::vector<Mdst_quality>::iterator it = qmgr.begin();
+    for (std::vector<Belle::Mdst_quality>::iterator it = qmgr.begin();
          it != qmgr.end(); ++it) {
-      Mdst_quality& q = *it;
+      Belle::Mdst_quality& q = *it;
       std::string c(q.name()());
       //    if((strcmp(c,"SVD ")==0) && (q.quality() & 0x02)) ret = false;
       //also to remove exp9 bad svd events
@@ -507,20 +510,20 @@ namespace Belle2 {
 
     //  if( m_benergy_db == 0 && BsCouTab(BELLE_EVENT) > 0 ){
     if (m_benergy_db == 0) {
-      Belle_event_Manager& bevt_mgr = Belle_event_Manager::get_manager();
-      Belle_event_Manager::const_iterator bevt = bevt_mgr.begin();
+      Belle::Belle_event_Manager& bevt_mgr = Belle::Belle_event_Manager::get_manager();
+      Belle::Belle_event_Manager::const_iterator bevt = bevt_mgr.begin();
       if (bevt != bevt_mgr.end() && (*bevt)) {
-        if (bevt->ExpMC() == 1) energy = BeamEnergy::E_beam2();
+        if (bevt->ExpMC() == 1) energy = Belle::BeamEnergy::E_beam2();
         if (bevt->ExpMC() == 2) {
           if (m_benergy_mcdb == 0) return energy;    //energy = 5.290000;
-          if (m_benergy_mcdb != 0) energy = BeamEnergy::E_beam2();
+          if (m_benergy_mcdb != 0) energy = Belle::BeamEnergy::E_beam2();
         }
         return energy;
       }
     }
 
     if ((expnum == 0 || runnum == 0) && BsCouTab(BELLE_EVENT) > 0) {
-      Belle_event& bevt = Belle_event_Manager::get_manager()[0];
+      Belle::Belle_event& bevt = Belle::Belle_event_Manager::get_manager()[0];
       if (bevt.ExpMC() == 1) {
         expnum = bevt.ExpNo();
         runnum = bevt.RunNo();

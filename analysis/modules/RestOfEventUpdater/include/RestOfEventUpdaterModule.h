@@ -46,8 +46,8 @@ namespace Belle2 {
 
   private:
 
-    typedef std::map<unsigned int, bool> intAndBoolMap;
-    typedef std::map<unsigned int, unsigned int> intAndIntMap;
+    typedef std::map<unsigned int, bool> intAndBoolMap; /**< Type definition helper for a map of integer and boolean */
+    typedef std::map<unsigned int, unsigned int> intAndIntMap; /**< Type definition helper for a map of integer and integer */
 
     std::string m_inputListName; /**< Name of the ParticleList which contains information that will be used for updating */
     StoreObjPtr<ParticleList> m_inputList; /**< ParticleList which contains information that will be used for updating */

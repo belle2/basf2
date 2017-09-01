@@ -124,7 +124,7 @@ namespace Belle2 {
     public:
       /// Constructor
       NamedChoosableVarSetFilter(const std::string& varName = "")
-        : Super(makeUnique<ATruthVarSet>(), varName)
+        : Super(std::make_unique<ATruthVarSet>(), varName)
       {
       }
     };

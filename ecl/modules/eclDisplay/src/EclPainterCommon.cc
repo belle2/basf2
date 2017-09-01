@@ -29,20 +29,6 @@ EclPainterCommon::~EclPainterCommon()
   delete m_hist;
 }
 
-int EclPainterCommon::getBinCount()
-{
-  switch (m_type) {
-    case AMP:
-      return 295;
-    case AMP_SUM:
-      return 50;
-    case TIME:
-      return 128;
-  }
-
-  return 1;
-}
-
 int EclPainterCommon::getMinX()
 {
   switch (m_type) {

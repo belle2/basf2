@@ -18,6 +18,7 @@
 
 #include "gtest/gtest.h"
 #include "framework/core/RandomNumbers.h"
+#include <framework/logging/LogSystem.h>
 
 namespace {
   /** Class to set up random numbers before running each test.
@@ -32,6 +33,11 @@ namespace {
       name += "/";
       name += test.name();
       Belle2::RandomNumbers::initialize(name);
+    }
+    /** Reset the logsytem after each test */
+    virtual void OnTestEnd(const ::testing::TestInfo&) final override
+    {
+      Belle2::LogSystem::Instance().resetLogging();
     }
   };
 }

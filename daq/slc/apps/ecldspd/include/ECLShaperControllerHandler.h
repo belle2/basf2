@@ -29,6 +29,32 @@ namespace Belle2 {
     int m_sh_num;
   };
 
+  class ECLShaperBootHandler : public NSMVHandlerInt {
+
+  public:
+    ECLShaperBootHandler(ECLShaperControllerCallback& callback,
+                         const std::string& name)
+      : NSMVHandlerInt(name, false, true),
+        m_callback(callback) {}
+    virtual ~ECLShaperBootHandler() throw() {}
+
+  public:
+    bool handleSetInt(int val)
+    {
+      try {
+        m_callback.boot(m_callback.getDBObject());
+        return true;
+      } catch (const RCHandlerException& e) {
+        LogFile::error(e.what());
+      }
+      return false;
+    }
+
+  private:
+    ECLShaperControllerCallback& m_callback;
+
+  };
+
 }
 
 #endif

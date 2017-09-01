@@ -76,7 +76,7 @@ namespace Belle2 {
     int electCooToInt(int copper, int finesse, int lane, int axis);
 
     //! remap the channel ID for scitilators and RPCs
-    unsigned short getChannel(int sector, int layer,  int plane,  unsigned short channel);
+    unsigned short getChannel(int layer,  int plane,  unsigned short channel);
 
     //! handle 0-->max max-->0 channel number flip between software and detector
     unsigned short flipChannel(int isForward, int sector, int layer, int plane, unsigned short channel, bool& isOutRange);
@@ -99,7 +99,7 @@ namespace Belle2 {
     //! offset of the scintillator ADC
     const int m_scintADCOffset = 3400;
 
-    //! threshold for the scintillator ADC after subtracting the offset
+    //! threshold for the scintillator NPE
     double m_scintThreshold = 7;
 
     //! is this real data (true) or MC data (false)
@@ -107,6 +107,12 @@ namespace Belle2 {
 
     //! name of BKLMDigit store array
     std::string m_outputDigitsName;
+
+    //! counter for channels that was rejected due to un-reasonable channel number
+    long m_rejectedCount = 0;
+
+    //! warnig message: number of channels rejected due to un-reasonable channel number
+    std::map<std::string, long> m_rejected;
   };
 
 

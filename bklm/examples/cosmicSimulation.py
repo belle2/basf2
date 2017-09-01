@@ -10,9 +10,13 @@
 
 from basf2 import *
 from ROOT import Belle2
+from generators import add_cosmics_generator
+
 from reconstruction import add_mdst_output
 
 # Set the global log level
+from simulation import add_simulation
+
 set_log_level(LogLevel.INFO)
 
 # Set random seed
@@ -24,33 +28,6 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])  # we want to process 100 events
 eventinfosetter.param('runList', [1])  # from run number 1
 eventinfosetter.param('expList', [1])  # and experiment number 1
-
-# Register the geometry module
-geometry = register_module('Geometry')
-geometry.param('components', ['BKLM'])
-
-# Register the CRY module
-cry = register_module('CRYInput')
-
-# cosmic data input
-cry.param('CosmicDataDir', Belle2.FileSystem.findFile('data/generators/modules/cryinput/'))
-
-# user input file
-cry.param('SetupFile', Belle2.FileSystem.findFile('generators/examples/cry.setup'))
-
-# acceptance half-lengths - at least one particle has to enter that box to use that event
-cry.param('acceptLength', 6.0)
-cry.param('acceptWidth', 6.0)
-cry.param('acceptHeight', 6.0)
-cry.param('maxTrials', 100000)
-
-# keep half-lengths - all particles that do not enter the box are removed (keep box >= accept box)
-cry.param('keepLength', 6.0)
-cry.param('keepWidth', 6.0)
-cry.param('keepHeight', 6.0)
-
-# minimal kinetic energy - all particles below that energy are ignored
-cry.param('kineticEnergyThreshold', 0.01)
 
 # Register the Progress module and the Python histogram module
 progress = register_module('Progress')
@@ -65,29 +42,15 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(progress)
 
-# Reset the top volume: must be larger than the generated surface and higher than the detector
-# It is the users responsibility to ensure a full angular coverage
-main.add_module("Gearbox", override=[
-    ("/Global/length", "50.", "m"),
-    ("/Global/width", "50.", "m"),
-    ("/Global/height", "50.", "m"),
-])
+add_cosmics_generator(main,
+                      global_box_size=[50, 50, 50], accept_box=[6, 6, 6],
+                      keep_box=[6, 6, 6],
+                      setup_file='generators/examples/cry.setup')
 
-# Full Geant4 simulation
-g4sim = register_module('FullSim')
+add_simulation(main)
 
-# BKLM digi
-bklmdigi = register_module('BKLMDigitizer')
-# BKLM reco
-bklmreco = register_module('BKLMReconstructor')
-
-main.add_module(geometry)
-main.add_module(cry)
 # uncomment the following line if you want event by event info
 # main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)
-main.add_module(g4sim)
-main.add_module(bklmdigi)
-main.add_module(bklmreco)
 
 main.add_module(output)
 

@@ -75,17 +75,17 @@ std::unique_ptr<BaseDetectorTrackCombinationFilter>
 DetectorTrackCombinationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<BaseDetectorTrackCombinationFilter>();
+    return std::make_unique<BaseDetectorTrackCombinationFilter>();
   } else if (filterName == "all") {
-    return makeUnique<AllDetectorTrackCombinationFilter>();
+    return std::make_unique<AllDetectorTrackCombinationFilter>();
   } else if (filterName == "truth") {
-    return makeUnique<MCDetectorTrackCombinationFilter>();
+    return std::make_unique<MCDetectorTrackCombinationFilter>();
   } else if (filterName == "recording") {
-    return makeUnique<RecordingDetectorTrackCombinationFilter>("DetectorTrackCombinationFilter.root");
+    return std::make_unique<RecordingDetectorTrackCombinationFilter>("DetectorTrackCombinationFilter.root");
   } else if (filterName == "mva") {
-    return makeUnique<MVADetectorTrackCombinationFilter>("tracking/data/vxdcdc_DetectorTrackCombinationFilter.xml");
+    return std::make_unique<MVADetectorTrackCombinationFilter>("tracking/data/vxdcdc_DetectorTrackCombinationFilter.xml");
   } else if (filterName == "pass_through") {
-    return makeUnique<PassThroughDetectorTrackCombinationWeightFilter>();
+    return std::make_unique<PassThroughDetectorTrackCombinationWeightFilter>();
   } else {
     return Super::create(filterName);
   }

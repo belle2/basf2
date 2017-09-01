@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Poyuan Chen                                              *
+ *               Vasily Shebalin                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,27 +19,38 @@ namespace Belle2 {
   /*! Class to store ECLTrig, still need to be study
    * relation to ECLHit
    * filled in ecl/modules/eclDigitizer/src/ECLDigitizerModule.cc
+   * and ecl/modules/eclUnpacker/ECLUnpacker.cc
    */
 
   class ECLTrig : public RelationsObject {
   public:
     /** default constructor for ROOT */
-    ECLTrig() {
-      m_CellId = 0;    /**< Cell ID */
+    ECLTrig()
+    {
+      m_TrigId = 0;    /**< Trig ID == crate ID */
       m_TimeTrig = 0; /**< Trig Time */
+      m_TrigTag = 0;
     }
 
 
-    /*! Set  Cell ID
+    /*! Set  TrigID
      */
-    void setCellId(int CellId) { m_CellId = CellId; }
-    /*! Set Trig Time
+    void setTrigId(int TrigId) { m_TrigId = TrigId; }
+    /*! Set Trig Time (crate Id)
+     */
+    void setTrigTag(int TrigTag) { m_TrigTag = TrigTag; }
+    /*! Set Triger Tag (crate Id)
      */
     void setTimeTrig(double TimeTrig) { m_TimeTrig = TimeTrig; }
-    /*! Get Cell ID
-     * @return cell ID
+    /*! Get Trig ID
+     * @return trig ID
      */
-    int getCellId() const { return m_CellId; }
+    int getTrigId() const { return m_TrigId; }
+
+    /*! Get Trig ID
+     * @return trig ID
+     */
+    int getTrigTag() const { return m_TrigTag; }
 
     /*! Get Trig Time
      * @return Trig Time
@@ -46,11 +58,14 @@ namespace Belle2 {
     double getTimeTrig() const { return m_TimeTrig; }
 
   private:
-    int m_CellId;      /**< Cell ID */
+    int m_TrigId;      /**< Trig ID */
     double m_TimeTrig; /**< Trig Time */
+    int m_TrigTag;
 
 
-    ClassDef(ECLTrig, 1);/**< ClassDef */
+//    ClassDef(ECLTrig, 1);/**< ClassDef */
+//    ClassDef(ECLTrig, 2); // CellId -> TrigId
+    ClassDef(ECLTrig, 3); // TrigTag added
 
   };
 } // end namespace Belle2

@@ -36,12 +36,21 @@ namespace Belle2 {
     public:
 
       /**
-       * Constructor.
-       * @param[in] global          If true, load global transformations
-       *                            (false - local).
-       * @param[in] useDisplacement Whether to use EKLMDisplacement or not.
+       * Source of displacement (alignment) data.
        */
-      TransformData(bool global, bool useDisplacement);
+      enum Displacement {
+        c_None,         /**< Displacement is not used. */
+        c_Displacement, /**< Use displacement data (for geometry). */
+        c_Alignment,    /**< Use alignment data (for everything else). */
+      };
+
+      /**
+       * Constructor.
+       * @param[in] global           If true, load global transformations
+       *                             (false - local).
+       * @param[in] displacementType Displacement type.
+       */
+      TransformData(bool global, Displacement displacementType);
 
       /**
        * Destructor.

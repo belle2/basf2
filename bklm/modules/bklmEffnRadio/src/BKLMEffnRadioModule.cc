@@ -359,8 +359,8 @@ void BKLMEffnRadioModule::terminate()
 
   TCanvas cLegend("colorLegend", "colorLegend", 0, 0, 1000, 800);
   cLegend.Range(0, 0, 1000, 1000);
-  TLatex l;
-  l.SetTextSize(l.GetTextSize() / 2.0);
+  TLatex latex;
+  latex.SetTextSize(latex.GetTextSize() / 2.0);
   for (int i = 0; i < 48; i++) {
     float lInd = i / (float)48;
     float colorIndex = lInd * 48 + 51;
@@ -369,8 +369,8 @@ void BKLMEffnRadioModule::terminate()
     char buffer[200];
     sprintf(buffer, "%d", roundInd);
 
-    l.SetTextColor(colorIndex);
-    l.DrawLatex(100, 18 * i, buffer);
+    latex.SetTextColor(colorIndex);
+    latex.DrawLatex(100, 18 * i, buffer);
   }
   cLegend.Write();
 
@@ -424,8 +424,8 @@ void BKLMEffnRadioModule::terminate()
 
           }
           //draw over strips
-          TLatex l(10, 10, buffer);
-          l.DrawLatex(100, 10, buffer);
+          TLatex latex2(10, 10, buffer);
+          latex2.DrawLatex(100, 10, buffer);
 
         }
       }
@@ -632,7 +632,7 @@ void BKLMEffnRadioModule::getEffs()
           //now that we checked the efficieny for this track, lets delete the points for the track
           //however, we memorize the ids used for that track, so we don't use the same points for a different track
           //for the same eff plane
-        } catch (string& s) {
+        } catch (string& str) {
           //we land here if the eff.layer is outside the range of existing layeres
           //let's compute theta, phi of the track in the global reference frame
           //grab two points in the local system, transform to global and take the difference vector
@@ -777,8 +777,8 @@ bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  Stor
 
     m_pointIndices.insert(firstHit);
     m_pointIndices.insert(secondHit);
-    for (auto pi : locIndices) {
-      m_pointIndices.insert(pi);
+    for (auto pointIndex : locIndices) {
+      m_pointIndices.insert(pointIndex);
     }
     return true;
 

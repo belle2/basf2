@@ -56,7 +56,7 @@ int RawDataBlockFormat::GetBufferPos(int n)
     if (m_buffer[ pos_nwords ] <= 0) {
       char err_buf[500];
       sprintf(err_buf,
-              "[FATAL] CORRUPTED DATA: length of this data block is strange ( %d words ). Maybe data is corrupted or RawHeader info has not been filled yet. Exiting...",
+              "[FATAL] ERROR_EVENT : length of this data block is strange ( %d words ). Maybe data is corrupted or RawHeader info has not been filled yet. Exiting...",
               m_buffer[ pos_nwords ]);
       printf("%s", err_buf);
       string err_str = err_buf;     throw (err_str);
@@ -65,7 +65,7 @@ int RawDataBlockFormat::GetBufferPos(int n)
     }
     if (pos_nwords >= m_nwords) {
       char err_buf[500];
-      sprintf(err_buf, "[FATAL] CORRUPTED DATA: value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
+      sprintf(err_buf, "[FATAL] ERROR_EVENT : value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
               pos_nwords, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("%s", err_buf);
       string err_str = err_buf;     throw (err_str);

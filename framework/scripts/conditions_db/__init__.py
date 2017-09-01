@@ -54,7 +54,7 @@ class ConditionsDB:
         #: session object to get keep-alive support and connection pooling
         self._session = requests.Session()
         # change the api to return json instead of xml, much easier in python
-        self._session.headers.update({"Accept": "application/json"})
+        self._session.headers.update({"Accept": "application/json", "Cache-Control": "no-cache"})
         # add a http adapter to honour our max_connections and retries settings
         self._session.mount(self._base_url, requests.adapters.HTTPAdapter(
             pool_connections=max_connections, pool_maxsize=max_connections,
@@ -103,12 +103,13 @@ class ConditionsDB:
             else:
                 raise ConditionsDB.RequestError(error)
 
-        try:
-            req.json()
-        except json.JSONDecodeError as e:
-            B2INFO("Invalid response: {}".format(req.content))
-            raise ConditionsDB.RequestError("{method} {url} returned invalid JSON response {}"
-                                            .format(e, method=method, url=url))
+        if method != "HEAD":
+            try:
+                req.json()
+            except json.JSONDecodeError as e:
+                B2INFO("Invalid response: {}".format(req.content))
+                raise ConditionsDB.RequestError("{method} {url} returned invalid JSON response {}"
+                                                .format(e, method=method, url=url))
         return req
 
     def get_globalTags(self):

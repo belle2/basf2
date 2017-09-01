@@ -30,3 +30,25 @@ def add_tsim(path, SimulationMode=1, minHits=4, OpenFilter=False, Belle2Phase="P
     add_grl_trigger(path, SimulationMode, Belle2Phase)
     add_gdl_trigger(path, SimulationMode, OpenFilter)
     EffCalculation(path)
+    path.add_module('StatisticsSummary').set_name('Sum_TriggerSimulation')
+
+
+def add_subdetector_tsim(path, SimulationMode=1, minHits=4, OpenFilter=False, Belle2Phase="Phase2"):
+    """
+    add the trigger simlation of subdetector, no grl and gdl
+    the parameters are the same as above
+    """
+    add_cdc_trigger(path, SimulationMode, minHits)
+    add_ecl_trigger(path)
+    add_klm_trigger(path)
+
+
+def add_grl_gdl_tsim(path, SimulationMode=1, minHits=4, OpenFilter=False, Belle2Phase="Phase2"):
+    """
+    add grl and gdl, the function have to applied based on the
+    dataobjects produced in add_subdetector_trigger_simulation
+    the parameters are the same as above
+    """
+    add_grl_trigger(path, SimulationMode, Belle2Phase)
+    add_gdl_trigger(path, SimulationMode, OpenFilter)
+    EffCalculation(path)

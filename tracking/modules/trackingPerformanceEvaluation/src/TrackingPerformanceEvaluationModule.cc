@@ -67,7 +67,7 @@ TrackingPerformanceEvaluationModule::TrackingPerformanceEvaluationModule() :
   addParam("TracksName", m_TracksName, "Name of Track collection.", std::string(""));
   addParam("RecoTracksName", m_RecoTracksName, "Name of RecoTrack collection.", std::string("RecoTracks"));
   addParam("MCRecoTracksName", m_MCRecoTracksName, "Name of MCRecoTrack collection.", std::string("MCRecoTracks"));
-
+  addParam("ParticleHypothesis", m_ParticleHypothesis, "Particle Hypothesis used in the track fit.", int(211));
 
 }
 
@@ -145,6 +145,27 @@ void TrackingPerformanceEvaluationModule::initialize()
   m_h1_cotTheta_res = createHistogram1D("h1cotThetares", "cot#theta residuals", 100, -0.1, 0.1, "cot#theta resid",
                                         m_histoList_trkQuality);
 
+  //track parameters residuals - momentum
+  m_h1_px_res = createHistogram1D("h1pxres", "px absolute residuals", 200, -0.05, 0.05, "px_{reco} - px_{MC} (GeV/c)",
+                                  m_histoList_trkQuality);
+  m_h1_py_res = createHistogram1D("h1pyres", "py absolute residuals", 200, -0.05, 0.05, "py_{reco} - py_{MC} (GeV/c)",
+                                  m_histoList_trkQuality);
+  m_h1_pz_res = createHistogram1D("h1pzres", "pz absolute residuals", 200, -0.05, 0.05, "pz_{reco} - pz_{MC} (GeV/c)",
+                                  m_histoList_trkQuality);
+  m_h1_p_res = createHistogram1D("h1pres", "p relative residuals", 200, -0.05, 0.05, "p_{reco} - p_{MC} / p_{MC}",
+                                 m_histoList_trkQuality);
+  m_h1_pt_res = createHistogram1D("h1ptres", "pt relative residuals", 200, -0.05, 0.05, "pt_{reco} - pt_{MC} / pt_{MC}",
+                                  m_histoList_trkQuality);
+  //track parameters residuals - position
+  m_h1_x_res = createHistogram1D("h1xres", " residuals", 200, -0.05, 0.05, "x_{reco} - x_{MC} (cm)", m_histoList_trkQuality);
+  m_h1_y_res = createHistogram1D("h1yres", " residuals", 200, -0.05, 0.05, "y_{reco} - y_{MC} (cm)", m_histoList_trkQuality);
+  m_h1_z_res = createHistogram1D("h1zres", " residuals", 200, -0.05, 0.05, "z_{reco} - z_{MC} (cm)", m_histoList_trkQuality);
+  m_h1_r_res = createHistogram1D("h1rres", " residuals", 200, -0.05, 0.05, "r_{reco} - r_{MC} (cm)", m_histoList_trkQuality);
+  m_h1_rtot_res = createHistogram1D("h1rtotres", " residuals", 200, -0.05, 0.05, "rtot_{reco} - rtot_{MC} (cm)",
+                                    m_histoList_trkQuality);
+
+  m_h2_chargeVSchargeMC  = createHistogram2D("h2chargecheck", "chargeVSchargeMC", 3, -1.5, 1.5, "charge MC", 3, -1.5, 1.5,
+                                             "charge reco", m_histoList_trkQuality);
 
   //track parameters pulls
   m_h1_d0_pll = createHistogram1D("h1d0pll", "d0 pulls", 100, -5, 5, "d0 pull", m_histoList_trkQuality);
@@ -254,6 +275,18 @@ void TrackingPerformanceEvaluationModule::initialize()
                                      "entry per Track with PXD hits connected to a MCParticle",
                                      m_h3_MCParticle /*, m_histoList*/);
 
+  m_h3_RecoTrackswPXDHitsPerMCParticle = (TH3F*)duplicateHistogram("h3RecoTrackswPXDHitsPerMCParticle",
+                                         "entry per RecoTrack with PXD hits connected to a MCParticle",
+                                         m_h3_MCParticle /*, m_histoList*/);
+
+  m_h3_RecoTrackswPXDHitsPerMCParticlewPXDHits = (TH3F*)duplicateHistogram("h3RecoTrackswPXDHitsPerMCParticlewPXDHits",
+                                                 "entry per RecoTrack with PXD hits connected to a MCParticle with PXD hits",
+                                                 m_h3_MCParticle /*, m_histoList*/);
+
+  m_h3_MCParticleswPXDHits = (TH3F*)duplicateHistogram("h3MCParticleswPXDHitsPerMCParticle",
+                                                       "entry per MCParticle with PXD hits",
+                                                       m_h3_MCParticle /*, m_histoList*/);
+
   m_h3_MCRecoTrack = (TH3F*)duplicateHistogram("h3MCRecoTrack",
                                                "entry per MCRecoTrack connected to the MCParticle",
                                                m_h3_MCParticle /*, m_histoList*/);
@@ -351,12 +384,21 @@ void TrackingPerformanceEvaluationModule::event()
     else
       continue;
 
+    if (mcParticle.hasSeenInDetector(Const::PXD))
+      m_h3_MCParticleswPXDHits->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+
     //1. retrieve all the Tracks related to the MCParticle
 
     //1.0 check if there is a RecoTrack
     RelationVector<RecoTrack> MCRecoTracks_fromMCParticle =
       DataStore::getRelationsWithObj<RecoTrack>(&mcParticle, m_MCRecoTracksName);
 
+    if (MCRecoTracks_fromMCParticle.size() > 0)
+      if (MCRecoTracks_fromMCParticle[0]->hasPXDHits()) {
+        m_h3_RecoTrackswPXDHitsPerMCParticle->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+        if (mcParticle.hasSeenInDetector(Const::PXD))
+          m_h3_RecoTrackswPXDHitsPerMCParticlewPXDHits->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+      }
     m_multiplicityMCRecoTracks->Fill(MCRecoTracks_fromMCParticle.size());
 
     RelationVector<RecoTrack> RecoTracks_fromMCParticle =
@@ -383,9 +425,9 @@ void TrackingPerformanceEvaluationModule::event()
 
     for (int trk = 0; trk < (int)Tracks_fromMCParticle.size(); trk++) {
 
-      const TrackFitResult* fitResult = Tracks_fromMCParticle[trk]->getTrackFitResult(Const::ChargedStable(211));
+      const TrackFitResult* fitResult = Tracks_fromMCParticle[trk]->getTrackFitResult(Const::ChargedStable(m_ParticleHypothesis));
 
-      if (fitResult == NULL)
+      if ((fitResult == NULL) || (fitResult->getParticleType() != Const::ChargedStable(m_ParticleHypothesis)))
         B2DEBUG(99, " the TrackFitResult is not found!");
 
       else { // valid TrackFitResult found
@@ -446,9 +488,9 @@ void TrackingPerformanceEvaluationModule::event()
     int nMCParticles = 0;
 
     //check if the track has been fitted
-    const TrackFitResult* fitResult = track.getTrackFitResult(Const::ChargedStable(211));
+    const TrackFitResult* fitResult = track.getTrackFitResult(Const::ChargedStable(m_ParticleHypothesis));
 
-    if (fitResult == NULL)
+    if ((fitResult == NULL) || (fitResult->getParticleType() != Const::ChargedStable(m_ParticleHypothesis)))
       continue;
 
     m_h1_pValue->Fill(fitResult->getPValue());
@@ -729,6 +771,22 @@ void  TrackingPerformanceEvaluationModule::fillTrackParams1DHistograms(const Tra
   double z0_res = fitResult->getZ0() - mcParticleInfo.getZ0();
   double cotTheta_res = fitResult->getCotTheta() - mcParticleInfo.getCotTheta();
 
+  //track parameters residuals in momentum:
+  double px_res = fitResult->getMomentum().X() - mcParticleInfo.getPx();
+  double py_res = fitResult->getMomentum().Y() - mcParticleInfo.getPy();
+  double pz_res = fitResult->getMomentum().Z() - mcParticleInfo.getPz();
+  double p_res = (fitResult->getMomentum().Mag() - mcParticleInfo.getP()) / mcParticleInfo.getP();
+  double pt_res = (fitResult->getMomentum().Pt() - mcParticleInfo.getPt()) / mcParticleInfo.getPt();
+
+  //track parameters residuals in position:
+  double x_res = fitResult->getPosition().X() - mcParticleInfo.getX();
+  double y_res = fitResult->getPosition().Y() - mcParticleInfo.getY();
+  double z_res = fitResult->getPosition().Z() - mcParticleInfo.getZ();
+  double r_res = fitResult->getPosition().Perp() - sqrt(mcParticleInfo.getX() * mcParticleInfo.getX() + mcParticleInfo.getY() *
+                                                        mcParticleInfo.getY());
+  double rtot_res = fitResult->getPosition().Mag() - sqrt(mcParticleInfo.getX() * mcParticleInfo.getX() + mcParticleInfo.getY() *
+                                                          mcParticleInfo.getY() + mcParticleInfo.getZ() * mcParticleInfo.getZ());
+
   m_h1_d0_err->Fill(d0_err);
   m_h1_phi_err->Fill(phi_err);
   m_h1_omega_err->Fill(omega_err);
@@ -740,6 +798,20 @@ void  TrackingPerformanceEvaluationModule::fillTrackParams1DHistograms(const Tra
   m_h1_omega_res->Fill(omega_res);
   m_h1_z0_res->Fill(z0_res);
   m_h1_cotTheta_res->Fill(cotTheta_res);
+
+  m_h1_px_res->Fill(px_res);
+  m_h1_py_res->Fill(py_res);
+  m_h1_pz_res->Fill(pz_res);
+  m_h1_p_res->Fill(p_res);
+  m_h1_pt_res->Fill(pt_res);
+
+  m_h1_x_res->Fill(x_res);
+  m_h1_y_res->Fill(y_res);
+  m_h1_z_res->Fill(z_res);
+  m_h1_r_res->Fill(r_res);
+  m_h1_rtot_res->Fill(rtot_res);
+
+  m_h2_chargeVSchargeMC->Fill(mcParticleInfo.getCharge(), fitResult->getChargeSign());
 
   m_h1_d0_pll->Fill(d0_res / d0_err);
   m_h1_phi_pll->Fill(phi_res / phi_err);
@@ -793,7 +865,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
   //hits used in the fit
 
-  const TrackFitResult* fitResult = theTrack.getTrackFitResult(Const::ChargedStable(211));
+  const TrackFitResult* fitResult = theTrack.getTrackFitResult(Const::ChargedStable(m_ParticleHypothesis));
 
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
@@ -803,7 +875,8 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
   double pt = -999;
 
 
-  if (fitResult != NULL) { // valid TrackFitResult found
+  if ((fitResult != NULL)
+      || (fitResult->getParticleType() != Const::ChargedStable(m_ParticleHypothesis))) { // valid TrackFitResult found
     d0_err = sqrt((fitResult->getCovariance5())[0][0]);
     z0_err = sqrt((fitResult->getCovariance5())[3][3]);
     pt = fitResult->getMomentum().Pt();
@@ -927,7 +1000,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
     }
   }
 
-  if (fitResult != NULL) {
+  if ((fitResult != NULL) && (fitResult->getParticleType() == Const::ChargedStable(m_ParticleHypothesis))) {
     if (hasPXDhit) {
       m_h2_d0errVSpt_wpxd->Fill(pt, d0_err);
       m_h2_z0errVSpt_wpxd->Fill(pt, z0_err);
@@ -973,6 +1046,17 @@ void TrackingPerformanceEvaluationModule::addMoreInefficiencyPlots(TList* histoL
 void TrackingPerformanceEvaluationModule::addMoreEfficiencyPlots(TList* histoList)
 {
 
+
+  TH1F* h_MCPwPXDhits_pt = createHistogramsRatio("hMCPwPXDhits", "fraction of MCParticles with PXD hits VS pt",
+                                                 m_h3_MCParticleswPXDHits,
+                                                 m_h3_MCParticle, true, 0);
+  histoList->Add(h_MCPwPXDhits_pt);
+
+  TH1F* h_RTwPXDhitsMCPwPXDHits_pt = createHistogramsRatio("hRecoTrkswPXDhitsMCPwPXDHits",
+                                                           "fraction of MCParticles with PXD Hits with RecoTracks with PXD hits VS pt",
+                                                           m_h3_RecoTrackswPXDHitsPerMCParticlewPXDHits,
+                                                           m_h3_MCParticleswPXDHits, true, 0);
+  histoList->Add(h_RTwPXDhitsMCPwPXDHits_pt);
 
   TH1F* h_wPXDhits_pt = createHistogramsRatio("hTrkswPXDhits", "fraction of tracks with PXD hits VS pt",
                                               m_h3_TrackswPXDHitsPerMCParticle,

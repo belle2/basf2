@@ -52,12 +52,12 @@ namespace Belle2 {
       CDCWireHit();
 
       /**
-       *  Constructor assoziating the CDCHit with estimates of the drift length and charge deposit.
+       *  Constructor associating the CDCHit with estimates of the drift length and charge deposit.
        *
        *  Also stores the CDCHit necessary for later translation to Genfit.
        *
        *  @param ptrHit               Reference to the CDCHit.
-       *  @param driftLength          Initial estimate of the dirft length at the reference position.
+       *  @param driftLength          Initial estimate of the drift length at the reference position.
        *  @param driftLengthVariance  Initial estimate of the variance of the dirft length at the reference position.
        *  @param chargeDeposit        Initial estimate of the deposited charge in the drift cell.
        */

@@ -21,7 +21,7 @@ namespace Belle2 {
   public:
     virtual void initialize(const DBObject& obj) throw(RCHandlerException);
     virtual void configure(const DBObject& obj) throw(RCHandlerException);
-    virtual void boot(const std::string& opt, const DBObject& obj) throw(RCHandlerException);
+    virtual void boot(const DBObject& obj) throw(RCHandlerException);
     virtual void load(const DBObject& obj) throw(RCHandlerException);
     virtual void start(int expno, int runno) throw(RCHandlerException);
     virtual void stop() throw(RCHandlerException);
@@ -42,7 +42,7 @@ namespace Belle2 {
     std::map<std::string, int> m_trgcommands;
 
   private:
-    void send(const NSMMessage& msg) throw(RCHandlerException);
+    void send(RCNode& node, const NSMMessage& msg) throw(RCHandlerException);
     void statftx(ftsw_t* ftsw, int ftswid);
 
   };

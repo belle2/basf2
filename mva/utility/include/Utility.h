@@ -17,6 +17,12 @@
 namespace Belle2 {
   namespace MVA {
 
+    /**
+     * Convenience function which does nothing.
+     * The only purpose of this function is to be called so that ROOT loads the dictionaries belonging to the mva package
+     * This is necessary if you change the working directory in your python steering file after you import basf2_mva.
+     */
+    void loadRootDictionary();
 
     /**
      * Convenience function which downloads a given weightfile from the database
@@ -97,6 +103,26 @@ namespace Belle2 {
      */
     std::unique_ptr<Belle2::MVA::Expert> teacher_splot(const GeneralOptions& general_options, const SpecificOptions& specific_options,
                                                        const MetaOptions& meta_options);
+
+    /**
+     * Performs a sideband substraction training, convienence function
+     * @param general_options shared options of all methods
+     * @param splot_options splot options defining the splot training
+     * @param specific_options of the used mva method
+     */
+    std::unique_ptr<Belle2::MVA::Expert> teacher_sideband_substraction(const GeneralOptions& general_options,
+        const SpecificOptions& specific_options,
+        const MetaOptions& meta_options);
+
+    /**
+     * Performs a MC vs data pre-training and afterwards reweighted training, convienence function
+     * @param general_options shared options of all methods
+     * @param splot_options splot options defining the splot training
+     * @param specific_options of the used mva method
+     */
+    std::unique_ptr<Belle2::MVA::Expert> teacher_reweighting(const GeneralOptions& general_options,
+                                                             const SpecificOptions& specific_options,
+                                                             const MetaOptions& meta_options);
 
 
   }

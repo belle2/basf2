@@ -183,7 +183,7 @@ void Belle2::ECL::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg
         B5 = B1 >> (k_b - 9);
 
 
-        B1 = B2 >> 13;
+        //B1 = B2 >> 13; //Variable 'B1' is reassigned a value before the old one has been used. (TF)
         B2 += (A1 << 11);
         B3 = (B2 / A1);
 

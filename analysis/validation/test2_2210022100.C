@@ -48,15 +48,15 @@ void plotTime(TFile* pfile, TTree* ptree, TFile *outputFile){
   TString tmCuts("(D0_isSignal == 1)");
   Double_t ax = 0.01;
  
-  h_tres_all = new TH1F("h_tres_all", "full momentum range", 100,-ax, ax);
+  h_tres_all = new TH1F("h_tres_all", "D0 flight time resolution", 100,-ax, ax);
   ptree->Project("h_tres_all", "D0_K_S0_FT - D0_K_S0_MCFT",tmCuts);
   h_tres_all->GetXaxis()->SetTitle("t_{reco} - t_{gen} (ns)");
 
-  h_sigmat_all = new TH1F("h_sigmat_all", "full momentum range", 100,0, 0.01);
+  h_sigmat_all = new TH1F("h_sigmat_all", "D0 flight time error", 100,0, 0.01);
   ptree->Project("h_sigmat_all", "D0_K_S0_FTE",tmCuts);
   h_sigmat_all->GetXaxis()->SetTitle("#sigma_{t} (ns)");
 
-  h_sig_all = new TH1F("h_sig_all", "full momentum range", 100,0, 200);
+  h_sig_all = new TH1F("h_sig_all", "D0 flight time significance", 100,0, 200);
   ptree->Project("h_sig_all", "D0_K_S0_FT/D0_K_S0_FTE",tmCuts);
   
   

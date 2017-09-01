@@ -26,6 +26,11 @@
 typedef ft2u_t fast_t;
 typedef ft2u_t slow_t;
 typedef ft2u_t dump_t;
+//#include "ft2p_fast.h"
+//#include "ft2p_slow.h"
+//typedef struct ft2p_fast fast_t;
+//typedef struct ft2p_slow slow_t;
+
 #include "ftsw.h"
 
 #include "statft.h"
@@ -285,12 +290,12 @@ void color2u067(fast_t *f, slow_t *s, char* ss, char* state)
   sprintf(trst, "%04d.%02d.%02d %02d:%02d:%02d",
 	  tp->tm_year+1900, tp->tm_mon+1, tp->tm_mday,
 	  tp->tm_hour, tp->tm_min, tp->tm_sec);
-  strcat(ss,css);
+  //strcat(ss,css);
   tp = localtime(&t1);
   sprintf(terr, "%04d.%02d.%02d %02d:%02d:%02d",
 	  tp->tm_year+1900, tp->tm_mon+1, tp->tm_mday,
 	  tp->tm_hour, tp->tm_min, tp->tm_sec);
-  strcat(ss,css);
+  //strcat(ss,css);
   if (first) {
     sprintf(css ,"starting statft...\n"); /* white */
     strcat(ss,css);
@@ -325,6 +330,8 @@ void color2u067(fast_t *f, slow_t *s, char* ss, char* state)
     sprintf(state ,"READY"); /* green */
   } else if ((s->seltrg & 7) == 0) { /* none trigger */
     sprintf(css ,"READY (trigger is disabled)\n"); /* yellow */
+    strcat(ss, css);
+    sprintf(state ,"READY"); /* green */
   } else if (f->toutcnt == toutcnt_sav && B(f->stat, 29)) { /* busy */
     sprintf(css ,"BUSY");
     strcat(ss, css);

@@ -77,6 +77,14 @@ namespace Belle2 {
     void add(EKLMElementID element, int parameter, double correction,
              bool invertSign);
 
+    /**
+     * Set parameter value.
+     * @param[in] element    Element identifier.
+     * @param[in] parameter  Parameter number.
+     * @param[in] value      Value.
+     */
+    void set(EKLMElementID element, int parameter, double value);
+
   private:
 
     /** Sector alignment. */

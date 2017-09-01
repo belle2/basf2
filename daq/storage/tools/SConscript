@@ -1,6 +1,9 @@
 Import('env')
 
 env['TOOLS_LIBS']['file2socket'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['file2file'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['file2check'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['file2list'] = ['daq', 'framework', '$ROOT_LIBS' ]
 env['TOOLS_LIBS']['stevtserver'] = ['daq', 'framework', '$ROOT_LIBS', 'pthread' ]
 env['TOOLS_LIBS']['storagein'] = ['daq', 'framework', '$ROOT_LIBS' ]
 env['TOOLS_LIBS']['storageout'] = ['daq', 'framework', '$ROOT_LIBS' ]

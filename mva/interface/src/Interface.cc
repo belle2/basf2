@@ -15,6 +15,7 @@
 #include <mva/methods/FANN.h>
 #include <mva/methods/PDF.h>
 #include <mva/methods/Trivial.h>
+#include <mva/methods/Reweighter.h>
 #include <mva/methods/Combination.h>
 
 #include <framework/logging/Logger.h>
@@ -50,6 +51,7 @@ namespace Belle2 {
       static Interface<PythonOptions, PythonTeacher, PythonExpert> interface_Python;
       static Interface<PDFOptions, PDFTeacher, PDFExpert> interface_PDF;
       static Interface<CombinationOptions, CombinationTeacher, CombinationExpert> interface_Combination;
+      static Interface<ReweighterOptions, ReweighterTeacher, ReweighterExpert> interface_Reweighter;
       static Interface<TrivialOptions, TrivialTeacher, TrivialExpert> interface_Trivial;
     }
 

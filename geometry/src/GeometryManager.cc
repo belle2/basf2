@@ -81,7 +81,7 @@ namespace Belle2 {
           B2WARNING("Global volume not large enough in " << name << " direction, enlarging from "
                     << current << " mm to " << extent << " mm");
         } else {
-          B2INFO("Setting global volume size to " << name << "= +-" << extent << " mm");
+          B2DEBUG(10, "Setting global volume size to " << name << "= +-" << extent << " mm");
         }
         return extent;
       }
@@ -124,18 +124,18 @@ namespace Belle2 {
       std::string detectorName;
       try {
         detectorName = detectorDir.getString("Name");
-        B2INFO("Creating geometry for detector: " << detectorName);
+        B2DEBUG(50, "Creating geometry for detector: " << detectorName);
       } catch (gearbox::PathEmptyError& e) {
         B2FATAL("Could not read detector name, make sure gearbox is connected and "
                 << detectorDir.getPath() << " points to the geometry description");
       }
 
-      const double width  = detectorDir.getLength("Global/width",  0);
-      const double height = detectorDir.getLength("Global/height", 0);
-      const double length = detectorDir.getLength("Global/length", 0);
-      const std::string material = detectorDir.getString("Global/material", "Air");
+      const double globalWidth  = detectorDir.getLength("Global/width",  0);
+      const double globalHeight = detectorDir.getLength("Global/height", 0);
+      const double globalLength = detectorDir.getLength("Global/length", 0);
+      const std::string globalMaterial = detectorDir.getString("Global/material", "Air");
 
-      GeoConfiguration config(detectorName, width, height, length, material);
+      GeoConfiguration config(detectorName, globalWidth, globalHeight, globalLength, globalMaterial);
 
       // Add materials
       Materials& materials = Materials::getInstance();
@@ -171,19 +171,19 @@ namespace Belle2 {
         excludedNames.erase(name);
         additionalNames.erase(name);
         if (!m_components.empty() && m_components.count(name) == 0) {
-          B2INFO("DetectorComponent " << name << " not in list of components, skipping");
+          B2DEBUG(50, "DetectorComponent " << name << " not in list of components, skipping");
           continue;
         }
         if (m_components.empty() && !isDefault) {
           if (m_additional.count(name) == 0) {
-            B2INFO("DectorComponent " << name << " is not enabled by default, skipping");
+            B2DEBUG(50, "DectorComponent " << name << " is not enabled by default, skipping");
             continue;
           } else {
-            B2INFO("DectorComponent " << name << " is enabled in addition to the default components");
+            B2DEBUG(50, "DectorComponent " << name << " is enabled in addition to the default components");
           }
         }
         if (!m_excluded.empty() && m_excluded.count(name) > 0) {
-          B2INFO("DetectorComponent " << name << " in list of excluded components, skipping");
+          B2DEBUG(10, "DetectorComponent " << name << " in list of excluded components, skipping");
           continue;
         }
 
@@ -193,7 +193,7 @@ namespace Belle2 {
           if (creator) {
             creator->createPayloads(GearDir(component, "Content"), iov);
           } else {
-            B2ERROR("Could not load creator");
+            B2ERROR("Could not load creator " << creatorName << " from " << libraryName);
           }
         }
         config.addComponent({name, creatorName, libraryName});
@@ -202,9 +202,9 @@ namespace Belle2 {
       //If there are still names left in the componentNames, excludedNames or
       //additionalNames there is probably an typo in the respective component
       //list. Throw an error for each name left using a small lambda function
-      auto checkRemaining = [](const std::string & type, const std::set<std::string> componentNames) {
-        for (const std::string& name : componentNames) {
-          B2ERROR("'" << name << "' is specified in list of "
+      auto checkRemaining = [](const std::string & type, const std::set<std::string> remainingNames) {
+        for (const std::string& name : remainingNames) {
+          B2ERROR("Geometry '" << name << "' is specified in list of "
                   << type << " but could not be found");
         }
       };
@@ -232,7 +232,7 @@ namespace Belle2 {
       if (runManager) runManager->ReinitializeGeometry(true, true);
 
       // create new geometry
-      B2INFO("Creating geometry for detector: " << config.getName());
+      B2DEBUG(10, "Creating geometry for detector: " << config.getName());
 
       // create Materials
       Materials& materials = Materials::getInstance();
@@ -258,8 +258,8 @@ namespace Belle2 {
       G4LogicalVolume* top_log = new G4LogicalVolume(top_box, top_mat, "Top", 0, 0, 0);
       setVisibility(*top_log, false);
       m_topVolume = new G4PVPlacement(0, G4ThreeVector(), top_log, "Top", 0, false, 0);
-      B2INFO("Created top volume with x= +-" << config.getGlobalWidth() << " cm, y= +-"
-             << config.getGlobalHeight() << " cm, z= +-" << config.getGlobalLength() << " cm");
+      B2DEBUG(10, "Created top volume with x= +-" << config.getGlobalWidth() << " cm, y= +-"
+              << config.getGlobalHeight() << " cm, z= +-" << config.getGlobalLength() << " cm");
 
       for (const GeoComponent& component : config.getComponents()) {
         CreatorBase* creator = CreatorManager::getCreator(component.getCreator(), component.getLibrary());
@@ -270,19 +270,19 @@ namespace Belle2 {
           try {
             if (!useDB) throw CreatorBase::DBNotImplemented();
             creator->createFromDB(component.getName(), *top_log, type);
-            B2INFO("called creator " << component.getCreator() << " to create component " << component.getName() << " from DB");
+            B2DEBUG(50, "called creator " << component.getCreator() << " to create component " << component.getName() << " from DB");
 
           } catch (CreatorBase::DBNotImplemented& e) {
             GearDir parameters = Gearbox::getInstance().getDetectorComponent(component.getName());
             creator->create(parameters, *top_log, type);
-            B2INFO("called creator " << component.getCreator() << " to create component " << component.getName() << " from Gearbox");
+            B2DEBUG(50, "called creator " << component.getCreator() << " to create component " << component.getName() << " from Gearbox");
           }
           int newSolids = G4SolidStore::GetInstance()->size() - oldSolids;
           int newLogical = G4LogicalVolumeStore::GetInstance()->size() - oldLogical;
           int newPhysical = G4PhysicalVolumeStore::GetInstance()->size() - oldPhysical;
-          B2INFO("DetectorComponent " << component.getName() << " created " << newSolids
-                 << " solids, " << newLogical << " logical volumes and "
-                 << newPhysical << " physical volumes");
+          B2DEBUG(50, "DetectorComponent " << component.getName() << " created " << newSolids
+                  << " solids, " << newLogical << " logical volumes and "
+                  << newPhysical << " physical volumes");
           m_creators.push_back(creator);
           if (m_assignRegions) {
             //Automatically assign a region with the creator name to all volumes
@@ -307,24 +307,18 @@ namespace Belle2 {
       int newSolids = G4SolidStore::GetInstance()->size();
       int newLogical = G4LogicalVolumeStore::GetInstance()->size();
       int newPhysical = G4PhysicalVolumeStore::GetInstance()->size();
-      B2INFO("Created a total of " << newSolids << " solids, " << newLogical
-             << " logical volumes and " << newPhysical << " physical volumes");
+      B2DEBUG(50, "Created a total of " << newSolids << " solids, " << newLogical
+              << " logical volumes and " << newPhysical << " physical volumes");
 
       //Enlarge top volume to always encompass all volumes
       top_box->SetXHalfLength(getTopMinSize("x", kXAxis, top_log, xHalfLength));
       top_box->SetYHalfLength(getTopMinSize("y", kYAxis, top_log, yHalfLength));
       top_box->SetZHalfLength(getTopMinSize("z", kZAxis, top_log, zHalfLength));
 
-      B2INFO("Initializing magnetic field if present ...");
-      B2INFO_MEASURE_TIME(
-        "Initialization of magnetic field took ",
-        BFieldMap::Instance().initialize();
-      );
-      B2INFO("Optimizing geometry and creating lookup tables ...");
-      B2INFO_MEASURE_TIME(
-        "Optimizing geometry took ",
-        G4GeometryManager::GetInstance()->CloseGeometry(true, LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 200, PACKAGENAME()));
-      );
+      B2DEBUG(50, "Initializing magnetic field if present ...");
+      BFieldMap::Instance().initialize();
+      B2DEBUG(50, "Optimizing geometry and creating lookup tables ...");
+      G4GeometryManager::GetInstance()->CloseGeometry(true, LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 200, PACKAGENAME()));
     }
 
     void GeometryManager::createTGeoRepresentation()

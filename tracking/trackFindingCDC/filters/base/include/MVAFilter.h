@@ -16,7 +16,6 @@
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <framework/core/ModuleParamList.h>
 
@@ -66,8 +65,8 @@ namespace Belle2 {
       void initialize() override
       {
         Super::initialize();
-        m_mvaExpert = makeUnique<MVAExpert>(m_param_identifier,
-                                            Super::getVarSet().getNamedVariables());
+        m_mvaExpert = std::make_unique<MVAExpert>(m_param_identifier,
+                                                  Super::getVarSet().getNamedVariables());
         m_mvaExpert->initialize();
       }
 
@@ -123,7 +122,7 @@ namespace Belle2 {
       /// Constructor of the filter.
       explicit MVAFilter(const std::string& defaultTrainingName = "",
                          double defaultCut = NAN)
-        :  Super(makeUnique<AVarSet>(),
+        :  Super(std::make_unique<AVarSet>(),
                  defaultTrainingName,
                  defaultCut)
       {}

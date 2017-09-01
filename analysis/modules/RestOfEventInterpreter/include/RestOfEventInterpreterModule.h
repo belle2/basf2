@@ -45,10 +45,13 @@ namespace Belle2 {
 
   private:
 
-    typedef std::map<std::string, std::shared_ptr<Variable::Cut>> stringAndCutMap;
-    typedef std::map<std::string, std::vector<double>> stringAndVectorMap;
-    typedef std::map<unsigned int, bool> intAndBoolMap;
-    typedef std::map<std::string, std::map<unsigned int, bool>> stringAndMapOfIntAndBoolMap;
+    typedef std::map<std::string, std::shared_ptr<Variable::Cut>>
+                                                               stringAndCutMap; /**< Type definition helper for a map of string and cuts */
+    typedef std::map<std::string, std::vector<double>>
+                                                    stringAndVectorMap; /**< Type definition helper for a map of string and vector of doubles */
+    typedef std::map<unsigned int, bool> intAndBoolMap; /**< Type definition helper for a map of integer and boolean */
+    typedef std::map<std::string, std::map<unsigned int, bool>>
+                                                             stringAndMapOfIntAndBoolMap; /**< Type definition helper for a map of string and nested map of integer and boolean */
 
     std::string m_particleList;  /**< Name of the ParticleList */
 

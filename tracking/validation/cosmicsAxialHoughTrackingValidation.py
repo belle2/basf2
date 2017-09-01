@@ -43,7 +43,7 @@ class CosmicsAxialHough(TrackingValidationRun):
         if interactive_display:
             cdc_display_module = cdcdisplay.CDCSVGDisplayModule(os.getcwd(), interactive=True)
             cdc_display_module.draw_recotracks = True
-            cdc_display_module.draw_recotrack_trajectories = True
+            cdc_display_module.draw_recotrack_seed_trajectories = True
             path.add_module(cdc_display_module)
 
     tracking_coverage = {

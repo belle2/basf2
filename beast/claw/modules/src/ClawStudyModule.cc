@@ -160,10 +160,10 @@ void ClawStudyModule::event()
   }
 
   //number of entries in SimHits
-  int nSimHits = SimHits.getEntries();
+  //int nSimHits = SimHits.getEntries();
 
   //loop over all SimHit entries
-  for (int i = 0; i < nSimHits; i++) {
+  for (int i = 0; i < (int) SimHits.getEntries(); i++) {
     ClawSimHit* aHit = SimHits[i];
     int detNB = aHit->getCellId();
     if (detNB < 8) {

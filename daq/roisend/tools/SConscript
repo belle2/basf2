@@ -2,5 +2,6 @@ Import('env')
 
 env['TOOLS_LIBS']['hltout2merger'] = ['daq', 'framework', '$ROOT_LIBS', 'rt' ]
 env['TOOLS_LIBS']['merger_merge'] = ['daq', 'framework', '$ROOT_LIBS', 'rt' ]
+env['TOOLS_LIBS']['roisenderd'] = ['daq', 'framework', '$ROOT_LIBS', 'rt' ]
 
 Return('env')

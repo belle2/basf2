@@ -109,15 +109,15 @@ void BKLMDQMModule::event()
 
   StoreArray<BKLMDigit> digits(m_OutputDigitsName);
   for (int i = 0; i < digits.getEntries(); i++) {
-    BKLMDigit* digit = static_cast<BKLMDigit*>(digits[i]);
-    m_LayerHits->Fill(digit->getModuleID());
-    m_CTime->Fill(digit->getCTime());
-    m_SimTime->Fill(digit->getSimTime());
-    m_Time->Fill(digit->getTime());
-    m_SimEDep->Fill(digit->getSimEDep());
-    m_EDep->Fill(digit->getEDep());
-    m_SimNPixel->Fill(digit->getSimNPixel());
-    m_NPixel->Fill(digit->getNPixel());
+    BKLMDigit* bklmDigit = static_cast<BKLMDigit*>(digits[i]);
+    m_LayerHits->Fill(bklmDigit->getModuleID());
+    m_CTime->Fill(bklmDigit->getCTime());
+    m_SimTime->Fill(bklmDigit->getSimTime());
+    m_Time->Fill(bklmDigit->getTime());
+    m_SimEDep->Fill(bklmDigit->getSimEDep());
+    m_EDep->Fill(bklmDigit->getEDep());
+    m_SimNPixel->Fill(bklmDigit->getSimNPixel());
+    m_NPixel->Fill(bklmDigit->getNPixel());
   }
 }
 

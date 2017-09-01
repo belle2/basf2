@@ -17,7 +17,10 @@
 #include <TDirectory.h>
 
 #include <boost/filesystem/operations.hpp>
+
 #include <iostream>
+#include <algorithm>
+#include <vector>
 
 namespace Belle2 {
   namespace MVA {
@@ -43,6 +46,30 @@ namespace Belle2 {
           signal_weight_sum += m_weight;
       }
       return signal_weight_sum / weight_sum;
+
+    }
+
+    unsigned int Dataset::getFeatureIndex(std::string feature)
+    {
+
+      auto it = std::find(m_general_options.m_variables.begin(), m_general_options.m_variables.end(), feature);
+      if (it == m_general_options.m_variables.end()) {
+        B2ERROR("Unknown feature named " << feature);
+        return 0;
+      }
+      return std::distance(m_general_options.m_variables.begin(), it);
+
+    }
+
+    unsigned int Dataset::getSpectatorIndex(std::string spectator)
+    {
+
+      auto it = std::find(m_general_options.m_spectators.begin(), m_general_options.m_spectators.end(), spectator);
+      if (it == m_general_options.m_spectators.end()) {
+        B2ERROR("Unknown spectator named " << spectator);
+        return 0;
+      }
+      return std::distance(m_general_options.m_spectators.begin(), it);
 
     }
 
@@ -245,6 +272,49 @@ namespace Belle2 {
 
     }
 
+    CombinedDataset::CombinedDataset(const GeneralOptions& general_options, Dataset& signal_dataset,
+                                     Dataset& background_dataset) : Dataset(general_options), m_signal_dataset(signal_dataset),
+      m_background_dataset(background_dataset) { }
+
+    void CombinedDataset::loadEvent(unsigned int iEvent)
+    {
+      if (iEvent < m_signal_dataset.getNumberOfEvents()) {
+        m_signal_dataset.loadEvent(iEvent);
+        m_target = 1.0;
+        m_isSignal = true;
+        m_weight = m_signal_dataset.m_weight;
+        m_input = m_signal_dataset.m_input;
+        m_spectators = m_signal_dataset.m_spectators;
+      } else {
+        m_background_dataset.loadEvent(iEvent - m_signal_dataset.getNumberOfEvents());
+        m_target = 0.0;
+        m_isSignal = false;
+        m_weight = m_background_dataset.m_weight;
+        m_input = m_background_dataset.m_input;
+        m_spectators = m_background_dataset.m_spectators;
+      }
+    }
+
+    std::vector<float> CombinedDataset::getFeature(unsigned int iFeature)
+    {
+
+      auto s = m_signal_dataset.getFeature(iFeature);
+      auto b = m_background_dataset.getFeature(iFeature);
+      s.insert(s.end(), b.begin(), b.end());
+      return s;
+
+    }
+
+    std::vector<float> CombinedDataset::getSpectator(unsigned int iSpectator)
+    {
+
+      auto s = m_signal_dataset.getSpectator(iSpectator);
+      auto b = m_background_dataset.getSpectator(iSpectator);
+      s.insert(s.end(), b.begin(), b.end());
+      return s;
+
+    }
+
     ROOTDataset::ROOTDataset(const GeneralOptions& general_options) : Dataset(general_options)
     {
       for (auto variable : general_options.m_variables)
@@ -254,7 +324,15 @@ namespace Belle2 {
             throw std::runtime_error("Interface doesn't support variable more then one time in either spectators, variables or target variable");
           }
 
-      auto filenames = RootIOUtilities::expandWordExpansions(m_general_options.m_datafiles);
+      std::vector<std::string> filenames;
+      for (const auto& filename : m_general_options.m_datafiles) {
+        if (boost::filesystem::exists(filename)) {
+          filenames.push_back(filename);
+        } else {
+          auto temp = RootIOUtilities::expandWordExpansions(m_general_options.m_datafiles);
+          filenames.insert(filenames.end(), temp.begin(), temp.end());
+        }
+      }
       if (filenames.empty()) {
         B2ERROR("Found no valid filenames in GeneralOptions");
         throw std::runtime_error("Found no valid filenames in GeneralOptions");

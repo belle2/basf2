@@ -20,6 +20,7 @@
 </header>
 """
 
+import glob
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
@@ -60,7 +61,16 @@ param_pgun = {
 pgun.param(param_pgun)
 path.add_module(pgun)
 
-add_simulation(path)
+# add simulation and reconstruction modules to the path
+if 'BELLE2_BACKGROUND_DIR' in os.environ:
+    background_files = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+    print('Background files:')
+    print(background_files)
+    add_simulation(path, bkgfiles=background_files)
+else:
+    print('Warning: variable BELLE2_BACKGROUND_DIR is not set')
+    add_simulation(path)
+
 add_reconstruction(path)
 
 output = register_module('RootOutput')

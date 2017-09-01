@@ -8,7 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#pragma once
+#ifndef BKLMMISALIGNMENT_DB_H
+#define BKLMMISALIGNMENT_DB_H
 
 #include <calibration/DBObjCalibrationConstMapBase.h>
 
@@ -39,3 +40,4 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
+#endif

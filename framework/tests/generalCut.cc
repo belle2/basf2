@@ -208,6 +208,16 @@ namespace {
     a = MockGeneralCut::compile("1000 > nan");
     EXPECT_FALSE(a->check(&testObject));
 
+    // Check if we have double precision
+    a = MockGeneralCut::compile("3.141592653589793 == 3.141592653589792");
+    EXPECT_FALSE(a->check(&testObject));
+
+    a = MockGeneralCut::compile("3.1415926535897931234567890 == 3.1415926535897931234567891");
+    EXPECT_TRUE(a->check(&testObject));
+
+    a = MockGeneralCut::compile("3141592653589 != 3141592653588");
+    EXPECT_TRUE(a->check(&testObject));
+
     a = MockGeneralCut::compile("");
     EXPECT_TRUE(a->check(&testObject));
 

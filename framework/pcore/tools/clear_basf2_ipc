@@ -1,0 +1,2 @@
+#!/bin/bash
+framework-pcore-clear_ipcs "$@"

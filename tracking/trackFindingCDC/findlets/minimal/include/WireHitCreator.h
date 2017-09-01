@@ -72,6 +72,9 @@ namespace Belle2 {
       /// Parameter : List of super layers to be used - mostly for debugging
       std::vector<int> m_param_useSuperLayers;
 
+      /// Parameter : If true, the second hit information will be used to create Wire Hits
+      bool m_param_useSecondHits = false;
+
     private: // Prepared variables
       /// Geometry set to be used.
       CDC::CDCGeometryPar::EWirePosition m_wirePosSet = CDC::CDCGeometryPar::c_Base;

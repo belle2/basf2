@@ -61,9 +61,9 @@ namespace {
     }
   }
 }
-EventProcessor::StoppedBySignalException::StoppedBySignalException(int signal):
-  runtime_error("Execution stopped by signal " + to_string(signal) + "!"),
-  signal(signal)
+EventProcessor::StoppedBySignalException::StoppedBySignalException(int signal_):
+  runtime_error("Execution stopped by signal " + to_string(signal_) + "!"),
+  signal(signal_)
 {
 }
 

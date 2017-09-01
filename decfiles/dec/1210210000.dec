@@ -1,0 +1,23 @@
+# EventType: 1210210000
+# Descriptor: [B+ -> e+ nu_e]cc
+# NickName: Bu_enu
+# Documentation: SM B-> e nu signal MC  
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Mario Merola
+# Email: mario.merola@na.infn.it
+# Cuts: None
+# Date: 20170630
+#
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0 e+  nu_e  PHOTOS  SLN;
+Enddecay
+CDecay B-sig
+
+End

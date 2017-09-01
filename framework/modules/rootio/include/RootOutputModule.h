@@ -177,6 +177,9 @@ namespace Belle2 {
     /** Highest event number in highest run.
      */
     unsigned long m_eventHigh;
+
+    /** Whether or not we want to build an event index */
+    bool m_buildIndex{true};
   };
 } // end namespace Belle2
 

@@ -49,6 +49,9 @@ namespace Belle2 {
     //! File name
     std::string m_outputFileName;
 
+    //! If true the output filename will be interpreted as a boost::format pattern
+    bool m_fileNameIsPattern;
+
     //! Compression level
     int m_compressionLevel;
 

@@ -1,0 +1,41 @@
+# EventType: 1190710002
+# Descriptor: [B0 -> Xu l nu]cc
+# NickName: Bd_Xulnu=cocktail
+# Documentation: Cocktail of charmless semileptonic B decays
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Mario Merola
+# Email: mario.merola@na.infn.it
+# Cuts: None
+# Date: 20170703
+#
+#
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
+Enddecay
+
+Decay anti-B0sig
+
+#                    b -> u l nu
+0.000134000 pi+     e-      anti-nu_e   PHOTOS   ISGW2; #[Reconstructed PDG2011]
+0.000247000 rho+    e-      anti-nu_e   PHOTOS   ISGW2; #[Reconstructed PDG2011]
+0.001892   Xu+  e-  anti-nu_e         PHOTOS    VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00;
+
+#
+0.000134000 pi+     mu-     anti-nu_mu                      PHOTOS   ISGW2; #[Reconstructed PDG2011]
+0.000247000 rho+    mu-     anti-nu_mu                      PHOTOS   ISGW2; #[Reconstructed PDG2011]
+0.001892   Xu+  mu-  anti-nu_mu      PHOTOS       VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00;
+
+#
+0.000060   pi+    tau- anti-nu_tau                 ISGW2;
+0.000083   rho+   tau- anti-nu_tau                 ISGW2;
+0.000090   a_1+    tau- anti-nu_tau                 ISGW2;
+0.000008   b_1+    tau- anti-nu_tau                 ISGW2;
+0.000008   a_0+    tau- anti-nu_tau                 ISGW2;
+0.000008   a_2+    tau- anti-nu_tau                 ISGW2;
+Enddecay
+CDecay B0sig
+
+
+End

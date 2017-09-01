@@ -78,8 +78,12 @@ namespace Belle2 {
         infoPar.getBackplaneCapacitanceV(),
         infoPar.getInterstripCapacitanceV(),
         infoPar.getCouplingCapacitanceV(),
+        infoPar.getAduEquivalentU(),
+        infoPar.getAduEquivalentV(),
         infoPar.getElectronicNoiseU(),
         infoPar.getElectronicNoiseV(),
+        infoPar.getAduEquivalentSbwU(),
+        infoPar.getAduEquivalentSbwV(),
         infoPar.getElectronicNoiseSbwU(),
         infoPar.getElectronicNoiseSbwV()
       );
@@ -114,8 +118,12 @@ namespace Belle2 {
         sensor.getDouble("BackplaneCapacitanceV") * unit_pFcm,
         sensor.getDouble("InterstripCapacitanceV") * unit_pFcm,
         sensor.getDouble("CouplingCapacitanceV") * unit_pFcm,
+        sensor.getWithUnit("ADUEquivalentU"),
+        sensor.getWithUnit("ADUEquivalentV"),
         sensor.getWithUnit("ElectronicNoiseU"),
         sensor.getWithUnit("ElectronicNoiseV"),
+        sensor.getWithUnit("ADUEquivalentSbwU", 0),
+        sensor.getWithUnit("ADUEquivalentSbwV", 0),
         sensor.getWithUnit("ElectronicNoiseSbwU", 0),
         sensor.getWithUnit("ElectronicNoiseSbwV", 0)
       );
@@ -483,7 +491,11 @@ namespace Belle2 {
 
       //Create diamond radiation sensors if defined and in background mode
       if (m_activeChips) {
-        createDiamonds(parameters.getRadiationSensors(), topVolume, *envelope);
+        if (parameters.getRadiationSensors().getSubDetector() == "") {
+          B2DEBUG(10, "Apparently no radiation sensors defined, skipping");
+        } else {
+          createDiamonds(parameters.getRadiationSensors(), topVolume, *envelope);
+        }
       }
     }
 

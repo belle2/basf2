@@ -6,36 +6,40 @@ import multiprocessing
 # prepare a multiprocessing context which uses fork
 ctx = multiprocessing.get_context("fork")
 
-if not os.path.exists("collector_output"):
-    os.mkdir("collector_output")
+working_dir = "collector_output"
 
+if not os.path.exists(working_dir):
+    os.mkdir(working_dir)
+
+# Comment out to turn off debugging
 logging.package("calibration").log_level = LogLevel.DEBUG
 
 
 def _create_file(num):
     main = create_path()
-    main.add_module("EventInfoSetter", expList=[1, 1], runList=[run, run + 1], evtNumList=[100, 100])
+    main.add_module("EventInfoSetter", expList=[1], runList=[run], evtNumList=[10000])
     main.add_module("RootOutput", outputFileName="MyInputFile_" + str(run) + ".root")
     process(main)
     print(statistics)
 
 
 def _run_child(run):
+    set_random_seed(run*5)
     main = create_path()
-    main.add_module("RootInput", inputFileNames=["MyInputFile_" + str(run) + ".root", "MyInputFile_" + str(run + 1) + ".root"])
-    main.add_module("HistoManager", histoFileName="MyOutputFile_" + str(run) + ".root", workDirName="collector_output")
-    testmod = main.add_module("TestHisto", entriesPerEvent=10)
+    main.add_module("RootInput", inputFileNames=["MyInputFile_" + str(run) + ".root"])
+    main.add_module("HistoManager", histoFileName=working_dir+"/MyOutputFile_" + str(run) + ".root", workDirName=working_dir)
+    testmod = main.add_module("TestHisto", entriesPerEvent=100)
     process(main)
     print(statistics)
 
 
-for run in range(1, 4):
+for run in range(1, 11):
     child = ctx.Process(target=_create_file, args=(run,))
     child.start()
     # wait for it to finish
     child.join()
 
-for run in range(1, 3):
+for run in range(1, 11):
     child = ctx.Process(target=_run_child, args=(run,))
     child.start()
     # wait for it to finish

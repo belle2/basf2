@@ -42,6 +42,12 @@ namespace {
     const auto& angle = std::acos(currentCenter.dot(nextCenter) / (currentCenter.norm() * nextCenter.norm()));
     return TMath::Pi() - angle > 2;
   }
+
+  bool isConnected(const TVector3& position, const VxdID& nextSensor)
+  {
+    // TODO: It may be possible to include a much better condition here, then just returning everything from that layer
+    return true;
+  }
 }
 
 void SpacePointMatcher::initializeEventCache(std::vector<RecoTrack*>& seedsVector __attribute__((unused)),
@@ -66,6 +72,18 @@ void SpacePointMatcher::fillInAllRanges(std::vector<RangeType>& ranges,
     const auto& vxdID = keyValuePair.first;
     const auto& range = keyValuePair.second;
     if (vxdID.getLayerNumber() == layer and (ladder == 0 or vxdID.getLadderNumber() == ladder)) {
+      ranges.push_back(range);
+    }
+  }
+}
+
+void SpacePointMatcher::fillInAllRanges(std::vector<RangeType>& ranges,
+                                        unsigned short layer, const TVector3& position)
+{
+  for (const auto& keyValuePair : m_cachedHitMap) {
+    const auto& vxdID = keyValuePair.first;
+    const auto& range = keyValuePair.second;
+    if (vxdID.getLayerNumber() == layer and isConnected(position, vxdID)) {
       ranges.push_back(range);
     }
   }

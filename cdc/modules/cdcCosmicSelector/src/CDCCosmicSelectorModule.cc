@@ -25,7 +25,7 @@ REG_MODULE(CDCCosmicSelector)
 CDCCosmicSelectorModule::CDCCosmicSelectorModule() : Module()
 {
   // Set description
-  setDescription("Select cosmics passing through the trigger counter");
+  setDescription("Modify MCParticles for cosmics so that the global time is zero at y=0 assuming a cosmic trajectory is a line. And select cosmics passing through a trigger counter. This module works only for the event with the no. of primary charged MC particles=1. Please place this module after the event-generator and before FullSim.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("xOfCounter", m_xOfCounter, "x-position of trigger counter (cm)",  -0.6);

@@ -144,8 +144,6 @@ class WaveformAnalyzer(Module):
             rawDigits = waveform.getRelationsWith("TOPRawDigits")
             nTOPRawDigits = len(rawDigits)
 
-            if nTOPRawDigits != 2:
-                print("Warning: #TOPRawDigits is not 2, but", nTOPRawDigits)
             if args.plotWaveforms and nTOPRawDigits > 2:
                 # There are at least 3 Top raw digits
                 wf_display(waveform, run, event, "manyPeaks")

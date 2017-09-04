@@ -1,3 +1,6 @@
+
+# Script to analyze the output of TOPFE_qualityPlots.py
+
 import ROOT
 ROOT.gStyle.SetOptStat(0)
 ROOT.gROOT.SetBatch()
@@ -110,7 +113,7 @@ t.Draw("fePeakHt>>feh0")
 for iCanv in range(1, 9):
     c.cd(iCanv)
     h = ROOT.TH1D("feh%d" % iCanv, "channel %d" % iCanv, 1000, 50, 1050)
-    t.Draw("fePeakHt>>feh%d" % iCanv, "ch %% 8 == %d" % (iCanv-1))
+    t.Draw("fePeakHt>>feh%d" % iCanv, "ch %% 8 == %d" % (iCanv - 1))
     hists.append(h)
 c.SaveAs("fePeakHt_byChannel.pdf")
 
@@ -156,10 +159,10 @@ c.SaveAs("fePeakHt_byBoardStack.pdf")
 # Count the number of failure modes
 total = t.GetEntries()
 
-print("Fraction with width > 30: %.3f" % (1.0*t.Draw("fePeakWd", "fePeakWd>30", "goff")/total))
-print("Fraction with peaks at window borders: (average occupancy / bin = %.3f)" % (1./256))
-print("\ttdc < 2        : %.3f" % (1.0*t.Draw("fePeakWd", "fePeakTDC<2", "goff")/total))
-print("\t63 < tdc < 66  : %.3f" % (1.0*t.Draw("fePeakWd", "fePeakTDC>63 && fePeakTDC<66", "goff")/total))
-print("\t127 < tdc < 130: %.3f" % (1.0*t.Draw("fePeakWd", "fePeakTDC>127 && fePeakTDC<130", "goff")/total))
-print("\t191 < tdc < 194: %.3f" % (1.0*t.Draw("fePeakWd", "fePeakTDC>191 && fePeakTDC<194", "goff")/total))
-print("\ttdc > 255      : %.3f" % (1.0*t.Draw("fePeakWd", "fePeakTDC>255", "goff")/total))
+print("Fraction with width > 30: %.3f" % (1.0 * t.Draw("fePeakWd", "fePeakWd>30", "goff") / total))
+print("Fraction with peaks at window borders: (average occupancy / bin = %.3f)" % (1. / 256))
+print("\ttdc < 2        : %.3f" % (1.0 * t.Draw("fePeakWd", "fePeakTDC<2", "goff") / total))
+print("\t63 < tdc < 66  : %.3f" % (1.0 * t.Draw("fePeakWd", "fePeakTDC>63 && fePeakTDC<66", "goff") / total))
+print("\t127 < tdc < 130: %.3f" % (1.0 * t.Draw("fePeakWd", "fePeakTDC>127 && fePeakTDC<130", "goff") / total))
+print("\t191 < tdc < 194: %.3f" % (1.0 * t.Draw("fePeakWd", "fePeakTDC>191 && fePeakTDC<194", "goff") / total))
+print("\ttdc > 255      : %.3f" % (1.0 * t.Draw("fePeakWd", "fePeakTDC>255", "goff") / total))

@@ -132,8 +132,10 @@ class WaveformAnalyzer(Module):
             wins = np.array(waveform.getStorageWindows())
             if not np.all(wins[:-1] <= wins[1:]):  # change false for pics
                 self.nWaveFormsOutOfOrder += 1
-                wf_display(waveform, run, event, "windowOrder")
-                self.plotCounter += 1
+                if args.plotWaveforms:
+                    wf_display(waveform, run, event, "windowOrder")
+                    self.plotCounter += 1
+
             wf = np.array(waveform.getWaveform())
             if args.plotWaveforms:
                 wf_display(waveform, run, event, "general")
@@ -208,7 +210,7 @@ class WaveformAnalyzer(Module):
             )
 
             # only plot the first 10 figures.
-            if self.plotCounter >= 10:
+            if args.plotWaveforms and self.plotCounter >= 10:
                 evtMetaData.obj().setEndOfData()
 
     def terminate(self):

@@ -15,7 +15,13 @@ parser.add_argument('filename', help='name of data file')
 parser.add_argument(
     '--plotWaveforms',
     action='store_true',
-    help='whether to print out suspicious waveforms')
+    help='whether to print out suspicious waveforms'
+)
+parser.add_argument(
+    '--tupleName',
+    help='name of the ntuple file',
+    default="TOPFE.root"
+)
 
 args = parser.parse_args()
 
@@ -110,7 +116,7 @@ class WaveformAnalyzer(Module):
             ":nTOPRawDigits:ch:nNarrowPeaks:nInFirstWindow:nHeight150")
         self.nWaveForms = 0
         self.nWaveFormsOutOfOrder = 0
-        self.f = TFile.Open("TOPFE.root", "RECREATE")
+        self.f = TFile.Open(args.tupleName, "RECREATE")
         # this variable counts how many plots were created. Stop after 10
         self.plotCounter = 0
 

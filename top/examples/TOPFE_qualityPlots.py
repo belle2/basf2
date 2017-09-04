@@ -24,6 +24,9 @@ gROOT.SetBatch()
 
 
 def wf_display(waveform, run, event, suffix=""):
+
+    # Some of the following code was taken from top/tools/showFEWaveforms.py
+    # TODO: Think about re-using this code in the two scripts
     '''
     Simple event display of waveforms with feature extraction points
     '''
@@ -107,7 +110,7 @@ class WaveformAnalyzer(Module):
             ":nTOPRawDigits:ch:nNarrowPeaks:nInFirstWindow:nHeight150")
         self.nWaveForms = 0
         self.nWaveFormsOutOfOrder = 0
-        self.f = TFile.Open("ntuple.root", "RECREATE")
+        self.f = TFile.Open("TOPFE.root", "RECREATE")
         # this variable counts how many plots were created. Stop after 10
         self.plotCounter = 0
 
@@ -245,12 +248,12 @@ unpack.param('swapBytes', True)
 unpack.param('dataFormat', 0x0301)
 main.add_module(unpack)
 
-# TOPWaveformFeatureExtractor
+
 topfe = register_module('TOPWaveformFeatureExtractor')
 # topfe.param('threshold', 20)
 main.add_module(topfe)
 
-# dump headers
+
 drdh = register_module(WaveformAnalyzer())
 main.add_module(drdh)
 

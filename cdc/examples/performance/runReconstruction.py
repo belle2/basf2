@@ -70,11 +70,13 @@ def rec(input, output, topInCounter=False, magneticField=True):
     main_path.add_module('Progress')
 
     # Add CDC CR reconstruction.
-    add_cosmics_reconstruction(main_path,
-                               components=['CDC'],
-                               top_in_counter=topInCounter,
-                               data_taking_period=data_period,
-                               merge_tracks=False)
+    set_cdc_cr_parameters(data_period)
+    add_cdc_cr_reconstruction(main_path)
+    #    add_cosmics_reconstruction(main_path,
+    #                               components=['CDC'],
+    #                               top_in_counter=topInCounter,
+    #                               data_taking_period=data_period,
+    #                               merge_tracks=False)
 
     # Simple analysi module.
     output = "/".join(['output', output])

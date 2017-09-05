@@ -51,20 +51,20 @@ class VxdCdcPartFinderHarvester(HarvestingModule):
         mc_particle = mc_track.getRelated("MCParticles")
 
         return_dict = {
-            "vxd_was_found": this_best_track_vxd is not None,
-            "cdc_was_found": this_best_track_cdc is not None,
+            "vxd_was_found": bool(this_best_track_vxd),
+            "cdc_was_found": bool(this_best_track_cdc),
             "cdc_has_related": False,
             "vxd_has_related": False,
             "both_related": False,
         }
 
-        if this_best_track_vxd is not None and this_best_track_cdc is not None:
+        if this_best_track_vxd and this_best_track_cdc:
             return_dict["both_related"] = this_best_track_cdc.getRelated("VXDRecoTracks") == this_best_track_vxd
 
-        if this_best_track_vxd is not None:
-            return_dict["vxd_has_related"] = this_best_track_vxd.getRelated("CDCRecoTracks") is not None
-        if this_best_track_cdc is not None:
-            return_dict["cdc_has_related"] = this_best_track_cdc.getRelated("VXDRecoTracks") is not None
+        if this_best_track_vxd:
+            return_dict["vxd_has_related"] = bool(this_best_track_vxd.getRelated("CDCRecoTracks"))
+        if this_best_track_cdc:
+            return_dict["cdc_has_related"] = bool(this_best_track_cdc.getRelated("VXDRecoTracks"))
 
         return_dict.update(peel_reco_track_hit_content(mc_track))
         return_dict.update(peel_mc_particle(mc_particle))
@@ -131,6 +131,7 @@ def run():
     path.add_module("ProgressBar")
     basf2.process(path)
     print(basf2.statistics)
+
 
 if __name__ == "__main__":
     run()

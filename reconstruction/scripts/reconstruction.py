@@ -4,6 +4,7 @@
 from basf2 import *
 
 from svd import add_svd_reconstruction
+from pxd import add_pxd_reconstruction
 
 from tracking import (
     add_mc_tracking_reconstruction,
@@ -60,6 +61,10 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
     # add svd_reconstruction
     if components is None or 'SVD' in components:
         add_svd_reconstruction(path)
+
+    # add pxd_reconstruction
+    if components is None or 'PXD' in components:
+        add_pxd_reconstruction(path)
 
     # Add tracking reconstruction modules
     add_tracking_reconstruction(path,

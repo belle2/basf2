@@ -67,18 +67,18 @@ void EKLMRawPackerModule::event()
     int* buf = new int[2];//for one hit, hit length is 2;
     buf[0] = 0;
     buf[1] = 0;
-    EKLMDigit* digit = digits[d];
+    EKLMDigit* eklmDigit = digits[d];
 //OBTAIN PARAMETERS OF HIT FROM MC---------------------------
-    int   iEndcap = digit->getEndcap();
-    int   iLayer   = digit->getLayer();
-    int   iSector  = digit->getSector();
-    int   iPlane   = digit->getPlane();
-    int   iStrip   = digit->getStrip();
-    int   iCharge  = digit->getCharge();
-    float fTime    = digit->getTime();
-//    float fEDep    = digit->getEDep();
-//    float fMCTime  = digit->getSiPMMCTime();
-//    float fGTime   = digit->getGlobalTime();
+    int   iEndcap = eklmDigit->getEndcap();
+    int   iLayer   = eklmDigit->getLayer();
+    int   iSector  = eklmDigit->getSector();
+    int   iPlane   = eklmDigit->getPlane();
+    int   iStrip   = eklmDigit->getStrip();
+    int   iCharge  = eklmDigit->getCharge();
+    float fTime    = eklmDigit->getTime();
+//    float fEDep    = eklmDigit->getEDep();
+//    float fMCTime  = eklmDigit->getSiPMMCTime();
+//    float fGTime   = eklmDigit->getGlobalTime();
 //    int   iTDC = 0;                           //---Do we need TDC?
 //GET MODULE ID IN ELECTRONIC FROM PARAMETERS----------------------------------
     int electId = 1;
@@ -115,7 +115,7 @@ void EKLMRawPackerModule::event()
     data_words[copperId][finesse].push_back(buf[1]);
     delete [] buf;
   }
-//  B2INFO("EKLMRawPackerModule:: N_good_eklmdigits " << n_Gdidgits);
+//  B2INFO("EKLMRawPackerModule:: N_good_eklmeklmDigits " << n_Gdidgits);
   RawCOPPERPackerInfo rawcprpacker_info;
   for (int i = 0 ; i < 4; i++) {
     // Fill event info (These values will be stored in RawHeader )

@@ -125,7 +125,7 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
     basicHitSelectionSingle = basicHitSelection + "&& offlineFlag<=0"
     tr.Draw("Sum$(" + basicHitSelectionSingle + ")>>hNHitAllSlots(100,-0.5,499.5)")
     tr.Draw("Sum$(" + basicHitSelectionSingle + "&&!isCalCh)>>hNHitAllSlotsNoCalCh(100,-0.5,499.5)")
-    tr.Draw("rawTime>>hRawTimeAll(128,-128,512)", "hitQuality%10<4 && hitQuality>0")
+    tr.Draw("rawTime>>hRawTimeAll(128,-128,640)", "hitQuality%10<4 && hitQuality>0")
     hNHitAll = [gROOT.FindObject("hNHitAllSlots")]
     hNHitNoCalCh = [gROOT.FindObject("hNHitAllSlotsNoCalCh")]
     hRawTimeList = [gROOT.FindObject("hRawTimeAll")]
@@ -141,7 +141,7 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=2, IsOfflineFEDisabled=
         slotCut = " && slotNum==" + str(slot)
         tr.Draw("Sum$(" + basicHitSelectionSingle + slotCut + ")>>hNHitAll" + str(slot) + "(90,2.5,92.5)")
         tr.Draw("Sum$(" + basicHitSelectionSingle + " && !isCalCh" + slotCut + ")>>hNHitNoCalCh" + str(slot) + "(90,2.5,92.5)")
-        tr.Draw("rawTime>>hRawTime" + str(slot) + "(128,-128,512)",
+        tr.Draw("rawTime>>hRawTime" + str(slot) + "(128,-128,640)",
                 "hitQuality>0 " + slotCut)
         hNHitAllTmp = gROOT.FindObject("hNHitAll" + str(slot))
         hNHitNoCalChTmp = gROOT.FindObject("hNHitNoCalCh" + str(slot))

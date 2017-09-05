@@ -3,6 +3,7 @@
 
 from basf2 import *
 from ROOT import Belle2
+from pxd import add_pxd_simulation
 from svd import add_svd_simulation
 from svd import add_svd_reconstruction
 from tracking import add_tracking_for_PXDDataReduction_simulation
@@ -139,10 +140,7 @@ def add_simulation(
         if usePXDDataReduction:
             add_PXDDataReduction(path, components, use_vxdtf2)
         else:
-            pxd_digitizer = register_module('PXDDigitizer')
-            path.add_module(pxd_digitizer)
-        pxd_clusterizer = register_module('PXDClusterizer')
-        path.add_module(pxd_clusterizer)
+            add_pxd_simulation(path)
 
     # TOP digitization
     if components is None or 'TOP' in components:

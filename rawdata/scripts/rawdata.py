@@ -10,6 +10,13 @@ def add_packers(path, components=None):
     This function adds the raw data packer modules to a path.
     """
 
+    # Add Gearbox or geometry to path if not already there
+    if "Gearbox" not in path:
+        path.add_module("Gearbox")
+
+    if "Geometry" not in path:
+        path.add_module("Geometry")
+
     # PXD
     if components is None or 'PXD' in components:
         pxdpacker = register_module('PXDPacker')
@@ -123,6 +130,13 @@ def add_unpackers(path, components=None):
     """
     This function adds the raw data unpacker modules to a path.
     """
+
+    # Add Gearbox or geometry to path if not already there
+    if "Gearbox" not in path:
+        path.add_module("Gearbox")
+
+    if "Geometry" not in path:
+        path.add_module("Geometry")
 
     # PXD
     if components is None or 'PXD' in components:

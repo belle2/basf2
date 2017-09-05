@@ -137,11 +137,7 @@ int RaveKinematicVertexFitter::fit()
   // make sure all output in this function is converted to log messages
   auto output_capture = captureOutput();
 
-  int ndf = 0;
-
-  ndf = 2 * m_inputParticles.size();
-
-  if (ndf < 4 && m_vertFit) {
+  if (m_inputParticles.size() < 2 && m_vertFit) {
     return -1;
   }
   int nOfVertices = -100;

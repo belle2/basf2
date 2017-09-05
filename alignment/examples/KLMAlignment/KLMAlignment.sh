@@ -26,7 +26,7 @@ basf2 ${BELLE2_LOCAL_DIR}/alignment/examples/KLMAlignment/Collection.py eetomumu
 basf2 ${BELLE2_LOCAL_DIR}/alignment/examples/KLMAlignment/Alignment.py eetomumu_col.root
 
 # Comparison of the alignment results and initial displacement.
-root -b -q ${BELLE2_LOCAL_DIR}'/alignment/examples/KLMAlignment/CompareAlignment.C("EKLMDisplacement.root","alignment.root","comparison.root")'
+root -b -q ${BELLE2_LOCAL_DIR}'/alignment/examples/KLMAlignment/CompareAlignment.C("displacement/EKLMDisplacement.root","alignment.root","comparison.root")'
 
 # Graphical comparison of alignment results and initial displacement.
 root -b -q ${BELLE2_LOCAL_DIR}'/alignment/examples/KLMAlignment/ViewAlignment.C("comparison.root")'

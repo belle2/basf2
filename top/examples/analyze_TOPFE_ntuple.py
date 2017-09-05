@@ -44,8 +44,26 @@ c.SetLogy(False)
 c.Clear()
 
 t.Draw("fePeakHt:fePeak1Ht", calChannel, "hist")
-c.SaveAs("fePeakHt_vs_fePeak1Ht.pdf")
+c.SaveAs("fePeakHt_vs_fePeak1Ht_cal.pdf")
 c.Clear()
+
+wd_adcHist = ROOT.TH2D("wd_adcHist", "Width vs Pulse height;width;height", 130, 0, 130, 1100, 50, 1150)
+t.Draw("fePeakHt:fePeakWd>>wd_adcHist", "", "colz")
+c.SaveAs("fePeakWd_vs_fePeakHt.pdf")
+c.Clear()
+wd_adcHist.Reset()
+
+wd_adcHist.SetTitle("Width vs Pulse height in the calibration channel;width;height")
+t.Draw("fePeakHt:fePeakWd>>wd_adcHist", calChannel, "colz")
+c.SaveAs("fePeakWd_vs_fePeakHt_cal.pdf")
+c.Clear()
+wd_adcHist.Reset()
+
+wd_adcHist.SetTitle("Width vs Pulse height in the signal channel;width;height")
+t.Draw("fePeakHt:fePeakWd>>wd_adcHist", signalChannel, "colz")
+c.SaveAs("fePeakWd_vs_fePeakHt_sig.pdf")
+c.Clear()
+wd_adcHist.Reset()
 
 wd_tdcHist = ROOT.TH2D("wd_tdcHist", "Width vs TDC;TDC;width", 256, 1, 257, 130, 0, 130)
 t.Draw("fePeakWd:fePeakTDC>>wd_tdcHist", "", "colz")
@@ -116,17 +134,6 @@ c.SaveAs("fePeak1TDC_signalChannel.pdf")
 c.BuildLegend()
 c.Clear()
 tdcHist.Reset()
-
-t.SetLineColor(4)
-t.Draw("nTOPRawDigits", calChannel)
-c.SaveAs("nTOPRawDigits_cal.pdf")
-c.BuildLegend()
-c.Clear()
-
-t.Draw("nTOPRawDigits", signalChannel)
-c.SaveAs("nTOPRawDigits_signal.pdf")
-c.BuildLegend()
-c.Clear()
 
 hists = []
 c.Clear()

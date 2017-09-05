@@ -31,6 +31,13 @@ void CDCToSVDSpacePointCKFFindlet::exposeParameters(ModuleParamList* moduleParam
   m_storeArrayHandler.exposeParameters(moduleParamList, prefix);
   m_overlapResolver.exposeParameters(moduleParamList, prefix);
   m_spacePointTagger.exposeParameters(moduleParamList, prefix);
+
+  moduleParamList->addParameter("minimalHitRequirement", m_param_minimalHitRequirement,
+                                "Minimal Hit requirement for the results (counted in space points)",
+                                m_param_minimalHitRequirement);
+  moduleParamList->addParameter("minimalPtRequirement", m_param_minimalPtRequirement,
+                                "Minimal Pt requirement for the input CDC tracks",
+                                m_param_minimalPtRequirement);
 }
 
 void CDCToSVDSpacePointCKFFindlet::beginEvent()
@@ -46,9 +53,18 @@ void CDCToSVDSpacePointCKFFindlet::apply()
 {
   m_dataLoader.apply(m_cdcRecoTrackVector, m_spacePointVector);
 
-  m_treeSearchFindlet.apply(m_cdcRecoTrackVector, m_spacePointVector, m_results);
+  const auto& hasLowPt = [this](const auto & track) {
+    return track->getMomentumSeed().Pt() < m_param_minimalPtRequirement;
+  };
+  TrackFindingCDC::erase_remove_if(m_cdcRecoTrackVector, hasLowPt);
 
+  m_treeSearchFindlet.apply(m_cdcRecoTrackVector, m_spacePointVector, m_results);
   m_overlapResolver.apply(m_results);
+
+  const auto& hasLowHitNumber = [this](const CKFResultObject<RecoTrack, SpacePoint>& result) {
+    return result.getHits().size() < m_param_minimalHitRequirement;
+  };
+  TrackFindingCDC::erase_remove_if(m_results, hasLowHitNumber);
 
   m_storeArrayHandler.apply(m_results);
   m_spacePointTagger.apply(m_results, m_spacePointVector);

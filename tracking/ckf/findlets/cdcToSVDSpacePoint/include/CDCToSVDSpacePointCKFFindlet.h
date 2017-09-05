@@ -62,6 +62,12 @@ namespace Belle2 {
     void beginEvent() override;
 
   private:
+    // Parameters
+    /// Minimal pt requirement
+    double m_param_minimalPtRequirement = 0.3;
+    /// Minimal hit requirement for the results (counted in number of space points)
+    unsigned int m_param_minimalHitRequirement = 3;
+
     // Findlets
     /// Findlet for retrieving the cdc tracks
     CKFDataLoader<RecoTrack, SpacePoint> m_dataLoader;

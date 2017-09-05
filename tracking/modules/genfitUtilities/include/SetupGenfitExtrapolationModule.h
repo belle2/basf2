@@ -25,48 +25,35 @@ namespace Belle2 {
   class SetupGenfitExtrapolationModule : public Module {
 
   public:
-    /** Constructor .
-     */
+    /** Constructor. */
     SetupGenfitExtrapolationModule();
-
-    /** Destructor.
-     */
-    virtual ~SetupGenfitExtrapolationModule();
 
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.
      */
-    virtual void initialize();
-
-    /** Called when entering a new run.
-     */
-    virtual void beginRun();
-
-    /** This method is the core of the module.
-     * This method is called for each event. All processing of the event has to take place in this method.
-     */
-    virtual void event();
-
-    /** This method is called if the current run ends.
-     */
-    virtual void endRun();
-
-    /** This method is called at the end of the event processing.
-     */
-    virtual void terminate();
+    void initialize();
 
   private:
+    /// choice of geometry representation: 'TGeo' or 'Geant4'.
+    std::string m_geometry = "Geant4";
 
-    std::string m_geometry;       /**< choice of geometry representation: 'TGeo' or 'Geant4'.  */
-
-    bool m_noEffects;             /**< switch on/off ALL material effects in Genfit. "true" overwrites "true" flags for the individual effects.*/
-    bool m_energyLossBetheBloch;  /**< Determines if calculation of energy loss is on/off in Genfit */
-    bool m_noiseBetheBloch;       /**< Determines if calculation of energy loss variance is on/off in Genfit */
-    bool m_noiseCoulomb;          /**< Determines if calculation of multiple scattering covariance matrix on/off in Genfit */
-    bool m_energyLossBrems;       /**< Determines if calculation of bremsstrahlung energy loss is on/off in Genfit */
-    bool m_noiseBrems;            /**< Determines if calculation of bremsstrahlung energy loss variance is on/off in Genfit */
-    std::string m_mscModel;       /**< Multiple scattering model */
-    bool m_useVXDAlignment;       /**< Use VXD alignment from database? */
-    DBObjPtr<VXDAlignment> m_vxdAlignment; /**< DB object with VXD alignment */
+    /// switch on/off ALL material effects in Genfit. "true" overwrites "true" flags for the individual effects.
+    bool m_noEffects = false;
+    /// Determines if calculation of energy loss is on/off in Genfit
+    bool m_energyLossBetheBloch = true;
+    /// Determines if calculation of energy loss variance is on/off in Genfit
+    bool m_noiseBetheBloch = true;
+    /// Determines if calculation of multiple scattering covariance matrix on/off in Genfit
+    bool m_noiseCoulomb = true;
+    /// Determines if calculation of bremsstrahlung energy loss is on/off in Genfit
+    bool m_energyLossBrems = true;
+    /// Determines if calculation of bremsstrahlung energy loss variance is on/off in Genfit
+    bool m_noiseBrems = true;
+    /// Multiple scattering model
+    std::string m_mscModel = "Highland";
+    /// Use VXD alignment from database?
+    bool m_useVXDAlignment = true;
+    /// DB object with VXD alignment
+    DBObjPtr<VXDAlignment> m_vxdAlignment;
   };
 }

@@ -80,30 +80,26 @@ SetupGenfitExtrapolationModule::SetupGenfitExtrapolationModule() :
 
   //input
   addParam("whichGeometry", m_geometry,
-           "Which geometry should be used, either 'TGeo' or 'Geant4'", std::string("Geant4"));
+           "Which geometry should be used, either 'TGeo' or 'Geant4'", m_geometry);
 
   // Energy loss, multiple scattering configuration.
   addParam("energyLossBetheBloch", m_energyLossBetheBloch,
-           "activate the material effect: EnergyLossBetheBloch", true);
+           "activate the material effect: EnergyLossBetheBloch", m_energyLossBetheBloch);
   addParam("noiseBetheBloch", m_noiseBetheBloch,
-           "activate the material effect: NoiseBetheBloch", true);
+           "activate the material effect: NoiseBetheBloch", m_noiseBetheBloch);
   addParam("noiseCoulomb", m_noiseCoulomb,
-           "activate the material effect: NoiseCoulomb", true);
+           "activate the material effect: NoiseCoulomb", m_noiseCoulomb);
   addParam("energyLossBrems", m_energyLossBrems,
-           "activate the material effect: EnergyLossBrems", true);
+           "activate the material effect: EnergyLossBrems", m_energyLossBrems);
   addParam("noiseBrems", m_noiseBrems,
-           "activate the material effect: NoiseBrems", true);
+           "activate the material effect: NoiseBrems", m_noiseBrems);
   addParam("noEffects", m_noEffects,
            "switch off all material effects in Genfit. This overwrites all "
-           "individual material effects switches", false);
+           "individual material effects switches", m_noEffects);
   addParam("MSCModel", m_mscModel,
-           "Multiple scattering model", std::string("Highland"));
+           "Multiple scattering model", m_mscModel);
   addParam("useVXDAlignment", m_useVXDAlignment,
-           "Use VXD alignment from database?", bool(true));
-}
-
-SetupGenfitExtrapolationModule::~SetupGenfitExtrapolationModule()
-{
+           "Use VXD alignment from database?", m_useVXDAlignment);
 }
 
 void SetupGenfitExtrapolationModule::initialize()
@@ -152,20 +148,3 @@ void SetupGenfitExtrapolationModule::initialize()
     genfit::MaterialEffects::getInstance()->setMscModel(m_mscModel);
   }
 }
-
-void SetupGenfitExtrapolationModule::beginRun()
-{
-}
-
-void SetupGenfitExtrapolationModule::event()
-{
-}
-
-void SetupGenfitExtrapolationModule::endRun()
-{
-}
-
-void SetupGenfitExtrapolationModule::terminate()
-{
-}
-

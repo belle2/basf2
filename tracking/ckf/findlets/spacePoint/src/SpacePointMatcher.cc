@@ -43,7 +43,7 @@ namespace {
     return TMath::Pi() - angle > 2;
   }
 
-  bool isConnected(const TVector3& position, const VxdID& nextSensor)
+  bool isConnected(const TVector3& position __attribute__((unused)), const VxdID& nextSensor __attribute__((unused)))
   {
     // TODO: It may be possible to include a much better condition here, then just returning everything from that layer
     return true;

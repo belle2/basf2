@@ -78,6 +78,11 @@ SetupGenfitExtrapolationModule::SetupGenfitExtrapolationModule() :
                  " genfit in order to integrate it into basf2 logging system. Also sets up update of VXDAlignment from DB (temporary).");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("ignoreIfPresent", m_ignoreIfPresent,
+           "If true this module will silently ignore if the geometry is already "
+           "present and do nothing in that case. If false a B2FATAL will be "
+           "if the geometry was already created before", m_ignoreIfPresent);
+
   //input
   addParam("whichGeometry", m_geometry,
            "Which geometry should be used, either 'TGeo' or 'Geant4'", m_geometry);
@@ -104,20 +109,19 @@ SetupGenfitExtrapolationModule::SetupGenfitExtrapolationModule() :
 
 void SetupGenfitExtrapolationModule::initialize()
 {
+  if (genfit::FieldManager::getInstance()->isInitialized() or genfit::MaterialEffects::getInstance()->isInitialized()) {
+    if (m_ignoreIfPresent) {
+      B2DEBUG(50, "Magnetic field or material handling already initialized.  Not touching settings.");
+      return;
+    } else {
+      B2FATAL("Magnetic field or material handling already initialized.  Not touching settings.");
+    }
+  }
+
   setupGenfitStreams();
 
-  //pass the magnetic field to genfit
-  if (genfit::FieldManager::getInstance()->isInitialized()) {
-    B2ERROR("Magnetic field handling already initialized.  Not touching settings.");
-  } else {
-    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
-    genfit::FieldManager::getInstance()->useCache();
-  }
-
-  if (genfit::MaterialEffects::getInstance()->isInitialized()) {
-    B2ERROR("Material handling already initialized.  Not touching settings.");
-    return;
-  }
+  genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+  genfit::FieldManager::getInstance()->useCache();
 
   if (!geometry::GeometryManager::getInstance().getTopVolume()) {
     B2FATAL("No geometry set up so far. Load the geometry module.");

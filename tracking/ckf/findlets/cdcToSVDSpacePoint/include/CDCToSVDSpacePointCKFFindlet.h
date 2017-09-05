@@ -19,7 +19,6 @@
 #include <tracking/ckf/findlets/base/CKFDataLoader.h>
 #include <tracking/ckf/findlets/base/TreeSearchFindlet.h>
 #include <tracking/ckf/findlets/base/OverlapResolverFindlet.h>
-#include <tracking/ckf/findlets/base/ResultWriter.h>
 #include <tracking/ckf/findlets/base/SpacePointTagger.h>
 
 #include <tracking/ckf/states/CKFStateObject.h>
@@ -69,15 +68,13 @@ namespace Belle2 {
     unsigned int m_param_minimalHitRequirement = 3;
 
     // Findlets
-    /// Findlet for retrieving the cdc tracks
+    /// Findlet for retrieving the cdc tracks and writing the result out
     CKFDataLoader<RecoTrack, SpacePoint> m_dataLoader;
     /// Findlet doing the main work: the tree finding
     TreeSearchFindlet<RecoTrack, SpacePoint, SpacePointMatcher, CKFCDCToSpacePointStateObjectFilterFactory, 12>
     m_treeSearchFindlet;
     /// Findlet for resolving overlaps
     OverlapResolverFindlet<VXDTrackCombinationFilterFactory> m_overlapResolver;
-    /// Findlet for handling the store array write out
-    ResultWriter<RecoTrack, SpacePoint> m_storeArrayHandler;
     /// Findlet for tagging the used space points
     SpacePointTagger<RecoTrack, SpacePoint, SVDCluster> m_spacePointTagger;
 

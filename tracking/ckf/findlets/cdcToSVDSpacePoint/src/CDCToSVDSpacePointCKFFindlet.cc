@@ -17,7 +17,6 @@ CDCToSVDSpacePointCKFFindlet::CDCToSVDSpacePointCKFFindlet()
 {
   addProcessingSignalListener(&m_dataLoader);
   addProcessingSignalListener(&m_treeSearchFindlet);
-  addProcessingSignalListener(&m_storeArrayHandler);
   addProcessingSignalListener(&m_overlapResolver);
   addProcessingSignalListener(&m_spacePointTagger);
 }
@@ -28,7 +27,6 @@ void CDCToSVDSpacePointCKFFindlet::exposeParameters(ModuleParamList* moduleParam
 
   m_dataLoader.exposeParameters(moduleParamList, prefix);
   m_treeSearchFindlet.exposeParameters(moduleParamList, prefix);
-  m_storeArrayHandler.exposeParameters(moduleParamList, prefix);
   m_overlapResolver.exposeParameters(moduleParamList, prefix);
   m_spacePointTagger.exposeParameters(moduleParamList, prefix);
 
@@ -38,6 +36,7 @@ void CDCToSVDSpacePointCKFFindlet::exposeParameters(ModuleParamList* moduleParam
   moduleParamList->addParameter("minimalPtRequirement", m_param_minimalPtRequirement,
                                 "Minimal Pt requirement for the input CDC tracks",
                                 m_param_minimalPtRequirement);
+
 }
 
 void CDCToSVDSpacePointCKFFindlet::beginEvent()
@@ -66,6 +65,6 @@ void CDCToSVDSpacePointCKFFindlet::apply()
   };
   TrackFindingCDC::erase_remove_if(m_results, hasLowHitNumber);
 
-  m_storeArrayHandler.apply(m_results);
+  m_dataLoader.store(m_results);
   m_spacePointTagger.apply(m_results, m_spacePointVector);
 }

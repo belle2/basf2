@@ -53,6 +53,14 @@ Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStat
     return 0;
   }
 
+  const Vector3D position(currentState.getMSoPPosition());
+  const Vector3D hitPosition(spacePoint->getPosition());
+
+  const double sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
+  if (sameHemisphere != 1) {
+    return NAN;
+  }
+
   const unsigned int layer = extractGeometryLayer(currentState);
   const Vector3D momentum(currentState.getMSoPMomentum());
 
@@ -62,10 +70,6 @@ Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStat
   if (not currentState.isFitted() and not currentState.isAdvanced()) {
     // Filter 1
     const RecoTrack* cdcTrack = currentState.getSeedRecoTrack();
-
-    const Vector3D position(currentState.getMSoPPosition());
-    const Vector3D hitPosition(spacePoint->getPosition());
-
     const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed(), m_cachedBField);
 
     const double arcLength = trajectory.calcArcLength2D(hitPosition);
@@ -78,14 +82,6 @@ Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStat
     maximumValues = &m_param_maximumHelixDistance;
   } else {
     // Filter 2 + 3
-    const Vector3D position(currentState.getMSoPPosition());
-    const Vector3D hitPosition(spacePoint->getPosition());
-
-    const double sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
-    if (sameHemisphere != 1) {
-      return NAN;
-    }
-
     const auto& measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
     double residual = 0;
 

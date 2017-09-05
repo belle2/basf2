@@ -24,23 +24,23 @@ namespace Belle2 {
 
     static constexpr const MaximalValueArray m_param_maximumHelixDistance = {
       // high pt, middle pt, low pt
-      {0.15733, 3.40249, 10.95084}, // layer 3
-      {0.22804, 0.93842, 8.78157}, // layer 4
-      {0.48812, 4.82704, 16.30189}, // layer 5
-      {12.14745, 109.19225, 426.43899}, // layer 6
+      {1.38532, 1.44346, 1.53386}, // layer 3
+      {1.96701, 2.17819, 2.19784}, // layer 4
+      {2.33064, 2.67768, 2.67174}, // layer 5
+      {6, 6, 6}, // layer 6
     };
 
     static constexpr const MaximalValueArray m_param_maximumResidual = {
-      {1.12139, 1.12533, 12.03218}, // layer 3
-      {1.00493, 1.24574, 10.51225}, // layer 4
-      {1.14461, 4.0116, 20.48132}, // layer 5
-      {6.49328, 100.7814, 176.81082}, // layer 6
+      {1.52328, 1.57714, 1.63069}, // layer 3
+      {1.61301, 1.78301, 1.75973}, // layer 4
+      {1.85188, 2.19571, 2.38167}, // layer 5
+      {5.5, 5, 5}, // layer 6
     };
 
     static constexpr const MaximalValueArray m_param_maximumResidual2 = {
-      {0.0521, 0.08309, 2.07406}, // layer 3
-      {0.06964, 0.12137, 4.80165}, // layer 4
-      {0.05506, 0.1015, 0.5402}, // layer 5
+      {0.69713, 0.39872, 0.41854}, // layer 3
+      {0.72737, 0.40816, 0.53138}, // layer 4
+      {0.35624, 0.12846, 0.22516}, // layer 5
       {0.00975, 0.06432, 0.5969}, // layer 6
     };
 

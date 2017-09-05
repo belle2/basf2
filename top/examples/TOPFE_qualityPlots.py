@@ -6,7 +6,7 @@
 
 from basf2 import *
 from ROOT import Belle2, gROOT
-from ROOT import TNtuple, TFile, TH1F, TCanvas, TGraph
+from ROOT import TNtuple, TFile, TH1F, TCanvas, TGraph, gStyle
 import numpy as np
 import argparse
 parser = argparse.ArgumentParser(description='Extracts information about the FE parameters',
@@ -18,7 +18,7 @@ parser.add_argument(
     help='whether to print out suspicious waveforms'
 )
 parser.add_argument(
-    '--tupleName',
+    '--output',
     help='name of the ntuple file',
     default="TOPFE.root"
 )
@@ -38,15 +38,23 @@ def wf_display(waveform, run, event, suffix=""):
     '''
     #: 1D histograms
     hist = TH1F('h', 'wf', 64 * 4, 0.0, 64.0 * 4)
-    hist.SetXTitle("sample number")
-    hist.SetYTitle("sample value [ADC counts]")
-    hist.SetLabelSize(0.06, "XY")
-    hist.SetTitleSize(0.07, "XY")
-    hist.SetTitleOffset(0.7, "XY")
-    #: graphs
-    graph = TGraph(10)
     #: canvas
     c1 = TCanvas('c1', 'WF event display', 800, 800)
+
+    # plot aesthetics
+    hist.SetXTitle("sample number")
+    hist.SetYTitle("sample value [ADC counts]")
+    hist.SetLabelSize(0.06, "XY")   # readable labels
+    hist.SetTitleSize(0.07, "XY")   # readable axis titles
+    gStyle.SetTitleSize(0.07, "t")  # readable plot title
+    c1.SetLeftMargin(0.2)           #
+    c1.SetBottomMargin(0.16)        # move margins to make space for axis titles
+    c1.SetRightMargin(0.04)         #
+    hist.SetTitleOffset(1.3, "Y")   # readable axis offset
+    hist.SetTitleOffset(1.0, "X")   # readable axis offset
+
+    #: graphs
+    graph = TGraph(10)
     #: output file name
     fname = 'waveforms_run' + str(run) + '_event' + str(event) + '_chan'
     pdfFile = fname
@@ -116,7 +124,7 @@ class WaveformAnalyzer(Module):
             ":nTOPRawDigits:ch:nNarrowPeaks:nInFirstWindow:nHeight150")
         self.nWaveForms = 0
         self.nWaveFormsOutOfOrder = 0
-        self.f = TFile.Open(args.tupleName, "RECREATE")
+        self.f = TFile.Open(args.output, "RECREATE")
         # this variable counts how many plots were created. Stop after 10
         self.plotCounter = 0
 

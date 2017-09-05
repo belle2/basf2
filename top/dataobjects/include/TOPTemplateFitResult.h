@@ -25,44 +25,83 @@ namespace Belle2 {
     TOPTemplateFitResult();
 
     /**
-     *Usefull contructor
+     *Usefull contructor for data from Zynqs
      *@param template fit rising edge, lower 8 bit are fraction
      *@param background offset
      *@param amplitude
      *@param chi square
      */
-    TOPTemplateFitResult(unsigned short risingEdge, short backgroundOffset,
-                         short amplitude, unsigned short chisquare);
+    explicit TOPTemplateFitResult(short risingEdge, short backgroundOffset,
+                                  short amplitude, short chisquare);
+
+    /**
+     *Usefull contructor for software implementation of template fit in basf2
+     *@param template fit rising edge in samples
+     *@param template fit rising edge in ns
+     *@param background offset
+     *@param amplitude
+     *@param chi square
+     */
+    TOPTemplateFitResult(double risingEdge, double risingEdgeTime, double backgroundOffset,
+                         double amplitude, double chisquare);
 
     /**
      * Sets background offset
      * @param background offset
      */
-    void setBackgroundOffset(short backgroundOffset) { m_backgroundOffset = backgroundOffset;}
+    void setBackgroundOffset(double backgroundOffset) { m_backgroundOffset = backgroundOffset;}
 
     /**
      * Sets amplitude
      * @param amplitude
      */
-    void setAmplitude(short amplitude) {m_amplitude = amplitude;}
+    void setAmplitude(double amplitude) {m_amplitude = amplitude;}
 
     /**
      * Sets chi square
      * @param chi square
      */
-    void setChisquare(unsigned short chisquare) {m_chisquare = chisquare;}
+    void setChisquare(double chisquare) {m_chisquare = chisquare;}
 
     /**
-     * Sets rising edge
+     * Sets rising edge from Zynq and converts to double
+     * This does not convert from sample to time space
      * @param rising edge
      */
-    void setRisingEdge(unsigned short risingEdge);
+    void setRisingEdgeAndConvert(unsigned short risingEdge);
+
+    /**
+     * Sets rising edge in samples
+     * @param rising edge in samples
+     */
+    void setRisingEdge(double risingEdge) {m_risingEdge = risingEdge;}
+
+    /**
+     * Sets rising edge in ns
+     * @param rising edge in ns
+     */
+    void setRisingEdgeTime(double risingEdge) {m_risingEdgeTime = risingEdge;}
+
+
+    /**
+     *@brief Set parameters of used template function for later plotting.
+     *@param sigma
+     *@param alpha
+     *@param n
+     */
+    static void setTemplateParameters(float sigma, float alpha, float n);
+
+    /**
+     *Get rising edge in samples
+     *@return rising edge in samples
+     */
+    double getRisingEdge() const {return m_risingEdge;}
 
     /**
      * Get rising Edge
-     * @return rising edge
+     * @return rising edge in ns
      */
-    double getRisingEdge() const {return m_risingEdge;}
+    double getRisingEdgeTime() const {return m_risingEdgeTime;}
 
     /**
      * Get rising Edge Raw
@@ -74,27 +113,32 @@ namespace Belle2 {
      * Get background offset
      * @return background offset
      */
-    short getBackgroundOffset() const {return m_backgroundOffset;}
+    double getBackgroundOffset() const {return m_backgroundOffset;}
 
     /**
      * Get ampltide
      * @return amplitude
      */
-    short getAmplitude() const {return m_amplitude;};
+    double getAmplitude() const {return m_amplitude;};
 
     /**
      * Get chi square
      * @return chi square
      */
-    unsigned short getChisquare() const {return m_chisquare;}
+    double getChisquare() const {return m_chisquare;}
 
     /**
-     * Get mean position of template function
+     * Get mean position of template function in samples
      */
     double getMean() const;
 
     /**
-     * Get value of template function
+     * Get mean position of template function in ns
+     */
+    double getMeanTime() const;
+
+    /**
+     * Get value of template function in sample space
      * @param position to evaluate template function
      * @return value of template function
      */
@@ -117,15 +161,17 @@ namespace Belle2 {
     double risingEdgeShortToRisingEdgeDouble(unsigned short risingEdgeS) const;
 
     double m_risingEdge;/**< template fit rising edge position*/
+    double m_risingEdgeTime; /**<template fit rising edge in ns*/
+    double m_backgroundOffset;/**< background offset from fit*/
+    double m_amplitude;/**< amplitude from fit*/
+    double m_chisquare;/**< chi square value of template fit */
     unsigned m_risingEdgeRaw;/**< template fit rising edge position received from FEE*/
-    short m_backgroundOffset;/**< background offset from fit*/
-    short m_amplitude;/**< amplitude from fit*/
-    unsigned short m_chisquare;/**< chi square value of template fit */
-    const float m_templateSigma = 1.81;/**< template gaus sigma */
-    const float m_templateAlpha = -0.45;/**< template exponential tail position */
-    const float m_templateN = 18.06;/**< template exponential decay constant */
 
-    ClassDef(TOPTemplateFitResult, 1); /**< ClassDef */
+    static float s_templateSigma;/**< template gaus sigma */
+    static float s_templateAlpha;/**< template exponential tail position */
+    static float s_templateN;/**< template exponential decay constant */
+
+    ClassDef(TOPTemplateFitResult, 2); /**< ClassDef */
   };
 
 }

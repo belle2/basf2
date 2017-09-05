@@ -140,7 +140,6 @@ void InclusiveBtagReconstructionModule::event()
     map2vector.convert(btagDaughtersMap, btagCandidates);
 
     StoreArray<Particle> particles;
-    StoreObjPtr<ParticleList> btagList(m_btagListName);
 
     for (std::vector<int> daughterIndices : btagCandidates) {
       TLorentzVector momentum;

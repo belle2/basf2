@@ -1,5 +1,5 @@
 #include <framework/logging/Logger.h>
-#include <tracking/modules/genfitter/Geant4MaterialInterface.h>
+#include <tracking/modules/genfitUtilities/Geant4MaterialInterface.h>
 #include <geometry/GeometryManager.h>
 
 #include "genfit/Exception.h"

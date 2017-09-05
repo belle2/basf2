@@ -37,7 +37,7 @@ namespace Belle2 {
       virtual void setMinimumPval(double minPval) {m_Pvalmin = minPval;}
       /// Bin width of each slide
       virtual void setBinWidth(double bw) {m_binWidth = bw;}
-      /// Work with B Field or not;
+      /// Work with B field or not;
       virtual void BField(bool bfield) {m_BField = bfield;}
       /// Input root file names, results of collector module
       virtual void inputFileNames(std::string inputname)

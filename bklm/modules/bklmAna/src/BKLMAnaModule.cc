@@ -187,7 +187,7 @@ void BKLMAnaModule::event()
     RelationVector<ExtHit> relatedExtHit = track->getRelationsTo<ExtHit>();
     RelationVector<Muid> Muids = track->getRelationsTo<Muid>();
     for (unsigned int t = 0; t < relatedExtHit.size(); t++) {
-      ExtHit* exthit =  extHits[t];
+      ExtHit* exthit =  relatedExtHit[t];
       if (exthit->getDetectorID() != Const::EDetector::BKLM) continue;
       int copyid = exthit->getCopyID();
       int isForward = (copyid & BKLM_END_MASK) >> BKLM_END_BIT;

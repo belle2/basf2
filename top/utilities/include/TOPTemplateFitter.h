@@ -20,36 +20,6 @@ namespace Belle2 {
   namespace TOP {
 
     /**
-    @brief Parameters of the template function.
-    We use a crystal ball function
-    */
-    struct TemplateParameters {
-      double amplitude = 100.;
-      double mean = 32.;
-      double sigma = 1.81;
-      double alpha = -0.45;
-      double n = 18.06;
-    };
-
-    /**
-    @brief structure holding values from template fit
-    */
-    struct FitResult {
-      double amplitudeScaling, amplitudeScalingErr; /**< fitted amplitude and error*/
-      double backgroundOffset, backgroundOffsetError; /**< fitted background offset and error*/
-      double risingEdge, risingEdgeError;/**< fitted rising edge and error*/
-    };
-
-    /**
-    @brief Variables used during template fit minimization
-    */
-    struct MinimizationSums {
-      double S1;
-      double Sx, Sxx;
-      float Sy, Sxy, Syy;
-    };
-
-    /**
      *@brief Class to perform template fit on TOP waveform data
      *Minimzation method is described here http://wwwa1.kph.uni-mainz.de/Vorlesungen/SS11/Statistik/
      *@author Tobias Weber
@@ -57,6 +27,55 @@ namespace Belle2 {
     class TOPTemplateFitter {
 
     public:
+
+      /**
+       *@brief Parameters of the template function.
+       *We use a crystal ball function
+       */
+      struct TemplateParameters {
+        double amplitude = 100.;
+        double mean = 32.;
+        double sigma = 1.81;
+        double alpha = -0.45;
+        double n = 18.06;
+      };
+
+      /**
+       *@brief structure holding values from template fit
+       */
+      struct FitResult {
+        double amplitude, amplitudeError; /**< fitted amplitude and error*/
+        double backgroundOffset, backgroundOffsetError; /**< fitted background offset and error*/
+        double risingEdge;/**< fitted rising edge*/
+
+        void clear()
+        {
+          amplitude = 0;
+          amplitudeError = 0;
+          backgroundOffset = 0;
+          backgroundOffsetError = 0;
+          risingEdge = 0;
+        }
+      };
+
+      /**
+      *@brief Variables used during template fit minimization
+      */
+      struct MinimizationSums {
+        double S1;
+        double Sx, Sxx;
+        double Sy, Sxy, Syy;
+
+        void clear()
+        {
+          S1 = 0;
+          Sx = 0;
+          Sxx = 0;
+          Sy = 0;
+          Sxy = 0;
+          Syy = 0;
+        }
+      };
 
       /**
       @brief full constructor
@@ -88,46 +107,76 @@ namespace Belle2 {
       @brief Returns the template parameters
       @return template parameters
       */
-      static TemplateParameters& GetTemplateParameters() {return s_templateParameters;}
+      static TemplateParameters& getTemplateParameters() {return s_templateParameters;}
 
       /**
       @brief Returns the total number of template samples
       @return total number of template samples
       */
-      static int GetTemplateSamples() {return s_totalTemplateSamples;}
+      static int getTemplateSamples() {return s_totalTemplateSamples;}
 
       /**
       @brief Returns the template resolution
       @return template resolution
       */
-      static int GetTemplateResolution() {return s_templateResolution;}
+      static int getTemplateResolution() {return s_templateResolution;}
 
       /**
       @brief Sets the template parameters
       @param template Parameters
       */
-      static void SetTemplateParameters(const TemplateParameters& params);
+      static void setTemplateParameters(const TemplateParameters& params);
 
       /**
       @brief Set the total number of template samples
       @param total number of template samples
       */
-      static void SetTemplateSamples(int nSamples);
+      static void setTemplateSamples(int nSamples);
 
       /**
       @brief Set the template resolution
       @param template resolution
       */
-      static void SetTemplateResolution(int resolution);
+      static void setTemplateResolution(int resolution);
 
       /**
-      @brief Performs the template fit in sample space
+      @brief Intializes the template fit using default values
+      */
+      static void InitializeTemplateFit();
+
+      /**
+      @brief Prepares data and performs the template fit in sample space
       @param initial guess for rising edge position from CFD
       @param range of template fit*/
-      void PerformTemplateFit(const double risingEdgeStart,
+      void performTemplateFit(const double risingEdgeStart,
                               const double fitRange);
 
     private:
+
+      /**
+       *@brief performs the template fit
+       *@param sample vector
+       *@param pedestal vector
+       *@param timing correction for samples
+       *@param rising edge from constant fraction discrimination
+       */
+      void PerformTemplateFitMinimize(const std::vector<short>& samples, const std::vector<short>& pedestals,
+                                      const std::vector<float>& timingCorrection, const double risingEdgeCFD, const double fitRange);
+
+      /**
+       *@brief  Compute the minimized parameters and chi square value
+       *@param minimization sums for chisq calculation
+       *@param minimized parameters
+       *@return chi square
+       */
+      double ComputeMinimizedParametersAndChisq(const MinimizationSums& sums, FitResult& result);
+
+      /**
+       *@brief compute the rising edge of the template (which is easily done for the Gaussian center
+       *of the crystal ball.
+       *@return rising edge
+       */
+      double GetTemplateRisingEdge();
 
       /**
       @brief crystal ball function
@@ -143,11 +192,6 @@ namespace Belle2 {
       */
       static double CalculateTemplate(const double x);
 
-      /**
-      @brief Intializes the template fit using default values
-      */
-      static void InitializeTemplateFit();
-
       const TOPRawWaveform m_wf; /** <raw sampled waveforms */
       const TOPSampleTimes m_sampleTimes; /** <provides timing correction */
       double m_averageRMS; /**average RMS of waveform samples, no database for this */
@@ -156,6 +200,8 @@ namespace Belle2 {
       static int s_templateResolution;/**< resolution of template with respect to normal sample spacing*/
       static TemplateParameters s_templateParameters;/**< parameters used for the template calculation*/
       static std::vector<double> s_templateSamples;/**<precomputed template samples*/
+      static int s_fineOffsetRange;/**<range for offset between template and signal*/
+      static bool s_templateReInitialize;/**<flag showing that the template samples have to be recomputed*/
 
       //fit results
       FitResult m_result;/**< fit result from template fit*/

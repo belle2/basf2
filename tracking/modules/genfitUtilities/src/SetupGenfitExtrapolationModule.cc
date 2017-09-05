@@ -12,8 +12,8 @@
 // Common setup for everything that uses genfit's extrapolation code.
 //
 
-#include <tracking/modules/genfitter/SetupGenfitExtrapolationModule.h>
-#include <tracking/modules/genfitter/Geant4MaterialInterface.h>
+#include <tracking/modules/genfitUtilities/SetupGenfitExtrapolationModule.h>
+#include <tracking/modules/genfitUtilities/Geant4MaterialInterface.h>
 
 #include <geometry/GeometryManager.h>
 #include <geometry/bfieldmap/BFieldMap.h>

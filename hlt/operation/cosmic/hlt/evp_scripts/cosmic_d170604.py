@@ -5,7 +5,7 @@ import basf2
 import os
 import sys
 import ROOT
-from softwaretrigger.path_functions import add_unpackers
+from rawdata import add_unpackers
 from tracking import add_cdc_cr_track_finding, add_prune_tracks
 from reconstruction import add_cosmics_reconstruction, add_posttracking_reconstruction
 

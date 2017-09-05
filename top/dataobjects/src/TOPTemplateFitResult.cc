@@ -15,10 +15,14 @@ using namespace std;
 
 namespace Belle2 {
 
+  float TOPTemplateFitResult::s_templateSigma = 1.81;
+  float TOPTemplateFitResult::s_templateAlpha = -0.45;
+  float TOPTemplateFitResult::s_templateN = 18.06;
+
   TOPTemplateFitResult::TOPTemplateFitResult() {}
 
-  TOPTemplateFitResult::TOPTemplateFitResult(unsigned short risingEdge, short backgroundOffset,
-                                             short amplitude, unsigned short chisquare)
+  TOPTemplateFitResult::TOPTemplateFitResult(short risingEdge, short backgroundOffset,
+                                             short amplitude, short chisquare)
   {
     m_risingEdgeRaw = risingEdge;
     m_risingEdge = risingEdgeShortToRisingEdgeDouble(risingEdge);
@@ -27,7 +31,13 @@ namespace Belle2 {
     m_chisquare = chisquare;
   }
 
-  void TOPTemplateFitResult::setRisingEdge(unsigned short risingEdge)
+  TOPTemplateFitResult::TOPTemplateFitResult(double risingEdge, double risingEdgeTime, double backgroundOffset,
+                                             double amplitude, double chisquare)
+    : m_risingEdge(risingEdge), m_risingEdgeTime(risingEdgeTime), m_backgroundOffset(backgroundOffset), m_amplitude(amplitude),
+      m_chisquare(chisquare)
+  {}
+
+  void TOPTemplateFitResult::setRisingEdgeAndConvert(unsigned short risingEdge)
   {
     m_risingEdgeRaw = risingEdge;
     m_risingEdge = risingEdgeShortToRisingEdgeDouble(risingEdge);
@@ -45,12 +55,25 @@ namespace Belle2 {
     return risingEdgeD;
   }
 
+  void TOPTemplateFitResult::setTemplateParameters(float sigma, float alpha, float n)
+  {
+    s_templateSigma = sigma;
+    s_templateAlpha = alpha;
+    s_templateN = n;
+  }
+
   double TOPTemplateFitResult::getMean() const
   {
     //center of template is gaussian function -> there is a relation between rising edge
     //position and template mean
-    return m_risingEdge + sqrt(2 * logf(2)) * m_templateSigma;
+    return m_risingEdge + sqrt(2 * logf(2)) * s_templateSigma;
   }
+
+  double TOPTemplateFitResult::getMeanTime() const
+  {
+    return m_risingEdgeTime + sqrt(2 * logf(2)) * s_templateSigma;
+  }
+
 
   double TOPTemplateFitResult::getTemplateFunctionValue(double x) const
   {
@@ -61,17 +84,17 @@ namespace Belle2 {
   {
     double absAlpha;
     double value;
-    double t = (x - getMean()) / m_templateSigma;
-    if (m_templateAlpha < 0) t = -t;
-    if (m_templateAlpha > 0) absAlpha = m_templateAlpha;
-    else absAlpha = -m_templateAlpha;
+    double t = (x - getMean()) / s_templateSigma;
+    if (s_templateAlpha < 0) t = -t;
+    if (s_templateAlpha > 0) absAlpha = s_templateAlpha;
+    else absAlpha = -s_templateAlpha;
 
     if (t >= -absAlpha) {
       value = exp(-0.5 * t * t) * m_amplitude;
     } else {
-      double a = powf(m_templateN / absAlpha, m_templateN) * exp(-0.5 * absAlpha * absAlpha);
-      double b = m_templateN / absAlpha - absAlpha;
-      value = a / powf(b - t, m_templateN) * m_amplitude;
+      double a = powf(s_templateN / absAlpha, s_templateN) * exp(-0.5 * absAlpha * absAlpha);
+      double b = s_templateN / absAlpha - absAlpha;
+      value = a / powf(b - t, s_templateN) * m_amplitude;
     }
     return value;
   }

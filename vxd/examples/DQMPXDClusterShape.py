@@ -72,7 +72,6 @@ use_local_database('database.txt')
 use_local_database('localdb/database.txt')
 use_local_database(Belle2.FileSystem.findFile("localdb/database.txt"))
 """
-"""
 reset_database()
 use_database_chain()
 if args.global_tag is not None:
@@ -83,7 +82,6 @@ if args.local_db is not None:
     use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
     use_local_database(Belle2.FileSystem.findFile("localdb/database.txt"))
 # use_local_database(Belle2.FileSystem.findFile("centraldb/database.txt"))
-"""
 
 # For Particle Gun:
 CommonSets = {

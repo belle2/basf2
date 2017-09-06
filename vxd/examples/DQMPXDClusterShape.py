@@ -203,6 +203,7 @@ else:
 if (args.useShapeCorrection is True):
     main.add_module(ActivatePXDClusterShapeCorrection)
 
+
 add_pxd_reconstruction(main)
 add_svd_reconstruction(main)
 add_tracking_reconstruction(main,

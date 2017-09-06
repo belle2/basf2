@@ -25,10 +25,10 @@
 
 from basf2 import *
 from ROOT import Belle2
-from svd import add_svd_simulation
+from simulation import add_simulation
+from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
 from tracking import add_tracking_reconstruction
-from simulation import add_simulation
 
 import argparse
 parser = argparse.ArgumentParser(description="PXD cluster shape DQM for Belle II")
@@ -41,7 +41,7 @@ parser.add_argument(
     type=str,
     help='Global tag to use at central DB in PNNL')
 
-parser.add_argument('--data-output', dest='DataOutput', action='store_const', const=False, default=False,
+parser.add_argument('--data-output', dest='DataOutput', action='store_const', const=True, default=False,
                     help='Save data to output file, default = False')
 
 parser.add_argument('--useShapeCorrection', dest='useShapeCorrection', action='store_const', const=True,
@@ -76,10 +76,12 @@ reset_database()
 use_database_chain()
 if args.global_tag is not None:
     use_central_database(args.global_tag, LogLevel.DEBUG)
-# use_central_database("GT_gen_prod_003.01_Master-20170721-132500", LogLevel.DEBUG)
-# if args.local_db is not None:
-#     use_local_database(Belle2.FileSystem.findFile(args.local_db), "", LogLevel.DEBUG)
-# use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
+    use_central_database("GT_gen_prod_003.01_Master-20170721-132500", LogLevel.DEBUG)
+if args.local_db is not None:
+    use_local_database(Belle2.FileSystem.findFile(args.local_db), "", LogLevel.DEBUG)
+    use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
+    use_local_database(Belle2.FileSystem.findFile("localdb/database.txt"))
+# use_local_database(Belle2.FileSystem.findFile("centraldb/database.txt"))
 
 # For Particle Gun:
 CommonSets = {
@@ -162,7 +164,7 @@ PXDDQMClusterShape.param('SeeDQMOfCalibration', 1)
 PXDDQMClusterShape.logging.debug_level = 150
 # PXDDQMClusterShape.set_log_level(LogLevel.INFO)
 # PXDDQMClusterShape.set_log_level(LogLevel.DEBUG)
-# PXDDQMClusterShape.set_debug_level(140)
+# PXDDQMClusterShape.set_debug_level(40)
 
 # ============================================================================
 # Do the DQM from the simulation or real data
@@ -184,8 +186,8 @@ if (args.UseRealdata is True):
     # main.add_module(PXDDIGI)
     # main.add_module(SVDDIGI)
     # main.add_module(CDCDigitizer)
-    main.add_module(PXDCLUST)
-    main.add_module(SVDCLUST)
+    # main.add_module(PXDCLUST)
+    # main.add_module(SVDCLUST)
 else:
     main.add_module(eventinfosetter)
     if (args.UseParticleGun is True):
@@ -201,7 +203,7 @@ else:
 if (args.useShapeCorrection is True):
     main.add_module(ActivatePXDClusterShapeCorrection)
 
-add_svd_simulation(main)
+add_pxd_reconstruction(main)
 add_svd_reconstruction(main)
 add_tracking_reconstruction(main,
                             pruneTracks=False,

@@ -978,6 +978,7 @@ void PXDDQMClusterShapeModule::event()
 
       if (sensorID.getLayerNumber() > 2)
         continue;
+      B2DEBUG(230, "See some PXD hit, layer" << sensorID.getLayerNumber());
       auto& genfitTrack = RecoTrackGenfitAccess::getGenfitTrack(recoTrack);
       auto cluster = recoHit->getCluster();
       float m_EEClusterU = cluster->getUSigma();

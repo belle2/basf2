@@ -386,10 +386,6 @@ GenfitterVXDTB.param('GFTrackCandidatesColName', 'caTracks')
 GenfitterVXDTB.param('FilterId', 'Kalman')
 
 setupGenfit = register_module('SetupGenfitExtrapolation')
-GenFitter = register_module('GenFitter')
-# GenFitter.logging.log_level = LogLevel.WARNING
-GenFitter.param('GFTrackCandidatesColName', 'caTracks')
-GenFitter.param('FilterId', 'Kalman')
 
 eventCounter = register_module('EventCounter')
 eventCounter.logging.log_level = LogLevel.INFO
@@ -417,7 +413,6 @@ if (UseTracks is True):
     main.add_module(TrackFinderMCTruthRecoTrack)
     # main.add_module(TrackFinderMCTruth)
     main.add_module(GenfitterVXDTB)
-    # main.add_module(GenFitter)
 main.add_module(PXDSHCAL)
 
 main.add_module("PrintCollections")

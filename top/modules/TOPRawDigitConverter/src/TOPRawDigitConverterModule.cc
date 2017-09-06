@@ -127,7 +127,7 @@ namespace Belle2 {
 
     // check validity of steering parameters
     if (m_lookBackWindows >= (int) m_storageDepth)
-      B2ERROR("'loobBackWindows' must be less that 'storageDepth'");
+      B2ERROR("'lookBackWindows' must be less that 'storageDepth'");
 
   }
 

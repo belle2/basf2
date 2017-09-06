@@ -33,7 +33,7 @@ namespace Belle2 {
     /**return the sensor ID*/
     VxdID getSensorInfo() {return m_sensorInfo;};
 
-    bool isSensorInRange(TVector3 trackPosition);
+    bool isSensorInRange(TVector3 trackPosition, int layer);
 
     void setSharedPlanePtr(genfit::SharedPlanePtr spp) {m_sharedPlanePtr = spp;};
     genfit::SharedPlanePtr getSharedPlanePtr() {return m_sharedPlanePtr;};
@@ -44,6 +44,7 @@ namespace Belle2 {
     double m_sensorPhiMax;
     double m_sensorZMin;
     double m_sensorZMax;
+    int m_layer;
 
     VxdID m_sensorInfo; /**< the sensor ID*/
 

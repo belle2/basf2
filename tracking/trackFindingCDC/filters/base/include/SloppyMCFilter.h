@@ -14,15 +14,18 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Sloppy MC Filter Type using a VarSet and the truth variable in it. It will true for correct ones and
-    /// sometimes also for false ones.
+    /**
+     * Sloppy MC Filter Type using a VarSet and the truth variable in it. It will return true for correct ones and
+     * based on the scale factor also sometimes for false ones.
+     */
     template<class ATruthVarSet>
     class SloppyMCFilter : public MCFilter<ATruthVarSet> {
     private:
+      /// The parent class
       using Super = MCFilter<ATruthVarSet>;
 
     public:
-      /// Reject an item if the truth variable is 0 in some fractions of the events, else accept it.
+      /// Reject an item if the truth variable is 0 or in some fractions of the events, else accept it.
       Weight operator()(const typename Super::Object& object) override
       {
         Weight truth = Super::operator()(object);
@@ -40,6 +43,7 @@ namespace Belle2 {
       }
 
     private:
+      /// The prescaling of the false items returning true. May be a parameter later.
       unsigned int m_scaleFactor = 10;
     };
   }

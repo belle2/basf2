@@ -108,14 +108,22 @@ namespace Belle2 {
 
 
       // Ratio of the average DeltaT across the whole detector
-      name = str(format("SlotAverageDeltaTComparison_CalSet_%1%") %  m_calSetLabel);
+      name = str(format("TOPAverageDeltaTComparison_CalSet_%1%") %  m_calSetLabel);
       title = str(format("Ratio of the average #Delta T in CalSet %1% over the previous one, over the whole detector") %  m_calSetLabel);
       m_topAverageDeltaTComparison.push_back(new TH1F(name.c_str(), title.c_str(), 512 * 16, 0., 512 * 16.));
 
       // Ratio of the st.dev on DeltaT across the whole detector
-      name = str(format("SlotRMSDeltaTComparison_CalSet_%1%") % m_calSetLabel);
-      title = str(format("Ratio of the RMS of #Delta T in CalSet %1% over the previous one, , over the whole detector")  % m_calSetLabel);
+      name = str(format("TOPSigmaDeltaTComparison_CalSet_%1%") % m_calSetLabel);
+      title = str(format("Ratio of the st. dev. of #Delta T in CalSet %1% over the previous one, , over the whole detector")  %
+                  m_calSetLabel);
       m_topSigmaDeltaTComparison.push_back(new TH1F(name.c_str(), title.c_str(), 512 * 16, 0., 512 * 16.));
+
+      // Ratio of the average number of calpulses across the whole detector
+      name = str(format("TOPSampleOccupancyComparison_CalSet_%1%") %  m_calSetLabel);
+      title = str(
+                format("Ratio of the average number of calpulses per sample in CalSet %1% over the previous one, over the whole detector") %
+                m_calSetLabel);
+      m_topSampleOccupancyComparison.push_back(new TH1F(name.c_str(), title.c_str(), 512 * 16, 0., 512 * 16.));
 
 
       // ------
@@ -302,6 +310,8 @@ namespace Belle2 {
                                                                m_topAverageDeltaT[refSet]);
       m_topSigmaDeltaTComparison[iSet] = calculateHistoRatio(m_topSigmaDeltaTComparison[iSet], m_topSigmaDeltaT[iSet],
                                                              m_topSigmaDeltaT[refSet]);
+      m_topSampleOccupancyComparison[iSet] = calculateHistoRatio(m_topSampleOccupancyComparison[iSet], m_topSampleOccupancy[iSet],
+                                                                 m_topSampleOccupancy[refSet]);
 
       // Loop over the sets. Do not make the comparison for the set #0
       for (int iSlot = 0; iSlot < 16; iSlot++) {
@@ -377,9 +387,10 @@ namespace Belle2 {
             // Initializes the file name
             m_calSetFile = new TFile((m_calSetDirectory + entryName).c_str(), " ");
             // Finds out the Slot and BS ID
-            parseSlotAndScrodIDfromFileName(entryName);
+            int parserStatus = parseSlotAndScrodIDfromFileName(entryName);
             // Fills the histograms
-            analyzeCalFile();
+            if (parserStatus == 1)
+              analyzeCalFile();
             // Closes the file
             m_calSetFile->Close();
           }
@@ -406,9 +417,10 @@ namespace Belle2 {
                   // Initializes the file name
                   m_calSetFile = new TFile((m_calSetDirectory + entryName + fileName).c_str(), " ");
                   // Finds out the Slot and BS ID
-                  parseSlotAndScrodIDfromFileName(fileName);
+                  int parserStatus = parseSlotAndScrodIDfromFileName(fileName);
                   // Fills the histograms
-                  analyzeCalFile();
+                  if (parserStatus == 1)
+                    analyzeCalFile();
                   // Closes the file
                   m_calSetFile->Close();
                 } else if (file->IsDirectory()  && fileName != "." && fileName != "..") {
@@ -458,6 +470,8 @@ namespace Belle2 {
       m_topSigmaDeltaT[iSet]->Write();
       m_topSampleOccupancy[iSet]->Write();
       m_topAverageDeltaTComparison[iSet]->Write();
+      m_topSigmaDeltaTComparison[iSet]->Write();
+      m_topSampleOccupancyComparison[iSet]->Write();
 
       for (int iSlot = 0; iSlot < 16; iSlot ++) {
         TDirectory* dirSlot = dirSet->mkdir(str(format("slot%1%") % (iSlot + 1)).c_str());
@@ -550,6 +564,10 @@ namespace Belle2 {
     // 012345678901234567890
     //
 
+    if (!(inputString[0] == 't' && inputString[1] == 'b' &&  inputString[2] == 'c')) {
+      B2WARNING(inputString << " is not a valid TBC file. Skipping it.");
+      return 0;
+    }
     stringSlot += inputString[7];
     stringSlot += inputString[8];
     stringBS += inputString[10];

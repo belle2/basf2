@@ -50,7 +50,7 @@ namespace Belle2 {
    * /absolute/path/to/CalibrationSetRootFolder3/  LabelSet3
    *
    *
-   * 2) Basic functioning
+   * 2) Basic functions
    * - The output histograms are declared as private members, and are initialized in the defineHisto() function
    * - The main loop that runs over all the datasets and all the rootfiles is implemented in endRun(), that calls the two main functions of this module,
    *   analyzeCalFile() and  makeComparisons().
@@ -229,6 +229,8 @@ namespace Belle2 {
     m_topAverageDeltaTComparison; /**< Average of the DeltaT (time difference petween the calibraiton pulses) distribution, as function of the channel number on the whole detector*/
     std::vector<TH1F*>
     m_topSigmaDeltaTComparison; /**< Standard deviation of the DeltaT (time difference petween the calibraiton pulses) distribution, as function of the channel number  on the whole detector*/
+    std::vector<TH1F*>
+    m_topSampleOccupancyComparison; /**< Ratios of the average sample occupancy on the whole detector */
 
 
 

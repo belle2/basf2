@@ -146,8 +146,8 @@ namespace Belle2 {
         short vFall1 = height * gauss(tdc.getSampleTime(sampleFall + 1), mean, sigma);
 
         if (threshold > 0) {
-          double halfWid = sigma * sqrt(-2 * log(threshold / height));
-          int overThr = tdc.getSample(mean + halfWid) - tdc.getSample(mean - halfWid);
+          double halfDt = sigma * sqrt(-2 * log(threshold / height));
+          int overThr = tdc.getSample(mean + halfDt) - tdc.getSample(mean - halfDt);
           if (overThr < thresholdCount) continue;
         }
 

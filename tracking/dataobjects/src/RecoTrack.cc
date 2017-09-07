@@ -339,7 +339,7 @@ RecoTrack* RecoTrack::copyToStoreArray(StoreArray<RecoTrack>& storeArray) const
   if (wasFitSuccessful()) {
     const auto& mSoP = getMeasuredStateOnPlaneFromFirstHit();
     return copyToStoreArrayUsing(storeArray, mSoP.getPos(), mSoP.getMom(), static_cast<short>(mSoP.getCharge()),
-                                 mSoP.getCov(), mSoP.getTime());
+                                 mSoP.get6DCov(), mSoP.getTime());
   } else {
     return copyToStoreArrayUsingSeeds(storeArray);
   }

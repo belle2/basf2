@@ -55,12 +55,12 @@ namespace Belle2 {
     /**
      * Set the list of dead channels
      */
-    void setDeadChannel(std::vector<int> channels) {m_DeadChannels = channels; }
+    void setDeadChannel(std::vector<int>& channels) {m_DeadChannels = channels; }
 
     /**
      * Set the list of hot channels
      */
-    void setHotChannel(std::vector<int> channels) { m_HotChannels = channels; }
+    void setHotChannel(std::vector<int>& channels) { m_HotChannels = channels; }
 
     /**
      * Add a channel number to the list of dead channels

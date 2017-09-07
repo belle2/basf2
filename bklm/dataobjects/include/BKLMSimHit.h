@@ -42,6 +42,9 @@ namespace Belle2 {
     //! Copy constructor
     BKLMSimHit(const BKLMSimHit&);
 
+    //! Assignment operator
+    BKLMSimHit& operator=(const BKLMSimHit&);
+
     //! Determine whether this hit is in an RPC or scintillator
     //! @return whether this hit is in an RPC (true) or scintillator (false)
     bool inRPC() const { return ((m_ModuleID & BKLM_INRPC_MASK) != 0); }

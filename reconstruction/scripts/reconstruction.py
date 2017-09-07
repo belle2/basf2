@@ -3,6 +3,9 @@
 
 from basf2 import *
 
+from svd import add_svd_reconstruction
+from pxd import add_pxd_reconstruction
+
 from tracking import (
     add_mc_tracking_reconstruction,
     add_tracking_reconstruction,
@@ -54,6 +57,14 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
     :param use_vxdtf2: if true the VXDTF version 2 will be used if false (default) verion 1 of the VXDTF will be used.
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
+
+    # add svd_reconstruction
+    if components is None or 'SVD' in components:
+        add_svd_reconstruction(path)
+
+    # add pxd_reconstruction
+    if components is None or 'PXD' in components:
+        add_pxd_reconstruction(path)
 
     # Add tracking reconstruction modules
     add_tracking_reconstruction(path,

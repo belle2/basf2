@@ -9,6 +9,7 @@
 // Description : TRG ECL Unpacker Module
 //---------------------------------------------------------------
 // 1.00 : 2017/05/06 : First version
+// 1.01 : 2017/07/17 : Add FTSW clock from FAM, fine timing
 //---------------------------------------------------------------
 
 #ifndef TRGECLUNPACKER_H
@@ -63,9 +64,6 @@ namespace Belle2 {
 
     /** Unpacker main function.*/
     virtual void checkBuffer(int*);
-
-    /** Utility of TRG ECL.*/
-    std::string u_int2string(int, int);
 
   protected :
     /** Event number */

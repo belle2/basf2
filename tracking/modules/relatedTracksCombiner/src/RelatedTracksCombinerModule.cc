@@ -70,30 +70,35 @@ void RelatedTracksCombinerModule::event()
   // their VXD partner if they do.
   // For this, the fitted or seed state of the tracks is used - if they are already fitted or not.
   for (const RecoTrack& cdcRecoTrack : m_cdcRecoTracks) {
-    const RecoTrack* vxdRecoTrack = cdcRecoTrack.getRelated<RecoTrack>(m_vxdRecoTracksStoreArrayName);
-    if (vxdRecoTrack) {
-      TVector3 vxdPosition;
-      std::tie(vxdPosition, std::ignore, std::ignore) = vxdRecoTrack->extractTrackState();
+    bool hasPartner = false;
+    for (const RecoTrack& vxdRecoTrack : cdcRecoTrack.getRelationsWith<RecoTrack>(m_vxdRecoTracksStoreArrayName)) {
+      try {
+        hasPartner = true;
+        TVector3 vxdPosition;
+        std::tie(vxdPosition, std::ignore, std::ignore) = vxdRecoTrack.extractTrackState();
 
-      short cdcCharge = cdcRecoTrack.getChargeSeed();
+        short cdcCharge = cdcRecoTrack.getChargeSeed();
 
-      // For the combined track, we use the momentum of the CDC track
-      // helix-extrapolated to the start position of the VXD track.
-      const TVector3& trackMomentum = extrapolateMomentum(cdcRecoTrack, vxdPosition);
+        // For the combined track, we use the momentum of the CDC track
+        // helix-extrapolated to the start position of the VXD track.
+        const TVector3& trackMomentum = extrapolateMomentum(cdcRecoTrack, vxdPosition);
 
-      // We are using the basic information of the VXD track here, but copying the momentum and the charge from the
-      // cdc track.
-      // TODO: we should handle the covariance matrix properly here!
-      RecoTrack* newMergedTrack = vxdRecoTrack->copyToStoreArray(m_recoTracks);
-      newMergedTrack->setPositionAndMomentum(vxdPosition, trackMomentum);
-      newMergedTrack->setChargeSeed(cdcCharge);
-      newMergedTrack->addHitsFromRecoTrack(vxdRecoTrack);
-      newMergedTrack->addHitsFromRecoTrack(&cdcRecoTrack, newMergedTrack->getNumberOfTotalHits());
-    } else {
-      if (not m_useOnlyFittedTracksInSingles or cdcRecoTrack.wasFitSuccessful()) {
-        RecoTrack* newTrack = cdcRecoTrack.copyToStoreArray(m_recoTracks);
-        newTrack->addHitsFromRecoTrack(&cdcRecoTrack);
+        // We are using the basic information of the VXD track here, but copying the momentum and the charge from the
+        // cdc track.
+        // TODO: we should handle the covariance matrix properly here!
+        RecoTrack* newMergedTrack = vxdRecoTrack.copyToStoreArray(m_recoTracks);
+        newMergedTrack->setPositionAndMomentum(vxdPosition, trackMomentum);
+        newMergedTrack->setChargeSeed(cdcCharge);
+        newMergedTrack->addHitsFromRecoTrack(&vxdRecoTrack);
+        newMergedTrack->addHitsFromRecoTrack(&cdcRecoTrack, newMergedTrack->getNumberOfTotalHits());
+      } catch (genfit::Exception& e) {
+        B2WARNING("Could not combine tracks, because of: " << e.what());
       }
+    }
+
+    if (not hasPartner and (not m_useOnlyFittedTracksInSingles or cdcRecoTrack.wasFitSuccessful())) {
+      RecoTrack* newTrack = cdcRecoTrack.copyToStoreArray(m_recoTracks);
+      newTrack->addHitsFromRecoTrack(&cdcRecoTrack);
     }
   }
 

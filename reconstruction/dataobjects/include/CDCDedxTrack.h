@@ -154,7 +154,7 @@ namespace Belle2 {
     void setError(double error) { m_dedx_avg_truncated_err = error; }
 
     /** Set the dE/dx value for this hit */
-    void setDedx(int i, double dedx) { m_dEdx[i] = dedx; }
+    void setDedx(int i, double newdedx) { m_dEdx[i] = newdedx; }
 
   private:
 
@@ -208,7 +208,7 @@ namespace Belle2 {
     double m_cdcChi[Const::ChargedStable::c_SetSize];  /**< chi values for each particle type */
     double m_cdcLogl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
 
-    ClassDef(CDCDedxTrack, 4); /**< Debug output for CDCDedxPID module. */
+    ClassDef(CDCDedxTrack, 5); /**< Debug output for CDCDedxPID module. */
   };
 }
 #endif

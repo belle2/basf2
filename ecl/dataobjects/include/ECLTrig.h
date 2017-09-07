@@ -29,6 +29,7 @@ namespace Belle2 {
     {
       m_TrigId = 0;    /**< Trig ID == crate ID */
       m_TimeTrig = 0; /**< Trig Time */
+      m_TrigTag = 0;
     }
 
 
@@ -37,11 +38,19 @@ namespace Belle2 {
     void setTrigId(int TrigId) { m_TrigId = TrigId; }
     /*! Set Trig Time (crate Id)
      */
+    void setTrigTag(int TrigTag) { m_TrigTag = TrigTag; }
+    /*! Set Triger Tag (crate Id)
+     */
     void setTimeTrig(double TimeTrig) { m_TimeTrig = TimeTrig; }
     /*! Get Trig ID
      * @return trig ID
      */
     int getTrigId() const { return m_TrigId; }
+
+    /*! Get Trig ID
+     * @return trig ID
+     */
+    int getTrigTag() const { return m_TrigTag; }
 
     /*! Get Trig Time
      * @return Trig Time
@@ -51,10 +60,12 @@ namespace Belle2 {
   private:
     int m_TrigId;      /**< Trig ID */
     double m_TimeTrig; /**< Trig Time */
+    int m_TrigTag;
 
 
 //    ClassDef(ECLTrig, 1);/**< ClassDef */
-    ClassDef(ECLTrig, 2); // CellId -> TrigId
+//    ClassDef(ECLTrig, 2); // CellId -> TrigId
+    ClassDef(ECLTrig, 3); // TrigTag added
 
   };
 } // end namespace Belle2

@@ -22,7 +22,7 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
-#include <genfit/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 //root stuff
 #include "TTree.h"
@@ -76,7 +76,7 @@ namespace Belle2 {
       isgood: flag which is false if some error occured (do not use the point if false)
       du and dv are the uncertainties in u and v on the sensor plane of the fit (local coordinates)
      */
-    TVector3 getTrackInterSec(VXD::SensorInfoBase& svdSensorInfo, const genfit::Track* aTrack, bool& isgood, double& du, double& dv);
+    TVector3 getTrackInterSec(VXD::SensorInfoBase& svdSensorInfo, const RecoTrack* aTrack, bool& isgood, double& du, double& dv);
 
     int findClosestDigit(VxdID& vxdid, TVector3 intersection);
     int findClosestCluster(VxdID& vxdid, TVector3 intersection);
@@ -88,6 +88,7 @@ namespace Belle2 {
     bool m_useAlignment;
 
     double m_distcut; //distance cut in cm!
+    double m_otherdistcut; //distance cut for otherpxd-hit in cm!
 
     //if true a tree with lots of info will be filled if false only the histograms are filled
     bool m_writeTree;
@@ -99,10 +100,11 @@ namespace Belle2 {
     std::string m_pxdclustersname;
     std::string m_pxddigitsname;
     std::string m_tracksname;
+    std::string m_ROIsName;
     StoreArray<PXDDigit> m_pxddigits;
     StoreArray<PXDCluster> m_pxdclusters;
     StoreObjPtr<EventMetaData> storeEventMetaData;
-    //StoreArray<genfit::Track> m_tracks;
+    //StoreArray<RecoTrack> m_tracks;
 
     //tree to store needed information
     TTree* m_tree;
@@ -114,6 +116,8 @@ namespace Belle2 {
     std::map<VxdID, double> m_v_fit;
     std::map<VxdID, double> m_u_clus;
     std::map<VxdID, double> m_v_clus;
+    std::map<VxdID, int> m_ucell_clus;
+    std::map<VxdID, int> m_vcell_clus;
     std::map<VxdID, double> m_u_digi;
     std::map<VxdID, double> m_v_digi;
     std::map<VxdID, double> m_sigma_u_fit;
@@ -142,6 +146,25 @@ namespace Belle2 {
     std::map<VxdID, TH2D*> m_h_tracksROI;
     std::map<VxdID, TH2D*> m_h_digitsROI;
     std::map<VxdID, TH2D*> m_h_clusterROI;
+
+    //ROI information
+    std::map<VxdID, int> m_roi_number_of;
+    std::map<VxdID, int> m_roi_minU;
+    std::map<VxdID, int> m_roi_minV;
+    std::map<VxdID, int> m_roi_maxU;
+    std::map<VxdID, int> m_roi_maxV;
+    std::map<VxdID, int> m_roi_widthU;
+    std::map<VxdID, int> m_roi_widthV;
+    std::map<VxdID, int> m_roi_centerU;
+    std::map<VxdID, int> m_roi_centerV;
+    std::map<VxdID, int> m_roi_area;
+    std::map<VxdID, int> m_roi_fit_inside;
+    std::map<VxdID, int> m_roi_clus_inside;
+    std::map<VxdID, int> m_roi_digi_inside;
+    std::map<VxdID, double> m_roi_u_residual;
+    std::map<VxdID, double> m_roi_v_residual;
+    std::map<VxdID, int> m_roi_ucell_residual;
+    std::map<VxdID, int> m_roi_vcell_residual;
   };
 }
 

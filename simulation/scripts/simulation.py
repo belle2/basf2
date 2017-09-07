@@ -3,6 +3,9 @@
 
 from basf2 import *
 from ROOT import Belle2
+from pxd import add_pxd_simulation
+from svd import add_svd_simulation
+from svd import add_svd_reconstruction
 from tracking import add_tracking_for_PXDDataReduction_simulation
 
 
@@ -41,6 +44,8 @@ def add_PXDDataReduction(path, components, use_vxdtf2=False):
     pxd_digitizer.param('Digits', pxd_unfiltered_digits)
     path.add_module(pxd_digitizer)
 
+    # SVD tracking
+    add_svd_reconstruction(path)
     # SVD tracking
 
     svd_reco_tracks = '__ROIsvdRecoTracks'
@@ -122,10 +127,7 @@ def add_simulation(
 
     # SVD digitization
     if components is None or 'SVD' in components:
-        svd_digitizer = register_module('SVDDigitizer')
-        path.add_module(svd_digitizer)
-        svd_clusterizer = register_module('SVDClusterizer')
-        path.add_module(svd_clusterizer)
+        add_svd_simulation(path)
 
     # CDC digitization
     if components is None or 'CDC' in components:
@@ -138,10 +140,7 @@ def add_simulation(
         if usePXDDataReduction:
             add_PXDDataReduction(path, components, use_vxdtf2)
         else:
-            pxd_digitizer = register_module('PXDDigitizer')
-            path.add_module(pxd_digitizer)
-        pxd_clusterizer = register_module('PXDClusterizer')
-        path.add_module(pxd_clusterizer)
+            add_pxd_simulation(path)
 
     # TOP digitization
     if components is None or 'TOP' in components:

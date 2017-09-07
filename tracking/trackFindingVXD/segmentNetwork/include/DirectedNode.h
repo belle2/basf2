@@ -57,7 +57,12 @@ namespace Belle2 {
     /** ************************* CONSTRUCTORS ************************* */
 
     /** protected constructor. accepts an entry which can not be changed any more */
-    DirectedNode(EntryType& entry) : m_entry(entry), m_metaInfo(MetaInfoType()) {}
+    DirectedNode(EntryType& entry) : m_entry(entry), m_metaInfo(MetaInfoType())
+    {
+      // Reserve some space for the vectors, TODO: can still be fine-tuned
+      m_innerNodes.reserve(10);
+      m_outerNodes.reserve(10);
+    }
 
 
     /** copy constructor */

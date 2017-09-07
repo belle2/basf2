@@ -7,7 +7,7 @@
 import basf2
 import os
 from reconstruction import add_cosmics_reconstruction
-from softwaretrigger.path_functions import add_unpackers
+from rawdata import add_unpackers
 from softwaretrigger import (
     add_fast_reco_software_trigger,
     add_hlt_software_trigger,

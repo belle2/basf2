@@ -149,6 +149,12 @@ namespace Belle2 {
        * @result drift velocity of an electron in the E+B field.
        */
       const TVector3 getDriftVelocity(const TVector3& E, const TVector3& B) const;
+      /** Return pixel kind ID
+       * @param sensorID the sensor identification
+       * @param v Local v coordinate
+       * @return pixel kind ID in range 0..7, 0-3 for Layer=1, 4-7 for Layer=2
+       */
+      int getPixelKind(const VxdID sensorID, double v) const;
 
     protected:
       /** Calculate Lorentz shift factor.

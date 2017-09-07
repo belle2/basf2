@@ -203,13 +203,22 @@ void CDCT0CalibrationCollectorModule::collect()
           double dt_prop;
           double t = cdcgeo.getT0(wireid) - tdc * cdcgeo.getTdcBinWidth(); // - dt_flight - dt_prop;
           dt_flight = mop.getTime();
-          if (dt_flight < 50) {t -= dt_flight;}
+          if (dt_flight < 50) {
+            t -= dt_flight;
+          } else {
+            continue;
+          }
+
           double z = pocaOnWire.Z();
           TVector3 m_backWirePos = cdcgeo.wireBackwardPosition(wireid, CDCGeometryPar::c_Aligned);
           double z_prop = z - m_backWirePos.Z();
           B2DEBUG(99, "z_prop = " << z_prop << " |z " << z << " |back wire poss: " << m_backWirePos.Z());
           dt_prop = z_prop * cdcgeo.getPropSpeedInv(lay);
-          if (z_prop < 240) {t -= dt_prop;}
+          if (z_prop < 240) {
+            t -= dt_prop;
+          } else {
+            continue;
+          }
           // Time Walk
           t -= cdcgeo.getTimeWalk(wireid, adc);
           // substract event t0;

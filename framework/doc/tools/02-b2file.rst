@@ -38,6 +38,14 @@ basf2 output file. It will also update the xml file catalog::
                    argument does not contain an equal sign it's interpeted as a
                    key to delete from the dataDescriptions
 
+``b2file-catalog-add``: Add a file to a local XML file catalog
+--------------------------------------------------------------
+
+This simple tool adds a file to a local XML file catalog so that it can be
+found as a parent file independent of the local name or folder structure::
+
+    usage: b2file-catalog-add [--help] FILENAME
+
 ``b2file-check``: Check a basf2 output file for consistency
 -----------------------------------------------------------
 
@@ -113,22 +121,13 @@ restrictions apply:
 
     $ b2file-merge -f -q --no-catalog full.root jobs/*.root
 
-``b2file-catalog-add``: Add a file to a local XML file catalog
---------------------------------------------------------------
-
-This simple tool adds a file to a local XML file catalog so that it can be
-found as a parent file independent of the local name or folder structure::
-
-    usage: b2file-catalog-add [--help] FILENAME
-
-
-``b2file-create_mixed_run``: Create a run of mixed data from a set of input files
+``b2file-mix``: Create a run of mixed data from a set of input files
 ---------------------------------------------------------------------------------
 
 .. argparse::
-    :filename: framework/tools/b2file-create_mixed_run
+    :filename: framework/tools/b2file-mix
     :func: create_argumentparser
-    :prog: b2file-create_mixed_run
+    :prog: b2file-mix
     :nodefaultconst:
     :nogroupsections:
 

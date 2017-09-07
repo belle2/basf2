@@ -317,8 +317,8 @@ def get_argument_parser():
                         help="if given don't print output of failed tests")
     parser.add_argument("--filter", type=str, default=None, help="Only run tests where the name "
                         "of the steering file matches the given regular expression")
-    parser.add_argument("directories", nargs="*", help="run all tests included in these directories. "
-                        "If none are specified run all tests")
+    parser.add_argument("directories", nargs="*", help="run all tests included in this directory."
+                        "If none are specified run all tests", metavar="DIRECTORY")
     parser.add_argument("-t", "--timeout", type=int, default=None, metavar="SECONDS",
                         help="if given this is the maximum runtime in seconds for each "
                         "test case before they are killed and marked as failed")

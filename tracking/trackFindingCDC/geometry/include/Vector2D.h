@@ -16,10 +16,12 @@
 #include <tracking/trackFindingCDC/numerics/ERotation.h>
 #include <tracking/trackFindingCDC/numerics/ESign.h>
 
-#include <TVector2.h>
+#include <iosfwd>
 #include <cmath>
 #include <iostream>
 #include <sstream>
+
+class TVector2;
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -40,11 +42,7 @@ namespace Belle2 {
       }
 
       /// Constructor translating from a TVector2 instance
-      explicit Vector2D(const TVector2& tvector)
-        : m_x(tvector.X())
-        , m_y(tvector.Y())
-      {
-      }
+      explicit Vector2D(const TVector2& tVector2);
 
       /// Constructor from two coordinates
       Vector2D(const double x, const double y)
@@ -65,13 +63,8 @@ namespace Belle2 {
       {
       }
 
-      /// Assignment translating from a TVector3 instance
-      Vector2D& operator=(const TVector2& tvector)
-      {
-        setX(tvector.X());
-        setY(tvector.Y());
-        return *this;
-      }
+      /// Assignment translating from a TVector2 instance
+      Vector2D& operator=(const TVector2& tvector);
 
       /// Constucts a unit vector with azimuth angle equal to phi
       static Vector2D Phi(const double phi)
@@ -129,10 +122,7 @@ namespace Belle2 {
       }
 
       /// Casting the back to TVector2 seamlessly
-      operator const TVector2()
-      {
-        return TVector2(x(), y());
-      }
+      operator const TVector2();
 
       /// Equality comparison with both coordinates
       bool operator==(const Vector2D& rhs) const

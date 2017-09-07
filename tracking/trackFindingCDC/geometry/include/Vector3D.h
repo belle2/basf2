@@ -12,9 +12,11 @@
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
-#include <TVector3.h>
+#include <iosfwd>
 #include <cmath>
 #include <iostream>
+
+class TVector3;
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -34,11 +36,7 @@ namespace Belle2 {
       }
 
       /// Constructor translating from a TVector3 instance
-      explicit Vector3D(const TVector3& tvector)
-        : m_xy(tvector.X(), tvector.Y())
-        , m_z(tvector.Z())
-      {
-      }
+      explicit Vector3D(const TVector3& tVector3);
 
       /// Constructor from three coordinates
       Vector3D(double x, double y, double z)
@@ -62,13 +60,7 @@ namespace Belle2 {
       }
 
       /// Assignment translating from a TVector3 instance
-      Vector3D& operator=(const TVector3& tvector)
-      {
-        m_xy.setX(tvector.X());
-        m_xy.setY(tvector.Y());
-        m_z = tvector.Z();
-        return *this;
-      }
+      Vector3D& operator=(const TVector3& tVector3);
 
       /// Constructs the average of two vectors
       /** Computes the average of two vectors.
@@ -111,10 +103,7 @@ namespace Belle2 {
       }
 
       /// Casting the back to TVector3 seamlessly
-      operator const TVector3() const
-      {
-        return TVector3(x(), y(), z());
-      }
+      operator const TVector3() const;
 
       /// Equality comparison with all three coordinates
       bool operator==(const Vector3D& rhs) const

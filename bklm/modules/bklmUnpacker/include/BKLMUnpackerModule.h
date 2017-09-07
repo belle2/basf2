@@ -107,6 +107,12 @@ namespace Belle2 {
 
     //! name of BKLMDigit store array
     std::string m_outputDigitsName;
+
+    //! counter for channels that was rejected due to un-reasonable channel number
+    long m_rejectedCount = 0;
+
+    //! warnig message: number of channels rejected due to un-reasonable channel number
+    std::map<std::string, long> m_rejected;
   };
 
 

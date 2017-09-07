@@ -23,7 +23,25 @@ look for the file in a local xml file catalog using an logical file name (LFN)::
 ---------------------------------------------------
 
 This tools allows to modify the LFN and the data descriptions stored in a given
-basf2 output file. It will also update the xml file catalog::
+basf2 output file. It will also update the xml file catalog.
+
+The keys and values for the data descriptions can take any value and are not
+used by the offline software in any way. They can be used for bookkeeping or
+additional information not otherwise included in the metadata.
+
+At the moment the only commonly used keys are
+
+dataLevel
+  is automatically set when using `reconstruction.add_mdst_output`,
+  `modularAnalysis.outputMdst`, `modularAnalysis.outputUdst`, or
+  `modularAnalysis.skimOutputUdst` functions and will be set to either "mdst"
+  or "udst".
+
+skimDecayMode
+  is automatically set when using `modularAnalysis.skimOutputUdst` and will
+  contain the name of the skim.
+
+::
 
   usage: b2file-metadata-add [-h] [-l LFN] [-d KEY=VALUE] FILENAME
 
@@ -36,7 +54,7 @@ basf2 output file. It will also update the xml file catalog::
 -d KEYVALUE, --description KEYVALUE
                    data description to set of the form key=value. If the
                    argument does not contain an equal sign it's interpeted as a
-                   key to delete from the dataDescriptions
+                   key to delete from the dataDescriptions.
 
 ``b2file-catalog-add``: Add a file to a local XML file catalog
 --------------------------------------------------------------

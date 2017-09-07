@@ -30,10 +30,6 @@ from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True
 PyConfig.StartGuiThread = False
 import ROOT
-# load the framework_io library because it contains helper functions to fill the
-# FileMetaData
-ROOT.gSystem.Load('libframework_io')
-ROOT.gROOT.LoadMacro(ROOT.Belle2.FileSystem.findFile("include/framework/io/RootIOUtilities.h"))
 
 
 def create_argumentparser():
@@ -47,7 +43,7 @@ def create_argumentparser():
                         help="the run number to set for the output file")
     parser.add_argument("-f", "--overwrite", default=False, action="store_true",
                         help="overwrite output file if it exists")
-    parser.add_argument("inputfile", nargs="+", type=str,
+    parser.add_argument("inputfile", nargs="+", type=str, metavar="INPUTFILE",
                         help="input filenames containing the events")
     parser.add_argument("--seed", type=str, default=None,
                         help="Random seed to use for shuffling, can be used to "
@@ -86,6 +82,11 @@ def get_branchnames(tree):
 
 
 if __name__ == "__main__":
+    # load the framework_io library because it contains helper functions to fill the
+    # FileMetaData
+    ROOT.gSystem.Load('libframework_io')
+    ROOT.gROOT.LoadMacro(ROOT.Belle2.FileSystem.findFile("include/framework/io/RootIOUtilities.h"))
+
     parser = create_argumentparser()
     args = parser.parse_args()
     if os.path.exists(args.output) and not args.overwrite:

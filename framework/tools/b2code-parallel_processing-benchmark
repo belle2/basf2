@@ -10,95 +10,96 @@ cores (aka. -p argument to basf2). 0 cores equals true single-core mode.
 # we want to print some stuff to sys.stderr and the print function makes this
 # much easier
 from __future__ import print_function
-import os
 import sys
 import numpy as np
 import argparse
 import timeit
 
-# Specify the possible arguments
-parser = argparse.ArgumentParser(
-    description=__doc__,
-    formatter_class=argparse.RawDescriptionHelpFormatter,
-    usage="%(prog)s [optional arguments] [--] STEERING_FILE [BASF2 OPTIONS]"
-)
 
-parser.add_argument("-p", dest="ncoresmax", default=4, type=int,
-                    help="Try up to this many cores")
-parser.add_argument("-o", dest="output", default='benchmark_parallel_processing.pdf',
-                    help="File name to save output PDF as.")
-parser.add_argument("-r", dest="repetitions", default=2, type=int,
-                    help="Number of repetitions for each measurement (minimum is used in plot)")
-parser.add_argument("--pf", dest="parallelfraction", default=1, type=float,
-                    help="Fraction of parallel code. Used to plot ideal line according to Amdahl's law.")
+def get_argument_parser():
+    # Specify the possible arguments
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        usage="%(prog)s [optional arguments] [--] STEERING_FILE [BASF2 OPTIONS]"
+    )
 
-options, args = parser.parse_known_args()
-# remove the -- if present
-if args and args[0] == "--":
-    del args[0]
-
-if len(args) < 1:
-    print("Please specify a steering file!")
-    sys.exit(1)
-
-try:
-    import matplotlib as mpl
-    mpl.use("Agg")
-    from matplotlib import pyplot as pl
-    from matplotlib.backends.backend_pdf import PdfPages
-except ImportError:
-    print("Error: Could not find matplotlib which is required to create "
-          "the plots.\nPlease install matplotlib using\n    $ pip3 install matplotlib",
-          file=sys.stderr)
-    sys.exit(1)
+    parser.add_argument("-p", dest="ncoresmax", default=4, type=int,
+                        help="Try up to this many cores")
+    parser.add_argument("-o", dest="output", default='benchmark_parallel_processing.pdf',
+                        help="File name to save output PDF as.")
+    parser.add_argument("-r", dest="repetitions", default=2, type=int,
+                        help="Number of repetitions for each measurement (minimum is used in plot)")
+    parser.add_argument("--pf", dest="parallelfraction", default=1, type=float,
+                        help="Fraction of parallel code. Used to plot ideal line according to Amdahl's law.")
+    return parser
 
 
-repetitions = 1
-xdata = np.arange(1, options.ncoresmax+1)
-ydata = np.zeros(options.ncoresmax)
-t_singlecore = 0
-for i in range(options.ncoresmax+1):
-    timer = timeit.Timer('os.system("basf2 -p' + str(i) + ' ' + ' '.join(args) + '")',
-                      'import os')
-    if options.repetitions == 0:
-        t = timer.timeit(number=1)
-    else:
-        t = min(timer.repeat(number=1, repeat=options.repetitions))
+if __name__ == "__main__":
+    options, args = get_argument_parser().parse_known_args()
+    # remove the -- if present
+    if args and args[0] == "--":
+        del args[0]
 
-    if i == 0:
-        t_singlecore = t
-    else:
-        ydata[i-1] = t_singlecore/t
+    if len(args) < 1:
+        print("Please specify a steering file!")
+        sys.exit(1)
 
+    try:
+        import matplotlib as mpl
+        mpl.use("Agg")
+        from matplotlib import pyplot as pl
+        from matplotlib.backends.backend_pdf import PdfPages
+    except ImportError:
+        print("Error: Could not find matplotlib which is required to create "
+              "the plots.\nPlease install matplotlib using\n    $ pip3 install matplotlib",
+              file=sys.stderr)
+        sys.exit(1)
 
-fig = pl.figure(figsize=(12, 8))
-axis = fig.add_subplot(1, 1, 1)
+    repetitions = 1
+    xdata = np.arange(1, options.ncoresmax+1)
+    ydata = np.zeros(options.ncoresmax)
+    t_singlecore = 0
+    for i in range(options.ncoresmax+1):
+        timer = timeit.Timer('os.system("basf2 -p' + str(i) + ' ' + ' '.join(args) + '")',
+                             'import os')
+        if options.repetitions == 0:
+            t = timer.timeit(number=1)
+        else:
+            t = min(timer.repeat(number=1, repeat=options.repetitions))
 
-#add ideal line
-axis.plot([1, xdata[-1]], [1.0, xdata[-1]], ls=":", c="0.3")
+        if i == 0:
+            t_singlecore = t
+        else:
+            ydata[i-1] = t_singlecore/t
 
-#amdahl's law
-xideal = np.linspace(1, xdata[-1], 50)
-pf = options.parallelfraction
-yideal = 1/( (1 - pf) + pf/xideal)
-axis.plot(xideal, yideal, label='p=' + str(pf), ls="--", c='0.3')
+    fig = pl.figure(figsize=(12, 8))
+    axis = fig.add_subplot(1, 1, 1)
 
-#actual data
-axis.plot(xdata, ydata, label='', c='b', marker='.')
+    # add ideal line
+    axis.plot([1, xdata[-1]], [1.0, xdata[-1]], ls=":", c="0.3")
 
-# and add title and labels
-axis.set_xlabel("#Cores")
-axis.set_ylabel("Relative Performance ($T_0 / T$)")
-#axis.set_title(title[0])
-axis.set_ylim(ymin=0)
-axis.grid()
+    # amdahl's law
+    xideal = np.linspace(1, xdata[-1], 50)
+    pf = options.parallelfraction
+    yideal = 1/((1 - pf) + pf/xideal)
+    axis.plot(xideal, yideal, label='p=' + str(pf), ls="--", c='0.3')
 
-# save plots
-with PdfPages(options.output) as pdf:
-    # select the figure
-    pl.figure(fig.number)
-    # adjust the layout to fit exactly on the canvas
-    pl.tight_layout()
-    # add to pdf
-    pdf.savefig(fig)
+    # actual data
+    axis.plot(xdata, ydata, label='', c='b', marker='.')
 
+    # and add title and labels
+    axis.set_xlabel("#Cores")
+    axis.set_ylabel("Relative Performance ($T_0 / T$)")
+    # axis.set_title(title[0])
+    axis.set_ylim(ymin=0)
+    axis.grid()
+
+    # save plots
+    with PdfPages(options.output) as pdf:
+        # select the figure
+        pl.figure(fig.number)
+        # adjust the layout to fit exactly on the canvas
+        pl.tight_layout()
+        # add to pdf
+        pdf.savefig(fig)

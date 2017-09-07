@@ -57,6 +57,11 @@ void CDCToSVDSpacePointCKFFindlet::apply()
   };
   TrackFindingCDC::erase_remove_if(m_cdcRecoTrackVector, hasLowPt);
 
+  const auto& hitIsAlreadyUsed = [](const auto & hit) {
+    return hit->getAssignmentState();
+  };
+  TrackFindingCDC::erase_remove_if(m_spacePointVector, hitIsAlreadyUsed);
+
   m_treeSearchFindlet.apply(m_cdcRecoTrackVector, m_spacePointVector, m_results);
   m_overlapResolver.apply(m_results);
 

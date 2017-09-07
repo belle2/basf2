@@ -80,7 +80,9 @@ namespace Belle2 {
       seeds.reserve(seeds.size() + m_inputRecoTracks.getEntries());
 
       for (auto& item : m_inputRecoTracks) {
-        seeds.push_back(&item);
+        if (not item.template getRelated<RecoTrack>(m_param_outputRecoTrackStoreArrayName)) {
+          seeds.push_back(&item);
+        }
       }
 
       m_trackFitter.apply(seeds);

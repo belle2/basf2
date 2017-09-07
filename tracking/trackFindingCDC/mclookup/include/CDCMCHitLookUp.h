@@ -21,6 +21,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     class Vector3D;
+    class Vector2D;
 
     /// Interface class to the Monte Carlo information for individual hits
     /** This class provides a stable interface for the underlying implementation for look ups
@@ -43,7 +44,7 @@ namespace Belle2 {
 
 
       /// Getter for the two dimensional reference position of the wire the given hit is located on - mainly for the python event display
-      const TVector2 getRefPos2D(const CDCHit* ptrHit) const;
+      const Vector2D getRefPos2D(const CDCHit* ptrHit) const;
 
       /// Getter for the reference drift length in the two dimensional projection
       float getRefDriftLength(const CDCHit* ptrHit) const;
@@ -52,7 +53,7 @@ namespace Belle2 {
       const Vector3D getRecoPos3D(const CDCHit* ptrHit) const;
 
       /// Getter for the three dimensional position of the ionisation of the primary simulated hit for the hit.
-      const TVector3 getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const;
+      const Vector3D getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const;
 
     public:
       /// Indicates if the hit was reassigned to a different mc particle because it was caused by a secondary.

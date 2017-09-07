@@ -35,6 +35,9 @@ namespace Belle2 {
 
     "numberOfHoles",
 
+    "sigma_uv",
+    "residual_over_sigma",
+
     "residual",
 
     "chi2_calculated",

@@ -33,12 +33,6 @@ bool CKFCDCToSpacePointStateObjectBasicVarSet::extract(const BaseCKFCDCToSpacePo
     return false;
   }
 
-  /*
-   * "seed_has_cdc",
-    "seed_has_svd",
-    "seed_lowest_svd_layer",
-   */
-
   const auto& cdcHits = cdcTrack->getSortedCDCHitList();
   const auto& svdHits = cdcTrack->getSortedSVDHitList();
   var<named("seed_cdc_hits")>() = cdcHits.size();
@@ -96,13 +90,13 @@ bool CKFCDCToSpacePointStateObjectBasicVarSet::extract(const BaseCKFCDCToSpacePo
   double residual = 0;
 
   if (spacePoint->getType() == VXD::SensorInfoBase::SVD) {
-    for (const auto& svdCluster : spacePoint->getRelationsWith<SVDCluster>()) {
+    for (const auto& svdCluster : spacePoint->getRelationsTo<SVDCluster>()) {
       SVDRecoHit recoHit(&svdCluster);
       chi2 += fitter.calculateChi2<SVDRecoHit, 1>(result->getMeasuredStateOnPlane(), recoHit);
       residual += fitter.calculateResidualDistance<SVDRecoHit, 1>(result->getMeasuredStateOnPlane(), recoHit);
     }
   } else {
-    PXDRecoHit recoHit(spacePoint->getRelated<PXDCluster>());
+    PXDRecoHit recoHit(spacePoint->getRelatedTo<PXDCluster>());
     chi2 = fitter.calculateChi2<PXDRecoHit, 2>(result->getMeasuredStateOnPlane(), recoHit);
     residual = fitter.calculateResidualDistance<PXDRecoHit, 2>(result->getMeasuredStateOnPlane(), recoHit);
   }
@@ -114,6 +108,11 @@ bool CKFCDCToSpacePointStateObjectBasicVarSet::extract(const BaseCKFCDCToSpacePo
   } else {
     var<named("chi2")>() = -999;
   }
+
+  const auto& cov5 = firstMeasurement.getCov();
+  const double sigmaUV = std::sqrt(std::max(cov5(4, 4), cov5(3, 3)));
+  var<named("sigma_uv")>() = sigmaUV;
+  var<named("residual_over_sigma")>() = residual / sigmaUV;
 
   return true;
 }

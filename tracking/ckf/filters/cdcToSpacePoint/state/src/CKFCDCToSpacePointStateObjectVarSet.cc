@@ -17,6 +17,74 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+namespace {
+  template<class APredicate>
+  double meanOver(const BaseCKFCDCToSpacePointStateObjectFilter::Object* state, const APredicate& t)
+  {
+    double sum = 0;
+    unsigned int numberOfHits = 0;
+
+    state->walk([&](const auto & walkState) {
+      const SpacePoint* spacePoint = walkState->getHit();
+      if (not spacePoint) {
+        return;
+      }
+      for (auto& cluster : spacePoint->getRelationsTo<SVDCluster>()) {
+        numberOfHits++;
+        sum += t(cluster);
+      }
+    });
+
+    return sum / numberOfHits;
+  }
+
+  template<class APredicate>
+  double minOver(const BaseCKFCDCToSpacePointStateObjectFilter::Object* state, const APredicate& t)
+  {
+    double minimalValue = NAN;
+
+    state->walk([&](const auto & walkState) {
+      const SpacePoint* spacePoint = walkState->getHit();
+      if (not spacePoint) {
+        return;
+      }
+      for (auto& cluster : spacePoint->getRelationsTo<SVDCluster>()) {
+        double currentValue = t(cluster);
+        if (std::isnan(minimalValue)) {
+          minimalValue = currentValue;
+        } else {
+          minimalValue = std::min(currentValue, minimalValue);
+        }
+      }
+    });
+
+    return minimalValue;
+  }
+
+  template<class APredicate>
+  double stdOver(const BaseCKFCDCToSpacePointStateObjectFilter::Object* state, const APredicate& t)
+  {
+    double sum = 0;
+    double sumSquared = 0;
+    unsigned int numberOfHits = 0;
+
+    state->walk([&](const auto & walkState) {
+      const SpacePoint* spacePoint = walkState->getHit();
+      if (not spacePoint) {
+        return;
+      }
+      for (auto& cluster : spacePoint->getRelationsTo<SVDCluster>()) {
+        numberOfHits++;
+        const auto& currentValue =  t(cluster);
+        sum += currentValue;
+        sumSquared += currentValue;
+      }
+    });
+
+    return std::sqrt((sumSquared - sum / numberOfHits) / numberOfHits - 1);
+  }
+}
+
 bool CKFCDCToSpacePointStateObjectVarSet::extract(const BaseCKFCDCToSpacePointStateObjectFilter::Object* result)
 {
   RecoTrack* cdcTrack = result->getSeedRecoTrack();
@@ -46,101 +114,6 @@ bool CKFCDCToSpacePointStateObjectVarSet::extract(const BaseCKFCDCToSpacePointSt
   Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
 
   const auto& sensorInfo = spacePoint->getVxdID();
-
-  var<named("track_position_x")>() = position.x();
-  var<named("track_position_y")>() = position.y();
-  var<named("track_position_z")>() = position.z();
-
-  var<named("hit_position_x")>() = hitPosition.x();
-  var<named("hit_position_y")>() = hitPosition.y();
-  var<named("hit_position_z")>() = hitPosition.z();
-
-  var<named("track_position_at_hit_x")>() = trackPositionAtHit.x();
-  var<named("track_position_at_hit_y")>() = trackPositionAtHit.y();
-  var<named("track_position_at_hit_z")>() = trackPositionAtHit.z();
-
-  const auto& cov = firstMeasurement.get6DCov();
-  const auto& cov5 = firstMeasurement.getCov();
-
-  var<named("C_00")>() = cov(0, 0);
-  var<named("C_01")>() = cov(0, 1);
-  var<named("C_02")>() = cov(0, 2);
-  var<named("C_03")>() = cov(0, 3);
-  var<named("C_04")>() = cov(0, 4);
-  var<named("C_05")>() = cov(0, 4);
-
-  var<named("C_10")>() = cov(1, 0);
-  var<named("C_11")>() = cov(1, 1);
-  var<named("C_12")>() = cov(1, 2);
-  var<named("C_13")>() = cov(1, 3);
-  var<named("C_14")>() = cov(1, 4);
-  var<named("C_15")>() = cov(1, 4);
-
-  var<named("C_20")>() = cov(2, 0);
-  var<named("C_21")>() = cov(2, 1);
-  var<named("C_22")>() = cov(2, 2);
-  var<named("C_23")>() = cov(2, 3);
-  var<named("C_24")>() = cov(2, 4);
-  var<named("C_25")>() = cov(2, 4);
-
-  var<named("C_30")>() = cov(3, 0);
-  var<named("C_31")>() = cov(3, 1);
-  var<named("C_32")>() = cov(3, 2);
-  var<named("C_33")>() = cov(3, 3);
-  var<named("C_34")>() = cov(3, 4);
-  var<named("C_35")>() = cov(3, 4);
-
-  var<named("C_40")>() = cov(4, 0);
-  var<named("C_41")>() = cov(4, 1);
-  var<named("C_42")>() = cov(4, 2);
-  var<named("C_43")>() = cov(4, 3);
-  var<named("C_44")>() = cov(4, 4);
-  var<named("C_45")>() = cov(4, 4);
-
-  var<named("C_50")>() = cov(5, 0);
-  var<named("C_51")>() = cov(5, 1);
-  var<named("C_52")>() = cov(5, 2);
-  var<named("C_53")>() = cov(5, 3);
-  var<named("C_54")>() = cov(5, 4);
-  var<named("C_55")>() = cov(5, 4);
-
-  var<named("C5_00")>() = cov5(0, 0);
-  var<named("C5_01")>() = cov5(0, 1);
-  var<named("C5_02")>() = cov5(0, 2);
-  var<named("C5_03")>() = cov5(0, 3);
-  var<named("C5_04")>() = cov5(0, 4);
-
-  var<named("C5_10")>() = cov5(1, 0);
-  var<named("C5_11")>() = cov5(1, 1);
-  var<named("C5_12")>() = cov5(1, 2);
-  var<named("C5_13")>() = cov5(1, 3);
-  var<named("C5_14")>() = cov5(1, 4);
-
-  var<named("C5_20")>() = cov5(2, 0);
-  var<named("C5_21")>() = cov5(2, 1);
-  var<named("C5_22")>() = cov5(2, 2);
-  var<named("C5_23")>() = cov5(2, 3);
-  var<named("C5_24")>() = cov5(2, 4);
-
-  var<named("C5_30")>() = cov5(3, 0);
-  var<named("C5_31")>() = cov5(3, 1);
-  var<named("C5_32")>() = cov5(3, 2);
-  var<named("C5_33")>() = cov5(3, 3);
-  var<named("C5_34")>() = cov5(3, 4);
-
-  var<named("C5_40")>() = cov5(4, 0);
-  var<named("C5_41")>() = cov5(4, 1);
-  var<named("C5_42")>() = cov5(4, 2);
-  var<named("C5_43")>() = cov5(4, 3);
-  var<named("C5_44")>() = cov5(4, 4);
-
-  const auto& state = firstMeasurement.getState();
-
-  var<named("state_0")>() = state(0);
-  var<named("state_1")>() = state(1);
-  var<named("state_2")>() = state(2);
-  var<named("state_3")>() = state(3);
-  var<named("state_4")>() = state(4);
 
   var<named("ladder")>() = sensorInfo.getLadderNumber();
   var<named("sensor")>() = sensorInfo.getSensorNumber();
@@ -173,6 +146,40 @@ bool CKFCDCToSpacePointStateObjectVarSet::extract(const BaseCKFCDCToSpacePointSt
         var<named("last_id")>() = parentSensorInfo.getID();
       }
     }
+  }
+
+  if (spacePoint->getType() == VXD::SensorInfoBase::SensorType::SVD) {
+    const auto& clusters = spacePoint->getRelationsTo<SVDCluster>();
+
+    B2ASSERT("Must be related to exactly 2 clusters", clusters.size() == 2);
+    const SVDCluster* firstCluster = clusters[0];
+    const SVDCluster* secondCluster = clusters[1];
+
+    var<named("cluster_1_charge")>() = firstCluster->getCharge();
+    var<named("cluster_2_charge")>() = secondCluster->getCharge();
+    var<named("mean_rest_cluster_charge")>() = meanOver(result, [](const auto & s) {return s.getCharge();});
+    var<named("min_rest_cluster_charge")>() = minOver(result, [](const auto & s) {return s.getCharge();});
+    var<named("std_rest_cluster_charge")>() = stdOver(result, [](const auto & s) {return s.getCharge();});
+    var<named("cluster_1_seed_charge")>() = firstCluster->getSeedCharge();
+    var<named("cluster_2_seed_charge")>() = secondCluster->getSeedCharge();
+    var<named("mean_rest_cluster_seed_charge")>() = meanOver(result, [](const auto & s) {return s.getSeedCharge();});;
+    var<named("min_rest_cluster_seed_charge")>() = minOver(result, [](const auto & s) {return s.getSeedCharge();});;
+    var<named("std_rest_cluster_seed_charge")>() = stdOver(result, [](const auto & s) {return s.getSeedCharge();});;
+    var<named("cluster_1_size")>() = firstCluster->getSize();
+    var<named("cluster_2_size")>() = secondCluster->getSize();
+    var<named("mean_rest_cluster_size")>() = meanOver(result, [](const auto & s) {return s.getSize();});;
+    var<named("min_rest_cluster_size")>() = meanOver(result, [](const auto & s) {return s.getSize();});;
+    var<named("std_rest_cluster_size")>() = stdOver(result, [](const auto & s) {return s.getSize();});;
+    var<named("cluster_1_snr")>() = firstCluster->getSNR();
+    var<named("cluster_2_snr")>() = secondCluster->getSNR();
+    var<named("mean_rest_cluster_snr")>() = meanOver(result, [](const auto & s) {return s.getSNR();});;
+    var<named("min_rest_cluster_snr")>() = minOver(result, [](const auto & s) {return s.getSNR();});;
+    var<named("std_rest_cluster_snr")>() = stdOver(result, [](const auto & s) {return s.getSNR();});;
+    var<named("cluster_1_charge_over_size")>() = firstCluster->getCharge() / firstCluster->getSize();
+    var<named("cluster_2_charge_over_size")>() = secondCluster->getCharge() / secondCluster->getSize();
+    var<named("mean_rest_cluster_charge_over_size")>() = meanOver(result, [](const auto & s) {return s.getCharge() / s.getSize();});;
+    var<named("min_rest_cluster_charge_over_size")>() = minOver(result, [](const auto & s) {return s.getCharge() / s.getSize();});;
+    var<named("std_rest_cluster_charge_over_size")>() = stdOver(result, [](const auto & s) {return s.getCharge() / s.getSize();});;
   }
 
   return true;

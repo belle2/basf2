@@ -15,8 +15,7 @@
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 #include <tracking/trackFindingCDC/utilities/Relation.h>
-
-#include <boost/range/iterator_range.hpp>
+#include <tracking/trackFindingCDC/utilities/Range.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -26,19 +25,19 @@ namespace Belle2 {
     public:
       /// Returns a two iterator range covering the range of possible neighboring axial stereo segment pairs of the given axial stereo segment pair out of the sorted range given by the two other argumets.
       template<class ASegmentPairIterator>
-      boost::iterator_range<ASegmentPairIterator>
+      Range<ASegmentPairIterator>
       getPossibleNeighbors(const CDCSegmentPair& segmentPair,
                            const ASegmentPairIterator& itBegin,
                            const ASegmentPairIterator& itEnd) const
       {
 
         const CDCSegment2D* ptrEndSegment = segmentPair.getToSegment();
-        if (not ptrEndSegment) boost::iterator_range<ASegmentPairIterator>(itEnd, itEnd);
+        if (not ptrEndSegment) Range<ASegmentPairIterator>(itEnd, itEnd);
 
         std::pair<ASegmentPairIterator, ASegmentPairIterator> itPairPossibleNeighbors =
           std::equal_range(itBegin, itEnd, ptrEndSegment);
-        return boost::iterator_range<ASegmentPairIterator>(itPairPossibleNeighbors.first,
-                                                           itPairPossibleNeighbors.second);
+        return Range<ASegmentPairIterator>(itPairPossibleNeighbors.first,
+                                           itPairPossibleNeighbors.second);
       }
 
       /** Main filter method returning the weight of the neighborhood relation.

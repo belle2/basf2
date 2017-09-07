@@ -16,8 +16,7 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <tracking/trackFindingCDC/utilities/Relation.h>
-
-#include <boost/range/iterator_range.hpp>
+#include <tracking/trackFindingCDC/utilities/Range.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -36,7 +35,7 @@ namespace Belle2 {
        *  facets of the given facet out of the sorted range given by the two other argumets.
        */
       template <class AFacetIt>
-      boost::iterator_range<AFacetIt>
+      Range<AFacetIt>
       getPossibleNeighbors(const CDCFacet& facet, const AFacetIt& itBegin, const AFacetIt& itEnd) const
       {
         const CDCRLWireHitPair& rearRLWireHitPair = facet.getRearRLWireHitPair();

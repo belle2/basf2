@@ -7,7 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
@@ -15,10 +14,9 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
+
 #include <tracking/trackFindingCDC/utilities/Relation.h>
-
-#include <boost/range/iterator_range.hpp>
-
+#include <tracking/trackFindingCDC/utilities/Range.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -29,7 +27,7 @@ namespace Belle2 {
     public:
       /// Returns a two iterator range covering the range of possible neighboring segment triples of the given facet out of the sorted range given by the two other argumets.
       template<class ACDCSegmentTripleIterator>
-      boost::iterator_range<ACDCSegmentTripleIterator>
+      Range<ACDCSegmentTripleIterator>
       getPossibleNeighbors(const CDCSegmentTriple& triple,
                            const ACDCSegmentTripleIterator& itBegin,
                            const ACDCSegmentTripleIterator& itEnd)
@@ -38,7 +36,7 @@ namespace Belle2 {
         const CDCAxialSegment2D* endSegment = triple.getEndSegment();
         std::pair<ACDCSegmentTripleIterator,  ACDCSegmentTripleIterator> itPairPossibleNeighbors = std::equal_range(itBegin, itEnd,
             endSegment);
-        return boost::iterator_range<ACDCSegmentTripleIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
+        return Range<ACDCSegmentTripleIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
 
       }
 

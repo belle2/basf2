@@ -15,8 +15,7 @@
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 #include <tracking/trackFindingCDC/utilities/Relation.h>
-
-#include <boost/range/iterator_range.hpp>
+#include <tracking/trackFindingCDC/utilities/Range.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -26,15 +25,15 @@ namespace Belle2 {
     public:
       /// Returns the full range of segments.
       template<class ASegmentIterator>
-      boost::iterator_range<ASegmentIterator>
+      Range<ASegmentIterator>
       getPossibleNeighbors(const CDCSegment2D& segment,
                            const ASegmentIterator& itBegin,
                            const ASegmentIterator& itEnd) const
       {
         std::pair<ASegmentIterator, ASegmentIterator> sameSuperClusterItPair =
           std::equal_range(itBegin, itEnd, segment, std::less<CDCSegment2D>());
-        return boost::iterator_range<ASegmentIterator>(sameSuperClusterItPair.first,
-                                                       sameSuperClusterItPair.second);
+        return Range<ASegmentIterator>(sameSuperClusterItPair.first,
+                                       sameSuperClusterItPair.second);
       }
 
       /**

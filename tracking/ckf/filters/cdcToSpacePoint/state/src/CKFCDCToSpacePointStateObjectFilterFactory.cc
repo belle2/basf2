@@ -22,6 +22,7 @@
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackFindingCDC/filters/base/NamedChoosableVarSetFilter.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -29,6 +30,9 @@ using namespace TrackFindingCDC;
 namespace {
   /// MC filter for VXD - CDC relations.
   using MCCKFCDCToSpacePointStateObjectFilter = MCFilter<CKFStateTruthVarSet<RecoTrack, SpacePoint>>;
+
+  /// MC-ordering filter for VXD - CDC relations.
+  using MCOrderingCKFCDCToSpacePointStateObjectFilter = NamedChoosableVarSetFilter<CKFStateTruthVarSet<RecoTrack, SpacePoint>>;
 
   /// Sloppy MC filter for VXD - CDC relations.
   using SloppyMCCKFCDCToSpacePointStateObjectFilter = SloppyMCFilter<CKFStateTruthVarSet<RecoTrack, SpacePoint>>;
@@ -76,6 +80,7 @@ CKFCDCToSpacePointStateObjectFilterFactory::getValidFilterNamesAndDescriptions()
     {"none", "no track combination is valid"},
     {"all", "set all track combinations as good"},
     {"truth", "monte carlo truth"},
+    {"ordering_truth", "monte carlo truth ordering"},
     {"sloppy_truth", "sloppy monte carlo truth"},
     {"pxd_simple", "simple filter to be used in pxd"},
     {"svd_simple", "simple filter to be used in svd"},
@@ -97,6 +102,8 @@ CKFCDCToSpacePointStateObjectFilterFactory::create(const std::string& filterName
     return std::make_unique<SimpleCKFPXDStateFilter>();
   } else if (filterName == "truth") {
     return std::make_unique<MCCKFCDCToSpacePointStateObjectFilter>();
+  } else if (filterName == "ordering_truth") {
+    return std::make_unique<MCOrderingCKFCDCToSpacePointStateObjectFilter>("truth_inverted");
   } else if (filterName == "sloppy_truth") {
     return std::make_unique<SloppyMCCKFCDCToSpacePointStateObjectFilter>();
   } else if (filterName == "recording") {

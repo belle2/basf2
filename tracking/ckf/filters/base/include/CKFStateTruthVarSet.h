@@ -24,6 +24,7 @@ namespace Belle2 {
   constexpr
   static char const* const ckfStateTruthVarNames[] = {
     "truth",
+    "truth_inverted",
     "truth_position_x",
     "truth_position_y",
     "truth_position_z",
@@ -80,6 +81,7 @@ namespace Belle2 {
       Super::template var<Super::named("truth_momentum_y")>() = 0;
       Super::template var<Super::named("truth_momentum_z")>() = 0;
       Super::template var<Super::named("truth")>() = false;
+      Super::template var<Super::named("truth_inverted")>() = true;
 
       if (not allStatesCorrect(*result)) {
         // Keep all variables set to false and return.
@@ -92,6 +94,7 @@ namespace Belle2 {
       const RecoTrack* cdcMCTrack = mcCDCMatchLookUp.getMatchedMCRecoTrack(*seedTrack);
 
       Super::template var<Super::named("truth")>() = true;
+      Super::template var<Super::named("truth_inverted")>() = false;
 
       Super::template var<Super::named("truth_position_x")>() = cdcMCTrack->getPositionSeed().X();
       Super::template var<Super::named("truth_position_y")>() = cdcMCTrack->getPositionSeed().Y();

@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-
 #include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
@@ -26,6 +24,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCTrajectory2D;
 
     /**
      *  Class representing a hit wire in the central drift chamber.

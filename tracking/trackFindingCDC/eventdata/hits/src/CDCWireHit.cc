@@ -10,6 +10,8 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
 #include <cdc/translators/SimpleTDCCountTranslator.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>

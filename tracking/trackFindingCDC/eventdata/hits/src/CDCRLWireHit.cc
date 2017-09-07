@@ -10,6 +10,8 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
 #include <cdc/dataobjects/CDCSimHit.h>
 
 using namespace Belle2;

@@ -61,7 +61,7 @@ namespace Belle2 {
             continue;
           }
 
-          const auto& relatedClusters = spacePoint->getRelationsWith<ACluster>();
+          const auto& relatedClusters = spacePoint->getRelationsTo<ACluster>();
           for (const auto& relatedCluster : relatedClusters) {
             m_usedClusters.insert(&relatedCluster);
           }
@@ -79,7 +79,7 @@ namespace Belle2 {
           continue;
         }
 
-        const auto& relatedClusters = spacePoint->getRelationsWith<ACluster>();
+        const auto& relatedClusters = spacePoint->getRelationsTo<ACluster>();
         for (const auto& relatedCluster : relatedClusters) {
           if (TrackFindingCDC::is_in(&relatedCluster, m_usedClusters)) {
             spacePoint->setAssignmentState(true);

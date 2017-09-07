@@ -27,7 +27,7 @@ double KalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& measuredStat
     }
     return chi2;
   } else if (spacePoint.getType() == VXD::SensorInfoBase::SensorType::PXD) {
-    PXDRecoHit recoHit(spacePoint.getRelated<PXDCluster>());
+    PXDRecoHit recoHit(spacePoint.getRelatedTo<PXDCluster>());
     return kalmanStepImplementation<PXDRecoHit, 2>(measuredStateOnPlane, recoHit);
   } else {
     B2FATAL("Can not fit unknown type " << spacePoint.getType() << "!");

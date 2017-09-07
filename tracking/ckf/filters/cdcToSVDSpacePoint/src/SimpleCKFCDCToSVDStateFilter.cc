@@ -85,7 +85,7 @@ Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStat
     const auto& measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
     double residual = 0;
 
-    for (const auto& svdCluster : spacePoint->getRelationsWith<SVDCluster>()) {
+    for (const auto& svdCluster : spacePoint->getRelationsTo<SVDCluster>()) {
       SVDRecoHit recoHit(&svdCluster);
       residual += m_fitter.calculateResidualDistance<SVDRecoHit, 1>(measuredStateOnPlane, recoHit);
     }

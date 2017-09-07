@@ -23,15 +23,15 @@ namespace Belle2 {
     const std::string& mcRecoTrackStoreArrayName = mcRecoTrack.getArrayName();
 
     if (spacePoint.getType() == VXD::SensorInfoBase::SensorType::SVD) {
-      for (const SVDCluster& relatedCluster : spacePoint.getRelationsWith<SVDCluster>()) {
-        const auto& relatedMCTracksToCluster = relatedCluster.getRelationsWith<RecoTrack>(mcRecoTrackStoreArrayName);
+      for (const SVDCluster& relatedCluster : spacePoint.getRelationsTo<SVDCluster>()) {
+        const auto& relatedMCTracksToCluster = relatedCluster.getRelationsTo<RecoTrack>(mcRecoTrackStoreArrayName);
         if (not TrackFindingCDC::any(relatedMCTracksToCluster, isSameMCTrack)) {
           return false;
         }
       }
     } else if (spacePoint.getType() == VXD::SensorInfoBase::SensorType::PXD) {
-      for (const PXDCluster& relatedCluster : spacePoint.getRelationsWith<PXDCluster>()) {
-        const auto& relatedMCTracksToCluster = relatedCluster.getRelationsWith<RecoTrack>(mcRecoTrackStoreArrayName);
+      for (const PXDCluster& relatedCluster : spacePoint.getRelationsTo<PXDCluster>()) {
+        const auto& relatedMCTracksToCluster = relatedCluster.getRelationsTo<RecoTrack>(mcRecoTrackStoreArrayName);
         if (not TrackFindingCDC::any(relatedMCTracksToCluster, isSameMCTrack)) {
           return false;
         }
@@ -44,9 +44,9 @@ namespace Belle2 {
     // For this, get the reco hit information of the related hit
     const RecoHitInformation* recoHitInformationOfHit;
     if (spacePoint.getType() == VXD::SensorInfoBase::SensorType::SVD) {
-      recoHitInformationOfHit = mcRecoTrack.getRecoHitInformation(spacePoint.getRelated<SVDCluster>());
+      recoHitInformationOfHit = mcRecoTrack.getRecoHitInformation(spacePoint.getRelatedTo<SVDCluster>());
     } else if (spacePoint.getType() == VXD::SensorInfoBase::SensorType::PXD) {
-      recoHitInformationOfHit = mcRecoTrack.getRecoHitInformation(spacePoint.getRelated<PXDCluster>());
+      recoHitInformationOfHit = mcRecoTrack.getRecoHitInformation(spacePoint.getRelatedTo<PXDCluster>());
     } else {
       B2FATAL("Can not handle unknown type " << spacePoint.getType() << "!");
     }

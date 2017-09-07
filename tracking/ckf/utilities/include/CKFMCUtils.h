@@ -86,7 +86,6 @@ namespace Belle2 {
     };
 
     state.walk(findFalseHit);
-
     return not oneIsWrong;
   }
 

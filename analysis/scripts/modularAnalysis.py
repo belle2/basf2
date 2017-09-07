@@ -51,7 +51,7 @@ def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
     path.add_module(conf)
 
 
-def inputMdst(environmentType, filename, path=analysis_main, parentLevel=0, skipNEvents=0, entrySequence=None):
+def inputMdst(environmentType, filename, path=analysis_main, skipNEvents=0, entrySequence=None, *, parentLevel=0):
     """
     Loads the specified ROOT (DST/mDST/muDST) file with the RootInput module.
 
@@ -71,17 +71,17 @@ def inputMdst(environmentType, filename, path=analysis_main, parentLevel=0, skip
     @param environmentType type of the environment to be loaded
     @param filename the name of the file to be loaded
     @param path modules are added to this path
-    @param parentLevel Number of generations of parent files (files used as input when creating a file) to be read
     @param skipNEvents N events of the input file are skipped
     @param entrySequence The number sequences (e.g. 23:42,101) defining the entries which are processed.
+    @param parentLevel Number of generations of parent files (files used as input when creating a file) to be read
     """
     if entrySequence is not None:
         entrySequence = [entrySequence]
 
-    inputMdstList(environmentType, [filename], path, parentLevel, skipNEvents, entrySequence)
+    inputMdstList(environmentType, [filename], path, skipNEvents, entrySequence, parentLevel=parentLevel)
 
 
-def inputMdstList(environmentType, filelist, path=analysis_main, parentLevel=0, skipNEvents=0, entrySequences=None):
+def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, entrySequences=None, *, parentLevel=0):
     """
     Loads the specified ROOT (DST/mDST/muDST) files with the RootInput module.
 
@@ -103,18 +103,18 @@ def inputMdstList(environmentType, filelist, path=analysis_main, parentLevel=0, 
     @param environmentType type of the environment to be loaded
     @param filelist the filename list of files to be loaded
     @param path modules are added to this path
-    @param parentLevel Number of generations of parent files (files used as input when creating a file) to be read
     @param skipNEvents N events of the input files are skipped
     @param entrySequences The number sequences (e.g. 23:42,101) defining the entries which are processed for
         each inputFileName.
+    @param parentLevel Number of generations of parent files (files used as input when creating a file) to be read
     """
 
     roinput = register_module('RootInput')
     roinput.param('inputFileNames', filelist)
-    roinput.param('parentLevel', parentLevel)
     roinput.param('skipNEvents', skipNEvents)
     if entrySequences is not None:
         roinput.param('entrySequences', entrySequences)
+    roinput.param('parentLevel', parentLevel)
 
     path.add_module(roinput)
     progress = register_module('ProgressBar')

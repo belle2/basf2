@@ -269,7 +269,8 @@ def add_cdc_cr_track_fit_and_track_creator(path, components=None,
         add_prune_tracks(path=path, components=components, reco_tracks=reco_tracks)
 
 
-def add_mc_matcher(path, components=None, reco_tracks="RecoTracks", use_second_cdc_hits=False):
+def add_mc_matcher(path, components=None, reco_tracks="RecoTracks", use_second_cdc_hits=False,
+                   split_after_delta_t=-1.0):
     """
     Match the tracks to the MC truth. The matching works based on
     the output of the TrackFinderMCTruthRecoTracks.
@@ -285,7 +286,8 @@ def add_mc_matcher(path, components=None, reco_tracks="RecoTracks", use_second_c
                     UseSecondCDCHits=use_second_cdc_hits,
                     UsePXDHits=is_pxd_used(components),
                     UseSVDHits=is_svd_used(components),
-                    UseCDCHits=is_cdc_used(components))
+                    UseCDCHits=is_cdc_used(components),
+                    SplitAfterDeltaT=split_after_delta_t)
 
     path.add_module('MCRecoTracksMatcher',
                     mcRecoTracksStoreArrayName='MCRecoTracks',

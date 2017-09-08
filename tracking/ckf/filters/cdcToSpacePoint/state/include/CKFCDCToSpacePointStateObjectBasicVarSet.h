@@ -35,6 +35,10 @@ namespace Belle2 {
 
     "numberOfHoles",
 
+    "pt",
+    "tan_lambda",
+    "phi",
+
     "sigma_uv",
     "residual_over_sigma",
 

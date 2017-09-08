@@ -31,8 +31,8 @@ namespace Belle2 {
     "truth_momentum_x",
     "truth_momentum_y",
     "truth_momentum_z",
-    "event_id",
-    "seed_number"
+    "truth_event_id",
+    "truth_seed_number"
   };
 
   /// Vehicle class to transport the variable names
@@ -70,8 +70,8 @@ namespace Belle2 {
       if (not seedTrack) return false;
 
       StoreObjPtr<EventMetaData> eventMetaData;
-      Super::template var<Super::named("event_id")>() = eventMetaData->getEvent();
-      Super::template var<Super::named("seed_number")>() = seedTrack->getArrayIndex();
+      Super::template var<Super::named("truth_event_id")>() = eventMetaData->getEvent();
+      Super::template var<Super::named("truth_seed_number")>() = seedTrack->getArrayIndex();
 
       // Default to 0 or false (depending on context)
       Super::template var<Super::named("truth_position_x")>() = 0;

@@ -12,6 +12,9 @@
 #include <tracking/ckf/filters/cdcToSpacePoint/state/BaseCKFCDCToSpacePointStateObjectFilter.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
 
 namespace Belle2 {
   /// Names of the variables to be generated.
@@ -28,9 +31,9 @@ namespace Belle2 {
     "last_segment",
     "last_id",
 
-    "pt",
-    "tan_lambda",
-    "phi",
+    "quality_index_triplet",
+    "quality_index_circle",
+    "quality_index_helix",
 
     "cluster_1_charge",
     "cluster_2_charge",
@@ -86,5 +89,10 @@ namespace Belle2 {
   public:
     /// Generate and assign the variables from the VXD-CDC object.
     virtual bool extract(const BaseCKFCDCToSpacePointStateObjectFilter::Object* object) override;
+
+  private:
+    QualityEstimatorCircleFit m_qualityCircle;
+    QualityEstimatorRiemannHelixFit m_qualityHelix;
+    QualityEstimatorTripletFit m_qualityTriplet;
   };
 }

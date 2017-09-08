@@ -64,20 +64,20 @@ bool CKFCDCToSpacePointStateObjectBasicVarSet::extract(const BaseCKFCDCToSpacePo
   Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
   Vector3D distance = trackPositionAtHit - hitPosition;
 
-  var<named("distance")>() = distance.norm();
-  var<named("xy_distance")>() = distance.xy().norm();
-  var<named("z_distance")>() = distance.z();
+  var<named("distance")>() = static_cast<Float_t>(distance.norm());
+  var<named("xy_distance")>() = static_cast<Float_t>(distance.xy().norm());
+  var<named("z_distance")>() = static_cast<Float_t>(distance.z());
 
   Vector3D mSoP_distance = position - hitPosition;
 
-  var<named("mSoP_distance")>() = mSoP_distance.norm();
-  var<named("mSoP_xy_distance")>() = mSoP_distance.xy().norm();
-  var<named("mSoP_z_distance")>() = mSoP_distance.z();
+  var<named("mSoP_distance")>() = static_cast<Float_t>(mSoP_distance.norm());
+  var<named("mSoP_xy_distance")>() = static_cast<Float_t>(mSoP_distance.xy().norm());
+  var<named("mSoP_z_distance")>() = static_cast<Float_t>(mSoP_distance.z());
 
   var<named("same_hemisphere")>() = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
 
-  var<named("arcLengthOfHitPosition")>() = trajectory.calcArcLength2D(hitPosition);
-  var<named("arcLengthOfCenterPosition")>() = trajectory.calcArcLength2D(Vector3D(0, 0, 0));
+  var<named("arcLengthOfHitPosition")>() = static_cast<Float_t>(trajectory.calcArcLength2D(hitPosition));
+  var<named("arcLengthOfCenterPosition")>() = static_cast<Float_t>(trajectory.calcArcLength2D(Vector3D(0, 0, 0)));
 
   var<named("numberOfHoles")>() = result->getNumberOfHoles();
 
@@ -85,9 +85,14 @@ bool CKFCDCToSpacePointStateObjectBasicVarSet::extract(const BaseCKFCDCToSpacePo
   var<named("number")>() = result->getNumber();
   var<named("overlap")>() = isOnOverlapLayer(*result);
 
+  var<named("pt")>() = static_cast<Float_t>(momentum.xy().norm());
+  var<named("tan_lambda")>() = static_cast<Float_t>(trajectory.getTanLambda());
+  var<named("phi")>() = static_cast<Float_t>(momentum.phi());
+
+
   KalmanUpdateFitter fitter;
-  double chi2 = 0;
-  double residual = 0;
+  Float_t chi2 = 0;
+  Float_t residual = 0;
 
   if (spacePoint->getType() == VXD::SensorInfoBase::SVD) {
     for (const auto& svdCluster : spacePoint->getRelationsTo<SVDCluster>()) {
@@ -104,13 +109,13 @@ bool CKFCDCToSpacePointStateObjectBasicVarSet::extract(const BaseCKFCDCToSpacePo
   var<named("residual")>() = residual;
 
   if (result->isFitted()) {
-    var<named("chi2")>() = result->getChi2();
+    var<named("chi2")>() = static_cast<Float_t>(result->getChi2());
   } else {
     var<named("chi2")>() = -999;
   }
 
   const auto& cov5 = firstMeasurement.getCov();
-  const double sigmaUV = std::sqrt(std::max(cov5(4, 4), cov5(3, 3)));
+  const Float_t sigmaUV = std::sqrt(std::max(cov5(4, 4), cov5(3, 3)));
   var<named("sigma_uv")>() = sigmaUV;
   var<named("residual_over_sigma")>() = residual / sigmaUV;
 

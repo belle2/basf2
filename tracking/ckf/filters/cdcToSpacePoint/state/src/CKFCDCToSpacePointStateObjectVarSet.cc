@@ -120,10 +120,6 @@ bool CKFCDCToSpacePointStateObjectVarSet::extract(const BaseCKFCDCToSpacePointSt
   var<named("segment")>() = sensorInfo.getSegmentNumber();
   var<named("id")>() = sensorInfo.getID();
 
-  var<named("pt")>() = momentum.xy().norm();
-  var<named("tan_lambda")>() = trajectory.getTanLambda();
-  var<named("phi")>() = momentum.phi();
-
   var<named("last_layer")>() = 0;
   var<named("last_ladder")>() = 0;
   var<named("last_sensor")>() = 0;
@@ -180,6 +176,24 @@ bool CKFCDCToSpacePointStateObjectVarSet::extract(const BaseCKFCDCToSpacePointSt
     var<named("mean_rest_cluster_charge_over_size")>() = meanOver(result, [](const auto & s) {return s.getCharge() / s.getSize();});;
     var<named("min_rest_cluster_charge_over_size")>() = minOver(result, [](const auto & s) {return s.getCharge() / s.getSize();});;
     var<named("std_rest_cluster_charge_over_size")>() = stdOver(result, [](const auto & s) {return s.getCharge() / s.getSize();});;
+  }
+
+  std::vector<const SpacePoint*> spacePoints;
+  result->walk([&](const auto * walkState) {
+    const SpacePoint* sp = walkState->getHit();
+    if (sp) {
+      spacePoints.push_back(sp);
+    }
+  });
+
+  if (spacePoints.size() >= 3) {
+    var<named("quality_index_triplet")>() = m_qualityTriplet.estimateQuality(spacePoints);
+    var<named("quality_index_circle")>() = m_qualityCircle.estimateQuality(spacePoints);
+    var<named("quality_index_helix")>() = m_qualityHelix.estimateQuality(spacePoints);
+  } else {
+    var<named("quality_index_triplet")>() = 0;
+    var<named("quality_index_circle")>() = 0;
+    var<named("quality_index_helix")>() = 0;
   }
 
   return true;

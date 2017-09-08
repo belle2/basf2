@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/utilities/Common.h>
 #include <tracking/trackFindingCDC/utilities/Functional.h>
 
 namespace Belle2 {

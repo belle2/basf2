@@ -10,7 +10,10 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/topology/EStereoKind.h>
+
+#include <tracking/trackFindingCDC/utilities/Common.h>
 #include <tracking/trackFindingCDC/utilities/Functional.h>
+
 #include <utility>
 #include <climits>
 

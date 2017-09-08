@@ -12,6 +12,8 @@
 
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
+#include <tracking/trackFindingCDC/utilities/Common.h>
+
 #include <cdc/geometry/CDCGeometryPar.h>
 
 using namespace Belle2;

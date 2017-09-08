@@ -46,8 +46,8 @@ TOPInterimFENtupleModule::TOPInterimFENtupleModule() : HistoModule()
   addParam("useDoublePulse", m_useDoublePulse,
            "set true when you require both of double calibration pulses for reference timing. You need to enable offline feature extraction.",
            (bool)true);
-  //  addParam("averageSamplingRate", m_averageSamplingRate, "sampling rate with assumption of uniform interval in a unit of GHz",
-  //           (float)2.71394);
+  addParam("averageSamplingRate", m_averageSamplingRate, "sampling rate with assumption of uniform interval in a unit of GHz",
+           (float)2.71394);
   addParam("minHeightFirstCalPulse", m_calibrationPulseThreshold1, "pulse height threshold for the first cal. pulse",
            (float)600.);
   addParam("minHeightSecondCalPulse", m_calibrationPulseThreshold1, "pulse height threshold for the second cal. pulse",
@@ -88,7 +88,6 @@ void TOPInterimFENtupleModule::defineHisto()
   m_tree->Branch("isCalCh", m_isCalCh, "isCalCh[nHit]/O");
   m_tree->Branch("eventNum", m_eventNum, "eventNum[nHit]/i");
   m_tree->Branch("winNum", m_winNum, "winNum[nHit]/S");
-  m_tree->Branch("trigWinNum", m_trigWinNum, "trigWinNum[nHit]/S");
   m_tree->Branch("windowsInOrder", m_windowsInOrder, "windowsInOrder[nHit]/O");
   m_tree->Branch("hitQuality", m_hitQuality, "hitQuality[nHit]/b");
   m_tree->Branch("time", m_time, "time[nHit]/F");
@@ -132,7 +131,7 @@ void TOPInterimFENtupleModule::event()
   StoreArray<TOPDigit> digits;
 
   std::map<short, short> nHitOfflineFEMap;
-  //std::map<short, int> windowNumListMap;
+  std::map<short, int> windowNumListMap;
   static std::set<short> noisyChannelBlackListSet;
   UInt_t EventNum = EventMetaDataPtr->getEvent();
   m_eventErrorFlag = EventMetaDataPtr->getErrorFlag();
@@ -177,7 +176,6 @@ void TOPInterimFENtupleModule::event()
 
     const auto* rawDigit = digit.getRelated<TOPRawDigit>();
     if (rawDigit) {
-      m_trigWinNum[m_nHit] = (short)rawDigit->getLastWriteAddr();
       m_windowsInOrder[m_nHit] = rawDigit->areWindowsInOrder();
       if (rawDigit->isPedestalJump()) m_isReallyJunk[m_nHit] = true;
       const auto* waveform = rawDigit->getRelated<TOPRawWaveform>();
@@ -199,7 +197,7 @@ void TOPInterimFENtupleModule::event()
 
           //store window number
           int iWin = 0;
-          //windowNumListMap[globalChannelId] = m_nHit;
+          windowNumListMap[globalChannelId] = m_nHit;
           for (const auto& window : waveform->getStorageWindows()) {
             if (iWin < c_NWindow)
               m_winNumList[m_nHit][iWin] = window;
@@ -226,26 +224,25 @@ void TOPInterimFENtupleModule::event()
     short globalChannelId = m_pixelId[iHit] - 1 + (m_slotNum[iHit] - 1) * c_NPixelPerModule;
     m_nHitOfflineFE[iHit] = nHitOfflineFEMap[globalChannelId];
 
-    //now no need to correct discontinous window number as this is already considered in RawDigitConvertor
     //apply correction for discontinuous window number
-    //    short nWindowAdded = m_winNum[iHit];
-    //    if (!m_windowsInOrder[iHit]) {
-    //      if (windowNumListMap.count(globalChannelId) == 0)
-    //        B2WARNING("TOPInterimFENtuple : windoww are not in order, but waveform data is not found!!");
-    //      else {
-    //        short winNumInFE = TMath::FloorNint(m_rawTime[iHit]) / c_NSamplePerWindow;
-    //        int jHit = windowNumListMap[globalChannelId];
-    //        if (winNumInFE < 0 || winNumInFE >= c_NWindow
-    //            || m_winNumList[jHit][winNumInFE] < 0) m_hitQuality[iHit] += 50;
-    //
-    //        short nWindowCorrection = (m_winNumList[jHit][winNumInFE] - m_winNumList[jHit][0] - winNumInFE);
-    //        if (nWindowCorrection < 0) nWindowCorrection += c_NWindowRingBuffer;
-    //        nWindowAdded += nWindowCorrection;
-    //      }
-    //    }
-    //
-    //    m_time[iHit] += (nWindowAdded * c_NSamplePerWindow / m_averageSamplingRate);
-    //    m_sample[m_nHit] = TMath::FloorNint(m_rawTime[iHit] + nWindowAdded * c_NSamplePerWindow) % c_NSampleTBC;
+    short nWindowAdded = m_winNum[iHit];
+    if (!m_windowsInOrder[iHit]) {
+      if (windowNumListMap.count(globalChannelId) == 0)
+        B2WARNING("TOPInterimFENtuple : windoww are not in order, but waveform data is not found!!");
+      else {
+        short winNumInFE = TMath::FloorNint(m_rawTime[iHit]) / c_NSamplePerWindow;
+        int jHit = windowNumListMap[globalChannelId];
+        if (winNumInFE < 0 || winNumInFE >= c_NWindow
+            || m_winNumList[jHit][winNumInFE] < 0) m_hitQuality[iHit] += 50;
+
+        short nWindowCorrection = (m_winNumList[jHit][winNumInFE] - m_winNumList[jHit][0] - winNumInFE);
+        if (nWindowCorrection < 0) nWindowCorrection += c_NWindowRingBuffer;
+        nWindowAdded += nWindowCorrection;
+      }
+    }
+
+    m_time[iHit] += (nWindowAdded * c_NSamplePerWindow / m_averageSamplingRate);
+    m_sample[m_nHit] = TMath::FloorNint(m_rawTime[iHit] + nWindowAdded * c_NSamplePerWindow) % c_NSampleTBC;
   }//for(int iHit)
 
   StoreArray<TOPInterimFEInfo> infos;

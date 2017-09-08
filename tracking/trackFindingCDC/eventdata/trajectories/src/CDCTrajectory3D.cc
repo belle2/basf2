@@ -271,35 +271,13 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double bZ) 
   return true;
 }
 
-RecoTrack* CDCTrajectory3D::storeInto(StoreArray<RecoTrack>& recoTracks) const
-{
-  Vector3D position = getSupport();
-  return storeInto(recoTracks, CDCBFieldUtil::getBFieldZ(position));
-}
-
-RecoTrack* CDCTrajectory3D::storeInto(StoreArray<RecoTrack>& recoTracks, const double bZ) const
+CovarianceMatrix<6> CDCTrajectory3D::getCartesianCovariance(double bZ) const
 {
   // Set the start parameters
-  Vector3D position = getSupport();
   Vector3D momentum = bZ == 0 ? getFlightDirection3DAtSupport() : getMom3DAtSupport(bZ);
   ESign charge = getChargeSign();
-
-  // Do not propagate invalid fits, signal that the fit is invalid to the caller.
-  if (not ESignUtil::isValid(charge) or momentum.hasNAN() or position.hasNAN()) {
-    return nullptr;
-  }
-
-  RecoTrack* newRecoTrack = recoTracks.appendNew(position, momentum, charge);
-  if (std::isfinite(getFlightTime())) {
-    newRecoTrack->setTimeSeed(getFlightTime());
-  }
-
-  const CovarianceMatrix<6>& cov6 = calculateCovarianceMatrix(getLocalHelix(), momentum, charge, bZ);
-  TMatrixDSym covSeed = TMatrixConversion::toTMatrix(cov6);
-  newRecoTrack->setSeedCovariance(covSeed);
-  return newRecoTrack;
+  return calculateCovarianceMatrix(getLocalHelix(), momentum, charge, bZ);
 }
-
 
 bool CDCTrajectory3D::isCurler(double factor) const
 {

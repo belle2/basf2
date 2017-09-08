@@ -18,8 +18,6 @@
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
-#include <framework/datastore/StoreArray.h>
-
 #include <TMath.h>
 #include <cmath>
 
@@ -119,11 +117,8 @@ namespace Belle2 {
       /// Copies the trajectory information to the Genfit track candidate
       bool fillInto(genfit::TrackCand& gfTrackCand, double bZ) const;
 
-      /// Copies the trajectory information to the RecoTrack
-      RecoTrack* storeInto(StoreArray<RecoTrack>& recoTracks) const;
-
-      /// Copies the trajectory information to the RecoTrack
-      RecoTrack* storeInto(StoreArray<RecoTrack>& recoTracks, double bZ) const;
+      /// Convert the helix parameters to the cartesian coordinates x,y,z,px,py,pz
+      CovarianceMatrix<6> getCartesianCovariance(double bZ) const;
 
     public:
       /// Reverses the trajectory in place.

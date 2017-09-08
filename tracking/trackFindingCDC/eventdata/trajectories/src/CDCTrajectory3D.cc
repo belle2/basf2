@@ -10,22 +10,23 @@
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
-#include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
+
+#include <tracking/trackFindingCDC/numerics/TMatrixConversion.h>
 
 #include <genfit/TrackCand.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/MCParticle.h>
 
+#include <TMatrixDSym.h>
+
 #include <cmath>
-#include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,
                                  const CDCTrajectorySZ& trajectorySZ) :
@@ -98,7 +99,7 @@ CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const dou
   const int iPz = 5;
 
   const TMatrixDSym& seedCov = gfTrackCand.getCovSeed();
-  CovarianceMatrix<6> cov6 = CovarianceMatrixUtil::fromTMatrix<6>(seedCov);
+  CovarianceMatrix<6> cov6 = TMatrixConversion::fromTMatrix<6>(seedCov);
 
   // 1. Rotate to a system where phi0 = 0
   JacobianMatrix<6, 6> jacobianRot = JacobianMatrixUtil::zero<6, 6>();
@@ -263,7 +264,7 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double bZ) 
   gfTrackCand.setPosMomSeed(position, momentum, charge);
 
   const CovarianceMatrix<6> cov6 = calculateCovarianceMatrix(getLocalHelix(), momentum, charge, bZ);
-  TMatrixDSym covSeed = CovarianceMatrixUtil::toTMatrix(cov6);
+  TMatrixDSym covSeed = TMatrixConversion::toTMatrix(cov6);
 
   gfTrackCand.setCovSeed(covSeed);
 
@@ -294,7 +295,7 @@ RecoTrack* CDCTrajectory3D::storeInto(StoreArray<RecoTrack>& recoTracks, const d
   }
 
   const CovarianceMatrix<6>& cov6 = calculateCovarianceMatrix(getLocalHelix(), momentum, charge, bZ);
-  TMatrixDSym covSeed = CovarianceMatrixUtil::toTMatrix(cov6);
+  TMatrixDSym covSeed = TMatrixConversion::toTMatrix(cov6);
   newRecoTrack->setSeedCovariance(covSeed);
   return newRecoTrack;
 }

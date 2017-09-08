@@ -12,6 +12,8 @@
 
 #include <genfit/TrackCand.h>
 
+#include <TMatrixDSym.h>
+
 #include <boost/range/irange.hpp>
 
 #include <gtest/gtest.h>

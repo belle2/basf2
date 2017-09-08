@@ -18,6 +18,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/ModuleParamList.h>
 
+#include <TMatrixDSym.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

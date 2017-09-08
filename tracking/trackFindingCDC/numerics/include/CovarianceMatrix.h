@@ -14,7 +14,6 @@
 #include <tracking/trackFindingCDC/numerics/PrecisionMatrix.h>
 
 #include <Eigen/Dense>
-#include <TMatrixDSym.h>
 
 namespace Belle2 {
 
@@ -32,37 +31,6 @@ namespace Belle2 {
       static CovarianceMatrix<N> identity()
       {
         return CovarianceMatrix<N>::Identity();
-      }
-
-      /// Create a covariance matrix from a TMatrix representation
-      template <int N>
-      static CovarianceMatrix<N> fromTMatrix(const TMatrixDSym& tCov)
-      {
-        assert(tCov.GetNrows() == N);
-        assert(tCov.GetNcols() == N);
-        assert(tCov.GetRowLwb() == 0);
-        assert(tCov.GetColLwb() == 0);
-
-        CovarianceMatrix<N> result;
-        for (int i = 0; i < N; ++i) {
-          for (int j = 0; j < N; ++j) {
-            result(i, j) = tCov(i, j);
-          }
-        }
-        return result;
-      }
-
-      /// Translate the covariance matrix to the TMatrix representation
-      template <int N>
-      static TMatrixDSym toTMatrix(const CovarianceMatrix<N>& cov)
-      {
-        TMatrixDSym result(N);
-        for (int i = 0; i < N; ++i) {
-          for (int j = 0; j < N; ++j) {
-            result(i, j) = cov(i, j);
-          }
-        }
-        return result;
       }
 
       /// Transport the covariance matrix inplace with the given jacobian matrix

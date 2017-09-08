@@ -44,6 +44,8 @@
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
+#include <TMatrixDSym.h>
+
 #include <cmath>
 #include <exception>
 

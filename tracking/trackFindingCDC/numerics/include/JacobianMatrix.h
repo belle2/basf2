@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/numerics/ParameterVector.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <Eigen/Dense>
+#include <Eigen/Core>
 
 namespace Belle2 {
 

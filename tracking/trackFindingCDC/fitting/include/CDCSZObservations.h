@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/fitting/EFitVariance.h>
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 
 #include <vector>
 

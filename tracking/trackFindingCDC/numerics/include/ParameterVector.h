@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 
 namespace Belle2 {
 

@@ -14,6 +14,9 @@
 #include <framework/logging/Logger.h>
 
 #include <boost/math/tools/precision.hpp>
+
+#include <Eigen/Dense>
+
 #include <cmath>
 
 using namespace boost::math;

@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
-#include <Eigen/Dense>
+#include <Eigen/Core>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

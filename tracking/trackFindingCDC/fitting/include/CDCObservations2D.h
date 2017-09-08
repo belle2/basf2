@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/fitting/EFitPos.h>
 #include <tracking/trackFindingCDC/fitting/EFitVariance.h>
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <iterator>
 
 namespace Belle2 {

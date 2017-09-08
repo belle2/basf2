@@ -14,6 +14,8 @@
 #include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackFindingCDC/numerics/Angle.h>
 
+#include <Eigen/Dense>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

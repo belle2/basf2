@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/numerics/ParameterVector.h>
 #include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 
 namespace Belle2 {
 

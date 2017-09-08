@@ -68,6 +68,9 @@ namespace Belle2 {
 
   private:
 
+    //! run number
+    int  m_run;
+
     //! number of validated ExtHit in BKLM in one event
     int  m_nExtHit;
 

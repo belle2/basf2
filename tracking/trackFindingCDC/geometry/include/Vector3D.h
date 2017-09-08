@@ -14,7 +14,6 @@
 
 #include <iosfwd>
 #include <cmath>
-#include <iostream>
 
 class TVector3;
 
@@ -144,19 +143,8 @@ namespace Belle2 {
         return std::isnan(x()) or std::isnan(y()) or std::isnan(z());
       }
 
-      /// Output operator for debugging
-      friend std::ostream& operator<<(std::ostream& output, const Vector3D& vector)
-      {
-        return output << "Vector3D(" << vector.x() << "," << vector.y() << "," << vector.z() << ")";
-      }
-
       /// Output operator for python
-      std::string __str__() const
-      {
-        std::stringstream sstream;
-        sstream << *this;
-        return sstream.str();
-      }
+      std::string __str__() const;
 
       /// Calculates the three dimensional dot product.
       double dot(const Vector3D& rhs) const
@@ -560,8 +548,9 @@ namespace Belle2 {
 
       /// Memory for the third coordinate
       double m_z;
-
     };
 
+    /// Output operator for debugging
+    std::ostream& operator<<(std::ostream& output, const Vector3D& vector3D);
   }
 }

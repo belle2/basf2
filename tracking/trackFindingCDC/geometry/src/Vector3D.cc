@@ -11,6 +11,9 @@
 
 #include <TVector3.h>
 
+#include <sstream>
+#include <iostream>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -33,3 +36,14 @@ Vector3D::operator const TVector3() const
   return TVector3(x(), y(), z());
 }
 
+std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const Vector3D& vector3D)
+{
+  return output << "Vector3D(" << vector3D.x() << "," << vector3D.y() << "," << vector3D.z() << ")";
+}
+
+std::string Vector3D::__str__() const
+{
+  std::stringstream sstream;
+  sstream << *this;
+  return sstream.str();
+}

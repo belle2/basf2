@@ -14,6 +14,8 @@
 #include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
 #include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
+#include <iosfwd>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -108,13 +110,6 @@ namespace Belle2 {
       {
         return Line2D(distanceToOrigin(), normal().unit());
       } // not optimal yet. tangential.norm() is getting calculated two times.
-
-      /// Output operate helping debugging.
-      friend std::ostream& operator<<(std::ostream& output, const ParameterLine2D& line)
-      {
-        output << "ParameterLine2D(" << line.support() << "," << line.tangential() << ")";
-        return output;
-      }
 
     public:
       /// Gives the tangential vector of the line.
@@ -431,7 +426,9 @@ namespace Belle2 {
 
       /// Tangential vector of the line
       Vector2D m_tangential;
-
     };
+
+    /// Output operate helping debugging.
+    std::ostream& operator<<(std::ostream& output, const ParameterLine2D& line);
   }
 }

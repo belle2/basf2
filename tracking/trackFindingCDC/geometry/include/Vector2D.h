@@ -18,14 +18,11 @@
 
 #include <iosfwd>
 #include <cmath>
-#include <iostream>
-#include <sstream>
 
 class TVector2;
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
     /**
      * A two dimensional vector which is equipped with functions for correct handeling \n
      * of orientation related issues in addition to the expected vector methods. \n
@@ -162,20 +159,8 @@ namespace Belle2 {
         return std::isnan(x()) or std::isnan(y());
       }
 
-      /// Output operator for debugging
-      friend std::ostream& operator<<(std::ostream& output, const Vector2D& vector)
-      {
-        output << "Vector2D(" << vector.x() << "," << vector.y() << ")";
-        return output;
-      }
-
       /// Output operator for python
-      std::string __str__() const
-      {
-        std::stringstream sstream;
-        sstream << *this;
-        return sstream.str();
-      }
+      std::string __str__() const;
 
       /// Calculates the two dimensional dot product.
       double dot(const Vector2D& rhs) const
@@ -688,8 +673,9 @@ namespace Belle2 {
 
       /// Memory for the second coordinate
       double m_y;
-
     };
 
+    /// Output operator for debugging
+    std::ostream& operator<<(std::ostream& output, const Vector2D& vector2D);
   }
 }

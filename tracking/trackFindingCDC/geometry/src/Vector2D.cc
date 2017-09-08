@@ -11,6 +11,9 @@
 
 #include <TVector2.h>
 
+#include <sstream>
+#include <iostream>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -30,4 +33,17 @@ Vector2D& Vector2D::operator=(const TVector2& tVector2)
 Vector2D::operator const TVector2()
 {
   return TVector2(x(), y());
+}
+
+std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const Vector2D& vector2D)
+{
+  output << "Vector2D(" << vector2D.x() << "," << vector2D.y() << ")";
+  return output;
+}
+
+std::string Vector2D::__str__() const
+{
+  std::stringstream sstream;
+  sstream << *this;
+  return sstream.str();
 }

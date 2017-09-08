@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
+#include <iosfwd>
 #include <cmath>
 
 namespace Belle2 {
@@ -669,19 +670,6 @@ namespace Belle2 {
        */
       Vector2D atArcLength(double arcLength) const;
 
-    public:
-      /// Debug helper
-      friend std::ostream& operator<<(std::ostream& output, const GeneralizedCircle& circle)
-      {
-        if (circle.isLine()) {
-          output << "Line support point = " << circle.perigee();
-          return output;
-        } else {
-          output << "CircleCenter = " << circle.center() << ", Radius = " << circle.absRadius();
-          return output;
-        }
-      }
-
     private:
       // Order of this parameters make them easier to initialize
 
@@ -693,8 +681,9 @@ namespace Belle2 {
 
       /// Memory for the first parameter
       double m_n0;
-
     };
 
+    /// Debug helper
+    std::ostream& operator<<(std::ostream& output, const GeneralizedCircle& circle);
   }
 }

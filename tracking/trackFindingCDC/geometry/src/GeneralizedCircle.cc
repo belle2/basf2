@@ -11,6 +11,8 @@
 #include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
 #include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
 #include <tracking/trackFindingCDC/numerics/Quadratic.h>
+
+#include <iostream>
 #include <cmath>
 
 using namespace Belle2;
@@ -351,4 +353,15 @@ Vector2D GeneralizedCircle::atArcLength(const double arcLength) const
   double atX = arcLength * sinc_pi(chiHalf) * sin(chiHalf) + impact();
   double atY = -arcLength * sinc_pi(chi);
   return Vector2D::compose(-n12().unit(), atX, atY);
+}
+
+std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const GeneralizedCircle& circle)
+{
+  if (circle.isLine()) {
+    output << "Line support point = " << circle.perigee();
+    return output;
+  } else {
+    output << "CircleCenter = " << circle.center() << ", Radius = " << circle.absRadius();
+    return output;
+  }
 }

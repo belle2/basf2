@@ -30,13 +30,13 @@ std::unique_ptr<BaseVarSet<const CDCFacet> >
 UnionRecordingFacetFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {
-    return std::make_unique<BasicFacetVarSet>();
+    return makeUnique<BasicFacetVarSet>();
   } else if (name == "fitless") {
-    return std::make_unique<FitlessFacetVarSet>();
+    return makeUnique<FitlessFacetVarSet>();
   } else if (name == "bend") {
-    return std::make_unique<BendFacetVarSet>();
+    return makeUnique<BendFacetVarSet>();
   } else if (name == "fit") {
-    return std::make_unique<FitFacetVarSet>();
+    return makeUnique<FitFacetVarSet>();
   } else if (name == "mva") {
     MVAFacetFilter mvaFacetFilter;
     return std::move(mvaFacetFilter).releaseVarSet();

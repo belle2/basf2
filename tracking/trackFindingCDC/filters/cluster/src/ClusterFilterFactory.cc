@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/filters/cluster/UnionRecordingClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/cluster/MVABackgroundClusterFilter.h>
 
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -46,11 +47,11 @@ std::unique_ptr<Filter<CDCWireHitCluster> >
 ClusterFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "all") {
-    return std::make_unique<AllClusterFilter>();
+    return makeUnique<AllClusterFilter>();
   } else if (filterName == "unionrecording") {
-    return std::make_unique<UnionRecordingClusterFilter>();
+    return makeUnique<UnionRecordingClusterFilter>();
   } else if (filterName == "mva_bkg") {
-    return std::make_unique<MVABackgroundClusterFilter>();
+    return makeUnique<MVABackgroundClusterFilter>();
   } else {
     return Super::create(filterName);
   }

@@ -21,6 +21,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
 
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -60,27 +61,27 @@ std::map<std::string, std::string> FacetFilterFactory::getValidFilterNamesAndDes
 std::unique_ptr<BaseFacetFilter> FacetFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::make_unique<NoneFilter<BaseFacetFilter>>();
+    return makeUnique<NoneFilter<BaseFacetFilter>>();
   } else if (filterName == "all") {
-    return std::make_unique<AllFacetFilter>();
+    return makeUnique<AllFacetFilter>();
   } else if (filterName == "truth") {
-    return std::make_unique<MCFacetFilter>();
+    return makeUnique<MCFacetFilter>();
   } else if (filterName == "feasible") {
-    return std::make_unique<FeasibleRLFacetFilter>();
+    return makeUnique<FeasibleRLFacetFilter>();
   } else if (filterName == "simple") {
-    return std::make_unique<SimpleFacetFilter>();
+    return makeUnique<SimpleFacetFilter>();
   } else if (filterName == "realistic") {
-    return std::make_unique<RealisticFacetFilter>();
+    return makeUnique<RealisticFacetFilter>();
   } else if (filterName == "realistic_loss") {
-    return std::make_unique<RealisticFacetFilter>(25);
+    return makeUnique<RealisticFacetFilter>(25);
   } else if (filterName == "chi2") {
-    return std::make_unique<Chi2FacetFilter>();
+    return makeUnique<Chi2FacetFilter>();
   } else if (filterName == "chi2_old") {
-    return std::make_unique<Chi2FacetFilter>(75.0, 120.0);
+    return makeUnique<Chi2FacetFilter>(75.0, 120.0);
   } else if (filterName == "unionrecording") {
-    return std::make_unique<UnionRecordingFacetFilter>();
+    return makeUnique<UnionRecordingFacetFilter>();
   } else if (filterName == "mva") {
-    return std::make_unique<MVAFacetFilter>();
+    return makeUnique<MVAFacetFilter>();
   } else {
     return Super::create(filterName);
   }

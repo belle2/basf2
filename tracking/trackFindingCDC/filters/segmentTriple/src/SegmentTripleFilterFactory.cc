@@ -16,6 +16,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
 
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -50,13 +51,13 @@ std::unique_ptr<Filter<CDCSegmentTriple> >
 SegmentTripleFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::make_unique<NoneFilter<BaseSegmentTripleFilter>>();
+    return makeUnique<NoneFilter<BaseSegmentTripleFilter>>();
   } else if (filterName == "all") {
-    return std::make_unique<AllSegmentTripleFilter>();
+    return makeUnique<AllSegmentTripleFilter>();
   } else if (filterName == "truth") {
-    return std::make_unique<MCSegmentTripleFilter>();
+    return makeUnique<MCSegmentTripleFilter>();
   } else if (filterName == "simple") {
-    return std::make_unique<SimpleSegmentTripleFilter>();
+    return makeUnique<SimpleSegmentTripleFilter>();
   } else {
     return Super::create(filterName);
   }

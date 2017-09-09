@@ -7,13 +7,23 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/segmentPairRelation/MVARealisticSegmentPairRelationFilter.h>
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+#pragma once
 
-using namespace Belle2;
-using namespace TrackFindingCDC;
+#include <memory>
 
-MVARealisticSegmentPairRelationFilter::MVARealisticSegmentPairRelationFilter()
-  : Super(makeUnique<VarSet>(), "tracking/data/trackfindingcdc_RealisticSegmentPairRelationFilter.xml", 0.22)
-{
+namespace Belle2 {
+  namespace TrackFindingCDC {
+
+    /**
+     * Transitional constructed to be replaced when the real thing becomes avaible.
+     *
+     * FIXME: Replace me with std::make_unique
+     */
+    template<typename T, typename... Args>
+    std::unique_ptr<T> makeUnique(Args&& ... args)
+    {
+      return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+    }
+
+  }
 }

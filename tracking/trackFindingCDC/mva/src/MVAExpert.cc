@@ -9,6 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/mva/MVAExpert.h>
 
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <mva/interface/Interface.h>
 
@@ -34,7 +35,7 @@ void MVAExpert::initialize()
       not(boost::ends_with(m_identifier, ".root") or
           boost::ends_with(m_identifier, ".xml"))) {
     using DBWeightFileRepresentation = DBObjPtr<DatabaseRepresentationOfWeightfile>;
-    m_weightfileRepresentation = std::make_unique<DBWeightFileRepresentation>(m_identifier);
+    m_weightfileRepresentation = makeUnique<DBWeightFileRepresentation>(m_identifier);
   }
 }
 
@@ -79,7 +80,7 @@ void MVAExpert::beginRun()
 
     std::vector<float> dummy;
     dummy.resize(m_selectedNamedVariables.size(), 0);
-    m_dataset = std::make_unique<MVA::SingleDataset>(generalOptions, std::move(dummy), 0);
+    m_dataset = makeUnique<MVA::SingleDataset>(generalOptions, std::move(dummy), 0);
   } else {
     B2ERROR("Could not find weight file for identifier " << m_identifier);
   }
@@ -89,10 +90,10 @@ std::unique_ptr<MVA::Weightfile> MVAExpert::getWeightFile()
 {
   if (m_weightfileRepresentation) {
     std::stringstream ss((*m_weightfileRepresentation)->m_data);
-    return std::make_unique<MVA::Weightfile>(MVA::Weightfile::loadFromStream(ss));
+    return makeUnique<MVA::Weightfile>(MVA::Weightfile::loadFromStream(ss));
   } else {
     std::string weightFilePath = FileSystem::findFile(m_identifier);
-    return std::make_unique<MVA::Weightfile>(MVA::Weightfile::loadFromFile(weightFilePath));
+    return makeUnique<MVA::Weightfile>(MVA::Weightfile::loadFromFile(weightFilePath));
   }
 }
 

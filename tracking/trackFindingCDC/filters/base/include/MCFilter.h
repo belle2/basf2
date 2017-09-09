@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -27,7 +28,7 @@ namespace Belle2 {
 
     public:
       /// Constructor.
-      MCFilter() : Super(std::make_unique<ATruthVarSet>())
+      MCFilter() : Super(makeUnique<ATruthVarSet>())
       {
       }
 

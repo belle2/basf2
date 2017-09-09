@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 #include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <framework/core/ModuleParamList.h>
 #include <memory>
@@ -136,13 +137,13 @@ namespace Belle2 {
     public:
       /// Constructor of the chooseable filter taking the default filter name and parameters
       ChooseableFilter()
-        : Super(std::make_unique<AFilterFactory>())
+        : Super(makeUnique<AFilterFactory>())
       {
       }
 
       /// Constructor of the chooseable filter taking the default filter name and parameters
       ChooseableFilter(const std::string& filterName)
-        : Super(std::make_unique<AFilterFactory>(), filterName)
+        : Super(makeUnique<AFilterFactory>(), filterName)
       {
       }
     };

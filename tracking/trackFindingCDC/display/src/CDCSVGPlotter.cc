@@ -30,6 +30,7 @@
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -100,7 +101,7 @@ const AttributeMap c_defaultSVGAttributes({
 
 CDCSVGPlotter::CDCSVGPlotter(bool animate, bool forwardFade)
   : m_animate(animate)
-  , m_eventdataPlotter(std::make_unique<SVGPrimitivePlotter>(c_defaultSVGAttributes), animate, forwardFade)
+  , m_eventdataPlotter(makeUnique<SVGPrimitivePlotter>(c_defaultSVGAttributes), animate, forwardFade)
 {
   int top = -112;
   int left = -112;

@@ -65,15 +65,15 @@ std::unique_ptr<BaseSegmentFilter>
 SegmentFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::make_unique<NoneSegmentFilter>();
+    return makeUnique<NoneSegmentFilter>();
   } else if (filterName == "all") {
-    return std::make_unique<AllSegmentFilter>();
+    return makeUnique<AllSegmentFilter>();
   } else if (filterName == "bkg_truth") {
-    return std::make_unique<BkgMCSegmentFilter>();
+    return makeUnique<BkgMCSegmentFilter>();
   } else if (filterName == "bkg_recording") {
-    return std::make_unique<BkgRecordingSegmentFilter>("BackgroundSegmentFilter.root");
+    return makeUnique<BkgRecordingSegmentFilter>("BackgroundSegmentFilter.root");
   } else if (filterName == "bkg_mva") {
-    return std::make_unique<BkgMVASegmentFilter>("tracking/data/trackfindingcdc_BackgroundSegmentFilter.xml");
+    return makeUnique<BkgMVASegmentFilter>("tracking/data/trackfindingcdc_BackgroundSegmentFilter.xml");
   } else {
     return Super::create(filterName);
   }

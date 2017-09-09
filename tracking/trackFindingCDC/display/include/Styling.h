@@ -16,6 +16,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <cdc/dataobjects/CDCHit.h>
 
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <map>
 #include <sstream>
@@ -134,7 +135,7 @@ namespace Belle2 {
        */
       virtual std::unique_ptr<ObjectMapping> createMapping(const std::string& mappingName)
       {
-        return std::make_unique<ConstantMapping<AObject>>(mappingName);
+        return makeUnique<ConstantMapping<AObject>>(mappingName);
       }
 
       /// Sets the given attribute to the attribute mapping
@@ -186,7 +187,7 @@ namespace Belle2 {
       /// Constructor. Sets the stroke mapping the the default color cycle.
       DefaultColorCycleStyling() : ChooseableStyling<AObject>()
       {
-        this->set("stroke", std::make_unique<DefaultColorCycleMapping<AObject>>());
+        this->set("stroke", makeUnique<DefaultColorCycleMapping<AObject>>());
       }
     };
 

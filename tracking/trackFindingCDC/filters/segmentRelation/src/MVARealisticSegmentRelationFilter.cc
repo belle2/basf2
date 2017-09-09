@@ -8,12 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentRelation/MVARealisticSegmentRelationFilter.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 MVARealisticSegmentRelationFilter::MVARealisticSegmentRelationFilter()
-  : Super(std::make_unique<VarSet>(),
+  : Super(makeUnique<VarSet>(),
           "tracking/data/trackfindingcdc_RealisticSegmentRelationFilter.xml",
           0.805)
 {

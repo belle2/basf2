@@ -20,6 +20,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
 
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -58,21 +59,21 @@ std::unique_ptr<Filter<CDCSegmentPair> >
 SegmentPairFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::make_unique<NoneFilter<BaseSegmentPairFilter>>();
+    return makeUnique<NoneFilter<BaseSegmentPairFilter>>();
   } else if (filterName == "all") {
-    return std::make_unique<AllSegmentPairFilter>();
+    return makeUnique<AllSegmentPairFilter>();
   } else if (filterName == "truth") {
-    return std::make_unique<MCSegmentPairFilter>();
+    return makeUnique<MCSegmentPairFilter>();
   } else if (filterName == "fitless") {
-    return std::make_unique<FitlessSegmentPairFilter>();
+    return makeUnique<FitlessSegmentPairFilter>();
   } else if (filterName == "simple") {
-    return std::make_unique<SimpleSegmentPairFilter>();
+    return makeUnique<SimpleSegmentPairFilter>();
   } else if (filterName == "unionrecording") {
-    return std::make_unique<UnionRecordingSegmentPairFilter>();
+    return makeUnique<UnionRecordingSegmentPairFilter>();
   } else if (filterName == "feasible") {
-    return std::make_unique<MVAFeasibleSegmentPairFilter>();
+    return makeUnique<MVAFeasibleSegmentPairFilter>();
   } else if (filterName == "realistic") {
-    return std::make_unique<MVARealisticSegmentPairFilter>();
+    return makeUnique<MVARealisticSegmentPairFilter>();
   } else {
     return Super::create(filterName);
   }

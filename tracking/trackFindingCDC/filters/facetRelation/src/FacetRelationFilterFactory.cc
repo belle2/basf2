@@ -19,6 +19,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
 
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -57,21 +58,21 @@ std::unique_ptr<BaseFacetRelationFilter >
 FacetRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::make_unique<NoneFilter<BaseFacetRelationFilter>>();
+    return makeUnique<NoneFilter<BaseFacetRelationFilter>>();
   } else if (filterName == "all") {
-    return std::make_unique<AllFacetRelationFilter>();
+    return makeUnique<AllFacetRelationFilter>();
   } else if (filterName == "truth") {
-    return std::make_unique<MCFacetRelationFilter>();
+    return makeUnique<MCFacetRelationFilter>();
   } else if (filterName == "simple") {
-    return std::make_unique<SimpleFacetRelationFilter>();
+    return makeUnique<SimpleFacetRelationFilter>();
   } else if (filterName == "chi2") {
-    return std::make_unique<Chi2FacetRelationFilter>();
+    return makeUnique<Chi2FacetRelationFilter>();
   } else if (filterName == "chi2_old") {
-    return std::make_unique<Chi2FacetRelationFilter>(130.0, 200.0);
+    return makeUnique<Chi2FacetRelationFilter>(130.0, 200.0);
   } else if (filterName == "unionrecording") {
-    return std::make_unique<UnionRecordingFacetRelationFilter>();
+    return makeUnique<UnionRecordingFacetRelationFilter>();
   } else if (filterName == "mva") {
-    return std::make_unique<MVAFacetRelationFilter>();
+    return makeUnique<MVAFacetRelationFilter>();
   } else {
     return Super::create(filterName);
   }

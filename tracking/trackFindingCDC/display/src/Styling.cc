@@ -21,11 +21,11 @@ std::unique_ptr<ChooseableRecoTrackStyling::ObjectMapping>
 ChooseableRecoTrackStyling::createMapping(const std::string& mappingName)
 {
   if (mappingName == "ListColors") {
-    return std::make_unique<RecoTrackListColorsColorMap>();
+    return makeUnique<RecoTrackListColorsColorMap>();
   } else if (mappingName == "MatchingStatus") {
-    return std::make_unique<RecoTrackMatchingStatusColorMap>();
+    return makeUnique<RecoTrackMatchingStatusColorMap>();
   } else if (mappingName == "MCMatchingStatus") {
-    return std::make_unique<MCRecoTrackMatchingStatusColorMap>();
+    return makeUnique<MCRecoTrackMatchingStatusColorMap>();
   } else {
     return Super::createMapping(mappingName);
   }
@@ -35,19 +35,19 @@ std::unique_ptr<ChooseableSegmentStyling::ObjectMapping>
 ChooseableSegmentStyling::createMapping(const std::string& mappingName)
 {
   if (mappingName == "SegmentMCTrackIdColorMap") {
-    return std::make_unique<SegmentMCTrackIdColorMap>();
+    return makeUnique<SegmentMCTrackIdColorMap>();
   } else if (mappingName == "SegmentFBInfoColorMap") {
-    return std::make_unique<SegmentFBInfoColorMap>();
+    return makeUnique<SegmentFBInfoColorMap>();
   } else if (mappingName == "SegmentFirstInTrackIdColorMap") {
-    return std::make_unique<SegmentFirstInTrackIdColorMap>();
+    return makeUnique<SegmentFirstInTrackIdColorMap>();
   } else if (mappingName == "SegmentLastInTrackIdColorMap") {
-    return std::make_unique<SegmentLastInTrackIdColorMap>();
+    return makeUnique<SegmentLastInTrackIdColorMap>();
   } else if (mappingName == "SegmentFirstNPassedSuperLayersColorMap") {
-    return std::make_unique<SegmentFirstNPassedSuperLayersColorMap>();
+    return makeUnique<SegmentFirstNPassedSuperLayersColorMap>();
   } else if (mappingName == "SegmentLastNPassedSuperLayersColorMap") {
-    return std::make_unique<SegmentLastNPassedSuperLayersColorMap>();
+    return makeUnique<SegmentLastNPassedSuperLayersColorMap>();
   } else if (mappingName == "ListColors") {
-    return std::make_unique<SegmentListColorsColorMap>();
+    return makeUnique<SegmentListColorsColorMap>();
   } else {
     return Super::createMapping(mappingName);
   }
@@ -57,35 +57,35 @@ std::unique_ptr<ChooseableHitStyling::ObjectMapping>
 ChooseableHitStyling::createMapping(const std::string& mappingName)
 {
   if (mappingName == "ZeroDriftLengthColorMap") {
-    return std::make_unique<ZeroDriftLengthColorMap>();
+    return makeUnique<ZeroDriftLengthColorMap>();
   } else if (mappingName == "ZeroDriftLengthStrokeWidthMap") {
-    return std::make_unique<ZeroDriftLengthStrokeWidthMap>();
+    return makeUnique<ZeroDriftLengthStrokeWidthMap>();
   } else if (mappingName == "TakenFlagColorMap") {
-    return std::make_unique<TakenFlagColorMap>();
+    return makeUnique<TakenFlagColorMap>();
   } else if (mappingName == "RLColorMap") {
-    return std::make_unique<RLColorMap>();
+    return makeUnique<RLColorMap>();
   } else if (mappingName == "PosFlagColorMap") {
-    return std::make_unique<PosFlagColorMap>();
+    return makeUnique<PosFlagColorMap>();
   } else if (mappingName == "BackgroundTagColorMap") {
-    return std::make_unique<BackgroundTagColorMap>();
+    return makeUnique<BackgroundTagColorMap>();
   } else if (mappingName == "MCSegmentIdColorMap") {
-    return std::make_unique<MCSegmentIdColorMap>();
+    return makeUnique<MCSegmentIdColorMap>();
   } else if (mappingName == "TOFColorMap") {
-    return std::make_unique<TOFColorMap>();
+    return makeUnique<TOFColorMap>();
   } else if (mappingName == "ReassignedSecondaryMap") {
-    return std::make_unique<ReassignedSecondaryMap>();
+    return makeUnique<ReassignedSecondaryMap>();
   } else if (mappingName == "MCParticleColorMap") {
-    return std::make_unique<MCParticleColorMap>();
+    return makeUnique<MCParticleColorMap>();
   } else if (mappingName == "MCPDGCodeColorMap") {
-    return std::make_unique<MCPDGCodeColorMap>();
+    return makeUnique<MCPDGCodeColorMap>();
   } else if (mappingName == "MCPrimaryColorMap") {
-    return std::make_unique<MCPrimaryColorMap>();
+    return makeUnique<MCPrimaryColorMap>();
   } else if (mappingName == "SimHitPDGCodeColorMap") {
-    return std::make_unique<SimHitPDGCodeColorMap>();
+    return makeUnique<SimHitPDGCodeColorMap>();
   } else if (mappingName == "SimHitIsBkgColorMap") {
-    return std::make_unique<SimHitIsBkgColorMap>();
+    return makeUnique<SimHitIsBkgColorMap>();
   } else if (mappingName == "NLoops") {
-    return std::make_unique<NLoopsColorMap>();
+    return makeUnique<NLoopsColorMap>();
   } else {
     return Super::createMapping(mappingName);
   }

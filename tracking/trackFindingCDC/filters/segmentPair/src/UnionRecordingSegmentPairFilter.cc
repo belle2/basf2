@@ -48,28 +48,28 @@ std::unique_ptr<BaseVarSet<CDCSegmentPair> >
 UnionRecordingSegmentPairFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {
-    return std::make_unique<BasicSegmentPairVarSet>();
+    return makeUnique<BasicSegmentPairVarSet>();
   } else if (name == "hit_gap") {
-    return std::make_unique<HitGapSegmentPairVarSet>();
+    return makeUnique<HitGapSegmentPairVarSet>();
   } else if (name == "skimmed_hit_gap") {
-    return std::make_unique<SkimmedHitGapSegmentPairVarSet>();
+    return makeUnique<SkimmedHitGapSegmentPairVarSet>();
   } else if (name == "fitless") {
-    return std::make_unique<FitlessSegmentPairVarSet>();
+    return makeUnique<FitlessSegmentPairVarSet>();
   } else if (name == "feasible") {
     MVAFeasibleSegmentPairFilter filter;
     return std::move(filter).releaseVarSet();
   } else if (name == "pre_fit") {
     const bool preliminaryFit = true;
-    return std::make_unique<FitSegmentPairVarSet>(preliminaryFit);
+    return makeUnique<FitSegmentPairVarSet>(preliminaryFit);
   } else if (name == "fit") {
-    return std::make_unique<FitSegmentPairVarSet>(false);
+    return makeUnique<FitSegmentPairVarSet>(false);
   } else if (name == "realistic") {
     MVARealisticSegmentPairFilter filter;
     return std::move(filter).releaseVarSet();
   } else if (name == "truth") {
-    return std::make_unique<TruthSegmentPairVarSet>();
+    return makeUnique<TruthSegmentPairVarSet>();
   } else if (name == "trail") {
-    return std::make_unique<TrailSegmentPairVarSet>();
+    return makeUnique<TrailSegmentPairVarSet>();
   } else {
     return Super::createVarSet(name);
   }

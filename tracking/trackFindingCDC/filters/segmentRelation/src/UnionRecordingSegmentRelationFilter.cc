@@ -17,6 +17,7 @@
 #include <tracking/trackFindingCDC/filters/segmentRelation/MVAFeasibleSegmentRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentRelation/MVARealisticSegmentRelationFilter.h>
 
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -33,16 +34,16 @@ std::unique_ptr<BaseVarSet<Relation<const CDCSegment2D> > >
 UnionRecordingSegmentRelationFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {
-    return std::make_unique<BasicSegmentRelationVarSet>();
+    return makeUnique<BasicSegmentRelationVarSet>();
   } else if (name == "hit_gap") {
-    return std::make_unique<HitGapSegmentRelationVarSet>();
+    return makeUnique<HitGapSegmentRelationVarSet>();
   } else if (name == "feasible") {
     MVAFeasibleSegmentRelationFilter filter;
     return std::move(filter).releaseVarSet();
   } else if (name == "fitless") {
-    return std::make_unique<FitlessSegmentRelationVarSet>();
+    return makeUnique<FitlessSegmentRelationVarSet>();
   } else if (name == "fit") {
-    return std::make_unique<FitSegmentRelationVarSet>();
+    return makeUnique<FitSegmentRelationVarSet>();
   } else if (name == "realistic") {
     MVARealisticSegmentRelationFilter filter;
     return std::move(filter).releaseVarSet();

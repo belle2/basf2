@@ -35,7 +35,7 @@ use_central_database("GT_gen_data_002.11_gcr2017-07", LogLevel.WARNING)
 
 
 def rec(input, output, topInCounter=False, magneticField=True,
-        unpacking=False, isBFieldMapper=True):
+        unpacking=False, fieldMapper=True):
     main_path = basf2.create_path()
     logging.log_level = LogLevel.INFO
 
@@ -63,7 +63,7 @@ def rec(input, output, topInCounter=False, magneticField=True,
     main_path.add_module('Gearbox')
     #
 
-    if isBFieldMapper is True:
+    if fieldMapper is True:
         main_path.add_module('CDCJobCntlParModifier',
                              MapperGeometry=True,
                              MapperPhiAngle=43.3)
@@ -108,4 +108,4 @@ if __name__ == "__main__":
     parser.add_argument('output', help='Output file you want to store the results.')
     args = parser.parse_args()
     rec(args.input, args.output, topInCounter=False, magneticField=True,
-        unpacking=False, isBFieldMapper=True)
+        unpacking=False, fieldMapper=True)

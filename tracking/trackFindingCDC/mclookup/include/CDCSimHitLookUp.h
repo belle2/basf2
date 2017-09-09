@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>

@@ -101,10 +101,10 @@ void CDCMCTrackStore::fillMCTracks()
 
   const CDCMCMap& mcMap = *m_ptrMCMap;
 
-  for (const CDCMCMap::MCParticleByCDCHitRelation& relation : mcMap.getMCParticleByHitRelations()) {
+  for (const auto& relation : mcMap.getHitsByMCParticle()) {
 
-    const CDCHit* ptrHit = relation.get<CDCHit>();
-    const MCParticle* ptrMCParticle = relation.get<MCParticle>();
+    const MCParticle* ptrMCParticle = std::get<const MCParticle* const>(relation);
+    const CDCHit* ptrHit = std::get<const CDCHit*>(relation);
 
     if (not mcMap.isBackground(ptrHit) and ptrMCParticle) {
 

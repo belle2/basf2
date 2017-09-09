@@ -28,11 +28,14 @@ use_database_chain()
 use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
 # use_local_database("cdc_crt/database.txt", "cdc_crt")
 # use_local_database("localDB/database.txt", "localDB")
+# For GCR, July 2017.
 use_central_database("GT_gen_data_002.11_gcr2017-07", LogLevel.WARNING)
+# For GCR, August 2017.
+# use_central_database("GT_gen_data_003.04_gcr2017-08", LogLevel.WARNING)
 
 
-def rec(input, output, topInCounter=False, magneticField=True):
-
+def rec(input, output, topInCounter=False, magneticField=True,
+        unpacking=False, isBFieldMapper=True):
     main_path = basf2.create_path()
     logging.log_level = LogLevel.INFO
 
@@ -50,7 +53,8 @@ def rec(input, output, topInCounter=False, magneticField=True):
     # RootInput
     main_path.add_module('RootInput',
                          inputFileNames=input)
-
+    if unpacking is True:
+        main_path.add_module('CDCUnpacker')
     # gearbox & geometry needs to be registered any way
     #    main_path.add_module('Gearbox',
     #                         override=[
@@ -58,6 +62,12 @@ def rec(input, output, topInCounter=False, magneticField=True):
     #                         ])
     main_path.add_module('Gearbox')
     #
+
+    if isBFieldMapper is True:
+        main_path.add_module('CDCJobCntlParModifier',
+                             MapperGeometry=True,
+                             MapperPhiAngle=43.3)
+
     if magneticField is False:
         main_path.add_module('Geometry',
                              components=['CDC'])
@@ -97,4 +107,5 @@ if __name__ == "__main__":
     parser.add_argument('input', help='Input file to be processed (unpacked CDC data).')
     parser.add_argument('output', help='Output file you want to store the results.')
     args = parser.parse_args()
-    rec(args.input, args.output, topInCounter=False, magneticField=True)
+    rec(args.input, args.output, topInCounter=False, magneticField=True,
+        unpacking=False, isBFieldMapper=True)

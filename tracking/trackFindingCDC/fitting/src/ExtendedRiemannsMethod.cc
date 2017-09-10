@@ -52,18 +52,24 @@ void ExtendedRiemannsMethod::update(CDCTrajectory2D& trajectory2D,
 }
 
 namespace {
-  /// Helper indices for meaningfull matrix access to the observations matrices
-  constexpr size_t iW = 0;
-  constexpr size_t iX = 1;
-  constexpr size_t iY = 2;
-  constexpr size_t iR2 = 3;
-  constexpr size_t iL = 4;
 
+  /// Namespace to hide the contained enum constants
+  namespace NParabolicParameterIndices {
+    /// Helper indices for meaningfull matrix access to the observations matrices
+    enum EParabolicIndices {
+      iW = 0,
+      iX = 1,
+      iY = 2,
+      iR2 = 3,
+      iL = 4
+    };
+  }
   /// Variant with drift circles
   PerigeeCircle fit(const Matrix< double, 5, 5 >& sumMatrix,
                     bool lineConstrained = false,
                     bool originConstrained = false)
   {
+    using namespace NParabolicParameterIndices;
     // Solve the normal equation X * n = y
     if (lineConstrained) {
       if (originConstrained) {
@@ -106,6 +112,7 @@ namespace {
     // Solve the normal equation min_n  n^T * X * n
     // n is the smallest eigenvector
 
+    using namespace NParabolicParameterIndices;
     if (lineConstrained) {
       if (originConstrained) {
         Matrix< double, 2, 2> X = sumMatrix.block<2, 2>(1, 1);
@@ -157,7 +164,7 @@ namespace {
     // Solve the normal equation min_n  n^T * c * n
     // for the plane normal and move the plain by the offset
     // n is the smallest eigenvector
-
+    using namespace NParabolicParameterIndices;
     if (lineConstrained) {
       Matrix< double, 2, 2> X = c.block<2, 2>(1, 1);
       SelfAdjointEigenSolver< Matrix<double, 2, 2> > eigensolver(X);
@@ -270,6 +277,8 @@ namespace {
 
 UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& observations2D) const
 {
+  using namespace NParabolicParameterIndices;
+
   // Matrix of weighted sums
   Matrix< double, 5, 5 > s = observations2D.getWXYRLSumMatrix();
 

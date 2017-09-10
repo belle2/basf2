@@ -8,6 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.fwd.h>
+
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>

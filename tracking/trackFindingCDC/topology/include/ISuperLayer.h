@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/topology/EStereoKind.h>
 
-#include <tracking/trackFindingCDC/utilities/Common.h>
 #include <tracking/trackFindingCDC/utilities/Functional.h>
 
 #include <utility>
@@ -86,26 +85,6 @@ namespace Belle2 {
        *  Return c_Invalid for the outer volume and for invalid super layers
        */
       static ISuperLayer getNextOutwards(ISuperLayer iSuperLayer);
-
-      /**
-       *  Returns the common superlayer of two objects
-       *  ISuperLayerUtil::c_Invalid if there is no common super layer.
-       */
-      template<class T1, class T2>
-      static ISuperLayer getCommon(const T1& t1, const T2& t2)
-      {
-        return Common<MayIndirectTo<GetISuperLayer>>()(t1, t2).value_or(c_Invalid);
-      }
-
-      /**
-       *  Returns the common superlayer of hits in a container.
-       *  ISuperLayerUtil::c_Invalid if there is no common super layer or the container is empty.
-       */
-      template<class AHits>
-      static ISuperLayer getCommon(const AHits& hits)
-      {
-        return Common<MayIndirectTo<GetISuperLayer>>()(hits).value_or(c_Invalid);
-      }
 
       /// Returns the superlayer of an object.
       template<class T>

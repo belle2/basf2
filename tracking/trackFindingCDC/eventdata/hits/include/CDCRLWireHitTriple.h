@@ -149,11 +149,16 @@ namespace Belle2 {
 
       /// Getter for the common superlayer id of the pair
       ISuperLayer getISuperLayer() const
-      { return ISuperLayerUtil::getCommon(getStartRLWireHit(), getRearRLWireHitPair()); }
+      {
+        assert(getStartRLWireHit().getISuperLayer() == getRearRLWireHitPair().getISuperLayer());
+        return getStartRLWireHit().getISuperLayer();
+      }
 
       /// Getter for the common stereo type of the superlayer of the pair.
       EStereoKind getStereoKind() const
-      { return ISuperLayerUtil::getStereoKind(getISuperLayer()); }
+      {
+        return ISuperLayerUtil::getStereoKind(getISuperLayer());
+      }
 
       /// Indicator if the underlying wires are axial.
       bool isAxial() const

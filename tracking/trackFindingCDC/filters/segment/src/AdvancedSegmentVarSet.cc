@@ -23,7 +23,7 @@ bool AdvancedSegmentVarSet::extract(const CDCSegment2D* segment)
 {
 
   const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
-  unsigned int iSuperLayer = ISuperLayerUtil::getCommon(*segment);
+  ISuperLayer iSuperLayer = segment->getISuperLayer();
   if (not ISuperLayerUtil::isInCDC(iSuperLayer)) {
     return false;
   }

@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Common.h>
 #include <tracking/trackFindingCDC/utilities/Functional.h>
 
 namespace Belle2 {
@@ -37,33 +36,6 @@ namespace Belle2 {
       EStereoKind operator()(const T& t) const
       {
         return t.getStereoKind();
-      }
-    };
-
-    /**
-     *  This is a utility class for the free EStereoKind type.
-     *  It provides the basic methods to operate on the EStereoKind numbers.
-     */
-    struct EStereoKindUtil {
-
-      /// Utility classes should not be instantiated
-      EStereoKindUtil() = delete;
-
-      /**
-       *  Returns the common stereo type of hits in a container.
-       *  EStereoKind::c_Invalid if there is no common stereo kind or the container is empty.
-       */
-      template <class AHits>
-      static EStereoKind getCommon(const AHits& hits)
-      {
-        return Common<MayIndirectTo<GetEStereoKind>>()(hits).value_or(EStereoKind::c_Invalid);
-      }
-
-      /// Returns the superlayer of an object
-      template <class T>
-      static EStereoKind getFrom(const T& t)
-      {
-        return MayIndirectTo<GetEStereoKind>()(t).value_or(EStereoKind::c_Invalid);
       }
     };
   }

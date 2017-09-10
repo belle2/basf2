@@ -49,7 +49,7 @@ namespace Belle2 {
        */
       EStereoKind getStereoKind() const
       {
-        return EStereoKindUtil::getCommon(*this);
+        return ISuperLayerUtil::getStereoKind(getISuperLayer());
       }
 
       /// Indicator if the underlying wires are axial.
@@ -67,7 +67,7 @@ namespace Belle2 {
        */
       ISuperLayer getISuperLayer() const
       {
-        return ISuperLayerUtil::getCommon(*this);
+        return ISuperLayerUtil::getFrom(this->front());
       }
 
       /// Legacy accessor for the items of the segments, still used in some corners

@@ -9,17 +9,13 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
 
+#include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
+
+#include <tracking/trackFindingCDC/numerics/CovarianceMatrix.h>
+#include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
 #include <tracking/trackFindingCDC/numerics/Angle.h>
 
-#include <framework/logging/Logger.h>
-
-#include <boost/math/tools/precision.hpp>
-
 #include <Eigen/Dense>
-
-#include <cmath>
-
-using namespace boost::math;
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

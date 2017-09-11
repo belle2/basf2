@@ -20,9 +20,6 @@
 
 #include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
-#include <boost/range/adaptor/transformed.hpp>
-#include <boost/range/iterator_range_core.hpp>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -135,10 +132,12 @@ void SuperClusterCreator::apply(std::vector<CDCWireHit>& inputWireHits,
   B2ASSERT("Expect wire hit neighborhood to be symmetric ",
            WeightedRelationUtil<CDCWireHit>::areSymmetric(m_wireHitRelations));
 
-  auto ptrWireHits =
-    inputWireHits |
-    // boost::make_iterator_range(wireHitsInSuperLayer.begin(), wireHitsInSuperLayer.end()) |
-    boost::adaptors::transformed(&std::addressof<CDCWireHit>);
+  // Obtain the wire hits as pointers.
+  std::vector<CDCWireHit*> ptrWireHits;
+  ptrWireHits.reserve(inputWireHits.size());
+  for (CDCWireHit& wireHit : inputWireHits) {
+    ptrWireHits.push_back(&wireHit);
+  }
 
   m_wirehitClusterizer.createFromPointers(ptrWireHits, wireHitNeighborhood, outputSuperClusters);
 

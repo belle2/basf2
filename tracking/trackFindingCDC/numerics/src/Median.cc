@@ -9,16 +9,16 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/numerics/Median.h>
 
-#include <framework/logging/Logger.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
-#include <boost/range/algorithm_ext/erase.hpp>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
 double TrackFindingCDC::median(std::vector<double> values)
 {
   auto notfinite = [](double v) { return not std::isfinite(v); };
-  boost::remove_erase_if(values, notfinite);
+  erase_remove_if(values, notfinite);
 
   int n = values.size();
 
@@ -40,7 +40,7 @@ double TrackFindingCDC::weightedMedian(std::vector<WithWeight<double> > weighted
   auto notfinite = [](const WithWeight<double>& weightedValue) {
     return not std::isfinite(weightedValue) or not std::isfinite(weightedValue.getWeight());
   };
-  boost::remove_erase_if(weightedValues, notfinite);
+  erase_remove_if(weightedValues, notfinite);
 
   if (weightedValues.empty()) return NAN;
 

@@ -59,14 +59,17 @@ def wf_display(waveform, run, event, suffix=""):
     fname = 'waveforms_run' + str(run) + '_event' + str(event) + '_chan'
     pdfFile = fname
     chan = waveform.getChannel()
+    asic = waveform.getASICNumber()
+    carr = waveform.getCarrierNumber()
+    bstk = (chan // 8 // 4 // 4) % 4
     pdfFile = pdfFile + '-' + str(chan)
-
     nHits = 0
     wf = waveform.getWaveform()
     hist.Reset()
     numSamples = waveform.getSize()
     hist.SetBins(numSamples, 0.0, float(numSamples))
-    title = 'chan ' + str(chan) + ' win'
+    title = 'channel: ' + str(chan % 8) + ' asic: ' + str(asic) \
+        + ' carrier: ' + str(carr) + ' BS: ' + str(bstk) + ' win:'
     for window in waveform.getStorageWindows():
         title += ' ' + str(window)
     hist.SetTitle(title)

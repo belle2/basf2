@@ -11,6 +11,8 @@
 
 #include <tracking/trackFindingCDC/utilities/CompositeProcessingSignalListener.h>
 
+#include <tracking/trackFindingCDC/utilities/ParamList.h>
+
 #include <vector>
 #include <tuple>
 #include <string>
@@ -19,7 +21,6 @@ namespace Belle2 {
   class ModuleParamList;
 
   namespace TrackFindingCDC {
-
     /// Interface for a minimal algorithm part that wants to expose some parameters to a module
     template<class ... AIOTypes>
     class Findlet : public CompositeProcessingSignalListener {
@@ -61,9 +62,22 @@ namespace Belle2 {
         return "(no description)";
       }
 
+      /**
+       *  Forward prefixed parameters of this findlet to the module parameter list.
+       *
+       *  This method is deprecated as the exposeParams below uses a less compile heavy equivalent.
+       */
+      virtual void exposeParameters(ModuleParamList* moduleParamList,
+                                    const std::string& prefix)
+      {
+        ParamList paramList;
+        this->exposeParams(&paramList, prefix);
+        paramList.transferTo(moduleParamList);
+      }
+
       /// Forward prefixed parameters of this findlet to the module parameter list
-      virtual void exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
-                                    const std::string& prefix __attribute__((unused)))
+      virtual void exposeParams(ParamList* paramList __attribute__((unused)),
+                                const std::string& prefix __attribute__((unused)))
       {
       }
 

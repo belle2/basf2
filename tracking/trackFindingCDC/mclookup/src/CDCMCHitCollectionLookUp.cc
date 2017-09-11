@@ -11,12 +11,13 @@
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
+#include <tracking/trackFindingCDC/utilities/ReversedRange.h>
+
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <TDatabasePDG.h>
-#include <boost/range/adaptor/reversed.hpp>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -163,7 +164,7 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>::getLastHit(const ACDCHitCollection*
 
   const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
 
-  for (const CDCHit* hit : boost::adaptors::reverse(hits)) {
+  for (const CDCHit* hit : reversedRange(hits)) {
     if (mcTrackId == mcHitLookUp.getMCTrackId(hit)) return hit;
   }
   return nullptr;

@@ -25,8 +25,6 @@
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <boost/range/adaptor/transformed.hpp>
-
 #include <memory>
 
 using namespace Belle2;

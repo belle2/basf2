@@ -1,9 +1,22 @@
+//////////////////////////////////////////////////////////
+// 5 - plot
+//
+// Plot the results of the calibration and compare
+//
+// Usage: root calib5_plotDifference.C
+//
+// Input: B2Electrons.root, NewB2Electrons.root
+// Output: none
+//
+// Contributors: Jake Bennett
+//////////////////////////////////////////////////////////
+
 #include "TFile.h"
 #include "TTree.h"
 #include "TH1F.h"
 #include "TCanvas.h"
 
-void test4_plotDifference(){
+void calib5_plotDifference(){
 
   TFile* uncorrected = new TFile("B2Electrons.root");
   TTree* untree = (TTree*)uncorrected->Get("tree");

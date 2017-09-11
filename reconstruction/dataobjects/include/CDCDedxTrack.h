@@ -63,8 +63,8 @@ namespace Belle2 {
 
     /** Add a single hit to the object */
     void addHit(int lwire, int wire, int layer, double doca, double enta, int adcCount, double dE, double path, double dedx,
-                double cellHeight,
-                double cellHalfWidth, int driftT, double driftD, double driftDRes, double wiregain)
+                double cellHeight, double cellHalfWidth, int driftT, double driftD, double driftDRes, double wiregain, double twodcor,
+                double onedcor)
     {
       h_nHits++;
       h_lwire.push_back(lwire);
@@ -84,6 +84,8 @@ namespace Belle2 {
       h_driftDRes.push_back(driftDRes);
 
       h_wiregain.push_back(wiregain);
+      h_twodcor.push_back(twodcor);
+      h_onedcor.push_back(onedcor);
     }
 
     /** Return the track ID */
@@ -184,6 +186,10 @@ namespace Belle2 {
 
     /** Return the wire gain for this hit */
     double getWireGain(int i) const { return h_wiregain[i]; }
+    /** Return the 2D correction for this hit */
+    double getTwoDCorrection(int i) const { return h_twodcor[i]; }
+    /** Return the 1D correction for this hit */
+    double getOneDCorrection(int i) const { return h_onedcor[i]; }
 
     /** Set the dE/dx value for this hit */
     void setDedx(int i, double dedx) { h_dedx[i] = dedx; }
@@ -205,6 +211,8 @@ namespace Belle2 {
     double m_coscor;  /**< calibration cosine correction */
     double m_rungain; /**< calibration run gain */
     std::vector<double> h_wiregain; /**< calibration hit gain (indexed on number of hits) */
+    std::vector<double> h_twodcor;  /**< calibration 2-D correction (indexed on number of hits) */
+    std::vector<double> h_onedcor;  /**< calibration 1-D correction (indexed on number of hits) */
     double m_predmean[Const::ChargedStable::c_SetSize]; /**< predicted dE/dx truncated mean */
     double m_predres[Const::ChargedStable::c_SetSize];  /**< predicted dE/dx resolution */
 

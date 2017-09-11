@@ -97,20 +97,24 @@ void HitLevelInfoWriterModule::initialize()
   m_tree->Branch("hEnta", h_enta, "hEnta[hNHits]/D");
   m_tree->Branch("hDriftT", h_driftT, "hDriftT[hNHits]/D");
   m_tree->Branch("hWireGain", h_wireGain, "hWireGain[hNHits]/D");
+  //  m_tree->Branch("hTwodcor", &h_twodcor, "hTwodcor[hNHits]/D");
+  //  m_tree->Branch("hOnedcor", &h_onedcor, "hOnedcor[hNHits]/D");
+
 }
 
 void HitLevelInfoWriterModule::event()
 {
 
-  double coscor[40] = {1.0000, 1.0000, 1.0000, 1.0000, 1.0000,
-                       0.9998, 0.9651, 0.9538, 0.9542, 0.9356,
-                       0.9213, 0.9094, 0.9005, 0.8851, 0.8712,
-                       0.8519, 0.8173, 0.7814, 0.7341, 0.6873,
-                       0.6873, 0.7341, 0.7814, 0.8173, 0.8519,
-                       0.8712, 0.8851, 0.9005, 0.9094, 0.9213,
-                       0.9356, 0.9542, 0.9538, 0.9651, 0.9998,
-                       1.0000, 1.0000, 1.0000, 1.0000, 1.0000
-                      };
+  const int nbins = 40;
+  double coscor[nbins] = {1.0000, 1.0000, 1.0000, 1.0000, 1.0000,
+                          0.9998, 0.9651, 0.9538, 0.9542, 0.9356,
+                          0.9213, 0.9094, 0.9005, 0.8851, 0.8712,
+                          0.8519, 0.8173, 0.7814, 0.7341, 0.6873,
+                          0.6873, 0.7341, 0.7814, 0.8173, 0.8519,
+                          0.8712, 0.8851, 0.9005, 0.9094, 0.9213,
+                          0.9356, 0.9542, 0.9538, 0.9651, 0.9998,
+                          1.0000, 1.0000, 1.0000, 1.0000, 1.0000
+                         };
 
   StoreArray<CDCDedxTrack> dedxTracks;
 
@@ -130,6 +134,7 @@ void HitLevelInfoWriterModule::event()
     }
 
     if (dedxTrack->size() == 0 || dedxTrack->size() > 200) continue;
+    if (dedxTrack->getCosTheta() < -1.0 || dedxTrack->getCosTheta() > 1.0) continue;
 
     // fill the event meta data
     StoreObjPtr<EventMetaData> evtMetaData;
@@ -143,18 +148,27 @@ void HitLevelInfoWriterModule::event()
     // fill the TTree with the CDCDedxTrack information
     fillDedx(dedxTrack);
 
-    m_rungain = 48.0;
-
     // doing this by hand now, will come from constants eventually
-    double binsize = 2.0 / 40.;
+    double binsize = 2.0 / nbins;
     int bin = floor((m_cosTheta + 1.0) / binsize);
     m_coscor = coscor[bin];
 
     bin = floor((m_cosTheta - 0.5 * binsize + 1.0) / binsize);
     double frac = ((m_cosTheta - 0.5 * binsize + 1.0) / binsize) - bin;
 
-    if (bin == 39) m_coscorext = 1.0;
-    else m_coscorext = (coscor[bin + 1] - coscor[bin]) * frac + coscor[bin];
+    int thisbin = bin, nextbin = bin + 1;
+    if (abs(1 + m_cosTheta) < (binsize / 2.0) || (m_cosTheta > 0 && abs(m_cosTheta) < (binsize / 2.0))) {
+      thisbin = bin + 1;
+      nextbin = bin + 2;
+      frac -= 1;
+    } else if (abs(1 - m_cosTheta) < (binsize / 2.0) || (m_cosTheta < 0 && abs(m_cosTheta) < (binsize / 2.0))) {
+      thisbin = bin - 1;
+      nextbin = bin;
+      frac += 1;
+    }
+    m_coscorext = (coscor[nextbin] - coscor[thisbin]) * frac + coscor[thisbin];
+
+    m_rungain = 48.0;
 
     m_truncorig = m_trunc;
     m_trunc = m_trunc / m_coscor;
@@ -239,6 +253,8 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
     h_enta[ihit] = dedxTrack->getEnta(ihit);
     h_driftT[ihit] = dedxTrack->getDriftT(ihit);
     h_wireGain[ihit] = dedxTrack->getWireGain(ihit);
+    //    h_twodcor[ihit] = dedxTrack->getTwoDCorrection(ihit);
+    //    h_onedcor[ihit] = dedxTrack->getOneDCorrection(ihit);
   }
 }
 

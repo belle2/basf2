@@ -323,15 +323,8 @@ void CDCDedxPIDModule::event()
     dedxTrack->m_rungain = m_DBRunGain->getRunGain();
 
     // get the cosine correction
-    // extrapolate the binned correction
+    // extrapolate the binned correction <--- NEED TO INCLUDE THIS
     double coscor = 1.0;
-    unsigned int cosbin = 0;
-    while (costh > m_cosbinedges[cosbin] && cosbin < m_cosbinedges.size()) cosbin++;
-    if (cosbin < m_cosbinedges.size() - 1) {
-      double frac = (costh - m_cosbinedges[cosbin]) / (m_cosbinedges[cosbin + 1] - m_cosbinedges[cosbin]);
-      coscor = (m_DBCosine->getMean(m_cosbinedges[cosbin + 1]) - m_DBCosine->getMean(m_cosbinedges[cosbin])) * frac + m_DBCosine->getMean(
-                 m_cosbinedges[cosbin]);
-    }
     dedxTrack->m_coscor = coscor;
 
     // initialize a few variables to be used in the loop over track points
@@ -482,6 +475,10 @@ void CDCDedxPIDModule::event()
           // get the wire gain constant
           double wiregain = m_DBWireGains->getWireGain(iwire);
 
+          // get the 2D and 1D corrections (dummy for now)
+          double twodcor = 1.0;
+          double onedcor = 1.0;
+
           // apply the calibration to dE to propagate to both hit and layer measurements
           //double correction = dedxTrack->m_rungain * dedxTrack->m_coscor * wiregain;
           //adcCount = adcCount/correction;
@@ -501,7 +498,7 @@ void CDCDedxPIDModule::event()
 
           if (m_enableDebugOutput)
             dedxTrack->addHit(wire, iwire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
-                              driftDRealistic, driftDRealisticRes, wiregain);
+                              driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor);
           nhitscombined++;
         }
       } catch (genfit::Exception) {

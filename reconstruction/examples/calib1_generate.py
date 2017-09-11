@@ -3,6 +3,7 @@
 
 #############################################################
 # 1 - generate
+#
 # Generate a sample of electron tracks for dE/dx calibration
 # using the BabayagaNLO generator (ee(gamma) - large angle)
 #
@@ -11,13 +12,23 @@
 # Input: None
 # Output: B2Electrons.root
 #
+# Contributors: Jake Bennett
 #
-# Example steering file - 2011 Belle II Collaboration
+# Example steering file - 2017 Belle II Collaboration
 #############################################################
 
 from basf2 import *
 from simulation import add_simulation
-from reconstruction import add_reconstruction, add_mdst_output
+from reconstruction import add_reconstruction
+
+# TEMPORARY
+# use the calibration constants determined with calib2_calibrate.py
+use_local_database("roys_calibration_results/CDCDedxRunGainCalibration/outputdb/database.txt",
+                   "roys_calibration_results/CDCDedxRunGainCalibration/outputdb")
+use_local_database("roys_calibration_results/CDCDedxWireGainCalibration/outputdb/database.txt",
+                   "roys_calibration_results/CDCDedxWireGainCalibration/outputdb")
+use_local_database("roys_calibration_results/CDCDedxCosineCalibration/outputdb/database.txt",
+                   "roys_calibration_results/CDCDedxCosineCalibration/outputdb")
 
 # main path
 main = create_path()
@@ -33,17 +44,13 @@ main.add_module(babayaganlo)
 add_simulation(main)
 add_reconstruction(main)
 
-# enable debug output for CDCDedxPIDModule (used in next step)
-for m in main.modules():
-    if m.name() == 'CDCDedxPID':
-        m.param('enableDebugOutput', True)
-
 # write the results to file
 rootoutput = register_module('RootOutput')
 rootoutput.param('outputFileName', 'B2Electrons.root')
-rootoutput.param('branchNames', ['CDCDedxTracks', 'EventMetaData'])
+rootoutput.param('branchNames', ['CDCDedxTracks', 'Tracks', 'TrackFitResults'])
 main.add_module(rootoutput)
 
+# add a progress bar
 main.add_module('ProgressBar')
 
 # generate events

@@ -136,6 +136,8 @@ namespace Belle2 {
     double h_enta[kMaxHits];   /**< entrance angle */
     double h_driftT[kMaxHits];   /**< drift time */
     double h_wireGain[kMaxHits];   /**< calibration hit gain */
+    double h_twodcor[kMaxHits];   /**< calibration 2D correction */
+    double h_onedcor[kMaxHits];   /**< calibration 1D cleanup correction */
   };
 } // Belle2 namespace
 #endif

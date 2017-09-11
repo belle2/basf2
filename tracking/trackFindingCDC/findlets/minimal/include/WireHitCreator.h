@@ -23,6 +23,7 @@
 #include <vector>
 #include <tuple>
 #include <string>
+#include <memory>
 
 namespace Belle2 {
   class ModuleParamList;

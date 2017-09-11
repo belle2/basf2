@@ -30,13 +30,12 @@
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
+#include <tracking/trackFindingCDC/utilities/ReversedRange.h>
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <framework/datastore/StoreArray.h>
-
-#include <boost/range/adaptor/reversed.hpp>
 
 #include <cmath>
 
@@ -670,7 +669,7 @@ void CDCSVGPlotter::drawStoreVector(const std::string& storeObjName,
   B2INFO("with " << vector.size() << " entries");
   B2INFO("Attributes are");
   B2INFO(styling.info());
-  drawIterable<a_drawTrajectories>(vector | boost::adaptors::reversed, styling);
+  drawIterable<a_drawTrajectories>(reversedRange(vector), styling);
 }
 
 template <bool a_drawTrajectory, class AIterable, class AStyling>

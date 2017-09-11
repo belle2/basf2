@@ -9,7 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/core/ModuleParamList.h>
+#include <string>
+#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -20,12 +21,13 @@ namespace Belle2 {
     class CDCSegment2D;
     class CDCSegment3D;
     class CDCTrack;
+    class ParamList;
 
     /// Helper construct implementing the (re)estimation of the drift length for various hit objects
     struct DriftLengthEstimator {
 
       /// Add the parameters of the estimator to the module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
+      void exposeParams(ParamList* paramList, const std::string& prefix);
 
       /// Update the drift length of the reconstructed hit in place.
       double updateDriftLength(CDCRecoHit2D& recoHit2D);

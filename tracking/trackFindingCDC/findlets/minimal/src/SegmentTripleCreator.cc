@@ -34,9 +34,9 @@ std::string SegmentTripleCreator::getDescription()
          "segment pairs filtered by some acceptance criterion";
 }
 
-void SegmentTripleCreator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void SegmentTripleCreator::exposeParams(ParamList* paramList, const std::string& prefix)
 {
-  m_segmentTripleFilter.exposeParameters(moduleParamList, prefix);
+  m_segmentTripleFilter.exposeParams(paramList, prefix);
 }
 
 void SegmentTripleCreator::apply(const std::vector<CDCSegment2D>& inputSegments,

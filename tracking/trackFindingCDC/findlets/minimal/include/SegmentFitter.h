@@ -23,7 +23,7 @@
 #include <string>
 
 namespace Belle2 {
-  class ModuleParamList;
+
 
   namespace TrackFindingCDC {
     class CDCSegment2D;
@@ -41,7 +41,7 @@ namespace Belle2 {
       std::string getDescription() override;
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+      void exposeParams(ParamList* paramList, const std::string& prefix) override;
 
       /// Signals the beginning of the event processing
       void initialize() override;

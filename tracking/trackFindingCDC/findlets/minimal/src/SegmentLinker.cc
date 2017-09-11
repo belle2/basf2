@@ -13,6 +13,8 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+
 #include <vector>
 #include <string>
 
@@ -29,24 +31,24 @@ std::string SegmentLinker::getDescription()
   return "Links segments by extraction of segment paths in a cellular automaton.";
 }
 
-void SegmentLinker::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void SegmentLinker::exposeParams(ParamList* paramList, const std::string& prefix)
 {
-  m_segment2DRelationCreator.exposeParameters(moduleParamList, prefix);
+  m_segment2DRelationCreator.exposeParams(paramList, prefix);
 
-  moduleParamList->addParameter(prefixed(prefix, "wholeSuperLayer"),
-                                m_param_wholeSuperLayer,
-                                "Link segment in the whole superlayer instead of inside the super cluster.",
-                                m_param_wholeSuperLayer);
+  paramList->addParameter(prefixed(prefix, "wholeSuperLayer"),
+                          m_param_wholeSuperLayer,
+                          "Link segment in the whole superlayer instead of inside the super cluster.",
+                          m_param_wholeSuperLayer);
 
-  moduleParamList->addParameter(prefixed(prefix, "dealiasLinked"),
-                                m_param_dealiasLinked,
-                                "Block hits that appear in linked segments such that unlinked reverse and aliases are excluded.",
-                                m_param_dealiasLinked);
+  paramList->addParameter(prefixed(prefix, "dealiasLinked"),
+                          m_param_dealiasLinked,
+                          "Block hits that appear in linked segments such that unlinked reverse and aliases are excluded.",
+                          m_param_dealiasLinked);
 
-  moduleParamList->addParameter(prefixed(prefix, "onlyLinked"),
-                                m_param_onlyLinked,
-                                "Switch to construct only segments that have a linked partner.",
-                                m_param_onlyLinked);
+  paramList->addParameter(prefixed(prefix, "onlyLinked"),
+                          m_param_onlyLinked,
+                          "Switch to construct only segments that have a linked partner.",
+                          m_param_onlyLinked);
 }
 
 void SegmentLinker::apply(const std::vector<CDCSegment2D>& inputSegment2Ds,

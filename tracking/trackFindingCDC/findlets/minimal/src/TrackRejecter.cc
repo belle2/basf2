@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 using namespace Belle2::TrackFindingCDC;
 
@@ -28,13 +28,13 @@ std::string TrackRejecter::getDescription()
   return "Deletes fake tracks that have been rejected by a filter";
 }
 
-void TrackRejecter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void TrackRejecter::exposeParams(ParamList* paramList, const std::string& prefix)
 {
-  m_trackFilter.exposeParameters(moduleParamList, prefix);
-  moduleParamList->addParameter(prefixed(prefix, "deleteRejected"),
-                                m_param_deleteRejected,
-                                "Delete the rejected tracks instead of marking them as background.",
-                                m_param_deleteRejected);
+  m_trackFilter.exposeParams(paramList, prefix);
+  paramList->addParameter(prefixed(prefix, "deleteRejected"),
+                          m_param_deleteRejected,
+                          "Delete the rejected tracks instead of marking them as background.",
+                          m_param_deleteRejected);
 }
 
 void TrackRejecter::apply(std::vector<CDCTrack>& tracks)

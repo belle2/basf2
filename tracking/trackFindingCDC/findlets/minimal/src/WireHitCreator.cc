@@ -26,7 +26,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -37,44 +37,44 @@ std::string WireHitCreator::getDescription()
          "which can be used from all modules after that";
 }
 
-void WireHitCreator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void WireHitCreator::exposeParams(ParamList* paramList, const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "wirePosSet"),
-                                m_param_wirePosSet,
-                                "Set of geometry parameters to be used in the track finding. "
-                                "Either 'base', 'misaligned' or 'aligned'.",
-                                m_param_wirePosSet);
+  paramList->addParameter(prefixed(prefix, "wirePosSet"),
+                          m_param_wirePosSet,
+                          "Set of geometry parameters to be used in the track finding. "
+                          "Either 'base', 'misaligned' or 'aligned'.",
+                          m_param_wirePosSet);
 
-  moduleParamList->addParameter(prefixed(prefix, "ignoreWireSag"),
-                                m_param_ignoreWireSag,
-                                "Assume a wire sag coefficient of zero "
-                                "such that the wires appear to be straight for "
-                                "the track finders",
-                                m_param_ignoreWireSag);
+  paramList->addParameter(prefixed(prefix, "ignoreWireSag"),
+                          m_param_ignoreWireSag,
+                          "Assume a wire sag coefficient of zero "
+                          "such that the wires appear to be straight for "
+                          "the track finders",
+                          m_param_ignoreWireSag);
 
-  moduleParamList->addParameter(prefixed(prefix, "flightTimeEstimation"),
-                                m_param_flightTimeEstimation,
-                                "Option which flight direction should be assumed for "
-                                "an initial time of flight estimation. Options are: "
-                                "'none' (no TOF correction), "
-                                "'outwards', "
-                                "'downwards'.",
-                                m_param_flightTimeEstimation);
+  paramList->addParameter(prefixed(prefix, "flightTimeEstimation"),
+                          m_param_flightTimeEstimation,
+                          "Option which flight direction should be assumed for "
+                          "an initial time of flight estimation. Options are: "
+                          "'none' (no TOF correction), "
+                          "'outwards', "
+                          "'downwards'.",
+                          m_param_flightTimeEstimation);
 
-  moduleParamList->addParameter(prefixed(prefix, "triggerPoint"),
-                                m_param_triggerPoint,
-                                "Point relative to which the flight times are calculated",
-                                m_param_triggerPoint);
+  paramList->addParameter(prefixed(prefix, "triggerPoint"),
+                          m_param_triggerPoint,
+                          "Point relative to which the flight times are calculated",
+                          m_param_triggerPoint);
 
-  moduleParamList->addParameter(prefixed(prefix, "useSuperLayers"),
-                                m_param_useSuperLayers,
-                                "List of super layers to be used - mostly for debugging",
-                                m_param_useSuperLayers);
+  paramList->addParameter(prefixed(prefix, "useSuperLayers"),
+                          m_param_useSuperLayers,
+                          "List of super layers to be used - mostly for debugging",
+                          m_param_useSuperLayers);
 
-  moduleParamList->addParameter(prefixed(prefix, "useSecondHits"),
-                                m_param_useSecondHits,
-                                "Use the second hit information in the track finding.",
-                                m_param_useSecondHits);
+  paramList->addParameter(prefixed(prefix, "useSecondHits"),
+                          m_param_useSecondHits,
+                          "Use the second hit information in the track finding.",
+                          m_param_useSecondHits);
 
 }
 

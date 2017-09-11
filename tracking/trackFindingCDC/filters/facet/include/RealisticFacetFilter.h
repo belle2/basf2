@@ -14,7 +14,7 @@
 #include <string>
 
 namespace Belle2 {
-  class ModuleParamList;
+
 
   namespace TrackFindingCDC {
     class CDCFacet;
@@ -35,7 +35,7 @@ namespace Belle2 {
 
     public:
       /// Expose the set of parameters of the filter to the module parameter list.
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+      void exposeParams(ParamList* paramList, const std::string& prefix) final;
 
     public:
       /**

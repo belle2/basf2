@@ -20,7 +20,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -30,63 +30,63 @@ std::string AxialTrackCreatorSegmentHough::getDescription()
   return "Generates axial tracks from segments using a hough space over phi0 impact and curvature for the spares case.";
 }
 
-void AxialTrackCreatorSegmentHough::exposeParameters(ModuleParamList* moduleParamList,
-                                                     const std::string& prefix)
+void AxialTrackCreatorSegmentHough::exposeParams(ParamList* paramList,
+                                                 const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "minNHits"),
-                                m_param_minNHits,
-                                "Absolute minimal number of hits to make an axial track.",
-                                m_param_minNHits);
+  paramList->addParameter(prefixed(prefix, "minNHits"),
+                          m_param_minNHits,
+                          "Absolute minimal number of hits to make an axial track.",
+                          m_param_minNHits);
 
-  moduleParamList->addParameter(prefixed(prefix, "minFractionNHits"),
-                                m_param_minFractionNHits,
-                                "Minimal number of hits as a fraction of the total hits in the event.",
-                                m_param_minFractionNHits);
+  paramList->addParameter(prefixed(prefix, "minFractionNHits"),
+                          m_param_minFractionNHits,
+                          "Minimal number of hits as a fraction of the total hits in the event.",
+                          m_param_minFractionNHits);
 
-  moduleParamList->addParameter(prefixed(prefix, "maxLevel"),
-                                m_param_maxLevel,
-                                "Level of divisions in the hough space.",
-                                m_param_maxLevel);
+  paramList->addParameter(prefixed(prefix, "maxLevel"),
+                          m_param_maxLevel,
+                          "Level of divisions in the hough space.",
+                          m_param_maxLevel);
 
-  moduleParamList->addParameter(prefixed(prefix, "curvBounds"),
-                                m_param_curvBounds,
-                                "Curvature bounds of the hough space.",
-                                m_param_curvBounds);
+  paramList->addParameter(prefixed(prefix, "curvBounds"),
+                          m_param_curvBounds,
+                          "Curvature bounds of the hough space.",
+                          m_param_curvBounds);
 
-  moduleParamList->addParameter(prefixed(prefix, "impactBounds"),
-                                m_param_impactBounds,
-                                "Impact parameter bounds of the hough space.",
-                                m_param_impactBounds);
+  paramList->addParameter(prefixed(prefix, "impactBounds"),
+                          m_param_impactBounds,
+                          "Impact parameter bounds of the hough space.",
+                          m_param_impactBounds);
 
-  moduleParamList->addParameter(prefixed(prefix, "discretePhi0Width"),
-                                m_param_discretePhi0Width,
-                                "Width of the phi0 bins at the lowest level of the hough space.",
-                                m_param_discretePhi0Width);
+  paramList->addParameter(prefixed(prefix, "discretePhi0Width"),
+                          m_param_discretePhi0Width,
+                          "Width of the phi0 bins at the lowest level of the hough space.",
+                          m_param_discretePhi0Width);
 
-  moduleParamList->addParameter(prefixed(prefix, "discretePhi0Overlap"),
-                                m_param_discretePhi0Overlap,
-                                "Overlap of the phi0 bins at the lowest level of the hough space.",
-                                m_param_discretePhi0Overlap);
+  paramList->addParameter(prefixed(prefix, "discretePhi0Overlap"),
+                          m_param_discretePhi0Overlap,
+                          "Overlap of the phi0 bins at the lowest level of the hough space.",
+                          m_param_discretePhi0Overlap);
 
-  moduleParamList->addParameter(prefixed(prefix, "discreteImpactWidth"),
-                                m_param_discreteImpactWidth,
-                                "Width of the impact bins at the lowest level of the hough space.",
-                                m_param_discreteImpactWidth);
+  paramList->addParameter(prefixed(prefix, "discreteImpactWidth"),
+                          m_param_discreteImpactWidth,
+                          "Width of the impact bins at the lowest level of the hough space.",
+                          m_param_discreteImpactWidth);
 
-  moduleParamList->addParameter(prefixed(prefix, "discreteImpactOverlap"),
-                                m_param_discreteImpactOverlap,
-                                "Overlap of the impact bins at the lowest level of the hough space.",
-                                m_param_discreteImpactOverlap);
+  paramList->addParameter(prefixed(prefix, "discreteImpactOverlap"),
+                          m_param_discreteImpactOverlap,
+                          "Overlap of the impact bins at the lowest level of the hough space.",
+                          m_param_discreteImpactOverlap);
 
-  moduleParamList->addParameter(prefixed(prefix, "discreteCurvWidth"),
-                                m_param_discreteCurvWidth,
-                                "Width of the curvature bins at the lowest level of the hough space.",
-                                m_param_discreteCurvWidth);
+  paramList->addParameter(prefixed(prefix, "discreteCurvWidth"),
+                          m_param_discreteCurvWidth,
+                          "Width of the curvature bins at the lowest level of the hough space.",
+                          m_param_discreteCurvWidth);
 
-  moduleParamList->addParameter(prefixed(prefix, "discreteCurvOverlap"),
-                                m_param_discreteCurvOverlap,
-                                "Overlap of the curvature bins at the lowest level of the hough space.",
-                                m_param_discreteCurvOverlap);
+  paramList->addParameter(prefixed(prefix, "discreteCurvOverlap"),
+                          m_param_discreteCurvOverlap,
+                          "Overlap of the curvature bins at the lowest level of the hough space.",
+                          m_param_discreteCurvOverlap);
 
 }
 

@@ -30,9 +30,9 @@ std::string SegmentPairCreator::getDescription()
   return "Creates axial stereo segment pairs from a set of segments filtered by some acceptance criterion";
 }
 
-void SegmentPairCreator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void SegmentPairCreator::exposeParams(ParamList* paramList, const std::string& prefix)
 {
-  m_segmentPairFilter.exposeParameters(moduleParamList, prefix);
+  m_segmentPairFilter.exposeParams(paramList, prefix);
 }
 
 void SegmentPairCreator::apply(const std::vector<CDCSegment2D>& inputSegments,

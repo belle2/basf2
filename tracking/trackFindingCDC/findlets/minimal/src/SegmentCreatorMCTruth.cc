@@ -22,26 +22,26 @@
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 #include <TRandom.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void SegmentCreatorMCTruth::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void SegmentCreatorMCTruth::exposeParams(ParamList* paramList, const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "reconstructedDriftLength"),
-                                m_param_reconstructedDriftLength,
-                                "Switch to assign the reconstructed drift length to each hit, "
-                                "as it can be estimated from two dimensional information only.",
-                                m_param_reconstructedDriftLength);
+  paramList->addParameter(prefixed(prefix, "reconstructedDriftLength"),
+                          m_param_reconstructedDriftLength,
+                          "Switch to assign the reconstructed drift length to each hit, "
+                          "as it can be estimated from two dimensional information only.",
+                          m_param_reconstructedDriftLength);
 
-  moduleParamList->addParameter(prefixed(prefix, "reconstructedPositions"),
-                                m_param_reconstructedPositions,
-                                "Switch to reconstruct the positions in the segments "
-                                "immitating the facet ca picking up all correct hits.",
-                                m_param_reconstructedPositions);
+  paramList->addParameter(prefixed(prefix, "reconstructedPositions"),
+                          m_param_reconstructedPositions,
+                          "Switch to reconstruct the positions in the segments "
+                          "immitating the facet ca picking up all correct hits.",
+                          m_param_reconstructedPositions);
 }
 
 std::string SegmentCreatorMCTruth::getDescription()

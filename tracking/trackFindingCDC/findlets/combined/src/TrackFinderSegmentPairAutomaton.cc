@@ -22,10 +22,10 @@ TrackFinderSegmentPairAutomaton::TrackFinderSegmentPairAutomaton()
   this->addProcessingSignalListener(&m_trackOrienter);
   this->addProcessingSignalListener(&m_segmentPairSwapper);
 
-  ModuleParamList moduleParamList;
+  ParamList paramList;
   const std::string prefix = "";
-  this->exposeParameters(&moduleParamList, prefix);
-  moduleParamList.getParameter<int>("SegmentPairRelationOnlyBest").setDefaultValue(1);
+  this->exposeParams(&paramList, prefix);
+  paramList.getParameter<int>("SegmentPairRelationOnlyBest").setDefaultValue(1);
 
   m_segmentPairs.reserve(100);
   m_segmentPairRelations.reserve(100);
@@ -38,16 +38,16 @@ std::string TrackFinderSegmentPairAutomaton::getDescription()
   return "Generates tracks from segments using a cellular automaton built from segment pairs.";
 }
 
-void TrackFinderSegmentPairAutomaton::exposeParameters(ModuleParamList* moduleParamList,
-                                                       const std::string& prefix)
+void TrackFinderSegmentPairAutomaton::exposeParams(ParamList* paramList,
+                                                   const std::string& prefix)
 {
-  m_segmentPairCreator.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPair"));
-  m_segmentPairRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPairRelation"));
-  m_trackCreatorSegmentPairAutomaton.exposeParameters(moduleParamList, prefix);
-  m_trackCreatorSingleSegments.exposeParameters(moduleParamList, prefix);
-  m_trackLinker.exposeParameters(moduleParamList, prefixed(prefix, "TrackRelation"));
-  m_trackOrienter.exposeParameters(moduleParamList, prefix);
-  m_segmentPairSwapper.exposeParameters(moduleParamList, prefix);
+  m_segmentPairCreator.exposeParams(paramList, prefixed(prefix, "SegmentPair"));
+  m_segmentPairRelationCreator.exposeParams(paramList, prefixed(prefix, "SegmentPairRelation"));
+  m_trackCreatorSegmentPairAutomaton.exposeParams(paramList, prefix);
+  m_trackCreatorSingleSegments.exposeParams(paramList, prefix);
+  m_trackLinker.exposeParams(paramList, prefixed(prefix, "TrackRelation"));
+  m_trackOrienter.exposeParams(paramList, prefix);
+  m_segmentPairSwapper.exposeParams(paramList, prefix);
 }
 
 void TrackFinderSegmentPairAutomaton::beginEvent()

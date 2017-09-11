@@ -16,9 +16,10 @@
 #include <tracking/trackFindingCDC/varsets/UnionVarSet.h>
 #include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
 
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
-#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 #include <vector>
 #include <string>
@@ -52,21 +53,21 @@ namespace Belle2 {
       }
 
       /// Expose the set of parameters of the filter to the module parameter list.
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+      void exposeParams(ParamList* paramList, const std::string& prefix) override
       {
-        Super::exposeParameters(moduleParamList, prefix);
+        Super::exposeParams(paramList, prefix);
 
-        moduleParamList->addParameter(prefixed(prefix, "varSets"),
-                                      m_param_varSetNames,
-                                      "List of names refering to concrete variable sets."
-                                      "Valid names: " + join(", ", this->getValidVarSetNames()),
-                                      m_param_varSetNames);
+        paramList->addParameter(prefixed(prefix, "varSets"),
+                                m_param_varSetNames,
+                                "List of names refering to concrete variable sets."
+                                "Valid names: " + join(", ", this->getValidVarSetNames()),
+                                m_param_varSetNames);
 
-        moduleParamList->addParameter(prefixed(prefix, "skim"),
-                                      m_param_skim,
-                                      "Filter name which object must pass to be recorded."
-                                      "Valid names: " + join(", ", this->getValidFilterNames()),
-                                      m_param_skim);
+        paramList->addParameter(prefixed(prefix, "skim"),
+                                m_param_skim,
+                                "Filter name which object must pass to be recorded."
+                                "Valid names: " + join(", ", this->getValidFilterNames()),
+                                m_param_skim);
       }
 
       /// Initialize the recorder before event processing.

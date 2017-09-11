@@ -18,7 +18,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/iterator_range_core.hpp>
@@ -37,14 +37,14 @@ std::string SuperClusterCreator::getDescription()
          "neighborhood";
 }
 
-void SuperClusterCreator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void SuperClusterCreator::exposeParams(ParamList* paramList, const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "expandOverApogeeGap"),
-                                m_param_expandOverApogeeGap,
-                                "Expand the super clusters over the typical gap at the apogee of the trajectory",
-                                m_param_expandOverApogeeGap);
+  paramList->addParameter(prefixed(prefix, "expandOverApogeeGap"),
+                          m_param_expandOverApogeeGap,
+                          "Expand the super clusters over the typical gap at the apogee of the trajectory",
+                          m_param_expandOverApogeeGap);
 
-  m_wireHitRelationFilter.exposeParameters(moduleParamList, prefix);
+  m_wireHitRelationFilter.exposeParams(paramList, prefix);
 }
 
 void SuperClusterCreator::apply(std::vector<CDCWireHit>& inputWireHits,

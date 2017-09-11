@@ -16,7 +16,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 #include <cmath>
 
@@ -35,20 +35,20 @@ Chi2FacetFilter::Chi2FacetFilter(double chi2Cut, double penaltyWidth)
 {
 }
 
-void Chi2FacetFilter::exposeParameters(ModuleParamList* moduleParamList,
-                                       const std::string& prefix)
+void Chi2FacetFilter::exposeParams(ParamList* paramList,
+                                   const std::string& prefix)
 {
-  Super::exposeParameters(moduleParamList, prefix);
+  Super::exposeParams(paramList, prefix);
 
-  moduleParamList->addParameter(prefixed(prefix, "chi2CutByISuperLayer"),
-                                m_param_chi2CutByISuperLayer,
-                                "Acceptable chi2 values by superlayer id",
-                                m_param_chi2CutByISuperLayer);
+  paramList->addParameter(prefixed(prefix, "chi2CutByISuperLayer"),
+                          m_param_chi2CutByISuperLayer,
+                          "Acceptable chi2 values by superlayer id",
+                          m_param_chi2CutByISuperLayer);
 
-  moduleParamList->addParameter(prefixed(prefix, "penaltyFactor"),
-                                m_param_penaltyFactor,
-                                "Factor for cut value to obtain the width used in translation from chi2 values to weight penalties",
-                                m_param_penaltyFactor);
+  paramList->addParameter(prefixed(prefix, "penaltyFactor"),
+                          m_param_penaltyFactor,
+                          "Factor for cut value to obtain the width used in translation from chi2 values to weight penalties",
+                          m_param_penaltyFactor);
 }
 
 void Chi2FacetFilter::initialize()

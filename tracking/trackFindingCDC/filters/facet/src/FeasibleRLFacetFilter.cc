@@ -14,7 +14,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -24,15 +24,15 @@ FeasibleRLFacetFilter::FeasibleRLFacetFilter(bool hardRLCut)
 {
 }
 
-void FeasibleRLFacetFilter::exposeParameters(ModuleParamList* moduleParamList,
-                                             const std::string& prefix)
+void FeasibleRLFacetFilter::exposeParams(ParamList* paramList,
+                                         const std::string& prefix)
 {
-  Super::exposeParameters(moduleParamList, prefix);
-  moduleParamList->addParameter(prefixed(prefix, "hardRLCut"),
-                                m_param_hardRLCut,
-                                "Switch to disallow the boarderline possible hit and "
-                                "right left passage information.",
-                                m_param_hardRLCut);
+  Super::exposeParams(paramList, prefix);
+  paramList->addParameter(prefixed(prefix, "hardRLCut"),
+                          m_param_hardRLCut,
+                          "Switch to disallow the boarderline possible hit and "
+                          "right left passage information.",
+                          m_param_hardRLCut);
 }
 
 Weight FeasibleRLFacetFilter::operator()(const CDCFacet& facet)

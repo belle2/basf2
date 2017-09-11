@@ -24,11 +24,11 @@ std::string WireHitPreparer::getDescription()
   return "Combine the CDCHits from the DataStore with the geometry information.";
 }
 
-void WireHitPreparer::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void WireHitPreparer::exposeParams(ParamList* paramList, const std::string& prefix)
 {
-  m_wireHitCreator.exposeParameters(moduleParamList, prefix);
-  m_wireHitBackgroundBlocker.exposeParameters(moduleParamList, prefix);
-  m_wireHitMCMultiLoopBlocker.exposeParameters(moduleParamList, prefix);
+  m_wireHitCreator.exposeParams(paramList, prefix);
+  m_wireHitBackgroundBlocker.exposeParams(paramList, prefix);
+  m_wireHitMCMultiLoopBlocker.exposeParams(paramList, prefix);
 }
 
 void WireHitPreparer::apply(std::vector<CDCWireHit>& outputWireHits)

@@ -15,7 +15,6 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 
 namespace Belle2 {
-  class ModuleParamList;
 
   namespace TrackFindingCDC {
     class CDCTrack;
@@ -62,7 +61,7 @@ namespace Belle2 {
       std::string getDescription() final;
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+      void exposeParams(ParamList* paramList, const std::string& prefix) final;
 
       /// Initialisation before the event processing starts
       void initialize() final;

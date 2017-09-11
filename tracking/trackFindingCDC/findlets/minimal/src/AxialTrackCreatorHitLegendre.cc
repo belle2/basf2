@@ -17,7 +17,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -70,8 +70,8 @@ std::string AxialTrackCreatorHitLegendre::getDescription()
   return "Generates axial tracks from hits using several increasingly relaxed legendre space search over phi0 and curvature.";
 }
 
-void AxialTrackCreatorHitLegendre::exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
-                                                    const std::string& prefix __attribute__((unused)))
+void AxialTrackCreatorHitLegendre::exposeParams(ParamList* paramList __attribute__((unused)),
+                                                const std::string& prefix __attribute__((unused)))
 {
 }
 

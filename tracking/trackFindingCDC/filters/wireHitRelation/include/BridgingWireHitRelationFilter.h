@@ -20,7 +20,7 @@
 #include <tracking/trackFindingCDC/utilities/Range.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 #include <vector>
 #include <map>
@@ -50,15 +50,15 @@ namespace Belle2 {
 
     public:
       /// Expose the set of parameters of the filter to the module parameter list.
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+      void exposeParams(ParamList* paramList, const std::string& prefix) override
       {
-        moduleParamList->addParameter(prefixed(prefix, "missingPrimaryNeighborThresholds"),
-                                      m_param_missingPrimaryNeighborThresholdMap,
-                                      "Map of o'clock directions to number of missing drift cells "
-                                      "in the primary neighborhood to trigger the inclusion of secondary neighbors "
-                                      "in that very o'clock direction",
-                                      m_param_missingPrimaryNeighborThresholdMap
-                                     );
+        paramList->addParameter(prefixed(prefix, "missingPrimaryNeighborThresholds"),
+                                m_param_missingPrimaryNeighborThresholdMap,
+                                "Map of o'clock directions to number of missing drift cells "
+                                "in the primary neighborhood to trigger the inclusion of secondary neighbors "
+                                "in that very o'clock direction",
+                                m_param_missingPrimaryNeighborThresholdMap
+                               );
       }
 
       void initialize() override

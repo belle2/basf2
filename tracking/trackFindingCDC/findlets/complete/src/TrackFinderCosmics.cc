@@ -14,13 +14,13 @@ using namespace TrackFindingCDC;
 
 TrackFinderCosmics::TrackFinderCosmics()
 {
-  ModuleParamList moduleParamList;
-  this->exposeParameters(&moduleParamList, "");
-  moduleParamList.getParameter<std::string>("flightTimeEstimation").setDefaultValue("downwards");
-  moduleParamList.getParameter<std::string>("SegmentOrientation").setDefaultValue("downwards");
-  moduleParamList.getParameter<std::string>("TrackOrientation").setDefaultValue("downwards");
-  moduleParamList.getParameter<std::string>("SegmentPairFilter").setDefaultValue("simple");
-  moduleParamList.getParameter<std::string>("SegmentPairRelationFilter").setDefaultValue("simple");
+  ParamList paramList;
+  this->exposeParams(&paramList, "");
+  paramList.getParameter<std::string>("flightTimeEstimation").setDefaultValue("downwards");
+  paramList.getParameter<std::string>("SegmentOrientation").setDefaultValue("downwards");
+  paramList.getParameter<std::string>("TrackOrientation").setDefaultValue("downwards");
+  paramList.getParameter<std::string>("SegmentPairFilter").setDefaultValue("simple");
+  paramList.getParameter<std::string>("SegmentPairRelationFilter").setDefaultValue("simple");
 }
 
 std::string TrackFinderCosmics::getDescription()

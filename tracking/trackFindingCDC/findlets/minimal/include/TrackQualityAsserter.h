@@ -46,7 +46,7 @@ namespace Belle2 {
       std::string getDescription() override;
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+      void exposeParams(ParamList* paramList, const std::string& prefix) final;
 
       /// Main function to clean up the tracks
       void apply(std::vector<CDCTrack>& tracks) final;

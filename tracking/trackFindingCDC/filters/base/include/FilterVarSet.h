@@ -14,7 +14,9 @@
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <memory>
@@ -98,20 +100,17 @@ namespace Belle2 {
       void initialize() final {
         Super::initialize();
 
-        ModuleParamList moduleParamList;
+        ParamList paramList;
         const std::string prefix = "";
-        m_ptrFilter->exposeParameters(&moduleParamList, prefix);
+        m_ptrFilter->exposeParams(&paramList, prefix);
 
         // try to find the MVAFilter cut parameter and reset it such that we can set it
-        try {
-          ModuleParam<double> cutParam = moduleParamList.getParameter<double>("cut");
-          m_cut = cutParam.getValue();
-          cutParam.setValue(NAN);
-        } catch (ModuleParamList::ModuleParameterNotFoundError)
+        if (paramList.hasParameter("cut"))
         {
-          // Not found. Continue.
+          Param<double>& cutParam = paramList.getParameter<double>("cut");
+          m_cut = cutParam.getValue();
+          cutParam.setDefaultValue(NAN);
         }
-
         if (m_ptrFilter) m_ptrFilter->initialize();
       }
 

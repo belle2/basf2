@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/mva/Recorder.h>
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -53,23 +54,23 @@ namespace Belle2 {
       {}
 
       /// Expose the set of parameters of the filter to the module parameter list.
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+      void exposeParams(ParamList* paramList, const std::string& prefix) override
       {
-        Super::exposeParameters(moduleParamList, prefix);
-        moduleParamList->addParameter(prefixed(prefix, "rootFileName"),
-                                      m_param_rootFileName,
-                                      "Name of the ROOT file to be written",
-                                      m_param_rootFileName);
+        Super::exposeParams(paramList, prefix);
+        paramList->addParameter(prefixed(prefix, "rootFileName"),
+                                m_param_rootFileName,
+                                "Name of the ROOT file to be written",
+                                m_param_rootFileName);
 
-        moduleParamList->addParameter(prefixed(prefix, "treeName"),
-                                      m_param_treeName,
-                                      "Name of the Tree to be written",
-                                      m_param_treeName);
+        paramList->addParameter(prefixed(prefix, "treeName"),
+                                m_param_treeName,
+                                "Name of the Tree to be written",
+                                m_param_treeName);
 
-        moduleParamList->addParameter(prefixed(prefix, "returnWeight"),
-                                      m_param_returnWeight,
-                                      "Weight this filter should return when called. Defaults to NAN",
-                                      m_param_returnWeight);
+        paramList->addParameter(prefixed(prefix, "returnWeight"),
+                                m_param_returnWeight,
+                                "Weight this filter should return when called. Defaults to NAN",
+                                m_param_returnWeight);
       }
 
       /// Initialize the recorder before event processing.

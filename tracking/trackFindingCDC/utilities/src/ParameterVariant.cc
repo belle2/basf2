@@ -9,14 +9,14 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-AssignParameterVisitor::AssignParameterVisitor(ModuleParamList* moduleParamList,
+AssignParameterVisitor::AssignParameterVisitor(ParamList* paramList,
                                                const std::string& paramName)
-  : m_moduleParamList(moduleParamList)
+  : m_paramList(paramList)
   , m_paramName(paramName)
 {
 }
@@ -24,8 +24,8 @@ AssignParameterVisitor::AssignParameterVisitor(ModuleParamList* moduleParamList,
 template <class T>
 void AssignParameterVisitor::operator()(const T& t) const
 {
-  B2DEBUG(200, "Received parameter of type" << PyObjConvUtils::Type<T>::name());
-  m_moduleParamList->getParameter<T>(m_paramName).setDefaultValue(t);
+  B2ASSERT("Received unknown parameter name " << m_paramName, m_paramList->hasParameter(m_paramName));
+  m_paramList->getParameter<T>(m_paramName).setDefaultValue(t);
 }
 
 // Make explicit template function instances of
@@ -36,10 +36,10 @@ void AssignParameterVisitor::operator()(const T& t) const
 //     void instantiate_AssignParameterVisitor_operator() __attribute__((unused));
 //     void instantiate_AssignParameterVisitor_operator()
 //     {
-//       ModuleParamList moduleParamList;
+//       ParamList paramList;
 //       const std::string name = "";
 //       ParameterVariant value;
-//       AssignParameterVisitor psv(&moduleParamList, name);
+//       AssignParameterVisitor psv(&paramList, name);
 //       boost::apply_visitor(psv, value);
 //     }
 //   }

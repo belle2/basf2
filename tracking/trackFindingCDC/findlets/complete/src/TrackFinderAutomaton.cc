@@ -27,14 +27,14 @@ TrackFinderAutomaton::TrackFinderAutomaton()
   this->addProcessingSignalListener(&m_trackFlightTimeAdjuster);
   this->addProcessingSignalListener(&m_trackExporter);
 
-  ModuleParamList moduleParamList;
+  ParamList paramList;
   const std::string prefix = "";
-  this->exposeParameters(&moduleParamList, prefix);
-  moduleParamList.getParameter<std::string>("flightTimeEstimation").setDefaultValue("outwards");
-  moduleParamList.getParameter<std::string>("TrackOrientation").setDefaultValue("outwards");
+  this->exposeParams(&paramList, prefix);
+  paramList.getParameter<std::string>("flightTimeEstimation").setDefaultValue("outwards");
+  paramList.getParameter<std::string>("TrackOrientation").setDefaultValue("outwards");
 
   // Mimics earlier behaviour
-  moduleParamList.getParameter<bool>("WriteSegments").setDefaultValue(true);
+  paramList.getParameter<bool>("WriteSegments").setDefaultValue(true);
 
   m_wireHits.reserve(1000);
   m_clusters.reserve(100);
@@ -48,18 +48,18 @@ std::string TrackFinderAutomaton::getDescription()
   return "Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages.";
 }
 
-void TrackFinderAutomaton::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void TrackFinderAutomaton::exposeParams(ParamList* paramList, const std::string& prefix)
 {
-  m_wireHitsSwapper.exposeParameters(moduleParamList, prefix);
-  m_segmentsSwapper.exposeParameters(moduleParamList, prefix);
-  m_tracksSwapper.exposeParameters(moduleParamList, prefix);
+  m_wireHitsSwapper.exposeParams(paramList, prefix);
+  m_segmentsSwapper.exposeParams(paramList, prefix);
+  m_tracksSwapper.exposeParams(paramList, prefix);
 
-  m_wireHitPreparer.exposeParameters(moduleParamList, prefix);
-  m_clusterPreparer.exposeParameters(moduleParamList, prefix);
-  m_segmentFinderFacetAutomaton.exposeParameters(moduleParamList, prefix);
-  m_trackFinderSegmentPairAutomaton.exposeParameters(moduleParamList, prefix);
-  m_trackFlightTimeAdjuster.exposeParameters(moduleParamList, prefix);
-  m_trackExporter.exposeParameters(moduleParamList, prefix);
+  m_wireHitPreparer.exposeParams(paramList, prefix);
+  m_clusterPreparer.exposeParams(paramList, prefix);
+  m_segmentFinderFacetAutomaton.exposeParams(paramList, prefix);
+  m_trackFinderSegmentPairAutomaton.exposeParams(paramList, prefix);
+  m_trackFlightTimeAdjuster.exposeParams(paramList, prefix);
+  m_trackExporter.exposeParams(paramList, prefix);
 }
 
 void TrackFinderAutomaton::beginEvent()

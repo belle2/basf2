@@ -11,16 +11,19 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
-#include <framework/core/ModuleParamList.h>
-#include <framework/logging/Logger.h>
+#include <algorithm>
+#include <vector>
+#include <string>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class ParamList;
+
     /**
      * Selector to remove all weighted relations, where a definable Filter
      * gives NaN as a result. Will also update all stored weights with the result of the filter.
@@ -54,17 +57,16 @@ namespace Belle2 {
       }
 
       /// Expose the parameters of the filter.
-      void exposeParameters(ModuleParamList* moduleParamList,
-                            const std::string& prefix) override
+      void exposeParams(ParamList* paramList, const std::string& prefix) override
       {
-        Super::exposeParameters(moduleParamList, prefix);
-        m_filter.exposeParameters(moduleParamList, prefix);
+        Super::exposeParams(paramList, prefix);
+        m_filter.exposeParams(paramList, prefix);
       }
 
       /// Main function of the class: calculate the filter result and remove all relations, where the filter returns NaN
       void apply(std::vector<WeightedRelationItem>& weightedRelations) override
       {
-        for (auto& weightedRelation : weightedRelations) {
+        for (WeightedRelationItem& weightedRelation : weightedRelations) {
           const Weight weight = m_filter(weightedRelation);
           weightedRelation.setWeight(weight);
         }

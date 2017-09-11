@@ -16,7 +16,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.h>
 #include <framework/logging/Logger.h>
 
 #include <string>
@@ -24,6 +24,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class ParamList;
 
     /// Factory that can create apropriate filter instances from a name
     template<class AFilter>
@@ -130,13 +131,13 @@ namespace Belle2 {
           continue;
         }
 
-        ModuleParamList moduleParamList;
+        ParamList paramList;
         const std::string prefix = "";
-        filter->exposeParameters(&moduleParamList, prefix);
+        filter->exposeParams(&paramList, prefix);
 
         std::map<std::string, std::string> filterParameters;
-        for (auto && name : moduleParamList.getParameterNames()) {
-          filterParameters[name] = moduleParamList.getParameterDescription(name);
+        for (auto && name : paramList.getParameterNames()) {
+          filterParameters[name] = paramList.getParameterDescription(name);
         }
 
         oss << quoted(filterName) << " :\n";

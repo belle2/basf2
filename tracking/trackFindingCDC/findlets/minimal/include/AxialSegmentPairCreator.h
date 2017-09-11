@@ -20,7 +20,6 @@
 #include <string>
 
 namespace Belle2 {
-  class ModuleParamList;
 
   namespace TrackFindingCDC {
     class CDCAxialSegmentPair;
@@ -41,7 +40,7 @@ namespace Belle2 {
       std::string getDescription() final;
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+      void exposeParams(ParamList* paramList, const std::string& prefix) final;
 
       /// Main method constructing pairs in adjacent super layers
       void apply(const std::vector<CDCSegment2D>& inputSegments,

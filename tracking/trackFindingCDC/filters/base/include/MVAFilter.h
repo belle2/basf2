@@ -15,12 +15,15 @@
 
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <framework/core/ModuleParamList.h>
 
 namespace Belle2 {
+
   namespace TrackFindingCDC {
 
     /// Filter based on a mva method.
@@ -47,18 +50,18 @@ namespace Belle2 {
       }
 
       /// Expose the set of parameters of the filter to the module parameter list.
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+      void exposeParams(ParamList* paramList, const std::string& prefix) override
       {
-        Super::exposeParameters(moduleParamList, prefix);
-        moduleParamList->addParameter(prefixed(prefix, "cut"),
-                                      m_param_cut,
-                                      "The cut value of the mva output below which the object is rejected",
-                                      m_param_cut);
+        Super::exposeParams(paramList, prefix);
+        paramList->addParameter(prefixed(prefix, "cut"),
+                                m_param_cut,
+                                "The cut value of the mva output below which the object is rejected",
+                                m_param_cut);
 
-        moduleParamList->addParameter(prefixed(prefix, "identifier"),
-                                      m_param_identifier,
-                                      "Database identfier of the expert of weight file name",
-                                      m_param_identifier);
+        paramList->addParameter(prefixed(prefix, "identifier"),
+                                m_param_identifier,
+                                "Database identfier of the expert of weight file name",
+                                m_param_identifier);
 
       }
 

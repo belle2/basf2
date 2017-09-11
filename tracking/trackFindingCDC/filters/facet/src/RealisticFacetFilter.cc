@@ -15,7 +15,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 #include <cmath>
 
@@ -32,15 +32,15 @@ RealisticFacetFilter::RealisticFacetFilter(double phiPullCut)
 {
 }
 
-void RealisticFacetFilter::exposeParameters(ModuleParamList* moduleParamList,
-                                            const std::string& prefix)
+void RealisticFacetFilter::exposeParams(ParamList* paramList,
+                                        const std::string& prefix)
 {
-  Super::exposeParameters(moduleParamList, prefix);
-  moduleParamList->addParameter(prefixed(prefix, "phiPullCut"),
-                                m_param_phiPullCut,
-                                "Acceptable angle pull in the angle of adjacent tangents to the "
-                                "drift circles.",
-                                m_param_phiPullCut);
+  Super::exposeParams(paramList, prefix);
+  paramList->addParameter(prefixed(prefix, "phiPullCut"),
+                          m_param_phiPullCut,
+                          "Acceptable angle pull in the angle of adjacent tangents to the "
+                          "drift circles.",
+                          m_param_phiPullCut);
 }
 
 Weight RealisticFacetFilter::operator()(const CDCFacet& facet)

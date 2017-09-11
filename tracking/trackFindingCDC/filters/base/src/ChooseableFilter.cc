@@ -9,5 +9,10 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
 
+#include <tracking/trackFindingCDC/utilities/Param.h>
+#include <tracking/trackFindingCDC/utilities/Param.icc.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::Param<std::map<std::string, FilterParamVariant> >;

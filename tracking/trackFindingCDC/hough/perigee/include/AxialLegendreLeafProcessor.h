@@ -21,9 +21,9 @@
 #include <vector>
 
 namespace Belle2 {
-  class ModuleParamList;
 
   namespace TrackFindingCDC {
+    class ParamList;
 
     /**
      *  Predicate class that is feed the nodes in a WeightedHoughTree walk
@@ -129,7 +129,7 @@ namespace Belle2 {
 
     public:
       /// Expose the parameters as a module parameter list
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
+      void exposeParams(ParamList* paramList, const std::string& prefix);
 
       /// Function to notify the leaf processor about changes in parameters before a new walk
       void beginWalk();

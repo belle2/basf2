@@ -35,17 +35,17 @@ std::string TrackFinderSegmentTripleAutomaton::getDescription()
   return "Generates tracks from segments using a cellular automaton built from segment triples.";
 }
 
-void TrackFinderSegmentTripleAutomaton::exposeParameters(ModuleParamList* moduleParamList,
-                                                         const std::string& prefix)
+void TrackFinderSegmentTripleAutomaton::exposeParams(ParamList* paramList,
+                                                     const std::string& prefix)
 {
-  m_axialSegmentPairCreator.exposeParameters(moduleParamList, prefixed(prefix, "axialSegmentPair"));
-  m_segmentTripleCreator.exposeParameters(moduleParamList, prefixed(prefix, "segmentTriple"));
-  m_segmentTripleRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "segmentTripleRelation"));
-  m_trackCreatorSegmentTripleAutomaton.exposeParameters(moduleParamList, prefix);
-  m_trackCreatorSingleSegments.exposeParameters(moduleParamList, prefix);
-  m_trackLinker.exposeParameters(moduleParamList, prefixed(prefix, "TrackRelation"));
-  m_trackOrienter.exposeParameters(moduleParamList, prefix);
-  m_segmentTripleSwapper.exposeParameters(moduleParamList, prefix);
+  m_axialSegmentPairCreator.exposeParams(paramList, prefixed(prefix, "axialSegmentPair"));
+  m_segmentTripleCreator.exposeParams(paramList, prefixed(prefix, "segmentTriple"));
+  m_segmentTripleRelationCreator.exposeParams(paramList, prefixed(prefix, "segmentTripleRelation"));
+  m_trackCreatorSegmentTripleAutomaton.exposeParams(paramList, prefix);
+  m_trackCreatorSingleSegments.exposeParams(paramList, prefix);
+  m_trackLinker.exposeParams(paramList, prefixed(prefix, "TrackRelation"));
+  m_trackOrienter.exposeParams(paramList, prefix);
+  m_segmentTripleSwapper.exposeParams(paramList, prefix);
 }
 
 void TrackFinderSegmentTripleAutomaton::beginEvent()

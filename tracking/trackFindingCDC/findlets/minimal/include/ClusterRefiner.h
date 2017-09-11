@@ -48,8 +48,8 @@ namespace Belle2 {
       }
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
-        m_wireHitRelationFilter.exposeParameters(moduleParamList, prefix);
+      void exposeParams(ParamList* paramList, const std::string& prefix) final {
+        m_wireHitRelationFilter.exposeParams(paramList, prefix);
       }
 
     public:

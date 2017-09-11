@@ -28,9 +28,9 @@ std::string AxialSegmentPairCreator::getDescription()
   return "Creates axial axial segment pairs from a set of segments filtered by some acceptance criterion";
 }
 
-void AxialSegmentPairCreator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void AxialSegmentPairCreator::exposeParams(ParamList* paramList, const std::string& prefix)
 {
-  m_axialSegmentPairFilter.exposeParameters(moduleParamList, prefix);
+  m_axialSegmentPairFilter.exposeParams(paramList, prefix);
 }
 
 void AxialSegmentPairCreator::apply(const std::vector<CDCSegment2D>& inputSegments,

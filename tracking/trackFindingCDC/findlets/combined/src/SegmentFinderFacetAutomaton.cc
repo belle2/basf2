@@ -30,10 +30,10 @@ SegmentFinderFacetAutomaton::SegmentFinderFacetAutomaton()
   m_segments.reserve(200);
   m_intermediateSegments.reserve(200);
 
-  ModuleParamList moduleParamList;
+  ParamList paramList;
   const std::string prefix = "";
-  this->exposeParameters(&moduleParamList, prefix);
-  moduleParamList.getParameter<std::string>("SegmentOrientation").setDefaultValue("curling");
+  this->exposeParams(&paramList, prefix);
+  paramList.getParameter<std::string>("SegmentOrientation").setDefaultValue("curling");
 }
 
 std::string SegmentFinderFacetAutomaton::getDescription()
@@ -41,18 +41,18 @@ std::string SegmentFinderFacetAutomaton::getDescription()
   return "Generates segments from hits using a cellular automaton build from hit triples (facets).";
 }
 
-void SegmentFinderFacetAutomaton::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void SegmentFinderFacetAutomaton::exposeParams(ParamList* paramList, const std::string& prefix)
 {
-  m_facetCreator.exposeParameters(moduleParamList, prefixed(prefix, "Facet"));
-  m_facetRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "FacetRelation"));
-  m_segmentCreatorFacetAutomaton.exposeParameters(moduleParamList, prefix);
-  m_segmentLinker.exposeParameters(moduleParamList, prefixed(prefix, "SegmentRelation"));
+  m_facetCreator.exposeParams(paramList, prefixed(prefix, "Facet"));
+  m_facetRelationCreator.exposeParams(paramList, prefixed(prefix, "FacetRelation"));
+  m_segmentCreatorFacetAutomaton.exposeParams(paramList, prefix);
+  m_segmentLinker.exposeParams(paramList, prefixed(prefix, "SegmentRelation"));
 
-  m_segmentFitter.exposeParameters(moduleParamList, prefix);
-  m_segmentAliasResolver.exposeParameters(moduleParamList, prefix);
-  m_segmentOrienter.exposeParameters(moduleParamList, prefix);
+  m_segmentFitter.exposeParams(paramList, prefix);
+  m_segmentAliasResolver.exposeParams(paramList, prefix);
+  m_segmentOrienter.exposeParams(paramList, prefix);
 
-  m_facetSwapper.exposeParameters(moduleParamList, prefix);
+  m_facetSwapper.exposeParams(paramList, prefix);
 }
 
 void SegmentFinderFacetAutomaton::beginEvent()

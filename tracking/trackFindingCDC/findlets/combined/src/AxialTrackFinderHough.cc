@@ -14,7 +14,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -30,32 +30,32 @@ AxialTrackFinderHough::AxialTrackFinderHough()
   // Set default parameters of the hough spaces
   /////////////////////////////////////////////
 
-  ModuleParamList moduleParamList;
+  ParamList paramList;
   const std::string prefix = "";
-  this->exposeParameters(&moduleParamList, prefix);
+  this->exposeParams(&paramList, prefix);
 
   // Setup the default parameters of the fine hough space
-  moduleParamList.getParameter<int>("fineGranularityLevel").setDefaultValue(12);
-  moduleParamList.getParameter<int>("fineSectorLevelSkip").setDefaultValue(2);
-  // moduleParamList.getParameter<std::vector<double>>("fineCurvBounds").setDefaultValue({ -0.018, 0.75});
-  moduleParamList.getParameter<std::vector<float>>("fineCurvBounds").setDefaultValue({{ -0.02, 0.14}});
-  moduleParamList.getParameter<int>("fineDiscretePhi0Width").setDefaultValue(19);
-  moduleParamList.getParameter<int>("fineDiscretePhi0Overlap").setDefaultValue(5);
-  moduleParamList.getParameter<int>("fineDiscreteCurvWidth").setDefaultValue(1);
-  moduleParamList.getParameter<int>("fineDiscreteCurvOverlap").setDefaultValue(-1);
-  moduleParamList.getParameter<std::vector<ParameterVariantMap>>("fineRelaxationSchedule")
-                                                              .setDefaultValue(getDefaultFineRelaxationSchedule());
+  paramList.getParameter<int>("fineGranularityLevel").setDefaultValue(12);
+  paramList.getParameter<int>("fineSectorLevelSkip").setDefaultValue(2);
+  // paramList.getParameter<std::vector<double>>("fineCurvBounds").setDefaultValue({ -0.018, 0.75});
+  paramList.getParameter<std::vector<float>>("fineCurvBounds").setDefaultValue({{ -0.02, 0.14}});
+  paramList.getParameter<int>("fineDiscretePhi0Width").setDefaultValue(19);
+  paramList.getParameter<int>("fineDiscretePhi0Overlap").setDefaultValue(5);
+  paramList.getParameter<int>("fineDiscreteCurvWidth").setDefaultValue(1);
+  paramList.getParameter<int>("fineDiscreteCurvOverlap").setDefaultValue(-1);
+  paramList.getParameter<std::vector<ParameterVariantMap>>("fineRelaxationSchedule")
+                                                        .setDefaultValue(getDefaultFineRelaxationSchedule());
 
   // Setup the default parameters of the rough hough space
-  moduleParamList.getParameter<int>("roughGranularityLevel").setDefaultValue(10);
-  moduleParamList.getParameter<int>("roughSectorLevelSkip").setDefaultValue(0);
-  moduleParamList.getParameter<std::vector<float>>("roughCurvBounds").setDefaultValue({{ 0.0, 0.30}});
-  moduleParamList.getParameter<int>("roughDiscretePhi0Width").setDefaultValue(19);
-  moduleParamList.getParameter<int>("roughDiscretePhi0Overlap").setDefaultValue(5);
-  moduleParamList.getParameter<int>("roughDiscreteCurvWidth").setDefaultValue(1);
-  moduleParamList.getParameter<int>("roughDiscreteCurvOverlap").setDefaultValue(-1);
-  moduleParamList.getParameter<std::vector<ParameterVariantMap>>("roughRelaxationSchedule")
-                                                              .setDefaultValue(getDefaultRoughRelaxationSchedule());
+  paramList.getParameter<int>("roughGranularityLevel").setDefaultValue(10);
+  paramList.getParameter<int>("roughSectorLevelSkip").setDefaultValue(0);
+  paramList.getParameter<std::vector<float>>("roughCurvBounds").setDefaultValue({{ 0.0, 0.30}});
+  paramList.getParameter<int>("roughDiscretePhi0Width").setDefaultValue(19);
+  paramList.getParameter<int>("roughDiscretePhi0Overlap").setDefaultValue(5);
+  paramList.getParameter<int>("roughDiscreteCurvWidth").setDefaultValue(1);
+  paramList.getParameter<int>("roughDiscreteCurvOverlap").setDefaultValue(-1);
+  paramList.getParameter<std::vector<ParameterVariantMap>>("roughRelaxationSchedule")
+                                                        .setDefaultValue(getDefaultRoughRelaxationSchedule());
 }
 
 std::string AxialTrackFinderHough::getDescription()
@@ -63,13 +63,13 @@ std::string AxialTrackFinderHough::getDescription()
   return "Generates axial tracks from hits using several increasingly relaxed hough space search over phi0 and curvature.";
 }
 
-void AxialTrackFinderHough::exposeParameters(ModuleParamList* moduleParamList,
-                                             const std::string& prefix)
+void AxialTrackFinderHough::exposeParams(ParamList* paramList,
+                                         const std::string& prefix)
 {
-  m_fineHoughSearch.exposeParameters(moduleParamList, prefixed("fine", prefix));
-  m_roughHoughSearch.exposeParameters(moduleParamList, prefixed("rough", prefix));
-  m_axialTrackHitMigrator.exposeParameters(moduleParamList, prefix);
-  m_axialTrackMerger.exposeParameters(moduleParamList, prefixed("merge", prefix));
+  m_fineHoughSearch.exposeParams(paramList, prefixed("fine", prefix));
+  m_roughHoughSearch.exposeParams(paramList, prefixed("rough", prefix));
+  m_axialTrackHitMigrator.exposeParams(paramList, prefix);
+  m_axialTrackMerger.exposeParams(paramList, prefixed("merge", prefix));
 }
 
 void AxialTrackFinderHough::apply(const std::vector<CDCWireHit>& wireHits,

@@ -24,37 +24,37 @@
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 #include <TRandom.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void AxialTrackCreatorMCTruth::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void AxialTrackCreatorMCTruth::exposeParams(ParamList* paramList, const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "reconstructedDriftLength"),
-                                m_param_reconstructedDriftLength,
-                                "Switch to assign the reconstructed drift length to each hit, "
-                                "as it can be estimated from two dimensional information only.",
-                                m_param_reconstructedDriftLength);
+  paramList->addParameter(prefixed(prefix, "reconstructedDriftLength"),
+                          m_param_reconstructedDriftLength,
+                          "Switch to assign the reconstructed drift length to each hit, "
+                          "as it can be estimated from two dimensional information only.",
+                          m_param_reconstructedDriftLength);
 
-  moduleParamList->addParameter(prefixed(prefix, "reconstructedPositions"),
-                                m_param_reconstructedPositions,
-                                "Switch to reconstruct the positions in the tracks "
-                                "immitating the legendre finder.",
-                                m_param_reconstructedPositions);
+  paramList->addParameter(prefixed(prefix, "reconstructedPositions"),
+                          m_param_reconstructedPositions,
+                          "Switch to reconstruct the positions in the tracks "
+                          "immitating the legendre finder.",
+                          m_param_reconstructedPositions);
 
-  moduleParamList->addParameter(prefixed(prefix, "fit"),
-                                m_param_fit,
-                                "Fit the track instead of forwarding the mc truth fit information",
-                                m_param_fit);
+  paramList->addParameter(prefixed(prefix, "fit"),
+                          m_param_fit,
+                          "Fit the track instead of forwarding the mc truth fit information",
+                          m_param_fit);
 
-  moduleParamList->addParameter(prefixed(prefix, "useOnlyBeforeTOP"),
-                                m_param_useOnlyBeforeTOP,
-                                "Cut tracks after the last layer of the CDC has been reached, "
-                                "assuming the tracks left the CDC.",
-                                m_param_useOnlyBeforeTOP);
+  paramList->addParameter(prefixed(prefix, "useOnlyBeforeTOP"),
+                          m_param_useOnlyBeforeTOP,
+                          "Cut tracks after the last layer of the CDC has been reached, "
+                          "assuming the tracks left the CDC.",
+                          m_param_useOnlyBeforeTOP);
 }
 
 std::string AxialTrackCreatorMCTruth::getDescription()

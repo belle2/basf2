@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -22,18 +22,18 @@ std::string TrackOrienter::getDescription()
   return "Fixes the flight direction of tracks to a preferred orientation by simple heuristics.";
 }
 
-void TrackOrienter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void TrackOrienter::exposeParams(ParamList* paramList, const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "TrackOrientation"),
-                                m_param_trackOrientationString,
-                                "Option which orientation of tracks shall be generate. "
-                                "Valid options are '' (default of the finder), "
-                                "'none' (one orientation, algorithm dependent), "
-                                "'symmetric', "
-                                "'curling', "
-                                "'outwards', "
-                                "'downwards'.",
-                                m_param_trackOrientationString);
+  paramList->addParameter(prefixed(prefix, "TrackOrientation"),
+                          m_param_trackOrientationString,
+                          "Option which orientation of tracks shall be generate. "
+                          "Valid options are '' (default of the finder), "
+                          "'none' (one orientation, algorithm dependent), "
+                          "'symmetric', "
+                          "'curling', "
+                          "'outwards', "
+                          "'downwards'.",
+                          m_param_trackOrientationString);
 }
 
 void TrackOrienter::initialize()

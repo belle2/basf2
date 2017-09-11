@@ -18,7 +18,6 @@
 #include <string>
 
 namespace Belle2 {
-  class ModuleParamList;
 
   namespace TrackFindingCDC {
     class CDCTrack;
@@ -37,7 +36,7 @@ namespace Belle2 {
       std::string getDescription() final;
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+      void exposeParams(ParamList* paramList, const std::string& prefix) final;
 
       /// Merge tracks together. Allows for axial hits to be added as it may see fit.
       void apply(std::vector<CDCTrack>& axialTracks, const std::vector<const CDCWireHit*>& axialWireHits) final;

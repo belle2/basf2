@@ -14,7 +14,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -24,14 +24,14 @@ std::string TrackCreatorSingleSegments::getDescription()
   return "Creates a track for each segments that is yet unused by any of the given tracks.";
 }
 
-void TrackCreatorSingleSegments::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void TrackCreatorSingleSegments::exposeParams(ParamList* paramList, const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "MinimalHitsBySuperLayerId"),
-                                m_param_minimalHitsBySuperLayerId,
-                                "Map of super layer ids to minimum hit number, "
-                                "for which left over segments shall be forwarded as tracks, "
-                                "if the exceed the minimal hit requirement. Default empty.",
-                                m_param_minimalHitsBySuperLayerId);
+  paramList->addParameter(prefixed(prefix, "MinimalHitsBySuperLayerId"),
+                          m_param_minimalHitsBySuperLayerId,
+                          "Map of super layer ids to minimum hit number, "
+                          "for which left over segments shall be forwarded as tracks, "
+                          "if the exceed the minimal hit requirement. Default empty.",
+                          m_param_minimalHitsBySuperLayerId);
 }
 
 void TrackCreatorSingleSegments::apply(const std::vector<CDCSegment2D>& segments,

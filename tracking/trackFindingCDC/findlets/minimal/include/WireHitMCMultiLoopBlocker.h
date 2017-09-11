@@ -16,7 +16,6 @@
 #include <cmath>
 
 namespace Belle2 {
-  class ModuleParamList;
 
   namespace TrackFindingCDC {
     class CDCWireHit;
@@ -41,7 +40,7 @@ namespace Belle2 {
       std::string getDescription() final;
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+      void exposeParams(ParamList* paramList, const std::string& prefix) final;
 
       /// Signals the start of the event processing
       void initialize() final;

@@ -41,7 +41,7 @@ namespace Belle2 {
       SegmentTrackAdderWithNormalization();
 
       /// Expose the parameters of the sub-findlets.
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+      void exposeParams(ParamList* paramList, const std::string& prefix) override;
 
       /// Short description of the findlet
       std::string getDescription() override;

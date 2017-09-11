@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
@@ -46,14 +46,13 @@ namespace Belle2 {
       using Super = Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>>;
 
       /// Expose the useOnlySingleBestCandidate parameter to the module.
-      void exposeParameters(ModuleParamList* moduleParamList,
-                            const std::string& prefix) override
+      void exposeParams(ParamList* paramList, const std::string& prefix) override
       {
-        Super::exposeParameters(moduleParamList, prefix);
+        Super::exposeParams(paramList, prefix);
 
-        moduleParamList->addParameter(prefixed(prefix, "useOnlySingleBestCandidate"), m_param_useOnlySingleBestCandidate,
-                                      "Use only the found candidate, if it is the only one. Otherwise, use the best one.",
-                                      m_param_useOnlySingleBestCandidate);
+        paramList->addParameter(prefixed(prefix, "useOnlySingleBestCandidate"), m_param_useOnlySingleBestCandidate,
+                                "Use only the found candidate, if it is the only one. Otherwise, use the best one.",
+                                m_param_useOnlySingleBestCandidate);
       }
 
       /// Main function of this class doing the relation selection.

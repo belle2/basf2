@@ -12,7 +12,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -27,15 +27,15 @@ SimpleFacetRelationFilter::SimpleFacetRelationFilter(double deviationCosCut)
 {
 }
 
-void SimpleFacetRelationFilter::exposeParameters(ModuleParamList* moduleParamList,
-                                                 const std::string& prefix)
+void SimpleFacetRelationFilter::exposeParams(ParamList* paramList,
+                                             const std::string& prefix)
 {
-  Super::exposeParameters(moduleParamList, prefix);
-  moduleParamList->addParameter(prefixed(prefix, "deviationCosCut"),
-                                m_param_deviationCosCut,
-                                "Acceptable deviation cosine in the angle of adjacent tangents "
-                                "to the drift circles.",
-                                m_param_deviationCosCut);
+  Super::exposeParams(paramList, prefix);
+  paramList->addParameter(prefixed(prefix, "deviationCosCut"),
+                          m_param_deviationCosCut,
+                          "Acceptable deviation cosine in the angle of adjacent tangents "
+                          "to the drift circles.",
+                          m_param_deviationCosCut);
 }
 
 Weight SimpleFacetRelationFilter::operator()(const CDCFacet& fromFacet,

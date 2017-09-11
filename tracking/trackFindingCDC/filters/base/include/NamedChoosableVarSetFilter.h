@@ -11,6 +11,8 @@
 
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
 
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 namespace Belle2 {
@@ -47,9 +49,9 @@ namespace Belle2 {
       }
 
       /// Add the parameters of this filter to the given parameter list
-      void exposeParameters(ModuleParamList* parameterList, const std::string& prefix) override
+      void exposeParams(ParamList* parameterList, const std::string& prefix) override
       {
-        Super::exposeParameters(parameterList, prefix);
+        Super::exposeParams(parameterList, prefix);
 
         if (m_param_varName == "") {
           // Make a forced parameter if no default variable name is present

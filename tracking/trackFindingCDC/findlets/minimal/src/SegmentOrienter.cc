@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -24,18 +24,18 @@ std::string SegmentOrienter::getDescription()
 }
 
 
-void SegmentOrienter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void SegmentOrienter::exposeParams(ParamList* paramList, const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "SegmentOrientation"),
-                                m_param_segmentOrientationString,
-                                "Option which orientation of segments shall be generate. "
-                                "Valid options are '' (default of the finder), "
-                                "'none' (one orientation, algorithm dependent), "
-                                "'symmetric', "
-                                "'curling', "
-                                "'outwards', "
-                                "'downwards'.",
-                                m_param_segmentOrientationString);
+  paramList->addParameter(prefixed(prefix, "SegmentOrientation"),
+                          m_param_segmentOrientationString,
+                          "Option which orientation of segments shall be generate. "
+                          "Valid options are '' (default of the finder), "
+                          "'none' (one orientation, algorithm dependent), "
+                          "'symmetric', "
+                          "'curling', "
+                          "'outwards', "
+                          "'downwards'.",
+                          m_param_segmentOrientationString);
 }
 
 void SegmentOrienter::initialize()

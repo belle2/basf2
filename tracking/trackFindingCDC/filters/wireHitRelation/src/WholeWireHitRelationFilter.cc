@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -21,10 +21,10 @@ WholeWireHitRelationFilter::WholeWireHitRelationFilter(int neighborhoodDegree)
 {
 }
 
-void WholeWireHitRelationFilter::exposeParameters(ModuleParamList* moduleParamList,
-                                                  const std::string& prefix)
+void WholeWireHitRelationFilter::exposeParams(ParamList* paramList,
+                                              const std::string& prefix)
 {
-  moduleParamList
+  paramList
   ->addParameter(prefixed(prefix, "degree"),
                  m_param_degree,
                  "Neighbor degree which are included. 1 for primary, 2 for secondary, 3 ...",

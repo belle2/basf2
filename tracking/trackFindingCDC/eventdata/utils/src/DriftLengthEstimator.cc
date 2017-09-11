@@ -17,6 +17,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
@@ -27,17 +28,17 @@ using namespace TrackFindingCDC;
 namespace {
 }
 
-void DriftLengthEstimator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void DriftLengthEstimator::exposeParams(ParamList* paramList, const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "useAlphaInDriftLength"),
-                                m_param_useAlphaInDriftLength,
-                                "Switch to serve the alpha angle to the drift length translator",
-                                m_param_useAlphaInDriftLength);
+  paramList->addParameter(prefixed(prefix, "useAlphaInDriftLength"),
+                          m_param_useAlphaInDriftLength,
+                          "Switch to serve the alpha angle to the drift length translator",
+                          m_param_useAlphaInDriftLength);
 
-  moduleParamList->addParameter(prefixed(prefix, "tofMassScale"),
-                                m_param_tofMassScale,
-                                "Mass to estimate the velocity in the flight time to the hit",
-                                m_param_tofMassScale);
+  paramList->addParameter(prefixed(prefix, "tofMassScale"),
+                          m_param_tofMassScale,
+                          "Mass to estimate the velocity in the flight time to the hit",
+                          m_param_tofMassScale);
 }
 
 double DriftLengthEstimator::updateDriftLength(CDCRecoHit2D& recoHit2D)

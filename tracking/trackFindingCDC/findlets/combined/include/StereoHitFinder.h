@@ -51,7 +51,7 @@ namespace Belle2 {
       void beginEvent() final;
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+      void exposeParams(ParamList* paramList, const std::string& prefix) final;
 
       /// Generates the segment from wire hits
       void apply(std::vector<CDCWireHit>& inputWireHits, std::vector<CDCTrack>& tracks) final;

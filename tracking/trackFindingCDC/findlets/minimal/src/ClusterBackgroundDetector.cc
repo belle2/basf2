@@ -28,10 +28,10 @@ std::string ClusterBackgroundDetector::getDescription()
   return "Marks clusters as background if the used filter detectes them as such";
 }
 
-void ClusterBackgroundDetector::exposeParameters(ModuleParamList* moduleParamList,
-                                                 const std::string& prefix)
+void ClusterBackgroundDetector::exposeParams(ParamList* paramList,
+                                             const std::string& prefix)
 {
-  m_clusterFilter.exposeParameters(moduleParamList, prefix);
+  m_clusterFilter.exposeParams(paramList, prefix);
 }
 
 void ClusterBackgroundDetector::apply(std::vector<CDCWireHitCluster>& outputClusters)

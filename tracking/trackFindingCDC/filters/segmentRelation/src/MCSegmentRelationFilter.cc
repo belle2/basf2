@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -21,14 +21,14 @@ MCSegmentRelationFilter::MCSegmentRelationFilter(bool allowReverse)
 {
 }
 
-void MCSegmentRelationFilter::exposeParameters(ModuleParamList* moduleParamList,
-                                               const std::string& prefix)
+void MCSegmentRelationFilter::exposeParams(ParamList* paramList,
+                                           const std::string& prefix)
 {
-  Super::exposeParameters(moduleParamList, prefix);
-  moduleParamList->addParameter(prefixed(prefix, "requireRLPure"),
-                                m_param_requireRLPure,
-                                "Switch to require the segment combination contain mostly correct rl information",
-                                m_param_requireRLPure);
+  Super::exposeParams(paramList, prefix);
+  paramList->addParameter(prefixed(prefix, "requireRLPure"),
+                          m_param_requireRLPure,
+                          "Switch to require the segment combination contain mostly correct rl information",
+                          m_param_requireRLPure);
 
 }
 

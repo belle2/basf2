@@ -21,7 +21,7 @@
 #include <cmath>
 
 namespace Belle2 {
-  class ModuleParamList;
+
   namespace TrackFindingCDC {
 
     /// Class mapping the neighborhood of wires to the neighborhood of wire hits.
@@ -32,7 +32,7 @@ namespace Belle2 {
       explicit WholeWireHitRelationFilter(int neighborhoodDegree = 2);
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
+      void exposeParams(ParamList* paramList, const std::string& prefix) final;
 
       /// Returns a vector containing the neighboring wire hits of the given wire hit out of the sorted range given by the two iterator other argumets.
       template<class ACDCWireHitIterator>

@@ -16,6 +16,8 @@
 #include <tracking/trackFindingCDC/collectors/selectors/FilterSelector.h>
 #include <tracking/trackFindingCDC/collectors/selectors/BestMatchSelector.h>
 #include <tracking/trackFindingCDC/collectors/selectors/CutSelector.h>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
+
 #include <tracking/modules/vxdCDCTrackMerger/DetectorTrackCombinationFilterFactory.h>
 #include <tracking/modules/vxdCDCTrackMerger/ExtrapolationDetectorTrackCombinationSelector.h>
 #include <tracking/modules/vxdCDCTrackMerger/StoreArrayMerger.h>

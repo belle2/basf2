@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 #include <vector>
 
@@ -25,20 +25,20 @@ std::string WireHitBackgroundBlocker::getDescription()
   return "Marks hits as background based on simple heuristics.";
 }
 
-void WireHitBackgroundBlocker::exposeParameters(ModuleParamList* moduleParamList,
-                                                const std::string& prefix)
+void WireHitBackgroundBlocker::exposeParams(ParamList* paramList,
+                                            const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "blockNegativeDriftLength"),
-                                m_param_blockNegativeDriftLength,
-                                "Switch to drop wire hits with negative "
-                                "drift lengths from output",
-                                m_param_blockNegativeDriftLength);
+  paramList->addParameter(prefixed(prefix, "blockNegativeDriftLength"),
+                          m_param_blockNegativeDriftLength,
+                          "Switch to drop wire hits with negative "
+                          "drift lengths from output",
+                          m_param_blockNegativeDriftLength);
 
-  moduleParamList->addParameter(prefixed(prefix, "noiseChargeDeposit"),
-                                m_param_noiseChargeDeposit,
-                                "Threshold energy below which the hit is considered "
-                                "to be electronic noise",
-                                m_param_noiseChargeDeposit);
+  paramList->addParameter(prefixed(prefix, "noiseChargeDeposit"),
+                          m_param_noiseChargeDeposit,
+                          "Threshold energy below which the hit is considered "
+                          "to be electronic noise",
+                          m_param_noiseChargeDeposit);
 }
 
 void WireHitBackgroundBlocker::apply(std::vector<CDCWireHit>& wireHits)

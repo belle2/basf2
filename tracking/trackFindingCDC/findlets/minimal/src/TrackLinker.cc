@@ -26,9 +26,9 @@ std::string TrackLinker::getDescription()
   return "Links tracks by extraction of track paths in a cellular automaton.";
 }
 
-void TrackLinker::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void TrackLinker::exposeParams(ParamList* paramList, const std::string& prefix)
 {
-  m_trackRelationCreator.exposeParameters(moduleParamList, prefix);
+  m_trackRelationCreator.exposeParams(paramList, prefix);
 }
 
 void TrackLinker::apply(const std::vector<CDCTrack>& inputTracks, std::vector<CDCTrack>& outputTracks)

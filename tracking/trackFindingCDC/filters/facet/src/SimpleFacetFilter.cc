@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 #include <cmath>
 
@@ -30,15 +30,15 @@ SimpleFacetFilter::SimpleFacetFilter(double deviationCosCut)
 {
 }
 
-void SimpleFacetFilter::exposeParameters(ModuleParamList* moduleParamList,
-                                         const std::string& prefix)
+void SimpleFacetFilter::exposeParams(ParamList* paramList,
+                                     const std::string& prefix)
 {
-  Super::exposeParameters(moduleParamList, prefix);
-  moduleParamList->addParameter(prefixed(prefix, "deviationCosCut"),
-                                m_param_deviationCosCut,
-                                "Acceptable deviation cosine in the angle of adjacent tangents "
-                                "to the drift circles.",
-                                m_param_deviationCosCut);
+  Super::exposeParams(paramList, prefix);
+  paramList->addParameter(prefixed(prefix, "deviationCosCut"),
+                          m_param_deviationCosCut,
+                          "Acceptable deviation cosine in the angle of adjacent tangents "
+                          "to the drift circles.",
+                          m_param_deviationCosCut);
 }
 
 Weight SimpleFacetFilter::operator()(const CDCFacet& facet)

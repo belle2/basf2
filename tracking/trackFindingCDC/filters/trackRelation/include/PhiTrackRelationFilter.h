@@ -10,6 +10,8 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/trackRelation/BaseTrackRelationFilter.h>
+
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 namespace Belle2 {
@@ -24,11 +26,11 @@ namespace Belle2 {
 
     public:
       /// Export all parameters
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+      void exposeParams(ParamList* paramList, const std::string& prefix) override
       {
-        moduleParamList->addParameter(prefixed(prefix, "maximalPhiDistance"), m_param_maximalPhiDistance,
-                                      "Maximal Phi distance below to tracks should be merged.",
-                                      m_param_maximalPhiDistance);
+        paramList->addParameter(prefixed(prefix, "maximalPhiDistance"), m_param_maximalPhiDistance,
+                                "Maximal Phi distance below to tracks should be merged.",
+                                m_param_maximalPhiDistance);
       }
 
       /// Implementation of the phi calculation.

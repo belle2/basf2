@@ -16,14 +16,14 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 #include <vector>
 #include <string>
 #include <algorithm>
 
 namespace Belle2 {
-  class ModuleParamList;
+
 
   namespace TrackFindingCDC {
 
@@ -59,9 +59,9 @@ namespace Belle2 {
       }
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
-        m_relationFilter.exposeParameters(moduleParamList, prefix);
-        moduleParamList->addParameter(prefixed(prefix, "onlyBest"),
+      void exposeParams(ParamList* paramList, const std::string& prefix) final {
+        m_relationFilter.exposeParams(paramList, prefix);
+        paramList->addParameter(prefixed(prefix, "onlyBest"),
         m_param_onlyBest,
         "Maximal number of the best relation to keep from each " +
         getClassMnemomicParameterDescription((AItem*)nullptr),

@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -24,13 +24,13 @@ std::string WireHitMCMultiLoopBlocker::getDescription()
          "based on MC information.";
 }
 
-void WireHitMCMultiLoopBlocker::exposeParameters(ModuleParamList* moduleParamList,
-                                                 const std::string& prefix)
+void WireHitMCMultiLoopBlocker::exposeParams(ParamList* paramList,
+                                             const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "UseNLoops"),
-                                m_param_useNLoops,
-                                "Maximal number of loops accepted",
-                                m_param_useNLoops);
+  paramList->addParameter(prefixed(prefix, "UseNLoops"),
+                          m_param_useNLoops,
+                          "Maximal number of loops accepted",
+                          m_param_useNLoops);
 }
 
 void WireHitMCMultiLoopBlocker::initialize()

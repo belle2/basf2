@@ -44,7 +44,7 @@ namespace Belle2 {
       /**
        * Constructor
        */
-      LaserCalibratorFit(unsigned moduleID);
+      explicit LaserCalibratorFit(unsigned moduleID);
 
       /**
        * Destructor

@@ -48,7 +48,7 @@ namespace Belle2 {
     FilterBasedVXDCDCTrackMergerFindlet();
 
     /// Expose the parameters of the sub findlets.
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+    void exposeParams(TrackFindingCDC::ParamList* paramList, const std::string& prefix) override;
 
     /// Do the track merging.
     void apply() override;

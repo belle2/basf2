@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <framework/core/ModuleParamList.h>
+
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 namespace Belle2 {
@@ -33,7 +33,7 @@ namespace Belle2 {
     using Super = TrackFindingCDC::Findlet<WeightedRelationItem>;
 
     /// Expose the cut value to the module.
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+    void exposeParams(TrackFindingCDC::ParamList* paramList, const std::string& prefix) override;
 
     /// Do the extrapolation.
     void apply(std::vector<WeightedRelationItem>& weightedRelations) override;

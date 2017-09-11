@@ -7,25 +7,27 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/modules/vxdCDCTrackMerger/StoreArrayMerger.h>
-#include <framework/dataobjects/Helix.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+
+#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/dataobjects/Helix.h>
 
 using namespace Belle2;
 
-void StoreArrayMerger::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void StoreArrayMerger::exposeParams(TrackFindingCDC::ParamList* paramList, const std::string& prefix)
 {
-  Super::exposeParameters(moduleParamList, prefix);
+  Super::exposeParams(paramList, prefix);
 
   // CDC input tracks
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "CDCRecoTrackStoreArrayName"), m_param_cdcRecoTrackStoreArrayName,
-                                "StoreArray name of the CDC Track Store Array", m_param_cdcRecoTrackStoreArrayName);
+  paramList->addParameter(TrackFindingCDC::prefixed(prefix, "CDCRecoTrackStoreArrayName"), m_param_cdcRecoTrackStoreArrayName,
+                          "StoreArray name of the CDC Track Store Array", m_param_cdcRecoTrackStoreArrayName);
   // VXD input tracks
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "VXDRecoTrackStoreArrayName"), m_param_vxdRecoTrackStoreArrayName,
-                                "StoreArray name of the VXD Track Store Array", m_param_vxdRecoTrackStoreArrayName);
+  paramList->addParameter(TrackFindingCDC::prefixed(prefix, "VXDRecoTrackStoreArrayName"), m_param_vxdRecoTrackStoreArrayName,
+                          "StoreArray name of the VXD Track Store Array", m_param_vxdRecoTrackStoreArrayName);
 }
 
 void StoreArrayMerger::initialize()

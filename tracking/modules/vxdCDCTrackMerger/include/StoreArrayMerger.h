@@ -7,11 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <framework/core/ModuleParamList.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -27,7 +25,7 @@ namespace Belle2 {
     using Super = TrackFindingCDC::Findlet<RecoTrack*, RecoTrack*>;
   public:
     /// Expose the parameters of the findlet
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+    void exposeParams(TrackFindingCDC::ParamList* paramList, const std::string& prefix) override;
 
     /// Require/register the store arrays
     void initialize() override;

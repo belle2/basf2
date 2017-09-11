@@ -22,9 +22,9 @@ namespace Belle2 {
       setDescription(
         "This module merges tracks which are reconstructed, separately, in the silicon (PXD+VXD) and in the CDC");
 
-      ModuleParamList moduleParamList = this->getParamList();
-      moduleParamList.getParameter<std::string>("distanceFilter").setDefaultValue("pass_through");
-      this->setParamList(moduleParamList);
+      ModuleParamList paramList = this->getParamList();
+      paramList.getParameter<std::string>("distanceFilter").setDefaultValue("pass_through");
+      this->setParamList(paramList);
     }
   };
 }

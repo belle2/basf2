@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/modules/vxdCDCTrackMerger/ExtrapolationDetectorTrackCombinationSelector.h>
 
+#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/MeasuredStateOnPlane.h>
@@ -18,20 +20,20 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void ExtrapolationDetectorTrackCombinationSelector::exposeParameters(ModuleParamList* moduleParamList,
+void ExtrapolationDetectorTrackCombinationSelector::exposeParams(ParamList* paramList,
     const std::string& prefix)
 {
-  Super::exposeParameters(moduleParamList, prefix);
+  Super::exposeParams(paramList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cutValue"), m_param_cutValue,
-                                "The maximal distance of extrapolated tracks defined on a plane with the"
-                                " given radius, above the relation will be deleted.",
-                                m_param_cutValue);
+  paramList->addParameter(TrackFindingCDC::prefixed(prefix, "cutValue"), m_param_cutValue,
+                          "The maximal distance of extrapolated tracks defined on a plane with the"
+                          " given radius, above the relation will be deleted.",
+                          m_param_cutValue);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "radius"), m_param_radius,
-                                "Radius to which the two tracks in each relation should be extrapolated. "
-                                "This can be for example the CDC inner wall radius.",
-                                m_param_radius);
+  paramList->addParameter(TrackFindingCDC::prefixed(prefix, "radius"), m_param_radius,
+                          "Radius to which the two tracks in each relation should be extrapolated. "
+                          "This can be for example the CDC inner wall radius.",
+                          m_param_radius);
 }
 
 void ExtrapolationDetectorTrackCombinationSelector::apply(std::vector<WeightedRelationItem>& weightedRelations)

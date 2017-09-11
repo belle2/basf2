@@ -14,15 +14,11 @@
 
 #include <TMatrixDSym.h>
 
-#include <boost/range/irange.hpp>
-
 #include <gtest/gtest.h>
 
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-using boost::irange;
 
 TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory3D_constructorPosMomCharge)
 {
@@ -127,9 +123,8 @@ TEST(TrackFindingCDCTest, CDCTrajectory3D_GFTrackRoundTrip)
   EXPECT_NEAR(expectedMomentum.z(), momentum.z(), 10e-7);
 
   EXPECT_EQ(expectedCharge, charge);
-
-  for (int i : irange(0, 6)) {
-    for (int j : irange(0, 6)) {
+  for (int i = 0; i < 6; ++i) {
+    for (int j = 0; j < 6; ++j) {
       EXPECT_NEAR(expectedCov6(i, j), cov6(i, j), 10e-7);
     }
   }

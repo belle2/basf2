@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/filters/base/Filter.fwd.h>
+
 #include <tracking/trackFindingCDC/utilities/CompositeProcessingSignalListener.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>

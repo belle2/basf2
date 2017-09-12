@@ -9,7 +9,21 @@
  **************************************************************************/
 #pragma once
 
-// This header file is deprecated
-// Instead use one of the following headers depending on the *minimal* needs of your use.
-#include <tracking/trackFindingCDC/filters/base/PassThroughFilter.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/PassThroughFilter.icc.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+
+    /// Filter adapter type that passes the weight of a weighted relation as a result
+    template<class AFilter>
+    class PassThroughFilter : public AFilter {
+    public:
+      /// Type of the object to be filtered
+      using Object = typename AFilter::Object;
+
+    public:
+      /// Returns the weight obtained from getWeight()
+      Weight operator()(const Object& obj) final;
+    };
+  }
+}

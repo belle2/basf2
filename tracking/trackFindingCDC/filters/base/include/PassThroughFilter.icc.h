@@ -9,7 +9,15 @@
  **************************************************************************/
 #pragma once
 
-// This header file is deprecated
-// Instead use one of the following headers depending on the *minimal* needs of your use.
 #include <tracking/trackFindingCDC/filters/base/PassThroughFilter.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/PassThroughFilter.icc.h>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+
+    template <class AFilter>
+    Weight PassThroughFilter<AFilter>::operator()(const Object& object)
+    {
+      return object.getWeight();
+    }
+  }
+}

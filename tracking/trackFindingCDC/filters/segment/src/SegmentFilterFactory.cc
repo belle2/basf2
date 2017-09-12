@@ -13,7 +13,8 @@
 
 #include <tracking/trackFindingCDC/filters/segment/AdvancedSegmentVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>

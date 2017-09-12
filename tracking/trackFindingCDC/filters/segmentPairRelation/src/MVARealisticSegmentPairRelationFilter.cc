@@ -10,8 +10,12 @@
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/MVARealisticSegmentPairRelationFilter.h>
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::MVA<BaseSegmentPairRelationFilter>;
 
 MVARealisticSegmentPairRelationFilter::MVARealisticSegmentPairRelationFilter()
   : Super(makeUnique<VarSet>(), "tracking/data/trackfindingcdc_RealisticSegmentPairRelationFilter.xml", 0.22)

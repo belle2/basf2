@@ -14,7 +14,8 @@
 #include <tracking/trackFindingCDC/filters/facet/BasicFacetVarSet.h>
 #include <tracking/trackFindingCDC/filters/facet/Chi2FacetFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.dcl.h>
+
 #include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>

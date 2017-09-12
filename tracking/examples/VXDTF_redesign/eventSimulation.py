@@ -26,6 +26,8 @@ from basf2 import *
 from beamparameters import add_beamparameters
 from simulation import add_simulation
 
+import os
+
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
 
@@ -125,9 +127,13 @@ mctrackfinder.param('RecoTracksStoreArrayName', 'MCRecoTracks')
 main.add_module(mctrackfinder)
 
 
+outputFileName = "MyRootFile.root"
+if os.environ.get('USE_BEAST2_GEOMETRY'):
+    outputFileName = "MyRootFile_Beast2.root"
+
 # Root output. Default filename can be overriden with '-o' basf2 option.
 rootOutput = register_module('RootOutput')
-rootOutput.param('outputFileName', "MyRootFile.root")
+rootOutput.param('outputFileName', outputFileName)
 main.add_module(rootOutput)
 
 log_to_file('createSim.log', append=False)

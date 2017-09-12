@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
 #include <tracking/trackFindingCDC/mclookup/CDCSimHitLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
 
 #include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>

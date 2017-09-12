@@ -7,9 +7,16 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
+
+#include <tracking/trackFindingCDC/mclookup/CDCSimHitLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>

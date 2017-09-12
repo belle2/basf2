@@ -9,7 +9,34 @@
  **************************************************************************/
 #pragma once
 
-// This header file is deprecated
-// Instead use one of the following headers depending on the *minimal* needs of your use.
 #include <tracking/trackFindingCDC/filters/base/NotFilter.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/NotFilter.icc.h>
+
+#include <tracking/trackFindingCDC/numerics/Weight.h>
+
+#include <memory>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+
+    template <class AFilter>
+    NotFilter<AFilter>::NotFilter(std::unique_ptr<AFilter> filter)
+      : m_filter(std::move(filter))
+    {
+      this->addProcessingSignalListener(m_filter.get());
+    }
+
+    template <class AFilter>
+    NotFilter<AFilter>::~NotFilter() = default;
+
+    template <class AFilter>
+    Weight NotFilter<AFilter>::operator()(const typename AFilter::Object& obj)
+    {
+      Weight result = (*m_filter)(obj);
+      if (std::isnan(result)) {
+        return 1;
+      } else {
+        return NAN;
+      }
+    }
+  }
+}

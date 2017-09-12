@@ -15,7 +15,9 @@
 
 #include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <memory>
 

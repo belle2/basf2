@@ -760,6 +760,8 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     converter = register_module('SPTC2RTConverter')
     converter.param('recoTracksStoreArrayName', reco_tracks)
     converter.param('spacePointsTCsStoreArrayName', nameSPTCs)
+    converter.param('svdClustersName', svd_clusters)
+    converter.param('svdHitsStoreArrayName', svd_clusters)
     path.add_module(converter)
 
 

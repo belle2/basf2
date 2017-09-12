@@ -131,7 +131,7 @@ def add_unpackers(path, components=None):
         path.add_module(pxdunpacker)
 
         pxdhitsorter = register_module('PXDRawHitSorter')
-        pxdhitsorter.param('mergeFrames', False)
+        pxdhitsorter.param('mergeFrames', True)
         path.add_module(pxdhitsorter)
 
         pxd_clusterizer = register_module('PXDClusterizer')

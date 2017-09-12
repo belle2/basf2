@@ -467,7 +467,6 @@ struct dhc_ghost_frame {
     word0.print();
     B2DEBUG(20, "DHC Ghost Frame TNRLO " << hex << trigger_nr_lo << " DHE ID $" << getDHEId() << " DHP port $" << getDHPPort() <<
             " CRC $");
-
   };
   inline unsigned short getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
   inline unsigned short getDHPPort(void) const {return (word0.getMisc()) & 0x3;};

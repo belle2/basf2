@@ -9,7 +9,17 @@
  **************************************************************************/
 #pragma once
 
-// This header file is deprecated
-// Instead use one of the following headers depending on the *minimal* needs of your use.
-#include <tracking/trackFindingCDC/filters/base/SloppyMCFilter.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/SloppyMCFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/SloppyFilter.dcl.h>
+#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.dcl.h>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+
+    /**
+     * Sloppy MC Filter Type using a VarSet and the truth variable in it. It will return true for correct ones and
+     * based on the scale factor also sometimes for false ones.
+     */
+    template<class ATruthVarSet>
+    using SloppyMCFilter = Sloppy<TruthVarFilter<ATruthVarSet> >;
+  }
+}

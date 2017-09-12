@@ -9,7 +9,5 @@
  **************************************************************************/
 #pragma once
 
-// This header file is deprecated
-// Instead use one of the following headers depending on the *minimal* needs of your use.
-#include <tracking/trackFindingCDC/filters/base/SloppyMCFilter.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/SloppyMCFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/SloppyFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>

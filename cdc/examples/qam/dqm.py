@@ -29,6 +29,10 @@ for w in nWires:
 nWiresSL = [160 * 8, 160 * 6, 192 * 6, 224 * 6, 256 * 6, 288 * 6,
             320 * 6, 352 * 6, 384 * 6]
 
+rfClock = 1.017774
+refT0 = 4905.0 * rfClock
+refMPV = 80
+
 
 class DQM():
 
@@ -51,6 +55,20 @@ class DQM():
                         for i in range(14336)]
         self.histHit = [self.f.Get('h' + str(400000 + i))
                         for i in range(56)]
+
+        self.lines = []
+        for h in self.histTDC:
+            y = h.GetMaximum()
+            line = TLine(refT0, 0, refT0, y)
+            line.SetLineColor(2)
+            self.lines.append(line)
+
+        self.lineMPVs = []
+        for h in self.histADC:
+            y = h.GetMaximum()
+            line = TLine(refMPV, 0, refMPV, y)
+            line.SetLineColor(2)
+            self.lineMPVs.append(line)
         #        self.histADCinLayer = [self.f.Get('h' + str(500000 + i))
         #                               for i in range(56)]
 
@@ -146,6 +164,7 @@ class DQM():
             self.hid = i + j
             self.canvas.cd(j + 1)
             self.histADC[self.hid].Draw()
+            self.lineMPVs[self.hid].Draw()
 
         self.type = 'adc'
         self.canvas.Update()
@@ -159,6 +178,7 @@ class DQM():
             self.hid = i + j
             self.canvas.cd(j + 1)
             self.histTDC[self.hid].Draw()
+            self.lines[self.hid].Draw()
 
         self.canvas.Update()
         self.type = 'tdc'
@@ -184,6 +204,7 @@ class DQM():
             self.hid = i + j
             self.canvas.cd(j + 1)
             self.histTDC[self.hid].Draw()
+            self.lines[self.hid].Draw()
 
         self.type = 'tdc'
         self.canvas.Update()
@@ -196,6 +217,7 @@ class DQM():
             self.hid = i + j
             self.canvas.cd(j + 1)
             self.histADC[self.hid].Draw()
+            self.lineMPVs[self.hid].Draw()
 
         self.type = 'adc'
         self.canvas.Update()

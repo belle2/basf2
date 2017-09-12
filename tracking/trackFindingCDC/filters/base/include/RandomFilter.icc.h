@@ -9,7 +9,17 @@
  **************************************************************************/
 #pragma once
 
-// This header file is deprecated
-// Instead use one of the following headers depending on the *minimal* needs of your use.
 #include <tracking/trackFindingCDC/filters/base/RandomFilter.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/RandomFilter.icc.h>
+
+#include <TRandom.h>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+
+    template <class AFilter>
+    Weight RandomFilter<AFilter>::operator()(const Object& obj __attribute__((unused)))
+    {
+      return gRandom->Rndm();
+    }
+  }
+}

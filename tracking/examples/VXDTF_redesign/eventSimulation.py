@@ -27,6 +27,7 @@ from beamparameters import add_beamparameters
 from simulation import add_simulation
 
 import os
+import sys
 
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
@@ -38,7 +39,17 @@ from setup_modules import setup_Geometry
 # ---------------------------------------------------------------------------------------
 
 # Set Random Seed for reproducable simulation. 0 means really random.
-set_random_seed(12345)
+rndseed = 12345
+# assume the first argument is the random seed
+if(len(sys.argv) > 1):
+    rndseed = sys.argv[1]
+
+outputDir = './'
+# assume second argument is the output directory
+if(len(sys.argv) > 2):
+    outputDir = sys.argv[2]
+
+set_random_seed(rndseed)
 
 # Set log level. Can be overridden with the "-l LEVEL" flag for basf2.
 set_log_level(LogLevel.ERROR)
@@ -126,10 +137,13 @@ mctrackfinder.param('WhichParticles', ['primary'])
 mctrackfinder.param('RecoTracksStoreArrayName', 'MCRecoTracks')
 main.add_module(mctrackfinder)
 
-
-outputFileName = "MyRootFile.root"
+# build the name of the output file
+outputFileName = outputDir + './'
 if os.environ.get('USE_BEAST2_GEOMETRY'):
-    outputFileName = "MyRootFile_Beast2.root"
+    outputFileName += "SimEvts_Beast2"
+else:
+    outputFileName += "SimEvts_Belle2"
+outputFileName += '_' + str(rndseed) + '.root'
 
 # Root output. Default filename can be overriden with '-o' basf2 option.
 rootOutput = register_module('RootOutput')

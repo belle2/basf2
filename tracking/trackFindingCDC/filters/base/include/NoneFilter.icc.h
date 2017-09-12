@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
@@ -9,7 +9,15 @@
  **************************************************************************/
 #pragma once
 
-// This header file is deprecated
-// Instead use one of the following headers depending on the *minimal* needs of your use.
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+
+    template <class AFilter>
+    Weight NoneFilter<AFilter>::operator()(const Object& obj __attribute__((unused)))
+    {
+      return NAN;
+    }
+  }
+}

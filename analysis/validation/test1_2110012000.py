@@ -37,9 +37,9 @@ fillParticleList('pi+:all', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4')
 copyList('pi+:pt', 'pi+:all')
 applyCuts('pi+:pt', 'pt > 0.1')
 
-loadStdAllPi0()
+stdPi0s('veryLoose')
 # reconstruct D+:kpi and perform a mass constrained vertex fit
-reconstructDecay('D+:sig -> pi+:pt pi0:all', '1.81 < M < 1.91')
+reconstructDecay('D+:sig -> pi+:pt pi0:veryLoose', '1.81 < M < 1.91')
 massVertexRave('D+:sig', 0.001)
 
 # truth matching
@@ -68,7 +68,7 @@ toolsDZ += ['MCTruth', '^D+ -> pi+ pi0']
 ntupleFile('../2110012000.ntup.root')
 ntupleTree('dp', 'D+:sig', toolsDZ)
 
-summaryOfLists(['D+:sig', 'pi+:pt', 'pi0:all'])
+summaryOfLists(['D+:sig', 'pi+:pt', 'pi0:veryLoose'])
 # --------------------------------------------------
 # Process the events and print call statistics
 # --------------------------------------------------

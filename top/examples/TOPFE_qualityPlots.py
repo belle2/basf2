@@ -120,6 +120,8 @@ class WaveformAnalyzer(Module):
 
     def initialize(self):
         ''' Initialize the Module: open the canvas. '''
+
+        #: output ntuple
         self.feProps = TNtuple(
             "feProps",
             "feProps",
@@ -127,10 +129,13 @@ class WaveformAnalyzer(Module):
             ":fePeak1Ht:fePeak1TDC:fePeak1Wd"
             ":fePeakHt:fePeakTDC:fePeakWd:fePeakIntegral"
             ":nTOPRawDigits:ch:nNarrowPeaks:nInFirstWindow:nHeight150")
+        #: number of waveforms processed
         self.nWaveForms = 0
+        #: number of waveforms out of order
         self.nWaveFormsOutOfOrder = 0
+        #: object of output file
         self.f = TFile.Open(args.output, "RECREATE")
-        # this variable counts how many plots were created. Stop after 10
+        #: counts how many plots were created. Stop after 10
         self.plotCounter = 0
 
     def event(self):
@@ -251,6 +256,7 @@ class WaveformAnalyzer(Module):
                 evtMetaData.obj().setEndOfData()
 
     def terminate(self):
+        '''End of run'''
         self.f.WriteTObject(self.feProps)
         self.f.Close()
         print("# Waveforms:", self.nWaveForms)

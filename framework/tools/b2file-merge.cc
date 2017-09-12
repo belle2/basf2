@@ -66,9 +66,10 @@ void printBackgroundInfo(const BackgroundInfo& a)
  *
  * number of events, file names and real time are not checked to allow for
  * different file sets to be used. We cannot check the background rate either
- * since this is slightly fluctuating as it's calculated by #events/real time.
+ * since this is slightly fluctuating as it's calculated as (number of events)/real time.
  * @param a basic background info to compare against
  * @param b new background info which has to be compatible
+ * @param filename input filename used to report errors
  */
 void checkBackgroundCompatible(const BackgroundInfo& a, const BackgroundInfo& b, const std::string& filename)
 {

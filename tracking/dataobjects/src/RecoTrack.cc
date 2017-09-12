@@ -305,7 +305,7 @@ void RecoTrack::deleteFittedInformation()
 }
 
 /// Helper function to get the seed or the measured state on plane from a track
-std::tuple<const TVector3&, const TVector3&, short> RecoTrack::extractTrackState() const
+std::tuple<TVector3, TVector3, short> RecoTrack::extractTrackState() const
 {
   if (not wasFitSuccessful()) {
     return std::make_tuple(getPositionSeed(), getMomentumSeed(), getChargeSeed());

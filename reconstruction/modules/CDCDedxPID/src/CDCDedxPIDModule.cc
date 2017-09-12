@@ -334,8 +334,8 @@ void CDCDedxPIDModule::event()
       bool lastHitInCurrentLayer = lastHit;
       if (!lastHit) {
         // peek at next hit
-        genfit::AbsMeasurement* aAbsMeasurementPtr = (*(tp + 1))->getRawMeasurement(0);
-        const CDCRecoHit* nextcdcRecoHit = dynamic_cast<const CDCRecoHit* >(aAbsMeasurementPtr);
+        genfit::AbsMeasurement* aAbsMeasurementPtrNext = (*(tp + 1))->getRawMeasurement(0);
+        const CDCRecoHit* nextcdcRecoHit = dynamic_cast<const CDCRecoHit* >(aAbsMeasurementPtrNext);
         // if next hit fails, assume this is the last hit in the layer
         if (!nextcdcRecoHit || !(cdcRecoHit->getCDCHit()) || !((*(tp + 1))->getFitterInfo())) {
           lastHitInCurrentLayer = true;

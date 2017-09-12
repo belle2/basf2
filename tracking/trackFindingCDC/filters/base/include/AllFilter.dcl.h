@@ -9,7 +9,21 @@
  **************************************************************************/
 #pragma once
 
-// This header file is deprecated
-// Instead use one of the following headers depending on the *minimal* needs of your use.
-#include <tracking/trackFindingCDC/filters/base/AllFilter.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+
+    /// Filter adapter type that accepts all items (just for reference).
+    template<class AFilter>
+    class AllFilter : public AFilter {
+    public:
+      /// Type of the object to be filtered
+      using Object = typename AFilter::Object;
+
+    public:
+      /// Accept all items.
+      Weight operator()(const Object& obj) final;
+    };
+  }
+}

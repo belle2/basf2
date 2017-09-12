@@ -19,8 +19,6 @@
 #include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
-#include <boost/algorithm/string/predicate.hpp>
-
 #include <vector>
 #include <string>
 #include <memory>
@@ -29,28 +27,32 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// A filter that records variables form given objects. It may record native varsets and/or weigths from other filters.
-    template <class AFilterFactory>
-    class UnionRecordingFilter : public Recording<typename AFilterFactory::CreatedFilter> {
+    template <class AFilter>
+    class UnionRecording : public Recording<AFilter> {
 
     private:
       /// Type of the super class
-      using Super = Recording<typename AFilterFactory::CreatedFilter>;
+      using Super = Recording<AFilter>;
 
-      /// Type of the filters that can be included in the recodring
-      using CreatedFilter = typename AFilterFactory::CreatedFilter;
+      /// Type of the factory used to produce FilterVarSets to be add to the recording
+      using AFilterFactory = FilterFactory<AFilter>;
 
     public:
       /// Type of the object to be analysed.
-      using Object = typename CreatedFilter::Object;
+      using Object = typename AFilter::Object;
 
     public:
       /// Constructor of the filter.
-      UnionRecordingFilter(const std::string& defaultRootFileName = "records.root",
-                           const std::string& defaultTreeName = "records")
+      UnionRecording(std::unique_ptr<AFilterFactory> filterFactory,
+                     const std::string& defaultRootFileName = "records.root",
+                     const std::string& defaultTreeName = "records")
         : Super(makeUnique<UnionVarSet<Object>>(), defaultRootFileName, defaultTreeName)
-        , m_filterFactory()
+        , m_filterFactory(std::move(filterFactory))
       {
       }
+
+      /// Default destructor
+      ~UnionRecording() = default;
 
       /// Expose the set of parameters of the filter to the module parameter list.
       void exposeParams(ParamList* paramList, const std::string& prefix) override
@@ -75,7 +77,7 @@ namespace Belle2 {
       {
         /// Create the skimming filter
         if (m_param_skim != "") {
-          std::unique_ptr<CreatedFilter> skimFilter = m_filterFactory.create(m_param_skim);
+          std::unique_ptr<AFilter> skimFilter = m_filterFactory->create(m_param_skim);
           this->setSkimFilter(std::move(skimFilter));
         }
 
@@ -112,7 +114,7 @@ namespace Belle2 {
       {
         // Get all filter names and make a var set name for each.
         std::map<std::string, std::string> filterNamesAndDescriptions =
-          m_filterFactory.getValidFilterNamesAndDescriptions();
+          m_filterFactory->getValidFilterNamesAndDescriptions();
 
         std::vector<std::string> filterNames;
         filterNames.reserve(filterNamesAndDescriptions.size());
@@ -127,17 +129,17 @@ namespace Belle2 {
       /// Create a variable set for the given name.
       virtual std::unique_ptr<BaseVarSet<Object>> createVarSet(const std::string& name) const
       {
-        if (boost::starts_with(name, "filter(") and boost::ends_with(name, ")")) {
+        if (name.find("filter(") == 0 and name.rfind(")") == name.size() - 1) {
           B2INFO("Detected filter name");
           std::string filterName = name.substr(7, name.size() - 8);
           B2INFO("filterName = " << filterName);
-          std::unique_ptr<CreatedFilter> filter = m_filterFactory.create(filterName);
+          std::unique_ptr<AFilter> filter = m_filterFactory->create(filterName);
           if (not filter) {
             B2WARNING("Could not construct filter for name " << filterName);
             return std::unique_ptr<BaseVarSet<Object>>(nullptr);
           } else {
             BaseVarSet<Object>* filterVarSet =
-              new FilterVarSet<CreatedFilter>(filterName, std::move(filter));
+              new FilterVarSet<AFilter>(filterName, std::move(filter));
             return std::unique_ptr<BaseVarSet<Object> >(filterVarSet);
           }
         } else {
@@ -159,8 +161,28 @@ namespace Belle2 {
       std::string m_param_skim = "";
 
       /// FilterFactory
-      AFilterFactory m_filterFactory;
+      std::unique_ptr<AFilterFactory> m_filterFactory;
+    };
 
+
+    /// A filter that records variables form given objects. It may record native varsets and/or weigths from other filters.
+    template <class AFilterFactory>
+    class UnionRecordingFilter : public UnionRecording<typename AFilterFactory::CreatedFilter> {
+
+    private:
+      /// Type of the super class
+      using Super = UnionRecording<typename AFilterFactory::CreatedFilter>;
+
+    public:
+      /// Constructor of the filter.
+      UnionRecordingFilter(const std::string& defaultRootFileName = "records.root",
+                           const std::string& defaultTreeName = "records")
+        : Super(makeUnique<AFilterFactory>(), defaultRootFileName, defaultTreeName)
+      {
+      }
+
+      /// Default destructor
+      ~UnionRecordingFilter() = default;
     };
   }
 }

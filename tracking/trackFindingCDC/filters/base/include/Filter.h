@@ -31,6 +31,9 @@ namespace Belle2 {
       /// Type of the object to be analysed.
       using Object = AObject;
 
+      /// Mark this class as the basic interface
+      using Interface = Filter<AObject>;
+
     public:
       /// Make destructor of interface class virtual
       virtual ~Filter() = default;

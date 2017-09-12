@@ -13,10 +13,10 @@
 #include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <tracking/trackFindingCDC/topology/EWirePosition.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/ADCCountTranslatorBase.h>
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
 
@@ -26,7 +26,6 @@
 #include <memory>
 
 namespace Belle2 {
-
 
   namespace TrackFindingCDC {
     class CDCWireHit;
@@ -59,7 +58,7 @@ namespace Belle2 {
 
     private:
       /// Parameter : Geometry set to be used. Either "base", "misalign" or " aligned"
-      std::string m_param_wirePosSet = "base";
+      std::string m_param_wirePosition = "base";
 
       /// Parameter : Switch to deactivate the sag of the wires for the concerns of the track finders.
       bool m_param_ignoreWireSag = false;
@@ -78,7 +77,7 @@ namespace Belle2 {
 
     private: // Prepared variables
       /// Geometry set to be used.
-      CDC::CDCGeometryPar::EWirePosition m_wirePosSet = CDC::CDCGeometryPar::c_Base;
+      EWirePosition m_wirePosition = EWirePosition::c_Base;
 
       /// Method for the initial time of flight estimation
       EPreferredDirection m_flightTimeEstimation = EPreferredDirection::c_None;

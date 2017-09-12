@@ -9,12 +9,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.fwd.h>
 
 #include <tracking/trackFindingCDC/filters/base/FilterParamMap.h>
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <memory>
 

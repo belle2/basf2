@@ -26,6 +26,9 @@ from basf2 import *
 from beamparameters import add_beamparameters
 from simulation import add_simulation
 
+from pxd import add_pxd_reconstruction
+from svd import add_svd_reconstruction
+
 # If later the use of bg is wanted, you can as well import setup_bg
 from setup_modules import setup_sim
 from setup_modules import setup_Geometry
@@ -97,12 +100,16 @@ setup_Geometry(path=main)
 
 # Detector Simulation:
 add_simulation(path=main,
+               usePXDDataReduction=False,  # for training one does not want the data reduction
                components=['BeamPipe',
                            'MagneticFieldConstant4LimitedRSVD',
                            'PXD',
                            'SVD',
                            'CDC'])
 
+# this adds the clusters for PXD and SVD (was done by the usePXDDataReduction previously) which are needed in the next steps
+add_pxd_reconstruction(path=main)
+add_svd_reconstruction(path=main)
 
 # ---------------------------------------------------------------------------------------
 # Setting up the MC based track finder.

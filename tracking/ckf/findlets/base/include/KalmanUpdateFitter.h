@@ -109,6 +109,8 @@ namespace Belle2 {
       const Eigen::Matrix<double, Dimension, 5>& H_k = convertToEigen<Dimension, 5>(measurementOnPlane.getHMatrix()->getMatrix());
       const Eigen::Matrix<double, Dimension, Dimension>& V_k = convertToEigen<Dimension, Dimension>(measurementOnPlane.getCov());
 
+      delete measurementsOnPlane.front();
+
       return std::make_tuple(m_k, H_k, V_k);
     };
   };

@@ -44,13 +44,14 @@ def add_PXDDataReduction(path, components, use_vxdtf2=False):
     pxd_digitizer.param('Digits', pxd_unfiltered_digits)
     path.add_module(pxd_digitizer)
 
-    # SVD tracking
-    add_svd_reconstruction(path)
-    # SVD tracking
+    # SVD reconstruction
+    svd_cluster = '__ROIsvdClusters'
+    add_svd_reconstruction(path, svd_cluster)
 
+    # SVD tracking
     svd_reco_tracks = '__ROIsvdRecoTracks'
 
-    add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2)
+    add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2, svd_cluster='__ROIsvdClusters')
 
     pxdDataRed = register_module('PXDDataReduction')
     param_pxdDataRed = {

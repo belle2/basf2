@@ -132,13 +132,12 @@ class WFDisplay(Module):
         k = 0
         nHits = 0
         fname = 'waveforms_run' + str(run) + '_event' + str(event) + '_chan'
+        #: output file name
         self.pdfFile = fname
         for waveform in waveforms:
             slot = waveform.getModuleID()
             chan = waveform.getChannel()
-            if(chan % 8 == 0):
-                continue
-            self.pdfFile = self.pdfFile + '-' + str(chan)
+            self.pdfFile = self.pdfFile + '-S' + str(slot) + '_' + str(chan)
             wf = waveform.getWaveform()
             self.hist[k].Reset()
             numSamples = waveform.getSize()

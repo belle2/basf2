@@ -9,15 +9,32 @@
  **************************************************************************/
 #pragma once
 
-// This header file is deprecated
-// Instead use one of the following headers depending on the *minimal* needs of your use.
-#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// MC Filter Type using a VarSet and the truth variable in it.
     template<class ATruthVarSet>
-    using MCFilter = TruthVarFilter<ATruthVarSet>;
+    class TruthVarFilter : public ChoosableFromVarSetFilter<ATruthVarSet> {
+
+    private:
+      /// Type of the base class
+      using Super = ChoosableFromVarSetFilter<ATruthVarSet>;
+
+    public:
+      /// Type of the handled object.
+      using Object = typename Super::Object;
+
+    public:
+      /// Constructor.
+      TruthVarFilter();
+
+      /// Default destructor
+      ~TruthVarFilter();
+
+    public:
+      /// Reject an item if the truth variable is 0, else accept it.
+      Weight operator()(const Object& object) override;
+    };
   }
 }

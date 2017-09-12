@@ -9,15 +9,31 @@
  **************************************************************************/
 #pragma once
 
-// This header file is deprecated
-// Instead use one of the following headers depending on the *minimal* needs of your use.
 #include <tracking/trackFindingCDC/filters/base/TruthVarFilter.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
+
+#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
+
+#include <tracking/trackFindingCDC/numerics/Weight.h>
+
+#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// MC Filter Type using a VarSet and the truth variable in it.
+
+    template <class ATruthVarSet>
+    TruthVarFilter<ATruthVarSet>::TruthVarFilter()
+      : Super("truth")
+    {
+    }
+
+    template <class ATruthVarSet>
+    TruthVarFilter<ATruthVarSet>::~TruthVarFilter() = default;
+
     template<class ATruthVarSet>
-    using MCFilter = TruthVarFilter<ATruthVarSet>;
+    auto TruthVarFilter<ATruthVarSet>::operator()(const Object& object) -> Weight {
+      Weight value = Super::operator()(object);
+      if (std::isnan(value)) return NAN;
+      return 1.0;
+    }
   }
 }

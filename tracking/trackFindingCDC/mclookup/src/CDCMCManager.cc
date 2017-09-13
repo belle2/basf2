@@ -26,6 +26,9 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

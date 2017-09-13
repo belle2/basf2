@@ -14,6 +14,8 @@
 #include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
 #include <tracking/trackFindingCDC/numerics/Index.h>
 
+#include <map>
+
 namespace Belle2 {
   class MCParticle;
   class CDCSimHit;

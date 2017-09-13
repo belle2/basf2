@@ -14,6 +14,10 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
+#include <mdst/dataobjects/MCParticle.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -98,109 +102,6 @@ void CDCMCMap::fillSimHitByHitMap()
     }
   }
 }
-
-/*
-void CDCMCMap::fillMCParticleByHitMap()
-{
-
-  StoreArray<MCParticle> mcParticles;
-  StoreArray<CDCHit> hits;
-
-  RelationArray mcParticleToHitsRelations(mcParticles, hits);
-  if (not mcParticleToHitsRelations.isValid()) {
-    B2WARNING("Relation from MCParticles to CDCHits not present");
-    return;
-  }
-
-  // Pickup an iterator for hinted insertion
-  MCParticleByCDCHitMap::iterator itInsertHint = m_mcParticlesByHit.end();
-
-  std::map<const MCParticle*, std::vector<const CDCSimHit*>> primarySimHitsByMCParticle;
-
-  for (const RelationElement& mcParticleToHitsRelation : mcParticleToHitsRelations) {
-
-    RelationElement::index_type iMCParticle = mcParticleToHitsRelation.getFromIndex();
-    const MCParticle* ptrMCParticle = mcParticles[iMCParticle];
-
-    size_t nRelatedHits = mcParticleToHitsRelation.getSize();
-    for (size_t iRelation = 0; iRelation < nRelatedHits; ++iRelation) {
-
-      RelationElement::index_type iHit = mcParticleToHitsRelation.getToIndex(iRelation);
-      RelationElement::weight_type weight = mcParticleToHitsRelation.getWeight(iRelation);
-
-      const CDCHit* ptrHit = hits[iHit];
-
-      if (m_mcParticlesByHit.by<CDCHit>().count(ptrHit) != 0) {
-        B2WARNING("CDCHit as more than one related MCParticle - reorganize the mapping");
-      }
-
-      if (indicatesReassignedSecondary(weight)) {
-        m_reassignedSecondaryHits.insert(ptrHit);
-      } else {
-        const CDCSimHit* ptrSimHit = ptrHit->getRelated<CDCSimHit>();
-        if (ptrMCParticle->isPrimaryParticle() and ptrSimHit) {
-          primarySimHitsByMCParticle[ptrMCParticle].push_back(ptrSimHit);
-        }
-      }
-
-      itInsertHint = m_mcParticlesByHit.insert(itInsertHint, {ptrMCParticle, ptrHit});
-    }
-  }
-
-  // Check if every hit has a corresponding MCParticle
-  // Only exception is, if the hit is background.
-  for (const CDCHit& hit : hits) {
-    const CDCHit* ptrHit = &hit;
-
-    if (m_mcParticlesByHit.by<CDCHit>().count(ptrHit) == 0 and not isBackground(ptrHit)) {
-      B2WARNING("CDCHit has no related MCParticle but CDCSimHit indicates that it is no background "
-                "in CDCMCMap::fill()");
-    };
-  }
-
-  // Check time ordering of primary hits
-  int nSortedIncorretly = 0;
-  auto lessFlightTime = [](const CDCSimHit* lhs, const CDCSimHit* rhs) {
-    return lhs->getFlightTime() < rhs->getFlightTime();
-  };
-
-  auto lessArrayIndex = [](const CDCSimHit* lhs, const CDCSimHit* rhs) -> bool {
-    return lhs->getArrayIndex() < rhs->getArrayIndex();
-  };
-
-  for (std::pair<const MCParticle* const, std::vector<const CDCSimHit*>>&
-           primarySimHitsForMCParticle : primarySimHitsByMCParticle) {
-
-    const MCParticle* ptrMCParticle = primarySimHitsForMCParticle.first;
-    std::vector<const CDCSimHit*>& simHits = primarySimHitsForMCParticle.second;
-    std::sort(simHits.begin(), simHits.end(), lessArrayIndex);
-    auto itSorted = std::is_sorted_until(simHits.begin(), simHits.end(), lessFlightTime);
-    if (itSorted != simHits.end()) {
-      ++nSortedIncorretly;
-      B2DEBUG(100,
-              "CDCSimHits for MCParticle " << ptrMCParticle->getArrayIndex()
-                                           << " only sorted correctly up to hit number "
-                                           << std::distance(simHits.begin(), itSorted));
-      --itSorted;
-      B2DEBUG(100,
-              "Between wire " << (*itSorted)->getWireID() << " " << (*itSorted)->getFlightTime()
-                              << "ns "
-                              << (*itSorted)->getArrayIndex());
-      ++itSorted;
-      B2DEBUG(100,
-              "and wire " << (*itSorted)->getWireID() << " " << (*itSorted)->getFlightTime()
-                          << "ns "
-                          << (*itSorted)->getArrayIndex());
-    }
-  }
-  if (nSortedIncorretly) {
-    B2WARNING("(BII-2136) CDCSimHits for "
-              << nSortedIncorretly
-              << " primary mc particles are not sorted correctly by their time of flight");
-  }
-}
-*/
-
 
 void CDCMCMap::fillMCParticleByHitMap()
 {
@@ -348,4 +249,34 @@ void CDCMCMap::validateReassignedSecondaries() const
       B2WARNING("CDCHit is reassigned secondary but related CDCSimHit is not.");
     }
   }
+}
+
+MayBePtr<const CDCSimHit> CDCMCMap::getSimHit(const CDCHit* hit) const
+{
+  return hit ? hit->getRelated<CDCSimHit>() : nullptr;
+}
+
+MayBePtr<const CDCHit> CDCMCMap::getHit(const CDCSimHit* simHit) const
+{
+  return simHit ? simHit->getRelated<CDCHit>() : nullptr;
+}
+
+bool CDCMCMap::isBackground(const CDCSimHit* simHit) const
+{
+  return simHit ? simHit->getBackgroundTag() != CDCSimHit::bg_none : false;
+}
+
+bool CDCMCMap::isBackground(const CDCHit* hit) const
+{
+  return isBackground(getSimHit(hit));
+}
+
+MayBePtr<const MCParticle> CDCMCMap::getMCParticle(const CDCHit* hit) const
+{
+  return hit ? hit->getRelated<MCParticle>() : nullptr;
+}
+
+MayBePtr<const MCParticle> CDCMCMap::getMCParticle(const CDCSimHit* simHit) const
+{
+  return simHit ? simHit->getRelated<MCParticle>() : nullptr;
 }

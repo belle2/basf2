@@ -13,11 +13,11 @@
 #include <tracking/trackFindingCDC/numerics/ERightLeft.h>
 #include <tracking/trackFindingCDC/numerics/Index.h>
 
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCSimHit.h>
-#include <mdst/dataobjects/MCParticle.h>
-
 namespace Belle2 {
+  class MCParticle;
+  class CDCSimHit;
+  class CDCHit;
+
   namespace TrackFindingCDC {
 
     class Vector3D;
@@ -82,7 +82,6 @@ namespace Belle2 {
 
       /// Returns the true right left passage information
       ERightLeft getRLInfo(const CDCHit* ptrHit) const;
-
     };
   }
 }

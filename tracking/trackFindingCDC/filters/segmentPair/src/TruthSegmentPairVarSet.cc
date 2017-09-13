@@ -15,6 +15,8 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
+#include <cdc/dataobjects/CDCSimHit.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

@@ -12,14 +12,14 @@
 #include <tracking/trackFindingCDC/utilities/Range.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCSimHit.h>
-#include <mdst/dataobjects/MCParticle.h>
-
 #include <map>
 #include <set>
 
 namespace Belle2 {
+  class MCParticle;
+  class CDCSimHit;
+  class CDCHit;
+
   namespace TrackFindingCDC {
 
     /// Class to organize and present the monte carlo hit information
@@ -64,46 +64,28 @@ namespace Belle2 {
 
     public:
       /// Seeks the CDCSimHit related to the CDCHit.
-      MayBePtr<const CDCSimHit> getSimHit(const CDCHit* hit) const
-      {
-        return hit ? hit->getRelated<CDCSimHit>() : nullptr;
-      }
+      MayBePtr<const CDCSimHit> getSimHit(const CDCHit* hit) const;
 
       /// Seeks the CDCHit related to the CDCSimHit - nullptr if no CDCHit is related.
-      MayBePtr<const CDCHit> getHit(const CDCSimHit* simHit) const
-      {
-        return simHit ? simHit->getRelated<CDCHit>() : nullptr;
-      }
+      MayBePtr<const CDCHit> getHit(const CDCSimHit* simHit) const;
 
       /// Indicates if the CDCSimHit is considered background.
-      bool isBackground(const CDCSimHit* simHit) const
-      {
-        return simHit ? simHit->getBackgroundTag() != CDCSimHit::bg_none : false;
-      }
+      bool isBackground(const CDCSimHit* simHit) const;
 
       /// Indicates if the CDCSimHit is considered background.
-      bool isBackground(const CDCHit* hit) const
-      {
-        return isBackground(getSimHit(hit));
-      }
+      bool isBackground(const CDCHit* hit) const;
 
       /**
        *  Seeks the MCParticle related to the CDCHit.
        *  Nullptr if no MCParticle is related, this is also the case for background hits.
        */
-      MayBePtr<const MCParticle> getMCParticle(const CDCHit* hit) const
-      {
-        return hit ? hit->getRelated<MCParticle>() : nullptr;
-      }
+      MayBePtr<const MCParticle> getMCParticle(const CDCHit* hit) const;
 
       /**
        *  Seeks the MCParticle related to the CDCSimHit.
        *  Nullptr if no MCParticle is related, this is also the case for background hits.
        */
-      MayBePtr<const MCParticle> getMCParticle(const CDCSimHit* simHit) const
-      {
-        return simHit ? simHit->getRelated<MCParticle>() : nullptr;
-      }
+      MayBePtr<const MCParticle> getMCParticle(const CDCSimHit* simHit) const;
 
       /// Getter for the range MCParticle to CDCSimHits relations which come from the given MCParticle
       auto getSimHits(const MCParticle* mcParticle) const

@@ -20,8 +20,6 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
-#include <framework/core/ModuleParamList.h>
-
 namespace Belle2 {
 
   namespace TrackFindingCDC {

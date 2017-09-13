@@ -10,7 +10,6 @@
 #pragma once
 
 #include <framework/logging/Logger.h>
-#include <framework/core/ModuleParamList.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 #include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>

@@ -14,7 +14,6 @@
 #include <tracking/trackFindingCDC/display/AttributeMap.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <cdc/dataobjects/CDCHit.h>
 
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
@@ -24,6 +23,7 @@
 
 namespace Belle2 {
   class RecoTrack;
+  class CDCHit;
 
   namespace TrackFindingCDC {
 

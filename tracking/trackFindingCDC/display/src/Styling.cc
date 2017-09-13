@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/display/RecoTrackColorMapping.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
+#include <cdc/dataobjects/CDCHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

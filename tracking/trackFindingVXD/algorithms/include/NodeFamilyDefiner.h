@@ -85,6 +85,7 @@ namespace Belle2 {
         metaInfo.setFamily(family);
         NeighbourContainerType& innerNeighbours = neighbour->getInnerNodes();
         NeighbourContainerType& outerNeighbours = neighbour->getOuterNodes();
+        newNeighbours.reserve(innerNeighbours.size() + outerNeighbours.size());
         newNeighbours.insert(newNeighbours.end(), innerNeighbours.begin(), innerNeighbours.end());
         newNeighbours.insert(newNeighbours.end(), outerNeighbours.begin(), outerNeighbours.end());
       }

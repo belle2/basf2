@@ -72,7 +72,7 @@ c.Clear()
 
 ht_tdcHist = ROOT.TH2D("ht_tdcHist", "Height vs TDC;TDC;height", 256, 1, 257, 1100, 50, 1150)
 t.Draw("fePeakHt:fePeakTDC>>ht_tdcHist", "", "colz")
-c.SaveAs("fePeakHt_vs_TDC.df")
+c.SaveAs("fePeakHt_vs_TDC.pdf")
 c.SetLogz()
 c.Clear()
 

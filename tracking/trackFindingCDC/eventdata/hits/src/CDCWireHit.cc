@@ -16,6 +16,8 @@
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
 
+#include <cdc/dataobjects/CDCHit.h>
+
 #include <cmath>
 
 using namespace Belle2;
@@ -113,6 +115,21 @@ CDCWireHit::CDCWireHit(const WireID& wireID,
 {
 }
 
+bool CDCWireHit::operator<(const CDCHit& hit)
+{
+  return this->getWireID().getEWire() < hit.getID();
+}
+
+bool TrackFindingCDC::operator<(const CDCWireHit& wireHit, const CDCHit& hit)
+{
+  return wireHit.getWireID().getEWire() < hit.getID();
+}
+
+bool TrackFindingCDC::operator<(const CDCHit& hit, const CDCWireHit& wireHit)
+{
+  return hit.getID() < wireHit.getWireID().getEWire();
+}
+
 const CDCWire& CDCWireHit::attachWire() const
 {
   m_wire = CDCWire::getInstance(m_wireID);
@@ -158,4 +175,9 @@ Circle2D CDCWireHit::conformalTransformed(const Vector2D& relativeTo) const
   Circle2D driftCircle(getRefPos2D() - relativeTo, getRefDriftLength());
   driftCircle.conformalTransform();
   return driftCircle;
+}
+
+Index CDCWireHit::getStoreIHit() const
+{
+  return getHit() ? getHit()->getArrayIndex() : c_InvalidIndex;
 }

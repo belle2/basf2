@@ -15,6 +15,8 @@
 
 #include <tracking/trackFindingCDC/numerics/ToFinite.h>
 
+#include <cdc/dataobjects/CDCHit.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

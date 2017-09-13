@@ -18,11 +18,13 @@
 
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
 #include <cdc/dataobjects/ADCCountTranslatorBase.h>
-#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/WireID.h>
 
 #include <cassert>
 
 namespace Belle2 {
+  class CDCHit;
+
   namespace TrackFindingCDC {
     class CDCTrajectory2D;
 
@@ -126,23 +128,13 @@ namespace Belle2 {
       }
 
       /// Defines CDCWireHits and raw CDCHit to be coaligned.
-      bool operator<(const CDCHit& hit)
-      {
-        return this->getWireID().getEWire() < hit.getID();
-      }
+      bool operator<(const CDCHit& hit);
 
-      /// Defines CDCWireHits and raw CDCHit to be coaligned.
-      friend bool operator<(const CDCWireHit& wireHit, const CDCHit& hit)
-      {
-        return wireHit.getWireID().getEWire() < hit.getID();
-      }
+      friend bool operator<(const CDCWireHit& wireHit, const CDCHit& hit);
 
       /// Defines wire hits and raw CDCHit to be coaligned.
       // Same as above but the other way round.
-      friend bool operator<(const CDCHit& hit, const CDCWireHit& wireHit)
-      {
-        return hit.getID() < wireHit.getWireID().getEWire();
-      }
+      friend bool operator<(const CDCHit& hit, const CDCWireHit& wireHit);
 
       /// Defines CDCWireSuperLayer and CDCWireHit to be coordered with the super layers
       friend bool operator<(const CDCWireHit& wireHit, const CDCWireSuperLayer& wireSuperLayer)
@@ -164,10 +156,7 @@ namespace Belle2 {
       }
 
       /// Getter for the index of the hit in the StoreArray holding this hit.
-      Index getStoreIHit() const
-      {
-        return getHit() ? getHit()->getArrayIndex() : c_InvalidIndex;
-      }
+      Index getStoreIHit() const;
 
       /// Getter for the CDCWire the hit is located on.
       const CDCWire& getWire() const
@@ -365,5 +354,11 @@ namespace Belle2 {
         return wireHit;
       }
     };
+
+    /// Defines CDCWireHits and raw CDCHit to be coaligned.
+    bool operator<(const CDCWireHit& wireHit, const CDCHit& hit);
+
+    /// Defines CDCWireHits and raw CDCHit to be coaligned.
+    bool operator<(const CDCHit& hit, const CDCWireHit& wireHit);;
   }
 }

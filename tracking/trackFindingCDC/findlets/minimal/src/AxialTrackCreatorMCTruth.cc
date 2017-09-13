@@ -24,6 +24,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <cdc/dataobjects/CDCHit.h>
 
 #include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 

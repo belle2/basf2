@@ -15,6 +15,8 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 
+#include <cdc/dataobjects/CDCHit.h>
+
 #include <cassert>
 
 using namespace Belle2;

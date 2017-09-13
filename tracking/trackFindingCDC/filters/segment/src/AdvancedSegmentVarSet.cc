@@ -16,6 +16,8 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 
+#include <cdc/dataobjects/CDCHit.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

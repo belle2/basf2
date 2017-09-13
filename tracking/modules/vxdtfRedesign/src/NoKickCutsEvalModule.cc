@@ -12,8 +12,8 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <TFile.h>
-#include <tracking/modules/hitXP/hitXPModule.h>
-#include <tracking/modules/NoKickCutsEval/NoKickCutsEvalModule.h>
+#include <tracking/modules/trackingPerformanceEvaluation/hitXPModule.h>
+#include <tracking/modules/vxdtfRedesign/NoKickCutsEvalModule.h>
 
 
 #include <cstdio>

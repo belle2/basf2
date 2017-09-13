@@ -109,6 +109,12 @@ path.add_module(secMapBootStrap)
 nameTag = 'Belle2'
 if os.environ.get('USE_BEAST2_GEOMETRY'):
     nameTag = 'Beast2'
+
+if usePXD:
+    nameTag += '_VXD'
+else:
+    nameTag += '_SVDOnly'
+
 SecMapTrainerBase = register_module('VXDTFTrainingDataCollector')
 SecMapTrainerBase.param('NameTag', nameTag)
 SecMapTrainerBase.param('SpacePointTrackCandsName', 'checkedSPTCs')

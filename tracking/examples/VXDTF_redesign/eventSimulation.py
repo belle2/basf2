@@ -17,8 +17,13 @@
 # adapted in this script. Some convenience functions are outsourced
 # to setup_modules.py.
 #
+# The script takes two optional command line arguments: the first will
+# be interpreted as random seed, the second as directory for the output.
+# e.g: basf2 'eventSimulation.py 12354 ./datadir/'
+# will result in setting the random seed to 12354 and the output will
+# be written to './datadir/'
 #
-# Contributors: Jonas Wagner, Felix Metzner
+# Contributors: Jonas Wagner, Felix Metzner, Thomas Lueck
 #####################################################################
 
 

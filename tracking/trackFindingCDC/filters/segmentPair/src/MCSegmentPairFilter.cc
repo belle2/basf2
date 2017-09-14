@@ -13,10 +13,14 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.icc.h>
+
 #include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::MCSymmetric<BaseSegmentPairFilter>;
 
 MCSegmentPairFilter::MCSegmentPairFilter(bool allowReverse)
   : Super(allowReverse)

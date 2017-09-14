@@ -10,7 +10,12 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/segmentPair/BaseSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
+
+#include <map>
+#include <string>
+#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

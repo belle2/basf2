@@ -12,9 +12,6 @@
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
-#include <vector>
-#include <utility>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegment2D;

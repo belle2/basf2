@@ -143,10 +143,13 @@ void TrackFinderVXDBasicPathFinderModule::event()
   for (auto& aPath : collectedPaths) {
     vector <const SpacePoint*> spPath;
     spPath.reserve(aPath->size());
+    short family;
     spPath.push_back(aPath->back()->getEntry().getInnerHit()->spacePoint);
     for (auto aNodeIt = (*aPath).rbegin(); aNodeIt != (*aPath).rend();  ++aNodeIt) {
       spPath.push_back((*aNodeIt)->getEntry().getOuterHit()->spacePoint);
+      family = (*aNodeIt)->getMetaInfo().getFamily();
     }
+    m_sptcCreator.createSPTCs(m_TCs, spPath, family);
   }
 
 

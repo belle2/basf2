@@ -14,6 +14,8 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCSimHitLookUp.h>
 
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 

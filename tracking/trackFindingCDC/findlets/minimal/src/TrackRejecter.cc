@@ -11,11 +11,17 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 #include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
-using namespace Belle2::TrackFindingCDC;
+using namespace Belle2;
+using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::ChooseableFilter<TrackFilterFactory>;
 
 TrackRejecter::TrackRejecter(const std::string& defaultFilterName)
   : m_trackFilter(defaultFilterName)

@@ -13,6 +13,8 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
 #include <tracking/trackFindingCDC/numerics/ToFinite.h>
 
 #include <cdc/dataobjects/CDCHit.h>

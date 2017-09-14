@@ -9,14 +9,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
-
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 
 #include <tracking/trackFindingCDC/geometry/UncertainHelix.h>
+
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/CovarianceMatrix.h>
 
 #include <TMath.h>
 #include <cmath>
@@ -29,8 +29,15 @@ namespace Belle2 {
   class MCParticle;
   class RecoTrack;
 
-
   namespace TrackFindingCDC {
+    class CDCTrajectory2D;
+    class CDCTrajectorySZ;
+
+    class WireLine;
+
+    class UncertainHelix;
+    class UncertainPerigeeCircle;
+    class UncertainSZLine;
 
     /// Particle full three dimensional trajectory.
     class CDCTrajectory3D  {
@@ -217,37 +224,19 @@ namespace Belle2 {
 
     public:
       /// Getter for the two dimensional trajectory
-      CDCTrajectory2D getTrajectory2D() const
-      {
-        return CDCTrajectory2D(getLocalOrigin().xy(),
-                               getLocalHelix().uncertainCircleXY(),
-                               getFlightTime());
-      }
+      CDCTrajectory2D getTrajectory2D() const;
 
       /// Getter for the sz trajectory
-      CDCTrajectorySZ getTrajectorySZ() const
-      {
-        UncertainSZLine globalSZLine = getLocalHelix().uncertainSZLine();
-        globalSZLine.passiveMoveBy(Vector2D(0, -getLocalOrigin().z()));
-        return CDCTrajectorySZ(globalSZLine);
-      }
+      CDCTrajectorySZ getTrajectorySZ() const;
 
       /// Getter for the circle in global coordinates.
-      PerigeeCircle getGlobalCircle() const
-      {
-        // Down cast since we do not necessarily wont the covariance matrix transformed as well
-        PerigeeCircle result(getLocalHelix()->circleXY());
-        result.passiveMoveBy(-getLocalOrigin().xy());
-        return result;
-      }
+      PerigeeCircle getGlobalCircle() const;
 
       /// Getter for the circle in local coordinates
-      UncertainPerigeeCircle getLocalCircle() const
-      { return getLocalHelix().uncertainCircleXY(); }
+      UncertainPerigeeCircle getLocalCircle() const;
 
       /// Getter for the sz line starting from the local origin
-      UncertainSZLine getLocalSZLine() const
-      { return getLocalHelix().uncertainSZLine(); }
+      UncertainSZLine getLocalSZLine() const;
 
       /// Getter for an individual element of the covariance matrix of the local helix parameters.
       double getLocalCovariance(EHelixParameter iRow, EHelixParameter iCol) const
@@ -328,8 +317,6 @@ namespace Belle2 {
 
       /// Memory for the estimation of the time at which the particle arrived at the support point.
       double m_flightTime = NAN;
-
     };
-
   }
 }

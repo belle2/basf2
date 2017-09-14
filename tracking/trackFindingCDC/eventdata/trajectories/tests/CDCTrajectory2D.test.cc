@@ -7,11 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <gtest/gtest.h>
+#include <tracking/trackFindingCDC/topology/WireLine.h>
 
+#include <gtest/gtest.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

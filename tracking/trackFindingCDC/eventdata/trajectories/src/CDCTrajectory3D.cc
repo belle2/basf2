@@ -7,12 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
+
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
+#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/UncertainSZLine.h>
+#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
 
 #include <tracking/trackFindingCDC/numerics/TMatrixConversion.h>
 
@@ -29,15 +35,15 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,
-                                 const CDCTrajectorySZ& trajectorySZ) :
-  m_localOrigin(trajectory2D.getLocalOrigin()),
-  m_localHelix(trajectory2D.getLocalCircle(), trajectorySZ.getSZLine()),
-  m_flightTime(trajectory2D.getFlightTime())
+                                 const CDCTrajectorySZ& trajectorySZ)
+  : m_localOrigin(trajectory2D.getLocalOrigin())
+  , m_localHelix(trajectory2D.getLocalCircle(), trajectorySZ.getSZLine())
+  , m_flightTime(trajectory2D.getFlightTime())
 {
 }
 
-CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D) :
-  CDCTrajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption())
+CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D)
+  : CDCTrajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption())
 {
 }
 
@@ -46,13 +52,13 @@ CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
                                  const Vector3D& mom3D,
                                  const double charge,
                                  const double bZ)
-  : m_localOrigin(pos3D),
-    m_localHelix(CDCBFieldUtil::absMom2DToCurvature(mom3D.xy().norm(), charge, bZ),
+  : m_localOrigin(pos3D)
+  , m_localHelix(CDCBFieldUtil::absMom2DToCurvature(mom3D.xy().norm(), charge, bZ),
                  mom3D.xy().unit(),
                  0.0,
                  mom3D.cotTheta(),
-                 0.0),
-    m_flightTime(time)
+                 0.0)
+  , m_flightTime(time)
 {
 }
 
@@ -60,8 +66,7 @@ CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
                                  const double time,
                                  const Vector3D& mom3D,
                                  const double charge)
-  : CDCTrajectory3D(pos3D, time, mom3D, charge,
-                    CDCBFieldUtil::getBFieldZ(pos3D))
+  : CDCTrajectory3D(pos3D, time, mom3D, charge, CDCBFieldUtil::getBFieldZ(pos3D))
 {
 }
 
@@ -82,12 +87,12 @@ CDCTrajectory3D::CDCTrajectory3D(const MCParticle& mcParticle)
 {
 }
 
-CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const double bZ) :
-  CDCTrajectory3D(Vector3D{gfTrackCand.getPosSeed()},
-                  gfTrackCand.getTimeSeed(),
-                  Vector3D{gfTrackCand.getMomSeed()},
-                  gfTrackCand.getChargeSeed(),
-                  bZ)
+CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const double bZ)
+  : CDCTrajectory3D(Vector3D{gfTrackCand.getPosSeed()},
+                    gfTrackCand.getTimeSeed(),
+                    Vector3D{gfTrackCand.getMomSeed()},
+                    gfTrackCand.getChargeSeed(),
+                    bZ)
 {
   // Maybe push these out of this function:
   // Indices of the cartesian coordinates
@@ -152,9 +157,8 @@ CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const dou
   m_localHelix.setHelixCovariance(helixCovariance);
 }
 
-CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand) :
-  CDCTrajectory3D(gfTrackCand,
-                  CDCBFieldUtil::getBFieldZ(Vector3D{gfTrackCand.getPosSeed()}))
+CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand)
+  : CDCTrajectory3D(gfTrackCand, CDCBFieldUtil::getBFieldZ(Vector3D{gfTrackCand.getPosSeed()}))
 {
 }
 
@@ -314,6 +318,39 @@ double CDCTrajectory3D::shiftPeriod(int nPeriods)
   double arcLength2D = m_localHelix.shiftPeriod(nPeriods);
   m_flightTime += arcLength2D / Const::speedOfLight;
   return arcLength2D;
+}
+
+CDCTrajectory2D CDCTrajectory3D::getTrajectory2D() const
+{
+  return CDCTrajectory2D(getLocalOrigin().xy(),
+                         getLocalHelix().uncertainCircleXY(),
+                         getFlightTime());
+}
+
+CDCTrajectorySZ CDCTrajectory3D::getTrajectorySZ() const
+{
+  UncertainSZLine globalSZLine = getLocalHelix().uncertainSZLine();
+  globalSZLine.passiveMoveBy(Vector2D(0, -getLocalOrigin().z()));
+  return CDCTrajectorySZ(globalSZLine);
+}
+
+
+PerigeeCircle CDCTrajectory3D::getGlobalCircle() const
+{
+  // Down cast since we do not necessarily wont the covariance matrix transformed as well
+  PerigeeCircle result(getLocalHelix()->circleXY());
+  result.passiveMoveBy(-getLocalOrigin().xy());
+  return result;
+}
+
+UncertainPerigeeCircle CDCTrajectory3D::getLocalCircle() const
+{
+  return getLocalHelix().uncertainCircleXY();
+}
+
+UncertainSZLine CDCTrajectory3D::getLocalSZLine() const
+{
+  return getLocalHelix().uncertainSZLine();
 }
 
 double CDCTrajectory3D::setLocalOrigin(const Vector3D& localOrigin)

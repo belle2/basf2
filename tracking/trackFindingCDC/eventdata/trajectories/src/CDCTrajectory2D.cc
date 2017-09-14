@@ -7,10 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/topology/WireLine.h>
+
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
 #include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
@@ -23,17 +24,16 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
 CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
                                  const double time,
                                  const Vector2D& mom2D,
                                  const double charge,
                                  const double bZ)
-  : m_localOrigin(pos2D),
-    m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, bZ),
+  : m_localOrigin(pos2D)
+  , m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, bZ),
                          mom2D.unit(),
-                         0.0),
-    m_flightTime(time)
+                         0.0)
+  , m_flightTime(time)
 {
 }
 
@@ -41,11 +41,11 @@ CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
                                  const double time,
                                  const Vector2D& mom2D,
                                  const double charge)
-  : m_localOrigin(pos2D),
-    m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, pos2D),
+  : m_localOrigin(pos2D)
+  , m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, pos2D),
                          mom2D.unit(),
-                         0.0),
-    m_flightTime(time)
+                         0.0)
+  , m_flightTime(time)
 {
 }
 

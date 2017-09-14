@@ -10,11 +10,14 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
-#include <tracking/trackFindingCDC/topology/WireLine.h>
 
 #include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
 
 #include <TMath.h>
 #include <cmath>
@@ -22,6 +25,7 @@
 namespace Belle2 {
 
   namespace TrackFindingCDC {
+    class WireLine;
 
     /// Particle trajectory as it is seen in xy projection represented as a circle.
     class CDCTrajectory2D  {
@@ -29,8 +33,8 @@ namespace Belle2 {
     public:
       /// Default constructor for ROOT compatibility.
       CDCTrajectory2D()
-        : m_localOrigin(),
-          m_localPerigeeCircle()
+        : m_localOrigin()
+        , m_localPerigeeCircle()
       {}
 
       /**
@@ -39,8 +43,8 @@ namespace Belle2 {
        *  The start point is set to the closest approach to the origin.
        */
       explicit CDCTrajectory2D(const UncertainPerigeeCircle& perigeeCircle)
-        : m_localOrigin(0.0, 0.0),
-          m_localPerigeeCircle(perigeeCircle)
+        : m_localOrigin(0.0, 0.0)
+        , m_localPerigeeCircle(perigeeCircle)
       {}
 
       /**
@@ -53,9 +57,9 @@ namespace Belle2 {
       CDCTrajectory2D(const Vector2D& localOrigin,
                       const UncertainPerigeeCircle& localPerigeeCircle,
                       double flightTime = NAN)
-        : m_localOrigin(localOrigin),
-          m_localPerigeeCircle(localPerigeeCircle),
-          m_flightTime(flightTime)
+        : m_localOrigin(localOrigin)
+        , m_localPerigeeCircle(localPerigeeCircle)
+        , m_flightTime(flightTime)
       {}
 
       /**

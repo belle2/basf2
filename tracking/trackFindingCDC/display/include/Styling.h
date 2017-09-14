@@ -13,8 +13,6 @@
 #include <tracking/trackFindingCDC/display/Mapping.h>
 #include <tracking/trackFindingCDC/display/AttributeMap.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <map>
@@ -26,6 +24,7 @@ namespace Belle2 {
   class CDCHit;
 
   namespace TrackFindingCDC {
+    class CDCSegment2D;
 
     /// Interface for a mapping of object and an index to styling attributes
     template <class AObject>

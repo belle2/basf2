@@ -90,11 +90,15 @@ class CDCHistMakerModule(Module):
         """
 
         super(CDCHistMakerModule, self).__init__()
+        #: Experimental number
         self.m_exp = exp
+        #: Run number
         self.m_run = run
+        #: Output directory
         self.m_dest = dest
         if os.path.exists(self.m_dest) is False:
             os.mkdir(self.m_dest)
+        #: Output file name
         self.m_outputFile = self.m_dest + '/dqm.{0:0>4}.{1:0>5}.root'.format(self.m_exp, self.m_run)
 
     def event(self):

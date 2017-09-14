@@ -1,21 +1,19 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
+#include <tracking/trackFindingCDC/filters/segmentTriple/ChooseableSegmentTripleFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/filters/segmentTriple/SegmentTripleFilterFactory.h>
 
-namespace Belle2 {
-  namespace TrackFindingCDC {
-    class CDCSegmentTriple;
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 
-    /// Base filter for the constuction of segment triples.
-    using BaseSegmentTripleFilter = Filter<CDCSegmentTriple> ;
-  }
-}
+using namespace Belle2 ;
+using namespace TrackFindingCDC ;
+
+template class TrackFindingCDC::ChooseableFilter<SegmentTripleFilterFactory>;

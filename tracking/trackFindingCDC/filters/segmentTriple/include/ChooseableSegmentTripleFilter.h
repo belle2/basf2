@@ -9,9 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segmentTriple/BaseSegmentTripleFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTriple/SegmentTripleFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
+
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

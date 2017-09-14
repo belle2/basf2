@@ -9,18 +9,21 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-
 #include <tracking/trackFindingCDC/fitting/EFitPos.h>
 #include <tracking/trackFindingCDC/fitting/EFitVariance.h>
 
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+
 #include <Eigen/Core>
+#include <vector>
 #include <iterator>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
+    class CDCTrajectory2D;
     class CDCWire;
     class CDCWireHit;
     class CDCRLWireHit;
@@ -266,10 +269,7 @@ namespace Belle2 {
        *  Calculate the total transvers travel distance traversed by these observations comparing
        *  the travel distance of first and last position.
        */
-      double getTotalPerpS(const CDCTrajectory2D& trajectory2D) const
-      {
-        return trajectory2D.calcArcLength2DBetween(getFrontPos2D(), getBackPos2D());
-      }
+      double getTotalPerpS(const CDCTrajectory2D& trajectory2D) const;
 
       /**
        *  Checks if the last position of these observations lies at greater travel distance than the

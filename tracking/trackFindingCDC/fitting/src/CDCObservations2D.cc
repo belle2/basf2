@@ -19,6 +19,13 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 using namespace Eigen;
 using namespace Belle2;
@@ -290,6 +297,11 @@ std::size_t CDCObservations2D::appendRange(const CDCWireHitSegment& wireHits)
     nAppendedHits += append(wireHit);
   }
   return nAppendedHits;
+}
+
+double CDCObservations2D::getTotalPerpS(const CDCTrajectory2D& trajectory2D) const
+{
+  return trajectory2D.calcArcLength2DBetween(getFrontPos2D(), getBackPos2D());
 }
 
 std::size_t CDCObservations2D::getNObservationsWithDriftRadius() const

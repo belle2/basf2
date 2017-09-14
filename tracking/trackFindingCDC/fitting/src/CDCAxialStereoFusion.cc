@@ -14,8 +14,12 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
-#include <tracking/trackFindingCDC/utilities/GetValueType.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 

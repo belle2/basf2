@@ -7,12 +7,17 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 
-#include <gtest/gtest.h>
+#include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
+#include <tracking/trackFindingCDC/geometry/LineParameters.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
+#include <framework/logging/Logger.h>
+
+#include <Eigen/Core>
+
+#include <gtest/gtest.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

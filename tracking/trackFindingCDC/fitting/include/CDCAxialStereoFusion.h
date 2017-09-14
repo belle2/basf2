@@ -10,13 +10,16 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/utils/DriftLengthEstimator.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+
+#include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegmentPair;
+    class CDCSegment3D;
+    class CDCSegment2D;
+    class CDCTrajectory3D;
+    class CDCTrajectory2D;
 
     /**
      * Utility class implementing the Kalmanesk combination of to two dimensional

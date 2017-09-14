@@ -7,11 +7,14 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/fitting/RiemannsMethod.h>
 
-#include <Eigen/Dense>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
+#include <framework/logging/Logger.h>
+
+#include <Eigen/Dense>
 
 using namespace Belle2;
 using namespace Eigen;

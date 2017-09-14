@@ -9,12 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-#include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
 #include <Eigen/Core>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCFacet;
+    class UncertainParameterLine2D;
 
     /// Utility class to fit hit triplet and relations of them
     class FacetFitter {

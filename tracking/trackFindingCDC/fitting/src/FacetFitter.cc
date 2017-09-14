@@ -9,6 +9,11 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
+#include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
 #include <Eigen/Dense>
 
 #include <Math/Functor.h>

@@ -9,13 +9,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+#include <tracking/trackFindingCDC/fitting/EFitVariance.h>
+#include <tracking/trackFindingCDC/fitting/EFitPos.h>
+
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegment2D;
+    class CDCWireHitSegment;
+    class CDCWireHit;
+    class CDCWire;
 
     /// Class implementing a fit for two dimensional trajectory circle using a generic fitting backend.
     template<class AFitMethod>
@@ -60,7 +65,7 @@ namespace Belle2 {
       }
 
       /// Fits to the wire positions. Explicit specialisation to be used from python.
-      CDCTrajectory2D fit(const std::vector<const Belle2::TrackFindingCDC::CDCWire*>& wires) const
+      CDCTrajectory2D fit(const std::vector<const CDCWire*>& wires) const
       {
         CDCTrajectory2D result;
         update(result, wires);

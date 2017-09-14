@@ -9,6 +9,14 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/fitting/KarimakisMethod.h>
 
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
 #include <Eigen/Dense>
 
 using namespace Belle2;

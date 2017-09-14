@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
+
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 namespace Belle2 {

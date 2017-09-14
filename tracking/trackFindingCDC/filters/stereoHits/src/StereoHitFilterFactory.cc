@@ -14,12 +14,14 @@
 
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
 
-#include <tracking/trackFindingCDC/filters/base/AllFilter.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
-#include <tracking/trackFindingCDC/filters/base/RandomFilter.h>
-#include <tracking/trackFindingCDC/filters/base/NamedChoosableVarSetFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MCFilter.h>
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/RandomFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
@@ -33,8 +35,8 @@ namespace {
   using AllStereoHitFilter = AllFilter<BaseStereoHitFilter>;
   using NoneStereoHitFilter = NoneFilter<BaseStereoHitFilter>;
   using RandomStereoHitFilter = RandomFilter<BaseStereoHitFilter>;
-  using MCStereoHitFilter = MCFilter<VariadicUnionVarSet<StereoHitTruthVarSet, StereoHitVarSet>>;
-  using SimpleStereoHitFilter = NamedChoosableVarSetFilter<StereoHitVarSet>;
+  using MCStereoHitFilter = TruthVarFilter<StereoHitTruthVarSet>;
+  using SimpleStereoHitFilter = ChoosableFromVarSetFilter<StereoHitVarSet>;
   using RecordingStereoHitFilter =
     RecordingFilter<VariadicUnionVarSet<StereoHitTruthVarSet, StereoHitVarSet>>;
   using MVAStereoHitFilter = MVAFilter<StereoHitVarSet>;

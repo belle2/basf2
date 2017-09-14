@@ -15,6 +15,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    template class ChooseableFilter<FacetRelationFilterFactory>;
     using ChooseableFacetRelationFilter = ChooseableFilter<FacetRelationFilterFactory>;
   }
 }

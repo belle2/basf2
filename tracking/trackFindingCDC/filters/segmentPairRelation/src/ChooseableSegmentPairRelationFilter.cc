@@ -13,5 +13,3 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-template class TrackFindingCDC::ChooseableFilter<SegmentPairRelationFilterFactory>;

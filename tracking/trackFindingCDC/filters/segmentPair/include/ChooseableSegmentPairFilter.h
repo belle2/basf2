@@ -9,13 +9,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segmentPair/BaseSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/SegmentPairFilterFactory.h>
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    template class ChooseableFilter<SegmentPairFilterFactory>;
     using ChooseableSegmentPairFilter = ChooseableFilter<SegmentPairFilterFactory>;
   }
 }

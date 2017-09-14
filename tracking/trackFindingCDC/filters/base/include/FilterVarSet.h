@@ -18,7 +18,6 @@
 
 #include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
-#include <boost/algorithm/string/predicate.hpp>
 #include <memory>
 
 namespace Belle2 {
@@ -153,7 +152,7 @@ namespace Belle2 {
        */
       MayBePtr<Float_t> find(std::string varName) override
       {
-        if (boost::starts_with(varName, m_filterNamePrefix)) {
+        if (varName.find(m_filterNamePrefix) == 0) {
           std::string varNameWithoutPrefix = varName.substr(m_filterNamePrefix.size());
           MayBePtr<Float_t> found = Super::find(varNameWithoutPrefix);
           if (found) return found;

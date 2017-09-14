@@ -57,7 +57,7 @@ namespace Belle2 {
     std::vector<hitXP> m_8hitTrack; /**< vector of selected hit */
     NoKickCuts m_trackCuts; /**< auxiliary member to apply the cuts */
     double m_pmax = 2.; /**< range analyzed with cuts */
-
+    int m_numberOfCuts;
     // enum Eparameters { /**< name of the track parameters */
     //   omega,
     //   d0,
@@ -86,6 +86,7 @@ namespace Belle2 {
       m_hitXP.clear();
       m_setHitXP.clear();
       m_8hitTrack.clear();
+      m_numberOfCuts = 0;
     }
 
     /**  this method build a vector of hitXP from a track. The ouput is the

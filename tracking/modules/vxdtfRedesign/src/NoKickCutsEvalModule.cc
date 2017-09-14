@@ -170,8 +170,6 @@ void NoKickCutsEvalModule::event()
 
 
 
-
-
 void NoKickCutsEvalModule::endRun()
 {
   //-------------------------------FIT-EVALUATE THE CUTS---------------------------------------------------//
@@ -400,7 +398,7 @@ void NoKickCutsEvalModule::endRun()
           for (int theta = 0; theta < c_nbint; theta++) {
             for (int p = 0; p < c_nbinp; p++) {
               double layerdiff = lay2 - lay1;
-              if (layerdiff >= 0 && (layerdiff < 3 || (lay1 == 0 && lay2 == 3))) {
+              if (layerdiff >= 0 && layerdiff < 3) {
                 if (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetEntries() > 0) {
                   m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Write();
                 }
@@ -418,13 +416,13 @@ void NoKickCutsEvalModule::endRun()
           for (int minmax = 0; minmax < 2; minmax++) {
             if (minmax == 0) {
               double layerdiff = lay2 - lay1;
-              if (layerdiff >= 0 && (layerdiff < 3 || (lay1 == 0 && lay2 == 3))) {
+              if (layerdiff >= 0 && layerdiff < 3) {
                 cut_m_histo.at(par).at(lay1).at(lay2)->Write();
               }
             }
             if (minmax == 1) {
               double layerdiff = lay2 - lay1;
-              if (layerdiff >= 0 && (layerdiff < 3 || (lay1 == 0 && lay2 == 3))) {
+              if (layerdiff >= 0 && layerdiff < 3) {
                 cut_M_histo.at(par).at(lay1).at(lay2)->Write();
               }
             }
@@ -486,7 +484,13 @@ double NoKickCutsEvalModule::deltaParEval(hitXP hit1, hitXP hit2, NoKickCuts::EP
   int layer1 = hit1.m_sensorLayer;
   int layer2 = hit2.m_sensorLayer;
   double layerdiff = layer2 - layer1;
-  if (layerdiff >= 0 && (layerdiff < 3 || (layer1 == 0 && layer2 == 3))) {
+  // bool zeroFlag = true;
+  // if(is0){
+  //   if(layer1>2){
+  //     zeroFlag = false;
+  //   }
+  // }
+  if (layerdiff >= 0 && layerdiff < 3) {
     switch (par) {
       case NoKickCuts::c_Omega:
         out = abs(hit1.getOmegaEntry() - hit2.getOmegaEntry());

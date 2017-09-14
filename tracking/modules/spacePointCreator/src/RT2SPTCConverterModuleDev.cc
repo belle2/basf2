@@ -111,10 +111,17 @@ void RT2SPTCConverterModule::initialize()
   m_trackSel = new NoKickRTSel(m_noKickCutsFile);
 
   if (m_noKickOutput) {
-    m_momentumTFile = new TFile("TrackSelection_NoKick.root", "RECREATE");
+    m_noKickOutputTFile = new TFile("TrackSelection_NoKick.root", "RECREATE");
     m_momSel = new TH1F("m_momSel", "m_momSel", 100, 0, 4);
     m_momCut = new TH1F("m_momCut", "m_momCut", 100, 0, 4);
     m_momEff = new TH1F("m_momEff", "m_momEff", 100, 0, 4);
+
+    m_PDGIDSel = new TH1F("m_PDGIDSel", "m_PDGIDSel", 6000, -3000, 3000);
+    m_PDGIDCut = new TH1F("m_PDGIDCut", "m_PDGIDCut", 6000, -3000, 3000);
+    m_PDGIDEff = new TH1F("m_PDGIDEff", "m_PDGIDEff", 6000, -3000, 3000);
+
+    m_nCutHit = new TH1F("m_nCutHit", "m_nCutHit", 30, 0, 30);
+
   }
 
 
@@ -137,13 +144,23 @@ void RT2SPTCConverterModule::event()
 
     if (m_noKickCutsFile.size() != 0) {
       bool passCut = m_trackSel->trackSelector(recoTrack);
+      if (m_noKickOutput) {
+        int nCutHit = m_trackSel->m_numberOfCuts;
+        m_nCutHit->Fill(nCutHit);
+      }
       if (!passCut) {
         m_ncut++;
-        if (m_noKickOutput) m_momCut->Fill(recoTrack.getMomentumSeed().Mag());
+        if (m_noKickOutput) {
+          m_momCut->Fill(recoTrack.getMomentumSeed().Mag());
+          m_PDGIDCut->Fill(recoTrack.getRelationsTo<MCParticle>()[0]->getPDG());
+        }
         continue; //exclude tracks with catastrophic multiple scattering interactions
       } else {
         m_npass++;
-        if (m_noKickOutput) m_momSel->Fill(recoTrack.getMomentumSeed().Mag());
+        if (m_noKickOutput) {
+          m_momSel->Fill(recoTrack.getMomentumSeed().Mag());
+          m_PDGIDCut->Fill(recoTrack.getRelationsTo<MCParticle>()[0]->getPDG());
+        }
       }
     }
     std::pair<std::vector<const SpacePoint*>, ConversionState> spacePointStatePair;
@@ -399,7 +416,7 @@ void RT2SPTCConverterModule::endRun()
   B2RESULT("Number of Cutted Tracks (NoKickRTSel): " << m_ncut);
 
   if (m_noKickOutput) {
-    m_momentumTFile->cd();
+    m_noKickOutputTFile->cd();
     m_momSel->Write();
     m_momCut->Write();
 
@@ -408,7 +425,18 @@ void RT2SPTCConverterModule::endRun()
     m_momEff->Divide(m_momSel, m_momEff, 1, 1);
     m_momEff->Write();
 
-    delete m_momentumTFile;
+    m_PDGIDSel->Write();
+    m_PDGIDCut->Write();
+
+    m_PDGIDEff->Add(m_PDGIDSel, 1);
+    m_PDGIDEff->Add(m_PDGIDCut, 1);
+    m_PDGIDEff->Divide(m_PDGIDSel, m_PDGIDEff, 1, 1);
+    m_PDGIDEff->Write();
+
+    m_nCutHit->Write();
+
+
+    delete m_noKickOutputTFile;
   }
 }
 

@@ -12,7 +12,11 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 

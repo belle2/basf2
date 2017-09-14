@@ -16,7 +16,9 @@
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/UnionRecordingSegmentPairRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/MVARealisticSegmentPairRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 

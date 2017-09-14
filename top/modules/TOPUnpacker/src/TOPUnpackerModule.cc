@@ -30,8 +30,9 @@
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPSlowData.h>
 #include <top/dataobjects/TOPInterimFEInfo.h>
+#include <top/dataobjects/TOPTemplateFitResult.h>
 
-
+#include <bitset>
 
 using namespace std;
 
@@ -64,6 +65,8 @@ namespace Belle2 {
              "name of TOPRawWaveform store array", string(""));
     addParam("outputRawDigitsName", m_outputRawDigitsName,
              "name of TOPRawDigit store array", string(""));
+    addParam("outputTemplateFitResultName", m_templateFitResultName,
+             "name of TOPTemplateFitResult", string(""));
     addParam("swapBytes", m_swapBytes, "if true, swap bytes", false);
     addParam("dataFormat", m_dataFormat,
              "data format as defined in top/include/RawDataTypes.h, 0 = auto detect", 0);
@@ -99,9 +102,14 @@ namespace Belle2 {
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.registerInDataStore(DataStore::c_DontWriteOut);
 
+    StoreArray<TOPTemplateFitResult> templateFitResults(m_templateFitResultName);
+    templateFitResults.registerInDataStore(DataStore::c_DontWriteOut);
+
     rawDigits.registerRelationTo(waveforms, DataStore::c_Event, DataStore::c_DontWriteOut);
+    rawDigits.registerRelationTo(templateFitResults, DataStore::c_Event, DataStore::c_DontWriteOut);
     rawDigits.registerRelationTo(info, DataStore::c_Event, DataStore::c_DontWriteOut);
     waveforms.registerRelationTo(info, DataStore::c_Event, DataStore::c_DontWriteOut);
+
 
     // check if front end mappings are available
     const auto& mapper = m_topgp->getFrontEndMapper();
@@ -112,6 +120,7 @@ namespace Belle2 {
 
   void TOPUnpackerModule::beginRun()
   {
+    m_channelStatistics.clear();
   }
 
   void TOPUnpackerModule::event()
@@ -127,9 +136,12 @@ namespace Belle2 {
     rawDigits.clear();
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.clear();
+    StoreArray<TOPTemplateFitResult> templateFitResults(m_templateFitResultName);
+    templateFitResults.clear();
     StoreArray<TOPSlowData> slowData;
     slowData.clear();
 
+    StoreObjPtr<EventMetaData> evtMetaData;
     for (auto& raw : rawData) {
       for (int finesse = 0; finesse < 4; finesse++) {
         const int* buffer = raw.GetDetectorBuffer(0, finesse);
@@ -139,19 +151,28 @@ namespace Belle2 {
         int err = 0;
         int dataFormat = m_dataFormat;
         if (dataFormat == 0) { // auto detect data format
-          DataArray array(buffer, bufferSize, m_swapBytes);
-          unsigned word = array.getWord();
-          dataFormat = (word >> 16);
+          //std::cout<<"evtMetaData->getExperiment() == 1\t"<< evtMetaData->getExperiment() << std::endl;
+          if (evtMetaData->getExperiment() == 1) { // GCR data
+            dataFormat = 0x0301;
+            m_swapBytes = true;
+          } else
+            // NOTE: we need to add extra clauses if there are GCR runs between
+            // phases II and III. (See pull request #644 for more details)
+          {
+            DataArray array(buffer, bufferSize, m_swapBytes);
+            unsigned word = array.getWord();
+            dataFormat = (word >> 16);
+          }
         }
         switch (dataFormat) {
           case static_cast<int>(TOP::RawDataType::c_Type0Ver16):
             unpackType0Ver16(buffer, bufferSize, rawDigits, slowData);
             break;
           case static_cast<int>(TOP::RawDataType::c_Type2Ver1):
-            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, false);
+            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, templateFitResults, false);
             break;
           case static_cast<int>(TOP::RawDataType::c_Type3Ver1):
-            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, true);
+            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, templateFitResults, true);
             break;
           case static_cast<int>(TOP::RawDataType::c_Draft):
             unpackProductionDraft(buffer, bufferSize, digits);
@@ -285,6 +306,7 @@ namespace Belle2 {
   int TOPUnpackerModule::unpackInterimFEVer01(const int* buffer, int bufferSize,
                                               StoreArray<TOPRawDigit>& rawDigits,
                                               StoreArray<TOPRawWaveform>& waveforms,
+                                              StoreArray<TOPTemplateFitResult>& templateFits,
                                               bool pedestalSubtracted)
   {
 
@@ -294,31 +316,76 @@ namespace Belle2 {
     StoreArray<TOPInterimFEInfo> infos;
 
     DataArray array(buffer, bufferSize, m_swapBytes);
+
+    map<unsigned short, int> evtNumCounter; //counts the occurence of carrier-generated event numbers.
+    std::vector<unsigned short> channelCounter(128, 0); //counts occurence of carrier/asic/channel combinations
+
     unsigned word = array.getWord(); // header word 0
     unsigned short scrodID = word & 0x0FFF;
     auto* info = infos.appendNew(scrodID, bufferSize);
 
     word = array.getWord(); // header word 1 (what it contains?)
 
-    short asicChanFix = 0; // temporary fix since it's not given in FE header
 
-    while (array.getRemainingWords() > 3) {
+    while (array.getRemainingWords() > 0) {
 
       unsigned header = array.getWord(); // word 0
+
+      if ((header & 0xFF) == 0xBE) { //this is a super short FE header
+//        B2DEBUG(100, "0b" << std::bitset<8>(header & 0xFF) << " " << std::bitset<8>((header>>8) & 0xFF) << " " << std::bitset<8>((header>>16) & 0xFF) << " " << std::bitset<8>((header>>24) & 0xFF));
+
+        unsigned short scrodID_SSFE;
+        unsigned short carrier_SSFE;
+        unsigned short asic_SSFE;
+        unsigned short channel_SSFE;
+        unsigned short evtNum_SSFE;
+
+        evtNum_SSFE = (header >> 8) & 0xFF;
+        scrodID_SSFE = (header >> 16) & 0x7F;
+        channel_SSFE = (header >> 24) & 0x07;
+        asic_SSFE = (header >> 27) & 0x03;
+        carrier_SSFE = (header >> 29) & 0x03;
+
+        if (scrodID_SSFE != scrodID) {
+          B2ERROR("TOPUnpacker: corrupted data - different scrodID's in HLSB and super short FE header");
+          B2DEBUG(100, "Different scrodID's in HLSB and FE header: " << scrodID << " " << scrodID_SSFE << " word = 0x" << std::hex << word);
+          info->setErrorFlag(TOPInterimFEInfo::c_DifferentScrodIDs);
+          return array.getRemainingWords();
+        }
+
+        B2DEBUG(100, scrodID_SSFE << "\t" << carrier_SSFE << "\t"  << asic_SSFE << "\t" << channel_SSFE << "\t" << evtNum_SSFE);
+
+        int channelID = carrier_SSFE * 32 + asic_SSFE * 8 + channel_SSFE;
+        channelCounter[channelID] += 1;
+        evtNumCounter[evtNum_SSFE] += 1;
+
+        info->incrementFEHeadersCount();
+        info->incrementEmptyFEHeadersCount();
+
+        continue;
+      }
+
       if (header != 0xaaaa0104 and header != 0xaaaa0103 and header != 0xaaaa0100) {
         B2ERROR("TOPUnpacker: corrupted data - invalid FE header word");
-        B2DEBUG(100, "Invalid FE header word: " << std::hex << header);
+        B2DEBUG(100, "Invalid FE header word: " << std::hex << header  << " 0b" << std::bitset<32>(header));
+        B2DEBUG(100, "SCROD ID: " << scrodID << " " << std::hex << scrodID);
+
         info->setErrorFlag(TOPInterimFEInfo::c_InvalidFEHeader);
         return array.getRemainingWords();
       }
 
+
       word = array.getWord(); // word 1
       unsigned short scrodID_FE = word >> 25;
       unsigned short convertedAddr = (word >> 16) & 0x1FF;
+      unsigned short evtNum_numWin_trigPat_FEheader = word & 0xFFFF;
+      unsigned short evtNum_FEheader = evtNum_numWin_trigPat_FEheader & 0xFF;
+      evtNumCounter[evtNum_FEheader] += 1;
+
       if (scrodID_FE != scrodID) {
         B2ERROR("TOPUnpacker: corrupted data - different scrodID's in HLSB and FE header");
         B2DEBUG(100, "Different scrodID's in HLSB and FE header: "
-                << scrodID << " " << scrodID_FE);
+                << scrodID << " " << scrodID_FE << " word = 0x" << std::hex << word);
         info->setErrorFlag(TOPInterimFEInfo::c_DifferentScrodIDs);
         return array.getRemainingWords();
       }
@@ -326,14 +393,16 @@ namespace Belle2 {
       word = array.getWord(); // word 2
       //      unsigned lastWrAddr = word & 0x1FF;
       unsigned lastWrAddr = (word & 0x0FF) << 1;
-      unsigned short asicChannelFE = (word >> 9) & 0x07;
+      //unsigned short asicChannelFE = (word >> 9) & 0x07;
+      unsigned short asicChannelFE = (word >> 8) & 0x07;
       unsigned short asicFE = (word >> 12) & 0x03;
       unsigned short carrierFE = (word >> 14) & 0x03;
+      unsigned short channelID = carrierFE * 32 + asicFE * 8 + asicChannelFE;
+      //B2DEBUG(100, "carrier asic chn " << carrierFE << " " << asicFE << " " << asicChannelFE << " " << channelID << " 0b" << std::bitset<32>(word) );
 
-      // temporary fix since it's not given in FE
-      asicChannelFE = asicChanFix % 8;
-      asicChanFix++;
-      // end fix
+      B2DEBUG(100, scrodID_FE << "\t" << carrierFE << "\t" << asicFE << "\t" << asicChannelFE << "\t" << evtNum_FEheader);
+
+      channelCounter[channelID] += 1;
 
       std::vector<TOPRawDigit*> digits; // needed for creating relations to waveforms
 
@@ -362,25 +431,26 @@ namespace Belle2 {
 
         // feature-extracted data (negative signal)
         word = array.getWord(); // word 9
+        //short n_samp_i = (word >> 16) & 0xFFFF;
         word = array.getWord(); // word 10
         short samplePeak_n = word & 0xFFFF;
         short valuePeak_n = (word >> 16) & 0xFFFF;
 
         word = array.getWord(); // word 11
-        short sampleRise_n = word & 0xFFFF;
-        short valueRise0_n = (word >> 16) & 0xFFFF;
+        //short sampleRise_n = word & 0xFFFF;
+        //short valueRise0_n = (word >> 16) & 0xFFFF;
 
         word = array.getWord(); // word 12
-        short valueRise1_n = word & 0xFFFF;
-        short sampleFall_n = (word >> 16) & 0xFFFF;
+        //short valueRise1_n = word & 0xFFFF;
+        //short sampleFall_n = (word >> 16) & 0xFFFF;
 
         word = array.getWord(); // word 13
-        short valueFall0_n = word & 0xFFFF;
-        short valueFall1_n = (word >> 16) & 0xFFFF;
+        //short valueFall0_n = word & 0xFFFF;
+        //short valueFall1_n = (word >> 16) & 0xFFFF;
 
         word = array.getWord(); // word 14
         short integral_n = word & 0xFFFF;
-        //      short qualityFlags_n = (word >> 16) & 0xFFFF;
+        short qualityFlags_n = (word >> 16) & 0xFFFF;
 
         if (abs(valuePeak_p) != 9999) {
           auto* digit = rawDigits.appendNew(scrodID);
@@ -401,8 +471,17 @@ namespace Belle2 {
           //        digit->setErrorFlags(qualityFlags_p); // not good solution !
           digit->addRelationTo(info);
           digits.push_back(digit);
+          //template fit result is saved in negative pulse fe data
+          if (valuePeak_p < 150) {
+            auto* tlpfResult = templateFits.appendNew();
+            tlpfResult->setBackgroundOffset(samplePeak_n);
+            tlpfResult->setAmplitude(valuePeak_n);
+            tlpfResult->setChisquare(qualityFlags_n);
+            tlpfResult->setRisingEdge(integral_n);
+            digit->addRelationTo(tlpfResult);
+          }
         }
-        if (abs(valuePeak_n) != 9999) {
+        /*if (abs(valuePeak_n) != 9999) {
           auto* digit = rawDigits.appendNew(scrodID);
           digit->setCarrierNumber(carrierFE);
           digit->setASICNumber(asicFE);
@@ -421,7 +500,7 @@ namespace Belle2 {
           //        digit->setErrorFlags(qualityFlags_n); // not good solution !
           digit->addRelationTo(info);
           digits.push_back(digit);
-        }
+        }*/
       }
 
       // magic word
@@ -443,6 +522,14 @@ namespace Belle2 {
 
       // waveform header
       word = array.getWord(); // word 16
+      unsigned long evtNum_numWaves_refWin_WFheader = word;
+      unsigned short evtNum_WFheader = (evtNum_numWaves_refWin_WFheader >> 24) & 0xFF;
+
+      if (evtNum_WFheader != evtNum_FEheader) {
+        B2ERROR("TOPUnpacker: different carrier event number in FE header (" << evtNum_FEheader << ") and WF header (" << evtNum_WFheader <<
+                ")");
+      }
+
       word = array.getWord(); // word 17
       word = array.getWord(); // word 18
       word = array.getWord(); // word 19
@@ -539,6 +626,54 @@ namespace Belle2 {
       for (auto& digit : digits) digit->addRelationTo(waveform);
 
     }
+
+    if (evtNumCounter.size() != 1) {
+      B2ERROR("TOPUnpacker: Possible frame shift detected. (More than one unique carrier event number in this readout event)");
+    }
+
+    int nASICs = 0;
+
+    string evtNumOutputString;
+    evtNumOutputString += "Carrier event numbers and their counts for SCROD ID " + std::to_string(scrodID) + ":\n";
+    for (auto const& it : evtNumCounter) {
+      nASICs += it.second;
+      evtNumOutputString += std::to_string(it.first) + ":\t" + std::to_string(it.second) + "\n";
+    }
+    evtNumOutputString += "Total:\t" + std::to_string(nASICs);
+    B2DEBUG(100, evtNumOutputString);
+
+    int nChannels = 0;
+    int nChannelsDiff = 0;
+
+    string channelOutputString;
+    channelOutputString += "Detected channels and their counts for SCROD ID (channels with count == 1 are omitted)" + std::to_string(
+                             scrodID) + ":\n";
+
+    int channelIndex(0);
+    for (auto const& it : channelCounter) {
+      if (it > 0) {
+        nChannelsDiff += 1;
+      }
+      nChannels += it;
+
+      int channelID = channelIndex;
+      int carrier = channelID / 32;
+      int asic = (channelID % 32) / 8;
+      int chn = channelID % 8;
+
+      if (it != 1) {
+        channelOutputString += "carrier: " + std::to_string(carrier) + " asic: " + std::to_string(asic) + " chn: " + std::to_string(
+                                 chn) + " occurence: " + std::to_string(it) + "\n";
+        B2WARNING("ScrodID: " << scrodID << " carrier: " << carrier << " asic: " << asic << " chn: " << chn << " seen " << it <<
+                  " times instead of once");
+      }
+      channelIndex += 1;
+    }
+
+    m_channelStatistics[nChannels] += 1;
+
+    channelOutputString += "Total:\t" + std::to_string(nChannels) + " " + std::to_string(nChannelsDiff);
+    B2DEBUG(100, channelOutputString);
 
     return array.getRemainingWords();
 
@@ -680,6 +815,11 @@ namespace Belle2 {
 
   void TOPUnpackerModule::endRun()
   {
+    B2INFO("TOPUnpacker: Channels seen per event statistics:");
+    B2INFO("TOPUnpacker: nChn\tcount");
+    for (auto& entry : m_channelStatistics) {
+      B2INFO("TOPUnpacker: " << entry.first << "\t\t" << entry.second);
+    }
   }
 
   void TOPUnpackerModule::terminate()

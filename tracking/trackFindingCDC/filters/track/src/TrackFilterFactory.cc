@@ -14,11 +14,13 @@
 
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
 
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 #include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MCFilter.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
@@ -28,7 +30,7 @@ using namespace TrackFindingCDC;
 namespace {
   using AllTrackFilter = AllFilter<BaseTrackFilter>;
   using NoneTrackFilter = NoneFilter<BaseTrackFilter>;
-  using MCTrackFilter = MCFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
+  using MCTrackFilter = TruthVarFilter<TruthTrackVarSet>;
   using RecordingTrackFilter = RecordingFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
   using MVATrackFilter = MVAFilter<BasicTrackVarSet>;
 }

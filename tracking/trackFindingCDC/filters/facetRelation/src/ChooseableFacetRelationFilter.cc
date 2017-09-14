@@ -7,14 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
+#include <tracking/trackFindingCDC/filters/facetRelation/ChooseableFacetRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/facetRelation/FacetRelationFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+using namespace Belle2;
+using namespace TrackFindingCDC;
 
-namespace Belle2 {
-  namespace TrackFindingCDC {
-    using ChooseableFacetRelationFilter = ChooseableFilter<FacetRelationFilterFactory>;
-  }
-}
+template class TrackFindingCDC::ChooseableFilter<FacetRelationFilterFactory>;

@@ -18,10 +18,14 @@
 
 #include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
 
+#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.icc.h>
+
 #include <tracking/trackFindingCDC/varsets/RelationVarSet.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::UnionRecordingFilter<FacetRelationFilterFactory>;
 
 std::vector<std::string>
 UnionRecordingFacetRelationFilter::getValidVarSetNames() const

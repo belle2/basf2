@@ -9,8 +9,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facetRelation/MCFacetRelationFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.icc.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::MCSymmetric<BaseFacetRelationFilter>;
 
 MCFacetRelationFilter::MCFacetRelationFilter(bool allowReverse)
   : Super(allowReverse)

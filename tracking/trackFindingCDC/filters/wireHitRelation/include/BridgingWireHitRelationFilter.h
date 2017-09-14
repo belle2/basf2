@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>

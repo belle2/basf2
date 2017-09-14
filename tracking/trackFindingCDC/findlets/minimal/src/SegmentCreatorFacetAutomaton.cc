@@ -19,6 +19,7 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 #include <tracking/trackFindingCDC/utilities/ParamList.icc.h>

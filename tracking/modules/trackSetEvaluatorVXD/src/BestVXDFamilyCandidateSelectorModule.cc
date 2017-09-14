@@ -21,7 +21,7 @@ REG_MODULE(BestVXDFamilyCandidateSelector)
 
 BestVXDFamilyCandidateSelectorModule::BestVXDFamilyCandidateSelectorModule() : Module()
 {
-  setDescription("Module that selects a subset with a fixed size x out of all SpacePointTrackCandidates. Based on qualityIndex.");
+  setDescription("Module that selects the best candidate for each SPTC family");
   setPropertyFlags(c_ParallelProcessingCertified);
 
 

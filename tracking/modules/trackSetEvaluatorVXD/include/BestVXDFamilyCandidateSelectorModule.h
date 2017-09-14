@@ -17,6 +17,7 @@
 
 
 namespace Belle2 {
+  /** Module that selects the best candidate for each SPTC family.*/
   class BestVXDFamilyCandidateSelectorModule : public Module {
   public:
     /** Constructor of the module. */

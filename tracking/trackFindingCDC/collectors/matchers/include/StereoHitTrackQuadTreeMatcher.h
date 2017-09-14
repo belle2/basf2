@@ -10,9 +10,6 @@
 #pragma once
 #include <tracking/trackFindingCDC/collectors/matchers/MatcherInterface.h>
 
-#include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 

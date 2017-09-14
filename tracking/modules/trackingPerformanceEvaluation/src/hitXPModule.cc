@@ -178,7 +178,7 @@ void hitXPModule::event()
     m_Eprimary = particle.getStatus();
     // for (const SVDCluster& cluster : particle.getRelationsFrom<SVDCluster>()) {
     //   for (const SVDTrueHit& hit : cluster.getRelationsTo<SVDTrueHit>()) {
-    for (const SVDTrueHit& hit : particle.getRelationsFrom<SVDTrueHit>()) {
+    for (const SVDTrueHit& hit : particle.getRelationsTo<SVDTrueHit>()) {
       hit_iterator++;
       VxdID trueHitSensorID = hit.getSensorID();
       const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);

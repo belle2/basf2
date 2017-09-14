@@ -14,6 +14,8 @@
 #include <tracking/trackFindingCDC/filters/cluster/UnionRecordingClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/cluster/MVABackgroundClusterFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
+
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
@@ -23,6 +25,8 @@ ClusterFilterFactory::ClusterFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
 {
 }
+
+ClusterFilterFactory::~ClusterFilterFactory() = default;
 
 std::string ClusterFilterFactory::getIdentifier() const
 {

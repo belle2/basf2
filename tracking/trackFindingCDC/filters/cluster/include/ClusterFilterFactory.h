@@ -10,7 +10,8 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -25,6 +26,9 @@ namespace Belle2 {
     public:
       /// Constructor forwarding the default filter name
       ClusterFilterFactory(const std::string& defaultFilterName = "mva_bkg");
+
+      /// Default destructor
+      ~ClusterFilterFactory();
 
       /// Getter for a short identifier for the factory
       std::string getIdentifier() const override;

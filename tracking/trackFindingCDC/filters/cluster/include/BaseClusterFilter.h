@@ -10,10 +10,10 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCWireHitCluster;
     using BaseClusterFilter = Filter<CDCWireHitCluster>;
   }
 }

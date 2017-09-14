@@ -275,7 +275,7 @@ namespace Belle2 {
     /**
      * assign family identifier
      */
-    void setFamily(unsigned short family) { m_family = family; }
+    void setFamily(short family) { m_family = family; }
 
     /**
      * set the sorting parameters

@@ -134,25 +134,16 @@ void TrackFinderVXDCellOMatModule::event()
 
   /// convert paths of directedNodeNetwork-nodes to paths of const SpacePoint*:
   //  Resulting SpacePointPath contains SpacePoints sorted from the innermost to the outermost.
-  vector< vector <const SpacePoint*> > collectedSpacePointPaths;
-  collectedSpacePointPaths.reserve(collectedPaths.size());
   for (auto& aPath : collectedPaths) {
     vector <const SpacePoint*> spPath;
-    unsigned short family = 0;
+    spPath.reserve(aPath->size());
+    short family;
     spPath.push_back(aPath->back()->getEntry().getInnerHit()->spacePoint);
     for (auto aNodeIt = (*aPath).rbegin(); aNodeIt != (*aPath).rend();  ++aNodeIt) {
       spPath.push_back((*aNodeIt)->getEntry().getOuterHit()->spacePoint);
       family = (*aNodeIt)->getMetaInfo().getFamily();
     }
-
-    auto* newSPTC = m_TCs.appendNew(spPath);
-
-    // Set relations between Nodes and Space Point Track Candidates
-    for (const SpacePoint* aNode : spPath) { // is a const SpacePoint* here
-      if (aNode->getType() == VXD::SensorInfoBase::VXD) continue; /**< Don't create a relation for the VirtualIP. */
-      newSPTC->addRelationTo(aNode, 1.);
-    }
-    newSPTC->setFamily(family);
+    m_sptcCreator.createSPTCs(m_TCs, spPath, family);
   }
 
 
@@ -164,5 +155,4 @@ void TrackFinderVXDCellOMatModule::event()
           " and " << collectedPaths.size() <<
           " paths while calling its collecting function " << m_pathCollector.nRecursiveCalls <<
           " times.");
-
 }

@@ -24,16 +24,12 @@ namespace Belle2 {
 
     /** takes simple vectors of SpacePoints and convert them to real SpacePointTrackCand.
      * returns number of TCs successfully created. */
-    unsigned int createSPTCs(SPTCContainerType& tcContainer, std::vector<std::vector<const SpacePoint*> >& allPaths)
+    SpacePointTrackCand* createSPTCs(SPTCContainerType& tcContainer, std::vector<const SpacePoint*>& spacePoints, short family = -1)
     {
-      unsigned int nTCsCreated = 0;
+      SpacePointTrackCand* newSPTC = tcContainer.appendNew(spacePoints);
+      newSPTC->setFamily(family);
 
-      for (std::vector<const SpacePoint*>& aPath : allPaths) {
-        auto* newSPTC = tcContainer.appendNew(aPath);
-        nTCsCreated++;
-      }
-
-      return nTCsCreated;
+      return newSPTC;
     }
   };
 

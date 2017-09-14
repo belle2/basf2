@@ -63,6 +63,11 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
            "Regulates if every subset of sufficient length of a path shall be collected as separate path or not.",
            bool(false));
 
+  addParam("setFamilies",
+           m_PARAMsetFamilies,
+           "Additionally assign a common family identifier to all Tracks that are share a node.",
+           bool(false));
+
 }
 
 /** *************************************+************************************* **/
@@ -123,6 +128,11 @@ void TrackFinderVXDBasicPathFinderModule::event()
           " cells total -> found " << nSeeds << " seeds");
   if (nSeeds == 0) { B2WARNING("TrackFinderVXDBasicPathFinderModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!"); return; }
 
+  // mark families
+  if (m_PARAMsetFamilies) {
+    unsigned short nFamilies = m_familyDefiner.defineFamilies(segmentNetwork);
+    B2DEBUG(10, "Number of families in the network: " << nFamilies);
+  }
 
   /// collect all Paths starting from a Seed:
   auto collectedPaths = m_pathCollector.findPaths(segmentNetwork, m_PARAMstoreSubsets);
@@ -130,15 +140,13 @@ void TrackFinderVXDBasicPathFinderModule::event()
 
   /// convert paths of directedNodeNetwork-nodes to paths of const SpacePoint*:
   //  Resulting SpacePointPath contains SpacePoints sorted from the innermost to the outermost.
-  vector< vector <const SpacePoint*> > collectedSpacePointPaths;
-  collectedSpacePointPaths.reserve(collectedPaths.size());
   for (auto& aPath : collectedPaths) {
     vector <const SpacePoint*> spPath;
+    spPath.reserve(aPath->size());
     spPath.push_back(aPath->back()->getEntry().getInnerHit()->spacePoint);
     for (auto aNodeIt = (*aPath).rbegin(); aNodeIt != (*aPath).rend();  ++aNodeIt) {
       spPath.push_back((*aNodeIt)->getEntry().getOuterHit()->spacePoint);
     }
-    collectedSpacePointPaths.push_back(spPath);
   }
 
 
@@ -150,12 +158,4 @@ void TrackFinderVXDBasicPathFinderModule::event()
           " and " << collectedPaths.size() <<
           " paths while calling its collecting function " << m_pathCollector.nRecursiveCalls <<
           " times.");
-
-
-  /// convert the raw paths to fullgrown SpacePoinTrackCands
-  unsigned int nCreated = m_sptcCreator.createSPTCs(m_TCs, collectedSpacePointPaths);
-  B2DEBUG(10, " TrackFinderVXDCellOMat-event" << m_eventCounter <<
-          ": " << nCreated <<
-          " TCs created and stored into StoreArray!");
-
 }

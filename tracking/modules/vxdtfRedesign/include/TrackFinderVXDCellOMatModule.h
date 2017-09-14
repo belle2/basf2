@@ -112,6 +112,7 @@ namespace Belle2 {
     /** Regulates if every subset of sufficient length of a path shall be collected as separate path or not. */
     bool m_PARAMstoreSubsets;
 
+    /** If ture additionally assign a common family identifier to all Tracks that are share a node. */
     bool m_PARAMsetFamilies;
 
     /// member variables

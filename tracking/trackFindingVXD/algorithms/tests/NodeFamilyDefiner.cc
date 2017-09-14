@@ -59,31 +59,31 @@ namespace NodeFamilyTests {
     // filling network:
     for (unsigned int index = 1 ; index < 5; index++) {
       // correct order: outerEntry, innerEntry:
-      intNetwork.addNode(std::to_string(intArray.at(index - 1)), intArray.at(index - 1));
-      intNetwork.addNode(std::to_string(intArray.at(index)), intArray.at(index));
+      intNetwork.addNode(intArray.at(index - 1), intArray.at(index - 1));
+      intNetwork.addNode(intArray.at(index), intArray.at(index));
 
-      intNetwork.linkNodes(std::to_string(intArray.at(index - 1)), std::to_string(intArray.at(index)));
+      intNetwork.linkNodes(intArray.at(index - 1), intArray.at(index));
     }
 
     for (unsigned int index = 1 ; index < 5; index++) {
-      intNetwork.addNode(std::to_string(intArray2.at(index - 1)), intArray2.at(index - 1));
-      intNetwork.addNode(std::to_string(intArray2.at(index)), intArray2.at(index));
+      intNetwork.addNode(intArray2.at(index - 1), intArray2.at(index - 1));
+      intNetwork.addNode(intArray2.at(index), intArray2.at(index));
 
-      intNetwork.linkNodes(std::to_string(intArray2.at(index - 1)), std::to_string(intArray2.at(index)));
+      intNetwork.linkNodes(intArray2.at(index - 1), intArray2.at(index));
     }
 
     for (unsigned int index = 1 ; index < 5; index++) {
-      intNetwork.addNode(std::to_string(intArray3.at(index - 1)), intArray3.at(index - 1));
-      intNetwork.addNode(std::to_string(intArray3.at(index)), intArray3.at(index));
+      intNetwork.addNode(intArray3.at(index - 1), intArray3.at(index - 1));
+      intNetwork.addNode(intArray3.at(index), intArray3.at(index));
 
-      intNetwork.linkNodes(std::to_string(intArray3.at(index - 1)), std::to_string(intArray3.at(index)));
+      intNetwork.linkNodes(intArray3.at(index - 1), intArray3.at(index));
     }
 
     for (unsigned int index = 1 ; index < 3; index++) {
-      intNetwork.addNode(std::to_string(intArray4.at(index - 1)), intArray4.at(index - 1));
-      intNetwork.addNode(std::to_string(intArray4.at(index)), intArray4.at(index));
+      intNetwork.addNode(intArray4.at(index - 1), intArray4.at(index - 1));
+      intNetwork.addNode(intArray4.at(index), intArray4.at(index));
 
-      intNetwork.linkNodes(std::to_string(intArray4.at(index - 1)), std::to_string(intArray4.at(index)));
+      intNetwork.linkNodes(intArray4.at(index - 1), intArray4.at(index));
     }
 
     // filling network - end.

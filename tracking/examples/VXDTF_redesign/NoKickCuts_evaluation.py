@@ -47,6 +47,7 @@ gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 
 rootinput = register_module('RootInput')
+rootinput.param("inputFileNames", "/group/belle2/users/lueck/data/new/train/simulatedEvents_rndSeed_*.root")
 
 progressbar = register_module('ProgressBar')
 

@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
+#include <tracking/trackFindingVXD/tcTools/SpacePointTrackCandCreator.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/SelectSubset.h>

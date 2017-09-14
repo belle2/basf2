@@ -56,7 +56,7 @@ void AddVXDTrackCandidateSubSetsModule::addSubCandidates(int iCand)
     std::vector<const SpacePoint*> tmp = sptc->getHits();
     tmp.erase(tmp.begin() + iHit);
 
-    m_sptcCreator(m_spacePointTrackCands, tmp, sptc->getFamily());
+    m_sptcCreator.createSPTCs(m_spacePointTrackCands, tmp, sptc->getFamily());
   }
 }
 

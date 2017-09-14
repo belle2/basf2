@@ -1,21 +1,17 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
+#include <tracking/trackFindingCDC/filters/axialSegmentPair/ChooseableAxialSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 
-namespace Belle2 {
-  namespace TrackFindingCDC {
-    class CDCAxialSegmentPair;
+using namespace Belle2;
+using namespace TrackFindingCDC;
 
-    /// Base class for filter for the constuction of axial to axial segment pairs.
-    using BaseAxialSegmentPairFilter = Filter<CDCAxialSegmentPair> ;
-  }
-}
+template class TrackFindingCDC::ChooseableFilter<AxialSegmentPairFilterFactory>;

@@ -17,6 +17,8 @@
 #include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
+#include <tracking/trackFindingCDC/numerics/EigenView.h>
+
 #include <framework/logging/Logger.h>
 
 #include <Eigen/Eigen>
@@ -278,7 +280,9 @@ namespace {
       perigeePrecision.col(c_I) = Eigen::Matrix<double, 3, 1>::Zero();
     }
 
-    return perigeePrecision;
+    PerigeePrecision result;
+    mapToEigen(result) = perigeePrecision;
+    return result;
   }
 
 }

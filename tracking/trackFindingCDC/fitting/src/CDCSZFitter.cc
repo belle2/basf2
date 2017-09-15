@@ -23,6 +23,8 @@
 
 #include <tracking/trackFindingCDC/geometry/SZParameters.h>
 
+#include <tracking/trackFindingCDC/numerics/EigenView.h>
+
 #include <framework/logging/Logger.h>
 
 #include <Eigen/Eigen>
@@ -112,7 +114,8 @@ namespace {
     ambiguitySZToN(1, c_TanL) = -nWSZ(2) * nWSZ(2) * nWSZ(2);
     ambiguitySZToN(2, c_TanL) = nWSZ(1) * nWSZ(2) * nWSZ(2);
 
-    SZPrecision szPrecision = ambiguitySZToN.transpose() * precN * ambiguitySZToN;
+    SZPrecision szPrecision;
+    mapToEigen(szPrecision) = ambiguitySZToN.transpose() * precN * ambiguitySZToN;
 
     SZCovariance szCovariance = SZUtil::covarianceFromFullPrecision(szPrecision);
     return UncertainSZLine(szParameters, szCovariance, chi2);

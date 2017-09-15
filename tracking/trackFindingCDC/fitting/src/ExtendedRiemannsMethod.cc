@@ -341,7 +341,7 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& ob
     calcPrecision(resultCircle, sNoL, isLineConstrained(), isOriginConstrained());
 
   // Use in pivoting in case the matrix is not full rank as it is for the constrained cases
-  PerigeeCovariance perigeeCovariance = perigeePrecision.colPivHouseholderQr().inverse();
+  PerigeeCovariance perigeeCovariance = PerigeeUtil::covarianceFromPrecision(perigeePrecision);
 
   resultCircle.setNDF(ndf);
   resultCircle.setChi2(chi2);

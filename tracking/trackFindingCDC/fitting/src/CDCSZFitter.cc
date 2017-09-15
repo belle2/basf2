@@ -21,6 +21,8 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
+#include <tracking/trackFindingCDC/geometry/SZParameters.h>
+
 #include <framework/logging/Logger.h>
 
 #include <Eigen/Dense>
@@ -56,7 +58,7 @@ namespace {
     szPrecision(c_TanL, c_Z0) = sumMatrixWS(1, 0);
     szPrecision(c_Z0, c_Z0) = sumMatrixWS(0, 0);
 
-    SZCovariance szCovariance = szPrecision.inverse();
+    SZCovariance szCovariance = SZUtil::covarianceFromFullPrecision(szPrecision);
     return UncertainSZLine(szParameters, szCovariance, chi2);
   }
 
@@ -112,7 +114,7 @@ namespace {
 
     SZPrecision szPrecision = ambiguitySZToN.transpose() * precN * ambiguitySZToN;
 
-    SZCovariance szCovariance = szPrecision.inverse();
+    SZCovariance szCovariance = SZUtil::covarianceFromFullPrecision(szPrecision);
     return UncertainSZLine(szParameters, szCovariance, chi2);
   }
 }

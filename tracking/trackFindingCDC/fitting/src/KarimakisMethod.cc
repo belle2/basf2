@@ -241,7 +241,7 @@ UncertainPerigeeCircle KarimakisMethod::fitInternal(CDCObservations2D& observati
   PerigeePrecision perigeePrecision = calcPrecisionKarimaki(resultCircle, sNoL, isLineConstrained());
 
   // Use in pivotingin caset the matrix is not full rank as is for the constrained cases-
-  PerigeeCovariance perigeeCovariance = perigeePrecision.colPivHouseholderQr().inverse();
+  PerigeeCovariance perigeeCovariance = PerigeeUtil::covarianceFromPrecision(perigeePrecision);
 
   resultCircle.setChi2(chi2);
   resultCircle.setNDF(ndf);

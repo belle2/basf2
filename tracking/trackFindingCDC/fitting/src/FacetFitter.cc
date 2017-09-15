@@ -142,7 +142,7 @@ namespace {
     linePrecision(c_Phi0, c_I) = p * meanArcLength;
     linePrecision(c_I, c_Phi0) = p * meanArcLength;
     linePrecision(c_I, c_I) = p;
-    LineCovariance lineCovariance = linePrecision.inverse();
+    LineCovariance lineCovariance = LineUtil::covarianceFromFullPrecision(linePrecision);
 
     Vector2D tangential(phiVec(0), phiVec(1));
     Vector2D n12 = tangential.orthogonal(ERotation::c_Clockwise);

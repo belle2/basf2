@@ -9,10 +9,24 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/numerics/PlainMatrix.h>
+
 #include <Eigen/Core>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+
+    template <class T, int M, int N>
+    auto mapToEigen(PlainMatrix<T, M, N>& plainMatrix)
+    {
+      return Eigen::Map<Eigen::Matrix<T, M, N, Eigen::ColMajor> >(plainMatrix.data());
+    }
+
+    template <class T, int M, int N>
+    auto mapToEigen(const PlainMatrix<T, M, N>& plainMatrix)
+    {
+      return Eigen::Map<const Eigen::Matrix<T, M, N, Eigen::ColMajor>>(plainMatrix.data());
+    }
 
     template <class T, int M, int N>
     auto& mapToEigen(Eigen::Matrix<T, M, N>& matrix)

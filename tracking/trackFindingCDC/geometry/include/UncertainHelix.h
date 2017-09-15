@@ -133,7 +133,7 @@ namespace Belle2 {
                                     const PerigeeHelixAmbiguity& fromAmbiguity,
                                     const UncertainPerigeeCircle& toPerigeeCircle,
                                     const PerigeeHelixAmbiguity& toAmbiguity,
-                                    const SZParameters& szParameters = SZParameters(0.0, 0.0));
+                                    const SZParameters& szParameters);
 
       /**
        *  Construct the average helix including its covariance matrix incoorporating additional

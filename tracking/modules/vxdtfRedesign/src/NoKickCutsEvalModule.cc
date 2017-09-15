@@ -233,8 +233,16 @@ void NoKickCutsEvalModule::endRun()
                 sum_M = sum_M + m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(bin_M);
               }
               if (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetEntries() < 100) {
-                bin_m = 0;
-                bin_M = c_nbin + 1;
+                int filledBin_m = 0;
+                int filledBin_M = c_nbin + 1;
+                while (_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(filledBin_m) == 0) {
+                  filledBin_m++;
+                }
+                while (_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(filledBin_M) == 0) {
+                  filledBin_M--;
+                }
+                bin_m = filledBin_m;
+                bin_M = filledBin_M;
               }
               cut_M_theta.push_back(m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinCenter(bin_M));
               cut_m_theta.push_back(m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinCenter(bin_m));
@@ -521,12 +529,21 @@ double NoKickCutsEvalModule::deltaParEval(hitXP hit1, hitXP hit2, NoKickCuts::EP
   return out;
 }
 
+// double NoKickCutsEvalModule::cutFunction(int p, double pwidth)
+// {
+//   double out;
+//   double mom = p * pwidth;
+//   if (mom > 0.04)
+//     out = -7.5 * pow(10, -7) / pow(mom, 3.88) + 1;
+//   else out = 6.3 * mom + 0.57;
+//   return out;
+// }
 double NoKickCutsEvalModule::cutFunction(int p, double pwidth)
 {
   double out;
   double mom = p * pwidth;
-  if (mom > 0.04)
-    out = -7.5 * pow(10, -7) / pow(mom, 3.88) + 1;
-  else out = 6.3 * mom + 0.57;
+  if (mom > 0.4)
+    out = 0.999
+          else out = -4.57 * pow(10, -7) / pow(mom, 3.31) + 0.999;
   return out;
 }

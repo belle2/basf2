@@ -68,6 +68,11 @@ HelixUtil::CovarianceMatrix HelixUtil::stackBlocks(const PerigeeUtil::Covariance
   return result;
 }
 
+HelixUtil::PerigeeAmbiguity HelixUtil::defaultPerigeeAmbiguity()
+{
+  return PerigeeAmbiguity::Zero();
+}
+
 double HelixUtil::average(const HelixParameters& fromPar,
                           const HelixCovariance& fromCov,
                           const HelixParameters& toPar,

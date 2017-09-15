@@ -51,9 +51,6 @@ namespace Belle2 {
     /// Utility struct for functions and types related to the helix parameters.
     struct HelixUtil : UncertainParametersUtil<HelixUtil, EHelixParameter> {
 
-      /// Matrix type for the ambiguity to the perigee parameters, e.g. under the stereo projection.
-      using PerigeeAmbiguity = TrackFindingCDC::JacobianMatrix<3, 5>;
-
       /// Getter for the signs which have to be applied to reverse the parameters
       static HelixUtil::ParameterVector reversalSigns();
 
@@ -76,6 +73,12 @@ namespace Belle2 {
       /// Combine covariance matrices from the xy space and the sz space in their respective blocks
       static HelixUtil::CovarianceMatrix stackBlocks(const PerigeeUtil::CovarianceMatrix& perigeeCov,
                                                      const SZUtil::CovarianceMatrix& szCov);
+
+      /// Matrix type for the ambiguity to the perigee parameters, e.g. under the stereo projection.
+      using PerigeeAmbiguity = TrackFindingCDC::JacobianMatrix<3, 5>;
+
+      /// Initialse a default covariance matrix to zero.
+      static PerigeeAmbiguity defaultPerigeeAmbiguity();
 
       /**
        *  Calculates the weighted average between two helix parameter sets

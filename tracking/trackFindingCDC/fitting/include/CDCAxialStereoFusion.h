@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/utils/DriftLengthEstimator.h>
 
-#include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
+#include <tracking/trackFindingCDC/geometry/HelixParameters.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -72,8 +72,8 @@ namespace Belle2 {
        *  Calculate the ambiguity of the helix parameters relative to the three circle
        *  parameters given the hit content of the segment and their stereo displacement.
        */
-      JacobianMatrix<3, 5> calcAmbiguity(const CDCSegment3D& segment3D,
-                                         const CDCTrajectory2D& trajectory2D);
+      PerigeeHelixAmbiguity calcAmbiguity(const CDCSegment3D& segment3D,
+                                          const CDCTrajectory2D& trajectory2D);
 
 
     private:

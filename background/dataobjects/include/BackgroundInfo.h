@@ -10,9 +10,10 @@
 
 #pragma once
 
-#include <TObject.h>
+#include <framework/pcore/Mergeable.h>
 #include <simulation/dataobjects/SimHitBase.h>
 #include <background/dataobjects/BackgroundMetaData.h>
+#include <framework/core/FrameworkExceptions.h>
 #include <string>
 #include <vector>
 
@@ -21,9 +22,16 @@ namespace Belle2 {
   /**
    * This class stores the information about what background was mixed or overlayed.
    */
-  class BackgroundInfo: public TObject {
+  class BackgroundInfo: public Mergeable {
 
   public:
+
+    /**
+     * Exception definition
+     */
+    BELLE2_DEFINE_EXCEPTION(BackgroundInfoNotMergeable,
+                            "BackgroundInfo: objects cannot be merged");
+
     /**
      * enum for methods used to add BG
      */
@@ -151,7 +159,7 @@ namespace Belle2 {
      * Returns background descriptions
      * @return descriptions
      */
-    const std::vector<BackgroundDescr>& getBackgroundDescr() const {return m_backgrounds;}
+    const std::vector<BackgroundDescr>& getBackgrounds() const {return m_backgrounds;}
 
     /**
      * Returns included components
@@ -208,12 +216,28 @@ namespace Belle2 {
     double getMaxEdepECL() const {return m_maxEdepECL;}
 
     /**
+     * Implementation of abstract class function
+     */
+    virtual void merge(const Mergeable* other);
+
+    /**
+     * Implementation of abstract class function
+     */
+    virtual void clear();
+
+    /**
      * Print the info
      */
     void print() const;
 
-
   private:
+
+    /**
+     * Checks if other object can be merged with this object
+     * @param other object to be merged with this object
+     * @return true, if can be merged
+     */
+    bool canBeMerged(const BackgroundInfo* other);
 
     /**
      * Print info when BG mixing is used
@@ -237,7 +261,7 @@ namespace Belle2 {
     bool m_wrapAround = false; /**< wrap around events in the tail after maxTime */
     double m_maxEdepECL = 0;  /**< maximal allowed deposited energy in ECL */
 
-    ClassDef(BackgroundInfo, 2); /**< Class definition */
+    ClassDef(BackgroundInfo, 3); /**< Class definition */
   };
 }
 

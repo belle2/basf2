@@ -82,7 +82,6 @@ namespace Belle2 {
     unsigned m_numEvents = 0;      /**< number of events (tree entries) in the sample */
     unsigned m_eventCount = 0;     /**< current event (tree entry) */
     StoreEntries m_storeEntries;   /**< store entries with connected branches */
-    int m_BGInfoIndex = -1; /**< index of BackgroundInfo object in the store array */
     unsigned m_index = 0; /**< index of BackgroundDescr in BackgroundInfo object */
 
   };

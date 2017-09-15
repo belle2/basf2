@@ -104,9 +104,9 @@ namespace Belle2 {
     }
 
     // add BackgroundInfo to persistent tree
-    StoreArray<BackgroundInfo> bkgInfos("", DataStore::c_Persistent);
-    bkgInfos.registerInDataStore();
-    auto* bkgInfo = bkgInfos.appendNew();
+    StoreObjPtr<BackgroundInfo> bkgInfo("", DataStore::c_Persistent);
+    bkgInfo.registerInDataStore();
+    bkgInfo.create();
     bkgInfo->setMethod(BackgroundInfo::c_Overlay);
     BackgroundInfo::BackgroundDescr descr;
     descr.tag = SimHitBase::bg_other;
@@ -114,7 +114,6 @@ namespace Belle2 {
     descr.fileNames = m_inputFileNames;
     descr.numEvents = m_numEvents;
     m_index = bkgInfo->appendBackgroundDescr(descr);
-    m_BGInfoIndex = bkgInfos.getEntries() - 1;
 
   }
 
@@ -126,6 +125,7 @@ namespace Belle2 {
 
   void BGOverlayInputModule::event()
   {
+    StoreObjPtr<BackgroundInfo> bkgInfo("", DataStore::c_Persistent);
 
     for (auto entry : m_storeEntries) {
       entry->resetForGetEntry();
@@ -136,9 +136,7 @@ namespace Belle2 {
     if (m_eventCount >= m_numEvents) {
       m_eventCount = 0;
       B2INFO("BGOverlayInput: events for BG overlay will be re-used");
-      StoreArray<BackgroundInfo> bkgInfos("", DataStore::c_Persistent);
-      if (m_BGInfoIndex >= 0 and m_BGInfoIndex < bkgInfos.getEntries())
-        bkgInfos[m_BGInfoIndex]->incrementReusedCounter(m_index);
+      bkgInfo->incrementReusedCounter(m_index);
     }
 
     for (auto entry : m_storeEntries) {

@@ -1,24 +1,15 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Nils Braun                                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
+#include <tracking/trackFindingCDC/filters/segment/BaseSegmentFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-
-namespace Belle2 {
-  namespace TrackFindingCDC {
-    class CDCRLWireHit;
-    class CDCTrack;
-    template class Filter<WeightedRelation<CDCTrack, const CDCRLWireHit>>;
-    /// Base filter for stereo hit - track relations.
-    using BaseStereoHitFilter = Filter<WeightedRelation<CDCTrack, const CDCRLWireHit>>;
-  }
-}
+using namespace Belle2;
+using namespace TrackFindingCDC;

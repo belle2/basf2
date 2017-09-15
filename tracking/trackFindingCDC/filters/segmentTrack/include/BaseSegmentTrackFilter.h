@@ -9,13 +9,15 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegment2D;
     class CDCTrack;
+    template class Filter<WeightedRelation<CDCTrack, const CDCSegment2D>>;
     using BaseSegmentTrackFilter = Filter<WeightedRelation<CDCTrack, const CDCSegment2D>>;
   }
 }

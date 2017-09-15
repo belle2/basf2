@@ -8,11 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+
+#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
+    template class Filter<CDCTrack>;
     using BaseTrackFilter = Filter<CDCTrack>;
   }
 }

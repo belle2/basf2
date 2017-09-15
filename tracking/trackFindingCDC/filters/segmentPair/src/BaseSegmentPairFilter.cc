@@ -1,21 +1,15 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Oliver Frost                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
+#include <tracking/trackFindingCDC/filters/segmentPair/BaseSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 
-namespace Belle2 {
-  namespace TrackFindingCDC {
-    class CDCSegment2D;
-    template class Filter<CDCSegment2D>;
-    /// Base filter to distinguish fake from real segments.
-    using BaseSegmentFilter = Filter<CDCSegment2D>;
-  }
-}
+using namespace Belle2;
+using namespace TrackFindingCDC;

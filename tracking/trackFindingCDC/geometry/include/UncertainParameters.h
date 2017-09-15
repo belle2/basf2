@@ -9,17 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/CovarianceMatrixUtil.h>
-#include <tracking/trackFindingCDC/numerics/JacobianMatrixUtil.h>
-#include <tracking/trackFindingCDC/numerics/ParameterVectorUtil.h>
-
 #include <tracking/trackFindingCDC/numerics/CovarianceMatrix.h>
 #include <tracking/trackFindingCDC/numerics/PrecisionMatrix.h>
 #include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
 #include <tracking/trackFindingCDC/numerics/ParameterVector.h>
 
 namespace Belle2 {
-
   namespace TrackFindingCDC {
 
     /// Utility struct to instantiate a couple of helper function related to a set of uncertain parameters
@@ -45,56 +40,31 @@ namespace Belle2 {
       using JacobianMatrix = TrackFindingCDC::JacobianMatrix<c_N>;
 
       /// Transport the covariance matrix inplace with the given jacobian matrix
-      static void transport(const JacobianMatrix& jacobian, CovarianceMatrix& cov)
-      {
-        CovarianceMatrixUtil::transport(jacobian, cov);
-      }
+      static void transport(const JacobianMatrix& jacobian, CovarianceMatrix& cov);
 
       /// Return a copy of the covariance matrix transported with the given jacobian matrix
       static CovarianceMatrix transported(const JacobianMatrix& jacobian,
-                                          const CovarianceMatrix& cov)
-      {
-        return CovarianceMatrixUtil::transported(jacobian, cov);
-      }
+                                          const CovarianceMatrix& cov);
 
       /// Jacobian matrix needed in the reversal operation of the parameter vector
-      static JacobianMatrix reversalJacobian()
-      {
-        return JacobianMatrixUtil::scale(T::reversalSigns());
-      }
+      static JacobianMatrix reversalJacobian();
 
       /// Reverse the covariance matrix inplace.
-      static void reverse(CovarianceMatrix& cov)
-      {
-        return transport(reversalJacobian(), cov);
-      }
+      static void reverse(CovarianceMatrix& cov);
 
       /// Return a copy of the reversed covariance matrix.
-      static CovarianceMatrix reversed(const CovarianceMatrix& cov)
-      {
-        return transported(reversalJacobian(), cov);
-      }
+      static CovarianceMatrix reversed(const CovarianceMatrix& cov);
 
       /// Returns an identity matrix
-      static CovarianceMatrix identity()
-      {
-        return CovarianceMatrixUtil::identity<c_N>();
-      }
+      static CovarianceMatrix identity();
 
       /// Getter for a sub part of the covariance matrix.
-      template <class AParameterVector, unsigned int I = 0>
-      static AParameterVector getSubParameterVector(const ParameterVector& par)
-      {
-        return ParameterVectorUtil::getSub<AParameterVector, I>(par);
-      }
+      template <class AParameterVector, int I = 0>
+      static AParameterVector getSubParameterVector(const ParameterVector& par);
 
       /// Getter for a sub part of the covariance matrix.
-      template <class ACovarianceMatrix, unsigned int I = 0>
-      static ACovarianceMatrix getSubCovarianceMatrix(const CovarianceMatrix& cov)
-      {
-        return CovarianceMatrixUtil::getSub<ACovarianceMatrix, I>(cov);
-      }
+      template <class ACovarianceMatrix, int I = 0>
+      static ACovarianceMatrix getSubCovarianceMatrix(const CovarianceMatrix& cov);
     };
-
   }
 }

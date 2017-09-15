@@ -14,9 +14,6 @@
 
 #include <tracking/trackFindingCDC/geometry/UncertainParameters.h>
 
-#include <tracking/trackFindingCDC/numerics/CovarianceMatrixUtil.h>
-#include <tracking/trackFindingCDC/numerics/ParameterVectorUtil.h>
-
 namespace Belle2 {
 
   namespace TrackFindingCDC {
@@ -53,54 +50,27 @@ namespace Belle2 {
     struct HelixUtil : UncertainParametersUtil<HelixUtil, EHelixParameter> {
 
       /// Getter for the signs which have to be applied to reverse the parameters
-      static ParameterVector reversalSigns()
-      {
-        return ParameterVectorUtil::stack(PerigeeUtil::reversalSigns(), SZUtil::reversalSigns());
-      }
+      static HelixUtil::ParameterVector reversalSigns();
 
       /// Get helix parameters related to the xy space
-      static PerigeeUtil::ParameterVector getPerigeeParameters(const ParameterVector& helixPar)
-      {
-        using namespace NHelixParameterIndices;
-        return getSubParameterVector<PerigeeUtil::ParameterVector, c_Curv>(helixPar);
-      }
+      static PerigeeUtil::ParameterVector getPerigeeParameters(const ParameterVector& helixPar);
 
       /// Get sz parameters
-      static SZUtil::ParameterVector getSZParameters(const ParameterVector& helixPar)
-      {
-        using namespace NHelixParameterIndices;
-        return getSubParameterVector<SZUtil::ParameterVector, c_TanL>(helixPar);
-      }
+      static SZUtil::ParameterVector getSZParameters(const ParameterVector& helixPar);
 
       /// Combine parameters from the xy space and the sz space
-      static ParameterVector stack(const PerigeeUtil::ParameterVector& perigeePar,
-                                   const SZUtil::ParameterVector& szPar)
-      {
-        ParameterVector result = ParameterVectorUtil::stack(perigeePar, szPar);
-        return result;
-      }
+      static HelixUtil::ParameterVector stack(const PerigeeUtil::ParameterVector& perigeePar,
+                                              const SZUtil::ParameterVector& szPar);
 
       /// Get perigee covariance matrix related to the xy space
-      static PerigeeUtil::CovarianceMatrix getPerigeeCovariance(const CovarianceMatrix& helixCov)
-      {
-        using namespace NHelixParameterIndices;
-        return getSubCovarianceMatrix<PerigeeUtil::CovarianceMatrix, c_Curv>(helixCov);
-      }
+      static PerigeeUtil::CovarianceMatrix getPerigeeCovariance(const CovarianceMatrix& helixCov);
 
       /// Get sz covariance matrix
-      static SZUtil::CovarianceMatrix getSZCovariance(const CovarianceMatrix& helixCov)
-      {
-        using namespace NHelixParameterIndices;
-        return getSubCovarianceMatrix<SZUtil::CovarianceMatrix, c_TanL>(helixCov);
-      }
+      static SZUtil::CovarianceMatrix getSZCovariance(const CovarianceMatrix& helixCov);
 
       /// Combine covariance matrices from the xy space and the sz space in their respective blocks
-      static CovarianceMatrix stackBlocks(const PerigeeUtil::CovarianceMatrix& perigeeCov,
-                                          const SZUtil::CovarianceMatrix& szCov)
-      {
-        CovarianceMatrix result = CovarianceMatrixUtil::stackBlocks(perigeeCov, szCov);
-        return result;
-      }
+      static HelixUtil::CovarianceMatrix stackBlocks(const PerigeeUtil::CovarianceMatrix& perigeeCov,
+                                                     const SZUtil::CovarianceMatrix& szCov);
     };
 
     /// Vector of helix parameters

@@ -27,7 +27,6 @@
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
-using namespace Eigen;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -345,7 +344,7 @@ Vector2D CDCObservations2D::getCentralPoint() const
 
 void CDCObservations2D::passiveMoveBy(const Vector2D& origin)
 {
-  Matrix<double, 1, 2> eigenOrigin(origin.x(), origin.y());
+  Eigen::Matrix<double, 1, 2> eigenOrigin(origin.x(), origin.y());
   EigenObservationMatrix eigenObservations = getObservationMatrix();
   eigenObservations.leftCols<2>().rowwise() -= eigenOrigin;
 }
@@ -365,7 +364,7 @@ Eigen::Matrix<double, 5, 5> CDCObservations2D::getWXYRLSumMatrix()
 
   // B2INFO("Matrix of observations: " << endl << eigenObservation);
 
-  Matrix<double, Dynamic, 5> projectedPoints(nObservations, 5);
+  Eigen::Matrix<double, Eigen::Dynamic, 5> projectedPoints(nObservations, 5);
 
   const std::size_t iW = 0;
   const std::size_t iX = 1;
@@ -374,16 +373,16 @@ Eigen::Matrix<double, 5, 5> CDCObservations2D::getWXYRLSumMatrix()
   const std::size_t iL = 4;
 
   projectedPoints.col(iW) =
-    Matrix<double, Dynamic, 1>::Constant(nObservations, 1.0); // Offset column
+    Eigen::Matrix<double, Eigen::Dynamic, 1>::Constant(nObservations, 1.0); // Offset column
   projectedPoints.col(iX) = eigenObservation.col(0);
   projectedPoints.col(iY) = eigenObservation.col(1);
   projectedPoints.col(iR2) = eigenObservation.leftCols<2>().rowwise().squaredNorm() -
                              eigenObservation.col(2).rowwise().squaredNorm();
   projectedPoints.col(iL) = eigenObservation.col(2);
 
-  Array<double, Dynamic, 1> weights = eigenObservation.col(3);
-  Matrix<double, Dynamic, 5> weightedProjectedPoints = projectedPoints.array().colwise() * weights;
-  Matrix<double, 5, 5> sumMatrix = weightedProjectedPoints.transpose() * projectedPoints;
+  Eigen::Array<double, Eigen::Dynamic, 1> weights = eigenObservation.col(3);
+  Eigen::Matrix<double, Eigen::Dynamic, 5> weightedProjectedPoints = projectedPoints.array().colwise() * weights;
+  Eigen::Matrix<double, 5, 5> sumMatrix = weightedProjectedPoints.transpose() * projectedPoints;
 
   // B2INFO("Matrix of sums: " << endl << sumMatrix);
 
@@ -396,7 +395,7 @@ Eigen::Matrix<double, 4, 4> CDCObservations2D::getWXYLSumMatrix()
   CDCObservations2D::EigenObservationMatrix eigenObservation = getObservationMatrix();
   std::size_t nObservations = size();
 
-  Matrix<double, Dynamic, 4> projectedPoints(nObservations, 4);
+  Eigen::Matrix<double, Eigen::Dynamic, 4> projectedPoints(nObservations, 4);
 
   const std::size_t iW = 0;
   const std::size_t iX = 1;
@@ -404,14 +403,14 @@ Eigen::Matrix<double, 4, 4> CDCObservations2D::getWXYLSumMatrix()
   const std::size_t iL = 3;
 
   projectedPoints.col(iW) =
-    Matrix<double, Dynamic, 1>::Constant(nObservations, 1.0); // Offset column
+    Eigen::Matrix<double, Eigen::Dynamic, 1>::Constant(nObservations, 1.0); // Offset column
   projectedPoints.col(iX) = eigenObservation.col(0);
   projectedPoints.col(iY) = eigenObservation.col(1);
   projectedPoints.col(iL) = eigenObservation.col(2);
 
-  Array<double, Dynamic, 1> weights = eigenObservation.col(3);
-  Matrix<double, Dynamic, 4> weightedProjectedPoints = projectedPoints.array().colwise() * weights;
-  Matrix<double, 4, 4> sumMatrix = weightedProjectedPoints.transpose() * projectedPoints;
+  Eigen::Array<double, Eigen::Dynamic, 1> weights = eigenObservation.col(3);
+  Eigen::Matrix<double, Eigen::Dynamic, 4> weightedProjectedPoints = projectedPoints.array().colwise() * weights;
+  Eigen::Matrix<double, 4, 4> sumMatrix = weightedProjectedPoints.transpose() * projectedPoints;
 
   return sumMatrix;
 }
@@ -421,7 +420,7 @@ Eigen::Matrix<double, 4, 4> CDCObservations2D::getWXYRSumMatrix()
   CDCObservations2D::EigenObservationMatrix eigenObservation = getObservationMatrix();
   std::size_t nObservations = size();
 
-  Matrix<double, Dynamic, 4> projectedPoints(nObservations, 4);
+  Eigen::Matrix<double, Eigen::Dynamic, 4> projectedPoints(nObservations, 4);
 
   const std::size_t iW = 0;
   const std::size_t iX = 1;
@@ -429,15 +428,15 @@ Eigen::Matrix<double, 4, 4> CDCObservations2D::getWXYRSumMatrix()
   const std::size_t iR2 = 3;
 
   projectedPoints.col(iW) =
-    Matrix<double, Dynamic, 1>::Constant(nObservations, 1.0); // Offset column
+    Eigen::Matrix<double, Eigen::Dynamic, 1>::Constant(nObservations, 1.0); // Offset column
   projectedPoints.col(iX) = eigenObservation.col(0);
   projectedPoints.col(iY) = eigenObservation.col(1);
   projectedPoints.col(iR2) = eigenObservation.leftCols<2>().rowwise().squaredNorm() -
                              eigenObservation.col(2).rowwise().squaredNorm();
 
-  Array<double, Dynamic, 1> weights = eigenObservation.col(3);
-  Matrix<double, Dynamic, 4> weightedProjectedPoints = projectedPoints.array().colwise() * weights;
-  Matrix<double, 4, 4> sumMatrix = weightedProjectedPoints.transpose() * projectedPoints;
+  Eigen::Array<double, Eigen::Dynamic, 1> weights = eigenObservation.col(3);
+  Eigen::Matrix<double, Eigen::Dynamic, 4> weightedProjectedPoints = projectedPoints.array().colwise() * weights;
+  Eigen::Matrix<double, 4, 4> sumMatrix = weightedProjectedPoints.transpose() * projectedPoints;
   return sumMatrix;
 }
 
@@ -446,20 +445,20 @@ Eigen::Matrix<double, 3, 3> CDCObservations2D::getWXYSumMatrix()
   CDCObservations2D::EigenObservationMatrix eigenObservation = getObservationMatrix();
   std::size_t nObservations = size();
 
-  Matrix<double, Dynamic, 3> projectedPoints(nObservations, 3);
+  Eigen::Matrix<double, Eigen::Dynamic, 3> projectedPoints(nObservations, 3);
 
   const std::size_t iW = 0;
   const std::size_t iX = 1;
   const std::size_t iY = 2;
 
   projectedPoints.col(iW) =
-    Matrix<double, Dynamic, 1>::Constant(nObservations, 1.0); // Offset column
+    Eigen::Matrix<double, Eigen::Dynamic, 1>::Constant(nObservations, 1.0); // Offset column
   projectedPoints.col(iX) = eigenObservation.col(0);
   projectedPoints.col(iY) = eigenObservation.col(1);
 
-  Array<double, Dynamic, 1> weights = eigenObservation.col(3);
-  Matrix<double, Dynamic, 3> weightedProjectedPoints = projectedPoints.array().colwise() * weights;
-  Matrix<double, 3, 3> sumMatrix = weightedProjectedPoints.transpose() * projectedPoints;
+  Eigen::Array<double, Eigen::Dynamic, 1> weights = eigenObservation.col(3);
+  Eigen::Matrix<double, Eigen::Dynamic, 3> weightedProjectedPoints = projectedPoints.array().colwise() * weights;
+  Eigen::Matrix<double, 3, 3> sumMatrix = weightedProjectedPoints.transpose() * projectedPoints;
 
   return sumMatrix;
 }

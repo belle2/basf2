@@ -25,12 +25,12 @@
 
 #include <framework/logging/Logger.h>
 
-#include <Eigen/Dense>
+#include <Eigen/Eigen>
+#include <Eigen/QR>
+#include <Eigen/Core>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-using namespace Eigen;
 
 const CDCSZFitter& CDCSZFitter::getFitter()
 {
@@ -39,12 +39,12 @@ const CDCSZFitter& CDCSZFitter::getFitter()
 }
 
 namespace {
-  UncertainSZLine fitZ(const Matrix<double, 3, 3>& sumMatrixWSZ)
+  UncertainSZLine fitZ(const Eigen::Matrix<double, 3, 3>& sumMatrixWSZ)
   {
     // Solve the normal equation X * n = y
-    Matrix<double, 2, 2> sumMatrixWS = sumMatrixWSZ.block<2, 2>(0, 0);
-    Matrix<double, 2, 1> sumVectorZOverWS = sumMatrixWSZ.block<2, 1>(0, 2);
-    Matrix<double, 2, 1> nZOverWS = sumMatrixWS.llt().solve(sumVectorZOverWS);
+    Eigen::Matrix<double, 2, 2> sumMatrixWS = sumMatrixWSZ.block<2, 2>(0, 0);
+    Eigen::Matrix<double, 2, 1> sumVectorZOverWS = sumMatrixWSZ.block<2, 1>(0, 2);
+    Eigen::Matrix<double, 2, 1> nZOverWS = sumMatrixWS.llt().solve(sumVectorZOverWS);
     double chi2 = sumMatrixWSZ(2, 2) - nZOverWS.transpose() * sumVectorZOverWS;
 
     using namespace NSZParameterIndices;
@@ -63,26 +63,26 @@ namespace {
   }
 
   // Declare function as currently unused to avoid compiler warning
-  UncertainSZLine fitSZ(const Matrix<double, 3, 3>& sumMatrixWSZ) __attribute__((__unused__));
+  UncertainSZLine fitSZ(const Eigen::Matrix<double, 3, 3>& sumMatrixWSZ) __attribute__((__unused__));
 
   /// Variant without drift circles and seperating the offset before the matrix solving
-  UncertainSZLine fitSZ(const Matrix<double, 3, 3>& sumMatrixWSZ)
+  UncertainSZLine fitSZ(const Eigen::Matrix<double, 3, 3>& sumMatrixWSZ)
   {
 
     // Matrix of averages
-    Matrix<double, 3, 3> averageMatrixWSZ = sumMatrixWSZ / sumMatrixWSZ(0);
+    Eigen::Matrix<double, 3, 3> averageMatrixWSZ = sumMatrixWSZ / sumMatrixWSZ(0);
 
     // Measurement means
-    Matrix<double, 3, 1> meansWSZ = averageMatrixWSZ.row(0);
+    Eigen::Matrix<double, 3, 1> meansWSZ = averageMatrixWSZ.row(0);
 
     // Covariance matrix
-    Matrix<double, 3, 3> covMatrixWSZ = averageMatrixWSZ - meansWSZ * meansWSZ.transpose();
+    Eigen::Matrix<double, 3, 3> covMatrixWSZ = averageMatrixWSZ - meansWSZ * meansWSZ.transpose();
 
-    Matrix<double, 2, 2> covMatrixSZ = covMatrixWSZ.block<2, 2>(1, 1);
-    Matrix<double, 2, 1> meansSZ = meansWSZ.segment<2>(1);
+    Eigen::Matrix<double, 2, 2> covMatrixSZ = covMatrixWSZ.block<2, 2>(1, 1);
+    Eigen::Matrix<double, 2, 1> meansSZ = meansWSZ.segment<2>(1);
 
-    SelfAdjointEigenSolver<Matrix<double, 2, 2>> eigensolver(covMatrixSZ);
-    if (eigensolver.info() != Success) {
+    Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double, 2, 2>> eigensolver(covMatrixSZ);
+    if (eigensolver.info() != Eigen::Success) {
       B2WARNING(
         "SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
     }
@@ -90,23 +90,23 @@ namespace {
     // the eigenvalues are generated in increasing order
     // we are interested in the lowest one since we want to compute the normal vector of the line
     // here
-    Matrix<double, 2, 1> nSZ = eigensolver.eigenvectors().col(0);
+    Eigen::Matrix<double, 2, 1> nSZ = eigensolver.eigenvectors().col(0);
     B2INFO("nSZ " << nSZ);
     nSZ /= std::copysign(nSZ.norm(), -nSZ(1)); // Making n2 negative to normalize to forward along s
-    Matrix<double, 3, 1> nWSZ;
+    Eigen::Matrix<double, 3, 1> nWSZ;
     nWSZ << -meansSZ.transpose() * nSZ, nSZ;
     B2INFO("nWSZ " << nWSZ);
 
     double chi2 = nWSZ.transpose() * sumMatrixWSZ * nWSZ;
 
-    PrecisionMatrix<3> precN = sumMatrixWSZ;
+    Eigen::Matrix<double, 3, 3> precN = sumMatrixWSZ;
 
     using namespace NSZParameterIndices;
     SZParameters szParameters;
     szParameters(c_TanL) = -nWSZ(1) / nWSZ(2);
     szParameters(c_Z0) = -nWSZ(0) / nWSZ(2);
 
-    Matrix<double, 3, 2> ambiguitySZToN = Matrix<double, 3, 2>::Zero();
+    Eigen::Matrix<double, 3, 2> ambiguitySZToN = Eigen::Matrix<double, 3, 2>::Zero();
     ambiguitySZToN(0, c_Z0) = -nWSZ(2);
     ambiguitySZToN(0, c_TanL) = -nWSZ(1) * nWSZ(0);
     ambiguitySZToN(1, c_TanL) = -nWSZ(2) * nWSZ(2) * nWSZ(2);
@@ -214,7 +214,7 @@ void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ, CDCSZObservations& obser
   size_t ndf = observationsSZ.size() - 2;
 
   // Matrix of weighted sums
-  Matrix<double, 3, 3> sumMatrixWSZ = observationsSZ.getWSZSumMatrix();
+  Eigen::Matrix<double, 3, 3> sumMatrixWSZ = observationsSZ.getWSZSumMatrix();
   UncertainSZLine uncertainSZLine = fitZ(sumMatrixWSZ);
 
   uncertainSZLine.setNDF(ndf);

@@ -14,19 +14,18 @@
 #include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 
 #include <Math/Functor.h>
 #include <Math/BrentMinimizer1D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using namespace Eigen;
 
 namespace {
 
   template<int N>
-  Vector2D getCenterForwardDirection(const Matrix<double, N, 3>& xyl)
+  Vector2D getCenterForwardDirection(const Eigen::Matrix<double, N, 3>& xyl)
   {
     /// Rotate in forward direction
     Vector2D coordinate(xyl(N - 1, 0) - xyl(0, 0), xyl(N - 1, 1) - xyl(0, 1));
@@ -34,7 +33,7 @@ namespace {
   }
 
   template<int N>
-  Vector2D getTangentialForwardDirection(const Matrix<double, N, 3>& xyl)
+  Vector2D getTangentialForwardDirection(const Eigen::Matrix<double, N, 3>& xyl)
   {
     /// Rotate in forward direction
     Vector2D fromPos(xyl(0, 0), xyl(0, 1));
@@ -49,9 +48,9 @@ namespace {
   }
 
   template<int N>
-  void rotate(Vector2D coordinate, Matrix<double, N, 3>& xyl)
+  void rotate(Vector2D coordinate, Eigen::Matrix<double, N, 3>& xyl)
   {
-    Matrix<double, 3, 3> rot = Matrix<double, 3, 3>::Identity();
+    Eigen::Matrix<double, 3, 3> rot = Eigen::Matrix<double, 3, 3>::Identity();
     rot(0, 0) = coordinate.x();
     rot(0, 1) = -coordinate.y();
     rot(1, 0) = coordinate.y();
@@ -67,27 +66,27 @@ namespace {
     vec = vec.passiveRotatedBy(coordinate.flippedSecond());
   }
 
-  Vector2d fitPhiVecZeroSteps(const Matrix<double, 3, 3>& xylCov, double& chi2)
+  Eigen::Vector2d fitPhiVecZeroSteps(const Eigen::Matrix<double, 3, 3>& xylCov, double& chi2)
   {
     chi2 = xylCov(1, 1) + 2 * xylCov(1, 2) + xylCov(2, 2);
-    return Vector2d(1, 0);
+    return Eigen::Vector2d(1, 0);
   }
 
-  Vector2d fitPhiVecOneStep(const Matrix<double, 3, 3>& xylCov, double& chi2)
+  Eigen::Vector2d fitPhiVecOneStep(const Eigen::Matrix<double, 3, 3>& xylCov, double& chi2)
   {
     const double phi = (xylCov(0, 1) + xylCov(0, 2)) / xylCov(0, 0);
     chi2 = xylCov(1, 1) + 2 * xylCov(1, 2) + xylCov(2, 2) - phi * (xylCov(0, 1) + xylCov(0, 2));
-    return Vector2d(std::cos(phi), std::sin(phi));
+    return Eigen::Vector2d(std::cos(phi), std::sin(phi));
   }
 
-  Vector2d fitPhiVecBrent(const Matrix<double, 3, 3>& xylCov, int nIter, double& chi2)
+  Eigen::Vector2d fitPhiVecBrent(const Eigen::Matrix<double, 3, 3>& xylCov, int nIter, double& chi2)
   {
-    const Matrix< double, 2, 2> A = xylCov.topLeftCorner<2, 2>();
-    const Matrix< double, 2, 1> b = xylCov.topRightCorner<2, 1>();
+    const Eigen::Matrix< double, 2, 2> A = xylCov.topLeftCorner<2, 2>();
+    const Eigen::Matrix< double, 2, 1> b = xylCov.topRightCorner<2, 1>();
     const double c = xylCov(2, 2);
 
     auto calcReducedChi2 = [&A, &b](double phi) -> double {
-      Matrix<double, 2, 1> normal(std::sin(phi), -std::cos(phi));
+      Eigen::Matrix<double, 2, 1> normal(std::sin(phi), -std::cos(phi));
       return ((normal.transpose() * A - 2 * b.transpose()) * normal)[0];
     };
 
@@ -98,12 +97,12 @@ namespace {
 
     chi2 = bm.FValMinimum() + c;
     const double phi = bm.XMinimum();
-    return Vector2d(std::cos(phi), std::sin(phi));
+    return Eigen::Vector2d(std::cos(phi), std::sin(phi));
   }
 
   template<int N>
-  UncertainParameterLine2D fit(Matrix<double, N, 3> xyl,
-                               Array<double, N, 1> w,
+  UncertainParameterLine2D fit(Eigen::Matrix<double, N, 3> xyl,
+                               Eigen::Array<double, N, 1> w,
                                int nSteps)
   {
     /// Rotate in forward direction
@@ -116,12 +115,12 @@ namespace {
 
     rotate(coordinate, xyl);
 
-    Array< double, 1, 3> averages = (xyl.array().colwise() * w).colwise().sum() / w.sum();
-    Matrix< double, N, 3> deltas = xyl.array().rowwise() - averages;
-    Matrix< double, N, 3> weightedDeltas = deltas.array().colwise() * w;
-    Matrix< double, 3, 3> covariances = deltas.transpose() * weightedDeltas / w.sum();
+    Eigen::Array< double, 1, 3> averages = (xyl.array().colwise() * w).colwise().sum() / w.sum();
+    Eigen::Matrix< double, N, 3> deltas = xyl.array().rowwise() - averages;
+    Eigen::Matrix< double, N, 3> weightedDeltas = deltas.array().colwise() * w;
+    Eigen::Matrix< double, 3, 3> covariances = deltas.transpose() * weightedDeltas / w.sum();
 
-    Vector2d phiVec;
+    Eigen::Vector2d phiVec;
     double chi2 = 0.0;
     if (nSteps == 0) {
       phiVec = fitPhiVecZeroSteps(covariances, chi2);
@@ -163,10 +162,10 @@ namespace {
 double FacetFitter::fit(const CDCFacet& facet, int nSteps)
 {
   // Measurement matrix
-  Matrix< double, 3, 3> xyl;
+  Eigen::Matrix< double, 3, 3> xyl;
 
   // Weight matrix
-  Array< double, 3, 1> w;
+  Eigen::Array< double, 3, 1> w;
 
   const CDCRLWireHit& startRLWireHit = facet.getStartRLWireHit();
   const CDCRLWireHit& middleRLWireHit = facet.getMiddleRLWireHit();
@@ -207,10 +206,10 @@ UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
                                           int nSteps)
 {
   // Observations matrix
-  Matrix< double, 6, 3> xyl;
+  Eigen::Matrix< double, 6, 3> xyl;
 
   // Weight matrix
-  Array< double, 6, 1> w;
+  Eigen::Array< double, 6, 1> w;
 
   const Vector2D support = Vector2D::average(fromFacet.getMiddleWire().getRefPos2D(),
                                              toFacet.getMiddleWire().getRefPos2D());
@@ -274,8 +273,8 @@ UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
 }
 
 
-UncertainParameterLine2D FacetFitter::fit(Matrix<double, 3, 3> xyl,
-                                          Array<double, 3, 1> w,
+UncertainParameterLine2D FacetFitter::fit(Eigen::Matrix<double, 3, 3> xyl,
+                                          Eigen::Array<double, 3, 1> w,
                                           int nSteps)
 {
   return ::fit(std::move(xyl), std::move(w), nSteps);

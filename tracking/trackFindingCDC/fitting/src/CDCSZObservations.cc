@@ -14,7 +14,6 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 
-using namespace Eigen;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -116,7 +115,7 @@ Vector2D CDCSZObservations::getCentralPoint() const
 
 void CDCSZObservations::passiveMoveBy(const Vector2D& origin)
 {
-  Matrix<double, 1, 2> eigenOrigin(origin.x(), origin.y());
+  Eigen::Matrix<double, 1, 2> eigenOrigin(origin.x(), origin.y());
   EigenObservationMatrix eigenObservations = getObservationMatrix();
   eigenObservations.leftCols<2>().rowwise() -= eigenOrigin;
 }
@@ -134,19 +133,19 @@ Eigen::Matrix<double, 3, 3> CDCSZObservations::getWSZSumMatrix()
   EigenObservationMatrix eigenObservation = getObservationMatrix();
   std::size_t nObservations = size();
 
-  Matrix<double, Dynamic, 3> projectedPoints(nObservations, 3);
+  Eigen::Matrix<double, Eigen::Dynamic, 3> projectedPoints(nObservations, 3);
 
   const std::size_t iW = 0;
   const std::size_t iS = 1;
   const std::size_t iZ = 2;
 
-  projectedPoints.col(iW) = Matrix<double, Dynamic, 1>::Constant(nObservations, 1.0); // Offset column
+  projectedPoints.col(iW) = Eigen::Matrix<double, Eigen::Dynamic, 1>::Constant(nObservations, 1.0); // Offset column
   projectedPoints.col(iS) = eigenObservation.col(0);
   projectedPoints.col(iZ) = eigenObservation.col(1);
 
-  Array<double, Dynamic, 1> weights = eigenObservation.col(2);
-  Matrix<double, Dynamic, 3> weightedProjectedPoints = projectedPoints.array().colwise() * weights;
-  Matrix<double, 3, 3> sumMatrix = weightedProjectedPoints.transpose() * projectedPoints;
+  Eigen::Array<double, Eigen::Dynamic, 1> weights = eigenObservation.col(2);
+  Eigen::Matrix<double, Eigen::Dynamic, 3> weightedProjectedPoints = projectedPoints.array().colwise() * weights;
+  Eigen::Matrix<double, 3, 3> sumMatrix = weightedProjectedPoints.transpose() * projectedPoints;
 
   return sumMatrix;
 }

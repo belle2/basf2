@@ -17,11 +17,9 @@
 #include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
-#include <Eigen/Dense>
+#include <Eigen/Core>
 
 using namespace Belle2;
-using namespace Eigen;
-
 using namespace TrackFindingCDC;
 
 KarimakisMethod::KarimakisMethod()
@@ -70,8 +68,8 @@ namespace {
 
   /// Variant implementing Karimakis method without drift circles.
   UncertainPerigeeCircle fitKarimaki(const double /*sw*/,
-                                     const Matrix< double, 4, 1 >& a,
-                                     const Matrix< double, 4, 4 >& c,
+                                     const Eigen::Matrix< double, 4, 1 >& a,
+                                     const Eigen::Matrix< double, 4, 4 >& c,
                                      bool lineConstrained = false)
   {
     double q1, q2 = 0.0;
@@ -114,7 +112,7 @@ namespace {
   /// Variant without drift circles
   double calcChi2Karimaki(const PerigeeCircle& parameters,
                           const double sw,
-                          const Matrix< double, 4, 4 >& c,
+                          const Eigen::Matrix< double, 4, 4 >& c,
                           bool lineConstrained = false)
   {
     // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
@@ -144,7 +142,7 @@ namespace {
 
 
   PerigeePrecision calcPrecisionKarimaki(const PerigeeCircle& parameters,
-                                         const Matrix< double, 4, 4 >& s,
+                                         const Eigen::Matrix< double, 4, 4 >& s,
                                          bool lineConstrained = false)
   {
     PerigeePrecision perigeePrecision;
@@ -216,16 +214,16 @@ namespace {
 UncertainPerigeeCircle KarimakisMethod::fitInternal(CDCObservations2D& observations2D) const
 {
   // Matrix of weighted sums
-  Matrix< double, 4, 4> sNoL = observations2D.getWXYRSumMatrix();
+  Eigen::Matrix< double, 4, 4> sNoL = observations2D.getWXYRSumMatrix();
 
   // Matrix of averages
-  Matrix< double, 4, 4> aNoL = sNoL / sNoL(iW);
+  Eigen::Matrix<double, 4, 4> aNoL = sNoL / sNoL(iW);
 
   // Measurement means
-  Matrix< double, 4, 1> meansNoL = aNoL.row(iW);
+  Eigen::Matrix<double, 4, 1> meansNoL = aNoL.row(iW);
 
   // Covariance matrix
-  Matrix< double, 4, 4> cNoL = aNoL - meansNoL * meansNoL.transpose();
+  Eigen::Matrix<double, 4, 4> cNoL = aNoL - meansNoL * meansNoL.transpose();
 
   // Determine NDF : Circle fit eats up to 3 degrees of freedom debpending on the constraints
   size_t ndf = observations2D.size() - 2;

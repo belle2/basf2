@@ -52,9 +52,7 @@ namespace Belle2 {
       /// Getter for the signs which have to be applied to reverse the parameters
       static ParameterVector reversalSigns()
       {
-        ParameterVector result;
-        result << -1, 1, -1, -1, 1;
-        return result;
+        return ParameterVectorUtil::stack(PerigeeUtil::reversalSigns(), SZUtil::reversalSigns());
       }
 
       /// Get helix parameters related to the xy space

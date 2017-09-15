@@ -41,9 +41,7 @@ namespace Belle2 {
       /// Getter for the signs which have to be applied to reverse the traversal direction
       static ParameterVector reversalSigns()
       {
-        ParameterVector result;
-        result << -1, -1;
-        return result;
+        return ParameterVector({ -1.0, -1.0});
       }
     };
 

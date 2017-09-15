@@ -9,8 +9,6 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/geometry/Helix.h>
 
-#include <tracking/trackFindingCDC/numerics/JacobianMatrixUtil.h>
-
 #include <boost/math/tools/minima.hpp>
 
 using namespace Belle2;
@@ -82,7 +80,7 @@ HelixJacobian Helix::passiveMoveByJacobian(const Vector3D& by) const
   // Fills the upper left 3x3 corner.
   PerigeeJacobian perigeeJacobian = circleXY().passiveMoveByJacobian(by.xy());
   SZJacobian szJacobian = SZUtil::identity();
-  HelixJacobian jacobian = JacobianMatrixUtil::stackBlocks(perigeeJacobian, szJacobian);
+  HelixJacobian jacobian = HelixUtil::stackBlocks(perigeeJacobian, szJacobian);
 
   double curv = curvatureXY();
   double tanL = tanLambda();

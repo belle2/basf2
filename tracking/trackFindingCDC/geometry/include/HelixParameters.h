@@ -14,6 +14,8 @@
 
 #include <tracking/trackFindingCDC/geometry/UncertainParameters.h>
 
+#include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
+
 namespace Belle2 {
 
   namespace TrackFindingCDC {
@@ -49,6 +51,9 @@ namespace Belle2 {
     /// Utility struct for functions and types related to the helix parameters.
     struct HelixUtil : UncertainParametersUtil<HelixUtil, EHelixParameter> {
 
+      /// Matrix type for the ambiguity to the perigee parameters, e.g. under the stereo projection.
+      using PerigeeAmbiguity = TrackFindingCDC::JacobianMatrix<3, 5>;
+
       /// Getter for the signs which have to be applied to reverse the parameters
       static HelixUtil::ParameterVector reversalSigns();
 
@@ -71,6 +76,52 @@ namespace Belle2 {
       /// Combine covariance matrices from the xy space and the sz space in their respective blocks
       static HelixUtil::CovarianceMatrix stackBlocks(const PerigeeUtil::CovarianceMatrix& perigeeCov,
                                                      const SZUtil::CovarianceMatrix& szCov);
+
+      /**
+       *  Calculates the weighted average between two helix parameter sets
+       *  with their respective covariance matrix.
+       *
+       *  Returns the chi2 value of the average.
+       */
+      static double average(const HelixUtil::ParameterVector& fromPar,
+                            const HelixUtil::CovarianceMatrix& fromCov,
+                            const HelixUtil::ParameterVector& toPar,
+                            const HelixUtil::CovarianceMatrix& toCov,
+                            HelixUtil::ParameterVector& avgPar,
+                            HelixUtil::CovarianceMatrix& avgCov);
+
+      /**
+       *  Calculates the weighted average between a perigee parameter sets and
+       *  helix parameter sets with their respective covariance matrix under
+       *  consideration of the relative ambiguity between the helix and
+       *  the given perigee parameters.
+       *
+       *  Returns the chi2 value of the average.
+       */
+      static double average(const PerigeeUtil::ParameterVector& fromPar,
+                            const PerigeeUtil::CovarianceMatrix& fromCov,
+                            const HelixUtil::PerigeeAmbiguity& fromAmbiguity,
+                            const HelixUtil::ParameterVector& toPar,
+                            const HelixUtil::CovarianceMatrix& toCov,
+                            HelixUtil::ParameterVector& avgPar,
+                            HelixUtil::CovarianceMatrix& avgCov);
+
+      /**
+       *  Calculates the weighted average between two perigee parameter sets
+       *  with their respective covariance matrix under consideration of their relative
+       *  ambiguity to a helix near the sz parameters given as a reference.
+       *
+       *  Returns the chi2 value of the average.
+       */
+      static double average(const PerigeeUtil::ParameterVector& fromPar,
+                            const PerigeeUtil::CovarianceMatrix& fromCov,
+                            const HelixUtil::PerigeeAmbiguity& fromAmbiguity,
+                            const PerigeeUtil::ParameterVector& toPar,
+                            const PerigeeUtil::CovarianceMatrix& toCov,
+                            const HelixUtil::PerigeeAmbiguity& toAmbiguity,
+                            const SZUtil::ParameterVector& szParameters,
+                            HelixUtil::ParameterVector& avgPar,
+                            HelixUtil::CovarianceMatrix& avgCov);
     };
 
     /// Vector of helix parameters
@@ -85,6 +136,8 @@ namespace Belle2 {
     /// Jacobian matrix for the helix parameters
     using HelixJacobian = HelixUtil::JacobianMatrix;
 
+    /// Matrix type for the ambiguity to the perigee parameters, e.g. under the stereo projection.
+    using PerigeeHelixAmbiguity = HelixUtil::PerigeeAmbiguity;
   }
 
 }

@@ -43,6 +43,19 @@ namespace Belle2 {
       {
         return ParameterVector({ -1.0, -1.0});
       }
+
+      /**
+       *  Calculates the weighted average between two line parameter sets
+       *  with their respective covariance matrix.
+       *
+       *  Returns the chi2 value of the average.
+       */
+      static double average(const LineUtil::ParameterVector& fromPar,
+                            const LineUtil::CovarianceMatrix& fromCov,
+                            const LineUtil::ParameterVector& toPar,
+                            const LineUtil::CovarianceMatrix& toCov,
+                            LineUtil::ParameterVector& avgPar,
+                            LineUtil::CovarianceMatrix& avgCov);
     };
 
     /// Vector of the line parameters

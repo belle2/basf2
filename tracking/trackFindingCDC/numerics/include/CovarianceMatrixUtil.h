@@ -18,6 +18,8 @@
 #include <tracking/trackFindingCDC/numerics/ParameterVector.h>
 
 #include <Eigen/Core>
+#include <Eigen/LU>
+#include <Eigen/QR>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -82,6 +84,34 @@ namespace Belle2 {
         return cov.template block<M, M>(I, I);
       }
 
+      template <int N>
+      static CovarianceMatrix<N> fromPrecision(const PrecisionMatrix<N>& prec)
+      {
+        return prec.colPivHouseholderQr().inverse();
+      }
+
+      template <int N>
+      static PrecisionMatrix<N> toPrecision(const CovarianceMatrix<N>& cov)
+      {
+        return cov.colPivHouseholderQr().inverse();
+      }
+
+      template <int N>
+      static CovarianceMatrix<N> fromFullPrecision(const PrecisionMatrix<N>& prec)
+      {
+        CovarianceMatrix<N> cov;
+        mapToEigen(cov) = mapToEigen(prec).inverse();
+        return cov;
+      }
+
+      template <int N>
+      static PrecisionMatrix<N> fullToPrecision(const CovarianceMatrix<N>& cov)
+      {
+        PrecisionMatrix<N> prec;
+        mapToEigen(prec) = mapToEigen(cov).inverse();
+        return prec;
+      }
+
       /**
        *  Averages two parameter vectors taking into account their respective covariances.
        *
@@ -101,12 +131,12 @@ namespace Belle2 {
                             ParameterVector<N>& par,
                             CovarianceMatrix<N>& cov)
       {
-        PrecisionMatrix<N> precision1 = cov1.colPivHouseholderQr().inverse();
-        PrecisionMatrix<N> precision2 = cov2.colPivHouseholderQr().inverse();
+        PrecisionMatrix<N> precision1 = toPrecision(cov1);
+        PrecisionMatrix<N> precision2 = toPrecision(cov2);
         PrecisionMatrix<N> precision;
         double chi2 =
           PrecisionMatrixUtil::average(par1, precision1, par2, precision2, par, precision);
-        cov = precision.colPivHouseholderQr().inverse();
+        cov = fromPrecision(precision);
         return chi2;
       }
 
@@ -134,8 +164,8 @@ namespace Belle2 {
                             ParameterVector<M>& par,
                             CovarianceMatrix<M>& cov)
       {
-        PrecisionMatrix<N1> precision1 = cov1.colPivHouseholderQr().inverse();
-        PrecisionMatrix<N2> precision2 = cov2.colPivHouseholderQr().inverse();
+        PrecisionMatrix<N1> precision1 = toPrecision(cov1);
+        PrecisionMatrix<N2> precision2 = toPrecision(cov2);
         PrecisionMatrix<M> precision;
         double chi2 = PrecisionMatrixUtil::average(par1,
                                                    precision1,
@@ -145,7 +175,7 @@ namespace Belle2 {
                                                    ambiguity2,
                                                    par,
                                                    precision);
-        cov = precision.colPivHouseholderQr().inverse();
+        cov = fromPrecision(precision);
         return chi2;
       }
     };

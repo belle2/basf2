@@ -58,6 +58,24 @@ namespace Belle2 {
       /// Returns an identity matrix
       static CovarianceMatrix identity();
 
+      /// Convert the precision matrix to the corresponding covariance matrix
+      static CovarianceMatrix covarianceFromPrecision(const PrecisionMatrix& prec);
+
+      /// Convert the covariance matrix to the corresponding precision matrix
+      static PrecisionMatrix precisionFromCovariance(const CovarianceMatrix& cov);
+
+      /**
+       *  Convert the precision matrix to the corresponding covariance matrix.
+       *  Faster version with foreknowledge that the precision is of full rank.
+       */
+      static CovarianceMatrix covarianceFromFullPrecision(const PrecisionMatrix& prec);
+
+      /**
+       *  Convert the covariance matrix to the corresponding precision matrix.
+       *  Faster version with foreknowledge that the precision is of full rank.
+       */
+      static PrecisionMatrix precisionFromFullCovariance(const CovarianceMatrix& cov);
+
       /// Getter for a sub part of the covariance matrix.
       template <class AParameterVector, int I = 0>
       static AParameterVector getSubParameterVector(const ParameterVector& par);

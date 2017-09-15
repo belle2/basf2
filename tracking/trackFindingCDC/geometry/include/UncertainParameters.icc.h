@@ -74,5 +74,33 @@ namespace Belle2 {
     {
       return CovarianceMatrixUtil::getSub<ACovarianceMatrix, I>(cov);
     }
+
+    template <class T, class AEParameters>
+    auto
+    UncertainParametersUtil<T, AEParameters>::covarianceFromPrecision(const PrecisionMatrix& prec)
+    -> CovarianceMatrix {
+      return CovarianceMatrixUtil::fromPrecision(prec);
+    }
+
+    template <class T, class AEParameters>
+    auto
+    UncertainParametersUtil<T, AEParameters>::precisionFromCovariance(const CovarianceMatrix& cov)
+    -> PrecisionMatrix {
+      return CovarianceMatrixUtil::toPrecision(cov);
+    }
+
+    template <class T, class AEParameters>
+    auto
+    UncertainParametersUtil<T, AEParameters>::covarianceFromFullPrecision(const PrecisionMatrix& prec)
+    -> CovarianceMatrix {
+      return CovarianceMatrixUtil::fromFullPrecision(prec);
+    }
+
+    template <class T, class AEParameters>
+    auto
+    UncertainParametersUtil<T, AEParameters>::precisionFromFullCovariance(const CovarianceMatrix& cov)
+    -> PrecisionMatrix {
+      return CovarianceMatrixUtil::fullToPrecision(cov);
+    }
   }
 }

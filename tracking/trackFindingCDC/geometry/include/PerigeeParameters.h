@@ -45,6 +45,19 @@ namespace Belle2 {
       {
         return ParameterVector({ -1.0, 1.0, -1.0});
       }
+
+      /**
+       *  Calculates the weighted average between two perigee parameter sets
+       *  with their respective covariance matrix.
+       *
+       *  Returns the chi2 value of the average.
+       */
+      static double average(const PerigeeUtil::ParameterVector& fromPar,
+                            const PerigeeUtil::CovarianceMatrix& fromCov,
+                            const PerigeeUtil::ParameterVector& toPar,
+                            const PerigeeUtil::CovarianceMatrix& toCov,
+                            PerigeeUtil::ParameterVector& avgPar,
+                            PerigeeUtil::CovarianceMatrix& avgCov);
     };
 
     /// Vector of the perigee parameters

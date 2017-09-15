@@ -11,14 +11,6 @@
 
 #include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
 
-#include <tracking/trackFindingCDC/numerics/CovarianceMatrixUtil.h>
-
-#include <tracking/trackFindingCDC/numerics/CovarianceMatrix.h>
-#include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
-#include <tracking/trackFindingCDC/numerics/Angle.h>
-
-#include <Eigen/Dense>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -32,23 +24,10 @@ UncertainPerigeeCircle::average(const UncertainPerigeeCircle& fromPerigeeCircle,
   const PerigeeParameters& toPar = toPerigeeCircle.perigeeParameters();
   const PerigeeCovariance& toCov = toPerigeeCircle.perigeeCovariance();
 
-  using namespace NPerigeeParameterIndices;
-  PerigeeParameters refPar = (fromPar + toPar) / 2.0;
-  refPar(c_Phi0) = AngleUtil::average(fromPar(c_Phi0), toPar(c_Phi0));
-
-  PerigeeParameters relFromPar = fromPar - refPar;
-  AngleUtil::normalise(relFromPar(c_Phi0));
-
-  PerigeeParameters relToPar = toPar - refPar;
-  AngleUtil::normalise(relToPar(c_Phi0));
-
-  PerigeeParameters relAvgPar;
+  PerigeeParameters avgPar;
   PerigeeCovariance avgCov;
-  double chi2 =
-    CovarianceMatrixUtil::average(relFromPar, fromCov, relToPar, toCov, relAvgPar, avgCov);
 
-  PerigeeParameters avgPar = relAvgPar + refPar;
-  AngleUtil::normalise(avgPar(c_Phi0));
+  double chi2 = PerigeeUtil::average(fromPar, fromCov, toPar, toCov, avgPar, avgCov);
 
   // Calculating 3 parameters from 6 input parameters. 3 NDF remaining.
   size_t ndf = 3;

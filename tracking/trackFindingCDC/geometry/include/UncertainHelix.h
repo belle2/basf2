@@ -15,6 +15,8 @@
 #include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
 #include <tracking/trackFindingCDC/geometry/UncertainSZLine.h>
 
+#include <tracking/trackFindingCDC/numerics/JacobianMatrixUtil.h>
+
 #include <cmath>
 
 namespace Belle2 {

@@ -9,8 +9,9 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/geometry/Helix.h>
 
-#include <boost/math/tools/minima.hpp>
+#include <tracking/trackFindingCDC/numerics/JacobianMatrixUtil.h>
 
+#include <boost/math/tools/minima.hpp>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

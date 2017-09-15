@@ -21,6 +21,8 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
+#include <tracking/trackFindingCDC/numerics/JacobianMatrixUtil.h>
+
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 
 using namespace Belle2;

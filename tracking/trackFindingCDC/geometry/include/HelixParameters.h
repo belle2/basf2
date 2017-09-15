@@ -14,6 +14,9 @@
 
 #include <tracking/trackFindingCDC/geometry/UncertainParameters.h>
 
+#include <tracking/trackFindingCDC/numerics/CovarianceMatrixUtil.h>
+#include <tracking/trackFindingCDC/numerics/ParameterVectorUtil.h>
+
 namespace Belle2 {
 
   namespace TrackFindingCDC {

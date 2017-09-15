@@ -12,6 +12,9 @@
 #include <tracking/trackFindingCDC/geometry/HelixParameters.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
 
+#include <tracking/trackFindingCDC/numerics/CovarianceMatrixUtil.h>
+#include <tracking/trackFindingCDC/numerics/JacobianMatrixUtil.h>
+
 #include <tracking/trackFindingCDC/numerics/CovarianceMatrix.h>
 #include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
 #include <tracking/trackFindingCDC/numerics/Angle.h>

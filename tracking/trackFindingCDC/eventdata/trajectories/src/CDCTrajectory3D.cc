@@ -20,6 +20,8 @@
 #include <tracking/trackFindingCDC/geometry/UncertainSZLine.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
 
+#include <tracking/trackFindingCDC/numerics/CovarianceMatrixUtil.h>
+#include <tracking/trackFindingCDC/numerics/JacobianMatrixUtil.h>
 #include <tracking/trackFindingCDC/numerics/TMatrixConversion.h>
 
 #include <genfit/TrackCand.h>

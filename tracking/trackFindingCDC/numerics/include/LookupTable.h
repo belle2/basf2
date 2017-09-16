@@ -9,12 +9,20 @@
 **************************************************************************/
 #pragma once
 
-#include <boost/algorithm/clamp.hpp>
+#include <functional>
 #include <vector>
 #include <cmath>
+#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+
+    template<class T>
+    constexpr const T& clamp(const T& value, const T& lowerBound, const T& upperBound)
+    {
+      assert(not(upperBound < lowerBound));
+      return (value < lowerBound) ? lowerBound : (upperBound < value) ? upperBound : value;
+    }
 
     /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
     template <class AResultType = double>
@@ -73,7 +81,7 @@ namespace Belle2 {
         const int iMax =  m_values.size() - 2; // Subtracting sentinal index
         double iBin = 0;
         double delta = std::modf((x - m_lowerBound) / m_binWidth, &iBin);
-        int i = boost::algorithm::clamp(iBin, 0, iMax);
+        int i = clamp(int(iBin), 0, iMax);
         return m_values[i] * (1 - delta) + m_values[i + 1] * delta;
       }
 
@@ -83,7 +91,7 @@ namespace Belle2 {
         if (not std::isfinite(x)) return m_values.back(); // Return sentinal value
         const int iMax =  m_values.size() - 2; // Subtracting sentinal index
         int iBin = std::round((x - m_lowerBound) / m_binWidth);
-        int i = boost::algorithm::clamp(iBin, 0, iMax);
+        int i = clamp(iBin, 0, iMax);
         return m_values[i];
       }
 
@@ -91,7 +99,7 @@ namespace Belle2 {
       const T& at(int i) const
       {
         const int iMax =  m_values.size() - 2; // Subtracting sentinal index
-        i = boost::algorithm::clamp(i, 0, iMax);
+        i = clamp(i, 0, iMax);
         return m_values[i];
       }
 

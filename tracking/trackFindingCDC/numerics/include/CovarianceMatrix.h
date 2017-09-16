@@ -9,14 +9,14 @@
  **************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
+#include <tracking/trackFindingCDC/numerics/Matrix.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// The representation type of a covariance matrix of n related parameters
     template <int N>
-    using CovarianceMatrix = Eigen::Matrix<double, N, N>;
+    using CovarianceMatrix = Matrix<double, N, N>;
 
   }
 }

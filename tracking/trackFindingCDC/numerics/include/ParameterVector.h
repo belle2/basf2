@@ -9,14 +9,14 @@
  **************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
+#include <tracking/trackFindingCDC/numerics/Matrix.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Vector type for n related parameters
     template <int N>
-    using ParameterVector = Eigen::Matrix<double, N, 1>;
+    using ParameterVector = Matrix<double, N, 1>;
 
   }
 }

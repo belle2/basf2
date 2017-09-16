@@ -9,14 +9,14 @@
  **************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
+#include <tracking/trackFindingCDC/numerics/Matrix.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// The representation type of derivatives from n to m parameters as used in the transport of covariance matrices.
     template <int M, int N = M>
-    using JacobianMatrix = Eigen::Matrix<double, M, N>;
+    using JacobianMatrix = Matrix<double, M, N>;
 
   }
 }

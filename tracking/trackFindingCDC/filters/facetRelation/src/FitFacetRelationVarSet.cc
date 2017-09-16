@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
 #include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackFindingCDC/geometry/LineParameters.h>

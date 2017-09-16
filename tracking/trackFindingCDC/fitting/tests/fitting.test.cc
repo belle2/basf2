@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
-#include <tracking/trackFindingCDC/fitting/CDCFitter2D.h>
+#include <tracking/trackFindingCDC/fitting/CDCFitter2D.icc.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZObservations.h>
 

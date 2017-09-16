@@ -19,6 +19,12 @@ namespace Belle2 {
     class CDCKarimakiFitter : public CDCFitter2D<Belle2::TrackFindingCDC::KarimakisMethod> {
 
     public:
+      /// Default constructor
+      CDCKarimakiFitter();
+
+      /// Default destructor
+      ~CDCKarimakiFitter();
+
       /// Static getter for a general fitter instance with Karimakis method.
       static const CDCKarimakiFitter& getFitter();
 

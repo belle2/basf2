@@ -46,7 +46,7 @@ namespace Belle2 {
        *  Constructor taking the flag if the reconstructed positon of the hits should be used when they are available
        *  The default is to use the wire position and the drift length signed by the right left passage hypotheses.
        */
-      explicit CDCObservations2D(EFitPos fitPos = EFitPos::c_RLDriftCircle,
+      explicit CDCObservations2D(EFitPos fitPos = EFitPos::c_RecoPos,
                                  EFitVariance fitVariance = EFitVariance::c_Proper)
         : m_fitPos(fitPos)
         , m_fitVariance(fitVariance)

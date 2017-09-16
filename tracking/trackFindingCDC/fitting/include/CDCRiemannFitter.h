@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/fitting/CDCFitter2D.h>
+
 #include <tracking/trackFindingCDC/fitting/ExtendedRiemannsMethod.h>
 
 namespace Belle2 {
@@ -19,6 +20,12 @@ namespace Belle2 {
     class CDCRiemannFitter : public CDCFitter2D<Belle2::TrackFindingCDC::ExtendedRiemannsMethod> {
 
     public:
+      /// Default constructor
+      CDCRiemannFitter();
+
+      /// Default destructor
+      ~CDCRiemannFitter();
+
       /// Static getter for a general Riemann fitter
       static const CDCRiemannFitter& getFitter();
 

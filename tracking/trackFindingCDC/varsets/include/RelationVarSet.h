@@ -14,7 +14,6 @@
 #include <tracking/trackFindingCDC/utilities/Relation.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
-#include <boost/algorithm/string/predicate.hpp>
 #include <vector>
 #include <string>
 #include <cassert>
@@ -107,13 +106,13 @@ namespace Belle2 {
        */
       MayBePtr<Float_t> find(std::string varName) override
       {
-        if (boost::starts_with(varName, m_firstPrefix)) {
+        if (0 == varName.find(m_firstPrefix)) {
           std::string varNameWithoutPrefix = varName.substr(m_firstPrefix.size());
           MayBePtr<Float_t> found = m_firstVarSet.find(varNameWithoutPrefix);
           if (found) return found;
         }
 
-        if (boost::starts_with(varName, m_secondPrefix)) {
+        if (0 == varName.find(m_secondPrefix)) {
           std::string varNameWithoutPrefix = varName.substr(m_secondPrefix.size());
           MayBePtr<Float_t> found = m_secondVarSet.find(varNameWithoutPrefix);
           if (found) return found;

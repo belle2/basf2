@@ -63,10 +63,18 @@ namespace Belle2 {
 #include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
 
-#include <boost/algorithm/string/predicate.hpp>
+#include <algorithm>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+namespace {
+  bool ends_with(std::string in, std::string what)
+  {
+    if (what.size() > in.size()) return false;
+    return std::equal(what.rbegin(), what.rend(), in.rbegin());
+  }
+}
 
 MVAExpert::Impl::Impl(const std::string& identifier,
                       std::vector<Named<Float_t*> > namedVariables)
@@ -79,8 +87,7 @@ void MVAExpert::Impl::initialize()
 {
   MVA::AbstractInterface::initSupportedInterfaces();
   if (not m_weightfileRepresentation and
-      not(boost::ends_with(m_identifier, ".root") or
-          boost::ends_with(m_identifier, ".xml"))) {
+      not(ends_with(m_identifier, ".root") or ends_with(m_identifier, ".xml"))) {
     using DBWeightFileRepresentation = DBObjPtr<DatabaseRepresentationOfWeightfile>;
     m_weightfileRepresentation = std::make_unique<DBWeightFileRepresentation>(m_identifier);
   }

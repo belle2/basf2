@@ -12,7 +12,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <boost/algorithm/string/predicate.hpp>
 #include <fstream>
 
 using namespace Belle2;
@@ -459,7 +458,7 @@ void SVGPrimitivePlotter::writeAttributes(std::ostream& outputStream,
     const std::string& value = attribute.second;
 
     // Skip special attribute
-    if (boost::starts_with(key, "_")) {
+    if ('_' == key[0]) {
       continue;
     }
 

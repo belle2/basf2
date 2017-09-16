@@ -17,9 +17,13 @@
 #include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
 #include <tracking/trackFindingCDC/numerics/ParameterVector.h>
 
+#include <tracking/trackFindingCDC/numerics/EigenView.h>
+
 #include <Eigen/Core>
 #include <Eigen/LU>
 #include <Eigen/QR>
+
+#include <type_traits>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -38,7 +42,7 @@ namespace Belle2 {
       template <int N>
       static void transport(const JacobianMatrix<N, N>& jacobian, CovarianceMatrix<N>& cov)
       {
-        cov = jacobian * cov * jacobian.transpose();
+        mapToEigen(cov) = mapToEigen(jacobian) * mapToEigen(cov) * mapToEigen(jacobian).transpose();
       }
 
       /// Return a copy of the covariance matrix transported with the given jacobian matrix
@@ -46,7 +50,9 @@ namespace Belle2 {
       static CovarianceMatrix<M> transported(const JacobianMatrix<M, N>& jacobian,
                                              const CovarianceMatrix<N>& cov)
       {
-        return jacobian * cov * jacobian.transpose();
+        CovarianceMatrix<M> result;
+        mapToEigen(result) = mapToEigen(jacobian) * mapToEigen(cov) * mapToEigen(jacobian).transpose();
+        return result;
       }
 
       /// Scale the covariance inplace by the given factors in each parameter
@@ -71,8 +77,8 @@ namespace Belle2 {
                                                       const CovarianceMatrix<N2>& block2)
       {
         CovarianceMatrix < N1 + N2 > result;
-        result << block1, Eigen::Matrix<double, N1, N2>::Zero(),
-               Eigen::Matrix<double, N2, N1>::Zero(), block2;
+        mapToEigen(result) << mapToEigen(block1), Eigen::Matrix<double, N1, N2>::Zero(),
+                   Eigen::Matrix<double, N2, N1>::Zero(), mapToEigen(block2);
         return result;
       }
 
@@ -80,20 +86,25 @@ namespace Belle2 {
       template <class ACovarianceMatrix, int I = 0, int N = 0>
       static ACovarianceMatrix getSub(const CovarianceMatrix<N>& cov)
       {
-        constexpr const int M = ACovarianceMatrix::RowsAtCompileTime;
+        constexpr const int M =
+          std::remove_reference_t<decltype(mapToEigen(ACovarianceMatrix()))>::RowsAtCompileTime;
         return cov.template block<M, M>(I, I);
       }
 
       template <int N>
       static CovarianceMatrix<N> fromPrecision(const PrecisionMatrix<N>& prec)
       {
-        return prec.colPivHouseholderQr().inverse();
+        CovarianceMatrix<N> cov;
+        mapToEigen(cov) = mapToEigen(prec).colPivHouseholderQr().inverse();
+        return cov;
       }
 
       template <int N>
       static PrecisionMatrix<N> toPrecision(const CovarianceMatrix<N>& cov)
       {
-        return cov.colPivHouseholderQr().inverse();
+        PrecisionMatrix<N> prec;
+        mapToEigen(prec) = mapToEigen(cov).colPivHouseholderQr().inverse();
+        return prec;
       }
 
       template <int N>

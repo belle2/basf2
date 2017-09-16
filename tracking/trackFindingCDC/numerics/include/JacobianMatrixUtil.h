@@ -14,7 +14,11 @@
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
+#include <tracking/trackFindingCDC/numerics/EigenView.h>
+
 #include <Eigen/Core>
+
+#include <type_traits>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -61,7 +65,9 @@ namespace Belle2 {
       template <int N>
       static JacobianMatrix<N> scale(const ParameterVector<N>& scales)
       {
-        return scales.asDiagonal();
+        JacobianMatrix<N> result = zero<N>();
+        mapToEigen(result).diagonal() = mapToEigen(scales);
+        return result;
       }
 
       /// Combines two jacobian matrices by putting them in two blocks diagonal to each other in a
@@ -71,8 +77,8 @@ namespace Belle2 {
                                                              const JacobianMatrix<M2, N2>& block2)
       {
         JacobianMatrix < M1 + M2, N1 + N2 > result;
-        result << block1, Eigen::Matrix<double, M1, N2>::Zero(),
-               Eigen::Matrix<double, M2, N1>::Zero(), block2;
+        mapToEigen(result) << mapToEigen(block1), Eigen::Matrix<double, M1, N2>::Zero(),
+                   Eigen::Matrix<double, M2, N1>::Zero(), mapToEigen(block2);
         return result;
       }
     };

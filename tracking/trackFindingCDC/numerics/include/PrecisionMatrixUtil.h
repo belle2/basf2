@@ -15,7 +15,11 @@
 #include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
 #include <tracking/trackFindingCDC/numerics/ParameterVector.h>
 
+#include <tracking/trackFindingCDC/numerics/EigenView.h>
+
 #include <Eigen/Core>
+
+#include <type_traits>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -34,7 +38,8 @@ namespace Belle2 {
       template <int N>
       static void transport(const JacobianMatrix<N, N>& ambiguity, PrecisionMatrix<N>& precision)
       {
-        precision = ambiguity.transpose() * precision * ambiguity;
+        mapToEigen(precision) =
+          mapToEigen(ambiguity).transpose() * mapToEigen(precision) * mapToEigen(ambiguity);
       }
 
       /// Return a copy of the precision matrix transported with the given back projection jacobian
@@ -43,7 +48,7 @@ namespace Belle2 {
       static PrecisionMatrix<M> transported(const JacobianMatrix<N, M>& ambiguity,
                                             const PrecisionMatrix<N>& precision)
       {
-        return ambiguity.transpose() * precision * ambiguity;
+        return mapToEigen(ambiguity).transpose() * mapToEigen(precision) * mapToEigen(ambiguity);
       }
 
       /// Scale the precision inplace by the given factors in each parameter
@@ -68,8 +73,8 @@ namespace Belle2 {
                                                      const PrecisionMatrix<N2>& block2)
       {
         PrecisionMatrix < N1 + N2 > result;
-        result << block1, Eigen::Matrix<double, N1, N2>::Zero(),
-               Eigen::Matrix<double, N2, N1>::Zero(), block2;
+        mapToEigen(result) << mapToEigen(block1), Eigen::Matrix<double, N1, N2>::Zero(),
+                   Eigen::Matrix<double, N2, N1>::Zero(), mapToEigen(block2);
         return result;
       }
 
@@ -77,7 +82,8 @@ namespace Belle2 {
       template <class APrecisionMatrix, int I = 0, int N = 0>
       static APrecisionMatrix getSub(const PrecisionMatrix<N>& precision)
       {
-        constexpr const int M = APrecisionMatrix::RowsAtCompileTime;
+        constexpr const int M =
+          std::remove_reference_t<decltype(mapToEigen(APrecisionMatrix()))>::RowsAtCompileTime;
         return precision.template block<M, M>(I, I);
       }
 
@@ -100,15 +106,23 @@ namespace Belle2 {
                             ParameterVector<N>& parameter,
                             PrecisionMatrix<N>& precision)
       {
-        precision = precision1 + precision2;
-        parameter = precision.colPivHouseholderQr().solve(precision1 * parameter1 +
-                                                          precision2 * parameter2);
+        const auto& ePrecision1 = mapToEigen(precision1);
+        const auto& ePrecision2 = mapToEigen(precision2);
+        auto&& ePrecision = mapToEigen(precision);
 
-        ParameterVector<N> residual1 = parameter1 - parameter;
-        ParameterVector<N> residual2 = parameter2 - parameter;
+        const auto& eParameter1 = mapToEigen(parameter1);
+        const auto& eParameter2 = mapToEigen(parameter2);
+        auto&& eParameter = mapToEigen(parameter);
 
-        Eigen::Matrix<double, 1, 1> chi2 = (residual1.transpose() * precision1 * residual1 +
-                                            residual2.transpose() * precision2 * residual2);
+        ePrecision = ePrecision1 + ePrecision2;
+        eParameter = ePrecision.colPivHouseholderQr().solve(ePrecision1 * eParameter1 +
+                                                            ePrecision2 * eParameter2);
+
+        auto eResidual1 = eParameter1 - eParameter;
+        auto eResidual2 = eParameter2 - eParameter;
+
+        Eigen::Matrix<double, 1, 1> chi2 = (eResidual1.transpose() * ePrecision1 * eResidual1 +
+                                            eResidual2.transpose() * ePrecision2 * eResidual2);
         return chi2[0];
       }
 
@@ -136,18 +150,29 @@ namespace Belle2 {
                             ParameterVector<M>& parameter,
                             PrecisionMatrix<M>& precision)
       {
-        precision = (ambiguity1.transpose() * precision1 * ambiguity1 +
-                     ambiguity2.transpose() * precision2 * ambiguity2);
+        const auto& eParameter1 = mapToEigen(parameter1);
+        const auto& ePrecision1 = mapToEigen(precision1);
+        const auto& eAmbiguity1 = mapToEigen(ambiguity1);
 
-        parameter =
-          precision.colPivHouseholderQr().solve(ambiguity1.transpose() * precision1 * parameter1 +
-                                                ambiguity2.transpose() * precision2 * parameter2);
+        const auto& eParameter2 = mapToEigen(parameter2);
+        const auto& ePrecision2 = mapToEigen(precision2);
+        const auto& eAmbiguity2 = mapToEigen(ambiguity2);
 
-        ParameterVector<N1> residual1 = parameter1 - ambiguity1 * parameter;
-        ParameterVector<N2> residual2 = parameter2 - ambiguity2 * parameter;
+        auto&& ePrecision = mapToEigen(precision);
+        auto&& eParameter = mapToEigen(parameter);
 
-        Eigen::Matrix<double, 1, 1> chi2 = (residual1.transpose() * precision1 * residual1 +
-                                            residual2.transpose() * precision2 * residual2);
+        ePrecision = (eAmbiguity1.transpose() * ePrecision1 * eAmbiguity1 +
+                      eAmbiguity2.transpose() * ePrecision2 * eAmbiguity2);
+
+        eParameter = ePrecision.colPivHouseholderQr().solve(
+                       eAmbiguity1.transpose() * ePrecision1 * eParameter1 +
+                       eAmbiguity2.transpose() * ePrecision2 * eParameter2);
+
+        auto eResidual1 = eParameter1 - eAmbiguity1 * eParameter;
+        auto eResidual2 = eParameter2 - eAmbiguity2 * eParameter;
+
+        Eigen::Matrix<double, 1, 1> chi2 = (eResidual1.transpose() * ePrecision1 * eResidual1 +
+                                            eResidual2.transpose() * ePrecision2 * eResidual2);
         return chi2[0];
       }
     };

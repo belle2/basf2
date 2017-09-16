@@ -11,6 +11,10 @@
 
 #include <tracking/trackFindingCDC/numerics/ParameterVector.h>
 
+#include <tracking/trackFindingCDC/numerics/EigenView.h>
+
+#include <type_traits>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -21,8 +25,9 @@ namespace Belle2 {
       template <class AParameterVector, int I = 0, int N = 0>
       static AParameterVector getSub(const ParameterVector<N>& par)
       {
-        constexpr const int M = AParameterVector::RowsAtCompileTime;
-        return par.template segment<M>(I);
+        constexpr const int M =
+          std::remove_reference_t<decltype(mapToEigen(AParameterVector()))>::RowsAtCompileTime;
+        return par.template block<M, 1>(I, 0);
       }
 
       /// Combines two parameter vectors by stacking them over each other.
@@ -31,7 +36,7 @@ namespace Belle2 {
                                                const ParameterVector<N2>& lowerPar)
       {
         ParameterVector < N1 + N2 > result;
-        result << upperPar, lowerPar;
+        mapToEigen(result) << mapToEigen(upperPar), mapToEigen(lowerPar);
         return result;
       }
     };

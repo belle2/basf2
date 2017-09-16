@@ -17,6 +17,11 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+double TrackFindingCDC::sinc(double x)
+{
+  return boost::math::sinc_pi(x);
+}
+
 double TrackFindingCDC::asinc(double x)
 {
   // Implementation inspired by BOOST's sinc

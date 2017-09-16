@@ -11,8 +11,10 @@
 #include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
 #include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
+#include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
+
 #include <framework/logging/Logger.h>
-#include <boost/math/special_functions/sinc.hpp>
+
 #include <cmath>
 
 using namespace Belle2;
@@ -97,9 +99,8 @@ Vector2D PerigeeCircle::atArcLength(double arcLength) const
   double chi = arcLength * curvature();
   double chiHalf = chi / 2.0;
 
-  using boost::math::sinc_pi;
-  double atX = arcLength * sinc_pi(chi);
-  double atY = arcLength * sinc_pi(chiHalf) * sin(chiHalf) + impact();
+  double atX = arcLength * sinc(chi);
+  double atY = arcLength * sinc(chiHalf) * sin(chiHalf) + impact();
   return Vector2D::compose(phi0Vec(), atX, atY);
 }
 

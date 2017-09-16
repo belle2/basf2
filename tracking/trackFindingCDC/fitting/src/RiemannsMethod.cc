@@ -9,13 +9,17 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/fitting/RiemannsMethod.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/fitting/EigenObservationMatrix.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
 #include <framework/logging/Logger.h>
 
 #include <Eigen/Eigen>
 #include <Eigen/Core>
+
+#include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -45,10 +49,9 @@ void RiemannsMethod::update(CDCTrajectory2D& trajectory2D,
 void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D,
                                               CDCObservations2D& observations2D) const
 {
-
-  CDCObservations2D::EigenObservationMatrix eigenObservation = observations2D.getObservationMatrix();
+  EigenObservationMatrix eigenObservation = getEigenObservationMatrix(&observations2D);
+  assert(eigenObservation.cols() == 4);
   size_t nObservations = observations2D.size();
-
 
   if (isLineConstrained()) {
 
@@ -139,8 +142,8 @@ void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D,
 
 void RiemannsMethod::updateWithDriftLength(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const
 {
-
-  CDCObservations2D::EigenObservationMatrix eigenObservation = observations2D.getObservationMatrix();
+  EigenObservationMatrix eigenObservation = getEigenObservationMatrix(&observations2D);
+  assert(eigenObservation.cols() == 4);
   size_t nObservations = observations2D.size();
 
   //cout << "updateWithRightLeft : " << endl;

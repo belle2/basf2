@@ -9,6 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/fitting/ExtendedRiemannsMethod.h>
 
+#include <tracking/trackFindingCDC/fitting/EigenObservationMatrix.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
@@ -294,7 +295,7 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& ob
   using namespace NParabolicParameterIndices;
 
   // Matrix of weighted sums
-  Eigen::Matrix< double, 5, 5 > s = observations2D.getWXYRLSumMatrix();
+  Eigen::Matrix< double, 5, 5 > s = getWXYRLSumMatrix(observations2D);
 
   // The same as above without drift lengths
   Eigen::Matrix<double, 4, 4> sNoL = s.block<4, 4>(0, 0);

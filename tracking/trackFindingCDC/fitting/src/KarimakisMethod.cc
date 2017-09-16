@@ -9,6 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/fitting/KarimakisMethod.h>
 
+#include <tracking/trackFindingCDC/fitting/EigenObservationMatrix.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
@@ -205,8 +206,6 @@ namespace {
     }
     return perigeePrecision;
   }
-
-
 }
 
 
@@ -214,7 +213,7 @@ namespace {
 UncertainPerigeeCircle KarimakisMethod::fitInternal(CDCObservations2D& observations2D) const
 {
   // Matrix of weighted sums
-  Eigen::Matrix< double, 4, 4> sNoL = observations2D.getWXYRSumMatrix();
+  Eigen::Matrix< double, 4, 4> sNoL = getWXYRSumMatrix(observations2D);
 
   // Matrix of averages
   Eigen::Matrix<double, 4, 4> aNoL = sNoL / sNoL(iW);

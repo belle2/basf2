@@ -14,6 +14,8 @@
 #include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
+#include <tracking/trackFindingCDC/numerics/EigenView.h>
+
 #include <Eigen/Core>
 
 #include <Math/Functor.h>
@@ -25,7 +27,7 @@ using namespace TrackFindingCDC;
 namespace {
 
   template<int N>
-  Vector2D getCenterForwardDirection(const Eigen::Matrix<double, N, 3>& xyl)
+  Vector2D getCenterForwardDirection(const Matrix<double, N, 3>& xyl)
   {
     /// Rotate in forward direction
     Vector2D coordinate(xyl(N - 1, 0) - xyl(0, 0), xyl(N - 1, 1) - xyl(0, 1));
@@ -33,7 +35,7 @@ namespace {
   }
 
   template<int N>
-  Vector2D getTangentialForwardDirection(const Eigen::Matrix<double, N, 3>& xyl)
+  Vector2D getTangentialForwardDirection(const Matrix<double, N, 3>& xyl)
   {
     /// Rotate in forward direction
     Vector2D fromPos(xyl(0, 0), xyl(0, 1));
@@ -48,9 +50,9 @@ namespace {
   }
 
   template<int N>
-  void rotate(Vector2D coordinate, Eigen::Matrix<double, N, 3>& xyl)
+  void rotate(Vector2D coordinate, Matrix<double, N, 3>& xyl)
   {
-    Eigen::Matrix<double, 3, 3> rot = Eigen::Matrix<double, 3, 3>::Identity();
+    Matrix<double, 3, 3> rot = Matrix<double, 3, 3>::Identity();
     rot(0, 0) = coordinate.x();
     rot(0, 1) = -coordinate.y();
     rot(1, 0) = coordinate.y();
@@ -101,19 +103,22 @@ namespace {
   }
 
   template<int N>
-  UncertainParameterLine2D fit(Eigen::Matrix<double, N, 3> xyl,
-                               Eigen::Array<double, N, 1> w,
+  UncertainParameterLine2D fit(Matrix<double, N, 3> xylIn,
+                               Matrix<double, N, 1> wIn,
                                int nSteps)
   {
     /// Rotate in forward direction
-    Vector2D coordinate = getTangentialForwardDirection(xyl);
+    Vector2D coordinate = getTangentialForwardDirection(xylIn);
     // Sometimes the calculation of the tangent fails due to misestimated dirft lengths
     // Make best effort the continue the calculation
     if (coordinate.hasNAN()) {
-      coordinate = getCenterForwardDirection(xyl);
+      coordinate = getCenterForwardDirection(xylIn);
     }
 
-    rotate(coordinate, xyl);
+    rotate(coordinate, xylIn);
+
+    auto xyl = mapToEigen(xylIn);
+    auto w = mapToEigen(wIn).array();
 
     Eigen::Array< double, 1, 3> averages = (xyl.array().colwise() * w).colwise().sum() / w.sum();
     Eigen::Matrix< double, N, 3> deltas = xyl.array().rowwise() - averages;
@@ -162,10 +167,10 @@ namespace {
 double FacetFitter::fit(const CDCFacet& facet, int nSteps)
 {
   // Measurement matrix
-  Eigen::Matrix< double, 3, 3> xyl;
+  Matrix<double, 3, 3> xyl = Matrix<double, 3, 3>::Zero();
 
   // Weight matrix
-  Eigen::Array< double, 3, 1> w;
+  Matrix<double, 3, 1> w = Matrix<double, 3, 1>::Zero();
 
   const CDCRLWireHit& startRLWireHit = facet.getStartRLWireHit();
   const CDCRLWireHit& middleRLWireHit = facet.getMiddleRLWireHit();
@@ -206,10 +211,10 @@ UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
                                           int nSteps)
 {
   // Observations matrix
-  Eigen::Matrix< double, 6, 3> xyl;
+  Matrix<double, 6, 3> xyl = Matrix<double, 6, 3>::Zero();
 
   // Weight matrix
-  Eigen::Array< double, 6, 1> w;
+  Matrix<double, 6, 1> w = Matrix<double, 6, 1>::Zero();
 
   const Vector2D support = Vector2D::average(fromFacet.getMiddleWire().getRefPos2D(),
                                              toFacet.getMiddleWire().getRefPos2D());
@@ -273,8 +278,8 @@ UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
 }
 
 
-UncertainParameterLine2D FacetFitter::fit(Eigen::Matrix<double, 3, 3> xyl,
-                                          Eigen::Array<double, 3, 1> w,
+UncertainParameterLine2D FacetFitter::fit(Matrix<double, 3, 3> xyl,
+                                          Matrix<double, 3, 1> w,
                                           int nSteps)
 {
   return ::fit(std::move(xyl), std::move(w), nSteps);

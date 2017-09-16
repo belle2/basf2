@@ -41,16 +41,22 @@ namespace Belle2 {
       // Start off by fitting the items of the leaf with a general trajectory
       // that may have a distinct impact != 0
       /////////////////////////////////////////////////////////////////////////
+      auto fitPos = EFitPos::c_RecoPos;
+      // auto fitPos = EFitPos::c_RLDriftCircle;
+
+      // auto fitVariance = EFitVariance::c_Nominal;
+      auto fitVariance = EFitVariance::c_DriftLength;
+      // auto fitVariance = EFitVariance::c_Pseudo;
+      // auto fitVariance = EFitVariance::c_Proper;
+      CDCObservations2D observations2D(fitPos, fitVariance);
+
       CDCKarimakiFitter fitter;
       // CDCRiemannFitter fitter;
-      // fitter.setFitVariance(EFitVariance::c_Nominal);
-      fitter.setFitVariance(EFitVariance::c_DriftLength); // Best one of the eight combinations of fitters..
-      // fitter.setFitVariance(EFitVariance::c_Pseudo);
-      // fitter.setFitVariance(EFitVariance::c_Proper);
 
       std::vector<WithSharedMark<CDCRLWireHit>> hits(leaf->begin(), leaf->end());
       std::sort(hits.begin(), hits.end()); // Hits should be naturally sorted
-      CDCTrajectory2D trajectory2D = fitter.fit(hits);
+      observations2D.appendRange(hits);
+      CDCTrajectory2D trajectory2D = fitter.fit(observations2D);
       {
         const double curv = trajectory2D.getCurvature();
         std::array<DiscreteCurv, 2> curvs = leaf->template getBounds<DiscreteCurv>();
@@ -87,7 +93,9 @@ namespace Belle2 {
           hits.erase(std::unique(hits.begin(), hits.end()), hits.end());
 
           // Update the current fit
-          trajectory2D = fitter.fit(hits);
+          observations2D.clear();
+          observations2D.appendRange(hits);
+          trajectory2D = fitter.fit(observations2D);
           trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
         }
       }

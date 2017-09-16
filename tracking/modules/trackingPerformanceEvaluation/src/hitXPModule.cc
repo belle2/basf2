@@ -179,30 +179,27 @@ void hitXPModule::event()
     // for (const SVDCluster& cluster : particle.getRelationsFrom<SVDCluster>()) {
     //   for (const SVDTrueHit& hit : cluster.getRelationsTo<SVDTrueHit>()) {
     for (const SVDTrueHit& hit : particle.getRelationsTo<SVDTrueHit>()) {
-      hit_iterator++;
-      VxdID trueHitSensorID = hit.getSensorID();
-      const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);
-      const SVDCluster* cluster = hit.getRelationsFrom<SVDCluster>()[0];
-      hitXPDerivate entry(hit, *cluster, particle, sensorInfo);
-      int NClusterU = 0;
-      int NClusterV = 0;
-      for (SVDCluster Ncluster : hit.getRelationsFrom<SVDCluster>()) {
-        if (Ncluster.isUCluster()) NClusterU++;
-        else NClusterV++;
+      if (hit.getRelationsFrom<SVDCluster>().size() > 0) {
+        hit_iterator++;
+        VxdID trueHitSensorID = hit.getSensorID();
+        const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);
+        const SVDCluster* cluster = hit.getRelationsFrom<SVDCluster>()[0];
+        hitXPDerivate entry(hit, *cluster, particle, sensorInfo);
+        int NClusterU = 0;
+        int NClusterV = 0;
+        for (SVDCluster Ncluster : hit.getRelationsFrom<SVDCluster>()) {
+          if (Ncluster.isUCluster()) NClusterU++;
+          else NClusterV++;
+        }
+        entry.setClusterU(NClusterU);
+        entry.setClusterV(NClusterV);
+
+        bool isReconstructed(false);
+        for (const RecoTrack& aRecoTrack : particle.getRelationsFrom<RecoTrack>())
+          isReconstructed |= aRecoTrack.hasSVDHits();
+        entry.setReconstructed(isReconstructed);
+        m_hitXPSet.insert(entry);
       }
-      entry.setClusterU(NClusterU);
-      entry.setClusterV(NClusterV);
-
-      bool isReconstructed(false);
-      for (const RecoTrack& aRecoTrack : particle.getRelationsFrom<RecoTrack>())
-        isReconstructed |= aRecoTrack.hasSVDHits();
-      entry.setReconstructed(isReconstructed);
-
-      m_hitXPSet.insert(entry);
-
-
-
-
     }
     //}
     //}

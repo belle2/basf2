@@ -227,6 +227,12 @@ namespace Belle2 {
       std::size_t appendRange(const CDCAxialSegmentPair& axialSegmentPair);
 
       /**
+       *  Appends all reconstructed hits from the three dimensional track.
+       *  @return  Number of added hits
+       */
+      std::size_t appendRange(const CDCTrack& track);
+
+      /**
        *  Appends all the reference wire positions.
        *  @note For cross check to legendre finder.
        *  @return  Number of added hits

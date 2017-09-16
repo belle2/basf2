@@ -273,6 +273,15 @@ std::size_t CDCObservations2D::appendRange(const CDCAxialSegmentPair& axialSegme
   return nAppendedHits;
 }
 
+std::size_t CDCObservations2D::appendRange(const CDCTrack& track)
+{
+  std::size_t nAppendedHits = 0;
+  for (const CDCRecoHit3D& recoHit3D : track) {
+    nAppendedHits += append(recoHit3D);
+  }
+  return nAppendedHits;
+}
+
 std::size_t CDCObservations2D::appendRange(const std::vector<const CDCWire*>& wires)
 {
   std::size_t nAppendedHits = 0;

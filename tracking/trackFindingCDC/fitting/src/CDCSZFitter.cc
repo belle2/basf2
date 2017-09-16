@@ -9,6 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
+#include <tracking/trackFindingCDC/fitting/EigenObservationMatrix.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZObservations.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
@@ -217,7 +218,7 @@ void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ, CDCSZObservations& obser
   size_t ndf = observationsSZ.size() - 2;
 
   // Matrix of weighted sums
-  Eigen::Matrix<double, 3, 3> sumMatrixWSZ = observationsSZ.getWSZSumMatrix();
+  Eigen::Matrix<double, 3, 3> sumMatrixWSZ = getWSZSumMatrix(observationsSZ);
   UncertainSZLine uncertainSZLine = fitZ(sumMatrixWSZ);
 
   uncertainSZLine.setNDF(ndf);

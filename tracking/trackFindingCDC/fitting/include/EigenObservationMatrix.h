@@ -9,12 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
-
 #include <Eigen/Core>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCObservations2D;
+    class CDCSZObservations;
 
     /**
      *  Matrix type used to wrap the raw memory chunk of values
@@ -30,6 +30,14 @@ namespace Belle2 {
      *             render it useless for subceeding calculations.
      */
     EigenObservationMatrix getEigenObservationMatrix(CDCObservations2D* observations2D);
+
+    /**
+     *  Returns the observations structured as an Eigen matrix
+     *  This returns a reference to the stored observations.
+     *  @note      Operations may alter the content of the underlying memory and
+     *             render it useless for subceeding calculations.
+     */
+    EigenObservationMatrix getEigenObservationMatrix(CDCSZObservations* szObservations);
 
     /**
      *  Constructs a symmetric matrix of weighted sums of x, y, r^2 and drift lengts as relevant for
@@ -124,5 +132,22 @@ namespace Belle2 {
      *  * + symmetric.
      */
     Eigen::Matrix<double, 3, 3> getWXYSumMatrix(CDCObservations2D& observations2D);
+
+    /**
+     *  Constructs a symmetric matrix of weighted sums of s, z as relevant for line fits.
+     *
+     *  Cumulates weights, s positions, z positions and products thereof
+     *  @returns symmetric matrix s with the following:
+     *  * \f$ s_{00} = \sum w \f$
+     *  * \f$ s_{01} = \sum s * w \f$
+     *  * \f$ s_{02} = \sum z * w \f$
+     *
+     *  * \f$ s_{11} = \sum s * s * w \f$
+     *  * \f$ s_{12} = \sum s * z * w \f$
+     *
+     *  * \f$ s_{22} = \sum z * z * w \f$
+     *  * + symmetric.
+     */
+    Eigen::Matrix<double, 3, 3> getWSZSumMatrix(CDCSZObservations& szObservations);
   }
 }

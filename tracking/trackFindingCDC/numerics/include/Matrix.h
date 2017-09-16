@@ -9,10 +9,18 @@
  **************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
+// #include <Eigen/Core>
+// namespace Belle2 {
+//   namespace TrackFindingCDC {
+//     template <class T, int M, int N>
+//     using Matrix = Eigen::Matrix<T, M, N>;
+//   }
+// }
+
+#include <tracking/trackFindingCDC/numerics/PlainMatrix.h>
 namespace Belle2 {
   namespace TrackFindingCDC {
     template <class T, int M, int N>
-    using Matrix = Eigen::Matrix<T, M, N>;
+    using Matrix = PlainMatrix<T, M, N>;
   }
 }

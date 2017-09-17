@@ -9,10 +9,10 @@
  **************************************************************************/
 #pragma once
 
-#include <boost/variant/variant_fwd.hpp>
+// #include <boost/variant/variant_fwd.hpp>
 
-#include <map>
-#include <vector>
+// #include <map>
+// #include <vector>
 #include <string>
 #include <memory>
 
@@ -21,7 +21,7 @@ namespace Belle2 {
     class ParamList;
 
     /// Variant of types allowed to be forwarded to a filter selected at runtime
-    using FilterParamVariant = boost::variant<bool, int, double, std::string, std::vector<std::string> >;
+    // using FilterParamVariant = boost::variant<bool, int, double, std::string, std::vector<std::string> >;
 
     /**
      *  Facade for a map of parameters that should be forwarded to a filter selected at runtime.
@@ -54,7 +54,7 @@ namespace Belle2 {
       void assignTo(ParamList* filterParamList);
 
       /// Getter for the currently stored values
-      std::map<std::string, FilterParamVariant> getValues() const;
+      // std::map<std::string, FilterParamVariant> getValues() const;
 
     private:
       /// Forward declartion of implementation.

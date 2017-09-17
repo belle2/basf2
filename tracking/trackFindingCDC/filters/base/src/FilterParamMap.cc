@@ -73,7 +73,7 @@ FilterParamMap::assignTo(ParamList* filterParamList)
   m_impl->assignTo(filterParamList);
 };
 
-std::map<std::string, FilterParamVariant> FilterParamMap::getValues() const
-{
-  return m_impl->getValues();
-}
+// std::map<std::string, FilterParamVariant> FilterParamMap::getValues() const
+// {
+//   return m_impl->getValues();
+// }

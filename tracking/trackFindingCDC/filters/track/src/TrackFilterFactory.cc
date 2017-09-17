@@ -20,7 +20,7 @@
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
-#include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
+#include <tracking/trackFindingCDC/filters/base/FilterVarSet.icc.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 

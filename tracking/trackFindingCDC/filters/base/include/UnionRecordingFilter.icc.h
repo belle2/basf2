@@ -13,12 +13,14 @@
 
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
+#include <tracking/trackFindingCDC/filters/base/FilterVarSet.icc.h>
+#include <tracking/trackFindingCDC/filters/base/FilterVarSet.dcl.h>
 
 #include <tracking/trackFindingCDC/varsets/UnionVarSet.h>
 
 #include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <vector>
 #include <string>

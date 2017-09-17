@@ -12,10 +12,12 @@
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/FilterVarSet.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+template class TrackFindingCDC::FilterVarSet<Chi2FacetFilter>;
 template class TrackFindingCDC::MVA<BaseFacetFilter>;
 
 MVAFacetFilter::MVAFacetFilter()

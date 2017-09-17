@@ -12,13 +12,13 @@
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackTruthVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
-
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterVarSet.icc.h>
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 

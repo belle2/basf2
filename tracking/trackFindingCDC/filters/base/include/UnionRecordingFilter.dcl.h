@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.dcl.h>
+
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.fwd.h>
 
 #include <tracking/trackFindingCDC/varsets/BaseVarSet.h>

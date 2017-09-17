@@ -16,7 +16,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
+#include <tracking/trackFindingCDC/filters/base/FilterVarSet.dcl.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 

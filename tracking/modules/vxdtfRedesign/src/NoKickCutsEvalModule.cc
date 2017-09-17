@@ -235,10 +235,10 @@ void NoKickCutsEvalModule::endRun()
               if (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetEntries() < 100) {
                 int filledBin_m = 0;
                 int filledBin_M = c_nbin + 1;
-                while (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(filledBin_m) == 0) {
+                while (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(filledBin_m) == 0 && filledBin_m < c_nbin / 2) {
                   filledBin_m++;
                 }
-                while (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(filledBin_M) == 0) {
+                while (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(filledBin_M) == 0 && filledBin_M > c_nbin / 2) {
                   filledBin_M--;
                 }
                 bin_m = filledBin_m;

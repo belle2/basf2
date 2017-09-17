@@ -235,10 +235,10 @@ void NoKickCutsEvalModule::endRun()
               if (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetEntries() < 100) {
                 int filledBin_m = 0;
                 int filledBin_M = c_nbin + 1;
-                while (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(filledBin_m) == 0 && filledBin_m < c_nbin / 2) {
+                while (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(filledBin_m) == 0 && filledBin_m < (double)  c_nbin / 2) {
                   filledBin_m++;
                 }
-                while (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(filledBin_M) == 0 && filledBin_M > c_nbin / 2) {
+                while (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(filledBin_M) == 0 && filledBin_M > (double) c_nbin / 2) {
                   filledBin_M--;
                 }
                 bin_m = filledBin_m;
@@ -541,7 +541,7 @@ double NoKickCutsEvalModule::deltaParEval(hitXP hit1, hitXP hit2, NoKickCuts::EP
 double NoKickCutsEvalModule::cutFunction(int p, double pwidth)
 {
   double out;
-  double mom = p * pwidth;
+  double mom = p * pwidth + c_pmin + pwidth / 2;
   if (mom > 0.4) {
     out = 0.999;
   } else out = -4.57 * pow(10, -7) / pow(mom, 3.31) + 0.999;

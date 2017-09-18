@@ -14,8 +14,17 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
-
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCTangent.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
 
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/utilities/Relation.h>
@@ -23,8 +32,21 @@
 #include <tracking/trackFindingCDC/utilities/ReversedRange.h>
 #include <tracking/trackFindingCDC/utilities/GetIterator.h>
 
+#include <framework/logging/Logger.h>
+
 #include <functional>
-#include <numeric>
+#include <algorithm>
+#include <iterator>
+
+#include <cassert>
+#include <cstddef>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+    class CDCRLWireHit;
+    class CDCWire;
+  }
+}
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

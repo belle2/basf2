@@ -17,5 +17,3 @@ namespace Belle2 {
     using CDCStereoSegment2D = CDCSegment2D;
   }
 }
-
-

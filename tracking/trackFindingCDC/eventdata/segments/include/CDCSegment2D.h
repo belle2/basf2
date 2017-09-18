@@ -14,6 +14,8 @@
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 
+#include <vector>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -24,6 +26,8 @@ namespace Belle2 {
 
     class CDCFacet;
     class CDCTangent;
+
+    class CDCWire;
 
     template<class T, class S> class WeightedRelation;
     template<class T, class S> class Relation;

@@ -49,8 +49,6 @@ namespace Belle2 {
 
       /// Memory for the flag marking this cluster as background
       bool m_backgroundFlag = false;
-
     };
-
   }
 }

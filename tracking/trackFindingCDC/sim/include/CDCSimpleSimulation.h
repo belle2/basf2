@@ -10,6 +10,9 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/utilities/VectorRange.h>
+
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <vector>
 #include <memory>

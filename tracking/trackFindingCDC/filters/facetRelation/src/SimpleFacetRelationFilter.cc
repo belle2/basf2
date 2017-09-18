@@ -7,8 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/facetRelation/SimpleFacetRelationFilter.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -41,7 +42,7 @@ void SimpleFacetRelationFilter::exposeParams(ParamList* paramList,
 Weight SimpleFacetRelationFilter::operator()(const CDCFacet& fromFacet,
                                              const CDCFacet& toFacet)
 {
-  if (fromFacet.getStartWire() == toFacet.getEndWire()) return NAN;
+  if (fromFacet.getStartWireHit().isOnWire(toFacet.getEndWire())) return NAN;
 
   // the compatibility of the short legs or all?
   // start end to continuation middle end

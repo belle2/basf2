@@ -15,6 +15,8 @@
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
 #include <tracking/trackFindingCDC/numerics/ToFinite.h>
 
 #include <cdc/dataobjects/CDCHit.h>

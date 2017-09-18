@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
 #include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
@@ -54,8 +55,8 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
   var<named("from_middle_cos_delta")>() = fromMiddleCos;
   var<named("to_middle_cos_delta")>() = toMiddleCos;
 
-  Vector2D frontWirePos2D = fromFacet->getStartWire().getRefPos2D();
-  Vector2D backWirePos2D  = toFacet->getEndWire().getRefPos2D();
+  Vector2D frontWirePos2D = fromFacet->getStartWireHit().getRefPos2D();
+  Vector2D backWirePos2D  = toFacet->getEndWireHit().getRefPos2D();
   {
     int nSteps = 0;
     UncertainParameterLine2D fitLine = FacetFitter::fit(*fromFacet, *toFacet, nSteps);
@@ -94,7 +95,7 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
     {
       double phi0_var = fromFacet->getFitLine().lineCovariance()(c_Phi0, c_Phi0);
       if (not std::isfinite(phi0_var)) {
-        B2INFO("from addr " << fromFacet);
+        B2INFO("from addr " << *fromFacet);
         B2INFO("From cov " << std::endl << fromFacet->getFitLine().lineCovariance());
         B2INFO("From cov " << std::endl << fromFitLine.lineCovariance());
       }
@@ -102,7 +103,7 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
     {
       double phi0_var = toFacet->getFitLine().lineCovariance()(c_Phi0, c_Phi0);
       if (not std::isfinite(phi0_var)) {
-        B2INFO("to addr " << toFacet);
+        B2INFO("to addr " << *toFacet);
         B2INFO("To cov " << std::endl << toFacet->getFitLine().lineCovariance());
         B2INFO("To cov " << std::endl << toFitLine.lineCovariance());
       }

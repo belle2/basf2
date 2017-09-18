@@ -10,6 +10,7 @@
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
@@ -176,24 +177,24 @@ double FacetFitter::fit(const CDCFacet& facet, int nSteps)
   const CDCRLWireHit& middleRLWireHit = facet.getMiddleRLWireHit();
   const CDCRLWireHit& endRLWireHit = facet.getEndRLWireHit();
 
-  const Vector2D support = middleRLWireHit.getWire().getRefPos2D();
+  const Vector2D support = middleRLWireHit.getWireHit().getRefPos2D();
 
   const double startDriftLengthVar = startRLWireHit.getRefDriftLengthVariance();
-  const Vector2D startWirePos2D = startRLWireHit.getWire().getRefPos2D();
+  const Vector2D startWirePos2D = startRLWireHit.getWireHit().getRefPos2D();
   xyl(0, 0) = startWirePos2D.x() - support.x();
   xyl(0, 1) = startWirePos2D.y() - support.y();
   xyl(0, 2) = startRLWireHit.getSignedRefDriftLength();
   w(0) = 1.0 / startDriftLengthVar;
 
   const double middleDriftLengthVar = middleRLWireHit.getRefDriftLengthVariance();
-  const Vector2D middleWirePos2D = middleRLWireHit.getWire().getRefPos2D();
+  const Vector2D middleWirePos2D = middleRLWireHit.getWireHit().getRefPos2D();
   xyl(1, 0) = middleWirePos2D.x() - support.x();
   xyl(1, 1) = middleWirePos2D.y() - support.y();
   xyl(1, 2) = middleRLWireHit.getSignedRefDriftLength();
   w(1) = 1.0 / middleDriftLengthVar;
 
   const double endDriftLengthVar = endRLWireHit.getRefDriftLengthVariance();
-  const Vector2D endWirePos2D = endRLWireHit.getWire().getRefPos2D();
+  const Vector2D endWirePos2D = endRLWireHit.getWireHit().getRefPos2D();
   xyl(2, 0) = endWirePos2D.x() - support.x();
   xyl(2, 1) = endWirePos2D.y() - support.y();
   xyl(2, 2) = endRLWireHit.getSignedRefDriftLength();
@@ -216,29 +217,29 @@ UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
   // Weight matrix
   Matrix<double, 6, 1> w = Matrix<double, 6, 1>::Zero();
 
-  const Vector2D support = Vector2D::average(fromFacet.getMiddleWire().getRefPos2D(),
-                                             toFacet.getMiddleWire().getRefPos2D());
+  const Vector2D support = Vector2D::average(fromFacet.getMiddleWireHit().getRefPos2D(),
+                                             toFacet.getMiddleWireHit().getRefPos2D());
   {
     const CDCRLWireHit& startRLWireHit = fromFacet.getStartRLWireHit();
     const CDCRLWireHit& middleRLWireHit = fromFacet.getMiddleRLWireHit();
     const CDCRLWireHit& endRLWireHit = fromFacet.getEndRLWireHit();
 
     const double startDriftLengthVar = startRLWireHit.getRefDriftLengthVariance();
-    const Vector2D startWirePos2D = startRLWireHit.getWire().getRefPos2D();
+    const Vector2D startWirePos2D = startRLWireHit.getWireHit().getRefPos2D();
     xyl(0, 0) = startWirePos2D.x() - support.x();
     xyl(0, 1) = startWirePos2D.y() - support.y();
     xyl(0, 2) = startRLWireHit.getSignedRefDriftLength();
     w(0) = 1.0 / startDriftLengthVar;
 
     const double middleDriftLengthVar = middleRLWireHit.getRefDriftLengthVariance();
-    const Vector2D middleWirePos2D = middleRLWireHit.getWire().getRefPos2D();
+    const Vector2D middleWirePos2D = middleRLWireHit.getWireHit().getRefPos2D();
     xyl(1, 0) = middleWirePos2D.x() - support.x();
     xyl(1, 1) = middleWirePos2D.y() - support.y();
     xyl(1, 2) = middleRLWireHit.getSignedRefDriftLength();
     w(1) = 1.0 / middleDriftLengthVar;
 
     const double endDriftLengthVar = endRLWireHit.getRefDriftLengthVariance();
-    const Vector2D endWirePos2D = endRLWireHit.getWire().getRefPos2D();
+    const Vector2D endWirePos2D = endRLWireHit.getWireHit().getRefPos2D();
     xyl(2, 0) = endWirePos2D.x() - support.x();
     xyl(2, 1) = endWirePos2D.y() - support.y();
     xyl(2, 2) = endRLWireHit.getSignedRefDriftLength();
@@ -251,21 +252,21 @@ UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
     const CDCRLWireHit& endRLWireHit = toFacet.getEndRLWireHit();
 
     const double startDriftLengthVar = startRLWireHit.getRefDriftLengthVariance();
-    const Vector2D startWirePos2D = startRLWireHit.getWire().getRefPos2D();
+    const Vector2D startWirePos2D = startRLWireHit.getWireHit().getRefPos2D();
     xyl(3, 0) = startWirePos2D.x() - support.x();
     xyl(3, 1) = startWirePos2D.y() - support.y();
     xyl(3, 2) = startRLWireHit.getSignedRefDriftLength();
     w(3) = 1.0 / startDriftLengthVar;
 
     const double middleDriftLengthVar = middleRLWireHit.getRefDriftLengthVariance();
-    const Vector2D middleWirePos2D = middleRLWireHit.getWire().getRefPos2D();
+    const Vector2D middleWirePos2D = middleRLWireHit.getWireHit().getRefPos2D();
     xyl(4, 0) = middleWirePos2D.x() - support.x();
     xyl(4, 1) = middleWirePos2D.y() - support.y();
     xyl(4, 2) = middleRLWireHit.getSignedRefDriftLength();
     w(4) = 1.0 / middleDriftLengthVar;
 
     const double endDriftLengthVar = endRLWireHit.getRefDriftLengthVariance();
-    const Vector2D endWirePos2D = endRLWireHit.getWire().getRefPos2D();
+    const Vector2D endWirePos2D = endRLWireHit.getWireHit().getRefPos2D();
     xyl(5, 0) = endWirePos2D.x() - support.x();
     xyl(5, 1) = endWirePos2D.y() - support.y();
     xyl(5, 2) = endRLWireHit.getSignedRefDriftLength();

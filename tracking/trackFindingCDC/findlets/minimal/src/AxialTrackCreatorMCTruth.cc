@@ -25,6 +25,9 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>

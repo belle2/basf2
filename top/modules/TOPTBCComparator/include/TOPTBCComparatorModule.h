@@ -165,7 +165,7 @@ namespace Belle2 {
     bool m_compareToPreviousSet =
       true; /**< Determines if the reverence set for the ratio is the first CalSet of the list (if false) or if each CalSet is compared to the previous one (if true) */
     std::string m_outputFile = ""; /**< File in which the output histograms are stored */
-    short m_minCalPulses = 200; /** < Minimum number of calpulses to declare a sample as non-empty> */
+    short m_minCalPulses = 200; /** < Minimum number of calpulses to declare a sample as non-empty */
     short m_numSamples = 256; /**< Number of samples that have been calibrated*/
 
 
@@ -177,7 +177,7 @@ namespace Belle2 {
     short m_slotID = -1; /**< ID of the slot whose calibrations are being analyzed*/
     short m_boardstackID = -1; /**< ID of the slot whose calibrations are being analyzed*/
     short m_scrodID = -1; /**< ID of the scrod  whose calibrations are being analyzed*/
-    short m_calSetID = 0; /** < Internal ID of the calibration set that is being analyzed */
+    short m_calSetID = 0; /**< Internal ID of the calibration set that is being analyzed */
     short m_totCalSets = 0; /** < Total number of calibration sets, as counted int defineHistos */
 
 

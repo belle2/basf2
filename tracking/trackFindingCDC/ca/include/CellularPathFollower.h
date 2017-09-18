@@ -13,8 +13,6 @@
 #include <tracking/trackFindingCDC/ca/Path.h>
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 
-#include <framework/logging/Logger.h>
-
 #include <vector>
 
 namespace Belle2 {

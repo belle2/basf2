@@ -16,8 +16,6 @@
 #include <tracking/trackFindingCDC/numerics/EIncDec.h>
 #include <tracking/trackFindingCDC/numerics/ESign.h>
 
-#include <framework/logging/Logger.h>
-
 #include <utility>
 #include <cmath>
 

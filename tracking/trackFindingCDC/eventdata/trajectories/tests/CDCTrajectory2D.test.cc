@@ -11,6 +11,8 @@
 
 #include <tracking/trackFindingCDC/topology/WireLine.h>
 
+#include <framework/logging/Logger.h>
+
 #include <gtest/gtest.h>
 
 using namespace Belle2;

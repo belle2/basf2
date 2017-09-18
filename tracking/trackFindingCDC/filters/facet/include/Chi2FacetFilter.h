@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 
 #include <vector>
+#include <array>
 #include <string>
 #include <cmath>
 

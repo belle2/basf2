@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -31,6 +31,9 @@ namespace Belle2 {
 
     /// Generic functor to get the stereo kind from an object.
     struct GetEStereoKind {
+      /// Marker function for the isFunctor test
+      operator FunctorTag();
+
       /// Returns the stereo kind of an object.
       template<class T, class SFINAE = decltype(&T::getStereoKind)>
       EStereoKind operator()(const T& t) const

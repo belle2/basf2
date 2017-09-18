@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <tracking/trackFindingCDC/utilities/ReversedRange.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>

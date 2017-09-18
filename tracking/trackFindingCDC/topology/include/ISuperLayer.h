@@ -11,9 +11,8 @@
 
 #include <tracking/trackFindingCDC/topology/EStereoKind.h>
 
-#include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
 
-#include <utility>
 #include <climits>
 
 namespace Belle2 {
@@ -24,11 +23,21 @@ namespace Belle2 {
 
     /// Generic functor to get the superlayer id from an object.
     struct GetISuperLayer {
+      /// Marker function for the isFunctor test
+      operator FunctorTag();
+
       /// Returns the superlayer of an object.
-      template<class T, class SFINAE =  decltype(&T::getISuperLayer)>
+      template<class T, class SFINAE = decltype(&T::getISuperLayer)>
       ISuperLayer operator()(const T& t) const
       {
         return t.getISuperLayer();
+      }
+
+      /// Returns the superlayer of a pointer.
+      template < class T, class SFINAE = decltype(std::declval<T>()->getISuperLayer()) >
+      auto operator()(const T& t) const -> decltype(t->getISuperLayer())
+      {
+        return t->getISuperLayer();
       }
     };
 
@@ -90,7 +99,7 @@ namespace Belle2 {
       template<class T>
       static ISuperLayer getFrom(const T& t)
       {
-        return MayIndirectTo<GetISuperLayer>()(t);
+        return GetISuperLayer()(t);
       }
     };
   }

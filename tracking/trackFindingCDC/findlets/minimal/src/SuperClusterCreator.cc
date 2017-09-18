@@ -14,8 +14,8 @@
 
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/trackFindingCDC/utilities/ParamList.icc.h>

@@ -9,25 +9,17 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
+
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// An additive measure of quality
-    using Weight = double;
+    /// Operator to sort for lowest according to the weight of the object.
+    using LessWeight = LessOf<MayIndirectTo<GetWeight>>;
 
-    /// Generic functor to get the weight from an object.
-    struct GetWeight {
-      /// Marker function for the isFunctor test
-      operator FunctorTag();
-
-      /// Returns the weight of an object.
-      template<class T, class SFINAE = decltype(&T::getWeight)>
-      Weight operator()(const T& t) const
-      {
-        return t.getWeight();
-      }
-    };
+    /// Operator to sort for highest according to the weight of the object.
+    using GreaterWeight = GreaterOf<MayIndirectTo<GetWeight>>;
   }
 }

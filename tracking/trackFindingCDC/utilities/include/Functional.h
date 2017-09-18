@@ -9,27 +9,16 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
+
 #include <tracking/trackFindingCDC/utilities/EnableIf.h>
 
-#include <iterator>
-#include <functional>
 #include <type_traits>
 #include <utility>
 #include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    /// Tag class to facilitate marking of class as a functor in the sense of this code
-    struct FunctorTag {
-    };
-
-    /// Test whether a given class is a functor
-    template <class T>
-    constexpr bool isFunctor()
-    {
-      return std::is_convertible<T, FunctorTag>::value;
-    }
 
     /// Generic identity functor.
     struct Id {

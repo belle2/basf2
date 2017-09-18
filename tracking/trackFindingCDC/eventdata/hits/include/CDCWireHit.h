@@ -18,7 +18,7 @@
 #include <tracking/trackFindingCDC/numerics/ERightLeft.h>
 #include <tracking/trackFindingCDC/numerics/Index.h>
 
-#include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
 
 #include <cdc/dataobjects/WireID.h>
 

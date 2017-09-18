@@ -9,9 +9,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/numerics/Median.h>
 
+#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 #include <framework/logging/Logger.h>
+
+#include <cmath>
 
 using namespace Belle2;
 

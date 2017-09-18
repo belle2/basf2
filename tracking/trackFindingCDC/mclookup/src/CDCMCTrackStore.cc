@@ -19,6 +19,7 @@
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 #include <cdc/dataobjects/CDCHit.h>

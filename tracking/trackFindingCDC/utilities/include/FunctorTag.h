@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
@@ -9,25 +9,20 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
+#include <type_traits>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// An additive measure of quality
-    using Weight = double;
-
-    /// Generic functor to get the weight from an object.
-    struct GetWeight {
-      /// Marker function for the isFunctor test
-      operator FunctorTag();
-
-      /// Returns the weight of an object.
-      template<class T, class SFINAE = decltype(&T::getWeight)>
-      Weight operator()(const T& t) const
-      {
-        return t.getWeight();
-      }
+    /// Tag class to facilitate marking of class as a functor in the sense of this code
+    struct FunctorTag {
     };
+
+    /// Test whether a given class is a functor
+    template <class T>
+    constexpr bool isFunctor()
+    {
+      return std::is_convertible<T, FunctorTag>::value;
+    }
   }
 }

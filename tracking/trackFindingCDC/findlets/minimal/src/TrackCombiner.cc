@@ -10,9 +10,12 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCombiner.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
+#include <tracking/trackFindingCDC/numerics/Index.h>
 #include <tracking/trackFindingCDC/utilities/Range.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 

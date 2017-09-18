@@ -3,6 +3,8 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#pragma extra_include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>;
+
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireHitCluster+;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireHitSegment+;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCRLWireHitSegment+;

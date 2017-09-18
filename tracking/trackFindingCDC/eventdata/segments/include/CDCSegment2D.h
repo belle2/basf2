@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 

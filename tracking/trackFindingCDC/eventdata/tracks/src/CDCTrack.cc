@@ -15,6 +15,8 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
 #include <tracking/trackFindingCDC/numerics/FloatComparing.h>
 
 using namespace Belle2;
@@ -336,7 +338,7 @@ CDCTrack CDCTrack::reversed() const
 MayBePtr<const CDCRecoHit3D> CDCTrack::find(const CDCWireHit& wireHit) const
 {
   auto hasWireHit = [&wireHit](const CDCRecoHit3D & recoHit3D) {
-    return recoHit3D.getWireHit() == wireHit;
+    return recoHit3D.hasWireHit(wireHit);
   };
   auto itRecoHit3D = std::find_if(this->begin(), this->end(), hasWireHit);
   return itRecoHit3D == this->end() ? nullptr : &*itRecoHit3D;

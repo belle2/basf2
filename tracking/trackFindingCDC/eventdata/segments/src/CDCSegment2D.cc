@@ -15,6 +15,8 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
 
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/utilities/Relation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>

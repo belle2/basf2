@@ -10,9 +10,13 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+
 #include <tracking/trackFindingCDC/ca/Path.h>
 
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
@@ -26,6 +30,10 @@ namespace Belle2 {
     class CDCSegment3D;
     class CDCSegmentPair;
     class CDCSegmentTriple;
+
+    class CDCWireHit;
+    class Vector2D;
+    class Vector3D;
 
     /// Class representing a sequence of three dimensional reconstructed hits
     class CDCTrack : public std::vector<CDCRecoHit3D> {

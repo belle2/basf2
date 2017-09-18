@@ -7,7 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
@@ -15,9 +14,35 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+
+#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+
 #include <tracking/trackFindingCDC/numerics/FloatComparing.h>
+
+#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+
+#include <framework/logging/Logger.h>
+
+#include <algorithm>
+#include <cmath>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+    class CDCRLWireHit;
+  }
+}
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

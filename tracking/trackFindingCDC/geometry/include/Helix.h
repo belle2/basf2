@@ -131,6 +131,12 @@ namespace Belle2 {
         return point.distance(closest(point));
       }
 
+      /// Calculates the distance of the line parallel to the z axes through the given point
+      double distanceXY(const Vector2D& point) const
+      {
+        return m_circleXY.distance(point);
+      }
+
       /**
        *  Moves the coordinates system by the given vector. Updates perigee point in place.
        *  @return arcLength2D that has to be traversed to the new origin

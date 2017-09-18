@@ -17,8 +17,10 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 
 #include <cdc/dataobjects/CDCSimHit.h>

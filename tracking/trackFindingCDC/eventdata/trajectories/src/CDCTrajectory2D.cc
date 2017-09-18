@@ -9,15 +9,27 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <tracking/trackFindingCDC/topology/WireLine.h>
-
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
+#include <tracking/trackFindingCDC/topology/WireLine.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+
+#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
 #include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 
+#include <vector>
+#include <utility>
+#include <ostream>
 #include <cmath>
 #include <cassert>
 
@@ -260,4 +272,11 @@ double CDCTrajectory2D::setLocalOrigin(const Vector2D& localOrigin)
   m_localPerigeeCircle.passiveMoveBy(localOrigin - m_localOrigin);
   m_localOrigin = localOrigin;
   return arcLength2D;
+}
+
+
+std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const CDCTrajectory2D& trajectory2D)
+{
+  return output << "Local origin : " << trajectory2D.getLocalOrigin() << ", "
+         << "local circle : " << trajectory2D.getLocalCircle();
 }

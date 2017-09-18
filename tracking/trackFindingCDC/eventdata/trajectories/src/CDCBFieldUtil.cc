@@ -7,14 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+
+#include <tracking/trackFindingCDC/numerics/ERotation.h>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
+
 #include <geometry/bfieldmap/BFieldMap.h>
-#include <framework/logging/Logger.h>
+
+#include <framework/geometry/B2Vector3.h>
 
 #include <TMath.h>
 #include <cmath>
-#include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -32,6 +37,11 @@ ESign CDCBFieldUtil::getBFieldZSign()
   return sign(CDCBFieldUtil::getBFieldZ());
 }
 
+double CDCBFieldUtil::getBFieldZ()
+{
+  return getBFieldZ(Vector3D(0, 0, 0));
+}
+
 double CDCBFieldUtil::getBFieldZ(const Vector2D& pos2D)
 {
   return getBFieldZ(Vector3D(pos2D, 0));
@@ -46,6 +56,8 @@ double CDCBFieldUtil::getBFieldZ(const Vector3D& pos3D)
   auto mag3D = BFieldMap::Instance().getBField(B2Vector3D(pos3D.x(), pos3D.y(), pos3D.z()));
   return mag3D.Z();
 }
+
+
 
 double CDCBFieldUtil::getAlphaFromBField(double bField)
 {

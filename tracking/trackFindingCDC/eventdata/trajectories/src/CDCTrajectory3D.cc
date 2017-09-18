@@ -16,9 +16,18 @@
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
+#include <tracking/trackFindingCDC/geometry/UncertainHelix.h>
+#include <tracking/trackFindingCDC/geometry/Helix.h>
+#include <tracking/trackFindingCDC/geometry/HelixParameters.h>
 #include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
 #include <tracking/trackFindingCDC/geometry/UncertainSZLine.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/ESign.h>
+#include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
 #include <tracking/trackFindingCDC/numerics/CovarianceMatrixUtil.h>
 #include <tracking/trackFindingCDC/numerics/JacobianMatrixUtil.h>
@@ -26,11 +35,14 @@
 
 #include <genfit/TrackCand.h>
 
-#include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <TMatrixDSym.h>
+#include <framework/gearbox/Const.h>
 
+#include <TMatrixDSym.h>
+#include <TVector3.h>
+
+#include <ostream>
 #include <cmath>
 
 using namespace Belle2;
@@ -364,4 +376,10 @@ double CDCTrajectory3D::setLocalOrigin(const Vector3D& localOrigin)
   m_localHelix.passiveMoveBy(localOrigin - m_localOrigin);
   m_localOrigin = localOrigin;
   return arcLength2D;
+}
+
+std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const CDCTrajectory3D& trajectory3D)
+{
+  return output << "Local origin : " << trajectory3D.getLocalOrigin() << ", "
+         << "local helix : " << trajectory3D.getLocalHelix();
 }

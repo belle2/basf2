@@ -14,11 +14,22 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
 
 #include <tracking/trackFindingCDC/numerics/TMatrixConversion.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/RecoHitInformation.h>
+
+#include <framework/datastore/StoreArray.h>
+
+#include <TMatrixDSymfwd.h>
+#include <TMatrixTSym.h>
+#include <cmath>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

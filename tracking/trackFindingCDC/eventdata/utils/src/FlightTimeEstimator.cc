@@ -9,10 +9,14 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+
 #include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
 #include <tracking/trackFindingCDC/numerics/Angle.h>
 
 #include <framework/gearbox/Const.h>
+
+#include <algorithm>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

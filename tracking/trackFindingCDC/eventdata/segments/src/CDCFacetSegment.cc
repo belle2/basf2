@@ -13,6 +13,8 @@
 
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
+#include <framework/logging/Logger.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

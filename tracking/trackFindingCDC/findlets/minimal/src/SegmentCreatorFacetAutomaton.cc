@@ -18,6 +18,8 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
 #include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>

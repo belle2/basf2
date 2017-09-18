@@ -19,6 +19,8 @@
 
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 

@@ -15,6 +15,8 @@
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 
+#include <cassert>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -138,8 +140,8 @@ namespace Belle2 {
       {
         m_fromSegment = fromSegment;
         m_toSegment = toSegment;
-        if (not checkSegmentsNonNullptr()) B2WARNING("CDCSegmentPair: one segment set to nullptr");
-        if (not checkSegmentsStereoKinds()) B2WARNING("CDCSegmentPair: segments set with same stereo type");
+        assert(checkSegmentsNonNullptr());
+        assert(checkSegmentsStereoKinds());
       }
 
       /** Determines the angle between the last reconstructed position of the from segment and

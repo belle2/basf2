@@ -23,6 +23,7 @@
 #include <tracking/trackFindingCDC/utilities/ReversedRange.h>
 #include <tracking/trackFindingCDC/utilities/GetIterator.h>
 
+#include <functional>
 #include <numeric>
 
 using namespace Belle2;

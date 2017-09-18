@@ -14,6 +14,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCWireHit;
+    class CDCWire;
 
     /// A segment consisting of two dimensional reconsturcted hits
     class CDCWireHitSegment :  public CDCSegment<const Belle2::TrackFindingCDC::CDCWireHit*> {

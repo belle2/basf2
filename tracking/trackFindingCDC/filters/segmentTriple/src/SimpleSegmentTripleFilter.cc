@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;

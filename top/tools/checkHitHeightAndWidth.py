@@ -37,8 +37,9 @@ class Histogrammer(Module):
     #: Default output name
     outname = 'calpulseCheck.root'
 
-    #: Sets the output file name
     def setOutputName(self, outputname):
+        ''' Sets the output file name '''
+
         self.outname = outputname
 
     def event(self):

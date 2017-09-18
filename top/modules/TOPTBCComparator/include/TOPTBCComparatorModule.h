@@ -29,20 +29,20 @@ namespace Belle2 {
    *
    * 1) Input format
    * The input constants are given in the histogram format provided by the TOPTimeCalibrator module. According to the current (2017)
-   * TBC production standards, all the root files belonging to the same calibration set must be locaded in one single directory. No more than one level of subdirectory is allowed
-   * An example of a valid directory stucutre fore the input is:
+   * TBC production standards, all the root files belonging to the same calibration set must be locaded in one single directory, with no more than one level of subdirectories.
+   * An example of a valid directory stucture for the input is:
    *
-   * CalibrationSetRootFolder/ - tbc_ch0/
-   *                           - tbc_ch1/
-   *                           - tbc_ch2/
-   *                           - ...
-   *                           - tbc_ch7/
+   * CalibrationSetRootFolder/tbc_ch0/
+   *                          tbc_ch1/
+   *                          tbc_ch2/
+   *                          ...
+   *                          tbc_ch7/
    *
    * where the root files are located under tbc_chX/
-   * The modules is sensitive to the name format of the input files, since slot, BS and scrod ID are parted from them.
-   * The naming stantard must be tbcSlotXX_Y-scrodZZZ.root, where XX is ste slot number, Y is the BS number, and ZZZ is the scrodID. Both 2- and 3-digits scrodID are allowed
+   * The module is sensitive to the name format of the input files, since slot, BS and scrod ID are parsed from them.
+   * The naming is tbcSlotXX_Y-scrodZZZ.root, where XX is the slot number, Y is the BS number, and ZZZ is the scrodID. Both 2- and 3-digits scrodID are allowed.
    *
-   * To specify the calibration sets to be analyzed and compared, the used must provide a text file containing the absolute path to the CalibrationSetRootFolder, and a label to identify the calibration set.
+   * To specify the calibration sets to be analyzed and compared, the user must provide a text file containing the absolute path to the CalibrationSetRootFolder, and a label to identify the calibration set.
    * Separate sets are specified on separate lines of this configuration file:
    *
    * /absolute/path/to/CalibrationSetRootFolder1/  LabelSet1
@@ -56,15 +56,15 @@ namespace Belle2 {
    *   analyzeCalFile() and  makeComparisons().
    * - First all the calset-by-calset histograms are filled, then the comparisons are done by taking ratios of these histograms
    * - The output writing is done in the terminate() function
-   * - The histogram filling is performed in the analyzeFile() function, called in the main loop inside endRun().
-   * - The histogram comparison is performed in the makeComparisons() function, called in endRun() outside the main loop.
+   * - The histogram filling is performed in the analyzeFile() function, called in the main loop over the calibration sets inside endRun().
+   * - The histogram comparison is performed in the makeComparisons() function, called in endRun() outside the main loop over the calibration sets.
    *
    *
    * 3) How to add a new histogram
-   * - Declare it as private member
+   * - Declare it as private member.
    * - Initialize it in defineHisto()
-   * - Fill it in analyzeCalFile() (if it is a simple monitoring plot) or in  makeComparisons() (if it compares plots form different datasets)
-   * - Write it in terminate()
+   * - Fill it in analyzeCalFile() (if it is a simple monitoring plot) or in  makeComparisons() (if it compares plots from different datasets)
+   * - Write it in the output file in terminate()
    *
    *
    * 4) How to add a new comparison histogram
@@ -106,7 +106,7 @@ namespace Belle2 {
 
     /**
      * End-of-run action.
-     * The main analysis loop over the calibraitonSets happen here. This function has to be modified only if the directory structure
+     * The main analysis loop over the calibration sets happens here. This function has to be modified only if the directory structure
      * of the TOPTimeBaseCalibrator module output is changed
      * Both the core functions analyzeCalFile() and makeComparisons() are called here.
      */
@@ -165,7 +165,7 @@ namespace Belle2 {
     bool m_compareToPreviousSet =
       true; /**< Determines if the reverence set for the ratio is the first CalSet of the list (if false) or if each CalSet is compared to the previous one (if true) */
     std::string m_outputFile = ""; /**< File in which the output histograms are stored */
-    short m_minCalPulses = 200; /** < Minimum number of calpulses to declare a sample as non-empty */
+    short m_minCalPulses = 200; /**< Minimum number of calpulses to declare a sample as non-empty */
     short m_numSamples = 256; /**< Number of samples that have been calibrated*/
 
 
@@ -178,7 +178,7 @@ namespace Belle2 {
     short m_boardstackID = -1; /**< ID of the slot whose calibrations are being analyzed*/
     short m_scrodID = -1; /**< ID of the scrod  whose calibrations are being analyzed*/
     short m_calSetID = 0; /**< Internal ID of the calibration set that is being analyzed */
-    short m_totCalSets = 0; /** < Total number of calibration sets, as counted int defineHistos */
+    short m_totCalSets = 0; /**< Total number of calibration sets, as counted int defineHistos */
 
 
     // Delta T plots, slot-by-slot

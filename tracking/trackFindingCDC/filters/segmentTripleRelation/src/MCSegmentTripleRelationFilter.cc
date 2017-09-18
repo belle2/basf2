@@ -11,6 +11,8 @@
 
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.icc.h>
 
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

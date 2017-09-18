@@ -17,16 +17,16 @@
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
-#include <cdc/dataobjects/ADCCountTranslatorBase.h>
-#include <cdc/dataobjects/TDCCountTranslatorBase.h>
-
 #include <vector>
 #include <tuple>
 #include <string>
 #include <memory>
 
 namespace Belle2 {
-
+  namespace CDC {
+    class TDCCountTranslatorBase;
+    class ADCCountTranslatorBase;
+  }
   namespace TrackFindingCDC {
     class CDCWireHit;
 
@@ -41,6 +41,12 @@ namespace Belle2 {
       using Super = Findlet<CDCWireHit>;
 
     public:
+      /// Default constructor
+      WireHitCreator();
+
+      /// Default destructor
+      ~WireHitCreator();
+
       /// Short description of the findlet
       std::string getDescription() final;
 
@@ -90,10 +96,10 @@ namespace Belle2 {
 
     private: // Translators
       /// TDC Count translator to be used to calculate the initial dirft length estiamtes
-      std::unique_ptr<CDC::TDCCountTranslatorBase> m_tdcCountTranslator = nullptr;
+      std::unique_ptr<CDC::TDCCountTranslatorBase> m_tdcCountTranslator;
 
       /// ADC Count translator to be used to calculate the charge deposit in the drift cell
-      std::unique_ptr<CDC::ADCCountTranslatorBase> m_adcCountTranslator = nullptr;
+      std::unique_ptr<CDC::ADCCountTranslatorBase> m_adcCountTranslator;
     };
   }
 }

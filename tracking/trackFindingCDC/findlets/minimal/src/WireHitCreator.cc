@@ -31,6 +31,9 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+WireHitCreator::WireHitCreator() = default;
+WireHitCreator::~WireHitCreator() = default;
+
 std::string WireHitCreator::getDescription()
 {
   return "Combines the geometrical information and the raw hit information into wire hits, "

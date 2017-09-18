@@ -17,7 +17,6 @@
 #include <vector>
 
 namespace Belle2 {
-  class RecoTrack;
 
   namespace TrackFindingCDC {
     class CDCSegment2D;
@@ -59,19 +58,27 @@ namespace Belle2 {
 
       /// Getter for the superlayer id the track starts from.
       ISuperLayer getStartISuperLayer() const
-      { return front().getISuperLayer(); }
+      {
+        return front().getISuperLayer();
+      }
 
       /// Getter for the superlayer id the track ends in.
       ISuperLayer getEndISuperLayer() const
-      { return back().getISuperLayer(); }
+      {
+        return back().getISuperLayer();
+      }
 
       /// Getter for the position of the first reconstructed hit.
       const Vector3D& getStartRecoPos3D() const
-      { return front().getRecoPos3D(); }
+      {
+        return front().getRecoPos3D();
+      }
 
       /// Getter for the position of the last reconstructed hit.
       const Vector3D& getEndRecoPos3D() const
-      { return back().getRecoPos3D(); }
+      {
+        return back().getRecoPos3D();
+      }
 
       /// Setter for the two dimensional trajectory. The trajectory should start at the start of the
       /// track and follow its direction.

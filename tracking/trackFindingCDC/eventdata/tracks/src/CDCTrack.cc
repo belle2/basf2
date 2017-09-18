@@ -15,10 +15,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/RecoTrackUtil.h>
-
 #include <tracking/trackFindingCDC/numerics/FloatComparing.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

@@ -36,6 +36,8 @@ namespace {
   using BkgMVASegmentFilter = MVAFilter<AdvancedSegmentVarSet>;
 }
 
+template class TrackFindingCDC::FilterFactory<BaseSegmentFilter>;
+
 SegmentFilterFactory::SegmentFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
 {

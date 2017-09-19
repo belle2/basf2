@@ -22,6 +22,8 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+template class TrackFindingCDC::FilterFactory<BaseSegmentTripleFilter>;
+
 SegmentTripleFilterFactory::SegmentTripleFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
 {

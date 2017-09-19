@@ -28,6 +28,8 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+template class TrackFindingCDC::FilterFactory<BaseFacetFilter>;
+
 FacetFilterFactory::FacetFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
 {

@@ -25,6 +25,8 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+template class TrackFindingCDC::FilterFactory<BaseSegmentPairRelationFilter>;
+
 SegmentPairRelationFilterFactory::SegmentPairRelationFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
 {

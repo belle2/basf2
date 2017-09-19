@@ -23,6 +23,8 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+template class TrackFindingCDC::FilterFactory<BaseAxialSegmentPairFilter>;
+
 AxialSegmentPairFilterFactory::AxialSegmentPairFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
 {

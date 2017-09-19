@@ -35,6 +35,8 @@ namespace {
   using MVASegmentTrackFilter = MVAFilter<SegmentTrackVarSet>;
 }
 
+template class TrackFindingCDC::FilterFactory<BaseSegmentTrackFilter>;
+
 SegmentTrackFilterFactory::SegmentTrackFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
 {

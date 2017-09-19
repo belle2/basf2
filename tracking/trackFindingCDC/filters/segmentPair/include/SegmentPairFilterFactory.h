@@ -19,6 +19,8 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    // Guard to prevent repeated instatiations
+    extern template class FilterFactory<BaseSegmentPairFilter>;
 
     /// Factory that can create appropriate segment pair filters from associated names.
     class SegmentPairFilterFactory : public FilterFactory<BaseSegmentPairFilter> {

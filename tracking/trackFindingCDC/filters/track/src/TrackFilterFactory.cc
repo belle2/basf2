@@ -35,6 +35,8 @@ namespace {
   using MVATrackFilter = MVAFilter<BasicTrackVarSet>;
 }
 
+template class TrackFindingCDC::FilterFactory<BaseTrackFilter>;
+
 TrackFilterFactory::TrackFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
 {

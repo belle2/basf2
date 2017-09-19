@@ -21,6 +21,8 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+template class TrackFindingCDC::FilterFactory<BaseClusterFilter>;
+
 ClusterFilterFactory::ClusterFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
 {

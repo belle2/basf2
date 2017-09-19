@@ -42,6 +42,8 @@ namespace {
   using MVAStereoHitFilter = MVAFilter<StereoHitVarSet>;
 }
 
+template class TrackFindingCDC::FilterFactory<BaseStereoHitFilter>;
+
 StereoHitFilterFactory::StereoHitFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
 {

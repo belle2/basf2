@@ -14,11 +14,13 @@
 #include <ecl/digitization/algorithms.h>
 #include <ecl/digitization/shaperdsp.h>
 #include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/database/DBObjPtr.h>
 
 // ROOT
 #include <TRandom.h>
@@ -69,11 +71,26 @@ void ECLDigitizerModule::initialize()
   m_adc.resize(EclConfiguration::m_nch);
 
   EclConfiguration::get().setBackground(m_background);
-
 }
 
 void ECLDigitizerModule::beginRun()
 {
+  const EclConfiguration& ec = EclConfiguration::get();
+  DBObjPtr<ECLCrystalCalib>
+  Ael("ECLCrystalElectronics"),
+      Aen("ECLCrystalEnergy"),
+      Tel("ECLCrystalElectronicsTime"),
+      Ten("ECLCrystalTimeOffset");
+  double c = 1.0 / (4.0 * ec.m_rf) * 1e3, ic = 1 / c;
+
+  calibration_t def = {1, 0};
+  m_calib.assign(8736, def);
+
+  if (Ael) for (int i = 0; i < 8736; i++) m_calib[i].ascale /= Ael->getCalibVector()[i];
+  if (Aen) for (int i = 0; i < 8736; i++) m_calib[i].ascale /= Aen->getCalibVector()[i] * 20000.0;
+
+  if (Tel) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tel->getCalibVector()[i] * ic;
+  if (Ten) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Ten->getCalibVector()[i] * ic;
 }
 
 // interface to C shape fitting function function
@@ -89,7 +106,7 @@ void ECLDigitizerModule::shapeFitterWrapper(const int j, const int* FitA, const 
               &m_lar, &m_ltr, &m_lq , &m_chi);
 }
 
-void ECLDigitizerModule::event()
+int ECLDigitizerModule::shapeSignals()
 {
   const EclConfiguration& ec = EclConfiguration::get();
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();
@@ -109,8 +126,8 @@ void ECLDigitizerModule::event()
   // emulate response for ECL hits after ADC measurements
   for (const auto& hit : m_eclSimHits) {
     int j = hit.getCellId() - 1; //0~8735
-    double hitE       = hit.getEnergyDep() / Unit::GeV;
-    double hitTimeAve = (hit.getFlightTime() + eclp->time2sensor(j, hit.getPosition())) / Unit::us;
+    double hitE       = hit.getEnergyDep() * m_calib[j].ascale / Unit::GeV;
+    double hitTimeAve = (hit.getFlightTime() + m_calib[j].tshift + eclp->time2sensor(j, hit.getPosition())) / Unit::us;
     m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
   }
 
@@ -118,18 +135,9 @@ void ECLDigitizerModule::event()
   for (const auto& hit : m_eclHits) {
     if (hit.getBackgroundTag() == ECLHit::bg_none) continue;
     int j = hit.getCellId() - 1; //0~8735
-    double hitE       = hit.getEnergyDep() / Unit::GeV;
-    double hitTimeAve = hit.getTimeAve() / Unit::us;
+    double hitE       = hit.getEnergyDep() * m_calib[j].ascale  / Unit::GeV;
+    double hitTimeAve = (hit.getTimeAve() + m_calib[j].tshift) / Unit::us;
     m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
-  }
-
-  // make relation between cellid and eclhits
-  struct ch_t {int cell, id;};
-  vector<ch_t> hitmap;
-  for (const auto& hit : m_eclHits) {
-    int j = hit.getCellId() - 1; //0~8735
-    if (hit.getBackgroundTag() == ECLHit::bg_none) hitmap.push_back({j, hit.getArrayIndex()});
-    //    cout<<"C:"<<hit.getBackgroundTag()<<" "<<hit.getCellId()<<" "<<hit.getEnergyDep()<<" "<<hit.getTimeAve()<<endl;
   }
 
   // internuclear counter effect -- charged particle crosses diode and produces signal
@@ -140,8 +148,8 @@ void ECLDigitizerModule::event()
       // 5000 pairs in the diode per 1 MeV deposited in the crystal attached to the diode
       // conversion factor to get equvalent energy deposition in the crystal to sum up it with deposition in crystal
       constexpr double diodeEdep2crystalEdep = 1 / (5000 * 3.6e-6);
-      double hitE       = hit.getEnergyDep() / Unit::GeV * diodeEdep2crystalEdep;
-      double hitTimeAve = hit.getTimeAve() / Unit::us;
+      double hitE       = hit.getEnergyDep() * m_calib[j].ascale / Unit::GeV * diodeEdep2crystalEdep;
+      double hitTimeAve = (hit.getTimeAve() + m_calib[j].tshift) / Unit::us;
 
       adccounts_t& a = m_adc[j];
       // cout << "internuclearcountereffect " << j << " " << hit.getEnergyDep() << " " << hit.getTimeAve() << " " << a.total << endl;
@@ -151,32 +159,49 @@ void ECLDigitizerModule::event()
     }
   }
 
+  if (m_calibration) {
+    // This has been added by Alex Bobrov for calibration
+    // of covariance matrix artificially generate 100 MeV in time for each crystal
+    double hitE = 0.1, hitTimeAve = 0.0;
+    for (int j = 0; j < ec.m_nch; j++)
+      m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
+  }
+
+  return ttrig;
+}
+
+void ECLDigitizerModule::event()
+{
+  const EclConfiguration& ec = EclConfiguration::get();
+  const int ttrig = shapeSignals();
+
+  // make relation between cellid and eclhits
+  struct ch_t {int cell, id;};
+  vector<ch_t> hitmap;
+  for (const auto& hit : m_eclHits) {
+    int j = hit.getCellId() - 1; //0~8735
+    if (hit.getBackgroundTag() == ECLHit::bg_none) hitmap.push_back({j, hit.getArrayIndex()});
+    //    cout<<"C:"<<hit.getBackgroundTag()<<" "<<hit.getCellId()<<" "<<hit.getEnergyDep()<<" "<<hit.getTimeAve()<<endl;
+  }
+
+  int FitA[ec.m_nsmp]; // buffer for the waveform fitter
+  float z[ec.m_nsmp], AdcNoise[ec.m_nsmp]; // buffers with electronic noise
+
   // loop over entire calorimeter
   for (int j = 0; j < ec.m_nch; j++) {
     adccounts_t& a = m_adc[j];
 
-    if (m_calibration) {
-      // This has been added by Alex Bobrov for calibration
-      // of covariance matrix artificially generate 100 MeV in time for each crystal
-      double hitE = 0.1, hitTimeAve = 0.0;
-      a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
-    } else if (a.total < 0.0001)
-      continue;
+    // amplitude of background waveform should be always above of so
+    // low threshold thus perform the waveform fitting anyway.
+    if (a.total < 0.0001) continue;
 
     //Noise generation
-    float z[ec.m_nsmp];
-    for (int i = 0; i < ec.m_nsmp; i++)
-      z[i] = gRandom->Gaus(0, 1);
-
-    float AdcNoise[ec.m_nsmp];
+    for (int i = 0; i < ec.m_nsmp; i++) z[i] = gRandom->Gaus(0, 1);
     m_noise[m_tbl[j].inoise].generateCorrelatedNoise(z, AdcNoise);
-
-    int FitA[ec.m_nsmp];
     for (int  i = 0; i < ec.m_nsmp; i++) {
-      // first clip and then add noise
-      // FitA[i] = 20 * (1000 * max(0.0, a.c[i]) + AdcNoise[i]) + 3000;
-      // or add noise and then clip?
-      FitA[i] = max(0.0, 20 * (1000 * a.c[i] + AdcNoise[i]) + 3000);
+      // add noise and then clip
+      int A = 20 * (1000 * a.c[i] + AdcNoise[i]) + 3000;
+      FitA[i] = max(0, min(A, (1 << 18) - 1));
     }
 
     int  energyFit = 0; // fit output : Amplitude 18 bits

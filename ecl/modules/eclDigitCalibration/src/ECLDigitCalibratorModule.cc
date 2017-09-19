@@ -21,6 +21,7 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLEventInformation.h>
+#include <ecl/digitization/EclConfiguration.h>
 
 // FRAMEWORK
 #include <framework/datastore/RelationArray.h>
@@ -46,8 +47,11 @@ REG_MODULE(ECLDigitCalibratorPureCsI)
 //-----------------------------------------------------------------
 
 // constructor
-ECLDigitCalibratorModule::ECLDigitCalibratorModule() : m_calibrationEnergyHigh("ECLDigitEnergyConstantsHigh"),
-  m_calibrationTime("ECLDigitTimeConstants")
+ECLDigitCalibratorModule::ECLDigitCalibratorModule() :
+  m_calibrationCrystalElectronics("ECLCrystalElectronics"),
+  m_calibrationCrystalEnergy("ECLCrystalEnergy"),
+  m_calibrationCrystalElectronicsTime("ECLCrystalElectronicsTime"),
+  m_calibrationCrystalTimeOffset("ECLCrystalTimeOffset")
 {
   // Set module properties
   setDescription("Applies digit energy, time and time-resolution calibration to each ECL digit. Counts number of out-of-time background digits to determine the event-by-event background level.");
@@ -64,7 +68,31 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() : m_calibrationEnergyHigh("
 // destructor
 ECLDigitCalibratorModule::~ECLDigitCalibratorModule()
 {
+  ;
 }
+
+// initialize calibration
+void ECLDigitCalibratorModule::initializeCalibration()
+{
+
+  m_timeInverseSlope = 1.0 / (4.0 * EclConfiguration::m_rf) *
+                       1e3;  // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz. Same for all crystals.
+
+  callbackCalibration(m_calibrationCrystalElectronics, v_calibrationCrystalElectronics, v_calibrationCrystalElectronicsUnc);
+  callbackCalibration(m_calibrationCrystalEnergy, v_calibrationCrystalEnergy, v_calibrationCrystalEnergyUnc);
+  callbackCalibration(m_calibrationCrystalElectronicsTime, v_calibrationCrystalElectronicsTime,
+                      v_calibrationCrystalElectronicsTimeUnc);
+  callbackCalibration(m_calibrationCrystalTimeOffset, v_calibrationCrystalTimeOffset, v_calibrationCrystalTimeOffsetUnc);
+}
+
+// callback calibration
+void ECLDigitCalibratorModule::callbackCalibration(DBObjPtr<ECLCrystalCalib>& cal, std::vector<float>& constants,
+                                                   std::vector<float>& constantsUnc)
+{
+  constants = cal->getCalibVector();
+  constantsUnc = cal->getCalibUncVector();
+}
+
 
 // initialize
 void ECLDigitCalibratorModule::initialize()
@@ -80,16 +108,10 @@ void ECLDigitCalibratorModule::initialize()
   eclCalDigits.registerRelationTo(eclDigits);
   eclEventInformationPtr.registerInDataStore();
 
-  // resize vector that holds calibration ratio E/A
-  m_calibrationEnergyHighRatio.resize(c_nCrystals + 1);
+  // initialize calibration
+  initializeCalibration();
 
-  // resize vector that holds the time (and time resolution) calibration constants
-  m_calibrationTimeOffset.resize(c_nCrystals + 1);
-
-  // HARDCODED VALUES SHOULD DISAPPEAR FOR RELEASE-00-08
-  // time calibration for MC: t = a * (m_timeFit + b)
-  m_timeInverseSlope = 1.0 / 2.0366; // "b", (CH for svn revision 25745)
-
+  // initialize time resolution (not yet from the database)
   // read the Background correction factors (for full background)
   m_fileBackground = new TFile(m_fileBackgroundName.c_str(), "READ");
   if (!m_fileBackground) B2FATAL("Could not find file: " << m_fileBackgroundName);
@@ -120,10 +142,31 @@ void ECLDigitCalibratorModule::initialize()
 // begin run
 void ECLDigitCalibratorModule::beginRun()
 {
-  // get the calibration objects and put them into vectors (to be accessed via cell id later)
-  // TF: THIS MUST BE MOVED TO event() and use the new callback method to check for intra-run dependencies
-  prepareEnergyCalibrationConstants();
-  prepareTimeCalibrationConstants();
+  // Check if any of the calibration constants have changed
+  if (m_calibrationCrystalElectronics.hasChanged()) {
+    if (m_calibrationCrystalElectronics) {
+      callbackCalibration(m_calibrationCrystalElectronics, v_calibrationCrystalElectronics, v_calibrationCrystalElectronicsUnc);
+    } else B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrystalElectronics for current run!");
+  }
+
+  if (m_calibrationCrystalEnergy.hasChanged()) {
+    if (m_calibrationCrystalEnergy) {
+      callbackCalibration(m_calibrationCrystalEnergy, v_calibrationCrystalEnergy, v_calibrationCrystalEnergyUnc);
+    } else B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrystalEnergy for current run!");
+  }
+
+  if (m_calibrationCrystalElectronicsTime.hasChanged()) {
+    if (m_calibrationCrystalElectronicsTime) {
+      callbackCalibration(m_calibrationCrystalElectronicsTime, v_calibrationCrystalElectronicsTime,
+                          v_calibrationCrystalElectronicsTimeUnc);
+    } else B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrystalElectronicsTime for current run!");
+  }
+
+  if (m_calibrationCrystalTimeOffset.hasChanged()) {
+    if (m_calibrationCrystalTimeOffset) {
+      callbackCalibration(m_calibrationCrystalTimeOffset, v_calibrationCrystalTimeOffset, v_calibrationCrystalTimeOffsetUnc);
+    } else B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrystalTimeOffset for current run!");
+  }
 
 }
 
@@ -148,21 +191,23 @@ void ECLDigitCalibratorModule::event()
     const int cellid = aECLDigit.getCellId();
 
     // check that the cell id is valid
-    if (cellid < 1 || cellid > c_nCrystals) {
+    if (cellid < 1 or cellid > c_nCrystals) {
       B2FATAL("ECLDigitCalibrationModule::event():" << cellid << " out of range!");
     }
 
-    // perform the digit energy calibration
+    // perform the digit energy calibration: E = A * Ce * Cs
     const int amplitude           = aECLDigit.getAmp();
-    const double calibratedEnergy = getCalibratedEnergy(cellid, amplitude); // Fitted amplitude to GeV
+    double calibratedEnergy = amplitude * v_calibrationCrystalElectronics[cellid - 1] * v_calibrationCrystalEnergy[cellid - 1];
+    if (calibratedEnergy < 0.0) calibratedEnergy = 0.0;
 
-    // perform the digit timing calibration
+    // perform the digit timing calibration: t = c * (tfit - Te - Ts)
     const int time              = aECLDigit.getTimeFit();
     if (time == -2048) aECLCalDigit->addStatus(ECLCalDigit::c_IsFailedFit); //this is used to flag failed fits
-    const double calibratedTime = getCalibratedTime(cellid, time,
-                                                    aECLCalDigit->hasStatus(ECLCalDigit::c_IsFailedFit)); // calibrated time
+    double calibratedTime = m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
+                                                  v_calibrationCrystalTimeOffset[cellid - 1]);
 
-    B2DEBUG(170, "cellid = " << cellid << ", amplitude = " << amplitude << ", energy = " << calibratedEnergy);
+    B2DEBUG(175, "cellid = " << cellid << ", amplitude = " << amplitude << ", energy = " << calibratedEnergy);
+    B2DEBUG(175, "cellid = " << cellid << ", time = " << time << ", calibratedTime = " << calibratedTime);
 
     // fill the ECLCalDigit with the cell id, the calibrated information and calibration status
     aECLCalDigit->setCellId(cellid);
@@ -175,10 +220,6 @@ void ECLDigitCalibratorModule::event()
     // set a relation to the ECLDigit
     aECLCalDigit->addRelationTo(&aECLDigit);
 
-    B2DEBUG(175, "ECLDigitCalibratorModule: Time (raw): " << aECLDigit.getTimeFit() << ", Time (calibrated): " <<
-            aECLCalDigit->getTime() << ", Time resolution (calibrated): " << aECLCalDigit->getTimeResolution());
-    B2DEBUG(175, "ECLDigitCalibratorModule: Amplitude (raw): " << aECLDigit.getAmp() << ", Energy (calibrated): " <<
-            aECLCalDigit->getEnergy());
   }
 
   // determine background level
@@ -210,32 +251,6 @@ void ECLDigitCalibratorModule::endRun()
 void ECLDigitCalibratorModule::terminate()
 {
 
-}
-
-// Energy calibration
-double ECLDigitCalibratorModule::getCalibratedEnergy(int cellid, int amplitude) const
-{
-
-  //for small amplitudes we return zero (to be discussed and coordinated with digitizer development)
-  if (amplitude <= c_MinimumAmplitude) return c_energyForSmallAmplitude;
-
-  double calenergy = static_cast<double>(amplitude) * m_calibrationEnergyHighRatio.at(cellid);
-
-  return calenergy;
-}
-
-// Time calibration
-double ECLDigitCalibratorModule::getCalibratedTime(const int cellid, const int fittedtime, const bool fitfailed) const
-{
-
-  double caltime = c_timeForFitFailed; // Set the time to zero ("trigger time") in case the waveform fit failed
-  if (!fitfailed) {
-    caltime = m_timeInverseSlope * (fittedtime + m_calibrationTimeOffset[cellid] * Belle2::Unit::ns);  // calibrated time from fit
-    B2DEBUG(175, "ECLDigitCalibratorModule::getCalibratedTime: timeInverseSlope = " << m_timeInverseSlope <<
-            ", calibrationTimeOffset [ns] = " << m_calibrationTimeOffset[cellid] * Belle2::Unit::ns);
-  }
-
-  return caltime;
 }
 
 // Time resolution calibration
@@ -278,77 +293,6 @@ double ECLDigitCalibratorModule::getT99(const int cellid, const double energy, c
           Belle2::Unit::MeV);
 
   return t99;
-}
-
-//// time resolution interpolation
-//double ECLDigitCalibratorModule::getInterpolatedTimeResolution(const double x, const int bin) const
-//{
-//  double interpolation = m_timeResolutionPointResolution[bin] +
-//                         (m_timeResolutionPointResolution[bin + 1] - m_timeResolutionPointResolution[bin]) *
-//                         (x - m_timeResolutionPointX[bin]) / (m_timeResolutionPointX[bin + 1] - m_timeResolutionPointX[bin]);
-//
-//  return interpolation;
-//}
-
-// prepare energy calibration constants (high energy point only)
-void ECLDigitCalibratorModule::prepareEnergyCalibrationConstants()
-{
-
-  std::fill(m_calibrationEnergyHighRatio.begin(), m_calibrationEnergyHighRatio.end(), 0.);
-
-  int nCalibrationHighEnergy = 0;
-
-  for (const ECLDigitEnergyConstants& calHigh : m_calibrationEnergyHigh) {
-    const int cellid       = calHigh.getCellID();
-    const double amplitude = static_cast<double>(calHigh.getAmplitude());
-    const double energy    = static_cast<double>(calHigh.getEnergy());
-
-    if (cellid < 1 || cellid > c_nCrystals) { // check if the cellid is withing range
-      B2FATAL("ECLDigitCalibratorModule::prepareEnergyCalibrationConstants(): high energy: Wrong cell id [0.." << c_nCrystals << "]: " <<
-              cellid);
-      continue;
-    } else if (m_calibrationEnergyHighRatio[cellid] > 1.e-5) {
-      B2ERROR("ECLDigitCalibratorModule::prepareEnergyCalibrationConstants(): high energy: Constants for cell id " << cellid <<
-              " already filled");
-    } else { // basic checks passed, fill the vector entry
-      if (amplitude) m_calibrationEnergyHighRatio[cellid] = energy / amplitude;
-      nCalibrationHighEnergy++;
-    }
-  }
-
-  // check if all cell ids have a calibration constant
-  if (nCalibrationHighEnergy != c_nCrystals) {
-    B2FATAL("[ECLDigitCalibratorModule::prepareEnergyCalibrationConstants()], high energy: Not all cells have valid high energy calibration constants!");
-  }
-
-}
-
-// Prepare time calibration constants.
-void ECLDigitCalibratorModule::prepareTimeCalibrationConstants()
-{
-
-  std::fill(m_calibrationTimeOffset.begin(), m_calibrationTimeOffset.end(), 0.);
-  int nCalibrationTime = 0;
-
-  for (const ECLDigitTimeConstants& calTime : m_calibrationTime) {
-    const int cellid    = calTime.getCellID();
-    const double offset = static_cast<double>(calTime.getOffset());
-
-    if (cellid < 1 || cellid > c_nCrystals) { // check if the cellid is withing range
-      B2FATAL("ECLDigitCalibratorModule::prepareTimeCalibrationConstants(): Wrong cell id [0.." << c_nCrystals << "]: " <<
-              cellid);
-      continue;
-    } else { // basic checks passed, fill the vector entry
-      m_calibrationTimeOffset[cellid] = offset;
-      nCalibrationTime++;
-    }
-  }
-
-  // Check if all cell ids have a calibration constant.
-  if (nCalibrationTime != c_nCrystals) {
-    B2FATAL("[ECLDigitCalibratorModule::prepareTimeCalibrationConstants()], time: Not all cells have valid time calibration constants!");
-  }
-
 }
 
 // Determine background level by event by counting out-of-time digits above threshold.

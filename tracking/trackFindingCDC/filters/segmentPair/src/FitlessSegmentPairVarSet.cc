@@ -14,6 +14,8 @@
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 
+#include <tracking/trackFindingCDC/numerics/Angle.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

@@ -11,6 +11,8 @@
 
 #include <tracking/trackFindingCDC/filters/trackRelation/BaseTrackRelationFilter.h>
 
+#include <tracking/trackFindingCDC/numerics/Angle.h>
+
 #include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 

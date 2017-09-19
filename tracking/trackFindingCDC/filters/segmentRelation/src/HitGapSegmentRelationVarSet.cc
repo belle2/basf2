@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
+#include <tracking/trackFindingCDC/numerics/Angle.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

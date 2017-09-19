@@ -17,7 +17,10 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCRLWireHit;
     class CDCTrack;
-    template class Filter<WeightedRelation<CDCTrack, const CDCRLWireHit>>;
+
+    // Guard to prevent repeated instatiations
+    extern template class Filter<WeightedRelation<CDCTrack, const CDCRLWireHit>>;
+
     /// Base filter for stereo hit - track relations.
     using BaseStereoHitFilter = Filter<WeightedRelation<CDCTrack, const CDCRLWireHit>>;
   }

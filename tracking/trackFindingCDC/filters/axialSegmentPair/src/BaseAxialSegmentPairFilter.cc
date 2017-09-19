@@ -13,3 +13,5 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::Filter<CDCAxialSegmentPair>;

@@ -14,7 +14,11 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
-    template class Filter<CDCTrack>;
+
+    // Guard to prevent repeated instatiations
+    extern template class Filter<CDCTrack>;
+
+    /// Base class for track filters
     using BaseTrackFilter = Filter<CDCTrack>;
   }
 }

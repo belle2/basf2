@@ -18,6 +18,8 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+template class TrackFindingCDC::Filter<Relation<const CDCSegment2D> >;
+
 BaseSegmentRelationFilter::BaseSegmentRelationFilter() = default;
 
 BaseSegmentRelationFilter::~BaseSegmentRelationFilter() = default;

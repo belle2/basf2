@@ -19,6 +19,9 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegment2D;
 
+    // Guard to prevent repeated instatiations
+    extern template class Filter<Relation<const CDCSegment2D> >;
+
     /// Base class for filtering the neighborhood of segments
     class BaseSegmentRelationFilter : public Filter<Relation<const CDCSegment2D>> {
 

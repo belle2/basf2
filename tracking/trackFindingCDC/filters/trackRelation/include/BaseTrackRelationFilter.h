@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
@@ -19,6 +19,10 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+
+    // Guard to prevent repeated instatiations
+    extern template class Filter<Relation<const CDCTrack> >;
+
     /// Base class for filtering the neighborhood of tracks
     class BaseTrackRelationFilter : public Filter<Relation<const CDCTrack> > {
 

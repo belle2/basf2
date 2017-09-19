@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
@@ -19,6 +19,10 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+
+    // Guard to prevent repeated instatiations
+    extern template class Filter<Relation<const CDCSegmentPair> >;
+
     /// Base class for filtering the neighborhood of axial stereo segment pairs
     class BaseSegmentPairRelationFilter  : public Filter<Relation<const CDCSegmentPair>> {
 

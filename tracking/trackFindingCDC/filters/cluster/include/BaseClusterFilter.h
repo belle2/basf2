@@ -14,7 +14,11 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCWireHitCluster;
-    template class Filter<CDCWireHitCluster>;
+
+    // Guard to prevent repeated instatiations
+    extern template class Filter<CDCWireHitCluster>;
+
+    /// Base class for wire hit cluster filters
     using BaseClusterFilter = Filter<CDCWireHitCluster>;
   }
 }

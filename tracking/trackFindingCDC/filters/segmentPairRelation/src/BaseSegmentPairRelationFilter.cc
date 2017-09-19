@@ -3,25 +3,15 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Oliver Frost                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
+#include <tracking/trackFindingCDC/filters/segmentPairRelation/BaseSegmentPairRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+using namespace Belle2;
+using namespace TrackFindingCDC;
 
-namespace Belle2 {
-  namespace TrackFindingCDC {
-    class CDCSegment2D;
-    class CDCTrack;
-
-    // Guard to prevent repeated instatiations
-    extern template class Filter<WeightedRelation<CDCTrack, const CDCSegment2D>>;
-
-    /// Base class for segment to track association filters
-    using BaseSegmentTrackFilter = Filter<WeightedRelation<CDCTrack, const CDCSegment2D>>;
-  }
-}
+template class TrackFindingCDC::Filter<Relation<const CDCSegmentPair> >;

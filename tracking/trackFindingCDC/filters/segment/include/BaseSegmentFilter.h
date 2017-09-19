@@ -14,7 +14,10 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegment2D;
-    template class Filter<CDCSegment2D>;
+
+    // Guard to prevent repeated instatiations
+    extern template class Filter<CDCSegment2D>;
+
     /// Base filter to distinguish fake from real segments.
     using BaseSegmentFilter = Filter<CDCSegment2D>;
   }

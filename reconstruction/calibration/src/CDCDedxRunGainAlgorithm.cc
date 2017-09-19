@@ -29,6 +29,7 @@ CDCDedxRunGainAlgorithm::CDCDedxRunGainAlgorithm() : CalibrationAlgorithm("CDCDe
 
 CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
 {
+
   // Get data objects
   auto& means = getObject<TH1F>("means");
 

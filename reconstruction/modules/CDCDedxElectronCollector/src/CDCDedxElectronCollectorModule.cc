@@ -86,7 +86,7 @@ void CDCDedxElectronCollectorModule::collect()
   for (auto track : tracks) {
 
     // clean up cuts -> ONLY FOR COSMICS
-    if (track.getMomentum() < 10.0 or track.getNLayerHits() < 43 or track.getNLayerHits() > 64)
+    if (track.getMomentum() > 10.0 or track.getNLayerHits() < 43 or track.getNLayerHits() > 64)
       continue;
 
     // SPECIAL CORRECTION FOR COSMICS -> REMOVE MOMENTUM DEPENDENCE

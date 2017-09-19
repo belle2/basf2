@@ -15,7 +15,8 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    template class ChooseableFilter<SegmentTripleRelationFilterFactory>;
+    // Guard to prevent repeated instatiations
+    extern template class ChooseableFilter<SegmentTripleRelationFilterFactory>;
     using ChooseableSegmentTripleRelationFilter = ChooseableFilter<SegmentTripleRelationFilterFactory>;
   }
 }

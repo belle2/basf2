@@ -15,6 +15,8 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    // Guard to prevent repeated instatiations
+    extern template class CDCFitter2D<ExtendedRiemannsMethod>;
 
     /// Class implementing the Riemann fit for two dimensional trajectory circle
     class CDCRiemannFitter : public CDCFitter2D<Belle2::TrackFindingCDC::ExtendedRiemannsMethod> {

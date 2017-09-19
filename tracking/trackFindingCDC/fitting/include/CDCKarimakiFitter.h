@@ -14,9 +14,11 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    // Guard to prevent repeated instatiations
+    extern template class CDCFitter2D<KarimakisMethod>;
 
     /// Class implementing the fitter using Karimakis method.
-    class CDCKarimakiFitter : public CDCFitter2D<Belle2::TrackFindingCDC::KarimakisMethod> {
+    class CDCKarimakiFitter : public CDCFitter2D<KarimakisMethod> {
 
     public:
       /// Default constructor

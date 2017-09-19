@@ -21,7 +21,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-template class TrackFindingCDC::UncertainParametersUtil<HelixUtil, EHelixParameter>;
+template struct TrackFindingCDC::UncertainParametersUtil<HelixUtil, EHelixParameter>;
 
 HelixUtil::ParameterVector HelixUtil::reversalSigns()
 {

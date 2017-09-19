@@ -35,6 +35,10 @@ namespace Belle2 {
     /// Importing the enumeration for the namespace but not the constants.
     using ELineParameter = NLineParameterIndices::ELineParameter;
 
+    // Guard to prevent repeated template symbol emission
+    struct LineUtil;
+    extern template struct UncertainParametersUtil<LineUtil, ELineParameter>;
+
     /// Utility struct for functions and types related to the line parameters.
     struct LineUtil : UncertainParametersUtil<LineUtil, ELineParameter> {
 

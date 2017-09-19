@@ -37,6 +37,10 @@ namespace Belle2 {
     /// Importing the enumeration for the namespace but not the constants.
     using EPerigeeParameter = NPerigeeParameterIndices::EPerigeeParameter;
 
+    // Guard to prevent repeated template symbol emission
+    struct PerigeeUtil;
+    extern template struct UncertainParametersUtil<PerigeeUtil, EPerigeeParameter>;
+
     /// Utility struct for functions and types related to the perigee parameters.
     struct PerigeeUtil : UncertainParametersUtil<PerigeeUtil, EPerigeeParameter> {
 

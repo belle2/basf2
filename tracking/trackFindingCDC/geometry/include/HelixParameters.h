@@ -48,6 +48,10 @@ namespace Belle2 {
     /// Importing the enumeration for the namespace but not the constants.
     using EHelixParameter = NHelixParameterIndices::EHelixParameter;
 
+    // Guard to prevent repeated template symbol emission
+    struct HelixUtil;
+    extern template struct UncertainParametersUtil<HelixUtil, EHelixParameter>;
+
     /// Utility struct for functions and types related to the helix parameters.
     struct HelixUtil : UncertainParametersUtil<HelixUtil, EHelixParameter> {
 

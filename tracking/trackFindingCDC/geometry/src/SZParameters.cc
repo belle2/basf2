@@ -14,4 +14,4 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-template class TrackFindingCDC::UncertainParametersUtil<SZUtil, ESZParameter>;
+template struct TrackFindingCDC::UncertainParametersUtil<SZUtil, ESZParameter>;

@@ -16,7 +16,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-template class TrackFindingCDC::UncertainParametersUtil<PerigeeUtil, EPerigeeParameter>;
+template struct TrackFindingCDC::UncertainParametersUtil<PerigeeUtil, EPerigeeParameter>;
 
 double PerigeeUtil::average(const PerigeeParameters& fromPar,
                             const PerigeeCovariance& fromCov,

@@ -16,7 +16,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-template class TrackFindingCDC::UncertainParametersUtil<LineUtil, ELineParameter>;
+template struct TrackFindingCDC::UncertainParametersUtil<LineUtil, ELineParameter>;
 
 double LineUtil::average(const LineParameters& fromPar,
                          const LineCovariance& fromCov,

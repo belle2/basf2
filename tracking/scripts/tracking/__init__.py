@@ -591,7 +591,8 @@ def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", compo
     # add a suffix to be able to have different
     vxd_trackcands = '__VXDGFTrackCands' + suffix
 
-    vxd_trackfinder = path.add_module('VXDTF', GFTrackCandidatesColName=vxd_trackcands)
+    vxd_trackfinder = path.add_module('VXDTF',
+                                      GFTrackCandidatesColName=vxd_trackcands)
     vxd_trackfinder.param('svdClustersName', svd_clusters)
     # WARNING: workaround for possible clashes between fitting and VXDTF
     # stays until the redesign of the VXDTF is finished.
@@ -805,14 +806,11 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2=Fa
 
     # SVD ONLY TRACK FINDING
     if(use_vxdtf2):
-        add_vxd_track_finding_vxdtf2(
-            path,
-            svd_clusters=svd_cluster,
-            components=['SVD'],
-            reco_tracks=svd_reco_tracks,
-            suffix="__ROI")
+        add_vxd_track_finding_vxdtf2(path, components=['SVD'], reco_tracks=svd_reco_tracks, suffix="__ROI",
+                                     svd_clusters=svd_cluster)
     else:
-        add_vxd_track_finding(path, svd_clusters=svd_cluster, components=['SVD'], reco_tracks=svd_reco_tracks, suffix="__ROI")
+        add_vxd_track_finding(path, components=['SVD'], reco_tracks=svd_reco_tracks, suffix="__ROI",
+                              svd_clusters=svd_cluster)
 
     # TRACK FITTING
 

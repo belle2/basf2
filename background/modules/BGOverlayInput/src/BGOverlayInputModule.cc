@@ -59,6 +59,8 @@ namespace Belle2 {
     // Add parameters
     addParam("inputFileNames", m_inputFileNames,
              "List of files with measured beam background ");
+    addParam("extensionName", m_extensionName,
+             "name added to default branch names", string("_beamBG"));
 
   }
 
@@ -114,6 +116,7 @@ namespace Belle2 {
     descr.fileNames = m_inputFileNames;
     descr.numEvents = m_numEvents;
     m_index = bkgInfo->appendBackgroundDescr(descr);
+    bkgInfo->setExtensionName(m_extensionName);
 
   }
 
@@ -198,7 +201,7 @@ namespace Belle2 {
         continue;
       }
 
-      std::string name = branchName + "_BG";
+      std::string name = branchName + m_extensionName;
       bool ok = DataStore::Instance().registerEntry(name, durability, objClass,
                                                     array, storeFlags);
       if (!ok) {

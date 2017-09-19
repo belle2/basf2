@@ -141,6 +141,13 @@ namespace Belle2 {
     void setMaxEdepECL(double maxEdepECL) {m_maxEdepECL = maxEdepECL;}
 
     /**
+     * Set name that is added to default branch names of background collections
+     * Used primarily to pass this name from BGOverlayInput to BGOverlayExecutor module
+     * @param name extension name
+     */
+    void setExtensionName(const std::string& name) {m_extensionName = name;}
+
+    /**
      * Increments sample reused counter
      * @param index element index in std::vector
      */
@@ -216,6 +223,13 @@ namespace Belle2 {
     double getMaxEdepECL() const {return m_maxEdepECL;}
 
     /**
+     * Returns name added to default branch names of background collections
+     * Used primarily to pass this name from BGOverlayInput to BGOverlayExecutor module
+     * @return extension name
+     */
+    const std::string& getExtensionName() const {return m_extensionName;}
+
+    /**
      * Implementation of abstract class function
      */
     virtual void merge(const Mergeable* other);
@@ -260,8 +274,9 @@ namespace Belle2 {
     double m_maxTimePXD = 0;  /**< maximal time shift of background event for PXD */
     bool m_wrapAround = false; /**< wrap around events in the tail after maxTime */
     double m_maxEdepECL = 0;  /**< maximal allowed deposited energy in ECL */
+    std::string m_extensionName; /**< name added to default branch names of background */
 
-    ClassDef(BackgroundInfo, 3); /**< Class definition */
+    ClassDef(BackgroundInfo, 4); /**< Class definition */
   };
 }
 

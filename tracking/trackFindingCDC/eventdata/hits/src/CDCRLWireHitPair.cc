@@ -16,7 +16,7 @@
 
 #include <tracking/trackFindingCDC/numerics/ERightLeft.h>
 
-#include <algorithm>
+#include <utility>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

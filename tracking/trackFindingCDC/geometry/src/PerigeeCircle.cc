@@ -21,6 +21,7 @@
 #include <tracking/trackFindingCDC/numerics/Angle.h>
 
 #include <ostream>
+#include <utility>
 #include <cmath>
 
 namespace Belle2 {

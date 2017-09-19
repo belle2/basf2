@@ -36,6 +36,7 @@
 #include <framework/logging/Logger.h>
 
 #include <algorithm>
+#include <utility>
 #include <cmath>
 
 namespace Belle2 {

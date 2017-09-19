@@ -15,6 +15,8 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
 
+    extern template class CDCMCHitCollectionLookUp<CDCTrack>;
+
     /// Specialisation of the lookup for the truth values of reconstructed tracks.
     class CDCMCTrackLookUp  : public CDCMCHitCollectionLookUp<CDCTrack> {
 

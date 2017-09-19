@@ -15,6 +15,8 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegment3D;
 
+    extern template class CDCMCHitCollectionLookUp<CDCSegment3D>;
+
     /// Specialisation of the lookup for the truth values of two dimensional segments.
     class CDCMCSegment3DLookUp : public CDCMCHitCollectionLookUp<CDCSegment3D> {
 

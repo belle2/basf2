@@ -9,16 +9,22 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/Circle2D.h>
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackFindingCDC/numerics/ERotation.h>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
+
+#include <utility>
 #include <iosfwd>
 #include <cmath>
 
 namespace Belle2 {
 
   namespace TrackFindingCDC {
+    class Circle2D;
 
     /**
      *  A generalized circle.

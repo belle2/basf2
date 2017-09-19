@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
+#include <string>
 #include <iosfwd>
 #include <cmath>
 

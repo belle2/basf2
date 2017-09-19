@@ -12,7 +12,7 @@
 #include <TVector2.h>
 
 #include <sstream>
-#include <iostream>
+#include <ostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

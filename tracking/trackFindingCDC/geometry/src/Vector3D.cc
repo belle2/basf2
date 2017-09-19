@@ -9,10 +9,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
 #include <TVector3.h>
 
 #include <sstream>
-#include <iostream>
+#include <ostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

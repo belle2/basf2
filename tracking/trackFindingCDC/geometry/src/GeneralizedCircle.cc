@@ -7,12 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
+
+#include <tracking/trackFindingCDC/geometry/Circle2D.h>
+#include <tracking/trackFindingCDC/geometry/Line2D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackFindingCDC/numerics/ERotation.h>
+
 #include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
 #include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
-#include <iostream>
+#include <ostream>
 #include <cmath>
 
 using namespace Belle2;

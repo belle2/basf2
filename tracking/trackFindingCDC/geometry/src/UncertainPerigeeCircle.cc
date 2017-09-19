@@ -9,7 +9,10 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
 
+#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
+
+#include <ostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -33,4 +36,12 @@ UncertainPerigeeCircle::average(const UncertainPerigeeCircle& fromPerigeeCircle,
   size_t ndf = 3;
 
   return UncertainPerigeeCircle(avgPar, avgCov, chi2, ndf);
+}
+
+std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const UncertainPerigeeCircle& circle)
+{
+  return output << "UncertainPerigeeCircle("
+         << "curvature=" << circle->curvature() << ","
+         << "phi0=" << circle->phi0() << ","
+         << "impact=" << circle->impact() << ")";
 }

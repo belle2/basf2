@@ -16,6 +16,7 @@
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
+#include <iosfwd>
 #include <cmath>
 
 namespace Belle2 {
@@ -325,17 +326,6 @@ namespace Belle2 {
         return m_szLine;
       }
 
-      /// Debug helper
-      friend std::ostream& operator<<(std::ostream& output, const Helix& helix)
-      {
-        return output << "Helix("
-               << "curv=" << helix.curvatureXY() << ","
-               << "phi0=" << helix.phi0() << ","
-               << "impact=" << helix.impactXY() << ","
-               << "tanL=" << helix.tanLambda() << ","
-               << "z0=" << helix.z0() << ")";
-      }
-
     private:
       /// Memory of the projection of the helix in xy space.
       PerigeeCircle m_circleXY;
@@ -346,5 +336,7 @@ namespace Belle2 {
 
     };
 
+    /// Debug helper
+    std::ostream& operator<<(std::ostream& output, const Helix& helix);
   }
 }

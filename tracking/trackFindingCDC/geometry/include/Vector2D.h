@@ -16,6 +16,8 @@
 #include <tracking/trackFindingCDC/numerics/ERotation.h>
 #include <tracking/trackFindingCDC/numerics/ESign.h>
 
+#include <algorithm>
+#include <string>
 #include <iosfwd>
 #include <cmath>
 

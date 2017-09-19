@@ -13,16 +13,20 @@
 
 #include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
 #include <tracking/trackFindingCDC/geometry/UncertainSZLine.h>
+#include <tracking/trackFindingCDC/geometry/SZLine.h>
 
 #include <tracking/trackFindingCDC/geometry/HelixParameters.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
 #include <tracking/trackFindingCDC/geometry/SZParameters.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
-#include <cmath>
+#include <cstddef>
+#include <iosfwd>
 
 namespace Belle2 {
 
   namespace TrackFindingCDC {
+    class Vector3D;
 
     /// A general helix class including a covariance matrix.
     class UncertainHelix {
@@ -328,13 +332,6 @@ namespace Belle2 {
         return arcLength2D;
       }
 
-    public:
-      /// Debug helper
-      friend std::ostream& operator<<(std::ostream& output, const UncertainHelix& uncertainHelix)
-      {
-        return output << "Uncertain" << uncertainHelix.helix();
-      }
-
     private:
       /// Memory for the underlying helix
       Helix m_helix;
@@ -350,5 +347,7 @@ namespace Belle2 {
 
     };
 
+    /// Debug helper
+    std::ostream& operator<<(std::ostream& output, const UncertainHelix& uncertainHelix);
   }
 }

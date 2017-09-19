@@ -9,11 +9,15 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/geometry/UncertainHelix.h>
 
+#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
+
+#include <tracking/trackFindingCDC/geometry/Helix.h>
+
 #include <tracking/trackFindingCDC/geometry/HelixParameters.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
 #include <tracking/trackFindingCDC/geometry/SZParameters.h>
 
-#include <cmath>
+#include <ostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -88,4 +92,9 @@ UncertainHelix UncertainHelix::average(const UncertainPerigeeCircle& fromPerigee
   size_t ndf = 1;
 
   return UncertainHelix(avgPar, avgCov, chi2, ndf);
+}
+
+std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const UncertainHelix& uncertainHelix)
+{
+  return output << "Uncertain" << uncertainHelix.helix();
 }

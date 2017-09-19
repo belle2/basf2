@@ -9,7 +9,9 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 
-#include <iostream>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <ostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

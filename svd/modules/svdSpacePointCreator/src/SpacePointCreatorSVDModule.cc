@@ -7,9 +7,9 @@
  *                                                                        *
  **************************************************************************/
 
-#include <tracking/modules/spacePointCreator/SpacePointCreatorSVDModule.h>
+#include <svd/modules/svdSpacePointCreator/SpacePointCreatorSVDModule.h>
 
-#include <tracking/spacePointCreation/SpacePointHelperFunctions.h>
+#include <svd/modules/svdSpacePointCreator/SpacePointHelperFunctions.h>
 
 #include <framework/logging/Logger.h>
 

@@ -61,23 +61,6 @@ namespace Belle2 {
   };
 
 
-  /** store a spacePoint for given Cluster.
-   *
-   * for SVDClusters use the functions provideSVDClusterSingles(.) or provideSVDClusterCombinations(.) instead.
-   *
-   * first parameter is a storeArray containing Clusters (e.g. PXD or Tel).
-   * second parameter is a storeArra containing a version of spacePoints (will be filled in the function).
-   */
-  template <class ClusterType, class SpacePointType> inline void storeSingleCluster(
-    const StoreArray<ClusterType>& clusters,
-    StoreArray<SpacePointType>& spacePoints)
-  {
-    for (unsigned int i = 0; i < uint(clusters.getEntries()); ++i) {
-      const ClusterType* currentCluster = clusters[i];
-      SpacePointType* newSP = spacePoints.appendNew((currentCluster));
-      newSP->addRelationTo(currentCluster);
-    }
-  }
 
 
 

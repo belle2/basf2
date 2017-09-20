@@ -7,9 +7,7 @@
  *                                                                        *
  **************************************************************************/
 
-#include <tracking/modules/spacePointCreator/SpacePointCreatorPXDModule.h>
-
-#include <tracking/spacePointCreation/SpacePointHelperFunctions.h>
+#include <pxd/modules/pxdSpacePointCreator/SpacePointCreatorPXDModule.h>
 
 #include <framework/logging/Logger.h>
 
@@ -69,8 +67,11 @@ void SpacePointCreatorPXDModule::initialize()
 void SpacePointCreatorPXDModule::event()
 {
 
-  storeSingleCluster(m_pxdClusters, m_spacePoints);
-
+  for (unsigned int i = 0; i < uint(m_pxdClusters.getEntries()); ++i) {
+    const PXDCluster* currentCluster = m_pxdClusters[i];
+    SpacePoint* newSP = m_spacePoints.appendNew((currentCluster));
+    newSP->addRelationTo(currentCluster);
+  }
 
   B2DEBUG(1, "SpacePointCreatorPXDModule(" << m_nameOfInstance << ")::event: spacePoints created! Size of arrays:\n" <<
           "pxdClusters: " << m_pxdClusters.getEntries() <<
@@ -111,3 +112,6 @@ void SpacePointCreatorPXDModule::InitializeCounters()
   m_TESTERPXDClusterCtr = 0;
   m_TESTERSpacePointCtr = 0;
 }
+
+
+

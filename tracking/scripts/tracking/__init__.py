@@ -419,8 +419,8 @@ def add_ckf_based_track_finding(path, reco_tracks="RecoTracks",
                                 svd_reco_tracks="SVDRecoTracks",
                                 pxd_reco_tracks="PXDRecoTracks",
                                 use_mc_truth=False,
-                                add_merger=False,
-                                add_vxdtf2=False,
+                                add_merger=True,
+                                add_vxdtf2=True,
                                 components=None):
     """
     First approach to add the CKF to the path with all the track finding related and needed

@@ -163,8 +163,6 @@ static int getNode(const char* const node, SnmpObject* object);
 static int getIndexNode(const char* const nodeBase, int index, SnmpObject* object);
 
 
-static int mpodInit = 1;
-HSNMP crateHsnmp[MAX_CRATES];
 
 #ifdef MPOD_MAIN
 #ifdef _WINDOWS
@@ -175,94 +173,104 @@ int main(int argc , char**   argv)
 #endif
 
 {
-
+#define MAX_CRATES 3
+  HSNMP crates[MAX_CRATES];
   double ret;
 //  double voltage;
   double vSet = 0;
   int ch = 200;
   int iret;
   char cret[2000];
-
-  HSNMP crate1;
+  HSNMP crate;
 
 #ifdef _CVIs_
   if (InitCVIRTE(hInstance, 0, 0) == 0) return -1;     /* out of memory */
 #endif
 
   MPOD_Start();
-//  MPOD_Open(0,"arich-mpod1.kek.jp");
-  MPOD_Open(0, "f9mpod.ijs.si");
-  MPOD_Open(1, "f9mpod2.ijs.si");
-  crate1 = crateHsnmp[1];
+
+
+
+
 
   printf("-----------------------------------------------------------------\n");
   /*
     for (i=0;i<8;i++) {
-      setChannelSwitch(crate1, i, 0);
-    setOutputVoltage(crate1, i, 0.);
-      setChannelSwitch(crate1, 100+i, 0);
-    setOutputVoltage(crate1, 100+i, 0.);
+      setChannelSwitch(crate, i, 0);
+    setOutputVoltage(crate, i, 0.);
+      setChannelSwitch(crate, 100+i, 0);
+    setOutputVoltage(crate, 100+i, 0.);
     }
   */
-  strcpy(cret, MPOD_GetString(0, "moduleDescription.ma2"));
-  printf("Module type: %s\n", cret);
+  const char hosts[][255] = {"f9mpod2.ijs.si", "f9mpod.ijs.si", "arich-mpod1.kek.jp"};
+  for (int i = 0; i < MAX_CRATES; i++) {
+    crates[i] =  NULL;
+    crates[i] =  MPOD_Open(hosts[i]);
+    if (!crates[i]) continue;
+    iret = getMainSwitch(crates[i]);
+    printf("Main Switch Crate %d= %i\n", i, iret);
+    if (!iret) continue;
 
-  iret = getMainSwitch(crate1);
-  printf("Main Switch = %i\n", iret);
+    iret = MPOD_GetIntCh(crates[i], "fanNominalSpeed", 0);
+    printf("Fan nominal speed = %i\n", iret);
+    printf("Number of modules = %i\n", MPOD_GetIntCh(crates[i], "moduleNumber", 0));
+    for (int module = 0; module < MaxSlotsPerCrate; module++) {
+      printf("ModuleDescription crate %d module %d =>%s\n", i, module, getModuleDescription(crates[i], module));
+    }
+  }
+  crate = crates[0];
+
+
+
 
 //  iret=MPOD_GetInt(0,"moduleNumber.0");
-  iret = MPOD_GetIntCh(0, "moduleNumber", 0);
-  printf("Module Number = %i\n", iret);
 
-  iret = MPOD_GetIntCh(0, "fanNominalSpeed", 0);
-  printf("Fan nominal speed = %i\n", iret);
-
-  ret = MPOD_GetDouble(0, "outputVoltage.201");
+  ret = MPOD_GetDouble(crate, "outputVoltage.201");
   printf("Output Voltage = %f.\n", ret);
 
-  setOutputVoltage(crate1, ch, 9000.);
+  setOutputVoltage(crate, ch, 9000.);
 //  vSet = getOutputVoltage(crate1, ch);
-  vSet = MPOD_GetDoubleCh(0, "outputVoltage", ch + 1);
+  vSet = MPOD_GetDoubleCh(crate, "outputVoltage", ch + 1);
   printf("Output Voltage %i = %f.\n", ch, vSet);
 
 //Test Channel Status
-  iret = getChannelSwitch(crate1, ch);
+  iret = getChannelSwitch(crate, ch);
   printf("Channel Status %i = %i\n", ch, iret);
 
 //Test Reading the Sense Measurement
-  ret = getOutputSenseMeasurement(crate1, ch);
+  ret = getOutputSenseMeasurement(crate, ch);
   printf("Sense Voltage =  %f\n", ret);
 
 //Test Reading the Current
-  ret = getCurrentMeasurement(crate1, ch);
+  ret = getCurrentMeasurement(crate, ch);
   printf("Current Measurement =  %f\n", ret);
 
   printf("Turning channel %i ON\n", ch);
-  setChannelSwitch(crate1, ch, 1);
+  setChannelSwitch(crate, ch, 1);
   Delay(1);
 
 //Test Channel Status
-  iret = getChannelSwitch(crate1, ch);
+  iret = getChannelSwitch(crate, ch);
   printf("Channel Status %i = %i\n", ch, iret);
 
 //Test Reading the Sense Measurement
-  ret = getOutputSenseMeasurement(crate1, ch);
+  ret = getOutputSenseMeasurement(crate, ch);
   printf("Sense Voltage =  %f\n", ret);
 
 //Test Reading the Current
-  ret = getCurrentMeasurement(crate1, ch);
+  ret = getCurrentMeasurement(crate, ch);
   printf("Current Measurement =  %f\n", ret);
 
   getchar();
 
   printf("Turning channel %i OFF\n", ch);
-  setChannelSwitch(crate1, ch, 0);
+  setChannelSwitch(crate, ch, 0);
 
   printf("-----------------------------------------------------------------\n");
 
   Delay(1);
 
-  MPOD_Close(0);
+  MPOD_Close(crate);
   MPOD_End();
 
   return 0;
@@ -272,122 +280,106 @@ int main(int argc , char**   argv)
 
 int _VI_FUNC MPOD_Start(void)
 {
-  int i;
-  if (mpodInit) {
-    for (i = 0; i < MAX_CRATES; i++) crateHsnmp[i] = NULL;
-    if (!snmpInit()) return -1;                    // basic init
-    mpodInit = 0;
-  }
-  return 0;
+  return (snmpInit());                     // basic init
 }
 
-int _VI_FUNC MPOD_Open(int mpodn, const char* address)
+HSNMP _VI_FUNC MPOD_Open(const char* address)
 {
-  if (crateHsnmp[mpodn]) {
-    printf("Crate number %i already in use!\n", mpodn);
-    return -2;
-  }
-  crateHsnmp[mpodn] = snmpOpen(address);   // open TCP/IP socket
-  //printf("hsnmp %d\n",crateHsnmp[mpodn] );
-  if (crateHsnmp[mpodn] == NULL) return -1;
-  return 0;
+  return  snmpOpen(address);   // open TCP/IP socket
 }
 
-int _VI_FUNC MPOD_GetInt(int mpodn, const char* oidstr)
+int _VI_FUNC MPOD_GetInt(HSNMP mpodn, const char* oidstr)
 {
   SnmpObject tmpObject;
-  if (!crateHsnmp[mpodn]) return 0;
+  if (!mpodn) return 0;
   getNode(oidstr, &tmpObject);
-  return snmpGetInt(crateHsnmp[mpodn], &tmpObject);
+  return snmpGetInt(mpodn, &tmpObject);
 }
 
-int _VI_FUNC MPOD_SetInt(int mpodn, const char* oidstr, int iset)
+int _VI_FUNC MPOD_SetInt(HSNMP mpodn, const char* oidstr, int iset)
 {
   SnmpObject tmpObject;
-  if (!crateHsnmp[mpodn]) return 0;
+  if (!mpodn) return 0;
   getNode(oidstr, &tmpObject);
-  return snmpSetInt(crateHsnmp[mpodn], &tmpObject, iset);
+  return snmpSetInt(mpodn, &tmpObject, iset);
 }
 
-double _VI_FUNC MPOD_GetDouble(int mpodn, const char* oidstr)
+double _VI_FUNC MPOD_GetDouble(HSNMP mpodn, const char* oidstr)
 {
   SnmpObject tmpObject;
-  if (!crateHsnmp[mpodn]) return 0;
+  if (!mpodn) return 0;
   getNode(oidstr, &tmpObject);
-  return snmpGetDouble(crateHsnmp[mpodn], &tmpObject);
+  return snmpGetDouble(mpodn, &tmpObject);
 }
 
-double _VI_FUNC MPOD_SetDouble(int mpodn, const char* oidstr, double dset)
+double _VI_FUNC MPOD_SetDouble(HSNMP mpodn, const char* oidstr, double dset)
 {
   SnmpObject tmpObject;
-
+  if (!mpodn) return 0;
   getNode(oidstr, &tmpObject);
-  return snmpSetDouble(crateHsnmp[mpodn], &tmpObject, dset);
+  return snmpSetDouble(mpodn, &tmpObject, dset);
 }
 
-char* _VI_FUNC MPOD_GetString(int mpodn, const char* oidstr)
+char* _VI_FUNC MPOD_GetString(HSNMP mpodn, const char* oidstr)
 {
   SnmpObject tmpObject;
-  if (!crateHsnmp[mpodn]) return 0;
+  if (!mpodn) return 0;
   getNode(oidstr, &tmpObject);
-  return snmpGetString(crateHsnmp[mpodn], &tmpObject);
+  return snmpGetString(mpodn, &tmpObject);
 }
 
-int _VI_FUNC MPOD_GetIntCh(int mpodn, const char* oidstrbase, int ich)
+int _VI_FUNC MPOD_GetIntCh(HSNMP mpodn, const char* oidstrbase, int ich)
 {
   SnmpObject tmpObject;
-  if (!crateHsnmp[mpodn]) return 0;
+  if (!mpodn) return 0;
   getIndexNode(oidstrbase, ich, &tmpObject);
-  return snmpGetInt(crateHsnmp[mpodn], &tmpObject);
+  return snmpGetInt(mpodn, &tmpObject);
 }
 
-int _VI_FUNC MPOD_SetIntCh(int mpodn, const char* oidstrbase, int ich, int iset)
+int _VI_FUNC MPOD_SetIntCh(HSNMP mpodn, const char* oidstrbase, int ich, int iset)
 {
   SnmpObject tmpObject;
-  if (!crateHsnmp[mpodn]) return 0;
+  if (!mpodn) return 0;
   getIndexNode(oidstrbase, ich, &tmpObject);
-  return snmpSetInt(crateHsnmp[mpodn], &tmpObject, iset);
+  return snmpSetInt(mpodn, &tmpObject, iset);
 }
 
-double _VI_FUNC MPOD_GetDoubleCh(int mpodn, const char* oidstrbase, int ich)
+double _VI_FUNC MPOD_GetDoubleCh(HSNMP mpodn, const char* oidstrbase, int ich)
 {
   SnmpObject tmpObject;
-  if (!crateHsnmp[mpodn]) return 0;
+  if (!mpodn) return 0;
   getIndexNode(oidstrbase, ich, &tmpObject);
-  return snmpGetDouble(crateHsnmp[mpodn], &tmpObject);
+  return snmpGetDouble(mpodn, &tmpObject);
 }
 
-double _VI_FUNC MPOD_SetDoubleCh(int mpodn, const char* oidstrbase, int ich,
+double _VI_FUNC MPOD_SetDoubleCh(HSNMP mpodn, const char* oidstrbase, int ich,
                                  double dset)
 {
   SnmpObject tmpObject;
-
+  if (!mpodn) return 0;
   getIndexNode(oidstrbase, ich, &tmpObject);
-  return snmpSetDouble(crateHsnmp[mpodn], &tmpObject, dset);
+  return snmpSetDouble(mpodn, &tmpObject, dset);
 }
 
-char* _VI_FUNC MPOD_GetStringCh(int mpodn, const char* oidstrbase, int ich)
+char* _VI_FUNC MPOD_GetStringCh(HSNMP mpodn, const char* oidstrbase, int ich)
 {
   SnmpObject tmpObject;
-  if (!crateHsnmp[mpodn]) return 0;
+  if (!mpodn) return 0;
   getIndexNode(oidstrbase, ich, &tmpObject);
-  return snmpGetString(crateHsnmp[mpodn], &tmpObject);
+  return snmpGetString(mpodn, &tmpObject);
 }
 
-int _VI_FUNC MPOD_Close(int mpodn)
+int _VI_FUNC MPOD_Close(HSNMP mpodn)
 {
-  if (!crateHsnmp[mpodn]) return 0;
-  snmpClose(crateHsnmp[mpodn]);
-  crateHsnmp[mpodn] = NULL;
+  if (!mpodn) return 0;
+  snmpClose(mpodn);
+  mpodn = NULL;
   return 0;
 }
 
 int _VI_FUNC MPOD_End(void)
 {
-  if (!mpodInit) {
-    snmpCleanup();  // finish
-    mpodInit = 1;
-  }
+  snmpCleanup();  // finish
   return 0;
 }
 
@@ -727,8 +719,12 @@ HSNMP snmpOpen(const char* const ipAddress)
   snmp_sess_init(&snmpSession);                  // structure defaults
   snmpSession.version = SNMP_VERSION_2c;
   snmpSession.peername = strdup(ipAddress);
-  snmpSession.community = (u_char*)strdup(m_readCommunity);
-  snmpSession.community_len = strlen(m_readCommunity);
+  /*
+    snmpSession.community = (u_char*)strdup(m_readCommunity);
+    snmpSession.community_len = strlen(m_readCommunity);
+  */
+  snmpSession.community = (u_char*)strdup(m_writeCommunity);
+  snmpSession.community_len = strlen(m_writeCommunity);
 
   snmpSession.timeout = 300000;   // timeout (us)
   snmpSession.retries = 2;        // retries
@@ -1027,9 +1023,8 @@ int setChannelSwitch(HSNMP session, int channel, int value)
  */
 int setOutputSwitch(HSNMP session, int channel, int value)
 {
-  if (channel < 0 || channel >= MaxChannelsPerCrate)
-    return 0;
-
+  if (channel < 0 || channel >= MaxChannelsPerCrate) return 0;
+  printf("setOutputSwitch ch=%d =>%d", channel, value);
   return snmpSetInt(session, &outputSwitch[channel], value);
 }
 
@@ -2014,7 +2009,7 @@ static int snmpGetInt(HSNMP session, const SnmpObject* object)
     value = getIntegerVariable(response->variables);
   } else {
     logErrors(session, response, object, status, "snmpGetInt");
-    return 0;
+    return -1;
   }
 
   snmp_free_pdu(response);
@@ -2038,7 +2033,7 @@ static int snmpSetInt(HSNMP session, const SnmpObject* object, int value)
     result = getIntegerVariable(response->variables);
   } else {
     logErrors(session, response, object, status, "snmpSetInt");
-    return 0;
+    return -1;
   }
 
   snmp_free_pdu(response);
@@ -2060,7 +2055,7 @@ static double snmpGetDouble(HSNMP session, const SnmpObject* object)
     value = getDoubleVariable(response->variables);
   } else {
     logErrors(session, response, object, status, "snmpGetDouble");
-    return 0;
+    return -1;
   }
 
   snmp_free_pdu(response);
@@ -2083,7 +2078,7 @@ static double snmpSetDouble(HSNMP session, const SnmpObject* object, double valu
     result = getDoubleVariable(response->variables);
   } else {
     logErrors(session, response, object, status, "snmpSetDouble");
-    return 0;
+    return -1;
   }
 
   snmp_free_pdu(response);
@@ -2113,7 +2108,7 @@ static char* snmpGetString(HSNMP session, const SnmpObject* object)
     }
   } else {
     logErrors(session, response, object, status, "snmpGetString");
-    return 0;
+    return NULL;
   }
 
   snmp_free_pdu(response);

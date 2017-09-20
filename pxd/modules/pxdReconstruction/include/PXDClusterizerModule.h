@@ -129,8 +129,8 @@ namespace Belle2 {
       /** Size of the cluster at which we switch from Center of Gravity to Analog Head Tail */
       int m_sizeHeadTail;
 
-      /** Apply recognition of cluster shape and set its ID */
-      bool m_useClusterShape;
+      /** Do not aply recognition of cluster shape and set its ID */
+      bool m_notUseClusterShape;
 
       /** Size of cluster Cache (0 = default) */
       int m_clusterCacheSize;

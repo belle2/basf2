@@ -25,14 +25,31 @@ class QAM():
         #: input file name
         self.f = TFile(fname)
         #: Histograms for helix parameters etc...
-        self.histHelix = {'ndf': [self.f.Get('h0{0};1'.format(i)) for i in range(2)],
-                          'pval': [self.f.Get('h0{0};1'.format(i)) for i in range(2, 4)],
-                          'd0': [self.f.Get('h0{0};1'.format(i)) for i in range(4, 6)],
-                          'phi0': [self.f.Get('h12;1')],
-                          'omega': [self.f.Get('h3;1')],
-                          'z0': [self.f.Get('h14;1')],
-                          'tanl': [self.f.Get('h15;1')],
-                          'pt': [self.f.Get('h16;1')]}
+        self.histHelix = {'ndf': {'all': self.f.Get('h17;1'),
+                                  'up': self.f.Get('h00;1'),
+                                  'down': self.f.Get('h01;1')},
+                          'pval': {'all': self.f.Get('h18;1'),
+                                   'up': self.f.Get('h02;1'),
+                                   'down': self.f.Get('h03;1')},
+                          'd0': {'all': self.f.Get('h11;1'),
+                                 'up': self.f.Get('h04;1'),
+                                 'down': self.f.Get('h05;1')},
+                          'phi0': {'all': self.f.Get('h12;1'),
+                                   'up': self.f.Get('h06;1'),
+                                   'down': self.f.Get('h07;1')},
+                          'omega': {'all': self.f.Get('h13;1'),
+                                    'up': self.f.Get('h08;1'),
+                                    'down': self.f.Get('h09;1')},
+                          'z0': {'all': self.f.Get('h14;1'),
+                                 'up': self.f.Get('h0a;1'),
+                                 'down': self.f.Get('h0b;1')},
+                          'tanl': {'all': self.f.Get('h15;1'),
+                                   'up': self.f.Get('h0c;1'),
+                                   'down': self.f.Get('h0d;1')},
+                          'pt': {'all': self.f.Get('h16;1'),
+                                 'up': self.f.Get('h0e;1'),
+                                 'down': self.f.Get('h0f;1')}
+                          }
 
         #: Resolution histograms
         self.histReso = {'d0': self.f.Get('h1;1'),
@@ -88,11 +105,11 @@ class QAM():
         self.histReso[key].Draw()
         self.canvas.Update()
 
-    def draw(self, key='pt'):
+    def draw(self, key='pt', option='all', gopt=''):
         '''
         Plot histogram of helix parameters etc..
         '''
-        (self.histHelix[key])[0].Draw()
+        self.histHelix[key][option].Draw(gopt)
         self.canvas.Update()
 
 

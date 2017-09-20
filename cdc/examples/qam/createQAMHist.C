@@ -34,12 +34,22 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
   TVector3* posSeed1 = 0;
   TVector3* posSeed2 = 0;
 
-  TH1F* h00 = new TH1F("h00", "ndf", 100, 0.0, 100.0);
-  TH1F* h01 = new TH1F("h01", "ndf", 100, 0.0, 100.0);
+  TH1F* h00 = new TH1F("h00", "ndf (up)", 100, 0.0, 100.0);
+  TH1F* h01 = new TH1F("h01", "ndf (down)", 100, 0.0, 100.0);
   TH1F* h02 = new TH1F("h02", "pval (up)", 100, 0.0, 1.0);
   TH1F* h03 = new TH1F("h03", "pval (down)", 100, 0.0, 1.0);
   TH1F* h04 = new TH1F("h04", "d0 (up)", 100, -10.0, 10.0);
   TH1F* h05 = new TH1F("h05", "d0 (down)", 100, -10.0, 10.0);
+  TH1F* h06 = new TH1F("h06", "phi0 (up)", 100, -180.0, 180.0);
+  TH1F* h07 = new TH1F("h07", "phi0 (down)", 100, -180.0, 180.0);
+  TH1F* h08 = new TH1F("h08", "Omega (up)", 100, -0.015, 0.015);
+  TH1F* h09 = new TH1F("h09", "Omega (down)", 100, -0.015, 0.015);
+  TH1F* h0a = new TH1F("h0a", "z0 (up)", 100, -20.0, 20.0);
+  TH1F* h0b = new TH1F("h0b", "z0 (down)", 100, -20.0, 20.0);
+  TH1F* h0c = new TH1F("h0c", "tan lambda (up)", 100, -2.0, 2.0);
+  TH1F* h0d = new TH1F("h0d", "tan lambda (down)", 100, -2.0, 2.0);
+  TH1F* h0e = new TH1F("h0e", "Pt (up)", 100, 0.0, 40.0);
+  TH1F* h0f = new TH1F("h0f", "Pt (down)", 100, 0.0, 40.0);
 
   TH1F* h11 = new TH1F("h11", "d0", 100, -10.0, 10.0);
   TH1F* h12 = new TH1F("h12", "phi0", 100, -180.0, 180.0);
@@ -47,6 +57,8 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
   TH1F* h14 = new TH1F("h14", "z0", 100, -20.0, 20.0);
   TH1F* h15 = new TH1F("h15", "tan lambda", 100, -2.0, 2.0);
   TH1F* h16 = new TH1F("h16", "Pt", 100, 0.0, 40.0);
+  TH1F* h17 = new TH1F("h17", "ndf", 100, 0.0, 100.0);
+  TH1F* h18 = new TH1F("h18", "pval", 100, 0.0, 1.0);
 
   TH1F* h1 = new TH1F("h1", "d0 difference", 100, -0.4, 0.4);
   TH1F* h2 = new TH1F("h2", "phi0 difference", 100, -0.5, 0.5);
@@ -132,6 +144,17 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
       h03->Fill(Pval2);
       h04->Fill(D01);
       h05->Fill(D02);
+      h06->Fill(Phi01);
+      h07->Fill(Phi02);
+      h08->Fill(Om1);
+      h09->Fill(Om2);
+      h0a->Fill(Z01);
+      h0b->Fill(Z02);
+      h0c->Fill(tanLambda1);
+      h0d->Fill(tanLambda2);
+      h0e->Fill(Pt1);
+      h0f->Fill(Pt2);
+
     } else {
       h00->Fill(ndf2);
       h01->Fill(ndf1);
@@ -139,6 +162,17 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
       h03->Fill(Pval1);
       h04->Fill(D02);
       h05->Fill(D01);
+      h06->Fill(Phi02);
+      h07->Fill(Phi01);
+      h08->Fill(Om2);
+      h09->Fill(Om1);
+      h0a->Fill(Z02);
+      h0b->Fill(Z01);
+      h0c->Fill(tanLambda2);
+      h0d->Fill(tanLambda1);
+      h0e->Fill(Pt2);
+      h0f->Fill(Pt1);
+
     }
 
     h11->Fill(D01);
@@ -153,7 +187,10 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
     h15->Fill(tanLambda2);
     h16->Fill(Pt1);
     h16->Fill(Pt2);
-
+    h17->Fill(ndf1);
+    h17->Fill(ndf2);
+    h18->Fill(Pval1);
+    h18->Fill(Pval2);
 
     if (ndf1 < 25 || ndf2 < 25) continue;
 
@@ -206,7 +243,7 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
 	}
       }
     }
-    std::cout << "- ncand = " << ncand << std::endl;
+    //    std::cout << "- ncand = " << ncand << std::endl;
   }
 
   TCanvas* c1a = new TCanvas("c1a", "c1a", 500, 500);
@@ -243,16 +280,16 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
 
   Double_t x_Pt[13] = {0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9};
   Double_t ex_Pt[13] = {0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10};
-  Double_t y0_sigma[13], y1_sigma[13], y2_sigma[13], y3_sigma[13], y4_sigma[13], y5_sigma[13];
-  Double_t ey0_sigma[13], ey1_sigma[13], ey2_sigma[13], ey3_sigma[13], ey4_sigma[13], ey5_sigma[13];
-  Double_t dy0_sigma[13], dy1_sigma[13], dy2_sigma[13], dy3_sigma[13], dy4_sigma[13], dy5_sigma[13];
-  Double_t edy0_sigma[13], edy1_sigma[13], edy2_sigma[13], edy3_sigma[13], edy4_sigma[13], edy5_sigma[13];
-  Double_t py0_sigma[13], py1_sigma[13], py2_sigma[13], py3_sigma[13], py4_sigma[13], py5_sigma[13];
-  Double_t epy0_sigma[13], epy1_sigma[13], epy2_sigma[13], epy3_sigma[13], epy4_sigma[13], epy5_sigma[13];
-  Double_t oy0_sigma[13], oy1_sigma[13], oy2_sigma[13], oy3_sigma[13], oy4_sigma[13], oy5_sigma[13];
-  Double_t eoy0_sigma[13], eoy1_sigma[13], eoy2_sigma[13], eoy3_sigma[13], eoy4_sigma[13], eoy5_sigma[13];
-  Double_t zy0_sigma[13], zy1_sigma[13], zy2_sigma[13], zy3_sigma[13], zy4_sigma[13], zy5_sigma[13];
-  Double_t ezy0_sigma[13], ezy1_sigma[13], ezy2_sigma[13], ezy3_sigma[13], ezy4_sigma[13], ezy5_sigma[13];
+  Double_t y0_sigma[13];
+  Double_t ey0_sigma[13];
+  Double_t dy0_sigma[13];
+  Double_t edy0_sigma[13];
+  Double_t py0_sigma[13];
+  Double_t epy0_sigma[13];
+  Double_t oy0_sigma[13];
+  Double_t eoy0_sigma[13];
+  Double_t zy0_sigma[13];
+  Double_t ezy0_sigma[13];
 
   TCanvas* c4_0 = new TCanvas("c4_0", "c4_0", 950, 950);
   c4_0->Divide(6, 6);
@@ -420,6 +457,17 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
   h03->Write();
   h04->Write();
   h05->Write();
+  h06->Write();
+  h07->Write();
+  h08->Write();
+  h09->Write();
+  h0a->Write();
+  h0b->Write();
+  h0c->Write();
+  h0d->Write();
+  h0e->Write();
+  h0f->Write();
+
 
   h11->Write();
   h12->Write();
@@ -427,6 +475,8 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
   h14->Write();
   h15->Write();
   h16->Write();
+  h17->Write();
+  h18->Write();
 
   h1->Write();
   h2->Write();

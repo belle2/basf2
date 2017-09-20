@@ -8,7 +8,7 @@ from ROOT import TFile, TH1D, TH2D, TCanvas, TFile, TChain
 from ROOT import TH1F
 import argparse
 import glob
-
+import time
 
 reset_database()
 use_database_chain()
@@ -62,13 +62,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     ana(exp=args.exp, run=args.run, magneticField=True,
-        #         prefix='/gpfs/home/belle/karim/BASF2/build-2017-08-21/cdc/examples/performance/data_reference',
         prefix='/ghi/fs01/belle2/bdata/users/karim/data/GCR1/build-2017-08-21',
-        #         dest='/ghi/fs01/belle2/bdata/group/detector/CDC/qam/GCR1/build-2017-08-21'
         # dest='/ghi/fs01/belle2/bdata/group/detector/CDC/qam/GCR1/test'
         dest='.'  # Store current directory.
         )
 
+    time.sleep(3)
     ROOT.gROOT.LoadMacro('createQAMHist.C')
     #    ROOT.gSystem.Load('createQAMHist_C.so')
     #    prefix = '/gpfs/home/belle/karim/BASF2/build-2017-08-21/cdc/examples/performance/data_reference'

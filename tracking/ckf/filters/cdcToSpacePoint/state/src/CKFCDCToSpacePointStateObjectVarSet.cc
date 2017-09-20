@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <TMath.h>
+#include <tracking/ckf/findlets/base/KalmanUpdateFitter.h>
 
 using namespace std;
 using namespace Belle2;
@@ -90,7 +91,22 @@ bool CKFCDCToSpacePointStateObjectVarSet::extract(const BaseCKFCDCToSpacePointSt
   RecoTrack* cdcTrack = result->getSeedRecoTrack();
   const SpacePoint* spacePoint = result->getHit();
 
-  // TODO: Do not dismiss spacePoint = 0 cases!
+  const auto& cdcHits = cdcTrack->getSortedCDCHitList();
+  const auto& svdHits = cdcTrack->getSortedSVDHitList();
+  var<named("seed_cdc_hits")>() = cdcHits.size();
+  var<named("seed_svd_hits")>() = svdHits.size();
+  if (svdHits.empty()) {
+    var<named("seed_lowest_svd_layer")>() = NAN;
+  } else {
+    var<named("seed_lowest_svd_layer")>() = svdHits.front()->getSensorID().getLayerNumber();
+  }
+  if (cdcHits.empty()) {
+    var<named("seed_lowest_cdc_layer")>() = NAN;
+  } else {
+    var<named("seed_lowest_cdc_layer")>() = cdcHits.front()->getICLayer();
+  }
+
+// TODO: Do not dismiss spacePoint = 0 cases!
   if (not cdcTrack or not spacePoint) {
     return false;
   }
@@ -113,36 +129,7 @@ bool CKFCDCToSpacePointStateObjectVarSet::extract(const BaseCKFCDCToSpacePointSt
 
   Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
 
-  const auto& sensorInfo = spacePoint->getVxdID();
-
-  var<named("ladder")>() = sensorInfo.getLadderNumber();
-  var<named("sensor")>() = sensorInfo.getSensorNumber();
-  var<named("segment")>() = sensorInfo.getSegmentNumber();
-  var<named("id")>() = sensorInfo.getID();
-
-  var<named("last_layer")>() = 0;
-  var<named("last_ladder")>() = 0;
-  var<named("last_sensor")>() = 0;
-  var<named("last_segment")>() = 0;
-  var<named("last_id")>() = 0;
-
-  const auto* parent = result->getParent();
-  if (parent) {
-    // skip the overlap layers
-    parent = parent->getParent();
-    if (parent) {
-      const auto* parentSpacePoint = parent->getHit();
-      if (parentSpacePoint) {
-        const auto& parentSensorInfo = parentSpacePoint->getVxdID();
-
-        var<named("last_layer")>() = parentSensorInfo.getLayerNumber();
-        var<named("last_ladder")>() = parentSensorInfo.getLadderNumber();
-        var<named("last_sensor")>() = parentSensorInfo.getSensorNumber();
-        var<named("last_segment")>() = parentSensorInfo.getSegmentNumber();
-        var<named("last_id")>() = parentSensorInfo.getID();
-      }
-    }
-  }
+  KalmanUpdateFitter fitter;
 
   if (spacePoint->getType() == VXD::SensorInfoBase::SensorType::SVD) {
     const auto& clusters = spacePoint->getRelationsTo<SVDCluster>();

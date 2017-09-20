@@ -44,13 +44,18 @@ namespace Belle2 {
 
     "residual",
 
-    "chi2_calculated",
     "chi2",
 
-    "seed_cdc_hits",
-    "seed_svd_hits",
-    "seed_lowest_svd_layer",
-    "seed_lowest_cdc_layer",
+    "ladder",
+    "sensor",
+    "segment",
+    "id",
+
+    "last_layer",
+    "last_ladder",
+    "last_sensor",
+    "last_segment",
+    "last_id",
   };
 
   /// Vehicle class to transport the variable names

@@ -55,10 +55,10 @@ namespace {
   using RecordingCKFCDCToSpacePointStateObjectFilter = RecordingFilter<VariadicUnionVarSet<CKFStateTruthVarSet<RecoTrack, SpacePoint>,
         CKFCDCToSpacePointStateObjectBasicVarSet, CKFCDCToSpacePointStateObjectVarSet>>;
 
-  /// Recording filter for VXD - CDC relations.
+  /// MVA filter for VXD - CDC relations.
   class MVACKFCDCToSpacePointStateObjectFilter : public
-    MVAFilter<VariadicUnionVarSet<CKFCDCToSpacePointStateObjectBasicVarSet, CKFCDCToSpacePointStateObjectVarSet>> {
-    using Super = MVAFilter<VariadicUnionVarSet<CKFCDCToSpacePointStateObjectBasicVarSet, CKFCDCToSpacePointStateObjectVarSet>>;
+    MVAFilter<CKFCDCToSpacePointStateObjectBasicVarSet> {
+    using Super = MVAFilter<CKFCDCToSpacePointStateObjectBasicVarSet>;
   public:
     using Super::Super;
 

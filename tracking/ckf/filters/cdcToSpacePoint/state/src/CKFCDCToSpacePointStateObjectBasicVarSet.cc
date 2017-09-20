@@ -13,11 +13,11 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
-#include <TMath.h>
 #include <tracking/ckf/utilities/StateAlgorithms.h>
 #include <tracking/ckf/findlets/base/KalmanUpdateFitter.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
+#include <cdc/dataobjects/CDCHit.h>
 
 using namespace std;
 using namespace Belle2;
@@ -31,22 +31,6 @@ bool CKFCDCToSpacePointStateObjectBasicVarSet::extract(const BaseCKFCDCToSpacePo
   if (not cdcTrack or not spacePoint) {
     // TODO: Can we also extract meaningful things of the spacePoint is null?
     return false;
-  }
-
-  const auto& cdcHits = cdcTrack->getSortedCDCHitList();
-  const auto& svdHits = cdcTrack->getSortedSVDHitList();
-  var<named("seed_cdc_hits")>() = cdcHits.size();
-  var<named("seed_svd_hits")>() = svdHits.size();
-
-  if (svdHits.empty()) {
-    var<named("seed_lowest_svd_layer")>() = NAN;
-  } else {
-    var<named("seed_lowest_svd_layer")>() = svdHits.front()->getSensorID().getLayerNumber();
-  }
-  if (cdcHits.empty()) {
-    var<named("seed_lowest_cdc_layer")>() = NAN;
-  } else {
-    var<named("seed_lowest_cdc_layer")>() = cdcHits.front()->getICLayer();
   }
 
   const auto& firstMeasurement = result->getMeasuredStateOnPlane();
@@ -89,23 +73,50 @@ bool CKFCDCToSpacePointStateObjectBasicVarSet::extract(const BaseCKFCDCToSpacePo
   var<named("tan_lambda")>() = static_cast<Float_t>(trajectory.getTanLambda());
   var<named("phi")>() = static_cast<Float_t>(momentum.phi());
 
+  const auto& sensorInfo = spacePoint->getVxdID();
+
+  var<named("ladder")>() = sensorInfo.getLadderNumber();
+  var<named("sensor")>() = sensorInfo.getSensorNumber();
+  var<named("segment")>() = sensorInfo.getSegmentNumber();
+  var<named("id")>() = sensorInfo.getID();
+
+  var<named("last_layer")>() = 0;
+  var<named("last_ladder")>() = 0;
+  var<named("last_sensor")>() = 0;
+  var<named("last_segment")>() = 0;
+  var<named("last_id")>() = 0;
+
+  const auto* parent = result->getParent();
+  if (parent) {
+    // skip the overlap layers
+    parent = parent->getParent();
+    if (parent) {
+      const auto* parentSpacePoint = parent->getHit();
+      if (parentSpacePoint) {
+        const auto& parentSensorInfo = parentSpacePoint->getVxdID();
+
+        var<named("last_layer")>() = parentSensorInfo.getLayerNumber();
+        var<named("last_ladder")>() = parentSensorInfo.getLadderNumber();
+        var<named("last_sensor")>() = parentSensorInfo.getSensorNumber();
+        var<named("last_segment")>() = parentSensorInfo.getSegmentNumber();
+        var<named("last_id")>() = parentSensorInfo.getID();
+      }
+    }
+  }
 
   KalmanUpdateFitter fitter;
-  Float_t chi2 = 0;
   Float_t residual = 0;
 
   if (spacePoint->getType() == VXD::SensorInfoBase::SVD) {
     for (const auto& svdCluster : spacePoint->getRelationsTo<SVDCluster>()) {
       SVDRecoHit recoHit(&svdCluster);
-      chi2 += fitter.calculateChi2<SVDRecoHit, 1>(result->getMeasuredStateOnPlane(), recoHit);
       residual += fitter.calculateResidualDistance<SVDRecoHit, 1>(result->getMeasuredStateOnPlane(), recoHit);
     }
   } else {
     PXDRecoHit recoHit(spacePoint->getRelatedTo<PXDCluster>());
-    chi2 = fitter.calculateChi2<PXDRecoHit, 2>(result->getMeasuredStateOnPlane(), recoHit);
+    // chi2 = fitter.calculateChi2<PXDRecoHit, 2>(result->getMeasuredStateOnPlane(), recoHit);
     residual = fitter.calculateResidualDistance<PXDRecoHit, 2>(result->getMeasuredStateOnPlane(), recoHit);
   }
-  var<named("chi2_calculated")>() = chi2;
   var<named("residual")>() = residual;
 
   if (result->isFitted()) {

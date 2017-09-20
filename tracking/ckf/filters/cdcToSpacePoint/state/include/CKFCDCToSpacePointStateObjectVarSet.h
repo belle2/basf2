@@ -20,16 +20,10 @@ namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
   static char const* const ckfCDCToSpacePointStateObjectVarNames[] = {
-    "ladder",
-    "sensor",
-    "segment",
-    "id",
-
-    "last_layer",
-    "last_ladder",
-    "last_sensor",
-    "last_segment",
-    "last_id",
+    "seed_cdc_hits",
+    "seed_svd_hits",
+    "seed_lowest_svd_layer",
+    "seed_lowest_cdc_layer",
 
     "quality_index_triplet",
     "quality_index_circle",

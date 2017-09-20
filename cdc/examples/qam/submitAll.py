@@ -6,10 +6,11 @@ import subprocess
 from functools import reduce
 import argparse
 
-parser.add_argument('mode', help='dqm or qam')
+parser = argparse.ArgumentParser()
+parser.add_argument('type', help='dqm or qam', type=str)
 args = parser.parse_args()
 
-mode = args.mode
+mode = args.type
 
 
 def getRunList(dir):
@@ -32,10 +33,10 @@ exp = 1
 runs = getRunList(dir)
 
 for run in runs:
-    if mode is 'dqm':
+    if mode == 'dqm':
         logfile = 'dqm.cosmic.{0:0>4}.{1:0>5}.log'.format(exp, run)
         command = ' '.join(['basf2 CDCHistMaker.py', str(exp), str(run), '>&', logfile])
-    elif mode is 'qam':
+    elif mode == 'qam':
         logfile = 'qam.cosmic.{0:0>4}.{1:0>5}.log'.format(exp, run)
         command = ' '.join(['basf2 QAMHistMaker.py', str(exp), str(run), '>&', logfile])
     else:

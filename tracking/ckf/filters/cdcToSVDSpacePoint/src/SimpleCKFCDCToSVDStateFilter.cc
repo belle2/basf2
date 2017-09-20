@@ -103,10 +103,6 @@ Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStat
   }*/
 
   if (valueToCheck > (*maximumValues)[layer - 3][getPTRange(momentum)]) {
-    if (currentState.getTruthInformation()) {
-      B2WARNING("Throwing away a truth hit with " << valueToCheck << " instead of " << (*maximumValues)[layer - 3][getPTRange(momentum)]);
-      B2WARNING("on layer " << layer << " and momentum " << momentum);
-    }
     return NAN;
   }
 

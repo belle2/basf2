@@ -21,6 +21,7 @@ namespace Belle2 {
     /// The parent class
     using Super = TrackFindingCDC::Findlet<ResultPair>;
 
+    /// Constructor
     OverlapTeacher() : m_varSetFilter("truth_number_of_correct_hits")
     {
       this->addProcessingSignalListener(&m_varSetFilter);

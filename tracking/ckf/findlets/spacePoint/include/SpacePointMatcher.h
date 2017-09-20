@@ -23,6 +23,9 @@
 #include <framework/core/ModuleParamList.h>
 
 namespace Belle2 {
+  /**
+   * Hit Matcher class to be used in CDC->SVD or CDC+SVD->PXD CKF.
+   */
   class SpacePointMatcher : public TrackFindingCDC::ProcessingSignalListener {
     /// Shortcut for a part of the return type
     using RangeType = TrackFindingCDC::VectorRange<const SpacePoint*>;

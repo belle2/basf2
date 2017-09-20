@@ -16,6 +16,7 @@
 
 using namespace Belle2;
 
+/// Test converting a TMatrix to eigen
 TEST(TrackingCKFTest, eigen_matrix_conversion_TMatrixD)
 {
   const double rootMatrixContent[2 * 5] = {1, 2, 3, 4, 5,
@@ -31,6 +32,8 @@ TEST(TrackingCKFTest, eigen_matrix_conversion_TMatrixD)
     }
   }
 }
+
+/// Test converting a TVector to eigen
 TEST(TrackingCKFTest, eigen_matrix_conversion_TVectorD)
 {
   const double rootMatrixContent[2 * 5] = {1, 2, 3, 4, 5};

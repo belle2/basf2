@@ -34,6 +34,7 @@ namespace Belle2 {
     return stateObject.getNumber() % 2 == 0;
   }
 
+  /// Check if this state should describe an overlap hit. Always false for CDC hits
   inline bool isOnOverlapLayer(const CKFStateObject<RecoTrack, TrackFindingCDC::CDCRLWireHit>& stateObject __attribute__((unused)))
   {
     return false;
@@ -52,7 +53,7 @@ namespace Belle2 {
     }
   };
 
-  /// Helper functor for extrating useful ID information
+  /// Helper functor for extracting useful ID information
   struct HitIDExtractor {
     /// Marker function for the isFunctor test
     operator TrackFindingCDC::FunctorTag();

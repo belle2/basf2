@@ -12,6 +12,9 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 namespace Belle2 {
+  /**
+   * Findlet for teaching a MC or recording filter, which states are correct (= setting the truth information)
+   */
   template<class ASeedObject, class AHitObject>
   class StateTeacher : public TrackFindingCDC::Findlet<CKFStateObject<ASeedObject, AHitObject>*> {
   public:

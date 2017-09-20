@@ -35,6 +35,7 @@ PXDDIGI = register_module('PXDDigitizer')
 # SVD digitization module
 SVDDIGI = register_module('SVDDigitizer')
 SVDDIGI.param('GenerateShaperDigits', True)
+# SVDDIGI.param('signalsList', 'SVDSignalsList.csv')
 # SVD clusterizer
 SVDCLUST = register_module('SVDClusterizer')
 SVDCLUST.param('digitsSorted', True)

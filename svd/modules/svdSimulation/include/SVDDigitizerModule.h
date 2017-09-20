@@ -75,6 +75,11 @@ namespace Belle2 {
        */
       void saveWaveforms();
 
+      /** Save signals to a root-delimited file (to be analyzed in Python).
+       * This method is only called when a name is set for the file.
+       */
+      void saveSignals();
+
       /** Initialize the module and check module parameters */
       virtual void initialize() override;
       /** Initialize the list of existing SVD Sensors */
@@ -160,6 +165,8 @@ namespace Belle2 {
       std::string m_rootFilename;
       /** Store waveform data in the reporting file? */
       bool m_storeWaveforms;
+      /** Name of the tab-delimited listing of signals */
+      std::string m_signalsList = "";
 
       // Other data members:
 

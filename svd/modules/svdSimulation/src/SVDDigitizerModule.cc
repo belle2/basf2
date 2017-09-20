@@ -24,6 +24,9 @@
 #include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <boost/tuple/tuple.hpp>
+#include <fstream>
+#include <sstream>
+#include <regex>
 #include <algorithm>
 #include <numeric>
 #include <deque>
@@ -108,6 +111,9 @@ SVDDigitizerModule::SVDDigitizerModule() :
            string(""));
   addParam("storeWaveforms", m_storeWaveforms,
            "Store waveforms in a TTree in the statistics file.", bool(false));
+  addParam("signalsList", m_signalsList,
+           "Store signals (time/charge/tau) in a tab-delimited file",
+           m_signalsList);
 }
 
 void SVDDigitizerModule::initialize()
@@ -393,6 +399,8 @@ void SVDDigitizerModule::event()
     m_rootFile->cd();
     saveWaveforms();
   }
+  if (m_signalsList != "")
+    saveSignals();
 
   saveDigits();
 }
@@ -923,6 +931,58 @@ void SVDDigitizerModule::saveWaveforms()
     } // FOREACH stripSignal
   } // FOREACH sensor
   m_rootFile->Flush();
+}
+
+void SVDDigitizerModule::saveSignals()
+{
+  static size_t recordNo = 0;
+  static const string header("Event\tSensor\tSide\tStrip\tContrib\tTime\tCharge\tTau");
+  regex startLine("^|\n"); // for inserting event/sensor/etc info
+  ofstream outfile(m_signalsList, ios::out | ios::app);
+  if (recordNo == 0) outfile << header << endl;
+  for (Sensors::value_type& sensor : m_sensors) {
+    VxdID sensorID(sensor.first);
+    const SensorInfo& info =
+      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensor.first));
+    // u-side digits:
+    size_t isU = 1;
+    double thresholdU = 3.0 * info.getElectronicNoiseU();
+    for (StripSignals::value_type& stripSignal : sensor.second.first) {
+      size_t strip = stripSignal.first;
+      SVDSignal& s = stripSignal.second;
+      // Read the value only if the signal is large enough.
+      if (s.getCharge() < thresholdU)
+        continue;
+      // Else print to a string
+      ostringstream preamble;
+      // We don't have eventNo, but we don't care about event boundaries.
+      preamble << "$&" << recordNo << '\t' << sensorID << '\t' << isU << '\t' << strip << '\t';
+      string signalString = s.toString();
+      signalString.pop_back(); // remove the last newline!!!
+      string tableString = regex_replace(signalString, startLine, preamble.str());
+      outfile << tableString << endl; // now we have to add the newline back.
+    } // FOREACH stripSignal
+    // x-side digits:
+    isU = 0;
+    double thresholdV = 3.0 * info.getElectronicNoiseV();
+    for (StripSignals::value_type& stripSignal : sensor.second.second) {
+      size_t strip = stripSignal.first;
+      SVDSignal& s = stripSignal.second;
+      // Read the value only if the signal is large enough.
+      if (s.getCharge() < thresholdV)
+        continue;
+      // Else print to a string
+      ostringstream preamble;
+      // We don't have eventNo, but we don't care about event boundaries.
+      preamble << "$&" << recordNo << '\t' << sensorID << '\t' << isU << '\t' << strip << '\t';
+      string signalString = s.toString();
+      signalString.pop_back(); // remove the last newline!!!
+      string tableString = regex_replace(signalString, startLine, preamble.str());
+      outfile << tableString << endl; // now we have to add the newline back.
+    } // FOREACH stripSignal
+  } // for sensors
+  outfile.close();
+  recordNo++;
 }
 
 void SVDDigitizerModule::terminate()

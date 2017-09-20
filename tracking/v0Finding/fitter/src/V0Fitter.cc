@@ -14,6 +14,8 @@
 #include <genfit/FieldManager.h>
 #include <genfit/Exception.h>
 
+#include <framework/utilities/IOIntercept.h>
+
 #include <TVector3.h>
 
 using namespace Belle2;
@@ -62,7 +64,12 @@ bool V0Fitter::fitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, ge
   VertexVector vertexVector;
   std::vector<genfit::Track*> trackPair {&trackPlus, &trackMinus};
 
+
   try {
+    IOIntercept::OutputToLogMessages
+    logCapture("V0Fitter GFRaveVertexFactory", LogConfig::c_Debug, LogConfig::c_Debug);
+    logCapture.start();
+
     genfit::GFRaveVertexFactory vertexFactory;
     vertexFactory.findVertices(&vertexVector.v, trackPair);
   } catch (...) {
@@ -76,7 +83,7 @@ bool V0Fitter::fitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, ge
   }
 
   if ((*vertexVector[0]).getNTracks() != 2) {
-    B2ERROR("Wrong number of tracks in vertex.");
+    B2DEBUG(100, "Wrong number of tracks in vertex.");
     return false;
   }
 
@@ -96,7 +103,7 @@ bool V0Fitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit:
     // code trying several windings before giving up, so this
     // happens occasionally.  Something more stable would perhaps
     // be desirable.
-    B2WARNING("Could not extrapolate track to vertex.");
+    B2DEBUG(200, "Could not extrapolate track to vertex.");
     return false;
   }
   return true;

@@ -13,7 +13,7 @@
 import basf2
 from ROOT import Belle2
 from simulation import add_simulation
-from reconstruction import add_mdst_output, add_reconstruction
+from tracking import add_tracking_reconstruction
 from modularAnalysis import generateY4S
 from tracking.harvest.harvesting import HarvestingModule
 from tracking.harvest import refiners
@@ -36,7 +36,7 @@ def run():
     path.add_module(rootinput)
     path.add_module('Gearbox')
 
-    add_reconstruction(path, components=components, pruneTracks=False)
+    add_tracking_reconstruction(path, components=components, pruneTracks=False, prune_temporary_tracks=False)
 
     # add additional matching for vxd and cdc only tracks here
 

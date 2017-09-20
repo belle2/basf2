@@ -75,7 +75,7 @@ namespace Belle2 {
     std::string m_MCRecoTracksName; /**< MCRecoTrack StoreArray name */
     std::string m_RecoTracksName; /**< RecoTrack StoreArray name */
     std::string m_TracksName; /**< Track StoreArray name */
-
+    int m_ParticleHypothesis;  /**< Particle Hypothesis for the track fit (default: 211) */
 
     /* list of histograms filled per MCParticle found in the event */
 
@@ -100,6 +100,18 @@ namespace Belle2 {
     TH1F* m_h1_omega_res; /**< error */
     TH1F* m_h1_z0_res; /**< error */
     TH1F* m_h1_cotTheta_res; /**< error */
+    //residuals on momentum parameters
+    TH1F* m_h1_px_res; /**< px residual */
+    TH1F* m_h1_py_res; /**< py residual */
+    TH1F* m_h1_pz_res; /**< pz residual */
+    TH1F* m_h1_p_res; /**< p residual */
+    TH1F* m_h1_pt_res; /**< pt residual */
+    //residuals on position parameters
+    TH1F* m_h1_x_res; /**< x residual */
+    TH1F* m_h1_y_res; /**< y residual */
+    TH1F* m_h1_z_res; /**< z residual */
+    TH1F* m_h1_r_res; /**< R residual (in cylindrical coordinates) */
+    TH1F* m_h1_rtot_res; /**< r residual (3D distance) */
     //pulls on track parameters
     TH1F* m_h1_d0_pll; /**< error */
     TH1F* m_h1_phi_pll; /**< error */
@@ -137,14 +149,18 @@ namespace Belle2 {
     TH2F* m_h2_d0errVSpt; /**< error */
     TH2F* m_h2_d0errMSVSpt; /**< error */
 
+    TH2F* m_h2_chargeVSchargeMC; //**< charge comparison */
 
     //histograms used for efficiency plots
     TH1F* m_h1_HitsRecoTrackPerMCRecoTrack;  /**< hits */
     TH1F* m_h1_HitsMCRecoTrack;  /**< hits */
 
     TH3F* m_h3_MCParticle;  /**< efficiency*/
+    TH3F* m_h3_MCParticleswPXDHits;  /**< efficiency*/
     TH3F* m_h3_TracksPerMCParticle;  /**< efficiency*/
     TH3F* m_h3_TrackswPXDHitsPerMCParticle;  /**< efficiency*/
+    TH3F* m_h3_RecoTrackswPXDHitsPerMCParticle;  /**< efficiency*/
+    TH3F* m_h3_RecoTrackswPXDHitsPerMCParticlewPXDHits;  /**< efficiency*/
     TH3F* m_h3_MCRecoTrack;  /**< efficiency*/
     TH3F* m_h3_TracksPerMCRecoTrack;  /**< efficiency*/
 

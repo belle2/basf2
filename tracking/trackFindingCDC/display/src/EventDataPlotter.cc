@@ -756,9 +756,16 @@ void EventDataPlotter::drawTrajectory(const RecoTrack& recoTrack, const Attribut
       TMatrixDSym cov;
 
       try {
-        const genfit::MeasuredStateOnPlane& state = recoTrack.getMeasuredStateOnPlaneFromRecoHit(recoHit);
+        const auto* trackPoint = recoTrack.getCreatedTrackPoint(recoHit);
+        const auto* fittedResult = trackPoint->getFitterInfo();
+        if (not fittedResult) {
+          B2WARNING("Skipping unfitted track point");
+          continue;
+        }
+        const genfit::MeasuredStateOnPlane& state = fittedResult->getFittedState();
         state.getPosMomCov(pos, mom, cov);
       } catch (genfit::Exception) {
+        B2WARNING("Skipping state with strange pos, mom or cov");
         continue;
       }
 

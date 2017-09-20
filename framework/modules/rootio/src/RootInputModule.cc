@@ -179,14 +179,20 @@ void RootInputModule::initialize()
     for (unsigned int iFile = 0; iFile < m_entrySequences.size(); ++iFile) {
       int64_t offset = m_tree->GetTreeOffset()[iFile];
       int64_t next_offset = m_tree->GetTreeOffset()[iFile + 1];
-      for (const auto& entry : generate_number_sequence(m_entrySequences[iFile])) {
-        int64_t global_entry = entry + offset;
-        if (global_entry >= next_offset) {
-          B2WARNING("Given sequence contains entry numbers which are out of range. "
-                    "I won't add any further events to the EventList for the current file.");
-          break;
-        } else {
+      // check if Sequence consists only of ':', e.g. the whole file is requested
+      if (m_entrySequences[iFile] == ":") {
+        for (int64_t global_entry = offset; global_entry < next_offset; ++global_entry)
           elist->Enter(global_entry);
+      } else {
+        for (const auto& entry : generate_number_sequence(m_entrySequences[iFile])) {
+          int64_t global_entry = entry + offset;
+          if (global_entry >= next_offset) {
+            B2WARNING("Given sequence contains entry numbers which are out of range. "
+                      "I won't add any further events to the EventList for the current file.");
+            break;
+          } else {
+            elist->Enter(global_entry);
+          }
         }
       }
     }
@@ -535,8 +541,8 @@ bool RootInputModule::readParentTrees()
     }
 
     // get entry number in parent tree
-    long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
-    if (entry < 0) {
+    long entryNumber = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
+    if (entryNumber < 0) {
       B2ERROR("No event " << experiment << "/" << run << "/" << event << " in parent file " << parentPfn);
       return false;
     }
@@ -544,7 +550,7 @@ bool RootInputModule::readParentTrees()
     // read the tree and mark the data read in the data store
     EventMetaData* parentMetaData = nullptr;
     tree->SetBranchAddress("EventMetaData", &parentMetaData);
-    tree->GetEntry(entry);
+    tree->GetEntry(entryNumber);
     for (auto entry : m_parentStoreEntries[level]) {
       entry->ptr = entry->object;
     }

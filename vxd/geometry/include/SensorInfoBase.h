@@ -143,6 +143,23 @@ namespace Belle2 {
         return m_length * m_splitLength / m_vCells;
       }
 
+      /** Return the pitch ID of the sensor
+       * @param v v-coordinate where to determine the pitchID
+       * only used for PXD sensors with two different pixel sizes along v
+       * @return Pixel/Strip ID in v direction:
+       * 0 for pitch at smaller v, 1 for bigger v
+       *     Attention: Pitch ID depend from sensor position
+       *       For PXD it swap for sensor=1 vs. seensor=2
+       *       Sensor=1: bigger pitch = 0, smaller = 1
+       *       Sensor=2: smaller pitch = 0, bigger = 1
+       */
+      int getVPitchID(double v = 0) const
+      {
+        if (m_splitLength <= 0) return 0;
+        if (v / m_length + 0.5 >= m_splitLength) return 0;
+        return 1;
+      }
+
       /** Return the position of a specific strip/pixel in u direction
        * @param uID id of the strip/pixel in u coordinates
        * @param vID id of the strip/pixel in v coordinates, ignored for rectangular sensors
@@ -195,6 +212,8 @@ namespace Belle2 {
       int getUCells() const { return m_uCells; }
       /** Return number of pixel/strips in v direction */
       int getVCells() const { return m_vCells + m_vCells2; }
+      /** Return number of pixel/strips in v direction up to change pitch */
+      int getVCells2() const { return m_vCells2; }
 
       /** Check wether a given point is inside the active area.
        * Optionally, one can specify a tolerance which should be added to the

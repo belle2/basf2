@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/display/SVGPrimitivePlotter.h>
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <framework/logging/Logger.h>
 
@@ -47,7 +46,7 @@ SVGPrimitivePlotter::SVGPrimitivePlotter(const SVGPrimitivePlotter& plotter)
 
 std::unique_ptr<PrimitivePlotter> SVGPrimitivePlotter::clone() const
 {
-  return makeUnique<SVGPrimitivePlotter>(*this);
+  return std::make_unique<SVGPrimitivePlotter>(*this);
 }
 
 void SVGPrimitivePlotter::drawLine(float startX,

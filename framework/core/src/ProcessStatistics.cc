@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/core/Module.h>
 #include <framework/core/ProcessStatistics.h>
 
 #include <framework/logging/Logger.h>
@@ -72,7 +71,7 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
 
   stringstream out;
   out << boost::format("%|" + numWidth + "T=|\n");
-  out << outputheader % "Name" % "Calls" % "VMemory(MB)" % "Time(s)" % "Time(ms)/Call";
+  out << outputheader % "Name" % "Calls" % "Memory(MB)" % "Time(s)" % "Time(ms)/Call";
   out << boost::format("%|" + numWidth + "T=|\n");
 
   std::vector<ModuleStatistics> modulesSortedByIndex(*modules);
@@ -189,7 +188,7 @@ void ProcessStatistics::setCounters(double& time, double& memory,
                                     double startTime, double startMemory)
 {
   time = Utils::getClock() - startTime;
-  memory = Utils::getVirtualMemoryKB() - startMemory;
+  memory = Utils::getRssMemoryKB() - startMemory;
 }
 
 TObject* ProcessStatistics::Clone(const char*) const

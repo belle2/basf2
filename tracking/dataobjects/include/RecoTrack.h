@@ -227,6 +227,27 @@ namespace Belle2 {
     genfit::TrackCand createGenfitTrackCand() const;
 
     /**
+     * Append a new RecoTrack to the given store array and copy its general properties, but not the hits themself.
+     * The position, momentum, charge etc. are set to the given parameters.
+     */
+    RecoTrack* copyToStoreArrayUsing(StoreArray<RecoTrack>& storeArray, const TVector3& position,
+                                     const TVector3& momentum, short charge,
+                                     const TMatrixDSym& covariance, double timeSeed) const;
+
+    /**
+     * Append a new RecoTrack to the given store array and copy its general properties, but not the hits themself.
+     * The position, momentum and charge are set to the seed values of this reco track.
+     */
+    RecoTrack* copyToStoreArrayUsingSeeds(StoreArray<RecoTrack>& storeArray) const;
+
+    /**
+     * Append a new RecoTrack to the given store array and copy its general properties, but not the hits themself.
+     * The position, momentum and charge are set to the seed values of this reco track, if it was not fitted
+     * or to the values at the first hit.
+     */
+    RecoTrack* copyToStoreArray(StoreArray<RecoTrack>& storeArray) const;
+
+    /**
      * Add all hits from another RecoTrack to this RecoTrack.
      * @param recoTrack Pointer to the RecoTrack where the hits are copied from
      * @param sortingParameterOffset This number will be added to the sortingParameter of all hits copied
@@ -343,7 +364,7 @@ namespace Belle2 {
     template <class HitType>
     TrackingDetector getTrackingDetector(const HitType* hit) const
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSafely(hit);
       return recoHitInformation->getTrackingDetector();
     }
 
@@ -351,7 +372,7 @@ namespace Belle2 {
     template <class HitType>
     RightLeftInformation getRightLeftInformation(const HitType* hit) const
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSafely(hit);
       return recoHitInformation->getRightLeftInformation();
     }
 
@@ -359,7 +380,7 @@ namespace Belle2 {
     template <class HitType>
     OriginTrackFinder getFoundByTrackFinder(const HitType* hit) const
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSafely(hit);
       return recoHitInformation->getFoundByTrackFinder();
     }
 
@@ -367,7 +388,7 @@ namespace Belle2 {
     template <class HitType>
     unsigned int getSortingParameter(const HitType* hit) const
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSafely(hit);
       return recoHitInformation->getSortingParameter();
     }
 
@@ -375,7 +396,7 @@ namespace Belle2 {
     template <class HitType>
     void setRightLeftInformation(const HitType* hit, RightLeftInformation rightLeftInformation)
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSafely(hit);
       recoHitInformation->setRightLeftInformation(rightLeftInformation);
       setDirtyFlag();
     }
@@ -384,7 +405,7 @@ namespace Belle2 {
     template <class HitType>
     void setFoundByTrackFinder(const HitType* hit, OriginTrackFinder originTrackFinder)
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSafely(hit);
       recoHitInformation->setFoundByTrackFinder(originTrackFinder);
     }
 
@@ -392,7 +413,7 @@ namespace Belle2 {
     template <class HitType>
     void setSortingParameter(const HitType* hit, unsigned int sortingParameter)
     {
-      RecoHitInformation* recoHitInformation = getRecoHitInformationSavely(hit);
+      RecoHitInformation* recoHitInformation = getRecoHitInformationSafely(hit);
       recoHitInformation->setSortingParameter(sortingParameter);
       setDirtyFlag();
     }
@@ -524,6 +545,9 @@ namespace Belle2 {
     /// Return the time seed stored in the reco track. ATTENTION: This is not the fitted time.
     double getTimeSeed() const { return m_genfitTrack.getTimeSeed(); }
 
+    /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
+    std::tuple<TVector3, TVector3, short> extractTrackState() const;
+
     /// Set the position and momentum seed of the reco track. ATTENTION: This is not the fitted position or momentum.
     void setPositionAndMomentum(const TVector3& positionSeed, const TVector3& momentumSeed)
     {
@@ -541,9 +565,6 @@ namespace Belle2 {
 
     /// Set the covariance of the seed. ATTENTION: This is not the fitted covariance.
     void setSeedCovariance(const TMatrixDSym& seedCovariance) { m_genfitTrack.setCovSeed(seedCovariance); }
-
-    /// Set the tracking seed by using the fitted state at the first measurement. Will fail if the state is not present.
-    void copyStateFromSeed();
 
     // Fitting
     /// Returns true if the last fit with the given representation was successful.
@@ -664,11 +685,17 @@ namespace Belle2 {
         B2FATAL("MeasuredStateOnPlane cannot be provided for RecoHit which was not used in the fit.");
       }
 
-      const auto hitTrackPoint = getCreatedTrackPoint(recoHitInfo);
-      if (hitTrackPoint == nullptr) {
+      const auto* hitTrackPoint = getCreatedTrackPoint(recoHitInfo);
+      if (not hitTrackPoint) {
         B2FATAL("TrackPoint was requested which has not been created");
       }
-      return hitTrackPoint->getFitterInfo(representation)->getFittedState();
+
+      const auto* fittedResult = hitTrackPoint->getFitterInfo(representation);
+      if (not fittedResult) {
+        B2FATAL("No fit result for the given point");
+      }
+
+      return fittedResult->getFittedState();
     }
 
     /** Return genfit's MasuredStateOnPlane, that is closest to the given point
@@ -904,7 +931,7 @@ namespace Belle2 {
 
     /// Returns the reco hit information for a given hit or throws an exception if the hit is not related to the track.
     template <class HitType>
-    RecoHitInformation* getRecoHitInformationSavely(HitType* hit) const
+    RecoHitInformation* getRecoHitInformationSafely(HitType* hit) const
     {
       RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
       if (recoHitInformation == nullptr) {

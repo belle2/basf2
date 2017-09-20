@@ -13,6 +13,11 @@
 
 
 from basf2 import *
+from ROOT import Belle2
+
+import os
+
+# sets up the geometry. The file for the default geometry for Belle2 is geometry/Belle2.xml
 
 
 def setup_Geometry(path=None):
@@ -20,9 +25,19 @@ def setup_Geometry(path=None):
     Sets the geometry. Should be used in all VXDTF2 related scripts to ensure to use the same geometry in all
     trainings / validation steps!
     param path: the path to append the geometry
+
     """
+
+    # If the environmental variable USE_BEAST2_GEOMETRY is set the Beast2 geometry will be used, else the default Belle2 geometry
+    fileName = 'geometry/Belle2.xml'
+    if os.environ.get('USE_BEAST2_GEOMETRY'):
+        print('WARNING: will use the Beast2 geometry: geometry/Beast2_phase2.xml')
+        fileName = 'geometry/Beast2_phase2.xml'
+    print('The used geometry is ' + fileName)
+
     # Gearbox
     gearbox = register_module('Gearbox')
+    gearbox.param('fileName', fileName)
     path.add_module(gearbox)
 
     # Geometry
@@ -209,7 +224,8 @@ def setup_RTCtoSPTCConverters(
         sptcOutput='checkedSPTCs',
         usePXD=True,
         logLevel=LogLevel.INFO,
-        debugVal=1):
+        debugVal=1,
+        useNoKick=False):
     """This function adds the modules needed to convert Reco-TCs to SpacePointTCs to given path.
 
     @param path if set to 0 (standard) the created modules will not be added, but returned.
@@ -226,6 +242,8 @@ def setup_RTCtoSPTCConverters(
     @param logLevel set to logLevel level of your choice.
 
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
+
+    @param useNoKick enable the training sample selection based on track parameters (and produce a TFile of its effect)
     """
     print("setup RTCtoSPTCConverters...")
     spacePointNames = []
@@ -272,6 +290,13 @@ def setup_RTCtoSPTCConverters(
     recoTrackCandConverter.param('useSingleClusterSP', False)
     recoTrackCandConverter.param('minSP', 3)
     recoTrackCandConverter.param('skipProblematicCluster', False)
+
+    NoKickCuts = Belle2.FileSystem.findFile("data/tracking/NoKickCuts.root")
+    if useNoKick:
+        recoTrackCandConverter.param('noKickCutsFile', NoKickCuts)  # NoKickCuts applied
+        recoTrackCandConverter.param('noKickOutput', True)  # produce output TFile of NoKickCuts
+    else:
+        recoTrackCandConverter.param('noKickCutsFile', "")  # NoKickCuts not applied
 
     # SpacePointTrackCand referee
     sptcReferee = register_module('SPTCReferee')

@@ -201,16 +201,15 @@ class Plotter(object):
         if errorband_kwargs is not None and yerr is not None:
             if 'color' not in errorband_kwargs:
                 errorband_kwargs['color'] = color
-            x1 = x
-            y1 = y - yerr
-            y2 = y + yerr
             if xerr is not None:
-                boundaries = numpy.r_[numpy.c_[x - xerr, y1, y2], numpy.c_[x + xerr, y1, y2]]
-                boundaries = boundaries[boundaries[:, 0].argsort()]
-                x1 = boundaries[:, 0]
-                y1 = boundaries[:, 1]
-                y2 = boundaries[:, 2]
-            f = axis.fill_between(x1, y1, y2, interpolate=True, **errorband_kwargs)
+                # Ensure that xerr and yerr are iterable numpy arrays
+                xerr = x + xerr - x
+                yerr = y + yerr - y
+                for _x, _y, _xe, _ye in zip(x, y, xerr, yerr):
+                    axis.add_patch(matplotlib.patches.Rectangle((_x - _xe, _y - _ye), 2*_xe, 2*_ye,
+                                                                **errorband_kwargs))
+            else:
+                f = axis.fill_between(x, y - yerr, y + yerr, interpolate=True, **errorband_kwargs)
 
         if fill_kwargs is not None:
             axis.fill_between(x, y, 0, **fill_kwargs)
@@ -297,6 +296,53 @@ class PurityAndEfficiencyOverCut(Plotter):
         self.axis.set_xlim((self.xmin, self.xmax))
         self.axis.set_ylim((self.ymin, self.ymax))
         self.axis.set_title("Classification Plot")
+        self.axis.get_xaxis().set_label_text('Cut Value')
+        self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
+        return self
+
+
+class SignalToNoiseOverCut(Plotter):
+    """
+    Plots the signal to noise ratio over the cut value (for cut choosing)
+    """
+    #: @var xmax
+    #: Maximum x value
+    #: @var ymax
+    #: Maximum y value
+
+    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, normed=True):
+        """
+        Add a new curve to the plot
+        @param data pandas.DataFrame containing all data
+        @param column which is used to calculate signal to noise ratio for different cuts
+        @param signal_mask boolean numpy.array defining which events are signal events
+        @param bckgrd_mask boolean numpy.array defining which events are background events
+        @param weight_column column in data containing the weights for each event
+        """
+
+        hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
+
+        signal2noise, signal2noise_error = hists.get_signal_to_noise(['Signal'], ['Background'])
+
+        cuts = hists.bin_centers
+
+        self.xmin, self.xmax = numpy.nanmin([numpy.nanmin(cuts), self.xmin]), numpy.nanmax([numpy.nanmax(cuts), self.xmax])
+        self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(signal2noise), self.ymin]), \
+            numpy.nanmax([numpy.nanmax(signal2noise), self.ymax])
+
+        self.plots.append(self._plot_datapoints(self.axis, cuts, signal2noise, xerr=0, yerr=signal2noise_error))
+
+        self.labels.append(column)
+
+        return self
+
+    def finish(self):
+        """
+        Sets limits, title, axis-labels and legend of the plot
+        """
+        self.axis.set_xlim((self.xmin, self.xmax))
+        self.axis.set_ylim((self.ymin, self.ymax))
+        self.axis.set_title("Signal to Noise Plot")
         self.axis.get_xaxis().set_label_text('Cut Value')
         self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
         return self
@@ -1000,7 +1046,10 @@ class Correlation(Plotter):
             else:
                 weights = numpy.ones(len(data[column][m]))
 
-            xrange = np.percentile(data[column][m], [5, 95])
+            # The cast to float32 is a workaround for the following numpy issue:
+            # https://github.com/numpy/numpy/issues/8123
+            xrange = np.percentile(data[column][m], [5, 95]).astype(np.float32)
+
             colormap = plt.get_cmap('coolwarm')
             tmp, x = np.histogram(data[column][m], bins=100,
                                   range=xrange, normed=True, weights=weights)

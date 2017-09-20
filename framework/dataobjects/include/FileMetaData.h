@@ -197,6 +197,9 @@ namespace Belle2 {
      */
     void setDataDescription(const std::string& key, const std::string& value) { m_dataDescription[key] = value; }
 
+    /** remove an existing data description */
+    void removeDataDescription(const std::string& key) { m_dataDescription.erase(key); }
+
     /**
      * Exposes methods of the FileMetaData class to Python.
      */

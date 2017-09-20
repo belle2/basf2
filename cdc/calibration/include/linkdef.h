@@ -7,6 +7,8 @@
 
 #pragma link C++ class Belle2::CDCDatabaseImporter+;
 #pragma link C++ class Belle2::CDC::T0Correction+;
+#pragma link C++ class Belle2::CDC::T0Correction4CAF+;
 #pragma link C++ class Belle2::CDC::XTCalibration+;
-//#pragma link C++ class Belle2::CDC::SpaceResolutionCalibration;
+#pragma link C++ class Belle2::CDC::SpaceResolutionCalibration;
+#pragma link C++ class Belle2::CDC::TimeWalkCalibration+;
 #endif

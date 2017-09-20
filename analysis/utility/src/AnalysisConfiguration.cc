@@ -10,7 +10,6 @@
 
 #include <analysis/utility/AnalysisConfiguration.h>
 
-using namespace std;
 using namespace Belle2;
 
 AnalysisConfiguration* AnalysisConfiguration::s_instance = 0;

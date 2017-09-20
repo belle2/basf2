@@ -13,7 +13,6 @@ using namespace Belle2;
 
 //#define DESY
 
-
 // Main
 RFMaster::RFMaster(string conffile)
 {
@@ -39,7 +38,6 @@ RFMaster::RFMaster(string conffile)
   FILE* f = fopen("pid.data", "w");
   fprintf(f, "%d", getpid());
   fclose(f);
-
 
 }
 
@@ -140,9 +138,12 @@ int RFMaster::Configure(NSMmsg*, NSMcontext*)
   return 0;
 }
 
-int RFMaster::UnConfigure(NSMmsg*, NSMcontext*)
+int RFMaster::UnConfigure(NSMmsg* msgm, NSMcontext* msgc)
 {
-  int* pars;
+  int pars[10];
+  pars[0] = msgm->pars[0];
+  pars[1] = msgm->pars[1];
+
   // Unconfigure RoiSender
   char* roisender = m_conf->getconf("roisender", "nodename");
   RFNSM_Status::Instance().set_flag(0);
@@ -179,15 +180,16 @@ int RFMaster::UnConfigure(NSMmsg*, NSMcontext*)
 #ifdef DESY
   b2nsm_wait(5);
 #else
-  while (RFNSM_Status::Instance().get_flag() != nnodes) b2nsm_wait(1);
+  //  printf ( "RFMaster : Unconfigure : started. - nnodes=%d, flag=%d\n",
+  //     nnodes, RFNSM_Status::Instance().get_flag() );
+  while (RFNSM_Status::Instance().get_flag() != nnodes) {
+    b2nsm_wait(1);
+    //    printf ( "RFMaster : Unconfigure : in prog. - nnodes=%d, flag=%d\n",
+    //       nnodes, RFNSM_Status::Instance().get_flag() );
+  }
+  //  printf ( "RFMaster : Unconfigure - done: nnodes=%d, flag=%d\n",
+  //       nnodes, RFNSM_Status::Instance().get_flag() );
 #endif
-
-  // Unconfigure distributor
-  char* distributor = m_conf->getconf("distributor", "nodename");
-  RFNSM_Status::Instance().set_flag(0);
-  //  b2nsm_sendreq(distributor, "RF_UNCONFIGURE", 0, pars);
-  b2nsm_sendreq(distributor, "RC_ABORT", 0, pars);
-  while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
 
   // Unconfigure DqmServer
   char* dqmserver = m_conf->getconf("dqmserver", "nodename");
@@ -196,13 +198,55 @@ int RFMaster::UnConfigure(NSMmsg*, NSMcontext*)
   b2nsm_sendreq(dqmserver, "RC_ABORT", 0, pars);
   while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
 
-  //  sleep ( 5 );
+  // Unconfigure distributor
+  char* distributor = m_conf->getconf("distributor", "nodename");
+  RFNSM_Status::Instance().set_flag(0);
+  //  b2nsm_sendreq(distributor, "RF_UNCONFIGURE", 0, pars);
+  b2nsm_sendreq(distributor, "RC_ABORT", 0, pars);
+  while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
+
+  printf("RFMaster : Unconfigure done.\n");
+  fflush(stdout);
+
   return 0;
 
 }
 
-int RFMaster::Start(NSMmsg*, NSMcontext*)
+int RFMaster::Start(NSMmsg* msgm, NSMcontext* msgc)
 {
+  int pars[10];
+  pars[0] = msgm->pars[0];
+  pars[1] = msgm->pars[1];
+  printf("RFMaster : Start exp=%d, run=%d\n", pars[0], pars[1]);
+  fflush(stdout);
+
+  // 0. Start DQMserver
+  char* dqmserver = m_conf->getconf("dqmserver", "nodename");
+  RFNSM_Status::Instance().set_flag(0);
+  //  b2nsm_sendreq(dqmserver, "RF_STOP", 0, pars);
+  b2nsm_sendreq(dqmserver, "RC_START", 2, pars);
+  while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
+
+  // 1. Start worker nodes
+  int maxnodes = m_conf->getconfi("processor", "nnodes");
+  int idbase = m_conf->getconfi("processor", "idbase");
+  char* hostbase = m_conf->getconf("processor", "nodebase");
+  char* badlist = m_conf->getconf("processor", "badlist");
+
+  char hostnode[512], idname[3];
+  RFNSM_Status::Instance().set_flag(0);
+  int nnodes = 0;
+  for (int i = 0; i < maxnodes; i++) {
+    sprintf(idname, "%2.2d", idbase + i);
+    if (badlist == NULL  ||
+        strstr(badlist, idname) == 0) {
+      sprintf(hostnode, "evp_%s%2.2d", hostbase, idbase + i);
+      //      b2nsm_sendreq(hostnode, "RF_STOP", 0, pars);
+      b2nsm_sendreq(hostnode, "RC_START", 2, pars);
+      nnodes++;
+    }
+  }
+
   return 0;
 }
 
@@ -245,6 +289,9 @@ int RFMaster::Stop(NSMmsg* msg, NSMcontext*)
   //  b2nsm_sendreq(dqmserver, "RF_STOP", 0, pars);
   b2nsm_sendreq(dqmserver, "RC_STOP", 0, pars);
   while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
+
+  printf("RFMaster : Stopped. exp=%d, run=%d\n", pars[0], pars[1]);
+  fflush(stdout);
 
   return 0;
 }

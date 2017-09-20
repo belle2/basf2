@@ -42,6 +42,10 @@
 #pragma link C++ class Belle2::RecoTrack+;
 #pragma link C++ class Belle2::RecoHitInformation+;
 #pragma link C++ class Belle2::SectorMapConfig+;
+#pragma link C++ class Belle2::hitXP+;
+#pragma link C++ class Belle2::hitXPDerivate+;
+#pragma link C++ class std::vector<Belle2::hitXP>+;
+#pragma link C++ class std::vector<Belle2::hitXPDerivate>+;
 
 #pragma link C++ class Belle2::SpacePointInfo+;
 #pragma link C++ class Belle2::FilterInfo+;
@@ -52,8 +56,10 @@
 #pragma link C++ namespace Belle2::VXDTFRawSecMapTypedef+; //implicit
 #pragma link C++ namespace Belle2::VXDTFSecMapTypedef+; //implicit
 
-// ---------------------------------------------------------------------------- // Muid evolution
-// In version 5 (-4),
+// ----------------------------------------------------------------------------
+
+// Muid evolution
+// In version 5- (-4),
 //   o   m_Momentum is not stored (stored in a TVector)
 //   o   m_MuonPDFValue is stored in a float (double)
 //   o   (ditto for m_PionPDFValue, m_KaonPDFValue, m_ProtonPDFValue,
@@ -116,43 +122,8 @@
   sourceClass="Belle2::Muid" source="double m_ChiSquared" version="[-4]" \
   targetClass="Belle2::Muid" target="m_ChiSquared" \
   code = "{ m_ChiSquared = onfile.m_ChiSquared; }"
-// MuidHit evolution
-// In version 2 (1),
-//   o   m_ExtPosition is stored in a float[3] (TVector)
-//   o   m_HitPosition is stored in a float[3] (TVector)
-//   o   m_ExtTime is stored in a float (double)
-//   o   m_HitTime is stored in a float (double)
-//   o   m_ChiSquared is stored in a float (double)
-#pragma read \
-  sourceClass="Belle2::MuidHit" source="TVector3 m_ExtPosition" version="[1]" \
-  targetClass="Belle2::MuidHit" target="m_ExtPosition" \
-  code = "{ \
-            m_ExtPosition[0] = onfile.m_ExtPosition.X(); \
-            m_ExtPosition[1] = onfile.m_ExtPosition.Y(); \
-            m_ExtPosition[2] = onfile.m_ExtPosition.Z(); \
-          }"
-#pragma read \
-  sourceClass="Belle2::MuidHit" source="double m_ExtTime" version="[1]" \
-  targetClass="Belle2::MuidHit" target="m_ExtTime" \
-  code = "{ m_ExtTime = onfile.m_ExtTime; }"
-#pragma read \
-  sourceClass="Belle2::MuidHit" source="TVector3 m_HitPosition" version="[1]" \
-  targetClass="Belle2::MuidHit" target="m_HitPosition" \
-  code = "{ \
-            m_HitPosition[0] = onfile.m_HitPosition.X(); \
-            m_HitPosition[1] = onfile.m_HitPosition.Y(); \
-            m_HitPosition[2] = onfile.m_HitPosition.Z(); \
-          }"
-#pragma read \
-  sourceClass="Belle2::MuidHit" source="double m_HitTime" version="[1]" \
-  targetClass="Belle2::MuidHit" target="m_HitTime" \
-  code = "{ m_HitTime = onfile.m_HitTime; }"
-#pragma read \
-  sourceClass="Belle2::MuidHit" source="double m_ChiSquared" version="[1]" \
-  targetClass="Belle2::MuidHit" target="m_ChiSquared" \
-  code = "{ m_ChiSquared = onfile.m_ChiSquared; }"
 // ExtHit evolution
-// In version 4 (3 or earlier),
+// In version 4- (3 or earlier),
 //   o   m_TOF is stored in a float (double)
 //   o   m_Position is stored in a float[3] (TVector)
 //   o   m_Momentum is stored in a float[3] (TVector)
@@ -191,7 +162,7 @@
             } \
           }"
 // TrackClusterSeparation evolution
-// In version 3 (-2),
+// In version 3- (-2),
 //   o   m_TrackIndex is not stored (stored in an int)
 //   o   m_Direction is not stored (stored in a TVector3)
 //   o   m_Distance is stored in a float (double)

@@ -14,10 +14,12 @@ st: Stream ID
 from basf2 import *
 from ROOT import Belle2
 import datetime
-from tracking import add_cdc_cr_track_finding
+from generators import add_cosmics_generator
+from simulation import add_simulation
+
 import os.path
 import sys
-from cdc.cr import *
+from cdc.cr import getDataPeriod
 
 
 # Set the global log level
@@ -27,19 +29,18 @@ set_log_level(LogLevel.INFO)
 reset_database()
 use_database_chain()
 use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
-use_central_database("cdc_cr_test1", LogLevel.WARNING)
+use_central_database("GT_gen_data_002.11_gcr2017-07", LogLevel.WARNING)
 
 
-def main(exp, run, evt, st):
-    '''
+def sim(exp, run, evt, st, topInCounter=True, magneticField=False):
+    """
     exp : Experimental number
     run : Run number
     evt : Number of events to be generated
     st : stream ID
-    '''
+    """
 
     main_path = create_path()
-    emptyPath = create_path()
 
     main_path.add_module('EventInfoSetter',
                          expList=[int(exp)],
@@ -48,25 +49,16 @@ def main(exp, run, evt, st):
 
     main_path.add_module('Progress')
 
-    period = getDataPeriod(int(run))
-    set_cdc_cr_parameters(period)
+    period = getDataPeriod(exp=int(exp),
+                           run=int(run))
 
-    phi = getPhiRotation()
+    if not magneticField:
+        components = ['CDC']
+    else:
+        components = ['CDC', 'MagneticFieldConstant4LimitedRCDC']
 
-    gearbox = register_module('Gearbox',
-                              override=[
-                                  ("/Global/length", "8.", "m"),
-                                  ("/Global/width", "8.", "m"),
-                                  ("/Global/height", "1.5", "m"),
-                                  ("/DetectorComponent[@name='CDC']//GlobalPhiRotation", str(phi), "deg"),
-                              ])
-    main_path.add_module(gearbox)
-
-    main_path.add_module('Geometry',
-                         components=['CDC']
-                         )
-
-    add_cdc_cr_simulation(main_path, emptyPath)
+    add_cosmics_generator(main_path, components=components, pre_general_run_setup=period, top_in_counter=topInCounter)
+    add_simulation(main_path, components=components)
 
     output = register_module('RootOutput',
                              outputFileName='gcr.cdc.{0:04d}.{1:06d}.{2:04d}.root'.format(int(exp), int(run), int(st)))
@@ -74,6 +66,7 @@ def main(exp, run, evt, st):
     print_path(main_path)
     process(main_path)
     print(statistics)
+
 
 if __name__ == "__main__":
 
@@ -85,4 +78,4 @@ if __name__ == "__main__":
     parser.add_argument('st', help='Stream ID')
 
     args = parser.parse_args()
-    main(args.exp, args.run, args.evt, args.st)
+    sim(args.exp, args.run, args.evt, args.st, topInCounter=False, magneticField=True)

@@ -10,69 +10,69 @@ import os
 import sys
 import csv
 
-if len(sys.argv) == 1:
-    sys.exit('Need one argument: path of look up table !')
 
-# assuming interest only in this type of events
-dataType = 'on_resonance'
-belleLevel = 'caseB'
+def submit_job(listArgs, logDir, myCmd):
+    print(listArgs)
+    # end of file name for log files
+    filenameEnd = '_'.join(listArgs)
 
-yourWorkingDirectoryPath = '.'
-subLogDir = yourWorkingDirectoryPath + '/analysisLog/'
-lookUpTablePath = yourWorkingDirectoryPath + sys.argv[1]
+    # job submission with arguments
+    os.system('bsub ' +
+              ' -q l' +
+              ' -oo ' + logDir + '/' + 'out_' + filenameEnd +
+              ' -eo ' + logDir + '/' + 'err_' + filenameEnd +
+              ' -N' +
+              ' \" ' + myCmd +
+              ' ' + sys.argv[2].lower() + ' ' +
+              ' '.join(listArgs) +
+              '\"')
+
+    # summary
+    print('Submitted job for: ' + ' '.join(listArgs))
+
+if len(sys.argv) != 3:
+    sys.exit('Need two arguments: 1) path of look up table, 2) mc or data')
+
+# yourWorkingDirectoryPath = '.'
+# logDir = yourWorkingDirectoryPath + '/analysisLog/'
+
+lookUpTablePath = sys.argv[1]
+
+mc_or_data = sys.argv[2].lower()
+isMC = {"mc": True, "data": False}.get(mc_or_data, None)
+if isMC is None:
+    sys.exit('Second parameter must be "mc" or "data" to indicate whether we run on MC or real data')
 
 # the job we are submitting
-myCmd = yourWorkingDirectoryPath + '/analysisJob.sh'
+# myCmd = yourWorkingDirectoryPath + '/analysisJob.sh'
+myCmd = './analysisJob.sh'
+logDir = './analysisLog'
 
-# a bit of clean-up before job submission
-
-for eventType in ['evtgen-charged', 'evtgen-mixed']:
-
-    print('Cleaning log dir ..')
-    # path where we want to store the log files
-    logDir = subLogDir + eventType
-
-    if os.path.exists(logDir):
-        # clean up log dir before jobs, so only relevant files are saved
-        os.system("rm -rf " + logDir + '/*')
-    else:
-        os.makedirs(logDir)
 # ================================= Submit jobs ! ==============================
 print('Jobs submission ..')
 
 # open look up table
 with open(lookUpTablePath) as f:
+
     reader = csv.reader(f, delimiter='\t')
 
-    # for each line of the txt file submit a job
+    # submit one job for each line , for each streamNo
     for row in reader:
-        expNo, streamNo, eventType, minRunNo, maxRunNo, nothing = row
+        if isMC:
+            print(row)
+            expNo = int(row[0])
 
-        # end of file name for log files
-        filenameEnd = str(expNo) + '_' + str(minRunNo) + '_' + str(maxRunNo) +\
-            '_' + str(streamNo)
+            if expNo in range(7, 28):
+                streamNoList = range(10, 20)
+            elif expNo in range(31, 66):
+                streamNoList = range(0, 10)
 
-        # job submission with arguments
-        os.system('bsub ' +
-                  ' -q l' +
-                  ' -oo ' + logDir + '/' + 'out_' + filenameEnd +
-                  ' -eo ' + logDir + '/' + 'err_' + filenameEnd +
-                  ' -N' +
-                  ' \" ' + myCmd + ' ' +
-                  str(expNo) + ' ' +
-                  str(minRunNo) + ' ' +
-                  str(maxRunNo) + ' ' +
-                  eventType + ' ' +
-                  dataType + ' ' +
-                  belleLevel + ' ' +
-                  str(streamNo) + '\"')
-
-        # summary
-        print('Submitted job for: ' +
-              str(expNo) + ' ' +
-              str(minRunNo) + ' ' +
-              str(maxRunNo) + ' ' +
-              eventType + ' ' +
-              dataType + ' ' +
-              belleLevel + ' ' +
-              str(streamNo))
+            for streamNo in streamNoList:
+                # removing empty element at end of line
+                row = row[:-1]
+                # adding streamNo
+                row.append(str(streamNo))
+                submit_job(row, logDir, myCmd)
+        else:
+            # removing empty element at end of line
+            submit_job(row[:-1], logDir, myCmd)

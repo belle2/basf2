@@ -13,11 +13,11 @@ void  ECLPionPdf::init(const char* parametersFileName)
   ECLAbsPdf::init(map);
 
   unsigned int len = nbins * nCosTheta ;
-  m_params = new Parameters [ len ];
-  m_integralPion = new double [ len ];
-  m_muonlike.m_params = new ECLMuonPdf::Parameters [ len ];
-  m_muonlike.m_integral1 = new double [ len ];
-  m_muonlike.m_integral2 = new double [ len ];
+  m_params = std::vector<Parameters>(len);
+  m_integralPion = std::vector<double>(len);
+  m_muonlike.m_params = std::vector<ECLMuonPdf::Parameters>(len);
+  m_muonlike.m_integral1 = std::vector<double>(len);
+  m_muonlike.m_integral2 = std::vector<double>(len);
   ECLAbsPdf& abs = m_muonlike;
   abs.init(map);
   for (unsigned int ip = 1; ip < nbins; ++ip)
@@ -48,10 +48,4 @@ double ECLPionPdf::pdf(double eop, double p, double costheta) const
   const Parameters& prm = m_params[i];
   return prm.fraction * m_muonlike.pdf(eop , p, costheta) +
          (1 - prm.fraction) * TMath::Gaus(eop, prm.mu3, prm.sigma3, true) / m_integralPion[i];
-}
-
-ECLPionPdf::~ECLPionPdf()
-{
-  delete[] m_params;
-  delete[] m_integralPion;
 }

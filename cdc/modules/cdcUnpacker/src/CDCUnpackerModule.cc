@@ -63,12 +63,12 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string(""));
   addParam("enableStoreCDCRawHit", m_enableStoreCDCRawHit, "Enable to store to the CDCRawHit object", false);
   addParam("enablePrintOut", m_enablePrintOut, "Enable to print out the data to the terminal", false);
-  addParam("setRelationRaw2Hit", m_setRelationRaw2Hit, "Set/unset relation between CDCHit and RawCDC.", false);
   addParam("boardIDTrig", m_boardIDTrig, "Board ID for the trigger.", 7);
   addParam("channelTrig", m_channelTrig, "Channel for the trigger.", 1);
   addParam("subtractTrigTiming", m_subtractTrigTiming, "Enable to subtract the trigger timing from TDCs.", false);
   addParam("tdcOffset", m_tdcOffset, "TDC offset (in TDC count).", 0);
   addParam("enableDatabase", m_enableDatabase, "Enable database to read the channel map.", true);
+  addParam("enable2ndHit", m_enable2ndHit, "Enable 2nd hit timing as a individual CDCHit object.", false);
 
   m_channelMapFromDB.addCallback(this, &CDCUnpackerModule::loadMap);
 }
@@ -298,15 +298,12 @@ void CDCUnpackerModule::event()
               } else {
                 tdc1 = trgTime - tdc1;
               }
-              const CDCHit* hit = cdcHits.appendNew(tdc1, fadcSum, wireId, tdc2);
-
-              if (m_enableStoreCDCRawHit == true && m_setRelationRaw2Hit == true) {
-                int nRaws = cdcRawHitWFs.getEntries();
-                for (int k = 0; k < nRaws; ++k) {
-                  hit->addRelationTo(cdcRawHitWFs[k]);
-                }
+              CDCHit* firstHit = cdcHits.appendNew(tdc1, fadcSum, wireId);
+              if (m_enable2ndHit == true) {
+                CDCHit* secondHit = cdcHits.appendNew(tdc2, fadcSum, wireId);
+                secondHit->setOtherHitIndices(firstHit);
+                secondHit->set2ndHitFlag();
               }
-
             }
 
 
@@ -392,7 +389,14 @@ void CDCUnpackerModule::event()
                 if (board == m_boardIDTrig && ch == m_channelTrig) {
                   tdcCountTrig = tdc1;
                 } else {
-                  cdcHits.appendNew(tdc1, fadcSum, wireId, tdc2);
+                  CDCHit* firstHit = cdcHits.appendNew(tdc1, fadcSum, wireId);
+                  if (length == 5) {
+                    if (m_enable2ndHit == true) {
+                      CDCHit* secondHit = cdcHits.appendNew(tdc2, fadcSum, wireId);
+                      secondHit->setOtherHitIndices(firstHit);
+                      secondHit->set2ndHitFlag();
+                    }
+                  }
                 }
 
                 if (m_enableStoreCDCRawHit == true) {
@@ -400,13 +404,6 @@ void CDCUnpackerModule::event()
                   cdcRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch, trgTime, fadcSum, tdc1, tdc2, tot);
                 }
 
-                if (m_setRelationRaw2Hit == true &&
-                    !(board == m_boardIDTrig && ch == m_channelTrig)) {
-                  // Set relation.
-                  CDCHit* hit = cdcHits[cdcHits.getEntries() - 1];
-                  const CDCRawHit* raw = cdcRawHits[cdcRawHits.getEntries() - 1];
-                  hit->addRelationTo(raw);
-                }
               } else {
                 B2WARNING("Undefined board id is fired: " << board << " " << ch);
               }
@@ -426,14 +423,15 @@ void CDCUnpackerModule::event()
   //
   if (m_subtractTrigTiming == true) {
     for (auto& hit : cdcHits) {
-      int tdc1 = hit.getTDCCount();
-      int tdc2 = hit.getTDCCount2ndHit();
-      tdc1  = tdc1 - (tdcCountTrig - m_tdcOffset);
-      if (tdc2 != 0) {
-        tdc2  = tdc2 - (tdcCountTrig - m_tdcOffset);
+      int tdc = hit.getTDCCount();
+      if (hit.is2ndHit()) {
+        if (tdc != 0) {
+          tdc  = tdc - (tdcCountTrig - m_tdcOffset);
+        }
+      } else {
+        tdc  = tdc - (tdcCountTrig - m_tdcOffset);
       }
-      hit.setTDCCount(static_cast<unsigned short>(tdc1));
-      hit.setTDCCount2ndHit(static_cast<unsigned short>(tdc2));
+      hit.setTDCCount(static_cast<unsigned short>(tdc));
     }
   }
 }

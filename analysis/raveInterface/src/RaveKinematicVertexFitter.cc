@@ -47,6 +47,11 @@ RaveKinematicVertexFitter::RaveKinematicVertexFitter(): m_useBeamSpot(false), m_
   m_useBeamSpot = RaveSetup::getRawInstance()->m_useBeamSpot;
 }
 
+IOIntercept::InterceptorScopeGuard<IOIntercept::OutputToLogMessages> RaveKinematicVertexFitter::captureOutput()
+{
+  static IOIntercept::OutputToLogMessages s_captureOutput("Rave", LogConfig::c_Debug, LogConfig::c_Debug);
+  return IOIntercept::start_intercept(s_captureOutput);
+}
 
 
 RaveKinematicVertexFitter::~RaveKinematicVertexFitter()
@@ -129,13 +134,10 @@ void RaveKinematicVertexFitter::setMother(const Particle* aMotherParticlePtr)
 
 int RaveKinematicVertexFitter::fit()
 {
+  // make sure all output in this function is converted to log messages
+  auto output_capture = captureOutput();
 
-
-  int ndf = 0;
-
-  ndf = 2 * m_inputParticles.size();
-
-  if (ndf < 4 && m_vertFit) {
+  if (m_inputParticles.size() < 2 && m_vertFit) {
     return -1;
   }
   int nOfVertices = -100;
@@ -323,7 +325,6 @@ int RaveKinematicVertexFitter::fit()
   }
 
   return 1;
-
 }
 
 void RaveKinematicVertexFitter::updateMother()

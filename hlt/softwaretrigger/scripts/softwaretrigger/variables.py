@@ -78,29 +78,9 @@ class SummarizeTriggerResults(PickleHarvestingModule):
         """
         return_dict = {identifier: result for identifier, result in result.getResults()}
 
-        # Write out some convenience variables: the fast reco/hlt/calibration and the full decision
-        fast_reco_result = Belle2.SoftwareTriggerResult()
-        hlt_result = Belle2.SoftwareTriggerResult()
-        calib_result = Belle2.SoftwareTriggerResult()
-
-        for trigger_name, trigger_result in return_dict.items():
-            if "fast_reco" in trigger_name:
-                result = fast_reco_result
-            elif "hlt" in trigger_name:
-                result = hlt_result
-            elif "calib" in trigger_name:
-                result = calib_result
-            else:
-                raise ValueError("Do not know", trigger_name)
-
-            result.addResult(trigger_name, Belle2.SoftwareTriggerCutResult(trigger_result))
-
-        return_dict["fast_reco_result"] = fast_reco_result.getTotalResult(True) != -1
-        return_dict["hlt_result"] = hlt_result.getTotalResult(False) == 1
-        return_dict["calib_result"] = calib_result.getTotalResult(False) == 1
-
-        return_dict["total_result"] = return_dict["fast_reco_result"] & return_dict["hlt_result"]
-
+        # Make it easier for the user to get the total result of everything
+        getFinalTriggerDecision = Belle2.SoftwareTrigger.FinalTriggerDecisionCalculator.getFinalTriggerDecision
+        return_dict["final_decision"] = getFinalTriggerDecision(result)
         yield return_dict
 
 

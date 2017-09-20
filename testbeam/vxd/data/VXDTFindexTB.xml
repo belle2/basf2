@@ -38,4 +38,16 @@ an entry within this list has to be added after adding the friendList-file to th
   <xi:include href="TB2016Test8Feb2016MagnetOnPXDSVD-moreThan1500MeV_PXDSVD.xml"/>
   <xi:include href="TB2016Test8Feb2016MagnetOnSVD-moreThan1500MeV_SVD.xml"/>
 
+  <!-- 2017 test beam geometry -->
+  <xi:include href="SecMapTB2017MagnetOffPXDSVD-moreThan1000MeV_PXDSVD.xml"/>
+  <xi:include href="SecMapTB2017MagnetOffSVD-moreThan1000MeV_SVD.xml"/>
+  <xi:include href="SecMapTB2017MagnetOnPXDSVD-moreThan1000MeV_PXDSVD.xml"/>
+  <xi:include href="SecMapTB2017MagnetOnSVD-moreThan1000MeV_SVD.xml"/>
+
+  <!-- 2017 test beam altered geometry, to be used for runs after March 1st 2017-->
+  <xi:include href="SecMapTB2017MagnetOffPXDSVD_afterMarch1st-moreThan1000MeV_PXDSVD.xml"/>
+  <xi:include href="SecMapTB2017MagnetOffSVD_afterMarch1st-moreThan1000MeV_SVD.xml"/>
+  <xi:include href="SecMapTB2017MagnetOnPXDSVD_afterMarch1st-moreThan1000MeV_PXDSVD.xml"/>
+  <xi:include href="SecMapTB2017MagnetOnSVD_afterMarch1st-moreThan1000MeV_SVD.xml"/>
+
 </CATFParameters>

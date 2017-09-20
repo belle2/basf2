@@ -94,7 +94,7 @@ namespace Belle2 {
    * \warning Use of this macro should be accompanied by a comment
    *          documenting the (significant) performance gains that justify
    *          its use. (Please make sure you compile in 'opt' mode.)
-   * \see #branch_unlikely(x)
+   * \see \def branch_unlikely(x)
    *
    * Usage:
    *
@@ -115,7 +115,7 @@ namespace Belle2 {
    * \warning Use of this macro should be accompanied by a comment
    *          documenting the (significant) performance gains that justify
    *          its use. (Please make sure you compile in 'opt' mode.)
-   * \see #branch_likely(x)
+   * \see \def branch_likely(x)
    *
    * Usage:
    *

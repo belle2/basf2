@@ -17,6 +17,7 @@
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPSlowData.h>
+#include <top/dataobjects/TOPTemplateFitResult.h>
 #include <string>
 
 namespace Belle2 {
@@ -57,6 +58,17 @@ namespace Belle2 {
         }
         B2ERROR("Bug in data format: DataArray - index out of range");
         return 0;
+      }
+
+      /**
+       * Returns next data word without incrementing the memory pointer
+       * @return data word
+       */
+      int peekWord()
+      {
+        int peek = getWord();
+        m_i--;
+        return peek;
       }
 
       /**
@@ -199,12 +211,14 @@ namespace Belle2 {
      * @param bufferSize buffer size
      * @param rawDigits collection to unpack feature-extracted data
      * @param waveforms collection to unpack waveforms
+     * @param template fit result collection to unpack template fit data
      * @param pedestalSubtracted false for version 2, true for version 3
      * @return number of words remaining in data buffer
      */
     int unpackInterimFEVer01(const int* buffer, int bufferSize,
                              StoreArray<TOPRawDigit>& rawDigits,
                              StoreArray<TOPRawWaveform>& waveforms,
+                             StoreArray<TOPTemplateFitResult>& templateFits,
                              bool pedestalSubtracted);
 
     /**
@@ -231,6 +245,10 @@ namespace Belle2 {
     std::string m_outputDigitsName;  /**< name of TOPDigit store array */
     std::string m_outputRawDigitsName;  /**< name of TOPRawDigit store array */
     std::string m_outputWaveformsName;  /**< name of TOPRawWaveform store array */
+    std::string m_templateFitResultName; /**< name of TOPTemplateFitResult store array */
+
+    std::map<int, int> m_channelStatistics; /**<counts how many different channels have been parsed in a given SCROD packet */
+
     bool m_swapBytes = false;     /**< if true, swap bytes */
     int m_dataFormat = 0;         /**< data format */
 

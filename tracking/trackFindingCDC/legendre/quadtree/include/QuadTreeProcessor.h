@@ -21,6 +21,7 @@
 #include <deque>
 #include <utility>
 #include <cmath>
+#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -67,7 +68,7 @@ namespace Belle2 {
                         int seedLevel,
                         const XYSpans& xySpans,
                         bool debugOutput = false)
-        : m_quadTree{makeUnique<QuadTree>(xySpans.first, xySpans.second, 0, nullptr)}
+        : m_quadTree{std::make_unique<QuadTree>(xySpans.first, xySpans.second, 0, nullptr)}
         , m_lastLevel(lastLevel)
         , m_seedLevel(seedLevel)
         , m_debugOutput(debugOutput)

@@ -216,30 +216,29 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
     if (fes.getGeneratedNPE() == 0)
       continue;
     EKLMSimHit* simHit = it->second;
-    EKLMDigit* digit = m_Digits.appendNew(simHit);
-    digit->setMCTime(simHit->getTime());
-    digit->setSiPMMCTime(fes.getMCTime());
-    digit->setPosition(simHit->getPosition());
-    digit->setGeneratedNPE(fes.getGeneratedNPE());
-    digit->addRelationTo(simHit);
+    EKLMDigit* eklmDigit = m_Digits.appendNew(simHit);
+    eklmDigit->setMCTime(simHit->getTime());
+    eklmDigit->setSiPMMCTime(fes.getMCTime());
+    eklmDigit->setPosition(simHit->getPosition());
+    eklmDigit->setGeneratedNPE(fes.getGeneratedNPE());
+    eklmDigit->addRelationTo(simHit);
     if (!fes.getFitStatus()) {
-      digit->setTime(fes.getFPGAFit()->getStartTime());
-      digit->setNPE(fes.getNPE());
+      eklmDigit->setTime(fes.getFPGAFit()->getStartTime());
+      eklmDigit->setNPE(fes.getNPE());
     } else {
-      digit->setTime(0.);
-      digit->setNPE(0);
+      eklmDigit->setTime(0.);
+      eklmDigit->setNPE(0);
     }
-    digit->setFitStatus(fes.getFitStatus());
-    if (digit->getNPE() > m_DiscriminatorThreshold)
-      digit->isGood(true);
+    eklmDigit->setFitStatus(fes.getFitStatus());
+    if (eklmDigit->getNPE() > m_DiscriminatorThreshold)
+      eklmDigit->isGood(true);
     else
-      digit->isGood(false);
+      eklmDigit->isGood(false);
     if (fes.getFitStatus() == EKLM::c_FPGASuccessfulFit && m_SaveFPGAFit) {
       StoreArray<EKLMFPGAFit> fpgaFits;
       EKLMFPGAFit* fit = fpgaFits.appendNew(*fes.getFPGAFit());
-      digit->addRelationTo(fit);
+      eklmDigit->addRelationTo(fit);
     }
-    /* cppcheck-suppress memleak */
   }
 }
 

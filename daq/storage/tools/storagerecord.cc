@@ -1,11 +1,3 @@
-//+
-// File : rawfile2rb.cc
-// Description : Read raw data dump file and put record in RingBuffer
-//
-// Author : Ryosuke Itoh, IPNS, KEK
-// Date : 25 - Sep - 2013
-//-
-
 #include <unistd.h>
 #include <cstdlib>
 #include <sys/types.h>
@@ -51,30 +43,14 @@ using namespace Belle2;
 
 const unsigned long long GB = 1000 * 1024 * 1024;
 const unsigned long long MAX_FILE_SIZE = 2 * GB;
-const char* g_table = "datafile";
-
-std::string popen(const std::string& cmd)
-{
-  char buf[1000];
-  FILE* fp;
-  if ((fp = ::popen(cmd.c_str(), "r")) == NULL) {
-    perror("can not exec commad");
-    exit(EXIT_FAILURE);
-  }
-  std::stringstream ss;
-  while (!feof(fp)) {
-    memset(buf, 0, 1000);
-    fgets(buf, sizeof(buf), fp);
-    ss << buf << std::endl;
-  }
-  pclose(fp);
-  return ss.str();
-}
+const char* g_table = "datafiles";
+unsigned int g_streamersize = 0;
+char* g_streamerinfo = new char[1000000];
 
 class FileHandler {
 
 public:
-  FileHandler(DBInterface& db, const std::string& runtype,
+  FileHandler(DBInterface* db, const std::string& runtype,
               const char* host, const char* dbtmp)
     : m_db(db), m_runtype(runtype), m_host(host), m_dbtmp(dbtmp)
   {
@@ -94,11 +70,19 @@ public:
 public:
   int open(const std::string& dir, int ndisks, int expno, int runno, int fileid)
   {
+    m_filesize = 0;
+    m_fileid = 0;
+    m_diskid = 1;
+    m_chksum = 1;
+    m_nevents = 0;
+    m_filesize = 0;
+    m_expno = expno;
+    m_runno = runno;
     m_fileid = fileid;
-    char filename[1024];
     bool available = false;
     for (int i = 0; i < ndisks; i++) {
       struct statvfs statfs;
+      char filename[1024];
       sprintf(filename, "%s%02d", dir.c_str(), m_diskid);
       statvfs(filename, &statfs);
       float usage = 1 - ((float)statfs.f_bfree / statfs.f_blocks);
@@ -128,20 +112,29 @@ public:
       B2FATAL("No disk available for writing");
       exit(1);
     }
-    if (m_fileid > 0) {
-      sprintf(filename, "%s%02d/storage/%s.%4.4d.%6.6d.sroot-%d",
-              dir.c_str(), m_diskid, m_runtype.c_str(), expno, runno, m_fileid);
-    } else if (m_fileid == 0) {
-      sprintf(filename, "%s%02d/storage/%s.%4.4d.%6.6d.sroot",
-              dir.c_str(), m_diskid, m_runtype.c_str(), expno, runno);
-    }
-    m_file = ::open(filename,  O_WRONLY | O_CREAT | O_EXCL, 0664);
-    m_path = filename;
+    std::string filedir = dir + StringUtil::form("%02d/storage/%4.4d/%5.5d/",
+                                                 m_diskid, expno, runno);
+    system(("mkdir -p " + filedir).c_str());
+    m_filename = StringUtil::form("%s.%4.4d.%5.5d.%s.f%5.5d.sroot",
+                                  m_runtype.c_str(), expno, runno, m_host.c_str(), m_fileid);
+    m_path = filedir + m_filename;
+    m_file = ::open(m_path.c_str(),  O_WRONLY | O_CREAT | O_EXCL, 0664);
     if (m_file < 0) {
-      B2FATAL("Failed to open file : " << filename);
+      B2FATAL("Failed to open file : " << m_path);
       exit(1);
     }
-    std::cout << "[DEBUG] New file " << filename << " is opened" << std::endl;
+    try {
+      m_db->connect();
+      m_db->execute("insert into %s (name, path, host, label, expno, runno, fileno, nevents, chksum, size) "
+                    "values ('%s', '%s', '%s', '%s', %d, %d, %d, 0, 0, 0);",
+                    g_table, m_filename.c_str(), m_path.c_str(), m_host.c_str(),
+                    m_runtype.c_str(), m_expno, m_runno, m_fileid);
+    } catch (const DBHandlerException& e) {
+      B2WARNING(e.what());
+    }
+    write(g_streamerinfo, g_streamersize, true);
+    B2INFO("New file " << m_path << " is opened");
+
     return m_id;
   }
 
@@ -150,13 +143,31 @@ public:
     if (m_file > 0) {
       std::cout << "[DEBUG] File closed" << std::endl;
       ::close(m_file);
+      try {
+        struct stat st;
+        stat(m_path.c_str(), &st);
+        std::string d = Date(st.st_mtime).toString();
+        //if (m_fileid == 0) m_nevents--;//1 entry for StreamerInfo
+        m_db->connect();
+        m_db->execute("update %s set time_close = '%s', chksum = %lu, nevents = %lu, "
+                      "size = %lu where name = '%s' and host = '%s';",
+                      g_table, d.c_str(), m_chksum, m_nevents, m_filesize,
+                      m_filename.c_str(), m_host.c_str());
+      } catch (const DBHandlerException& e) {
+        B2WARNING(e.what());
+      }
+      m_db->close();
     }
   }
 
-  int write(char* evbuf, int nbyte)
+  int write(char* evtbuf, int nbyte, bool isstreamer = false)
   {
-    int ret = ::write(m_file, evbuf, nbyte);
+    int ret = ::write(m_file, evtbuf, nbyte);
     m_filesize += nbyte;
+    if (!isstreamer) {
+      m_nevents++;
+    }
+    m_chksum = adler32(m_chksum, (unsigned char*)evtbuf, nbyte);
     return ret;
   }
 
@@ -166,18 +177,22 @@ public:
   }
 
 private:
-  DBInterface& m_db;
+  DBInterface* m_db;
   std::string m_runtype;
   std::string m_host;
   std::string m_dbtmp;
   int m_id;
+  std::string m_filename;
   std::string m_path;
   int m_diskid;
   int m_fileid;
   int m_file;
-  unsigned int m_filesize;
   std::string m_configname;
-
+  int m_expno;
+  int m_runno;
+  unsigned long long m_filesize;
+  unsigned long long m_chksum;
+  unsigned long long m_nevents;
 };
 
 FileHandler* g_file = NULL;
@@ -215,38 +230,46 @@ int main(int argc, char** argv)
   signal(SIGINT, signalHandler);
   signal(SIGKILL, signalHandler);
   ConfigFile config("slowcontrol");
-  PostgreSQLInterface db(config.get("database.host"),
-                         config.get("database.dbname"),
-                         config.get("database.user"),
-                         config.get("database.password"),
-                         config.getInt("database.port"));
+  PostgreSQLInterface* db = new PostgreSQLInterface(config.get("database.host"),
+                                                    config.get("database.dbname"),
+                                                    config.get("database.user"),
+                                                    config.get("database.password"),
+                                                    config.getInt("database.port"));
   SharedEventBuffer obuf;
   if (obufsize > 0) obuf.open(obufname, obufsize * 1000000);//, true);
   if (use_info) info.reportReady();
   B2DEBUG(1, "started recording.");
-  int* evtbuf = new int[10000000];
   unsigned long long nbyte_out = 0;
   unsigned int count_out = 0;
   unsigned int expno = 0;
   unsigned int runno = 0;
   unsigned int subno = 0;
+  int* evtbuf = new int[10000000];
   g_file = new FileHandler(db, runtype, hostname, file_dbtmp);
   FileHandler& file(*g_file);
-  SharedEventBuffer::Header iheader;
   int ecount = 0;
   bool newrun = false;
   unsigned int fileid = 0;
+  struct dataheader {
+    int nword;
+    int type;
+    unsigned int expno;
+    unsigned int runno;
+  } hd;
   while (true) {
     if (use_info) info.reportRunning();
-    ibuf.read(evtbuf, true, &iheader);
+    ibuf.lock();
+    ibuf.read((int*)&hd, true, true);
+    ibuf.read(evtbuf, true, true);
+    ibuf.unlock();
     int nbyte = evtbuf[0];
     int nword = (nbyte - 1) / 4 + 1;
     bool isnew = false;
-    if (!newrun || expno < iheader.expno || runno < iheader.runno) {
+    if (!newrun || expno < hd.expno || runno < hd.runno) {
       newrun = true;
       isnew = true;
-      expno = iheader.expno;
-      runno = iheader.runno;
+      expno = hd.expno;
+      runno = hd.runno;
       fileid = 0;
       if (use_info) {
         info.setExpNumber(expno);
@@ -260,13 +283,19 @@ int main(int argc, char** argv)
         count_out = 0;
       }
       obuf.lock();
-      SharedEventBuffer::Header* oheader = ibuf.getHeader();
+      SharedEventBuffer::Header* oheader = obuf.getHeader();
       oheader->expno = expno;
       oheader->runno = runno;
       obuf.unlock();
-      if (file) file.close();
+      if (file) {
+        file.close();
+      }
+      memcpy(g_streamerinfo, evtbuf, nbyte);
+      g_streamersize = nbyte;
       file.open(path, ndisks, expno, runno, fileid);
+      nbyte_out += nbyte;
       fileid++;
+      continue;
     }
     if (use_info) {
       info.addInputCount(1);
@@ -294,7 +323,7 @@ int main(int argc, char** argv)
       }
     } else {
       if (!ecount) {
-        B2WARNING("no run was initialzed for recording : " << iheader.expno << "." << iheader.runno);
+        B2WARNING("no run was initialzed for recording : " << hd.expno << "." << hd.runno);
       }
       ecount = 1;
     }

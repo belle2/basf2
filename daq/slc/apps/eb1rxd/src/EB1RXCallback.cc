@@ -4,35 +4,6 @@
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/Time.h>
 
-namespace Belle2 {
-
-  class NSMVHandlerEB1HostUsed : public NSMVHandlerInt {
-  public:
-    NSMVHandlerEB1HostUsed(RCCallback& callback, const std::string& name,
-                           const std::string& vname)
-      : NSMVHandlerInt(name, true, true),
-        m_callback(callback), m_vname(vname) {}
-    virtual ~NSMVHandlerEB1HostUsed() throw() {}
-  public:
-    bool handleGetInt(int& val)
-    {
-      m_callback.get(m_vname, val);
-      return true;
-    }
-    bool handleSetInt(int val)
-    {
-      m_callback.set(m_vname, val);
-      return true;
-    }
-
-  private:
-    RCCallback m_callback;
-    std::string m_vname;
-
-  };
-
-}
-
 using namespace Belle2;
 
 EB1RXCallback::EB1RXCallback()
@@ -58,9 +29,11 @@ void EB1RXCallback::initialize(const DBObject& obj) throw(RCHandlerException)
   const DBObjectList& o_txs(obj.getObjects("tx"));
   for (size_t i = 0; i < o_txs.size(); i++) {
     const DBObject& o_tx(o_txs[i]);
-    std::string host = o_tx.getText("host");
-    add(new NSMVHandlerEB1HostUsed(*this, host + ".used", StringUtil::form("tx[%d].used", i)));
     bool used = o_tx.getBool("used");
+    std::string vname = o_tx.getText("name") + ".";
+    std::string rname = StringUtil::form("tx[%d].", m_nsenders);
+    add(new NSMVHandlerRef(*this, vname + "used", rname + "used"));
+    add(new NSMVHandlerRef(*this, vname + "connection", rname + "connection"));
     if (used) {
       std::string vname = StringUtil::form("stat.in[%d].", m_nsenders);
       add(new NSMVHandlerInt(vname + "addr", true, false, 0));
@@ -69,6 +42,8 @@ void EB1RXCallback::initialize(const DBObject& obj) throw(RCHandlerException)
       add(new NSMVHandlerInt(vname + "byte", true, false, 0));
       add(new NSMVHandlerInt(vname + "event", true, false, 0));
       add(new NSMVHandlerFloat(vname + "total_byte", true, false, 0));
+      //add(new NSMVHandlerFloat(vname + "nevent", true, false, 0));
+      //add(new NSMVHandlerFloat(vname + "evtrate", true, false, 0));
       add(new NSMVHandlerFloat(vname + "flowrate", true, false, 0));
       m_nsenders++;
     }
@@ -80,6 +55,8 @@ void EB1RXCallback::initialize(const DBObject& obj) throw(RCHandlerException)
   add(new NSMVHandlerInt(vname + "byte", true, false, 0));
   add(new NSMVHandlerInt(vname + "event", true, false, 0));
   add(new NSMVHandlerFloat(vname + "total_byte", true, false, 0));
+  //add(new NSMVHandlerFloat(vname + "nevent", true, false, 0));
+  //add(new NSMVHandlerFloat(vname + "evtrate", true, false, 0));
   add(new NSMVHandlerFloat(vname + "flowrate", true, false, 0));
   std::string upname = std::string("/dev/shm/") + getNode().getName() + "_eb1rx_up";
   std::string downname = std::string("/dev/shm/") + getNode().getName() + "_eb1rx_down";
@@ -118,7 +95,6 @@ void EB1RXCallback::load(const DBObject& obj) throw(RCHandlerException)
     m_nsenders = 0;
     for (size_t i = 0; i < o_txs.size(); i++) {
       const DBObject& o_tx(o_txs[i]);
-      std::string name = o_tx.getText("name");
       bool used = o_tx.getBool("used");
       if (!used) continue;
       bool isftsw = o_tx.getBool("ftsw");

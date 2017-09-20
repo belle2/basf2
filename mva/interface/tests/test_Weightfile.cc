@@ -28,7 +28,7 @@ namespace {
   class TestOptions : public MVA::Options {
 
   public:
-    TestOptions(const std::string& x, const std::string& y) : x(x), y(y) { }
+    TestOptions(const std::string& _x, const std::string& _y) : x(_x), y(_y) { }
     virtual void load(const boost::property_tree::ptree& pt) override { y = pt.get<std::string>(x); }
     virtual void save(boost::property_tree::ptree& pt) const override { pt.put(x, y); }
     virtual po::options_description getDescription() override
@@ -216,6 +216,27 @@ namespace {
     MVA::Weightfile::saveToDatabase(weightfile, "MVAInterfaceTest");
 
     auto loaded = MVA::Weightfile::loadFromDatabase("MVAInterfaceTest");
+
+    EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
+
+    boost::filesystem::remove_all("testPayloads");
+    Database::reset();
+
+  }
+
+  TEST(WeightfileTest, StaticDatabaseBadSymbols)
+  {
+
+    TestHelpers::TempDirCreator tmp_dir;
+    LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+
+    MVA::Weightfile weightfile;
+    weightfile.addElement("Test", "a");
+
+    std::string evilIdentifier = "==> *+:";
+    MVA::Weightfile::saveToDatabase(weightfile, evilIdentifier);
+
+    auto loaded = MVA::Weightfile::loadFromDatabase(evilIdentifier);
 
     EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
 

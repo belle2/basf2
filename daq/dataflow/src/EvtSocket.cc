@@ -78,7 +78,7 @@ EvtSocketRecv::~EvtSocketRecv()
   delete[] m_recbuf;
 }
 
-EvtMessage* EvtSocketRecv::EvtSocketRecv::recv()
+EvtMessage* EvtSocketRecv::recv()
 {
   int stat = m_sock->get(m_recbuf, MAXEVTSIZE);
   if (stat <= 0) return NULL;

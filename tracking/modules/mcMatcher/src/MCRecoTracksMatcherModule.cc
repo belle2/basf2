@@ -201,7 +201,7 @@ MCRecoTracksMatcherModule::MCRecoTracksMatcherModule()
            m_param_minimalEfficiency,
            "Minimal efficiency of a MCTrack to be considered matchable to a PRTrack. "
            "This number encodes which fraction of the true hits must at least be in the reconstructed track. "
-           "The default 0.05 suggests that at least 20% of the true hits should have been picked up.",
+           "The default 0.05 suggests that at least 5% of the true hits should have been picked up.",
            0.05);
 }
 
@@ -447,6 +447,8 @@ void MCRecoTracksMatcherModule::event()
   // ### Building the Monte-Carlo track to highest efficiency patter recognition track relation ###
   // Weighted efficiency
   using Efficiency = float;
+  using Purity = float;
+
   struct MostWeightEfficientPRId {
     RecoTrackId id;
     Efficiency weightedEfficiency;
@@ -460,6 +462,7 @@ void MCRecoTracksMatcherModule::event()
     RecoTrackId bestPrId = 0;
     Efficiency bestWeightedEfficiency = weightedEfficiencyCol(0);
     Efficiency bestEfficiency = efficiencyCol(0);
+    Purity bestPurity = purityMatrix.row(0)(mcId);
 
     // Reject efficiency smaller than the minimal one
     if (bestWeightedEfficiency < m_param_minimalEfficiency) {
@@ -468,19 +471,23 @@ void MCRecoTracksMatcherModule::event()
 
     // In case of a tie in the weighted efficiency we use the regular efficiency to break it.
     for (RecoTrackId prId = 1; prId < nPRRecoTracks; ++prId) {
+      Eigen::RowVectorXd purityRow = purityMatrix.row(prId);
+
       Efficiency currentWeightedEfficiency = weightedEfficiencyCol(prId);
       Efficiency currentEfficiency = efficiencyCol(prId);
+      Purity currentPurity = purityRow(mcId);
 
       // Reject efficiency smaller than the minimal one
       if (currentWeightedEfficiency < m_param_minimalEfficiency) {
         currentWeightedEfficiency = 0;
       }
 
-      if (std::tie(currentWeightedEfficiency, currentEfficiency) >
-          std::tie(bestWeightedEfficiency, bestEfficiency)) {
+      if (std::tie(currentWeightedEfficiency, currentEfficiency, currentPurity) >
+          std::tie(bestWeightedEfficiency, bestEfficiency, bestPurity)) {
         bestPrId = prId;
         bestEfficiency = currentEfficiency;
         bestWeightedEfficiency = currentWeightedEfficiency;
+        bestPurity = currentPurity;
       }
     }
 
@@ -491,7 +498,6 @@ void MCRecoTracksMatcherModule::event()
 
   // ### Building the patter recognition track to highest purity Monte-Carlo track relation ###
   // Unweighted purity
-  using Purity = float;
   struct MostPureMCId {
     RecoTrackId id;
     Purity purity;

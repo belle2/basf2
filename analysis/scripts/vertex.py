@@ -398,6 +398,32 @@ def massRave(
     )
 
 
+def vertexTree(
+    list_name,
+    conf_level=0.001,
+    bb_verbose=0,
+    massConstraint=[],
+    path=analysis_main,
+):
+    """
+    Perform the specified kinematic fit for each Particle in the given ParticleList.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit. 0 selects CL > 0
+    @param bb_verbose   (legacy) BaBar verbosity
+    @param m_constraint list of PDG ids which are mass-constrained
+    @param path         modules are added to this path
+    """
+
+    treeFitter = register_module("TreeFitter")
+    treeFitter.set_name('TreeFitter_' + list_name)
+    treeFitter.param('particleList', list_name)
+    treeFitter.param('confidenceLevel', conf_level)
+    treeFitter.param('verbose', bb_verbose)
+    treeFitter.param('massConstraintList', massConstraint)
+    path.add_module(treeFitter)
+
+
 def TagV(
     list_name,
     MCassociation='',

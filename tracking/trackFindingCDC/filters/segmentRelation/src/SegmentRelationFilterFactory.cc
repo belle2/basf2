@@ -20,7 +20,6 @@
 #include <tracking/trackFindingCDC/filters/base/AndFilter.h>
 #include <tracking/trackFindingCDC/filters/base/NotFilter.h>
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -58,31 +57,31 @@ std::unique_ptr<BaseSegmentRelationFilter >
 SegmentRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<NoneFilter<BaseSegmentRelationFilter>>();
+    return std::make_unique<NoneFilter<BaseSegmentRelationFilter>>();
   } else if (filterName == "truth") {
-    return makeUnique<MCSegmentRelationFilter>();
+    return std::make_unique<MCSegmentRelationFilter>();
   } else if (filterName == "unionrecording") {
-    return makeUnique<UnionRecordingSegmentRelationFilter>();
+    return std::make_unique<UnionRecordingSegmentRelationFilter>();
   } else if (filterName == "feasible") {
-    return makeUnique<MVAFeasibleSegmentRelationFilter>();
+    return std::make_unique<MVAFeasibleSegmentRelationFilter>();
   } else if (filterName == "realistic") {
-    return makeUnique<MVARealisticSegmentRelationFilter>();
+    return std::make_unique<MVARealisticSegmentRelationFilter>();
   } else if (filterName == "false_positive") {
     std::string defaultFilterName = this->getDefaultFilterName();
     auto defaultFilter = this->create(defaultFilterName);
     std::string truthFilterName = "truth";
     auto truthFilter = this->create(truthFilterName);
-    auto notTruthFilter = makeUnique<NotFilter<BaseSegmentRelationFilter>>(std::move(truthFilter));
-    return makeUnique<AndFilter<BaseSegmentRelationFilter>>(std::move(notTruthFilter),
-                                                            std::move(defaultFilter));
+    auto notTruthFilter = std::make_unique<NotFilter<BaseSegmentRelationFilter>>(std::move(truthFilter));
+    return std::make_unique<AndFilter<BaseSegmentRelationFilter>>(std::move(notTruthFilter),
+           std::move(defaultFilter));
   } else if (filterName == "false_negative") {
     std::string defaultFilterName = this->getDefaultFilterName();
     auto defaultFilter = this->create(defaultFilterName);
     std::string truthFilterName = "truth";
     auto truthFilter = this->create(truthFilterName);
-    auto notDefaultFilter = makeUnique<NotFilter<BaseSegmentRelationFilter>>(std::move(defaultFilter));
-    return makeUnique<AndFilter<BaseSegmentRelationFilter>>(std::move(notDefaultFilter),
-                                                            std::move(truthFilter));
+    auto notDefaultFilter = std::make_unique<NotFilter<BaseSegmentRelationFilter>>(std::move(defaultFilter));
+    return std::make_unique<AndFilter<BaseSegmentRelationFilter>>(std::move(notDefaultFilter),
+           std::move(truthFilter));
   } else {
     return Super::create(filterName);
   }

@@ -10,6 +10,7 @@
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMElementID.h>
+#include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
@@ -17,14 +18,12 @@ using namespace Belle2;
 EKLMElementID::EKLMElementID() : m_Type(c_Endcap), m_Endcap(-1), m_Layer(-1),
   m_Sector(-1), m_Plane(-1), m_Segment(-1)
 {
-  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
 EKLMElementID::EKLMElementID(int endcap, int layer, int sector) :
   m_Type(c_Sector), m_Endcap(endcap), m_Layer(layer), m_Sector(sector),
   m_Plane(-1), m_Segment(-1)
 {
-  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
 EKLMElementID::EKLMElementID(
@@ -32,44 +31,44 @@ EKLMElementID::EKLMElementID(
   m_Type(c_Segment), m_Endcap(endcap), m_Layer(layer), m_Sector(sector),
   m_Plane(plane), m_Segment(segment)
 {
-  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
 EKLMElementID::EKLMElementID(int globalNumber)
 {
-  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
+  const EKLM::ElementNumbersSingleton* elementNumbers =
+    &(EKLM::ElementNumbersSingleton::Instance());
   int id = globalNumber;
   if (id <= 0)
     B2FATAL("Incorrect (non-positive) EKLM global element number.");
-  if (id <= m_ElementNumbers->getMaximalEndcapNumber()) {
+  if (id <= elementNumbers->getMaximalEndcapNumber()) {
     m_Type = c_Endcap;
     m_Endcap = id;
     return;
   }
-  id -= m_ElementNumbers->getMaximalEndcapNumber();
-  if (id <= m_ElementNumbers->getMaximalLayerGlobalNumber()) {
+  id -= elementNumbers->getMaximalEndcapNumber();
+  if (id <= elementNumbers->getMaximalLayerGlobalNumber()) {
     m_Type = c_Layer;
-    m_ElementNumbers->layerNumberToElementNumbers(id, &m_Endcap, &m_Layer);
+    elementNumbers->layerNumberToElementNumbers(id, &m_Endcap, &m_Layer);
     return;
   }
-  id -= m_ElementNumbers->getMaximalLayerGlobalNumber();
-  if (id <= m_ElementNumbers->getMaximalSectorGlobalNumber()) {
+  id -= elementNumbers->getMaximalLayerGlobalNumber();
+  if (id <= elementNumbers->getMaximalSectorGlobalNumber()) {
     m_Type = c_Sector;
-    m_ElementNumbers->sectorNumberToElementNumbers(
+    elementNumbers->sectorNumberToElementNumbers(
       id, &m_Endcap, &m_Layer, &m_Sector);
     return;
   }
-  id -= m_ElementNumbers->getMaximalSectorGlobalNumber();
-  if (id <= m_ElementNumbers->getMaximalPlaneGlobalNumber()) {
+  id -= elementNumbers->getMaximalSectorGlobalNumber();
+  if (id <= elementNumbers->getMaximalPlaneGlobalNumber()) {
     m_Type = c_Plane;
-    m_ElementNumbers->planeNumberToElementNumbers(
+    elementNumbers->planeNumberToElementNumbers(
       id, &m_Endcap, &m_Layer, &m_Sector, &m_Plane);
     return;
   }
-  id -= m_ElementNumbers->getMaximalPlaneGlobalNumber();
-  if (id <= m_ElementNumbers->getMaximalSegmentGlobalNumber()) {
+  id -= elementNumbers->getMaximalPlaneGlobalNumber();
+  if (id <= elementNumbers->getMaximalSegmentGlobalNumber()) {
     m_Type = c_Segment;
-    m_ElementNumbers->segmentNumberToElementNumbers(
+    elementNumbers->segmentNumberToElementNumbers(
       id, &m_Endcap, &m_Layer, &m_Sector, &m_Plane, &m_Segment);
     return;
   }
@@ -142,46 +141,56 @@ int EKLMElementID::getSegment() const
 
 int EKLMElementID::getLayerNumber() const
 {
-  return m_ElementNumbers->detectorLayerNumber(m_Endcap, m_Layer);
+  const EKLM::ElementNumbersSingleton* elementNumbers =
+    &(EKLM::ElementNumbersSingleton::Instance());
+  return elementNumbers->detectorLayerNumber(m_Endcap, m_Layer);
 }
 
 int EKLMElementID::getSectorNumber() const
 {
-  return m_ElementNumbers->sectorNumber(m_Endcap, m_Layer, m_Sector);
+  const EKLM::ElementNumbersSingleton* elementNumbers =
+    &(EKLM::ElementNumbersSingleton::Instance());
+  return elementNumbers->sectorNumber(m_Endcap, m_Layer, m_Sector);
 }
 
 int EKLMElementID::getPlaneNumber() const
 {
-  return m_ElementNumbers->planeNumber(m_Endcap, m_Layer, m_Sector, m_Plane);
+  const EKLM::ElementNumbersSingleton* elementNumbers =
+    &(EKLM::ElementNumbersSingleton::Instance());
+  return elementNumbers->planeNumber(m_Endcap, m_Layer, m_Sector, m_Plane);
 }
 
 int EKLMElementID::getSegmentNumber() const
 {
-  return m_ElementNumbers->segmentNumber(m_Endcap, m_Layer, m_Sector,
-                                         m_Plane, m_Segment);
+  const EKLM::ElementNumbersSingleton* elementNumbers =
+    &(EKLM::ElementNumbersSingleton::Instance());
+  return elementNumbers->segmentNumber(m_Endcap, m_Layer, m_Sector,
+                                       m_Plane, m_Segment);
 }
 
 int EKLMElementID::getGlobalNumber() const
 {
+  const EKLM::ElementNumbersSingleton* elementNumbers =
+    &(EKLM::ElementNumbersSingleton::Instance());
   int offset = 0;
   if (m_Type == c_Endcap)
     return m_Endcap;
   else
-    offset += m_ElementNumbers->getMaximalEndcapNumber();
+    offset += elementNumbers->getMaximalEndcapNumber();
   if (m_Type == c_Layer)
-    return offset + m_ElementNumbers->detectorLayerNumber(m_Endcap, m_Layer);
+    return offset + elementNumbers->detectorLayerNumber(m_Endcap, m_Layer);
   else
-    offset += m_ElementNumbers->getMaximalLayerGlobalNumber();
+    offset += elementNumbers->getMaximalLayerGlobalNumber();
   if (m_Type == c_Sector)
-    return offset + m_ElementNumbers->sectorNumber(m_Endcap, m_Layer, m_Sector);
+    return offset + elementNumbers->sectorNumber(m_Endcap, m_Layer, m_Sector);
   else
-    offset += m_ElementNumbers->getMaximalSectorGlobalNumber();
+    offset += elementNumbers->getMaximalSectorGlobalNumber();
   if (m_Type == c_Plane)
-    return offset + m_ElementNumbers->planeNumber(m_Endcap, m_Layer, m_Sector,
-                                                  m_Plane);
+    return offset + elementNumbers->planeNumber(m_Endcap, m_Layer, m_Sector,
+                                                m_Plane);
   else
-    offset += m_ElementNumbers->getMaximalPlaneGlobalNumber();
-  return offset + m_ElementNumbers->segmentNumber(m_Endcap, m_Layer, m_Sector,
-                                                  m_Plane, m_Segment);
+    offset += elementNumbers->getMaximalPlaneGlobalNumber();
+  return offset + elementNumbers->segmentNumber(m_Endcap, m_Layer, m_Sector,
+                                                m_Plane, m_Segment);
 }
 

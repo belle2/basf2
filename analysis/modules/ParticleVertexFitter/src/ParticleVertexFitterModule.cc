@@ -225,7 +225,7 @@ namespace Belle2 {
           && m_fitType != "massvertex"
           && m_fitType != "mass"
           && m_fitType != "fourC")
-        B2FATAL("ParticleVertexFitter: " << m_fitType << " ***invalid fit type for the Kfitter ");
+        B2FATAL("ParticleVertexFitter: " << m_fitType << " ***invalid fit type for the vertex fitter ");
     }
 
     // fits using Rave
@@ -615,11 +615,11 @@ namespace Belle2 {
 
       std::vector<Particle*> daughters = mother->getDaughters();
 
-      unsigned n = kv.getTrackCount();
-      if (daughters.size() != n)
+      unsigned track_count = kv.getTrackCount();
+      if (daughters.size() != track_count)
         return false;
 
-      for (unsigned iChild = 0; iChild < n; iChild++) {
+      for (unsigned iChild = 0; iChild < track_count; iChild++) {
         TLorentzVector childMom(kv.getTrackMomentum(iChild).px(),
                                 kv.getTrackMomentum(iChild).py(),
                                 kv.getTrackMomentum(iChild).pz(),
@@ -706,11 +706,11 @@ namespace Belle2 {
 
       std::vector<Particle*> daughters = mother->getDaughters();
 
-      unsigned n = kmv.getTrackCount();
-      if (daughters.size() != n)
+      unsigned track_count = kmv.getTrackCount();
+      if (daughters.size() != track_count)
         return false;
 
-      for (unsigned iChild = 0; iChild < n; iChild++) {
+      for (unsigned iChild = 0; iChild < track_count; iChild++) {
         TLorentzVector childMom(kmv.getTrackMomentum(iChild).px(),
                                 kmv.getTrackMomentum(iChild).py(),
                                 kmv.getTrackMomentum(iChild).pz(),
@@ -797,11 +797,11 @@ namespace Belle2 {
 
       std::vector<Particle*> daughters = mother->getDaughters();
 
-      unsigned n = km.getTrackCount();
-      if (daughters.size() != n)
+      unsigned track_count = km.getTrackCount();
+      if (daughters.size() != track_count)
         return false;
 
-      for (unsigned iChild = 0; iChild < n; iChild++) {
+      for (unsigned iChild = 0; iChild < track_count; iChild++) {
         TLorentzVector childMom(km.getTrackMomentum(iChild).px(),
                                 km.getTrackMomentum(iChild).py(),
                                 km.getTrackMomentum(iChild).pz(),
@@ -890,7 +890,7 @@ namespace Belle2 {
 
       const unsigned nd = daughters.size();
       unsigned l = 0;
-      std::vector<unsigned> u[nd];
+      std::vector<std::vector<unsigned>> u(nd);
       for (unsigned ichild = 0; ichild < nd; ichild++) {
         const Particle* daughter = mother->getDaughter(ichild);
         if (daughter->getNDaughters() > 0) {
@@ -901,8 +901,8 @@ namespace Belle2 {
         }
       }
 
-      unsigned n = kf.getTrackCount();
-      if (l != n)
+      unsigned track_count = kf.getTrackCount();
+      if (l != track_count)
         return false;
 
       for (unsigned iDaug = 0; iDaug < nd; iDaug++) {

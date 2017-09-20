@@ -13,7 +13,9 @@ env['LIBS'] = [
     'boost_program_options',
     'fann',
     'analysis_utility',
-    'analysis_ContinuumSuppression'
+    'analysis_ContinuumSuppression',
+    'reconstruction_dataobjects',
+    'analysis_ClusterUtility'
 ]
 
 

@@ -28,15 +28,20 @@ const char *nsmlib2_version   = "nsmlib2 1.9.40";
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <stdint.h>
 #include <stdarg.h>
-#include <signal.h>
 #include <unistd.h>
+#include <string.h>
+#include <ctype.h>
+#include <signal.h>
 #include <errno.h>
 #include <netdb.h> /* for struct hostent */
 #include <net/if.h> /* for struct ifconf, ifreq */
+#include <sys/socket.h> /* for ntoha etc */
+#include <netinet/in.h> /* for ntoha etc */
+#include <arpa/inet.h>  /* for ntoha etc */
 #include <sys/types.h>
+#include <sys/time.h>
 #include <sys/ioctl.h>
 #include <sys/select.h>
 #include <sys/stat.h>

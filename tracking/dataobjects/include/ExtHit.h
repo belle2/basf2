@@ -21,7 +21,7 @@ namespace Belle2 {
 
   //! Define state of extrapolation for each recorded hit
   enum ExtHitStatus { EXT_FIRST = -1, EXT_ENTER, EXT_EXIT, EXT_STOP, EXT_ESCAPE,
-                      EXT_ECLCROSS, EXT_ECLDL
+                      EXT_ECLCROSS, EXT_ECLDL, EXT_ECLNEAR
                     };
 
   //! Store one Ext hit as a ROOT object
@@ -143,7 +143,7 @@ namespace Belle2 {
     float m_Covariance[21];
 
     //! Needed to make the ROOT object storable
-    ClassDef(ExtHit, 6)
+    ClassDef(ExtHit, 7)
 
   };
 }

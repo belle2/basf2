@@ -12,9 +12,9 @@ void  ECLMuonPdf::init(const char* parametersFileName)
   ECLAbsPdf::init(map);
 
   unsigned int len = nbins * nCosTheta ;
-  m_params = new Parameters [ len ];
-  m_integral1 = new double [ len ];
-  m_integral2 = new double [ len ];
+  m_params = std::vector<Parameters>(len);
+  m_integral1 = std::vector<double>(len);
+  m_integral2 = std::vector<double>(len);
   for (unsigned int ip = 1; ip < nbins; ++ip)
     for (unsigned int ith = 0; ith < nCosTheta; ++ith) {
       unsigned int i = index(ip, ith);
@@ -38,11 +38,4 @@ double ECLMuonPdf::pdf(double eop, double p, double costheta) const
   double sigma1 = (eop < prm.mu1) ? prm.sigma1l : prm.sigma1r;
   return TMath::Gaus(eop, prm.mu1, sigma1, true) * prm.fraction / m_integral1[i] +
          (1 - prm.fraction) * TMath::Gaus(eop, prm.mu2, prm.sigma2, true) / m_integral2[2];
-}
-
-ECLMuonPdf::~ECLMuonPdf()
-{
-  delete[] m_params;
-  delete[] m_integral1;
-  delete[] m_integral2;
 }

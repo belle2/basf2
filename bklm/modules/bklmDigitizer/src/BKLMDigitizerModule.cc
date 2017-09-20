@@ -166,25 +166,25 @@ void BKLMDigitizerModule::digitize(const std::map<int, std::vector<std::pair<int
   for (std::map<int, std::vector<std::pair<int, BKLMSimHit*> > >::const_iterator iVolMap = volIDToSimHits.begin();
        iVolMap != volIDToSimHits.end(); ++iVolMap) {
     // Make one BKLMDigit for each scintillator strip then add relations to this BKLMDigit from each BKLMSimHit
-    BKLMDigit* digit = digits.appendNew((iVolMap->second.front()).second);
+    BKLMDigit* bklmDigit = digits.appendNew((iVolMap->second.front()).second);
     for (std::vector<std::pair<int, BKLMSimHit*> >::const_iterator iSimHit = iVolMap->second.begin(); iSimHit != iVolMap->second.end();
          ++iSimHit) {
-      simHits[iSimHit->first]->addRelationTo(digit);
+      simHits[iSimHit->first]->addRelationTo(bklmDigit);
     }
-    processEntry(iVolMap->second, digit);
+    processEntry(iVolMap->second, bklmDigit);
   }
 
 }
 
-void BKLMDigitizerModule::processEntry(std::vector<std::pair<int, BKLMSimHit*> > vHits, BKLMDigit* digit)
+void BKLMDigitizerModule::processEntry(std::vector<std::pair<int, BKLMSimHit*> > vHits, BKLMDigit* bklmDigit)
 {
 
-  digit->setFitStatus(EKLM::c_FPGANoSignal);
-  digit->setTime(0.0);
-  digit->setEDep(0.0);
-  digit->setSimNPixel(0);
-  digit->setNPixel(0.0);
-  digit->isAboveThreshold(false);
+  bklmDigit->setFitStatus(EKLM::c_FPGANoSignal);
+  bklmDigit->setTime(0.0);
+  bklmDigit->setEDep(0.0);
+  bklmDigit->setSimNPixel(0);
+  bklmDigit->setNPixel(0.0);
+  bklmDigit->isAboveThreshold(false);
 
   int nPE = 0;
   std::vector<double> adcPulse(m_nDigitizations, 0.0);
@@ -236,9 +236,9 @@ void BKLMDigitizerModule::processEntry(std::vector<std::pair<int, BKLMSimHit*> >
 
   if (first == m_nDigitizations) return;
 
-  digit->setFitStatus(EKLM::c_FPGASuccessfulFit);
-  digit->setTime(first * m_ADCSamplingTime);
-  digit->setSimNPixel(nPE);
+  bklmDigit->setFitStatus(EKLM::c_FPGASuccessfulFit);
+  bklmDigit->setTime(first * m_ADCSamplingTime);
+  bklmDigit->setSimNPixel(nPE);
 
   double bkgArea = 0.0;
   int bkgCount = 0;
@@ -257,9 +257,9 @@ void BKLMDigitizerModule::processEntry(std::vector<std::pair<int, BKLMSimHit*> >
   double bkgAmplitude = 0.0;
   if (bkgCount > 0) bkgAmplitude = bkgArea / double(bkgCount);
 
-  digit->setNPixel((sum - (last - first + 1) * bkgAmplitude) * 2.0 / m_ADCRange);
-  digit->setEDep(digit->getNPixel() / m_nPEperMeV);
-  digit->isAboveThreshold(nPE > m_discriminatorThreshold);
+  bklmDigit->setNPixel((sum - (last - first + 1) * bkgAmplitude) * 2.0 / m_ADCRange);
+  bklmDigit->setEDep(bklmDigit->getNPixel() / m_nPEperMeV);
+  bklmDigit->isAboveThreshold(nPE > m_discriminatorThreshold);
   return;
 }
 

@@ -126,6 +126,23 @@ namespace Belle2 {
      */
     const PayloadInfo& get(const std::string& name);
 
+    /** Get the timeout to wait for connections in seconds, 0 means built in default */
+    static unsigned int getConnectionTimeout() { return s_connectionTimeout; }
+    /** Get the timeout to wait for stalled connections (<10KB/s), 0 means no timeout */
+    static unsigned int getStalledTimeout() { return s_stalledTimeout; }
+    /** Get the number of retries to perform when downloading failes with HTTP response code >=500, 0 means no retries*/
+    static unsigned int getMaxRetries() { return s_maxRetries; }
+    /** Get the backoff factor for retries in seconds */
+    static unsigned int getBackoffFactor() { return s_backoffFactor; }
+    /** Set the timeout to wait for connections in seconds, 0 means built in default */
+    static void setConnectionTimeout(unsigned int timeout) { s_connectionTimeout = timeout; }
+    /** Set the timeout to wait for stalled connections (<10KB/s), 0 disables timeout */
+    static void setStalledTimeout(unsigned int timeout) { s_stalledTimeout = timeout; }
+    /** Set the number of retries to perform when downloading failes with HTTP response code >=500, 0 disables retry */
+    static void setMaxRetries(unsigned int retries) { s_maxRetries = retries; }
+    /** Set the backoff factor for retries in seconds. Minimum is 1 and 0 will be silently converted to 1 */
+    static void setBackoffFactor(unsigned int factor) { s_backoffFactor = std::max(1u, factor); }
+
   private:
 
     /** get an url and save the content to stream
@@ -198,5 +215,14 @@ namespace Belle2 {
     std::map<std::string, std::unique_ptr<FileSystem::TemporaryFile>> m_tempfiles;
     /** Map of all existing payloads */
     std::map<std::string, PayloadInfo> m_payloads;
+
+    /** Timeout to wait for connections in seconds */
+    static unsigned int s_connectionTimeout;
+    /** Timeout to wait for stalled connections (<10KB/s) */
+    static unsigned int s_stalledTimeout;
+    /** Number of retries to perform when downloading failes with HTTP response code >=500 */
+    static unsigned int s_maxRetries;
+    /** Backoff factor for retries in seconds */
+    static unsigned int s_backoffFactor;
   };
 }

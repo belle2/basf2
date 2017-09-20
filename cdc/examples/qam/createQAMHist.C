@@ -14,6 +14,7 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
 {
 
   gROOT->Reset();
+  gROOT->SetBatch(1);
   gStyle->SetOptStat(1);
   gStyle->SetOptTitle(111);
   gStyle->SetStatW(0.32);
@@ -222,7 +223,7 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
   h04->Draw();
   c1a->cd(6);
   h05->Draw();
-  c1a->Print("fitResults_1a.gif");
+  //  c1a->Print("fitResults_1a.gif");
 
   TCanvas* c1b = new TCanvas("c1b", "c1b", 500, 500);
   c1b->Divide(3, 2);
@@ -238,7 +239,7 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
   h15->Draw();
   c1b->cd(6);
   h16->Draw();
-  c1b->Print("fitResults_1b.gif");
+  //  c1b->Print("fitResults_1b.gif");
 
   Double_t x_Pt[13] = {0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9};
   Double_t ex_Pt[13] = {0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10};
@@ -289,12 +290,12 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
     ezy0_sigma[k] = (hz0[k]->GetFunction("gaus")->GetParError(2));
 
     std::cout << " end the loop " << k << std::endl;
-    if (k == 0) c4_0->Print("Results_bin0.gif");
-    if (k == 1) c4_0->Print("Results_bin1.gif");
-    if (k == 2) c4_0->Print("Results_bin2.gif");
-    if (k == 3) c4_0->Print("Results_bin3.gif");
-    if (k == 6) c4_0->Print("Results_bin6.gif");
-    if (k == 12) c4_0->Print("Results_bin12.gif");
+    //    if (k == 0) c4_0->Print("Results_bin0.gif");
+    //    if (k == 1) c4_0->Print("Results_bin1.gif");
+    //    if (k == 2) c4_0->Print("Results_bin2.gif");
+    //    if (k == 3) c4_0->Print("Results_bin3.gif");
+    //    if (k == 6) c4_0->Print("Results_bin6.gif");
+    //    if (k == 12) c4_0->Print("Results_bin12.gif");
 
   }
 
@@ -321,7 +322,7 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
   gr->Draw("AP");
 
 
-  c1_0->Print("Results_pt.gif");
+  //  c1_0->Print("Results_pt.gif");
 
 
   TCanvas* c1_1 = new TCanvas("c1_1", "d0 resolution", 450, 450);
@@ -343,7 +344,7 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
   dgr->GetYaxis()->CenterTitle();
   dgr->Draw("AP");
 
-  c1_1->Print("Results_d0.gif");
+  //  c1_1->Print("Results_d0.gif");
 
   // phi0:
   TCanvas* c1_2 = new TCanvas("c1_2", "phi0 resolution", 450, 450);
@@ -365,7 +366,7 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
   pgr->GetYaxis()->CenterTitle();
   pgr->Draw("AP");
 
-  c1_2->Print("Results_phi0.gif");
+  //  c1_2->Print("Results_phi0.gif");
 
   // omega:
   TCanvas* c1_3 = new TCanvas("c1_3", "omega resolution", 450, 450);
@@ -387,7 +388,7 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
   ogr->GetYaxis()->CenterTitle();
   ogr->Draw("AP");
 
-  c1_3->Print("Results_omega.gif");
+  //  c1_3->Print("Results_omega.gif");
 
   // z0:
   TCanvas* c1_4 = new TCanvas("c1_4", "z0 resolution", 450, 450);
@@ -409,7 +410,7 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
   zgr->GetYaxis()->CenterTitle();
   zgr->Draw("AP");
 
-  c1_4->Print("Results_z0.gif");
+  //  c1_4->Print("Results_z0.gif");
 
   TFile *fout = new TFile(outputName,"RECREATE");
   

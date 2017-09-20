@@ -129,7 +129,7 @@ CKFCDCToSpacePointStateObjectFilterFactory::create(const std::string& filterName
   } else if (filterName == "recording") {
     return std::make_unique<RecordingCKFCDCToSpacePointStateObjectFilter>("CKFCDCToSpacePointStateObjectFilter.root");
   } else if (filterName == "mva") {
-    return std::make_unique<MVACKFCDCToSpacePointStateObjectFilter>("tracking/data/ckf_CDCSVDStateFilter.xml");
+    return std::make_unique<MVACKFCDCToSpacePointStateObjectFilter>("tracking/data/ckf_CDCSVDStateFilter_1.xml");
   } else if (filterName == "sloppy_recording") {
     return std::make_unique<SloppyRecordingCKFCDCToSpacePointStateObjectFilter>("CKFCDCToSpacePointStateObjectFilter.root");
   } else {

@@ -12,7 +12,7 @@ LIBS    += -lm -lpthread -ldl -lrt -lreadline -lncurses -L$(PGSQL_LIB_PATH) -lpq
 LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_nsm \
 	-ldaq_slc_psql -ldaq_slc_hvcontrol_arichlv -ldaq_slc_hvcontrol 
 LIBS    += -lnsm2_corelib -lnsm2_b2lib
-LIBS    += -lsnmp
+LIBS    += -lnetsnmp
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT -I$(PGSQL_INC_PATH)
 CFLAGS  += -I$(BELLE2_DAQ_SLC)/include -I.

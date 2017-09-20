@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# install optional python packages which are required to
+# use ipython notebooks productively
+
+import subprocess
+import site
+import os
+import sys
+import argparse
+
+# the list of additional pip packages installed by this script, nothing atm
+optional_packages_list = []
+
+def can_install_sitepackages():
+    """
+    Returns true if the user can install additional packages in the default site-packages folder
+    """
+    first_site = site.getsitepackages()[0]
+    if os.access(first_site, os.W_OK):
+        print("Site package folder {} writeable. User can install additional packages.".format(first_site))
+        return True
+    else:
+        print("Site package folder {} read-only. User cannot install additional packages.".format(first_site))
+        return False
+
+
+def call_and_output(command_and_args, *args, **kwargs):
+    """
+    Call a shell command and output the stdout directly on the calling console
+    @param command_and_args: list of command and arguments
+    @param args: forwarded arguments to subprocess.check_output
+    @param kwargs: forwarded keyword arguments to subprocess.check_output
+    """
+    subprocess.run(command_and_args, *args, check=True, **kwargs)
+
+
+def get_argument_parser(target_required=False):
+    """
+    Return the argument parser. For easy automatized argmunt collection of FW tools.
+    @param target_required: True if the target argument is required because no write to the default
+                            folder is possible.
+    """
+    parser = argparse.ArgumentParser(description='Install optional python packages for basf2')
+    # if we can install into the default location, using the target parameter becomes optional
+    parser.add_argument('--target',
+                        required=target_required,
+                        help='Folder used as target to install additional pip packages. Must be writeable.')
+
+    parser.add_argument('package',
+                        nargs="*",
+                        help='Packages to additionally install in addition to {}'.format(optional_packages_list))
+
+    return parser
+
+
+if __name__ == "__main__":
+    # check if we can make the target parameter optional
+    can_install = can_install_sitepackages()
+
+    parser = get_argument_parser(not can_install)
+    args = parser.parse_args()
+    
+    target_option = []
+    target_pythonpath_env = os.environ.copy()
+    target_path_abs = None
+    if args.target:
+        print("Installing packages into target {} -- This will take some time.".format(args.target) )
+        target_path_abs = os.path.abspath(args.target)
+        target_option = ["--target", target_path_abs]
+    
+        # add the new target folder to the python path
+        target_pythonpath_env["PYTHONPATH"] = target_path_abs + ":" + target_pythonpath_env["PYTHONPATH"]
+    else:
+        print("Installing packages -- This will take some time.")
+    
+    # install packages
+    call_and_output(["pip3", "install", "-v"] + target_option + optional_packages_list + args.package,
+                    env=target_pythonpath_env)
+    
+    if not args.target:
+        print("All optional packages installed into the default site-packages location.")
+    else:
+        print("""All optional packages installed into the target folder {}
+                  !!!  IMPORTANT !!!
+               In order to use the installed optional python packages, you need to add
+               the target folder to your PYTHONPATH environment variable before running basf2.
+               You can do this by executing the following command after you called setuprel:""".format(target_path_abs) +
+    
+              os.linesep + 'export PYTHONPATH="' + target_path_abs + ':${PYTHONPATH}"')
+

@@ -33,6 +33,10 @@ namespace Belle2 {
     /** pointer to spacePoint */
     SpacePoint* spacePoint;
 
+    /** unique integer identifier */
+    int m_identifier;
+
+    /** longer name for debugging */
     std::string m_name;
 
     /** overloaded '=='-operator
@@ -83,21 +87,6 @@ namespace Belle2 {
       return *spacePoint;
     }
 
-
-//  /** returns pointer to hit of the tracknode if set, returns nullptr if not. */
-//  const SpacePoint* getHit() const
-//  {
-//    if (spacePoint == nullptr) B2WARNING("TrackNode::getHit: spacePoint for Tracknode not set - returning nullptr instead!")
-//    return spacePoint;
-//  }
-
-//  /** returns pointer to activeSector of the tracknode if set, returns nullptr if not. */
-//  ActiveSector<StaticSectorType, TrackNode>* getActiveSector()
-//  {
-//    if (sector == nullptr) B2WARNING("TrackNode::getActiveSector: ActiveSector for Tracknode not set - returning nullptr instead!")
-//    return sector;
-//  }
-
     /** returns reference to hit. */
     ActiveSector<StaticSectorType, TrackNode>& getActiveSector()
     {
@@ -105,26 +94,25 @@ namespace Belle2 {
       return *sector;
     }
 
-
     /** constructor WARNING: sector-pointing has still to be decided! */
-    TrackNode() : sector(nullptr), spacePoint(nullptr), m_name("SP: missing") {}
+    TrackNode() : sector(nullptr), spacePoint(nullptr), m_identifier(-1), m_name("SP: missing") {}
 
-    TrackNode(SpacePoint* spacePoint) :
+    TrackNode(SpacePoint* spacePoint) :      // Get unique identifier from SP ArrayIndex, Get long debugging name from SP
       sector(nullptr), spacePoint(spacePoint)
     {
+      m_identifier = spacePoint->getArrayIndex();
       m_name = "SP: " + spacePoint->getName();
     }
-
 
     /** destructor */
     ~TrackNode() {}
 
+    /** return ID of this node */
+    int getID() { return m_identifier; }
 
-    /** returns secID of this sector */
-    std::string getName() const
-    {
-      return m_name;
-    }
+    /** returns longer debugging name of this node */
+    const std::string& getName() const { return m_name; }
+
   };
 
 } //Belle2 namespace

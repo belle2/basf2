@@ -22,13 +22,15 @@ def bold(text):
 
 
 def print_summary(p):
-    monitoring.MonitorROCPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_ROC'))
-    monitoring.MonitorDiagPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_Diag'))
-    if p.particle.identifier in ['B+:generic', 'B0:generic']:
-        monitoring.MonitorMbcPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_Money'))
-    if p.particle.identifier in ['B+:semileptonic', 'B0:semileptonic']:
-        monitoring.MonitorCosBDLPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_Money'))
-
+    try:
+        monitoring.MonitorROCPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_ROC'))
+        monitoring.MonitorDiagPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_Diag'))
+        if p.particle.identifier in ['B+:generic', 'B0:generic']:
+            monitoring.MonitorMbcPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_Money'))
+        if p.particle.identifier in ['B+:semileptonic', 'B0:semileptonic']:
+            monitoring.MonitorCosBDLPlot(p, monitoring.removeJPsiSlash(p.particle.identifier + '_Money'))
+    except:
+        pass
     print(bold(p.particle.identifier))
     print('Total cpu time spent reconstructing this particle: ',
           p.module_statistic.particle_time + sum(p.module_statistic.channel_time.values()))

@@ -3,7 +3,6 @@ from softwaretrigger import (
     SOFTWARE_TRIGGER_GLOBAL_TAG_NAME
 )
 
-import rawdata
 import reconstruction
 from softwaretrigger import add_fast_reco_software_trigger, add_hlt_software_trigger, \
     add_calibration_software_trigger
@@ -13,49 +12,9 @@ ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*"]
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
 
 
-def add_packers(path, components=DEFAULT_HLT_COMPONENTS):
-    """
-    Slightly modified version of rawdata.add_packers to not include the packer for PXD and add the Geometry/Gearbox
-     when needed.
-    :param path: The path to which the packers will be added.
-    :param components: Which components to use.
-    """
-    # Add Gearbox or geometry to path if not already there
-    if "Gearbox" not in path:
-        path.add_module("Gearbox")
-
-    if "Geometry" not in path:
-        path.add_module("Geometry")
-
-    # Exclude PXD
-    rawdata.add_packers(path, components=components)
-
-
-def add_unpackers(path, components=DEFAULT_HLT_COMPONENTS):
-    """
-    Slightly modified version of rawdata.add_unpackers to not include the unpacker for PXD and add the Geometry/Gearbox
-     when needed.
-    :param path: The path to which the unpackers will be added.
-    :param components: Which components to use.
-    """
-    # Add Gearbox or geometry to path if not already there
-    if "Gearbox" not in path:
-        path.add_module("Gearbox")
-
-    if "Geometry" not in path:
-        path.add_module("Geometry")
-
-    # Exclude PXD
-    rawdata.add_unpackers(path, components=components)
-
-    # add clusterizer
-    if not components or "SVD" in components:
-        path.add_module("SVDClusterizer")
-
-
 def add_softwaretrigger_reconstruction(
         path,
-        store_array_debug_prescale=None,
+        store_array_debug_prescale=0,
         components=DEFAULT_HLT_COMPONENTS,
         additionalTrackFitHypotheses=[],
         softwaretrigger_mode='hlt_filter'):
@@ -127,15 +86,10 @@ def add_softwaretrigger_reconstruction(
         if softwaretrigger_mode in ['fast_reco_filter', 'hlt_filter']:
             # There are three possibilities for the output of this module
             # (1) the event is dismissed -> only store the metadata
-            fast_reco_cut_module.if_value("==-1", store_only_metadata_path, basf2.AfterConditionPath.CONTINUE)
-            # (2) we do not know what to do or the event is accepted -> go on with the hlt reconstruction
-            fast_reco_cut_module.if_value("!=-1", hlt_reconstruction_path, basf2.AfterConditionPath.CONTINUE)
+            fast_reco_cut_module.if_value("==0", store_only_metadata_path, basf2.AfterConditionPath.CONTINUE)
+            # (2) the event is accepted -> go on with the hlt reconstruction
+            fast_reco_cut_module.if_value("==1", hlt_reconstruction_path, basf2.AfterConditionPath.CONTINUE)
 
-            # second possibility
-            # # (2) the event is immediately accepted -> store everything
-            # fast_reco_cut_module.if_value("==1", store_only_rawdata_path, basf2.AfterConditionPath.CONTINUE)
-            # # (3) we do not know what to do -> go on with the reconstruction
-            # fast_reco_cut_module.if_value("==0", hlt_reconstruction_path, basf2.AfterConditionPath.CONTINUE)
         elif softwaretrigger_mode == 'monitoring':
             fast_reco_reconstruction_path.add_path(hlt_reconstruction_path)
 
@@ -149,10 +103,10 @@ def add_softwaretrigger_reconstruction(
         calibration_and_store_only_rawdata_path.add_path(get_store_only_rawdata_path())
         if softwaretrigger_mode == 'hlt_filter':
             # There are two possibilities for the output of this module
-            # (1) the event is accepted -> store everything
+            # (1) the event is rejected -> only store the metadata
+            hlt_cut_module.if_value("==0", store_only_metadata_path, basf2.AfterConditionPath.CONTINUE)
+            # (2) the event is accepted -> go on with the calibration
             hlt_cut_module.if_value("==1", calibration_and_store_only_rawdata_path, basf2.AfterConditionPath.CONTINUE)
-            # (2) we do not know what to do or the event is rejected -> only store the metadata
-            hlt_cut_module.if_value("!=1", store_only_metadata_path, basf2.AfterConditionPath.CONTINUE)
         elif softwaretrigger_mode in ['monitoring', 'fast_reco_filter']:
             hlt_reconstruction_path.add_path(calibration_and_store_only_rawdata_path)
 

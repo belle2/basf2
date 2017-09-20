@@ -79,10 +79,6 @@ void TrackFinderVXDBasicPathFinderModule::initialize()
 
   m_network.isRequired(m_PARAMNetworkName);
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
-
-  //Relations SpacePoints and SpacePointTCs:
-  m_TCs.registerRelationTo(m_spacePoints, DataStore::c_Event, DataStore::c_DontWriteOut);
-  m_spacePoints.registerRelationTo(m_TCs, DataStore::c_Event, DataStore::c_DontWriteOut);
 }
 
 

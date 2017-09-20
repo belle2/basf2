@@ -35,7 +35,7 @@ namespace Belle2 {
       /// Constructor from a series of hits.
       explicit CDCTrack(const std::vector<CDCRecoHit3D>& recoHits3D);
 
-      /// Constructor from a two dimensional segment filling the thrid dimension with 0 values.
+      /// Constructor from a two dimensional segment filling the third dimension with 0 values.
       explicit CDCTrack(const CDCSegment2D& segment);
 
       /// Concats several tracks from a path

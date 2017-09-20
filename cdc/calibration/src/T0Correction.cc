@@ -122,15 +122,16 @@ bool T0Correction::calibrate()
 
   B2INFO("Gaus fitting for whole channel");
   double par[3];
+  double mean = 0.;
   m_hTotal->SetDirectory(0);
-  const double mean = m_hTotal->GetMean();
+  mean = m_hTotal->GetMean();
   m_hTotal->Fit("g1", "Q", "", mean - 15, mean + 15);
   g1->GetParameters(par);
 
   B2INFO("Gaus fitting for each board");
   for (int ib = 1; ib < 300; ++ib) {
     if (m_hT0b[ib]->GetEntries() < 10) continue;
-    const double mean = m_hT0b[ib]->GetMean();
+    mean = m_hT0b[ib]->GetMean();
     m_hT0b[ib]->SetDirectory(0);
     m_hT0b[ib]->Fit("g1", "Q", "", mean - 15, mean + 15);
     g1->GetParameters(par);
@@ -147,7 +148,7 @@ bool T0Correction::calibrate()
       const int n = m_h1[ilay][iwire]->GetEntries();
       B2DEBUG(99, "layer " << ilay << " wire " << iwire << " entries " << n);
       if (n < 10) continue;
-      const double mean = m_h1[ilay][iwire]->GetMean();
+      mean = m_h1[ilay][iwire]->GetMean();
       m_h1[ilay][iwire]->SetDirectory(0);
       m_h1[ilay][iwire]->Fit("g1", "Q", "", mean - 15, mean + 15);
       g1->GetParameters(par);
@@ -181,16 +182,16 @@ bool T0Correction::calibrate()
     TDirectory* corrT0 = top->mkdir("DeltaT0");
     corrT0->cd();
 
-
-    TGraphErrors* grb = new TGraphErrors(b.size(), &b.at(0), &Sb.at(0), &db.at(0), &dSb.at(0));
-    grb->SetMarkerColor(2);
-    grb->SetMarkerSize(1.0);
-    grb->SetTitle("#DeltaT0;BoardID;#DeltaT0[ns]");
-    grb->SetMaximum(10);
-    grb->SetMinimum(-10);
-    grb->SetName("Board");
-    grb->Write();
-
+    if (b.size() > 2) {
+      TGraphErrors* grb = new TGraphErrors(b.size(), &b.at(0), &Sb.at(0), &db.at(0), &dSb.at(0));
+      grb->SetMarkerColor(2);
+      grb->SetMarkerSize(1.0);
+      grb->SetTitle("#DeltaT0;BoardID;#DeltaT0[ns]");
+      grb->SetMaximum(10);
+      grb->SetMinimum(-10);
+      grb->SetName("Board");
+      grb->Write();
+    }
     for (int sl = 0; sl < 56; ++sl) {
       if (c[sl].size() < 2) continue;
       gr[sl] = new TGraphErrors(c[sl].size(), &c[sl].at(0), &s[sl].at(0), &dc[sl].at(0), &ds[sl].at(0));

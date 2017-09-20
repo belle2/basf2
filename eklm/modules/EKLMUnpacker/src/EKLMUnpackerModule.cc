@@ -108,22 +108,23 @@ void EKLMUnpackerModule::event()
           //uint16_t tdc = bword3 & 0x7FF;
           uint16_t charge = bword4 & 0x7FFF;
           B2DEBUG(1, "copper: " << copperId << " finesse: " << finesse_num);
-          EKLMDigit* digit = eklmDigits.appendNew();
-          digit->setTime(ctime);
-          digit->setEndcap(endcap);
-          digit->setLayer(layer);
-          digit->setSector(sector);
-          digit->setPlane(plane);
-          digit->setStrip(strip);
-          digit->isGood(true);
-          digit->setCharge(charge);
-          //digit->setEDep(charge);
-          B2DEBUG(1, "from digit:endcap " << digit->getEndcap() <<
-                  " layer: " << digit->getLayer() << " strip: " <<
-                  digit->getSector() << ", " << " plane " <<
-                  digit->getPlane() << " :strip " << digit->getStrip() <<
-                  " charge=" << digit->getEDep() << " time=" <<
-                  digit->getTime());
+          EKLMDigit* eklmDigit = eklmDigits.appendNew();
+          eklmDigit->setTime(ctime);
+          eklmDigit->setEndcap(endcap);
+          eklmDigit->setLayer(layer);
+          eklmDigit->setSector(sector);
+          eklmDigit->setPlane(plane);
+          eklmDigit->setStrip(strip);
+          eklmDigit->isGood(true);
+          eklmDigit->setCharge(charge);
+          //eklmDigit->setEDep(charge);
+          B2DEBUG(1, "from digit: endcap: " << eklmDigit->getEndcap() <<
+                  " layer: " << eklmDigit->getLayer() <<
+                  " strip: " << eklmDigit->getSector() <<
+                  " plane: " << eklmDigit->getPlane() <<
+                  " strip: " << eklmDigit->getStrip() <<
+                  " charge: " << eklmDigit->getEDep() <<
+                  " time: " << eklmDigit->getTime());
         }
       } //finesse boards
     } //copper boards

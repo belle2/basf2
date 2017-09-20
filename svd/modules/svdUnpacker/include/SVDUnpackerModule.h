@@ -20,11 +20,13 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawSVD.h>
 #include <svd/dataobjects/SVDDigit.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDTransparentDigit.h>
 
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <svd/online/SVDStripNoiseMap.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <memory>
 
 namespace Belle2 {
 
@@ -50,23 +52,24 @@ namespace Belle2 {
       /**
        *Initializes the Module.
        */
-      virtual void initialize();
-      virtual void beginRun();
-      virtual void event();
-      virtual void endRun();
-
-      virtual void terminate();
+      virtual void initialize() override;
+      virtual void beginRun() override;
+      virtual void event() override;
+      virtual void endRun() override;
 
       std::string m_rawSVDListName;
       std::string m_svdDigitListName;
       std::string m_xmlMapFileName;
+
+      bool m_generateShaperDigts;
+      std::string m_svdShaperDigitListName;
 
       int m_wrongFTBcrc;
 
 
     private:
 
-      SVDOnlineToOfflineMap* m_map;
+      std::unique_ptr<SVDOnlineToOfflineMap> m_map;
       //unsigned short m_runType;
 
       void loadMap();

@@ -83,7 +83,7 @@ namespace Belle2 {
     unsigned m_calibrationChannel = 0; /**< asic channel number where the calibration pulses are routed */
     bool m_saveWaveform = false; /**< set true when you want to save waveform data */
     bool m_useDoublePulse = true; /**< set true when you require both of double calibration pulses for reference timing */
-    float m_averageSamplingRate = 2.71394; /**< sampling rate with assumption of uniform interval in a unit of GHz */
+    // float m_averageSamplingRate = 2.71394; /**< sampling rate with assumption of uniform interval in a unit of GHz */
     float m_calibrationPulseThreshold1 =
       600; /**< minimum pulse height for the first calibration pulse to be qualified as calibration signals */
     float m_calibrationPulseThreshold2 =
@@ -97,6 +97,7 @@ namespace Belle2 {
     bool m_isCalCh[c_NMaxHitEvent] = {0}; /**< true if the hit is in the calibration channel */
     unsigned m_eventNum[c_NMaxHitEvent] = {0}; /**< event number taken from EventMetaData */
     short m_winNum[c_NMaxHitEvent] = {0}; /**< "m_firstWindow" in TOPDigit */
+    short m_trigWinNum[c_NMaxHitEvent] = {0}; /**< "m_lastWriteAddr" in TOPRawDigit, window # when trigger is issued  */
     short m_winNumList[c_NMaxHitEvent][c_NWindow] = {0}; /**< list of window numbers for recorded waveform, valid only when waveform analysis is enabled */
     bool m_windowsInOrder[c_NMaxHitEvent] = {0}; /**< "areWindowsInOrder()" ; false if the window number of all (4) windows taken from TOPRawWaveform::getReferenceWindows() are consecutive */
     unsigned char m_hitQuality[c_NMaxHitEvent] = {0}; /**< "m_quality" in TOPDigit, =0:junk, =1:good, =2:charge sharing, =3:cross talk, =4:cal. pulse, +10 if cal. pulse is properly identified for the asic, +100(+200) for the first(second) calibration signal itself  */

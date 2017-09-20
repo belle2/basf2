@@ -51,8 +51,8 @@ void printBackgroundInfo(const BackgroundInfo& a)
   B2INFO("  wrapping around: " << (a.getWrapAround() ? "enabled" : "disabled"));
   B2INFO("   ECL energy cut: " << a.getMaxEdepECL() << " GeV");
   B2INFO("Background samples: ");
-  auto da = a.getBackgroundDescr();
-  auto cmpfn = [](const BackgroundInfo::BackgroundDescr & a, const BackgroundInfo::BackgroundDescr & b) {return a.type < b.type; };
+  auto da = a.getBackgrounds();
+  auto cmpfn = [](const BackgroundInfo::BackgroundDescr & descrA, const BackgroundInfo::BackgroundDescr & descrB) {return descrA.type < descrB.type; };
   std::sort(da.begin(), da.end(), cmpfn);
   for (const auto& d : da) {
     B2INFO("  " << d.type << ", scale " << d.scaleFactor);
@@ -66,9 +66,10 @@ void printBackgroundInfo(const BackgroundInfo& a)
  *
  * number of events, file names and real time are not checked to allow for
  * different file sets to be used. We cannot check the background rate either
- * since this is slightly fluctuating as it's calculated by #events/real time.
+ * since this is slightly fluctuating as it's calculated as (number of events)/real time.
  * @param a basic background info to compare against
  * @param b new background info which has to be compatible
+ * @param filename input filename used to report errors
  */
 void checkBackgroundCompatible(const BackgroundInfo& a, const BackgroundInfo& b, const std::string& filename)
 {
@@ -85,12 +86,12 @@ void checkBackgroundCompatible(const BackgroundInfo& a, const BackgroundInfo& b,
   if (a.getWrapAround() != b.getWrapAround()) B2ERROR("Incompatible background WrapAround in " << boost::io::quoted(filename));
   if (a.getMaxEdepECL() != b.getMaxEdepECL()) B2ERROR("Incompatible background MaxEdepECL in " << boost::io::quoted(filename));
 
-  auto da = a.getBackgroundDescr();
-  auto db = b.getBackgroundDescr();
+  auto da = a.getBackgrounds();
+  auto db = b.getBackgrounds();
   if (da.size() != db.size()) {
     B2ERROR("Incompatible background types in " << boost::io::quoted(filename));
   } else {
-    auto cmpfn = [](const BackgroundInfo::BackgroundDescr & a, const BackgroundInfo::BackgroundDescr & b) {return a.type < b.type; };
+    auto cmpfn = [](const BackgroundInfo::BackgroundDescr & descrA, const BackgroundInfo::BackgroundDescr & descrB) {return descrA.type < descrB.type; };
     std::sort(da.begin(), da.end(), cmpfn);
     std::sort(db.begin(), db.end(), cmpfn);
     for (size_t i = 0; i < da.size(); ++i) {

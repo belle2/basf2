@@ -195,6 +195,7 @@ namespace Belle2 {
     TH2F* m_h2ROIvMinMax;
     TH1F* m_h1totROIs; /**< distribution of number of all ROIs*/
     TH1F* m_h1okROIs; /**< distribution of number of ROIs containin a PXDDigit*/
+    TH1F* m_h1okROIfrac; /**< distribution of number of ROIsreduction factor*/
     TH1F* m_h1redFactor; /**< distribution of number of ROIsreduction factor*/
     TH1F* m_h1redFactor_L1; /**< distribution of number of ROIsreduction factor*/
     TH1F* m_h1redFactor_L2; /**< distribution of number of ROIsreduction factor*/

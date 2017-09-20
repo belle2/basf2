@@ -50,6 +50,24 @@ namespace Belle2 {
     }
 
     /**
+     * Assignment operator
+     */
+    TOPSignalShape& operator=(const TOPSignalShape& shape)
+    {
+      if (this != &shape) {
+        m_shape = shape.getShape();
+        m_tmin = shape.getTMin();
+        m_tmax = shape.getTMax();
+        m_tau = shape.getTau();
+        m_pole1 = shape.getPole1();
+        m_pole2 = shape.getPole2();
+        if (m_interpolator) delete m_interpolator;
+        m_interpolator = 0;
+      }
+      return *this;
+    }
+
+    /**
      * Destructor
      */
     ~TOPSignalShape()
@@ -74,7 +92,7 @@ namespace Belle2 {
      * Returns time of the last waveform sample
      * @return time [ns]
      */
-    double getTMax() const {return m_tmin;}
+    double getTMax() const {return m_tmax;}
 
     /**
      * Returns time constant of the exponential used for the extrapolation of tail

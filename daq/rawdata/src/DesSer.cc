@@ -31,7 +31,7 @@ DesSer::DesSer()
 #endif
 
   //  B2INFO("DeSerializerPrePC: Constructor done.");
-  printf("[INFO] DesSer: Constructor done.\n"); fflush(stdout);
+  printf("[DEBUG] DesSer: Constructor done.\n"); fflush(stdout);
 }
 
 
@@ -88,7 +88,7 @@ int* DesSer::getNewBuffer(int nwords, int* delete_flag)
 
 void DesSer::initialize(bool close_listen)
 {
-  printf("[INFO] DesSer: initialize() started.\n"); fflush(stdout);
+  printf("[DEBUG] DesSer: initialize() started.\n"); fflush(stdout);
   signal(SIGPIPE , SIG_IGN);
 
   //
@@ -146,7 +146,7 @@ void DesSer::initialize(bool close_listen)
     m_status.setOutputCount(0);
   }
   //  B2INFO("DesSer: initialize() was done.");
-  printf("[INFO] DesSer: initialize() was done.\n"); fflush(stdout);
+  printf("[DEBUG] DesSer: initialize() was done.\n"); fflush(stdout);
 
 }
 
@@ -250,7 +250,7 @@ int DesSer::sendByWriteV(RawDataBlockFormat* rawdblk)
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "[ERROR] WRITEV error.(%s) : sent %d bytes, header %d bytes body %d trailer %d\n" ,
+        sprintf(err_buf, "[WARNING] WRITEV error.(%s) : sent %d bytes, header %d bytes body %d trailer %d\n" ,
                 strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len);
 #ifdef NONSTOP
         m_run_error = 1;
@@ -282,7 +282,7 @@ int DesSer::sendByWriteV(RawDataBlockFormat* rawdblk)
   //
   if (n != total_send_bytes) {
     //    B2WARNING("Serializer: Sent byte(" << n << "bytes) is not same as the event size (" << total_send_bytes << "bytes). Retryring...");
-    printf("[WARNING] Serializer: Sent byte( %d bytes) is not same as the event size ( %d bytes). Retryring...\n", n, total_send_bytes);
+    printf("[NOTICE] Serializer: Sent byte( %d bytes) is not same as the event size ( %d bytes). Retryring...\n", n, total_send_bytes);
     fflush(stdout);
 
     double retry_start = getTimeSec();
@@ -301,7 +301,7 @@ int DesSer::sendByWriteV(RawDataBlockFormat* rawdblk)
     }
     double retry_end = getTimeSec();
     //    B2WARNING("Resending ends. It takes " << retry_end - retry_start << "(s)");
-    printf("Resending ends. It takes %lf (s)\n", retry_end - retry_start); fflush(stdout);
+    printf("[NOTICE] Resending ends. It takes %lf (s)\n", retry_end - retry_start); fflush(stdout);
   }
   //   printf( "[DEBUG] n %d total %d\n", n, total_send_bytes);
   //  delete temp_buf;
@@ -328,7 +328,7 @@ int DesSer::Send(int socket, char* buf, int size_bytes)
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "[ERROR] SEND ERROR.(%s)", strerror(errno));
+        sprintf(err_buf, "[WARNING] SEND ERROR.(%s)", strerror(errno));
 #ifdef NONSTOP
         m_run_error = 1;
         //        B2ERROR(err_buf);
@@ -381,13 +381,24 @@ void DesSer::Accept(bool close_listen)
   }
 
   if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
-    printf("[FATAL] Failed to bind. Maybe other programs have already occupied this port(%d). Exiting...",
+    printf("[FATAL] Failed to bind. Maybe other programs have already occupied this port(%d). Exiting...\n",
            m_port_to); fflush(stdout);
-
+    // Check the process occupying the port 33000.
+    FILE* fp;
+    char buf[256];
+    char cmdline[500];
+    sprintf(cmdline, "/usr/sbin/ss -ap | grep %d", m_port_to);
+    if ((fp = popen(cmdline, "r")) == NULL) {
+      printf("[WARNING] Failed to run %s\n", cmdline);
+    }
+    while (fgets(buf, 256, fp) != NULL) {
+      printf("[ERROR] Failed to bind. output of ss(port %d) : %s\n", m_port_to, buf); fflush(stdout);
+    }
+    // Error message
+    fclose(fp);
     char temp_char[500];
     sprintf(temp_char, "[FATAL] Failed to bind.(%s) Maybe other programs have already occupied this port(%d). Exiting...",
             strerror(errno), m_port_to);
-    printf("%s", temp_char);
     print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
@@ -407,7 +418,7 @@ void DesSer::Accept(bool close_listen)
   //
   int fd_accept;
   struct sockaddr_in sock_accept;
-  printf("[INFO] Accepting... : port %d server %s\n", m_port_to, m_hostname_local.c_str());
+  printf("[DEBUG] Accepting... : port %d server %s\n", m_port_to, m_hostname_local.c_str());
   fflush(stdout);
 
   if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
@@ -417,7 +428,7 @@ void DesSer::Accept(bool close_listen)
     exit(-1);
   } else {
     //    B2INFO("Done.");
-    printf("[INFO] Done.\n"); fflush(stdout);
+    printf("[DEBUG] Done.\n"); fflush(stdout);
 
     //    set timepout option
     struct timeval timeout;

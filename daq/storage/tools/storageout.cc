@@ -64,7 +64,7 @@ int main(int argc, char** argv)
       if (use_info) info.setOutputPort(port);
       SharedEventBuffer::Header hdr;
       while (true) {
-        long long nbyte = (ibuf.read(evtbuf, false, &hdr)) * sizeof(int);
+        long long nbyte = (ibuf.read(evtbuf, false, false, &hdr)) * sizeof(int);
         if (expno < hdr.expno || runno < hdr.runno) {
           expno = hdr.expno;
           runno = hdr.runno;

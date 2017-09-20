@@ -71,7 +71,7 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
   addParam("enableDebugOutput", m_enableDebugOutput,
            "Option to write out debugging information to CDCDedxTracks (DataStore objects).", true);
   addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.",
-           std::string("/data/reconstruction/dedxPID_PDFs_b6d3c44_500k_events.root"));
+           std::string("/data/reconstruction/dedxPID_PDFs_dd92782_500k_events.root"));
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 
   m_eventID = -1;
@@ -334,8 +334,8 @@ void CDCDedxPIDModule::event()
       bool lastHitInCurrentLayer = lastHit;
       if (!lastHit) {
         // peek at next hit
-        genfit::AbsMeasurement* aAbsMeasurementPtr = (*(tp + 1))->getRawMeasurement(0);
-        const CDCRecoHit* nextcdcRecoHit = dynamic_cast<const CDCRecoHit* >(aAbsMeasurementPtr);
+        genfit::AbsMeasurement* aAbsMeasurementPtrNext = (*(tp + 1))->getRawMeasurement(0);
+        const CDCRecoHit* nextcdcRecoHit = dynamic_cast<const CDCRecoHit* >(aAbsMeasurementPtrNext);
         // if next hit fails, assume this is the last hit in the layer
         if (!nextcdcRecoHit || !(cdcRecoHit->getCDCHit()) || !((*(tp + 1))->getFitterInfo())) {
           lastHitInCurrentLayer = true;

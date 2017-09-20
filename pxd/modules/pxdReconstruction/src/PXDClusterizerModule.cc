@@ -37,7 +37,7 @@ REG_MODULE(PXDClusterizer);
 //-----------------------------------------------------------------
 
 PXDClusterizerModule::PXDClusterizerModule() :
-  Module(), m_elNoise(150.0), m_gq(0.7), m_cutSeed(5.0), m_cutAdjacent(3.0), m_cutCluster(
+  Module(), m_elNoise(150.0), m_gq(0.6), m_cutSeed(5.0), m_cutAdjacent(3.0), m_cutCluster(
     8.0), m_sizeHeadTail(3), m_clusterCacheSize(0)
 {
   //Set module properties
@@ -52,7 +52,7 @@ PXDClusterizerModule::PXDClusterizerModule() :
            m_cutSeed);
   addParam("ClusterSN", m_cutCluster, "Minimum SN for clusters", m_cutCluster);
   addParam("Gq", m_gq, "Gq for pixels, nA/e-", m_gq);
-  addParam("ADCFineMode", m_ADCFineMode, "The slope of ADC cureve is 70 nA/ADU in fine mode and 130 in coarse mode", true);
+  addParam("ADCFineMode", m_ADCFineMode, "The slope of ADC cureve is 70 nA/ADU in fine mode and 130 in coarse mode", false);
   addParam("ClusterCacheSize", m_clusterCacheSize,
            "Maximum desired number of sensor rows", 0);
   addParam("HeadTailSize", m_sizeHeadTail,
@@ -68,8 +68,8 @@ PXDClusterizerModule::PXDClusterizerModule() :
   addParam("MCParticles", m_storeMCParticlesName, "MCParticles collection name",
            string(""));
 
-  addParam("useClusterShape", m_useClusterShape,
-           "Apply recognition of cluster shape and set it as ID", false);
+  addParam("notUseClusterShape", m_notUseClusterShape,
+           "Do not apply recognition of cluster shape and set it as ID", false);
 }
 
 void PXDClusterizerModule::initialize()
@@ -133,7 +133,7 @@ void PXDClusterizerModule::initialize()
   B2INFO(" -->  ClusterDigitRel:    " << m_relClusterDigitName);
   B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
   B2INFO(" -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
-  B2INFO(" -->  useClusterShape:    " << m_useClusterShape);
+  B2INFO(" -->  NotUseClusterShape: " << m_notUseClusterShape);
 
   /* Electron equivalent of 1 ADU is set using gq and slope of the ADC curve.*/
   m_eToADU = m_ADCFineMode ? (70.0 / m_gq) : (130.0 / m_gq);
@@ -345,7 +345,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
 
     short clsShapeID = (short)pxdClusterShapeType::no_shape_set;
     PXDClusterShape cs;
-    if (m_useClusterShape) {
+    if (!m_notUseClusterShape) {
       clsShapeID = (short)cs.setClsShape(cls, sensorID);
     }
 

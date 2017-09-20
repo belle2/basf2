@@ -112,7 +112,9 @@ EKLM::FiberAndElectronics::~FiberAndElectronics()
   free(m_ADCAmplitude);
   free(m_SignalTimeDependence);
   free(m_SignalTimeDependenceDiff);
-  reallocPhotoElectronBuffers(0);
+  free(m_Photoelectrons);
+  free(m_PhotoelectronIndex);
+  free(m_PhotoelectronIndex2);
 }
 
 void EKLM::FiberAndElectronics::setHitRange(

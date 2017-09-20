@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <hlt/softwaretrigger/calculations/HLTCalculator.h>
-#include <hlt/softwaretrigger/core/utilities.h>
+#include <hlt/softwaretrigger/calculations/utilities.h>
 // TODO: Also cache it
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>

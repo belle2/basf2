@@ -10,6 +10,13 @@ def add_packers(path, components=None):
     This function adds the raw data packer modules to a path.
     """
 
+    # Add Gearbox or geometry to path if not already there
+    if "Gearbox" not in path:
+        path.add_module("Gearbox")
+
+    if "Geometry" not in path:
+        path.add_module("Geometry")
+
     # PXD
     if components is None or 'PXD' in components:
         pxdpacker = register_module('PXDPacker')
@@ -124,6 +131,13 @@ def add_unpackers(path, components=None):
     This function adds the raw data unpacker modules to a path.
     """
 
+    # Add Gearbox or geometry to path if not already there
+    if "Gearbox" not in path:
+        path.add_module("Gearbox")
+
+    if "Geometry" not in path:
+        path.add_module("Geometry")
+
     # PXD
     if components is None or 'PXD' in components:
         pxdunpacker = register_module('PXDUnpacker')
@@ -198,13 +212,17 @@ def add_raw_output(path, filename='raw.root', additionalBranches=[]):
     path.add_module(output)
 
 
-def add_raw_seqoutput(path, filename='raw.sroot', additionalObjects=[]):
+def add_raw_seqoutput(path, filename='raw.sroot', additionalObjects=[], fileNameIsPattern=False):
     """
     This function adds an seqroot output module for raw data to a path.
+
+    :param bool fileNameIsPattern: If true the filename needs to be a printf pattern with a placeholder for the
+    filenumber starting at 0, for example "raw-f%06d.root"
     """
 
     output = register_module('SeqRootOutput')
     output.param('outputFileName', filename)
+    output.param('fileNameIsPattern', fileNameIsPattern)
     objects = ['EventMetaData', 'RawPXDs', 'RawSVDs', 'RawCDCs', 'RawTOPs', 'RawARICHs', 'RawECLs', 'RawKLMs']
     objects += additionalObjects
     output.param('saveObjs', objects)

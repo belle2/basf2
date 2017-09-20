@@ -148,15 +148,30 @@ def partial_fit(state, X, S, y, w, epoch):
 
 
 if __name__ == "__main__":
-    variables = ['M', 'p', 'pt', 'pz',
-                 'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)',
-                 'daughter(1, p)', 'daughter(1, pz)', 'daughter(1, pt)',
-                 'daughter(2, p)', 'daughter(2, pz)', 'daughter(2, pt)',
-                 'chiProb', 'dr', 'dz',
-                 'daughter(0, dr)', 'daughter(1, dr)',
-                 'daughter(0, dz)', 'daughter(1, dz)',
+    variables = ['p', 'pt', 'pz', 'phi',
+                 'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)', 'daughter(0, phi)',
+                 'daughter(1, p)', 'daughter(1, pz)', 'daughter(1, pt)', 'daughter(1, phi)',
+                 'daughter(2, p)', 'daughter(2, pz)', 'daughter(2, pt)', 'daughter(2, phi)',
+                 'chiProb', 'dr', 'dz', 'dphi',
+                 'daughter(0, dr)', 'daughter(1, dr)', 'daughter(0, dz)', 'daughter(1, dz)',
+                 'daughter(0, dphi)', 'daughter(1, dphi)',
                  'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
-                 'daughter(0, Kid)', 'daughter(0, piid)']
+                 'daughter(0, Kid)', 'daughter(0, piid)', 'daughter(1, Kid)', 'daughter(1, piid)',
+                 'daughterAngle(0, 1)', 'daughterAngle(0, 2)', 'daughterAngle(1, 2)',
+                 'daughter(2, daughter(0, E))', 'daughter(2, daughter(1, E))',
+                 'daughter(2, daughter(0, clusterTiming))', 'daughter(2, daughter(1, clusterTiming))',
+                 'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
+                 'daughter(2, daughter(0, minC2HDist))', 'daughter(2, daughter(1, minC2HDist))',
+                 'M']
+
+    variables2 = ['p', 'pt', 'pz', 'phi',
+                  'chiProb', 'dr', 'dz', 'dphi',
+                  'daughter(2, chiProb)',
+                  'daughter(0, Kid)', 'daughter(0, piid)', 'daughter(1, Kid)', 'daughter(1, piid)',
+                  'daughter(2, daughter(0, E))', 'daughter(2, daughter(1, E))',
+                  'daughter(2, daughter(0, clusterTiming))', 'daughter(2, daughter(1, clusterTiming))',
+                  'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
+                  'daughter(2, daughter(0, minC2HDist))', 'daughter(2, daughter(1, minC2HDist))']
 
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
@@ -169,11 +184,17 @@ if __name__ == "__main__":
     specific_options = basf2_mva.PythonOptions()
     specific_options.m_framework = "tensorflow"
     specific_options.m_steering_file = 'mva/examples/orthogonal_discriminators/tensorflow_adversary.py'
-    specific_options.m_nIterations = 400
+    specific_options.m_normalize = True
+    specific_options.m_nIterations = 1000
     specific_options.m_mini_batch_size = 400
-    specific_options.m_config = '{"adversary_steps": 20, "learning_rate": 0.001, "lambda": 10}'
+    specific_options.m_config = '{"adversary_steps": 13, "learning_rate": 0.001, "lambda": 0.1}'
     basf2_mva.teacher(general_options, specific_options)
 
     general_options.m_identifier = "tensorflow_baseline"
+    specific_options.m_nIterations = 100
     specific_options.m_config = '{"adversary_steps": 1, "learning_rate": 0.001, "lambda": -1.0}'
+    basf2_mva.teacher(general_options, specific_options)
+
+    general_options.m_variables = basf2_mva.vector(*variables2)
+    general_options.m_identifier = "tensorflow_feature_drop"
     basf2_mva.teacher(general_options, specific_options)

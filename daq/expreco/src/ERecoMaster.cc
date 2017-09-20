@@ -115,8 +115,20 @@ int ERecoMaster::Configure(NSMmsg*, NSMcontext*)
       nnodes++;
     }
   }
-  //  while (RFNSM_Status::Instance().get_flag() != nnodes) b2nsm_wait(1);
+  while (RFNSM_Status::Instance().get_flag() != nnodes) b2nsm_wait(1);
+
   sleep(10);
+
+  // 3. Configure event sampler
+  char* sampler = m_conf->getconf("eventsampler", "nodename");
+  RFNSM_Status::Instance().set_flag(0);
+  //  b2nsm_sendreq(distributor, "RF_CONFIGURE", 0, pars);
+  b2nsm_sendreq(sampler, "RC_LOAD", 0, pars);
+  while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
+  printf("ERecoMaster:: sampler configured\n");
+
+  sleep(2);
+
 
   printf("ERecoMaster:: event processors configured\n");
 
@@ -126,6 +138,14 @@ int ERecoMaster::Configure(NSMmsg*, NSMcontext*)
 int ERecoMaster::UnConfigure(NSMmsg*, NSMcontext*)
 {
   int* pars;
+
+  // Unconfigure sampler
+  char* sampler = m_conf->getconf("eventsampler", "nodename");
+  RFNSM_Status::Instance().set_flag(0);
+  //  b2nsm_sendreq(distributor, "RF_UNCONFIGURE", 0, pars);
+  b2nsm_sendreq(sampler, "RC_ABORT", 0, pars);
+  while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
+  printf("ErecoMaster: sampler unconfigured.\n");
 
   // Unconfigure event processors
   int maxnodes = m_conf->getconfi("processor", "nnodes");

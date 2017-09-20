@@ -25,7 +25,7 @@ REG_MODULE(CDCCosmicSelector)
 CDCCosmicSelectorModule::CDCCosmicSelectorModule() : Module()
 {
   // Set description
-  setDescription("Select cosmics passing through the trigger counter");
+  setDescription("Modify MCParticles for cosmics so that the global time is zero at y=0 assuming a cosmic trajectory is a line. And select cosmics passing through a trigger counter. This module works only for the event with the no. of primary charged MC particles=1. Please place this module after the event-generator and before FullSim.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("xOfCounter", m_xOfCounter, "x-position of trigger counter (cm)",  -0.6);
@@ -50,15 +50,17 @@ void CDCCosmicSelectorModule::initialize()
 
 void CDCCosmicSelectorModule::event()
 {
-  // Get SimHit array, MCParticle array
+  // Get MCParticle array
   StoreArray<MCParticle> mcParticles;
 
-  // Loop over all particles
-  int nMCPs = mcParticles.getEntries();
-  B2DEBUG(250, "Number of mcParticles in the current event: " << nMCPs);
-  if (nMCPs != 1) B2WARNING("No. of mcparticle != 1 !");
+  bool returnVal = false;
 
-  const double mass = 0.1056583715; //muon mass (GeV)
+  int nMCPs = mcParticles.getEntries();
+  if (nMCPs == 0) {
+    B2ERROR("No. of MCParticles=0 in the current event.");
+    setReturnValue(returnVal);
+    return;
+  }
 
   /*
   const double    yOfCounter = -16.25 + 3.0;
@@ -67,12 +69,38 @@ void CDCCosmicSelectorModule::event()
   const double zmaxOfCounter = -1.5 + 15.5;
   */
 
+  // Loop over prim. charged MC particle
   const double c = 29.9792458; //light speed (cm/ns)
-  bool returnVal = false;
+  double mass = 0.1056583715; //muon mass (GeV)
+  unsigned nPrimChgds = 0;
+
   for (int iMCPs = 0; iMCPs < nMCPs; ++iMCPs) {
     MCParticle* m_P = mcParticles[iMCPs];
 
-    if (abs(m_P->getPDG()) != 13) B2FATAL("Not muon !");
+    //    B2INFO("isPrimaryParticle= " << m_P->isPrimaryParticle());
+    if (!m_P->isPrimaryParticle()) continue;
+
+    unsigned pid = abs(m_P->getPDG());
+    if (pid ==   13) {
+      ++nPrimChgds;
+    } else if (pid ==   11) {
+      ++nPrimChgds;
+      mass = 0.000510998928;
+    } else if (pid ==  211) {
+      ++nPrimChgds;
+      mass = 0.13957018;
+    } else if (pid ==  321) {
+      ++nPrimChgds;
+      mass = 0.493677;
+    } else if (pid == 2212) {
+      ++nPrimChgds;
+      mass = 0.938272046;
+    } else {
+      continue;
+    }
+
+    //    B2INFO("No .of prim. charged MC particles= " << nPrimChgds);
+    if (nPrimChgds > 1) continue;
 
     const TVector3 vertex = m_P->getProductionVertex();
     const double vX0 = vertex.X();

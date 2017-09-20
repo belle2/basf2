@@ -1,3 +1,12 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Shebalin Vasily                                          *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 #ifndef ECLCHANNELMAPPER_H
 #define ECLCHANNELMAPPER_H
 #include <framework/logging/Logger.h>
@@ -24,6 +33,7 @@ namespace Belle2 {
 
   class ECLChannelMapper {
 
+    /// initialization flag
     bool isInitialized;
 
     /// convert (iCrate, iShaper, iChannel) to CellId for Barrel ECL
@@ -61,6 +71,7 @@ namespace Belle2 {
     /// get number of DSP channel in the shaper by given number of  CellId
     int getShaperChannel(int cellID);
 
+    /// get number of ShaperDSP modules in the given VME crate number
     inline int getNShapersInCrate(int iCrate)
     {
       if (iCrate <= ECL_BARREL_CRATES) return ECL_BARREL_SHAPERS_IN_CRATE;

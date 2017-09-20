@@ -35,7 +35,7 @@ namespace {
       Belle2::RandomNumbers::initialize(name);
     }
     /** Reset the logsytem after each test */
-    virtual void OnTestEnd(const ::testing::TestInfo& test) final override
+    virtual void OnTestEnd(const ::testing::TestInfo&) final override
     {
       Belle2::LogSystem::Instance().resetLogging();
     }

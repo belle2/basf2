@@ -29,6 +29,9 @@ namespace Belle2 {
     //! Copy constructor
     BKLMRawHit(const BKLMRawHit&);
 
+    //! Assignment operator
+    BKLMRawHit& operator=(const BKLMRawHit&);
+
     //! Destructor
     virtual ~BKLMRawHit() {}
 

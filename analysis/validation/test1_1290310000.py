@@ -41,8 +41,8 @@ def remove_module(path, name):
 from ROOT import Belle2
 
 # To access the FEI training weight files (FEI trained on MC7, also available
-# at KEKCC /home/belle2/tkeck/fei/Belle2_Generic_2017_Track14_1/ )
-use_central_database('test_merola', LogLevel.WARNING, 'fei_database')
+# at KEKCC /home/belle2/tkeck/feiv4/Belle2_2017_MC7_Track14_2/ )
+use_central_database('production', LogLevel.WARNING, 'fei_database')
 
 from variables import variables
 
@@ -156,19 +156,13 @@ outputRootFile = "../1290310000.ntup.root"
 
 path = create_path()
 
-# load the FEI reconstruction path
-# this has to be included in the input sandbox
-# it is located at /home/belle2/tkeck/fei/Belle2_Generic_2017_Track14_1/paths/
-fei_pickle = 'basf2_final_path_without_selection.pickle'
-if not os.path.isfile(fei_pickle):
-    sys.exit(
-        'basf2_path.pickle not found at: ' +
-        fei_pickle +
-        '\n'
-        'Please provide the fei_path.pickle file from an existing FEI training by setting the fei_pickle parameter in this script.')
 
-fei_path = get_path_from_file(fei_pickle)
-path.add_path(fei_path)
+import fei
+particles = fei.get_default_channels()
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MC7_Track14_2', training=False, monitor=False)
+feistate = fei.get_path(particles, configuration)
+path.add_path(feistate.path)
+
 
 filelist = ["../1290310000.dst.root"]
 
@@ -196,11 +190,11 @@ cutAndCopyList('B+:genericRank', 'B+:generic', 'rank==1')
 cutAndCopyList('B+:semileptonicRank', 'B+:semileptonic', 'rank==1')
 
 
-# MC7 && 8 - 95% eff working points
-electrons = ('e-:loose', 'p>0.01 and eid>0.510')
-pions = ('pi-:loose', 'p>0.01 and piid > 0.437')
-muons = ('mu-:loose', 'p>0.01 and muid > 0.01')  # WP not available
-kaons = ('K-:loose', 'p>0.01 and Kid > 0.293')
+# release-09
+electrons = ('e-:loose', 'p>0.01 and eid>0.750')  # 99% eff working points
+pions = ('pi-:loose', 'p>0.01 and piid > 0.429')  # 95% eff working points
+muons = ('mu-:loose', 'p>0.01 and muid > 0.625')  # 95% eff working points
+kaons = ('K-:loose', 'p>0.01 and Kid > 0.315')  # 95% eff working points
 
 
 stdPhotons('loose')

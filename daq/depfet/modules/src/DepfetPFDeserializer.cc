@@ -89,7 +89,7 @@ void DepfetPFDeserializerModule::event()
   m_count++;
   if (m_count == 1) return;
   unsigned int nword = 0;
-  m_ibuf[m_count % m_ibuf.size()].read(m_evtbuf, false);
+  m_ibuf[m_count % m_ibuf.size()].read(m_evtbuf, false, false);
   nword = m_evtbuf[0];
   if (m_info.isAvailable()) {
     m_info.addInputNBytes(m_evtbuf[0]*sizeof(int));

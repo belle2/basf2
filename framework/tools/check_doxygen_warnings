@@ -1,2 +1,2 @@
 #!/bin/bash
-b2doxygen_warnings "$@"
+b2code-doxygen-warnings "$@"

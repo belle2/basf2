@@ -55,7 +55,8 @@ BKLMReconstructorModule::BKLMReconstructorModule() : Module(), m_GeoPar(NULL)
   // MC 1 GeV/c muons: 1-sigma width is 0.15 ns
   addParam("Prompt window (ns)", m_PromptWindow,
            "Half-width of prompt window relative to PromptTime",
-           double(50.0));
+           //double(50.0));
+           double(2000.0));
 }
 
 BKLMReconstructorModule::~BKLMReconstructorModule()
@@ -94,28 +95,29 @@ void BKLMReconstructorModule::event()
   // sort by module+strip number
   std::map<int, int> volIDToDigits;
   for (int d = 0; d < digits.getEntries(); ++d) {
-    BKLMDigit* digit = digits[d];
-    if (digit->inRPC() || digit->isAboveThreshold()) {
-      volIDToDigits.insert(std::pair<int, int>(digit->getModuleID() & BKLM_MODULESTRIPID_MASK, d));
+    BKLMDigit* bklmDigit = digits[d];
+    if (bklmDigit->inRPC() || bklmDigit->isAboveThreshold()) {
+      volIDToDigits.insert(std::pair<int, int>(bklmDigit->getModuleID() & BKLM_MODULESTRIPID_MASK, d));
     }
   }
   if (volIDToDigits.empty()) return;
 
   StoreArray<BKLMHit1d> hit1ds;
+  hit1ds.clear();
 
   std::vector<BKLMDigit*> cluster;
   int oldVolID = volIDToDigits.begin()->first;
   double averageTime = digits[volIDToDigits.begin()->second]->getTime();
 
   for (std::map<int, int>::iterator iVolMap = volIDToDigits.begin(); iVolMap != volIDToDigits.end(); ++iVolMap) {
-    BKLMDigit* digit = digits[iVolMap->second];
-    if ((iVolMap->first > oldVolID + 1) || (std::fabs(digit->getTime() - averageTime) > m_DtMax)) {
+    BKLMDigit* bklmDigit = digits[iVolMap->second];
+    if ((iVolMap->first > oldVolID + 1) || (std::fabs(bklmDigit->getTime() - averageTime) > m_DtMax)) {
       hit1ds.appendNew(cluster); // also creates relation hit1d to each digit in cluster
       cluster.clear();
     }
     double n = (double)(cluster.size());
-    averageTime = (n * averageTime + digit->getTime()) / (n + 1.0);
-    cluster.push_back(digit);
+    averageTime = (n * averageTime + bklmDigit->getTime()) / (n + 1.0);
+    cluster.push_back(bklmDigit);
     oldVolID = iVolMap->first;
   }
   hit1ds.appendNew(cluster); // also creates relation hit1d to each digit in cluster
@@ -123,6 +125,7 @@ void BKLMReconstructorModule::event()
   // Construct StoreArray<BKLMHit2D> from orthogonal same-module hits in StoreArray<BKLMHit1D>
 
   StoreArray<BKLMHit2d> hit2ds;
+  hit2ds.clear();
 
   for (int i = 0; i < hit1ds.getEntries(); ++i) {
     int moduleID = hit1ds[i]->getModuleID() & BKLM_MODULEID_MASK;

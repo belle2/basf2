@@ -306,7 +306,7 @@ namespace Belle2 {
       std::fstream file(custom_weightfile, std::ios_base::in);
 
       int version = weightfile.getElement<int>("FastBDT_version", 0);
-      B2INFO("FastBDT Weightfile Version " << version);
+      B2DEBUG(100, "FastBDT Weightfile Version " << version);
       if (version < 2) {
 #if FastBDT_VERSION_MAJOR >= 3
         std::stringstream s;
@@ -319,7 +319,7 @@ namespace Belle2 {
         int dummy;
         // Try to read to integers, if this is sucessfull we have a old weightfile with a Feature Binning before the Tree.
         if (!(s >> dummy >> dummy)) {
-          B2INFO("FastBDT: I read a new weightfile of FastBDT using the new FastBDT version 3. Everythings fine!");
+          B2DEBUG(100, "FastBDT: I read a new weightfile of FastBDT using the new FastBDT version 3. Everythings fine!");
           // New format since version 3
           m_expert_forest = FastBDT::readForestFromStream<float>(file);
         } else {

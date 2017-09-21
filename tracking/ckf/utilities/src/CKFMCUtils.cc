@@ -8,8 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/utilities/CKFMCUtils.h>
-
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/dataobjects/RecoHitInformation.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
+#include <vxd/geometry/SensorInfoBase.h>
 
 namespace Belle2 {
   using namespace TrackFindingCDC;

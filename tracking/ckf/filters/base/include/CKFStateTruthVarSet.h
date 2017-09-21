@@ -9,15 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/filters/cdcToSpacePoint/state/BaseCKFCDCToSpacePointStateObjectFilter.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <tracking/ckf/utilities/CKFMCUtils.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <tracking/ckf/utilities/StateAlgorithms.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <tracking/ckf/utilities/CKFMCUtils.h>
 
 namespace Belle2 {
   /// Names of the variables to be generated.

@@ -9,8 +9,11 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
 #include <tracking/ckf/utilities/StateAlgorithms.h>
+#include <framework/core/ModuleParamList.h>
+#include <vector>
 
 namespace Belle2 {
   /**

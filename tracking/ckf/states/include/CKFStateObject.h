@@ -10,12 +10,8 @@
 #pragma once
 #include <tracking/ckf/states/CKFResultObject.h>
 
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
-
-#include <framework/logging/Logger.h>
-
 #include <genfit/MeasurementOnPlane.h>
-
+#include <framework/logging/Logger.h>
 #include <TVector3.h>
 #include <TMatrixDSym.h>
 

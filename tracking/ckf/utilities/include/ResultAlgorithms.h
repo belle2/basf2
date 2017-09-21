@@ -9,13 +9,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/states/CKFStateObject.h>
-
-#include <tracking/spacePointCreation/SpacePoint.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
-#include <tracking/dataobjects/RecoTrack.h>
-
 namespace Belle2 {
+  class RecoTrack;
+  class SpacePoint;
+
   /**
    * Helper functor for adding hits of a certain type to a given reco hit.
    */

@@ -8,7 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/filters/cdcToSpacePoint/result/VXDTrackCombinationVarSet.h>
-#include <cdc/dataobjects/CDCRecoHit.h>
+#include <tracking/ckf/states/CKFResultObject.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 using namespace std;
 using namespace Belle2;

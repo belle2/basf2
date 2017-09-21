@@ -10,12 +10,12 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
-#include <tracking/ckf/states/CKFResultObject.h>
-
-#include <tracking/spacePointCreation/SpacePoint.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
+  class RecoTrack;
+  class SpacePoint;
+
+  template <class ASeedObject, class AHitObject> class CKFResultObject;
   /**
    * Base filter for detector track combination filters.
    */

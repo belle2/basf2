@@ -9,11 +9,14 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/varsets/VarSet.h>
+#include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
+
 #include <tracking/ckf/filters/cdcToSpacePoint/result/BaseVXDTrackCombinationFilter.h>
 #include <tracking/ckf/findlets/base/AdvanceAlgorithm.h>
 #include <tracking/ckf/findlets/base/KalmanUpdateFitter.h>
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <framework/core/ModuleParamList.h>
 
 namespace Belle2 {
   /// Names of the variables to be generated.

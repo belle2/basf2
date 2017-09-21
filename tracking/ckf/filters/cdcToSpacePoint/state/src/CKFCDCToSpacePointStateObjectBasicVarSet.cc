@@ -17,7 +17,6 @@
 #include <tracking/ckf/findlets/base/KalmanUpdateFitter.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
-#include <cdc/dataobjects/CDCHit.h>
 
 using namespace std;
 using namespace Belle2;

@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 #include <tracking/ckf/filters/cdcToSpacePoint/state/BaseCKFCDCToSpacePointStateObjectFilter.h>
+#include <string>
 
 namespace Belle2 {
   /// Filter factory for detector track combination filters.

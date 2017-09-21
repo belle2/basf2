@@ -9,17 +9,17 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/states/CKFStateObject.h>
-#include <tracking/mcMatcher/TrackMatchLookUp.h>
-
-#include <tracking/dataobjects/RecoTrack.h>
-
-#include <vector>
 #include <tracking/ckf/utilities/StateAlgorithms.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/mcMatcher/TrackMatchLookUp.h>
+#include <framework/logging/Logger.h>
+
+#include <string>
 
 namespace Belle2 {
   class SpacePoint;
+  class RecoTrack;
+  template <class ASeedObject, class AHitObject> class CKFStateObject;
 
   namespace TrackFindingCDC {
     class CDCRLWireHit;

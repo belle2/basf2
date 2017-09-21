@@ -8,6 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/utilities/ResultAlgorithms.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
+#include <tracking/dataobjects/RecoHitInformation.h>
+
+#include <tracking/dataobjects/RecoTrack.h>
+#include <vxd/geometry/SensorInfoBase.h>
+#include <pxd/dataobjects/PXDCluster.h>
+#include <svd/dataobjects/SVDCluster.h>
 
 using namespace Belle2;
 

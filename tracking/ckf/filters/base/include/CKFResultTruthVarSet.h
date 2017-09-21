@@ -9,15 +9,15 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/utilities/CKFMCUtils.h>
-
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-
+#include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
+#include <tracking/ckf/utilities/CKFMCUtils.h>
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <string>
 
 namespace Belle2 {
   /// Names of the variables to be generated.

@@ -8,6 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/filters/pxdSpacePoint/PXDTrackCombinationVarSet.h>
+#include <tracking/ckf/states/CKFResultObject.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 
 using namespace std;

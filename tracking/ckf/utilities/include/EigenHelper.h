@@ -10,8 +10,8 @@
 #pragma once
 
 #include <Eigen/Dense>
-#include <framework/logging/LogMethod.h>
 #include <TVectorD.h>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
   /// Convert a ROOT matrix to Eigen

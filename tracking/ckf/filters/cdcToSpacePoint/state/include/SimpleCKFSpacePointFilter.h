@@ -12,6 +12,8 @@
 #include <tracking/ckf/filters/cdcToSpacePoint/state/BaseCKFCDCToSpacePointStateObjectFilter.h>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   /// A very simple filter for all space points. Should be overloaded for the different cases (SVD, PXD).
   class SimpleCKFSpacePointFilter : public BaseCKFCDCToSpacePointStateObjectFilter {
   public:

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <algorithm>
 #include <cmath>
 
 namespace Belle2 {

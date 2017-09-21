@@ -56,12 +56,6 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
   if (track.empty()) return;
 
   CDCTrajectory3D trajectory3D = track.getStartTrajectory3D();
-
-  // We reset the trajectory here to start (later) at the newStartPosition of the first hit
-  const Vector3D startPosition(0, 0, 0);
-  trajectory3D.setLocalOrigin(startPosition);
-  trajectory3D.setFlightTime(0);
-
   CDCTrajectory2D trajectory2D = trajectory3D.getTrajectory2D();
 
   // Check if we have to reverse the trajectory. This is done by counting the number of hits
@@ -79,6 +73,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
     trajectory3D.reverse();
     trajectory2D.reverse();
   }
+
 
   double arcLength2DPeriod = trajectory2D.getArcLength2DPeriod();
   for (CDCRecoHit3D& recoHit : track) {

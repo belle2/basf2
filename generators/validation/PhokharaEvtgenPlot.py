@@ -35,7 +35,9 @@ input_file = ROOT.TFile('PhokharaEvtgenAnalysis.root')
 data_tree = input_file.Get('tree')
 output_file = ROOT.TFile('PhokharaEvtgen.root', 'recreate')
 
-h_gamma_mass = ROOT.TH1F('gamma_mass', '', 100, 6.1, 10.58)
+h_gamma_mass = ROOT.TH1F('gamma_mass', 'Born cross section', 100, 6.1, 10.58)
+h_gamma_mass.GetXaxis().SetTitle('M_{J/#psi#eta_{c}}^{cutoff}, GeV/c^{2}')
+h_gamma_mass.GetYaxis().SetTitle('#sigma_{e^{+} e^{-} #rightarrow J/#psi #eta_{c}}, arbitrary units')
 n = data_tree.GetEntries()
 for i in range(0, n):
     data_tree.GetEntry(i)

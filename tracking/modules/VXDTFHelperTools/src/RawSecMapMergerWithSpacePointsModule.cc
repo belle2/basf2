@@ -518,8 +518,9 @@ std::pair<int, int> RawSecMapMergerWithSpacePointsModule::importROOTMap()
 
     m_importedSectorMaps.push_back(newMap);
 
-    string fileName = newMap.getMapName() + string(".xml");
-    std::ofstream file(fileName.c_str());
+
+    string afileName = newMap.getMapName() + string(".xml");
+    std::ofstream file(afileName.c_str());
 
     string tagName = "<" + newMap.getMapName() + ">\n";
     string endTagName = "\n</" + newMap.getMapName() + ">\n";

@@ -46,7 +46,7 @@ namespace Belle2 {
   private:
 
     /** True if channel is active. */
-    double m_Active;
+    bool m_Active;
 
     /** Makes objects storable. */
     ClassDef(Belle2::EKLMChannelData, 1);

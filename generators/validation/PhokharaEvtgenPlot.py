@@ -35,30 +35,30 @@ input_file = ROOT.TFile('PhokharaEvtgenAnalysis.root')
 data_tree = input_file.Get('tree')
 output_file = ROOT.TFile('PhokharaEvtgen.root', 'recreate')
 
-h_gamma_mass = ROOT.TH1F('gamma_mass', 'Born cross section', 100, 6.1, 10.58)
-h_gamma_mass.GetXaxis().SetTitle('M_{J/#psi#eta_{c}}^{cutoff}, GeV/c^{2}')
-h_gamma_mass.GetYaxis().SetTitle('#sigma_{e^{+} e^{-} #rightarrow J/#psi #eta_{c}}, arbitrary units')
+h_born = ROOT.TH1F('h_born', 'Born cross section', 100, 6.1, 10.58)
+h_born.GetXaxis().SetTitle('M_{J/#psi#eta_{c}}^{cutoff}, GeV/c^{2}')
+h_born.GetYaxis().SetTitle('#sigma_{e^{+} e^{-} #rightarrow J/#psi #eta_{c}}, arbitrary units')
 n = data_tree.GetEntries()
 for i in range(0, n):
     data_tree.GetEntry(i)
-    h_gamma_mass.Fill(data_tree.gamma_M)
+    h_born.Fill(data_tree.gamma_M)
 s = 0
 ecms = 10.58
 for i in range(100, 0, -1):
-    bc = h_gamma_mass.GetBinContent(i)
+    bc = h_born.GetBinContent(i)
     s += bc
     p = s / n
     q = 1.0 - p
-    r = born_measured_ratio(ecms, ecms - h_gamma_mass.GetBinLowEdge(i))
-    h_gamma_mass.SetBinContent(i, s / r / n)
-    h_gamma_mass.SetBinError(i, math.sqrt(n * p * q) / r / n)
+    r = born_measured_ratio(ecms, ecms - h_born.GetBinLowEdge(i))
+    h_born.SetBinContent(i, s / r / n)
+    h_born.SetBinError(i, math.sqrt(n * p * q) / r / n)
 
 contact = 'Kirill Chilikin (chilikin@lebedev.ru)'
-l = h_gamma_mass.GetListOfFunctions()
+l = h_born.GetListOfFunctions()
 l.Add(ROOT.TNamed('Description', 'Born cross section calculated from measured cross section'))
 l.Add(ROOT.TNamed('Check', 'Should be consistent with constant'))
 l.Add(ROOT.TNamed('Contact', contact))
 
 output_file.cd()
-h_gamma_mass.Write()
+h_born.Write()
 output_file.Close()

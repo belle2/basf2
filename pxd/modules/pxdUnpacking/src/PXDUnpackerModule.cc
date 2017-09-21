@@ -710,10 +710,10 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing DATCON ROIs", false);
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
   addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of PXD Clusters to be processed", std::string(""));
-  addParam("RemapLUT_IF_OB", m_RemapLUTifob, "Name of the LUT which remaps the inner forward and outer backward layer",
-           std::string(""));
-  addParam("RemapLUT_IB_OF", m_RemapLUTibof, "Name of the LUT which remaps the inner backward and outer forward layer",
-           std::string(""));
+  /*  addParam("RemapLUT_IF_OB", m_RemapLUTifob, "Name of the LUT which remaps the inner forward and outer backward layer",
+             std::string(""));
+    addParam("RemapLUT_IB_OF", m_RemapLUTibof, "Name of the LUT which remaps the inner backward and outer forward layer",
+             std::string(""));*/
   addParam("RemapFlag", m_RemapFlag, "Set to one if DHP data should be remapped according to Belle II node 10", false);
   addParam("DESY16_TrgOff", m_DESY16_FixTrigOffset, "Set to -1 in order to fix trigger missmatch", 0);
   addParam("IgnoreFrameCount", m_ignore_headernrframes, "Ignore Frame count in DHC End Frame", false);
@@ -745,37 +745,37 @@ void PXDUnpackerModule::initialize()
   m_unpackedEventsCount = 0;
   for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) m_errorCounter[i] = 0;
 
-  if (m_RemapFlag) {
-    B2INFO("open LUT");
-    int i = 0;
-    ifstream LUT_IF_OB_read(m_RemapLUTifob.c_str());
-    if (LUT_IF_OB_read) {
-      B2INFO("Read Raw ONSEN Data from " << m_RemapLUTifob);
-    } else {
-      B2ERROR("Could not open LUT_IF_OB: " << m_RemapLUTifob);
-    }
-    while (!LUT_IF_OB_read.eof()) {
-      i++;
-      LUT_IF_OB_read >> LUT_IF_OB[i];
-//      B2INFO("LUT_IF_OB :: " << i << " :: " << LUT_IF_OB[i]);
-    }
-    B2INFO("LUT_IF_OB written");
-    LUT_IF_OB_read.close();
-    int j = 0;
-    ifstream LUT_IB_OF_read(m_RemapLUTibof.c_str());
-    if (LUT_IB_OF_read) {
-      B2INFO("Read Raw ONSEN Data from " << m_RemapLUTibof);
-    } else {
-      B2ERROR("Could not open LUT_IB_OF: " << m_RemapLUTibof);
-    }
-    while (!LUT_IB_OF_read.eof()) {
-      j++;
-      LUT_IB_OF_read >> LUT_IB_OF[j];
-//      B2INFO("LUT_IB_OF :: " << j << " :: " << LUT_IB_OF[j]);
-    }
-    LUT_IB_OF_read.close();
-    B2INFO("LUT_IB_OF written");
-  }
+  /*  if (m_RemapFlag) {
+      B2INFO("open LUT");
+      int i = 0;
+      ifstream LUT_IF_OB_read(m_RemapLUTifob.c_str());
+      if (LUT_IF_OB_read) {
+        B2INFO("Read Raw ONSEN Data from " << m_RemapLUTifob);
+      } else {
+        B2ERROR("Could not open LUT_IF_OB: " << m_RemapLUTifob);
+      }
+      while (!LUT_IF_OB_read.eof()) {
+        i++;
+        LUT_IF_OB_read >> LUT_IF_OB[i];
+  //      B2INFO("LUT_IF_OB :: " << i << " :: " << LUT_IF_OB[i]);
+      }
+      B2INFO("LUT_IF_OB written");
+      LUT_IF_OB_read.close();
+      int j = 0;
+      ifstream LUT_IB_OF_read(m_RemapLUTibof.c_str());
+      if (LUT_IB_OF_read) {
+        B2INFO("Read Raw ONSEN Data from " << m_RemapLUTibof);
+      } else {
+        B2ERROR("Could not open LUT_IB_OF: " << m_RemapLUTibof);
+      }
+      while (!LUT_IB_OF_read.eof()) {
+        j++;
+        LUT_IB_OF_read >> LUT_IB_OF[j];
+  //      B2INFO("LUT_IB_OF :: " << j << " :: " << LUT_IB_OF[j]);
+      }
+      LUT_IB_OF_read.close();
+      B2INFO("LUT_IB_OF written");
+    }*/
 }
 
 const string error_name[ONSEN_MAX_TYPE_ERR] = {
@@ -807,7 +807,9 @@ bool first_event = false;
 
 void PXDUnpackerModule::terminate()
 {
-  B2ERROR("DHE IDs come in wrong order :: " << dheID_order_error);
+  if (dheID_order_error) {
+    B2ERROR("DHE IDs come in wrong order :: " << dheID_order_error);
+  }
   if (dheID_order_error == m_unpackedEventsCount) {
     B2ERROR("DHE IDs come in wrong order in every Event");
   }
@@ -820,7 +822,11 @@ void PXDUnpackerModule::terminate()
     B2ERROR(errstr + " )");
     for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
       if (m_errorCounter[i]) {
-        B2ERROR(error_name[i] << ": " << m_errorCounter[i]);
+        if (!error_name[i].compare("TOTAL EVENTS PROCESSED")) {
+          B2INFO(error_name[i] << ": " << m_errorCounter[i]);
+        } else {
+          B2ERROR(error_name[i] << ": " << m_errorCounter[i]);
+        }
         //printf("%s %d\n",error_name[i].c_str(), m_errorCounter[i]);
       }
     }
@@ -1208,6 +1214,20 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
                 v_cellID = PXDUnpackerModule::remap_row_IB_OF(dhp_row, dhp_col, dhp_dhp_id, dhe_ID);
                 u_cellID = PXDUnpackerModule::remap_col_IB_OF(dhp_row, dhp_col, dhp_dhp_id);
                 //                       B2DEBUG(20,"Remapped :: ROW_GEO " << v_cellID << " COL_GEO " << u_cellID);
+              }
+              if ((dhe_reformat == 1) && (IFOB_flag == 1)) {
+                //if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 768 - dhp_row ;} //if inner module
+                //if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = /*1 +*/ dhp_row ;} //if outer module
+                dhp_col += dhp_offset;
+                u_cellID = /*1 +*/ dhp_col;
+                v_cellID = /*1 +*/ dhp_row ;
+              }
+              if ((dhe_reformat == 1) && (IBOF_flag == 1)) {
+                //if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 768 - dhp_row ;} //if inner module
+                //if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = /*1 +*/ dhp_row ;} //if outer module
+                dhp_col += dhp_offset;
+                v_cellID = /*1 +*/ dhp_row ;
+                u_cellID = /*1 +*/ dhp_col;
               }
             }
             //           B2DEBUG(20,"ROW :: " << dhp_row << "COL :: " << dhp_col );
@@ -1642,7 +1662,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
             m_errorMask |= ONSEN_ERR_FLAG_FRAMES_IN_EVENT_COUNT;
           }
         }
-        if (counted32bWordsInDHC != nr_of_32bWords_in_dhc_end) {
+        if ((counted32bWordsInDHC != nr_of_32bWords_in_dhc_end) && !dhc.data_onsen_trigger_frame->is_SendUnfiltered()) {
           if (!m_ignore_headernrframes) {
             B2ERROR("Number of 32 Bit Words derived from DHC End Frame $" << nr_of_32bWords_in_dhc_end << " != $" << counted32bWordsInDHC <<
                     " Words Counted");

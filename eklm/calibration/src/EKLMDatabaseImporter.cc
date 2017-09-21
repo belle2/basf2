@@ -95,7 +95,8 @@ void EKLMDatabaseImporter::loadDefaultChannelData()
       for (iSector = 1; iSector <= geoDat->getNSectors(); iSector++) {
         for (iPlane = 1; iPlane <= geoDat->getNPlanes(); iPlane++) {
           for (iStrip = 1; iStrip <= geoDat->getNStrips(); iStrip++) {
-            strip = geoDat->stripNumber(iEndcap, iLayer, iSector, iPlane,                                               iStrip);
+            strip = geoDat->stripNumber(iEndcap, iLayer, iSector, iPlane,
+                                        iStrip);
             m_Channels->setChannelData(strip, &channelData);
           }
         }

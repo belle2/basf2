@@ -38,10 +38,24 @@ output_file = ROOT.TFile('PhokharaEvtgen.root', 'recreate')
 h_born = ROOT.TH1F('h_born', 'Born cross section', 100, 6.1, 10.58)
 h_born.GetXaxis().SetTitle('M_{J/#psi#eta_{c}}^{cutoff}, GeV/c^{2}')
 h_born.GetYaxis().SetTitle('#sigma_{e^{+} e^{-} #rightarrow J/#psi #eta_{c}}, arbitrary units')
+
+h_helicity = ROOT.TH1F('h_helicity', 'Virtual #gamma helicity angle', 20, -1, 1)
+h_helicity.GetXaxis().SetTitle('cos#Theta')
+h_helicity.GetYaxis().SetTitle('Events / 0.1')
+h_helicity.SetMinimum(0)
+
 n = data_tree.GetEntries()
 for i in range(0, n):
     data_tree.GetEntry(i)
     h_born.Fill(data_tree.gamma_M)
+    p_gamma = ROOT.TLorentzVector(data_tree.gamma_P4[0], data_tree.gamma_P4[1],
+                                  data_tree.gamma_P4[2], data_tree.gamma_P4[3])
+    p_jpsi = ROOT.TLorentzVector(data_tree.gamma_Jpsi_P4[0], data_tree.gamma_Jpsi_P4[1],
+                                 data_tree.gamma_Jpsi_P4[2], data_tree.gamma_Jpsi_P4[3])
+    v_boost = -p_gamma.BoostVector()
+    p_jpsi.Boost(v_boost)
+    h_helicity.Fill(math.cos(p_gamma.Vect().Angle(p_jpsi.Vect())))
+
 s = 0
 ecms = 10.58
 for i in range(100, 0, -1):
@@ -58,7 +72,12 @@ l = h_born.GetListOfFunctions()
 l.Add(ROOT.TNamed('Description', 'Born cross section calculated from measured cross section'))
 l.Add(ROOT.TNamed('Check', 'Should be consistent with constant'))
 l.Add(ROOT.TNamed('Contact', contact))
+l = h_helicity.GetListOfFunctions()
+l.Add(ROOT.TNamed('Description', 'Virtual photon helicity angle'))
+l.Add(ROOT.TNamed('Check', 'Should be consistent with constant'))
+l.Add(ROOT.TNamed('Contact', contact))
 
 output_file.cd()
 h_born.Write()
+h_helicity.Write()
 output_file.Close()

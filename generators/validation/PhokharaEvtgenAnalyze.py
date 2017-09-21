@@ -21,6 +21,7 @@ reconstructDecay('gamma:MC -> J/psi:MC eta_c:MC', '')
 
 tools = ['EventMetaData', '^gamma:MC']
 tools += ['InvMass', '^gamma:MC']
+tools += ['Kinematics', '^gamma:MC -> ^J/psi:MC eta_c:MC']
 tools += ['CustomFloats[Ecms]', '^gamma:MC']
 
 ntupleFile('PhokharaEvtgenAnalysis.root')

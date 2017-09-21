@@ -26,14 +26,14 @@ namespace Belle2 {
    * Imports Clusters of the SVD detector and converts them to spacePoints.
    *
    */
-  class SpacePointCreatorSVDModule : public Module {
+  class SVDSpacePointCreatorModule : public Module {
 
   public:
 
 
 
     /** Constructor */
-    SpacePointCreatorSVDModule();
+    SVDSpacePointCreatorModule();
 
 
 

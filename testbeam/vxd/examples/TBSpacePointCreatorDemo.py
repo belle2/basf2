@@ -97,7 +97,7 @@ particlegun.param('independentVertices', True)
 g4sim = register_module('FullSim')
 g4sim.param('StoreAllSecondaries', True)
 
-spCreatorSingle = register_module('SpacePointCreatorSVD')
+spCreatorSingle = register_module('SVDSpacePointCreator')
 spCreatorSingle.logging.log_level = LogLevel.INFO
 spCreatorSingle.logging.debug_level = 1
 spCreatorSingle.param('OnlySingleClusterSpacePoints', True)
@@ -105,7 +105,7 @@ spCreatorSingle.param('NameOfInstance', 'singlesOnly')
 spCreatorSingle.param('SpacePoints', 'singlesOnly')
 spCreatorSingle.param('SVDClusters', 'myPersonalSVDClusters')
 
-spCreatorCombi = register_module('SpacePointCreatorSVD')
+spCreatorCombi = register_module('SVDSpacePointCreator')
 spCreatorCombi.logging.log_level = LogLevel.DEBUG
 spCreatorCombi.logging.debug_level = 1
 spCreatorCombi.param('OnlySingleClusterSpacePoints', False)

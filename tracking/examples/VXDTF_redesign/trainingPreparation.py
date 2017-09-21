@@ -76,7 +76,7 @@ if usePXD:
     spCreatorPXD.param('SpacePoints', 'SpacePoints')
     path.add_module(spCreatorPXD)
 
-spCreatorSVD = register_module('SpacePointCreatorSVD')
+spCreatorSVD = register_module('SVDSpacePointCreator')
 spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
 spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
 spCreatorSVD.param('SpacePoints', 'SpacePoints')

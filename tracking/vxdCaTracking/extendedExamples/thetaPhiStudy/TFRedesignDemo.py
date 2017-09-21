@@ -217,7 +217,7 @@ trackfitter.param('FilterId', 'Kalman')
 
 
 # Conv
-spCreatorSVD = register_module('SpacePointCreatorSVD')
+spCreatorSVD = register_module('SVDSpacePointCreator')
 spCreatorSVD.logging.log_level = LogLevel.INFO
 spCreatorSVD.logging.debug_level = 5
 param_spCreatorSVD = {'OnlySingleClusterSpacePoints': False,
@@ -225,7 +225,7 @@ param_spCreatorSVD = {'OnlySingleClusterSpacePoints': False,
                       'SpacePoints': 'nosingleSP'}
 spCreatorSVD.param(param_spCreatorSVD)
 
-spCreatorSVDSingle = register_module('SpacePointCreatorSVD')
+spCreatorSVDSingle = register_module('SVDSpacePointCreator')
 spCreatorSVDSingle.logging.log_level = LogLevel.INFO
 spCreatorSVDSingle.logging.debug_level = 5
 param_spCreatorSVDSingle = {'OnlySingleClusterSpacePoints': True,

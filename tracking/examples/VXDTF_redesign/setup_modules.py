@@ -96,7 +96,7 @@ def setup_VXDTF2(path=None,
         modules.append(spCreatorPXD)
 
     if use_svd:
-        spCreatorSVD = register_module('SpacePointCreatorSVD')
+        spCreatorSVD = register_module('SVDSpacePointCreator')
         spCreatorSVD.logging.log_level = log_level
         spCreatorSVD.logging.debug_level = debug_level
         spCreatorSVD.param('OnlySingleClusterSpacePoints', False)

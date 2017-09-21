@@ -93,7 +93,7 @@ svdClusterizer = register_module('SVDClusterizer')
 
 # SpacePoint Creation
 # single clusters only
-spCreatorSVDsingle = register_module('SpacePointCreatorSVD')
+spCreatorSVDsingle = register_module('SVDSpacePointCreator')
 spCreatorSVDsingle.logging.log_level = LogLevel.INFO
 spCreatorSVDsingle.param('OnlySingleClusterSpacePoints', True)
 spCreatorSVDsingle.param('NameOfInstance', 'singleClusters')
@@ -101,7 +101,7 @@ spCreatorSVDsingle.param('SpacePoints', 'singleSP')
 # spCreatorSVD.param('SVDClusters', 'singleSP')
 
 # double clusters
-spCreatorSVD = register_module('SpacePointCreatorSVD')
+spCreatorSVD = register_module('SVDSpacePointCreator')
 spCreatorSVD.logging.log_level = LogLevel.INFO
 param_spCreatorSVD = {'OnlySingleClusterSpacePoints': False,
                       'NameOfInstance': 'couplesClusters',

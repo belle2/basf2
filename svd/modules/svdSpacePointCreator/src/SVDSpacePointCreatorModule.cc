@@ -7,7 +7,7 @@
  *                                                                        *
  **************************************************************************/
 
-#include <svd/modules/svdSpacePointCreator/SpacePointCreatorSVDModule.h>
+#include <svd/modules/svdSpacePointCreator/SVDSpacePointCreatorModule.h>
 
 #include <svd/modules/svdSpacePointCreator/SpacePointHelperFunctions.h>
 
@@ -20,9 +20,9 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(SpacePointCreatorSVD)
+REG_MODULE(SVDSpacePointCreator)
 
-SpacePointCreatorSVDModule::SpacePointCreatorSVDModule() :
+SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
   Module()
 {
   InitializeCounters();
@@ -46,7 +46,7 @@ SpacePointCreatorSVDModule::SpacePointCreatorSVDModule() :
 
 
 
-void SpacePointCreatorSVDModule::initialize()
+void SVDSpacePointCreatorModule::initialize()
 {
   // prepare all store- and relationArrays:
   m_spacePoints.registerInDataStore(m_spacePointsName, DataStore::c_DontWriteOut);
@@ -57,7 +57,7 @@ void SpacePointCreatorSVDModule::initialize()
   m_spacePoints.registerRelationTo(m_svdClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
 
 
-  B2INFO("SpacePointCreatorSVDModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
+  B2INFO("SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
          "\nsvdClusters: " << m_svdClusters.getName() <<
          "\nspacePoints: " << m_spacePoints.getName());
 
@@ -68,7 +68,7 @@ void SpacePointCreatorSVDModule::initialize()
 
 
 
-void SpacePointCreatorSVDModule::event()
+void SVDSpacePointCreatorModule::event()
 {
 
   if (m_onlySingleClusterSpacePoints == true) {
@@ -79,7 +79,7 @@ void SpacePointCreatorSVDModule::event()
   }
 
 
-  B2DEBUG(1, "SpacePointCreatorSVDModule(" << m_nameOfInstance <<
+  B2DEBUG(1, "SVDSpacePointCreatorModule(" << m_nameOfInstance <<
           ")::event: spacePoints for single SVDClusters created! Size of arrays:\n" <<
           ", svdClusters: " << m_svdClusters.getEntries() <<
           ", spacePoints: " << m_spacePoints.getEntries());
@@ -89,7 +89,7 @@ void SpacePointCreatorSVDModule::event()
     for (int index = 0; index < m_spacePoints.getEntries(); index++) {
       const SpacePoint* sp = m_spacePoints[index];
 
-      B2DEBUG(10, "SpacePointCreatorSVDModule(" << m_nameOfInstance << ")::event: spacePoint " << index <<
+      B2DEBUG(10, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::event: spacePoint " << index <<
               " with type " << sp->getType() <<
               " and VxdID " << VxdID(sp->getVxdID()) <<
               " is tied to a cluster in: " << sp->getArrayName());
@@ -102,15 +102,15 @@ void SpacePointCreatorSVDModule::event()
 
 
 
-void SpacePointCreatorSVDModule::terminate()
+void SVDSpacePointCreatorModule::terminate()
 {
-  B2INFO("SpacePointCreatorSVDModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
+  B2INFO("SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
          ", svdClusters: " << m_TESTERSVDClusterCtr <<
          ", spacePoints: " << m_TESTERSpacePointCtr);
 }
 
 
-void SpacePointCreatorSVDModule::InitializeCounters()
+void SVDSpacePointCreatorModule::InitializeCounters()
 {
   m_TESTERSVDClusterCtr = 0;
   m_TESTERSpacePointCtr = 0;

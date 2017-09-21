@@ -276,7 +276,8 @@ def add_cdc_cr_track_fit_and_track_creator(path, components=None,
                          reco_tracks=reco_tracks)
 
 
-def add_mc_matcher(path, components=None, reco_tracks="RecoTracks", use_second_cdc_hits=False,
+def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
+                   reco_tracks="RecoTracks", use_second_cdc_hits=False,
                    split_after_delta_t=-1.0):
     """
     Match the tracks to the MC truth. The matching works based on
@@ -284,13 +285,14 @@ def add_mc_matcher(path, components=None, reco_tracks="RecoTracks", use_second_c
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
+    :param mc_reco_tracks: Name of the StoreArray where the mc reco tracks will be stored
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param split_after_delta_t: If positive, split MCRecoTrack into multiple MCRecoTracks if the time
                                 distance between two adjecent SimHits is more than the given value
     """
     path.add_module('TrackFinderMCTruthRecoTracks',
-                    RecoTracksStoreArrayName='MCRecoTracks',
+                    RecoTracksStoreArrayName=mc_reco_tracks,
                     WhichParticles=[],
                     UseSecondCDCHits=use_second_cdc_hits,
                     UsePXDHits=is_pxd_used(components),
@@ -299,7 +301,7 @@ def add_mc_matcher(path, components=None, reco_tracks="RecoTracks", use_second_c
                     SplitAfterDeltaT=split_after_delta_t)
 
     path.add_module('MCRecoTracksMatcher',
-                    mcRecoTracksStoreArrayName='MCRecoTracks',
+                    mcRecoTracksStoreArrayName=mc_reco_tracks,
                     prRecoTracksStoreArrayName=reco_tracks,
                     UsePXDHits=is_pxd_used(components),
                     UseSVDHits=is_svd_used(components),

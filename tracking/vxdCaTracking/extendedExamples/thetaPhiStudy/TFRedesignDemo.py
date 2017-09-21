@@ -233,7 +233,7 @@ param_spCreatorSVDSingle = {'OnlySingleClusterSpacePoints': True,
                             'SpacePoints': 'singleSPonly'}
 spCreatorSVDSingle.param(param_spCreatorSVDSingle)
 
-spCreatorPXD = register_module('SpacePointCreatorPXD')
+spCreatorPXD = register_module('PXDSpacePointCreator')
 spCreatorPXD.logging.log_level = LogLevel.INFO
 spCreatorPXD.logging.debug_level = 5
 spCreatorPXD.param('NameOfInstance', 'pxdOnly')

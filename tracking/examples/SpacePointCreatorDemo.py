@@ -51,7 +51,7 @@ spCreatorCombi.param('OnlySingleClusterSpacePoints', False)
 spCreatorCombi.param('NameOfInstance', 'couplesAllowed')
 spCreatorCombi.param('SpacePoints', 'couplesAllowed')
 
-spCreatorPXD = register_module('SpacePointCreatorPXD')
+spCreatorPXD = register_module('PXDSpacePointCreator')
 spCreatorPXD.logging.log_level = LogLevel.INFO
 spCreatorPXD.logging.debug_level = 1
 spCreatorPXD.param('NameOfInstance', 'pxdOnly')

@@ -88,7 +88,7 @@ def setup_VXDTF2(path=None,
     # Preparation
     #################
     if use_pxd:
-        spCreatorPXD = register_module('SpacePointCreatorPXD')
+        spCreatorPXD = register_module('PXDSpacePointCreator')
         spCreatorPXD.logging.log_level = log_level
         spCreatorPXD.logging.debug_level = debug_level
         spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')

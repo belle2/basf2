@@ -673,9 +673,9 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     #################
     nameSPs = 'SpacePoints' + suffix
 
-    if 'SpacePointCreatorPXD' not in path:
+    if 'PXDSpacePointCreator' not in path:
         if use_pxd:
-            spCreatorPXD = register_module('SpacePointCreatorPXD')
+            spCreatorPXD = register_module('PXDSpacePointCreator')
             spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
             spCreatorPXD.param('SpacePoints', nameSPs)
             path.add_module(spCreatorPXD)

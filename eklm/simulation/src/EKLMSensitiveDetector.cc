@@ -49,6 +49,8 @@ EKLMSensitiveDetector(G4String name)
           for (iStrip = 1; iStrip <= m_GeoDat->getNStrips(); iStrip++) {
             strip = m_GeoDat->stripNumber(iEndcap, iLayer, iSector, iPlane,                                               iStrip);
             channelData = channels->getChannelData(strip);
+            if (channelData == NULL)
+              B2FATAL("Incomplete EKLM channel data.");
             channelActive[strip - 1] = channelData->getActive();
           }
         }

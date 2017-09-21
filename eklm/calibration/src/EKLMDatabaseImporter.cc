@@ -82,11 +82,10 @@ void EKLMDatabaseImporter::importSimulationParameters()
   simPar.import(iov);
 }
 
-void EKLMDatabaseImporter::importChannelData()
+void EKLMDatabaseImporter::loadDefaultChannelData()
 {
-  DBImportObjPtr<EKLMChannels> channels;
   EKLMChannelData channelData;
-  channels.construct();
+  m_Channels.construct();
   channelData.setActive(true);
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
   int iEndcap, iLayer, iSector, iPlane, iStrip, strip;
@@ -97,13 +96,27 @@ void EKLMDatabaseImporter::importChannelData()
         for (iPlane = 1; iPlane <= geoDat->getNPlanes(); iPlane++) {
           for (iStrip = 1; iStrip <= geoDat->getNStrips(); iStrip++) {
             strip = geoDat->stripNumber(iEndcap, iLayer, iSector, iPlane,                                               iStrip);
-            channels->setChannelData(strip, &channelData);
+            m_Channels->setChannelData(strip, &channelData);
           }
         }
       }
     }
   }
+}
+
+void EKLMDatabaseImporter::setChannelData(
+  int endcap, int layer, int sector, int plane, int strip,
+  EKLMChannelData* channelData)
+{
+  int stripGlobal;
+  const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
+  stripGlobal = geoDat->stripNumber(endcap, layer, sector, plane, strip);
+  m_Channels->setChannelData(stripGlobal, channelData);
+}
+
+void EKLMDatabaseImporter::importChannelData()
+{
   IntervalOfValidity iov(0, 0, -1, -1);
-  channels.import(iov);
+  m_Channels.import(iov);
 }
 

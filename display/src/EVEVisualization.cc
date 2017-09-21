@@ -1574,7 +1574,15 @@ void EVEVisualization::addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit)
   unsigned iCenter = hit->getIWire();
   if (hit->getPriorityPosition() == 1) iCenter += 1;
 
-  // get segment shape (depends on super layer)
+  // a track segment consists of 11 wires (15 in SL0) in a special configuration
+  // -> get the shift with respect to the center wire (*) for all wires
+  // SL 1-8:
+  //  _ _ _
+  // |_|_|_|
+  //  |_|_|
+  //   |*|
+  //  |_|_|
+  // |_|_|_|
   std::vector<int> layershift = { -2, -1, 0, 1, 2};
   std::vector<std::vector<float>> cellshift = {
     { -1, 0, 1},
@@ -1583,6 +1591,13 @@ void EVEVisualization::addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit)
     { -0.5, 0.5},
     { -1, 0, 1}
   };
+  // SL 0:
+  //  _ _ _ _ _
+  // |_|_|_|_|_|
+  //  |_|_|_|_|
+  //   |_|_|_|
+  //    |_|_|
+  //     |*|
   if (hit->getISuperLayer() == 0) {
     layershift = { 0, 1, 2, 3, 4};
     cellshift = {

@@ -22,6 +22,7 @@ using namespace Belle2;
 const std::string RootIOUtilities::c_treeNames[] = { "tree", "persistent" };
 const std::string RootIOUtilities::c_SteerBranchNames[] = { "branchNames", "branchNamesPersistent" };
 const std::string RootIOUtilities::c_SteerExcludeBranchNames[] = { "excludeBranchNames", "excludeBranchNamesPersistent" };
+const std::string RootIOUtilities::c_SteerAdditionalBranchNames[] = { "additionalBranchNames", "additionalBranchNamesPersistent" };
 
 std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string>& branchesToFilter,
                                                       const std::vector<std::string>& branches, const std::vector<std::string>& excludeBranches, int durability)

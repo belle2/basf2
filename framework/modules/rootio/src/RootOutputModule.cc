@@ -70,12 +70,15 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
   addParam(c_SteerBranchNames[0], m_branchNames[0],
            "Names of event durability branches to be saved. Empty means all branches. Objects with c_DontWriteOut flag added here will also be saved. (EventMetaData is always saved)",
            emptyvector);
-  addParam("additionalBranchNamesEvent", m_additionalBranchNames[0], "Add additional event branch names..", emptyvector);
   addParam(c_SteerBranchNames[1], m_branchNames[1],
            "Names of persistent durability branches to be saved. Empty means all branches. Objects with c_DontWriteOut flag added here will also be saved. (FileMetaData is always saved)",
            emptyvector);
-  addParam("additionalBranchNamesPersistent", m_additionalBranchNames[1], "Add additional persistent branch name.", emptyvector);
-
+  addParam(c_SteerAdditionalBranchNames[0], m_additionalBranchNames[0],
+           "Add additional event branch names without the need to specify all branchnames.",
+           emptyvector);
+  addParam(c_SteerAdditionalBranchNames[1], m_additionalBranchNames[1],
+           "Add additional persistent branch names without the need to specify all branchnames.",
+           emptyvector);
   addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0],
            "Names of event durability branches NOT to be saved. Branches also in branchNames are not saved.", emptyvector);
   addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1],

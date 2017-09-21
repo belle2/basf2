@@ -40,7 +40,7 @@ namespace Belle2 {
       /**
        * Destructor.
        */
-      ~EKLMSensitiveDetector() {};
+      ~EKLMSensitiveDetector();
 
       /**
        * Process each step and calculate variables for EKLMSimHit
@@ -52,6 +52,9 @@ namespace Belle2 {
 
       /** Geometry data. */
       const EKLM::GeometryData* m_GeoDat;
+
+      /** Active channels. */
+      bool* channelActive;
 
       /**
        * All hits with time large  than m_ThresholdHitTime

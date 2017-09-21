@@ -20,6 +20,12 @@ pt = array('d')
 dpt = array('d')
 
 files = glob.glob('qam.0*.root')
+# files = glob.glob('/ghi/fs01/belle2/bdata/group/detector/CDC/qam/GCR1/build-2017-08-21/qam.0001.*.root')
+
+if files is None:
+    print('No files are found')
+    exit(1)
+
 for f in files:
     run = int(f.split('.')[2])
     qam = QAM(f)

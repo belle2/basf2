@@ -72,6 +72,7 @@ if __name__ == "__main__":
     #    ROOT.gSystem.Load('createQAMHist_C.so')
     #    prefix = '/gpfs/home/belle/karim/BASF2/build-2017-08-21/cdc/examples/performance/data_reference'
     prefix = '.'
-    hist = ROOT.createQAMHist('/'.join([prefix, 'output.{0:0>4}.{1:0>5}.root'.format(args.exp, args.run)]),
-                              'qam.{0:0>4}.{1:0>5}.root'.format(args.exp, args.run))
+    hist = ROOT.createQAMHist(
+        '/'.join([prefix, 'output.{0:0>4}.{1:0>5}.root'.format(args.exp, args.run)]),
+        'qam.{0:0>4}.{1:0>5}.root'.format(args.exp, args.run))
     #    ROOT.createQAMHist()

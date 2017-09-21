@@ -50,8 +50,8 @@ for i in range(100, 0, -1):
     p = s / n
     q = 1.0 - p
     r = born_measured_ratio(ecms, ecms - h_gamma_mass.GetBinLowEdge(i))
-    h_gamma_mass.SetBinContent(i, s / r)
-    h_gamma_mass.SetBinError(i, math.sqrt(n * p * q) / r)
+    h_gamma_mass.SetBinContent(i, s / r / n)
+    h_gamma_mass.SetBinError(i, math.sqrt(n * p * q) / r / n)
 
 contact = 'Kirill Chilikin (chilikin@lebedev.ru)'
 l = h_gamma_mass.GetListOfFunctions()

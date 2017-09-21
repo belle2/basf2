@@ -21,16 +21,13 @@ def born_measured_ratio(ecms, ecut):
     pi = math.pi
     l = math.log(ecms / 2 / ecut)
     L = 2.0 * math.log(ecms / me)
-    r = 1. + alpha / pi * (-2.0 * l * (L - 1) + 1.5 * L + pi * pi / 3 - 2) + \
-        alpha * alpha / pi / pi * (0.5 * pow(-2.0 * l * (L - 1), 2) +
-                                   (1.5 * L + pi * pi / 3 - 2) * (-2.0 * l * (L - 1)) +
-                                   L * L * (-l / 3 + 11. / 8 -
-                                            pi * pi / 3) + L * (2.0 * l * l / 3 + 10. * l / 9 - 203. / 48 +
-                                                                11. * pi * pi / 12 + 3.0 * riemann_zeta_3) -
-                                   (4. * l * l * l / 9 + 10. * l * l / 9 +
-                                    2. * l / 9 * (28. / 3 - pi * pi)) - (pow(L - 2. * l, 3) / 18 -
-                                                                         5. / 18 * pow(L - 2. * l, 2) +
-                                                                         (28. / 3 - pi * pi) * (L - 2. * l) / 9))
+    r1 = -2.0 * l * (L - 1) + 1.5 * L + pi * pi / 3 - 2
+    r2 = 0.5 * pow(-2.0 * l * (L - 1), 2) + \
+        (1.5 * L + pi * pi / 3 - 2) * (-2.0 * l * (L - 1)) + L * L * (-l / 3 + 11. / 8 - pi * pi / 3) + \
+        L * (2.0 * l * l / 3 + 10. * l / 9 - 203. / 48 + 11. * pi * pi / 12 + 3.0 * riemann_zeta_3) - \
+        (4. * l * l * l / 9 + 10. * l * l / 9 + 2. * l / 9 * (28. / 3 - pi * pi)) - \
+        (pow(L - 2. * l, 3) / 18 - 5. / 18 * pow(L - 2. * l, 2) + (28. / 3 - pi * pi) * (L - 2. * l) / 9)
+    r = 1. + alpha / pi * r1 + alpha * alpha / pi / pi * r2
     return r
 
 

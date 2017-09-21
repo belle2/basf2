@@ -29,6 +29,10 @@ for w in nWires:
 nWiresSL = [160 * 8, 160 * 6, 192 * 6, 224 * 6, 256 * 6, 288 * 6,
             320 * 6, 352 * 6, 384 * 6]
 
+rfClock = 1.017774
+refT0 = 4905.0 * rfClock
+refMPV = 80
+
 
 class DQM():
 
@@ -43,49 +47,95 @@ class DQM():
 
         super(DQM, self).__init__()
 
+        #: input file name
         self.f = TFile(fname)
+        #: plot type (adc/tdc/hit)
         self.type = 'adc'
+        #: ADC histograms
         self.histADC = [self.f.Get('h' + str(100000 + i))
                         for i in range(14336)]
+        #: TDC histograms
         self.histTDC = [self.f.Get('h' + str(200000 + i))
                         for i in range(14336)]
+        #: Hit distribution histograms
         self.histHit = [self.f.Get('h' + str(400000 + i))
                         for i in range(56)]
+        #: Line for guide of TDC T0
+        self.lines = []
+        for h in self.histTDC:
+            y = h.GetMaximum()
+            line = TLine(refT0, 0, refT0, y)
+            line.SetLineColor(2)
+            self.lines.append(line)
+
+        #: Line for guide of ADC MPV
+        self.lineMPVs = []
+        for h in self.histADC:
+            y = h.GetMaximum()
+            line = TLine(refMPV, 0, refMPV, y)
+            line.SetLineColor(2)
+            self.lineMPVs.append(line)
         #        self.histADCinLayer = [self.f.Get('h' + str(500000 + i))
         #                               for i in range(56)]
 
+        #: Fitting function for ADC histogram
         self.sig = TF1("sig", "landau", 0, 200)
         #        self.sig = TF1("sig", "landau+expo(3)", 0, 200)
         #        self.sig.SetParameters(300.0,60.0,20.0,1000,-1.0)
+        #: Fitting function for TDC histogram
         self.ft0 = TF1("ft0", "[0]+[1]*(exp([2]*([3]-x))/(1+exp(-([4]-x)/[5])))", 2000, 4000)
         self.ft0.SetParameters(0, 10, 0, 0, 3800, 3.)
         self.ft0.FixParameter(0, 0.)
+        #: Fit status True if fitting has been finished
         self.m_fitStatus = False
+        #: canvas
         self.canvas = TCanvas("canvas", "canvas", 800, 800)
+        #: histogram ID
         self.hid = 0
+        #: Number of division for canvas
         self.ndiv = 1
+        #: MPV values
         self.par = [-1.0 for i in range(14336)]
+        #: MPV values w.r.t. layer
         self.parADCinLayer = [-1.0 for i in range(56)]
+        #: T0 values
         self.parT0 = [0.0 for i in range(14336)]
+        #: histogram
         self.h2 = TH2D("h2d", "MPV of all ADCs", 15000,
                        -500, 14500, 100, 0, 200)
+        #: Set stats.
         self.h2.SetStats(0)
+        #: Set title of X axis
         self.h2.GetXaxis().SetTitle('Cell ID')
+        #: Set title of Y axis
         self.h2.GetYaxis().SetTitle('MPV')
+        #: histogram
         self.h2ADCvsLayer = TH2D("h2dl", "MPV for every Layer", 56,
                                  0, 56, 100, 0, 200)
+        #: Set stats.
         self.h2ADCvsLayer.SetStats(0)
+        #: Set title of X axis
         self.h2ADCvsLayer.GetXaxis().SetTitle('Layer')
+        #: Set title of Y axis
         self.h2ADCvsLayer.GetYaxis().SetTitle('MPV (adc count)')
+        #: array cell
         self.x = array("d", [i for i in range(14336)])
+        #: array layer
         self.l = array("d", [i for i in range(56)])
+        #: TGraph
         self.graph = TGraph(len(self.x))
+        #: Marker style
         self.graph.SetMarkerStyle(kFullCircle)
+        #: Marker size
         self.graph.SetMarkerSize(0.3)
 
+        #: TGraph
         self.graph2 = TGraph(len(self.l))
+        #: Marker style
         self.graph2.SetMarkerStyle(kFullCircle)
+        #: Marker size
         self.graph2.SetMarkerSize(1.0)
+        #: Reference line
         self.line = [TLine(0, 0, 0, 200)]
 
         x0 = 0
@@ -146,6 +196,7 @@ class DQM():
             self.hid = i + j
             self.canvas.cd(j + 1)
             self.histADC[self.hid].Draw()
+            self.lineMPVs[self.hid].Draw()
 
         self.type = 'adc'
         self.canvas.Update()
@@ -159,6 +210,7 @@ class DQM():
             self.hid = i + j
             self.canvas.cd(j + 1)
             self.histTDC[self.hid].Draw()
+            self.lines[self.hid].Draw()
 
         self.canvas.Update()
         self.type = 'tdc'
@@ -184,6 +236,7 @@ class DQM():
             self.hid = i + j
             self.canvas.cd(j + 1)
             self.histTDC[self.hid].Draw()
+            self.lines[self.hid].Draw()
 
         self.type = 'tdc'
         self.canvas.Update()
@@ -196,6 +249,7 @@ class DQM():
             self.hid = i + j
             self.canvas.cd(j + 1)
             self.histADC[self.hid].Draw()
+            self.lineMPVs[self.hid].Draw()
 
         self.type = 'adc'
         self.canvas.Update()

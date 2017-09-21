@@ -21,10 +21,15 @@ void NoKickRTSel::hitXPBuilder(const RecoTrack& track)
   StoreArray<MCParticle> MCParticles;
   StoreArray<RecoTrack> recoTracks;
 
+  //const MCParticle* particle = track.getRelationFrom<MCParticle>();
+
   std::vector<Belle2::RecoHitInformation::UsedSVDHit*> clusterListSVD = track.getSVDHitList();
   for (const SVDCluster* cluster : clusterListSVD) {
     const MCParticle* particle = cluster->getRelationsTo<MCParticle>()[0];
     for (const SVDTrueHit& hit : cluster->getRelationsTo<SVDTrueHit>()) {
+      //if(hit->GetRelationFrom<MCParticle>()!=particle){
+      //continue;
+      //}
       VxdID trueHitSensorID = hit.getSensorID();
       const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);
       hitXPDerivate entry(hit, *cluster, *particle, sensorInfo);
@@ -54,6 +59,9 @@ void NoKickRTSel::hitXPBuilder(const RecoTrack& track)
   for (const PXDCluster* cluster : clusterListPXD) {
     const MCParticle* particle = cluster->getRelationsTo<MCParticle>()[0];
     for (const PXDTrueHit& hit : cluster->getRelationsTo<PXDTrueHit>()) {
+      //   if(hit->GetRelationFrom<MCParticle>()!=particle){
+      //     continue;
+      //   }
       VxdID trueHitSensorID = hit.getSensorID();
       const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);
       hitXPDerivate entry(hit, *particle, sensorInfo);

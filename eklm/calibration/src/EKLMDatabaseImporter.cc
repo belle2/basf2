@@ -13,9 +13,11 @@
 
 /* Belle2 headers. */
 #include <eklm/calibration/EKLMDatabaseImporter.h>
+#include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
 #include <eklm/dbobjects/EKLMReconstructionParameters.h>
 #include <eklm/dbobjects/EKLMSimulationParameters.h>
+#include <eklm/geometry/GeometryData.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/gearbox/GearDir.h>
@@ -78,5 +80,30 @@ void EKLMDatabaseImporter::importSimulationParameters()
     Unit::convertValue(gd.getDouble("HitTimeThreshold") , "ns"));
   IntervalOfValidity iov(0, 0, -1, -1);
   simPar.import(iov);
+}
+
+void EKLMDatabaseImporter::importChannelData()
+{
+  DBImportObjPtr<EKLMChannels> channels;
+  EKLMChannelData channelData;
+  channels.construct();
+  channelData.setActive(true);
+  const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
+  int iEndcap, iLayer, iSector, iPlane, iStrip, strip;
+  for (iEndcap = 1; iEndcap <= geoDat->getNEndcaps(); iEndcap++) {
+    for (iLayer = 1; iLayer <= geoDat->getNDetectorLayers(iEndcap);
+         iLayer++) {
+      for (iSector = 1; iSector <= geoDat->getNSectors(); iSector++) {
+        for (iPlane = 1; iPlane <= geoDat->getNPlanes(); iPlane++) {
+          for (iStrip = 1; iStrip <= geoDat->getNStrips(); iStrip++) {
+            strip = geoDat->stripNumber(iEndcap, iLayer, iSector, iPlane,                                               iStrip);
+            channels->setChannelData(strip, &channelData);
+          }
+        }
+      }
+    }
+  }
+  IntervalOfValidity iov(0, 0, -1, -1);
+  channels.import(iov);
 }
 

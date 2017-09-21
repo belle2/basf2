@@ -45,6 +45,11 @@ namespace Belle2 {
      */
     void importSimulationParameters();
 
+    /**
+     * Import channel data.
+     */
+    void importChannelData();
+
   };
 
 }

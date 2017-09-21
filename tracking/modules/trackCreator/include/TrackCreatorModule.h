@@ -72,5 +72,7 @@ namespace Belle2 {
     int m_defaultPDGCode; ///< Default PDG code, for which TrackFitResults will be created.
 
     bool m_useClosestHitToIP = false; ///< Flag to turn on special handling which measurement to choose; especially useful for Cosmics.
+    bool m_useBFieldAtHit =
+      false; ///< Flag to calculate the BField at the used hit (closest to IP or first one), instead of the one at the POCA. This is also useful for cosmics only.
   };
 }

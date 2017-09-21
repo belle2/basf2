@@ -53,6 +53,9 @@ TrackCreatorModule::TrackCreatorModule() :
 
   addParam("useClosestHitToIP", m_useClosestHitToIP, "Flag to turn on special handling which measurement "
            "to choose; especially useful for Cosmics.", m_useClosestHitToIP);
+  addParam("useBFieldAtHit", m_useBFieldAtHit, "Flag to calculate the BField at the used hit "
+           "(closest to IP or first one), instead of the one at the POCA. This is also useful for cosmics only.",
+           m_useBFieldAtHit);
 
 }
 
@@ -111,7 +114,8 @@ void TrackCreatorModule::event()
         B2DEBUG(200, "Trying to fit with PDG = " << pdg);
         trackFitter.fit(recoTrack, Const::ParticleType(abs(pdg)));
       }
-      trackBuilder.storeTrackFromRecoTrack(recoTrack, Const::ParticleType(abs(m_defaultPDGCode)), m_useClosestHitToIP);
+      trackBuilder.storeTrackFromRecoTrack(recoTrack, Const::ParticleType(abs(m_defaultPDGCode)),
+                                           m_useClosestHitToIP, m_useBFieldAtHit);
     } else {
       B2DEBUG(200, "Pion fit failed - not creating a Track out of this RecoTrack.");
     }

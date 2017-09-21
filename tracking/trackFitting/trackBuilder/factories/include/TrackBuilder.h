@@ -74,10 +74,12 @@ namespace Belle2 {
      * @param recoTrack:
      * @param useClosestHitInIP: Flag to turn on special handling which measurement "
     "to choose; especially useful for Cosmics
+     * @param useBFiledAtHit: Flag to calculate the BField at the used hit (closest to IP or first one), instead of the
+     *        one at the POCA. This is also useful for cosmics only.
      * @return
      */
     bool storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::ParticleType& defaultHypothesis,
-                                 const bool useClosestHitToIP = false);
+                                 const bool useClosestHitToIP = false, const bool useBFieldAtHit = false);
 
   private:
     std::string m_trackColName;  ///< TrackColName (output).

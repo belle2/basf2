@@ -30,7 +30,7 @@ EKLMSensitiveDetector(G4String name)
 {
   int iEndcap, iLayer, iSector, iPlane, iStrip, strip, maxStrip;
   EKLMChannelData* channelData;
-  channelActive = NULL;
+  m_ChannelActive = NULL;
   m_GeoDat = &(EKLM::GeometryData::Instance());
   DBObjPtr<EKLMSimulationParameters> simPar;
   if (!simPar.isValid())
@@ -40,7 +40,7 @@ EKLMSensitiveDetector(G4String name)
   if (!channels.isValid())
     B2FATAL("EKLM channel data are not available.");
   maxStrip = m_GeoDat->getMaximalStripGlobalNumber();
-  channelActive = new bool[maxStrip];
+  m_ChannelActive = new bool[maxStrip];
   for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
     for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
          iLayer++) {
@@ -52,7 +52,7 @@ EKLMSensitiveDetector(G4String name)
             channelData = channels->getChannelData(strip);
             if (channelData == NULL)
               B2FATAL("Incomplete EKLM channel data.");
-            channelActive[strip - 1] = channelData->getActive();
+            m_ChannelActive[strip - 1] = channelData->getActive();
           }
         }
       }
@@ -68,8 +68,8 @@ EKLMSensitiveDetector(G4String name)
 
 EKLM::EKLMSensitiveDetector::~EKLMSensitiveDetector()
 {
-  if (channelActive != NULL)
-    delete[] channelActive;
+  if (m_ChannelActive != NULL)
+    delete[] m_ChannelActive;
 }
 
 bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
@@ -84,7 +84,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   plane = hist->GetVolume(stripLevel + 3)->GetCopyNo();
   strip = hist->GetVolume(stripLevel)->GetCopyNo();
   stripGlobal = m_GeoDat->stripNumber(endcap, layer, sector, plane, strip);
-  if (!channelActive[stripGlobal - 1])
+  if (!m_ChannelActive[stripGlobal - 1])
     return false;
   const G4double eDep = aStep->GetTotalEnergyDeposit();
   /* Do not record hits without deposited energy. */

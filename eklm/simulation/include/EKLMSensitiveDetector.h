@@ -54,7 +54,7 @@ namespace Belle2 {
       const EKLM::GeometryData* m_GeoDat;
 
       /** Active channels. */
-      bool* channelActive;
+      bool* m_ChannelActive;
 
       /**
        * All hits with time large  than m_ThresholdHitTime

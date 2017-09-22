@@ -71,12 +71,12 @@ path.add_module(eventCounter)
 
 # put PXD and SVD SpacePoints into the same StoreArray
 if usePXD:
-    spCreatorPXD = register_module('SpacePointCreatorPXD')
+    spCreatorPXD = register_module('PXDSpacePointCreator')
     spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
     spCreatorPXD.param('SpacePoints', 'SpacePoints')
     path.add_module(spCreatorPXD)
 
-spCreatorSVD = register_module('SpacePointCreatorSVD')
+spCreatorSVD = register_module('SVDSpacePointCreator')
 spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
 spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
 spCreatorSVD.param('SpacePoints', 'SpacePoints')

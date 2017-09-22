@@ -677,16 +677,16 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     #################
     nameSPs = 'SpacePoints' + suffix
 
-    if 'SpacePointCreatorPXD' not in path:
+    if 'PXDSpacePointCreator' not in path:
         if use_pxd:
-            spCreatorPXD = register_module('SpacePointCreatorPXD')
+            spCreatorPXD = register_module('PXDSpacePointCreator')
             spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
             spCreatorPXD.param('SpacePoints', nameSPs)
             path.add_module(spCreatorPXD)
 
-    if 'SpacePointCreatorSVD' not in path:
+    if 'SVDSpacePointCreator' not in path:
         # always use svd!
-        spCreatorSVD = register_module('SpacePointCreatorSVD')
+        spCreatorSVD = register_module('SVDSpacePointCreator')
         spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
         spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
         spCreatorSVD.param('SpacePoints', nameSPs)

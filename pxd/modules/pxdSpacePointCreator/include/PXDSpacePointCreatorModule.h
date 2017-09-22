@@ -26,14 +26,14 @@ namespace Belle2 {
    * Imports Clusters of the pxd detector and converts them to spacePoints.
    *
    */
-  class SpacePointCreatorPXDModule : public Module {
+  class PXDSpacePointCreatorModule : public Module {
 
   public:
 
 
 
     /** Constructor */
-    SpacePointCreatorPXDModule();
+    PXDSpacePointCreatorModule();
 
 
 

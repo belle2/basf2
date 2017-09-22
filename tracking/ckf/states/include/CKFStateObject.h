@@ -216,6 +216,7 @@ namespace Belle2 {
       if (mSoPSet()) {
         return m_mSoPPosition;
       } else {
+        B2ASSERT("You are asking for a parent property without a parent!", getParent());
         return getParent()->getMSoPPosition();
       }
     }
@@ -227,6 +228,7 @@ namespace Belle2 {
         return m_mSoPMomentum;
 
       } else {
+        B2ASSERT("You are asking for a parent property without a parent!", getParent());
         return getParent()->getMSoPMomentum();
       }
     }
@@ -237,6 +239,7 @@ namespace Belle2 {
       if (mSoPSet()) {
         return m_mSoPCov;
       } else {
+        B2ASSERT("You are asking for a parent property without a parent!", getParent());
         return getParent()->getMSoPCovariance();
       }
     }

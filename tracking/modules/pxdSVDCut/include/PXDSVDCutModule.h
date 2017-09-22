@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jonas Wagner                                             *
+ * Contributors: Sebastian Racs                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,8 +15,6 @@
 #include <framework/core/Module.h>
 
 #include <string>
-#include <vector>
-
 
 namespace Belle2 {
 

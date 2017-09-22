@@ -47,7 +47,7 @@ namespace Belle2 {
     operator TrackFindingCDC::FunctorTag();
 
     template<class T>
-    auto operator()(const T& t) const -> decltype(t.getSeed())
+    auto operator()(const T& t) const
     {
       return t.getSeed();
     }
@@ -59,7 +59,7 @@ namespace Belle2 {
     operator TrackFindingCDC::FunctorTag();
 
     template<class T>
-    auto operator()(const T& t) const -> decltype(t->getHits().size())
+    auto operator()(const T& t) const
     {
       return t->getHits().size();
     }

@@ -72,7 +72,7 @@ namespace Belle2 {
 
     /// from a general state
     template <class AState>
-    auto operator()(const AState& state) const -> decltype(state->getHit())
+    auto operator()(const AState& state) const
     {
       return state->getHit();
     }
@@ -84,8 +84,8 @@ namespace Belle2 {
     operator TrackFindingCDC::FunctorTag();
 
     /// ... from a space point
-    template<class AState, class SFINAE = EnableIfSpacePoint<AState>>
-    auto operator()(const AState* state) const -> decltype(state->getHit()->getVxdID())
+    template<class AState>
+    auto operator()(const AState* state, EnableIfSpacePoint<AState>* = 0) const
     {
       const auto* hit = state->getHit();
       if (hit) {
@@ -96,8 +96,8 @@ namespace Belle2 {
     }
 
     /// ... from a wire hit
-    template<class AState, class SFINAE = EnableIfCDCWireHit<AState>>
-    auto operator()(const AState* state) const -> decltype(state->getHit()->getWireID())
+    template<class AState>
+    auto operator()(const AState* state, EnableIfCDCWireHit<AState>* = 0) const
     {
       return state->getHit()->getWireID();
     }

@@ -30,7 +30,7 @@ namespace Belle2 {
 
       /// Operator for getting the ICLayer of a wire hit
       template<class T1>
-      auto operator()(const T1& t1) const -> decltype(t1.getWireID().getICLayer())
+      auto operator()(const T1& t1) const
       {
         return t1.getWireID().getICLayer();
       }

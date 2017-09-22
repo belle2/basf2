@@ -18,12 +18,12 @@ namespace Belle2 {
   class OverlapTeacher : public TrackFindingCDC::Findlet<typename AVarSet::Object> {
   private:
     /// Helper Functor to get the TeacherInformation of a given result
-    struct TeacherInformationGetter {
+    struct GetTeacherInformation {
       /// Make it a functor
       operator TrackFindingCDC::FunctorTag();
 
       template<class T>
-      auto operator()(const T& t) const -> decltype(t.getTeacherInformation())
+      auto operator()(const T& t) const
       {
         return t.getTeacherInformation();
       }
@@ -87,7 +87,7 @@ namespace Belle2 {
       for (const auto& resultsWithSameSeed : groupedBySeeds)
       {
         const auto& maximalWeightElement = std::max_element(resultsWithSameSeed.begin(), resultsWithSameSeed.end(),
-                                                            TrackFindingCDC::LessOf<TeacherInformationGetter>());
+                                                            TrackFindingCDC::LessOf<GetTeacherInformation>());
         const auto& maximalWeight = maximalWeightElement->getTeacherInformation();
 
         for (auto& result : resultsWithSameSeed) {

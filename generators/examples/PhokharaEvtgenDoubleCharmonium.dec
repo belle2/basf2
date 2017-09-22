@@ -2,7 +2,7 @@
 Alias MyJ/psi J/psi
 
 Decay vpho
-1.0 MyJ/psi eta_c PHSP;
+1.0 MyJ/psi eta_c HELAMP 1.0 0.0 0.0 0.0 -1.0 0.0;
 Enddecay
 
 Decay MyJ/psi

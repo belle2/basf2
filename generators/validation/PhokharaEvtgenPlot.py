@@ -32,29 +32,42 @@ def born_measured_ratio(ecms, ecut):
 
 
 input_file = ROOT.TFile('PhokharaEvtgenAnalysis.root')
-data_tree = input_file.Get('tree')
+tree = input_file.Get('tree')
 output_file = ROOT.TFile('PhokharaEvtgen.root', 'recreate')
 
 h_born = ROOT.TH1F('h_born', 'Born cross section', 100, 6.1, 10.58)
 h_born.GetXaxis().SetTitle('M_{J/#psi#eta_{c}}^{cutoff}, GeV/c^{2}')
 h_born.GetYaxis().SetTitle('#sigma_{e^{+} e^{-} #rightarrow J/#psi #eta_{c}}, arbitrary units')
 
-h_helicity = ROOT.TH1F('h_helicity', 'Virtual #gamma helicity angle', 20, -1, 1)
-h_helicity.GetXaxis().SetTitle('cos#Theta')
-h_helicity.GetYaxis().SetTitle('Events / 0.1')
-h_helicity.SetMinimum(0)
+h_helicity_gamma = ROOT.TH1F('h_helicity_gamma', 'Virtual #gamma helicity angle', 20, -1, 1)
+h_helicity_gamma.GetXaxis().SetTitle('cos#theta_{#gamma}')
+h_helicity_gamma.GetYaxis().SetTitle('Events / 0.1')
+h_helicity_gamma.SetMinimum(0)
 
-n = data_tree.GetEntries()
+h_helicity_jpsi = ROOT.TH1F('h_helicity_jpsi', 'J/#psi helicity angle', 20, -1, 1)
+h_helicity_jpsi.GetXaxis().SetTitle('cos#theta_{J/#psi}')
+h_helicity_jpsi.GetYaxis().SetTitle('Events / 0.1')
+h_helicity_jpsi.SetMinimum(0)
+
+n = tree.GetEntries()
 for i in range(0, n):
-    data_tree.GetEntry(i)
-    h_born.Fill(data_tree.gamma_M)
-    p_gamma = ROOT.TLorentzVector(data_tree.gamma_P4[0], data_tree.gamma_P4[1],
-                                  data_tree.gamma_P4[2], data_tree.gamma_P4[3])
-    p_jpsi = ROOT.TLorentzVector(data_tree.gamma_Jpsi_P4[0], data_tree.gamma_Jpsi_P4[1],
-                                 data_tree.gamma_Jpsi_P4[2], data_tree.gamma_Jpsi_P4[3])
-    v_boost = -p_gamma.BoostVector()
-    p_jpsi.Boost(v_boost)
-    h_helicity.Fill(math.cos(p_gamma.Vect().Angle(p_jpsi.Vect())))
+    tree.GetEntry(i)
+    m = math.sqrt(tree.gamma_e * tree.gamma_e - tree.gamma_px * tree.gamma_px -
+                  tree.gamma_py * tree.gamma_py - tree.gamma_pz * tree.gamma_pz)
+    h_born.Fill(m)
+    p_gamma = ROOT.TLorentzVector(tree.gamma_px, tree.gamma_py,
+                                  tree.gamma_pz, tree.gamma_e)
+    p_jpsi = ROOT.TLorentzVector(tree.jpsi_px, tree.jpsi_py,
+                                 tree.jpsi_pz, tree.jpsi_e)
+    p_lepton = ROOT.TLorentzVector(tree.lepton_px, tree.lepton_py,
+                                   tree.lepton_pz, tree.lepton_e)
+    v_boost_gamma = -p_gamma.BoostVector()
+    v_boost_jpsi = -p_jpsi.BoostVector()
+    p_jpsi.Boost(v_boost_gamma)
+    h_helicity_gamma.Fill(-math.cos(p_gamma.Vect().Angle(p_jpsi.Vect())))
+    p_lepton.Boost(v_boost_jpsi)
+    p_gamma.Boost(v_boost_jpsi)
+    h_helicity_jpsi.Fill(-math.cos(p_gamma.Vect().Angle(p_lepton.Vect())))
 
 s = 0
 ecms = 10.58
@@ -72,12 +85,17 @@ l = h_born.GetListOfFunctions()
 l.Add(ROOT.TNamed('Description', 'Born cross section calculated from measured cross section'))
 l.Add(ROOT.TNamed('Check', 'Should be consistent with constant'))
 l.Add(ROOT.TNamed('Contact', contact))
-l = h_helicity.GetListOfFunctions()
+l = h_helicity_gamma.GetListOfFunctions()
 l.Add(ROOT.TNamed('Description', 'Virtual photon helicity angle'))
-l.Add(ROOT.TNamed('Check', 'Should be consistent with constant'))
+l.Add(ROOT.TNamed('Check', 'Should be distributed as (1 + cos^2 theta)'))
+l.Add(ROOT.TNamed('Contact', contact))
+l = h_helicity_jpsi.GetListOfFunctions()
+l.Add(ROOT.TNamed('Description', 'J/psi helicity angle'))
+l.Add(ROOT.TNamed('Check', 'Should be distributed as (1 + cos^2 theta)'))
 l.Add(ROOT.TNamed('Contact', contact))
 
 output_file.cd()
 h_born.Write()
-h_helicity.Write()
+h_helicity_gamma.Write()
+h_helicity_jpsi.Write()
 output_file.Close()

@@ -116,7 +116,7 @@ REG_MODULE(PXDUnpacker)
 #define ONSEN_ERR_FLAG_EXPERIMENT_NUMBER_EVTMETA_CHANGED 0x1000000000000000ull
 #define ONSEN_ERR_FLAG_RUNNUMBER_ONSEN_CHANGED 0x2000000000000000ull
 #define ONSEN_ERR_FLAG_EXPERIMENT_NUMBER_ONSEN_CHANGED 0x4000000000000000ull
-#define ONSEN_ERR_FLAG_EVENT_COUNT 0x8000000000000000ull
+//#define ONSEN_ERR_FLAG_EVENT_COUNT 0x8000000000000000ull
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
@@ -714,10 +714,6 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing DATCON ROIs", false);
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
   addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of PXD Clusters to be processed", std::string(""));
-  /*  addParam("RemapLUT_IF_OB", m_RemapLUTifob, "Name of the LUT which remaps the inner forward and outer backward layer",
-             std::string(""));
-    addParam("RemapLUT_IB_OF", m_RemapLUTibof, "Name of the LUT which remaps the inner backward and outer forward layer",
-             std::string(""));*/
   addParam("RemapFlag", m_RemapFlag, "Set to one if DHP data should be remapped according to Belle II node 10", false);
   addParam("DESY16_TrgOff", m_DESY16_FixTrigOffset, "Set to -1 in order to fix trigger missmatch", 0);
   addParam("IgnoreFrameCount", m_ignore_headernrframes, "Ignore Frame count in DHC End Frame", false);
@@ -748,38 +744,6 @@ void PXDUnpackerModule::initialize()
 
   m_unpackedEventsCount = 0;
   for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) m_errorCounter[i] = 0;
-
-  /*  if (m_RemapFlag) {
-      B2INFO("open LUT");
-      int i = 0;
-      ifstream LUT_IF_OB_read(m_RemapLUTifob.c_str());
-      if (LUT_IF_OB_read) {
-        B2INFO("Read Raw ONSEN Data from " << m_RemapLUTifob);
-      } else {
-        B2ERROR("Could not open LUT_IF_OB: " << m_RemapLUTifob);
-      }
-      while (!LUT_IF_OB_read.eof()) {
-        i++;
-        LUT_IF_OB_read >> LUT_IF_OB[i];
-  //      B2INFO("LUT_IF_OB :: " << i << " :: " << LUT_IF_OB[i]);
-      }
-      B2INFO("LUT_IF_OB written");
-      LUT_IF_OB_read.close();
-      int j = 0;
-      ifstream LUT_IB_OF_read(m_RemapLUTibof.c_str());
-      if (LUT_IB_OF_read) {
-        B2INFO("Read Raw ONSEN Data from " << m_RemapLUTibof);
-      } else {
-        B2ERROR("Could not open LUT_IB_OF: " << m_RemapLUTibof);
-      }
-      while (!LUT_IB_OF_read.eof()) {
-        j++;
-        LUT_IB_OF_read >> LUT_IB_OF[j];
-  //      B2INFO("LUT_IB_OF :: " << j << " :: " << LUT_IB_OF[j]);
-      }
-      LUT_IB_OF_read.close();
-      B2INFO("LUT_IB_OF written");
-    }*/
 }
 
 const string error_name[ONSEN_MAX_TYPE_ERR] = {
@@ -801,8 +765,8 @@ const string error_name[ONSEN_MAX_TYPE_ERR] = {
 
   "TOTAL DHH Trigger missmatch", "DHC Start Meta Data RunNr MM", "DHC Start Meta Data ExpNr MM",
   "DHC Start Meta Data SubrunNr MM", "DHC Wordcount missmatch", "Run Number (EvtMeta) changed during run",
-  "Experiment number (EvtMeta) changed during run", "Run Number (ONSEN) changed during run", "Experiment number (ONSEN) changed during run",
-  "TOTAL EVENTS PROCESSED"
+  "Experiment number (EvtMeta) changed during run", "Run Number (ONSEN) changed during run", "Experiment number (ONSEN) changed during run"
+  /*"-unused-"*/
 };
 
 const string errW[6] = {"ONSEN caused", "DHH caused", "HLT caused", "DATCON caused", "unclear" , "SetFlags & Events"};
@@ -820,18 +784,16 @@ void PXDUnpackerModule::terminate()
   int flag = 0;
   string errstr = "Statistic ( ;";
   errstr += to_string(m_unpackedEventsCount) + ";";
-  for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) { errstr += to_string(m_errorCounter[i]) + ";"; flag |= m_errorCounter[i];}
+  for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
+    errstr += to_string(m_errorCounter[i]) + ";";
+    flag |= m_errorCounter[i];
+  }
   if (flag != 0) {
     B2ERROR("PXD Unpacker --> Error Statistics (counted once per event!) in Events: " << m_unpackedEventsCount);
     B2ERROR(errstr + " )");
     for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
       if (m_errorCounter[i]) {
-        if (!error_name[i].compare("TOTAL EVENTS PROCESSED")) {
-          B2INFO(error_name[i] << ": " << m_errorCounter[i]);
-        } else {
-          B2ERROR(error_name[i] << ": " << m_errorCounter[i]);
-        }
-        //printf("%s %d\n",error_name[i].c_str(), m_errorCounter[i]);
+        B2ERROR(error_name[i] << ": " << m_errorCounter[i]);
       }
     }
   } else {
@@ -949,8 +911,6 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
     m_errorMask |= ONSEN_ERR_FLAG_FRAME_NR;
     return;
   }
-
-  m_errorMask |= ONSEN_ERR_FLAG_EVENT_COUNT;
 
   /// NEW format
   if (verbose) {

@@ -98,7 +98,7 @@ namespace Belle2 {
       }
 
       // Remove all empty results
-      const auto& resultIsEmpty = [](const ResultObject & result) {
+      const auto resultIsEmpty = [](const ResultObject & result) {
         return result.getHits().empty();
       };
       TrackFindingCDC::erase_remove_if(results, resultIsEmpty);

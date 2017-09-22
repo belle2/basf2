@@ -92,7 +92,7 @@ namespace Belle2 {
 
       if (m_param_useCaching) {
 
-        const auto& sameNormal = [&normal](const std::pair<Key, genfit::MeasuredStateOnPlane>& pair) {
+        const auto sameNormal = [&normal](const std::pair<Key, genfit::MeasuredStateOnPlane>& pair) {
           return pair.first == normal;
         };
         const auto& cachedItem = std::find_if(m_cachedMSoPs.begin(), m_cachedMSoPs.end(), sameNormal);
@@ -180,7 +180,7 @@ namespace Belle2 {
       }
     }
 
-    const auto& weightIsNan = [](const AState & state) {
+    const auto weightIsNan = [](const AState & state) {
       return std::isnan(state->getWeight());
     };
 

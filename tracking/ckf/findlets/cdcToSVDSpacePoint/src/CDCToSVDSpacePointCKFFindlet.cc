@@ -52,12 +52,12 @@ void CDCToSVDSpacePointCKFFindlet::apply()
 {
   m_dataLoader.apply(m_cdcRecoTrackVector, m_spacePointVector);
 
-  const auto& hasLowPt = [this](const auto & track) {
+  const auto hasLowPt = [this](const auto & track) {
     return track->getMomentumSeed().Pt() < m_param_minimalPtRequirement;
   };
   TrackFindingCDC::erase_remove_if(m_cdcRecoTrackVector, hasLowPt);
 
-  const auto& hitIsAlreadyUsed = [](const auto & hit) {
+  const auto hitIsAlreadyUsed = [](const auto & hit) {
     return hit->getAssignmentState();
   };
   TrackFindingCDC::erase_remove_if(m_spacePointVector, hitIsAlreadyUsed);
@@ -65,7 +65,7 @@ void CDCToSVDSpacePointCKFFindlet::apply()
   m_treeSearchFindlet.apply(m_cdcRecoTrackVector, m_spacePointVector, m_results);
   m_overlapResolver.apply(m_results);
 
-  const auto& hasLowHitNumber = [this](const CKFResultObject<RecoTrack, SpacePoint>& result) {
+  const auto hasLowHitNumber = [this](const CKFResultObject<RecoTrack, SpacePoint>& result) {
     return result.getHits().size() < m_param_minimalHitRequirement;
   };
   TrackFindingCDC::erase_remove_if(m_results, hasLowHitNumber);

@@ -84,7 +84,7 @@ namespace Belle2 {
     {
       std::vector<const HitObject*> hits;
 
-      const auto& hitAdder = [&hits](const CKFStateObject * walkObject) {
+      const auto hitAdder = [&hits](const CKFStateObject * walkObject) {
         const HitObject* hitObject = walkObject->getHit();
         if (hitObject) {
           hits.push_back(hitObject);
@@ -94,7 +94,7 @@ namespace Belle2 {
 
       double chi2 = 0;
 
-      const auto& chi2Adder = [&chi2](const CKFStateObject * walkObject) {
+      const auto chi2Adder = [&chi2](const CKFStateObject * walkObject) {
         if (walkObject->isFitted()) {
           chi2 += walkObject->getChi2();
         }

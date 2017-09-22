@@ -55,12 +55,11 @@ namespace Belle2 {
       const auto& svdHits = mcTrack->getSVDHitList();
       const auto& pxdHits = mcTrack->getPXDHitList();
 
-      const bool hasSVDLayer = TrackFindingCDC::any(svdHits, [&state](const SVDCluster * cluster) {
+      const auto sameLayer = [&state](const auto * cluster) {
         return cluster->getSensorID().getLayerNumber() == extractGeometryLayer(state);
-      });
-      const bool hasPXDLayer = TrackFindingCDC::any(pxdHits, [&state](const PXDCluster * cluster) {
-        return cluster->getSensorID().getLayerNumber() == extractGeometryLayer(state);
-      });
+      };
+      const bool hasSVDLayer = TrackFindingCDC::any(svdHits, sameLayer);
+      const bool hasPXDLayer = TrackFindingCDC::any(pxdHits, sameLayer);
 
       return (not hasSVDLayer and not hasPXDLayer);
     }
@@ -74,7 +73,7 @@ namespace Belle2 {
   {
     bool oneIsWrong = false;
 
-    const auto& findFalseHit = [&oneIsWrong](const CKFStateObject<RecoTrack, AHitObject>* walkState) {
+    const auto findFalseHit = [&oneIsWrong](const CKFStateObject<RecoTrack, AHitObject>* walkState) {
       if (oneIsWrong) {
         return;
       }
@@ -104,9 +103,10 @@ namespace Belle2 {
       return 0;
     }
 
-    const unsigned int numberOfCorrectHits = std::count_if(hits.begin(), hits.end(), [mcTrack](const auto * spacePoint) {
+    const auto correctHitLambda = [mcTrack](const auto * spacePoint) {
       return isCorrectHit(*spacePoint, *mcTrack);
-    });
+    };
+    const unsigned int numberOfCorrectHits = std::count_if(hits.begin(), hits.end(), correctHitLambda);
 
     return numberOfCorrectHits;
   }

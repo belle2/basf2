@@ -28,7 +28,7 @@ namespace Belle2 {
     }
 
     using State = typename AStateList::value_type;
-    const auto& weightIsNan = [](const State & state) {
+    const auto weightIsNan = [](const State & state) {
       return std::isnan(state->getWeight());
     };
 

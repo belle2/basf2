@@ -30,7 +30,7 @@ namespace Belle2 {
       }
 
       // Remove all non-fitted tracks
-      const auto& trackWasNotFitted = [](RecoTrack * recoTrack) {
+      const auto trackWasNotFitted = [](RecoTrack * recoTrack) {
         return not recoTrack->wasFitSuccessful();
       };
       TrackFindingCDC::erase_remove_if(recoTracks, trackWasNotFitted);

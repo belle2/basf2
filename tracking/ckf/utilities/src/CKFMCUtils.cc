@@ -17,7 +17,7 @@ namespace Belle2 {
 
   bool isCorrectHit(const SpacePoint& spacePoint, const RecoTrack& mcRecoTrack)
   {
-    const auto& isSameMCTrack = [&mcRecoTrack](const RecoTrack & clusterRecoTrack) {
+    const auto isSameMCTrack = [&mcRecoTrack](const RecoTrack & clusterRecoTrack) {
       return &clusterRecoTrack == &mcRecoTrack;
     };
 

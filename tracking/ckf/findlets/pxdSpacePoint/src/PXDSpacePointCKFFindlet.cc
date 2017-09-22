@@ -43,11 +43,11 @@ void PXDSpacePointCKFFindlet::beginEvent()
 void PXDSpacePointCKFFindlet::apply()
 {
   m_dataLoader.apply(m_cdcRecoTrackVector, m_spacePointVector);
-  const auto& notFromPXD = [](const SpacePoint * spacePoint) {
+  const auto notFromPXD = [](const SpacePoint * spacePoint) {
     return spacePoint->getType() != VXD::SensorInfoBase::PXD;
   };
   TrackFindingCDC::erase_remove_if(m_spacePointVector, notFromPXD);
-  const auto& hasNoSVD = [](const RecoTrack * recoTrack) {
+  const auto hasNoSVD = [](const RecoTrack * recoTrack) {
     const auto& svdHitList = recoTrack->getSVDHitList();
     return svdHitList.empty() or svdHitList.front()->getSensorID().getLayerNumber() > 4;
   };

@@ -66,12 +66,12 @@ namespace Belle2 {
       // Group the result elements by their seed, sort the by their number of correct hits and set the weight to
       // 1 for all results with the maximal number of correct hits and
       // 0 for al others
-      const auto& extractSeed = [](const ResultPair & result)
+      const auto extractSeed = [](const ResultPair & result)
       {
         return result.getSeed();
       };
 
-      const auto& bySeedSorter = [&extractSeed](const ResultPair & lhs, const ResultPair & rhs)
+      const auto bySeedSorter = [&extractSeed](const ResultPair & lhs, const ResultPair & rhs)
       {
         return lhs.getSeed() < rhs.getSeed();
       };
@@ -79,7 +79,7 @@ namespace Belle2 {
       std::sort(resultElements.begin(), resultElements.end(), bySeedSorter);
       const auto& groupedBySeeds = TrackFindingCDC::adjacent_groupby(resultElements.begin(), resultElements.end(), extractSeed);
 
-      const auto& byWeightSorter = [&extractSeed](const ResultPair & lhs, const ResultPair & rhs)
+      const auto byWeightSorter = [&extractSeed](const ResultPair & lhs, const ResultPair & rhs)
       {
         return lhs.getTeacherInformation() < rhs.getTeacherInformation();
       };

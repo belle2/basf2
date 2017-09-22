@@ -58,11 +58,11 @@ namespace Belle2 {
   {
     m_cachedHitMap.clear();
 
-    const auto& hitSorterByLayer = [](const TrackFindingCDC::CDCRLWireHit * lhs, const TrackFindingCDC::CDCRLWireHit * rhs) {
+    const auto hitSorterByLayer = [](const TrackFindingCDC::CDCRLWireHit * lhs, const TrackFindingCDC::CDCRLWireHit * rhs) {
       return lhs->getWireID().getICLayer() < rhs->getWireID().getICLayer();
     };
 
-    const auto& getLayer = [](const TrackFindingCDC::CDCRLWireHit * wireHit) {
+    const auto getLayer = [](const TrackFindingCDC::CDCRLWireHit * wireHit) {
       return wireHit->getWireID().getICLayer();
     };
 

@@ -42,16 +42,16 @@ namespace Belle2 {
       // that may have a distinct impact != 0
       /////////////////////////////////////////////////////////////////////////
       auto fitPos = EFitPos::c_RecoPos;
-      // auto fitPos = EFitPos::c_RLDriftCircle;
-
-      // auto fitVariance = EFitVariance::c_Nominal;
       auto fitVariance = EFitVariance::c_DriftLength;
-      // auto fitVariance = EFitVariance::c_Pseudo;
-      // auto fitVariance = EFitVariance::c_Proper;
+      // Other combinations of fit information
+      // EFitPos::c_RLDriftCircle x EFitVariance::(c_Nominal, c_Pseudo, c_Proper)
+      // have been tried, but found to be worse, which is
+      // not intutive. Probably the perfect circle trajectory
+      // is not as good of a model on the full CDC volume.
       CDCObservations2D observations2D(fitPos, fitVariance);
 
       CDCKarimakiFitter fitter;
-      // CDCRiemannFitter fitter;
+      // Tested alternative CDCRiemannFitter with only marginal differences;
 
       std::vector<WithSharedMark<CDCRLWireHit>> hits(leaf->begin(), leaf->end());
       std::sort(hits.begin(), hits.end()); // Hits should be naturally sorted

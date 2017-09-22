@@ -50,9 +50,9 @@ namespace Belle2 {
     public:
       /**
        *  Constructs a look up table for the given function
-       *  The function is sampled at n + 1 equally spaced points
-       *  between the given bound, such that the distance
-       *  between consecutive sampling points is (upper - lower) / nBins.
+       *  The function is sampled at nBins + 1 equally spaced points
+       *  between the given bounds, such that the distance
+       *  between consecutive sampling points is (upperBound - lowerBound) / nBins.
        */
       LookupTable(const std::function<T(double)>& map,
                   std::size_t nBins,
@@ -63,15 +63,15 @@ namespace Belle2 {
         , m_binWidth((m_upperBound - m_lowerBound) / nBins)
         , m_values(linspace(lowerBound, upperBound, nBins + 1, map))
       {
-        // Add a sentinal at the back.
+        // Add a sentinel at the back.
         m_values.push_back(map(NAN));
       }
 
       /// Evaluate as piecewise linear interpolation
       T operator()(double x) const
       {
-        if (not std::isfinite(x)) return m_values.back(); // Return sentinal
-        const int iMax =  m_values.size() - 2; // Subtracting sentinal index
+        if (not std::isfinite(x)) return m_values.back(); // Return sentinel
+        const int iMax =  m_values.size() - 2; // Subtracting sentinel index
         double iBin = 0;
         double delta = std::modf((x - m_lowerBound) / m_binWidth, &iBin);
         int i = std::min(std::max(0, static_cast<int>(iBin)), iMax);
@@ -81,8 +81,8 @@ namespace Belle2 {
       /// Return the precomputed value at the position closest to the given value.
       const T& nearest(double x) const
       {
-        if (not std::isfinite(x)) return m_values.back(); // Return sentinal value
-        const int iMax =  m_values.size() - 2; // Subtracting sentinal index
+        if (not std::isfinite(x)) return m_values.back(); // Return sentinel value
+        const int iMax =  m_values.size() - 2; // Subtracting sentinel index
         int iBin = std::round((x - m_lowerBound) / m_binWidth);
         int i = std::min(std::max(0, iBin), iMax);
         return m_values[i];
@@ -91,7 +91,7 @@ namespace Belle2 {
       /// Return the value at the given index
       const T& at(int i) const
       {
-        const int iMax =  m_values.size() - 2; // Subtracting sentinal index
+        const int iMax =  m_values.size() - 2; // Subtracting sentinel index
         i = std::min(std::max(0, i), iMax);
         return m_values[i];
       }

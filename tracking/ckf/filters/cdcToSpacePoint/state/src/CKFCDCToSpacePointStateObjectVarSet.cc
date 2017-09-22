@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <tracking/ckf/states/CKFStateObject.h>
-#include <tracking/ckf/findlets/base/KalmanUpdateFitter.h>
 #include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectVarSet.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/dataobjects/RecoTrack.h>
@@ -21,6 +20,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 namespace {
+  /// Helper function to calculate the mean of a given function over all states in the list
   template<class APredicate>
   double meanOver(const BaseCKFCDCToSpacePointStateObjectFilter::Object* state, const APredicate& t)
   {
@@ -41,6 +41,7 @@ namespace {
     return sum / numberOfHits;
   }
 
+  /// Helper function to calculate the min of a given function over all states in the list
   template<class APredicate>
   double minOver(const BaseCKFCDCToSpacePointStateObjectFilter::Object* state, const APredicate& t)
   {
@@ -64,6 +65,7 @@ namespace {
     return minimalValue;
   }
 
+  /// Helper function to calculate the std of a given function over all states in the list
   template<class APredicate>
   double stdOver(const BaseCKFCDCToSpacePointStateObjectFilter::Object* state, const APredicate& t)
   {
@@ -131,7 +133,21 @@ bool CKFCDCToSpacePointStateObjectVarSet::extract(const BaseCKFCDCToSpacePointSt
 
   Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
 
-  KalmanUpdateFitter fitter;
+  const auto calculateCharge = [](const auto & s) {
+    return s.getCharge();
+  };
+  const auto calculateSeedCharge = [](const auto & s) {
+    return s.getSeedCharge();
+  };
+  const auto calculateSize = [](const auto & s) {
+    return s.getSize();
+  };
+  const auto calculateSNR = [](const auto & s) {
+    return s.getSNR();
+  };
+  const auto calculateChargeSizeRatio = [](const auto & s) {
+    return s.getCharge() / s.getSize();
+  };
 
   if (spacePoint->getType() == VXD::SensorInfoBase::SensorType::SVD) {
     const auto& clusters = spacePoint->getRelationsTo<SVDCluster>();
@@ -140,31 +156,35 @@ bool CKFCDCToSpacePointStateObjectVarSet::extract(const BaseCKFCDCToSpacePointSt
     const SVDCluster* firstCluster = clusters[0];
     const SVDCluster* secondCluster = clusters[1];
 
-    var<named("cluster_1_charge")>() = firstCluster->getCharge();
-    var<named("cluster_2_charge")>() = secondCluster->getCharge();
-    var<named("mean_rest_cluster_charge")>() = meanOver(result, [](const auto & s) {return s.getCharge();});
-    var<named("min_rest_cluster_charge")>() = minOver(result, [](const auto & s) {return s.getCharge();});
-    var<named("std_rest_cluster_charge")>() = stdOver(result, [](const auto & s) {return s.getCharge();});
-    var<named("cluster_1_seed_charge")>() = firstCluster->getSeedCharge();
-    var<named("cluster_2_seed_charge")>() = secondCluster->getSeedCharge();
-    var<named("mean_rest_cluster_seed_charge")>() = meanOver(result, [](const auto & s) {return s.getSeedCharge();});;
-    var<named("min_rest_cluster_seed_charge")>() = minOver(result, [](const auto & s) {return s.getSeedCharge();});;
-    var<named("std_rest_cluster_seed_charge")>() = stdOver(result, [](const auto & s) {return s.getSeedCharge();});;
-    var<named("cluster_1_size")>() = firstCluster->getSize();
-    var<named("cluster_2_size")>() = secondCluster->getSize();
-    var<named("mean_rest_cluster_size")>() = meanOver(result, [](const auto & s) {return s.getSize();});;
-    var<named("min_rest_cluster_size")>() = meanOver(result, [](const auto & s) {return s.getSize();});;
-    var<named("std_rest_cluster_size")>() = stdOver(result, [](const auto & s) {return s.getSize();});;
-    var<named("cluster_1_snr")>() = firstCluster->getSNR();
-    var<named("cluster_2_snr")>() = secondCluster->getSNR();
-    var<named("mean_rest_cluster_snr")>() = meanOver(result, [](const auto & s) {return s.getSNR();});;
-    var<named("min_rest_cluster_snr")>() = minOver(result, [](const auto & s) {return s.getSNR();});;
-    var<named("std_rest_cluster_snr")>() = stdOver(result, [](const auto & s) {return s.getSNR();});;
-    var<named("cluster_1_charge_over_size")>() = firstCluster->getCharge() / firstCluster->getSize();
-    var<named("cluster_2_charge_over_size")>() = secondCluster->getCharge() / secondCluster->getSize();
-    var<named("mean_rest_cluster_charge_over_size")>() = meanOver(result, [](const auto & s) {return s.getCharge() / s.getSize();});;
-    var<named("min_rest_cluster_charge_over_size")>() = minOver(result, [](const auto & s) {return s.getCharge() / s.getSize();});;
-    var<named("std_rest_cluster_charge_over_size")>() = stdOver(result, [](const auto & s) {return s.getCharge() / s.getSize();});;
+    var<named("cluster_1_charge")>() = calculateCharge(*firstCluster);
+    var<named("cluster_2_charge")>() = calculateCharge(*secondCluster);
+    var<named("mean_rest_cluster_charge")>() = meanOver(result, calculateCharge);
+    var<named("min_rest_cluster_charge")>() = minOver(result, calculateCharge);
+    var<named("std_rest_cluster_charge")>() = stdOver(result, calculateCharge);
+
+    var<named("cluster_1_seed_charge")>() = calculateSeedCharge(*firstCluster);
+    var<named("cluster_2_seed_charge")>() = calculateSeedCharge(*secondCluster);
+    var<named("mean_rest_cluster_seed_charge")>() = meanOver(result, calculateSeedCharge);
+    var<named("min_rest_cluster_seed_charge")>() = minOver(result, calculateSeedCharge);
+    var<named("std_rest_cluster_seed_charge")>() = stdOver(result, calculateSeedCharge);
+
+    var<named("cluster_1_size")>() = calculateSize(*firstCluster);
+    var<named("cluster_2_size")>() = calculateSize(*secondCluster);
+    var<named("mean_rest_cluster_size")>() = meanOver(result, calculateSize);
+    var<named("min_rest_cluster_size")>() = meanOver(result, calculateSize);
+    var<named("std_rest_cluster_size")>() = stdOver(result, calculateSize);
+
+    var<named("cluster_1_snr")>() = calculateSNR(*firstCluster);
+    var<named("cluster_2_snr")>() = calculateSNR(*secondCluster);
+    var<named("mean_rest_cluster_snr")>() = meanOver(result, calculateSNR);
+    var<named("min_rest_cluster_snr")>() = minOver(result, calculateSNR);
+    var<named("std_rest_cluster_snr")>() = stdOver(result, calculateSNR);
+
+    var<named("cluster_1_charge_over_size")>() = calculateChargeSizeRatio(*firstCluster);
+    var<named("cluster_2_charge_over_size")>() = calculateChargeSizeRatio(*secondCluster);
+    var<named("mean_rest_cluster_charge_over_size")>() = meanOver(result, calculateChargeSizeRatio);
+    var<named("min_rest_cluster_charge_over_size")>() = minOver(result, calculateChargeSizeRatio);
+    var<named("std_rest_cluster_charge_over_size")>() = stdOver(result, calculateChargeSizeRatio);
   }
 
   std::vector<const SpacePoint*> spacePoints;

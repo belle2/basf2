@@ -1229,8 +1229,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
               B2DEBUG(20,"toffset " << toffset);
             };*/
             if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
-                                                          toffset, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F, dhp_cm, sorPreWord
-                                                         );
+                                                          toffset, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F, dhp_cm);
           }//HOT FIX GRADIENT
         }
       }

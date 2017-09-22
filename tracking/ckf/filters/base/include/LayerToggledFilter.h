@@ -47,6 +47,8 @@ namespace Belle2 {
     /// The weight is calculated using the subfilter based on the geometrical layer of the state.
     void apply(std::vector<AStateObject>& childStates) override
     {
+      GeometryLayerExtractor extractGeometryLayer;
+
       if (childStates.empty()) {
         return;
       }

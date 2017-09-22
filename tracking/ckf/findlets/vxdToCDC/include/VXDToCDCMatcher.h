@@ -59,6 +59,9 @@ namespace Belle2 {
   template<class AStateObject>
   TrackFindingCDC::VectorRange<const TrackFindingCDC::CDCRLWireHit*> VXDToCDCMatcher::getMatchingHits(AStateObject& currentState)
   {
+    GeometryLayerExtractor extractGeometryLayer;
+    OverlapExtractor isOnOverlapLayer;
+
     const unsigned int currentNumber = currentState.getNumber();
     const unsigned int nextLayer = extractGeometryLayer(currentState) + 1;
 

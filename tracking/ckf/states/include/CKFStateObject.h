@@ -14,6 +14,7 @@
 #include <framework/logging/Logger.h>
 #include <TVector3.h>
 #include <TMatrixDSym.h>
+#include <TVector.h>
 
 namespace Belle2 {
   /**
@@ -50,7 +51,7 @@ namespace Belle2 {
     CKFStateObject(SeedObject* seed, unsigned int number) :
       m_seedRecoTrack(seed), m_number(number), m_maximumNumber(number)
     {
-      setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
+      setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0)));
     }
 
     /**

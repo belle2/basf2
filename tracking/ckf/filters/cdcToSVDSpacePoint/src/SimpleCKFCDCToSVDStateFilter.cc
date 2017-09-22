@@ -61,6 +61,7 @@ Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStat
     return NAN;
   }
 
+  GeometryLayerExtractor extractGeometryLayer;
   const unsigned int layer = extractGeometryLayer(currentState);
   const Vector3D momentum(currentState.getMSoPMomentum());
 

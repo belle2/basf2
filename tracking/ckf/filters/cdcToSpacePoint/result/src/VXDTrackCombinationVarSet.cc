@@ -25,7 +25,7 @@ bool VXDTrackCombinationVarSet::extract(const BaseVXDTrackCombinationFilter::Obj
 
   const std::vector<const SpacePoint*> spacePoints = result->getHits();
 
-  genfit::MeasuredStateOnPlane mSoP = seedTrack->getMeasuredStateOnPlaneFromFirstHit();
+  genfit::MeasuredStateOnPlane mSoP = seedTrack->getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0));
 
   double chi2_vxd_full = 0;
   double chi2_vxd_max = std::nan("");
@@ -84,7 +84,7 @@ bool VXDTrackCombinationVarSet::extract(const BaseVXDTrackCombinationFilter::Obj
 
   var<named("theta")>() = mSoP.getMom().Theta();
 
-  const genfit::MeasuredStateOnPlane& firstCDCHit = seedTrack->getMeasuredStateOnPlaneFromFirstHit();
+  const genfit::MeasuredStateOnPlane& firstCDCHit = seedTrack->getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0));
   m_advanceAlgorithm.extrapolate(mSoP, firstCDCHit);
 
   const auto& distance = mSoP.getPos() - firstCDCHit.getPos();

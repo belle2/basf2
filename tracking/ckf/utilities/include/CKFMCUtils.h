@@ -32,6 +32,9 @@ namespace Belle2 {
     RecoTrack* seedTrack = state.getSeedRecoTrack();
     const auto* hit = state.getHit();
 
+    GeometryLayerExtractor extractGeometryLayer;
+    OverlapExtractor isOnOverlapLayer;
+
     B2ASSERT("State must have a seed", seedTrack);
 
     const std::string& seedTrackStoreArrayName = seedTrack->getArrayName();
@@ -55,7 +58,7 @@ namespace Belle2 {
       const auto& svdHits = mcTrack->getSVDHitList();
       const auto& pxdHits = mcTrack->getPXDHitList();
 
-      const auto sameLayer = [&state](const auto * cluster) {
+      const auto sameLayer = [&state, &extractGeometryLayer](const auto * cluster) {
         return cluster->getSensorID().getLayerNumber() == extractGeometryLayer(state);
       };
       const bool hasSVDLayer = TrackFindingCDC::any(svdHits, sameLayer);

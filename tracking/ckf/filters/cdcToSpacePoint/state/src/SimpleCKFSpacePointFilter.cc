@@ -33,13 +33,16 @@ void SimpleCKFSpacePointFilter::beginRun()
 
 bool SimpleCKFSpacePointFilter::checkOverlapAndHoles(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState)
 {
+  OverlapExtractor isOnOverlapLayer;
+
   if (currentState.getHit()) {
     return true;
   }
 
   int numberOfHoles = 0;
 
-  const auto countNumberOfHoles = [&numberOfHoles](const BaseCKFCDCToSpacePointStateObjectFilter::Object * walkObject) {
+  const auto countNumberOfHoles = [&numberOfHoles,
+  &isOnOverlapLayer](const BaseCKFCDCToSpacePointStateObjectFilter::Object * walkObject) {
     if (not walkObject->getHit() and not isOnOverlapLayer(*walkObject)) {
       numberOfHoles++;
     }

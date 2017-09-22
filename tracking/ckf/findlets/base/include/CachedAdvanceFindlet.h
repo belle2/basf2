@@ -73,6 +73,8 @@ namespace Belle2 {
         return true;
       }
 
+      GeometryLayerExtractor extractGeometryLayer;
+      OverlapExtractor isOnOverlapLayer;
       B2DEBUG(50, "Now advancing to state on " << currentState->getNumber()
               << " which is on " << extractGeometryLayer(*currentState) << " and "
               << isOnOverlapLayer(*currentState) << " " << HitIDExtractor()(currentState));

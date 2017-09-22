@@ -64,6 +64,8 @@ bool CKFCDCToSpacePointStateObjectBasicVarSet::extract(const BaseCKFCDCToSpacePo
 
   var<named("numberOfHoles")>() = result->getNumberOfHoles();
 
+  OverlapExtractor isOnOverlapLayer;
+
   var<named("layer")>() = spacePoint->getVxdID().getLayerNumber();
   var<named("number")>() = result->getNumber();
   var<named("overlap")>() = isOnOverlapLayer(*result);

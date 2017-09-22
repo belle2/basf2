@@ -78,6 +78,9 @@ namespace Belle2 {
   template<class AStateObject>
   TrackFindingCDC::ChainedArray<SpacePointMatcher::RangeType> SpacePointMatcher::getMatchingHits(AStateObject& currentState)
   {
+    GeometryLayerExtractor extractGeometryLayer;
+    OverlapExtractor isOnOverlapLayer;
+
     const unsigned int currentNumber = currentState.getNumber();
     const unsigned int currentLayer = extractGeometryLayer(currentState);
     const unsigned short nextLayer = static_cast<unsigned short>(currentLayer - 1);

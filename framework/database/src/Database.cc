@@ -36,6 +36,8 @@
 #include <boost/algorithm/string.hpp>
 #include <cstdlib>
 
+#define CURRENT_DEFAULT_TAG "GT_gen_prod_003.05_Master-20170914-123100"
+
 using namespace std;
 using namespace Belle2;
 
@@ -61,7 +63,7 @@ std::unique_ptr<Database> Database::s_instance{nullptr};
 
 std::string Database::getDefaultGlobalTags()
 {
-  return getFromEnvironment("BELLE2_CONDB_GLOBALTAG", "GT_gen_prod_003.05_Master-20170914-123100");
+  return getFromEnvironment("BELLE2_CONDB_GLOBALTAG", CURRENT_DEFAULT_TAG);
 }
 
 Database& Database::Instance()
@@ -84,8 +86,8 @@ Database& Database::Instance()
         } else if (FileSystem::isDir(localdb)) {
           // If a directory is given append the database file name
           if (globalTag.empty()) {
-            // Default name if no tags given
-            std::string fileName = FileSystem::findFile(localdb) + "/database.txt";
+            // Default name if no tags given: look for compile time tag.txt
+            std::string fileName = FileSystem::findFile(localdb) + "/" CURRENT_DEFAULT_TAG ".txt";
             B2DEBUG(10, "Adding fallback database " << fileName);
             LocalDatabase::createInstance(fileName, "", true, logLevel);
           } else {

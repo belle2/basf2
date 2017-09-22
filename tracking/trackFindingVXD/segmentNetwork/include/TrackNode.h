@@ -16,8 +16,6 @@
 
 #include <string>
 
-
-
 namespace Belle2 {
 
 
@@ -31,13 +29,10 @@ namespace Belle2 {
     ActiveSector<StaticSectorType, TrackNode>* sector;
 
     /** pointer to spacePoint */
-    SpacePoint* spacePoint;
+    SpacePoint* m_spacePoint;
 
     /** unique integer identifier */
     int m_identifier;
-
-    /** longer name for debugging */
-    std::string m_name;
 
     /** overloaded '=='-operator
      * TODO JKL: pretty ugly operator overload, should be fixed ASAP! (solution for null-ptr-issue needed)
@@ -46,21 +41,21 @@ namespace Belle2 {
     bool operator==(const TrackNode& b) const
     {
       // simple case: no null-ptrs interfering:
-      if (spacePoint != nullptr and b.spacePoint != nullptr and sector != nullptr and b.sector != nullptr) {
+      if (m_spacePoint != nullptr and b.m_spacePoint != nullptr and sector != nullptr and b.sector != nullptr) {
         // compares objects:
-        return (*spacePoint == *(b.spacePoint)) and (*sector == *(b.sector));
+        return (*m_spacePoint == *(b.m_spacePoint)) and (*sector == *(b.sector));
       }
 
       // case: at least one of the 2 nodes has no null-ptrs:
-      if (spacePoint != nullptr and sector != nullptr) return false; // means: this Node has no null-Ptrs -> the other one has
-      if (b.spacePoint != nullptr and b.sector != nullptr) return false; // means: the other Node has no null-Ptrs -> this one has
+      if (m_spacePoint != nullptr and sector != nullptr) return false; // means: this Node has no null-Ptrs -> the other one has
+      if (b.m_spacePoint != nullptr and b.sector != nullptr) return false; // means: the other Node has no null-Ptrs -> this one has
 
       // case: both nodes have got at least one null-ptr:
       bool spacePointsAreEqual = false;
-      if (spacePoint != nullptr and b.spacePoint != nullptr) {
-        spacePointsAreEqual = (*spacePoint == *(b.spacePoint));
+      if (m_spacePoint != nullptr and b.m_spacePoint != nullptr) {
+        spacePointsAreEqual = (*m_spacePoint == *(b.m_spacePoint));
       } else {
-        spacePointsAreEqual = (spacePoint == b.spacePoint);
+        spacePointsAreEqual = (m_spacePoint == b.m_spacePoint);
       }
       bool sectorsAreEqual = false;
       if (sector != nullptr and b.sector != nullptr) {
@@ -75,7 +70,7 @@ namespace Belle2 {
     /** overloaded '!='-operator */
     bool operator!=(const TrackNode& b) const
     {
-      if (spacePoint == nullptr) B2FATAL("TrackNode::operator !=: spacePoint for Tracknode not set - aborting run.");
+      if (m_spacePoint == nullptr) B2FATAL("TrackNode::operator !=: spacePoint for Tracknode not set - aborting run.");
       return !(*this == b);
     }
 
@@ -83,8 +78,8 @@ namespace Belle2 {
     /** returns reference to hit. */
     const SpacePoint& getHit() const
     {
-      if (spacePoint == nullptr) B2FATAL("TrackNode::getHit: spacePoint for Tracknode not set - aborting run.");
-      return *spacePoint;
+      if (m_spacePoint == nullptr) B2FATAL("TrackNode::getHit: spacePoint for Tracknode not set - aborting run.");
+      return *m_spacePoint;
     }
 
     /** returns reference to hit. */
@@ -95,23 +90,28 @@ namespace Belle2 {
     }
 
     /** constructor WARNING: sector-pointing has still to be decided! */
-    TrackNode() : sector(nullptr), spacePoint(nullptr), m_identifier(-1), m_name("SP: missing") {}
+    TrackNode() : sector(nullptr), m_spacePoint(nullptr), m_identifier(-1) {}
 
-    TrackNode(SpacePoint* spacePoint) :      // Get unique identifier from SP ArrayIndex, Get long debugging name from SP
-      sector(nullptr), spacePoint(spacePoint)
+    TrackNode(SpacePoint* spacePoint) :      // Get unique identifier from SP ArrayIndex
+      sector(nullptr), m_spacePoint(spacePoint)
     {
-      m_identifier = spacePoint->getArrayIndex();
-      m_name = "SP: " + spacePoint->getName();
+      m_identifier = m_spacePoint->getArrayIndex();
     }
 
     /** destructor */
     ~TrackNode() {}
 
     /** return ID of this node */
-    int getID() { return m_identifier; }
+    int getID() const { return m_identifier; }
 
     /** returns longer debugging name of this node */
-    const std::string& getName() const { return m_name; }
+    std::string getName() const
+    {
+      if (m_identifier >= 0)
+        return "SP: " + m_spacePoint->getName();
+      else
+        return "SP: missing";
+    }
 
   };
 

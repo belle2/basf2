@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/ckf/utilities/StateAlgorithms.h>
 #include <tracking/ckf/findlets/base/AdvanceAlgorithm.h>
 #include <tracking/ckf/utilities/SelectionAlgorithms.h>
 
@@ -180,10 +181,6 @@ namespace Belle2 {
       }
     }
 
-    const auto weightIsNan = [](const AState & state) {
-      return std::isnan(state->getWeight());
-    };
-
-    TrackFindingCDC::erase_remove_if(childStates, weightIsNan);
+    TrackFindingCDC::erase_remove_if(childStates, TrackFindingCDC::IndirectTo<TrackFindingCDC::HasNaNWeight>());
   }
 }

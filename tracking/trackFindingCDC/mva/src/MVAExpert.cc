@@ -17,6 +17,8 @@
 #include <mva/interface/Expert.h>
 #include <framework/database/DBObjPtr.h>
 
+#include <boost/algorithm/string/predicate.hpp>
+
 namespace Belle2 {
   class DatabaseRepresentationOfWeightfile;
   namespace MVA {
@@ -68,14 +70,6 @@ namespace Belle2 {
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-namespace {
-  bool ends_with(std::string in, std::string what)
-  {
-    if (what.size() > in.size()) return false;
-    return std::equal(what.rbegin(), what.rend(), in.rbegin());
-  }
-}
-
 MVAExpert::Impl::Impl(const std::string& identifier,
                       std::vector<Named<Float_t*> > namedVariables)
   : m_allNamedVariables(std::move(namedVariables))
@@ -86,6 +80,7 @@ MVAExpert::Impl::Impl(const std::string& identifier,
 void MVAExpert::Impl::initialize()
 {
   MVA::AbstractInterface::initSupportedInterfaces();
+  using boost::algorithm::ends_with;
   if (not m_weightfileRepresentation and
       not(ends_with(m_identifier, ".root") or ends_with(m_identifier, ".xml"))) {
     using DBWeightFileRepresentation = DBObjPtr<DatabaseRepresentationOfWeightfile>;

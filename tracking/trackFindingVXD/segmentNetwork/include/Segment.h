@@ -39,7 +39,7 @@ namespace Belle2 {
     FullSecID::BaseType m_innerSector;
 
     /** unique identifier */
-    const int m_identifier;
+    const std::int64_t m_identifier;
 
   public:
     /** ************************* CONSTRUCTORS ************************* */
@@ -65,7 +65,8 @@ namespace Belle2 {
       m_innerHit(innerNode),
       m_outerSector(outerSector),
       m_innerSector(innerSector),
-      m_identifier(outerNode->getID() << 16 | innerNode->getID()) // Use int TrackNode IDs to construct int Segment ID
+      m_identifier(static_cast<std::int64_t>(outerNode->getID()) << 32 | static_cast<std::int64_t>
+                   (innerNode->getID())) // Use int TrackNode IDs to construct int Segment ID
     {}
 
     /** ************************* OPERATORS ************************* */
@@ -80,7 +81,7 @@ namespace Belle2 {
 /// getters:
 
     /** return ID of this segment */
-    const int getID() const { return m_identifier; }
+    const std::int64_t getID() const { return m_identifier; }
 
     /** returns longer debugging name of this segment */
     std::string getName() const

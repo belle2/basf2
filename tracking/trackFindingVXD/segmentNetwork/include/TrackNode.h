@@ -32,7 +32,7 @@ namespace Belle2 {
     SpacePoint* m_spacePoint;
 
     /** unique integer identifier */
-    const int m_identifier;
+    const std::int32_t m_identifier;
 
     /** overloaded '=='-operator
      * TODO JKL: pretty ugly operator overload, should be fixed ASAP! (solution for null-ptr-issue needed)
@@ -100,7 +100,7 @@ namespace Belle2 {
     ~TrackNode() {}
 
     /** return ID of this node */
-    const int getID() const { return m_identifier; }
+    const std::int32_t getID() const { return m_identifier; }
 
     /** returns longer debugging name of this node */
     std::string getName() const

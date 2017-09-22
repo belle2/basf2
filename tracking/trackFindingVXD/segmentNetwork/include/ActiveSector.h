@@ -35,7 +35,7 @@ namespace Belle2 {
     std::vector<HitType*> m_hits;
 
     /** unique identifier */
-    const int m_identifier;
+    const std::int32_t m_identifier;
 
   public:
     /** ************************* CONSTRUCTORS ************************* */
@@ -77,7 +77,7 @@ namespace Belle2 {
 /// getters:
 
     /** return ID of this sector */
-    const int getID() const { return m_identifier; }
+    const std::int32_t getID() const { return m_identifier; }
 
     /** returns longer debugging name of this sector */
     std::string getName() const

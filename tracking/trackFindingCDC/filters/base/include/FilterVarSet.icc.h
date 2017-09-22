@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/filters/base/FilterVarSet.dcl.h>
 
 #include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <RtypesCore.h>
 
@@ -45,7 +44,7 @@ namespace Belle2 {
       : Super()
       , m_filterName(filterName)
       , m_filterNamePrefix(filterName + '_')
-      , m_ptrFilter(makeUnique<Filter>())
+      , m_ptrFilter(std::make_unique<Filter>())
     {
     }
 

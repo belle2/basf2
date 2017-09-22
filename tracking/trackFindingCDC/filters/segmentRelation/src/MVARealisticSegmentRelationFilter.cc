@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentRelation/MVARealisticSegmentRelationFilter.h>
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
 
@@ -18,7 +17,7 @@ using namespace TrackFindingCDC;
 template class TrackFindingCDC::MVA<BaseSegmentRelationFilter>;
 
 MVARealisticSegmentRelationFilter::MVARealisticSegmentRelationFilter()
-  : Super(makeUnique<VarSet>(),
+  : Super(std::make_unique<VarSet>(),
           "tracking/data/trackfindingcdc_RealisticSegmentRelationFilter.xml",
           0.805)
 {

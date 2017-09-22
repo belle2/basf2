@@ -20,7 +20,6 @@
 
 #include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <vector>
 #include <string>
@@ -148,7 +147,7 @@ namespace Belle2 {
     UnionRecordingFilter<AFilterFactory>::UnionRecordingFilter(
       const std::string& defaultRootFileName,
       const std::string& defaultTreeName)
-      : Super(makeUnique<AFilterFactory>(), defaultRootFileName, defaultTreeName)
+      : Super(std::make_unique<AFilterFactory>(), defaultRootFileName, defaultTreeName)
     {
     }
 

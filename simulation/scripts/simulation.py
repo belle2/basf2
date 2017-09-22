@@ -37,12 +37,8 @@ def check_simulation(path):
                 % (", ".join(required), ", ".join(found)))
 
 
-def add_PXDDataReduction(path, components, use_vxdtf2=False):
-
-    pxd_unfiltered_digits = 'pxd_unfiltered_digits'
-    pxd_digitizer = register_module('PXDDigitizer')
-    pxd_digitizer.param('Digits', pxd_unfiltered_digits)
-    path.add_module(pxd_digitizer)
+def add_PXDDataReduction(path, components, use_vxdtf2=False,
+                         pxd_unfiltered_digits='pxd_unfiltered_digits'):
 
     # SVD reconstruction
     svd_cluster = '__ROIsvdClusters'
@@ -84,6 +80,7 @@ def add_simulation(
         bkgfiles=None,
         bkgcomponents=None,
         bkgscale=1.0,
+        bkgOverlay=False,
         usePXDDataReduction=True,
         use_vxdtf2=False,
         generate_2nd_cdc_hits=False):
@@ -91,17 +88,22 @@ def add_simulation(
     This function adds the standard simulation modules to a path.
     """
 
-    # background mixing
+    # background mixing or overlay input before process forking
     if bkgfiles:
-        bkgmixer = register_module('BeamBkgMixer')
-        bkgmixer.param('backgroundFiles', bkgfiles)
-        if bkgcomponents:
-            bkgmixer.param('components', bkgcomponents)
+        if bkgOverlay:
+            bkginput = register_module('BGOverlayInput')
+            bkginput.param('inputFileNames', bkgfiles)
+            path.add_module(bkginput)
         else:
-            if components:
-                bkgmixer.param('components', components)
-        bkgmixer.param('overallScaleFactor', bkgscale)
-        path.add_module(bkgmixer)
+            bkgmixer = register_module('BeamBkgMixer')
+            bkgmixer.param('backgroundFiles', bkgfiles)
+            if bkgcomponents:
+                bkgmixer.param('components', bkgcomponents)
+            else:
+                if components:
+                    bkgmixer.param('components', components)
+            bkgmixer.param('overallScaleFactor', bkgscale)
+            path.add_module(bkgmixer)
 
     # geometry parameter database
     if 'Gearbox' not in path:
@@ -137,11 +139,11 @@ def add_simulation(
         path.add_module(cdc_digitizer)
 
     # PXD digitization
+    pxd_digits_name = ''
     if components is None or 'PXD' in components:
         if usePXDDataReduction:
-            add_PXDDataReduction(path, components, use_vxdtf2)
-        else:
-            add_pxd_simulation(path)
+            pxd_digits_name = 'pxd_unfiltered_digits'
+        add_pxd_simulation(path, digitsname=pxd_digits_name)
 
     # TOP digitization
     if components is None or 'TOP' in components:
@@ -169,6 +171,16 @@ def add_simulation(
     if components is None or 'EKLM' in components:
         eklm_digitizer = register_module('EKLMDigitizer')
         path.add_module(eklm_digitizer)
+
+    # background overlay executor - after all digitizers
+    if bkgOverlay:
+        bkgexecutor = register_module('BGOverlayExecutor')
+        bkgexecutor.param('PXDDigitsName', pxd_digits_name)
+        path.add_module(bkgexecutor)
+
+    # PXD data reduction - after background overlay executor
+    if (components is None or 'PXD' in components) and usePXDDataReduction:
+        add_PXDDataReduction(path, components, use_vxdtf2, pxd_digits_name)
 
     # statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Simulation')

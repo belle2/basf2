@@ -40,30 +40,6 @@ namespace Belle2 {
    */
   template<class AFilterFactory>
   class OverlapResolverFindlet : public TrackFindingCDC::Findlet<typename AFilterFactory::CreatedFilter::Object> {
-    /// Helper Functor to get the Seed of a given result
-    struct SeedGetter {
-      /// Make it a functor
-      operator TrackFindingCDC::FunctorTag();
-
-      template<class T>
-      auto operator()(const T& t) const -> decltype(t.getSeed())
-      {
-        return t.getSeed();
-      }
-    };
-
-    /// Helper Functor to get the Number of hits of a given result
-    struct NumberOfHitsGetter {
-      /// Make it a functor
-      operator TrackFindingCDC::FunctorTag();
-
-      template<class T>
-      auto operator()(const T& t) const -> decltype(t->getHits().size())
-      {
-        return t->getHits().size();
-      }
-    };
-
     /// Copy the seed definition
     using SeedObject = typename AFilterFactory::CreatedFilter::Object::SeedObject;
     /// Copy the hit definition

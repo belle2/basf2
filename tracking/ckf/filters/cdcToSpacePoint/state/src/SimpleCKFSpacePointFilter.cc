@@ -33,25 +33,18 @@ void SimpleCKFSpacePointFilter::beginRun()
 
 bool SimpleCKFSpacePointFilter::checkOverlapAndHoles(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState)
 {
-  const SpacePoint* spacePoint = currentState.getHit();
+  if (currentState.getHit()) {
+    return true;
+  }
 
   int numberOfHoles = 0;
 
-  currentState.walk([&numberOfHoles](const BaseCKFCDCToSpacePointStateObjectFilter::Object * walkObject) {
+  const auto countNumberOfHoles = [&numberOfHoles](const BaseCKFCDCToSpacePointStateObjectFilter::Object * walkObject) {
     if (not walkObject->getHit() and not isOnOverlapLayer(*walkObject)) {
       numberOfHoles++;
     }
-  });
+  };
+  currentState.walk(countNumberOfHoles);
 
-  // Allow layers to have no hit
-  // TODO: do only allow this in some cases, where it is reasonable to have no hit
-  if (not spacePoint) {
-    if (isOnOverlapLayer(currentState) or numberOfHoles <= m_param_hitJumpingUpTo) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  return true;
+  return isOnOverlapLayer(currentState) or numberOfHoles <= m_param_hitJumpingUpTo;
 }

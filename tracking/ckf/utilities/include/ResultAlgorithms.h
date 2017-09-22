@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/utilities/Functional.h>
+
 namespace Belle2 {
   class RecoTrack;
   class SpacePoint;
@@ -38,4 +40,28 @@ namespace Belle2 {
   template <>
   void RecoTrackHitsAdder::addHitToRecoTrack(const SpacePoint* const& spacePoint, RecoTrack& newRecoTrack,
                                              unsigned int& sortingParameter);
+
+  /// Helper Functor to get the Seed of a given result
+  struct SeedGetter {
+    /// Make it a functor
+    operator TrackFindingCDC::FunctorTag();
+
+    template<class T>
+    auto operator()(const T& t) const -> decltype(t.getSeed())
+    {
+      return t.getSeed();
+    }
+  };
+
+  /// Helper Functor to get the Number of hits of a given result
+  struct NumberOfHitsGetter {
+    /// Make it a functor
+    operator TrackFindingCDC::FunctorTag();
+
+    template<class T>
+    auto operator()(const T& t) const -> decltype(t->getHits().size())
+    {
+      return t->getHits().size();
+    }
+  };
 }

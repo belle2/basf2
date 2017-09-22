@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 #include <algorithm>
 #include <cmath>
 
@@ -27,15 +28,11 @@ namespace Belle2 {
       state->setWeight(weight);
     }
 
-    using State = typename AStateList::value_type;
-    const auto weightIsNan = [](const State & state) {
-      return std::isnan(state->getWeight());
-    };
-
-    TrackFindingCDC::erase_remove_if(childStates, weightIsNan);
+    TrackFindingCDC::erase_remove_if(childStates, TrackFindingCDC::IndirectTo<TrackFindingCDC::HasNaNWeight>());
 
     if (useNResults > 0 and childStates.size() > useNResults) {
-      std::sort(childStates.begin(), childStates.end(), TrackFindingCDC::LessOf<TrackFindingCDC::Deref>());
+      std::sort(childStates.begin(), childStates.end(),
+                TrackFindingCDC::LessOf<TrackFindingCDC::IndirectTo<TrackFindingCDC::GetWeight>>());
       childStates.resize(useNResults);
     }
   }

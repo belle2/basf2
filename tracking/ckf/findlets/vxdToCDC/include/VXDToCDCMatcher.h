@@ -22,6 +22,20 @@
 
 namespace Belle2 {
   class VXDToCDCMatcher : public TrackFindingCDC::ProcessingSignalListener {
+  private:
+    /// Helper functor for getting the ICLayer of a wire hit
+    struct ICLayerGetter {
+      /// Marker function for the isFunctor test
+      operator TrackFindingCDC::FunctorTag();
+
+      /// Operator for getting the ICLayer of a wire hit
+      template<class T1>
+      auto operator()(const T1& t1) const -> decltype(t1.getWireID().getICLayer())
+      {
+        return t1.getWireID().getICLayer();
+      }
+    };
+
   public:
     /// return the next hits for a given state, which are the hits on the next layer (or the same for overlaps)
     template<class AStateObject>
@@ -58,17 +72,12 @@ namespace Belle2 {
   {
     m_cachedHitMap.clear();
 
-    const auto hitSorterByLayer = [](const TrackFindingCDC::CDCRLWireHit * lhs, const TrackFindingCDC::CDCRLWireHit * rhs) {
-      return lhs->getWireID().getICLayer() < rhs->getWireID().getICLayer();
-    };
+    TrackFindingCDC::IndirectTo<ICLayerGetter> getLayer;
 
-    const auto getLayer = [](const TrackFindingCDC::CDCRLWireHit * wireHit) {
-      return wireHit->getWireID().getICLayer();
-    };
-
-    std::sort(filteredHitVector.begin(), filteredHitVector.end(), hitSorterByLayer);
-
+    std::sort(filteredHitVector.begin(), filteredHitVector.end(),
+              TrackFindingCDC::LessOf<TrackFindingCDC::IndirectTo<ICLayerGetter>>());
     const auto& groupedByLayer = TrackFindingCDC::adjacent_groupby(filteredHitVector.begin(), filteredHitVector.end(), getLayer);
+
     for (const auto& group : groupedByLayer) {
       const auto& layer = getLayer(group.front());
       m_cachedHitMap.emplace(layer, group);

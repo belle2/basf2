@@ -11,10 +11,24 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/filters/base/NamedChoosableVarSetFilter.h>
+#include <tracking/ckf/utilities/ResultAlgorithms.h>
 
 namespace Belle2 {
   template<class AVarSet>
   class OverlapTeacher : public TrackFindingCDC::Findlet<typename AVarSet::Object> {
+  private:
+    /// Helper Functor to get the TeacherInformation of a given result
+    struct TeacherInformationGetter {
+      /// Make it a functor
+      operator TrackFindingCDC::FunctorTag();
+
+      template<class T>
+      auto operator()(const T& t) const -> decltype(t.getTeacherInformation())
+      {
+        return t.getTeacherInformation();
+      }
+    };
+
   public:
     /// The pair of seed and hit vector to check
     using ResultPair = typename AVarSet::Object;
@@ -66,27 +80,14 @@ namespace Belle2 {
       // Group the result elements by their seed, sort the by their number of correct hits and set the weight to
       // 1 for all results with the maximal number of correct hits and
       // 0 for al others
-      const auto extractSeed = [](const ResultPair & result)
-      {
-        return result.getSeed();
-      };
 
-      const auto bySeedSorter = [&extractSeed](const ResultPair & lhs, const ResultPair & rhs)
-      {
-        return lhs.getSeed() < rhs.getSeed();
-      };
-
-      std::sort(resultElements.begin(), resultElements.end(), bySeedSorter);
-      const auto& groupedBySeeds = TrackFindingCDC::adjacent_groupby(resultElements.begin(), resultElements.end(), extractSeed);
-
-      const auto byWeightSorter = [&extractSeed](const ResultPair & lhs, const ResultPair & rhs)
-      {
-        return lhs.getTeacherInformation() < rhs.getTeacherInformation();
-      };
+      std::sort(resultElements.begin(), resultElements.end(), TrackFindingCDC::LessOf<SeedGetter>());
+      const auto& groupedBySeeds = TrackFindingCDC::adjacent_groupby(resultElements.begin(), resultElements.end(), SeedGetter());
 
       for (const auto& resultsWithSameSeed : groupedBySeeds)
       {
-        const auto& maximalWeightElement = std::max_element(resultsWithSameSeed.begin(), resultsWithSameSeed.end(), byWeightSorter);
+        const auto& maximalWeightElement = std::max_element(resultsWithSameSeed.begin(), resultsWithSameSeed.end(),
+                                                            TrackFindingCDC::LessOf<TeacherInformationGetter>());
         const auto& maximalWeight = maximalWeightElement->getTeacherInformation();
 
         for (auto& result : resultsWithSameSeed) {

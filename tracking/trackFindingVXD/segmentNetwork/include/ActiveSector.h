@@ -35,7 +35,7 @@ namespace Belle2 {
     std::vector<HitType*> m_hits;
 
     /** unique identifier */
-    int m_identifier;
+    const int m_identifier;
 
   public:
     /** ************************* CONSTRUCTORS ************************* */
@@ -47,10 +47,8 @@ namespace Belle2 {
     *      //      * @param staticSector pointer to static sector associated with this one.
      *      //      */
     ActiveSector(const StaticSectorType* staticSector):
-      m_staticSector(staticSector)
-    {
-      m_identifier = m_staticSector->getFullSecID();
-    }
+      m_staticSector(staticSector), m_identifier(staticSector->getFullSecID())
+    {}
 
 
     /** ************************* OPERATORS ************************* */
@@ -79,7 +77,7 @@ namespace Belle2 {
 /// getters:
 
     /** return ID of this sector */
-    int getID() const { return m_identifier; }
+    const int getID() const { return m_identifier; }
 
     /** returns longer debugging name of this sector */
     std::string getName() const

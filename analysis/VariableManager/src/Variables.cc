@@ -1832,6 +1832,21 @@ namespace Belle2 {
     }
 
 
+
+    double clusterTimingThreshold(const Particle* particle)
+    {
+      double time = 120;
+      double energy = particle->getEnergy();
+      if (energy > 0.0615) {
+        time = 1.3027 * (2.25587 / ((energy - 0.0338515) * (energy - 0.0338515) + 0.25 * 0.326737 * 0.326737) + 10.2218 * exp(
+                           -0.464072 * energy));
+      }
+      return time;
+    }
+
+
+
+
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
@@ -2127,6 +2142,8 @@ namespace Belle2 {
                       "returns std::numeric_limits<double>::infinity()");
     REGISTER_VARIABLE("random", random, "return a random number between 0 and 1. Can be used, e.g. for picking a random"
                       "candidate in the best candidate selection.");
+    REGISTER_VARIABLE("clusterTimingThreshold", clusterTimingThreshold,
+                      "energy dependent clusterTiming threshold that contains 99.7% true photons");
 
   }
 }

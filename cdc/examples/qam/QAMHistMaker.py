@@ -41,12 +41,13 @@ def ana(exp=1, run=3118, magneticField=True, prefix='', dest='.'):
     main.add_module(gearbox)
     main.add_module('Geometry')
 
-    output = "/".join([dest, 'output.{0:0>4}.{1:0>5}.root'.format(exp, run)])
+    output = "/".join([dest, 'qam.{0:0>4}.{1:0>5}.root'.format(exp, run)])
     main.add_module('CDCCosmicAnalysis',
                     noBFit=not magneticField,
                     Output=output,
                     treeName='treeTrk',
-                    phi0InRad=False)
+                    phi0InRad=False,
+                    qam=True)
 
     main.add_module('Progress')
     # process events and print call statistics
@@ -55,24 +56,22 @@ def ana(exp=1, run=3118, magneticField=True, prefix='', dest='.'):
 
 
 if __name__ == "__main__":
+
+    #    ROOT.gROOT.LoadMacro('createQAMHist.C')
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument('exp', help='Experimental number')
     parser.add_argument('run', help='Run number')
     args = parser.parse_args()
-
     ana(exp=args.exp, run=args.run, magneticField=True,
         prefix='/ghi/fs01/belle2/bdata/users/karim/data/GCR1/build-2017-08-21',
         # dest='/ghi/fs01/belle2/bdata/group/detector/CDC/qam/GCR1/test'
         dest='.'  # Store current directory.
         )
 
-    time.sleep(3)
-    ROOT.gROOT.LoadMacro('createQAMHist.C')
-    #    ROOT.gSystem.Load('createQAMHist_C.so')
     #    prefix = '/gpfs/home/belle/karim/BASF2/build-2017-08-21/cdc/examples/performance/data_reference'
-    prefix = '.'
-    hist = ROOT.createQAMHist(
-        '/'.join([prefix, 'output.{0:0>4}.{1:0>5}.root'.format(args.exp, args.run)]),
-        'qam.{0:0>4}.{1:0>5}.root'.format(args.exp, args.run))
-    #    ROOT.createQAMHist()
+    #    prefix = '.'
+    #    hist = ROOT.createQAMHist(
+    #        '/'.join([prefix, 'output.{0:0>4}.{1:0>5}.root'.format(args.exp, args.run)]),
+    #        'qam.{0:0>4}.{1:0>5}.root'.format(args.exp, args.run))

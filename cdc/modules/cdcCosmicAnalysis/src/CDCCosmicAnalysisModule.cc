@@ -28,9 +28,11 @@
 #include <Math/ProbFuncMathCore.h>
 #include "iostream"
 
+
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
+
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -51,6 +53,7 @@ CDCCosmicAnalysisModule::CDCCosmicAnalysisModule() : Module()
   addParam("EventT0Extraction", m_EventT0Extraction, "use event t0 extract t0 or not", false);
   addParam("treeName", m_treeName, "Output tree name", string("tree"));
   addParam("phi0InRad", m_phi0InRad, "Phi0 in unit of radian, true: rad, false: deg", true);
+  addParam("qam", m_qam, "Output QAM histograms", false);
 }
 
 CDCCosmicAnalysisModule::~CDCCosmicAnalysisModule()
@@ -245,6 +248,10 @@ void CDCCosmicAnalysisModule::terminate()
 {
   tfile->cd();
   tree->Write();
+  if (m_qam == true) {
+    createQAMHist(tree);
+  }
   tfile->Close();
 }
+
 

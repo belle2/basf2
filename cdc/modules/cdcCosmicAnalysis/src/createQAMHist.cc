@@ -1,16 +1,14 @@
+#include "cdc/modules/cdcCosmicAnalysis/CDCCosmicAnalysisModule.h"
 #include "TROOT.h"
-#include "TChain.h"
+#include "TStyle.h"
+#include "TTree.h"
 #include "TH1F.h"
 #include "TF1.h"
 #include "TCanvas.h"
-#include "TGraphErrors.h"
 #include "TVector3.h"
-#include "TStyle.h"
-#include "TFile.h"
+#include "TGraphErrors.h"
 
-
-Int_t createQAMHist(TString fname="output.0001.03118.root",
-		    TString outputName="output.root")
+void createQAMHist(TTree* tree)
 {
 
   gROOT->Reset();
@@ -22,8 +20,7 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
   gStyle->SetOptFit(1);
   gStyle->SetPalette(1);
 
-  TChain* treeTrk0 = new TChain("treeTrk");
-  treeTrk0->Add(fname);
+  TTree* treeTrk0 = tree;
 
   double ndf1, Pval1, D01, Phi01, Om1, Z01, tanLambda1, Pt1;
   double ndf2, Pval2, D02, Phi02, Om2, Z02, tanLambda2, Pt2;
@@ -33,6 +30,7 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
   TVector3* Mom2 = 0;
   TVector3* posSeed1 = 0;
   TVector3* posSeed2 = 0;
+
 
   TH1F* h00 = new TH1F("h00", "ndf (up)", 100, 0.0, 100.0);
   TH1F* h01 = new TH1F("h01", "ndf (down)", 100, 0.0, 100.0);
@@ -84,16 +82,16 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
   TH1F* ht0[14];
 
   for (int k = 0; k < 13; ++k) {
-    hpt0[k] = new TH1F(Form("hpt0_%d",k), "Pt resolution", 100, -0.04, 0.04);
-    hd0[k] = new TH1F(Form("hd0_%d",k), "d0 difference", 100, -0.4, 0.4);
-    hp0[k] = new TH1F(Form("hp0_%d",k), "phi0 difference", 100, -1.5, 1.5);
-    ho0[k] = new TH1F(Form("ho0_%d",k), "Omega difference", 100, -0.0003, 0.0003);
-    hz0[k] = new TH1F(Form("hz0_%d",k), "z0 difference", 100, -2.0, 2.0);
-    ht0[k] = new TH1F(Form("hl0_%d",k), "tan lambda difference", 100, -0.05, 0.05);
+    hpt0[k] = new TH1F(Form("hpt0_%d", k), "Pt resolution", 100, -0.04, 0.04);
+    hd0[k] = new TH1F(Form("hd0_%d", k), "d0 difference", 100, -0.4, 0.4);
+    hp0[k] = new TH1F(Form("hp0_%d", k), "phi0 difference", 100, -1.5, 1.5);
+    ho0[k] = new TH1F(Form("ho0_%d", k), "Omega difference", 100, -0.0003, 0.0003);
+    hz0[k] = new TH1F(Form("hz0_%d", k), "z0 difference", 100, -2.0, 2.0);
+    ht0[k] = new TH1F(Form("hl0_%d", k), "tan lambda difference", 100, -0.05, 0.05);
   }
 
   Int_t ncand = 0;
-  TChain* treeTrkj = treeTrk0;
+  TTree* treeTrkj = treeTrk0;
 
   treeTrkj->SetBranchAddress("ndf1", &ndf1);
   treeTrkj->SetBranchAddress("Pval1", &Pval1);
@@ -109,8 +107,8 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
   treeTrkj->SetBranchAddress("eZ01", &eZ01);
   treeTrkj->SetBranchAddress("etanL1", &etanL1);
   treeTrkj->SetBranchAddress("posSeed1", &posSeed1);
-  treeTrkj->SetBranchAddress("Mom1",&Mom1);
-  
+  treeTrkj->SetBranchAddress("Mom1", &Mom1);
+
   treeTrkj->SetBranchAddress("ndf2", &ndf2);
   treeTrkj->SetBranchAddress("Pval2", &Pval2);
   treeTrkj->SetBranchAddress("Pt2", &Pt2);
@@ -125,8 +123,8 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
   treeTrkj->SetBranchAddress("eZ02", &eZ02);
   treeTrkj->SetBranchAddress("etanL2", &etanL2);
   treeTrkj->SetBranchAddress("posSeed2", &posSeed2);
-  treeTrkj->SetBranchAddress("Mom2",&Mom2);
-  
+  treeTrkj->SetBranchAddress("Mom2", &Mom2);
+
   std::cout << " total entries = " << treeTrkj->GetEntries() << std::endl;
   for (int i = 0; (int)i < treeTrkj->GetEntries(); ++i) {
     treeTrkj->GetEntry(i);
@@ -222,25 +220,25 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
 
     if (posSeed1->Y() > 0) {
       for (int k = 0; (int)k < 13; ++k) {
-	if ((Pt1 + Pt2) / 2 > Pt_min[k] && (Pt1 + Pt2) / 2 < Pt_max[k]) {
-	  hpt0[k]->Fill(sqrt(2) * (Pt1 - Pt2) / (Pt1 + Pt2));
-	  hd0[k]->Fill(fabs(D01) - fabs(D02));
-	  hp0[k]->Fill((Phi01 - Phi02));
-	  ho0[k]->Fill((fabs(Om1) - fabs(Om2)));
-	  hz0[k]->Fill((Z01 - Z02));
-	  ht0[k]->Fill((fabs(tanLambda1) - fabs(tanLambda2)));
-	}
+        if ((Pt1 + Pt2) / 2 > Pt_min[k] && (Pt1 + Pt2) / 2 < Pt_max[k]) {
+          hpt0[k]->Fill(sqrt(2) * (Pt1 - Pt2) / (Pt1 + Pt2));
+          hd0[k]->Fill(fabs(D01) - fabs(D02));
+          hp0[k]->Fill((Phi01 - Phi02));
+          ho0[k]->Fill((fabs(Om1) - fabs(Om2)));
+          hz0[k]->Fill((Z01 - Z02));
+          ht0[k]->Fill((fabs(tanLambda1) - fabs(tanLambda2)));
+        }
       }
     } else {
       for (int k = 0; (int)k < 13; ++k) {
-	if ((Pt1 + Pt2) / 2 > Pt_min[k] && (Pt1 + Pt2) / 2 < Pt_max[k]) {
-	    hpt0[k]->Fill(sqrt(2) * (Pt2 - Pt1) / (Pt1 + Pt2));
-	    hd0[k]->Fill((fabs(D02) - fabs(D01)));
-	    hp0[k]->Fill((Phi02 - Phi01));
-	    ho0[k]->Fill((fabs(Om1) - fabs(Om2)));
-	    hz0[k]->Fill((Z02 - Z01));
-	    ht0[k]->Fill((fabs(tanLambda2) - fabs(tanLambda1)));
-	}
+        if ((Pt1 + Pt2) / 2 > Pt_min[k] && (Pt1 + Pt2) / 2 < Pt_max[k]) {
+          hpt0[k]->Fill(sqrt(2) * (Pt2 - Pt1) / (Pt1 + Pt2));
+          hd0[k]->Fill((fabs(D02) - fabs(D01)));
+          hp0[k]->Fill((Phi02 - Phi01));
+          ho0[k]->Fill((fabs(Om1) - fabs(Om2)));
+          hz0[k]->Fill((Z02 - Z01));
+          ht0[k]->Fill((fabs(tanLambda2) - fabs(tanLambda1)));
+        }
       }
     }
     //    std::cout << "- ncand = " << ncand << std::endl;
@@ -449,8 +447,8 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
 
   //  c1_4->Print("Results_z0.gif");
 
-  TFile *fout = new TFile(outputName,"RECREATE");
-  
+  //  TFile *fout = new TFile(outputName.c_str(),"RECREATE");
+
   h00->Write();
   h01->Write();
   h02->Write();
@@ -504,9 +502,8 @@ Int_t createQAMHist(TString fname="output.0001.03118.root",
   pgr->Write();
   ogr->Write();
   zgr->Write();
-  fout->Close();
+  //  fout->Close();
 
-  return 0;
-
+  //  return 0;
 
 }

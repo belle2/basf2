@@ -132,24 +132,15 @@ outputRootFile = 'dstarlnuOutput.root'
 
 
 # TODO: specify the location of database (faster)
-use_central_database('test_rachac', LogLevel.WARNING, 'fei_database')
+use_central_database('production', LogLevel.WARNING, 'fei_database')
 
-# TODO: load the FEI reconstruction path
-# specify the location of the fei_pickle file
-fei_pickle = 'basf2_final_path_without_selection.pickle'
-if not os.path.isfile(fei_pickle):
-    sys.exit(
-        'fei_path.pickle not found at: ' +
-        fei_pickle +
-        '\n'
-        'Please provide the fei_path.pickle file from an existing FEI training by setting the fei_pickle parameter in this script.')
+path = create_path()
 
-path = get_path_from_file(fei_pickle)
-# fileList = ['/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/prod00000874/s00/e0000/4S/r00000/signal/sub00/' +
-#            'mdst_000001_prod00000874_task00000001.root',
-#            '/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/prod00000874/s00/e0000/4S/r00000/signal/sub00/' +
-#            'mdst_000002_prod00000874_task00000002.root']
-
+import fei
+particles = fei.get_default_channels()
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MC7_Track14_2', training=False, monitor=False)
+feistate = fei.get_path(particles, configuration)
+path.add_path(feistate.path)
 
 fileList = ['/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/prod00000962/s00/e0000/4S/r00000/mixed/sub00/' +
             'mdst_001724_prod00000962_task00001729.root'

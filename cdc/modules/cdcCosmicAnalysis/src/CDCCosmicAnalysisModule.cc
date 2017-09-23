@@ -33,6 +33,11 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
+/**
+ * Create QAM histograms.
+ */
+void createQAMHist(TTree*);
+
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------

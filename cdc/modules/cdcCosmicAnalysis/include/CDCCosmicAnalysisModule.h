@@ -23,15 +23,9 @@
 #include "TTree.h"
 #include "TFile.h"
 
-/**
- * Create QAM histograms.
- */
-void createQAMHist(TTree*);
-
 namespace Belle2 {
 
   namespace CDC {
-
 
 
     /**

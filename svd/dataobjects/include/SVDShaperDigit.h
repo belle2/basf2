@@ -79,7 +79,8 @@ namespace Belle2 {
      * @param cellID Strip ID.
      * @param samples std::array of 6 APV raw samples.
      * @param FADCTime Time estimate from FADC
-     * @param pipelineAddress APV pipeline address
+     * @param mode SVDModeByte structure, packed trigger time bin and DAQ
+     * mode.
      */
     template<typename T>
     SVDShaperDigit(VxdID sensorID, bool isU, short cellID, T samples,

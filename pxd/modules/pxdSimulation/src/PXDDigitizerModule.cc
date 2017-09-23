@@ -78,6 +78,9 @@ PXDDigitizerModule::PXDDigitizerModule() :
   addParam("ADC", m_applyADC, "Simulate ADC?", true);
   addParam("Gq", m_gq, "Gq of a pixel in nA/electron", 0.6);
   addParam("ADCFineMode", m_ADCFineMode, "Fine mode has slope of ADC curve of 70 nA/ADU, coarse mode has 130", false);
+  addParam("PedestalMean", m_pedestalMean, "Mean of pedestals in ADU", 100.0);
+  addParam("PedestalRMS", m_pedestalRMS, "RMS of pedestals in ADU", 30.0);
+
 
   addParam("statisticsFilename", m_rootFilename,
            "ROOT Filename for statistics generation. If filename is empty, no statistics will be produced",
@@ -556,19 +559,37 @@ void PXDDigitizerModule::saveDigits()
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
     m_chargeThreshold = info.getChargeThreshold();
     m_chargeThresholdElectrons = m_chargeThreshold * m_eToADU;
-    for (Sensor::value_type& digit : sensor.second) {
-      const Digit& d = digit.first;
-      const DigitValue& v = digit.second;
+    for (Sensor::value_type& digitAndValue : sensor.second) {
+      const Digit& d = digitAndValue.first;
+      const DigitValue& v = digitAndValue.second;
 
       //Add Noise where applicable
       double charge = addNoise(v.charge());
 
+      // Draw a pedestal value
+      double pedestal = std::max(gRandom->Gaus(m_pedestalMean, m_pedestalRMS), 0.0);
+
+      // Add pedestal to charge
+      charge = round(charge / m_eToADU + pedestal);
+
+      // Clipping of ADC codes at 255
+      charge = std::min(charge, 255.0);
+
+      // Subtraction of integer pedestal in DHP
+      charge = charge - round(pedestal);
+
+      // Zero Suppression in DHP
+      if (charge < m_chargeThreshold)
+        continue;
+
+      /* FIXME this is wrong
       //Zero suppresion cut
       if (charge < m_chargeThresholdElectrons)
         continue;
 
       //Limit electrons to ADC steps
       if (m_applyADC) charge = round(charge / m_eToADU);
+      */
 
       //Add the digit to datastore
       int digIndex = storeDigits.getEntries();

@@ -184,6 +184,10 @@ namespace Belle2 {
       double m_chargeThreshold;
       /** ... and its equivalent in electrons */
       double m_chargeThresholdElectrons;
+      /** Mean pedestal in ADU */
+      double m_pedestalMean;
+      /** RMS pedestal in ADU */
+      double m_pedestalRMS;
       /** Structure containing all existing sensors */
       Sensors m_sensors;
 

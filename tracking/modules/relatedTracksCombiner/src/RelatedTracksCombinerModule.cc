@@ -72,29 +72,37 @@ void RelatedTracksCombinerModule::event()
   for (const RecoTrack& cdcRecoTrack : m_cdcRecoTracks) {
     bool hasPartner = false;
     for (const RecoTrack& vxdRecoTrack : cdcRecoTrack.getRelationsWith<RecoTrack>(m_vxdRecoTracksStoreArrayName)) {
-      hasPartner = true;
-      TVector3 vxdPosition;
-      std::tie(vxdPosition, std::ignore, std::ignore) = vxdRecoTrack.extractTrackState();
+      try {
+        hasPartner = true;
+        TVector3 vxdPosition;
+        std::tie(vxdPosition, std::ignore, std::ignore) = vxdRecoTrack.extractTrackState();
 
-      short cdcCharge = cdcRecoTrack.getChargeSeed();
+        short cdcCharge = cdcRecoTrack.getChargeSeed();
 
-      // For the combined track, we use the momentum of the CDC track
-      // helix-extrapolated to the start position of the VXD track.
-      const TVector3& trackMomentum = extrapolateMomentum(cdcRecoTrack, vxdPosition);
+        // For the combined track, we use the momentum of the CDC track
+        // helix-extrapolated to the start position of the VXD track.
+        const TVector3& trackMomentum = extrapolateMomentum(cdcRecoTrack, vxdPosition);
 
-      // We are using the basic information of the VXD track here, but copying the momentum and the charge from the
-      // cdc track.
-      // TODO: we should handle the covariance matrix properly here!
-      RecoTrack* newMergedTrack = vxdRecoTrack.copyToStoreArray(m_recoTracks);
-      newMergedTrack->setPositionAndMomentum(vxdPosition, trackMomentum);
-      newMergedTrack->setChargeSeed(cdcCharge);
-      newMergedTrack->addHitsFromRecoTrack(&vxdRecoTrack);
-      newMergedTrack->addHitsFromRecoTrack(&cdcRecoTrack, newMergedTrack->getNumberOfTotalHits());
+        // We are using the basic information of the VXD track here, but copying the momentum and the charge from the
+        // cdc track.
+        // TODO: we should handle the covariance matrix properly here!
+        RecoTrack* newMergedTrack = vxdRecoTrack.copyToStoreArray(m_recoTracks);
+        newMergedTrack->setPositionAndMomentum(vxdPosition, trackMomentum);
+        newMergedTrack->setChargeSeed(cdcCharge);
+        newMergedTrack->addHitsFromRecoTrack(&vxdRecoTrack);
+        newMergedTrack->addHitsFromRecoTrack(&cdcRecoTrack, newMergedTrack->getNumberOfTotalHits());
+
+        newMergedTrack->addRelationTo(&vxdRecoTrack);
+        newMergedTrack->addRelationTo(&cdcRecoTrack);
+      } catch (genfit::Exception& e) {
+        B2WARNING("Could not combine tracks, because of: " << e.what());
+      }
     }
 
     if (not hasPartner and (not m_useOnlyFittedTracksInSingles or cdcRecoTrack.wasFitSuccessful())) {
       RecoTrack* newTrack = cdcRecoTrack.copyToStoreArray(m_recoTracks);
       newTrack->addHitsFromRecoTrack(&cdcRecoTrack);
+      newTrack->addRelationTo(&cdcRecoTrack);
     }
   }
 
@@ -105,6 +113,7 @@ void RelatedTracksCombinerModule::event()
       if (not m_useOnlyFittedTracksInSingles or vxdRecoTrack.wasFitSuccessful()) {
         RecoTrack* newTrack = vxdRecoTrack.copyToStoreArray(m_recoTracks);
         newTrack->addHitsFromRecoTrack(&vxdRecoTrack);
+        newTrack->addRelationTo(&vxdRecoTrack);
       }
     }
   }

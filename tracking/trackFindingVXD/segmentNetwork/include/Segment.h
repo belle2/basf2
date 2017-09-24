@@ -40,6 +40,10 @@ namespace Belle2 {
     /** iD of sector carrying inner hit */
     FullSecID::BaseType m_innerSector;
 
+    /** unique integer identifier */
+    int m_identifier;
+
+    /** longer name for debugging */
     std::string m_name;
 
 
@@ -52,7 +56,9 @@ namespace Belle2 {
       m_innerHit(NULL),
       m_outerSector(FullSecID()),
       m_innerSector(FullSecID()),
-      m_name("Out: missing,\nin: missing") {}
+      m_identifier(-1),
+      m_name("Out: missing,\nin: missing")
+    {}
 
 
     /** Constructor.
@@ -67,9 +73,11 @@ namespace Belle2 {
       m_outerSector(outerSector),
       m_innerSector(innerSector)
     {
+      // Use int (=int32) TrackNode IDs to construct long (=int64) Segment ID
+      m_identifier = m_outerHit->getID() << 16 | m_innerHit->getID();
+      // Construct debugging Segment name out of debugging TrackNode names
       m_name = "Out: " + m_outerHit->getName() + ")" + ",\nin: " + m_innerHit->getName();
     }
-
 
     /** ************************* OPERATORS ************************* */
 
@@ -82,12 +90,11 @@ namespace Belle2 {
     /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
 /// getters:
 
-    /** returns secID of this sector */
-    std::string getName() const
-    {
-      return  m_name;
-    }
+    /** return ID of this segment */
+    int getID() { return m_identifier; }
 
+    /** returns longer debugging name of this segment */
+    const std::string& getName() const { return m_name; }
 
     /** returns inner hit of current Segment */
     inline const HitType* getInnerHit() const { return m_innerHit; }

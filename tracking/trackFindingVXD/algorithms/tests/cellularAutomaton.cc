@@ -27,8 +27,6 @@
 #include <tracking/trackFindingVXD/algorithms/PathCollectorRecursive.h>
 #include <tracking/trackFindingVXD/algorithms/NodeCompatibilityCheckerPathCollector.h>
 
-
-
 #include <array>
 #include <iostream>
 
@@ -73,59 +71,59 @@ namespace CellularAutomatonTests {
     // filling network:
     for (unsigned int index = 1 ; index < 5; index++) {
       // correct order: outerEntry, innerEntry:
-      intNetwork.addNode(std::to_string(intArray.at(index - 1)), intArray.at(index - 1));
-      intNetwork.addNode(std::to_string(intArray.at(index)), intArray.at(index));
+      intNetwork.addNode(intArray.at(index - 1), intArray.at(index - 1));
+      intNetwork.addNode(intArray.at(index), intArray.at(index));
 
-      intNetwork.linkNodes(std::to_string(intArray.at(index - 1)), std::to_string(intArray.at(index)));
+      intNetwork.linkNodes(intArray.at(index - 1), intArray.at(index));
     }
 
     for (unsigned int index = 1 ; index < 5; index++) {
-      intNetwork.addNode(std::to_string(intArray2.at(index - 1)), intArray2.at(index - 1));
-      intNetwork.addNode(std::to_string(intArray2.at(index)), intArray2.at(index));
+      intNetwork.addNode(intArray2.at(index - 1), intArray2.at(index - 1));
+      intNetwork.addNode(intArray2.at(index), intArray2.at(index));
 
-      intNetwork.linkNodes(std::to_string(intArray2.at(index - 1)), std::to_string(intArray2.at(index)));
+      intNetwork.linkNodes(intArray2.at(index - 1), intArray2.at(index));
     }
 
     for (unsigned int index = 1 ; index < 5; index++) {
-      intNetwork.addNode(std::to_string(intArray3.at(index - 1)), intArray3.at(index - 1));
-      intNetwork.addNode(std::to_string(intArray3.at(index)), intArray3.at(index));
+      intNetwork.addNode(intArray3.at(index - 1), intArray3.at(index - 1));
+      intNetwork.addNode(intArray3.at(index), intArray3.at(index));
 
-      intNetwork.linkNodes(std::to_string(intArray3.at(index - 1)), std::to_string(intArray3.at(index)));
+      intNetwork.linkNodes(intArray3.at(index - 1), intArray3.at(index));
     }
 
     {
       int oldOuterInt = 2;
       onTheFlyCreatedInts.push_back(42);
       int& newInnerInt = onTheFlyCreatedInts.back();
-      intNetwork.addNode(std::to_string(newInnerInt), newInnerInt);
-      intNetwork.linkNodes(std::to_string(newInnerInt), std::to_string(oldOuterInt));
+      intNetwork.addNode(newInnerInt, newInnerInt);
+      intNetwork.linkNodes(newInnerInt, oldOuterInt);
     }
 
     {
       onTheFlyCreatedInts.push_back(23);
       int& newOuterInt = onTheFlyCreatedInts.back();
       int& existingInt = intArray.at(1); // neither an outer nor an inner end before.
-      intNetwork.addNode(std::to_string(newOuterInt), newOuterInt);
-      intNetwork.linkNodes(std::to_string(newOuterInt), std::to_string(existingInt));
+      intNetwork.addNode(newOuterInt, newOuterInt);
+      intNetwork.linkNodes(newOuterInt, existingInt);
     }
 
-    intNetwork.linkNodes(std::to_string(intArray.at(0)), std::to_string(intArray.at(2)));
-    intNetwork.addInnerToLastOuterNode(std::to_string(intArray.at(3)));
+    intNetwork.linkNodes(intArray.at(0), intArray.at(2));
+    intNetwork.addInnerToLastOuterNode(intArray.at(3));
 
     {
       onTheFlyCreatedInts.push_back(31);
       int& newInnerInt = onTheFlyCreatedInts.back();
-      intNetwork.addNode(std::to_string(newInnerInt), newInnerInt);
-      intNetwork.addInnerToLastOuterNode(std::to_string(newInnerInt));
+      intNetwork.addNode(newInnerInt, newInnerInt);
+      intNetwork.addInnerToLastOuterNode(newInnerInt);
     }
 
-    intNetwork.addOuterToLastInnerNode(std::to_string(intArray2.at(1)));
+    intNetwork.addOuterToLastInnerNode(intArray2.at(1));
 
     {
       onTheFlyCreatedInts.push_back(66);
       int& newOuterInt = onTheFlyCreatedInts.back();
-      intNetwork.addNode(std::to_string(newOuterInt), newOuterInt);
-      intNetwork.addOuterToLastInnerNode(std::to_string(newOuterInt));
+      intNetwork.addNode(newOuterInt, newOuterInt);
+      intNetwork.addOuterToLastInnerNode(newOuterInt);
     }
     // filling network - end.
     EXPECT_EQ(17, intNetwork.size());

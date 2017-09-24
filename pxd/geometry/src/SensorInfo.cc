@@ -9,6 +9,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <geometry/bfieldmap/BFieldMap.h>
+#include <vxd/geometry/GeoCache.h>
 
 using namespace std;
 using namespace Belle2;
@@ -61,6 +62,15 @@ const TVector3 SensorInfo::getDriftVelocity(const TVector3& E,
                + mobility * mobilityH * mobilityH * BEdotB;
   v *= 1.0 / (1.0 + mobilityH * mobilityH * B.Mag2());
   return v;
+}
+
+int SensorInfo::getPixelKind(const VxdID sensorID, double v) const
+{
+  const SensorInfo& Info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+  int i_pixelKind = Info.getVPitchID(v);
+  if (Info.getID().getLayerNumber() == 2) i_pixelKind += 4;
+  if (Info.getID().getSensorNumber() == 2) i_pixelKind += 2;
+  return i_pixelKind;
 }
 
 const TVector3 SensorInfo::getLorentzShift(double u, double v) const

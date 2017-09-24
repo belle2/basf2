@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<display typeId="org.csstudio.opibuilder.Display" version="1.0.0">
+  <actions hook="false" hook_all="false" />
+  <auto_scale_widgets>
+    <auto_scale_widgets>false</auto_scale_widgets>
+    <min_width>-1</min_width>
+    <min_height>-1</min_height>
+  </auto_scale_widgets>
+  <auto_zoom_to_fit_all>false</auto_zoom_to_fit_all>
+  <background_color>
+    <color red="240" green="240" blue="240" />
+  </background_color>
+  <boy_version>5.1.0.201701171407</boy_version>
+  <foreground_color>
+    <color red="192" green="192" blue="192" />
+  </foreground_color>
+  <grid_space>6</grid_space>
+  <height>685</height>
+  <macros>
+    <include_parent_macros>true</include_parent_macros>
+    <nsm.node>ARICHLV</nsm.node>
+  </macros>
+  <name></name>
+  <rules />
+  <scripts />
+  <show_close_button>true</show_close_button>
+  <show_edit_range>true</show_edit_range>
+  <show_grid>true</show_grid>
+  <show_ruler>true</show_ruler>
+  <snap_to_geometry>true</snap_to_geometry>
+  <widget_type>Display</widget_type>
+  <width>685</width>
+  <wuid>-6568a690:15e3184f721:-56df</wuid>
+  <x>-1</x>
+  <y>-1</y>
+  <widget typeId="org.csstudio.opibuilder.widgets.polygon" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <alpha>255</alpha>
+    <anti_alias>true</anti_alias>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="30" green="144" blue="255" />
+    </background_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <fill_level>0.0</fill_level>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="255" green="0" blue="0" />
+    </foreground_color>
+    <height>50</height>
+    <horizontal_fill>true</horizontal_fill>
+    <line_color>
+      <color red="128" green="0" blue="255" />
+    </line_color>
+    <line_style>0</line_style>
+    <line_width>0</line_width>
+    <name>Polygon_1</name>
+    <points>
+      <point x="6" y="73" />
+      <point x="70" y="103" />
+      <point x="82" y="67" />
+      <point x="15" y="54" />
+      <point x="6" y="73" />
+    </points>
+    <pv_name>nsm://get:${nsm.node}:hvstate</pv_name>
+    <pv_value />
+    <rotation_angle>0.0</rotation_angle>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>true</keep_wh_ratio>
+    </scale_options>
+    <scripts>
+      <path pathString="hvswitch.js" checkConnect="true" sfe="false" seoe="false">
+        <pv trig="true">nsm://get:${nsm.node}:hvstate</pv>
+      </path>
+    </scripts>
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <transparent>false</transparent>
+    <visible>true</visible>
+    <widget_type>Polygon</widget_type>
+    <width>77</width>
+    <wuid>-366240f7:15e50bebbb9:-7c40</wuid>
+    <x>6</x>
+    <y>54</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.polyline" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <alarm_pulsing>false</alarm_pulsing>
+    <alpha>255</alpha>
+    <anti_alias>true</anti_alias>
+    <arrow_length>20</arrow_length>
+    <arrows>0</arrows>
+    <backcolor_alarm_sensitive>false</backcolor_alarm_sensitive>
+    <background_color>
+      <color red="30" green="144" blue="255" />
+    </background_color>
+    <border_alarm_sensitive>false</border_alarm_sensitive>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <fill_arrow>true</fill_arrow>
+    <fill_level>0.0</fill_level>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <forecolor_alarm_sensitive>false</forecolor_alarm_sensitive>
+    <foreground_color>
+      <color red="255" green="0" blue="0" />
+    </foreground_color>
+    <height>1</height>
+    <horizontal_fill>true</horizontal_fill>
+    <line_style>0</line_style>
+    <line_width>1</line_width>
+    <name>Polyline</name>
+    <points>
+      <point x="222" y="78" />
+      <point x="444" y="78" />
+      <point x="444" y="78" />
+      <point x="444" y="78" />
+    </points>
+    <pv_name></pv_name>
+    <pv_value />
+    <rotation_angle>0.0</rotation_angle>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>true</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <tooltip>$(pv_name)
+$(pv_value)</tooltip>
+    <transparent>false</transparent>
+    <visible>true</visible>
+    <widget_type>Polyline</widget_type>
+    <width>223</width>
+    <wuid>-7ffc1021:15e5b6c955b:-5d5f</wuid>
+    <x>222</x>
+    <y>78</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.Label" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <auto_size>false</auto_size>
+    <background_color>
+      <color red="255" green="255" blue="255" />
+    </background_color>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="0" green="0" blue="0" />
+    </foreground_color>
+    <height>20</height>
+    <horizontal_alignment>1</horizontal_alignment>
+    <name>Label</name>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <text>Sector1</text>
+    <tooltip></tooltip>
+    <transparent>true</transparent>
+    <vertical_alignment>1</vertical_alignment>
+    <visible>true</visible>
+    <widget_type>Label</widget_type>
+    <width>80</width>
+    <wrap_words>false</wrap_words>
+    <wuid>-7ffc1021:15e5b6c955b:-5ccb</wuid>
+    <x>126</x>
+    <y>69</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.Image" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <align_to_nearest_second>false</align_to_nearest_second>
+    <auto_size>true</auto_size>
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <crop_bottom>0</crop_bottom>
+    <crop_left>0</crop_left>
+    <crop_right>0</crop_right>
+    <crop_top>0</crop_top>
+    <degree>0</degree>
+    <enabled>true</enabled>
+    <flip_horizontal>false</flip_horizontal>
+    <flip_vertical>false</flip_vertical>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>50</height>
+    <image_file>logo.gif</image_file>
+    <name>Image</name>
+    <no_animation>false</no_animation>
+    <permutation_matrix>
+      <row>
+        <col>1.0</col>
+        <col>0.0</col>
+      </row>
+      <row>
+        <col>0.0</col>
+        <col>1.0</col>
+      </row>
+    </permutation_matrix>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <stretch_to_fit>false</stretch_to_fit>
+    <tooltip></tooltip>
+    <transparency>false</transparency>
+    <visible>true</visible>
+    <widget_type>Image</widget_type>
+    <width>50</width>
+    <wuid>-7ffc1021:15e5b6c955b:-5c04</wuid>
+    <x>477</x>
+    <y>54</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <fc>false</fc>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <height>56</height>
+    <lock_children>false</lock_children>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    </macros>
+    <name>Grouping Container</name>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <show_scrollbar>true</show_scrollbar>
+    <tooltip></tooltip>
+    <transparent>false</transparent>
+    <visible>true</visible>
+    <widget_type>Grouping Container</widget_type>
+    <width>1003</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d12</wuid>
+    <x>0</x>
+    <y>114</y>
+  </widget>
+  <widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false" />
+    <background_color>
+      <color red="240" green="240" blue="240" />
+    </background_color>
+    <border_color>
+      <color red="0" green="128" blue="255" />
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color red="192" green="192" blue="192" />
+    </foreground_color>
+    <group_name></group_name>
+    <height>36</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    </macros>
+    <name>Linking Container</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules />
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts />
+    <tooltip></tooltip>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>1003</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>6</x>
+    <y>12</y>
+  </widget>
+</display>

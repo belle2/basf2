@@ -34,23 +34,8 @@ namespace Belle2 {
       {pxdClusterShapeType::shape_3_L_mirr_u, "pxd cluster shape: cluster 2x2 (u,v) three pixels: (mirror_u_L)"},
       {pxdClusterShapeType::shape_3_L_mirr_v, "pxd cluster shape: cluster 2x2 (u,v) three pixels: (mirror_v_L)"},
       {pxdClusterShapeType::shape_3_L_mirr_uv, "pxd cluster shape: cluster 2x2 (u,v) three pixels: (mirror_u+v_L)"},
-      {pxdClusterShapeType::shape_large, "pxd cluster shape: larger cluster over 2 pixels in u and v"},
+      {pxdClusterShapeType::shape_large, "pxd cluster shape: larger cluster over 2 pixels in u and v"}
 
-      {pxdClusterShapeType::shape_corr_1, "pxd cluster shape: cluster 1x1 (single) pixel - corrected"},
-      {pxdClusterShapeType::shape_corr_2_u, "pxd cluster shape: cluster 2x1 (u,v) pixels - corrected"},
-      {pxdClusterShapeType::shape_corr_2_v, "pxd cluster shape: cluster 1x2 (u,v) pixels - corrected"},
-      {pxdClusterShapeType::shape_corr_2_uv_diag, "pxd cluster shape: cluster 2x2 diagonal (u,v) pixels - corrected"},
-      {pxdClusterShapeType::shape_corr_2_uv_antidiag, "pxd cluster shape: cluster 2x2 anti-diagonal (u,v) pixels - corrected"},
-      {pxdClusterShapeType::shape_corr_N1, "pxd cluster shape: cluster Nx1 (u,v) pixels, N > 2 - corrected"},
-      {pxdClusterShapeType::shape_corr_1M, "pxd cluster shape: cluster 1xM (u,v) pixels, M > 2 - corrected"},
-      {pxdClusterShapeType::shape_corr_N2, "pxd cluster shape: cluster Nx2 (u,v) pixels, N > 2 - corrected"},
-      {pxdClusterShapeType::shape_corr_2M, "pxd cluster shape: cluster 2xM (u,v) pixels, M > 2 - corrected"},
-      {pxdClusterShapeType::shape_corr_4, "pxd cluster shape: cluster 2x2 (u,v) four pixels - corrected"},
-      {pxdClusterShapeType::shape_corr_3_L, "pxd cluster shape: cluster 2x2 (u,v) three pixels: (L) - corrected"},
-      {pxdClusterShapeType::shape_corr_3_L_mirr_u, "pxd cluster shape: cluster 2x2 (u,v) three pixels: (mirror_u_L) - corrected"},
-      {pxdClusterShapeType::shape_corr_3_L_mirr_v, "pxd cluster shape: cluster 2x2 (u,v) three pixels: (mirror_v_L) - corrected"},
-      {pxdClusterShapeType::shape_corr_3_L_mirr_uv, "pxd cluster shape: cluster 2x2 (u,v) three pixels: (mirror_u+v_L) - corrected"},
-      {pxdClusterShapeType::shape_corr_large, "pxd cluster shape: larger cluster over 2 pixels in u and v - corrected"}
     };
 
     PXDClusterShape::~PXDClusterShape() {}
@@ -159,7 +144,7 @@ namespace Belle2 {
         }
       } else if (CSFull >= 5) {
         if (projV.getSize() == 1) {
-          clsShape = pxdClusterShapeType::shape_corr_N1;          // Nx1 (u,v) pixels, N > 2
+          clsShape = pxdClusterShapeType::shape_N1;          // Nx1 (u,v) pixels, N > 2
         } else if (projU.getSize() == 1) {
           clsShape = pxdClusterShapeType::shape_1M;               // 1xM (u,v) pixels, M > 2
         } else if (projV.getSize() == 2) {
@@ -167,7 +152,7 @@ namespace Belle2 {
         } else if (projU.getSize() == 2) {
           clsShape = pxdClusterShapeType::shape_2M;               // 2xM (u,v) pixels, M > 2
         } else {
-          clsShape = pxdClusterShapeType::shape_corr_large;       // big cluster over 2x2 pixels
+          clsShape = pxdClusterShapeType::shape_large;       // big cluster over 2x2 pixels
         }
       }
 

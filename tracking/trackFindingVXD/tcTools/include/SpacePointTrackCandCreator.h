@@ -18,34 +18,19 @@
 
 namespace Belle2 {
 
-  /**
-   * WARNING
-   *
-   * using old TrackLetFilters for seed-calculation as a workaround for the time being.
-   * Their input-containers expect local errors for sigmaU and sigmaV too, which are actually never used in the TrackletFilters (except for Debug-output) and will therefore set to 0.
-   */
-
-  /** small class to take simple vectors of SpacePoints and convert them to real SpacePointTrackCand including realistic seed */
+  /** small class to take simple vectors of SpacePoints and convert them to real SpacePointTrackCands */
   template<class SPTCContainerType>
   struct SpacePointTrackCandCreator {
 
-    /** takes simple vectors of SpacePoints and convert them to real SpacePointTrackCand and sets relation between SPs and SPTCs,
+    /** takes simple vectors of SpacePoints and convert them to real SpacePointTrackCand.
      * returns number of TCs successfully created. */
-    unsigned int createSPTCs(SPTCContainerType& tcContainer, std::vector<std::vector<const SpacePoint*> > allPaths)
+    unsigned int createSPTCs(SPTCContainerType& tcContainer, std::vector<std::vector<const SpacePoint*> >& allPaths)
     {
       unsigned int nTCsCreated = 0;
 
       for (std::vector<const SpacePoint*>& aPath : allPaths) {
-        nTCsCreated++;
-
         auto* newSPTC = tcContainer.appendNew(aPath);
-
-        // Set relations between Nodes and Space Point Track Candidates
-        for (const SpacePoint* aNode : aPath) { // is a const SpacePoint* here
-          if (aNode->getType() == VXD::SensorInfoBase::VXD) continue; /**< Don't create a relation for the VirtualIP. */
-          newSPTC->addRelationTo(aNode, 1.);
-        }
-
+        nTCsCreated++;
       }
 
       return nTCsCreated;

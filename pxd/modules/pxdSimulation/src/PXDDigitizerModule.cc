@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter                                            *
+ * Contributors: Martin Ritter, Benjamin Schwenker                        *
  *                                                                        *
  **************************************************************************/
 
@@ -74,10 +74,8 @@ PXDDigitizerModule::PXDDigitizerModule() :
            1.0);
   addParam("ElectronMaxSteps", m_elMaxSteps,
            "Maximum number of steps when propagating electrons", 200);
-
-  addParam("ADC", m_applyADC, "Simulate ADC?", true);
   addParam("Gq", m_gq, "Gq of a pixel in nA/electron", 0.6);
-  addParam("ADCFineMode", m_ADCFineMode, "Fine mode has slope of ADC curve of 70 nA/ADU, coarse mode has 130", false);
+  addParam("ADCUnit", m_ADCUnit, "Slope of the linear ADC transfer curve in nA/ADU", 70.0);
   addParam("PedestalMean", m_pedestalMean, "Mean of pedestals in ADU", 100.0);
   addParam("PedestalRMS", m_pedestalRMS, "RMS of pedestals in ADU", 30.0);
 
@@ -113,9 +111,10 @@ void PXDDigitizerModule::initialize()
 
   //Convert parameters to correct units
   m_elNoise *= Unit::e;
-  m_eToADU = (m_ADCFineMode) ? 70.0 / m_gq : 130.0 / m_gq;
+  m_eToADU = m_ADCUnit / m_gq;
   m_elStepTime *= Unit::ns;
   m_segmentLength *= Unit::mm;
+
 
   B2INFO(
     "PXDDigitizer Parameters (in system units, *=calculated +=set in xml):");
@@ -141,7 +140,6 @@ void PXDDigitizerModule::initialize()
   B2INFO(" -->  ElectronGroupSize:  " << m_elGroupSize << " e-");
   B2INFO(" -->  ElectronStepTime:   " << m_elStepTime << " ns");
   B2INFO(" -->  ElectronMaxSteps:   " << m_elMaxSteps);
-  B2INFO(" -->  ADC:                " << (m_applyADC ? "true" : "false"));
   B2INFO(" -->  ADU unit:           " << m_eToADU << " e-/ADU");
   B2INFO(" -->  statisticsFilename: " << m_rootFilename);
 
@@ -581,15 +579,6 @@ void PXDDigitizerModule::saveDigits()
       // Zero Suppression in DHP
       if (charge < m_chargeThreshold)
         continue;
-
-      /* FIXME this is wrong
-      //Zero suppresion cut
-      if (charge < m_chargeThresholdElectrons)
-        continue;
-
-      //Limit electrons to ADC steps
-      if (m_applyADC) charge = round(charge / m_eToADU);
-      */
 
       //Add the digit to datastore
       int digIndex = storeDigits.getEntries();

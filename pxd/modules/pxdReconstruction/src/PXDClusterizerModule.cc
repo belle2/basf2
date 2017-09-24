@@ -178,12 +178,12 @@ void PXDClusterizerModule::event()
   //To check sorting
   Pixel lastPixel;
   for (int i = 0; i < nPixels; i++) {
-    const PXDDigit* const digit = storeDigits[i];
-    Pixel px(digit, i);
+    const PXDDigit* const storeDigit = storeDigits[i];
+    Pixel px(storeDigit, i);
     //New sensor, write clusters
-    if (sensorID != digit->getSensorID()) {
+    if (sensorID != storeDigit->getSensorID()) {
       writeClusters(sensorID);
-      sensorID = digit->getSensorID();
+      sensorID = storeDigit->getSensorID();
       //Load the correct noise map for the new sensor
       m_noiseMap.setSensorID(sensorID);
     } else if (px <= lastPixel) {

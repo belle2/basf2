@@ -73,6 +73,6 @@ namespace Belle2 {
 
     bool m_useClosestHitToIP = false; ///< Flag to turn on special handling which measurement to choose; especially useful for Cosmics.
     bool m_useBFieldAtHit =
-      false; ///< Flag to calculate the BField at the used hit (closest to IP or first one), instead of the one at the POCA. This is also useful for cosmics only.
+      false; ///< Flag to calculate the BField at the used hit (closest to IP or first one), instead of the one at the POCA. Use this for cosmics to prevent problems, when cosmics reconstruction end up in the QCS magnet.
   };
 }

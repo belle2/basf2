@@ -32,8 +32,8 @@ namespace Belle2 {
 
   public:
     /// return the next hits for a given state, which are the hits on the next layer (or the same for overlaps)
-    template<class AStateObject>
-    TrackFindingCDC::ChainedArray<RangeType> getMatchingHits(AStateObject& currentState);
+    template<class AState>
+    TrackFindingCDC::ChainedArray<RangeType> getMatchingHits(AState& currentState);
 
     /// Fill the cache of hits for each event
     void initializeEventCache(std::vector<RecoTrack*>& seedsVector, std::vector<const SpacePoint*>& filteredHitVector);
@@ -75,8 +75,8 @@ namespace Belle2 {
     }
   };
 
-  template<class AStateObject>
-  TrackFindingCDC::ChainedArray<SpacePointMatcher::RangeType> SpacePointMatcher::getMatchingHits(AStateObject& currentState)
+  template<class AState>
+  TrackFindingCDC::ChainedArray<SpacePointMatcher::RangeType> SpacePointMatcher::getMatchingHits(AState& currentState)
   {
     GeometryLayerExtractor extractGeometryLayer;
     OverlapExtractor isOnOverlapLayer;

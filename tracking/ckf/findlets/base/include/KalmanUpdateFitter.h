@@ -49,8 +49,8 @@ namespace Belle2 {
   class KalmanUpdateFitter : public TrackFindingCDC::CompositeProcessingSignalListener {
   public:
     /// Main function: update the parameters stored in the mSoP of the state using the hit related to this state.
-    template <class AStateObject>
-    TrackFindingCDC::Weight operator()(AStateObject& currentState) const;
+    template <class AState>
+    TrackFindingCDC::Weight operator()(AState& currentState) const;
 
     /**
      * Reusable function to do the kalman update of a mSoP with the information in the hit.
@@ -115,8 +115,8 @@ namespace Belle2 {
     };
   };
 
-  template <class AStateObject>
-  TrackFindingCDC::Weight KalmanUpdateFitter::operator()(AStateObject& currentState) const
+  template <class AState>
+  TrackFindingCDC::Weight KalmanUpdateFitter::operator()(AState& currentState) const
   {
     B2ASSERT("Encountered invalid state", not currentState.isFitted() and currentState.isAdvanced());
 

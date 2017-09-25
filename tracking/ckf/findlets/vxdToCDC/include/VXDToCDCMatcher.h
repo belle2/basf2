@@ -38,8 +38,8 @@ namespace Belle2 {
 
   public:
     /// return the next hits for a given state, which are the hits on the next layer (or the same for overlaps)
-    template<class AStateObject>
-    TrackFindingCDC::VectorRange<const TrackFindingCDC::CDCRLWireHit*> getMatchingHits(AStateObject& currentState);
+    template<class AState>
+    TrackFindingCDC::VectorRange<const TrackFindingCDC::CDCRLWireHit*> getMatchingHits(AState& currentState);
 
     /// Fill the cache of hits for each event
     void initializeEventCache(std::vector<RecoTrack*>& seedsVector,
@@ -56,8 +56,8 @@ namespace Belle2 {
     std::map<unsigned int, TrackFindingCDC::VectorRange<const TrackFindingCDC::CDCRLWireHit*>> m_cachedHitMap;
   };
 
-  template<class AStateObject>
-  TrackFindingCDC::VectorRange<const TrackFindingCDC::CDCRLWireHit*> VXDToCDCMatcher::getMatchingHits(AStateObject& currentState)
+  template<class AState>
+  TrackFindingCDC::VectorRange<const TrackFindingCDC::CDCRLWireHit*> VXDToCDCMatcher::getMatchingHits(AState& currentState)
   {
     GeometryLayerExtractor extractGeometryLayer;
     OverlapExtractor isOnOverlapLayer;

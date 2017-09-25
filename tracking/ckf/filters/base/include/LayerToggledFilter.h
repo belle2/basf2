@@ -20,10 +20,10 @@ namespace Belle2 {
    * A special findlet, which is chooseable based on a given findlet
    * for layers higher than N, N and for the rest. The toggle layer N is also configurable.
    */
-  template <class AFindlet, class AStateObject>
-  class LayerToggledFilter : public TrackFindingCDC::Findlet<AStateObject> {
+  template <class AFindlet, class AState>
+  class LayerToggledFilter : public TrackFindingCDC::Findlet<AState> {
     /// the parent class
-    using Super = TrackFindingCDC::Findlet<AStateObject>;
+    using Super = TrackFindingCDC::Findlet<AState>;
   public:
     /// Add the subfilters as listeners.
     LayerToggledFilter() : Super()
@@ -45,7 +45,7 @@ namespace Belle2 {
     }
 
     /// The weight is calculated using the subfilter based on the geometrical layer of the state.
-    void apply(std::vector<AStateObject>& childStates) override
+    void apply(std::vector<AState>& childStates) override
     {
       GeometryLayerExtractor extractGeometryLayer;
 

@@ -21,26 +21,26 @@ namespace Belle2 {
    * As we have to keep those states in memory until all of their children are processed, we keep
    * a separate cache for every layer.
    */
-  template<class AStateObject, unsigned int N>
+  template<class AState, unsigned int N>
   class StateTransformer {
   public:
     /// The class of the hit
-    using HitPtr = const typename AStateObject::HitObject*;
+    using HitPtr = const typename AState::HitObject*;
 
     /// Use the hits and transform them into states, by reusing an internal cache of states
     template<class AHitArray>
-    void transform(const AHitArray& matchingHits, std::vector<AStateObject*>& childStates,
-                   AStateObject* currentState);
+    void transform(const AHitArray& matchingHits, std::vector<AState*>& childStates,
+                   AState* currentState);
 
   private:
     /// Temporary object pool for finding the next state
-    std::array < std::vector<AStateObject>, N + 1 > m_temporaryStates;
+    std::array < std::vector<AState>, N + 1 > m_temporaryStates;
   };
 
-  template <class AStateObject, unsigned int N>
+  template <class AState, unsigned int N>
   template <class AHitArray>
-  void StateTransformer<AStateObject, N>::transform(const AHitArray& matchingHits, std::vector<AStateObject*>& childStates,
-                                                    AStateObject* currentState)
+  void StateTransformer<AState, N>::transform(const AHitArray& matchingHits, std::vector<AState*>& childStates,
+                                              AState* currentState)
   {
     // As we do not want to recreate the states again and again, we reuse temporary states here
     // Because those have to exist until each of them is processed, we use one vector of temporary states for each layer
@@ -66,7 +66,7 @@ namespace Belle2 {
     childStates.reserve(matchingHits.size() + 1);
 
     for (auto iterator = temporaryStates.begin(); iterator != lastState; ++iterator) {
-      AStateObject& childState = *iterator;
+      AState& childState = *iterator;
       childStates.push_back(&childState);
     }
   }

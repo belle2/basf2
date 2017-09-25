@@ -40,6 +40,10 @@ namespace Belle2 {
     * @see key_type
     */
   struct key_hash : public std::unary_function<key_type, std::size_t> {
+    /** operator() returns hash for key k.
+      * @param k The key for which we need a hash
+      * @return Hash for key k.
+      */
     std::size_t operator()(const key_type& k) const
     {
       using boost::hash_value;
@@ -61,6 +65,10 @@ namespace Belle2 {
     * @see key_type2
     */
   struct key_hash2 : public std::unary_function<key_type2, std::size_t> {
+    /** operator() returns hash for key k.
+      * @param k The key for which we need a hash
+      * @return Hash for key k.
+      */
     std::size_t operator()(const key_type2& k) const
     {
       using boost::hash_value;
@@ -84,6 +92,11 @@ namespace Belle2 {
     * @see key_type
     */
   struct key_equal : public std::binary_function<key_type, key_type, bool> {
+    /** operator() returns comparing for keys v0 and v1 if they are equal.
+      * @param v0 First key for comparing
+      * @param v1 Second key for comparing
+      * @return True if v0 and v1 are equal.
+      */
     bool operator()(const key_type& v0, const key_type& v1) const
     {
       return (
@@ -103,6 +116,11 @@ namespace Belle2 {
     * @see key_type2
     */
   struct key_equal2 : public std::binary_function<key_type2, key_type2, bool> {
+    /** operator() returns comparing for keys v0 and v1 if they are equal.
+      * @param v0 First key for comparing
+      * @param v1 Second key for comparing
+      * @return True if v0 and v1 are equal.
+      */
     bool operator()(const key_type2& v0, const key_type2& v1) const
     {
       return (

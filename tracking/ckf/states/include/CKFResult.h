@@ -25,7 +25,7 @@ namespace Belle2 {
    * This object will not be stored to the DataStore, but is only for internal usage.
    */
   template <class ASeed, class AHitObject>
-  class CKFResultObject {
+  class CKFResult {
 
   public:
     /// Copy seed definition
@@ -34,8 +34,8 @@ namespace Belle2 {
     using HitObject = AHitObject;
 
     /// Constructor
-    CKFResultObject(ASeed* seed, const std::vector<const AHitObject*> hits, const genfit::MeasuredStateOnPlane& mSoP,
-                    double chi2) :
+    CKFResult(ASeed* seed, const std::vector<const AHitObject*> hits, const genfit::MeasuredStateOnPlane& mSoP,
+              double chi2) :
       m_seed(seed), m_hits(hits), m_chi2(chi2)
     {
       m_trackCharge = mSoP.getCharge();

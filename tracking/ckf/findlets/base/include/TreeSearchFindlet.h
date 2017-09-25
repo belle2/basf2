@@ -22,7 +22,7 @@ namespace Belle2 {
   /**
    * General implementation of a tree search algorithm using a given class as seeds and hits
    * and two algorithm classes to decide, which child states should be used.
-   * All combinations of childs are returned in the form of CKFResultObjects.
+   * All combinations of childs are returned in the form of CKFResults.
    * Make sure that your return vector can hold that much results (e.g. reserve space before to save time).
    *
    * The hit finder should return a Range/list of possible hits.
@@ -48,7 +48,7 @@ namespace Belle2 {
   class TreeSearchFindlet : public TrackFindingCDC::Findlet <
     ASeed*,
     const AHitObject*,
-    CKFResultObject<ASeed, AHitObject >> {
+    CKFResult<ASeed, AHitObject >> {
   public:
     /// The class of the seed
     using SeedPtr = ASeed*;
@@ -57,7 +57,7 @@ namespace Belle2 {
     /// The class of the state
     using StateObject = CKFStateObject<ASeed, AHitObject>;
     /// The returned objects after tree traversal.
-    using ResultObject = CKFResultObject<ASeed, AHitObject>;
+    using ResultObject = CKFResult<ASeed, AHitObject>;
     /// Parent class
     using Super = TrackFindingCDC::Findlet<SeedPtr, HitPtr, ResultObject>;
 

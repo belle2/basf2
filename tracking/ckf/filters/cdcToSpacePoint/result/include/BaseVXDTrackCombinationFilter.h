@@ -15,10 +15,10 @@ namespace Belle2 {
   class RecoTrack;
   class SpacePoint;
 
-  template <class ASeed, class AHitObject> class CKFResultObject;
+  template <class ASeed, class AHitObject> class CKFResult;
   /**
    * Base filter for detector track combination filters.
    */
   using BaseVXDTrackCombinationFilter =
-    TrackFindingCDC::Filter<CKFResultObject<RecoTrack, SpacePoint>>;
+    TrackFindingCDC::Filter<CKFResult<RecoTrack, SpacePoint>>;
 }

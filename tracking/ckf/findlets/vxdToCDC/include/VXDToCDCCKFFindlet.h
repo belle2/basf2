@@ -74,6 +74,6 @@ namespace Belle2 {
     /// Pointers to the RLWireHits as a vector
     std::vector<const TrackFindingCDC::CDCRLWireHit*> m_rlWireHitPointerVector;
     /// Vector for storing the results
-    std::vector<CKFResultObject<RecoTrack, TrackFindingCDC::CDCRLWireHit>> m_results;
+    std::vector<CKFResult<RecoTrack, TrackFindingCDC::CDCRLWireHit>> m_results;
   };
 }

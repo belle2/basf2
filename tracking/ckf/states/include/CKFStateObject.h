@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/ckf/states/CKFResultObject.h>
+#include <tracking/ckf/states/CKFResult.h>
 
 #include <genfit/MeasurementOnPlane.h>
 #include <framework/logging/Logger.h>
@@ -34,7 +34,7 @@ namespace Belle2 {
     /// Copy the class of the hits
     using HitObject = AHitObject;
     /// The class of the object returned by finalize()
-    using ResultObject = CKFResultObject<SeedObject, HitObject>;
+    using ResultObject = CKFResult<SeedObject, HitObject>;
 
     /// Default constructor needed for STL containers
     CKFStateObject() = default;

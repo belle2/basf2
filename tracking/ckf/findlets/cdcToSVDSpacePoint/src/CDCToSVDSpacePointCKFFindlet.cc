@@ -65,7 +65,7 @@ void CDCToSVDSpacePointCKFFindlet::apply()
   m_treeSearchFindlet.apply(m_cdcRecoTrackVector, m_spacePointVector, m_results);
   m_overlapResolver.apply(m_results);
 
-  const auto hasLowHitNumber = [this](const CKFResultObject<RecoTrack, SpacePoint>& result) {
+  const auto hasLowHitNumber = [this](const CKFResult<RecoTrack, SpacePoint>& result) {
     return result.getHits().size() < m_param_minimalHitRequirement;
   };
   TrackFindingCDC::erase_remove_if(m_results, hasLowHitNumber);

@@ -84,6 +84,6 @@ namespace Belle2 {
     /// Pointers to the (const) SpacePoints as a vector
     std::vector<const SpacePoint*> m_spacePointVector;
     /// Vector for storing the results
-    std::vector<CKFResultObject<RecoTrack, SpacePoint>> m_results;
+    std::vector<CKFResult<RecoTrack, SpacePoint>> m_results;
   };
 }

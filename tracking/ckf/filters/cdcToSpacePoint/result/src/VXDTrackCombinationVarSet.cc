@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/filters/cdcToSpacePoint/result/VXDTrackCombinationVarSet.h>
-#include <tracking/ckf/states/CKFResultObject.h>
+#include <tracking/ckf/states/CKFResult.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
 

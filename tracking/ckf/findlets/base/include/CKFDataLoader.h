@@ -90,7 +90,7 @@ namespace Belle2 {
     }
 
     /// Store the reco tracks and the relations
-    void store(std::vector<CKFResultObject<ASeed, AHitObject>>& results)
+    void store(std::vector<CKFResult<ASeed, AHitObject>>& results)
     {
       if (not m_param_exportTracks) {
         return;

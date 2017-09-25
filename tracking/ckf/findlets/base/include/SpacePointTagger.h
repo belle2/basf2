@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/ckf/states/CKFResultObject.h>
+#include <tracking/ckf/states/CKFResult.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -24,7 +24,7 @@
 
 namespace Belle2 {
   template <class ASeed, class AHitObject, class ACluster>
-  class SpacePointTagger : public TrackFindingCDC::Findlet<const CKFResultObject<ASeed, AHitObject>, const AHitObject* const> {
+  class SpacePointTagger : public TrackFindingCDC::Findlet<const CKFResult<ASeed, AHitObject>, const AHitObject* const> {
   public:
     /// Clear the used clusters
     void beginEvent() override
@@ -45,7 +45,7 @@ namespace Belle2 {
     }
 
     /// Mark all space points as used, that they share clusters if the given kind with the results.
-    void apply(const std::vector<CKFResultObject<ASeed, AHitObject>>& results,
+    void apply(const std::vector<CKFResult<ASeed, AHitObject>>& results,
                const std::vector<const AHitObject*>& spacePoints) override
     {
       if (not m_param_markUsedSpacePoints) {

@@ -21,7 +21,7 @@ namespace Belle2 {
    * The PXD digit class.
    *
    * This is a development implementation which is intentionally kept
-   * somewhat bulky. The coordinates probably won't be kept in future.
+   * somewhat bulky.
    */
   class PXDDigit : public DigitBase {
   public:
@@ -30,20 +30,17 @@ namespace Belle2 {
      * @param sensorID Sensor compact ID.
      * @param uCellID Cell ID in "r-phi".
      * @param vCellID Cell ID in "z".
-     * @param uCell Cell center u coordinate.
-     * @param vCell Cell center v coordinate.
      * @param charge The charge collected in the cell.
      */
-    PXDDigit(VxdID sensorID, unsigned short uCellID, unsigned short vCellID, float uCellPosition, float vCellPosition,
+    PXDDigit(VxdID sensorID, unsigned short uCellID, unsigned short vCellID,
              unsigned short charge):
       m_sensorID(sensorID),
       m_uCellID(uCellID), m_vCellID(vCellID),
-      m_uCellPosition(uCellPosition), m_vCellPosition(vCellPosition),
       m_charge(charge)
     {;}
 
     /** Default constructor for the ROOT IO. */
-    PXDDigit(): PXDDigit(0, -1, -1, 0, 0, 0) {}
+    PXDDigit(): PXDDigit(0, 0, 0, 0) {}
 
     /** Get frame number of this digit.
      * @return frame number of the digit.
@@ -74,16 +71,6 @@ namespace Belle2 {
      * @return v ID of the cell.
      */
     unsigned short getVCellID() const { return m_vCellID; }
-
-    /** Get u coordinate of cell center.
-     * @return u coordinate of cell center.
-     */
-    float getUCellPosition() const { return m_uCellPosition; }
-
-    /** Get v coordinate of cell center.
-     * @return v coordinate of cell center.
-     */
-    float getVCellPosition() const { return m_vCellPosition; }
 
     /** Get collected charge.
      * @return charge collected in the cell.
@@ -126,8 +113,6 @@ namespace Belle2 {
     unsigned short m_sensorID; /**< Compressed sensor identifier.*/
     unsigned short m_uCellID;  /**< Cell r-phi coordinate in pitch units. */
     unsigned short m_vCellID;  /**< Cell z coordinate in pitch units. */
-    float m_uCellPosition;     /**< Absolute cell position in r-phi. */
-    float m_vCellPosition;     /**< Absolute cell position in z. */
     unsigned short m_charge;   /**< Digitized charge in ADC units. */
 
     ClassDef(PXDDigit, 4)

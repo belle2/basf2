@@ -583,9 +583,7 @@ void PXDDigitizerModule::saveDigits()
       //Add the digit to datastore
       int digIndex = storeDigits.getEntries();
       storeDigits.appendNew(
-        PXDDigit(sensorID, d.u(), d.v(),
-                 info.getUCellPosition(d.u()),
-                 info.getVCellPosition(d.v()), charge));
+        PXDDigit(sensorID, d.u(), d.v(), charge));
 
       //If the digit has any relations to MCParticles, add the Relation
       if (v.particles().size() > 0) {

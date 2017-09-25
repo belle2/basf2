@@ -12,6 +12,7 @@
 ##############################################################################
 
 from basf2 import *
+from dump_digits import dump_digits
 
 # show warnings during processing
 set_log_level(LogLevel.WARNING)
@@ -64,12 +65,6 @@ output.param('outputFileName', 'SVDTestOutput.root')
 # geometry.param('Components', ['PXD','SVD'])
 geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
-# SVDDIGI.param('statisticsFilename', 'SVDDiags.root')
-SVDDIGI.param('PoissonSmearing', True)
-SVDDIGI.param('ElectronicEffects', True)
-SVDDIGI.param('statisticsFilename', 'SVDTestDiags.root')
-SVDDIGI.param('storeWaveforms', True)
-
 # ============================================================================
 # Do the simulation
 
@@ -82,6 +77,7 @@ main.add_module(particlegun)
 main.add_module(simulation)
 main.add_module(PXDDIGI)
 main.add_module(SVDDIGI)
+# main.add_module(dump_digits())
 main.add_module(SVDCLUST)
 main.add_module(output)
 

@@ -18,6 +18,7 @@
 #include <map>
 #include <algorithm>
 #include <math.h>
+#include <svd/simulation/SVDSimulationTools.h>
 
 namespace Belle2 {
   namespace SVD {
@@ -135,14 +136,17 @@ namespace Belle2 {
       /** Waveform shape.
        * @param t The time at which the function is to be calculated.
        * @param initTime The initial time of the waveform.
-       * @param charge The total charge of the waveform.
-       * @param tau The decay time of the waveform.
-       * @return Value of the waveform at time.
+       * @param charge The charge (peak value) of the waveform.
+       * @param tau The scale parameter (decay time) of the waveform.
+       * @param wfun The functional form of the waveform. Default is betaprime.
+       * The function is normalized to peak value of 1.
+       * @return Value of the waveform at t.
        */
-      double waveform(double t, double initTime, double charge, double tau) const
+      double waveform(double t, double initTime, double charge, double tau,
+                      waveFunction wfun = w_betaprime) const
       {
-        if ((tau <= 0.0) || (t < initTime)) return 0;
-        double z = (t - initTime) / tau; return charge * z * exp(1.0 - z);
+        double z = (t - initTime) / tau;
+        return charge * wfun(z);
       }
 
       /** Waveform taking parameters from a Wave struct.
@@ -153,10 +157,9 @@ namespace Belle2 {
       double waveform(double t, const Wave& wave) const
       { return waveform(t, wave.m_initTime, wave.m_charge, wave.m_tau); }
 
-      /** Make the SVDSignal a functor.
+      /** Make SVDSignal a functor.
        * @param t The time at which output is to be calculated.
-       * @return Boost tuple containing the summary value of the waveform (observable),
-       * and the relation maps of MCParticles and TrueHits.
+       * @return value of the waveform
        */
       double operator()(double t) const
       {
@@ -207,7 +210,7 @@ namespace Belle2 {
       /** Map of TrueHit associations. */
       relations_map m_truehits;
 
-    }; // class SVDDigit
+    }; // class SVDSignal
 
   } // end namespace SVD
 } // end namespace Belle2

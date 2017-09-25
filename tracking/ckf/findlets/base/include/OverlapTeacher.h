@@ -57,14 +57,14 @@ namespace Belle2 {
     }
 
     /// Main function of this findlet: add truth information from the passed var set
-    void apply(std::vector<ResultPair>& resultElements) final {
+    void apply(std::vector<ResultPair>& results) final {
       if (not m_param_enableOverlapTeacher)
       {
         return;
       }
 
       // Use the filter to add the number of correct hits as a weight
-      for (ResultPair& result : resultElements)
+      for (ResultPair& result : results)
       {
         const auto& numberOfCorrectHits = m_varSetFilter(result);
 
@@ -81,8 +81,8 @@ namespace Belle2 {
       // 1 for all results with the maximal number of correct hits and
       // 0 for al others
 
-      std::sort(resultElements.begin(), resultElements.end(), TrackFindingCDC::LessOf<SeedGetter>());
-      const auto& groupedBySeeds = TrackFindingCDC::adjacent_groupby(resultElements.begin(), resultElements.end(), SeedGetter());
+      std::sort(results.begin(), results.end(), TrackFindingCDC::LessOf<SeedGetter>());
+      const auto& groupedBySeeds = TrackFindingCDC::adjacent_groupby(results.begin(), results.end(), SeedGetter());
 
       for (const auto& resultsWithSameSeed : groupedBySeeds)
       {

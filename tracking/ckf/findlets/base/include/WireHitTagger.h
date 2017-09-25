@@ -19,8 +19,8 @@
 
 namespace Belle2 {
   /// Findlet for marking all wire hits in a given result vector as used
-  template <class ASeed, class AHitObject>
-  class WireHitTagger : public TrackFindingCDC::Findlet<const CKFResult<ASeed, AHitObject>> {
+  template <class ASeed, class AHit>
+  class WireHitTagger : public TrackFindingCDC::Findlet<const CKFResult<ASeed, AHit>> {
   public:
     /// Expose the parameters of the findlet
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
@@ -31,7 +31,7 @@ namespace Belle2 {
     }
 
     /// Mark all space points as used, that they share clusters if the given kind with the results.
-    void apply(const std::vector<CKFResult<ASeed, AHitObject>>& results) override
+    void apply(const std::vector<CKFResult<ASeed, AHit>>& results) override
     {
       if (not m_param_markUsedWireHits) {
         return;

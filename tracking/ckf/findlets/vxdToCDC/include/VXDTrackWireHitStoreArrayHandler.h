@@ -24,9 +24,9 @@ namespace Belle2 {
   /**
    * Store array handler for VXD RecoTrack seeds and Wire hits.
    */
-  template<class ASeed, class AHitObject>
-  class VXDTrackWireHitStoreArrayHandler : public TrackFindingCDC::Findlet<const CKFResult<ASeed, AHitObject>> {
-    using Super = TrackFindingCDC::Findlet<const CKFResult<ASeed, AHitObject>>;
+  template<class ASeed, class AHit>
+  class VXDTrackWireHitStoreArrayHandler : public TrackFindingCDC::Findlet<const CKFResult<ASeed, AHit>> {
+    using Super = TrackFindingCDC::Findlet<const CKFResult<ASeed, AHit>>;
 
   public:
     /// Expose the parameters of the findlet
@@ -62,7 +62,7 @@ namespace Belle2 {
     /**
      * Write back the found tracks (CDC only and the merged ones).
      */
-    void apply(const std::vector<CKFResult<ASeed, AHitObject>>& vxdTracksWithMatchedWireHits) override
+    void apply(const std::vector<CKFResult<ASeed, AHit>>& vxdTracksWithMatchedWireHits) override
     {
       // Create new CDC tracks out of the found wire hits and store them into a store array
       for (const auto& vxdTrackWithMatchedWireHits : vxdTracksWithMatchedWireHits) {

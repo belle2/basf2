@@ -44,20 +44,20 @@ namespace Belle2 {
    * In the end, the result object needs to return a copy of the objects, as the state objects
    * will be reused afterwards.
    */
-  template<class ASeed, class AHitObject, class AHitFinder, class AHitSelectorFilterFactory, unsigned int MaxNumber>
+  template<class ASeed, class AHit, class AHitFinder, class AHitSelectorFilterFactory, unsigned int MaxNumber>
   class TreeSearchFindlet : public TrackFindingCDC::Findlet <
     ASeed*,
-    const AHitObject*,
-    CKFResult<ASeed, AHitObject >> {
+    const AHit*,
+    CKFResult<ASeed, AHit >> {
   public:
     /// The class of the seed
     using SeedPtr = ASeed*;
     /// The class of the hit
-    using HitPtr = const AHitObject*;
+    using HitPtr = const AHit*;
     /// The class of the state
-    using StateObject = CKFState<ASeed, AHitObject>;
+    using StateObject = CKFState<ASeed, AHit>;
     /// The returned objects after tree traversal.
-    using ResultObject = CKFResult<ASeed, AHitObject>;
+    using ResultObject = CKFResult<ASeed, AHit>;
     /// Parent class
     using Super = TrackFindingCDC::Findlet<SeedPtr, HitPtr, ResultObject>;
 
@@ -109,7 +109,7 @@ namespace Belle2 {
     HitSelector<AHitSelectorFilterFactory> m_hitSelector;
 
     /// Subfindlet state teacher
-    StateTeacher<ASeed, AHitObject> m_stateTeacher;
+    StateTeacher<ASeed, AHit> m_stateTeacher;
 
     /// Subfindlet: hit finder
     AHitFinder m_hitFinder;
@@ -121,8 +121,8 @@ namespace Belle2 {
     void traverseTree(StateObject* currentState, std::vector<ResultObject>& resultsVector);
   };
 
-  template<class ASeed, class AHitObject, class AHitFinder, class AHitSelectorFilterFactory, unsigned int MaxNumber>
-  void TreeSearchFindlet<ASeed, AHitObject, AHitFinder, AHitSelectorFilterFactory, MaxNumber>::traverseTree(
+  template<class ASeed, class AHit, class AHitFinder, class AHitSelectorFilterFactory, unsigned int MaxNumber>
+  void TreeSearchFindlet<ASeed, AHit, AHitFinder, AHitSelectorFilterFactory, MaxNumber>::traverseTree(
     StateObject* currentState,
     std::vector<ResultObject>& resultsVector)
   {

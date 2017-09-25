@@ -24,17 +24,17 @@ namespace Belle2 {
    * to the filters.
    * This object will not be stored to the DataStore, but is only for internal usage.
    */
-  template <class ASeed, class AHitObject>
+  template <class ASeed, class AHit>
   class CKFResult {
 
   public:
     /// Copy seed definition
     using SeedObject = ASeed;
     /// Copy hit definition
-    using HitObject = AHitObject;
+    using HitObject = AHit;
 
     /// Constructor
-    CKFResult(ASeed* seed, const std::vector<const AHitObject*> hits, const genfit::MeasuredStateOnPlane& mSoP,
+    CKFResult(ASeed* seed, const std::vector<const AHit*> hits, const genfit::MeasuredStateOnPlane& mSoP,
               double chi2) :
       m_seed(seed), m_hits(hits), m_chi2(chi2)
     {
@@ -44,7 +44,7 @@ namespace Belle2 {
     }
 
     /// Getter for the stored hits
-    const std::vector<const AHitObject*>& getHits() const
+    const std::vector<const AHit*>& getHits() const
     {
       return m_hits;
     }
@@ -113,7 +113,7 @@ namespace Belle2 {
     /// The stored seed
     ASeed* m_seed;
     /// The stored hits
-    std::vector<const AHitObject*> m_hits;
+    std::vector<const AHit*> m_hits;
     /// The stored chi2
     double m_chi2;
     /// A weight, which transports the teacher information

@@ -26,13 +26,13 @@ namespace Belle2 {
    * They are set using the "initialize" and "set" function to reuse resources. To save computation time in
    * copying, we do not set the mSoP in the set function. It is only set in the advancing step and during initialization.
    */
-  template<class ASeed, class AHitObject>
+  template<class ASeed, class AHit>
   class CKFState {
   public:
     /// Copy the class of the seed track
     using SeedObject = ASeed;
     /// Copy the class of the hits
-    using HitObject = AHitObject;
+    using HitObject = AHit;
     /// The class of the object returned by finalize()
     using ResultObject = CKFResult<SeedObject, HitObject>;
 

@@ -34,9 +34,9 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  template<class ASeed, class AHitObject>
+  template<class ASeed, class AHit>
   class CKFResultTruthVarNames : public
-    TrackFindingCDC::VarNames<CKFResult<ASeed, AHitObject>> {
+    TrackFindingCDC::VarNames<CKFResult<ASeed, AHit>> {
 
   public:
     /// Number of variables to be generated.
@@ -54,14 +54,14 @@ namespace Belle2 {
    * Var set used in the CKF for calculating the probability of a correct result,
    * which knows the truth information if two tracks belong together or not.
    */
-  template<class ASeed, class AHitObject>
-  class CKFResultTruthVarSet : public TrackFindingCDC::VarSet<CKFResultTruthVarNames<ASeed, AHitObject>> {
+  template<class ASeed, class AHit>
+  class CKFResultTruthVarSet : public TrackFindingCDC::VarSet<CKFResultTruthVarNames<ASeed, AHit>> {
     /// Parent class
-    using Super = TrackFindingCDC::VarSet<CKFResultTruthVarNames<ASeed, AHitObject>>;
+    using Super = TrackFindingCDC::VarSet<CKFResultTruthVarNames<ASeed, AHit>>;
 
   public:
     /// Generate and assign the variables from the object.
-    virtual bool extract(const CKFResult<ASeed, AHitObject>* result) final {
+    virtual bool extract(const CKFResult<ASeed, AHit>* result) final {
       RecoTrack* seedTrack = result->getSeed();
       if (not seedTrack) return false;
 

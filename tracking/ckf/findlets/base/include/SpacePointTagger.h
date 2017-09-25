@@ -23,8 +23,8 @@
 #include <framework/core/ModuleParamList.h>
 
 namespace Belle2 {
-  template <class ASeed, class AHitObject, class ACluster>
-  class SpacePointTagger : public TrackFindingCDC::Findlet<const CKFResult<ASeed, AHitObject>, const AHitObject* const> {
+  template <class ASeed, class AHit, class ACluster>
+  class SpacePointTagger : public TrackFindingCDC::Findlet<const CKFResult<ASeed, AHit>, const AHit* const> {
   public:
     /// Clear the used clusters
     void beginEvent() override
@@ -45,8 +45,8 @@ namespace Belle2 {
     }
 
     /// Mark all space points as used, that they share clusters if the given kind with the results.
-    void apply(const std::vector<CKFResult<ASeed, AHitObject>>& results,
-               const std::vector<const AHitObject*>& spacePoints) override
+    void apply(const std::vector<CKFResult<ASeed, AHit>>& results,
+               const std::vector<const AHit*>& spacePoints) override
     {
       if (not m_param_markUsedSpacePoints) {
         return;
@@ -95,7 +95,7 @@ namespace Belle2 {
     /// Store the used clusters in the results
     std::set<const ACluster*> m_usedClusters;
     /// Store the used space points in the results
-    std::set<const AHitObject*> m_usedSpacePoints;
+    std::set<const AHit*> m_usedSpacePoints;
 
     // Parameters
     /// Parameter: Mark SP as used, if the share a single cluster with the results, or if they share a whole SP.

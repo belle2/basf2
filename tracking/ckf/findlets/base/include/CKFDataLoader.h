@@ -21,10 +21,10 @@ namespace Belle2 {
    * Findlet for loading the seeds and the hits from the data store.
    * Also, the tracks are fitted and only the fittable tracks are passed on.
    */
-  template <class ASeed, class AHitObject>
-  class CKFDataLoader : public TrackFindingCDC::Findlet<ASeed*, const AHitObject*> {
+  template <class ASeed, class AHit>
+  class CKFDataLoader : public TrackFindingCDC::Findlet<ASeed*, const AHit*> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<ASeed*, const AHitObject*>;
+    using Super = TrackFindingCDC::Findlet<ASeed*, const AHit*>;
 
   public:
     /// Add the subfindlets
@@ -75,7 +75,7 @@ namespace Belle2 {
     }
 
     /// Load in the reco tracks and the hits
-    void apply(std::vector<ASeed*>& seeds, std::vector<const AHitObject*>& hits) override
+    void apply(std::vector<ASeed*>& seeds, std::vector<const AHit*>& hits) override
     {
       seeds.reserve(seeds.size() + m_inputRecoTracks.getEntries());
 
@@ -90,7 +90,7 @@ namespace Belle2 {
     }
 
     /// Store the reco tracks and the relations
-    void store(std::vector<CKFResult<ASeed, AHitObject>>& results)
+    void store(std::vector<CKFResult<ASeed, AHit>>& results)
     {
       if (not m_param_exportTracks) {
         return;

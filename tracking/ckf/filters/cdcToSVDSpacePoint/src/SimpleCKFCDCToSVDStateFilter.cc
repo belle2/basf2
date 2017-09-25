@@ -19,26 +19,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-namespace {
-  template <class ARhs, class ALhs>
-  decltype(ARhs() % ALhs()) mod(ARhs a, ALhs b)
-  {
-    return (a % b + b) % b;
-  }
-
-  unsigned int getPTRange(const Vector3D& momentum)
-  {
-    const double pT = momentum.xy().norm();
-    if (pT > 0.4) {
-      return 0;
-    } else if (pT > 0.2) {
-      return 1;
-    } else {
-      return 2;
-    }
-  }
-}
-
 constexpr const double SimpleCKFCDCToSVDStateFilter::m_param_maximumHelixDistance[][3];
 constexpr const double SimpleCKFCDCToSVDStateFilter::m_param_maximumResidual[][3];
 constexpr const double SimpleCKFCDCToSVDStateFilter::m_param_maximumResidual2[][3];

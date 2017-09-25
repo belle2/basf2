@@ -91,4 +91,17 @@ namespace Belle2 {
       return state->getHit()->getWireID();
     }
   };
+
+  /// Helper function to extract the numbered pt-range out of a momentum vector
+  inline unsigned int getPTRange(const TrackFindingCDC::Vector3D& momentum)
+  {
+    const double pT = momentum.xy().norm();
+    if (pT > 0.4) {
+      return 0;
+    } else if (pT > 0.2) {
+      return 1;
+    } else {
+      return 2;
+    }
+  }
 }

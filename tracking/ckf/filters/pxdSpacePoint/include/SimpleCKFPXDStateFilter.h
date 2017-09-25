@@ -17,7 +17,7 @@ namespace Belle2 {
   class SimpleCKFPXDStateFilter : public SimpleCKFSpacePointFilter {
   public:
     /// Return NAN, if this state should not be used
-    TrackFindingCDC::Weight operator()(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState) final;
+    TrackFindingCDC::Weight operator()(const BaseCKFCDCToSpacePointStateFilter::Object& currentState) final;
 
   private:
     /// Shortcut for a 2x3 array.

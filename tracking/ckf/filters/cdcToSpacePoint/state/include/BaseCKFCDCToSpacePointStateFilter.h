@@ -19,6 +19,6 @@ namespace Belle2 {
   /**
    * Base filter for detector track combination filters.
    */
-  using BaseCKFCDCToSpacePointStateObjectFilter =
+  using BaseCKFCDCToSpacePointStateFilter =
     TrackFindingCDC::Filter<CKFState<RecoTrack, SpacePoint>>;
 }

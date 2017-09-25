@@ -7,11 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectFilterFactory.h>
-#include <tracking/ckf/filters/cdcToSpacePoint/state/BaseCKFCDCToSpacePointStateObjectFilter.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateFilterFactory.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/state/BaseCKFCDCToSpacePointStateFilter.h>
 #include <tracking/ckf/filters/base/CKFStateTruthVarSet.h>
-#include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectVarSet.h>
-#include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectBasicVarSet.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateVarSet.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateBasicVarSet.h>
 
 #include <tracking/ckf/filters/cdcToSVDSpacePoint/SimpleCKFCDCToSVDStateFilter.h>
 #include <tracking/ckf/filters/pxdSpacePoint/SimpleCKFPXDStateFilter.h>
@@ -30,40 +30,40 @@ using namespace TrackFindingCDC;
 
 namespace {
   /// MC filter for VXD - CDC relations.
-  using MCCKFCDCToSpacePointStateObjectFilter = MCFilter<CKFStateTruthVarSet<RecoTrack, SpacePoint>>;
+  using MCCKFCDCToSpacePointStateFilter = MCFilter<CKFStateTruthVarSet<RecoTrack, SpacePoint>>;
 
   /// MC-ordering filter for VXD - CDC relations.
-  using MCOrderingCKFCDCToSpacePointStateObjectFilter = NamedChoosableVarSetFilter<CKFStateTruthVarSet<RecoTrack, SpacePoint>>;
+  using MCOrderingCKFCDCToSpacePointStateFilter = NamedChoosableVarSetFilter<CKFStateTruthVarSet<RecoTrack, SpacePoint>>;
 
   /// Sloppy MC filter for VXD - CDC relations.
-  using SloppyMCCKFCDCToSpacePointStateObjectFilter = SloppyMCFilter<CKFStateTruthVarSet<RecoTrack, SpacePoint>>;
+  using SloppyMCCKFCDCToSpacePointStateFilter = SloppyMCFilter<CKFStateTruthVarSet<RecoTrack, SpacePoint>>;
 
   /// Prescaled recording filter for VXD - CDC relations.
-  class SloppyRecordingCKFCDCToSpacePointStateObjectFilter : public
+  class SloppyRecordingCKFCDCToSpacePointStateFilter : public
     RecordingFilter<VariadicUnionVarSet<CKFStateTruthVarSet<RecoTrack, SpacePoint>,
-    CKFCDCToSpacePointStateObjectBasicVarSet, CKFCDCToSpacePointStateObjectVarSet>> {
+    CKFCDCToSpacePointStateBasicVarSet, CKFCDCToSpacePointStateVarSet>> {
     using Super = RecordingFilter<VariadicUnionVarSet<CKFStateTruthVarSet<RecoTrack, SpacePoint>,
-          CKFCDCToSpacePointStateObjectBasicVarSet, CKFCDCToSpacePointStateObjectVarSet>>;
+          CKFCDCToSpacePointStateBasicVarSet, CKFCDCToSpacePointStateVarSet>>;
   public:
-    SloppyRecordingCKFCDCToSpacePointStateObjectFilter(const std::string& defaultRootFileName) : Super(defaultRootFileName)
+    SloppyRecordingCKFCDCToSpacePointStateFilter(const std::string& defaultRootFileName) : Super(defaultRootFileName)
     {
-      setSkimFilter(std::make_unique<SloppyMCCKFCDCToSpacePointStateObjectFilter>());
+      setSkimFilter(std::make_unique<SloppyMCCKFCDCToSpacePointStateFilter>());
     }
   };
 
   /// Recording filter for VXD - CDC relations.
-  using RecordingCKFCDCToSpacePointStateObjectFilter = RecordingFilter<VariadicUnionVarSet<CKFStateTruthVarSet<RecoTrack, SpacePoint>,
-        CKFCDCToSpacePointStateObjectBasicVarSet, CKFCDCToSpacePointStateObjectVarSet>>;
+  using RecordingCKFCDCToSpacePointStateFilter = RecordingFilter<VariadicUnionVarSet<CKFStateTruthVarSet<RecoTrack, SpacePoint>,
+        CKFCDCToSpacePointStateBasicVarSet, CKFCDCToSpacePointStateVarSet>>;
 
   /// MVA filter for VXD - CDC relations.
-  class MVACKFCDCToSpacePointStateObjectFilter : public
-    MVAFilter<CKFCDCToSpacePointStateObjectBasicVarSet> {
-    using Super = MVAFilter<CKFCDCToSpacePointStateObjectBasicVarSet>;
+  class MVACKFCDCToSpacePointStateFilter : public
+    MVAFilter<CKFCDCToSpacePointStateBasicVarSet> {
+    using Super = MVAFilter<CKFCDCToSpacePointStateBasicVarSet>;
   public:
     using Super::Super;
 
     /// Function to object for its signalness
-    Weight operator()(const CKFCDCToSpacePointStateObjectBasicVarSet::Object& obj) override
+    Weight operator()(const CKFCDCToSpacePointStateBasicVarSet::Object& obj) override
     {
       if (obj.getHit()) {
         return -Super::operator()(obj);
@@ -74,26 +74,26 @@ namespace {
   };
 
   /// All filter for VXD - CDC relations.
-  using AllCKFCDCToSpacePointStateObjectFilter = AllFilter<BaseCKFCDCToSpacePointStateObjectFilter>;
+  using AllCKFCDCToSpacePointStateFilter = AllFilter<BaseCKFCDCToSpacePointStateFilter>;
 }
 
-CKFCDCToSpacePointStateObjectFilterFactory::CKFCDCToSpacePointStateObjectFilterFactory(const std::string& defaultFilterName)
+CKFCDCToSpacePointStateFilterFactory::CKFCDCToSpacePointStateFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
 {
 }
 
-std::string CKFCDCToSpacePointStateObjectFilterFactory::getIdentifier() const
+std::string CKFCDCToSpacePointStateFilterFactory::getIdentifier() const
 {
-  return "CKFCDCToSpacePointStateObject";
+  return "CKFCDCToSpacePointState";
 }
 
-std::string CKFCDCToSpacePointStateObjectFilterFactory::getFilterPurpose() const
+std::string CKFCDCToSpacePointStateFilterFactory::getFilterPurpose() const
 {
   return "Filter out relations between CDC Reco Tracks and Space Points on very easy criteria";
 }
 
 std::map<std::string, std::string>
-CKFCDCToSpacePointStateObjectFilterFactory::getValidFilterNamesAndDescriptions() const
+CKFCDCToSpacePointStateFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   return {
     {"none", "no track combination is valid"},
@@ -109,29 +109,29 @@ CKFCDCToSpacePointStateObjectFilterFactory::getValidFilterNamesAndDescriptions()
   };
 }
 
-std::unique_ptr<BaseCKFCDCToSpacePointStateObjectFilter>
-CKFCDCToSpacePointStateObjectFilterFactory::create(const std::string& filterName) const
+std::unique_ptr<BaseCKFCDCToSpacePointStateFilter>
+CKFCDCToSpacePointStateFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::make_unique<NoneFilter<BaseCKFCDCToSpacePointStateObjectFilter>>();
+    return std::make_unique<NoneFilter<BaseCKFCDCToSpacePointStateFilter>>();
   } else if (filterName == "all") {
-    return std::make_unique<AllCKFCDCToSpacePointStateObjectFilter>();
+    return std::make_unique<AllCKFCDCToSpacePointStateFilter>();
   } else if (filterName == "svd_simple") {
     return std::make_unique<SimpleCKFCDCToSVDStateFilter>();
   } else if (filterName == "pxd_simple") {
     return std::make_unique<SimpleCKFPXDStateFilter>();
   } else if (filterName == "truth") {
-    return std::make_unique<MCCKFCDCToSpacePointStateObjectFilter>();
+    return std::make_unique<MCCKFCDCToSpacePointStateFilter>();
   } else if (filterName == "ordering_truth") {
-    return std::make_unique<MCOrderingCKFCDCToSpacePointStateObjectFilter>("truth_inverted");
+    return std::make_unique<MCOrderingCKFCDCToSpacePointStateFilter>("truth_inverted");
   } else if (filterName == "sloppy_truth") {
-    return std::make_unique<SloppyMCCKFCDCToSpacePointStateObjectFilter>();
+    return std::make_unique<SloppyMCCKFCDCToSpacePointStateFilter>();
   } else if (filterName == "recording") {
-    return std::make_unique<RecordingCKFCDCToSpacePointStateObjectFilter>("CKFCDCToSpacePointStateObjectFilter.root");
+    return std::make_unique<RecordingCKFCDCToSpacePointStateFilter>("CKFCDCToSpacePointStateFilter.root");
   } else if (filterName == "mva") {
-    return std::make_unique<MVACKFCDCToSpacePointStateObjectFilter>("tracking/data/ckf_CDCSVDStateFilter_1.xml");
+    return std::make_unique<MVACKFCDCToSpacePointStateFilter>("tracking/data/ckf_CDCSVDStateFilter_1.xml");
   } else if (filterName == "sloppy_recording") {
-    return std::make_unique<SloppyRecordingCKFCDCToSpacePointStateObjectFilter>("CKFCDCToSpacePointStateObjectFilter.root");
+    return std::make_unique<SloppyRecordingCKFCDCToSpacePointStateFilter>("CKFCDCToSpacePointStateFilter.root");
   } else {
     return Super::create(filterName);
   }

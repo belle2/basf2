@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <tracking/ckf/states/CKFState.h>
-#include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectVarSet.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateVarSet.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -22,7 +22,7 @@ using namespace TrackFindingCDC;
 namespace {
   /// Helper function to calculate the mean of a given function over all states in the list
   template<class APredicate>
-  double meanOver(const BaseCKFCDCToSpacePointStateObjectFilter::Object* state, const APredicate& t)
+  double meanOver(const BaseCKFCDCToSpacePointStateFilter::Object* state, const APredicate& t)
   {
     double sum = 0;
     unsigned int numberOfHits = 0;
@@ -43,7 +43,7 @@ namespace {
 
   /// Helper function to calculate the min of a given function over all states in the list
   template<class APredicate>
-  double minOver(const BaseCKFCDCToSpacePointStateObjectFilter::Object* state, const APredicate& t)
+  double minOver(const BaseCKFCDCToSpacePointStateFilter::Object* state, const APredicate& t)
   {
     double minimalValue = NAN;
 
@@ -67,7 +67,7 @@ namespace {
 
   /// Helper function to calculate the std of a given function over all states in the list
   template<class APredicate>
-  double stdOver(const BaseCKFCDCToSpacePointStateObjectFilter::Object* state, const APredicate& t)
+  double stdOver(const BaseCKFCDCToSpacePointStateFilter::Object* state, const APredicate& t)
   {
     double sum = 0;
     double sumSquared = 0;
@@ -90,7 +90,7 @@ namespace {
   }
 }
 
-bool CKFCDCToSpacePointStateObjectVarSet::extract(const BaseCKFCDCToSpacePointStateObjectFilter::Object* result)
+bool CKFCDCToSpacePointStateVarSet::extract(const BaseCKFCDCToSpacePointStateFilter::Object* result)
 {
   RecoTrack* cdcTrack = result->getSeedRecoTrack();
   const SpacePoint* spacePoint = result->getHit();

@@ -55,7 +55,7 @@ namespace Belle2 {
     /// The class of the hit
     using HitPtr = const AHit*;
     /// The class of the state
-    using StateObject = CKFState<ASeed, AHit>;
+    using State = CKFState<ASeed, AHit>;
     /// The returned objects after tree traversal.
     using ResultObject = CKFResult<ASeed, AHit>;
     /// Parent class
@@ -91,7 +91,7 @@ namespace Belle2 {
       for (SeedPtr seed : seedsVector) {
         B2DEBUG(50, "Starting with new seed...");
 
-        StateObject firstState(seed, MaxNumber);
+        State firstState(seed, MaxNumber);
         traverseTree(&firstState, results);
         B2DEBUG(50, "... finished with seed");
 
@@ -115,15 +115,15 @@ namespace Belle2 {
     AHitFinder m_hitFinder;
 
     /// Subfindlet: state transformer
-    StateTransformer<StateObject, MaxNumber> m_stateTransformer;
+    StateTransformer<State, MaxNumber> m_stateTransformer;
 
     /// Implementation of the traverseTree function
-    void traverseTree(StateObject* currentState, std::vector<ResultObject>& resultsVector);
+    void traverseTree(State* currentState, std::vector<ResultObject>& resultsVector);
   };
 
   template<class ASeed, class AHit, class AHitFinder, class AHitSelectorFilterFactory, unsigned int MaxNumber>
   void TreeSearchFindlet<ASeed, AHit, AHitFinder, AHitSelectorFilterFactory, MaxNumber>::traverseTree(
-    StateObject* currentState,
+    State* currentState,
     std::vector<ResultObject>& resultsVector)
   {
     B2DEBUG(50, "Now on number " << currentState->getNumber());
@@ -140,7 +140,7 @@ namespace Belle2 {
     B2DEBUG(50, "Having found " << matchingHits.size() << " possible hits");
 
     // Transform the hits into states
-    std::vector<StateObject*> childStates;
+    std::vector<State*> childStates;
     m_stateTransformer.transform(matchingHits, childStates, currentState);
 
     // Add truth information
@@ -157,7 +157,7 @@ namespace Belle2 {
 
     // Traverse the tree from each new state on
     B2DEBUG(50, "Having found " << childStates.size() << " child states.");
-    for (StateObject* childState : childStates) {
+    for (State* childState : childStates) {
       traverseTree(childState, resultsVector);
     }
   }

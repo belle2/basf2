@@ -9,13 +9,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/filters/cdcToSpacePoint/state/BaseCKFCDCToSpacePointStateObjectFilter.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/state/BaseCKFCDCToSpacePointStateFilter.h>
 
 namespace Belle2 {
   class ModuleParamList;
 
   /// A very simple filter for all space points. Should be overloaded for the different cases (SVD, PXD).
-  class SimpleCKFSpacePointFilter : public BaseCKFCDCToSpacePointStateObjectFilter {
+  class SimpleCKFSpacePointFilter : public BaseCKFCDCToSpacePointStateFilter {
   public:
     /// Expose the parameters to the module
     void exposeParameters(ModuleParamList* moduleParamList,
@@ -32,6 +32,6 @@ namespace Belle2 {
     double m_cachedBField;
 
     /// Helper function to check for the number of holes and overlap hits
-    bool checkOverlapAndHoles(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState);
+    bool checkOverlapAndHoles(const BaseCKFCDCToSpacePointStateFilter::Object& currentState);
   };
 }

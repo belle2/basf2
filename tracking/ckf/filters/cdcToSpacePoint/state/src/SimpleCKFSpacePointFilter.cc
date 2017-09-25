@@ -31,7 +31,7 @@ void SimpleCKFSpacePointFilter::beginRun()
   m_cachedBField = TrackFindingCDC::CDCBFieldUtil::getBFieldZ();
 }
 
-bool SimpleCKFSpacePointFilter::checkOverlapAndHoles(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState)
+bool SimpleCKFSpacePointFilter::checkOverlapAndHoles(const BaseCKFCDCToSpacePointStateFilter::Object& currentState)
 {
   OverlapExtractor isOnOverlapLayer;
 
@@ -42,7 +42,7 @@ bool SimpleCKFSpacePointFilter::checkOverlapAndHoles(const BaseCKFCDCToSpacePoin
   int numberOfHoles = 0;
 
   const auto countNumberOfHoles = [&numberOfHoles,
-  &isOnOverlapLayer](const BaseCKFCDCToSpacePointStateObjectFilter::Object * walkObject) {
+  &isOnOverlapLayer](const BaseCKFCDCToSpacePointStateFilter::Object * walkObject) {
     if (not walkObject->getHit() and not isOnOverlapLayer(*walkObject)) {
       numberOfHoles++;
     }

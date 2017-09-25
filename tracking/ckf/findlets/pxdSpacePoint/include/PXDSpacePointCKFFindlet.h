@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/ckf/filters/cdcToSpacePoint/result/VXDTrackCombinationFilterFactory.h>
-#include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectFilterFactory.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateFilterFactory.h>
 
 #include <tracking/ckf/findlets/spacePoint/SpacePointMatcher.h>
 
@@ -33,7 +33,7 @@ namespace Belle2 {
    * The implementation is split up in four parts and factored out into three sub findlets.
    * * Fetch the SpacePoints and the reco tracks from the data store (CDCTrackSpacePointStoreArrayHandler)
    * * Construct all possible candidates starting from a RecoTrack and going through the layers of the VXD collecting
-   *   space points (this is handles by the TreeSearchFindlet, which works on StateObjects. The selection
+   *   space points (this is handles by the TreeSearchFindlet, which works on States. The selection
    *   of space points is handled by the CDCToSpacePointHitSelector)
    * * Find a non-overlapping set of results (only one candidate per space point and seed) (OverlapResolverFindlet,
    *   quality is determined by a filter)
@@ -65,7 +65,7 @@ namespace Belle2 {
     /// Findlet for retrieving the cdc tracks
     CKFDataLoader<RecoTrack, SpacePoint> m_dataLoader;
     /// Findlet doing the main work: the tree finding
-    TreeSearchFindlet<RecoTrack, SpacePoint, SpacePointMatcher, CKFCDCToSpacePointStateObjectFilterFactory, 4> m_treeSearchFindlet;
+    TreeSearchFindlet<RecoTrack, SpacePoint, SpacePointMatcher, CKFCDCToSpacePointStateFilterFactory, 4> m_treeSearchFindlet;
     /// Findlet for resolving overlaps
     OverlapResolverFindlet<VXDTrackCombinationFilterFactory> m_overlapResolver;
     /// Findlet for tagging the used space points

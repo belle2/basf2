@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateObjectBasicVarSet.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateBasicVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
@@ -22,7 +22,7 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool CKFCDCToSpacePointStateObjectBasicVarSet::extract(const BaseCKFCDCToSpacePointStateObjectFilter::Object* result)
+bool CKFCDCToSpacePointStateBasicVarSet::extract(const BaseCKFCDCToSpacePointStateFilter::Object* result)
 {
   RecoTrack* cdcTrack = result->getSeedRecoTrack();
   const SpacePoint* spacePoint = result->getHit();

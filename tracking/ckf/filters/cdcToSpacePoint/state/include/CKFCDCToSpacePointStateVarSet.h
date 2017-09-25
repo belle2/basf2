@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 #include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
-#include <tracking/ckf/filters/cdcToSpacePoint/state/BaseCKFCDCToSpacePointStateObjectFilter.h>
+#include <tracking/ckf/filters/cdcToSpacePoint/state/BaseCKFCDCToSpacePointStateFilter.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
@@ -20,7 +20,7 @@
 namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
-  static char const* const ckfCDCToSpacePointStateObjectVarNames[] = {
+  static char const* const ckfCDCToSpacePointStateVarNames[] = {
     "seed_cdc_hits",
     "seed_svd_hits",
     "seed_lowest_svd_layer",
@@ -62,28 +62,28 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  class CKFCDCToSpacePointStateObjectVarNames : public TrackFindingCDC::VarNames<BaseCKFCDCToSpacePointStateObjectFilter::Object> {
+  class CKFCDCToSpacePointStateVarNames : public TrackFindingCDC::VarNames<BaseCKFCDCToSpacePointStateFilter::Object> {
 
   public:
     /// Number of variables to be generated.
-    static const size_t nVars = TrackFindingCDC::size(ckfCDCToSpacePointStateObjectVarNames);
+    static const size_t nVars = TrackFindingCDC::size(ckfCDCToSpacePointStateVarNames);
 
     /// Get the name of the column.
     constexpr
     static char const* getName(int iName)
     {
-      return ckfCDCToSpacePointStateObjectVarNames[iName];
+      return ckfCDCToSpacePointStateVarNames[iName];
     }
   };
 
   /**
    * Var set used in the VXD-CDC-Merger for calculating the probability of a VXD-CDC-track match.
    */
-  class CKFCDCToSpacePointStateObjectVarSet : public TrackFindingCDC::VarSet<CKFCDCToSpacePointStateObjectVarNames> {
+  class CKFCDCToSpacePointStateVarSet : public TrackFindingCDC::VarSet<CKFCDCToSpacePointStateVarNames> {
 
   public:
     /// Generate and assign the variables from the VXD-CDC object.
-    virtual bool extract(const BaseCKFCDCToSpacePointStateObjectFilter::Object* object) override;
+    virtual bool extract(const BaseCKFCDCToSpacePointStateFilter::Object* object) override;
 
   private:
     QualityEstimatorCircleFit m_qualityCircle;

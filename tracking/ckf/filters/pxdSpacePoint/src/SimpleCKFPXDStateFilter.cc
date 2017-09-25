@@ -22,7 +22,7 @@ constexpr const double SimpleCKFPXDStateFilter::m_param_maximumHelixDistanceXY[]
 constexpr const double SimpleCKFPXDStateFilter::m_param_maximumResidual[][3];
 constexpr const double SimpleCKFPXDStateFilter::m_param_maximumChi2[][3];
 
-Weight SimpleCKFPXDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState)
+Weight SimpleCKFPXDStateFilter::operator()(const BaseCKFCDCToSpacePointStateFilter::Object& currentState)
 {
   if (not checkOverlapAndHoles(currentState)) {
     return NAN;

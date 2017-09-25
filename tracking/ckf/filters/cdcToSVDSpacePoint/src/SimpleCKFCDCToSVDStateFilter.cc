@@ -23,7 +23,7 @@ constexpr const double SimpleCKFCDCToSVDStateFilter::m_param_maximumHelixDistanc
 constexpr const double SimpleCKFCDCToSVDStateFilter::m_param_maximumResidual[][3];
 constexpr const double SimpleCKFCDCToSVDStateFilter::m_param_maximumResidual2[][3];
 
-Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState)
+Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStateFilter::Object& currentState)
 {
   const auto* spacePoint = currentState.getHit();
 

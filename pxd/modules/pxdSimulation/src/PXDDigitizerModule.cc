@@ -75,7 +75,7 @@ PXDDigitizerModule::PXDDigitizerModule() :
   addParam("ElectronMaxSteps", m_elMaxSteps,
            "Maximum number of steps when propagating electrons", 200);
   addParam("Gq", m_gq, "Gq of a pixel in nA/electron", 0.6);
-  addParam("ADCUnit", m_ADCUnit, "Slope of the linear ADC transfer curve in nA/ADU", 70.0);
+  addParam("ADCUnit", m_ADCUnit, "Slope of the linear ADC transfer curve in nA/ADU", 130.0);
   addParam("PedestalMean", m_pedestalMean, "Mean of pedestals in ADU", 100.0);
   addParam("PedestalRMS", m_pedestalRMS, "RMS of pedestals in ADU", 30.0);
 

@@ -15,10 +15,10 @@ namespace Belle2 {
   class RecoTrack;
   class SpacePoint;
 
-  template <class ASeed, class AHitObject> class CKFStateObject;
+  template <class ASeed, class AHitObject> class CKFState;
   /**
    * Base filter for detector track combination filters.
    */
   using BaseCKFCDCToSpacePointStateObjectFilter =
-    TrackFindingCDC::Filter<CKFStateObject<RecoTrack, SpacePoint>>;
+    TrackFindingCDC::Filter<CKFState<RecoTrack, SpacePoint>>;
 }

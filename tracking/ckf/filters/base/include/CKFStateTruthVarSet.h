@@ -35,7 +35,7 @@ namespace Belle2 {
   /// Vehicle class to transport the variable names
   template<class ASeed, class AHitObject>
   class CKFStateTruthVarNames : public
-    TrackFindingCDC::VarNames<CKFStateObject<ASeed, AHitObject>> {
+    TrackFindingCDC::VarNames<CKFState<ASeed, AHitObject>> {
 
   public:
     /// Number of variables to be generated.
@@ -60,7 +60,7 @@ namespace Belle2 {
 
   public:
     /// Generate and assign the variables from the object.
-    virtual bool extract(const CKFStateObject<ASeed, AHitObject>* result) override
+    virtual bool extract(const CKFState<ASeed, AHitObject>* result) override
     {
       RecoTrack* seedTrack = result->getSeedRecoTrack();
 

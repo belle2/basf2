@@ -27,7 +27,7 @@ namespace Belle2 {
    * copying, we do not set the mSoP in the set function. It is only set in the advancing step and during initialization.
    */
   template<class ASeed, class AHitObject>
-  class CKFStateObject {
+  class CKFState {
   public:
     /// Copy the class of the seed track
     using SeedObject = ASeed;
@@ -37,18 +37,18 @@ namespace Belle2 {
     using ResultObject = CKFResult<SeedObject, HitObject>;
 
     /// Default constructor needed for STL containers
-    CKFStateObject() = default;
+    CKFState() = default;
     /// Move constructor needed for STL containers
-    CKFStateObject(CKFStateObject&&) = default;
+    CKFState(CKFState&&) = default;
     /// No copy constructor
-    CKFStateObject(const CKFStateObject&) = delete;
+    CKFState(const CKFState&) = delete;
     /// No copy constructor
-    CKFStateObject& operator=(const CKFStateObject&) = delete;
+    CKFState& operator=(const CKFState&) = delete;
 
     /**
      * Initialize the state as a root without a related space point (but with a reco track)
      */
-    CKFStateObject(SeedObject* seed, unsigned int number) :
+    CKFState(SeedObject* seed, unsigned int number) :
       m_seedRecoTrack(seed), m_number(number), m_maximumNumber(number)
     {
       setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0)));
@@ -61,7 +61,7 @@ namespace Belle2 {
      * as this is quite costly. This is only set in advancing and can not be accessed before (in all other cases the
      * parent's properties will be accessed).
      */
-    void set(CKFStateObject* parent, const HitObject* hitObject)
+    void set(CKFState* parent, const HitObject* hitObject)
     {
       m_parent = parent;
       m_seedRecoTrack = parent->getSeedRecoTrack();
@@ -85,7 +85,7 @@ namespace Belle2 {
     {
       std::vector<const HitObject*> hits;
 
-      const auto hitAdder = [&hits](const CKFStateObject * walkObject) {
+      const auto hitAdder = [&hits](const CKFState * walkObject) {
         const HitObject* hitObject = walkObject->getHit();
         if (hitObject) {
           hits.push_back(hitObject);
@@ -95,7 +95,7 @@ namespace Belle2 {
 
       double chi2 = 0;
 
-      const auto chi2Adder = [&chi2](const CKFStateObject * walkObject) {
+      const auto chi2Adder = [&chi2](const CKFState * walkObject) {
         if (walkObject->isFitted()) {
           chi2 += walkObject->getChi2();
         }
@@ -106,7 +106,7 @@ namespace Belle2 {
     }
 
     /// Return the parent state.
-    const CKFStateObject* getParent() const
+    const CKFState* getParent() const
     {
       return m_parent;
     }
@@ -140,7 +140,7 @@ namespace Belle2 {
     {
       unsigned int numberOfHoles = 0;
 
-      walk([&numberOfHoles](const CKFStateObject * walkObject) {
+      walk([&numberOfHoles](const CKFState * walkObject) {
         if (not walkObject->getHit()) {
           numberOfHoles++;
         }
@@ -175,7 +175,7 @@ namespace Belle2 {
     }
 
     /// States can be ordered by weight (used during overlap check).
-    bool operator<(const CKFStateObject& rhs) const
+    bool operator<(const CKFState& rhs) const
     {
       return getWeight() < rhs.getWeight();
     }
@@ -270,9 +270,9 @@ namespace Belle2 {
     }
 
     /// Helper function to call a function on this and all parent states until the root.
-    void walk(const std::function<void(const CKFStateObject*)> f) const
+    void walk(const std::function<void(const CKFState*)> f) const
     {
-      const CKFStateObject* walkObject = this;
+      const CKFState* walkObject = this;
 
       while (walkObject != nullptr) {
         f(walkObject);
@@ -290,7 +290,7 @@ namespace Belle2 {
     /// Where on the hierarchy the first state is located.
     unsigned int m_maximumNumber = 0;
     /// The parent state of this state
-    const CKFStateObject* m_parent = nullptr;
+    const CKFState* m_parent = nullptr;
     /// Chi2 of this special state with this hit and this reco track. Will only be set after fitting state.
     double m_chi2 = 0;
     /// Flag, if this state was already fitted.

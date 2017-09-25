@@ -23,7 +23,7 @@
 #include <tracking/ckf/findlets/base/OverlapResolverFindlet.h>
 #include <tracking/ckf/findlets/base/WireHitTagger.h>
 
-#include <tracking/ckf/states/CKFStateObject.h>
+#include <tracking/ckf/states/CKFState.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <cdc/dataobjects/CDCHit.h>

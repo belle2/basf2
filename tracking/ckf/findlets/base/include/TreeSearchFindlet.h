@@ -55,7 +55,7 @@ namespace Belle2 {
     /// The class of the hit
     using HitPtr = const AHitObject*;
     /// The class of the state
-    using StateObject = CKFStateObject<ASeed, AHitObject>;
+    using StateObject = CKFState<ASeed, AHitObject>;
     /// The returned objects after tree traversal.
     using ResultObject = CKFResult<ASeed, AHitObject>;
     /// Parent class

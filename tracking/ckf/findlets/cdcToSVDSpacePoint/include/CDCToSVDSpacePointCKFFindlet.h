@@ -21,7 +21,7 @@
 #include <tracking/ckf/findlets/base/OverlapResolverFindlet.h>
 #include <tracking/ckf/findlets/base/SpacePointTagger.h>
 
-#include <tracking/ckf/states/CKFStateObject.h>
+#include <tracking/ckf/states/CKFState.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePoint.h>

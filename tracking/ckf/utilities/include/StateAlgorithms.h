@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/states/CKFStateObject.h>
+#include <tracking/ckf/states/CKFState.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>

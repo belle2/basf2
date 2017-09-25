@@ -19,7 +19,7 @@
 namespace Belle2 {
   class SpacePoint;
   class RecoTrack;
-  template <class ASeed, class AHitObject> class CKFStateObject;
+  template <class ASeed, class AHitObject> class CKFState;
 
   namespace TrackFindingCDC {
     class CDCRLWireHit;
@@ -27,7 +27,7 @@ namespace Belle2 {
 
   /// Test a given state for correctness.
   template <class AHitObject>
-  bool isStateCorrect(const CKFStateObject<RecoTrack, AHitObject>& state)
+  bool isStateCorrect(const CKFState<RecoTrack, AHitObject>& state)
   {
     RecoTrack* seedTrack = state.getSeedRecoTrack();
     const auto* hit = state.getHit();
@@ -72,11 +72,11 @@ namespace Belle2 {
 
   /// Test this and all parent states for correctness
   template <class AHitObject>
-  bool allStatesCorrect(const CKFStateObject<RecoTrack, AHitObject>& state)
+  bool allStatesCorrect(const CKFState<RecoTrack, AHitObject>& state)
   {
     bool oneIsWrong = false;
 
-    const auto findFalseHit = [&oneIsWrong](const CKFStateObject<RecoTrack, AHitObject>* walkState) {
+    const auto findFalseHit = [&oneIsWrong](const CKFState<RecoTrack, AHitObject>* walkState) {
       if (oneIsWrong) {
         return;
       }

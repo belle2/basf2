@@ -16,12 +16,12 @@ namespace Belle2 {
    * Findlet for teaching a MC or recording filter, which states are correct (= setting the truth information)
    */
   template<class ASeed, class AHitObject>
-  class StateTeacher : public TrackFindingCDC::Findlet<CKFStateObject<ASeed, AHitObject>*> {
+  class StateTeacher : public TrackFindingCDC::Findlet<CKFState<ASeed, AHitObject>*> {
   public:
     /// The parent class
-    using Super = TrackFindingCDC::Findlet<CKFStateObject<ASeed, AHitObject>*>;
+    using Super = TrackFindingCDC::Findlet<CKFState<ASeed, AHitObject>*>;
     /// The state class
-    using State = CKFStateObject<ASeed, AHitObject>;
+    using State = CKFState<ASeed, AHitObject>;
 
     /// Expose the parameters of the filter
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override

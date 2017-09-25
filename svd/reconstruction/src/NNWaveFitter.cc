@@ -188,10 +188,10 @@ int NNWaveFitter::readNetworkData(const string& xmlFileName)
         for (const auto& con_tag : neuron_tag.second) {
           if (con_tag.first != "Con") continue;
           double weight = con_tag.second.get<double>("<xmlattr>.weight");
-          string sid = con_tag.second.get<string>("<xmlattr>.from");
-          size_t pos2 = stoi(sid.substr(sid.find('/') + 1, sid.size()));
+          string sid2 = con_tag.second.get<string>("<xmlattr>.from");
+          size_t pos2 = stoi(sid2.substr(sid2.find('/') + 1, sid2.size()));
           m_networkCoefs[layer].first(pos - 1, pos2 - 1) = weight;
-          B2DEBUG(400, "Reading connections " << sid << " weight: " << weight);
+          B2DEBUG(400, "Reading connections " << sid2 << " weight: " << weight);
         }
       }
     }

@@ -33,9 +33,9 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  template<class ASeedObject, class AHitObject>
+  template<class ASeed, class AHitObject>
   class CKFStateTruthVarNames : public
-    TrackFindingCDC::VarNames<CKFStateObject<ASeedObject, AHitObject>> {
+    TrackFindingCDC::VarNames<CKFStateObject<ASeed, AHitObject>> {
 
   public:
     /// Number of variables to be generated.
@@ -53,14 +53,14 @@ namespace Belle2 {
    * Var set used in the VXD-CDC-Merger for calculating the probability of a VXD-CDC-track match,
    * which knows the truth information if two tracks belong together or not.
    */
-  template<class ASeedObject, class AHitObject>
-  class CKFStateTruthVarSet : public TrackFindingCDC::VarSet<CKFStateTruthVarNames<ASeedObject, AHitObject>> {
+  template<class ASeed, class AHitObject>
+  class CKFStateTruthVarSet : public TrackFindingCDC::VarSet<CKFStateTruthVarNames<ASeed, AHitObject>> {
     /// The parent class
-    using Super = TrackFindingCDC::VarSet<CKFStateTruthVarNames<ASeedObject, AHitObject>>;
+    using Super = TrackFindingCDC::VarSet<CKFStateTruthVarNames<ASeed, AHitObject>>;
 
   public:
     /// Generate and assign the variables from the object.
-    virtual bool extract(const CKFStateObject<ASeedObject, AHitObject>* result) override
+    virtual bool extract(const CKFStateObject<ASeed, AHitObject>* result) override
     {
       RecoTrack* seedTrack = result->getSeedRecoTrack();
 

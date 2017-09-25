@@ -15,7 +15,7 @@ namespace Belle2 {
   class RecoTrack;
   class SpacePoint;
 
-  template <class ASeedObject, class AHitObject> class CKFResultObject;
+  template <class ASeed, class AHitObject> class CKFResultObject;
   /**
    * Base filter for detector track combination filters.
    */

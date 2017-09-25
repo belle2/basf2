@@ -44,20 +44,20 @@ namespace Belle2 {
    * In the end, the result object needs to return a copy of the objects, as the state objects
    * will be reused afterwards.
    */
-  template<class ASeedObject, class AHitObject, class AHitFinder, class AHitSelectorFilterFactory, unsigned int MaxNumber>
+  template<class ASeed, class AHitObject, class AHitFinder, class AHitSelectorFilterFactory, unsigned int MaxNumber>
   class TreeSearchFindlet : public TrackFindingCDC::Findlet <
-    ASeedObject*,
+    ASeed*,
     const AHitObject*,
-    CKFResultObject<ASeedObject, AHitObject >> {
+    CKFResultObject<ASeed, AHitObject >> {
   public:
     /// The class of the seed
-    using SeedPtr = ASeedObject*;
+    using SeedPtr = ASeed*;
     /// The class of the hit
     using HitPtr = const AHitObject*;
     /// The class of the state
-    using StateObject = CKFStateObject<ASeedObject, AHitObject>;
+    using StateObject = CKFStateObject<ASeed, AHitObject>;
     /// The returned objects after tree traversal.
-    using ResultObject = CKFResultObject<ASeedObject, AHitObject>;
+    using ResultObject = CKFResultObject<ASeed, AHitObject>;
     /// Parent class
     using Super = TrackFindingCDC::Findlet<SeedPtr, HitPtr, ResultObject>;
 
@@ -109,7 +109,7 @@ namespace Belle2 {
     HitSelector<AHitSelectorFilterFactory> m_hitSelector;
 
     /// Subfindlet state teacher
-    StateTeacher<ASeedObject, AHitObject> m_stateTeacher;
+    StateTeacher<ASeed, AHitObject> m_stateTeacher;
 
     /// Subfindlet: hit finder
     AHitFinder m_hitFinder;
@@ -121,8 +121,8 @@ namespace Belle2 {
     void traverseTree(StateObject* currentState, std::vector<ResultObject>& resultsVector);
   };
 
-  template<class ASeedObject, class AHitObject, class AHitFinder, class AHitSelectorFilterFactory, unsigned int MaxNumber>
-  void TreeSearchFindlet<ASeedObject, AHitObject, AHitFinder, AHitSelectorFilterFactory, MaxNumber>::traverseTree(
+  template<class ASeed, class AHitObject, class AHitFinder, class AHitSelectorFilterFactory, unsigned int MaxNumber>
+  void TreeSearchFindlet<ASeed, AHitObject, AHitFinder, AHitSelectorFilterFactory, MaxNumber>::traverseTree(
     StateObject* currentState,
     std::vector<ResultObject>& resultsVector)
   {

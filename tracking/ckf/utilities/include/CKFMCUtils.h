@@ -19,7 +19,7 @@
 namespace Belle2 {
   class SpacePoint;
   class RecoTrack;
-  template <class ASeedObject, class AHitObject> class CKFStateObject;
+  template <class ASeed, class AHitObject> class CKFStateObject;
 
   namespace TrackFindingCDC {
     class CDCRLWireHit;

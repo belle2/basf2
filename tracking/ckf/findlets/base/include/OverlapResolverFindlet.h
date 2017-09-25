@@ -41,9 +41,9 @@ namespace Belle2 {
   template<class AFilterFactory>
   class OverlapResolverFindlet : public TrackFindingCDC::Findlet<typename AFilterFactory::CreatedFilter::Object> {
     /// Copy the seed definition
-    using SeedObject = typename AFilterFactory::CreatedFilter::Object::SeedObject;
+    using Seed = typename AFilterFactory::CreatedFilter::Object::Seed;
     /// Copy the hit definition
-    using HitObject = typename AFilterFactory::CreatedFilter::Object::HitObject;
+    using Hit = typename AFilterFactory::CreatedFilter::Object::Hit;
 
   public:
     /// The pair of seed and hit vector to check
@@ -124,7 +124,7 @@ namespace Belle2 {
 
   private:
     /// Subfindlet for adding truth information before the overlap finder
-    OverlapTeacher<CKFResultTruthVarSet<SeedObject, HitObject>> m_overlapTeacher;
+    OverlapTeacher<CKFResultTruthVarSet<Seed, Hit>> m_overlapTeacher;
     /// Subfindlet: The quality filter
     TrackFindingCDC::ChooseableFilter<AFilterFactory> m_qualityFilter;
     /// Sub algorithm: the hopfield algorithm class

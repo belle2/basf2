@@ -29,9 +29,9 @@ namespace Belle2 {
 
   public:
     /// Copy seed definition
-    using SeedObject = ASeed;
+    using Seed = ASeed;
     /// Copy hit definition
-    using HitObject = AHit;
+    using Hit = AHit;
 
     /// Constructor
     CKFResult(ASeed* seed, const std::vector<const AHit*> hits, const genfit::MeasuredStateOnPlane& mSoP,

@@ -25,7 +25,7 @@ namespace Belle2 {
   class StateTransformer {
   public:
     /// The class of the hit
-    using HitPtr = const typename AState::HitObject*;
+    using HitPtr = const typename AState::Hit*;
 
     /// Use the hits and transform them into states, by reusing an internal cache of states
     template<class AHitArray>

@@ -34,16 +34,16 @@ namespace Belle2 {
 
     /// Calculate the layer this state is located on from a space point. (SFINAE)
     template<class AState>
-    unsigned int operator()(const AState& stateObject, EnableIfSpacePoint<AState>* = 0)
+    unsigned int operator()(const AState& state, EnableIfSpacePoint<AState>* = 0)
     {
-      return static_cast<unsigned int>((static_cast<double>(stateObject.getNumber()) / 2) + 1);
+      return static_cast<unsigned int>((static_cast<double>(state.getNumber()) / 2) + 1);
     }
 
     /// Calculate the layer this state is located on for wire hits. (SFINAE)
     template<class AState>
-    unsigned int operator()(const AState& stateObject, EnableIfCDCWireHit<AState>* = 0)
+    unsigned int operator()(const AState& state, EnableIfCDCWireHit<AState>* = 0)
     {
-      return 56 - stateObject.getNumber();
+      return 56 - state.getNumber();
     }
   };
 
@@ -54,14 +54,14 @@ namespace Belle2 {
 
     /// Check if this state should describe an overlap hit. (SFINAE)
     template<class AState>
-    bool operator()(const AState& stateObject, EnableIfSpacePoint<AState>* = 0)
+    bool operator()(const AState& state, EnableIfSpacePoint<AState>* = 0)
     {
-      return stateObject.getNumber() % 2 == 0;
+      return state.getNumber() % 2 == 0;
     }
 
     /// Check if this state should describe an overlap hit. Always false for CDC hits (SFINAE)
     template<class AState>
-    bool operator()(const AState& stateObject __attribute__((unused)), EnableIfCDCWireHit<AState>* = 0)
+    bool operator()(const AState& state __attribute__((unused)), EnableIfCDCWireHit<AState>* = 0)
     {
       return false;
     }

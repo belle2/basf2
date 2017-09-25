@@ -57,9 +57,9 @@ namespace Belle2 {
     /// The class of the state
     using State = CKFState<ASeed, AHit>;
     /// The returned objects after tree traversal.
-    using ResultObject = CKFResult<ASeed, AHit>;
+    using Result = CKFResult<ASeed, AHit>;
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<SeedPtr, HitPtr, ResultObject>;
+    using Super = TrackFindingCDC::Findlet<SeedPtr, HitPtr, Result>;
 
     /// Construct this findlet and add the subfindlet as listener
     TreeSearchFindlet() : Super()
@@ -84,7 +84,7 @@ namespace Belle2 {
      * only the states from the current state up to the first state (the one with number = N) are valid.
      */
     void apply(std::vector<SeedPtr>& seedsVector, std::vector<HitPtr>& hitVector,
-               std::vector<ResultObject>& results) override
+               std::vector<Result>& results) override
     {
       m_hitFinder.initializeEventCache(seedsVector, hitVector);
 
@@ -98,7 +98,7 @@ namespace Belle2 {
       }
 
       // Remove all empty results
-      const auto resultIsEmpty = [](const ResultObject & result) {
+      const auto resultIsEmpty = [](const Result & result) {
         return result.getHits().empty();
       };
       TrackFindingCDC::erase_remove_if(results, resultIsEmpty);
@@ -118,13 +118,13 @@ namespace Belle2 {
     StateTransformer<State, MaxNumber> m_stateTransformer;
 
     /// Implementation of the traverseTree function
-    void traverseTree(State* currentState, std::vector<ResultObject>& resultsVector);
+    void traverseTree(State* currentState, std::vector<Result>& resultsVector);
   };
 
   template<class ASeed, class AHit, class AHitFinder, class AHitSelectorFilterFactory, unsigned int MaxNumber>
   void TreeSearchFindlet<ASeed, AHit, AHitFinder, AHitSelectorFilterFactory, MaxNumber>::traverseTree(
     State* currentState,
-    std::vector<ResultObject>& resultsVector)
+    std::vector<Result>& resultsVector)
   {
     B2DEBUG(50, "Now on number " << currentState->getNumber());
 

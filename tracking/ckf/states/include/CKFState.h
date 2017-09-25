@@ -30,11 +30,11 @@ namespace Belle2 {
   class CKFState {
   public:
     /// Copy the class of the seed track
-    using SeedObject = ASeed;
+    using Seed = ASeed;
     /// Copy the class of the hits
-    using HitObject = AHit;
+    using Hit = AHit;
     /// The class of the object returned by finalize()
-    using ResultObject = CKFResult<SeedObject, HitObject>;
+    using Result = CKFResult<Seed, Hit>;
 
     /// Default constructor needed for STL containers
     CKFState() = default;
@@ -48,7 +48,7 @@ namespace Belle2 {
     /**
      * Initialize the state as a root without a related space point (but with a reco track)
      */
-    CKFState(SeedObject* seed, unsigned int number) :
+    CKFState(Seed* seed, unsigned int number) :
       m_seedRecoTrack(seed), m_number(number), m_maximumNumber(number)
     {
       setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0)));
@@ -61,12 +61,12 @@ namespace Belle2 {
      * as this is quite costly. This is only set in advancing and can not be accessed before (in all other cases the
      * parent's properties will be accessed).
      */
-    void set(CKFState* parent, const HitObject* hitObject)
+    void set(CKFState* parent, const Hit* hit)
     {
       m_parent = parent;
       m_seedRecoTrack = parent->getSeedRecoTrack();
       m_number = parent->getNumber() - 1;
-      m_hitObject = hitObject;
+      m_hit = hit;
       m_maximumNumber = parent->getMaximumNumber();
 
       // Reset other state
@@ -81,14 +81,14 @@ namespace Belle2 {
      * Create a storable result object out of this state with all its parents
      * (more or less a vector of the space points together with the chi2 of the whole track).
      */
-    ResultObject finalize() const
+    Result finalize() const
     {
-      std::vector<const HitObject*> hits;
+      std::vector<const Hit*> hits;
 
       const auto hitAdder = [&hits](const CKFState * walkObject) {
-        const HitObject* hitObject = walkObject->getHit();
-        if (hitObject) {
-          hits.push_back(hitObject);
+        const Hit* hit = walkObject->getHit();
+        if (hit) {
+          hits.push_back(hit);
         }
       };
       walk(hitAdder);
@@ -102,7 +102,7 @@ namespace Belle2 {
       };
       walk(chi2Adder);
 
-      return ResultObject(getSeedRecoTrack(), hits, getMeasuredStateOnPlane(), chi2);
+      return Result(getSeedRecoTrack(), hits, getMeasuredStateOnPlane(), chi2);
     }
 
     /// Return the parent state.
@@ -112,15 +112,15 @@ namespace Belle2 {
     }
 
     /// Return the track this state is related to.
-    SeedObject* getSeedRecoTrack() const
+    Seed* getSeedRecoTrack() const
     {
       return m_seedRecoTrack;
     }
 
     /// Return the SP this state is related to. May be nullptr.
-    const HitObject* getHit() const
+    const Hit* getHit() const
     {
-      return m_hitObject;
+      return m_hit;
     }
 
     /// Return the number ( ~ layer * 2)
@@ -282,9 +282,9 @@ namespace Belle2 {
 
   private:
     /// The seed reco track this state is related with.
-    SeedObject* m_seedRecoTrack = nullptr;
+    Seed* m_seedRecoTrack = nullptr;
     /// The hit object this state is attached to
-    const HitObject* m_hitObject = nullptr;
+    const Hit* m_hit = nullptr;
     /// Where on the hierarchy this state is located.
     unsigned int m_number = 0;
     /// Where on the hierarchy the first state is located.

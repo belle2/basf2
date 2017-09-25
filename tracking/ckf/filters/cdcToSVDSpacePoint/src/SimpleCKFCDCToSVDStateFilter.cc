@@ -42,7 +42,6 @@ namespace {
 constexpr const double SimpleCKFCDCToSVDStateFilter::m_param_maximumHelixDistance[][3];
 constexpr const double SimpleCKFCDCToSVDStateFilter::m_param_maximumResidual[][3];
 constexpr const double SimpleCKFCDCToSVDStateFilter::m_param_maximumResidual2[][3];
-constexpr const double SimpleCKFCDCToSVDStateFilter::m_param_maximumChi2[][3];
 
 Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStateObjectFilter::Object& currentState)
 {
@@ -97,11 +96,7 @@ Weight SimpleCKFCDCToSVDStateFilter::operator()(const BaseCKFCDCToSpacePointStat
     } else {
       maximumValues = &m_param_maximumResidual;
     }
-  }/* else {
-    // Filter 3
-    valueToCheck = currentState.getChi2();
-    maximumValues = &m_param_maximumChi2;
-  }*/
+  }
 
   if (valueToCheck > (*maximumValues)[layer - 3][getPTRange(momentum)]) {
     return NAN;

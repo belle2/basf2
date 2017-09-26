@@ -93,6 +93,7 @@ namespace Belle2 {
         return cov.template block<M, M>(I, I);
       }
 
+      /// Convert precision matrix to covariance matrix - allows for reduced rank
       template <int N>
       static CovarianceMatrix<N> fromPrecision(const PrecisionMatrix<N>& prec)
       {
@@ -101,6 +102,7 @@ namespace Belle2 {
         return cov;
       }
 
+      /// Convert covariance matrix to precision matrix - allows for reduced rank
       template <int N>
       static PrecisionMatrix<N> toPrecision(const CovarianceMatrix<N>& cov)
       {
@@ -109,6 +111,7 @@ namespace Belle2 {
         return prec;
       }
 
+      /// Convert covariance matrix to precision matrix - assumes full rank
       template <int N>
       static CovarianceMatrix<N> fromFullPrecision(const PrecisionMatrix<N>& prec)
       {
@@ -117,6 +120,7 @@ namespace Belle2 {
         return cov;
       }
 
+      /// Convert precision matrix to covariance matrix - assumes full rank
       template <int N>
       static PrecisionMatrix<N> fullToPrecision(const CovarianceMatrix<N>& cov)
       {

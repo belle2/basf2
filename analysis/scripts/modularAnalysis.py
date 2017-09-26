@@ -771,6 +771,8 @@ def reconstructDecay(
     @param candidate_limit Maximum amount of candidates to be reconstructed. If
                        the number of candidates is exceeded a Warning will be
                        printed.
+                       By default, all these candidates will be removed and event will be ignored.
+                       This behaviour can be changed by \'ignoreIfTooManyCandidates\' flag.
                        If no value is given the amount is limited to a sensible
                        default. A value <=0 will disable this limit and can
                        cause huge memory amounts so be careful.

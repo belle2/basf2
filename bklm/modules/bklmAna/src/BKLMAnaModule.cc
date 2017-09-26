@@ -63,6 +63,7 @@ void BKLMAnaModule::initialize()
   m_file = new TFile(m_filename.c_str(), "RECREATE");
 
   m_extTree = new TTree("exthit", "ext hit");
+  m_extTree->Branch("run", &m_run, "m_run/I");
   m_extTree->Branch("nExtHit", &m_nExtHit, "m_nExtHit/I");
   m_extTree->Branch("x", &m_extx, "m_extx[m_nExtHit]/F");
   m_extTree->Branch("y", &m_exty, "m_exty[m_nExtHit]/F");
@@ -139,7 +140,7 @@ void BKLMAnaModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
   //unsigned long eventNumber = eventMetaData->getEvent();
-  //unsigned long runNumber = eventMetaData->getRun();
+  unsigned long runNumber = eventMetaData->getRun();
   //unsigned long expNumber = eventMetaData->getExperiment();
   //---------------------------------------------
   // Get BKLM hits collection from the data store
@@ -171,6 +172,7 @@ void BKLMAnaModule::event()
     nExtHit++;
     if (nExtHit > 199) break;
   }
+  m_run = runNumber;
   m_nExtHit = nExtHit;
 
 //the second way, require muid
@@ -216,8 +218,10 @@ void BKLMAnaModule::event()
       m_totalTrkThephi[layer - 1]->Fill(trkphi, trktheta);
       m_totalMom->Fill(mom);
       //look for mateched BKLM2dHit
-      for (unsigned int mHit = 0; mHit < relatedHit2D.size(); mHit++) {
-        BKLMHit2d* hit = relatedHit2D[mHit];
+      //for (unsigned int mHit = 0; mHit < relatedHit2D.size(); mHit++) {
+      // BKLMHit2d* hit = relatedHit2D[mHit];
+      for (int mHit = 0; mHit < hits2D.getEntries(); mHit++) {
+        BKLMHit2d* hit = hits2D[mHit];
         //if(!hit->inRPC()) continue;
         if (hit->isForward() != isForward) continue;
         if (hit->getSector() != sector) continue;
@@ -227,14 +231,16 @@ void BKLMAnaModule::event()
         //on same track, same sector, same layer, we should believe extHit and BKLMHit2d are matched.
         //let's record the distance to check, should be small
         m_hdistance->Fill(distance.Mag());
-        matched = true;
+        if (distance.Mag() < 20) matched = true;
         //m_pointUsed.insert(m);
+        if (matched) break;
+      }
+      if (matched) {
         m_passYX->Fill(extVec[0], extVec[1]);
         m_passYZ->Fill(extVec[2], extVec[1]);
         m_passTrkThephi[layer - 1]->Fill(trkphi, trktheta);
         m_passThephi[layer - 1]->Fill(phi, theta);
         m_passMom->Fill(mom);
-        if (matched) break;
       }
     }//end of loop ext hit
   }//end of loop tracks

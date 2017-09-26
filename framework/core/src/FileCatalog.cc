@@ -159,7 +159,7 @@ bool FileCatalog::getMetaData(std::string& fileName, FileMetaData& metaData)
   if (m_fileName.empty()) return false;
 
   // get lock for read access to file catalog
-  FileSystem::Lock lock(m_fileName);
+  FileSystem::Lock lock(m_fileName, true);
   if (!lock.lock()) {
     B2ERROR("Locking of file catalog " << m_fileName << " failed.");
     return false;

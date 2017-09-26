@@ -10,6 +10,7 @@ import pickle
 import sys
 import os
 import glob
+import hashlib
 
 
 def get_background_files():
@@ -35,10 +36,14 @@ def get_background_files():
         assert False
 
     if len(bg) == 0:
-        print("No background files found in folder {} Terminating this script.".format(bg_folder))
+        print("No background files found in folder {} . Terminating this script.".format(bg_folder))
         assert False
 
     print("Background files loaded from folder {}".format(bg_folder))
+
+    print("{: >65} {: >65} ".format("- Background file name -", "- sha256 -"))
+    for f in bg:
+        print("{: >65} {: >65} ".format(f, hashlib.sha256(open(f, 'rb').read()).hexdigest()))
 
     return bg
 

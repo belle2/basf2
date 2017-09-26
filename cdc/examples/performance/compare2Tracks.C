@@ -169,17 +169,7 @@ void compare2Tracks(){
 
     Phi01 *=180/pi;
     Phi02 *=180/pi;
-    /** convert signg of D0*/
-    /*    double a = fabs(D01)*D02/fabs(D02);
-    D01=a;
-    double b = fabs(tanLambda1)*tanLambda2/fabs(tanLambda2);
-    tanLambda1=b;
-    */
-    //    if(D01>2.5  || D02>2.5) continue;
-    //if(abs(Z01)>10  || abs(Z02)>10  ) continue;
-    //    if(abs(abs(Z01)-abs(Z02))>0.5) continue;
 
-    //    if(D01*D02 <0) continue;
     hNDF1->Fill(ndf1);   hPval1->Fill(Pval1); hPhi01->Fill(Phi01);  hD01->Fill(D01); hZ01->Fill(Z01); htanLambda1->Fill(tanLambda1); hOmega1->Fill(Omega1); hPt1->Fill(Mom1->Perp());
     hNDF2->Fill(ndf2);   hPval2->Fill(Pval2); hPhi02->Fill(Phi02);  hD02->Fill(D02); hZ02->Fill(Z02); htanLambda2->Fill(tanLambda2); hOmega2->Fill(Omega2); hPt2->Fill(Mom2->Perp());
 
@@ -223,7 +213,7 @@ void compare2Tracks(){
     }
 
     // cut at both d0 and z0 dependence for other dependence
-    if(Z0m>-10 && Z0m < 10 &&  fabs(D0m) < 5){
+    if(Z0m>-5 && Z0m < 15 &&  fabs(D0m) < 3 && fabs(tanLm)<0.45){
       //if(fabs(Z0m)<3 && fabs(tanLm) < 0.5 &&  fabs(D0m) < 1 && fabs(Phi0m+90)<40){
       hdD0->Fill(dD0);
       hdZ0->Fill(dZ0);

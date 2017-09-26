@@ -28,6 +28,8 @@ namespace Belle2 {
     std::string m_tsHitCollectionName;
     /** switch for back-to-back condition */
     bool m_backToBack;
+    /** switch for turning off the ECL part */
+    bool m_skipECL;
 
   };
 

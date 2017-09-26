@@ -38,7 +38,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
     # Material effects for all track extrapolations
     if trigger_mode in ["all", "hlt"] and 'SetupGenfitExtrapolation' not in path:
-        path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
+        path.add_module('SetupGenfitExtrapolation',
+                        energyLossBrems=False, noiseBrems=False)
 
     if mcTrackFinding:
         # Always add the MC finder in all trigger modes.
@@ -50,7 +51,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                           use_second_cdc_hits=use_second_cdc_hits)
 
     if trigger_mode in ["hlt", "all"]:
-        add_mc_matcher(path, components=components, reco_tracks=reco_tracks, use_second_cdc_hits=use_second_cdc_hits)
+        add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
+                       use_second_cdc_hits=use_second_cdc_hits)
 
         if fit_tracks:
             add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
@@ -96,7 +98,8 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
 
     # Material effects for all track extrapolations
     if 'SetupGenfitExtrapolation' not in path:
-        path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
+        path.add_module('SetupGenfitExtrapolation',
+                        energyLossBrems=False, noiseBrems=False)
 
     cosmics_setup.set_cdc_cr_parameters(data_taking_period)
 
@@ -134,7 +137,8 @@ def add_geometry_modules(path, components=None):
 
     # Material effects for all track extrapolations
     if 'SetupGenfitExtrapolation' not in path:
-        path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
+        path.add_module('SetupGenfitExtrapolation',
+                        energyLossBrems=False, noiseBrems=False)
 
 
 def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use_second_cdc_hits=False):
@@ -166,9 +170,11 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, ad
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     """
     # Correct time seed
-    path.add_module("IPTrackTimeEstimator", recoTracksStoreArrayName=reco_tracks, useFittedInformation=False)
+    path.add_module("IPTrackTimeEstimator",
+                    recoTracksStoreArrayName=reco_tracks, useFittedInformation=False)
     # track fitting
-    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks).set_name("Combined_DAFRecoFitter")
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks).set_name(
+        "Combined_DAFRecoFitter")
     # create Belle2 Tracks from the genfit Tracks
     path.add_module('TrackCreator', defaultPDGCode=211, recoTrackColName=reco_tracks,
                     additionalPDGCodes=[13, 321, 2212] if additionalTrackFitHypotheses is None else additionalTrackFitHypotheses)
@@ -266,29 +272,36 @@ def add_cdc_cr_track_fit_and_track_creator(path, components=None,
 
     # Prune genfit tracks
     if prune_tracks:
-        add_prune_tracks(path=path, components=components, reco_tracks=reco_tracks)
+        add_prune_tracks(path=path, components=components,
+                         reco_tracks=reco_tracks)
 
 
-def add_mc_matcher(path, components=None, reco_tracks="RecoTracks", use_second_cdc_hits=False):
+def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
+                   reco_tracks="RecoTracks", use_second_cdc_hits=False,
+                   split_after_delta_t=-1.0):
     """
     Match the tracks to the MC truth. The matching works based on
     the output of the TrackFinderMCTruthRecoTracks.
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
+    :param mc_reco_tracks: Name of the StoreArray where the mc reco tracks will be stored
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
+    :param split_after_delta_t: If positive, split MCRecoTrack into multiple MCRecoTracks if the time
+                                distance between two adjecent SimHits is more than the given value
     """
     path.add_module('TrackFinderMCTruthRecoTracks',
-                    RecoTracksStoreArrayName='MCRecoTracks',
+                    RecoTracksStoreArrayName=mc_reco_tracks,
                     WhichParticles=[],
                     UseSecondCDCHits=use_second_cdc_hits,
                     UsePXDHits=is_pxd_used(components),
                     UseSVDHits=is_svd_used(components),
-                    UseCDCHits=is_cdc_used(components))
+                    UseCDCHits=is_cdc_used(components),
+                    SplitAfterDeltaT=split_after_delta_t)
 
     path.add_module('MCRecoTracksMatcher',
-                    mcRecoTracksStoreArrayName='MCRecoTracks',
+                    mcRecoTracksStoreArrayName=mc_reco_tracks,
                     prRecoTracksStoreArrayName=reco_tracks,
                     UsePXDHits=is_pxd_used(components),
                     UseSVDHits=is_svd_used(components),
@@ -351,16 +364,19 @@ def add_track_finding(
 
     # CDC track finder
     if use_cdc and trigger_mode in ["fast_reco", "all"]:
-        add_cdc_track_finding(path, reco_tracks=cdc_reco_tracks, use_second_hits=use_second_cdc_hits)
+        add_cdc_track_finding(path, reco_tracks=cdc_reco_tracks,
+                              use_second_hits=use_second_cdc_hits)
 
     # VXD track finder
     if use_svd and trigger_mode in ["hlt", "all"]:
         if use_vxdtf2:
             # version 2 of the track finder
-            add_vxd_track_finding_vxdtf2(path, components=components, reco_tracks=vxd_reco_tracks)
+            add_vxd_track_finding_vxdtf2(
+                path, components=components, reco_tracks=vxd_reco_tracks)
         else:
             # version 1 of the track finder
-            add_vxd_track_finding(path, components=components, reco_tracks=vxd_reco_tracks)
+            add_vxd_track_finding(
+                path, components=components, reco_tracks=vxd_reco_tracks)
 
         # track merging
         if use_svd and use_cdc:
@@ -375,8 +391,10 @@ def add_track_finding(
 
             # Prune the temporary products if requested
             if prune_temporary_tracks:
-                path.add_module('PruneRecoTracks', storeArrayName=cdc_reco_tracks)
-                path.add_module('PruneRecoTracks', storeArrayName=vxd_reco_tracks)
+                path.add_module('PruneRecoTracks',
+                                storeArrayName=cdc_reco_tracks)
+                path.add_module('PruneRecoTracks',
+                                storeArrayName=vxd_reco_tracks)
 
 
 def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_second_cdc_hits=False):
@@ -571,7 +589,7 @@ def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0
                     RecoTracksStoreArrayName=reco_tracks)
 
 
-def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None, suffix=""):
+def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix=""):
     """
     Convenience function for adding all vxd track finder modules
     to the path. This is for version1 of the trackfinder
@@ -591,7 +609,10 @@ def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None, suffi
     # add a suffix to be able to have different
     vxd_trackcands = '__VXDGFTrackCands' + suffix
 
-    vxd_trackfinder = path.add_module('VXDTF', GFTrackCandidatesColName=vxd_trackcands)
+    vxd_trackfinder = path.add_module('VXDTF',
+                                      GFTrackCandidatesColName=vxd_trackcands)
+    vxd_trackfinder.param('svdClustersName', svd_clusters)
+
     # WARNING: workaround for possible clashes between fitting and VXDTF
     # stays until the redesign of the VXDTF is finished.
     vxd_trackfinder.param('TESTERexpandedTestingRoutines', False)
@@ -611,11 +632,11 @@ def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None, suffi
         vxd_trackfinder.param('tuneCutoffs', 0.06)
 
     # Convert VXD trackcands to reco tracks
-    path.add_module("RecoTrackCreator", trackCandidatesStoreArrayName=vxd_trackcands,
+    path.add_module("RecoTrackCreator", svdHitsStoreArrayName=svd_clusters, trackCandidatesStoreArrayName=vxd_trackcands,
                     recoTracksStoreArrayName=reco_tracks, recreateSortingParameters=True)
 
 
-def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None, suffix="",
+def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
                                  sectormap_file=None):
     """
     Convenience function for adding all vxd track finder Version 2 modules
@@ -656,26 +677,30 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     #################
     nameSPs = 'SpacePoints' + suffix
 
-    if 'SpacePointCreatorPXD' not in path:
+    if 'PXDSpacePointCreator' not in path:
         if use_pxd:
-            spCreatorPXD = register_module('SpacePointCreatorPXD')
+            spCreatorPXD = register_module('PXDSpacePointCreator')
             spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
             spCreatorPXD.param('SpacePoints', nameSPs)
             path.add_module(spCreatorPXD)
 
-    if 'SpacePointCreatorSVD' not in path:
+    if 'SVDSpacePointCreator' not in path:
         # always use svd!
-        spCreatorSVD = register_module('SpacePointCreatorSVD')
+        spCreatorSVD = register_module('SVDSpacePointCreator')
         spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
         spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
         spCreatorSVD.param('SpacePoints', nameSPs)
+        spCreatorSVD.param('SVDClusters', svd_clusters)
         path.add_module(spCreatorSVD)
 
     # SecMap Bootstrap
     secMapBootStrap = register_module('SectorMapBootstrap')
-    secMapBootStrap.param('ReadSectorMap', sectormap_file is not None)  # read from file
-    secMapBootStrap.param('ReadSecMapFromDB', sectormap_file is None)  # this will override ReadSectorMap
-    secMapBootStrap.param('SectorMapsInputFile', sectormap_file or db_sec_map_file)
+    secMapBootStrap.param(
+        'ReadSectorMap', sectormap_file is not None)  # read from file
+    # this will override ReadSectorMap
+    secMapBootStrap.param('ReadSecMapFromDB', sectormap_file is None)
+    secMapBootStrap.param('SectorMapsInputFile',
+                          sectormap_file or db_sec_map_file)
     secMapBootStrap.param('SetupToRead', setup_name)
     secMapBootStrap.param('WriteSectorMap', False)
     path.add_module(secMapBootStrap)
@@ -733,7 +758,8 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     # Properties
     vIPRemover = register_module('SPTCvirtualIPRemover')
     vIPRemover.param('tcArrayName', nameSPTCs)
-    vIPRemover.param('maxTCLengthForVIPKeeping', 0)  # want to remove virtualIP for any track length
+    # want to remove virtualIP for any track length
+    vIPRemover.param('maxTCLengthForVIPKeeping', 0)
     path.add_module(vIPRemover)
 
     #################
@@ -745,6 +771,7 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
         overlapResolver = register_module('SVDOverlapResolver')
         overlapResolver.param('NameSpacePointTrackCands', nameSPTCs)
         overlapResolver.param('ResolveMethod', overlap_filter.lower())
+        overlapResolver.param('NameSVDClusters', svd_clusters)
         path.add_module(overlapResolver)
     #################
     # VXDTF2 Step 5
@@ -757,6 +784,8 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     converter = register_module('SPTC2RTConverter')
     converter.param('recoTracksStoreArrayName', reco_tracks)
     converter.param('spacePointsTCsStoreArrayName', nameSPTCs)
+    converter.param('svdClustersName', svd_clusters)
+    converter.param('svdHitsStoreArrayName', svd_clusters)
     path.add_module(converter)
 
 
@@ -775,7 +804,7 @@ def is_cdc_used(components):
     return components is None or 'CDC' in components
 
 
-def add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2=False):
+def add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2=False, svd_cluster='__ROIsvdClusters'):
     """
     This function adds the standard reconstruction modules for tracking to be used for the simulation of PXD data reduction
     to a path.
@@ -791,17 +820,21 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2=Fa
     # Material effects
     if 'SetupGenfitExtrapolation' not in path:
         material_effects = register_module('SetupGenfitExtrapolation')
-        material_effects.set_name('SetupGenfitExtrapolationForPXDDataReduction')
+        material_effects.set_name(
+            'SetupGenfitExtrapolationForPXDDataReduction')
         path.add_module(material_effects)
 
     # SET StoreArray names
+
     svd_reco_tracks = "__ROIsvdRecoTracks"
 
     # SVD ONLY TRACK FINDING
     if(use_vxdtf2):
-        add_vxd_track_finding_vxdtf2(path, components=['SVD'], reco_tracks=svd_reco_tracks, suffix="__ROI")
+        add_vxd_track_finding_vxdtf2(path, components=['SVD'], reco_tracks=svd_reco_tracks, suffix="__ROI",
+                                     svd_clusters=svd_cluster)
     else:
-        add_vxd_track_finding(path, components=['SVD'], reco_tracks=svd_reco_tracks, suffix="__ROI")
+        add_vxd_track_finding(path, components=['SVD'], reco_tracks=svd_reco_tracks, suffix="__ROI",
+                              svd_clusters=svd_cluster)
 
     # TRACK FITTING
 
@@ -809,4 +842,5 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2=Fa
     dafRecoFitter = register_module("DAFRecoFitter")
     dafRecoFitter.set_name("SVD-only DAFRecoFitter")
     dafRecoFitter.param('recoTracksStoreArrayName', svd_reco_tracks)
+    dafRecoFitter.param('svdHitsStoreArrayName', svd_cluster)
     path.add_module(dafRecoFitter)

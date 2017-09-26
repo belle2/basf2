@@ -78,50 +78,50 @@ SetupGenfitExtrapolationModule::SetupGenfitExtrapolationModule() :
                  " genfit in order to integrate it into basf2 logging system. Also sets up update of VXDAlignment from DB (temporary).");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("ignoreIfPresent", m_ignoreIfPresent,
+           "If true this module will silently ignore if the geometry is already "
+           "present and do nothing in that case. If false a B2FATAL will be "
+           "if the geometry was already created before", m_ignoreIfPresent);
+
   //input
   addParam("whichGeometry", m_geometry,
-           "Which geometry should be used, either 'TGeo' or 'Geant4'", std::string("Geant4"));
+           "Which geometry should be used, either 'TGeo' or 'Geant4'", m_geometry);
 
   // Energy loss, multiple scattering configuration.
   addParam("energyLossBetheBloch", m_energyLossBetheBloch,
-           "activate the material effect: EnergyLossBetheBloch", true);
+           "activate the material effect: EnergyLossBetheBloch", m_energyLossBetheBloch);
   addParam("noiseBetheBloch", m_noiseBetheBloch,
-           "activate the material effect: NoiseBetheBloch", true);
+           "activate the material effect: NoiseBetheBloch", m_noiseBetheBloch);
   addParam("noiseCoulomb", m_noiseCoulomb,
-           "activate the material effect: NoiseCoulomb", true);
+           "activate the material effect: NoiseCoulomb", m_noiseCoulomb);
   addParam("energyLossBrems", m_energyLossBrems,
-           "activate the material effect: EnergyLossBrems", true);
+           "activate the material effect: EnergyLossBrems", m_energyLossBrems);
   addParam("noiseBrems", m_noiseBrems,
-           "activate the material effect: NoiseBrems", true);
+           "activate the material effect: NoiseBrems", m_noiseBrems);
   addParam("noEffects", m_noEffects,
            "switch off all material effects in Genfit. This overwrites all "
-           "individual material effects switches", false);
+           "individual material effects switches", m_noEffects);
   addParam("MSCModel", m_mscModel,
-           "Multiple scattering model", std::string("Highland"));
+           "Multiple scattering model", m_mscModel);
   addParam("useVXDAlignment", m_useVXDAlignment,
-           "Use VXD alignment from database?", bool(true));
-}
-
-SetupGenfitExtrapolationModule::~SetupGenfitExtrapolationModule()
-{
+           "Use VXD alignment from database?", m_useVXDAlignment);
 }
 
 void SetupGenfitExtrapolationModule::initialize()
 {
+  if (genfit::FieldManager::getInstance()->isInitialized() or genfit::MaterialEffects::getInstance()->isInitialized()) {
+    if (m_ignoreIfPresent) {
+      B2DEBUG(50, "Magnetic field or material handling already initialized.  Not touching settings.");
+      return;
+    } else {
+      B2FATAL("Magnetic field or material handling already initialized.  Not touching settings.");
+    }
+  }
+
   setupGenfitStreams();
 
-  //pass the magnetic field to genfit
-  if (genfit::FieldManager::getInstance()->isInitialized()) {
-    B2ERROR("Magnetic field handling already initialized.  Not touching settings.");
-  } else {
-    genfit::FieldManager::getInstance()->init(new GFGeant4Field());
-    genfit::FieldManager::getInstance()->useCache();
-  }
-
-  if (genfit::MaterialEffects::getInstance()->isInitialized()) {
-    B2ERROR("Material handling already initialized.  Not touching settings.");
-    return;
-  }
+  genfit::FieldManager::getInstance()->init(new GFGeant4Field());
+  genfit::FieldManager::getInstance()->useCache();
 
   if (!geometry::GeometryManager::getInstance().getTopVolume()) {
     B2FATAL("No geometry set up so far. Load the geometry module.");
@@ -152,20 +152,3 @@ void SetupGenfitExtrapolationModule::initialize()
     genfit::MaterialEffects::getInstance()->setMscModel(m_mscModel);
   }
 }
-
-void SetupGenfitExtrapolationModule::beginRun()
-{
-}
-
-void SetupGenfitExtrapolationModule::event()
-{
-}
-
-void SetupGenfitExtrapolationModule::endRun()
-{
-}
-
-void SetupGenfitExtrapolationModule::terminate()
-{
-}
-

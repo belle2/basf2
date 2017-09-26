@@ -1,5 +1,6 @@
 from basf2 import *
 from ROOT import Belle2
+import ROOT
 from tracking import add_cdc_cr_track_finding
 from tracking import add_cdc_track_finding
 from tracking import add_cdc_cr_track_fit_and_track_creator
@@ -15,7 +16,7 @@ run_range = {'201607': [787, 833],
              '201609': [966, 973],
              '201702': [1601, 9999],
              'gcr2017': [3058, 100000],
-             'noamal': [-1, -1]
+             'normal': [-1, -1]
              }
 # Size of trigger counter.
 triggerSize = {'201607': [20.0, 6.0, 10.0],
@@ -72,6 +73,7 @@ triggerPos = []
 normTriggerPlaneDirection = []
 readOutPos = []
 globalPhi = 0.0
+cosmics_period = None
 
 
 def set_cdc_cr_parameters(period):
@@ -82,6 +84,7 @@ def set_cdc_cr_parameters(period):
     global normTriggerPlaneDirection
     global readOutPos
     global globalPhi
+    global cosmics_period
 
     lengthOfCounter = triggerSize[period][0]
     widthOfCounter = triggerSize[period][1]
@@ -89,6 +92,7 @@ def set_cdc_cr_parameters(period):
     normTriggerPlaneDirection = triggerPlaneDirection[period]
     readOutPos = pmtPosition[period]
     globalPhi = globalPhiRotation[period]
+    cosmics_period = period
 
 
 def add_cdc_cr_simulation(path, empty_path, topInCounter=True):
@@ -203,33 +207,50 @@ def add_cdc_cr_reconstruction(path, eventTimingExtraction=True,
                     )
 
 
-def getExpNumber(fname):
+def getExpRunNumber(fname):
     """
-    Get expperimental number from file name.
+    Get expperimental number and run number from file name.
     """
-    exp = int((fname.split('/')[-1]).split('.')[2])
-    return exp
+    f = ROOT.TFile(fname)
+    t = f.Get('tree')
+    t.GetEntry(0)
+    e = t.EventMetaData
+    exp = e.getExperiment()
+    run = e.getRun()
+    f.Close()
+    return [exp, run]
 
 
 def getRunNumber(fname):
     """
     Get run number from file name.
     """
-    run = int(((fname.split('/')[-1]).split('.')[3]).split('_')[0])
+    f = ROOT.TFile(fname)
+    t = f.Get('tree')
+    t.GetEntry(0)
+    e = t.EventMetaData
+    run = e.getRun()
+    f.Close()
     return run
 
 
-def getDataPeriod(run):
+def getDataPeriod(exp=0, run=0):
     """
     Get data period from run number
     It should be replaced the argument from run to (exp, run)!
     """
     period = None
+
+    if exp is 1:  # GCR2017
+        return 'gcr2017'
+
+    # Pre global cosmics until March 2017
     global run_range
 
     for key in run_range:
         if run_range[key][0] <= run <= run_range[key][1]:
             period = key
+            print("Data period : " + key)
             break
 
     if period is None:
@@ -242,3 +263,13 @@ def getDataPeriod(run):
 def getPhiRotation():
     global globalPhi
     return(globalPhi)
+
+
+def getMapperAngle(exp=1, run=3118):
+    if exp == 1:
+        if run < 3883:
+            return 16.7
+        else:
+            return 43.3
+    else:
+        return None

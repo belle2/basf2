@@ -24,6 +24,8 @@
 #include <Eigen/QR>
 
 #include <type_traits>
+#include <cmath>
+#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -152,6 +154,39 @@ namespace Belle2 {
       }
 
       /**
+       *  Averages two parameter vectors, one being from a projected space,
+       *  taking into account their respective covariances and the ambiguity
+       *  of the projection to the actual state
+       *
+       *  @param      par1        First parameters
+       *  @param      cov1        Covariance matrix to the first parameters
+       *  @param      ambiguity1  Projection ambiguity of the first parameters
+       *  @param      par2        Second parameters
+       *  @param      cov2        Covariance matrix to the second parameters
+       *  @param[out] par         Averaged parameters
+       *  @param[out] cov         Averaged covariance matrix
+       *  @return                 Chi square deviation of orignal parameters to the average
+       */
+      template <int M, int N1>
+      static double average(const ParameterVector<N1>& par1,
+                            const CovarianceMatrix<N1>& cov1,
+                            const JacobianMatrix<N1, M>& ambiguity1,
+                            const ParameterVector<M>& par2,
+                            const CovarianceMatrix<M>& cov2,
+                            ParameterVector<M>& par,
+                            CovarianceMatrix<M>& cov)
+      {
+        /* Naive implementation */
+        JacobianMatrix<M, M> ambiguity2 = identity<M>();
+        return average(par1, cov1, ambiguity1, par2, cov2, ambiguity2, par, cov);
+
+        /* Kalman implementation - may be faster */
+        // par = par2;
+        // cov = cov2;
+        // return kalmanUpdate(par1, cov1, ambiguity1, par, cov);
+      }
+
+      /**
        *  Averages two parameter vectors from a projected space taking into account their respective
        *  covariances and ambiguity matrices.
        *
@@ -188,6 +223,60 @@ namespace Belle2 {
                                                    precision);
         cov = fromPrecision(precision);
         return chi2;
+      }
+
+      /**
+       *  Updates a parameter and its covariance by integrating information from parameter vector
+       *  in a projected space and its covariances.
+       *  The update is expressed in terms of Kalman's equations.
+       *
+       *  This function updates the values of the second parameters in place.
+       *
+       *  @param          par1        First parameters
+       *  @param          cov1        Covariance matrix to the first parameters
+       *  @param          ambiguity1  Projection ambiguity of the first parameters
+       *  @param[in, out] par2        Second parameters - updated inplace
+       *  @param[in, out] cov2        Second covariance matrix - updated inplace
+       *  @return                     Chi square deviation of orignal parameters to the average
+       */
+      template <int M, int N1>
+      static double kalmanUpdate(const ParameterVector<N1>& par1,
+                                 const CovarianceMatrix<N1>& cov1,
+                                 const JacobianMatrix<N1, M>& ambiguity1,
+                                 ParameterVector<M>& par2,
+                                 CovarianceMatrix<M>& cov2)
+      {
+        /* Kalman update - smart version */
+        const auto& ePar1 = mapToEigen(par1);
+        const auto& eCov1 = mapToEigen(cov1);
+        const auto& eAmbiguity1 = mapToEigen(ambiguity1);
+
+        auto&& ePar2 = mapToEigen(par2);
+        auto&& eCov2 = mapToEigen(cov2);
+
+        // Apriori residual
+        auto residual = ePar1 - eAmbiguity1 * ePar2;
+        auto residualCov = eCov1 + eAmbiguity1 * eCov2 * eAmbiguity1.transpose();
+        auto residualPrecision = residualCov.inverse();
+
+        // Chi2 - calculate on the apriori residuals, which is the same value as for the posterior.
+        Eigen::Matrix<double, 1, 1> chi2 = residual.transpose() * residualPrecision * residual;
+
+        // Update parameters
+        auto kalmanGain = eCov2 * eAmbiguity1.transpose() * residualPrecision;
+        eCov2 -= kalmanGain * eAmbiguity1 * eCov2;
+        ePar2 += kalmanGain * residual;
+
+        return chi2[0];
+
+        // Posterior residual - here for reference, should be compiled out.
+        auto postResidual = ePar1 - eAmbiguity1 * ePar2;
+        auto postResidualCov = eCov1 - eAmbiguity1 * eCov2 * eAmbiguity1.transpose();
+        auto postResidualPrecision = postResidualCov.inverse();
+        Eigen::Matrix<double, 1, 1> postChi2 =
+          postResidual.transpose() * postResidualPrecision * postResidual;
+        (void)postChi2;
+        assert(std::fabs(postChi2[0] - chi2[0]) < 1e-8);
       }
     };
 

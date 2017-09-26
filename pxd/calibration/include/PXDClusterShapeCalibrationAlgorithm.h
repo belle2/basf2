@@ -92,10 +92,10 @@ namespace Belle2 {
     * @see key_type
     */
   struct key_equal : public std::binary_function<key_type, key_type, bool> {
-    /** operator() returns comparing for keys v0 and v1 if they are equal.
+    /** operator() returns true if keys v0 and v1 are equal.
       * @param v0 First key for comparing
       * @param v1 Second key for comparing
-      * @return True if v0 and v1 are equal.
+      * @return true if keys v0 and v1 are equal.
       */
     bool operator()(const key_type& v0, const key_type& v1) const
     {
@@ -116,10 +116,10 @@ namespace Belle2 {
     * @see key_type2
     */
   struct key_equal2 : public std::binary_function<key_type2, key_type2, bool> {
-    /** operator() returns comparing for keys v0 and v1 if they are equal.
+    /** operator() returns true if keys v0 and v1 are equal.
       * @param v0 First key for comparing
       * @param v1 Second key for comparing
-      * @return True if v0 and v1 are equal.
+      * @return true if keys v0 and v1 are equal.
       */
     bool operator()(const key_type2& v0, const key_type2& v1) const
     {

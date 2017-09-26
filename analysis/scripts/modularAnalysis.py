@@ -749,6 +749,7 @@ def reconstructDecay(
     writeOut=False,
     path=analysis_main,
     candidate_limit=None,
+    ignoreIfTooManyCandidates=True,
 ):
     """
     Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via
@@ -765,12 +766,14 @@ def reconstructDecay(
     @param writeOut    wether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
     @param candidate_limit Maximum amount of candidates to be reconstructed. If
-                       the number of candidates is exceeded no candidate will be
-                       reconstructed for that event and a Warning will be
+                       the number of candidates is exceeded a Warning will be
                        printed.
                        If no value is given the amount is limited to a sensible
                        default. A value <=0 will disable this limit and can
                        cause huge memory amounts so be careful.
+    @param ignoreIfTooManyCandidates weather event should be ignored or not if number of reconstructed
+                       candiades reaches limit. If event is ignored, no candiades are reconstructed,
+                       otherwise, number of candidates in candidate_limit is reconstructed.
     """
 
     pmake = register_module('ParticleCombiner')
@@ -781,6 +784,7 @@ def reconstructDecay(
     pmake.param('writeOut', writeOut)
     if candidate_limit is not None:
         pmake.param("maximumNumberOfCandidates", candidate_limit)
+    pmake.param("ignoreIfTooManyCandidates", ignoreIfTooManyCandidates)
     path.add_module(pmake)
 
 

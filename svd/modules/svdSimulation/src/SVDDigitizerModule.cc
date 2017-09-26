@@ -93,7 +93,7 @@ SVDDigitizerModule::SVDDigitizerModule() :
 
   // 4. Timing
   addParam("APVShapingTime", m_shapingTime, "APV25 shpaing time in ns",
-           double(50.0));
+           double(250.0));
   addParam("ADCSamplingTime", m_samplingTime,
            "Interval between ADC samples in ns", double(31.44));
   addParam("UseIntegrationWindow", m_applyWindow, "Use integration window?",

@@ -47,9 +47,17 @@ namespace Belle2 {
       /// Default initializing of the matrix
       PlainMatrix() = default;
 
-      /// Value initializing constructructor or construct from th given values.
-      PlainMatrix(std::array<T, S> a)
-        : m_values(a)
+      /// Construct from initialiser list - also for value initialisation
+      PlainMatrix(std::initializer_list<T> values)
+        : m_values{}
+      {
+        assert(m_values.size() >= values.size());
+        std::copy(values.begin(), values.end(), m_values.begin());
+      }
+
+      /// Construct from the given values.
+      PlainMatrix(std::array<T, S> values)
+        : m_values(values)
       {
       }
 

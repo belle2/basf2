@@ -19,8 +19,8 @@
 #include <memory>
 
 namespace Belle2 {
+  class ModuleParamList;
   namespace TrackFindingCDC {
-    class ParamList;
 
     /**
      *  Filter adapter to make a filter work on a set of variables and return
@@ -52,7 +52,7 @@ namespace Belle2 {
       ~ChoosableFromVarSet();
 
       /// Add the parameters of this filter to the given parameter list
-      void exposeParams(ParamList* parameterList, const std::string& prefix) override;
+      void exposeParameters(ModuleParamList* parameterList, const std::string& prefix) override;
 
       /// Initialisation method sets up a reference to the value in the variable set to be returned.
       void initialize() override;

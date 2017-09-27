@@ -9,7 +9,8 @@
  **************************************************************************/
 #include <tracking/modules/vxdCDCTrackMerger/FilterBasedVXDCDCTrackMergerFindlet.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
+
 #include <tracking/dataobjects/RecoTrack.h>
 
 using namespace Belle2;
@@ -25,20 +26,20 @@ FilterBasedVXDCDCTrackMergerFindlet::FilterBasedVXDCDCTrackMergerFindlet()
   addProcessingSignalListener(&m_distanceFilterCut);
 }
 
-void FilterBasedVXDCDCTrackMergerFindlet::exposeParams(TrackFindingCDC::ParamList* paramList, const std::string& prefix)
+void FilterBasedVXDCDCTrackMergerFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  m_storeArrayMerger.exposeParams(paramList, prefix);
-  m_allMatcher.exposeParams(paramList, prefix);
-  m_bestMatchSelector.exposeParams(paramList, prefix);
-  m_cutFilter.exposeParams(paramList, prefix);
-  m_relationAdder.exposeParams(paramList, prefix);
-  m_extrapolationSelector.exposeParams(paramList, TrackFindingCDC::prefixed("extrapolation", prefix));
-  m_distanceFilterCut.exposeParams(paramList, TrackFindingCDC::prefixed("distance", prefix));
+  m_storeArrayMerger.exposeParameters(moduleParamList, prefix);
+  m_allMatcher.exposeParameters(moduleParamList, prefix);
+  m_bestMatchSelector.exposeParameters(moduleParamList, prefix);
+  m_cutFilter.exposeParameters(moduleParamList, prefix);
+  m_relationAdder.exposeParameters(moduleParamList, prefix);
+  m_extrapolationSelector.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("extrapolation", prefix));
+  m_distanceFilterCut.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("distance", prefix));
 
-  paramList->addParameter("extrapolate", m_param_extrapolate, "Call the extrapolation and fitting routine after the prefilter.",
-                          m_param_extrapolate);
-  paramList->addParameter("mergeAndExtrapolate", m_param_mergeAndExtrapolate,
-                          "Merge the prefiltered combinations immediately and extrapolate afterwards.", m_param_mergeAndExtrapolate);
+  moduleParamList->addParameter("extrapolate", m_param_extrapolate, "Call the extrapolation and fitting routine after the prefilter.",
+                                m_param_extrapolate);
+  moduleParamList->addParameter("mergeAndExtrapolate", m_param_mergeAndExtrapolate,
+                                "Merge the prefiltered combinations immediately and extrapolate afterwards.", m_param_mergeAndExtrapolate);
 }
 
 void FilterBasedVXDCDCTrackMergerFindlet::apply()

@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -46,23 +46,23 @@ namespace Belle2 {
     Chooseable<AFilter>::~Chooseable() = default;
 
     template <class AFilter>
-    void Chooseable<AFilter>::exposeParams(ParamList* paramList, const std::string& prefix)
+    void Chooseable<AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
     {
-      Super::exposeParams(paramList, prefix);
+      Super::exposeParameters(moduleParamList, prefix);
       if (m_param_filterName == "") {
         /// Make a force parameter in case no default was given
-        paramList->addParameter(prefixed(prefix, "filter"),
-                                m_param_filterName,
-                                m_filterFactory->createFiltersNameDescription());
+        moduleParamList->addParameter(prefixed(prefix, "filter"),
+                                      m_param_filterName,
+                                      m_filterFactory->createFiltersNameDescription());
       } else {
         /// Make a normal parameter in case default is known
-        paramList->addParameter(prefixed(prefix, "filter"),
-                                m_param_filterName,
-                                m_filterFactory->createFiltersNameDescription(),
-                                m_param_filterName);
+        moduleParamList->addParameter(prefixed(prefix, "filter"),
+                                      m_param_filterName,
+                                      m_filterFactory->createFiltersNameDescription(),
+                                      m_param_filterName);
       }
 
-      m_param_filterParameters.addParameter(paramList,
+      m_param_filterParameters.addParameter(moduleParamList,
                                             prefixed(prefix, "filterParameters"),
                                             m_filterFactory->createFiltersParametersDescription());
     }
@@ -77,10 +77,10 @@ namespace Belle2 {
       }
 
       /// Transfer parameters
-      ParamList filterParamList;
+      ModuleParamList filterModuleParamList;
       const std::string prefix = "";
-      m_filter->exposeParams(&filterParamList, prefix);
-      m_param_filterParameters.assignTo(&filterParamList);
+      m_filter->exposeParameters(&filterModuleParamList, prefix);
+      m_param_filterParameters.assignTo(&filterModuleParamList);
       this->addProcessingSignalListener(m_filter.get());
       Super::initialize();
     }

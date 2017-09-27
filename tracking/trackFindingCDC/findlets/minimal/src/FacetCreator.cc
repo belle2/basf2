@@ -14,7 +14,7 @@
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <vector>
 #include <string>
@@ -34,22 +34,22 @@ std::string FacetCreator::getDescription()
   return "Creates hit triplet (facets) from each cluster filtered by a acceptance criterion.";
 }
 
-void FacetCreator::exposeParams(ParamList* paramList, const std::string& prefix)
+void FacetCreator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  m_wireHitRelationFilter.exposeParams(paramList, prefix);
-  m_feasibleRLFacetFilter.exposeParams(paramList, prefix);
-  m_facetFilter.exposeParams(paramList, prefix);
+  m_wireHitRelationFilter.exposeParameters(moduleParamList, prefix);
+  m_feasibleRLFacetFilter.exposeParameters(moduleParamList, prefix);
+  m_facetFilter.exposeParameters(moduleParamList, prefix);
 
-  paramList->addParameter(prefixed(prefix, "updateDriftLength"),
-                          m_param_updateDriftLength,
-                          "Switch to reestimate the drift length",
-                          m_param_updateDriftLength);
+  moduleParamList->addParameter(prefixed(prefix, "updateDriftLength"),
+                                m_param_updateDriftLength,
+                                "Switch to reestimate the drift length",
+                                m_param_updateDriftLength);
 
-  paramList->addParameter(prefixed(prefix, "leastSquareFit"),
-                          m_param_leastSquareFit,
-                          "Switch to fit the facet with the least square method "
-                          "for drift length estimation",
-                          m_param_leastSquareFit);
+  moduleParamList->addParameter(prefixed(prefix, "leastSquareFit"),
+                                m_param_leastSquareFit,
+                                "Switch to fit the facet with the least square method "
+                                "for drift length estimation",
+                                m_param_leastSquareFit);
 }
 
 void FacetCreator::apply(const std::vector<CDCWireHitCluster>& inputClusters, std::vector<CDCFacet>& facets)

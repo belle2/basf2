@@ -21,7 +21,7 @@
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -37,13 +37,13 @@ std::string WireHitMCMultiLoopBlocker::getDescription()
          "based on MC information.";
 }
 
-void WireHitMCMultiLoopBlocker::exposeParams(ParamList* paramList,
-                                             const std::string& prefix)
+void WireHitMCMultiLoopBlocker::exposeParameters(ModuleParamList* moduleParamList,
+                                                 const std::string& prefix)
 {
-  paramList->addParameter(prefixed(prefix, "UseNLoops"),
-                          m_param_useNLoops,
-                          "Maximal number of loops accepted",
-                          m_param_useNLoops);
+  moduleParamList->addParameter(prefixed(prefix, "UseNLoops"),
+                                m_param_useNLoops,
+                                "Maximal number of loops accepted",
+                                m_param_useNLoops);
 }
 
 void WireHitMCMultiLoopBlocker::initialize()

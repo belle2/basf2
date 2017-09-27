@@ -16,8 +16,8 @@
 #include <memory>
 
 namespace Belle2 {
+  class ModuleParamList;
   namespace TrackFindingCDC {
-    class ParamList;
 
     /// Factory that can create apropriate filter instances from a name
     template<class AFilter>

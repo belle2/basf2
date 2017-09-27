@@ -19,7 +19,7 @@
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -29,34 +29,34 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 template <class AQuadTree>
-void StereoHitTrackQuadTreeMatcher<AQuadTree>::exposeParams(ParamList* paramList,
-                                                            const std::string& prefix)
+void StereoHitTrackQuadTreeMatcher<AQuadTree>::exposeParameters(ModuleParamList* moduleParamList,
+    const std::string& prefix)
 {
-  Super::exposeParams(paramList, prefix);
+  Super::exposeParameters(moduleParamList, prefix);
 
-  paramList->addParameter(prefixed(prefix, "level"), m_param_quadTreeLevel,
-                          "The number of levels for the quad tree search.",
-                          m_param_quadTreeLevel);
+  moduleParamList->addParameter(prefixed(prefix, "level"), m_param_quadTreeLevel,
+                                "The number of levels for the quad tree search.",
+                                m_param_quadTreeLevel);
 
-  paramList->addParameter(prefixed(prefix, "minimumNumberOfHits"), m_param_minimumNumberOfHits,
-                          "The minimum number of hits in a quad tree bin to be called as result.",
-                          m_param_minimumNumberOfHits);
+  moduleParamList->addParameter(prefixed(prefix, "minimumNumberOfHits"), m_param_minimumNumberOfHits,
+                                "The minimum number of hits in a quad tree bin to be called as result.",
+                                m_param_minimumNumberOfHits);
 
-  paramList->addParameter(prefixed(prefix, "writeDebugInformation"), m_param_writeDebugInformation,
-                          "Set to true to output debug information.",
-                          m_param_writeDebugInformation);
+  moduleParamList->addParameter(prefixed(prefix, "writeDebugInformation"), m_param_writeDebugInformation,
+                                "Set to true to output debug information.",
+                                m_param_writeDebugInformation);
 
-  paramList->addParameter(prefixed(prefix, "checkForB2BTracks"),
-                          m_param_checkForB2BTracks,
-                          "Set to false to skip the check for back-2-back tracks "
-                          "(good for cosmics).",
-                          m_param_checkForB2BTracks);
+  moduleParamList->addParameter(prefixed(prefix, "checkForB2BTracks"),
+                                m_param_checkForB2BTracks,
+                                "Set to false to skip the check for back-2-back tracks "
+                                "(good for cosmics).",
+                                m_param_checkForB2BTracks);
 
-  paramList->addParameter(prefixed(prefix, "checkForInWireBoundsFactor"),
-                          m_param_checkForInWireBoundsFactor,
-                          "Used to scale the CDC before checking "
-                          "whether hits are in the CDC z bounds.",
-                          m_param_checkForInWireBoundsFactor);
+  moduleParamList->addParameter(prefixed(prefix, "checkForInWireBoundsFactor"),
+                                m_param_checkForInWireBoundsFactor,
+                                "Used to scale the CDC before checking "
+                                "whether hits are in the CDC z bounds.",
+                                m_param_checkForInWireBoundsFactor);
 }
 
 

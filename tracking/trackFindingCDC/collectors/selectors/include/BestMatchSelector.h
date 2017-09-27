@@ -22,9 +22,8 @@
 #include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
   namespace TrackFindingCDC {
-    class ParamList;
-
     /**
      * Selector to remove all relations in the list, which share the same collection item - except the one which the
      * highest weight - and vice versa.

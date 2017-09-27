@@ -216,11 +216,11 @@ namespace {
     using Node = typename SimpleRLTaggedWireHitPhi0CurvHough::Node;
     AxialLegendreLeafProcessor<Node> leafProcessor(maxLevel);
 
-    ParamList paramList;
+    ModuleParamList moduleParamList;
     const std::string prefix = "";
-    leafProcessor.exposeParams(&paramList, prefix);
-    paramList.getParameter<double>("minWeight").setDefaultValue(minWeight);
-    paramList.getParameter<double>("maxCurv").setDefaultValue(maxCurvAcceptance);
+    leafProcessor.exposeParameters(&moduleParamList, prefix);
+    moduleParamList.getParameter<double>("minWeight").setDefaultValue(minWeight);
+    moduleParamList.getParameter<double>("maxCurv").setDefaultValue(maxCurvAcceptance);
 
     // Execute the finding a couple of time to find a stable execution time.
     std::vector< std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> > > candidates;
@@ -240,15 +240,15 @@ namespace {
       leafProcessor.clear();
 
       // Make two passes - one with more restrictive curvature
-      paramList.getParameter<double>("maxCurv").setDefaultValue(curlCurv);
-      paramList.getParameter<int>("nRoadSearches").setDefaultValue(2);
-      paramList.getParameter<int>("roadLevel").setDefaultValue(4);
+      moduleParamList.getParameter<double>("maxCurv").setDefaultValue(curlCurv);
+      moduleParamList.getParameter<int>("nRoadSearches").setDefaultValue(2);
+      moduleParamList.getParameter<int>("roadLevel").setDefaultValue(4);
       leafProcessor.beginWalk();
       houghTree.findUsing(leafProcessor);
 
-      paramList.getParameter<double>("maxCurv").setDefaultValue(maxCurvAcceptance);
-      paramList.getParameter<int>("nRoadSearches").setDefaultValue(3);
-      paramList.getParameter<int>("roadLevel").setDefaultValue(0);
+      moduleParamList.getParameter<double>("maxCurv").setDefaultValue(maxCurvAcceptance);
+      moduleParamList.getParameter<int>("nRoadSearches").setDefaultValue(3);
+      moduleParamList.getParameter<int>("roadLevel").setDefaultValue(0);
       leafProcessor.beginWalk();
       houghTree.findUsing(leafProcessor);
 
@@ -326,11 +326,11 @@ namespace {
     using Node = typename SimpleRLTaggedWireHitPhi0CurvHough::Node;
     AxialLegendreLeafProcessor<Node> leafProcessor(maxLevel);
 
-    ParamList paramList;
+    ModuleParamList moduleParamList;
     const std::string prefix = "";
-    leafProcessor.exposeParams(&paramList, prefix);
-    paramList.getParameter<double>("minWeight").setDefaultValue(minWeight);
-    paramList.getParameter<double>("maxCurv").setDefaultValue(maxCurvAcceptance);
+    leafProcessor.exposeParameters(&moduleParamList, prefix);
+    moduleParamList.getParameter<double>("minWeight").setDefaultValue(minWeight);
+    moduleParamList.getParameter<double>("maxCurv").setDefaultValue(maxCurvAcceptance);
 
     // Execute the finding a couple of time to find a stable execution time.
     std::vector< std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> > > candidates;
@@ -351,15 +351,15 @@ namespace {
       leafProcessor.clear();
 
       // Make two passes - one with more restrictive curvature
-      paramList.getParameter<double>("maxCurv").setDefaultValue(curlCurv);
-      paramList.getParameter<int>("nRoadSearches").setDefaultValue(2);
-      paramList.getParameter<int>("roadLevel").setDefaultValue(4);
+      moduleParamList.getParameter<double>("maxCurv").setDefaultValue(curlCurv);
+      moduleParamList.getParameter<int>("nRoadSearches").setDefaultValue(2);
+      moduleParamList.getParameter<int>("roadLevel").setDefaultValue(4);
       leafProcessor.beginWalk();
       houghTree.findUsing(leafProcessor);
 
-      paramList.getParameter<double>("maxCurv").setDefaultValue(maxCurvAcceptance);
-      paramList.getParameter<int>("nRoadSearches").setDefaultValue(3);
-      paramList.getParameter<int>("roadLevel").setDefaultValue(0);
+      moduleParamList.getParameter<double>("maxCurv").setDefaultValue(maxCurvAcceptance);
+      moduleParamList.getParameter<int>("nRoadSearches").setDefaultValue(3);
+      moduleParamList.getParameter<int>("roadLevel").setDefaultValue(0);
       leafProcessor.beginWalk();
       houghTree.findUsing(leafProcessor);
 

@@ -21,9 +21,9 @@
 #include <cmath>
 
 namespace Belle2 {
+  class ModuleParamList;
 
   namespace TrackFindingCDC {
-    class ParamList;
     class MVAExpert;
 
     /// Filter based on a mva method.
@@ -52,7 +52,7 @@ namespace Belle2 {
       virtual ~MVA();
 
       /// Expose the set of parameters of the filter to the module parameter list.
-      void exposeParams(ParamList* paramList, const std::string& prefix) override;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
       /// Initialize the expert before event processing.
       void initialize() override;

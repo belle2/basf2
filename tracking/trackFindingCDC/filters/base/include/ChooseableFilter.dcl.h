@@ -21,10 +21,9 @@
 #include <memory>
 
 namespace Belle2 {
+  class ModuleParamList;
 
   namespace TrackFindingCDC {
-    class ParamList;
-
     /// Filter can delegate to a filter chosen and set up at run time by parameters
     template <class AFilter>
     class Chooseable : public AFilter {
@@ -49,7 +48,7 @@ namespace Belle2 {
       ~Chooseable();
 
       /// Expose the set of parameters of the filter to the module parameter list.
-      void exposeParams(ParamList* paramList, const std::string& prefix) final;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Initialize before event processing.
       void initialize() override;

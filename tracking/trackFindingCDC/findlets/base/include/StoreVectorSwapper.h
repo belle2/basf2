@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <vector>
 
@@ -57,24 +57,24 @@ namespace Belle2 {
       }
 
       /// Expose the parameters  to a module
-      void exposeParams(ParamList* paramList, const std::string& prefix) override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         std::string classMnemomicCapitalName = m_classMnemomicName;
         classMnemomicCapitalName[0] = ::toupper(classMnemomicCapitalName.at(0));
 
         if (not a_alwaysWrite) {
-          paramList->addParameter(prefixed(prefix, "Write" + classMnemomicCapitalName + "s"),
-                                  m_param_writeStoreVector,
-                                  "Switch if " + m_classMnemomicDescription +
-                                  "s shall be written to the DataStore",
-                                  m_param_writeStoreVector);
+          moduleParamList->addParameter(prefixed(prefix, "Write" + classMnemomicCapitalName + "s"),
+                                        m_param_writeStoreVector,
+                                        "Switch if " + m_classMnemomicDescription +
+                                        "s shall be written to the DataStore",
+                                        m_param_writeStoreVector);
         }
 
-        paramList->addParameter(prefixed(prefix, classMnemomicCapitalName + "sStoreObjName"),
-                                m_param_storeVectorName,
-                                "Name of the output StoreObjPtr of the " + m_classMnemomicDescription +
-                                "s generated within this module.",
-                                std::string(m_param_storeVectorName));
+        moduleParamList->addParameter(prefixed(prefix, classMnemomicCapitalName + "sStoreObjName"),
+                                      m_param_storeVectorName,
+                                      "Name of the output StoreObjPtr of the " + m_classMnemomicDescription +
+                                      "s generated within this module.",
+                                      std::string(m_param_storeVectorName));
         //FIXME: Small parameter names
       }
 

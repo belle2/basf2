@@ -14,7 +14,7 @@
 
 #include <tracking/trackFindingCDC/mva/Recorder.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -39,23 +39,23 @@ namespace Belle2 {
     Recording<AFilter>::~Recording() = default;
 
     template <class AFilter>
-    void Recording<AFilter>::exposeParams(ParamList* paramList, const std::string& prefix)
+    void Recording<AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
     {
-      Super::exposeParams(paramList, prefix);
-      paramList->addParameter(prefixed(prefix, "rootFileName"),
-                              m_param_rootFileName,
-                              "Name of the ROOT file to be written",
-                              m_param_rootFileName);
+      Super::exposeParameters(moduleParamList, prefix);
+      moduleParamList->addParameter(prefixed(prefix, "rootFileName"),
+                                    m_param_rootFileName,
+                                    "Name of the ROOT file to be written",
+                                    m_param_rootFileName);
 
-      paramList->addParameter(prefixed(prefix, "treeName"),
-                              m_param_treeName,
-                              "Name of the Tree to be written",
-                              m_param_treeName);
+      moduleParamList->addParameter(prefixed(prefix, "treeName"),
+                                    m_param_treeName,
+                                    "Name of the Tree to be written",
+                                    m_param_treeName);
 
-      paramList->addParameter(prefixed(prefix, "returnWeight"),
-                              m_param_returnWeight,
-                              "Weight this filter should return when called. Defaults to NAN",
-                              m_param_returnWeight);
+      moduleParamList->addParameter(prefixed(prefix, "returnWeight"),
+                                    m_param_returnWeight,
+                                    "Weight this filter should return when called. Defaults to NAN",
+                                    m_param_returnWeight);
     }
 
     template <class AFilter>

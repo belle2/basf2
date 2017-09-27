@@ -35,7 +35,7 @@ namespace Belle2 {
 
     public:
       /// Expose the set of parameters of the filter to the module parameter list.
-      void exposeParams(ParamList* paramList, const std::string& prefix) override;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
     public:
       /// Main filter method returning the weight of the neighborhood relation.

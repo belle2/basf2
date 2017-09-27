@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <framework/logging/Logger.h>
 
@@ -87,13 +87,13 @@ namespace Belle2 {
           continue;
         }
 
-        ParamList paramList;
+        ModuleParamList moduleParamList;
         const std::string prefix = "";
-        filter->exposeParams(&paramList, prefix);
+        filter->exposeParameters(&moduleParamList, prefix);
 
         std::map<std::string, std::string> filterParameters;
-        for (auto && name : paramList.getParameterNames()) {
-          filterParameters[name] = paramList.getParameterDescription(name);
+        for (auto && name : moduleParamList.getParameterNames()) {
+          filterParameters[name] = moduleParamList.getParameterDescription(name);
         }
 
         oss << quoted(filterName) << " :\n";

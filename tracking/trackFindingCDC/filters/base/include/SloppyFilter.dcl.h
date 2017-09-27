@@ -13,8 +13,9 @@
 
 #include <string>
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
-    class ParamList;
 
     template<class AFilter>
     class Sloppy : public AFilter {
@@ -28,7 +29,7 @@ namespace Belle2 {
       using Super::Super;
 
       /// Expose the set of parameters of the filter to the module parameter list.
-      void exposeParams(ParamList* paramList, const std::string& prefix) override;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
     public:
       /// Reject an item if the truth variable is 0 or in some fractions of the events, else accept it.

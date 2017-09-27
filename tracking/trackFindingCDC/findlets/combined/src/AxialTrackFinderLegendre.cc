@@ -34,11 +34,11 @@ std::string AxialTrackFinderLegendre::getDescription()
   return "Performs the pattern recognition in the CDC with the legendre hough finder";
 }
 
-void AxialTrackFinderLegendre::exposeParams(ParamList* paramList,
-                                            const std::string& prefix)
+void AxialTrackFinderLegendre::exposeParameters(ModuleParamList* moduleParamList,
+                                                const std::string& prefix)
 {
-  m_axialTrackHitMigrator.exposeParams(paramList, prefix);
-  m_axialTrackMerger.exposeParams(paramList, prefixed("merge", prefix));
+  m_axialTrackHitMigrator.exposeParameters(moduleParamList, prefix);
+  m_axialTrackMerger.exposeParameters(moduleParamList, prefixed("merge", prefix));
   // No parameters exposed for the legendre passes
 }
 

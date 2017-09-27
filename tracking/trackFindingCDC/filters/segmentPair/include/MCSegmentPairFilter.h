@@ -28,7 +28,7 @@ namespace Belle2 {
       explicit MCSegmentPairFilter(bool allowReverse = true);
 
       /// Expose the set of parameters of the filter to the module parameter list.
-      void exposeParams(ParamList* paramList, const std::string& prefix) final;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Checks if a axial stereo segment pair is a good combination.
       Weight operator()(const CDCSegmentPair& segmentPair) final;

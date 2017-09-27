@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Expose the parameters to the module.
-      void exposeParams(ParamList* paramList, const std::string& prefix) override;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
       /// Initialize the filter and the quad tree.
       void initialize() override;

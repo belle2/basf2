@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
@@ -29,13 +29,13 @@ SegmentTrackAdderWithNormalization::SegmentTrackAdderWithNormalization()
   addProcessingSignalListener(&m_singleHitSelector);
 }
 
-void SegmentTrackAdderWithNormalization::exposeParams(ParamList* paramList, const std::string& prefix)
+void SegmentTrackAdderWithNormalization::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  m_singleHitSelector.exposeParams(paramList, prefixed(prefix, "hitSelector"));
-  paramList->addParameter(prefixed(prefix, "removeUnmatchedSegments"),
-                          m_param_removeUnmatchedSegments,
-                          "Swtich to remove hits in segments that have no matching track from all tracks",
-                          m_param_removeUnmatchedSegments);
+  m_singleHitSelector.exposeParameters(moduleParamList, prefixed(prefix, "hitSelector"));
+  moduleParamList->addParameter(prefixed(prefix, "removeUnmatchedSegments"),
+                                m_param_removeUnmatchedSegments,
+                                "Swtich to remove hits in segments that have no matching track from all tracks",
+                                m_param_removeUnmatchedSegments);
 
 }
 

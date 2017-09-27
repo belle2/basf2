@@ -18,7 +18,7 @@
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -34,14 +34,14 @@ std::string SuperClusterCreator::getDescription()
          "neighborhood";
 }
 
-void SuperClusterCreator::exposeParams(ParamList* paramList, const std::string& prefix)
+void SuperClusterCreator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  paramList->addParameter(prefixed(prefix, "expandOverApogeeGap"),
-                          m_param_expandOverApogeeGap,
-                          "Expand the super clusters over the typical gap at the apogee of the trajectory",
-                          m_param_expandOverApogeeGap);
+  moduleParamList->addParameter(prefixed(prefix, "expandOverApogeeGap"),
+                                m_param_expandOverApogeeGap,
+                                "Expand the super clusters over the typical gap at the apogee of the trajectory",
+                                m_param_expandOverApogeeGap);
 
-  m_wireHitRelationFilter.exposeParams(paramList, prefix);
+  m_wireHitRelationFilter.exposeParameters(moduleParamList, prefix);
 }
 
 void SuperClusterCreator::apply(std::vector<CDCWireHit>& inputWireHits,

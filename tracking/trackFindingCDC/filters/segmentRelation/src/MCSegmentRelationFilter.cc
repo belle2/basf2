@@ -17,7 +17,7 @@
 
 #include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <cmath>
 
@@ -31,14 +31,14 @@ MCSegmentRelationFilter::MCSegmentRelationFilter(bool allowReverse)
 {
 }
 
-void MCSegmentRelationFilter::exposeParams(ParamList* paramList,
-                                           const std::string& prefix)
+void MCSegmentRelationFilter::exposeParameters(ModuleParamList* moduleParamList,
+                                               const std::string& prefix)
 {
-  Super::exposeParams(paramList, prefix);
-  paramList->addParameter(prefixed(prefix, "requireRLPure"),
-                          m_param_requireRLPure,
-                          "Switch to require the segment combination contain mostly correct rl information",
-                          m_param_requireRLPure);
+  Super::exposeParameters(moduleParamList, prefix);
+  moduleParamList->addParameter(prefixed(prefix, "requireRLPure"),
+                                m_param_requireRLPure,
+                                "Switch to require the segment combination contain mostly correct rl information",
+                                m_param_requireRLPure);
 
 }
 

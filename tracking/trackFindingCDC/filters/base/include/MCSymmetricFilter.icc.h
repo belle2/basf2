@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <string>
@@ -33,14 +33,14 @@ namespace Belle2 {
     MCSymmetric<AFilter>::~MCSymmetric() = default;
 
     template <class AFilter>
-    void MCSymmetric<AFilter>::exposeParams(ParamList* paramList, const std::string& prefix)
+    void MCSymmetric<AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
     {
-      Super::exposeParams(paramList, prefix);
-      paramList->addParameter(prefixed(prefix, "allowReverse"),
-                              m_param_allowReverse,
-                              "Indication whether the reverse to the truth is accepted"
-                              "preserving the progagation reversal symmetry.",
-                              m_param_allowReverse);
+      Super::exposeParameters(moduleParamList, prefix);
+      moduleParamList->addParameter(prefixed(prefix, "allowReverse"),
+                                    m_param_allowReverse,
+                                    "Indication whether the reverse to the truth is accepted"
+                                    "preserving the progagation reversal symmetry.",
+                                    m_param_allowReverse);
     }
 
     template <class AFilter>

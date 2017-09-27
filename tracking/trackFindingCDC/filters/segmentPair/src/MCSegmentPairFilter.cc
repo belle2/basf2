@@ -16,7 +16,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -28,20 +28,20 @@ MCSegmentPairFilter::MCSegmentPairFilter(bool allowReverse)
 {
 }
 
-void MCSegmentPairFilter::exposeParams(ParamList* paramList,
-                                       const std::string& prefix)
+void MCSegmentPairFilter::exposeParameters(ModuleParamList* moduleParamList,
+                                           const std::string& prefix)
 {
-  Super::exposeParams(paramList, prefix);
-  paramList->addParameter(prefixed(prefix, "requireRLPure"),
-                          m_param_requireRLPure,
-                          "Switch to require the segment combination contain mostly correct rl information",
-                          m_param_requireRLPure);
+  Super::exposeParameters(moduleParamList, prefix);
+  moduleParamList->addParameter(prefixed(prefix, "requireRLPure"),
+                                m_param_requireRLPure,
+                                "Switch to require the segment combination contain mostly correct rl information",
+                                m_param_requireRLPure);
 
 
-  paramList->addParameter(prefixed(prefix, "minSegmentSize"),
-                          m_param_minSegmentSize,
-                          "Minimum segment size to pass as monte carlo truth",
-                          m_param_minSegmentSize);
+  moduleParamList->addParameter(prefixed(prefix, "minSegmentSize"),
+                                m_param_minSegmentSize,
+                                "Minimum segment size to pass as monte carlo truth",
+                                m_param_minSegmentSize);
 
 }
 

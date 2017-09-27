@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/numerics/Angle.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 namespace Belle2 {
@@ -28,11 +28,11 @@ namespace Belle2 {
 
     public:
       /// Export all parameters
-      void exposeParams(ParamList* paramList, const std::string& prefix) override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
-        paramList->addParameter(prefixed(prefix, "maximalPhiDistance"), m_param_maximalPhiDistance,
-                                "Maximal Phi distance below to tracks should be merged.",
-                                m_param_maximalPhiDistance);
+        moduleParamList->addParameter(prefixed(prefix, "maximalPhiDistance"), m_param_maximalPhiDistance,
+                                      "Maximal Phi distance below to tracks should be merged.",
+                                      m_param_maximalPhiDistance);
       }
 
       /// Implementation of the phi calculation.

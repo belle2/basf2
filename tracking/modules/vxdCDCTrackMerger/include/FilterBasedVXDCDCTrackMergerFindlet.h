@@ -7,7 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
@@ -26,6 +25,8 @@
 #include <tracking/trackFindingCDC/collectors/adders/RelationAdder.h>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   /**
    * Findlet for combining VXD and CDC tracks.
    *
@@ -48,7 +49,7 @@ namespace Belle2 {
     FilterBasedVXDCDCTrackMergerFindlet();
 
     /// Expose the parameters of the sub findlets.
-    void exposeParams(TrackFindingCDC::ParamList* paramList, const std::string& prefix) override;
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
     /// Do the track merging.
     void apply() override;

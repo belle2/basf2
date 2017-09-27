@@ -21,7 +21,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -31,13 +31,13 @@ std::string AxialTrackMerger::getDescription()
   return "Merges axial tracks found in the legendre search";
 }
 
-void AxialTrackMerger::exposeParams(ParamList* paramList, const std::string& prefix)
+void AxialTrackMerger::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  paramList->addParameter(prefixed(prefix, "minFitProb"),
-                          m_param_minFitProb,
-                          "Minimal fit probability of the common fit "
-                          "of two tracks to be eligible for merging",
-                          m_param_minFitProb);
+  moduleParamList->addParameter(prefixed(prefix, "minFitProb"),
+                                m_param_minFitProb,
+                                "Minimal fit probability of the common fit "
+                                "of two tracks to be eligible for merging",
+                                m_param_minFitProb);
 }
 
 void AxialTrackMerger::apply(std::vector<CDCTrack>& axialTracks,

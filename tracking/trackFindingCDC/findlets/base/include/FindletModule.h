@@ -86,9 +86,9 @@ namespace Belle2 {
         const std::string prefix = "";
 
         // New way switch when exposeParameters is phased out
-        // ParamList paramList;
-        // m_findlet.exposeParams(&paramList, prefix);
-        // paramList.transferTo(&moduleParamList);
+        // ModuleParamList moduleParamList;
+        // m_findlet.exposeParameters(&moduleParamList, prefix);
+        // moduleParamList.transferTo(&moduleParamList);
 
         // Old way is deprecated.
         m_findlet.exposeParameters(&moduleParamList, prefix);

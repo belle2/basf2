@@ -42,16 +42,16 @@ void StereoHitFinder::beginEvent()
   m_relations.clear();
 }
 
-void StereoHitFinder::exposeParams(ParamList* paramList, const std::string& prefix)
+void StereoHitFinder::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  Super::exposeParams(paramList, prefix);
+  Super::exposeParameters(moduleParamList, prefix);
 
-  m_rlWireHitCreator.exposeParams(paramList, prefix);
-  m_matcher.exposeParams(paramList, prefix);
-  m_filterSelector.exposeParams(paramList, prefix);
-  m_singleMatchSelector.exposeParams(paramList, prefix);
-  m_adder.exposeParams(paramList, prefix);
-  m_szFitter.exposeParams(paramList, prefix);
+  m_rlWireHitCreator.exposeParameters(moduleParamList, prefix);
+  m_matcher.exposeParameters(moduleParamList, prefix);
+  m_filterSelector.exposeParameters(moduleParamList, prefix);
+  m_singleMatchSelector.exposeParameters(moduleParamList, prefix);
+  m_adder.exposeParameters(moduleParamList, prefix);
+  m_szFitter.exposeParameters(moduleParamList, prefix);
 }
 
 void StereoHitFinder::apply(std::vector<CDCWireHit>& inputWireHits, std::vector<CDCTrack>& tracks)

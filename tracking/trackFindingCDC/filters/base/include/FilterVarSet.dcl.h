@@ -23,8 +23,8 @@
 #include <memory>
 
 namespace Belle2 {
+  class ModuleParamList;
   namespace TrackFindingCDC {
-    class ParamList;
 
     /// Vehicle class to transport the variable names
     template<class AFilter>

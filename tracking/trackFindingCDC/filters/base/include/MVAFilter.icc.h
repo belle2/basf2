@@ -15,7 +15,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/trackFindingCDC/utilities/Named.h>
@@ -45,18 +45,18 @@ namespace Belle2 {
     MVA<AFilter>::~MVA() = default;
 
     template <class AFilter>
-    void MVA<AFilter>::exposeParams(ParamList* paramList, const std::string& prefix)
+    void MVA<AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
     {
-      Super::exposeParams(paramList, prefix);
-      paramList->addParameter(prefixed(prefix, "cut"),
-                              m_param_cut,
-                              "The cut value of the mva output below which the object is rejected",
-                              m_param_cut);
+      Super::exposeParameters(moduleParamList, prefix);
+      moduleParamList->addParameter(prefixed(prefix, "cut"),
+                                    m_param_cut,
+                                    "The cut value of the mva output below which the object is rejected",
+                                    m_param_cut);
 
-      paramList->addParameter(prefixed(prefix, "identifier"),
-                              m_param_identifier,
-                              "Database identfier of the expert of weight file name",
-                              m_param_identifier);
+      moduleParamList->addParameter(prefixed(prefix, "identifier"),
+                                    m_param_identifier,
+                                    "Database identfier of the expert of weight file name",
+                                    m_param_identifier);
     }
 
     template <class AFilter>

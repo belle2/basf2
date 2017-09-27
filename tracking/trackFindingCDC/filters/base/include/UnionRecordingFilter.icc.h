@@ -18,7 +18,7 @@
 
 #include <tracking/trackFindingCDC/varsets/UnionVarSet.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <vector>
@@ -42,23 +42,23 @@ namespace Belle2 {
     UnionRecording<AFilter>::~UnionRecording() = default;
 
     template <class AFilter>
-    void UnionRecording<AFilter>::exposeParams(ParamList* paramList, const std::string& prefix)
+    void UnionRecording<AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
     {
-      Super::exposeParams(paramList, prefix);
+      Super::exposeParameters(moduleParamList, prefix);
 
-      paramList->addParameter(prefixed(prefix, "varSets"),
-                              m_param_varSetNames,
-                              "List of names refering to concrete variable sets."
-                              "Valid names: " +
-                              join(", ", this->getValidVarSetNames()),
-                              m_param_varSetNames);
+      moduleParamList->addParameter(prefixed(prefix, "varSets"),
+                                    m_param_varSetNames,
+                                    "List of names refering to concrete variable sets."
+                                    "Valid names: " +
+                                    join(", ", this->getValidVarSetNames()),
+                                    m_param_varSetNames);
 
-      paramList->addParameter(prefixed(prefix, "skim"),
-                              m_param_skim,
-                              "Filter name which object must pass to be recorded."
-                              "Valid names: " +
-                              join(", ", this->getValidFilterNames()),
-                              m_param_skim);
+      moduleParamList->addParameter(prefixed(prefix, "skim"),
+                                    m_param_skim,
+                                    "Filter name which object must pass to be recorded."
+                                    "Valid names: " +
+                                    join(", ", this->getValidFilterNames()),
+                                    m_param_skim);
     }
 
     template <class AFilter>

@@ -18,7 +18,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -61,53 +61,53 @@ std::string AxialTrackCreatorHitHough::getDescription()
   return "Generates axial tracks from hits using several increasingly relaxed hough space search over phi0 and curvature.";
 }
 
-void AxialTrackCreatorHitHough::exposeParams(ParamList* paramList,
-                                             const std::string& prefix)
+void AxialTrackCreatorHitHough::exposeParameters(ModuleParamList* moduleParamList,
+                                                 const std::string& prefix)
 {
   // Parameters for the hough space
-  paramList->addParameter(prefixed(prefix, "granularityLevel"),
-                          m_param_granularityLevel,
-                          "Level of divisions in the hough space.",
-                          m_param_granularityLevel);
+  moduleParamList->addParameter(prefixed(prefix, "granularityLevel"),
+                                m_param_granularityLevel,
+                                "Level of divisions in the hough space.",
+                                m_param_granularityLevel);
 
-  paramList->addParameter(prefixed(prefix, "sectorLevelSkip"),
-                          m_param_sectorLevelSkip,
-                          "Number of levels to be skipped in the hough "
-                          "space on the first level to form sectors",
-                          m_param_sectorLevelSkip);
+  moduleParamList->addParameter(prefixed(prefix, "sectorLevelSkip"),
+                                m_param_sectorLevelSkip,
+                                "Number of levels to be skipped in the hough "
+                                "space on the first level to form sectors",
+                                m_param_sectorLevelSkip);
 
-  paramList->addParameter(prefixed(prefix, "curvBounds"),
-                          m_param_curvBounds,
-                          "Curvature bounds of the hough space. Either 2 or all discrete bounds",
-                          m_param_curvBounds);
+  moduleParamList->addParameter(prefixed(prefix, "curvBounds"),
+                                m_param_curvBounds,
+                                "Curvature bounds of the hough space. Either 2 or all discrete bounds",
+                                m_param_curvBounds);
 
-  paramList->addParameter(prefixed(prefix, "discretePhi0Width"),
-                          m_param_discretePhi0Width,
-                          "Width of the phi0 bins at the lowest level of the hough space.",
-                          m_param_discretePhi0Width);
+  moduleParamList->addParameter(prefixed(prefix, "discretePhi0Width"),
+                                m_param_discretePhi0Width,
+                                "Width of the phi0 bins at the lowest level of the hough space.",
+                                m_param_discretePhi0Width);
 
-  paramList->addParameter(prefixed(prefix, "discretePhi0Overlap"),
-                          m_param_discretePhi0Overlap,
-                          "Overlap of the phi0 bins at the lowest level of the hough space.",
-                          m_param_discretePhi0Overlap);
+  moduleParamList->addParameter(prefixed(prefix, "discretePhi0Overlap"),
+                                m_param_discretePhi0Overlap,
+                                "Overlap of the phi0 bins at the lowest level of the hough space.",
+                                m_param_discretePhi0Overlap);
 
-  paramList->addParameter(prefixed(prefix, "discreteCurvWidth"),
-                          m_param_discreteCurvWidth,
-                          "Width of the curvature bins at the lowest level of the hough space.",
-                          m_param_discreteCurvWidth);
+  moduleParamList->addParameter(prefixed(prefix, "discreteCurvWidth"),
+                                m_param_discreteCurvWidth,
+                                "Width of the curvature bins at the lowest level of the hough space.",
+                                m_param_discreteCurvWidth);
 
-  paramList->addParameter(prefixed(prefix, "discreteCurvOverlap"),
-                          m_param_discreteCurvOverlap,
-                          "Overlap of the curvature bins at the lowest level of the hough space.",
-                          m_param_discreteCurvOverlap);
+  moduleParamList->addParameter(prefixed(prefix, "discreteCurvOverlap"),
+                                m_param_discreteCurvOverlap,
+                                "Overlap of the curvature bins at the lowest level of the hough space.",
+                                m_param_discreteCurvOverlap);
 
   // Relaxation schedule
-  paramList->addParameter(prefixed(prefix, "relaxationSchedule"),
-                          m_param_relaxationSchedule,
-                          "Relaxation schedule for the leaf processor in the hough tree. "
-                          "For content of the individual parameter maps consider the parameters of the "
-                          "AxialLegendreLeafProcessor",
-                          m_param_relaxationSchedule);
+  moduleParamList->addParameter(prefixed(prefix, "relaxationSchedule"),
+                                m_param_relaxationSchedule,
+                                "Relaxation schedule for the leaf processor in the hough tree. "
+                                "For content of the individual parameter maps consider the parameters of the "
+                                "AxialLegendreLeafProcessor",
+                                m_param_relaxationSchedule);
 
 }
 
@@ -164,14 +164,14 @@ void AxialTrackCreatorHitHough::apply(const std::vector<const CDCWireHit*>& axia
   int maxTreeLevel = m_param_granularityLevel - m_param_sectorLevelSkip;
   AxialLegendreLeafProcessor<Node> leafProcessor(maxTreeLevel);
   leafProcessor.setAxialWireHits(axialWireHits);
-  ParamList paramList;
+  ModuleParamList moduleParamList;
   const std::string prefix = "";
-  leafProcessor.exposeParams(&paramList, prefix);
+  leafProcessor.exposeParameters(&moduleParamList, prefix);
 
   // Find tracks with increasingly relaxed conditions in the hough grid
   m_houghTree->seed(std::move(unusedAxialWireHits));
   for (const ParameterVariantMap& passParameters : m_param_relaxationSchedule) {
-    AssignParameterVisitor::update(&paramList, passParameters);
+    AssignParameterVisitor::update(&moduleParamList, passParameters);
     leafProcessor.beginWalk();
     m_houghTree->findUsing(leafProcessor);
   }

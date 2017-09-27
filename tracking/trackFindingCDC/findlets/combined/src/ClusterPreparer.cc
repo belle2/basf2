@@ -24,11 +24,11 @@ std::string ClusterPreparer::getDescription()
   return "Clusters the wire hits in the CDC to form locally connected groups with two granularities.";
 }
 
-void ClusterPreparer::exposeParams(ParamList* paramList, const std::string& prefix)
+void ClusterPreparer::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  m_superClusterCreator.exposeParams(paramList, prefixed(prefix, "SuperCluster"));
-  m_clusterRefiner.exposeParams(paramList, prefix);
-  m_clusterBackgroundDetector.exposeParams(paramList, prefixed(prefix, "Cluster"));
+  m_superClusterCreator.exposeParameters(moduleParamList, prefixed(prefix, "SuperCluster"));
+  m_clusterRefiner.exposeParameters(moduleParamList, prefix);
+  m_clusterBackgroundDetector.exposeParameters(moduleParamList, prefixed(prefix, "Cluster"));
 }
 
 void ClusterPreparer::apply(std::vector<CDCWireHit>& inputWireHits,

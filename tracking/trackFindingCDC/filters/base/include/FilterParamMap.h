@@ -17,9 +17,8 @@
 #include <memory>
 
 namespace Belle2 {
+  class ModuleParamList;
   namespace TrackFindingCDC {
-    class ParamList;
-
     /// Variant of types allowed to be forwarded to a filter selected at runtime
     // using FilterParamVariant = boost::variant<bool, int, double, std::string, std::vector<std::string> >;
 
@@ -48,10 +47,10 @@ namespace Belle2 {
 
       /// Create one parameter in the parameter list for the module with the given name and desciption.
       void
-      addParameter(ParamList* paramList, const std::string& name, const std::string& description);
+      addParameter(ModuleParamList* moduleParamList, const std::string& name, const std::string& description);
 
       /// Unpack the map of parameters and forward them to the concrete filter.
-      void assignTo(ParamList* filterParamList);
+      void assignTo(ModuleParamList* filterModuleParamList);
 
       /// Getter for the currently stored values
       // std::map<std::string, FilterParamVariant> getValues() const;

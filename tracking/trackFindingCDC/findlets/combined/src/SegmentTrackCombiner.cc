@@ -42,16 +42,16 @@ void SegmentTrackCombiner::beginEvent()
   Super::beginEvent();
 }
 
-void SegmentTrackCombiner::exposeParams(ParamList* paramList, const std::string& prefix)
+void SegmentTrackCombiner::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  Super::exposeParams(paramList, prefix);
+  Super::exposeParameters(moduleParamList, prefix);
 
-  m_sharedHitsMatcher.exposeParams(paramList, prefix);
-  m_selectPairsWithSharedHits.exposeParams(paramList, prefixed(prefix, "sharedHits"));
-  m_chooseableSegmentTrackSelector.exposeParams(paramList, prefixed(prefix, "segmentTrack"));
-  m_singleMatchSelector.exposeParams(paramList, prefix);
-  m_segmentTrackAdderWithNormalization.exposeParams(paramList, prefix);
-  m_trackRejecter.exposeParams(paramList, prefixed(prefix, "track"));
+  m_sharedHitsMatcher.exposeParameters(moduleParamList, prefix);
+  m_selectPairsWithSharedHits.exposeParameters(moduleParamList, prefixed(prefix, "sharedHits"));
+  m_chooseableSegmentTrackSelector.exposeParameters(moduleParamList, prefixed(prefix, "segmentTrack"));
+  m_singleMatchSelector.exposeParameters(moduleParamList, prefix);
+  m_segmentTrackAdderWithNormalization.exposeParameters(moduleParamList, prefix);
+  m_trackRejecter.exposeParameters(moduleParamList, prefixed(prefix, "track"));
 }
 
 // Do the combination work. See the SegmentTrackCombiner methods for full details.

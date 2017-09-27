@@ -14,7 +14,7 @@
 #include <tracking/ckf/utilities/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <vector>
@@ -56,15 +56,15 @@ namespace Belle2 {
       }
 
       /// Expose the parameters to a module
-      void exposeParams(ParamList* paramList, const std::string& prefix) override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         std::string classMnemomicCapitalName = m_classMnemomicName;
         classMnemomicCapitalName[0] = ::toupper(classMnemomicCapitalName.at(0));
 
-        paramList->addParameter(prefixed(prefix, classMnemomicCapitalName + "sStoreArrayName"),
-                                m_param_storeArrayName,
-                                "Name of the StoreArray of the " + m_classMnemomicDescription,
-                                std::string(m_param_storeArrayName));
+        moduleParamList->addParameter(prefixed(prefix, classMnemomicCapitalName + "sStoreArrayName"),
+                                      m_param_storeArrayName,
+                                      "Name of the StoreArray of the " + m_classMnemomicDescription,
+                                      std::string(m_param_storeArrayName));
       }
 
       /// Short description of the findlet

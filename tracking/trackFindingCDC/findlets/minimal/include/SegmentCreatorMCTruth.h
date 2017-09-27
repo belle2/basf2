@@ -29,7 +29,7 @@ namespace Belle2 {
 
     public:
       /// Expose the parameters to a module
-      void exposeParams(ParamList* paramList, const std::string& prefix) final;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Short description of the findlet
       std::string getDescription() final;

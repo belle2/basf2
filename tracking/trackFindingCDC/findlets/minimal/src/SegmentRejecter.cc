@@ -15,7 +15,7 @@
 
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -33,13 +33,13 @@ std::string SegmentRejecter::getDescription()
   return "Deletes fake segments that have been rejected by a filter";
 }
 
-void SegmentRejecter::exposeParams(ParamList* paramList, const std::string& prefix)
+void SegmentRejecter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  m_segmentFilter.exposeParams(paramList, prefix);
-  paramList->addParameter(prefixed(prefix, "deleteRejected"),
-                          m_param_deleteRejected,
-                          "Delete the rejected segments instead of marking this as background.",
-                          m_param_deleteRejected);
+  m_segmentFilter.exposeParameters(moduleParamList, prefix);
+  moduleParamList->addParameter(prefixed(prefix, "deleteRejected"),
+                                m_param_deleteRejected,
+                                "Delete the rejected segments instead of marking this as background.",
+                                m_param_deleteRejected);
 }
 
 void SegmentRejecter::apply(std::vector<CDCSegment2D>& segment2Ds)

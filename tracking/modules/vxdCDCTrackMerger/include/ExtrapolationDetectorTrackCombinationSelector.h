@@ -15,6 +15,7 @@
 
 namespace Belle2 {
   class RecoTrack;
+  class ModuleParamList;
 
   /**
    * Selector doing an extrapolation of the two tracks in the relations
@@ -33,7 +34,7 @@ namespace Belle2 {
     using Super = TrackFindingCDC::Findlet<WeightedRelationItem>;
 
     /// Expose the cut value to the module.
-    void exposeParams(TrackFindingCDC::ParamList* paramList, const std::string& prefix) override;
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
     /// Do the extrapolation.
     void apply(std::vector<WeightedRelationItem>& weightedRelations) override;

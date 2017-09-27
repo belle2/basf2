@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/SloppyFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <TRandom.h>
 
@@ -19,14 +19,14 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     template<class AFilter>
-    void Sloppy<AFilter>::exposeParams(ParamList* paramList, const std::string& prefix)
+    void Sloppy<AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
     {
-      Super::exposeParams(paramList, prefix);
-      paramList->addParameter("sloppinessFactor",
-                              m_param_sloppinessFactor,
-                              "Only accept every <sloppinessFactor>th instance "
-                              "that would normally pass the filter.",
-                              m_param_sloppinessFactor);
+      Super::exposeParameters(moduleParamList, prefix);
+      moduleParamList->addParameter("sloppinessFactor",
+                                    m_param_sloppinessFactor,
+                                    "Only accept every <sloppinessFactor>th instance "
+                                    "that would normally pass the filter.",
+                                    m_param_sloppinessFactor);
     }
 
     template<class AFilter>

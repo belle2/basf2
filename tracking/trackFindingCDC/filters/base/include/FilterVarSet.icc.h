@@ -11,7 +11,8 @@
 
 #include <tracking/trackFindingCDC/filters/base/FilterVarSet.dcl.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParam.h>
 
 #include <RtypesCore.h>
 
@@ -80,13 +81,14 @@ namespace Belle2 {
     {
       Super::initialize();
 
-      ParamList paramList;
+      ModuleParamList moduleParamList;
       const std::string prefix = "";
-      m_ptrFilter->exposeParams(&paramList, prefix);
+      m_ptrFilter->exposeParameters(&moduleParamList, prefix);
 
       // try to find the MVAFilter cut parameter and reset it such that we can set it
-      if (paramList.hasParameter("cut")) {
-        Param<double>& cutParam = paramList.getParameter<double>("cut");
+      std::vector<std::string> paramNames = moduleParamList.getParameterNames();
+      if (std::count(paramNames.begin(), paramNames.end(), "cut")) {
+        ModuleParam<double>& cutParam = moduleParamList.getParameter<double>("cut");
         m_cut = cutParam.getValue();
         cutParam.setDefaultValue(NAN);
       }

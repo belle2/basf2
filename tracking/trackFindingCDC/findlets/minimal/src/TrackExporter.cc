@@ -18,7 +18,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <TMatrixDSym.h>
 
@@ -30,32 +30,32 @@ std::string TrackExporter::getDescription()
   return "Creates a RecoTrack from each CDCTrack.";
 }
 
-void TrackExporter::exposeParams(ParamList* paramList, const std::string& prefix)
+void TrackExporter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  paramList->addParameter(prefixed(prefix, "RecoTracksStoreArrayName"),
-                          m_param_exportTracksInto,
-                          "Alias for exportTracksInto",
-                          m_param_exportTracksInto);
+  moduleParamList->addParameter(prefixed(prefix, "RecoTracksStoreArrayName"),
+                                m_param_exportTracksInto,
+                                "Alias for exportTracksInto",
+                                m_param_exportTracksInto);
 
-  paramList->addParameter(prefixed(prefix, "WriteRecoTracks"),
-                          m_param_exportTracks,
-                          "Alias for exportTracks",
-                          m_param_exportTracks);
+  moduleParamList->addParameter(prefixed(prefix, "WriteRecoTracks"),
+                                m_param_exportTracks,
+                                "Alias for exportTracks",
+                                m_param_exportTracks);
 
-  paramList->addParameter(prefixed(prefix, "exportTracks"),
-                          m_param_exportTracks,
-                          "Switch for the creation of reco tracks for each cdc track.",
-                          m_param_exportTracks);
+  moduleParamList->addParameter(prefixed(prefix, "exportTracks"),
+                                m_param_exportTracks,
+                                "Switch for the creation of reco tracks for each cdc track.",
+                                m_param_exportTracks);
 
-  paramList->addParameter(prefixed(prefix, "exportTracksInto"),
-                          m_param_exportTracksInto,
-                          "Name of the output StoreArray of RecoTracks.",
-                          m_param_exportTracksInto);
+  moduleParamList->addParameter(prefixed(prefix, "exportTracksInto"),
+                                m_param_exportTracksInto,
+                                "Name of the output StoreArray of RecoTracks.",
+                                m_param_exportTracksInto);
 
-  paramList->addParameter(prefixed(prefix, "discardCovarianceMatrix"),
-                          m_param_discardCovarianceMatrix,
-                          "Discard covariance matrix in favour of a hand written one.",
-                          m_param_discardCovarianceMatrix);
+  moduleParamList->addParameter(prefixed(prefix, "discardCovarianceMatrix"),
+                                m_param_discardCovarianceMatrix,
+                                "Discard covariance matrix in favour of a hand written one.",
+                                m_param_discardCovarianceMatrix);
 }
 
 void TrackExporter::initialize()

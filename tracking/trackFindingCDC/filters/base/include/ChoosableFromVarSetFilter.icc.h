@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -35,24 +35,24 @@ namespace Belle2 {
     ChoosableFromVarSet<AFilter>::~ChoosableFromVarSet() = default;
 
     template <class AFilter>
-    void ChoosableFromVarSet<AFilter>::exposeParams(ParamList* paramList,
-                                                    const std::string& prefix)
+    void ChoosableFromVarSet<AFilter>::exposeParameters(ModuleParamList* moduleParamList,
+                                                        const std::string& prefix)
     {
-      Super::exposeParams(paramList, prefix);
+      Super::exposeParameters(moduleParamList, prefix);
 
       if (m_param_varName == "") {
         // Make a forced parameter if no default variable name is present
-        paramList->addParameter(prefixed(prefix, "chosenVariable"),
-                                m_param_varName,
-                                "Choose the name of the variable "
-                                "that will be put out as a weight.");
+        moduleParamList->addParameter(prefixed(prefix, "chosenVariable"),
+                                      m_param_varName,
+                                      "Choose the name of the variable "
+                                      "that will be put out as a weight.");
       } else {
         // Normal unforced parameter if default name is present
-        paramList->addParameter(prefixed(prefix, "chosenVariable"),
-                                m_param_varName,
-                                "Choose the name of the variable "
-                                "that will be put out as a weight.",
-                                m_param_varName);
+        moduleParamList->addParameter(prefixed(prefix, "chosenVariable"),
+                                      m_param_varName,
+                                      "Choose the name of the variable "
+                                      "that will be put out as a weight.",
+                                      m_param_varName);
       }
     }
 

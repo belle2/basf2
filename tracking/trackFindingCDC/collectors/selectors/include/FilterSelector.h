@@ -21,9 +21,8 @@
 #include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
   namespace TrackFindingCDC {
-    class ParamList;
-
     /**
      * Selector to remove all weighted relations, where a definable Filter
      * gives NaN as a result. Will also update all stored weights with the result of the filter.
@@ -57,10 +56,10 @@ namespace Belle2 {
       }
 
       /// Expose the parameters of the filter.
-      void exposeParams(ParamList* paramList, const std::string& prefix) override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
-        Super::exposeParams(paramList, prefix);
-        m_filter.exposeParams(paramList, prefix);
+        Super::exposeParameters(moduleParamList, prefix);
+        m_filter.exposeParameters(moduleParamList, prefix);
       }
 
       /// Main function of the class: calculate the filter result and remove all relations, where the filter returns NaN

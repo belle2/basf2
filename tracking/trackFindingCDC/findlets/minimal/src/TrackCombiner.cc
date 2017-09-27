@@ -21,7 +21,7 @@
 #include <tracking/trackFindingCDC/utilities/Range.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <map>
 #include <deque>
@@ -84,13 +84,13 @@ std::string TrackCombiner::getDescription()
   return "Combines two sets of tracks to one final set by merging tracks that have large overlaps.";
 }
 
-void TrackCombiner::exposeParams(ParamList* paramList,
-                                 const std::string& prefix)
+void TrackCombiner::exposeParameters(ModuleParamList* moduleParamList,
+                                     const std::string& prefix)
 {
-  paramList->addParameter(prefixed(prefix, "identifyCommonSegments"),
-                          m_param_identifyCommonSegments,
-                          "Activate the identification of common segments",
-                          m_param_identifyCommonSegments);
+  moduleParamList->addParameter(prefixed(prefix, "identifyCommonSegments"),
+                                m_param_identifyCommonSegments,
+                                "Activate the identification of common segments",
+                                m_param_identifyCommonSegments);
 }
 
 void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,

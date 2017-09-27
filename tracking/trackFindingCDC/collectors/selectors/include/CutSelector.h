@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -46,12 +46,12 @@ namespace Belle2 {
       using Super = Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>>;
 
       /// Expose the cut value to the module.
-      void exposeParams(ParamList* paramList, const std::string& prefix) override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
-        Super::exposeParams(paramList, prefix);
-        paramList->addParameter(prefixed(prefix, "cutValue"), m_param_cutValue,
-                                "Value to cut at.",
-                                m_param_cutValue);
+        Super::exposeParameters(moduleParamList, prefix);
+        moduleParamList->addParameter(prefixed(prefix, "cutValue"), m_param_cutValue,
+                                      "Value to cut at.",
+                                      m_param_cutValue);
       }
 
       /// Do the cut.

@@ -29,7 +29,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -184,44 +184,44 @@ namespace Belle2 {
     }
 
     template <class ANode>
-    void AxialLegendreLeafProcessor<ANode>::exposeParams(ParamList* paramList,
-                                                         const std::string& prefix)
+    void AxialLegendreLeafProcessor<ANode>::exposeParameters(ModuleParamList* moduleParamList,
+                                                             const std::string& prefix)
     {
-      paramList->addParameter(prefixed(prefix, "maxLevel"),
-                              m_param_maxLevel,
-                              "Level of divisions in the hough space at which a leaf is reached",
-                              m_param_maxLevel);
+      moduleParamList->addParameter(prefixed(prefix, "maxLevel"),
+                                    m_param_maxLevel,
+                                    "Level of divisions in the hough space at which a leaf is reached",
+                                    m_param_maxLevel);
 
-      paramList->addParameter(prefixed(prefix, "minWeight"),
-                              m_param_minWeight,
-                              "Minimal exceptable weight of a leaf to be considered",
-                              m_param_minWeight);
+      moduleParamList->addParameter(prefixed(prefix, "minWeight"),
+                                    m_param_minWeight,
+                                    "Minimal exceptable weight of a leaf to be considered",
+                                    m_param_minWeight);
 
-      paramList->addParameter(prefixed(prefix, "maxCurv"),
-                              m_param_maxCurv,
-                              "Maximal curvature of a leaf to be considered",
-                              m_param_maxCurv);
+      moduleParamList->addParameter(prefixed(prefix, "maxCurv"),
+                                    m_param_maxCurv,
+                                    "Maximal curvature of a leaf to be considered",
+                                    m_param_maxCurv);
 
-      paramList->addParameter(prefixed(prefix, "curlCurv"),
-                              m_param_curlCurv,
-                              "Curvature below which hits on both arms of the trajectory are allowed",
-                              m_param_curlCurv);
+      moduleParamList->addParameter(prefixed(prefix, "curlCurv"),
+                                    m_param_curlCurv,
+                                    "Curvature below which hits on both arms of the trajectory are allowed",
+                                    m_param_curlCurv);
 
-      paramList->addParameter(prefixed(prefix, "nRoadSearches"),
-                              m_param_nRoadSearches,
-                              "How often the road search should be performed to find new hits",
-                              m_param_nRoadSearches);
+      moduleParamList->addParameter(prefixed(prefix, "nRoadSearches"),
+                                    m_param_nRoadSearches,
+                                    "How often the road search should be performed to find new hits",
+                                    m_param_nRoadSearches);
 
-      paramList->addParameter(prefixed(prefix, "roadLevel"),
-                              m_param_roadLevel,
-                              "Level of the read from which additional hits in the road search can be taken",
-                              m_param_roadLevel);
+      moduleParamList->addParameter(prefixed(prefix, "roadLevel"),
+                                    m_param_roadLevel,
+                                    "Level of the read from which additional hits in the road search can be taken",
+                                    m_param_roadLevel);
 
-      paramList->addParameter(prefixed(prefix, "curvResolution"),
-                              m_param_curvResolution,
-                              "The name of the resolution function to be used. "
-                              "Valid values are 'none', 'const', 'basic', 'origin', 'nonOrigin'",
-                              m_param_curvResolution);
+      moduleParamList->addParameter(prefixed(prefix, "curvResolution"),
+                                    m_param_curvResolution,
+                                    "The name of the resolution function to be used. "
+                                    "Valid values are 'none', 'const', 'basic', 'origin', 'nonOrigin'",
+                                    m_param_curvResolution);
     }
 
     template <class ANode>

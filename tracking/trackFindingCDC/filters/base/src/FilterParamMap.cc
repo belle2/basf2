@@ -11,9 +11,8 @@
 
 #include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
-#include <tracking/trackFindingCDC/utilities/Param.h>
-#include <tracking/trackFindingCDC/utilities/Param.icc.h>
+#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParam.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -21,26 +20,31 @@ using namespace TrackFindingCDC;
 namespace Belle2 {
   namespace TrackFindingCDC {
     using FilterParamVariant = boost::variant<bool, int, double, std::string, std::vector<std::string> >;
+  }
+}
 
-    // Instantiate the module parameter
-    template class Param<std::map<std::string, FilterParamVariant> >;
+// Instantiate the module parameter
+template class Belle2::ModuleParam<std::map<std::string, FilterParamVariant> >;
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
 
     /// Define the implementation
     class FilterParamMap::Impl {
     public:
       Impl() = default;
 
-      void addParameter(ParamList* paramList, const std::string& name, const std::string& description)
+      void addParameter(ModuleParamList* moduleParamList, const std::string& name, const std::string& description)
       {
-        paramList->addParameter(name,
-                                m_param_filterParameters,
-                                description,
-                                m_param_filterParameters);
+        moduleParamList->addParameter(name,
+                                      m_param_filterParameters,
+                                      description,
+                                      m_param_filterParameters);
       }
 
-      void assignTo(ParamList* filterParamList)
+      void assignTo(ModuleParamList* filterModuleParamList)
       {
-        AssignParameterVisitor::update(filterParamList, m_param_filterParameters);
+        AssignParameterVisitor::update(filterModuleParamList, m_param_filterParameters);
       }
 
       std::map<std::string, FilterParamVariant> getValues() const
@@ -62,15 +66,15 @@ FilterParamMap::FilterParamMap() :
 FilterParamMap::~FilterParamMap() = default;
 
 void
-FilterParamMap::addParameter(ParamList* paramList, const std::string& name, const std::string& description)
+FilterParamMap::addParameter(ModuleParamList* moduleParamList, const std::string& name, const std::string& description)
 {
-  m_impl->addParameter(paramList, name, description);
+  m_impl->addParameter(moduleParamList, name, description);
 }
 
 void
-FilterParamMap::assignTo(ParamList* filterParamList)
+FilterParamMap::assignTo(ModuleParamList* filterModuleParamList)
 {
-  m_impl->assignTo(filterParamList);
+  m_impl->assignTo(filterModuleParamList);
 };
 
 // std::map<std::string, FilterParamVariant> FilterParamMap::getValues() const

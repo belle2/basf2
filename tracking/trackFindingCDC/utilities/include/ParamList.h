@@ -19,6 +19,7 @@
 
 namespace Belle2 {
   class ModuleParamList;
+
   namespace TrackFindingCDC {
     /**
      *  This class provides a more light weight substitute for the similar ModuleParamList.

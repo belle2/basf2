@@ -14,6 +14,8 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   /**
    * This findlet has helper function to
    * * remove all tracks which have already a related partner from a std::vector of CDC tracks
@@ -25,7 +27,7 @@ namespace Belle2 {
     using Super = TrackFindingCDC::Findlet<RecoTrack*, RecoTrack*>;
   public:
     /// Expose the parameters of the findlet
-    void exposeParams(TrackFindingCDC::ParamList* paramList, const std::string& prefix) override;
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
     /// Require/register the store arrays
     void initialize() override;

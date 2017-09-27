@@ -16,7 +16,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -27,18 +27,18 @@ std::string AxialTrackHitMigrator::getDescription()
          "trajectory.";
 }
 
-void AxialTrackHitMigrator::exposeParams(ParamList* paramList,
-                                         const std::string& prefix)
+void AxialTrackHitMigrator::exposeParameters(ModuleParamList* moduleParamList,
+                                             const std::string& prefix)
 {
-  paramList->addParameter(prefixed(prefix, "dropDistance"),
-                          m_param_dropDistance,
-                          "Distance for a hit to be removed.",
-                          m_param_dropDistance);
+  moduleParamList->addParameter(prefixed(prefix, "dropDistance"),
+                                m_param_dropDistance,
+                                "Distance for a hit to be removed.",
+                                m_param_dropDistance);
 
-  paramList->addParameter(prefixed(prefix, "addDistance"),
-                          m_param_addDistance,
-                          "Distance for a hit to be added.",
-                          m_param_addDistance);
+  moduleParamList->addParameter(prefixed(prefix, "addDistance"),
+                                m_param_addDistance,
+                                "Distance for a hit to be added.",
+                                m_param_addDistance);
 }
 
 void AxialTrackHitMigrator::apply(const std::vector<const CDCWireHit*>& axialWireHits,

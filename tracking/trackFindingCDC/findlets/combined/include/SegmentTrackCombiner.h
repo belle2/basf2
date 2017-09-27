@@ -67,7 +67,7 @@ namespace Belle2 {
       void beginEvent() final;
 
       /// Expose the parameters to a module
-      void exposeParams(ParamList* paramList, const std::string& prefix) final;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Try to combine the segments and the tracks.
       void apply(std::vector<CDCSegment2D>& segments,

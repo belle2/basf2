@@ -18,7 +18,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <utility>
 
@@ -42,23 +42,23 @@ std::string SegmentAliasResolver::getDescription()
   return "Resolves the rl aliasing of segments in various scenarios";
 }
 
-void SegmentAliasResolver::exposeParams(ParamList* paramList, const std::string& prefix)
+void SegmentAliasResolver::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  paramList->addParameter(prefixed(prefix, "investigateAlias"),
-                          m_param_investigateAlias,
-                          "Which alias resolutions should be applied. "
-                          "Options are trailing_hit, last_hit, full.",
-                          m_param_investigateAlias);
+  moduleParamList->addParameter(prefixed(prefix, "investigateAlias"),
+                                m_param_investigateAlias,
+                                "Which alias resolutions should be applied. "
+                                "Options are trailing_hit, last_hit, full.",
+                                m_param_investigateAlias);
 
-  paramList->addParameter(prefixed(prefix, "reestimateDriftLength"),
-                          m_param_reestimateDriftLength,
-                          "Switch to reestimate the drift length in the alias resolver",
-                          m_param_reestimateDriftLength);
+  moduleParamList->addParameter(prefixed(prefix, "reestimateDriftLength"),
+                                m_param_reestimateDriftLength,
+                                "Switch to reestimate the drift length in the alias resolver",
+                                m_param_reestimateDriftLength);
 
-  paramList->addParameter(prefixed(prefix, "reestimatePositions"),
-                          m_param_reestimatePositions,
-                          "Switch to reestimate the reconstructed positions in the alias resolver",
-                          m_param_reestimatePositions);
+  moduleParamList->addParameter(prefixed(prefix, "reestimatePositions"),
+                                m_param_reestimatePositions,
+                                "Switch to reestimate the reconstructed positions in the alias resolver",
+                                m_param_reestimatePositions);
 }
 
 void SegmentAliasResolver::initialize()

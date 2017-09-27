@@ -9,25 +9,26 @@
  **************************************************************************/
 #include <tracking/modules/vxdCDCTrackMerger/StoreArrayMerger.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 #include <geometry/bfieldmap/BFieldMap.h>
+
+#include <framework/core/ModuleParamList.h>
 #include <framework/dataobjects/Helix.h>
 
 using namespace Belle2;
 
-void StoreArrayMerger::exposeParams(TrackFindingCDC::ParamList* paramList, const std::string& prefix)
+void StoreArrayMerger::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  Super::exposeParams(paramList, prefix);
+  Super::exposeParameters(moduleParamList, prefix);
 
   // CDC input tracks
-  paramList->addParameter(TrackFindingCDC::prefixed(prefix, "CDCRecoTrackStoreArrayName"), m_param_cdcRecoTrackStoreArrayName,
-                          "StoreArray name of the CDC Track Store Array", m_param_cdcRecoTrackStoreArrayName);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "CDCRecoTrackStoreArrayName"), m_param_cdcRecoTrackStoreArrayName,
+                                "StoreArray name of the CDC Track Store Array", m_param_cdcRecoTrackStoreArrayName);
   // VXD input tracks
-  paramList->addParameter(TrackFindingCDC::prefixed(prefix, "VXDRecoTrackStoreArrayName"), m_param_vxdRecoTrackStoreArrayName,
-                          "StoreArray name of the VXD Track Store Array", m_param_vxdRecoTrackStoreArrayName);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "VXDRecoTrackStoreArrayName"), m_param_vxdRecoTrackStoreArrayName,
+                                "StoreArray name of the VXD Track Store Array", m_param_vxdRecoTrackStoreArrayName);
 }
 
 void StoreArrayMerger::initialize()

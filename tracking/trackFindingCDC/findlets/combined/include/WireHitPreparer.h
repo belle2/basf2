@@ -39,7 +39,7 @@ namespace Belle2 {
       std::string getDescription() final;
 
       /// Expose the parameters to a module
-      void exposeParams(ParamList* paramList, const std::string& prefix) final;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Main function preparing the wire hits
       void apply(std::vector<CDCWireHit>& outputWireHits) final;

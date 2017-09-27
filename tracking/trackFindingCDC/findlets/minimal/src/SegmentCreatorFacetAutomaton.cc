@@ -25,7 +25,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <algorithm>
 #include <functional>
@@ -53,27 +53,27 @@ std::string SegmentCreatorFacetAutomaton::getDescription()
   return "Constructs segments by extraction of facet paths in a cellular automaton.";
 }
 
-void SegmentCreatorFacetAutomaton::exposeParams(ParamList* paramList, const std::string& prefix)
+void SegmentCreatorFacetAutomaton::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  paramList->addParameter(prefixed(prefix, "searchReversed"),
-                          m_param_searchReversed,
-                          "Switch to construct the reversed segment if it is available in the facet graph as well.",
-                          m_param_searchReversed);
+  moduleParamList->addParameter(prefixed(prefix, "searchReversed"),
+                                m_param_searchReversed,
+                                "Switch to construct the reversed segment if it is available in the facet graph as well.",
+                                m_param_searchReversed);
 
-  paramList->addParameter(prefixed(prefix, "searchAlias"),
-                          m_param_searchAlias,
-                          "Switch to construct the alias segment if it is available in the facet graph as well.",
-                          m_param_searchAlias);
+  moduleParamList->addParameter(prefixed(prefix, "searchAlias"),
+                                m_param_searchAlias,
+                                "Switch to construct the alias segment if it is available in the facet graph as well.",
+                                m_param_searchAlias);
 
-  paramList->addParameter(prefixed(prefix, "relaxSingleLayerSearch"),
-                          m_param_relaxSingleLayerSearch,
-                          "Switch to relax the alias and reverse search for segments contained in a single layer.",
-                          m_param_relaxSingleLayerSearch);
+  moduleParamList->addParameter(prefixed(prefix, "relaxSingleLayerSearch"),
+                                m_param_relaxSingleLayerSearch,
+                                "Switch to relax the alias and reverse search for segments contained in a single layer.",
+                                m_param_relaxSingleLayerSearch);
 
-  paramList->addParameter(prefixed(prefix, "allSingleAliases"),
-                          m_param_allSingleAliases,
-                          "Switch to activate the write out of all available orientations of single facet segments.",
-                          m_param_allSingleAliases);
+  moduleParamList->addParameter(prefixed(prefix, "allSingleAliases"),
+                                m_param_allSingleAliases,
+                                "Switch to activate the write out of all available orientations of single facet segments.",
+                                m_param_allSingleAliases);
 }
 
 void SegmentCreatorFacetAutomaton::apply(

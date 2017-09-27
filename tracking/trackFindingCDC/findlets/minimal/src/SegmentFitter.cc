@@ -17,7 +17,8 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -27,36 +28,36 @@ std::string SegmentFitter::getDescription()
   return "Fits each segment with a selectable method";
 }
 
-void SegmentFitter::exposeParams(ParamList* paramList, const std::string& prefix)
+void SegmentFitter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  paramList->addParameter(prefixed(prefix, "karimakiFit"),
-                          m_param_karimakiFit,
-                          "Switch to select Karimaki method for fitting instead of Riemann fit",
-                          m_param_karimakiFit);
+  moduleParamList->addParameter(prefixed(prefix, "karimakiFit"),
+                                m_param_karimakiFit,
+                                "Switch to select Karimaki method for fitting instead of Riemann fit",
+                                m_param_karimakiFit);
 
-  paramList->addParameter(prefixed(prefix, "fitPos"),
-                          m_param_fitPosString,
-                          "Positional information of the hits to be used in the fit. "
-                          "Options are 'recoPos', 'rlDriftCircle', 'wirePos'.",
-                          m_param_fitPosString);
+  moduleParamList->addParameter(prefixed(prefix, "fitPos"),
+                                m_param_fitPosString,
+                                "Positional information of the hits to be used in the fit. "
+                                "Options are 'recoPos', 'rlDriftCircle', 'wirePos'.",
+                                m_param_fitPosString);
 
-  paramList->addParameter(prefixed(prefix, "fitVariance"),
-                          m_param_fitVarianceString,
-                          "Positional information of the hits to be used in the fit. "
-                          "Options are 'unit', 'driftLength', 'pseudo', 'proper'.",
-                          m_param_fitVarianceString);
+  moduleParamList->addParameter(prefixed(prefix, "fitVariance"),
+                                m_param_fitVarianceString,
+                                "Positional information of the hits to be used in the fit. "
+                                "Options are 'unit', 'driftLength', 'pseudo', 'proper'.",
+                                m_param_fitVarianceString);
 
-  paramList->addParameter(prefixed(prefix, "updateDriftLength"),
-                          m_param_updateDriftLength,
-                          "Switch to reestimate the drift length",
-                          m_param_updateDriftLength);
+  moduleParamList->addParameter(prefixed(prefix, "updateDriftLength"),
+                                m_param_updateDriftLength,
+                                "Switch to reestimate the drift length",
+                                m_param_updateDriftLength);
 
-  paramList->addParameter(prefixed(prefix, "updateRecoPos"),
-                          m_param_updateRecoPos,
-                          "Switch to reestimate the position and right left passage information",
-                          m_param_updateRecoPos);
+  moduleParamList->addParameter(prefixed(prefix, "updateRecoPos"),
+                                m_param_updateRecoPos,
+                                "Switch to reestimate the position and right left passage information",
+                                m_param_updateRecoPos);
 
-  m_driftLengthEstimator.exposeParams(paramList, prefix);
+  m_driftLengthEstimator.exposeParameters(moduleParamList, prefix);
 }
 
 

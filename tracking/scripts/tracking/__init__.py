@@ -4,8 +4,8 @@
 from basf2 import *
 from ROOT import Belle2
 
-from svd import import add_svd_reconstruction
-from pxd import import add_pxd_reconstruction
+from svd import add_svd_reconstruction
+from pxd import add_pxd_reconstruction
 
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,

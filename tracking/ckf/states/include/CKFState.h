@@ -51,7 +51,7 @@ namespace Belle2 {
     CKFState(Seed* seed, unsigned int number) :
       m_seedRecoTrack(seed), m_number(number), m_maximumNumber(number)
     {
-      setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0)));
+      setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
     }
 
     /**

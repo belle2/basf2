@@ -9,13 +9,17 @@
  **************************************************************************/
 #pragma once
 
+#include <framework/core/ModuleParam.dcl.h>
+
 #include <boost/variant/variant.hpp>
+
 #include <string>
 #include <vector>
 #include <map>
 
 namespace Belle2 {
   class ModuleParamList;
+
   namespace TrackFindingCDC {
 
     /// Type variant with allowed parameters types
@@ -55,5 +59,10 @@ namespace Belle2 {
       /// Name of the parameter to be set.
       std::string m_paramName;
     };
+
   }
+
+  extern template class Belle2::ModuleParam<TrackFindingCDC::ParameterVariant>;
+  extern template class Belle2::ModuleParam<TrackFindingCDC::ParameterVariantMap>;
+  extern template class Belle2::ModuleParam<std::vector<TrackFindingCDC::ParameterVariantMap> >;
 }

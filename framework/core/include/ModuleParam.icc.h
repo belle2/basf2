@@ -19,12 +19,17 @@
 #include <string>
 
 namespace Belle2 {
+  template <class T>
+  std::string ModuleParam<T>::TypeInfo()
+  {
+    return PyObjConvUtils::Type<T>::name();
+  }
 
   template <class T>
   ModuleParam<T>::ModuleParam(T& paramVariable,
                               const std::string& description,
                               bool force)
-    : ModuleParamBase(PyObjConvUtils::Type<T>::name(), description, force)
+    : ModuleParamBase(TypeInfo(), description, force)
     , m_paramVariable(paramVariable) {};
 
   template <class T>

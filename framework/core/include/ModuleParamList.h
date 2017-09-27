@@ -23,5 +23,6 @@ to include the heavy implementation of boost::python almost everywhere.
 
 #include <framework/core/ModuleParamList.icc.h>
 #include <framework/core/ModuleParamList.dcl.h>
+#include <framework/core/ModuleParam.icc.h>
 
 #endif /* MODULEPARAMLIST_H_ */

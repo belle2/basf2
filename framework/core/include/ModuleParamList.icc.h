@@ -12,11 +12,9 @@
 
 #include <framework/core/ModuleParamList.dcl.h>
 
-#include <framework/core/ModuleParam.icc.h>
+#include <framework/core/ModuleParam.dcl.h>
 
 #include <framework/logging/Logger.h>
-
-#include <framework/core/PyObjConvUtils.h>
 
 #include <map>
 #include <vector>
@@ -92,12 +90,12 @@ namespace Belle2 {
       ModuleParamPtr moduleParam = mapIter->second;
 
       // Check the type of the stored parameter (currently done using the type identifier string)
-      if (moduleParam->getTypeInfo() == PyObjConvUtils::Type<T>::name()) {
+      if (moduleParam->getTypeInfo() == ModuleParam<T>::TypeInfo()) {
         ModuleParam<T>* explModParam = static_cast<ModuleParam<T>*>(moduleParam.get());
         return *explModParam;
       } else
         throw (ModuleParameterTypeError() << name << moduleParam->getTypeInfo()
-               << PyObjConvUtils::Type<T>::name());
+               << ModuleParam<T>::TypeInfo());
     } else
       throw (ModuleParameterNotFoundError() << name);
   }

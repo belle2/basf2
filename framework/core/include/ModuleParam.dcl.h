@@ -34,6 +34,14 @@ namespace Belle2 {
 
   public:
     /**
+     * Static function to generate a string description for the parameter type.
+     *
+     * This string will be used to identify the contained type and
+     * guaranties some level of type safety in this type erasure.
+     */
+    static std::string TypeInfo();
+
+    /**
      * Constructor.
      *
      * A parameter consists of a reference pointing to a member variable in the module

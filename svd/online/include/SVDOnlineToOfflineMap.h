@@ -12,6 +12,7 @@
 #define FADC_APV_MAPPER_H_
 
 #include <vxd/dataobjects/VxdID.h>
+#include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <boost/property_tree/ptree.hpp>
@@ -174,7 +175,7 @@ namespace Belle2 {
      */
     SVDShaperDigit* NewShaperDigit(unsigned char FADC, unsigned char APV25,
                                    unsigned char channel, short samples[6], float time = 0.0,
-                                   float timeError = 100.0);
+                                   SVDModeByte mode = SVDModeByte());
 
     /** Get ChipInfo for a given FADC/APV combination.
      * @param FADC is FADC number from the SVDRawCopper data.

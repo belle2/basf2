@@ -88,7 +88,8 @@ namespace Belle2 {
         unsigned int trgNumber : 8; //LSB
         unsigned int trgTiming : 8;
         unsigned int FADCnum   : 8;
-        unsigned int evtType   : 3;
+        unsigned int evtType   : 1; // Event type(0): 0…TTD event, 1…standalone event
+        unsigned int DAQMode   : 2; // Event type(2:1): "00"…1-sample, "01"…3-sample, "10"…6-sample
         unsigned int runType   : 2;
         unsigned int check     : 3; //MSB
       };

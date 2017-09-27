@@ -231,7 +231,8 @@ void SVDUnpackerModule::event()
             }
 
             if (m_generateShaperDigts) {
-              SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample);
+              SVDModeByte mode = SVDModeByte(m_MainHeader.runType, m_MainHeader.evtType, m_MainHeader.DAQMode, m_MainHeader.trgTiming);
+              SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample, mode);
               shaperDigits.appendNew(*newShaperDigit);
               delete newShaperDigit;
             }

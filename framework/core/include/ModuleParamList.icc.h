@@ -72,9 +72,7 @@ namespace Belle2 {
     try {
       ModuleParam<T>& explModParam = getParameter<T>(name);
       explModParam.setValue(value);
-    } catch (ModuleParameterNotFoundError& exc) {
-      B2ERROR(exc.what());
-    } catch (ModuleParameterTypeError& exc) {
+    } catch (std::runtime_error& exc) {
       B2ERROR(exc.what());
     }
   }
@@ -94,10 +92,9 @@ namespace Belle2 {
         ModuleParam<T>* explModParam = static_cast<ModuleParam<T>*>(moduleParam.get());
         return *explModParam;
       } else
-        throw (ModuleParameterTypeError() << name << moduleParam->getTypeInfo()
-               << ModuleParam<T>::TypeInfo());
+        throwTypeError(name, moduleParam->getTypeInfo(), ModuleParam<T>::TypeInfo());
     } else
-      throw (ModuleParameterNotFoundError() << name);
+      throwNotFoundError(name);
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -120,7 +117,7 @@ namespace Belle2 {
     try {
       ModuleParamPtr p = getParameterPtr(name);
       p->setValueToPythonObject(pyOutput, defaultValues);
-    } catch (ModuleParamList::ModuleParameterNotFoundError& exc) {
+    } catch (std::runtime_error& exc) {
       B2ERROR(exc.what());
     }
   }

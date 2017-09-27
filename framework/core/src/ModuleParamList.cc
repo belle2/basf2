@@ -11,6 +11,7 @@
 #include <framework/core/ModuleParamList.dcl.h>
 
 #include <framework/core/ModuleParamInfoPython.h>
+#include <framework/core/FrameworkExceptions.h>
 
 #include <boost/python/object.hpp>
 #include <boost/python/list.hpp>
@@ -20,6 +21,30 @@
 #include <memory>
 
 using namespace Belle2;
+
+/** Exception is thrown if the requested parameter could not be found. */
+BELLE2_DEFINE_EXCEPTION(ModuleParameterNotFoundError,
+                        "Could not find the parameter with the "
+                        "name '%1%'! The value of the parameter "
+                        "could NOT be set.");
+
+/** Exception is thrown if the type of the requested parameter is different from the expected type. */
+BELLE2_DEFINE_EXCEPTION(ModuleParameterTypeError,
+                        "The type of the module parameter '%1%' "
+                        "(%2%) is different from the type of the "
+                        "value it should be set to (%3%)!");
+
+void ModuleParamList::throwNotFoundError(const std::string& name)
+{
+  throw (ModuleParameterNotFoundError() << name);
+}
+
+void ModuleParamList::throwTypeError(const std::string& name,
+                                     const std::string& expectedTypeInfo,
+                                     const std::string& typeInfo)
+{
+  throw (ModuleParameterTypeError() << name << expectedTypeInfo << typeInfo);
+}
 
 ModuleParamList::ModuleParamList()
 {

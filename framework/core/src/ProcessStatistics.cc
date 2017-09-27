@@ -18,6 +18,7 @@
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/regex.hpp>
+#include <boost/format.hpp>
 
 #include <algorithm>
 #include <sstream>

@@ -12,8 +12,6 @@
 
 #include <framework/core/ModuleParam.dcl.h>
 
-#include <framework/core/FrameworkExceptions.h>
-
 #include <map>
 #include <vector>
 #include <string>
@@ -43,18 +41,25 @@ namespace Belle2 {
    */
   class ModuleParamList {
 
+  private:
+    /**
+     * Throws an error for a requested parameter that does not exist.
+     *
+     * @param name              The name of the parameter.
+     */
+    [[noreturn]] static void throwNotFoundError(const std::string& name);
+
+    /**
+     * Throws an error for a requested parameter that exists but was request with the wrong type.
+     *
+     * @param name              The name of the parameter.
+     * @param expectedTypeInfo  Type information which the parameter actually has.
+     * @param typeInfo          Type information with which the parameter was looked up.
+     */
+    [[noreturn]] static void throwTypeError(const std::string& name,
+                                            const std::string& expectedTypeInfo,
+                                            const std::string& typeInfo);
   public:
-    // Define exceptions
-    /** Exception is thrown if the requested parameter could not be found. */
-    BELLE2_DEFINE_EXCEPTION(ModuleParameterNotFoundError, "Could not find the parameter with the "
-                            "name '%1%'! The value of the parameter "
-                            "could NOT be set.");
-
-    /** Exception is thrown if the type of the requested parameter is different from the expected type. */
-    BELLE2_DEFINE_EXCEPTION(ModuleParameterTypeError, "The type of the module parameter '%1%' "
-                            "(%2%) is different from the type of the "
-                            "value it should be set to (%3%)!");
-
     /**
      * Constructor.
      */

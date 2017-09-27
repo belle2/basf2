@@ -52,6 +52,7 @@ namespace Belle2 {
       if (!cluster) {return -999;}
       const TVector3& pos = cluster->getClusterPosition();
       Belle2::StoreArray<Belle2::TrackFitResult> tracks;
+
       for (const Belle2::TrackFitResult& track : tracks) {
         const TVector3& trackPos = track.getPosition();
         if (trackPos.Angle(pos) < angle) {
@@ -64,9 +65,9 @@ namespace Belle2 {
     int particleKLMBelleECLFlag(const Particle* particle)
     {
       const float angle = 0.24;
-      const KLMCluster* cluster = particle->getKLMCluster();
-      if (!cluster) {return -999;}
-      const TVector3& pos = cluster->getClusterPosition();
+      const KLMCluster* klmcluster = particle->getKLMCluster();
+      if (!klmcluster) {return -999;}
+      const TVector3& pos = klmcluster->getClusterPosition();
       StoreArray<Belle2::ECLCluster> clusters;
       for (const Belle2::ECLCluster& cluster : clusters) {
         const TVector3& clusterPos = cluster.getClusterPosition();

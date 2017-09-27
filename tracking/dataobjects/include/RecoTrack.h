@@ -1016,7 +1016,11 @@ namespace Belle2 {
     genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr) const
     {
       checkDirtyFlag();
-      return m_genfitTrack.getFittedState(id, representation);
+      try {
+        return m_genfitTrack.getFittedState(id, representation);
+      } catch (genfit::Exception e) {
+        B2FATAL("Something is wrong with this track! " << e.what());
+      }
     }
 
     /// Helper: Check the dirty flag and produce a warning, whenever a fit result is accessed.

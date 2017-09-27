@@ -239,6 +239,10 @@ bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) cons
     return false;
   }
 
+  if (kfs->getBackwardNdf() < 5) {
+    return false;
+  }
+
   return true;
 }
 

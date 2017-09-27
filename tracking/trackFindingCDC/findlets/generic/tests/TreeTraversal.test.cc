@@ -1,18 +1,12 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost <oliver.frost@desy.de>                      *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-/*
- * This file contains test to check the behaviour of the c++ programming language.
- * Its purpose is mainly to asure the programmer that his assumptions about run time behaviour are
- * correct.
- */
 
 #include <gtest/gtest.h>
 #include <tracking/trackFindingCDC/findlets/generic/TreeTraversal.h>
@@ -74,7 +68,7 @@ TEST(TrackFindingCDCTest, Findlet_generic_TreeTraversal)
   seedStates.push_back(&states[0]);
 
   // Find the paths
-  std::vector<Result> results;
+  std::vector<std::vector<const int*>> results;
   testTreeTraversal.apply(seedStates, stateRelations, results);
 
   ASSERT_EQ(2, results.size());
@@ -91,7 +85,7 @@ TEST(TrackFindingCDCTest, Findlet_generic_TreeTraversal)
 
 TEST(TrackFindingCDCTest, Findlet_generic_WeightedTreeTraversal)
 {
-  WeightedTreeTraversal<AcceptHighWeight, State, Result> testWeightedTreeTraversal;
+  WeightedTreeTraversal<AcceptHighWeight, State> testWeightedTreeTraversal;
 
   // Prepare states
   std::vector<int> states({1, 2, 3});
@@ -108,7 +102,7 @@ TEST(TrackFindingCDCTest, Findlet_generic_WeightedTreeTraversal)
   seedStates.push_back(&states[0]);
 
   // Find the paths
-  std::vector<Result> results;
+  std::vector<std::vector<const int*>> results;
   testWeightedTreeTraversal.apply(seedStates, stateRelations, results);
 
   ASSERT_EQ(2, results.size());

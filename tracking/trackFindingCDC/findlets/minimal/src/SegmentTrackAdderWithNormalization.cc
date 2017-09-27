@@ -137,6 +137,13 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
   // Establish the ordering
   for (CDCTrack& track : tracks) {
     track.sortByArcLength2D();
+    CDCTrajectory3D startTrajectory = track.getStartTrajectory3D();
+    startTrajectory.setLocalOrigin(track.front().getRecoPos3D());
+    track.setStartTrajectory3D(startTrajectory);
+
+    CDCTrajectory3D endTrajectory = track.getEndTrajectory3D();
+    endTrajectory.setLocalOrigin(track.back().getRecoPos3D());
+    track.setEndTrajectory3D(endTrajectory);
   }
 
   // Normalize the trajectory and hit contents of the tracks

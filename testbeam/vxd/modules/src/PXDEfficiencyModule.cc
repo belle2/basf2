@@ -561,8 +561,8 @@ PXDEfficiencyModule::findClosestDigit(VxdID& avxdid, TVector3 intersection)
     if (avxdid != m_pxddigits[idigi]->getSensorID()) continue;
     //only digit on the correct sensor and direction should survive
 
-    double u = m_pxddigits[idigi]->getUCellPosition();
-    double v = m_pxddigits[idigi]->getVCellPosition();
+    double u = info.getUCellPosition(m_pxddigits[idigi]->getUCellID());
+    double v = info.getVCellPosition(m_pxddigits[idigi]->getVCellID());
     TVector3 current(u, v, 0);
 
     //2D dist sqared

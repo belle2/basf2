@@ -46,7 +46,7 @@ namespace Belle2 {
      *     should generally avoid to adjust the states in the currentPath to not interfere with the
      *     traversal of earlier siblings.
      */
-    template <class AStateRejecter, class AState, class AResult>
+    template <class AStateRejecter, class AState, class AResult = std::vector<const AState*>>
     class WeightedTreeTraversal
       : public Findlet<const AState* const, const WeightedRelation<AState>, AResult> {
     private:

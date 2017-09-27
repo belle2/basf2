@@ -17,7 +17,7 @@
 
 #include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 #include <cmath>
 

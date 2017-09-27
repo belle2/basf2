@@ -11,8 +11,8 @@
 
 #include <tracking/trackFindingCDC/filters/base/FilterVarSet.dcl.h>
 
-#include <framework/core/ModuleParamList.h>
-#include <framework/core/ModuleParam.h>
+#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParam.dcl.h>
 
 #include <RtypesCore.h>
 

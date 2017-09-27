@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.dcl.h>
 
 #include <framework/logging/Logger.h>
 

@@ -14,7 +14,7 @@
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 #include <vector>
 #include <string>

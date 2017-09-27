@@ -11,8 +11,8 @@
 
 #include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
 
-#include <framework/core/ModuleParamList.h>
-#include <framework/core/ModuleParam.h>
+#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParam.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

@@ -14,7 +14,7 @@
 
 #include <geometry/bfieldmap/BFieldMap.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 #include <framework/dataobjects/Helix.h>
 
 using namespace Belle2;

@@ -9,7 +9,7 @@
  **************************************************************************/
 #include <tracking/modules/vxdCDCTrackMerger/FilterBasedVXDCDCTrackMergerFindlet.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 

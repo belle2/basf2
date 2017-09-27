@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 #include <vector>
 #include <string>

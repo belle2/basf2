@@ -14,7 +14,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;

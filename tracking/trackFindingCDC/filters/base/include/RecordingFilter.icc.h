@@ -14,7 +14,7 @@
 
 #include <tracking/trackFindingCDC/mva/Recorder.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 

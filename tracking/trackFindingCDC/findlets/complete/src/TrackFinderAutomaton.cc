@@ -9,6 +9,9 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/complete/TrackFinderAutomaton.h>
 
+#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParam.dcl.h>
+
 #include <vector>
 
 using namespace Belle2;

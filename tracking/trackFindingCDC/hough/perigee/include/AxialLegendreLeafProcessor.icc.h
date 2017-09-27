@@ -29,7 +29,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

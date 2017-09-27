@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/numerics/Angle.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 namespace Belle2 {

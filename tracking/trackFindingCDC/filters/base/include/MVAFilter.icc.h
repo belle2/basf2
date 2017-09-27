@@ -15,7 +15,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.icc.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/trackFindingCDC/utilities/Named.h>

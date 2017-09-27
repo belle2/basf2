@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 
 #include <framework/core/Module.h>
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 #include <vector>
 #include <array>

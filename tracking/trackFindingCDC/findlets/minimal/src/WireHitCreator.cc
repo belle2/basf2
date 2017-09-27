@@ -25,7 +25,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

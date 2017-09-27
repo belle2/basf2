@@ -7,19 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.dcl.h>
+
+#include <framework/core/ModuleParamInfoPython.h>
 
 #include <boost/python/object.hpp>
 #include <boost/python/list.hpp>
 
-#include <framework/core/ModuleParamList.h>
-
-#include <framework/core/ModuleParamInfoPython.h>
 #include <algorithm>
+#include <utility>
+#include <memory>
 
-using namespace std;
 using namespace Belle2;
-using namespace boost::python;
-
 
 ModuleParamList::ModuleParamList()
 {
@@ -34,18 +34,18 @@ ModuleParamList::~ModuleParamList()
 
 std::vector<std::string> ModuleParamList::getUnsetForcedParams() const
 {
-  vector<string> missingParam;
-  for (const pair<string, ModuleParamPtr>& mapEntry : m_paramMap) {
+  std::vector<std::string> missingParam;
+  for (const std::pair<std::string, ModuleParamPtr>& mapEntry : m_paramMap) {
     if (mapEntry.second->isForcedInSteering() && !mapEntry.second->isSetInSteering())
       missingParam.push_back(mapEntry.first);
   }
   return missingParam;
 }
 
-boost::shared_ptr<boost::python::list> ModuleParamList::getParamInfoListPython() const
+std::shared_ptr<boost::python::list> ModuleParamList::getParamInfoListPython() const
 {
-  boost::shared_ptr<boost::python::list> returnList(new boost::python::list);
-  map<string, ModuleParamPtr>::const_iterator mapIter;
+  std::shared_ptr<boost::python::list> returnList(new boost::python::list);
+  std::map<std::string, ModuleParamPtr>::const_iterator mapIter;
 
   for (mapIter = m_paramMap.begin(); mapIter != m_paramMap.end(); ++mapIter) {
     ModuleParamInfoPython newParamInfo;
@@ -124,7 +124,7 @@ std::string ModuleParamList::getParamTypeString(const std::string& name) const
   } else {
     B2FATAL("Module parameter '" + name + "' does not exist!");
   }
-  return string();
+  return std::string();
 }
 
 

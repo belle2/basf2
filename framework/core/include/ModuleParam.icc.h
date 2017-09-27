@@ -1,0 +1,128 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Andreas Moll                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#ifndef MODULEPARAM_ICC_H_
+#define MODULEPARAM_ICC_H_
+
+#include <framework/core/ModuleParam.dcl.h>
+
+#include <framework/core/PyObjConvUtils.h>
+
+#include <boost/python/object.hpp>
+
+#include <string>
+
+namespace Belle2 {
+
+  /* --- ModuleParamBase Implementation --- */
+  inline ModuleParamBase::ModuleParamBase(const std::string& typeInfo,
+                                          const std::string& description,
+                                          bool force)
+    : m_typeInfo(typeInfo)
+    , m_description(description)
+    , m_forceInSteering(force)
+    , m_setInSteering(false)
+  {
+  }
+
+  inline ModuleParamBase::~ModuleParamBase() = default;
+
+  inline const std::string& ModuleParamBase::getTypeInfo() const
+  {
+    return m_typeInfo;
+  }
+
+  inline const std::string& ModuleParamBase::getDescription() const
+  {
+    return m_description;
+  }
+
+  inline bool ModuleParamBase::isSetInSteering() const
+  {
+    return m_setInSteering;
+  }
+
+  inline bool ModuleParamBase::isForcedInSteering() const
+  {
+    return m_forceInSteering;
+  }
+
+  /* --- ModuleParam<T> Implementation --- */
+  template <class T>
+  ModuleParam<T>::ModuleParam(T& paramVariable,
+                              const std::string& description,
+                              bool force)
+    : ModuleParamBase(PyObjConvUtils::Type<T>::name(), description, force)
+    , m_paramVariable(paramVariable) {};
+
+  template <class T>
+  ModuleParam<T>::~ModuleParam() = default;
+
+  template <class T>
+  void ModuleParam<T>::setValue(T value)
+  {
+    m_paramVariable = value;
+    m_setInSteering = true;
+  }
+
+  template <class T>
+  void ModuleParam<T>::setDefaultValue(T defaultValue)
+  {
+    m_defaultValue = defaultValue;
+    m_paramVariable = defaultValue;
+    m_setInSteering = false;
+  }
+
+  template <class T>
+  T& ModuleParam<T>::getValue()
+  {
+    return m_paramVariable;
+  }
+
+  template <class T>
+  T& ModuleParam<T>::getDefaultValue()
+  {
+    return m_defaultValue;
+  }
+
+  template <class T>
+  void ModuleParam<T>::setValueFromPythonObject(const boost::python::object& pyObject)
+  {
+    setValue(PyObjConvUtils::convertPythonObject(pyObject, getDefaultValue()));
+  }
+
+  template <class T>
+  void ModuleParam<T>::setValueToPythonObject(boost::python::object& pyObject,
+                                              bool defaultValues) const
+  {
+    pyObject =
+      PyObjConvUtils::convertToPythonObject((defaultValues) ? m_defaultValue : m_paramVariable);
+  }
+
+  template <class T>
+  void ModuleParam<T>::setValueFromParam(const ModuleParamBase& param)
+  {
+    const ModuleParam<T>* p = dynamic_cast<const ModuleParam<T>*>(&param);
+    if (p) {
+      m_defaultValue = p->m_defaultValue;
+      m_paramVariable = p->m_paramVariable;
+      m_setInSteering = p->m_setInSteering;
+    }
+  }
+
+  template <class T>
+  void ModuleParam<T>::resetValue()
+  {
+    m_paramVariable = m_defaultValue;
+    m_setInSteering = false;
+  }
+
+} // end of Belle2 namespace
+
+#endif /* MODULEPARAM_ICC_H_ */

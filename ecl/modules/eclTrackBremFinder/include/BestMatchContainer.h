@@ -30,13 +30,19 @@ namespace Belle2 {
   class BestMatchContainer {
   public:
 
+    /**
+     * Lambda typedef for the function comparing estimators. Returns true if
+     * the second parameter is a better estimation than the first one.
+     */
     typedef std::function< bool(TEstimator, TEstimator)> EstimatorComparison;
 
-    /*  static constexpr EstimatorComparison MatchSmaller = [](TEstimator currentBest, TEstimator newEst) {return newEst < currentBest;};
-      static EstimatorComparison MatchLarger = [](TEstimator currentBest, TEstimator newEst) {return newEst > currentBest;};
-    */
+    /**
+     * Add a new item with an estimator value
+     *
+     * @param estComparison The default estimator will favor items with
+     *  smaller estimates
+     */
     bool add(TItem const& item, TEstimator est,
-             // the default estimator will match via smaller estimators
              EstimatorComparison estComparison
     = [](TEstimator currentBest, TEstimator newEst) {return newEst < currentBest;}
             )
@@ -56,17 +62,28 @@ namespace Belle2 {
       return false;
     }
 
+    /**
+     * @return Returns true if at least one candidate has been matched.
+     */
     bool hasMatch() const
     {
       return m_oneMatch;
     }
 
+    /**
+     * @return Returns a reference to the candidate with the best match
+     * according to the estimator value.
+     */
     TItem const& getBestMatch() const
     {
       return m_bestMatch;
     }
 
   private:
+
+    /**
+     * Set a new item as the best match
+     */
     void setBestMatch(TItem const& item, TEstimator est)
     {
       m_bestMatch = item;
@@ -74,10 +91,14 @@ namespace Belle2 {
       m_oneMatch = true;
     }
 
+    /// Stores the best matched item
     TItem m_bestMatch;
-    TEstimator m_bestEstimator = TEstimator();
+
+    // stores if at least match item has been set
     bool m_oneMatch = false;
 
+    /// Stores the estimator value of the best match
+    TEstimator m_bestEstimator = TEstimator();
   };
 
 } //Belle2

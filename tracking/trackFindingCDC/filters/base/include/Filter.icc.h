@@ -11,14 +11,11 @@
 
 #include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 
-// Includes
 #include <tracking/trackFindingCDC/numerics/Weight.h>
-#include <tracking/trackFindingCDC/utilities/ParamList.h>
 
 #include <string>
 #include <cmath>
 
-// Forward declares
 namespace Belle2 {
   class ModuleParamList;
 }
@@ -33,17 +30,8 @@ namespace Belle2 {
     Filter<AObject>::~Filter() = default;
 
     template <class AObject>
-    void Filter<AObject>::exposeParameters(ModuleParamList* moduleParamList,
-                                           const std::string& prefix)
-    {
-      ParamList paramList;
-      this->exposeParams(&paramList, prefix);
-      paramList.transferTo(moduleParamList);
-    }
-
-    template <class AObject>
-    void Filter<AObject>::exposeParams(ParamList* paramList __attribute__((unused)),
-                                       const std::string& prefix __attribute__((unused)))
+    void Filter<AObject>::exposeParameters(ModuleParamList* moduleParamListw __attribute__((unused)),
+                                           const std::string& prefix  __attribute__((unused)))
     {
     }
 

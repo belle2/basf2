@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
-#include <tracking/trackFindingCDC/utilities/ParamList.h>
 #include <tracking/trackFindingCDC/utilities/GenIndices.h>
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 
@@ -84,13 +83,6 @@ namespace Belle2 {
         ModuleParamList moduleParamList = this->getParamList();
 
         const std::string prefix = "";
-
-        // New way switch when exposeParameters is phased out
-        // ModuleParamList moduleParamList;
-        // m_findlet.exposeParameters(&moduleParamList, prefix);
-        // moduleParamList.transferTo(&moduleParamList);
-
-        // Old way is deprecated.
         m_findlet.exposeParameters(&moduleParamList, prefix);
 
         this->setParamList(moduleParamList);

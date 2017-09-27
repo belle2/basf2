@@ -51,13 +51,6 @@ namespace Belle2 {
        */
       virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 
-      /**
-       *  Expose the set of parameters of the filter to the module parameter list.
-       *
-       *  Note that not all filters have yet exposed their parameters in this way.
-       */
-      virtual void exposeParams(ParamList* paramList, const std::string& prefix);
-
       /// Indicates if the filter requires Monte Carlo information.
       virtual bool needsTruthInformation();
 

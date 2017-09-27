@@ -49,7 +49,6 @@ namespace Belle2 {
        *
        *  This method is deprecated as the exposeParams below uses a less compile heavy equivalent.
        */
-      [[deprecated("Use exposeParams below. Same for Findlet::exposeParameters")]]
       virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 
       /**

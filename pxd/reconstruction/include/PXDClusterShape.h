@@ -43,6 +43,7 @@ namespace Belle2 {
 
     };
 
+    /** Type specifies cluster shape type description */
     typedef std::map<pxdClusterShapeType, std::string> pxdClusterShapeDescr;
 
     /** Class to correct estimation of cluster error and position base on its shape.

@@ -488,10 +488,10 @@ void pxdClusterShapeCalibrationModule::collect()
           double trVmid = info.getVCellPosition(iTrV);
           float trUNorm = (trU - trUmid) / uPitch;
           float trVNorm = (trV - trVmid) / vPitch;
-          for (auto digit : cluster.getRelationsTo<PXDDigit>()) {
-            float signal = digit.getCharge();
-            short int idigU = digit.getUCellID();
-            short int idigV = digit.getVCellID();
+          for (auto digit1 : cluster.getRelationsTo<PXDDigit>()) {
+            float signal = digit1.getCharge();
+            short int idigU = digit1.getUCellID();
+            short int idigV = digit1.getVCellID();
             int ind1 = 2 - idigU + iTrU;
             int ind2 = 2 - idigV + iTrV;
             if ((ind1 < 0) || (ind1 > 4)) continue;

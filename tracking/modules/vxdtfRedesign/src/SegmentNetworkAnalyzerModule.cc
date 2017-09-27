@@ -61,12 +61,12 @@ void SegmentNetworkAnalyzerModule::event()
     for (const auto& centerHit : outerHit->getInnerNodes()) {
       for (const auto& innerHit : centerHit->getInnerNodes()) {
 
-        Segment<TrackNode>* innerSegment = new Segment<TrackNode>(centerHit->getEntry().sector->getFullSecID(),
-                                                                  innerHit->getEntry().sector->getFullSecID(),
+        Segment<TrackNode>* innerSegment = new Segment<TrackNode>(centerHit->getEntry().m_sector->getFullSecID(),
+                                                                  innerHit->getEntry().m_sector->getFullSecID(),
                                                                   &centerHit->getEntry(),
                                                                   &innerHit->getEntry());
-        Segment<TrackNode>* outerSegment = new Segment<TrackNode>(outerHit->getEntry().sector->getFullSecID(),
-                                                                  centerHit->getEntry().sector->getFullSecID(),
+        Segment<TrackNode>* outerSegment = new Segment<TrackNode>(outerHit->getEntry().m_sector->getFullSecID(),
+                                                                  centerHit->getEntry().m_sector->getFullSecID(),
                                                                   &outerHit->getEntry(),
                                                                   &centerHit->getEntry());
 

@@ -19,8 +19,8 @@ dz0 = array('d')
 pt = array('d')
 dpt = array('d')
 
-files = glob.glob('qam.0*.root')
-# files = glob.glob('/ghi/fs01/belle2/bdata/group/detector/CDC/qam/GCR1/build-2017-08-21/qam.0001.*.root')
+# files = glob.glob('qam.0*.root')
+files = glob.glob('/ghi/fs01/belle2/bdata/group/detector/CDC/qam/GCR1/build-2017-08-21/qam.0001.*.root')
 
 if files is None:
     print('No files are found')
@@ -32,7 +32,6 @@ for f in files:
     rmsPt = qam.getRms('pt')
     rmsD0 = qam.getRms('d0')
     rmsZ0 = qam.getRms('z0')
-    #    print(str(run)+str(mean))
     x.append(run)
     dx.append(0.0)
     d0.append(rmsD0[0])

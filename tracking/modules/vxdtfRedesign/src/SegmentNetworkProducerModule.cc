@@ -352,7 +352,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
         innerSector = new ActiveSector<StaticSectorType, TrackNode>(innerRawSecPos->staticSector);
         innerRawSecPos->wasCreated = true;
         innerRawSecPos->sector = innerSector;
-        for (Belle2::TrackNode* hit : innerRawSecPos->hits) { hit->sector = innerSector; }
+        for (Belle2::TrackNode* hit : innerRawSecPos->hits) { hit->m_sector = innerSector; }
         // add all SpacePoints of this sector to ActiveSector:
         innerSector->addHits(innerRawSecPos->hits);
         activeSectors.push_back(innerSector);
@@ -364,7 +364,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
       if (!wasAnythingFoundSoFar) {
         outerSectorData.wasCreated = true;
         outerSectorData.sector = outerSector;
-        for (Belle2::TrackNode* hit : outerSectorData.hits) { hit->sector = outerSector; }
+        for (Belle2::TrackNode* hit : outerSectorData.hits) { hit->m_sector = outerSector; }
         // add all SpacePoints of this sector to ActiveSector:
         outerSector->addHits(outerSectorData.hits);
         activeSectors.push_back(outerSector);
@@ -497,7 +497,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
     if (centerHits.empty()) continue; // go to next outerHit
 
     // get the point to the static sector
-    const StaticSectorType* outerStaticSector = outerHit->getEntry().sector->getAttachedStaticSector();
+    const StaticSectorType* outerStaticSector = outerHit->getEntry().m_sector->getAttachedStaticSector();
     // should not happen, but just in case:
     if (outerStaticSector == NULL) {
       B2WARNING("Static sector not found. This should not happen!");
@@ -513,8 +513,8 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
       for (DirectedNode<TrackNode, VoidMetaInfo>* innerHit : innerHits) {
 
         //retrieve the filter
-        const auto* filter3sp = outerStaticSector->getFilter3sp(centerHit->getEntry().sector->getFullSecID(),
-                                                                innerHit->getEntry().sector->getFullSecID());
+        const auto* filter3sp = outerStaticSector->getFilter3sp(centerHit->getEntry().m_sector->getFullSecID(),
+                                                                innerHit->getEntry().m_sector->getFullSecID());
         if (filter3sp == NULL) continue;
 
         // the filter accepts spacepoint combinations
@@ -535,8 +535,8 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         if (not segmentNetwork.isNodeInNetwork(innerSegmentID)) {
           // create innerSegment first (order of storage in vector<segments> is irrelevant):
           Segment<TrackNode>* innerSegment = new Segment<TrackNode>(
-            centerHit->getEntry().sector->getFullSecID(),
-            innerHit->getEntry().sector->getFullSecID(),
+            centerHit->getEntry().m_sector->getFullSecID(),
+            innerHit->getEntry().m_sector->getFullSecID(),
             &centerHit->getEntry(),
             &innerHit->getEntry()
           );
@@ -549,8 +549,8 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         if (not segmentNetwork.isNodeInNetwork(outerSegmentID)) {
           // create innerSegment first (order of storage in vector<segments> is irrelevant):
           Segment<TrackNode>* outerSegment = new Segment<TrackNode>(
-            outerHit->getEntry().sector->getFullSecID(),
-            centerHit->getEntry().sector->getFullSecID(),
+            outerHit->getEntry().m_sector->getFullSecID(),
+            centerHit->getEntry().m_sector->getFullSecID(),
             &outerHit->getEntry(),
             &centerHit->getEntry()
           );

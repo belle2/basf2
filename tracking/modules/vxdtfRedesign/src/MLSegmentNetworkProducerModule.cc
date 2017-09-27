@@ -79,8 +79,8 @@ void MLSegmentNetworkProducerModule::event()
         if (!accepted) { nRejected++; continue; } // don't store combinations which have not been accepted
         nAccepted++;
 
-        Segment<TrackNode>* innerSegment = new Segment<TrackNode>(centerHit->getEntry().sector->getFullSecID(),
-                                                                  innerHit->getEntry().sector->getFullSecID(),
+        Segment<TrackNode>* innerSegment = new Segment<TrackNode>(centerHit->getEntry().m_sector->getFullSecID(),
+                                                                  innerHit->getEntry().m_sector->getFullSecID(),
                                                                   &centerHit->getEntry(),
                                                                   &innerHit->getEntry());
         B2DEBUG(999, "buildSegmentNetwork: innerSegment: " << innerSegment->getName());
@@ -95,8 +95,8 @@ void MLSegmentNetworkProducerModule::event()
 
         if (!alreadyAdded) {
           // create outerSector
-          Segment<TrackNode>* outerSegment = new Segment<TrackNode>(outerHit->getEntry().sector->getFullSecID(),
-                                                                    centerHit->getEntry().sector->getFullSecID(),
+          Segment<TrackNode>* outerSegment = new Segment<TrackNode>(outerHit->getEntry().m_sector->getFullSecID(),
+                                                                    centerHit->getEntry().m_sector->getFullSecID(),
                                                                     &outerHit->getEntry(),
                                                                     &centerHit->getEntry());
           B2DEBUG(999, "buildSegmentNetwork: outerSegment(freshly created): " << outerSegment->getName() <<

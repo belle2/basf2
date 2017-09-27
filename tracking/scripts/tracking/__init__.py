@@ -267,7 +267,8 @@ def add_cdc_cr_track_fit_and_track_creator(path, components=None,
                     recoTrackColName=reco_tracks,
                     trackColName=tracks,
                     defaultPDGCode=13,
-                    useClosestHitToIP=True
+                    useClosestHitToIP=True,
+                    useBFieldAtHit=True
                     )
 
     # Prune genfit tracks

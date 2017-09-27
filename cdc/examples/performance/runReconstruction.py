@@ -46,6 +46,9 @@ def rec(input, output, topInCounter=False, magneticField=True,
     data_period = getDataPeriod(exp=exp_number,
                                 run=run_number)
 
+    mapperAngle = getMapperAngle(exp=exp_number,
+                                 run=run_number)
+
     # print(data_period)
     if os.path.exists('output') is False:
         os.mkdir('output')
@@ -66,7 +69,7 @@ def rec(input, output, topInCounter=False, magneticField=True,
     if fieldMapper is True:
         main_path.add_module('CDCJobCntlParModifier',
                              MapperGeometry=True,
-                             MapperPhiAngle=43.3)
+                             MapperPhiAngle=mapperAngle)
 
     if magneticField is False:
         main_path.add_module('Geometry',

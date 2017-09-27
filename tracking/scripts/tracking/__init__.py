@@ -609,6 +609,14 @@ def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", compo
                    instances of track finding in one path.
     """
 
+    # Preparation of the VXD clusters
+    if is_pxd_used(components):
+        if 'PXDClusterizer' not in path:
+            add_pxd_reconstruction(path)
+
+    if 'SVDClusterizer' not in path:
+        add_svd_reconstruction(path)
+
     # Temporary array
     # add a suffix to be able to have different
     vxd_trackcands = '__VXDGFTrackCands' + suffix

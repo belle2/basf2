@@ -1,4 +1,4 @@
-#include <ecl/bremfinding/BremFinding.h>
+#include <ecl/modules/eclTrackBremFinder/BremFinding.h>
 #include <framework/utilities/Angle.h>
 
 using namespace std;

@@ -8,9 +8,9 @@
 
 #include <ecl/modules/eclTrackBremFinder/ECLTrackBremFinderModule.h>
 #include <ecl/modules/eclTrackBremFinder/BestMatchContainer.h>
+#include <ecl/modules/eclTrackBremFinder/BremFinding.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/bremfinding/BremFinding.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>

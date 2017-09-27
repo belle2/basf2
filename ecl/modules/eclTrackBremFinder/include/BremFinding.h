@@ -1,8 +1,6 @@
 #ifndef BREMFINDING_H
 #define BREMFINDING_H
 
-#include <ecl/modules/eclTrackBremFinder/ECLTrackBremFinderModule.h>
-#include <ecl/modules/eclTrackBremFinder/BestMatchContainer.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <mdst/dataobjects/ECLCluster.h>

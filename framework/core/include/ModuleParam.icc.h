@@ -20,40 +20,6 @@
 
 namespace Belle2 {
 
-  /* --- ModuleParamBase Implementation --- */
-  inline ModuleParamBase::ModuleParamBase(const std::string& typeInfo,
-                                          const std::string& description,
-                                          bool force)
-    : m_typeInfo(typeInfo)
-    , m_description(description)
-    , m_forceInSteering(force)
-    , m_setInSteering(false)
-  {
-  }
-
-  inline ModuleParamBase::~ModuleParamBase() = default;
-
-  inline const std::string& ModuleParamBase::getTypeInfo() const
-  {
-    return m_typeInfo;
-  }
-
-  inline const std::string& ModuleParamBase::getDescription() const
-  {
-    return m_description;
-  }
-
-  inline bool ModuleParamBase::isSetInSteering() const
-  {
-    return m_setInSteering;
-  }
-
-  inline bool ModuleParamBase::isForcedInSteering() const
-  {
-    return m_forceInSteering;
-  }
-
-  /* --- ModuleParam<T> Implementation --- */
   template <class T>
   ModuleParam<T>::ModuleParam(T& paramVariable,
                               const std::string& description,

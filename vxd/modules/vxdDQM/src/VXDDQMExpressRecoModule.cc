@@ -727,9 +727,9 @@ void VXDDQMExpressRecoModule::endRun()
     TFile* f_RefHistFile = new TFile(m_RefHistFileName.c_str(), "read");
     if (f_RefHistFile->IsOpen()) {
       B2INFO("Reference file name: " << m_RefHistFileName.c_str());
-      TVectorD* NoOfEventsRef = NULL;
-      f_RefHistFile->GetObject("DQMER_VXD_NoOfEvents_Ref", NoOfEventsRef);
-      m_NoOfEventsRef = (int)NoOfEventsRef->GetMatrixArray()[0];
+      TVectorD* NoOfEventsRef2 = NULL;
+      f_RefHistFile->GetObject("DQMER_VXD_NoOfEvents_Ref", NoOfEventsRef2);
+      m_NoOfEventsRef = (int)NoOfEventsRef2->GetMatrixArray()[0];
       //    m_NoOfEventsRef = 2;
       string Diru = str(format("Phi"));
       string Dirv = str(format("Theta"));
@@ -1040,11 +1040,11 @@ int VXDDQMExpressRecoModule::SetFlag(int Type, int bin, double* pars, double rat
     }
     iret = 1;
   } else if (Type == 10) {
-    float flag  = refhist->Chi2Test(temp);
+    float flag2  = refhist->Chi2Test(temp);
     flaghist->SetBinContent(bin + 1, 0);
-    if (flag > pars[1])
+    if (flag2 > pars[1])
       flaghist->SetBinContent(bin + 1, 2);
-    if (flag > pars[0])
+    if (flag2 > pars[0])
       flaghist->SetBinContent(bin + 1, 1);
     iret = 1;
   } else if (Type == 100) {

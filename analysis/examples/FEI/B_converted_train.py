@@ -15,7 +15,7 @@ ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Bel
 
 import fei
 particles = fei.get_default_channels(convertedFromBelle=True)
-configuration = fei.config.FeiConfiguration(prefix='FEI_Belle1_Generic_2017_1', b2bii=True, training=True)
+configuration = fei.config.FeiConfiguration(prefix='FEI_TEST', b2bii=True, training=True)
 feistate = fei.get_path(particles, configuration)
 
 path = create_path()
@@ -25,9 +25,7 @@ else:
     inputMdstList('Belle', [], path)
 
 path.add_path(feistate.path)
-
-if feistate.stage >= 0:
-    path.add_module('RootOutput')
+path.add_module('RootOutput')
 
 print(path)
 process(path)

@@ -52,7 +52,6 @@ namespace Belle2 {
       if (!cluster) {return -999;}
       const TVector3& pos = cluster->getClusterPosition();
       Belle2::StoreArray<Belle2::TrackFitResult> tracks;
-
       for (const Belle2::TrackFitResult& track : tracks) {
         const TVector3& trackPos = track.getPosition();
         if (trackPos.Angle(pos) < angle) {

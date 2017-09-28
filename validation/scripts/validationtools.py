@@ -41,9 +41,18 @@ def get_background_files():
 
     print("Background files loaded from folder {}".format(bg_folder))
 
+    # sort for easier comparison
+    bg = sorted(bg)
+
     print("{: >65} {: >65} ".format("- Background file name -", "- sha256 -"))
+    all_hexes = ""
     for f in bg:
-        print("{: >65} {: >65} ".format(f, hashlib.sha256(open(f, 'rb').read()).hexdigest()))
+        hex_hash = hashlib.sha256(open(f, 'rb').read()).hexdigest()
+        all_hexes = all_hexes + hex_hash
+        print("{: >65} {: >65} ".format(f, hex_hash))
+
+    print("{: >65} {: >65}".format("---", "---"))
+    print("{: >65} {: >65}".format("sha256 of all background file hashes", hashlib.sha256(all_hexes.encode()).hexdigest()))
 
     return bg
 

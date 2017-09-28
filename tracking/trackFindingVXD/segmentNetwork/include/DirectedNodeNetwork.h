@@ -27,7 +27,7 @@ namespace Belle2 {
   public:
     /** typedef for more readable Node-Type */
     typedef DirectedNode<EntryType, MetaInfoType> Node;
-    typedef int NodeID; // NodeID should be some unique integer
+    typedef std::int64_t NodeID; // NodeID should be some unique integer
 
   protected:
 

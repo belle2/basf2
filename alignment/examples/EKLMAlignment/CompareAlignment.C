@@ -1,5 +1,21 @@
 
 /**
+ * Get parameter index.
+ */
+int parameterIndex(int param)
+{
+  switch (param) {
+    case 1:
+      return 0;
+    case 2:
+      return 1;
+    case 6:
+      return 2;
+  }
+  return -1;
+}
+
+/**
  * Comparison of initial displacements and alignment result.
  */
 void CompareAlignment(const char *displacementFile, const char *alignmentFile,
@@ -39,13 +55,19 @@ void CompareAlignment(const char *displacementFile, const char *alignmentFile,
   tComparisonSector->Branch("error", &error, "error/F");
   n = tDisplacementSector->GetEntries();
   for (i = 0; i < n; i++) {
+    /*
+     * Usage of (param - 1) is intentional: EKLMAlignment module uses
+     * number 3 for dalpha.
+     */
     tDisplacementSector->GetEntry(i);
-    val0[endcap - 1][layer - 1][sector - 1][0][0][param - 1] = value;
+    val0[endcap - 1][layer - 1][sector - 1][0][0][param - 1] =
+      value;
   }
   n = tAlignmentSector->GetEntries();
   for (i = 0; i < n; i++) {
     tAlignmentSector->GetEntry(i);
-    value0 = val0[endcap - 1][layer - 1][sector - 1][0][0][param - 1];
+    value0 =
+      val0[endcap - 1][layer - 1][sector - 1][0][0][parameterIndex(param)];
     tComparisonSector->Fill();
   }
   /* Segment. */

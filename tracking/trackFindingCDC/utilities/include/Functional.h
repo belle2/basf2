@@ -243,7 +243,7 @@ namespace Belle2 {
     };
 
     /// Meta-functor that discards any return value that the given functor emits
-    template <int I, class AFunctor = Id>
+    template <class AFunctor = Id>
     using VoidOf = Composition<Void, AFunctor>;
 
     /// Meta-functor that calles the given functor in case the call works - otherwise do nothing

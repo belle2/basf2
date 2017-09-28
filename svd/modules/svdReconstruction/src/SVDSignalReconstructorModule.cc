@@ -279,8 +279,8 @@ void SVDSignalReconstructorModule::event()
       tie(stripAmplitude, stripAmplitudeError, stripChi2) =
         fitTool.getAmplitudeChi2(normedSamples, stripTime, stripSignalWidth);
       //De-normalize amplitudes and convert to ADU
-      stripAmplitude *= stripNoise * stripGain;
-      stripAmplitudeError *= stripNoise * stripGain;
+      stripAmplitude *= stripNoise;
+      stripAmplitudeError *= stripNoise;
       B2DEBUG(200, "RecoDigit " << iDigit << " Noise: " << stripNoise
               << "Time: " << stripTime << " +/- " << stripTimeError
               << " Amplitude: " << stripAmplitude << " +/- " << stripAmplitudeError

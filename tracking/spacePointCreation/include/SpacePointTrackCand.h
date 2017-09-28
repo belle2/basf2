@@ -270,7 +270,7 @@ namespace Belle2 {
     /**
      * return family identifier
      */
-    unsigned short getFamily() const { return m_family; }
+    short getFamily() const { return m_family; }
 
     /**
      * assign family identifier

@@ -5,7 +5,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::GblMultipleScatteringController+;
 #pragma link C++ class Belle2::GlobalLabel+;
 #pragma link C++ class Belle2::alignment::PedeApplication+;
 #pragma link C++ class Belle2::alignment::PedeResult+;

@@ -18,8 +18,29 @@
 #include <genfit/StateOnPlane.h>
 #include <root/TGeoMatrix.h>
 
+#include <framework/logging/Logger.h>
+
+#include <alignment/GlobalParam.h>
+
+
+#include <framework/dbobjects/BeamParameters.h>
+#include <alignment/dbobjects/VXDAlignment.h>
+#include <alignment/dbobjects/CDCCalibration.h>
+#include <alignment/dbobjects/BKLMAlignment.h>
+#include "GlobalLabel.h"
+#include <eklm/dbobjects/EKLMAlignment.h>
+
+#include <cdc/dbobjects/CDCTimeZeros.h>
+#include <cdc/dbobjects/CDCTimeWalks.h>
+#include <cdc/dbobjects/CDCAlignment.h>
+#include <cdc/dbobjects/CDCXtRelations.h>
+
+#include <alignment/GlobalParam.h>
+
 namespace Belle2 {
+  class MillepedeAlgorithm;
   namespace alignment {
+
     /// pair of the global unique id from object with constants and element representing some rigid body in hierarchy
     typedef std::pair<unsigned short, unsigned short> DetectorLevelElement;
     /// pair with global labels and matrix with coresponding global derivatives
@@ -28,11 +49,10 @@ namespace Belle2 {
     typedef std::vector<std::pair<int, double>> Constraint;
     /// vector of constraints
     typedef std::map<int, Constraint> Constraints;
+
     /// Class for alignment/calibration parameter hierarchy & constraints
     class GlobalDerivativesHierarchy {
-
     public:
-
       //! Constructor
       GlobalDerivativesHierarchy() {}
       //! Destructor (virtual)
@@ -61,6 +81,8 @@ namespace Belle2 {
           m_hierarchy.insert(std::make_pair(parentUID, std::vector<DetectorLevelElement>()));
           // insert child (can happen only once, so the vect is unique)
           m_hierarchy[parentUID].push_back(childUID);
+          m_usedUniqueIDs.insert(ChildDBObjectType::getGlobalUniqueID());
+          m_usedUniqueIDs.insert(MotherDBObjectType::getGlobalUniqueID());
         } else {
           // Update element transformation if inserted again
           m_lookup[childUID].second = childToMotherParamTransform;
@@ -77,6 +99,10 @@ namespace Belle2 {
       /// The only function to implement: what are the global labels for the element?
       virtual std::vector<int> getElementLabels(DetectorLevelElement element) = 0;
 
+      /// Get the global unique ids of DB objects used to construct hierarchy
+      /// Usefull to update hierarchy only when those changed
+      const std::set<unsigned short>& getUsedDBObjUniqueIDs() {return m_usedUniqueIDs;}
+
     private:
       /// Find the transformation in the lookup
       std::pair<DetectorLevelElement, TMatrixD> getChildToMotherTransform(DetectorLevelElement child);
@@ -85,6 +111,10 @@ namespace Belle2 {
       std::map<DetectorLevelElement, std::pair<DetectorLevelElement, TMatrixD>> m_lookup;
       //! Map of hierarchy relations mother-> child
       std::map<DetectorLevelElement, std::vector<DetectorLevelElement>> m_hierarchy;
+
+      /// The set of unique id of each DB object used for construction
+      /// For more efficient updates of hierarchy only when used objects change
+      std::set<unsigned short> m_usedUniqueIDs {};
     };
 
     /// 1D Hierarchy for Lorentz shift correction
@@ -171,87 +201,6 @@ namespace Belle2 {
       /// Conversion from G4Transform3D to 6D rigid body transformation parametrization
       TMatrixD convertTGeoToRigidBodyTransformation(TGeoHMatrix tgeo);
     private:
-
-
-    };
-
-    /**
-    class GlobalParamSetAccess {
-    public:
-      virtual unsigned short getGlobalUniqueID() = 0;
-      virtual double getGlobalParam(unsigned short, unsigned short) = 0;
-      virtual void setGlobalParam(double, unsigned short, unsigned short) = 0;
-      virtual std::vector<DetectorLevelElement> listGlobalParams() = 0;
-
-      virtual void construct() = 0;
-    };
-
-    template<class DBObjType>
-    class GlobalParamSet : public GlobalParamSetAccess {
-    public:
-      GlobalParamSet() {}
-      ~GlobalParamSet() {m_object.reset();}
-
-      virtual unsigned short getGlobalUniqueID() final {return DBObjType::getGlobalUniqueID();}
-      virtual double getGlobalParam(unsigned short element, unsigned short param) final {ensureConstructed(); return m_object->getGlobalParam(element, param);}
-      virtual void setGlobalParam(double value, unsigned short element, unsigned short param) final {ensureConstructed(); m_object->setGlobalParam(value, element, param);}
-      virtual std::vector<DetectorLevelElement> listGlobalParams() final {ensureConstructed(); return m_object->listGlobalParams();}
-
-      virtual void construct() final {m_object.reset(new DBObjType());}
-    private:
-      std::shared_ptr<DBObjType> m_object {};
-      void ensureConstructed() {if (!m_object) construct();}
-    };
-    **/
-
-    /// Set with no parameters, terminates hierarchy etc.
-    class EmptyGlobaParamSet {
-    public:
-      /// Get global unique id = 0
-      static unsigned short getGlobalUniqueID() {return 0;}
-      /// There no params stored here, returns always 0.
-      double getGlobalParam(unsigned short, unsigned short) {return 0.;}
-      /// No parameters to set. Does nothing
-      void setGlobalParam(double, unsigned short, unsigned short) {}
-      /// No parameters, returns empty vector
-      std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {};}
-    };
-
-    /// Class to hold hierarchy of whole Belle2
-    class HierarchyManager {
-
-    public:
-      /// Destructor
-      ~HierarchyManager();
-
-      /// Get instance of the manager
-      static HierarchyManager& getInstance();
-
-      /// Get the rigid body alignment hierarchy
-      RigidBodyHierarchy& getAlignmentHierarchy() { return *m_alignment; }
-
-      /// Get the Lorentz shift hierarchy
-      LorentShiftHierarchy& getLorentzShiftHierarchy() { return *m_lorentzShift; }
-
-      /// Write-out complete hierarchy to a text file
-      void writeConstraints(std::string txtFilename);
-
-    private:
-      /** Singleton class, hidden constructor */
-      HierarchyManager() {};
-      /** Singleton class, hidden copy constructor */
-      HierarchyManager(const HierarchyManager&);
-      /** Singleton class, hidden assignment operator */
-      HierarchyManager& operator=(const HierarchyManager&);
-
-      /// The alignment hierarchy
-      std::unique_ptr<RigidBodyHierarchy> m_alignment {new RigidBodyHierarchy()};
-      /// Hierarchy for Lorentz shift corrections
-      std::unique_ptr<LorentShiftHierarchy> m_lorentzShift {new LorentShiftHierarchy()};
-
-
-      //std::vector<std::shared_ptr<GlobalParamSetAccess>> m_globalVector {};
-
     };
   }
 }

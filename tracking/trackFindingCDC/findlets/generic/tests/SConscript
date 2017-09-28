@@ -1,0 +1,8 @@
+Import('env')
+
+# Use the common libraries of the track finder for the test compilation
+env['LIBS'] = [
+    'tracking_trackFindingCDC',
+    ]
+
+Return('env')

@@ -113,8 +113,6 @@ namespace Belle2 {
     /** counter for Cluster seed charge by distance from the start row */
     TH1F** m_StartRowCount;
 
-    /** Number of pixels on PXD v direction */
-    int m_nPixels;
     /** Number of VXD layers on Belle II */
     int c_nVXDLayers;
     /** Number of PXD layers on Belle II */

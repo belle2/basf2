@@ -17,9 +17,6 @@
 #include <tuple>
 #include <string>
 
-using namespace Belle2;
-using namespace TrackFindingCDC;
-
 template class Belle2::ModuleParam<bool>;
 template class Belle2::ModuleParam<int>;
 template class Belle2::ModuleParam<unsigned int>;

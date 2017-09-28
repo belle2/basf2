@@ -5,7 +5,8 @@ from basf2 import *
 from ROOT import Belle2
 
 
-def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False, trueEventTime=False):
+def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
+                    thetaDef='avg', zDef='min', trueEventTime=False):
     """
     This function adds the CDC trigger modules to a path.
     @path              modules are added to this path
@@ -19,6 +20,9 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False, true
     @lowPt             default threshold for track finding is 0.3Gev.
                        with the lowPt option, the threshold is 0.255GeV.
                        use together with the shortTracks option.
+    @thetaDef          theta definition for the CDCTriggerTrackCombiner
+    @zDef              z definition for the CDCTriggerTrackCombiner
+                       (for details see module description)
     @trueEventTime     since the event time finder is not yet finalized,
                        the true event time can be used instead.
                        recommended especially for tests on single tracks.
@@ -56,6 +60,8 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False, true
                 B2WARNING("no networks available for shortTracks=False and lowPt=True "
                           "(combination not recommended), using networks for lowPt=False")
         path.add_module('CDCTriggerNeuro', filename=filename)
+        path.add_module('CDCTriggerTrackCombiner',
+                        thetaDefition=thetaDef, zDefinition=zDef)
     elif SimulationMode == 2:
         B2WARNING("full simulation mode does not include all CDC trigger modules yet")
         # standard CDC trigger

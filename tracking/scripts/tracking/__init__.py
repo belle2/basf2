@@ -4,6 +4,9 @@
 from basf2 import *
 from ROOT import Belle2
 
+from svd import add_svd_reconstruction
+from pxd import add_pxd_reconstruction
+
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trigger_mode="all", additionalTrackFitHypotheses=None,
@@ -606,6 +609,14 @@ def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", compo
                    instances of track finding in one path.
     """
 
+    # Preparation of the VXD clusters
+    if is_pxd_used(components):
+        if 'PXDClusterizer' not in path:
+            add_pxd_reconstruction(path)
+
+    if 'SVDClusterizer' not in path:
+        add_svd_reconstruction(path)
+
     # Temporary array
     # add a suffix to be able to have different
     vxd_trackcands = '__VXDGFTrackCands' + suffix
@@ -678,12 +689,19 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     #################
     nameSPs = 'SpacePoints' + suffix
 
+    if 'PXDClusterizer' not in path:
+        if use_pxd:
+            add_pxd_reconstruction(path)
+
     if 'PXDSpacePointCreator' not in path:
         if use_pxd:
             spCreatorPXD = register_module('PXDSpacePointCreator')
             spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
             spCreatorPXD.param('SpacePoints', nameSPs)
             path.add_module(spCreatorPXD)
+
+    if 'SVDClusterizer' not in path:
+        add_svd_reconstruction(path)
 
     if 'SVDSpacePointCreator' not in path:
         # always use svd!

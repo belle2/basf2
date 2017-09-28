@@ -9,7 +9,10 @@
 #
 # Please adapt for your signal channel. Note that a large amount of MC is needed to train the specific FEI.
 # I usually use 100 million of signal events for each final state, mixed and charged MC.
+# This example is for hadronic tagging.
 
+import fei
+from modularAnalysis import *
 
 path = create_path()
 
@@ -23,7 +26,7 @@ skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
 skimfilter.if_value('>12', empty_path, AfterConditionPath.END)
 path.add_module(skimfilter)
 
-# signal side reconstruction
+# Signal side reconstruction
 fillParticleList('mu+', 'muIDBelle > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
 fillParticleList('e+', 'eIDBelle > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
 fillParticleList('gamma', 'goodGamma == 1 and E >= 1.0', writeOut=True, path=path)
@@ -67,7 +70,7 @@ cut = '[[{mc} > 0 and {sig} == 1] or [{mc} == 0 and {sig} != 1]]'.format(mc=sign
 applyCuts('B+:sig', cut, path=path)
 
 # FEI config
-fei_tag = 'SPEC - FEI - 100_v4
+fei_tag = 'my_specFEI'
 belle_particles = fei.get_default_channels(KLong=False,
                                            chargedB=True,
                                            neutralB=True,

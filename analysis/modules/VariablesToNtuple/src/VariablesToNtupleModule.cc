@@ -17,6 +17,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/utilities/MakeROOTCompatible.h>
+#include <framework/core/ModuleParam.icc.h>
 
 #include <cmath>
 #include <algorithm>

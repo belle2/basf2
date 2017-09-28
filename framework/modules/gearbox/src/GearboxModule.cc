@@ -12,6 +12,7 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/core/ModuleParam.icc.h>
 
 using namespace std;
 using namespace Belle2;

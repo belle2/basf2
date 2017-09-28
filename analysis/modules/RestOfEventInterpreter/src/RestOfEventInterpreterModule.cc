@@ -24,6 +24,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/core/ModuleParam.icc.h>
 
 #include <iostream>
 #include <utility>

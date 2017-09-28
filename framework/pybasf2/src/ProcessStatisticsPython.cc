@@ -14,6 +14,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
+#include <framework/core/PyObjConvUtils.h>
 
 using namespace Belle2;
 using namespace std;

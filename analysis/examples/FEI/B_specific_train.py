@@ -27,8 +27,8 @@ skimfilter.if_value('>12', empty_path, AfterConditionPath.END)
 path.add_module(skimfilter)
 
 # Signal side reconstruction
-fillParticleList('mu+', 'muIDBelle > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
-fillParticleList('e+', 'eIDBelle > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
+fillParticleList('mu+', 'muID > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
+fillParticleList('e+', 'eID > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
 fillParticleList('gamma', 'goodGamma == 1 and E >= 1.0', writeOut=True, path=path)
 reconstructDecay(
     'B+:sig_e -> gamma e+',

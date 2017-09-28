@@ -13,7 +13,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/RootMergeable.h>
 #include <framework/pcore/ProcHandler.h>
-#include <tracking/trackFindingVXD/utilities/VariableSet.h>
+#include <tracking/trackFindingVXD/utilities/Named.h>
 #include <TFile.h>
 #include <TTree.h>
 #include <TROOT.h>
@@ -58,11 +58,11 @@ namespace Belle2 {
       }
     }
 
-    SimpleVariableRecorder(std::vector<Named<float>>& namedVariables, std::string fileName, std::string treeName) :
+    SimpleVariableRecorder(std::vector<Named<float*>>& namedVariables, std::string fileName, std::string treeName) :
       SimpleVariableRecorder([ & namedVariables](TTree & tree)
     {
       for (auto& variable : namedVariables) {
-        tree.Branch(variable.getName().c_str(), variable.getValuePtr());
+        tree.Branch(variable.getName().c_str(), variable.getValue());
       }
     },
     fileName,

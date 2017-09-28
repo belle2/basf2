@@ -20,7 +20,7 @@
 using namespace Belle2;
 
 MVAExpert::MVAExpert(std::string identifier,
-                     std::vector<Named<float>>& namedVariables)
+                     std::vector<Named<float*>>& namedVariables)
   : m_namedVariables(namedVariables)
   , m_identifier(identifier)
 {
@@ -102,7 +102,7 @@ double MVAExpert::predict()
 
   // Transfer the extracted values to the data set were the expert can find them
   for (unsigned int i = 0; i < m_namedVariables.size(); ++i) {
-    m_dataset->m_input[i] = *(m_namedVariables[i].getValuePtr());
+    m_dataset->m_input[i] = *(m_namedVariables[i].getValue());
   }
   return m_expert->apply(*m_dataset)[0];
 }

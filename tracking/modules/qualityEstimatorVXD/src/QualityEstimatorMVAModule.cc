@@ -37,6 +37,8 @@ QualityEstimatorMVAModule::QualityEstimatorMVAModule() : Module()
 
   addParam("WeightFileIdentifier", m_WeightFileIdentifier,
            "Identifier of weightfile in Database or local root/xml file.", std::string(""));
+
+  addParam("ClusterInformation", m_ClusterInformation, "Wether to use cluster infos or not", std::string(""));
 }
 
 void QualityEstimatorMVAModule::initialize()

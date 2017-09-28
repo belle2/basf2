@@ -43,6 +43,8 @@ QETrainingDataCollectorModule::QETrainingDataCollectorModule() : Module()
            "Only required for MCInfo method. If false combining several MCTracks is allowed.", bool(true));
 
   addParam("TrainingDataOutputName", m_TrainingDataOutputName, "Name of the output rootfile.", std::string("QETrainingOutput.root"));
+
+  addParam("ClusterInformation", m_ClusterInformation, "Wether to use cluster infos or not", std::string(""));
 }
 
 void QETrainingDataCollectorModule::initialize()

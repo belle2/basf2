@@ -28,16 +28,10 @@ namespace Belle2 {
       return !(*this == other);
     }
 
-    Named<T>& operator= (T value)
-    {
-      m_value = value;
-      return *this;
-    }
-
     std::string getName() const {return m_name;}
     void setName(std::string name) {m_name = name;}
 
-    T* getValuePtr() {return &m_value;}
+    T getValue() {return m_value;}
 
   protected:
     std::string m_name;

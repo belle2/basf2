@@ -13,7 +13,6 @@
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 #include <tracking/trackFindingVXD/mva/SimpleVariableRecorder.h>
-#include <tracking/trackFindingVXD/utilities/VariableSet.h>
 #include <tracking/trackFindingVXD/variableExtractors/ClusterInfoExtractor.h>
 #include <tracking/trackFindingVXD/variableExtractors/QEResultsExtractor.h>
 
@@ -60,6 +59,7 @@ namespace Belle2 {
     /** Only required for MCInfo method */
     bool m_MCStrictQualityEstimator;
 
+    std::string m_ClusterInformation;
 
     // member variables
 
@@ -77,7 +77,14 @@ namespace Belle2 {
 
     std::unique_ptr<SimpleVariableRecorder> m_recorder;
 
-    MVAVariableSet m_variableSet;
+    std::vector<Named<float*>> m_variableSet;
 
+    std::unique_ptr<QEResultsExtractor> m_qeResultsExtractor;
+
+    float m_nSpacePoints = NAN;
+
+    float m_truth = NAN;
+
+    std::unique_ptr<ClusterInfoExtractor> m_clusterInfoExtractor;
   };
 }

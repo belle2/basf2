@@ -28,8 +28,8 @@ skimfilter.if_value('>12', empty_path, AfterConditionPath.END)
 path.add_module(skimfilter)
 
 # Signal side reconstruction
-fillParticleList('mu+', 'muID > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
-fillParticleList('e+', 'eID > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
+fillParticleList('mu+', 'muid > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
+fillParticleList('e+', 'eid > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
 fillParticleList('gamma', 'goodGamma == 1 and E >= 1.0', writeOut=True, path=path)
 reconstructDecay(
     'B+:sig_e -> gamma e+',
@@ -48,7 +48,7 @@ looseMCTruth('B+:sig', path=path)
 rankByHighest('B+:sig', 'daughter(0,E)', outputVariable='PhotonCandidateRank', path=path)
 buildRestOfEvent('B+:sig', path=path)
 clean_roe_mask = ('CleanROE', 'dr < 2 and abs(dz) < 4',
-                  'clusterE9E25 > 0.9 and clusterTiming < 50 and goodBelleGamma == 1 and trackMatchType==0')
+                  'clusterE9E25 > 0.9 and clusterTiming < 50 and goodGamma == 1 and trackMatchType==0')
 appendROEMasks('B+:sig', [clean_roe_mask], path=path)
 applyCuts('B+:sig', 'ROE_deltae(CleanROE) < 2.0 and ROE_mbc(CleanROE) > 4.8', path=path)
 
@@ -68,10 +68,9 @@ belle_particles = fei.get_default_channels(KLong=False,
                                            neutralB=False,
                                            semileptonic=False,
                                            B_extra_cut='nRemainingTracksInEvent <= 3',
-                                           convertedFromBelle=False,
                                            specific=True)
 
-configuration = fei.config.FeiConfiguration(prefix=fei_tag, training=False, b2bii=False, monitor=False)
+configuration = fei.config.FeiConfiguration(prefix=fei_tag, training=False, monitor=False)
 feistate = fei.get_path(belle_particles, configuration)
 
 

@@ -34,7 +34,7 @@ class PXDClusterShape_ParticleGunSetting():
             'independentVertices': False
             }
 
-        """ data_pixelType0 is preset for PXD pixel size 55 x 50 um """
+        #: data_pixelType0 is preset for PXD pixel size 55 x 50 um
         self.data_pixelType0 = CommonSets.copy()
         self.data_pixelType0.update({
             'yVertexParams': [1.35],
@@ -44,7 +44,7 @@ class PXDClusterShape_ParticleGunSetting():
             # 'zVertexParams': [0.9, 0.9070],
             # 'zVertexParams': [-2.0085, -2.0],
             })
-        """ data_pixelType1 is preset for PXD pixel size 60 x 50 um """
+        #: data_pixelType1 is preset for PXD pixel size 60 x 50 um
         self.data_pixelType1 = CommonSets.copy()
         self.data_pixelType1.update({
             'yVertexParams': [1.35],
@@ -54,7 +54,7 @@ class PXDClusterShape_ParticleGunSetting():
             # 'zVertexParams': [0.9, 0.9070],
             # 'zVertexParams': [-2.0085, -2.0],
             })
-        """ data_pixelType2 is preset for PXD pixel size 70 x 50 um """
+        #: data_pixelType2 is preset for PXD pixel size 70 x 50 um
         self.data_pixelType2 = CommonSets.copy()
         self.data_pixelType2.update({
             # 'yVertexParams': [1.35],
@@ -64,7 +64,7 @@ class PXDClusterShape_ParticleGunSetting():
             'zVertexParams': [0.9, 0.9070]
             # 'zVertexParams': [-2.0085, -2.0],
             })
-        """ data_pixelType3 is preset for PXD pixel size 85 x 50 um """
+        #: data_pixelType3 is preset for PXD pixel size 85 x 50 um
         self.data_pixelType3 = CommonSets.copy()
         self.data_pixelType3.update({
             # 'yVertexParams': [1.35],
@@ -74,7 +74,7 @@ class PXDClusterShape_ParticleGunSetting():
             # 'zVertexParams': [0.9, 0.9070],
             'zVertexParams': [-2.0085, -2.0]
             })
-        """ data_ParticleGunDefault is preset for particle gun in IP """
+        #: data_ParticleGunDefault is preset for particle gun in IP
         self.data_ParticleGunDefault = {
             }
 

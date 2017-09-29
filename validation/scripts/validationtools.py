@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+This file contains multiple utility functions which can be used by validation steering files.
+"""
+
 import subprocess
 import pickle
 import sys
 import os
 import glob
+import hashlib
 
 
 def get_background_files():
@@ -31,10 +36,23 @@ def get_background_files():
         assert False
 
     if len(bg) == 0:
-        print("No background files found in folder {} Terminating this script.".format(bg_folder))
+        print("No background files found in folder {} . Terminating this script.".format(bg_folder))
         assert False
 
     print("Background files loaded from folder {}".format(bg_folder))
+
+    # sort for easier comparison
+    bg = sorted(bg)
+
+    print("{: >65} {: >65} ".format("- Background file name -", "- sha256 -"))
+    all_hexes = ""
+    for f in bg:
+        hex_hash = hashlib.sha256(open(f, 'rb').read()).hexdigest()
+        all_hexes = all_hexes + hex_hash
+        print("{: >65} {: >65} ".format(f, hex_hash))
+
+    print("{: >65} {: >65}".format("---", "---"))
+    print("{: >65} {: >65}".format("sha256 of all background file hashes", hashlib.sha256(all_hexes.encode()).hexdigest()))
 
     return bg
 

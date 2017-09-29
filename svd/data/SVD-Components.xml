@@ -73,6 +73,8 @@
 			<BackplaneCapacitanceV unit="pF/cm">0.42</BackplaneCapacitanceV>
 			<InterstripCapacitanceV unit="pF/cm">0.65</InterstripCapacitanceV>
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
+                        <ADUEquivalentU unit="e">375</ADUEquivalentU>
+                        <ADUEquivalentV unit="e">375</ADUEquivalentV>
                         <ElectronicNoiseU unit="e">900</ElectronicNoiseU>
                         <ElectronicNoiseV unit="e">700</ElectronicNoiseV>
 		</Active>
@@ -106,8 +108,12 @@
 			<InterstripCapacitanceV unit="pF/cm">0.65</InterstripCapacitanceV>
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
                         <!-- All except backward sensors are on Origami -->
+                        <ADUEquivalentU unit="e">375</ADUEquivalentU>
+                        <ADUEquivalentV unit="e">375</ADUEquivalentV>
                         <ElectronicNoiseU unit="e">1100</ElectronicNoiseU>
                         <ElectronicNoiseV unit="e">650</ElectronicNoiseV>
+                        <ADUEquivalentSbwU unit="e">375</ADUEquivalentSbwU>
+                        <ADUEquivalentSbwV unit="e">375</ADUEquivalentSbwV>
                         <ElectronicNoiseSbwU unit="e">950</ElectronicNoiseSbwU>
                         <ElectronicNoiseSbwV unit="e">750</ElectronicNoiseSbwV>
 		</Active>
@@ -140,6 +146,8 @@
 			<BackplaneCapacitanceV unit="pF/cm">0.26</BackplaneCapacitanceV>
 	        	<InterstripCapacitanceV unit="pF/cm">0.75</InterstripCapacitanceV>
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
+                        <ADUEquivalentU unit="e">375</ADUEquivalentU>
+                        <ADUEquivalentV unit="e">375</ADUEquivalentV>
                         <ElectronicNoiseU unit="e">1100</ElectronicNoiseU>
                         <ElectronicNoiseV unit="e">800</ElectronicNoiseV>
 		</Active>
@@ -167,6 +175,10 @@
 			<xi:include xpointer="xpointer(//KaptonBase[@type='Slanted']/*)" />
 			<height unit="mm">0.100</height>
 		</Component>
+        <!-- There are is a single clamp on the modules in the slanted region -->
+		<Component type="SlantedClamps">
+			<u unit="mm">  14.31 </u> <v unit="mm"> 1.25 </v> <w unit="mm"> above </w> <woffset unit="mm">0.3</woffset>
+		</Component>
 	</Sensor>
 
 	<Sensor type="Slanted2" slanted="true">
@@ -179,6 +191,9 @@
 			<xi:include xpointer="xpointer(//KaptonBase[@type='Slanted']/*)" />
 			<height unit="mm">0.300</height>
 			<Component type="KaptonSlanted1"><w>bottom</w></Component>
+		</Component>
+		<Component type="SlantedClamps">
+			<u unit="mm">  14.31 </u> <v unit="mm"> 1.25 </v> <w unit="mm"> above </w> <woffset unit="mm">0.3</woffset>
 		</Component>
 	</Sensor>
 
@@ -196,6 +211,10 @@
 			<Component type="BarrelPitchAdapter"><w>bottom</w></Component>
 			<Component type="BarrelHybrid1"><w>top</w></Component>
 		</Component>
+        <!-- There are two clamps on the modules in the barrel region -->
+		<Component type="BarrelClamps">
+			<u unit="mm">  13.75 </u> <v unit="mm"> 60.0 </v> <w unit="mm"> above </w> <woffset unit="mm">1.3</woffset>
+		</Component>
 	</Sensor>
 
 	<Sensor type="Barrel3">
@@ -208,6 +227,10 @@
 			<height unit="mm">1.500</height>
 			<Component type="BarrelPitchAdapter"><w>bottom</w></Component>
 			<Component type="BarrelHybrid2"><w>top</w></Component>
+		</Component>
+        <!-- There are two clamps on the modules in the barrel region -->
+		<Component type="BarrelClamps">
+			<u unit="mm">  13.75 </u> <v unit="mm"> 69.47 </v> <w unit="mm"> above </w> <woffset unit="mm">1.5</woffset>
 		</Component>
 	</Sensor>
 
@@ -284,11 +307,39 @@
 		<height unit="mm">0.400</height>
 	</Component>
 
+	<!-- Clamp holding the cooling pipe in the barrel region -->
+	<Component name="BarrelClamps">
+		<Component type="Clamp">
+			<u unit="mm">  0.0</u> <v unit="mm">48.6</v>
+			<u unit="mm">  0.0</u> <v unit="mm">-48.6</v>
+		</Component>
+	</Component>
+
+	<!-- Clamp holding the cooling pipe in the slanted region -->
+	<Component name="SlantedClamps">
+		<Component type="Clamp">
+			<u unit="mm">  0.0</u> <v unit="mm">0.0</v>
+		</Component>
+	</Component>
+
 	<!-- APV layout -->
 	<Component name="APVs">
 		<width  unit="mm"> 20.546</width>
 		<length unit="mm">124.080</length>
 		<Component type="APV25">
+			<u unit="mm">  6.245</u> <v unit="mm">-57.885</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm">-50.385</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm">-42.885</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm">-34.785</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm">-11.595</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm"> 11.595</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm"> 34.785</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm"> 42.885</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm"> 50.385</v><woffset unit="mm">0.009</woffset>
+			<u unit="mm">  6.245</u> <v unit="mm"> 57.885</v><woffset unit="mm">0.009</woffset>
+		</Component>
+
+		<Component type="APV25_copper layer">
 			<u unit="mm">  6.245</u> <v unit="mm">-57.885</v>
 			<u unit="mm">  6.245</u> <v unit="mm">-50.385</v>
 			<u unit="mm">  6.245</u> <v unit="mm">-42.885</v>
@@ -300,6 +351,23 @@
 			<u unit="mm">  6.245</u> <v unit="mm"> 50.385</v>
 			<u unit="mm">  6.245</u> <v unit="mm"> 57.885</v>
 		</Component>
+
+		<Component type="Keratherm">
+			<u unit="mm">  5.170</u> <v unit="mm">-46.0</v><woffset unit="mm">0.109</woffset>
+			<u unit="mm">  5.170</u> <v unit="mm">46.0</v><woffset unit="mm">0.109</woffset>
+		</Component>
+
+		<Component type="Keratherm_Pad">
+			<u unit="mm">  5.170</u> <v unit="mm">+11.595</v><woffset unit="mm">0.109</woffset>
+			<u unit="mm">  5.170</u> <v unit="mm">-11.595</v><woffset unit="mm">0.109</woffset>
+		</Component>
+
+		<Component type="Clamp">
+			<u unit="mm">  5.310</u> <v unit="mm">23.030</v>
+			<u unit="mm">  5.310</u> <v unit="mm">0.06</v>
+			<u unit="mm">  5.310</u> <v unit="mm">-22.910</v>
+		</Component>
+
 		<!-- Add the top part of the Origami pitch adapter -->
 		<Component name="TopLongOrigamiPitchAdapter">
 			<Color>#cc9933</Color>
@@ -328,6 +396,45 @@
 		<width  unit="mm">8.055</width>
 		<length unit="mm">7.100</length>
 		<height unit="mm">0.100</height>
+	</Component>
+
+	<Component name="APV25_copper layer">
+		<Color>#42342B</Color>
+		<Material>Cu</Material>
+		<activeChipID>1</activeChipID>
+		<width  unit="mm">8.055</width>
+		<length unit="mm">7.100</length>
+		<height unit="mm">0.009</height>	
+	</Component>
+
+    <Component name="Keratherm">
+		<Color>#42342B</Color>
+		<Material>SVD-Keratherm</Material>
+		<activeChipID>1</activeChipID>
+		<width  unit="mm">4</width>
+		<length unit="mm">31.500</length>
+		<height unit="mm">0.680</height>
+	</Component>
+
+    <Component name="Keratherm_Pad">
+		<Color>#42342B</Color>
+		<Material>SVD-Keratherm</Material>
+		<activeChipID>1</activeChipID>
+		<width  unit="mm">4</width>
+		<length unit="mm">8.190</length>
+		<height unit="mm">0.680</height>
+	</Component>
+
+    <!-- The PEEK material has a increased density in order to compensate
+         the reduced height, which is necessary, because of overlaps with
+         the cooling pipe -->
+	<Component name="Clamp">
+		<Color>#42342B</Color>
+		<Material>SVD-Peek</Material>
+		<activeChipID>1</activeChipID>
+		<width  unit="mm">8.0</width>
+		<length unit="mm">2.5</length>
+		<height unit="mm">0.789</height>
 	</Component>
 
 	<!-- Origami flexes on bottom of sensors. The real shape is kind of

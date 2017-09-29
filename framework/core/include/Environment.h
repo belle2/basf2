@@ -144,7 +144,7 @@ namespace Belle2 {
      *
      * @param path The path to the file where the pickled path is stored.
      */
-    void setPicklePath(std::string path) { m_picklePath = path; }
+    void setPicklePath(const std::string& path) { m_picklePath = path; }
 
     /**
      * Returns the path to the file where the pickled path is stored
@@ -202,7 +202,7 @@ namespace Belle2 {
     int getLogLevelOverride() const { return m_logLevelOverride; }
 
     /** Set list of streaming objects */
-    void setStreamingObjects(std::vector<std::string> strobjs) { m_streamingObjects = strobjs; }
+    void setStreamingObjects(const std::vector<std::string>& strobjs) { m_streamingObjects = strobjs; }
 
     /** Get list of streaming objects */
     const std::vector<std::string>& getStreamingObjects() const { return m_streamingObjects; }

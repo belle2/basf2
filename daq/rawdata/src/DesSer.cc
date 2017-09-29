@@ -282,7 +282,7 @@ int DesSer::sendByWriteV(RawDataBlockFormat* rawdblk)
   //
   if (n != total_send_bytes) {
     //    B2WARNING("Serializer: Sent byte(" << n << "bytes) is not same as the event size (" << total_send_bytes << "bytes). Retryring...");
-    printf("[WARNING] Serializer: Sent byte( %d bytes) is not same as the event size ( %d bytes). Retryring...\n", n, total_send_bytes);
+    printf("[NOTICE] Serializer: Sent byte( %d bytes) is not same as the event size ( %d bytes). Retryring...\n", n, total_send_bytes);
     fflush(stdout);
 
     double retry_start = getTimeSec();
@@ -301,7 +301,7 @@ int DesSer::sendByWriteV(RawDataBlockFormat* rawdblk)
     }
     double retry_end = getTimeSec();
     //    B2WARNING("Resending ends. It takes " << retry_end - retry_start << "(s)");
-    printf("Resending ends. It takes %lf (s)\n", retry_end - retry_start); fflush(stdout);
+    printf("[NOTICE] Resending ends. It takes %lf (s)\n", retry_end - retry_start); fflush(stdout);
   }
   //   printf( "[DEBUG] n %d total %d\n", n, total_send_bytes);
   //  delete temp_buf;

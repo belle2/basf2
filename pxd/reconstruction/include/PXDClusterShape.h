@@ -21,51 +21,6 @@
 namespace Belle2 {
   namespace PXD {
 
-    /** Class to correct estimation of cluster error and position base on its shape
-     * This class will set a shape ID of cluster in clusterization time.
-     * ID is describe on list "pxdClusterShapeType"
-     * Function "pxdClusterShapeDescription" give more detail desription of shape.
-     *
-     * Function "setClsShape" set shape ID for cluster
-     * Function "ClsShapeCorrection" correct estimation of eror and reco position
-     * base on type of shape, if is available correcting method
-     * Correction is apply in advance also if available method using
-     *  - direction of reco track
-     *  - signal of cluster
-     *  - seed of cluster
-     * Function "CalibrationClsShapeCorrection" calibrate corrections for
-     * estimation of error and position of cluster
-     *
-     * @verbatim
-     *   u → → → → → → → → → →
-     * v┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐
-     * ↑│ │ │ │ │ │ │ │ │ │ │ │↑
-     *  ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
-     * ↑│ │ │ │X│ │ │ │ │ │ │ │↑
-     *  ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤ "L"
-     * ↑│ │ │ │x│x│ │ │ │x│ │ │↑
-     *  ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤ "mirror_u_L"
-     * ↑│ │ │ │ │ │ │ │x│x│ │ │↑
-     *  ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
-     * ↑│ │ │ │x│x│ │ │ │ │ │ │↑
-     *  ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤ "mirror_v_L"
-     * ↑│ │ │ │x│ │ │ │x│x│ │ │↑
-     *  ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤ "mirror_u+v_L"
-     * ↑│ │ │ │ │ │ │ │ │x│ │ │↑
-     *  ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
-     * ↑│ │ │ │ │x│ │ │ │ │ │ │↑
-     *  ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤ "2x2 diagonal"
-     * ↑│ │ │ │x│ │ │ │x│ │ │ │↑
-     *  ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤ "2x2 anti-diagonal"
-     * ↑│ │ │ │ │ │ │ │ │x│ │ │↑
-     *  ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤
-     * v│ │ │ │ │ │ │ │ │ │ │ │v
-     *  └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
-     *   u → → → → → → → → → →
-     * @endverbatim
-     *
-     */
-
     /** Type specifies cluster shape type */
     enum class pxdClusterShapeType {
       no_shape_set = 0,
@@ -84,27 +39,50 @@ namespace Belle2 {
       shape_3_L_mirr_u,
       shape_3_L_mirr_v,
       shape_3_L_mirr_uv,
-      shape_large,
+      shape_large
 
-      shape_corr_1 = -100,
-      shape_corr_2_u,
-      shape_corr_2_v,
-      shape_corr_2_uv_diag,
-      shape_corr_2_uv_antidiag,
-      shape_corr_N1,
-      shape_corr_1M,
-      shape_corr_N2,
-      shape_corr_2M,
-      shape_corr_4,
-      shape_corr_3_L,
-      shape_corr_3_L_mirr_u,
-      shape_corr_3_L_mirr_v,
-      shape_corr_3_L_mirr_uv,
-      shape_corr_large
     };
 
+    /** Type specifies cluster shape type description */
     typedef std::map<pxdClusterShapeType, std::string> pxdClusterShapeDescr;
 
+    /** Class to correct estimation of cluster error and position base on its shape.
+     * This class will set a shape ID of cluster in clusterization time.
+     * ID is describe on list "pxdClusterShapeType".
+     * Function "pxdClusterShapeDescription" give more detail desription of shape.
+     *
+     * Function "setClsShape" set shape ID for cluster.
+     * Correction is apply for RecoHit if available direction of reco track
+     *
+     * @verbatim
+     *   u → → → → → → → → → →
+     * v┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐v
+     * ↑│-│-│-│-│-│-│-│-│-│-│-│↑
+     * ↑├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤↑
+     * ↑│-│-│-│x│-│-│-│-│-│-│-│↑
+     * ↑├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤↑"L"
+     * ↑│-│-│-│x│x│-│-│-│x│-│-│↑
+     * ↑├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤↑"mirror_u_L"
+     * ↑│-│-│-│-│-│-│-│x│x│-│-│↑
+     * ↑├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤↑
+     * ↑│-│-│-│x│x│-│-│-│-│-│-│↑
+     * ↑├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤↑"mirror_v_L"
+     * ↑│-│-│-│x│-│-│-│x│x│-│-│↑
+     * ↑├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤↑"mirror_u+v_L"
+     * ↑│-│-│-│-│-│-│-│-│x│-│-│↑
+     * ↑├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤↑
+     * ↑│-│-│-│-│x│-│-│-│-│-│-│↑
+     * ↑├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤↑"2x2 diagonal"
+     * ↑│-│-│-│x│-│-│-│x│-│-│-│↑
+     * ↑├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤↑"2x2 anti-diagonal"
+     * ↑│-│-│-│-│-│-│-│-│x│-│-│↑
+     * ↑├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤↑
+     * ↑│-│-│-│-│-│-│-│-│-│-│-│↑
+     * v└─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘v
+     * - u → → → → → → → → → →
+     * @endverbatim
+     *
+     */
     class PXDClusterShape {
     public:
 

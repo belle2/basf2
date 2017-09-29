@@ -73,6 +73,15 @@ namespace {
     EXPECT_EQ(x.getNumberOfSpectators(), 2);
     EXPECT_EQ(x.getNumberOfEvents(), 1);
 
+    EXPECT_EQ(x.getFeatureIndex("a"), 0);
+    EXPECT_EQ(x.getFeatureIndex("b"), 1);
+    EXPECT_EQ(x.getFeatureIndex("c"), 2);
+    EXPECT_B2ERROR(x.getFeatureIndex("bla"));
+
+    EXPECT_EQ(x.getSpectatorIndex("e"), 0);
+    EXPECT_EQ(x.getSpectatorIndex("f"), 1);
+    EXPECT_B2ERROR(x.getSpectatorIndex("bla"));
+
     // Should just work
     x.loadEvent(0);
 
@@ -296,6 +305,74 @@ namespace {
 
     }
     EXPECT_THROW(MVA::SubDataset(general_options, events, test_dataset), std::runtime_error);
+
+  }
+
+  TEST(DatasetTest, CombinedDataset)
+  {
+
+    MVA::GeneralOptions general_options;
+    general_options.m_signal_class = 1;
+    general_options.m_variables = {"a", "b", "c", "d", "e"};
+    general_options.m_spectators = {"f", "g"};
+    TestDataset signal_dataset(general_options);
+    TestDataset bckgrd_dataset(general_options);
+
+    MVA::CombinedDataset x(general_options, signal_dataset, bckgrd_dataset);
+
+    EXPECT_EQ(x.getNumberOfFeatures(), 5);
+    EXPECT_EQ(x.getNumberOfEvents(), 40);
+
+    // Should just work
+    x.loadEvent(0);
+
+    EXPECT_EQ(x.m_input.size(), 5);
+    EXPECT_FLOAT_EQ(x.m_input[0], 1.0);
+    EXPECT_FLOAT_EQ(x.m_input[1], 2.0);
+    EXPECT_FLOAT_EQ(x.m_input[2], 3.0);
+    EXPECT_FLOAT_EQ(x.m_input[3], 4.0);
+    EXPECT_FLOAT_EQ(x.m_input[4], 5.0);
+
+    EXPECT_EQ(x.m_spectators.size(), 2);
+    EXPECT_FLOAT_EQ(x.m_spectators[0], 6.0);
+    EXPECT_FLOAT_EQ(x.m_spectators[1], 7.0);
+
+    EXPECT_FLOAT_EQ(x.m_weight, -3.0);
+    EXPECT_FLOAT_EQ(x.m_target, 1.0);
+    EXPECT_EQ(x.m_isSignal, true);
+
+    EXPECT_FLOAT_EQ(x.getSignalFraction(), 0.5);
+
+    auto feature = x.getFeature(1);
+    EXPECT_EQ(feature.size(), 40);
+    for (unsigned int iEvent = 0; iEvent < 40; ++iEvent) {
+      EXPECT_FLOAT_EQ(feature[iEvent], (iEvent % 20) + 2);
+    };
+
+    auto spectator = x.getSpectator(0);
+    EXPECT_EQ(spectator.size(), 40);
+    for (unsigned int iEvent = 0; iEvent < 40; ++iEvent) {
+      EXPECT_FLOAT_EQ(spectator[iEvent], (iEvent % 20) + 6);
+    };
+
+    // Same result for mother class implementation
+    feature = x.Dataset::getFeature(1);
+    EXPECT_EQ(feature.size(), 40);
+    for (unsigned int iEvent = 0; iEvent < 40; ++iEvent) {
+      EXPECT_FLOAT_EQ(feature[iEvent], (iEvent % 20) + 2);
+    };
+
+    spectator = x.Dataset::getSpectator(0);
+    EXPECT_EQ(spectator.size(), 40);
+    for (unsigned int iEvent = 0; iEvent < 40; ++iEvent) {
+      EXPECT_FLOAT_EQ(spectator[iEvent], (iEvent % 20) + 6);
+    };
+
+    for (unsigned int iEvent = 0; iEvent < 40; ++iEvent) {
+      x.loadEvent(iEvent);
+      EXPECT_EQ(x.m_isSignal, iEvent < 20);
+      EXPECT_FLOAT_EQ(x.m_target, iEvent < 20 ? 1.0 : 0.0);
+    }
 
   }
 

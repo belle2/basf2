@@ -36,6 +36,8 @@
 #include <boost/algorithm/string.hpp>
 #include <cstdlib>
 
+#define CURRENT_DEFAULT_TAG "GT_gen_prod_003.05_Master-20170914-123100"
+
 using namespace std;
 using namespace Belle2;
 
@@ -61,44 +63,45 @@ std::unique_ptr<Database> Database::s_instance{nullptr};
 
 std::string Database::getDefaultGlobalTags()
 {
-  return getFromEnvironment("BELLE2_CONDB_GLOBALTAG", "production");
+  return getFromEnvironment("BELLE2_CONDB_GLOBALTAG", CURRENT_DEFAULT_TAG);
 }
 
 Database& Database::Instance()
 {
   if (!s_instance) {
     DatabaseChain::createInstance(true);
-    const std::string fallback = getFromEnvironment("BELLE2_CONDB_FALLBACK",
-                                                    "/cvmfs/belle.cern.ch/conditions data/framework/database.txt");
+    const std::string fallback = getFromEnvironment("BELLE2_CONDB_FALLBACK", "/cvmfs/belle.cern.ch/conditions");
     const std::string globalTag = getDefaultGlobalTags();
     typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
     std::vector<string> tags;
     boost::split(tags, globalTag, boost::is_any_of(" \t\n\r"));
     // OK, add fallback databases unless empty location is specified
     if (!fallback.empty()) {
+      auto logLevel = LogConfig::c_Error;
       for (auto localdb : tokenizer(fallback, boost::char_separator<char> {" \t\n\r"})) {
         if (FileSystem::isFile(FileSystem::findFile(localdb, true))) {
           // If a file name is given use it as local DB
           B2DEBUG(10, "Adding fallback database " << FileSystem::findFile(localdb));
-          LocalDatabase::createInstance(FileSystem::findFile(localdb), "", true, LogConfig::c_Error);
+          LocalDatabase::createInstance(FileSystem::findFile(localdb), "", true, logLevel);
         } else if (FileSystem::isDir(localdb)) {
           // If a directory is given append the database file name
           if (globalTag.empty()) {
-            // Default name if no tags given
-            std::string fileName = FileSystem::findFile(localdb) + "/database.txt";
+            // Default name if no tags given: look for compile time tag.txt
+            std::string fileName = FileSystem::findFile(localdb) + "/" CURRENT_DEFAULT_TAG ".txt";
             B2DEBUG(10, "Adding fallback database " << fileName);
-            LocalDatabase::createInstance(fileName, "", true, LogConfig::c_Error);
+            LocalDatabase::createInstance(fileName, "", true, logLevel);
           } else {
             // One local DB for each global tag
             for (auto tag : tags) {
               std::string fileName = localdb + "/" + tag + ".txt";
               if (FileSystem::isFile(fileName)) {
                 B2DEBUG(10, "Adding fallback database " << fileName);
-                LocalDatabase::createInstance(fileName, "", true, LogConfig::c_Error);
+                LocalDatabase::createInstance(fileName, "", true, logLevel);
               }
             }
           }
         }
+        logLevel = LogConfig::c_Debug;
       }
     }
     // and add access to the central database unless we have an empty global tag

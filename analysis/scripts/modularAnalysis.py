@@ -51,7 +51,7 @@ def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
     path.add_module(conf)
 
 
-def inputMdst(environmentType, filename, path=analysis_main):
+def inputMdst(environmentType, filename, path=analysis_main, skipNEvents=0, entrySequence=None, *, parentLevel=0):
     """
     Loads the specified ROOT (DST/mDST/muDST) file with the RootInput module.
 
@@ -70,13 +70,18 @@ def inputMdst(environmentType, filename, path=analysis_main):
 
     @param environmentType type of the environment to be loaded
     @param filename the name of the file to be loaded
-    @param modules are added to this path
+    @param path modules are added to this path
+    @param skipNEvents N events of the input file are skipped
+    @param entrySequence The number sequences (e.g. 23:42,101) defining the entries which are processed.
+    @param parentLevel Number of generations of parent files (files used as input when creating a file) to be read
     """
+    if entrySequence is not None:
+        entrySequence = [entrySequence]
 
-    inputMdstList(environmentType, [filename], path)
+    inputMdstList(environmentType, [filename], path, skipNEvents, entrySequence, parentLevel=parentLevel)
 
 
-def inputMdstList(environmentType, filelist, path=analysis_main):
+def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, entrySequences=None, *, parentLevel=0):
     """
     Loads the specified ROOT (DST/mDST/muDST) files with the RootInput module.
 
@@ -97,11 +102,20 @@ def inputMdstList(environmentType, filelist, path=analysis_main):
 
     @param environmentType type of the environment to be loaded
     @param filelist the filename list of files to be loaded
-    @param modules are added to this path
+    @param path modules are added to this path
+    @param skipNEvents N events of the input files are skipped
+    @param entrySequences The number sequences (e.g. 23:42,101) defining the entries which are processed for
+        each inputFileName.
+    @param parentLevel Number of generations of parent files (files used as input when creating a file) to be read
     """
 
     roinput = register_module('RootInput')
     roinput.param('inputFileNames', filelist)
+    roinput.param('skipNEvents', skipNEvents)
+    if entrySequences is not None:
+        roinput.param('entrySequences', entrySequences)
+    roinput.param('parentLevel', parentLevel)
+
     path.add_module(roinput)
     progress = register_module('ProgressBar')
     path.add_module(progress)
@@ -736,7 +750,9 @@ def reconstructDecay(
     cut,
     dmID=0,
     writeOut=False,
-    path=analysis_main
+    path=analysis_main,
+    candidate_limit=None,
+    ignoreIfTooManyCandidates=True,
 ):
     """
     Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via
@@ -752,6 +768,15 @@ def reconstructDecay(
     @param dmID        user specified decay mode identifier
     @param writeOut    wether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
+    @param candidate_limit Maximum amount of candidates to be reconstructed. If
+                       the number of candidates is exceeded a Warning will be
+                       printed.
+                       If no value is given the amount is limited to a sensible
+                       default. A value <=0 will disable this limit and can
+                       cause huge memory amounts so be careful.
+    @param ignoreIfTooManyCandidates weather event should be ignored or not if number of reconstructed
+                       candiades reaches limit. If event is ignored, no candiades are reconstructed,
+                       otherwise, number of candidates in candidate_limit is reconstructed.
     """
 
     pmake = register_module('ParticleCombiner')
@@ -760,6 +785,9 @@ def reconstructDecay(
     pmake.param('cut', cut)
     pmake.param('decayMode', dmID)
     pmake.param('writeOut', writeOut)
+    if candidate_limit is not None:
+        pmake.param("maximumNumberOfCandidates", candidate_limit)
+    pmake.param("ignoreIfTooManyCandidates", ignoreIfTooManyCandidates)
     path.add_module(pmake)
 
 
@@ -792,6 +820,7 @@ def reconstructRecoil(
     dmID=0,
     writeOut=False,
     path=analysis_main,
+    candidate_limit=None,
 ):
     """
     Creates new Particles that recoil against the input particles.
@@ -809,6 +838,13 @@ def reconstructRecoil(
     @param dmID        user specified decay mode identifier
     @param writeOut    wether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
+    @param candidate_limit Maximum amount of candidates to be reconstructed. If
+                       the number of candidates is exceeded no candidate will be
+                       reconstructed for that event and a Warning will be
+                       printed.
+                       If no value is given the amount is limited to a sensible
+                       default. A value <=0 will disable this limit and can
+                       cause huge memory amounts so be careful.
     """
 
     pmake = register_module('ParticleCombiner')
@@ -818,6 +854,8 @@ def reconstructRecoil(
     pmake.param('decayMode', dmID)
     pmake.param('writeOut', writeOut)
     pmake.param('recoilParticleType', 1)
+    if candidate_limit is not None:
+        pmake.param("maximumNumberOfCandidates", candidate_limit)
     path.add_module(pmake)
 
 
@@ -827,6 +865,7 @@ def reconstructRecoilDaughter(
     dmID=0,
     writeOut=False,
     path=analysis_main,
+    candidate_limit=None,
 ):
     """
     Creates new Particles that are daughters of the particle reconstructed in the recoil (always assumed to be the first daughter).
@@ -844,6 +883,13 @@ def reconstructRecoilDaughter(
     @param dmID        user specified decay mode identifier
     @param writeOut    wether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
+    @param candidate_limit Maximum amount of candidates to be reconstructed. If
+                       the number of candidates is exceeded no candidate will be
+                       reconstructed for that event and a Warning will be
+                       printed.
+                       If no value is given the amount is limited to a sensible
+                       default. A value <=0 will disable this limit and can
+                       cause huge memory amounts so be careful.
     """
 
     pmake = register_module('ParticleCombiner')
@@ -853,6 +899,8 @@ def reconstructRecoilDaughter(
     pmake.param('decayMode', dmID)
     pmake.param('writeOut', writeOut)
     pmake.param('recoilParticleType', 2)
+    if candidate_limit is not None:
+        pmake.param("maximumNumberOfCandidates", candidate_limit)
     path.add_module(pmake)
 
 

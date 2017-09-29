@@ -149,6 +149,46 @@ def peel_event_info(event_meta_data, key="{part_name}"):
 
 
 @format_crop_keys
+def peel_store_array_info(item, key="{part_name}"):
+    if item:
+        return dict(
+            store_array_number=item.getArrayIndex()
+        )
+    else:
+        return dict(
+            store_array_number=float("nan")
+        )
+
+
+@format_crop_keys
+def peel_fit_status(reco_track, key="{part_name}"):
+    nan = float("nan")
+
+    crops = dict(
+        is_fitted=nan,
+        fit_pion_ok=nan,
+        fit_muon_ok=nan,
+        fit_electron_ok=nan,
+        fit_proton_ok=nan,
+        fit_kaon_ok=nan,
+    )
+
+    if reco_track:
+        crops["is_fitted"] = reco_track.wasFitSuccessful()
+
+        for rep in reco_track.getRepresentations():
+            pdg_code = rep.getPDG()
+
+            for crop in crops.keys():
+                if crop.startswith("fit_"):
+                    particle_name = crop.split("_")[1]
+                    if getattr(Belle2.Const, particle_name).getPDGCode() == pdg_code:
+                        crops[crop] = reco_track.wasFitSuccessful(rep)
+
+    return crops
+
+
+@format_crop_keys
 def peel_track_fit_result(track_fit_result, key="{part_name}"):
     nan = float("nan")
     if track_fit_result:
@@ -198,7 +238,6 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
             pz_variance=cov6(5, 5),
 
             p_value=track_fit_result.getPValue(),
-            is_fitted=True,  # FIXME
         )
 
     else:
@@ -233,11 +272,55 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
             pz_variance=nan,
 
             p_value=nan,
-
-            is_fitted=False,
         )
 
     return fit_crops
+
+
+# Custom peel function to get the sub detector hit efficiencies
+def peel_subdetector_hit_efficiency(mc_reco_track, reco_track):
+    def get_efficiency(detector_string):
+        mc_reco_hits = getattr(mc_reco_track, "get{}HitList".format(detector_string.upper()))()
+        mc_reco_hit_size = mc_reco_hits.size()
+
+        if not reco_track or mc_reco_hit_size == 0:
+            hit_efficiency = float('nan')
+        else:
+            hit_efficiency = 0.
+            for mc_reco_hit in mc_reco_hits:
+                for reco_hit in getattr(reco_track, "get{}HitList".format(detector_string.upper()))():
+                    if mc_reco_hit.getArrayIndex() == reco_hit.getArrayIndex():
+                        hit_efficiency += 1
+                        break
+
+            hit_efficiency /= mc_reco_hit_size
+
+        return {"{}_hit_efficiency".format(detector_string.lower()): hit_efficiency}
+
+    return dict(**get_efficiency("CDC"), **get_efficiency("SVD"), **get_efficiency("PXD"))
+
+
+# Custom peel function to get the sub detector hit purity
+def peel_subdetector_hit_purity(reco_track, mc_reco_track):
+    def get_efficiency(detector_string):
+        reco_hits = getattr(reco_track, "get{}HitList".format(detector_string.upper()))()
+        reco_hit_size = reco_hits.size()
+
+        if not mc_reco_track or reco_hit_size == 0:
+            hit_purity = float('nan')
+        else:
+            hit_purity = 0.
+            for reco_hit in reco_hits:
+                for mc_reco_hit in getattr(mc_reco_track, "get{}HitList".format(detector_string.upper()))():
+                    if mc_reco_hit.getArrayIndex() == reco_hit.getArrayIndex():
+                        hit_purity += 1
+                        break
+
+            hit_purity /= reco_hit_size
+
+        return {"{}_hit_purity".format(detector_string.lower()): hit_purity}
+
+    return dict(**get_efficiency("CDC"), **get_efficiency("SVD"), **get_efficiency("PXD"))
 
 
 def get_helix_from_mc_particle(mc_particle):

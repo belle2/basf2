@@ -97,6 +97,7 @@ AddedToExistingCluster: ;
   // Fill StoreArray<KLMCluster> and find matching ECLClusters
 
   StoreArray<KLMCluster> klmClusters;
+  // klmClusters.clear();
   for (unsigned int j = 0; j < clusterIndices.size(); ++j) {
     int layers[NLAYER + 1] = { 0 };
     unsigned int nHits = clusterIndices[j].size();

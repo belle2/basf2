@@ -154,7 +154,7 @@ namespace Belle2 {
       /// Constructor of the filter.
       explicit RecordingFilter(const std::string& defaultRootFileName = "records.root",
                                const std::string& defaultTreeName = "records")
-        : Super(makeUnique<AVarSet>(),
+        : Super(std::make_unique<AVarSet>(),
                 defaultRootFileName,
                 defaultTreeName)
       {}

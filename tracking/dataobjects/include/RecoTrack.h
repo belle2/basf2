@@ -227,6 +227,27 @@ namespace Belle2 {
     genfit::TrackCand createGenfitTrackCand() const;
 
     /**
+     * Append a new RecoTrack to the given store array and copy its general properties, but not the hits themself.
+     * The position, momentum, charge etc. are set to the given parameters.
+     */
+    RecoTrack* copyToStoreArrayUsing(StoreArray<RecoTrack>& storeArray, const TVector3& position,
+                                     const TVector3& momentum, short charge,
+                                     const TMatrixDSym& covariance, double timeSeed) const;
+
+    /**
+     * Append a new RecoTrack to the given store array and copy its general properties, but not the hits themself.
+     * The position, momentum and charge are set to the seed values of this reco track.
+     */
+    RecoTrack* copyToStoreArrayUsingSeeds(StoreArray<RecoTrack>& storeArray) const;
+
+    /**
+     * Append a new RecoTrack to the given store array and copy its general properties, but not the hits themself.
+     * The position, momentum and charge are set to the seed values of this reco track, if it was not fitted
+     * or to the values at the first hit.
+     */
+    RecoTrack* copyToStoreArray(StoreArray<RecoTrack>& storeArray) const;
+
+    /**
      * Add all hits from another RecoTrack to this RecoTrack.
      * @param recoTrack Pointer to the RecoTrack where the hits are copied from
      * @param sortingParameterOffset This number will be added to the sortingParameter of all hits copied
@@ -524,6 +545,9 @@ namespace Belle2 {
     /// Return the time seed stored in the reco track. ATTENTION: This is not the fitted time.
     double getTimeSeed() const { return m_genfitTrack.getTimeSeed(); }
 
+    /// Return the position, the momentum and the charge of the first measured state on plane or - if unfitted - the seeds.
+    std::tuple<TVector3, TVector3, short> extractTrackState() const;
+
     /// Set the position and momentum seed of the reco track. ATTENTION: This is not the fitted position or momentum.
     void setPositionAndMomentum(const TVector3& positionSeed, const TVector3& momentumSeed)
     {
@@ -541,9 +565,6 @@ namespace Belle2 {
 
     /// Set the covariance of the seed. ATTENTION: This is not the fitted covariance.
     void setSeedCovariance(const TMatrixDSym& seedCovariance) { m_genfitTrack.setCovSeed(seedCovariance); }
-
-    /// Set the tracking seed by using the fitted state at the first measurement. Will fail if the state is not present.
-    void copyStateFromSeed();
 
     // Fitting
     /// Returns true if the last fit with the given representation was successful.

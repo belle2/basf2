@@ -79,10 +79,6 @@ void TrackFinderVXDBasicPathFinderModule::initialize()
 
   m_network.isRequired(m_PARAMNetworkName);
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
-
-  //Relations SpacePoints and SpacePointTCs:
-  m_TCs.registerRelationTo(m_spacePoints, DataStore::c_Event, DataStore::c_DontWriteOut);
-  m_spacePoints.registerRelationTo(m_TCs, DataStore::c_Event, DataStore::c_DontWriteOut);
 }
 
 
@@ -138,9 +134,9 @@ void TrackFinderVXDBasicPathFinderModule::event()
   collectedSpacePointPaths.reserve(collectedPaths.size());
   for (auto& aPath : collectedPaths) {
     vector <const SpacePoint*> spPath;
-    spPath.push_back(aPath->back()->getEntry().getInnerHit()->spacePoint);
+    spPath.push_back(aPath->back()->getEntry().getInnerHit()->m_spacePoint);
     for (auto aNodeIt = (*aPath).rbegin(); aNodeIt != (*aPath).rend();  ++aNodeIt) {
-      spPath.push_back((*aNodeIt)->getEntry().getOuterHit()->spacePoint);
+      spPath.push_back((*aNodeIt)->getEntry().getOuterHit()->m_spacePoint);
     }
     collectedSpacePointPaths.push_back(spPath);
   }

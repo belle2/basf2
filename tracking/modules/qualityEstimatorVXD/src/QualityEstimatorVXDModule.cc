@@ -15,7 +15,6 @@
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRandom.h>
-#include <tracking/trackFindingVXD/utilities/UniquePointerHelper.h>
 #include <framework/logging/Logger.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
@@ -50,15 +49,15 @@ void QualityEstimatorVXDModule::initialize()
 
   // create pointer to chosen estimator
   if (m_EstimationMethod == "mcInfo") {
-    m_estimator = in_hopes_for_cpp14_make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
+    m_estimator = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
   } else if (m_EstimationMethod == "tripletFit") {
-    m_estimator = in_hopes_for_cpp14_make_unique<QualityEstimatorTripletFit>();
+    m_estimator = std::make_unique<QualityEstimatorTripletFit>();
   } else if (m_EstimationMethod == "circleFit") {
-    m_estimator = in_hopes_for_cpp14_make_unique<QualityEstimatorCircleFit>();
+    m_estimator = std::make_unique<QualityEstimatorCircleFit>();
   } else if (m_EstimationMethod == "helixFit") {
-    m_estimator = in_hopes_for_cpp14_make_unique<QualityEstimatorRiemannHelixFit>();
+    m_estimator = std::make_unique<QualityEstimatorRiemannHelixFit>();
   } else if (m_EstimationMethod == "random") {
-    m_estimator = in_hopes_for_cpp14_make_unique<QualityEstimatorRandom>();
+    m_estimator = std::make_unique<QualityEstimatorRandom>();
   }
   B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);
 }

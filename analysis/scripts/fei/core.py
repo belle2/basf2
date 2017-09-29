@@ -66,6 +66,7 @@ from fei import config
 import collections
 import argparse
 import os
+import shutil
 import typing
 import pickle
 import re
@@ -542,6 +543,18 @@ class Teacher(object):
         with open(channel + ".xml", "w") as f:
             f.write(content)
 
+    @staticmethod
+    def check_if_weightfile_is_fake(filename: str):
+        """
+        Checks if the provided filename is a fake-weightfile or not
+        @param filename the filename of the weightfile
+        """
+        try:
+            return '<method>Trivial</method>' in open(filename, 'r').readlines()[2]
+        except:
+            return True
+        return True
+
     def upload(self, channel: str):
         """
         Upload the weightfile into the condition database
@@ -698,6 +711,12 @@ def save_summary(particles: typing.Sequence[config.Particle], configuration: con
     configuration = config.FeiConfiguration(configuration.prefix, cache, configuration.b2bii,
                                             configuration.monitor, configuration.legacy, configuration.externTeacher,
                                             configuration.training)
+    # Backup existing Summary.pickle files
+    for i in [8, 7, 6, 5, 4, 3, 2, 1, 0]:
+        if os.path.isfile('Summary.pickle.backup_{}'.format(i)):
+            shutil.copyfile('Summary.pickle.backup_{}'.format(i), 'Summary.pickle.backup_{}'.format(i+1))
+    if os.path.isfile('Summary.pickle'):
+        shutil.copyfile('Summary.pickle', 'Summary.pickle.backup_0')
     pickle.dump((particles, configuration), open('Summary.pickle', 'wb'))
 
 

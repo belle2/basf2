@@ -16,7 +16,6 @@
 #include <tracking/trackFindingCDC/varsets/UnionVarSet.h>
 #include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <boost/algorithm/string.hpp>
 
@@ -46,7 +45,7 @@ namespace Belle2 {
       /// Constructor of the filter.
       UnionRecordingFilter(const std::string& defaultRootFileName = "records.root",
                            const std::string& defaultTreeName = "records")
-        : Super(makeUnique<UnionVarSet<Object>>(), defaultRootFileName, defaultTreeName)
+        : Super(std::make_unique<UnionVarSet<Object>>(), defaultRootFileName, defaultTreeName)
         , m_filterFactory()
       {
       }
@@ -78,7 +77,7 @@ namespace Belle2 {
           this->setSkimFilter(std::move(skimFilter));
         }
 
-        auto multiVarSet = makeUnique<UnionVarSet<Object>>();
+        auto multiVarSet = std::make_unique<UnionVarSet<Object>>();
 
         /// Create and add the concrete varsets from the varset parameter.
         for (std::string name : getVarSetNames()) {

@@ -10,7 +10,7 @@ import sys
 import ROOT
 
 from reconstruction import add_cosmics_reconstruction
-from softwaretrigger.path_functions import add_unpackers
+from rawdata import add_unpackers
 from softwaretrigger import (
     add_fast_reco_software_trigger,
     add_hlt_software_trigger,
@@ -150,7 +150,8 @@ progress = basf2.register_module('Progress')
 main_path.add_module(progress)
 
 etime = basf2.register_module('ElapsedTime')
-etime.param('EventInterval', 1000)
+etime.param('EventInterval', 10000)
+etime.logging.log_level = basf2.LogLevel.INFO
 main_path.add_module(etime)
 
 
@@ -158,4 +159,6 @@ main_path.add_module(etime)
 # Start basf2 processing
 ##########
 basf2.set_nprocesses(int(argvs[4]))
+basf2.set_streamobjs(saveobjs)
+
 basf2.process(main_path)

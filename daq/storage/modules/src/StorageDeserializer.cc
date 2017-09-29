@@ -91,7 +91,7 @@ void StorageDeserializerModule::initialize()
   }
   m_count = 0;
   while (true) {
-    m_package->setSerial(m_ibuf.read((int*)m_package->getData().getBuffer(), true));
+    m_package->setSerial(m_ibuf.read((int*)m_package->getData().getBuffer(), true, false));
     if (m_package->restore()) {
       if (m_info.isAvailable()) {
         m_info.setInputNBytes(m_package->getData().getByteSize());
@@ -111,7 +111,7 @@ void StorageDeserializerModule::event()
   m_count++;
   if (m_count == 1) return;
   while (true) {
-    m_package->setSerial(m_ibuf.read((int*)m_package->getData().getBuffer(), true));
+    m_package->setSerial(m_ibuf.read((int*)m_package->getData().getBuffer(), true, false));
     if (m_package->restore()) {
       if (m_info.isAvailable()) {
         m_info.addInputNBytes(m_package->getData().getByteSize());

@@ -78,7 +78,9 @@ int SocketIO::write_data(int sock, char* data, int len)
     }
     if (br < 0) {
       switch (errno) {
-        case EINTR: continue;
+        case EINTR:
+          return -1;
+        // continue;
         case EPIPE:
           return -1;        // connection closed, sigpipe
         case ENETUNREACH:
@@ -181,7 +183,8 @@ int SocketIO::read_data(int sock, char* data, int len)
             m_int = 0;
             return -2;
           } else
-            continue;
+            //            continue;
+            return -1;
         case EAGAIN:
           continue;
         default:

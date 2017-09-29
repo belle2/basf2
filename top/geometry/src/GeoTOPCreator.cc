@@ -433,10 +433,10 @@ namespace Belle2 {
                                    length,
                                    geo.getPrismEnclosure().getMaterial());
 
-        G4ThreeVector move;
-        move.setZ(Z + length / 2);
-        move.setY((height - geo.getSideRails().getHeight()) / 2);
-        qbb->AddPlacedVolume(extPlate, move, 0);
+        G4ThreeVector movePlate;
+        movePlate.setZ(Z + length / 2);
+        movePlate.setY((height - geo.getSideRails().getHeight()) / 2);
+        qbb->AddPlacedVolume(extPlate, movePlate, 0);
       }
 
       // side rails
@@ -645,8 +645,8 @@ namespace Belle2 {
                                                geo.getBrokenGlueContour(),
                                                geo.getGlueThickness(),
                                                geo.getBrokenGlueMaterial());
-        G4Transform3D move;
-        new G4PVPlacement(move, brokenGlue, geo.getName() + "BrokenGlue", glue, false, 1);
+        G4Transform3D fix;
+        new G4PVPlacement(fix, brokenGlue, geo.getName() + "BrokenGlue", glue, false, 1);
         B2RESULT("GeoTOPCreator, broken glue at " << geo.getName()
                  << addNumber(" of Slot", moduleID));
         m_numBrokenGlues++;
@@ -695,8 +695,8 @@ namespace Belle2 {
                                                geo.getBrokenGlueContour(),
                                                geo.getGlueThickness(),
                                                geo.getBrokenGlueMaterial());
-        G4Transform3D move;
-        new G4PVPlacement(move, brokenGlue, geo.getName() + "BrokenGlue", glue, false, 1);
+        G4Transform3D fix;
+        new G4PVPlacement(fix, brokenGlue, geo.getName() + "BrokenGlue", glue, false, 1);
         B2RESULT("GeoTOPCreator, broken glue at " << geo.getName()
                  << addNumber(" of Slot", moduleID));
         m_numBrokenGlues++;
@@ -776,8 +776,8 @@ namespace Belle2 {
                                         0,
                                         geo.getPeelOffCenter(region));
         G4Transform3D R = G4RotateY3D(-M_PI / 2);
-        G4Transform3D move = T * R;
-        new G4PVPlacement(move, peelOff, name, filter, false, 1);
+        G4Transform3D moveRegion = T * R;
+        new G4PVPlacement(moveRegion, peelOff, name, filter, false, 1);
         message += addNumber(" ", region.ID);
         numRegions++;
       }

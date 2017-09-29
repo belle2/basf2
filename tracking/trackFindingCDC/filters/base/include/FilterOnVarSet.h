@@ -14,7 +14,6 @@
 #include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
 
 #include <tracking/trackFindingCDC/utilities/Named.h>
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <framework/logging/Logger.h>
 
@@ -119,7 +118,7 @@ namespace Belle2 {
     public:
       /// Constructor of the filter.
       FilterOnVarSet()
-        : Super(makeUnique<AVarSet>())
+        : Super(std::make_unique<AVarSet>())
       {}
     };
   }

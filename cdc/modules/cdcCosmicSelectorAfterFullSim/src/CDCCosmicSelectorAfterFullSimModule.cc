@@ -28,7 +28,7 @@ REG_MODULE(CDCCosmicSelectorAfterFullSim)
 CDCCosmicSelectorAfterFullSimModule::CDCCosmicSelectorAfterFullSimModule() : Module()
 {
   // Set description
-  setDescription("Modify CDCSimHits and MCParticles for cosmics so that the global time to (approximately) zero at y=0 using FullSim output (=CDCSimHits). And select cosmics passing through a user-specified region at y=0. This module works only for the event with the no. of primary charged MC particles=1. Please place this module after FullSim and before CDCDigitizer.");
+  setDescription("Modify CDCSimHits and MCParticles for cosmics so that the global time is (approximately) zero at y=0 using FullSim output (=CDCSimHits). And select cosmics passing through a user-specified region at y=0. This module works only for the event with the no. of primary charged MC particles=1. Please place this module after FullSim and before CDCDigitizer.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("xOfRegion", m_xOfRegion, "x of center position of region at y=0 (cm)", 0.);

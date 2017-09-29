@@ -56,7 +56,11 @@ namespace Belle2 {
              "Input DecayDescriptor string (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).");
     addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
     addParam("maximumNumberOfCandidates", m_maximumNumberOfCandidates,
-             "Don't reconstruct channel if more candidates than given are produced.", -1);
+             "Max. number of candidates reconstructed ", 10000);
+
+    addParam("ignoreIfTooManyCandidates", m_ignoreIfTooManyCandidates,
+             "Don't reconstruct channel if more candidates than given by \'maximumNumberOfCandidates\' are produced.", true);
+
     addParam("decayMode", m_decayModeID, "User-specified decay mode identifier (saved in 'decayModeID' extra-info for each Particle)",
              0);
     addParam("writeOut", m_writeOut,
@@ -174,7 +178,12 @@ namespace Belle2 {
       numberOfCandidates++;
 
       if (m_maximumNumberOfCandidates > 0 and numberOfCandidates > m_maximumNumberOfCandidates) {
-        outputList->clear();
+        if (m_ignoreIfTooManyCandidates) {
+          B2WARNING("Maximum number of " << m_maximumNumberOfCandidates << " candidates reached, skipping event");
+          outputList->clear();
+        } else {
+          B2WARNING("Maximum number of " << m_maximumNumberOfCandidates << " candidates reached. Ignoring others");
+        }
         break;
       }
 

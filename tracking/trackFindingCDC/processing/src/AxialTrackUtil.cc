@@ -124,6 +124,10 @@ void AxialTrackUtil::normalizeTrack(CDCTrack& track)
 
   CDCTrajectory3D trajectory3D(trackTrajectory2D, CDCTrajectorySZ::basicAssumption());
   track.setStartTrajectory3D(trajectory3D);
+
+  Vector3D backPosition = track.back().getRecoPos3D();
+  trajectory3D.setLocalOrigin(backPosition);
+  track.setEndTrajectory3D(trajectory3D);
 }
 
 void AxialTrackUtil::updateRecoHit3D(const CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit)

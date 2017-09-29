@@ -28,7 +28,7 @@
 using namespace Belle2;
 
 bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::ParticleType& defaultHypothesis,
-                                           const bool useClosestHitToIP)
+                                           const bool useClosestHitToIP, const bool useBFieldAtHit)
 {
 
   StoreArray<Track> tracks(m_trackColName);
@@ -67,8 +67,9 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::Pa
       continue;
     }
 
+    genfit::MeasuredStateOnPlane extrapolatedMSoP = msop;
     try {
-      msop.extrapolateToLine(m_beamSpot, m_beamAxis);
+      extrapolatedMSoP.extrapolateToLine(m_beamSpot, m_beamAxis);
     } catch (...) {
       B2WARNING("Could not extrapolate the fit result for pdg " << particleType.getPDGCode() <<
                 " to the perigee point. Why, I don't know.");
@@ -80,14 +81,20 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::Pa
     TVector3 poca(0., 0., 0.);
     TVector3 dirInPoca(0., 0., 0.);
     TMatrixDSym cov(6);
-    msop.getPosMomCov(poca, dirInPoca, cov);
+    extrapolatedMSoP.getPosMomCov(poca, dirInPoca, cov);
     B2DEBUG(149, "Point of closest approach: " << poca.x() << "  " << poca.y() << "  " << poca.z());
     B2DEBUG(149, "Track direction in POCA: " << dirInPoca.x() << "  " << dirInPoca.y() << "  " << dirInPoca.z());
 
     const int charge = recoTrack.getTrackFitStatus(trackRep)->getCharge();
     const double pValue = recoTrack.getTrackFitStatus(trackRep)->getPVal();
+
     double Bx, By, Bz;  // In cgs units
-    genfit::FieldManager::getInstance()->getFieldVal(poca.X(), poca.Y(), poca.Z(), Bx, By, Bz);
+    if (useBFieldAtHit) {
+      const TVector3& hitPosition = msop.getPos();
+      genfit::FieldManager::getInstance()->getFieldVal(hitPosition.X(), hitPosition.Y(), hitPosition.Z(), Bx, By, Bz);
+    } else {
+      genfit::FieldManager::getInstance()->getFieldVal(poca.X(), poca.Y(), poca.Z(), Bx, By, Bz);
+    }
     Bz = Bz / 10.; // In SI-Units
 
     const uint64_t hitPatternCDCInitializer = getHitPatternCDCInitializer(recoTrack);

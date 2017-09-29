@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
 import validationserver
+
+"""
+Start the server which hosts the validation result plots and 
+serves them.
+"""
 
 # Only execute if the file is not imported
 if __name__ == '__main__':
     # run validation server with default settings and 
-    # parse command line input
+    # parse command line input in any case
     validationserver.run_server(parseCommandLine=True)

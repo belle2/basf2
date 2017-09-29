@@ -3,6 +3,8 @@
 
 # basf2 specific imports
 from basf2 import statistics
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
 import ROOT
 
 # Normal library imports
@@ -20,19 +22,13 @@ import localcontrol
 
 import json_objects
 
-# Import XML Parser. Use C-Version, if available
-try:
-    import xml.etree.cElementTree as XMLTree
-except ImportError:
-    import xml.etree.ElementTree as XMLTree
-
 # A pretty printer. Prints prettier lists, dicts, etc. :)
 import pprint
 pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
 from validationscript import Script, ScriptStatus
 from validationfunctions import get_start_time, get_validation_folders, scripts_in_dir, \
-    find_creator, parse_cmd_line_arguments
+    parse_cmd_line_arguments
 import validationfunctions
 
 import validationserver

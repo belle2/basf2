@@ -43,7 +43,8 @@ void
 CDCTriggerETFModule::initialize()
 {
   // register DataStore elements
-  StoreObjPtr<EventT0>::registerPersistent(m_EventTimeName);
+  StoreObjPtr<EventT0> eventTime(m_EventTimeName);
+  eventTime.registerInDataStore();
   StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
 }
 

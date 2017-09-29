@@ -15,8 +15,8 @@
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 #include <tracking/trackFindingCDC/utilities/GenIndices.h>
 #include <tracking/trackFindingCDC/utilities/TupleGenerate.h>
-#include <tracking/trackFindingCDC/utilities/EnableIf.h>
 
+#include <type_traits>
 #include <tuple>
 #include <array>
 #include <memory>
@@ -152,7 +152,7 @@ namespace Belle2 {
 
       /// Provide an externally constructed array by coordinate type
       template <class T>
-      EnableIf< HasType<T>::value, void>
+      std::enable_if_t< HasType<T>::value, void>
       assignArray(Array<TypeIndex<T>::value > array, Width<TypeIndex<T>::value > overlap = 0)
       {
         assignArray<TypeIndex<T>::value>(std::move(array), overlap);

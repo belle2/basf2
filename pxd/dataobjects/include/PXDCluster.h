@@ -34,27 +34,6 @@ namespace Belle2 {
       m_clsSize(0), m_uSize(0), m_vSize(0), m_uStart(0), m_vStart(0),
       m_clsShape(0) {}
 
-    /** Deprecated constructor for backward compatibility - will be removed soon.
-     * Doesn't contain error data.
-     * @param sensorID Sensor compact ID.
-     * @param uPosition Cluster u coordinate (r-phi).
-     * @param vPosition Cluster v coordinate (z).
-     * @param clsCharge The cluster charge.
-     * @param seedCharge The charge of the cluster seed.
-     * @param clsSize size of the cluster in pixels.
-     * @param uSize number of pixel columns contributing to the cluster.
-     * @param vSize number of pixel rows contributing to the cluster.
-     */
-    PXDCluster(VxdID sensorID, float uPosition, float vPosition, unsigned short clsCharge,
-               unsigned short seedCharge, unsigned short clsSize, unsigned short uSize,
-               unsigned short vSize, unsigned short uStart, unsigned short vStart):
-      m_sensorID(sensorID), m_uPosition(uPosition), m_vPosition(vPosition),
-      m_uPositionSigma(1), m_vPositionSigma(1), m_uvRho(0),
-      m_clsCharge(clsCharge), m_seedCharge(seedCharge),  m_clsSize(clsSize),
-      m_uSize(uSize), m_vSize(vSize), m_uStart(uStart), m_vStart(vStart),
-      m_clsShape(0)
-    {}
-
     /** Constructor.
      * @param sensorID Sensor compact ID.
      * @param uPosition Cluster u coordinate (r-phi).
@@ -210,7 +189,7 @@ namespace Belle2 {
     unsigned short m_vStart;      /**< Start row of the cluster */
     short m_clsShape;             /**< Cluster shape ID */
 
-    ClassDef(PXDCluster, 3)
+    ClassDef(PXDCluster, 4)
   };
 
 

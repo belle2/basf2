@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guglielmo De Nardo, Frank Meier                          *
+ * Contributors: Frank Meier                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,16 +14,16 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
-#include <ecl/dataobjects/ECLShower.h>
 #include <tracking/dataobjects/ExtHit.h>
+
+#include "TFile.h"
+#include "TTree.h"
 
 namespace Belle2 {
 
-  /** The modules creates and saves in the DataStore a Relation between Tracks and ECLShower.
-   *  It uses the existing Relation between Tracks and ExtHit, from which the ECL crystals
-   *  hit by the extrapolated tracks are found. All the ECLShowers containing the found
-   *  crystals are then associated to each Track. A Relation Track --> ECLShower is filled and saved
-   *  in the DataStore.
+  /** The module creates and saves a Relation between Tracks and ECLCluster in
+   *  the DataStore. It uses the existing Relation between Tracks and ExtHit as well
+   *  as the Relation between ECLCluster and ExtHit.
    */
   class ECLTrackClusterMatchingModule : public Module {
   public:
@@ -60,16 +60,36 @@ namespace Belle2 {
 
     /** Clean up anything you created in initialize(). */
     virtual void terminate();
+
   private:
-
-    /** Minimal distance between track and shower. */
-    double computeTrkMinDistance(const ECLShower&, StoreArray<Track>&) const;
-
-    /** Compute depth. */
-    void computeDepth(const ECLShower& shower, double& lTrk, double& lShower) const;
 
     /** Check if extrapolated hit is originating from pion entering ECL with valid ID. */
     bool checkPionECLEnterID(const ExtHit& extHit) const;
+
+    /** Check if extrapolated hit is inside ECL and matches one of the desired categories. */
+    bool isECLHit(const ExtHit& extHit) const;
+
+    double clusterQuality(const ExtHit& extHit, double deltaPhi, double deltaTheta) const;
+
+    /** members of ECLReconstructor Module */
+
+    TFile* m_rootFilePtr; /**< pointer at root file used for storing info */
+    std::string m_rootFileName; /**< name of the root file */
+    bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
+    TTree* m_tree; /**< Root tree and file for saving the output */
+
+    // variables
+    int m_iExperiment; /**< Experiment number */
+    int m_iRun; /**< Run number */
+    int m_iEvent; /**< Event number */
+
+    std::vector<double>* m_deltaPhi;
+    std::vector<double>* m_errorPhi;
+    std::vector<double>* m_deltaTheta;
+    std::vector<double>* m_errorTheta;
+    std::vector<double>* m_quality;
+    std::vector<double>* m_quality_best; /**< Best quality among all extrapolated hits of one track */
+
   };
 
 } //Belle2

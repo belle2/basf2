@@ -1,7 +1,7 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2017 - Belle II Collaboration                             *
- * Contributors: Guglielmo De Nardo, Frank Meier                          *
+ * Contributors: Frank Meier                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,10 +11,14 @@
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/RelationVector.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <set>
+#include <vector>
+#include <cmath>
 
 using namespace std;
 using namespace Belle2;
@@ -22,10 +26,26 @@ using namespace ECL;
 
 REG_MODULE(ECLTrackClusterMatching)
 
-ECLTrackClusterMatchingModule::ECLTrackClusterMatchingModule() : Module()
+ECLTrackClusterMatchingModule::ECLTrackClusterMatchingModule()
+  : Module(),
+    m_rootFilePtr(0),
+    m_writeToRoot(1),
+    m_tree(0),
+    m_iExperiment(0),
+    m_iRun(0),
+    m_iEvent(0),
+    m_deltaPhi(0),
+    m_deltaTheta(0),
+    m_quality(0),
+    m_quality_best(0)
 {
-  setDescription("Set the Track --> ECLShower and ECLCluster Relations.");
+  setDescription("Match Tracks to ECLCluster");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("writeToRoot", m_writeToRoot,
+           "set true if you want to save the information in a root file named by parameter 'rootFileName'", bool(true));
+  addParam("rootFileName", m_rootFileName,
+           "fileName used for root file where info are saved. Will be ignored if parameter 'writeToRoot' is false (standard)",
+           string("eclTrackClusterMatchingAnalysis.root"));
 }
 
 ECLTrackClusterMatchingModule::~ECLTrackClusterMatchingModule()
@@ -34,11 +54,32 @@ ECLTrackClusterMatchingModule::~ECLTrackClusterMatchingModule()
 
 void ECLTrackClusterMatchingModule::initialize()
 {
+  B2INFO("[ECLTrackClusterMatching Module]: Starting initialization of ECLTrackClusterMatching Module.");
+
   StoreArray<Track> tracks;
-  StoreArray<ECLShower> eclShowers;
   StoreArray<ECLCluster> eclClusters;
-  tracks.registerRelationTo(eclShowers);
   tracks.registerRelationTo(eclClusters);
+
+  if (m_writeToRoot == true) {
+    m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
+  } else
+    m_rootFilePtr = NULL;
+
+  // initialize tree
+  m_tree     = new TTree("m_tree", "ECL Track Cluster Matching Analysis tree");
+
+  m_tree->Branch("expNo", &m_iExperiment, "expNo/I");
+  m_tree->Branch("runNo", &m_iRun, "runNo/I");
+  m_tree->Branch("evtNo", &m_iEvent, "evtNo/I");
+
+  m_tree->Branch("deltaPhi", "std::vector<double>",  &m_deltaPhi);
+  m_tree->Branch("errorPhi", "std::vector<double>",  &m_errorPhi);
+  m_tree->Branch("deltaTheta", "std::vector<double>",  &m_deltaTheta);
+  m_tree->Branch("errorTheta", "std::vector<double>",  &m_errorTheta);
+  m_tree->Branch("quality", "std::vector<double>",  &m_quality);
+  m_tree->Branch("quality_best", "std::vector<double>",  &m_quality_best);
+
+  B2INFO("[ECLTrackClusterMatchingModule]: Initialization of ECLTrackClusterMatching Module completed.");
 }
 
 void ECLTrackClusterMatchingModule::beginRun()
@@ -47,72 +88,57 @@ void ECLTrackClusterMatchingModule::beginRun()
 
 void ECLTrackClusterMatchingModule::event()
 {
+  m_deltaPhi->clear();
+  m_errorPhi->clear();
+  m_deltaTheta->clear();
+  m_errorTheta->clear();
+  m_quality->clear();
+  m_quality_best->clear();
+
+  StoreObjPtr<EventMetaData> eventmetadata;
+  if (eventmetadata) {
+    m_iExperiment = eventmetadata->getExperiment();
+    m_iRun = eventmetadata->getRun();
+    m_iEvent = eventmetadata->getEvent();
+  } else {
+    m_iExperiment = -1;
+    m_iRun = -1;
+    m_iEvent = -1;
+  }
+
   StoreArray<Track> tracks;
-  StoreArray<ECLShower> eclRecShowers;
   StoreArray<ECLCluster> eclClusters;
-  StoreArray<ECLCalDigit> eclDigits;
 
   for (const Track& track : tracks) {
 
-    //Unique shower ids related to this track
-    set<int> uniqueShowerIds;
-
-    // Find extrapolated track hits in the ECL, considering
-    // only hit points where the track enters the crystal
-    // note that more than one crystal belonging to more than one shower
-    // can be found
+    const ECLCluster* cluster_best = nullptr;
+    double quality_tmp = 0;
+    // Find extrapolated track hits in the ECL, considering only hit points
+    // that either are on the sphere, closest to or on radial direction of an
+    // ECLCluster.
     for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
-      if (checkPionECLEnterID(extHit)) continue;
-      int copyid =  extHit.getCopyID();
-      const int cell = copyid + 1;
-
-      //Find ECLCalDigit with same cell ID as ExtHit
-      const auto idigit = find_if(eclDigits.begin(), eclDigits.end(),
-      [&](const ECLCalDigit & d) { return d.getCellId() == cell; }
-                                 );
-      //Couldn't find ECLCalDigit with same cell ID as the ExtHit
-      if (idigit == eclDigits.end()) continue;
-
-      //Save all unique shower IDs of the showers related to idigit
-      for (auto& shower : idigit->getRelationsFrom<ECLShower>()) {
-        bool inserted = (uniqueShowerIds.insert(shower.getUniqueId())).second;
-
-        //If this track <-> shower relation hasn't been set yet, set it for the shower and the ECLCLuster
-        if (!inserted) continue;
-
-        shower.setIsTrack(true);
-        track.addRelationTo(&shower);
-        ECLCluster* cluster = shower.getRelatedFrom<ECLCluster>();
-        if (cluster != nullptr) {
-          cluster->setIsTrack(true);
-          track.addRelationTo(cluster);
-        }
-      } //end loop on shower related to idigit
-    } // end loop on ExtHit
-  } // end loop on Tracks
-
-  for (auto& shower : eclRecShowers) {
-    // compute the distance from shower COG and the closest extrapolated track
-    double dist = computeTrkMinDistance(shower, tracks);
-    shower.setMinTrkDistance(dist);
-    ECLCluster* cluster = shower.getRelatedFrom<ECLCluster>();
-    if (cluster != nullptr)
-      cluster->setMinTrkDistance(float(dist));
-
-    // compute path lenghts on the energy weighted average crystals direction
-    // and on the extrapolated track direction corresponding to the minimum
-    // distance among the two lines.
-    // if more than one track is related to a shower the one with highest momentum is used
-    double lTrk, lShower;
-    if (shower.getIsTrack()) {
-      computeDepth(shower, lTrk, lShower);
-      B2DEBUG(150, "shower depth: ltrk = " << lTrk << " lShower = " << lShower);
-      shower.setTrkDepth(lTrk);
-      shower.setShowerDepth(lShower);
-      if (cluster != nullptr)
-        cluster->setdeltaL(lTrk);
+      if (!isECLHit(extHit)) continue;
+      m_errorPhi->push_back(extHit.getErrorPhi());
+      m_errorTheta->push_back(extHit.getErrorTheta());
+      ECLCluster* eclCluster = extHit.getRelatedFrom<ECLCluster>();
+      double deltaPhi = extHit.getPosition().Phi() - eclCluster->getPhi();
+      m_deltaPhi->push_back(deltaPhi);
+      double deltaTheta = extHit.getPosition().Theta() - eclCluster->getTheta();
+      m_deltaTheta->push_back(deltaTheta);
+      double quality = clusterQuality(extHit, deltaPhi, deltaTheta);
+      m_quality->push_back(quality);
+      if (quality > quality_tmp) {
+        quality_tmp = quality;
+        cluster_best = eclCluster;
+      }
+    } // end loop on ExtHits related to Track
+    m_quality_best->push_back(quality_tmp);
+    if (cluster_best != nullptr) {
+      // cluster_best->setIsTrack(true);
+      track.addRelationTo(cluster_best);
     }
-  }
+  } // end loop on Tracks
+  m_tree->Fill();
 }
 
 void ECLTrackClusterMatchingModule::endRun()
@@ -121,77 +147,12 @@ void ECLTrackClusterMatchingModule::endRun()
 
 void ECLTrackClusterMatchingModule::terminate()
 {
-}
 
-double ECLTrackClusterMatchingModule::computeTrkMinDistance(const ECLShower& shower, StoreArray<Track>& tracks) const
-{
-  double minDist(10000);
-  TVector3 cryCenter;
-  cryCenter.SetMagThetaPhi(shower.getR(), shower.getTheta(), shower.getPhi());
-
-  for (const auto& track : tracks) {
-    TVector3 trkpos(0, 0, 0);
-    bool found(false);
-    for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
-      if (checkPionECLEnterID(extHit)) continue;
-      trkpos = extHit.getPosition();
-      found = true;
-      break;
-    }
-    if (! found) continue;
-    double distance = (cryCenter - trkpos).Mag();
-    if (distance < minDist) minDist = distance;
+  if (m_rootFilePtr != NULL) {
+    m_rootFilePtr->cd(); //important! without this the framework root I/O (SimpleOutput etc) could mix with the root I/O of this module
+    m_tree->Write();
   }
-  if (minDist > 9999) minDist = -1;
-  return minDist;
-}
 
-void ECLTrackClusterMatchingModule::computeDepth(const ECLShower& shower, double& lTrk, double& lShower) const
-{
-  ECLGeometryPar* geometry = ECLGeometryPar::Instance();
-  TVector3 avgDir(0, 0, 0), showerCenter, trkpos, trkdir;
-  showerCenter.SetMagThetaPhi(shower.getR(), shower.getTheta(), shower.getPhi());
-
-  auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>();
-  for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
-    const auto aECLCalDigit = relatedDigitsPairs.object(iRel);
-    const auto weight = relatedDigitsPairs.weight(iRel);
-    double energy = weight * aECLCalDigit->getEnergy();
-    int cellid = aECLCalDigit->getCellId();
-    TVector3 cvec   = geometry->GetCrystalVec(cellid - 1);
-    avgDir += weight * energy * cvec;
-  }
-  double p = 0;
-  const Track* selectedTrk = nullptr;
-  for (const auto& track : shower.getRelationsFrom<Track>()) {
-    const TrackFitResult* fit = track.getTrackFitResult(Const::pion);
-    double cp = 0;
-    if (fit != 0) cp = fit->getMomentum().Mag();
-    if (cp > p) {
-      selectedTrk = & track;
-      p = cp;
-    }
-  }
-  lTrk = 0;
-  lShower = 0;
-  if (selectedTrk == nullptr) return;
-  bool found(false);
-  for (const auto& extHit : selectedTrk->getRelationsTo<ExtHit>()) {
-    if (checkPionECLEnterID(extHit)) continue;
-    trkpos = extHit.getPosition();
-    trkdir = extHit.getMomentum().Unit();
-    found = true;
-    break;
-  }
-  if (!found) return;
-  TVector3 w0 = showerCenter - trkpos;
-  double costh = avgDir * trkdir;
-  double sin2th = 1 - costh * costh;
-  lShower = costh * (w0 * trkdir) - w0 * avgDir;
-  lShower /= sin2th;
-
-  lTrk = w0 * trkdir - costh * (w0 * avgDir);
-  lTrk /= sin2th;
 }
 
 bool ECLTrackClusterMatchingModule::checkPionECLEnterID(const ExtHit& extHit) const
@@ -201,4 +162,18 @@ bool ECLTrackClusterMatchingModule::checkPionECLEnterID(const ExtHit& extHit) co
   else if (extHit.getStatus() != EXT_ENTER) return true;
   else if (extHit.getCopyID() == -1) return true;
   else return false;
+}
+
+bool ECLTrackClusterMatchingModule::isECLHit(const ExtHit& extHit) const
+{
+  if ((extHit.getDetectorID() != Const::EDetector::ECL)) return false;
+  ExtHitStatus extHitStatus = extHit.getStatus();
+  if (extHitStatus == EXT_ECLCROSS || extHitStatus == EXT_ECLDL || extHitStatus == EXT_ECLNEAR) return true;
+  else return false;
+
+}
+
+double ECLTrackClusterMatchingModule::clusterQuality(const ExtHit& extHit, double deltaPhi, double deltaTheta) const
+{
+  return abs(deltaTheta * extHit.getErrorTheta() * extHit.getErrorTheta() + deltaPhi * extHit.getErrorPhi() * extHit.getErrorPhi());
 }

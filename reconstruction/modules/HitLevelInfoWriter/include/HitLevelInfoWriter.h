@@ -70,6 +70,7 @@ namespace Belle2 {
     void clearEntries();
 
     std::string m_filename; /**< name of output ROOT file */
+    bool m_correct; /**< name of output ROOT file */
 
     TFile* m_file; /**< output ROOT file */
     TTree* m_tree; /**< output ROOT tree */

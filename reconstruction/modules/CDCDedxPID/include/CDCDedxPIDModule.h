@@ -22,6 +22,8 @@
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 #include <reconstruction/dbobjects/CDCDedxRunGain.h>
 #include <reconstruction/dbobjects/CDCDedxCosine.h>
+#include <reconstruction/dbobjects/CDCDedxCurvePars.h>
+#include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
 
 #include <string>
 #include <vector>
@@ -75,18 +77,6 @@ namespace Belle2 {
 
   private:
 
-    /** parameterized beta-gamma curve for predicted means */
-    double bgCurve(double* x, double* par) const;
-
-    /** calculate the predicted mean using the parameterized resolution */
-    double getMean(double bg) const;
-
-    /** parameterized resolution for predictions */
-    double sigmaCurve(double* x, double* par) const;
-
-    /** calculate the predicted resolution using the parameterized resolution */
-    double getSigma(double dedx, double nhit, double sin) const;
-
     /** Save arithmetic and truncated mean for the 'dedx' values.
      *
      * @param mean              calculated arithmetic mean
@@ -118,31 +108,28 @@ namespace Belle2 {
 
     TH2F* m_pdfs[3][Const::ChargedStable::c_SetSize]; /**< dedx:momentum PDFs. */
 
-    // parameters: full likelihood vs. truncated mean
-    bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */
+    bool m_usePrediction; /**< Whether to use parameterized means and resolutions or lookup tables */
     double m_removeLowest; /**< Portion of lowest dE/dx values that should be discarded for truncated mean */
     double m_removeHighest; /**< Portion of highest dE/dx values that should be discarded for truncated mean */
-
     bool m_enableDebugOutput; /**< Whether to save information on tracks and associated hits and dE/dx values in DedxTrack objects */
 
-    //parameters: which particles and detectors to use
-    bool m_onlyPrimaryParticles; /**< Only save data for primary particles (as determined by MC truth) */
-
-    //parameters: PDF configuration
+    bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */
     std::string m_pdfFile; /**< file containing the PDFs required for constructing a likelihood. */
+
+    bool m_onlyPrimaryParticles; /**< Only save data for primary particles (as determined by MC truth) */
     bool m_ignoreMissingParticles; /**< Ignore particles for which no PDFs are found. */
 
-    //parameters: calibration constants
+    // parameters: calibration constants
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
     DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
     DBObjPtr<CDCDedxCosine> m_DBCosine; /**< Electron saturation correction DB object */
     std::vector<double> m_cosbinedges;  /**< Electron saturation correction details */
 
-    int m_nLayerWires[9]; /**< number of wires per layer */
+    int m_nLayerWires[9]; /**< number of wires per layer: needed for wire gain calibration */
 
     // parameters to determine the predicted means and resolutions
-    double m_curvepars[15];  /**< dE/dx curve parameters */
-    double m_sigmapars[12];  /**< dE/dx resolution parameters */
+    DBObjPtr<CDCDedxCurvePars> m_DBCurvePars; /**< dE/dx curve parameters */
+    DBObjPtr<CDCDedxSigmaPars> m_DBSigmaPars; /**< dE/dx resolution parameters */
 
   };
 } // Belle2 namespace

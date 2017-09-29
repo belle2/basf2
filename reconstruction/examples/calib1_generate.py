@@ -21,14 +21,8 @@ from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 
-# TEMPORARY
-# use the calibration constants determined with calib2_calibrate.py
-use_local_database("roys_calibration_results/CDCDedxRunGainCalibration/outputdb/database.txt",
-                   "roys_calibration_results/CDCDedxRunGainCalibration/outputdb")
-use_local_database("roys_calibration_results/CDCDedxWireGainCalibration/outputdb/database.txt",
-                   "roys_calibration_results/CDCDedxWireGainCalibration/outputdb")
-use_local_database("roys_calibration_results/CDCDedxCosineCalibration/outputdb/database.txt",
-                   "roys_calibration_results/CDCDedxCosineCalibration/outputdb")
+# for curve parameters (until added to GT)
+use_local_database("localdb/database.txt", "localdb")
 
 # main path
 main = create_path()

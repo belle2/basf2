@@ -62,17 +62,26 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
   setDescription("Extract dE/dx and corresponding log-likelihood from fitted tracks and hits in the CDC.");
 
   //Parameter definitions
-  addParam("useIndividualHits", m_useIndividualHits,
-           "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values will be used.", true);
-  addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded", double(0.05));
-  addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded", double(0.25));
-
-  addParam("onlyPrimaryParticles", m_onlyPrimaryParticles, "Only save data for primary particles (as determined by MC truth)", false);
+  addParam("usePrediction", m_usePrediction,
+           "Use parameterized means and resolutions to determine PID values. If false, lookup table PDFs are used.", true);
+  addParam("removeLowest", m_removeLowest,
+           "portion of events with low dE/dx that should be discarded", double(0.05));
+  addParam("removeHighest", m_removeHighest,
+           "portion of events with high dE/dx that should be discarded", double(0.25));
   addParam("enableDebugOutput", m_enableDebugOutput,
            "Option to write out debugging information to CDCDedxTracks (DataStore objects).", true);
-  addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.",
+
+  addParam("useIndividualHits", m_useIndividualHits,
+           "If using lookup table PDFs, include PDF value for each hit in likelihood. If false, the truncated mean of dedx values will be used.",
+           false);
+  addParam("pdfFile", m_pdfFile,
+           "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.",
            std::string("/data/reconstruction/dedxPID_PDFs_dd92782_500k_events.root"));
-  addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
+
+  addParam("onlyPrimaryParticles", m_onlyPrimaryParticles,
+           "Only save data for primary particles (as determined by MC truth)", false);
+  addParam("ignoreMissingParticles", m_ignoreMissingParticles,
+           "Ignore particles for which no PDFs are found", false);
 }
 
 CDCDedxPIDModule::~CDCDedxPIDModule() { }
@@ -191,36 +200,11 @@ void CDCDedxPIDModule::initialize()
     m_nLayerWires[i] = m_nLayerWires[i - 1] + 6 * (160 + (i - 1) * 32);
   }
 
-
-  // setting these manually for now, but they should be read in from the DB
-  m_curvepars[0] = 0.00392444;
-  m_curvepars[1] = 26.8709;
-  m_curvepars[2] = 3.78296;
-  m_curvepars[3] = -0.534117;
-  m_curvepars[4] = 6.63276;
-  m_curvepars[5] = 0.494768;
-  m_curvepars[6] = -1.9872;
-  m_curvepars[7] = -0.000117405;
-  m_curvepars[8] = 0.00283862;
-  m_curvepars[9] = -0.0131518;
-  m_curvepars[10] = 0.706402;
-  m_curvepars[11] = 0.0803046;
-  m_curvepars[12] = 1.08118;
-  m_curvepars[13] = 0.543991;
-  m_curvepars[14] = 0.0031143;
-
-  m_sigmapars[0] = 0.0115507;
-  m_sigmapars[1] = 0.0773491;
-  m_sigmapars[2] = 3.9199e-05;
-  m_sigmapars[3] = -0.00345398;
-  m_sigmapars[4] = 0.111907;
-  m_sigmapars[5] = -1.59311;
-  m_sigmapars[6] = 9.16672;
-  m_sigmapars[7] = 43.9322;
-  m_sigmapars[8] = -124.213;
-  m_sigmapars[9] = 127.56;
-  m_sigmapars[10] = -56.7759;
-  m_sigmapars[11] = 10.3113;
+  // make sure the curve and resolution parameters are reasonable
+  if (m_DBCurvePars->getSize() == 0)
+    B2ERROR("No dE/dx curve parameters!");
+  if (m_DBSigmaPars->getSize() == 0)
+    B2ERROR("No dE/dx sigma parameters!");
 
   // create instances here to not confuse profiling
   CDCGeometryPar::Instance();
@@ -461,7 +445,7 @@ void CDCDedxPIDModule::event()
         int driftT = cdcHit->getTDCCount();
 
         // we want electrons to be one, so artificially scale the adcCount
-        adcCount /= 60.1; // <--------- HARD CODED FOR NOW
+        adcCount /= 46.1659; // <--------- HARD CODED FOR NOW
 
         RealisticTDCCountTranslator realistictdc;
         double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, 0, true, pocaOnWire.Z(), pocaMom.Phi(), pocaMom.Theta());
@@ -564,8 +548,17 @@ void CDCDedxPIDModule::event()
     }
 
     // save CDCDedxLikelihood
-    if (!m_pdfFile.empty()) {
-      CDCDedxLikelihood* likelihoodObj = likelihoodArray.appendNew(dedxTrack->m_cdcLogl);
+    if (m_usePrediction || !m_pdfFile.empty()) {
+
+      double* pidvalues;
+      if (m_usePrediction) {
+        pidvalues = dedxTrack->m_cdcChi;
+        for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; ++i) {
+          pidvalues[i] = -0.5 * pidvalues[i] * pidvalues[i];
+        }
+      } else pidvalues = dedxTrack->m_cdcLogl;
+
+      CDCDedxLikelihood* likelihoodObj = likelihoodArray.appendNew(pidvalues);
       track.addRelationTo(likelihoodObj);
     }
 
@@ -657,117 +650,19 @@ void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetS
   }
 }
 
-double CDCDedxPIDModule::bgCurve(double* x, double* par) const
-{
-  // calculate the predicted mean value as a function of beta-gamma (bg)
-  // this is done with a different function depending on the value of bg
-  double f = 0;
-  if (par[0] == 1)
-    f = par[1] * std::pow(std::sqrt(x[0] * x[0] + 1), par[3]) / std::pow(x[0], par[3]) *
-        (par[2] - par[5] * std::log(1 / x[0])) - par[4] + std::exp(par[6] + par[7] * x[0]);
-  else if (par[0] == 2)
-    f = par[1] * std::pow(x[0], 3) + par[2] * x[0] * x[0] + par[3] * x[0] + par[4];
-  else if (par[0] == 3)
-    f = -1.0 * par[1] * std::log(par[4] + std::pow(1 / x[0], par[2])) + par[3];
-
-  return f;
-}
-
-double CDCDedxPIDModule::getMean(double bg) const
-{
-  // define the section of the curve to use
-  double A = 0, B = 0, C = 0;
-  if (bg < 4.5)
-    A = 1;
-  else if (bg < 10)
-    B = 1;
-  else
-    C = 1;
-
-  double x[1]; x[0] = bg;
-  double parsA[9];
-  double parsB[5];
-  double parsC[5];
-
-  parsA[0] = 1; parsB[0] = 2; parsC[0] = 3;
-  for (int i = 0; i < 15; ++i) {
-    if (i < 7) parsA[i + 1] = m_curvepars[i];
-    else if (i < 11) parsB[i % 7 + 1] = m_curvepars[i];
-    else parsC[i % 11 + 1] = m_curvepars[i];
-  }
-
-  // calculate dE/dx from the Bethe-Bloch curve
-  double partA = bgCurve(x, parsA);
-  double partB = bgCurve(x, parsB);
-  double partC = bgCurve(x, parsC);
-
-  return (A * partA + B * partB + C * partC);
-}
-
-double CDCDedxPIDModule::sigmaCurve(double* x, double* par) const
-{
-  // calculate the predicted mean value as a function of beta-gamma (bg)
-  // this is done with a different function depending dE/dx, nhit, and sin(theta)
-  double f = 0;
-  if (par[0] == 1) {
-    // return dedx parameterization
-    f = par[1] + par[2] * x[0];
-  } else if (par[0] == 2) {
-    // return nhit or sin(theta) parameterization
-    f = par[1] * std::pow(x[0], 4) + par[2] * std::pow(x[0], 3) +
-        par[3] * x[0] * x[0] + par[4] * x[0] + par[5];
-  }
-
-  return f;
-}
-
-
-double CDCDedxPIDModule::getSigma(double dedx, double nhit, double sin) const
-{
-  if (nhit < 5) nhit = 5;
-  if (sin > 0.99) sin = 0.99;
-
-  double x[1];
-  double dedxpar[3];
-  double nhitpar[6];
-  double sinpar[6];
-
-  dedxpar[0] = 1; nhitpar[0] = 2; sinpar[0] = 2;
-  for (int i = 0; i < 5; ++i) {
-    if (i < 2) dedxpar[i + 1] = m_sigmapars[i];
-    nhitpar[i + 1] = m_sigmapars[i + 2];
-    sinpar[i + 1] = m_sigmapars[i + 7];
-  }
-
-  // determine sigma from the parameterization
-  x[0] = dedx;
-  double corDedx = sigmaCurve(x, dedxpar);
-  x[0] = nhit;
-  double corNHit = sigmaCurve(x, nhitpar);
-  if (nhit > 35) corNHit = 1.0;
-  x[0] = sin;
-  double corSin = sigmaCurve(x, sinpar);
-
-  return (corDedx * corSin * corNHit);
-}
-
 
 void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize],
                                     double(&predmean)[Const::ChargedStable::c_SetSize], double(&predsigma)[Const::ChargedStable::c_SetSize], double p, double dedx,
                                     double sin, int nhit) const
 {
-  // account for the fact that electron truncated mean peaks near 60 units -> scale to 1
-  // this should be done via calibration eventually
-  dedx = dedx / 59.267;
-
   // determine a chi value for each particle type
   Const::ParticleSet set = Const::chargedStableSet;
   for (const Const::ChargedStable& pdgIter : set) {
     double bg = p / pdgIter.getMass();
 
     // determine the predicted mean and resolution
-    double mean = getMean(bg);
-    double sigma = getSigma(mean, nhit, sin);
+    double mean = m_DBCurvePars->getMean(bg);
+    double sigma = m_DBSigmaPars->getSigma(mean, nhit, sin);
 
     predmean[pdgIter.getIndex()] = mean;
     predsigma[pdgIter.getIndex()] = sigma;

@@ -21,6 +21,7 @@ HitLevelInfoWriterModule::HitLevelInfoWriterModule() : Module()
   setDescription("Extract dE/dx information for calibration development.");
 
   addParam("outputFileName", m_filename, "Name for output file", std::string("HLInfo.root"));
+  addParam("applyCorrections", m_correct, "Apply corrections (cosmics only)", false);
 }
 
 HitLevelInfoWriterModule::~HitLevelInfoWriterModule() { }
@@ -171,8 +172,11 @@ void HitLevelInfoWriterModule::event()
     m_rungain = 48.0;
 
     m_truncorig = m_trunc;
-    m_trunc = m_trunc / m_coscor;
-    m_trunc = m_trunc / m_rungain;
+
+    if (m_correct) {
+      m_trunc = m_trunc / m_coscor;
+      m_trunc = m_trunc / m_rungain;
+    }
 
     m_tree->Fill();
   }

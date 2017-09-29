@@ -22,8 +22,8 @@ namespace Belle2 {
    * - must have begin() and end() with iterator pointing to pointers of entries ( = ContainerType< NodeType*>)
    *
    * Requirements for NodeType:
-   * - must have function: bool NodeType::getMetaInfo().setFamily()
-   * - must have function: bool NodeType::getMetaInfo().getFamily()
+   * - must have function: bool NodeType::setFamily()
+   * - must have function: bool NodeType::getFamily()
    * - must have function: NeighbourContainerType& NodeType::getInnerNodes()
    * - must have function: NeighbourContainerType& NodeType::getOuterNodes()
    *
@@ -43,14 +43,13 @@ namespace Belle2 {
     {
       short currentFamily = 0;
       for (NodeType* aNode : aNetwork) {
-        auto& metaInfo = aNode->getMetaInfo();
-        if (metaInfo.getFamily() != -1) {
-          B2DEBUG(1, "Node already assigned to a family:" << metaInfo.getFamily());
+        if (aNode->getFamily() != -1) {
+          B2DEBUG(1, "Node already assigned to a family:" << aNode->getFamily());
           continue;
         }
 
         B2DEBUG(1, "Happy little family: " << currentFamily);
-        metaInfo.setFamily(currentFamily);
+        aNode->setFamily(currentFamily);
 
 
         NeighbourContainerType& innerNeighbours = aNode->getInnerNodes();
@@ -75,14 +74,13 @@ namespace Belle2 {
       NeighbourContainerType newNeighbours;
       B2DEBUG(1, "Mark node for family: " << family << " with " << neighbours.size() << " neighbour nodes.");
       for (auto& neighbour : neighbours) {
-        auto& metaInfo = neighbour->getMetaInfo();
         // If node was already touched continue;
-        if (metaInfo.getFamily() != -1) {
-          short tmpFamily = metaInfo.getFamily();
+        if (neighbour.getFamily() != -1) {
+          short tmpFamily = neighbour.getFamily();
           if (tmpFamily != family) B2FATAL("Node already assigned to different family: " << family << ", " << tmpFamily);
           else continue;
         }
-        metaInfo.setFamily(family);
+        neighbour.setFamily(family);
         NeighbourContainerType& innerNeighbours = neighbour->getInnerNodes();
         NeighbourContainerType& outerNeighbours = neighbour->getOuterNodes();
         newNeighbours.reserve(innerNeighbours.size() + outerNeighbours.size());

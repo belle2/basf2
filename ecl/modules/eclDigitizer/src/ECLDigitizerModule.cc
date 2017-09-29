@@ -81,7 +81,7 @@ void ECLDigitizerModule::beginRun()
       Aen("ECLCrystalEnergy"),
       Tel("ECLCrystalElectronicsTime"),
       Ten("ECLCrystalTimeOffset");
-  double c = 1.0 / (4.0 * ec.m_rf) * 1e3, ic = 1 / c;
+  double ns_per_tick = 1.0 / (4.0 * ec.m_rf) * 1e3;// ~0.49126819903043308239 ns/tick
 
   calibration_t def = {1, 0};
   m_calib.assign(8736, def);
@@ -89,8 +89,8 @@ void ECLDigitizerModule::beginRun()
   if (Ael) for (int i = 0; i < 8736; i++) m_calib[i].ascale /= Ael->getCalibVector()[i];
   if (Aen) for (int i = 0; i < 8736; i++) m_calib[i].ascale /= Aen->getCalibVector()[i] * 20000.0;
 
-  if (Tel) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tel->getCalibVector()[i] * ic;
-  if (Ten) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Ten->getCalibVector()[i] * ic;
+  if (Tel) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tel->getCalibVector()[i] * ns_per_tick;
+  if (Ten) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Ten->getCalibVector()[i] * ns_per_tick;
 }
 
 // interface to C shape fitting function function

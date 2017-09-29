@@ -13,10 +13,11 @@
 
 #include <tracking/trackFindingCDC/numerics/LookupTable.h>
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
-#include <tracking/trackFindingCDC/utilities/GenIndices.h>
+
 #include <tracking/trackFindingCDC/utilities/TupleGenerate.h>
 
 #include <type_traits>
+#include <utility>
 #include <tuple>
 #include <array>
 #include <memory>
@@ -229,7 +230,7 @@ namespace Belle2 {
     private:
       /// Construct the box of the top node of the tree. Implementation unroling the indices.
       template <size_t... Is>
-      HoughBox constructHoughPlaneImpl(const IndexSequence<Is...>& is __attribute__((unused)))
+      HoughBox constructHoughPlaneImpl(const std::index_sequence<Is...>& is __attribute__((unused)))
       {
         return HoughBox(Type<Is>::getRange(std::get<Is>(m_arrays))...);
       }
@@ -237,7 +238,7 @@ namespace Belle2 {
       /// Construct the box of the top node of the tree.
       HoughBox constructHoughPlane()
       {
-        return constructHoughPlaneImpl(GenIndices<sizeof...(divisions)>());
+        return constructHoughPlaneImpl(std::make_index_sequence<sizeof...(divisions)>());
       }
 
     private:

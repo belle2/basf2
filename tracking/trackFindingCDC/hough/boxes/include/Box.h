@@ -9,10 +9,10 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/GenIndices.h>
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 
 #include <type_traits>
+#include <utility>
 #include <array>
 #include <algorithm>
 #include <cassert>
@@ -93,7 +93,7 @@ namespace Belle2 {
       static const size_t c_nTypes = std::tuple_size<Point>::value;
 
       /// Helper class to iterate over the individual coordinates
-      using Indices = GenIndices<c_nTypes>;
+      using Indices = std::make_index_sequence<c_nTypes>;
 
       /// Initialise the box with bound in each dimension.
       Box(const std::array<FirstType, 2>& firstBound,
@@ -357,7 +357,7 @@ namespace Belle2 {
        */
       template <size_t... Is>
       bool intersectsImpl(const This& box,
-                          IndexSequence<Is...> is __attribute__((unused))) const
+                          std::index_sequence<Is...> is __attribute__((unused))) const
       {
         return not(any({box.getUpperBound<Is>() < this->getLowerBound<Is>()... }) or
                    any({this->getUpperBound<Is>() < box.getLowerBound<Is>()... }));
@@ -369,7 +369,7 @@ namespace Belle2 {
        */
       template <size_t... Is>
       bool isInImpl(const Point& point,
-                    IndexSequence<Is...> is __attribute__((unused))) const
+                    std::index_sequence<Is...> is __attribute__((unused))) const
       {
         return not all({isIn<Is>(std::get<Is>(point))...});
       }

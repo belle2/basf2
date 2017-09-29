@@ -100,7 +100,10 @@ else:
     path = create_path()
     inputMdstList('MC7', [], path)
     path.add_path(feistate.path)
-    path.add_module('RootOutput')
+    r1 = register_module('RootOutput')
+    r1.set_name('ROE_RootOutput')
+    r1.param('additionalBranchNames', ['RestOfEvent'])
+    path.add_module(r1)
 
 
 process(path)

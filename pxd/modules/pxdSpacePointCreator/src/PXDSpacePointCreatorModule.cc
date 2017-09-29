@@ -7,9 +7,7 @@
  *                                                                        *
  **************************************************************************/
 
-#include <tracking/modules/spacePointCreator/SpacePointCreatorPXDModule.h>
-
-#include <tracking/spacePointCreation/SpacePointHelperFunctions.h>
+#include <pxd/modules/pxdSpacePointCreator/PXDSpacePointCreatorModule.h>
 
 #include <framework/logging/Logger.h>
 
@@ -20,9 +18,9 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(SpacePointCreatorPXD)
+REG_MODULE(PXDSpacePointCreator)
 
-SpacePointCreatorPXDModule::SpacePointCreatorPXDModule() :
+PXDSpacePointCreatorModule::PXDSpacePointCreatorModule() :
   Module()
 {
   InitializeCounters();
@@ -44,7 +42,7 @@ SpacePointCreatorPXDModule::SpacePointCreatorPXDModule() :
 
 
 
-void SpacePointCreatorPXDModule::initialize()
+void PXDSpacePointCreatorModule::initialize()
 {
   // prepare all store- and relationArrays:
   m_spacePoints.registerInDataStore(m_spacePointsName, DataStore::c_DontWriteOut);
@@ -66,13 +64,16 @@ void SpacePointCreatorPXDModule::initialize()
 
 
 
-void SpacePointCreatorPXDModule::event()
+void PXDSpacePointCreatorModule::event()
 {
 
-  storeSingleCluster(m_pxdClusters, m_spacePoints);
+  for (unsigned int i = 0; i < uint(m_pxdClusters.getEntries()); ++i) {
+    const PXDCluster* currentCluster = m_pxdClusters[i];
+    SpacePoint* newSP = m_spacePoints.appendNew((currentCluster));
+    newSP->addRelationTo(currentCluster);
+  }
 
-
-  B2DEBUG(1, "SpacePointCreatorPXDModule(" << m_nameOfInstance << ")::event: spacePoints created! Size of arrays:\n" <<
+  B2DEBUG(1, "PXDSpacePointCreatorModule(" << m_nameOfInstance << ")::event: spacePoints created! Size of arrays:\n" <<
           "pxdClusters: " << m_pxdClusters.getEntries() <<
           ", spacePoints: " << m_spacePoints.getEntries());
 
@@ -98,16 +99,19 @@ void SpacePointCreatorPXDModule::event()
 
 
 
-void SpacePointCreatorPXDModule::terminate()
+void PXDSpacePointCreatorModule::terminate()
 {
-  B2INFO("SpacePointCreatorPXDModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
+  B2INFO("PXDSpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
          "pxdClusters: " << m_TESTERPXDClusterCtr <<
          ", spacePoints: " << m_TESTERSpacePointCtr);
 }
 
 
-void SpacePointCreatorPXDModule::InitializeCounters()
+void PXDSpacePointCreatorModule::InitializeCounters()
 {
   m_TESTERPXDClusterCtr = 0;
   m_TESTERSpacePointCtr = 0;
 }
+
+
+

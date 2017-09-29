@@ -9,8 +9,6 @@
 
 #include <tracking/modules/spacePointCreator/SpacePointCreatorTestModule.h>
 
-#include <tracking/spacePointCreation/SpacePointHelperFunctions.h>
-
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <framework/logging/Logger.h>

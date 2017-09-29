@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/numerics/LookupTable.h>
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 #include <tracking/trackFindingCDC/utilities/GenIndices.h>
+#include <tracking/trackFindingCDC/utilities/TupleGenerate.h>
 #include <tracking/trackFindingCDC/utilities/EnableIf.h>
 
 #include <tuple>
@@ -62,7 +63,6 @@ namespace Belle2 {
 
     public:
       /// Constructor using the given maximal level.
-      template <class... RangeSpecOverlap>
       explicit BoxDivisionHoughTree(int maxLevel, int sectorLevelSkip = 0)
         : m_maxLevel(maxLevel)
         , m_sectorLevelSkip(sectorLevelSkip)
@@ -76,7 +76,7 @@ namespace Belle2 {
       using Array = typename Type<I>::Array;
 
       /// Tuple type of the discrete value arrays
-      using Arrays = MapGenIndices<Array, sizeof...(divisions)>;
+      using Arrays = TupleGenerateN<Array, sizeof...(divisions)>;
 
     public:
       /// Getter the number of divisions at each level for coordinate index I.

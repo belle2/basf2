@@ -17,7 +17,7 @@ logging.package("calibration").log_level = LogLevel.DEBUG
 
 def _create_file(num):
     main = create_path()
-    main.add_module("EventInfoSetter", expList=[1], runList=[run], evtNumList=[10000])
+    main.add_module("EventInfoSetter", expList=[1], runList=[run], evtNumList=[1000])
     main.add_module("RootOutput", outputFileName="MyInputFile_" + str(run) + ".root")
     process(main)
     print(statistics)

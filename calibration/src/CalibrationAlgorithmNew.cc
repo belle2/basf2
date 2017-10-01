@@ -1,7 +1,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/python/class.hpp>
 #include <boost/python/docstring_options.hpp>
-#include <calibration/calibration_algorithms/CalibrationAlgorithmNew.h>
+#include <calibration/CalibrationAlgorithmNew.h>
 #include <framework/core/PyObjConvUtils.h>
 #include <framework/utilities/RegisterPythonModule.h>
 
@@ -84,21 +84,44 @@ CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(vector< Belle2
 }
 
 /// Set the input file names used for this algorithm and resolve the wildcards
-void CalibrationAlgorithmNew::setInputFileNames(boost::python::list inputFileNames)
+void CalibrationAlgorithmNew::setInputFileNames(PyObject* inputFileNames)
 {
-  m_inputFileNames = expandWordExpansions(PyObjConvUtils::convertPythonObject(inputFileNames, std::vector<std::string>()));
+  // The reasoning for this very 'manual' approach to extending the Python interface
+  // (instead of using boost::python) is down to my fear of putting off final users.
+  // I didn't want users that inherit from this class to be forced to use boost and
+  // to have to define a new python module just to use the CAF. A derived class from
+  // from a boost exposed class would need to have its own boost python module definition
+  // to allow access from a steering file and to the base class functions.
+  // I also couldn't be bothered to write a full framework to get around the issue in a similar
+  // way to Module()...maybe there's an easy way.
+  //
+  // But this way we can allow people to continue using their ROOT implemented classes and inherit
+  // easily from this one. But add in a few helper functions that work with Python objects
+  // created in their steering file i.e. instead of being forced to use STL objects as input
+  // to the algorithm.
+  if (PyList_Check(inputFileNames)) {
+    boost::python::handle<> handle(boost::python::borrowed(inputFileNames));
+    boost::python::list listInputFileNames(handle);
+    auto vecInputFileNames = PyObjConvUtils::convertPythonObject(listInputFileNames, std::vector<std::string>());
+    setInputFileNames(vecInputFileNames);
+  } else {
+    B2ERROR("Tried to set the input files but we didn't receive a Python list.");
+  }
 }
 
-/// Get the (wildcard resolved) input file names used for this algorithm
-std::vector<std::string> CalibrationAlgorithmNew::getInputFileNames()
+/// Set the input file names used for this algorithm and resolve the wildcards
+void CalibrationAlgorithmNew::setInputFileNames(std::vector<std::string> inputFileNames)
 {
-  return m_inputFileNames;
+  m_inputFileNames = expandWordExpansions(inputFileNames);
 }
 
-/// Get the (wildcard resolved) input file names used for this algorithm
-boost::python::list CalibrationAlgorithmNew::getInputFileNames_Python()
+PyObject* CalibrationAlgorithmNew::getInputFileNames()
 {
-  return PyObjConvUtils::convertToPythonObject<std::string>(m_inputFileNames);
+  PyObject* objInputFileNames = PyList_New(m_inputFileNames.size());
+  for (std::size_t i = 0; i < m_inputFileNames.size(); ++i) {
+    PyList_SetItem(objInputFileNames, i, Py_BuildValue("s", m_inputFileNames[i].c_str()));
+  }
+  return objInputFileNames;
 }
 
 vector< CalibrationAlgorithmNew::ExpRun > CalibrationAlgorithmNew::string2RunList(string list) const
@@ -235,23 +258,3 @@ bool CalibrationAlgorithmNew::commit(std::list<Database::DBQuery> payloads)
 //  list.erase(std::unique(list.begin(), list.end()), list.end());
 //  return list;
 //}
-
-void CalibrationAlgorithmNew::exposePythonAPI()
-{
-  using namespace boost::python;
-  docstring_options options(true, true, false); //userdef, py sigs, c++ sigs
-
-  class_<CalibrationAlgorithmNew>("CalibrationAlgorithmNew", init<std::string>())
-  .def("setInputFileNames", &CalibrationAlgorithmNew::setInputFileNames)
-  .def("getInputFileNames", &CalibrationAlgorithmNew::getInputFileNames_Python);
-}
-
-//-----------------------------------
-//   Define the pybasf2 python module
-//-----------------------------------
-BOOST_PYTHON_MODULE(calibration_algorithms)
-{
-  CalibrationAlgorithmNew::exposePythonAPI();
-}
-
-REGISTER_PYTHON_MODULE(calibration_algorithms)

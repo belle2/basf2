@@ -1,5 +1,0 @@
-Import('env')
-env['PYTHON_MODULE'] = True
-env['LIBS'] = ['framework', 'framework_io', 'boost_python', '$ROOT_LIBS', 'calibration_dataobjects', 'alignment_dataobjects', 'calibration_dbobjects']
-Return('env')
-

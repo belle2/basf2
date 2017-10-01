@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #pragma once
+#include <Python.h>
 #include <string>
 #include <boost/python.hpp>
 #include <boost/python/list.hpp>
@@ -71,14 +72,11 @@ namespace Belle2 {
     /// Set the prefix used to identify datastore objects
     void setPrefix(std::string prefix) {m_prefix = prefix;}
 
-    /// Set the input file names used for this algorithm
-    void setInputFileNames(boost::python::list inputFileNames);
+    /// Set the input file names used for this algorithm from a Python list
+    void setInputFileNames(PyObject* inputFileNames);
 
-    /// Get the (wildcard resolved) input file names used for this algorithm
-    std::vector<std::string> getInputFileNames();
-
-    /// Get the (wildcard resolved) input file names used for this algorithm
-    boost::python::list getInputFileNames_Python();
+    /// Get the input file names used for this algorithm and pass them out as a Python list of unicode strings
+    PyObject* getInputFileNames();
 
     /// Get the complete list of runs from inspection of datastore
 //    std::vector<ExpRun> getRunListFromAllData();
@@ -101,8 +99,6 @@ namespace Belle2 {
     /// Get the description of the algoithm (set by developers in constructor)
     const std::string& getDescription() const {return m_description;}
 
-    static void exposePythonAPI();
-
   protected:
     // Developers implement this function ------------
 
@@ -116,6 +112,12 @@ namespace Belle2 {
 
     /// Get current iteration
     int getIteration() const { return m_iteration; }
+
+    /// Set the input file names used for this algorithm
+    void setInputFileNames(std::vector<std::string> inputFileNames);
+
+    /// Get the (wildcard resolved) input file names used for this algorithm
+    std::vector<std::string> getInputFileNamesCPP() {return m_inputFileNames;}
 
 //    /// Get calibration data object by name and list of runs
 //    template<class T>
@@ -213,7 +215,7 @@ namespace Belle2 {
     /// current iteration
     int m_iteration{0};
 
-//    ClassDef(CalibrationAlgorithmNew, 1); /**< Abstract base class for calibration algorithms */
+    ClassDef(CalibrationAlgorithmNew, 1); /**< Abstract base class for calibration algorithms */
   };
 } // namespace Belle2
 

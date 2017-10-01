@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import calibration_algorithms as calalgs
+import os
+import sys
+from basf2 import *
+import ROOT
+from ROOT import Belle2
+import time
 
-algo = calalgs.CalibrationAlgorithmNew("Tester")
+algo = Belle2.CalibrationAlgorithmNew("Tester")
 # Input Python list object works
-inputFileNames = ["collector_output/*"]
+inputFileNames = ["./collector_output/*"]
 algo.setInputFileNames(inputFileNames)
-# Python list object of files returned after expanding shell search (currently buggy)
-[print(x) for x in algo.getInputFileNames()]
+# Python list object of files returned after expanding shell search
+d = algo.getInputFileNames()
+for name in d:
+    print(name)

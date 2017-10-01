@@ -53,7 +53,7 @@ namespace Belle2 {
 
     // Add parameters
     addParam("decayString", m_decayString,
-             "Input DecayDescriptor string (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString).");
+             "Input DecayDescriptor string (see https://confluence.desy.de/display/BI/Physics+DecayString).");
     addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
     addParam("maximumNumberOfCandidates", m_maximumNumberOfCandidates,
              "Max. number of candidates reconstructed ", 10000);

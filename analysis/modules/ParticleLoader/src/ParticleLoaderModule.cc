@@ -59,7 +59,7 @@ namespace Belle2 {
     std::vector<std::tuple<std::string, std::string>> emptyDecayStringsAndCuts;
 
     addParam("decayStringsWithCuts", m_decayStringsWithCuts,
-             "List of (decayString, Variable::Cut) tuples that specify all output ParticleLists to be created by the module. Only Particles that pass specified selection criteria are added to the ParticleList (see https://belle2.cc.kek.jp/~twiki/bin/view/Physics/DecayString and https://belle2.cc.kek.jp/~twiki/bin/view/Physics/ParticleSelectorFunctions).",
+             "List of (decayString, Variable::Cut) tuples that specify all output ParticleLists to be created by the module. Only Particles that pass specified selection criteria are added to the ParticleList (see https://confluence.desy.de/display/BI/Physics+DecayString and https://confluence.desy.de/display/BI/Physics+ParticleSelectorFunctions).",
              emptyDecayStringsAndCuts);
 
     addParam("useMCParticles", m_useMCParticles,

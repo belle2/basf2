@@ -238,7 +238,7 @@ void SVDUnpackerModule::event()
 
             if (m_generateShaperDigts) {
               //B2INFO("Generating SVDShaperDigit object");
-              SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample, m_SVDModeByte);
+              SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample, 0.0, m_SVDModeByte);
               shaperDigits.appendNew(*newShaperDigit);
               delete newShaperDigit;
             }

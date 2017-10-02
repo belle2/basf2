@@ -76,7 +76,7 @@ namespace Belle2 {
     PyObject* getInputFileNames();
 
     /// Get the complete list of runs from inspection of datastore
-//    std::vector<ExpRun> getRunListFromAllData();
+    std::vector<Calibration::ExpRun> getRunListFromAllData();
 
     /// Runs calibration over vector of runs
     EResult execute(std::vector<Calibration::ExpRun> runs = {}, int iteration = 0);

@@ -21,6 +21,7 @@
 
 #include <calibration/dataobjects/CalibRootObjBase.h>
 #include <calibration/dataobjects/CalibRootObjNew.h>
+#include <calibration/dataobjects/RunRangeNew.h>
 #include <calibration/CalibObjManager.h>
 #include <calibration/Utilities.h>
 
@@ -80,6 +81,7 @@ namespace Belle2 {
     TDirectory* m_dir;
 
     CalibObjManager m_manager;
+    RunRangeNew* m_runRange;
 
     StoreObjPtr<EventMetaData> m_emd;
   };

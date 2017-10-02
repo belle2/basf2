@@ -100,15 +100,14 @@ CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(PyObject* runs
 
 CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(vector<ExpRun> runs, int iteration)
 {
-  // Check if we started a new iteration and clear old data
-  if (m_iteration != iteration) {
-    m_payloads.clear();
-    m_iteration = iteration;
+  if (m_inputFileNames.empty()) {
+    B2ERROR("There aren't any input files set. Please use CalibrationAlgorithm::setInputFiles()");
+    return c_Failure;
   }
   // Did we receive runs to execute over explicitly?
   if (!(runs.empty())) {
     for (auto expRun : runs) {
-      B2DEBUG(100, "(" << expRun.first << ", " << expRun.second << ")");
+      B2DEBUG(100, "ExpRun requested = (" << expRun.first << ", " << expRun.second << ")");
     }
   }
 
@@ -120,10 +119,10 @@ CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(vector<ExpRun>
 //    return c_Failure;
 //  }
 //
-//  if (getRunListFromAllData().empty()) {
-//    B2ERROR("No collected data.");
-//    return c_Failure;
-//  }
+  if (getRunListFromAllData().empty()) {
+    B2ERROR("No collected data.");
+    return c_Failure;
+  }
 //
 //  // If no runs are provided, just take all collected
 //  if (runs.empty())
@@ -168,6 +167,11 @@ CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(vector<ExpRun>
 //      return c_Failure;
 //    }
 //  }
+  // Check if we started a new iteration and clear old data
+  if (m_iteration != iteration) {
+    m_payloads.clear();
+    m_iteration = iteration;
+  }
 
 
   return calibrate();
@@ -372,8 +376,16 @@ bool CalibrationAlgorithmNew::commit(list<Database::DBQuery> payloads)
   return Database::Instance().storeData(payloads);
 }
 
-//vector< CalibrationAlgorithmNew::ExpRun > CalibrationAlgorithmNew::getRunListFromAllData()
-//{
+vector<ExpRun> CalibrationAlgorithmNew::getRunListFromAllData()
+{
+  // Save TDirectory to change back at the end
+  TDirectory* dir = gDirectory;
+  for (const string& fileName : m_inputFileNames) {
+    unique_ptr<TFile> f;
+    f.reset(TFile::Open(fileName.c_str(), "READ"));
+  }
+  dir->cd();
+  vector<ExpRun> runs;
 //  string fullName(m_prefix + "_" + RUN_RANGE_OBJ_NAME);
 //  StoreObjPtr<CalibRootObj<RunRange>> storeobj(fullName, DataStore::c_Persistent);
 //
@@ -389,4 +401,5 @@ bool CalibrationAlgorithmNew::commit(list<Database::DBQuery> payloads)
 //  std::sort(list.begin(), list.end());
 //  list.erase(std::unique(list.begin(), list.end()), list.end());
 //  return list;
-//}
+  return runs;
+}

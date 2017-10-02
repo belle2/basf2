@@ -11,11 +11,16 @@
 #pragma once
 #include <Python.h>
 #include <string>
+#include <algorithm>
 #include <boost/python.hpp>
 #include <boost/python/list.hpp>
+#include <boost/filesystem.hpp>
 #include <vector>
+#include <memory>
 #include <list>
 #include <TClonesArray.h>
+#include <TDirectory.h>
+#include <TFile.h>
 #include <boost/python/list.hpp>
 #include <framework/database/Database.h>
 #include <framework/io/RootIOUtilities.h>

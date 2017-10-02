@@ -1,3 +1,4 @@
+#include <set>
 #include <boost/algorithm/string.hpp>
 #include <boost/python/class.hpp>
 #include <boost/python/docstring_options.hpp>
@@ -10,6 +11,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace RootIOUtilities;
+namespace fs = boost::filesystem;
 
 const std::string CalibrationAlgorithmNew::RUN_RANGE_OBJ_NAME = "__ca_data_range";
 
@@ -112,7 +114,49 @@ void CalibrationAlgorithmNew::setInputFileNames(PyObject* inputFileNames)
 /// Set the input file names used for this algorithm and resolve the wildcards
 void CalibrationAlgorithmNew::setInputFileNames(std::vector<std::string> inputFileNames)
 {
-  m_inputFileNames = expandWordExpansions(inputFileNames);
+  // A lot of code below is tweaked from RootInputModule::initialize,
+  // since we're basically copying the functionality anyway.
+  if (inputFileNames.empty()) {
+    B2WARNING("You have called setInputFileNames() with an empty list. Did you mean to do that?");
+    return;
+  }
+  auto tmpInputFileNames = expandWordExpansions(inputFileNames);
+
+  // We'll use a set to enforce unique file paths as we check them
+  std::set<std::string> setInputFileNames;
+  // Check that files exist and convert to absolute paths
+  for (auto path : tmpInputFileNames) {
+    std::string fullPath = fs::absolute(path).string();
+    if (fs::exists(fullPath)) {
+      setInputFileNames.insert(fs::canonical(fullPath).string());
+    } else {
+      B2WARNING("Couldn't find the file " << path);
+    }
+  }
+
+  if (setInputFileNames.empty()) {
+    B2WARNING("No valid files specified!");
+    return;
+  }
+
+  //Open TFile to check they can be accessed by ROOT
+  TDirectory* dir = gDirectory;
+  for (const string& fileName : setInputFileNames) {
+    std::unique_ptr<TFile> f;
+    try {
+      f.reset(TFile::Open(fileName.c_str(), "READ"));
+    } catch (std::logic_error&) {
+      //this might happen for ~invaliduser/foo.root
+      //actually undefined behaviour per standard, reported as ROOT-8490 in JIRA
+    }
+    if (!f || !f->IsOpen()) {
+      B2FATAL("Couldn't open input file " + fileName);
+    }
+  }
+  dir->cd();
+
+  // Copy the entries of the set to a vector
+  m_inputFileNames = std::vector<std::string>(setInputFileNames.begin(), setInputFileNames.end());
 }
 
 PyObject* CalibrationAlgorithmNew::getInputFileNames()

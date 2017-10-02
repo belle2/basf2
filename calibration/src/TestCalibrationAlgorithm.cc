@@ -10,7 +10,7 @@
 using namespace std;
 using namespace Belle2;
 
-TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithm("CaTest")
+TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithmNew("CaTest")
 {
   setDescription(
     " -------------------------- Test Calibration Algoritm -------------------------\n"
@@ -22,7 +22,7 @@ TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithm("CaTe
   );
 }
 
-CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
+CalibrationAlgorithmNew::EResult TestCalibrationAlgorithm::calibrate()
 {
 //  // Pulling in data from collector output, we only use the histogram in this test
 //  auto& histogram1 = getObject<TH1F>("histogram1");

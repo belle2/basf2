@@ -9,13 +9,13 @@
  **************************************************************************/
 
 #pragma once
-#include <calibration/CalibrationAlgorithm.h>
+#include <calibration/CalibrationAlgorithmNew.h>
 
 namespace Belle2 {
   /**
    * Test class implementing calibration algorithm
    */
-  class TestCalibrationAlgorithm : public CalibrationAlgorithm {
+  class TestCalibrationAlgorithm : public CalibrationAlgorithmNew {
   public:
 
     /// Constructor set the prefix to TestCalibration

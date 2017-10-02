@@ -8,7 +8,7 @@ import ROOT
 from ROOT import Belle2
 import time
 
-algo = Belle2.CalibrationAlgorithmNew("Tester")
+algo = Belle2.TestCalibrationAlgorithm()
 # Input Python list object works
 inputFileNames = ["./collector_output/*"]
 algo.setInputFileNames(inputFileNames)
@@ -16,3 +16,4 @@ algo.setInputFileNames(inputFileNames)
 d = algo.getInputFileNames()
 for name in d:
     print(name)
+print(algo.execute())

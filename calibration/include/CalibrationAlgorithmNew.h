@@ -28,9 +28,6 @@ namespace Belle2 {
    */
   class CalibrationAlgorithmNew {
   public:
-    /// The name of always-created object holding set of all (exp,run) occured in data collection
-    static const std::string RUN_RANGE_OBJ_NAME;
-
     /// The result of calibration
     enum EResult {
       c_OK,           /**< Finished successfuly =0 in Python */

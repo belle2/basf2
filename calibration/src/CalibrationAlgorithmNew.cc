@@ -1,5 +1,6 @@
 #include <set>
 #include <memory>
+#include <utility>
 #include <boost/algorithm/string.hpp>
 #include <boost/python.hpp>
 #include <boost/python/list.hpp>
@@ -13,8 +14,6 @@ using namespace std;
 using namespace Belle2;
 using namespace Calibration;
 namespace fs = boost::filesystem;
-
-const string CalibrationAlgorithmNew::RUN_RANGE_OBJ_NAME = "__ca_data_range";
 
 /// Checks if the PyObject can be converted to ExpRun
 bool CalibrationAlgorithmNew::checkPyExpRun(PyObject* pyObj)

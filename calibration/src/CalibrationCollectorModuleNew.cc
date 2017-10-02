@@ -43,7 +43,7 @@ void CalibrationCollectorModuleNew::defineHisto()
   B2DEBUG(100, "Creating directories for individual collector objects.");
   m_manager.createDirectories();
   m_runRange = new RunRangeNew();
-  m_runRange->SetName("RunRange");
+  m_runRange->SetName(Calibration::RUN_RANGE_OBJ_NAME.c_str());
   m_dir->Add(m_runRange);
   inDefineHisto();
 }

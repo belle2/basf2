@@ -13,15 +13,102 @@ using namespace Belle2;
 using namespace RootIOUtilities;
 namespace fs = boost::filesystem;
 
-const std::string CalibrationAlgorithmNew::RUN_RANGE_OBJ_NAME = "__ca_data_range";
+const string CalibrationAlgorithmNew::RUN_RANGE_OBJ_NAME = "__ca_data_range";
 
-CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(vector< Belle2::CalibrationAlgorithmNew::ExpRun > runs,
-    int iteration)
+/// Checks if the PyObject can be converted to ExpRun
+bool CalibrationAlgorithmNew::checkPyExpRun(PyObject* pyObj)
+{
+  // Is it a sequence?
+  if (PySequence_Check(pyObj)) {
+    Py_ssize_t nObj = PySequence_Length(pyObj);
+    // Does it have 2 objects in it?
+    if (nObj != 2) {
+      B2DEBUG(100, "ExpRun was a Python sequence which didn't have exactly 2 entries!");
+      return false;
+    }
+    long value1, value2;
+    PyObject* item1, *item2;
+    item1 = PySequence_GetItem(pyObj, 0);
+    item2 = PySequence_GetItem(pyObj, 1);
+    // Did the GetItem work?
+    if ((item1 == NULL) || (item2 == NULL)) {
+      B2DEBUG(100, "A PyObject pointer was NULL in the sequence");
+      return false;
+    }
+    // Are they longs?
+    if (PyLong_Check(item1) && PyLong_Check(item2)) {
+      value1 = PyLong_AsLong(item1);
+      value2 = PyLong_AsLong(item2);
+      if (((value1 == -1) || (value2 == -1)) && PyErr_Occurred()) {
+        B2DEBUG(100, "An error occurred while converting the PyLong to long");
+        return false;
+      }
+    } else {
+      B2DEBUG(100, "One or more of the PyObjects in the ExpRun wasn't a long");
+      return false;
+    }
+    // Make sure to kill off the reference GetItem gave us responsibility for
+    Py_DECREF(item1);
+    Py_DECREF(item2);
+  } else {
+    B2DEBUG(100, "ExpRun was not a Python sequence.");
+    return false;
+  }
+  return true;
+}
+
+/// Converts the PyObject to an ExpRun. We've preoviously checked the object so this assumes a lot about the PyObject
+CalibrationAlgorithmNew::ExpRun CalibrationAlgorithmNew::convertPyExpRun(PyObject* pyObj)
+{
+  ExpRun expRun;
+  PyObject* itemExp, *itemRun;
+  itemExp = PySequence_GetItem(pyObj, 0);
+  itemRun = PySequence_GetItem(pyObj, 1);
+  expRun.first = PyLong_AsLong(itemExp);
+  Py_DECREF(itemExp);
+  expRun.second = PyLong_AsLong(itemRun);
+  Py_DECREF(itemRun);
+  return expRun;
+}
+
+CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(PyObject* runs, int iteration)
+{
+  B2DEBUG(100, "Running execute() using Python Object as input argument");
+  vector<ExpRun> vecRuns;
+  // Is it a list?
+  if (PySequence_Check(runs)) {
+    boost::python::handle<> handle(boost::python::borrowed(runs));
+    const boost::python::list listRuns(handle);
+
+    int nList = boost::python::len(listRuns);
+    for (int iList = 0; iList < nList; ++iList) {
+      boost::python::object pyExpRun(listRuns[iList]);
+      if (!checkPyExpRun(pyExpRun.ptr())) {
+        B2ERROR("Received Python ExpRuns couldn't be converted to C++");
+        return c_Failure;
+      } else {
+        vecRuns.push_back(convertPyExpRun(pyExpRun.ptr()));
+      }
+    }
+  } else {
+    B2ERROR("Tried to set the input runs but we didn't receive a Python sequence object (list,tuple).");
+    return c_Failure;
+  }
+  return execute(vecRuns, iteration);
+}
+
+CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(vector<ExpRun> runs, int iteration)
 {
   // Check if we started a new iteration and clear old data
   if (m_iteration != iteration) {
     m_payloads.clear();
     m_iteration = iteration;
+  }
+  // Did we receive runs to execute over explicitly?
+  if (!(runs.empty())) {
+    for (auto expRun : runs) {
+      B2DEBUG(100, "(" << expRun.first << ", " << expRun.second << ")");
+    }
   }
 
 //  // Let's check that we have the data by accessing an object
@@ -104,7 +191,7 @@ void CalibrationAlgorithmNew::setInputFileNames(PyObject* inputFileNames)
   if (PyList_Check(inputFileNames)) {
     boost::python::handle<> handle(boost::python::borrowed(inputFileNames));
     boost::python::list listInputFileNames(handle);
-    auto vecInputFileNames = PyObjConvUtils::convertPythonObject(listInputFileNames, std::vector<std::string>());
+    auto vecInputFileNames = PyObjConvUtils::convertPythonObject(listInputFileNames, vector<string>());
     setInputFileNames(vecInputFileNames);
   } else {
     B2ERROR("Tried to set the input files but we didn't receive a Python list.");
@@ -112,7 +199,7 @@ void CalibrationAlgorithmNew::setInputFileNames(PyObject* inputFileNames)
 }
 
 /// Set the input file names used for this algorithm and resolve the wildcards
-void CalibrationAlgorithmNew::setInputFileNames(std::vector<std::string> inputFileNames)
+void CalibrationAlgorithmNew::setInputFileNames(vector<string> inputFileNames)
 {
   // A lot of code below is tweaked from RootInputModule::initialize,
   // since we're basically copying the functionality anyway.
@@ -123,10 +210,10 @@ void CalibrationAlgorithmNew::setInputFileNames(std::vector<std::string> inputFi
   auto tmpInputFileNames = expandWordExpansions(inputFileNames);
 
   // We'll use a set to enforce unique file paths as we check them
-  std::set<std::string> setInputFileNames;
+  set<string> setInputFileNames;
   // Check that files exist and convert to absolute paths
   for (auto path : tmpInputFileNames) {
-    std::string fullPath = fs::absolute(path).string();
+    string fullPath = fs::absolute(path).string();
     if (fs::exists(fullPath)) {
       setInputFileNames.insert(fs::canonical(fullPath).string());
     } else {
@@ -142,10 +229,10 @@ void CalibrationAlgorithmNew::setInputFileNames(std::vector<std::string> inputFi
   //Open TFile to check they can be accessed by ROOT
   TDirectory* dir = gDirectory;
   for (const string& fileName : setInputFileNames) {
-    std::unique_ptr<TFile> f;
+    unique_ptr<TFile> f;
     try {
       f.reset(TFile::Open(fileName.c_str(), "READ"));
-    } catch (std::logic_error&) {
+    } catch (logic_error&) {
       //this might happen for ~invaliduser/foo.root
       //actually undefined behaviour per standard, reported as ROOT-8490 in JIRA
     }
@@ -156,53 +243,53 @@ void CalibrationAlgorithmNew::setInputFileNames(std::vector<std::string> inputFi
   dir->cd();
 
   // Copy the entries of the set to a vector
-  m_inputFileNames = std::vector<std::string>(setInputFileNames.begin(), setInputFileNames.end());
+  m_inputFileNames = vector<string>(setInputFileNames.begin(), setInputFileNames.end());
 }
 
 PyObject* CalibrationAlgorithmNew::getInputFileNames()
 {
   PyObject* objInputFileNames = PyList_New(m_inputFileNames.size());
-  for (std::size_t i = 0; i < m_inputFileNames.size(); ++i) {
+  for (size_t i = 0; i < m_inputFileNames.size(); ++i) {
     PyList_SetItem(objInputFileNames, i, Py_BuildValue("s", m_inputFileNames[i].c_str()));
   }
   return objInputFileNames;
 }
 
-vector< CalibrationAlgorithmNew::ExpRun > CalibrationAlgorithmNew::string2RunList(string list) const
+vector<CalibrationAlgorithmNew::ExpRun> CalibrationAlgorithmNew::string2RunList(string list) const
 {
-  std::vector<ExpRun> result;
+  vector<ExpRun> result;
 
   if (list == "")
     return result;
 
-  std::vector<std::string> runs;
+  vector<string> runs;
   boost::algorithm::split(runs, list, boost::is_any_of(","));
 
   for (auto exprunstr : runs) {
-    std::vector<std::string> exprun;
+    vector<string> exprun;
     boost::algorithm::split(exprun, exprunstr, boost::is_any_of("."));
     if (exprun.size() != 2)
       B2FATAL("Error in parsing object validity");
-    result.push_back(std::make_pair(std::stoi(exprun[0]), std::stoi(exprun[1])));
+    result.push_back(make_pair(stoi(exprun[0]), stoi(exprun[1])));
   }
   return result;
 }
 
-string CalibrationAlgorithmNew::runList2String(vector< CalibrationAlgorithmNew::ExpRun >& list) const
+string CalibrationAlgorithmNew::runList2String(vector<ExpRun>& list) const
 {
-  std::string str("");
+  string str("");
   for (auto run : list) {
     if (str != "")
       str = str + ",";
 
-    str = str + std::to_string(run.first) + "." + std::to_string(run.second);
+    str = str + to_string(run.first) + "." + to_string(run.second);
   }
   return str;
 }
 
-string CalibrationAlgorithmNew::runList2String(CalibrationAlgorithmNew::ExpRun run) const
+string CalibrationAlgorithmNew::runList2String(ExpRun run) const
 {
-  std::vector<ExpRun> runlist;
+  vector<ExpRun> runlist;
   runlist.push_back(run);
 
   return runList2String(runlist);
@@ -272,12 +359,12 @@ bool CalibrationAlgorithmNew::commit()
 {
   if (m_payloads.empty())
     return false;
-  std::list<Database::DBQuery> payloads = getPayloads();
+  list<Database::DBQuery> payloads = getPayloads();
   B2INFO("Committing " << payloads.size()  << " payloads to database.");
   return Database::Instance().storeData(payloads);
 }
 
-bool CalibrationAlgorithmNew::commit(std::list<Database::DBQuery> payloads)
+bool CalibrationAlgorithmNew::commit(list<Database::DBQuery> payloads)
 {
   if (payloads.empty())
     return false;

@@ -62,6 +62,8 @@ namespace Belle2 {
     /// Get the prefix used for getting calibration data
     std::string getPrefix() const {return m_prefix;}
 
+    bool checkPyExpRun(PyObject* pyObj);
+    ExpRun convertPyExpRun(PyObject* pyObj);
     /**
      * Alias for prefix. For convenience and less writing, we say developers to
      * set this to default collector module name in constructor of base class.
@@ -86,8 +88,11 @@ namespace Belle2 {
     /// Get the complete list of runs from inspection of datastore
 //    std::vector<ExpRun> getRunListFromAllData();
 
-    /// Runs calibration over list of runs
+    /// Runs calibration over vector of runs
     EResult execute(std::vector<ExpRun> runs = {}, int iteration = 0);
+
+    /// Runs calibration over Python list of runs
+    EResult execute(PyObject* runs, int iteration = 0);
 
     /// Get constants (in TObjects) for database update from last calibration
     const std::list<Database::DBQuery>& getPayloads() const { return m_payloads; }

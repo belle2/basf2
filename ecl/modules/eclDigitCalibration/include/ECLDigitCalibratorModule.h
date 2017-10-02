@@ -106,6 +106,10 @@ namespace Belle2 {
       std::vector < float > v_calibrationCrystalTimeOffsetUnc;  /**< single crystal time calibration offset as vector uncertainty*/
       DBObjPtr<ECLCrystalCalib> m_calibrationCrystalTimeOffset;  /**< single crystal time calibration offset*/
 
+      std::vector < float > v_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF as vector*/
+      std::vector < float > v_calibrationCrystalFlightTimeUnc;  /**< single crystal time calibration TOF as vector uncertainty*/
+      DBObjPtr<ECLCrystalCalib> m_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF*/
+
       double m_timeInverseSlope; /**< Time calibration inverse slope "a". */
 
       void initializeCalibration(); /**< reads calibration constants, performs checks, put them into a vector */

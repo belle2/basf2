@@ -51,7 +51,8 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() :
   m_calibrationCrystalElectronics("ECLCrystalElectronics"),
   m_calibrationCrystalEnergy("ECLCrystalEnergy"),
   m_calibrationCrystalElectronicsTime("ECLCrystalElectronicsTime"),
-  m_calibrationCrystalTimeOffset("ECLCrystalTimeOffset")
+  m_calibrationCrystalTimeOffset("ECLCrystalTimeOffset"),
+  m_calibrationCrystalFlightTime("ECLCrystalFlightTime")
 {
   // Set module properties
   setDescription("Applies digit energy, time and time-resolution calibration to each ECL digit. Counts number of out-of-time background digits to determine the event-by-event background level.");
@@ -83,6 +84,7 @@ void ECLDigitCalibratorModule::initializeCalibration()
   callbackCalibration(m_calibrationCrystalElectronicsTime, v_calibrationCrystalElectronicsTime,
                       v_calibrationCrystalElectronicsTimeUnc);
   callbackCalibration(m_calibrationCrystalTimeOffset, v_calibrationCrystalTimeOffset, v_calibrationCrystalTimeOffsetUnc);
+  callbackCalibration(m_calibrationCrystalFlightTime, v_calibrationCrystalFlightTime, v_calibrationCrystalFlightTimeUnc);
 }
 
 // callback calibration
@@ -168,6 +170,12 @@ void ECLDigitCalibratorModule::beginRun()
     } else B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrystalTimeOffset for current run!");
   }
 
+  if (m_calibrationCrystalFlightTime.hasChanged()) {
+    if (m_calibrationCrystalFlightTime) {
+      callbackCalibration(m_calibrationCrystalFlightTime, v_calibrationCrystalFlightTime, v_calibrationCrystalFlightTimeUnc);
+    } else B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrystalFlightTime for current run!");
+  }
+
 }
 
 // event
@@ -204,7 +212,7 @@ void ECLDigitCalibratorModule::event()
     const int time              = aECLDigit.getTimeFit();
     if (time == -2048) aECLCalDigit->addStatus(ECLCalDigit::c_IsFailedFit); //this is used to flag failed fits
     double calibratedTime = m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
-                                                  v_calibrationCrystalTimeOffset[cellid - 1]);
+                                                  v_calibrationCrystalTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1];
 
     B2DEBUG(175, "cellid = " << cellid << ", amplitude = " << amplitude << ", energy = " << calibratedEnergy);
     B2DEBUG(175, "cellid = " << cellid << ", time = " << time << ", calibratedTime = " << calibratedTime);

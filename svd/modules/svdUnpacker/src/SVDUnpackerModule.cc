@@ -200,6 +200,12 @@ void SVDUnpackerModule::event()
                       " expected: " << (m_eventMetaDataPtr->getEvent() & 0xFF)
                      );
             }
+
+            if (m_generateShaperDigts) { // create SVDModeByte object from MainHeader vars
+              //B2INFO("Filling SVDModeByte object");
+              m_SVDModeByte = SVDModeByte(m_MainHeader.runType, m_MainHeader.evtType, m_MainHeader.DAQMode, m_MainHeader.trgTiming);
+            }
+
           }
 
           if (m_APVHeader.check == 2) { // APV header
@@ -222,17 +228,17 @@ void SVDUnpackerModule::event()
             sample[5] = m_data_B.sample6;
 
 
-            for (unsigned int i = 0; i < 6; i++) {
+            for (unsigned int idat = 0; idat < 6; idat++) {
               // m_cellPosition member of the SVDDigit object is set to zero by NewDigit function
-              SVDDigit* newDigit = m_map->NewDigit(fadc, apv, strip, sample[i], i);
+              SVDDigit* newDigit = m_map->NewDigit(fadc, apv, strip, sample[idat], idat);
               svdDigits.appendNew(*newDigit);
 
               delete newDigit;
             }
 
             if (m_generateShaperDigts) {
-              SVDModeByte mode = SVDModeByte(m_MainHeader.runType, m_MainHeader.evtType, m_MainHeader.DAQMode, m_MainHeader.trgTiming);
-              SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample, mode);
+              //B2INFO("Generating SVDShaperDigit object");
+              SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample, m_SVDModeByte);
               shaperDigits.appendNew(*newShaperDigit);
               delete newShaperDigit;
             }
@@ -247,8 +253,8 @@ void SVDUnpackerModule::event()
             //uint32_t *crc16input = new uint32_t[iCRC];
             uint32_t crc16input[iCRC];
 
-            for (unsigned short i = 0; i < iCRC; i++)
-              crc16input[i] = htonl(crc16vec.at(i));
+            for (unsigned short icrc = 0; icrc < iCRC; icrc++)
+              crc16input[icrc] = htonl(crc16vec.at(icrc));
 
             //verify CRC16
             boost::crc_basic<16> bcrc(0x8005, 0xffff, 0, false, false);

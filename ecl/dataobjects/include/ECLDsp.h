@@ -52,7 +52,6 @@ namespace Belle2 {
      */
     void setDspA(int  DspArray[31])
     {
-      //for (int i = 0; i < 31; i++) { m_DspA[i] = DspArray[i];}
       m_DspAVector.assign(DspArray, DspArray + 31);
     }
 
@@ -60,7 +59,6 @@ namespace Belle2 {
      */
     void setDspA(std::vector <int> DspArrayVector)
     {
-      //for (int i = 0; i < 31; i++) { m_DspA[i] = DspArray[i];}
       m_DspAVector = DspArrayVector;
     }
 
@@ -97,11 +95,9 @@ namespace Belle2 {
   private:
 
     int m_CellId;      /**< Cell ID */
-//    int m_DspA[31];    /**< Dsp Array 0~31 for fit   */
     std::vector <int> m_DspAVector; /**< Dsp array vith variable length for calibration, tests, etc.  */
 
-    //ClassDef(ECLDsp, 1);/**< ClassDef */
-    ClassDef(ECLDsp, 2);/** dspa array with variable length*/
+    ClassDef(ECLDsp, 2);/* dspa array with variable length*/
 
   };
 } // end namespace Belle2

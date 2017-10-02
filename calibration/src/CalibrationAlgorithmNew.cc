@@ -1,16 +1,17 @@
 #include <set>
+#include <memory>
 #include <boost/algorithm/string.hpp>
-#include <boost/python/class.hpp>
-#include <boost/python/docstring_options.hpp>
+#include <boost/python.hpp>
+#include <boost/python/list.hpp>
+#include <boost/filesystem.hpp>
 #include <calibration/CalibrationAlgorithmNew.h>
+#include <framework/logging/Logger.h>
 #include <framework/core/PyObjConvUtils.h>
-#include <framework/utilities/RegisterPythonModule.h>
-
-#include <TClonesArray.h>
+#include <framework/io/RootIOUtilities.h>
 
 using namespace std;
 using namespace Belle2;
-using namespace RootIOUtilities;
+using namespace Calibration;
 namespace fs = boost::filesystem;
 
 const string CalibrationAlgorithmNew::RUN_RANGE_OBJ_NAME = "__ca_data_range";
@@ -58,7 +59,7 @@ bool CalibrationAlgorithmNew::checkPyExpRun(PyObject* pyObj)
 }
 
 /// Converts the PyObject to an ExpRun. We've preoviously checked the object so this assumes a lot about the PyObject
-CalibrationAlgorithmNew::ExpRun CalibrationAlgorithmNew::convertPyExpRun(PyObject* pyObj)
+ExpRun CalibrationAlgorithmNew::convertPyExpRun(PyObject* pyObj)
 {
   ExpRun expRun;
   PyObject* itemExp, *itemRun;
@@ -78,7 +79,7 @@ CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(PyObject* runs
   // Is it a list?
   if (PySequence_Check(runs)) {
     boost::python::handle<> handle(boost::python::borrowed(runs));
-    const boost::python::list listRuns(handle);
+    boost::python::list listRuns(handle);
 
     int nList = boost::python::len(listRuns);
     for (int iList = 0; iList < nList; ++iList) {
@@ -207,7 +208,7 @@ void CalibrationAlgorithmNew::setInputFileNames(vector<string> inputFileNames)
     B2WARNING("You have called setInputFileNames() with an empty list. Did you mean to do that?");
     return;
   }
-  auto tmpInputFileNames = expandWordExpansions(inputFileNames);
+  auto tmpInputFileNames = RootIOUtilities::expandWordExpansions(inputFileNames);
 
   // We'll use a set to enforce unique file paths as we check them
   set<string> setInputFileNames;
@@ -255,7 +256,7 @@ PyObject* CalibrationAlgorithmNew::getInputFileNames()
   return objInputFileNames;
 }
 
-vector<CalibrationAlgorithmNew::ExpRun> CalibrationAlgorithmNew::string2RunList(string list) const
+vector<ExpRun> CalibrationAlgorithmNew::string2RunList(string list) const
 {
   vector<ExpRun> result;
 

@@ -111,8 +111,8 @@ void ECLTrackClusterMatchingModule::event()
 
   for (const Track& track : tracks) {
 
-    const ECLCluster* cluster_best = nullptr;
-    double quality_tmp = 0;
+    ECLCluster* cluster_best = nullptr;
+    double quality_tmp = 1000;
     // Find extrapolated track hits in the ECL, considering only hit points
     // that either are on the sphere, closest to or on radial direction of an
     // ECLCluster.
@@ -127,14 +127,15 @@ void ECLTrackClusterMatchingModule::event()
       m_deltaTheta->push_back(deltaTheta);
       double quality = clusterQuality(extHit, deltaPhi, deltaTheta);
       m_quality->push_back(quality);
-      if (quality > quality_tmp) {
+      if (quality < quality_tmp) {
         quality_tmp = quality;
         cluster_best = eclCluster;
       }
     } // end loop on ExtHits related to Track
     m_quality_best->push_back(quality_tmp);
     if (cluster_best != nullptr) {
-      // cluster_best->setIsTrack(true);
+      if (cluster_best->isTrack()) cluster_best->setIsMatchedByTwoTracks(true);
+      else cluster_best->setIsTrack(true);
       track.addRelationTo(cluster_best);
     }
   } // end loop on Tracks

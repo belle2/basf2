@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <top/utilities/TOPTemplateFitter.h>
+#include <top/geometry/TOPGeometryPar.h>
 #include <framework/logging/Logger.h>
 #include <math.h>
 
@@ -57,46 +58,22 @@ void TOPTemplateFitter::setTemplateResolution(int resolution)
   s_templateReInitialize = true;
 }
 
-double TOPTemplateFitter::Crystalball(const double x)
-{
-  double value, t, absAlpha;
-  double a, b;
-
-  //crystalball function from roofit
-  t = (x - s_templateParameters.mean) / s_templateParameters.sigma;
-  if (s_templateParameters.alpha < 0) t = -t;
-  if (s_templateParameters.alpha > 0) absAlpha = s_templateParameters.alpha;
-  else absAlpha = -s_templateParameters.alpha;
-
-  if (t >= -absAlpha) {
-    value = exp(-0.5 * t * t) * s_templateParameters.amplitude;
-  } else {
-    a = pow(s_templateParameters.n / absAlpha, s_templateParameters.n) * exp(-0.5 * absAlpha * absAlpha);
-    b = s_templateParameters.n / absAlpha - absAlpha;
-    value = a / pow(b - t, s_templateParameters.n) * s_templateParameters.amplitude;
-  }
-  return value;
-}
-
-double TOPTemplateFitter::CalculateTemplate(const double x)
-{
-  //mimic integration of IRSX ASIC by integrating one bin around x value
-  const int integrationSteps = 32;
-  const double stepSize = 1. / integrationSteps;
-  double value = 0;
-  for (int i = 0; i < integrationSteps; ++i) value += Crystalball(x - 0.5 + stepSize * i);
-  return value / integrationSteps;
-}
-
 void TOPTemplateFitter::InitializeTemplateFit()
 {
   s_templateSamples.clear();
-  if (s_templateParameters.mean < 0 || s_templateParameters.mean > s_totalTemplateSamples) {
+  if (s_templateParameters.risingEdge < 0 || s_templateParameters.risingEdge > s_totalTemplateSamples) {
     B2FATAL("mean of template function invalid!");
   }
+
+  const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+  const auto& signalShape = geo->getSignalShape();
+  const auto& tdc = geo->getNominalTDC();
+  double dt = tdc.getSampleWidth();
+
   for (double x = 0; x < s_totalTemplateSamples; x += 1. / s_templateResolution) {
-    s_templateSamples.push_back(CalculateTemplate(x));
+    s_templateSamples.push_back(s_templateParameters.amplitude * signalShape.getValue((x - s_templateParameters.risingEdge)*dt));
   }
+
   s_templateReInitialize = false;
 }
 
@@ -115,11 +92,6 @@ void TOPTemplateFitter::performTemplateFit(const double risingEdgeStart,
   PerformTemplateFitMinimize(m_wf.getWaveform(), pedestals, timingCorrection, risingEdgeStart, fitRange);
 }
 
-double TOPTemplateFitter::GetTemplateRisingEdge()
-{
-  return s_templateParameters.mean - sqrt(2 * log(2)) * s_templateParameters.sigma;
-}
-
 void TOPTemplateFitter::PerformTemplateFitMinimize(const std::vector<short>& samples, const std::vector<short>& pedestals,
                                                    const std::vector<float>& timingCorrection, const double risingEdgeCFD, const double fitRange)
 {
@@ -127,10 +99,11 @@ void TOPTemplateFitter::PerformTemplateFitMinimize(const std::vector<short>& sam
     B2FATAL("Size of sample, pedestal and timing correction vectors has to be equal!");
   }
 
+  m_chisq_vec.clear();
   MinimizationSums sums;
   FitResult result;
   m_chisq = 1e6;
-  int initialOffset = risingEdgeCFD - GetTemplateRisingEdge();
+  int initialOffset = risingEdgeCFD - s_templateParameters.risingEdge;
   //offset search loop
   for (int fineOffset = -s_fineOffsetRange; fineOffset < s_fineOffsetRange; ++fineOffset) {
     sums.clear();
@@ -150,6 +123,7 @@ void TOPTemplateFitter::PerformTemplateFitMinimize(const std::vector<short>& sam
       sums.Syy += Sy * samples[signalSampleIndex];
     }
     double chisq = ComputeMinimizedParametersAndChisq(sums, result);
+    m_chisq_vec.push_back(chisq);
     if (chisq < m_chisq) { //save minimal chisq result
       m_chisq = chisq;
       m_result = result;
@@ -157,7 +131,7 @@ void TOPTemplateFitter::PerformTemplateFitMinimize(const std::vector<short>& sam
     }
   }
   //template offset back to sample space and scale amplitude
-  m_result.risingEdge = m_result.risingEdge / s_templateResolution + GetTemplateRisingEdge();
+  m_result.risingEdge = m_result.risingEdge / s_templateResolution + s_templateParameters.risingEdge;
   m_result.amplitude *= s_templateParameters.amplitude;
   m_result.amplitudeError *= s_templateParameters.amplitude;
 }

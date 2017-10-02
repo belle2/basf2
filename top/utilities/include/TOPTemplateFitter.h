@@ -34,10 +34,7 @@ namespace Belle2 {
        */
       struct TemplateParameters {
         double amplitude = 100.;
-        double mean = 32.;
-        double sigma = 1.81;
-        double alpha = -0.45;
-        double n = 18.06;
+        double risingEdge = 32.;
       };
 
       /**
@@ -96,6 +93,12 @@ namespace Belle2 {
       @return fit chi square
       */
       double getChisq() const {return m_chisq;}
+
+      /**
+      @brief Returns calculated chisq values
+      @return chisq vector
+      */
+      const std::vector<double>& getChisqVector() const {return m_chisq_vec;}
 
       /**
       @brief Returns fitted values with errors
@@ -171,26 +174,7 @@ namespace Belle2 {
        */
       double ComputeMinimizedParametersAndChisq(const MinimizationSums& sums, FitResult& result);
 
-      /**
-       *@brief compute the rising edge of the template (which is easily done for the Gaussian center
-       *of the crystal ball.
-       *@return rising edge
-       */
-      double GetTemplateRisingEdge();
 
-      /**
-      @brief crystal ball function
-      @param sample position
-      @return value of crystall ball function
-      */
-      static double Crystalball(const double x);
-
-      /**
-      @brief Calculate the value of the Template Function at given sample.
-      @param sample position. Can be fractional number
-      @return value of template function
-      */
-      static double CalculateTemplate(const double x);
 
       const TOPRawWaveform m_wf; /** <raw sampled waveforms */
       const TOPSampleTimes m_sampleTimes; /** <provides timing correction */
@@ -206,6 +190,7 @@ namespace Belle2 {
       //fit results
       FitResult m_result;/**< fit result from template fit*/
       double m_chisq;/**< chi square value from template fit */
+      std::vector<double> m_chisq_vec;/**< all computed chi square values from template fit */
 
     };
 

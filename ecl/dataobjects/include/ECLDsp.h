@@ -26,7 +26,6 @@ namespace Belle2 {
     ECLDsp() : m_DspAVector(31, 0)
     {
       m_CellId = 0;    /**< cell id */
-      //for (int i = 0; i < 31; i++)m_dspa[i] = 0; /**< dsp array 0~31 for fit   */
 
     }
 

@@ -17,6 +17,7 @@
 #include <TClonesArray.h>
 #include <TDirectory.h>
 #include <TFile.h>
+#include <TChain.h>
 #include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/logging/Logger.h>
@@ -132,6 +133,9 @@ namespace Belle2 {
     /// Get the complete RunRange from inspection of collected data
     RunRangeNew getRunRangeFromAllData() const;
 
+    /// Get the granularity of collected data
+    std::string getGranularity() const {return m_granularityOfData;};
+
     /**
      * Runs calibration over vector of runs for a given iteration. You can also specify the IoV to
      * save the database payload as. By default the Algorithm will create an IoV from your requested
@@ -180,77 +184,110 @@ namespace Belle2 {
     /// Get the input file names used for this algorithm as a STL vector
     std::vector<std::string> getInputFileNamesCPP() {return m_inputFileNames;}
 
-    /// Get calibration data object by name and list of runs
-    template<class T>
-    T& getObject(const std::string& name, const std::vector<Calibration::ExpRun>& runs) const
+    /// Get TTree calibration data object by name and list of runs, use TChain to avoid huge memory usage and merging
+    TChain* getTreeObject(const std::string& name, const std::vector<Calibration::ExpRun>& runs) const
     {
-      TDirectory* dir = gDirectory;
-      // Construct the TDirectory name where we expect our objects to be
+      TChain* chain = new TChain(name.c_str());
+      // Construct the TDirectory names where we expect our objects to be
       std::string fullName(m_prefix + "/" + name);
       std::string runRangeObjName(m_prefix + "/" + Calibration::RUN_RANGE_OBJ_NAME);
-      RunRangeNew* runRange;
-//      StoreObjPtr<CalibRootObj<T>> storeobj(fullName, DataStore::c_Persistent);
-//
-//      if (!storeobj.isValid()) {
-//        B2ERROR("Access to non-existing datastore object with name " << fullName << ". New empty object is created and returned.");
-//        B2ERROR("Check that the name registered in collector is the same as you request in algorithm: " << name);
-//        B2ERROR("Check that the algorithm and collector use the same prefix (if you changed collector name): " << m_prefix);
-//        storeobj.registerInDataStore();
-//        storeobj.construct();
-//      }
-
-      for (const auto& fileName : m_inputFileNames) {
-        //Open TFile to get the objects
-        std::unique_ptr<TFile> f;
-        f.reset(TFile::Open(fileName.c_str(), "READ"));
-        runRange = dynamic_cast<RunRangeNew*>(f->Get(runRangeObjName.c_str()));
-        if (runRange->getIntervalOfValidity().overlaps(m_data.getRequestedIov())) {
-          B2DEBUG(100, "Found requested data in file: " << fileName);
-        } else {
-          B2DEBUG(100, "No overlapping data found in file: " << fileName);
+      if (strcmp(getGranularity().c_str(), "run") == 0) {
+        RunRangeNew* runRange;
+        for (const auto& fileName : m_inputFileNames) {
+          //Open TFile to get the objects
+          std::unique_ptr<TFile> f;
+          f.reset(TFile::Open(fileName.c_str(), "READ"));
+          runRange = dynamic_cast<RunRangeNew*>(f->Get(runRangeObjName.c_str()));
+          if (runRange->getIntervalOfValidity().overlaps(m_data.getRequestedIov())) {
+            B2DEBUG(100, "Found requested data in file: " << fileName);
+            // Loop over runs in data and check if they exist in our requested ones, then add if they do
+            for (auto expRunData : runRange->getExpRunSet()) {
+              for (auto expRunRequested : m_data.getRequestedRuns()) {
+                if (expRunData == expRunRequested) {
+                  std::string objName = fullName + "/" + name + "_";
+                  objName += std::to_string(expRunData.first);
+                  objName += ".";
+                  objName += std::to_string(expRunData.second);
+                  chain->Add((fileName + "/" + objName).c_str());
+                }
+              }
+            }
+          } else {
+            B2DEBUG(100, "No overlapping data found in file: " << fileName);
+            continue;
+          }
+        }
+      } else {
+        std::string objName = fullName + "/" + name + "_-1.-1";
+        for (const auto& fileName : m_inputFileNames) {
+          chain->Add((fileName + "/" + objName).c_str());
         }
       }
-
-      dir->cd();
-
-//      std::string strRunList = runList2String(runlist);
-//      // TODO: Merge only once (now) or each call again?
-//      if (storeobj->objectExists(strRunList))
-//        return storeobj->getObject(strRunList);
-//
-//      // First access creates new object from template
-//      auto& merged = storeobj->getObject(strRunList);
-//      merged.Reset(); // To be sure
-//      TList list;
-//      list.SetOwner(false);
-//      for (auto run : runlist) {
-//        list.Add(&storeobj->getObject(runList2String(run)));
-//      }
-//      merged.Merge(&list);
-      T* obj = new T();
-      return *obj;
+      return chain;
     }
+
+    /// Get calibration data object by name and list of runs
+    template<class T>
+    T* getObject(const std::string& name, const std::vector<Calibration::ExpRun>& runs) const
+    {
+      T* obj = nullptr;
+//       T* objOther;
+//       TDirectory* dir = gDirectory;
+//       // Construct the TDirectory name where we expect our objects to be
+//       std::string fullName(m_prefix + "/" + name);
+//       std::string runRangeObjName(m_prefix + "/" + Calibration::RUN_RANGE_OBJ_NAME);
+//       RunRangeNew* runRange;
+//       for (const auto& fileName : m_inputFileNames) {
+//         //Open TFile to get the objects
+//         std::unique_ptr<TFile> f;
+//         f.reset(TFile::Open(fileName.c_str(), "READ"));
+//         if (getGranularity() == "run") {
+//           runRange = dynamic_cast<RunRangeNew*>(f->Get(runRangeObjName.c_str()));
+//           if (runRange->getIntervalOfValidity().overlaps(m_data.getRequestedIov())) {
+//             B2DEBUG(100, "Found requested data in file: " << fileName);
 //
-//    /// Get calibration data object by name and run
-//    template<class T>
-//    T& getObject(std::string name, CalibrationAlgorithmNew::ExpRun run) const
-//    {
-//      std::vector<ExpRun> runlist;
-//      runlist.push_back(run);
-//      return getObject<T>(name, runlist);
-//    }
 //
+//
+//           } else {
+//             B2DEBUG(100, "No overlapping data found in file: " << fileName);
+//           }
+//         } else {
+//           std::string objName = fullName + "/" + name + "_-1.-1";
+//           objOther = dynamic_cast<T*>(f->Get(objName.c_str()));
+//           if (!obj) {
+//             obj = objOther->CloneTree();
+//           } else {
+//             TList list;
+//             list.SetOwner(false);
+//             list.Add(objOther);
+//             obj->Merge(&list);
+//           }
+//         }
+//       }
+//
+//      dir->cd();
+      return obj;
+    }
+
     /// Get calibration data object (for all runs the calibration is requested)
     template<class T>
-    T& getObject(std::string name) const
+    TObject* getObject(std::string name) const
     {
-      return getObject<T>(name, m_data.getRequestedRuns());
+      T tmpObj;
+      if (tmpObj.InheritsFrom("TTree")) {
+        return getTreeObject(name, m_data.getRequestedRuns());
+      } else {
+        return getObject<T>(name, m_data.getRequestedRuns());
+      }
     }
 
 //    // Helpers ---------------- Database storage -----
 //
     /// Get the interval of validity from minimum and maximum experiment and run of input data files
     IntervalOfValidity getIovFromAllData();
+
+    /// Get the granularity of collected data
+    std::string getGranularityFromData() const;
 
     /// Store DBArray payload with given name with default IOV
     void saveCalibration(TClonesArray* data, const std::string& name);
@@ -275,6 +312,10 @@ namespace Belle2 {
     /// List of input files to the Algorithm, will initially be user defined but then gets the wildcards expanded during execute()
     std::vector<std::string> m_inputFileNames;
 
+    /// Granularity of input data. This only changes when the input files change so it isn't specific to an execution
+    std::string m_granularityOfData;
+
+    /// Data specific to a SINGLE execution of the algorithm. Gets reset at the beginning of execution
     ExecutionData m_data;
 
     /// Description of the algorithm

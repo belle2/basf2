@@ -27,7 +27,10 @@ CalibrationAlgorithmNew::EResult TestCalibrationAlgorithm::calibrate()
 {
 //  // Pulling in data from collector output, we only use the histogram in this test
 //  auto& histogram1 = getObject<TH1F>("histogram1");
-  auto& ttree = getObject<TTree>("tree");
+  TChain* ttree = dynamic_cast<TChain*>(getObject<TTree>("MyTree"));
+  ttree->Print();
+  B2INFO("Number of Entries in TChain was " << ttree->GetEntries());
+  delete ttree;
 //  auto& mille = getObject<MilleData>("test_mille");
 //
 //  if (histogram1.GetEntries() < 100 || ttree.GetEntries() < 100 || mille.getFiles().empty())

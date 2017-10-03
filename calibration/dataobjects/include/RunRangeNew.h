@@ -77,9 +77,23 @@ namespace Belle2 {
       return nMerged;
     }
 
+    void setGranularity(std::string& granularity)
+    {
+      if (granularity == "all" || granularity == "run") {
+        m_granularity = granularity;
+      } else {
+        B2WARNING("Tried to set RunRange granularity to something other than 'run' or 'all' -> " << granularity);
+      }
+    }
+
+    std::string getGranularity() const {return m_granularity;}
+
   private:
     /// The set of (exp,run) stored in object
     std::set<Calibration::ExpRun> m_expRunSet = {};
+
+    /// granularity used by the collector storing the information.
+    std::string m_granularity = "run";
 
     ClassDef(RunRangeNew, 1) /**< Mergeable set of (exp,run) pairs */
   };

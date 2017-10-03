@@ -114,14 +114,19 @@ CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(vector<ExpRun>
     m_data.setResult(c_Failure);
     return c_Failure;
   }
+
   // Did we receive runs to execute over explicitly?
   if (!(runs.empty())) {
     for (auto expRun : runs) {
       B2DEBUG(100, "ExpRun requested = (" << expRun.first << ", " << expRun.second << ")");
     }
-  }
-  // If no runs are provided, infer the runs from all collected data
-  if (runs.empty()) {
+    // We've asked explicitly for certain runs, but we should check if the data granularity is 'run'
+    if (strcmp(getGranularity().c_str(), "all") == 0) {
+      B2ERROR(("The data is collected with granularity=all (exp=-1,run=-1), but you seem to request calibration for specific runs."
+               " We'll continue but using ALL the input data given instead of the specific runs requested."));
+    }
+  } else {
+    // If no runs are provided, infer the runs from all collected data
     runs = getRunListFromAllData();
     // Let's check that we have some now
     if (runs.empty()) {
@@ -262,6 +267,7 @@ void CalibrationAlgorithmNew::setInputFileNames(vector<string> inputFileNames)
 
   // Copy the entries of the set to a vector
   m_inputFileNames = vector<string>(setInputFileNames.begin(), setInputFileNames.end());
+  m_granularityOfData = getGranularityFromData();
 }
 
 PyObject* CalibrationAlgorithmNew::getInputFileNames()
@@ -382,4 +388,20 @@ RunRangeNew CalibrationAlgorithmNew::getRunRangeFromAllData() const
   }
   dir->cd();
   return runRange;
+}
+
+string CalibrationAlgorithmNew::getGranularityFromData() const
+{
+  // Save TDirectory to change back at the end
+  TDirectory* dir = gDirectory;
+  RunRangeNew* runRange;
+  string runRangeObjName(m_prefix + "/" + RUN_RANGE_OBJ_NAME);
+  // We only check the first file
+  string fileName = m_inputFileNames[0];
+  unique_ptr<TFile> f;
+  f.reset(TFile::Open(fileName.c_str(), "READ"));
+  runRange = dynamic_cast<RunRangeNew*>(f->Get(runRangeObjName.c_str()));
+  string granularity = runRange->getGranularity();
+  dir->cd();
+  return granularity;
 }

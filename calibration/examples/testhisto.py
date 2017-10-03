@@ -33,14 +33,22 @@ def _run_child(run):
     print(statistics)
 
 
-for run in range(1, 5):
-    child = ctx.Process(target=_create_file, args=(run,))
-    child.start()
-    # wait for it to finish
-    child.join()
+def create_test_data():
+    for run in range(1, 5):
+        child = ctx.Process(target=_create_file, args=(run,))
+        child.start()
+        # wait for it to finish
+        child.join()
 
-for run in range(1, 5):
-    child = ctx.Process(target=_run_child, args=(run,))
-    child.start()
-    # wait for it to finish
-    child.join()
+
+def run_collector():
+    for run in range(1, 5):
+        child = ctx.Process(target=_run_child, args=(run,))
+        child.start()
+        # wait for it to finish
+        child.join()
+
+
+if __name__ == "__main__":
+    create_test_data()
+    run_collector()

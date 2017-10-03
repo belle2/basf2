@@ -58,9 +58,13 @@ namespace Belle2 {
     /**
      * Sets if the cluster angle is transformed into the coordinate system of the hits
      */
-
     bool m_angleCorrection = false;
 
+    std::string m_param_recoTracksStoreArrayName = "";
+
+    std::string m_param_eclClustersStoreArrayName = "";
+
+    std::string m_param_tracksStoreArrayName = "";
   };
 
 } //Belle2

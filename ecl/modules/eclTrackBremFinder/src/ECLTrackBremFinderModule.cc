@@ -42,6 +42,15 @@ ECLTrackBremFinderModule::ECLTrackBremFinderModule() :
   setDescription("Use Track direction to pick up possible ECL Brem Cluster");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray name of the reco tracks used for brem search",
+           m_param_recoTracksStoreArrayName);
+
+  addParam("eclClustersStoreArrayName", m_param_eclClustersStoreArrayName, "StoreArray name of the ECLClusters for brem matching",
+           m_param_eclClustersStoreArrayName);
+
+  addParam("tracksStoreArrayName", m_param_tracksStoreArrayName, "StoreArray name of the Tracks for brem matching",
+           m_param_tracksStoreArrayName);
+
   addParam("clusterAcceptanceFactor", m_clusterAcceptanceFactor,
            "Factor which is multipied onto the cluster position error to check for matches",
            m_clusterAcceptanceFactor);
@@ -57,7 +66,7 @@ ECLTrackBremFinderModule::ECLTrackBremFinderModule() :
 
 void ECLTrackBremFinderModule::initialize()
 {
-  StoreArray<ECLCluster> eclClusters;
+  StoreArray<ECLCluster> eclClusters(m_param_eclClustersStoreArrayName) ;
   eclClusters.registerRelationTo(eclClusters);
 
   StoreArray<genfit::MeasuredStateOnPlane> mSoPl;
@@ -67,13 +76,10 @@ void ECLTrackBremFinderModule::initialize()
 
 void ECLTrackBremFinderModule::event()
 {
-  StoreArray<Track> tracks;
-  StoreArray<RecoTrack> recoTracks;
-  StoreArray<ECLCluster> eclClusters;
+  StoreArray<Track> tracks(m_param_tracksStoreArrayName);
+  StoreArray<ECLCluster> eclClusters(m_param_eclClustersStoreArrayName);
   StoreObjPtr<EventMetaData> evtMetaData;
   StoreArray<genfit::MeasuredStateOnPlane> mSoPl;
-
-  B2DEBUG(1, "### Event " << evtMetaData->getEvent());
 
   // todo: only iterate over the RecoTracks which have been identified as e-Tracks
   // either use the Clusters matched to tracks (non-neutral) or use the smater decision
@@ -89,7 +95,8 @@ void ECLTrackBremFinderModule::event()
     // this is required, otherwise we cannot assign any brems cluster
     ECLCluster* primaryClusterOfTrack = nullptr;
     auto relatedClustersToTrack =
-      track.getRelationsWith<ECLCluster>();     //check the particle hypothesis ID here (has to be 6 for electron)!!
+      track.getRelationsWith<ECLCluster>
+      (m_param_eclClustersStoreArrayName);       //check the particle hypothesis ID here (has to be 6 for electron)!!
     for (auto& relatedCluster : relatedClustersToTrack) {
       int particleHypothesisID = relatedCluster.getHypothesisId();
       if (particleHypothesisID == 6) {
@@ -99,9 +106,9 @@ void ECLTrackBremFinderModule::event()
     if (!primaryClusterOfTrack)
       continue;
 
-    // get the RecoTrack to have easy acces to individual hits and
+    // get the RecoTrack to have easy access to individual hits and
     // their fit state
-    auto recoTrack = track.getRelatedTo<RecoTrack>("RecoTracks");
+    auto recoTrack = track.getRelatedTo<RecoTrack>(m_param_recoTracksStoreArrayName);
 
     if (!recoTrack) {
       // no reco track
@@ -109,21 +116,9 @@ void ECLTrackBremFinderModule::event()
       continue;
     }
 
-    // todo: use fast lookup using kd-tree, this is nasty
+    // possible improvement: use fast lookup using kd-tree, this is nasty
     // iterate over full cluster list to find possible compatible clusters
-    //size_t i = 0;
-    for (ECLCluster& cluster : eclClusters) {           //also check particle hypothesis ID here (now should be 5 for photons)!!!
-
-      PhiAngle clusterPhi(cluster.getPhi(), cluster.getUncertaintyPhi());
-      ThetaAngle clusterTheta(cluster.getTheta(), cluster.getUncertaintyTheta());
-
-      auto clusterPosition = cluster.getClusterPosition();
-
-      //B2INFO("Checking cluster #" << i << std::endl
-      //       << " Cluster Phi=" << clusterPhi.getAngle() << " +- " << clusterPhi.getError()
-      //       << " Theta=" << clusterTheta.getAngle() << " +- " << clusterTheta.getError());
-      //i++;
-
+    for (ECLCluster& cluster : eclClusters) {
       //check if the cluster belongs to a photon or electron
       int particleHypothesisID = cluster.getHypothesisId();
       if (particleHypothesisID == 6) {

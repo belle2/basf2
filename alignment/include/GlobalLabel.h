@@ -12,6 +12,7 @@
 #define GLOBALLABEL_H
 
 #include <map>
+#include <set>
 #include <vxd/dataobjects/VxdID.h>
 #include <cdc/dataobjects/WireID.h>
 #include <bklm/dataobjects/BKLMElementID.h>
@@ -86,11 +87,10 @@ namespace Belle2 {
                                       maxTIF; /**< max internal id = 1.999.999.999 */
     static const gidTYPE maxLabel   =
       maxGID;  /**< Label and internal id ("gid") are the same numbers (label is signed but 0 and <0 values are invalid to give to Pede)*/
-    static const gidTYPE beamOffset = 0;       /**< Offset of 0 for BeamParameters */
-    static const gidTYPE vxdOffset  = 100000;  /**< Offset of 100000 for VXD (VxdID(0) is dummy) */
-    static const gidTYPE cdcOffset  = 200000;  /**< Offset of 200000 in element ids for CDC. WireID(0) is a real wire */
-    static const gidTYPE bklmOffset  = 300000;  /**< Offset of 300000 in element ids for BKLM */
-    static const gidTYPE eklmOffset  = 400000;  /**< Offset of 400000 in element ids for EKLM */
+    static const gidTYPE vxdOffset  = 1000000;  /**< Offset of 100000 for VXD (VxdID(0) is dummy) */
+    static const gidTYPE cdcOffset  = 2000000;  /**< Offset of 200000 in element ids for CDC. WireID(0) is a real wire */
+    static const gidTYPE bklmOffset = 3000000;  /**< Offset of 300000 in element ids for BKLM */
+    static const gidTYPE eklmOffset = 4000000;  /**< Offset of 400000 in element ids for EKLM */
 
     /// Default constuctor. Members initialized in declaration
     GlobalLabel() {}
@@ -103,14 +103,6 @@ namespace Belle2 {
      * @param globalLabel The encoded label
      */
     explicit GlobalLabel(gidTYPE globalLabel);
-
-    /**
-     * @brief Constructor from BeamID (depends on time internally)
-     * @param vxdid BeamId of beam parameter (vertex, invariant mass ...)
-     * @param paramId Numeric identificator of calibration/alignment parameter
-     *                type (x,y,z of vertex etc.).
-     */
-    GlobalLabel(BeamID beamid, gidTYPE paramId);
 
     /**
      * @brief Constructor from VxdID (depends on time internally)
@@ -143,9 +135,26 @@ namespace Belle2 {
      */
     GlobalLabel(EKLMElementID eklmElement, gidTYPE paramId);
 
+    template<class DBObjType>
+    static GlobalLabel construct(gidTYPE element, gidTYPE param)
+    {
+      GlobalLabel label;
+      label.construct(DBObjType::getGlobalUniqueID(), element, param);
+      return label;
+    }
+
+    //TODO
     void construct(gidTYPE dbObjId, gidTYPE element, gidTYPE param)
     {
-      construct(100000 * dbObjId + element, param);
+      if (m_components.empty() or m_components.find(dbObjId) != m_components.end())
+        construct(100000 * dbObjId + element, param);
+      else
+        construct(0, 0);
+    }
+
+    static void setComponents(const std::set<unsigned short>& components)
+    {
+      m_components = components;
     }
 
     /**
@@ -210,9 +219,6 @@ namespace Belle2 {
      */
     EKLMElementID getEklmID() const;
 
-    //! Is this beam label?
-    bool    isBeam()          const {return (eid < vxdOffset);}
-
     //! Is this VXD label?
     bool    isVXD()          const {return (eid >= vxdOffset && eid < cdcOffset);}
 
@@ -225,6 +231,15 @@ namespace Belle2 {
     //! Is this EKLM label?
     bool    isEKLM()         const {return (eid >= eklmOffset && eid < maxEID);}
 
+    //! Is this Beam label?
+    bool    isBeam()         const {return (eid > 0 && eid < vxdOffset);}
+
+    //TODO
+    gidTYPE getUniqueId() const {return eid / 100000;}
+
+    //TODO
+    gidTYPE getElementId() const {return eid % 100000;}
+
     //! Get id of alignment/calibration parameter
     gidTYPE getParameterId() const {return pid;}
 
@@ -235,7 +250,7 @@ namespace Belle2 {
     bool    getTimeFlag()    const {return tif;}
 
     //! Is label valid? (non-zero)
-    bool    isValid() {return 0 != gid * eid * pid;}
+    bool    isValid() {return 0 != gid;}
 
     //! Dumps the label to std::cout
     void    dump(int level = 0) const;
@@ -282,6 +297,7 @@ namespace Belle2 {
     }
 
   private:
+    static std::set<unsigned short> m_components;
 
     //! Constructor for any detector
     //! @param elementId Unique id of Belle2 detector element (sensor, layer, wire...)

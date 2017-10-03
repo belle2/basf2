@@ -172,28 +172,28 @@ namespace Belle2 {
 
     /// Set external parameters and functions
 
-    // 1 .. 15, shapeID = 0: not setting shape, @see PXDClusterShape
+    /** 1 .. 15, shapeID = 0: not setting shape, @see PXDClusterShape */
     const int m_shapes = 15;
-    // kinds of pixels: sensors: 2x (in foreward and backward), pitch: 4x
+    /** kinds of pixels: sensors: 2x (in foreward and backward), pitch: 4x */
     const int m_pixelkinds = 8;
-    // dimension in local u, v, cases: 15 x 8 x 2 = 240
+    /** dimension in local u, v, cases: 15 x 8 x 2 = 240 */
     const int m_dimensions = 2;
-    // 18 x 18 = 324 (angles in u x v)
+    /** 18 x 18 = 324 (angles in u x v) */
     const int m_anglesU = 18;
-    // 18 x 18 = 324 (angles in u x v)
+    /** 18 x 18 = 324 (angles in u x v) */
     const int m_anglesV = 18;
-    // 7 x 7 = 49 (in-pixel positions in u x v)
+    /** 7 x 7 = 49 (in-pixel positions in u x v) */
     const int m_in_pixelU = 7;
-    // 7 x 7 = 49 (in-pixel positions in u x v)
+    /** 7 x 7 = 49 (in-pixel positions in u x v) */
     const int m_in_pixelV = 7;
-    // Minimum clusters for calculation of corrections
+    /** Minimum clusters for calculation of corrections */
     const int m_MinClustersCorrections = 110;
 
-    // Setting of minimum of hits in pixel for analysis, TODO set to > 5000, deactivate this function: set to -1
+    /** Setting of minimum of hits in pixel for analysis, TODO set to > 5000, deactivate this function: set to -1 */
     const int m_MinHitsInPixels = -1;
-    // Setting of minimum of hits in bin for acceptance, TODO set to > 5
+    /** Setting of minimum of hits in bin for acceptance, TODO set to > 5 */
     const int m_MinHitsAcceptInPixels = 5;
-    // 15 x 8 x 2 = 240 (shapes x pixelkinds x dimensions): bias corr., error estim. corr., in-pixel maps))
+    /** 15 x 8 x 2 = 240 (shapes x pixelkinds x dimensions): bias corr., error estim. corr., in-pixel maps)) */
     const int m_cases = m_shapes * m_pixelkinds * m_dimensions;
 
     /** Expert setting, production of monitoring histograms, default=False */

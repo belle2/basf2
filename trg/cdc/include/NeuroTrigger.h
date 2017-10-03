@@ -29,7 +29,7 @@ namespace Belle2 {
       /** Number of networks.
        * For network specific parameters you can give either a list with
        * values for each network, or a single value that will be used for all.
-       * The ranges are also valid if nPhi * nPt * nTheta = nMLPs.
+       * The ranges are also valid if nPhi * nPt * nTheta * nPattern = nMLPs.
        */
       unsigned nMLP = 1;
       /** Number of nodes in each hidden layer for all networks
@@ -62,9 +62,18 @@ namespace Belle2 {
       std::vector<std::vector<float>> thetaRangeTrain = {{17., 150.}};
       /** Maximum number of hits in a single super layer for all networks. */
       std::vector<unsigned short> maxHitsPerSL = {1};
-      /** Super layer pattern for which MLP is trained for all networks. */
+      /** Super layer pattern for which MLP is trained for all networks.
+       *  Binary pattern of 9 * maxHitsPerSL bits (on/off for each hit).
+       *  0 in bit <i>: hits from super layer <i> are not used.
+       *  1 in bit <i>: hits from super layer <i> are used.
+       *  SLpattern = 0: use any hits present, don't check the pattern. */
       std::vector<unsigned long> SLpattern = {0};
-      /** Super layer pattern mask for which MLP is trained for all networks. */
+      /** Super layer pattern mask for which MLP is trained for all networks.
+       *  Binary pattern of 9 * maxHitsPerSL bits (on/off for each hit).
+       *  0 in bit <i>: super layer <i> may or may not have a hit.
+       *  1 in bit <i>: super layer <i>
+       *                - must have a hit if SLpattern bit <i> = 1
+       *                - must not have a hit if SLpattenr bit <i> = 0 */
       std::vector<unsigned long> SLpatternMask = {0};
       /** Maximal drift time, identical for all networks. */
       unsigned tMax = 256;

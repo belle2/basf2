@@ -16,8 +16,6 @@
 
 #include <string>
 
-
-
 namespace Belle2 {
 
 
@@ -34,10 +32,7 @@ namespace Belle2 {
     SpacePoint* m_spacePoint;
 
     /** unique integer identifier */
-    int m_identifier;
-
-    /** longer name for debugging */
-    std::string m_name;
+    const std::int32_t m_identifier;
 
     /** overloaded '=='-operator
      * TODO JKL: pretty ugly operator overload, should be fixed ASAP! (solution for null-ptr-issue needed)
@@ -95,23 +90,26 @@ namespace Belle2 {
     }
 
     /** constructor WARNING: sector-pointing has still to be decided! */
-    TrackNode() : m_sector(nullptr), m_spacePoint(nullptr), m_identifier(-1), m_name("SP: missing") {}
+    TrackNode() : m_sector(nullptr), m_spacePoint(nullptr), m_identifier(-1) {}
 
-    TrackNode(SpacePoint* spacePoint) :      // Get unique identifier from SP ArrayIndex, Get long debugging name from SP
-      m_sector(nullptr), m_spacePoint(spacePoint)
-    {
-      m_identifier = spacePoint->getArrayIndex();
-      m_name = "SP: " + spacePoint->getName();
-    }
+    TrackNode(SpacePoint* spacePoint) :      // Get unique identifier from SP ArrayIndex
+      m_sector(nullptr), m_spacePoint(spacePoint), m_identifier(spacePoint->getArrayIndex())
+    {}
 
     /** destructor */
     ~TrackNode() {}
 
     /** return ID of this node */
-    int getID() { return m_identifier; }
+    const std::int32_t getID() const { return m_identifier; }
 
     /** returns longer debugging name of this node */
-    const std::string& getName() const { return m_name; }
+    std::string getName() const
+    {
+      if (m_identifier >= 0)
+        return "SP: " + m_spacePoint->getName();
+      else
+        return "SP: missing";
+    }
 
   };
 

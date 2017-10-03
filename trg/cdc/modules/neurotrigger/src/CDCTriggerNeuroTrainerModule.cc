@@ -306,20 +306,26 @@ CDCTriggerNeuroTrainerModule::event()
       for (unsigned irep = 0; irep < reps.size() && !foundValidRep; ++irep) {
         if (!recoTrack->wasFitSuccessful(reps[irep]))
           continue;
-        // get state (position, momentum etc.) from first hit
-        genfit::MeasuredStateOnPlane state =
-          recoTrack->getMeasuredStateOnPlaneFromFirstHit(reps[irep]);
+        // get state (position, momentum etc.) from hit closest to IP and
         // extrapolate to z-axis (may throw an exception -> continue to next representation)
         try {
+          genfit::MeasuredStateOnPlane state =
+            recoTrack->getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0), reps[irep]);
+          TVector3 closestPos = state.getPos();
           reps[irep]->extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000));
+          // flip tracks if necessary, such that all track go outward from the IP
+          if (state.getMom().Dot(closestPos - state.getPos()) < 0) {
+            state.setPosMom(state.getPos(), -state.getMom());
+            state.setChargeSign(-state.getCharge());
+          }
+          // get track parameters
+          phi0Target = state.getMom().Phi();
+          invptTarget = state.getCharge() / state.getMom().Pt();
+          thetaTarget = state.getMom().Theta();
+          zTarget = state.getPos().Z();
         } catch (...) {
           continue;
         }
-        // get track parameters
-        phi0Target = state.getMom().Phi();
-        invptTarget = reps[irep]->getCharge(state) / state.getMom().Pt();
-        thetaTarget = state.getMom().Theta();
-        zTarget = state.getPos().Z();
         // break loop
         foundValidRep = true;
       }
@@ -454,8 +460,13 @@ CDCTriggerNeuroTrainerModule::event()
 void
 CDCTriggerNeuroTrainerModule::terminate()
 {
+  // save the training data
+  saveTraindata(m_trainFilename, m_trainArrayname);
   // do training for all sectors with sufficient training samples
   for (unsigned isector = 0; isector < m_NeuroTrigger.nSectors(); ++isector) {
+    // skip sectors that have already been trained
+    if (m_NeuroTrigger[isector].isTrained())
+      continue;
     float nTrainMin = m_multiplyNTrain ? m_nTrainMin * m_NeuroTrigger[isector].nWeights() : m_nTrainMin;
     if (m_trainSets[isector].nSamples() < (nTrainMin + m_nValid + m_nTest)) {
       B2WARNING("Not enough training samples for sector " << isector << " (" << (nTrainMin + m_nValid + m_nTest)
@@ -463,6 +474,7 @@ CDCTriggerNeuroTrainerModule::terminate()
       continue;
     }
     train(isector);
+    m_NeuroTrigger[isector].trained = true;
     // set sector ranges
     vector<unsigned> indices = m_NeuroTrigger.getRangeIndices(m_parameters, isector);
     vector<float> phiRange = m_parameters.phiRange[indices[0]];
@@ -476,10 +488,9 @@ CDCTriggerNeuroTrainerModule::terminate()
     m_NeuroTrigger[isector].phiRange = phiRange;
     m_NeuroTrigger[isector].invptRange = invptRange;
     m_NeuroTrigger[isector].thetaRange = thetaRange;
+    // save all networks (including the newly trained)
+    m_NeuroTrigger.save(m_filename, m_arrayname);
   }
-  // save everything to file
-  m_NeuroTrigger.save(m_filename, m_arrayname);
-  saveTraindata(m_trainFilename, m_trainArrayname);
 }
 
 void

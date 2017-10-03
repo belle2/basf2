@@ -117,7 +117,7 @@ namespace Belle2 {
     short m_commonMode;    /**< Common Mode correction */
     // ~PXDRawHit();
 
-    ClassDef(PXDRawHit, 3)
+    ClassDef(PXDRawHit, 4)
   };
 
 

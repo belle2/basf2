@@ -4,6 +4,9 @@
 from basf2 import *
 from ROOT import Belle2
 
+from svd import add_svd_reconstruction
+from pxd import add_pxd_reconstruction
+
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trigger_mode="all", additionalTrackFitHypotheses=None,
@@ -606,6 +609,14 @@ def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", compo
                    instances of track finding in one path.
     """
 
+    # Preparation of the VXD clusters
+    if is_pxd_used(components):
+        if 'PXDClusterizer' not in path:
+            add_pxd_reconstruction(path)
+
+    if 'SVDClusterizer' not in path:
+        add_svd_reconstruction(path)
+
     # Temporary array
     # add a suffix to be able to have different
     vxd_trackcands = '__VXDGFTrackCands' + suffix
@@ -638,7 +649,7 @@ def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", compo
 
 
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
-                                 sectormap_file=None):
+                                 sectormap_file=None, PXDminSVDSPs=3):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -647,12 +658,14 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     Use the GenfitTrackCandidatesCreator Module to convert back.
 
     :param path: basf2 path
+    :param svd_clusters: SVDCluster collection name
     :param reco_tracks: Name of the output RecoTracks, Defaults to RecoTracks.
     :param components: List of the detector components to be used in the reconstruction. Defaults to None which means all
                        components.
     :param suffix: all names of intermediate Storearrays will have the suffix appended. Useful in cases someone needs to
                    put several instances of track finding in one path.
     :param sectormap_file: if set to a finite value, a file will be used instead of the sectormap in the database.
+    :param PXDminSVDSPs: When using PXD require at least this number of SVD SPs for the SPTCs
     """
     ##########################
     # some setting for VXDTF2
@@ -678,12 +691,19 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     #################
     nameSPs = 'SpacePoints' + suffix
 
+    if 'PXDClusterizer' not in path:
+        if use_pxd:
+            add_pxd_reconstruction(path)
+
     if 'PXDSpacePointCreator' not in path:
         if use_pxd:
             spCreatorPXD = register_module('PXDSpacePointCreator')
             spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
             spCreatorPXD.param('SpacePoints', nameSPs)
             path.add_module(spCreatorPXD)
+
+    if 'SVDClusterizer' not in path:
+        add_svd_reconstruction(path)
 
     if 'SVDSpacePointCreator' not in path:
         # always use svd!
@@ -742,6 +762,13 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     # VXDTF2 Step 3
     # Analyzer
     #################
+
+    # When using PXD require at least PXDminSVDSPs SVD SPs for the SPTCs
+    if(use_pxd):
+        pxdSVDCut = register_module('PXDSVDCut')
+        pxdSVDCut.param('minSVDSPs', PXDminSVDSPs)
+        pxdSVDCut.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
+        path.add_module(pxdSVDCut)
 
     # Quality
     qualityEstimator = register_module('QualityEstimatorVXD')

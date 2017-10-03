@@ -11,9 +11,10 @@
 #include <top/utilities/TOPTemplateFitter.h>
 #include <top/geometry/TOPGeometryPar.h>
 #include <framework/logging/Logger.h>
-#include <math.h>
 
+#include <algorithm>
 #include <iostream>
+#include <math.h>
 
 using namespace Belle2;
 using namespace Belle2::TOP;
@@ -23,9 +24,10 @@ using namespace std;
 TOPTemplateFitter::TemplateParameters TOPTemplateFitter::s_templateParameters;
 int TOPTemplateFitter::s_totalTemplateSamples = 64;
 int TOPTemplateFitter::s_templateResolution = 4;
-int TOPTemplateFitter::s_fineOffsetRange = TOPTemplateFitter::s_templateResolution * 4;
+int TOPTemplateFitter::s_fineOffsetRange = TOPTemplateFitter::s_templateResolution * 5;
 std::vector<double> TOPTemplateFitter::s_templateSamples;
 bool TOPTemplateFitter::s_templateReInitialize = true;
+bool TOPTemplateFitter::s_useParabola = true;
 
 TOPTemplateFitter::TOPTemplateFitter(const TOPRawWaveform& wf,
                                      const TOPSampleTimes& sampleTimes,
@@ -54,7 +56,7 @@ void TOPTemplateFitter::setTemplateSamples(int nSamples)
 void TOPTemplateFitter::setTemplateResolution(int resolution)
 {
   s_templateResolution = resolution;
-  s_fineOffsetRange = resolution * 4;
+  s_fineOffsetRange = resolution * 5;
   s_templateReInitialize = true;
 }
 
@@ -88,8 +90,37 @@ void TOPTemplateFitter::performTemplateFit(const double risingEdgeStart,
   vector<short> pedestals(m_wf.getSize(), m_averageRMS);//for now assume constant pedestals for TOP
   vector<float> timingCorrection(m_wf.getSize(),
                                  0.);//timing correction, should be relative to each sample in in units of samples -> pick correct template sample
+
   //perform template fit
+  m_chisq_vec.clear();
+  m_chisq = 1e6;
   PerformTemplateFitMinimize(m_wf.getWaveform(), pedestals, timingCorrection, risingEdgeStart, fitRange);
+
+  //use paraboic shape of chi^2 distribution to improve fit result
+  if (s_useParabola) {
+    auto it = std::min_element(std::begin(m_chisq_vec), std::end(m_chisq_vec));
+    int minidx = std::distance(std::begin(m_chisq_vec), it);
+    if (minidx > 0 && minidx < (int)m_chisq_vec.size() - 1) {
+      Point vertex;
+      CalculateParabolaVertex({ -1, m_chisq_vec[minidx - 1]}, {0, m_chisq_vec[minidx]}, {1, m_chisq_vec[minidx + 1]}, vertex);
+      m_chisq = vertex.second;
+      m_result.risingEdge += vertex.first / s_templateResolution;
+    }
+  }
+}
+
+void TOPTemplateFitter::CalculateParabolaVertex(const Point& p1, const Point& p2, const Point& p3, Point& vertex)
+{
+  double denom = (p1.first - p2.first) * (p1.first - p3.first) * (p2.first - p3.first);
+  double a     = (p3.first * (p2.second - p1.second) + p2.first * (p1.second - p3.second) + p1.first *
+                  (p3.second - p2.second)) / denom;
+  double b     = (p3.first * p3.first * (p1.second - p2.second) + p2.first * p2.first * (p3.second - p1.second)
+                  + p1.first * p1.first * (p2.second - p3.second)) / denom;
+  double c     = (p2.first * p3.first * (p2.first - p3.first) * p1.second + p3.first * p1.first * (p3.first - p1.first) * p2.second
+                  + p1.first * p2.first * (p1.first - p2.first) * p3.second) / denom;
+
+  vertex.first = -b / (2 * a);
+  vertex.second = c - b * b / (4 * a);
 }
 
 void TOPTemplateFitter::PerformTemplateFitMinimize(const std::vector<short>& samples, const std::vector<short>& pedestals,
@@ -99,10 +130,9 @@ void TOPTemplateFitter::PerformTemplateFitMinimize(const std::vector<short>& sam
     B2FATAL("Size of sample, pedestal and timing correction vectors has to be equal!");
   }
 
-  m_chisq_vec.clear();
+
   MinimizationSums sums;
   FitResult result;
-  m_chisq = 1e6;
   int initialOffset = risingEdgeCFD - s_templateParameters.risingEdge;
   //offset search loop
   for (int fineOffset = -s_fineOffsetRange; fineOffset < s_fineOffsetRange; ++fineOffset) {

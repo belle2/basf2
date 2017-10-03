@@ -19,6 +19,8 @@ namespace Belle2 {
 
   namespace TOP {
 
+    using Point = std::pair<double, double>;
+
     /**
      *@brief Class to perform template fit on TOP waveform data
      *Minimzation method is described here http://wwwa1.kph.uni-mainz.de/Vorlesungen/SS11/Statistik/
@@ -125,6 +127,12 @@ namespace Belle2 {
       static int getTemplateResolution() {return s_templateResolution;}
 
       /**
+       @brief Returns useParabola
+       @return useParabola
+       */
+      static bool getUseParabola() {return s_useParabola;}
+
+      /**
       @brief Sets the template parameters
       @param template Parameters
       */
@@ -141,6 +149,12 @@ namespace Belle2 {
       @param template resolution
       */
       static void setTemplateResolution(int resolution);
+
+      /**
+      @brief Enable Usage of parabola improvement
+      @param enable/disable usage
+      */
+      static void setUseParabola(bool use) {s_useParabola = use;}
 
       /**
       @brief Intializes the template fit using default values
@@ -174,11 +188,19 @@ namespace Belle2 {
        */
       double ComputeMinimizedParametersAndChisq(const MinimizationSums& sums, FitResult& result);
 
-
+      /**
+       *@brief Calculate vertex coordinates of parabola given three data points
+       *@param data point 1
+       *@param data point 2
+       *@param data point 3
+       *@param vertex position
+       */
+      void CalculateParabolaVertex(const Point& p1, const Point& p2, const Point& p3,
+                                   Point& vertex);
 
       const TOPRawWaveform m_wf; /** <raw sampled waveforms */
       const TOPSampleTimes m_sampleTimes; /** <provides timing correction */
-      double m_averageRMS; /**average RMS of waveform samples, no database for this */
+      const double m_averageRMS; /**average RMS of waveform samples, no database for this */
 
       static int s_totalTemplateSamples;/**< number of samples used for template*/
       static int s_templateResolution;/**< resolution of template with respect to normal sample spacing*/
@@ -186,6 +208,7 @@ namespace Belle2 {
       static std::vector<double> s_templateSamples;/**<precomputed template samples*/
       static int s_fineOffsetRange;/**<range for offset between template and signal*/
       static bool s_templateReInitialize;/**<flag showing that the template samples have to be recomputed*/
+      static bool s_useParabola; /** try improving fit by making use of parabolic shape of chisq values*/
 
       //fit results
       FitResult m_result;/**< fit result from template fit*/

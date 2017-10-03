@@ -6,6 +6,7 @@
 #include <TNamed.h>
 #include <TCollection.h>
 #include <framework/database/IntervalOfValidity.h>
+#include <framework/logging/Logger.h>
 #include <calibration/Utilities.h>
 
 namespace Belle2 {
@@ -46,7 +47,7 @@ namespace Belle2 {
       return m_expRunSet;
     }
 
-    /// Make IntervalOfValidity from the set, spanning all runs (NOT CONVINCED THIS IS RIGHT!)
+    /// Make IntervalOfValidity from the set, spanning all runs. Works because sets are sorted by default
     IntervalOfValidity getIntervalOfValidity()
     {
       if (m_expRunSet.empty())

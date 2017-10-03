@@ -1,5 +1,4 @@
 #include <set>
-#include <memory>
 #include <utility>
 #include <boost/algorithm/string.hpp>
 #include <boost/python.hpp>
@@ -71,9 +70,12 @@ ExpRun CalibrationAlgorithmNew::convertPyExpRun(PyObject* pyObj)
   return expRun;
 }
 
-CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(PyObject* runs, int iteration)
+CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(PyObject* runs, int iteration, IntervalOfValidity iov)
 {
   B2DEBUG(100, "Running execute() using Python Object as input argument");
+  // Reset the execution specific data in case the algorithm was previously called
+  m_data.reset();
+  m_data.setIteration(iteration);
   vector<ExpRun> vecRuns;
   // Is it a list?
   if (PySequence_Check(runs)) {
@@ -85,6 +87,7 @@ CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(PyObject* runs
       boost::python::object pyExpRun(listRuns[iList]);
       if (!checkPyExpRun(pyExpRun.ptr())) {
         B2ERROR("Received Python ExpRuns couldn't be converted to C++");
+        m_data.setResult(c_Failure);
         return c_Failure;
       } else {
         vecRuns.push_back(convertPyExpRun(pyExpRun.ptr()));
@@ -92,15 +95,23 @@ CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(PyObject* runs
     }
   } else {
     B2ERROR("Tried to set the input runs but we didn't receive a Python sequence object (list,tuple).");
+    m_data.setResult(c_Failure);
     return c_Failure;
   }
-  return execute(vecRuns, iteration);
+  return execute(vecRuns, iteration, iov);
 }
 
-CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(vector<ExpRun> runs, int iteration)
+CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(vector<ExpRun> runs, int iteration, IntervalOfValidity iov)
 {
+  // Check if we are calling this function directly and need to reset, or through Python where it was already done.
+  if (m_data.getResult() != c_Undefined) {
+    m_data.reset();
+    m_data.setIteration(iteration);
+  }
+
   if (m_inputFileNames.empty()) {
     B2ERROR("There aren't any input files set. Please use CalibrationAlgorithm::setInputFiles()");
+    m_data.setResult(c_Failure);
     return c_Failure;
   }
   // Did we receive runs to execute over explicitly?
@@ -109,28 +120,28 @@ CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(vector<ExpRun>
       B2DEBUG(100, "ExpRun requested = (" << expRun.first << ", " << expRun.second << ")");
     }
   }
-
-//  // Let's check that we have the data by accessing an object
-//  // created by all collector modules by their base class
-//  StoreObjPtr<CalibRootObj<RunRange>> storeobj(m_prefix + "_" + RUN_RANGE_OBJ_NAME, DataStore::c_Persistent);
-//  if (!storeobj.isValid()) {
-//    B2ERROR("Could not access collected data in datastore. " << (m_prefix + "_" + RUN_RANGE_OBJ_NAME) << " object does not exist.");
-//    return c_Failure;
-//  }
-//
-  if (getRunListFromAllData().empty()) {
-    B2ERROR("No collected data.");
-    return c_Failure;
+  // If no runs are provided, infer the runs from all collected data
+  if (runs.empty()) {
+    runs = getRunListFromAllData();
+    // Let's check that we have some now
+    if (runs.empty()) {
+      B2ERROR("No collected data in input files.");
+      m_data.setResult(c_Failure);
+      return c_Failure;
+    }
+    for (auto expRun : runs) {
+      B2DEBUG(100, "ExpRun requested = (" << expRun.first << ", " << expRun.second << ")");
+    }
   }
-//
-//  // If no runs are provided, just take all collected
-//  if (runs.empty())
-//    runs = getRunListFromAllData();
-//
-//  std::sort(runs.begin(), runs.end());
-//
-//  // After this line, the getObject<...>(...) helpers start to work
-//  m_runs = runs;
+
+  m_data.setRequestedRuns(runs);
+  if (iov.empty()) {
+    // If no user specified IoV we use the IoV from the executed run list
+    iov = IntervalOfValidity(runs[0].first, runs[0].second, runs[runs.size() - 1].first, runs[runs.size() - 1].second);
+  }
+  m_data.setRequestedIov(iov);
+  // After here, the getObject<...>(...) helpers start to work
+
 //
 //  IntervalOfValidity caRange(m_runs[0].first, m_runs[0].second, m_runs[m_runs.size() - 1].first, m_runs[m_runs.size() - 1].second);
 //
@@ -166,25 +177,28 @@ CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(vector<ExpRun>
 //      return c_Failure;
 //    }
 //  }
-  // Check if we started a new iteration and clear old data
-  if (m_iteration != iteration) {
-    m_payloads.clear();
-    m_iteration = iteration;
-  }
+//  // Check if we started a new iteration and clear old data
+//  if (m_data.getIteration() != iteration) {
+//    m_payloads.clear();
+//    m_iteration = iteration;
+//  }
 
-
-  return calibrate();
+  EResult result = calibrate();
+  m_data.setResult(result);
+  return result;
 }
 
 /// Set the input file names used for this algorithm and resolve the wildcards
 void CalibrationAlgorithmNew::setInputFileNames(PyObject* inputFileNames)
 {
   // The reasoning for this very 'manual' approach to extending the Python interface
-  // (instead of using boost::python) is down to my fear of putting off final users.
+  // (instead of using boost::python) is down to my fear of putting off final users with
+  // complexity on their side.
+  //
   // I didn't want users that inherit from this class to be forced to use boost and
   // to have to define a new python module just to use the CAF. A derived class from
   // from a boost exposed class would need to have its own boost python module definition
-  // to allow access from a steering file and to the base class functions.
+  // to allow access from a steering file and to the base class functions (I think).
   // I also couldn't be bothered to write a full framework to get around the issue in a similar
   // way to Module()...maybe there's an easy way.
   //
@@ -213,7 +227,7 @@ void CalibrationAlgorithmNew::setInputFileNames(vector<string> inputFileNames)
   }
   auto tmpInputFileNames = RootIOUtilities::expandWordExpansions(inputFileNames);
 
-  // We'll use a set to enforce unique file paths as we check them
+  // We'll use a set to enforce sorted unique file paths as we check them
   set<string> setInputFileNames;
   // Check that files exist and convert to absolute paths
   for (auto path : tmpInputFileNames) {
@@ -299,12 +313,6 @@ string CalibrationAlgorithmNew::runList2String(ExpRun run) const
   return runList2String(runlist);
 }
 
-//IntervalOfValidity CalibrationAlgorithmNew::getIovFromData()
-//{
-//  auto& range = getObject<RunRange>(RUN_RANGE_OBJ_NAME);
-//  return range.getIntervalOfValidity();
-//}
-
 void CalibrationAlgorithmNew::saveCalibration(TObject* data, const string& name, const IntervalOfValidity& iov)
 {
   m_payloads.emplace_back(name, data, iov);
@@ -317,46 +325,12 @@ void CalibrationAlgorithmNew::saveCalibration(TClonesArray* data, const string& 
 
 void CalibrationAlgorithmNew::saveCalibration(TObject* data, const string& name)
 {
-  if (m_runs.empty())
-    return;
-
-  IntervalOfValidity iov;
-  IntervalOfValidity caRange(m_runs[0].first, m_runs[0].second, m_runs[m_runs.size() - 1].first, m_runs[m_runs.size() - 1].second);
-
-//  if (getRunListFromAllData() == std::vector<ExpRun>({{ -1, -1}})) {
-//    // For granularity=all, automatic IOV is defined by range of collected data
-//    iov = getIovFromData();
-//  } else {
-//    int expMin = m_runs[0].first;
-//    int runMin = m_runs[0].second;
-//    int expMax = m_runs[m_runs.size() - 1].first;
-//    int runMax = m_runs[m_runs.size() - 1].second;
-//    iov = IntervalOfValidity(expMin, runMin, expMax, runMax);
-//  }
-
-  saveCalibration(data, name, iov);
+  saveCalibration(data, name, m_data.getRequestedIov());
 }
 
 void CalibrationAlgorithmNew::saveCalibration(TClonesArray* data, const string& name)
 {
-  if (m_runs.empty())
-    return;
-
-  IntervalOfValidity iov;
-  IntervalOfValidity caRange(m_runs[0].first, m_runs[0].second, m_runs[m_runs.size() - 1].first, m_runs[m_runs.size() - 1].second);
-
-//  if (getRunListFromAllData() == std::vector<ExpRun>({{ -1, -1}})) {
-//    // For granularity=all, automatic IOV is defined by range of collected data
-//    iov = getIovFromData();
-//  } else {
-//    int expMin = m_runs[0].first;
-//    int runMin = m_runs[0].second;
-//    int expMax = m_runs[m_runs.size() - 1].first;
-//    int runMax = m_runs[m_runs.size() - 1].second;
-//    iov = IntervalOfValidity(expMin, runMin, expMax, runMax);
-//  }
-
-  saveCalibration(data, name, iov);
+  saveCalibration(data, name, m_data.getRequestedIov());
 }
 
 bool CalibrationAlgorithmNew::commit()
@@ -375,30 +349,37 @@ bool CalibrationAlgorithmNew::commit(list<Database::DBQuery> payloads)
   return Database::Instance().storeData(payloads);
 }
 
-vector<ExpRun> CalibrationAlgorithmNew::getRunListFromAllData()
+vector<ExpRun> CalibrationAlgorithmNew::getRunListFromAllData() const
+{
+  RunRangeNew runRange = getRunRangeFromAllData();
+  set<ExpRun> expRunSet = runRange.getExpRunSet();
+  return vector<ExpRun>(expRunSet.begin(), expRunSet.end());
+}
+
+IntervalOfValidity CalibrationAlgorithmNew::getIovFromAllData() const
+{
+  return getRunRangeFromAllData().getIntervalOfValidity();
+}
+
+RunRangeNew CalibrationAlgorithmNew::getRunRangeFromAllData() const
 {
   // Save TDirectory to change back at the end
   TDirectory* dir = gDirectory;
-  for (const string& fileName : m_inputFileNames) {
+  RunRangeNew runRange;
+  RunRangeNew* runRangeOther;
+  // Construct the TDirectory name where we expect our objects to be
+  string runRangeObjName(m_prefix + "/" + RUN_RANGE_OBJ_NAME);
+  for (const auto& fileName : m_inputFileNames) {
+    //Open TFile to get the objects
     unique_ptr<TFile> f;
     f.reset(TFile::Open(fileName.c_str(), "READ"));
+    runRangeOther = dynamic_cast<RunRangeNew*>(f->Get(runRangeObjName.c_str()));
+    if (runRangeOther) {
+      runRange.merge(runRangeOther);
+    } else {
+      B2WARNING("Missing a RunRange object for file: " << fileName);
+    }
   }
   dir->cd();
-  vector<ExpRun> runs;
-//  string fullName(m_prefix + "_" + RUN_RANGE_OBJ_NAME);
-//  StoreObjPtr<CalibRootObj<RunRange>> storeobj(fullName, DataStore::c_Persistent);
-//
-//  std::vector<ExpRun> list;
-//  if (!storeobj.isValid())
-//    return list;
-//
-//  for (auto objAndIov : storeobj->getObjects()) {
-//    std::vector<ExpRun> sublist = string2RunList(objAndIov.second);
-//    for (auto exprun : sublist)
-//      list.push_back(exprun);
-//  }
-//  std::sort(list.begin(), list.end());
-//  list.erase(std::unique(list.begin(), list.end()), list.end());
-//  return list;
-  return runs;
+  return runRange;
 }

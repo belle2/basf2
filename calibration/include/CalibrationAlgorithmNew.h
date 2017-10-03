@@ -3,13 +3,14 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Tadeas Bilka                                            *
+ * Contributors:  Tadeas Bilka, David Dossett                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
 #include <Python.h>
+#include <memory>
 #include <string>
 #include <vector>
 #include <list>
@@ -18,9 +19,9 @@
 #include <TFile.h>
 #include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
+#include <framework/logging/Logger.h>
 #include <calibration/Utilities.h>
-//#include <calibration/dataobjects/RunRange.h>
-//#include <calibration/dataobjects/CalibRootObj.h>
+#include <calibration/dataobjects/RunRangeNew.h>
 
 namespace Belle2 {
   /**
@@ -30,16 +31,62 @@ namespace Belle2 {
   public:
     /// The result of calibration
     enum EResult {
-      c_OK,           /**< Finished successfuly =0 in Python */
-      c_Iterate,      /**< Needs iteration      =1 in Python */
-      c_NotEnoughData,/**< Needs more data      =2 in Python */
-      c_Failure       /**< Failed               =3 in Python */
+      c_OK,           /**< Finished successfuly             =0 in Python */
+      c_Iterate,      /**< Needs iteration                  =1 in Python */
+      c_NotEnoughData,/**< Needs more data                  =2 in Python */
+      c_Failure,      /**< Failed                           =3 in Python */
+      c_Undefined     /**< Not yet known (before execution) =4 in Python */
     };
 
     /**
-     * Constructor - sets the prefix for datastore objects (won't be accesses until execute(...))
+     * A class to hold all data that is needed ONLY for the most recent single execution of the algorithm.
+     * This is then reset upon calling execute() again. All other data members aren't reset
+     * unless you do it explicitly.
+     */
+    class ExecutionData {
+    public:
+      ExecutionData() {};
+      ~ExecutionData() {};
+      void reset()
+      {
+        B2DEBUG(100, "Resetting ExecutionData of algorithm");
+        m_requestedRuns.clear();
+        m_iteration = -1;
+        m_result = c_Undefined;
+      }
+      /// Returns the vector of ExpRuns
+      const std::vector<Calibration::ExpRun>& getRequestedRuns() const {return m_requestedRuns;}
+      /// Sets the vector of ExpRuns
+      void setRequestedRuns(std::vector<Calibration::ExpRun> requestedRuns) {m_requestedRuns = requestedRuns;}
+      /// Getter for current iteration
+      int getIteration() const {return m_iteration;}
+      /// Setter for current iteration
+      void setIteration(int iteration) {m_iteration = iteration;}
+      /// Getter for current result
+      EResult getResult() const {return m_result;}
+      /// Setter for current iteration
+      void setResult(EResult result) {m_result = result;}
+      /// Sets the requested IoV for this execution, based on the
+      void setRequestedIov(IntervalOfValidity iov = IntervalOfValidity(0, 0, -1, -1)) {m_iov = iov;}
+      /// Getter for requested IOV
+      const IntervalOfValidity& getRequestedIov() const {return m_iov;}
+
+    private:
+      /// Runs for which the calibration has been last requested, either requested explicitly or generated from the collected data
+      std::vector<Calibration::ExpRun> m_requestedRuns{};
+      /// current iteration for execution
+      int m_iteration{ -1};
+      /// Result of execution, default undefined to indicate we haven't run yet
+      EResult m_result{c_Undefined};
+      /// Current IoV to be executed, default empty. Will be either set by user explicitly or generated from collected/requested runs
+      IntervalOfValidity m_iov;
+    };
+
+    /**
+     * Constructor - sets the prefix for collected objects (won't be accesses until execute(...))
      * so you can change it via setPrefix(...). The prefix has to be shared among collectors and
-     * the algorithm to share the datastore objects, but can be changed (via parameter for collector modules).
+     * the algorithm to as it names the TDirectory in the collector output file where the objects are
+     * stored. But this can be changed (via parameter for collector modules).
      */
     explicit CalibrationAlgorithmNew(const std::string& collectorModuleName) : m_prefix(collectorModuleName) {}
 
@@ -49,8 +96,12 @@ namespace Belle2 {
     /// Get the prefix used for getting calibration data
     std::string getPrefix() const {return m_prefix;}
 
+    /// Checks that a PyObject can be successfully converted to an ExpRun type
     bool checkPyExpRun(PyObject* pyObj);
+
+    /// Performs the conversion of PyObject to ExpRun
     Calibration::ExpRun convertPyExpRun(PyObject* pyObj);
+
     /**
      * Alias for prefix. For convenience and less writing, we say developers to
      * set this to default collector module name in constructor of base class.
@@ -72,14 +123,27 @@ namespace Belle2 {
     /// Get the input file names used for this algorithm and pass them out as a Python list of unicode strings
     PyObject* getInputFileNames();
 
-    /// Get the complete list of runs from inspection of datastore
-    std::vector<Calibration::ExpRun> getRunListFromAllData();
+    /// Get the complete list of runs from inspection of collected data
+    std::vector<Calibration::ExpRun> getRunListFromAllData() const;
 
-    /// Runs calibration over vector of runs
-    EResult execute(std::vector<Calibration::ExpRun> runs = {}, int iteration = 0);
+    /// Get the complete IoV from inspection of collected data
+    IntervalOfValidity getIovFromAllData() const;
 
-    /// Runs calibration over Python list of runs
-    EResult execute(PyObject* runs, int iteration = 0);
+    /// Get the complete RunRange from inspection of collected data
+    RunRangeNew getRunRangeFromAllData() const;
+
+    /**
+     * Runs calibration over vector of runs for a given iteration. You can also specify the IoV to
+     * save the database payload as. By default the Algorithm will create an IoV from your requested
+     * ExpRuns, or from the overall ExpRuns of the input data if you haven't specified ExpRuns in this function.
+     *
+     * No checks are performed to make sure that a IoV you specify matches the data you ran over, it
+     * simply labels the IoV to commit to the database later.
+     */
+    EResult execute(std::vector<Calibration::ExpRun> runs = {}, int iteration = 0, IntervalOfValidity iov = IntervalOfValidity());
+
+    /// Runs calibration over Python list of runs. Converts to C++ and then calls the other execute() function
+    EResult execute(PyObject* runs, int iteration = 0, IntervalOfValidity iov = IntervalOfValidity());
 
     /// Get constants (in TObjects) for database update from last calibration
     const std::list<Database::DBQuery>& getPayloads() const { return m_payloads; }
@@ -100,27 +164,31 @@ namespace Belle2 {
     // Developers implement this function ------------
 
     /// Run algo on data - pure virtual: needs to be implemented
-    virtual EResult calibrate() {return c_OK;}
+    virtual EResult calibrate() = 0;
 
     // Helpers ---------------- Data retrieval -------
 
     /// Get the list of runs for which calibration is called
-    const std::vector<Calibration::ExpRun>& getRunList() const {return m_runs;}
+    const std::vector<Calibration::ExpRun>& getRunList() const {return m_data.getRequestedRuns();}
 
     /// Get current iteration
-    int getIteration() const { return m_iteration; }
+    int getIteration() const { return m_data.getIteration(); }
 
     /// Set the input file names used for this algorithm
     void setInputFileNames(std::vector<std::string> inputFileNames);
 
-    /// Get the (wildcard resolved) input file names used for this algorithm
+    /// Get the input file names used for this algorithm as a STL vector
     std::vector<std::string> getInputFileNamesCPP() {return m_inputFileNames;}
 
-//    /// Get calibration data object by name and list of runs
-//    template<class T>
-//    T& getObject(const std::string& name, std::vector<CalibrationAlgorithmNew::ExpRun> runlist) const
-//    {
-//      std::string fullName = m_prefix + "_" + name;
+    /// Get calibration data object by name and list of runs
+    template<class T>
+    T& getObject(const std::string& name, const std::vector<Calibration::ExpRun>& runs) const
+    {
+      TDirectory* dir = gDirectory;
+      // Construct the TDirectory name where we expect our objects to be
+      std::string fullName(m_prefix + "/" + name);
+      std::string runRangeObjName(m_prefix + "/" + Calibration::RUN_RANGE_OBJ_NAME);
+      RunRangeNew* runRange;
 //      StoreObjPtr<CalibRootObj<T>> storeobj(fullName, DataStore::c_Persistent);
 //
 //      if (!storeobj.isValid()) {
@@ -130,7 +198,21 @@ namespace Belle2 {
 //        storeobj.registerInDataStore();
 //        storeobj.construct();
 //      }
-//
+
+      for (const auto& fileName : m_inputFileNames) {
+        //Open TFile to get the objects
+        std::unique_ptr<TFile> f;
+        f.reset(TFile::Open(fileName.c_str(), "READ"));
+        runRange = dynamic_cast<RunRangeNew*>(f->Get(runRangeObjName.c_str()));
+        if (runRange->getIntervalOfValidity().overlaps(m_data.getRequestedIov())) {
+          B2DEBUG(100, "Found requested data in file: " << fileName);
+        } else {
+          B2DEBUG(100, "No overlapping data found in file: " << fileName);
+        }
+      }
+
+      dir->cd();
+
 //      std::string strRunList = runList2String(runlist);
 //      // TODO: Merge only once (now) or each call again?
 //      if (storeobj->objectExists(strRunList))
@@ -145,9 +227,9 @@ namespace Belle2 {
 //        list.Add(&storeobj->getObject(runList2String(run)));
 //      }
 //      merged.Merge(&list);
-//
-//      return merged;
-//    }
+      T* obj = new T();
+      return *obj;
+    }
 //
 //    /// Get calibration data object by name and run
 //    template<class T>
@@ -158,29 +240,23 @@ namespace Belle2 {
 //      return getObject<T>(name, runlist);
 //    }
 //
-//    /// Get calibration data object (for all runs the calibration is requested)
-//    template<class T>
-//    T& getObject(std::string name) const
-//    {
-//      return getObject<T>(name, m_runs);
-//    }
-//
+    /// Get calibration data object (for all runs the calibration is requested)
+    template<class T>
+    T& getObject(std::string name) const
+    {
+      return getObject<T>(name, m_data.getRequestedRuns());
+    }
+
 //    // Helpers ---------------- Database storage -----
 //
-//    /// Get the interval of validity from minimum and maximum experiment and run of data in requested calibration range
-//    IntervalOfValidity getIovFromData();
-//
+    /// Get the interval of validity from minimum and maximum experiment and run of input data files
+    IntervalOfValidity getIovFromAllData();
+
     /// Store DBArray payload with given name with default IOV
     void saveCalibration(TClonesArray* data, const std::string& name);
 
-    /// Store DBArray with given name and custom IOV
-    void saveCalibration(TClonesArray* data, const std::string& name, const IntervalOfValidity& iov);
-
     /// Store DB payload with given name with default IOV
     void saveCalibration(TObject* data, const std::string& name);
-
-    /// Store DB payload with given name and custom IOV
-    void saveCalibration(TObject* data, const std::string& name, const IntervalOfValidity& iov);
 
     // -----------------------------------------------
 
@@ -199,18 +275,23 @@ namespace Belle2 {
     /// List of input files to the Algorithm, will initially be user defined but then gets the wildcards expanded during execute()
     std::vector<std::string> m_inputFileNames;
 
+    ExecutionData m_data;
+
     /// Description of the algorithm
     std::string m_description{""};
 
-    /// The prefix of datastore objects
+    /// The name of the TDirectory the collector objects are contained within
     std::string m_prefix{""};
-    /// Runs for which the calibration has been last requested
-    std::vector<Calibration::ExpRun> m_runs{};
+
     /// Payloads generated by last calibration (needs to be transient as root needs default constructible elements)
     std::list<Database::DBQuery> m_payloads{}; //!transient
 
-    /// current iteration
-    int m_iteration{0};
+    /// Store DBArray with given name and custom IOV
+    void saveCalibration(TClonesArray* data, const std::string& name, const IntervalOfValidity& iov);
+
+    /// Store DB payload with given name and custom IOV
+    void saveCalibration(TObject* data, const std::string& name, const IntervalOfValidity& iov);
+
 
     ClassDef(CalibrationAlgorithmNew, 1); /**< Abstract base class for calibration algorithms */
   };

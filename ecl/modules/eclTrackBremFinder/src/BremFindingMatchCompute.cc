@@ -1,11 +1,11 @@
-#include <ecl/modules/eclTrackBremFinder/BremFinding.h>
+#include <ecl/modules/eclTrackBremFinder/BremFindingMatchCompute.h>
 #include <framework/utilities/Angle.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace ECL;
 
-bool BremFinding::isMatch()
+bool BremFindingMatchCompute::isMatch()
 {
   auto fitted_state = m_measuredStateOnPlane;
 

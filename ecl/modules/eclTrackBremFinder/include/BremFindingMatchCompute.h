@@ -23,17 +23,14 @@
 
 namespace Belle2 {
 
-  class BremFinding {
+  class BremFindingMatchCompute {
   public:
-    BremFinding(float clusterAcceptanceFactor, ECLCluster cluster, genfit::MeasuredStateOnPlane measuredStateOnPlane) :
+    BremFindingMatchCompute(float clusterAcceptanceFactor, ECLCluster const& cluster,
+                            genfit::MeasuredStateOnPlane const& measuredStateOnPlane) :
       m_clusterAcceptanceFactor(clusterAcceptanceFactor),
       m_eclCluster(cluster),
       m_measuredStateOnPlane(measuredStateOnPlane)
     {}
-
-    void setECLCluster(ECLCluster cluster) {m_eclCluster = cluster;}
-
-    void setMeasuredStateOnPlane(genfit::MeasuredStateOnPlane measuredstate) {m_measuredStateOnPlane = measuredstate;}
 
     void setClusterAcceptanceFactor(float acceptanceFactor) {m_clusterAcceptanceFactor = acceptanceFactor;}
 
@@ -45,9 +42,9 @@ namespace Belle2 {
   private:
     float m_clusterAcceptanceFactor;
 
-    ECLCluster m_eclCluster;
+    ECLCluster const& m_eclCluster;
 
-    genfit::MeasuredStateOnPlane m_measuredStateOnPlane;
+    genfit::MeasuredStateOnPlane const& m_measuredStateOnPlane;
 
     bool m_angleCorrection = false;
 

@@ -1,7 +1,7 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
- * Contributors: Thomas Hauth                                             *
+ * Contributors: Thomas Hauth, Patrick Ecker                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

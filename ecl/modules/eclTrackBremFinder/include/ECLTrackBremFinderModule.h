@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Hauth                                       *
+ * Contributors: Thomas Hauth, Patrick Ecker                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,6 +19,8 @@
 namespace Belle2 {
 
   /**
+   * Module to assign ECL Clusters resulting from Bremsstrahlung to the
+   * primary electron track.
    */
   class ECLTrackBremFinderModule : public Module {
   public:

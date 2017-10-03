@@ -13,6 +13,7 @@
 #include <calibration/modules/TestHisto/TestHistoModule.h>
 
 #include <TTree.h>
+#include <TH1F.h>
 #include <TRandom.h>
 
 using namespace Belle2;
@@ -37,6 +38,8 @@ TestHistoModule::TestHistoModule() : CalibrationCollectorModuleNew()
   addParam("entriesPerEvent", m_entriesPerEvent,
            "Number of entries that we fill into the saved tree per event. As we increase this we start storing larger amonuts of data in a smaller number of events to test the limits.",
            int(10));
+  addParam("spread", m_spread,
+           "Spread of gaussian (mean=42) filling of test histogram (range=<0,100>) - probability of algo iterations depend on it", int(17.));
 }
 
 void TestHistoModule::prepare()
@@ -58,6 +61,9 @@ void TestHistoModule::prepare()
   tree->Branch<double>("dof", &m_dof);
 
   registerObject<TTree>(objectName, tree);
+
+  auto hist = new TH1F("histo", "Test histogram, which mean value should be found by test calibration algo", 100, 0., 100.);
+  registerObject<TH1F>("MyHisto", hist);
 }
 
 void TestHistoModule::inDefineHisto()
@@ -89,6 +95,8 @@ void TestHistoModule::collect()
     m_dof = gRandom->Gaus();
     getObject<TTree>(objectName).Fill();
   }
+
+  getObject<TH1F>("MyHisto").Fill(gRandom->Gaus(42., m_spread));
 }
 
 //void TestHistoModule::terminate()

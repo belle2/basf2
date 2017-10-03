@@ -147,29 +147,6 @@ CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(vector<ExpRun>
   m_data.setRequestedIov(iov);
   // After here, the getObject<...>(...) helpers start to work
 
-//
-//  IntervalOfValidity caRange(m_runs[0].first, m_runs[0].second, m_runs[m_runs.size() - 1].first, m_runs[m_runs.size() - 1].second);
-//
-//  if (getRunListFromAllData() == std::vector<ExpRun>({{ -1, -1}})) {
-//    // Data collected with granularity=all
-//    if (m_runs != std::vector<ExpRun>({{ -1, -1}})) {
-//      B2ERROR("The data is collected with granularity=all (exp=-1,run=-1), but you seem to request calibration for specific runs.");
-//      // Take the (-1,-1)
-//      m_runs = getRunListFromAllData();
-//      caRange = getIovFromData();
-//    }
-//    if (getIovFromData().empty()) {
-//      B2ERROR("No collected data.");
-//      return c_Failure;
-//    }
-//  }
-//
-//  IntervalOfValidity dataRange = getIovFromData();
-//  if (dataRange.empty()) {
-//    B2ERROR("No data collected for selected runs.");
-//    return c_Failure;
-//  }
-//
 //  if (!dataRange.contains(caRange)) {
 //    B2ERROR("The requested range for calibration is not contained within range of collected data.");
 //    // TODO: remove runs outside collected data range...?
@@ -188,7 +165,7 @@ CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(vector<ExpRun>
 //    m_iteration = iteration;
 //  }
 
-  EResult result = calibrate();
+  CalibrationAlgorithmNew::EResult result = calibrate();
   m_data.setResult(result);
   return result;
 }
@@ -404,4 +381,50 @@ string CalibrationAlgorithmNew::getGranularityFromData() const
   string granularity = runRange->getGranularity();
   dir->cd();
   return granularity;
+}
+
+shared_ptr<TChain> CalibrationAlgorithmNew::getTreeObject(const string& name, const vector<ExpRun>& requestedRuns) const
+{
+  auto chain = make_shared<TChain>(name.c_str());
+  chain->SetDirectory(0);
+  // Construct the TDirectory names where we expect our objects to be
+  string fullName(m_prefix + "/" + name);
+  string runRangeObjName(m_prefix + "/" + RUN_RANGE_OBJ_NAME);
+  RunRangeNew runRangeRequested;
+  for (auto expRun : requestedRuns) {
+    runRangeRequested.add(expRun.first, expRun.second);
+  }
+  if (strcmp(getGranularity().c_str(), "run") == 0) {
+    RunRangeNew* runRangeData;
+    for (const auto& fileName : m_inputFileNames) {
+      //Open TFile to get the objects
+      unique_ptr<TFile> f;
+      f.reset(TFile::Open(fileName.c_str(), "READ"));
+      runRangeData = dynamic_cast<RunRangeNew*>(f->Get(runRangeObjName.c_str()));
+      if (runRangeData->getIntervalOfValidity().overlaps(runRangeRequested.getIntervalOfValidity())) {
+        B2DEBUG(100, "Found requested data in file: " << fileName);
+        // Loop over runs in data and check if they exist in our requested ones, then add if they do
+        for (auto expRunData : runRangeData->getExpRunSet()) {
+          for (auto expRunRequested : requestedRuns) {
+            if (expRunData == expRunRequested) {
+              string objName = fullName + "/" + name + "_";
+              objName += std::to_string(expRunData.first);
+              objName += ".";
+              objName += std::to_string(expRunData.second);
+              chain->Add((fileName + "/" + objName).c_str());
+            }
+          }
+        }
+      } else {
+        B2DEBUG(100, "No overlapping data found in file: " << fileName);
+        continue;
+      }
+    }
+  } else {
+    string objName = fullName + "/" + name + "_-1.-1";
+    for (const auto& fileName : m_inputFileNames) {
+      chain->Add((fileName + "/" + objName).c_str());
+    }
+  }
+  return chain;
 }

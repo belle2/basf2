@@ -55,6 +55,8 @@ namespace Belle2 {
 
     /** Number of entries created in the saved tree per event. Will affect the total size of objects stored */
     int m_entriesPerEvent;
+    /** Spread of gaussian (mean=42) filling test histogram (range=<0,100>) - probability of algo iterations depend on it */
+    int m_spread;
 
     void inDefineHisto();
 

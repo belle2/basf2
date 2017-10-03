@@ -6,6 +6,7 @@
 #include <TClonesArray.h>
 #include <calibration/dbobjects/TestCalibObject.h>
 #include <calibration/dbobjects/TestCalibMean.h>
+#include <memory>
 
 
 using namespace std;
@@ -25,12 +26,14 @@ TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithmNew("C
 
 CalibrationAlgorithmNew::EResult TestCalibrationAlgorithm::calibrate()
 {
-//  // Pulling in data from collector output, we only use the histogram in this test
-//  auto& histogram1 = getObject<TH1F>("histogram1");
-  TChain* ttree = dynamic_cast<TChain*>(getObject<TTree>("MyTree"));
-  ttree->Print();
-  B2INFO("Number of Entries in TChain was " << ttree->GetEntries());
-  delete ttree;
+  // Pulling in data from collector output. It now returns shared_ptr<T> so the underlying pointer
+  // will delete itself automatically at the end of this scope unless you do something
+  auto ttree = getObject<TTree>("MyTree");
+  auto hist = getObject<TH1F>("MyHisto");
+  B2INFO("Number of Entries in MyTree was " << ttree->GetEntries());
+  B2INFO("Number of Entries in MyHisto was " << hist->GetEntries());
+  B2INFO("Mean of MyHisto was " << hist->GetMean());
+  return c_OK;
 //  auto& mille = getObject<MilleData>("test_mille");
 //
 //  if (histogram1.GetEntries() < 100 || ttree.GetEntries() < 100 || mille.getFiles().empty())
@@ -61,5 +64,4 @@ CalibrationAlgorithmNew::EResult TestCalibrationAlgorithm::calibrate()
 //  if (mean - 42. >= 1.)
 //    return c_Iterate;
 //
-  return c_OK;
 }

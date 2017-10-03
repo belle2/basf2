@@ -59,4 +59,5 @@ def before_iteration(iteration):
     B2RESULT("iteration callback for iteration %d" % iteration)
     set_random_seed("my seed for iteration %d" % iteration)
 
+
 run_calibration(main, iteration_callback=before_iteration)

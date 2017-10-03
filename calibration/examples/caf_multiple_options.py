@@ -100,5 +100,6 @@ def main(argv):
     cal_fw.run()
     print("End of CAF processing.")
 
+
 if __name__ == "__main__":
     main(sys.argv[1:])

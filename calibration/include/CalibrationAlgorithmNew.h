@@ -185,30 +185,59 @@ namespace Belle2 {
     std::vector<std::string> getInputFileNamesCPP() {return m_inputFileNames;}
 
     /// Get TTree calibration data object by name and list of runs, use TChain to avoid huge memory usage and merging
-    TChain* getTreeObject(const std::string& name, const std::vector<Calibration::ExpRun>& runs) const
+    std::shared_ptr<TChain> getTreeObject(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const;
+
+    /// Get calibration data object by name and list of runs, the Merge function will be called to generate the overall object
+    template<class T>
+    std::shared_ptr<T> getObject(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const
     {
-      TChain* chain = new TChain(name.c_str());
+      T* wrappedObj = new T();
+      wrappedObj->SetDirectory(0);
+      auto mergedObj = std::shared_ptr<T>(wrappedObj);
+      bool mergedEmpty = true;
+      mergedObj->SetName(name.c_str());
+      TDirectory* dir = gDirectory;
+
+      // Technically we could grab all the objects from all files, add to list and then merge at the end.
+      // But I prefer the more memory efficient (cpu wasting) way of merging with all objects
+      // in a file before moving on to the next one.
+      TList list;
+      list.SetOwner(false);
+
       // Construct the TDirectory names where we expect our objects to be
       std::string fullName(m_prefix + "/" + name);
       std::string runRangeObjName(m_prefix + "/" + Calibration::RUN_RANGE_OBJ_NAME);
-      if (strcmp(getGranularity().c_str(), "run") == 0) {
-        RunRangeNew* runRange;
-        for (const auto& fileName : m_inputFileNames) {
-          //Open TFile to get the objects
-          std::unique_ptr<TFile> f;
-          f.reset(TFile::Open(fileName.c_str(), "READ"));
-          runRange = dynamic_cast<RunRangeNew*>(f->Get(runRangeObjName.c_str()));
-          if (runRange->getIntervalOfValidity().overlaps(m_data.getRequestedIov())) {
+      RunRangeNew runRangeRequested;
+      for (auto expRun : requestedRuns) {
+        runRangeRequested.add(expRun.first, expRun.second);
+      }
+
+      RunRangeNew* runRangeData;
+      for (const auto& fileName : m_inputFileNames) {
+        //Open TFile to get the objects
+        std::unique_ptr<TFile> f;
+        f.reset(TFile::Open(fileName.c_str(), "READ"));
+        runRangeData = dynamic_cast<RunRangeNew*>(f->Get(runRangeObjName.c_str()));
+
+        if (strcmp(getGranularity().c_str(), "run") == 0) {
+          if (runRangeData->getIntervalOfValidity().overlaps(runRangeRequested.getIntervalOfValidity())) {
             B2DEBUG(100, "Found requested data in file: " << fileName);
             // Loop over runs in data and check if they exist in our requested ones, then add if they do
-            for (auto expRunData : runRange->getExpRunSet()) {
-              for (auto expRunRequested : m_data.getRequestedRuns()) {
+            for (auto expRunData : runRangeData->getExpRunSet()) {
+              for (auto expRunRequested : requestedRuns) {
                 if (expRunData == expRunRequested) {
                   std::string objName = fullName + "/" + name + "_";
                   objName += std::to_string(expRunData.first);
                   objName += ".";
                   objName += std::to_string(expRunData.second);
-                  chain->Add((fileName + "/" + objName).c_str());
+                  TObject* objOther = f->Get(objName.c_str());
+                  if (mergedEmpty) {
+                    objOther->Copy(*(mergedObj.get()));
+                    mergedObj->SetDirectory(0);
+                    mergedEmpty = false;
+                  } else {
+                    list.Add(objOther);
+                  }
                 }
               }
             }
@@ -216,69 +245,41 @@ namespace Belle2 {
             B2DEBUG(100, "No overlapping data found in file: " << fileName);
             continue;
           }
+        } else {
+          std::string objName = fullName + "/" + name + "_-1.-1";
+          TObject* objOther = f->Get(objName.c_str());
+          if (mergedEmpty) {
+            objOther->Copy(*(mergedObj.get()));
+            mergedObj->SetDirectory(0);
+            mergedEmpty = false;
+          } else {
+            list.Add(objOther);
+          }
         }
-      } else {
-        std::string objName = fullName + "/" + name + "_-1.-1";
-        for (const auto& fileName : m_inputFileNames) {
-          chain->Add((fileName + "/" + objName).c_str());
-        }
+        mergedObj->Merge(&list);
+        list.Clear();
       }
-      return chain;
+      dir->cd();
+      return mergedObj;
     }
 
-    /// Get calibration data object by name and list of runs
-    template<class T>
-    T* getObject(const std::string& name, const std::vector<Calibration::ExpRun>& runs) const
+    /** Get calibration data object (for all runs the calibration is requested for)
+     *  This function will only work during or after execute() has been called once.
+     */
+    std::shared_ptr<TTree> getObject(std::string name) const
     {
-      T* obj = nullptr;
-//       T* objOther;
-//       TDirectory* dir = gDirectory;
-//       // Construct the TDirectory name where we expect our objects to be
-//       std::string fullName(m_prefix + "/" + name);
-//       std::string runRangeObjName(m_prefix + "/" + Calibration::RUN_RANGE_OBJ_NAME);
-//       RunRangeNew* runRange;
-//       for (const auto& fileName : m_inputFileNames) {
-//         //Open TFile to get the objects
-//         std::unique_ptr<TFile> f;
-//         f.reset(TFile::Open(fileName.c_str(), "READ"));
-//         if (getGranularity() == "run") {
-//           runRange = dynamic_cast<RunRangeNew*>(f->Get(runRangeObjName.c_str()));
-//           if (runRange->getIntervalOfValidity().overlaps(m_data.getRequestedIov())) {
-//             B2DEBUG(100, "Found requested data in file: " << fileName);
-//
-//
-//
-//           } else {
-//             B2DEBUG(100, "No overlapping data found in file: " << fileName);
-//           }
-//         } else {
-//           std::string objName = fullName + "/" + name + "_-1.-1";
-//           objOther = dynamic_cast<T*>(f->Get(objName.c_str()));
-//           if (!obj) {
-//             obj = objOther->CloneTree();
-//           } else {
-//             TList list;
-//             list.SetOwner(false);
-//             list.Add(objOther);
-//             obj->Merge(&list);
-//           }
-//         }
-//       }
-//
-//      dir->cd();
-      return obj;
+      // We cheekily cast the TChain to TTree so that the template works nicely
+      // Hopefully this doesn't cause issues if people do low level stuff to the tree...
+      return std::dynamic_pointer_cast<TTree>(getTreeObject(name, m_data.getRequestedRuns()));
     }
 
-    /// Get calibration data object (for all runs the calibration is requested)
+    /** Get calibration data object (for all runs the calibration is requested for)
+     *  This function will only work during or after execute() has been called once.
+     */
     template<class T>
-    TObject* getObject(std::string name) const
+    std::shared_ptr<T> getObject(std::string name) const
     {
-      T tmpObj;
-      if (tmpObj.InheritsFrom("TTree")) {
-        return getTreeObject(name, m_data.getRequestedRuns());
-      } else {
-        return getObject<T>(name, m_data.getRequestedRuns());
-      }
+      return getObject<T>(name, m_data.getRequestedRuns());
     }
 
 //    // Helpers ---------------- Database storage -----

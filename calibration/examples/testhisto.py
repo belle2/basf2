@@ -15,7 +15,7 @@ if not os.path.exists(working_dir):
 logging.package("calibration").log_level = LogLevel.DEBUG
 
 
-def _create_file(num):
+def _create_file(run):
     main = create_path()
     main.add_module("EventInfoSetter", expList=[1, 2], runList=[run, run + 1], evtNumList=[1000, 1000])
     main.add_module("RootOutput", outputFileName="MyInputFile_" + str(run) + ".root")

@@ -27,7 +27,7 @@ import sys
 
 
 def get_generated_pdg_code():
-    return 13
+    return int(sys.argv[1])
 
 
 def get_simulation_components():

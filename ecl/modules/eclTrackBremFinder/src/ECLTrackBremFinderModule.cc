@@ -6,33 +6,19 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <ecl/modules/eclTrackBremFinder/ECLTrackBremFinderModule.h>
-#include <ecl/modules/eclTrackBremFinder/BestMatchContainer.h>
-#include <ecl/modules/eclTrackBremFinder/BremFinding.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/geometry/ECLGeometryPar.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <tracking/dataobjects/ExtHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <framework/datastore/RelationVector.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Angle.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <set>
 
-#include <TMath.h>
-#include "../include/ECLTrackBremFinderModule.h"
-#include "../../../../genfit2/code2/core/include/AbsFitterInfo.h"
-#include "../../../../genfit2/code2/core/include/Exception.h"
+#include <ecl/modules/eclTrackBremFinder/ECLTrackBremFinderModule.h>
+#include <ecl/modules/eclTrackBremFinder/BestMatchContainer.h>
+#include <ecl/modules/eclTrackBremFinder/BremFindingMatchCompute.h>
 
-using namespace std;
 using namespace Belle2;
-using namespace ECL;
 
 REG_MODULE(ECLTrackBremFinder)
 
@@ -61,7 +47,6 @@ ECLTrackBremFinderModule::ECLTrackBremFinderModule() :
   addParam("angleCorrection", m_angleCorrection,
            "Shall the angle of the cluster be transformed into the coordinate system of the hits",
            m_angleCorrection);
-
 }
 
 void ECLTrackBremFinderModule::initialize()
@@ -150,6 +135,8 @@ void ECLTrackBremFinderModule::event()
       // the trackpoints direction
       genfit::MeasuredStateOnPlane outermostTrackPointFittedState = genfit::MeasuredStateOnPlane();
       genfit::MeasuredStateOnPlane innermostTrackPointFittedState = genfit::MeasuredStateOnPlane();
+
+      // todo: what is this ?
       double maxRho = 0, minRho = 16;
       bool outermostTrackPointWasSet = false, innermostTrackPointWasSet = false;
       for (auto& track_point : recoTrack->getHitPointsWithMeasurement()) {
@@ -180,23 +167,20 @@ void ECLTrackBremFinderModule::event()
           innermostTrackPointWasSet = true;
         }
 
-        BremFinding bremFinder = BremFinding(m_clusterAcceptanceFactor, cluster, fitted_state);
+        auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, fitted_state);
 
         if (m_angleCorrection) {
           bremFinder.setAngleCorrectionTrue();
         }
-        /*
-                bremFinder.setECLCluster(cluster);
-                bremFinder.setFitterInfo(fitter_info);
-                bremFinder.setClusterAcceptanceFactor(m_clusterAcceptanceFactor);
-        */
+
         if (bremFinder.isMatch()) {
           ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, track_point->getSortingParameter());
           matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
         }
       }
 
-      //Set a virtual hit at the edge of the cdc and check if the position matches  a cluster position
+      // todo: put in one method
+      // Set a virtual hit at the edge of the cdc and check if the position matches  a cluster position
       if (outermostTrackPointWasSet) {
         auto fitted_state = outermostTrackPointFittedState;
         try {
@@ -206,13 +190,14 @@ void ECLTrackBremFinderModule::event()
           continue;
         }
 
-        BremFinding bremFinder = BremFinding(m_clusterAcceptanceFactor, cluster, fitted_state);
+        auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, fitted_state);
         if (bremFinder.isMatch()) {
           ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, -2);
           matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
         }
       }
 
+      // Set a virtual point to the outer vxd casing
       if (outermostTrackPointWasSet) {
         auto fitted_state = outermostTrackPointFittedState;
         try {
@@ -222,7 +207,7 @@ void ECLTrackBremFinderModule::event()
           continue;
         }
 
-        BremFinding bremFinder = BremFinding(m_clusterAcceptanceFactor, cluster, fitted_state);
+        auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, fitted_state);
         if (bremFinder.isMatch()) {
           ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, -3);
           matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
@@ -239,7 +224,7 @@ void ECLTrackBremFinderModule::event()
           continue;
         }
 
-        BremFinding bremFinder = BremFinding(m_clusterAcceptanceFactor, cluster, fitted_state);
+        auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, fitted_state);
         if (bremFinder.isMatch()) {
           ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, -1);
           matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
@@ -251,21 +236,14 @@ void ECLTrackBremFinderModule::event()
       if (matchContainer.hasMatch()) {
 
         auto matchClustermSoP = matchContainer.getBestMatch();
-        /*
-                auto fitter_info = matchClustermSoP.second->getFitterInfo();
-                if (!fitter_info) {
-                  // not fitter info available for this hit
-                  continue;
-                }
-        */
-        auto fitted_state = std::get<1>(matchClustermSoP);
+        const auto fitted_state = std::get<1>(matchClustermSoP);
 
-        auto fitted_pos = fitted_state.getPos();
-        auto fitted_mom = fitted_state.getMom();
-        auto fitted_dir = fitted_state.getDir();
+        const auto fitted_pos = fitted_state.getPos();
+        const auto fitted_mom = fitted_state.getMom();
+        const auto fitted_dir = fitted_state.getDir();
 
-        auto hit_theta = fitted_mom.Theta();
-        auto hit_phi = fitted_mom.Phi();
+        const auto hit_theta = fitted_mom.Theta();
+        const auto hit_phi = fitted_mom.Phi();
 
         B2DEBUG(1, "Best Cluster" << std::endl
                 << " Cluster Phi=" << std::get<0>(matchClustermSoP)->getPhi() << " Theta=" << std::get<0>(matchClustermSoP)->getTheta()
@@ -277,14 +255,8 @@ void ECLTrackBremFinderModule::event()
         // add sorting parameter to relation, to get information about the place the photon was radiated
         primaryClusterOfTrack->addRelationTo(std::get<0>(matchClustermSoP), std::get<2>(matchClustermSoP));
 
-// newly created relation
-        auto thisShouldBePrimaryCluster = std::get<0>(matchClustermSoP)->getRelatedFrom<ECLCluster>();
-        B2DEBUG(1, "-> Relation setup " << (thisShouldBePrimaryCluster != nullptr));
-
       }
-
     }
-
   }
 }
 

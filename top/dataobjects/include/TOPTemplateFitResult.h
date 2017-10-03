@@ -82,15 +82,6 @@ namespace Belle2 {
      */
     void setRisingEdgeTime(double risingEdge) {m_risingEdgeTime = risingEdge;}
 
-
-    /**
-     *@brief Set parameters of used template function for later plotting.
-     *@param sigma
-     *@param alpha
-     *@param n
-     */
-    static void setTemplateParameters(float sigma, float alpha, float n);
-
     /**
      *Get rising edge in samples
      *@return rising edge in samples
@@ -127,31 +118,7 @@ namespace Belle2 {
      */
     double getChisquare() const {return m_chisquare;}
 
-    /**
-     * Get mean position of template function in samples
-     */
-    double getMean() const;
-
-    /**
-     * Get mean position of template function in ns
-     */
-    double getMeanTime() const;
-
-    /**
-     * Get value of template function in sample space
-     * @param position to evaluate template function
-     * @return value of template function
-     */
-    double getTemplateFunctionValue(double x) const;
-
   private:
-
-    /**
-     * Template is defined as crystal ball.
-     * @param position to evaluate crystal ball function
-     * @return value of crystal ball function
-     */
-    double crystalball(double x) const ;
 
     /**
      * Convert rising edge saved in short to double
@@ -166,10 +133,6 @@ namespace Belle2 {
     double m_amplitude;/**< amplitude from fit*/
     double m_chisquare;/**< chi square value of template fit */
     unsigned m_risingEdgeRaw;/**< template fit rising edge position received from FEE*/
-
-    static float s_templateSigma;/**< template gaus sigma */
-    static float s_templateAlpha;/**< template exponential tail position */
-    static float s_templateN;/**< template exponential decay constant */
 
     ClassDef(TOPTemplateFitResult, 2); /**< ClassDef */
   };

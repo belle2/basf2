@@ -13,7 +13,6 @@
 #include <framework/logging/Logger.h>
 
 #include <algorithm>
-#include <iostream>
 #include <math.h>
 
 using namespace Belle2;
@@ -64,13 +63,13 @@ void TOPTemplateFitter::InitializeTemplateFit()
 {
   s_templateSamples.clear();
   if (s_templateParameters.risingEdge < 0 || s_templateParameters.risingEdge > s_totalTemplateSamples) {
-    B2FATAL("mean of template function invalid!");
+    B2FATAL("rising edge of template function invalid!");
   }
 
   const auto* geo = TOPGeometryPar::Instance()->getGeometry();
   const auto& signalShape = geo->getSignalShape();
   const auto& tdc = geo->getNominalTDC();
-  double dt = tdc.getSampleWidth();
+  const double dt = tdc.getSampleWidth();
 
   for (double x = 0; x < s_totalTemplateSamples; x += 1. / s_templateResolution) {
     s_templateSamples.push_back(s_templateParameters.amplitude * signalShape.getValue((x - s_templateParameters.risingEdge)*dt));

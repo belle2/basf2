@@ -27,8 +27,8 @@ def add_tsim(path, SimulationMode=1, shortTracks=False, OpenFilter=False, Belle2
     add_cdc_trigger(path=path, SimulationMode=SimulationMode, shortTracks=shortTracks, thetaDef='avg', zDef='min')
     add_ecl_trigger(path)
     add_klm_trigger(path)
-    add_grl_trigger(path, SimulationMode, Belle2Phase)
-    add_gdl_trigger(path, SimulationMode, OpenFilter)
+    add_grl_trigger(path, SimulationMode)
+    add_gdl_trigger(path=path, SimulationMode=SimulationMode, OpenFilter=OpenFilter, Belle2Phase=Belle2Phase)
     EffCalculation(path)
     path.add_module('StatisticsSummary').set_name('Sum_TriggerSimulation')
 
@@ -49,6 +49,6 @@ def add_grl_gdl_tsim(path, SimulationMode=1, OpenFilter=False, Belle2Phase="Phas
     dataobjects produced in add_subdetector_trigger_simulation
     the parameters are the same as above
     """
-    add_grl_trigger(path, SimulationMode, Belle2Phase)
-    add_gdl_trigger(path, SimulationMode, OpenFilter)
+    add_grl_trigger(path, SimulationMode)
+    add_gdl_trigger(path, SimulationMode, OpenFilter, Belle2Phase)
     EffCalculation(path)

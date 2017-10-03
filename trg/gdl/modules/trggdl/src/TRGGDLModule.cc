@@ -46,7 +46,8 @@ namespace Belle2 {
       _configFilename("TRGGDLConfig.dat"),
       _simulationMode(1),
       _fastSimulationMode(0),
-      _firmwareSimulationMode(0)
+      _firmwareSimulationMode(0),
+      _Phase("Phase2")
   {
 
     string desc = "TRGGDLModule(" + version() + ")";
@@ -54,6 +55,7 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     addParam("DebugLevel", _debugLevel, "TRGGDL debug level", _debugLevel);
+    addParam("Belle2Phase", _Phase, "Phase2 or Phase3", _Phase);
     addParam("ConfigFile",
              _configFilename,
              "The filename of CDC trigger config file",
@@ -112,12 +114,14 @@ namespace Belle2 {
       _gdl = TRGGDL::getTRGGDL(cfn,
                                _simulationMode,
                                _fastSimulationMode,
-                               _firmwareSimulationMode);
+                               _firmwareSimulationMode,
+                               _Phase);
     } else if (cfn != _gdl->configFile()) {
       _gdl = TRGGDL::getTRGGDL(cfn,
                                _simulationMode,
                                _fastSimulationMode,
-                               _firmwareSimulationMode);
+                               _firmwareSimulationMode,
+                               _Phase);
     }
 
     if (TRGDebug::level()) {

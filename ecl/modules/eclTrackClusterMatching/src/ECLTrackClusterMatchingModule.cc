@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #include <ecl/modules/eclTrackClusterMatching/ECLTrackClusterMatchingModule.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/geometry/ECLGeometryPar.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -22,7 +20,6 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace ECL;
 
 REG_MODULE(ECLTrackClusterMatching)
 
@@ -65,8 +62,11 @@ void ECLTrackClusterMatchingModule::initialize()
   } else
     m_rootFilePtr = NULL;
 
+  TDirectory* oldDir = gDirectory;
+  m_rootFilePtr->cd();
   // initialize tree
   m_tree     = new TTree("m_tree", "ECL Track Cluster Matching Analysis tree");
+  oldDir->cd();
 
   m_tree->Branch("expNo", &m_iExperiment, "expNo/I");
   m_tree->Branch("runNo", &m_iRun, "runNo/I");
@@ -112,14 +112,18 @@ void ECLTrackClusterMatchingModule::event()
   for (const Track& track : tracks) {
 
     ECLCluster* cluster_best = nullptr;
-    double quality_tmp = 1000;
+    double quality_tmp = 1e6;
     // Find extrapolated track hits in the ECL, considering only hit points
     // that either are on the sphere, closest to or on radial direction of an
     // ECLCluster.
     for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
       if (!isECLHit(extHit)) continue;
-      m_errorPhi->push_back(extHit.getErrorPhi());
-      m_errorTheta->push_back(extHit.getErrorTheta());
+      double errorPhi = extHit.getErrorPhi();
+      if (errorPhi > 2 * M_PI) continue;
+      m_errorPhi->push_back(errorPhi);
+      double errorTheta = extHit.getErrorTheta();
+      if (errorTheta > M_PI) continue;
+      m_errorTheta->push_back(errorTheta);
       ECLCluster* eclCluster = extHit.getRelatedFrom<ECLCluster>();
       double deltaPhi = extHit.getPosition().Phi() - eclCluster->getPhi();
       m_deltaPhi->push_back(deltaPhi);
@@ -148,12 +152,16 @@ void ECLTrackClusterMatchingModule::endRun()
 
 void ECLTrackClusterMatchingModule::terminate()
 {
-
-  if (m_rootFilePtr != NULL) {
-    m_rootFilePtr->cd(); //important! without this the framework root I/O (SimpleOutput etc) could mix with the root I/O of this module
+  if (m_tree != NULL) {
+    TDirectory* oldDir = gDirectory;
+    if (m_rootFilePtr)
+      m_rootFilePtr->cd();
     m_tree->Write();
+    oldDir->cd();
   }
-
+  if (m_rootFilePtr != NULL) {
+    m_rootFilePtr->Close();
+  }
 }
 
 bool ECLTrackClusterMatchingModule::checkPionECLEnterID(const ExtHit& extHit) const
@@ -171,10 +179,10 @@ bool ECLTrackClusterMatchingModule::isECLHit(const ExtHit& extHit) const
   ExtHitStatus extHitStatus = extHit.getStatus();
   if (extHitStatus == EXT_ECLCROSS || extHitStatus == EXT_ECLDL || extHitStatus == EXT_ECLNEAR) return true;
   else return false;
-
 }
 
 double ECLTrackClusterMatchingModule::clusterQuality(const ExtHit& extHit, double deltaPhi, double deltaTheta) const
 {
-  return abs(deltaTheta * extHit.getErrorTheta() * extHit.getErrorTheta() + deltaPhi * extHit.getErrorPhi() * extHit.getErrorPhi());
+  return sqrt(deltaTheta * deltaTheta / (extHit.getErrorTheta() * extHit.getErrorTheta()) + deltaPhi * deltaPhi /
+              (extHit.getErrorPhi() * extHit.getErrorPhi()));
 }

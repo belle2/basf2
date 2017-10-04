@@ -14,6 +14,8 @@ using namespace Belle2;
 using namespace Calibration;
 namespace fs = boost::filesystem;
 
+const ExpRun CalibrationAlgorithmNew::m_allExpRun = make_pair(-1, -1);
+
 /// Checks if the PyObject can be converted to ExpRun
 bool CalibrationAlgorithmNew::checkPyExpRun(PyObject* pyObj)
 {
@@ -256,44 +258,20 @@ PyObject* CalibrationAlgorithmNew::getInputFileNames()
   return objInputFileNames;
 }
 
-vector<ExpRun> CalibrationAlgorithmNew::string2RunList(string list) const
+string CalibrationAlgorithmNew::getExpRunString(ExpRun& expRun) const
 {
-  vector<ExpRun> result;
-
-  if (list == "")
-    return result;
-
-  vector<string> runs;
-  boost::algorithm::split(runs, list, boost::is_any_of(","));
-
-  for (auto exprunstr : runs) {
-    vector<string> exprun;
-    boost::algorithm::split(exprun, exprunstr, boost::is_any_of("."));
-    if (exprun.size() != 2)
-      B2FATAL("Error in parsing object validity");
-    result.push_back(make_pair(stoi(exprun[0]), stoi(exprun[1])));
-  }
-  return result;
+  string expRunString;
+  expRunString += to_string(expRun.first);
+  expRunString += ".";
+  expRunString += to_string(expRun.second);
+  return expRunString;
 }
 
-string CalibrationAlgorithmNew::runList2String(vector<ExpRun>& list) const
+string CalibrationAlgorithmNew::getFullObjectPath(string name, ExpRun expRun) const
 {
-  string str("");
-  for (auto run : list) {
-    if (str != "")
-      str = str + ",";
-
-    str = str + to_string(run.first) + "." + to_string(run.second);
-  }
-  return str;
-}
-
-string CalibrationAlgorithmNew::runList2String(ExpRun run) const
-{
-  vector<ExpRun> runlist;
-  runlist.push_back(run);
-
-  return runList2String(runlist);
+  string dirName = getPrefix() + "/" + name;
+  string objName = name + "_" + getExpRunString(expRun);
+  return dirName + "/" + objName;
 }
 
 void CalibrationAlgorithmNew::saveCalibration(TObject* data, const string& name, const IntervalOfValidity& iov)
@@ -351,7 +329,7 @@ RunRangeNew CalibrationAlgorithmNew::getRunRangeFromAllData() const
   RunRangeNew runRange;
   RunRangeNew* runRangeOther;
   // Construct the TDirectory name where we expect our objects to be
-  string runRangeObjName(m_prefix + "/" + RUN_RANGE_OBJ_NAME);
+  string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
   for (const auto& fileName : m_inputFileNames) {
     //Open TFile to get the objects
     unique_ptr<TFile> f;
@@ -372,7 +350,7 @@ string CalibrationAlgorithmNew::getGranularityFromData() const
   // Save TDirectory to change back at the end
   TDirectory* dir = gDirectory;
   RunRangeNew* runRange;
-  string runRangeObjName(m_prefix + "/" + RUN_RANGE_OBJ_NAME);
+  string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
   // We only check the first file
   string fileName = m_inputFileNames[0];
   unique_ptr<TFile> f;
@@ -383,17 +361,13 @@ string CalibrationAlgorithmNew::getGranularityFromData() const
   return granularity;
 }
 
-shared_ptr<TChain> CalibrationAlgorithmNew::getTreeObject(const string& name, const vector<ExpRun>& requestedRuns) const
+shared_ptr<TChain> CalibrationAlgorithmNew::getTreeObjectPtr(const string& name, const vector<ExpRun>& requestedRuns) const
 {
   auto chain = make_shared<TChain>(name.c_str());
   chain->SetDirectory(0);
   // Construct the TDirectory names where we expect our objects to be
-  string fullName(m_prefix + "/" + name);
-  string runRangeObjName(m_prefix + "/" + RUN_RANGE_OBJ_NAME);
-  RunRangeNew runRangeRequested;
-  for (auto expRun : requestedRuns) {
-    runRangeRequested.add(expRun.first, expRun.second);
-  }
+  string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
+  RunRangeNew runRangeRequested(requestedRuns);
   if (strcmp(getGranularity().c_str(), "run") == 0) {
     RunRangeNew* runRangeData;
     for (const auto& fileName : m_inputFileNames) {
@@ -407,10 +381,7 @@ shared_ptr<TChain> CalibrationAlgorithmNew::getTreeObject(const string& name, co
         for (auto expRunData : runRangeData->getExpRunSet()) {
           for (auto expRunRequested : requestedRuns) {
             if (expRunData == expRunRequested) {
-              string objName = fullName + "/" + name + "_";
-              objName += std::to_string(expRunData.first);
-              objName += ".";
-              objName += std::to_string(expRunData.second);
+              string objName = getFullObjectPath(name, expRunData);
               chain->Add((fileName + "/" + objName).c_str());
             }
           }
@@ -421,7 +392,8 @@ shared_ptr<TChain> CalibrationAlgorithmNew::getTreeObject(const string& name, co
       }
     }
   } else {
-    string objName = fullName + "/" + name + "_-1.-1";
+    ExpRun allGranExpRun = getAllGranularityExpRun();
+    string objName = getFullObjectPath(name, allGranExpRun);
     for (const auto& fileName : m_inputFileNames) {
       chain->Add((fileName + "/" + objName).c_str());
     }

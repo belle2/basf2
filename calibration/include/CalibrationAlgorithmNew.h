@@ -182,36 +182,32 @@ namespace Belle2 {
     void setInputFileNames(std::vector<std::string> inputFileNames);
 
     /// Get the input file names used for this algorithm as a STL vector
-    std::vector<std::string> getInputFileNamesCPP() {return m_inputFileNames;}
+    std::vector<std::string> getVecInputFileNames() {return m_inputFileNames;}
 
     /// Get TTree calibration data object by name and list of runs, use TChain to avoid huge memory usage and merging
-    std::shared_ptr<TChain> getTreeObject(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const;
+    std::shared_ptr<TChain> getTreeObjectPtr(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const;
 
     /// Get calibration data object by name and list of runs, the Merge function will be called to generate the overall object
     template<class T>
-    std::shared_ptr<T> getObject(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const
+    std::shared_ptr<T> getObjectPtr(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const
     {
       T* wrappedObj = new T();
+      B2DEBUG(100, "Getting " << wrappedObj->ClassName() << " calibration object: " << name);
       wrappedObj->SetDirectory(0);
-      auto mergedObj = std::shared_ptr<T>(wrappedObj);
+      auto mergedObjPtr = std::shared_ptr<T>(wrappedObj);
       bool mergedEmpty = true;
-      mergedObj->SetName(name.c_str());
+      mergedObjPtr->SetName(name.c_str());
       TDirectory* dir = gDirectory;
 
       // Technically we could grab all the objects from all files, add to list and then merge at the end.
-      // But I prefer the more memory efficient (cpu wasting) way of merging with all objects
-      // in a file before moving on to the next one.
+      // But I prefer the more memory efficient way of merging with all objects
+      // in a file before moving on to the next one, just in case TDirectory stuff screws us.
       TList list;
       list.SetOwner(false);
 
       // Construct the TDirectory names where we expect our objects to be
-      std::string fullName(m_prefix + "/" + name);
-      std::string runRangeObjName(m_prefix + "/" + Calibration::RUN_RANGE_OBJ_NAME);
-      RunRangeNew runRangeRequested;
-      for (auto expRun : requestedRuns) {
-        runRangeRequested.add(expRun.first, expRun.second);
-      }
-
+      std::string runRangeObjName(getPrefix() + "/" + Calibration::RUN_RANGE_OBJ_NAME);
+      RunRangeNew runRangeRequested(requestedRuns);
       RunRangeNew* runRangeData;
       for (const auto& fileName : m_inputFileNames) {
         //Open TFile to get the objects
@@ -226,14 +222,11 @@ namespace Belle2 {
             for (auto expRunData : runRangeData->getExpRunSet()) {
               for (auto expRunRequested : requestedRuns) {
                 if (expRunData == expRunRequested) {
-                  std::string objName = fullName + "/" + name + "_";
-                  objName += std::to_string(expRunData.first);
-                  objName += ".";
-                  objName += std::to_string(expRunData.second);
+                  std::string objName = getFullObjectPath(name, expRunData);
                   TObject* objOther = f->Get(objName.c_str());
                   if (mergedEmpty) {
-                    objOther->Copy(*(mergedObj.get()));
-                    mergedObj->SetDirectory(0);
+                    objOther->Copy(*(mergedObjPtr.get()));
+                    mergedObjPtr->SetDirectory(0);
                     mergedEmpty = false;
                   } else {
                     list.Add(objOther);
@@ -246,40 +239,43 @@ namespace Belle2 {
             continue;
           }
         } else {
-          std::string objName = fullName + "/" + name + "_-1.-1";
+          Calibration::ExpRun allGranExpRun = getAllGranularityExpRun();
+          std::string objName = getFullObjectPath(name, allGranExpRun);
           TObject* objOther = f->Get(objName.c_str());
           if (mergedEmpty) {
-            objOther->Copy(*(mergedObj.get()));
-            mergedObj->SetDirectory(0);
+            objOther->Copy(*(mergedObjPtr.get()));
+            mergedObjPtr->SetDirectory(0);
             mergedEmpty = false;
           } else {
             list.Add(objOther);
           }
         }
-        mergedObj->Merge(&list);
+        mergedObjPtr->Merge(&list);
         list.Clear();
       }
       dir->cd();
-      return mergedObj;
+      return mergedObjPtr;
     }
 
-    /** Get calibration data object (for all runs the calibration is requested for)
+    /** Get TTree calibration data object (for all runs the calibration is requested for)
      *  This function will only work during or after execute() has been called once.
+     *  The returned shared_ptr is actually holding a TChain object cast as a TTree.
      */
-    std::shared_ptr<TTree> getObject(std::string name) const
+    std::shared_ptr<TTree> getObjectPtr(std::string name) const
     {
+      B2DEBUG(100, "Getting TTree calibration object: " << name);
       // We cheekily cast the TChain to TTree so that the template works nicely
       // Hopefully this doesn't cause issues if people do low level stuff to the tree...
-      return std::dynamic_pointer_cast<TTree>(getTreeObject(name, m_data.getRequestedRuns()));
+      return std::dynamic_pointer_cast<TTree>(getTreeObjectPtr(name, m_data.getRequestedRuns()));
     }
 
     /** Get calibration data object (for all runs the calibration is requested for)
      *  This function will only work during or after execute() has been called once.
      */
     template<class T>
-    std::shared_ptr<T> getObject(std::string name) const
+    std::shared_ptr<T> getObjectPtr(std::string name) const
     {
-      return getObject<T>(name, m_data.getRequestedRuns());
+      return getObjectPtr<T>(name, m_data.getRequestedRuns());
     }
 
 //    // Helpers ---------------- Database storage -----
@@ -301,14 +297,17 @@ namespace Belle2 {
     /// Set algorithm description (in constructor)
     void setDescription(std::string description) {m_description = description;}
 
+    Calibration::ExpRun getAllGranularityExpRun() const {return m_allExpRun;}
+
   private:
 
-    /// Get string repr. of (exp,run) for CalibRootObj
-    std::string runList2String(Calibration::ExpRun run) const ;
-    /// Get string repr. of list((exp,run) for CalibRootObj
-    std::string runList2String(std::vector<Calibration::ExpRun>& list) const;
-    /// Get list((exp,run)) from string repr. in CalibRootObj
-    std::vector<Calibration::ExpRun> string2RunList(std::string list) const;
+    static const Calibration::ExpRun m_allExpRun;
+
+    /// Gets the "exp.run" string repr. of (exp,run)
+    std::string getExpRunString(Calibration::ExpRun& expRun) const;
+
+    /// constructs the full TDirectory + Key name of an object in a TFile based on its name and exprun
+    std::string getFullObjectPath(std::string name, Calibration::ExpRun expRun) const;
 
     /// List of input files to the Algorithm, will initially be user defined but then gets the wildcards expanded during execute()
     std::vector<std::string> m_inputFileNames;

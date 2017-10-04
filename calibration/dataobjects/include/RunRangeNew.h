@@ -17,6 +17,14 @@ namespace Belle2 {
     /// Constructor
     RunRangeNew() : TNamed() {};
 
+    /// Constructor from vector of ExpRun objects
+    RunRangeNew(std::vector<Calibration::ExpRun> expRuns) : TNamed()
+    {
+      for (auto expRun : expRuns) {
+        this->add(expRun.first, expRun.second);
+      }
+    };
+
     /// Destructor
     virtual ~RunRangeNew()
     {

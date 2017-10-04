@@ -28,8 +28,8 @@ CalibrationAlgorithmNew::EResult TestCalibrationAlgorithm::calibrate()
 {
   // Pulling in data from collector output. It now returns shared_ptr<T> so the underlying pointer
   // will delete itself automatically at the end of this scope unless you do something
-  auto ttree = getObject<TTree>("MyTree");
-  auto hist = getObject<TH1F>("MyHisto");
+  auto ttree = getObjectPtr<TTree>("MyTree");
+  auto hist = getObjectPtr<TH1F>("MyHisto");
   B2INFO("Number of Entries in MyTree was " << ttree->GetEntries());
   B2INFO("Number of Entries in MyHisto was " << hist->GetEntries());
   B2INFO("Mean of MyHisto was " << hist->GetMean());

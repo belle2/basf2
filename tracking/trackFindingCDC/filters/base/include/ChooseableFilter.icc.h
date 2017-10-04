@@ -108,5 +108,8 @@ namespace Belle2 {
       : Super(std::make_unique<AFilterFactory>(), filterName)
     {
     }
+
+    template <class AFilterFactory>
+    ChooseableFilter<AFilterFactory>::~ChooseableFilter() = default;
   }
 }

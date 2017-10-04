@@ -100,6 +100,9 @@ namespace Belle2 {
 
       /// Constructor of the chooseable filter taking the default filter name
       ChooseableFilter(const std::string& filterName);
+
+      /// Default destructor
+      ~ChooseableFilter();
     };
   }
 }

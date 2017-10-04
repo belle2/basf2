@@ -185,21 +185,24 @@ namespace Belle2 {
     std::vector<std::string> getVecInputFileNames() {return m_inputFileNames;}
 
     /// Get TTree calibration data object by name and list of runs, use TChain to avoid huge memory usage and merging
-    std::shared_ptr<TTree> getTreeObjectPtr(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const;
+    std::unique_ptr<TTree> getTreeObjectPtr(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const;
 
     /** Get TTree calibration data object by name, use TChain to avoid huge memory usage and merging
      *  This will only work properly after or during an execute()->calibrate() call.
+     *  We pass out a unique_ptr to make it obvious that the caller owns the object.
      */
-    std::shared_ptr<TTree> getTreeObjectPtr(const std::string& name) const {return getTreeObjectPtr(name, m_data.getRequestedRuns());}
+    std::unique_ptr<TTree> getTreeObjectPtr(const std::string& name) const
+    {
+      return std::move(getTreeObjectPtr(name, m_data.getRequestedRuns()));
+    }
 
     /// Get calibration data object by name and list of runs, the Merge function will be called to generate the overall object
     template<class T>
-    std::shared_ptr<T> getObjectPtr(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const
+    std::unique_ptr<T> getObjectPtr(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const
     {
-      T* wrappedObj = new T();
-      B2DEBUG(100, "Getting " << wrappedObj->ClassName() << " calibration object: " << name);
-      wrappedObj->SetDirectory(0);
-      auto mergedObjPtr = std::shared_ptr<T>(wrappedObj);
+      T* mergedObjPtr = new T();
+      B2DEBUG(100, "Getting " << mergedObjPtr->ClassName() << " calibration object: " << name);
+      mergedObjPtr->SetDirectory(0);
       bool mergedEmpty = true;
       mergedObjPtr->SetName(name.c_str());
       TDirectory* dir = gDirectory;
@@ -231,7 +234,7 @@ namespace Belle2 {
                   B2DEBUG(100, "Adding " << objName << " from file " << fileName);
                   TObject* objOther = f->Get(objName.c_str());
                   if (mergedEmpty) {
-                    objOther->Copy(*(mergedObjPtr.get()));
+                    objOther->Copy(*mergedObjPtr);
                     mergedObjPtr->SetDirectory(0);
                     mergedEmpty = false;
                   } else {
@@ -250,7 +253,7 @@ namespace Belle2 {
           B2DEBUG(100, "Adding " << objName << " from file " << fileName);
           TObject* objOther = f->Get(objName.c_str());
           if (mergedEmpty) {
-            objOther->Copy(*(mergedObjPtr.get()));
+            objOther->Copy(*mergedObjPtr);
             mergedObjPtr->SetDirectory(0);
             mergedEmpty = false;
           } else {
@@ -261,14 +264,18 @@ namespace Belle2 {
         list.Clear();
       }
       dir->cd();
-      return mergedObjPtr;
+      std::unique_ptr<T> objOutput(mergedObjPtr);
+      return std::move(objOutput);
     }
 
     /** Get calibration data object (for all runs the calibration is requested for)
      *  This function will only work during or after execute() has been called once.
      */
     template<class T>
-    std::shared_ptr<T> getObjectPtr(std::string name) const {return getObjectPtr<T>(name, m_data.getRequestedRuns());}
+    std::unique_ptr<T> getObjectPtr(std::string name) const
+    {
+      return std::move(getObjectPtr<T>(name, m_data.getRequestedRuns()));
+    }
 
 //    // Helpers ---------------- Database storage -----
 //

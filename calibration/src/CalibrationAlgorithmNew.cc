@@ -361,10 +361,12 @@ string CalibrationAlgorithmNew::getGranularityFromData() const
   return granularity;
 }
 
-shared_ptr<TTree> CalibrationAlgorithmNew::getTreeObjectPtr(const string& name, const vector<ExpRun>& requestedRuns) const
+unique_ptr<TTree> CalibrationAlgorithmNew::getTreeObjectPtr(const string& name, const vector<ExpRun>& requestedRuns) const
 {
   B2DEBUG(100, "Getting TTree calibration object: " << name);
-  auto chain = make_shared<TChain>(name.c_str());
+  // We cheekily cast the TChain to TTree so that the user never knows
+  // Hopefully this doesn't cause issues if people do low level stuff to the tree...
+  TChain* chain = new TChain(name.c_str());
   chain->SetDirectory(0);
   // Construct the TDirectory names where we expect our objects to be
   string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
@@ -401,7 +403,6 @@ shared_ptr<TTree> CalibrationAlgorithmNew::getTreeObjectPtr(const string& name, 
       chain->Add((fileName + "/" + objName).c_str());
     }
   }
-  // We cheekily cast the TChain to TTree so that the user never knows
-  // Hopefully this doesn't cause issues if people do low level stuff to the tree...
-  return std::dynamic_pointer_cast<TTree>(chain);
+  unique_ptr<TTree> tree(chain);
+  return move(tree);
 }

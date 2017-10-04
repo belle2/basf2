@@ -88,7 +88,12 @@ namespace Belle2 {
     template<class AState>
     auto operator()(const AState* state, EnableIfCDCWireHit<AState>* = 0) const
     {
-      return state->getHit()->getWireID();
+      const auto* hit = state->getHit();
+      if (hit) {
+        return hit->getWireID();
+      } else {
+        return WireID();
+      }
     }
   };
 

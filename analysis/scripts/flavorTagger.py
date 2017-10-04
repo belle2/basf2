@@ -497,6 +497,8 @@ def trackLevelTeacher(weightFiles='B2JpsiKs_mu'):
     Trains all categories at track level except KaonPion, MaximumPstar and FSC which are only at the event level.
     """
 
+    B2INFO('TRACK LEVEL TEACHER')
+
     ReadyMethods = 0
 
     for (particleList, category) in trackLevelParticleLists:
@@ -639,8 +641,6 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu'):
     """
 
     B2INFO('EVENT LEVEL TEACHER')
-    if not Belle2.FileSystem.findFile(filesDirectory):
-        B2FATAL('flavorTagger: THE NEEDED DIRECTORY "./FlavorTagging/TrainedMethods" DOES NOT EXIST!')
 
     ReadyMethods = 0
 
@@ -1051,14 +1051,14 @@ def flavorTagger(
     # Directory where the weights of the trained Methods are saved
     # workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'
 
-    if not Belle2.FileSystem.findFile(workingDirectory):
+    if not Belle2.FileSystem.findFile(workingDirectory, True):
         B2FATAL('flavorTagger: THE GIVEN WORKING DIRECTORY "' + workingDirectory + '" DOES NOT EXIST! PLEASE SPECIFY A VALID PATH.')
 
     if mode == 'Sampler' or (mode == 'Expert' and downloadFromDatabaseIfNotfound):
-        if not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging'):
+        if not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging', True):
             os.mkdir(workingDirectory + '/FlavorTagging')
             os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
-        elif not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging/TrainedMethods'):
+        elif not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging/TrainedMethods', True):
             os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
 
     global filesDirectory

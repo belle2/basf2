@@ -30,7 +30,7 @@ void compare2Tracks(bool draw_sim =false, TString sCharge="all"){
   int ndfmin=25;
   double D0min = 5;
   int nbin = floor(180/binWidth);
-  string filename = "output_3955-4005/output_*.root";
+  string filename = "output/output_*.root";
   //Root file contain histograms for compare with this results
   //TString result4Compare = "result_sim.root";
   TString result4Compare = "result_July.root";

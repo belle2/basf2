@@ -193,13 +193,21 @@ else:
     print 'Aborted because of unknown build option:', option
     Exit(1)
 
-
 # allow overriding some things from command line (e.g. to enable scan-build)
 override_from_environment = ['CC', 'CXX', 'LD']
 for v in override_from_environment:
     if v in os.environ:
         print "Note: Overriding variable %s ('%s') from environment ($%s='%s')." % (v, global_env[v], v, os.environ[v])
         global_env[v] = os.environ[v]
+
+if os.environ.get("BELLE2_USE_CCACHE", "no").lower() in ["yes", "true", "on", "1"]:
+    print "Note: Using ccache to memorize the build."
+    global_env["CC"] = "ccache " + global_env["CC"]
+    global_env["CXX"] = "ccache " + global_env["CXX"]
+    global_env["ENV"]["CCACHE_BASEDIR"] = Dir("#.").abspath
+    # Note :
+    # ccache can take a prefix commands with CCACHE_PREFIX like e.g. time
+    # It may also replace the compiler with CCACHE_CC for other tools
 
 # central release
 repository = None

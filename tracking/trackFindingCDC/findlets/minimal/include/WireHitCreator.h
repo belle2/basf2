@@ -13,20 +13,20 @@
 #include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+#include <tracking/trackFindingCDC/topology/EWirePosition.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
-
-#include <cdc/geometry/CDCGeometryPar.h>
-#include <cdc/dataobjects/ADCCountTranslatorBase.h>
-#include <cdc/dataobjects/TDCCountTranslatorBase.h>
 
 #include <vector>
 #include <tuple>
 #include <string>
+#include <memory>
 
 namespace Belle2 {
-  class ModuleParamList;
-
+  namespace CDC {
+    class TDCCountTranslatorBase;
+    class ADCCountTranslatorBase;
+  }
   namespace TrackFindingCDC {
     class CDCWireHit;
 
@@ -41,6 +41,12 @@ namespace Belle2 {
       using Super = Findlet<CDCWireHit>;
 
     public:
+      /// Default constructor
+      WireHitCreator();
+
+      /// Default destructor
+      ~WireHitCreator();
+
       /// Short description of the findlet
       std::string getDescription() final;
 
@@ -58,7 +64,7 @@ namespace Belle2 {
 
     private:
       /// Parameter : Geometry set to be used. Either "base", "misalign" or " aligned"
-      std::string m_param_wirePosSet = "base";
+      std::string m_param_wirePosition = "base";
 
       /// Parameter : Switch to deactivate the sag of the wires for the concerns of the track finders.
       bool m_param_ignoreWireSag = false;
@@ -77,7 +83,7 @@ namespace Belle2 {
 
     private: // Prepared variables
       /// Geometry set to be used.
-      CDC::CDCGeometryPar::EWirePosition m_wirePosSet = CDC::CDCGeometryPar::c_Base;
+      EWirePosition m_wirePosition = EWirePosition::c_Base;
 
       /// Method for the initial time of flight estimation
       EPreferredDirection m_flightTimeEstimation = EPreferredDirection::c_None;
@@ -90,10 +96,10 @@ namespace Belle2 {
 
     private: // Translators
       /// TDC Count translator to be used to calculate the initial dirft length estiamtes
-      std::unique_ptr<CDC::TDCCountTranslatorBase> m_tdcCountTranslator = nullptr;
+      std::unique_ptr<CDC::TDCCountTranslatorBase> m_tdcCountTranslator;
 
       /// ADC Count translator to be used to calculate the charge deposit in the drift cell
-      std::unique_ptr<CDC::ADCCountTranslatorBase> m_adcCountTranslator = nullptr;
+      std::unique_ptr<CDC::ADCCountTranslatorBase> m_adcCountTranslator;
     };
   }
 }

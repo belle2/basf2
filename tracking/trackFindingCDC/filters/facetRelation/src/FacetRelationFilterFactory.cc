@@ -17,11 +17,15 @@
 #include <tracking/trackFindingCDC/filters/facetRelation/UnionRecordingFacetRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/facetRelation/MVAFacetRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::FilterFactory<BaseFacetRelationFilter>;
 
 FacetRelationFilterFactory::FacetRelationFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

@@ -11,17 +11,18 @@
 
 #include <tracking/trackFindingCDC/filters/segmentTripleRelation/BaseSegmentTripleRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTriple/MCSegmentTripleFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegmentTriple;
+
     /// Class filtering the neighborhood of segment triples with monte carlo information
-    class MCSegmentTripleRelationFilter:
-      public MCSymmetricFilterMixin<BaseSegmentTripleRelationFilter > {
+    class MCSegmentTripleRelationFilter : public MCSymmetric<BaseSegmentTripleRelationFilter> {
 
     private:
       /// Type of the super class
-      using Super = MCSymmetricFilterMixin<BaseSegmentTripleRelationFilter >;
+      using Super = MCSymmetric<BaseSegmentTripleRelationFilter>;
 
     public:
       /** Constructor. */

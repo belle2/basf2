@@ -10,20 +10,21 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/MCAxialSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
+
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.dcl.h>
+
 #include <tracking/trackFindingCDC/filters/segmentTriple/BaseSegmentTripleFilter.h>
-
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegmentTriple;
+
     /// Filter for the constuction of segment triples based on monte carlo information
-    class MCSegmentTripleFilter  : public MCSymmetricFilterMixin<Filter<CDCSegmentTriple> > {
+    class MCSegmentTripleFilter  : public MCSymmetric<BaseSegmentTripleFilter> {
 
     private:
       /// Type of the super class
-      using Super = MCSymmetricFilterMixin<Filter<CDCSegmentTriple> >;
+      using Super = MCSymmetric<BaseSegmentTripleFilter>;
 
     public:
       /// Constructor initializing the symmetry flag.

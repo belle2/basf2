@@ -9,6 +9,10 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <ostream>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -32,4 +36,10 @@ ParameterLine2D ParameterLine2D::touchingCircles(const Vector2D& fromCenter,
   toPos += toCenter;
 
   return ParameterLine2D::throughPoints(fromPos, toPos);
+}
+
+std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const ParameterLine2D& line)
+{
+  output << "ParameterLine2D(" << line.support() << "," << line.tangential() << ")";
+  return output;
 }

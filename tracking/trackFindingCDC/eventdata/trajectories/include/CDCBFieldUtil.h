@@ -9,15 +9,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
-
 #include <tracking/trackFindingCDC/numerics/ERotation.h>
-#include <cmath>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
 
 namespace Belle2 {
-
   namespace TrackFindingCDC {
+    class Vector3D;
+    class Vector2D;
 
     /// Helper functions to interact with the magnetic field
     class CDCBFieldUtil {
@@ -28,11 +26,14 @@ namespace Belle2 {
       /// Getter for the sign of the magnetic field in z direction
       static ESign getBFieldZSign();
 
+      /// Getter for the signed magnetic field stength in z direction at the origin ( in Tesla )
+      static double getBFieldZ();
+
       /// Getter for the signed magnetic field stength in z direction ( in Tesla )
       static double getBFieldZ(const Vector2D& pos2D);
 
       /// Getter for the signed magnetic field stength in z direction ( in Tesla )
-      static double getBFieldZ(const Vector3D& pos3D = Vector3D(0.0, 0.0, 0.0));
+      static double getBFieldZ(const Vector3D& pos3D);
 
       /// Translater from magnetic field strength in Tesla to the alpha value.
       static double getAlphaFromBField(double bField);

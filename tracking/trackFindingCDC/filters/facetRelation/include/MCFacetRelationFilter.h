@@ -13,18 +13,18 @@
 
 #include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCFacet;
 
     /// Class filtering the neighborhood of facets with monte carlo information
-    class MCFacetRelationFilter : public MCSymmetricFilterMixin<BaseFacetRelationFilter> {
+    class MCFacetRelationFilter : public MCSymmetric<BaseFacetRelationFilter> {
 
     private:
       /// Type of the super class
-      using Super = MCSymmetricFilterMixin<BaseFacetRelationFilter>;
+      using Super = MCSymmetric<BaseFacetRelationFilter>;
 
     public:
       /**

@@ -10,25 +10,28 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/BaseAxialSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
+
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
-    class MCAxialSegmentPairFilter:
-      public MCSymmetricFilterMixin<Filter<CDCAxialSegmentPair> > {
+    class MCAxialSegmentPairFilter : public MCSymmetric<BaseAxialSegmentPairFilter> {
 
     private:
       /// Type of the super class
-      using Super = MCSymmetricFilterMixin<Filter<CDCAxialSegmentPair> >;
+      using Super = MCSymmetric<BaseAxialSegmentPairFilter>;
 
     public:
       /// Constructor
       explicit MCAxialSegmentPairFilter(bool allowReverse = true);
 
+      /// Default destructor
+      ~MCAxialSegmentPairFilter();
+
       /// Checks if a pair of axial segments is a good combination
-      Weight operator()(const Belle2::TrackFindingCDC::CDCAxialSegmentPair& axialSegmentPair) final;
+      Weight operator()(const CDCAxialSegmentPair& axialSegmentPair) final;
     };
 
   }

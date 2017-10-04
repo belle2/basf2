@@ -9,29 +9,16 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
+
 #include <tracking/trackFindingCDC/utilities/EnableIf.h>
 
-#include <boost/optional.hpp>
-
-#include <iterator>
-#include <functional>
 #include <type_traits>
 #include <utility>
 #include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    /// Tag class to facilitate marking of class as a functor in the sense of this code
-    struct FunctorTag {
-    };
-
-    /// Test whether a given class is a functor
-    template <class T>
-    constexpr bool isFunctor()
-    {
-      return std::is_convertible<T, FunctorTag>::value;
-    }
 
     /// Generic identity functor.
     struct Id {
@@ -256,7 +243,7 @@ namespace Belle2 {
     };
 
     /// Meta-functor that discards any return value that the given functor emits
-    template <int I, class AFunctor = Id>
+    template <class AFunctor = Id>
     using VoidOf = Composition<Void, AFunctor>;
 
     /// Meta-functor that calles the given functor in case the call works - otherwise do nothing
@@ -549,47 +536,5 @@ namespace Belle2 {
 
     // ******************** Other operators are left as exercise ********************
 
-
-    /// Adapter of a category function to find the common category of several objects
-    template <class AFunctor>
-    struct Common {
-
-    private:
-      /// Memory for the nested functor
-      AFunctor m_functor;
-
-    public:
-      /**
-       *  Returns the common category value of a range.
-       *
-       *  In case the category value differ between the values return empty optional.
-       */
-      template <class Ts, class Category = decltype(m_functor(*std::declval<Ts>().begin()))>
-      boost::optional<Category> operator()(const Ts& ts) const
-      {
-        auto it = std::begin(ts);
-        auto itEnd = std::end(ts);
-        if (it == itEnd) return {}; // empty case
-        Category category = m_functor(*it);
-        for (; it != itEnd; ++it) {
-          if (category != m_functor(*it)) return {};
-        }
-        return boost::make_optional(category);
-      }
-
-      /**
-       *  Returns the common category of two values.
-       *
-       *  In case the category value differ between the values return empty optional
-       */
-      template<class T1, class T2, class Category = decltype(m_functor(std::declval<T1>()))>
-      boost::optional<Category> operator()(const T1& t1, const T2& t2) const
-      {
-        Category cat1 = m_functor(t1);
-        Category cat2 = m_functor(t2);
-        if (cat1 == cat2) return boost::make_optional(cat1);
-        return {};
-      }
-    };
   }
 }

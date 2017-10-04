@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/filters/wireHitRelation/SecondaryWireHitRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/wireHitRelation/WholeWireHitRelationFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
@@ -19,7 +19,6 @@
 #include <tracking/trackFindingCDC/ca/Clusterizer.h>
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
-#include <boost/range/adaptor/transformed.hpp>
 #include <vector>
 #include <string>
 
@@ -27,7 +26,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Refines the clustering of wire hits from  clusters to clusters
-    template <class AWireHitRelationFilter = SecondaryWireHitRelationFilter>
+    template <class AWireHitRelationFilter = WholeWireHitRelationFilter>
     class ClusterCreator : public Findlet<CDCWireHit&, CDCWireHitCluster> {
 
     private:
@@ -59,8 +58,14 @@ namespace Belle2 {
         B2ASSERT("Expect wire hit neighborhood to be symmetric ",
         WeightedRelationUtil<CDCWireHit>::areSymmetric(m_wireHitRelations));
 
-        auto ptrWireHits =
-        inputWireHits | boost::adaptors::transformed(&std::addressof<CDCWireHit>);
+        // Obtain the wire hits as pointers.
+        std::vector<CDCWireHit*> ptrWireHits;
+        ptrWireHits.reserve(inputWireHits.size());
+        for (CDCWireHit& wireHit : inputWireHits)
+        {
+          ptrWireHits.push_back(&wireHit);
+        }
+
         WeightedNeighborhood<CDCWireHit> wireHitNeighborhood(m_wireHitRelations);
         m_wirehitClusterizer.createFromPointers(ptrWireHits, wireHitNeighborhood, outputClusters);
       }

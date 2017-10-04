@@ -25,10 +25,13 @@
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+WireHitCreator::WireHitCreator() = default;
+WireHitCreator::~WireHitCreator() = default;
 
 std::string WireHitCreator::getDescription()
 {
@@ -38,11 +41,11 @@ std::string WireHitCreator::getDescription()
 
 void WireHitCreator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "wirePosSet"),
-                                m_param_wirePosSet,
+  moduleParamList->addParameter(prefixed(prefix, "wirePosition"),
+                                m_param_wirePosition,
                                 "Set of geometry parameters to be used in the track finding. "
                                 "Either 'base', 'misaligned' or 'aligned'.",
-                                m_param_wirePosSet);
+                                m_param_wirePosition);
 
   moduleParamList->addParameter(prefixed(prefix, "ignoreWireSag"),
                                 m_param_ignoreWireSag,
@@ -85,14 +88,14 @@ void WireHitCreator::initialize()
   // Create the wires and layers once during initialisation
   CDCWireTopology::getInstance();
 
-  if (m_param_wirePosSet == "base") {
-    m_wirePosSet = CDC::CDCGeometryPar::c_Base;
-  } else if (m_param_wirePosSet == "misaligned") {
-    m_wirePosSet = CDC::CDCGeometryPar::c_Misaligned;
-  } else if (m_param_wirePosSet == "aligned") {
-    m_wirePosSet = CDC::CDCGeometryPar::c_Aligned;
+  if (m_param_wirePosition == "base") {
+    m_wirePosition = EWirePosition::c_Base;
+  } else if (m_param_wirePosition == "misaligned") {
+    m_wirePosition = EWirePosition::c_Misaligned;
+  } else if (m_param_wirePosition == "aligned") {
+    m_wirePosition = EWirePosition::c_Aligned;
   } else {
-    B2ERROR("Received unknown wirePosSet " << m_param_wirePosSet);
+    B2ERROR("Received unknown wirePosition " << m_param_wirePosition);
   }
 
   m_tdcCountTranslator.reset(new CDC::RealisticTDCCountTranslator);
@@ -132,7 +135,7 @@ void WireHitCreator::initialize()
 void WireHitCreator::beginRun()
 {
   CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
-  wireTopology.reinitialize(m_wirePosSet, m_param_ignoreWireSag);
+  wireTopology.reinitialize(m_wirePosition, m_param_ignoreWireSag);
 }
 
 void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)

@@ -9,12 +9,18 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/MCSegmentPairRelationFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.icc.h>
+
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-MCSegmentPairRelationFilter::MCSegmentPairRelationFilter(bool allowReverse) :
-  Super(allowReverse),
-  m_mcSegmentPairFilter(allowReverse)
+template class TrackFindingCDC::MCSymmetric<BaseSegmentPairRelationFilter>;
+
+MCSegmentPairRelationFilter::MCSegmentPairRelationFilter(bool allowReverse)
+  : Super(allowReverse)
+  , m_mcSegmentPairFilter(allowReverse)
 {
   this->addProcessingSignalListener(&m_mcSegmentPairFilter);
 }

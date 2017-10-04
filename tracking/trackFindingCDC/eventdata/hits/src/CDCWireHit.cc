@@ -7,14 +7,32 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <cdc/translators/SimpleTDCCountTranslator.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackFindingCDC/topology/EStereoKind.h>
+
+#include <tracking/trackFindingCDC/geometry/Circle2D.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackFindingCDC/numerics/Index.h>
+
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
 
-#include <cmath>
+#include <cdc/dataobjects/TDCCountTranslatorBase.h>
+#include <cdc/dataobjects/ADCCountTranslatorBase.h>
+
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/WireID.h>
+#include <framework/logging/Logger.h>
+
+#include <ostream>
 
 using namespace Belle2;
 using namespace CDC;
@@ -111,6 +129,31 @@ CDCWireHit::CDCWireHit(const WireID& wireID,
 {
 }
 
+bool CDCWireHit::operator<(const CDCHit& hit)
+{
+  return this->getWireID().getEWire() < hit.getID();
+}
+
+bool TrackFindingCDC::operator<(const CDCWireHit& wireHit, const CDCWireSuperLayer& wireSuperLayer)
+{
+  return wireHit.getISuperLayer() < wireSuperLayer.getISuperLayer();
+}
+
+bool TrackFindingCDC::operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCWireHit& wireHit)
+{
+  return wireSuperLayer.getISuperLayer() < wireHit.getISuperLayer();
+}
+
+bool TrackFindingCDC::operator<(const CDCWireHit& wireHit, const CDCHit& hit)
+{
+  return wireHit.getWireID().getEWire() < hit.getID();
+}
+
+bool TrackFindingCDC::operator<(const CDCHit& hit, const CDCWireHit& wireHit)
+{
+  return hit.getID() < wireHit.getWireID().getEWire();
+}
+
 const CDCWire& CDCWireHit::attachWire() const
 {
   m_wire = CDCWire::getInstance(m_wireID);
@@ -156,4 +199,30 @@ Circle2D CDCWireHit::conformalTransformed(const Vector2D& relativeTo) const
   Circle2D driftCircle(getRefPos2D() - relativeTo, getRefDriftLength());
   driftCircle.conformalTransform();
   return driftCircle;
+}
+
+Index CDCWireHit::getStoreIHit() const
+{
+  return getHit() ? getHit()->getArrayIndex() : c_InvalidIndex;
+}
+
+const Vector2D& CDCWireHit::getRefPos2D() const
+{
+  return getWire().getRefPos2D();
+}
+
+const Vector3D& CDCWireHit::getRefPos3D() const
+{
+  return getWire().getRefPos3D();
+}
+
+double CDCWireHit::getRefCylindricalR() const
+{
+  return getWire().getRefCylindricalR();
+}
+
+std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const CDCWireHit& wirehit)
+{
+  return output << "CDCWireHit(" << wirehit.getWireID()
+         << ", drift length=" << wirehit.getRefDriftLength() << ")";
 }

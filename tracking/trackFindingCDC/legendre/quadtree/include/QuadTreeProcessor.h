@@ -16,12 +16,12 @@
 
 #include <algorithm>
 #include <functional>
+#include <memory>
 #include <map>
 #include <vector>
 #include <deque>
 #include <utility>
 #include <cmath>
-#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

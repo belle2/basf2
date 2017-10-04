@@ -36,6 +36,11 @@
 #include <top/dbobjects/TOPCalChannelT0.h>
 #include <top/dbobjects/TOPCalChannelMask.h>
 #include <top/dbobjects/TOPPmtGainPar.h>
+#include <top/dbobjects/TOPPmtQE.h>
+#include <top/dbobjects/TOPPmtInstallation.h>
+#include <top/dbobjects/TOPPmtObsoleteData.h>
+#include <top/dbobjects/TOPPmtTTSPar.h>
+#include <top/dbobjects/TOPPmtTTSHisto.h>
 
 #include <iostream>
 #include <fstream>
@@ -43,6 +48,7 @@
 #include <set>
 
 #include "TFile.h"
+#include "TTree.h"
 
 
 using namespace std;
@@ -469,6 +475,305 @@ namespace Belle2 {
               << ncall << "/" << nall);
     return;
   }
+
+
+  void importPmtQEData(string fileName, string treeName = "qePmtData")
+  {
+
+    // declare db objects to be imported
+    DBImportArray<TOPPmtQE> pmtQEs;
+
+    static const int nChann = 16;
+    std::string serialNum;
+    std::vector<float> QE_data[nChann];
+    float lambdaFirst, lambdaStep, collEff;
+
+    // open root file and get tree
+    TFile* file = new TFile(fileName.c_str(), "r");
+    TTree* tQeData = (TTree*)file->Get(treeName.c_str());
+
+    tQeData->SetBranchAddress("serialNum", &serialNum);
+    tQeData->SetBranchAddress("lambdaFirst", &lambdaFirst);
+    tQeData->SetBranchAddress("lambdaStep", &lambdaStep);
+    tQeData->SetBranchAddress("collEff", &collEff);
+    for (int ic = 0; ic < nChann; ic++) {
+      TString cString = "QE_ch";
+      cString += ic + 1;
+      tQeData->SetBranchAddress(cString, &QE_data[ic]);
+    }
+
+    // loop on input tree entries and construct the pmtQE objects
+    int countPMTs = 0;
+
+    for (int ient = 0; ient < tQeData->GetEntries(); ient++) {
+      tQeData->GetEntry(ient);
+      auto* pmtQE = pmtQEs.appendNew(serialNum, lambdaFirst, lambdaStep, collEff);
+
+      for (int ic = 0; ic < nChann; ic++) {
+        pmtQE->setQE(ic + 1, QE_data[ic]);
+      }
+      countPMTs++;
+    }
+
+    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    pmtQEs.import(iov);
+
+    B2RESULT("QE data imported to database for" << countPMTs << " PMT's.");
+
+    return;
+  }
+
+
+  void importPmtGainData(string fileName, string treeName = "gainPmtData")
+  {
+
+    // declare db objects to be imported
+    DBImportArray<TOPPmtGainPar> pmtGains;
+
+    static const int nChann = 16;
+    std::string serialNum;
+    float gain_const[nChann], gain_slope[nChann], gain_ratio[nChann];
+    float hv_op;
+
+    // open root file and get tree
+    TFile* file = new TFile(fileName.c_str(), "r");
+    TTree* tGainData = (TTree*)file->Get(treeName.c_str());
+
+    tGainData->SetBranchAddress("serialNum", &serialNum);
+    tGainData->SetBranchAddress("gain_const", &gain_const);
+    tGainData->SetBranchAddress("gain_slope", &gain_slope);
+    tGainData->SetBranchAddress("gain_ratio", &gain_ratio);
+    tGainData->SetBranchAddress("hv_op", &hv_op);
+
+
+    // loop on input tree entries and construct the pmtGain objects
+    int countPMTs = 0;
+
+    for (int ient = 0; ient < tGainData->GetEntries(); ient++) {
+      tGainData->GetEntry(ient);
+      auto* pmtGain = pmtGains.appendNew(serialNum);
+
+      for (int ic = 0; ic < nChann; ic++) {
+        pmtGain->setChannelData(ic + 1, gain_const[ic], gain_slope[ic], gain_ratio[ic]);
+        pmtGain->setNominalHV(hv_op);
+      }
+      countPMTs++;
+    }
+
+    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    pmtGains.import(iov);
+
+    B2RESULT("PMT gain data imported to database for" << countPMTs << " PMT's.");
+
+    return;
+  }
+
+
+  void importPmtInstallationData(string fileName, string treeName = "installationPmtData")
+  {
+
+    // declare db objects to be imported
+    DBImportArray<TOPPmtInstallation> pmtInst;
+
+    std::string serialNum;
+    int moduleCNum, arrayNum, PMTposition;
+
+    // open root file and get tree
+    TFile* file = new TFile(fileName.c_str(), "r");
+    TTree* tInstData = (TTree*)file->Get(treeName.c_str());
+
+    tInstData->SetBranchAddress("serialNum", &serialNum);
+    tInstData->SetBranchAddress("moduleCNum", &moduleCNum);
+    tInstData->SetBranchAddress("arrayNum", &arrayNum);
+    tInstData->SetBranchAddress("PMTposition", &PMTposition);
+
+    // loop on input tree entries and construct the pmtGain objects
+    int countPMTs = 0;
+
+    for (int ient = 0; ient < tInstData->GetEntries(); ient++) {
+      tInstData->GetEntry(ient);
+      pmtInst.appendNew(serialNum, moduleCNum, arrayNum, PMTposition);
+      countPMTs++;
+    }
+
+    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    pmtInst.import(iov);
+
+    B2RESULT("PMT installation data imported to database for" << countPMTs << " PMT's.");
+
+    return;
+  }
+
+
+  void importPmtObsoleteData(string fileName, string treeName = "obsPmtData")
+  {
+
+    // declare db objects to be imported
+    DBImportArray<TOPPmtObsoleteData> pmtObsData;
+
+    std::string serialNum;
+    std::string cathode;
+    float hv_spec, dark_spec, qe380_spec;
+    TOPPmtObsoleteData::EType type;
+
+    // open root file and get tree
+    TFile* file = new TFile(fileName.c_str(), "r");
+    TTree* tObsData = (TTree*)file->Get(treeName.c_str());
+
+    tObsData->SetBranchAddress("serialNum", &serialNum);
+    tObsData->SetBranchAddress("cathode", &cathode);
+    tObsData->SetBranchAddress("hv_spec", &hv_spec);
+    tObsData->SetBranchAddress("dark_spec", &dark_spec);
+    tObsData->SetBranchAddress("qe380_spec", &qe380_spec);
+
+    // loop on input tree entries and construct the pmtGain objects
+    int countPMTs = 0;
+
+    for (int ient = 0; ient < tObsData->GetEntries(); ient++) {
+      tObsData->GetEntry(ient);
+
+      // set type to unknown for now
+      type = TOPPmtObsoleteData::c_Unknown;
+
+      pmtObsData.appendNew(serialNum, type, cathode, hv_spec, dark_spec, qe380_spec);
+      countPMTs++;
+    }
+
+    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    pmtObsData.import(iov);
+
+    B2RESULT("PMT obsolete data imported to database for" << countPMTs << " PMT's.");
+
+    return;
+  }
+
+
+  void importPmtTTSPar(string fileName, string treeName = "ttsPmtPar")
+  {
+
+    // declare db objects to be imported
+    DBImportArray<TOPPmtTTSPar> pmtTtsPars;
+
+    static const int nChann = 16;
+    std::string serialNum;
+    std::vector<float> gausFrac[nChann];
+    std::vector<float> gausMean[nChann];
+    std::vector<float> gausSigma[nChann];
+
+
+    // open root file and get tree
+    TFile* file = new TFile(fileName.c_str(), "r");
+    TTree* tTtsPar = (TTree*)file->Get(treeName.c_str());
+
+    tTtsPar->SetBranchAddress("serialNum", &serialNum);
+    for (int ic = 0; ic < nChann; ic++) {
+      TString cStringF = "gausF_ch";
+      TString cStringM = "gausM_ch";
+      TString cStringS = "gausS_ch";
+
+      cStringF += ic + 1;
+      cStringM += ic + 1;
+      cStringS += ic + 1;
+
+      tTtsPar->SetBranchAddress(cStringF, &gausFrac[ic]);
+      tTtsPar->SetBranchAddress(cStringM, &gausMean[ic]);
+      tTtsPar->SetBranchAddress(cStringS, &gausSigma[ic]);
+    }
+
+    // loop on input tree entries and construct the pmtQE objects
+    int countPMTs = 0;
+
+    for (int ient = 0; ient < tTtsPar->GetEntries(); ient++) {
+      tTtsPar->GetEntry(ient);
+      auto* pmtTtsPar = pmtTtsPars.appendNew(serialNum);
+
+      for (int ic = 0; ic < nChann; ic++) {
+
+        // check that the vectors have the same size. Otherwise skip the channel
+        if ((gausFrac[ic].size() != gausMean[ic].size()) ||
+            (gausFrac[ic].size() != gausSigma[ic].size())) {
+
+          B2ERROR("The TTSPar vectors for PMT " << serialNum << ", channel " << ic + 1 << " have different sizes! Skipping channel...");
+          continue;
+        }
+
+        for (uint iv = 0; iv < gausFrac[ic].size(); iv++) {
+          pmtTtsPar->appendGaussian(ic + 1,
+                                    gausFrac[ic].at(iv),
+                                    gausMean[ic].at(iv),
+                                    gausSigma[ic].at(iv));
+        }
+      }
+      countPMTs++;
+    }
+
+    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    pmtTtsPars.import(iov);
+
+    B2RESULT("TTS parameters imported to database for" << countPMTs << " PMT's.");
+
+    return;
+  }
+
+
+  void importPmtTTSHisto(string fileName, string treeName = "ttsPmtHisto")
+  {
+
+    // declare db objects to be imported
+    DBImportArray<TOPPmtTTSHisto> pmtTtsHistos;
+
+    static const int nChann = 16;
+    std::string serialNum;
+    std::vector<float> hv[nChann];
+    std::vector<TH1F*> histo[nChann];
+
+    // open root file and get tree
+    TFile* file = new TFile(fileName.c_str(), "r");
+    TTree* tTtsHisto = (TTree*)file->Get(treeName.c_str());
+
+    tTtsHisto->SetBranchAddress("serialNum", &serialNum);
+    for (int ic = 0; ic < nChann; ic++) {
+      TString cStringHV = "hv_ch";
+      TString cStringHist = "histo_ch";
+
+      cStringHV += ic + 1;
+      cStringHist += ic + 1;
+
+      tTtsHisto->SetBranchAddress(cStringHV, &hv[ic]);
+      tTtsHisto->SetBranchAddress(cStringHist, &histo[ic]);
+    }
+
+    // loop on input tree entries and construct the pmtQE objects
+    int countPMTs = 0;
+
+    for (int ient = 0; ient < tTtsHisto->GetEntries(); ient++) {
+      tTtsHisto->GetEntry(ient);
+      auto* pmtTtsHisto = pmtTtsHistos.appendNew(serialNum);
+
+      for (int ic = 0; ic < nChann; ic++) {
+
+        // check that the vectors have the same size. Otherwise skip the channel
+        if (hv[ic].size() != histo[ic].size()) {
+          B2ERROR("Mismatch between HV values and TTS histograms for PMT " << serialNum << ", channel " << ic + 1 << ". Skipping channel...");
+          continue;
+        }
+
+        for (uint iv = 0; iv < hv[ic].size(); iv++) {
+          pmtTtsHisto->appendHistogram(ic + 1, hv[ic].at(iv), histo[ic].at(iv));
+        }
+      }
+      countPMTs++;
+    }
+
+    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    pmtTtsHistos.import(iov);
+
+    B2RESULT("TTS histograms imported to database for" << countPMTs << " PMT's.");
+
+    return;
+  }
+
+
 
 
 

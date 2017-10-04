@@ -29,7 +29,9 @@ def _run_child(run):
     main.add_module("RootInput", inputFileNames=["MyInputFile_" + str(run) + ".root"])
     main.add_module("HistoManager", histoFileName="MyOutputFile_" + str(run) + ".root", workDirName=working_dir)
     testmod = main.add_module("TestHisto", entriesPerEvent=5000)
-#    testmod.param("granularity","all")
+    # testmod.param("granularity","all")
+    testmod.param("preScale", 0.5)
+    testmod.param("maxEventsPerRun", 100)
     process(main)
     print(statistics)
 
@@ -51,5 +53,5 @@ def run_collector():
 
 
 if __name__ == "__main__":
-    create_test_data()
+    # create_test_data()
     run_collector()

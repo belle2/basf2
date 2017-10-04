@@ -2,16 +2,18 @@
 
 #include <string>
 
+using namespace std;
 using namespace Belle2;
+using namespace Calibration;
 
-const std::string CalibObjManager::PREFIX = "TmpCalibRootObj_";
+const string CalibObjManager::PREFIX = "TmpCalibRootObj_";
 
-void CalibObjManager::addObject(std::string name, std::unique_ptr<CalibRootObjBase> object)
+void CalibObjManager::addObject(string name, unique_ptr<CalibRootObjBase> object)
 {
   if (m_templateObjects.find(name) != m_templateObjects.end()) {
     m_templateObjects[name].reset();
   }
-  m_templateObjects[name] = std::move(object);
+  m_templateObjects[name] = move(object);
 }
 
 void CalibObjManager::createDirectories()
@@ -24,10 +26,10 @@ void CalibObjManager::createDirectories()
   }
 }
 
-void CalibObjManager::writeCurrentObjects(const EventMetaData& emd)
+void CalibObjManager::writeCurrentObjects(const ExpRun& expRun)
 {
   for (auto& x : m_templateObjects) {
-    std::string calObjName = addPrefix(x.first) + getSuffix(emd);
+    string calObjName = addPrefix(x.first) + getSuffix(expRun);
     B2DEBUG(100, "We are writing the current Exp,Run object for " << calObjName << " to its TDirectory.");
     TDirectory* objDir = m_dir->GetDirectory(x.first.c_str());
     CalibRootObjBase* objMemory = dynamic_cast<CalibRootObjBase*>(objDir->FindObject(calObjName.c_str()));
@@ -50,10 +52,10 @@ void CalibObjManager::writeCurrentObjects(const EventMetaData& emd)
   }
 }
 
-void CalibObjManager::clearCurrentObjects(const EventMetaData& emd)
+void CalibObjManager::clearCurrentObjects(const ExpRun& expRun)
 {
   for (auto& x : m_templateObjects) {
-    std::string calObjName = addPrefix(x.first) + getSuffix(emd);
+    string calObjName = addPrefix(x.first) + getSuffix(expRun);
     B2DEBUG(100, "We are deleting the current Exp,Run object for " << calObjName);
     TDirectory* objectDir = m_dir->GetDirectory(x.first.c_str());
     // Should only delete objects that are memory resident
@@ -76,7 +78,7 @@ void CalibObjManager::replaceObjects()
                 << ". Replacing it with the wrapped TObject.");
         objFile->setObjectName(removePrefix(key->GetName()).c_str());
         objFile->write(objectDir);
-        std::string calObjName = objFile->GetName();
+        string calObjName = objFile->GetName();
         objectDir->Delete((calObjName + ";*").c_str());
       }
     }
@@ -85,25 +87,25 @@ void CalibObjManager::replaceObjects()
   }
 }
 
-std::string CalibObjManager::getSuffix(const Belle2::Calibration::KeyType& key)
+string CalibObjManager::getSuffix(const KeyType& key)
 {
-  return "_" + std::to_string(key.first) + "." + std::to_string(key.second);
+  return "_" + to_string(key.first) + "." + to_string(key.second);
 }
 
-std::string CalibObjManager::getSuffix(const EventMetaData& emd)
+string CalibObjManager::getSuffix(const EventMetaData& emd)
 {
-  Belle2::Calibration::KeyType key = std::make_pair(emd.getExperiment(), emd.getRun());
+  KeyType key = make_pair(emd.getExperiment(), emd.getRun());
   return getSuffix(key);
 }
 
-std::string CalibObjManager::addPrefix(std::string name)
+string CalibObjManager::addPrefix(string name)
 {
   return PREFIX + name;
 }
 
-std::string CalibObjManager::removePrefix(const char* name)
+string CalibObjManager::removePrefix(const char* name)
 {
-  std::string strname = name;
+  string strname = name;
   strname.erase(0, PREFIX.length());
   return strname;
 }

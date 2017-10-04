@@ -12,6 +12,7 @@
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
+#include <calibration/Utilities.h>
 
 namespace Belle2 {
 
@@ -49,10 +50,10 @@ namespace Belle2 {
       * run over several input files containing the same (exp,run). We merge
       * with the file resident copy and replace it.
       */
-    void writeCurrentObjects(const EventMetaData& emd);
+    void writeCurrentObjects(const Calibration::ExpRun& emd);
 
     /// Any memory resident CalibRootObj are removed from the directory
-    void clearCurrentObjects(const EventMetaData& emd);
+    void clearCurrentObjects(const Calibration::ExpRun& emd);
 
     /**
       * This is a weird one. The problem is that we want to store the 'raw' ROOT objects in our final output data.

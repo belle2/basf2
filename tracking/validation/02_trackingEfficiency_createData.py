@@ -3,8 +3,8 @@
 
 #################################################################
 #                                                               #
-#    script to simulate 10 charged muon tracks with             #
-#    fixed transverse momentum using the ParticleGun            #
+#    script to simulate 10 charged tracks of configurable type  #
+#    with fixed transverse momentum using the ParticleGun       #
 #                                                               #
 #    written by Michael Ziegler, KIT                            #
 #    michael.ziegler2@kit.edu                                   #
@@ -15,7 +15,7 @@
 <header>
     <output>trackingEfficiency_pt_0.05GeV.root</output>
     <contact>thomas.hauth@kit.edu</contact>
-    <description>Create events with 10 muon tracks with fixed pt value.</description>
+    <description>Create events with 10 tracks with fixed pt value.</description>
 </header>
 """
 

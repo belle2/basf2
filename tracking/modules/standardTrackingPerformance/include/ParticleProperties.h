@@ -37,6 +37,8 @@ namespace Belle2 {
     int nWeights;  /** Number of entries in weights array  */
     float weights[maxNweights];  /** Weights of the hits in sequence  */
 
+    int matchedToECLCluster; /**< boolean if matched to ECL cluster */
+
     double mass_gen; /**< generated mass */
     double px_gen; /**< generated momentum in x direction */
     double py_gen; /**< generated momentum in y direction */
@@ -72,6 +74,8 @@ namespace Belle2 {
       nWeights = 0;
       for (int i = 0; i < maxNweights; ++i)
         weights[i] = 0;
+
+      matchedToECLCluster = 0;
 
       mass_gen = value;
       px_gen = value;

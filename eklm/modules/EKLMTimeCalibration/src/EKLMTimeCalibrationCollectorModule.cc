@@ -153,7 +153,7 @@ void EKLMTimeCalibrationCollectorModule::collect()
   }
 }
 
-void EKLMTimeCalibrationCollectorModule::terminate()
+void EKLMTimeCalibrationCollectorModule::finish()
 {
 }
 

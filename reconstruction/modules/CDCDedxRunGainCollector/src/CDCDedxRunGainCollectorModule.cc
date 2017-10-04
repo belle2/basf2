@@ -9,6 +9,8 @@
  **************************************************************************/
 
 #include <reconstruction/modules/CDCDedxRunGainCollector/CDCDedxRunGainCollectorModule.h>
+#include <TH1F.h>
+#include <TTree.h>
 
 using namespace Belle2;
 

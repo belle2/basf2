@@ -58,12 +58,12 @@ void CaTestModule::prepare()
   ttree->Branch<int>("run", &m_run);
   ttree->Branch<int>("exp", &m_exp);
   ttree->Branch<int>("pid", &m_procId);
-  auto mmille = new MilleData();
+//  auto mmille = new MilleData();
 
   // Data object registration ----------------------------------------------
   registerObject<TH1F>("histogram1", histo1);
   registerObject<TTree>("tree", ttree);
-  registerObject<MilleData>("test_mille", mmille);
+//  registerObject<MilleData>("test_mille", mmille);
 
 }
 
@@ -81,10 +81,10 @@ void CaTestModule::collect()
   getObject<TH1F>("histogram1").Fill(gRandom->Gaus(42., m_spread));
   getObject<TTree>("tree").Fill();
 
-  auto& mille = getObject<MilleData>("test_mille");
-  if (!mille.isOpen()) mille.open(
-      to_string(emd->getExperiment()) + "-" + to_string(emd->getRun()) + "-sevt-" + to_string(emd->getEvent()) + "-pid" + std::to_string(
-        ProcHandler::EvtProcID()) + ".mille");
+//  auto& mille = getObject<MilleData>("test_mille");
+//  if (!mille.isOpen()) mille.open(
+//      to_string(emd->getExperiment()) + "-" + to_string(emd->getRun()) + "-sevt-" + to_string(emd->getEvent()) + "-pid" + std::to_string(
+//        ProcHandler::EvtProcID()) + ".mille");
 
   //if (mille.isOpen() && nevents && nevents % 100 == 0)
   //  mille.close();

@@ -11,6 +11,7 @@
 #include <reconstruction/calibration/CDCDedxRunGainAlgorithm.h>
 #include <TNtuple.h>
 #include <TF1.h>
+#include <TH1F.h>
 
 using namespace Belle2;
 
@@ -32,20 +33,20 @@ CDCDedxRunGainAlgorithm::CDCDedxRunGainAlgorithm() : CalibrationAlgorithm("CDCDe
 CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
 {
 
-  // Get data objects
-  auto& means = getObject<TH1F>("means");
-  auto& ttree = getObject<TTree>("tree");
+  // Get data objects, they are now unique_ptr<T>
+  auto means = getObjectPtr<TH1F>("means");
+  auto ttree = getTreeObjectPtr("tree");
 
   // require at least 100 tracks (arbitrary for now)
-  if (ttree.GetEntries() < 100)
+  if (ttree->GetEntries() < 100)
     return c_NotEnoughData;
 
   int run;
-  ttree.SetBranchAddress("run", &run);
+  ttree->SetBranchAddress("run", &run);
 
   int lastrun = -1;
-  for (int i = 0; i < ttree.GetEntries(); ++i) {
-    ttree.GetEvent(i);
+  for (int i = 0; i < ttree->GetEntries(); ++i) {
+    ttree->GetEvent(i);
     if (lastrun == -1) lastrun = run;
     else if (run != lastrun) {
       B2WARNING("dE/dx run gain calibration failing - multiple runs included!");
@@ -53,8 +54,8 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
     }
   }
 
-  means.Fit("gaus");
-  float rungain = means.GetFunction("gaus")->GetParameter(1);
+  means->Fit("gaus");
+  float rungain = means->GetFunction("gaus")->GetParameter(1);
 
   //  TNtuple* gains = new TNtuple("runGains","CDC dE/dx run gains","run:gain");
   //  gains->Fill(lastrun,rungain);

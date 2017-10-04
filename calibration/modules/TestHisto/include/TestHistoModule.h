@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <calibration/CalibrationCollectorModuleNew.h>
+#include <calibration/CalibrationCollectorModule.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <calibration/dataobjects/CalibRootObjNew.h>
@@ -19,7 +19,7 @@
 
 namespace Belle2 {
   /// Testing module for collection of calibration data
-  class TestHistoModule : public CalibrationCollectorModuleNew {
+  class TestHistoModule : public CalibrationCollectorModule {
 
   public:
 

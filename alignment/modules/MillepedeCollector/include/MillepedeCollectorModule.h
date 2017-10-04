@@ -11,7 +11,7 @@
 #ifndef MILLEPEDECOLLECTORMODULE_H
 #define MILLEPEDECOLLECTORMODULE_H
 
-#include <calibration/CalibrationCollectorModule.h>
+#include <calibration/CalibrationCollectorModule_OLD.h>
 #include <genfit/Track.h>
 #include <genfit/StateOnPlane.h>
 #include <genfit/MeasuredStateOnPlane.h>
@@ -26,7 +26,7 @@ namespace Belle2 {
    * Collects data from GBL-fitted tracks and produces binary files for Millepede
    *
    */
-  class MillepedeCollectorModule : public CalibrationCollectorModule {
+  class MillepedeCollectorModule : public CalibrationCollectorModule_OLD {
 
   public:
 

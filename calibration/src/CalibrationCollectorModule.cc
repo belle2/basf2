@@ -1,10 +1,14 @@
 #include <calibration/CalibrationCollectorModule.h>
-#include <calibration/CalibrationAlgorithm.h>
 
 using namespace std;
 using namespace Belle2;
+using namespace Calibration;
 
-CalibrationCollectorModule::CalibrationCollectorModule() : Module(), m_expRunEvents()
+CalibrationCollectorModule::CalibrationCollectorModule() :
+  HistoModule(),
+  m_dir(nullptr),
+  m_manager(),
+  m_expRunEvents()
 {
   addParam("granularity", m_granularity,
            "Granularity of data collection. Data is separated by runs (=run) or not separated at all (=all)", std::string("run"));
@@ -23,17 +27,13 @@ CalibrationCollectorModule::CalibrationCollectorModule() : Module(), m_expRunEve
            "all events are collected, but for preScale=0.5 only 50 percent will be. Since this is based on a random choice, you should set the "
            "random seed to a fixed value if you want repeatable results.\n\n"
            "Should be a float in range [0.0,1.0], default=1.0", float(1.0));
+
 }
-
-
 
 void CalibrationCollectorModule::initialize()
 {
-  if (m_granularity != "run" && m_granularity != "all")
-    B2ERROR("Invalid granularity option provided: '" << m_granularity << "' Allowed options are: 'run' or 'all'");
-
-  registerObject<RunRange>(CalibrationAlgorithm::RUN_RANGE_OBJ_NAME, new RunRange());
-
+  StoreObjPtr<EventMetaData>::required();
+  REG_HISTOGRAM
   prepare();
 }
 
@@ -65,20 +65,24 @@ void CalibrationCollectorModule::event()
 
 void CalibrationCollectorModule::beginRun()
 {
-  // Which ExpRun are we in?
-  StoreObjPtr<EventMetaData> emd;
-  pair<int, int> exprun = {emd->getExperiment(), emd->getRun()};
+  /** It seems that the beginRun() function is called in each basf2 subprocess when the run changes in each process.
+    * This is nice because it allows us to write the new (exp,run) object creation in the beginRun function as though
+    * the other processes don't exist.
+    */
+  // Current (Exp,Run)
+  ExpRun expRun = make_pair(m_emd->getExperiment(), m_emd->getRun());
+  m_runRange->add(expRun.first, expRun.second);
 
   // Do we care about the number of events collected in each (input data) ExpRun?
   // If so, we want to create values for the events collected map
   if (m_maxEventsPerRun > -1) {
     // Do we have a count for this ExpRun yet? If not create one
-    auto i_eventsInExpRun = m_expRunEvents.find(exprun);
+    auto i_eventsInExpRun = m_expRunEvents.find(expRun);
     if (i_eventsInExpRun == m_expRunEvents.end())
-      m_expRunEvents[exprun] = 0;
+      m_expRunEvents[expRun] = 0;
 
     // Set our pointer to the correct location for this ExpRun
-    m_eventsCollectedInRun = &m_expRunEvents[exprun];
+    m_eventsCollectedInRun = &m_expRunEvents[expRun];
     // Want to reset our flag to start collection if necessary
     if ((*m_eventsCollectedInRun) < m_maxEventsPerRun) {
       B2INFO("New run has had less events than the maximum collected so far ("
@@ -96,18 +100,40 @@ void CalibrationCollectorModule::beginRun()
       m_runCollectOnRun = false;
     }
   }
-
   // Granularity=all removes data spliting by runs by setting
   // always the same exp, run for calibration data objects
-  if (m_granularity == "all")
-    exprun = { -1, -1};
-
-  // For getObject<> to work
-  m_currentExpRun = exprun;
-
-  // Even for granularity=all, we want to remember all runs...
-  getObject<RunRange>(CalibrationAlgorithm::RUN_RANGE_OBJ_NAME).add(emd->getExperiment(), emd->getRun());
-
+  if (m_granularity == "all") {
+    m_expRun = { -1, -1};
+  } else {
+    m_expRun = expRun;
+  }
   // Run the user's startRun() implementation if there is one
   startRun();
+}
+
+void CalibrationCollectorModule::defineHisto()
+{
+  m_dir = gDirectory->mkdir(getName().c_str());
+  m_manager.setDirectory(m_dir);
+  B2INFO("Saving output to TDirectory " << m_dir->GetPath());
+  B2DEBUG(100, "Creating directories for individual collector objects.");
+  m_manager.createDirectories();
+  m_runRange = new RunRangeNew();
+  m_runRange->setGranularity(m_granularity);
+  m_runRange->SetName(Calibration::RUN_RANGE_OBJ_NAME.c_str());
+  m_dir->Add(m_runRange);
+  inDefineHisto();
+}
+
+void CalibrationCollectorModule::endRun()
+{
+  closeRun();
+  m_manager.writeCurrentObjects(m_expRun);
+  m_manager.clearCurrentObjects(m_expRun);
+}
+
+void CalibrationCollectorModule::terminate()
+{
+  finish();
+  m_manager.replaceObjects();
 }

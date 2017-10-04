@@ -426,7 +426,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
     fExpertHistograms->cd("NoSorting");
   }
 
-  int nEntries = getObject<TTree>(name_SourceTree.Data()).GetEntries();
+  auto tree = getTreeObjectPtr(name_SourceTree.Data());
+  int nEntries = tree->GetEntries();
 
   B2INFO("Entries: " << nEntries);
   SummariesInfo[0] = nEntries;
@@ -437,33 +438,33 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
          ", PixelKind: " << m_PixelKind
         );
 
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("event", &m_evt);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("run", &m_run);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("exp", &m_exp);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("pid", &m_procId);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("layer", &m_layer);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("sensor", &m_sensor);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("pixelKind", &m_pixelKind);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("closeEdge", &m_closeEdge);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("shape", &m_shape);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("phiTrack", &m_phiTrack);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("thetaTrack", &m_thetaTrack);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("phiTrue", &m_phiTrue);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("thetaTrue", &m_thetaTrue);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("signal", &m_signal);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("seed", &m_seed);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("InPixUTrue", &m_InPixUTrue);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("InPixVTrue", &m_InPixVTrue);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("InPixU", &m_InPixU);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("InPixV", &m_InPixV);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidUTrue", &m_ResidUTrue);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidVTrue", &m_ResidVTrue);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("SigmaU", &m_SigmaU);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("SigmaV", &m_SigmaV);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidUTrack", &m_ResidUTrack);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidVTrack", &m_ResidVTrack);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("SigmaUTrack", &m_SigmaUTrack);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("SigmaVTrack", &m_SigmaVTrack);
+  tree->SetBranchAddress("event", &m_evt);
+  tree->SetBranchAddress("run", &m_run);
+  tree->SetBranchAddress("exp", &m_exp);
+  tree->SetBranchAddress("pid", &m_procId);
+  tree->SetBranchAddress("layer", &m_layer);
+  tree->SetBranchAddress("sensor", &m_sensor);
+  tree->SetBranchAddress("pixelKind", &m_pixelKind);
+  tree->SetBranchAddress("closeEdge", &m_closeEdge);
+  tree->SetBranchAddress("shape", &m_shape);
+  tree->SetBranchAddress("phiTrack", &m_phiTrack);
+  tree->SetBranchAddress("thetaTrack", &m_thetaTrack);
+  tree->SetBranchAddress("phiTrue", &m_phiTrue);
+  tree->SetBranchAddress("thetaTrue", &m_thetaTrue);
+  tree->SetBranchAddress("signal", &m_signal);
+  tree->SetBranchAddress("seed", &m_seed);
+  tree->SetBranchAddress("InPixUTrue", &m_InPixUTrue);
+  tree->SetBranchAddress("InPixVTrue", &m_InPixVTrue);
+  tree->SetBranchAddress("InPixU", &m_InPixU);
+  tree->SetBranchAddress("InPixV", &m_InPixV);
+  tree->SetBranchAddress("ResidUTrue", &m_ResidUTrue);
+  tree->SetBranchAddress("ResidVTrue", &m_ResidVTrue);
+  tree->SetBranchAddress("SigmaU", &m_SigmaU);
+  tree->SetBranchAddress("SigmaV", &m_SigmaV);
+  tree->SetBranchAddress("ResidUTrack", &m_ResidUTrack);
+  tree->SetBranchAddress("ResidVTrack", &m_ResidVTrack);
+  tree->SetBranchAddress("SigmaUTrack", &m_SigmaUTrack);
+  tree->SetBranchAddress("SigmaVTrack", &m_SigmaVTrack);
 
 
   // create vector for storing on database:
@@ -565,7 +566,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
   if (m_DoExpertHistograms) {
     for (int i_ev = 0; i_ev < nEntries; i_ev++) {
-      getObject<TTree>(name_SourceTree.Data()).GetEntry(i_ev);
+      tree->GetEntry(i_ev);
       int iShp = m_shape;
       if (iShp < 1) iShp = 1;
       if (iShp > m_shapes) iShp = m_shapes;
@@ -616,16 +617,16 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
                  i_shape + 1)].c_str()
           );
     if (!m_DoExpertHistograms) {  // acceleration of calibration process
-      getObject<TTree>(name_SourceTree.Data()).Draw("ResidUTrack:ResidVTrack", c1, "goff");
-      nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
+      tree->Draw("ResidUTrack:ResidVTrack", c1, "goff");
+      nSelRowsTemp = (int)tree->GetSelectedRows();
       if (nSelRowsTemp < m_MinClustersCorrections) continue;
     }
     for (int i_pk = 0; i_pk < m_pixelkinds; i_pk++) {  // TODO nastavit na 0
       cCat = Form("pixelKind == %i", i_pk);
       c2.SetTitle(cCat.Data());
       if (!m_DoExpertHistograms) {  // acceleration of calibration process
-        getObject<TTree>(name_SourceTree.Data()).Draw("ResidUTrack:ResidVTrack", c1 + c2, "goff");
-        nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
+        tree->Draw("ResidUTrack:ResidVTrack", c1 + c2, "goff");
+        nSelRowsTemp = (int)tree->GetSelectedRows();
         if (nSelRowsTemp < m_MinClustersCorrections) continue;
       }
       B2INFO("   ---> Processing pixel kind: " << i_pk <<
@@ -650,8 +651,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
           c3b.SetTitle(cCat.Data());
         }
         if (!m_DoExpertHistograms) {  // acceleration of calibration process
-          getObject<TTree>(name_SourceTree.Data()).Draw("ResidUTrack:ResidVTrack", c1 + c2 + c3a + c3b, "goff");
-          nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
+          tree->Draw("ResidUTrack:ResidVTrack", c1 + c2 + c3a + c3b, "goff");
+          nSelRowsTemp = (int)tree->GetSelectedRows();
           if (nSelRowsTemp < m_MinClustersCorrections) continue;
         }
         for (int i_angleV = 0; i_angleV < m_anglesV; i_angleV++) {  // TODO nastavit na 0
@@ -674,8 +675,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
             c4b.SetTitle(cCat.Data());
           }
           if (!m_DoExpertHistograms) {  // acceleration of calibration process
-            getObject<TTree>(name_SourceTree.Data()).Draw("ResidUTrack:ResidVTrack", c1 + c2 + c3a + c3b + c4a + c4b, "goff");
-            nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
+            tree->Draw("ResidUTrack:ResidVTrack", c1 + c2 + c3a + c3b + c4a + c4b, "goff");
+            nSelRowsTemp = (int)tree->GetSelectedRows();
             if (nSelRowsTemp < m_MinClustersCorrections) continue;
           }
           cCat = Form("closeEdge == 0");
@@ -683,11 +684,11 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
           cFin = c1 && c2 && c3a && c3b && c4a && c4b && c5;
 
-          getObject<TTree>(name_SourceTree.Data()).Draw(">>selection", cFin);
+          tree->Draw(">>selection", cFin);
           TEventList* selectionn = (TEventList*)gDirectory->Get("selection");
-          //getObject<TTree>(name_SourceTree.Data()).SetEventList(selectionn);
-          //printf("---> GetSelRaws : %i\n",(int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows() );
-          int nSelRows = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
+          //tree->SetEventList(selectionn);
+          //printf("---> GetSelRaws : %i\n",(int)tree->GetSelectedRows() );
+          int nSelRows = (int)tree->GetSelectedRows();
           SummariesInfoSh[i_shape] += nSelRows;
           SummariesInfoAng[i_angleU * m_anglesV + i_angleV] += nSelRows;
           SummariesInfoPK[i_pk] += nSelRows;
@@ -701,7 +702,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
             std::vector<double> Colm7(nSelRows);
             std::vector<double> Colm8(nSelRows);
             for (int i = 0; i < nSelRows; i++) {
-              getObject<TTree>(name_SourceTree.Data()).GetEntry(selectionn->GetEntry(i));
+              tree->GetEntry(selectionn->GetEntry(i));
               if ((m_UseRealData == kTRUE) || (m_UseTracks == kTRUE)) {
                 Colm1[i] = m_ResidUTrack;
                 Colm2[i] = m_ResidVTrack;
@@ -720,26 +721,26 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
             }
 
-            //          int imax = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
+            //          int imax = (int)tree->GetSelectedRows();
             //          if (imax > 50) imax = 50;
-            //          getObject<TTree>(name_SourceTree.Data()).Draw("ResidUTrack:ResidVTrack:ResidUTrack/SigmaU:ResidVTrack/SigmaV", cFin, "goff");
+            //          tree->Draw("ResidUTrack:ResidVTrack:ResidUTrack/SigmaU:ResidVTrack/SigmaV", cFin, "goff");
             //          for (int i = 0; i < imax; i++ ) {
-            //getObject<TTree>(name_SourceTree.Data()).GetEvent(i);
-            //            getObject<TTree>(name_SourceTree.Data()).GetEntry(selectionn->GetEntry(i));
-            //printf("%lld ", getObject<TTree>(name_SourceTree.Data()).GetEntryNumber(i));
+            //tree->GetEvent(i);
+            //            tree->GetEntry(selectionn->GetEntry(i));
+            //printf("%lld ", tree->GetEntryNumber(i));
             //            printf("%i %i (%i %i %4.1f) (%f - %f - %f) ", i, m_evt, m_shape, m_pixelKind, m_signal, 22.2, Colm1[i], m_ResidUTrack);
             //printf("%i %i (%i %i %4.1f) (%f - %f - %f) ", i, m_evt, m_shape, m_pixelKind, m_signal, 22, 22, m_ResidUTrack);
             //printf("%i %i %lli (%i %i %4.1f) ", i, m_evt, selection->GetEntry(i), m_shape, m_pixelKind, m_signal);
             //          }
             //          if ((m_UseRealData == kTRUE) || (m_UseTracks == kTRUE)) {
-            //getObject<TTree>(name_SourceTree.Data()).Draw("ResidUTrack:ResidVTrack:ResidUTrack/SigmaU:ResidVTrack/SigmaV", cFin, "goff");
-            //getObject<TTree>(name_SourceTree.Data()).Draw("ResidUTrack:ResidVTrack:ResidUTrack/SigmaU:ResidVTrack/SigmaV", "", "goff");
+            //tree->Draw("ResidUTrack:ResidVTrack:ResidUTrack/SigmaU:ResidVTrack/SigmaV", cFin, "goff");
+            //tree->Draw("ResidUTrack:ResidVTrack:ResidUTrack/SigmaU:ResidVTrack/SigmaV", "", "goff");
             //          } else if ((m_CalibrationKind == 2) || (m_UseTracks == kFALSE)) {
-            //getObject<TTree>(name_SourceTree.Data()).Draw("ResidUTrue:ResidVTrue:ResidUTrue/SigmaU:ResidVTrue/SigmaV", cFin, "goff");
-            //getObject<TTree>(name_SourceTree.Data()).Draw("ResidUTrue:ResidVTrue:ResidUTrue/SigmaU:ResidVTrue/SigmaV", "", "goff");
+            //tree->Draw("ResidUTrue:ResidVTrue:ResidUTrue/SigmaU:ResidVTrue/SigmaV", cFin, "goff");
+            //tree->Draw("ResidUTrue:ResidVTrue:ResidUTrue/SigmaU:ResidVTrue/SigmaV", "", "goff");
             //          }
 
-            //          printf("---> GetSelRaws : %i \n",(int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows() );
+            //          printf("---> GetSelRaws : %i \n",(int)tree->GetSelectedRows() );
             //          continue;
 
             // B2DEBUG(10, "2--> Selection criteria: ");
@@ -748,10 +749,10 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
 
             B2DEBUG(30, "--> Selected raws " << nSelRows);
-//            double* Col1 = getObject<TTree>(name_SourceTree.Data()).GetV1();
-//            double* Col2 = getObject<TTree>(name_SourceTree.Data()).GetV2();
-            //double* Col3 = getObject<TTree>(name_SourceTree.Data()).GetV3();
-            //double* Col4 = getObject<TTree>(name_SourceTree.Data()).GetV4();
+//            double* Col1 = tree->GetV1();
+//            double* Col2 = tree->GetV2();
+            //double* Col3 = tree->GetV3();
+            //double* Col4 = tree->GetV4();
 
             double RetVal;
             double RetValError;
@@ -879,9 +880,9 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
                     cFin = c6a && c6b && c7a && c7b && c1 && c2 && c3a && c3b && c4a && c4b && c5;
 
-                    getObject<TTree>(name_SourceTree.Data()).Draw(sVarexp.Data(), cFin, "goff");
+                    tree->Draw(sVarexp.Data(), cFin, "goff");
 
-                    int nSelRows2 = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
+                    int nSelRows2 = (int)tree->GetSelectedRows();
                     if (nSelRows2 >= m_MinHitsAcceptInPixels) {
                       TInPixelPositionMap[make_tuple(i_shape, i_pk, i_angleU, i_angleV, i_ipU, i_ipV)] = 1.0;
                     }
@@ -896,12 +897,12 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
   B2DEBUG(30, "--> bias correction calculation done. ");
 
-//  int n_Events = getObject<TTree>(name_SourceTree.Data()).GetEntries();
+//  int n_Events = tree->GetEntries();
   /*
     double *fResidU = new double[n_Events];
     double *fResidV = new double[n_Events];
     for (int i_Ev = 0; i_Ev < n_Events; i_Ev++) {
-      getObject<TTree>(name_SourceTree.Data()).GetEntry(i_Ev);
+      tree->GetEntry(i_Ev);
       int iIndexPhi = (m_phiTrue+ (TMath::Pi() / 2.0)) / (TMath::Pi() / m_anglesU);
       int iIndexTheta = (m_thetaTrue + (TMath::Pi() / 2.0)) / (TMath::Pi() / m_anglesV);
       fResidU[i_Ev] = m_ResidUTrue;
@@ -941,7 +942,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
               if ((i_Ev == (int)(n_Events / 2)) && (nSelRows < m_MinClustersCorrections / 4)) {  // acceleration
                 continue;
               }
-              getObject<TTree>(name_SourceTree.Data()).GetEntry(i_Ev);
+              tree->GetEntry(i_Ev);
               int iIndexPhi = (m_phiTrue + (TMath::Pi() / 2.0)) / (TMath::Pi() / m_anglesU);
               int iIndexTheta = (m_thetaTrue + (TMath::Pi() / 2.0)) / (TMath::Pi() / m_anglesV);
               if ((m_UseRealData == kTRUE) || (m_UseTracks == kTRUE)) {

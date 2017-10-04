@@ -17,6 +17,7 @@
 #include <tuple>
 #include <unordered_map>
 #include <TCut.h>
+#include <TVectorD.h>
 //#include <boost/multi_array.hpp>
 #include <boost/functional/hash.hpp>
 #include <framework/gearbox/Unit.h>

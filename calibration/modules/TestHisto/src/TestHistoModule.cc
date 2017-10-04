@@ -28,7 +28,7 @@ REG_MODULE(TestHisto)
 //                 Implementation
 //-----------------------------------------------------------------
 
-TestHistoModule::TestHistoModule() : CalibrationCollectorModuleNew()
+TestHistoModule::TestHistoModule() : CalibrationCollectorModule()
 {
   // Set module properties
   setDescription("Test Module for saving big data in CAF");

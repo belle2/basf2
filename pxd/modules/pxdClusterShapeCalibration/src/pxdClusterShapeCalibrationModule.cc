@@ -137,7 +137,7 @@ void pxdClusterShapeCalibrationModule::prepare()
 
 }
 
-void pxdClusterShapeCalibrationModule::terminate()
+void pxdClusterShapeCalibrationModule::finish()
 {
 
   // not need action on the end.

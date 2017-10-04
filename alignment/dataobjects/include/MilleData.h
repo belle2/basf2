@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+#include <TNamed.h>
 #include <genfit/MilleBinary.h>
 #include <genfit/GblTrajectory.h>
 #include <framework/pcore/Mergeable.h>

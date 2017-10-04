@@ -16,12 +16,12 @@ using namespace std;
 using namespace Belle2;
 using namespace alignment;
 
-MillepedeAlgorithm::MillepedeAlgorithm() : CalibrationAlgorithm("MillepedeCollector")
+MillepedeAlgorithm::MillepedeAlgorithm() : CalibrationAlgorithm_OLD("MillepedeCollector")
 {
   setDescription("Millepede calibration & alignment algorithm");
 }
 
-CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
+CalibrationAlgorithm_OLD::EResult MillepedeAlgorithm::calibrate()
 {
   B2INFO(" Mean of Chi2 / NDF of tracks before calibration: " << getObject<TH1F>("chi2/ndf").GetMean(););
 
@@ -86,7 +86,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   // Therefore we must add our result to all previous constants...
 
   // Set of of all (exp, run) occured in data collection
-  auto& runSet = getObject<RunRange>(CalibrationAlgorithm::RUN_RANGE_OBJ_NAME);
+  auto& runSet = getObject<RunRange>(CalibrationAlgorithm_OLD::RUN_RANGE_OBJ_NAME);
   // Objects in DB we are interested in
   std::list<Database::DBQuery> belle2Constants;
   if (nBeamParams)

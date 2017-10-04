@@ -225,7 +225,7 @@ void CDCT0CalibrationCollectorModule::collect()
   }//end of func
 }
 
-void CDCT0CalibrationCollectorModule::terminate()
+void CDCT0CalibrationCollectorModule::finish()
 {
 }
 

@@ -4,41 +4,36 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Tadeas Bilka (tadeas.bilka@gmail.com)                    *
- *               David Dossett (david.dossett@unimelb.edu.au)             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
 
-#include <memory>
-#include <utility>
+#include <framework/core/Module.h>
+#include <string>
+#include <TFile.h>
 
-#include <TDirectory.h>
-#include <TNamed.h>
-#include <TRandom.h>
-
-#include <framework/core/HistoModule.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <calibration/dataobjects/CalibRootObj.h>
 
-#include <calibration/dataobjects/CalibRootObjBase.h>
-#include <calibration/dataobjects/CalibRootObjNew.h>
-#include <calibration/dataobjects/RunRangeNew.h>
-#include <calibration/CalibObjManager.h>
-#include <calibration/Utilities.h>
+#include <TH1.h>
+#include <TTree.h>
+#include <TRandom.h>
+#include <alignment/dataobjects/MilleData.h>
 
 namespace Belle2 {
   /**
    * Calibration collector module base class
    */
-  class CalibrationCollectorModuleNew: public HistoModule {
+  class CalibrationCollectorModule_OLD: public Module {
 
   public:
     /// Constructor. Sets the default prefix for calibration dataobjects
-    CalibrationCollectorModuleNew();
+    CalibrationCollectorModule_OLD();
     /// Virtual destructor (base class)
-    virtual ~CalibrationCollectorModuleNew() {}
+    virtual ~CalibrationCollectorModule_OLD() {}
 
     /// Set up a default RunRange object in datastore and call prepare()
     void initialize() final;
@@ -46,27 +41,6 @@ namespace Belle2 {
     void event() final;
     /// Reset the m_runCollectOnRun flag, if necessary, to begin collection again
     void beginRun() final;
-    /// Write the current collector objects to a file and clear their memory
-    void endRun() final;
-    /// Write the final objects to the file
-    void terminate() final;
-
-    void defineHisto();
-
-    /// Register object with a name, takes ownership, do not access the pointer beyond prepare()
-    template <class T>
-    void registerObject(std::string name, T* obj)
-    {
-      std::unique_ptr<CalibRootObjBase> calObj(new CalibRootObjNew<T>(obj));
-      calObj->SetName(name.c_str());
-      m_manager.addObject(name, std::move(calObj));
-    }
-
-    template<class T>
-    T& getObject(std::string name)
-    {
-      return *(m_manager.getObject<T>(name, m_expRun));
-    }
 
   protected:
     /// Replacement for initialize(). Register calibration dataobjects here as well
@@ -75,26 +49,37 @@ namespace Belle2 {
     virtual void collect() {}
     /// Replacement for beginRun(). Do anything you would normally do in beginRun here
     virtual void startRun() {}
-    /// Replacement for endRun(). Do anything you would normally do in endRun here.
-    virtual void closeRun() {}
-    /// Replacement for defineHisto(). Do anything you would normally do in defineHisto here.
-    virtual void inDefineHisto() {}
 
-    TDirectory* m_dir;
+    /// Register object with name, takes ownership, do not access the pointer beyond prepare()
+    template <class T>
+    void registerObject(std::string name, T* obj)
+    {
+      std::string fullName = getName() + "_" + name;
 
-    /// Controls the creation, collection and access to calibration objects
-    CalibObjManager m_manager;
+      StoreObjPtr<CalibRootObj<T>> storeobj(fullName, DataStore::c_Persistent);
+      storeobj.registerInDataStore();
 
-    /// Overall list of runs processed
-    RunRangeNew* m_runRange;
+      if (storeobj.isValid()) {
+        B2WARNING("Replacing existing calibration data object internal template. Potentially dangerous...");
+        storeobj->replaceObject(obj);
+      } else
+        storeobj.construct(obj);
+    }
 
-    /// Current ExpRun for object retrieval (becomes -1,-1 for granularity=all)
-    Calibration::ExpRun m_expRun;
-
-    /// Current EventMetaData
-    StoreObjPtr<EventMetaData> m_emd;
+    /// Get object valid for current experiment and run by its name
+    template <class T>
+    T& getObject(std::string name)
+    {
+      std::string strExpRun = std::to_string(m_currentExpRun.first) + "." + std::to_string(m_currentExpRun.second);
+      std::string fullName = getName() + "_" + name;
+      StoreObjPtr<CalibRootObj<T>> storeobj(fullName, DataStore::c_Persistent);
+      return storeobj->getObject(strExpRun);
+    }
 
   private:
+    /// Current exp, run for correct object retrieval/creation
+    std::pair<int, int> m_currentExpRun = { -999, -999};
+
     /****** Module Parameters *******/
     /// Granularity of data collection = run|all(= no granularity, exp,run=-1,-1)
     std::string m_granularity;
@@ -108,7 +93,7 @@ namespace Belle2 {
     bool m_runCollectOnRun = true;
     /// How many events processed for each ExpRun so far, stops counting up once max is hit
     /// Only used/incremented if m_maxEventsPerRun > -1
-    std::map<Calibration::ExpRun, int> m_expRunEvents;
+    std::map<std::pair<int, int>, int> m_expRunEvents;
     /// Will point at correct value in m_expRunEvents
     int* m_eventsCollectedInRun;
 
@@ -128,3 +113,4 @@ namespace Belle2 {
     }
   };
 } // Belle2 namespace
+

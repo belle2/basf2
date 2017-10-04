@@ -10,6 +10,7 @@
 
 #include <reconstruction/calibration/CDCDedxCosineAlgorithm.h>
 #include <TF1.h>
+#include <TH1F.h>
 
 using namespace Belle2;
 
@@ -32,15 +33,15 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 {
 
   // Get data objects
-  auto& ttree = getObject<TTree>("tree");
+  auto ttree = getTreeObjectPtr("tree");
 
   // require at least 100 tracks (arbitrary for now)
-  if (ttree.GetEntries() < 100)
+  if (ttree->GetEntries() < 100)
     return c_NotEnoughData;
 
   double dedx, costh;
-  ttree.SetBranchAddress("dedx", &dedx);
-  ttree.SetBranchAddress("costh", &costh);
+  ttree->SetBranchAddress("dedx", &dedx);
+  ttree->SetBranchAddress("costh", &costh);
 
   const int nbins = 101;
   TH1F* dedxcosth[nbins];
@@ -48,8 +49,8 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
     dedxcosth[i] = new TH1F(TString::Format("dedxcosth%d", i), "dE/dx in bins of cosine", 100, 20, 70);
   }
 
-  for (int i = 0; i < ttree.GetEntries(); ++i) {
-    ttree.GetEvent(i);
+  for (int i = 0; i < ttree->GetEntries(); ++i) {
+    ttree->GetEvent(i);
     if (costh < -1.0 || costh > 1.0) continue;
     int bin = (int)((costh + 1.0) / 2.0 * nbins);
     dedxcosth[bin]->Fill(dedx);

@@ -65,7 +65,7 @@ REG_MODULE(MillepedeCollector)
 //                 Implementation
 //-----------------------------------------------------------------
 
-MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModule()
+MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModule_OLD()
 {
   setPropertyFlags(c_ParallelProcessingCertified);
   setDescription("Calibration data collector for Millepede Algorithm");

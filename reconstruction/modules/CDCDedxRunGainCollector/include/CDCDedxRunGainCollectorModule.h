@@ -18,7 +18,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <TTree.h>
 #include <TFile.h>
 #include <TRandom.h>
 

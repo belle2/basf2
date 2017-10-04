@@ -169,7 +169,7 @@ void CDCCalibrationCollectorModule::collect()
   }
 }
 
-void CDCCalibrationCollectorModule::terminate()
+void CDCCalibrationCollectorModule::finish()
 {
 }
 

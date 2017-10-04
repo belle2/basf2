@@ -12,7 +12,7 @@
 using namespace std;
 using namespace Belle2;
 
-TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithmNew("CaTest")
+TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithm("CaTest")
 {
   setDescription(
     " -------------------------- Test Calibration Algoritm -------------------------\n"
@@ -24,7 +24,7 @@ TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithmNew("C
   );
 }
 
-CalibrationAlgorithmNew::EResult TestCalibrationAlgorithm::calibrate()
+CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
 {
   // Pulling in data from collector output. It now returns shared_ptr<T> so the underlying pointer
   // will delete itself automatically at the end of this scope unless you do something

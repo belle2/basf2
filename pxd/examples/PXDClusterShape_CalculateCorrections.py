@@ -108,13 +108,8 @@ print("                 PixelKind: ", PixelKind)
 inputFileName = 'pxdClShCalSrc_RealData' + str(UseRealData) + '_Track' + str(UseTracks)
 inputFileName = inputFileName + '_Calib' + str(CalibrationKind) + '_Pixel' + str(PixelKind) + '.root'
 
-# Only initialize RootInput, as we do not loop over events,
-# only load persistent objects stored during data collection
-input = register_module('RootInput')
-input.param('inputFileName', inputFileName)
-input.initialize()
-
 algo = Belle2.PXDClusterShapeCalibrationAlgorithm()
+algo.setInputFiles([inputFileName])
 algo.setUseTracks(UseTracks)
 algo.setUseRealData(UseRealData)
 algo.setCompareTruePointTracks(CompareTruePointTracks)

@@ -22,6 +22,8 @@
 #include <iostream>
 #include <stdio.h>
 #include <TMath.h>
+#include <TH1F.h>
+#include <TH2F.h>
 
 #include <calibration/CalibrationCollectorModule.h>
 #include <pxd/calibration/PXDClusterShapeCalibrationAlgorithm.h>

@@ -18,7 +18,7 @@
 using namespace Belle2;
 
 MillepedeTreeConversionAlgorithm::MillepedeTreeConversionAlgorithm() :
-  CalibrationAlgorithm("MillepedeCollector")
+  CalibrationAlgorithm_OLD("MillepedeCollector")
 {
   m_OutputFile = "millepede_data.root";
 }
@@ -32,7 +32,7 @@ void MillepedeTreeConversionAlgorithm::setOutputFile(const char* outputFile)
   m_OutputFile = outputFile;
 }
 
-CalibrationAlgorithm::EResult MillepedeTreeConversionAlgorithm::calibrate()
+CalibrationAlgorithm_OLD::EResult MillepedeTreeConversionAlgorithm::calibrate()
 {
   const int max_entries = 100;
   int i, j, n;
@@ -74,6 +74,6 @@ CalibrationAlgorithm::EResult MillepedeTreeConversionAlgorithm::calibrate()
   t_out->Write();
   delete t_out;
   delete f_out;
-  return CalibrationAlgorithm::c_OK;
+  return CalibrationAlgorithm_OLD::c_OK;
 }
 

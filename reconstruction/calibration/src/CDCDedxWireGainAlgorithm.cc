@@ -30,22 +30,22 @@ CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() : CalibrationAlgorithm("CDC
 CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 {
   // Get data objects
-  auto& ttree = getObject<TTree>("tree");
+  auto ttree = getTreeObjectPtr("tree");
 
   // require at least 100 tracks (arbitrary for now)
-  if (ttree.GetEntries() < 100)
+  if (ttree->GetEntries() < 100)
     return c_NotEnoughData;
 
   // You HAVE to set these pointers to 0!
   std::vector<int>* wire = 0;
   std::vector<double>* dedxhit = 0;
 
-  ttree.SetBranchAddress("wire", &wire);
-  ttree.SetBranchAddress("dedxhit", &dedxhit);
+  ttree->SetBranchAddress("wire", &wire);
+  ttree->SetBranchAddress("dedxhit", &dedxhit);
 
   std::map<int, std::vector<double> > wirededx;
-  for (int i = 0; i < ttree.GetEntries(); ++i) {
-    ttree.GetEvent(i);
+  for (int i = 0; i < ttree->GetEntries(); ++i) {
+    ttree->GetEvent(i);
     for (unsigned int j = 0; j < wire->size(); ++j) {
       wirededx[wire->at(j)].push_back(dedxhit->at(j));
     }

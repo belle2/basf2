@@ -185,7 +185,12 @@ namespace Belle2 {
     std::vector<std::string> getVecInputFileNames() {return m_inputFileNames;}
 
     /// Get TTree calibration data object by name and list of runs, use TChain to avoid huge memory usage and merging
-    std::shared_ptr<TChain> getTreeObjectPtr(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const;
+    std::shared_ptr<TTree> getTreeObjectPtr(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const;
+
+    /** Get TTree calibration data object by name, use TChain to avoid huge memory usage and merging
+     *  This will only work properly after or during an execute()->calibrate() call.
+     */
+    std::shared_ptr<TTree> getTreeObjectPtr(const std::string& name) const {return getTreeObjectPtr(name, m_data.getRequestedRuns());}
 
     /// Get calibration data object by name and list of runs, the Merge function will be called to generate the overall object
     template<class T>
@@ -223,6 +228,7 @@ namespace Belle2 {
               for (auto expRunRequested : requestedRuns) {
                 if (expRunData == expRunRequested) {
                   std::string objName = getFullObjectPath(name, expRunData);
+                  B2DEBUG(100, "Adding " << objName << " from file " << fileName);
                   TObject* objOther = f->Get(objName.c_str());
                   if (mergedEmpty) {
                     objOther->Copy(*(mergedObjPtr.get()));
@@ -241,6 +247,7 @@ namespace Belle2 {
         } else {
           Calibration::ExpRun allGranExpRun = getAllGranularityExpRun();
           std::string objName = getFullObjectPath(name, allGranExpRun);
+          B2DEBUG(100, "Adding " << objName << " from file " << fileName);
           TObject* objOther = f->Get(objName.c_str());
           if (mergedEmpty) {
             objOther->Copy(*(mergedObjPtr.get()));
@@ -257,26 +264,11 @@ namespace Belle2 {
       return mergedObjPtr;
     }
 
-    /** Get TTree calibration data object (for all runs the calibration is requested for)
-     *  This function will only work during or after execute() has been called once.
-     *  The returned shared_ptr is actually holding a TChain object cast as a TTree.
-     */
-    std::shared_ptr<TTree> getObjectPtr(std::string name) const
-    {
-      B2DEBUG(100, "Getting TTree calibration object: " << name);
-      // We cheekily cast the TChain to TTree so that the template works nicely
-      // Hopefully this doesn't cause issues if people do low level stuff to the tree...
-      return std::dynamic_pointer_cast<TTree>(getTreeObjectPtr(name, m_data.getRequestedRuns()));
-    }
-
     /** Get calibration data object (for all runs the calibration is requested for)
      *  This function will only work during or after execute() has been called once.
      */
     template<class T>
-    std::shared_ptr<T> getObjectPtr(std::string name) const
-    {
-      return getObjectPtr<T>(name, m_data.getRequestedRuns());
-    }
+    std::shared_ptr<T> getObjectPtr(std::string name) const {return getObjectPtr<T>(name, m_data.getRequestedRuns());}
 
 //    // Helpers ---------------- Database storage -----
 //
@@ -337,5 +329,3 @@ namespace Belle2 {
     ClassDef(CalibrationAlgorithmNew, 1); /**< Abstract base class for calibration algorithms */
   };
 } // namespace Belle2
-
-

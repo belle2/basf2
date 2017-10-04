@@ -17,7 +17,7 @@ logging.package("calibration").log_level = LogLevel.DEBUG
 
 def _create_file(run):
     main = create_path()
-    main.add_module("EventInfoSetter", expList=[1, 2], runList=[run, run + 1], evtNumList=[1000, 1000])
+    main.add_module("EventInfoSetter", expList=[1], runList=[run], evtNumList=[1000])
     main.add_module("RootOutput", outputFileName="MyInputFile_" + str(run) + ".root")
     process(main)
     print(statistics)
@@ -28,7 +28,8 @@ def _run_child(run):
     main = create_path()
     main.add_module("RootInput", inputFileNames=["MyInputFile_" + str(run) + ".root"])
     main.add_module("HistoManager", histoFileName="MyOutputFile_" + str(run) + ".root", workDirName=working_dir)
-    testmod = main.add_module("TestHisto", entriesPerEvent=100)
+    testmod = main.add_module("TestHisto", entriesPerEvent=5000)
+#    testmod.param("granularity","all")
     process(main)
     print(statistics)
 

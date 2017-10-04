@@ -149,24 +149,6 @@ CalibrationAlgorithmNew::EResult CalibrationAlgorithmNew::execute(vector<ExpRun>
   m_data.setRequestedIov(iov);
   // After here, the getObject<...>(...) helpers start to work
 
-//  if (!dataRange.contains(caRange)) {
-//    B2ERROR("The requested range for calibration is not contained within range of collected data.");
-//    // TODO: remove runs outside collected data range...?
-//    B2INFO("If you want to extend the validity range of calibration constants beyond data, you should do it before DB commit manually.");
-//
-//    // This probably cannot happen until some logic elsewhere is broken - let's have it as a consistency check
-//    if (!dataRange.overlaps(caRange)) {
-//      B2ERROR("The calibration range does not even overlap with the collected data.");
-//      // We should get just c_NotEnoughData or c_Failure all times, so don't start and fail
-//      return c_Failure;
-//    }
-//  }
-//  // Check if we started a new iteration and clear old data
-//  if (m_data.getIteration() != iteration) {
-//    m_payloads.clear();
-//    m_iteration = iteration;
-//  }
-
   CalibrationAlgorithmNew::EResult result = calibrate();
   m_data.setResult(result);
   return result;
@@ -276,12 +258,14 @@ string CalibrationAlgorithmNew::getFullObjectPath(string name, ExpRun expRun) co
 
 void CalibrationAlgorithmNew::saveCalibration(TObject* data, const string& name, const IntervalOfValidity& iov)
 {
-  m_payloads.emplace_back(name, data, iov);
+  B2DEBUG(100, "Saving calibration TObject = '" <<  name << "' to payloads list.");
+  getPayloads().emplace_back(name, data, iov);
 }
 
 void CalibrationAlgorithmNew::saveCalibration(TClonesArray* data, const string& name, const IntervalOfValidity& iov)
 {
-  m_payloads.emplace_back(name, data, iov);
+  B2DEBUG(100, "Saving calibration TClonesArray '" <<  name << "' to payloads list.");
+  getPayloads().emplace_back(name, data, iov);
 }
 
 void CalibrationAlgorithmNew::saveCalibration(TObject* data, const string& name)
@@ -296,7 +280,7 @@ void CalibrationAlgorithmNew::saveCalibration(TClonesArray* data, const string& 
 
 bool CalibrationAlgorithmNew::commit()
 {
-  if (m_payloads.empty())
+  if (getPayloads().empty())
     return false;
   list<Database::DBQuery> payloads = getPayloads();
   B2INFO("Committing " << payloads.size()  << " payloads to database.");

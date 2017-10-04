@@ -32,32 +32,31 @@ CalibrationAlgorithmNew::EResult TestCalibrationAlgorithm::calibrate()
   auto hist = getObjectPtr<TH1F>("MyHisto");
   B2INFO("Number of Entries in MyTree was " << ttree->GetEntries());
   B2INFO("Number of Entries in MyHisto was " << hist->GetEntries());
-  B2INFO("Mean of MyHisto was " << hist->GetMean());
-  return c_OK;
+
+  float mean = hist->GetMean();
+  float meanError = hist->GetMeanError();
+
+  B2INFO("Mean of MyHisto was " << mean);
+  B2INFO("Mean Error of MyHisto was " << meanError);
 //  auto& mille = getObject<MilleData>("test_mille");
-//
-//  if (histogram1.GetEntries() < 100 || ttree.GetEntries() < 100 || mille.getFiles().empty())
-//    return c_NotEnoughData;
-//
-//  Float_t mean = histogram1.GetMean();
-//  Float_t meanError = histogram1.GetMeanError();
-//
-//  if (meanError <= 0.)
-//    return c_Failure;
-//
-//  // Example of saving a DBObject.
-//  TestCalibMean* correction = new TestCalibMean(mean, meanError);
-//  saveCalibration(correction, "TestCalibMean");
-//
-//  // Example of saving a Belle2 DBArray of DBObjects defined in the dbobjects directory
-//  TClonesArray* exampleDBArrayConstants = new TClonesArray("Belle2::TestCalibObject", 2);
-//  float val = 0.0;
-//  for (int i = 0; i < 2; i++) {
-//    val += 1.0;
-//    new((*exampleDBArrayConstants)[i]) TestCalibObject(val);
-//  }
-//  saveCalibration(exampleDBArrayConstants, "TestCalibObjects");
-//
+
+  if (hist->GetEntries() < 100 || ttree->GetEntries() < 100)
+    return c_NotEnoughData;
+
+  // Example of saving a DBObject.
+  TestCalibMean* correction = new TestCalibMean(mean, meanError);
+  saveCalibration(correction, "TestCalibMean");
+
+  // Example of saving a Belle2 DBArray of DBObjects defined in the dbobjects directory
+  TClonesArray* exampleDBArrayConstants = new TClonesArray("Belle2::TestCalibObject", 2);
+  float val = 0.0;
+  for (int i = 0; i < 2; i++) {
+    val += 1.0;
+    new((*exampleDBArrayConstants)[i]) TestCalibObject(val);
+  }
+  saveCalibration(exampleDBArrayConstants, "TestCalibObjects");
+  return c_OK;
+
 //  // Iterate until we find answer to the most fundamental question...
 //  B2INFO("mean: " << mean);
 //  B2INFO("meanError: " << meanError);

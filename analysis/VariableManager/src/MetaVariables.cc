@@ -216,7 +216,9 @@ namespace Belle2 {
 
                     // Check if it's a number first
           if (op != std::end(operators)) {
+            // Should evaluate the variable here now and push back the value as a string (saves repeating it later)
             output_queue.push_back(next_arg);
+
             // Check if it's an operation
           } else if (op < 5) {
             while

@@ -43,7 +43,7 @@ namespace Belle2 {
     template<class AState>
     unsigned int operator()(const AState& state, EnableIfCDCWireHit<AState>* = 0)
     {
-      return 56 - state.getNumber();
+      return 55 - state.getNumber();
     }
   };
 

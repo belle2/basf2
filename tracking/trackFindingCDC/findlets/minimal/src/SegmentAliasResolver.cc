@@ -63,6 +63,7 @@ void SegmentAliasResolver::exposeParameters(ModuleParamList* moduleParamList, co
 
 void SegmentAliasResolver::initialize()
 {
+  Super::initialize();
   for (const std::string& investigatedAlias : m_param_investigateAlias) {
     if (investigatedAlias == "full") {
       m_fullAlias = true;

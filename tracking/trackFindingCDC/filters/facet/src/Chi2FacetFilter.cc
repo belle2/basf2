@@ -54,6 +54,7 @@ void Chi2FacetFilter::exposeParameters(ModuleParamList* moduleParamList,
 
 void Chi2FacetFilter::initialize()
 {
+  Super::initialize();
   if (m_param_chi2CutByISuperLayer.size() == 1) {
     for (int iSL = 0; iSL < ISuperLayerUtil::c_N; ++iSL) {
       m_chi2CutByISuperLayer[iSL] = m_param_chi2CutByISuperLayer[0];

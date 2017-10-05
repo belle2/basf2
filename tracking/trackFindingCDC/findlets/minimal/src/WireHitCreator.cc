@@ -150,6 +150,7 @@ void WireHitCreator::initialize()
 
 void WireHitCreator::beginRun()
 {
+  Super::beginRun();
   CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
   wireTopology.reinitialize(m_wirePosition, m_param_ignoreWireSag);
 }

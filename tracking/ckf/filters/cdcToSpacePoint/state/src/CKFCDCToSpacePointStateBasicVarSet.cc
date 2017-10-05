@@ -11,6 +11,8 @@
 #include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateBasicVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
 #include <tracking/ckf/utilities/StateAlgorithms.h>

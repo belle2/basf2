@@ -12,6 +12,7 @@
 #include <tracking/ckf/utilities/StateAlgorithms.h>
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 using namespace std;
 using namespace Belle2;

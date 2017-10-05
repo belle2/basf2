@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/findlets/spacePoint/SpacePointMatcher.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

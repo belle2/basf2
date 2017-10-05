@@ -11,6 +11,8 @@
 #include <tracking/ckf/states/CKFState.h>
 #include <tracking/ckf/filters/cdcToSpacePoint/state/CKFCDCToSpacePointStateVarSet.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <TMath.h>

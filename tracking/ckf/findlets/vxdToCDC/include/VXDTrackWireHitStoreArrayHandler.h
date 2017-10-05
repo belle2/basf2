@@ -15,6 +15,7 @@
 #include <tracking/ckf/states/CKFResult.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <framework/datastore/StoreArray.h>

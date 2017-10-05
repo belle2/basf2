@@ -29,14 +29,5 @@ namespace Belle2 {
         return t.getWeight();
       }
     };
-
-    /// Operator testing for Nan weight
-    using HasNaNWeight = Composition<EqualNaN, GetWeight>;
-
-    /// Operator to sort for lowest according to the weight of the object.
-    using LessWeight = LessOf<MayIndirectTo<GetWeight>>;
-
-    /// Operator to sort for highest according to the weight of the object.
-    using GreaterWeight = GreaterOf<MayIndirectTo<GetWeight>>;
   }
 }

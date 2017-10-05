@@ -10,9 +10,8 @@
 #include <tracking/ckf/filters/cdcToSpacePoint/state/SimpleCKFSpacePointFilter.h>
 
 #include <tracking/ckf/utilities/StateAlgorithms.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
 
 #include <framework/core/ModuleParamList.h>
 

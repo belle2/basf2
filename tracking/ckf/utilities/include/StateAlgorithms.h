@@ -15,6 +15,7 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackFindingCDC/utilities/EnableIf.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
 namespace Belle2 {
   /// Shortcut to make compilation dependent on state content for space point-like states (SFINAE)

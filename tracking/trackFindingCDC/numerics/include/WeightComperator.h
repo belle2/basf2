@@ -21,5 +21,8 @@ namespace Belle2 {
 
     /// Operator to sort for highest according to the weight of the object.
     using GreaterWeight = GreaterOf<MayIndirectTo<GetWeight>>;
+
+    /// Operator testing for Nan weight
+    using HasNaNWeight = Composition<EqualNaN, GetWeight>;
   }
 }

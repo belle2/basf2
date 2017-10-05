@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
 
 #include <tracking/ckf/findlets/base/OverlapTeacher.h>
 #include <tracking/ckf/filters/base/CKFResultTruthVarSet.h>

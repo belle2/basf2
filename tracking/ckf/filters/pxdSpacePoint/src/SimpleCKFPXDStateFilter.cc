@@ -13,6 +13,8 @@
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 
 using namespace Belle2;

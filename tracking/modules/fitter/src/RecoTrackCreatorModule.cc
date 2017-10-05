@@ -100,7 +100,7 @@ void RecoTrackCreatorModule::event()
 
     // Add also the MC information
     const int mcParticleID = trackCandidate.getMcTrackId();
-    if (mcParticleID >= 0 and mcParticles.isOptional()) {
+    if (mcParticleID >= 0 and mcParticles.isOptional() and mcParticles.getEntries() > 0) {
       MCParticle* relatedMCParticle = mcParticles[mcParticleID];
       if (relatedMCParticle) {
         newRecoTrack->addRelationTo(relatedMCParticle);

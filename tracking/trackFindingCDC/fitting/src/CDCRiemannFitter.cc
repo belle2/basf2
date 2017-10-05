@@ -9,7 +9,15 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
-using namespace Belle2::TrackFindingCDC;
+#include <tracking/trackFindingCDC/fitting/CDCFitter2D.icc.h>
+
+using namespace Belle2;
+using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::CDCFitter2D<ExtendedRiemannsMethod>;
+
+CDCRiemannFitter::CDCRiemannFitter() = default;
+CDCRiemannFitter::~CDCRiemannFitter() = default;
 
 const CDCRiemannFitter& CDCRiemannFitter::getFitter()
 {

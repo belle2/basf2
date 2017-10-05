@@ -55,15 +55,15 @@ namespace {
       }
       const double x1 = x[segment];
       const double x2 = x[segment + 1];
-      const double x = gRandom->Uniform(x1, x2);
+      const double xx = gRandom->Uniform(x1, x2);
       //Now calculate y(x) using line between (x1,y1) and (x2,y2)
       const double y1 = y[segment];
       const double y2 = y[segment + 1];
-      const double y = (y2 == y1) ? y1 : y1 + (x - x1) / (x2 - x1) * (y2 - y1);
+      const double yy = (y2 == y1) ? y1 : y1 + (xx - x1) / (x2 - x1) * (y2 - y1);
       //Generate a random y inside the step function
       const double randY = gRandom->Uniform(0, max(y1, y2));
       //And accept the x value if randY lies below the line
-      if (randY < y) return x;
+      if (randY < yy) return xx;
       //Otherwise repeat generation of x and y
     }
   }
@@ -295,20 +295,20 @@ bool ParticleGun::setParameters(const Parameters& p)
       } else if (dist == c_discreteSpectrum || dist == c_discretePtSpectrum || hasParams >= 4) {
         //Check wellformedness of polyline pdf: ascending x coordinates and positive y coordinates with at least one nonzero value
         //Discrete spectrum only requires positive weights, no sorting needed
-        const std::vector<double>& p = getPars(par);
+        const std::vector<double>& pvec = getPars(par);
         const std::string parname = (dist == c_discreteSpectrum || dist == c_discretePtSpectrum)
                                     ? "weight" : "y coordinate";
         //Check for sorting for polylines
         if ((dist != c_discreteSpectrum) && (dist != c_discretePtSpectrum)) {
           for (size_t i = 0; i < (hasParams / 2) - 1; ++i) {
-            if (p[i] > p[i + 1]) {
+            if (pvec[i] > pvec[i + 1]) {
               B2ERROR(par << " generation: " << distributionNames[dist] << " requires x coordinates in ascending order");
               ok = false;
             }
           }
         }
         //Check that values are non-negative and at least one value is positive
-        auto minmax = std::minmax_element(p.begin() + hasParams / 2, p.end());
+        auto minmax = std::minmax_element(pvec.begin() + hasParams / 2, pvec.end());
         if (*minmax.first < 0) {
           B2ERROR(par << " generation: " << distributionNames[dist] << " requires "
                   << parname << "s to be non-negative");

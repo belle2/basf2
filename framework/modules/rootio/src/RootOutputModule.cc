@@ -73,7 +73,12 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
   addParam(c_SteerBranchNames[1], m_branchNames[1],
            "Names of persistent durability branches to be saved. Empty means all branches. Objects with c_DontWriteOut flag added here will also be saved. (FileMetaData is always saved)",
            emptyvector);
-
+  addParam(c_SteerAdditionalBranchNames[0], m_additionalBranchNames[0],
+           "Add additional event branch names without the need to specify all branchnames.",
+           emptyvector);
+  addParam(c_SteerAdditionalBranchNames[1], m_additionalBranchNames[1],
+           "Add additional persistent branch names without the need to specify all branchnames.",
+           emptyvector);
   addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0],
            "Names of event durability branches NOT to be saved. Branches also in branchNames are not saved.", emptyvector);
   addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1],
@@ -139,7 +144,9 @@ void RootOutputModule::initialize()
       const std::string& branchName = iter->first;
       //skip transient entries (allow overriding via branchNames)
       if (iter->second.dontWriteOut
-          && find(m_branchNames[durability].begin(), m_branchNames[durability].end(), branchName) == m_branchNames[durability].end())
+          && find(m_branchNames[durability].begin(), m_branchNames[durability].end(), branchName) == m_branchNames[durability].end()
+          && find(m_additionalBranchNames[durability].begin(), m_additionalBranchNames[durability].end(),
+                  branchName) ==  m_additionalBranchNames[durability].end())
         continue;
       //skip branches the user doesn't want
       if (branchList.count(branchName) == 0) {

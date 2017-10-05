@@ -9,8 +9,6 @@
 
 #include <testbeam/vxd/modules/spacePointCreatorTEL/SpacePointCreatorTELTestModule.h>
 
-#include <tracking/spacePointCreation/SpacePointHelperFunctions.h>
-
 #include <testbeam/vxd/tracking/spacePointCreation/TBSpacePoint.h>
 
 #include <framework/dataobjects/EventMetaData.h>

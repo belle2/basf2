@@ -70,8 +70,16 @@ def command_download(args, db=None):
     Download a global tag from the database
 
     This command allows to download a global tag from the central database to be
-    used locally, either als lockup directory for payloads or as a standalone
+    used locally, either als lookup directory for payloads or as a standalone
     local database if --create-dbfile is specified.
+
+    The command requires the TAGNAME to download and optionally an output
+    directory which defaults to centraldb in the local working directory. It
+    will check for existing payloads in the output directory and only download
+    payloads which are not present or don't have the excpeted checksum.
+
+    One can filter the payloads to be downloaded by payload name using the
+    --filter, --exclude and --regex options.
     """
 
     payloadfilter = ItemFilter(args)
@@ -93,14 +101,14 @@ def command_download(args, db=None):
         group = args.add_mutually_exclusive_group()
         group.add_argument("--tag-pattern", default=False, action="store_true",
                            help="if given, all global tags which match the shell-style "
-                           "pattern TAGNAME will be downloaded: `*` stands for anything, "
-                           "`?` stands for a single character."
-                           "If -c is given as well the database files will be DIR/TAGNAME.txt")
+                           "pattern TAGNAME will be downloaded: ``*`` stands for anything, "
+                           "``?`` stands for a single character. "
+                           "If -c is given as well the database files will be ``DIR/TAGNAME.txt``")
         group.add_argument("--tag-regex", default=False, action="store_true",
                            help="if given, all global tags matching the regular "
                            "expression given by TAGNAME will be downloaded (see "
-                           "https://docs.python.org/3/library/re.html)"
-                           "If -c is given as well the database files will be DIR/TAGNAME.txt")
+                           "https://docs.python.org/3/library/re.html). "
+                           "If -c is given as well the database files will be ``DIR/TAGNAME.txt``")
         return
 
     try:

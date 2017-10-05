@@ -1,12 +1,13 @@
 #include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/utilities/ReversedRange.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <framework/dataobjects/Helix.h>
-
-#include <boost/range/adaptor/reversed.hpp>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -277,7 +278,7 @@ void TrackQualityTools::removeHitsInTheBeginningIfAngleLarge(CDCTrack& track, do
   double lastAngle = NAN;
   bool removeAfterThis = false;
 
-  for (const CDCRecoHit3D& recoHit : boost::adaptors::reverse(track)) {
+  for (const CDCRecoHit3D& recoHit : reversedRange(track)) {
     if (removeAfterThis) {
       recoHit.getWireHit().getAutomatonCell().setAssignedFlag();
       continue;

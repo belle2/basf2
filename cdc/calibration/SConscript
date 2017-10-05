@@ -1,6 +1,7 @@
 Import('env')
 	
-env['LIBS'] = ['$ROOT_LIBS','Minuit', 'framework', 'cdc', 'cdc_dataobjects']
+env['LIBS'] = ['$ROOT_LIBS','Minuit', 'cdc', 'cdc_dataobjects', 'framework',
+	    'calibration', 'calibration_dataobjects']
 env['SUBLIB'] = True
 
 Return('env')

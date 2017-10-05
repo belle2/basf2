@@ -14,9 +14,7 @@
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 
-#include <framework/core/ModuleParamList.h>
-
-#include <boost/range/adaptor/indirected.hpp>
+#include <framework/core/ModuleParamList.icc.h>
 
 #include <vector>
 #include <string>
@@ -65,9 +63,15 @@ void FacetCreator::apply(const std::vector<CDCWireHitCluster>& inputClusters, st
     }
     B2ASSERT("Expect the clusters to be sorted", std::is_sorted(cluster.begin(), cluster.end()));
 
+    // Obtain the set of wire hits as references
+    std::vector<std::reference_wrapper<CDCWireHit> > wireHits;
+    wireHits.reserve(cluster.size());
+    for (CDCWireHit* wireHit : cluster) {
+      wireHits.push_back(std::ref(*wireHit));
+    }
+
     // Create the neighborhood of wire hits on the cluster
     m_wireHitRelations.clear();
-    auto wireHits = cluster | boost::adaptors::indirected;
     WeightedNeighborhood<const CDCWireHit>::appendUsing(m_wireHitRelationFilter,
                                                         wireHits,
                                                         m_wireHitRelations);

@@ -15,10 +15,13 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

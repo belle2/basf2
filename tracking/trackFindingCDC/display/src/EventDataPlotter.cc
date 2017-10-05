@@ -34,6 +34,8 @@
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
+#include <tracking/trackFindingCDC/geometry/Circle2D.h>
+
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 
@@ -43,6 +45,8 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <mdst/dataobjects/MCParticle.h>
+
+#include <TMatrixDSym.h>
 
 #include <cmath>
 #include <exception>

@@ -9,29 +9,32 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 #include <tracking/trackFindingCDC/utilities/Relation.h>
-
-#include <boost/range/iterator_range.hpp>
+#include <tracking/trackFindingCDC/utilities/Range.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+
+    // Guard to prevent repeated instatiations
+    extern template class Filter<Relation<const CDCTrack> >;
+
     /// Base class for filtering the neighborhood of tracks
     class BaseTrackRelationFilter : public Filter<Relation<const CDCTrack> > {
 
     public:
       /// Returns the full range of tracks.
       template<class ACDCTrackIterator>
-      boost::iterator_range<ACDCTrackIterator>
+      Range<ACDCTrackIterator>
       getPossibleNeighbors(const CDCTrack& track  __attribute__((unused)),
                            const ACDCTrackIterator& itBegin,
                            const ACDCTrackIterator& itEnd) const
       {
-        return boost::iterator_range<ACDCTrackIterator>(itBegin, itEnd);
+        return Range<ACDCTrackIterator>(itBegin, itEnd);
       }
 
       /**

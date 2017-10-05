@@ -16,14 +16,17 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
+#include <framework/logging/Logger.h>
+
+#include <memory>
 
 #include <vector>
 #include <string>
 #include <algorithm>
 
 namespace Belle2 {
-  class ModuleParamList;
+
 
   namespace TrackFindingCDC {
 

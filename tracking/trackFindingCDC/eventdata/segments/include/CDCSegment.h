@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
 
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 #include <tracking/trackFindingCDC/topology/EStereoKind.h>
@@ -28,18 +27,6 @@ namespace Belle2 {
       /// Default constructor for ROOT
       CDCSegment() = default;
 
-      /// Defines segments and superlayers to be coaligned.
-      friend bool operator<(const CDCSegment<T>& segment, const CDCWireSuperLayer& wireSuperLayer)
-      {
-        return segment.getISuperLayer() < wireSuperLayer.getISuperLayer();
-      }
-
-      /// Defines segments and superlayers to be coaligned.
-      friend bool operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCSegment<T>& segment)
-      {
-        return wireSuperLayer.getISuperLayer() < segment.getISuperLayer();
-      }
-
       /**
        * Returns the common stereo type of all hits.
        *
@@ -49,7 +36,7 @@ namespace Belle2 {
        */
       EStereoKind getStereoKind() const
       {
-        return EStereoKindUtil::getCommon(*this);
+        return ISuperLayerUtil::getStereoKind(getISuperLayer());
       }
 
       /// Indicator if the underlying wires are axial.
@@ -67,7 +54,7 @@ namespace Belle2 {
        */
       ISuperLayer getISuperLayer() const
       {
-        return ISuperLayerUtil::getCommon(*this);
+        return ISuperLayerUtil::getFrom(this->front());
       }
 
       /// Legacy accessor for the items of the segments, still used in some corners

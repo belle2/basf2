@@ -293,11 +293,17 @@ namespace Belle2 {
     /// Store DBArray payload with given name with default IOV
     void saveCalibration(TClonesArray* data, const std::string& name);
 
-    /// Store DB payload with given name with default IOV
-    void saveCalibration(TObject* data, const std::string& name);
-
     /// Store DBArray with given name and custom IOV
     void saveCalibration(TClonesArray* data, const std::string& name, const IntervalOfValidity& iov);
+
+    /// Store DB payload with default name and default IOV
+    void saveCalibration(TObject* data);
+
+    /// Store DB payload with default name and custom IOV
+    void saveCalibration(TObject* data, const IntervalOfValidity& iov);
+
+    /// Store DB payload with given name with default IOV
+    void saveCalibration(TObject* data, const std::string& name);
 
     /// Store DB payload with given name and custom IOV
     void saveCalibration(TObject* data, const std::string& name, const IntervalOfValidity& iov);

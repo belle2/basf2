@@ -17,7 +17,7 @@
 #include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/FitSegmentPairVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.dcl.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 

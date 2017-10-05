@@ -14,6 +14,7 @@
 #include <alignment/PedeResult.h>
 #include <alignment/PedeApplication.h>
 #include <alignment/dataobjects/PedeSteering.h>
+#include <boost/python/list.hpp>
 
 namespace Belle2 {
   /**
@@ -37,8 +38,11 @@ namespace Belle2 {
     /// Get the Pede application (for status etc.)
     alignment::PedeApplication& pede() {return m_pede;}
 
-    /// Add (false, default behavior) or subtract (true) corrections to previous values?
+    /// Add (false) or subtract (true) corrections to previous values?
     void invertSign(bool use_subtraction = true) {m_invertSign = use_subtraction;}
+
+    /// Set components (BeamParameters...) to calibrate or empty for all available in data
+    void setComponents(const std::vector<std::string>& components) {m_components = components;}
 
   protected:
 
@@ -46,6 +50,8 @@ namespace Belle2 {
     virtual EResult calibrate();
 
   private:
+    /// Components (BeamParameters...) to calibrate or empty for all available in data
+    std::vector<std::string> m_components{};
     /// Add (true) or subtract (false) corrections?
     bool m_invertSign{false};
     /// The steering with commands

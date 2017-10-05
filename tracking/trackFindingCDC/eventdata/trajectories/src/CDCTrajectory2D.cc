@@ -7,33 +7,45 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
+
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
+#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
+#include <tracking/trackFindingCDC/topology/WireLine.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+
+#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
 #include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 
+#include <vector>
+#include <utility>
+#include <ostream>
 #include <cmath>
 #include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
 CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
                                  const double time,
                                  const Vector2D& mom2D,
                                  const double charge,
                                  const double bZ)
-  : m_localOrigin(pos2D),
-    m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, bZ),
+  : m_localOrigin(pos2D)
+  , m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, bZ),
                          mom2D.unit(),
-                         0.0),
-    m_flightTime(time)
+                         0.0)
+  , m_flightTime(time)
 {
 }
 
@@ -41,11 +53,11 @@ CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
                                  const double time,
                                  const Vector2D& mom2D,
                                  const double charge)
-  : m_localOrigin(pos2D),
-    m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, pos2D),
+  : m_localOrigin(pos2D)
+  , m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, pos2D),
                          mom2D.unit(),
-                         0.0),
-    m_flightTime(time)
+                         0.0)
+  , m_flightTime(time)
 {
 }
 
@@ -260,4 +272,11 @@ double CDCTrajectory2D::setLocalOrigin(const Vector2D& localOrigin)
   m_localPerigeeCircle.passiveMoveBy(localOrigin - m_localOrigin);
   m_localOrigin = localOrigin;
   return arcLength2D;
+}
+
+
+std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const CDCTrajectory2D& trajectory2D)
+{
+  return output << "Local origin : " << trajectory2D.getLocalOrigin() << ", "
+         << "local circle : " << trajectory2D.getLocalCircle();
 }

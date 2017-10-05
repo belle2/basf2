@@ -5,9 +5,10 @@ from basf2 import *
 from ROOT import Belle2
 
 
-def add_svd_reconstruction(path):
+def add_svd_reconstruction(path, clusterName=""):
 
     svd_clusterizer = register_module('SVDClusterizer')
+    svd_clusterizer.param('Clusters', clusterName)
     path.add_module(svd_clusterizer)
 
 

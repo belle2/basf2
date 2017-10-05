@@ -83,6 +83,7 @@ void ECLUnpackerModule::initialize()
     m_eclDigits.registerRelationTo(m_eclTrigs);
   }
   m_eclDsps.registerInDataStore(m_eclDspsName);
+  m_eclDsps.registerRelationTo(m_eclDigits);
 
   // make full name of the initialization file
   std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
@@ -97,7 +98,7 @@ void ECLUnpackerModule::initialize()
 
   B2INFO("ECL Unpacker: eclChannelMapper initialized successfully");
 
-  // or initialize if from DB TODO
+  // or initialize it from DB TODO
 }
 
 void ECLUnpackerModule::beginRun()
@@ -329,7 +330,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           // fill eclDigits data object
           B2DEBUG(100, "New eclDigit: cid = " << cellID << " amp = " << dspAmplitude << " time = " << dspTime << " qflag = " <<
                   dspQualityFlag);
-          //B2DEBUG(10,"iCrate = " << iCrate << " iShaper = " << iShaper << " iChannel = " << iChannel);
 
           // construct eclDigit object and save it in DataStore
           ECLDigit* newEclDigit = m_eclDigits.appendNew();
@@ -389,11 +389,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
             cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
-            if (nADCSamplesPerChannel == 31) { // TODO: change fixed size in eclDsp to parameter
-              ECLDsp* newEclDsp = m_eclDsps.appendNew();
-              newEclDsp->setCellId(cellID);
-              newEclDsp->setDspA(eclWaveformSamples.data());
-            } else B2WARNING("nADCSamplesPerChannel != 31, ADC samples will not be stored");
+            ECLDsp* newEclDsp = m_eclDsps.appendNew(cellID, eclWaveformSamples);
           }
 
           nRead++;

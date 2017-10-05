@@ -9,13 +9,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segmentPair/BaseSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/SkimmedHitGapSegmentPairVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
+#include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegmentPair;
 
     /// Filter for the constuction of segment pairs based on simple criteria without the common fit.
     class FitlessSegmentPairFilter : public FilterOnVarSet<SkimmedHitGapSegmentPairVarSet> {

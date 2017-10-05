@@ -97,6 +97,7 @@ void BaseRecoFitterModule::event()
             recoTrack.getMomentumSeed().Z());
     B2DEBUG(100, "Position: " << recoTrack.getPositionSeed().X() << " " << recoTrack.getPositionSeed().Y() << " " <<
             recoTrack.getPositionSeed().Z());
+    B2DEBUG(100, "Charge: " << recoTrack.getChargeSeed());
     B2DEBUG(100, "Total number of hits assigned to the track: " << recoTrack.getNumberOfTotalHits());
 
     for (const unsigned int pdgCodeToUseForFitting : m_param_pdgCodesToUseForFitting) {
@@ -113,6 +114,13 @@ void BaseRecoFitterModule::event()
         //Calculate probability
         double pValue = recoTrack.getTrackFitStatus()->getPVal();
         B2DEBUG(99, "       pValue of the fit: " << pValue);
+        B2DEBUG(99, "Charge after fit " << recoTrack.getMeasuredStateOnPlaneFromFirstHit().getCharge());
+        B2DEBUG(99, "Position after fit " << recoTrack.getMeasuredStateOnPlaneFromFirstHit().getPos().X() << " " <<
+                recoTrack.getMeasuredStateOnPlaneFromFirstHit().getPos().Y() << " " <<
+                recoTrack.getMeasuredStateOnPlaneFromFirstHit().getPos().Z());
+        B2DEBUG(99, "Momentum after fit " << recoTrack.getMeasuredStateOnPlaneFromFirstHit().getMom().X() << " " <<
+                recoTrack.getMeasuredStateOnPlaneFromFirstHit().getMom().Y() << " " <<
+                recoTrack.getMeasuredStateOnPlaneFromFirstHit().getMom().Z());
       } else {
         B2DEBUG(99, "       fit failed!");
       }

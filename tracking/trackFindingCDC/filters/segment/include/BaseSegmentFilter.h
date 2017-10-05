@@ -9,11 +9,15 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegment2D;
+
+    // Guard to prevent repeated instatiations
+    extern template class Filter<CDCSegment2D>;
+
     /// Base filter to distinguish fake from real segments.
     using BaseSegmentFilter = Filter<CDCSegment2D>;
   }

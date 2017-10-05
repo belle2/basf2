@@ -143,6 +143,11 @@ namespace Belle2 {
        */
       void createGeometry(const CDCGeometry& parameters, G4LogicalVolume& topVolume,
                           geometry::GeometryTypes type);
+      /**
+       * Create the B-field mapper geometry (tentative function)
+       */
+      void createMapper(G4LogicalVolume& topVolume);
+
       //! CDC G4 logical volume.
       G4LogicalVolume* logical_cdc;
 

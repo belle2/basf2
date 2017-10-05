@@ -13,9 +13,11 @@
 
 /* Belle2 headers. */
 #include <eklm/calibration/EKLMDatabaseImporter.h>
+#include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
 #include <eklm/dbobjects/EKLMReconstructionParameters.h>
 #include <eklm/dbobjects/EKLMSimulationParameters.h>
+#include <eklm/geometry/GeometryData.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/gearbox/GearDir.h>
@@ -78,5 +80,44 @@ void EKLMDatabaseImporter::importSimulationParameters()
     Unit::convertValue(gd.getDouble("HitTimeThreshold") , "ns"));
   IntervalOfValidity iov(0, 0, -1, -1);
   simPar.import(iov);
+}
+
+void EKLMDatabaseImporter::loadDefaultChannelData()
+{
+  EKLMChannelData channelData;
+  m_Channels.construct();
+  channelData.setActive(true);
+  const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
+  int iEndcap, iLayer, iSector, iPlane, iStrip, strip;
+  for (iEndcap = 1; iEndcap <= geoDat->getNEndcaps(); iEndcap++) {
+    for (iLayer = 1; iLayer <= geoDat->getNDetectorLayers(iEndcap);
+         iLayer++) {
+      for (iSector = 1; iSector <= geoDat->getNSectors(); iSector++) {
+        for (iPlane = 1; iPlane <= geoDat->getNPlanes(); iPlane++) {
+          for (iStrip = 1; iStrip <= geoDat->getNStrips(); iStrip++) {
+            strip = geoDat->stripNumber(iEndcap, iLayer, iSector, iPlane,
+                                        iStrip);
+            m_Channels->setChannelData(strip, &channelData);
+          }
+        }
+      }
+    }
+  }
+}
+
+void EKLMDatabaseImporter::setChannelData(
+  int endcap, int layer, int sector, int plane, int strip,
+  EKLMChannelData* channelData)
+{
+  int stripGlobal;
+  const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
+  stripGlobal = geoDat->stripNumber(endcap, layer, sector, plane, strip);
+  m_Channels->setChannelData(stripGlobal, channelData);
+}
+
+void EKLMDatabaseImporter::importChannelData()
+{
+  IntervalOfValidity iov(0, 0, -1, -1);
+  m_Channels.import(iov);
 }
 

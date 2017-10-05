@@ -18,11 +18,14 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
-
-#include <framework/core/ModuleParamList.h>
+#include <cdc/dataobjects/CDCHit.h>
 
 #include <TRandom.h>
 

@@ -201,6 +201,7 @@ TrgEclMaster::simulate01(int m_nEvent)
     }
     if (HitTCId.size() == 0) {continue;}
     else {
+      HitTCId.clear();
       for (int iTCId = 0; iTCId < 576; iTCId++) {
         const int hitsize =  TCTiming[iTCId].size();
         for (int ihit = 0; ihit < hitsize; ihit++) {

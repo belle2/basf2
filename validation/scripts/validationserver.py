@@ -276,14 +276,8 @@ def setup_gzip_compression(path, cherry_config):
                                                           'application/json']})
 
 
-def parse_cmd_line_arguments():
-    """!
-    Sets up a parser for command line arguments,
-    parses them and returns the arguments.
-    @return: An object containing the parsed command line arguments.
-    Arguments are accessed like they are attributes of the object,
-    i.e. [name_of_object].[desired_argument]
-    """
+def get_argument_parser():
+    """Prepare a parser for all the known command line arguments"""
 
     # Set up the command line parser
     parser = argparse.ArgumentParser()
@@ -298,10 +292,22 @@ def parse_cmd_line_arguments():
     parser.add_argument("-v", "--view", help="Open validation website"
                         " in the system's default browser.",
                         action='store_true')
-    parser.add_argument("--production", help="Run in production environment"
+    parser.add_argument("--production", help="Run in production environment: "
                         "no log/error output via website and no auto-reload",
                         action="store_true")
 
+    return parser
+
+
+def parse_cmd_line_arguments():
+    """!
+    Sets up a parser for command line arguments,
+    parses them and returns the arguments.
+    @return: An object containing the parsed command line arguments.
+    Arguments are accessed like they are attributes of the object,
+    i.e. [name_of_object].[desired_argument]
+    """
+    parser = get_argument_parser()
     # Return the parsed arguments!
     return parser.parse_args()
 

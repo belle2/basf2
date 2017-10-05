@@ -7,23 +7,28 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/MCAxialSegmentPairFilter.h>
-
-#include <framework/logging/Logger.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.icc.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::MCSymmetric<BaseAxialSegmentPairFilter>;
 
 MCAxialSegmentPairFilter::MCAxialSegmentPairFilter(bool allowReverse) :
   Super(allowReverse)
 {
 }
 
+MCAxialSegmentPairFilter::~MCAxialSegmentPairFilter() = default;
 
 Weight MCAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axialSegmentPair)
 {

@@ -14,6 +14,8 @@
 #include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
 #include <tracking/trackFindingCDC/numerics/Index.h>
 
+#include <map>
+
 namespace Belle2 {
   class MCParticle;
   class CDCSimHit;
@@ -63,16 +65,14 @@ namespace Belle2 {
     };
 
     /// Interface class to the Monte Carlo information for collections of hits
-    template<class ACDCHitCollection>
+    template <typename ACDCHitCollection>
     class CDCMCHitCollectionLookUp  {
 
     public:
       /// Provide a user-defined constructor because the Intel compiler complains (wrongfully)
       /// that a const-instance of a class w/o user-defined ctor is useless. But in C++11 we have
       /// per-member initialization ...
-      CDCMCHitCollectionLookUp()
-      {
-      }
+      CDCMCHitCollectionLookUp() = default;
 
       /// Clears all Monte Carlo information left from the last event
       void clear();

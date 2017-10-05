@@ -1,41 +1,23 @@
 Here are instruction for running validation of newly produced simulations for Charmless B Decay physics group.
 Validation consist of two steps: production of nTuples and nTuple analysis
 
-0. Prerelease tests
-    Before release, it might be benefitial to validate scripts on small sample. Thus, one need to generate files localy. It can be done with default validation means:
-    > cd ../
-    > basf2 test0_1210032007.py
-    > basf2 test0_1210032008.py
-    N.B. By default, scripts produce 100ev., for test you might need more, say 1k (takes ~2.4sec/event). Please modify scripts accordingly.
-
 1. Production of nTuples
     a.  To produce nTuples, make sure you know how to work with gbasf2:
         https://confluence.desy.de/pages/viewpage.action?pageId=47819144
 
     b.  Go to Rec/ directory and submit gb2 jobs:
         > cd Rec
-        > gbasf2 RecMC9_Bu_Rho0Kst+_K+pi0.py -i /belle/MC/prerelease-00-09-00b/DBxxxxxxxx/MC9/prod00002146/s00/e0000/4S/r00000/1210032008/sub00 -f aliases.py BTools.py -p MC9_Kpi0_T -s prerelease-00-09-00b
-        > gbasf2 RecMC9_Bu_Rho0Kst+_K+pi0.py -i /belle/MC/prerelease-00-09-00b/DBxxxxxxxx/MC9/prod00002145/s00/e0000/4S/r00000/1210032007/sub00  -f aliases.py BTools.py -p MC9_Kpi0_L -s prerelease-00-09-00b
-        N.B. Scripts might vary from release to release.
-        MC9 Transverse:   /belle/MC/prerelease-00-09-00b/DBxxxxxxxx/MC9/prod00002146/s00/e0000/4S/r00000/1210032008/sub00
-        MC9 Longitudinal: /belle/MC/prerelease-00-09-00b/DBxxxxxxxx/MC9/prod00002145/s00/e0000/4S/r00000/1210032007/sub00 
-
-    b'. For prerelease, no need to use gbasf2, just use basf2:
-        > cd Rec
-        > basf2 RecMC9_Bu_Rho0Kst+_K+pi0.py -i ../../../1210032008.dst.root 
-        > mv Bu_Rho0Kst+_K+pi0.root Bu_Rho0Kst+_K+pi0_Transverse.root
-        > basf2 RecMC9_Bu_Rho0Kst+_K+pi0.py -i ../../../1210032007.dst.root 
-        > mv Bu_Rho0Kst+_K+pi0.root Bu_Rho0Kst+_K+pi0_Longitudinal.root
-        > hadd Bu_Rho0Kst+_K+pi0.root Bu_Rho0Kst+_K+pi0_Transverse.root Bu_Rho0Kst+_K+pi0_Longitudinal.root
-        In this case, skip sub-steps c and d and go straight to step 2
+        > gbasf2 Rec_Bu_Rho0Kst+_K+pi0_gb2.py -i <Address of transverse-polarized samples> -f aliases.py BTools.py -p Kpi0_T
+        > gbasf2 Rec_Bu_Rho0Kst+_K+pi0_gb2.py -i <Address of longitudinaly-polarized samples> -f aliases.py BTools.py -p Kpi0_L
+        N.B. Scripts are created for basf2 release-00-08-00. If release version will change, you will might need to update them.
 
     c.  Once jobs are completed, download otuput tuples:
-        > gb2_ds_get /belle/user/$USER/MC9_Kpi0_T
-        > gb2_ds_get /belle/user/$USER/MC9_Kpi0_L
+        > gb2_ds_get /belle/user/$USER/Kpi0_T
+        > gb2_ds_get /belle/user/$USER/Kpi0_L
 
     d.  Merge outputs:
-        > hadd Bu_Rho0Kst+_K+pi0_Transverse.root MC9_Kpi0_T/*.root
-        > hadd Bu_Rho0Kst+_K+pi0_Longitudinal.root MC9_Kpi0_L/*.root
+        > hadd Bu_Rho0Kst+_K+pi0_Transverse.root Kpi0_T/*.root
+        > hadd Bu_Rho0Kst+_K+pi0_Longitudinal.root Kpi0_L/*.root
         > hadd Bu_Rho0Kst+_K+pi0.root Bu_Rho0Kst+_K+pi0_Transverse.root Bu_Rho0Kst+_K+pi0_Longitudinal.root
 
     N.B. As a result of this step, you will have Bu_Rho0Kst+_K+pi0_Transverse.root and Bu_Rho0Kst+_K+pi0_Longitudinal.root stred in Rec/ direcotry.

@@ -21,14 +21,14 @@ If you modify original ntuples, pleae make changes of tuple names here according
 """
 
 
-#: Continuum background
+# Continuum background
 CB_suppression = {
-    'R2':  #: Ratio of 2nd to 0th order Fox-Wolfarm moments
+    'R2':  # Ratio of 2nd to 0th order Fox-Wolfarm moments
     {'tuple_name': 'B_R2',
      'lLim': 0.,
      'uLim': 1.,
         'xaxis': "R2"},
-    'CosTBz':  #: Cosine of the angle between the B thrust axis & the z axis in the CM
+    'CosTBz':  # Cosine of the angle between the B thrust axis & the z axis in the CM
     {'tuple_name': 'B_CosTBz',
      'lLim': 0,
      'uLim': 1,
@@ -56,180 +56,179 @@ CB_suppression = {
 }
 
 
-#: KS0 variables
+# KS0
+# However, this might be redundant. Just use goodKs
 k0s_variables = {
-    'KsOpAng':  #: Opening angle
-    {'tuple_name': 'B_K0s_hel',
+    'KsOpAng':  # Opening angle
+    {'tuple_name': 'B__K0s_hel',
      'lLim': -1.001,
      'uLim': 1.001,
      'xaxis': "cos(#theta_{K^{0}_{s}})"},
-    'Ksdr':  #: transverse distance in respect to IP
-    {'tuple_name': 'B_K0s_dr',
+    'Ksdr':  # transverse distance in respect to IP
+    {'tuple_name': 'B__K0s_dr',
              'lLim': 0.,
              'uLim': 120,
              'logY': False,
              'xaxis': "K^{0}_{s} flight distance, cm"},
-    'goodKs':  #: GoodKs
-    {'tuple_name': 'B_K0s_goodKs',
+    'goodKs':  # GoodKs
+    {'tuple_name': 'B__K0s_goodKs',
      'lLim': 0.,
      'uLim': 1.001,
      'xaxis': "goodKs"},
-    'KsVLike':  #: K0s V-Like
-    {'tuple_name': 'B_K0s_ksnbVLike',
+    'KsVLike':  # K0s V-Like
+    {'tuple_name': 'B__K0s_ksnbVLike',
      'lLim': 0.,
      'uLim': 1.001,
      'xaxis': "K0s v-like"},
-    'KsNoLam':  #: KsNoLam
-    {'tuple_name': 'B_K0s_ksnbNoLam',
+    'KsNoLam':  # KsNoLam
+    {'tuple_name': 'B__K0s_ksnbNoLam',
      'lLim': -1.001,
      'uLim': 1.001,
      'xaxis': "KsNoLam"},
-    'KsSt':  #: Standard
-    {'tuple_name': 'B_K0s_ksnbStandard',
+    'KsSt':  # Standard
+    {'tuple_name': 'B__K0s_ksnbStandard',
              'lLim': 0.,
              'uLim': 1.001,
              'xaxis': "Standard K0s"}
 }
 
-#: pi0 variables
+# pi0
 pi0_variables = {
-    'EgMin':  #: Min gamma energy
-    {'tuple_name': 'min(B_g0_E,B_g1_E)',
+    'EgMin':  # Min gamma energy
+    {'tuple_name': 'min(B__g0_E,B__g1_E)',
      'lLim': 0,
      'uLim': 5.,
      'xaxis': "min(E_{#gamma}), GeV"},
-    'EgMax':  #: Max gamma energy
-    {'tuple_name': 'max(B_g0_E,B_g1_E)',
+    'EgMax':  # Max gamma energy
+    {'tuple_name': 'max(B__g0_E,B__g1_E)',
      'lLim': 0,
      'uLim': 5.,
      'xaxis': "max(E_{#gamma}), GeV"},
-    'Eg1':  #: gamma 1 energy
-    {'tuple_name': 'B_g0_E',
+    'Eg1':  # gamma 1 energy
+    {'tuple_name': 'B__g0_E',
      'lLim': 0,
      'uLim': 5.,
      'xaxis': "E_{#gamma 1}, GeV"},
-    'Eg2':  #: gamma 2 energy
-    {'tuple_name': 'B_g1_E',
+    'Eg2':  # gamma 2 energy
+    {'tuple_name': 'B__g1_E',
      'lLim': 0,
      'uLim': 5.,
      'xaxis': "E_{#gamma 2}, GeV"},
-    'Thetag1':  #: gamma 1 cosTheta
-    {'tuple_name': 'B_g0_cosTheta',
+    'Thetag1':  # gamma 1 cosTheta
+    {'tuple_name': 'B__g0_cosTheta',
      'lLim': -1.,
      'uLim': 1.,
      'xaxis': "cos(#theta^{#gamma 1})"},
-    'Thetag2':  #: gamma 2 coTheta
-    {'tuple_name': 'B_g1_cosTheta',
+    'Thetag2':  # gamma 2 coTheta
+    {'tuple_name': 'B__g1_cosTheta',
      'lLim': -1.,
      'uLim': 1.,
      'xaxis': "cos(#theta^{#gamma 2})"},
-    'Mpi0Rec':  #: Mass
-    {'tuple_name': 'pow( pow(B_g0_E+B_g1_E,2) - pow(B_g0_px+B_g1_px,2) \
-        - pow(B_g0_py+B_g1_py,2) - pow(B_g0_pz+B_g1_pz,2),0.5)',
+    'Mpi0Rec':  # Mass
+    {'tuple_name': 'pow( pow(B__g0_E+B__g1_E,2) - pow(B__g0_px+B__g1_px,2) \
+        - pow(B__g0_py+B__g1_py,2) - pow(B__g0_pz+B__g1_pz,2),0.5)',
      'lLim': 0.12,
      'uLim': 0.15,
      'xaxis': "M_{#pi^{0}}, GeV/c^{2}"}
 }
 
-#: PID variables
 pid_variables = {
-    'RhoPi_SepMin':  #: atc_pid(3,1,5,3,2) of pi- from rho0
-    {'tuple_name': 'min(B_Rh0_PID_K_vs_pi,B_Rh1_PID_K_vs_pi)',
+    'RhoPi_SepMin':  # atc_pid(3,1,5,3,2) of pi- from rho0
+    {'tuple_name': 'min(B__Rh0_PID_K_vs_pi,B__Rh1_PID_K_vs_pi)',
      'lLim': 0.,
      'uLim': 1.,
      'logY': False,
      'xaxis': "min(#pi_{#rho}) K/#pi separation"},
-    'RhoPi_SepMax':  #: atc_pid(3,1,5,3,2) of pi- from rho0
-    {'tuple_name': 'max(B_Rh0_PID_K_vs_pi,B_Rh1_PID_K_vs_pi)',
+    'RhoPi_SepMax':  # atc_pid(3,1,5,3,2) of pi- from rho0
+    {'tuple_name': 'max(B__Rh0_PID_K_vs_pi,B__Rh1_PID_K_vs_pi)',
      'lLim': 0.,
      'uLim': 1.,
      'logY': False,
      'xaxis': "max(#pi_{#rho}) K/#pi separation"},
-    'KstPi_Sep':  #: atc_pid(3,1,5,3,2) of pi+ from K*+
-    {'tuple_name': 'B_Kh1_PID_K_vs_pi',
+    'KstPi_Sep':  # atc_pid(3,1,5,3,2) of pi+ from K*+
+    {'tuple_name': 'B__Kh1_PID_K_vs_pi',
      'lLim': 0.,
      'uLim': 1.,
      'logY': False,
      'xaxis': "#pi_{K^*} K/#pi separation"},
-    'KstK_Sep':  #: atc_pid(3,1,5,3,2) of pi+ from K*+
-    {'tuple_name': 'B_Kh0_PID_K_vs_pi',
+    'KstK_Sep':  # atc_pid(3,1,5,3,2) of pi+ from K*+
+    {'tuple_name': 'B__Kh0_PID_K_vs_pi',
      'lLim': 0.,
      'uLim': 1.,
      'logY': False,
      'xaxis': "K_{K^*} K/#pi separation"}
 }
 
-#: Kinematic variables
 kinematics = {
     'RhoPi_pT_min':
-        {'tuple_name': 'min(B_Rh0_pt,B_Rh1_pt)',
+        {'tuple_name': 'min(B__Rh0_pt,B__Rh1_pt)',
          'lLim': 0.,
          'uLim': 3.,
          'logY': False,
          'xaxis': "min(P^{T}_{#pi from #rho}), GeV/c"},
     'RhoPi_pT_max':
-        {'tuple_name': 'max(B_Rh0_pt,B_Rh1_pt)',
+        {'tuple_name': 'max(B__Rh0_pt,B__Rh1_pt)',
          'lLim': 0.,
          'uLim': 3.,
          'logY': False,
          'xaxis': "max(P^{T}_{#pi from #rho}), GeV/c"},
     'RhoPi_p_min':
-        {'tuple_name': 'min(B_Rh0_p,B_Rh1_p)',
+        {'tuple_name': 'min(B__Rh0_p,B__Rh1_p)',
          'lLim': 0.,
          'uLim': 3.,
          'logY': False,
          'xaxis': "min(P_{#pi from #rho}), GeV/c"},
     'RhoPi_p_max':
-        {'tuple_name': 'max(B_Rh0_p,B_Rh1_p)',
+        {'tuple_name': 'max(B__Rh0_p,B__Rh1_p)',
          'lLim': 0.,
          'uLim': 3.,
          'logY': False,
          'xaxis': "max(P_{#pi from #rho}), GeV/c"},
-    #: K from K*
-    'KstK_M':  #: Mass
-        {'tuple_name': 'B_Kh0_M',
+    # K from K*
+    'KstK_M':  # Mass
+        {'tuple_name': 'B__Kh0_M',
          'lLim': 0.46,
          'uLim': 0.53,
          'xaxis': "M_{K}, GeV/c^{2}"},
-    'KstK_E':  #: Mass
-        {'tuple_name': 'B_Kh0_E',
+    'KstK_E':  # Mass
+        {'tuple_name': 'B__Kh0_E',
          'lLim': 0.,
          'uLim': 4.,
          'xaxis': "E_{K}, GeV"},
-    'KstK_p':  #: Mass
-        {'tuple_name': 'B_Kh0_p',
+    'KstK_p':  # Mass
+        {'tuple_name': 'B__Kh0_p',
          'lLim': 0.,
          'uLim': 4.,
          'xaxis': "P_{K}, GeV/c"},
-    'KstK_pt':  #: Mass
-        {'tuple_name': 'B_Kh0_pt',
+    'KstK_pt':  # Mass
+        {'tuple_name': 'B__Kh0_pt',
          'lLim': 0.,
          'uLim': 4.,
          'xaxis': "P^{T}_{K}, GeV/c"},
-    #: pi from K*
-    'KstPi_M':  #: Mass
-        {'tuple_name': 'B_Kh1_M',
+    # pi from K*
+    'KstPi_M':  # Mass
+        {'tuple_name': 'B__Kh1_M',
          'lLim': 0.13,
          'uLim': 0.14,
          'xaxis': "M_{#pi from K^{*}}, GeV/c^{2}"},
-    'KstPi_E':  #: Mass
-        {'tuple_name': 'B_Kh1_E',
+    'KstPi_E':  # Mass
+        {'tuple_name': 'B__Kh1_E',
          'lLim': 0.,
          'uLim': 4.,
          'xaxis': "E_{#pi from K^{*}}, GeV"},
-    'KstPi_p':  #: Mass
-        {'tuple_name': 'B_Kh1_p',
+    'KstPi_p':  # Mass
+        {'tuple_name': 'B__Kh1_p',
          'lLim': 0.,
          'uLim': 4.,
          'xaxis': "P_{#pi from K^{*}}, GeV/c"},
-    'KstPi_pt':  #: Mass
-        {'tuple_name': 'B_Kh1_pt',
+    'KstPi_pt':  # Mass
+        {'tuple_name': 'B__Kh1_pt',
          'lLim': 0.,
          'uLim': 4.,
          'xaxis': "P^{T}_{#pi from K^{*}}, GeV/c"},
 }
 
-#: Vertex quality variables
+# Vertex quality
 vertex_variables = {
     'Pvalue':
         {'tuple_name': 'B_VtxPvalue',
@@ -238,25 +237,25 @@ vertex_variables = {
          'logY': False,
          'xaxis': "B-vertex p-value"},
     'RhoPi_dr_max':
-        {'tuple_name': 'max(B_Rh0_dr,B_Rh1_dr)',
+        {'tuple_name': 'max(B__Rh0_dr,B__Rh1_dr)',
          'lLim': 0.,
          'uLim': 4,
          'logY': False,
          'xaxis': "max(dr_{#pi from #rho}), cm"},
     'RhoPi_dr_min':
-        {'tuple_name': 'min(B_Rh0_dr,B_Rh1_dr)',
+        {'tuple_name': 'min(B__Rh0_dr,B__Rh1_dr)',
          'lLim': 0.,
          'uLim': 4,
          'logY': False,
          'xaxis': "min(dr_{#pi from #rho}), cm"},
     'KstK_dr':
-        {'tuple_name': 'B_Kh0_dr',
+        {'tuple_name': 'B__Kh0_dr',
          'lLim': 0.,
          'uLim': 100,
          'logY': False,
          'xaxis': "dr_{K}, cm"},
     'KstPi_dr':
-        {'tuple_name': 'B_Kh1_dr',
+        {'tuple_name': 'B__Kh1_dr',
          'lLim': 0.,
          'uLim': 4,
          'logY': False,
@@ -270,54 +269,52 @@ vertex_variables = {
 }
 
 
-#: Kaon and pion identification for final state with K0
+# Kaon and pion identification
 K0spi_pid_variables = {
     'RhoPi_SepMin':
-        {'tuple_name': 'min(B_Rh0_PID_K_vs_pi,B_Rh1_PID_K_vs_pi)',
+        {'tuple_name': 'min(B__Rh0_PID_K_vs_pi,B__Rh1_PID_K_vs_pi)',
          'lLim': 0.,
          'uLim': 1.,
          'logY': False,
          'xaxis': "min(#pi_{#rho}) K/#pi separation"},
     'RhoPi_SepMax':
-        {'tuple_name': 'max(B_Rh0_PID_K_vs_pi,B_Rh1_PID_K_vs_pi)',
+        {'tuple_name': 'max(B__Rh0_PID_K_vs_pi,B__Rh1_PID_K_vs_pi)',
          'lLim': 0.,
          'uLim': 1.,
          'logY': False,
          'xaxis': "max(#pi_{#rho}) K/#pi separation"},
     'KstPip_Sep':
-        {'tuple_name': 'B_Kh1_PID_K_vs_pi',
+        {'tuple_name': 'B__Kh1_PID_K_vs_pi',
          'lLim': 0.,
          'uLim': 1.,
          'logY': False,
          'xaxis': "K_{K^*} K/#pi separation"}
 }
 
-#: Kaon and pion identification for final state with pi0
 Kpi0_pid_variables = {
     'RhoPi_Kpi_SepMin':
-        {'tuple_name': 'min(B_Rh0_PID_K_vs_pi,B_Rh1_PID_K_vs_pi)',
+        {'tuple_name': 'min(B__Rh0_PID_K_vs_pi,B__Rh1_PID_K_vs_pi)',
          'lLim': 0.,
          'uLim': 1.,
          'logY': False,
          'xaxis': "min(#pi_{#rho}) K/#pi separation"},
     'RhoPi_Kpi_SepMax':
-        {'tuple_name': 'max(B_Rh0_PID_K_vs_pi,B_Rh1_PID_K_vs_pi)',
+        {'tuple_name': 'max(B__Rh0_PID_K_vs_pi,B__Rh1_PID_K_vs_pi)',
          'lLim': 0.,
          'uLim': 1.,
          'logY': False,
          'xaxis': "max(#pi_{#rho}) K/#pi separation"},
     'Kst_Kpi_Sep':
-        {'tuple_name': 'B_Kh0_PID_K_vs_pi',
+        {'tuple_name': 'B__Kh0_PID_K_vs_pi',
          'lLim': 0.,
          'uLim': 1.,
          'logY': False,
          'xaxis': "#K_{K^*} K/#pi separation"}
 }
 
-#: All-event variables
 event_variables = {
     'VTX_Rank':
-        {'tuple_name': 'B_vtx_rank',
+        {'tuple_name': 'B__vtx_rank',
          'lLim': 0.,
          'uLim': 10.,
          'logY': False,

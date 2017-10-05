@@ -16,6 +16,7 @@
 #include <type_traits>
 #include <utility>
 #include <cassert>
+#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -533,6 +534,19 @@ namespace Belle2 {
     {
       return {toFunctor(lhs), toFunctor(rhs)};
     }
+
+    /// Unary functor for equality comparison to NAN
+    struct IsNaN {
+      /// Marker function for the isFunctor test
+      operator FunctorTag();
+
+      /// Operator for equality comparision to NaN
+      template<class T>
+      bool operator()(const T& t) const
+      {
+        return std::isnan(t);
+      }
+    };
 
     // ******************** Other operators are left as exercise ********************
 

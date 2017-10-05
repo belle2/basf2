@@ -17,6 +17,7 @@
 #include <TRandom.h>
 
 #include <alignment/dataobjects/MilleData.h>
+#include <framework/pcore/ProcHandler.h>
 
 using namespace Belle2;
 using namespace std;
@@ -68,8 +69,8 @@ void TestHistoModule::prepare()
   registerObject<TH1F>("MyHisto", hist);
 
 
-  auto mmille = new MilleData();
-  registerObject<MilleData>("test_mille", mmille);
+  auto mille = new MilleData();
+  registerObject<MilleData>("test_mille", mille);
 }
 
 void TestHistoModule::inDefineHisto()
@@ -82,6 +83,16 @@ void TestHistoModule::startRun()
 
 void TestHistoModule::closeRun()
 {
+  // We close the file at end of run, producing
+  // one file per run (and process id) which is more
+  // convenient than one large binary block.
+  auto mille = getObjectPtr<MilleData>("test_mille");
+  if (mille->isOpen()) {
+    for (auto& fileName : mille->getFiles()) {
+      B2INFO("Stored Mille binary file: " << fileName);
+    }
+    mille->close();
+  }
 }
 
 void TestHistoModule::collect()
@@ -91,6 +102,7 @@ void TestHistoModule::collect()
   m_exp = m_emd->getExperiment();
 
   std::string objectName = "MyTree";
+  auto tree = getObjectPtr<TTree>(objectName);
   for (int i = 0; i < m_entriesPerEvent; ++i) {
     m_hitX = gRandom->Gaus();
     m_hitY = gRandom->Gaus();
@@ -101,12 +113,19 @@ void TestHistoModule::collect()
     m_chisq = gRandom->Gaus();
     m_pvalue = gRandom->Gaus();
     m_dof = gRandom->Gaus();
-    getObject<TTree>(objectName).Fill();
+    tree->Fill();
   }
 
-  getObject<TH1F>("MyHisto").Fill(gRandom->Gaus(42., m_spread));
+  getObjectPtr<TH1F>("MyHisto")->Fill(gRandom->Gaus(42., m_spread));
 
-  getObject<MilleData>("test_mille");
+  auto mille = getObjectPtr<MilleData>("test_mille");
+  // Open new file on request (at start or after being closed)
+  if (!mille->isOpen()) {
+    string newFileName = to_string(m_exp) + "-" + to_string(m_run) + "-sevt-" + to_string(m_evt) + "-pid" + std::to_string(
+                           ProcHandler::EvtProcID()) + ".mille";
+    B2INFO("Opening new binary file " << newFileName);
+    mille->open(newFileName);
+  }
 }
 
 void TestHistoModule::finish()

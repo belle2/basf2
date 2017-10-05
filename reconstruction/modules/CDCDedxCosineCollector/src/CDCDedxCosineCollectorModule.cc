@@ -74,6 +74,6 @@ void CDCDedxCosineCollectorModule::collect()
     m_nhits = track.getNLayerHits();
 
     // Data object access and filling
-    getObject<TTree>("tree").Fill();
+    getObjectPtr<TTree>("tree")->Fill();
   }
 }

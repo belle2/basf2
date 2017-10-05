@@ -61,7 +61,7 @@ void CDCDedxWireGainCollectorModule::collect()
 {
   StoreArray<CDCDedxTrack> tracks;
   // Collector object access
-  auto& tree = getObject<TTree>("tree");
+  auto tree = getObjectPtr<TTree>("tree");
 
   for (auto track : tracks) {
     // Make sure to remove all the data in vectors from the previous track
@@ -82,6 +82,6 @@ void CDCDedxWireGainCollectorModule::collect()
     }
 
     // Track information filled
-    tree.Fill();
+    tree->Fill();
   }
 }

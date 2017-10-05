@@ -41,6 +41,9 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
   B2INFO("Mean of MyHisto was " << mean);
   B2INFO("Mean Error of MyHisto was " << meanError);
   auto mille = getObjectPtr<MilleData>("test_mille");
+  for (auto& fileName : mille->getFiles()) {
+    B2INFO("Stored Mille binary file: " << fileName);
+  }
 
   if (hist->GetEntries() < 100 || ttree->GetEntries() < 100 || mille->getFiles().empty())
     return c_NotEnoughData;

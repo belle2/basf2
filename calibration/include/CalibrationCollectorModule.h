@@ -15,12 +15,13 @@
 #include <utility>
 
 #include <TDirectory.h>
-#include <TNamed.h>
+#include <TFile.h>
 #include <TRandom.h>
 
 #include <framework/core/HistoModule.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/logging/Logger.h>
 
 #include <calibration/dataobjects/CalibRootObjBase.h>
 #include <calibration/dataobjects/CalibRootObj.h>
@@ -51,7 +52,7 @@ namespace Belle2 {
     /// Write the final objects to the file
     void terminate() final;
 
-    void defineHisto();
+    void defineHisto() final;
 
     /// Register object with a name, takes ownership, do not access the pointer beyond prepare()
     template <class T>
@@ -63,9 +64,9 @@ namespace Belle2 {
     }
 
     template<class T>
-    T& getObject(std::string name)
+    T* getObjectPtr(std::string name)
     {
-      return *(m_manager.getObject<T>(name, m_expRun));
+      return m_manager.getObject<T>(name, m_expRun);
     }
 
   protected:

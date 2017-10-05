@@ -264,7 +264,7 @@ void pxdClusterShapeCalibrationModule::collect()
               m_InPixVTrue *= Info.getVPitch(truehit.getV()) / Unit::um;  // [um]
             }  // end of true hit
           }  // end of exist simulation
-          getObject<TTree>("pxdCal").Fill();
+          getObjectPtr<TTree>("pxdCal")->Fill();
         }  // end of cluster
       }  // end of over track points
     }  // end of over tracks
@@ -361,7 +361,7 @@ void pxdClusterShapeCalibrationModule::collect()
           m_InPixVTrue *= Info.getVPitch(truehit.getV()) / Unit::um;  // [um]
         }  // end of true hit
 
-        getObject<TTree>("pxdCal").Fill();
+        getObjectPtr<TTree>("pxdCal")->Fill();
       } // end of truehit
     } // end of cluster
   } // end of "if" not use tracks, for simulations only

@@ -32,6 +32,7 @@ MilleData& MilleData::operator=(const MilleData& other)
   m_numRecords = other.m_numRecords;
   return *this;
 }
+
 void MilleData::close()
 {
   if (m_binary) {

@@ -67,10 +67,10 @@ void CDCDedxRunGainCollectorModule::collect()
   m_run = emd->getRun();
   m_exp = emd->getExperiment();
 
-  getObject<TTree>("tree").Fill();
+  getObjectPtr<TTree>("tree")->Fill();
 
   for (auto track : tracks) {
     if (track.getNLayerHits() < 10) continue;
-    getObject<TH1F>("means").Fill(track.getTruncatedMean());
+    getObjectPtr<TH1F>("means")->Fill(track.getTruncatedMean());
   }
 }

@@ -148,7 +148,7 @@ void EKLMTimeCalibrationCollectorModule::collect()
         m_GeoDat->stripNumber(digits[j]->getEndcap(), digits[j]->getLayer(),
                               digits[j]->getSector(), digits[j]->getPlane(),
                               digits[j]->getStrip());
-      getObject<TTree>("calibration_data").Fill();
+      getObjectPtr<TTree>("calibration_data")->Fill();
     }
   }
 }

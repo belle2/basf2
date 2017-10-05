@@ -26,7 +26,7 @@ def _create_file(run):
 def _run_child(run):
     set_random_seed(run * 5)
     main = create_path()
-    main.add_module("RootInput", inputFileNames=["MyInputFile_" + str(run) + ".root"])
+    main.add_module("RootInput", inputFileNames=["MyInputFile_*.root"], entrySequences=[])
     main.add_module("HistoManager", histoFileName="MyOutputFile_" + str(run) + ".root", workDirName=working_dir)
     testmod = main.add_module("TestHisto", entriesPerEvent=100)
     # testmod.param("granularity","all")
@@ -37,7 +37,7 @@ def _run_child(run):
 
 
 def create_test_data():
-    for run in range(1, 5):
+    for run in range(1, 2):
         child = ctx.Process(target=_create_file, args=(run,))
         child.start()
         # wait for it to finish
@@ -45,7 +45,7 @@ def create_test_data():
 
 
 def run_collector():
-    for run in range(1, 5):
+    for run in range(1, 2):
         child = ctx.Process(target=_run_child, args=(run,))
         child.start()
         # wait for it to finish
@@ -53,5 +53,5 @@ def run_collector():
 
 
 if __name__ == "__main__":
-    create_test_data()
+    # create_test_data()
     run_collector()

@@ -41,10 +41,7 @@ namespace Belle2 {
     int getNumRecords() {return m_numRecords;}
     /// Are files written with double precision?
     bool hasDoublePrecision() {return m_doublePrecision;}
-    /** Root-like Reset function for "template compatibility" with ROOT objects. Alias for clear(). */
-    virtual void Reset() {clear();}
-    /// Root-like SetDirectory function for "template compatibility" with ROOT objects. Does nothing.
-    virtual void SetDirectory(TDirectory*) {}
+
   private:
     /// Use double-precision for binary files
     bool m_doublePrecision{false};

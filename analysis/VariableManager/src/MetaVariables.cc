@@ -217,9 +217,13 @@ namespace Belle2 {
         std::vector<std::string> output_queue;
         std::vector<std::string> operator_stack;
 
-        while (pos < arguments[0].size()) {
+        B2INFO("Entering RPN converter.");
+        while (pos != std::string::npos) {
 
-          std::string next_arg = arguments[0].substr(prev_pos, pos);
+          B2INFO("Current pos: " << int(pos));
+          B2INFO("Previous pos: " << int(prev_pos));
+          std::string next_arg = arguments[0].substr(prev_pos, pos - prev_pos);
+          B2INFO("Next arg:" << next_arg);
 
           std::map<std::string, int>::iterator op = operators.find(next_arg);
           std::vector<std::string>::iterator bra = std::find(std::begin(brackets), std::end(brackets), next_arg);
@@ -262,8 +266,14 @@ namespace Belle2 {
           }
 
           // Get the next argument
-          prev_pos = pos;
+          prev_pos = pos + 1;
           pos = arguments[0].find(seperator, prev_pos);
+          B2INFO("New pos: " << int(pos));
+          std::string cur_queue;
+          for (auto const& out : output_queue) {
+            cur_queue += out;
+          }
+          B2INFO("Current RPN formula output queue: " << cur_queue);
         }
 
         // No more arguments to read, clean up:
@@ -273,9 +283,11 @@ namespace Belle2 {
         }
 
         // Display to screen (debugging purposes)
-        std::string rpn_queue(output_queue.begin(), output_queue.end());
+        std::string rpn_queue;
+        for (auto const& out : output_queue) {
+          rpn_queue += out;
+        }
         B2INFO("RPN formula output stack: " << rpn_queue);
-
       }
       return nullptr;
     }

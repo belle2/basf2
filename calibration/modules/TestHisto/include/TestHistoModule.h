@@ -27,10 +27,10 @@ namespace Belle2 {
     TestHistoModule();
 
     virtual void prepare();
-
     virtual void collect();
-
     virtual void startRun();
+    virtual void closeRun();
+    virtual void finish();
   private:
 
     StoreObjPtr<EventMetaData> m_emd;

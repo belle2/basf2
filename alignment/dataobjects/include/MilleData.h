@@ -3,25 +3,23 @@
 #include <string>
 #include <vector>
 
-#include <TNamed.h>
+#include <calibration/core/MergeableNamed.h>
 #include <genfit/MilleBinary.h>
 #include <genfit/GblTrajectory.h>
 
 namespace Belle2 {
   /// Mergeable class holding list of so far opened mille binaries and providing the binaries
-  class MilleData : public TNamed {
+  class MilleData : public MergeableNamed {
   public:
     /// Constructor. Set doublePrecision to true to write binary files with doubles instead of floats
-    explicit MilleData(bool doublePrecision = false) : TNamed(), m_doublePrecision(doublePrecision) {};
+    explicit MilleData(bool doublePrecision = false) : MergeableNamed(), m_doublePrecision(doublePrecision) {};
     /// Destructor
     virtual ~MilleData() { close(); }
 
     /// Implementation of merging
-    virtual void merge(const MilleData* other);
+    virtual void merge(const MergeableNamed* other);
     /// Implementation of clearing
     virtual void clear() { m_files.clear(); m_numRecords = 0; }
-    /// Allow merging using TFileMerger if saved directly to a file.
-    Long64_t Merge(TCollection* hlist);
     /// Open a new file and remember it. Filename should encode also process id!
     void open(std::string filename);
     /// Is some file already open?
@@ -35,7 +33,7 @@ namespace Belle2 {
     /// Copy by assignment (if some file on LHS is opened, it is closed during this operation; file pointers not transfered - new file to be opened)
     MilleData& operator=(const MilleData& other);
     /// Construct from other object (pointer to binary file is not transfered - new file has to be opened by new object)
-    MilleData(const MilleData& other) : TNamed(other), m_doublePrecision(other.m_doublePrecision), m_files(other.m_files),
+    MilleData(const MilleData& other) : MergeableNamed(other), m_doublePrecision(other.m_doublePrecision), m_files(other.m_files),
       m_binary(nullptr),
       m_numRecords(other.m_numRecords) {}
 

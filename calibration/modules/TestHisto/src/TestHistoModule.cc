@@ -8,13 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <string>
-
 #include <calibration/modules/TestHisto/TestHistoModule.h>
+
+#include <string>
 
 #include <TTree.h>
 #include <TH1F.h>
 #include <TRandom.h>
+
+#include <alignment/dataobjects/MilleData.h>
 
 using namespace Belle2;
 using namespace std;
@@ -64,16 +66,22 @@ void TestHistoModule::prepare()
 
   auto hist = new TH1F("histo", "Test histogram, which mean value should be found by test calibration algo", 100, 0., 100.);
   registerObject<TH1F>("MyHisto", hist);
+
+
+  auto mmille = new MilleData();
+  registerObject<MilleData>("test_mille", mmille);
 }
 
 void TestHistoModule::inDefineHisto()
 {
-  ;
 }
 
 void TestHistoModule::startRun()
 {
-  ;
+}
+
+void TestHistoModule::closeRun()
+{
 }
 
 void TestHistoModule::collect()
@@ -97,12 +105,10 @@ void TestHistoModule::collect()
   }
 
   getObject<TH1F>("MyHisto").Fill(gRandom->Gaus(42., m_spread));
+
+  getObject<MilleData>("test_mille");
 }
 
-//void TestHistoModule::terminate()
-//{
-//  TDirectory* oldDir = gDirectory;
-//  m_dir->cd();
-//  m_obj->Write("MyCaliObj");
-//  oldDir->cd();
-//}
+void TestHistoModule::finish()
+{
+}

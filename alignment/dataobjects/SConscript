@@ -1,4 +1,4 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'genfit2']
+env['LIBS'] = ['framework', 'genfit2', 'calibration_core']
 Return('env')

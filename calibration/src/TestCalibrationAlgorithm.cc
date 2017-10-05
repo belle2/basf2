@@ -1,13 +1,15 @@
 #include <calibration/TestCalibrationAlgorithm.h>
 
-#include <TProfile.h>
-#include <TTree.h>
-#include <TRandom.h>
-#include <TClonesArray.h>
-#include <calibration/dbobjects/TestCalibObject.h>
-#include <calibration/dbobjects/TestCalibMean.h>
 #include <memory>
 
+#include <TTree.h>
+#include <TH1F.h>
+#include <TRandom.h>
+#include <TClonesArray.h>
+
+#include <alignment/dataobjects/MilleData.h>
+#include <calibration/dbobjects/TestCalibObject.h>
+#include <calibration/dbobjects/TestCalibMean.h>
 
 using namespace std;
 using namespace Belle2;
@@ -38,9 +40,9 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
 
   B2INFO("Mean of MyHisto was " << mean);
   B2INFO("Mean Error of MyHisto was " << meanError);
-//  auto& mille = getObject<MilleData>("test_mille");
+  auto mille = getObjectPtr<MilleData>("test_mille");
 
-  if (hist->GetEntries() < 100 || ttree->GetEntries() < 100)
+  if (hist->GetEntries() < 100 || ttree->GetEntries() < 100 || mille->getFiles().empty())
     return c_NotEnoughData;
 
   // Example of saving a DBObject.

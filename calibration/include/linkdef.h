@@ -7,8 +7,6 @@
 
 #pragma link C++ class Belle2::CalibrationAlgorithm+;
 #pragma link C++ class Belle2::TestCalibrationAlgorithm+;
-
 #pragma link C++ class Belle2::DBObjCalibrationConstMapBase+;
-
 
 #endif

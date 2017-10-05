@@ -14,7 +14,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Short form for std::enable_if
+    /// Short form for std::enable_if::type - replace with std::enable_if_t when ROOT understands it.
     template<bool cond, class T = void>
     using EnableIf = typename std::enable_if<cond, T>::type;
   }

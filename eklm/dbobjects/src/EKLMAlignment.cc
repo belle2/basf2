@@ -158,3 +158,53 @@ void EKLMAlignment::set(EKLMElementID element, int parameter, double value)
   }
 }
 
+double EKLMAlignment::getGlobalParam(unsigned short element,
+                                     unsigned short param)
+{
+  EKLMAlignmentData* alignmentData;
+  EKLMElementID id(element);
+  alignmentData = getSectorAlignment(id.getSectorNumber());
+  if (alignmentData == NULL)
+    return 0;
+  switch (param) {
+    case 1:
+      return alignmentData->getDx();
+    case 2:
+      return alignmentData->getDy();
+    case 6:
+      return alignmentData->getDalpha();
+  }
+  B2FATAL("Attempt to get EKLM alignment parameter with incorrect number " <<
+          param);
+  return 0;
+}
+
+void EKLMAlignment::setGlobalParam(double value, unsigned short element,
+                                   unsigned short param)
+{
+  EKLMAlignmentData* alignmentData;
+  EKLMElementID id(element);
+  alignmentData = getSectorAlignment(id.getSectorNumber());
+  if (alignmentData == NULL)
+    return;
+  switch (param) {
+    case 1:
+      alignmentData->setDx(value);
+      return;
+    case 2:
+      alignmentData->setDy(value);
+      return;
+    case 6:
+      alignmentData->setDalpha(value);
+      return;
+  }
+  B2FATAL("Attempt to set EKLM alignment parameter with incorrect number " <<
+          param);
+}
+
+/* TODO: this function is not implemented. */
+std::vector<std::pair<unsigned short, unsigned short>>
+                                                    EKLMAlignment::listGlobalParams()
+{
+  return {};
+}

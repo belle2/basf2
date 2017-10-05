@@ -10,19 +10,19 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/segmentRelation/BaseSegmentRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
+
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.dcl.h>
 
 namespace Belle2 {
-  class ModuleParamList;
 
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of segment relations based on MC information.
-    class MCSegmentRelationFilter : public MCSymmetricFilterMixin<BaseSegmentRelationFilter> {
+    class MCSegmentRelationFilter : public MCSymmetric<BaseSegmentRelationFilter> {
 
     private:
       /// Type of the super class
-      using Super = MCSymmetricFilterMixin<BaseSegmentRelationFilter >;
+      using Super = MCSymmetric<BaseSegmentRelationFilter >;
 
     public:
       /// Constructor

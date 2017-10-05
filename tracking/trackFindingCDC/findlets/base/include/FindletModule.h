@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 
 #include <framework/core/Module.h>
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 #include <vector>
 #include <array>
@@ -79,9 +79,12 @@ namespace Belle2 {
         this->setDescription(description);
 
         this->addStoreVectorParameters(Indices());
+
         ModuleParamList moduleParamList = this->getParamList();
+
         const std::string prefix = "";
         m_findlet.exposeParameters(&moduleParamList, prefix);
+
         this->setParamList(moduleParamList);
       }
 

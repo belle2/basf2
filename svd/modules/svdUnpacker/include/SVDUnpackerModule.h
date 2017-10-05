@@ -67,10 +67,14 @@ namespace Belle2 {
       int m_wrongFTBcrc;
 
 
+
+
     private:
 
       std::unique_ptr<SVDOnlineToOfflineMap> m_map;
       //unsigned short m_runType;
+
+      SVDModeByte m_SVDModeByte;
 
       void loadMap();
       void printB2Debug(uint32_t* data32, uint32_t* data32_min, uint32_t* data32_max, int nWords);
@@ -86,9 +90,12 @@ namespace Belle2 {
 
       struct MainHeader {
         unsigned int trgNumber : 8; //LSB
-        unsigned int trgTiming : 8;
+        unsigned int trgType   : 4;
+        unsigned int trgTiming : 3;
+        unsigned int onebit    : 1;
         unsigned int FADCnum   : 8;
-        unsigned int evtType   : 3;
+        unsigned int evtType   : 1; // Event type(0): 0…TTD event, 1…standalone event
+        unsigned int DAQMode   : 2; // Event type(2:1): "00"…1-sample, "01"…3-sample, "10"…6-sample
         unsigned int runType   : 2;
         unsigned int check     : 3; //MSB
       };

@@ -413,13 +413,13 @@ def add_vxdtf_v2(path=None,
     # Preparation
     #################
     if use_pxd:
-        spCreatorPXD = register_module('SpacePointCreatorPXD')
+        spCreatorPXD = register_module('PXDSpacePointCreator')
         spCreatorPXD.logging.log_level = log_level
         spCreatorPXD.logging.debug_level = debug_level
         spCreatorPXD.param('SpacePoints', 'SpacePointsPXD')
         modules.append(spCreatorPXD)
 
-    spCreatorSVD = register_module('SpacePointCreatorSVD')
+    spCreatorSVD = register_module('SVDSpacePointCreator')
     spCreatorSVD.logging.log_level = log_level
     spCreatorSVD.logging.debug_level = debug_level
     spCreatorSVD.param('OnlySingleClusterSpacePoints', False)

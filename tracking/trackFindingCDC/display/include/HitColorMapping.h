@@ -13,13 +13,14 @@
 #include <tracking/trackFindingCDC/display/Mapping.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
-#include <cdc/dataobjects/CDCHit.h>
 
 #include <map>
 #include <vector>
 #include <string>
 
 namespace Belle2 {
+  class CDCHit;
+
   namespace TrackFindingCDC {
 
     class CDCWireHit;

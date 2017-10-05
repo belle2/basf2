@@ -85,6 +85,30 @@ namespace Belle2 {
      */
     void set(EKLMElementID element, int parameter, double value);
 
+    /* Interface to global Millepede calibration. */
+
+    /**
+     * Get global unique identifier.
+     * @return Global unique identifier.
+     */
+    static unsigned short getGlobalUniqueID() { return 40; }
+
+    /**
+     * Get global parameter.
+     * @return Global parameter value.
+     */
+    double getGlobalParam(unsigned short element, unsigned short param);
+
+    /**
+     * Set global parameter.
+     */
+    void setGlobalParam(double value, unsigned short element,
+                        unsigned short param);
+    /**
+     * Get a list of stored global parameters.
+     */
+    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams();
+
   private:
 
     /** Sector alignment. */

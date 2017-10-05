@@ -29,7 +29,7 @@ namespace Belle2 {
       unsigned int nTCsCreated = 0;
 
       for (std::vector<const SpacePoint*>& aPath : allPaths) {
-        auto* newSPTC = tcContainer.appendNew(aPath);
+        tcContainer.appendNew(aPath);
         nTCsCreated++;
       }
 

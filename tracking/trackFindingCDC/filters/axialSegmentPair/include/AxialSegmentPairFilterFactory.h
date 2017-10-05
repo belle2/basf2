@@ -10,10 +10,13 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/BaseAxialSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    // Guard to prevent repeated instatiations
+    extern template class FilterFactory<BaseAxialSegmentPairFilter>;
 
     /// Factory that can create appropriate axial segment pair filters from associated names.
     class AxialSegmentPairFilterFactory : public FilterFactory<BaseAxialSegmentPairFilter> {

@@ -74,6 +74,7 @@ namespace Belle2 {
     /// Switch for the firmware simulation. 0:do nothing, 1:do everything
     int _firmwareSimulationMode;
 
+    std::string _Phase;
   private:
 
     /// A pointer to a TRGGDL;

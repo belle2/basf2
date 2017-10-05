@@ -517,7 +517,7 @@ void VXDDQMModule::event()
         if (fCharge1 < m_CutCorrelationSigPXD) continue;
         VxdID sensorID1 = digitPXD1.getSensorID();
         auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID1));
-        TVector3 rLocal1(digitPXD1.getUCellPosition(), digitPXD1.getVCellPosition(), 0);
+        TVector3 rLocal1(info.getUCellPosition(digitPXD1.getUCellID()), info.getVCellPosition(digitPXD1.getVCellID()), 0);
         TVector3 ral1 = info.pointToGlobal(rLocal1);
         iIsPXD1 = 1;
         iIsU1 = 1;
@@ -655,7 +655,7 @@ void VXDDQMModule::event()
           if (fCharge2 < m_CutCorrelationSigPXD) continue;
           VxdID sensorID2 = digitPXD2.getSensorID();
           auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID2));
-          TVector3 rLocal2(digitPXD2.getUCellPosition(), digitPXD2.getVCellPosition(), 0);
+          TVector3 rLocal2(info.getUCellPosition(digitPXD2.getUCellID()), info.getVCellPosition(digitPXD2.getVCellID()), 0);
           TVector3 ral2 = info.pointToGlobal(rLocal2);
           iIsPXD2 = 1;
           iIsU2 = 1;

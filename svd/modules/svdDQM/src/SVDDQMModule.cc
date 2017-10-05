@@ -371,26 +371,26 @@ void SVDDQMModule::event()
   // Fired strips
   vector< set<int> > uStrips(c_nSVDSensors); // sets to eliminate multiple samples per strip
   vector< set<int> > vStrips(c_nSVDSensors);
-  for (const SVDDigit& digit : storeSVDDigits) {
-    int iLayer = digit.getSensorID().getLayerNumber();
+  for (const SVDDigit& digitIn : storeSVDDigits) {
+    int iLayer = digitIn.getSensorID().getLayerNumber();
     if ((iLayer < c_firstSVDLayer) || (iLayer > c_lastSVDLayer)) continue;
-    int iLadder = digit.getSensorID().getLadderNumber();
-    int iSensor = digit.getSensorID().getSensorNumber();
+    int iLadder = digitIn.getSensorID().getLadderNumber();
+    int iSensor = digitIn.getSensorID().getSensorNumber();
     int index = getSensorIndex(iLayer, iLadder, iSensor);
     VxdID sensorID(iLayer, iLadder, iSensor);
     SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-    if (digit.isUStrip()) {
-      uStrips.at(index).insert(digit.getCellID());
-      if (m_chargeUSt[index] != NULL) m_chargeUSt[index]->Fill(digit.getCharge());
-      if ((m_hitMapU[index] != NULL) && (digit.getCharge() > m_CutSVDCharge))
-        m_hitMapU[index]->Fill(digit.getCellID(), digit.getIndex());
-//        m_hitMapU[index]->Fill(SensorInfo.getUCellID(digit.getCellPosition()), digit.getIndex());
+    if (digitIn.isUStrip()) {
+      uStrips.at(index).insert(digitIn.getCellID());
+      if (m_chargeUSt[index] != NULL) m_chargeUSt[index]->Fill(digitIn.getCharge());
+      if ((m_hitMapU[index] != NULL) && (digitIn.getCharge() > m_CutSVDCharge))
+        m_hitMapU[index]->Fill(digitIn.getCellID(), digitIn.getIndex());
+//        m_hitMapU[index]->Fill(SensorInfo.getUCellID(digitIn.getCellPosition()), digitIn.getIndex());
     } else {
-      vStrips.at(index).insert(digit.getCellID());
-      if (m_chargeVSt[index] != NULL) m_chargeVSt[index]->Fill(digit.getCharge());
-      if ((m_hitMapV[index] != NULL) && (digit.getCharge() > m_CutSVDCharge))
-        m_hitMapV[index]->Fill(digit.getCellID(), digit.getIndex());
-//        m_hitMapV[index]->Fill(SensorInfo.getVCellID(digit.getCellPosition()), digit.getIndex());
+      vStrips.at(index).insert(digitIn.getCellID());
+      if (m_chargeVSt[index] != NULL) m_chargeVSt[index]->Fill(digitIn.getCharge());
+      if ((m_hitMapV[index] != NULL) && (digitIn.getCharge() > m_CutSVDCharge))
+        m_hitMapV[index]->Fill(digitIn.getCellID(), digitIn.getIndex());
+//        m_hitMapV[index]->Fill(SensorInfo.getVCellID(digitIn.getCellPosition()), digitIn.getIndex());
     }
   }
   for (int i = 0; i < c_nSVDSensors; i++) {

@@ -11,18 +11,18 @@
 
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/BaseSegmentPairRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/MCSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
+
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     ///Class filtering the neighborhood of axial stereo segment pairs with monte carlo information
-    class MCSegmentPairRelationFilter :
-      public MCSymmetricFilterMixin<BaseSegmentPairRelationFilter > {
+    class MCSegmentPairRelationFilter : public MCSymmetric<BaseSegmentPairRelationFilter> {
 
     private:
       /// Type of the super class
-      using Super = MCSymmetricFilterMixin<BaseSegmentPairRelationFilter >;
+      using Super = MCSymmetric<BaseSegmentPairRelationFilter>;
 
     public:
       /** Constructor setting to default reversal symmetry. */

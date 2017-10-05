@@ -16,6 +16,7 @@
 #include <framework/logging/Logger.h>
 
 #include <vector>
+#include <functional>
 #include <algorithm>
 #include <chrono>
 #include <numeric>

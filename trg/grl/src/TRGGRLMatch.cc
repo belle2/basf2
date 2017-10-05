@@ -82,7 +82,7 @@ namespace Belle2 {
     if (_match3D == 1) {
       _z0 = helix.dz();
       _slope = helix.tanl();
-      _ex_z = _z0 + _slope * _R;
+      _ex_z = _z0 + _slope * 2 * _r * asin(_R / (2 * _r));
       _pz = _pt * _slope;
       _p = sqrt(_pz * _pz + _pt * _pt);
       _dz = _cluster_z - _ex_z;

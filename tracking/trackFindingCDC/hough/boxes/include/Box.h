@@ -13,12 +13,11 @@
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 #include <tracking/trackFindingCDC/utilities/EnableIf.h>
 
-#include <framework/logging/Logger.h>
-
 #include <array>
 #include <algorithm>
 #include <cassert>
 #include <numeric>
+#include <ostream>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

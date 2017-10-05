@@ -27,6 +27,7 @@ import math
 import functools
 import copy
 import pdb
+import pickle
 
 import basf2_mva_util
 from basf2_mva_evaluation import plotting
@@ -35,6 +36,15 @@ from generators import get_default_decayfile
 
 def removeJPsiSlash(string):
     return string.replace('/', '')
+
+
+def load_config():
+    if not os.path.isfile('Summary.pickle'):
+        raise RuntimeError("""Could not find Summary.pickle!
+                              This file is automatically created by the FEI training.
+                              But you can also create it yourself using:
+                              pickle.dump((particles, configuration), open('Summary.pickle', 'wb'))""")
+    return pickle.load(open('Summary.pickle', 'rb'))
 
 
 class Statistic(object):

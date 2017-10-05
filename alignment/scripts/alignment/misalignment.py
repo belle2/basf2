@@ -171,6 +171,9 @@ class CreateMisalignmentModule(Module):
                 for deformation in self.global_deformations:
                     delta += deformation(global_pos)
 
+            if sensor == Belle2.VxdID(1, 1, 1):
+                delta = ROOT.TVector3(0., 0., 0.)
+
             new_global_pos = global_pos + delta
             new_local_pos = info.pointToLocal(new_global_pos)
 

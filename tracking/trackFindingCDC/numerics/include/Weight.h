@@ -9,8 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Functional.h>
-#include <cmath>
+#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

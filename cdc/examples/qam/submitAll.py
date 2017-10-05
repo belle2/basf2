@@ -28,7 +28,9 @@ def getRunList(dir):
     return(runs)
 
 
-dir = '/ghi/fs01/belle2/bdata/users/karim/data/GCR1/build-2017-08-21'
+# dir = '/ghi/fs01/belle2/bdata/users/karim/data/GCR1/build-2017-08-21'
+dir = '/ghi/fs01/belle2/bdata/users/karim/data/GCR1/release-00-09-02'
+# dir = '/home/belle/muchida/basf2/release/cdc/examples/performance/output'
 exp = 1
 runs = getRunList(dir)
 

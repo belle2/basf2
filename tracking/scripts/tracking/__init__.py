@@ -4,6 +4,9 @@
 from basf2 import *
 from ROOT import Belle2
 
+from svd import add_svd_reconstruction
+from pxd import add_pxd_reconstruction
+
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trigger_mode="all", additionalTrackFitHypotheses=None,
@@ -267,7 +270,8 @@ def add_cdc_cr_track_fit_and_track_creator(path, components=None,
                     recoTrackColName=reco_tracks,
                     trackColName=tracks,
                     defaultPDGCode=13,
-                    useClosestHitToIP=True
+                    useClosestHitToIP=True,
+                    useBFieldAtHit=True
                     )
 
     # Prune genfit tracks
@@ -778,7 +782,7 @@ def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0
                     RecoTracksStoreArrayName=reco_tracks)
 
 
-def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None, suffix=""):
+def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix=""):
     """
     Convenience function for adding all vxd track finder modules
     to the path. This is for version1 of the trackfinder
@@ -794,12 +798,22 @@ def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None, suffi
                    instances of track finding in one path.
     """
 
+    # Preparation of the VXD clusters
+    if is_pxd_used(components):
+        if 'PXDClusterizer' not in path:
+            add_pxd_reconstruction(path)
+
+    if 'SVDClusterizer' not in path:
+        add_svd_reconstruction(path)
+
     # Temporary array
     # add a suffix to be able to have different
     vxd_trackcands = '__VXDGFTrackCands' + suffix
 
-    vxd_trackfinder = path.add_module(
-        'VXDTF', GFTrackCandidatesColName=vxd_trackcands)
+    vxd_trackfinder = path.add_module('VXDTF',
+                                      GFTrackCandidatesColName=vxd_trackcands)
+    vxd_trackfinder.param('svdClustersName', svd_clusters)
+
     # WARNING: workaround for possible clashes between fitting and VXDTF
     # stays until the redesign of the VXDTF is finished.
     vxd_trackfinder.param('TESTERexpandedTestingRoutines', False)
@@ -819,12 +833,12 @@ def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None, suffi
         vxd_trackfinder.param('tuneCutoffs', 0.06)
 
     # Convert VXD trackcands to reco tracks
-    path.add_module("RecoTrackCreator", trackCandidatesStoreArrayName=vxd_trackcands,
+    path.add_module("RecoTrackCreator", svdHitsStoreArrayName=svd_clusters, trackCandidatesStoreArrayName=vxd_trackcands,
                     recoTracksStoreArrayName=reco_tracks, recreateSortingParameters=True)
 
 
-def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None, suffix="",
-                                 sectormap_file=None):
+def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
+                                 sectormap_file=None, PXDminSVDSPs=3):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -833,12 +847,14 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     Use the GenfitTrackCandidatesCreator Module to convert back.
 
     :param path: basf2 path
+    :param svd_clusters: SVDCluster collection name
     :param reco_tracks: Name of the output RecoTracks, Defaults to RecoTracks.
     :param components: List of the detector components to be used in the reconstruction. Defaults to None which means all
                        components.
     :param suffix: all names of intermediate Storearrays will have the suffix appended. Useful in cases someone needs to
                    put several instances of track finding in one path.
     :param sectormap_file: if set to a finite value, a file will be used instead of the sectormap in the database.
+    :param PXDminSVDSPs: When using PXD require at least this number of SVD SPs for the SPTCs
     """
     ##########################
     # some setting for VXDTF2
@@ -864,19 +880,27 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     #################
     nameSPs = 'SpacePoints' + suffix
 
-    if 'SpacePointCreatorPXD' not in path:
+    if 'PXDClusterizer' not in path:
         if use_pxd:
-            spCreatorPXD = register_module('SpacePointCreatorPXD')
+            add_pxd_reconstruction(path)
+
+    if 'PXDSpacePointCreator' not in path:
+        if use_pxd:
+            spCreatorPXD = register_module('PXDSpacePointCreator')
             spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
             spCreatorPXD.param('SpacePoints', nameSPs)
             path.add_module(spCreatorPXD)
 
-    if 'SpacePointCreatorSVD' not in path:
+    if 'SVDClusterizer' not in path:
+        add_svd_reconstruction(path)
+
+    if 'SVDSpacePointCreator' not in path:
         # always use svd!
-        spCreatorSVD = register_module('SpacePointCreatorSVD')
+        spCreatorSVD = register_module('SVDSpacePointCreator')
         spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
         spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
         spCreatorSVD.param('SpacePoints', nameSPs)
+        spCreatorSVD.param('SVDClusters', svd_clusters)
         path.add_module(spCreatorSVD)
 
     # SecMap Bootstrap
@@ -928,6 +952,13 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     # Analyzer
     #################
 
+    # When using PXD require at least PXDminSVDSPs SVD SPs for the SPTCs
+    if(use_pxd):
+        pxdSVDCut = register_module('PXDSVDCut')
+        pxdSVDCut.param('minSVDSPs', PXDminSVDSPs)
+        pxdSVDCut.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
+        path.add_module(pxdSVDCut)
+
     # Quality
     qualityEstimator = register_module('QualityEstimatorVXD')
     qualityEstimator.param('EstimationMethod', quality_estimator)
@@ -957,6 +988,7 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
         overlapResolver = register_module('SVDOverlapResolver')
         overlapResolver.param('NameSpacePointTrackCands', nameSPTCs)
         overlapResolver.param('ResolveMethod', overlap_filter.lower())
+        overlapResolver.param('NameSVDClusters', svd_clusters)
         path.add_module(overlapResolver)
     #################
     # VXDTF2 Step 5
@@ -969,6 +1001,8 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     converter = register_module('SPTC2RTConverter')
     converter.param('recoTracksStoreArrayName', reco_tracks)
     converter.param('spacePointsTCsStoreArrayName', nameSPTCs)
+    converter.param('svdClustersName', svd_clusters)
+    converter.param('svdHitsStoreArrayName', svd_clusters)
     path.add_module(converter)
 
 
@@ -987,7 +1021,7 @@ def is_cdc_used(components):
     return components is None or 'CDC' in components
 
 
-def add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2=False):
+def add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2=False, svd_cluster='__ROIsvdClusters'):
     """
     This function adds the standard reconstruction modules for tracking to be used for the simulation of PXD data reduction
     to a path.
@@ -1008,15 +1042,16 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2=Fa
         path.add_module(material_effects)
 
     # SET StoreArray names
+
     svd_reco_tracks = "__ROIsvdRecoTracks"
 
     # SVD ONLY TRACK FINDING
     if(use_vxdtf2):
-        add_vxd_track_finding_vxdtf2(
-            path, components=['SVD'], reco_tracks=svd_reco_tracks, suffix="__ROI")
+        add_vxd_track_finding_vxdtf2(path, components=['SVD'], reco_tracks=svd_reco_tracks, suffix="__ROI",
+                                     svd_clusters=svd_cluster)
     else:
-        add_vxd_track_finding(
-            path, components=['SVD'], reco_tracks=svd_reco_tracks, suffix="__ROI")
+        add_vxd_track_finding(path, components=['SVD'], reco_tracks=svd_reco_tracks, suffix="__ROI",
+                              svd_clusters=svd_cluster)
 
     # TRACK FITTING
 
@@ -1024,4 +1059,5 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2=Fa
     dafRecoFitter = register_module("DAFRecoFitter")
     dafRecoFitter.set_name("SVD-only DAFRecoFitter")
     dafRecoFitter.param('recoTracksStoreArrayName', svd_reco_tracks)
+    dafRecoFitter.param('svdHitsStoreArrayName', svd_cluster)
     path.add_module(dafRecoFitter)

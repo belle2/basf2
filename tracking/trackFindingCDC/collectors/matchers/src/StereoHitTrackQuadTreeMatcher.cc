@@ -12,7 +12,14 @@
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/HitZ0TanLambdaLegendre.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+
+#include <framework/core/ModuleParamList.icc.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 

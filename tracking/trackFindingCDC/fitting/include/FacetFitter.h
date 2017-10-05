@@ -9,12 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-#include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
-#include <Eigen/Dense>
+#include <tracking/trackFindingCDC/numerics/Matrix.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCFacet;
+    class UncertainParameterLine2D;
 
     /// Utility class to fit hit triplet and relations of them
     class FacetFitter {
@@ -47,8 +47,8 @@ namespace Belle2 {
        *  @param w      An array of weights corresponding to the observations
        *  @param nSteps Maximal number of steps to be taken in the mimisation
        */
-      static UncertainParameterLine2D fit(Eigen::Matrix<double, 3, 3> xyl,
-                                          Eigen::Array<double, 3, 1> w,
+      static UncertainParameterLine2D fit(Matrix<double, 3, 3> xyl,
+                                          Matrix<double, 3, 1> w,
                                           int nSteps = 100);
     };
   }

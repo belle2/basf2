@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 #include <tracking/trackFindingCDC/ca/Path.h>

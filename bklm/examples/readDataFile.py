@@ -32,8 +32,18 @@ use_local_database("localdb/database.txt", "localdb")
 # input = register_module('RootInput')
 input = register_module('SeqRootInput')
 conversion = register_module('Convert2RawDet')
-# filelist = 'root_out_170217_003.sroot'
+# method 1, input one file
+# filelist = '/hsm/belle2/bdata/Data/sRaw/e0001/r03978/sub00/cosmic.0001.03978.HLT1.f00000.sroot'
 # input.param('inputFileName', filelist)
+# method 2, input several files, use a pattern for the filenames
+filelist = '/hsm/belle2/bdata/Data/sRaw/e0001/r03978/sub00/cosmic.0001.03978.HLT1.f%05d.sroot'
+input.param('fileNameIsPattern', 1)
+input.param('inputFileNames', filelist)
+# method 3, input several files, name all files
+# filelist = ['/hsm/belle2/bdata/Data/sRaw/e0001/r03978/sub00/cosmic.0001.03978.HLT1.f00000.sroot',
+#             '/hsm/belle2/bdata/Data/sRaw/e0001/r03978/sub00/cosmic.0001.03978.HLT1.f00001.sroot'
+#            ]
+# input.param('inputFileNames', filelist)
 
 # EventInfoSetter - generate event meta data
 eventinfosetter = register_module('EventInfoSetter')

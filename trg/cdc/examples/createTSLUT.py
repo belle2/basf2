@@ -80,6 +80,7 @@ def createLUT(TrueLRTable, inner):
             LUT[pattern] = 3
     return LUT
 
+
 innerLUT = createLUT(innerTrueLRTable, inner=True)
 outerLUT = createLUT(outerTrueLRTable, inner=False)
 

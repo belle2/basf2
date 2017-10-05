@@ -7,16 +7,17 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/facetRelation/Chi2FacetRelationFilter.h>
 
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -72,7 +73,7 @@ void Chi2FacetRelationFilter::initialize()
 
 Weight Chi2FacetRelationFilter::operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet)
 {
-  if (fromFacet.getStartWire() == toFacet.getEndWire()) return NAN;
+  if (fromFacet.getStartWireHit().isOnWire(toFacet.getEndWire())) return NAN;
 
   constexpr const int nSteps = 0;
   const UncertainParameterLine2D fitLine = FacetFitter::fit(fromFacet, toFacet, nSteps);

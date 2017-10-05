@@ -11,20 +11,19 @@
 
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
-#include <tracking/trackFindingCDC/mclookup/CDCSimHitLookUp.h>
-
-#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegment3DLookUp.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCMCTrackLookUp;
+    class CDCMCSegment3DLookUp;
+    class CDCMCSegment2DLookUp;
+    class CDCMCHitLookUp;
+
+    class CDCSimHitLookUp;
+    class CDCMCTrackStore;
+    class CDCMCMap;
+
 
     ///Class to organize and present the monte carlo hit information
-
     class CDCMCManager  {
 
     public:
@@ -32,32 +31,25 @@ namespace Belle2 {
       static CDCMCManager& getInstance();
 
       /// Getter for the singletone instance of the CDCMCMap
-      static const CDCMCMap& getMCMap()
-      { return getInstance().m_mcMap; }
+      static const CDCMCMap& getMCMap();
 
       /// Getter for the singletone instance of the CDCMCTrackStore
-      static const CDCMCTrackStore& getMCTrackStore()
-      { return getInstance().m_mcTrackStore; }
+      static const CDCMCTrackStore& getMCTrackStore();
 
       /// Getter for the singletone instance of the CDCSimHitLookUp
-      static const CDCSimHitLookUp& getSimHitLookUp()
-      { return getInstance().m_simHitLookUp; }
+      static const CDCSimHitLookUp& getSimHitLookUp();
 
       /// Getter for the singletone instance of the CDCMCHitLookUp
-      static const CDCMCHitLookUp& getMCHitLookUp()
-      { return getInstance().m_mcHitLookUp; }
+      static const CDCMCHitLookUp& getMCHitLookUp();
 
       /// Getter for the singletone instance of the CDCMCSegment2DLookUp
-      static const CDCMCSegment2DLookUp& getMCSegment2DLookUp()
-      { return getInstance().m_mcSegment2DLookUp; }
+      static const CDCMCSegment2DLookUp& getMCSegment2DLookUp();
 
       /// Getter for the singletone instance of the CDCMCSegment3DLookUp
-      static const CDCMCSegment3DLookUp& getMCSegment3DLookUp()
-      { return getInstance().m_mcSegment3DLookUp; }
+      static const CDCMCSegment3DLookUp& getMCSegment3DLookUp();
 
       /// Getter for the singletone instance of the CDCMCTrackLookUp
-      static const CDCMCTrackLookUp& getMCTrackLookUp()
-      { return getInstance().m_mcTrackLookUp; }
+      static const CDCMCTrackLookUp& getMCTrackLookUp();
 
     private:
       /// Default constructor only accessable for getInstance()
@@ -76,28 +68,6 @@ namespace Belle2 {
     private:
       /// Memory for the event, run and experminent number corresponding to the currently stored data.
       EventMetaData m_eventMetaData = EventMetaData(-999, -999, -999);
-
-      /// Memory for the singletone CDCMCMap
-      CDCMCMap m_mcMap;
-
-      /// Memory for the singletone CDCMCTrackStore
-      CDCMCTrackStore m_mcTrackStore;
-
-      /// Memory for the singletone CDCSimHitLookUp
-      CDCSimHitLookUp m_simHitLookUp;
-
-      /// Memory for the singletone CDCMCHitLookUp
-      CDCMCHitLookUp m_mcHitLookUp;
-
-      /// Memory for the singletone CDCMCSegmentLookUp
-      CDCMCSegment2DLookUp m_mcSegment2DLookUp;
-
-      /// Memory for the singletone CDCMCSegmentLookUp
-      CDCMCSegment3DLookUp m_mcSegment3DLookUp;
-
-      /// Memory for the singletone CDCMCTrackLookUp
-      CDCMCTrackLookUp m_mcTrackLookUp;
-
     };
   }
 }

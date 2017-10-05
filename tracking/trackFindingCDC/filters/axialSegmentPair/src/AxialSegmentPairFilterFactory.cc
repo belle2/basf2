@@ -14,11 +14,15 @@
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/MCAxialSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/SimpleAxialSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::FilterFactory<BaseAxialSegmentPairFilter>;
 
 AxialSegmentPairFilterFactory::AxialSegmentPairFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

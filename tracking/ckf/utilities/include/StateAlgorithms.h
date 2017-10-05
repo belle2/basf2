@@ -14,19 +14,20 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/trackFindingCDC/utilities/EnableIf.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
+
+#include <type_traits>
 
 namespace Belle2 {
   /// Shortcut to make compilation dependent on state content for space point-like states (SFINAE)
   template<class AState>
   using EnableIfSpacePoint =
-    TrackFindingCDC::EnableIf<std::is_same<decltype(std::declval<AState>().getHit()), const SpacePoint*>::value>;
+    std::enable_if_t<std::is_same<decltype(std::declval<AState>().getHit()), const SpacePoint*>::value>;
 
   /// Shortcut to make compilation dependent on state content for cdc wire hit-like states (SFINAE)
   template<class AState>
   using EnableIfCDCWireHit =
-    TrackFindingCDC::EnableIf<std::is_same<decltype(std::declval<AState>().getHit()), const TrackFindingCDC::CDCRLWireHit*>::value>;
+    std::enable_if_t<std::is_same<decltype(std::declval<AState>().getHit()), const TrackFindingCDC::CDCRLWireHit*>::value>;
 
   /// Functor for extracting the geometrical layer of a state
   struct GeometryLayerExtractor {

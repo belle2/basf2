@@ -16,6 +16,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCLUT TRGCDCLUT
@@ -51,6 +52,12 @@ namespace Belle2 {
     /// get LUT Values
     int getValue(unsigned) const;
 
+    /// list of LUTs, to avoid reading LUT data 2336 times
+    static std::map<std::string, TRGCDCLUT> dictionary;
+
+    /// get LUT from dictionary, load new LUT if it doesn't exist
+    static TRGCDCLUT* getLUT(const std::string& filename, int);
+
   private:
 
     /// LUT data
@@ -61,7 +68,6 @@ namespace Belle2 {
 
     /// LUT name.
     std::string m_name;
-
 
   };
 

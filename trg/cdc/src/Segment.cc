@@ -56,19 +56,17 @@ namespace Belle2 {
       _storeHits{},
       m_TSLUTFileName(TSLUTFile)
   {
-    m_TSLUT = new TCLUT();
   }
 
 
   TRGCDCSegment::~TRGCDCSegment()
   {
-    delete m_TSLUT;
   }
 
   void
   TRGCDCSegment::initialize()
   {
-    m_TSLUT->setDataFile(m_TSLUTFileName, _wires.size() + 1);
+    m_TSLUT = TRGCDCLUT::getLUT(m_TSLUTFileName, _wires.size() + 1);
   }
 
   void

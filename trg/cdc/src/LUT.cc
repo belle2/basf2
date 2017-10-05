@@ -28,6 +28,8 @@ using namespace std;
 
 namespace Belle2 {
 
+  map<string, TRGCDCLUT> TRGCDCLUT::dictionary;
+
   std::string TRGCDCLUT::version(void) const
   {
     return string("TRGCDCLUT 1.00");
@@ -75,6 +77,15 @@ namespace Belle2 {
       }
     }
     openFile.close();
+  }
+
+  TRGCDCLUT* TRGCDCLUT::getLUT(const std::string& filename, int nInputBit)
+  {
+    if (TRGCDCLUT::dictionary.find(filename) == TRGCDCLUT::dictionary.end()) {
+      TRGCDCLUT::dictionary[filename] = TRGCDCLUT();
+      TRGCDCLUT::dictionary[filename].setDataFile(filename, nInputBit);
+    }
+    return &(TRGCDCLUT::dictionary[filename]);
   }
 }
 

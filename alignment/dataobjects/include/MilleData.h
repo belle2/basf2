@@ -6,22 +6,22 @@
 #include <TNamed.h>
 #include <genfit/MilleBinary.h>
 #include <genfit/GblTrajectory.h>
-#include <framework/pcore/Mergeable.h>
 
 namespace Belle2 {
   /// Mergeable class holding list of so far opened mille binaries and providing the binaries
-  class MilleData : public Mergeable {
+  class MilleData : public TNamed {
   public:
     /// Constructor. Set doublePrecision to true to write binary files with doubles instead of floats
-    explicit MilleData(bool doublePrecision = false) : Mergeable(), m_doublePrecision(doublePrecision) {};
+    explicit MilleData(bool doublePrecision = false) : TNamed(), m_doublePrecision(doublePrecision) {};
     /// Destructor
     virtual ~MilleData() { close(); }
 
     /// Implementation of merging
-    virtual void merge(const Mergeable* other);
+    virtual void merge(const MilleData* other);
     /// Implementation of clearing
     virtual void clear() { m_files.clear(); m_numRecords = 0; }
-
+    /// Allow merging using TFileMerger if saved directly to a file.
+    Long64_t Merge(TCollection* hlist);
     /// Open a new file and remember it. Filename should encode also process id!
     void open(std::string filename);
     /// Is some file already open?
@@ -35,13 +35,18 @@ namespace Belle2 {
     /// Copy by assignment (if some file on LHS is opened, it is closed during this operation; file pointers not transfered - new file to be opened)
     MilleData& operator=(const MilleData& other);
     /// Construct from other object (pointer to binary file is not transfered - new file has to be opened by new object)
-    MilleData(const MilleData& other) : m_doublePrecision(other.m_doublePrecision), m_files(other.m_files), m_binary(nullptr),
+    MilleData(const MilleData& other) : TNamed(other), m_doublePrecision(other.m_doublePrecision), m_files(other.m_files),
+      m_binary(nullptr),
       m_numRecords(other.m_numRecords) {}
 
     /// Get number of records (trajectories) written to binary files
     int getNumRecords() {return m_numRecords;}
     /// Are files written with double precision?
     bool hasDoublePrecision() {return m_doublePrecision;}
+    /** Root-like Reset function for "template compatibility" with ROOT objects. Alias for clear(). */
+    virtual void Reset() {clear();}
+    /// Root-like SetDirectory function for "template compatibility" with ROOT objects. Does nothing.
+    virtual void SetDirectory(TDirectory*) {}
   private:
     /// Use double-precision for binary files
     bool m_doublePrecision{false};

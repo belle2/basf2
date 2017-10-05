@@ -12,7 +12,7 @@
 #define ALIGNMENT_MILLEPEDETREECONVERSIONALGORITHM_H
 
 /* Belle2 headers. */
-#include <calibration/CalibrationAlgorithm_OLD.h>
+#include <calibration/CalibrationAlgorithm.h>
 
 namespace Belle2 {
 
@@ -21,7 +21,7 @@ namespace Belle2 {
    * from GBL data saved to a ROOT file. This conversion is intended for
    * debugging.
    */
-  class MillepedeTreeConversionAlgorithm : public CalibrationAlgorithm_OLD {
+  class MillepedeTreeConversionAlgorithm : public CalibrationAlgorithm {
 
   public:
 
@@ -38,7 +38,7 @@ namespace Belle2 {
     /**
      * Calibration.
      */
-    CalibrationAlgorithm_OLD::EResult calibrate();
+    CalibrationAlgorithm::EResult calibrate();
 
     /**
      * Set output file name.

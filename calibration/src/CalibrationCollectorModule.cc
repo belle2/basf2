@@ -118,7 +118,7 @@ void CalibrationCollectorModule::defineHisto()
   B2INFO("Saving output to TDirectory " << m_dir->GetPath());
   B2DEBUG(100, "Creating directories for individual collector objects.");
   m_manager.createDirectories();
-  m_runRange = new RunRangeNew();
+  m_runRange = new RunRange();
   m_runRange->setGranularity(m_granularity);
   m_runRange->SetName(Calibration::RUN_RANGE_OBJ_NAME.c_str());
   m_dir->Add(m_runRange);

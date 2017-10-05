@@ -22,7 +22,7 @@
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/logging/Logger.h>
 #include <calibration/Utilities.h>
-#include <calibration/dataobjects/RunRangeNew.h>
+#include <calibration/dataobjects/RunRange.h>
 
 namespace Belle2 {
   /**
@@ -135,11 +135,11 @@ namespace Belle2 {
     /// Get the complete list of runs from inspection of collected data
     std::vector<Calibration::ExpRun> getRunListFromAllData() const;
 
+    /// Get the complete RunRange from inspection of collected data
+    RunRange getRunRangeFromAllData() const;
+
     /// Get the complete IoV from inspection of collected data
     IntervalOfValidity getIovFromAllData() const;
-
-    /// Get the complete RunRange from inspection of collected data
-    RunRangeNew getRunRangeFromAllData() const;
 
     /// Get the granularity of collected data
     std::string getGranularity() const {return m_granularityOfData;};
@@ -190,7 +190,7 @@ namespace Belle2 {
     void setInputFileNames(std::vector<std::string> inputFileNames);
 
     /// Get the input file names used for this algorithm as a STL vector
-    std::vector<std::string> getVecInputFileNames() {return m_inputFileNames;}
+    std::vector<std::string> getVecInputFileNames() const {return m_inputFileNames;}
 
     /// Get TTree calibration data object by name and list of runs, use TChain to avoid huge memory usage and merging
     std::unique_ptr<TTree> getTreeObjectPtr(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const;
@@ -210,9 +210,9 @@ namespace Belle2 {
     {
       T* mergedObjPtr = new T();
       B2DEBUG(100, "Getting " << mergedObjPtr->ClassName() << " calibration object: " << name);
-      mergedObjPtr->SetDirectory(0);
       bool mergedEmpty = true;
       mergedObjPtr->SetName(name.c_str());
+      mergedObjPtr->SetDirectory(0);
       TDirectory* dir = gDirectory;
 
       // Technically we could grab all the objects from all files, add to list and then merge at the end.
@@ -223,13 +223,13 @@ namespace Belle2 {
 
       // Construct the TDirectory names where we expect our objects to be
       std::string runRangeObjName(getPrefix() + "/" + Calibration::RUN_RANGE_OBJ_NAME);
-      RunRangeNew runRangeRequested(requestedRuns);
-      RunRangeNew* runRangeData;
+      RunRange runRangeRequested(requestedRuns);
+      RunRange* runRangeData;
       for (const auto& fileName : m_inputFileNames) {
         //Open TFile to get the objects
         std::unique_ptr<TFile> f;
         f.reset(TFile::Open(fileName.c_str(), "READ"));
-        runRangeData = dynamic_cast<RunRangeNew*>(f->Get(runRangeObjName.c_str()));
+        runRangeData = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
 
         if (strcmp(getGranularity().c_str(), "run") == 0) {
           if (runRangeData->getIntervalOfValidity().overlaps(runRangeRequested.getIntervalOfValidity())) {
@@ -287,9 +287,6 @@ namespace Belle2 {
 
 //    // Helpers ---------------- Database storage -----
 //
-    /// Get the interval of validity from minimum and maximum experiment and run of input data files
-    IntervalOfValidity getIovFromAllData();
-
     /// Get the granularity of collected data
     std::string getGranularityFromData() const;
 
@@ -298,6 +295,12 @@ namespace Belle2 {
 
     /// Store DB payload with given name with default IOV
     void saveCalibration(TObject* data, const std::string& name);
+
+    /// Store DBArray with given name and custom IOV
+    void saveCalibration(TClonesArray* data, const std::string& name, const IntervalOfValidity& iov);
+
+    /// Store DB payload with given name and custom IOV
+    void saveCalibration(TObject* data, const std::string& name, const IntervalOfValidity& iov);
 
     // -----------------------------------------------
 
@@ -331,12 +334,6 @@ namespace Belle2 {
     /// The name of the TDirectory the collector objects are contained within
     std::string m_prefix{""};
 
-    /// Store DBArray with given name and custom IOV
-    void saveCalibration(TClonesArray* data, const std::string& name, const IntervalOfValidity& iov);
-
-    /// Store DB payload with given name and custom IOV
-    void saveCalibration(TObject* data, const std::string& name, const IntervalOfValidity& iov);
-
-    ClassDef(CalibrationAlgorithm, 1); /**< Abstract base class for calibration algorithms */
+    ClassDef(CalibrationAlgorithm, 2); /**< Abstract base class for calibration algorithms */
   };
 } // namespace Belle2

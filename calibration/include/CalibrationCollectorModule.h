@@ -23,8 +23,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <calibration/dataobjects/CalibRootObjBase.h>
-#include <calibration/dataobjects/CalibRootObjNew.h>
-#include <calibration/dataobjects/RunRangeNew.h>
+#include <calibration/dataobjects/CalibRootObj.h>
+#include <calibration/dataobjects/RunRange.h>
 #include <calibration/CalibObjManager.h>
 #include <calibration/Utilities.h>
 
@@ -57,7 +57,7 @@ namespace Belle2 {
     template <class T>
     void registerObject(std::string name, T* obj)
     {
-      std::unique_ptr<CalibRootObjBase> calObj(new CalibRootObjNew<T>(obj));
+      std::unique_ptr<CalibRootObjBase> calObj(new CalibRootObj<T>(obj));
       calObj->SetName(name.c_str());
       m_manager.addObject(name, std::move(calObj));
     }
@@ -88,7 +88,7 @@ namespace Belle2 {
     CalibObjManager m_manager;
 
     /// Overall list of runs processed
-    RunRangeNew* m_runRange;
+    RunRange* m_runRange;
 
     /// Current ExpRun for object retrieval (becomes -1,-1 for granularity=all)
     Calibration::ExpRun m_expRun;

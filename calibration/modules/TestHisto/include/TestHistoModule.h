@@ -13,7 +13,7 @@
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <calibration/dataobjects/CalibRootObjNew.h>
+#include <calibration/dataobjects/CalibRootObj.h>
 #include <TTree.h>
 //#include <TDirectory.h>
 

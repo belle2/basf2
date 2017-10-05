@@ -296,7 +296,7 @@ bool CalibrationAlgorithm::commit(list<Database::DBQuery> payloads)
 
 vector<ExpRun> CalibrationAlgorithm::getRunListFromAllData() const
 {
-  RunRangeNew runRange = getRunRangeFromAllData();
+  RunRange runRange = getRunRangeFromAllData();
   set<ExpRun> expRunSet = runRange.getExpRunSet();
   return vector<ExpRun>(expRunSet.begin(), expRunSet.end());
 }
@@ -306,19 +306,19 @@ IntervalOfValidity CalibrationAlgorithm::getIovFromAllData() const
   return getRunRangeFromAllData().getIntervalOfValidity();
 }
 
-RunRangeNew CalibrationAlgorithm::getRunRangeFromAllData() const
+RunRange CalibrationAlgorithm::getRunRangeFromAllData() const
 {
   // Save TDirectory to change back at the end
   TDirectory* dir = gDirectory;
-  RunRangeNew runRange;
-  RunRangeNew* runRangeOther;
+  RunRange runRange;
+  RunRange* runRangeOther;
   // Construct the TDirectory name where we expect our objects to be
   string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
   for (const auto& fileName : m_inputFileNames) {
     //Open TFile to get the objects
     unique_ptr<TFile> f;
     f.reset(TFile::Open(fileName.c_str(), "READ"));
-    runRangeOther = dynamic_cast<RunRangeNew*>(f->Get(runRangeObjName.c_str()));
+    runRangeOther = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
     if (runRangeOther) {
       runRange.merge(runRangeOther);
     } else {
@@ -333,13 +333,13 @@ string CalibrationAlgorithm::getGranularityFromData() const
 {
   // Save TDirectory to change back at the end
   TDirectory* dir = gDirectory;
-  RunRangeNew* runRange;
+  RunRange* runRange;
   string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
   // We only check the first file
   string fileName = m_inputFileNames[0];
   unique_ptr<TFile> f;
   f.reset(TFile::Open(fileName.c_str(), "READ"));
-  runRange = dynamic_cast<RunRangeNew*>(f->Get(runRangeObjName.c_str()));
+  runRange = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
   string granularity = runRange->getGranularity();
   dir->cd();
   return granularity;
@@ -354,14 +354,14 @@ unique_ptr<TTree> CalibrationAlgorithm::getTreeObjectPtr(const string& name, con
   chain->SetDirectory(0);
   // Construct the TDirectory names where we expect our objects to be
   string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
-  RunRangeNew runRangeRequested(requestedRuns);
+  RunRange runRangeRequested(requestedRuns);
   if (strcmp(getGranularity().c_str(), "run") == 0) {
-    RunRangeNew* runRangeData;
+    RunRange* runRangeData;
     for (const auto& fileName : m_inputFileNames) {
       //Open TFile to get the objects
       unique_ptr<TFile> f;
       f.reset(TFile::Open(fileName.c_str(), "READ"));
-      runRangeData = dynamic_cast<RunRangeNew*>(f->Get(runRangeObjName.c_str()));
+      runRangeData = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
       if (runRangeData->getIntervalOfValidity().overlaps(runRangeRequested.getIntervalOfValidity())) {
         B2DEBUG(100, "Found requested data in file: " << fileName);
         // Loop over runs in data and check if they exist in our requested ones, then add if they do

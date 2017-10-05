@@ -8,7 +8,7 @@
 
 #include <calibration/Utilities.h>
 #include <calibration/dataobjects/CalibRootObjBase.h>
-#include <calibration/dataobjects/CalibRootObjNew.h>
+#include <calibration/dataobjects/CalibRootObj.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
@@ -79,14 +79,14 @@ namespace Belle2 {
       TDirectory* objectDir = m_dir->GetDirectory(name.c_str());
       std::string fullName = addPrefix(name) + getSuffix(expRun);
       // Try looking in the memory resident objects only first
-      CalibRootObjNew<T>* calObj = dynamic_cast<CalibRootObjNew<T>*>(objectDir->FindObject(fullName.c_str()));
+      CalibRootObj<T>* calObj = dynamic_cast<CalibRootObj<T>*>(objectDir->FindObject(fullName.c_str()));
       if (!calObj) {
         // If there aren't any then either there isn't an object at all, or the only objects are file resident
         // We'll create a new memory resident object to use for now since any file resident TTree will have lost
         // its connection to the branch variables the user defined, We'll merge this new object with any file resident
         // object later.
         B2DEBUG(100, "No memory resident copies of the object with the name " << fullName << ". Will make one.");
-        calObj = dynamic_cast<CalibRootObjNew<T>*>(m_templateObjects[name]->Clone(fullName.c_str()));
+        calObj = dynamic_cast<CalibRootObj<T>*>(m_templateObjects[name]->Clone(fullName.c_str()));
         objectDir->Add(calObj);
       }
       return calObj->getObject();

@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <calibration/CalibrationAlgorithm_OLD.h>
+#include <calibration/CalibrationAlgorithm.h>
 #include <alignment/PedeResult.h>
 #include <alignment/PedeApplication.h>
 #include <alignment/dataobjects/PedeSteering.h>
@@ -19,7 +19,7 @@ namespace Belle2 {
   /**
    * Class implementing Millepede calibration algorithm
    */
-  class MillepedeAlgorithm : public CalibrationAlgorithm_OLD {
+  class MillepedeAlgorithm : public CalibrationAlgorithm {
   public:
 
     /// Constructor set the prefix to MillepedeCalibration

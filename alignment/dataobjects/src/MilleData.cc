@@ -1,11 +1,12 @@
 #include <alignment/dataobjects/MilleData.h>
 
 #include <framework/utilities/FileSystem.h>
+#include <TList.h>
 
 using namespace std;
 using namespace Belle2;
 
-void MilleData::merge(const Mergeable* other)
+void MilleData::merge(const MilleData* other)
 {
   auto* data = static_cast<const MilleData*>(other);
   const vector<string>& files = data->getFiles();
@@ -56,5 +57,17 @@ void MilleData::open(string filename)
   m_files.push_back(filename);
 }
 
-
-
+Long64_t MilleData::Merge(TCollection* hlist)
+{
+  Long64_t nMerged = 0;
+  if (hlist) {
+    const MilleData* xh = 0;
+    TIter nxh(hlist);
+    while ((xh = dynamic_cast<MilleData*>(nxh()))) {
+      // Add xh to me
+      merge(xh);
+      ++nMerged;
+    }
+  }
+  return nMerged;
+}

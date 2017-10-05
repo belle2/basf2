@@ -32,6 +32,7 @@
 #include <framework/dataobjects/FileMetaData.h>
 
 #include <TMath.h>
+#include <TH1F.h>
 
 #include <genfit/FullMeasurement.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
@@ -65,7 +66,7 @@ REG_MODULE(MillepedeCollector)
 //                 Implementation
 //-----------------------------------------------------------------
 
-MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModule_OLD()
+MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModule()
 {
   setPropertyFlags(c_ParallelProcessingCertified);
   setDescription("Calibration data collector for Millepede Algorithm");
@@ -362,7 +363,7 @@ void MillepedeCollectorModule::collect()
   }
 }
 
-void MillepedeCollectorModule::endRun()
+void MillepedeCollectorModule::closeRun()
 {
   // We close the file at end of run, producing
   // one file per run (and process id) which is more
@@ -372,7 +373,7 @@ void MillepedeCollectorModule::endRun()
     mille.close();
 }
 
-void MillepedeCollectorModule::terminate()
+void MillepedeCollectorModule::finish()
 {
 
   StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);

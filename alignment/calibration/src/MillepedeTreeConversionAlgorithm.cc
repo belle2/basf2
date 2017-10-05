@@ -18,7 +18,7 @@
 using namespace Belle2;
 
 MillepedeTreeConversionAlgorithm::MillepedeTreeConversionAlgorithm() :
-  CalibrationAlgorithm_OLD("MillepedeCollector")
+  CalibrationAlgorithm("MillepedeCollector")
 {
   m_OutputFile = "millepede_data.root";
 }
@@ -32,7 +32,7 @@ void MillepedeTreeConversionAlgorithm::setOutputFile(const char* outputFile)
   m_OutputFile = outputFile;
 }
 
-CalibrationAlgorithm_OLD::EResult MillepedeTreeConversionAlgorithm::calibrate()
+CalibrationAlgorithm::EResult MillepedeTreeConversionAlgorithm::calibrate()
 {
   const int max_entries = 100;
   int i, j, n;
@@ -44,8 +44,8 @@ CalibrationAlgorithm_OLD::EResult MillepedeTreeConversionAlgorithm::calibrate()
   std::vector<double>* derLocal, *derGlobal;
   float value, error, der[max_entries];
   int nlab, label[max_entries];
-  TTree& gblData = getObject<TTree>("GblDataTree");
-  gblData.SetBranchAddress("GblData", &dat);
+  auto gblData = getTreeObjectPtr("GblDataTree");
+  gblData->SetBranchAddress("GblData", &dat);
   TFile* f_out = new TFile(m_OutputFile.c_str(), "recreate");
   TTree* t_out = new TTree("mille", "");
   t_out->Branch("value", &value, "value/F");
@@ -53,9 +53,9 @@ CalibrationAlgorithm_OLD::EResult MillepedeTreeConversionAlgorithm::calibrate()
   t_out->Branch("nlab", &nlab, "nlab/I");
   t_out->Branch("label", label, "label[nlab]/I");
   t_out->Branch("der", der, "der[nlab]/F");
-  n = gblData.GetEntries();
+  n = gblData->GetEntries();
   for (i = 0; i < n; i++) {
-    gblData.GetEntry(i);
+    gblData->GetEntry(i);
     for (it = dat->begin(); it != dat->end(); ++it) {
       it->getAllData(aValue, aErr, indLocal, derLocal, labGlobal, derGlobal);
       if (labGlobal->size() == 0)
@@ -74,6 +74,6 @@ CalibrationAlgorithm_OLD::EResult MillepedeTreeConversionAlgorithm::calibrate()
   t_out->Write();
   delete t_out;
   delete f_out;
-  return CalibrationAlgorithm_OLD::c_OK;
+  return CalibrationAlgorithm::c_OK;
 }
 

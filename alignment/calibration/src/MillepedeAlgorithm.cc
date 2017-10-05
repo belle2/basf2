@@ -1,13 +1,17 @@
+#include <TH1F.h>
+
 #include <alignment/calibration/MillepedeAlgorithm.h>
 
 #include <alignment/PedeApplication.h>
 #include <alignment/PedeResult.h>
 #include <alignment/dataobjects/PedeSteering.h>
+#include <alignment/dataobjects/MilleData.h>
 #include <alignment/dbobjects/VXDAlignment.h>
 #include <alignment/dbobjects/CDCCalibration.h>
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <alignment/GlobalLabel.h>
 
+#include <calibration/dataobjects/RunRange.h>
 #include <eklm/dbobjects/EKLMAlignment.h>
 
 #include <framework/dbobjects/BeamParameters.h>
@@ -16,18 +20,20 @@ using namespace std;
 using namespace Belle2;
 using namespace alignment;
 
-MillepedeAlgorithm::MillepedeAlgorithm() : CalibrationAlgorithm_OLD("MillepedeCollector")
+MillepedeAlgorithm::MillepedeAlgorithm() : CalibrationAlgorithm("MillepedeCollector")
 {
   setDescription("Millepede calibration & alignment algorithm");
 }
 
-CalibrationAlgorithm_OLD::EResult MillepedeAlgorithm::calibrate()
+CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 {
-  B2INFO(" Mean of Chi2 / NDF of tracks before calibration: " << getObject<TH1F>("chi2/ndf").GetMean(););
+  auto hist_chisq = getObjectPtr<TH1F>("chi2/ndf");
+  B2INFO(" Mean of Chi2 / NDF of tracks before calibration: " << hist_chisq->GetMean(););
 
   // Write out binary files from tree and add to steering
   prepareMilleBinary();
-  for (auto file : getObject<MilleData>("mille").getFiles())
+  auto mille_data = getObjectPtr<MilleData>("mille");
+  for (auto file : mille_data->getFiles())
     m_steering.addFile(file);
 
   // Run calibration on steering
@@ -86,7 +92,7 @@ CalibrationAlgorithm_OLD::EResult MillepedeAlgorithm::calibrate()
   // Therefore we must add our result to all previous constants...
 
   // Set of of all (exp, run) occured in data collection
-  auto& runSet = getObject<RunRange>(CalibrationAlgorithm_OLD::RUN_RANGE_OBJ_NAME);
+  auto runSet = getObjectPtr<RunRange>(Calibration::RUN_RANGE_OBJ_NAME);
   // Objects in DB we are interested in
   std::list<Database::DBQuery> belle2Constants;
   if (nBeamParams)
@@ -106,7 +112,7 @@ CalibrationAlgorithm_OLD::EResult MillepedeAlgorithm::calibrate()
   std::map<string, BKLMAlignment*> previousBKLM;
   std::map<string, EKLMAlignment*> previousEKLM;
   // Collect all distinct existing objects in DB:
-  for (auto& exprun : runSet.getExpRunSet()) {
+  for (auto& exprun : runSet->getExpRunSet()) {
     // Ask DB for data at Event 1 in each run
     auto event1 = EventMetaData(1, exprun.second, exprun.first);
     Database::Instance().getData(event1, belle2Constants);
@@ -157,22 +163,22 @@ CalibrationAlgorithm_OLD::EResult MillepedeAlgorithm::calibrate()
 
   if (newBeam.empty() && nBeamParams) {
     B2ERROR("No previous BeamParameters found. First update from nominal. Only vertex position is filled!");
-    newBeam.insert({to_string(getIovFromData()), new BeamParameters()});
+    newBeam.insert({to_string(getIovFromAllData()), new BeamParameters()});
   }
 
   if (newVXD.empty() && nVXDparams) {
     B2INFO("No previous VXDAlignment found. First update from nominal.");
-    newVXD.insert({to_string(getIovFromData()), new VXDAlignment()});
+    newVXD.insert({to_string(getIovFromAllData()), new VXDAlignment()});
   }
 
   if (newCDC.empty() && nCDCparams) {
     B2INFO("No previous CDCCalibration found. First update from nominal.");
-    newCDC.insert({to_string(getIovFromData()), new CDCCalibration()});
+    newCDC.insert({to_string(getIovFromAllData()), new CDCCalibration()});
   }
 
   if (newBKLM.empty() && nBKLMparams) {
     B2INFO("No previous BKLMAlignment found. First update from nominal.");
-    newBKLM.insert({to_string(getIovFromData()), new BKLMAlignment()});
+    newBKLM.insert({to_string(getIovFromAllData()), new BKLMAlignment()});
   }
 
   if (newEKLM.empty())
@@ -245,15 +251,15 @@ CalibrationAlgorithm_OLD::EResult MillepedeAlgorithm::calibrate()
 
   // Save (possibly updated) objects
   for (auto& beam : newBeam)
-    saveCalibration(beam.second, "BeamParameters", to_IOV(beam.first).overlap(getIovFromData()));
+    saveCalibration(beam.second, "BeamParameters", to_IOV(beam.first).overlap(getIovFromAllData()));
   for (auto& vxd : newVXD)
-    saveCalibration(vxd.second, "VXDAlignment", to_IOV(vxd.first).overlap(getIovFromData()));
+    saveCalibration(vxd.second, "VXDAlignment", to_IOV(vxd.first).overlap(getIovFromAllData()));
   for (auto& cdc : newCDC)
-    saveCalibration(cdc.second, "CDCCalibration", to_IOV(cdc.first).overlap(getIovFromData()));
+    saveCalibration(cdc.second, "CDCCalibration", to_IOV(cdc.first).overlap(getIovFromAllData()));
   for (auto& bklm : newBKLM)
-    saveCalibration(bklm.second, "BKLMAlignment", to_IOV(bklm.first).overlap(getIovFromData()));
+    saveCalibration(bklm.second, "BKLMAlignment", to_IOV(bklm.first).overlap(getIovFromAllData()));
   for (auto& eklm : newEKLM)
-    saveCalibration(eklm.second, "EKLMAlignment", to_IOV(eklm.first).overlap(getIovFromData()));
+    saveCalibration(eklm.second, "EKLMAlignment", to_IOV(eklm.first).overlap(getIovFromAllData()));
 
   //commit();
 
@@ -278,8 +284,8 @@ void MillepedeAlgorithm::prepareMilleBinary()
   const std::string milleFileName("gbl-data.mille");
 
   // For no entries, no binary file is created
-  auto& gblDataTree = getObject<TTree>("GblDataTree");
-  if (!gblDataTree.GetEntries()) {
+  auto gblDataTree = getTreeObjectPtr("GblDataTree");
+  if (!gblDataTree->GetEntries()) {
     B2WARNING("No trajectories in GBL data tree.");
     return;
   }
@@ -297,11 +303,11 @@ void MillepedeAlgorithm::prepareMilleBinary()
 
   // Read vectors of GblData from tree branch
   std::vector<gbl::GblData>* currentGblData = new std::vector<gbl::GblData>();
-  gblDataTree.SetBranchAddress("GblData", &currentGblData);
+  gblDataTree->SetBranchAddress("GblData", &currentGblData);
 
   B2INFO("Writing Millepede binary files...");
-  for (unsigned int iRecord = 0; iRecord < gblDataTree.GetEntries(); ++iRecord) {
-    gblDataTree.GetEntry(iRecord);
+  for (unsigned int iRecord = 0; iRecord < gblDataTree->GetEntries(); ++iRecord) {
+    gblDataTree->GetEntry(iRecord);
 
     if (!currentGblData)
       continue;

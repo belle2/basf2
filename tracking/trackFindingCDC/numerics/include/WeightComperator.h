@@ -23,6 +23,6 @@ namespace Belle2 {
     using GreaterWeight = GreaterOf<MayIndirectTo<GetWeight>>;
 
     /// Operator testing for Nan weight
-    using HasNaNWeight = Composition<EqualNaN, GetWeight>;
+    using HasNaNWeight = Composition<IsNaN, GetWeight>;
   }
 }

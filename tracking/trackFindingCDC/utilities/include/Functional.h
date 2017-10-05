@@ -536,7 +536,7 @@ namespace Belle2 {
     }
 
     /// Unary functor for equality comparison to NAN
-    struct EqualNaN {
+    struct IsNaN {
       /// Marker function for the isFunctor test
       operator FunctorTag();
 

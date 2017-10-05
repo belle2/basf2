@@ -49,8 +49,6 @@ namespace Belle2 {
     void setDataFile(const std::string& filename, int);
 
     /// get LUT Values
-    double getValue(double) const;
-
     int getValue(unsigned) const;
 
   private:

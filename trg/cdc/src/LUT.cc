@@ -41,16 +41,6 @@ namespace Belle2 {
   {
   }
 
-  double TRGCDCLUT::getValue(double id) const
-  {
-    int range = pow(2, m_bitsize);
-    if (id >= range) {
-      return 0;
-    } else {
-      return double(m_data[id]);
-    }
-  }
-
   int TRGCDCLUT::getValue(unsigned id) const
   {
     unsigned range = pow(2, m_bitsize);
@@ -73,7 +63,7 @@ namespace Belle2 {
     int range = pow(2, nInputBit);
     openFile.open(filename.c_str());
     m_data.resize(range);
-    while (getline(openFile, tmpstr)) {
+    while (getline(openFile, tmpstr) && i < range) {
       if (!(tmpstr.size() == 0)) {
         if (tmpstr[0] >= '0' && tmpstr[0] <= '9') {
           tmpint = atoi(tmpstr.c_str());
@@ -82,10 +72,9 @@ namespace Belle2 {
         } else {
           continue;
         }
-
       }
     }
-
+    openFile.close();
   }
 }
 

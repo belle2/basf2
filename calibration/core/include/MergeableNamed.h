@@ -42,10 +42,15 @@ namespace Belle2 {
     /// Clear content of this object (e.g. set to zeroes). Called by the Reset() function
     virtual void clear() = 0;
 
+    // Make a new
+//   virtual TObject* clone() const = 0;
+
     /// Allow merging using TFileMerger if saved directly to a file.
     virtual Long64_t Merge(TCollection* hlist);
     /** Root-like Reset function for "template compatibility" with ROOT objects. Alias for clear(). */
     virtual void Reset() {clear();}
+    /** Root-like Clone function for "template compatibility" with ROOT objects. Calls clone() */
+//    virtual TObject* Clone(const char* newname = "") const {clone();}
     /** Root-like SetDirectory function for "template compatibility" with ROOT objects. Does nothing. */
     virtual void SetDirectory(TDirectory*) {}
   private:

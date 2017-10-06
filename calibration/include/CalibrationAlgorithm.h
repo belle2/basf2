@@ -208,11 +208,8 @@ namespace Belle2 {
     template<class T>
     std::unique_ptr<T> getObjectPtr(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const
     {
-      T* mergedObjPtr = new T();
-      B2DEBUG(100, "Getting " << mergedObjPtr->ClassName() << " calibration object: " << name);
+      T* mergedObjPtr = nullptr;
       bool mergedEmpty = true;
-      mergedObjPtr->SetName(name.c_str());
-      mergedObjPtr->SetDirectory(0);
       TDirectory* dir = gDirectory;
 
       // Technically we could grab all the objects from all files, add to list and then merge at the end.
@@ -240,9 +237,9 @@ namespace Belle2 {
                 if (expRunData == expRunRequested) {
                   std::string objName = getFullObjectPath(name, expRunData);
                   B2DEBUG(100, "Adding " << objName << " from file " << fileName);
-                  TObject* objOther = f->Get(objName.c_str());
+                  T* objOther = (T*)f->Get(objName.c_str());
                   if (mergedEmpty) {
-                    objOther->Copy(*mergedObjPtr);
+                    mergedObjPtr = (T*)objOther->Clone(name.c_str());
                     mergedObjPtr->SetDirectory(0);
                     mergedEmpty = false;
                   } else {
@@ -259,9 +256,9 @@ namespace Belle2 {
           Calibration::ExpRun allGranExpRun = getAllGranularityExpRun();
           std::string objName = getFullObjectPath(name, allGranExpRun);
           B2DEBUG(100, "Adding " << objName << " from file " << fileName);
-          TObject* objOther = f->Get(objName.c_str());
+          T* objOther = (T*)f->Get(objName.c_str());
           if (mergedEmpty) {
-            objOther->Copy(*mergedObjPtr);
+            mergedObjPtr = (T*)objOther->Clone(name.c_str());
             mergedObjPtr->SetDirectory(0);
             mergedEmpty = false;
           } else {
@@ -273,6 +270,8 @@ namespace Belle2 {
       }
       dir->cd();
       std::unique_ptr<T> objOutput(mergedObjPtr);
+      mergedObjPtr->SetDirectory(0);
+      B2DEBUG(100, "Passing back merged data " << name);
       return std::move(objOutput);
     }
 

@@ -1,6 +1,7 @@
 #include <alignment/dataobjects/MilleData.h>
 
 #include <framework/utilities/FileSystem.h>
+#include <framework/logging/Logger.h>
 #include <limits.h>
 #include <stdlib.h>
 
@@ -24,6 +25,16 @@ void MilleData::merge(const MergeableNamed* other)
     if (!exists)
       m_files.push_back(file);
   }
+}
+
+MilleData* MilleData::Clone(const char* newname) const
+{
+  B2DEBUG(100, "***********Calling Clone of MilleData**********");
+  MilleData* obj = new MilleData(*this);
+  if (newname && strlen(newname)) {
+    obj->SetName(newname);
+  }
+  return obj;
 }
 
 MilleData& MilleData::operator=(const MilleData& other)

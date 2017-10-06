@@ -18,9 +18,9 @@ namespace Belle2 {
     virtual ~MilleData() { close(); }
 
     /// Implementation of merging
-    virtual void merge(const MergeableNamed* other);
+    virtual void merge(const MergeableNamed* other) override;
     /// Implementation of clearing
-    virtual void clear() { m_files.clear(); m_numRecords = 0; }
+    virtual void clear() override { m_files.clear(); m_numRecords = 0; }
     /// Open a new file and remember it. Filename should encode also process id!
     void open(std::string filename);
     /// Is some file already open?
@@ -37,6 +37,8 @@ namespace Belle2 {
     MilleData(const MilleData& other) : MergeableNamed(other), m_doublePrecision(other.m_doublePrecision), m_files(other.m_files),
       m_binary(nullptr),
       m_numRecords(other.m_numRecords) {}
+
+    virtual MilleData* Clone(const char* newname = "") const override;
 
     /// Get number of records (trajectories) written to binary files
     int getNumRecords() {return m_numRecords;}
@@ -57,6 +59,6 @@ namespace Belle2 {
     /// Number of written trajectories
     int m_numRecords{0};
 
-    ClassDef(MilleData, 2) /**< Mergeable list of opened mille binaries */
+    ClassDefOverride(MilleData, 2) /**< Mergeable list of opened mille binaries */
   };
 }

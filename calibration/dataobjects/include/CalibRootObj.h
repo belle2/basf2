@@ -37,32 +37,16 @@ namespace Belle2 {
       }
     }
 
-    /// Allow merging using TFileMerger if saved directly to a file.
-    virtual Long64_t Merge(TCollection* hlist) override
+    virtual void merge(const MergeableNamed* other) override
     {
-      B2DEBUG(100, "Running Merge() on " << this->GetName());
-      Long64_t nMerged = 0;
-      if (hlist) {
-        const CalibRootObj<T>* xh = 0;
-        TIter nxh(hlist);
-        while ((xh = dynamic_cast<CalibRootObj<T>*>(nxh()))) {
-          // Add xh to me
-          merge(xh);
-          ++nMerged;
-        }
-      }
-      B2DEBUG(100, "Merged " << nMerged << " objects");
-      return nMerged;
-    }
-
-    virtual void merge(const CalibRootObj<T>* other)
-    {
+      auto castedOther = dynamic_cast<const CalibRootObj<T>*>(other);
       TList list;
       list.SetOwner(false);
-      list.Add(other->m_object);
+      list.Add(castedOther->getObject());
       m_object->Merge(&list);
     }
 
+    virtual void clear() override {m_object->Reset();}
     /**
      * @brief User constructor
      * @param object Pointer to prepared ROOT object
@@ -82,9 +66,9 @@ namespace Belle2 {
       m_object = object;
     }
 
-    T* getObject() {return m_object;}
+    T* getObject() const {return m_object;}
 
-    virtual void write(TDirectory* dir)
+    virtual void write(TDirectory* dir) override
     {
       dir->WriteTObject(m_object, m_object->GetName(), "Overwrite");
     }
@@ -103,11 +87,10 @@ namespace Belle2 {
      * The stored template object is copied and
      * new one is created for the iov.
      */
-    virtual TNamed* constructObject(std::string name) override
+    virtual CalibRootObj<T>* constructObject(std::string name) const override
     {
       B2DEBUG(100, "Creating new CalibRootObj with name " << name);
-      T* newObj = new T();
-      cloneObj(m_object, newObj);
+      T* newObj = (T*)cloneObj(m_object, name);
       newObj->SetDirectory(nullptr);
       newObj->Reset();
       CalibRootObj<T>* newCalibObj = new CalibRootObj<T>(newObj);
@@ -127,12 +110,15 @@ namespace Belle2 {
     *
     * @return void
     */
-    void cloneObj(TObject* source, TObject* dest)
+    TNamed* cloneObj(TNamed* source, std::string newName) const
     {
-      B2DEBUG(100, "Held object wil be treated as a generic TObject and have Copy() called.");
+      //B2DEBUG(100, "Held object wil be treated as a generic TObject and have Copy() called.");
       // Construct the object by making a copy
       // of the source object
-      source->Copy(*dest);
+      //source->Copy(*dest);
+      B2DEBUG(100, "Held object wil be treated as a generic TNamed and have Clone(newname) called.");
+      TNamed* dest = (TNamed*)source->Clone(newName.c_str());
+      return dest;
     }
 
     /**
@@ -146,17 +132,14 @@ namespace Belle2 {
      *
      * @return void
      */
-    void cloneObj(TTree* source, TTree*& dest)
+    TTree* cloneObj(TTree* source, std::string newName) const
     {
       B2DEBUG(100, "Held object is a TTree which will be have CloneTree() called.");
-      if (dest) {
-        // Empty tree is in dest by default.
-        delete dest;
-        dest = nullptr;
-      }
       // Construct the TTree by making a copy
       // of the source TTree
-      dest = source->CloneTree();
+      TTree* dest = source->CloneTree(0);
+      dest->SetName(newName.c_str());
+      return dest;
     }
 
     ClassDefOverride(CalibRootObj, 1) /// Run dependent mergeable wrapper

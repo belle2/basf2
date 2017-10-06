@@ -111,10 +111,12 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
     }
   }
 
-  if (gcp.getMisalignmentInputType()) {
-    m_misalignmentFromDB = new DBObjPtr<CDCMisalignment>;
-    if ((*m_misalignmentFromDB).isValid()) {
-      (*m_misalignmentFromDB).addCallback(this, &CDCGeometryPar::setWirPosMisalignParams);
+  if (gcp.getMisalignment()) {
+    if (gcp.getMisalignmentInputType()) {
+      m_misalignmentFromDB = new DBObjPtr<CDCMisalignment>;
+      if ((*m_misalignmentFromDB).isValid()) {
+        (*m_misalignmentFromDB).addCallback(this, &CDCGeometryPar::setWirPosMisalignParams);
+      }
     }
   }
 

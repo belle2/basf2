@@ -355,11 +355,12 @@ string CalibrationAlgorithm::getGranularityFromData() const
   return granularity;
 }
 
+// Have to put the explicit template specialization in the enclosing namespace
 namespace Belle2 {
   template<>
-  unique_ptr<TTree> CalibrationAlgorithm::getObjectPtr<TTree>(const string& name, const vector<ExpRun>& requestedRuns) const
+  unique_ptr<TTree> CalibrationAlgorithm::getObjectPtr<TTree>(const string& name,
+                                                              const vector<ExpRun>& requestedRuns) const
   {
-    B2DEBUG(100, "Getting TTree calibration object  from specialized: " << name);
     // We cheekily cast the TChain to TTree so that the user never knows
     // Hopefully this doesn't cause issues if people do low level stuff to the tree...
     TChain* chain = new TChain(name.c_str());

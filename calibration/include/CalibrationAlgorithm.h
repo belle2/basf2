@@ -194,74 +194,7 @@ namespace Belle2 {
 
     /// Get calibration data object by name and list of runs, the Merge function will be called to generate the overall object
     template<class T>
-    std::unique_ptr<T> getObjectPtr(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const
-    {
-      T* mergedObjPtr = nullptr;
-      bool mergedEmpty = true;
-      TDirectory* dir = gDirectory;
-
-      // Technically we could grab all the objects from all files, add to list and then merge at the end.
-      // But I prefer the more memory efficient way of merging with all objects
-      // in a file before moving on to the next one, just in case TDirectory stuff screws us.
-      TList list;
-      list.SetOwner(false);
-
-      // Construct the TDirectory names where we expect our objects to be
-      std::string runRangeObjName(getPrefix() + "/" + Calibration::RUN_RANGE_OBJ_NAME);
-      RunRange runRangeRequested(requestedRuns);
-      RunRange* runRangeData;
-      for (const auto& fileName : m_inputFileNames) {
-        //Open TFile to get the objects
-        std::unique_ptr<TFile> f;
-        f.reset(TFile::Open(fileName.c_str(), "READ"));
-        runRangeData = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
-
-        if (strcmp(getGranularity().c_str(), "run") == 0) {
-          if (runRangeData->getIntervalOfValidity().overlaps(runRangeRequested.getIntervalOfValidity())) {
-            B2DEBUG(100, "Found requested data in file: " << fileName);
-            // Loop over runs in data and check if they exist in our requested ones, then add if they do
-            for (auto expRunData : runRangeData->getExpRunSet()) {
-              for (auto expRunRequested : requestedRuns) {
-                if (expRunData == expRunRequested) {
-                  std::string objName = getFullObjectPath(name, expRunData);
-                  B2DEBUG(100, "Adding " << objName << " from file " << fileName);
-                  T* objOther = (T*)f->Get(objName.c_str());
-                  if (mergedEmpty) {
-                    mergedObjPtr = (T*)objOther->Clone(name.c_str());
-                    mergedObjPtr->SetDirectory(0);
-                    mergedEmpty = false;
-                  } else {
-                    list.Add(objOther);
-                  }
-                }
-              }
-            }
-          } else {
-            B2DEBUG(100, "No overlapping data found in file: " << fileName);
-            continue;
-          }
-        } else {
-          Calibration::ExpRun allGranExpRun = getAllGranularityExpRun();
-          std::string objName = getFullObjectPath(name, allGranExpRun);
-          B2DEBUG(100, "Adding " << objName << " from file " << fileName);
-          T* objOther = (T*)f->Get(objName.c_str());
-          if (mergedEmpty) {
-            mergedObjPtr = (T*)objOther->Clone(name.c_str());
-            mergedObjPtr->SetDirectory(0);
-            mergedEmpty = false;
-          } else {
-            list.Add(objOther);
-          }
-        }
-        mergedObjPtr->Merge(&list);
-        list.Clear();
-      }
-      dir->cd();
-      std::unique_ptr<T> objOutput(mergedObjPtr);
-      mergedObjPtr->SetDirectory(0);
-      B2DEBUG(100, "Passing back merged data " << name);
-      return std::move(objOutput);
-    }
+    std::unique_ptr<T> getObjectPtr(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const;
 
     /** Get calibration data object (for all runs the calibration is requested for)
      *  This function will only work during or after execute() has been called once.
@@ -272,8 +205,8 @@ namespace Belle2 {
       return std::move(getObjectPtr<T>(name, m_data.getRequestedRuns()));
     }
 
-//    // Helpers ---------------- Database storage -----
-//
+    // Helpers ---------------- Database storage -----
+
     /// Get the granularity of collected data
     std::string getGranularityFromData() const;
 
@@ -328,5 +261,82 @@ namespace Belle2 {
     std::string m_prefix{""};
 
     ClassDef(CalibrationAlgorithm, 2); /**< Abstract base class for calibration algorithms */
-  };
+  };  // End of CalibrationAlgorithm definition
+
+
+  /**************************************
+   *                                    *
+   * Implementation of larger templates *
+   *                                    *
+   **************************************/
+  template<class T>
+  std::unique_ptr<T> CalibrationAlgorithm::getObjectPtr(const std::string& name,
+                                                        const std::vector<Calibration::ExpRun>& requestedRuns) const
+  {
+    T* mergedObjPtr = nullptr;
+    bool mergedEmpty = true;
+    TDirectory* dir = gDirectory;
+
+    // Technically we could grab all the objects from all files, add to list and then merge at the end.
+    // But I prefer the (maybe) more memory efficient way of merging with all objects
+    // in a file before moving on to the next one, just in case TDirectory stuff screws us.
+    TList list;
+    list.SetOwner(false);
+
+    // Construct the TDirectory names where we expect our objects to be
+    std::string runRangeObjName(getPrefix() + "/" + Calibration::RUN_RANGE_OBJ_NAME);
+    RunRange runRangeRequested(requestedRuns);
+    RunRange* runRangeData;
+    for (const auto& fileName : m_inputFileNames) {
+      //Open TFile to get the objects
+      std::unique_ptr<TFile> f;
+      f.reset(TFile::Open(fileName.c_str(), "READ"));
+      runRangeData = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
+
+      if (strcmp(getGranularity().c_str(), "run") == 0) {
+        if (runRangeData->getIntervalOfValidity().overlaps(runRangeRequested.getIntervalOfValidity())) {
+          B2DEBUG(100, "Found requested data in file: " << fileName);
+          // Loop over runs in data and check if they exist in our requested ones, then add if they do
+          for (auto expRunData : runRangeData->getExpRunSet()) {
+            for (auto expRunRequested : requestedRuns) {
+              if (expRunData == expRunRequested) {
+                std::string objName = getFullObjectPath(name, expRunData);
+                B2DEBUG(100, "Adding " << objName << " from file " << fileName);
+                T* objOther = (T*)f->Get(objName.c_str());
+                if (mergedEmpty) {
+                  mergedObjPtr = (T*)objOther->Clone(name.c_str());
+                  mergedObjPtr->SetDirectory(0);
+                  mergedEmpty = false;
+                } else {
+                  list.Add(objOther);
+                }
+              }
+            }
+          }
+        } else {
+          B2DEBUG(100, "No overlapping data found in file: " << fileName);
+          continue;
+        }
+      } else {
+        Calibration::ExpRun allGranExpRun = getAllGranularityExpRun();
+        std::string objName = getFullObjectPath(name, allGranExpRun);
+        B2DEBUG(100, "Adding " << objName << " from file " << fileName);
+        T* objOther = (T*)f->Get(objName.c_str());
+        if (mergedEmpty) {
+          mergedObjPtr = (T*)objOther->Clone(name.c_str());
+          mergedObjPtr->SetDirectory(0);
+          mergedEmpty = false;
+        } else {
+          list.Add(objOther);
+        }
+      }
+      mergedObjPtr->Merge(&list);
+      list.Clear();
+    }
+    dir->cd();
+    std::unique_ptr<T> objOutput(mergedObjPtr);
+    mergedObjPtr->SetDirectory(0);
+    B2DEBUG(100, "Passing back merged data " << name);
+    return std::move(objOutput);
+  }
 } // namespace Belle2

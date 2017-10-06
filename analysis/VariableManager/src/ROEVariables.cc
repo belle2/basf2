@@ -154,14 +154,17 @@ namespace Belle2 {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (not roe.isValid())
           return -999.0;
+        std::vector<const Track*> roeTracks = roe->getTracks(maskName);
         int roe_tracks = roe->getNTracks(maskName);
         int par_tracks = 0;
         const auto& daughters = particle->getFinalStateDaughters();
         for (const auto& daughter : daughters)
         {
           int pdg = abs(daughter->getPDGCode());
-          if (pdg == 11 or pdg == 13 or pdg == 211 or pdg == 321 or pdg == 2212)
-            par_tracks++;
+          if (pdg == 11 or pdg == 13 or pdg == 211 or pdg == 321 or pdg == 2212) {
+            if (std::find(roeTracks.begin(), roeTracks.end(), daughter->getTrack()) != roeTracks.end())
+              par_tracks++;
+          }
         }
         return roe_tracks - par_tracks;
       };
@@ -1622,7 +1625,7 @@ namespace Belle2 {
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("nRemainingTracksInRestOfEvent(maskName)", nRemainingTracksInRestOfEventWithMask,
-                      "Returns number remaining tracks between given particle and the ROE accepting masks."
+                      "Returns number of remaining tracks between the ROE (specified via a mask) and the given particle. For the given particle only tracks are counted which are in the RoE."
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray."
                       "Is required for the specific FEI.");
 

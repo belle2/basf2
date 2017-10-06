@@ -79,8 +79,8 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   averageSqrtN = new double[m_maxStrip];
   timeShift = new double[m_maxStrip];
   calibrateStrip = new bool[m_maxStrip];
-  // A unique_ptr<TTree> is returned. In reality it's a TChain cast as TTree
-  auto t = getTreeObjectPtr("calibration_data");
+
+  auto t = getObjectPtr<TTree>("calibration_data");
   t->SetBranchAddress("time", &ev.time);
   t->SetBranchAddress("dist", &ev.dist);
   t->SetBranchAddress("npe", &ev.npe);

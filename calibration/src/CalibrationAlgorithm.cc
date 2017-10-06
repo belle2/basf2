@@ -9,8 +9,8 @@
 #include <framework/core/PyObjConvUtils.h>
 #include <framework/io/RootIOUtilities.h>
 
-using namespace std;
 using namespace Belle2;
+using namespace std;
 using namespace Calibration;
 namespace fs = boost::filesystem;
 
@@ -355,48 +355,51 @@ string CalibrationAlgorithm::getGranularityFromData() const
   return granularity;
 }
 
-unique_ptr<TTree> CalibrationAlgorithm::getTreeObjectPtr(const string& name, const vector<ExpRun>& requestedRuns) const
-{
-  B2DEBUG(100, "Getting TTree calibration object: " << name);
-  // We cheekily cast the TChain to TTree so that the user never knows
-  // Hopefully this doesn't cause issues if people do low level stuff to the tree...
-  TChain* chain = new TChain(name.c_str());
-  chain->SetDirectory(0);
-  // Construct the TDirectory names where we expect our objects to be
-  string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
-  RunRange runRangeRequested(requestedRuns);
-  if (strcmp(getGranularity().c_str(), "run") == 0) {
-    RunRange* runRangeData;
-    for (const auto& fileName : m_inputFileNames) {
-      //Open TFile to get the objects
-      unique_ptr<TFile> f;
-      f.reset(TFile::Open(fileName.c_str(), "READ"));
-      runRangeData = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
-      if (runRangeData->getIntervalOfValidity().overlaps(runRangeRequested.getIntervalOfValidity())) {
-        B2DEBUG(100, "Found requested data in file: " << fileName);
-        // Loop over runs in data and check if they exist in our requested ones, then add if they do
-        for (auto expRunData : runRangeData->getExpRunSet()) {
-          for (auto expRunRequested : requestedRuns) {
-            if (expRunData == expRunRequested) {
-              string objName = getFullObjectPath(name, expRunData);
-              B2DEBUG(100, "Adding TTree " << objName << " from file " << fileName);
-              chain->Add((fileName + "/" + objName).c_str());
+namespace Belle2 {
+  template<>
+  unique_ptr<TTree> CalibrationAlgorithm::getObjectPtr<TTree>(const string& name, const vector<ExpRun>& requestedRuns) const
+  {
+    B2DEBUG(100, "Getting TTree calibration object  from specialized: " << name);
+    // We cheekily cast the TChain to TTree so that the user never knows
+    // Hopefully this doesn't cause issues if people do low level stuff to the tree...
+    TChain* chain = new TChain(name.c_str());
+    chain->SetDirectory(0);
+    // Construct the TDirectory names where we expect our objects to be
+    string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
+    RunRange runRangeRequested(requestedRuns);
+    if (strcmp(getGranularity().c_str(), "run") == 0) {
+      RunRange* runRangeData;
+      for (const auto& fileName : m_inputFileNames) {
+        //Open TFile to get the objects
+        unique_ptr<TFile> f;
+        f.reset(TFile::Open(fileName.c_str(), "READ"));
+        runRangeData = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
+        if (runRangeData->getIntervalOfValidity().overlaps(runRangeRequested.getIntervalOfValidity())) {
+          B2DEBUG(100, "Found requested data in file: " << fileName);
+          // Loop over runs in data and check if they exist in our requested ones, then add if they do
+          for (auto expRunData : runRangeData->getExpRunSet()) {
+            for (auto expRunRequested : requestedRuns) {
+              if (expRunData == expRunRequested) {
+                string objName = getFullObjectPath(name, expRunData);
+                B2DEBUG(100, "Adding TTree " << objName << " from file " << fileName);
+                chain->Add((fileName + "/" + objName).c_str());
+              }
             }
           }
+        } else {
+          B2DEBUG(100, "No overlapping data found in file: " << fileName);
+          continue;
         }
-      } else {
-        B2DEBUG(100, "No overlapping data found in file: " << fileName);
-        continue;
+      }
+    } else {
+      ExpRun allGranExpRun = getAllGranularityExpRun();
+      string objName = getFullObjectPath(name, allGranExpRun);
+      for (const auto& fileName : m_inputFileNames) {
+        B2DEBUG(100, "Adding TTree " << objName << " from file " << fileName);
+        chain->Add((fileName + "/" + objName).c_str());
       }
     }
-  } else {
-    ExpRun allGranExpRun = getAllGranularityExpRun();
-    string objName = getFullObjectPath(name, allGranExpRun);
-    for (const auto& fileName : m_inputFileNames) {
-      B2DEBUG(100, "Adding TTree " << objName << " from file " << fileName);
-      chain->Add((fileName + "/" + objName).c_str());
-    }
+    unique_ptr<TTree> tree(chain);
+    return move(tree);
   }
-  unique_ptr<TTree> tree(chain);
-  return move(tree);
 }

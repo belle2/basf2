@@ -35,7 +35,7 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
 
   // Get data objects, they are now unique_ptr<T>
   auto means = getObjectPtr<TH1F>("means");
-  auto ttree = getTreeObjectPtr("tree");
+  auto ttree = getObjectPtr<TTree>("tree");
 
   // require at least 100 tracks (arbitrary for now)
   if (ttree->GetEntries() < 100)

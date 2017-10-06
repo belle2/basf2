@@ -192,18 +192,6 @@ namespace Belle2 {
     /// Get the input file names used for this algorithm as a STL vector
     std::vector<std::string> getVecInputFileNames() const {return m_inputFileNames;}
 
-    /// Get TTree calibration data object by name and list of runs, use TChain to avoid huge memory usage and merging
-    std::unique_ptr<TTree> getTreeObjectPtr(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const;
-
-    /** Get TTree calibration data object by name, use TChain to avoid huge memory usage and merging
-     *  This will only work properly after or during an execute()->calibrate() call.
-     *  We pass out a unique_ptr to make it obvious that the caller owns the object.
-     */
-    std::unique_ptr<TTree> getTreeObjectPtr(const std::string& name) const
-    {
-      return std::move(getTreeObjectPtr(name, m_data.getRequestedRuns()));
-    }
-
     /// Get calibration data object by name and list of runs, the Merge function will be called to generate the overall object
     template<class T>
     std::unique_ptr<T> getObjectPtr(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const

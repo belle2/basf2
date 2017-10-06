@@ -33,7 +33,7 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 {
 
   // Get data objects
-  auto ttree = getTreeObjectPtr("tree");
+  auto ttree = getObjectPtr<TTree>("tree");
 
   // require at least 100 tracks (arbitrary for now)
   if (ttree->GetEntries() < 100)

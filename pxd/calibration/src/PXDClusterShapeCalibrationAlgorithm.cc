@@ -965,7 +965,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
     fExpertHistograms->cd("NoSorting");
   }
 
-  auto tree = getTreeObjectPtr(name_SourceTree.Data());
+  auto tree = getObjectPtr<TTree>(name_SourceTree.Data());
   int nEntries = tree->GetEntries();
 
   B2INFO("Entries: " << nEntries);

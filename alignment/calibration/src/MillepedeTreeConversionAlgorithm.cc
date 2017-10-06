@@ -44,7 +44,7 @@ CalibrationAlgorithm::EResult MillepedeTreeConversionAlgorithm::calibrate()
   std::vector<double>* derLocal, *derGlobal;
   float value, error, der[max_entries];
   int nlab, label[max_entries];
-  auto gblData = getTreeObjectPtr("GblDataTree");
+  auto gblData = getObjectPtr<TTree>("GblDataTree");
   gblData->SetBranchAddress("GblData", &dat);
   TFile* f_out = new TFile(m_OutputFile.c_str(), "recreate");
   TTree* t_out = new TTree("mille", "");

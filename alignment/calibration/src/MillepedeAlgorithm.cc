@@ -146,7 +146,7 @@ void MillepedeAlgorithm::prepareMilleBinary()
   const std::string milleFileName("gbl-data.mille");
 
   // For no entries, no binary file is created
-  auto gblDataTree = getTreeObjectPtr("GblDataTree");  // Note that 'getTreeObjectPtr' is different to getObjectPtr
+  auto gblDataTree = getObjectPtr<TTree>("GblDataTree");
   if (!gblDataTree->GetEntries()) {
     B2WARNING("No trajectories in GBL data tree.");
     return;

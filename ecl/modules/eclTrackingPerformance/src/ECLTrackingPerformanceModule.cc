@@ -184,7 +184,7 @@ void ECLTrackingPerformanceModule::event()
             }
           }
         }
-        for (const auto& extHit : recoTrack->getRelationsTo<ExtHit>()) {
+        for (const auto& extHit : b2Track->getRelationsTo<ExtHit>()) {
           if (!isECLHit(extHit)) continue;
           ECLCluster* eclCluster = extHit.getRelatedFrom<ECLCluster>();
           if (eclCluster != nullptr) {

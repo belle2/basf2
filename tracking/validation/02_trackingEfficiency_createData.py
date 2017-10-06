@@ -44,7 +44,7 @@ add_reconstruction(path, None, pruneTracks=0)
 
 tracking_efficiency = register_module('ECLTrackingPerformance')
 # tracking_efficiency.logging.log_level = LogLevel.DEBUG
-tracking_efficiency.param('outputFileName', output_file_name)
+tracking_efficiency.param('outputFileName', output_filename)
 path.add_module(tracking_efficiency)
 
 additional_options(path)

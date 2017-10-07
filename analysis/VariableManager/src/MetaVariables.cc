@@ -311,30 +311,23 @@ namespace Belle2 {
           std::map<std::string, int>::iterator op = operators.find(output);
 
           if (op != operators.end()) {
-            B2INFO("Fetching input1 from operand_stack.");
             Manager::FunctionPtr rhs = operand_stack.back();
             operand_stack.pop_back();
-            B2INFO("Fetching input2 from operand_stack.");
             Variable::Manager::FunctionPtr lhs = operand_stack.back();
             operand_stack.pop_back();
 
-            auto func = [lhs, op, rhs](const Particle * particle) -> double {
-              if (op->first.compare("^") == 0)
+            char operation = op->first.front();
+
+            auto func = [lhs, operation, rhs](const Particle * particle) -> double {
+              switch (operation)
               {
-                return std::pow(lhs(particle), rhs(particle));
-              } else if (op->first.compare("*") == 0)
-              {
-                return lhs(particle) * rhs(particle);
-              } else if (op->first.compare("/") == 0)
-              {
-                return lhs(particle) / rhs(particle);
-              } else if (op->first.compare("+") == 0)
-              {
-                return lhs(particle) + rhs(particle);
-              } else if (op->first.compare("-") == 0)
-              {
-                return lhs(particle) - rhs(particle);
+                case '+': return lhs(particle) + rhs(particle);
+                case '-': return lhs(particle) - rhs(particle);
+                case '*': return lhs(particle) * rhs(particle);
+                case '/': return lhs(particle) / rhs(particle);
+                case '^': return std::pow(lhs(particle), rhs(particle));
               }
+              B2INFO("No operation match.");
               return 0;
             };
             operand_stack.push_back(func);

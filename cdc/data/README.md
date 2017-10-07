@@ -159,4 +159,5 @@ Format: layerID (0-55), wireID (0-), displacement (dx,dy,dz) of sense wire at ba
 * deisplacement.dat:  <- obsolete
 * deisplacement_v1.dat: tensions added <- obsolete
 * deisplacement_v1.1.dat: add corrections for the longer outer wall (by 430um w.r.t. design)
-
+* deisplacement_v2.dat: add corrections (in z-direction only) for the end-plate displacements due to wire tensions.
+* deisplacement_v2.1.dat: add other remaining corrections (for endp-late tilt, rotation, etc.). (x,y) as well as z are changed.

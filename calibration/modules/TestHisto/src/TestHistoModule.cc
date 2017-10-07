@@ -93,6 +93,7 @@ void TestHistoModule::closeRun()
     }
     mille->close();
   }
+  getObjectPtr<TTree>("MyTree")->GetDirectory()->ls();
 }
 
 void TestHistoModule::collect()

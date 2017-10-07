@@ -128,12 +128,9 @@ void CalibrationCollectorModule::defineHisto()
 void CalibrationCollectorModule::endRun()
 {
   closeRun();
-  m_manager.writeCurrentObjects(m_expRun);
-  m_manager.clearCurrentObjects(m_expRun);
 }
 
 void CalibrationCollectorModule::terminate()
 {
   finish();
-  m_manager.replaceObjects();
 }

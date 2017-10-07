@@ -99,6 +99,15 @@ namespace Belle2 {
       return newCalibObj;
     }
 
+    virtual T* cloneHeldObj(const std::string name) const override
+    {
+      B2DEBUG(100, "Creating new TNamed obect with name " << name);
+      T* newObj = dynamic_cast<T*>(cloneObj(m_object, name));
+      B2DEBUG(100, "Created Object with name " << name);
+      return newObj;
+    }
+
+
     /**
     * @brief Clone "normal" TObject
     * Makes a deep copy of source object

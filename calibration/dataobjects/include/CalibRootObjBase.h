@@ -25,6 +25,7 @@ namespace Belle2 {
     virtual ~CalibRootObjBase() {};
 
     virtual CalibRootObjBase* Clone(const char* newname = "") const override {return constructObject(newname);}
+    virtual TNamed* cloneHeldObj(const std::string newname = "") const = 0;
 
     virtual void write(TDirectory* dir) = 0;
     virtual void setObjectName(std::string name) = 0;

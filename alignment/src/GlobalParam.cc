@@ -260,17 +260,19 @@ namespace Belle2 {
             for (int w = 0; w < nWires[l]; ++w) {
 
               PhiF = dPhi * (w + offset[l] + 0.5 * shiftHold[l]);
-              PhiB = dPhi * (w + offset[l]);
 
-              double xWire = R[l] * 0.1 * cos(PhiF); // + cdc->get(WireID(l, w), CDCAlignment::wireFwdX);
-              double yWire = R[l] * 0.1 * sin(PhiF); // + cdc->get(WireID(l, w), CDCAlignment::wireFwdY);
+              double xWire = R[l] * 0.1 * cos(PhiF) + cdc->get(WireID(l, w), CDCAlignment::wireFwdX);
+              double yWire = R[l] * 0.1 * sin(PhiF) + cdc->get(WireID(l, w), CDCAlignment::wireFwdY);
 
               misForward[l][w][0] = dxLayer[l] + (1. - cos(dPhiLayer[l])) * xWire + sin(dPhiLayer[l]) * yWire;
               misForward[l][w][1] = dyLayer[l] + (1. - cos(dPhiLayer[l])) * yWire - sin(dPhiLayer[l]) * xWire;
               misForward[l][w][2] = 0. ;
 
-              xWire = R[l] * 0.1 * cos(PhiB); // + cdc->get(WireID(l, w), CDCAlignment::wireBwdX);
-              yWire = R[l] * 0.1 * sin(PhiB); // + cdc->get(WireID(l, w), CDCAlignment::wireBwdY);
+              PhiB = dPhi * (w + offset[l]);
+
+              xWire = R[l] * 0.1 * cos(PhiB) + cdc->get(WireID(l, w), CDCAlignment::wireBwdX);
+              yWire = R[l] * 0.1 * sin(PhiB) + cdc->get(WireID(l, w), CDCAlignment::wireBwdY);
+
               misBackward[l][w][0] = dxLayer[l] + (1. - cos(dPhiLayer[l])) * xWire + sin(dPhiLayer[l]) * yWire;
               misBackward[l][w][1] = dyLayer[l] + (1. - cos(dPhiLayer[l])) * yWire - sin(dPhiLayer[l]) * xWire;
               misBackward[l][w][2] = 0.;
@@ -293,13 +295,13 @@ namespace Belle2 {
 
               auto wire = WireID(l, w);
 
-              cdc->add(wire, CDCAlignment::wireFwdX, - misForward[l][w][0]);
-              cdc->add(wire, CDCAlignment::wireFwdY, - misForward[l][w][1]);
-              cdc->add(wire, CDCAlignment::wireFwdZ, - misForward[l][w][2]);
+              cdc->add(wire, CDCAlignment::wireFwdX, misForward[l][w][0]);
+              cdc->add(wire, CDCAlignment::wireFwdY, misForward[l][w][1]);
+              cdc->add(wire, CDCAlignment::wireFwdZ, misForward[l][w][2]);
 
-              cdc->add(wire, CDCAlignment::wireBwdX, - misBackward[l][w][0]);
-              cdc->add(wire, CDCAlignment::wireBwdY, - misBackward[l][w][1]);
-              cdc->add(wire, CDCAlignment::wireBwdZ, - misBackward[l][w][2]);
+              cdc->add(wire, CDCAlignment::wireBwdX, misBackward[l][w][0]);
+              cdc->add(wire, CDCAlignment::wireBwdY, misBackward[l][w][1]);
+              cdc->add(wire, CDCAlignment::wireBwdZ, misBackward[l][w][2]);
 
               /*cdc->set(wire, CDCAlignment::wireFwdX, misForward[l][w][0] + cdc->get(wire, CDCAlignment::wireFwdX));
               cdc->set(wire, CDCAlignment::wireFwdY, misForward[l][w][1] + cdc->get(wire, CDCAlignment::wireFwdY));

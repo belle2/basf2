@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
@@ -10,16 +10,20 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/utilities/IsDetected.h>
-#include <tracking/trackFindingCDC/utilities/GetIterator.h>
+#include <type_traits>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Type predicate to check if Ts is iterable by means of std::begin().
-    template<class Ts>
+    /**
+     *  Typical application of the detection idiom
+     *
+     *  Tests whether a Functor can be called with the given argument types.
+     */
+    template <class AFunctor, typename... Ts>
     constexpr bool isApplicable()
     {
-      return isDetected<GetIterator, Ts>();
+      return isDetected<std::result_of_t, AFunctor(Ts...)>();
     }
   }
 }

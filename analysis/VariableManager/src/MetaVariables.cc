@@ -203,10 +203,11 @@ namespace Belle2 {
         operators["-"] = 2;
 
         std::vector<std::string> brackets;
-        brackets.push_back("[");
-        brackets.push_back("]");
+        brackets.push_back("(");
+        brackets.push_back(")");
 
         std::string seperator(" ");
+        std::string next_arg;
         std::size_t prev_pos = 0;
         std::size_t pos = arguments[0].find(seperator);
 
@@ -214,24 +215,36 @@ namespace Belle2 {
           B2FATAL("Wrong number of arguments for meta function formula");
         }
 
+        // Putting an initial parser here so later we can make this smarter and
+        // not have strict rquirements on the input format
+        std::vector<std::string> input_queue;
+
+        while ((pos = arguments[0].find_first_of(seperator, prev_pos)) != std::string::npos) {
+          next_arg = arguments[0].substr(prev_pos, pos - prev_pos);
+          if (next_arg.compare(seperator) != 0 && next_arg.size() != 0) {
+            input_queue.push_back(next_arg);
+            //B2INFO("Adding to input queue:" << input_queue.back());
+          }
+          prev_pos = pos + 1;
+        }
+        next_arg = arguments[0].substr(prev_pos);
+        if (next_arg.compare(seperator) != 0) {
+          input_queue.push_back(next_arg);
+          //B2INFO("Adding to input queue:" << input_queue.back());
+        }
+
         std::vector<std::string> output_queue;
         std::vector<std::string> operator_stack;
 
         B2INFO("Entering RPN converter.");
-        while (pos != std::string::npos) {
+        for (auto const& input : input_queue) {
 
-          B2INFO("Current pos: " << int(pos));
-          B2INFO("Previous pos: " << int(prev_pos));
-          std::string next_arg = arguments[0].substr(prev_pos, pos - prev_pos);
-          B2INFO("Next arg:" << next_arg);
-
-          std::map<std::string, int>::iterator op = operators.find(next_arg);
-          std::vector<std::string>::iterator bra = std::find(std::begin(brackets), std::end(brackets), next_arg);
+          std::map<std::string, int>::iterator op = operators.find(input);
+          std::vector<std::string>::iterator bra = std::find(std::begin(brackets), std::end(brackets), input);
 
           // Check if it's a number first
           if (op == operators.end() && bra == std::end(brackets)) {
-            // Should evaluate the variable here now and push back the value as a string (saves repeating it later)
-            output_queue.push_back(next_arg);
+            output_queue.push_back(input);
 
             // Check if it's an operation
           } else if (op != operators.end()) {
@@ -247,10 +260,10 @@ namespace Belle2 {
               operator_stack.pop_back();
             }
             // Now can read next operator onto the operator stack
-            operator_stack.push_back(next_arg);
+            operator_stack.push_back(input);
             // Open bracket case
           } else if (bra != std::end(brackets) && next_arg.compare(brackets[0]) == 0) {
-            operator_stack.push_back(next_arg);
+            operator_stack.push_back(input);
             // Close bracket case
           } else if (bra != std::end(brackets) && next_arg.compare(brackets[1]) == 0) {
             while (
@@ -266,9 +279,6 @@ namespace Belle2 {
           }
 
           // Get the next argument
-          prev_pos = pos + 1;
-          pos = arguments[0].find(seperator, prev_pos);
-          B2INFO("New pos: " << int(pos));
           std::string cur_queue;
           for (auto const& out : output_queue) {
             cur_queue += out;
@@ -288,18 +298,62 @@ namespace Belle2 {
           rpn_queue += out;
         }
         B2INFO("RPN formula output stack: " << rpn_queue);
+
+
+        // Then can do normal RPN calculation
+        B2INFO("Entering RPN calculator.");
+        // Need to use a stack of FunctionPtr for this I think
+        std::vector<Belle2::Variable::Manager::FunctionPtr> operand_stack;
+
+        for (auto const& output : output_queue) {
+
+          B2INFO("Processing input:" << output);
+          std::map<std::string, int>::iterator op = operators.find(output);
+
+          if (op != operators.end()) {
+            B2INFO("Fetching input1 from operand_stack.");
+            Manager::FunctionPtr rhs = operand_stack.back();
+            operand_stack.pop_back();
+            B2INFO("Fetching input2 from operand_stack.");
+            Variable::Manager::FunctionPtr lhs = operand_stack.back();
+            operand_stack.pop_back();
+
+            auto func = [lhs, op, rhs](const Particle * particle) -> double {
+              if (op->first.compare("^") == 0)
+              {
+                return std::pow(lhs(particle), rhs(particle));
+              } else if (op->first.compare("*") == 0)
+              {
+                return lhs(particle) * rhs(particle);
+              } else if (op->first.compare("/") == 0)
+              {
+                return lhs(particle) / rhs(particle);
+              } else if (op->first.compare("+") == 0)
+              {
+                return lhs(particle) + rhs(particle);
+              } else if (op->first.compare("-") == 0)
+              {
+                return lhs(particle) - rhs(particle);
+              }
+              return 0;
+            };
+            operand_stack.push_back(func);
+
+          } else {
+            operand_stack.push_back(Manager::Instance().getVariable(output)->function);
+          }
+
+        }
+
+        return operand_stack.back();
+      } else {
+        B2FATAL("Wrong number of arguments for meta function formula");
       }
-      return nullptr;
-    }
+      /*
+      char operation = ' ';
+      int pos = 0;
 
-
-    // Then can do normal RPN calculation
-
-    /*
-    char operation = ' ';
-    int pos = 0;
-
-    if (arguments[0].find('+') != std::string::npos) {
+      if (arguments[0].find('+') != std::string::npos) {
         pos = arguments[0].find('+');
         operation = '+';
       } else if (arguments[0].find('-') != std::string::npos) {
@@ -339,10 +393,11 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         return var->function;
       }
-    } else {
+      } else {
       B2FATAL("Wrong number of arguments for meta function formula");
+      }
+      */
     }
-    */
 
     Manager::FunctionPtr nCleanedTracks(const std::vector<std::string>& arguments)
     {

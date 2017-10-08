@@ -29,7 +29,7 @@ main.add_module('EvtGenInput')
 
 # detector simulation
 bg = validationtools.get_background_files()
-add_simulation(main, bkgfiles=bg)
+add_simulation(main, bkgfiles=bg, use_vxdtf2=True)
 
 # trigger simulation
 add_tsim(main)

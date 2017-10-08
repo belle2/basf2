@@ -37,7 +37,7 @@ evtgeninput = register_module('EvtGenInput')
 main.add_module(evtgeninput)
 
 # detector simulation, no background files
-add_simulation(main)
+add_simulation(main, use_vxdtf2=True)
 
 # trigger simulation
 add_tsim(main)

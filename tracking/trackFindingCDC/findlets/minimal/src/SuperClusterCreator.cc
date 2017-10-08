@@ -124,21 +124,18 @@ void SuperClusterCreator::apply(std::vector<CDCWireHit>& inputWireHits,
     }
   }
 
+  /// Obtain the wire hits as pointers
+  const std::vector<CDCWireHit*> wireHitPtrs = as_pointers<CDCWireHit>(inputWireHits);
+
+  /// Create the wire hit relations
   WeightedNeighborhood<CDCWireHit>::appendUsing(m_wireHitRelationFilter,
-                                                inputWireHits,
+                                                wireHitPtrs,
                                                 m_wireHitRelations);
 
   B2ASSERT("Expect wire hit neighborhood to be symmetric ",
            WeightedRelationUtil<CDCWireHit>::areSymmetric(m_wireHitRelations));
 
-  // Obtain the wire hits as pointers.
-  std::vector<CDCWireHit*> ptrWireHits;
-  ptrWireHits.reserve(inputWireHits.size());
-  for (CDCWireHit& wireHit : inputWireHits) {
-    ptrWireHits.push_back(&wireHit);
-  }
-
-  m_wirehitClusterizer.apply(ptrWireHits, m_wireHitRelations, outputSuperClusters);
+  m_wirehitClusterizer.apply(wireHitPtrs, m_wireHitRelations, outputSuperClusters);
 
   int iSuperCluster = -1;
   for (CDCWireHitCluster& superCluster : outputSuperClusters) {

@@ -16,31 +16,34 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <tracking/trackFindingCDC/utilities/Relation.h>
-#include <tracking/trackFindingCDC/utilities/Range.h>
+#include <tracking/trackFindingCDC/utilities/VectorRange.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
+
+#include <algorithm>
+#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    // Guard to prevent repeated instatiations
+    // Guard to prevent repeated instantiations
     extern template class Filter<Relation<const CDCSegmentTriple> >;
 
     /// Base class for filtering the neighborhood of segment triples
     class BaseSegmentTripleRelationFilter : public Filter<Relation<const CDCSegmentTriple>> {
 
     public:
-      /// Returns a two iterator range covering the range of possible neighboring segment triples of the given facet out of the sorted range given by the two other argumets.
-      template<class ACDCSegmentTripleIterator>
-      Range<ACDCSegmentTripleIterator>
-      getPossibleNeighbors(const CDCSegmentTriple& triple,
-                           const ACDCSegmentTripleIterator& itBegin,
-                           const ACDCSegmentTripleIterator& itEnd)
+      /// Returns the segment triples form the range that continue on the to site of the given segment triple.
+      std::vector<const CDCSegmentTriple*> getPossibleNeighbors(
+        const CDCSegmentTriple* segmentTriple,
+        const std::vector<const CDCSegmentTriple*>::const_iterator& itBegin,
+        const std::vector<const CDCSegmentTriple*>::const_iterator& itEnd) const
       {
+        assert(std::is_sorted(itBegin, itEnd, LessOf<Deref>()) && "Expected segment triples to be sorted");
+        const CDCSegment2D* endSegment = segmentTriple->getEndSegment();
 
-        const CDCAxialSegment2D* endSegment = triple.getEndSegment();
-        std::pair<ACDCSegmentTripleIterator,  ACDCSegmentTripleIterator> itPairPossibleNeighbors = std::equal_range(itBegin, itEnd,
-            endSegment);
-        return Range<ACDCSegmentTripleIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
-
+        ConstVectorRange<const CDCSegmentTriple*> neighbors{
+          std::equal_range(itBegin, itEnd, &endSegment, LessOf<Deref>())};
+        return {neighbors.begin(),  neighbors.end()};
       }
 
       /// Main filter method returning the weight of the neighborhood relation. Return NAN if relation shall be rejected.

@@ -14,8 +14,13 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
+
 #include <tracking/trackFindingCDC/utilities/Relation.h>
-#include <tracking/trackFindingCDC/utilities/Range.h>
+#include <tracking/trackFindingCDC/utilities/VectorRange.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
+
+#include <algorithm>
+#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -27,21 +32,18 @@ namespace Belle2 {
     class BaseSegmentPairRelationFilter  : public Filter<Relation<const CDCSegmentPair>> {
 
     public:
-      /// Returns a two iterator range covering the range of possible neighboring axial stereo segment pairs of the given axial stereo segment pair out of the sorted range given by the two other argumets.
-      template<class ASegmentPairIterator>
-      Range<ASegmentPairIterator>
-      getPossibleNeighbors(const CDCSegmentPair& segmentPair,
-                           const ASegmentPairIterator& itBegin,
-                           const ASegmentPairIterator& itEnd) const
+      /// Returns the segment pairs form the range that continue on the to site of the given segment pair.
+      std::vector<const CDCSegmentPair*> getPossibleNeighbors(
+        const CDCSegmentPair* segmentPair,
+        const std::vector<const CDCSegmentPair*>::const_iterator& itBegin,
+        const std::vector<const CDCSegmentPair*>::const_iterator& itEnd) const
       {
+        assert(std::is_sorted(itBegin, itEnd, LessOf<Deref>()) && "Expected segment pairs to be sorted");
+        const CDCSegment2D* toSegment = segmentPair->getToSegment();
 
-        const CDCSegment2D* ptrEndSegment = segmentPair.getToSegment();
-        if (not ptrEndSegment) Range<ASegmentPairIterator>(itEnd, itEnd);
-
-        std::pair<ASegmentPairIterator, ASegmentPairIterator> itPairPossibleNeighbors =
-          std::equal_range(itBegin, itEnd, ptrEndSegment);
-        return Range<ASegmentPairIterator>(itPairPossibleNeighbors.first,
-                                           itPairPossibleNeighbors.second);
+        ConstVectorRange<const CDCSegmentPair*> neighbors{
+          std::equal_range(itBegin, itEnd, &toSegment, LessOf<Deref>())};
+        return {neighbors.begin(),  neighbors.end()};
       }
 
       /** Main filter method returning the weight of the neighborhood relation.

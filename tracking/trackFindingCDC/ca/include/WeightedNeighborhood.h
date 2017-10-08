@@ -67,23 +67,20 @@ namespace Belle2 {
        */
       /**@{*/
       /// Appends relations between elements in the given AItems using the ARelationFilter.
-      template <class ARelationFilter, class AItems>
+      template <class ARelationFilter>
       static void appendUsing(ARelationFilter& relationFilter,
-                              AItems& items,
+                              const std::vector<AItem*>& items,
                               std::vector<WeightedRelation<AItem>>& weightedRelations)
       {
-        for (AItem& from : items) {
-          auto possibleNeighbors =
-            relationFilter.getPossibleNeighbors(from, std::begin(items), std::end(items));
-          for (AItem& to : possibleNeighbors) {
-            // Relations point to the elements. Take the address of the item here
-            AItem* ptrFrom = &from;
-            AItem* ptrTo = &to;
-            if (ptrFrom == ptrTo) continue;
-            Relation<AItem> neighborRelation(ptrFrom, ptrTo);
+        for (AItem* from : items) {
+          std::vector<AItem*> possibleNeighbors =
+            relationFilter.getPossibleNeighbors(from, items.begin(), items.end());
+          for (AItem* to : possibleNeighbors) {
+            if (from == to) continue;
+            Relation<AItem> neighborRelation(from, to);
             Weight weight = relationFilter(neighborRelation);
             if (std::isnan(weight)) continue;
-            weightedRelations.emplace_back(ptrFrom, weight, ptrTo);
+            weightedRelations.emplace_back(from, weight, to);
           } // end for from
         } // end for to
         // sort everything afterwards

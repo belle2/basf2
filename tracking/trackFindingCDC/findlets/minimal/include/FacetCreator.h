@@ -62,8 +62,8 @@ namespace Belle2 {
        *  Generates facets on the given wire hits generating neighboring triples of hits.
        *  Inserts the result to the end of the GenericFacetCollection.
        */
-      void createFacets(const CDCWireHitCluster& wireHits,
-                        const WeightedNeighborhood<const CDCWireHit>& neighborhood,
+      void createFacets(const std::vector<CDCWireHit*>& wireHits,
+                        const std::vector<WeightedRelation<CDCWireHit> >& wireHitRelations,
                         std::vector<CDCFacet>& facets);
 
       /**
@@ -100,7 +100,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the wire hit neighborhood in within a cluster.
-      std::vector<WeightedRelation<const CDCWireHit> > m_wireHitRelations;
+      std::vector<WeightedRelation<CDCWireHit> > m_wireHitRelations;
     };
   }
 }

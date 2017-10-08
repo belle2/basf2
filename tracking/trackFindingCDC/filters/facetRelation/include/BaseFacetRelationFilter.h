@@ -15,8 +15,12 @@
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/Relation.h>
-#include <tracking/trackFindingCDC/utilities/Range.h>
+#include <tracking/trackFindingCDC/utilities/VectorRange.h>
+
+#include <algorithm>
+#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -34,16 +38,21 @@ namespace Belle2 {
 
     public:
       /**
-       *  Returns a two iterator range covering the range of possible neighboring
+       *  Returns the selection of facets covering the range of possible neighboring
        *  facets of the given facet out of the sorted range given by the two other argumets.
        */
-      template <class AFacetIt>
-      Range<AFacetIt>
-      getPossibleNeighbors(const CDCFacet& facet, const AFacetIt& itBegin, const AFacetIt& itEnd) const
+      std::vector<const CDCFacet*> getPossibleNeighbors(
+        const CDCFacet* facet,
+        const std::vector<const CDCFacet*>::const_iterator& itBegin,
+        const std::vector<const CDCFacet*>::const_iterator& itEnd) const
       {
-        const CDCRLWireHitPair& rearRLWireHitPair = facet.getRearRLWireHitPair();
-        std::pair<AFacetIt, AFacetIt> neighbors = std::equal_range(itBegin, itEnd, rearRLWireHitPair);
-        return {neighbors.first, neighbors.second};
+        // Expensive assert - but true one the less
+        // assert(std::is_sorted(itBegin, itEnd, LessOf<Deref>()) && "Expected facets to be sorted");
+
+        const CDCRLWireHitPair& rearRLWireHitPair = facet->getRearRLWireHitPair();
+        ConstVectorRange<const CDCFacet*> neighbors{
+          std::equal_range(itBegin, itEnd, &rearRLWireHitPair, LessOf<Deref>())};
+        return {neighbors.begin(), neighbors.end()};
       }
 
       /**

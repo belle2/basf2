@@ -17,8 +17,10 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <tracking/trackFindingCDC/utilities/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 
 #include <cmath>
+#include <cassert>
 
 namespace Belle2 {
 
@@ -35,21 +37,22 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Returns a vector containing the neighboring wire hits of the given wire hit out of the sorted range given by the two iterator other argumets.
-      template<class ACDCWireHitIterator>
-      std::vector<std::reference_wrapper<CDCWireHit> > getPossibleNeighbors(const CDCWireHit& wireHit,
-          const ACDCWireHitIterator& itBegin,
-          const ACDCWireHitIterator& itEnd) const
+      std::vector<CDCWireHit*> getPossibleNeighbors(
+        CDCWireHit* wireHit,
+        const std::vector<CDCWireHit*>::const_iterator& itBegin,
+        const std::vector<CDCWireHit*>::const_iterator& itEnd) const
       {
+        assert(std::is_sorted(itBegin, itEnd, LessOf<Deref>()) && "Expected wire hits to be sorted");
 
         const int nWireNeighbors = 8 + 10 * (m_param_degree - 1);
         std::vector<const CDCWire*> m_wireNeighbors;
         m_wireNeighbors.reserve(nWireNeighbors);
 
-        std::vector<std::reference_wrapper<CDCWireHit> > m_wireHitNeighbors;
+        std::vector<CDCWireHit*> m_wireHitNeighbors;
         m_wireHitNeighbors.reserve(2 * nWireNeighbors);
 
         const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
-        const CDCWire& wire = wireHit.getWire();
+        const CDCWire& wire = wireHit->getWire();
 
         const CDCWire* ccwSixthSecondWireNeighbor = wireTopology.getSecondNeighborSixOClock(wire);
         const CDCWire* ccwInWireNeighbor = wireTopology.getNeighborCCWInwards(wire);
@@ -128,13 +131,13 @@ namespace Belle2 {
 
         std::sort(std::begin(m_wireNeighbors), std::end(m_wireNeighbors));
 
-        for (const CDCWire* ptrNeighborWire : m_wireNeighbors) {
-          const CDCWire& neighborWire = *ptrNeighborWire;
-          std::pair<ACDCWireHitIterator, ACDCWireHitIterator> itPairPossibleNeighbors = std::equal_range(itBegin, itEnd, neighborWire);
+        for (const CDCWire* neighborWire : m_wireNeighbors) {
+          ConstVectorRange<CDCWireHit*> neighborWireHits{
+            std::equal_range(itBegin, itEnd, neighborWire, LessOf<Deref>())};
 
           m_wireHitNeighbors.insert(m_wireHitNeighbors.end(),
-                                    itPairPossibleNeighbors.first,
-                                    itPairPossibleNeighbors.second);
+                                    neighborWireHits.begin(),
+                                    neighborWireHits.end());
         }
 
         return m_wireHitNeighbors;

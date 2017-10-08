@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -39,7 +40,7 @@ void TrackLinker::apply(const std::vector<CDCTrack>& inputTracks, std::vector<CD
 
   // Create linking relations
   m_trackRelations.clear();
-  m_trackRelationCreator.apply(inputTracks, m_trackRelations);
+  m_trackRelationCreator.apply(trackPtrs, m_trackRelations);
 
   // Find linking paths
   m_trackPaths.clear();

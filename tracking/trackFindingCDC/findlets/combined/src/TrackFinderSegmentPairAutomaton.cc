@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentPairAutomaton.h>
 
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+
 #include <framework/core/ModuleParamList.icc.h>
 #include <framework/core/ModuleParam.dcl.h>
 
@@ -66,7 +68,11 @@ void TrackFinderSegmentPairAutomaton::apply(const std::vector<CDCSegment2D>& inp
                                             std::vector<CDCTrack>& tracks)
 {
   m_segmentPairCreator.apply(inputSegments, m_segmentPairs);
-  m_segmentPairRelationCreator.apply(m_segmentPairs, m_segmentPairRelations);
+
+  std::vector<const CDCSegmentPair*> segmentPairPtrs =
+    as_pointers<const CDCSegmentPair>(m_segmentPairs);
+  m_segmentPairRelationCreator.apply(segmentPairPtrs, m_segmentPairRelations);
+
   m_trackCreatorSegmentPairAutomaton.apply(m_segmentPairs, m_segmentPairRelations, m_preLinkingTracks);
 
   m_trackCreatorSingleSegments.apply(inputSegments, m_preLinkingTracks);

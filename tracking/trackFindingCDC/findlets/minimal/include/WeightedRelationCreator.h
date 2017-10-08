@@ -15,6 +15,7 @@
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 
 #include <framework/core/ModuleParamList.icc.h>
 #include <framework/logging/Logger.h>
@@ -41,7 +42,7 @@ namespace Belle2 {
      *  from each segment.
      */
     template <class AItem, class ARelationFilter>
-    class WeightedRelationCreator : public Findlet<AItem, WeightedRelation<AItem>> {
+    class WeightedRelationCreator : public Findlet<AItem* const, WeightedRelation<AItem>> {
 
     private:
       /// Type of the base class
@@ -72,10 +73,12 @@ namespace Belle2 {
       }
 
       /// Main function
-      void apply(typename Super::template ToVector<AItem>& inputObjects,
+      void apply(const std::vector<AItem*>& inputObjects,
                  std::vector<WeightedRelation<AItem>>& weightedRelations) final {
+
         B2ASSERT("Expected the objects on which relations are constructed to be sorted",
-        std::is_sorted(inputObjects.begin(), inputObjects.end()));
+        std::is_sorted(inputObjects.begin(), inputObjects.end(), LessOf<Deref>()));
+
         WeightedNeighborhood<AItem>::appendUsing(m_relationFilter, inputObjects, weightedRelations);
 
         if (m_param_onlyBest > 0)

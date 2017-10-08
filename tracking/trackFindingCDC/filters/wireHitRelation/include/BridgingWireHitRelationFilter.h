@@ -18,6 +18,7 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <tracking/trackFindingCDC/utilities/Range.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.icc.h>
@@ -25,6 +26,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -81,22 +83,24 @@ namespace Belle2 {
       }
 
       /// Returns a vector containing the neighboring wire hits of the given wire hit out of the sorted range given by the two iterator other argumets.
-      template<class ACDCWireHitIterator>
-      std::vector<std::reference_wrapper<CDCWireHit> > getPossibleNeighbors(const CDCWireHit& wireHit,
-          const ACDCWireHitIterator& itBegin,
-          const ACDCWireHitIterator& itEnd)
+      std::vector< CDCWireHit*> getPossibleNeighbors(
+        CDCWireHit* wireHit,
+        const std::vector< CDCWireHit*>::const_iterator& itBegin,
+        const std::vector< CDCWireHit*>::const_iterator& itEnd)
       {
+        assert(std::is_sorted(itBegin, itEnd, LessOf<Deref>()) && "Expected wire hits to be sorted");
+
         std::vector<std::pair<const CDCWire*, int> > wireNeighbors;
         wireNeighbors.reserve(8);
 
-        std::vector<std::reference_wrapper<CDCWireHit> > wireHitNeighbors;
+        std::vector< CDCWireHit*> wireHitNeighbors;
         wireHitNeighbors.reserve(12);
 
         std::array<short, 12> missingPrimaryNeighbor = {0};
 
         const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
-        const CDCWire& wire = wireHit.getWire();
+        const CDCWire& wire = wireHit->getWire();
 
         // Analyse primary neighborhood - sorted such that the wire hits relations are most likely sorted.
         for (short oClockDirection : {5, 7, 3, 9, 1, 11}) {
@@ -110,7 +114,8 @@ namespace Belle2 {
           const CDCWire* neighborWire = wireAndOClockDirection.first;
           int oClockDirection = wireAndOClockDirection.second;
 
-          Range<ACDCWireHitIterator> wireHitRange{std::equal_range(itBegin, itEnd, *neighborWire)};
+          ConstVectorRange< CDCWireHit*> wireHitRange{
+            std::equal_range(itBegin, itEnd, neighborWire, LessOf<Deref>())};
           if (wireHitRange.empty()) {
             int ccwOClockDirection = oClockDirection - 1;
             int cwOClockDirection = oClockDirection == 11 ? 0 : oClockDirection + 1;
@@ -139,7 +144,8 @@ namespace Belle2 {
 
         for (std::pair<const CDCWire*, int> wireAndOClockDirection : wireNeighbors) {
           const CDCWire* neighborWire = wireAndOClockDirection.first;
-          Range<ACDCWireHitIterator> wireHitRange{std::equal_range(itBegin, itEnd, *neighborWire)};
+          ConstVectorRange< CDCWireHit*> wireHitRange{
+            std::equal_range(itBegin, itEnd, neighborWire, LessOf<Deref>())};
           wireHitNeighbors.insert(wireHitNeighbors.end(),
                                   wireHitRange.begin(),
                                   wireHitRange.end());
@@ -149,7 +155,7 @@ namespace Belle2 {
         std::inplace_merge(wireHitNeighbors.begin(),
                            wireHitNeighbors.begin() + nPrimaryWireHitNeighbors,
                            wireHitNeighbors.end(),
-                           std::less<const CDCWireHit>());
+                           std::less<CDCWireHit*>());
 
         return wireHitNeighbors;
       }

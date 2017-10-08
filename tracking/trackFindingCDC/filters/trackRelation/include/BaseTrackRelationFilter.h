@@ -14,8 +14,8 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
+
 #include <tracking/trackFindingCDC/utilities/Relation.h>
-#include <tracking/trackFindingCDC/utilities/Range.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -28,13 +28,12 @@ namespace Belle2 {
 
     public:
       /// Returns the full range of tracks.
-      template<class ACDCTrackIterator>
-      Range<ACDCTrackIterator>
-      getPossibleNeighbors(const CDCTrack& track  __attribute__((unused)),
-                           const ACDCTrackIterator& itBegin,
-                           const ACDCTrackIterator& itEnd) const
+      std::vector<const CDCTrack*> getPossibleNeighbors(
+        const CDCTrack* track __attribute__((unused)),
+        const std::vector<const CDCTrack*>::const_iterator& itBegin,
+        const std::vector<const CDCTrack*>::const_iterator& itEnd) const
       {
-        return Range<ACDCTrackIterator>(itBegin, itEnd);
+        return {itBegin, itEnd};
       }
 
       /**

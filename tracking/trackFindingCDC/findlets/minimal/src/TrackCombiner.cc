@@ -13,10 +13,9 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
-
 #include <tracking/trackFindingCDC/numerics/Index.h>
 
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/Range.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
@@ -293,10 +292,12 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
   }
 
   // Extract paths
+  // Obtain the segments as pointers
+  std::vector<const CDCSegment3D*> segmentPtrs = as_pointers<const CDCSegment3D>(segments);
+
   // Memory for the track paths generated from the graph.
   std::vector<Path<const CDCSegment3D>> segmentPaths;
-  WeightedNeighborhood<const CDCSegment3D> segmentNeighborhood(segmentRelations);
-  m_cellularPathFinder.apply(segments, segmentNeighborhood, segmentPaths);
+  m_cellularPathFinder.apply(segmentPtrs, segmentRelations, segmentPaths);
 
   // Put the linked segments together
   outputTracks.clear();

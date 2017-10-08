@@ -22,6 +22,7 @@
 #include <framework/logging/Logger.h>
 
 #include <vector>
+#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -67,22 +68,24 @@ namespace Belle2 {
       }
 
       /// Applies the cellular automaton to the collection and its neighborhood
-      template<class ACellHolderRange>
-      void apply(const ACellHolderRange& cellHolders,
-                 const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood,
+      void apply(const std::vector<ACellHolder*>& cellHolders,
+                 const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations,
                  std::vector<Path<ACellHolder> >& paths)
       {
+        B2ASSERT("Expected the relations to be sorted",
+                 std::is_sorted(cellHolderRelations.begin(), cellHolderRelations.end()));
+
         // Forward all cells as paths
         if (m_param_caMode == "cells") {
-          for (ACellHolder& cellHolder : cellHolders) {
-            paths.push_back({&cellHolder});
+          for (ACellHolder* cellHolder : cellHolders) {
+            paths.push_back({cellHolder});
           }
           return;
         }
 
         // Forward all relations as paths
         if (m_param_caMode == "relations") {
-          for (const WeightedRelation<ACellHolder>& cellHolderRelation : cellHolderNeighborhood) {
+          for (const WeightedRelation<ACellHolder>& cellHolderRelation : cellHolderRelations) {
             paths.push_back({cellHolderRelation.getFrom(), cellHolderRelation.getTo()});
           }
           return;
@@ -98,17 +101,17 @@ namespace Belle2 {
         // at a time denying all knots it picked up, applying the
         // cellular automaton again and so on. No best candidate
         // analysis needed
-        for (ACellHolder& cellHolder : cellHolders) {
-          cellHolder.unsetAndForwardMaskedFlag();
+        for (ACellHolder* cellHolder : cellHolders) {
+          cellHolder->unsetAndForwardMaskedFlag();
         }
 
         B2DEBUG(100, "Apply multipass cellular automat");
         do {
-          m_cellularAutomaton.applyTo(cellHolders, cellHolderNeighborhood);
+          m_cellularAutomaton.applyTo(cellHolders, cellHolderRelations);
 
-          auto lessStartCellState = [this](ACellHolder & lhs, ACellHolder & rhs) {
-            AutomatonCell& lhsCell = lhs.getAutomatonCell();
-            AutomatonCell& rhsCell = rhs.getAutomatonCell();
+          auto lessStartCellState = [this](ACellHolder * lhs, ACellHolder * rhs) {
+            AutomatonCell& lhsCell = lhs->getAutomatonCell();
+            AutomatonCell& rhsCell = rhs->getAutomatonCell();
 
             // Cells with state lower than the minimal cell state are one lowest category
             if (rhsCell.getCellState() < m_param_minState) return false;
@@ -125,13 +128,13 @@ namespace Belle2 {
           auto itStartCellHolder =
             std::max_element(cellHolders.begin(), cellHolders.end(), lessStartCellState);
           if (itStartCellHolder == cellHolders.end()) break;
-          else if (not itStartCellHolder->getAutomatonCell().hasStartFlag()) break;
-          else if (itStartCellHolder->getAutomatonCell().getCellState() < m_param_minState) break;
+          else if (not(*itStartCellHolder)->getAutomatonCell().hasStartFlag()) break;
+          else if ((*itStartCellHolder)->getAutomatonCell().getCellState() < m_param_minState) break;
 
-          const ACellHolder* highestCellHolder = &*itStartCellHolder;
+          const ACellHolder* highestCellHolder = *itStartCellHolder;
 
           Path<ACellHolder> newPath = m_cellularPathFollower.followSingle(highestCellHolder,
-                                      cellHolderNeighborhood,
+                                      cellHolderRelations,
                                       m_param_minState);
 
           if (newPath.empty()) break;
@@ -142,8 +145,8 @@ namespace Belle2 {
           }
 
           // Block the items that have already used components
-          for (ACellHolder& cellHolder : cellHolders) {
-            cellHolder.receiveMaskedFlag();
+          for (ACellHolder* cellHolder : cellHolders) {
+            cellHolder->receiveMaskedFlag();
           }
 
           if (static_cast<int>(newPath.size()) >= m_param_minPathLength) {

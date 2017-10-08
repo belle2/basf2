@@ -10,6 +10,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCombiner.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
@@ -77,6 +78,8 @@ namespace {
     return result;
   }
 }
+
+TrackCombiner::TrackCombiner() = default;
 
 std::string TrackCombiner::getDescription()
 {

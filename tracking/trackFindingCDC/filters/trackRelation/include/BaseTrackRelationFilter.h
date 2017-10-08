@@ -11,14 +11,15 @@
 
 #include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <tracking/trackFindingCDC/utilities/Relation.h>
 
+#include <vector>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCTrack;
 
     // Guard to prevent repeated instantiations
     extern template class Filter<Relation<const CDCTrack> >;
@@ -29,36 +30,22 @@ namespace Belle2 {
     public:
       /// Returns the full range of tracks.
       std::vector<const CDCTrack*> getPossibleNeighbors(
-        const CDCTrack* track __attribute__((unused)),
+        const CDCTrack* track,
         const std::vector<const CDCTrack*>::const_iterator& itBegin,
-        const std::vector<const CDCTrack*>::const_iterator& itEnd) const
-      {
-        return {itBegin, itEnd};
-      }
+        const std::vector<const CDCTrack*>::const_iterator& itEnd) const;
 
       /**
        *  Main filter method returning the weight of the neighborhood relation.
        *  Return always returns NAN to reject all track neighbors.
        */
-      virtual Weight operator()(const CDCTrack& from  __attribute__((unused)),
-                                const CDCTrack& to  __attribute__((unused)))
-      {
-        return 1;
-      }
+      virtual Weight operator()(const CDCTrack& from, const CDCTrack& to);
 
       /**
        *  Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.
        */
-      Weight operator()(const Relation<const CDCTrack>& relation) override
-      {
-        const CDCTrack* ptrFrom(relation.first);
-        const CDCTrack* ptrTo(relation.second);
-        if (ptrFrom == ptrTo) return NAN; // Prevent relation to same.
-        if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
-        return this->operator()(*ptrFrom, *ptrTo);
-      }
+      Weight operator()(const Relation<const CDCTrack>& relation) override;
     };
   }
 }

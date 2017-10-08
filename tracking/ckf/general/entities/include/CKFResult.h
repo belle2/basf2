@@ -34,10 +34,23 @@ namespace Belle2 {
     using Hit = AHit;
 
     /// Constructor
-    CKFResult(ASeed* seed, const std::vector<const AHit*> hits, const genfit::MeasuredStateOnPlane& mSoP,
-              double chi2) :
-      m_seed(seed), m_hits(hits), m_chi2(chi2)
+    template <class AState>
+    CKFResult(const std::vector<const AState*>& path, const genfit::MeasuredStateOnPlane& mSoP)
     {
+      std::vector<const Hit*> hits;
+      double chi2 = 0;
+
+      for (const AState* state : path) {
+        const Hit* hit = state->getHit();
+        if (hit) {
+          hits.push_back(hit);
+        }
+
+        if (state->isFitted()) {
+          chi2 += state->getChi2();
+        }
+      }
+
       m_trackCharge = mSoP.getCharge();
       m_trackMomentum = mSoP.getMom();
       m_trackPosition = mSoP.getPos();

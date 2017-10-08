@@ -13,7 +13,7 @@
 
 using namespace Belle2;
 
-CKFToSVDState::CKFToSVDState(RecoTrack* seed, unsigned int number) : CKFState(seed, number)
+CKFToSVDState::CKFToSVDState(const RecoTrack* seed) : CKFState(seed)
 {
   setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
 }

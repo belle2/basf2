@@ -9,15 +9,18 @@
  **************************************************************************/
 #pragma once
 #include <tracking/ckf/general/entities/CKFState.h>
-#include <tracking/ckf/svd/entities/CKFToSVDResult.h>
 
 namespace Belle2 {
   class RecoTrack;
   class SpacePoint;
 
   /// Specialized CKF State for extrapolating into the SVD
-  class CKFToSVDState : public CKFState<RecoTrack, SpacePoint, CKFToSVDResult> {
+  class CKFToSVDState : public CKFState<RecoTrack, SpacePoint> {
+  public:
+    /// Copy the constructors from the base class
+    using CKFState::CKFState;
+
     /// Constructor setting the state to the position of the first CDC track seed hit
-    CKFToSVDState(RecoTrack* seed, unsigned int number);
+    CKFToSVDState(const RecoTrack* seed);
   };
 }

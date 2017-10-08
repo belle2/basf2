@@ -9,11 +9,21 @@
  **************************************************************************/
 #pragma once
 #include <tracking/ckf/general/entities/CKFResult.h>
+#include <tracking/ckf/svd/entities/CKFToSVDState.h>
 
 namespace Belle2 {
   class RecoTrack;
   class SpacePoint;
 
   /// Specialized CKF State for extrapolating into the SVD
-  using CKFToSVDResult = CKFResult<RecoTrack, SpacePoint>;
+  class CKFToSVDResult : public CKFResult<RecoTrack, SpacePoint> {
+    using Super = CKFResult<RecoTrack, SpacePoint>;
+  public:
+    using Super::Super;
+
+    CKFToSVDResult(const std::vector<const CKFToSVDState*>& path) :
+      Super(path, path.back()->getMeasuredStateOnPlane())
+    {
+    }
+  };
 }

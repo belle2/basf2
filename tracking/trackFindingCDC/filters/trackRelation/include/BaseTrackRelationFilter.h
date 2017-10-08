@@ -9,11 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
-
-#include <tracking/trackFindingCDC/numerics/Weight.h>
-
-#include <tracking/trackFindingCDC/utilities/Relation.h>
+#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
 
 #include <vector>
 
@@ -22,30 +18,23 @@ namespace Belle2 {
     class CDCTrack;
 
     // Guard to prevent repeated instantiations
-    extern template class Filter<Relation<const CDCTrack> >;
+    extern template class RelationFilter<const CDCTrack>;
 
     /// Base class for filtering the neighborhood of tracks
-    class BaseTrackRelationFilter : public Filter<Relation<const CDCTrack> > {
+    class BaseTrackRelationFilter : public RelationFilter<const CDCTrack> {
 
     public:
-      /// Returns the full range of tracks.
+      /// Default constructor
+      BaseTrackRelationFilter();
+
+      /// Default destructor
+      ~BaseTrackRelationFilter();
+
+      /// Reenforce that the full range of tracks is possible as no particular default is applicable.
       std::vector<const CDCTrack*> getPossibleNeighbors(
         const CDCTrack* track,
         const std::vector<const CDCTrack*>::const_iterator& itBegin,
-        const std::vector<const CDCTrack*>::const_iterator& itEnd) const;
-
-      /**
-       *  Main filter method returning the weight of the neighborhood relation.
-       *  Return always returns NAN to reject all track neighbors.
-       */
-      virtual Weight operator()(const CDCTrack& from, const CDCTrack& to);
-
-      /**
-       *  Main filter method overriding the filter interface method.
-       *  Checks the validity of the pointers in the relation and unpacks the relation to
-       *  the method implementing the rejection.
-       */
-      Weight operator()(const Relation<const CDCTrack>& relation) override;
+        const std::vector<const CDCTrack*>::const_iterator& itEnd) const final;
     };
   }
 }

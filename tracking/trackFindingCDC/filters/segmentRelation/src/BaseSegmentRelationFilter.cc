@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
@@ -22,13 +22,14 @@
 
 #include <tracking/trackFindingCDC/utilities/Functional.h>
 
+#include <vector>
 #include <algorithm>
 #include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-template class TrackFindingCDC::Filter<Relation<const CDCSegment2D> >;
+template class TrackFindingCDC::RelationFilter<const CDCSegment2D>;
 
 BaseSegmentRelationFilter::BaseSegmentRelationFilter() = default;
 
@@ -45,36 +46,30 @@ std::vector<const CDCSegment2D*> BaseSegmentRelationFilter::getPossibleNeighbors
   return {neighbors.begin(), neighbors.end()};
 }
 
-Weight BaseSegmentRelationFilter::operator()(const CDCSegment2D& from __attribute__((unused)),
-                                             const CDCSegment2D& to __attribute__((unused)))
-{
-  return 1;
-}
-
 Weight BaseSegmentRelationFilter::operator()(const Relation<const CDCSegment2D>& relation)
 {
-  const CDCSegment2D* ptrFrom(relation.first);
-  const CDCSegment2D* ptrTo(relation.second);
-  if (ptrFrom == ptrTo) return NAN; // Prevent relation to same.
-  if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
+  const CDCSegment2D* from = relation.getFrom();
+  const CDCSegment2D* to = relation.getTo();
+  if (from == to) return NAN; // Prevent relation to same.
+  if ((from == nullptr) or (to == nullptr)) return NAN;
 
   // Make an overlap check to prevent aliases and reverse segments to be linked
   std::vector<const CDCWireHit*> fromWireHits;
-  fromWireHits.reserve(ptrFrom->size());
-  for (const CDCRecoHit2D& recoHit2D : *ptrFrom) {
+  fromWireHits.reserve(from->size());
+  for (const CDCRecoHit2D& recoHit2D : *from) {
     fromWireHits.push_back(&recoHit2D.getWireHit());
   }
   std::sort(fromWireHits.begin(), fromWireHits.end());
   int nOverlap = 0;
-  for (const CDCRecoHit2D& recoHit2D : *ptrTo) {
+  for (const CDCRecoHit2D& recoHit2D : *to) {
     if (std::binary_search(fromWireHits.begin(), fromWireHits.end(), &recoHit2D.getWireHit())) {
       ++nOverlap;
     }
   }
 
-  if (1.0 * nOverlap / ptrFrom->size() > 0.8 or 1.0 * nOverlap / ptrFrom->size() > 0.8) {
+  if (1.0 * nOverlap / from->size() > 0.8 or 1.0 * nOverlap / from->size() > 0.8) {
     return NAN;
   }
 
-  return operator()(*ptrFrom, *ptrTo);
+  return this->operator()(*from, *to);
 }

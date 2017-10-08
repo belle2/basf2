@@ -11,18 +11,23 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
 
 #include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 
+#include <vector>
 #include <algorithm>
 #include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-template class TrackFindingCDC::Filter<Relation<const CDCFacet> >;
+template class TrackFindingCDC::RelationFilter<const CDCFacet>;
+
+BaseFacetRelationFilter::BaseFacetRelationFilter() = default;
+
+BaseFacetRelationFilter::~BaseFacetRelationFilter() = default;
 
 std::vector<const CDCFacet*> BaseFacetRelationFilter::getPossibleNeighbors(
   const CDCFacet* facet,
@@ -36,18 +41,4 @@ std::vector<const CDCFacet*> BaseFacetRelationFilter::getPossibleNeighbors(
   ConstVectorRange<const CDCFacet*> neighbors{
     std::equal_range(itBegin, itEnd, &rearRLWireHitPair, LessOf<Deref>())};
   return {neighbors.begin(), neighbors.end()};
-}
-
-Weight BaseFacetRelationFilter::operator()(const CDCFacet& from __attribute__((unused)),
-                                           const CDCFacet& to __attribute__((unused)))
-{
-  return 1;
-}
-
-Weight BaseFacetRelationFilter::operator()(const Relation<const CDCFacet>& relation)
-{
-  const CDCFacet* ptrFrom(relation.getFrom());
-  const CDCFacet* ptrTo(relation.getTo());
-  if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
-  return this->operator()(*ptrFrom, *ptrTo);
 }

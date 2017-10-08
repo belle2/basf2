@@ -9,11 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
-
-#include <tracking/trackFindingCDC/numerics/Weight.h>
-
-#include <tracking/trackFindingCDC/utilities/Relation.h>
+#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
 
 #include <vector>
 
@@ -22,12 +18,18 @@ namespace Belle2 {
     class CDCFacet;
 
     // Guard to prevent repeated instantiations
-    extern template class Filter<Relation<const CDCFacet> >;
+    extern template class RelationFilter<const CDCFacet>;
 
     /// Base class for filtering the neighborhood of facets.
-    class BaseFacetRelationFilter : public Filter<Relation<const CDCFacet> > {
+    class BaseFacetRelationFilter : public RelationFilter<const CDCFacet> {
 
     public:
+      /// Default constructor
+      BaseFacetRelationFilter();
+
+      /// Default destructor
+      ~BaseFacetRelationFilter();
+
       /**
        *  Returns the selection of facets covering the range of possible neighboring
        *  facets of the given facet out of the sorted range given by the two other argumets.
@@ -35,20 +37,7 @@ namespace Belle2 {
       std::vector<const CDCFacet*> getPossibleNeighbors(
         const CDCFacet* facet,
         const std::vector<const CDCFacet*>::const_iterator& itBegin,
-        const std::vector<const CDCFacet*>::const_iterator& itEnd) const;
-
-      /**
-       *  Main filter method returning the weight of the neighborhood relation.
-       *  Return always returns NAN to reject all facet neighbors.
-       */
-      virtual Weight operator()(const CDCFacet& from, const CDCFacet& to);
-
-      /**
-       *  Main filter method overriding the filter interface method.
-       *  Checks the validity of the pointers in the relation and unpacks the relation to
-       *  the method implementing the rejection.
-       */
-      Weight operator()(const Relation<const CDCFacet>& relation) override;
+        const std::vector<const CDCFacet*>::const_iterator& itEnd) const final;
     };
   }
 }

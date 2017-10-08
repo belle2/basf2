@@ -7,7 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <tracking/trackFindingCDC/ca/CellularAutomaton.h>
@@ -15,6 +14,8 @@
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
 #include <tracking/trackFindingCDC/ca/Path.h>
+#include <tracking/trackFindingCDC/ca/CellHolder.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.h>
@@ -23,17 +24,23 @@
 #include <vector>
 
 namespace Belle2 {
-
   namespace TrackFindingCDC {
-
     /**
      *  Class to combine the run of the cellular automaton and the repeated path extraction.
      *  Execute the cellular automaton and extracting paths interatively blocking the already used
      *  knots until there is no more path fullfilling the minimal length / energy requirement given
      *  as minStateToFollow to the constructor.
      */
-    template<class ACellHolder>
-    class  MultipassCellularPathFinder {
+    template <class ACellHolder>
+    class MultipassCellularPathFinder {
+    public:
+      /// Default constructor also checking the validity of the template arguments
+      MultipassCellularPathFinder()
+      {
+        // Experiment in how to specify the requirements of the template parameters
+        // Somewhat incomplete
+        static_assert_isCellHolder<ACellHolder>();
+      }
 
     public:
       /// Expose the parameters to a module
@@ -87,13 +94,10 @@ namespace Belle2 {
           m_param_caMode = "normal";
         }
 
-        // multiple passes of the cellular automat
-        // one segment is created at a time denying all knots it picked up,
-        // applying the cellular automaton again
-        // and so on
-        // no best candidate analysis needed
-        // (only makes sense with minimal clusters to avoid evaluating of uncommon paths)
-
+        // Multiple passes of the cellular automaton. One path is created
+        // at a time denying all knots it picked up, applying the
+        // cellular automaton again and so on. No best candidate
+        // analysis needed
         for (ACellHolder& cellHolder : cellHolders) {
           cellHolder.unsetAndForwardMaskedFlag();
         }
@@ -147,7 +151,6 @@ namespace Belle2 {
           }
 
         } while (true);
-
       }
 
     private:

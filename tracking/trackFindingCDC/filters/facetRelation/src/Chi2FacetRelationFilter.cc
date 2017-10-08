@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>

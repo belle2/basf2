@@ -11,29 +11,20 @@
 
 #include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
-#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/Relation.h>
-#include <tracking/trackFindingCDC/utilities/VectorRange.h>
 
-#include <algorithm>
-#include <cassert>
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCFacet;
 
     // Guard to prevent repeated instantiations
     extern template class Filter<Relation<const CDCFacet> >;
 
-    /**
-     *  Base class for filtering the neighborhood of facets.
-     *  Base implementation providing the getLowestPossibleNeighbor and
-     *  isStillPossibleNeighbor method using the geometry of the facet.
-     *  Besides that it accepts all facets.
-     */
+    /// Base class for filtering the neighborhood of facets.
     class BaseFacetRelationFilter : public Filter<Relation<const CDCFacet> > {
 
     public:
@@ -44,39 +35,20 @@ namespace Belle2 {
       std::vector<const CDCFacet*> getPossibleNeighbors(
         const CDCFacet* facet,
         const std::vector<const CDCFacet*>::const_iterator& itBegin,
-        const std::vector<const CDCFacet*>::const_iterator& itEnd) const
-      {
-        // Expensive assert - but true one the less
-        // assert(std::is_sorted(itBegin, itEnd, LessOf<Deref>()) && "Expected facets to be sorted");
-
-        const CDCRLWireHitPair& rearRLWireHitPair = facet->getRearRLWireHitPair();
-        ConstVectorRange<const CDCFacet*> neighbors{
-          std::equal_range(itBegin, itEnd, &rearRLWireHitPair, LessOf<Deref>())};
-        return {neighbors.begin(), neighbors.end()};
-      }
+        const std::vector<const CDCFacet*>::const_iterator& itEnd) const;
 
       /**
        *  Main filter method returning the weight of the neighborhood relation.
        *  Return always returns NAN to reject all facet neighbors.
        */
-      virtual Weight operator()(const CDCFacet& from  __attribute__((unused)),
-                                const CDCFacet& to  __attribute__((unused)))
-      {
-        return 1;
-      }
+      virtual Weight operator()(const CDCFacet& from, const CDCFacet& to);
 
       /**
        *  Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.
        */
-      Weight operator()(const Relation<const CDCFacet>& relation) override
-      {
-        const CDCFacet* ptrFrom(relation.getFrom());
-        const CDCFacet* ptrTo(relation.getTo());
-        if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
-        return this->operator()(*ptrFrom, *ptrTo);
-      }
+      Weight operator()(const Relation<const CDCFacet>& relation) override;
     };
   }
 }

@@ -37,7 +37,7 @@ class FullBkg(TrackingValidationRun):
     #: Use back ground in the simulation (-so)
     bkg_files = bg
     root_input_file = '../EvtGenSim_VXDTF2.root'
-    finder_module = staticmethod(lambda path: tracking.add_tracking_reconstruction(path, use_vxdtf2=False))
+    finder_module = staticmethod(lambda path: tracking.add_tracking_reconstruction(path, use_vxdtf2=True))
     tracking_coverage = {
         'WhichParticles': [],  # Include all particles, also secondaries
         'UsePXDHits': True,

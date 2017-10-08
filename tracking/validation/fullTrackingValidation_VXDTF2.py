@@ -28,7 +28,7 @@ class Full(TrackingValidationRun):
     #: Generator to be used in the simulation (-so)
     generator_module = 'generic'
     root_input_file = '../EvtGenSimNoBkg_VXDTF2.root'
-    finder_module = staticmethod(lambda path: tracking.add_tracking_reconstruction(path, use_vxdtf2=False))
+    finder_module = staticmethod(lambda path: tracking.add_tracking_reconstruction(path, use_vxdtf2=True))
     tracking_coverage = {
         'WhichParticles': [],  # Include all particles, also secondaries
         'UsePXDHits': True,

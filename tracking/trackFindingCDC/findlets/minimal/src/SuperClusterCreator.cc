@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
+#include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
 
 #include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
@@ -131,9 +131,7 @@ void SuperClusterCreator::apply(std::vector<CDCWireHit>& inputWireHits,
   const std::vector<CDCWireHit*> wireHitPtrs = as_pointers<CDCWireHit>(inputWireHits);
 
   /// Create the wire hit relations
-  WeightedNeighborhood<CDCWireHit>::appendUsing(m_wireHitRelationFilter,
-                                                wireHitPtrs,
-                                                m_wireHitRelations);
+  RelationFilterUtil::appendUsing(m_wireHitRelationFilter, wireHitPtrs, m_wireHitRelations);
 
   B2ASSERT("Expect wire hit neighborhood to be symmetric ",
            WeightedRelationUtil<CDCWireHit>::areSymmetric(m_wireHitRelations));

@@ -15,7 +15,9 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/ca/Clusterizer.h>
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
+
+#include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
+
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <vector>
@@ -65,9 +67,7 @@ namespace Belle2 {
 
           // Create the wire hit relations within the supercluster.
           m_wireHitRelations.clear();
-          WeightedNeighborhood<CDCWireHit>::appendUsing(m_wireHitRelationFilter,
-          wireHitPtrs,
-          m_wireHitRelations);
+          RelationFilterUtil::appendUsing(m_wireHitRelationFilter, wireHitPtrs, m_wireHitRelations);
           const std::size_t nClustersBefore = outputClusters.size();
           m_wireHitClusterizer.apply(superCluster, m_wireHitRelations, outputClusters);
           const std::size_t nClustersAfter = outputClusters.size();

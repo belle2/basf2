@@ -17,7 +17,8 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/ca/Clusterizer.h>
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
+
+#include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
 
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
@@ -57,9 +58,7 @@ namespace Belle2 {
 
         // create the neighborhood
         m_wireHitRelations.clear();
-        WeightedNeighborhood<CDCWireHit>::appendUsing(m_wireHitRelationFilter,
-        wireHitPtrs,
-        m_wireHitRelations);
+        RelationFilterUtil::appendUsing(m_wireHitRelationFilter, wireHitPtrs, m_wireHitRelations);
 
         B2ASSERT("Expect wire hit neighborhood to be symmetric ",
         WeightedRelationUtil<CDCWireHit>::areSymmetric(m_wireHitRelations));

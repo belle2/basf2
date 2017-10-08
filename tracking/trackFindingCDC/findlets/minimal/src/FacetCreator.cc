@@ -13,6 +13,8 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
+#include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
+
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -70,9 +72,7 @@ void FacetCreator::apply(const std::vector<CDCWireHitCluster>& inputClusters, st
 
     // Create the neighborhood of wire hits on the cluster
     m_wireHitRelations.clear();
-    WeightedNeighborhood<CDCWireHit>::appendUsing(m_wireHitRelationFilter,
-                                                  wireHits,
-                                                  m_wireHitRelations);
+    RelationFilterUtil::appendUsing(m_wireHitRelationFilter, wireHits, m_wireHitRelations);
 
     B2ASSERT("Wire neighborhood is not symmetric. Check the geometry.",
              WeightedRelationUtil<CDCWireHit>::areSymmetric(m_wireHitRelations));

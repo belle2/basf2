@@ -9,14 +9,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
-
-#include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <tracking/trackFindingCDC/utilities/Relation.h>
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
@@ -26,14 +24,14 @@
 #include <framework/core/ModuleParamList.icc.h>
 
 #include <vector>
-
+#include <string>
 #include <memory>
 #include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-template class TrackFindingCDC::Filter<Relation<const CDCWireHit> >;
+template class TrackFindingCDC::RelationFilter<const CDCWireHit>;
 
 BridgingWireHitRelationFilter::BridgingWireHitRelationFilter() = default;
 
@@ -142,12 +140,4 @@ std::vector<CDCWireHit*> BridgingWireHitRelationFilter::getPossibleNeighbors(
                      std::less<CDCWireHit*>());
 
   return wireHitNeighbors;
-}
-
-Weight BridgingWireHitRelationFilter::operator()(const Relation<const CDCWireHit>& relation)
-{
-  const CDCWireHit* ptrFrom(relation.first);
-  const CDCWireHit* ptrTo(relation.second);
-  if (not ptrFrom or not ptrTo) return NAN;
-  return 0;
 }

@@ -9,11 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
-
-#include <tracking/trackFindingCDC/numerics/Weight.h>
-
-#include <tracking/trackFindingCDC/utilities/Relation.h>
+#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
 
 #include <string>
 #include <map>
@@ -39,11 +35,11 @@ namespace Belle2 {
      *  The criterion can be lowered such that fewer missing hits trigger the inclusion of the
      *  secondary neighbors.
      */
-    class BridgingWireHitRelationFilter : public Filter<Relation<const CDCWireHit> > {
+    class BridgingWireHitRelationFilter : public RelationFilter<const CDCWireHit> {
 
     private:
       /// Type of the base class
-      using Super = Filter<Relation<const CDCWireHit> >;
+      using Super = RelationFilter<const CDCWireHit>;
 
     public:
       /// Default constructor
@@ -66,13 +62,6 @@ namespace Belle2 {
         CDCWireHit* wireHit,
         const std::vector< CDCWireHit*>::const_iterator& itBegin,
         const std::vector< CDCWireHit*>::const_iterator& itEnd);
-
-      /**
-       *  Main filter method overriding the filter interface method.
-       *  Checks the validity of the pointers in the relation and unpacks the relation to
-       *  the method implementing the rejection.
-       */
-      Weight operator()(const Relation<const CDCWireHit>& relation) final;
 
     private:
       /// Parameter: A map from o'clock direction to the number of missing primary drift cells

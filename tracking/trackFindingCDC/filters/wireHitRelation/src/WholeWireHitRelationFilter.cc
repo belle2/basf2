@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
@@ -23,13 +23,15 @@
 
 #include <framework/core/ModuleParamList.icc.h>
 
+#include <vector>
+#include <string>
 #include <cmath>
 #include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-template class TrackFindingCDC::Filter<Relation<const CDCWireHit> >;
+template class TrackFindingCDC::RelationFilter<const CDCWireHit>;
 
 WholeWireHitRelationFilter::WholeWireHitRelationFilter(int neighborhoodDegree)
   : m_param_degree(neighborhoodDegree)
@@ -155,12 +157,4 @@ std::vector<CDCWireHit*> WholeWireHitRelationFilter::getPossibleNeighbors(
   }
 
   return m_wireHitNeighbors;
-}
-
-Weight WholeWireHitRelationFilter::operator()(const Relation<const CDCWireHit>& relation)
-{
-  const CDCWireHit* ptrFrom(relation.first);
-  const CDCWireHit* ptrTo(relation.second);
-  if (not ptrFrom or not ptrTo) return NAN;
-  return 0;
 }

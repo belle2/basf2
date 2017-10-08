@@ -9,12 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/utilities/Relation.h>
-
-#include <tracking/trackFindingCDC/numerics/Weight.h>
-
+#include <vector>
 #include <string>
 
 namespace Belle2 {
@@ -24,7 +21,7 @@ namespace Belle2 {
     class CDCWireHit;
 
     /// Class mapping the neighborhood of wires to the neighborhood of wire hits.
-    class WholeWireHitRelationFilter : public Filter<Relation<const CDCWireHit>> {
+    class WholeWireHitRelationFilter : public RelationFilter<CDCWireHit> {
 
     public:
       /// Constructor form the default neighborhood degree
@@ -43,14 +40,7 @@ namespace Belle2 {
       std::vector<CDCWireHit*> getPossibleNeighbors(
         CDCWireHit* wireHit,
         const std::vector<CDCWireHit*>::const_iterator& itBegin,
-        const std::vector<CDCWireHit*>::const_iterator& itEnd) const;
-
-      /**
-       *  Main filter method overriding the filter interface method.
-       *  Checks the validity of the pointers in the relation and unpacks the relation to
-       *  the method implementing the rejection.
-       */
-      Weight operator()(const Relation<const CDCWireHit>& relation) final;
+        const std::vector<CDCWireHit*>::const_iterator& itEnd) const final;
 
     private:
       /// Degree of the neighbor extend

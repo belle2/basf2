@@ -9,27 +9,22 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
-#include <tracking/trackFindingCDC/utilities/Relation.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
-#include <tracking/trackFindingCDC/utilities/Range.h>
-#include <tracking/trackFindingCDC/utilities/Functional.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
-#include <framework/core/ModuleParamList.icc.h>
-
-#include <vector>
+#include <string>
 #include <map>
-#include <memory>
-#include <cassert>
+#include <array>
+#include <vector>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCWireHit;
 
     /**
      *  Wire hit relation filter that is compensating for hit inefficiencies.
@@ -41,8 +36,8 @@ namespace Belle2 {
      *  In an attempt to detect if this occured the primary wire hit neighborhood
      *  is slightly extended to bridge to the secondary neighborhood in the critical directions.
      *
-     *  The criterium can be extended lower more for instance to include the
-     *  secondary neighbors for each missing primary drift cell.
+     *  The criterion can be lowered such that fewer missing hits trigger the inclusion of the
+     *  secondary neighbors.
      */
     class BridgingWireHitRelationFilter : public Filter<Relation<const CDCWireHit> > {
 
@@ -51,126 +46,33 @@ namespace Belle2 {
       using Super = Filter<Relation<const CDCWireHit> >;
 
     public:
+      /// Default constructor
+      BridgingWireHitRelationFilter();
+
+      /// Default destructor
+      ~BridgingWireHitRelationFilter();
+
       /// Expose the set of parameters of the filter to the module parameter list.
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
-      {
-        moduleParamList->addParameter(prefixed(prefix, "missingPrimaryNeighborThresholds"),
-                                      m_param_missingPrimaryNeighborThresholdMap,
-                                      "Map of o'clock directions to number of missing drift cells "
-                                      "in the primary neighborhood to trigger the inclusion of secondary neighbors "
-                                      "in that very o'clock direction",
-                                      m_param_missingPrimaryNeighborThresholdMap
-                                     );
-      }
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
-      void initialize() override
-      {
-        Super::initialize();
-        for (short oClockDirection = 0; oClockDirection < 12; oClockDirection++) {
-          m_missingPrimaryNeighborThresholds[oClockDirection] = 3;
-          if (m_param_missingPrimaryNeighborThresholdMap.count(oClockDirection)) {
-            m_missingPrimaryNeighborThresholds[oClockDirection] =
-              m_param_missingPrimaryNeighborThresholdMap[oClockDirection];
-          }
-        }
+      /// Receive signal at the begin of the event processing and prepare some parameters
+      void initialize() override;
 
-        /// Prepare the lookup such that it turns out most likely sorted.
-        for (short oClockDirection : {5, 6, 7, 4, 8, 3, 9, 2, 10, 1, 0, 11}) {
-          if (m_missingPrimaryNeighborThresholds[oClockDirection] < 3) {
-            m_consideredSecondaryNeighbors.push_back(oClockDirection);
-          }
-        }
-      }
-
-      /// Returns a vector containing the neighboring wire hits of the given wire hit out of the sorted range given by the two iterator other argumets.
+      /**
+       *  Returns a vector containing the neighboring wire hits of the given wire hit out of the
+       *  sorted range given by the two iterator other argumets.
+       */
       std::vector< CDCWireHit*> getPossibleNeighbors(
         CDCWireHit* wireHit,
         const std::vector< CDCWireHit*>::const_iterator& itBegin,
-        const std::vector< CDCWireHit*>::const_iterator& itEnd)
-      {
-        assert(std::is_sorted(itBegin, itEnd, LessOf<Deref>()) && "Expected wire hits to be sorted");
-
-        std::vector<std::pair<const CDCWire*, int> > wireNeighbors;
-        wireNeighbors.reserve(8);
-
-        std::vector< CDCWireHit*> wireHitNeighbors;
-        wireHitNeighbors.reserve(12);
-
-        std::array<short, 12> missingPrimaryNeighbor = {0};
-
-        const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
-
-        const CDCWire& wire = wireHit->getWire();
-
-        // Analyse primary neighborhood - sorted such that the wire hits relations are most likely sorted.
-        for (short oClockDirection : {5, 7, 3, 9, 1, 11}) {
-          MayBePtr<const CDCWire> neighborWire = wireTopology.getPrimaryNeighbor(oClockDirection, wire);
-          if (neighborWire) wireNeighbors.emplace_back(neighborWire, oClockDirection);
-        }
-
-        std::sort(std::begin(wireNeighbors), std::end(wireNeighbors));
-
-        for (std::pair<const CDCWire*, int> wireAndOClockDirection : wireNeighbors) {
-          const CDCWire* neighborWire = wireAndOClockDirection.first;
-          int oClockDirection = wireAndOClockDirection.second;
-
-          ConstVectorRange< CDCWireHit*> wireHitRange{
-            std::equal_range(itBegin, itEnd, neighborWire, LessOf<Deref>())};
-          if (wireHitRange.empty()) {
-            int ccwOClockDirection = oClockDirection - 1;
-            int cwOClockDirection = oClockDirection == 11 ? 0 : oClockDirection + 1;
-            ++missingPrimaryNeighbor[ccwOClockDirection];
-            ++missingPrimaryNeighbor[oClockDirection];
-            ++missingPrimaryNeighbor[cwOClockDirection];
-          }
-          wireHitNeighbors.insert(wireHitNeighbors.end(),
-                                  wireHitRange.begin(),
-                                  wireHitRange.end());
-        }
-
-        size_t nPrimaryWireHitNeighbors = wireHitNeighbors.size();
-        wireNeighbors.clear();
-
-        // Analyse secondary neighborhood
-        for (short oClockDirection : m_consideredSecondaryNeighbors) {
-          MayBePtr<const CDCWire> neighborWire =
-            wireTopology.getSecondaryNeighbor(oClockDirection, wire);
-          if (not neighborWire) continue;
-          if (missingPrimaryNeighbor[oClockDirection] < m_missingPrimaryNeighborThresholds[oClockDirection]) continue;
-          wireNeighbors.emplace_back(neighborWire, oClockDirection);
-        }
-
-        std::sort(std::begin(wireNeighbors), std::end(wireNeighbors));
-
-        for (std::pair<const CDCWire*, int> wireAndOClockDirection : wireNeighbors) {
-          const CDCWire* neighborWire = wireAndOClockDirection.first;
-          ConstVectorRange< CDCWireHit*> wireHitRange{
-            std::equal_range(itBegin, itEnd, neighborWire, LessOf<Deref>())};
-          wireHitNeighbors.insert(wireHitNeighbors.end(),
-                                  wireHitRange.begin(),
-                                  wireHitRange.end());
-        }
-
-        /// Merge the sorted primary and secondary neighbors.
-        std::inplace_merge(wireHitNeighbors.begin(),
-                           wireHitNeighbors.begin() + nPrimaryWireHitNeighbors,
-                           wireHitNeighbors.end(),
-                           std::less<CDCWireHit*>());
-
-        return wireHitNeighbors;
-      }
+        const std::vector< CDCWireHit*>::const_iterator& itEnd);
 
       /**
        *  Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.
        */
-      Weight operator()(const Relation<const CDCWireHit>& relation) final {
-        const CDCWireHit * ptrFrom(relation.first);
-        const CDCWireHit * ptrTo(relation.second);
-        if (not ptrFrom or not ptrTo) return NAN;
-        return 0;
-      }
+      Weight operator()(const Relation<const CDCWireHit>& relation) final;
 
     private:
       /// Parameter: A map from o'clock direction to the number of missing primary drift cells

@@ -12,6 +12,9 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
+#include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
 #include <tracking/trackFindingCDC/utilities/Functional.h>

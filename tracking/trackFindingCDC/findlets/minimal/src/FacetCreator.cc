@@ -11,8 +11,10 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.icc.h>
 
@@ -121,9 +123,9 @@ void FacetCreator::createFacets(const std::vector<CDCWireHit*>& wireHits,
         if (endWireHit->hasTakenFlag()) continue;
 
         // Skip combinations where the facet starts and ends on the same wire
-        if (not(ptrStartWireHit->getWire() == ptrEndWireHit->getWire())) {
-          createFacetsForHitTriple(startWireHit, middleWireHit, endWireHit, facets);
-        }
+        if (ptrStartWireHit->isOnWire(ptrEndWireHit->getWire())) continue;
+
+        createFacetsForHitTriple(startWireHit, middleWireHit, endWireHit, facets);
       } // end for itEndWireHit
     } // end for itStartWireHit
   } // end for itMiddleWireHit

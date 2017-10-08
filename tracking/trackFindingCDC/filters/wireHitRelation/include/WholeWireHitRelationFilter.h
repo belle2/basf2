@@ -9,22 +9,19 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
-
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 
 #include <tracking/trackFindingCDC/utilities/Relation.h>
-#include <tracking/trackFindingCDC/utilities/Functional.h>
 
-#include <cmath>
-#include <cassert>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
+
+#include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
 
   namespace TrackFindingCDC {
+    class CDCWireHit;
 
     /// Class mapping the neighborhood of wires to the neighborhood of wire hits.
     class WholeWireHitRelationFilter : public Filter<Relation<const CDCWireHit>> {
@@ -33,128 +30,27 @@ namespace Belle2 {
       /// Constructor form the default neighborhood degree
       explicit WholeWireHitRelationFilter(int neighborhoodDegree = 2);
 
+      /// Default destructor
+      ~WholeWireHitRelationFilter();
+
       /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
-      /// Returns a vector containing the neighboring wire hits of the given wire hit out of the sorted range given by the two iterator other argumets.
+      /**
+       *  Returns a vector containing the neighboring wire hits of the given wire hit out of the
+       *  sorted range given by the two iterator other argumets.
+       */
       std::vector<CDCWireHit*> getPossibleNeighbors(
         CDCWireHit* wireHit,
         const std::vector<CDCWireHit*>::const_iterator& itBegin,
-        const std::vector<CDCWireHit*>::const_iterator& itEnd) const
-      {
-        assert(std::is_sorted(itBegin, itEnd, LessOf<Deref>()) && "Expected wire hits to be sorted");
-
-        const int nWireNeighbors = 8 + 10 * (m_param_degree - 1);
-        std::vector<const CDCWire*> m_wireNeighbors;
-        m_wireNeighbors.reserve(nWireNeighbors);
-
-        std::vector<CDCWireHit*> m_wireHitNeighbors;
-        m_wireHitNeighbors.reserve(2 * nWireNeighbors);
-
-        const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
-        const CDCWire& wire = wireHit->getWire();
-
-        const CDCWire* ccwSixthSecondWireNeighbor = wireTopology.getSecondNeighborSixOClock(wire);
-        const CDCWire* ccwInWireNeighbor = wireTopology.getNeighborCCWInwards(wire);
-        const CDCWire* ccwWireNeighbor = wireTopology.getNeighborCCW(wire);
-        const CDCWire* ccwOutWireNeighbor = wireTopology.getNeighborCCWOutwards(wire);
-        const CDCWire* ccwTwelvethSecondWireNeighbor = wireTopology.getSecondNeighborTwelveOClock(wire);
-
-        const CDCWire* cwSixthSecondWireNeighbor = ccwSixthSecondWireNeighbor;
-        const CDCWire* cwInWireNeighbor = wireTopology.getNeighborCWInwards(wire);
-        const CDCWire* cwWireNeighbor = wireTopology.getNeighborCW(wire);
-        const CDCWire* cwOutWireNeighbor = wireTopology.getNeighborCWOutwards(wire);
-        const CDCWire* cwTwelvethSecondWireNeighbor = ccwTwelvethSecondWireNeighbor;
-
-        // Insert the neighbors such that they are most likely sorted.
-
-        // Degree 1 neighnborhood - only add the six oclock and the twelve oclock neighbot once
-        if (m_param_degree > 1 and ccwSixthSecondWireNeighbor) m_wireNeighbors.push_back(ccwSixthSecondWireNeighbor);
-
-        if (cwInWireNeighbor) m_wireNeighbors.push_back(cwInWireNeighbor);
-        if (ccwInWireNeighbor) m_wireNeighbors.push_back(ccwInWireNeighbor);
-
-        if (cwWireNeighbor) m_wireNeighbors.push_back(cwWireNeighbor);
-        if (ccwWireNeighbor) m_wireNeighbors.push_back(ccwWireNeighbor);
-
-        if (cwOutWireNeighbor) m_wireNeighbors.push_back(cwOutWireNeighbor);
-        if (ccwOutWireNeighbor) m_wireNeighbors.push_back(ccwOutWireNeighbor);
-
-        if (m_param_degree > 1 and ccwTwelvethSecondWireNeighbor) m_wireNeighbors.push_back(ccwTwelvethSecondWireNeighbor);
-
-        for (int degree = 1; degree < m_param_degree; ++degree) {
-          if (cwSixthSecondWireNeighbor) {
-            cwSixthSecondWireNeighbor = cwSixthSecondWireNeighbor->getNeighborCW();
-            m_wireNeighbors.push_back(cwSixthSecondWireNeighbor);
-          }
-          if (ccwSixthSecondWireNeighbor) {
-            ccwSixthSecondWireNeighbor = ccwSixthSecondWireNeighbor->getNeighborCCW();
-            m_wireNeighbors.push_back(ccwSixthSecondWireNeighbor);
-          }
-
-          if (cwInWireNeighbor) {
-            cwInWireNeighbor = cwInWireNeighbor->getNeighborCW();
-            m_wireNeighbors.push_back(cwInWireNeighbor);
-          }
-          if (ccwInWireNeighbor) {
-            ccwInWireNeighbor = ccwInWireNeighbor->getNeighborCCW();
-            m_wireNeighbors.push_back(ccwInWireNeighbor);
-          }
-
-          if (cwWireNeighbor) {
-            cwWireNeighbor = cwWireNeighbor->getNeighborCW();
-            m_wireNeighbors.push_back(cwWireNeighbor);
-          }
-          if (ccwWireNeighbor) {
-            ccwWireNeighbor = ccwWireNeighbor->getNeighborCCW();
-            m_wireNeighbors.push_back(ccwWireNeighbor);
-          }
-
-          if (cwOutWireNeighbor) {
-            cwOutWireNeighbor = cwOutWireNeighbor->getNeighborCW();
-            m_wireNeighbors.push_back(cwOutWireNeighbor);
-          }
-          if (ccwOutWireNeighbor) {
-            ccwOutWireNeighbor = ccwOutWireNeighbor->getNeighborCCW();
-            m_wireNeighbors.push_back(ccwOutWireNeighbor);
-          }
-
-          if (cwTwelvethSecondWireNeighbor) {
-            cwTwelvethSecondWireNeighbor = cwTwelvethSecondWireNeighbor->getNeighborCW();
-            m_wireNeighbors.push_back(cwTwelvethSecondWireNeighbor);
-          }
-          if (ccwTwelvethSecondWireNeighbor) {
-            ccwTwelvethSecondWireNeighbor = ccwTwelvethSecondWireNeighbor->getNeighborCCW();
-            m_wireNeighbors.push_back(ccwTwelvethSecondWireNeighbor);
-          }
-        }
-
-        std::sort(std::begin(m_wireNeighbors), std::end(m_wireNeighbors));
-
-        for (const CDCWire* neighborWire : m_wireNeighbors) {
-          ConstVectorRange<CDCWireHit*> neighborWireHits{
-            std::equal_range(itBegin, itEnd, neighborWire, LessOf<Deref>())};
-
-          m_wireHitNeighbors.insert(m_wireHitNeighbors.end(),
-                                    neighborWireHits.begin(),
-                                    neighborWireHits.end());
-        }
-
-        return m_wireHitNeighbors;
-
-      }
+        const std::vector<CDCWireHit*>::const_iterator& itEnd) const;
 
       /**
        *  Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.
        */
-      Weight operator()(const Relation<const CDCWireHit>& relation) final {
-        const CDCWireHit * ptrFrom(relation.first);
-        const CDCWireHit * ptrTo(relation.second);
-        if (not ptrFrom or not ptrTo) return NAN;
-        return 0;
-      }
+      Weight operator()(const Relation<const CDCWireHit>& relation) final;
 
     private:
       /// Degree of the neighbor extend

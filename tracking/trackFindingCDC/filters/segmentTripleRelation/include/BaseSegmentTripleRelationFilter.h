@@ -11,19 +11,13 @@
 
 #include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
-
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <tracking/trackFindingCDC/utilities/Relation.h>
-#include <tracking/trackFindingCDC/utilities/VectorRange.h>
-#include <tracking/trackFindingCDC/utilities/Functional.h>
-
-#include <algorithm>
-#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegmentTriple;
 
     // Guard to prevent repeated instantiations
     extern template class Filter<Relation<const CDCSegmentTriple> >;
@@ -36,33 +30,16 @@ namespace Belle2 {
       std::vector<const CDCSegmentTriple*> getPossibleNeighbors(
         const CDCSegmentTriple* segmentTriple,
         const std::vector<const CDCSegmentTriple*>::const_iterator& itBegin,
-        const std::vector<const CDCSegmentTriple*>::const_iterator& itEnd) const
-      {
-        assert(std::is_sorted(itBegin, itEnd, LessOf<Deref>()) && "Expected segment triples to be sorted");
-        const CDCSegment2D* endSegment = segmentTriple->getEndSegment();
-
-        ConstVectorRange<const CDCSegmentTriple*> neighbors{
-          std::equal_range(itBegin, itEnd, &endSegment, LessOf<Deref>())};
-        return {neighbors.begin(),  neighbors.end()};
-      }
+        const std::vector<const CDCSegmentTriple*>::const_iterator& itEnd) const;
 
       /// Main filter method returning the weight of the neighborhood relation. Return NAN if relation shall be rejected.
       virtual Weight operator()(const CDCSegmentTriple& from  __attribute__((unused)),
-                                const CDCSegmentTriple& to  __attribute__((unused)))
-      {
-        return 1;
-      }
+                                const CDCSegmentTriple& to  __attribute__((unused)));
 
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      Weight operator()(const Relation<const CDCSegmentTriple>& relation) override
-      {
-        const CDCSegmentTriple* ptrFrom(relation.first);
-        const CDCSegmentTriple* ptrTo(relation.second);
-        if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
-        return this->operator()(*ptrFrom, *ptrTo);
-      }
+      Weight operator()(const Relation<const CDCSegmentTriple>& relation) override;
     };
   }
 }

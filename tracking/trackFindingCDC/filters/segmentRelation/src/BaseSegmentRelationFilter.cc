@@ -15,6 +15,16 @@
 
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 
+#include <tracking/trackFindingCDC/numerics/Weight.h>
+
+#include <tracking/trackFindingCDC/utilities/Relation.h>
+#include <tracking/trackFindingCDC/utilities/VectorRange.h>
+
+#include <tracking/trackFindingCDC/utilities/Functional.h>
+
+#include <algorithm>
+#include <cassert>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -23,6 +33,17 @@ template class TrackFindingCDC::Filter<Relation<const CDCSegment2D> >;
 BaseSegmentRelationFilter::BaseSegmentRelationFilter() = default;
 
 BaseSegmentRelationFilter::~BaseSegmentRelationFilter() = default;
+
+std::vector<const CDCSegment2D*> BaseSegmentRelationFilter::getPossibleNeighbors(
+  const CDCSegment2D* segment,
+  const std::vector<const CDCSegment2D*>::const_iterator& itBegin,
+  const std::vector<const CDCSegment2D*>::const_iterator& itEnd) const
+{
+  assert(std::is_sorted(itBegin, itEnd, LessOf<Deref>()) && "Expected segments to be sorted");
+  ConstVectorRange<const CDCSegment2D*> neighbors{
+    std::equal_range(itBegin, itEnd, segment, LessOf<Deref>())};
+  return {neighbors.begin(), neighbors.end()};
+}
 
 Weight BaseSegmentRelationFilter::operator()(const CDCSegment2D& from __attribute__((unused)),
                                              const CDCSegment2D& to __attribute__((unused)))

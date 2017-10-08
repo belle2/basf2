@@ -11,19 +11,13 @@
 
 #include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <tracking/trackFindingCDC/utilities/Relation.h>
-#include <tracking/trackFindingCDC/utilities/VectorRange.h>
-#include <tracking/trackFindingCDC/utilities/Functional.h>
-
-#include <algorithm>
-#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegment2D;
 
     // Guard to prevent repeated instantiations
     extern template class Filter<Relation<const CDCSegment2D> >;
@@ -38,17 +32,11 @@ namespace Belle2 {
       /// Default destructor
       virtual ~BaseSegmentRelationFilter();
 
-      /// Returns all equivalent segment ins the range.
+      /// Returns all equivalent segment in the range.
       std::vector<const CDCSegment2D*> getPossibleNeighbors(
         const CDCSegment2D* segment,
         const std::vector<const CDCSegment2D*>::const_iterator& itBegin,
-        const std::vector<const CDCSegment2D*>::const_iterator& itEnd) const
-      {
-        assert(std::is_sorted(itBegin, itEnd, LessOf<Deref>()) && "Expected segments to be sorted");
-        ConstVectorRange<const CDCSegment2D*> neighbors{
-          std::equal_range(itBegin, itEnd, segment, LessOf<Deref>())};
-        return {neighbors.begin(),  neighbors.end()};
-      }
+        const std::vector<const CDCSegment2D*>::const_iterator& itEnd) const;
 
       /**
        *  Main filter method returning the weight of the neighborhood relation.

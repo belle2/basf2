@@ -6,7 +6,10 @@
   <contact>Thomas.Hauth@kit.edu</contact>
   <input>EvtGenSimNoBkg.root</input>
   <output>FullTrackingValidation.root</output>
-  <description>This script validates the full track finding chain in Y(4S) runs.</description>
+  <description>This script validates the full track finding chain in Y(4S) runs.
+  This file loads the simulation file which used VXDTF2 (instead of VXDTF1) for data reduction. As
+  soon as VXDTF2 becomes the default, this file can be removed.
+  </description>
 </header>
 """
 

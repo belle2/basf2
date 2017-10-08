@@ -7,7 +7,10 @@
   <contact>tkuhr</contact>
   <cacheable/>
   <description>This steering file produces 1000 generic BBbar events with EvtGen
-  and runs the detector simulation without mixing in background.</description>
+  and runs the detector simulation without mixing in background.
+  This file uses the new VXDTF2 (instead of VXDTF1) for data reduction in the simulation. As
+  soon as VXDTF2 becomes the default, this file can be removed.
+  </description>
 </header>
 """
 

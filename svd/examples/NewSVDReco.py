@@ -34,7 +34,10 @@ PXDDIGI = register_module('PXDDigitizer')
 SVDDIGI = register_module('SVDDigitizer')
 SVDDIGI.param('StartSampling', -0.5*31.44)
 SVDDIGI.param('GenerateShaperDigits', True)
-SVDDIGI.param('signalsList', 'SVDSignalsList.csv')
+# SVDDIGI.param('signalsList', 'SVDSignalsList.csv')
+SVDDIGI.param('RandomizeEventTimes', True)
+SVDDIGI.param('TimeFrameLow', -180)
+SVDDIGI.param('TimeFrameHigh', 150)
 # SVD signal reconstructor
 # SVDSIGR = register_module('SVDSignalReconstructor')
 # Write RecoDigits so that we can check them

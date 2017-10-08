@@ -146,6 +146,21 @@ namespace Belle2 {
       double m_samplingTime;
       /** Whether or not to apply a time window cut */
       bool   m_applyWindow;
+      /** Randomize event times?
+       * If set to true, event times will be randomized uniformly from
+       * m_minTimeFrame to m_maxTimeFrame.
+       */
+      bool m_randomizeEventTimes = false;
+      /** Low edge of randomization time frame */
+      float m_minTimeFrame = -300;
+      /** High edge of randomization time frame */
+      float m_maxTimeFrame = 150;
+      /** Current event time.
+       * This is what gets randomized if m_randomizeEventTimes is true.
+       */
+      float m_currentEventTime = 0.0;
+
+
       /** Time window start.
        * Starting from this time, signal samples are taken in samplingTime intervals.
        */
@@ -154,11 +169,6 @@ namespace Belle2 {
        * Number of consecutive APV25 samples
        */
       int m_nAPV25Samples;
-      /** Whether or not to apply random phase sampling.
-       * If set to true, the first samples of the event will be taken at a random time point
-       * with probability centered around the time when first particle reaches
-       * the SVD. */
-      bool m_randomPhaseSampling;
 
       // 5. Reporting
       /** Name of the ROOT filename to output statistics */
@@ -183,7 +193,7 @@ namespace Belle2 {
       Sensor*            m_currentSensor;
       /** Pointer to the SensorInfo of the current sensor */
       const SensorInfo*  m_currentSensorInfo;
-      /** Time of the current detector event, from the SimHit.. */
+      /** Time of the current SimHit.. */
       double m_currentTime;
       /** Thickness of current sensor (read from m_currentSensorInfo).*/
       double m_sensorThickness;

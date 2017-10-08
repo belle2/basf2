@@ -11,6 +11,7 @@
 #include <vxd/geometry/GeoCache.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
@@ -102,8 +103,12 @@ SVDDigitizerModule::SVDDigitizerModule() :
            "Start of the sampling window, in ns", double(-31.44));
   addParam("nAPV25Samples", m_nAPV25Samples, "number of APV25 samples",
            6);
-  addParam("RandomPhaseSampling", m_randomPhaseSampling,
-           "Start sampling at a random time?", bool(false));
+  addParam("RandomizeEventTimes", m_randomizeEventTimes,
+           "Randomize event times over a frame interval", bool(false));
+  addParam("TimeFrameLow", m_minTimeFrame,
+           "Left edge of event time randomization window, ns", m_minTimeFrame);
+  addParam("TimeFrameHigh", m_maxTimeFrame,
+           "Right edge of event time randomization window, ns", m_maxTimeFrame);
 
   // 5. Reporting
   addParam("statisticsFilename", m_rootFilename,
@@ -127,6 +132,9 @@ void SVDDigitizerModule::initialize()
 
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
   storeDigits.registerRelationTo(storeTrueHits);
+
+  if (m_randomizeEventTimes)
+    StoreObjPtr<EventMetaData> storeEvents;
 
   //Set names in case default was used. We need the names to initialize the RelationIndices.
   m_relMCParticleSimHitName = DataStore::relationName(
@@ -165,6 +173,8 @@ void SVDDigitizerModule::initialize()
   m_noiseFraction = TMath::Freq(m_SNAdjacent); // 0.9... !
   m_samplingTime *= Unit::ns;
   m_shapingTime *= Unit::ns;
+  m_minTimeFrame *= Unit::ns;
+  m_maxTimeFrame *= Unit::ns;
 
   B2INFO(
     "SVDDigitizer parameters (in default system units, *=cannot be set directly):");
@@ -192,11 +202,9 @@ void SVDDigitizerModule::initialize()
   B2INFO(" TIMING: ");
   B2INFO(" -->  APV25 shaping time: " << m_shapingTime);
   B2INFO(" -->  Sampling time:      " << m_samplingTime);
-  B2INFO(" -->  IntegrationWindow:  " << (m_applyWindow ? "true" : "false"));
   B2INFO(" -->  Start of int. wind.:" << m_startSampling);
   B2INFO(" -->  Number of samples:  " << m_nAPV25Samples);
-  B2INFO(
-    " -->  Random phase sampl.:" << (m_randomPhaseSampling ? "true" : "false"));
+  B2INFO(" -->  Random event times. " << (m_randomizeEventTimes ? "true" : "false"));
   B2INFO(" REPORTING: ");
   B2INFO(" -->  statisticsFilename: " << m_rootFilename);
   B2INFO(
@@ -287,9 +295,16 @@ void SVDDigitizerModule::beginRun()
 
 void SVDDigitizerModule::event()
 {
+  // Generate current event time
+  if (m_randomizeEventTimes) {
+    StoreObjPtr<EventMetaData> storeEvent;
+    m_currentEventTime = gRandom->Uniform(m_minTimeFrame, m_maxTimeFrame);
+    storeEvent->setTime(static_cast<unsigned long>(1000 + m_currentEventTime));
+  } else
+    m_currentEventTime = 0.0;
+
   //Clear sensors and process SimHits
   for (Sensors::value_type& sensor : m_sensors) {
-
     sensor.second.first.clear();  // u strips
     sensor.second.second.clear(); // v strips
   }
@@ -407,20 +422,8 @@ void SVDDigitizerModule::event()
 
 void SVDDigitizerModule::processHit()
 {
-  if (m_applyWindow) {
-    //Ignore hits which are outside of the SVD active time frame.
-    //Here we can only discard hits that arrived after the window was closed;
-    //we will later start sampling only after the window opened.
-    double stopSampling = m_startSampling + m_nAPV25Samples * m_samplingTime;
-    B2DEBUG(30,
-            "Checking if hit is in timeframe " << m_currentHit->getGlobalTime() << " <= " << stopSampling);
-
-    if (m_currentHit->getGlobalTime() > stopSampling)
-      return;
-  }
-
-  // Set time of the event
-  m_currentTime = m_currentHit->getGlobalTime();
+  // Set time of the hit
+  m_currentTime = m_currentEventTime + m_currentHit->getGlobalTime();
 
   //Get Steplength and direction
   const TVector3& startPoint = m_currentHit->getPosIn();
@@ -682,9 +685,6 @@ void SVDDigitizerModule::saveDigits()
 
   //Set time of the first sample
   double initTime = m_startSampling;
-  if (m_randomPhaseSampling) {
-    initTime = gRandom->Uniform(0.0, m_samplingTime);
-  }
 
   // ... to store digit-digit relations
   vector<pair<unsigned int, float> > digit_weights;

@@ -167,13 +167,13 @@ void StripCalibrationMap::constructDefaultMap()
       B2FATAL("SVD sensors expected in layers 3 to 6. This code will not work!");
     }
     // u side
-    StripData uStripData(true, info.getElectronicNoiseU(), info.getAduEquivalentU(), 265.0, 0.0);
+    StripData uStripData(true, info.getElectronicNoiseU(), info.getAduEquivalentU(), 270.0, 5.4);
     for (unsigned int uStrip = 0; uStrip < info.getUCells(); ++uStrip) {
       unsigned int uID = getUniqueChannelID(id, true, uStrip);
       m_stripData.insert(std::make_pair(uID, uStripData));
     }
     // v side
-    StripData vStripData(true, info.getElectronicNoiseV(), info.getAduEquivalentV(), 250.0, 0.0);
+    StripData vStripData(true, info.getElectronicNoiseV(), info.getAduEquivalentV(), 270.0, -0.0);
     for (unsigned int vStrip = 0; vStrip < info.getVCells(); ++vStrip) {
       unsigned int uID = getUniqueChannelID(id, false, vStrip);
       m_stripData.insert(std::make_pair(uID, vStripData));

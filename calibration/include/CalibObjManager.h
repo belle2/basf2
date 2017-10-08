@@ -37,6 +37,9 @@ namespace Belle2 {
       */
     void addObject(std::string name, std::unique_ptr<CalibRootObjBase> object);
 
+    void writeCurrentObjects(const Calibration::ExpRun& expRun);
+
+    void clearCurrentObjects(const Calibration::ExpRun& expRun);
     /** Each object gets its own TDirectory under the main manager directory to store its objects.
       * We create them using this function.
       */

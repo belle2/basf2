@@ -10,6 +10,7 @@ CalibrationCollectorModule::CalibrationCollectorModule() :
   m_manager(),
   m_expRunEvents()
 {
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("granularity", m_granularity,
            "Granularity of data collection. Data is separated by runs (=run) or not separated at all (=all)", std::string("run"));
 
@@ -128,6 +129,13 @@ void CalibrationCollectorModule::defineHisto()
 void CalibrationCollectorModule::endRun()
 {
   closeRun();
+  // Moving between runs possibly creates new objects if getObjectPtr is called and granularity is run
+  // So we should write and clear the current memory objects.
+  if (m_granularity == "run") {
+    ExpRun expRun = make_pair(m_emd->getExperiment(), m_emd->getRun());
+    m_manager.writeCurrentObjects(expRun);
+    m_manager.clearCurrentObjects(expRun);
+  }
 }
 
 void CalibrationCollectorModule::terminate()

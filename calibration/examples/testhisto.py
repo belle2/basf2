@@ -17,7 +17,7 @@ logging.package("calibration").log_level = LogLevel.DEBUG
 
 def _create_file(run):
     main = create_path()
-    main.add_module("EventInfoSetter", expList=[1], runList=[run], evtNumList=[1000])
+    main.add_module("EventInfoSetter", expList=[1], runList=[run], evtNumList=[100])
     main.add_module("RootOutput", outputFileName="MyInputFile_" + str(run) + ".root")
     process(main)
     print(statistics)
@@ -28,8 +28,8 @@ def _run_child(run):
     main = create_path()
     main.add_module("RootInput", inputFileNames=["MyInputFile_*.root"], entrySequences=[])
     main.add_module("HistoManager", histoFileName="MyOutputFile_" + str(run) + ".root", workDirName=working_dir)
-    testmod = main.add_module("TestHisto", entriesPerEvent=100)
-    # testmod.param("granularity","all")
+    testmod = main.add_module("TestHisto", entriesPerEvent=1000)
+#    testmod.param("granularity","all")
 #    testmod.param("preScale", 0.5)
 #    testmod.param("maxEventsPerRun", 100)
     process(main)
@@ -37,7 +37,7 @@ def _run_child(run):
 
 
 def create_test_data():
-    for run in range(1, 2):
+    for run in range(1, 101):
         child = ctx.Process(target=_create_file, args=(run,))
         child.start()
         # wait for it to finish

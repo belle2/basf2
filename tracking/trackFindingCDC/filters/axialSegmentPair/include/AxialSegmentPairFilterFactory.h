@@ -15,7 +15,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    // Guard to prevent repeated instatiations
+    // Guard to prevent repeated instantiations
     extern template class FilterFactory<BaseAxialSegmentPairFilter>;
 
     /// Factory that can create appropriate axial segment pair filters from associated names.

@@ -21,7 +21,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    // Guard to prevent repeated instatiations
+    // Guard to prevent repeated instantiations
     extern template class Filter<Relation<const CDCFacet> >;
 
     /**

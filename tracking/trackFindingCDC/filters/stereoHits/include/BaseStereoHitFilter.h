@@ -18,7 +18,7 @@ namespace Belle2 {
     class CDCRLWireHit;
     class CDCTrack;
 
-    // Guard to prevent repeated instatiations
+    // Guard to prevent repeated instantiations
     extern template class Filter<WeightedRelation<CDCTrack, const CDCRLWireHit>>;
 
     /// Base filter for stereo hit - track relations.

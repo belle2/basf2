@@ -29,7 +29,7 @@ namespace Belle2 {
   /**
    * The SVD RecoDigit class.
    *
-   * The SVDRecoDigit is a calibrated and time-fitted strip singal.
+   * The SVDRecoDigit is a calibrated and time-fitted strip signal.
    * It contains SVDModeByte and strip identification data, plus fit
    * and fit quality information.
    * NB:

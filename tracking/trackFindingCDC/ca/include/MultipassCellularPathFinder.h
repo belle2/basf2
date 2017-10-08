@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/ca/CellularAutomaton.h>
 #include <tracking/trackFindingCDC/ca/CellularPathFollower.h>
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
 #include <tracking/trackFindingCDC/ca/Path.h>
 #include <tracking/trackFindingCDC/ca/CellHolder.h>
@@ -67,7 +66,7 @@ namespace Belle2 {
 
       }
 
-      /// Applies the cellular automaton to the collection and its neighborhood
+      /// Applies the cellular automaton to the collection and its relations
       void apply(const std::vector<ACellHolder*>& cellHolders,
                  const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations,
                  std::vector<Path<ACellHolder> >& paths)

@@ -18,7 +18,6 @@
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 #include <tracking/trackFindingCDC/eventdata/utils/DriftLengthEstimator.h>
 
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <vector>

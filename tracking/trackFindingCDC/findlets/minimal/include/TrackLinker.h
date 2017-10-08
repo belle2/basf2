@@ -15,7 +15,6 @@
 #include <tracking/trackFindingCDC/filters/trackRelation/ChooseableTrackRelationFilter.h>
 
 #include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
 #include <vector>
 #include <string>

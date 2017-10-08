@@ -9,9 +9,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
+
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <framework/logging/Logger.h>
 
@@ -35,7 +36,7 @@ namespace Belle2 {
       /**
        *  Applies the cellular automaton to the collection of cells and its neighborhood
        *  @param cellHolders             The range based iterable containing the cells.
-       *  @param cellHolderNeighborhood  The weighted neighborhood between the cells.
+       *  @param cellHolderRelations     The weighted relations between the cells.
        *  @return                        The cell holder with the highest cell state found.
        */
       ACellHolder* applyTo(const std::vector<ACellHolder*>& cellHolders,

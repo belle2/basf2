@@ -9,9 +9,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 #include <tracking/trackFindingCDC/ca/Path.h>
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <vector>
 #include <cassert>

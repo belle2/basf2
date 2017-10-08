@@ -111,7 +111,7 @@ bool StripCalibrationMap::readMapFromXml(const std::string& ooMapName, const std
                strip += countIncrement, ++i) {
             // gain is electrons/ADU, so m_calLevel * 1000 / peak. We se
             // gain to 1.0 for nonsensical peak measurements.
-            double gain = (peakArray[i] > 1.0) ? 25000 / peakArray[i] : 1.0;
+            double gain = (peakArray[i] > 1.0) ? 22500 / peakArray[i] : 1.0;
             // noise: we convert form ADU to e-, so gain*noise
             double noise = gain * noiseArray[i];
             // peakWidth, peakTime: In hardware tests, time is measured in
@@ -167,7 +167,7 @@ void StripCalibrationMap::constructDefaultMap()
       B2FATAL("SVD sensors expected in layers 3 to 6. This code will not work!");
     }
     // u side
-    StripData uStripData(true, info.getElectronicNoiseU(), info.getAduEquivalentU(), 200.0, 0.0);
+    StripData uStripData(true, info.getElectronicNoiseU(), info.getAduEquivalentU(), 265.0, 0.0);
     for (unsigned int uStrip = 0; uStrip < info.getUCells(); ++uStrip) {
       unsigned int uID = getUniqueChannelID(id, true, uStrip);
       m_stripData.insert(std::make_pair(uID, uStripData));

@@ -31,10 +31,9 @@ namespace Belle2 {
       ~BaseSegmentPairRelationFilter();
 
       /// Returns the segment pairs form the range that continue on the to site of the given segment pair.
-      std::vector<const CDCSegmentPair*> getPossibleNeighbors(
-        const CDCSegmentPair* segmentPair,
-        const std::vector<const CDCSegmentPair*>::const_iterator& itBegin,
-        const std::vector<const CDCSegmentPair*>::const_iterator& itEnd) const final;
+      std::vector<const CDCSegmentPair*> getPossibleTos(
+        const CDCSegmentPair* from,
+        const std::vector<const CDCSegmentPair*>& segmentPairs) const final;
     };
   }
 }

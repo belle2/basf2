@@ -31,11 +31,9 @@ namespace Belle2 {
       /// Default destructor
       virtual ~RelationFilter();
 
-      /// Filters the given collection of objects for the once neighboring the given one
-      virtual std::vector<AObject*> getPossibleNeighbors(
-        AObject* from,
-        const typename std::vector<AObject*>::const_iterator& itBegin,
-        const typename std::vector<AObject*>::const_iterator& itEnd) const;
+      /// Selects the objects possibly related to the given one from the given pool of objects.
+      virtual std::vector<AObject*> getPossibleTos(AObject* from,
+                                                   const std::vector<AObject*>& objects) const;
 
       /**
        *  Main filter method returning the weight of the neighborhood relation.

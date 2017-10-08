@@ -37,10 +37,8 @@ namespace Belle2 {
        *  Returns a vector containing the neighboring wire hits of the given wire hit out of the
        *  sorted range given by the two iterator other argumets.
        */
-      std::vector<CDCWireHit*> getPossibleNeighbors(
-        CDCWireHit* wireHit,
-        const std::vector<CDCWireHit*>::const_iterator& itBegin,
-        const std::vector<CDCWireHit*>::const_iterator& itEnd) const final;
+      std::vector<CDCWireHit*> getPossibleTos(CDCWireHit* from,
+                                              const std::vector<CDCWireHit*>& wireHits) const final;
 
     private:
       /// Degree of the neighbor extend

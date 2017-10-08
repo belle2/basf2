@@ -50,13 +50,12 @@ void WholeWireHitRelationFilter::exposeParameters(ModuleParamList* moduleParamLi
                  m_param_degree);
 }
 
-std::vector<CDCWireHit*> WholeWireHitRelationFilter::getPossibleNeighbors(
-  CDCWireHit* wireHit,
-  const std::vector<CDCWireHit*>::const_iterator& itBegin,
-  const std::vector<CDCWireHit*>::const_iterator& itEnd) const
-
+std::vector<CDCWireHit*> WholeWireHitRelationFilter::getPossibleTos(
+  CDCWireHit* from,
+  const std::vector<CDCWireHit*>& wireHits) const
 {
-  assert(std::is_sorted(itBegin, itEnd, LessOf<Deref>()) && "Expected wire hits to be sorted");
+  assert(std::is_sorted(wireHits.begin(), wireHits.end(), LessOf<Deref>()) &&
+         "Expected wire hits to be sorted");
 
   const int nWireNeighbors = 8 + 10 * (m_param_degree - 1);
   std::vector<const CDCWire*> m_wireNeighbors;
@@ -66,7 +65,7 @@ std::vector<CDCWireHit*> WholeWireHitRelationFilter::getPossibleNeighbors(
   m_wireHitNeighbors.reserve(2 * nWireNeighbors);
 
   const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
-  const CDCWire& wire = wireHit->getWire();
+  const CDCWire& wire = from->getWire();
 
   const CDCWire* ccwSixthSecondWireNeighbor = wireTopology.getSecondNeighborSixOClock(wire);
   const CDCWire* ccwInWireNeighbor = wireTopology.getNeighborCCWInwards(wire);
@@ -149,7 +148,7 @@ std::vector<CDCWireHit*> WholeWireHitRelationFilter::getPossibleNeighbors(
 
   for (const CDCWire* neighborWire : m_wireNeighbors) {
     ConstVectorRange<CDCWireHit*> neighborWireHits{
-      std::equal_range(itBegin, itEnd, neighborWire, LessOf<Deref>())};
+      std::equal_range(wireHits.begin(), wireHits.end(), neighborWire, LessOf<Deref>())};
 
     m_wireHitNeighbors.insert(m_wireHitNeighbors.end(),
                               neighborWireHits.begin(),

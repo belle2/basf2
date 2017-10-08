@@ -21,12 +21,11 @@ template <class AObject>
 RelationFilter<AObject>::~RelationFilter() = default;
 
 template <class AObject>
-std::vector<AObject*> RelationFilter<AObject>::getPossibleNeighbors(
+std::vector<AObject*> RelationFilter<AObject>::getPossibleTos(
   AObject* from __attribute__((unused)),
-  const typename std::vector<AObject*>::const_iterator& itBegin,
-  const typename std::vector<AObject*>::const_iterator& itEnd) const
+  const std::vector<AObject*>& objects) const
 {
-  return {itBegin, itEnd};
+  return objects;
 }
 
 template <class AObject>

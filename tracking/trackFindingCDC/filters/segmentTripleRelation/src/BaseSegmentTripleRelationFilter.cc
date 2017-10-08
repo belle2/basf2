@@ -29,17 +29,16 @@ BaseSegmentTripleRelationFilter::BaseSegmentTripleRelationFilter() = default;
 
 BaseSegmentTripleRelationFilter::~BaseSegmentTripleRelationFilter() = default;
 
-std::vector<const CDCSegmentTriple*> BaseSegmentTripleRelationFilter::getPossibleNeighbors(
-  const CDCSegmentTriple* segmentTriple,
-  const std::vector<const CDCSegmentTriple*>::const_iterator& itBegin,
-  const std::vector<const CDCSegmentTriple*>::const_iterator& itEnd) const
+std::vector<const CDCSegmentTriple*> BaseSegmentTripleRelationFilter::getPossibleTos(
+  const CDCSegmentTriple* from,
+  const std::vector<const CDCSegmentTriple*>& segmentTriples) const
 {
-  assert(std::is_sorted(itBegin, itEnd, LessOf<Deref>()) &&
+  assert(std::is_sorted(segmentTriples.begin(), segmentTriples.end(), LessOf<Deref>()) &&
          "Expected segment triples to be sorted");
 
-  const CDCSegment2D* endSegment = segmentTriple->getEndSegment();
+  const CDCSegment2D* endSegment = from->getEndSegment();
 
   ConstVectorRange<const CDCSegmentTriple*> neighbors{
-    std::equal_range(itBegin, itEnd, &endSegment, LessOf<Deref>())};
+    std::equal_range(segmentTriples.begin(), segmentTriples.end(), &endSegment, LessOf<Deref>())};
   return {neighbors.begin(), neighbors.end()};
 }

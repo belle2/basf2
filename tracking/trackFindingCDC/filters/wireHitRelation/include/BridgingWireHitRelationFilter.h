@@ -35,11 +35,11 @@ namespace Belle2 {
      *  The criterion can be lowered such that fewer missing hits trigger the inclusion of the
      *  secondary neighbors.
      */
-    class BridgingWireHitRelationFilter : public RelationFilter<const CDCWireHit> {
+    class BridgingWireHitRelationFilter : public RelationFilter<CDCWireHit> {
 
     private:
       /// Type of the base class
-      using Super = RelationFilter<const CDCWireHit>;
+      using Super = RelationFilter<CDCWireHit>;
 
     public:
       /// Default constructor
@@ -58,10 +58,8 @@ namespace Belle2 {
        *  Returns a vector containing the neighboring wire hits of the given wire hit out of the
        *  sorted range given by the two iterator other argumets.
        */
-      std::vector< CDCWireHit*> getPossibleNeighbors(
-        CDCWireHit* wireHit,
-        const std::vector< CDCWireHit*>::const_iterator& itBegin,
-        const std::vector< CDCWireHit*>::const_iterator& itEnd);
+      std::vector<CDCWireHit*> getPossibleTos(CDCWireHit* from,
+                                              const std::vector<CDCWireHit*>& wireHits) const final;
 
     private:
       /// Parameter: A map from o'clock direction to the number of missing primary drift cells

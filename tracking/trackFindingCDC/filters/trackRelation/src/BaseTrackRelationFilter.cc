@@ -22,10 +22,10 @@ BaseTrackRelationFilter::BaseTrackRelationFilter() = default;
 
 BaseTrackRelationFilter::~BaseTrackRelationFilter() = default;
 
-std::vector<const CDCTrack*> BaseTrackRelationFilter::getPossibleNeighbors(
-  const CDCTrack* track __attribute__((unused)),
-  const std::vector<const CDCTrack*>::const_iterator& itBegin,
-  const std::vector<const CDCTrack*>::const_iterator& itEnd) const
+std::vector<const CDCTrack*> BaseTrackRelationFilter::getPossibleTos(
+  const CDCTrack* from __attribute__((unused)),
+  const std::vector<const CDCTrack*>& tracks) const
 {
-  return {itBegin, itEnd};
+  // All tracks a possible - no geometric selection here.
+  return tracks;
 }

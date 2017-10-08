@@ -52,10 +52,9 @@ namespace Belle2 {
                               std::vector<WeightedRelation<AObject>>& weightedRelations)
       {
         for (AObject* from : objects) {
-          std::vector<AObject*> possibleNeighbors =
-            relationFilter.getPossibleNeighbors(from, objects.begin(), objects.end());
+          std::vector<AObject*> possibleTos = relationFilter.getPossibleTos(from, objects);
 
-          for (AObject* to : possibleNeighbors) {
+          for (AObject* to : possibleTos) {
             if (from == to) continue;
             Relation<AObject> relation(from, to);
             Weight weight = relationFilter(relation);

@@ -39,10 +39,9 @@ namespace Belle2 {
       virtual ~BaseSegmentRelationFilter();
 
       /// Returns all equivalent segment in the range.
-      std::vector<const CDCSegment2D*> getPossibleNeighbors(
-        const CDCSegment2D* segment,
-        const std::vector<const CDCSegment2D*>::const_iterator& itBegin,
-        const std::vector<const CDCSegment2D*>::const_iterator& itEnd) const final;
+      std::vector<const CDCSegment2D*> getPossibleTos(
+        const CDCSegment2D* from,
+        const std::vector<const CDCSegment2D*>& segments) const final;
 
       using Super::operator();
 

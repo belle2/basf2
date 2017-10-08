@@ -29,16 +29,17 @@ BaseFacetRelationFilter::BaseFacetRelationFilter() = default;
 
 BaseFacetRelationFilter::~BaseFacetRelationFilter() = default;
 
-std::vector<const CDCFacet*> BaseFacetRelationFilter::getPossibleNeighbors(
-  const CDCFacet* facet,
-  const std::vector<const CDCFacet*>::const_iterator& itBegin,
-  const std::vector<const CDCFacet*>::const_iterator& itEnd) const
+std::vector<const CDCFacet*> BaseFacetRelationFilter::getPossibleTos(
+  const CDCFacet* from,
+  const std::vector<const CDCFacet*>& facets) const
 {
-  // Expensive assert - but true one the less
-  // assert(std::is_sorted(itBegin, itEnd, LessOf<Deref>()) && "Expected facets to be sorted");
+  // Expensive assert has been deactivated - but true nonetheless
+  assert(true or (std::is_sorted(facets.begin(), facets.end(), LessOf<Deref>()) &&
+                  "Expected facets to be sorted"));
 
-  const CDCRLWireHitPair& rearRLWireHitPair = facet->getRearRLWireHitPair();
+  const CDCRLWireHitPair& rearRLWireHitPair = from->getRearRLWireHitPair();
+
   ConstVectorRange<const CDCFacet*> neighbors{
-    std::equal_range(itBegin, itEnd, &rearRLWireHitPair, LessOf<Deref>())};
+    std::equal_range(facets.begin(), facets.end(), &rearRLWireHitPair, LessOf<Deref>())};
   return {neighbors.begin(), neighbors.end()};
 }

@@ -68,12 +68,12 @@ void BridgingWireHitRelationFilter::initialize()
   }
 }
 
-std::vector<CDCWireHit*> BridgingWireHitRelationFilter::getPossibleNeighbors(
-  CDCWireHit* wireHit,
-  const std::vector<CDCWireHit*>::const_iterator& itBegin,
-  const std::vector<CDCWireHit*>::const_iterator& itEnd)
+std::vector<CDCWireHit*> BridgingWireHitRelationFilter::getPossibleTos(
+  CDCWireHit* from,
+  const std::vector<CDCWireHit*>& wireHits) const
 {
-  assert(std::is_sorted(itBegin, itEnd, LessOf<Deref>()) && "Expected wire hits to be sorted");
+  assert(std::is_sorted(wireHits.begin(), wireHits.end(), LessOf<Deref>()) &&
+         "Expected wire hits to be sorted");
 
   std::vector<std::pair<const CDCWire*, int>> wireNeighbors;
   wireNeighbors.reserve(8);
@@ -85,7 +85,7 @@ std::vector<CDCWireHit*> BridgingWireHitRelationFilter::getPossibleNeighbors(
 
   const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
-  const CDCWire& wire = wireHit->getWire();
+  const CDCWire& wire = from->getWire();
 
   // Analyse primary neighborhood - sorted such that the wire hits relations are most likely sorted.
   for (short oClockDirection : {5, 7, 3, 9, 1, 11}) {
@@ -100,7 +100,7 @@ std::vector<CDCWireHit*> BridgingWireHitRelationFilter::getPossibleNeighbors(
     int oClockDirection = wireAndOClockDirection.second;
 
     ConstVectorRange<CDCWireHit*> wireHitRange{
-      std::equal_range(itBegin, itEnd, neighborWire, LessOf<Deref>())};
+      std::equal_range(wireHits.begin(), wireHits.end(), neighborWire, LessOf<Deref>())};
     if (wireHitRange.empty()) {
       int ccwOClockDirection = oClockDirection - 1;
       int cwOClockDirection = oClockDirection == 11 ? 0 : oClockDirection + 1;
@@ -129,7 +129,7 @@ std::vector<CDCWireHit*> BridgingWireHitRelationFilter::getPossibleNeighbors(
   for (std::pair<const CDCWire*, int> wireAndOClockDirection : wireNeighbors) {
     const CDCWire* neighborWire = wireAndOClockDirection.first;
     ConstVectorRange<CDCWireHit*> wireHitRange{
-      std::equal_range(itBegin, itEnd, neighborWire, LessOf<Deref>())};
+      std::equal_range(wireHits.begin(), wireHits.end(), neighborWire, LessOf<Deref>())};
     wireHitNeighbors.insert(wireHitNeighbors.end(), wireHitRange.begin(), wireHitRange.end());
   }
 

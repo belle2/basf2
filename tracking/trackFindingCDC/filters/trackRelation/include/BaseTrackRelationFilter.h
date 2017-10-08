@@ -31,10 +31,9 @@ namespace Belle2 {
       ~BaseTrackRelationFilter();
 
       /// Reenforce that the full range of tracks is possible as no particular default is applicable.
-      std::vector<const CDCTrack*> getPossibleNeighbors(
-        const CDCTrack* track,
-        const std::vector<const CDCTrack*>::const_iterator& itBegin,
-        const std::vector<const CDCTrack*>::const_iterator& itEnd) const final;
+      std::vector<const CDCTrack*> getPossibleTos(
+        const CDCTrack* from,
+        const std::vector<const CDCTrack*>& tracks) const final;
     };
   }
 }

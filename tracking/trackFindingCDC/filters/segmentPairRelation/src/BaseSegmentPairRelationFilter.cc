@@ -28,16 +28,16 @@ BaseSegmentPairRelationFilter::BaseSegmentPairRelationFilter() = default;
 
 BaseSegmentPairRelationFilter::~BaseSegmentPairRelationFilter() = default;
 
-std::vector<const CDCSegmentPair*> BaseSegmentPairRelationFilter::getPossibleNeighbors(
-  const CDCSegmentPair* segmentPair,
-  const std::vector<const CDCSegmentPair*>::const_iterator& itBegin,
-  const std::vector<const CDCSegmentPair*>::const_iterator& itEnd) const
+std::vector<const CDCSegmentPair*> BaseSegmentPairRelationFilter::getPossibleTos(
+  const CDCSegmentPair* from,
+  const std::vector<const CDCSegmentPair*>& segmentPairs) const
 {
-  assert(std::is_sorted(itBegin, itEnd, LessOf<Deref>()) && "Expected segment pairs to be sorted");
+  assert(std::is_sorted(segmentPairs.begin(), segmentPairs.end(), LessOf<Deref>()) &&
+         "Expected segment pairs to be sorted");
 
-  const CDCSegment2D* toSegment = segmentPair->getToSegment();
+  const CDCSegment2D* toSegment = from->getToSegment();
 
   ConstVectorRange<const CDCSegmentPair*> neighbors{
-    std::equal_range(itBegin, itEnd, &toSegment, LessOf<Deref>())};
+    std::equal_range(segmentPairs.begin(), segmentPairs.end(), &toSegment, LessOf<Deref>())};
   return {neighbors.begin(), neighbors.end()};
 }

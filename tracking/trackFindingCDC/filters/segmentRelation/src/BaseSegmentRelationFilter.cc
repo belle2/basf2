@@ -35,15 +35,17 @@ BaseSegmentRelationFilter::BaseSegmentRelationFilter() = default;
 
 BaseSegmentRelationFilter::~BaseSegmentRelationFilter() = default;
 
-std::vector<const CDCSegment2D*> BaseSegmentRelationFilter::getPossibleNeighbors(
-  const CDCSegment2D* segment,
-  const std::vector<const CDCSegment2D*>::const_iterator& itBegin,
-  const std::vector<const CDCSegment2D*>::const_iterator& itEnd) const
+std::vector<const CDCSegment2D*> BaseSegmentRelationFilter::getPossibleTos(
+  const CDCSegment2D* from,
+  const std::vector<const CDCSegment2D*>& segments) const
 {
-  assert(std::is_sorted(itBegin, itEnd, LessOf<Deref>()) && "Expected segments to be sorted");
-  ConstVectorRange<const CDCSegment2D*> neighbors{
-    std::equal_range(itBegin, itEnd, segment, LessOf<Deref>())};
-  return {neighbors.begin(), neighbors.end()};
+  assert(std::is_sorted(segments.begin(), segments.end(), LessOf<Deref>()) &&
+         "Expected segments to be sorted");
+
+  ConstVectorRange<const CDCSegment2D*> tos{
+    std::equal_range(segments.begin(), segments.end(), from, LessOf<Deref>())};
+
+  return {tos.begin(), tos.end()};
 }
 
 Weight BaseSegmentRelationFilter::operator()(const Relation<const CDCSegment2D>& relation)

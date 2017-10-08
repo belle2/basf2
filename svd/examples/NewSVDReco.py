@@ -35,9 +35,10 @@ SVDDIGI = register_module('SVDDigitizer')
 SVDDIGI.param('GenerateShaperDigits', True)
 # SVDDIGI.param('signalsList', 'SVDSignalsList.csv')
 # SVD signal reconstructor
-SVDSIGR = register_module('SVDSignalReconstructor')
+# SVDSIGR = register_module('SVDSignalReconstructor')
 # Write RecoDigits so that we can check them
-SVDSIGR.param('WriteRecoDigits', True)
+# SVDSIGR.param('WriteRecoDigits', True)
+SVDCLUST = register_module('SVDClusterizerDirect')
 # Save output of simulation
 output = register_module('RootOutput')
 
@@ -54,7 +55,7 @@ particlegun.param('pdgCodes', [-11, 11])
 particlegun.param('nTracks', 1)
 
 # Set the number of events to be processed (100 events)
-eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10000], 'runList': [1]})
 
 # Set output filename
 output.param('outputFileName', 'SVDTestOutput.root')
@@ -76,7 +77,8 @@ main.add_module(simulation)
 main.add_module(PXDDIGI)
 main.add_module(SVDDIGI)
 # main.add_module(dump_digits())
-main.add_module(SVDSIGR)
+# main.add_module(SVDSIGR)
+main.add_module(SVDCLUST)
 main.add_module(output)
 
 # Process events

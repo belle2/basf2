@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <vector>
 #include <string>
@@ -20,14 +20,14 @@ namespace Belle2 {
   class ModuleParamList;
 
   template <class AState, class AFilter>
-  class StateRejecter : public TrackFindingCDC::Findlet<const AState* const, TrackFindingCDC::WithWeight<AState*>> {
+  class LimitedFilter : public TrackFindingCDC::Findlet<const AState* const, TrackFindingCDC::WithWeight<AState*>> {
   private:
     /// Parent class
     using Super = TrackFindingCDC::Findlet<const AState* const, TrackFindingCDC::WithWeight<AState*>>;
 
   public:
     /// Construct this findlet and add the subfindlet as listener
-    StateRejecter();
+    LimitedFilter();
 
     /// Expose the parameters of the subfindlet
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
@@ -39,14 +39,9 @@ namespace Belle2 {
 
   private:
     /// State filter to decide which available continuations should be traversed next.
-    AFilter m_firstFilter;
-    /// State filter to advance all states.
-    AFilter m_advanceFilter;
-    /// State filter to decide which available continuations should be traversed next.
-    AFilter m_secondFilter;
-    /// State filter to kalman update all states.
-    AFilter m_updateFilter;
-    /// State filter to decide which available continuations should be traversed next.
-    AFilter m_thirdFilter;
+    AFilter m_filter;
+
+    /// Parameter how many objects should pass maximal
+    int m_param_useNStates = 0;
   };
 }

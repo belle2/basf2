@@ -21,6 +21,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <functional>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -68,10 +69,8 @@ namespace Belle2 {
 
           m_wireHitRelations.clear();
           WeightedNeighborhood<CDCWireHit>::appendUsing(m_wireHitRelationFilter, wireHits, m_wireHitRelations);
-          WeightedNeighborhood<CDCWireHit> wireHitNeighborhood(m_wireHitRelations);
-
           const std::size_t nClustersBefore = outputClusters.size();
-          m_wireHitClusterizer.createFromPointers(superCluster, wireHitNeighborhood, outputClusters);
+          m_wireHitClusterizer.apply(superCluster, m_wireHitRelations, outputClusters);
           const std::size_t nClustersAfter = outputClusters.size();
 
           // Update the super cluster id of the just created clusters

@@ -66,8 +66,7 @@ namespace Belle2 {
           ptrWireHits.push_back(&wireHit);
         }
 
-        WeightedNeighborhood<CDCWireHit> wireHitNeighborhood(m_wireHitRelations);
-        m_wirehitClusterizer.createFromPointers(ptrWireHits, wireHitNeighborhood, outputClusters);
+        m_wirehitClusterizer.apply(ptrWireHits, m_wireHitRelations, outputClusters);
       }
 
     private:

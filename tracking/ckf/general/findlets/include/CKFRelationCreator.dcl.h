@@ -15,7 +15,7 @@
 namespace Belle2 {
   class ModuleParamList;
 
-  template<class AState, class ASeedRelationFilter, class AHitRelationFilter>
+  template<class AState, class ASeedRelationFilter, class AHitRelationFilter = ASeedRelationFilter>
   class CKFRelationCreator : public TrackFindingCDC::Findlet<AState, AState, TrackFindingCDC::WeightedRelation<AState>> {
   public:
     using Super = TrackFindingCDC::Findlet<AState, AState, TrackFindingCDC::WeightedRelation<AState>>;

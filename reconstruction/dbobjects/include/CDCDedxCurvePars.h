@@ -31,7 +31,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedxCurvePars(std::vector<double> curvepars): m_curvepars(curvepars) {};
+    CDCDedxCurvePars(short version, std::vector<double> curvepars): m_version(version), m_curvepars(curvepars) {};
 
     /**
      * Destructor
@@ -42,37 +42,32 @@ namespace Belle2 {
      */
     double getSize() const {return m_curvepars.size(); };
 
-    /** Return run gain
-     * @return run gain
+    /** Get the version for the curve parameterization
+     */
+    short getVersion() const {return m_version; };
+
+    /** Return vector of curve parameters
+     * @return vector of curve parameters
+     */
+    std::vector<double> getCurvePars() const {return m_curvepars; };
+
+    /** Return specific curve parameter
+     * @return specific curve parameter
      */
     double getCurvePar(int par) const {return m_curvepars[par]; };
 
-    /** Set run gain
-     * @param run gain
+    /** Set version number
+     * @param version
+     */
+    void setVersion(short version) {m_version = version; };
+
+    /** Set parameter
+     * @param parameter
      */
     void setCurvePar(int par, double value) {m_curvepars[par] = value; };
 
-    /** Get the predicted mean according to the beta-gamma curve parameterization
-     */
-    double getMean(double bg) const
-    {
-      // define the section of the curve to use
-      double A = 0, B = 0, C = 0;
-      if (bg < 4.5) A = 1;
-      else if (bg < 10) B = 1;
-      else C = 1;
-
-      // calculate dE/dx from the parameterized Bethe-Bloch curve
-      if (A != 0) A *= m_curvepars[0] * std::pow(std::sqrt(bg * bg + 1), m_curvepars[2]) / std::pow(bg,
-                         m_curvepars[2]) * (m_curvepars[1] - m_curvepars[4] * std::log(1 / bg)) - m_curvepars[3] + std::exp(
-                           m_curvepars[5] + m_curvepars[6] * bg);
-      if (B != 0) B *= m_curvepars[7] * std::pow(bg, 3) + m_curvepars[8] * bg * bg + m_curvepars[9] * bg + m_curvepars[10];
-      if (C != 0) C *= -1.0 * m_curvepars[11] * std::log(m_curvepars[14] + std::pow(1 / bg, m_curvepars[12])) + m_curvepars[13];
-
-      return (A + B + C);
-    }
-
   private:
+    short m_version; /**< version number for curve parameterization */
     std::vector<double> m_curvepars; /**< dE/dx curve parameters */
 
     ClassDef(CDCDedxCurvePars, 1); /**< ClassDef */

@@ -77,6 +77,18 @@ namespace Belle2 {
 
   private:
 
+    /** parameterized beta-gamma curve for predicted means */
+    double bgCurve(double* x, double* par, int version) const;
+
+    /** calculate the predicted mean using the parameterized resolution */
+    double getMean(double bg) const;
+
+    /** parameterized resolution for predictions */
+    double sigmaCurve(double* x, double* par, int version) const;
+
+    /** calculate the predicted resolution using the parameterized resolution */
+    double getSigma(double dedx, double nhit, double sin) const;
+
     /** Save arithmetic and truncated mean for the 'dedx' values.
      *
      * @param mean              calculated arithmetic mean
@@ -105,6 +117,10 @@ namespace Belle2 {
      * @param pdf   pointer to array of 2d PDFs to use (not modified)
      * */
     void saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx, TH2F* const* pdf) const;
+
+    // parameters to determine the predicted means and resolutions
+    std::vector<double> m_curvepars; /**< dE/dx curve parameters */
+    std::vector<double> m_sigmapars; /**< dE/dx resolution parameters */
 
     TH2F* m_pdfs[3][Const::ChargedStable::c_SetSize]; /**< dedx:momentum PDFs. */
 

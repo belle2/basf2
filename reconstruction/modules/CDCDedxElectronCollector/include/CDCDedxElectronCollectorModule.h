@@ -12,6 +12,8 @@
 
 #include <calibration/CalibrationCollectorModule.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 #include <framework/datastore/StoreArray.h>
 

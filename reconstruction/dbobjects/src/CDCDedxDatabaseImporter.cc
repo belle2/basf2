@@ -71,11 +71,12 @@ void CDCDedxDatabaseImporter::importCurveParameters()
   if (nFiles != 1) { B2FATAL("Sorry, you must only import one file at a time for now!"); }
 
   // loop over the histogram to fill the TClonesArray
+  short version = parhist->GetBinContent(1);
   std::vector<double> curvepars;
-  for (int bin = 1; bin <= parhist->GetNbinsX(); ++bin) {
+  for (int bin = 2; bin <= parhist->GetNbinsX(); ++bin) {
     curvepars.push_back(parhist->GetBinContent(bin));
   }
-  new(curveParameters[0]) CDCDedxCurvePars(curvepars);
+  new(curveParameters[0]) CDCDedxCurvePars(version, curvepars);
 
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   Database::Instance().storeData(m_name, curveParameters[0], iov);
@@ -116,11 +117,12 @@ void CDCDedxDatabaseImporter::importSigmaParameters()
   if (nFiles != 1) { B2FATAL("Sorry, you must only import one file at a time for now!"); }
 
   // loop over the histogram to fill the TClonesArray
+  short version = parhist->GetBinContent(1);
   std::vector<double> sigmapars;
-  for (int bin = 1; bin <= parhist->GetNbinsX(); ++bin) {
+  for (int bin = 2; bin <= parhist->GetNbinsX(); ++bin) {
     sigmapars.push_back(parhist->GetBinContent(bin));
   }
-  new(sigmaParameters[0]) CDCDedxSigmaPars(sigmapars);
+  new(sigmaParameters[0]) CDCDedxSigmaPars(version, sigmapars);
 
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   Database::Instance().storeData(m_name, sigmaParameters[0], iov);

@@ -70,16 +70,16 @@ void calib4_printPayloads(){
   TFile* curvefile = new TFile("localdb/dbstore_CDCDedxCurvePars_rev_1.root");
   Belle2::CDCDedxCurvePars* cp = (Belle2::CDCDedxCurvePars*)curvefile->Get("CDCDedxCurvePars");
   std::cout << "Curve parameters:" << std::endl;
+  std::cout << "Version: " << cp->getVersion() << std::endl;
   for( int i = 0; i < cp->getSize(); ++i ){
     std::cout << cp->getCurvePar(i) << std::endl;
   }
-  std::cout << cp->getMean(1.5) << std::endl;
 
   TFile* sigmafile = new TFile("localdb/dbstore_CDCDedxSigmaPars_rev_1.root");
   Belle2::CDCDedxSigmaPars* sp = (Belle2::CDCDedxSigmaPars*)sigmafile->Get("CDCDedxSigmaPars");
   std::cout << "Sigma parameters:" << std::endl;
+  std::cout << "Version: " << sp->getVersion() << std::endl;
   for( int i = 0; i < sp->getSize(); ++i ){
     std::cout << sp->getSigmaPar(i) << std::endl;
   }
-  std::cout << sp->getSigma(1.0,10,0.0) << std::endl;
 }

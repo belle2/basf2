@@ -38,6 +38,8 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
 void CDCDedxElectronCollectorModule::prepare()
 {
   StoreArray<CDCDedxTrack>::required();
+  StoreArray<Track>::required();
+  StoreArray<TrackFitResult>::required();
 
   // Data object creation
   auto means = new TH1F("means", "CDC dE/dx truncated means", 100, 0, 2);
@@ -63,7 +65,7 @@ void CDCDedxElectronCollectorModule::prepare()
 
 void CDCDedxElectronCollectorModule::collect()
 {
-  StoreArray<CDCDedxTrack> tracks;
+  StoreArray<CDCDedxTrack> dedxTracks;
 
   // Collector object access
   auto& means = getObject<TH1F>("means");
@@ -71,26 +73,37 @@ void CDCDedxElectronCollectorModule::collect()
 
   // SPECIAL CORRECTION FOR COSMICS -> REMOVE MOMENTUM DEPENDENCE
   const float momcorr[50] = {
-    0.936667, 0.791667, 0.763456, 0.755219, 0.758876,
-    0.762439, 0.769009, 0.776787, 0.783874, 0.791462,
-    0.796567, 0.80445,  0.809177, 0.815605, 0.817414,
-    0.822127, 0.828355, 0.83215,  0.832959, 0.833546,
-    0.840324, 0.844323, 0.847539, 0.849506, 0.850848,
-    0.852272, 0.854783, 0.853612, 0.861432, 0.859428,
-    0.859533, 0.862021, 0.865721, 0.868412, 0.868954,
-    0.872075, 0.872732, 0.872475, 0.872152, 0.876957,
-    0.87419,  0.875742, 0.874523, 0.878218, 0.873543,
-    0.881054, 0.874919, 0.877849, 0.886954, 0.882283
+    1.14045,  0.73178,  0.709983, 0.711266, 0.716683,
+    0.727419, 0.735754, 0.74534,  0.754149, 0.761252,
+    0.768799, 0.77552,  0.780306, 0.786253, 0.79139,
+    0.797053, 0.800905, 0.804441, 0.807102, 0.809439,
+    0.815215, 0.818581, 0.821492, 0.823083, 0.824502,
+    0.828764, 0.830907, 0.831392, 0.832376, 0.833232,
+    0.836063, 0.839065, 0.841527, 0.84118,  0.842779,
+    0.840801, 0.844476, 0.846664, 0.848733, 0.844318,
+    0.84837,  0.850549, 0.852183, 0.851242, 0.856488,
+    0.852705, 0.851871, 0.852278, 0.856854, 0.856848
   };
 
-  for (auto track : tracks) {
+  for (int idedx = 0; idedx < dedxTracks.getEntries(); idedx++) {
+    //for (auto track : tracks) {
+
+    CDCDedxTrack* dedxTrack = dedxTracks[idedx];
+    const Track* track = dedxTrack->getRelatedFrom<Track>();
+    const TrackFitResult* fitResult = track->getTrackFitResult(Const::pion);
+    if (!fitResult) {
+      B2WARNING("No related fit for this track...");
+      continue;
+    }
 
     // clean up cuts -> ONLY FOR COSMICS
-    if (track.getMomentum() > 10.0 or track.getNLayerHits() < 43 or track.getNLayerHits() > 64)
+    if (dedxTrack->getMomentum() < 1.0 or dedxTrack->getMomentum() > 10.0 or dedxTrack->getNLayerHits() < 41)
+      continue;
+    if (fitResult->getD0() > 10.0 or (fitResult->getZ0() - 35) > 50.0)
       continue;
 
     // SPECIAL CORRECTION FOR COSMICS -> REMOVE MOMENTUM DEPENDENCE
-    int ibinm = 5.0 * track.getMomentum();
+    int ibinm = 5.0 * dedxTrack->getMomentum();
     if (ibinm < 0) ibinm = 0;
     if (ibinm > 49) ibinm = 49;
 
@@ -102,21 +115,21 @@ void CDCDedxElectronCollectorModule::collect()
     m_dedxhit.clear();
 
     // Simple numbers don't need to be cleared
-    m_dedx = track.getTruncatedMean() / momcorr[ibinm]; // <---- ONLY FOR COSMICS
-    m_costh = track.getCosTheta();
-    m_nhits = track.size();
+    m_dedx = dedxTrack->getTruncatedMean() / 48.0 / momcorr[ibinm]; // <---- ONLY FOR COSMICS
+    m_costh = dedxTrack->getCosTheta();
+    m_nhits = dedxTrack->size();
 
     if (m_nhits > m_maxNumHits) continue;
     for (int i = 0; i < m_nhits; ++i) {
-      m_wire.push_back(track.getWire(i));
-      m_layer.push_back(track.getHitLayer(i));
-      m_doca.push_back(track.getDoca(i));
-      m_enta.push_back(track.getEnta(i));
-      m_dedxhit.push_back(track.getDedx(i) / momcorr[ibinm]); // <---- ONLY FOR COSMICS
+      m_wire.push_back(dedxTrack->getWire(i));
+      m_layer.push_back(dedxTrack->getHitLayer(i));
+      m_doca.push_back(dedxTrack->getDoca(i));
+      m_enta.push_back(dedxTrack->getEnta(i));
+      m_dedxhit.push_back(dedxTrack->getDedx(i) / 48.0 / momcorr[ibinm]); // <---- ONLY FOR COSMICS
     }
 
     // Track information filled
     tree.Fill();
-    means.Fill(m_dedx / momcorr[ibinm]); // <---- ONLY FOR COSMICS
+    means.Fill(m_dedx); // <---- ONLY FOR COSMICS
   }
 }

@@ -42,7 +42,7 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 
   // make histograms to store dE/dx values in bins of cos(theta)
   // bin size can be arbitrary, for now just make uniform bins
-  const int nbins = 40;
+  const int nbins = 100;
   std::vector<double> binedges;
   TH1F* dedxcosth[nbins];
   for (unsigned int i = 0; i < nbins; ++i) {

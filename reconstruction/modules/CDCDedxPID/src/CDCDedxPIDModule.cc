@@ -203,8 +203,10 @@ void CDCDedxPIDModule::initialize()
   // make sure the curve and resolution parameters are reasonable
   if (m_DBCurvePars->getSize() == 0)
     B2ERROR("No dE/dx curve parameters!");
+  else m_curvepars = m_DBCurvePars->getCurvePars();
   if (m_DBSigmaPars->getSize() == 0)
     B2ERROR("No dE/dx sigma parameters!");
+  else m_sigmapars = m_DBSigmaPars->getSigmaPars();
 
   // create instances here to not confuse profiling
   CDCGeometryPar::Instance();
@@ -445,7 +447,7 @@ void CDCDedxPIDModule::event()
         int driftT = cdcHit->getTDCCount();
 
         // we want electrons to be one, so artificially scale the adcCount
-        adcCount /= 46.1659; // <--------- HARD CODED FOR NOW
+        adcCount /= 43.76; // <--------- HARD CODED FOR NOW
 
         RealisticTDCCountTranslator realistictdc;
         double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, 0, true, pocaOnWire.Z(), pocaMom.Phi(), pocaMom.Theta());
@@ -650,6 +652,103 @@ void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetS
   }
 }
 
+double CDCDedxPIDModule::bgCurve(double* x, double* par, int version) const
+{
+  // calculate the predicted mean value as a function of beta-gamma (bg)
+  // this is done with a different function depending on the value of bg
+  double f = 0;
+
+  if (version == 0) {
+    if (par[0] == 1)
+      f = par[1] * std::pow(std::sqrt(x[0] * x[0] + 1), par[3]) / std::pow(x[0], par[3]) *
+          (par[2] - par[5] * std::log(1 / x[0])) - par[4] + std::exp(par[6] + par[7] * x[0]);
+    else if (par[0] == 2)
+      f = par[1] * std::pow(x[0], 3) + par[2] * x[0] * x[0] + par[3] * x[0] + par[4];
+    else if (par[0] == 3)
+      f = -1.0 * par[1] * std::log(par[4] + std::pow(1 / x[0], par[2])) + par[3];
+  }
+
+  return f;
+}
+
+double CDCDedxPIDModule::getMean(double bg) const
+{
+  // define the section of the curve to use
+  double A = 0, B = 0, C = 0;
+  if (bg < 4.5)
+    A = 1;
+  else if (bg < 10)
+    B = 1;
+  else
+    C = 1;
+
+  double x[1]; x[0] = bg;
+  double parsA[9];
+  double parsB[5];
+  double parsC[5];
+
+  parsA[0] = 1; parsB[0] = 2; parsC[0] = 3;
+  for (int i = 0; i < 15; ++i) {
+    if (i < 7) parsA[i + 1] = m_curvepars[i];
+    else if (i < 11) parsB[i % 7 + 1] = m_curvepars[i];
+    else parsC[i % 11 + 1] = m_curvepars[i];
+  }
+
+  // calculate dE/dx from the Bethe-Bloch curve
+  double partA = bgCurve(x, parsA, 0);
+  double partB = bgCurve(x, parsB, 0);
+  double partC = bgCurve(x, parsC, 0);
+
+  return (A * partA + B * partB + C * partC);
+}
+
+double CDCDedxPIDModule::sigmaCurve(double* x, double* par, int version) const
+{
+  // calculate the predicted mean value as a function of beta-gamma (bg)
+  // this is done with a different function depending dE/dx, nhit, and sin(theta)
+  double f = 0;
+
+  if (version == 0) {
+    if (par[0] == 1) { // return dedx parameterization
+      f = par[1] + par[2] * x[0];
+    } else if (par[0] == 2) { // return nhit or sin(theta) parameterization
+      f = par[1] * std::pow(x[0], 4) + par[2] * std::pow(x[0], 3) +
+          par[3] * x[0] * x[0] + par[4] * x[0] + par[5];
+    }
+  }
+
+  return f;
+}
+
+
+double CDCDedxPIDModule::getSigma(double dedx, double nhit, double sin) const
+{
+  if (nhit < 5) nhit = 5;
+  if (sin > 0.99) sin = 0.99;
+
+  double x[1];
+  double dedxpar[3];
+  double nhitpar[6];
+  double sinpar[6];
+
+  dedxpar[0] = 1; nhitpar[0] = 2; sinpar[0] = 2;
+  for (int i = 0; i < 5; ++i) {
+    if (i < 2) dedxpar[i + 1] = m_sigmapars[i];
+    nhitpar[i + 1] = m_sigmapars[i + 2];
+    sinpar[i + 1] = m_sigmapars[i + 7];
+  }
+
+  // determine sigma from the parameterization
+  x[0] = dedx;
+  double corDedx = sigmaCurve(x, dedxpar, 0);
+  x[0] = nhit;
+  double corNHit = sigmaCurve(x, nhitpar, 0);
+  if (nhit > 35) corNHit = 1.0;
+  x[0] = sin;
+  double corSin = sigmaCurve(x, sinpar, 0);
+
+  return (corDedx * corSin * corNHit);
+}
 
 void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize],
                                     double(&predmean)[Const::ChargedStable::c_SetSize], double(&predsigma)[Const::ChargedStable::c_SetSize], double p, double dedx,
@@ -661,8 +760,8 @@ void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize
     double bg = p / pdgIter.getMass();
 
     // determine the predicted mean and resolution
-    double mean = m_DBCurvePars->getMean(bg);
-    double sigma = m_DBSigmaPars->getSigma(mean, nhit, sin);
+    double mean = getMean(bg);
+    double sigma = getSigma(mean, nhit, sin);
 
     predmean[pdgIter.getIndex()] = mean;
     predsigma[pdgIter.getIndex()] = sigma;

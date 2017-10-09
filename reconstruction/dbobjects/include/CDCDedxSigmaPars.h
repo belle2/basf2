@@ -31,7 +31,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedxSigmaPars(std::vector<double> sigmapars): m_sigmapars(sigmapars) {};
+    CDCDedxSigmaPars(short version, std::vector<double> sigmapars): m_version(version), m_sigmapars(sigmapars) {};
 
     /**
      * Destructor
@@ -42,33 +42,32 @@ namespace Belle2 {
      */
     double getSize() const {return m_sigmapars.size(); };
 
-    /** Return run gain
-     * @return run gain
+    /** Get the version for the sigma parameterization
+     */
+    int getVersion() const {return m_version; };
+
+    /** Return vector of sigma parameters
+     * @return vector of sigma parameters
+     */
+    std::vector<double> getSigmaPars() const {return m_sigmapars; };
+
+    /** Return specific sigma parameters
+     * @return specific sigma parameters
      */
     double getSigmaPar(int par) const {return m_sigmapars[par]; };
 
-    /** Set run gain
-     * @param run gain
+    /** Set version number
+     * @param version
+     */
+    void setVersion(short version) {m_version = version; };
+
+    /** Set sigma parameter
+     * @param sigma parameter
      */
     void setSigmaPar(int par, double value) {m_sigmapars[par] = value; };
 
-    /** Get the predicted resolution according to the parameterization
-     */
-    double getSigma(double dedx, double nhit, double sin) const
-    {
-      if (nhit < 5) nhit = 5;
-      if (sin > 0.99) sin = 0.99;
-
-      double corDedx = m_sigmapars[0] + m_sigmapars[1] * dedx;
-      double corNHit = m_sigmapars[2] * std::pow(nhit, 4) + m_sigmapars[3] * std::pow(nhit,
-                       3) + m_sigmapars[4] * nhit * nhit + m_sigmapars[5] * nhit + m_sigmapars[6];
-      double corSin = m_sigmapars[7] * std::pow(sin, 4) + m_sigmapars[8] * std::pow(sin,
-                      3) + m_sigmapars[9] * sin * sin + m_sigmapars[10] * sin + m_sigmapars[11];
-
-      return (corDedx * corSin * corNHit);
-    }
-
   private:
+    short m_version; /**< version number for sigma parameterization */
     std::vector<double> m_sigmapars; /**< dE/dx resolution parameters */
 
     ClassDef(CDCDedxSigmaPars, 1); /**< ClassDef */

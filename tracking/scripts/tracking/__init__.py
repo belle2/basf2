@@ -649,7 +649,11 @@ def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", compo
 
 
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
-                                 sectormap_file=None, PXDminSVDSPs=3):
+                                 sectormap_file=None, custom_setup_name=None, PXDminSVDSPs=3,
+                                 filter_overlapping=True,
+                                 quality_estimator='tripletFit', use_quality_index_cutter=False,
+                                 TFstrictSeeding=True, TFstoreSubsets=False,
+                                 track_finder_module='TrackFinderVXDCellOMat'):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -665,15 +669,21 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     :param suffix: all names of intermediate Storearrays will have the suffix appended. Useful in cases someone needs to
                    put several instances of track finding in one path.
     :param sectormap_file: if set to a finite value, a file will be used instead of the sectormap in the database.
+    :param custom_setup_name: Set a custom setup name for the tree in the sector map.
     :param PXDminSVDSPs: When using PXD require at least this number of SVD SPs for the SPTCs
+    :param filter_overlapping: Whether to use SVDOverlapResolver, Default: True
+    :param quality_estimator: Which QualityEstimator to use. Default: tripletFit
+    :param use_quality_index_cutter: Whether to use VXDTrackCandidatesQualityIndexCutter to cut TCs with QI below 0.1.
+                                     To be used in conjunction with quality_estimator='mcInfo'. Default: False
+    :param TFstrictSeeding: Whether to use strict seeding for paths in the TrackFinder. Default: True
+    :param TFstoreSubsets: Whether to store subsets of paths in the TrackFinder. Default: False
+    :param track_finder_module: Which TrackFinder module to use. Default: TrackFinderVXDCellOMat,
+                                other option: TrackFinderVXDBasicPathFinder
     """
+    # TODO: Add missing parameter dectriptions
     ##########################
     # some setting for VXDTF2
     ##########################
-    use_segment_network_filters = True
-    filter_overlapping = True
-    # the 'tripletFit' currently does not work with PXD
-    quality_estimator = 'tripletFit'  # other option is 'circleFit'
     overlap_filter = 'greedy'  # other option is  'hopfield'
     # setting different for pxd and svd:
     if is_pxd_used(components):
@@ -716,13 +726,10 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
 
     # SecMap Bootstrap
     secMapBootStrap = register_module('SectorMapBootstrap')
-    secMapBootStrap.param(
-        'ReadSectorMap', sectormap_file is not None)  # read from file
-    # this will override ReadSectorMap
-    secMapBootStrap.param('ReadSecMapFromDB', sectormap_file is None)
-    secMapBootStrap.param('SectorMapsInputFile',
-                          sectormap_file or db_sec_map_file)
-    secMapBootStrap.param('SetupToRead', setup_name)
+    secMapBootStrap.param('ReadSectorMap', sectormap_file is not None)  # read from file
+    secMapBootStrap.param('ReadSecMapFromDB', sectormap_file is None)  # this will override ReadSectorMap
+    secMapBootStrap.param('SectorMapsInputFile', sectormap_file or db_sec_map_file)
+    secMapBootStrap.param('SetupToRead', custom_setup_name or setup_name)
     secMapBootStrap.param('WriteSectorMap', False)
     path.add_module(secMapBootStrap)
 
@@ -734,10 +741,9 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     segNetProducer = register_module('SegmentNetworkProducer')
     segNetProducer.param('CreateNeworks', 3)
     segNetProducer.param('NetworkOutputName', nameSegNet)
-    segNetProducer.param('allFiltersOff', not use_segment_network_filters)
     segNetProducer.param('SpacePointsArrayNames', [nameSPs])
     segNetProducer.param('printNetworks', False)
-    segNetProducer.param('sectorMapName', setup_name)
+    segNetProducer.param('sectorMapName', custom_setup_name or setup_name)
     segNetProducer.param('addVirtualIP', False)
     segNetProducer.param('observerType', 0)
     path.add_module(segNetProducer)
@@ -750,13 +756,14 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     # append a suffix to the storearray name
     nameSPTCs = 'SPTrackCands' + suffix
 
-    cellOmat = register_module('TrackFinderVXDCellOMat')
-    cellOmat.param('NetworkName', nameSegNet)
-    cellOmat.param('SpacePointTrackCandArrayName', nameSPTCs)
-    cellOmat.param('SpacePoints', nameSPs)
-    cellOmat.param('printNetworks', False)
-    cellOmat.param('strictSeeding', True)
-    path.add_module(cellOmat)
+    trackFinder = register_module(track_finder_module)
+    trackFinder.param('NetworkName', nameSegNet)
+    trackFinder.param('SpacePointTrackCandArrayName', nameSPTCs)
+    trackFinder.param('SpacePoints', nameSPs)
+    trackFinder.param('printNetworks', False)
+    trackFinder.param('strictSeeding', TFstrictSeeding)
+    trackFinder.param('storeSubsets', TFstoreSubsets)
+    path.add_module(trackFinder)
 
     #################
     # VXDTF2 Step 3
@@ -775,6 +782,12 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     qualityEstimator.param('EstimationMethod', quality_estimator)
     qualityEstimator.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
     path.add_module(qualityEstimator)
+
+    if use_quality_index_cutter:
+        qualityIndexCutter = register_module('VXDTrackCandidatesQualityIndexCutter')
+        qualityIndexCutter.param('minRequiredQuality', 0.1)
+        qualityIndexCutter.param('NameSpacePointTrackCands', nameSPTCs)
+        path.add_module(qualityIndexCutter)
 
     # will discard track candidates (with low quality estimators) if the number of TC is above threshold
     maxCandidateSelection = register_module('BestVXDTrackCandidatesSelector')

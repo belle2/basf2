@@ -1794,10 +1794,10 @@ namespace Belle2 {
           // There is a track match
           result = 1.0;
         }
-        if (cluster->getConnectedRegionId() > 0) {
-          // The cluster is only in the connected region, so its a CR track match
-          result = 2.0;
-        }
+        //if (cluster->getConnectedRegionId() > 0) {
+        //  // The cluster is only in the connected region, so its a CR track match
+        //  result = 2.0;
+        //}
       }
       return result;
     }

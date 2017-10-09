@@ -113,15 +113,12 @@ cut_BC = {
 cut_FitRange = cut_merger([cut_MK, cut_MR, cut_dE, cut_Mbc, cut_hK, cut_hR], "Fit ranges")
 
 #: PID cut for charged hadrons
-== == == =
-# Combined pi0 cuts
 cut_pi0 = cut_merger([cut_mingE, cut_minpi0E, cut_minpi0p], "$\\pi^0$\\ cuts")
 
-# Combined fit range cuts
+#: Combined fit range cuts
 cut_FitRange = cut_merger([cut_MK, cut_MR, cut_dE, cut_Mbc, cut_hK, cut_hR], "Fit ranges")
 
-# PID cut for charged hadrons
->>>>>> > 1bc04a4500d906bc6251706b9b228a4f9c08094d
+#: PID cut for charged hadrons
 cut_chhPID = {
     "cut_name": "PID",
     "cut_alias": "PID of charged",
@@ -129,10 +126,7 @@ cut_chhPID = {
 }
 
 #: List of selection cuts
-== == == =
-# List of selection cuts
 cuts_Kpi0 = [cut_FitRange, cut_pi0, cut_BC]
 
-# Combined selection cuts
->>>>>> > 1bc04a4500d906bc6251706b9b228a4f9c08094d
+#: Combined selection cuts
 cut_Kpi0 = cut_merger(cuts_Kpi0, "DummySel")

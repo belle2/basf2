@@ -381,9 +381,19 @@ namespace Belle2 {
           for (auto expRunData : runRangeData->getExpRunSet()) {
             for (auto expRunRequested : requestedRuns) {
               if (expRunData == expRunRequested) {
-                string objName = getFullObjectPath(name, expRunData);
-                B2DEBUG(100, "Adding TTree " << objName << " from file " << fileName);
-                chain->Add((fileName + "/" + objName).c_str());
+                string objDirName = getFullObjectPath(name, expRunData);
+                TDirectory* objDir = f->GetDirectory(objDirName.c_str());
+                // Annoyingly GetPath() returns a string that isn't useful to TChain.Add(), it contains a
+                // filename.root:/path/to/dir  instead of filename.root/path/to/dir
+                // So we have to construct the path explicitly
+                string objDirPath = objDir->GetPath();
+                // Find all the objects inside, there may be more than one
+                for (auto key : * (objDir->GetListOfKeys())) {
+                  string keyName = key->GetName();
+                  string objectPath = fileName + "/" + objDirName + "/" + keyName;
+                  B2DEBUG(100, "Adding TTree " << objectPath);
+                  chain->Add(objectPath.c_str());
+                }
               }
             }
           }
@@ -394,10 +404,11 @@ namespace Belle2 {
       }
     } else {
       ExpRun allGranExpRun = getAllGranularityExpRun();
-      string objName = getFullObjectPath(name, allGranExpRun);
+      string objDirName = getFullObjectPath(name, allGranExpRun);
       for (const auto& fileName : m_inputFileNames) {
-        B2DEBUG(100, "Adding TTree " << objName << " from file " << fileName);
-        chain->Add((fileName + "/" + objName).c_str());
+        string objectPath = fileName + "/" + objDirName + "/" + name + "_1";  // Only one index for this granularity
+        B2DEBUG(100, "Adding TTree " << objectPath);
+        chain->Add(objectPath.c_str());
       }
     }
     unique_ptr<TTree> tree(chain);

@@ -3,6 +3,7 @@
 #include <string>
 #include <TList.h>
 #include <TTree.h>
+#include <TROOT.h>
 #include <TObject.h>
 #include <TH1F.h>
 #include <TH2F.h>
@@ -30,11 +31,9 @@ namespace Belle2 {
     /// Destructor
     virtual ~CalibRootObj()
     {
-      if (m_object) {
-        m_object->SetDirectory(nullptr);
-        delete m_object;
-        B2DEBUG(100, "Deleted the object stored inside " << this->GetName());
-      }
+      gROOT->GetListOfCleanups()->Remove(this);
+      delete m_object;
+      B2DEBUG(100, "Deleted the object stored inside " << this->GetName());
     }
 
     virtual void merge(const MergeableNamed* other) override
@@ -57,13 +56,10 @@ namespace Belle2 {
      */
     explicit CalibRootObj(T* object) : CalibRootObjBase()
     {
-      B2DEBUG(100, "Creating CalibRootObj");
-      if (m_object) {
-        delete m_object;
-      }
-
-      object->SetDirectory(nullptr);
       m_object = object;
+      m_object->SetDirectory(nullptr);
+      B2DEBUG(100, "Creating CalibRootObj");
+      gROOT->GetListOfCleanups()->Add(this);
     }
 
     T* getObject() const {return m_object;}
@@ -149,6 +145,13 @@ namespace Belle2 {
       TTree* dest = source->CloneTree(0);
       dest->SetName(newName.c_str());
       return dest;
+    }
+
+    /** Called from ROOT if obj is deleted. Kill pointer to avoid double free. */
+    virtual void RecursiveRemove(TObject* obj) override
+    {
+      if (obj == m_object)
+        m_object = nullptr;
     }
 
     ClassDefOverride(CalibRootObj, 1) /// Run dependent mergeable wrapper

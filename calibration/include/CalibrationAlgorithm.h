@@ -300,15 +300,21 @@ namespace Belle2 {
           for (auto expRunData : runRangeData->getExpRunSet()) {
             for (auto expRunRequested : requestedRuns) {
               if (expRunData == expRunRequested) {
-                std::string objName = getFullObjectPath(name, expRunData);
-                B2DEBUG(100, "Adding " << objName << " from file " << fileName);
-                T* objOther = (T*)f->Get(objName.c_str());
-                if (mergedEmpty) {
-                  mergedObjPtr = (T*)objOther->Clone(name.c_str());
-                  mergedObjPtr->SetDirectory(0);
-                  mergedEmpty = false;
-                } else {
-                  list.Add(objOther);
+                // Get the path/directory of the Exp,Run TDirectory that holds the object(s)
+                std::string objDirName = getFullObjectPath(name, expRunData);
+                TDirectory* objDir = f->GetDirectory(objDirName.c_str());
+                // Find all the objects inside, there may be more than one
+                for (auto key : * (objDir->GetListOfKeys())) {
+                  std::string keyName = key->GetName();
+                  B2DEBUG(100, "Adding found object " << keyName << " in the directory " << objDir->GetPath());
+                  T* objOther = (T*)objDir->Get(keyName.c_str());
+                  if (mergedEmpty) {
+                    mergedObjPtr = (T*)objOther->Clone(name.c_str());
+                    mergedObjPtr->SetDirectory(0);
+                    mergedEmpty = false;
+                  } else {
+                    list.Add(objOther);
+                  }
                 }
               }
             }
@@ -319,9 +325,11 @@ namespace Belle2 {
         }
       } else {
         Calibration::ExpRun allGranExpRun = getAllGranularityExpRun();
-        std::string objName = getFullObjectPath(name, allGranExpRun);
-        B2DEBUG(100, "Adding " << objName << " from file " << fileName);
-        T* objOther = (T*)f->Get(objName.c_str());
+        std::string objDirName = getFullObjectPath(name, allGranExpRun);
+        TDirectory* objDir = f->GetDirectory(objDirName.c_str());
+        std::string objPath = objDirName + "/" + name + "_1";
+        T* objOther = (T*)f->Get(objPath.c_str()); // Only one index for granularity == all
+        B2DEBUG(100, "Adding " << objPath);
         if (mergedEmpty) {
           mergedObjPtr = (T*)objOther->Clone(name.c_str());
           mergedObjPtr->SetDirectory(0);

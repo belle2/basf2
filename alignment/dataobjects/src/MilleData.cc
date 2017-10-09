@@ -29,7 +29,6 @@ void MilleData::merge(const MergeableNamed* other)
 
 MilleData* MilleData::Clone(const char* newname) const
 {
-  B2DEBUG(100, "***********Calling Clone of MilleData**********");
   MilleData* obj = new MilleData(*this);
   if (newname && strlen(newname)) {
     obj->SetName(newname);

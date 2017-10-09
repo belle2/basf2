@@ -48,24 +48,33 @@ namespace Belle2 {
     template<typename T>
     T* getObject(std::string name, Belle2::Calibration::KeyType expRun)
     {
-      TDirectory* objectDir = m_dir->GetDirectory(name.c_str());
-      std::string fullName = name + getSuffix(expRun);
-      T* obj;
-      objectDir->GetObject(fullName.c_str(), obj);
-
+      TDirectory* oldDir = gDirectory;
+      std::string objectDirName = name + '/' + getObjectExpRunName(name, expRun);
+      TDirectory* objectDir = m_dir->GetDirectory(objectDirName.c_str());
+      // Does this run's directory already exist?
+      if (!objectDir) {
+        B2DEBUG(100, "No TDirectory for this ExpRun yet, making " << objectDirName);
+        m_dir->mkdir(objectDirName.c_str());
+        objectDir = m_dir->GetDirectory(objectDirName.c_str());
+      }
+      objectDir->cd();
+      std::string prefixedFullName = addPrefix(name);
+      // First check if we currently have an object we're using
+      T* obj = dynamic_cast<T*>(objectDir->FindObject(prefixedFullName.c_str()));
       if (!obj) {
-        B2DEBUG(100, "No object with the name " << fullName << " in " << objectDir->GetPath() << ". Will make one.");
-        obj = dynamic_cast<T*>(m_templateObjects[name]->cloneHeldObj(fullName));
+        B2DEBUG(100, "No object in memory with the name " << prefixedFullName << " in " << gDirectory->GetPath() << ", will make one");
+        obj = dynamic_cast<T*>(m_templateObjects[name]->cloneHeldObj(prefixedFullName));
         obj->SetDirectory(objectDir);
         obj->Reset();
         // Did SetDirectory work? Or was it a dummy class method?
         T* objTest;
-        objectDir->GetObject(fullName.c_str(), objTest);
+        objectDir->GetObject(prefixedFullName.c_str(), objTest);
         if (!objTest) {
-          B2DEBUG(100, "SetDirectory was a dummy. Adding to Object to TDirectory manually.");
+          B2DEBUG(100, "SetDirectory was a dummy function. Adding to Object to TDirectory manually.");
           objectDir->Add(obj);
         }
       }
+      oldDir->cd();
       return obj;
     }
 
@@ -81,9 +90,17 @@ namespace Belle2 {
     std::map<std::string, std::unique_ptr<CalibRootObjBase>> m_templateObjects;
 
     /// We rename objects based on the Exp,Run that they contain so we need to generate a nice naming convention
-    std::string getSuffix(const Belle2::Calibration::KeyType& key);
+    std::string getSuffix(const Belle2::Calibration::ExpRun& key) const;
 
     /// Sometimes it's nice to just pass in the EventMetaData instead of converting manually
-    std::string getSuffix(const EventMetaData& emd);
+    std::string getSuffix(const EventMetaData& emd) const;
+
+    std::string getObjectExpRunName(const std::string& name, const Calibration::ExpRun& expRun) const;
+
+    unsigned int extractKeyIndex(std::string& keyName) const;
+
+    std::string addPrefix(const std::string& name) const;
+
+    const static std::string TMPPREFIX;
   };
 }

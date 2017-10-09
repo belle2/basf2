@@ -141,4 +141,10 @@ void CalibrationCollectorModule::endRun()
 void CalibrationCollectorModule::terminate()
 {
   finish();
+  // Haven't written objects yet if collecting with granularity == all
+  // Write them now that everything is done.
+  if (m_granularity == "all") {
+    m_manager.writeCurrentObjects(m_expRun);
+    m_manager.clearCurrentObjects(m_expRun);
+  }
 }

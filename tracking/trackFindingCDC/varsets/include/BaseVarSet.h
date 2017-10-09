@@ -9,9 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
-
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
+
+#include <tracking/trackFindingCDC/utilities/CompositeProcessingSignalListener.h>
 
 #include <tracking/trackFindingCDC/utilities/Named.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
@@ -28,7 +28,7 @@ namespace Belle2 {
      *  Base class defining the interface for various different implementation of sets of variables.
      */
     template<class AObject>
-    class BaseVarSet : public ProcessingSignalListener {
+    class BaseVarSet : public CompositeProcessingSignalListener {
 
     public:
       /// Object type from which variables shall be extracted.

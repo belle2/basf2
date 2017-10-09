@@ -10,11 +10,12 @@
 #pragma once
 
 #include <tracking/ckf/general/findlets/StateRejecter.dcl.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 
 namespace Belle2 {
-  template <class AState, class AFilter>
-  StateRejecter<AState, AFilter>::StateRejecter() : Super()
+  template <class AState, class AFindlet>
+  StateRejecter<AState, AFindlet>::StateRejecter() : Super()
   {
     Super::addProcessingSignalListener(&m_firstFilter);
     Super::addProcessingSignalListener(&m_advanceFilter);
@@ -24,19 +25,19 @@ namespace Belle2 {
   };
 
   /// Expose the parameters of the subfindlet
-  template <class AState, class AFilter>
-  void StateRejecter<AState, AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+  template <class AState, class AFindlet>
+  void StateRejecter<AState, AFindlet>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
-    m_firstFilter.exposeParameters(moduleParamList, prefix);
-    m_advanceFilter.exposeParameters(moduleParamList, prefix);
-    m_secondFilter.exposeParameters(moduleParamList, prefix);
-    m_updateFilter.exposeParameters(moduleParamList, prefix);
-    m_thirdFilter.exposeParameters(moduleParamList, prefix);
+    m_firstFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("first", prefix));
+    m_advanceFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("advance", prefix));
+    m_secondFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("second", prefix));
+    m_updateFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("update", prefix));
+    m_thirdFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("third", prefix));
   };
 
-  template <class AState, class AFilter>
-  void StateRejecter<AState, AFilter>::apply(const std::vector<const AState*>& currentPath,
-                                             std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates)
+  template <class AState, class AFindlet>
+  void StateRejecter<AState, AFindlet>::apply(const std::vector<const AState*>& currentPath,
+                                              std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates)
   {
     m_firstFilter.apply(currentPath, childStates);
     m_advanceFilter.apply(currentPath, childStates);

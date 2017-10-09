@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/utilities/Relation.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <vector>
 #include <string>
@@ -22,10 +22,10 @@ namespace Belle2 {
   /**
    */
   template <class AState, class AStateRejecter, class AResult>
-  class TreeSearcher : public TrackFindingCDC::Findlet<const AState, const TrackFindingCDC::Relation<AState>, AResult> {
+  class TreeSearcher : public TrackFindingCDC::Findlet<const AState, const TrackFindingCDC::WeightedRelation<AState>, AResult> {
   private:
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const AState, const TrackFindingCDC::Relation<AState>, AResult>;
+    using Super = TrackFindingCDC::Findlet<const AState, const TrackFindingCDC::WeightedRelation<AState>, AResult>;
 
   public:
     /// Construct this findlet and add the subfindlet as listener
@@ -41,13 +41,13 @@ namespace Belle2 {
      * traversal.
      */
     void apply(const std::vector<AState>& seededStates,
-               const std::vector<TrackFindingCDC::Relation<AState>>& relations,
+               const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
                std::vector<AResult>& results) final;
 
   private:
     /// Implementation of the traverseTree function
     void traverseTree(std::vector<const AState*>& path,
-                      const std::vector<TrackFindingCDC::Relation<AState>>& relations,
+                      const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
                       std::vector<AResult>& results);
 
   private:

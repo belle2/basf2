@@ -10,15 +10,15 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/utilities/Relation.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 namespace Belle2 {
   class ModuleParamList;
 
-  template<class AState, class ARelationFilter>
-  class CKFRelationCreator : public TrackFindingCDC::Findlet<const AState, const AState, TrackFindingCDC::Relation<AState>> {
+  template<class AState, class ASeedRelationFilter, class AHitRelationFilter>
+  class CKFRelationCreator : public TrackFindingCDC::Findlet<AState, AState, TrackFindingCDC::WeightedRelation<AState>> {
   public:
-    using Super = TrackFindingCDC::Findlet<const AState, const AState, TrackFindingCDC::Relation<AState>>;
+    using Super = TrackFindingCDC::Findlet<AState, AState, TrackFindingCDC::WeightedRelation<AState>>;
 
     /// Construct this findlet and add the subfindlet as listener
     CKFRelationCreator();
@@ -28,11 +28,13 @@ namespace Belle2 {
 
     /**
      */
-    void apply(const std::vector<AState>& seedStates, const std::vector<AState>& states,
-               std::vector<TrackFindingCDC::Relation<AState>>& relations) override;
+    void apply(std::vector<AState>& seedStates, std::vector<AState>& states,
+               std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations) override;
 
   private:
-    /// Subfindlet for the relation checking
-    ARelationFilter m_filter;
+    /// Subfindlet for the relation checking between seed and hits
+    ASeedRelationFilter m_seedFilter;
+    /// Subfindlet for the relation checking between hits and hits
+    AHitRelationFilter m_hitFilter;
   };
 }

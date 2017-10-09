@@ -27,7 +27,7 @@ namespace Belle2 {
 
   template <class AState, class AStateRejecter, class AResult>
   void TreeSearcher<AState, AStateRejecter, AResult>::apply(const std::vector<AState>& seededStates,
-                                                            const std::vector<TrackFindingCDC::Relation<AState>>& relations,
+                                                            const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
                                                             std::vector<AResult>& results)
   {
     B2ASSERT("Expected relation to be sorted",
@@ -48,7 +48,7 @@ namespace Belle2 {
 
   template <class AState, class AStateRejecter, class AResult>
   void TreeSearcher<AState, AStateRejecter, AResult>::traverseTree(std::vector<const AState*>& path,
-      const std::vector<TrackFindingCDC::Relation<AState>>& relations,
+      const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
       std::vector<AResult>& results)
   {
     // Implement only graph traversal logic and leave the extrapolation and selection to the
@@ -58,9 +58,10 @@ namespace Belle2 {
       TrackFindingCDC::asRange(std::equal_range(relations.begin(), relations.end(), currentState));
 
     std::vector<TrackFindingCDC::WithWeight<AState*>> childStates;
-    for (const TrackFindingCDC::Relation<AState>& continuation : continuations) {
+    for (const TrackFindingCDC::WeightedRelation<AState>& continuation : continuations) {
       AState* childState = continuation.getTo();
-      childStates.emplace_back(childState);
+      TrackFindingCDC::Weight weight = continuation.getWeight();
+      childStates.emplace_back(childState, weight);
     }
 
     // Do everything with child states, linking, extrapolation, teaching, discarding, what have

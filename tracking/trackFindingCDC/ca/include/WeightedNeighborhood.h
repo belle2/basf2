@@ -69,12 +69,13 @@ namespace Belle2 {
       /// Appends relations between elements in the given AItems using the ARelationFilter.
       template <class ARelationFilter, class AItems>
       static void appendUsing(ARelationFilter& relationFilter,
-                              AItems& items,
+                              AItems& fromItems,
+                              AItems& toItems,
                               std::vector<WeightedRelation<AItem>>& weightedRelations)
       {
-        for (AItem& from : items) {
+        for (AItem& from : fromItems) {
           auto possibleNeighbors =
-            relationFilter.getPossibleNeighbors(from, std::begin(items), std::end(items));
+            relationFilter.getPossibleNeighbors(from, std::begin(toItems), std::end(toItems));
           for (AItem& to : possibleNeighbors) {
             // Relations point to the elements. Take the address of the item here
             AItem* ptrFrom = &from;
@@ -90,6 +91,15 @@ namespace Belle2 {
         std::sort(std::begin(weightedRelations), std::end(weightedRelations));
       }
       /**@}*/
+
+      /// Shortcut for appending with from and to starting in the same set of elements.
+      template <class ARelationFilter, class AItems>
+      static void appendUsing(ARelationFilter& relationFilter,
+                              AItems& items,
+                              std::vector<WeightedRelation<AItem>>& weightedRelations)
+      {
+        appendUsing(relationFilter, items, items, weightedRelations);
+      }
 
     public:
       /// Using the constructors of the base class

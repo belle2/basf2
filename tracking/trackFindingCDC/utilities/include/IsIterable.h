@@ -17,7 +17,7 @@ namespace Belle2 {
 
     /// Type predicate to check if Ts is iterable by means of std::begin().
     template<class Ts>
-    constexpr bool isApplicable()
+    constexpr bool isIterable()
     {
       return isDetected<GetIterator, Ts>();
     }

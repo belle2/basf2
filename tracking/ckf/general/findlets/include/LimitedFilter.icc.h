@@ -42,7 +42,7 @@ namespace Belle2 {
 
     TrackFindingCDC::erase_remove_if(childStates, TrackFindingCDC::HasNaNWeight());
 
-    if (m_param_useNStates > 0 and childStates.size() > m_param_useNStates) {
+    if (m_param_useNStates > 0 and childStates.size() > static_cast<unsigned int>(m_param_useNStates)) {
       std::sort(childStates.begin(), childStates.end(), TrackFindingCDC::LessOf<TrackFindingCDC::GetWeight>());
       childStates.erase(childStates.begin() + m_param_useNStates, childStates.end());
     }

@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/utilities/Relation.h>
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 
 #include <vector>
 #include <string>
@@ -19,29 +19,31 @@
 namespace Belle2 {
   class ModuleParamList;
 
-  template <class AState, class AFilter>
-  class LimitedFilter : public TrackFindingCDC::Findlet<const AState* const, TrackFindingCDC::WithWeight<AState*>> {
+  template <class AState>
+  class OnStateApplier : public TrackFindingCDC::Findlet<const AState* const, TrackFindingCDC::WithWeight<AState*>> {
   private:
     /// Parent class
     using Super = TrackFindingCDC::Findlet<const AState* const, TrackFindingCDC::WithWeight<AState*>>;
 
   public:
+    /// The object this filter refers to
+    using Object = std::pair<const std::vector<const AState*>, AState*>;
+
     /// Construct this findlet and add the subfindlet as listener
-    LimitedFilter();
+    OnStateApplier();
 
     /// Expose the parameters of the subfindlet
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
     /**
      */
     void apply(const std::vector<const AState*>& currentPath,
-               std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates) final;
+               std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates) override;
 
-  private:
-    /// State filter to decide which available continuations should be traversed next.
-    AFilter m_filter;
+    /// Return the truth information requirement of the filter itself
+    virtual bool needsTruthInformation();
 
-    /// Parameter how many objects should pass maximal
-    int m_param_useNStates = 0;
+    /// Copy the filter operator to this method
+    virtual TrackFindingCDC::Weight operator()(const Object& object);
   };
 }

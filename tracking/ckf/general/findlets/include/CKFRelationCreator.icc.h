@@ -12,7 +12,8 @@
 #include <tracking/ckf/general/findlets/CKFRelationCreator.dcl.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
+#include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 namespace Belle2 {
   template<class AState, class ASeedRelationFilter, class AHitRelationFilter>
@@ -35,10 +36,13 @@ namespace Belle2 {
       std::vector<AState>& states,
       std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations)
   {
+    const std::vector<AState*> seedStatePointers = TrackFindingCDC::as_pointers<AState>(seedStates);
+    const std::vector<AState*> statePointers = TrackFindingCDC::as_pointers<AState>(states);
+
     // relations += seed states -> states
-    TrackFindingCDC::WeightedNeighborhood<AState>::appendUsing(m_seedFilter, seedStates, states, relations);
+    TrackFindingCDC::RelationFilterUtil::appendUsing(m_seedFilter, seedStatePointers, statePointers, relations);
 
     // relations += states -> states
-    TrackFindingCDC::WeightedNeighborhood<AState>::appendUsing(m_hitFilter, states, states, relations);
+    TrackFindingCDC::RelationFilterUtil::appendUsing(m_hitFilter, statePointers, statePointers, relations);
   }
 }

@@ -67,7 +67,6 @@ void CaTestModule::prepare()
 
 void CaTestModule::collect()
 {
-  static int nevents = 0;
   StoreObjPtr<EventMetaData> emd;
 
   m_procId = ProcHandler::EvtProcID();

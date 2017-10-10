@@ -95,7 +95,7 @@ string CalibObjManager::getSuffix(const ExpRun& expRun) const
 
 string CalibObjManager::getSuffix(const EventMetaData& emd) const
 {
-  ExpRun key = make_pair(emd.getExperiment(), emd.getRun());
+  const ExpRun key = make_pair(emd.getExperiment(), emd.getRun());
   return getSuffix(key);
 }
 

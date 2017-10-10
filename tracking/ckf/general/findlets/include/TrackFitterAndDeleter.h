@@ -22,8 +22,10 @@ namespace Belle2 {
     /// Fit the tracks and remove unfittable ones.
     void apply(std::vector<RecoTrack*>& recoTracks) override;
 
+    void beginRun() override;
+
   private:
     /// The track fitter algorithm to use
-    TrackFitter m_trackFitter;
+    std::unique_ptr<TrackFitter> m_trackFitter;
   };
 }

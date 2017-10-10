@@ -16,7 +16,7 @@ using namespace Belle2;
 void TrackFitterAndDeleter::apply(std::vector<RecoTrack*>& recoTracks)
 {
   for (RecoTrack* recoTrack : recoTracks) {
-    m_trackFitter.fit(*recoTrack);
+    m_trackFitter->fit(*recoTrack);
   }
 
   // Remove all non-fitted tracks
@@ -24,4 +24,9 @@ void TrackFitterAndDeleter::apply(std::vector<RecoTrack*>& recoTracks)
     return not recoTrack->wasFitSuccessful();
   };
   TrackFindingCDC::erase_remove_if(recoTracks, trackWasNotFitted);
+}
+
+void TrackFitterAndDeleter::beginRun()
+{
+  m_trackFitter.reset(new TrackFitter());
 }

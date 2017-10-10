@@ -245,6 +245,15 @@ MCParticleColorMap::MCParticleColorMap()
 {
 }
 
+std::string MCParticleColorMap::info()
+{
+  std::ostringstream oss;
+  for (const std::pair<int, std::string>& colorForMCParticleID : m_usedColors) {
+    oss << "MCParticle " << colorForMCParticleID.first << " -> " << colorForMCParticleID.second << "\n";
+  }
+  return oss.str();
+}
+
 std::string MCParticleColorMap::map(int index __attribute__((unused)), const CDCHit& hit)
 {
   MCParticle* mcParticle = hit.getRelated<MCParticle>("MCParticles");

@@ -7,10 +7,8 @@ from ROOT import TFile, TCanvas, TH1F, TH2F, TGaxis, TStyle, TProfile
 from ROOT import gROOT, gStyle, gPad
 import os
 import sys
-import inspect
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir)
+import pathlib
+sys.path.insert(0, pathlib.Path(__file__).parents[1])
 from Global.fit_variables import fit_variables
 from Global.selection_variables import *
 from Global.cuts import *
@@ -27,21 +25,17 @@ def Single_Variable_Plot(
         p_address="Plots/",
         h_address="Hists/",
         MCTrue=False):
-    # gROOT.ProcessLine("gROOT->SetBatch()")
+    """
+    This function creates and saves 1D hist.
+    """
     gROOT.SetBatch()
     gStyle.SetOptStat(0)
-    # Variable shoule be dictionary with fields like:
-    #   {'tuple_name':'B_R2',
-    #   'lLim': 0.,
-    #   'uLim': 1.,
-    #   'xaxis':"R2"}
-    #
     f = TFile(file_name)
     tree = f.Get(tree_name)
     nBins = 100
     mode_name = file_name.split("/")[-1].split(".")[0] + "_" + tree_name
     if MCTrue:
-        varname = variable['tuple_name'].replace("B__", "B__MCT_")
+        varname = variable['tuple_name'].replace("B_", "B_MCT_")
     else:
         varname = variable['tuple_name']
     if alias == "":
@@ -75,21 +69,17 @@ def Variable_Plot_2D(
         p_address="Plots/",
         h_address="Hists/",
         MCTrue=False):
-    # gROOT.ProcessLine("gROOT->SetBatch()")
+    """
+    This function creates and saves 2D hist.
+    """
     gROOT.SetBatch()
     gStyle.SetOptStat(0)
-    # Variable shoule be dictionary with fields like:
-    #   {'tuple_name':'B_R2',
-    #   'lLim': 0.,
-    #   'uLim': 1.,
-    #   'xaxis':"R2"}
-    #
     f = TFile(file_name)
     tree = f.Get(tree_name)
     mode_name = file_name.split("/")[-1].split(".")[0] + "_" + tree_name
     if MCTrue:
-        varnamex = variablex['tuple_name'].replace("B__", "B__MCT_")
-        varnamey = variabley['tuple_name'].replace("B__", "B__MCT_")
+        varnamex = variablex['tuple_name'].replace("B_", "B_MCT_")
+        varnamey = variabley['tuple_name'].replace("B_", "B_MCT_")
     else:
         varnamex = variablex['tuple_name']
         varnamey = variabley['tuple_name']
@@ -124,65 +114,11 @@ def Variable_Plot_2D(
     return h_address + obj_name + ".root"
 
 
-def Fit_Variables_Plot(file_name, tree_name="B2KstRho", cut=no_cut):
-    # gROOT.ProcessLine("gROOT->SetBatch()")
-    gROOT.SetBatch()
-    gStyle.SetOptStat(0)
-    f = TFile(file_name)
-    tree = f.Get(tree_name)
-    mode_name = file_name.split("/")[-1].split(".")[0] + "_" + tree_name
-    c = TCanvas("c", "c", 600, 900)
-    plots = []
-    for i, v in enumerate(fit_variables):
-        h = TH1F("histo_" + str(i), ";" + fit_variables[v]['xaxis'] + ";", 100, fit_variables[v]['lLim'], fit_variables[v]['uLim'])
-        tree.Project("histo_" + str(i), fit_variables[v]['tuple_name'], cut["cut"])
-        plots.append(h)
-    c.Divide(2, 3)
-    for i, h in enumerate(plots):
-        c.cd(i + 1)
-        h.Draw()
-    if not os.path.exists("Plots/" + mode_name):
-        os.system("mkdir Plots/" + mode_name)
-    if not os.path.exists("Plots/" + mode_name + "/Fit_Variables"):
-        os.system("mkdir Plots/" + mode_name + "/Fit_Variables")
-    c.SaveAs("Plots/" + mode_name + "/Fit_Variables/" + cut["cut_name"] + ".pdf")
-    return
-
-
-def Selection_Variables_Plot(file_name, tree_name, cut=no_cut, final_state="auto"):
-    if final_state == "auto":
-        if "K+pi0" in file_name:
-            mode = "Kpi0"
-        elif "K0spi+" in file_name:
-            mode = "K0spi"
-        else:
-            print("Failed to define set of selection variables for " + file_name + ", terminating")
-            return
-    else:
-        mode = final_state
-    if mode == "K0spi":
-        all_selections = [k0s_variables,
-                          K0spi_pid_variables,
-                          vertex_variables,
-                          fit_variables]
-    elif mode == "Kpi0":
-        all_selections = [pi0_variables,
-                          Kpi0_pid_variables,
-                          vertex_variables,
-                          fit_variables]
-    else:
-        print("Failed to find correct final state. Exiting.")
-        return
-    # We can't look for CB suppression variables at  gen-level candidates
-    if "MC" not in tree_name:
-        all_selections.append(CB_suppression)
-    for s in all_selections:
-        for v in s:
-            Single_Variable_Plot(file_name, tree_name, s[v], v, cut)
-    return
-
-
 def binom_err(k, N):
+    """
+    This function returns ratio and its uncertainty calculated
+    with assumption of binomial distribution.
+    """
     if N == 0:
         if k == 0:
             ratio = 1
@@ -202,6 +138,11 @@ def binom_err(k, N):
 
 
 def eff_err(k, N):
+    """
+    This function returns ratio and its uncertainty calculated
+    with assumption of binomial distribution.
+    It treats special cases differently from binom_err(k, N).
+    """
     if N == 0:
         if k == 0:
             ratio = 0
@@ -220,6 +161,10 @@ def eff_err(k, N):
 
 
 def indep_err(a, b):
+    """
+    This function returns ratio and its uncertainty for
+    two independent variables.
+    """
     if b == 0:
         if a == 0:
             ratio = 0
@@ -237,6 +182,18 @@ def indep_err(a, b):
 
 
 def hist_algebra(hists, extra):
+    """
+    This function defines operations with histograms,
+    which can be preformed when several histograms
+    are plot together. Now defined:
+        a//b - for each bin of hists a and b, ther ratio
+        is calculated with binomial error.
+
+        a/b - for each bin of hists a and b, ther ratio
+        is calculated with assumption of their independence
+
+        a%b - for each bin of a and b, a/(a+b) ratio is claculated
+    """
     if re.match("[0-9]//[0-9]", extra['expression']):
         h1 = int(extra['expression'].split("//")[0])
         h2 = int(extra['expression'].split("//")[1])
@@ -304,13 +261,14 @@ def Plot_Hists_Together(
         logY=False,
         extra="",
         leg_columns=4):
-    gROOT.SetBatch()
     """
      Hists should be defined a list of following dictionaries:
      hist = {hist_addr:<address of .root file with histo>,
             name:<String to be shown in TLegend>
             }
     """
+    gROOT.SetBatch()
+
     colors = [2, 4, 8, 46, 6, 40, 3, 7]
     mstyle = [20, 21, 22, 23, 29, 33, 34]
 
@@ -393,13 +351,17 @@ def Plot_Hists_Together(
 
 
 def Compare(samples, variables, description, extra="", Normalized=False):
+    """
+    For each variable of the given set, this function plots together
+    corresponding distribution for several samples.
+    """
     for varset in variables:
         for var in varset:
             hists = []
             logY = False
             try:
                 logY = varset[var]["logY"]
-            except:
+            except BaseException:
                 pass
             for s in samples:
                 hist_addr = Single_Variable_Plot(s['file_name'], s['tree_name'], varset[var], var, s["cut"], MCTrue=s['MCTrue'])
@@ -422,13 +384,19 @@ def Compare(samples, variables, description, extra="", Normalized=False):
 
 
 def Var_Resolution(tree, variable, cut=no_cut, nBins=100):
+    """
+    This function returns resolution of given variable
+    """
     h = TH1F("h", "Resolution of " + variable['xaxis'], nBins, variable['lLim'], variable['uLim'])
-    mct_tuple_name = variable['tuple_name'].replace("B__", "B__MCT_")
+    mct_tuple_name = variable['tuple_name'].replace("B_", "B_MCT_")
     tree.Project("h", variable['tuple_name'], cut["cut"])
     return [h.GetStdDev(), h.GetStdDevError()]
 
 
 def Resolution_Plots(file_name, tree_name, variable, alias="", cut=no_cut, p_address="Plots/", h_address="Hists/"):
+    """
+    This function does resolution study of fit variable.
+    """
     gROOT.SetBatch()
     gStyle.SetOptStat(0)
     f = TFile(file_name)
@@ -452,17 +420,17 @@ def Resolution_Plots(file_name, tree_name, variable, alias="", cut=no_cut, p_add
     if not os.path.exists(h_address):
         os.system("mkdir -p " + h_address)
 
-    mct_tuple_name = variable['tuple_name'].replace("B__", "B__MCT_")
+    mct_tuple_name = variable['tuple_name'].replace("B_", "B_MCT_")
     llim = variable['lLim']
     ulim = variable['uLim']
     try:
         mcllim = variable['MClLim']
         mculim = variable['MCuLim']
-    except:
+    except BaseException:
         mcllim = variable['lLim']
         mculim = variable['uLim']
     res_scale = 1
-    if variable['tuple_name'] == "B__Mbc_corr":
+    if variable['tuple_name'] == "B_Mbc_corr":
         res_scale = 0.01
 
     h1 = TH2F(
@@ -509,7 +477,7 @@ def Resolution_Plots(file_name, tree_name, variable, alias="", cut=no_cut, p_add
     for var in fit_variables:
         res = TH1F("histo", ";Generated " + variable['xaxis'] + "; #sigma (Arb.units)", nBins, mcllim, mculim)
         res_2D = TH2F(var, var, nBins, mcllim, mculim, 2 * nBins, -ulim, ulim)
-        var_mct_tuple_name = fit_variables[var]['tuple_name'].replace("B__", "B__MCT_")
+        var_mct_tuple_name = fit_variables[var]['tuple_name'].replace("B_", "B_MCT_")
         tree.Project(
             var,
             "(" +

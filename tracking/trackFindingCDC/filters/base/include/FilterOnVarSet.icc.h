@@ -75,7 +75,8 @@ namespace Belle2 {
     }
 
     template <class AFilter>
-    auto OnVarSet<AFilter>::getVarSet() -> AVarSet& {
+    auto OnVarSet<AFilter>::getVarSet() const -> AVarSet&
+    {
       return *m_varSet;
     }
 

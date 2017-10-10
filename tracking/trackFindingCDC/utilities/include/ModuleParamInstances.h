@@ -1,5 +1,5 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
+1;4205;0c * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -43,5 +43,6 @@ namespace Belle2 {
   extern template class Belle2::ModuleParam<std::map<short, unsigned long>>;
   extern template class Belle2::ModuleParam<std::map<int, int>>;
 
+  extern template class Belle2::ModuleParam<std::tuple<double, double>>;
   extern template class Belle2::ModuleParam<std::tuple<double, double, double>>;
 }

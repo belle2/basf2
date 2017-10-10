@@ -32,7 +32,7 @@ namespace Belle2 {
      *  Dummy implementation based on UnionVarSet. The UnionVarSet can be optimized and leverage that
      *  the types of all nested variable sets are known at compile time.
      */
-    template<class... AVarSets>
+    template <class... AVarSets>
     class VariadicUnionVarSet : public BaseVarSet<typename FirstType<AVarSets...>::Object> {
 
     private:
@@ -51,7 +51,7 @@ namespace Belle2 {
       /// Create the union variable set.
       explicit VariadicUnionVarSet()
       {
-        EvalVariadic{(m_multiVarSet.push_back(makeUnique<AVarSets>()), true)...};
+        EvalVariadic{(m_multiVarSet.push_back(makeUnique<AVarSets>()), std::ignore)...};
         assert(m_multiVarSet.size() == sizeof...(AVarSets));
       }
 
@@ -60,29 +60,8 @@ namespace Belle2 {
 
       /// Initialize all contained variable set before event processing.
       void initialize() final {
-        m_multiVarSet.initialize();
-      }
-
-      /// Signal the beginning of a new run
-      void beginRun() final {
-        m_multiVarSet.beginRun();
-      }
-
-      /// Signal the beginning of a new event
-      void beginEvent() override
-      {
-        m_multiVarSet.beginEvent();
-      }
-
-      /// Signal the end of a run
-      void endRun() override
-      {
-        m_multiVarSet.beginRun();
-      }
-
-      /// Terminate all contained variable set after event processing.
-      void terminate() final {
-        m_multiVarSet.terminate();
+        this->addProcessingSignalListener(&m_multiVarSet);
+        Super::initialize();
       }
 
       /**
@@ -100,7 +79,7 @@ namespace Belle2 {
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
-      std::vector<Named<Float_t*>> getNamedVariables(std::string prefix) override
+      std::vector<Named<Float_t*>> getNamedVariables(const std::string& prefix) override
       {
         return m_multiVarSet.getNamedVariables(prefix);
       }
@@ -109,7 +88,7 @@ namespace Belle2 {
        *   Pointer to the variable with the given name.
        *   Returns nullptr if not found.
        */
-      MayBePtr<Float_t> find(std::string varName) override
+      MayBePtr<Float_t> find(const std::string& varName) override
       {
         return m_multiVarSet.find(varName);
       }

@@ -35,22 +35,14 @@ namespace Belle2 {
 
     public:
       /// Default constructor for ROOT compatibility.
-      CDCTrajectory2D()
-        : m_localOrigin()
-        , m_localPerigeeCircle()
-      {
-      }
+      CDCTrajectory2D();
 
       /**
        *  Constructs a trajectory from a generalized circle.
        *  Constructs a trajectory which is described by the given line or circle.
        *  The start point is set to the closest approach to the origin.
        */
-      explicit CDCTrajectory2D(const UncertainPerigeeCircle& perigeeCircle)
-        : m_localOrigin(0.0, 0.0)
-        , m_localPerigeeCircle(perigeeCircle)
-      {
-      }
+      explicit CDCTrajectory2D(const UncertainPerigeeCircle& perigeeCircle);
 
       /**
        *  Constructs a trajectory from a generalized circle and a start point.
@@ -61,12 +53,7 @@ namespace Belle2 {
        */
       CDCTrajectory2D(const Vector2D& localOrigin,
                       const UncertainPerigeeCircle& localPerigeeCircle,
-                      double flightTime = NAN)
-        : m_localOrigin(localOrigin)
-        , m_localPerigeeCircle(localPerigeeCircle)
-        , m_flightTime(flightTime)
-      {
-      }
+                      double flightTime = NAN);
 
       /**
        *  Construct a trajectory with given start point, transverse momentum at the start point,
@@ -84,48 +71,69 @@ namespace Belle2 {
 
     public:
       /// Checks if the circle is already set to a valid value.
-      bool isFitted() const
-      {
-        return not getLocalCircle()->isInvalid();
-      }
+      bool isFitted() const;
 
       /// Clears all information from this trajectoy
-      void clear()
-      {
-        m_localOrigin.set(0.0, 0.0);
-        m_localPerigeeCircle.invalidate();
-        m_flightTime = NAN;
-      }
+      void clear();
 
     public:
       /// Reverses the trajectory in place
-      void reverse()
-      {
-        m_localPerigeeCircle.reverse();
-        m_flightTime = -m_flightTime;
-      }
+      void reverse();
 
       /// Returns the reverse trajectory as a copy
-      CDCTrajectory2D reversed() const
-      {
-        return CDCTrajectory2D(getLocalOrigin(), getLocalCircle().reversed(), -getFlightTime());
-      }
+      CDCTrajectory2D reversed() const;
 
     public:
       /**
-       *  Gives the three dimensional point which is on the dirft circle away from the wire line.
+       *  Gives the two z postions where the given drift circle on the wire line touches the trajectory
+       *
+       *  Only works for the skew stereo wires
+       *
+       *  @param wireLine  The geometrical wire line on which the hit is located-
+       *  @param distance  The desired distance from the wire line a.k.a. drift length
+       *  @param z         The expected value of z to which to closest solution should be selected.
+       */
+      std::array<double, 2> reconstructBothZ(const WireLine& wireLine, double distance = 0.0, double z = 0) const;
+
+      /**
+       *  Gives the one z postions within the CDC closest to the given z
+       *  where the given drift circle on the wire line touches the trajectory.
+       *
+       *  Only works for the skew stereo wires.
+       *
+       *  @param wireLine  The geometrical wire line on which the hit is located-
+       *  @param distance  The desired distance from the wire line a.k.a. drift length
+       *  @param z         The expected value of z to which to closest solution should be selected.
+       */
+      double reconstructZ(const WireLine& wireLine, double distance = 0.0, double z = 0) const;
+
+      /**
+       *  Gives the two three dimensional points where the drift circle touches the wire line.
+       *
+       *  Only works for the skew stereo wires.
+       *
+       *  @param wireLine  The geometrical wire line on which the hit is located-
+       *  @param distance  The desired distance from the wire line a.k.a. drift length
+       *  @param z         The expected value of z to which to closest solution should be selected.
+       */
+      std::array<Vector3D, 2> reconstructBoth3D(const WireLine& wireLine, double distance = 0.0, double z = 0) const;
+
+      /**
+       *  Gives the one three dimensional postions within the CDC  closest to the given z
+       *  where the given drift circle on the wire line touches the trajectory.
        *
        *  This method makes the reconstruction of the z coordinate possible by using the skewness \n
        *  stereo layer of the stereo wires.  The point is determined such that it is at the (signed)
        *  distance to  the wire line.
+       *
+       *  @param wireLine  The geometrical wire line on which the hit is located-
+       *  @param distance  The desired distance from the wire line a.k.a. drift length
+       *  @param z         The expected value of z to which to closest solution should be selected.
        */
-      Vector3D reconstruct3D(const WireLine& wireLine, double distance = 0.0) const;
+      Vector3D reconstruct3D(const WireLine& wireLine, double distance = 0.0, double z = 0) const;
 
       /// Calculates the closest approach on the trajectory to the given point
-      Vector2D getClosest(const Vector2D& point) const
-      {
-        return getLocalCircle()->closest(point - getLocalOrigin()) + getLocalOrigin();
-      }
+      Vector2D getClosest(const Vector2D& point) const;
 
     private:
       /**

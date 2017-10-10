@@ -14,6 +14,8 @@
 #include <memory>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
     /// Filter adapter type that joins two filter results in an and like fashion
     template<class AFilter>
@@ -29,6 +31,9 @@ namespace Belle2 {
 
       /// Default destructor
       ~AndFilter();
+
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Return result of right hand side filter if left hand side filter acknowledges.
       Weight operator()(const typename AFilter::Object& obj) final;

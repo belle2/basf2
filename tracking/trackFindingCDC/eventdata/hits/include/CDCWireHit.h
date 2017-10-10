@@ -262,7 +262,7 @@ namespace Belle2 {
        *    yield the closest approach of the drift circle to the trajectory
        *    in the reference plane.
        */
-      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, ERightLeft rlInfo) const;
+      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, ERightLeft rlInfo, double z = 0) const;
 
       /**
        *  Applys the conformal transformation to the drift circle this hit represents.

@@ -16,8 +16,9 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeoControlPar.h>
 #include <cdc/simulation/CDCSimControlPar.h>
+#include <cdc/utilities/OpenFile.h>
 
-#include <float.h>
+//#include <float.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -25,8 +26,8 @@
 #include <iomanip>
 
 #include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/device/file.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
+//#include <boost/iostreams/device/file.hpp>
+//#include <boost/iostreams/filter/gzip.hpp>
 
 #include <Math/ChebyshevPol.h>
 
@@ -449,7 +450,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 
 }
 
-//TODO: move the following two functions to cdc/utilities
+/*
+//TODO: move the following two functions to cdc/utilities <-done
 // Open a file
 void CDCGeometryPar::openFile(std::ifstream& ifs, const std::string& fileName0) const
 {
@@ -468,8 +470,6 @@ void CDCGeometryPar::openFile(std::ifstream& ifs, const std::string& fileName0) 
     if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName1 << " !");
   }
 }
-
-/*
 // Open a file using boost (to be able to read a gzipped file)
 void CDCGeometryPar::openFile(boost::iostreams::filtering_istream& ifs, const std::string& fileName0) const
 {
@@ -518,8 +518,10 @@ void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometr
     }
   }
 
-  ifstream ifs;
-  openFile(ifs, fileName0);
+  //  ifstream ifs;
+  //  openFile(ifs, fileName0);
+  boost::iostreams::filtering_istream ifs;
+  openFileB(ifs, fileName0);
 
   int iL(0), iC(0);
   const int np = 3;
@@ -583,7 +585,8 @@ void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometr
   if (nRead != nSenseWires) B2FATAL("CDCGeometryPar::readWirePositionParams: #lines read-in (=" << nRead <<
                                       ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
 
-  ifs.close();
+  //  ifs.close();
+  boost::iostreams::close(ifs);
 }
 
 
@@ -680,8 +683,9 @@ void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
   }
 
   boost::iostreams::filtering_istream ifs;
-  //  openFile(ifs, fileName0);
-  //TODO: use openFile() in cdc/utilities instead of the following 18 lines
+  openFileB(ifs, fileName0);
+  //TODO: use openFile() in cdc/utilities instead of the following 18 lines <- done
+  /*
   std::string fileName1 = "/cdc/data/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName1);
 
@@ -699,6 +703,7 @@ void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
     ifs.push(boost::iostreams::file_source(fileName));
     if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName1 << " !");
   }
+  */
 
   //read alpha bin info.
   unsigned short nAlphaBins = 0;
@@ -821,7 +826,8 @@ void CDCGeometryPar::newReadSigma(const GearDir gbxParams, const int mode)
   }
 
   ifstream ifs;
-  openFile(ifs, fileName0);
+  //  openFile(ifs, fileName0);
+  openFileA(ifs, fileName0);
 
   //read alpha bin info.
   unsigned short nAlphaBins = 0;
@@ -925,7 +931,8 @@ void CDCGeometryPar::readPropSpeed(const GearDir gbxParams, const int mode)
   }
 
   ifstream ifs;
-  openFile(ifs, fileName0);
+  //  openFile(ifs, fileName0);
+  openFileA(ifs, fileName0);
 
   int iL;
   double speed;
@@ -992,7 +999,8 @@ void CDCGeometryPar::readT0(const GearDir gbxParams, int mode)
   }
 
   ifstream ifs;
-  openFile(ifs, fileName0);
+  //  openFile(ifs, fileName0);
+  openFileA(ifs, fileName0);
 
   int iL(0), iC(0);
   float t0(0);
@@ -1028,7 +1036,8 @@ void CDCGeometryPar::readBadWire(const GearDir gbxParams, int mode)
   }
 
   ifstream ifs;
-  openFile(ifs, fileName0);
+  //  openFile(ifs, fileName0);
+  openFileA(ifs, fileName0);
 
   int iCL(0), iW(0);
   unsigned nRead = 0;
@@ -1063,7 +1072,8 @@ void CDCGeometryPar::readTW(const GearDir gbxParams, const int mode)
   }
 
   ifstream ifs;
-  openFile(ifs, fileName0);
+  //  openFile(ifs, fileName0);
+  openFileA(ifs, fileName0);
 
   unsigned iBoard = 0;
   float coef = 0.;
@@ -1091,7 +1101,8 @@ void CDCGeometryPar::readChMap()
   std::string fileName0 = CDCGeoControlPar::getInstance().getChMapFile();
 
   ifstream ifs;
-  openFile(ifs, fileName0);
+  //  openFile(ifs, fileName0);
+  openFileA(ifs, fileName0);
 
   unsigned short iSL, iL, iW, iB, iC;
   unsigned nRead = 0;

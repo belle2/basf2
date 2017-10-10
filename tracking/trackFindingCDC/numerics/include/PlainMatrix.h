@@ -22,7 +22,7 @@ namespace Belle2 {
      *
      *  This represents a fixed sized matrix with dimensions known at compile time to
      *  replace the Eigen::Matrix as vocabulary type at object interfaces.
-     *  Because of its limited feature set to significantly reduces the compilation time
+     *  Because of its limited feature set it significantly reduces the compilation time
      *  of the whole cdc track finding as the Eigen headers do not have to be included
      *  in each translation unit.
      *
@@ -48,7 +48,7 @@ namespace Belle2 {
       PlainMatrix() = default;
 
       /// Construct from initialiser list - also for value initialisation
-      PlainMatrix(std::initializer_list<T> values)
+      explicit PlainMatrix(std::initializer_list<T> values)
         : m_values{}
       {
         assert(m_values.size() >= values.size());
@@ -56,7 +56,7 @@ namespace Belle2 {
       }
 
       /// Construct from the given values.
-      PlainMatrix(std::array<T, S> values)
+      explicit PlainMatrix(std::array<T, S> values)
         : m_values(values)
       {
       }
@@ -134,6 +134,7 @@ namespace Belle2 {
         }
         return out;
       }
+
       /// Elementwise addition of two matrices
       PlainMatrix<T, M, N> operator+(const PlainMatrix<T, M, N>& rhs) const
       {
@@ -233,25 +234,25 @@ namespace Belle2 {
       }
 
     private:
-      /// The begin iterator of the flattend values
+      /// The begin iterator of the flattened values
       T* begin()
       {
         return data();
       }
 
-      /// The end iterator of the flattend values
+      /// The end iterator of the flattened values
       T* end()
       {
         return data() + size();
       }
 
-      /// The begin const_iterator of the flattend values
+      /// The begin const_iterator of the flattened values
       const T* begin() const
       {
         return data();
       }
 
-      /// The end const_iterator of the flattend values
+      /// The end const_iterator of the flattened values
       const T* end() const
       {
         return data() + size();

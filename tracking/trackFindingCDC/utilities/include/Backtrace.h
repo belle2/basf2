@@ -1,21 +1,18 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
-
-#include <type_traits>
+#include <framework/logging/LogConfig.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Short form for std::enable_if::type - replace with std::enable_if_t when ROOT understands it.
-    template<bool cond, class T = void>
-    using EnableIf = typename std::enable_if<cond, T>::type;
+    /// Dump the current call stack to the logging with the given level
+    void printBacktrace(LogConfig::ELogLevel logLevel, int nFrames = 100);
   }
 }

@@ -255,6 +255,10 @@ void compare2Tracks(bool draw_sim =false, TString sCharge="all"){
     hNDF2->Fill(ndf2);    hPval2->Fill(Pval2); hPhi02->Fill(Phi02);  hD02->Fill(D02); hZ02->Fill(Z02); htanLambda2->Fill(tanLambda2); hOmega2->Fill(Omega2); hPt2->Fill(Mom2->Perp());
     hZ0Pt->Fill(Ptm,Z0m);
 
+    
+    // NDF cut
+    if(ndf1<25 ||ndf2<25) continue;
+
     if(index>=0 && index<nbin){
       hdD0TanPhi0[index]->Fill(tanLm, dD0);
       hdZ0TanPhi0[index]->Fill(tanLm, dZ0);

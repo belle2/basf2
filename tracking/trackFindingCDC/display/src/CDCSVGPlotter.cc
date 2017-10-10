@@ -446,6 +446,7 @@ void CDCSVGPlotter::drawWrongRLHits(const std::string& hitCollectionsStoreObjNam
     // Skip the bad reverse
     if (correctRLVote < 0 and hitCollection.getAutomatonCell().hasReverseFlag()) continue;
 
+    m_eventdataPlotter.startGroup();
     for (const auto& recoHit : hitCollection) {
       ERightLeft rlInfo = recoHit.getRLInfo();
       const CDCHit* hit = recoHit.getWireHit().getHit();
@@ -467,6 +468,7 @@ void CDCSVGPlotter::drawWrongRLHits(const std::string& hitCollectionsStoreObjNam
       AttributeMap attributeMap{{"stroke", color}};
       m_eventdataPlotter.draw(recoHit, attributeMap);
     }
+    m_eventdataPlotter.endGroup();
   }
 }
 
@@ -649,9 +651,9 @@ void CDCSVGPlotter::drawStoreArray(const std::string& storeArrayName,
   }
 
   B2INFO("with " << storeArray.getEntries() << " entries");
+  drawIterable<a_drawTrajectories>(storeArray, styling);
   B2INFO("Attributes are");
   B2INFO(styling.info());
-  drawIterable<a_drawTrajectories>(storeArray, styling);
 }
 
 template <class AItem, bool a_drawTrajectories>
@@ -675,9 +677,9 @@ void CDCSVGPlotter::drawStoreVector(const std::string& storeObjName,
 
   const std::vector<StoreItem>& vector = *storeVector;
   B2INFO("with " << vector.size() << " entries");
+  drawIterable<a_drawTrajectories>(reversedRange(vector), styling);
   B2INFO("Attributes are");
   B2INFO(styling.info());
-  drawIterable<a_drawTrajectories>(reversedRange(vector), styling);
 }
 
 template <bool a_drawTrajectory, class AIterable, class AStyling>

@@ -59,7 +59,7 @@ namespace Belle2 {
 
     protected:
       /// Getter for the set of variables
-      AVarSet& getVarSet();
+      AVarSet& getVarSet() const;
 
       /// Setter for the set of variables
       void setVarSet(std::unique_ptr<AVarSet> varSet);

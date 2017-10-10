@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
 #include <tracking/trackFindingCDC/ca/Path.h>
@@ -22,10 +22,8 @@
 #include <string>
 
 namespace Belle2 {
-
-
   namespace TrackFindingCDC {
-    class CDCTrack;
+    class CDCSegment3D;
 
     /// Combines two sets of tracks to one final set by merging tracks that have large overlaps
     class TrackCombiner : public Findlet<const CDCTrack, const CDCTrack, CDCTrack> {
@@ -35,6 +33,9 @@ namespace Belle2 {
       using Super = Findlet<const CDCTrack, const CDCTrack, CDCTrack>;
 
     public:
+      /// Default constructor
+      TrackCombiner();
+
       /// Short description of the findlet
       std::string getDescription() final;
 

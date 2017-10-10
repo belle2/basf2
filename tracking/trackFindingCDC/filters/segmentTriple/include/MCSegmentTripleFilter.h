@@ -16,6 +16,8 @@
 #include <tracking/trackFindingCDC/filters/segmentTriple/BaseSegmentTripleFilter.h>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
     class CDCSegmentTriple;
 
@@ -29,6 +31,12 @@ namespace Belle2 {
     public:
       /// Constructor initializing the symmetry flag.
       explicit MCSegmentTripleFilter(bool allowReverse = true);
+
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+
+      /// Initialize the before event processing.
+      void initialize() final;
 
     public:
       /// Check if the segment triple is aligned in the Monte Carlo track. Signals NAN if not.

@@ -19,8 +19,6 @@
 #include <cmath>
 
 namespace Belle2 {
-
-
   namespace TrackFindingCDC {
     class CDCFacet;
 

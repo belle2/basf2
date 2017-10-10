@@ -9,10 +9,10 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/GenIndices.h>
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
-#include <tracking/trackFindingCDC/utilities/EnableIf.h>
 
+#include <type_traits>
+#include <utility>
 #include <array>
 #include <algorithm>
 #include <cassert>
@@ -93,7 +93,7 @@ namespace Belle2 {
       static const size_t c_nTypes = std::tuple_size<Point>::value;
 
       /// Helper class to iterate over the individual coordinates
-      using Indices = GenIndices<c_nTypes>;
+      using Indices = std::make_index_sequence<c_nTypes>;
 
       /// Initialise the box with bound in each dimension.
       Box(const std::array<FirstType, 2>& firstBound,
@@ -131,14 +131,14 @@ namespace Belle2 {
 
       /// Get the lower bound of the box in the coordinate I - first coordinate case
       template<std::size_t I>
-      const EnableIf<I == 0, Type<I> >& getLowerBound() const
+      const std::enable_if_t<I == 0, Type<I> >& getLowerBound() const
       {
         return m_firstBounds[0];
       }
 
       /// Get the lower bound of the box in the coordinate I - subordinary coordinate case
       template<std::size_t I>
-      const EnableIf < I != 0, Type<I> > & getLowerBound() const
+      const std::enable_if_t < I != 0, Type<I> > & getLowerBound() const
       {
         static_assert(I < c_nTypes,
                       "Accessed index exceeds number of coordinates");
@@ -147,21 +147,21 @@ namespace Belle2 {
 
       /// Get the lower bound of the box by the type of the coordinate.
       template <class T>
-      const EnableIf<HasType<T>::value, T>& getLowerBound() const
+      const std::enable_if_t<HasType<T>::value, T>& getLowerBound() const
       {
         return getLowerBound<TypeIndex<T>::value>();
       }
 
       /// Get the upper bound of the box in the coordinate I
       template <std::size_t I>
-      const EnableIf<I == 0, Type<I>>& getUpperBound() const
+      const std::enable_if_t<I == 0, Type<I>>& getUpperBound() const
       {
         return m_firstBounds[1];
       }
 
       /// Get the lower bound of the box in the coordinate I - subordinary coordinate case
       template<std::size_t I>
-      const EnableIf < I != 0, Type<I> > & getUpperBound() const
+      const std::enable_if_t < I != 0, Type<I> > & getUpperBound() const
       {
         static_assert(I < c_nTypes,
                       "Accessed index exceeds number of coordinates");
@@ -170,21 +170,21 @@ namespace Belle2 {
 
       /// Get the upper bound of the box by the type of the coordinate.
       template <class T>
-      const EnableIf<HasType<T>::value, T>& getUpperBound() const
+      const std::enable_if_t<HasType<T>::value, T>& getUpperBound() const
       {
         return getUpperBound<TypeIndex<T>::value>();
       }
 
       /// Get the bounds of the box in the coordinate I - first coordinate case
       template <std::size_t I>
-      const EnableIf<I == 0, std::array<Type<I>, 2>>& getBounds() const
+      const std::enable_if_t<I == 0, std::array<Type<I>, 2>>& getBounds() const
       {
         return m_firstBounds;
       }
 
       /// Get the bounds of the box in the coordinate I - subordinary coordinate case
       template <std::size_t I>
-      const EnableIf < I != 0, std::array<Type<I>, 2 >>& getBounds() const
+      const std::enable_if_t < I != 0, std::array<Type<I>, 2 >>& getBounds() const
       {
         static_assert(I < c_nTypes, "Accessed index exceeds number of coordinates");
         return m_subordinaryBox.template getBounds < I - 1 > ();
@@ -192,7 +192,7 @@ namespace Belle2 {
 
       /// Get the bounds of the box by the type of the coordinate.
       template <class T>
-      const EnableIf<HasType<T>::value, std::array<T, 2>>& getBounds() const
+      const std::enable_if_t<HasType<T>::value, std::array<T, 2>>& getBounds() const
       {
         return getBounds<TypeIndex<T>::value>();
       }
@@ -357,7 +357,7 @@ namespace Belle2 {
        */
       template <size_t... Is>
       bool intersectsImpl(const This& box,
-                          IndexSequence<Is...> is __attribute__((unused))) const
+                          std::index_sequence<Is...> is __attribute__((unused))) const
       {
         return not(any({box.getUpperBound<Is>() < this->getLowerBound<Is>()... }) or
                    any({this->getUpperBound<Is>() < box.getLowerBound<Is>()... }));
@@ -369,7 +369,7 @@ namespace Belle2 {
        */
       template <size_t... Is>
       bool isInImpl(const Point& point,
-                    IndexSequence<Is...> is __attribute__((unused))) const
+                    std::index_sequence<Is...> is __attribute__((unused))) const
       {
         return not all({isIn<Is>(std::get<Is>(point))...});
       }

@@ -20,8 +20,4 @@ REG_MODULE(TFCDC_SegmentTrackCombiner);
 TFCDC_SegmentTrackCombinerModule::TFCDC_SegmentTrackCombinerModule()
   : Super( {"CDCSegment2DVector", "CDCTrackVector"})
 {
-  ModuleParamList moduleParamList = this->getParamList();
-  moduleParamList.getParameter<double>("sharedHitsCutValue").setDefaultValue(1.0);
-  moduleParamList.getParameter<bool>("useOnlySingleBestCandidate").setDefaultValue(false);
-  moduleParamList.getParameter<bool>("hitSelectorUseOnlySingleBestCandidate").setDefaultValue(false);
 }

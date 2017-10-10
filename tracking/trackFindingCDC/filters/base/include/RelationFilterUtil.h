@@ -74,7 +74,7 @@ namespace Belle2 {
                               const std::vector<AObject*>& objects,
                               std::vector<WeightedRelation<AObject>>& weightedRelations)
       {
-        appendUsing(relationFilter, objects, weightedRelations);
+        appendUsing(relationFilter, objects, objects, weightedRelations);
       };
     };
   }

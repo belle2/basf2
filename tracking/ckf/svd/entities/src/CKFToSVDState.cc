@@ -10,10 +10,22 @@
 
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
 
 using namespace Belle2;
 
 CKFToSVDState::CKFToSVDState(const RecoTrack* seed) : CKFState(seed)
 {
   setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
+}
+
+unsigned int CKFToSVDState::getGeometricalLayer() const
+{
+  const SpacePoint* spacePoint = getHit();
+  if (not spacePoint) {
+    // return number of layer (6) + 1 -> we fake the 7th layer as the CDC
+    return 7;
+  }
+
+  return spacePoint->getVxdID().getLayerNumber();
 }

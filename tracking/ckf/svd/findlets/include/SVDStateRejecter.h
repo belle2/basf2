@@ -1,15 +1,20 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Nils Braun                                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include <tracking/modules/cdcToVXDExtrapolator/CKFModules.h>
+#include <tracking/ckf/general/findlets/StateRejecter.dcl.h>
+#include <tracking/ckf/svd/entities/CKFToSVDState.h>
 
-using namespace Belle2;
+#include <tracking/ckf/svd/filters/states/SVDStateFilterFactory.h>
 
-REG_MODULE(CDCToSVDSpacePointCKF)
+namespace Belle2 {
+  /// Rejecter findlet for CKF SVD states
+  using SVDStateRejecter = StateRejecter<CKFToSVDState, ChooseableSVDStateFilter>;
+}

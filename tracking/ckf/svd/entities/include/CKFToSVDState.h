@@ -22,5 +22,17 @@ namespace Belle2 {
 
     /// Constructor setting the state to the position of the first CDC track seed hit
     CKFToSVDState(const RecoTrack* seed);
+
+    unsigned int getGeometricalLayer() const;
+
+    bool operator<(unsigned int layer)
+    {
+      return getGeometricalLayer() < layer;
+    }
+
+    friend bool operator<(unsigned int layer, const CKFToSVDState& state)
+    {
+      return layer < state.getGeometricalLayer();
+    }
   };
 }

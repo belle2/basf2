@@ -34,6 +34,7 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 #include <limits>
 
 #include <cmath>
@@ -203,40 +204,46 @@ namespace Belle2 {
         operators["-"] = 2;
 
         std::vector<std::string> brackets;
-        brackets.push_back("(");
-        brackets.push_back(")");
+        brackets.push_back("[");
+        brackets.push_back("]");
 
-        std::string seperator(" ");
+        std::string seperators("^*/+-[]");
         std::string next_arg;
         std::size_t prev_pos = 0;
-        std::size_t pos = arguments[0].find(seperator);
+        std::size_t pos = 0;
 
         if (pos == std::string::npos) {
           B2FATAL("Wrong number of arguments for meta function formula");
         }
 
         // Putting an initial parser here so later we can make this smarter and
-        // not have strict rquirements on the input format
+        // not have strict requirements on the input format
         std::vector<std::string> input_queue;
 
-        while ((pos = arguments[0].find_first_of(seperator, prev_pos)) != std::string::npos) {
+        while ((pos = arguments[0].find_first_of(seperators, prev_pos)) != std::string::npos) {
           next_arg = arguments[0].substr(prev_pos, pos - prev_pos);
-          if (next_arg.compare(seperator) != 0 && next_arg.size() != 0) {
-            input_queue.push_back(next_arg);
-            //B2INFO("Adding to input queue:" << input_queue.back());
+          boost::trim(next_arg);
+          if (next_arg.size() == 0) {
+            B2FATAL("Meta function formula incorrectly formatted.");
           }
+          // Add argument and following operand
+          input_queue.push_back(next_arg);
+          input_queue.push_back(arguments[0].substr(pos, 1));
           prev_pos = pos + 1;
         }
         next_arg = arguments[0].substr(prev_pos);
-        if (next_arg.compare(seperator) != 0) {
+        B2INFO("Got final arg:" << next_arg);
+        boost::trim(next_arg);
+        B2INFO("Final arg trimmed");
+        if (next_arg.size() != 0) {
           input_queue.push_back(next_arg);
-          //B2INFO("Adding to input queue:" << input_queue.back());
+          B2INFO("Adding to input queue:" << input_queue.back());
         }
 
         std::vector<std::string> output_queue;
         std::vector<std::string> operator_stack;
 
-        B2INFO("Entering RPN converter.");
+        //B2INFO("Entering RPN converter.");
         for (auto const& input : input_queue) {
 
           std::map<std::string, int>::iterator op = operators.find(input);
@@ -283,7 +290,7 @@ namespace Belle2 {
           for (auto const& out : output_queue) {
             cur_queue += out;
           }
-          B2INFO("Current RPN formula output queue: " << cur_queue);
+          //B2INFO("Current RPN formula output queue: " << cur_queue);
         }
 
         // No more arguments to read, clean up:
@@ -297,17 +304,16 @@ namespace Belle2 {
         for (auto const& out : output_queue) {
           rpn_queue += out;
         }
-        B2INFO("RPN formula output stack: " << rpn_queue);
+        //B2INFO("RPN formula output stack: " << rpn_queue);
 
 
         // Then can do normal RPN calculation
-        B2INFO("Entering RPN calculator.");
+        //B2INFO("Entering RPN calculator.");
         // Need to use a stack of FunctionPtr for this I think
         std::vector<Belle2::Variable::Manager::FunctionPtr> operand_stack;
 
         for (auto const& output : output_queue) {
 
-          B2INFO("Processing input:" << output);
           std::map<std::string, int>::iterator op = operators.find(output);
 
           if (op != operators.end()) {
@@ -342,54 +348,6 @@ namespace Belle2 {
       } else {
         B2FATAL("Wrong number of arguments for meta function formula");
       }
-      /*
-      char operation = ' ';
-      int pos = 0;
-
-      if (arguments[0].find('+') != std::string::npos) {
-        pos = arguments[0].find('+');
-        operation = '+';
-      } else if (arguments[0].find('-') != std::string::npos) {
-        pos = arguments[0].find('-');
-        operation = '-';
-      } else if (arguments[0].find('*') != std::string::npos) {
-        pos = arguments[0].find('*');
-        operation = '*';
-      } else if (arguments[0].find('/') != std::string::npos) {
-        pos = arguments[0].find('/');
-        operation = '/';
-      } else if (arguments[0].find('^') != std::string::npos) {
-        pos = arguments[0].find('^');
-        operation = '^';
-      }
-
-      if (operation != ' ') {
-        std::string lhs = std::string("formula(") + arguments[0].substr(0, pos) + std::string(")");
-        std::string rhs = std::string("formula(") + arguments[0].substr(pos + 1) + std::string(")");
-
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(lhs);
-        const Variable::Manager::Var* var2 = Manager::Instance().getVariable(rhs);
-
-        auto func = [var, operation, var2](const Particle * particle) -> double {
-          switch (operation)
-          {
-            case '+': return var->function(particle) + var2->function(particle);
-            case '-': return var->function(particle) - var2->function(particle);
-            case '*': return var->function(particle) * var2->function(particle);
-            case '/': return var->function(particle) / var2->function(particle);
-            case '^': return std::pow(var->function(particle), var2->function(particle));
-          }
-          return 0;
-        };
-        return func;
-      } else {
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        return var->function;
-      }
-      } else {
-      B2FATAL("Wrong number of arguments for meta function formula");
-      }
-      */
     }
 
     Manager::FunctionPtr nCleanedTracks(const std::vector<std::string>& arguments)

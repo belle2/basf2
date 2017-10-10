@@ -326,6 +326,24 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr passesEventCut(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string cutString = arguments[0];
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
+        auto func = [cut](const Particle*) -> double {
+          if (cut->check(nullptr))
+            return 1;
+          else
+            return 0;
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function passesEventCut");
+      }
+    }
+
     Manager::FunctionPtr varFor(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
@@ -1008,6 +1026,9 @@ endloop:
                       "Returns 1 if particle passes the cut otherwise 0.\n"
                       "Useful if you want to write out if a particle would have passed a cut or not.\n"
                       "Returns -999 if particle is a nullptr.");
+    REGISTER_VARIABLE("passesEventCut(cut)", passesEventCut,
+                      "Returns 1 if event passes the cut otherwise 0.\n"
+                      "Useful if you want to select events passing a cut without looping into particles, such as for skimming.\n");
     REGISTER_VARIABLE("countDaughters(cut)", countDaughters,
                       "Returns number of direct daughters which satisfy the cut.\n"
                       "Used by the skimming package (for what exactly?)\n"

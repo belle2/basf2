@@ -28,7 +28,6 @@ void compare2Tracks(bool draw_sim =false, TString sCharge="all"){
   TGaxis::SetMaxDigits(4);
   double binWidth=45;
   int ndfmin=25;
-  double D0min = 5;
   int nbin = floor(180/binWidth);
   string filename = "output/output_*.root";
   //Root file contain histograms for compare with this results
@@ -58,7 +57,6 @@ void compare2Tracks(bool draw_sim =false, TString sCharge="all"){
   double Omega1, Omega2;
   short charge;
 
-  double binwidth_phi0 = 45;
   tree->SetBranchAddress("evtT0",&evtT0);
   tree->SetBranchAddress("charge",&charge);
   tree->SetBranchAddress("ndf1",&ndf1);
@@ -149,7 +147,7 @@ void compare2Tracks(bool draw_sim =false, TString sCharge="all"){
     hsPtPhi0[i] = new TH2D(Form("hsPtPhi0_%d",i),Form("D0 = %3.1f ;Phi0;dPt",i-15+0.5),90,-180,0,100,-0.1,0.1);
   }
   double ndf, Phi0, tanLambda, D0,Z0, Pval, Omega;
-  TVector* Mom;
+
   hNDF1->SetLineColor(kRed);
   hPval1->SetLineColor(kRed);
   hPhi01->SetLineColor(kRed);
@@ -257,7 +255,7 @@ void compare2Tracks(bool draw_sim =false, TString sCharge="all"){
 
     
     // NDF cut
-    if(ndf1<25 ||ndf2<25) continue;
+    if(ndf1<ndfmin ||ndf2<ndfmin) continue;
 
     if(index>=0 && index<nbin){
       hdD0TanPhi0[index]->Fill(tanLm, dD0);

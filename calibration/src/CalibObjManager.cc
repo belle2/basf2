@@ -29,6 +29,8 @@ void CalibObjManager::createDirectories()
   for (auto& x : m_templateObjects) {
     if (m_dir->GetDirectory(x.first.c_str()) == 0) {
       m_dir->mkdir(x.first.c_str());
+      TDirectory* objectDir = m_dir->GetDirectory(x.first.c_str());
+      objectDir->SetWritable(true);
       B2DEBUG(100, "Made TDirectory: " << x.first);
     }
   }
@@ -36,44 +38,54 @@ void CalibObjManager::createDirectories()
 
 void CalibObjManager::writeCurrentObjects(const ExpRun& expRun)
 {
-  TDirectory* oldDir = gDirectory;
   for (auto& x : m_templateObjects) {
     TDirectory* objectDir = m_dir->GetDirectory((x.first + '/' + getObjectExpRunName(x.first, expRun)).c_str());
-    objectDir->cd();
-    string prefixedName = addPrefix(x.first);
-    TNamed* objMemory = dynamic_cast<TNamed*>(objectDir->FindObject(prefixedName.c_str()));
-    if (objMemory) {
-      // We have found a memory resident object for this exp,run and want to write it
-      // But is there already an object written from this same exp,run being evaluated previously?
-      // Loop over the keys to find any previous objects and the highest previous index.
-      unsigned int index = 0;
-      for (auto key : * (gDirectory->GetListOfKeys())) {
-        string keyName = key->GetName();
-        B2DEBUG(100, "Found previous Key " << keyName << " in the directory " << gDirectory->GetPath());
-        unsigned int currentIndex = extractKeyIndex(keyName);
-        if (currentIndex > index) {
-          index = currentIndex;
-        }
+    for (auto key : * (objectDir->GetList())) {
+      TNamed* objMemory = dynamic_cast<TNamed*>(objectDir->FindObject(key->GetName()));
+      if (objMemory) {
+        objectDir->WriteTObject(objMemory, key->GetName(), "Overwrite");
       }
-      B2DEBUG(100, "Highest previous index for object " << x.first
-              << " for Exp.Run = " << encodeExpRun(expRun)
-              << " was " << index);
-      objMemory->SetName((x.first + "_" + to_string(index + 1)).c_str());
-      B2DEBUG(100, "We are writing the object " << objMemory->GetName() << " to its TDirectory.");
-      gDirectory->WriteTObject(objMemory, objMemory->GetName(), "Overwrite");
     }
   }
-  oldDir->cd();
 }
 
 void CalibObjManager::clearCurrentObjects(const ExpRun& expRun)
 {
   for (auto& x : m_templateObjects) {
     TDirectory* objectDir = m_dir->GetDirectory((x.first + '/' + getObjectExpRunName(x.first, expRun)).c_str());
-    B2DEBUG(100, "We are deleting all the in-memory objects " << objectDir->GetPath());
-    // Should only delete objects that are memory resident
+    B2DEBUG(100, "We are deleting all the in-memory + file objects " << objectDir->GetPath());
     objectDir->DeleteAll();
   }
+}
+
+/// Scans the directory to get the highest "_i" index of an object with this name
+unsigned int CalibObjManager::getHighestIndexObject(const string name, const TDirectory* dir) const
+{
+  unsigned int index = 0;
+  // Try from the list of objects
+  for (auto key : * (dir->GetList())) {
+    string keyName = key->GetName();
+    if (keyName.find(name) != std::string::npos) {
+      B2DEBUG(1000, "Found previous Object " << keyName << " in the directory " << dir->GetPath());
+      unsigned int currentIndex = extractKeyIndex(keyName);
+      if (currentIndex > index) {
+        index = currentIndex;
+      }
+    }
+  }
+  // Try from List of keys
+  for (auto key : * (dir->GetListOfKeys())) {
+    string keyName = key->GetName();
+    if (keyName.find(name) != std::string::npos) {
+      B2DEBUG(1000, "Found previous Key " << keyName << " in the directory " << dir->GetPath());
+      unsigned int currentIndex = extractKeyIndex(keyName);
+      if (currentIndex > index) {
+        index = currentIndex;
+      }
+    }
+  }
+  B2DEBUG(1000, "Returning highest index " << index);
+  return index;
 }
 
 string CalibObjManager::getSuffix(const ExpRun& expRun) const

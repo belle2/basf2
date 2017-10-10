@@ -50,9 +50,9 @@ namespace Belle2 {
       /// write outut or store db
       virtual void Write();
     private:
-      std::unique_ptr<TH1F> m_hTotal;       /**< 1D histogram of delta T whole channel */
-      std::unique_ptr<TH1F> m_h1[56][385];    /**<1D histogram for each channel*/
-      std::unique_ptr<TH1F> m_hT0b[300];      /**<1D histogram for each board*/
+      std::shared_ptr<TH1F> m_hTotal;       /**< 1D histogram of delta T whole channel */
+      std::shared_ptr<TH1F> m_h1[56][385];    /**<1D histogram for each channel*/
+      std::shared_ptr<TH1F> m_hT0b[300];      /**<1D histogram for each board*/
       double m_xmin = 0.07;   /**< minimum drift length*/
       double m_ndfmin = 5;    /**< minimum ndf required */
       double m_Pvalmin = 0.;  /**< minimum pvalue required */

@@ -13,6 +13,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <utility>
 #include <list>
 #include <TClonesArray.h>
 #include <TDirectory.h>
@@ -56,6 +57,7 @@ namespace Belle2 {
         m_result = c_Undefined;
         m_payloads.clear();
         m_iov = IntervalOfValidity();
+        m_mapCalibData.clear();
       }
       /// Returns the vector of ExpRuns
       const std::vector<Calibration::ExpRun>& getRequestedRuns() const {return m_requestedRuns;}
@@ -77,6 +79,20 @@ namespace Belle2 {
       std::list<Database::DBQuery>& getPayloads() {return m_payloads;}
       /// Get constants (in TObjects) for database update from last calibration but passed by VALUE
       std::list<Database::DBQuery> getPayloadValues() {return m_payloads;}
+      /// Get a previously created object in m_mapCalibData if one exists, otherwise return shared_ptr(nullptr)
+      std::shared_ptr<TNamed> getCalibObj(const std::string name, const RunRange runRange) const
+      {
+        auto it = m_mapCalibData.find(std::make_pair(name, runRange));
+        if (it == m_mapCalibData.end()) {
+          return nullptr;
+        }
+        return it->second;
+      }
+      /// Insert a newly created object in m_mapCalibData. Overwrites a previous entry if one exists
+      void setCalibObj(const std::string name, const RunRange runRange, const std::shared_ptr<TNamed>& objectPtr)
+      {
+        m_mapCalibData[std::make_pair(name, runRange)] = objectPtr;
+      }
 
     private:
       /// Runs for which the calibration has been last requested, either requested explicitly or generated from the collected data
@@ -89,6 +105,15 @@ namespace Belle2 {
       IntervalOfValidity m_iov;
       /// Payloads saved by execution
       std::list<Database::DBQuery> m_payloads{};
+      /**  Map of shared pointers to merged calibration objects created by getObjectPtr() calls.
+        *  Used to lookup previously created objects instead of recreating them needlessly.
+        *  Using shared_ptr allows us to return a shared_ptr so the user knows that they don't
+        *  own the pointer exclusively, but that they could hold onto a shared_ptr for longer than the
+        *  reset of this ExecutionData object if they really wanted to i.e. you could hold onto a previous execution's
+        *  created data if you wish (not recommended), but if you don't care then you can be assured that the memory will
+        *  clear itself for you upon a new execute().
+        */
+      std::map<std::pair<std::string, RunRange>, std::shared_ptr<TNamed>> m_mapCalibData;
     };
 
     /**
@@ -194,15 +219,15 @@ namespace Belle2 {
 
     /// Get calibration data object by name and list of runs, the Merge function will be called to generate the overall object
     template<class T>
-    std::unique_ptr<T> getObjectPtr(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns) const;
+    std::shared_ptr<T> getObjectPtr(const std::string& name, const std::vector<Calibration::ExpRun>& requestedRuns);
 
     /** Get calibration data object (for all runs the calibration is requested for)
      *  This function will only work during or after execute() has been called once.
      */
     template<class T>
-    std::unique_ptr<T> getObjectPtr(std::string name) const
+    std::shared_ptr<T> getObjectPtr(std::string name)
     {
-      return std::move(getObjectPtr<T>(name, m_data.getRequestedRuns()));
+      return getObjectPtr<T>(name, m_data.getRequestedRuns());
     }
 
     // Helpers ---------------- Database storage -----
@@ -270,10 +295,16 @@ namespace Belle2 {
    *                                    *
    **************************************/
   template<class T>
-  std::unique_ptr<T> CalibrationAlgorithm::getObjectPtr(const std::string& name,
-                                                        const std::vector<Calibration::ExpRun>& requestedRuns) const
+  std::shared_ptr<T> CalibrationAlgorithm::getObjectPtr(const std::string& name,
+                                                        const std::vector<Calibration::ExpRun>& requestedRuns)
   {
-    T* mergedObjPtr = nullptr;
+    // Check if this object already exists
+    RunRange runRangeRequested(requestedRuns);
+    std::shared_ptr<T> objOutputPtr = std::dynamic_pointer_cast<T>(m_data.getCalibObj(name, runRangeRequested));
+    if (objOutputPtr)
+      return objOutputPtr;
+
+    std::shared_ptr<T> mergedObjPtr(nullptr);
     bool mergedEmpty = true;
     TDirectory* dir = gDirectory;
 
@@ -285,7 +316,6 @@ namespace Belle2 {
 
     // Construct the TDirectory names where we expect our objects to be
     std::string runRangeObjName(getPrefix() + "/" + Calibration::RUN_RANGE_OBJ_NAME);
-    RunRange runRangeRequested(requestedRuns);
     RunRange* runRangeData;
     for (const auto& fileName : m_inputFileNames) {
       //Open TFile to get the objects
@@ -309,7 +339,7 @@ namespace Belle2 {
                   B2DEBUG(100, "Adding found object " << keyName << " in the directory " << objDir->GetPath());
                   T* objOther = (T*)objDir->Get(keyName.c_str());
                   if (mergedEmpty) {
-                    mergedObjPtr = (T*)objOther->Clone(name.c_str());
+                    mergedObjPtr = std::shared_ptr<T>(dynamic_cast<T*>(objOther->Clone(name.c_str())));
                     mergedObjPtr->SetDirectory(0);
                     mergedEmpty = false;
                   } else {
@@ -326,12 +356,11 @@ namespace Belle2 {
       } else {
         Calibration::ExpRun allGranExpRun = getAllGranularityExpRun();
         std::string objDirName = getFullObjectPath(name, allGranExpRun);
-        TDirectory* objDir = f->GetDirectory(objDirName.c_str());
         std::string objPath = objDirName + "/" + name + "_1";
         T* objOther = (T*)f->Get(objPath.c_str()); // Only one index for granularity == all
         B2DEBUG(100, "Adding " << objPath);
         if (mergedEmpty) {
-          mergedObjPtr = (T*)objOther->Clone(name.c_str());
+          mergedObjPtr = std::shared_ptr<T>(dynamic_cast<T*>(objOther->Clone(name.c_str())));
           mergedObjPtr->SetDirectory(0);
           mergedEmpty = false;
         } else {
@@ -342,9 +371,12 @@ namespace Belle2 {
       list.Clear();
     }
     dir->cd();
-    std::unique_ptr<T> objOutput(mergedObjPtr);
-    mergedObjPtr->SetDirectory(0);
+    objOutputPtr = mergedObjPtr;
+    objOutputPtr->SetDirectory(0);
+    // make a TNamed version to input to the map of previous calib objects
+    std::shared_ptr<TNamed> storedObjPtr = std::static_pointer_cast<TNamed>(objOutputPtr);
+    m_data.setCalibObj(name, runRangeRequested, storedObjPtr);
     B2DEBUG(100, "Passing back merged data " << name);
-    return std::move(objOutput);
+    return objOutputPtr;
   }
 } // namespace Belle2

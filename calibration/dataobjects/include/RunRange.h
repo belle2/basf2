@@ -100,6 +100,15 @@ namespace Belle2 {
     /// Root-like SetDirectory function for "template compatibility" with ROOT objects. Does nothing.
     void SetDirectory(TDirectory*) {}
 
+    /// Comparison operator so that we can use RunRange in a map as a key
+    bool operator<(const RunRange& other) const
+    {
+      if (m_granularity == other.m_granularity) {
+        return m_expRunSet < other.m_expRunSet;
+      }
+      return m_granularity < other.m_granularity;
+    }
+
   private:
     /// The set of (exp,run) stored in object
     std::set<Calibration::ExpRun> m_expRunSet = {};

@@ -79,8 +79,9 @@ void CalibrationCollectorModule::beginRun()
   if (m_maxEventsPerRun > -1) {
     // Do we have a count for this ExpRun yet? If not create one
     auto i_eventsInExpRun = m_expRunEvents.find(expRun);
-    if (i_eventsInExpRun == m_expRunEvents.end())
+    if (i_eventsInExpRun == m_expRunEvents.end()) {
       m_expRunEvents[expRun] = 0;
+    }
 
     // Set our pointer to the correct location for this ExpRun
     m_eventsCollectedInRun = &m_expRunEvents[expRun];

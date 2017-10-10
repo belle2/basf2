@@ -114,7 +114,6 @@ namespace Belle2 {
     std::map<Calibration::ExpRun, int> m_expRunEvents;
     /// Will point at correct value in m_expRunEvents
     int* m_eventsCollectedInRun;
-
     /// I'm a little worried about floating point precision when comparing to 0.0 and 1.0 as special values.
     /// But since a user will have set them (or left them as default) as exactly equal to 0.0 or 1.0 rather
     /// than calculating them in almost every case, I think we can assume that the equalities hold.

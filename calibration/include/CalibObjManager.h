@@ -45,10 +45,11 @@ namespace Belle2 {
       */
     void createDirectories();
 
+    unsigned int getHighestIndexObject(const std::string name, const TDirectory* dir) const;
+
     template<typename T>
-    T* getObject(std::string name, Belle2::Calibration::KeyType expRun)
+    T* getObject(const std::string name, const Belle2::Calibration::ExpRun expRun)
     {
-      TDirectory* oldDir = gDirectory;
       std::string objectDirName = name + '/' + getObjectExpRunName(name, expRun);
       TDirectory* objectDir = m_dir->GetDirectory(objectDirName.c_str());
       // Does this run's directory already exist?
@@ -56,25 +57,27 @@ namespace Belle2 {
         B2DEBUG(100, "No TDirectory for this ExpRun yet, making " << objectDirName);
         m_dir->mkdir(objectDirName.c_str());
         objectDir = m_dir->GetDirectory(objectDirName.c_str());
+        objectDir->SetWritable(true);
       }
-      objectDir->cd();
-      std::string prefixedFullName = addPrefix(name);
-      // First check if we currently have an object we're using
-      T* obj = dynamic_cast<T*>(objectDir->FindObject(prefixedFullName.c_str()));
+      unsigned int highestIndex = getHighestIndexObject(name, objectDir);
+      std::string highestIndexName = name + "_" + std::to_string(highestIndex);
+      // First check if we currently have an object we're using.
+      T* obj = dynamic_cast<T*>(objectDir->FindObject(highestIndexName.c_str()));
       if (!obj) {
-        B2DEBUG(100, "No object in memory with the name " << prefixedFullName << " in " << gDirectory->GetPath() << ", will make one");
-        obj = dynamic_cast<T*>(m_templateObjects[name]->cloneHeldObj(prefixedFullName));
+        B2DEBUG(100, "Highest index is only file resident for " << highestIndexName << " in " << objectDir->GetPath() <<
+                ". Will make a higher one");
+        std::string newName = name + "_" + std::to_string(highestIndex + 1);
+        obj = dynamic_cast<T*>(m_templateObjects[name]->cloneHeldObj(newName));
         obj->SetDirectory(objectDir);
         obj->Reset();
         // Did SetDirectory work? Or was it a dummy class method?
         T* objTest;
-        objectDir->GetObject(prefixedFullName.c_str(), objTest);
+        objectDir->GetObject(newName.c_str(), objTest);
         if (!objTest) {
           B2DEBUG(100, "SetDirectory was a dummy function. Adding to Object to TDirectory manually.");
           objectDir->Add(obj);
         }
       }
-      oldDir->cd();
       return obj;
     }
 

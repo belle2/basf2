@@ -89,11 +89,11 @@ void TestHistoModule::closeRun()
   auto mille = getObjectPtr<MilleData>("test_mille");
   if (mille->isOpen()) {
     for (auto& fileName : mille->getFiles()) {
-      B2INFO("Stored Mille binary file: " << fileName);
+      B2DEBUG(100, "Stored Mille binary file: " << fileName);
     }
     mille->close();
   }
-  //getObjectPtr<TTree>("MyTree")->GetDirectory()->ls();
+  //getObjectPtr<TT/ree>("MyTree")->GetDirectory()->ls();
 }
 
 void TestHistoModule::collect()
@@ -104,6 +104,8 @@ void TestHistoModule::collect()
 
   std::string objectName = "MyTree";
   auto tree = getObjectPtr<TTree>(objectName);
+  auto hist = getObjectPtr<TH1F>("MyHisto");
+
   for (int i = 0; i < m_entriesPerEvent; ++i) {
     m_hitX = gRandom->Gaus();
     m_hitY = gRandom->Gaus();
@@ -115,9 +117,8 @@ void TestHistoModule::collect()
     m_pvalue = gRandom->Gaus();
     m_dof = gRandom->Gaus();
     tree->Fill();
+    hist->Fill(gRandom->Gaus(42., m_spread));
   }
-
-  getObjectPtr<TH1F>("MyHisto")->Fill(gRandom->Gaus(42., m_spread));
 
   auto mille = getObjectPtr<MilleData>("test_mille");
   // Open new file on request (at start or after being closed)

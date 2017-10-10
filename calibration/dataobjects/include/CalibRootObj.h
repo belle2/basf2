@@ -31,7 +31,7 @@ namespace Belle2 {
     /// Destructor
     virtual ~CalibRootObj()
     {
-      gROOT->GetListOfCleanups()->Remove(this);
+//      gROOT->GetListOfCleanups()->Remove(this);
       delete m_object;
       B2DEBUG(100, "Deleted the object stored inside " << this->GetName());
     }
@@ -57,9 +57,9 @@ namespace Belle2 {
     explicit CalibRootObj(T* object) : CalibRootObjBase()
     {
       m_object = object;
-      m_object->SetDirectory(nullptr);
+//      m_object->SetDirectory(nullptr);
       B2DEBUG(100, "Creating CalibRootObj");
-      gROOT->GetListOfCleanups()->Add(this);
+//      gROOT->GetListOfCleanups()->Add(this);
     }
 
     T* getObject() const {return m_object;}
@@ -87,7 +87,7 @@ namespace Belle2 {
     {
       B2DEBUG(100, "Creating new CalibRootObj with name " << name);
       T* newObj = (T*)cloneObj(m_object, name);
-      newObj->SetDirectory(nullptr);
+//      newObj->SetDirectory(nullptr);
       newObj->Reset();
       CalibRootObj<T>* newCalibObj = new CalibRootObj<T>(newObj);
       newCalibObj->SetName(name.c_str());
@@ -148,11 +148,11 @@ namespace Belle2 {
     }
 
     /** Called from ROOT if obj is deleted. Kill pointer to avoid double free. */
-    virtual void RecursiveRemove(TObject* obj) override
-    {
-      if (obj == m_object)
-        m_object = nullptr;
-    }
+//    virtual void RecursiveRemove(TObject* obj) override
+//    {
+//      if (obj == m_object)
+//        m_object = nullptr;
+//    }
 
     ClassDefOverride(CalibRootObj, 1) /// Run dependent mergeable wrapper
   };

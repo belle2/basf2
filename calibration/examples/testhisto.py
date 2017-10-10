@@ -13,12 +13,13 @@ if not os.path.exists(working_dir):
 
 # Comment out to turn off debugging
 logging.package("calibration").log_level = LogLevel.DEBUG
+logging.package("calibration").debug_level = 90
 
 
 def _create_file(run):
     main = create_path()
-    main.add_module("EventInfoSetter", expList=[1], runList=[run], evtNumList=[100])
-    main.add_module("RootOutput", outputFileName="MyInputFile_" + str(run) + ".root")
+    main.add_module("EventInfoSetter", expList=[1, 1], runList=[run, run + 1], evtNumList=[100, 100])
+    main.add_module("RootOutput", outputFileName="test_data/MyInputFile_" + str(run) + ".root")
     process(main)
     print(statistics)
 
@@ -26,18 +27,19 @@ def _create_file(run):
 def _run_child(run):
     set_random_seed(run * 5)
     main = create_path()
-    main.add_module("RootInput", inputFileNames=["MyInputFile_*.root"], entrySequences=[])
+    main.add_module("RootInput", inputFileNames=["test_data/MyInputFile_*.root"], entrySequences=[])
     main.add_module("HistoManager", histoFileName="MyOutputFile_" + str(run) + ".root", workDirName=working_dir)
     testmod = main.add_module("TestHisto", entriesPerEvent=1000)
-#    testmod.param("granularity","all")
+    testmod.param("granularity", "all")
 #    testmod.param("preScale", 0.5)
 #    testmod.param("maxEventsPerRun", 100)
     process(main)
+    # print(statistics(statistics.TOTAL))
     print(statistics)
 
 
 def create_test_data():
-    for run in range(1, 101):
+    for run in range(1, 11):
         child = ctx.Process(target=_create_file, args=(run,))
         child.start()
         # wait for it to finish

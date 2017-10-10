@@ -357,17 +357,24 @@ string CalibrationAlgorithm::getGranularityFromData() const
 
 // Have to put the explicit template specialization in the enclosing namespace
 namespace Belle2 {
+  /** We cheekily cast the TChain to TTree for the returned pointer so that the user never knows
+    * Hopefully this doesn't cause issues if people do low level stuff to the tree...
+    */
   template<>
-  unique_ptr<TTree> CalibrationAlgorithm::getObjectPtr<TTree>(const string& name,
-                                                              const vector<ExpRun>& requestedRuns) const
+  shared_ptr<TTree> CalibrationAlgorithm::getObjectPtr<TTree>(const string& name,
+                                                              const vector<ExpRun>& requestedRuns)
   {
-    // We cheekily cast the TChain to TTree so that the user never knows
-    // Hopefully this doesn't cause issues if people do low level stuff to the tree...
-    TChain* chain = new TChain(name.c_str());
+    // Check if this object already exists in our map
+    RunRange runRangeRequested(requestedRuns);
+    std::shared_ptr<TTree> objOutputPtr = std::dynamic_pointer_cast<TTree>(m_data.getCalibObj(name, runRangeRequested));
+    if (objOutputPtr)
+      return objOutputPtr;
+
+    // If not we best make a new one
+    shared_ptr<TChain> chain = make_shared<TChain>(name.c_str());
     chain->SetDirectory(0);
     // Construct the TDirectory names where we expect our objects to be
     string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
-    RunRange runRangeRequested(requestedRuns);
     if (strcmp(getGranularity().c_str(), "run") == 0) {
       RunRange* runRangeData;
       for (const auto& fileName : m_inputFileNames) {
@@ -411,7 +418,11 @@ namespace Belle2 {
         chain->Add(objectPath.c_str());
       }
     }
-    unique_ptr<TTree> tree(chain);
-    return move(tree);
+    objOutputPtr = static_pointer_cast<TTree>(chain);
+    // make a TNamed version to input to the map of previous calib objects
+    shared_ptr<TNamed> storedObjPtr = static_pointer_cast<TNamed>(objOutputPtr);
+    m_data.setCalibObj(name, runRangeRequested, storedObjPtr);
+    B2DEBUG(100, "Passing back merged data " << name);
+    return objOutputPtr;
   }
 }

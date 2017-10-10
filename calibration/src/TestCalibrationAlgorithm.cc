@@ -31,6 +31,9 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
   // Pulling in data from collector output. It now returns shared_ptr<T> so the underlying pointer
   // will delete itself automatically at the end of this scope unless you do something
   auto ttree = getObjectPtr<TTree>("MyTree");
+  for (int i = 0; i < 20; ++i) {
+    B2INFO("Current use_count of TTree is " << getObjectPtr<TTree>("MyTree").use_count());
+  }
   auto hist = getObjectPtr<TH1F>("MyHisto");
   B2INFO("Number of Entries in MyTree was " << ttree->GetEntries());
   B2INFO("Number of Entries in MyHisto was " << hist->GetEntries());

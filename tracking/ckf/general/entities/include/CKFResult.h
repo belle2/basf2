@@ -16,6 +16,8 @@
 
 #include <vector>
 
+#include <framework/logging/Logger.h>
+
 namespace Belle2 {
   /**
    * Object for temporary storage of a CKF tree search result.
@@ -37,23 +39,22 @@ namespace Belle2 {
     template <class AState>
     CKFResult(const std::vector<const AState*>& path, const genfit::MeasuredStateOnPlane& mSoP)
     {
-      std::vector<const Hit*> hits;
-      double chi2 = 0;
-
       for (const AState* state : path) {
         const Hit* hit = state->getHit();
         if (hit) {
-          hits.push_back(hit);
+          m_hits.push_back(hit);
         }
 
         if (state->isFitted()) {
-          chi2 += state->getChi2();
+          m_chi2 += state->getChi2();
         }
       }
 
       m_trackCharge = mSoP.getCharge();
       m_trackMomentum = mSoP.getMom();
       m_trackPosition = mSoP.getPos();
+
+      m_seed = path.front()->getSeed();
     }
 
     /// Getter for the stored hits
@@ -63,7 +64,7 @@ namespace Belle2 {
     }
 
     /// Getter for the stored seeds
-    ASeed* getSeed() const
+    const ASeed* getSeed() const
     {
       return m_seed;
     }
@@ -74,28 +75,10 @@ namespace Belle2 {
       return m_chi2;
     }
 
-    /// Getter for the teacher information
-    TrackFindingCDC::Weight getTeacherInformation() const
-    {
-      return m_teacherInformation;
-    }
-
-    /// Setter for the teacher information
-    void setTeacherInformation(TrackFindingCDC::Weight teacherInformation)
-    {
-      m_teacherInformation = teacherInformation;
-    }
-
     /// Get the position this track should start at
     const TVector3& getPosition() const
     {
       return m_trackPosition;
-    }
-
-    /// Get the position this track should start at
-    void setPosition(const TVector3& position)
-    {
-      m_trackPosition = position;
     }
 
     /// Get the momentum this track should start at (defined at the position)
@@ -104,33 +87,19 @@ namespace Belle2 {
       return m_trackMomentum;
     }
 
-    /// Set the momentum this track should start at (defined at the position)
-    void setMomentum(const TVector3& momentum)
-    {
-      m_trackMomentum = momentum;
-    }
-
     /// Set the charge of the track
     short getCharge() const
     {
       return m_trackCharge;
     }
 
-    /// Set the charge of the track
-    void setCharge(short charge)
-    {
-      m_trackCharge = charge;
-    }
-
   private:
     /// The stored seed
-    ASeed* m_seed;
+    const ASeed* m_seed;
     /// The stored hits
     std::vector<const AHit*> m_hits;
     /// The stored chi2
-    double m_chi2;
-    /// A weight, which transports the teacher information
-    TrackFindingCDC::Weight m_teacherInformation = NAN;
+    double m_chi2 = 0;
     /// The position this track should start at
     TVector3 m_trackPosition;
     /// The momentum this track should start at (defined at the position)

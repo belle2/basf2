@@ -92,20 +92,17 @@ namespace Belle2 {
     }
 
     for (const auto& result : results) {
-      RecoTrack* seed = result.getSeed();
+      const RecoTrack* seed = result.getSeed();
       if (not seed) {
         continue;
       }
-
-      const auto& matchedHits = result.getHits();
-      B2ASSERT("There are no hits related!", not matchedHits.empty());
 
       const TVector3& trackPosition = result.getPosition();
       const TVector3& trackMomentum = result.getMomentum();
       const short& trackCharge = result.getCharge();
 
       RecoTrack* newRecoTrack = m_outputRecoTracks.appendNew(trackPosition, trackMomentum, trackCharge);
-      // TODO RecoTrackHitsAdder::addHitsToRecoTrack(matchedHits, *newRecoTrack);
+      result.addToRecoTrack(*newRecoTrack);
 
       seed->addRelationTo(newRecoTrack);
     }

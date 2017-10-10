@@ -13,14 +13,14 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegmentTriple;
 
     /// Filter for the constuction of segment triples based on simple criterions
-    class AllSegmentTripleFilter : public Filter<CDCSegmentTriple> {
+    class AllSegmentTripleFilter : public BaseSegmentTripleFilter {
 
     public:
       /// All implementation returns the size of the segment triples accepting all.
       Weight operator()(const CDCSegmentTriple& segmentTriple) final;
     };
-
   }
 }

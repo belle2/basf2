@@ -1733,6 +1733,20 @@ def inclusiveBtagReconstruction(upsilon_list_name, bsig_list_name, btag_list_nam
     path.add_module(btag)
 
 
+def selectDaughters(particle_list_name, decay_string, path=analysis_main):
+    """
+    Redefine the Daughters of a particle: select from decayString
+
+    @param particle_list_name input particle list
+    @para decay_string  for selecting the Daughters to be preserved
+    """
+    seld = register_module('SelectDaughters')
+    seld.set_name('SelectDaughters_' + particle_list_name)
+    seld.param('listName', particle_list_name)
+    seld.param('decayString', decay_string)
+    path.add_module(seld)
+
+
 if __name__ == '__main__':
     desc_list = []
     for function_name in sorted(list_functions(sys.modules[__name__])):

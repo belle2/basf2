@@ -13,13 +13,12 @@
 
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 
+#include <array>
 #include <vector>
 #include <string>
 #include <cmath>
 
 namespace Belle2 {
-  class ModuleParamList;
-
   namespace TrackFindingCDC {
     class CDCFacet;
 

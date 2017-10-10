@@ -7,12 +7,17 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 
-#include <gtest/gtest.h>
+#include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
+#include <tracking/trackFindingCDC/geometry/LineParameters.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
+#include <tracking/trackFindingCDC/numerics/Matrix.h>
+
+#include <framework/logging/Logger.h>
+
+#include <gtest/gtest.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -20,8 +25,8 @@ using namespace TrackFindingCDC;
 
 TEST(TrackFindingCDCTest, fitting_FacetFitter_fitLine)
 {
-  Eigen::Array<double, 3, 1> weights = Eigen::Array<double, 3, 1>::Constant(1.0 / 4.0);
-  Eigen::Matrix<double, 3, 3> xyl = Eigen::Matrix<double, 3, 3>::Zero();
+  Matrix<double, 3, 1> weights = Matrix<double, 3, 1>::Constant(1.0 / 4.0);
+  Matrix<double, 3, 3> xyl = Matrix<double, 3, 3>::Zero();
 
   xyl(0, 0) = -1;
   xyl(0, 1) = 1.1;
@@ -50,8 +55,8 @@ TEST(TrackFindingCDCTest, fitting_FacetFitter_fitLine)
 
 TEST(TrackFindingCDCTest, fitting_FacetFitter_fitLine_alongYAxes)
 {
-  Eigen::Array<double, 3, 1> weights = Eigen::Array<double, 3, 1>::Ones();
-  Eigen::Matrix<double, 3, 3> xyl = Eigen::Matrix<double, 3, 3>::Zero();
+  Matrix<double, 3, 1> weights = Matrix<double, 3, 1>::Constant(1.0);
+  Matrix<double, 3, 3> xyl = Matrix<double, 3, 3>::Zero();
 
   xyl(0, 0) = 1.1;
   xyl(0, 1) = -1;
@@ -81,8 +86,8 @@ TEST(TrackFindingCDCTest, fitting_FacetFitter_fitLine_alongYAxes)
 
 TEST(TrackFindingCDCTest, fitting_FacetFitter_fitLine_sameSide)
 {
-  Eigen::Array<double, 3, 1> weights = Eigen::Array<double, 3, 1>::Ones();
-  Eigen::Matrix<double, 3, 3> xyl = Eigen::Matrix<double, 3, 3>::Zero();
+  Matrix<double, 3, 1> weights = Matrix<double, 3, 1>::Constant(1);
+  Matrix<double, 3, 3> xyl = Matrix<double, 3, 3>::Zero();
 
   xyl(0, 0) = 1;
   xyl(0, 1) = 0.8;

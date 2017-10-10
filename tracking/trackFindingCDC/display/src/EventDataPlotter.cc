@@ -34,6 +34,8 @@
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
+#include <tracking/trackFindingCDC/geometry/Circle2D.h>
+
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 
@@ -43,6 +45,8 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <mdst/dataobjects/MCParticle.h>
+
+#include <TMatrixDSym.h>
 
 #include <cmath>
 #include <exception>
@@ -412,9 +416,11 @@ void EventDataPlotter::draw(const CDCRecoHit2D& recoHit2D, const AttributeMap& a
   float radius = wireHit.getRefDriftLength();
   primitivePlotter.drawCircle(x, y, radius, attributeMap);
 
-  float supportPointRadius = 0.2;
-  Circle2D supportPoint(recoPos2D, supportPointRadius);
-  draw(supportPoint, attributeMap);
+  if (not recoPos2D.hasNAN()) {
+    float supportPointRadius = 0.2;
+    Circle2D supportPoint(recoPos2D, supportPointRadius);
+    draw(supportPoint, attributeMap);
+  }
 
   primitivePlotter.endGroup();
 }

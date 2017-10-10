@@ -14,12 +14,16 @@
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleCondition.h>
 #include <framework/core/PathElement.h>
+
+#include <framework/core/FrameworkExceptions.h>
 #include <framework/logging/LogConfig.h>
+#include <framework/logging/Logger.h>
 
 #include <boost/shared_ptr.hpp>
 
 #include <list>
 #include <string>
+#include <memory>
 
 namespace boost {
   namespace python {
@@ -363,7 +367,7 @@ namespace Belle2 {
      * a python list of all default values and the description of the parameter.
      * @return A python list containing the parameters of this parameter list.
      */
-    boost::shared_ptr<boost::python::list> getParamInfoListPython() const;
+    std::shared_ptr<boost::python::list> getParamInfoListPython() const;
 
     /**
      * Exposes methods of the Module class to Python.

@@ -63,6 +63,9 @@ void AxialSegmentPairCreator::apply(const std::vector<CDCSegment2D>& inputSegmen
       }
     }
 
+    // Make pairs with the same super layer
+    create(startSegments, startSegments, axialSegmentPairs);
+
     // Make pairs of this superlayer and the superlayer more to the outside
     {
       ISuperLayer iStereoSuperLayerOut = ISuperLayerUtil::getNextOutwards(iSuperLayer);

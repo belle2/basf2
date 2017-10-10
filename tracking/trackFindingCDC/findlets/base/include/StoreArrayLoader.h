@@ -14,7 +14,7 @@
 #include <tracking/ckf/utilities/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <vector>
@@ -27,9 +27,11 @@ namespace Belle2 {
      * This findlet can be used to retrieve data from a store array.
      * Please note that this module returns pointers.
      */
-    template<class IOType>
-    class StoreArrayLoader:
-      public Findlet<IOType*> {
+    template <class IOType>
+    class StoreArrayLoader : public Findlet<IOType*> {
+
+      /// Type of the base class
+      using Super =  Findlet<IOType*>;
 
     public:
       /// Constructor taking the default name of the store vector which is the source for the import.
@@ -76,6 +78,7 @@ namespace Belle2 {
       /// Receive signal before the start of the event processing
       void initialize() override
       {
+        Super::initialize();
         StoreArray<IOType> storeArray(m_param_storeArrayName);
         storeArray.isRequired();
       }

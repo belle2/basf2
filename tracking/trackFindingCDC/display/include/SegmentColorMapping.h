@@ -12,6 +12,9 @@
 #include <tracking/trackFindingCDC/display/ColorMapping.h>
 #include <tracking/trackFindingCDC/display/Mapping.h>
 
+#include <vector>
+#include <string>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegment2D;

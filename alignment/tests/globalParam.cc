@@ -29,30 +29,30 @@ using namespace alignment;
 
 namespace {
   /// Test class for hierarchy parameter storage
-  class MockDBObj : public TObject {
-  public:
-    static unsigned short getGlobalUniqueID() { return 1; }
-    double getGlobalParam(unsigned short element, unsigned short param)
-    {
-      if (element != 1)
-        return 0.;
-      if (param != 1)
-        return 0.;
-
-      return m_value;
-    }
-    void setGlobalParam(unsigned short element, unsigned short param, double val)
-    {
-      if (element != 1)
-        return;
-      if (param != 1)
-        return;
-      m_value = val;
-    }
-    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {{1, 1}};}
-  private:
-    double m_value {0.};
-  };
+//   class MockDBObj : public TObject {
+//   public:
+//     static unsigned short getGlobalUniqueID() { return 1; }
+//     double getGlobalParam(unsigned short element, unsigned short param)
+//     {
+//       if (element != 1)
+//         return 0.;
+//       if (param != 1)
+//         return 0.;
+//
+//       return m_value;
+//     }
+//     void setGlobalParam(unsigned short element, unsigned short param, double val)
+//     {
+//       if (element != 1)
+//         return;
+//       if (param != 1)
+//         return;
+//       m_value = val;
+//     }
+//     std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {{1, 1}};}
+//   private:
+//     double m_value {0.};
+//   };
 
   class MockDetectorInterface : public IGlobalParamInterface {
   public:

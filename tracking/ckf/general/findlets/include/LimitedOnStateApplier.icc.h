@@ -37,4 +37,10 @@ namespace Belle2 {
   {
     return m_filter.needsTruthInformation();
   };
+
+  template <class AState, class AFilter>
+  void LimitedOnStateApplier<AState, AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+  {
+    m_filter.exposeParameters(moduleParamList, prefix);
+  };
 }

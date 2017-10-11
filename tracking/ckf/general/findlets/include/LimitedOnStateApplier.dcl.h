@@ -38,6 +38,8 @@ namespace Belle2 {
 
     bool needsTruthInformation() override;
 
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override ;
+
   private:
     /// Parameter how many objects should pass maximal
     int m_param_useNStates = 0;

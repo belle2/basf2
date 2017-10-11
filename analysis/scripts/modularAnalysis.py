@@ -1751,7 +1751,7 @@ if __name__ == '__main__':
     desc_list = []
     for function_name in sorted(list_functions(sys.modules[__name__])):
         function = globals()[function_name]
-        signature = inspect.formatargspec(*inspect.getargspec(function))
+        signature = inspect.formatargspec(*inspect.getfullargspec(function))
         signature = signature.replace(repr(analysis_main), 'analysis_main')
         desc_list.append((function.__name__, signature + '\n' + function.__doc__))
 

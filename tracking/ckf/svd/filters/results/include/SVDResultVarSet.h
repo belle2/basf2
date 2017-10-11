@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
 
 #include <tracking/ckf/svd/entities/CKFToSVDResult.h>
+#include <tracking/ckf/svd/utilities/SVDAdvancer.h>
 
 namespace Belle2 {
   /// Names of the variables to be generated.
@@ -65,7 +66,13 @@ namespace Belle2 {
   class SVDResultVarSet : public TrackFindingCDC::VarSet<SVDResultVarNames> {
 
   public:
+    SVDResultVarSet();
+
     /// Generate and assign the variables from the object.
     bool extract(const CKFToSVDResult* object) final;
+
+  private:
+    /// Findlet for advancing
+    SVDAdvancer m_advancer;
   };
 }

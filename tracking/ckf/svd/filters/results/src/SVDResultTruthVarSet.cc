@@ -23,7 +23,6 @@ bool SVDResultTruthVarSet::extract(const CKFToSVDResult* result)
 
   var<named("truth_event_number")>() = m_eventMetaData->getEvent();
   var<named("truth_seed_number")>() = seedTrack->getArrayIndex();
-  // TODO var<named("truth_teacher")>() = result->getTeacherInformation();
 
   const std::string& seedTrackStoreArrayName = seedTrack->getArrayName();
 

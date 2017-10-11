@@ -12,9 +12,17 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <tracking/ckf/general/utilities/Advance.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+SVDResultVarSet::SVDResultVarSet() : TrackFindingCDC::VarSet<SVDResultVarNames>()
+{
+  addProcessingSignalListener(&m_advancer);
+}
+
 
 bool SVDResultVarSet::extract(const CKFToSVDResult* result)
 {
@@ -39,9 +47,9 @@ bool SVDResultVarSet::extract(const CKFToSVDResult* result)
     layerUsed[spacePoint->getVxdID().getLayerNumber()] += 1;
 
     // TODO
-    /*if (not m_advanceAlgorithm.extrapolate(mSoP, *spacePoint)) {
+    if (std::isnan(m_advancer.extrapolateToPlane(mSoP, *spacePoint))) {
       return false;
-    }*/
+    }
     const double chi2 = 0; //TODO m_kalmanAlgorithm.kalmanStep(mSoP, *spacePoint);
 
     chi2_vxd_full += chi2;
@@ -87,7 +95,7 @@ bool SVDResultVarSet::extract(const CKFToSVDResult* result)
 
 
   const genfit::MeasuredStateOnPlane& firstCDCHit = seedTrack->getMeasuredStateOnPlaneFromFirstHit();
-  // TODO m_advanceAlgorithm.extrapolate(mSoP, firstCDCHit);
+  m_advancer.extrapolateToPlane(mSoP, firstCDCHit.getPlane(), 1);
 
   const auto& distance = mSoP.getPos() - firstCDCHit.getPos();
   var<named("distance_to_seed_track")>() = distance.Mag();

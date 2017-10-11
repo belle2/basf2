@@ -212,10 +212,21 @@ namespace Belle2 {
     */
     bool operator < (const SVDShaperDigit&   x)const
     {
-      bool sensorOrder = getSensorID()  < x.getSensorID() ;
-      bool sideOrder = isUStrip() && ! x.isUStrip();
+
+      /*
+      //to be re-checked
+      bool sensorOrder = getSensorID()  <= x.getSensorID() ;
+      bool sideOrder = isUStrip() || ( (! isUStrip() && ! x.isUStrip()) );
       bool cellOrder = getCellID() < x.getCellID();
-      return sensorOrder || sideOrder || cellOrder ;
+      return sensorOrder && sideOrder && cellOrder ;
+      */
+
+      if (getSensorID() != x.getSensorID())
+        return getSensorID() < x. getSensorID();
+      if (isUStrip() != x.isUStrip())
+        return isUStrip();
+      else
+        return getCellID() < x.getCellID();
     }
 
   private:

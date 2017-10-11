@@ -141,6 +141,7 @@ namespace Belle2 {
       bool m_background;  /**< background flag */
       bool m_calibration;  /**< calibration flag */
       bool m_inter; /**< internuclear counter effect */
+      bool m_HadronPulseShape; /**< hadron pulse shape flag */
     };
   }//ECL
 }//Belle2

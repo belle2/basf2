@@ -12,6 +12,9 @@
 #include <framework/gearbox/Unit.h>
 #include <simulation/background/BkgNeutronWeight.h>
 
+#include "G4EmCalculator.hh"// Used to get dE/dx for pulse shape construction
+#include <framework/utilities/FileSystem.h>
+
 using namespace std;
 using namespace Belle2::ECL;
 
@@ -28,6 +31,7 @@ SensitiveDetector::SensitiveDetector(G4String name, G4double UNUSED(thresholdEne
   m_trackID = 0;
   m_WeightedTime = 0;
   m_energyDeposit = 0;
+  m_hadronenergyDeposit = 0;
 
   registerMCParticleRelation(m_eclSimHitRel);
   registerMCParticleRelation(m_eclHitRel);
@@ -45,15 +49,59 @@ SensitiveDetector::~SensitiveDetector()
 
 void SensitiveDetector::Initialize(G4HCofThisEvent*)
 {
+  m_HadronEmissionFile = FileSystem::findFile("/data/ecl/HadronScintEmissionFunction.root");
+  TFile* InFile = new TFile(m_HadronEmissionFile.c_str(), "READ");
+  if (!InFile || InFile->IsZombie())
+    B2FATAL("Could not open file " << "HadronScintEmissionFunction.root");
+  m_HadronEmissionFunction = (TGraph*) InFile->Get("HadronEmissionFunction");
+  InFile->Close();
+  delete InFile;
 }
-
+//Returns percent of scintillation emission for hadron component for given ionization dEdx value
+//See slides: https://kds.kek.jp/indico/event/24563/session/17/contribution/256/material/slides/0.pdf
+//for additional details
+double SensitiveDetector::GetHadronIntensityFromDEDX(double x)
+{
+  if (x < 2) return 0;
+  if (x > 232) return m_HadronEmissionFunction->Eval(232);
+  return m_HadronEmissionFunction->Eval(x);
+  //return 0;
+}
+//
+//Return total scintillation efficiency, normalized to 1 for photons, for CsI(Tl) given ionization dEdx value.
+//See slides: https://kds.kek.jp/indico/event/24563/session/17/contribution/256/material/slides/0.pdf
+//for additional details
+double GetCsITlScintillationEfficiency(double x)
+{
+  const double p0 = 1.52;
+  const double p1 = 0.00344839;
+  const double p2 = 2.0;
+  double val = 1;
+  if (x > 0) val = p0 / (1 + (p1 * x) + (p2 / x));
+  if (val < 1 && x < 10) val = 1;
+  return val;
+}
 //-----------------------------------------------------
 // Method invoked for every step in sensitive detector
 //-----------------------------------------------------
 bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 {
+  //
+  G4EmCalculator emCal;
+  double preKineticEnergy = aStep->GetPreStepPoint()->GetKineticEnergy();
+  double postKineticEnergy = aStep->GetPostStepPoint()->GetKineticEnergy();
+  double avgKineticEnergy = 0.5 * (preKineticEnergy + postKineticEnergy);
+  const G4String m_n = "G4_CESIUM_IODIDE";
+  G4String step_part_name = aStep->GetTrack()->GetDefinition()->GetParticleName();
+  double ELE_DEDX = emCal.ComputeDEDX(avgKineticEnergy, step_part_name, "eIoni", m_n)  / CLHEP::MeV * CLHEP::cm / 4.51;
+  double HAD_DEDX = emCal.ComputeDEDX(avgKineticEnergy, step_part_name, "hIoni", m_n)  / CLHEP::MeV * CLHEP::cm / 4.51;
+  double ION_DEDX = emCal.ComputeDEDX(avgKineticEnergy, step_part_name, "ionIoni", m_n) / CLHEP::MeV * CLHEP::cm / 4.51;
+  G4double DEDX_val = ELE_DEDX + HAD_DEDX + ION_DEDX; //2/3 should be 0;
+  //
   //  return true;
   G4double edep = aStep->GetTotalEnergyDeposit();
+  double LightOutputCorrection = GetCsITlScintillationEfficiency(DEDX_val);
+  edep *= LightOutputCorrection;
   const G4StepPoint& s0 = *aStep->GetPreStepPoint();
   const G4StepPoint& s1 = *aStep->GetPostStepPoint();
   const G4Track&  track = *aStep->GetTrack();
@@ -65,12 +113,17 @@ bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
     m_energyDeposit = 0;
     m_WeightedTime = 0;
     m_WeightedPos.set(0, 0, 0);
+    m_hadronenergyDeposit = 0;
   }
   //Update energy deposit
   G4double hedep = 0.5 * edep; // half of energy deposition -- for averaging purpose
   m_energyDeposit += edep;
   m_WeightedTime  += (s0.GetGlobalTime() + s1.GetGlobalTime()) * hedep;
   m_WeightedPos   += (s0.GetPosition()   + s1.GetPosition()) * hedep;
+  //
+  //Calculate hadronic scintillation component intensity from dEdx
+  m_hadronenergyDeposit += (edep / CLHEP::GeV) * GetHadronIntensityFromDEDX(DEDX_val);
+  //
   //Save Hit if track leaves volume or is killed
   if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
     if (m_energyDeposit > 0.0) {
@@ -80,7 +133,7 @@ bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
       m_WeightedTime *= dTotalEnergy;
       m_WeightedPos  *= dTotalEnergy;
       int pdgCode = track.GetDefinition()->GetPDGEncoding();
-      saveSimHit(cellID, m_trackID, pdgCode, m_WeightedTime, m_energyDeposit, m_momentum, m_WeightedPos);
+      saveSimHit(cellID, m_trackID, pdgCode, m_WeightedTime, m_energyDeposit, m_momentum, m_WeightedPos, m_hadronenergyDeposit);
     }
     //Reset TrackID
     m_trackID = 0;
@@ -131,13 +184,13 @@ void SensitiveDetector::EndOfEvent(G4HCofThisEvent*)
 }
 
 int SensitiveDetector::saveSimHit(G4int cellId, G4int trackID, G4int pid, G4double tof, G4double edep,
-                                  const G4ThreeVector& mom, const G4ThreeVector& pos)
+                                  const G4ThreeVector& mom, const G4ThreeVector& pos, double Hadronedep)
 {
   int simhitNumber = m_eclSimHits.getEntries();
   m_eclSimHitRel.add(trackID, simhitNumber);
   tof  *= 1 / CLHEP::ns;
   edep *= 1 / CLHEP::GeV;
-  m_eclSimHits.appendNew(cellId + 1, trackID, pid, tof, edep, mom * (1 / CLHEP::GeV), pos * (1 / CLHEP::cm));
+  m_eclSimHits.appendNew(cellId + 1, trackID, pid, tof, edep, mom * (1 / CLHEP::GeV), pos * (1 / CLHEP::cm), Hadronedep);
   return simhitNumber;
 }
 

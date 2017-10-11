@@ -61,6 +61,8 @@ namespace Belle2 {
     for (const TrackFindingCDC::WeightedRelation<AState>& continuation : continuations) {
       AState* childState = continuation.getTo();
       TrackFindingCDC::Weight weight = continuation.getWeight();
+      // the state may still include information from an other round of processing, so lets set it back
+      childState->reset();
       childStates.emplace_back(childState, weight);
     }
 

@@ -23,13 +23,8 @@
 #include <tracking/ckf/svd/findlets/SVDStateRejecter.h>
 #include <tracking/trackFindingCDC/findlets/base/StoreArrayLoader.h>
 
-#include <tracking/ckf/svd/filters/relations/SVDRelationFilterFactory.h>
-#include <tracking/ckf/svd/filters/results/SVDResultFilterFactory.h>
-
-// I do not quite understand, why I need this here...
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
-
-#include <vector>
+#include <tracking/ckf/svd/filters/relations/ChooseableSVDRelationFilter.h>
+#include <tracking/ckf/svd/filters/results/ChooseableSVDResultFilter.h>
 
 namespace Belle2 {
   class RecoTrack;
@@ -61,6 +56,9 @@ namespace Belle2 {
   public:
     /// Constructor, for setting module description and parameters.
     CKFToSVDFindlet();
+
+    /// Default desctructor
+    ~CKFToSVDFindlet();
 
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

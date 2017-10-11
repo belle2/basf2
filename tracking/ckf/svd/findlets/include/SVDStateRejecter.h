@@ -12,9 +12,10 @@
 #include <tracking/ckf/general/findlets/StateRejecter.dcl.h>
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
 
-#include <tracking/ckf/svd/filters/states/SVDStateFilterFactory.h>
+#include <tracking/ckf/svd/filters/states/ChooseableOnSVDStateApplier.h>
 
 namespace Belle2 {
   /// Rejecter findlet for CKF SVD states
-  using SVDStateRejecter = StateRejecter<CKFToSVDState, ChooseableSVDStateFilter>;
+  // TODO: this is the point where one wants to implement the cached advance filter!
+  using SVDStateRejecter = StateRejecter<CKFToSVDState, ChooseableOnSVDStateApplier>;
 }

@@ -21,6 +21,7 @@
 #include <tracking/ckf/general/findlets/LimitedOnStateApplier.icc.h>
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/ckf/svd/filters/relations/LayerSVDRelationFilter.icc.h>
 
 #include <framework/core/ModuleParamList.dcl.h>
 
@@ -28,6 +29,8 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+CKFToSVDFindlet::~CKFToSVDFindlet() = default;
 
 CKFToSVDFindlet::CKFToSVDFindlet()
 {

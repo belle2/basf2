@@ -20,6 +20,11 @@
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
+#include <tracking/ckf/general/filters/AdvanceFilter.h>
+#include <tracking/ckf/general/filters/KalmanFilter.h>
+#include <tracking/ckf/svd/utilities/SVDAdvancer.h>
+#include <tracking/ckf/svd/utilities/SVDKalmanStepper.h>
+
 #include <tracking/ckf/svd/filters/states/SVDStateVarSet.h>
 #include <tracking/ckf/svd/filters/states/SVDStateBasicVarSet.h>
 #include <tracking/ckf/svd/filters/states/SVDStateTruthVarSet.h>
@@ -74,12 +79,14 @@ std::map<std::string, std::string> SVDStateFilterFactory::getValidFilterNamesAnd
   return {
     {"none", "no track combination is valid"},
     {"all", "set all track combinations as good"},
+    {"advance", "extrapolate the states"},
+    {"fit", "update the mSoP using a Kalman Filter"},
     {"truth", "monte carlo truth"},
     {"ordering_truth", "monte carlo truth ordering"},
     {"sloppy_truth", "sloppy monte carlo truth"},
     {"simple", "simple filter to be used in svd"},
     {"recording", "record variables to a TTree"},
-    {"mva", "MVA filter"},
+    //{"mva", "MVA filter"},
     {"sloppy_recording", "record variables to a TTree"},
   };
 }
@@ -91,6 +98,10 @@ SVDStateFilterFactory::create(const std::string& filterName) const
     return std::make_unique<TrackFindingCDC::NoneFilter<BaseSVDStateFilter>>();
   } else if (filterName == "all") {
     return std::make_unique<TrackFindingCDC::AllFilter<BaseSVDStateFilter>>();
+  } else if (filterName == "advance") {
+    return std::make_unique<AdvanceFilter<CKFToSVDState, SVDAdvancer>>();
+  } else if (filterName == "fit") {
+    return std::make_unique<KalmanFilter<CKFToSVDState, SVDKalmanStepper>>();
   } else if (filterName == "simple") {
     return std::make_unique<SimpleSVDStateFilter>();
   } else if (filterName == "truth") {

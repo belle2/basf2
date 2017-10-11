@@ -18,11 +18,11 @@
 
 namespace Belle2 {
   /// Factory that can create appropriate cluster filters from associated names.
-  class SVDStateFilterFactory : public TrackFindingCDC::FilterFactory<BaseSVDOnStateApplier> {
+  class SVDStateFilterFactory : public TrackFindingCDC::FilterFactory<BaseSVDStateFilter> {
 
   private:
     /// Type of the base class
-    using Super = TrackFindingCDC::FilterFactory<BaseSVDOnStateApplier>;
+    using Super = TrackFindingCDC::FilterFactory<BaseSVDStateFilter>;
 
   public:
     /// Constructor forwarding the default filter name
@@ -41,8 +41,6 @@ namespace Belle2 {
     std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
 
     /// Create a filter with the given name.
-    std::unique_ptr<BaseSVDOnStateApplier> create(const std::string& filterName) const override;
+    std::unique_ptr<BaseSVDStateFilter> create(const std::string& filterName) const override;
   };
-
-  using ChooseableSVDStateFilter = TrackFindingCDC::ChooseableFilter<SVDStateFilterFactory>;
 }

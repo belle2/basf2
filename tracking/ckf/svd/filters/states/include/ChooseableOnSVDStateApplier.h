@@ -9,12 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/ckf/general/findlets/LimitedOnStateApplier.dcl.h>
+#include <tracking/ckf/svd/filters/states/SVDStateFilterFactory.h>
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
-
-#include <tracking/ckf/general/findlets/OnStateApplier.dcl.h>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
-  /// Base filter for CKF SVD states
-  using BaseSVDStateFilter = TrackFindingCDC::Filter<std::pair<const std::vector<const CKFToSVDState*>, CKFToSVDState*>>;
+  using ChooseableOnSVDStateApplier = LimitedOnStateApplier<CKFToSVDState,
+        TrackFindingCDC::ChooseableFilter<SVDStateFilterFactory>>;
 }

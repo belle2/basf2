@@ -144,8 +144,6 @@ namespace Belle2 {
       double m_shapingTime;
       /** Interval between two waveform samples (30 ns). */
       double m_samplingTime;
-      /** Whether or not to apply a time window cut */
-      bool   m_applyWindow;
       /** Randomize event times?
        * If set to true, event times will be randomized uniformly from
        * m_minTimeFrame to m_maxTimeFrame.

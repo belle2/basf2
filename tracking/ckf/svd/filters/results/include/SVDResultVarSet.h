@@ -15,6 +15,7 @@
 
 #include <tracking/ckf/svd/entities/CKFToSVDResult.h>
 #include <tracking/ckf/svd/utilities/SVDAdvancer.h>
+#include <tracking/ckf/svd/utilities/SVDKalmanStepper.h>
 
 namespace Belle2 {
   /// Names of the variables to be generated.
@@ -74,5 +75,7 @@ namespace Belle2 {
   private:
     /// Findlet for advancing
     SVDAdvancer m_advancer;
+    /// Findlet for kalman step
+    SVDKalmanStepper m_kalmanStepper;
   };
 }

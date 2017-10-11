@@ -75,7 +75,10 @@ Weight SimpleSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair)
 
   if (not currentState->isFitted() and not currentState->mSoPSet()) {
     // Filter 1
-    const RecoTrack* cdcTrack = currentState->getSeed();
+    const RecoTrack* cdcTrack = previousStates.front()->getSeed();
+
+    B2ASSERT("A path without a seed?", cdcTrack);
+
     const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed(), m_cachedBField);
 
     const double arcLength = trajectory.calcArcLength2D(hitPosition);

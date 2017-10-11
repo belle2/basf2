@@ -24,7 +24,10 @@ namespace Belle2 {
   public:
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 
-    double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, CKFToSVDState& state);
+    double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const CKFToSVDState& state);
+
+    double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint& spacePoint);
+
     double calculateResidual(genfit::MeasuredStateOnPlane& measuredStateOnPlane, CKFToSVDState& state);
 
   private:

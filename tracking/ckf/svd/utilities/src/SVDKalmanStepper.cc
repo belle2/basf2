@@ -22,7 +22,7 @@ void SVDKalmanStepper::exposeParameters(ModuleParamList* moduleParamList __attri
 {
 }
 
-double SVDKalmanStepper::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, CKFToSVDState& state)
+double SVDKalmanStepper::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const CKFToSVDState& state)
 {
   double chi2 = 0;
   for (const std::unique_ptr<SVDRecoHit>& svdRecoHit : state.getRecoHits()) {
@@ -35,6 +35,12 @@ double SVDKalmanStepper::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateO
     chi2 += m_kalmanStepper.kalmanStep(measuredStateOnPlane, *measurementOnPlane);
   }
   return chi2;
+}
+
+double SVDKalmanStepper::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint& spacePoint)
+{
+  CKFToSVDState state(&spacePoint);
+  return kalmanStep(measuredStateOnPlane, state);
 }
 
 double SVDKalmanStepper::calculateResidual(genfit::MeasuredStateOnPlane& measuredStateOnPlane, CKFToSVDState& state)

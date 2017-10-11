@@ -21,8 +21,8 @@ bool SVDStateTruthVarSet::extract(const BaseSVDStateFilter::Object* pair)
   const std::vector<const CKFToSVDState*>& previousStates = pair->first;
   CKFToSVDState* state = pair->second;
 
-  const RecoTrack* seedTrack = state->getSeed();
-  if (not seedTrack) return false;
+  const RecoTrack* seedTrack = previousStates.front()->getSeed();
+  B2ASSERT("Path without seed?", seedTrack);
 
   var<named("truth_event_id")>() = m_eventMetaData->getEvent();
   var<named("truth_seed_number")>() = seedTrack->getArrayIndex();
@@ -46,7 +46,7 @@ bool SVDStateTruthVarSet::extract(const BaseSVDStateFilter::Object* pair)
   TrackMatchLookUp mcCDCMatchLookUp("MCRecoTracks", seedTrackStoreArrayName);
   const RecoTrack* cdcMCTrack = mcCDCMatchLookUp.getMatchedMCRecoTrack(*seedTrack);
 
-  var<named("truth")>() = true;
+  var<named("truth")>() = 1;
 
   var<named("truth_position_x")>() = cdcMCTrack->getPositionSeed().X();
   var<named("truth_position_y")>() = cdcMCTrack->getPositionSeed().Y();

@@ -21,14 +21,15 @@ using namespace TrackFindingCDC;
 SVDResultVarSet::SVDResultVarSet() : TrackFindingCDC::VarSet<SVDResultVarNames>()
 {
   addProcessingSignalListener(&m_advancer);
+  addProcessingSignalListener(&m_kalmanStepper);
 }
 
 
 bool SVDResultVarSet::extract(const CKFToSVDResult* result)
 {
   const RecoTrack* seedTrack = result->getSeed();
-  if (not seedTrack) return false;
 
+  B2ASSERT("A result without a seed?", seedTrack);
   B2ASSERT("RecoTrack should be fitted at this stage!", seedTrack->wasFitSuccessful());
 
   const std::vector<const SpacePoint*> spacePoints = result->getHits();
@@ -46,11 +47,10 @@ bool SVDResultVarSet::extract(const CKFToSVDResult* result)
     const SpacePoint* spacePoint = *spacePointIterator;
     layerUsed[spacePoint->getVxdID().getLayerNumber()] += 1;
 
-    // TODO
     if (std::isnan(m_advancer.extrapolateToPlane(mSoP, *spacePoint))) {
       return false;
     }
-    const double chi2 = 0; //TODO m_kalmanAlgorithm.kalmanStep(mSoP, *spacePoint);
+    const double chi2 = m_kalmanStepper.kalmanStep(mSoP, *spacePoint);
 
     chi2_vxd_full += chi2;
 

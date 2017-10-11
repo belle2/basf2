@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
-#include <genfit/MeasurementOnPlane.h>
+#include <genfit/MeasuredStateOnPlane.h>
 #include <TVector3.h>
 
 #include <vector>

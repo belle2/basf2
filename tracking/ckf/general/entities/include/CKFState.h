@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <genfit/MeasurementOnPlane.h>
+#include <genfit/MeasuredStateOnPlane.h>
 #include <framework/logging/Logger.h>
 
 #include <TVector3.h>

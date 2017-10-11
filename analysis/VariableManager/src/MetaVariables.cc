@@ -212,33 +212,46 @@ namespace Belle2 {
         std::size_t prev_pos = 0;
         std::size_t pos = 0;
 
-        if (pos == std::string::npos) {
-          B2FATAL("Wrong number of arguments for meta function formula");
-        }
-
         // Putting an initial parser here so later we can make this smarter and
         // not have strict requirements on the input format
         std::vector<std::string> input_queue;
 
         while ((pos = arguments[0].find_first_of(seperators, prev_pos)) != std::string::npos) {
           next_arg = arguments[0].substr(prev_pos, pos - prev_pos);
-          boost::trim(next_arg);
-          if (next_arg.size() == 0) {
-            B2FATAL("Meta function formula incorrectly formatted.");
+
+          // Ignore everything inside another function's arguments (mostly particle lists we want to avoid)
+          if (arguments[0].find_first_of("(", prev_pos) != std::string::npos && arguments[0].find_first_of("(", prev_pos) < pos) {
+            if (arguments[0].find_first_of(")", prev_pos) > pos) {
+              pos = arguments[0].find_first_of(")", prev_pos);
+              pos = arguments[0].find_first_of(seperators, pos + 1);
+              if (pos == std::string::npos) {
+                // Reached end of the input
+                next_arg = arguments[0].substr(prev_pos);
+                break;
+              } else {
+                next_arg = arguments[0].substr(prev_pos, pos - prev_pos);
+              }
+            }
           }
-          // Add argument and following operand
-          input_queue.push_back(next_arg);
+          boost::trim(next_arg);
+          // Add argument and following operand unless it's just an empty space
+          if (next_arg.size() != 0) {
+            input_queue.push_back(next_arg);
+          }
           input_queue.push_back(arguments[0].substr(pos, 1));
           prev_pos = pos + 1;
         }
         next_arg = arguments[0].substr(prev_pos);
-        B2INFO("Got final arg:" << next_arg);
         boost::trim(next_arg);
-        B2INFO("Final arg trimmed");
         if (next_arg.size() != 0) {
           input_queue.push_back(next_arg);
-          B2INFO("Adding to input queue:" << input_queue.back());
         }
+
+        std::string rpn_inqueue;
+        for (auto const& in : input_queue) {
+          rpn_inqueue += in;
+        }
+        //B2INFO("RPN formula input stack: " << rpn_inqueue);
 
         std::vector<std::string> output_queue;
         std::vector<std::string> operator_stack;
@@ -250,7 +263,7 @@ namespace Belle2 {
           std::vector<std::string>::iterator bra = std::find(std::begin(brackets), std::end(brackets), input);
 
           // Check if it's a number first
-          if (op == operators.end() && bra == std::end(brackets)) {
+          if (op == operators.end() && bra == brackets.end()) {
             output_queue.push_back(input);
 
             // Check if it's an operation
@@ -269,10 +282,10 @@ namespace Belle2 {
             // Now can read next operator onto the operator stack
             operator_stack.push_back(input);
             // Open bracket case
-          } else if (bra != std::end(brackets) && next_arg.compare(brackets[0]) == 0) {
+          } else if (bra != brackets.end() && input.compare(brackets[0]) == 0) {
             operator_stack.push_back(input);
             // Close bracket case
-          } else if (bra != std::end(brackets) && next_arg.compare(brackets[1]) == 0) {
+          } else if (bra != std::end(brackets) && input.compare(brackets[1]) == 0) {
             while (
               operator_stack.size() > 0 &&
               operator_stack.back().compare(brackets[0]) != 0) {
@@ -281,7 +294,6 @@ namespace Belle2 {
             }
             // Should only be left bracket on top now, if not unmatched parenthesis.
             // Should add error check for this.
-            output_queue.push_back(operator_stack.back());
             operator_stack.pop_back();
           }
 
@@ -1104,7 +1116,9 @@ endloop:
                       "Clean tracks are defined by the tracks which pass the given cut assuming a pion hypothesis.");
     REGISTER_VARIABLE("formula(v1 + v2 * [v3 - v4] / v5^v6)", formula,
                       "Returns the result of the given formula, where v1-v6 are variables.\n"
-                      "Parenthesis MUST be in the form of square brackets: [v1 * v2].");
+                      "Parenthesis MUST be in the form of square brackets: [v1 * v2].\n"
+                      "Currently only supports one level of round parentheses () in variable names,"
+                      " i.e. passesCut(cut) as an input variable will fail if the cut also contains ( or ).");
     REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame,
                       "Returns the value of the variable using the rest frame of the given particle as current reference frame.\n"
                       "E.g. useRestFrame(daughter(0, p)) returns the total momentum of the first daughter in its mother's rest-frame");

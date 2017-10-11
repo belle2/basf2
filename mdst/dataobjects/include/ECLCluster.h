@@ -32,7 +32,6 @@ namespace Belle2 {
      */
     ECLCluster() :
       m_isTrack(false),
-      m_isMatchedByTwoTracks(false),
       m_status(0),
       m_connectedRegionId(0),
       m_hypothesisId(5), // set to 5 (all photons) for b2bii
@@ -64,9 +63,6 @@ namespace Belle2 {
 
     /** Set m_isTrack true if the cluster matches with at least one track. */
     void setIsTrack(bool istrack) { m_isTrack = istrack; }
-
-    /** Set m_isMatchedByTwoTracks true if the cluster matches with two tracks. */
-    void setIsMatchedByTwoTracks(bool ismatchedbytwotracks) { m_isMatchedByTwoTracks = ismatchedbytwotracks; }
 
     /** Set status. */
     void setStatus(int status) { m_status = status; }
@@ -160,9 +156,6 @@ namespace Belle2 {
 
     /** Return true if the cluster matches with track. */
     bool isTrack() const { return m_isTrack; }
-
-    /** Return true if the cluster matches with two tracks. */
-    bool isMatchedByTwoTracks() const { return m_isMatchedByTwoTracks; }
 
     /** Return true if cluster has no match with track. */
     bool isNeutral() const { return !m_isTrack; }
@@ -263,9 +256,6 @@ namespace Belle2 {
 
     /** Is related to track (true) or not (false). */
     bool m_isTrack;
-
-    /** Is related to two tracks (true) or not (false). */
-    bool m_isMatchedByTwoTracks;
 
     /** Cluster status. */
     int m_status;

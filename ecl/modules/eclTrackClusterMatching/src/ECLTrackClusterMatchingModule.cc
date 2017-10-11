@@ -138,8 +138,11 @@ void ECLTrackClusterMatchingModule::event()
     } // end loop on ExtHits related to Track
     m_quality_best->push_back(quality_tmp);
     if (cluster_best != nullptr) {
-      if (cluster_best->isTrack()) cluster_best->setIsMatchedByTwoTracks(true);
-      else cluster_best->setIsTrack(true);
+      if (cluster_best->isTrack()) {
+        Track* previously_matching_track = cluster_best->getRelatedFrom<Track>();
+        track.addRelationTo(previously_matching_track);
+        previously_matching_track->addRelationTo(&track);
+      } else cluster_best->setIsTrack(true);
       track.addRelationTo(cluster_best);
     }
   } // end loop on Tracks

@@ -9,30 +9,48 @@
  **************************************************************************/
 #pragma once
 #include <tracking/ckf/general/entities/CKFState.h>
+#include <svd/reconstruction/SVDRecoHit.h>
+#include <genfit/SharedPlanePtr.h>
+#include <memory>
+
+namespace genfit {
+  class MeasuredStateOnPlane;
+}
 
 namespace Belle2 {
   class RecoTrack;
   class SpacePoint;
+  class SVDRecoHit;
 
   /// Specialized CKF State for extrapolating into the SVD
   class CKFToSVDState : public CKFState<RecoTrack, SpacePoint> {
   public:
+    /// When constructed by a hit, set the reco hit
+    CKFToSVDState(const SpacePoint* hit);
+
     /// Copy the constructors from the base class
     using CKFState::CKFState;
 
     /// Constructor setting the state to the position of the first CDC track seed hit
     CKFToSVDState(const RecoTrack* seed);
 
+    /// Extract the real layer this state sits on
     unsigned int getGeometricalLayer() const;
 
-    bool operator<(unsigned int layer)
-    {
-      return getGeometricalLayer() < layer;
-    }
+    /// Make the states comparable with a layer
+    bool operator<(unsigned int layer) const;
 
-    friend bool operator<(unsigned int layer, const CKFToSVDState& state)
-    {
-      return layer < state.getGeometricalLayer();
-    }
+    /// Make a layer comparable to the states
+    friend bool operator<(unsigned int layer, const CKFToSVDState& state);
+
+    /// Return the plane of the first SVD cluster
+    genfit::SharedPlanePtr getPlane(const genfit::MeasuredStateOnPlane& state) const;
+
+    const SVDRecoHit& getRecoHit() const;
+
+    const std::vector<std::unique_ptr<SVDRecoHit>>& getRecoHits() const;
+
+  private:
+    std::vector<std::unique_ptr<SVDRecoHit>> m_recoHits;
   };
 }

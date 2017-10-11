@@ -10,6 +10,8 @@
 
 #include <tracking/ckf/svd/entities/CKFToSVDResult.h>
 
+#include <tracking/trackFindingCDC/utilities/ReversedRange.h>
+
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <pxd/dataobjects/PXDCluster.h>
@@ -18,14 +20,13 @@
 using namespace Belle2;
 
 CKFToSVDResult::CKFToSVDResult(const std::vector<const CKFToSVDState*>& path) :
-  // TODO
-  Super(path, path.front()->getMeasuredStateOnPlane())
+  Super(path, path.back()->getMeasuredStateOnPlane())
 {
 }
 
 void CKFToSVDResult::addToRecoTrack(RecoTrack& recoTrack) const
 {
-  for (const SpacePoint* spacePoint : getHits()) {
+  for (const SpacePoint* spacePoint : TrackFindingCDC::reversedRange(getHits())) {
     const int detID = spacePoint->getType();
     unsigned int sortingParameter = 0;
 

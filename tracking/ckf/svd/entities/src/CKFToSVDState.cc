@@ -11,6 +11,9 @@
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
+#include <svd/dataobjects/SVDCluster.h>
+
+#include <genfit/MeasuredStateOnPlane.h>
 
 using namespace Belle2;
 
@@ -28,4 +31,39 @@ unsigned int CKFToSVDState::getGeometricalLayer() const
   }
 
   return spacePoint->getVxdID().getLayerNumber();
+}
+
+bool CKFToSVDState::operator<(unsigned int layer) const
+{
+  return getGeometricalLayer() < layer;
+}
+
+bool operator<(unsigned int layer, const CKFToSVDState& state)
+{
+  return layer < state.getGeometricalLayer();
+}
+
+genfit::SharedPlanePtr CKFToSVDState::getPlane(const genfit::MeasuredStateOnPlane& state) const
+{
+  const SVDRecoHit& recoHit = getRecoHit();
+  return recoHit.constructPlane(state);
+}
+
+const SVDRecoHit& CKFToSVDState::getRecoHit() const
+{
+  B2ASSERT("You are asking for the reco hit, although no hit is present.", not m_recoHits.empty());
+  return *m_recoHits.front();
+}
+
+const std::vector<std::unique_ptr<SVDRecoHit>>& CKFToSVDState::getRecoHits() const
+{
+  B2ASSERT("You are asking for the reco hit, although no hit is present.", not m_recoHits.empty());
+  return m_recoHits;
+}
+
+CKFToSVDState::CKFToSVDState(const SpacePoint* hit) : CKFState<RecoTrack, SpacePoint>(hit)
+{
+  for (const SVDCluster& svdCluster : hit->getRelationsTo<SVDCluster>()) {
+    m_recoHits.push_back(std::make_unique<SVDRecoHit>(&svdCluster));
+  }
 }

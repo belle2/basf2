@@ -38,6 +38,7 @@ namespace Belle2 {
     float weights[maxNweights];  /** Weights of the hits in sequence  */
 
     int matchedToECLCluster; /**< boolean if matched to ECL cluster */
+    int hypothesisOfMatchedECLCluster; /**< hypothesis ID of matched ECL cluster */
 
     double mass_gen; /**< generated mass */
     double px_gen; /**< generated momentum in x direction */
@@ -76,6 +77,7 @@ namespace Belle2 {
         weights[i] = 0;
 
       matchedToECLCluster = 0;
+      hypothesisOfMatchedECLCluster = 0;
 
       mass_gen = value;
       px_gen = value;

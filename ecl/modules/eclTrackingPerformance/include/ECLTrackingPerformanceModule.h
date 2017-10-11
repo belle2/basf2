@@ -136,11 +136,6 @@ namespace Belle2 {
      * @return: true if MCParticle decays in the given decay chain, else false
      */
     bool isSignalDecay(const MCParticle& mcParticle);
-
-    /**
-     * Checks if extrapolated hit comes from ECL.
-     */
-    bool isECLHit(const ExtHit& extHit);
   };
 
 

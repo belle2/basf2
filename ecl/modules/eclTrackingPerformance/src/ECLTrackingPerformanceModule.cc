@@ -89,7 +89,7 @@ void ECLTrackingPerformanceModule::event()
   m_nReconstructedChargedStableTracks = 0;
   m_nFittedChargedStabletracks = 0;
 
-  for (MCParticle& mcParticle : mcParticles) {
+  for (const MCParticle& mcParticle : mcParticles) {
     // check status of mcParticle
     if (isPrimaryMcParticle(mcParticle) && isChargedStable(mcParticle) && mcParticle.hasStatus(MCParticle::c_StableInGenerator)) {
       setVariablesToDefaultValue();
@@ -184,14 +184,11 @@ void ECLTrackingPerformanceModule::event()
             }
           }
         }
-        for (const auto& extHit : b2Track->getRelationsTo<ExtHit>()) {
-          if (!isECLHit(extHit)) continue;
-          ECLCluster* eclCluster = extHit.getRelatedFrom<ECLCluster>();
-          if (eclCluster != nullptr) {
-            m_trackProperties.matchedToECLCluster = 1;
-            break;
-          }
-        } // end loop on ExtHits related to Track
+        ECLCluster* eclCluster = b2Track->getRelatedTo<ECLCluster>();
+        if (eclCluster != nullptr) {
+          m_trackProperties.matchedToECLCluster = 1;
+          m_trackProperties.hypothesisOfMatchedECLCluster = eclCluster->getHypothesisId();
+        }
       }
 
       m_dataTree->Fill(); // write data to tree
@@ -255,6 +252,7 @@ void ECLTrackingPerformanceModule::setupTree()
   addVariableToTree("pValue", m_pValue);
 
   addVariableToTree("ECLMatch", m_trackProperties.matchedToECLCluster);
+  addVariableToTree("HypothesisID", m_trackProperties.hypothesisOfMatchedECLCluster);
 
   addVariableToTree("nPXDhits", m_trackProperties.nPXDhits);
   addVariableToTree("nSVDhits", m_trackProperties.nSVDhits);
@@ -303,8 +301,8 @@ bool ECLTrackingPerformanceModule::isSignalDecay(const MCParticle& mcParticle)
   // remove photons from list
   daughterMcParticles = removeFinalStateRadiation(daughterMcParticles);
 
-  for (auto mcParticle : daughterMcParticles) {
-    daughterPDGs.push_back(mcParticle->getPDG());
+  for (const auto& daughterMcParticle : daughterMcParticles) {
+    daughterPDGs.push_back(daughterMcParticle->getPDG());
   }
 
   std::sort(daughterPDGs.begin(), daughterPDGs.end());
@@ -371,13 +369,4 @@ void ECLTrackingPerformanceModule::addVariableToTree(const std::string& varName,
   std::stringstream leaf;
   leaf << varName << "/I";
   m_dataTree->Branch(varName.c_str(), &varReference, leaf.str().c_str());
-}
-
-bool ECLTrackingPerformanceModule::isECLHit(const ExtHit& extHit)
-{
-  if (abs(extHit.getPdgCode()) != Const::pion.getPDGCode()) return true;
-  else if ((extHit.getDetectorID() != Const::EDetector::ECL)) return true;
-  else if (extHit.getStatus() != EXT_ENTER) return true;
-  else if (extHit.getCopyID() == -1) return true;
-  else return false;
 }

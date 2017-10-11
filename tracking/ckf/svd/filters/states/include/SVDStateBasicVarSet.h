@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
 
 #include <tracking/ckf/svd/filters/states/BaseSVDStateFilter.h>
+#include <tracking/ckf/svd/utilities/SVDKalmanStepper.h>
 
 namespace Belle2 {
   /// Names of the variables to be generated.
@@ -82,5 +83,8 @@ namespace Belle2 {
   public:
     /// Generate and assign the variables from the VXD-CDC-pair
     virtual bool extract(const BaseSVDStateFilter::Object* pair) override;
+
+  private:
+    SVDKalmanStepper m_kalmanStepper;
   };
 }

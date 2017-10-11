@@ -28,25 +28,29 @@ bool SVDStateBasicVarSet::extract(const BaseSVDStateFilter::Object* pair)
   const std::vector<const CKFToSVDState*>& previousStates = pair->first;
   CKFToSVDState* state = pair->second;
 
-  const RecoTrack* cdcTrack = state->getSeed();
-  const SpacePoint* spacePoint = state->getHit();
+  const RecoTrack* cdcTrack = previousStates.front()->getSeed();
+  B2ASSERT("Path without seed?", cdcTrack);
 
-  if (not cdcTrack or not spacePoint) {
-    // TODO: Can we also extract meaningful things of the spacePoint is null?
-    return false;
+  const SpacePoint* spacePoint = state->getHit();
+  B2ASSERT("Path without hit?", spacePoint);
+
+  genfit::MeasuredStateOnPlane firstMeasurement;
+  if (state->mSoPSet()) {
+    firstMeasurement = state->getMeasuredStateOnPlane();
+  } else {
+    firstMeasurement = previousStates.back()->getMeasuredStateOnPlane();
   }
 
-  const auto& firstMeasurement = state->getMeasuredStateOnPlane();
   Vector3D position = Vector3D(firstMeasurement.getPos());
   Vector3D momentum = Vector3D(firstMeasurement.getMom());
 
   const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
 
-  const auto& hitPosition = Vector3D(spacePoint->getPosition());
+  const Vector3D hitPosition = static_cast<Vector3D>(spacePoint->getPosition());
 
   const double arcLength = trajectory.calcArcLength2D(hitPosition);
-  const auto& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
-  const auto& trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
+  const Vector2D& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
+  double trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
 
   Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
   Vector3D distance = trackPositionAtHit - hitPosition;
@@ -75,7 +79,7 @@ bool SVDStateBasicVarSet::extract(const BaseSVDStateFilter::Object* pair)
   var<named("tan_lambda")>() = static_cast<Float_t>(trajectory.getTanLambda());
   var<named("phi")>() = static_cast<Float_t>(momentum.phi());
 
-  const auto& sensorInfo = spacePoint->getVxdID();
+  const VxdID& sensorInfo = spacePoint->getVxdID();
 
   var<named("ladder")>() = sensorInfo.getLadderNumber();
   var<named("sensor")>() = sensorInfo.getSensorNumber();
@@ -88,27 +92,19 @@ bool SVDStateBasicVarSet::extract(const BaseSVDStateFilter::Object* pair)
   var<named("last_segment")>() = 0;
   var<named("last_id")>() = 0;
 
-  const auto* parent = previousStates.back();
-  if (parent) {
-    const auto* parentSpacePoint = parent->getHit();
-    if (parentSpacePoint) {
-      const auto& parentSensorInfo = parentSpacePoint->getVxdID();
+  const CKFToSVDState* parent = previousStates.back();
+  const SpacePoint* parentSpacePoint = parent->getHit();
+  if (parentSpacePoint) {
+    const VxdID& parentSensorInfo = parentSpacePoint->getVxdID();
 
-      var<named("last_layer")>() = parentSensorInfo.getLayerNumber();
-      var<named("last_ladder")>() = parentSensorInfo.getLadderNumber();
-      var<named("last_sensor")>() = parentSensorInfo.getSensorNumber();
-      var<named("last_segment")>() = parentSensorInfo.getSegmentNumber();
-      var<named("last_id")>() = parentSensorInfo.getID();
-    }
+    var<named("last_layer")>() = parentSensorInfo.getLayerNumber();
+    var<named("last_ladder")>() = parentSensorInfo.getLadderNumber();
+    var<named("last_sensor")>() = parentSensorInfo.getSensorNumber();
+    var<named("last_segment")>() = parentSensorInfo.getSegmentNumber();
+    var<named("last_id")>() = parentSensorInfo.getID();
   }
 
-  //TODO KalmanUpdateFitter fitter;
-  Float_t residual = 0;
-
-  for (const auto& svdCluster : spacePoint->getRelationsTo<SVDCluster>()) {
-    SVDRecoHit recoHit(&svdCluster);
-    // TODO residual += fitter.calculateResidualDistance<SVDRecoHit, 1>(state->getMeasuredStateOnPlane(), recoHit);
-  }
+  const double residual = m_kalmanStepper.calculateResidual(firstMeasurement, *state);
   var<named("residual")>() = residual;
 
   if (state->isFitted()) {
@@ -117,7 +113,7 @@ bool SVDStateBasicVarSet::extract(const BaseSVDStateFilter::Object* pair)
     var<named("chi2")>() = -999;
   }
 
-  const auto& cov5 = firstMeasurement.getCov();
+  const TMatrixDSym& cov5 = firstMeasurement.getCov();
   const Float_t sigmaUV = std::sqrt(std::max(cov5(4, 4), cov5(3, 3)));
   var<named("sigma_uv")>() = sigmaUV;
   var<named("residual_over_sigma")>() = residual / sigmaUV;

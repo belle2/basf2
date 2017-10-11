@@ -39,7 +39,7 @@ SVDDIGI.param('RandomizeEventTimes', True)
 SVDDIGI.param('TimeFrameLow', -180)
 SVDDIGI.param('TimeFrameHigh', 150)
 # SVD signal reconstructor
-# SVDSIGR = register_module('SVDSignalReconstructor')
+# SVDSIGR = register_module('SVDNNShapeReconstructor')
 # Write RecoDigits so that we can check them
 # SVDSIGR.param('WriteRecoDigits', True)
 SVDCLUST = register_module('SVDClusterizerDirect')

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <svd/modules/svdReconstruction/SVDSignalReconstructorModule.h>
+#include <svd/modules/svdReconstruction/SVDNNShapeReconstructorModule.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -34,15 +34,15 @@ using namespace Belle2::SVD;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDSignalReconstructor)
+REG_MODULE(SVDNNShapeReconstructor)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDSignalReconstructorModule::SVDSignalReconstructorModule() : Module()
+SVDNNShapeReconstructorModule::SVDNNShapeReconstructorModule() : Module()
 {
-  B2DEBUG(200, "Now in SVDSignalReconstructorModule ctor");
+  B2DEBUG(200, "Now in SVDNNShapeReconstructorModule ctor");
   //Set module properties
   setDescription("Reconstruct signals on SVD strips.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -68,7 +68,7 @@ SVDSignalReconstructorModule::SVDSignalReconstructorModule() : Module()
            m_cutAdjacent);
 }
 
-void SVDSignalReconstructorModule::initialize()
+void SVDNNShapeReconstructorModule::initialize()
 {
   //Register collections
   StoreArray<SVDRecoDigit> storeRecoDigits(m_storeRecoDigitsName);
@@ -135,8 +135,8 @@ void SVDSignalReconstructorModule::initialize()
   m_fitter.setNetwrok(m_timeFitterXmlName);
 }
 
-void SVDSignalReconstructorModule::createRelationLookup(const RelationArray& relation,
-                                                        RelationLookup& lookup, size_t digits)
+void SVDNNShapeReconstructorModule::createRelationLookup(const RelationArray& relation,
+                                                         RelationLookup& lookup, size_t digits)
 {
   lookup.clear();
   //If we don't have a relation we don't build a lookuptable
@@ -148,8 +148,8 @@ void SVDSignalReconstructorModule::createRelationLookup(const RelationArray& rel
   }
 }
 
-void SVDSignalReconstructorModule::fillRelationMap(const RelationLookup& lookup,
-                                                   std::map<unsigned int, float>& relation, unsigned int index)
+void SVDNNShapeReconstructorModule::fillRelationMap(const RelationLookup& lookup,
+                                                    std::map<unsigned int, float>& relation, unsigned int index)
 {
   //If the lookup table is not empty and the element is set
   if (!lookup.empty() && lookup[index]) {
@@ -165,7 +165,7 @@ void SVDSignalReconstructorModule::fillRelationMap(const RelationLookup& lookup,
   }
 }
 
-void SVDSignalReconstructorModule::event()
+void SVDNNShapeReconstructorModule::event()
 {
   const StoreArray<SVDShaperDigit> storeShaperDigits(m_storeShaperDigitsName);
   // If no digits, nothing to do

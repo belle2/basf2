@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SVDSignalReconstructorModule_H
-#define SVDSignalReconstructorModule_H
+#ifndef SVDNNShapeReconstructorModule_H
+#define SVDNNShapeReconstructorModule_H
 
 #include <framework/core/Module.h>
 #include <framework/datastore/RelationArray.h>
@@ -24,13 +24,13 @@ namespace Belle2 {
 
   namespace SVD {
 
-    /** The SVD SignalReconstructor.
+    /** The SVD NNShapeReconstructor.
      *
      * This module produces SVDRecoDigits from SVDShaperDigits (signal samples taken
      * on individual strips) by first performing time and apmlitude fitting, and then
      * calibrating the recovered signals.
      */
-    class SVDSignalReconstructorModule : public Module {
+    class SVDNNShapeReconstructorModule : public Module {
 
     public:
 
@@ -38,7 +38,7 @@ namespace Belle2 {
       typedef std::vector<const RelationElement*> RelationLookup;
 
       /** Constructor defining the parameters */
-      SVDSignalReconstructorModule();
+      SVDNNShapeReconstructorModule();
 
       /** Initialize the module */
       virtual void initialize();
@@ -124,4 +124,4 @@ namespace Belle2 {
   } //end SVD namespace;
 } // end namespace Belle2
 
-#endif // SVDSignalReconstructorModule_H
+#endif // SVDNNShapeReconstructorModule_H

@@ -4,13 +4,12 @@
 #include <memory>
 
 #include <TDirectory.h>
+#include <TNamed.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 
 #include <calibration/Utilities.h>
-#include <calibration/dataobjects/CalibRootObjBase.h>
-#include <calibration/dataobjects/CalibRootObj.h>
 
 namespace Belle2 {
 
@@ -27,7 +26,7 @@ namespace Belle2 {
       * So we are only really responsible for cleaning up the template object which belongs to no directory and
       * is never used directly by an outside user except when creating object that is passed in for the template.
       */
-    virtual ~CalibObjManager() {}
+    virtual ~CalibObjManager() {m_templateObjects.clear(); B2INFO("Destructor of CalibObjManager");}
 
     /// Change the directory that we will be using to find/store all our objects, we don't own it
     void setDirectory(TDirectory* dir) {m_dir = dir;}
@@ -35,7 +34,7 @@ namespace Belle2 {
     /** Add a new object to manage, this is used as a template for creating future/missing objects.
       * We take ownership of this object but cannot guarantee that a user won't alter the wrapped ROOT object :(
       */
-    void addObject(std::string name, std::unique_ptr<CalibRootObjBase> object);
+    void addObject(std::string name, std::shared_ptr<TNamed> object);
 
     void writeCurrentObjects(const Calibration::ExpRun& expRun);
 
@@ -46,6 +45,8 @@ namespace Belle2 {
     void createDirectories();
 
     unsigned int getHighestIndexObject(const std::string name, const TDirectory* dir) const;
+
+    void deleteHeldObjects();
 
     template<typename T>
     T* getObject(const std::string name, const Belle2::Calibration::ExpRun expRun)
@@ -67,7 +68,8 @@ namespace Belle2 {
         B2DEBUG(100, "Highest index is only file resident for " << highestIndexName << " in " << objectDir->GetPath() <<
                 ". Will make a higher one");
         std::string newName = name + "_" + std::to_string(highestIndex + 1);
-        obj = dynamic_cast<T*>(m_templateObjects[name]->cloneHeldObj(newName));
+        T* castObj = dynamic_cast<T*>(m_templateObjects[name].get());
+        obj = cloneObj(castObj, newName);
         obj->SetDirectory(objectDir);
         obj->Reset();
         // Did SetDirectory work? Or was it a dummy class method?
@@ -83,6 +85,13 @@ namespace Belle2 {
 
   private:
 
+    template<typename T>
+    T* cloneObj(T* source, std::string newName) const
+    {
+      B2DEBUG(100, "Held object wil be treated as a generic TNamed and have Clone(newname) called.");
+      return dynamic_cast<T*>(source->Clone(newName.c_str()));
+    }
+
     /// The TDirectory where all of our managed objects should be found, and where we should create new ones
     TDirectory* m_dir;
 
@@ -90,7 +99,7 @@ namespace Belle2 {
      * The objects that we are managing, these are template objects for all future objects for each (Exp,Run).
      * They should not contain data themselves.
      */
-    std::map<std::string, std::unique_ptr<CalibRootObjBase>> m_templateObjects;
+    std::map<std::string, std::shared_ptr<TNamed>> m_templateObjects;
 
     /// We rename objects based on the Exp,Run that they contain so we need to generate a nice naming convention
     std::string getSuffix(const Belle2::Calibration::ExpRun& key) const;
@@ -101,9 +110,5 @@ namespace Belle2 {
     std::string getObjectExpRunName(const std::string& name, const Calibration::ExpRun& expRun) const;
 
     unsigned int extractKeyIndex(std::string& keyName) const;
-
-    std::string addPrefix(const std::string& name) const;
-
-    const static std::string TMPPREFIX;
   };
 }

@@ -35,8 +35,6 @@ CaTestModule::CaTestModule() : CalibrationCollectorModule()
 {
   // Set module properties
   setDescription("Test Module for saving big data in CAF");
-  setPropertyFlags(c_ParallelProcessingCertified);
-
   // Parameter definitions
   addParam("entriesPerEvent", m_entriesPerEvent,
            "Number of entries that we fill into the saved tree per event. As we increase this we start storing larger amonuts of data in a smaller number of events to test the limits.",

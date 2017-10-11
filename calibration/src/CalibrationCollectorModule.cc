@@ -10,7 +10,7 @@ CalibrationCollectorModule::CalibrationCollectorModule() :
   m_manager(),
   m_expRunEvents()
 {
-  setPropertyFlags(c_ParallelProcessingCertified);
+  setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
   addParam("granularity", m_granularity,
            "Granularity of data collection. Data is separated by runs (=run) or not separated at all (=all)", std::string("run"));
 
@@ -148,4 +148,5 @@ void CalibrationCollectorModule::terminate()
     m_manager.writeCurrentObjects(m_expRun);
     m_manager.clearCurrentObjects(m_expRun);
   }
+  m_manager.deleteHeldObjects();
 }

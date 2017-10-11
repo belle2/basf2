@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/NegativeFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
@@ -45,6 +46,9 @@ namespace {
 
   /// Recording filter for VXD - CDC relations.
   using RecordingSVDStateFilter = RecordingFilter<VariadicUnionVarSet<SVDStateTruthVarSet, SVDStateBasicVarSet, SVDStateVarSet>>;
+
+  /// MVA filter for svd states
+  using MVASVDStateFilter = NegativeFilter<MVAFilter<SVDStateBasicVarSet>>;
 
   /// Prescaled recording filter for VXD - CDC relations.
   class SloppyRecordingSVDStateFilter : public RecordingSVDStateFilter {
@@ -86,7 +90,7 @@ std::map<std::string, std::string> SVDStateFilterFactory::getValidFilterNamesAnd
     {"sloppy_truth", "sloppy monte carlo truth"},
     {"simple", "simple filter to be used in svd"},
     {"recording", "record variables to a TTree"},
-    //{"mva", "MVA filter"},
+    {"mva", "MVA filter"},
     {"sloppy_recording", "record variables to a TTree"},
   };
 }
@@ -112,8 +116,8 @@ SVDStateFilterFactory::create(const std::string& filterName) const
     return std::make_unique<SloppyMCSVDStateFilter>();
   } else if (filterName == "recording") {
     return std::make_unique<RecordingSVDStateFilter>("SVDStateFilter.root");
-    // TODO} else if (filterName == "mva") {
-    //  return std::make_unique<MVASVDStateFilter>("tracking/data/ckf_CDCSVDStateFilter_1.xml");
+  } else if (filterName == "mva") {
+    return std::make_unique<MVASVDStateFilter>("tracking/data/ckf_CDCSVDStateFilter_1.xml");
   } else if (filterName == "sloppy_recording") {
     return std::make_unique<SloppyRecordingSVDStateFilter>("SVDStateFilter.root");
   } else {

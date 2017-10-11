@@ -1102,9 +1102,9 @@ endloop:
     REGISTER_VARIABLE("nCleanedTracks(cut)", nCleanedTracks,
                       "[Eventbased] ]Returns the number of clean Tracks in the event\n"
                       "Clean tracks are defined by the tracks which pass the given cut assuming a pion hypothesis.");
-    REGISTER_VARIABLE("formula(v1 + v2 * v3 - v4 / v5^v6)", formula,
+    REGISTER_VARIABLE("formula(v1 + v2 * [v3 - v4] / v5^v6)", formula,
                       "Returns the result of the given formula, where v1-v6 are variables.\n"
-                      "Useful Calculate formula, no parenthesis allowed yet.");
+                      "Parenthesis MUST be in the form of square brackets: [v1 * v2].");
     REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame,
                       "Returns the value of the variable using the rest frame of the given particle as current reference frame.\n"
                       "E.g. useRestFrame(daughter(0, p)) returns the total momentum of the first daughter in its mother's rest-frame");

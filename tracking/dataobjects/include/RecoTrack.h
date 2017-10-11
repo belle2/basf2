@@ -888,7 +888,7 @@ namespace Belle2 {
       checkDirtyFlag();
       try {
         return m_genfitTrack.getFittedState(id, representation);
-      } catch (genfit::Exception e) {
+      } catch (const genfit::Exception& e) {
         B2FATAL("Could not get fitted state for this hit id! Are you sure this hit was fitted (e.g. DAF deleted it)? " << e.what());
       }
     }

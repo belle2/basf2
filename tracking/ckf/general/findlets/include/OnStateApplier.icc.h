@@ -24,9 +24,20 @@ namespace Belle2 {
   };
 
   template <class AState>
-  void OnStateApplier<AState>::apply(const std::vector<const AState*>& currentPath __attribute__((unused)),
-                                     std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates __attribute__((unused)))
+  void OnStateApplier<AState>::apply(const std::vector<const AState*>& currentPath,
+                                     std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates)
   {
+    if (childStates.empty()) {
+      return;
+    }
+
+    for (TrackFindingCDC::WithWeight<AState*>& stateWithWeight : childStates) {
+      AState& state = *stateWithWeight;
+      const TrackFindingCDC::Weight& weight = this->operator()({currentPath, &state});
+      stateWithWeight.setWeight(weight);
+    }
+
+    TrackFindingCDC::erase_remove_if(childStates, TrackFindingCDC::HasNaNWeight());
   };
 
   template <class AState>

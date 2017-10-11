@@ -15,6 +15,12 @@
 
 namespace Belle2 {
   template <class AState, class AFilter>
+  LimitedOnStateApplier<AState, AFilter>::LimitedOnStateApplier()
+  {
+    this->addProcessingSignalListener(&m_filter);
+  };
+
+  template <class AState, class AFilter>
   void LimitedOnStateApplier<AState, AFilter>::apply(const std::vector<const AState*>& currentPath,
                                                      std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates)
   {
@@ -42,5 +48,8 @@ namespace Belle2 {
   void LimitedOnStateApplier<AState, AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
     m_filter.exposeParameters(moduleParamList, prefix);
+
+    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useNStates"), m_param_useNStates, "Only use the best N states",
+                                  m_param_useNStates);
   };
 }

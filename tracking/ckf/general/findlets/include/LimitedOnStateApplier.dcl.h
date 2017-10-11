@@ -28,6 +28,7 @@ namespace Belle2 {
     using Object = typename Super::Object;
 
   public:
+    LimitedOnStateApplier();
     /**
      */
     void apply(const std::vector<const AState*>& currentPath,

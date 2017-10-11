@@ -205,6 +205,19 @@ namespace Belle2 {
       return DigitBase::c_DontAppend;
     }
 
+    /**
+    *
+    * @param
+    * @return append status
+    */
+    bool operator < (const SVDShaperDigit&   x)const
+    {
+      bool sensorOrder = getSensorID()  < x.getSensorID() ;
+      bool sideOrder = isUStrip() && ! x.isUStrip();
+      bool cellOrder = getCellID() < x.getCellID();
+      return sensorOrder || sideOrder || cellOrder ;
+    }
+
   private:
 
     VxdID::baseType m_sensorID; /**< Compressed sensor identifier.*/

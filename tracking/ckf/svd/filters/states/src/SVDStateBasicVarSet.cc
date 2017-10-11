@@ -46,7 +46,7 @@ bool SVDStateBasicVarSet::extract(const BaseSVDStateFilter::Object* pair)
 
   const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
 
-  const Vector3D hitPosition = static_cast<Vector3D>(spacePoint->getPosition());
+  const Vector3D& hitPosition = static_cast<Vector3D>(spacePoint->getPosition());
 
   const double arcLength = trajectory.calcArcLength2D(hitPosition);
   const Vector2D& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);

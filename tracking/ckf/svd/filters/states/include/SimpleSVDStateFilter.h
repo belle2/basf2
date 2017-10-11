@@ -11,6 +11,7 @@
 
 #include <tracking/ckf/svd/filters/states/BaseSVDStateFilter.h>
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
+#include <tracking/ckf/svd/utilities/SVDKalmanStepper.h>
 
 namespace Belle2 {
   /// A very simple filter for all space points. Should be overloaded for the different cases (SVD, PXD).
@@ -24,6 +25,8 @@ namespace Belle2 {
   private:
     /// Cache for the B field at the IP
     double m_cachedBField;
+
+    SVDKalmanStepper m_kalmanStepper;
 
     /// Shortcut for a 4x3 array.
     using MaximalValueArray = double[4][3];

@@ -47,24 +47,28 @@ void SimpleSVDStateFilter::beginRun()
 
 Weight SimpleSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair)
 {
+  const std::vector<const CKFToSVDState*>& previousStates = pair.first;
   CKFToSVDState* currentState = pair.second;
+
   const auto* spacePoint = currentState->getHit();
 
-  if (not spacePoint) {
-    // lets use a very small number here, to always have the empty state in the game
-    return 0;
+  genfit::MeasuredStateOnPlane firstMeasurement;
+  if (currentState->mSoPSet()) {
+    firstMeasurement = currentState->getMeasuredStateOnPlane();
+  } else {
+    firstMeasurement = previousStates.back()->getMeasuredStateOnPlane();
   }
 
-  const Vector3D position(currentState->getMSoPPosition());
-  const Vector3D hitPosition(spacePoint->getPosition());
+  Vector3D position = Vector3D(firstMeasurement.getPos());
+  Vector3D momentum = Vector3D(firstMeasurement.getMom());
+
+  const Vector3D hitPosition = static_cast<Vector3D>(spacePoint->getPosition());
 
   const double sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
   if (sameHemisphere != 1) {
     return NAN;
   }
 
-  const unsigned int layer = currentState->getGeometricalLayer();
-  const Vector3D momentum(currentState->getMSoPMomentum());
 
   double valueToCheck;
   const MaximalValueArray* maximumValues;
@@ -84,14 +88,7 @@ Weight SimpleSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair)
     maximumValues = &m_param_maximumHelixDistance;
   } else {
     // Filter 2 + 3
-    //const auto& measuredStateOnPlane = currentState->getMeasuredStateOnPlane();
-    double residual = 0;
-
-    /*for (const SVDCluster& svdCluster : spacePoint->getRelationsTo<SVDCluster>()) {
-      //SVDRecoHit recoHit(&svdCluster);
-      residual += 0; //TODO m_fitter.calculateResidualDistance<SVDRecoHit, 1>(measuredStateOnPlane, recoHit);
-    }*/
-
+    const double residual = m_kalmanStepper.calculateResidual(firstMeasurement, *currentState);
     valueToCheck = residual;
     if (currentState->isFitted()) {
       maximumValues = &m_param_maximumResidual2;
@@ -100,6 +97,7 @@ Weight SimpleSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair)
     }
   }
 
+  const unsigned int layer = currentState->getGeometricalLayer();
   if (valueToCheck > (*maximumValues)[layer - 3][getPTRange(momentum)]) {
     return NAN;
   }

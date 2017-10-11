@@ -96,37 +96,37 @@ bool SVDStateVarSet::extract(const BaseSVDStateFilter::Object* pair)
   const std::vector<const CKFToSVDState*>& previousStates = pair->first;
   CKFToSVDState* state = pair->second;
 
+  const RecoTrack* cdcTrack = previousStates.front()->getSeed();
+  B2ASSERT("Path without seed?", cdcTrack);
+
+  const SpacePoint* spacePoint = state->getHit();
+  B2ASSERT("Path without hit?", spacePoint);
+
   std::vector<const CKFToSVDState*> allStates = previousStates;
   allStates.push_back(state);
 
-  const RecoTrack* cdcTrack = state->getSeed();
-  const SpacePoint* spacePoint = state->getHit();
-
-  const auto& cdcHits = cdcTrack->getSortedCDCHitList();
+  const std::vector<CDCHit*>& cdcHits = cdcTrack->getSortedCDCHitList();
 
   var<named("seed_cdc_hits")>() = cdcHits.size();
   var<named("seed_lowest_cdc_layer")>() = cdcHits.front()->getICLayer();
 
-  // TODO: Do not dismiss spacePoint = 0 cases!
-  if (not cdcTrack or not spacePoint) {
-    return false;
+  genfit::MeasuredStateOnPlane firstMeasurement;
+  if (state->mSoPSet()) {
+    firstMeasurement = state->getMeasuredStateOnPlane();
+  } else {
+    firstMeasurement = previousStates.back()->getMeasuredStateOnPlane();
   }
 
-  if (not cdcTrack->wasFitSuccessful()) {
-    return false;
-  }
-
-  const auto& firstMeasurement = state->getMeasuredStateOnPlane();
   Vector3D position = Vector3D(firstMeasurement.getPos());
   Vector3D momentum = Vector3D(firstMeasurement.getMom());
 
   const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
 
-  const auto& hitPosition = Vector3D(spacePoint->getPosition());
+  const Vector3D& hitPosition = static_cast<Vector3D>(spacePoint->getPosition());
 
   const double arcLength = trajectory.calcArcLength2D(hitPosition);
-  const auto& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
-  const auto& trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
+  const Vector2D& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
+  const double trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
 
   Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
 

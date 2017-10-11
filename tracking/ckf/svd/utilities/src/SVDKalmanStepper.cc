@@ -17,7 +17,8 @@
 
 using namespace Belle2;
 
-void SVDKalmanStepper::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void SVDKalmanStepper::exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
+                                        const std::string& prefix __attribute__((unused)))
 {
 }
 

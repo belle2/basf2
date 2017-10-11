@@ -318,7 +318,7 @@ def draw_matching_in_pt(data_tree):
     matching_hist = TProfile('hMatching', 'hMatching', number_bins, pt_lower, pt_upper)
     matching_hist.SetMinimum(0)
     matching_hist.SetMaximum(1.05)
-    data_tree.Draw("ECLMatch:pt_gen>>hMatching", "", "profile")
+    data_tree.Draw("ECLMatch:pt_gen>>hMatching", "pt!=-999", "profile")
 
     description = ('Events with 10 tracks with fixed transverse '
                    'momentum are generated using the ParticleGun(200 '
@@ -335,7 +335,7 @@ def draw_matching_in_pt(data_tree):
                                                   CONTACT_PERSON['Email']))
 
     matching_hist.SetTitle('Matching efficiency in bins of transverse momentum pt.')
-    matching_hist.SetXTitle('pt in GeV')
+    matching_hist.SetXTitle('#it{p}_{T} [GeV/c]')
     matching_hist.SetYTitle('efficiency')
 
     # write hist to the output file

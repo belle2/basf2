@@ -38,8 +38,7 @@ namespace Belle2 {
 
     for (CKFToSVDState* state : states) {
       const unsigned int layer = state->getGeometricalLayer();
-      // TODO: Make this more general (not dependent on currentLayer > nextLayer)
-      if (currentLayer >= layer and layer >= nextLayer) {
+      if (std::max(currentLayer, nextLayer) >= layer and layer >= std::min(currentLayer, nextLayer)) {
         possibleNextStates.push_back(state);
       }
     }

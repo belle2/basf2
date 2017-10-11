@@ -9,15 +9,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/svd/filters/relations/LayerSVDRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
-
-#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 namespace Belle2 {
   /// Base filter for CKF SVD states
-  class SectorSVDRelationFilter : public LayerSVDRelationFilter {
-  public:
-    TrackFindingCDC::Weight operator()(const CKFToSVDState& from, const CKFToSVDState& to) override;
-  };
+  using BaseSVDPairFilter = TrackFindingCDC::Filter<std::pair<const CKFToSVDState*, const CKFToSVDState*>>;
 }

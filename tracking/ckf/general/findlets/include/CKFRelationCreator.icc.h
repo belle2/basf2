@@ -17,6 +17,9 @@
 
 namespace Belle2 {
   template<class AState, class ASeedRelationFilter, class AHitRelationFilter>
+  CKFRelationCreator<AState, ASeedRelationFilter, AHitRelationFilter>::~CKFRelationCreator() = default;
+
+  template<class AState, class ASeedRelationFilter, class AHitRelationFilter>
   CKFRelationCreator<AState, ASeedRelationFilter, AHitRelationFilter>::CKFRelationCreator() : Super()
   {
     Super::addProcessingSignalListener(&m_seedFilter);

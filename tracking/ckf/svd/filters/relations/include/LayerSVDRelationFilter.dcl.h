@@ -21,9 +21,15 @@
 
 namespace Belle2 {
   /// Base filter for CKF SVD states
+  template <class AFilter>
   class LayerSVDRelationFilter : public TrackFindingCDC::RelationFilter<CKFToSVDState> {
+    /// The parent class
+    using Super = TrackFindingCDC::RelationFilter<CKFToSVDState>;
+
   public:
-    /// Default constructor
+    using Super::operator();
+
+    /// Add the filter as listener
     LayerSVDRelationFilter();
 
     /// Default destructor
@@ -34,8 +40,12 @@ namespace Belle2 {
 
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
+    TrackFindingCDC::Weight operator()(const CKFToSVDState& from, const CKFToSVDState& to) override;
+
   private:
     /// Parameter: Make it possible to jump over N layers.
     int m_param_hitJumping = 1;
+    /// Filter for rejecting the states
+    AFilter m_filter;
   };
 }

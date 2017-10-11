@@ -7,48 +7,53 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/svd/filters/relations/SVDRelationFilterFactory.h>
-#include <tracking/ckf/svd/filters/relations/SectorSVDRelationFilter.h>
+#include <tracking/ckf/svd/filters/relations/SVDPairFilterFactory.h>
+#include <tracking/ckf/svd/filters/relations/SectorSVDPairFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-SVDRelationFilterFactory::SVDRelationFilterFactory(const std::string& defaultFilterName)
+SVDPairFilterFactory::SVDPairFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
 {
 }
 
-SVDRelationFilterFactory::~SVDRelationFilterFactory() = default;
+SVDPairFilterFactory::~SVDPairFilterFactory() = default;
 
-std::string SVDRelationFilterFactory::getIdentifier() const
+std::string SVDPairFilterFactory::getIdentifier() const
 {
-  return "SVDRelation";
+  return "SVDPair";
 }
 
-std::string SVDRelationFilterFactory::getFilterPurpose() const
+std::string SVDPairFilterFactory::getFilterPurpose() const
 {
-  return "Reject svd relations. ";
+  return "Reject svd pairs. ";
 }
 
-std::map<std::string, std::string> SVDRelationFilterFactory::getValidFilterNamesAndDescriptions() const
+std::map<std::string, std::string> SVDPairFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   return {
     {"all", "all combinations are valid"},
+    {"none", "no combination is valid"},
     {"sensor", "use sensor/ladder information"},
   };
 }
 
-std::unique_ptr<LayerSVDRelationFilter>
-SVDRelationFilterFactory::create(const std::string& filterName) const
+std::unique_ptr<BaseSVDPairFilter>
+SVDPairFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "all") {
-    return std::make_unique<LayerSVDRelationFilter>();
+    return std::make_unique<TrackFindingCDC::AllFilter<BaseSVDPairFilter>>();
+  } else if (filterName == "none") {
+    return std::make_unique<TrackFindingCDC::NoneFilter<BaseSVDPairFilter>>();
   } else if (filterName == "sensor") {
-    return std::make_unique<SectorSVDRelationFilter>();
+    return std::make_unique<SectorSVDPairFilter>();
   } else {
     return Super::create(filterName);
   }

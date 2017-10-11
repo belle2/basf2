@@ -23,6 +23,9 @@ namespace Belle2 {
     /// Construct this findlet and add the subfindlet as listener
     CKFRelationCreator();
 
+    /// Default destructor
+    ~CKFRelationCreator();
+
     /// Expose the parameters of the subfindlet
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 

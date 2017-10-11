@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/svd/filters/relations/SectorSVDRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
+#include <tracking/ckf/svd/filters/relations/SectorSVDPairFilter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
@@ -45,8 +45,11 @@ namespace {
 }
 
 TrackFindingCDC::Weight
-SectorSVDRelationFilter::operator()(const CKFToSVDState& fromState, const CKFToSVDState& toState)
+SectorSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>& relation)
 {
+  const CKFToSVDState& fromState = *(relation.first);
+  const CKFToSVDState& toState = *(relation.second);
+
   const SpacePoint* fromSpacePoint = fromState.getHit();
   const SpacePoint* toSpacePoint = toState.getHit();
 

@@ -9,25 +9,24 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/svd/filters/relations/LayerSVDRelationFilter.h>
+#include <tracking/ckf/svd/filters/relations/BaseSVDPairFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   /// Factory that can create appropriate cluster filters from associated names.
-  class SVDRelationFilterFactory : public TrackFindingCDC::FilterFactory<LayerSVDRelationFilter> {
+  class SVDPairFilterFactory : public TrackFindingCDC::FilterFactory<BaseSVDPairFilter> {
 
   private:
     /// Type of the base class
-    using Super = TrackFindingCDC::FilterFactory<LayerSVDRelationFilter>;
+    using Super = TrackFindingCDC::FilterFactory<BaseSVDPairFilter>;
 
   public:
     /// Constructor forwarding the default filter name
-    SVDRelationFilterFactory(const std::string& defaultFilterName = "sensor");
+    SVDPairFilterFactory(const std::string& defaultFilterName = "sensor");
 
     /// Default destructor
-    ~SVDRelationFilterFactory();
+    ~SVDPairFilterFactory();
 
     /// Getter for a short identifier for the factory
     std::string getIdentifier() const override;
@@ -39,8 +38,6 @@ namespace Belle2 {
     std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
 
     /// Create a filter with the given name.
-    std::unique_ptr<LayerSVDRelationFilter> create(const std::string& filterName) const override;
+    std::unique_ptr<BaseSVDPairFilter> create(const std::string& filterName) const override;
   };
-
-  using ChooseableSVDRelationFilter = TrackFindingCDC::ChooseableFilter<SVDRelationFilterFactory>;
 }

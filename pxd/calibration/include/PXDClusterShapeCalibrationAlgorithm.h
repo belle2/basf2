@@ -387,8 +387,6 @@ namespace Belle2 {
     float m_SigmaVResUnBias = 0.0;
 
 
-    ClassDef(PXDClusterShapeCalibrationAlgorithm, 1); /**< Class implementing PXD cluster shape calibration algorithm */
-
   };
 } // namespace Belle2
 

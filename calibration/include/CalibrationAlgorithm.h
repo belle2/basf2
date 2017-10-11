@@ -285,7 +285,6 @@ namespace Belle2 {
     /// The name of the TDirectory the collector objects are contained within
     std::string m_prefix{""};
 
-    ClassDef(CalibrationAlgorithm, 2); /**< Abstract base class for calibration algorithms */
   };  // End of CalibrationAlgorithm definition
 
 

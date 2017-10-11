@@ -71,7 +71,6 @@ namespace Belle2 {
       int m_firstRun = 0; /**< First run. */
       int m_lastExperiment = -1; /**< Last experiment */
       int m_lastRun = -1; /**< Last run. */
-      ClassDef(T0Correction4CAF, 0); /**< class implementing T0 correction algorithm */
     };
   }// name space CDC
 } // namespace Belle2

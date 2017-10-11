@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
 #include <tracking/ckf/general/utilities/EigenHelper.h>
 #include <framework/core/ModuleParamList.dcl.h>
 
@@ -26,13 +25,12 @@ namespace Eigen {
 }
 
 namespace Belle2 {
-  class KalmanStepper : public TrackFindingCDC::ProcessingSignalListener {
-  public:
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 
-    template <unsigned int Dimension>
-    double kalmanStepImplementation(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
-                                    const genfit::MeasurementOnPlane& measurementOnPlane) const
+  template <unsigned int Dimension>
+  class KalmanStepper {
+  public:
+    double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                      const genfit::MeasurementOnPlane& measurementOnPlane) const
     {
       // Extract matrices from the state
       Eigen::Vector5d x_k = convertToEigen<5>(measuredStateOnPlane.getState());
@@ -53,11 +51,10 @@ namespace Belle2 {
       measuredStateOnPlane.setCov(TMatrixDSym(5, C_k.data()));
 
       // We return the new chi2
-      const double chi2 = calculateChi2<Dimension>(x_k, C_k, m_k, H_k, V_k);
+      const double chi2 = calculateChi2(x_k, C_k, m_k, H_k, V_k);
       return chi2;
     }
 
-    template <unsigned int Dimension>
     double calculateChi2(const Eigen::Vector5d& x_k, const Eigen::Matrix5d& C_k,
                          const Eigen::Matrix<double, Dimension, 1>& m_k,
                          const Eigen::Matrix<double, Dimension, 5>& H_k,
@@ -66,6 +63,20 @@ namespace Belle2 {
       const Eigen::Matrix<double, Dimension, 1>& residual = m_k - H_k * x_k;
       const double chi2 = (residual.transpose() * (V_k - H_k * C_k * H_k.transpose()).inverse() * residual).value();
       return chi2;
+    }
+
+    double calculateResidual(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                             const genfit::MeasurementOnPlane& measurementOnPlane) const
+    {
+      // Extract matrices from the state
+      const Eigen::Vector5d& x_k = convertToEigen<5>(measuredStateOnPlane.getState());
+
+      // extract matrices from the measurement
+      const Eigen::Matrix<double, Dimension, 1>& m_k = convertToEigen<Dimension>(measurementOnPlane.getState());
+      const Eigen::Matrix<double, Dimension, 5>& H_k = convertToEigen<Dimension, 5>(measurementOnPlane.getHMatrix()->getMatrix());
+
+      const Eigen::Matrix<double, Dimension, 1>& residual = m_k - H_k * x_k;
+      return residual.norm();
     }
   };
 }

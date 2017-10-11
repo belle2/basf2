@@ -11,8 +11,3 @@
 #include <tracking/ckf/general/utilities/KalmanStepper.h>
 
 using namespace Belle2;
-
-void KalmanStepper::exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
-                                     const std::string& prefix __attribute__((unused)))
-{
-}

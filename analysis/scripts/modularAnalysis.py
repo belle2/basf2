@@ -749,7 +749,7 @@ def applyEventCuts(cut, path=analysis_main):
     """
     Removes events that do not pass the given selection criteria (given in ParticleSelector style).
 
-    @param cut  Event that do not pass these selection criteria are removed from the ParticleList
+    @param cut  Events that do not pass these selection criteria are skipped
     @param path      modules are added to this path
     """
 

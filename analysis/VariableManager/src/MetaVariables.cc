@@ -1027,7 +1027,7 @@ endloop:
                       "Useful if you want to write out if a particle would have passed a cut or not.\n"
                       "Returns -999 if particle is a nullptr.");
     REGISTER_VARIABLE("passesEventCut(cut)", passesEventCut,
-                      "Returns 1 if event passes the cut otherwise 0.\n"
+                      "[Eventbased] Returns 1 if event passes the cut otherwise 0.\n"
                       "Useful if you want to select events passing a cut without looping into particles, such as for skimming.\n");
     REGISTER_VARIABLE("countDaughters(cut)", countDaughters,
                       "Returns number of direct daughters which satisfy the cut.\n"

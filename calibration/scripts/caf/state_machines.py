@@ -657,7 +657,7 @@ class CalibrationMachine(Machine):
         if self.iteration > 0:
             previous_iteration_dir = os.path.join(self.root_dir, str(self.iteration - 1))
             for algorithm in self.calibration.algorithms:
-                algorithm_name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
+                algorithm_name = algorithm.algorithm.__cppname__.replace('Belle2::', '')
                 database_dir = os.path.join(previous_iteration_dir, AlgorithmMachine.alg_output_dir, 'outputdb')
                 list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
                 B2INFO('Adding local database from previous iteration of {0} for use by {1}'.format(algorithm_name,
@@ -851,7 +851,7 @@ class AlgorithmMachine(Machine):
         #: Calibration object that we take the algorithm from
         self.cal_machine = cal_machine
         #: Get a nicer version of the algorithm name
-        self.name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
+        self.name = algorithm.algorithm.__cppname__.replace('Belle2::', '')
         #: Which iteration step are we in
         self.iteration = self.cal_machine.iteration
         #: Results of this iteration for this algorithm
@@ -1043,10 +1043,10 @@ class AlgorithmMachine(Machine):
         input_files = []
         if self.cal_machine._collector_job.subjobs:
             for subjob in self.cal_machine._collector_job.subjobs.values():
-                input_file = os.path.join(subjob.output_dir, "RootOutput.root")
+                input_file = os.path.join(subjob.output_dir, "CollectorOutput.root")
                 input_files.append(input_file)
         else:
-            input_files.append(os.path.join(self.cal_machine._collector_job.output_dir, "RootOutput.root"))
+            input_files.append(os.path.join(self.cal_machine._collector_job.output_dir, "CollectorOutput.root"))
 
         self.algorithm.data_input(input_files)
 

@@ -132,7 +132,7 @@ class Calibration():
         #: Output results of algorithms for each iteration
         self.results = {}
         #: Output patterns of files produced by collector and which need to be saved in the output directory
-        self.output_patterns = ['RootOutput.root']
+        self.output_patterns = ['CollectorOutput.root']
         #: List of calibration objects that will depend on this one.
         self.future_dependencies = []
         #: OrderedDictionary of dependencies of calibration objects, where value is the calibrations
@@ -412,19 +412,12 @@ class Algorithm():
         #: assumed to be the CalibrationAlgorithm instance, and iteration is an int e.g. 0, 1, 2...
         self.pre_algorithm = pre_algorithm
 
-    @staticmethod
-    def default_rootinput_setup(input_file_paths):
+    def default_rootinput_setup(self, input_file_paths):
         """
-        Simple RootInput setup and bound up in a method. Applied to the data_input attribute
+        Simple setup to set the input file names to the algorithm. Applied to the data_input attribute
         by default.
         """
-        from basf2 import create_path, process
-        load_data = create_path()
-        load_data.add_module('RootInput',
-                             inputFileNames=input_file_paths,
-                             ignoreCommandLineOverride=True,
-                             entrySequences=["0"] * len(input_file_paths))
-        process(load_data)
+        self.algorithm.setInputFileNames(input_file_paths)
 
 
 class CAF():

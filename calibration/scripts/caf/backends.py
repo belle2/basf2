@@ -760,7 +760,7 @@ class LSF(Batch):
         """
         Do the actual batch submission command and collect the output to find out the job id for later monitoring.
         """
-        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True, env={})
+        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
         return sub_out
 
     class Result():

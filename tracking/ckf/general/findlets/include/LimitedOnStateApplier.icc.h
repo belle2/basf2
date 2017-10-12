@@ -11,7 +11,9 @@
 
 #include <tracking/ckf/general/findlets/LimitedOnStateApplier.dcl.h>
 #include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/numerics/WeightComperator.h>
+#include <algorithm>
 
 namespace Belle2 {
   template <class AState, class AFilter>

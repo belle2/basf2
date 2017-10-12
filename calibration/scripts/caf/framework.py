@@ -22,10 +22,10 @@ from caf.utils import method_dispatch
 from caf.utils import find_sources
 from caf.utils import AlgResult
 from caf.utils import temporary_workdir
-from caf.utils import iov_from_vector
 from caf.utils import IoV
 from caf.utils import IoV_Result
 
+from caf import strategies
 import caf.backends
 from caf.state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError, CalibrationRunner
 
@@ -154,6 +154,11 @@ class Calibration():
         #: the collector job. Generally only useful for setting the 'queue' of the batch system backends that the collector
         #: jobs are submitted to e.g. cal.backend_args = {"queue":"short"}
         self.backend_args = {}
+
+        #: The strategy that the algorithm will be run against. Your choices are:
+        #:     "single_iov" - The default and fastest. All of your collected data will be executed at once.
+        #:                    An IoV will be applied to the payloads that corresponds to the full IoV of the data.
+        self.algorithm_strategy = "single_iov"
 
         self._local_database_chain = []
 
@@ -411,6 +416,8 @@ class Algorithm():
         #: IT MUST ONLY HAVE TWO ARGUMENTS pre_algorithm(algorithm, iteration)  where algorithm can be
         #: assumed to be the CalibrationAlgorithm instance, and iteration is an int e.g. 0, 1, 2...
         self.pre_algorithm = pre_algorithm
+        #: The algorithm stratgey that will be used when running over the collected data
+        self.strategy = strategies.SingleIOV()
 
     def default_rootinput_setup(self, input_file_paths):
         """

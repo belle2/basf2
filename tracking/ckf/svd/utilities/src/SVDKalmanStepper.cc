@@ -28,6 +28,8 @@ double SVDKalmanStepper::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateO
     const genfit::MeasurementOnPlane* measurementOnPlane = measurementsOnPlane.front();
 
     chi2 += m_kalmanStepper.kalmanStep(measuredStateOnPlane, *measurementOnPlane);
+
+    delete measurementOnPlane;
   }
   return chi2;
 }
@@ -49,6 +51,8 @@ double SVDKalmanStepper::calculateResidual(genfit::MeasuredStateOnPlane& measure
     const genfit::MeasurementOnPlane* measurementOnPlane = measurementsOnPlane.front();
 
     residual += m_kalmanStepper.calculateResidual(measuredStateOnPlane, *measurementOnPlane);
+
+    delete measurementOnPlane;
   }
   return residual;
 }

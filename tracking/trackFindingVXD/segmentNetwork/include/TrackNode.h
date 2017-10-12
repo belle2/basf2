@@ -97,11 +97,11 @@ namespace Belle2 {
     /** constructor WARNING: sector-pointing has still to be decided! */
     TrackNode() : sector(nullptr), spacePoint(nullptr), m_identifier(-1), m_name("SP: missing") {}
 
-    TrackNode(SpacePoint* spacePoint) :      // Get unique identifier from SP ArrayIndex, Get long debugging name from SP
-      sector(nullptr), spacePoint(spacePoint)
+    TrackNode(SpacePoint* new_spacePoint) :      // Get unique identifier from SP ArrayIndex, Get long debugging name from SP
+      sector(nullptr), spacePoint(new_spacePoint)
     {
-      m_identifier = spacePoint->getArrayIndex();
-      m_name = "SP: " + spacePoint->getName();
+      m_identifier = new_spacePoint->getArrayIndex();
+      m_name = "SP: " + new_spacePoint->getName();
     }
 
     /** destructor */

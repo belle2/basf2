@@ -17,11 +17,6 @@
 
 using namespace Belle2;
 
-void SVDKalmanStepper::exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
-                                        const std::string& prefix __attribute__((unused)))
-{
-}
-
 double SVDKalmanStepper::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const CKFToSVDState& state)
 {
   double chi2 = 0;

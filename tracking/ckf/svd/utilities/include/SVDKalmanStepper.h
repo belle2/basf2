@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
 #include <tracking/ckf/general/utilities/KalmanStepper.h>
 
 namespace genfit {
@@ -20,10 +19,8 @@ namespace Belle2 {
   class SpacePoint;
   class CKFToSVDState;
 
-  class SVDKalmanStepper : public TrackFindingCDC::ProcessingSignalListener {
+  class SVDKalmanStepper {
   public:
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
-
     double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const CKFToSVDState& state);
 
     double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint& spacePoint);

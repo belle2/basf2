@@ -15,16 +15,6 @@ namespace Belle2 {
   template <class AState, class AKalmanStepper>
   class KalmanFilter : public TrackFindingCDC::Filter<std::pair<const std::vector<const AState*>, AState*>> {
   public:
-    KalmanFilter()
-    {
-      this->addProcessingSignalListener(&m_kalmanStepper);
-    }
-
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
-    {
-      m_kalmanStepper.exposeParameters(moduleParamList, prefix);
-    }
-
     TrackFindingCDC::Weight operator()(const std::pair<const std::vector<const AState*>, AState*>& pair) override
     {
       AState* currentState = pair.second;

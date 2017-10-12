@@ -430,6 +430,7 @@ def add_ecl_track_cluster_module(path, components=None):
         ecl_track_cluster = register_module('ECLTrackClusterMatching')
         ecl_track_cluster.logging.log_level = LogLevel.DEBUG
         ecl_track_cluster.logging.debug_level = 90
+        ecl_track_cluster.param("writeToRoot", True)
         path.add_module(ecl_track_cluster)
 
 

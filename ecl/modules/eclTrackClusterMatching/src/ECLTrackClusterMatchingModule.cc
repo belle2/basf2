@@ -39,7 +39,7 @@ ECLTrackClusterMatchingModule::ECLTrackClusterMatchingModule()
   setDescription("Match Tracks to ECLCluster");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("writeToRoot", m_writeToRoot,
-           "set true if you want to save the information in a root file named by parameter 'rootFileName'", bool(true));
+           "set true if you want to save the information in a root file named by parameter 'rootFileName'", bool(false));
   addParam("rootFileName", m_rootFileName,
            "fileName used for root file where info are saved. Will be ignored if parameter 'writeToRoot' is false (standard)",
            string("eclTrackClusterMatchingAnalysis.root"));
@@ -56,17 +56,15 @@ void ECLTrackClusterMatchingModule::initialize()
   StoreArray<Track> tracks;
   StoreArray<ECLCluster> eclClusters;
   tracks.registerRelationTo(eclClusters);
+  tracks.registerRelationTo(tracks);
 
   if (m_writeToRoot == true) {
     m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
   } else
     m_rootFilePtr = NULL;
 
-  TDirectory* oldDir = gDirectory;
-  m_rootFilePtr->cd();
   // initialize tree
   m_tree     = new TTree("m_tree", "ECL Track Cluster Matching Analysis tree");
-  oldDir->cd();
 
   m_tree->Branch("expNo", &m_iExperiment, "expNo/I");
   m_tree->Branch("runNo", &m_iRun, "runNo/I");
@@ -155,14 +153,9 @@ void ECLTrackClusterMatchingModule::endRun()
 
 void ECLTrackClusterMatchingModule::terminate()
 {
-  if (m_tree != NULL) {
-    TDirectory* oldDir = gDirectory;
-    if (m_rootFilePtr)
-      m_rootFilePtr->cd();
-    m_tree->Write();
-    oldDir->cd();
-  }
   if (m_rootFilePtr != NULL) {
+    m_rootFilePtr->cd();
+    m_tree->Write();
     m_rootFilePtr->Close();
   }
 }

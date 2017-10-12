@@ -24,22 +24,22 @@ namespace {
   {
     const int sensorNumberDifference =
       static_cast<int>(currentSensor.getSensorNumber()) - static_cast<int>(nextSensor.getSensorNumber());
-    if (abs(sensorNumberDifference) > 1) {
+    const int layerNumberDifference =
+      static_cast<int>(currentSensor.getLayerNumber()) - static_cast<int>(nextSensor.getLayerNumber());
+
+    if ((abs(sensorNumberDifference) > 1 and layerNumberDifference == 1) or (abs(sensorNumberDifference) > 2)) {
       return false;
     }
     VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
     const VXD::SensorInfoBase& currentSensorInfo = geoCache.getSensorInfo(currentSensor);
     const VXD::SensorInfoBase& nextSensorInfo = geoCache.getSensorInfo(nextSensor);
 
-    const Vector2D& currentCenter = Vector3D(
-                                      currentSensorInfo.pointToGlobal(TVector3(-0.5 * currentSensorInfo.getWidth(),
-                                          -0.5 * currentSensorInfo.getLength(),
-                                          0))).xy();
-    const Vector2D& nextCenter = Vector3D(nextSensorInfo.pointToGlobal(TVector3(-0.5 * nextSensorInfo.getWidth(),
-                                          -0.5 * nextSensorInfo.getLength(),
-                                          0))).xy();
+    TVector3 origin;
 
-    const double& angle = std::acos(currentCenter.dot(nextCenter) / (currentCenter.norm() * nextCenter.norm()));
+    const Vector2D currentCenter = Vector3D(currentSensorInfo.pointToGlobal(origin)).xy();
+    const Vector2D nextCenter = Vector3D(nextSensorInfo.pointToGlobal(origin)).xy();
+
+    const double angle = currentCenter.angleWith(nextCenter);
     return TMath::Pi() - angle > 2;
   }
 }

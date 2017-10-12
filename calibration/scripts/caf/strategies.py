@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from basf2 import B2ERROR, B2FATAL, B2INFO
+from .utils import AlgResult
+from .utils import runs_overlapping_iov
+
 
 class AlgorithmStrategyBase():
     """Base class for Algorithm strategies. These do the actual execution of
@@ -10,11 +14,10 @@ if the final payloads have an IoV that is independent to the actual runs used to
 them."""
 
     def __init__(self):
-        self.algorithm = None
-        self.central_database_gt = ""
-        self.input_files = []
-        self.local_database_chain = []
-        self.result = None
+        self.results = []
+        self.machine = None
+        self.strategy_specific_args = {}
+        self.iov_to_calibrate = None
 
     def run():
         raise NotImplementedError('Need to implement a run() method in {} Strategy.'.format(self.__class__.__name__))
@@ -22,77 +25,43 @@ them."""
 
 class SingleIOV(AlgorithmStrategyBase):
     """The fastest and simplest Algorithm strategy. Runs the algorithm only once over all of the input
-data. The payload IoV is automatically calculated from the collected data."""
+data or only the data corresponding to the requested IoV. The payload IoV is the set to the same as the one
+that was executed.
+"""
 
     def __init__(self):
         super().__init__()
 
-    def run(machine, iov_to_calibrate, child_conn):
+    def run(self):
         """
-        Runs a single AlgorithmMachine inside a subprocess over the IoV vector from the
-        input data. Should produce the best constants requested and create a list of results
-        to send out.
+        Runs the algorithm machine over the collected data and fills the results.
         """
-        B2INFO("Setting up {}".format(machine.name))
-        machine.setup_algorithm()
-        B2INFO("Beginning execution of {}".format(machine.name))
-
-        if not iov_to_calibrate:
-            iov_to_execute = ROOT.vector("std::pair<int,int>")()
-            for iov in machine.all_iov_collected:
-                iov_to_execute.push_back(iov)
-                machine.execute_iov(vec_iov=iov_to_execute)
-                readable_iov_to_execute = iov_from_vector(iov_to_execute)
-                if machine.results[-1].result == AlgResult.ok.value:
-                    machine.success(successful_iov=iov_to_execute)
-                    try:
-                        machine.complete()
-                    except ConditionError:
-                        machine.setup_algorithm(vec_iovs=iov_to_execute)
-                elif machine.results[-1].result == AlgResult.iterate.value:
-                    machine.iteration_requested(successful_iov=iov_to_execute)
-                    try:
-                        machine.complete()
-                    except ConditionError:
-                        machine.setup_algorithm(vec_iovs=iov_to_execute)
-                elif machine.results[-1].result == AlgResult.failure.value:
-                    machine.fail()
-                elif machine.results[-1].result == AlgResult.not_enough_data.value:
-                    machine.not_enough_data()
-                    try:  # Try to include next IoV in vector and recalculate
-                        machine.merge_next_iov()
-                    except ConditionError:
-                        try:
-                            merged_iov = ROOT.vector("std::pair<int,int>")()
-                            machine.merge_previous_iov(merged_iov=merged_iov, final_iov=iov_to_execute)
-                            list_payloads = machine.algorithm.algorithm.getPayloads()
-                            list_payloads.pop_back()
-                            machine.execute_iov(vec_iov=merged_iov)
-                        except ConditionError:
-                            machine.fail()  # If there's no next or previous IoVs then there wasn't enough data in the full set
-                            return
-
-            # Commit all the payloads and send out the results
-            machine.algorithm.algorithm.commit()
-            child_conn.send(machine.results)
+        B2INFO("Setting up SingleIOV strategy for ".format(self.machine.name))
+        self.machine.setup_algorithm()
+        B2INFO("Beginning execution of {}".format(self.machine.name))
+        runs_to_execute = []
         # If we were given a specific IoV to calibrate we just execute all runs in that IoV at once
-        else:
-            iov_to_execute = runs_overlapping_iov(iov_to_calibrate, machine.all_iov_collected)
-            machine.execute_iov(vec_iov=iov_to_execute)
-            readable_iov_to_execute = iov_from_vector(iov_to_execute)
-            if machine.results[-1].result == AlgResult.ok.value:
-                machine.success(successful_iov=iov_to_execute)
-                machine.complete(single_iov=True)
-            elif machine.results[-1].result == AlgResult.iterate.value:
-                machine.iteration_requested(successful_iov=iov_to_execute)
-                machine.complete(single_iov=True)
-            elif machine.results[-1].result == AlgResult.failure.value:
-                machine.fail()
-            elif machine.results[-1].result == AlgResult.not_enough_data.value:
-                machine.not_enough_data()
-                machine.fail()  # Since we're only doing one overall IoV and there wasn't enough data, we fail
-                return
-
+        if self.iov_to_calibrate:
+            runs_to_execute = runs_overlapping_iov(self.iov_to_calibrate, self.machine.all_runs_collected)
+        self.machine.execute_runs(runs=runs_to_execute)
+        B2INFO("Finished execution with result code {}".format(self.machine.results[0].result))
+        # Save the result
+        self.results.append(self.machine.results[0])
+        if (self.results[0].result == AlgResult.ok.value) or (self.results[0].result == AlgResult.iterate.value):
             # Commit all the payloads and send out the results
-            machine.algorithm.algorithm.commit()
-            child_conn.send(machine.results)
+            self.machine.algorithm.algorithm.commit()
+
+    def setup_defaults(self):
+        """
+        Anything that is setup by outside config files by default goes here.
+        """
+        import ROOT
+        import configparser
+        from .utils import decode_json_string
+        config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
+        if config_file_path:
+            config = configparser.ConfigParser()
+            config.read(config_file_path)
+        else:
+            B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
+        self.heartbeat = decode_json_string(config['CAF_DEFAULTS']['Heartbeat'])

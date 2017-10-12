@@ -734,83 +734,25 @@ class CalibrationMachine(Machine):
         self._algorithm_results[self.iteration] = {}
 
         for algorithm in self.calibration.algorithms:
-            machine = AlgorithmMachine(algorithm, self)
+            algorithm.strategy.iov_to_calibrate = self.iov_to_calibrate
+            algorithm.strategy.machine = AlgorithmMachine(algorithm, self)
             child = ctx.Process(target=CalibrationMachine._run_algorithm_over_data,
-                                args=(machine, self.iov_to_calibrate, child_conn))
+                                args=(algorithm.strategy, child_conn))
             child.start()
             # wait for it to finish
             child.join()
             # Get the return codes of the algorithm for the IoVs found by the Process
-            self._algorithm_results[self.iteration][machine.name] = parent_conn.recv()
+            self._algorithm_results[self.iteration][algorithm.strategy.machine.name] = parent_conn.recv()
 
     @staticmethod
-    def _run_algorithm_over_data(machine, runs_to_calibrate, child_conn):
+    def _run_algorithm_over_data(strategy, child_conn):
         """
         Runs a single AlgorithmMachine inside a subprocess over the run list from the
         input data. Should produce the best constants requested and create a list of results
         to send out.
         """
-        B2INFO("Setting up {}".format(machine.name))
-        machine.setup_algorithm()
-        B2INFO("Beginning execution of {}".format(machine.name))
-
-        if not runs_to_calibrate:
-            runs_to_execute = []
-            for run in machine.all_runs_collected:
-                runs_to_execute.append(run)
-                machine.execute_runs(runs=runs_to_execute)
-                if machine.results[-1].result == AlgResult.ok.value:
-                    machine.success(successful_runs=runs_to_execute)
-                    try:
-                        machine.complete()
-                    except ConditionError:
-                        machine.setup_algorithm(runs=runs_to_execute)
-                elif machine.results[-1].result == AlgResult.iterate.value:
-                    machine.iteration_requested(successful_runs=runs_to_execute)
-                    try:
-                        machine.complete()
-                    except ConditionError:
-                        machine.setup_algorithm(runs=runs_to_execute)
-                elif machine.results[-1].result == AlgResult.failure.value:
-                    machine.fail()
-                elif machine.results[-1].result == AlgResult.not_enough_data.value:
-                    machine.not_enough_data()
-                    try:  # Try to include next IoV in vector and recalculate
-                        machine.merge_next_iov()
-                    except ConditionError:
-                        try:
-                            merged_runs = []
-                            machine.merge_previous_runs(merged_runs=merged_runs, final_runs=runs_to_execute)
-                            list_payloads = machine.algorithm.algorithm.getPayloads()
-                            list_payloads.pop_back()
-                            machine.execute_runs(runs=merged_runs)
-                        except ConditionError:
-                            machine.fail()  # If there's no next or previous IoVs then there wasn't enough data in the full set
-                            return
-
-            # Commit all the payloads and send out the results
-            machine.algorithm.algorithm.commit()
-            child_conn.send(machine.results)
-        # If we were given a specific IoV to calibrate we just execute all runs in that IoV at once
-        else:
-            runs_to_execute = runs_overlapping_iov(runs_to_calibrate, machine.all_runs_collected)
-            machine.execute_runs(runs=runs_to_execute)
-            if machine.results[-1].result == AlgResult.ok.value:
-                machine.success(successful_runs=runs_to_execute)
-                machine.complete(single_run=True)
-            elif machine.results[-1].result == AlgResult.iterate.value:
-                machine.iteration_requested(successful_runs=runs_to_execute)
-                machine.complete(single_run=True)
-            elif machine.results[-1].result == AlgResult.failure.value:
-                machine.fail()
-            elif machine.results[-1].result == AlgResult.not_enough_data.value:
-                machine.not_enough_data()
-                machine.fail()  # Since we're only doing one overall IoV and there wasn't enough data, we fail
-                return
-
-            # Commit all the payloads and send out the results
-            machine.algorithm.algorithm.commit()
-            child_conn.send(machine.results)
+        strategy.run()
+        child_conn.send(strategy.results)
 
     def _prepare_final_db(self):
         """
@@ -1066,9 +1008,14 @@ class AlgorithmMachine(Machine):
         B2INFO("Running {0} in working directory {1}".format(self.name, os.getcwd()))
 
         runs_to_execute = kwargs["runs"]
-        # Create nicer overall IoV for this execution
-        iov = iov_from_runs(runs_to_execute)
-        B2INFO("Performing execution on {0}".format(iov))
+        if runs_to_execute:
+            # Create nicer overall IoV for this execution
+            iov = iov_from_runs(runs_to_execute)
+            B2INFO("Performing execution on {0}".format(iov))
+        else:
+            # Get IoV from the collected data
+            runs_to_execute = self.all_runs_collected
+            iov = iov_from_runs(self.all_runs_collected)
 
         # Creates new entry in list<DBQuery> payloads of algorithm
         alg_result = self.algorithm.algorithm.execute(runs_to_execute, self.iteration)

@@ -83,30 +83,27 @@ namespace Belle2 {
 
   protected:
 
-/// module parameters
+    /// module parameters
 
-    std::string m_spacePointsName; /**< SpacePoint collection name */
+    /** SpacePoint collection name */
+    std::string m_spacePointsName;
 
-    StoreArray<SpacePoint>
-    m_spacePoints; /**< the storeArray for svdClusters as member, is faster than recreating link for each event */
+    /** the storeArray for svdClusters as member, is faster than recreating link for each event */
+    StoreArray<SpacePoint> m_spacePoints;
 
-    /** name for StoreArray< SpacePointTrackCand> to be filled */
+    /** name for StoreArray<SpacePointTrackCand> to be filled */
     std::string m_PARAMSpacePointTrackCandArrayName;
 
-
-    /** name for StoreObjPtr< DirectedNodeNetwork> which contains the networks needed */
+    /** name for StoreObjPtr<DirectedNodeNetwork> which contains the networks needed */
     std::string m_PARAMNetworkName;
-
 
     /** the name of the SectorMap used for this instance. */
     std::string m_PARAMsecMapName;
 
-
     /** If true for each event and each network created a file with a graph is created. */
     bool m_PARAMprintNetworks;
 
-
-    /** Regulates if every node with enough notes below it is used as a seed or only the outermost nodes. */
+    /** Regulates if every node with enough nodes below it is used as a seed or only the outermost nodes. */
     bool m_PARAMstrictSeeding;
 
     /** Regulates if every subset of sufficient length of a path shall be collected as separate path or not. */

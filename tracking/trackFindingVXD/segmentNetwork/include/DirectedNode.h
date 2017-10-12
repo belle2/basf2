@@ -14,8 +14,6 @@
 
 // stl:
 #include <vector>
-// #include <memory>    // std::shared_ptr
-
 
 
 namespace Belle2 {

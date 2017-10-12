@@ -12,6 +12,7 @@
 
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <string>
 
 namespace Belle2 {
   /// Testing module for collection of calibration data
@@ -55,5 +56,6 @@ namespace Belle2 {
     int m_spread;
     /// Runs during the defineHisto() function
     virtual void inDefineHisto();
+    void describeProcess(std::string functionName);
   };
 }

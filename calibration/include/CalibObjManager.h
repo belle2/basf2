@@ -44,22 +44,17 @@ namespace Belle2 {
       */
     void createDirectories();
 
+    void createExpRunDirectories(Calibration::ExpRun& expRun) const;
+
     unsigned int getHighestIndexObject(const std::string name, const TDirectory* dir) const;
 
     void deleteHeldObjects();
 
-    template<typename T>
+    template<class T>
     T* getObject(const std::string name, const Belle2::Calibration::ExpRun expRun)
     {
       std::string objectDirName = name + '/' + getObjectExpRunName(name, expRun);
       TDirectory* objectDir = m_dir->GetDirectory(objectDirName.c_str());
-      // Does this run's directory already exist?
-      if (!objectDir) {
-        B2DEBUG(100, "No TDirectory for this ExpRun yet, making " << objectDirName);
-        m_dir->mkdir(objectDirName.c_str());
-        objectDir = m_dir->GetDirectory(objectDirName.c_str());
-        objectDir->SetWritable(true);
-      }
       unsigned int highestIndex = getHighestIndexObject(name, objectDir);
       std::string highestIndexName = name + "_" + std::to_string(highestIndex);
       // First check if we currently have an object we're using.
@@ -68,8 +63,7 @@ namespace Belle2 {
         B2DEBUG(100, "Highest index is only file resident for " << highestIndexName << " in " << objectDir->GetPath() <<
                 ". Will make a higher one");
         std::string newName = name + "_" + std::to_string(highestIndex + 1);
-        T* castObj = dynamic_cast<T*>(m_templateObjects[name].get());
-        obj = cloneObj(castObj, newName);
+        obj = cloneObj(dynamic_cast<T*>(m_templateObjects[name].get()), newName);
         obj->SetDirectory(objectDir);
         obj->Reset();
         // Did SetDirectory work? Or was it a dummy class method?
@@ -85,10 +79,10 @@ namespace Belle2 {
 
   private:
 
-    template<typename T>
+    template<class T>
     T* cloneObj(T* source, std::string newName) const
     {
-      B2DEBUG(100, "Held object wil be treated as a generic TNamed and have Clone(newname) called.");
+      B2DEBUG(100, "Held object " << source->GetName() << " will be treated as a generic TNamed and have Clone(newname) called.");
       return dynamic_cast<T*>(source->Clone(newName.c_str()));
     }
 

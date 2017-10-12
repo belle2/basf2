@@ -11,17 +11,6 @@ using namespace Belle2;
 using namespace Calibration;
 
 namespace Belle2 {
-  /**
-   * @brief Clone TTree (Needs special treatment)
-   * Makes a deep copy of source TTree
-   * to dest TTree
-   *
-   * NOTE: For T not a TTree, this function is
-   * never instantiated (as it is non-virtual
-   * and not used in that case)
-   *
-   * @return void
-   */
   template<>
   TTree* CalibObjManager::cloneObj(TTree* source, std::string newName) const
   {
@@ -58,11 +47,27 @@ namespace Belle2 {
     }
   }
 
+  void CalibObjManager::createExpRunDirectories(ExpRun& expRun) const
+  {
+    for (auto& x : m_templateObjects) {
+      TDirectory* objectDir = m_dir->GetDirectory(x.first.c_str());
+      string dirName = x.first + getSuffix(expRun);
+      TDirectory* newDir = objectDir->GetDirectory(dirName.c_str());
+      if (!newDir) {
+        newDir = objectDir->mkdir(dirName.c_str());
+        newDir->SetWritable(true);
+        B2DEBUG(100, "Made TDirectory " << newDir->GetPath());
+      }
+    }
+  }
+
   void CalibObjManager::writeCurrentObjects(const ExpRun& expRun)
   {
     for (auto& x : m_templateObjects) {
       TDirectory* objectDir = m_dir->GetDirectory((x.first + '/' + getObjectExpRunName(x.first, expRun)).c_str());
+      B2DEBUG(100, "Writing for " << x.first);
       for (auto key : * (objectDir->GetList())) {
+        B2DEBUG(100, "Writing for " << key->GetName());
         TNamed* objMemory = dynamic_cast<TNamed*>(objectDir->FindObject(key->GetName()));
         if (objMemory) {
           objectDir->WriteTObject(objMemory, key->GetName(), "Overwrite");

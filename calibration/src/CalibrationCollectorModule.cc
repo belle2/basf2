@@ -1,4 +1,5 @@
 #include <calibration/CalibrationCollectorModule.h>
+#include <framework/pcore/ProcHandler.h>
 
 using namespace std;
 using namespace Belle2;
@@ -109,21 +110,24 @@ void CalibrationCollectorModule::beginRun()
   } else {
     m_expRun = expRun;
   }
+  m_manager.createExpRunDirectories(m_expRun);
   // Run the user's startRun() implementation if there is one
   startRun();
 }
 
 void CalibrationCollectorModule::defineHisto()
 {
-  m_dir = gDirectory->mkdir(getName().c_str());
-  m_manager.setDirectory(m_dir);
-  B2INFO("Saving output to TDirectory " << m_dir->GetPath());
-  B2DEBUG(100, "Creating directories for individual collector objects.");
-  m_manager.createDirectories();
-  m_runRange = new RunRange();
-  m_runRange->setGranularity(m_granularity);
-  m_runRange->SetName(Calibration::RUN_RANGE_OBJ_NAME.c_str());
-  m_dir->Add(m_runRange);
+  if (!ProcHandler::parallelProcessingUsed() || ProcHandler::isWorkerProcess()) {
+    m_dir = gDirectory->mkdir(getName().c_str());
+    m_manager.setDirectory(m_dir);
+    B2INFO("Saving output to TDirectory " << m_dir->GetPath());
+    B2DEBUG(100, "Creating directories for individual collector objects.");
+    m_manager.createDirectories();
+    m_runRange = new RunRange();
+    m_runRange->setGranularity(m_granularity);
+    m_runRange->SetName(Calibration::RUN_RANGE_OBJ_NAME.c_str());
+    m_dir->Add(m_runRange);
+  }
   inDefineHisto();
 }
 
@@ -142,11 +146,13 @@ void CalibrationCollectorModule::endRun()
 void CalibrationCollectorModule::terminate()
 {
   finish();
+  // actually this should be done by the write() called by HistoManager....
+
   // Haven't written objects yet if collecting with granularity == all
   // Write them now that everything is done.
-  if (m_granularity == "all") {
-    m_manager.writeCurrentObjects(m_expRun);
-    m_manager.clearCurrentObjects(m_expRun);
-  }
+//  if (m_granularity == "all") {
+//    m_manager.writeCurrentObjects(m_expRun);
+//    m_manager.clearCurrentObjects(m_expRun);
+//  }
   m_manager.deleteHeldObjects();
 }

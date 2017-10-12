@@ -324,7 +324,7 @@ namespace Belle2 {
 
       if (strcmp(getGranularity().c_str(), "run") == 0) {
         if (runRangeData->getIntervalOfValidity().overlaps(runRangeRequested.getIntervalOfValidity())) {
-          B2DEBUG(100, "Found requested data in file: " << fileName);
+          B2DEBUG(100, "Found requested ExpRun in file: " << fileName);
           // Loop over runs in data and check if they exist in our requested ones, then add if they do
           for (auto expRunData : runRangeData->getExpRunSet()) {
             for (auto expRunRequested : requestedRuns) {
@@ -337,12 +337,14 @@ namespace Belle2 {
                   std::string keyName = key->GetName();
                   B2DEBUG(100, "Adding found object " << keyName << " in the directory " << objDir->GetPath());
                   T* objOther = (T*)objDir->Get(keyName.c_str());
-                  if (mergedEmpty) {
-                    mergedObjPtr = std::shared_ptr<T>(dynamic_cast<T*>(objOther->Clone(name.c_str())));
-                    mergedObjPtr->SetDirectory(0);
-                    mergedEmpty = false;
-                  } else {
-                    list.Add(objOther);
+                  if (objOther) {
+                    if (mergedEmpty) {
+                      mergedObjPtr = std::shared_ptr<T>(dynamic_cast<T*>(objOther->Clone(name.c_str())));
+                      mergedObjPtr->SetDirectory(0);
+                      mergedEmpty = false;
+                    } else {
+                      list.Add(objOther);
+                    }
                   }
                 }
               }
@@ -358,19 +360,26 @@ namespace Belle2 {
         std::string objPath = objDirName + "/" + name + "_1";
         T* objOther = (T*)f->Get(objPath.c_str()); // Only one index for granularity == all
         B2DEBUG(100, "Adding " << objPath);
-        if (mergedEmpty) {
-          mergedObjPtr = std::shared_ptr<T>(dynamic_cast<T*>(objOther->Clone(name.c_str())));
-          mergedObjPtr->SetDirectory(0);
-          mergedEmpty = false;
-        } else {
-          list.Add(objOther);
+        if (objOther) {
+          if (mergedEmpty) {
+            mergedObjPtr = std::shared_ptr<T>(dynamic_cast<T*>(objOther->Clone(name.c_str())));
+            mergedObjPtr->SetDirectory(0);
+            mergedEmpty = false;
+          } else {
+            list.Add(objOther);
+          }
         }
       }
-      mergedObjPtr->Merge(&list);
+      if (!mergedEmpty)
+        mergedObjPtr->Merge(&list);
       list.Clear();
     }
     dir->cd();
     objOutputPtr = mergedObjPtr;
+    if (!objOutputPtr) {
+      B2ERROR("No data found for object " << name);
+      return nullptr;
+    }
     objOutputPtr->SetDirectory(0);
     // make a TNamed version to input to the map of previous calib objects
     std::shared_ptr<TNamed> storedObjPtr = std::static_pointer_cast<TNamed>(objOutputPtr);

@@ -45,7 +45,7 @@ CaTestModule::CaTestModule() : CalibrationCollectorModule()
 
 void CaTestModule::prepare()
 {
-  B2INFO("Running CaTest::prepare() function");
+  describeProcess("CaTest::prepare");
   std::string objectName = "MyTree";
   // Data object creation --------------------------------------------------
   TTree* tree = new TTree(objectName.c_str(), "");
@@ -76,17 +76,17 @@ void CaTestModule::prepare()
 
 void CaTestModule::inDefineHisto()
 {
-  B2INFO("Running CaTest::inDefineHisto()");
+  describeProcess("CaTest::inDefineHisto()");
 }
 
 void CaTestModule::startRun()
 {
-  B2INFO("Running CaTest::startRun()");
+  describeProcess("CaTest::startRun()");
 }
 
 void CaTestModule::closeRun()
 {
-  B2INFO("Running CaTest::closeRun()");
+  describeProcess("CaTest::closeRun()");
   // We close the file at end of run, producing
   // one file per run (and process id) which is more
   // convenient than one large binary block.
@@ -102,6 +102,7 @@ void CaTestModule::closeRun()
 
 void CaTestModule::collect()
 {
+  describeProcess("CaTest::collect()");
   m_evt = m_emd->getEvent();
   m_run = m_emd->getRun();
   m_exp = m_emd->getExperiment();
@@ -136,5 +137,13 @@ void CaTestModule::collect()
 
 void CaTestModule::finish()
 {
-  B2INFO("Running CaTest::finish()");
+  describeProcess("CaTest::finish()");
+}
+
+void CaTestModule::describeProcess(string functionName)
+{
+  B2DEBUG(100, "Running " + functionName + " function from a Process of type " + ProcHandler::getProcessName()
+          + "\nParallel Processing Used = " + to_string(ProcHandler::parallelProcessingUsed())
+          + "\nThis EvtProcID Id = " + to_string(ProcHandler::EvtProcID())
+          + "\nThe gDirectory is " + gDirectory->GetPath());
 }

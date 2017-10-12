@@ -33,6 +33,7 @@
 
 #include <TMath.h>
 #include <TH1F.h>
+#include <TTree.h>
 
 #include <genfit/FullMeasurement.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>

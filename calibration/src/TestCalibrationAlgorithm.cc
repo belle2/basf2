@@ -32,6 +32,10 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
   // will delete itself automatically at the end of this scope unless you do something
   auto ttree = getObjectPtr<TTree>("MyTree");
   auto hist = getObjectPtr<TH1F>("MyHisto");
+  auto mille = getObjectPtr<MilleData>("test_mille");
+  if (!ttree) return c_Failure;
+  if (!hist) return c_Failure;
+  if (!mille) return c_Failure;
   B2INFO("Number of Entries in MyTree was " << ttree->GetEntries());
   B2INFO("Number of Entries in MyHisto was " << hist->GetEntries());
 
@@ -40,7 +44,7 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
 
   B2INFO("Mean of MyHisto was " << mean);
   B2INFO("Mean Error of MyHisto was " << meanError);
-  auto mille = getObjectPtr<MilleData>("test_mille");
+  if (!mille) return c_Failure;
   for (auto& fileName : mille->getFiles()) {
     B2INFO("Stored Mille binary file: " << fileName);
   }

@@ -423,6 +423,10 @@ namespace Belle2 {
         chain->Add(objectPath.c_str());
       }
     }
+    if (!chain->GetListOfFiles()->GetEntries()) {
+      B2ERROR("No data found for object " << name);
+      return nullptr;
+    }
     objOutputPtr = static_pointer_cast<TTree>(chain);
     // make a TNamed version to input to the map of previous calib objects
     shared_ptr<TNamed> storedObjPtr = static_pointer_cast<TNamed>(objOutputPtr);

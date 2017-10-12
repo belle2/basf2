@@ -27,7 +27,7 @@ namespace Belle2 {
     void addSPTC(std::vector<SpacePointTrackCand>& target, SpacePointTrackCand cand) const override
     {
       // determine length
-      if (cand.getNHits() < m_minPathLength) {
+      if (cand.getNHits() >= m_minPathLength) {
         // if long enough add to final set
         target.push_back(cand);
       }

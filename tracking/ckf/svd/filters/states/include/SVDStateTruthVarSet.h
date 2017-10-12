@@ -16,6 +16,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <tracking/ckf/svd/filters/states/BaseSVDStateFilter.h>
+#include <tracking/ckf/svd/utilities/SVDMCUtil.h>
 
 namespace Belle2 {
   /// Names of the variables to be generated.
@@ -60,5 +61,7 @@ namespace Belle2 {
 
   private:
     StoreObjPtr<EventMetaData> m_eventMetaData;
+
+    MCUtil m_mcUtil;
   };
 }

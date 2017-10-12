@@ -14,7 +14,7 @@
 #include <tracking/ckf/svd/utilities/SVDKalmanStepper.h>
 
 namespace Belle2 {
-  /// A very simple filter for all space points. Should be overloaded for the different cases (SVD, PXD).
+  /// A very simple filter for all space points.
   class SimpleSVDStateFilter : public BaseSVDStateFilter {
   public:
     /// Set the cached B field

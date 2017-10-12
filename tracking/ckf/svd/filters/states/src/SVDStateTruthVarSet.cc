@@ -21,22 +21,25 @@ bool SVDStateTruthVarSet::extract(const BaseSVDStateFilter::Object* pair)
   const std::vector<const CKFToSVDState*>& previousStates = pair->first;
   CKFToSVDState* state = pair->second;
 
+  std::vector<const CKFToSVDState*> allStates = previousStates;
+  allStates.push_back(state);
+
   const RecoTrack* seedTrack = previousStates.front()->getSeed();
   B2ASSERT("Path without seed?", seedTrack);
 
   var<named("truth_event_id")>() = m_eventMetaData->getEvent();
   var<named("truth_seed_number")>() = seedTrack->getArrayIndex();
 
-  // Default to 0 or false (depending on context)
+  // Default to 0
   var<named("truth_position_x")>() = 0;
   var<named("truth_position_y")>() = 0;
   var<named("truth_position_z")>() = 0;
   var<named("truth_momentum_x")>() = 0;
   var<named("truth_momentum_y")>() = 0;
   var<named("truth_momentum_z")>() = 0;
-  var<named("truth")>() = false;
+  var<named("truth")>() = 0;
 
-  if (not /*TODO allStatesCorrect(*state)*/true) {
+  if (not m_mcUtil.allStatesCorrect(allStates)) {
     // Keep all variables set to false and return.
     return true;
   }

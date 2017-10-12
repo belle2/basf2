@@ -53,6 +53,9 @@ namespace Belle2 {
       const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
       std::vector<AResult>& results)
   {
+    // Make it possible to end earlier (with less hits)
+    results.emplace_back(path);
+
     // Implement only graph traversal logic and leave the extrapolation and selection to the
     // rejecter.
     const AState* currentState = path.back();
@@ -75,7 +78,6 @@ namespace Belle2 {
 
     if (childStates.empty()) {
       B2DEBUG(50, "Terminating this route, as there are no possible child states.");
-      results.emplace_back(path);
       return;
     }
 

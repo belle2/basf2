@@ -28,7 +28,6 @@ namespace Belle2 {
 
     TrackFindingCDC::Weight operator()(const std::pair<const std::vector<const AState*>, AState*>& pair) override
     {
-      B2INFO("Will now extrapolate!");
       const std::vector<const AState*>& previousStates = pair.first;
       AState* currentState = pair.second;
 

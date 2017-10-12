@@ -19,6 +19,7 @@
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 
 #include <framework/core/ModuleParam.icc.h>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
   template<class AFilter>
@@ -75,6 +76,7 @@ namespace Belle2 {
         if (useBestNResults < m_resultsWithWeight.size()) {
           std::sort(m_resultsWithWeight.begin(), m_resultsWithWeight.end(), TrackFindingCDC::GreaterWeight());
         }
+
         const auto& lastItemToUse = std::next(m_resultsWithWeight.begin(), useBestNResults);
         const auto& longestElement = *(std::max_element(m_resultsWithWeight.begin(), lastItemToUse,
                                                         TrackFindingCDC::LessOf<NumberOfHitsGetter>()));

@@ -11,6 +11,8 @@
 
 #include <tracking/ckf/general/findlets/TreeSearcher.dcl.h>
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <framework/logging/Logger.h>
+#include <tracking/trackFindingCDC/utilities/Range.h>
 
 namespace Belle2 {
   template <class AState, class AStateRejecter, class AResult>
@@ -83,6 +85,7 @@ namespace Belle2 {
       if (std::count(path.begin(), path.end(), childState)) {
         // Cycle detected -- is this the best handling?
         // Other options: Raise an exception and bail out of this seed
+        B2WARNING("Cycle detected!");
         continue;
       }
       path.push_back(childState);

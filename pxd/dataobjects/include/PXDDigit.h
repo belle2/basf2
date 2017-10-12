@@ -115,7 +115,7 @@ namespace Belle2 {
     unsigned short m_vCellID;  /**< Cell z coordinate in pitch units. */
     unsigned short m_charge;   /**< Digitized charge in ADC units. */
 
-    ClassDef(PXDDigit, 4)
+    ClassDef(PXDDigit, 5)
 
   }; // class PXDDigit
 

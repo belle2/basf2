@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# check for help argument
+echo $@ | grep -E -- "(^|\\s)(--help|-h)($|\\s)" &>/dev/null
+if [ $? -eq 0 ] || [ $# -eq 0 ]; then
+    cat <<EOT
+This program will try to find the shared library which contains a shared
+symbol. This is useful to find out which library needs to be added as
+dependency to the SConscript. The symbol name can be any valid grep pattern.
+It's advisable to put the symbol name into single quotes to prevent the shell
+interpreting special characters like () 
+  $0 <symbol name>
+
+For example to find the library which contains Belle2::MCParticle::MCParticle() 
+you can run 
+  $0 'Belle2::MCParticle::Class()'
+EOT
+    exit 1;
+fi
+
+# Make a list of library directories. If the environment variables are not set
+# replace them with /dev/null so that the absolute path will definitely not
+# exist
+EXTDIR="${BELLE2_EXTERNALS_DIR-/dev/null}/$BELLE2_ARCH"
+LIBDIRS=()
+LIBDIRS+=("${BELLE2_LOCAL_DIR-/dev/null}/lib/$BELLE2_SUBDIR")
+LIBDIRS+=("${BELLE2_RELEASE_DIR-/dev/null}/lib/$BELLE2_SUBDIR")
+LIBDIRS+=("${EXTDIR}/${BELLE2_EXTERNALS_OPTION}/root/lib")
+LIBDIRS+=("${EXTDIR}/${BELLE2_EXTERNALS_OPTION}/lib")
+LIBDIRS+=("${EXTDIR}/common/lib")
+FOUND=()
+
+# loop over all library dirs
+for dirname in "${LIBDIRS[@]}"; do
+  # if it exists go into it
+  if [ ! -d ${dirname} ]; then 
+    continue
+  fi
+  pushd $dirname &>/dev/null
+  # and look for all libraries containing the symbol we are looking for
+  for filename in *.so; do
+    nm -CD --defined-only $filename 2>/dev/null | grep -H --label=${filename} "$@"
+    if [ $? -eq 0 ]; then
+      FOUND+=("$filename")
+    fi
+  done
+done
+
+# print condensed result
+if [ ${#FOUND[@]} -eq 0 ]; then
+  echo "Could not find any match for ${@}"
+  exit 1
+else
+  echo "Matches for ${@} found in ${FOUND[@]}"
+  exit 0
+fi

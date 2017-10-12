@@ -47,7 +47,7 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   m_ModuleID |= ((strip - 1) << BKLM_MAXSTRIP_BIT);
 }
 
-BKLMDigit::BKLMDigit(int moduleID, short ctime, short tdc, short charge) :
+BKLMDigit::BKLMDigit(int moduleID, int ctime, short tdc, short charge) :
   DigitBase(),
   m_SimTime(0.0),
   m_SimEDep(0.0),

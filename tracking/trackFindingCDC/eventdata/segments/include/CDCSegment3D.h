@@ -9,13 +9,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegment2D;
+    class CDCTrajectory2D;
 
     /// A segment consisting of three dimensional reconstructed hits.
     class CDCSegment3D : public CDCSegment<CDCRecoHit3D> {

@@ -184,7 +184,7 @@ void TRGGRLMatchModule::calculationdistance(CDCTriggerTrack* _track, TRGECLClust
 {
 
 //double    _pt = _track->getTransverseMomentum(1.5);
-  double    _r = abs(1.0 / _track->getOmega()) ;
+  double    _r = 1.0 / _track->getOmega() ;
   double    _phi = _track->getPhi0() ;
 
   //-- cluster/TRGECL information
@@ -196,24 +196,19 @@ void TRGGRLMatchModule::calculationdistance(CDCTriggerTrack* _track, TRGECLClust
 //double    _re_scaled_p = _pt * _D / _R;
 
   //-- calculation
-  if (_R > (2 * _r)) {
+  if (_R > abs(2 * _r)) {
     ds[0] = 99999.;
   } else {
-    //  double theta0 = acos(_R/(2*_r)) + _phi;
-    double theta0 = asin(_R / (2 * _r)) + _phi;
-    double theta1 = 2 * _phi - theta0;
+    double theta0 = _phi - asin(_R / (2 * _r));
 
-    double ex_x0 = _R * cos(theta0), ex_y0 = _R * sin(theta0), ex_x1 = _R * cos(theta1), ex_y1 = _R * sin(theta1);
-    double dr0 = sqrt((ex_x0 - _cluster_x) * (ex_x0 - _cluster_x) + (ex_y0 - _cluster_y) * (ex_y0 - _cluster_y));
-    double dr1 = sqrt((ex_x1 - _cluster_x) * (ex_x1 - _cluster_x) + (ex_y1 - _cluster_y) * (ex_y1 - _cluster_y));
-
-    ds[0] = (dr0 < dr1) ? dr0 : dr1;
+    double ex_x0 = _R * cos(theta0), ex_y0 = _R * sin(theta0);
+    ds[0] = sqrt((ex_x0 - _cluster_x) * (ex_x0 - _cluster_x) + (ex_y0 - _cluster_y) * (ex_y0 - _cluster_y));
   }
   //z information
   if (_match3D == 1) {
     double      _z0 = _track->getZ0();
     double      _slope = _track->getCotTheta();
-    double      _ex_z = _z0 + _slope * _R;
+    double      _ex_z = _z0 + _slope * 2 * _r * asin(_R / (2 * _r));
     ds[1] = fabs(_cluster_z - _ex_z);
 
   }

@@ -17,6 +17,7 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 #include <vector>

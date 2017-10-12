@@ -37,7 +37,7 @@ def check_simulation(path):
                 % (", ".join(required), ", ".join(found)))
 
 
-def add_PXDDataReduction(path, components, use_vxdtf2=False,
+def add_PXDDataReduction(path, components, use_vxdtf2=True,
                          pxd_unfiltered_digits='pxd_unfiltered_digits'):
 
     # SVD reconstruction
@@ -82,7 +82,7 @@ def add_simulation(
         bkgscale=1.0,
         bkgOverlay=False,
         usePXDDataReduction=True,
-        use_vxdtf2=False,
+        use_vxdtf2=True,
         generate_2nd_cdc_hits=False):
     """
     This function adds the standard simulation modules to a path.

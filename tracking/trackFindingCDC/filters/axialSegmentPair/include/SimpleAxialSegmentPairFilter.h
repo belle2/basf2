@@ -10,13 +10,15 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/BaseAxialSegmentPairFilter.h>
+
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    using CDCAxialSegment2D = class CDCSegment2D;
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
-    class SimpleAxialSegmentPairFilter : public Filter<CDCAxialSegmentPair> {
+    class SimpleAxialSegmentPairFilter : public BaseAxialSegmentPairFilter {
 
     public:
       /// Constructor
@@ -39,8 +41,6 @@ namespace Belle2 {
     private:
       /// Memory of the Riemann fitter for the circle fits.
       CDCRiemannFitter m_riemannFitter;
-
     };
-
   }
 }

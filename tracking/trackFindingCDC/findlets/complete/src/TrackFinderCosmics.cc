@@ -9,6 +9,9 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/complete/TrackFinderCosmics.h>
 
+#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParam.dcl.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

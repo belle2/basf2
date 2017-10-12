@@ -19,7 +19,10 @@
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 #include <tracking/trackFindingCDC/topology/ILayer.h>
 #include <tracking/trackFindingCDC/topology/IWire.h>
+#include <tracking/trackFindingCDC/topology/EWirePosition.h>
+
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+
 #include <cdc/dataobjects/WireID.h>
 
 #include <vector>
@@ -72,7 +75,7 @@ namespace Belle2 {
 
     public:
       /// Reload all geometry parameters form the CDCGeometryPar to adjust to changes in geometry
-      void reinitialize(CDC::CDCGeometryPar::EWirePosition wirePosSet, bool ignoreWireSag);
+      void reinitialize(EWirePosition wirePosition, bool ignoreWireSag);
 
     public:
       /**

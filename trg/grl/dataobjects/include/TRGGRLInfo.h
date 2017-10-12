@@ -23,6 +23,8 @@ namespace Belle2 {
       m_n_2dfinder_track(-1),
       m_n_2dfitter_track(-1),
       m_n_3dfitter_track(-1),
+      m_n_3dfitter_track_Z10(-1),
+      m_n_3dfitter_track_Z25(-1),
       m_n_NN_track(-1),
       m_n_2dmatch_track(-1),
       m_n_3dmatch_track(-1),
@@ -30,19 +32,25 @@ namespace Belle2 {
       m_n_neutral_cluster(-1),
       m_n_high_300_cluster(-1),
       m_n_high_1000_cluster(-1),
+      m_n_high_1000_cluster415(-1),
+      m_n_high_1000_cluster2316(-1),
+      m_n_high_1000_cluster117(-1),
       m_n_high_2000_cluster(-1),
-      m_n_high_2000_endcap_cluster(-1),
+      m_n_high_2000_cluster414(-1),
+      m_n_high_2000_cluster231516(-1),
+      m_n_high_2000_cluster117(-1),
       m_nbbc(-1),
       m_nbbtc(-1),
       m_n_klm_track(-1),
       m_n_klm_hit(-1),
       m_bhabhaveto(-1),
-      m_sbhabhaveto(-1),
       m_eclbhabhaveto(-1),
-      m_bhabha_accept1(-1),
-      m_bhabha_accept2(-1),
-      m_gg_accept1(-1),
-      m_gg_accept2(-1) {}
+      m_n_PhiPairHigh(-1),
+      m_n_PhiPairLow(-1),
+      m_n_3DPair(-1),
+      m_n_SameHem1Trk(-1),
+      m_n_OppHem1Trk(-1)
+    {}
     ~TRGGRLInfo() {}
 
 
@@ -52,6 +60,10 @@ namespace Belle2 {
     int getN2Dfittertrk() const  {return m_n_2dfitter_track;}
     /**get the number of 3D charged tracks*/
     int getN3Dfittertrk() const  {return m_n_3dfitter_track;}
+    /**get the number of 3D charged tracks*/
+    int getN3DfittertrkZ10() const  {return m_n_3dfitter_track_Z10;}
+    /**get the number of 3D charged tracks*/
+    int getN3DfittertrkZ25() const  {return m_n_3dfitter_track_Z25;}
     /**get the number of NN charged tracks*/
     int getNNNtrk() const  {return m_n_NN_track;}
     /**get the number of 2D matched tracks*/
@@ -63,13 +75,23 @@ namespace Belle2 {
     /**get the number of eclcluster*/
     int getNcluster() const {return m_n_cluster;}
     /**get the number of eclclusters >300MeV*/
-    int getNhighcluster1() const {return m_n_high_300_cluster;}
+    int getNhig300cluster() const {return m_n_high_300_cluster;}
     /**get the number of eclcluster >1GeV, exclude TCID 1,2,17*/
-    int getNhighcluster2() const {return m_n_high_1000_cluster;}
-    /**get the number of eclcluster >2GeV*/
-    int getNhighcluster3() const {return m_n_high_2000_cluster;}
-    /**get the number of eclcluster >2GeV in TCID 1 and 17*/
-    int getNhighcluster4() const {return m_n_high_2000_endcap_cluster;}
+    int getNhigh1GeVcluster() const {return m_n_high_1000_cluster;}
+    /**get the number of eclcluster >1GeV, exclude TCID 1,2,17*/
+    int getNhigh1GeVcluster415() const {return m_n_high_1000_cluster415;}
+    /**get the number of eclcluster >1GeV, exclude TCID 1,2,17*/
+    int getNhigh1GeVcluster2316() const {return m_n_high_1000_cluster2316;}
+    /**get the number of eclcluster >1GeV, exclude TCID 1,2,17*/
+    int getNhigh1GeVcluster117() const {return m_n_high_1000_cluster117;}
+    /**get the number of eclcluster >1GeV, exclude TCID 1,2,17*/
+    int getNhigh2GeVcluster() const {return m_n_high_2000_cluster;}
+    /**get the number of eclcluster >1GeV, exclude TCID 1,2,17*/
+    int getNhigh2GeVcluster414() const {return m_n_high_2000_cluster414;}
+    /**get the number of eclcluster >1GeV, exclude TCID 1,2,17*/
+    int getNhigh2GeVcluster231516() const {return m_n_high_2000_cluster231516;}
+    /**get the number of eclcluster >1GeV, exclude TCID 1,2,17*/
+    int getNhigh2GeVcluster117() const {return m_n_high_2000_cluster117;}
     /**get the number of eclclusters without associated tracks*/
     int getNneucluster() const {return m_n_neutral_cluster;}
     /**get the number of klm tracks*/
@@ -78,22 +100,19 @@ namespace Belle2 {
     int getNklmhit() const {return m_n_klm_hit;}
     /**get two track bhabha logic*/
     int getBhabhaVeto() const {return m_bhabhaveto;}
-    /**get one track bhabha logic*/
-    int getsBhabhaVeto() const {return m_sbhabhaveto;}
     /**get eclbhabha*/
     int geteclBhabhaVeto() const {return m_eclbhabhaveto;}
-    /**get bhabha accept logic 1*/
-    int getBhabhaAccept1() const {return m_bhabha_accept1;}
-    /**get bhabha accept logic 2*/
-    int getBhabhaAccept2() const {return m_bhabha_accept2;}
-    /**get gg accept logic 1*/
-    int getggAccept1() const {return m_gg_accept1;}
-    /**get gg accept logic 2*/
-    int getggAccept2() const  {return m_gg_accept2;}
-    /**get the number of back to back cluster pairs*/
-    int getNbbCluster() const  {return m_nbbc;}
-    /**get the number of back to back cdc track and ecl cluster pairs*/
-    int getNbbTrkCluster() const  {return m_nbbtc;}
+    /***/
+    int getPhiPairHigh() const {return m_n_PhiPairHigh;}
+    /***/
+    int getPhiPairLow() const {return m_n_PhiPairLow;}
+    /***/
+    int get3DPair() const {return m_n_3DPair;}
+    /***/
+    int getNSameHem1Trk() const {return m_n_SameHem1Trk;}
+    /***/
+    int getNOppHem1Trk() const {return m_n_OppHem1Trk;}
+
 
     /**set the number of 2D tracks*/
     void setN2Dfindertrk(int N2Dfindertrk)  {m_n_2dfinder_track = N2Dfindertrk;}
@@ -101,24 +120,36 @@ namespace Belle2 {
     void setN2Dfittertrk(int N2Dfittertrk)  {m_n_2dfitter_track = N2Dfittertrk;}
     /**set the number of 3D charged tracks*/
     void setN3Dfittertrk(int N3Dfittertrk)  {m_n_3dfitter_track = N3Dfittertrk;}
+    /**set the number of 3D charged tracks*/
+    void setN3DfittertrkZ10(int N3DfittertrkZ10)  {m_n_3dfitter_track_Z10 = N3DfittertrkZ10;}
+    /**set the number of 3D charged tracks*/
+    void setN3DfittertrkZ25(int N3DfittertrkZ25)  {m_n_3dfitter_track_Z25 = N3DfittertrkZ25;}
     /**set the number of NN charged tracks*/
     void setNNNtrk(int NNNtrk)  {m_n_NN_track = NNNtrk;}
     /**set the number of 2D matched tracks*/
     void setN2Dmatchtrk(int N2Dmatchtrk)  {m_n_2dmatch_track = N2Dmatchtrk;}
     /**set the number of 3D matched tracks*/
     void setN3Dmatchtrk(int N3Dmatchtrk)  {m_n_3dmatch_track = N3Dmatchtrk;}
-    /**set the number of NN tracks*/
-    //void setNNNmatchtrk(int NNNmatchtrk)  {m_n_NNmatch_track = NNNmatchtrk;}
     /**set the number of clusters*/
     void setNcluster(int Ncluster)  {m_n_cluster = Ncluster;}
     /**set the number of cluster >300 MeV*/
-    void setNhighcluster1(int Nclusterh1)  {m_n_high_300_cluster = Nclusterh1;}
+    void setNhigh300cluster(int N300clusterh)  {m_n_high_300_cluster = N300clusterh;}
     /**set the number of cluster >1 GeV exclude TCID 1,2,17*/
-    void setNhighcluster2(int Nclusterh2)  {m_n_high_1000_cluster = Nclusterh2;}
-    /**set the number of cluster >2 GeV*/
-    void setNhighcluster3(int Nclusterh3)  {m_n_high_2000_cluster = Nclusterh3;}
-    /**set the number of cluster >2 GeV in TCID 1, 17*/
-    void setNhighcluster4(int Nclusterh4)  {m_n_high_2000_endcap_cluster = Nclusterh4;}
+    void setNhigh1GeVcluster(int Nhigh1GeVcluster)  {m_n_high_1000_cluster = Nhigh1GeVcluster;}
+    /**set the number of cluster >1 GeV exclude TCID 1,2,17*/
+    void setNhigh1GeVcluster415(int Nhigh1GeVcluster415)  {m_n_high_1000_cluster415 = Nhigh1GeVcluster415;}
+    /**set the number of cluster >1 GeV exclude TCID 1,2,17*/
+    void setNhigh1GeVcluster2316(int Nhigh1GeVcluster2316)  {m_n_high_1000_cluster2316 = Nhigh1GeVcluster2316;}
+    /**set the number of cluster >1 GeV exclude TCID 1,2,17*/
+    void setNhigh1GeVcluster117(int Nhigh1GeVcluster117)  {m_n_high_1000_cluster117 = Nhigh1GeVcluster117;}
+    /**set the number of cluster >1 GeV exclude TCID 1,2,17*/
+    void setNhigh2GeVcluster(int Nhigh2GeVcluster)  {m_n_high_2000_cluster = Nhigh2GeVcluster;}
+    /**set the number of cluster >1 GeV exclude TCID 1,2,17*/
+    void setNhigh2GeVcluster414(int Nhigh2GeVcluster414)  {m_n_high_2000_cluster414 = Nhigh2GeVcluster414;}
+    /**set the number of cluster >1 GeV exclude TCID 1,2,17*/
+    void setNhigh2GeVcluster231516(int Nhigh2GeVcluster231516)  {m_n_high_2000_cluster231516 = Nhigh2GeVcluster231516;}
+    /**set the number of cluster >1 GeV exclude TCID 1,2,17*/
+    void setNhigh2GeVcluster117(int Nhigh2GeVcluster117)  {m_n_high_2000_cluster117 = Nhigh2GeVcluster117;}
     /**set the number of cluster w/o associated tracks*/
     void setNneucluster(int Nneucluster)  {m_n_neutral_cluster = Nneucluster;}
     /**set the number of klm tracks*/
@@ -128,21 +159,17 @@ namespace Belle2 {
     /**set the value of bhabha*/
     void setBhabhaVeto(int bha)  {m_bhabhaveto = bha;}
     /**set the value of sbhabha*/
-    void setsBhabhaVeto(int sbha)  {m_sbhabhaveto = sbha;}
-    /**set the value of sbhabha*/
     void seteclBhabhaVeto(int eclbha)  {m_eclbhabhaveto = eclbha;}
-    /**set the value of bhabha accept1*/
-    void setBhabhaAccept1(int bhaa1)  {m_bhabha_accept1 = bhaa1;}
-    /**set the value of bhabha accept2*/
-    void setBhabhaAccept2(int bhaa2)  {m_bhabha_accept2 = bhaa2;}
-    /**set the value of gg accept1*/
-    void setggAccept1(int gga1)  {m_gg_accept1 = gga1;}
-    /**set the value of gg accept2*/
-    void setggAccept2(int gga2)  {m_gg_accept2 = gga2;}
-    /**set the number of back to back eclcluster pairs*/
-    void setNbbCluster(int nbbc)  {m_nbbc = nbbc;}
-    /**set the number of back to back track and eclcluster pairs*/
-    void setNbbTrkCluster(int nbbtc)  {m_nbbtc = nbbtc;}
+    /***/
+    void setPairHigh(int PhiPairHigh) {m_n_PhiPairHigh = PhiPairHigh;}
+    /***/
+    void setPairLow(int PhiPairLow) {m_n_PhiPairLow = PhiPairLow;}
+    /***/
+    void set3DPair(int n3DPair) {m_n_3DPair = n3DPair;}
+    /***/
+    void setNSameHem1Trk(int SameHem1Trk) {m_n_SameHem1Trk = SameHem1Trk;}
+    /***/
+    void setNOppHem1Trk(int OppHem1Trk) {m_n_OppHem1Trk = OppHem1Trk;}
 
 
   private:
@@ -152,6 +179,10 @@ namespace Belle2 {
     int m_n_2dfitter_track;
     /**#3D fitter tracks*/
     int m_n_3dfitter_track;
+    /**#3D fitter tracks*/
+    int m_n_3dfitter_track_Z10;
+    /**#3D fitter tracks*/
+    int m_n_3dfitter_track_Z25;
     /**#NN tracks*/
     int m_n_NN_track;
     /**#2D matched finder tracks*/
@@ -168,37 +199,47 @@ namespace Belle2 {
     int m_n_high_300_cluster;
     /**# ecl clusers with energy threshold 1GeV, TC ID 1,2,17 is exlcuded for dedicated single photon trigger */
     int m_n_high_1000_cluster;
+    /**# ecl clusers with energy threshold 1GeV */
+    int m_n_high_1000_cluster415;
+    /**# ecl clusers with energy threshold 1GeV */
+    int m_n_high_1000_cluster2316;
+    /**# ecl clusers with energy threshold 1GeV */
+    int m_n_high_1000_cluster117;
     /**# ecl clusers with energy threshold 2GeV */
     int m_n_high_2000_cluster;
+    /**# ecl clusers with energy threshold 2GeV */
+    int m_n_high_2000_cluster414;
+    /**# ecl clusers with energy threshold 2GeV */
+    int m_n_high_2000_cluster231516;
+    /**# ecl clusers with energy threshold 2GeV */
+    int m_n_high_2000_cluster117;
     /**# ecl clusers with energy threshold 2GeV in TC ID 1 and 17 */
     int m_n_high_2000_endcap_cluster;
     /**# back to back ecl cluser pairs */
     int m_nbbc;
     /**# back to back cdc track and ecl clsuter*/
     int m_nbbtc;
-
     /**# klm track*/
     int m_n_klm_track;
     /**# klm hit*/
     int m_n_klm_hit;
     /**two track Bhabha veto, bahbah:1, non-bhabha:0*/
     int m_bhabhaveto;
-    /**one track Bhabha veto, sbahbah:1, non-sbhabha:0*/
-    int m_sbhabhaveto;
     /**ecl Bhabha veto (only ecl information is used), eclbahbah:1, non-eclbhabha:0*/
     int m_eclbhabhaveto;
-    /**Bhabha accept, bhabha:1, non-bhabha:0*/
-    int m_bhabha_accept1;
-    /**Bhabha accept, bhabha:1, non-bhabha:0*/
-    int m_bhabha_accept2;
-    /**gamma gamma accept, gg:1, non-gg:0*/
-    int m_gg_accept1;
-    /**gamma gamma accept, gg:1, non-gg:0*/
-    int m_gg_accept2;
-
+    /***/
+    int m_n_PhiPairHigh;
+    /***/
+    int m_n_PhiPairLow;
+    /***/
+    int m_n_3DPair;
+    /***/
+    int m_n_SameHem1Trk;
+    /***/
+    int m_n_OppHem1Trk;
 
     /**! The Class title*/
-    ClassDef(TRGGRLInfo, 1); /*< the class title */
+    ClassDef(TRGGRLInfo, 2); /*< the class title */
   };
 } // end namespace Belle2
 

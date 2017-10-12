@@ -35,13 +35,13 @@ NtupleMakerModule::NtupleMakerModule() : Module()
   m_iCand = 0;
 
   //Set module properties
-  setDescription("Make a TTree with the properties of selected decay products. See https://belle2.cc.kek.jp/~twiki/bin/view/Physics/NtupleMaker for an introduction.");
+  setDescription("Make a TTree with the properties of selected decay products. See https://confluence.desy.de/display/BI/Physics+NtupleMaker for an introduction.");
   //Parameter definition
   addParam("fileName", m_fileName, "Name of ROOT file for output", string(""));
   addParam("treeName", m_treeName, "Name of TTree to be filled.", string(""));
   addParam("comment", m_comment, "Comment about the content of the TTree.", string(""));
   addParam("tools", m_toolNames,
-           "List of tools and decay descriptors. Available tools are described in https://belle2.cc.kek.jp/~twiki/bin/view/Physics/NtupleTool",
+           "List of tools and decay descriptors. Available tools are described in https://confluence.desy.de/display/BI/Physics+NtupleTool",
            vector<string>());
   addParam("listName", m_listName, "Name of particle list with reconstructed particles.", string(""));
 }

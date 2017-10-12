@@ -22,11 +22,10 @@
 // FRAMEWORK
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 
 // ECL
-#include <framework/database/DBArray.h>
-#include <ecl/dbobjects/ECLDigitEnergyConstants.h>
-#include <ecl/dbobjects/ECLDigitTimeConstants.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
 
 // OTHER
 #include <vector>
@@ -89,21 +88,44 @@ namespace Belle2 {
       double m_backgroundTimingCut;  /**< Timing window for background level counting. */
 
       const int c_nCrystals = 8736;  /**< Number of ECL crystals. */
-      std::vector < double > m_calibrationEnergyHighRatio;  /**< vector with single crystal calibration ratios (high energy) */
-      std::vector < double > m_calibrationTimeOffset;  /**< vector with time calibration constant offsets */
 
-      DBArray<ECLDigitEnergyConstants> m_calibrationEnergyHigh;  /**< single crystal calibration constants high energy */
-      DBArray<ECLDigitTimeConstants> m_calibrationTime;  /**< single crystal calibration constants time */
+      std::vector < float > v_calibrationCrystalElectronics;  /**< single crystal electronics calibration as vector*/
+      std::vector < float > v_calibrationCrystalElectronicsUnc;  /**< single crystal electronics calibration as vector uncertainty*/
+      DBObjPtr<ECLCrystalCalib> m_calibrationCrystalElectronics;  /**< single crystal electronics calibration */
 
-      double getCalibratedEnergy(const int cellid, const int energy) const; /**< energy calibration */
-      double getCalibratedTime(const int cellid, const int time, const bool fitfailed) const; /**< timing correction. */
-      double getT99(const int cellid, const double energy, const bool fitfailed, const int bgcount) const; /**< t99%. */
-//      double getInterpolatedTimeResolution(const double x, const int bin) const; /**< timing resolution interpolation. */
-      void prepareEnergyCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
-      void prepareTimeCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
-      int determineBackgroundECL(); /**< count out of time digits to determine baclground levels */
+      std::vector < float > v_calibrationCrystalEnergy;  /**< single crystal energy calibration as vector*/
+      std::vector < float > v_calibrationCrystalEnergyUnc;  /**< single crystal energy calibration as vector uncertainty*/
+      DBObjPtr<ECLCrystalCalib> m_calibrationCrystalEnergy;  /**< single crystal energy calibration */
+
+      std::vector < float > v_calibrationCrystalElectronicsTime;  /**< single crystal time calibration offset electronics as vector*/
+      std::vector < float >
+      v_calibrationCrystalElectronicsTimeUnc;  /**< single crystal time calibration offset electronics as vector uncertainty*/
+      DBObjPtr<ECLCrystalCalib> m_calibrationCrystalElectronicsTime;  /**< single crystal time calibration offset electronics*/
+
+      std::vector < float > v_calibrationCrystalTimeOffset;  /**< single crystal time calibration offset as vector*/
+      std::vector < float > v_calibrationCrystalTimeOffsetUnc;  /**< single crystal time calibration offset as vector uncertainty*/
+      DBObjPtr<ECLCrystalCalib> m_calibrationCrystalTimeOffset;  /**< single crystal time calibration offset*/
+
+      std::vector < float > v_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF as vector*/
+      std::vector < float > v_calibrationCrystalFlightTimeUnc;  /**< single crystal time calibration TOF as vector uncertainty*/
+      DBObjPtr<ECLCrystalCalib> m_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF*/
 
       double m_timeInverseSlope; /**< Time calibration inverse slope "a". */
+
+      void initializeCalibration(); /**< reads calibration constants, performs checks, put them into a vector */
+      void callbackCalibration(DBObjPtr<ECLCrystalCalib>& cal, std::vector<float>& constants,
+                               std::vector<float>& constantsUnc); /**< reads calibration constants */
+
+
+
+//      double getCalibratedEnergy(const int cellid, const int energy) const; /**< energy calibration */
+//      double getCalibratedTime(const int cellid, const int time, const bool fitfailed) const; /**< timing correction. */
+      double getT99(const int cellid, const double energy, const bool fitfailed, const int bgcount) const; /**< t99%. */
+//      double getInterpolatedTimeResolution(const double x, const int bin) const; /**< timing resolution interpolation. */
+//      void prepareEnergyCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
+//      void prepareTimeCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
+      int determineBackgroundECL(); /**< count out of time digits to determine baclground levels */
+
       double m_timeResolutionPointResolution[4]; /**< Time resolution calibration interpolation parameter "Resolution". */
       double m_timeResolutionPointX[4];  /**< Time resolution calibration interpolation parameter "x = 1/E (GeV)". */
       const double c_timeResolutionForFitFailed  = 1.0e9; /**< Time resolution for failed fits". */

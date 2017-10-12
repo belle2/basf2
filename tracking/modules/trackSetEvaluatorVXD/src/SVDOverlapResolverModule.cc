@@ -82,7 +82,7 @@ void SVDOverlapResolverModule::event()
       if (spacePointPointer->getType() != VXD::SensorInfoBase::SensorType::SVD) continue;
 
       //at the position of the svdCluster Index, the track index is pushed back;
-      RelationVector<SVDCluster> svdClusterRelations = spacePointPointer->getRelationsTo<SVDCluster>();
+      RelationVector<SVDCluster> svdClusterRelations = spacePointPointer->getRelationsTo<SVDCluster>(m_nameSVDClusters);
       for (SVDCluster const& svdClusterPointer : svdClusterRelations) {
         svdHitRelatedTracks[svdClusterPointer.getArrayIndex()].push_back(iCand);
       }

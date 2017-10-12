@@ -12,6 +12,9 @@
 #include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 #include <tracking/ckf/general/utilities/Advance.h>
 
+#include <genfit/MeasuredStateOnPlane.h>
+#include <framework/logging/Logger.h>
+
 namespace Belle2 {
   template <class AState, class AnAdvancer = Advancer>
   class AdvanceFilter : public TrackFindingCDC::Filter<std::pair<const std::vector<const AState*>, AState*>> {
@@ -31,13 +34,27 @@ namespace Belle2 {
       const std::vector<const AState*>& previousStates = pair.first;
       AState* currentState = pair.second;
 
+      if (not previousStates.back()->mSoPSet()) {
+        for (const AState* state : previousStates) {
+
+          if (state->getHit()) {
+            B2WARNING(state->getGeometricalLayer() << " " << state->getHit()->getVxdID() << " " << state->mSoPSet());
+          } else {
+            B2WARNING(state->getGeometricalLayer() << " 0.0.0 " << state->mSoPSet());
+          }
+        }
+      }
+
       B2ASSERT("Can not extrapolate with nothing", not previousStates.empty());
+      B2ASSERT("Can not extrapolate with nothing", previousStates.back()->mSoPSet());
       genfit::MeasuredStateOnPlane mSoP = previousStates.back()->getMeasuredStateOnPlane();
       genfit::SharedPlanePtr plane = currentState->getPlane(mSoP);
 
       const double returnValue = m_advancer.extrapolateToPlane(mSoP, plane);
 
-      currentState->setMeasuredStateOnPlane(mSoP);
+      if (not std::isnan(returnValue)) {
+        currentState->setMeasuredStateOnPlane(mSoP);
+      }
 
       return returnValue;
     }

@@ -67,27 +67,8 @@ SectorSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFT
   const VxdID& toVXDID = toSpacePoint->getVxdID();
 
   if (fromVXDID.getLayerNumber() == toVXDID.getLayerNumber()) {
-    // next layer is an overlap one, so lets return all hits from the same layer, that are on a
-    // ladder which is below the last added hit.
-    const unsigned int fromLadderNumber = fromVXDID.getLadderNumber();
-    const unsigned int maximumLadderNumber = VXD::GeoCache::getInstance().getLadders(fromVXDID).size();
-
-    // the reason for this strange formula is the numbering scheme in the VXD.
-    // we first substract 1 from the ladder number to have a ladder counting from 0 to N - 1,
-    // then we add (PXD)/subtract(SVD) one to get to the next (overlapping) ladder and do a % N to also cope for the
-    // highest number. Then we add 1 again, to go from the counting from 0 .. N-1 to 1 .. N.
-    // The + maximumLadderNumber in between makes sure, we are not ending with negative numbers
-    const int direction = -1;
-    const unsigned int overlappingLadder =
-      ((fromLadderNumber + maximumLadderNumber - 1) + direction) % maximumLadderNumber + 1;
-
-    B2DEBUG(100, "Overlap check on " << fromLadderNumber << " using from " << overlappingLadder);
-    if (toVXDID.getLadderNumber() == overlappingLadder) {
-      // TODO: Also check for sensor?
-      return 1.0;
-    } else {
-      return NAN;
-    }
+    // TODO: Also check for sensors?
+    return 1.0;
   }
 
   // next layer is not an overlap one, so we can just return all hits of the next layer

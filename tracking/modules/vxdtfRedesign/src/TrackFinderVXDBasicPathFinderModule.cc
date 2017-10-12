@@ -147,7 +147,7 @@ void TrackFinderVXDBasicPathFinderModule::event()
     spPath.push_back(aPath->back()->getEntry().getInnerHit()->spacePoint);
     for (auto aNodeIt = (*aPath).rbegin(); aNodeIt != (*aPath).rend();  ++aNodeIt) {
       spPath.push_back((*aNodeIt)->getEntry().getOuterHit()->spacePoint);
-      family = (*aNodeIt)->getMetaInfo().getFamily();
+      family = (*aNodeIt)->getFamily();
     }
     m_sptcCreator.createSPTCs(m_TCs, spPath, family);
   }

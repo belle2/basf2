@@ -75,12 +75,12 @@ namespace Belle2 {
       B2DEBUG(1, "Mark node for family: " << family << " with " << neighbours.size() << " neighbour nodes.");
       for (auto& neighbour : neighbours) {
         // If node was already touched continue;
-        if (neighbour.getFamily() != -1) {
-          short tmpFamily = neighbour.getFamily();
+        if (neighbour->getFamily() != -1) {
+          short tmpFamily = neighbour->getFamily();
           if (tmpFamily != family) B2FATAL("Node already assigned to different family: " << family << ", " << tmpFamily);
           else continue;
         }
-        neighbour.setFamily(family);
+        neighbour->setFamily(family);
         NeighbourContainerType& innerNeighbours = neighbour->getInnerNodes();
         NeighbourContainerType& outerNeighbours = neighbour->getOuterNodes();
         newNeighbours.reserve(innerNeighbours.size() + outerNeighbours.size());

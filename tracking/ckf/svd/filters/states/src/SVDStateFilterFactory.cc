@@ -30,6 +30,7 @@
 #include <tracking/ckf/svd/filters/states/SVDStateBasicVarSet.h>
 #include <tracking/ckf/svd/filters/states/SVDStateTruthVarSet.h>
 #include <tracking/ckf/svd/filters/states/SimpleSVDStateFilter.h>
+#include <tracking/ckf/svd/filters/states/AllSVDStateFilter.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -101,7 +102,7 @@ SVDStateFilterFactory::create(const std::string& filterName) const
   if (filterName == "none") {
     return std::make_unique<TrackFindingCDC::NoneFilter<BaseSVDStateFilter>>();
   } else if (filterName == "all") {
-    return std::make_unique<TrackFindingCDC::AllFilter<BaseSVDStateFilter>>();
+    return std::make_unique<AllSVDStateFilter>();
   } else if (filterName == "advance") {
     return std::make_unique<AdvanceFilter<CKFToSVDState, SVDAdvancer>>();
   } else if (filterName == "fit") {

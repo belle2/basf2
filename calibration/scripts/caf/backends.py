@@ -666,7 +666,7 @@ class PBS(Batch):
         """
         Do the actual batch submission command and collect the output to find out the job id for later monitoring.
         """
-        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True)
+        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, env={})
         return sub_out
 
     class Result():
@@ -760,7 +760,7 @@ class LSF(Batch):
         """
         Do the actual batch submission command and collect the output to find out the job id for later monitoring.
         """
-        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True, env={})
         return sub_out
 
     class Result():

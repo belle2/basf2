@@ -126,8 +126,8 @@ class Calibration():
             #: Files used for collection procedure
             self.input_files = input_files
         #: Since many collectors require some different setup, this is a path added before the collector and after the
-        #: default RootInput module setup. If this path contains RootInput then it's params are used instead, except for
-        #: the input_files.
+        #: default RootInput module + HistoManager setup. If this path contains RootInput then it's params are used instead,
+        #: except for the input_files.
         self.pre_collector_path = None
         #: Output results of algorithms for each iteration
         self.results = {}

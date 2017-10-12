@@ -42,13 +42,14 @@ bool SVDResultTruthVarSet::extract(const CKFToSVDResult* result)
   }
 
   // Count the number of times the related MC-track is also related to the clusters.
-  const unsigned int numberOfCorrectHits = 0; //TODO getNumberOfCorrectHits(mcTrack, result->getHits());
+  const unsigned int numberOfCorrectHits = m_mcUtil.getNumberOfCorrectHits(mcTrack, result->getHits());
 
   var<named("truth_number_of_correct_hits")>() = numberOfCorrectHits;
   var<named("truth_number_of_mc_svd_hits")>() = mcTrack->getNumberOfSVDHits();
   var<named("truth_number_of_mc_pxd_hits")>() = mcTrack->getNumberOfPXDHits();
   var<named("truth_number_of_mc_cdc_hits")>() = mcTrack->getNumberOfCDCHits();
-  var<named("truth")>() = static_cast<double>(numberOfCorrectHits) / static_cast<double>(mcTrack->getNumberOfSVDHits());
+
+  var<named("truth")>() = static_cast<double>(numberOfCorrectHits) / (static_cast<double>(mcTrack->getNumberOfSVDHits()) / 2);
 
   return true;
 }

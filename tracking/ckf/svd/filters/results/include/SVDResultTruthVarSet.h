@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
 
 #include <tracking/ckf/svd/entities/CKFToSVDResult.h>
+#include <tracking/ckf/svd/utilities/SVDMCUtil.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -57,5 +58,7 @@ namespace Belle2 {
 
   private:
     StoreObjPtr<EventMetaData> m_eventMetaData;
+
+    MCUtil m_mcUtil;
   };
 }

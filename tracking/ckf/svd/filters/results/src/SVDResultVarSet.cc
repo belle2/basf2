@@ -21,7 +21,6 @@ using namespace TrackFindingCDC;
 SVDResultVarSet::SVDResultVarSet() : TrackFindingCDC::VarSet<SVDResultVarNames>()
 {
   addProcessingSignalListener(&m_advancer);
-  addProcessingSignalListener(&m_kalmanStepper);
 }
 
 

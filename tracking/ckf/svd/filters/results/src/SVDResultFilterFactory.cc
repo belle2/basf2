@@ -26,11 +26,8 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 namespace {
-  /// MC filter using the truth information
-  using MCSVDResultFilter = TruthVarFilter<SVDResultTruthVarSet>;
-
-  /// MC filter using the teacher information
-  using TruthTeacherSVDResultFilter = ChoosableFromVarSetFilter<SVDResultTruthVarSet>;
+  /// MC filter using the truth/teacher information
+  using ChooseableTruthSVDResultFilter = ChoosableFromVarSetFilter<SVDResultTruthVarSet>;
 
   /// Basic recording filter for SVD - CDC results.
   using RecordingSVDResultFilter = RecordingFilter<VariadicUnionVarSet<SVDResultTruthVarSet, SVDResultVarSet>>;
@@ -81,9 +78,9 @@ SVDResultFilterFactory::create(const std::string& filterName) const
   } else if (filterName == "mva") {
     return std::make_unique<MVASVDResultFilter>("tracking/data/ckf_CDCToSVDResult.xml");
   } else if (filterName == "truth") {
-    return std::make_unique<MCSVDResultFilter>();
+    return std::make_unique<ChooseableTruthSVDResultFilter>("truth");
   } else if (filterName == "truth_teacher") {
-    return std::make_unique<TruthTeacherSVDResultFilter>("truth_teacher");
+    return std::make_unique<ChooseableTruthSVDResultFilter>("truth_teacher");
   } else {
     return Super::create(filterName);
   }

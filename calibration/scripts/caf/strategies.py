@@ -8,7 +8,7 @@ from .utils import runs_overlapping_iov
 
 class AlgorithmStrategyBase():
     """Base class for Algorithm strategies. These do the actual execution of
-CalibrationAlgorithm classes on collected data. Each strategy may be quite different
+Algorithm Machine class on collected data. Each strategy may be quite different
 in terms of how fast it may be, how database payloads are passed between executions, and
 if the final payloads have an IoV that is independent to the actual runs used to calculates
 them."""

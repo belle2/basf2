@@ -11,8 +11,11 @@ __all__ = ["Calibration", "Algorithm", "CAF"]
 
 import os
 import sys
+from threading import Thread
 
 from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL
+
+import ROOT
 
 from caf.utils import past_from_future_dependencies
 from caf.utils import topological_sort
@@ -27,7 +30,7 @@ from caf.utils import IoV_Result
 
 from caf import strategies
 import caf.backends
-from caf.state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError, CalibrationRunner
+from caf.state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError
 
 
 class Calibration():
@@ -425,6 +428,63 @@ class Algorithm():
         by default.
         """
         self.algorithm.setInputFileNames(input_file_paths)
+
+
+class RunnerError(Exception):
+    """
+    Base exception class for Machine Runner
+    """
+    pass
+
+
+class CalibrationRunner(Thread):
+    """
+    Runs a `CalibrationMachine` in a Thread. Will process from intial state
+    to the final state.
+    """
+
+    def __init__(self, machine, heartbeat=None):
+        """
+        """
+        super().__init__()
+        #: The `CalibrationMachine` that we will run
+        self.machine = machine
+        #: Allowed transitions that we will use to progress
+        self.moves = ["submit_collector", "complete", "run_algorithms", "iterate"]
+        self.setup_defaults()
+        if heartbeat:
+            #: Heartbeat of the monitoring
+            self.heartbeat = heartbeat
+
+    def run(self):
+        """
+        Will be run in a new Thread by calling the start() method
+        """
+        from time import sleep
+        while self.machine.state != "completed":
+            for trigger in self.moves:
+                try:
+                    if trigger in self.machine.get_transitions(self.machine.state):
+                        getattr(self.machine, trigger)()
+                    sleep(self.heartbeat)  # Only sleeps if transition completed
+                except ConditionError:
+                    continue
+
+            if self.machine.state == "failed":
+                break
+
+    def setup_defaults(self):
+        """
+        Anything that is setup by outside config files by default goes here.
+        """
+        import configparser
+        config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
+        if config_file_path:
+            config = configparser.ConfigParser()
+            config.read(config_file_path)
+        else:
+            B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
+        self.heartbeat = decode_json_string(config['CAF_DEFAULTS']['Heartbeat'])
 
 
 class CAF():

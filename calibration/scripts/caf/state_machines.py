@@ -5,8 +5,6 @@ from functools import partial
 from collections import defaultdict
 
 import configparser
-from threading import Thread, Lock, RLock
-from time import sleep
 import pickle
 import multiprocessing
 import glob
@@ -586,7 +584,7 @@ class CalibrationMachine(Machine):
             if "fail" in possible_transitions:
                 getattr(self, "fail")()
             else:
-                raise RunnerError(("Failed to automatically transition out of {0} state.".format(self.state)))
+                raise MachineError(("Failed to automatically transition out of {0} state.".format(self.state)))
 
     def _make_output_dir(self):
         """
@@ -1023,54 +1021,6 @@ class AlgorithmMachine(Machine):
         self.results.append(result)
 
 
-class CalibrationRunner(Thread):
-    """
-    Runs a `CalibrationMachine` in a Thread. Will process from intial state
-    to the final state.
-    """
-
-    def __init__(self, machine, heartbeat=None):
-        """
-        """
-        super().__init__()
-        #: The `CalibrationMachine` that we will run
-        self.machine = machine
-        #: Allowed transitions that we will use to progress
-        self.moves = ["submit_collector", "complete", "run_algorithms", "iterate"]
-        self.setup_defaults()
-        if heartbeat:
-            #: Heartbeat of the monitoring
-            self.heartbeat = heartbeat
-
-    def run(self):
-        """
-        Will be run in a new Thread by calling the start() method
-        """
-        while self.machine.state != "completed":
-            for trigger in self.moves:
-                try:
-                    if trigger in self.machine.get_transitions(self.machine.state):
-                        getattr(self.machine, trigger)()
-                    sleep(self.heartbeat)  # Only sleeps if transition completed
-                except ConditionError:
-                    continue
-
-            if self.machine.state == "failed":
-                break
-
-    def setup_defaults(self):
-        """
-        Anything that is setup by outside config files by default goes here.
-        """
-        config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
-        if config_file_path:
-            config = configparser.ConfigParser()
-            config.read(config_file_path)
-        else:
-            B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
-        self.heartbeat = decode_json_string(config['CAF_DEFAULTS']['Heartbeat'])
-
-
 class MachineError(Exception):
     """
     Base exception class for this module
@@ -1088,12 +1038,5 @@ class ConditionError(MachineError):
 class TransitionError(MachineError):
     """
     Exception for when transitions fail
-    """
-    pass
-
-
-class RunnerError(Exception):
-    """
-    Base exception class for Machine Runner
     """
     pass

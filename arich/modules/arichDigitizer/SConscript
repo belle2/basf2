@@ -1,5 +1,5 @@
 Import('env')
  	
-env['LIBS'] = ['framework', 'arich_dataobjects', 'arich']
+env['LIBS'] = ['framework', 'arich_dataobjects', 'arich', 'background_dataobjects']
 
 Return('env')

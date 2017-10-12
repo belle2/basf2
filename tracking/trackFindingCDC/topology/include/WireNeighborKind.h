@@ -28,18 +28,20 @@ namespace Belle2 {
 
       /// Useful constructor from cell distance and direction to reach the designated neighbor
       WireNeighborKind(short cellDistance, short oClockDirection)
-        : m_cellDistance(cellDistance),
-          m_oClockDirection(modulo(oClockDirection, 12))
+        : m_cellDistance(cellDistance)
+        , m_oClockDirection(moduloFast(oClockDirection, 12))
       {}
 
       /// Calculate the distance between the current and the layer of the designated neighbor
       short getILayerDifference() const
-      { return getILayerDifferenceSign() * getAbsILayerDifference(); }
+      {
+        return getILayerDifferenceSign() * getAbsILayerDifference();
+      }
 
       /// Calculate the absolute distance between the current and the layer of the designated neighbor
       short getAbsILayerDifference() const
       {
-        short slope = abs(symmetricModulo(getOClockDirection() + 3, 6));
+        short slope = abs(symmetricModuloFast(getOClockDirection() + 3, 6));
         short iAbsLayerDifference = slope * getCellDistance() / 2;
         if (iAbsLayerDifference > 2) iAbsLayerDifference = 2;
         return iAbsLayerDifference;
@@ -47,7 +49,9 @@ namespace Belle2 {
 
       ///  Calculate if the designated neighbor is more outside.
       short getILayerDifferenceSign() const
-      { return sign(symmetricModulo(getOClockDirection() + 3, 12)); }
+      {
+        return sign(symmetricModuloFast(getOClockDirection() + 3, 12));
+      }
 
       /**
        *  Get the distance to the wire neighbor counted in number of cells.

@@ -12,7 +12,12 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/utilities/VectorRange.h>
+
+#include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <set>
 #include <sstream>
@@ -238,6 +243,15 @@ MCParticleColorMap::MCParticleColorMap()
   , m_iColor(0)
   , m_usedColors()
 {
+}
+
+std::string MCParticleColorMap::info()
+{
+  std::ostringstream oss;
+  for (const std::pair<int, std::string>& colorForMCParticleID : m_usedColors) {
+    oss << "MCParticle " << colorForMCParticleID.first << " -> " << colorForMCParticleID.second << "\n";
+  }
+  return oss.str();
 }
 
 std::string MCParticleColorMap::map(int index __attribute__((unused)), const CDCHit& hit)

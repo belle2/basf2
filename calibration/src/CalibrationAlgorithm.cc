@@ -133,6 +133,16 @@ void CalibrationAlgorithm::saveCalibration(TClonesArray* data, const string& nam
   m_payloads.emplace_back(name, data, iov);
 }
 
+void CalibrationAlgorithm::saveCalibration(TObject* data, const IntervalOfValidity& iov)
+{
+  saveCalibration(data, DataStore::objectName(data->IsA(), ""), iov);
+}
+
+void CalibrationAlgorithm::saveCalibration(TObject* data)
+{
+  saveCalibration(data, DataStore::objectName(data->IsA(), ""));
+}
+
 void CalibrationAlgorithm::saveCalibration(TObject* data, const string& name)
 {
   if (m_runs.empty())

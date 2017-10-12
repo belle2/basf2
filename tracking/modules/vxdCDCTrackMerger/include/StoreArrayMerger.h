@@ -7,15 +7,15 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <framework/core/ModuleParamList.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   /**
    * This findlet has helper function to
    * * remove all tracks which have already a related partner from a std::vector of CDC tracks

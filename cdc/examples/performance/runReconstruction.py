@@ -29,9 +29,9 @@ use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
 # use_local_database("cdc_crt/database.txt", "cdc_crt")
 # use_local_database("localDB/database.txt", "localDB")
 # For GCR, July 2017.
-use_central_database("GT_gen_data_002.11_gcr2017-07", LogLevel.WARNING)
-# For GCR, August 2017.
-# use_central_database("GT_gen_data_003.04_gcr2017-08", LogLevel.WARNING)
+# use_central_database("GT_gen_data_002.11_gcr2017-07", LogLevel.WARNING)
+# For GCR, July and August 2017.
+use_central_database("GT_gen_data_003.04_gcr2017-08", LogLevel.WARNING)
 
 
 def rec(input, output, topInCounter=False, magneticField=True,
@@ -45,6 +45,9 @@ def rec(input, output, topInCounter=False, magneticField=True,
     # Set the peiod of data taking.
     data_period = getDataPeriod(exp=exp_number,
                                 run=run_number)
+
+    mapperAngle = getMapperAngle(exp=exp_number,
+                                 run=run_number)
 
     # print(data_period)
     if os.path.exists('output') is False:
@@ -66,7 +69,7 @@ def rec(input, output, topInCounter=False, magneticField=True,
     if fieldMapper is True:
         main_path.add_module('CDCJobCntlParModifier',
                              MapperGeometry=True,
-                             MapperPhiAngle=43.3)
+                             MapperPhiAngle=mapperAngle)
 
     if magneticField is False:
         main_path.add_module('Geometry',
@@ -88,7 +91,7 @@ def rec(input, output, topInCounter=False, magneticField=True,
     #                               data_taking_period=data_period,
     #                               merge_tracks=False)
 
-    # Simple analysi module.
+    # Simple analysis module.
     output = "/".join(['output', output])
     main_path.add_module('CDCCosmicAnalysis',
                          noBFit=not magneticField,
@@ -108,4 +111,4 @@ if __name__ == "__main__":
     parser.add_argument('output', help='Output file you want to store the results.')
     args = parser.parse_args()
     rec(args.input, args.output, topInCounter=False, magneticField=True,
-        unpacking=False, fieldMapper=True)
+        unpacking=True, fieldMapper=True)

@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <Rtypes.h>
+#include <RtypesCore.h>
 
 #include <tracking/trackFindingCDC/utilities/Named.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>

@@ -14,7 +14,6 @@
 #include <tracking/trackFindingCDC/utilities/Relation.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
-#include <boost/algorithm/string/predicate.hpp>
 #include <vector>
 #include <string>
 #include <cassert>
@@ -25,12 +24,12 @@ namespace Belle2 {
     template <class ABaseVarSet>
     class RelationVarSet : public BaseVarSet<Relation<const typename ABaseVarSet::Object> > {
 
+      /// Type of the base class
+      using Super = BaseVarSet<Relation<const typename ABaseVarSet::Object> >;
+
     public:
       /// Object type from which the variables shall be extracted
       using BaseObject = typename ABaseVarSet::Object;
-
-      /// Object type from which variables shall be extracted.
-      using Object = typename std::pair<const BaseObject*, const BaseObject*>;
 
     public:
       /**
@@ -39,39 +38,9 @@ namespace Belle2 {
        */
       void initialize() override
       {
-        m_firstVarSet.initialize();
-        m_secondVarSet.initialize();
-      }
-
-      /// Signal the beginning of a new run
-      void beginRun() override
-      {
-        m_firstVarSet.beginRun();
-        m_secondVarSet.beginRun();
-      }
-
-      /// Signal the beginning of a new event
-      void beginEvent() override
-      {
-        m_firstVarSet.beginEvent();
-        m_secondVarSet.beginEvent();
-      }
-
-      /// Signal the end of a run
-      void endRun() override
-      {
-        m_secondVarSet.endRun();
-        m_firstVarSet.endRun();
-      }
-
-      /**
-       *  Terminate the variable set after event processing.
-       *  Can be specialised if the derived variable set has to tear down aquired resources.
-       */
-      void terminate() override
-      {
-        m_secondVarSet.terminate();
-        m_firstVarSet.terminate();
+        this->addProcessingSignalListener(&m_firstVarSet);
+        this->addProcessingSignalListener(&m_secondVarSet);
+        Super::initialize();
       }
 
       /// Main method that extracts the variable values from the complex object.
@@ -84,7 +53,7 @@ namespace Belle2 {
       }
 
       /// Method for extraction from an object instead of a pointer.
-      bool extract(const std::pair<const BaseObject*, const BaseObject*>& obj)
+      bool extract(const Relation<const BaseObject>& obj)
       {
         return extract(&obj);
       }
@@ -93,7 +62,7 @@ namespace Belle2 {
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
-      std::vector<Named<Float_t*>> getNamedVariables(std::string prefix) override
+      std::vector<Named<Float_t*>> getNamedVariables(const std::string& prefix) override
       {
         std::vector<Named<Float_t*> > result = m_firstVarSet.getNamedVariables(prefix + m_firstPrefix);
         std::vector<Named<Float_t*> > extend = m_secondVarSet.getNamedVariables(prefix + m_secondPrefix);
@@ -105,15 +74,15 @@ namespace Belle2 {
        *   Pointer to the variable with the given name.
        *   Returns nullptr if not found.
        */
-      MayBePtr<Float_t> find(std::string varName) override
+      MayBePtr<Float_t> find(const std::string& varName) override
       {
-        if (boost::starts_with(varName, m_firstPrefix)) {
+        if (0 == varName.find(m_firstPrefix)) {
           std::string varNameWithoutPrefix = varName.substr(m_firstPrefix.size());
           MayBePtr<Float_t> found = m_firstVarSet.find(varNameWithoutPrefix);
           if (found) return found;
         }
 
-        if (boost::starts_with(varName, m_secondPrefix)) {
+        if (0 == varName.find(m_secondPrefix)) {
           std::string varNameWithoutPrefix = varName.substr(m_secondPrefix.size());
           MayBePtr<Float_t> found = m_secondVarSet.find(varNameWithoutPrefix);
           if (found) return found;

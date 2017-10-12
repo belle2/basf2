@@ -9,7 +9,15 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 
-using namespace Belle2::TrackFindingCDC;
+#include <tracking/trackFindingCDC/fitting/CDCFitter2D.icc.h>
+
+using namespace Belle2;
+using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::CDCFitter2D<KarimakisMethod>;
+
+CDCKarimakiFitter::CDCKarimakiFitter() = default;
+CDCKarimakiFitter::~CDCKarimakiFitter() = default;
 
 const CDCKarimakiFitter& CDCKarimakiFitter::getFitter()
 {

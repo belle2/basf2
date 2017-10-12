@@ -1,0 +1,17 @@
+Import('env')
+
+import os
+
+# Mark this folder as a sub library
+env.Dictionary()['SUBLIB'] = True
+
+# Additional libraries
+env['LIBS'] = [
+    'tracking',
+    'tracking_trackFindingCDC',
+    'framework',
+    'genfit2',
+    '$ROOT_LIBS',
+    ]
+
+Return('env')

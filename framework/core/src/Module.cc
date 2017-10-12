@@ -23,11 +23,10 @@
 #include <framework/core/ModuleManager.h>
 #include <framework/core/Path.h>
 
+#include <framework/logging/Logger.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace boost::python;
-
 
 Module::Module() :
   m_name(),
@@ -168,7 +167,7 @@ bool Module::hasProperties(unsigned int propertyFlags) const
 bool Module::hasUnsetForcedParams() const
 {
   auto missing = m_moduleParamList.getUnsetForcedParams();
-  string allMissing = "";
+  std::string allMissing = "";
   for (auto s : missing)
     allMissing += s + " ";
   if (!missing.empty())
@@ -274,7 +273,7 @@ void Module::setParamPythonDict(const boost::python::dict& dictionary)
 //                          Python API
 //=====================================================================
 
-boost::shared_ptr<boost::python::list> Module::getParamInfoListPython() const
+std::shared_ptr<boost::python::list> Module::getParamInfoListPython() const
 {
   return m_moduleParamList.getParamInfoListPython();
 }

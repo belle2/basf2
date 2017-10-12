@@ -21,9 +21,11 @@ class Histogrammer(Module):
 
     ''' A module to histogram width and amplitude of calibration pulses'''
 
-    #: 2D histograms
+    #: Width VS amplitude plot in each slot
     hist = [TH2F('WidthVSAmplitude_Slot_' + str(k + 1), 'With VS amplidute of the Digits in slot ' + str(k + 1),
                  2000, 0., 2000, 80, 0., 20) for k in range(16)]
+
+    #: Width as function of the sample number in each channel
     histSampling = [[TH2F('WidthVSample_Slot_' + str(k + 1) + '_Channel_' + str(j),
                           'With VS amplidute of the Digits in slot ' + str(k + 1) + ' channel ' + str(j),
                           256,
@@ -32,9 +34,12 @@ class Histogrammer(Module):
                           100,
                           0.,
                           20) for k in range(16)] for j in range(512)]
+    #: Default output name
     outname = 'calpulseCheck.root'
 
     def setOutputName(self, outputname):
+        ''' Sets the output file name '''
+
         self.outname = outputname
 
     def event(self):

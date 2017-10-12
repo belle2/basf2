@@ -50,24 +50,37 @@ namespace Belle2 {
      */
     ~AlignableEKLMRecoHit();
 
-    /**
-     * Vector of integer labels for calibration/alignment
-     * parameters available (must match #columns of derivatives(...)).
-     * The labels must be unique across all subdetectors in calibration.
-     * @return Vector of integer labels.
-     */
-    std::vector<int> labels();
-
-    /**
-     * Derivatives of residuals (local measurement coordinates) w.r.t.
-     * alignment/calibration parameters
-     * @param[in] sop Predicted state of the track as linearization point
-     *                around which derivatives of alignment/calibration
-     *                parameters shall be computed
-     * @return Matrix with #rows = dimension of residual, #columns = number of
-     *         parameters. #columns must match labels().size().
-     */
-    TMatrixD derivatives(const genfit::StateOnPlane* sop);
+    /** @brief Labels and derivatives of residuals (local measurement coordinates) w.r.t. alignment/calibration parameters
+    * Matrix "G" of derivatives valid for given prediction of track state:
+    *
+    * G(i, j) = d_residual_i/d_parameter_j
+    *
+    * For 2D measurement (u,v):
+    *
+    * G = ( du/da du/db du/dc ... )
+    *     ( dv/da dv/db dv/dc ... )
+    *
+    * for calibration parameters a, b, c.
+    *
+    * For 1D measurement:
+    *
+    * G = (   0     0     0   ... )
+    *     ( dv/da dv/db dv/dc ... )    for V-strip,
+    *
+    *
+    * G = ( du/da du/db du/dc ... )
+    *     (   0     0     0   ... )    for U-strip,
+    *
+    * Measurements with more dimesions (slopes, curvature) should provide
+    * full 4-5Dx(n params) matrix (state as (q/p, u', v', u, v) or (u', v', u, v))
+    *
+    *
+    * @param sop Predicted state of the track as linearization point around
+    * which derivatives of alignment/calibration parameters shall be computed
+    * @return pair<vector<int>, TMatrixD> With matrix with #rows = dimension of residual, #columns = number of parameters.
+    * #columns must match vector<int>.size().
+    */
+    virtual std::pair<std::vector<int>, TMatrixD> globalDerivatives(const genfit::StateOnPlane* sop);
 
     /**
      * Clone.

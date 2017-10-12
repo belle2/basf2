@@ -30,13 +30,16 @@ TRGGDLCosmicRunModule::TRGGDLCosmicRunModule() : Module::Module()
   addParam("BackToBack", m_backToBack,
            "Switch to turn back-to-back requirement on or off.",
            true);
+  addParam("skipECL", m_skipECL,
+           "Switch to turn off the ECL part of the cosmic trigger.",
+           false);
 }
 
 void
 TRGGDLCosmicRunModule::initialize()
 {
   StoreArray<CDCTriggerSegmentHit>::required(m_tsHitCollectionName);
-  StoreArray<TRGECLTrg>::required();
+  if (!m_skipECL) StoreArray<TRGECLTrg>::required();
 }
 
 void
@@ -60,15 +63,17 @@ TRGGDLCosmicRunModule::event()
   }
 
   bool TCHit = false;
-  StoreArray<TRGECLTrg> tchit;
-  for (int itchit  = 0; itchit < tchit.getEntries(); itchit++) {
-    if ((tchit[itchit] -> getNofTCHit()) > 0) {
-      TCHit = true;
+  if (!m_skipECL) {
+    StoreArray<TRGECLTrg> tchit;
+    for (int itchit  = 0; itchit < tchit.getEntries(); itchit++) {
+      if ((tchit[itchit] -> getNofTCHit()) > 0) {
+        TCHit = true;
+      }
     }
   }
 
   if (m_backToBack)
-    setReturnValue(BackToBack && TCHit);
+    setReturnValue(BackToBack && (TCHit || m_skipECL));
   else
-    setReturnValue(TSinSL2 && TCHit);
+    setReturnValue(TSinSL2 && (TCHit || m_skipECL));
 }

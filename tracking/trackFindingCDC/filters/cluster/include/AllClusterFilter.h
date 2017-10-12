@@ -10,13 +10,13 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCWireHitCluster;
 
     /// Filter accepting all clusters
-    class AllClusterFilter : public Filter<CDCWireHitCluster> {
+    class AllClusterFilter : public BaseClusterFilter {
 
     public:
       /// Basic filter method to override. All implementation rejects all clusters.

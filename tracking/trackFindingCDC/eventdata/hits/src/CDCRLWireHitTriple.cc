@@ -7,13 +7,59 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
 
-#include <cassert>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackFindingCDC/topology/WireNeighborKind.h>
+#include <tracking/trackFindingCDC/numerics/Modulo.h>
+
+#include <iostream>
+#include <limits.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+CDCRLWireHitTriple::Shape::Shape()
+  : m_startToMiddleCellDistance(CHAR_MAX / 2)
+  , m_middleToEndCellDistance(CHAR_MAX / 2)
+  , m_oClockDelta(SHRT_MIN)
+{
+}
+
+CDCRLWireHitTriple::Shape::Shape(const short startToMiddleCellDistance,
+                                 const short middleToEndCellDistance,
+                                 const short oClockDelta)
+  : m_startToMiddleCellDistance(startToMiddleCellDistance)
+  , m_middleToEndCellDistance(middleToEndCellDistance)
+  , m_oClockDelta(oClockDelta)
+{
+}
+
+short CDCRLWireHitTriple::Shape::getStartToMiddleCellDistance() const
+{
+  return m_startToMiddleCellDistance;
+}
+
+short CDCRLWireHitTriple::Shape::getMiddleToEndCellDistance() const
+{
+  return m_middleToEndCellDistance;
+}
+
+short CDCRLWireHitTriple::Shape::getCellExtend() const
+{
+  return m_startToMiddleCellDistance + m_middleToEndCellDistance;
+}
+
+short CDCRLWireHitTriple::Shape::getOClockDelta() const
+{
+  return m_oClockDelta;
+}
+
+bool CDCRLWireHitTriple::Shape::isValid() const
+{
+  return getCellExtend() >= 2 and getCellExtend() <= 4;
+}
 
 CDCRLWireHitTriple::CDCRLWireHitTriple(const CDCRLWireHit& startRLWireHit,
                                        const CDCRLWireHit& middleRLWireHit,
@@ -68,5 +114,16 @@ CDCRLWireHitTriple::Shape CDCRLWireHitTriple::getShape() const
   const short middleToEndCellDistance =  middleToEndNeighborKind.getCellDistance();
   return Shape(startToMiddleCellDistance,
                middleToEndCellDistance,
-               symmetricModulo(oClockDelta, 12));
+               symmetricModuloFast(oClockDelta, 12));
+}
+
+std::ostream& TrackFindingCDC::
+operator<<(std::ostream& output, const CDCRLWireHitTriple& rlWireHitTriple)
+{
+  return (output << "Start : " << rlWireHitTriple.getStartRLWireHit() << " "
+          << "Middle : "
+          << rlWireHitTriple.getMiddleRLWireHit()
+          << " "
+          << "End : "
+          << rlWireHitTriple.getEndRLWireHit());
 }

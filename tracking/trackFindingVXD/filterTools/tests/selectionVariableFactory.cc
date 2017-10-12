@@ -27,22 +27,22 @@ namespace SelFarFactoryTests {
   class DummyHit {
   public:
     /** std constructor */
-    DummyHit(): x(0), y(0), z(0) {};
+    DummyHit(): m_x(0), m_y(0), m_z(0) {};
 
     /** constructor*/
-    DummyHit(double x, double y, double z): x(x), y(y), z(z) {};
+    DummyHit(double x, double y, double z): m_x(x), m_y(y), m_z(z) {};
 
     /** destructor */
     virtual ~DummyHit() {};
 
-    double X() const { return x; }/**< return x */
-    double Y() const { return y; }/**< return y */
-    double Z() const { return z; }/**< return z */
+    double X() const { return m_x; }/**< return x */
+    double Y() const { return m_y; }/**< return y */
+    double Z() const { return m_z; }/**< return z */
 
   private:
-    double x; /**< x */
-    double y; /**< y */
-    double z; /**< z */
+    double m_x; /**< x */
+    double m_y; /**< y */
+    double m_z; /**< z */
   };
 
 

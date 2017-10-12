@@ -1,0 +1,5 @@
+genopi.xml   mapping of the LV channels
+Generator scripts for opi files
+genArichlvDetector.py -> ArichlvDetector.opi 
+genArichlvStatus.py   -> ArichlvStatus.opi 
+genArichlvSectorPlt.py -> vmon-Sector*.plt and  cmon-Sector*.plt

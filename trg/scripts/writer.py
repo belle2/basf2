@@ -406,7 +406,7 @@ class VCDWriter(object):
 
                     for j, name in enumerate(scope[i:]):
                         scope_type = self._scope_types.get(
-                            scope[:i+j+1], self._default_scope_type)
+                            scope[:i + j + 1], self._default_scope_type)
                         yield '$scope {} {} $end'.format(scope_type, name)
                     break
             else:

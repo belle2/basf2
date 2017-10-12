@@ -11,7 +11,9 @@ def add_pxd_reconstruction(path):
     path.add_module(pxd_clusterizer)
 
 
-def add_pxd_simulation(path):
+def add_pxd_simulation(path, digitsname=None):
 
     pxd_digitizer = register_module('PXDDigitizer')
+    if digitsname:
+        pxd_digitizer.param('Digits', digitsname)
     path.add_module(pxd_digitizer)

@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 #include <vector>
 
@@ -88,6 +88,7 @@ namespace Belle2 {
       /// Receive signal before the start of the event processing
       void initialize() override
       {
+        Super::initialize();
         if (m_param_writeStoreVector) {
           StoreWrappedObjPtr< std::vector<IOType> > storeVector(m_param_storeVectorName);
           storeVector.registerInDataStore(DataStore::c_DontWriteOut);
@@ -97,6 +98,8 @@ namespace Belle2 {
       /// Receive signal for the start of a new event.
       void beginEvent() override
       {
+        Super::beginEvent();
+
         /// Attain super cluster vector on the DataStore if needed.
         if (m_param_writeStoreVector) {
           StoreWrappedObjPtr< std::vector<IOType> > storeVector(m_param_storeVectorName);

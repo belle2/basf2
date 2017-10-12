@@ -81,20 +81,24 @@ void CKFToSVDFindlet::apply()
   m_dataHandler.apply(m_cdcRecoTrackVector);
   m_hitsLoader.apply(m_spacePointVector);
 
+  B2DEBUG(50, "Starting with " << m_spacePointVector.size() << " hits.");
+
   const auto hitIsAlreadyUsed = [](const auto & hit) {
     return hit->getAssignmentState();
   };
   TrackFindingCDC::erase_remove_if(m_spacePointVector, hitIsAlreadyUsed);
 
+  B2DEBUG(50, "Now have " << m_spacePointVector.size() << " hits.");
+
   m_stateCreatorFromTracks.apply(m_cdcRecoTrackVector, m_seedStates);
   m_stateCreatorFromHits.apply(m_spacePointVector, m_states);
   m_relationCreator.apply(m_seedStates, m_states, m_relations);
 
-  B2INFO("Created " << m_relations.size() << " relations.");
+  B2DEBUG(50, "Created " << m_relations.size() << " relations.");
 
   m_treeSearchFindlet.apply(m_seedStates, m_relations, m_results);
 
-  B2INFO("Having found " << m_results.size() << " results before overlap check");
+  B2DEBUG(50, "Having found " << m_results.size() << " results before overlap check");
 
   m_overlapResolver.apply(m_results);
 
@@ -103,7 +107,7 @@ void CKFToSVDFindlet::apply()
   };
   TrackFindingCDC::erase_remove_if(m_results, hasLowHitNumber);
 
-  B2INFO("Having found " << m_results.size() << " results");
+  B2DEBUG(50, "Having found " << m_results.size() << " results");
 
   m_dataHandler.store(m_results);
   m_spacePointTagger.apply(m_results, m_spacePointVector);

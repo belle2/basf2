@@ -104,6 +104,11 @@ namespace Belle2 {
      */
     std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
 
+    /** Array of names of branches that should be written out although they are not flagged for writeout.
+     *  And usually ignored, use to writeout RestOfEvent.
+     */
+    std::vector<std::string> m_additionalBranchNames[DataStore::c_NDurabilityTypes];
+
     /** Array for names of branches that should NOT be written out.
      *
      *  This takes precedence over m_branchNames, so if a branch is in both
@@ -177,6 +182,9 @@ namespace Belle2 {
     /** Highest event number in highest run.
      */
     unsigned long m_eventHigh;
+
+    /** Whether or not we want to build an event index */
+    bool m_buildIndex{true};
   };
 } // end namespace Belle2
 

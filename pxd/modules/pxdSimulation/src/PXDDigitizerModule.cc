@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter                                            *
+ * Contributors: Martin Ritter, Benjamin Schwenker                        *
  *                                                                        *
  **************************************************************************/
 
@@ -74,10 +74,11 @@ PXDDigitizerModule::PXDDigitizerModule() :
            1.0);
   addParam("ElectronMaxSteps", m_elMaxSteps,
            "Maximum number of steps when propagating electrons", 200);
+  addParam("Gq", m_gq, "Gq of a pixel in nA/electron", 0.6);
+  addParam("ADCUnit", m_ADCUnit, "Slope of the linear ADC transfer curve in nA/ADU", 130.0);
+  addParam("PedestalMean", m_pedestalMean, "Mean of pedestals in ADU", 100.0);
+  addParam("PedestalRMS", m_pedestalRMS, "RMS of pedestals in ADU", 30.0);
 
-  addParam("ADC", m_applyADC, "Simulate ADC?", true);
-  addParam("Gq", m_gq, "Gq of a pixel in nA/electron", 0.5);
-  addParam("ADCFineMode", m_ADCFineMode, "Fine mode has slope of ADC curve of 70 nA/ADU, coarse mode has 130", false);
 
   addParam("statisticsFilename", m_rootFilename,
            "ROOT Filename for statistics generation. If filename is empty, no statistics will be produced",
@@ -110,9 +111,10 @@ void PXDDigitizerModule::initialize()
 
   //Convert parameters to correct units
   m_elNoise *= Unit::e;
-  m_eToADU = (m_ADCFineMode) ? 70.0 / m_gq : 130.0 / m_gq;
+  m_eToADU = m_ADCUnit / m_gq;
   m_elStepTime *= Unit::ns;
   m_segmentLength *= Unit::mm;
+
 
   B2INFO(
     "PXDDigitizer Parameters (in system units, *=calculated +=set in xml):");
@@ -138,7 +140,6 @@ void PXDDigitizerModule::initialize()
   B2INFO(" -->  ElectronGroupSize:  " << m_elGroupSize << " e-");
   B2INFO(" -->  ElectronStepTime:   " << m_elStepTime << " ns");
   B2INFO(" -->  ElectronMaxSteps:   " << m_elMaxSteps);
-  B2INFO(" -->  ADC:                " << (m_applyADC ? "true" : "false"));
   B2INFO(" -->  ADU unit:           " << m_eToADU << " e-/ADU");
   B2INFO(" -->  statisticsFilename: " << m_rootFilename);
 
@@ -556,26 +557,33 @@ void PXDDigitizerModule::saveDigits()
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
     m_chargeThreshold = info.getChargeThreshold();
     m_chargeThresholdElectrons = m_chargeThreshold * m_eToADU;
-    for (Sensor::value_type& digit : sensor.second) {
-      const Digit& d = digit.first;
-      const DigitValue& v = digit.second;
+    for (Sensor::value_type& digitAndValue : sensor.second) {
+      const Digit& d = digitAndValue.first;
+      const DigitValue& v = digitAndValue.second;
 
       //Add Noise where applicable
       double charge = addNoise(v.charge());
 
-      //Zero suppresion cut
-      if (charge < m_chargeThresholdElectrons)
-        continue;
+      // Draw a pedestal value
+      double pedestal = std::max(gRandom->Gaus(m_pedestalMean, m_pedestalRMS), 0.0);
 
-      //Limit electrons to ADC steps
-      if (m_applyADC) charge = round(charge / m_eToADU);
+      // Add pedestal to charge
+      charge = round(charge / m_eToADU + pedestal);
+
+      // Clipping of ADC codes at 255
+      charge = std::min(charge, 255.0);
+
+      // Subtraction of integer pedestal in DHP
+      charge = charge - round(pedestal);
+
+      // Zero Suppression in DHP
+      if (charge < m_chargeThreshold)
+        continue;
 
       //Add the digit to datastore
       int digIndex = storeDigits.getEntries();
       storeDigits.appendNew(
-        PXDDigit(sensorID, d.u(), d.v(),
-                 info.getUCellPosition(d.u()),
-                 info.getVCellPosition(d.v()), charge));
+        PXDDigit(sensorID, d.u(), d.v(), charge));
 
       //If the digit has any relations to MCParticles, add the Relation
       if (v.particles().size() > 0) {

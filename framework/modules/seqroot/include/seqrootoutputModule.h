@@ -44,10 +44,13 @@ namespace Belle2 {
   private:
 
     ///! Write StreamerInfos to a file
-    void writeStreamerInfos();
+    void getStreamerInfos();
 
     //! File name
     std::string m_outputFileName;
+
+    //! If true the output filename will be interpreted as a boost::format pattern
+    bool m_fileNameIsPattern;
 
     //! Compression level
     int m_compressionLevel;
@@ -63,6 +66,12 @@ namespace Belle2 {
 
     //! DataStoreStreamer
     DataStoreStreamer* m_streamer;
+
+    //! StreamerInfo to be written
+    char* m_streamerinfo;
+
+    //! The size of the StreamerInfo
+    int m_streamerinfo_size;
 
     //! Time
     struct timeval m_t0; /**< time at begin of current run. */

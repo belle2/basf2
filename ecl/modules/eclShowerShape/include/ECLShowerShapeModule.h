@@ -120,10 +120,10 @@ namespace Belle2 {
                                     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>& weightFileRepresentation);
 
       /** Load MVA weight file and set pointer of expert.
-       * return the general options of the weightfile associated with weightFileRepresentation.
+       * If weightFileRepresentation is the BRL MVA, also set m_dataset size according to weightFileRepresentation MVA::GeneralOptions
        */
-      MVA::GeneralOptions initilizeMVA(const std::string& identifier,
-                                       std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>& weightFileRepresentation, std::unique_ptr<MVA::Expert>& expert);
+      void initializeMVA(const std::string& identifier,
+                         std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>& weightFileRepresentation, std::unique_ptr<MVA::Expert>& expert);
 
       /**
       * Set showr shape variables.

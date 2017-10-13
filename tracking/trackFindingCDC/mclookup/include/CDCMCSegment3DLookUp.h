@@ -10,10 +10,12 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitCollectionLookUp.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegment3D;
+
+    extern template class CDCMCHitCollectionLookUp<CDCSegment3D>;
 
     /// Specialisation of the lookup for the truth values of two dimensional segments.
     class CDCMCSegment3DLookUp : public CDCMCHitCollectionLookUp<CDCSegment3D> {

@@ -19,13 +19,13 @@ namespace TreeFitter {
 
   class InteractionPoint : public InternalParticle {
   public:
-    InteractionPoint(Particle* particle, bool forceFitAll) ;
+    InteractionPoint(Belle2::Particle* particle, bool forceFitAll) ;
     //    InteractionPoint(Particle* particle, bool forceFitAll,
     //                     bool addupsilon) ; //FT: we don't actually have addupsilon in Belle2, this can be trimmed
 
     virtual ~InteractionPoint() ;
 
-    ErrCode initBeamSpot(Particle* particle) ;
+    ErrCode initBeamSpot(Belle2::Particle* particle) ;
 
     virtual int dim() const { return 3 ; } // (x,y,z)
 
@@ -51,9 +51,9 @@ namespace TreeFitter {
   private:
     bool m_constrainXY ;
     bool m_constrainXYZ ;
-    HepVector m_ipPos ;       // interaction point position
-    HepSymMatrix m_ipCov ;    // cov matrix
-    HepSymMatrix m_ipCovInv ; // inverse of cov matrix
+    CLHEP::HepVector m_ipPos ;       // interaction point position
+    CLHEP::HepSymMatrix m_ipCov ;    // cov matrix
+    CLHEP::HepSymMatrix m_ipCovInv ; // inverse of cov matrix
   } ;
 
 }

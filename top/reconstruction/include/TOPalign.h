@@ -49,11 +49,10 @@ namespace Belle2 {
        * Add data
        * @param moduleID module ID
        * @param pixelID pixel ID (e.g. software channel, 1-based)
-       * @param TDC digitized time
-       * @param time t0-corrected time in [ns] converted from TDC
+       * @param time t0-corrected time in [ns]
        * @return data size (or 0 on error)
        */
-      static int addData(int moduleID, int pixelID, int TDC, double time);
+      static int addData(int moduleID, int pixelID, double time);
 
       /**
        * Sets expected photon yields

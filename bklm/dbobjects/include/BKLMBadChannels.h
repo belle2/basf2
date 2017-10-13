@@ -8,7 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#pragma once
+#ifndef BKLMBADCHANNELS_DB_H
+#define BKLMBADCHANNELS_DB_H
 
 #include <TObject.h>
 #include <vector>
@@ -23,7 +24,7 @@ namespace Belle2 {
    *   isForward[0,1], 0 is backward, 1 is forward
    *   sector[1-8], 1 is on +x axis, 2 is on +y axis
    *   layer[1-15], 1 is the innemost
-   *   plane[0, 1], 0 phiReadout plane, not always the inner plane according to the real detector geometry
+   *   plane[0, 1], 0 zReadout plane, not always the inner plane according to the real detector geometry
    *   strip[1-48]
    */
 
@@ -34,7 +35,7 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    BKLMBadChannels(): m_DeadChannels(), m_HotChannels() {};
+    BKLMBadChannels(): m_DeadChannels(), m_HotChannels(), m_comment() {};
 
     /**
      * Default destructor
@@ -54,12 +55,12 @@ namespace Belle2 {
     /**
      * Set the list of dead channels
      */
-    void setDeadChannel(std::vector<int> channels) {m_DeadChannels = channels; }
+    void setDeadChannel(std::vector<int>& channels) {m_DeadChannels = channels; }
 
     /**
      * Set the list of hot channels
      */
-    void setHotChannel(std::vector<int> channels) { m_HotChannels = channels; }
+    void setHotChannel(std::vector<int>& channels) { m_HotChannels = channels; }
 
     /**
      * Add a channel number to the list of dead channels
@@ -119,3 +120,5 @@ namespace Belle2 {
   };
 
 }// end namespace Belle2
+
+#endif

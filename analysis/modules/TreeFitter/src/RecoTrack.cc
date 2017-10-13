@@ -11,15 +11,6 @@
 //Creates and initialises charged particles using helix parameters. Defines the projection of reconstruction (helix) constraints to the fit.
 
 //#include <stdio.h>
-//#include <Beta/BtaCandidate.hh>
-
-//#include <analysis/dataobjects/Particle.h>
-
-//#include <BetaRecoAdapter/BtaAbsRecoObject.hh>
-//#include <TrkBase/TrkFit.hh>
-//#include <TrkBase/TrkRecoTrk.hh>
-//#include <TrkBase/TrkPoca.hh>
-//#include <TrkBase/TrkDifTraj.hh>
 #include <analysis/modules/TreeFitter/RecoTrack.h>
 #include <analysis/modules/TreeFitter/FitParams.h>
 #include <analysis/modules/TreeFitter/HelixUtils.h>
@@ -27,27 +18,21 @@
 #include <framework/gearbox/Const.h>
 
 #include <TMath.h>
-//using std::cout;
-//using std::endl;
 
 namespace TreeFitter {
 
   extern int vtxverbose ;
 
-  RecoTrack::RecoTrack(Particle* particle, const ParticleBase* mother)
+  RecoTrack::RecoTrack(Belle2::Particle* particle, const ParticleBase* mother)
     : RecoParticle(particle, mother), m_bfield(0), m_trackfit(0), m_cached(false), m_flt(0), m_m(7), m_matrixV(7)
   {
     //FT: FIX ME: This initialises the BField at the IP. This might not be a correct assumption, but is the easiest and fastest for now. Check the impact of using the field at the perigee, or perhaps at the decay vertex as appropriate, especially for significantly displaced vertices.
-    m_bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T; //Bz in Tesla
+    m_bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T; //Bz in Tesla
     B2DEBUG(80, "RecoTrack - Bz from BFieldManager: " << m_bfield);
-    //    PdtPid::PidType pidType = PdtPid::pion ;
-    //    if( bc()->pdtEntry() ) pidType = bc()->pdtEntry()->pidId() ;
-    //    _trkFit = bc()->recoTrk()->fitResult(pidType) ;
     if (m_trackfit == 0) {
       //FT: this is superflous as m_trackfit has just been initialised, but we'll need the statement in future developments.
-
       //FT: For now we still use the pion track hypothesis. Later: add multiple hypotheses, add a flag to allow users to choose whether they want the "true" hypothesis or just the pion (for cases where the pion works better, for whatever reason)
-      m_trackfit = particle->getTrack()->getTrackFitResult(Const::pion);
+      m_trackfit = particle->getTrack()->getTrackFitResult(Belle2::Const::pion);
     }
   }
 
@@ -83,14 +68,6 @@ namespace TreeFitter {
     //FT: is this correct? Might need to make it 3D
     m_flt = m_trackfit->getHelix().getArcLength2DAtXY(pt.X(), pt.Y());
     // FIX ME: use helix poca to get estimate of flightlength first
-
-    // FT: This needs a control statement...
-    /*
-    double lowrange  = _trkFit->traj().lowRange() ;
-    double highrange = _trkFit->traj().hiRange() ;
-    if(     _flt < lowrange)  _flt = lowrange ;
-    else if(_flt > highrange) _flt = highrange ;
-    */
     return ErrCode() ;
   } ;
 
@@ -106,6 +83,7 @@ namespace TreeFitter {
       m_m(i) = tau[i - 1];
     // FIX ME: bring z0 in the correct domain ...
     TMatrixDSym cov = m_trackfit->getCovariance5();
+    //could also be TMatrixDSym cov = (m_trackfit->getUncertainHelix()).getCovariance();
     for (int row = 1; row <= 5; ++row)
       for (int col = 1; col <= row; ++col)
         m_matrixV(row, col) = cov[row - 1][col - 1];
@@ -114,9 +92,9 @@ namespace TreeFitter {
     return ErrCode() ;
   }
 
-  HepVector symdiag(const HepSymMatrix& m)   //FT: I don't think this is actually ever used outside of printouts
+  CLHEP::HepVector symdiag(const CLHEP::HepSymMatrix& m)   //FT: I don't think this is actually ever used outside of printouts
   {
-    HepVector rc(m.num_row()) ;
+    CLHEP::HepVector rc(m.num_row()) ;
     for (int i = 1; i <= m.num_row(); ++i)
       rc(i) = sqrt(m.fast(i, i)) ;
     return rc ;
@@ -126,7 +104,7 @@ namespace TreeFitter {
   {
     ErrCode status ;
     // create HepVector with parameters
-    HepVector vertexpars(6) ;
+    CLHEP::HepVector vertexpars(6) ;
     int posindexmother = mother()->posIndex() ;
     for (int row = 1; row <= 3; ++row)
       vertexpars(row) = fitparams.par()(posindexmother + row) ;
@@ -135,8 +113,8 @@ namespace TreeFitter {
       vertexpars(3 + row) = fitparams.par()(momindex + row) ;
 
     // translate into trackparameters
-    HepVector helixpars(6) ;
-    HepMatrix jacobian(6, 6) ;
+    CLHEP::HepVector helixpars(6) ;
+    CLHEP::HepMatrix jacobian(6, 6) ;
     HelixUtils::helixFromVertex(vertexpars, charge(), m_bfield, helixpars, jacobian) ;
 
     // get the measured track parameters at the poca to the mother
@@ -151,6 +129,7 @@ namespace TreeFitter {
       std::cout << "pred = " << helixpars.T() << std::endl ;
       std::cout << "m   = " << m_m.T() << std::endl ;
       std::cout << "sig = " << symdiag(m_matrixV).T() << std::endl ;
+      std::cout << "V matrix = " << m_matrixV << std::endl ;
     }
 
     // get the measured track parameters at the flightlength of the vertex
@@ -167,7 +146,13 @@ namespace TreeFitter {
     }
 
     // bring phi-residual in the correct domain ([-pi,pi])
+    if (vtxverbose >= 8)     std::cout << "bring phi-residual in the correct domain ([-pi,pi]): " << p.r(2);
     p.r(2) = HelixUtils::phidomain(p.r(2)) ;
+    if (vtxverbose >= 8) {
+      std::cout << " -> " << p.r(2) << std::endl;
+      std::cout << "And now the Jacobian:" << std::endl;
+      std::cout << jacobian << std::endl;
+    }
     // FIX ME: bring z0 residual in the correct domain --> this needs some thinking
 
     // calculate the full projection matrix from the jacobian
@@ -179,6 +164,10 @@ namespace TreeFitter {
       // the momentum
       for (int col = 1; col <= 3; ++col)
         p.H(row, momindex + col) = jacobian(row, col + 3) ;
+    }
+    if (vtxverbose >= 8) {
+      std::cout << "And now the H matrix:" << std::endl;
+      std::cout << p.H() << std::endl;
     }
     return status ;
   }

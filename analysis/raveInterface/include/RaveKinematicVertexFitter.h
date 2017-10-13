@@ -26,6 +26,9 @@
 #include <rave/Track.h>
 #include <rave/KinematicTree.h>
 
+// for intercepting rave output
+#include <framework/utilities/IOIntercept.h>
+
 #include <iostream>
 
 namespace Belle2 {
@@ -176,6 +179,10 @@ namespace Belle2 {
       /** Convert the error matrix from P-E to P-M. It Requires an input error matrit in the form X,P,E */
       TMatrixDSym ErrorMatrixEnergyToMass(TLorentzVector p4, TMatrixDSym EnergyErr);
 
+      /** Start capturing the output of rave and divert it to log messages.
+       * Capturing will finish as soon as the returned object goes out of scope
+       */
+      IOIntercept::InterceptorScopeGuard<IOIntercept::OutputToLogMessages> captureOutput();
     };
   }
 

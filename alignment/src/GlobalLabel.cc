@@ -15,6 +15,8 @@ using namespace std;
 
 using namespace Belle2;
 
+std::set<unsigned short> GlobalLabel::m_components = {};
+
 GlobalLabel::GlobalLabel(GlobalLabel::gidTYPE globalLabel) :
   gid(0), eid(0), pid(0), tid(0), tif(0)
 {
@@ -41,12 +43,6 @@ GlobalLabel::GlobalLabel(GlobalLabel::gidTYPE globalLabel) :
   }
 }
 
-GlobalLabel::GlobalLabel(BeamID beamid, gidTYPE paramId) : gid(0), eid(0),
-  pid(0), tid(0), tif(0)
-{
-  construct((int)beamid + beamOffset, paramId);
-}
-
 GlobalLabel::GlobalLabel(VxdID vxdid, GlobalLabel::gidTYPE paramId): gid(0),
   eid(0), pid(0), tid(0), tif(0)
 {
@@ -65,11 +61,11 @@ GlobalLabel::GlobalLabel(BKLMElementID bklmid, GlobalLabel::gidTYPE paramId):
   construct(bklmid.getID() + bklmOffset, paramId);
 }
 
-GlobalLabel::GlobalLabel(EKLMSegmentID eklmSegment,
+GlobalLabel::GlobalLabel(EKLMElementID eklmElement,
                          GlobalLabel::gidTYPE paramId):
   gid(0), eid(0), pid(0), tid(0), tif(0)
 {
-  construct(eklmSegment.getSegmentGlobalNumber() + eklmOffset, paramId);
+  construct(eklmElement.getGlobalNumber() + eklmOffset, paramId);
 }
 
 void GlobalLabel::registerTimeDependent(GlobalLabel::gidTYPE start,
@@ -101,10 +97,10 @@ void GlobalLabel::clearTimeDependentParamaters()
 
 GlobalLabel::gidTYPE GlobalLabel::setParameterId(GlobalLabel::gidTYPE paramId)
 {
-  if (paramId > maxPID) {
+  if (!getUniqueId() or paramId > maxPID) {
     return label();
   }
-  construct(eid, paramId);
+  construct(getUniqueId(), getElementId(), paramId);
   return label();
 }
 
@@ -129,11 +125,11 @@ BKLMElementID GlobalLabel::getBklmID() const
   return BKLMElementID(eid - bklmOffset);
 }
 
-EKLMSegmentID GlobalLabel::getEklmID() const
+EKLMElementID GlobalLabel::getEklmID() const
 {
   if (!isEKLM())
     B2FATAL("Attempt to call GlobalLabel::getEklmID() for non-EKLM label.");
-  return EKLMSegmentID(eid - eklmOffset);
+  return EKLMElementID(eid - eklmOffset);
 }
 
 void GlobalLabel::construct(GlobalLabel::gidTYPE elementId,

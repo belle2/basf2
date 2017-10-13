@@ -335,12 +335,12 @@ void FilterCalculatorModule::initialize()
   for (int i = 0; i < numCuts - 1; ++i) {
     string secMapName = (boost::format("%1%$%2%to%3%MeV_%4%") % m_PARAMsectorSetupFileName % int(m_PARAMpTcuts.at(i) * 1000) % int(
                            m_PARAMpTcuts.at(i + 1) * 1000) % m_detectorName).str();
-    for (int i = 0; i < int(secMapName.length()); ++i) {
-      switch (secMapName.at(i)) {
+    for (int j = 0; j < int(secMapName.length()); ++j) {
+      switch (secMapName.at(j)) {
         case '$':
-          secMapName.at(i) = '-';
+          secMapName.at(j) = '-';
         case '.':
-          secMapName.at(i) = '-';
+          secMapName.at(j) = '-';
       }
     }
     m_PARAMsecMapNames.push_back(secMapName);
@@ -723,13 +723,13 @@ void FilterCalculatorModule::event()
           m_badTrackletCounter++;
         } else {
           B2DEBUG(20, " tracklet passed bad-tracklet-filters");
-          int chosenSecMap = -1;
+          int chosenSecMapPassedFilter = -1;
           for (double ptCutoff : m_PARAMpTcuts) {
             if (mcMomValue > ptCutoff) {
-              chosenSecMap++;
+              chosenSecMapPassedFilter++;
             } else { break; }
           }
-          m_trackletMomentumCounter.at(chosenSecMap)++;
+          m_trackletMomentumCounter.at(chosenSecMapPassedFilter)++;
           newTracklet.addHit(newVirtualHit); /// adding virtual hit to tracklet!
 
           B2DEBUG(20, "adding tracklet to list");

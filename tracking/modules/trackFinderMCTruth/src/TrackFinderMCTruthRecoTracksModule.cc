@@ -93,7 +93,10 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            m_useReassignedHits,
            "Include hits reassigned from discarded seconardy daughters in the tracks.",
            false);
-
+  addParam("UseSecondCDCHits",
+           m_useSecondCDCHits,
+           "Also includes the CDC 2nd hit information in the MC tracks.",
+           false);
   addParam("MinPXDHits",
            m_minPXDHits,
            "Minimum number of PXD hits needed to allow the created of a track candidate",
@@ -166,8 +169,18 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            "Covariance matrix used to smear the true pos and mom before passed to track candidate. "
            "This matrix will also passed to Genfit as the initial covarance matrix. "
            "If any diagonal value is negative this feature will not be used. "
-           "OFF DIAGNOLA ELEMENTS DO NOT HAVE AN EFFECT AT THE MOMENT",
+           "OFF DIAGONAL ELEMENTS DO NOT HAVE AN EFFECT AT THE MOMENT",
            std::vector<double>(36, -1.0));
+
+  addParam("SplitAfterDeltaT",
+           m_splitAfterDeltaT,
+           "Minimal time delay between two sim hits (in ns) after which MC reco track will be "
+           "split into seperate tracks. If < 0, don't do splitting."
+           "This feature was designed to be used in MC cosmics reconstruction to get two MCRecoTracks"
+           "when track pass through empty SVD region, so that number of MCRecoTracks can be compared with"
+           "number of non merged reco tracks. ",
+           -1.0);
+
   // names of output containers
   addParam("RecoTracksStoreArrayName",
            m_recoTracksStoreArrayName,
@@ -644,6 +657,11 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
           const CDCHit* cdcHit = relatedHits.object(i);
 
+          // continue if this is a 2nd CDC hit information and we do not want to use it
+          if (!m_useSecondCDCHits && cdcHit->is2ndHit()) {
+            continue;
+          }
+
           auto mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderPriorityHit;
 
           // Reassigned hits are auxiliary
@@ -721,6 +739,35 @@ void TrackFinderMCTruthRecoTracksModule::event()
       return std::get<0>(rhs) < std::get<0>(lhs);
     });
 
+    // Now create vectors of vectors, which will either contain hits the full vector WithTimeanddetectorInformation
+    // or slices of it, when cutting SplitAfterDeltaT is positive, each slice corresponding to a (sub-) reco track
+    // created by the MC particle.
+    std::vector< std::vector<TimeHitIDDetector> > hitsWithTimeAndDetectorInformationVectors;
+
+    if (m_splitAfterDeltaT < 0.0) { // no splitting, vector will only contain a single hitInformation vector
+      hitsWithTimeAndDetectorInformationVectors.push_back(hitsWithTimeAndDetectorInformation);
+    } else { // split on delta t
+
+      std::vector<TimeHitIDDetector>::size_type splitFromIdx = 0; // whenever splitting subtrack, start slice from this index
+      for (std::vector<TimeHitIDDetector>::size_type i = 1; i != hitsWithTimeAndDetectorInformation.size(); i++) {
+
+        double delta_t = (std::get<0>(hitsWithTimeAndDetectorInformation[i])
+                          - std::get<0>(hitsWithTimeAndDetectorInformation[i - 1]));
+
+        if (delta_t > m_splitAfterDeltaT) {
+          // push slice of `hitsWithTimeAndDetectorInformation' between splitFromidx  and previous index
+          hitsWithTimeAndDetectorInformationVectors
+          .emplace_back(hitsWithTimeAndDetectorInformation.begin() + splitFromIdx,
+                        hitsWithTimeAndDetectorInformation.begin() + i);
+          splitFromIdx = i;
+        }
+      }
+      // add subtrack after last splitting to list of tracks
+      hitsWithTimeAndDetectorInformationVectors
+      .emplace_back(hitsWithTimeAndDetectorInformation.begin() + splitFromIdx,
+                    hitsWithTimeAndDetectorInformation.end());
+    }
+
     //Now create TrackCandidate
     int counter = recoTracks.getEntries();
     B2DEBUG(100, "We came pass all filter of the MCPartile and hit properties. TrackCandidate " << counter <<
@@ -772,53 +819,55 @@ void TrackFinderMCTruthRecoTracksModule::event()
       covSeed = m_initialCov;
     }
 
-    //Finally create RecoTrack
-    // TODO: In former times, the track candidate also stored the PDG code!!!
-    short int charge = static_cast<short int>(aMcParticlePtr->getCharge());
-    RecoTrack* newRecoTrack = recoTracks.appendNew(position, momentum, charge);
-    if (m_setTimeSeed) {
-      newRecoTrack->setTimeSeed(time);
-    }
-    ++m_nRecoTracks;
+    // Finally create RecoTracks for MC particle.
+    // Either only one or multiple tracks, if SplitAfterDeltaT is positive
+    for (const auto& hitInformationVector : hitsWithTimeAndDetectorInformationVectors) {
 
-
-    //create relation between the track candidates and the mcParticle (redundant to saving the MCId)
-    newRecoTrack->addRelationTo(aMcParticlePtr);
-    B2DEBUG(100, " --- Create relation between genfit::TrackCand " << counter << " and MCParticle " << iPart);
-
-    int hitCounter = 0;
-    for (const TimeHitIDDetector& hitInformation : hitsWithTimeAndDetectorInformation) {
-      const Const::EDetector& detectorInformation = std::get<3>(hitInformation);
-      const int hitID = std::get<1>(hitInformation);
-      const auto hitOriginMCFinderType = std::get<2>(hitInformation);
-
-      if (detectorInformation == Const::CDC) {
-        const CDCHit* cdcHit = cdcHits[hitID];
-        const CDCSimHit* aCDCSimHitPtr = cdcHit->getRelatedFrom<CDCSimHit>();
-
-        //now determine the correct sign to resolve the left right ambiguity in the fitter
-        TVector3 simHitPos = aCDCSimHitPtr->getPosTrack();
-        TVector3 simMom = aCDCSimHitPtr->getMomentum();
-        TVector3 simHitPosOnWire = aCDCSimHitPtr->getPosWire();
-
-        CDC::CDCGeometryPar& cdcGeometry = CDC::CDCGeometryPar::Instance();
-        const unsigned short isRightHit = cdcGeometry.getNewLeftRightRaw(simHitPosOnWire, simHitPos, simMom);
-
-        if (isRightHit) {
-          newRecoTrack->addCDCHit(cdcHit, hitCounter, RecoHitInformation::RightLeftInformation::c_right, hitOriginMCFinderType);
-        } else {
-          newRecoTrack->addCDCHit(cdcHit, hitCounter, RecoHitInformation::RightLeftInformation::c_left, hitOriginMCFinderType);
-        }
-        B2DEBUG(101, "CDC hit " << hitID << " has reft/right sign " << isRightHit);
-      } else if (detectorInformation == Const::PXD) {
-        const PXDCluster* pxdCluster = pxdClusters[hitID];
-        newRecoTrack->addPXDHit(pxdCluster, hitCounter, hitOriginMCFinderType);
-      } else if (detectorInformation == Const::SVD) {
-        const SVDCluster* svdCluster = svdClusters[hitID];
-        newRecoTrack->addSVDHit(svdCluster, hitCounter, hitOriginMCFinderType);
+      // TODO: In former times, the track candidate also stored the PDG code!!!
+      short int charge = static_cast<short int>(aMcParticlePtr->getCharge());
+      RecoTrack* newRecoTrack = recoTracks.appendNew(position, momentum, charge);
+      if (m_setTimeSeed) {
+        newRecoTrack->setTimeSeed(time);
       }
+      ++m_nRecoTracks;
 
-      ++hitCounter;
+      //create relation between the track candidates and the mcParticle (redundant to saving the MCId)
+      newRecoTrack->addRelationTo(aMcParticlePtr);
+      B2DEBUG(100, " --- Create relation between genfit::TrackCand " << counter << " and MCParticle " << iPart);
+
+      int hitCounter = 0;
+      for (const TimeHitIDDetector& hitInformation : hitInformationVector) {
+        const Const::EDetector& detectorInformation = std::get<3>(hitInformation);
+        const int hitID = std::get<1>(hitInformation);
+        const auto hitOriginMCFinderType = std::get<2>(hitInformation);
+
+        if (detectorInformation == Const::CDC) {
+          const CDCHit* cdcHit = cdcHits[hitID];
+          const CDCSimHit* aCDCSimHitPtr = cdcHit->getRelatedFrom<CDCSimHit>();
+
+          //now determine the correct sign to resolve the left right ambiguity in the fitter
+          TVector3 simHitPos = aCDCSimHitPtr->getPosTrack();
+          TVector3 simMom = aCDCSimHitPtr->getMomentum();
+          TVector3 simHitPosOnWire = aCDCSimHitPtr->getPosWire();
+
+          CDC::CDCGeometryPar& cdcGeometry = CDC::CDCGeometryPar::Instance();
+          const unsigned short isRightHit = cdcGeometry.getNewLeftRightRaw(simHitPosOnWire, simHitPos, simMom);
+
+          if (isRightHit) {
+            newRecoTrack->addCDCHit(cdcHit, hitCounter, RecoHitInformation::RightLeftInformation::c_right, hitOriginMCFinderType);
+          } else {
+            newRecoTrack->addCDCHit(cdcHit, hitCounter, RecoHitInformation::RightLeftInformation::c_left, hitOriginMCFinderType);
+          }
+          B2DEBUG(101, "CDC hit " << hitID << " has reft/right sign " << isRightHit);
+        } else if (detectorInformation == Const::PXD) {
+          const PXDCluster* pxdCluster = pxdClusters[hitID];
+          newRecoTrack->addPXDHit(pxdCluster, hitCounter, hitOriginMCFinderType);
+        } else if (detectorInformation == Const::SVD) {
+          const SVDCluster* svdCluster = svdClusters[hitID];
+          newRecoTrack->addSVDHit(svdCluster, hitCounter, hitOriginMCFinderType);
+        }
+        ++hitCounter;
+      }
     }
   }//end loop over MCParticles
 }

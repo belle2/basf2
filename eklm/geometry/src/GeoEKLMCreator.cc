@@ -1673,7 +1673,9 @@ createSegmentSupport(int iSegmentSupport, G4LogicalVolume* plane) const
     m_LogVol.segmentsup[m_CurVol.plane - 1][iSegmentSupport - 1];
   const EKLMGeometry::SegmentSupportPosition* segmentSupportPos =
     m_GeoDat->getSegmentSupportPosition(m_CurVol.plane, iSegmentSupport);
-  t = HepGeom::Translate3D(
+  t = (*m_TransformData->getPlaneDisplacement(m_CurVol.endcap, m_CurVol.layer,
+                                              m_CurVol.sector, m_CurVol.plane)) *
+      HepGeom::Translate3D(
         0.5 * (segmentSupportPos->getDeltaLLeft() -
                segmentSupportPos->getDeltaLRight()) +
         segmentSupportPos->getX(), segmentSupportPos->getY(),
@@ -1726,14 +1728,16 @@ void EKLM::GeoEKLMCreator::createStripSegment(int iSegment) const
 
 void EKLM::GeoEKLMCreator::createSegment(G4LogicalVolume* plane) const
 {
-  const HepGeom::Transform3D* t;
+  HepGeom::Transform3D t;
   std::string segmentName =
     "Segment_" + std::to_string(m_CurVol.segment) + "_" + plane->GetName();
-  t = m_TransformData->getSegmentTransform(
-        m_CurVol.endcap, m_CurVol.layer, m_CurVol.sector, m_CurVol.plane,
-        m_CurVol.segment);
+  t = (*m_TransformData->getPlaneDisplacement(m_CurVol.endcap, m_CurVol.layer,
+                                              m_CurVol.sector, m_CurVol.plane)) *
+      (*m_TransformData->getSegmentTransform(
+         m_CurVol.endcap, m_CurVol.layer, m_CurVol.sector, m_CurVol.plane,
+         m_CurVol.segment));
   try {
-    new G4PVPlacement(*t, m_LogVol.segment[m_CurVol.segment - 1], segmentName,
+    new G4PVPlacement(t, m_LogVol.segment[m_CurVol.segment - 1], segmentName,
                       plane, false, m_CurVol.segment, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
@@ -1935,7 +1939,8 @@ void EKLM::GeoEKLMCreator::create(const GearDir& content,
   (void)type;
   m_GeoDat = &(EKLM::GeometryData::Instance(GeometryData::c_Gearbox));
   try {
-    m_TransformData = new EKLM::TransformData(false, true);
+    m_TransformData =
+      new EKLM::TransformData(false, EKLM::TransformData::c_Displacement);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -1952,7 +1957,8 @@ void EKLM::GeoEKLMCreator::createFromDB(const std::string& name,
   (void)type;
   m_GeoDat = &(EKLM::GeometryData::Instance(GeometryData::c_Database));
   try {
-    m_TransformData = new EKLM::TransformData(false, true);
+    m_TransformData =
+      new EKLM::TransformData(false, EKLM::TransformData::c_Displacement);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -1967,7 +1973,8 @@ void EKLM::GeoEKLMCreator::createPayloads(const GearDir& content,
   (void)content;
   m_GeoDat = &(EKLM::GeometryData::Instance(GeometryData::c_Gearbox));
   try {
-    m_TransformData = new EKLM::TransformData(false, true);
+    m_TransformData =
+      new EKLM::TransformData(false, EKLM::TransformData::c_Displacement);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }

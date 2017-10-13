@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -31,38 +31,14 @@ namespace Belle2 {
 
     /// Generic functor to get the stereo kind from an object.
     struct GetEStereoKind {
+      /// Marker function for the isFunctor test
+      operator FunctorTag();
+
       /// Returns the stereo kind of an object.
       template<class T, class SFINAE = decltype(&T::getStereoKind)>
       EStereoKind operator()(const T& t) const
       {
         return t.getStereoKind();
-      }
-    };
-
-    /**
-     *  This is a utility class for the free EStereoKind type.
-     *  It provides the basic methods to operate on the EStereoKind numbers.
-     */
-    struct EStereoKindUtil {
-
-      /// Utility classes should not be instantiated
-      EStereoKindUtil() = delete;
-
-      /**
-       *  Returns the common stereo type of hits in a container.
-       *  EStereoKind::c_Invalid if there is no common stereo kind or the container is empty.
-       */
-      template <class AHits>
-      static EStereoKind getCommon(const AHits& hits)
-      {
-        return Common<MayIndirectTo<GetEStereoKind>>()(hits).value_or(EStereoKind::c_Invalid);
-      }
-
-      /// Returns the superlayer of an object
-      template <class T>
-      static EStereoKind getFrom(const T& t)
-      {
-        return MayIndirectTo<GetEStereoKind>()(t).value_or(EStereoKind::c_Invalid);
       }
     };
   }

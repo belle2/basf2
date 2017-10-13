@@ -13,7 +13,14 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
 
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
+
 #include <tracking/trackFindingCDC/numerics/ToFinite.h>
+
+#include <cdc/dataobjects/CDCHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -44,7 +51,7 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   double empty_s_max = 0;
   double empty_s_min = 0;
 
-  double last_perp_s = std::nan("");
+  double last_perp_s = NAN;
 
   for (const CDCRecoHit3D& recoHit : *track) {
     // Drift circle information

@@ -10,11 +10,23 @@
 #include <TSystem.h>
 #include <stdlib.h>
 #include <time.h>
+#include <signal.h>
 
 #include "framework/datastore/StoreObjPtr.h"
 #include "framework/dataobjects/EventMetaData.h"
+#include "framework/core/Environment.h"
 
 // #define DESY
+
+namespace {
+// Signal Handler
+  static int signalled = 0;
+  static void signalHandler(int sig)
+  {
+    signalled = sig;
+    printf("Raw2Ds : Signal received\n");
+  }
+}
 
 using namespace std;
 using namespace Belle2;
@@ -82,6 +94,16 @@ void Raw2DsModule::initialize()
 
 void Raw2DsModule::beginRun()
 {
+  if (Environment::Instance().getNumberProcesses() != 0) {
+    struct sigaction s;
+    memset(&s, '\0', sizeof(s));
+    s.sa_handler = signalHandler;
+    sigemptyset(&s.sa_mask);
+    if (sigaction(SIGINT, &s, NULL) != 0) {
+      B2FATAL("Rbuf2Ds: Error to connect signal handler");
+    }
+    printf("Raw2Ds : Signal Handler installed.\n");
+  }
   B2INFO("beginRun called.");
 }
 
@@ -100,12 +122,13 @@ void Raw2DsModule::registerRawCOPPERs()
 
 
   // Get a record from ringbuf
-  int error_flag = 0;
+  unsigned int error_flag = 0;
   int size;
   int* evtbuf = new int[MAXEVTSIZE];
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
     //    usleep(100);
     //    usleep(20);
+    if (signalled != 0) break;
     usleep(5);
   }
   //  B2INFO("Raw2Ds: got an event from RingBuffer, size=" << size <<
@@ -133,6 +156,7 @@ void Raw2DsModule::registerRawCOPPERs()
   unsigned int utime = 0;
   unsigned int ctime = 0;
   unsigned long long int mtime = 0;
+
   // Store data contents in Corresponding RawXXXX
   for (int cprid = 0; cprid < ncprs * npackedevts; cprid++) {
     // Pick up one COPPER and copy data in a temporary buffer
@@ -154,14 +178,12 @@ void Raw2DsModule::registerRawCOPPERs()
       continue;
     }
 
+    // Set one block to RawCOPPER
     RawCOPPER tempcpr;
-    //    tempcpr.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);  -> bug. If RawFTSW is stored in bufbody, tempcpr's version becomes 0 and getNodeID fails.
     tempcpr.SetBuffer(cprbuf, nwds_buf, false, 1, 1);
-
-    //    int subsysid = ((RawCOPPER&)tempdblk).GetNodeID(cprid);
-    //    int subsysid = tempcpr.GetNodeID(cprid);
     int subsysid = tempcpr.GetNodeID(0);
-    if (tempcpr.GetEventCRCError(0) != 0) error_flag = 1;
+    //    if (tempcpr.GetEventCRCError(0) != 0) error_flag = 1;
+    error_flag |= (unsigned int)(tempcpr.GetDataType(0));
 
     // Switch to each detector and register RawXXX
     if ((subsysid & DETECTOR_MASK) == CDC_ID) {
@@ -206,7 +228,8 @@ void Raw2DsModule::registerRawCOPPERs()
   evtmetadata->setEvent(sndhdr.GetEventNumber());
   evtmetadata->setTime(mtime);  //time(NULL));
   //  evtmetadata->setTime((unsigned long long int) utime);//time(NULL));
-  if (error_flag) evtmetadata->addErrorFlag(EventMetaData::c_B2LinkCRCError);
+
+  if (error_flag) setErrorFlag(error_flag, evtmetadata);
 
   delete[] evtbuf;
 
@@ -227,3 +250,17 @@ void Raw2DsModule::terminate()
   B2INFO("Raw2Ds: terminate called");
 }
 
+void Raw2DsModule::setErrorFlag(unsigned int error_flag, StoreObjPtr<EventMetaData> evtmetadata)
+{
+  //  RawHeader_latest raw_hdr;
+  int error_set = 0;
+  if (error_flag & RawHeader_latest::B2LINK_PACKET_CRC_ERROR) {
+    evtmetadata->addErrorFlag(EventMetaData::c_B2LinkPacketCRCError);
+    error_set = 1;
+  }
+  if (error_flag & RawHeader_latest::B2LINK_EVENT_CRC_ERROR) {
+    evtmetadata->addErrorFlag(EventMetaData::c_B2LinkEventCRCError);
+    error_set = 1;
+  }
+  if (error_set)  B2INFO("Raw2Ds: Error flag was set in EventMetaData.");
+}

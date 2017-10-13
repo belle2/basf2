@@ -65,14 +65,14 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
 #endif
         continue;
       } else {
-        perror("ERRNOUM");
+        perror("[WARNING]");
         char err_buf[500];
         sprintf(err_buf, "recv() returned error; ret = %d. : %s %s %d",
                 read_size, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
         m_run_error = 1;
         //        B2ERROR(err_buf);
-        printf("[ERROR] %s\n", err_buf); fflush(stdout);
+        printf("[WARNING] %s\n", err_buf); fflush(stdout);
         string err_str = "RUN_ERROR";
         printf("AIUEO********************\n"); fflush(stdout);
         throw (err_str);
@@ -83,7 +83,7 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
     } else if (read_size == 0) {
       // Connection is closed ( error )
       char err_buf[500];
-      sprintf(err_buf, "[ERROR] Connection is closed by peer(%s). readsize = %d %d. : %s %s %d",
+      sprintf(err_buf, "[WARNING] Connection is closed by peer(%s). readsize = %d %d. : %s %s %d",
               strerror(errno), read_size, errno, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
       m_run_error = 1;
@@ -138,7 +138,6 @@ int DesSerPrePC::Connect()
     timeout.tv_usec = 0;
     setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, &timeout, (socklen_t)sizeof(timeout));
 
-    //    B2INFO("[DEBUG] Connecting to " << m_hostname_from[ i ].c_str() << " port " << m_port_from[ i ]);
     printf("[DEBUG] Connecting to %s port %d\n" , m_hostname_from[ i ].c_str(), m_port_from[ i ]); fflush(stdout);
 
     while (1) {
@@ -147,7 +146,7 @@ int DesSerPrePC::Connect()
         usleep(500000);
       } else {
         //        B2INFO("Done");
-        printf("[INFO] Done\n"); fflush(stdout);
+        printf("[DEBUG] Done\n"); fflush(stdout);
         break;
       }
     }
@@ -550,11 +549,11 @@ void DesSerPrePC::DataAcquisition()
   // For data check
   unsigned int eve_copper_0 = 0;
   //  B2INFO("initializing...");
-  printf("[INFO] initializing...\n"); fflush(stdout);
+  printf("[DEBUG] initializing...\n"); fflush(stdout);
   initialize();
 
   //  B2INFO("Done.");
-  printf("[INFO] Done.\n"); fflush(stdout);
+  printf("[DEBUG] Done.\n"); fflush(stdout);
 
   if (m_start_flag == 0) {
     //
@@ -563,7 +562,7 @@ void DesSerPrePC::DataAcquisition()
     Connect();
     if (m_status.isAvailable()) {
       //      B2INFO("DeSerializerPrePC: Waiting for Start...\n");
-      printf("[INFO] DeSerializerPrePC: Waiting for Start...\n"); fflush(stdout);
+      printf("[DEBUG] DeSerializerPrePC: Waiting for Start...\n"); fflush(stdout);
       m_status.reportRunning();
     }
     m_start_time = getTimeSec();
@@ -700,7 +699,7 @@ void DesSerPrePC::DataAcquisition()
       //
       if (m_start_flag == 0) {
         //        B2INFO("SerializerPC: Sending the 1st packet...");
-        printf("[INFO] SerializerPC: Sending the 1st packet...\n"); fflush(stdout);
+        printf("[DEBUG] SerializerPC: Sending the 1st packet...\n"); fflush(stdout);
       }
 
       try {
@@ -714,7 +713,7 @@ void DesSerPrePC::DataAcquisition()
       }
       if (m_start_flag == 0) {
         //        B2INFO("Done. ");
-        printf("[INFO] Done.\n"); fflush(stdout);
+        printf("[DEBUG] Done.\n"); fflush(stdout);
         m_start_flag = 1;
       }
     }
@@ -741,7 +740,7 @@ void DesSerPrePC::DataAcquisition()
     if ((n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC) % 100000 == 0) {
       double interval = cur_time - m_prev_time;
       double total_time = cur_time - m_start_time;
-      printf("[INFO] Event %12d Rate %6.2lf[kHz] Recvd %6.2lf[MB/s] sent %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s]\n",
+      printf("[DEBUG] Event %12d Rate %6.2lf[kHz] Recvd %6.2lf[MB/s] sent %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s]\n",
              n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC,
              (n_basf2evt  - m_prev_nevt)*NUM_EVT_PER_BASF2LOOP_PC / interval / 1.e3,
              (m_recvd_totbytes - m_recvd_prev_totbytes) / interval / 1.e6,

@@ -9,12 +9,28 @@
 #include <daq/rfarm/event/modules/Rbuf2DsModule.h>
 #include <TSystem.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include "framework/datastore/StoreObjPtr.h"
 #include "framework/dataobjects/EventMetaData.h"
+#include "framework/core/Environment.h"
+
+//extern int basf2SignalReceived;
+
+
+namespace {
+// Signal Handler
+  static int signalled = 0;
+  static void signalHandler(int sig)
+  {
+    signalled = sig;
+    printf("Rbuf2Ds : Signal received\n");
+  }
+}
 
 using namespace std;
 using namespace Belle2;
+
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -39,6 +55,7 @@ Rbuf2DsModule::Rbuf2DsModule() : Module()
   m_rbuf = NULL;
   m_nrecv = 0;
   m_compressionLevel = 0;
+
 
   //Parameter definition
   B2INFO("Rx: Constructor done.");
@@ -70,6 +87,7 @@ void Rbuf2DsModule::initialize()
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
     //    printf ( "Rx : evtbuf is not available yet....\n" );
     //    usleep(100);
+    if (signalled != 0) break;
     usleep(20);
   }
 
@@ -89,6 +107,16 @@ void Rbuf2DsModule::initialize()
 
 void Rbuf2DsModule::beginRun()
 {
+  if (Environment::Instance().getNumberProcesses() != 0) {
+    struct sigaction s;
+    memset(&s, '\0', sizeof(s));
+    s.sa_handler = signalHandler;
+    sigemptyset(&s.sa_mask);
+    if (sigaction(SIGINT, &s, NULL) != 0) {
+      B2FATAL("Rbuf2Ds: Error to connect signal handler");
+    }
+    printf("Ds2Rbuf : Signal Handler installed.\n");
+  }
   B2INFO("beginRun called.");
 }
 
@@ -104,6 +132,8 @@ void Rbuf2DsModule::event()
 
   char* evtbuf = new char[MAXEVTSIZE];
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
+    //    printf ( "Signal Status = %d\n", globalSignalReceived );
+    if (signalled != 0) break;
     usleep(100);
     //    usleep(20);
   }

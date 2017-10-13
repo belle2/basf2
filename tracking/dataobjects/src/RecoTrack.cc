@@ -37,6 +37,50 @@ RecoTrack::RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum,
   m_genfitTrack.setCovSeed(covSeed);
 }
 
+void RecoTrack::registerRequiredRelations(
+  StoreArray<RecoTrack>& recoTracks,
+  std::string const& pxdHitsStoreArrayName,
+  std::string const& svdHitsStoreArrayName,
+  std::string const& cdcHitsStoreArrayName,
+  std::string const& bklmHitsStoreArrayName,
+  std::string const& eklmHitsStoreArrayName,
+  std::string const& recoHitInformationStoreArrayName)
+{
+  StoreArray<RecoHitInformation> recoHitInformations(recoHitInformationStoreArrayName);
+  recoHitInformations.registerInDataStore();
+  recoTracks.registerRelationTo(recoHitInformations);
+
+  StoreArray<RecoHitInformation::UsedCDCHit> cdcHits(cdcHitsStoreArrayName);
+  if (cdcHits.isOptional()) {
+    cdcHits.registerRelationTo(recoTracks);
+    recoHitInformations.registerRelationTo(cdcHits);
+  }
+
+  StoreArray<RecoHitInformation::UsedSVDHit> svdHits(svdHitsStoreArrayName);
+  if (svdHits.isOptional()) {
+    svdHits.registerRelationTo(recoTracks);
+    recoHitInformations.registerRelationTo(svdHits);
+  }
+
+  StoreArray<RecoHitInformation::UsedPXDHit> pxdHits(pxdHitsStoreArrayName);
+  if (pxdHits.isOptional()) {
+    pxdHits.registerRelationTo(recoTracks);
+    recoHitInformations.registerRelationTo(pxdHits);
+  }
+
+  StoreArray<RecoHitInformation::UsedBKLMHit> bklmHits(bklmHitsStoreArrayName);
+  if (bklmHits.isOptional()) {
+    bklmHits.registerRelationTo(recoTracks);
+    recoHitInformations.registerRelationTo(bklmHits);
+  }
+
+  StoreArray<RecoHitInformation::UsedEKLMHit> eklmHits(eklmHitsStoreArrayName);
+  if (eklmHits.isOptional()) {
+    eklmHits.registerRelationTo(recoTracks);
+    recoHitInformations.registerRelationTo(eklmHits);
+  }
+}
+
 RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
                                           const std::string& storeArrayNameOfRecoTracks,
                                           const std::string& storeArrayNameOfCDCHits,
@@ -171,6 +215,16 @@ genfit::TrackCand RecoTrack::createGenfitTrackCand() const
   return createdTrackCand;
 }
 
+const genfit::TrackPoint* RecoTrack::getCreatedTrackPoint(const RecoHitInformation* recoHitInformation) const
+{
+  int createdTrackPointID = recoHitInformation->getCreatedTrackPointID();
+  if (createdTrackPointID == -1) {
+    return nullptr;
+  }
+
+  return m_genfitTrack.getPoint(createdTrackPointID);
+}
+
 size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, const unsigned int sortingParameterOffset)
 {
   size_t hitsCopied = 0;
@@ -232,6 +286,8 @@ bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) cons
   if (not fs->isFitConverged()) {
     return false;
   }
+
+  // make sure we only consider fitted if the Kalman method was used
   const genfit::KalmanFitStatus* kfs = dynamic_cast<const genfit::KalmanFitStatus*>(fs);
   if (not kfs) {
     return false;
@@ -302,21 +358,105 @@ void RecoTrack::deleteFittedInformation()
   }
 }
 
-void RecoTrack::copyStateFromSeed()
+/// Helper function to get the seed or the measured state on plane from a track
+std::tuple<TVector3, TVector3, short> RecoTrack::extractTrackState() const
 {
-  if (getRepresentations().empty()) {
-    B2FATAL("No representation present, so it is not possible to copy the state!");
+  if (not wasFitSuccessful()) {
+    return std::make_tuple(getPositionSeed(), getMomentumSeed(), getChargeSeed());
+  } else {
+    const auto& measuredStateOnPlane = getMeasuredStateOnPlaneFromFirstHit();
+    return std::make_tuple(measuredStateOnPlane.getPos(), measuredStateOnPlane.getMom(), measuredStateOnPlane.getCharge());
   }
-  const auto& measuredStateFromFirstHit = getMeasuredStateOnPlaneFromFirstHit();
+}
 
-  const auto& position = measuredStateFromFirstHit.getPos();
-  const auto& momentum = measuredStateFromFirstHit.getMom();
-  const auto& charge = measuredStateFromFirstHit.getCharge();
-  const auto& time = measuredStateFromFirstHit.getTime();
-  const auto& covariance = measuredStateFromFirstHit.getCov();
+RecoTrack* RecoTrack::copyToStoreArrayUsing(StoreArray<RecoTrack>& storeArray,
+                                            const TVector3& position, const TVector3& momentum, short charge,
+                                            const TMatrixDSym& covariance, double timeSeed) const
+{
+  RecoTrack* newRecoTrack = storeArray.appendNew(position, momentum, charge,
+                                                 getStoreArrayNameOfCDCHits(), getStoreArrayNameOfSVDHits(), getStoreArrayNameOfPXDHits(),
+                                                 getStoreArrayNameOfBKLMHits(), getStoreArrayNameOfEKLMHits(), getStoreArrayNameOfRecoHitInformation());
 
-  setPositionAndMomentum(position, momentum);
-  setChargeSeed(charge);
-  setTimeSeed(time);
-  setSeedCovariance(covariance);
+  newRecoTrack->setTimeSeed(timeSeed);
+  newRecoTrack->setSeedCovariance(covariance);
+
+  return newRecoTrack;
+}
+
+RecoTrack* RecoTrack::copyToStoreArrayUsingSeeds(StoreArray<RecoTrack>& storeArray) const
+{
+  return copyToStoreArrayUsing(storeArray, getPositionSeed(), getMomentumSeed(), getChargeSeed(), getSeedCovariance(), getTimeSeed());
+}
+
+RecoTrack* RecoTrack::copyToStoreArray(StoreArray<RecoTrack>& storeArray) const
+{
+  if (wasFitSuccessful()) {
+    const auto& mSoP = getMeasuredStateOnPlaneFromFirstHit();
+    return copyToStoreArrayUsing(storeArray, mSoP.getPos(), mSoP.getMom(), static_cast<short>(mSoP.getCharge()),
+                                 mSoP.get6DCov(), mSoP.getTime());
+  } else {
+    return copyToStoreArrayUsingSeeds(storeArray);
+  }
+}
+
+bool RecoTrack::hasTrackFitStatus(const genfit::AbsTrackRep* representation) const
+{
+  checkDirtyFlag();
+
+  // there might be the case, where the genfit track has no trackreps, even not the cardinal
+  // one because no fit attempt was performed. In this case, the "hasFitStatus" call to genfit
+  // will fail with an access violation. To prevent that, check for the number of reps here before
+  // actually calling genfit's hasFitStatus(...)
+  if (m_genfitTrack.getNumReps() == 0)
+    return false;
+
+  return m_genfitTrack.hasFitStatus(representation);
+}
+
+std::vector<RecoHitInformation*> RecoTrack::getRecoHitInformations(bool getSorted) const
+{
+  std::vector<RecoHitInformation*> hitList;
+  RelationVector<RecoHitInformation> recoHitInformations = getRelationsTo<RecoHitInformation>
+                                                           (m_storeArrayNameOfRecoHitInformation);
+
+  hitList.reserve(recoHitInformations.size());
+  for (auto& recoHit : recoHitInformations) {
+    hitList.push_back(&recoHit);
+  }
+
+  // sort the returned vector if requested
+  if (getSorted) {
+    std::sort(hitList.begin(), hitList.end(), [](const RecoHitInformation * a,
+    const RecoHitInformation * b) -> bool {
+      return a->getSortingParameter() < b->getSortingParameter();
+    });
+  }
+
+  return hitList;
+}
+
+const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromRecoHit(const RecoHitInformation* recoHitInfo,
+    const genfit::AbsTrackRep* representation) const
+{
+  checkDirtyFlag();
+
+  if (!hasTrackFitStatus(representation)) {
+    B2FATAL("MeasuredStateOnPlane can not be retrieved for RecoTracks where no fit has been attempted.");
+  }
+
+  if (!recoHitInfo->useInFit()) {
+    B2FATAL("MeasuredStateOnPlane cannot be provided for RecoHit which was not used in the fit.");
+  }
+
+  const auto* hitTrackPoint = getCreatedTrackPoint(recoHitInfo);
+  if (not hitTrackPoint) {
+    B2FATAL("TrackPoint was requested which has not been created");
+  }
+
+  const auto* fittedResult = hitTrackPoint->getFitterInfo(representation);
+  if (not fittedResult) {
+    throw NoTrackFitResult();
+  }
+
+  return fittedResult->getFittedState();
 }

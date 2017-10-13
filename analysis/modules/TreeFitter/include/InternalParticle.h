@@ -14,13 +14,13 @@
 #include <analysis/modules/TreeFitter/ParticleBase.h>
 #include <vector>
 
-using namespace CLHEP;
+//using namespace CLHEP;
 
 namespace TreeFitter {
 
   class InternalParticle : public ParticleBase {
   public:
-    InternalParticle(Particle* particle, const ParticleBase* mother,
+    InternalParticle(Belle2::Particle* particle, const ParticleBase* mother,
                      bool forceFitAll) ;
     virtual ~InternalParticle() ;
 
@@ -72,7 +72,7 @@ namespace TreeFitter {
     double phidomain(const double);
 
     //should be moved back to helixutils
-    double helixPoca(const HepVector&, const HepVector&,
+    double helixPoca(const CLHEP::HepVector&, const CLHEP::HepVector&,
                      double&, double&, TVector3&, bool);
   protected:
     ErrCode initMom(FitParams* fitparams) const ;

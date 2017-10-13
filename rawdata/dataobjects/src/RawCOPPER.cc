@@ -67,7 +67,7 @@ void RawCOPPER::SetVersion()
       break;
     default : {
       char err_buf[500];
-      sprintf(err_buf, "[FATAL] Invalid version of a data format(0x%.8x = 0x7f7f**..). Exiting...\n %s %s %d\n",
+      sprintf(err_buf, "[FATAL] ERROR_EVENT : Invalid version of a data format(0x%.8x = 0x7f7f**..). Exiting...\n %s %s %d\n",
               m_buffer[ POS_FORMAT_VERSION ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("%s", err_buf); fflush(stdout);
       string err_str = err_buf; throw (err_str);

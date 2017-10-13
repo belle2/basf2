@@ -11,17 +11,17 @@
 
 #include <tracking/trackFindingCDC/filters/trackRelation/BaseTrackRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of track relations based on MC information.
-    class MCTrackRelationFilter : public MCSymmetricFilterMixin<BaseTrackRelationFilter > {
+    class MCTrackRelationFilter : public MCSymmetric<BaseTrackRelationFilter > {
 
     private:
       /// Type of the super class
-      using Super = MCSymmetricFilterMixin<BaseTrackRelationFilter >;
+      using Super = MCSymmetric<BaseTrackRelationFilter>;
 
     public:
       /**

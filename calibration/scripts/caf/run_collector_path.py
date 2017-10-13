@@ -1,4 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from basf2 import *
+
+# The backend provides the input data files to the job and you can get the list of
+# files from this function
+from caf.backends import get_input_data
 
 
 def run_collectors():
@@ -10,13 +17,22 @@ def run_collectors():
     import os
     import sys
     import pickle
+    import json
 
-    # Create the database chain to use a passed in localdb if one exists and fall back to central
-    # if not
+    # We pass in basf2 and CAF options via the config.json file
+    with open('collector_config.json', 'r') as config_file:
+        config = json.load(config_file)
+
+    # Create the database chain to use the necessary central DB global tag and local DBs if they are requested
+    # We don't check for existence of keys in the dictionary as we want it to fail if they don't exist.
     reset_database()
     use_database_chain(True)
-    use_central_database('production')
-    use_local_database('inputdb/database.txt', 'inputdb', True, LogLevel.INFO)
+    if config['global_tag']:
+        B2INFO("Using Global Tag {}".format(config['global_tag']))
+        use_central_database(config['global_tag'])
+    for filename, directory in config['local_database_chain']:
+        B2INFO("Adding Local Database {} to chain".format(filename))
+        use_local_database(filename, directory, True, LogLevel.INFO)
 
     # create a path with all modules needed before calibration path is run.
     collector_path = create_path()
@@ -43,13 +59,7 @@ def run_collectors():
         B2FATAL("Couldn't find any pickle files for collector path!")
 
     # Grab the input data. Can't continue without some
-    input_data_file_path = 'input_data_files.data'
-    if os.path.exists(input_data_file_path):
-        with open(input_data_file_path, 'br') as input_data_file:
-            input_files = pickle.load(input_data_file)
-    else:
-        B2ERROR("No input data pickle file could be found: {0}".format(input_data_file))
-        sys.exit(1)
+    input_data = get_input_data()
 
     # Now we need to create a path that definitely has RootInput as a module.
     main = create_path()
@@ -58,9 +68,9 @@ def run_collectors():
     pe = PathExtras(collector_path)
     if 'RootInput' in pe:
         root_input_mod = collector_path.modules()[pe.index('RootInput')]
-        root_input_mod.param('inputFileNames', input_files)
+        root_input_mod.param('inputFileNames', input_data)
     else:
-        main.add_module('RootInput', inputFileNames=input_files)
+        main.add_module('RootInput', inputFileNames=input_data)
 
     main.add_path(collector_path)
     main.add_module('RootOutput', branchNames=["EventMetaData"])

@@ -62,8 +62,6 @@ namespace Belle2 {
     double m_phi;
     /** K0L truth   */
     double m_isKl;
-    /** is cluster from beambkg?   */
-    double m_isBeamBKG;
     /** did cluster pass selection of algorythm?  */
     bool   m_passed;
     /** cluster wrongly reconstructed as K0L?   */
@@ -86,7 +84,7 @@ namespace Belle2 {
     TEfficiency* m_fakeMom;
 
     /** output path   */
-    std::string m_outPath = "KlongValidationData.root";
+    std::string m_outPath = "nightlyKlongValidation.root";
 
     /** root tree etc. */
     TFile* m_f = nullptr;  //

@@ -336,14 +336,14 @@ double BFieldComponentQuad::getApertureLER(double s) const
 int BFieldComponentQuad::getRange(double s, const ranges_t& r) const
 {
   auto it0 = r.begin() + 1;
-  auto it = linear_sentinel(it0, s, [](double s, const range_t& r) {return s <= r.r0;});
+  auto it = linear_sentinel(it0, s, [](double s_, const range_t& r_) {return s_ <= r_.r0;});
   if (s > (--it)->r1) return -1;
   return it - it0;
 }
 
 double BFieldComponentQuad::getAperture(double s, std::vector<ApertPoint>::const_iterator jt0) const
 {
-  auto jt = linear_sentinel(jt0, s, [](double s, const ApertPoint & r) {return s <= r.s;});
+  auto jt = linear_sentinel(jt0, s, [](double s_, const ApertPoint & r) {return s_ <= r.s;});
   const ApertPoint& p1 = *(jt - 1), &p2 = *jt;
   return p1.r + (p2.r - p1.r) / (p2.s - p1.s) * (s - p1.s);
 }

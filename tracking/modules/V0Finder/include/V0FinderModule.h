@@ -5,8 +5,6 @@
 
 #include <memory>
 
-#include "genfit/GFRaveVertexFactory.h"
-
 namespace Belle2 {
   /** A V0 finder module.
    *

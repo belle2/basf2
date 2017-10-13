@@ -17,20 +17,14 @@ import os
 import glob
 
 
-def setBelleOrBelle2AndRevision(belleOrBelle2='Belle2', buildOrRevision='notDefined'):
+def setBelleOrBelle2(belleOrBelle2='Belle2'):
     """
     Sets belleOrBelle2Flag and the Revision of weight files according to the specified arguments.
     """
 
     global belleOrBelle2Flag
-    global buildOrRevisionFlag
 
     belleOrBelle2Flag = belleOrBelle2
-
-    if buildOrRevision == 'notDefined':
-        buildOrRevision = os.environ['BELLE2_RELEASE']
-
-    buildOrRevisionFlag = "_" + buildOrRevision + "_"
 
 
 def getBelleOrBelle2():
@@ -427,7 +421,7 @@ def trackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
     for (particleList, category) in trackLevelParticleLists:
 
-        methodPrefixTrackLevel = belleOrBelle2Flag + buildOrRevisionFlag + weightFiles + 'TrackLevel' + category + 'FBDT'
+        methodPrefixTrackLevel = belleOrBelle2Flag + "_" + weightFiles + 'TrackLevel' + category + 'FBDT'
         identifierTrackLevel = filesDirectory + '/' + methodPrefixTrackLevel + "_1.root"
         targetVariable = 'isRightTrack(' + category + ')'
         extraInfoName = targetVariable
@@ -503,11 +497,13 @@ def trackLevelTeacher(weightFiles='B2JpsiKs_mu'):
     Trains all categories at track level except KaonPion, MaximumPstar and FSC which are only at the event level.
     """
 
+    B2INFO('TRACK LEVEL TEACHER')
+
     ReadyMethods = 0
 
     for (particleList, category) in trackLevelParticleLists:
 
-        methodPrefixTrackLevel = belleOrBelle2Flag + buildOrRevisionFlag + weightFiles + 'TrackLevel' + category + 'FBDT'
+        methodPrefixTrackLevel = belleOrBelle2Flag + "_" + weightFiles + 'TrackLevel' + category + 'FBDT'
         targetVariable = 'isRightTrack(' + category + ')'
         weightFile = filesDirectory + '/' + methodPrefixTrackLevel + "_1.root"
 
@@ -559,7 +555,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
-        methodPrefixEventLevel = belleOrBelle2Flag + buildOrRevisionFlag + weightFiles + 'EventLevel' + category + 'FBDT'
+        methodPrefixEventLevel = belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
         targetVariable = 'isRightCategory(' + category + ')'
         extraInfoName = targetVariable
@@ -645,14 +641,12 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu'):
     """
 
     B2INFO('EVENT LEVEL TEACHER')
-    if not Belle2.FileSystem.findFile(filesDirectory):
-        B2FATAL('flavorTagger: THE NEEDED DIRECTORY "./FlavorTagging/TrainedMethods" DOES NOT EXIST!')
 
     ReadyMethods = 0
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
-        methodPrefixEventLevel = belleOrBelle2Flag + buildOrRevisionFlag + weightFiles + 'EventLevel' + category + 'FBDT'
+        methodPrefixEventLevel = belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         targetVariable = 'isRightCategory(' + category + ')'
         weightFile = filesDirectory + '/' + methodPrefixEventLevel + "_1.root"
 
@@ -704,7 +698,7 @@ def trackAndEventLevels(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_
     # check if methods are ready and download them from Database if specified
     for (particleList, category) in trackLevelParticleLists:
 
-        methodPrefixTrackLevel = belleOrBelle2Flag + buildOrRevisionFlag + weightFiles + 'TrackLevel' + category + 'FBDT'
+        methodPrefixTrackLevel = belleOrBelle2Flag + "_" + weightFiles + 'TrackLevel' + category + 'FBDT'
         identifierTrackLevel = filesDirectory + '/' + methodPrefixTrackLevel + '_1.root'
         targetVariable = 'isRightTrack(' + category + ')'
         extraInfoName = targetVariable
@@ -735,7 +729,7 @@ def trackAndEventLevels(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
-        methodPrefixEventLevel = belleOrBelle2Flag + buildOrRevisionFlag + weightFiles + 'EventLevel' + category + 'FBDT'
+        methodPrefixEventLevel = belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
         identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
         targetVariable = 'isRightCategory(' + category + ')'
         extraInfoName = targetVariable
@@ -813,7 +807,7 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
     B2INFO('COMBINER LEVEL')
 
-    methodPrefixCombinerLevel = belleOrBelle2Flag + buildOrRevisionFlag + weightFiles + 'Combiner' \
+    methodPrefixCombinerLevel = belleOrBelle2Flag + "_" + weightFiles + 'Combiner' \
         + categoriesCombinationCode
 
     if mode == 'Sampler':
@@ -933,7 +927,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
 
     B2INFO('COMBINER LEVEL TEACHER')
 
-    methodPrefixCombinerLevel = belleOrBelle2Flag + buildOrRevisionFlag + weightFiles + 'Combiner' \
+    methodPrefixCombinerLevel = belleOrBelle2Flag + "_" + weightFiles + 'Combiner' \
         + categoriesCombinationCode
 
     sampledFilesList = glob.glob(filesDirectory + '/' + methodPrefixCombinerLevel + 'sampled*.root')
@@ -1026,7 +1020,6 @@ def flavorTagger(
         'MaximumPstar',
         'KaonPion'],
     belleOrBelle2="Belle2",
-    buildOrRevision='notDefined',
     downloadFromDatabaseIfNotfound=True,
     uploadToDatabaseAfterTraining=False,
     samplerFileId='',
@@ -1045,7 +1038,6 @@ def flavorTagger(
       @param combinerMethods                    Multivariate method used for the combiner: 'TMVA-FBDT' or 'FANN-MLP'.
       @param categories                         Categories used for flavor tagging
       @param belleOrBelle2                      Uses Files trained for Belle or Belle2 MC
-      @param buildOrRevision                    Name of the basf2 build or revision
       @param downloadFromDatabaseIfNotfound     Looks for weight files in the Database if not found in workingDirectory.
       @param uploadToDatabaseAfterTraining      Uploads the weight files into the Database after training.
       @param samplerFileId                      Identifier to paralellize training.
@@ -1059,14 +1051,14 @@ def flavorTagger(
     # Directory where the weights of the trained Methods are saved
     # workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'
 
-    if not Belle2.FileSystem.findFile(workingDirectory):
+    if not Belle2.FileSystem.findFile(workingDirectory, True):
         B2FATAL('flavorTagger: THE GIVEN WORKING DIRECTORY "' + workingDirectory + '" DOES NOT EXIST! PLEASE SPECIFY A VALID PATH.')
 
     if mode == 'Sampler' or (mode == 'Expert' and downloadFromDatabaseIfNotfound):
-        if not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging'):
+        if not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging', True):
             os.mkdir(workingDirectory + '/FlavorTagging')
             os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
-        elif not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging/TrainedMethods'):
+        elif not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging/TrainedMethods', True):
             os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
 
     global filesDirectory
@@ -1102,7 +1094,7 @@ def flavorTagger(
     B2INFO('    Working directory is: ' + filesDirectory)
     B2INFO(' ')
 
-    setBelleOrBelle2AndRevision(belleOrBelle2, buildOrRevision)
+    setBelleOrBelle2(belleOrBelle2)
     setInteractionWithDatabase(downloadFromDatabaseIfNotfound, uploadToDatabaseAfterTraining)
     WhichCategories(categories)
     setVariables()

@@ -12,9 +12,9 @@ void  ECLElectronPdf::init(const char* parametersFileName)
   ECLAbsPdf::init(map);
 
   unsigned int len = nbins * nCosTheta ;
-  m_params = new Parameters [ len ];
-  m_integral1 = new double [ len ];
-  m_integral2 = new double [ len ];
+  m_params = std::vector<Parameters>(len);
+  m_integral1 = std::vector<double>(len);
+  m_integral2 = std::vector<double>(len);
   for (unsigned int ip = 1; ip < nbins; ++ip)
     for (unsigned int ith = 0; ith < nCosTheta; ++ith) {
       unsigned int i = index(ip, ith);
@@ -66,11 +66,4 @@ double ECLElectronPdf::pdf(double eop, double p, double costheta) const
   }
   t2 /= m_integral2[i];
   return prm.fraction * t1 + (1 - prm.fraction) * t2;
-}
-
-ECLElectronPdf::~ECLElectronPdf()
-{
-  delete[] m_params;
-  delete[] m_integral1;
-  delete[] m_integral2;
 }

@@ -61,11 +61,14 @@ namespace Belle2 {
     /**< Vector of extra info names */
     std::vector<std::string> m_extraInfoNames;
 
-    std::string m_decayString;  /**< DecayString specifying the daughter Particle to which the extra-info field will be added */
-    DecayDescriptor m_pDDescriptor;         /**< Decay descriptor of the particle being selected */
+    /**< DecayString specifying the daughter Particle to which the extra-info field will be added */
+    std::string m_decayString;
+    /**< Decay descriptor of the particle being selected */
+    DecayDescriptor m_pDDescriptor;
+    /**< if true the extraInfo is written to daughter specified by the decay string*/
     bool m_writeToDaughter = false;
-    int m_overwrite =
-      0; /**< -1/0/1: Overwrite if lower / don't overwrite / overwrite if higher, in case if extra info with given name already exists */
+    /**< -1/0/1: Overwrite if lower / don't overwrite / overwrite if higher, in case if extra info with given name already exists */
+    int m_overwrite = 0;
 
     /**
      * Adds extra info to the particle. The value is estimated for the source

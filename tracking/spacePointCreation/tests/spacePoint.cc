@@ -12,6 +12,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/utilities/TestHelpers.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -116,11 +117,11 @@ namespace Belle2 {
     VXD::SensorInfoBase anotherSensorInfoBase = createSensorInfo(anotherVxdID, 2.3, 4.2);
 
     // create new SVDClusters and fill it with Info getting a Hit which is not at the origin
-    // SVDCluster (VxdID sensorID, bool isU, float position, float positionSigma, double clsTime, double clsTimeSigma, float seedCharge, float clsCharge, unsigned short clsSize)
-    SVDCluster clusterU1 = SVDCluster(aVxdID, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
-    SVDCluster clusterV1 = SVDCluster(aVxdID, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
-    SVDCluster clusterU2 = SVDCluster(aVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1);
-    SVDCluster clusterU3 = SVDCluster(anotherVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1);
+    // SVDCluster (VxdID sensorID, bool isU, float position, float positionSigma, double clsTime, double clsTimeSigma, float seedCharge, float clsCharge, unsigned short clsSize, double clsSNR)
+    SVDCluster clusterU1 = SVDCluster(aVxdID, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1, 1);
+    SVDCluster clusterV1 = SVDCluster(aVxdID, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1, 1);
+    SVDCluster clusterU2 = SVDCluster(aVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1, 1);
+    SVDCluster clusterU3 = SVDCluster(anotherVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1, 1);
 
 
     // normal u+v = 2D Cluster (order of input irrelevant):
@@ -139,15 +140,15 @@ namespace Belle2 {
 
     // should throw, since too many clusters (of same sensor) given:
     std::vector<const SVDCluster*> bad3Clusters = { &clusterU1, &clusterV1, &clusterU2 };
-    EXPECT_THROW(SpacePoint(bad3Clusters, &sensorInfoBase), std::runtime_error);
+    EXPECT_B2FATAL(SpacePoint(bad3Clusters, &sensorInfoBase));
 
     // should throw, since two clusters of same type (but on same sensor) given:
     std::vector<const SVDCluster*> badSameType = { &clusterU1, &clusterU2 };
-    EXPECT_THROW(SpacePoint(badSameType, &sensorInfoBase), std::runtime_error);
+    EXPECT_B2FATAL(SpacePoint(badSameType, &sensorInfoBase));
 
     // should throw, since two clusters of different sensors given:
     std::vector<const SVDCluster*> badDifferentSensors = { &clusterV1, &clusterU3 };
-    EXPECT_THROW(SpacePoint(badDifferentSensors, &sensorInfoBase), std::runtime_error);
+    EXPECT_B2FATAL(SpacePoint(badDifferentSensors, &sensorInfoBase));
 
 
     // check results for full 2D cluster-combi:
@@ -527,8 +528,8 @@ namespace Belle2 {
 
     // create new SVDClusters and fill it with Info getting a Hit which is not at the origin
     // SVDCluster (VxdID sensorID, bool isU, float position, float positionSigma, double clsTime, double clsTimeSigma, float seedCharge, float clsCharge, unsigned short clsSize)
-    SVDCluster clusterU1 = SVDCluster(aVxdID, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
-    SVDCluster clusterV1 = SVDCluster(aVxdID, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster clusterU1 = SVDCluster(aVxdID, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1, 1);
+    SVDCluster clusterV1 = SVDCluster(aVxdID, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1, 1);
 
     vector<const SVDCluster*> clusters2d = { &clusterU1, &clusterV1 };
     SpacePoint testPoint2D = SpacePoint(clusters2d, &sensorInfoBase);
@@ -541,10 +542,6 @@ namespace Belle2 {
     vector<const SVDCluster*> clustersV = { &clusterV1 };
     SpacePoint testPoint1DV = SpacePoint(clustersV, &sensorInfoBase);
     EXPECT_EQ(testPoint1DV.getNClustersAssigned(), 1);
-
-    // create empty SpacePoint (via default constructor and check if it has 0 assigned Clusters)
-    SpacePoint emptyPoint = SpacePoint();
-    EXPECT_EQ(emptyPoint.getNClustersAssigned(), 0);
   }
 
 

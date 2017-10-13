@@ -20,7 +20,7 @@ namespace Belle2 {
   /**
    * Class to store raw IRS waveforms.
    * IRS3B: http://www.phys.hawaii.edu/~kurtisn/doku.php?id=itop:documentation:data_format
-   * IRSX: https://belle2.cc.kek.jp/~twiki/pub/Detector/TOP/Module01Firmware/data_format_v1_5.xlsx
+   * IRSX: https://confluence.desy.de/download/attachments/34035431/data_format_v2_0.xlsx
    */
   class TOPRawWaveform : public RelationsObject {
   public:
@@ -43,7 +43,7 @@ namespace Belle2 {
       short vPeak = 0;    /**< ADC value at samplePeak */
       short vFall0 = 0;   /**< ADC value at sampleFall */
       short vFall1 = 0;   /**< ADC value at sampleFall + 1 */
-      short integral = 0; /**< integral of a pulse (e.g. \propto charge) */
+      int integral = 0;   /**< integral of a pulse (e.g. \propto charge) */
     };
 
 
@@ -184,17 +184,16 @@ namespace Belle2 {
     unsigned getReferenceWindow() const { return m_referenceASIC; }
 
     /**
-     * This corresponds to the last window in the analog memory sampled.
-     * All timing is a "look-back" from this window.
-     * @return reference window number
-     */
-    const std::vector<unsigned short>& getReferenceWindows() const { return m_windows; }
-
-    /**
      * Returns IRS analog storage window this waveform was taken from.
-     * @return segment window number
+     * @return first segment window number
      */
     unsigned getStorageWindow() const { return (m_segmentASIC & 0x01FF); }
+
+    /**
+     * Returns storage window numbers of waveform segments
+     * @return window numbers
+     */
+    const std::vector<unsigned short>& getStorageWindows() const { return m_windows; }
 
     /**
      * Returns ASIC channel number
@@ -254,12 +253,21 @@ namespace Belle2 {
       unsigned last = lastSample / c_WindowSize + 1;
       unsigned size = m_windows.size();
       for (unsigned i = 1; i < std::min(last, size); i++) {
-        auto diff = m_windows[i] - m_windows[i - 1];
+        int diff = m_windows[i] - m_windows[i - 1];
         if (diff < 0) diff += storageDepth;
         if (diff != 1) return false;
       }
       return true;
     }
+
+    /**
+     * Returns integral of a peak
+     * @param sampleRise sample number just before 50% CFD crossing at leading edge
+     * @param samplePeak sample number at maximum
+     * @param sampleFall sample number just before 50% CFD crossing at falling edge
+     * @return integral
+     */
+    int getIntegral(int sampleRise, int samplePeak, int sampleFall) const;
 
     /**
      * Do feature extraction

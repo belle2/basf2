@@ -4,6 +4,7 @@ import os
 
 import basf2
 from ROOT import Belle2
+from generators import add_cosmics_generator
 
 import simulation
 import tracking
@@ -44,17 +45,6 @@ def main(mc_drift, generator_module, track_finder, turns, selection_mode, select
                         runList=[2],
                         )
 
-    # Load gearbox parameters
-    path.add_module('Gearbox',
-                    override=[
-                        ("/Global/length", "8.", "m"),
-                        ("/Global/width", "8.", "m"),
-                        ("/Global/height", "1.5", "m")
-                    ])
-
-    # Create geometry
-    path.add_module('Geometry', components=['CDC'])
-
     if generator_module == "evtgen":
         path.add_module("EvtGenInput")
 
@@ -76,25 +66,17 @@ def main(mc_drift, generator_module, track_finder, turns, selection_mode, select
                         nTracks=1)
 
     elif generator_module == "cosmics":
-        # Register the CRY module
-        path.add_module('CRYInput', CosmicDataDir=Belle2.FileSystem.findFile('data/generators/modules/cryinput/'),
-                        # user input file
-                        SetupFile='cry.setup',
-                        # acceptance half-lengths - at least one particle has to enter that box to use that event
-                        acceptLength=0.6,
-                        acceptWidth=0.2,
-                        acceptHeight=0.2,
-                        maxTrials=10000,
-                        # keep half-lengths - all particles that do not enter the box are removed
-                        # (keep box >= accept box)
-                        keepLength=0.6,
-                        keepWidth=0.2,
-                        keepHeight=0.2,
-                        # minimal kinetic energy - all particles below that energy are ignored
-                        kineticEnergyThreshold=0.01)
+        add_cosmics_generator(path, accept_box=[0.6, 0.2, 0.2], keep_box=[0.6, 0.2, 0.2])
 
     else:
         raise ValueError("Unknown generator module key " + generator_module)
+
+    if "Gearbox" not in path:
+        path.add_module("Gearbox")
+
+    if "Geometry" not in path:
+        # Create geometry
+        path.add_module('Geometry', components=['CDC'])
 
     # to prevent delta rays, not realistic !
     path.add_module('FullSim', ProductionCut=1000000.)
@@ -135,9 +117,15 @@ def main(mc_drift, generator_module, track_finder, turns, selection_mode, select
         path.add_module("TrackTimeExtraction", maximalIterations=turns)
     elif turns == 0:
         if selection_mode != "all_tracks":
-            path.add_module("FullGridTrackTimeExtraction", recoTracksStoreArrayName="__SelectedRecoTracks")
+            path.add_module(
+                "FullGridTrackTimeExtraction",
+                recoTracksStoreArrayName="__SelectedRecoTracks",
+                minimalT0Shift=-70,
+                maximalT0Shift=70,
+                numberOfGrids=6)
         else:
-            path.add_module("FullGridTrackTimeExtraction", recoTracksStoreArrayName="RecoTracks")
+            path.add_module("FullGridTrackTimeExtraction", recoTracksStoreArrayName="RecoTracks",
+                            maximalT0Shift=70, minimalT0Shift=-70, numberOfGrids=6)
 
     path.add_module("DAFRecoFitter",
                     pdgCodesToUseForFitting=13)

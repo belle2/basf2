@@ -1,0 +1,43 @@
+# EventType: 1310022100
+# Descriptor: [B_s -> K_s Pi0]cc
+# NickName: Bs_K0Pi0
+# Documentation: 2 Body charmless process
+# Tested: Yes
+# PhysicsWG: BTOCHARMLESS
+# Responsible: Tao Luo
+# Email: luot@pitt.edu
+# Cuts: None
+# Date: 20170913
+# Changes: use of aliases defined in DECAY.DEC; date: 20170903; author: Tao Luo
+
+Alias      B_s*0sig      B_s*0
+Alias      anti-B_s*0sig anti-B_s*0
+ChargeConj B_s*0sig      anti-B_s*0sig 
+
+Alias      K_S0sig       K_S0
+ChargeConj K_S0sig       K_S0sig
+
+Decay Upsilon(5S)
+0.50       B_s*0sig          anti-B_s*0                  PHSP;
+0.50       B_s*0             anti-B_s*0sig               PHSP;
+Enddecay
+
+Decay B_s*0sig
+1.000 B_s0sig            gamma           VSP_PWAVE;
+Enddecay
+
+CDecay anti-B_s*0sig
+
+Decay B_s0sig
+1.000           K_S0    pi0   PHSP;
+Enddecay
+
+CDecay anti-B_s0sig
+
+Decay pi0
+1.000 gamma             gamma                   PHSP;
+Enddecay
+
+End
+
+

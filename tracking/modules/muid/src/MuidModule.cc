@@ -36,6 +36,7 @@ MuidModule::MuidModule() :
   m_BKLMHitsColName(""),
   m_EKLMHitsColName(""),
   m_KLMClustersColName(""),
+  m_ECLClustersColName(""),
   m_TrackClusterSeparationsColName(""),
   m_MeanDt(0.0),
   m_MaxDt(0.0),
@@ -43,7 +44,8 @@ MuidModule::MuidModule() :
   m_MinKE(0.0),
   m_MaxStep(0.0),
   m_MaxDistSqInVariances(0.0),
-  m_MaxClusterTrackConeAngle(0.0),
+  m_MaxKLMTrackClusterDistance(0.0),
+  m_MaxECLTrackClusterDistance(0.0),
   m_TrackingVerbosity(0),
   m_EnableVisualization(false),
   m_MagneticFieldStepperName(""),
@@ -66,6 +68,7 @@ MuidModule::MuidModule() :
   addParam("BKLMHitsColName", m_BKLMHitsColName, "Name of collection holding the reconstructed 2D hits in barrel KLM", string(""));
   addParam("EKLMHitsColName", m_EKLMHitsColName, "Name of collection holding the reconstructed 2D hits in endcap KLM", string(""));
   addParam("KLMClustersColName", m_KLMClustersColName, "Name of collection holding the KLMClusters", string(""));
+  addParam("ECLClustersColName", m_ECLClustersColName, "Name of collection holding the ECLClusters", string(""));
   addParam("TrackClusterSeparationsColName", m_TrackClusterSeparationsColName,
            "Name of collection holding the TrackClusterSeparations", string(""));
   addParam("MeanDt", m_MeanDt, "[ns] Mean hit-trigger time for coincident hits (default 0)", double(0.0));
@@ -75,8 +78,10 @@ MuidModule::MuidModule() :
   addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation (default 0.002)", double(0.002));
   addParam("MaxStep", m_MaxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity; default 25)", double(25.0));
   addParam("MaxDistSigma", m_MaxDistSqInVariances, "[#sigmas] Maximum hit-to-extrapolation difference (default 3.5)", double(3.5));
-  addParam("MaxKLMClusterTrackConeAngle", m_MaxClusterTrackConeAngle,
-           "[degrees] Maximum cone angle between matching track and KLM cluster.", double(15.0));
+  addParam("MaxKLMTrackClusterDistance", m_MaxKLMTrackClusterDistance,
+           "[cm] Maximum distance of closest approach of track to KLM cluster for match (default 150)", double(150.0));
+  addParam("MaxECLTrackClusterDistance", m_MaxECLTrackClusterDistance,
+           "[cm] Maximum distance of closest approach of track to ECL cluster for match (default 100)", double(100.0));
   // Additional parameters copied from FullSimModule
   addParam("TrackingVerbosity", m_TrackingVerbosity,
            "Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info.",
@@ -153,9 +158,10 @@ void MuidModule::initialize()
   m_Extrapolator->setBKLMHitsColName(m_BKLMHitsColName);
   m_Extrapolator->setEKLMHitsColName(m_EKLMHitsColName);
   m_Extrapolator->setKLMClustersColName(m_KLMClustersColName);
+  m_Extrapolator->setECLClustersColName(m_ECLClustersColName);
   m_Extrapolator->setTrackClusterSeparationsColName(m_TrackClusterSeparationsColName);
-  m_Extrapolator->initialize(m_MeanDt, m_MaxDt, m_MaxDistSqInVariances, m_MaxClusterTrackConeAngle,
-                             m_MinPt, m_MinKE, m_Hypotheses);
+  m_Extrapolator->initialize(m_MeanDt, m_MaxDt, m_MaxDistSqInVariances, m_MaxKLMTrackClusterDistance,
+                             m_MaxECLTrackClusterDistance, m_MinPt, m_MinKE, m_Hypotheses);
 
   return;
 

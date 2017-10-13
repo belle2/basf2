@@ -10,16 +10,30 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/topology/EStereoKind.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackFindingCDC/numerics/ERotation.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <iosfwd>
 
 namespace Belle2 {
   class CDCSimHit;
+  class CDCHit;
 
   namespace TrackFindingCDC {
+    class CDCTrajectory2D;
+    class CDCWireHit;
+    class CDCWire;
+    class Vector3D;
 
     /**
      *  Class representing a two dimensional reconstructed hit in the central drift chamber.
-     *  A recohit represents a likely point where the particle went through. It is always assoziated with a
+     *  A recohit represents a likely point where the particle went through. It is always associated with a
      *  wire hit it seeks to reconstruct. The reconstructed point is stored as a displacement from the
      *  wire reference position assoziated with the hit. The displacement generally is as long as the drift length
      *  but must not.\n
@@ -123,94 +137,118 @@ namespace Belle2 {
 
       /// Defines wires and the two dimensional reconstructed hits as coaligned.
       friend bool operator<(const CDCRecoHit2D& recoHit2D, const CDCWire& wire)
-      { return recoHit2D.getWire() < wire; }
+      { return recoHit2D.getRLWireHit() < wire; }
 
       /// Defines wires and the two dimensional reconstructed hits as coaligned.
       friend bool operator<(const CDCWire& wire, const CDCRecoHit2D& recoHit2D)
-      { return wire < recoHit2D.getWire(); }
+      { return wire < recoHit2D.getRLWireHit(); }
 
       /// Defines wire hits and the two dimensional reconstructed hits as coaligned.
       friend bool operator<(const CDCRecoHit2D& recoHit2D, const CDCWireHit& wireHit)
-      { return recoHit2D.getWireHit() < wireHit; }
+      { return recoHit2D.getRLWireHit() < wireHit; }
 
       /// Defines wire hits and the two dimensional reconstructed hits as coaligned.
       friend bool operator<(const CDCWireHit& wireHit, const CDCRecoHit2D& recoHit2D)
-      { return wireHit < recoHit2D.getWireHit(); }
-
-      /// Output operator. Help debugging.
-      friend std::ostream& operator<<(std::ostream& output, const CDCRecoHit2D& recohit)
-      {
-        output << "CDCRecoHit2D(" << recohit.getRLWireHit() << ","
-               << recohit.getRecoDisp2D() << ")" ;
-        return output;
-      }
+      { return wireHit < recoHit2D.getRLWireHit(); }
 
       /// Getter for the stereo type of the underlying wire.
       EStereoKind getStereoKind() const
-      { return getRLWireHit().getStereoKind(); }
+      {
+        return getRLWireHit().getStereoKind();
+      }
 
       /// Indicator if the underlying wire is axial.
       bool isAxial() const
-      { return getWire().isAxial(); }
+      {
+        return getRLWireHit().isAxial();
+      }
 
       /// Getter for the superlayer id.
       ISuperLayer getISuperLayer() const
-      { return getRLWireHit().getISuperLayer(); }
+      {
+        return getRLWireHit().getISuperLayer();
+      }
 
       /// Getter for the wire the reconstructed hit assoziated to.
       const CDCWire& getWire() const
-      { return getRLWireHit().getWire(); }
+      {
+        return getRLWireHit().getWire();
+      }
 
       /// Getter for the reference position of the wire.
       const Vector2D& getRefPos2D() const
-      { return getRLWireHit().getRefPos2D(); }
+      {
+        return getRLWireHit().getRefPos2D();
+      }
 
       /// Checks if the reconstructed hit is assoziated with the give wire.
       bool isOnWire(const CDCWire& wire) const
-      { return getRLWireHit().isOnWire(wire); }
+      {
+        return getRLWireHit().isOnWire(wire);
+      }
 
       /// Getter for the wire hit assoziated with the reconstructed hit.
       const CDCWireHit& getWireHit() const
-      { return getRLWireHit().getWireHit(); }
+      {
+        return getRLWireHit().getWireHit();
+      }
 
       /// Checks if the reconstructed hit is assoziated with the give wire hit.
       bool hasWireHit(const CDCWireHit& wireHit) const
-      { return getRLWireHit().hasWireHit(wireHit); }
+      {
+        return getRLWireHit().hasWireHit(wireHit);
+      }
 
       /// Getter for the right left passage information.
       ERightLeft getRLInfo() const
-      { return getRLWireHit().getRLInfo(); }
+      {
+        return getRLWireHit().getRLInfo();
+      }
 
       /// Setter the right left passage information.
       void setRLInfo(ERightLeft& rlInfo)
-      { m_rlWireHit.setRLInfo(rlInfo); }
+      {
+        m_rlWireHit.setRLInfo(rlInfo);
+      }
 
       /// Getter for the drift length at the wire reference position.
       double getRefDriftLength() const
-      { return getRLWireHit().getRefDriftLength(); }
+      {
+        return getRLWireHit().getRefDriftLength();
+      }
 
       /// Setter for the drift length at the wire reference position.
       void setRefDriftLength(double driftLength, bool snapRecoPos);
 
       /// Getter for the drift length at the wire reference position signed with the right left passage hypotheses.
       double getSignedRefDriftLength() const
-      { return getRLWireHit().getSignedRefDriftLength(); }
+      {
+        return getRLWireHit().getSignedRefDriftLength();
+      }
 
       /// Getter for the uncertainty in the drift length at the wire reference position.
       double getRefDriftLengthVariance() const
-      { return getRLWireHit().getRefDriftLengthVariance(); }
+      {
+        return getRLWireHit().getRefDriftLengthVariance();
+      }
 
       /// Getter for the position in the reference plane.
       Vector2D getRecoPos2D() const
-      { return getRecoDisp2D() + getRefPos2D(); }
+      {
+        return getRecoDisp2D() + getRefPos2D();
+      }
 
       /// Setter for the position in the reference plane.
       void setRecoPos2D(const Vector2D& recoPos2D)
-      { m_recoDisp2D = recoPos2D - getRefPos2D(); }
+      {
+        m_recoDisp2D = recoPos2D - getRefPos2D();
+      }
 
       /// Getter for the displacement from the wire reference position.
       const Vector2D& getRecoDisp2D() const
-      { return m_recoDisp2D; }
+      {
+        return m_recoDisp2D;
+      }
 
       /// Getter for the direction of flight
       Vector2D getFlightDirection2D() const
@@ -235,16 +273,19 @@ namespace Belle2 {
        *  moved parallel to the stereo wire.
        *  For axial hits the point of closest approach on the trajectory is returned.
        */
-      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D) const
-      { return getRLWireHit().reconstruct3D(trajectory2D); }
+      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, const double z = 0) const;
 
       /// Getter for the oriented wire hit assoziated with the reconstructed hit.
       const CDCRLWireHit& getRLWireHit() const
-      { return m_rlWireHit; }
+      {
+        return m_rlWireHit;
+      }
 
       /// Setter for the oriented wire hit assoziated with the reconstructed hit.
       void setRLWireHit(const CDCRLWireHit& rlWireHit)
-      { m_rlWireHit = rlWireHit; }
+      {
+        m_rlWireHit = rlWireHit;
+      }
 
     private:
       /// Memory for the reference to the assiziated wire hit.
@@ -252,8 +293,10 @@ namespace Belle2 {
 
       /// Memory for the displacement fo the assoziated wire reference position.
       Vector2D m_recoDisp2D;
-
     };
 
+
+    /// Output operator. Help debugging.
+    std::ostream& operator<<(std::ostream& output, const CDCRecoHit2D& recohit);
   }
 }

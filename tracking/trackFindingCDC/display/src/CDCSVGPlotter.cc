@@ -21,6 +21,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
@@ -30,13 +31,19 @@
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+#include <tracking/trackFindingCDC/utilities/ReversedRange.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <framework/datastore/StoreArray.h>
 
-#include <boost/range/adaptor/reversed.hpp>
+#include <tracking/dataobjects/RecoTrack.h>
+
+#include <cdc/dataobjects/CDCRecoHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
+#include <cdc/dataobjects/CDCHit.h>
+
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <cmath>
 
@@ -101,7 +108,7 @@ const AttributeMap c_defaultSVGAttributes({
 
 CDCSVGPlotter::CDCSVGPlotter(bool animate, bool forwardFade)
   : m_animate(animate)
-  , m_eventdataPlotter(makeUnique<SVGPrimitivePlotter>(c_defaultSVGAttributes), animate, forwardFade)
+  , m_eventdataPlotter(std::make_unique<SVGPrimitivePlotter>(c_defaultSVGAttributes), animate, forwardFade)
 {
   int top = -112;
   int left = -112;
@@ -439,6 +446,7 @@ void CDCSVGPlotter::drawWrongRLHits(const std::string& hitCollectionsStoreObjNam
     // Skip the bad reverse
     if (correctRLVote < 0 and hitCollection.getAutomatonCell().hasReverseFlag()) continue;
 
+    m_eventdataPlotter.startGroup();
     for (const auto& recoHit : hitCollection) {
       ERightLeft rlInfo = recoHit.getRLInfo();
       const CDCHit* hit = recoHit.getWireHit().getHit();
@@ -460,6 +468,7 @@ void CDCSVGPlotter::drawWrongRLHits(const std::string& hitCollectionsStoreObjNam
       AttributeMap attributeMap{{"stroke", color}};
       m_eventdataPlotter.draw(recoHit, attributeMap);
     }
+    m_eventdataPlotter.endGroup();
   }
 }
 
@@ -642,9 +651,9 @@ void CDCSVGPlotter::drawStoreArray(const std::string& storeArrayName,
   }
 
   B2INFO("with " << storeArray.getEntries() << " entries");
+  drawIterable<a_drawTrajectories>(storeArray, styling);
   B2INFO("Attributes are");
   B2INFO(styling.info());
-  drawIterable<a_drawTrajectories>(storeArray, styling);
 }
 
 template <class AItem, bool a_drawTrajectories>
@@ -668,9 +677,9 @@ void CDCSVGPlotter::drawStoreVector(const std::string& storeObjName,
 
   const std::vector<StoreItem>& vector = *storeVector;
   B2INFO("with " << vector.size() << " entries");
+  drawIterable<a_drawTrajectories>(reversedRange(vector), styling);
   B2INFO("Attributes are");
   B2INFO(styling.info());
-  drawIterable<a_drawTrajectories>(vector | boost::adaptors::reversed, styling);
 }
 
 template <bool a_drawTrajectory, class AIterable, class AStyling>

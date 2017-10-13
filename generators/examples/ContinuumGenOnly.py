@@ -22,7 +22,6 @@ main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
 evtgen = register_module('EvtGenInput')
 evtgen.param('ParentParticle', 'vpho')
 evtgen.param('userDECFile', os.environ['BELLE2_LOCAL_DIR'] + '/generators/evtgen/decayfiles/ccbar+Dst.dec')
-evtgen.param('DECFile', os.environ['BELLE2_LOCAL_DIR'] + '/generators/evtgen/decayfiles/DECAY_BELLE2.DEC')
 
 # run
 main.add_module("Progress")

@@ -206,9 +206,9 @@ void ExtPhysicsConstructor::ConstructProcess()
   m_MagFieldLimitProcess = new ExtMagFieldLimitProcess;
   m_ELossProcess = new ExtEnergyLoss;
   m_Messenger = new ExtMessenger(m_StepLengthLimitProcess, m_MagFieldLimitProcess, m_ELossProcess);
-  G4ParticleTable* theParticleTable = G4ParticleTable::GetParticleTable();
+  G4ParticleTable* myParticleTable = G4ParticleTable::GetParticleTable();
   // theParticleIterator is a Geant4 macro since version 10.
-  G4ParticleTable::G4PTblDicIterator* myParticleIterator = theParticleTable->GetIterator();
+  G4ParticleTable::G4PTblDicIterator* myParticleIterator = myParticleTable->GetIterator();
   myParticleIterator->reset();
   while ((*myParticleIterator)()) {
     G4ParticleDefinition* particle = myParticleIterator->value();

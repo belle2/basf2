@@ -11,16 +11,19 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
 
+#include <vector>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCWireHit;
+    class CDCWire;
 
     /// A segment consisting of two dimensional reconsturcted hits
-    class CDCWireHitSegment :  public CDCSegment<const Belle2::TrackFindingCDC::CDCWireHit*> {
+    class CDCWireHitSegment :  public CDCSegment<const CDCWireHit*> {
 
     public:
       /// Getter for the vector of wires the hits of this segment are based on in the same order
-      std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const;
+      std::vector<const CDCWire*> getWireSegment() const;
 
     };
 

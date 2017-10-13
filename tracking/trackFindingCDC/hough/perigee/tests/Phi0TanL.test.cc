@@ -18,7 +18,6 @@
 #include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
 #include <tracking/trackFindingCDC/hough/perigee/ImpactRep.h>
 
-#include <boost/range/adaptor/transformed.hpp>
 #include <vector>
 
 using namespace Belle2;
@@ -198,6 +197,13 @@ namespace {
 
     houghTree.initialize();
 
+    // Obtain the segments as pointers.
+    std::vector<const CDCSegment2D*> m_ptrSegment2Ds;
+    m_ptrSegment2Ds.reserve(m_mcSegment2Ds.size());
+    for (const CDCSegment2D& segment2D : m_mcSegment2Ds) {
+      m_ptrSegment2Ds.push_back(&segment2D);
+    }
+
     // Execute the finding a couple of time to find a stable execution time.
     std::vector< std::pair<HoughBox, std::vector<const CDCSegment2D*> > > candidates;
 
@@ -205,7 +211,7 @@ namespace {
     TimeItResult timeItResult = timeIt(100, true, [&]() {
       // Exclude the timing of the resource release for comparision with the legendre test.
       houghTree.fell();
-      houghTree.seed(m_mcSegment2Ds | boost::adaptors::transformed(&std::addressof<CDCSegment2D>));
+      houghTree.seed(m_ptrSegment2Ds);
 
       const double minWeight = 50.0;
       // candidates = houghTree.find(minWeight);

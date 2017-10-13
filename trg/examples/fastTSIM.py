@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# ------------------------------------------------------------------------------------------------------
-#           TSim-ecl example code.
-# ------------------------------------------------------------------------------------------------------
-#       In order to test Tsim-ecl code, you need a root file which has ECLHit table.(after Gsim)
-#       ex)
-#       commend > basf2 TrgEcl_pgun.py [Name of output root file]
-# ------------------------------------------------------------------------------------------------------
+# The example of running simulation of L1 trigger
+
 import os
 from basf2 import *
 from simulation import add_simulation
@@ -25,7 +20,7 @@ babayaganlo = register_module('BabayagaNLOInput')
 babayaganlo.param('FMax', 7.5e4)
 babayaganlo.param('FinalState', 'ee')
 babayaganlo.param('MaxAcollinearity', 180.0)
-babayaganlo.param('ScatteringAngleRange', [15.0, 165.0])
+babayaganlo.param('ScatteringAngleRange', [15, 165])
 # babayaganlo.param('VacuumPolarization', 'hadr5')
 babayaganlo.param('VacuumPolarization', 'hlmnt')
 babayaganlo.param('SearchMax', 10000)

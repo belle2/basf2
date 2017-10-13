@@ -3,6 +3,9 @@
 
 from basf2 import *
 
+from svd import add_svd_reconstruction
+from pxd import add_pxd_reconstruction
+
 from tracking import (
     add_mc_tracking_reconstruction,
     add_tracking_reconstruction,
@@ -18,9 +21,12 @@ from softwaretrigger import (
     add_calibration_software_trigger,
 )
 
+import mdst
+
 
 def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False,
-                       additionalTrackFitHypotheses=None, addClusterExpertModules=True):
+                       additionalTrackFitHypotheses=None, addClusterExpertModules=True, use_vxdtf2=True,
+                       use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -48,7 +54,17 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
         the additional fitted hypotheses are muon, kaon and proton, i.e. [13, 321, 2212].
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
+    :param use_vxdtf2: if true the VXDTF version 2 will be used if false (default) verion 1 of the VXDTF will be used.
+    :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
+
+    # add svd_reconstruction
+    if components is None or 'SVD' in components:
+        add_svd_reconstruction(path)
+
+    # add pxd_reconstruction
+    if components is None or 'PXD' in components:
+        add_pxd_reconstruction(path)
 
     # Add tracking reconstruction modules
     add_tracking_reconstruction(path,
@@ -57,7 +73,12 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                 mcTrackFinding=False,
                                 trigger_mode=trigger_mode,
                                 skipGeometryAdding=skipGeometryAdding,
-                                additionalTrackFitHypotheses=additionalTrackFitHypotheses)
+                                additionalTrackFitHypotheses=additionalTrackFitHypotheses,
+                                use_vxdtf2=use_vxdtf2,
+                                use_second_cdc_hits=use_second_cdc_hits)
+
+    # Statistics summary
+    path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
     # Add further reconstruction modules
     add_posttracking_reconstruction(path,
@@ -79,32 +100,53 @@ def add_cosmics_reconstruction(
         components=None,
         pruneTracks=True,
         skipGeometryAdding=False,
-        eventTimingExtraction=False,
-        addClusterExpertModules=True):
+        eventTimingExtraction=True,
+        addClusterExpertModules=True,
+        merge_tracks=True,
+        top_in_counter=False,
+        data_taking_period='gcr2017',
+        use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
     plus the modules to calculate the software trigger cuts.
 
     :param path: Add the modules to this path.
+    :param data_taking_period: The cosmics generation will be added using the
+           parameters, that where used in this period of data taking. The periods can be found in cdc/cr/__init__.py.
+
     :param components: list of geometry components to include reconstruction for, or None for all components.
     :param pruneTracks: Delete all hits except the first and last of the tracks after the dEdX modules.
     :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
         determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
         all (but you will have to add it on your own then).
+
     :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
         FullGridTrackTimeExtraction modules.
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
+
+    :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
+    :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
+
+    :param top_in_counter: time of propagation from the hit point to the PMT in the trigger counter is subtracted
+           (assuming PMT is put at -z of the counter).
     """
 
     # Add cdc tracking reconstruction modules
     add_cr_tracking_reconstruction(path,
                                    components=components,
-                                   pruneTracks=False,
-                                   skipGeometryAdding=skipGeometryAdding,
-                                   eventTimingExtraction=eventTimingExtraction)
+                                   prune_tracks=False,
+                                   skip_geometry_adding=skipGeometryAdding,
+                                   event_time_extraction=eventTimingExtraction,
+                                   merge_tracks=merge_tracks,
+                                   data_taking_period=data_taking_period,
+                                   top_in_counter=top_in_counter,
+                                   use_second_cdc_hits=use_second_cdc_hits)
+
+    # Statistics summary
+    path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
     # Add further reconstruction modules
     add_posttracking_reconstruction(path,
@@ -114,18 +156,24 @@ def add_cosmics_reconstruction(
                                     trigger_mode="all")
 
 
-def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True):
+def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
+                          use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules with MC tracking
     to a path.
 
     @param components list of geometry components to include reconstruction for, or None for all components.
+    @param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     """
 
     # tracking
     add_mc_tracking_reconstruction(path,
                                    components=components,
-                                   pruneTracks=False)
+                                   pruneTracks=False,
+                                   use_second_cdc_hits=use_second_cdc_hits)
+
+    # Statistics summary
+    path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path,
@@ -154,6 +202,8 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         add_top_modules(path, components)
         add_arich_modules(path, components)
 
+    path.add_module('StatisticsSummary').set_name('Sum_PID')
+
     if trigger_mode in ["fast_reco", "all"]:
         add_ecl_modules(path, components)
 
@@ -175,6 +225,8 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         # FIXME: Disabled for HLT until execution time bug is fixed
         add_cluster_expert_modules(path, components)
 
+    path.add_module('StatisticsSummary').set_name('Sum_Clustering')
+
 
 def add_mdst_output(
     path,
@@ -194,38 +246,7 @@ def add_mdst_output(
            fields to the output FileMetaData
     """
 
-    output = register_module('RootOutput')
-    output.param('outputFileName', filename)
-    branches = [
-        'Tracks',
-        'V0s',
-        'TrackFitResults',
-        'PIDLikelihoods',
-        'TracksToPIDLikelihoods',
-        'ECLClusters',
-        'ECLClustersToTracks',
-        'KLMClusters',
-        'KLMClustersToTracks',
-        'TRGSummary',
-        'SoftwareTriggerResult',
-    ]
-    persistentBranches = ['FileMetaData']
-    if mc:
-        branches += ['MCParticles', 'TracksToMCParticles',
-                     'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
-        persistentBranches += ['BackgroundInfos']
-    branches += additionalBranches
-    output.param('branchNames', branches)
-    output.param('branchNamesPersistent', persistentBranches)
-    # set dataDescription correctly
-    if dataDescription is None:
-        dataDescription = {}
-    # set dataLevel to mdst if it's not already set to something else (which
-    # might happen for udst output since that calls this function)
-    dataDescription.setdefault("dataLevel", "mdst")
-    output.param("additionalDataDescription", dataDescription)
-    path.add_module(output)
-    return output
+    return mdst.add_mdst_output(path, mc, filename, additionalBranches, dataDescription)
 
 
 def add_arich_modules(path, components=None):
@@ -268,9 +289,6 @@ def add_cluster_expert_modules(path, components=None):
     if components is None or ('EKLM' in components and 'BKLM' in components and 'ECL' in components):
         KLMClassifier = register_module('KLMExpert')
         path.add_module(KLMClassifier)
-
-        ECLClassifier = register_module('ECLExpert')
-        path.add_module(ECLClassifier)
 
 
 def add_pid_module(path, components=None):

@@ -77,7 +77,7 @@ namespace Belle2 {
     unsigned int nCases = 1;
     double absError = 1e-6;
 
-    for (unsigned int i = 0; i < nCases; ++i) {
+    for (unsigned int iCase = 0; iCase < nCases; ++iCase) {
 
       auto bField = 1.5;
       auto pType = Belle2::Const::electron;

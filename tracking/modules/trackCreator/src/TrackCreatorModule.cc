@@ -53,6 +53,9 @@ TrackCreatorModule::TrackCreatorModule() :
 
   addParam("useClosestHitToIP", m_useClosestHitToIP, "Flag to turn on special handling which measurement "
            "to choose; especially useful for Cosmics.", m_useClosestHitToIP);
+  addParam("useBFieldAtHit", m_useBFieldAtHit, "Flag to calculate the BField at the used hit "
+           "(closest to IP or first one), instead of the one at the POCA. Use this for cosmics to prevent problems, when cosmics reconstruction end up in the QCS magnet.",
+           m_useBFieldAtHit);
 
 }
 
@@ -95,13 +98,30 @@ void TrackCreatorModule::event()
   TrackBuilder trackBuilder(m_trackColName, m_trackFitResultColName, m_mcParticleColName,
                             m_beamSpotAsTVector, m_beamAxisAsTVector);
   for (auto& recoTrack : recoTracks) {
+//<<<<<<< HEAD
     for (const auto& pdg : m_pdgCodes) {
       // Does not refit in case the particle hypotheses demanded in this module have already been fitted before.
       // Otherwise fits them with the default fitter.
       B2DEBUG(200, "Trying to fit with PDG = " << pdg);
       trackFitter.fit(recoTrack, Const::ParticleType(abs(pdg)));
     }
-
+//=======
+    // Require pion fit as a safety measure
+    /*   const bool pionFitWasSuccessful = trackFitter.fit(recoTrack, Const::ParticleType(abs(m_defaultPDGCode)));
+       // Does not refit in case the particle hypotheses demanded in this module have already been fitted before.
+       // Otherwise fits them with the default fitter.
+       if (pionFitWasSuccessful) {
+         for (const auto& pdg : m_additionalPDGCodes) {
+           B2DEBUG(200, "Trying to fit with PDG = " << pdg);
+           trackFitter.fit(recoTrack, Const::ParticleType(abs(pdg)));
+         }
+         trackBuilder.storeTrackFromRecoTrack(recoTrack, Const::ParticleType(abs(m_defaultPDGCode)),
+                                              m_useClosestHitToIP, m_useBFieldAtHit);
+       } else {
+         B2DEBUG(200, "Pion fit failed - not creating a Track out of this RecoTrack.");
+    >>>>>>> master
+       }
+    */
     trackBuilder.storeTrackFromRecoTrack(recoTrack, m_useClosestHitToIP);
   }
 }

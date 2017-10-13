@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <mdst/dataobjects/MCParticle.h>
-//#include <tracking/modules/trackingPerformanceEvaluation/MCParticleInfo.h>
 #include <tracking/dataobjects/MCParticleInfo.h>
 
 using namespace std;
@@ -37,10 +36,10 @@ MCParticleInfo::getD0()
   double y = this->getY();
   double R = 1 / this->getOmega(); //cm
 
-  double alpha =  R / pt * m_charge; //cm/GeV
+  double alpha =  R / pt; //cm/GeV
   double Cx = x + alpha * py; //cm
   double Cy = y - alpha * px; //cm
-  double d0 = sqrt(Cx * Cx + Cy * Cy) - R; //cm
+  double d0 = sqrt(Cx * Cx + Cy * Cy) - R * m_charge; //cm
   d0 = d0 * m_charge;
 
   return d0;

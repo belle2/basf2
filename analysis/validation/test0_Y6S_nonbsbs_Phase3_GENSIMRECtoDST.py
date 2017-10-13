@@ -36,7 +36,7 @@ evtgen.param('userDECFile', Belle2.FileSystem.findFile('generators/evtgen/decayf
 main.add_module(evtgen)
 print_params(evtgen)
 import pdg
-pdg.load(Belle2.FileSystem.findFile('generators/evtgen/decayfiles/Y6S.pdl'))  # to load a different file
+pdg.load(Belle2.FileSystem.findFile('/decfiles/dec/Y6S.pdl'))  # to load a different file
 
 # simulation
 add_simulation(main)

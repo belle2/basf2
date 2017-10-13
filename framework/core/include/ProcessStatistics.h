@@ -12,6 +12,7 @@
 
 #include <framework/core/ModuleStatistics.h>
 #include <framework/pcore/Mergeable.h>
+#include <framework/core/Module.h>
 
 #include <map>
 #include <vector>
@@ -141,6 +142,7 @@ namespace Belle2 {
     {
       setCounters(m_moduleTime, m_moduleMemory,
                   m_moduleTime, m_moduleMemory);
+      if (module && module->hasProperties(Module::c_DontCollectStatistics)) return;
       m_stats[getIndex(module)].add(type, m_moduleTime, m_moduleMemory);
     }
 

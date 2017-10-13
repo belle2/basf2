@@ -345,7 +345,7 @@ void TelDataMergerTB2016Module::saveDigits(int matchposition)
         continue;
       }
       B2DEBUG(10, "it->first: " << it->first << ", it->second: " << it->second);
-      storePXDDigits2.appendNew(it->second, std::get<1>(pxddigit), std::get<2>(pxddigit), 0.0, 0.0, std::get<3>(pxddigit));
+      storePXDDigits2.appendNew(it->second, std::get<1>(pxddigit), std::get<2>(pxddigit), std::get<3>(pxddigit));
       if (counter == 0) B2DEBUG(10, "Storing " << PXDDigits.size() << "digits for the PXD with the sensor ID " << m_PXDEUDAQNumber);
 
     }

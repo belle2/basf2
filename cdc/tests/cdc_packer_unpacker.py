@@ -69,8 +69,8 @@ class PackerUnpackerTestModule(Module):
             assert hit.getID() == hitPackedUnpacked.getID()
             assert hit.getTDCCount() == hitPackedUnpacked.getTDCCount()
             assert hit.getADCCount() == hitPackedUnpacked.getADCCount()
-            assert hit.getTDCCount2ndHit() == hitPackedUnpacked.getTDCCount2ndHit()
             assert hit.getStatus() == hitPackedUnpacked.getStatus()
+
 
 main = create_path()
 # Create Event information

@@ -17,6 +17,9 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/regex.hpp>
 
 #include <TFile.h>
 
@@ -25,6 +28,19 @@
 
 namespace Belle2 {
   namespace MVA {
+
+    std::string makeSaveForDatabase(std::string str)
+    {
+      std::map<std::string, std::string> replace {
+        {" ", "__sp"},
+      };
+      for (auto& pair : replace) {
+        boost::replace_all(str, pair.first, pair.second);
+      }
+      //const static boost::regex blackList("[^a-zA-Z0-9_]");
+      //return boost::regex_replace(str, blackList, "");
+      return str;
+    }
 
     Weightfile::~Weightfile()
     {
@@ -205,6 +221,10 @@ namespace Belle2 {
 
       DatabaseRepresentationOfWeightfile* database_representation_of_weightfile = nullptr;
       file.GetObject("Weightfile", database_representation_of_weightfile);
+
+      if (database_representation_of_weightfile == nullptr) {
+        throw std::runtime_error("The provided ROOT file " + filename + " does not contain a valid MVA weightfile.");
+      }
       std::stringstream ss(database_representation_of_weightfile->m_data);
       delete database_representation_of_weightfile;
       return Weightfile::loadFromStream(ss);
@@ -234,12 +254,12 @@ namespace Belle2 {
       Weightfile::saveToStream(weightfile, ss);
       DatabaseRepresentationOfWeightfile database_representation_of_weightfile;
       database_representation_of_weightfile.m_data = ss.str();
-      Belle2::Database::Instance().storeData(identifier, &database_representation_of_weightfile, iov);
+      Belle2::Database::Instance().storeData(makeSaveForDatabase(identifier), &database_representation_of_weightfile, iov);
     }
 
     Weightfile Weightfile::loadFromDatabase(const std::string& identifier, const Belle2::EventMetaData& emd)
     {
-      auto pair = Belle2::Database::Instance().getData(emd, identifier);
+      auto pair = Belle2::Database::Instance().getData(emd, makeSaveForDatabase(identifier));
 
       if (pair.first == 0) {
         throw std::runtime_error("Given identifier cannot be loaded from the database: " + identifier);

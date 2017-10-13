@@ -9,12 +9,12 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/GenIndices.h>
 #include <tracking/trackFindingCDC/utilities/Product.h>
 
 #include <framework/utilities/Utils.h>
 
 #include <tuple>
+#include <utility>
 #include <vector>
 #include <iterator>
 #include <cassert>
@@ -69,13 +69,13 @@ namespace Belle2 {
       {
         const ABox& box = node;
         if (branch_unlikely(node.getLevel() == 0)) {
-          std::vector<ABox> result = makeSubBoxes(box, GenIndices<s_nSubBoxes>());
+          std::vector<ABox> result = makeSubBoxes(box, std::make_index_sequence<s_nSubBoxes>());
           // Apply further divisions sectorLevelSkip times and return all boxes.
           for (int iSkipped = 0; iSkipped < m_sectorLevelSkip; ++iSkipped) {
             std::vector<ABox> sectoredBoxes;
             sectoredBoxes.reserve(result.size() * s_nSubBoxes);
             for (const ABox& boxToDivide : result) {
-              for (const ABox& dividedBox : makeSubBoxes(boxToDivide, GenIndices<s_nSubBoxes>())) {
+              for (const ABox& dividedBox : makeSubBoxes(boxToDivide, std::make_index_sequence<s_nSubBoxes>())) {
                 sectoredBoxes.push_back(dividedBox);
               }
             }
@@ -84,20 +84,20 @@ namespace Belle2 {
 
           return result;
         }
-        return makeSubBoxes(box, GenIndices<s_nSubBoxes>());
+        return makeSubBoxes(box, std::make_index_sequence<s_nSubBoxes>());
       }
 
       /// Make all subboxs with overlap of the given box.
       template<std::size_t... Is>
       std::vector<ABox>
-      makeSubBoxes(const ABox& box, IndexSequence<Is...> /*globalSubBoxIndex*/)
+      makeSubBoxes(const ABox& box, std::index_sequence<Is...> /*globalSubBoxIndex*/)
       {
-        return {{ makeSubBox(box, Is, GenIndices<sizeof...(divisions)>())... }};
+        return {{ makeSubBox(box, Is, std::make_index_sequence<sizeof...(divisions)>())... }};
       }
 
       /// Make the subbox with overlaps of the given box at global index.
       template <std::size_t... Is>
-      ABox makeSubBox(const ABox& box, std::size_t globalISubBox, IndexSequence<Is...> /*coordinatesIndex*/)
+      ABox makeSubBox(const ABox& box, std::size_t globalISubBox, std::index_sequence<Is...> /*coordinatesIndex*/)
       {
         std::array<std::size_t, sizeof...(divisions)> indices;
         for (size_t c_Index = 0 ; c_Index <  sizeof...(divisions); ++c_Index) {

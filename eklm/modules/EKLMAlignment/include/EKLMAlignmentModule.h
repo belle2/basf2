@@ -62,8 +62,38 @@ namespace Belle2 {
 
   private:
 
+    /** Payload name. */
+    std::string m_PayloadName;
+
     /** Mode. */
     std::string m_Mode;
+
+    /** What should be randomly displaced */
+    std::string m_RandomDisplacement;
+
+    /** If the displacement should be the same for all sectors. */
+    bool m_SectorSameDisplacement;
+
+    /** Fix sector dx at 0. */
+    bool m_SectorZeroDx;
+
+    /** Fix sector dy at 0. */
+    bool m_SectorZeroDy;
+
+    /** Fix sector dalpha at 0. */
+    bool m_SectorZeroDalpha;
+
+    /** Sector dx */
+    double m_SectorDx;
+
+    /** Sector dy. */
+    double m_SectorDy;
+
+    /** Sector dalpha. */
+    double m_SectorDalpha;
+
+    /** Name of input file. */
+    std::string m_InputFile;
 
     /** Name of output file. */
     std::string m_OutputFile;
@@ -72,14 +102,49 @@ namespace Belle2 {
     const EKLM::GeometryData* m_GeoDat;
 
     /**
+     * Fill EKLMAlignment with zero displacements.
+     * @param[in,out] alignment EKLMAlignment dbobject.
+     */
+    void fillZeroDisplacements(EKLMAlignment* alignment);
+
+    /**
      * Generation of zero displacements.
      */
     void generateZeroDisplacement();
 
     /**
-     * Generation of random displacements.
+     * Generation of fixed sector displacements.
+     * @param[in] dx     dx.
+     * @param[in] dy     dy.
+     * @param[in] dalpha dalpha.
      */
-    void generateRandomDisplacement();
+    void generateFixedSectorDisplacement(double dx, double dy, double dalpha);
+
+    /**
+     * Generation of random displacements.
+     * @param[in] displaceSector  Whether sectors should be displaced.
+     * @param[in] displaceSegment Whether segments should be displaced.
+     */
+    void generateRandomDisplacement(bool displaceSector, bool displaceSegment);
+
+    /**
+     * Read displacement from ROOT file.
+     */
+    void readDisplacementFromROOTFile();
+
+    /**
+     * Generate random sector displacements and check if they are correct
+     * (no overlaps).
+     * @oaram[in] f Output file.
+     */
+    void studySectorAlignmentLimits(TFile* f);
+
+    /**
+     * Generate random segment displacements and check if they are correct
+     * (no overlaps).
+     * @oaram[in] f Output file.
+     */
+    void studySegmentAlignmentLimits(TFile* f);
 
     /**
      * Generate random displacements and check if they are correct

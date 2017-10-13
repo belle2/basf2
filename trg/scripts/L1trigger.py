@@ -10,7 +10,7 @@ from gdltrigger import add_gdl_trigger
 from effCalculation import EffCalculation
 
 
-def add_tsim(path, SimulationMode=1, minHits=4, OpenFilter=False):
+def add_tsim(path, SimulationMode=1, shortTracks=False, OpenFilter=False, Belle2Phase="Phase2"):
     """
     add the gdl module to path
     @param path            module is added to this path
@@ -22,10 +22,33 @@ def add_tsim(path, SimulationMode=1, minHits=4, OpenFilter=False):
     @param OpenFilter      if OpenFilter is True, the events failed to pass L1 trigger
                            will be discarded. Make sure you do need open filter before you
                            set the value to True
+    @param Belle2Phase      the trigger menu at the phase is applied. Option: Phase2, Phase3
     """
-    add_cdc_trigger(path, SimulationMode, minHits)
+    add_cdc_trigger(path=path, SimulationMode=SimulationMode, shortTracks=shortTracks, thetaDef='avg', zDef='min')
     add_ecl_trigger(path)
     add_klm_trigger(path)
     add_grl_trigger(path, SimulationMode)
-    add_gdl_trigger(path, SimulationMode, OpenFilter)
+    add_gdl_trigger(path=path, SimulationMode=SimulationMode, OpenFilter=OpenFilter, Belle2Phase=Belle2Phase)
+    EffCalculation(path)
+    path.add_module('StatisticsSummary').set_name('Sum_TriggerSimulation')
+
+
+def add_subdetector_tsim(path, SimulationMode=1, shortTracks=False, OpenFilter=False, Belle2Phase="Phase2"):
+    """
+    add the trigger simlation of subdetector, no grl and gdl
+    the parameters are the same as above
+    """
+    add_cdc_trigger(path=path, SimulationMode=SimulationMode, shortTracks=shortTracks)
+    add_ecl_trigger(path=path)
+    add_klm_trigger(path=path)
+
+
+def add_grl_gdl_tsim(path, SimulationMode=1, OpenFilter=False, Belle2Phase="Phase2"):
+    """
+    add grl and gdl, the function have to applied based on the
+    dataobjects produced in add_subdetector_trigger_simulation
+    the parameters are the same as above
+    """
+    add_grl_trigger(path, SimulationMode)
+    add_gdl_trigger(path, SimulationMode, OpenFilter, Belle2Phase)
     EffCalculation(path)

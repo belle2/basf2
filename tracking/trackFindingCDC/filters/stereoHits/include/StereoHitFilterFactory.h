@@ -10,10 +10,13 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/stereoHits/BaseStereoHitFilter.h>
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    // Guard to prevent repeated instantiations
+    extern template class FilterFactory<BaseStereoHitFilter>;
 
     /// Factory that can create appropriate stereo hit to track combination filters from associated names.
     class StereoHitFilterFactory : public FilterFactory<BaseStereoHitFilter> {

@@ -16,10 +16,13 @@
 #include <tracking/trackFindingCDC/filters/trackRelation/HitGapTrackRelationVarSet.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/FitTrackRelationVarSet.h>
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.icc.h>
+
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::UnionRecordingFilter<TrackRelationFilterFactory>;
 
 std::vector<std::string>
 UnionRecordingTrackRelationFilter::getValidVarSetNames() const
@@ -33,14 +36,14 @@ std::unique_ptr<BaseVarSet<Relation<const CDCTrack> > >
 UnionRecordingTrackRelationFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {
-    return makeUnique<BasicTrackRelationVarSet>();
+    return std::make_unique<BasicTrackRelationVarSet>();
   } else if (name == "hit_gap") {
-    return makeUnique<HitGapTrackRelationVarSet>();
+    return std::make_unique<HitGapTrackRelationVarSet>();
   } else if (name == "feasible") {
     MVAFeasibleTrackRelationFilter filter;
     return std::move(filter).releaseVarSet();
   } else if (name == "fit") {
-    return makeUnique<FitTrackRelationVarSet>();
+    return std::make_unique<FitTrackRelationVarSet>();
   } else if (name == "realistic") {
     MVARealisticTrackRelationFilter filter;
     return std::move(filter).releaseVarSet();

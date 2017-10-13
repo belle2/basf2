@@ -209,11 +209,10 @@ if __name__ == '__main__':
             o += graphics.finish()
 
         o += b2latex.Section("Classifier Plot")
-        o += b2latex.String("""
-            This section contains the receiver operating characteristics (ROC), purity projection, ...
-            of the classifiers on training and independent data.
-            The legend of each plot contains the shortened identifier and the area under the ROC curve in parenthesis.
-        """)
+        o += b2latex.String("This section contains the receiver operating characteristics (ROC), purity projection, ..."
+                            "of the classifiers on training and independent data."
+                            "The legend of each plot contains the shortened identifier and the area under the ROC curve"
+                            "in parenthesis.")
 
         o += b2latex.Section("ROC Plot")
         graphics = b2latex.Graphics()
@@ -293,9 +292,8 @@ if __name__ == '__main__':
                 o += graphics.finish()
 
         o += b2latex.Section("Spectators")
-        o += b2latex.String("""
-            This section contains the distribution and dependence on the classifier outputs of all spectator variables.
-        """)
+        o += b2latex.String("This section contains the distribution and dependence on the"
+                            "classifier outputs of all spectator variables.")
 
         table = b2latex.LongTable(r"ll", "Abbreviations of spectators", "{name} & {abbr}", r"Spectator & Abbreviation")
         for s in spectators:
@@ -315,12 +313,14 @@ if __name__ == '__main__':
             o += graphics.finish()
 
             for identifier in identifiers:
+                o += b2latex.SubSubSection(format.string(spectator) + " with classifier " + format.string(identifier))
                 identifier_abbr = identifier_abbreviations[identifier]
                 data = {identifier_abbr: test_probability[identifier_abbr], spectator_abbr: spectators_data[spectator_abbr]}
                 graphics = b2latex.Graphics()
                 p = plotting.Correlation()
-                p.add(data, spectator_abbr, identifier_abbr, list(range(10, 100, 10)), test_target[identifier_abbr] == 0)
-                p.axis.set_title("Correlation plot for {}".format(identifier))
+                p.add(data, spectator_abbr, identifier_abbr, list(range(10, 100, 10)),
+                      test_target[identifier_abbr] == 1,
+                      test_target[identifier_abbr] == 0)
                 p.finish()
                 p.save('correlation_plot_{}_{}.png'.format(hash(spectator), hash(identifier)))
                 graphics.add('correlation_plot_{}_{}.png'.format(hash(spectator), hash(identifier)), width=1.0)

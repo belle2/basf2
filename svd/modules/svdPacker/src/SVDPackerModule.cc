@@ -41,7 +41,8 @@ REG_MODULE(SVDPacker)
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDPackerModule::SVDPackerModule() : Module()
+SVDPackerModule::SVDPackerModule() : Module(),
+  m_FADCTriggerNumberOffset(0)
 {
   // Set module properties
 
@@ -52,6 +53,8 @@ SVDPackerModule::SVDPackerModule() : Module()
   //addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string(""));
   addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", FileSystem::findFile("data/svd/svd_mapping.xml"));
   addParam("NodeID", m_nodeid, "Node ID", 0);
+  addParam("FADCTriggerNumberOffset", m_FADCTriggerNumberOffset,
+           "number to be added to the FADC trigger number to match the main trigger number", 0);
   // initialize event #
   n_basf2evt = 0;
 
@@ -69,6 +72,7 @@ void SVDPackerModule::initialize()
 
   StoreArray<RawSVD>::registerPersistent(m_rawSVDListName);
   StoreArray<SVDDigit>::required(m_svdDigitListName);
+  m_eventMetaDataPtr.required();
   loadMap();
   prepFADClist();
 
@@ -90,6 +94,13 @@ void SVDPackerModule::event()
 
   StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
   StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
+
+  if (!m_eventMetaDataPtr.isValid()) {  // give up...
+    B2ERROR("Missing valid EventMetaData.");
+    return;
+  }
+
+
 
   rawSVDList.clear();
 
@@ -187,14 +198,16 @@ void SVDPackerModule::event()
     addData32(data32);
 
     m_FTBHeader.errorsField = 0;
-    m_FTBHeader.eventNumber = iFADC; // for now FTB header contains FTB number 0-47 !!!!!!!!!!
+    m_FTBHeader.eventNumber = (m_eventMetaDataPtr->getEvent() & 0xFFFFFF);
 
     addData32(data32);
 
 
     // here goes FADC header
-    m_MainHeader.trgNumber = 0;
+    m_MainHeader.trgNumber = ((m_eventMetaDataPtr->getEvent() - m_FADCTriggerNumberOffset) & 0xFF);
+    m_MainHeader.trgType = 0xf;
     m_MainHeader.trgTiming = 0;
+    m_MainHeader.onebit = 0;
     m_MainHeader.FADCnum = iFADCnumber[iFADC]; // write original FADC number
     m_MainHeader.evtType = 0;
     m_MainHeader.runType = 0x2; //zero-suppressed mode
@@ -207,8 +220,12 @@ void SVDPackerModule::event()
       // here goes APV header
       m_APVHeader.CMC1 = 0;
       m_APVHeader.CMC2 = 0;
-      m_APVHeader.reserved = 0;
-      m_APVHeader.errorBit = 0;
+
+      m_APVHeader.FIFOfullErr = 0;
+      m_APVHeader.FrameErr = 0;
+      m_APVHeader.DetectErr = 0;
+      m_APVHeader.APVErr = 0;
+
       m_APVHeader.pipelineAddr = 0;
       m_APVHeader.APVnum = iAPV;
       m_APVHeader.check = 2;

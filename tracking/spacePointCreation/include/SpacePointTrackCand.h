@@ -13,6 +13,7 @@
 // framework
 #include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/core/FrameworkExceptions.h>
 
 // SpacePoint
 #include <tracking/spacePointCreation/SpacePoint.h>
@@ -111,15 +112,6 @@ namespace Belle2 {
      */
     bool operator == (const SpacePointTrackCand& rhs);
 
-
-    /**
-     * Compares two track candidates and determines if they share hits.
-    *
-    * optional parameter determines if TCs shall be compared at SpacePoint-level (standard, true) or at Cluster level (= false)
-     * If at least one Hit is shared, return value is true -> tracks are overlapping.
-     * Return value is false if no hits are shared.
-     * */
-    bool checkOverlap(const SpacePointTrackCand& rhs, bool compareSPs = true);
 
     /**
      * get hits (space points) of track candidate

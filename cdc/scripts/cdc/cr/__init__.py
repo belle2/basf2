@@ -1,5 +1,6 @@
 from basf2 import *
 from ROOT import Belle2
+import ROOT
 from tracking import add_cdc_cr_track_finding
 from tracking import add_cdc_track_finding
 from tracking import add_cdc_cr_track_fit_and_track_creator
@@ -14,7 +15,8 @@ run_range = {'201607': [787, 833],
              '201608b': [917, 924],
              '201609': [966, 973],
              '201702': [1601, 9999],
-             'noamal': [-1, -1]
+             'gcr2017': [3058, 100000],
+             'normal': [-1, -1]
              }
 # Size of trigger counter.
 triggerSize = {'201607': [20.0, 6.0, 10.0],
@@ -22,6 +24,7 @@ triggerSize = {'201607': [20.0, 6.0, 10.0],
                '201608b': [100.0, 8.0, 10.0],
                '201609': [100.0, 8.0, 10.0],
                '201702': [100.0, 8.0, 10.0],
+               'gcr2017': [100, 0, 8.0, 10.0],
                'normal': [100.0, 8.0, 10.0]
                }
 # Center position of trigger counter.
@@ -30,6 +33,7 @@ triggerPosition = {'201607': [0.3744, 0.0, -1.284],
                    '201608b': [-1.87, -1.25, 11.0],
                    '201609': [0, 0, 11.0],
                    '201702': [0., -1.5, 21.0],
+                   'gcr2017': [0.0, 0.0, 0.0],
                    'normal': [0.0, 0.0, 0.0]
                    }
 
@@ -39,6 +43,7 @@ triggerPlaneDirection = {'201607': [1, -1, 0],
                          '201608b': [0, 1, 0],
                          '201609': [0, 1, 0],
                          '201702': [0, 1, 0],
+                         'gcr2017': [0, 1, 0],
                          'normal': [0, 1, 0]
                          }
 
@@ -48,6 +53,7 @@ pmtPosition = {'201607': [0, 0, 0],
                '201608b': [-1.87, 0, -42.0],
                '201609': [0, 0, -42.0],
                '201702': [0., -1.5, -31.0],
+               'gcr2017': [0.0, 0.0, -50.0],
                'normal': [0, 0, -50.0]
                }
 
@@ -57,6 +63,7 @@ globalPhiRotation = {'201607': 1.875,
                      '201608b': 1.875,
                      '201609': 1.875,
                      '201702': 0.0,
+                     'gcr2017': 0.0,
                      'normal': 0.0
                      }
 
@@ -66,6 +73,7 @@ triggerPos = []
 normTriggerPlaneDirection = []
 readOutPos = []
 globalPhi = 0.0
+cosmics_period = None
 
 
 def set_cdc_cr_parameters(period):
@@ -76,6 +84,7 @@ def set_cdc_cr_parameters(period):
     global normTriggerPlaneDirection
     global readOutPos
     global globalPhi
+    global cosmics_period
 
     lengthOfCounter = triggerSize[period][0]
     widthOfCounter = triggerSize[period][1]
@@ -83,6 +92,7 @@ def set_cdc_cr_parameters(period):
     normTriggerPlaneDirection = triggerPlaneDirection[period]
     readOutPos = pmtPosition[period]
     globalPhi = globalPhiRotation[period]
+    cosmics_period = period
 
 
 def add_cdc_cr_simulation(path, empty_path, topInCounter=True):
@@ -133,49 +143,109 @@ def add_cdc_cr_simulation(path, empty_path, topInCounter=True):
     path.add_module('CDCDigitizer')
 
 
-def add_cdc_cr_reconstruction(path, eventTimingExtraction=False):
+def add_cdc_cr_reconstruction(path, eventTimingExtraction=True,
+                              topInCounter=False):
     """
     Add CDC CR reconstruction
     """
 
     # Add cdc track finder
-    add_cdc_cr_track_finding(path)
+    add_cdc_cr_track_finding(path, merge_tracks=False)
 
     # Setup Genfit extrapolation
     path.add_module("SetupGenfitExtrapolation")
 
-    # Add cdc track fitter
-    add_cdc_cr_track_fit_and_track_creator(path,
-                                           eventTimingExtraction=eventTimingExtraction,
-                                           lightPropSpeed=lightPropSpeed,
-                                           triggerPos=triggerPos,
-                                           normTriggerPlaneDirection=normTriggerPlaneDirection,
-                                           readOutPos=readOutPos
-                                           )
+    # Time seed
+    path.add_module("PlaneTriggerTrackTimeEstimator",
+                    pdgCodeToUseForEstimation=13,
+                    triggerPlanePosition=triggerPos,
+                    triggerPlaneDirection=normTriggerPlaneDirection,
+                    useFittedInformation=False)
+
+    # Initial track fitting
+    path.add_module("DAFRecoFitter",
+                    probCut=0.00001,
+                    pdgCodesToUseForFitting=13,
+                    )
+
+    # Correct time seed with TOP in counter.
+    path.add_module("PlaneTriggerTrackTimeEstimator",
+                    pdgCodeToUseForEstimation=13,
+                    triggerPlanePosition=triggerPos,
+                    triggerPlaneDirection=normTriggerPlaneDirection,
+                    useFittedInformation=True,
+                    useReadoutPosition=topInCounter,
+                    readoutPosition=readOutPos,
+                    readoutPositionPropagationSpeed=lightPropSpeed
+                    )
+
+    # Track fitting
+    path.add_module("DAFRecoFitter",
+                    # probCut=0.00001,
+                    pdgCodesToUseForFitting=13,
+                    )
+
+    if eventTimingExtraction is True:
+        # Extract the time
+        path.add_module("FullGridTrackTimeExtraction",
+                        recoTracksStoreArrayName="RecoTracks",
+                        maximalT0Shift=40,
+                        minimalT0Shift=-40,
+                        numberOfGrids=6
+                        )
+
+        # Track fitting
+        path.add_module("DAFRecoFitter",
+                        # probCut=0.00001,
+                        pdgCodesToUseForFitting=13,
+                        )
+
+    # Create Belle2 Tracks from the genfit Tracks
+    path.add_module('TrackCreator',
+                    defaultPDGCode=13,
+                    useClosestHitToIP=True,
+                    useBFieldAtHit=True
+                    )
 
 
-def getExpNumber(fname):
+def getExpRunNumber(fname):
     """
-    Get expperimental number from file name.
+    Get expperimental number and run number from file name.
     """
-    exp = int((fname.split('/')[-1]).split('.')[2])
-    return exp
+    f = ROOT.TFile(fname)
+    t = f.Get('tree')
+    t.GetEntry(0)
+    e = t.EventMetaData
+    exp = e.getExperiment()
+    run = e.getRun()
+    f.Close()
+    return [exp, run]
 
 
 def getRunNumber(fname):
     """
     Get run number from file name.
     """
-    run = int((fname.split('/')[-1]).split('.')[3])
+    f = ROOT.TFile(fname)
+    t = f.Get('tree')
+    t.GetEntry(0)
+    e = t.EventMetaData
+    run = e.getRun()
+    f.Close()
     return run
 
 
-def getDataPeriod(run):
+def getDataPeriod(exp=0, run=0):
     """
     Get data period from run number
     It should be replaced the argument from run to (exp, run)!
     """
     period = None
+
+    if exp is 1:  # GCR2017
+        return 'gcr2017'
+
+    # Pre global cosmics until March 2017
     global run_range
 
     for key in run_range:
@@ -194,3 +264,13 @@ def getDataPeriod(run):
 def getPhiRotation():
     global globalPhi
     return(globalPhi)
+
+
+def getMapperAngle(exp=1, run=3118):
+    if exp == 1:
+        if run < 3883:
+            return 16.7
+        else:
+            return 43.3
+    else:
+        return None

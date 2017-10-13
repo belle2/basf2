@@ -73,7 +73,12 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
   addParam(c_SteerBranchNames[1], m_branchNames[1],
            "Names of persistent durability branches to be saved. Empty means all branches. Objects with c_DontWriteOut flag added here will also be saved. (FileMetaData is always saved)",
            emptyvector);
-
+  addParam(c_SteerAdditionalBranchNames[0], m_additionalBranchNames[0],
+           "Add additional event branch names without the need to specify all branchnames.",
+           emptyvector);
+  addParam(c_SteerAdditionalBranchNames[1], m_additionalBranchNames[1],
+           "Add additional persistent branch names without the need to specify all branchnames.",
+           emptyvector);
   addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0],
            "Names of event durability branches NOT to be saved. Branches also in branchNames are not saved.", emptyvector);
   addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1],
@@ -88,6 +93,7 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
   addParam("additionalDataDescription", m_additionalDataDescription, "Additional dictionary of "
            "name->value pairs to be added to the file metadata to describe the data",
            m_additionalDataDescription);
+  addParam("buildIndex", m_buildIndex, "Build Event Index for faster finding of events by exp/run/event number", m_buildIndex);
 }
 
 
@@ -105,7 +111,7 @@ void RootOutputModule::initialize()
 
   setOutputFile();
   TDirectory* dir = gDirectory;
-  m_file = new TFile(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
+  m_file = TFile::Open(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
   if (m_file->IsZombie()) {
     //try creating necessary directories
     boost::filesystem::path dirpath(m_outputFileName);
@@ -138,7 +144,9 @@ void RootOutputModule::initialize()
       const std::string& branchName = iter->first;
       //skip transient entries (allow overriding via branchNames)
       if (iter->second.dontWriteOut
-          && find(m_branchNames[durability].begin(), m_branchNames[durability].end(), branchName) == m_branchNames[durability].end())
+          && find(m_branchNames[durability].begin(), m_branchNames[durability].end(), branchName) == m_branchNames[durability].end()
+          && find(m_additionalBranchNames[durability].begin(), m_additionalBranchNames[durability].end(),
+                  branchName) ==  m_additionalBranchNames[durability].end())
         continue;
       //skip branches the user doesn't want
       if (branchList.count(branchName) == 0) {
@@ -240,12 +248,14 @@ void RootOutputModule::fillFileMetaData()
     //create an index for the event tree
     TTree* tree = m_tree[DataStore::c_Event];
     unsigned long numEntries = tree->GetEntries();
-    if (numEntries > 10000000) {
-      //10M events correspond to about 240MB for the TTreeIndex object. for more than ~45M entries this causes crashes, broken files :(
-      B2WARNING("Not building TTree index because of large number of events. The index object would conflict with ROOT limits on object size and cause problems.");
-    } else if (tree->GetBranch("EventMetaData")) {
-      tree->SetBranchAddress("EventMetaData", 0);
-      RootIOUtilities::buildIndex(tree);
+    if (m_buildIndex) {
+      if (numEntries > 10000000) {
+        //10M events correspond to about 240MB for the TTreeIndex object. for more than ~45M entries this causes crashes, broken files :(
+        B2WARNING("Not building TTree index because of large number of events. The index object would conflict with ROOT limits on object size and cause problems.");
+      } else if (tree->GetBranch("EventMetaData")) {
+        tree->SetBranchAddress("EventMetaData", 0);
+        RootIOUtilities::buildIndex(tree);
+      }
     }
 
     fileMetaDataPtr->setNEvents(numEntries);

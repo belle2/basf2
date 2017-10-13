@@ -192,8 +192,7 @@ namespace Belle2 {
           double time = gRandom->Rndm() * sampleTimes->getTimeRange();
           unsigned window = gRandom->Rndm() * m_storageWindows;
           double sample = sampleTimes->getSample(window, time);
-          int tdc = int(sample * m_sampleDivisions);
-          auto* digit = digits.appendNew(moduleID, pixelID, tdc);
+          auto* digit = digits.appendNew(moduleID, pixelID, sample);
           digit->setFirstWindow(window);
           digit->setTime(time);
           digit->setTimeError(timeError);
@@ -203,8 +202,7 @@ namespace Belle2 {
           // second calpulse
           time += gRandom->Gaus(m_timeDifference, m_timeResolution);
           sample = sampleTimes->getSample(window, time);
-          tdc = int(sample * m_sampleDivisions);
-          digit = digits.appendNew(moduleID, pixelID, tdc);
+          digit = digits.appendNew(moduleID, pixelID, sample);
           digit->setFirstWindow(window);
           digit->setTime(time);
           digit->setTimeError(timeError);

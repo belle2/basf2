@@ -109,18 +109,9 @@ namespace Belle2 {
        * Add data
        * @param moduleID module ID
        * @param pixelID pixel ID (e.g. software channel, 1-based)
-       * @param TDC digitized time
-       * @param time t0-corrected time in [ns] converted from TDC
+       * @param time t0-corrected time in [ns]
        */
-      int addData(int moduleID, int pixelID, int TDC, double time);
-
-      /**
-       * Add data (for backward compatibility only)
-       * @param moduleID module ID
-       * @param pixelID pixel ID (e.g. software channel, 1-based)
-       * @param TDC digitized time
-       */
-      int addData(int moduleID, int pixelID, int TDC);
+      int addData(int moduleID, int pixelID, double time);
 
       /**
        * Return size of data list

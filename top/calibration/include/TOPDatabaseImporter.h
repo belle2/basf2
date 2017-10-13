@@ -39,9 +39,10 @@ namespace Belle2 {
 
     /**
      * Import sample time calibration constants to database
-     * @param fileName text file name with calibration constants
+     * Output of TOPTimeBaseCalibrator (root files with histograms)
+     * @param fileNames file names separated by space (since vector doesn't work!)
      */
-    void importSampleTimeCalibration(std::string fileName);
+    void importSampleTimeCalibration(std::string fileNames);
 
     /**
      * Import sample time calibration constants to database
@@ -58,6 +59,11 @@ namespace Belle2 {
     void importChannelT0CalibrationKichimi(std::string fileNames);
 
     /**
+     * Prints sample time calibration info about constants stored in database
+     */
+    void getSampleTimeCalibrationInfo();
+
+    /**
      * Print sample time calibration constants stored in database
      */
     void printSampleTimeCalibration();
@@ -68,6 +74,48 @@ namespace Belle2 {
      * @param fractionHot the fraction of noisy PMs to randomly assign
      */
     void generateFakeChannelMask(double fractionDead, double fractionHot);
+
+    /**
+     * Import PMT Quantum Efficiency data to database
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtQEData(std::string fileName, std::string treeName);
+
+    /**
+     * Import PMT gain parameters data to database
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtGainData(std::string fileName, std::string treeName);
+
+    /**
+     * Import PMT installation data to database
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtInstallationData(std::string fileName, std::string treeName);
+
+    /**
+     * Import PMT specifications from Hamamatsu (not to be used!)
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtObsoleteData(std::string fileName, std::string treeName);
+
+    /**
+     * Import gaussians fitting the TTS distributions
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtTTSPar(std::string fileName, std::string treeName);
+
+    /**
+     * Import histograms used for PMT TTS determination
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtTTSHisto(std::string fileName, std::string treeName);
 
     /**
      * for testing purposes only! - will be removed ...

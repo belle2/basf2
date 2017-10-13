@@ -37,6 +37,19 @@ CDCTrigger2DFinderModule::countSL(bool* layer)
   return lcnt;
 }
 
+bool
+CDCTrigger2DFinderModule::shortTrack(bool* layer)
+{
+  unsigned short lcnt = 0;
+  // check axial super layers (even layer number),
+  // break at first layer without hit
+  for (int i = 0; i < CDC_SUPER_LAYERS; i += 2) {
+    if (layer[i] == true) ++lcnt;
+    else break;
+  }
+  return (lcnt >= m_minHitsShort);
+}
+
 /*
 * Find the intercept in hough space.
 * In each iteration the Hough plane is divided in quarters.
@@ -130,7 +143,7 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
               << " layerHit " << int(layerHit[0]) << int(layerHit[2])
               << int(layerHit[4]) << int(layerHit[6]) << int(layerHit[8])
               << " nSL " << nSL);
-      if (nSL >= m_minHits) {
+      if (nSL >= m_minHits || shortTrack(layerHit)) {
         if (iterations != maxIterations) {
           fastInterceptFinder(hits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);
         } else {
@@ -573,11 +586,11 @@ CDCTrigger2DFinderModule::patternClustering()
         }
       }
       if (overflowRight && !overflowTop) {
-        B2WARNING("cluster extends right of " << rX << " x " << rY << " area");
+        B2DEBUG(100, "cluster extends right of " << rX << " x " << rY << " area");
       } else if (overflowTop && !overflowRight) {
-        B2WARNING("cluster extends above " << rX << " x " << rY << " area");
+        B2DEBUG(100, "cluster extends above " << rX << " x " << rY << " area");
       } else if (overflowRight && overflowTop) {
-        B2WARNING("cluster extends right and above " << rX << " x " << rY << " area");
+        B2DEBUG(100, "cluster extends right and above " << rX << " x " << rY << " area");
       }
       // find corners of cluster
       unsigned topRight2 = topRightSquare(pattern);
@@ -623,7 +636,7 @@ CDCTrigger2DFinderModule::patternClustering()
       }
       if (idList.size() == 0) {
         setReturnValue(false);
-        B2WARNING("id list empty");
+        B2DEBUG(100, "id list empty");
       }
 
       // select 1 hit per super layer
@@ -749,7 +762,7 @@ CDCTrigger2DFinderModule::topRightSquare(vector<unsigned>& pattern)
       }
       if (!unique) {
         setReturnValue(false);
-        B2WARNING("topRightSquare not unique");
+        B2DEBUG(100, "topRightSquare not unique");
       }
     }
     return index;
@@ -767,7 +780,7 @@ CDCTrigger2DFinderModule::topRightCorner(unsigned pattern)
   if ((pattern >> 1) & 1) {
     if ((pattern >> 2) & 1) {
       setReturnValue(false);
-      B2WARNING("topRightCorner not unique");
+      B2DEBUG(100, "topRightCorner not unique");
     }
     return 1;
   }
@@ -785,7 +798,7 @@ CDCTrigger2DFinderModule::bottomLeftCorner(unsigned pattern)
   if ((pattern >> 2) & 1) {
     if ((pattern >> 1) & 1) {
       setReturnValue(false);
-      B2WARNING("bottomLeftCorner not unique");
+      B2DEBUG(100, "bottomLeftCorner not unique");
     }
     return 2;
   }

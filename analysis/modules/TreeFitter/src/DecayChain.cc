@@ -31,7 +31,7 @@ namespace TreeFitter {
       it->print(os) ;
   }
 
-  DecayChain::DecayChain(Particle* particle, bool forceFitAll)
+  DecayChain::DecayChain(Belle2::Particle* particle, bool forceFitAll)
     : m_dim(0), m_mother(0), m_isOwner(true)
   {
     m_mother = ParticleBase::createParticle(particle, 0, forceFitAll);
@@ -62,7 +62,8 @@ namespace TreeFitter {
     mergedconstraint = MergedConstraint() ;
     for (ParticleBase::constraintlist::iterator it =  m_constraintlist.begin() ;
          it != m_constraintlist.end(); ++it) {
-      if (it->isLinear()) m_mergedconstraintlist.push_back(&(*it)) ;
+      //      if (it->isLinear()) m_mergedconstraintlist.push_back(&(*it)) ;
+      if (true) m_mergedconstraintlist.push_back(&(*it)); //FT: never filter constraints together
       else  mergedconstraint.push_back(&(*it)) ;
     }
 
@@ -111,6 +112,7 @@ namespace TreeFitter {
     //#ifdef THEOLDWAY
     if (m_mergedconstraintlist.empty()) {//FT:Merged constraints actually crash this so the old method is used; go back and find out why
       for (ParticleBase::constraintlist::const_iterator it = m_constraintlist.begin() ;
+           //FT: as far as I can tell, this is never empty?
            it != m_constraintlist.end(); ++it) {
         //  status |= it->filter(&par) ;
         status |= it->filter(&par, &reference) ;
@@ -124,6 +126,7 @@ namespace TreeFitter {
       for (std::vector<Constraint*>::const_iterator it = m_mergedconstraintlist.begin() ;
            it != m_mergedconstraintlist.end(); ++it) {
         status |= (*it)->filter(&par) ;
+        B2WARNING("Not using referencing...");
         //  status |= (*it)->filter(&par,&reference) ; //FT: temporarily disabled because of crashing
         if (vtxverbose >= 2 && status.failure()) {
           std::cout << "status is failure after parsing constraint: " ;
@@ -143,7 +146,7 @@ namespace TreeFitter {
     return m_mother->chiSquare(par) ;
   }
 
-  const ParticleBase* DecayChain::locate(Particle* particle) const   //FT: This needs investigation
+  const ParticleBase* DecayChain::locate(Belle2::Particle* particle) const   //FT: This needs investigation
   {
     const ParticleBase* rc(0);
     // return _mother->locate(bc) ;
@@ -161,7 +164,7 @@ namespace TreeFitter {
     return rc ;
   }
 
-  int DecayChain::index(Particle* particle) const
+  int DecayChain::index(Belle2::Particle* particle) const
   {
     int rc = -1 ;
     const ParticleBase* base = locate(particle);
@@ -169,7 +172,7 @@ namespace TreeFitter {
     return rc;
   }
 
-  int DecayChain::posIndex(Particle* particle) const
+  int DecayChain::posIndex(Belle2::Particle* particle) const
   {
     int rc = -1 ;
     const ParticleBase* base = locate(particle);
@@ -177,7 +180,7 @@ namespace TreeFitter {
     return rc;
   }
 
-  int DecayChain::momIndex(Particle* particle) const
+  int DecayChain::momIndex(Belle2::Particle* particle) const
   {
     int rc = -1 ;
     const ParticleBase* base = locate(particle);
@@ -185,7 +188,7 @@ namespace TreeFitter {
     return rc ;
   }
 
-  int DecayChain::tauIndex(Particle* particle) const
+  int DecayChain::tauIndex(Belle2::Particle* particle) const
   {
     int rc = -1 ;
     const ParticleBase* base = locate(particle) ;

@@ -126,8 +126,7 @@ namespace Belle2 {
     StoreArray<TOPDigit> topDigits;
     for (const auto& digit : topDigits) {
       if (digit.getHitQuality() == TOPDigit::c_Good)
-        reco.addData(digit.getModuleID(), digit.getPixelID(), digit.getTDC(),
-                     digit.getTime());
+        reco.addData(digit.getModuleID(), digit.getPixelID(), digit.getTime());
     }
 
     // loop over reconstructed tracks and make sum of log likelihoods for diff. bunches

@@ -131,7 +131,7 @@ namespace Belle2 {
     for (int i = 0; i < ndigi; i++) {
       TOPDigit* digi = topDigits[i];
       int ich = c_NumChannels - getOldNumbering(digi->getPixelID());
-      if (digi->getTDC() < m_tdc[ich]) m_tdc[ich] = digi->getTDC(); // single hit TDC
+      if (digi->getRawTime() < m_tdc[ich]) m_tdc[ich] = digi->getRawTime(); // single hit TDC
     }
     m_nhit = 0;
     for (int ich = 0; ich < c_NumChannels; ich++) {

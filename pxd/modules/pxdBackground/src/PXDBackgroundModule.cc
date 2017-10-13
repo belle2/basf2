@@ -51,8 +51,7 @@ PXDBackgroundModule::PXDBackgroundModule() :
   m_doseReportingLevel(c_reportNTuple),
   m_nfluxReportingLevel(c_reportNTuple),
   m_occupancyReportingLevel(c_reportNTuple),
-  m_componentName(""), m_componentTime(0),
-  m_triggerWidth(5), m_acceptanceWidth(2.5), // keeps 99%
+  m_componentName(""), m_componentTime(0), m_integrationTime(20),
   m_nielNeutrons(new TNiel(c_niel_neutronFile)),
   m_nielProtons(new TNiel(c_niel_protonFile)),
   m_nielPions(new TNiel(c_niel_pionFile)),
@@ -64,9 +63,7 @@ PXDBackgroundModule::PXDBackgroundModule() :
   // FIXME: This information can in principle be extracted from bg files, though not trivially.
   addParam("componentName", m_componentName, "Background component name to process", m_componentName);
   addParam("componentTime", m_componentTime, "Background component time", m_componentTime);
-  addParam("triggerWidth", m_triggerWidth, "RMS of trigger time estimate in ns", m_triggerWidth);
-  addParam("acceptanceWidth", m_acceptanceWidth,
-           "A hit is accepted if arrived within +/- accpetanceWidth * RMS(hit time - trigger time) of trigger; in ns", m_acceptanceWidth);
+  addParam("integrationTime", m_integrationTime, "PXD integration time", m_integrationTime);
   addParam("doseReportingLevel", m_doseReportingLevel, "0 - no data, 1 - summary only, 2 - summary + ntuple", m_doseReportingLevel);
   addParam("nfluxReportingLevel", m_nfluxReportingLevel, "0 - no data, 1 - summary only, 2 - summary + ntuple",
            m_nfluxReportingLevel);
@@ -136,8 +133,7 @@ void PXDBackgroundModule::initialize()
   m_storeNeutronFluxesName = storeNeutronFluxes.getName();
 
   m_componentTime *= Unit::us;
-  m_acceptanceWidth *= Unit::ns;
-  m_triggerWidth *= Unit::ns;
+  m_integrationTime *= Unit::us;
 }
 
 void PXDBackgroundModule::beginRun()
@@ -307,26 +303,26 @@ void PXDBackgroundModule::event()
     }
   }
 
-  // Fired pixels
+  // Occupancy
   if (m_occupancyReportingLevel > c_reportNone) {
     B2DEBUG(100, "Fired pixels");
     currentSensorID.setID(0);
     double currentSensorCut = 0;
     // Store fired pixels: count number of digits over threshold
     std::map<VxdID, std::vector<float> > firedPixels;
-    for (const PXDDigit& digit : storeDigits) {
+    for (const PXDDigit& storeDigit : storeDigits) {
       // Filter out digits with signals below zero-suppression threshold
       // ARE THRE SUCH DIGITS?
-      VxdID sensorID = digit.getSensorID();
+      VxdID sensorID = storeDigit.getSensorID();
       if (sensorID != currentSensorID) {
         currentSensorID = sensorID;
         auto info = getInfo(sensorID);
         currentSensorCut = info.getChargeThreshold();
       }
-      B2DEBUG(30, "Digit charge: " << digit.getCharge() << " threshold: " << currentSensorCut);
-      if (digit.getCharge() <  currentSensorCut) continue;
+      B2DEBUG(30, "Digit charge: " << storeDigit.getCharge() << " threshold: " << currentSensorCut);
+      if (storeDigit.getCharge() <  currentSensorCut) continue;
       B2DEBUG(30, "Passed.");
-      firedPixels[sensorID].push_back(digit.getCharge());
+      firedPixels[sensorID].push_back(storeDigit.getCharge());
     }
     // Process the map
     for (auto idAndSet : firedPixels) {
@@ -337,7 +333,6 @@ void PXDBackgroundModule::event()
       m_sensorData[sensorID].m_fired += fired;
     }
 
-    // Occupancy
     B2DEBUG(100, "Occupancy");
     currentSensorID.setID(0);
     int nPixels = 0;
@@ -349,8 +344,9 @@ void PXDBackgroundModule::event()
         nPixels = info.getUCells() * info.getVCells();
       }
 
+      double w_acceptance =  m_integrationTime / currentComponentTime;
       double occupancy = 1.0 / nPixels * cluster.getSize();
-      m_sensorData[sensorID].m_occupancy +=  occupancy;
+      m_sensorData[sensorID].m_occupancy +=  w_acceptance * occupancy;
 
       if (m_occupancyReportingLevel == c_reportNTuple) {
         storeOccupancyEvents.appendNew(
@@ -384,7 +380,7 @@ void PXDBackgroundModule::terminate()
           << "expo\t"
           << "neutronFlux\t"
           << "fired\t"
-          << "occupancy\t"
+          << "occupancy"
           << endl;
   double componentTime = m_componentTime / Unit::us;
   for (auto vxdSensor : m_sensorData) {

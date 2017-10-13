@@ -72,7 +72,6 @@ void DqmHistoManagerModule::initialize()
 
   // Clear event counter
   m_nevent = 0;
-
 }
 
 void DqmHistoManagerModule::beginRun()
@@ -85,6 +84,16 @@ void DqmHistoManagerModule::beginRun()
     m_sock = new EvtSocketSend(m_hostname, m_port);
     printf("EvtSocketSend (Proc %d) : fd = %d\n", ProcHandler::EvtProcID(),
            (m_sock->sock())->sock());
+
+    m_pstep = m_interval / (ProcHandler::numEventProcesses() > 1 ? ProcHandler::numEventProcesses() : 1);
+    m_dstep = m_dumpinterval / (ProcHandler::numEventProcesses() > 1 ? ProcHandler::numEventProcesses() : 1);
+
+    m_ptime = time(NULL);
+    m_dtime = m_ptime;
+    if (ProcHandler:: EvtProcID() < 100) {
+      m_ptime -= m_pstep * ProcHandler::EvtProcID();
+      m_dtime += m_dstep * ProcHandler::EvtProcID();
+    }
     m_initialized = true;
   }
 }
@@ -101,56 +110,46 @@ void DqmHistoManagerModule::endRun()
 
 void DqmHistoManagerModule::event()
 {
-  //  if ( ProcHandler::EvtProcID() >= 10000 ) {
-  //    m_nevent++;
-  //    return;
-  //  }
   if (!m_initialized) {
     //    cout << "DqmHistoManager:: first pass in event() : proc="
     //   << ProcHandler::EvtProcID() << endl;
     RbTupleManager::Instance().begin(ProcHandler::EvtProcID());
     m_initialized = true;
   }
-  if ((ProcHandler::numEventProcesses() > 0 &&
-       ((ProcHandler::EvtProcID() < 100 &&
-         m_nevent % (m_interval / ProcHandler::numEventProcesses()) == 0) ||
-        (ProcHandler::EvtProcID() >= 10000 &&
-         m_nevent % m_interval == 0))) ||
-      (ProcHandler::numEventProcesses() == 0 &&
-       m_nevent % m_interval == 0)) {
-    //  if (m_nevent % m_interval == 0) {
+
+  time_t ctime = time(NULL);
+
+  // Transfer hitograms over network
+  if ((ctime - m_ptime) > m_interval) {
     //    printf ( "DqmHistoManager: event = %d\n", m_nevent );
     //    printf ( "DqmHistoManger: dumping histos.....\n" );
     m_msg->clear();
     m_nobjs = 0;
-
     // Stream histograms with directory structure
     StreamHistograms(gDirectory, m_msg);
 
     EvtMessage* msg = m_msg->encode_msg(MSG_EVENT);
     //    printf ( "Message Size = %d\n", msg->size() );
 
+    printf("DqmHistoManger(proc:%d): dumping histos.....%d histos\n",
+           ProcHandler::EvtProcID(), m_nobjs);
+    fflush(stdout);
+
     (msg->header())->reserved[0] = 0;
     (msg->header())->reserved[1] = m_nobjs;
     (msg->header())->reserved[2] = 0;
-
     if (m_nobjs > 0) {
-      printf("DqmHistoManger(proc:%d): dumping histos.....%d histos\n",
-             ProcHandler::EvtProcID(), m_nobjs);
       m_sock->send(msg);
     }
-
     delete(msg);
-
+    m_ptime = ctime;
+  }
+  // Dump histograms to file
+  if ((ctime - m_dtime) > m_dumpinterval) {
     // Dump histograms to file
     RbTupleManager::Instance().dump();
+    m_dtime = ctime;
   }
-
-  /*
-  if ( m_dumpinterval > 0 && m_nevent % m_dumpinterval == 0 && ProcHandler::EvtProcID() >= 20000) {
-    RbTupleManager::Instance().hadd(false);
-  }
-  */
 
   m_nevent++;
 
@@ -178,6 +177,9 @@ void DqmHistoManagerModule::terminate()
 
     delete(msg);
 
+    // Dump hitograms to file
+    RbTupleManager::Instance().dump();
+
     //    RbTupleManager::Instance().terminate();
     //    delete m_sock;
     //    delete m_msg;
@@ -199,11 +201,11 @@ int DqmHistoManagerModule::StreamHistograms(TDirectory* curdir, MsgHandler* msg)
     if (obj->IsA()->InheritsFrom("TH1")) {
       TH1* h1 = (TH1*) obj;
       //      printf ( "Key = %s, entry = %f\n", key->GetName(), h1->GetEntries() );
-      if (h1->GetEntries() > 0) {    // Do not send empty histograms
-        m_msg->add(h1, h1->GetName());
-        nobjs++;
-        m_nobjs++;
-      }
+      //      if (h1->GetEntries() > 0) {    // Do not send empty histograms
+      m_msg->add(h1, h1->GetName());
+      nobjs++;
+      m_nobjs++;
+      //      }
     } else if (obj->IsA()->InheritsFrom(TDirectory::Class())) {
       //      printf ( "New directory found  %s, Go into subdir\n", obj->GetName() );
       TDirectory* tdir = (TDirectory*) obj;
@@ -221,6 +223,7 @@ int DqmHistoManagerModule::StreamHistograms(TDirectory* curdir, MsgHandler* msg)
       curdir->cd();
     }
   }
+  return 0;
 }
 
 

@@ -52,7 +52,7 @@ int main(int argc, char** argv)
       int nsock = socket.size();
       while (true) {
         unsigned int nword = 0;
-        ibuf.read(evtbuf, false);
+        ibuf.read(evtbuf, false, false);
         nword = evtbuf[0];
         unsigned int evtno = evtbuf[4];
         if (info.isAvailable()) {

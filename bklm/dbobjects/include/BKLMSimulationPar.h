@@ -8,7 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#pragma once
+#ifndef BKLMSIMULATIONPAR_DB_H
+#define BKLMSIMULATIONPAR_DB_H
 
 #include <TObject.h>
 #include <framework/gearbox/Gearbox.h>
@@ -133,3 +134,4 @@ namespace Belle2 {
 
 } // end of namespace Belle2
 
+#endif

@@ -217,6 +217,9 @@ namespace Belle2 {
     /** If true for each event and each network created a file with a graph is created. */
     bool m_PARAMprintNetworks;
 
+    /** If true a file containing Mathematica code to generate a graph of the segment network is created. */
+    bool m_PARAMprintToMathematica;
+
     /** For debugging purposes: if true, all filters are deactivated for all hit-combinations and therefore all combinations are accepted. */
     bool m_PARAMallFiltersOff;
 

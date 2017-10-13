@@ -78,24 +78,13 @@ namespace Belle2 {
       rtra_clear_();
     }
 
-    int TOPreco::addData(int moduleID, int pixelID, int TDC, double time)
+    int TOPreco::addData(int moduleID, int pixelID, double time)
     {
       int status;
       moduleID--; // 0-based ID used in fortran
       pixelID--;   // 0-based ID used in fortran
       float t = (float) time;
-      data_put_(&moduleID, &pixelID, &TDC, &t, &status);
-      return status;
-    }
-
-
-    int TOPreco::addData(int moduleID, int pixelID, int TDC)
-    {
-      int status;
-      moduleID--; // 0-based ID used in fortran
-      pixelID--;   // 0-based ID used in fortran
-      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-      float t = geo->getNominalTDC().getTime(TDC);
+      int TDC = 0; // it's not used in Fortran code
       data_put_(&moduleID, &pixelID, &TDC, &t, &status);
       return status;
     }

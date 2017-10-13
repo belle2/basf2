@@ -4,7 +4,6 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Maeda Yosuke                                             *
- *               Umberto Tamponi                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,10 +19,7 @@
 namespace Belle2 {
 
   /**
-   * Module to produce an ntuple of smaller size respect to the data starting from TOPDigits and TOPRawDigits.
-   * Most of the braches of the tree are actual copies of the most relevant data members of TOPDigits and TOPRawDigits,
-   * except for few values with are slighty modified to make the analysis more immediate and easy (see the documentation of the single data members for more informations).
-   * The module is intended to provide a fast way to assest the quality of the TOP data before the calibration.
+   * Module to produce ntuple from TOPDigits and TOPRawDigits
    */
   class TOPInterimFENtupleModule : public HistoModule {
 
@@ -78,44 +74,59 @@ namespace Belle2 {
     /**
      * enum for maximum number of array elements (# of hits per event)
      */
-    enum { c_NMaxHit = 2000 };
+    enum { c_NWindow = 4, c_NSamplePerWindow = 64, c_NWaveformSample = 256,
+           c_NSampleTBC = 256, c_NPixelPerModule = 512, c_NWindowRingBuffer = 512,
+           c_NMaxHitPerChannel = 5, c_NMaxHitEvent = 5000
+         };
 
     TTree* m_tree = 0; /**< ntuple */
-    unsigned m_calibrationChannel; /**< asic channel number where the calibration pulses are routed */
+    unsigned m_calibrationChannel = 0; /**< asic channel number where the calibration pulses are routed */
+    bool m_saveWaveform = false; /**< set true when you want to save waveform data */
+    bool m_useDoublePulse = true; /**< set true when you require both of double calibration pulses for reference timing */
+    // float m_averageSamplingRate = 2.71394; /**< sampling rate with assumption of uniform interval in a unit of GHz */
+    float m_calibrationPulseThreshold1 =
+      600; /**< minimum pulse height for the first calibration pulse to be qualified as calibration signals */
+    float m_calibrationPulseThreshold2 =
+      450; /**< minimum pulse height for the secon calibration pulse to be qualified as calibration signals */
+    float m_calibrationPulseInterval = 21.85; /**< nominal DeltaT value (time interval of two calibration signals) in a unit of ns */
+    float m_calibrationPulseIntervalRange = 2; /**< tolerable shift of DeltaT from its nominal before calibration in a unit of ns */
 
     int m_nHit = 0; /**< number of hits for the event */
-    short m_slotNum[c_NMaxHit] = {0}; /**< "m_moduleID" in TOPDigit, slot number */
-    short m_pixelId[c_NMaxHit] = {0}; /**< "m_pixelID" in TOPDigit */
-    bool m_isCalCh[c_NMaxHit] = {0}; /**< true if the hit is in the calibration channel */
-    unsigned m_eventNum[c_NMaxHit] = {0}; /**< event number taken from EventMetaData */
-    short m_winNum[c_NMaxHit] = {0}; /**< "m_firstWindow" in TOPDigit */
-    float m_time[c_NMaxHit] = {0}; /**< "m_time" in TOPDigit, hit time after time base correction (thus in ns unit), but not yet available */
-
-    float m_rawTdc[c_NMaxHit] = {0}; /**< "m_TDC" in TOPDigit, divided by 16 to make it in sample unit */
-    float m_refTdc[c_NMaxHit] = {0}; /**< "m_rawTdc" in cal. channel */
-    unsigned short m_quality[c_NMaxHit] = {0}; /**< hit quality, from TOPDigit: c_Junk = 0, c_Good = 1, c_ChargeShare = 2, c_CrossTalk = 3, c_CalPulse = 4 */
-    unsigned short m_sample[c_NMaxHit] = {0}; /**< Actual 50% crossing sample in the whole waveform, calculated as (digit.getTDC() / 16 + digit.getFirstWindow() * 64) % 256. */
-
-    float m_height[c_NMaxHit] = {0}; /**< "m_ADC" in TOPDigit */
-    float m_q[c_NMaxHit] = {0}; /**< "m_integral" in TOPDigit, but not available */
-    float m_width[c_NMaxHit] = {0}; /**< "m_pulseWidth" in TOPDigit, full width at half maximum of the pulse */
-    short m_nPixelInRawDigit = 0; /**< # of pixels with hits in TOPRawDigits */
-
-    unsigned short m_carrier[c_NMaxHit] = {0}; /**< carrier board number, copy from TOPRawDigit */
-    unsigned short m_asic[c_NMaxHit] = {0};    /**< ASIC number, copy from TOPRawDigit */
-    unsigned short m_channel[c_NMaxHit] = {0};  /**< ASIC channel number,  copy from TOPRawDigit. */
-    unsigned short m_TFine[c_NMaxHit] = {0}; /**< fine timing for 50% CFD (within two samples), copied from TOPRawDigit */
-    unsigned short m_sampleRise[c_NMaxHit] = {0};  /**< sample number just before 50% CFD crossing, copied from in TOPRawDigit */
-    unsigned short m_samplePeak[c_NMaxHit] = {0}; /**< sample number of the peak position, calculated as TOPRawDigits.m_sampleRise + TOPRawDigits.m_dSamplePeak */
-    unsigned short m_sampleFall[c_NMaxHit] = {0}; /**< sample number of the peak position, calculated as TOPRawDigits.m_sampleRise + TOPRawDigits.m_dSampleFall */
-
-
-
+    short m_slotNum[c_NMaxHitEvent] = {0}; /**< "m_moduleID" in TOPDigit, slot number */
+    short m_pixelId[c_NMaxHitEvent] = {0}; /**< "m_pixelID" in TOPDigit */
+    bool m_isCalCh[c_NMaxHitEvent] = {0}; /**< true if the hit is in the calibration channel */
+    unsigned m_eventNum[c_NMaxHitEvent] = {0}; /**< event number taken from EventMetaData */
+    short m_winNum[c_NMaxHitEvent] = {0}; /**< "m_firstWindow" in TOPDigit */
+    short m_trigWinNum[c_NMaxHitEvent] = {0}; /**< "m_lastWriteAddr" in TOPRawDigit, window # when trigger is issued  */
+    short m_winNumList[c_NMaxHitEvent][c_NWindow] = {0}; /**< list of window numbers for recorded waveform, valid only when waveform analysis is enabled */
+    bool m_windowsInOrder[c_NMaxHitEvent] = {0}; /**< "areWindowsInOrder()" ; false if the window number of all (4) windows taken from TOPRawWaveform::getReferenceWindows() are consecutive */
+    unsigned char m_hitQuality[c_NMaxHitEvent] = {0}; /**< "m_quality" in TOPDigit, =0:junk, =1:good, =2:charge sharing, =3:cross talk, =4:cal. pulse, +10 if cal. pulse is properly identified for the asic, +100(+200) for the first(second) calibration signal itself  */
+    bool m_isReallyJunk[c_NMaxHitEvent] = {0}; /**< true if pedestal jump or other invalid hit is detected, not saved */
+    float m_time[c_NMaxHitEvent] = {0}; /**< time in a unit of ns, defined as m_rawTime+64*m_winNum. Converted into ns unit with assumption of uniform sampling interval. 0 ns at the start of the window number 0. When waveform analysis is enabled, discontinuous window numbers are considered. */
+    float m_rawTime[c_NMaxHitEvent] = {0}; /**< "m_rawTime" [0-256] in new TOPDigit (update at May, 2017) in sample(time bin) unit */
+    float m_refTime[c_NMaxHitEvent] = {0}; /**< time of the first calibration signal as reference timing. Chosen from a list of m_time for each asic. When waveform analysis is enabled, double pulse is required. Otherwise, hit timing in the calibration channel of a correcponding asic is used. */
+    unsigned short m_sample[c_NMaxHitEvent] = {0}; /**< (m_rawTDC+m_winNum*64)%256, for time base correction */
+    float m_height[c_NMaxHitEvent] = {0}; /**< "m_pulseHeight" in new TOPDigit (update at May, 2017) */
+    float m_integral[c_NMaxHitEvent] = {0}; /**< "m_integral" in TOPDigit, but not available */
+    float m_width[c_NMaxHitEvent] = {0}; /**< "m_pulseWidth" in TOPDigit, full width at half maximum of the pulse, converted into unit of samples from ns */
+    char m_offlineFlag[c_NMaxHitEvent] = {0}; /**< =-1 if the channel does not have waveform information, =0 when the hit comes from online FE, >=1 when the hit comes from offline FE ; =-100 corresponding TOPRawDigit object is not found (problematic case) */
+    short m_nHitOfflineFE[c_NMaxHitEvent] = {0}; /**< number of hits for each pixel */
+    short m_waveform[c_NMaxHitEvent][c_NWaveformSample] = {0}; /**< waveform from TOPRawWaveform, if not exist, filled with -32767 */
 
     short m_nFEHeader = 0; /**< m_FEHeaders in TOPInterimFEInfo, the total # of FE headers found */
     short m_nEmptyFEHeader = 0; /**< m_emptyFEHeaders in TOPInterimFEInfo, the total # of empty FE headers */
     short m_nWaveform = 0; /**< m_waveforms in TOPInterimFEInfo, # of waveformes */
     unsigned m_errorFlag = 0; /**< m_errorFlags in TOPInterimFEInfo, defined in the TOPInterimFEInfo.h */
+
+    unsigned m_eventErrorFlag = 0; /**< m_errorFlags in EventMetaData, 0x1 : CRC error */
+
+    /**
+     * Find reference timing. In case that the waveform analysis is enabled,
+     * try to find a pair of calibration pulses and timing of the first one
+     * is used as reference timing for the correcponding asic.
+     * If not enabled, feature extracted timing for a calibration channel is used.
+     */
+    void getReferenceTiming();
 
   };
 

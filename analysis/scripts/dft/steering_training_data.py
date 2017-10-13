@@ -9,11 +9,13 @@ from dft.DeepFlavorTagger import *
 def create_train_data(
         working_dir,
         file_names,
-        prefix,
+        identifier,
         variable_list,
         environmentType='MC5',
         target='qrCombined',
         overwrite=False,
+        max_events=0,
+        mode='sampler',
         *args,
         **kwargs):
     main = create_path()
@@ -23,32 +25,26 @@ def create_train_data(
 
     inputMdstList(environmentType, filelist=file_names, path=main)
 
-    main.add_module('Gearbox')
-    if 'Geometry' not in main:
-        main.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
-
     findMCDecay('B0:sig', 'B0 -> nu_tau anti-nu_tau', writeOut=True, path=main)
     matchMCTruth('B0:sig', main)
     applyCuts('B0:sig', 'isSignal > 0.5', path=main)
 
     buildRestOfEvent('B0:sig', path=main)
 
-    DeepFlavorTagger('B0:sig', 'externTeacher', working_dir, prefix, variable_list, target=target, overwrite=overwrite,
+    DeepFlavorTagger('B0:sig', mode, working_dir, identifier, variable_list, target=target, overwrite=overwrite,
                      path=main, *args, **kwargs)
 
     main.add_module('ProgressBar')
 
-    process(main)
+    process(main, max_events)
     print(statistics)
 
 
-def test_expert(working_dir, file_names, prefix, environmentType='MC5'):
+def test_expert(working_dir, file_names, identifier, output_variable='networkOutput', environmentType='MC5',
+                max_events=0):
     main = create_path()
 
     inputMdstList(environmentType, file_names, path=main)
-
-    if 'Geometry' not in main:
-        main.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
 
     findMCDecay('B0:sig', 'B0 -> nu_tau anti-nu_tau', writeOut=True, path=main)
     matchMCTruth('B0:sig', main)
@@ -57,25 +53,25 @@ def test_expert(working_dir, file_names, prefix, environmentType='MC5'):
     buildRestOfEvent('B0:sig', path=main)
 
     # main.add_module('PrintCollections')
-    DeepFlavorTagger('B0:sig', 'expert', working_dir, prefix, path=main)
+    DeepFlavorTagger('B0:sig', 'expert', working_dir, identifier, path=main)
 
-    variablesToNTuple('B0:sig', ['extraInfo(qrCombined)', 'extraInfo(qrMC)', 'extraInfo(B0Probability)',
-                                 'extraInfo(BOProbabilityMC)'], filename=os.path.join(working_dir, prefix + '_test_output.root'),
+    # define output variable
+    output_variable_name = ''.join('extraInfo(', output_variable, ')')
+
+    variablesToNTuple('B0:sig', ['extraInfo(qrCombined)', output_variable_name],
+                      filename=os.path.join(working_dir, identifier + '_test_output.root'),
                       path=main)
 
     main.add_module('ProgressBar')
 
-    process(main, 1000)
+    process(main, max_events)
     print(statistics)
 
 
-def test_expert_jpsi(working_dir, file_names, prefix, environmentType='MC5'):
+def test_expert_jpsi(working_dir, file_names, prefix, environmentType='MC5', max_events=0):
     main = create_path()
 
     inputMdstList(environmentType, file_names, path=main)
-
-    if 'Geometry' not in main:
-        main.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
 
     fillParticleList('pi+:highPID', 'piid >= .1', path=main)
     fillParticleList('mu+:highPID', 'muid >= .1', path=main)
@@ -115,5 +111,5 @@ def test_expert_jpsi(working_dir, file_names, prefix, environmentType='MC5'):
 
     main.add_module('ProgressBar')
 
-    process(main, 1000)
+    process(main, max_events)
     print(statistics)

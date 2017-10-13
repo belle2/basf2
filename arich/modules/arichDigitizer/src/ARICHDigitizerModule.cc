@@ -24,6 +24,8 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
+#include <background/dataobjects/BackgroundInfo.h>
+
 
 // ROOT
 #include <TVector2.h>
@@ -59,7 +61,7 @@ namespace Belle2 {
 
     // Add parameters
     addParam("TimeWindow", m_timeWindow, "Readout time window width in ns", 250.0);
-    addParam("BackgroundHits", m_bkgLevel, "Number of background hits per hapd per readout (electronics noise)", 0.4);
+    addParam("BackgroundHits", m_bkgLevel, "Number of background hits per hapd per readout (electronics noise)", 0.2);
 
   }
 
@@ -78,6 +80,13 @@ namespace Belle2 {
 
     StoreArray<ARICHDigit> digits;
     digits.registerInDataStore();
+
+    m_bgOverlay = false;
+    StoreObjPtr<BackgroundInfo> bgInfo("", DataStore::c_Persistent);
+    if (bgInfo.isValid()) {
+      if (bgInfo->getMethod() == BackgroundInfo::c_Overlay) m_bgOverlay = true;
+    }
+
   }
 
   void ARICHDigitizerModule::beginRun()
@@ -177,7 +186,8 @@ namespace Belle2 {
 
     }
 
-    //--- add electronic noise hits
+    //--- if background not overlayed add electronic noise hits
+    if (m_bgOverlay) return;
     uint8_t bitmap = 1;
     unsigned nSlots = m_geoPar->getDetectorPlane().getNSlots();
     for (unsigned id = 1; id < nSlots + 1; id++) {

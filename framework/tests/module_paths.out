@@ -1,7 +1,7 @@
 [INFO] Steering file: framework/tests/module_paths.py
 [INFO] The random number seed is set to "something important"
 [[[]] -> EventInfoSetter -> [SelectOddEvents -> EventInfoPrinter] -> PrintCollections]
-[RESULT] Starting event processing, random seed is set to 'something important'
+[INFO] Starting event processing, random seed is set to 'something important'
 [INFO] Begin of new run
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
@@ -58,8 +58,8 @@
 [INFO] ================================================================================
 
 [INFO] second process() call follows...
-[RESULT] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
+[INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] Begin of new run
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1

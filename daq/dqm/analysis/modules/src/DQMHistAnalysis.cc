@@ -47,6 +47,11 @@ void DQMHistAnalysisModule::addHist(const std::string& dirname, const std::strin
   }
 }
 
+const DQMHistAnalysisModule::HistList& DQMHistAnalysisModule::getHistList()
+{
+  return g_hist;
+}
+
 TH1* DQMHistAnalysisModule::findHist(const std::string& histname)
 {
   if (g_hist.find(histname) != g_hist.end()) {

@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <memory>
 #include <map>
 #include <vector>
 #include <deque>
@@ -67,7 +68,7 @@ namespace Belle2 {
                         int seedLevel,
                         const XYSpans& xySpans,
                         bool debugOutput = false)
-        : m_quadTree{makeUnique<QuadTree>(xySpans.first, xySpans.second, 0, nullptr)}
+        : m_quadTree{std::make_unique<QuadTree>(xySpans.first, xySpans.second, 0, nullptr)}
         , m_lastLevel(lastLevel)
         , m_seedLevel(seedLevel)
         , m_debugOutput(debugOutput)
@@ -196,15 +197,6 @@ namespace Belle2 {
                          int nItemsThreshold,
                          AY yLimit)
       {
-        B2DEBUG(100,
-                "startFillingTree with " << node->getItems().size() << " hits at level "
-                << node->getLevel()
-                << " ("
-                << node->getXMean()
-                << "/ "
-                << node->getYMean()
-                << ")");
-
         if (node->getNItems() < nItemsThreshold) {
           return;
         }
@@ -316,10 +308,10 @@ namespace Belle2 {
        */
       virtual XYSpans createChild(QuadTree* node, int iX, int iY) const
       {
-        AX xMin = node->getXBinBound(iX);
-        AX xMax = node->getXBinBound(iX + 1);
-        AY yMin = node->getYBinBound(iY);
-        AY yMax = node->getYBinBound(iY + 1);
+        AX xMin = node->getXLowerBound(iX);
+        AX xMax = node->getXUpperBound(iX);
+        AY yMin = node->getYLowerBound(iY);
+        AY yMax = node->getYUpperBound(iY);
         return XYSpans({xMin, xMax}, {yMin, yMax});
       }
 
@@ -364,7 +356,7 @@ namespace Belle2 {
         if (not m_debugOutput) return;
         for (QuadTree& childNode : children) {
           if (childNode.getLevel() != getLastLevel()) continue; // Only write the lowest level
-          m_debugOutputMap[ {childNode.getXMean(), childNode.getYMean()}] = childNode.getItems();
+          //m_debugOutputMap[ {childNode.getXMean(), childNode.getYMean()}] = childNode.getItems();
         }
       }
 

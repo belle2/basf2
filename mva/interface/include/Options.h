@@ -125,26 +125,47 @@ namespace Belle2 {
        */
       virtual po::options_description getDescription() override;
 
-      bool m_use_multiclass = false; /**< Use multi-class training */
-      bool m_use_hyperparameter = false; /**< Use hyperparameter training */
-      std::string m_hyperparameter_metric = "AUC"; /**< Hyperparameter Metric */
-      std::vector<std::string> m_hyperparameters; /**< List of hyper-parameters to change */
-
       bool m_use_splot = false; /**< Use splot training */
       std::string m_splot_variable = "M"; /**< Discriminating variable */
       std::vector<std::string> m_splot_mc_files; /**< Monte carlo files used for the distribution of the discriminating variable */
       bool m_splot_combined = false; /**< Combine sPlot training with PDF classifier for discriminating variable */
       bool m_splot_boosted = false; /**< Use boosted sPlot training (aPlot) */
+
+      bool m_use_sideband_substraction = false; /**< Use sideband substraction */
+      std::vector<std::string> m_sideband_mc_files; /**< used to estimate the number of events in the different regions */
+      std::string m_sideband_variable =
+        ""; /**< Variable defining the signal region (1) background region (2) negative signal region (3) or unused (otherwise) for the sideband substraction */
+
+      bool m_use_reweighting = false; /**< Use a pretraining of data against mc and weight the mc afterwards */
+      std::string m_reweighting_identifier = ""; /**< Identifier used to save the reweighting expert */
+      std::string m_reweighting_variable =
+        ""; /**< Variable defining for which events the reweighting should be used (1) or not used (0). If empty the reweighting is applied to all events */
+      std::vector<std::string> m_reweighting_data_files; /**< Data files for the pretraining */
+      std::vector<std::string> m_reweighting_mc_files; /**< MC files for the pretraining */
     };
 
     template<typename T>
-    std::function<void(T)> check_bounds(T min, T max, std::string name)
+    std::function<void(T)> check_bounds(T min, T max, const std::string& name)
     {
       return [name, min, max](T v) -> void {
         if (v <= min || v >= max)
         {
           throw po::validation_error(po::validation_error::invalid_option_value, name,
           std::to_string(min) + " <= " + name + " <= " + std::to_string(max) + ": provided value " + std::to_string(v));
+        }
+      };
+    }
+
+    template<typename T>
+    std::function<void(std::vector<T>)> check_bounds_vector(T min, T max, const std::string& name)
+    {
+      return [name, min, max](const std::vector<T>& vec) -> void {
+        for (auto v : vec)
+        {
+          if (v <= min || v >= max) {
+            throw po::validation_error(po::validation_error::invalid_option_value, name,
+            std::to_string(min) + " <= " + name + " <= " + std::to_string(max) + ": provided value " + std::to_string(v));
+          }
         }
       };
     }

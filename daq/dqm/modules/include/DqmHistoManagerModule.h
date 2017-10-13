@@ -28,6 +28,7 @@
 
 #include <string>
 #include <iostream>
+#include <time.h>
 
 
 #define DQM_SOCKET 9899
@@ -62,7 +63,12 @@ namespace Belle2 {
 
     bool        m_initmain; /**< True if initialize() was called. */
     bool        m_initialized;
-    int m_nevent;
+    int         m_nevent;
+    time_t      m_ptime;
+    time_t      m_dtime;
+    time_t      m_pstep;
+    time_t      m_dstep;
+
 
     // Socket interface
     EvtSocketSend*  m_sock;

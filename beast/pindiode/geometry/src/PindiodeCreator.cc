@@ -339,14 +339,9 @@ namespace Belle2 {
         */
 
         //Sensitive area
-        G4double dx_pin = 2.65 / 2.*CLHEP::mm;
-        G4double dz_pin = 2.65 / 2.*CLHEP::mm;
-        G4double dy_pin = 0.10 / 2.*CLHEP::mm;
-        if (phase == 2) {
-          dx_pin = dx_pins;
-          dz_pin = dz_pins;
-          dy_pin = dy_pins;
-        }
+        G4double dx_pin = dx_pins;
+        G4double dz_pin = dz_pins;
+        G4double dy_pin = dy_pins;
 
         G4VSolid* s_pin = new G4Box("s_pin", dx_pin, dy_pin, dz_pin);
         G4LogicalVolume* l_pin = new G4LogicalVolume(s_pin, geometry::Materials::get("G4_SILICON_DIOXIDE"), "l_pin", 0, m_sensitive);
@@ -378,7 +373,7 @@ namespace Belle2 {
                                       z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
                         G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
                                       (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
-            new G4PVPlacement(transform, l_pin, TString::Format("p_pin_2_%d", i).Data(), &topVolume, false, detID1);
+            new G4PVPlacement(transform, l_pin, TString::Format("p_pin_2_%d", i).Data(), &topVolume, false, detID2);
             B2INFO("        PIN-" << detID2 << " placed at: " << transform.getTranslation() << " mm");
           }
           /*

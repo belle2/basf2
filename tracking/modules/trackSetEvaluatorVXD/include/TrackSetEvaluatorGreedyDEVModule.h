@@ -35,7 +35,7 @@ namespace Belle2 {
     void initialize() override final
     {
       m_spacePointTrackCands.isRequired(m_nameSpacePointTrackCands);
-      m_overlapNetworks.isRequired();
+      m_overlapNetworks.isRequired(m_nameOverlapNetworks);
     }
 
     /** Application of the algorithm. */
@@ -48,5 +48,7 @@ namespace Belle2 {
 
     /** access to tcNetwork, which will be produced by this module */
     StoreArray<OverlapNetwork> m_overlapNetworks;
+    /** name of the overlap networks */
+    std::string m_nameOverlapNetworks;
   };
 }

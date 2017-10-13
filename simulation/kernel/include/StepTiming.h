@@ -34,7 +34,7 @@ namespace Belle2 {
       /** Signature of the callback function */
       typedef std::function<void (G4Track*, G4LogicalVolume*, double)> callbackType;
       /** Constructor: create an instance with a given callback function. */
-      explicit StepTiming(callbackType callback): G4VSteppingVerbose(), m_callback(callback) {}
+      explicit StepTiming(const callbackType& callback): G4VSteppingVerbose(), m_callback(callback) {}
       /** Start timing a new step */
       virtual void NewStep();
       /** Step finished, call callback function */

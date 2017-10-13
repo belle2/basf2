@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 try:
     from unittest.mock import patch, MagicMock
 except ImportError:
@@ -51,7 +51,6 @@ class TestEnvironmentInformation(TestCase):
 
         self.assertEqual(repr_information, string_information)
 
-# @endcond
     def test_cached_revision(self):
         self.information._cached_revision = "Revision"
 
@@ -67,3 +66,7 @@ class TestEnvironmentInformation(TestCase):
 
     def test_get_current_revision(self):
         pass
+
+if __name__ == "__main__":
+    main()
+# @endcond

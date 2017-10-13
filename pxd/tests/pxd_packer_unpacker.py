@@ -14,8 +14,10 @@ from ROOT import Belle2
 import numpy
 
 import simulation
+from rawdata import add_packers
 
 pxd_rawhits_pack_unpack_collection = "PXDRawHits_test"
+pxd_rawhits_pack_unpack_collection_digits = "PXDDigits_test"
 pxd_rawhits_pack_unpack_collection_adc = pxd_rawhits_pack_unpack_collection + "_adc"
 pxd_rawhits_pack_unpack_collection_pedestal = pxd_rawhits_pack_unpack_collection + "_pedestal"
 pxd_rawhits_pack_unpack_collection_roi = pxd_rawhits_pack_unpack_collection + "_roi"
@@ -25,11 +27,19 @@ set_random_seed(42)
 class PxdPackerUnpackerTestModule(Module):
 
     """
-    module which checks if the collection of PXDDigits from the simulation and
-    the PXDRawHits from the packing/unpacking procedure are equal.
-    The Unpackr does not create PXDDigits but PXDRawHits and therefore these two lists
-    must be compared in both parameters they have in common
+    Module which checks if a collection of PXDDigits and
+    a collection of PXDRawHits from the packing/unpacking procedure are equal.
+    The PXDUnpacker does not create PXDDigits but PXDRawHits and therefore these two lists
+    must be compared.
     """
+
+    def __init__(self, rawhits_collection='PXDRawHits', digits_collection="PXDDigits"):
+        """constructor"""
+        # call constructor of base class, required if you implement __init__ yourself!
+        super().__init__()
+        # and do whatever else is necessary like declaring member variables
+        self.rawhits_collection = rawhits_collection
+        self.digits_collection = digits_collection
 
     def sortDigits(self, unsortedPyStoreArray):
         """ use a some digit information to sort the PXDDigits list
@@ -69,9 +79,9 @@ class PxdPackerUnpackerTestModule(Module):
 
         # load the digits and the collection which results from the packer and unpacker
         # processed by packer and unpacker
-        pxdRawHitsPackedUnpacked_unsorted = Belle2.PyStoreArray(pxd_rawhits_pack_unpack_collection)
+        pxdRawHitsPackedUnpacked_unsorted = Belle2.PyStoreArray(self.rawhits_collection)
         # direct from simulation
-        pxdDigits_unsorted = Belle2.PyStoreArray("PXDDigits")
+        pxdDigits_unsorted = Belle2.PyStoreArray(self.digits_collection)
 
         # sort the digits, because the order gets
         # lost during the packing/unpacking process
@@ -98,6 +108,7 @@ class PxdPackerUnpackerTestModule(Module):
             # therefor, limit the maximal charge of the digit here in the comparison
             assert numpy.isclose(min(255.0, digit.getCharge()), rawHitPackedUnpacked.getCharge())
 
+
 # to run the framework the used modules need to be registered
 particlegun = register_module('ParticleGun')
 particlegun.param('pdgCodes', [13, -13])
@@ -114,39 +125,42 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(particlegun)
 # add simulation for pxd only
-simulation.add_simulation(main, components=['PXD'])
+simulation.add_simulation(main, components=['PXD'], usePXDDataReduction=False)
 
 main.add_module(progress)
 
-packer = register_module('PXDPacker')
-# [[dhhc1, dhh1, dhh2, dhh3, dhh4, dhh5] [ ... ]]
-# -1 is disable port
-packer.param('dhe_to_dhc', [
-    [0, 2, 4, 34, 36, 38],
-    [1, 6, 8, 40, 42, 44],
-    [2, 10, 12, 46, 48, 50],
-    [3, 14, 16, 52, 54, 56],
-    [4, 3, 5, 35, 37, 39],
-    [5, 7, 9, 41, 43, 45],
-    [6, 11, 13, 47, 49, 51],
-    [7, 15, 17, 53, 55, 57],
-])
+# create raw data
+add_packers(main, components=['PXD'])
+
+# unpack raw data. creates collection PXDRawHits_test
+pxdunpacker = register_module('PXDUnpacker')
+pxdunpacker.param('HeaderEndianSwap', True)
+pxdunpacker.param("PXDRawHitsName", pxd_rawhits_pack_unpack_collection)
+pxdunpacker.param("PXDRawAdcsName", pxd_rawhits_pack_unpack_collection_adc)
+pxdunpacker.param("PXDRawPedestalsName", pxd_rawhits_pack_unpack_collection_pedestal)
+pxdunpacker.param("PXDRawROIsName", pxd_rawhits_pack_unpack_collection_roi)
+main.add_module(pxdunpacker)
+
+# sort rawhits. creates collection PXDDigits_test
+pxdhitsorter = register_module('PXDRawHitSorter')
+pxdhitsorter.param('mergeFrames', True)
+pxdhitsorter.param('rawHits', pxd_rawhits_pack_unpack_collection)
+pxdhitsorter.param('digits', pxd_rawhits_pack_unpack_collection_digits)
+main.add_module(pxdhitsorter)
 
 
-main.add_module(packer)
-
-unpacker = register_module('PXDUnpacker')
-unpacker.param("IgnoreDATCON", True)
-unpacker.param("PXDRawHitsName", pxd_rawhits_pack_unpack_collection)
-unpacker.param("PXDRawAdcsName", pxd_rawhits_pack_unpack_collection_adc)
-unpacker.param("PXDRawPedestalsName", pxd_rawhits_pack_unpack_collection_pedestal)
-unpacker.param("PXDRawROIsName", pxd_rawhits_pack_unpack_collection_roi)
-unpacker.param("RemapFlag", False)
-main.add_module(unpacker)
-
-# run custom test module to check if the PXDDigits and the
+# run custom test module to check if the simulated PXDDigits and the
 # pxd_digits_pack_unpack_collection collections are equal
-main.add_module(PxdPackerUnpackerTestModule())
+main.add_module(PxdPackerUnpackerTestModule(rawhits_collection=pxd_rawhits_pack_unpack_collection, digits_collection="PXDDigits"))
+
+
+# run custom test module 2nd time to check if the collection pxd_rawhits_pack_unpack_collection_digits
+# and the pxd_digits_pack_unpack_collection collections are equal
+main.add_module(
+    PxdPackerUnpackerTestModule(
+        rawhits_collection=pxd_rawhits_pack_unpack_collection,
+        digits_collection=pxd_rawhits_pack_unpack_collection_digits))
+
 
 # Process events
 process(main)

@@ -16,7 +16,10 @@ using namespace Belle2;
 
 void GblMultipleScatteringController::controlTrackSegment(TVector3 entry, TVector3 exit, genfit::GblFitter* fitter)
 {
-  int midPointInCDC = false;
+  (void)entry;
+  (void)exit;
+  (void)fitter;
+  /*int midPointInCDC = false;
   TVector3 midPoint = (exit + entry) * 0.5;
   if (!gGeoManager) {
     B2ERROR("Could not access geometry manager.");
@@ -46,5 +49,5 @@ void GblMultipleScatteringController::controlTrackSegment(TVector3 entry, TVecto
     fitter->setMSOptions(false, false);
   else
     // Thick scatterers
-    fitter->setMSOptions(true, true);
+    fitter->setMSOptions(true, true);*/
 }

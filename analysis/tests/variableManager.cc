@@ -63,6 +63,19 @@ namespace {
       Manager::Instance().getVariable("daughterSumOf(daughter(1, ExtraInfoWrongName(signalProbability)))");
     EXPECT_TRUE(nestedDoesNotExist != nullptr); // TODO This should actually return nullptr, but this is not easy to implement.
 
+    // Test collection
+    auto vec = Manager::Instance().resolveCollections({"myCollection"});
+    EXPECT_EQ(vec.size(), 1);
+    EXPECT_EQ(vec[0], "myCollection");
+    EXPECT_TRUE(Manager::Instance().addCollection("myCollection", {"p", "px", "py", "pz"}));
+
+    auto vec2 = Manager::Instance().resolveCollections({"myCollection"});
+    EXPECT_EQ(vec2.size(), 4);
+    EXPECT_EQ(vec2[0], "p");
+    EXPECT_EQ(vec2[1], "px");
+    EXPECT_EQ(vec2[2], "py");
+    EXPECT_EQ(vec2[3], "pz");
+
     // Test alias
     const Manager::Var* aliasDoesNotExists = Manager::Instance().getVariable("myAlias");
     EXPECT_TRUE(aliasDoesNotExists == nullptr);

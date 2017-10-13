@@ -29,7 +29,7 @@ namespace Belle2 {
 
   public:
     virtual void init(NSMCommunicator& com) throw();
-    virtual void boot(const DBObject&) throw(RCHandlerException) {}
+    virtual void boot(const std::string& opt, const DBObject&) throw(RCHandlerException) {}
     virtual void load(const DBObject&) throw(RCHandlerException) {}
     virtual void start(int /*expno*/, int /*runno*/) throw(RCHandlerException) {}
     virtual void stop() throw(RCHandlerException) {}

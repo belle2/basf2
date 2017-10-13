@@ -50,6 +50,8 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
            "If true, track candidates (RecoTracks) and reconstructed hits will be shown in the display.", false);
   addParam("showCDCHits", m_showCDCHits,
            "If true, CDCHit objects will be shown as drift cylinders (shortened, z position set to zero).", false);
+  addParam("showBKLM2dHits", m_showBKLM2dHits,
+           "If true, BKLM2dHit objects will be shown in the display", true);
   addParam("showARICHHits", m_showARICHHits,
            "If true, ARICHHit objects will be shown.", false);
   addParam("automatic", m_automatic,
@@ -80,6 +82,7 @@ void DisplayModule::initialize()
   StoreArray<EKLMSimHit>::optional();
   StoreArray<ECLCluster>::optional();
   StoreArray<KLMCluster>::optional();
+  StoreArray<BKLMHit2d>::optional();
   StoreArray<Track>::optional();
   StoreArray<TrackFitResult>::optional();
   StoreArray<RecoTrack>::optional();
@@ -101,8 +104,6 @@ void DisplayModule::initialize()
   m_display = new DisplayUI(m_automatic);
   if (hasCondition())
     m_display->allowFlaggingEvents(getCondition()->getPath()->getPathString());
-  //pass some parameters to DisplayUI to be able to change them at run time
-  m_display->addParameter("Show full geometry", getParam<bool>("fullGeometry"), 0);
   m_display->addParameter("Show MC info", getParam<bool>("showMCInfo"), 0);
   {
     //MC-specific parameters
@@ -115,10 +116,6 @@ void DisplayModule::initialize()
   m_display->addParameter("Show candidates and rec. hits", getParam<bool>("showRecoTracks"), 0);
   m_display->addParameter("Show tracks, vertices, gammas", getParam<bool>("showTrackLevelObjects"), 0);
 
-  EveGeometry::addGeometry();
-  m_visualizer = new EVEVisualization();
-  m_visualizer->setOptions(m_options);
-
   if (!m_fullGeometry and Gearbox::getInstance().exists("Detector/Name")) {
     std::string detectorName = Gearbox::getInstance().getString("Detector/Name");
     if (detectorName != "Belle2Detector") {
@@ -126,7 +123,14 @@ void DisplayModule::initialize()
       m_fullGeometry = true;
     }
   }
+  if (m_fullGeometry) {
+    //pass some parameters to DisplayUI to be able to change them at run time
+    m_display->addParameter("Show full geometry", getParam<bool>("fullGeometry"), 0);
+  }
 
+  EveGeometry::addGeometry(m_fullGeometry ? EveGeometry::c_Full : EveGeometry::c_Simplified);
+  m_visualizer = new EVEVisualization();
+  m_visualizer->setOptions(m_options);
   m_display->hideObjects(m_hideObjects);
 }
 
@@ -220,6 +224,12 @@ void DisplayModule::event()
     StoreArray<CDCHit> cdchits;
     for (auto& hit : cdchits)
       m_visualizer->addCDCHit(&hit);
+  }
+
+  if (m_showBKLM2dHits) {
+    StoreArray<BKLMHit2d> bklmhits;
+    for (auto& hit : bklmhits)
+      m_visualizer->addBKLMHit2d(&hit);
   }
 
   if (m_showARICHHits) {

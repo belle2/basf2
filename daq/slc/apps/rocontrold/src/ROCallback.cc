@@ -120,7 +120,6 @@ void ROCallback::configure(const DBObject& obj) throw(RCHandlerException)
       add(new NSMVHandlerROOutputPort(m_stream0[i], vname + ".output.port"));
     }
   } catch (const std::out_of_range& e) {
-    LogFile::error(e.what());
     throw (RCHandlerException(e.what()));
   }
 }
@@ -141,7 +140,7 @@ void ROCallback::load(const DBObject& obj) throw(RCHandlerException)
   log(LogFile::INFO, "Booted eb0");
   try_wait();
   for (size_t i = 0; i < m_stream0.size(); i++) {
-    if (!m_stream0[i].load(obj, 10)) {
+    if (!m_stream0[i].load(obj, 0)) {
       throw (RCHandlerException("Faield to boot stream0-%d", (int)i));
     }
     log(LogFile::INFO, "Booted %d-th stream0", i);

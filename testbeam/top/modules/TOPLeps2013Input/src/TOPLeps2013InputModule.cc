@@ -234,7 +234,7 @@ namespace Belle2 {
       int ich = (m_top.pmtid_mcp[i] - 1) * m_numPMTchannels + m_top.ch_mcp[i];
       int TDC = t / m_tdcWidth;
       if (TDC < m_tdcOverflow)
-        digits.appendNew(1, getNewNumbering(ich), TDC);
+        digits.appendNew(1, getNewNumbering(ich), t * Unit::ps);
     }
 
     // write track info to data store

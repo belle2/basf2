@@ -27,6 +27,7 @@
 #include <sstream>
 #include <iomanip>
 #include <cstring>
+#include <set>
 
 using namespace std;
 using namespace Belle2;
@@ -42,6 +43,7 @@ REG_MODULE(SVDUnpacker)
 //-----------------------------------------------------------------
 
 SVDUnpackerModule::SVDUnpackerModule() : Module(),
+  m_generateShaperDigts(false),
   m_shutUpFTBError(0),
   m_FADCTriggerNumberOffset(0)
 {
@@ -51,6 +53,8 @@ SVDUnpackerModule::SVDUnpackerModule() : Module(),
 
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
   addParam("svdDigitListName", m_svdDigitListName, "Name of the SVD Digits List", string(""));
+  addParam("GenerateShaperDigts", m_generateShaperDigts, "Generate SVDShaperDigits", bool(false));
+  addParam("svdShaperDigitListName", m_svdShaperDigitListName, "Name of the SVDShaperDigits list", string(""));
   addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", FileSystem::findFile("data/svd/svd_mapping.xml"));
   addParam("shutUpFTBError", m_shutUpFTBError,
            "if >0 is the number of reported FTB header ERRORs before quiet operations. If <0 full log produced.", -1);
@@ -67,6 +71,12 @@ void SVDUnpackerModule::initialize()
   m_eventMetaDataPtr.required();
   StoreArray<RawSVD>::required(m_rawSVDListName);
   StoreArray<SVDDigit>::registerPersistent(m_svdDigitListName);
+
+  if (m_generateShaperDigts) {
+    StoreArray<SVDShaperDigit> storeShaperDigits(m_svdShaperDigitListName);
+    storeShaperDigits.registerInDataStore();
+    m_svdShaperDigitListName = storeShaperDigits.getName();
+  }
 
   loadMap();
 }
@@ -85,6 +95,8 @@ void SVDUnpackerModule::event()
 {
   StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
   StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
+  set< SVDShaperDigit > SVDShaperDigitsSet;
+  StoreArray<SVDShaperDigit> shaperDigits(m_svdShaperDigitListName);
 
   if (!m_eventMetaDataPtr.isValid()) {  // give up...
     B2ERROR("Missing valid EventMetaData." << std::endl <<
@@ -190,6 +202,12 @@ void SVDUnpackerModule::event()
                       " expected: " << (m_eventMetaDataPtr->getEvent() & 0xFF)
                      );
             }
+
+            if (m_generateShaperDigts) { // create SVDModeByte object from MainHeader vars
+              //B2INFO("Filling SVDModeByte object");
+              m_SVDModeByte = SVDModeByte(m_MainHeader.runType, m_MainHeader.evtType, m_MainHeader.DAQMode, m_MainHeader.trgTiming);
+            }
+
           }
 
           if (m_APVHeader.check == 2) { // APV header
@@ -212,14 +230,22 @@ void SVDUnpackerModule::event()
             sample[5] = m_data_B.sample6;
 
 
-            for (unsigned int i = 0; i < 6; i++) {
+            for (unsigned int idat = 0; idat < 6; idat++) {
               // m_cellPosition member of the SVDDigit object is set to zero by NewDigit function
-              SVDDigit* newDigit = m_map->NewDigit(fadc, apv, strip, sample[i], i);
+              SVDDigit* newDigit = m_map->NewDigit(fadc, apv, strip, sample[idat], idat);
               svdDigits.appendNew(*newDigit);
 
               delete newDigit;
             }
 
+            if (m_generateShaperDigts) {
+              //B2INFO("Generating SVDShaperDigit object");
+              SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample, 0.0, m_SVDModeByte);
+              // shaperDigits.appendNew(*newShaperDigit);
+
+              SVDShaperDigitsSet.insert(*newShaperDigit);
+              delete newShaperDigit;
+            }
 
           }  //is data frame
 
@@ -231,8 +257,8 @@ void SVDUnpackerModule::event()
             //uint32_t *crc16input = new uint32_t[iCRC];
             uint32_t crc16input[iCRC];
 
-            for (unsigned short i = 0; i < iCRC; i++)
-              crc16input[i] = htonl(crc16vec.at(i));
+            for (unsigned short icrc = 0; icrc < iCRC; icrc++)
+              crc16input[icrc] = htonl(crc16vec.at(icrc));
 
             //verify CRC16
             boost::crc_basic<16> bcrc(0x8005, 0xffff, 0, false, false);
@@ -254,6 +280,10 @@ void SVDUnpackerModule::event()
     } // end event loop
 
   }
+
+  for (const SVDShaperDigit& aDigit : SVDShaperDigitsSet)
+    shaperDigits.appendNew(aDigit);
+
 } //end event function
 #ifndef __clang__
 #pragma GCC diagnostic pop
@@ -265,17 +295,10 @@ void SVDUnpackerModule::endRun()
 }
 
 
-void SVDUnpackerModule::terminate()
-{
-  delete m_map;
-
-}
-
 //load the sensor MAP from xml file
 void SVDUnpackerModule::loadMap()
 {
-  m_map = new SVDOnlineToOfflineMap(m_xmlMapFileName);
-
+  m_map = unique_ptr<SVDOnlineToOfflineMap>(new SVDOnlineToOfflineMap(m_xmlMapFileName));
 }
 
 

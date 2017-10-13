@@ -70,7 +70,8 @@ void EKLMReconstructorModule::initialize()
   digits.isRequired();
   hit2ds.registerRelationTo(digits);
   alignmentHits.registerRelationTo(hit2ds);
-  m_TransformData = new EKLM::TransformData(true, false);
+  m_TransformData =
+    new EKLM::TransformData(true, EKLM::TransformData::c_Alignment);
   m_GeoDat = &(EKLM::GeometryData::Instance());
   if (m_GeoDat->getNPlanes() != 2)
     B2FATAL("It is not possible to run EKLM reconstruction with 1 plane.");
@@ -174,7 +175,6 @@ void EKLMReconstructorModule::event()
           EKLMAlignmentHit* alignmentHit = alignmentHits.appendNew(i);
           alignmentHit->addRelationTo(hit2d);
         }
-        /* cppcheck-suppress memleak */
       }
     }
     it = it3;

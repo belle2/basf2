@@ -30,6 +30,10 @@ void EB1RXCallback::initialize(const DBObject& obj) throw(RCHandlerException)
   for (size_t i = 0; i < o_txs.size(); i++) {
     const DBObject& o_tx(o_txs[i]);
     bool used = o_tx.getBool("used");
+    std::string vname = o_tx.getText("name") + ".";
+    std::string rname = StringUtil::form("tx[%d].", m_nsenders);
+    add(new NSMVHandlerRef(*this, vname + "used", rname + "used"));
+    add(new NSMVHandlerRef(*this, vname + "connection", rname + "connection"));
     if (used) {
       std::string vname = StringUtil::form("stat.in[%d].", m_nsenders);
       add(new NSMVHandlerInt(vname + "addr", true, false, 0));
@@ -91,7 +95,6 @@ void EB1RXCallback::load(const DBObject& obj) throw(RCHandlerException)
     m_nsenders = 0;
     for (size_t i = 0; i < o_txs.size(); i++) {
       const DBObject& o_tx(o_txs[i]);
-      std::string name = o_tx.getText("name");
       bool used = o_tx.getBool("used");
       if (!used) continue;
       bool isftsw = o_tx.getBool("ftsw");
@@ -206,14 +209,9 @@ void EB1RXCallback::monitor() throw(RCHandlerException)
     set(vname + "connection", (int)m_eb_stat->down(0).port > 0);
     double total_byte = m_eb_stat->down(0).total_byte;
     double flowrate = (m_total_byte_out[0] - total_byte) / dt;
-    //double nevent = m_eb_stat->down(0).nevent;
-    //double evtrate = (m_nevent - nevent)/ dt;
-    //set(vname + "nevent", (float)nevent);
-    //set(vname + "evtrate", (float)evtrate);
     set(vname + "total_byte", (float)total_byte);
     set(vname + "floarate", (float)flowrate);
     m_total_byte_out[0] = total_byte;
-    //m_nevent_out[0] = nevent;
     for (int i = 0; i < m_nsenders; i++) {
       std::string vname = StringUtil::form("stat.in[%d].", i);
       set(vname + "event", (int)m_eb_stat->up(i).event);
@@ -223,14 +221,9 @@ void EB1RXCallback::monitor() throw(RCHandlerException)
       set(vname + "connection", (int)m_eb_stat->up(i).port > 0);
       double total_byte = m_eb_stat->down(0).total_byte;
       double flowrate = (m_total_byte_in[i] - total_byte) / dt;
-      //double nevent = m_eb_stat->down(0).nevent;
-      //double evtrate = (m_nevent - nevent)/ dt;
-      //set(vname + "nevent", (float)nevent);
-      //set(vname + "evtrate", (float)evtrate);
       set(vname + "total_byte", (float)total_byte);
       set(vname + "floarate", (float)flowrate);
       m_total_byte_in[i] = total_byte;
-      //m_nevent_in[i] = nevent;
     }
   } else {
     std::string vname = StringUtil::form("stat.out.");
@@ -239,8 +232,6 @@ void EB1RXCallback::monitor() throw(RCHandlerException)
     set(vname + "addr", 0);
     set(vname + "port", 0);
     set(vname + "connection", 0);
-    //set(vname + "nevent", 0);
-    //set(vname + "evtrate", 0);
     set(vname + "total_byte", 0);
     set(vname + "floarate", 0);
     for (int i = 0; i < m_nsenders; i++) {
@@ -250,8 +241,6 @@ void EB1RXCallback::monitor() throw(RCHandlerException)
       set(vname + "addr", 0);
       set(vname + "port", 0);
       set(vname + "connection", 0);
-      //set(vname + "nevent", 0);
-      //set(vname + "evtrate", 0);
       set(vname + "total_byte", 0);
       set(vname + "floarate", 0);
     }

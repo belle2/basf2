@@ -9,168 +9,114 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/fitting/EFitVariance.h>
+#include <tracking/trackFindingCDC/fitting/EFitPos.h>
 
-#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCTrack;
+    class CDCSegment3D;
+    class CDCAxialSegmentPair;
+    class CDCSegment2D;
+    class CDCWireHitSegment;
+    class CDCWireHit;
+    class CDCTrajectory2D;
+    class CDCObservations2D;
+
+    class CDCWire;
 
     /// Class implementing a fit for two dimensional trajectory circle using a generic fitting backend.
     template<class AFitMethod>
     class CDCFitter2D : public AFitMethod {
 
     public:
-      /// Empty constructor
-      CDCFitter2D() = default;
+      /// Default constructor
+      CDCFitter2D();
+
+      /// Default destructor
+      ~CDCFitter2D();
 
       /// Fits a collection of observation drift circles.
-      CDCTrajectory2D fit(CDCObservations2D observations2D) const
-      {
-        CDCTrajectory2D result;
-        update(result, observations2D);
-        return result;
-      }
+      CDCTrajectory2D fit(const CDCObservations2D& observations2D) const;
 
+      /// Fits a collection of observation drift circles.
+      CDCTrajectory2D fit(CDCObservations2D&& observations2D) const;
+
+      /// Update the trajectory with a fit to the observations.
+      void update(CDCTrajectory2D& trajectory2D, const CDCObservations2D& observations2D) const;
+
+      /// Update the trajectory with a fit to the observations.
+      void update(CDCTrajectory2D& trajectory2D, CDCObservations2D&& observations2D) const;
+
+      /// Fits the track
+      CDCTrajectory2D fit(const CDCTrack& track) const;
+
+      /// Fits the segment
+      CDCTrajectory2D fit(const CDCSegment3D& segment) const;
+
+      /// Fits to the two segments
+      CDCTrajectory2D fit(const CDCSegment2D& fromSegment, const CDCSegment2D& toSegment) const;
+
+      /// Fits the segment
+      CDCTrajectory2D fit(const CDCSegment2D& segment) const;
+
+      /// Fits to the wire hit observations.
+      CDCTrajectory2D fit(const std::vector<const CDCWireHit*>& wireHit) const;
+
+      /// Fits to the wire positions. Explicit specialisation to be used from python.
+      CDCTrajectory2D fit(const std::vector<const CDCWire*>& wires) const;
+
+      /// Fits to the wire positions. Explicit specialisation to be used from python.
+      CDCTrajectory2D fit(const CDCWireHitSegment& wireHits) const;
+
+      /// Updates the given trajectory inplace from the given segment
+      void update(CDCTrajectory2D& trajectory2D, const CDCSegment2D& segment) const;
+
+      /// Updates the given trajectory inplace from the given segment pair
+      void update(CDCTrajectory2D& trajectory2D, const CDCAxialSegmentPair& axialSegmentPair) const;
+
+    private:
       /// Fits a collection of hit typs which are convertable to observation circles.
       template<class AHits>
-      CDCTrajectory2D fit(const AHits& hits) const
-      {
-        CDCTrajectory2D result;
-        update(result, hits);
-        return result;
-      }
+      CDCTrajectory2D fitGeneric(const AHits& hits) const;
 
       /// Fits together two collections of hit types which are convertable to observation circles.
       template<class AStartHits, class AEndHits>
-      CDCTrajectory2D fit(const AStartHits& startHits, const AEndHits& endHits) const
-      {
-        CDCTrajectory2D result;
-        update(result, startHits, endHits);
-        return result;
-      }
+      CDCTrajectory2D fitGeneric(const AStartHits& startHits, const AEndHits& endHits) const;
 
-      /// Fits the segment
-      CDCTrajectory2D fit(const CDCSegment2D& segment) const
-      {
-        CDCTrajectory2D result;
-        update(result, segment);
-        return result;
-      }
-
-      /// Fits to the wire positions. Explicit specialisation to be used from python.
-      CDCTrajectory2D fit(const std::vector<const Belle2::TrackFindingCDC::CDCWire*>& wires) const
-      {
-        CDCTrajectory2D result;
-        update(result, wires);
-        return result;
-      }
-
-      /// Fits to the wire positions. Explicit specialisation to be used from python.
-      CDCTrajectory2D fit(const CDCWireHitSegment& wireHits) const
-      {
-        CDCTrajectory2D result;
-        update(result, wireHits);
-        return result;
-      }
+      /**
+       *  Updates a given trajectory with a fit to a collection of hits types,
+       * which are convertable to observation circles.
+       */
+      template <class AHits>
+      void updateGeneric(CDCTrajectory2D& trajectory2D, const AHits& hits) const;
 
       /**
        *  Updates a given trajectory with a fit to two collection of hit types,
        *  which are convertable to observation circles.
        */
       template <class AStartHits, class AEndHits>
-      void update(CDCTrajectory2D& trajectory2D, const AStartHits& startHits, const AEndHits& endHits) const
-      {
-        CDCObservations2D observations2D;
-        observations2D.setFitVariance(m_fitVariance);
+      void updateGeneric(CDCTrajectory2D& trajectory2D,
+                         const AStartHits& startHits,
+                         const AEndHits& endHits) const;
 
-        if (m_usePosition) {
-          observations2D.setFitPos(EFitPos::c_RecoPos);
-          observations2D.appendRange(startHits);
-        }
-        if (m_useOrientation) {
-          observations2D.setFitPos(EFitPos::c_RLDriftCircle);
-          observations2D.appendRange(startHits);
-        }
-
-        if (m_usePosition) {
-          observations2D.setFitPos(EFitPos::c_RecoPos);
-          observations2D.appendRange(endHits);
-        }
-        if (m_useOrientation) {
-          observations2D.setFitPos(EFitPos::c_RLDriftCircle);
-          observations2D.appendRange(endHits);
-        }
-
-        if (observations2D.size() < 4) {
-          trajectory2D.clear();
-        } else {
-          AFitMethod::update(trajectory2D, observations2D);
-        }
-      }
-
-      /**
-       *  Updates a given trajectory with a fit to a collection of hits types,
-       *  which are convertable to observation circles.
-       */
-      template <class AHits>
-      void update(CDCTrajectory2D& trajectory2D, const AHits& hits) const
-      {
-        CDCObservations2D observations2D;
-        observations2D.setFitVariance(m_fitVariance);
-
-        if (m_usePosition) {
-          observations2D.setFitPos(EFitPos::c_RecoPos);
-          observations2D.appendRange(hits);
-        }
-        if (m_useOrientation) {
-          observations2D.setFitPos(EFitPos::c_RLDriftCircle);
-          observations2D.appendRange(hits);
-        }
-
-        if (observations2D.size() < 4) {
-          trajectory2D.clear();
-        } else {
-          AFitMethod::update(trajectory2D, observations2D);
-        }
-      }
-
-      /// Update the trajectory with a fit to the observations.
-      void update(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const
-      {
-        AFitMethod::update(trajectory2D, observations2D);
-      }
-
+    public:
       //set which information should be used from the recohits
       //useOnlyPosition is standard
 
       /// Setup the fitter to use only the reconstructed positions of the hits
-      void useOnlyPosition()
-      {
-        m_usePosition = true;
-        m_useOrientation = false;
-      }
+      void useOnlyPosition();
 
       /// Setup the fitter to use only reference position and the drift length with right left orientation
-      void useOnlyOrientation()
-      {
-        m_usePosition = false;
-        m_useOrientation = true;
-      }
+      void useOnlyOrientation();
 
       /// Setup the fitter to use both the reconstructed position and the reference position and the drift length with right left orientation.
-      void usePositionAndOrientation()
-      {
-        m_usePosition = true;
-        m_useOrientation = true;
-      }
+      void usePositionAndOrientation();
 
       /// Setup the fitter to use the given variance measure by default.
-      void setFitVariance(EFitVariance fitVariance)
-      {
-        m_fitVariance = fitVariance;
-      }
+      void setFitVariance(EFitVariance fitVariance);
 
     private:
       /// Flag indicating the reconstructed position shall be used in the fit.

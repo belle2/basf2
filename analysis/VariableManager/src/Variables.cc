@@ -1368,7 +1368,7 @@ namespace Belle2 {
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
         /// TODO: check if ECLCluster will provide this on its own
-        float theta = shower->getMomentum().Theta();
+        float theta = shower->getTheta();
         if (theta < 0.555) {
           result = 1.0;
         } else if (theta < 2.26) {
@@ -1794,10 +1794,6 @@ namespace Belle2 {
           // There is a track match
           result = 1.0;
         }
-        if (cluster->getConnectedRegionId() > 0) {
-          // The cluster is only in the connected region, so its a CR track match
-          result = 2.0;
-        }
       }
       return result;
     }
@@ -1830,6 +1826,7 @@ namespace Belle2 {
     {
       return gRandom->Uniform(0, 1);
     }
+
 
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
@@ -2007,7 +2004,7 @@ namespace Belle2 {
                       "flavor type of decay(0 = unflavored, 1 = flavored)");
     REGISTER_VARIABLE("charge", particleCharge, "charge of particle");
     REGISTER_VARIABLE("trackMatchType", trackMatchType,
-                      "-1 particle has no ECL cluster, 0 particle has no associated track, 1 there is a matched track, 2 the matched track is only nearby the cluster"
+                      "-1 particle has no ECL cluster, 0 particle has no associated track, 1 there is a matched track"
                       "called connected - region(CR) track match");
     REGISTER_VARIABLE("mdstIndex", particleMdstArrayIndex,
                       "StoreArray index(0 - based) of the MDST object from which the Particle was created");

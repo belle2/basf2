@@ -22,8 +22,6 @@ namespace Belle2 {
     public:
       /// Construct a train of facets from the given oriented wire hits
       static CDCFacetSegment create(const CDCRLWireHitSegment& rlWireHitSegment);
-
     };
-
   }
 }

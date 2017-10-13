@@ -70,6 +70,15 @@ namespace Belle2 {
              "if true, use common T0 calibration (needs DB)", true);
     addParam("subtractOffset", m_subtractOffset,
              "if true, subtract offset defined for nominal TDC (required for MC)", false);
+    addParam("pedestalRMS", m_pedestalRMS,
+             "r.m.s of pedestals [ADC counts], "
+             "if positive, timeError will be estimated from FE data", 9.0);
+    addParam("maxPulseWidth", m_maxPulseWidth,
+             "maximal pulse width [ns] to flag digit as good", 10.0);
+    addParam("storageDepth", m_storageDepth, "ASIC analog storage depth", (unsigned) 512);
+    addParam("lookBackWindows", m_lookBackWindows,
+             "number of look back windows; used to set time origin correctly (only if >0)", 0);
+
     addParam("calibrationChannel", m_calibrationChannel,
              "calpulse selection: ASIC channel (use -1 to turn off the selection)", -1);
     addParam("calpulseWidthMin", m_calpulseWidthMin,
@@ -77,9 +86,9 @@ namespace Belle2 {
     addParam("calpulseWidthMax", m_calpulseWidthMax,
              "calpulse selection: maximal width [ns]", 0.0);
     addParam("calpulseHeightMin", m_calpulseHeightMin,
-             "calpulse selection: minimal height [ns]", 0);
+             "calpulse selection: minimal height [ADC counts]", 0);
     addParam("calpulseHeightMax", m_calpulseHeightMax,
-             "calpulse selection: maximal height [ns]", 0);
+             "calpulse selection: maximal height [ADC counts]", 0);
   }
 
 
@@ -105,7 +114,6 @@ namespace Belle2 {
     // equidistant sample times in case calibration is not required
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_sampleTimes.setTimeAxis(geo->getNominalTDC().getSyncTimeBase());
-    m_sampleDivisions = (0x1 << geo->getNominalTDC().getSubBits());
 
     // either common T0 or TDC offset
     if (m_useCommonT0Calibration and m_subtractOffset)
@@ -116,6 +124,10 @@ namespace Belle2 {
     if (m_useChannelT0Calibration) m_channelT0 = new DBObjPtr<TOPCalChannelT0>;
     if (m_useModuleT0Calibration) m_moduleT0 = new DBObjPtr<TOPCalModuleT0>;
     if (m_useCommonT0Calibration) m_commonT0 = new DBObjPtr<TOPCalCommonT0>;
+
+    // check validity of steering parameters
+    if (m_lookBackWindows >= (int) m_storageDepth)
+      B2ERROR("'lookBackWindows' must be less that 'storageDepth'");
 
   }
 
@@ -159,6 +171,7 @@ namespace Belle2 {
   {
 
     // get mappers
+
     const auto& feMapper = TOPGeometryPar::Instance()->getFrontEndMapper();
     const auto& chMapper = TOPGeometryPar::Instance()->getChannelMapper();
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
@@ -167,8 +180,21 @@ namespace Belle2 {
     StoreArray<TOPDigit> digits(m_outputDigitsName);
     digits.clear();
 
+    // set storage windows in RawDigits if not already done in unpacker
+
+    for (auto& rawDigit : rawDigits) {
+      const auto* waveform = rawDigit.getRelated<TOPRawWaveform>();
+      if (waveform and rawDigit.getStorageWindows().empty()) {
+        rawDigit.setStorageWindows(waveform->getStorageWindows());
+      }
+    }
+
+    // convert to TOPDigits
+
     for (const auto& rawDigit : rawDigits) {
+
       if (rawDigit.getErrorFlags() != 0) continue;
+
       auto scrodID = rawDigit.getScrodID();
       const auto* feemap = feMapper.getMap(scrodID);
       if (!feemap) {
@@ -183,7 +209,18 @@ namespace Belle2 {
                                          rawDigit.getASICChannel());
       auto pixelID = chMapper.getPixelID(channel);
       double rawTime = rawDigit.getCFDLeadingTime(); // time in [samples]
-      int tdc = int(rawTime * m_sampleDivisions);
+      rawTime = rawDigit.correctTime(rawTime, m_storageDepth); // correct time after window discontinuity
+      int window = rawDigit.getASICWindow();
+      if (m_lookBackWindows > 0) { // set time origin correctly
+        int lastWriteAddr = rawDigit.getLastWriteAddr();
+        int nback = lastWriteAddr - window;
+        if (nback < 0) nback += m_storageDepth;
+        int nwin = m_lookBackWindows - nback;
+        window -= nwin;
+        if (window < 0) window += m_storageDepth;
+        if (window >= (int) m_storageDepth) window -= m_storageDepth;
+        rawTime += nwin * TOPRawDigit::c_WindowSize;
+      }
       const auto* sampleTimes = &m_sampleTimes; // equidistant sample times
       if (m_useSampleTimeCalibration) {
         sampleTimes = (*m_timebase)->getSampleTimes(scrodID, channel % 128);
@@ -193,40 +230,49 @@ namespace Belle2 {
           continue;
         }
       }
-      auto window = rawDigit.getASICWindow();
       double time = sampleTimes->getTime(window, rawTime); // time in [ns]
       if (m_useChannelT0Calibration) time -= (*m_channelT0)->getT0(moduleID, channel);
       if (m_useModuleT0Calibration) time -= (*m_moduleT0)->getT0(moduleID);
       if (m_useCommonT0Calibration) time -= (*m_commonT0)->getT0();
       if (m_subtractOffset) time -= geo->getNominalTDC().getOffset();
-      double width = sampleTimes->getDeltaTime(window, rawDigit.getCFDFallingTime(),
+      double width = sampleTimes->getDeltaTime(window,
+                                               rawDigit.getCFDFallingTime(),
                                                rawDigit.getCFDLeadingTime()); // in [ns]
-      auto* digit = digits.appendNew(moduleID, pixelID, tdc);
+
+      double timeError = geo->getNominalTDC().getTimeJitter();
+      if (m_pedestalRMS > 0) {
+        double rawErr = rawDigit.getCFDLeadingTimeError(m_pedestalRMS); // in [samples]
+        auto sampleRise = rawDigit.getSampleRise();
+        timeError = rawErr * sampleTimes->getTimeBin(window, sampleRise); // [ns]
+      }
+
+      auto* digit = digits.appendNew(moduleID, pixelID, rawTime);
       digit->setTime(time);
-      // digit->setTimeError(timeError); TODO!
-      digit->setADC(rawDigit.getValuePeak());
+      digit->setTimeError(timeError);
+      digit->setPulseHeight(rawDigit.getValuePeak());
       digit->setIntegral(rawDigit.getIntegral());
       digit->setPulseWidth(width);
       digit->setChannel(channel);
       digit->setFirstWindow(window);
       digit->addRelationTo(&rawDigit);
+
       if (!rawDigit.isFEValid() or rawDigit.isPedestalJump())
         digit->setHitQuality(TOPDigit::c_Junk);
-      const auto* waveform = rawDigit.getRelated<TOPRawWaveform>();
-      if (waveform) {
-        if (!waveform->areWindowsInOrder(rawDigit.getSampleFall() + 1))
-          digit->setHitQuality(TOPDigit::c_Junk);
-      }
+      if (rawDigit.isAtWindowDiscontinuity(m_storageDepth))
+        digit->setHitQuality(TOPDigit::c_Junk);
+      if (digit->getPulseWidth() > m_maxPulseWidth)
+        digit->setHitQuality(TOPDigit::c_Junk);
     }
 
-    // select and flag calpulses, if calibration channel given
+    // if calibration channel given, select and flag cal pulses
+
     unsigned calibrationChannel = m_calibrationChannel;
     if (calibrationChannel < 8) {
       for (auto& digit : digits) {
         if (digit.getHitQuality() != TOPDigit::c_Good) continue;
         if (digit.getASICChannel() != calibrationChannel) continue;
-        if (digit.getADC() < m_calpulseHeightMin) continue;
-        if (digit.getADC() > m_calpulseHeightMax) continue;
+        if (digit.getPulseHeight() < m_calpulseHeightMin) continue;
+        if (digit.getPulseHeight() > m_calpulseHeightMax) continue;
         if (digit.getPulseWidth() < m_calpulseWidthMin) continue;
         if (digit.getPulseWidth() > m_calpulseWidthMax) continue;
         digit.setHitQuality(TOPDigit::c_CalPulse);

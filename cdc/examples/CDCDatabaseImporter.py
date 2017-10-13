@@ -16,6 +16,13 @@ import glob
 import subprocess
 from fnmatch import fnmatch
 
+# Specify the exp and run where iov is valid.
+# N.B. -1 means unbound.
+expFirst = 0
+expLast = -1
+runFirst = 0
+runLast = -1
+
 mapfile = FileSystem.findFile('data/cdc/ch_map.dat')
 t0file = FileSystem.findFile('data/cdc/t0_v1.dat')
 bwfile = FileSystem.findFile('data/cdc/badwire_v1.dat')
@@ -25,8 +32,8 @@ xtfile = FileSystem.findFile('data/cdc/xt_v3_chebyshev.dat.gz')
 sgfile = FileSystem.findFile('data/cdc/sigma_v2.dat')
 dispfile = FileSystem.findFile('data/cdc/displacement_v1.1.dat')
 alfile = FileSystem.findFile('data/cdc/alignment_v2.dat')
-misalfile = FileSystem.findFile('data/cdc/misalignment_v2.dat')
-use_local_database("cdc_crt/database.txt", "cdc_crt")
+# misalfile = FileSystem.findFile('data/cdc/misalignment_v2.dat')
+use_local_database("localDB/database.txt", "localDB")
 
 main = create_path()
 
@@ -42,7 +49,8 @@ main.add_module(gearbox)
 # process single event
 process(main)
 
-dbImporter = CDCDatabaseImporter()
+dbImporter = CDCDatabaseImporter(expFirst, runFirst, expLast, runLast)
+# dbImporter = CDCDatabaseImporter()
 dbImporter.importChannelMap(mapfile)
 dbImporter.importTimeZero(t0file)
 dbImporter.importBadWire(bwfile)
@@ -52,7 +60,7 @@ dbImporter.importXT(xtfile)
 dbImporter.importSigma(sgfile)
 dbImporter.importDisplacement(dispfile)
 dbImporter.importWirPosAlign(alfile)
-dbImporter.importWirPosMisalign(misalfile)
+# dbImporter.importWirPosMisalign(misalfile)
 
 # dbImporter.printChannelMap()
 # dbImporter.printTimeZero()

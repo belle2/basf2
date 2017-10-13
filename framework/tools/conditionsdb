@@ -1,6 +1,2 @@
-#!/usr/bin/env python3
-
-import sys
-from conditions_db.cli_main import main
-
-sys.exit(main())
+#!/bin/bash
+b2conditionsdb "$@"

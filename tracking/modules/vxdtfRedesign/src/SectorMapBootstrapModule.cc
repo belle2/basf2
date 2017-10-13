@@ -32,6 +32,9 @@
 #include "framework/gearbox/Const.h"
 #include "framework/datastore/StoreObjPtr.h"
 
+// DB access:
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/PayloadFile.h>
 
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -72,14 +75,22 @@ retrieve the SectorMaps from SectorMapsInputFile during initialize.", m_readSect
   addParam("WriteSectorMap", m_writeSectorMap, "If set to true \
 at endRun write the SectorMaps to SectorMapsOutputFile.", m_writeSectorMap);
 
+  addParam("SetupToRead", m_setupToRead, "If non empty only the setup with the given name will be read"
+           " from the from the root file. All other will be ignored. If empty \"\" (default) all setups are read. Will "
+           "only used if sectormap is retrieved from root file. Case will be ignored!",
+           std::string(""));
 
+  addParam("ReadSecMapFromDB", m_readSecMapFromDB, "If set to true the sector map will be read from the Data Base. NOTE: this will "
+           "override the parameter ReadSectorMap (reading sector map from file)!!!", m_readSecMapFromDB);
 }
 
 void
 SectorMapBootstrapModule::initialize()
 {
 
-  if (m_readSectorMap)
+  if (m_readSecMapFromDB)
+    retrieveSectorMapFromDB();
+  else if (m_readSectorMap)
     retrieveSectorMap();
   else
     bootstrapSectorMap();
@@ -118,6 +129,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   // WARNING: chose the names of the configs in that way that they are not contained in each other!
   //       E.g. having two configs with names "BobTheGreat" and "Bob" is not allowed as it will cause problems in some modules!
 
+
+  // for now declare this as default config for SVD only tracking!
   SectorMapConfig config1;
 //   config1.pTmin = 0.02;
 //   config1.pTmax = 0.08;
@@ -139,7 +152,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1.seedMaxDist2IPZ = 23.5;
   config1.nHitsMin = 3;
   config1.vIP = B2Vector3D(0, 0, 0);
-  config1.secMapName = "lowTestRedesign";
+  config1.secMapName = "SVDOnlyDefault"; // has been: "lowTestRedesign";
   config1.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "Distance1DZ", "SlopeRZ", "Distance3DNormed"};
   config1.threeHitFilters = { "Angle3DSimple", "CosAngleXY", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
   config1.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
@@ -151,6 +164,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
 
 
   // same as config1 but allows the PXD layers
+  // default for VXD tracking (SVD+PXD)
   SectorMapConfig config1point1;
   config1point1.pTmin = 0.02; // minimal relevant version
   config1point1.pTmax = 3.15; // minimal relevant version // Feb18-onePass-Test
@@ -163,7 +177,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1point1.seedMaxDist2IPZ = 23.5;
   config1point1.nHitsMin = 3;
   config1point1.vIP = B2Vector3D(0, 0, 0);
-  config1point1.secMapName = "lowTestSVDPXD";
+  config1point1.secMapName = "SVDPXDDefault"; // has been: "lowTestSVDPXD";
   config1point1.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "Distance1DZ", "SlopeRZ", "Distance3DNormed"};
   config1point1.threeHitFilters = { "Angle3DSimple", "CosAngleXY", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
   config1point1.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
@@ -404,10 +418,24 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
   tree->SetBranchAddress(c_setupKeyNameBranchName.c_str(),
                          & setupKeyName);
 
+  // ignore case, so only upper case
+  TString setupToRead_upper = m_setupToRead;
+  setupToRead_upper.ToUpper();
+  // to monitor if anything was read from the root files
+  bool read_something = false;
+
   FiltersContainer<SpacePoint>& filtersContainer = FiltersContainer<SpacePoint>::getInstance();
   auto nEntries = tree->GetEntriesFast();
   for (int i = 0;  i < nEntries ; i++) {
     tree->GetEntry(i);
+
+    // if a setup name is specified only read that one
+    if (setupToRead_upper != "") {
+      TString buff = setupKeyName->Data();
+      buff.ToUpper();
+      if (buff != setupToRead_upper) continue;
+    }
+
     rootFile.cd(setupKeyName->Data());
 
     B2DEBUG(1, "Retrieving SectorMap with name " << setupKeyName->Data());
@@ -424,11 +452,75 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
 
     setupKeyName->Clear();
 
+    read_something = true;
   }
 
+  if (!read_something) B2WARNING("No setup was read from the root file! The requested setup name was: " << m_setupToRead);
 
   rootFile.Close();
+}
 
+/// Retrieve the whole sector map from the data base
+void
+SectorMapBootstrapModule::retrieveSectorMapFromDB(void)
+{
+  B2INFO("Retrieving sectormap from DB. Filename: " << m_sectorMapsInputFile.c_str());
 
+  DBObjPtr<PayloadFile> sectorMapsInputFile(m_sectorMapsInputFile.c_str());
+  TFile rootFile(sectorMapsInputFile->getFileName().c_str());
+
+  // some cross check that the file is open
+  if (!rootFile.IsOpen()) B2FATAL("The Payload file: " << sectorMapsInputFile->getFileName().c_str() << " not found in the DB");
+
+  TTree* tree = NULL;
+  rootFile.GetObject(c_setupKeyNameTTreeName.c_str(), tree);
+
+  // test if the tree was found
+  if (!tree) B2FATAL("Did not found the setup tree: " << c_setupKeyNameTTreeName.c_str());
+
+  TString* setupKeyName = NULL;
+  tree->SetBranchAddress(c_setupKeyNameBranchName.c_str(),
+                         & setupKeyName);
+
+  // ignore case, so only upper case
+  TString setupToRead_upper = m_setupToRead;
+  setupToRead_upper.ToUpper();
+  // to monitor if anything was read from the root files
+  bool read_something = false;
+
+  FiltersContainer<SpacePoint>& filtersContainer = FiltersContainer<SpacePoint>::getInstance();
+  auto nEntries = tree->GetEntriesFast();
+  for (int i = 0;  i < nEntries ; i++) {
+    tree->GetEntry(i);
+
+    // if a setup name is specified only read that one
+    if (setupToRead_upper != "") {
+      TString buff = setupKeyName->Data();
+      buff.ToUpper();
+      if (buff != setupToRead_upper) continue;
+    }
+
+    rootFile.cd(setupKeyName->Data());
+
+    B2DEBUG(1, "Retrieving SectorMap with name " << setupKeyName->Data());
+
+    VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
+
+    string setupKeyNameStd = string(setupKeyName->Data());
+    segmentFilters->retrieveFromRootFile(setupKeyName);
+
+    B2DEBUG(1, "Retrieved map with name: " << setupKeyNameStd << " from rootfie.");
+    filtersContainer.assignFilters(setupKeyNameStd, segmentFilters);
+
+    rootFile.cd("..");
+
+    setupKeyName->Clear();
+
+    read_something = true;
+  }
+
+  if (!read_something) B2WARNING("No setup was read from the root file! The requested setup name was: " << m_setupToRead);
+
+  rootFile.Close();
 }
 

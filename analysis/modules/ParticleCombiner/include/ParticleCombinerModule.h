@@ -71,14 +71,15 @@ namespace Belle2 {
     bool m_isSelfConjugatedParticle; /**< flag that indicates whether an anti-particle mother does not exist and should not be reconstructed as well*/
 
     std::string m_cutParameter;  /**< selection criteria */
-    std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
 
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
 
     int m_recoilParticleType =
       0; /**< type of recoil particle: 0 - not recoil (normal reconstruction); 1 - recoil against e+e- and all daughters; 2 - recoil against first daughter */
 
-    int m_maximumNumberOfCandidates; /**< drop all candidates if more candidates than this parameter are produced */
+    int m_maximumNumberOfCandidates; /**< maximum number of reconstructed candidates */
+
+    bool m_ignoreIfTooManyCandidates;  /**< drop all candidates if max. number of candidate reached */
 
   };
 

@@ -1,0 +1,34 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import sys
+import subprocess
+
+argvs = sys.argv
+argc = len(argvs)
+
+if ( argc < 7 ) :
+  print 'Usage : hadd outfile nodebase basedir nnodes procid badlist'
+  exit(0)
+
+outfile = argvs[1]
+nodebase = argvs[2]
+basedir = argvs[3]
+nnodes = int(argvs[4])
+procid = int(argvs[5])
+badlist = argvs[6]
+
+haddcmd = "hadd " + outfile + " "
+for i in range(procid, procid + nnodes):
+    nodeid = '%2.2d' % i
+    if badlist.find(nodeid) == -1:
+        nodename = nodebase + nodeid
+	haddcmd += ' ../evp_'+ nodename + '/histofile.root'
+
+print haddcmd
+
+p = subprocess.Popen(haddcmd, shell=True, stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+p.wait()
+

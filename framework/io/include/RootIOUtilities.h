@@ -81,6 +81,9 @@ namespace Belle2 {
 
     /** Steering parameter names for m_excludeBranchNames. */
     extern const std::string c_SteerExcludeBranchNames[];
+
+    /** Steering parameter names for m_additionalBranchNames. */
+    extern const std::string c_SteerAdditionalBranchNames[];
   }
 }
 #endif

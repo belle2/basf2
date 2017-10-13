@@ -85,6 +85,7 @@ class TestingModule(Module):
     Test module which writes out the processed event numbers
     into the global processed_event_numbers list
     """
+
     def event(self):
         """
         Called for each event

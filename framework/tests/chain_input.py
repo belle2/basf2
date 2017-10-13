@@ -37,6 +37,7 @@ class TestModule(Module):
 
         self.iEvent += 1
 
+
 inputfiles = [
     Belle2.FileSystem.findFile('framework/tests/chaintest_1.root'),
     Belle2.FileSystem.findFile('framework/tests/chaintest_2.root')

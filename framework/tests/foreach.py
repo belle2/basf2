@@ -68,7 +68,7 @@ for use_pp in [False, True]:
             assert statistics.get(testmod).calls(statistics.END_RUN) == 2
         # 6 events, a 3 particles
         assert statistics.get(pgun).calls(statistics.EVENT) == 6
-        assert statistics.get(testmod).calls(statistics.EVENT) == 3*6
+        assert statistics.get(testmod).calls(statistics.EVENT) == 3 * 6
 
         sys.exit(0)
     retbytes = os.wait()[1]

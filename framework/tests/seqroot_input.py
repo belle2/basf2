@@ -66,7 +66,7 @@ filename = Belle2.FileSystem.findFile('framework/tests/seqroot_input.sroot')
 main = create_path()
 seqinput = main.add_module("SeqRootInput", logLevel=LogLevel.WARNING)
 main.add_module("EventInfoPrinter")
-main.add_module("PrintCollections")
+main.add_module("PrintCollections", printForEvent=0)
 main.add_module(TestModule())
 
 with clean_working_directory():

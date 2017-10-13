@@ -18,7 +18,7 @@ class NoopModule(Module):
 
 input = register_module('RootInput')
 eventinfo = register_module('EventInfoPrinter')
-printcollections = register_module('PrintCollections')
+printcollections = register_module('PrintCollections', printForEvent=0)
 
 input.param('inputFileName', Belle2.FileSystem.findFile('framework/tests/root_input.root'))
 # load all branches, minus PXDClusters (relations with PXDClusters are automatically excluded)

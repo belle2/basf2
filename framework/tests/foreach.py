@@ -45,7 +45,7 @@ for use_pp in [False, True]:
         subeventpath.add_module(testmod)
         # read: for each  $objName   in $arrayName   run over $path
         path.for_each('MCParticle', 'MCParticles', subeventpath)
-        path.add_module('PrintCollections')
+        path.add_module('PrintCollections', printForEvent=0)
         if use_pp:
             set_nprocesses(2)
             logging.log_level = LogLevel.WARNING  # suppress output

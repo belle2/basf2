@@ -50,7 +50,7 @@ main.add_module(NoopModule())
 
 main.add_module('RootInput', logLevel=LogLevel.WARNING, inputFileNames=inputfiles)
 main.add_module('EventInfoPrinter')
-main.add_module('PrintCollections')
+main.add_module('PrintCollections', printForEvent=0)
 
 main.add_module(TestModule())
 

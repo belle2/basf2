@@ -121,11 +121,15 @@ void TrackFinderVXDCellOMatModule::event()
   unsigned int nSeeds = m_cellularAutomaton.findSeeds(segmentNetwork, m_PARAMstrictSeeding);
   if (nSeeds == 0) { B2WARNING("TrackFinderVXDCellOMatModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!"); return; }
 
+  m_bestPaths.clear();
+  m_familyIndex.clear();
 
   // mark families
   if (m_PARAMsetFamilies) {
     unsigned short nFamilies = m_familyDefiner.defineFamilies(segmentNetwork);
     B2DEBUG(10, "Number of families in the network: " << nFamilies);
+    m_bestPaths.reserve(nFamilies);
+    m_familyIndex.resize(nFamilies, -1);
   }
 
   /// collect all Paths starting from a Seed:
@@ -134,16 +138,39 @@ void TrackFinderVXDCellOMatModule::event()
 
   /// convert paths of directedNodeNetwork-nodes to paths of const SpacePoint*:
   //  Resulting SpacePointPath contains SpacePoints sorted from the innermost to the outermost.
+  unsigned short family;
+  unsigned short current_index = 0;
+  double qi;
+
   for (auto& aPath : collectedPaths) {
     vector <const SpacePoint*> spPath;
     spPath.reserve(aPath->size());
-    short family;
     spPath.push_back(aPath->back()->getEntry().getInnerHit()->spacePoint);
     for (auto aNodeIt = (*aPath).rbegin(); aNodeIt != (*aPath).rend();  ++aNodeIt) {
       spPath.push_back((*aNodeIt)->getEntry().getOuterHit()->spacePoint);
-      family = (*aNodeIt)->getFamily();
     }
-    m_sptcCreator.createSPTCs(m_TCs, spPath, family);
+    family = aPath->back()->getFamily();
+    if (m_PARAMsetFamilies) {
+      SpacePointTrackCand tempSPTC = SpacePointTrackCand(spPath);
+      qi = m_estimator->estimateQuality(tempSPTC.getSortedHits());
+      if (m_familyIndex.at(family) == -1) {
+        m_familyIndex[family] = current_index;
+        current_index ++;
+        m_bestPaths.push_back(tempSPTC);
+      } else if (qi > m_bestPaths.at(m_familyIndex[family]).getQualityIndex()) {
+        tempSPTC.setQualityIndex(qi);
+        m_bestPaths.at(m_familyIndex[family]) = tempSPTC;
+      }
+    } else {
+      m_sptcCreator.createSPTCs(m_TCs, spPath, family);
+    }
+  }
+
+  if (m_PARAMsetFamilies) {
+    for (unsigned short fam = 0; fam < m_familyIndex.size(); fam++) {
+      std::vector<const SpacePoint*> path = m_bestPaths.at(m_familyIndex[fam]).getHits();
+      m_sptcCreator.createSPTCs(m_TCs, path, fam);
+    }
   }
 
 

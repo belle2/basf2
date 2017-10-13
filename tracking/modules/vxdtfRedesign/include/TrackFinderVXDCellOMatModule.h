@@ -30,7 +30,11 @@
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
 
 #include <tracking/trackFindingVXD/tcTools/SpacePointTrackCandCreator.h>
+#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
+
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
 
 
 namespace Belle2 {
@@ -146,6 +150,12 @@ namespace Belle2 {
     /** StoreArray for the TCs created in this module */
     StoreArray<Belle2::SpacePointTrackCand> m_TCs;
 
+    /** pointer to the QualityEstimator */
+    std::unique_ptr<QualityEstimatorBase> m_estimator;
+
+    std::vector<SpacePointTrackCand> m_bestPaths;
+
+    std::vector<short> m_familyIndex;
 
     /// counters and other debug stuff:
     /** counts event numbers */

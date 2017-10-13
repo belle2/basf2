@@ -27,6 +27,7 @@
 #include <sstream>
 #include <iomanip>
 #include <cstring>
+#include <set>
 
 using namespace std;
 using namespace Belle2;
@@ -94,6 +95,7 @@ void SVDUnpackerModule::event()
 {
   StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
   StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
+  set< SVDShaperDigit > SVDShaperDigitsSet;
   StoreArray<SVDShaperDigit> shaperDigits(m_svdShaperDigitListName);
 
   if (!m_eventMetaDataPtr.isValid()) {  // give up...
@@ -239,7 +241,9 @@ void SVDUnpackerModule::event()
             if (m_generateShaperDigts) {
               //B2INFO("Generating SVDShaperDigit object");
               SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample, 0.0, m_SVDModeByte);
-              shaperDigits.appendNew(*newShaperDigit);
+              // shaperDigits.appendNew(*newShaperDigit);
+
+              SVDShaperDigitsSet.insert(*newShaperDigit);
               delete newShaperDigit;
             }
 
@@ -276,6 +280,10 @@ void SVDUnpackerModule::event()
     } // end event loop
 
   }
+
+  for (const SVDShaperDigit& aDigit : SVDShaperDigitsSet)
+    shaperDigits.appendNew(aDigit);
+
 } //end event function
 #ifndef __clang__
 #pragma GCC diagnostic pop

@@ -42,8 +42,11 @@ namespace Belle2 {
       if (std::max(currentLayer, nextLayer) >= layer and layer >= std::min(currentLayer, nextLayer)) {
 
         if (currentLayer == layer) {
-          const VxdID& fromVXDID = currentState->getHit()->getVxdID();
-          const VxdID& toVXDID = nextState->getHit()->getVxdID();
+          const SpacePoint* const currentSpacePoint = currentState->getHit();
+          const SpacePoint* const nextSpacePoint = nextState->getHit();
+
+          const VxdID& fromVXDID = currentSpacePoint->getVxdID();
+          const VxdID& toVXDID = nextSpacePoint->getVxdID();
           // next layer is an overlap one, so lets return all hits from the same layer, that are on a
           // ladder which is below the last added hit.
           const unsigned int fromLadderNumber = fromVXDID.getLadderNumber();
@@ -61,6 +64,28 @@ namespace Belle2 {
           if (toVXDID.getLadderNumber() != overlappingLadder) {
             continue;
           }
+
+          // Next we make sure to not have any cycles in our graph: we do this by defining only the halves of the
+          // sensor as overlapping. So if the first hit is coming from sensor 1 and the second from sensor 2,
+          // they are only related if the one from sensor 1 is on the half, that is pointing towards sensor 2
+          // and the one on sensor 2 is on the half that is pointing towards sensor 1.
+          //
+          //                       X                         X                         X
+          //               ----|----                    ----|----                    ----|----
+          //  This is fine:         X        This not:                X   This not:          X
+          //                      ----|----                    ----|----                    ----|----
+
+          // for PXD its the other way round!
+          const double currentStateU = currentSpacePoint->getNormalizedLocalU();
+          if (currentStateU > 0.2) {
+            continue;
+          }
+
+          const double nextStateU = nextSpacePoint->getNormalizedLocalU();
+          if (nextStateU <= 0.8) {
+            continue;
+          }
+
         }
 
 

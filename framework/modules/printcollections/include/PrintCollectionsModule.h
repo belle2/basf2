@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Thomas Hauth                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -47,6 +47,9 @@ namespace Belle2 {
 
   private:
 
+    /** Parameter to set the event number for which the collections should be printed. -1 means that
+     * the collections will be printed for all events. */
+    unsigned int m_printForEvent = 1;
   };
 }
 

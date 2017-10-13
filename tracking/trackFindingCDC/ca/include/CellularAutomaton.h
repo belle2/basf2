@@ -9,13 +9,15 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
+
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <framework/logging/Logger.h>
 
 #include <cmath>
+#include <cassert>
 
 namespace Belle2 {
 
@@ -34,18 +36,20 @@ namespace Belle2 {
       /**
        *  Applies the cellular automaton to the collection of cells and its neighborhood
        *  @param cellHolders             The range based iterable containing the cells.
-       *  @param cellHolderNeighborhood  The weighted neighborhood between the cells.
+       *  @param cellHolderRelations     The weighted relations between the cells.
        *  @return                        The cell holder with the highest cell state found.
        */
-      template<class ACellHolderRange>
-      ACellHolder* applyTo(ACellHolderRange& cellHolders,
-                           const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood) const
+      ACellHolder* applyTo(const std::vector<ACellHolder*>& cellHolders,
+                           const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations) const
       {
+        B2ASSERT("Expected the relations to be sorted",
+                 std::is_sorted(cellHolderRelations.begin(), cellHolderRelations.end()));
+
         // Set all cell states to -inf and the non permanent flags to unset.
         prepareCellFlags(cellHolders);
 
-        for (ACellHolder& cellHolder : cellHolders) {
-          AutomatonCell& cell = cellHolder.getAutomatonCell();
+        for (ACellHolder* cellHolder : cellHolders) {
+          AutomatonCell& cell = cellHolder->getAutomatonCell();
           if (cell.hasMaskedFlag()) continue;
           if (cell.hasCycleFlag()) continue;
 
@@ -58,7 +62,7 @@ namespace Belle2 {
 
           try {
             // Assignes flags and the cell state
-            getFinalCellState(cellHolder, cellHolderNeighborhood);
+            getFinalCellState(cellHolder, cellHolderRelations);
           } catch (CycleException) {
             // TODO: Come up with some handeling for cycles.
             // For now we continue to look for long paths in the graph
@@ -71,9 +75,9 @@ namespace Belle2 {
           }
         }
 
-        auto lessStartCellState = [](ACellHolder & lhs, ACellHolder & rhs) {
-          AutomatonCell& lhsCell = lhs.getAutomatonCell();
-          AutomatonCell& rhsCell = rhs.getAutomatonCell();
+        auto lessStartCellState = [](ACellHolder * lhs, ACellHolder * rhs) {
+          AutomatonCell& lhsCell = lhs->getAutomatonCell();
+          AutomatonCell& rhsCell = rhs->getAutomatonCell();
           return (std::make_pair(lhsCell.hasStartFlag(), lhsCell.getCellState()) <
                   std::make_pair(rhsCell.hasStartFlag(), rhsCell.getCellState()));
         };
@@ -81,8 +85,8 @@ namespace Belle2 {
         auto itStartCellHolder =
           std::max_element(cellHolders.begin(), cellHolders.end(), lessStartCellState);
         if (itStartCellHolder == cellHolders.end()) return nullptr;
-        if (not itStartCellHolder->getAutomatonCell().hasStartFlag()) return nullptr;
-        return &*itStartCellHolder;
+        if (not(*itStartCellHolder)->getAutomatonCell().hasStartFlag()) return nullptr;
+        return *itStartCellHolder;
       }
 
     private:
@@ -91,10 +95,10 @@ namespace Belle2 {
        *  Determines it if necessary traversing the graph.
        *  Throws CycleException if it encounters a cycle in the graph.
        */
-      Weight getFinalCellState(ACellHolder& cellHolder,
-                               const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood) const
+      Weight getFinalCellState(ACellHolder* cellHolder,
+                               const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations) const
       {
-        AutomatonCell& cell = cellHolder.getAutomatonCell();
+        AutomatonCell& cell = cellHolder->getAutomatonCell();
 
         // Throw if this cell has already been traversed in this recursion cycle
         if (cell.hasCycleFlag()) {
@@ -109,7 +113,7 @@ namespace Belle2 {
           // Mark cell in order to detect if it was already traversed in this recursion cycle
           cell.setCycleFlag();
 
-          Weight finalCellState = updateState(cellHolder, cellHolderNeighborhood);
+          Weight finalCellState = updateState(cellHolder, cellHolderRelations);
 
           // Unmark the cell
           cell.unsetCycleFlag();
@@ -118,16 +122,16 @@ namespace Belle2 {
       }
 
       /// Updates the state of a cell considering all continuations recursively
-      Weight updateState(ACellHolder& cellHolder,
-                         const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood) const
+      Weight updateState(ACellHolder* cellHolder,
+                         const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations) const
       {
-        AutomatonCell& cell = cellHolder.getAutomatonCell();
+        AutomatonCell& cell = cellHolder->getAutomatonCell();
 
-        //--- blocked cells do not contribute a continuation ---
+        // --- blocked cells do not contribute a continuation ---
+        // Redundant check.
         if (cell.hasMaskedFlag()) {
-          cell.setCellState(NAN);
           cell.setAssignedFlag();
-          return cell.getCellState();
+          return NAN;
         }
 
         //--- Search for neighbors ---
@@ -136,9 +140,11 @@ namespace Belle2 {
         // Flag to keep track whether the best continuation lies on a prioriy path
         bool isPriorityPath = false;
 
+        auto continuations = asRange(
+                               std::equal_range(cellHolderRelations.begin(), cellHolderRelations.end(), cellHolder));
+
         // Check neighbors now
-        for (const WeightedRelation<ACellHolder>& relation :
-             cellHolderNeighborhood.equal_range(&cellHolder)) {
+        for (const WeightedRelation<ACellHolder>& relation : continuations) {
           // Advance to valid neighbor
           ACellHolder* neighborCellHolder = relation.getTo();
 
@@ -153,7 +159,7 @@ namespace Belle2 {
           neighborCell.unsetStartFlag();
 
           // Get the value of the neighbor
-          Weight neighborCellState = getFinalCellState(*neighborCellHolder, cellHolderNeighborhood);
+          Weight neighborCellState = getFinalCellState(neighborCellHolder, cellHolderRelations);
 
           // Add the value of the connetion to the gain value
           Weight stateWithContinuation = neighborCellState + relation.getWeight();
@@ -191,18 +197,15 @@ namespace Belle2 {
        *  Helper function to prepare the stats.
        *  Clears all temporary cell flags and sets the cell state to minus infinity.
        */
-      template<class ACellHolderRange>
-      void prepareCellFlags(ACellHolderRange& cellHolders) const
+      void prepareCellFlags(const std::vector<ACellHolder*>& cellHolders) const
       {
-        for (ACellHolder& cellHolder : cellHolders) {
-          AutomatonCell& cell = cellHolder.getAutomatonCell();
+        for (ACellHolder* cellHolder : cellHolders) {
+          AutomatonCell& cell = cellHolder->getAutomatonCell();
           cell.unsetTemporaryFlags();
+          if (cell.hasMaskedFlag()) continue;
           cell.setCellState(NAN);
         }
       }
-
     };
-
   }
-
 }

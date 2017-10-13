@@ -15,12 +15,10 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
-
-#include <boost/range/algorithm/stable_partition.hpp>
-#include <boost/range/algorithm_ext/is_sorted.hpp>
-#include <boost/range/algorithm_ext/erase.hpp>
 
 #include <numeric>
 
@@ -124,6 +122,10 @@ void AxialTrackUtil::normalizeTrack(CDCTrack& track)
 
   CDCTrajectory3D trajectory3D(trackTrajectory2D, CDCTrajectorySZ::basicAssumption());
   track.setStartTrajectory3D(trajectory3D);
+
+  Vector3D backPosition = track.back().getRecoPos3D();
+  trajectory3D.setLocalOrigin(backPosition);
+  track.setEndTrajectory3D(trajectory3D);
 }
 
 void AxialTrackUtil::updateRecoHit3D(const CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit)
@@ -142,8 +144,9 @@ void AxialTrackUtil::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double max
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   auto farFromTrajectory = [&trajectory2D, &maximumDistance](CDCRecoHit3D & recoHit3D) {
-    Vector2D recoPos2D = recoHit3D.getRecoPos2D();
-    if (fabs(trajectory2D.getDist2D(recoPos2D)) > maximumDistance) {
+    Vector2D refPos2D = recoHit3D.getRefPos2D();
+    double distance = trajectory2D.getDist2D(refPos2D) - recoHit3D.getSignedRecoDriftLength();
+    if (std::fabs(distance) > maximumDistance) {
       recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(false);
       // This must be here as the deleted hits must not participate in the hough search again.
       recoHit3D.getWireHit().getAutomatonCell().setMaskedFlag(true);
@@ -151,7 +154,7 @@ void AxialTrackUtil::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double max
     }
     return false;
   };
-  boost::remove_erase_if(track, farFromTrajectory);
+  erase_remove_if(track, farFromTrajectory);
 }
 
 void AxialTrackUtil::deleteTracksWithLowFitProbability(std::vector<CDCTrack>& axialTracks,
@@ -220,14 +223,15 @@ std::vector<CDCRecoHit3D> AxialTrackUtil::splitBack2BackTrack(CDCTrack& track)
     return getArmSign(hit, center) == majorArmSign;
   };
 
-  auto minorArmHits = boost::stable_partition<boost::return_found_end>(track, isOnMajorArm);
+  auto itFirstMinorArmHit = std::stable_partition(track.begin(),
+                                                  track.end(),
+                                                  isOnMajorArm);
 
-  for (const CDCRecoHit3D& recoHit3D : minorArmHits) {
+  for (const CDCRecoHit3D& recoHit3D : asRange(itFirstMinorArmHit, track.end())) {
     recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(false);
     removedHits.push_back(recoHit3D);
   }
-
-  boost::erase(track, minorArmHits);
+  track.erase(itFirstMinorArmHit, track.end());
 
   return removedHits;
 }
@@ -306,7 +310,7 @@ void AxialTrackUtil::removeHitsAfterSuperLayerBreak(CDCTrack& track)
 
   // We only check for holes in the forward arm for now
   // We do not use emptyEndingSLayers here, as it would leave to a severy efficiency drop.
-  assert(boost::is_sorted(forwardSLayerHoles));
+  assert(std::is_sorted(forwardSLayerHoles.begin(), forwardSLayerHoles.end()));
   if (forwardSLayerHoles.empty()) return;
 
   const ISuperLayer breakSLayer = forwardSLayerHoles.front();
@@ -318,7 +322,8 @@ void AxialTrackUtil::removeHitsAfterSuperLayerBreak(CDCTrack& track)
     }
     return false;
   };
-  boost::remove_erase_if(track, isInBackwardArm);
+
+  erase_remove_if(track, isInBackwardArm);
 
   auto isAfterSLayerBreak = [breakSLayer](const CDCRecoHit3D & recoHit3D) {
     recoHit3D.getWireHit().getAutomatonCell().unsetTakenFlag();
@@ -328,7 +333,8 @@ void AxialTrackUtil::removeHitsAfterSuperLayerBreak(CDCTrack& track)
     }
     return false;
   };
-  boost::remove_erase_if(track, isAfterSLayerBreak);
+
+  erase_remove_if(track, isAfterSLayerBreak);
 }
 
 std::vector<ISuperLayer> AxialTrackUtil::getSLayerHoles(const std::array<int, ISuperLayerUtil::c_N>& nHitsBySLayer)

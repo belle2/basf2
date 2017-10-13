@@ -203,7 +203,8 @@ def add_cdc_cr_reconstruction(path, eventTimingExtraction=True,
     # Create Belle2 Tracks from the genfit Tracks
     path.add_module('TrackCreator',
                     defaultPDGCode=13,
-                    useClosestHitToIP=True
+                    useClosestHitToIP=True,
+                    useBFieldAtHit=True
                     )
 
 
@@ -263,3 +264,13 @@ def getDataPeriod(exp=0, run=0):
 def getPhiRotation():
     global globalPhi
     return(globalPhi)
+
+
+def getMapperAngle(exp=1, run=3118):
+    if exp == 1:
+        if run < 3883:
+            return 16.7
+        else:
+            return 43.3
+    else:
+        return None

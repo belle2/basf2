@@ -146,7 +146,7 @@ namespace Belle2 {
     bool m_addTimeOfFlight4Bg;     /**< A switch used to control adding time of flight into the total drift time or not for beam bg. */
     bool m_outputNegativeDriftTime;     /**< A switch to output negative drift time to CDCHit */
     bool m_output2ndHit;         /**< A switch to output 2nd hit */
-    bool m_misalign;             /**< A switch to control misalignment */
+    bool m_align;             /**< A switch to control alignment */
     bool m_correctForWireSag;    /**< A switch to control wire sag */
 //    float m_eventTime;         /**< It is a timing of event, which includes a time jitter due to the trigger system */
 

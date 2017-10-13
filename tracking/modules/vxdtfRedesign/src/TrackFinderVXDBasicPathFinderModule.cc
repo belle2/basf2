@@ -155,9 +155,9 @@ void TrackFinderVXDBasicPathFinderModule::event()
   for (auto& aPath : collectedPaths) {
     vector <const SpacePoint*> spPath;
     spPath.reserve(aPath->size());
-    spPath.push_back(aPath->back()->getEntry().getInnerHit()->spacePoint);
+    spPath.push_back(aPath->back()->getEntry().getInnerHit()->m_spacePoint);
     for (auto aNodeIt = (*aPath).rbegin(); aNodeIt != (*aPath).rend();  ++aNodeIt) {
-      spPath.push_back((*aNodeIt)->getEntry().getOuterHit()->spacePoint);
+      spPath.push_back((*aNodeIt)->getEntry().getOuterHit()->m_spacePoint);
     }
     family = aPath->back()->getFamily();
     if (m_PARAMsetFamilies) {

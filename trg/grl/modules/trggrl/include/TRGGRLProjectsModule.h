@@ -34,7 +34,7 @@ namespace Belle2 {
 //  TRGGRLProjectsModule(const std::string & type);
 
     /// Destructor
-    virtual ~TRGGRLProjectsModule();
+    virtual ~TRGGRLProjectsModule() {};
 
     /// Initilizes TRGGRLProjectsModule.
     virtual void initialize();
@@ -55,7 +55,7 @@ namespace Belle2 {
   public:
 
     /// returns version of TRGGRLProjectsModule.
-    std::string version(void) const;
+    //std::string version(void) const;
 
   private: // Parameters
 

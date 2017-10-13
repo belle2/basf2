@@ -59,14 +59,17 @@ def wf_display(waveform, run, event, suffix=""):
     fname = 'waveforms_run' + str(run) + '_event' + str(event) + '_chan'
     pdfFile = fname
     chan = waveform.getChannel()
+    asic = waveform.getASICNumber()
+    carr = waveform.getCarrierNumber()
+    bstk = (chan // 8 // 4 // 4) % 4
     pdfFile = pdfFile + '-' + str(chan)
-
     nHits = 0
     wf = waveform.getWaveform()
     hist.Reset()
     numSamples = waveform.getSize()
     hist.SetBins(numSamples, 0.0, float(numSamples))
-    title = 'chan ' + str(chan) + ' win'
+    title = 'channel: ' + str(chan % 8) + ' asic: ' + str(asic) \
+        + ' carrier: ' + str(carr) + ' BS: ' + str(bstk) + ' win:'
     for window in waveform.getStorageWindows():
         title += ' ' + str(window)
     hist.SetTitle(title)
@@ -122,14 +125,20 @@ class WaveformAnalyzer(Module):
         self.feProps = TNtuple(
             "feProps",
             "feProps",
-            "fePeak1Ht:fePeak1TDC:fePeak1Wd:fePeakHt:fePeakTDC:fePeakWd:fePeakIntegral"
-            ":nTOPRawDigits:ch:nNarrowPeaks:nInFirstWindow:nHeight150")
+            "event:run"
+            ":fePeak1Ht:fePeak1TDC:fePeak1Wd"
+            ":fePeakHt:fePeakTDC:fePeakWd:fePeakIntegral"
+            ":nTOPRawDigits:ch:nNarrowPeaks:nInFirstWindow:nHeight150:nOscillations")
+
         #: number of waveforms processed
         self.nWaveForms = 0
+
         #: number of waveforms out of order
         self.nWaveFormsOutOfOrder = 0
+
         #: object of output file
         self.f = TFile.Open(args.output, "RECREATE")
+
         #: counts how many plots were created. Stop after 10
         self.plotCounter = 0
 
@@ -145,18 +154,18 @@ class WaveformAnalyzer(Module):
             chan = waveform.getChannel()
             self.nWaveForms += 1
             # declare some counters for our ntuple
-            nInFirstWindow, nNarrowPeaks, nHeight150 = 0, 0, 0
+            nInFirstWindow, nNarrowPeaks, nHeight150, nOscillations = 0, 0, 0, 0
 
             # waveform.areWindowsInOrder is a bit too strict at the moment
             wins = np.array(waveform.getStorageWindows())
             if not np.all(wins[:-1] <= wins[1:]):  # change false for pics
                 self.nWaveFormsOutOfOrder += 1
-                if args.plotWaveforms:
+                if False and args.plotWaveforms:
                     wf_display(waveform, run, event, "windowOrder")
                     self.plotCounter += 1
 
             wf = np.array(waveform.getWaveform())
-            if args.plotWaveforms:
+            if False and args.plotWaveforms:
                 wf_display(waveform, run, event, "general")
                 self.plotCounter += 1
 
@@ -165,11 +174,11 @@ class WaveformAnalyzer(Module):
             rawDigits = waveform.getRelationsWith("TOPRawDigits")
             nTOPRawDigits = len(rawDigits)
 
-            if args.plotWaveforms and nTOPRawDigits > 2:
+            if False and args.plotWaveforms and nTOPRawDigits > 2:
                 # There are at least 3 Top raw digits
                 wf_display(waveform, run, event, "manyPeaks")
                 self.plotCounter += 1
-            if args.plotWaveforms and nTOPRawDigits > 3:
+            if False and args.plotWaveforms and nTOPRawDigits > 3:
                 # There are at least 4 TOPRawDigits
                 wf_display(waveform, run, event, "tooManyPeaks")
                 self.plotCounter += 1
@@ -184,8 +193,18 @@ class WaveformAnalyzer(Module):
             if 0 < fePeakTDC < 65 and chan % 8 == 0:
                 # To see if cal pulse is in first window
                 nInFirstWindow += 1
-                if args.plotWaveforms:
+                if False and args.plotWaveforms:
                     wf_display(waveform, run, event, "calPuls_firstWin")
+                    self.plotCounter += 1
+
+            # there are strange bumps in the ADC distribtion of the cal channels
+            if (140 < fePeakHt < 220) and chan % 8 == 0:
+                if False and args.plotWaveforms:
+                    wf_display(waveform, run, event, "strangeADCBump_1")
+                    self.plotCounter += 1
+            if (300 < fePeakHt < 410) and chan % 8 == 0:
+                if False and args.plotWaveforms:
+                    wf_display(waveform, run, event, "strangeADCBump_2")
                     self.plotCounter += 1
 
             fePeak1Ht = -1
@@ -199,21 +218,38 @@ class WaveformAnalyzer(Module):
                 fePeak1Wd = rawDigits[1].getSampleFall() - rawDigits[1].getSampleRise()
                 fePeak1Integral = rawDigits[1].getIntegral()
 
+            if nTOPRawDigits > 1 and fePeak1TDC < 64:
+                # counting the times that the second digit is found in the first window
+                if False and args.plotWaveforms:
+                    wf_display(waveform, run, event, "secondPeakInFirstWindow")
+                    self.plotCounter += 1
+
             if fePeakWd < 5 or nTOPRawDigits > 1 and fePeak1Wd < 5:
                 # counting thin peaks
                 nNarrowPeaks += 1
-                if args.plotWaveforms:
+                if False and args.plotWaveforms:
                     wf_display(waveform, run, event, "thinpeak")
                     self.plotCounter += 1
 
             if 145 < fePeak1Ht < 155 and chan % 8 == 0:
                 # Jan needs to write a comment about why we're doing this test
                 nHeight150 += 1
-                if args.plotWaveforms:
+                if False and args.plotWaveforms:
                     wf_display(waveform, run, event, "peak1Ht_is_150")
                     self.plotCounter += 1
 
+            if nTOPRawDigits > 5 and (fePeakHt - fePeak1Ht) < 5:
+                if np.mean(wf) < 10:
+                    # want to count the portion of times we see this oscillation behavior
+                    # guard the call to numpy.mean by the previous if statements
+                    nOscillations += 1
+                    if False and args.plotWaveforms:
+                        wf_display(waveform, run, event, "oscillations")
+                        self.plotCounter += 1
+
             self.feProps.Fill(
+                event,
+                run,
                 fePeak1Ht,
                 fePeak1TDC,
                 fePeak1Wd,
@@ -225,7 +261,8 @@ class WaveformAnalyzer(Module):
                 chan,
                 nNarrowPeaks,
                 nInFirstWindow,
-                nHeight150
+                nHeight150,
+                nOscillations,
             )
 
             # only plot the first 10 figures.

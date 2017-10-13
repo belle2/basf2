@@ -745,6 +745,21 @@ def applyCuts(list_name, cut, path=analysis_main):
     path.add_module(pselect)
 
 
+def applyEventCuts(cut, path=analysis_main):
+    """
+    Removes events that do not pass the given selection criteria (given in ParticleSelector style).
+
+    @param cut  Events that do not pass these selection criteria are skipped
+    @param path      modules are added to this path
+    """
+
+    eselect = register_module('VariableToReturnValue')
+    eselect.param('variable', 'passesEventCut(' + cut + ')')
+    path.add_module(eselect)
+    empty_path = create_path()
+    eselect.if_value('<1', empty_path)
+
+
 def reconstructDecay(
     decayString,
     cut,
@@ -752,6 +767,7 @@ def reconstructDecay(
     writeOut=False,
     path=analysis_main,
     candidate_limit=None,
+    ignoreIfTooManyCandidates=True,
 ):
     """
     Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via
@@ -768,12 +784,14 @@ def reconstructDecay(
     @param writeOut    wether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
     @param candidate_limit Maximum amount of candidates to be reconstructed. If
-                       the number of candidates is exceeded no candidate will be
-                       reconstructed for that event and a Warning will be
+                       the number of candidates is exceeded a Warning will be
                        printed.
                        If no value is given the amount is limited to a sensible
                        default. A value <=0 will disable this limit and can
                        cause huge memory amounts so be careful.
+    @param ignoreIfTooManyCandidates weather event should be ignored or not if number of reconstructed
+                       candiades reaches limit. If event is ignored, no candiades are reconstructed,
+                       otherwise, number of candidates in candidate_limit is reconstructed.
     """
 
     pmake = register_module('ParticleCombiner')
@@ -784,6 +802,7 @@ def reconstructDecay(
     pmake.param('writeOut', writeOut)
     if candidate_limit is not None:
         pmake.param("maximumNumberOfCandidates", candidate_limit)
+    pmake.param("ignoreIfTooManyCandidates", ignoreIfTooManyCandidates)
     path.add_module(pmake)
 
 
@@ -1729,11 +1748,25 @@ def inclusiveBtagReconstruction(upsilon_list_name, bsig_list_name, btag_list_nam
     path.add_module(btag)
 
 
+def selectDaughters(particle_list_name, decay_string, path=analysis_main):
+    """
+    Redefine the Daughters of a particle: select from decayString
+
+    @param particle_list_name input particle list
+    @para decay_string  for selecting the Daughters to be preserved
+    """
+    seld = register_module('SelectDaughters')
+    seld.set_name('SelectDaughters_' + particle_list_name)
+    seld.param('listName', particle_list_name)
+    seld.param('decayString', decay_string)
+    path.add_module(seld)
+
+
 if __name__ == '__main__':
     desc_list = []
     for function_name in sorted(list_functions(sys.modules[__name__])):
         function = globals()[function_name]
-        signature = inspect.formatargspec(*inspect.getargspec(function))
+        signature = inspect.formatargspec(*inspect.getfullargspec(function))
         signature = signature.replace(repr(analysis_main), 'analysis_main')
         desc_list.append((function.__name__, signature + '\n' + function.__doc__))
 

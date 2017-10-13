@@ -9,9 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
-
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
+
+#include <tracking/trackFindingCDC/utilities/CompositeProcessingSignalListener.h>
 
 #include <tracking/trackFindingCDC/utilities/Named.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
@@ -28,7 +28,7 @@ namespace Belle2 {
      *  Base class defining the interface for various different implementation of sets of variables.
      */
     template<class AObject>
-    class BaseVarSet : public ProcessingSignalListener {
+    class BaseVarSet : public CompositeProcessingSignalListener {
 
     public:
       /// Object type from which variables shall be extracted.
@@ -59,7 +59,7 @@ namespace Belle2 {
        *  Base implementaton returns empty vector
        *  @param prefix Name prefix to apply to all variable names.
        */
-      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix __attribute__((unused)))
+      virtual std::vector<Named<Float_t*> > getNamedVariables(const std::string& prefix __attribute__((unused)))
       {
         return {};
       }
@@ -75,7 +75,7 @@ namespace Belle2 {
        *  Getter for a map of names to float values
        *  @param prefix Name prefix to apply to all variable names.
        */
-      std::map<std::string, Float_t> getNamedValues(std::string prefix)
+      std::map<std::string, Float_t> getNamedValues(const std::string& prefix) const
       {
         std::map<std::string, Float_t> result;
         std::vector<Named<Float_t*> > namedVariables = this->getNamedVariables(prefix);
@@ -87,7 +87,7 @@ namespace Belle2 {
       }
 
       /// Getter for a map of names to float values
-      std::map<std::string, Float_t> getNamedValues()
+      std::map<std::string, Float_t> getNamedValues() const
       {
         const std::string prefix = "";
         return this->getNamedValues(prefix);
@@ -97,7 +97,7 @@ namespace Belle2 {
        *   Pointer to the variable with the given name.
        *   Returns nullptr if not found.
        */
-      virtual MayBePtr<Float_t> find(std::string varName)
+      virtual MayBePtr<Float_t> find(const std::string& varName)
       {
         std::vector<Named<Float_t*> > namedVariables = this->getNamedVariables();
         for (const Named<Float_t* >& namedVariable : namedVariables) {

@@ -55,11 +55,20 @@ TelDataReaderModule::TelDataReaderModule() : Module(),
 
   //Parameter definition
   std::vector<std::string> emptyStringVector;
-  addParam("inputFileName", m_inputFileName, "Input file name. For multiple files, use inputFileNames instead. Can be overridden using the -i argument to basf2.", std::string(""));
-  addParam("inputFileNames", m_inputFileNames, "List of input files. You may use wildcards to specify multiple files, e.g. 'somePrefix_*.root'. Can be overridden using the -i argument to basf2.", emptyStringVector);
-  addParam("maxNumEntries", m_ullMaxNumEntries, "The Maximum number of enries to be processed.\nIf this is zero, no restrict will be placed.", static_cast<unsigned long long int>(0));
-  addParam("numEntriesSkip", m_ullNumEntriesSkip, "The number of entries that shall be skipped at the beginning.", static_cast<unsigned long long int>(0));
-  addParam("numEntriesPrint", m_numPrint, "How often to print the current entry number.\nIf this is zero, do not print any progress output.", static_cast<unsigned long long int>(0));
+  addParam("inputFileName", m_inputFileName,
+           "Input file name. For multiple files, use inputFileNames instead. Can be overridden using the -i argument to basf2.",
+           std::string(""));
+  addParam("inputFileNames", m_inputFileNames,
+           "List of input files. You may use wildcards to specify multiple files, e.g. 'somePrefix_*.root'. Can be overridden using the -i argument to basf2.",
+           emptyStringVector);
+  addParam("maxNumEntries", m_ullMaxNumEntries,
+           "The Maximum number of enries to be processed.\nIf this is zero, no restrict will be placed.",
+           static_cast<unsigned long long int>(0));
+  addParam("numEntriesSkip", m_ullNumEntriesSkip, "The number of entries that shall be skipped at the beginning.",
+           static_cast<unsigned long long int>(0));
+  addParam("numEntriesPrint", m_numPrint,
+           "How often to print the current entry number.\nIf this is zero, do not print any progress output.",
+           static_cast<unsigned long long int>(0));
   // This is dirty, but safe for all practical purposes - there may be less EuTels, but hardly more.
   m_eutelPlaneNrs = {0, 1, 2, 3, 4, 5};
   addParam("eutelPlaneNrs", m_eutelPlaneNrs, "EUDAQ plane numbers ordered in beam direction", m_eutelPlaneNrs);
@@ -387,8 +396,6 @@ void TelDataReaderModule::event()
               storePXDDigits.appendNew(it->second,
                                        digit.getUCellID(),
                                        digit.getVCellID(),
-                                       digit.getUCellPosition(),
-                                       digit.getVCellPosition(),
                                        digit.getCharge());
             }
           }

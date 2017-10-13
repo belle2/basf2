@@ -135,7 +135,7 @@ void PXDRawHitSorterModule::event()
       //Normal case: pixel has different address
       if (!lastpx || px > *lastpx) {
         //Write the digit
-        storeDigits.appendNew(sensorID, px.getU(), px.getV(), 0, 0, px.getCharge());
+        storeDigits.appendNew(sensorID, px.getU(), px.getV(), px.getCharge());
         ++index;
       } else {
         //We already have a pixel at this address, see if we merge or drop the new one
@@ -143,8 +143,7 @@ void PXDRawHitSorterModule::event()
           //Merge the two pixels. As the PXDDigit does not have setters we have to create a new object.
           const PXDDigit& old = *storeDigits[index - 1];
           *storeDigits[index - 1] = PXDDigit(old.getSensorID(), old.getUCellID(),
-                                             old.getVCellID(), old.getUCellPosition(), old.getVCellPosition(),
-                                             old.getCharge() + px.getCharge());
+                                             old.getVCellID(), old.getCharge() + px.getCharge());
         } //Otherwise delete the second pixel by forgetting about it.
       }
       lastpx = &px;

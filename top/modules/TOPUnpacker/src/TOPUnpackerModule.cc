@@ -477,7 +477,7 @@ namespace Belle2 {
             tlpfResult->setBackgroundOffset(samplePeak_n);
             tlpfResult->setAmplitude(valuePeak_n);
             tlpfResult->setChisquare(qualityFlags_n);
-            tlpfResult->setRisingEdge(integral_n);
+            tlpfResult->setRisingEdgeAndConvert(integral_n);
             digit->addRelationTo(tlpfResult);
           }
         }

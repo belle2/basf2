@@ -91,6 +91,9 @@ void RelatedTracksCombinerModule::event()
         newMergedTrack->setChargeSeed(cdcCharge);
         newMergedTrack->addHitsFromRecoTrack(&vxdRecoTrack);
         newMergedTrack->addHitsFromRecoTrack(&cdcRecoTrack, newMergedTrack->getNumberOfTotalHits());
+
+        newMergedTrack->addRelationTo(&vxdRecoTrack);
+        newMergedTrack->addRelationTo(&cdcRecoTrack);
       } catch (genfit::Exception& e) {
         B2WARNING("Could not combine tracks, because of: " << e.what());
       }
@@ -99,6 +102,7 @@ void RelatedTracksCombinerModule::event()
     if (not hasPartner and (not m_useOnlyFittedTracksInSingles or cdcRecoTrack.wasFitSuccessful())) {
       RecoTrack* newTrack = cdcRecoTrack.copyToStoreArray(m_recoTracks);
       newTrack->addHitsFromRecoTrack(&cdcRecoTrack);
+      newTrack->addRelationTo(&cdcRecoTrack);
     }
   }
 
@@ -109,6 +113,7 @@ void RelatedTracksCombinerModule::event()
       if (not m_useOnlyFittedTracksInSingles or vxdRecoTrack.wasFitSuccessful()) {
         RecoTrack* newTrack = vxdRecoTrack.copyToStoreArray(m_recoTracks);
         newTrack->addHitsFromRecoTrack(&vxdRecoTrack);
+        newTrack->addRelationTo(&vxdRecoTrack);
       }
     }
   }

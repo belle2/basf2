@@ -17,12 +17,13 @@ Group_Of_Variables = {
     'Variable2':{...}
     ...
 }
-If you modify original ntuples, pleae make changes of tuple names here accordingly.
+If you modify original ntuples, please make changes of tuple names here accordingly.
 """
 
+#: Fit variables
 fit_variables = {
     'Mbc':
-        {'tuple_name': 'B__Mbc_corr',
+        {'tuple_name': 'B_Mbc_corr',
          'lLim': 5.255,
          'MClLim': 5.265,
          'uLim': 5.29,
@@ -32,7 +33,7 @@ fit_variables = {
          'logY': False,
          'tex_name': "$\\text{M}_{\\text{bc}}$"},
     'deltaE':
-        {'tuple_name': 'B__deltaE_corr',
+        {'tuple_name': 'B_deltaE_corr',
          'lLim': -0.1,
          'MClLim': -0.015,
          'uLim': 0.1,
@@ -42,7 +43,7 @@ fit_variables = {
          'logY': False,
          'tex_name': "$\Delta$E"},
     'Mrho':
-        {'tuple_name': 'B__MR',
+        {'tuple_name': 'B_MR',
          'lLim': 0.5,
          'uLim': 1.05,
          'xaxis': "M_{#pi#pi}, GeV/c^{2}",
@@ -50,7 +51,7 @@ fit_variables = {
          'logY': False,
          'tex_name': "$\\text{M}_{\pi\pi}$"},
     'MKST':
-        {'tuple_name': 'B__MK',
+        {'tuple_name': 'B_MK',
          'lLim': 0.792,
          'uLim': 0.992,
          'xaxis': "M_{K#pi}, GeV/c^{2}",
@@ -58,7 +59,7 @@ fit_variables = {
          'logY': False,
          'tex_name': "$\\text{M}_{\\text{K}\\pi}$"},
     'rhohel':
-        {'tuple_name': 'B__helR',
+        {'tuple_name': 'B_helR',
          'lLim': -1,
          'uLim': 1,
          'xaxis': "cos(#theta_{#pi#pi})",
@@ -66,7 +67,7 @@ fit_variables = {
          'logY': False,
          'tex_name': "$\\cos(\\theta_{\\pi\\pi})$"},
     'Ksthel':
-        {'tuple_name': 'B__helK',
+        {'tuple_name': 'B_helK',
          'lLim': -1,
          'uLim': 1,
          'xaxis': "cos(#theta_{K#pi})",
@@ -74,21 +75,3 @@ fit_variables = {
          'logY': False,
          'tex_name': "$\\cos(\\theta_{\\text{K}\\pi})$"}
 }
-
-from ROOT import RooRealVar
-
-
-def make_real(v):
-    return RooRealVar(
-        fit_variables[v]["tuple_name"],
-        fit_variables[v]["tuple_name"],
-        fit_variables[v]["lLim"],
-        fit_variables[v]["uLim"],
-        fit_variables[v]["units"])
-
-
-def make_fit_var_real():
-    global fit_variables
-    for v in fit_variables:
-        fit_variables[v]['real_var'] = make_real(v)
-    return

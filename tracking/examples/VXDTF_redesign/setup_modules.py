@@ -15,15 +15,29 @@
 from basf2 import *
 from ROOT import Belle2
 
+import os
+
+# sets up the geometry. The file for the default geometry for Belle2 is geometry/Belle2.xml
+
 
 def setup_Geometry(path=None):
     """
     Sets the geometry. Should be used in all VXDTF2 related scripts to ensure to use the same geometry in all
     trainings / validation steps!
     param path: the path to append the geometry
+
     """
+
+    # If the environmental variable USE_BEAST2_GEOMETRY is set the Beast2 geometry will be used, else the default Belle2 geometry
+    fileName = 'geometry/Belle2.xml'
+    if os.environ.get('USE_BEAST2_GEOMETRY'):
+        print('WARNING: will use the Beast2 geometry: geometry/Beast2_phase2.xml')
+        fileName = 'geometry/Beast2_phase2.xml'
+    print('The used geometry is ' + fileName)
+
     # Gearbox
     gearbox = register_module('Gearbox')
+    gearbox.param('fileName', fileName)
     path.add_module(gearbox)
 
     # Geometry
@@ -74,7 +88,7 @@ def setup_VXDTF2(path=None,
     # Preparation
     #################
     if use_pxd:
-        spCreatorPXD = register_module('SpacePointCreatorPXD')
+        spCreatorPXD = register_module('PXDSpacePointCreator')
         spCreatorPXD.logging.log_level = log_level
         spCreatorPXD.logging.debug_level = debug_level
         spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
@@ -82,7 +96,7 @@ def setup_VXDTF2(path=None,
         modules.append(spCreatorPXD)
 
     if use_svd:
-        spCreatorSVD = register_module('SpacePointCreatorSVD')
+        spCreatorSVD = register_module('SVDSpacePointCreator')
         spCreatorSVD.logging.log_level = log_level
         spCreatorSVD.logging.debug_level = debug_level
         spCreatorSVD.param('OnlySingleClusterSpacePoints', False)

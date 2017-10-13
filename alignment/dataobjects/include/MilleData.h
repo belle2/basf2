@@ -12,7 +12,8 @@ namespace Belle2 {
   class MilleData : public Mergeable {
   public:
     /// Constructor. Set doublePrecision to true to write binary files with doubles instead of floats
-    explicit MilleData(bool doublePrecision = false) : Mergeable(), m_doublePrecision(doublePrecision) {};
+    MilleData(bool doublePrecision = false, bool absFilePaths = false) : Mergeable(), m_doublePrecision(doublePrecision),
+      m_absFilePaths(absFilePaths) {};
     /// Destructor
     virtual ~MilleData() { close(); }
 
@@ -44,6 +45,11 @@ namespace Belle2 {
   private:
     /// Use double-precision for binary files
     bool m_doublePrecision{false};
+    /// Use absolute file paths to binary files
+    /// Default is False - so you have to move the binaries to working dir of the algorithm
+    /// If True, the original location of binaries is remebered in datastore and Millepede will
+    /// take them from there
+    bool m_absFilePaths{false};
     std::vector<std::string> m_files{}; /**< List of already created file names */
     /// Pointer to current binary file
     gbl::MilleBinary* m_binary{nullptr}; //! Pointer to opened binary file (not streamed)

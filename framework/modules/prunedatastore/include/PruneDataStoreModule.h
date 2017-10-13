@@ -13,7 +13,7 @@
 #include <framework/core/Module.h>
 #include <string>
 #include <vector>
-#include <boost/regex.hpp>
+#include <regex>
 
 namespace Belle2 {
   /**
@@ -59,10 +59,10 @@ namespace Belle2 {
     bool m_keepMatchedEntries = true;
 
     /** Caching the regex expression for the keep check */
-    std::vector < boost::regex > m_compiled_regex;
+    std::vector < std::regex > m_compiled_regex;
 
     /** Caching the regex expression for the keep check */
-    std::vector < boost::regex > m_compiled_regex_implicit;
+    std::vector < std::regex > m_compiled_regex_implicit;
 
   };
 } // end namespace Belle2

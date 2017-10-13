@@ -41,11 +41,11 @@ void PruneDataStoreModule::initialize()
 {
   // prepare the regex_matchers, otherwise this nede to be done for each DataStore item
   for (auto& kEntry : m_matchEntries) {
-    m_compiled_regex.push_back(boost::regex(kEntry));
+    m_compiled_regex.push_back(std::regex(kEntry));
   }
   // also get the regex for the implicit keeps
   for (auto& kEntry : m_keepEntriesImplicit) {
-    m_compiled_regex_implicit.push_back(boost::regex(kEntry));
+    m_compiled_regex_implicit.push_back(std::regex(kEntry));
   }
 }
 
@@ -60,14 +60,14 @@ void PruneDataStoreModule::event()
     // check if this entry is in our to keep list
     bool toKeep = !m_keepMatchedEntries;
     for (auto const& regx : m_compiled_regex) {
-      if (regex_match(datastore_key, regx)) {
+      if (std::regex_match(datastore_key, regx)) {
         toKeep = m_keepMatchedEntries;
       }
     }
 
     // check for implicit keeps
     for (auto const& regx : m_compiled_regex_implicit) {
-      if (regex_match(datastore_key, regx)) {
+      if (std::regex_match(datastore_key, regx)) {
         // always keep, no matter of the keepMatchedEntries configuration
         toKeep = true;
       }

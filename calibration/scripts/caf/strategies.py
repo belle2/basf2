@@ -50,18 +50,3 @@ that was executed.
         if (self.results[0].result == AlgResult.ok.value) or (self.results[0].result == AlgResult.iterate.value):
             # Commit all the payloads and send out the results
             self.machine.algorithm.algorithm.commit()
-
-    def setup_defaults(self):
-        """
-        Anything that is setup by outside config files by default goes here.
-        """
-        import ROOT
-        import configparser
-        from .utils import decode_json_string
-        config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
-        if config_file_path:
-            config = configparser.ConfigParser()
-            config.read(config_file_path)
-        else:
-            B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
-        self.heartbeat = decode_json_string(config['CAF_DEFAULTS']['Heartbeat'])

@@ -745,6 +745,21 @@ def applyCuts(list_name, cut, path=analysis_main):
     path.add_module(pselect)
 
 
+def applyEventCuts(cut, path=analysis_main):
+    """
+    Removes events that do not pass the given selection criteria (given in ParticleSelector style).
+
+    @param cut  Events that do not pass these selection criteria are skipped
+    @param path      modules are added to this path
+    """
+
+    eselect = register_module('VariableToReturnValue')
+    eselect.param('variable', 'passesEventCut(' + cut + ')')
+    path.add_module(eselect)
+    empty_path = create_path()
+    eselect.if_value('<1', empty_path)
+
+
 def reconstructDecay(
     decayString,
     cut,

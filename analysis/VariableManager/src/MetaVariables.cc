@@ -1003,10 +1003,10 @@ endloop:
 
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
-                      "[Eventbased] ]Returns the number of clean Clusters in the event\n"
+                      "[Eventbased] Returns the number of clean Clusters in the event\n"
                       "Clean clusters are defined by the clusters which pass the given cut assuming a photon hypothesis.");
     REGISTER_VARIABLE("nCleanedTracks(cut)", nCleanedTracks,
-                      "[Eventbased] ]Returns the number of clean Tracks in the event\n"
+                      "[Eventbased] Returns the number of clean Tracks in the event\n"
                       "Clean tracks are defined by the tracks which pass the given cut assuming a pion hypothesis.");
     REGISTER_VARIABLE("formula(v1 + v2 * v3 - v4 / v5^v6)", formula,
                       "Returns the result of the given formula, where v1-v6 are variables.\n"
@@ -1078,11 +1078,11 @@ endloop:
                       "The extraInfo has to be set first by a module like MVAExpert. If nothing is set under this name, -999 is returned.\n"
                       "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the MVAExpert.");
     REGISTER_VARIABLE("eventExtraInfo(name)", eventExtraInfo,
-                      "[eventbased] Returns extra info stored under the given name in the event extra info.\n"
+                      "[Eventbased] Returns extra info stored under the given name in the event extra info.\n"
                       "The extraInfo has to be set first by another module like MVAExpert in event mode.\n"
                       "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the MVAExpert for an event.");
     REGISTER_VARIABLE("eventCached(variable)", eventCached,
-                      "[eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
+                      "[Eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
                       "The result of second call to this variable in the same event will be provided from the cache.");
     REGISTER_VARIABLE("particleCached(variable)", particleCached,
                       "Returns value of given variable and caches this value in the ParticleExtraInfo of the provided particle.\n"

@@ -12,7 +12,7 @@ from basf2 import *
 set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 input = register_module('RootInput')
-filelist = '/ghi/fs01/belle2/bdata/group/detector/BKLM/GCR1/dst.run03173.*.root'
+filelist = '/ghi/fs01/belle2/bdata/group/detector/BKLM/GCR1/rerun/dst.run03173.*.root'
 # input.param('fileNameIsPattern', True)
 input.param('inputFileNames', filelist)
 

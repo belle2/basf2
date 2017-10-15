@@ -409,7 +409,8 @@ CDCTrigger2DFinderModule::mergeIdList(std::vector<unsigned>& merged,
 void
 CDCTrigger2DFinderModule::findAllCrossingHits(std::vector<unsigned>& list,
                                               double x1, double x2,
-                                              double y1, double y2)
+                                              double y1, double y2,
+                                              const cdcMap& inputMap)
 {
   StoreArray<CDCTriggerSegmentHit> tsHits(m_hitCollectionName);
 
@@ -417,6 +418,8 @@ CDCTrigger2DFinderModule::findAllCrossingHits(std::vector<unsigned>& list,
   for (int iHit = 0; iHit < tsHits.getEntries(); iHit++) {
     unsigned short iSL = tsHits[iHit]->getISuperLayer();
     if (iSL % 2) continue;
+    // associate only the hits actually used to form the cluster
+    if (m_suppressClone && inputMap.find(iHit) == inputMap.end()) continue;
     //TODO: add options: center cell / active priority cell / all priority cells
     vector<double> phi = {0, 0, 0};
     phi[0] = tsHits[iHit]->getSegmentID() - TSoffset[iSL];
@@ -480,7 +483,7 @@ CDCTrigger2DFinderModule::selectHits(std::vector<unsigned>& list,
 * Alternative peak finding with nested patterns
 */
 void
-CDCTrigger2DFinderModule::patternClustering()
+CDCTrigger2DFinderModule::patternClustering(const cdcMap& inputMap)
 {
   StoreArray<CDCTriggerTrack> storeTracks(m_outputCollectionName);
   StoreArray<CDCTriggerSegmentHit> tsHits(m_hitCollectionName);
@@ -619,7 +622,7 @@ CDCTrigger2DFinderModule::patternClustering()
         double x2 = (round(centerX) == centerX) ? x + dx : x + 2 * dx;
         double y1 = (round(centerY) == centerY) ? y - dy : y - 2 * dy;
         double y2 = (round(centerY) == centerY) ? y + dy : y + 2 * dy;
-        findAllCrossingHits(idList, x1, x2, y1, y2);
+        findAllCrossingHits(idList, x1, x2, y1, y2, inputMap);
       }
       if (idList.size() == 0) {
         setReturnValue(false);

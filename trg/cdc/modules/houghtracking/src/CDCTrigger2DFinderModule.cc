@@ -148,6 +148,10 @@ CDCTrigger2DFinderModule::initialize()
   if (m_testFilename != "") {
     testFile.open(m_testFilename);
   }
+
+  if (m_suppressClone) {
+    B2INFO("2D finder will exit with the first track candidate in time.");
+  }
 }
 
 void
@@ -223,17 +227,18 @@ CDCTrigger2DFinderModule::event()
     plane->ResizeTo(m_nCellsPhi, m_nCellsR);
   }
 
+  // hit map containing only the early hits
+  cdcMap fastHitMap;
   if (m_suppressClone && !hitMap.empty()) {
     // find the first track candidates in Hough plane
     // only for z0 resolution study with single-track events
     // This will surely fail with multi-track ones,
     // in which case we really need tick-by-tick simulation for all hits.
-    B2INFO("2D finder will end with the first track candidate in time.");
 
     /** Pair of <counter, cdcPair>, for hits with indices */
     typedef pair<int, cdcPair> cdcHitPair;
+    // sequential hit map, ordered by TS found time
     typedef vector<cdcHitPair> cdcSeqMap;
-    // typedef std::unordered_map<int, cdcPair> cdcSeqMap;
     cdcSeqMap seqHitMap;
     // copy hit map to sequential hit map and sort it by TS found time
     for (auto hit : hitMap) {
@@ -243,8 +248,6 @@ CDCTrigger2DFinderModule::event()
       return tsHits[i.first]->foundTime() < tsHits[j.first]->foundTime();
     });
     auto seqHitItr = seqHitMap.begin();
-    // hit map containing only the early hits
-    cdcMap fastHitMap;
     /* layer filter */
     vector<bool> layerHit(CDC_SUPER_LAYERS, false);
     // data clock cycle in unit of 2ns
@@ -284,7 +287,7 @@ CDCTrigger2DFinderModule::event()
 
   /* merge track candidates */
   if (m_clusterPattern)
-    patternClustering();
+    patternClustering(fastHitMap);
   else
     connectedRegions();
 

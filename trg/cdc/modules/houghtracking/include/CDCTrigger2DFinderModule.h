@@ -206,6 +206,9 @@ namespace Belle2 {
     /** switch to check separately for a hit in the innermost super layer */
     bool m_requireSL0;
 
+    /** switch to send only the first found track and suppress the subsequent clones */
+    bool m_suppressClone;
+
     /** switch to save the Hough plane in DataStore
      *  (0: don't save, 1: save only peaks, 2: save full plane) */
     unsigned m_storePlane;

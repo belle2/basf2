@@ -3,16 +3,14 @@
 
 ##############################################################################
 #
-# This is an example steering file to run SVD part of Belle2 simulation.
-# It uses ParicleGun module to generate tracks,
-# (see "generators/example/ParticleGunFull.py" for detailed usage)
-# builds PXD and SVD geometry, performs geant4 and SVD simulation,
-# and stores output in a root file.
+# This steering file demonstrates the use of the new SVD reconstruction path.
+# Currently it ends by creating SVDRecoDigits, clustering is not yet in place.
 #
 ##############################################################################
 
 from basf2 import *
 from dump_digits import dump_digits
+from dump_clusters import dump_clusters
 
 # show warnings during processing
 set_log_level(LogLevel.WARNING)
@@ -35,11 +33,21 @@ simulation = register_module('FullSim')
 PXDDIGI = register_module('PXDDigitizer')
 # SVD digitization module
 SVDDIGI = register_module('SVDDigitizer')
+SVDDIGI.param('StartSampling', -31.44)
 SVDDIGI.param('GenerateShaperDigits', True)
 # SVDDIGI.param('signalsList', 'SVDSignalsList.csv')
-# SVD clusterizer
-SVDCLUST = register_module('SVDClusterizer')
-SVDCLUST.param('digitsSorted', True)
+SVDDIGI.param('RandomizeEventTimes', True)
+SVDDIGI.param('TimeFrameLow', -180)
+SVDDIGI.param('TimeFrameHigh', 150)
+# SVD signal reconstructor
+SVDSIGR = register_module('SVDNNShapeReconstructor')
+# Write RecoDigits so that we can check them
+SVDSIGR.param('WriteRecoDigits', True)
+# Direct clusterizer
+SVDCLUST1 = register_module('SVDClusterizerDirect')
+SVDCLUST1.param('Clusters', 'SVDClustersDirect')
+# RecoDigit clusterizer
+SVDCLUST2 = register_module('SVDNNClusterizer')
 # Save output of simulation
 output = register_module('RootOutput')
 
@@ -56,7 +64,7 @@ particlegun.param('pdgCodes', [-11, 11])
 particlegun.param('nTracks', 1)
 
 # Set the number of events to be processed (100 events)
-eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 
 # Set output filename
 output.param('outputFileName', 'SVDTestOutput.root')
@@ -77,8 +85,11 @@ main.add_module(particlegun)
 main.add_module(simulation)
 main.add_module(PXDDIGI)
 main.add_module(SVDDIGI)
-# main.add_module(dump_digits())
-main.add_module(SVDCLUST)
+main.add_module(SVDSIGR)
+main.add_module(SVDCLUST1)
+main.add_module(dump_clusters('direct_clusters_dump.txt', 'SVDClustersDirect'))
+main.add_module(SVDCLUST2)
+main.add_module(dump_clusters('clusters_dump.txt', 'SVDClusters'))
 main.add_module(output)
 
 # Process events

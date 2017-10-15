@@ -4,7 +4,7 @@
 # ---------------------------------------------------------------------------------------
 # Display of waveforms with feature extraction points superimposed
 # Unpacker is set for Interim FE format v2.1
-# Usage: basf2 showFEWaveforms.py -i <file_name.sroot>
+# Usage: basf2 topShowFEWaveforms.py -i <file_name.sroot>
 # ---------------------------------------------------------------------------------------
 
 # avoid race conditions beetween pyroot and GUI thread

@@ -3,7 +3,7 @@
 
 # ---------------------------------------------------------------------------------------
 # Unpack raw data in Interim FE format v2.1 to TOPDigits
-# Usage: basf2 unpackToTOPDigits.py -i <input_file.sroot> -o <output_file.root>
+# Usage: basf2 topUnpackToTOPDigits.py -i <input_file.sroot> -o <output_file.root>
 # ---------------------------------------------------------------------------------------
 
 from basf2 import *

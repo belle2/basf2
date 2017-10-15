@@ -3,7 +3,7 @@
 
 # ---------------------------------------------------------------------------------------
 # TOP MCP-PMT channel-by-channel gain/efficiency anslysis using laser data
-# Usage: basf2 analyzeGainEff.py <input_file.sroot> --arg --slot (slotNum) --arg --PMT (PMTNum)
+# Usage: basf2 topAnalyzeGainEff.py <input_file.sroot> --arg --slot (slotNum) --arg --PMT (PMTNum)
 # ---------------------------------------------------------------------------------------
 
 from basf2 import *

@@ -3,7 +3,7 @@
 
 # ---------------------------------------------------------------------------------------
 # Prints a summary of raw data given in Interim FE format v2.1
-# usage: basf2 checkInterimFEData.py -i <file_name.sroot> [-n <num_of_events_to_process>]
+# usage: basf2 topCheckInterimFEData.py -i <file_name.sroot> [-n <num_of_events_to_process>]
 # ---------------------------------------------------------------------------------------
 
 from basf2 import *

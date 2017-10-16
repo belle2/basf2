@@ -2143,7 +2143,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("random", random, "return a random number between 0 and 1. Can be used, e.g. for picking a random"
                       "candidate in the best candidate selection.");
     REGISTER_VARIABLE("clusterTimingThreshold", clusterTimingThreshold,
-                      "energy dependent clusterTiming threshold that contains 99.7% true photons");
+                      "energy dependent clusterTiming threshold");
 
   }
 }

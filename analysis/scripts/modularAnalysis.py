@@ -12,6 +12,7 @@ import sys
 import inspect
 from vertex import *
 from analysisPath import *
+from variables import variables
 
 
 def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
@@ -1740,3 +1741,160 @@ if __name__ == '__main__':
     from pager import Pager
     with Pager('List of available functions in modularAnalysis'):
         pretty_print_description_list(desc_list)
+
+
+def writePi0EtaVeto(
+    particleList,
+    decayString,
+    workingDirectory='.',
+    timecut=-1,
+    pi0softForward=0,
+    pi0softBarrel=0,
+    pi0softBackward=0,
+    etasoftForward=0,
+    etasoftBarrel=0,
+    etasoftBackward=0,
+    selection='',
+    path=analysis_main,
+):
+    """
+    Give pi0/eta probability for hard photon.
+    default weight file is set 1.4 GeV as the lower limit of hard photon energy in CMS Frame when mva training for pi0etaveto.
+
+    You can choose clusterTiming cut pattern by param timecut.
+    timecut=-1 is clusterErrorTiming cut. This is the default.
+    timecut=-2 is clusterTimingThreshold cut. This is energy dependent clusterTiming cut.
+    Others are constant value cut. The value is set to to timecut value.
+
+    You can also change the energy cut value for each detection region in the ECL.
+    The default cut values are as below.
+    0.025 GeV for forward pi0 soft photon
+    0.02 GeV for other pi0 soft photon
+    0.035 GeV for forward eta soft photon
+    0.03 GeV for other eta soft photon
+    For example, you should set pi0softForward to -0.05 when you want to set forward pi0 soft photon energy to 0.02.
+    For example, you should set pi0softForward to 0.05 when you want to set forward pi0 soft photon energy to 0.03.
+
+    @param particleList     The input ParticleList
+    @param decayString specify Particle to be added to the ParticleList
+    @param workingDirectory The weight file directory
+    @param timecut The clusterTiming cut pattern as described above
+    @param pi0softForward delta energy threshold of forward pi0 soft photon
+    @param pi0softBarrel delta energy threshold of barrel pi0 soft photon
+    @param pi0softBackward delta energy threshold of backward pi0 soft photon
+    @param etasoftForward delta energy threshold of forward eta soft photon
+    @param etasoftBarrel delta energy threshold of barrel eta soft photon
+    @param etasoftBackward delta energy threshold of backward eta soft photon
+    @param selection Selection criteria that Particle needs meet in order for for_each ROE path to continue
+    """
+
+    variables.addAlias('ctime', 'clusterTimingThreshold')
+
+    roe_path = create_path()
+
+    deadEndPath = create_path()
+
+    signalSideParticleFilter(particleList, selection, roe_path, deadEndPath)
+
+    pi0For = pi0softForward + 0.025
+    pi0Barrel = pi0softBarrel + 0.02
+    pi0Back = pi0softBackward + 0.02
+    etaFor = etasoftForward + 0.035
+    etaBarrel = etasoftBarrel + 0.03
+    etaBack = etasoftBackward + 0.03
+
+# clusterErrorTiming cut
+    if timecut == -1:
+        fillParticleList(
+            'gamma:pi0',
+            'abs(clusterTiming)<clusterErrorTiming and [clusterReg==1 and E>' +
+            str(pi0For) +
+            '] or [clusterReg==2 and E>' +
+            str(pi0Barrel) +
+            '] or [clusterReg==3 and E>' +
+            str(pi0Back) +
+            ']',
+            path=roe_path)
+        fillParticleList(
+            'gamma:eta',
+            'abs(clusterTiming)<clusterErrorTiming and [clusterReg==1 and E>' +
+            str(etaFor) +
+            '] or [clusterReg==2 and E>' +
+            str(etaBarrel) +
+            '] or [clusterReg==3 and E>' +
+            str(etaBack) +
+            ']',
+            path=roe_path)
+
+# clusterTimingThreshold cut
+    elif timecut == -2:
+        fillParticleList(
+            'gamma:pi0',
+            'abs(clusterTiming)<ctime and [clusterReg==1 and E>' +
+            str(pi0For) +
+            '] or [clusterReg==2 and E>' +
+            str(pi0Barrel) +
+            '] or [clusterReg==3 and E>' +
+            str(pi0Back) +
+            ']',
+            path=roe_path)
+        fillParticleList(
+            'gamma:eta',
+            'abs(clusterTiming)<ctime and [clusterReg==1 and E>' +
+            str(etaFor) +
+            '] or [clusterReg==2 and E>' +
+            str(etaBarrel) +
+            '] or [clusterReg==3 and E>' +
+            str(etaBack) +
+            ']',
+            path=roe_path)
+
+# constant clusterTiming cut
+    else:
+        fillParticleList(
+            'gamma:pi0',
+            'abs(clusterTiming)<' +
+            str(timecut) +
+            ' and [clusterReg==1 and E>' +
+            str(pi0For) +
+            '] or [clusterReg==2 and E>' +
+            str(pi0Barrel) +
+            '] or [clusterReg==3 and E>' +
+            str(pi0Back) +
+            ']',
+            path=roe_path)
+        fillParticleList(
+            'gamma:eta',
+            'abs(clusterTiming)<' +
+            str(timecut) +
+            ' and [clusterReg==1 and E>' +
+            str(etaFor) +
+            '] or [clusterReg==2 and E>' +
+            str(etaBarrel) +
+            '] or [clusterReg==3 and E>' +
+            str(etaBack) +
+            ']',
+            path=roe_path)
+
+    fillSignalSideParticleList('gamma:sig', decayString, path=roe_path)
+
+    reconstructDecay('pi0:veto -> gamma:sig gamma:pi0', '', path=roe_path)
+    reconstructDecay('eta:veto -> gamma:sig gamma:eta', '', path=roe_path)
+
+    variables.addAlias('lowE', 'daughter(1,E)')
+    variables.addAlias('cTheta', 'daughter(1,clusterTheta)')
+    variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')
+    variables.addAlias('minC2Hdist', 'daughter(1,minC2HDist)')
+
+    roe_path.add_module('MVAExpert', listNames=['pi0:veto'], extraInfoName='Pi0Veto',
+                        identifier=workingDirectory + '/pi0veto.root')
+    roe_path.add_module('MVAExpert', listNames=['eta:veto'], extraInfoName='EtaVeto',
+                        identifier=workingDirectory + '/etaveto.root')
+
+    rankByHighest('pi0:veto', 'extraInfo(Pi0Veto)', 1, path=roe_path)
+    rankByHighest('eta:veto', 'extraInfo(EtaVeto)', 1, path=roe_path)
+
+    variableToSignalSideExtraInfo('pi0:veto', {'extraInfo(Pi0Veto)': 'Pi0_Prob'}, path=roe_path)
+    variableToSignalSideExtraInfo('eta:veto', {'extraInfo(EtaVeto)': 'Eta_Prob'}, path=roe_path)
+
+    path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

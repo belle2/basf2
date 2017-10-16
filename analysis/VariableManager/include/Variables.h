@@ -743,7 +743,7 @@ namespace Belle2 {
      */
     double random(const Particle*);
     /**
-     * return energy dependent clusterTiming threshold that contains 99.7% true photons
+     * return energy dependent clusterTiming threshold
      */
     double clusterTimingThreshold(const Particle*);
   }

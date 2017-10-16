@@ -11,9 +11,10 @@
 #include <svd/modules/svdCalibration/SVDDatabaseTestModule.h>
 #include <framework/logging/Logger.h>
 
-#include <svd/dbobjects/SVDNoiseCalibrations.h>
-#include <svd/dbobjects/SVDPulseShapeCalibrations.h>
+//#include <svd/dbobjects/SVDPulseShapeCalibrations.h>
 #include <svd/dbobjects/SVDLocalRunBadStrips.h>
+
+#include <vxd/dataobjects/VxdID.h>
 
 using namespace std;
 using namespace Belle2;
@@ -51,12 +52,11 @@ void SVDDatabaseTestModule::event()
   /** Get default values for noise, charge and ADC counts and
    * print them
    */
-  B2INFO("Noise = " << m_obj_noise->getNoise(1, true, 1));
-  B2INFO("Charge [e] = " << m_obj_pulseShape->getChargeFromADC(1, true, 1, 1));
-  B2INFO("ADC counts [a.u.] = " << m_obj_pulseShape->getADCFromCharge(1, true, 1, 22500.));
-  B2INFO("Peaking time [ns] = " << m_obj_pulseShape->getPeakTime(1, true, 1));
-  B2INFO("Pulse width [ns] = " << m_obj_pulseShape->getWidth(1, true, 1));
+  B2INFO("Noise = " << m_obj_noise.getNoise(VxdID(3, 1, 1) , true, 0));
+  //  B2INFO("Charge [e] = " << m_obj_pulseShape->getChargeFromADC(1, true, 1, 1));
+  //  B2INFO("ADC counts [a.u.] = " << m_obj_pulseShape->getADCFromCharge(1, true, 1, 22500.));
+  //  B2INFO("Peaking time [ns] = " << m_obj_pulseShape->getPeakTime(1, true, 1));
+  //  B2INFO("Pulse width [ns] = " << m_obj_pulseShape->getWidth(1, true, 1));
   B2INFO("isBad = " << m_obj_badStrip->isBad(1, true, 1));
 
 }
-

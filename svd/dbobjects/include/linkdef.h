@@ -21,11 +21,10 @@
 #pragma link C++ class Belle2::SVDSensorInfoPar+;
 #pragma link C++ class Belle2::SVDGeometryPar+;
 
-#pragma link C++ class Belle2::SVDPulseShapeCalibrations+;
-#pragma link C++ class Belle2::SVDNoiseCalibrations+;
 #pragma link C++ class Belle2::SVDLocalRunBadStrips+;
 
 #pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsVector<float>>+;
 #pragma link C++ class Belle2::SVDCalibrationsVector<float> +;
+
 
 #endif

@@ -11,10 +11,14 @@
 
 #pragma once
 
-#include <TObject.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <svd/dbobjects/SVDCalibrationsBase.h>
+#include <svd/dbobjects/SVDCalibrationsVector.h>
+#include <framework/database/DBObjPtr.h>
+#include <string>
 
-#include <framework/logging/Logger.h>
+//#include <framework/logging/Logger.h>
+
 
 namespace Belle2 {
 
@@ -26,30 +30,44 @@ namespace Belle2 {
    * are not read from the DB.
    *
    */
-  class SVDNoiseCalibrations : public TObject {
+  class SVDNoiseCalibrations {
   public:
+    static std::string name;
+    typedef SVDCalibrationsBase< SVDCalibrationsVector<float> > t_payload;
+
     /** Constructor, no input argument is required */
-    SVDNoiseCalibrations()
+    SVDNoiseCalibrations(): m_aDBObjPtr(name)
     {}
 
+
     /** This is the method for getting the noise.
-     * Currently we return a fixed default value for every strip.
-     *
      * Input:
      * @param sensor ID: identitiy of the sensor for which the
      * calibration is required
-     * @param isU: sensor side, true for p side, false for n side
+     * @param isU: sensor side, true for p (u) side, false for n (v) side
      * @param strip: strip number
      *
      * Output: integer corresponding to the strip noise in ADC counts.
+     * it throws std::out_of_range if the strip is unknown
      */
-    int getNoise(VxdID , bool , unsigned char)
+    float getNoise(VxdID sensorID, bool isU , unsigned short strip) const
     {
-      return 2;
+      return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
+                              sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
+                              strip);
     }
-  private:
 
-    ClassDef(SVDNoiseCalibrations, 1);
+    void setNoise(VxdID sensorID, bool isU , unsigned short strip, float stripNoise)
+    {
+      m_aDBObjPtr->set(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
+                       sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
+                       strip, stripNoise);
+    }
+
+  private:
+    DBObjPtr< t_payload > m_aDBObjPtr;
+
+
   };
 }
 

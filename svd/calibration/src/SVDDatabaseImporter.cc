@@ -24,9 +24,10 @@
 #include <framework/logging/Logger.h>
 
 // DB objects
-#include <svd/dbobjects/SVDPulseShapeCalibrations.h>
-#include <svd/dbobjects/SVDNoiseCalibrations.h>
+#include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/dbobjects/SVDLocalRunBadStrips.h>
+
+#include <vxd/dataobjects/VxdID.h>
 
 #include <iostream>
 /*#include <fstream>
@@ -41,25 +42,25 @@ using namespace Belle2;
 
 void SVDDatabaseImporter::importSVDPulseShapeCalibrations(/*std::string fileName*/)
 {
-  /* std::ifstream stream;
-  stream.open(fileName.c_str());
-  if (!stream) {
-    B2ERROR("openFile: " << fileName << " *** failed to open");
-    return;
-  }
-  B2INFO(fileName << ": open for reading");
-  */
+  // /* std::ifstream stream;
+  // stream.open(fileName.c_str());
+  // if (!stream) {
+  //   B2ERROR("openFile: " << fileName << " *** failed to open");
+  //   return;
+  // }
+  // B2INFO(fileName << ": open for reading");
+  // */
 
-  DBImportObjPtr<SVDPulseShapeCalibrations> svdpulsecal;
+  //   DBImportObjPtr<SVDPulseShapeCalibrations> svdpulsecal;
 
-  //stream.close();
+  // //stream.close();
 
-  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
-                         m_lastExperiment, m_lastRun);
-  svdpulsecal.construct();
-  svdpulsecal.import(iov);
+  //   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+  //                        m_lastExperiment, m_lastRun);
+  // svdpulsecal.construct();
+  // svdpulsecal.import(iov);
 
-  B2RESULT("SVDPulseShapeCalibrations imported to database.");
+  // B2RESULT("SVDPulseShapeCalibrations imported to database.");
 
 }
 
@@ -75,13 +76,13 @@ void SVDDatabaseImporter::importSVDNoiseCalibrations(/*std::string fileName*/)
   B2INFO(fileName << ": open for reading");
   */
 
-  DBImportObjPtr<SVDNoiseCalibrations> svdnoisecal;
+  DBImportObjPtr< SVDNoiseCalibrations::t_payload > svdnoisecal(SVDNoiseCalibrations::name);
 
   //stream.close();
-
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
   svdnoisecal.construct();
+  svdnoisecal->set(3, 1, 1, 1, 0, 3.14159265) ;
   svdnoisecal.import(iov);
 
   B2RESULT("SVDNoiseCalibrations imported to database.");
@@ -108,6 +109,7 @@ void SVDDatabaseImporter::importSVDLocalRunBadStrips(/*std::string fileName*/)
   svdbadstrips.construct();
   svdbadstrips.import(iov);
 
+
   B2RESULT("SVDLocalRunBadStrips imported to database.");
 
 }
@@ -116,13 +118,13 @@ void SVDDatabaseImporter::importSVDLocalRunBadStrips(/*std::string fileName*/)
 void SVDDatabaseImporter::printSVDPulseShapeCalibrations()
 {
 
-  DBObjPtr<SVDPulseShapeCalibrations> svdPulseShapeCal;
-  // float adc = static_cast<float> ( svdPulseShapeCal->getADCFromCharge(22500.));
+  // DBObjPtr<SVDPulseShapeCalibrations> svdPulseShapeCal;
+  // // float adc = static_cast<float> ( svdPulseShapeCal->getADCFromCharge(22500.));
 
-  std::cout << "Charge from ADC:  "  <<  svdPulseShapeCal->getChargeFromADC(1, true, 1,
-            1) << ", ADC from Charge:  " << svdPulseShapeCal->getADCFromCharge(1, true, 1,
-                22500.) << ", peaking time [ns]: " << svdPulseShapeCal->getPeakTime(1, true,
-                    1) << ", pulse width [ns]: " << svdPulseShapeCal->getWidth(1, true, 1) << " . " << std::endl;
+  // std::cout << "Charge from ADC:  "  <<  svdPulseShapeCal->getChargeFromADC(1, true, 1,
+  //           1) << ", ADC from Charge:  " << svdPulseShapeCal->getADCFromCharge(1, true, 1,
+  //               22500.) << ", peaking time [ns]: " << svdPulseShapeCal->getPeakTime(1, true,
+  //                   1) << ", pulse width [ns]: " << svdPulseShapeCal->getWidth(1, true, 1) << " . " << std::endl;
 
 }
 
@@ -130,10 +132,11 @@ void SVDDatabaseImporter::printSVDPulseShapeCalibrations()
 void SVDDatabaseImporter::printSVDNoiseCalibrations()
 {
 
-  DBObjPtr<SVDNoiseCalibrations> svdNoiseCal;
+  // DBObjPtr<SVDNoiseCalibrations> svdNoiseCal;
+  SVDNoiseCalibrations svdNoiseCal;
   // float adc = static_cast<float> ( svdNoiseCal->getADCFromCharge(22500.));
 
-  std::cout << "Noise: "  <<  svdNoiseCal->getNoise(1, true, 1) << " . " << std::endl;
+  //std::cout << "Noise: "  <<  svdNoiseCal.getNoise( VxdID(3,1,1), true, 1) << " . " << std::endl;
 
 }
 

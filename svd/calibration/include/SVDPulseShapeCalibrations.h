@@ -14,8 +14,6 @@
 #include <TObject.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <framework/logging/Logger.h>
-
 namespace Belle2 {
 
   /** This class defines the dbobject and the methods to access the
@@ -27,7 +25,7 @@ namespace Belle2 {
    * are not read from the DB.
    *
    */
-  class SVDPulseShapeCalibrations : public TObject {
+  class SVDPulseShapeCalibrations {
   public:
     /** Constructor, no input argument is required */
     SVDPulseShapeCalibrations()
@@ -125,7 +123,6 @@ namespace Belle2 {
       return gain;
     }
 
-    ClassDef(SVDPulseShapeCalibrations, 1);
   };
 }
 

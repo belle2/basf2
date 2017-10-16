@@ -13,7 +13,6 @@
 #include <TObject.h>
 #include <vector>
 
-
 namespace Belle2 {
 
   template < class T  >
@@ -67,7 +66,7 @@ namespace Belle2 {
 
     /** Simple destructor
      */
-    ~SVDCalibrationsBase() {};
+    ~SVDCalibrationsBase() {  };
 
     /**
      * Return the calibration associated to a given strip.
@@ -83,11 +82,9 @@ namespace Belle2 {
                                     unsigned int ladder,
                                     unsigned int sensor,
                                     unsigned int side,
-                                    unsigned int strip)
+                                    unsigned int strip) const
     {
-
       return T::get(calibrations.at(layer).at(ladder).at(sensor).at(side) , strip);
-
     }
 
     /**
@@ -107,9 +104,20 @@ namespace Belle2 {
              unsigned int strip,
              typename T::calibrationType value)
     {
-
-
       T::set(calibrations.at(layer).at(ladder).at(sensor).at(side) , strip , value);
+    }
+
+    /**
+     * Return the array index of the side
+     * @param isU
+     *
+     */
+    E_side sideIndex(bool isU) const
+    {
+      if (isU)
+        return Uindex;
+      return Vindex;
+      // tertium non datur
     }
 
     ClassDef(SVDCalibrationsBase, 1)

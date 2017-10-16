@@ -27,7 +27,6 @@ namespace Belle2 {
     ~SVDCalibrationsVector() {};
     static inline calibrationType get(const payloadContainerType& svdVector, unsigned int strip)
     {
-      // Here we will put all the necessary check on the limits of arg strip.
       return svdVector.at(strip);
     }
 
@@ -38,7 +37,7 @@ namespace Belle2 {
     }
 
     static void init(payloadContainerType& svdVector, unsigned int layer,
-                     unsigned int , unsigned int ,
+                     unsigned int /*ladder*/ , unsigned int /*sensor*/,
                      unsigned int side, const T& defaultT)
     {
       unsigned int numberOfStrips = 0;
@@ -47,13 +46,17 @@ namespace Belle2 {
         return;
 
       switch (side) {
-        case SVDCalibrationsBase< SVDCalibrationsVector<T> >::Uindex :
+        case SVDCalibrationsBase< SVDCalibrationsVector >::Uindex :
           numberOfStrips = 768;
-        case SVDCalibrationsBase< SVDCalibrationsVector<T> >::Vindex :
+          break;
+
+        case SVDCalibrationsBase< SVDCalibrationsVector >::Vindex :
           numberOfStrips = layer == 3 ? 768 : 512;
       }
 
       svdVector.resize(numberOfStrips , defaultT);
+
+
     }
   };
 }

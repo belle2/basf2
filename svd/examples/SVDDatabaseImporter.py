@@ -31,7 +31,7 @@ gearbox = register_module('Gearbox')
 main.add_module(gearbox)
 
 # process single event
-process(main)
+# process(main)
 
 print("processato!")
 

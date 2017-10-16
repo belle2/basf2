@@ -4,7 +4,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
-
+#pragma link C++ nestedtypedef;
 
 #pragma link C++ class Belle2::SVDCoolingPipesPar+;
 #pragma link C++ class Belle2::SVDEndringsPar+;
@@ -24,5 +24,8 @@
 #pragma link C++ class Belle2::SVDPulseShapeCalibrations+;
 #pragma link C++ class Belle2::SVDNoiseCalibrations+;
 #pragma link C++ class Belle2::SVDLocalRunBadStrips+;
+
+#pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsVector<float>>+;
+#pragma link C++ class Belle2::SVDCalibrationsVector<float> +;
 
 #endif

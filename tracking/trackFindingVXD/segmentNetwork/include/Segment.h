@@ -81,7 +81,7 @@ namespace Belle2 {
 /// getters:
 
     /** return ID of this segment */
-    const std::int64_t getID() const { return m_identifier; }
+    std::int64_t getID() const { return m_identifier; }
 
     /** returns longer debugging name of this segment */
     std::string getName() const

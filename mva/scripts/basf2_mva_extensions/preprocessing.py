@@ -8,7 +8,7 @@ import numpy as np
 
 class fast_equal_frequency_binning():
     """
-    This class provides a fast implemebntation of equal frequency binning.
+    This class provides a fast implementation of equal frequency binning.
     In Equal frequency binning the binning is chosen in a way that every bin has the same number of entries.
     An example with a Neural Network can be found in: mva/examples/keras/preprocessing.py
     """
@@ -30,7 +30,7 @@ class fast_equal_frequency_binning():
         """
         for variable in range(len(x[0, :])):
             self.state['binning_array'].append(np.percentile(np.nan_to_num(x[:, variable]),
-                                                             range(number_of_bins)))
+                                                             np.arange(number_of_bins) / number_of_bins * 100))
         self.state['number_of_bins'] = number_of_bins
 
     def apply(self, x):

@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
     specific_options = basf2_mva.PythonOptions()
     specific_options.m_framework = "contrib_keras"
-    specific_options.m_steering_file = 'mva/examples/keras/simple_deep.py'
+    specific_options.m_steering_file = 'mva/examples/keras/preprocessing.py'
     specific_options.m_normalize = True
     specific_options.m_training_fraction = 0.9
 

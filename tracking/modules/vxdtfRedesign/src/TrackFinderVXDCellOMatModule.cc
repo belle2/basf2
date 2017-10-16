@@ -84,6 +84,9 @@ void TrackFinderVXDCellOMatModule::initialize()
   m_network.isRequired(m_PARAMNetworkName);
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
 
+  if (m_PARAMsetFamilies) {
+    m_estimator = std::make_unique<QualityEstimatorTripletFit>();
+  }
 }
 
 
@@ -152,6 +155,7 @@ void TrackFinderVXDCellOMatModule::event()
     family = aPath->back()->getFamily();
     if (m_PARAMsetFamilies) {
       SpacePointTrackCand tempSPTC = SpacePointTrackCand(spPath);
+
       qi = m_estimator->estimateQuality(tempSPTC.getSortedHits());
       if (m_familyIndex.at(family) == -1) {
         m_familyIndex[family] = current_index;
@@ -160,6 +164,8 @@ void TrackFinderVXDCellOMatModule::event()
       } else if (qi > m_bestPaths.at(m_familyIndex[family]).getQualityIndex()) {
         tempSPTC.setQualityIndex(qi);
         m_bestPaths.at(m_familyIndex[family]) = tempSPTC;
+      } else {
+        continue;
       }
     } else {
       m_sptcCreator.createSPTCs(m_TCs, spPath, family);

@@ -35,25 +35,24 @@ bool MCUtil::hitIsCorrect(const RecoTrack* mcRecoTrack, const SpacePoint* spaceP
     }
   }
 
-  /*
   // Test if these clusters are on the first half of the track
   // For this, get the reco hit information of the related hit
-  const RecoHitInformation* recoHitInformationOfHit = mcRecoTrack.getRecoHitInformation(spacePoint.getRelatedTo<SVDCluster>());
+  const RecoHitInformation* recoHitInformationOfHit = mcRecoTrack->getRecoHitInformation(spacePoint->getRelatedTo<SVDCluster>());
   B2ASSERT("Invalid MC information", recoHitInformationOfHit);
 
   // then we also need the first exit out of this detector
-  const std::vector<RecoHitInformation*> recoHitInformationList = mcRecoTrack.getRecoHitInformations(true);
+  const std::vector<RecoHitInformation*> recoHitInformationList = mcRecoTrack->getRecoHitInformations(true);
   // For this, we get an iterator into the first entry (there must be at least one hit in this detector, so we are safe)
   const auto& detector = recoHitInformationOfHit->getTrackingDetector();
 
   const auto& itToFirstEntryInDetector = std::find_if(recoHitInformationList.begin(), recoHitInformationList.end(),
-                                                      [detector](RecoHitInformation * hitInformation) {
-                                                        return hitInformation->getTrackingDetector() == detector;
-                                                      });
+  [detector](RecoHitInformation * hitInformation) {
+    return hitInformation->getTrackingDetector() == detector;
+  });
   const auto& itToFirstEntryAfterDetector = std::find_if(itToFirstEntryInDetector, recoHitInformationList.end(),
-                                                         [detector](RecoHitInformation * hitInformation) {
-                                                           return hitInformation->getTrackingDetector() != detector;
-                                                         });
+  [detector](RecoHitInformation * hitInformation) {
+    return hitInformation->getTrackingDetector() != detector;
+  });
 
   if (itToFirstEntryAfterDetector == recoHitInformationList.end()) {
     // This is a really strange case: it should actually not be possible to find such a hit. Better
@@ -62,9 +61,7 @@ bool MCUtil::hitIsCorrect(const RecoTrack* mcRecoTrack, const SpacePoint* spaceP
   }
 
   const auto* firstHitAfterDetector = *itToFirstEntryAfterDetector;
-  return firstHitAfterDetector->getSortingParameter() >= recoHitInformationOfHit->getSortingParameter();*/
-
-  return true;
+  return firstHitAfterDetector->getSortingParameter() >= recoHitInformationOfHit->getSortingParameter();
 }
 
 unsigned int MCUtil::getNumberOfCorrectHits(const RecoTrack* mcRecoTrack, const std::vector<const SpacePoint*>& hits) const

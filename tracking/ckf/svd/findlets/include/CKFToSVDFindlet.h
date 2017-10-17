@@ -21,7 +21,7 @@
 #include <tracking/ckf/general/findlets/TreeSearcher.dcl.h>
 #include <tracking/ckf/general/findlets/OverlapResolver.dcl.h>
 #include <tracking/ckf/svd/findlets/SVDStateRejecter.h>
-#include <tracking/trackFindingCDC/findlets/base/StoreArrayLoader.h>
+#include <tracking/ckf/svd/findlets/SpacePointLoader.h>
 
 #include <tracking/ckf/svd/filters/relations/ChooseableSVDRelationFilter.h>
 #include <tracking/ckf/svd/filters/results/ChooseableSVDResultFilter.h>
@@ -75,15 +75,13 @@ namespace Belle2 {
     // Parameters
     /// Minimal hit requirement for the results (counted in number of space points)
     unsigned int m_param_minimalHitRequirement = 3;
-    /// Use only already used hits
-    bool m_param_useAssignedHits = true;
 
 
     // Findlets
     /// Findlet for retrieving the cdc tracks and writing the result out
     CKFDataHandler<CKFToSVDResult> m_dataHandler;
     /// Findlet for loading the space points
-    TrackFindingCDC::StoreArrayLoader<const SpacePoint> m_hitsLoader;
+    SpacePointLoader m_hitsLoader;
     /// Findlet for creating states out of tracks
     StateCreator<RecoTrack, CKFToSVDState> m_stateCreatorFromTracks;
     /// Findlet for creating states out of hits

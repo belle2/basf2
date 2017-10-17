@@ -73,6 +73,8 @@ namespace Belle2 {
     // Parameters
     /// Minimal hit requirement for the results (counted in number of space points)
     unsigned int m_param_minimalHitRequirement = 3;
+    /// Use only already used hits
+    bool m_param_useAssignedHits = true;
 
 
     // Findlets

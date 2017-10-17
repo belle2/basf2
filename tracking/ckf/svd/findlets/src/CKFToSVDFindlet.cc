@@ -60,6 +60,9 @@ void CKFToSVDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   moduleParamList->addParameter("minimalHitRequirement", m_param_minimalHitRequirement,
                                 "Minimal Hit requirement for the results (counted in space points)",
                                 m_param_minimalHitRequirement);
+  moduleParamList->addParameter("useAssignedHits", m_param_useAssignedHits,
+                                "Use only already used hits",
+                                m_param_useAssignedHits);
 }
 
 void CKFToSVDFindlet::beginEvent()
@@ -83,10 +86,17 @@ void CKFToSVDFindlet::apply()
 
   B2DEBUG(50, "Starting with " << m_spacePointVector.size() << " hits.");
 
-  const auto hitIsAlreadyUsed = [](const auto & hit) {
-    return hit->getAssignmentState();
-  };
-  TrackFindingCDC::erase_remove_if(m_spacePointVector, hitIsAlreadyUsed);
+  if (m_param_useAssignedHits) {
+    const auto hitIsNotAlreadyUsed = [](const auto & hit) {
+      return not hit->getAssignmentState();
+    };
+    TrackFindingCDC::erase_remove_if(m_spacePointVector, hitIsNotAlreadyUsed);
+  } else {
+    const auto hitIsAlreadyUsed = [](const auto & hit) {
+      return hit->getAssignmentState();
+    };
+    TrackFindingCDC::erase_remove_if(m_spacePointVector, hitIsAlreadyUsed);
+  }
 
   B2DEBUG(50, "Now have " << m_spacePointVector.size() << " hits.");
 

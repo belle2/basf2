@@ -109,13 +109,22 @@ namespace Belle2 {
 
       /** Storage for adc hits from entire calorimeter (8736 crystals) */
       std::vector<adccounts_t> m_adc;  /**< ACD counts */
+
+      /** calibration constants per channel */
+      struct calibration_t {
+        float ascale; /**< amplitude scale */
+        float tshift; /**< time shift */
+      };
+      /** Storage for calibration constants */
+      std::vector<calibration_t> m_calib;
+
       /** function wrapper for waveform fit */
       void shapeFitterWrapper(const int j, const int* FitA, const int m_ttrig,
                               int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const ;
 
       /** read Shaper-DSP data from root file */
       void readDSPDB();
-
+      int shapeSignals();
       void repack(const ECLWFAlgoParams&, algoparams_t&);
       void getfitparams(const ECLWaveformData&, const ECLWFAlgoParams&, fitparams_t&);
 
@@ -131,7 +140,7 @@ namespace Belle2 {
       /** Module parameters */
       bool m_background;  /**< background flag */
       bool m_calibration;  /**< calibration flag */
-      bool m_inter;
+      bool m_inter; /**< internuclear counter effect */
     };
   }//ECL
 }//Belle2

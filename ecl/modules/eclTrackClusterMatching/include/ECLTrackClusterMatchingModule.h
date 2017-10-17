@@ -63,9 +63,6 @@ namespace Belle2 {
 
   private:
 
-    /** Check if extrapolated hit is originating from pion entering ECL with valid ID. */
-    bool checkPionECLEnterID(const ExtHit& extHit) const;
-
     /** Check if extrapolated hit is inside ECL and matches one of the desired categories. */
     bool isECLHit(const ExtHit& extHit) const;
 
@@ -83,12 +80,21 @@ namespace Belle2 {
     int m_iRun; /**< Run number */
     int m_iEvent; /**< Event number */
 
+    std::vector<int>* m_trackNo;
+    std::vector<double>* m_trackMomentum;
     std::vector<double>* m_deltaPhi;
-    std::vector<double>* m_errorPhi;
+    std::vector<double>* m_phiCluster;
+    std::vector<double>* m_errorPhi_ECLNEAR;
+    std::vector<double>* m_errorPhi_ECLCROSS;
+    std::vector<double>* m_errorPhi_ECLDL;
     std::vector<double>* m_deltaTheta;
-    std::vector<double>* m_errorTheta;
+    std::vector<double>* m_thetaCluster;
+    std::vector<double>* m_errorTheta_ECLNEAR;
+    std::vector<double>* m_errorTheta_ECLCROSS;
+    std::vector<double>* m_errorTheta_ECLDL;
     std::vector<double>* m_quality;
     std::vector<double>* m_quality_best; /**< Best quality among all extrapolated hits of one track */
+    std::vector<int>* m_hitstatus_best;
 
   };
 

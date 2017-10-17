@@ -105,7 +105,7 @@ namespace Belle2 {
     ~TrackNode() {}
 
     /** return ID of this node */
-    const std::int32_t getID() const { return m_identifier; }
+    std::int32_t getID() const { return m_identifier; }
 
     /** returns longer debugging name of this node */
     std::string getName() const

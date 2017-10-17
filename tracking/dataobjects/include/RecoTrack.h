@@ -886,7 +886,11 @@ namespace Belle2 {
     genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr) const
     {
       checkDirtyFlag();
-      return m_genfitTrack.getFittedState(id, representation);
+      try {
+        return m_genfitTrack.getFittedState(id, representation);
+      } catch (const genfit::Exception& e) {
+        B2FATAL("Could not get fitted state for this hit id! Are you sure this hit was fitted (e.g. DAF deleted it)? " << e.what());
+      }
     }
 
     /// Helper: Check the dirty flag and produce a warning, whenever a fit result is accessed.

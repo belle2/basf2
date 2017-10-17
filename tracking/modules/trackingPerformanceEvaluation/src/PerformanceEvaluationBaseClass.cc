@@ -448,7 +448,7 @@ TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_den, TH2F* h2_num,
 {
   const char* name1 = "_noGeoAcc";
   const char* name2 = "_withGeoAcc";
-  const char* err = "_error_";
+  const char* err_char = "_error_";
   const char* addTitle = "Errors, ";
 
   std::string total;
@@ -460,13 +460,13 @@ TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_den, TH2F* h2_num,
   if (geo_accettance == false) {
     total = std::string(name) + std::string(name1);
     trueTitle = std::string(title) + std::string(name1);
-    error = std::string(name) + std::string(err) + std::string(name1);
+    error = std::string(name) + std::string(err_char) + std::string(name1);
   }
 
   else {
     total = std::string(name) + std::string(name2);
     trueTitle = std::string(title) + std::string(name2);
-    error = std::string(name) + std::string(err) + std::string(name2);
+    error = std::string(name) + std::string(err_char) + std::string(name2);
   }
 
   TH2F* h2[2];
@@ -508,7 +508,7 @@ TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_MC, TH2F* h2_RecoTrack,
 
   const char* name1 = "_noGeoAcc";
   const char* name2 = "_withGeoAcc";
-  const char* err = "_error_";
+  const char* err_char = "_error_";
   const char* addTitle = "Errors, ";
 
   std::string total1 = std::string(name) + std::string(name1);
@@ -517,8 +517,8 @@ TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_MC, TH2F* h2_RecoTrack,
   std::string title1 = std::string(title) + std::string(name1);
   std::string title2 = std::string(title) + std::string(name2);
 
-  std::string error1 = std::string(name) + std::string(err) + std::string(name1);
-  std::string error2 = std::string(name) + std::string(err) + std::string(name2);
+  std::string error1 = std::string(name) + std::string(err_char) + std::string(name1);
+  std::string error2 = std::string(name) + std::string(err_char) + std::string(name2);
   std::string titleErr = std::string(addTitle) + std::string(title);
 
   TH2F* h2[4];
@@ -603,10 +603,10 @@ TH1F* PerformanceEvaluationBaseClass::geoAcc1D(TH1F* h1_den, TH1F* h1_num, const
 TH2F* PerformanceEvaluationBaseClass::geoAcc2D(TH2F* h2_den, TH2F* h2_num,
                                                const char* name, const char* title, TList* histoList)
 {
-  const char* err = "_err";
+  const char* err_char = "_err";
   const char* addTitle = "Errors, ";
 
-  std::string error = std::string(name) + std::string(err);
+  std::string error = std::string(name) + std::string(err_char);
   std::string titleErr = std::string(addTitle) + std::string(title);
 
   TH2F* h2[2];

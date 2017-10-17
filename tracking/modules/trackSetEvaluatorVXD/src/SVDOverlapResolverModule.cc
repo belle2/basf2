@@ -38,7 +38,8 @@ SVDOverlapResolverModule::SVDOverlapResolverModule() : Module()
 
   addParam("NameSVDClusters", m_nameSVDClusters, "Name of expected StoreArray.", string(""));
 
-  addParam("ResolveMethod", m_resolveMethod, "Strategy used to resolve overlaps.", string("greedy"));
+  addParam("ResolveMethod", m_resolveMethod, "Strategy used to resolve overlaps. Currently implemented are \"greedy\" and "
+           " \"hopfield\" ", string("greedy"));
 
   addParam("minActivityState", m_minActivityState, "Sets the minimal value of activity for acceptance. (0,1)",
            float(0.7));

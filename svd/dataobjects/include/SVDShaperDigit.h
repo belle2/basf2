@@ -201,7 +201,7 @@ namespace Belle2 {
                      [this](APVRawSampleType x, APVFloatSampleType y)->APVRawSampleType
       { return trimToSampleRange(x + y); }
                     );
-      // FIXME: Reset FADC time flag in mode byt.
+      // FIXME: Reset FADC time flag in mode byte.
       return DigitBase::c_DontAppend;
     }
 

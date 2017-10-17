@@ -70,8 +70,6 @@ bool SVDStateBasicVarSet::extract(const BaseSVDStateFilter::Object* pair)
   var<named("arcLengthOfHitPosition")>() = static_cast<Float_t>(trajectory.calcArcLength2D(hitPosition));
   var<named("arcLengthOfCenterPosition")>() = static_cast<Float_t>(trajectory.calcArcLength2D(Vector3D(0, 0, 0)));
 
-  var<named("numberOfHoles")>() = 0; //TODO state->getNumberOfHoles();
-
   var<named("layer")>() = spacePoint->getVxdID().getLayerNumber();
   var<named("number")>() = previousStates.size();
 

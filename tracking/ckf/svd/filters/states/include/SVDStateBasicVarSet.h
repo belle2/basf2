@@ -35,8 +35,6 @@ namespace Belle2 {
     "arcLengthOfHitPosition",
     "arcLengthOfCenterPosition",
 
-    "numberOfHoles",
-
     "pt",
     "tan_lambda",
     "phi",

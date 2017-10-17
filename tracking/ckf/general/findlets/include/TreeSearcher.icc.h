@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/utilities/Range.h>
+#include <tracking/trackFindingCDC/ca/CellHolder.h>
 
 namespace Belle2 {
   template <class AState, class AStateRejecter, class AResult>
@@ -89,6 +90,11 @@ namespace Belle2 {
     }
 
     // Traverse the tree from each new state on
+    const auto stateLess = [](const auto & lhs, const auto & rhs) {
+      return lhs->getAutomatonCell().getCellState() < rhs->getAutomatonCell().getCellState();
+    };
+    std::sort(childStates.begin(), childStates.end(), stateLess);
+
     B2DEBUG(50, "Having found " << childStates.size() << " child states.");
     for (const AState* childState : childStates) {
       path.push_back(childState);

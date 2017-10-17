@@ -21,6 +21,7 @@
 #include <tracking/ckf/general/findlets/TreeSearcher.dcl.h>
 #include <tracking/ckf/general/findlets/OverlapResolver.dcl.h>
 #include <tracking/ckf/svd/findlets/SVDStateRejecter.h>
+#include <tracking/ckf/svd/findlets/UnusedVXDTracksAdder.h>
 #include <tracking/ckf/svd/findlets/SpacePointLoader.h>
 
 #include <tracking/ckf/svd/filters/relations/ChooseableSVDRelationFilter.h>
@@ -74,6 +75,8 @@ namespace Belle2 {
     TrackFindingCDC::CellularAutomaton<CKFToSVDState> m_automaton;
     /// Findlet for resolving overlaps
     OverlapResolver<SizeSVDResultFilter> m_overlapResolver;
+    /// Findlet for adding unused VXDTF2 results
+    UnusedVXDTracksAdder m_unusedTracksAdder;
     /// Findlet for tagging the used space points
     SpacePointTagger<CKFToSVDResult, SVDCluster> m_spacePointTagger;
 

@@ -15,6 +15,8 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -51,4 +53,11 @@ SeededSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFT
   }
 
   return NAN;
+}
+
+void SeededSVDPairFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "vxdTracksStoreArrayName"), m_param_vxdTracksStoreArrayName,
+                                "Store Array name coming from VXDTF2",
+                                m_param_vxdTracksStoreArrayName);
 }

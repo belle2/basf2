@@ -44,6 +44,7 @@ CKFToSVDSeedFindlet::CKFToSVDSeedFindlet()
   addProcessingSignalListener(&m_relationCreator);
   addProcessingSignalListener(&m_treeSearchFindlet);
   addProcessingSignalListener(&m_overlapResolver);
+  addProcessingSignalListener(&m_unusedTracksAdder);
   addProcessingSignalListener(&m_spacePointTagger);
 }
 
@@ -58,6 +59,7 @@ void CKFToSVDSeedFindlet::exposeParameters(ModuleParamList* moduleParamList, con
   m_relationCreator.exposeParameters(moduleParamList, prefix);
   m_treeSearchFindlet.exposeParameters(moduleParamList, prefix);
   m_overlapResolver.exposeParameters(moduleParamList, prefix);
+  m_unusedTracksAdder.exposeParameters(moduleParamList, prefix);
   m_spacePointTagger.exposeParameters(moduleParamList, prefix);
 }
 
@@ -97,34 +99,7 @@ void CKFToSVDSeedFindlet::apply()
 
   m_overlapResolver.apply(m_results);
 
-  // Also add the VXDRecoTracks, which do not have any partner
-  StoreArray<RecoTrack> vxdRecoTracks("VXDRecoTracks");
-  std::map<const RecoTrack*, bool> usedVXDRecoTracks;
-
-  for (const RecoTrack& recoTrack : vxdRecoTracks) {
-    usedVXDRecoTracks.emplace(&recoTrack, false);
-  }
-
-  for (const CKFToSVDResult& result : m_results) {
-    const std::vector<const SpacePoint*>& spacePoints = result.getHits();
-    if (spacePoints.empty()) {
-      continue;
-    }
-    const SVDCluster* relatedSVDCluster = spacePoints.front()->getRelated<SVDCluster>();
-    const RecoTrack* recoTrack = relatedSVDCluster->getRelated<RecoTrack>(vxdRecoTracks.getName());
-    usedVXDRecoTracks[recoTrack] = true;
-  }
-
-  for (const auto& pair : usedVXDRecoTracks) {
-    const bool used = pair.second;
-    if (not used) {
-      const RecoTrack* recoTrack = pair.first;
-      SpacePointTrackCand* spacePointTrackCand = recoTrack->getRelated<SpacePointTrackCand>("SPTrackCands");
-      m_results.emplace_back(nullptr, spacePointTrackCand->getHits(), -1, spacePointTrackCand->getPosSeed(),
-                             spacePointTrackCand->getMomSeed(), spacePointTrackCand->getChargeSeed());
-    }
-  }
-
+  m_unusedTracksAdder.apply(m_results);
   m_dataHandler.store(m_results);
 
   // Reassign the space points according to the new results

@@ -18,6 +18,8 @@ namespace Belle2 {
   public:
     TrackFindingCDC::Weight operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>& relation) override;
 
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+
   private:
     std::string m_param_vxdTracksStoreArrayName = "VXDRecoTracks";
     unsigned int m_param_maximalNumberOfDifferentRecoTracks = 0;

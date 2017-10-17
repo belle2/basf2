@@ -11,8 +11,14 @@
 
 #pragma once
 
-#include <TObject.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <svd/dbobjects/SVDCalibrationsBase.h>
+#include <svd/dbobjects/SVDCalibrationsVector.h>
+#include <svd/dbobjects/SVDStripCalAmp.h>
+#include <framework/database/DBObjPtr.h>
+#include <string>
+
+#include <math.h>
 
 namespace Belle2 {
 
@@ -27,13 +33,15 @@ namespace Belle2 {
    */
   class SVDPulseShapeCalibrations {
   public:
+    static std::string name;
+    typedef SVDCalibrationsBase< SVDCalibrationsVector< SVDStripCalAmp > > t_payload;
+
     /** Constructor, no input argument is required */
-    SVDPulseShapeCalibrations()
+    SVDPulseShapeCalibrations(): m_aDBObjPtr(name)
     {}
 
     /** Return the charge (number of electrons/holes) collected on a specific
      * strip, given the number of ADC counts.
-     * Currently the gain is a fixed default value for every strip.
      *
      * Input:
      * @param sensor ID: identity of the sensor for which the
@@ -46,15 +54,18 @@ namespace Belle2 {
      * Output: float corresponding to the charge [e] converted
      * from the read ADC pulse.
      */
-    float getChargeFromADC(Belle2::VxdID sensorID, bool isU, unsigned char strip,  unsigned char pulseADC)
+    inline double getChargeFromADC(
+      const Belle2::VxdID& sensorID,
+      const bool& isU, const unsigned short& strip,
+      const unsigned char& pulseADC
+    ) const
     {
-      return (float) pulseADC * getGain(sensorID, isU, strip);
+      return  pulseADC / getGain(sensorID, isU, strip);
     }
 
-    /** Return an integer corresponding to the ADC pulse
+    /** Return a signed long integer corresponding to the ADC pulse
      * height per strip, provided the charge [e] collected
      * on that strip.
-     * Currently the gain is a fixed default value for every strip.
      *
      * Input:
      * @param sensor ID: identity of the sensor for which the
@@ -66,11 +77,43 @@ namespace Belle2 {
      *
      * Output: an integer number representing the ADC pulse height
      * for the correponding input charge, on the given strip.
+     * The output is capped at 255.
      */
     // it was previously defined as unsigned char, but not working
-    int getADCFromCharge(Belle2::VxdID sensorID, bool isU, unsigned char strip, float charge)
+    inline long int getADCFromCharge(
+      const Belle2::VxdID& sensorID,
+      const bool& isU, const unsigned char& strip,
+      const double& charge) const
     {
-      return charge / getGain(sensorID, isU, strip);
+      return roundl(charge * getGain(sensorID, isU, strip));
+    }
+
+    /** Return an unsigned 8 bit integer corresponding to the ADC pulse
+     * height per strip, provided the charge [e] collected
+     * on that strip.
+     *
+     * Input:
+     * @param sensor ID: identity of the sensor for which the
+     * calibration is required
+     * @param isU: sensor side, true for p side, false for n side
+     * @param strip: strip number
+     * @param charge: the charge in units [e] is also
+     * required as input argument
+     *
+     * Output: an integer number representing the ADC pulse height
+     * for the correponding input charge, on the given strip.
+     * The output is capped at 255.
+     */
+    // it was previously defined as unsigned char, but not working
+    inline unsigned char getCappedADCFromCharge(
+      const Belle2::VxdID& sensorID,
+      const bool& isU, const unsigned char& strip,
+      const double& charge) const
+    {
+      auto chargeLongInt = getADCFromCharge(sensorID, isU, strip, charge);
+      if (chargeLongInt < 0)
+        return 0;
+      return chargeLongInt > 255 ? 255 : chargeLongInt;
     }
 
     /** Return the peaking time of the strip.
@@ -85,10 +128,12 @@ namespace Belle2 {
      * Output: a float number corresponding to the peaking time
      */
 
-    float getPeakTime(VxdID , bool, unsigned char)
+    inline float getPeakTime(const VxdID& sensorID, const bool& isU,
+                             const unsigned short& strip) const
     {
-      return 50;
-
+      return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
+                              sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
+                              strip).peakTime;
     }
 
     /** Return the width of the pulse shape for a given strip.
@@ -103,25 +148,38 @@ namespace Belle2 {
      * Output: a float number corresponding to the pulse width in ns.
      */
 
-    float getWidth(VxdID , bool, unsigned char)
+    inline float getWidth(const VxdID& sensorID, const bool& isU,
+                          const unsigned short& strip) const
     {
-      return 120;
+      return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
+                              sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
+                              strip).pulseWidth;
 
     }
 
 
   private:
 
-    /** A number providing the conversion constant for the gain:
-     * gain*pulseADC = charge [e]
-     * charge/gain = pulse height [ADC counts]
+    /** Return the channel gain.
+     * the gain is expressed in ADC counts / # electrons injected in the channel
+     * That is:
+     * gain / pulseADC = charge [e]
+     * charge * gain = pulse height [ADC counts]
      */
-    float getGain(VxdID , bool, unsigned char)
-    {
 
-      const float gain = 22500. / 60.;
-      return gain;
+    inline float getGain(const VxdID& sensorID, const bool& isU,
+                         const unsigned short& strip) const
+    {
+      return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
+                              sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
+                              strip).gain;
+
+      //  const float gain = 22500. / 60.;
+
     }
+
+  private:
+    DBObjPtr< t_payload > m_aDBObjPtr;
 
   };
 }

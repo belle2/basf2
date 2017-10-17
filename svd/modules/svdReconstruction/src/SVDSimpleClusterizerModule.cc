@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter, Peter Kvasnicka                           *
+ * Contributors: Giulia Casarosa                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -159,71 +159,30 @@ void SVDSimpleClusterizerModule::event()
   if (nDigits == 0)
     return;
 
+  //create a dummy cluster just to start
+  SimpleClusterCandidate* clusterCandidate = new SimpleClusterCandidate(storeDigits[0]->getSensorID(), storeDigits[0]->isUStrip(),
+      m_sizeHeadTail, m_cutSeed, m_cutAdjacent);
 
+  //loop over the SVDRecoDigits
   int i = 0;
-  VxdID prevSensorID = storeDigits[0]->getSensorID();
-  bool prevSide = storeDigits[0]->isUStrip();
-  int prevCellID = storeDigits[0]->getCellID();
-
-  SimpleClusterCandidate* clusterCandidate = new SimpleClusterCandidate(prevSensorID, prevSide, m_sizeHeadTail, m_cutSeed,
-      m_cutAdjacent);
-
-  bool skip = false;
   while (i < nDigits) {
 
+    //retrieve the VxdID, sensor and cellID of the current RecoDigit
     VxdID thisSensorID = storeDigits[i]->getSensorID();
     bool thisSide = storeDigits[i]->isUStrip();
     int thisCellID = storeDigits[i]->getCellID();
 
-    //    B2INFO("looking for a strip to ADD, index "<<i<<", sensor, side, cellID = "<<thisSensorID<<","<<thisSide<<", "<<thisCellID);
-    //    B2INFO("PREVIOUS: sensor, side, cellID = "<<prevSensorID<<","<<prevSide<<", "<<prevCellID);
-
-    if (! skip)
-      if ((thisSide != prevSide) || (thisSensorID != prevSensorID) ||
-          (thisCellID != prevCellID + 1)) {
-        //  B2INFO("side: "<<thisSide<<" VS "<< prevSide);
-        //  B2INFO("sensor: "<<thisSensorID<<" VS "<< prevSensorID);
-        //  B2INFO("cell: "<<thisCellID<<" VS "<< prevCellID);
-        if (clusterCandidate->size() > 0) {
-          clusterCandidate->finalizeCluster();
-          if (clusterCandidate->isGoodCluster())
-            writeClusters(*clusterCandidate);
-        }
-
-        clusterCandidate->clear();
-        delete clusterCandidate;
-
-        clusterCandidate = new SimpleClusterCandidate(thisSensorID, thisSide, m_sizeHeadTail, m_cutSeed, m_cutAdjacent);
-
-        prevSide = thisSide;
-        prevSensorID = thisSensorID;
-        prevCellID = thisCellID;
-        skip = true;
-
-        continue;
-      }
-
-    skip = false;
-
-    //     calibration
     //Ignore digits with insufficient signal
-    //    float ADCnoise = m_NoiseCal->getNoise(thisSensorID, thisSide, thisCellID);
-    //    float thisNoise = m_PulseShapeCal->getChargeFromADC(thisSensorID, thisSide, thisCellID, ADCnoise);
-
-    float thisNoise = 50; //to be removed
+    float ADCnoise = m_NoiseCal->getNoise(thisSensorID, thisSide, thisCellID);
+    float thisNoise = m_PulseShapeCal->getChargeFromADC(thisSensorID, thisSide, thisCellID, ADCnoise);
+    //    float thisNoise = 50; //to be removed
     float thisCharge = storeDigits[i]->getCharge();
-
-    //    B2INFO( "signal over noise = " << thisCharge / thisNoise);
     if ((float)thisCharge / thisNoise < m_cutAdjacent) {
       i++;
-
-      prevSide = thisSide;
-      prevSensorID = thisSensorID;
-      prevCellID = thisCellID;
-
       continue;
     }
 
+    //this strip has a sufficient S/N
     stripInCluster aStrip;
     aStrip.recoDigitIndex = i;
     aStrip.charge = thisCharge;
@@ -231,18 +190,33 @@ void SVDSimpleClusterizerModule::event()
     aStrip.noise = thisNoise;
     aStrip.time = storeDigits[i]->getTime();
 
-    //    B2INFO("addind a strip, index "<<i<<", sensor, side, cellID = "<<thisSensorID<<","<<thisSide<<", "<<thisCellID);
-    clusterCandidate->add(aStrip);
+    //try to add the strip to the existing cluster
+    if (! clusterCandidate->add(thisSensorID, thisSide, aStrip)) {
 
+      //if the strip is not added, write the cluster, if present and good:
+      if (clusterCandidate->size() > 0) {
+        clusterCandidate->finalizeCluster();
+        if (clusterCandidate->isGoodCluster()) {
+          writeClusters(*clusterCandidate);
+        }
+      }
 
-    prevSide = thisSide;
-    prevSensorID = thisSensorID;
-    prevCellID = thisCellID;
+      //prepare for the next cluster:
 
+      //      clusterCandidate->clear(); //not needed with pointer
+      delete clusterCandidate;
+
+      clusterCandidate = new SimpleClusterCandidate(thisSensorID, thisSide, m_sizeHeadTail, m_cutSeed, m_cutAdjacent);
+
+      //start another cluster:
+      if (! clusterCandidate->add(thisSensorID, thisSide, aStrip))
+        B2WARNING("this state is forbidden!!");
+
+    }
     i++;
+  } //exit loop on RecoDigits
 
-  }
-
+  //write the last cluster, if good
   if (clusterCandidate->size() > 0) {
     clusterCandidate->finalizeCluster();
     if (clusterCandidate->isGoodCluster())

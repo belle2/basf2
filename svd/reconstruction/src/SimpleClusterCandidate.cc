@@ -35,16 +35,34 @@ namespace Belle2 {
       , m_SNR(0)
       , m_strips(4) {m_strips.clear();};
 
-    void SimpleClusterCandidate::add(const struct  stripInCluster& aStrip)
+    bool SimpleClusterCandidate::add(VxdID vxdID, bool isUside, struct  stripInCluster& aStrip)
     {
 
-      //      B2INFO("ADDING A STRIP");
-      m_strips.push_back(aStrip);
+      bool added = false;
 
-      if (aStrip.charge > m_seedCharge) {
-        m_seedCharge = aStrip.charge;
-        m_seedIndex = m_strips.size() - 1;
+      //do not add if you are on the wrong sensor or side
+      if ((m_vxdID != vxdID) || (m_isUside != isUside))
+        return false;
+
+      //add if it's the first strip
+      if (m_strips.size() == 0)
+        added = true;
+
+      //add if it adjacent to the last strip added
+      //(we assume that SVDRecoDigits are ordered)
+      if ((m_strips.size() > 0 && (aStrip.cellID == m_strips.at(m_strips.size() - 1).cellID + 1)))
+        added  = true;
+
+      //add it to the vector od strips, update the seed charge and index:
+      if (added) {
+        m_strips.push_back(aStrip);
+
+        if (aStrip.charge > m_seedCharge) {
+          m_seedCharge = aStrip.charge;
+          m_seedIndex = m_strips.size() - 1;
+        }
       }
+      return added;
 
     };
 

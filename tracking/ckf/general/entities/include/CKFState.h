@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+
 #include <genfit/MeasuredStateOnPlane.h>
 #include <framework/logging/Logger.h>
 
@@ -83,7 +85,6 @@ namespace Belle2 {
     void setMeasuredStateOnPlane(const genfit::MeasuredStateOnPlane& mSoP)
     {
       m_measuredStateOnPlane = mSoP;
-      mSoP.getPosMomCov(m_mSoPPosition, m_mSoPMomentum, m_mSoPCov);
       m_hasMSoP = true;
     }
 
@@ -92,27 +93,6 @@ namespace Belle2 {
     {
       B2ASSERT("You are asking for an invalid variable!", mSoPSet());
       return m_measuredStateOnPlane;
-    }
-
-    /// Get the 3d position of the mSoP (cached)
-    const TVector3& getMSoPPosition() const
-    {
-      B2ASSERT("You are asking for an invalid variable!", mSoPSet());
-      return m_mSoPPosition;
-    }
-
-    /// Get the 3d momentum of the mSoP (cached)
-    const TVector3& getMSoPMomentum() const
-    {
-      B2ASSERT("You are asking for an invalid variable!", mSoPSet());
-      return m_mSoPMomentum;
-    }
-
-    /// Get the 6d covariance matrix of the mSoP (cached)
-    const TMatrixDSym& getMSoPCovariance() const
-    {
-      B2ASSERT("You are asking for an invalid variable!", mSoPSet());
-      return m_mSoPCov;
     }
 
     /// Check if state was already fitted.
@@ -127,12 +107,19 @@ namespace Belle2 {
       return m_hasMSoP;
     }
 
-    /// Reset the whole state, as it would be "new"
+    /// Reset the state to be seen as "new"
     void reset()
     {
       m_isFitted = false;
       m_hasMSoP = false;
     }
+
+    /// Getter for the automaton cell.
+    TrackFindingCDC::AutomatonCell& getAutomatonCell()
+    {
+      return m_automatonCell;
+    }
+
 
   private:
     /// The seed this state is related with.
@@ -147,11 +134,7 @@ namespace Belle2 {
     bool m_hasMSoP = false;
     /// MSoP after advancing. Is undetermined before extrapolating!
     genfit::MeasuredStateOnPlane m_measuredStateOnPlane;
-    /// Cache for the position of the mSoP. May be invalid if the mSoP is not set
-    TVector3 m_mSoPPosition;
-    /// Cache for the momentum of the mSoP. May be invalid if the mSoP is not set
-    TVector3 m_mSoPMomentum;
-    /// Cache for the cov of the mSoP. May be invalid if the mSoP is not set
-    TMatrixDSym m_mSoPCov {6};
+    /// Memory for the automaton cell.
+    TrackFindingCDC::AutomatonCell m_automatonCell;
   };
 }

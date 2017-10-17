@@ -4,6 +4,7 @@
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
 * Contributors: Christian Oswald,Phillip Urquijo                         *
+*               Vishal Bhardwaj                                          *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -30,11 +31,28 @@ namespace Belle2 {
     /** Great Grand Mother ID. */
     int* m_iGDGDMotherID;
 
+    /** Mother ID. 1 */
+    int* m_iMotherID1;
+    /** Grand Mother ID. 1 */
+    int* m_iGDMotherID1;
+    /** Great Grand Mother ID. 1 */
+    int* m_iGDGDMotherID1;
+    /** MC Info */
+    int* m_iMCINFO;
+
+    bool m_InterMediate;
+
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:
     /** Constuctor. */
-    NtupleMCHierarchyTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
+    NtupleMCHierarchyTool(TTree* tree, DecayDescriptor& decaydescriptor,
+                          const std::string& strOptions)
+      : NtupleFlatTool(tree,  decaydescriptor, strOptions)
+    {
+      m_InterMediate = false;
+      setupTree();
+    }
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);
   };

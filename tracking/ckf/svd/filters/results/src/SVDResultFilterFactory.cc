@@ -21,6 +21,7 @@
 
 #include <tracking/ckf/svd/filters/results/SVDResultVarSet.h>
 #include <tracking/ckf/svd/filters/results/SVDResultTruthVarSet.h>
+#include <tracking/ckf/svd/filters/results/SizeSVDResultFilter.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -61,6 +62,7 @@ std::map<std::string, std::string> SVDResultFilterFactory::getValidFilterNamesAn
     {"all", "all combination are valid"},
     {"recording", "record variables to a TTree"},
     {"mva", "filter based on the trained MVA method"},
+    {"size", "ordering accoring to size"},
     {"truth", "monte carlo truth"},
     {"truth_teacher", "monte carlo truth returning the result of the teacher"},
   };
@@ -81,6 +83,8 @@ SVDResultFilterFactory::create(const std::string& filterName) const
     return std::make_unique<ChooseableTruthSVDResultFilter>("truth");
   } else if (filterName == "truth_teacher") {
     return std::make_unique<ChooseableTruthSVDResultFilter>("truth_teacher");
+  } else if (filterName == "size") {
+    return std::make_unique<SizeSVDResultFilter>();
   } else {
     return Super::create(filterName);
   }

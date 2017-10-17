@@ -92,10 +92,6 @@ namespace Belle2 {
     }
 
     for (const auto& result : results) {
-      const RecoTrack* seed = result.getSeed();
-      if (not seed) {
-        continue;
-      }
 
       const TVector3& trackPosition = result.getPosition();
       const TVector3& trackMomentum = result.getMomentum();
@@ -104,6 +100,10 @@ namespace Belle2 {
       RecoTrack* newRecoTrack = m_outputRecoTracks.appendNew(trackPosition, trackMomentum, trackCharge);
       result.addToRecoTrack(*newRecoTrack);
 
+      const RecoTrack* seed = result.getSeed();
+      if (not seed) {
+        continue;
+      }
       seed->addRelationTo(newRecoTrack);
     }
   }

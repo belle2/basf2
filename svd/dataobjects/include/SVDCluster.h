@@ -13,6 +13,7 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <sstream>
 
 namespace Belle2 {
 
@@ -24,26 +25,68 @@ namespace Belle2 {
 
     /** Constructor.
      * @param sensorID Sensor compact ID.
-     * @param isU True if u strips, otherwise false.
-     * @param position Seed strip coordinate.
-     * @param positionSigma Error in strip coordinate.
-     * @param clsTime The average of waveform maxima times of strips in the cluster.
-     * @param clsTimeSigma The standard deviation of waveform maxima times.
-     * @param clsCharge The cluster charge in electrons.
-     * @param seedCharge The charge of the seed strip in electrons.
-     * @param clsSize The size of the cluster in the corresponding strip pitch units.
-     * @param clsSNR Signal-to-noise ratio, cluster charge / std error of cluster charge.
+     * @param isU true if u strips, otherwise false.
+     * @param position Hit position estimate.
+     * @param positionSigma Error of hit postion estimate.
+     * @param clsTime Hit time stimate.
+     * @param clsTimeSigma Error of hit time estimate.
+     * @param clsCharge The cluster charge in ADC units.
+     * @param seedCharge The charge of the seed strip in ADC units.
+     * @param clsSize Cluster size, number of fired strips that form the cluster.
+     * @param clsSN Signal-to-noise ratio for the cluster
+     * @param clsChi2 value for cluster fit
      */
     SVDCluster(VxdID sensorID, bool isU, float position, float positionSigma,
-               double clsTime, double clsTimeSigma, float seedCharge, float clsCharge,
-               unsigned short clsSize, float clsSNR):
-      m_sensorID(sensorID), m_isU(isU), m_position(position), m_positionSigma(positionSigma), m_clsTime(clsTime),
-      m_clsTimeSigma(clsTimeSigma), m_clsCharge(clsCharge),
-      m_seedCharge(seedCharge), m_clsSize(clsSize), m_clsSNR(clsSNR)
+               double clsTime, double clsTimeSigma, float clsCharge, float seedCharge,
+               unsigned short clsSize, float clsSN, float clsChi2):
+      m_sensorID(sensorID), m_isU(isU),
+      m_position(position), m_positionSigma(positionSigma),
+      m_clsTime(clsTime), m_clsTimeSigma(clsTimeSigma), m_clsCharge(clsCharge),
+      m_seedCharge(seedCharge), m_clsSize(clsSize), m_clsSN(clsSN),
+      m_clsChi2(clsChi2)
     {}
 
     /** Default constructor for the ROOT IO. */
-    SVDCluster(): SVDCluster(0, true, 0, 100, 0, 100, 0, 0, 0, 0)
+    SVDCluster(): SVDCluster(0, false, 0.0, 1.0, 0.0, 100.0, 0.0, 0.0, 0, 1.0,
+                               100.0)
+    {}
+
+    /** OLD STYLE 8-params constructor, just for backward compatibility.
+     * Will be removed in future.
+     * @param sensorID Sensor compact ID.
+     * @param isU true if u strips, otherwise false.
+     * @param position Hit position estimate.
+     * @param clsTime Hit time stimate.
+     * @param clsTimeSigma Error of hit time estimate.
+     * @param clsCharge The cluster charge in ADC units.
+     * @param seedCharge The charge of the seed strip in ADC units.
+     * @param clsSize Cluster size, number of fired strips that form the cluster.
+     */
+    SVDCluster(VxdID sensorID, bool isU, float position, double clsTime,
+               double clsTimeSigma, float clsCharge, float seedCharge,
+               unsigned short clsSize):
+      SVDCluster(sensorID, isU, position, 1.0, clsTime, clsTimeSigma,
+                 clsCharge, seedCharge, clsSize, 1.0, 100.0)
+    {}
+
+    /** OLD STYLE Constructor, just for backward compatibility.
+     * @param sensorID Sensor compact ID.
+     * @param isU true if u strips, otherwise false.
+     * @param position Hit position estimate.
+     * @param positionSigma Error of hit postion estimate.
+     * @param clsTime Hit time stimate.
+     * @param clsTimeSigma Error of hit time estimate.
+     * @param clsCharge The cluster charge in ADC units.
+     * @param seedCharge The charge of the seed strip in ADC units.
+     * @param clsSize Cluster size, number of fired strips that form the cluster.
+     * @param clsSN Signal-to-noise ratio for the cluster
+     * Will be removed in future.
+     */
+    SVDCluster(VxdID sensorID, bool isU, float position, float positionSigma,
+               double clsTime, double clsTimeSigma, float clsCharge, float seedCharge,
+               unsigned short clsSize, float clsSN):
+      SVDCluster(sensorID, isU, position, 1.0, clsTime, clsTimeSigma,
+                 clsCharge, seedCharge, clsSize, clsSN, 100.0)
     {}
 
     /** Get the sensor ID.
@@ -97,7 +140,26 @@ namespace Belle2 {
     /** Get cluster SNR.
      * @return cluster charge / std error of cluster charge
      */
-    float getSNR() const { return m_clsSNR; }
+    float getSNR() const { return m_clsSN; }
+
+    /** Get chi2 of the time/amplitude fit.
+     * @return Chi2/ndf for the fit
+     */
+    float getChi2() const { return m_clsChi2; }
+
+    /** Get a string representation of the cluster. */
+    std::string print() const
+    {
+      VxdID thisSensorID(m_sensorID);
+      std::ostringstream os;
+      os << "VXDID : " << m_sensorID << " = " << std::string(thisSensorID)
+         << " side: " << ((m_isU) ? "U" : "V") << " position: " << m_position
+         << " +/- " << m_positionSigma << " time: " << m_clsTime << " +/- "
+         << m_clsTimeSigma << " charge: " << m_clsCharge << " seed charge: "
+         << m_seedCharge << " size: " << m_clsSize << " S/N: " << m_clsSN
+         << " Fit Chi2: " << m_clsChi2 << std::endl;
+      return os.str();
+    }
 
   protected:
     unsigned short m_sensorID; /**< Compressed sensor identifier.*/
@@ -109,9 +171,10 @@ namespace Belle2 {
     float m_clsCharge;         /**< Deposited charge in electrons. */
     float m_seedCharge;        /**< Cluster seed charge in electrons. */
     unsigned short m_clsSize;  /**< Cluster size in pixels */
-    float m_clsSNR;            /**< Cluster charge signal-to-noise */
+    float m_clsSN;             /**< Cluster S/N ratio */
+    float m_clsChi2;           /**< Chi2 for time/amplitude fit */
 
-    ClassDef(SVDCluster, 3)
+    ClassDef(SVDCluster, 4)
 
   };
 

@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Andreas Moll, Thomas Hauth                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -33,6 +33,11 @@ REG_MODULE(PrintCollections)
 PrintCollectionsModule::PrintCollectionsModule()
 {
   setDescription("Prints the contents of the DataStore in each event, listing all objects and arrays (including size).");
+
+  addParam("printForEvent", m_printForEvent,
+           "Print the collections only for a specific event number. "
+           "If set to 0, the collections of all events will be printed, which might be a lot of output.",
+           m_printForEvent);
 }
 
 
@@ -48,6 +53,11 @@ void PrintCollectionsModule::initialize()
 void PrintCollectionsModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
+
+  // check if printing for a specific event was selected.
+  if ((m_printForEvent != eventMetaDataPtr->getEvent()) and (m_printForEvent > 0))
+    return;
+
   B2INFO("============================================================================");
   B2INFO("DataStore collections in event " << eventMetaDataPtr->getEvent());
   B2INFO("============================================================================");

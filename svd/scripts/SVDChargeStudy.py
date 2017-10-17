@@ -3,11 +3,7 @@
 
 from basf2 import *
 from SVDChargeSharing import SVDChargeSharing
-from ROOT import Belle2
-logging.log_level = LogLevel.INFO
-
-# reset_database()
-# use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True, LogLevel.ERROR)
+logging.log_level = LogLevel.WARNING
 
 # Particle gun module
 particlegun = register_module('ParticleGun')
@@ -23,10 +19,6 @@ geometry = register_module('Geometry')
 simulation = register_module('FullSim')
 # SVD digitization module
 svddigi = register_module('SVDDigitizer')
-svddigi.logging.log_level = LogLevel.DEBUG
-svddigi.param('storeWaveforms', True)
-svddigi.param('statisticsFilename', 'APV25WaveForms.root')
-
 # SVD clustering module
 svdclust = register_module('SVDClusterizer')
 # RootOutput
@@ -75,7 +67,7 @@ if (factor != 1.0):
     })
 
 # Select subdetectors to be built
-geometry.param('components', ['SVD', 'MagneticField'])
+geometry.param('components', ['SVD'])
 
 # svddigi.param('statisticsFilename', 'digi.root')
 svddigi.param('ElectronicEffects', True)
@@ -91,7 +83,6 @@ main.add_module(simulation)
 main.add_module(svddigi)
 main.add_module(svdclust)
 main.add_module(analyze)
-main.add_module('RootOutput')
 
 # generate events
 process(main)

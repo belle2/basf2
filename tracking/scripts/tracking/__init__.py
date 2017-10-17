@@ -10,7 +10,7 @@ from pxd import add_pxd_reconstruction
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trigger_mode="all", additionalTrackFitHypotheses=None,
-                                reco_tracks="RecoTracks", prune_temporary_tracks=True, use_vxdtf2=False,
+                                reco_tracks="RecoTracks", prune_temporary_tracks=True, use_vxdtf2=True,
                                 fit_tracks=True, use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules for tracking
@@ -335,7 +335,7 @@ def add_track_finding(
         trigger_mode="all",
         reco_tracks="RecoTracks",
         prune_temporary_tracks=True,
-        use_vxdtf2=False,
+        use_vxdtf2=True,
         use_second_cdc_hits=False):
     """
     Adds the realistic track finding to the path.
@@ -1021,7 +1021,7 @@ def is_cdc_used(components):
     return components is None or 'CDC' in components
 
 
-def add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2=False, svd_cluster='__ROIsvdClusters'):
+def add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2=True, svd_cluster='__ROIsvdClusters'):
     """
     This function adds the standard reconstruction modules for tracking to be used for the simulation of PXD data reduction
     to a path.

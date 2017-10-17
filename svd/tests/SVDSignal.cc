@@ -5,6 +5,7 @@
 #include <svd/simulation/SVDSignal.h>
 #include <gtest/gtest.h>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <math.h>
 
@@ -148,6 +149,29 @@ namespace Belle2 {
       }
       double function_value = signal(time);
       EXPECT_EQ(function_value, expected_value);
+    }
+
+    /** Check the waveform string representation. */
+    TEST(SVDSignal, toString)
+    {
+      // Create an artificial signal and load it with data.
+      vector<double> charges;
+      charges.push_back(10);
+      charges.push_back(11);
+      charges.push_back(30);
+      vector<double> times;
+      for (int i = 0; i < 3; ++i) times.push_back(i * 15.0e-9);
+      vector<RelationElement::index_type> mcParticles;
+      for (int i = 0; i < 3; ++i) mcParticles.push_back(3 * i);
+      vector<RelationElement::index_type> trueHits;
+      for (int i = 0; i < 3; ++i) trueHits.push_back(7 * i);
+      const float tau = 50.0e-9; // 25 ns shaping time
+      SVDSignal signal;
+      for (int i = 0; i < 3; ++i) signal.add(times.at(i), charges.at(i), tau, mcParticles.at(i), trueHits.at(i));
+      std::ostringstream os;
+      for (int i = 0; i < 3; ++i)
+        os << i + 1 << '\t' << times.at(i) << '\t' << charges.at(i) << '\t' << tau << std::endl;
+      EXPECT_EQ(signal.toString(), os.str());
     }
 
   } // namespace SVD

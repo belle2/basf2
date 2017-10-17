@@ -16,7 +16,7 @@
 #include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/geometry/AlignmentChecker.h>
 #include <eklm/geometry/GeometryData.h>
-#include <eklm/modules/EKLMAlignment/EKLMAlignmentModule.h>
+#include <eklm/modules/EKLMDisplacementGenerator/EKLMDisplacementGeneratorModule.h>
 
 #include <framework/core/RandomNumbers.h>
 #include <framework/database/Database.h>
@@ -26,11 +26,12 @@
 
 using namespace Belle2;
 
-REG_MODULE(EKLMAlignment)
+REG_MODULE(EKLMDisplacementGenerator)
 
-EKLMAlignmentModule::EKLMAlignmentModule() : Module()
+EKLMDisplacementGeneratorModule::EKLMDisplacementGeneratorModule() : Module()
 {
-  setDescription("Module for generation of EKLM displacement data.");
+  setDescription("Module for generation of EKLM displacement or "
+                 "alignment data.");
   addParam("PayloadName", m_PayloadName,
            "Payload name ('EKLMDisplacement' or 'EKLMAlignment')",
            std::string("EKLMDisplacement"));
@@ -57,11 +58,11 @@ EKLMAlignmentModule::EKLMAlignmentModule() : Module()
   m_GeoDat = NULL;
 }
 
-EKLMAlignmentModule::~EKLMAlignmentModule()
+EKLMDisplacementGeneratorModule::~EKLMDisplacementGeneratorModule()
 {
 }
 
-void EKLMAlignmentModule::fillZeroDisplacements(EKLMAlignment* alignment)
+void EKLMDisplacementGeneratorModule::fillZeroDisplacements(EKLMAlignment* alignment)
 {
   EKLMAlignmentData alignmentData(0., 0., 0.);
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
@@ -84,7 +85,7 @@ void EKLMAlignmentModule::fillZeroDisplacements(EKLMAlignment* alignment)
   }
 }
 
-void EKLMAlignmentModule::generateZeroDisplacement()
+void EKLMDisplacementGeneratorModule::generateZeroDisplacement()
 {
   IntervalOfValidity iov(0, 0, -1, -1);
   EKLMAlignment alignment;
@@ -93,7 +94,7 @@ void EKLMAlignmentModule::generateZeroDisplacement()
   Database::Instance().storeData(m_PayloadName, (TObject*)&alignment, iov);
 }
 
-void EKLMAlignmentModule::generateFixedSectorDisplacement(
+void EKLMDisplacementGeneratorModule::generateFixedSectorDisplacement(
   double dx, double dy, double dalpha)
 {
   IntervalOfValidity iov(0, 0, -1, -1);
@@ -114,7 +115,7 @@ void EKLMAlignmentModule::generateFixedSectorDisplacement(
   Database::Instance().storeData(m_PayloadName, (TObject*)&alignment, iov);
 }
 
-void EKLMAlignmentModule::generateRandomDisplacement(
+void EKLMDisplacementGeneratorModule::generateRandomDisplacement(
   bool displaceSector, bool displaceSegment)
 {
   IntervalOfValidity iov(0, 0, -1, -1);
@@ -219,7 +220,7 @@ sector:
   Database::Instance().storeData(m_PayloadName, (TObject*)&alignment, iov);
 }
 
-void EKLMAlignmentModule::readDisplacementFromROOTFile()
+void EKLMDisplacementGeneratorModule::readDisplacementFromROOTFile()
 {
   int i, n, iEndcap, iLayer, iSector, iPlane, iSegment, sector, segment, param;
   float value;
@@ -280,7 +281,7 @@ void EKLMAlignmentModule::readDisplacementFromROOTFile()
   Database::Instance().storeData(m_PayloadName, (TObject*)&alignment, iov);
 }
 
-void EKLMAlignmentModule::studySectorAlignmentLimits(TFile* f)
+void EKLMDisplacementGeneratorModule::studySectorAlignmentLimits(TFile* f)
 {
   const int nPoints = 1000;
   const float maxDx = 5. * Unit::cm;
@@ -327,7 +328,7 @@ void EKLMAlignmentModule::studySectorAlignmentLimits(TFile* f)
   t->Write();
 }
 
-void EKLMAlignmentModule::studySegmentAlignmentLimits(TFile* f)
+void EKLMDisplacementGeneratorModule::studySegmentAlignmentLimits(TFile* f)
 {
   const int nPoints = 1000;
   const float maxDx = 9. * Unit::cm;
@@ -384,7 +385,7 @@ void EKLMAlignmentModule::studySegmentAlignmentLimits(TFile* f)
   t->Write();
 }
 
-void EKLMAlignmentModule::studyAlignmentLimits()
+void EKLMDisplacementGeneratorModule::studyAlignmentLimits()
 {
   TFile* f;
   f = new TFile(m_OutputFile.c_str(), "recreate");
@@ -393,7 +394,7 @@ void EKLMAlignmentModule::studyAlignmentLimits()
   delete f;
 }
 
-void EKLMAlignmentModule::saveDisplacement(EKLMAlignment* alignment)
+void EKLMDisplacementGeneratorModule::saveDisplacement(EKLMAlignment* alignment)
 {
   int iEndcap, iLayer, iSector, iPlane, iSegment, sector, segment, param;
   float value;
@@ -454,7 +455,7 @@ void EKLMAlignmentModule::saveDisplacement(EKLMAlignment* alignment)
   delete f;
 }
 
-void EKLMAlignmentModule::initialize()
+void EKLMDisplacementGeneratorModule::initialize()
 {
   m_GeoDat = &(EKLM::GeometryData::Instance());
   if (!((m_PayloadName == "EKLMDisplacement") ||
@@ -482,19 +483,19 @@ void EKLMAlignmentModule::initialize()
     B2FATAL("Unknown operation mode.");
 }
 
-void EKLMAlignmentModule::beginRun()
+void EKLMDisplacementGeneratorModule::beginRun()
 {
 }
 
-void EKLMAlignmentModule::event()
+void EKLMDisplacementGeneratorModule::event()
 {
 }
 
-void EKLMAlignmentModule::endRun()
+void EKLMDisplacementGeneratorModule::endRun()
 {
 }
 
-void EKLMAlignmentModule::terminate()
+void EKLMDisplacementGeneratorModule::terminate()
 {
 }
 

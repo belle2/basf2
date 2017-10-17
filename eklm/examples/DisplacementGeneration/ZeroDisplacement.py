@@ -17,8 +17,8 @@ eventinfosetter.param('evtNumList', [1])
 # XML reader
 xmldata = register_module('Gearbox')
 
-# EKLM alignment
-eklmalignment = register_module('EKLMAlignment')
+# EKLM displacement generator
+eklmalignment = register_module('EKLMDisplacementGenerator')
 # Uncomment to generate alignment data instead of displacement data.
 # eklmalignment.param('PayloadName', 'EKLMAlignment')
 

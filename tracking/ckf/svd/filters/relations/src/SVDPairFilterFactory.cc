@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/ckf/svd/filters/relations/SVDPairFilterFactory.h>
 #include <tracking/ckf/svd/filters/relations/SectorSVDPairFilter.h>
+#include <tracking/ckf/svd/filters/relations/SeededSVDPairFilter.h>
+#include <tracking/ckf/svd/filters/relations/DistanceSVDPairFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
@@ -42,6 +44,8 @@ std::map<std::string, std::string> SVDPairFilterFactory::getValidFilterNamesAndD
     {"all", "all combinations are valid"},
     {"none", "no combination is valid"},
     {"sensor", "use sensor/ladder information"},
+    {"seeded", "use the VXDTF information"},
+    {"distance", "based on the position distance"},
   };
 }
 
@@ -50,11 +54,23 @@ SVDPairFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "all") {
     return std::make_unique<TrackFindingCDC::AllFilter<BaseSVDPairFilter>>();
-  } else if (filterName == "none") {
-    return std::make_unique<TrackFindingCDC::NoneFilter<BaseSVDPairFilter>>();
-  } else if (filterName == "sensor") {
-    return std::make_unique<SectorSVDPairFilter>();
-  } else {
-    return Super::create(filterName);
   }
+
+  if (filterName == "none") {
+    return std::make_unique<TrackFindingCDC::NoneFilter<BaseSVDPairFilter>>();
+  }
+
+  if (filterName == "sensor") {
+    return std::make_unique<SectorSVDPairFilter>();
+  }
+
+  if (filterName == "seeded") {
+    return std::make_unique<SeededSVDPairFilter>();
+  }
+
+  if (filterName == "distance") {
+    return std::make_unique<DistanceSVDPairFilter>();
+  }
+
+  return Super::create(filterName);
 }

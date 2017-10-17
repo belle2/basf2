@@ -26,6 +26,8 @@
 #include <tracking/ckf/svd/filters/relations/ChooseableSVDRelationFilter.h>
 #include <tracking/ckf/svd/filters/results/ChooseableSVDResultFilter.h>
 
+#include <tracking/trackFindingCDC/ca/CellularAutomaton.h>
+
 namespace Belle2 {
   class RecoTrack;
   class SpacePoint;
@@ -94,6 +96,8 @@ namespace Belle2 {
     OverlapResolver<ChooseableSVDResultFilter> m_overlapResolver;
     /// Findlet for tagging the used space points
     SpacePointTagger<CKFToSVDResult, SVDCluster> m_spacePointTagger;
+    /// Findlet for adding a recursion cell state to the states
+    TrackFindingCDC::CellularAutomaton<CKFToSVDState> m_automaton;
 
     // Object pools
     /// Pointers to the CDC Reco tracks as a vector

@@ -30,7 +30,7 @@ class fast_equal_frequency_binning():
         """
         for variable in range(len(x[0, :])):
             self.state['binning_array'].append(np.percentile(np.nan_to_num(x[:, variable]),
-                                                             np.arange(number_of_bins) / number_of_bins * 100))
+                                                             np.linspace(0, 100, number_of_bins + 1)))
         self.state['number_of_bins'] = number_of_bins
 
     def apply(self, x):

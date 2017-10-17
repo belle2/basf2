@@ -57,6 +57,12 @@ namespace Belle2 {
       m_seed = path.front()->getSeed();
     }
 
+    CKFResult(const ASeed* seed, std::vector<const AHit*> hits, double chi2, const TVector3& trackPosition,
+              const TVector3& trackMomentum, short trackCharge) :
+      m_seed(seed), m_hits(hits), m_chi2(chi2), m_trackPosition(trackPosition), m_trackMomentum(trackMomentum),
+      m_trackCharge(trackCharge)
+    {}
+
     /// Getter for the stored hits
     const std::vector<const AHit*>& getHits() const
     {

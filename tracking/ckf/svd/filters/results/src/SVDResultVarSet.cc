@@ -42,8 +42,7 @@ bool SVDResultVarSet::extract(const CKFToSVDResult* result)
   std::vector<unsigned int> layerUsed;
   layerUsed.resize(7, 0);
 
-  for (auto spacePointIterator = spacePoints.rbegin(); spacePointIterator != spacePoints.rend(); spacePointIterator++) {
-    const SpacePoint* spacePoint = *spacePointIterator;
+  for (const SpacePoint* spacePoint : spacePoints) {
     layerUsed[spacePoint->getVxdID().getLayerNumber()] += 1;
 
     if (std::isnan(m_advancer.extrapolateToPlane(mSoP, *spacePoint))) {
@@ -68,9 +67,8 @@ bool SVDResultVarSet::extract(const CKFToSVDResult* result)
   var<named("chi2_vxd_min")>() = chi2_vxd_min;
   var<named("chi2_vxd_mean")>() = chi2_vxd_full / spacePoints.size();
   var<named("number_of_hits")>() = spacePoints.size();
-  var<named("prob")>() = 0; // TODO
   var<named("pt")>() = mSoP.getMom().Pt();
-  var<named("chi2_seed")>() = seedTrack->getTrackFitStatus()->getChi2();
+  var<named("chi2_cdc")>() = seedTrack->getTrackFitStatus()->getChi2();
   var<named("number_of_holes")>() = std::count(layerUsed.begin(), layerUsed.end(), 0);
 
   if (spacePoints.empty()) {
@@ -97,8 +95,8 @@ bool SVDResultVarSet::extract(const CKFToSVDResult* result)
   m_advancer.extrapolateToPlane(mSoP, firstCDCHit.getPlane(), 1);
 
   const auto& distance = mSoP.getPos() - firstCDCHit.getPos();
-  var<named("distance_to_seed_track")>() = distance.Mag();
-  var<named("distance_to_seed_track_xy")>() = distance.Pt();
+  var<named("distance_to_cdc_track")>() = distance.Mag();
+  var<named("distance_to_cdc_track_xy")>() = distance.Pt();
 
   return true;
 }

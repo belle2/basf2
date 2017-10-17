@@ -49,7 +49,7 @@ void AddVXDTrackCandidateSubSetsModule::addSubCandidates(int iCand)
 {
   auto sptc = m_spacePointTrackCands[iCand];
   int nHits = sptc->getNHits();
-  // minimum length of track candidate is 3
+  // minimum length of subset track candidate is 3, thus original track should have at least 4
   if (nHits < 4) return;
 
   for (int iHit = 0; iHit < nHits; ++iHit) {

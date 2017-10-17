@@ -25,7 +25,6 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 
 #include <boost/math/distributions/chi_squared.hpp>
-
 #include <algorithm>
 #include <numeric>
 #include <functional>
@@ -56,10 +55,10 @@ SVDSimpleClusterizerModule::SVDSimpleClusterizerModule() : Module(),
 
   // 1. Collections.
   addParam("RecoDigits", m_storeRecoDigitsName,
-           "RecoDigits collection name", string(""));
+           "SVDRecoDigits collection name", string(""));
   addParam("Clusters", m_storeClustersName,
-           "Cluster collection name", string(""));
-  addParam("TrueHits", m_storeTrueHitsName,
+           "SVDCluster collection name", string(""));
+  addParam("SVDTrueHits", m_storeTrueHitsName,
            "TrueHit collection name", string(""));
   addParam("MCParticles", m_storeMCParticlesName,
            "MCParticles collection name", string(""));
@@ -118,9 +117,9 @@ void SVDSimpleClusterizerModule::initialize()
 
   B2INFO(" 1. COLLECTIONS:");
   B2INFO(" -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
-  B2INFO(" -->  Digits:             " << DataStore::arrayName<SVDRecoDigit>(m_storeRecoDigitsName));
-  B2INFO(" -->  Clusters:           " << DataStore::arrayName<SVDCluster>(m_storeClustersName));
-  B2INFO(" -->  TrueHits:           " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
+  B2INFO(" -->  SVDDigits:          " << DataStore::arrayName<SVDRecoDigit>(m_storeRecoDigitsName));
+  B2INFO(" -->  SVDClusters:        " << DataStore::arrayName<SVDCluster>(m_storeClustersName));
+  B2INFO(" -->  SVDTrueHits:        " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
   B2INFO(" -->  DigitMCRel:         " << m_relRecoDigitMCParticleName);
   B2INFO(" -->  ClusterMCRel:       " << m_relClusterMCParticleName);
   B2INFO(" -->  ClusterDigitRel:    " << m_relClusterRecoDigitName);
@@ -173,9 +172,10 @@ void SVDSimpleClusterizerModule::event()
     int thisCellID = storeDigits[i]->getCellID();
 
     //Ignore digits with insufficient signal
-    float ADCnoise = m_NoiseCal->getNoise(thisSensorID, thisSide, thisCellID);
-    float thisNoise = m_PulseShapeCal->getChargeFromADC(thisSensorID, thisSide, thisCellID, ADCnoise);
-    //    float thisNoise = 50; //to be removed
+    //uncomment when calibration will be in
+    //    float ADCnoise = m_NoiseCal->getNoise(thisSensorID, thisSide, thisCellID);
+    //    float thisNoise = m_PulseShapeCal->getChargeFromADC(thisSensorID, thisSide, thisCellID, ADCnoise);
+    float thisNoise = 50; //to be removed when calibration will be in
     float thisCharge = storeDigits[i]->getCharge();
     if ((float)thisCharge / thisNoise < m_cutAdjacent) {
       i++;
@@ -237,7 +237,7 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   float position = cluster.getPosition();
   float positionError = cluster.getPositionError();
   float time = cluster.getTime();
-  float timeError = cluster.getTimeError();
+  float timeError = cluster.getTimeError(); //not implemented yet
   float seedCharge = cluster.getSeedCharge();
   float charge = cluster.getCharge();
   float size = cluster.size();
@@ -247,6 +247,5 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   storeClusters.appendNew(SVDCluster(
                             sensorID, isU, position, positionError, time, timeError, seedCharge, charge, size, SNR
                           ));
-
 
 }

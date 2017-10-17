@@ -69,7 +69,6 @@ namespace Belle2 {
     void SimpleClusterCandidate::finalizeCluster()
     {
 
-      //      B2INFO("finalizing a cluster");
       const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
       const VXD::SensorInfoBase& info = geo.getSensorInfo(m_vxdID);
 
@@ -86,11 +85,15 @@ namespace Belle2 {
       for (auto aStrip : m_strips) {
         double stripPos = m_isUside ? info.getUCellPosition(aStrip.cellID) : info.getVCellPosition(aStrip.cellID);
         m_position += stripPos * aStrip.charge;
-        m_charge     += aStrip.charge;
+        m_charge += aStrip.charge;
+        m_time += aStrip.time * aStrip.charge;;
         noise += aStrip.noise * aStrip.noise;
-        //  B2INFO("position = "<<stripPos<<", charge = "<<aStrip.charge);
       }
+
       noise = sqrt(noise);
+      m_time /= m_charge;
+      m_SNR = m_charge / noise;
+
       if (clusterSize < m_sizeHeadTail) { // COG, size = 1 or 2
         m_position /= m_charge;
         // Compute position error
@@ -119,11 +122,6 @@ namespace Belle2 {
                                              0.5 * landauTail * landauTail);
       }
 
-      //      B2INFO("size = "<< m_strips.size()<<" charge = " << m_charge << ", time = " << 0 << ", position = " << m_position << ", SNR = " << 0 << ", time error = " <<
-      //      0);
-
-
-
 
     };
 
@@ -135,25 +133,8 @@ namespace Belle2 {
       if (m_seedCharge > 0)
         isGood = true;
 
-      //      B2INFO("this one is good? "<<isGood);
       return isGood;
     };
-
-    void SimpleClusterCandidate::clear()
-    {
-
-      m_charge = 0;
-      m_chargeError = 0;
-      m_seedCharge = 0;
-      m_time = 0;
-      m_timeError = 0;
-      m_position = 0;
-      m_positionError = 0;
-      m_SNR = 0;
-      m_strips.clear();
-      m_strips.resize(4);
-    };
-
 
   }  //SVD namespace
 } //Belle2 namespace

@@ -76,7 +76,7 @@ SectorSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFT
   // TODO: test of the lookup is too slow
   if (isConnected(fromVXDID, toVXDID)) {
     return 1.0;
-  } else {
-    return NAN;
   }
+
+  return NAN;
 }

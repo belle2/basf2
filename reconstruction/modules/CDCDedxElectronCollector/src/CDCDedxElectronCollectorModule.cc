@@ -71,23 +71,7 @@ void CDCDedxElectronCollectorModule::collect()
   auto& means = getObject<TH1F>("means");
   auto& tree = getObject<TTree>("tree");
 
-  // SPECIAL CORRECTION FOR COSMICS -> REMOVE MOMENTUM DEPENDENCE
-  const float momcorr[50] = {
-    1.14045,  0.73178,  0.709983, 0.711266, 0.716683,
-    0.727419, 0.735754, 0.74534,  0.754149, 0.761252,
-    0.768799, 0.77552,  0.780306, 0.786253, 0.79139,
-    0.797053, 0.800905, 0.804441, 0.807102, 0.809439,
-    0.815215, 0.818581, 0.821492, 0.823083, 0.824502,
-    0.828764, 0.830907, 0.831392, 0.832376, 0.833232,
-    0.836063, 0.839065, 0.841527, 0.84118,  0.842779,
-    0.840801, 0.844476, 0.846664, 0.848733, 0.844318,
-    0.84837,  0.850549, 0.852183, 0.851242, 0.856488,
-    0.852705, 0.851871, 0.852278, 0.856854, 0.856848
-  };
-
   for (int idedx = 0; idedx < dedxTracks.getEntries(); idedx++) {
-    //for (auto track : tracks) {
-
     CDCDedxTrack* dedxTrack = dedxTracks[idedx];
     const Track* track = dedxTrack->getRelatedFrom<Track>();
     const TrackFitResult* fitResult = track->getTrackFitResult(Const::pion);
@@ -95,17 +79,6 @@ void CDCDedxElectronCollectorModule::collect()
       B2WARNING("No related fit for this track...");
       continue;
     }
-
-    // clean up cuts -> ONLY FOR COSMICS
-    if (dedxTrack->getMomentum() < 1.0 or dedxTrack->getMomentum() > 10.0 or dedxTrack->getNLayerHits() < 41)
-      continue;
-    if (fitResult->getD0() > 10.0 or (fitResult->getZ0() - 35) > 50.0)
-      continue;
-
-    // SPECIAL CORRECTION FOR COSMICS -> REMOVE MOMENTUM DEPENDENCE
-    int ibinm = 5.0 * dedxTrack->getMomentum();
-    if (ibinm < 0) ibinm = 0;
-    if (ibinm > 49) ibinm = 49;
 
     // Make sure to remove all the data in vectors from the previous track
     m_wire.clear();
@@ -115,7 +88,7 @@ void CDCDedxElectronCollectorModule::collect()
     m_dedxhit.clear();
 
     // Simple numbers don't need to be cleared
-    m_dedx = dedxTrack->getTruncatedMean() / 48.0 / momcorr[ibinm]; // <---- ONLY FOR COSMICS
+    m_dedx = dedxTrack->getTruncatedMean();
     m_costh = dedxTrack->getCosTheta();
     m_nhits = dedxTrack->size();
 
@@ -125,11 +98,11 @@ void CDCDedxElectronCollectorModule::collect()
       m_layer.push_back(dedxTrack->getHitLayer(i));
       m_doca.push_back(dedxTrack->getDoca(i));
       m_enta.push_back(dedxTrack->getEnta(i));
-      m_dedxhit.push_back(dedxTrack->getDedx(i) / 48.0 / momcorr[ibinm]); // <---- ONLY FOR COSMICS
+      m_dedxhit.push_back(dedxTrack->getDedx(i));
     }
 
     // Track information filled
     tree.Fill();
-    means.Fill(m_dedx); // <---- ONLY FOR COSMICS
+    means.Fill(m_dedx);
   }
 }

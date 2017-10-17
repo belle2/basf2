@@ -124,6 +124,7 @@ namespace Belle2 {
 
     TH2F* m_pdfs[3][Const::ChargedStable::c_SetSize]; /**< dedx:momentum PDFs. */
 
+    bool m_trackLevel; /**< Whether to use track-level or hit-level MC */
     bool m_usePrediction; /**< Whether to use parameterized means and resolutions or lookup tables */
     double m_removeLowest; /**< Portion of lowest dE/dx values that should be discarded for truncated mean */
     double m_removeHighest; /**< Portion of highest dE/dx values that should be discarded for truncated mean */

@@ -40,7 +40,7 @@ namespace Belle2 {
       m_coscor(0), m_rungain(0),
       l_nHits(0), l_nHitsUsed(0), h_nHits(0)
     {
-      m_dedx_avg = m_dedx_avg_truncated = m_dedx_avg_truncated_err = 0.0;
+      m_dedx = m_dedx_avg = m_dedx_avg_truncated = m_dedx_avg_truncated_err = 0.0;
 
       // set default values for all particles
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
@@ -95,7 +95,9 @@ namespace Belle2 {
     double getPDG() const { return m_pdg; }
 
     /** Get the dE/dx mean for this track */
-    double getDedx() const { return m_dedx_avg; }
+    double getDedx() const { return m_dedx; }
+    /** Get the dE/dx mean for this track */
+    double getDedxMean() const { return m_dedx_avg; }
     /** Get dE/dx truncated mean for this track */
     double getTruncatedMean() const { return m_dedx_avg_truncated; }
     /** Get the error on the dE/dx truncated mean for this track */
@@ -119,7 +121,9 @@ namespace Belle2 {
     double getRunGain() const { return m_rungain; }
 
     /** Set the dE/dx mean for this track */
-    void setMean(double mean) { m_dedx_avg = mean; }
+    void setDedx(double dedx) { m_dedx = dedx; }
+    /** Set the dE/dx mean for this track */
+    void setDedxMean(double mean) { m_dedx_avg = mean; }
     /** Set the dE/dx truncated average for this track */
     void setTruncatedMean(double mean) { m_dedx_avg_truncated = mean; }
     /** Set the error on the dE/dx truncated mean for this track */
@@ -203,6 +207,7 @@ namespace Belle2 {
     double m_p;        /**< momentum at the IP */
     double m_p_cdc;    /**< momentum at the inner layer of the CDC */
     double m_pdg;        /**< MC PID */
+    double m_mcmass;     /**< MC PID mass */
     double m_mother_pdg; /**< MC PID of mother particle */
     double m_p_true;     /**< MC true momentum */
     double m_length;   /**< total distance travelled by the track */
@@ -217,6 +222,7 @@ namespace Belle2 {
     double m_predres[Const::ChargedStable::c_SetSize];  /**< predicted dE/dx resolution */
 
     // track level dE/dx measurements
+    double m_dedx;     /**< dE/dx truncated mean used to get PID value */
     double m_dedx_avg;               /**< dE/dx mean value per track */
     double m_dedx_avg_truncated;     /**< dE/dx truncated mean per track */
     double m_dedx_avg_truncated_err; /**< standard deviation of m_dedx_avg_truncated */

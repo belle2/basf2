@@ -41,6 +41,7 @@
 #include <TFile.h>
 #include <TH2F.h>
 #include <TMath.h>
+#include <TRandom.h>
 
 #include <memory>
 #include <cassert>
@@ -62,6 +63,8 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
   setDescription("Extract dE/dx and corresponding log-likelihood from fitted tracks and hits in the CDC.");
 
   //Parameter definitions
+  addParam("trackLevel", m_trackLevel,
+           "Use track-level MC. If false, use hit-level MC", true);
   addParam("usePrediction", m_usePrediction,
            "Use parameterized means and resolutions to determine PID values. If false, lookup table PDFs are used.", true);
   addParam("removeLowest", m_removeLowest,
@@ -271,12 +274,15 @@ void CDCDedxPIDModule::event()
 
         //add some MC truths to CDCDedxTrack object
         dedxTrack->m_pdg = mcpart->getPDG();
+        dedxTrack->m_mcmass = mcpart->getMass();
         const MCParticle* mother = mcpart->getMother();
         dedxTrack->m_mother_pdg = mother ? mother->getPDG() : 0;
 
         const TVector3 trueMomentum = mcpart->getMomentum();
         dedxTrack->m_p_true = trueMomentum.Mag();
       }
+    } else {
+      dedxTrack->m_pdg = -999;
     }
 
     // get momentum (at origin) from fit result
@@ -520,38 +526,53 @@ void CDCDedxPIDModule::event()
     if (dedxTrack->l_dedx.empty()) {
       B2DEBUG(50, "Found track with no hits, ignoring.");
       continue;
-    }
-
-    // calculate likelihoods for truncated mean
-    if (!m_useIndividualHits or m_enableDebugOutput) {
-      calculateMeans(&(dedxTrack->m_dedx_avg),
-                     &(dedxTrack->m_dedx_avg_truncated),
-                     &(dedxTrack->m_dedx_avg_truncated_err),
-                     dedxTrack->l_dedx);
+    } else {
+      // determine the number of hits for this track (used below)
       const int numDedx = dedxTrack->l_dedx.size();
       dedxTrack->l_nHits = numDedx;
       // add a factor of 0.5 here to make sure we are rounding appropriately...
       const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.5);
       const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.5);
       dedxTrack->l_nHitsUsed = highEdgeTrunc - lowEdgeTrunc;
-      saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated,
-                   std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->l_nHitsUsed);
     }
 
-    // save the PID information if not using individual hits
+    // Get the truncated mean
+    //
+    // If using track-level MC, get the predicted mean and resolution and throw a random
+    // number to get the simulated dE/dx truncated mean. Otherwise, calculate the truncated
+    // mean from the simulated hits (hit-level MC).
+    if (!m_useIndividualHits or m_enableDebugOutput) {
+      calculateMeans(&(dedxTrack->m_dedx_avg),
+                     &(dedxTrack->m_dedx_avg_truncated),
+                     &(dedxTrack->m_dedx_avg_truncated_err),
+                     dedxTrack->l_dedx);
+    }
+
+    if (m_trackLevel) {
+      if (dedxTrack->m_pdg == -999) {
+        B2DEBUG(50, "No MCParticle for this track, skipping dE/dx");
+        dedxTrack->m_dedx = -1; // should continue; leave it in for testing...
+      }
+      // determine the predicted mean and resolution
+      double mean = getMean(dedxTrack->m_p_true / dedxTrack->m_mcmass);
+      double sigma = getSigma(mean, dedxTrack->l_nHitsUsed, std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta));
+      dedxTrack->m_dedx = gRandom->Gaus(mean, sigma);
+      while (dedxTrack->m_dedx < 0)
+        dedxTrack->m_dedx = gRandom->Gaus(mean, sigma);
+    } else
+      dedxTrack->m_dedx = dedxTrack->m_dedx_avg_truncated;
+
+    // save the PID information for both lookup tables and parameterized means and resolutions
     if (!m_useIndividualHits) {
       saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated, m_pdfs[2]);
     }
-
-    if (m_enableDebugOutput) {
-      // book the information for this track
-      CDCDedxTrack* newCDCDedxTrack = dedxArray.appendNew(*dedxTrack);
-      track.addRelationTo(newCDCDedxTrack);
-    }
+    saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_p_cdc, dedxTrack->m_dedx,
+                 std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->l_nHitsUsed);
 
     // save CDCDedxLikelihood
+    //
+    // use parameterized method if called or if pdf file for lookup tables is empty
     if (m_usePrediction || !m_pdfFile.empty()) {
-
       double* pidvalues;
       if (m_usePrediction) {
         pidvalues = dedxTrack->m_cdcChi;
@@ -559,9 +580,17 @@ void CDCDedxPIDModule::event()
           pidvalues[i] = -0.5 * pidvalues[i] * pidvalues[i];
         }
       } else pidvalues = dedxTrack->m_cdcLogl;
+      if (pidvalues != pidvalues)
+        B2ERROR("Bad PID value: " << dedxTrack->m_cdcChi << "\t" << dedxTrack->m_cdcLogl);
 
       CDCDedxLikelihood* likelihoodObj = likelihoodArray.appendNew(pidvalues);
       track.addRelationTo(likelihoodObj);
+    }
+
+    if (m_enableDebugOutput) {
+      // book the information for this track
+      CDCDedxTrack* newCDCDedxTrack = dedxArray.appendNew(*dedxTrack);
+      track.addRelationTo(newCDCDedxTrack);
     }
 
   } // end of loop over tracks
@@ -743,7 +772,7 @@ double CDCDedxPIDModule::getSigma(double dedx, double nhit, double sin) const
   double corDedx = sigmaCurve(x, dedxpar, 0);
   x[0] = nhit;
   double corNHit = sigmaCurve(x, nhitpar, 0);
-  if (nhit > 35) corNHit = 1.0;
+  if (nhit > 42) corNHit = 1.0;
   x[0] = sin;
   double corSin = sigmaCurve(x, sinpar, 0);
 

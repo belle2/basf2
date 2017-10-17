@@ -16,13 +16,13 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/reconstruction/SimpleClusterCandidate.h>
 
+//neew calibration objects
 //#include <svd/calibration/SVDPulseShapeCalibrations.h>
 //#include <svd/calibration/SVDNoiseCalibrations.h>
-#include <framework/database/DBObjPtr.h>
-#include <svd/dbobjects/SVDPulseShapeCalibrations.h>
-#include <svd/dbobjects/SVDNoiseCalibrations.h>
-
-//#include <vector>
+//old calibration objects:
+//#include <framework/database/DBObjPtr.h>
+//#include <svd/dbobjects/SVDPulseShapeCalibrations.h>
+//#include <svd/dbobjects/SVDNoiseCalibrations.h>
 
 namespace Belle2 {
 
@@ -80,10 +80,11 @@ namespace Belle2 {
       /** Size of the cluster at which we switch from Center of Gravity to Analog Head Tail */
       int m_sizeHeadTail;
 
-
+      //old calibration objects
+      //      DBObjPtr<SVDPulseShapeCalibrations> m_PulseShapeCal;
+      //      DBObjPtr<SVDNoiseCalibrations> m_NoiseCal;
+      //new calibration objects
       //      SVDPulseShapeCalibrations m_PulseShapeCal;
-      DBObjPtr<SVDPulseShapeCalibrations> m_PulseShapeCal;
-      DBObjPtr<SVDNoiseCalibrations> m_NoiseCal;
       //      SVDNoiseCalibrations m_NoiseCal;
 
       void writeClusters(SimpleClusterCandidate clusterCand);

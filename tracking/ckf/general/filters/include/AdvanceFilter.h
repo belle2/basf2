@@ -32,22 +32,14 @@ namespace Belle2 {
     TrackFindingCDC::Weight operator()(const std::pair<const std::vector<const AState*>, AState*>& pair) override
     {
       const std::vector<const AState*>& previousStates = pair.first;
+      B2ASSERT("Can not extrapolate with nothing", not previousStates.empty());
+
+      const AState* lastState = previousStates.back();
       AState* currentState = pair.second;
 
-      if (not previousStates.back()->mSoPSet()) {
-        for (const AState* state : previousStates) {
+      B2ASSERT("Can not extrapolate with nothing", lastState->mSoPSet());
+      genfit::MeasuredStateOnPlane mSoP = lastState->getMeasuredStateOnPlane();
 
-          if (state->getHit()) {
-            B2WARNING(state->getGeometricalLayer() << " " << state->getHit()->getVxdID() << " " << state->mSoPSet());
-          } else {
-            B2WARNING(state->getGeometricalLayer() << " 0.0.0 " << state->mSoPSet());
-          }
-        }
-      }
-
-      B2ASSERT("Can not extrapolate with nothing", not previousStates.empty());
-      B2ASSERT("Can not extrapolate with nothing", previousStates.back()->mSoPSet());
-      genfit::MeasuredStateOnPlane mSoP = previousStates.back()->getMeasuredStateOnPlane();
       genfit::SharedPlanePtr plane = currentState->getPlane(mSoP);
 
       const double returnValue = m_advancer.extrapolateToPlane(mSoP, plane);

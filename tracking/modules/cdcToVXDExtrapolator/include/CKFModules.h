@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 #include <tracking/ckf/svd/findlets/CKFToSVDFindlet.h>
+#include <tracking/ckf/svd/findlets/CKFToSVDSeedFindlet.h>
 
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
@@ -25,6 +26,17 @@ namespace Belle2 {
   public:
     /// Set description
     CDCToSVDSpacePointCKFModule()
+    {
+      setDescription("Combinatorical Kalman Filter used for extracting CDC tracks into "
+                     "SVD and create merged tracks.");
+    }
+  };
+
+  class CDCToSVDSeedCKFModule : public TrackFindingCDC::FindletModule<CKFToSVDSeedFindlet> {
+
+  public:
+    /// Set description
+    CDCToSVDSeedCKFModule()
     {
       setDescription("Combinatorical Kalman Filter used for extracting CDC tracks into "
                      "SVD and create merged tracks.");

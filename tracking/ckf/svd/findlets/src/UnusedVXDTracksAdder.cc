@@ -21,10 +21,6 @@
 
 using namespace Belle2;
 
-// Go ->
-std::map<const RecoTrack*, bool> m_usedVXDRecoTracks;
-StoreArray<RecoTrack> m_vxdRecoTracks("VXDRecoTracks");
-
 void UnusedVXDTracksAdder::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);

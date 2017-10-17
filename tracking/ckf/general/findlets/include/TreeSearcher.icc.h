@@ -67,6 +67,13 @@ namespace Belle2 {
       AState* childState = continuation.getTo();
       TrackFindingCDC::Weight weight = continuation.getWeight();
       // the state may still include information from an other round of processing, so lets set it back
+
+      if (std::count(path.begin(), path.end(), childState)) {
+        // Cycle detected -- is this the best handling?
+        // Other options: Raise an exception and bail out of this seed
+        B2FATAL("Cycle detected!");
+      }
+
       childState->reset();
       childStates.emplace_back(childState, weight);
     }
@@ -84,12 +91,6 @@ namespace Belle2 {
     // Traverse the tree from each new state on
     B2DEBUG(50, "Having found " << childStates.size() << " child states.");
     for (const AState* childState : childStates) {
-      if (std::count(path.begin(), path.end(), childState)) {
-        // Cycle detected -- is this the best handling?
-        // Other options: Raise an exception and bail out of this seed
-        B2WARNING("Cycle detected!");
-        continue;
-      }
       path.push_back(childState);
       traverseTree(path, relations, results);
       path.pop_back();

@@ -111,7 +111,7 @@ def add_softwaretrigger_reconstruction(
             hlt_reconstruction_path.add_path(calibration_and_store_only_rawdata_path)
 
     elif softwaretrigger_mode == 'softwaretrigger_off':
-        fast_reco_reconstruction_path.add_module("PruneDataStore", keepEntries=["EventMetaData"] + RAW_SAVE_STORE_ARRAYS)
+        fast_reco_reconstruction_path.add_module("PruneDataStore", matchEntries=["EventMetaData"] + RAW_SAVE_STORE_ARRAYS)
 
     path.add_path(fast_reco_reconstruction_path)
 
@@ -126,7 +126,7 @@ def get_store_only_metadata_path():
     :return: The created path.
     """
     store_metadata_path = basf2.create_path()
-    store_metadata_path.add_module("PruneDataStore", keepEntries=ALWAYS_SAVE_REGEX). \
+    store_metadata_path.add_module("PruneDataStore", matchEntries=ALWAYS_SAVE_REGEX). \
         set_name("KeepMetaData")
 
     return store_metadata_path
@@ -143,7 +143,7 @@ def get_store_only_rawdata_path():
     :return: The created path.
     """
     store_rawdata_path = basf2.create_path()
-    store_rawdata_path.add_module("PruneDataStore", keepEntries=ALWAYS_SAVE_REGEX + RAW_SAVE_STORE_ARRAYS) \
+    store_rawdata_path.add_module("PruneDataStore", matchEntries=ALWAYS_SAVE_REGEX + RAW_SAVE_STORE_ARRAYS) \
         .set_name("KeepRawData")
 
     return store_rawdata_path

@@ -24,6 +24,13 @@ using namespace TrackFindingCDC;
 TrackFindingCDC::Weight
 SeededSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>& relation)
 {
+  const CKFToSVDState& fromState = *(relation.first);
+  const SpacePoint* fromSpacePoint = fromState.getHit();
+
+  if (not fromSpacePoint) {
+    return 1.0;
+  }
+
   std::map<const RecoTrack*, unsigned int> relatedRecoTrackHistogram;
 
   for (const CKFToSVDState* state : {relation.first, relation.second}) {

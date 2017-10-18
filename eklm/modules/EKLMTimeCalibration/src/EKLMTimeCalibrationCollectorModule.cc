@@ -43,8 +43,6 @@ EKLMTimeCalibrationCollectorModule::EKLMTimeCalibrationCollectorModule() :
 
 EKLMTimeCalibrationCollectorModule::~EKLMTimeCalibrationCollectorModule()
 {
-  if (m_TransformData != NULL)
-    delete m_TransformData;
 }
 
 void EKLMTimeCalibrationCollectorModule::prepare()
@@ -155,5 +153,7 @@ void EKLMTimeCalibrationCollectorModule::collect()
 
 void EKLMTimeCalibrationCollectorModule::terminate()
 {
+  if (m_TransformData != NULL)
+    delete m_TransformData;
 }
 

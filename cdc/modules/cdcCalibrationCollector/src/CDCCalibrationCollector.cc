@@ -135,7 +135,7 @@ void CDCCalibrationCollectorModule::collect()
     }
     if (!m_BField) {ndf = fs->getNdf() + 1;} // incase no Magnetic field, Npars = 4;
     else {ndf = fs->getNdf();}
-
+    if (ndf < 15) continue;
     double Chi2 = fs->getChi2();
     Pval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
     //store track parameters

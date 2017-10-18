@@ -11,15 +11,14 @@
 #ifndef ECLWAVEFORMS_H
 #define ECLWAVEFORMS_H
 
-#include <framework/dataobjects/DigitBase.h>
+#include <TObject.h>
 #include <algorithm>
 
 namespace Belle2 {
   /*!
     Class to store ECL waveforms for entire calorimeter
   */
-  //  class ECLWaveforms : public DigitBase {
-  class ECLWaveforms : public RelationsObject {
+  class ECLWaveforms : public TObject {
   public:
     /** default constructor for ROOT */
     ECLWaveforms() {}

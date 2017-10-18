@@ -23,6 +23,7 @@
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLWaveforms.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <vector>
 
@@ -129,12 +130,14 @@ namespace Belle2 {
       void makeWaveforms();
       void repack(const ECLWFAlgoParams&, algoparams_t&);
       void getfitparams(const ECLWaveformData&, const ECLWFAlgoParams&, fitparams_t&);
+      /** fill the waveform array FitA by electronic noise and bias it for channel J [0-8735]*/
+      void makeElectronicNoiseAndPedestal(int j, int* FitA);
 
       /** input arrays */
       StoreArray<ECLHit>    m_eclHits;  /**< hits array  */
       StoreArray<ECLHit>    m_eclDiodeHits;
       StoreArray<ECLSimHit> m_eclSimHits;
-      StoreArray<ECLWaveforms> m_eclWaveforms;
+      StoreObjPtr<ECLWaveforms> m_eclWaveforms;
       /** Output Arrays */
       StoreArray<ECLDigit>  m_eclDigits;
       StoreArray<ECLDsp>    m_eclDsps;

@@ -14,6 +14,7 @@
 #include <tracking/ckf/findlets/base/TrackFitterAndDeleter.h>
 #include <tracking/ckf/utilities/ResultAlgorithms.h>
 
+#include <tracking/ckf/utilities/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/findlets/base/StoreArrayLoader.h>
 
 namespace Belle2 {

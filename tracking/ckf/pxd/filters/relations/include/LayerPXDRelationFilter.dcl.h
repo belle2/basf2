@@ -44,7 +44,7 @@ namespace Belle2 {
 
   private:
     /// Parameter: Make it possible to jump over N layers.
-    int m_param_hitJumping = 1;
+    int m_param_hitJumping = 0;
     /// Filter for rejecting the states
     AFilter m_filter;
   };

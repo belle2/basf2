@@ -72,6 +72,9 @@ void ECLDigitizerModule::initialize()
   if (m_waveformMaker)
     m_eclWaveforms.registerInDataStore(m_eclWaveformsName);
 
+  m_eclWaveformDigits.registerInDataStore("ECLWaveformDigit_BG");
+  m_eclWaveformDigits.isOptional();
+
   readDSPDB();
 
   m_adc.resize(EclConfiguration::m_nch);

@@ -1376,7 +1376,7 @@ namespace Belle2 {
                     target_prob = particlei->getExtraInfo(isRightTrack[indexRightTrack]);
                   }
                 }
-                if (prob > maximumTargetProb) {
+                if (target_prob > maximumTargetProb) {
                   maximumTargetProb = target_prob;
                   target = particlei;
                 }

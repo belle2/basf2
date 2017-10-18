@@ -24,16 +24,83 @@
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
-
-T0Correction4CAF::T0Correction4CAF(): CalibrationAlgorithm("CDCT0CalibrationCollector")
+T0Correction4CAF::T0Correction4CAF(): CalibrationAlgorithm("CDCCalibrationCollector"),
+  m_firstExperiment(0), m_firstRun(0),
+  m_lastExperiment(-1), m_lastRun(-1)
 {
-
-  setDescription(" -------------------------- T0 Calibration Algoritm -------------------------\n"
-
-                 " ------------------------------------------------------------------------------\n"
-                );
+  /*
+   setDescription(
+    " -------------------------- Test Calibration Algoritm -------------------------\n"
+    "                                                                               \n"
+    "  Testing algorithm which just gets mean of a test histogram collected by      \n"
+    "  CaTest module and provides a DB object with another histogram with one       \n"
+    "  entry at calibrated value.                                                   \n"
+    " ------------------------------------------------------------------------------\n"
+    );
+  */
 }
 
+void T0Correction4CAF::CreateHisto()
+{
+
+  B2INFO("CreateHisto");
+  double x;
+  double t_mea;
+  double w;
+  double t_fit;
+  double ndf;
+  double Pval;
+  int IWire;
+  int lay;
+
+  auto tree = getObjectPtr<TTree>("tree");
+  //  TChain* tree = new TChain("tree");
+  //  tree->Add(m_inputRootFileName.c_str());
+  tree->SetBranchAddress("lay", &lay);
+  tree->SetBranchAddress("IWire", &IWire);
+  tree->SetBranchAddress("x_u", &x);
+  tree->SetBranchAddress("t", &t_mea);
+  tree->SetBranchAddress("t_fit", &t_fit);
+  tree->SetBranchAddress("weight", &w);
+  tree->SetBranchAddress("ndf", &ndf);
+  tree->SetBranchAddress("Pval", &Pval);
+  double halfCSize[56];
+  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  for (int i = 0; i < 56; ++i) {
+    double R = cdcgeo.senseWireR(i);
+    double nW = cdcgeo.nWiresInLayer(i);
+    halfCSize[i] = M_PI * R / nW;
+  }
+
+  m_hTotal = new TH1F("hTotal", "hTotal", 30, -15, 15);
+  //for each channel
+  for (int il = 0; il < 56; il++) {
+    const int nW = cdcgeo.nWiresInLayer(il);
+    for (int ic = 0; ic < nW; ++ic) {
+      m_h1[il][ic] = new TH1F(Form("h1%d@%d", il, ic), Form("L%d_cell%d", il, ic), 30, -15, 15);
+    }
+  }
+  //for each board
+  for (int ib = 0; ib < 300; ++ib) {
+    m_hT0b[ib] = new TH1F(Form("hT0b%d", ib), Form("boardID_%d", ib), 100, -20, 20);
+  }
+  //read data
+  const int nEntries = tree->GetEntries();
+  B2INFO("Number of entries: " << nEntries);
+  for (int i = 0; i < nEntries; ++i) {
+    tree->GetEntry(i);
+    double xmax = halfCSize[lay] - 0.1;
+    if ((fabs(x) < m_xmin) || (fabs(x) > xmax)
+        || (ndf < m_ndfmin)
+        || (Pval < m_Pvalmin)) continue; /*select good region*/
+    //each channel
+    m_hTotal->Fill(t_mea - t_fit);
+    m_h1[lay][IWire]->Fill(t_mea - t_fit);
+    //each board
+    m_hT0b[cdcgeo.getBoardID(WireID(lay, IWire))]->Fill(t_mea - t_fit);
+  }
+  B2INFO("Finish making histogram for all channels");
+}
 
 CalibrationAlgorithm::EResult T0Correction4CAF::calibrate()
 {
@@ -42,8 +109,9 @@ CalibrationAlgorithm::EResult T0Correction4CAF::calibrate()
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
 
+  CreateHisto();
 
-  //  CreateHisto();
+  TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels;#DeltaT;#channels", 100, -10, 10);
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
 
   TF1* g1 = new TF1("g1", "gaus", -100, 100);
@@ -55,20 +123,18 @@ CalibrationAlgorithm::EResult T0Correction4CAF::calibrate()
 
   B2INFO("Gaus fitting for whole channel");
   double par[3];
-  m_hTotal = getObjectPtr<TH1F>("hTotal");
+  double mean = 0.;
   m_hTotal->SetDirectory(0);
-  B2DEBUG(99, "number of entries:" << m_hTotal->GetEntries());
-  const double mean = m_hTotal->GetMean();
+  mean = m_hTotal->GetMean();
   m_hTotal->Fit("g1", "Q", "", mean - 15, mean + 15);
   g1->GetParameters(par);
 
   B2INFO("Gaus fitting for each board");
   for (int ib = 1; ib < 300; ++ib) {
-    m_hT0b[ib] = getObjectPtr<TH1F>(Form("hT0b%d", ib));
-    if (m_hT0b[ib]->GetEntries() < 20) continue;
-    const double meanb = m_hT0b[ib]->GetMean();
+    if (m_hT0b[ib]->GetEntries() < 10) continue;
+    mean = m_hT0b[ib]->GetMean();
     m_hT0b[ib]->SetDirectory(0);
-    m_hT0b[ib]->Fit("g1", "Q", "", meanb - 15, meanb + 15);
+    m_hT0b[ib]->Fit("g1", "Q", "", mean - 15, mean + 15);
     g1->GetParameters(par);
     b.push_back(ib);
     db.push_back(0.0);
@@ -78,17 +144,14 @@ CalibrationAlgorithm::EResult T0Correction4CAF::calibrate()
     err_dtb[ib] = g1->GetParError(1);
   }
   B2INFO("Gaus fitting for each cell");
-  TH1D* hs = new TH1D("hs", "Sigma of delta T0 of all channel", 100, -15, 15);
-  TH1D* hm = new TH1D("hm", "Sigma of delta T0 of all channel", 100, 0, 15);
   for (int ilay = 0; ilay < 56; ++ilay) {
     for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
-      m_h1[ilay][iwire] = getObjectPtr<TH1F>(Form("hdT_lay%d_cell%d", ilay, iwire));
       const int n = m_h1[ilay][iwire]->GetEntries();
       B2DEBUG(99, "layer " << ilay << " wire " << iwire << " entries " << n);
       if (n < 10) continue;
-      const double meanc = m_h1[ilay][iwire]->GetMean();
+      mean = m_h1[ilay][iwire]->GetMean();
       m_h1[ilay][iwire]->SetDirectory(0);
-      m_h1[ilay][iwire]->Fit("g1", "Q", "", meanc - 15, meanc + 15);
+      m_h1[ilay][iwire]->Fit("g1", "Q", "", mean - 15, mean + 15);
       g1->GetParameters(par);
       c[ilay].push_back(iwire);
       dc[ilay].push_back(0.0);
@@ -97,9 +160,7 @@ CalibrationAlgorithm::EResult T0Correction4CAF::calibrate()
 
       dt[ilay][iwire] = par[1];
       err_dt[ilay][iwire] = g1->GetParError(1);
-
-      hm->Fill(par[1]);
-      hs->Fill(par[2]);
+      hm_All->Fill(par[1]);
     }
   }
 
@@ -111,20 +172,29 @@ CalibrationAlgorithm::EResult T0Correction4CAF::calibrate()
     TGraphErrors* gr[56];
     TDirectory* top = gDirectory;
     m_hTotal->Write();
-    hm->Write();
-    hs->Write();
+    hm_All->Write();
+    TDirectory* subDir[56];
+    for (int ilay = 0; ilay < 56; ++ilay) {
+      subDir[ilay] = top ->mkdir(Form("lay_%d", ilay));
+      subDir[ilay]->cd();
+      for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
+        m_h1[ilay][iwire]->Write();
+      }
+    }
+    top->cd();
     TDirectory* corrT0 = top->mkdir("DeltaT0");
     corrT0->cd();
 
-    TGraphErrors* grb = new TGraphErrors(b.size(), &b.at(0), &Sb.at(0), &db.at(0), &dSb.at(0));
-    grb->SetMarkerColor(2);
-    grb->SetMarkerSize(1.0);
-    grb->SetTitle("#DeltaT0;BoardID;#DeltaT0[ns]");
-    grb->SetMaximum(10);
-    grb->SetMinimum(-10);
-    grb->SetName("Board");
-    grb->Write();
-
+    if (b.size() > 2) {
+      TGraphErrors* grb = new TGraphErrors(b.size(), &b.at(0), &Sb.at(0), &db.at(0), &dSb.at(0));
+      grb->SetMarkerColor(2);
+      grb->SetMarkerSize(1.0);
+      grb->SetTitle("#DeltaT0;BoardID;#DeltaT0[ns]");
+      grb->SetMaximum(10);
+      grb->SetMinimum(-10);
+      grb->SetName("Board");
+      grb->Write();
+    }
     for (int sl = 0; sl < 56; ++sl) {
       if (c[sl].size() < 2) continue;
       gr[sl] = new TGraphErrors(c[sl].size(), &c[sl].at(0), &s[sl].at(0), &dc[sl].at(0), &ds[sl].at(0));
@@ -136,28 +206,15 @@ CalibrationAlgorithm::EResult T0Correction4CAF::calibrate()
       gr[sl]->SetName(Form("lay%d", sl));
       gr[sl]->Write();
     }
-    if (m_debug) {
-      TDirectory* Direct[56];
-      for (int il = 0; il < 56; ++il) {
-        top->cd();
-        Direct[il] = gDirectory->mkdir(Form("lay_%d", il));
-        Direct[il]->cd();
-        for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
-          m_h1[il][w]->Write();
-        }
-      }
-    }
     fout->Close();
   }
   B2INFO("Write constants");
   Write();
-  //return true;
-  if (fabs(hm->GetMean()) < 0.2 && hm->GetRMS() < 0.5) {
+  if (fabs(hm_All->GetMean()) < m_maxMeanDt && hm_All->GetRMS() < m_maxRMSDt) {
     return c_OK;
   } else {
     return c_Iterate;
   }
-
 }
 void T0Correction4CAF::Write()
 {

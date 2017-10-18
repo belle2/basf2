@@ -28,6 +28,6 @@ namespace Belle2 {
     double calculateResidual(genfit::MeasuredStateOnPlane& measuredStateOnPlane, CKFToPXDState& state);
 
   private:
-    KalmanStepper<1> m_kalmanStepper;
+    KalmanStepper<2> m_kalmanStepper;
   };
 }

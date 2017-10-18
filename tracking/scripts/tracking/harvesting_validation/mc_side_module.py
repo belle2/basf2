@@ -82,6 +82,7 @@ class MCSideTrackingValidationModule(basic_mc_side_module.BasicMCSideTrackingVal
     def peel(self, mc_reco_track):
         crops = super().peel(mc_reco_track=mc_reco_track)
 
+        track_match_look_up = self.track_match_look_up
         mc_particle = track_match_look_up.getRelatedMCParticle(mc_reco_track)
         reco_track = track_match_look_up.getRelatedPRRecoTrack(mc_reco_track)
         mc_particle_crops = peelers.peel_mc_particle(mc_particle)
@@ -108,6 +109,28 @@ class MCSideTrackingValidationModule(basic_mc_side_module.BasicMCSideTrackingVal
                           ))
 
         return crops
+
+    def peel_hit_efficiencies_in_all_pr_tracks(self, mc_reco_track):
+        mc_det_hit_ids = utilities.get_det_hit_ids(mc_reco_track)
+
+        hit_efficiency_in_all_found = utilities.calc_hit_efficiency(self.found_det_hit_ids,
+                                                                    mc_det_hit_ids)
+
+        unfound_hit_efficiency = 1.0 - hit_efficiency_in_all_found
+
+        hit_efficiency_in_all_matched = utilities.calc_hit_efficiency(self.matched_det_hit_ids,
+                                                                      mc_det_hit_ids)
+
+        hit_efficiency_in_all_fake = utilities.calc_hit_efficiency(self.fake_det_hit_ids,
+                                                                   mc_det_hit_ids)
+
+        hit_efficiency_crops = dict(
+            hit_efficiency_in_all_found=hit_efficiency_in_all_found,
+            unfound_hit_efficiency=unfound_hit_efficiency,
+            hit_efficiency_in_all_mached=hit_efficiency_in_all_matched,
+            hit_efficiency_in_all_fake=hit_efficiency_in_all_fake,
+        )
+        return hit_efficiency_crops
 
     # Refiners to be executed on terminate #
     # #################################### #
@@ -213,3 +236,15 @@ class MCSideTrackingValidationModule(basic_mc_side_module.BasicMCSideTrackingVal
         # renaming quantity to name that is more suitable for display
         select=dict(hit_efficiency_in_all_found="total hit efficiency in all reconstructed tracks for missing mc tracks")
     )
+
+
+class ExpertMCSideTrackingValidationModule(MCSideTrackingValidationModule):
+    """Module to collect more matching information about the found particles and to generate
+       validation plots and figures of merit on the performance of track finding. This module
+       gives information on the number of hits etc. """
+
+    def __init__(self, *args, **kwds):
+        """Constructor issuing a deprecation warning"""
+        warnings.warn("ExpertMCSideTrackingValidationModule is depricated for MCSideTrackingValidationModule",
+                      DeprecationWarning)
+        super().__init__(*args, **kwds)

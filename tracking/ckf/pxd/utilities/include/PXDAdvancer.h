@@ -7,11 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include <tracking/modules/cdcToVXDExtrapolator/CKFModules.h>
+#include <tracking/ckf/general/utilities/Advance.h>
 
-using namespace Belle2;
+namespace Belle2 {
+  class SpacePoint;
 
-REG_MODULE(CDCToSVDSpacePointCKF)
-REG_MODULE(CDCToSVDSeedCKF)
-REG_MODULE(ToPXDCKF)
+  class PXDAdvancer : public Advancer {
+  public:
+    double extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                              const SpacePoint& spacePoint, double direction = 1);
+
+    using Advancer::extrapolateToPlane;
+  };
+}

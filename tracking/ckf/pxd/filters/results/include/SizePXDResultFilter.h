@@ -1,17 +1,25 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Nils Braun                                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include <tracking/modules/cdcToVXDExtrapolator/CKFModules.h>
+#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.dcl.h>
+#include <tracking/ckf/pxd/filters/results/PXDResultVarSet.h>
+#include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
 
-using namespace Belle2;
+namespace Belle2 {
+  /// Base filter for CKF PXD results (on overlap check)
+  class SizePXDResultFilter : public TrackFindingCDC::ChoosableFromVarSetFilter<PXDResultVarSet> {
+  public:
+    SizePXDResultFilter() : TrackFindingCDC::ChoosableFromVarSetFilter<PXDResultVarSet>("number_of_hits")
+    {
 
-REG_MODULE(CDCToSVDSpacePointCKF)
-REG_MODULE(CDCToSVDSeedCKF)
-REG_MODULE(ToPXDCKF)
+    }
+  };
+}

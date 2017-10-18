@@ -7,11 +7,21 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include <tracking/modules/cdcToVXDExtrapolator/CKFModules.h>
+#include <vector>
 
-using namespace Belle2;
+namespace Belle2 {
+  class SpacePoint;
+  class CKFToPXDState;
+  class RecoTrack;
 
-REG_MODULE(CDCToSVDSpacePointCKF)
-REG_MODULE(CDCToSVDSeedCKF)
-REG_MODULE(ToPXDCKF)
+  class MCUtil {
+  public:
+    unsigned int getNumberOfCorrectPXDHits(const RecoTrack* mcRecoTrack, const std::vector<const SpacePoint*>& hits) const;
+
+    bool allStatesCorrect(const std::vector<const CKFToPXDState*>& states) const;
+
+    bool pxdHitIsCorrect(const RecoTrack* mcRecoTrack, const SpacePoint* spacePoint) const;
+  };
+}

@@ -1,17 +1,21 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Nils Braun                                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include <tracking/modules/cdcToVXDExtrapolator/CKFModules.h>
+#include <tracking/ckf/pxd/filters/relations/BasePXDPairFilter.h>
+#include <tracking/ckf/pxd/entities/CKFToPXDState.h>
 
-using namespace Belle2;
-
-REG_MODULE(CDCToSVDSpacePointCKF)
-REG_MODULE(CDCToSVDSeedCKF)
-REG_MODULE(ToPXDCKF)
+namespace Belle2 {
+  /// Base filter for CKF PXD states
+  class SectorPXDPairFilter : public BasePXDPairFilter {
+  public:
+    TrackFindingCDC::Weight operator()(const std::pair<const CKFToPXDState*, const CKFToPXDState*>& relation) override;
+  };
+}

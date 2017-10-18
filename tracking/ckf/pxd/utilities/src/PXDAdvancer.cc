@@ -8,10 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/cdcToVXDExtrapolator/CKFModules.h>
+#include <tracking/ckf/pxd/utilities/PXDAdvancer.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
+#include <pxd/reconstruction/PXDRecoHit.h>
+#include <pxd/dataobjects/PXDCluster.h>
 
 using namespace Belle2;
 
-REG_MODULE(CDCToSVDSpacePointCKF)
-REG_MODULE(CDCToSVDSeedCKF)
-REG_MODULE(ToPXDCKF)
+double PXDAdvancer::extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                                       const SpacePoint& spacePoint, double direction)
+{
+  PXDRecoHit recoHit(spacePoint.getRelated<PXDCluster>());
+  const genfit::SharedPlanePtr& plane = recoHit.constructPlane(measuredStateOnPlane);
+  return Advancer::extrapolateToPlane(measuredStateOnPlane, plane, direction);
+}

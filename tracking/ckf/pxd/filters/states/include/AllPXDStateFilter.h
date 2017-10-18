@@ -7,11 +7,14 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include <tracking/modules/cdcToVXDExtrapolator/CKFModules.h>
+#include <tracking/ckf/pxd/filters/states/BasePXDStateFilter.h>
 
-using namespace Belle2;
-
-REG_MODULE(CDCToSVDSpacePointCKF)
-REG_MODULE(CDCToSVDSeedCKF)
-REG_MODULE(ToPXDCKF)
+namespace Belle2 {
+  /// A very simple filter for all space points.
+  class AllPXDStateFilter : public BasePXDStateFilter {
+  public:
+    TrackFindingCDC::Weight operator()(const BasePXDStateFilter::Object& pair) final;
+  };
+}

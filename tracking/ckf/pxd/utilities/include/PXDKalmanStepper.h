@@ -7,11 +7,27 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include <tracking/modules/cdcToVXDExtrapolator/CKFModules.h>
+#include <tracking/ckf/general/utilities/KalmanStepper.h>
 
-using namespace Belle2;
+namespace genfit {
+  class MeasuredStateOnPlane;
+}
 
-REG_MODULE(CDCToSVDSpacePointCKF)
-REG_MODULE(CDCToSVDSeedCKF)
-REG_MODULE(ToPXDCKF)
+namespace Belle2 {
+  class SpacePoint;
+  class CKFToPXDState;
+
+  class PXDKalmanStepper {
+  public:
+    double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const CKFToPXDState& state);
+
+    double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint& spacePoint);
+
+    double calculateResidual(genfit::MeasuredStateOnPlane& measuredStateOnPlane, CKFToPXDState& state);
+
+  private:
+    KalmanStepper<1> m_kalmanStepper;
+  };
+}

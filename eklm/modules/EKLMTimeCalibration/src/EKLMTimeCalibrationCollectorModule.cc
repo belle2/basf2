@@ -78,7 +78,7 @@ void EKLMTimeCalibrationCollectorModule::collect()
     RelationVector<ExtHit> extHits = tracks[i]->getRelationsTo<ExtHit>();
     n2 = extHits.size();
     for (j = 0; j < n2; j++) {
-      if (extHits[j]->getDetectorID() != Const::EDetector::KLM)
+      if (extHits[j]->getDetectorID() != Const::EDetector::EKLM)
         continue;
       if (!m_GeoDat->hitInEKLM(extHits[j]->getPosition().Z()))
         continue;

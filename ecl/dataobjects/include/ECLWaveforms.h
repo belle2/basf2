@@ -25,10 +25,10 @@ namespace Belle2 {
     ECLWaveforms() {}
 
     /** get data */
-    std::vector<unsigned int>& getStore() { return _store;}
+    std::vector<unsigned int>& getStore() { return m_store;}
 
   private:
-    std::vector<unsigned int> _store;
+    std::vector<unsigned int> m_store;
     ClassDef(ECLWaveforms, 1);/**< ClassDef */
   };
 }

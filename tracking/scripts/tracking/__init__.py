@@ -650,9 +650,8 @@ def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", compo
 
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
                                  sectormap_file=None, custom_setup_name=None, PXDminSVDSPs=3,
-                                 filter_overlapping=True,
+                                 filter_overlapping=True, TFstrictSeeding=True, TFstoreSubsets=False,
                                  quality_estimator='tripletFit', use_quality_index_cutter=False,
-                                 TFstrictSeeding=True, TFstoreSubsets=False,
                                  track_finder_module='TrackFinderVXDCellOMat'):
     """
     Convenience function for adding all vxd track finder Version 2 modules
@@ -671,16 +670,17 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     :param sectormap_file: if set to a finite value, a file will be used instead of the sectormap in the database.
     :param custom_setup_name: Set a custom setup name for the tree in the sector map.
     :param PXDminSVDSPs: When using PXD require at least this number of SVD SPs for the SPTCs
-    :param filter_overlapping: Whether to use SVDOverlapResolver, Default: True
-    :param quality_estimator: Which QualityEstimator to use. Default: tripletFit
-    :param use_quality_index_cutter: Whether to use VXDTrackCandidatesQualityIndexCutter to cut TCs with QI below 0.1.
-                                     To be used in conjunction with quality_estimator='mcInfo'. Default: False
-    :param TFstrictSeeding: Whether to use strict seeding for paths in the TrackFinder. Default: True
-    :param TFstoreSubsets: Whether to store subsets of paths in the TrackFinder. Default: False
-    :param track_finder_module: Which TrackFinder module to use. Default: TrackFinderVXDCellOMat,
+    :param filter_overlapping: DEBUGGING ONLY: Whether to use SVDOverlapResolver, Default: True
+    :param TFstrictSeeding: DEBUGGING ONLY: Whether to use strict seeding for paths in the TrackFinder. Default: True
+    :param TFstoreSubsets: DEBUGGING ONLY: Whether to store subsets of paths in the TrackFinder. Default: False
+    :param quality_estimator: DEBUGGING ONLY: Which QualityEstimator to use.
+                              Default: tripletFit ('tripletFit' currently does not work with PXD)
+    :param use_quality_index_cutter: DEBUGGING ONLY: Whether to use VXDTrackCandidatesQualityIndexCutter to cut TCs
+                                      with QI below 0.1. To be used in conjunction with quality_estimator='mcInfo'.
+                                      Default: False
+    :param track_finder_module: DEBUGGING ONLY: Which TrackFinder module to use. Default: TrackFinderVXDCellOMat,
                                 other option: TrackFinderVXDBasicPathFinder
     """
-    # TODO: Add missing parameter dectriptions
     ##########################
     # some setting for VXDTF2
     ##########################

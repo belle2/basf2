@@ -20,6 +20,7 @@ using namespace Belle2;
 EKLMAlignmentAlongStripsAlgorithm::EKLMAlignmentAlongStripsAlgorithm() :
   CalibrationAlgorithm("EKLMAlignmentAlongStripsCollector")
 {
+  m_OutputFile = "";
 }
 
 EKLMAlignmentAlongStripsAlgorithm::~EKLMAlignmentAlongStripsAlgorithm()
@@ -28,30 +29,33 @@ EKLMAlignmentAlongStripsAlgorithm::~EKLMAlignmentAlongStripsAlgorithm()
 
 CalibrationAlgorithm::EResult EKLMAlignmentAlongStripsAlgorithm::calibrate()
 {
-  return CalibrationAlgorithm::c_OK;
-}
-
-void EKLMAlignmentAlongStripsAlgorithm::dumpData(const char* fname)
-{
   int i, n;
   struct Event* event = NULL;
   TFile* f_out;
   TTree* t_in, *t_out;
-  t_in = &getObject<TTree>("calibration_data");
-  getObject<TTree>("calibration_data").Print();
-  t_in->Print();
-  t_in->SetBranchAddress("event", &event);
-  f_out = new TFile(fname, "recreate");
-  t_out = new TTree("tree", "");
-  t_out->Branch("event", event);
-  n = t_in->GetEntries();
-  for (i = 0; i < n; i++) {
-    t_in->GetEntry(i);
-    t_out->Fill();
+  if (m_OutputFile != "") {
+    t_in = &getObject<TTree>("calibration_data");
+    getObject<TTree>("calibration_data").Print();
+    t_in->Print();
+    t_in->SetBranchAddress("event", &event);
+    f_out = new TFile(m_OutputFile.c_str(), "recreate");
+    t_out = new TTree("tree", "");
+    t_out->Branch("event", event);
+    n = t_in->GetEntries();
+    for (i = 0; i < n; i++) {
+      t_in->GetEntry(i);
+      t_out->Fill();
+    }
+    f_out->cd();
+    t_out->Write();
+    delete t_out;
+    delete f_out;
   }
-  f_out->cd();
-  t_out->Write();
-  delete t_out;
-  delete f_out;
+  return CalibrationAlgorithm::c_OK;
+}
+
+void EKLMAlignmentAlongStripsAlgorithm::setOutputFile(const char* outputFile)
+{
+  m_OutputFile = outputFile;
 }
 

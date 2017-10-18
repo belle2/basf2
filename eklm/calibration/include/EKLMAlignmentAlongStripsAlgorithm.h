@@ -56,9 +56,14 @@ namespace Belle2 {
     CalibrationAlgorithm::EResult calibrate();
 
     /**
-     * Write collected data into a ROOT file.
+     * Set output file name.
      */
-    void dumpData(const char* fname);
+    void setOutputFile(const char* outputFile);
+
+  private:
+
+    /** Output file name. */
+    std::string m_OutputFile;
 
   };
 

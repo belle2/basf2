@@ -67,7 +67,12 @@ void UnusedVXDTracksAdder::apply(std::vector<CKFToSVDResult>& results)
     if (not used) {
       const RecoTrack* recoTrack = pair.first;
       SpacePointTrackCand* spacePointTrackCand = recoTrack->getRelated<SpacePointTrackCand>("SPTrackCands");
-      results.emplace_back(nullptr, spacePointTrackCand->getHits(), -1, spacePointTrackCand->getPosSeed(),
+      std::vector<const SpacePoint*> hits = spacePointTrackCand->getSortedHits();
+
+      // TODO: maybe implement a flag, if the hits are reversed or not - otherwise it would be more consistent...
+      std::reverse(hits.begin(), hits.end());
+
+      results.emplace_back(nullptr, hits, -1, spacePointTrackCand->getPosSeed(),
                            spacePointTrackCand->getMomSeed(), spacePointTrackCand->getChargeSeed());
     }
   }

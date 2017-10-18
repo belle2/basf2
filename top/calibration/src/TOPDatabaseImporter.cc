@@ -477,7 +477,7 @@ namespace Belle2 {
   }
 
 
-  void importPmtQEData(string fileName, string treeName = "qePmtData")
+  void TOPDatabaseImporter::importPmtQEData(string fileName, string treeName = "qePmtData")
   {
 
     // declare db objects to be imported
@@ -524,7 +524,7 @@ namespace Belle2 {
   }
 
 
-  void importPmtGainData(string fileName, string treeName = "gainPmtData")
+  void TOPDatabaseImporter::importPmtGainData(string fileName, string treeName = "gainPmtData")
   {
 
     // declare db objects to be imported
@@ -569,7 +569,7 @@ namespace Belle2 {
   }
 
 
-  void importPmtInstallationData(string fileName, string treeName = "installationPmtData")
+  void TOPDatabaseImporter::importPmtInstallationData(string fileName, string treeName = "installationPmtData")
   {
 
     // declare db objects to be imported
@@ -605,7 +605,7 @@ namespace Belle2 {
   }
 
 
-  void importPmtObsoleteData(string fileName, string treeName = "obsPmtData")
+  void TOPDatabaseImporter::importPmtObsoleteData(string fileName, string treeName = "obsPmtData")
   {
 
     // declare db objects to be imported
@@ -648,7 +648,7 @@ namespace Belle2 {
   }
 
 
-  void importPmtTTSPar(string fileName, string treeName = "ttsPmtPar")
+  void TOPDatabaseImporter::importPmtTTSPar(string fileName, string treeName = "ttsPmtPar")
   {
 
     // declare db objects to be imported
@@ -716,7 +716,7 @@ namespace Belle2 {
   }
 
 
-  void importPmtTTSHisto(string fileName, string treeName = "ttsPmtHisto")
+  void TOPDatabaseImporter::importPmtTTSHisto(string fileName, string treeName = "ttsPmtHisto")
   {
 
     // declare db objects to be imported

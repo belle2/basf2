@@ -21,6 +21,7 @@
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 
@@ -79,6 +80,11 @@ void WireHitCreator::exposeParameters(ModuleParamList* moduleParamList, const st
                                 m_param_useSecondHits,
                                 "Use the second hit information in the track finding.",
                                 m_param_useSecondHits);
+
+  moduleParamList->addParameter(prefixed(prefix, "useBadWires"),
+                                m_param_useBadWires,
+                                "Also create the hits that are on bad wires.",
+                                m_param_useBadWires);
 
   moduleParamList->addParameter(prefixed(prefix, "useDegreeSector"),
                                 m_param_useDegreeSector,
@@ -163,6 +169,7 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
   const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
   CDC::TDCCountTranslatorBase& tdcCountTranslator = *m_tdcCountTranslator;
   CDC::ADCCountTranslatorBase& adcCountTranslator = *m_adcCountTranslator;
+  CDC::CDCGeometryPar& geometryPar = CDC::CDCGeometryPar::Instance();
 
   // Create the wire hits into a vector
   StoreArray<CDCHit> hits;
@@ -198,6 +205,11 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
     WireID wireID(hit.getID());
     if (not wireTopology.isValidWireID(wireID)) {
       B2WARNING("Skip invalid wire id " << hit.getID());
+      continue;
+    }
+
+    // ignore hit if it is on a bad wire
+    if (not m_param_useBadWires and geometryPar.isBadWire(wireID)) {
       continue;
     }
 

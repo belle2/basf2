@@ -74,7 +74,7 @@ namespace Belle2 {
   private:
     // Parameters
     /// Minimal hit requirement for the results (counted in number of space points)
-    unsigned int m_param_minimalHitRequirement = 3;
+    unsigned int m_param_minimalHitRequirement = 2;
 
 
     // Findlets

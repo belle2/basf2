@@ -109,12 +109,12 @@ void CKFToPXDFindlet::apply()
 
   B2DEBUG(50, "Having found " << m_results.size() << " results before overlap check");
 
-  m_overlapResolver.apply(m_results);
-
   const auto hasLowHitNumber = [this](const CKFResult<RecoTrack, SpacePoint>& result) {
     return result.getHits().size() < m_param_minimalHitRequirement;
   };
   TrackFindingCDC::erase_remove_if(m_results, hasLowHitNumber);
+
+  m_overlapResolver.apply(m_results);
 
   B2DEBUG(50, "Having found " << m_results.size() << " results");
 

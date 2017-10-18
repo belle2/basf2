@@ -184,33 +184,49 @@ namespace Belle2 {
       TObject* objectPtr = 0;
       branch->SetAddress(&objectPtr);
       branch->GetEntry();
-      bool array = (string(branch->GetClassName()) == "TClonesArray");
-      if (!array) {               // only arrays will be read-in
+      std::string objName = branch->GetClassName();
+
+      if (objName == "TClonesArray") {
+        TClass* objClass = (static_cast<TClonesArray*>(objectPtr))->GetClass();
+        branch->ResetAddress();
+        delete objectPtr;
+
+        const std::string className = objClass->GetName();
+        if (className.find("Belle2::") == std::string::npos) { // only Belle2 classes
+          m_tree->SetBranchStatus(branchName.c_str(), 0);
+          continue;
+        }
+
+        std::string name = branchName + m_extensionName;
+        bool ok = DataStore::Instance().registerEntry(name, durability, objClass,
+                                                      true, storeFlags);
+        if (!ok) {
+          m_tree->SetBranchStatus(branchName.c_str(), 0);
+          continue;
+        }
+        DataStore::StoreEntry& entry = (map.find(name))->second;
+        m_tree->SetBranchAddress(branchName.c_str(), &(entry.object));
+        m_storeEntries.push_back(&entry);
+      } else if (objName == "Belle2::ECLWaveforms") {
+        std::string name = branchName;// + m_extensionName;
+        bool ok = DataStore::Instance().registerEntry(name, durability, objectPtr->IsA(),
+                                                      false, storeFlags);
+        branch->ResetAddress();
+        delete objectPtr;
+
+        if (!ok) {
+          m_tree->SetBranchStatus(branchName.c_str(), 0);
+          continue;
+        }
+        DataStore::StoreEntry& entry = (map.find(name))->second;
+        m_tree->SetBranchAddress(branchName.c_str(), &(entry.object));
+        m_storeEntries.push_back(&entry);
+
+      } else {
         m_tree->SetBranchStatus(branchName.c_str(), 0);
         branch->ResetAddress();
         delete objectPtr;
-        continue;
       }
-      TClass* objClass = (static_cast<TClonesArray*>(objectPtr))->GetClass();
-      branch->ResetAddress();
-      delete objectPtr;
-
-      const std::string className = objClass->GetName();
-      if (className.find("Belle2::") == std::string::npos) { // only Belle2 classes
-        m_tree->SetBranchStatus(branchName.c_str(), 0);
-        continue;
-      }
-
-      std::string name = branchName + m_extensionName;
-      bool ok = DataStore::Instance().registerEntry(name, durability, objClass,
-                                                    array, storeFlags);
-      if (!ok) {
-        m_tree->SetBranchStatus(branchName.c_str(), 0);
-        continue;
-      }
-      DataStore::StoreEntry& entry = (map.find(name))->second;
-      m_tree->SetBranchAddress(branchName.c_str(), &(entry.object));
-      m_storeEntries.push_back(&entry);
 
     }
 

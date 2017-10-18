@@ -48,11 +48,12 @@ namespace Belle2 {
       /// Appends relations between elements in the given AItems using the ARelationFilter.
       template <class AObject, class ARelationFilter>
       static void appendUsing(ARelationFilter& relationFilter,
-                              const std::vector<AObject*>& objects,
+                              const std::vector<AObject*>& froms,
+                              const std::vector<AObject*>& tos,
                               std::vector<WeightedRelation<AObject>>& weightedRelations)
       {
-        for (AObject* from : objects) {
-          std::vector<AObject*> possibleTos = relationFilter.getPossibleTos(from, objects);
+        for (AObject* from : froms) {
+          std::vector<AObject*> possibleTos = relationFilter.getPossibleTos(from, tos);
 
           for (AObject* to : possibleTos) {
             if (from == to) continue;
@@ -66,6 +67,15 @@ namespace Belle2 {
         std::sort(std::begin(weightedRelations), std::end(weightedRelations));
       }
       /**@}*/
+
+      /// Shortcut for applying appendUsing with froms=tos
+      template <class AObject, class ARelationFilter>
+      static void appendUsing(ARelationFilter& relationFilter,
+                              const std::vector<AObject*>& objects,
+                              std::vector<WeightedRelation<AObject>>& weightedRelations)
+      {
+        appendUsing(relationFilter, objects, objects, weightedRelations);
+      };
     };
   }
 }

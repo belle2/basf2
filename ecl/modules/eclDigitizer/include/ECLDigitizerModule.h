@@ -21,7 +21,7 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLTrig.h>
-#include <ecl/dataobjects/ECLWaveformDigit.h>
+#include <ecl/dataobjects/ECLWaveforms.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <vector>
@@ -134,7 +134,7 @@ namespace Belle2 {
       StoreArray<ECLHit>    m_eclHits;  /**< hits array  */
       StoreArray<ECLHit>    m_eclDiodeHits;
       StoreArray<ECLSimHit> m_eclSimHits;
-      StoreArray<ECLWaveformDigit> m_eclWaveformDigits;
+      StoreArray<ECLWaveforms> m_eclWaveforms;
       /** Output Arrays */
       StoreArray<ECLDigit>  m_eclDigits;
       StoreArray<ECLDsp>    m_eclDsps;
@@ -145,6 +145,8 @@ namespace Belle2 {
       bool m_calibration;  /**< calibration flag */
       bool m_inter; /**< internuclear counter effect */
       bool m_waveformMaker; /**< produce only waveform digits */
+      unsigned int m_compAlgo; /**< compression algorithm for background waveforms */
+      std::string m_eclWaveformsName;   /**< name of background waveforms storage*/
     };
   }//ECL
 }//Belle2

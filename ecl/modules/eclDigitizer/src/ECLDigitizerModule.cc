@@ -13,9 +13,9 @@
 #include <ecl/modules/eclDigitizer/ECLDigitizerModule.h>
 #include <ecl/digitization/algorithms.h>
 #include <ecl/digitization/shaperdsp.h>
+#include <ecl/digitization/ECLCompress.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/dataobjects/ECLWaveforms.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
@@ -51,8 +51,9 @@ ECLDigitizerModule::ECLDigitizerModule() : Module()
            false);
   addParam("DiodeDeposition", m_inter,
            "Flag to take into account energy deposition in photodiodes; Default diode is not sensitive detector", false);
-  addParam("WavefromMaker", m_waveformMaker,
-           "Flag to produce background waveform digits", false);
+  addParam("WaveformMaker", m_waveformMaker, "Flag to produce background waveform digits", false);
+  addParam("CompressionAlgorithm", m_compAlgo, "Waveform compression algorithm", 0u);
+  addParam("eclWaveformsName", m_eclWaveformsName, "Name of the output collection (digitized waveforms)", string(""));
 }
 
 ECLDigitizerModule::~ECLDigitizerModule()
@@ -69,8 +70,10 @@ void ECLDigitizerModule::initialize()
 
   m_eclDigits.registerRelationTo(m_eclHits);
 
-  m_eclWaveformDigits.registerInDataStore("ECLWaveformDigit_BG");
-  m_eclWaveformDigits.isOptional();
+  m_eclWaveforms.registerInDataStore(m_eclWaveformsName);
+  m_eclWaveforms.isOptional();
+
+  //  B2INFO(m_eclWaveforms.getName());
 
   readDSPDB();
 
@@ -181,9 +184,16 @@ int ECLDigitizerModule::shapeSignals()
 void ECLDigitizerModule::makeWaveforms()
 {
   const EclConfiguration& ec = EclConfiguration::get();
-  unsigned int FitA[ec.m_nsmp]; // buffer for the waveform fitter
+  BitStream out(ec.m_nch * ec.m_nsmp * 18 / 32);
+  out.putNBits(m_compAlgo, 8);
+  ECLCompress* comp = NULL;
+  if (m_compAlgo == 1) {
+    comp = new ECLBaseCompress;
+  } else if (m_compAlgo == 2) {
+    comp = new ECLDeltaCompress;
+  }
+  int FitA[ec.m_nsmp]; // buffer for the waveform fitter
   float z[ec.m_nsmp], AdcNoise[ec.m_nsmp]; // buffers with electronic noise
-  unsigned int wform[18]; // packed waveform
   // loop over entire calorimeter
   for (int j = 0; j < ec.m_nch; j++) {
     adccounts_t& a = m_adc[j];
@@ -196,10 +206,16 @@ void ECLDigitizerModule::makeWaveforms()
       int A = 20 * (1000 * a.c[i] + AdcNoise[i]) + 3000;
       FitA[i] = max(0, min(A, (1 << 18) - 1));
     }
-    ec.pack(wform, j + 1, FitA);
-    auto d = m_eclWaveformDigits.appendNew();
-    d->fill(wform);
+    comp->compress(out, FitA);
+    // if(j==8735) {
+    //   for (int  i = 0; i < ec.m_nsmp; i++) cout<<FitA[i]<<" "; cout<<endl;
+    // }
   }
+  out.resize();
+
+  ECLWaveforms* wf = m_eclWaveforms.appendNew();
+  std::swap(out.getStore(), wf->getStore());
+  if (comp) delete comp;
 }
 
 void ECLDigitizerModule::event()
@@ -221,8 +237,20 @@ void ECLDigitizerModule::event()
   }
 
   // check validity and waveform storage size
-  bool isBGOverlay = m_eclWaveformDigits.isValid() && m_eclWaveformDigits.getEntries() == ec.m_nch;
-  int pos = 0; //position in background buffer assuming it is ordered by the channel number
+  bool isBGOverlay = m_eclWaveforms.isValid();
+  BitStream out;
+  ECLCompress* comp = NULL;
+  //  B2INFO("overlay "<<isBGOverlay);
+  if (isBGOverlay) {
+    std::swap(out.getStore(), m_eclWaveforms[0]->getStore());
+    out.setPos(0);
+    unsigned int compAlgo = out.getNBits(8);
+    if (compAlgo == 1) {
+      comp = new ECLBaseCompress;
+    } else if (compAlgo == 2) {
+      comp = new ECLDeltaCompress;
+    }
+  }
 
   int FitA[ec.m_nsmp]; // buffer for the waveform fitter
   float z[ec.m_nsmp], AdcNoise[ec.m_nsmp]; // buffers with electronic noise
@@ -231,32 +259,22 @@ void ECLDigitizerModule::event()
   for (int j = 0; j < ec.m_nch; j++) {
     adccounts_t& a = m_adc[j];
 
-    bool isWave = false;
-
-    if (isBGOverlay) {
-      while (pos < ec.m_nch && j != static_cast<int>(m_eclWaveformDigits[pos]->getUniqueChannelID() - 1)) ++pos;
-      int cellId = ec.unpack(FitA, m_eclWaveformDigits[pos]->data()) - 1;
-      if (cellId != j) {
-        B2WARNING("ECLDigitizerModule: Waveform for background overlay is not found for channel " << j + 1);
-        pos = 0; // reset position and hope that the next channel will be found
-        memset(FitA, 0, sizeof FitA);
-      } else
-        isWave = true;
-    }
-
-    // amplitude of background waveform should be always above of so
-    // low threshold thus perform the waveform fitting anyway.
-    if (!isWave && a.total < 0.0001) continue;
-
     // if background waveform is here there is no need to generate
     // electronic noise since it is already in the waveform
-    if (isWave) {
+    if (isBGOverlay) {
+      comp->uncompress(out, FitA);
       for (int  i = 0; i < ec.m_nsmp; i++) {
         int A = 20000 * a.c[i] + FitA[i];
         FitA[i] = max(0, min(A, (1 << 18) - 1));
       }
+      // if(j==8735) {
+      //  for (int  i = 0; i < ec.m_nsmp; i++) cout<<FitA[i]<<" "; cout<<endl;
+      // }
     } else {
-      //Noise generation
+      // Signal amplitude should be above 100 keV
+      if (a.total < 0.0001) continue;
+
+      // Noise generation
       for (int i = 0; i < ec.m_nsmp; i++) z[i] = gRandom->Gaus(0, 1);
       m_noise[m_tbl[j].inoise].generateCorrelatedNoise(z, AdcNoise);
       for (int  i = 0; i < ec.m_nsmp; i++) {
@@ -289,6 +307,7 @@ void ECLDigitizerModule::event()
         if (hit.cell == j) eclDigit->addRelationTo(m_eclHits[hit.id]);
     }
   } //store each crystal hit
+  if (comp) delete comp;
 }
 
 void ECLDigitizerModule::endRun()

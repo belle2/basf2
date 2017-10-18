@@ -116,7 +116,7 @@ namespace Belle2 {
     addBGDigits<CDCHit>(m_CDCHitsName);
     addBGDigits<TOPDigit>(m_TOPDigitsName);
     addBGDigits<ARICHDigit>(m_ARICHDigitsName);
-    //    addBGDigits<ECLDsp>(m_ECLDspsName);
+    //    addBGDigits<ECLDsp>(m_ECLDspsName); //waveforms are unpacked and overlayed in ECLDigitizerModule
     addBGDigits<BKLMDigit>(m_BKLMDigitsName);
     addBGDigits<EKLMDigit>(m_EKLMDigitsName);
 

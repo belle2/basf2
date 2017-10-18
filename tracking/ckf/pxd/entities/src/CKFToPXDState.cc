@@ -26,8 +26,8 @@ unsigned int CKFToPXDState::getGeometricalLayer() const
 {
   const SpacePoint* spacePoint = getHit();
   if (not spacePoint) {
-    // return number of layer (6) + 1 -> we fake the 7th layer as the CDC
-    return 7;
+    // return number of layer (2) + 1 -> we fake the 3th layer as the SVD
+    return 3;
   }
 
   return spacePoint->getVxdID().getLayerNumber();

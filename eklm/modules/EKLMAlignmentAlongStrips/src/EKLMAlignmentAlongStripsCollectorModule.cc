@@ -29,8 +29,8 @@ using namespace Belle2;
 
 REG_MODULE(EKLMAlignmentAlongStripsCollector)
 
-EKLMAlignmentAlongStripsCollectorModule::EKLMAlignmentAlongStripsCollectorModule() :
-  CalibrationCollectorModule()
+EKLMAlignmentAlongStripsCollectorModule::
+EKLMAlignmentAlongStripsCollectorModule() : CalibrationCollectorModule()
 {
   setDescription("Module for EKLM alignment along strip (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -38,7 +38,8 @@ EKLMAlignmentAlongStripsCollectorModule::EKLMAlignmentAlongStripsCollectorModule
   m_GeoDat = NULL;
 }
 
-EKLMAlignmentAlongStripsCollectorModule::~EKLMAlignmentAlongStripsCollectorModule()
+EKLMAlignmentAlongStripsCollectorModule::
+~EKLMAlignmentAlongStripsCollectorModule()
 {
   delete m_Event;
 }
@@ -107,11 +108,12 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
       m_Event->z = hitPosition.Z();
       m_Event->stripGlobal = it2->first;
       m_GeoDat->stripNumberToElementNumbers(
-        m_Event->stripGlobal, &m_Event->endcap, &m_Event->layer, &m_Event->sector,
-        &m_Event->plane, &m_Event->strip);
-      m_Event->segmentGlobal = m_GeoDat->segmentNumber(
-                                 m_Event->endcap, m_Event->layer, m_Event->sector, m_Event->plane,
-                                 (m_Event->strip - 1) / m_GeoDat->getNStripsSegment() + 1);
+        m_Event->stripGlobal, &m_Event->endcap, &m_Event->layer,
+        &m_Event->sector, &m_Event->plane, &m_Event->strip);
+      m_Event->segmentGlobal =
+        m_GeoDat->segmentNumber(
+          m_Event->endcap, m_Event->layer, m_Event->sector, m_Event->plane,
+          (m_Event->strip - 1) / m_GeoDat->getNStripsSegment() + 1);
       getObject<TTree>("calibration_data").Fill();
     }
   }

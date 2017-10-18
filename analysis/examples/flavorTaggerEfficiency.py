@@ -86,15 +86,21 @@ methods = []
 
 
 class Quiet:
+    """Context handler class to quiet errors in a 'with' statement"""
 
     def __init__(self, level=ROOT.kInfo + 1):
+        """Class constructor"""
+        #: the level to quiet
         self.level = level
 
     def __enter__(self):
+        """Enter the context"""
+        #: the previously set level to be ignored
         self.oldlevel = ROOT.gErrorIgnoreLevel
         ROOT.gErrorIgnoreLevel = self.level
 
     def __exit__(self, type, value, traceback):
+        """Exit the context"""
         ROOT.gErrorIgnoreLevel = self.oldlevel
 
 # root-file

@@ -35,8 +35,6 @@ CalibrationAlgorithm::EResult EKLMAlignmentAlongStripsAlgorithm::calibrate()
   TTree* t_in, *t_out;
   if (m_OutputFile != "") {
     t_in = &getObject<TTree>("calibration_data");
-    getObject<TTree>("calibration_data").Print();
-    t_in->Print();
     t_in->SetBranchAddress("event", &event);
     f_out = new TFile(m_OutputFile.c_str(), "recreate");
     t_out = new TTree("tree", "");

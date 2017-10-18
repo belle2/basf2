@@ -45,14 +45,12 @@ namespace Belle2 {
   class PathCollectorRecursive {
   public:
 
-
     /** typedef to clarify what is a path here*/
     typedef std::vector<NodeType*> Path;
 
 
     /** typedef to clarify what is a pathPtr here*/
     typedef std::unique_ptr<Path> PathPtr;
-
 
 
     /** main function does need a network fulfilling some stuff which is fulfilled by any DirectedNode*/
@@ -150,6 +148,11 @@ namespace Belle2 {
     {
       B2DEBUG(150, "findPathsRecursive was started");
       nRecursiveCalls++;
+
+      if (currentPath->size() > 30) {
+        B2WARNING("findPathsRecursive reached a path length of over 30. Stopping Path here!");
+        return;
+      }
 
       // Test if there are viable neighbours to current node
       NeighbourContainerType viableNeighbours;

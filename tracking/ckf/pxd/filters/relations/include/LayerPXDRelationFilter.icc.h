@@ -57,7 +57,7 @@ namespace Belle2 {
           // then we add (PXD)/subtract(PXD) one to get to the next (overlapping) ladder and do a % N to also cope for the
           // highest number. Then we add 1 again, to go from the counting from 0 .. N-1 to 1 .. N.
           // The + maximumLadderNumber in between makes sure, we are not ending with negative numbers
-          const int direction = -1;
+          const int direction = 1;
           const unsigned int overlappingLadder =
             ((fromLadderNumber + maximumLadderNumber - 1) + direction) % maximumLadderNumber + 1;
 
@@ -77,12 +77,12 @@ namespace Belle2 {
 
           // for PXD its the other way round!
           const double currentStateU = currentSpacePoint->getNormalizedLocalU();
-          if (currentStateU > 0.2) {
+          if (currentStateU <= 0.8) {
             continue;
           }
 
           const double nextStateU = nextSpacePoint->getNormalizedLocalU();
-          if (nextStateU <= 0.8) {
+          if (nextStateU > 0.2) {
             continue;
           }
 

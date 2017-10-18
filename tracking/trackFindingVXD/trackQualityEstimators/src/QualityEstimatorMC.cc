@@ -15,27 +15,9 @@
 
 using namespace Belle2;
 
-void QualityEstimatorMC::fillMatrixWithMCInformation()
-{
-  // fill Matrix
-  for (RecoTrack& mcRecoTrack : m_mcRecoTracks) {
-    int mcRecoTrackIndex = mcRecoTrack.getArrayIndex();
-    for (SVDCluster* cluster : mcRecoTrack.getSVDHitList()) {
-      m_linkMatrix.insert(mcRecoTrackIndex, cluster->getArrayIndex()) = true;
-    }
-  }
-}
-
-double QualityEstimatorMC::estimateQuality(std::vector<SpacePoint const*> const& measurements)
+double QualityEstimatorMC::estimateQuality(std::vector<constSPpointer> const& measurements)
 {
   if (measurements.empty()) return 0;
-
-  // initialize Matrix
-  m_linkMatrix = Eigen::SparseMatrix<bool> (m_mcRecoTracks.getEntries(), StoreArray<SVDCluster>("").getEntries());
-  // Best guess about required size. Average should be slightly below 8 SVD clusters (2 per layer) per Track.
-  m_linkMatrix.reserve(m_mcRecoTracks.getEntries() * 8);
-  // create relation SVDClusterIndex to MCRecoTrackIndex
-  fillMatrixWithMCInformation();
 
   m_match = getBestMatchToMCClusters(measurements);
 
@@ -47,17 +29,17 @@ double QualityEstimatorMC::estimateQuality(std::vector<SpacePoint const*> const&
     else if (spacepoint->getType() == VXD::SensorInfoBase::PXD)
       n_pxd_spacepoints++;
     else
-      B2WARNING("QualityEstimatorMC: SpacePoint in measurements vector has a Type != SVD or PXD");
+      B2FATAL("QualityEstimatorMC: SpacePoint in measurements vector has a Type != SVD or PXD");
   }
 
   return calculateQualityIndex(n_svd_spacepoints * 2 + n_pxd_spacepoints, m_match);
 }
 
-QualityEstimatorMC::MatchInfo QualityEstimatorMC::getBestMatchToMCClusters(std::vector<SpacePoint const*> const& measurements)
+QualityEstimatorMC::MatchInfo QualityEstimatorMC::getBestMatchToMCClusters(std::vector<constSPpointer> const& measurements)
 {
   std::map<MCRecoTrackIndex, NMatches> matches;
 
-  for (SpacePoint const* spacePoint : measurements) {
+  for (constSPpointer spacePoint : measurements) {
 
     for (SVDCluster& cluster : spacePoint->getRelationsTo<SVDCluster>(m_svdClustersName)) {
       for (RecoTrack& recoTrack : cluster.getRelationsWith<RecoTrack>(m_mcRecoTracksStoreArrayName)) {
@@ -94,7 +76,7 @@ double QualityEstimatorMC::calculateQualityIndex(int nClusters, MatchInfo& match
 }
 
 
-QualityEstimationResults QualityEstimatorMC::estimateQualityAndProperties(std::vector<SpacePoint const*> const& measurements)
+QualityEstimationResults QualityEstimatorMC::estimateQualityAndProperties(std::vector<constSPpointer> const& measurements)
 {
   QualityEstimatorBase::estimateQualityAndProperties(measurements);
   if (m_results.qualityIndicator != 0) {
@@ -104,5 +86,3 @@ QualityEstimationResults QualityEstimatorMC::estimateQualityAndProperties(std::v
   }
   return m_results;
 }
-
-

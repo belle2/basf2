@@ -26,6 +26,7 @@ namespace Belle2 {
     typedef int MCRecoTrackIndex;
     typedef int NMatches;
     typedef std::pair<MCRecoTrackIndex, NMatches> MatchInfo;
+    typedef SpacePoint const* constSPpointer;
 
     QualityEstimatorMC(std::string mcRecoTracksStoreArrayName = "MCRecoTracks",
                        bool strictQualityIndex = true):
@@ -35,10 +36,8 @@ namespace Belle2 {
       // store to make sure SPTCs are compared to the correct SVDStoreArray
       if (m_mcRecoTracks.getEntries() > 0) {
         m_svdClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
-        //todo: add logging warning.
-      } else m_svdClustersName = "";
-
-      m_pxdClustersName = "";
+        m_pxdClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfPXDHits();
+      } else { B2FATAL("m_mcRecoTracks has 0 entries. Can not retrieve StorArrayName of SVD and PXd"); }
     };
 
     virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) final;
@@ -47,7 +46,7 @@ namespace Belle2 {
     virtual QualityEstimationResults estimateQualityAndProperties(std::vector<SpacePoint const*> const& measurements) override final;
 
   protected:
-    MatchInfo getBestMatchToMCClusters(std::vector<SpacePoint const*> const& measurements);
+    MatchInfo getBestMatchToMCClusters(std::vector<constSPpointer> const& measurements);
     double calculateQualityIndex(int nClusters, MatchInfo& match);
     void fillMatrixWithMCInformation();
 
@@ -73,4 +72,3 @@ namespace Belle2 {
     Eigen::SparseMatrix<bool> m_linkMatrix;
   };
 }
-

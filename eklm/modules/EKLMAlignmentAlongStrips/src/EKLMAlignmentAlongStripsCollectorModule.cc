@@ -97,7 +97,7 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
       ++it;
     } while ((it != mapExtHit.end()) && (it->first == itLower->first));
     itUpper = it;
-    if (digitVolumes.find(itLower->first) == digitVolumes.end())
+    if (digitVolumes.find(itLower->first) != digitVolumes.end())
       continue;
     /* Found: write all extHits to the data tree. */
     for (it2 = itLower; it2 != itUpper; ++it2) {

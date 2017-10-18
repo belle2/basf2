@@ -37,12 +37,6 @@ namespace Belle2 {
     /// Extract the real layer this state sits on
     unsigned int getGeometricalLayer() const;
 
-    /// Make the states comparable with a layer
-    bool operator<(unsigned int layer) const;
-
-    /// Make a layer comparable to the states
-    friend bool operator<(unsigned int layer, const CKFToSVDState& state);
-
     /// Return the plane of the first SVD cluster
     genfit::SharedPlanePtr getPlane(const genfit::MeasuredStateOnPlane& state) const;
 

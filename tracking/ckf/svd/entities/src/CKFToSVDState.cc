@@ -33,16 +33,6 @@ unsigned int CKFToSVDState::getGeometricalLayer() const
   return spacePoint->getVxdID().getLayerNumber();
 }
 
-bool CKFToSVDState::operator<(unsigned int layer) const
-{
-  return getGeometricalLayer() < layer;
-}
-
-bool operator<(unsigned int layer, const CKFToSVDState& state)
-{
-  return layer < state.getGeometricalLayer();
-}
-
 genfit::SharedPlanePtr CKFToSVDState::getPlane(const genfit::MeasuredStateOnPlane& state) const
 {
   const SVDRecoHit& recoHit = getRecoHit();

@@ -30,16 +30,22 @@ DistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CK
 
   B2ASSERT("You have filled the wrong states into this!", toSpacePoint);
 
+  const VxdID& toVXDID = toSpacePoint->getVxdID();
+  const double toPhi = toSpacePoint->getPosition().Phi();
+
   if (not fromSpacePoint) {
-    // We are coming from a CDC track, so we can use its position to only look for matching ladders
-    // TODO: implement a better way, e.g. using
-    // const RecoTrack* seed = fromState.getSeed();
-    // const auto& cdcPosition = fromState.getMSoPPosition();
-    return 1.0;
+    // We are coming from an SVD track, so we can use its position to only look for matching ladders
+    const genfit::MeasuredStateOnPlane& mSoP = fromState.getMeasuredStateOnPlane();
+    const double fromPhi = mSoP.getPos().Phi();
+
+    if (abs(fromPhi - toPhi) < 0.2) {
+      return 1.0;
+    }
+
+    return NAN;
   }
 
   const VxdID& fromVXDID = fromSpacePoint->getVxdID();
-  const VxdID& toVXDID = toSpacePoint->getVxdID();
 
   if (fromVXDID.getLayerNumber() == toVXDID.getLayerNumber()) {
     // TODO: Also check for sensors?
@@ -47,9 +53,8 @@ DistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CK
   }
 
   const double fromPhi = fromSpacePoint->getPosition().Phi();
-  const double toPhi = toSpacePoint->getPosition().Phi();
 
-  if (abs(fromPhi - toPhi) < 0.2) {
+  if (abs(fromPhi - toPhi) < 0.05) {
     return 1.0;
   }
 

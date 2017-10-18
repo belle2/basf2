@@ -34,7 +34,6 @@ EKLMTimeCalibrationCollectorModule::EKLMTimeCalibrationCollectorModule() :
 {
   setDescription("Module for EKLM time calibration (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_nStripDifferent = -1;
   m_ev = {0, 0, 0};
   m_Strip = 0;
   m_TransformData = NULL;
@@ -49,7 +48,6 @@ void EKLMTimeCalibrationCollectorModule::prepare()
 {
   TTree* t;
   m_GeoDat = &(EKLM::GeometryData::Instance());
-  m_nStripDifferent = m_GeoDat->getNStripsDifferentLength();
   StoreArray<EKLMHit2d>::required();
   StoreArray<EKLMDigit>::required();
   StoreArray<Track>::required();

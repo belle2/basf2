@@ -148,9 +148,9 @@ void TrackFinderVXDBasicPathFinderModule::event()
 
   /// convert paths of directedNodeNetwork-nodes to paths of const SpacePoint*:
   //  Resulting SpacePointPath contains SpacePoints sorted from the innermost to the outermost.
-  unsigned short family;
+  short family = -1;
   unsigned short current_index = 0;
-  double qi;
+  double qi = 0.;
 
   for (auto& aPath : collectedPaths) {
     vector <const SpacePoint*> spPath;
@@ -160,6 +160,11 @@ void TrackFinderVXDBasicPathFinderModule::event()
       spPath.push_back((*aNodeIt)->getEntry().getOuterHit()->m_spacePoint);
     }
     family = aPath->back()->getFamily();
+    /**
+     * TODO: Eventually introduce another parameter for the application of the 2-SP-Overlap
+     * resolution via the families, as defineFamilies should be able to be called independently
+     * from the overlap resolving part.
+     */
     if (m_PARAMsetFamilies) {
       SpacePointTrackCand tempSPTC = SpacePointTrackCand(spPath);
       qi = m_estimator->estimateQuality(tempSPTC.getSortedHits());

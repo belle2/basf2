@@ -75,8 +75,8 @@ bool SVDResultVarSet::extract(const CKFToSVDResult* result)
     var<named("last_hit_layer")>() = -1;
     var<named("first_hit_layer")>() = -1;
   } else {
-    var<named("last_hit_layer")>() = spacePoints.front()->getVxdID().getLayerNumber();
-    var<named("first_hit_layer")>() = spacePoints.back()->getVxdID().getLayerNumber();
+    var<named("last_hit_layer")>() = spacePoints.back()->getVxdID().getLayerNumber();
+    var<named("first_hit_layer")>() = spacePoints.front()->getVxdID().getLayerNumber();
   }
 
   var<named("has_missing_layer_1")>() = layerUsed[1] == 0;

@@ -1748,12 +1748,14 @@ def writePi0EtaVeto(
     decayString,
     workingDirectory='.',
     timecut=-1,
-    pi0softForward=0,
-    pi0softBarrel=0,
-    pi0softBackward=0,
-    etasoftForward=0,
-    etasoftBarrel=0,
-    etasoftBackward=0,
+    pi0softForward=0.025,
+    pi0softBarrel=0.02,
+    pi0softBackward=0.02,
+    etasoftForward=0.035,
+    etasoftBarrel=0.03,
+    etasoftBackward=0.03,
+    pi0vetoname='Pi0_Prob',
+    etavetoname='Eta_Prob',
     selection='',
     path=analysis_main,
 ):
@@ -1772,23 +1774,21 @@ def writePi0EtaVeto(
     0.02 GeV for other pi0 soft photon
     0.035 GeV for forward eta soft photon
     0.03 GeV for other eta soft photon
-    For example, you should set pi0softForward to -0.05 when you want to set forward pi0 soft photon energy to 0.02.
-    For example, you should set pi0softForward to 0.05 when you want to set forward pi0 soft photon energy to 0.03.
 
     @param particleList     The input ParticleList
     @param decayString specify Particle to be added to the ParticleList
     @param workingDirectory The weight file directory
     @param timecut The clusterTiming cut pattern as described above
-    @param pi0softForward delta energy threshold of forward pi0 soft photon
-    @param pi0softBarrel delta energy threshold of barrel pi0 soft photon
-    @param pi0softBackward delta energy threshold of backward pi0 soft photon
-    @param etasoftForward delta energy threshold of forward eta soft photon
-    @param etasoftBarrel delta energy threshold of barrel eta soft photon
-    @param etasoftBackward delta energy threshold of backward eta soft photon
+    @param pi0softForward energy cut value of forward pi0 soft photon
+    @param pi0softBarrel energy cut value of barrel pi0 soft photon
+    @param pi0softBackward energy cut value of backward pi0 soft photon
+    @param etasoftForward energy cut value of forward eta soft photon
+    @param etasoftBarrel energy cut value of barrel eta soft photon
+    @param etasoftBackward energy cut value of backward eta soft photon
+    @param pi0vetoname extraInfo name of pi0 probability
+    @param etavetoname extraInfo name of eta probability
     @param selection Selection criteria that Particle needs meet in order for for_each ROE path to continue
     """
-
-    variables.addAlias('ctime', 'clusterTimingThreshold')
 
     roe_path = create_path()
 
@@ -1796,58 +1796,56 @@ def writePi0EtaVeto(
 
     signalSideParticleFilter(particleList, selection, roe_path, deadEndPath)
 
-    pi0For = pi0softForward + 0.025
-    pi0Barrel = pi0softBarrel + 0.02
-    pi0Back = pi0softBackward + 0.02
-    etaFor = etasoftForward + 0.035
-    etaBarrel = etasoftBarrel + 0.03
-    etaBack = etasoftBackward + 0.03
 
 # clusterErrorTiming cut
     if timecut == -1:
         fillParticleList(
             'gamma:pi0',
-            'abs(clusterTiming)<clusterErrorTiming and [clusterReg==1 and E>' +
-            str(pi0For) +
+            '[clusterReg==1 and E>' +
+            str(pi0softForward) +
             '] or [clusterReg==2 and E>' +
-            str(pi0Barrel) +
+            str(pi0softBarrel) +
             '] or [clusterReg==3 and E>' +
-            str(pi0Back) +
+            str(pi0softBackward) +
             ']',
             path=roe_path)
+        applyCuts('gamma:pi0', 'abs(clusterTiming)<clusterErrorTiming', path=roe_path)
         fillParticleList(
             'gamma:eta',
-            'abs(clusterTiming)<clusterErrorTiming and [clusterReg==1 and E>' +
-            str(etaFor) +
+            '[clusterReg==1 and E>' +
+            str(etasoftForward) +
             '] or [clusterReg==2 and E>' +
-            str(etaBarrel) +
+            str(etasoftBarrel) +
             '] or [clusterReg==3 and E>' +
-            str(etaBack) +
+            str(etasoftBackward) +
             ']',
             path=roe_path)
+        applyCuts('gamma:pi0', 'abs(clusterTiming)<clusterErrorTiming', path=roe_path)
 
 # clusterTimingThreshold cut
     elif timecut == -2:
         fillParticleList(
             'gamma:pi0',
-            'abs(clusterTiming)<ctime and [clusterReg==1 and E>' +
-            str(pi0For) +
+            '[clusterReg==1 and E>' +
+            str(pi0softForward) +
             '] or [clusterReg==2 and E>' +
-            str(pi0Barrel) +
+            str(pi0softBarrel) +
             '] or [clusterReg==3 and E>' +
-            str(pi0Back) +
+            str(pi0softBackward) +
             ']',
             path=roe_path)
+        applyCuts('gamma:pi0', 'abs(clusterTiming)<clusterTimingThreshold', path=roe_path)
         fillParticleList(
             'gamma:eta',
-            'abs(clusterTiming)<ctime and [clusterReg==1 and E>' +
-            str(etaFor) +
+            '[clusterReg==1 and E>' +
+            str(etasoftForward) +
             '] or [clusterReg==2 and E>' +
-            str(etaBarrel) +
+            str(etasoftBarrel) +
             '] or [clusterReg==3 and E>' +
-            str(etaBack) +
+            str(etasoftBackward) +
             ']',
             path=roe_path)
+        applyCuts('gamma:eta', 'abs(clusterTiming)<clusterTimingThreshold', path=roe_path)
 
 # constant clusterTiming cut
     else:
@@ -1856,25 +1854,27 @@ def writePi0EtaVeto(
             'abs(clusterTiming)<' +
             str(timecut) +
             ' and [clusterReg==1 and E>' +
-            str(pi0For) +
+            str(pi0softForward) +
             '] or [clusterReg==2 and E>' +
-            str(pi0Barrel) +
+            str(pi0softBarrel) +
             '] or [clusterReg==3 and E>' +
-            str(pi0Back) +
+            str(pi0softBackward) +
             ']',
             path=roe_path)
+        applyCuts('gamma:pi0', 'abs(clusterTiming)<' + str(timecut), path=roe_path)
         fillParticleList(
             'gamma:eta',
             'abs(clusterTiming)<' +
             str(timecut) +
             ' and [clusterReg==1 and E>' +
-            str(etaFor) +
+            str(etasoftForward) +
             '] or [clusterReg==2 and E>' +
-            str(etaBarrel) +
+            str(etasoftBarrel) +
             '] or [clusterReg==3 and E>' +
-            str(etaBack) +
+            str(etasoftBackward) +
             ']',
             path=roe_path)
+        applyCuts('gamma:eta', 'abs(clusterTiming)<' + str(timecut), path=roe_path)
 
     fillSignalSideParticleList('gamma:sig', decayString, path=roe_path)
 
@@ -1894,7 +1894,7 @@ def writePi0EtaVeto(
     rankByHighest('pi0:veto', 'extraInfo(Pi0Veto)', 1, path=roe_path)
     rankByHighest('eta:veto', 'extraInfo(EtaVeto)', 1, path=roe_path)
 
-    variableToSignalSideExtraInfo('pi0:veto', {'extraInfo(Pi0Veto)': 'Pi0_Prob'}, path=roe_path)
-    variableToSignalSideExtraInfo('eta:veto', {'extraInfo(EtaVeto)': 'Eta_Prob'}, path=roe_path)
+    variableToSignalSideExtraInfo('pi0:veto', {'extraInfo(Pi0Veto)': pi0vetoname}, path=roe_path)
+    variableToSignalSideExtraInfo('eta:veto', {'extraInfo(EtaVeto)': etavetoname}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

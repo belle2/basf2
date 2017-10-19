@@ -91,13 +91,16 @@ bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   double preKineticEnergy = aStep->GetPreStepPoint()->GetKineticEnergy();
   double postKineticEnergy = aStep->GetPostStepPoint()->GetKineticEnergy();
   double avgKineticEnergy = 0.5 * (preKineticEnergy + postKineticEnergy);
-  const G4String m_n = "G4_CESIUM_IODIDE";
-  G4String step_part_name = aStep->GetTrack()->GetDefinition()->GetParticleName();
-  double ELE_DEDX = emCal.ComputeDEDX(avgKineticEnergy, step_part_name, "eIoni", m_n)  / CLHEP::MeV * CLHEP::cm / 4.51;
-  double HAD_DEDX = emCal.ComputeDEDX(avgKineticEnergy, step_part_name, "hIoni", m_n)  / CLHEP::MeV * CLHEP::cm / 4.51;
-  double ION_DEDX = emCal.ComputeDEDX(avgKineticEnergy, step_part_name, "ionIoni", m_n) / CLHEP::MeV * CLHEP::cm / 4.51;
+  const G4ParticleDefinition* StepParticleDefinition = aStep->GetTrack()->GetParticleDefinition();
+  G4Material* StepMaterial = aStep->GetTrack()->GetMaterial();
+  double ELE_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "eIoni"  ,
+                                      StepMaterial) / CLHEP::MeV * CLHEP::cm / 4.51;
+  double HAD_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "hIoni"  ,
+                                      StepMaterial) / CLHEP::MeV * CLHEP::cm / 4.51;
+  double ION_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "ionIoni",
+                                      StepMaterial) / CLHEP::MeV * CLHEP::cm / 4.51;
   G4double DEDX_val = ELE_DEDX + HAD_DEDX + ION_DEDX; //2/3 should be 0;
-  //
+//
   //  return true;
   G4double edep = aStep->GetTotalEnergyDeposit();
   double LightOutputCorrection = GetCsITlScintillationEfficiency(DEDX_val);

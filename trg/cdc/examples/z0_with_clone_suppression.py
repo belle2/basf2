@@ -139,7 +139,7 @@ class Ana(Module):
     def initialize(self):
         self.event_info = Belle2.PyStoreObj('EventMetaData')
         self.mc = Belle2.PyStoreArray('MCParticles')
-        self.finder_trk2d = Belle2.PyStoreArray('TRGCDC2DFinderFastTracks')
+        self.finder_trk2d = Belle2.PyStoreArray('TRGCDC2DFinderTracks')
         self.fast_finder_trk2d = Belle2.PyStoreArray('TRGCDC2DFinderFastTracks')
         self.trk2d = Belle2.PyStoreArray('TRGCDC2DFitterTracks')
         self.fast_trk2d = Belle2.PyStoreArray('TRGCDC2DFitterFastTracks')
@@ -158,10 +158,6 @@ class Ana(Module):
         self.n3d_fast_neuro = 0
 
     def event(self):
-        if not any(self.finder_trk2d) and any(self.trk2d):
-            B2WARNING('In event {}'.format(self.event_info.getEvent()))
-            B2WARNING('2D fitter returns something while finder says there is nothing!')
-
         self.n2d_finder += any(self.finder_trk2d)
         self.n2d_fitter += any(self.trk2d)
         self.n3d_fitter += any(self.trk3d)

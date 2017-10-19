@@ -16,8 +16,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
-// TODO: Fix this up in general and integrate Pixel properly
-
 namespace Belle2 {
   class QualityEstimatorMC : public QualityEstimatorBase {
 
@@ -29,16 +27,10 @@ namespace Belle2 {
     typedef SpacePoint const* constSPpointer;
 
     QualityEstimatorMC(std::string mcRecoTracksStoreArrayName = "MCRecoTracks",
-                       bool strictQualityIndex = true):
-      QualityEstimatorBase(), m_strictQualityIndex(strictQualityIndex), m_mcRecoTracksStoreArrayName(mcRecoTracksStoreArrayName)
-    {
-      m_mcRecoTracks.isRequired(mcRecoTracksStoreArrayName);
-      // store to make sure SPTCs are compared to the correct SVDStoreArray
-      if (m_mcRecoTracks.getEntries() > 0) {
-        m_svdClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
-        m_pxdClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfPXDHits();
-      } else { B2FATAL("m_mcRecoTracks has 0 entries. Can not retrieve StorArrayName of SVD and PXd"); }
-    };
+                       bool strictQualityIndex = true, std::string svdClustersName = "", std::string pxdClustersName = ""):
+      QualityEstimatorBase(), m_strictQualityIndex(strictQualityIndex), m_mcRecoTracksStoreArrayName(mcRecoTracksStoreArrayName),
+      m_svdClustersName(svdClustersName), m_pxdClustersName(pxdClustersName)
+    { };
 
     virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) final;
 

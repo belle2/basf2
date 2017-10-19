@@ -39,6 +39,12 @@ QualityEstimatorVXDModule::QualityEstimatorVXDModule() : Module()
   addParam("MCRecoTracksStoreArrayName", m_MCRecoTracksStoreArrayName,
            "Only required for MCInfo method. Name of StoreArray containing MCRecoTracks.", std::string("MCRecoTracks"));
 
+  addParam("MCsvdClustersName", m_MCsvdClustersName,
+           "Only required for MCInfo method. Name of StoreArray containing svdClusters.", std::string(""));
+
+  addParam("MCpxdClustersName", m_MCpxdClustersName,
+           "Only required for MCInfo method. Name of StoreArray containing pxdClusters.", std::string(""));
+
   addParam("MCStrictQualityEstimator", m_MCStrictQualityEstimator,
            "Only required for MCInfo method. If false combining several MCTracks is allowed.", bool(true));
 }
@@ -49,7 +55,9 @@ void QualityEstimatorVXDModule::initialize()
 
   // create pointer to chosen estimator
   if (m_EstimationMethod == "mcInfo") {
-    m_estimator = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
+    StoreArray<RecoTrack>::required(m_MCRecoTracksStoreArrayName);
+    m_estimator = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator,
+                                                       m_MCsvdClustersName, m_MCpxdClustersName);
   } else if (m_EstimationMethod == "tripletFit") {
     m_estimator = std::make_unique<QualityEstimatorTripletFit>();
   } else if (m_EstimationMethod == "circleFit") {

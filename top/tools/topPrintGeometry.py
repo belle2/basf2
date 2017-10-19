@@ -7,13 +7,13 @@ import sys
 # ---------------------------------------------------------------------------
 # Prints all geometry parameters of TOP
 #
-# Usage:  basf2 topPrintGeometry.py
+# Usage:  basf2 top/tools/printGeometry.py
 #
 # Note: print-out is about 2000 lines long
 #       pipe it to less or redirect the output to a file
 #
 # The filename of the main xml file can be specified as an optional argument
-#   example: basf2 topPrintMapElectronicChToPixels.py testbeam/top/LEPS2013-6/TOP.xml
+#   example: basf2 top/tools/viewMappings.py testbeam/top/LEPS2013-6/TOP.xml
 #            (hint: omit 'data' from the path)
 # ---------------------------------------------------------------------------
 

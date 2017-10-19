@@ -3,14 +3,14 @@
 
 # ---------------------------------------------------------------------------------------
 # Unpack raw data in Interim FE format v2.1 to TOPDigits and gives summary plots
-# Usage: basf2 topMakeInterimFEDataNtuple.py <input_file.sroot>
+# Usage: basf2 makeInterimFEDataNtuple.py <input_file.sroot>
 # ---------------------------------------------------------------------------------------
 
 from basf2 import *
 import sys
 import argparse
 import re
-from topPlotInterimFEDataNtuple import plotInterimFEDataNtupleSummary
+from plotInterimFEDataNtuple import plotInterimFEDataNtupleSummary
 
 parser = argparse.ArgumentParser(description="Create ntuple file and plots from interimFE data")
 parser.add_argument("inputFile", nargs='?', default="NoInputFile",

@@ -4,7 +4,7 @@
 # ---------------------------------------------------------------------------------------
 # Subtract cal pulse time in TOPDigits::m_time
 #
-# Usage: basf2 topSubtractCalPulse.py [channel] -i <input_file.root> -o <output_file.root>
+# Usage: basf2 subtractCalPulse.py [channel] -i <input_file.root> -o <output_file.root>
 #   channel  calibration channel (0-7, default=0)
 #   input_file  root file prepared with unpackToTOPDigits.py (calibrationChannel must be set)
 #   outpu_file  root output file (default = RootOutput.root)

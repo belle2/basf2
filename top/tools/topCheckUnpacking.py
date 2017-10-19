@@ -3,7 +3,7 @@
 
 # ---------------------------------------------------------------------------------------
 # Checks the unpacking of raw data given in Interim FE format
-# Usage: basf2 topCheckUnpacking.py -i <file_name.sroot> [<debug_level>]
+# Usage: basf2 checkUnpacking.py -i <file_name.sroot> [<debug_level>]
 #   debug_level 100: to print additional information on errors
 #   debug_level 200: to print buffer sizes and additional information on errors
 # ---------------------------------------------------------------------------------------

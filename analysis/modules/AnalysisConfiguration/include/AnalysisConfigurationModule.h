@@ -31,11 +31,10 @@ namespace Belle2 {
 
   public:
 
-    /**
-     * Constructor
-     */
+    /** Constructor */
     AnalysisConfigurationModule();
 
+    /** Initialize the module */
     virtual void initialize() override;
 
 

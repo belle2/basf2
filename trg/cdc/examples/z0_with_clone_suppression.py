@@ -5,6 +5,8 @@ import basf2
 from basf2 import *
 from ROOT import Belle2
 from cdctrigger import add_cdc_trigger
+from math import pi, tan
+from interactive import embed
 
 """
 generate tracks with particle gun, simulate CDC and CDC trigger, save the output.
@@ -42,6 +44,8 @@ basf2.set_random_seed(seed)
 
 main = basf2.create_path()
 
+empty_path = basf2.create_path()
+
 main.add_module('EventInfoSetter', evtNumList=evtnum)
 main.add_module('Progress')
 main.add_module('Gearbox')
@@ -51,6 +55,32 @@ main.add_module('Geometry', components=['BeamPipe',
 particlegun = basf2.register_module('ParticleGun')
 particlegun.param(particlegun_params)
 main.add_module(particlegun)
+
+# z position of the two ends of the first layer used by trigger
+z_SL0 = [-31 - 1.5 / tan(30 / 180. * pi), 57 + 1.5 / tan(17 / 180. * pi)]
+# radius of the first layer used by trigger
+r_SL0 = 18.3
+
+
+class Skim(Module):
+    "Reject tracks with bad combination of z0 and theta"
+
+    def initialize(self):
+        self.mc = Belle2.PyStoreArray('MCParticles')
+
+    def event(self):
+        self.return_value(0)
+        z0 = self.mc[0].getVertex().Z()
+        vec = self.mc[0].getMomentum()
+        # skip the event if the track didn't reach SL0
+        if z_SL0[0] < z0 + r_SL0 / vec.Pt() * vec.Z() < z_SL0[1]:
+            self.return_value(1)
+
+
+skim = Skim()
+main.add_module(skim)
+skim.if_false(empty_path)
+
 main.add_module('FullSim')
 main.add_module('CDCDigitizer')
 

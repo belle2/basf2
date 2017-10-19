@@ -1820,7 +1820,7 @@ def writePi0EtaVeto(
             str(etasoftBackward) +
             ']',
             path=roe_path)
-        applyCuts('gamma:pi0', 'abs(clusterTiming)<clusterErrorTiming', path=roe_path)
+        applyCuts('gamma:eta', 'abs(clusterTiming)<clusterErrorTiming', path=roe_path)
 
 # clusterTimingThreshold cut
     elif timecut == -2:

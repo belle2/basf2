@@ -18,7 +18,7 @@ generate tracks with particle gun, simulate CDC and CDC trigger, save the output
 
 # general options
 seed = 10000
-evtnum = 100
+evtnum = 600
 particlegun_params = {
     'pdgCodes': [-13, 13],
     'nTracks': 1,
@@ -139,16 +139,59 @@ class Ana(Module):
     def initialize(self):
         self.event_info = Belle2.PyStoreObj('EventMetaData')
         self.mc = Belle2.PyStoreArray('MCParticles')
-        self.trk2d = Belle2.PyStoreArray('TRGCDC2DFinderTracks')
-        self.fast_trk2d = Belle2.PyStoreArray('TRGCDC2DFinderFastTracks')
+        self.finder_trk2d = Belle2.PyStoreArray('TRGCDC2DFinderFastTracks')
+        self.fast_finder_trk2d = Belle2.PyStoreArray('TRGCDC2DFinderFastTracks')
+        self.trk2d = Belle2.PyStoreArray('TRGCDC2DFitterTracks')
+        self.fast_trk2d = Belle2.PyStoreArray('TRGCDC2DFitterFastTracks')
+        self.trk3d = Belle2.PyStoreArray('TRGCDC3DFitterTracks')
+        self.fast_trk3d = Belle2.PyStoreArray('TRGCDC3DFitterFastTracks')
+        self.trknt = Belle2.PyStoreArray('TRGCDCNeuroTracks')
+        self.fast_trknt = Belle2.PyStoreArray('TRGCDCNeuroFastTracks')
+
+        self.n2d_finder = 0
+        self.n2d_fast_finder = 0
+        self.n2d_fitter = 0
+        self.n2d_fast_fitter = 0
+        self.n3d_fitter = 0
+        self.n3d_fast_fitter = 0
+        self.n3d_neuro = 0
+        self.n3d_fast_neuro = 0
 
     def event(self):
+        if not any(self.finder_trk2d) and any(self.trk2d):
+            B2WARNING('In event {}'.format(self.event_info.getEvent()))
+            B2WARNING('2D fitter returns something while finder says there is nothing!')
+
+        self.n2d_finder += any(self.finder_trk2d)
+        self.n2d_fitter += any(self.trk2d)
+        self.n3d_fitter += any(self.trk3d)
+        self.n3d_neuro += any(self.trknt)
+        self.n2d_fast_finder += any(self.fast_finder_trk2d)
+        self.n2d_fast_fitter += any(self.fast_trk2d)
+        self.n3d_fast_fitter += any(self.fast_trk3d)
+        self.n3d_fast_neuro += any(self.fast_trknt)
+
         if len(self.trk2d) == 0 or len(self.fast_trk2d) == 0:
             return
         ts_hits = self.trk2d[0].getRelationsTo('CDCTriggerSegmentHits')
         B2DEBUG(10, 'TS size: {}'.format(ts_hits.size()))
         fast_ts_hits = self.fast_trk2d[0].getRelationsTo('CDCTriggerSegmentHits')
         B2DEBUG(10, 'fast TS size: {}'.format(fast_ts_hits.size()))
+
+    def terminate(self):
+        total = self.n2d_finder
+        fast_total = self.n2d_fast_finder
+        all_numbers = ','.join(['{}'] * 8)
+
+        B2INFO(all_numbers.format(self.n2d_finder, self.n2d_fitter, self.n3d_fitter, self.n3d_neuro,
+                                  self.n2d_fast_finder, self.n2d_fast_fitter, self.n3d_fast_fitter, self.n3d_fast_neuro))
+
+        B2INFO('2D fitter retention rate: {:.2%} (original)/ {:.2%} (fast)'.format(
+            self.n2d_fitter / total, self.n2d_fast_fitter / fast_total))
+        B2INFO('3D fitter retention rate: {:.2%} (original)/ {:.2%} (fast)'.format(
+            self.n3d_fitter / self.n2d_fitter, self.n3d_fast_fitter / self.n2d_fast_fitter))
+        B2INFO('3D neuro retention rate: {:.2%} (original)/ {:.2%} (fast)'.format(
+            self.n3d_neuro / total, self.n3d_fast_neuro / fast_total))
 
 
 main.add_module(Ana())

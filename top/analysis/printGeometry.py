@@ -5,12 +5,15 @@ from basf2 import *
 import sys
 
 # ---------------------------------------------------------------------------
-# Prints mapping of TOP electronic channels to pixels
+# Prints all geometry parameters of TOP
 #
-# Usage:  basf2 top/tools/viewMappings.py
+# Usage:  basf2 top/analysis/printGeometry.py
+#
+# Note: print-out is about 2000 lines long
+#       pipe it to less or redirect the output to a file
 #
 # The filename of the main xml file can be specified as an optional argument
-#   example: basf2 top/tools/viewMappings.py testbeam/top/LEPS2013-6/TOP.xml
+#   example: basf2 top/analysis/printGeometry.py testbeam/top/LEPS2013-6/TOP.xml
 #            (hint: omit 'data' from the path)
 # ---------------------------------------------------------------------------
 
@@ -18,7 +21,7 @@ import sys
 set_log_level(LogLevel.ERROR)
 
 # set DEBUG level for top only to print mappings
-logging.set_package('top', LogConfig(LogLevel.DEBUG, 100))
+logging.set_package('top', LogConfig(LogLevel.DEBUG, 10000))
 
 # Create path
 main = create_path()

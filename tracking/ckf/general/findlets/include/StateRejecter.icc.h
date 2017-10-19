@@ -39,10 +39,16 @@ namespace Belle2 {
   void StateRejecter<AState, AFindlet>::apply(const std::vector<const AState*>& currentPath,
                                               std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates)
   {
+    B2DEBUG(100, "Starting with " << childStates.size() << " states.");
     m_firstFilter.apply(currentPath, childStates);
+    B2DEBUG(100, "After first filter " << childStates.size() << " states.");
     m_advanceFilter.apply(currentPath, childStates);
+    B2DEBUG(100, "After advance filter " << childStates.size() << " states.");
     m_secondFilter.apply(currentPath, childStates);
+    B2DEBUG(100, "After second filter " << childStates.size() << " states.");
     m_updateFilter.apply(currentPath, childStates);
+    B2DEBUG(100, "After update filter " << childStates.size() << " states.");
     m_thirdFilter.apply(currentPath, childStates);
+    B2DEBUG(100, "After third filter " << childStates.size() << " states.");
   };
 }

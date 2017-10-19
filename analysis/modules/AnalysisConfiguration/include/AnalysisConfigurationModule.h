@@ -40,7 +40,7 @@ namespace Belle2 {
 
 
   protected:
-    std::string m_tupleStyle; /* Style of naming of variables in nTuple configured by user.
+    std::string m_tupleStyle; /**< Style of naming of variables in nTuple configured by user.
                               Possible values are listd in m_style.
                               If user gives wrong style name, it is switchd to "default"
                               */

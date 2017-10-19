@@ -181,10 +181,18 @@ int MPOD_CableTest(int id)
   int iret;
   int min = 0;
   int max = 3;
-  //const char  path[100]="arich-mpod3.b2nsm.kek.jp";
-  const char  path[100] = "f9mpod2.ijs.si";
+  const char  pathkek[100] = "arich-mpod3.b2nsm.kek.jp";
+  const char  pathijs[100] = "f9mpod2.ijs.si";
   MPOD_Start();
-  HSNMP crate =  MPOD_Open(path);
+  HSNMP crate =  MPOD_Open(pathkek);
+  if (!crate) {
+    crate =  MPOD_Open(pathijs);
+    if (!crate) {
+      printf("<h5>Error: Cannot connect to device %s</h5>\n", pathkek);
+      return 0;
+    }
+
+  }
 
   time_t rawtime;
   struct tm* info;
@@ -196,10 +204,7 @@ int MPOD_CableTest(int id)
   printf("%s<br/>", asctime(info));
 
 
-  if (!crate) {
-    printf("<h5>Error: Cannot connect to device %s</h5>\n", path);
-    return 0;
-  }
+
 
   if (id < 2)  for (int ch = 0; ch < 4; ch++) {
       setChannelSwitch(crate, ch , id);

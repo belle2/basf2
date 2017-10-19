@@ -1,9 +1,9 @@
 /**************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2010 - Belle II Collaboration                             *
+* Copyright(C) 2017 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Christian Oswald,Phillip Urquijo                         *
+* Contributors: Jo-Frederik Krohn                                        *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -23,7 +23,7 @@ namespace Belle2 {
   class NtupleKlIdTool : public NtupleFlatTool {
   private:
 
-
+    /** the Kl pid */
     float* m_KlId     ;
     /** is Forward EKLM. */
     float* m_isFEKLM  ;

@@ -11,13 +11,11 @@
 #ifndef SVDDAQDIAGNOSTICS_H
 #define SVDDAQDIAGNOSTICS_H
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace Belle2 {
   /**
    * Class to store SVD DAQ diagnostic information
-   *
-   *
    */
   class SVDDAQDiagnostic {
   public:
@@ -98,6 +96,7 @@ namespace Belle2 {
     uint8_t getFTBError() const { return m_info.parts.ftbError; }
 
   private:
+    // NB: the awful indentation is due to fixstyle.
     union {
       /** Raw value */
 uint64_t code : Bits;

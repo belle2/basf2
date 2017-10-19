@@ -117,6 +117,13 @@ namespace Belle2 {
       m_staticSectors[1] = nullptr;
     }
 
+    /** Destructor **/
+    ~VXDTFFilters()
+    {
+      // delete the static sectors
+      for (staticSector_t* aSector : m_staticSectors) if (aSector != nullptr) delete aSector;
+    }
+
     /** To add an array of sectors on a sensor.
      * @param normalizedUsup and @param normalizedVsup
      * are two vectors of double coding the geometry of the sectors.

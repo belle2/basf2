@@ -84,18 +84,14 @@ namespace Belle2 {
     }
 
 
-    /** assigns filters. */
+    /** assigns filters. The ownership of filters is taken by FiltersContainer! */
     void assignFilters(const std::string& setupName ,
                        VXDTFFilters<point_t>* filters)
     {
+      // case there is already a filter with this name in the container, we delete that filter!
       if (m_allSetupsFilters.count(setupName)) {
-        // case there is already a filter with this name in the container, we dont allow that it is overwritten!
-        B2WARNING("Trying to add a filter which is already in the container! Will not add it! And delete it!");
-        // assignFilters assumes that the ownership is taken by the container,
-        // so to not have a mem leak delete it if it is not the same as in the container
-        if (filters && filters != m_allSetupsFilters[ setupName ]) delete filters;
-
-        return;
+        B2INFO("Replacing existing filter for setup name: " << setupName);
+        if (m_allSetupsFilters[ setupName ] && filters != m_allSetupsFilters[ setupName ]) delete m_allSetupsFilters[ setupName ];
       }
       m_allSetupsFilters[ setupName ] = filters;
     }

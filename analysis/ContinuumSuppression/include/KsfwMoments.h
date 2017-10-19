@@ -121,11 +121,11 @@ namespace Belle2 {
     }
 
   private:
-    int m_uf;              /*< Flag that specifiies we are using the final state for signal */
-    double m_Hso[2][3][5]; /*< KSFW moments */
-    double m_Hoo[2][5];    /*< KSFW moments */
-    double m_et[2];        /*< Transverse energy */
-    double m_mm2[2];       /*< Missing mass squared */
+    int m_uf;              /**< Flag that specifiies we are using the final state for signal */
+    double m_Hso[2][3][5]; /**< KSFW moments */
+    double m_Hoo[2][5];    /**< KSFW moments */
+    double m_et[2];        /**< Transverse energy */
+    double m_mm2[2];       /**< Missing mass squared */
   };
 
 } // Belle2 namespace

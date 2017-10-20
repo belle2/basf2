@@ -17,7 +17,7 @@
 
 namespace Belle2 {
 
-
+  /** Class to calculate the Cleo clone variables */
   class CleoCones {
   public:
 

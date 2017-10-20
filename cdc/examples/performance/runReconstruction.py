@@ -76,7 +76,7 @@ def rec(input, output, topInCounter=False, magneticField=True,
                              components=['CDC'])
     else:
         #        main_path.add_module('Geometry')
-        main_path.add_module('Geometry', excludedComponents=['SVD', 'PXD', 'ARICH', 'BeamPipe', 'EKLM'])
+        main_path.add_module('Geometry', excludedComponents=['SVD', 'PXD', 'ARICH', 'BeamPipe', 'HeavyMetalShield', 'EKLM'])
         #        main_path.add_module('Geometry',
         #                             components=['CDC', 'MagneticFieldConstant4LimitedRCDC'])
 

@@ -73,6 +73,7 @@ class PackerUnpackerTest(Module):
             assert digit.getStrip() == digitUnpacked.getStrip()
             assert digit.getCharge() == digitUnpacked.getCharge()
 
+
 main = create_path()
 
 eventinfosetter = register_module('EventInfoSetter')

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015  Belle II Collaboration                              *
+ * Copyright(C) 2017  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Kirill Chilikin                                          *
@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMTIMECALIBRATIONCOLLECTORMODULE_H
-#define EKLMTIMECALIBRATIONCOLLECTORMODULE_H
+#ifndef EKLMALIGNMENTALONGSTRIPSCOLLECTORMODULE_H
+#define EKLMALIGNMENTALONGSTRIPSCOLLECTORMODULE_H
 
 /* C++ headers. */
 #include <string>
@@ -20,7 +20,7 @@
 
 /* Belle2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
-#include <eklm/calibration/EKLMTimeCalibrationAlgorithm.h>
+#include <eklm/calibration/EKLMAlignmentAlongStripsAlgorithm.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformData.h>
 
@@ -29,7 +29,7 @@ namespace Belle2 {
   /**
    * EKLM time calibration (data collection).
    */
-  class EKLMTimeCalibrationCollectorModule :
+  class EKLMAlignmentAlongStripsCollectorModule :
     public CalibrationCollectorModule {
 
   public:
@@ -37,12 +37,12 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EKLMTimeCalibrationCollectorModule();
+    EKLMAlignmentAlongStripsCollectorModule();
 
     /**
      * Destructor.
      */
-    ~EKLMTimeCalibrationCollectorModule();
+    ~EKLMAlignmentAlongStripsCollectorModule();
 
     /**
      * Initializer.
@@ -61,17 +61,11 @@ namespace Belle2 {
 
   private:
 
-    /** Transformation data. */
-    EKLM::TransformData* m_TransformData;
-
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 
-    /** Event (for tree branches). */
-    struct EKLMTimeCalibrationAlgorithm::Event m_ev;
-
-    /** Number of strip (for tree branch). */
-    int m_Strip;
+    /** Event. */
+    struct EKLMAlignmentAlongStripsAlgorithm::Event* m_Event;
 
   };
 

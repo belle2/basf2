@@ -167,6 +167,19 @@ int EKLMElementNumbers::stripNumber(int endcap, int layer, int sector,
          + strip;
 }
 
+void EKLMElementNumbers::stripNumberToElementNumbers(
+  int stripGlobal, int* endcap, int* layer, int* sector, int* plane,
+  int* strip) const
+{
+  static int maxStrip = getMaximalStripGlobalNumber();
+  int planeGlobal;
+  if (stripGlobal <= 0 || stripGlobal > maxStrip)
+    B2FATAL("Number of strip must be from 1 to " << maxStrip << ".");
+  *strip = (stripGlobal - 1) % m_MaximalStripNumber + 1;
+  planeGlobal = (stripGlobal - 1) / m_MaximalStripNumber + 1;
+  planeNumberToElementNumbers(planeGlobal, endcap, layer, sector, plane);
+}
+
 int EKLMElementNumbers::stripLocalNumber(int strip) const
 {
   static int maxStrip = getMaximalStripGlobalNumber();

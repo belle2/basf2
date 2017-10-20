@@ -53,12 +53,37 @@ void SVDDatabaseImporter::importSVDPulseShapeCalibrations(/*std::string fileName
   defaultCalAmp.peakTime = 75.;
   defaultCalAmp.pulseWidth = 120.;
   svdPulseShapeCal.construct(defaultCalAmp);
+
   SVDStripCalAmp funnyCalAmp;
   funnyCalAmp.gain = 60. / 22500;
   funnyCalAmp.peakTime = .75;
   funnyCalAmp.pulseWidth = 1.20;
+  /********************Loop for filling default values*********/
 
-  svdPulseShapeCal->set(3, 1, 1, 1, 0, funnyCalAmp);
+
+  unsigned int laddersOnLayer[] = { 0, 0, 0, 8, 11, 13, 17 };
+  for (unsigned int layer = 0 ; layer < 7 ; layer ++) {
+    unsigned int sensorsOnLadder[] = {0, 0, 0, 3, 4, 5, 6};
+    for (unsigned int ladder = 1; ladder < laddersOnLayer[layer]; ladder ++) {
+      for (unsigned int sensor = 1; sensor < sensorsOnLadder[layer]; sensor ++) {
+
+        B2INFO("layer: " << layer << "ladder: " << ladder << " sensor: " << sensor);
+        Bool_t side = 1;
+        for (int strip = 0; strip < 768; strip++)  svdPulseShapeCal->set(layer, ladder, sensor, side, strip, defaultCalAmp);
+        side = 0;
+        int maxStripNumber = 512;
+        if (layer == 3) maxStripNumber = 768;
+
+        for (int strip = 0; strip < maxStripNumber; strip++) svdPulseShapeCal->set(layer, ladder, sensor, side, strip, defaultCalAmp);
+
+
+      }
+    }
+  }
+
+  /*****************end of the Loop*****************/
+  //svdPulseShapeCal->set(3, 1, 1, 1, 0, funnyCalAmp);
+
   svdPulseShapeCal.import(iov);
   B2RESULT("SVDPulseShapeCalibrations imported to database.");
 
@@ -83,10 +108,65 @@ void SVDDatabaseImporter::importSVDNoiseCalibrations(/*std::string fileName*/)
   //stream.close();
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
-  float defaultNoise = 3.l;
-  svdnoisecal.construct(defaultNoise);
+
+  svdnoisecal.construct(3.33);
+
   // Here we write a different noise
-  svdnoisecal->set(3, 1, 1, 1, 0, 3.14159265) ;
+
+
+  float defaultUsideNoiseSlanted = 900. / 375.;
+  float defaultVsideNoiseSlanted = 700. / 375.;
+  float defaultUsideNoiseBarrel = 1100. / 375.;
+  float defaultVsideNoiseBarrel = 650. / 375.;
+  float defaultUsideNoiseBwd = 950. / 375.;
+  float defaultVsideNoiseBwd = 750. / 375.;
+  float defaultUsideNoiseLayer3 = 1100. / 375.;
+  float defaultVsideNoiseLayer3 = 800. / 375.;
+  float valueToFill = -99;
+
+
+  /***********************start filling loop**************/
+
+  unsigned int laddersOnLayer[] = { 0, 0, 0, 8, 11, 13, 17 };
+  for (unsigned int layer = 1 ; layer < 7 ; layer ++) {
+    unsigned int sensorsOnLadder[] = {0, 0, 0, 3, 4, 5, 6};
+    for (unsigned int ladder = 1; ladder < laddersOnLayer[layer]; ladder ++) {
+      for (unsigned int sensor = 1; sensor < sensorsOnLadder[layer]; sensor ++) {
+        /** Setting the correct noise value to fill*/
+        Bool_t side = 1;
+
+        if (layer == 3) valueToFill = defaultUsideNoiseLayer3;
+        else {
+          valueToFill = defaultUsideNoiseBarrel;
+          if (sensor == 1) /** First sensor on ladders is Slanted */      valueToFill = defaultUsideNoiseSlanted;
+          if (sensor == sensorsOnLadder[layer] - 1)
+            valueToFill = defaultUsideNoiseBwd;
+        }
+
+
+        for (int strip = 0; strip < 768; strip++)
+          svdnoisecal->set(layer, ladder, sensor, side, strip, valueToFill);
+        B2INFO("Filled side U!");
+
+        side = 0;
+
+        int maxStripNumber = 512;
+        if (layer == 3) {
+          maxStripNumber = 768;
+          valueToFill = defaultVsideNoiseLayer3;
+        } else {
+          valueToFill = defaultVsideNoiseBarrel;
+          if (sensor == 1) /** First sensor on ladders is Slanted */      valueToFill = defaultVsideNoiseSlanted;
+          if (sensor == sensorsOnLadder[layer] - 1)
+            valueToFill = defaultVsideNoiseBwd;
+        }
+        for (int strip = 0; strip < maxStripNumber; strip++) svdnoisecal->set(layer, ladder, sensor, side, strip, valueToFill);
+
+      }
+    }
+  }
+  /************************end of filling*********************/
+
   svdnoisecal.import(iov);
 
   B2RESULT("SVDNoiseCalibrations imported to database.");

@@ -6,7 +6,7 @@
  * Contributors: Jonas Wagner                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
- ******************************************************************Q********/
+ **************************************************************************/
 
 #pragma once
 
@@ -30,7 +30,7 @@ namespace Belle2 {
                        bool strictQualityIndex = true):
       QualityEstimatorBase(), m_strictQualityIndex(strictQualityIndex)
     {
-      m_mcRecoTracks.isRequired(mcRecoTracksStoreAQrrayName);
+      m_mcRecoTracks.isRequired(mcRecoTracksStoreArrayName);
       // store to make sure SPTCs are compared to the correct SVDStoreArray
       m_svdClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
     };

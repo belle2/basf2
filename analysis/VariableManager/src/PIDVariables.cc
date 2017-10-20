@@ -178,50 +178,50 @@ namespace Belle2 {
     double particleElectronId(const Particle* part)
     {
       const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return -999;
+      if (!pid) return 0.5;
 
-      return pid->getProbability(Const::electron);
+      return pid->getProbability(Const::electron, Const::pion);
     }
 
     double particleMuonId(const Particle* part)
     {
       const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return -999;
+      if (!pid) return 0.5;
 
-      return pid->getProbability(Const::muon);
+      return pid->getProbability(Const::muon, Const::pion);
     }
 
     double particlePionId(const Particle* part)
     {
       const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return -999;
+      if (!pid) return 0.5;
 
-      return pid->getProbability(Const::pion);
+      return pid->getProbability(Const::pion, Const::kaon);
     }
 
     double particleKaonId(const Particle* part)
     {
       const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return -999;
+      if (!pid) return 0.5;
 
-      return pid->getProbability(Const::kaon);
+      return pid->getProbability(Const::kaon, Const::pion);
     }
 
 
     double particleProtonId(const Particle* part)
     {
       const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return -999;
+      if (!pid) return 0.5;
 
-      return pid->getProbability(Const::proton);
+      return pid->getProbability(Const::proton, Const::pion);
     }
 
     double particleDeuteronId(const Particle* part)
     {
       const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return -999;
+      if (!pid) return 0.5;
 
-      return pid->getProbability(Const::deuteron);
+      return pid->getProbability(Const::deuteron, Const::pion);
     }
 
 
@@ -317,54 +317,6 @@ namespace Belle2 {
 
 
 
-    double particleElectronIdLegacy(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      return pid->getProbability(Const::electron, Const::pion);
-    }
-
-    double particleMuonIdLegacy(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      return pid->getProbability(Const::muon, Const::pion);
-    }
-
-    double particlePionIdLegacy(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      return pid->getProbability(Const::pion, Const::kaon);
-    }
-
-    double particleKaonIdLegacy(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      return pid->getProbability(Const::kaon, Const::pion);
-    }
-
-
-    double particleProtonIdLegacy(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      return pid->getProbability(Const::proton, Const::pion);
-    }
-
-    double particleDeuteronIdLegacy(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      return pid->getProbability(Const::deuteron, Const::pion);
-    }
 
 
 
@@ -755,17 +707,17 @@ namespace Belle2 {
     REGISTER_VARIABLE("DLLMuon", particleDeltaLogLMuon,     "DEPRECATED. Delta Log L = L(particle's hypothesis) - L(muon)");
 
 
-    REGISTER_VARIABLE("eid", particleElectronIdLegacy,
+    REGISTER_VARIABLE("eid", particleElectronId,
                       "DEPRECATED. electron ID variable used before release 01-00-00. To be replaced by PID_eID");
-    REGISTER_VARIABLE("muid", particleMuonIdLegacy,
+    REGISTER_VARIABLE("muid", particleMuonId,
                       "DEPRECATED. muon ID variable used before release 01-00-00. To be replaced by PID_muID");
-    REGISTER_VARIABLE("piid", particlePionIdLegacy,
+    REGISTER_VARIABLE("piid", particlePionId,
                       "DEPRECATED. Pion ID variable used before release 01-00-00. To be replaced by PID_piID");
-    REGISTER_VARIABLE("Kid", particleKaonIdLegacy,
+    REGISTER_VARIABLE("Kid", particleKaonId,
                       "DEPRECATED. Kaon ID variable used before release 01-00-00. To be replaced by PID_KID");
-    REGISTER_VARIABLE("prid", particleProtonIdLegacy,
+    REGISTER_VARIABLE("prid", particleProtonId,
                       "DEPRECATED. Proton ID variable used before release 01-00-00. To be replaced by PID_prID");
-    REGISTER_VARIABLE("did", particleDeuteronIdLegacy,
+    REGISTER_VARIABLE("did", particleDeuteronId,
                       "DEPRECATED. Deuteron ID variable used before release 01-00-00. To be replaced by PID_dID");
 
     REGISTER_VARIABLE("PIDKid_belle", particleKaonIdBelle, "DEPRECATED. kaon identification probability bellestyle");

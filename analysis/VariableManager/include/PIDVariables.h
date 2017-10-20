@@ -139,36 +139,6 @@ namespace Belle2 {
 
 
 
-    /**
-     * return electron Id using only the pion as alternative hypothesis
-     */
-    double particleElectronIdLegacy(const Particle* part);
-
-    /**
-     * return muon Id
-     */
-    double particleMuonIdLegacy(const Particle* part);
-
-    /**
-     * return pion Id
-     */
-    double particlePionIdLegacy(const Particle* part);
-
-    /**
-     * return kaon Id
-     */
-    double particleKaonIdLegacy(const Particle* part);
-
-    /**
-     * return proton Id
-     */
-    double particleProtonIdLegacy(const Particle* part);
-
-    /**
-     * return deuteron Id
-     */
-    double particleProtonIdLegacy(const Particle* part);
-
 
 
 

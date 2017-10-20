@@ -10,11 +10,12 @@
 #pragma once
 
 #include <tracking/ckf/general/findlets/LimitedOnStateApplier.dcl.h>
+#include <tracking/ckf/general/findlets/LayerToggledApplier.dcl.h>
 #include <tracking/ckf/pxd/filters/states/PXDStateFilterFactory.h>
 #include <tracking/ckf/pxd/entities/CKFToPXDState.h>
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
-  using ChooseableOnPXDStateApplier = LimitedOnStateApplier<CKFToPXDState,
-        TrackFindingCDC::ChooseableFilter<PXDStateFilterFactory>>;
+  using ChooseableOnPXDStateApplier = LayerToggledApplier<CKFToPXDState, LimitedOnStateApplier<CKFToPXDState,
+        TrackFindingCDC::ChooseableFilter<PXDStateFilterFactory>>>;
 }

@@ -1,4 +1,18 @@
-#include <analysis/modules/MarkDuplicateVertex/MarkDuplicateVertexModule.h>
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributor: Francesco Tenchini                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+//Identify duplicate vertices (distinct particles, but built from the same daughters) and mark the one with best chi2.
+//Only works if the particle has exactly two daughters. Mainly used to deal when merging V0 vertices with hand-built ones.
+
+//Functionality is designed to be expanded if needed.
+
+#include <analysis/modules/DuplicateVertexMarker/DuplicateVertexMarkerModule.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
@@ -17,11 +31,11 @@ using namespace Belle2;
 //                 Register module
 //-----------------------------------------------------------------
 
-REG_MODULE(MarkDuplicateVertex)
+REG_MODULE(DuplicateVertexMarker)
 
-MarkDuplicateVertexModule::MarkDuplicateVertexModule() : Module(), m_targetVar(nullptr)
+DuplicateVertexMarkerModule::DuplicateVertexMarkerModule() : Module(), m_targetVar(nullptr)
 {
-  setDescription("Identify duplicate vertices (distinct particles, but built from the same daughters) and mark the one with best chi2. Only works if the particle has exactly two daughters. Mainly used to deal when merging V0 vertices with hand-built ones. Functionality is designed to be expanded as needed.");
+  setDescription("Identify duplicate vertices (distinct particles, but built from the same daughters) and mark the one with best chi2. Only works if the particle has exactly two daughters. Mainly used to deal when merging V0 vertices with hand-built ones.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Add parameters
@@ -34,7 +48,7 @@ MarkDuplicateVertexModule::MarkDuplicateVertexModule() : Module(), m_targetVar(n
            true);
 }
 
-void MarkDuplicateVertexModule::initialize()
+void DuplicateVertexMarkerModule::initialize()
 {
   StoreObjPtr<ParticleList>::required(m_particleList);
 
@@ -42,11 +56,11 @@ void MarkDuplicateVertexModule::initialize()
 
   m_targetVar = manager.getVariable("chiProb");
   if (m_targetVar == nullptr) {
-    B2ERROR("MarkDuplicateVertex: Variable::Manager doesn't have variable chiProb");
+    B2ERROR("DuplicateVertexMarker: Variable::Manager doesn't have variable chiProb");
   }
 }
 
-void MarkDuplicateVertexModule::event()
+void DuplicateVertexMarkerModule::event()
 {
   const StoreObjPtr<ParticleList> inPList(m_particleList);
   if (!inPList)

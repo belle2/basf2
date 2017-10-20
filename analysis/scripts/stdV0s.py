@@ -18,7 +18,7 @@ def markDuplicate(
     #    extraInfoName
     path=analysis_main
 ):
-    markdup = register_module('MarkDuplicateVertex')
+    markdup = register_module('DuplicateVertexMarker')
     markdup.param('particleList', particleList)
     markdup.param('prioritiseV0', prioritiseV0)
     path.add_module(markdup)

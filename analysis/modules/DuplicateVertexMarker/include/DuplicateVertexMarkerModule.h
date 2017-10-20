@@ -1,3 +1,12 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributor: Francesco Tenchini                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 #pragma once
 
 #include <analysis/VariableManager/Manager.h>
@@ -9,14 +18,14 @@ namespace Belle2 {
   /**
 
    */
-  class MarkDuplicateVertexModule : public Module {
+  class DuplicateVertexMarkerModule : public Module {
 
   public:
 
     /**
      * Constructor
      */
-    MarkDuplicateVertexModule();
+    DuplicateVertexMarkerModule();
 
     /**
      * Initialize the Module.

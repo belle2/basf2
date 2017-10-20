@@ -19,6 +19,22 @@ namespace Belle2 {
   protected:
   };
 
+  /**
+   * Utility function to create dummy TrackFitResults
+   */
+  TrackFitResult const* addDummyTrack(StoreArray<TrackFitResult>& trackFitResults, Const::ChargedStable particeType)
+  {
+    const TVector3 dummyVector3;
+    const TMatrixDSym dummyMatrix(6);
+    const int charge = 1;
+    const float pValue = 1.;
+    const float bField = 1.5;
+
+    const auto newFitRes = trackFitResults.appendNew(dummyVector3, dummyVector3, dummyMatrix, charge, particeType, pValue,
+                                                     bField, 0, 0);
+    return newFitRes;
+  }
+
   /** Test simple Setters and Getters.
    */
   TEST_F(TrackTest, settersNGetters)
@@ -29,20 +45,10 @@ namespace Belle2 {
     StoreArray<TrackFitResult>::registerPersistent();
     StoreArray<TrackFitResult> myResults;
 
-    const TVector3 dummyVector3;
-    const TMatrixDSym dummyMatrix(6);
-    const int charge = 1;
-    const float pValue = 1.;
-    const float bField = 1.5;
-
-    const auto myPion = myResults.appendNew(dummyVector3, dummyVector3, dummyMatrix, charge, Const::pion,     pValue,
-                                            bField, 0, 0);
-
-    const auto myKaon = myResults.appendNew(dummyVector3, dummyVector3, dummyMatrix, charge, Const::kaon,     pValue, bField, 0, 0);
-
-    const auto myElectron = myResults.appendNew(dummyVector3, dummyVector3, dummyMatrix, charge, Const::electron, pValue, bField, 0, 0);
-
-    const auto myMuon = myResults.appendNew(dummyVector3, dummyVector3, dummyMatrix, charge, Const::muon,     pValue, bField, 0, 0);
+    const auto myPion = addDummyTrack(myResults, Const::pion);
+    const auto myKaon = addDummyTrack(myResults, Const::kaon);
+    const auto myElectron = addDummyTrack(myResults, Const::electron);
+    const auto myMuon = addDummyTrack(myResults, Const::muon);
 
     EXPECT_EQ(myPion->getArrayIndex(), 0);
     EXPECT_EQ(myKaon->getArrayIndex(), 1);
@@ -91,5 +97,47 @@ namespace Belle2 {
     EXPECT_EQ(countMuon, 1);
     EXPECT_EQ(countElectron, 0);
     EXPECT_EQ(countKaon, 1);
+  }
+
+  /** Test simple Setters and Getters.
+   */
+  TEST_F(TrackTest, getFitResultWithClosestMass)
+  {
+    //Create some TrackFitResults in the the DataStore.
+    //PDGCode of the TrackFitResult will be used in the test to identify the TFR.
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<TrackFitResult>::registerPersistent();
+    StoreArray<TrackFitResult> myResults;
+
+    // add two fit results
+    const auto myKaon = addDummyTrack(myResults, Const::kaon);
+    const auto myElectron = addDummyTrack(myResults, Const::electron);
+
+    Track mytrack1;
+    mytrack1.setTrackFitResultIndex(Const::electron, myElectron->getArrayIndex());
+    mytrack1.setTrackFitResultIndex(Const::kaon, myKaon->getArrayIndex());
+
+    EXPECT_EQ(mytrack1.getNumberOfFittedHypotheses(), 2);
+
+    // check for correct hypothesis if we request a fitted particle
+    const auto fitCloseToKaonMass = mytrack1.getFitResultWithClosestMass(Const::kaon);
+    EXPECT_EQ(Const::kaon.getPDGCode(), fitCloseToKaonMass.first.getPDGCode());
+    EXPECT_EQ(mytrack1.getTrackFitResult(Const::kaon)->getArrayIndex(), fitCloseToKaonMass.second->getArrayIndex());
+
+    // check to get Pion fit
+    const auto wantPionButHaveElectronFit = mytrack1.getFitResultWithClosestMass(Const::pion);
+    EXPECT_EQ(Const::electron.getPDGCode(), wantPionButHaveElectronFit.first.getPDGCode());
+    EXPECT_EQ(mytrack1.getTrackFitResult(Const::electron)->getArrayIndex(), wantPionButHaveElectronFit.second->getArrayIndex());
+
+    // check to get Electron fit
+    const auto wantMuonButHaveElectronFit = mytrack1.getFitResultWithClosestMass(Const::muon);
+    EXPECT_EQ(Const::electron.getPDGCode(), wantMuonButHaveElectronFit.first.getPDGCode());
+    EXPECT_EQ(mytrack1.getTrackFitResult(Const::electron)->getArrayIndex(), wantMuonButHaveElectronFit.second->getArrayIndex());
+
+    // check to get Proton fit
+    const auto wantProtonButHaveKaonFit = mytrack1.getFitResultWithClosestMass(Const::proton);
+    EXPECT_EQ(Const::kaon.getPDGCode(), wantProtonButHaveKaonFit.first.getPDGCode());
+    EXPECT_EQ(mytrack1.getTrackFitResult(Const::kaon)->getArrayIndex(), wantProtonButHaveKaonFit.second->getArrayIndex());
+
   }
 }  // namespace

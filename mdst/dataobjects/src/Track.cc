@@ -64,3 +64,23 @@ std::vector < short int> Track::getValidIndices() const
 
   return resultParticleIndex;
 }
+
+Track::ChargedStableTrackFitResultPair Track::getFitResultWithClosestMass(const Const::ChargedStable& requestedType) const
+{
+  // make sure at least one hypothesis exist. No B2 Track should exist which does not have at least
+  // one hypothesis
+  assert(getNumberOfFittedHypotheses() > 0);
+
+  // find fitted hypothesis which is closest to the mass of our requested particle type
+  auto allFitRes = getTrackFitResults();
+
+  // sort so the closest mass hypothesis fit in the first entry of the vector
+  auto bestMassFit = std::min_element(allFitRes.begin(), allFitRes.end(), [requestedType](auto & a, auto & b) {
+    const auto massDiffA = std::abs(a.first.getMass() - requestedType.getMass());
+    const auto massDiffB = std::abs(b.first.getMass() - requestedType.getMass());
+
+    return massDiffA < massDiffB;
+  });
+
+  return ChargedStableTrackFitResultPair(bestMassFit->first, bestMassFit->second);
+}

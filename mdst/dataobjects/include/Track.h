@@ -54,6 +54,23 @@ namespace Belle2 {
      */
     const TrackFitResult* getTrackFitResult(const Const::ChargedStable& chargedStable) const;
 
+    /** Return the track fit for a fit hypothesis with the closest mass
+     *
+     * Multiple particle hypothesis are used for fitting during the reconstruction and stored with
+     * this Track class. Not all hypothesis are available for all tracks because either a specific hypothesis
+     * was not fitted or because the fit failed.
+     * This method returns the track fit result of a successful fit with the hypothesis of a mass closest
+     * to the requested particle type. If the requested type's hypothesis is available it will be returned
+     * otherwise the next closest hypothesis in terms of the absolute mass difference will be returned.
+     *
+     * For example, if a pion is requested (mass 140 MeV) and only a muon fit (mass 106 MeV) and an
+     * electron fit (mass 511 kEV) is available, the muon fit result will be returned.
+     *
+     * @param requestedType The particle type for which the fit result should be returned.
+     * @return pair of the particle type used for the fit and a pointer to the TrackFitResult object.
+     *
+     */
+    ChargedStableTrackFitResultPair getFitResultWithClosestMass(const Const::ChargedStable& requestedType) const;
 
     /** Access to all track fit results at the same time
      *

@@ -37,22 +37,16 @@ QualityEstimatorVXDModule::QualityEstimatorVXDModule() : Module()
            "Name of StoreArray containing the SpacePointTrackCandidates to be estimated.", std::string(""));
 
   addParam("MCRecoTracksStoreArrayName", m_MCRecoTracksStoreArrayName,
-           "Only required for mcInfo method. Name of StoreArray containing MCRecoTracks.", std::string("MCRecoTracks"));
+           "Only required for MCInfo method. Name of StoreArray containing MCRecoTracks.", std::string("MCRecoTracks"));
 
   addParam("MCStrictQualityEstimator", m_MCStrictQualityEstimator,
-           "Only required for mcInfo method. If false combining several MCTracks is allowed.", bool(true));
+           "Only required for MCInfo method. If false combining several MCTracks is allowed.", bool(true));
 }
 
 void QualityEstimatorVXDModule::initialize()
 {
   m_spacePointTrackCands.isRequired(m_SpacePointTrackCandsStoreArrayName);
 
-  if (m_EstimationMethod == "mcInfo")
-    StoreArray<RecoTrack>(m_MCRecoTracksStoreArrayName).isRequired();
-}
-
-void QualityEstimatorVXDModule::event()
-{
   // create pointer to chosen estimator
   if (m_EstimationMethod == "mcInfo") {
     m_estimator = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
@@ -66,12 +60,17 @@ void QualityEstimatorVXDModule::event()
     m_estimator = std::make_unique<QualityEstimatorRandom>();
   }
   B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);
+}
 
-
+void QualityEstimatorVXDModule::beginRun()
+{
   // BField is required by all QualityEstimators
   double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
   m_estimator->setMagneticFieldStrength(bFieldZ);
+}
 
+void QualityEstimatorVXDModule::event()
+{
   // assign a QI computed using the selected QualityEstimator for each given SpacePointTrackCand
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
 

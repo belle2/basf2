@@ -3,9 +3,7 @@
 
 """Trains an MVA method from a TTree set of records."""
 
-import os
 import sys
-import os.path
 import subprocess
 import argparse
 
@@ -122,6 +120,7 @@ def main():
         ]
         print(cmd)
         subprocess.call(cmd)
+
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')

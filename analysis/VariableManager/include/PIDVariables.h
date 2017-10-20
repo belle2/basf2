@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Anze Zupanc                                *
+ * Contributors: Marko Staric, Anze Zupanc, Umberto Tamponi               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,10 +12,87 @@
 
 #include <analysis/dataobjects/Particle.h>
 #include <framework/gearbox/Const.h>
+#include <analysis/VariableManager/Manager.h>
 
 namespace Belle2 {
 
   namespace Variable {
+
+
+    /**
+     * @return  LogL(particle's hypothesis) for a particle, using an arbitrary combination of sub-detectors
+     * For expert's use only!!
+     * The particle hypothesis and the detectors combination to be used for the likelihood calculation are passed as a vector of strings.
+     * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM},  ALL, or DEFAULT (=SVD+CDC+TOP+ARICH).
+     * Exmaples:
+     * pi likelihood using TOP and CDC only =  particleLogLikelihoodValue(211, TOP, CDC);
+     * pi likelihood using all the information =  particleLogLikelihoodValue(211, ALL);
+     */
+    Manager::FunctionPtr particleLogLikelihoodValue(const std::vector<std::string>& arguments);
+
+    /**
+     * @return  posterior probability for a certain mass hypothesis  with respect to an alternative hypothesis. Any set of detectors can be used to calculate the likelihood ratios.
+     * For expert's use only!!
+     * The particle hypothesis and the detectors combination to be used for the likelihood calculation are passed as a vector of strings.
+     * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM},  ALL, or DEFAULT (=SVD+CDC+TOP+ARICH).
+     * Exmaples:
+     * probability of pi over K, using TOP and CDC only =  particlePairProbability(211, 321, TOP, CDC);
+     * probability of K over pi, using ARICH, TOP, CDC only =  particlePairProbability(321, 211, ARICH, TOP, CDC);
+     */
+    Manager::FunctionPtr particlePairProbability(const std::vector<std::string>& arguments);
+
+    /**
+    * @return  posterior probability for a certain mass hypothesis, taking into account all the possible alternatives. Any set of detectors can be used to calculate the likelihood ratios.
+    * For expert's use only!!
+    * The particle hypothesis and the detectors combination to be used for the likelihood calculation are passed as a vector of strings.
+    * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM},  ALL, or DEFAULT (=SVD+CDC+TOP+ARICH).
+    * Exmaples:
+    * probability of pi hypothesis, using TOP and CDC only =  particleProbability(211, TOP, CDC);
+    * probability of K hypothesis, using ARICH, TOP, CDC only =  particleProbability(321, ARICH, TOP, CDC);
+    */
+    Manager::FunctionPtr particlePairProbability(const std::vector<std::string>& arguments);
+
+    /**
+    * @return  returns 1 if the PID probabiliy is missing for the provided detector list, otherwise 0.
+    * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM},  ALL, or DEFAULT (=SVD+CDC+TOP+ARICH).
+    */
+    Manager::FunctionPtr particleMisisngProbability(const std::vector<std::string>& arguments);
+
+
+
+
+    /**
+     * return electron Id to be used in the physics analisys
+     */
+    double particleElectronId(const Particle* part);
+
+    /**
+     * return muon Id to be used in the physics analisys
+     */
+    double particleMuonId(const Particle* part);
+
+    /**
+     * return pion Id to be used in the physics analisys
+     */
+    double particlePionId(const Particle* part);
+
+    /**
+     * return kaon Id to be used in the physics analisys
+     */
+    double particleKaonId(const Particle* part);
+
+    /**
+     * return proton Id to be used in the physics analisys
+     */
+    double particleProtonId(const Particle* part);
+
+    /**
+     * return deuteron Id to be used in the physics analisys
+     */
+    double particleProtonId(const Particle* part);
+
+
+
 
     /**
      * returns Delta Log L = L(particle's hypothesis) - L(otherHypothesis)
@@ -59,10 +136,41 @@ namespace Belle2 {
      */
     double particleDeltaLogLMuon(const Particle* part);
 
+
+
+
     /**
-     * return electron Id
+     * return electron Id using only the pion as alternative hypothesis
      */
-    double particleElectronId(const Particle* part);
+    double particleElectronIdLegacy(const Particle* part);
+
+    /**
+     * return muon Id
+     */
+    double particleMuonIdLegacy(const Particle* part);
+
+    /**
+     * return pion Id
+     */
+    double particlePionIdLegacy(const Particle* part);
+
+    /**
+     * return kaon Id
+     */
+    double particleKaonIdLegacy(const Particle* part);
+
+    /**
+     * return proton Id
+     */
+    double particleProtonIdLegacy(const Particle* part);
+
+    /**
+     * return deuteron Id
+     */
+    double particleProtonIdLegacy(const Particle* part);
+
+
+
 
     /**
      * return pion vs electron Id
@@ -94,10 +202,6 @@ namespace Belle2 {
      */
     double particleElectronECLId(const Particle* part);
 
-    /**
-     * return muon Id
-     */
-    double particleMuonId(const Particle* part);
 
     /**
      * return electron Id
@@ -115,11 +219,6 @@ namespace Belle2 {
     double particleMuonARICHId(const Particle* part);
 
     /**
-     * return pion Id
-     */
-    double particlePionId(const Particle* part);
-
-    /**
      * return electron Id
      */
     double particlePiondEdxId(const Particle* part);
@@ -134,10 +233,6 @@ namespace Belle2 {
      */
     double particlePionARICHId(const Particle* part);
 
-    /**
-     * return kaon Id
-     */
-    double particleKaonId(const Particle* part);
 
     /**
      * return electron Id
@@ -154,10 +249,6 @@ namespace Belle2 {
      */
     double particleKaonARICHId(const Particle* part);
 
-    /**
-     * return proton Id
-     */
-    double particleProtonId(const Particle* part);
 
     /**
      * return electron Id

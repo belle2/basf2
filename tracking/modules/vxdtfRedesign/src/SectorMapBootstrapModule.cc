@@ -32,9 +32,6 @@
 #include "framework/gearbox/Const.h"
 #include "framework/datastore/StoreObjPtr.h"
 
-// DB access:
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/PayloadFile.h>
 
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -88,9 +85,13 @@ void
 SectorMapBootstrapModule::initialize()
 {
 
-  if (m_readSecMapFromDB)
+  if (m_readSecMapFromDB) {
+    B2INFO("Retrieving sectormap from DB. Filename: " << m_sectorMapsInputFile.c_str());
+    m_sectorMapsInputFileDBPtr = new DBObjPtr<PayloadFile>(m_sectorMapsInputFile.c_str());
     retrieveSectorMapFromDB();
-  else if (m_readSectorMap)
+    // add a callback function so that the sectormap is updated each time the DBObj changes
+    (*m_sectorMapsInputFileDBPtr).addCallback(this,  &SectorMapBootstrapModule::retrieveSectorMapFromDB);
+  } else if (m_readSectorMap)
     retrieveSectorMap();
   else
     bootstrapSectorMap();
@@ -464,13 +465,12 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
 void
 SectorMapBootstrapModule::retrieveSectorMapFromDB(void)
 {
-  B2INFO("Retrieving sectormap from DB. Filename: " << m_sectorMapsInputFile.c_str());
 
-  DBObjPtr<PayloadFile> sectorMapsInputFile(m_sectorMapsInputFile.c_str());
-  TFile rootFile(sectorMapsInputFile->getFileName().c_str());
+  TFile rootFile((*m_sectorMapsInputFileDBPtr)->getFileName().c_str());
 
   // some cross check that the file is open
-  if (!rootFile.IsOpen()) B2FATAL("The Payload file: " << sectorMapsInputFile->getFileName().c_str() << " not found in the DB");
+  if (!rootFile.IsOpen()) B2FATAL("The Payload file: " << (*m_sectorMapsInputFileDBPtr)->getFileName().c_str() <<
+                                    " not found in the DB");
 
   TTree* tree = NULL;
   rootFile.GetObject(c_setupKeyNameTTreeName.c_str(), tree);

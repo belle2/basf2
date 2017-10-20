@@ -42,6 +42,8 @@ namespace Belle2 {
 
   public:
 
+    QualityEstimatorBase() {}
+
     virtual ~QualityEstimatorBase() = default;
 
     void setMagneticFieldStrength(double magneticFieldZ = 1.5) {m_magneticFieldZ = magneticFieldZ;}

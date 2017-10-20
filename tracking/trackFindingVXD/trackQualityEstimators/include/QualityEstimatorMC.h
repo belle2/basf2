@@ -6,7 +6,7 @@
  * Contributors: Jonas Wagner                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+ ******************************************************************Q********/
 
 #pragma once
 
@@ -30,20 +30,12 @@ namespace Belle2 {
                        bool strictQualityIndex = true):
       QualityEstimatorBase(), m_strictQualityIndex(strictQualityIndex)
     {
-      m_mcRecoTracks = StoreArray<RecoTrack>(mcRecoTracksStoreArrayName);
-
+      m_mcRecoTracks.isRequired(mcRecoTracksStoreAQrrayName);
       // store to make sure SPTCs are compared to the correct SVDStoreArray
       m_svdClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
-
-      // initialize Matrix
-      m_linkMatrix = Eigen::SparseMatrix<bool> (m_mcRecoTracks.getEntries(), StoreArray<SVDCluster>(m_svdClustersName).getEntries());
-      // Best guess about required size. Average should be slightly below 8 SVD clusters (2 per layer) per Track.
-      m_linkMatrix.reserve(m_mcRecoTracks.getEntries() * 8);
-      // create relation SVDClusterIndex to MCRecoTrackIndex
-      fillMatrixWithMCInformation();
     };
 
-    virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) override final;
+    virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) final;
 
     /** additionally return momentum_truth if it is a perfect match to a single MCRecoTrack */
     virtual QualityEstimationResults estimateQualityAndProperties(std::vector<SpacePoint const*> const& measurements) override final;

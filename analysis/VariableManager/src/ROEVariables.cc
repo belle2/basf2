@@ -540,8 +540,8 @@ namespace Belle2 {
 
         for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++)
         {
-          const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResult(Const::pion);
-          roeCharge += tfr->getChargeSign();
+          const auto closestMassTrackFitResult = roeTracks[iTrack]->getFitResultWithClosestMass(Const::pion);
+          roeCharge += closestMassTrackFitResult.second->getChargeSign();
         }
 
         return roeCharge;

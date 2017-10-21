@@ -1925,7 +1925,8 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
     B2WARNING("CDCGeometryPar::getMinDriftTime: minDriftTime not determined; assume zero.");
     minTime = 0.;
   } else if (minTime > 20.) {
-    B2WARNING("CDCGeometryPar::getMinDriftTime: minDriftTime > 20ns. Ok ?");
+    B2WARNING("CDCGeometryPar::getMinDriftTime: minDriftTime > 20ns. Ok ?\n" << "iCLayer,lr,alpha,theta= " << iCLayer << " " << lr <<
+              " " << alpha << " " << theta);
   }
 
   return minTime;

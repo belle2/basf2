@@ -20,6 +20,7 @@ ap.add_argument(
     help='should we run the cosmic ray tracking (be careful with this in combination with particle gun config)')
 ap.add_argument('--npdfs', type=int, default=1, help='how many pdfs should we write out (-1 is one pdf for each track)')
 ap.add_argument('--full-output', action='store_true', help='do you want a full mdst or just the relavent TOP objects?')
+ap.add_argument('--particle', type=int, default=13, help='pdg code of the particles to generate (13, 211, 321, etc)')
 opts = ap.parse_args()
 
 # use a pyhon3 enum for readable particle gun configuration setup
@@ -29,6 +30,7 @@ class ParticleGunConfig(Enum):
     FROMORIGIN = 0
     FROMABOVE = 1
     FROMSIDE = 2
+
 
 opts.particlegun = ParticleGunConfig(opts.config)
 print("Particle gun configuration selected is: ", opts.particlegun)
@@ -71,7 +73,8 @@ main.add_module(geometry)
 
 # Particle gun: generate multiple tracks
 particlegun = register_module('ParticleGun')
-particlegun.param('pdgCodes', [13])  # always muons (could take a list e.g. [-211, 321, -321])
+particlegun.param('pdgCodes', [opts.particle])
+# TODO +/-
 particlegun.param('nTracks', 1)
 particlegun.param('varyNTracks', False)
 particlegun.param('independentVertices', False)

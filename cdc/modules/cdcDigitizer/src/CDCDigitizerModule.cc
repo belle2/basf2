@@ -101,6 +101,9 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   //TDC Threshold
   addParam("Threshold", m_tdcThreshold,
            "dEdx value for TDC Threshold in eV", 40.0);
+  //ADC Threshold
+  addParam("Threshold4ADC", m_adcThreshold,
+           "Threshold for ADC-count (in unit of count). ADC-count <= threshold is treated as count=0.", 0);
   addParam("tMin", m_tMin, "Lower edge of time window in ns", -100.);
   addParam("tMaxOuter", m_tMaxOuter, "Upper edge of time window in ns for the normal-cell layers", 500.);
   addParam("tMaxInner", m_tMaxInner, "Upper edge of time window in ns for the small-cell layers", 300.);
@@ -321,11 +324,16 @@ void CDCDigitizerModule::event()
     if (m_wireID.getISuperLayer() == 0) tMax = m_tMaxInner;
     if (hitDriftTime < m_tMin || hitDriftTime > tMax) continue;
 
+    unsigned short adcCount = getADCCount(hitdEdx);
+    if (adcCount <= m_adcThreshold) adcCount = 0;
+    //    B2INFO("adcCount= " << adcCount);
+
     iterSignalMap = signalMap.find(m_wireID);
 
     if (iterSignalMap == signalMap.end()) {
       // new entry
-      signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, hitdEdx)));
+      //      signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, hitdEdx)));
+      signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, adcCount)));
       B2DEBUG(150, "Creating new Signal with encoded wire number: " << m_wireID);
     } else {
       // ... smallest drift time has to be checked, ...
@@ -347,7 +355,8 @@ void CDCDigitizerModule::event()
         iterSignalMap->second.m_simHitIndex3 = iHits;
       }
       // ... total charge has to be updated.
-      iterSignalMap->second.m_charge += hitdEdx;
+      //      iterSignalMap->second.m_charge += hitdEdx;
+      iterSignalMap->second.m_charge += adcCount;
     }
 
     // add one hit per trigger time window to the trigger signal map
@@ -378,7 +387,8 @@ void CDCDigitizerModule::event()
   for (iterSignalMap = signalMap.begin(); iterSignalMap != signalMap.end(); ++iterSignalMap) {
 
     //add time-walk (here for simplicity)
-    unsigned short adcCount = getADCCount(iterSignalMap->second.m_charge);
+    //    unsigned short adcCount = getADCCount(iterSignalMap->second.m_charge);
+    unsigned short adcCount = iterSignalMap->second.m_charge;
     iterSignalMap->second.m_driftTime += m_cdcgp->getTimeWalk(iterSignalMap->first,
                                                               adcCount);
 

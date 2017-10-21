@@ -15,30 +15,55 @@ using namespace std;
 
 namespace Belle2 {
 
-  std::ostream& operator<<(std::ostream& os, SVDDAQModeType mode)
-  {
-    switch (mode) {
-      case SVDDAQModeType::zerosupp_6samples :
-        os << "0-supp 6 samples";
-        break;
-      case SVDDAQModeType::zerosupp_3samples :
-        os << "0-supp 3 samples";
-        break;
-      default : os << "unknown mode";
-    }
-    return os;
-  }
+  const SVDModeByte::baseType SVDModeByte::c_DefaultID = 151;
 
   SVDModeByte::operator string() const
   {
-    stringstream out;
-    if (m_id.parts.triggerBin <= MaxGoodTriggerBin) {
-      out << "trg " << static_cast<int>(m_id.parts.triggerBin);
-    } else {
-      out << "trg *";
+    stringstream os;
+    switch (m_id.parts.runType) {
+      case SVDRunType::raw:
+        os << "raw";
+        break;
+      case SVDRunType::transparent:
+        os << "transpt";
+        break;
+      case SVDRunType::zero_suppressed:
+        os << "0-suppr";
+        break;
+      case SVDRunType::zero_suppressed_timefit:
+        os << "0-suppr+tfit";
+        break;
     }
-    out << " DAQ " << m_id.parts.daqMode;
-    return out.str();
+    os << "/";
+    switch (m_id.parts.eventType) {
+      case SVDEventType::global_run:
+        os << "global";
+        break;
+      case SVDEventType::local_run:
+        os << "local";
+        break;
+    }
+    os << "/";
+    switch (m_id.parts.daqMode) {
+      case SVDDAQModeType::daq_1sample:
+        os << "1 sample";
+        break;
+      case SVDDAQModeType::daq_3samples:
+        os << "3 samples";
+        break;
+      case SVDDAQModeType::daq_6samples:
+        os << "6 samples";
+        break;
+      default:
+        os << "unknown";
+    }
+    os << "/";
+    if (m_id.parts.triggerBin <= MaxGoodTriggerBin) {
+      os << static_cast<int>(m_id.parts.triggerBin);
+    } else {
+      os << "???";
+    }
+    return os.str();
   }
 
   std::ostream& operator<<(std::ostream& out, const SVDModeByte& id)

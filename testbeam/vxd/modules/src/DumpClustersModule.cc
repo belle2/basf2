@@ -14,6 +14,7 @@
 #include <testbeam/vxd/dataobjects/TelCluster.h>
 
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 using namespace Belle2;
 

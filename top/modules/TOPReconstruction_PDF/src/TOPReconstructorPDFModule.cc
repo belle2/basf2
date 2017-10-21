@@ -227,33 +227,34 @@ namespace Belle2 {
 
       // write out the pdf if needed
       if (m_writeNPdfs < 0 or m_iEvent < m_writeNPdfs) {
-        reco.redoPDF(m_masses[1]);
-        // FIXME this hard codes muon id ... figure out how to make this better
-        // I guess we loop over hypotheses in this outer loop -- Sam
-
-        // collection of gaussian_t's for each pixel
-        vector<vector<TOPPDFCollection::gaussian_t>> channelPDFCollection(512);
-
-        // the mean, width and normalisation for each peak in the pdf
-        float position = 0, width = 0, numPhotons = 0;
-        for (int pixelID = 1; pixelID <= 512; pixelID++) {
-          for (int k = 0; k < reco.getNumOfPDFPeaks(pixelID); k++) {
-
-            // get this peak
-            reco.getPDFPeak(pixelID, k, position, width, numPhotons);
-
-            // save the triplet of values using nice pythonic c++11
-            auto tp = vector<float> {position, width, numPhotons};
-            channelPDFCollection.at(pixelID - 1).push_back(tp);
-
-          } // end loop over peaks in the pdf for this pixel
-        } // end loop over pixels
-
         // add this vector of vector of triplets to the TOPPDFCollection
         TOPPDFCollection* topPDFColl = pdfCollection.appendNew();
-        topPDFColl->addHypothesisPDFSample(channelPDFCollection, 13);
-        track.addRelationTo(topPDFColl);
+        for (size_t ihypothesis = 0; ihypothesis < Const::ChargedStable::c_SetSize; ++ihypothesis) {
+          double iMass = m_masses[ihypothesis];
+          int iPDGCode = m_pdgCodes[ihypothesis];
+          reco.redoPDF(iMass);
 
+          // collection of gaussian_t's for each pixel
+          vector<vector<TOPPDFCollection::gaussian_t>> channelPDFCollection(512);
+
+          // the mean, width and normalisation for each peak in the pdf
+          float position = 0, width = 0, numPhotons = 0;
+          for (int pixelID = 1; pixelID <= 512; pixelID++) {
+            for (int k = 0; k < reco.getNumOfPDFPeaks(pixelID); k++) {
+
+              // get this peak
+              reco.getPDFPeak(pixelID, k, position, width, numPhotons);
+
+              // save the triplet of values using nice pythonic c++11
+              auto tp = vector<float> {position, width, numPhotons};
+              channelPDFCollection.at(pixelID - 1).push_back(tp);
+
+            } // end loop over peaks in the pdf for this pixel
+          } // end loop over pixels
+
+          topPDFColl->addHypothesisPDFSample(channelPDFCollection, iPDGCode);
+        }
+        track.addRelationTo(topPDFColl);
       } // closes if statement about optional writing out pdfs
 
       // write out pulls for each digit if needed

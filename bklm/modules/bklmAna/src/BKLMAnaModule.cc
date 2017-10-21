@@ -187,7 +187,7 @@ void BKLMAnaModule::event()
     RelationVector<ExtHit> relatedExtHit = track->getRelationsTo<ExtHit>();
     RelationVector<Muid> Muids = track->getRelationsTo<Muid>();
     for (unsigned int t = 0; t < relatedExtHit.size(); t++) {
-      ExtHit* exthit =  extHits[t];
+      ExtHit* exthit =  relatedExtHit[t];
       if (exthit->getDetectorID() != Const::EDetector::BKLM) continue;
       int copyid = exthit->getCopyID();
       int isForward = (copyid & BKLM_END_MASK) >> BKLM_END_BIT;
@@ -216,8 +216,8 @@ void BKLMAnaModule::event()
       m_totalTrkThephi[layer - 1]->Fill(trkphi, trktheta);
       m_totalMom->Fill(mom);
       //look for mateched BKLM2dHit
-      for (unsigned int m = 0; m < relatedHit2D.size(); m++) {
-        BKLMHit2d* hit = relatedHit2D[m];
+      for (unsigned int mHit = 0; mHit < relatedHit2D.size(); mHit++) {
+        BKLMHit2d* hit = relatedHit2D[mHit];
         //if(!hit->inRPC()) continue;
         if (hit->isForward() != isForward) continue;
         if (hit->getSector() != sector) continue;

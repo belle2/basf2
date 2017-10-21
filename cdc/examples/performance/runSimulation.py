@@ -67,6 +67,7 @@ def sim(exp, run, evt, st, topInCounter=True, magneticField=False):
     process(main_path)
     print(statistics)
 
+
 if __name__ == "__main__":
 
     import argparse

@@ -46,6 +46,9 @@ namespace Belle2 {
     //! Copy constructor
     BKLMDigit(const BKLMDigit&);
 
+    //! Assignment operator
+    BKLMDigit& operator=(const BKLMDigit&);
+
     //! Destructor
     virtual ~BKLMDigit() {}
 

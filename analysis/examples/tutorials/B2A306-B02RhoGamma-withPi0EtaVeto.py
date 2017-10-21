@@ -96,35 +96,48 @@ writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma')
 
 # pi0/eta soft photon selection is important for pi0/eta veto performance.
 # The default cut values are as below.
-# clusterErrorTiming is upper limit of abs(clusterTiming) for pi0/eta soft photon
-# 0.025 GeV is lower limit of energy for forward pi0 soft photon
-# 0.02 GeV is lower limit of energy for other pi0 soft photon
-# 0.035 GeV is lower limit of energy for forward eta soft photon
-# 0.03 GeV is lower limit of energy for other eta soft photon
+# clusterErrorTiming for pi0/eta soft photon abs(clusterTiming)
+# 0.025 GeV for forward pi0 soft photon energy
+# 0.02 GeV for other pi0 soft photon energy
+# 0.035 GeV for forward eta soft photon energy
+# 0.03 GeV for other eta soft photon energy
 
-# You can change soft photon selection for energy and clusterTiming both.
-# For example, you can use clusterTimingThreshold for soft photon abs(clusterTiming) selection.
+# You can choose clusterTiming cut pattern by param timecut.
+# For example, you can use clusterTimingThreshold for soft photon clusterTiming cut.
 # clusterTimingThreshold is decided to fit photon energy vs abs(clusterTiming) that contains 99.7% of photon.
 # But clusterTimingThreshold is set to 120ns for E < 0.0615 GeV
-# to prevent from becoming overheat clusterTimingThreshold in low energy range.
-# This definition is effective for pi0/eta veto while photon efficiency may be down in low energy range.
-# From here, I show some ways of using writePi0EtaVeto.
-# For example, you should set timecut to -2 if you want to use the energy dependent clusterTiming cut.
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma','', -2)
-# For example, you should set timecut to 100 if you want to use the 100 ns constant clusterTiming cut.
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma','', 100)
-# For example, you should set pi0softForward to 0.02 when you want to set forward pi0 soft photon energy to 0.02 GeV.
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma','','', 0.02)
-# For example, you should set pi0softForward to 0.03 when you want to set forward pi0 soft photon energy to 0.03 GeV.
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma','','', 0.03)
-# For example, you should set pi0vetoname to 'My_Pi0_Prob' when you want to set extraInfo name of pi0 probability to 'My_Pi0_Prob'.
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma','','','','','','','', 'My_Pi0_Prob')
-# For example, you should set etavetoname to 'My_Eta_Prob' when you want to set extraInfo name of eta probability to 'My_Eta_Prob'.
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma','','','','','','','','', 'My_Eta_Prob')
+# to prevent from becoming overheat clusterTimingThreshold in low energy region.
+# This definition is effective for pi0/eta veto while photon efficiency may be down in low energy region.
+# If you use the energy dependent clusterTiming cut by clusterTimingThreshold, please set timecut to -2.
+# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',timecut=-2)
+# If you use the 140 ns constant clusterTiming cut, please set timecut to 140.
+# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',timecut=140)
+# In other words, timecut=-1 means clusterTiming cut by clusterErrorTiming(default),
+# timecut=-2 means clusterTiming cut by clusterTimingThreshold,
+# and others means clusterTiming cut constant value. The constant value is set to to timecut.
+
+# You can also change the energy cut value for each detection region in the ECL.
+# For example, if you set energy cut value for forward pi0 soft photon to 0.03 GeV, please set pi0softForward to 0.03.
+# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',pi0softForward=0.03)
+# Energy cut in the barrel and backward region is also available as well.
+
+# You might apply writePi0EtaVeto in one process several times.
+# Please be careful in that case.
+# You have to set pi0softname and etasoftname parameters to your original names except for default
+# from the second application for debug. For example,
+# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',timecut=140,
+# pi0softname='PI0SOFT_type2',etasoftname='ETASOFT_type2')
+# Please note that this is not enough if you apply this function more than once
+# regarding same particleList in one process,
+# you have to set not only pi0softname and etasoftname parameters
+# but also pi0vetoname and etavetoname parameters to your original names except for default
+# from the second application for debug. For example,
+# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',timecut=140,
+# pi0softname='PI0SOFT_type2',etasoftname='ETASOFT_type2',pi0vetoname='Pi0_Prob2',etavetoname='Eta_Prob2')
 
 # If you train by yourself, for example, you should refer to
-# B2A701-ContinuumSuppression_Input.py and
-# B2A702-ContinuumSuppression_MVATrain.py.
+# B2A701-ContinuumSuppression_Input.py
+# B2A702-ContinuumSuppression_MVATrain.py
 
 
 # You can also do a simple veto using delta mass ranking as below.

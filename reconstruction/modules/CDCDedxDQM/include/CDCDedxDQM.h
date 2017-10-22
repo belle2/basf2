@@ -18,7 +18,7 @@
 
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 #include <reconstruction/dbobjects/CDCDedxRunGain.h>
-#include <reconstruction/dbobjects/CDCDedxCosine.h>
+#include <reconstruction/dbobjects/CDCDedxCosineCor.h>
 
 #include <string>
 #include <vector>
@@ -66,8 +66,7 @@ namespace Belle2 {
 
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
     DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
-    DBObjPtr<CDCDedxCosine> m_DBCosine; /**< Electron saturation correction DB object */
-    std::vector<double> m_cosbinedges;  /**< Electron saturation correction details */
+    DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
 
   };
 } // Belle2 namespace

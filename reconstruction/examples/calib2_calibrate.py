@@ -24,6 +24,7 @@ import os
 import sys
 import ROOT
 from ROOT.Belle2 import CDCDedxWireGainAlgorithm, CDCDedxRunGainAlgorithm, CDCDedxCosineAlgorithm
+from ROOT.Belle2 import CDCDedx2DCorrectionAlgorithm, CDCDedx1DCleanupAlgorithm
 from caf.framework import Calibration, CAF
 
 ROOT.gROOT.SetBatch(True)
@@ -35,6 +36,8 @@ input_files = [os.path.abspath('B2Electrons.root')]
 run_gain_alg = CDCDedxRunGainAlgorithm()
 wire_gain_alg = CDCDedxWireGainAlgorithm()
 cosine_alg = CDCDedxCosineAlgorithm()
+twod_alg = CDCDedx2DCorrectionAlgorithm()
+oned_alg = CDCDedx1DCleanupAlgorithm()
 
 # Create Calibration objects from Collector, Algorithm(s), and input files
 run_gains = Calibration(
@@ -52,12 +55,24 @@ cosine = Calibration(
     collector="CDCDedxElectronCollector",
     algorithms=cosine_alg,
     input_files=input_files)
+twod = Calibration(
+    name='CDCDedx2DCalibration',
+    collector="CDCDedxElectronCollector",
+    algorithms=twod_alg,
+    input_files=input_files)
+oned = Calibration(
+    name='CDCDedx1DCleanup',
+    collector="CDCDedxElectronCollector",
+    algorithms=oned_alg,
+    input_files=input_files)
 
 # Create a CAF instance and add calibrations
 caf = CAF()
 caf.add_calibration(run_gains)
 caf.add_calibration(wire_gains)
 caf.add_calibration(cosine)
+caf.add_calibration(twod)
+caf.add_calibration(oned)
 
 # Run the calibration
 caf.run()  # Creates local database files when finished (no auto upload)

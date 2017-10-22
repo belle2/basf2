@@ -177,26 +177,6 @@ void CDCDedxPIDModule::initialize()
     //leaking pdfFile so I can access the histograms
   }
 
-
-  // make sure the calibration constants are reasonable
-  // run gains
-  if (m_DBRunGain->getRunGain() == 0)
-    B2ERROR("Run gain is zero!");
-
-  // wire gains
-  for (unsigned int i = 0; i < 14336; ++i) {
-    if (m_DBWireGains->getWireGain(i) == 0)
-      B2ERROR("Wire gain " << i << " is zero!");
-  }
-
-  // cosine correction (store the bin edges for extrapolation)
-  m_cosbinedges = m_DBCosine->getCosThetaBins();
-  for (unsigned int i = 0; i < m_cosbinedges.size(); ++i) {
-    double gain = m_DBCosine->getMean(m_cosbinedges[i]);
-    if (gain == 0)
-      B2ERROR("Cosine gain is zero...");
-  }
-
   // lookup table for number of wires per layer (indexed on superlayer)
   m_nLayerWires[0] = 1280;
   for (int i = 1; i < 9; ++i) {
@@ -207,9 +187,15 @@ void CDCDedxPIDModule::initialize()
   if (m_DBCurvePars->getSize() == 0)
     B2ERROR("No dE/dx curve parameters!");
   else m_curvepars = m_DBCurvePars->getCurvePars();
+
   if (m_DBSigmaPars->getSize() == 0)
     B2ERROR("No dE/dx sigma parameters!");
   else m_sigmapars = m_DBSigmaPars->getSigmaPars();
+
+  // get the hadron correction parameters
+  if (m_DBHadronCor->getSize() == 0)
+    B2ERROR("No hadron correction parameters!");
+  else m_hadronpars = m_DBHadronCor->getHadronPars();
 
   // create instances here to not confuse profiling
   CDCGeometryPar::Instance();
@@ -311,13 +297,14 @@ void CDCDedxPIDModule::event()
       continue;
     }
 
+    // scale factor to make electron dE/dx ~ 1
+    double scale = m_DBScaleFactor->getScaleFactor();
+
     // store run gains
     dedxTrack->m_rungain = m_DBRunGain->getRunGain();
 
     // get the cosine correction
-    // extrapolate the binned correction <--- NEED TO INCLUDE THIS
-    double coscor = 1.0;
-    dedxTrack->m_coscor = coscor;
+    dedxTrack->m_coscor = m_DBCosineCor->getMean(costh);
 
     // initialize a few variables to be used in the loop over track points
     double layerdE = 0.0; // total charge in current layer
@@ -453,7 +440,7 @@ void CDCDedxPIDModule::event()
         int driftT = cdcHit->getTDCCount();
 
         // we want electrons to be one, so artificially scale the adcCount
-        adcCount /= 43.76; // <--------- HARD CODED FOR NOW
+        adcCount /= scale;
 
         RealisticTDCCountTranslator realistictdc;
         double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, 0, true, pocaOnWire.Z(), pocaMom.Phi(), pocaMom.Theta());
@@ -467,13 +454,15 @@ void CDCDedxPIDModule::event()
           // get the wire gain constant
           double wiregain = m_DBWireGains->getWireGain(iwire);
 
-          // get the 2D and 1D corrections (dummy for now)
-          double twodcor = 1.0;
-          double onedcor = 1.0;
+          // get the 2D correction
+          double twodcor = m_DB2DCor->getMean(currentLayer, doca, entAng);
+
+          // get the 1D cleanup correction
+          double onedcor = m_DB1DCleanup->getMean(currentLayer, entAng);
 
           // apply the calibration to dE to propagate to both hit and layer measurements
-          //double correction = dedxTrack->m_rungain * dedxTrack->m_coscor * wiregain;
-          //adcCount = adcCount/correction;
+          double correction = dedxTrack->m_rungain * dedxTrack->m_coscor * wiregain * twodcor * onedcor;
+          adcCount = adcCount / correction;
 
           layerdE += 1.0 * adcCount;
           layerdx += celldx;
@@ -580,8 +569,6 @@ void CDCDedxPIDModule::event()
           pidvalues[i] = -0.5 * pidvalues[i] * pidvalues[i];
         }
       } else pidvalues = dedxTrack->m_cdcLogl;
-      if (pidvalues != pidvalues)
-        B2ERROR("Bad PID value: " << dedxTrack->m_cdcChi << "\t" << dedxTrack->m_cdcLogl);
 
       CDCDedxLikelihood* likelihoodObj = likelihoodArray.appendNew(pidvalues);
       track.addRelationTo(likelihoodObj);
@@ -679,6 +666,46 @@ void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetS
 
     logl[iPart] += log(probability);
   }
+}
+
+double CDCDedxPIDModule::D2I(const double cosTheta, const double D) const
+{
+  double absCosTheta   = fabs(cosTheta);
+  double projection    = pow(absCosTheta, m_hadronpars[3]) + m_hadronpars[2];
+  double chargeDensity = D / projection;
+  double numerator     = 1 + m_hadronpars[0] * chargeDensity;
+  double denominator   = 1 + m_hadronpars[1] * chargeDensity;
+
+  double I = D * m_hadronpars[4] * numerator / denominator;
+
+  return I;
+}
+
+double CDCDedxPIDModule::I2D(const double cosTheta, const double I) const
+{
+  double absCosTheta = fabs(cosTheta);
+  double projection  = pow(absCosTheta, m_hadronpars[3]) + m_hadronpars[2];
+
+  double a =  m_hadronpars[0] / projection;
+  double b =  1 - m_hadronpars[1] / projection * (I / m_hadronpars[4]);
+  double c = -1.0 * I / m_hadronpars[4];
+
+  if (b == 0 && a == 0) {
+    B2WARNING("both a and b coefficiants for hadron correction are 0");
+    return I;
+  }
+
+  double D = (a != 0) ? (-b + sqrt(b * b - 4.0 * a * c)) / (2.0 * a) : -c / b;
+  if (D < 0) {
+    B2WARNING("D is less 0! will try another solution");
+    D = (a != 0) ? (-b - sqrt(b * b + 4.0 * a * c)) / (2.0 * a) : -c / b;
+    if (D < 0) {
+      B2WARNING("D is still less 0! just return uncorrectecd value");
+      return I;
+    }
+  }
+
+  return D;
 }
 
 double CDCDedxPIDModule::bgCurve(double* x, double* par, int version) const

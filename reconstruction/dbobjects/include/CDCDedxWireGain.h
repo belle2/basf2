@@ -26,12 +26,12 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    CDCDedxWireGain(): m_means() {};
+    CDCDedxWireGain(): m_wiregains() {};
 
     /**
      * Constructor
      */
-    CDCDedxWireGain(std::map<int, double>& means): m_means(means) {};
+    CDCDedxWireGain(std::vector<double>& wiregains): m_wiregains(wiregains) {};
 
     /**
      * Destructor
@@ -39,17 +39,21 @@ namespace Belle2 {
     ~CDCDedxWireGain() {};
 
     /** Return wire gain
-     * @return wire gain
+     * @param wire number
      */
     float getWireGain(int wire) const
     {
-      double mean = m_means.at(wire);
-      return mean;
+      double gain = m_wiregains[wire];
+      return gain;
     };
 
   private:
-    /** dE/dx gains for each wire: key is continuous wire number (0-14336) */
-    std::map<int, double> m_means;
+    /** Note, we are using dense packed wire number (0-14336) defined as follows:
+    const int iwire = (superlayer == 0) ?
+    160*layer+wire : m_nLayerWires[superlayer-1]+(160+32*(superlayer-1))*layer+wire;
+        -see reconstruction/modules/CDCDedxPIDModule */
+    std::vector<double> m_wiregains; /**< dE/dx gains for each wire */
+
 
     ClassDef(CDCDedxWireGain, 2); /**< ClassDef */
   };

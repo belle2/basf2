@@ -12,64 +12,64 @@
 
 #include <TObject.h>
 #include <vector>
-#include <cmath>
 
 namespace Belle2 {
 
   /**
-   *   dE/dx sigma (versus beta-gamma) parameterization constants
+   *   dE/dx hadron saturation parameterization constants
    */
 
-  class CDCDedxSigmaPars: public TObject {
+  class CDCDedxHadronCor: public TObject {
   public:
 
     /**
      * Default constructor
      */
-    CDCDedxSigmaPars(): m_sigmapars() {};
+    CDCDedxHadronCor(): m_hadronpars() {};
 
     /**
      * Constructor
      */
-    CDCDedxSigmaPars(short version, std::vector<double>& sigmapars): m_version(version), m_sigmapars(sigmapars) {};
+    CDCDedxHadronCor(short version, std::vector<double>& hadronpars): m_version(version), m_hadronpars(hadronpars) {};
 
     /**
      * Destructor
      */
-    ~CDCDedxSigmaPars() {};
+    ~CDCDedxHadronCor() {};
 
     /** Get the number of parameters
      */
-    double getSize() const {return m_sigmapars.size(); };
+    double getSize() const {return m_hadronpars.size(); };
 
-    /** Get the version for the sigma parameterization
+    /** Get the version for the hadron parameterization
      */
-    int getVersion() const {return m_version; };
+    short getVersion() const {return m_version; };
 
-    /** Return vector of sigma parameters
-     * @return vector of sigma parameters
+    /** Return vector of hadron parameters
+     * @return vector of hadron parameters
      */
-    std::vector<double> getSigmaPars() const {return m_sigmapars; };
+    std::vector<double> getHadronPars() const {return m_hadronpars; };
 
-    /** Return specific sigma parameters
-     * @return specific sigma parameters
+    /** Return specific hadron parameter
+     * @return hadron parameter
      */
-    double getSigmaPar(int par) const {return m_sigmapars[par]; };
+    double getHadronPar(int par) const {return m_hadronpars[par]; };
 
     /** Set version number
      * @param version
      */
     void setVersion(short version) {m_version = version; };
 
-    /** Set sigma parameter
-     * @param sigma parameter
+    /** Set a parameter
+     * @param parameter key
+     * @param parameter value
      */
-    void setSigmaPar(int par, double value) {m_sigmapars[par] = value; };
+    void setHadronPar(int par, double value) {m_hadronpars[par] = value; };
 
   private:
-    short m_version; /**< version number for sigma parameterization */
-    std::vector<double> m_sigmapars; /**< dE/dx resolution parameters */
+    short m_version; /**< version number for hadron saturation parameterization */
+    std::vector<double> m_hadronpars; /**< dE/dx hadron correction parameters */
 
-    ClassDef(CDCDedxSigmaPars, 1); /**< ClassDef */
+    ClassDef(CDCDedxHadronCor, 1); /**< ClassDef */
   };
 } // end namespace Belle2

@@ -19,11 +19,15 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBArray.h>
 
+#include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 #include <reconstruction/dbobjects/CDCDedxRunGain.h>
-#include <reconstruction/dbobjects/CDCDedxCosine.h>
+#include <reconstruction/dbobjects/CDCDedxCosineCor.h>
+#include <reconstruction/dbobjects/CDCDedx2DCor.h>
+#include <reconstruction/dbobjects/CDCDedx1DCleanup.h>
 #include <reconstruction/dbobjects/CDCDedxCurvePars.h>
 #include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
+#include <reconstruction/dbobjects/CDCDedxHadronCor.h>
 
 #include <string>
 #include <vector>
@@ -89,6 +93,12 @@ namespace Belle2 {
     /** calculate the predicted resolution using the parameterized resolution */
     double getSigma(double dedx, double nhit, double sin) const;
 
+    /** hadron saturation parameterization part 1 */
+    double I2D(double cosTheta, double I) const;
+
+    /** hadron saturation parameterization part 2 */
+    double D2I(double cosTheta, double D) const;
+
     /** Save arithmetic and truncated mean for the 'dedx' values.
      *
      * @param mean              calculated arithmetic mean
@@ -137,14 +147,19 @@ namespace Belle2 {
     bool m_ignoreMissingParticles; /**< Ignore particles for which no PDFs are found. */
 
     // parameters: calibration constants
+    DBObjPtr<CDCDedxScaleFactor> m_DBScaleFactor; /**< Scale factor to make electrons ~1 */
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
     DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
-    DBObjPtr<CDCDedxCosine> m_DBCosine; /**< Electron saturation correction DB object */
-    std::vector<double> m_cosbinedges;  /**< Electron saturation correction details */
+    DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
+    DBObjPtr<CDCDedx2DCor> m_DB2DCor; /**< 2D correction DB object */
+    DBObjPtr<CDCDedx1DCleanup> m_DB1DCleanup; /**< 1D correction DB object */
+    DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< hadron saturation parameters */
+
+    std::vector<double> m_hadronpars; /**< hadron saturation parameters */
 
     int m_nLayerWires[9]; /**< number of wires per layer: needed for wire gain calibration */
 
-    // parameters to determine the predicted means and resolutions
+    // parameters to determine the predicted means and resolutions and hadron correction
     DBObjPtr<CDCDedxCurvePars> m_DBCurvePars; /**< dE/dx curve parameters */
     DBObjPtr<CDCDedxSigmaPars> m_DBSigmaPars; /**< dE/dx resolution parameters */
 

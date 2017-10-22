@@ -38,17 +38,16 @@ void CDCDedxDQMModule::defineHisto()
   }
 
   // cosine correction (store the bin edges for extrapolation)
-  m_cosbinedges = m_DBCosine->getCosThetaBins();
-  const int ncgains = m_cosbinedges.size();
-  for (unsigned int i = 0; i < ncgains; ++i) {
-    double gain = m_DBCosine->getMean(m_cosbinedges[i]);
+  const unsigned int ncosbins = m_DBCosineCor->getNBins();
+  for (unsigned int i = 0; i < ncosbins; ++i) {
+    double gain = m_DBCosineCor->getMean(2 / ncosbins - 1);
     if (gain == 0)
       B2ERROR("Cosine gain is zero...");
   }
 
   m_h_rungains = new TH1F("h_rungains", "h_rungains", 100, 0, 100);
-  m_h_wiregains = new TH1F("h_wiregains", "h_wiregains", 14336, -0.5, 14335.5);
-  m_h_cosinegains = new TH1F("h_cosinegains", "h_cosinegains", ncgains, -1, 1);
+  m_h_wiregains = new TH1F("h_wiregains", "h_wiregains", 100, 0, 2);
+  m_h_cosinegains = new TH1F("h_cosinegains", "h_cosinegains", ncosbins, -1, 1);
 }
 
 void CDCDedxDQMModule::initialize()
@@ -62,10 +61,11 @@ void CDCDedxDQMModule::beginRun()
   m_h_rungains->Fill(m_DBRunGain->getRunGain());
 
   for (unsigned int i = 0; i < 14336; ++i)
-    m_h_wiregains->SetBinContent(i, m_DBWireGains->getWireGain(i));
+    m_h_wiregains->Fill(m_DBWireGains->getWireGain(i));
 
-  for (unsigned int i = 0; i < m_cosbinedges.size(); ++i)
-    m_h_cosinegains->SetBinContent(i, m_DBCosine->getMean(m_cosbinedges[i]));
+  int ncosbins = m_DBCosineCor->getNBins();
+  for (unsigned int i = 0; i < ncosbins; ++i)
+    m_h_cosinegains->SetBinContent(i, m_DBCosineCor->getMean(2 / ncosbins - 1));
 }
 
 void CDCDedxDQMModule::event()

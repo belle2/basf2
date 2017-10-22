@@ -23,7 +23,7 @@
 
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 #include <reconstruction/dbobjects/CDCDedxRunGain.h>
-#include <reconstruction/dbobjects/CDCDedxCosine.h>
+#include <reconstruction/dbobjects/CDCDedxCosineCor.h>
 
 #include <string>
 #include <vector>
@@ -91,8 +91,7 @@ namespace Belle2 {
     //parameters: calibration constants
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
     DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
-    DBObjPtr<CDCDedxCosine> m_DBCosine; /**< Electron saturation correction DB object */
-    std::vector<double> m_cosbinedges;  /**< Electron saturation correction details */
+    DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
 
     /** Recalculate the dE/dx mean values after corrections */
     void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;

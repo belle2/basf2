@@ -33,6 +33,16 @@ namespace Belle2 {
     virtual ~CDCDedxDatabaseImporter() {};
 
     /**
+     * Import a scale factor to make electron dE/dx ~ 1
+     */
+    void importScaleFactor(double scale);
+
+    /**
+     * Import parameters for the hadron correction
+     */
+    void importHadronCorrection();
+
+    /**
      * Import predicted mean parameters to the database
      */
     void importCurveParameters();

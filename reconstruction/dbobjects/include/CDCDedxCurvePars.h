@@ -31,7 +31,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedxCurvePars(short version, std::vector<double> curvepars): m_version(version), m_curvepars(curvepars) {};
+    CDCDedxCurvePars(short version, std::vector<double>& curvepars): m_version(version), m_curvepars(curvepars) {};
 
     /**
      * Destructor
@@ -52,7 +52,7 @@ namespace Belle2 {
     std::vector<double> getCurvePars() const {return m_curvepars; };
 
     /** Return specific curve parameter
-     * @return specific curve parameter
+     * @return curve parameter
      */
     double getCurvePar(int par) const {return m_curvepars[par]; };
 
@@ -61,8 +61,9 @@ namespace Belle2 {
      */
     void setVersion(short version) {m_version = version; };
 
-    /** Set parameter
-     * @param parameter
+    /** Set a parameter
+     * @param parameter key
+     * @param parameter value
      */
     void setCurvePar(int par, double value) {m_curvepars[par] = value; };
 

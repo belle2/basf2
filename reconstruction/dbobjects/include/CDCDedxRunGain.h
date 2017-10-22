@@ -47,7 +47,7 @@ namespace Belle2 {
     void setRunGain(double gain) {m_gain = gain; };
 
   private:
-    double m_gain;       /**< Run gain */
+    double m_gain; /**< Run gain */
 
     ClassDef(CDCDedxRunGain, 2); /**< ClassDef */
   };

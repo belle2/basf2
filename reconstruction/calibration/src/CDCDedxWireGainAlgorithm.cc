@@ -43,7 +43,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   ttree.SetBranchAddress("wire", &wire);
   ttree.SetBranchAddress("dedxhit", &dedxhit);
 
-  std::map<int, std::vector<double> > wirededx;
+  std::vector<double> wirededx[14336];
   for (int i = 0; i < ttree.GetEntries(); ++i) {
     ttree.GetEvent(i);
     for (unsigned int j = 0; j < wire->size(); ++j) {
@@ -51,15 +51,15 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     }
   }
 
-  std::map<int, double> means;
-  for (auto const& awire : wirededx) {
-    double mean = calculateMean(awire.second, 0.05, 0.25);
-    if (mean != 0)
-      means[awire.first] = mean;
-  }
-
+  std::vector<double> means;
   for (unsigned int i = 0; i < 14336; ++i) {
-    if (!means[i]) means[i] = 1.0;
+    std::cout << "Wire gain: " << i;
+    if (wirededx[i].size() < 50) {
+      means.push_back(1.0); // <-- FIX ME, should return not enough data
+    } else {
+      double mean = calculateMean(wirededx[i], 0.05, 0.25);
+      means.push_back(mean);
+    }
   }
 
   B2INFO("dE/dx Calibration done for " << means.size() << " CDC wires");

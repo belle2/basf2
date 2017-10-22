@@ -11,57 +11,44 @@
 #pragma once
 
 #include <TObject.h>
-#include <map>
 
 namespace Belle2 {
 
   /**
-   *   dE/dx wire gain calibration constants
+   *   dE/dx run gain calibration constants
    */
 
-  class CDCDedxCosine: public TObject {
-
+  class CDCDedxScaleFactor: public TObject {
   public:
 
     /**
      * Default constructor
      */
-    CDCDedxCosine(): m_means() {};
+    CDCDedxScaleFactor(): m_scale(0) {};
 
     /**
      * Constructor
      */
-    CDCDedxCosine(std::map<double, double>& means): m_means(means) {};
+    CDCDedxScaleFactor(double scale): m_scale(scale) {};
 
     /**
      * Destructor
      */
-    ~CDCDedxCosine() {};
+    ~CDCDedxScaleFactor() {};
 
-    /** Return bin centers as a function of cos(theta)
-     * @return vector of bin centers
+    /** Return scale factor
+     * @return scale factor
      */
-    std::vector<double> getCosThetaBins() const
-    {
-      std::vector<double> binedges;
-      for (std::map<double, double>::const_iterator it = m_means.begin(); it != m_means.end(); ++it)
-        binedges.push_back(it->first);
-      return binedges;
-    };
+    double getScaleFactor() const {return m_scale; };
 
-    /** Return dE/dx mean value for given cos(theta)
-     * @return dE/dx mean value
+    /** Set scale factor
+     * @param scale factor
      */
-    double getMean(double costh) const
-    {
-      double mean = m_means.at(costh);
-      return mean;
-    };
+    void setScaleFactor(double scale) {m_scale = scale; };
 
   private:
-    /** dE/dx gains in cos(theta) bins: key is low edge of bin */
-    std::map<double, double> m_means;
+    double m_scale; /**< Scale factor to make electron dE/dx ~ 1 */
 
-    ClassDef(CDCDedxCosine, 2); /**< ClassDef */
+    ClassDef(CDCDedxScaleFactor, 1); /**< ClassDef */
   };
 } // end namespace Belle2

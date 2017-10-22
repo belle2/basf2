@@ -59,9 +59,9 @@ void DedxCorrectionModule::initialize()
   }
 
   // cosine correction (store the bin edges for extrapolation)
-  m_cosbinedges = m_DBCosine->getCosThetaBins();
-  for (unsigned int i = 0; i < m_cosbinedges.size(); ++i) {
-    double gain = m_DBCosine->getMean(m_cosbinedges[i]);
+  int ncosbins = m_DBCosineCor->getNBins();
+  for (int i = 0; i < ncosbins; ++i) {
+    double gain = m_DBCosineCor->getMean(2 / ncosbins - 1);
     if (gain == 0)
       B2ERROR("Cosine gain is zero...");
   }
@@ -149,15 +149,9 @@ void DedxCorrectionModule::WireGainCorrection(int wireID, double& dedx) const
 void DedxCorrectionModule::CosineCorrection(double costh, double& dedx) const
 {
 
-  double coscor = 1;
-  unsigned int cosbin = 0;
-  while (costh > m_cosbinedges[cosbin] && cosbin < m_cosbinedges.size()) cosbin++;
-  if (cosbin < m_cosbinedges.size() - 1) {
-    double frac = (costh - m_cosbinedges[cosbin]) / (m_cosbinedges[cosbin + 1] - m_cosbinedges[cosbin]);
-    coscor = (m_DBCosine->getMean(m_cosbinedges[cosbin + 1]) - m_DBCosine->getMean(m_cosbinedges[cosbin])) * frac + m_DBCosine->getMean(
-               m_cosbinedges[cosbin]);
-  }
-  dedx = dedx / coscor;
+  double coscor = m_DBCosineCor->getMean(costh);
+  if (coscor != 0)
+    dedx = dedx / coscor;
 }
 
 void DedxCorrectionModule::HadronCorrection(double costheta, double& dedx) const

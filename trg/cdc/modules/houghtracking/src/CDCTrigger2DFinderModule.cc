@@ -8,6 +8,7 @@
  **************************************************************************/
 
 #include <trg/cdc/modules/houghtracking/CDCTrigger2DFinderModule.h>
+#include <trg/cdc/modules/houghtracking/CDCTrigger2DFinderFirmware.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -39,7 +40,8 @@ REG_MODULE(CDCTrigger2DFinder)
 //                 Implementation
 //-----------------------------------------------------------------
 
-CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
+CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module(),
+  firmware{this}
 {
   //Set module properties
   setDescription("Hough tracking algorithm for CDC trigger.");
@@ -152,6 +154,8 @@ CDCTrigger2DFinderModule::initialize()
   if (m_suppressClone) {
     B2INFO("2D finder will exit with the first track candidate in time.");
   }
+
+  firmware.initialize();
 }
 
 void
@@ -309,6 +313,7 @@ CDCTrigger2DFinderModule::event()
       }
     }
   }
+  firmware.event();
 }
 
 void

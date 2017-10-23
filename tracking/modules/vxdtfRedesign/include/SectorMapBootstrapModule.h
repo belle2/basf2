@@ -39,7 +39,7 @@ namespace Belle2 {
     //! Destructor
     virtual ~SectorMapBootstrapModule()
     {
-      if (m_sectorMapsInputFileDBPtr != nullptr) delete m_sectorMapsInputFileDBPtr;
+      if (m_ptrDBObjPtr != nullptr) delete m_ptrDBObjPtr;
     };
 
     virtual void initialize()   ;
@@ -63,8 +63,8 @@ namespace Belle2 {
     // if specified (non "") ONLY the setup with this name will be read. Else all setups in the root file will be read
     std::string m_setupToRead = std::string("");
 
-    // DBObjPtr to the payloadfile from which the sectormap is read
-    DBObjPtr<PayloadFile>* m_sectorMapsInputFileDBPtr = nullptr;  //(m_sectorMapsInputFile.c_str());
+    // pointer to the DBObjPtr for the payloadfile from which the sectormap is read
+    DBObjPtr<PayloadFile>* m_ptrDBObjPtr = nullptr;
 
 
     // if true the sector map will be read from the DB. NOTE: this will override m_readSectorMap (read from file)

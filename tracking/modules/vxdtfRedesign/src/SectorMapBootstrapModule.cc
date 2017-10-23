@@ -4,6 +4,7 @@
  *                                                                              *
  * Author: The Belle II Collaboration                                           *
  * Contributors: Eugenio Paoloni                                                *
+ *               Thomas Lueck                                                   *
  *                                                                              *
  * This software is provided "as is" without any warranty.                      *
  *******************************************************************************/
@@ -87,10 +88,10 @@ SectorMapBootstrapModule::initialize()
 
   if (m_readSecMapFromDB) {
     B2INFO("Retrieving sectormap from DB. Filename: " << m_sectorMapsInputFile.c_str());
-    m_sectorMapsInputFileDBPtr = new DBObjPtr<PayloadFile>(m_sectorMapsInputFile.c_str());
+    m_ptrDBObjPtr = new DBObjPtr<PayloadFile>(m_sectorMapsInputFile.c_str());
     retrieveSectorMapFromDB();
     // add a callback function so that the sectormap is updated each time the DBObj changes
-    (*m_sectorMapsInputFileDBPtr).addCallback(this,  &SectorMapBootstrapModule::retrieveSectorMapFromDB);
+    m_ptrDBObjPtr->addCallback(this,  &SectorMapBootstrapModule::retrieveSectorMapFromDB);
   } else if (m_readSectorMap)
     retrieveSectorMap();
   else
@@ -466,10 +467,18 @@ void
 SectorMapBootstrapModule::retrieveSectorMapFromDB(void)
 {
 
-  TFile rootFile((*m_sectorMapsInputFileDBPtr)->getFileName().c_str());
+  // for debugging only
+  B2WARNING("retrieve new Secmap");
+  std::cout << m_ptrDBObjPtr->getName() << std::endl;
+  std::cout << (*m_ptrDBObjPtr)->getFileName() << std::endl;
+  m_ptrDBObjPtr->debugOutput();
+
+  if (m_ptrDBObjPtr == nullptr) B2FATAL("ERROR: the pointer to the DB payload is not present!");
+
+  TFile rootFile((*m_ptrDBObjPtr)->getFileName().c_str());
 
   // some cross check that the file is open
-  if (!rootFile.IsOpen()) B2FATAL("The Payload file: " << (*m_sectorMapsInputFileDBPtr)->getFileName().c_str() <<
+  if (!rootFile.IsOpen()) B2FATAL("The Payload file: " << (*m_ptrDBObjPtr)->getFileName().c_str() <<
                                     " not found in the DB");
 
   TTree* tree = NULL;

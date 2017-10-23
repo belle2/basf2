@@ -21,6 +21,7 @@ REG_MODULE(AddVXDTrackCandidateSubSets)
 AddVXDTrackCandidateSubSetsModule::AddVXDTrackCandidateSubSetsModule() : Module()
 {
   setDescription("Module that creates additional candidates that each miss a different SpacePoint.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray.", std::string(""));
 }

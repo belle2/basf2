@@ -75,6 +75,10 @@ namespace Belle2 {
     addParam("trackHypothesis", m_trackHypothesis,
              "Track hypothesis to use when loading the particle. By default, use the particle's own hypothesis.",
              0);
+
+    addParam("enforceFitHypothesis", m_enforceFitHypothesis,
+             "If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available.",
+             m_enforceFitHypothesis);
   }
 
   void ParticleLoaderModule::initialize()
@@ -365,6 +369,11 @@ namespace Belle2 {
 
         if (!trackFit) {
           B2WARNING("Track returned null TrackFitResult pointer for ChargedStable::getPDGCode()  = " << type.getPDGCode());
+          continue;
+        }
+
+        if (m_enforceFitHypothesis && (trackFit->getParticleType().getPDGCode() != type.getPDGCode())) {
+          // the required hypothesis does not exist for this track, skip it
           continue;
         }
 

@@ -17,13 +17,14 @@ import subprocess
 from fnmatch import fnmatch
 
 
-use_local_database("localDB_toImport/database_toImport.txt", "localDB_toImport")
+use_local_database("localDB_run400_toImport/database_run400_toImport.txt", "localDB_run400_toImport")
+# use_local_database("localDB_run111_toImport/database_run111_toImport.txt", "localDB_run111_toImport")
 
 main = create_path()
 
 # Event info setter - execute single event
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [1], 'expList': [3], 'runList': [400]})
 main.add_module(eventinfosetter)
 
 # Gearbox - access to xml files
@@ -56,12 +57,12 @@ dbImporter.importSVDLocalRunBadStrips()
 print("importBadStrips_Done")
 
 # print the imported information
-dbImporter.printSVDNoiseCalibrations()
+# dbImporter.printSVDNoiseCalibrations()
 
 # print the imported information
-dbImporter.printSVDPulseShapeCalibrations()
+# dbImporter.printSVDPulseShapeCalibrations()
 
 # print the imported information
-dbImporter.printSVDLocalRunBadStrips()
+# dbImporter.printSVDLocalRunBadStrips()
 
 print("IMPORT COMPLETED!!!")

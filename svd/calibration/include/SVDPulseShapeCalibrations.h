@@ -27,9 +27,6 @@ namespace Belle2 {
    * constants needed to calibrate the SVDShaperDigit: the charge,
    * the ADC counts, the peaking time and the width.
    *
-   * Currently the returned values are the default ones and they
-   * are not read from the DB.
-   *
    */
   class SVDPulseShapeCalibrations {
   public:
@@ -88,8 +85,8 @@ namespace Belle2 {
       return roundl(charge * getGain(sensorID, isU, strip));
     }
 
-    /** Return an unsigned 8 bit integer corresponding to the ADC pulse
-     * height per strip, provided the charge [e] collected
+    /** Return an unsigned 8 bit integer corresponding to the ADC
+     * pulse height per strip, provided the charge [e] collected
      * on that strip.
      *
      * Input:
@@ -104,7 +101,7 @@ namespace Belle2 {
      * for the correponding input charge, on the given strip.
      * The output is capped at 255.
      */
-    // it was previously defined as unsigned char, but not working
+
     inline unsigned char getCappedADCFromCharge(
       const Belle2::VxdID& sensorID,
       const bool& isU, const unsigned char& strip,
@@ -117,8 +114,6 @@ namespace Belle2 {
     }
 
     /** Return the peaking time of the strip.
-     * Currently we return a fixed default value for every strip.
-     *
      * Input:
      * @param sensorID: identity of the sensor for which the
      * calibration is required
@@ -137,7 +132,11 @@ namespace Belle2 {
     }
 
     /** Return the width of the pulse shape for a given strip.
-     * Currently we return a fixed default value for every strip.
+     * Since it is provided from local run measurements in
+     * [APV clock/8] units, the correct value to be uploaded on the
+     * central DB for the width in [ns], the conversion factor
+     * [31.44ns/8] must be applied.
+     * The payload already retrieves the converted width in [ns].
      *
      * Input:
      * @param sensorID: identity of the sensor for which the
@@ -151,9 +150,8 @@ namespace Belle2 {
     inline float getWidth(const VxdID& sensorID, const bool& isU,
                           const unsigned short& strip) const
     {
-      return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
-                              sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
-                              strip).pulseWidth;
+      return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                              m_aDBObjPtr->sideIndex(isU), strip).pulseWidth;
 
     }
 
@@ -170,11 +168,9 @@ namespace Belle2 {
     inline float getGain(const VxdID& sensorID, const bool& isU,
                          const unsigned short& strip) const
     {
-      return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
-                              sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
-                              strip).gain;
+      return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                              m_aDBObjPtr->sideIndex(isU), strip).gain ;
 
-      //  const float gain = 22500. / 60.;
 
     }
 

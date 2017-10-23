@@ -89,10 +89,11 @@ bool MCUtil::allStatesCorrect(const std::vector<const CKFToPXDState*>& states) c
   const std::string& seedTrackStoreArrayName = seed->getArrayName();
 
   TrackMatchLookUp mcCDCMatchLookUp("MCRecoTracks", seedTrackStoreArrayName);
-  const RecoTrack* mcTrack = mcCDCMatchLookUp.getMatchedMCRecoTrack(*seed);
+  const RecoTrack* mcTrack = mcCDCMatchLookUp.getRelatedMCRecoTrack(*seed);
 
   if (not mcTrack) {
-    // Track is a seed
+    // Track is a fake
+    B2DEBUG(100, "Seed is a fake");
     return false;
   }
 

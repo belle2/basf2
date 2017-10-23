@@ -47,7 +47,7 @@ bool SVDStateTruthVarSet::extract(const BaseSVDStateFilter::Object* pair)
   const std::string& seedTrackStoreArrayName = seedTrack->getArrayName();
 
   TrackMatchLookUp mcCDCMatchLookUp("MCRecoTracks", seedTrackStoreArrayName);
-  const RecoTrack* cdcMCTrack = mcCDCMatchLookUp.getMatchedMCRecoTrack(*seedTrack);
+  const RecoTrack* cdcMCTrack = mcCDCMatchLookUp.getRelatedMCRecoTrack(*seedTrack);
 
   var<named("truth")>() = 1;
 

@@ -27,7 +27,7 @@ bool PXDResultTruthVarSet::extract(const CKFToPXDResult* result)
   const std::string& seedTrackStoreArrayName = seedTrack->getArrayName();
 
   TrackMatchLookUp mcCDCMatchLookUp("MCRecoTracks", seedTrackStoreArrayName);
-  const RecoTrack* mcTrack = mcCDCMatchLookUp.getMatchedMCRecoTrack(*seedTrack);
+  const RecoTrack* mcTrack = mcCDCMatchLookUp.getRelatedMCRecoTrack(*seedTrack);
 
   // Default to false
   var<named("truth_number_of_correct_hits")>() = 0;

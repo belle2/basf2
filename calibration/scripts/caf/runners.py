@@ -27,7 +27,7 @@ class AlgorithmsRunner(Runner):
 
     In this example the chosen `AlgorithmsRunner.run` is simple and just loops over the list of `framework.Algorithm`
     calling each one's `strategies.AlgorithmStrategy.run` and `strategies.AlgorithmStrategy.commit` methods in order.
-    Thereby generating a localdb with the only communication between the `AlgorithmStrategy` instances coming from the
+    Thereby generating a localdb with the only communication between the `strategies.AlgorithmStrategy` instances coming from the
     database payloads being available from one algorithm to the next.
 
     But you could imagine a more complex situation. The `AlgorithmsRunner` might take the first `framework.Algorithm` and
@@ -40,7 +40,7 @@ class AlgorithmsRunner(Runner):
     interface to the `framework.CAF` you can easily plugin a different special case, or mix and match a custom class with
     default CAF ones.
 
-    The run() method should be defined for every derived `AlgorithmsRunner`. It will be called once and only once for each
+    The run(self) method should be defined for every derived `AlgorithmsRunner`. It will be called once and only once for each
     iteration of (collector -> algorithm).
 
     Input files are automatically given via the `framework.Calibration.output_patterns` which constructs
@@ -68,58 +68,3 @@ class RunnerError(Exception):
     Base exception class for Runners
     """
     pass
-
-
-class CalibrationRunner(Thread, Runner):
-    """
-    Runs a `state_machines.CalibrationMachine` in a Thread. Will process from intial state
-    to the final state. Because we use the same method naming as the Thread class and implement
-    a `run` method, the `run` method we define gets called by the Thread defined `start` method when
-    we start a Thread.
-    """
-
-    #: Allowed transitions that we will use to progress
-    moves = ["submit_collector", "complete", "run_algorithms", "iterate"]
-
-    def __init__(self, machine=None, heartbeat=None):
-        """
-        """
-        super().__init__()
-        #: The `CalibrationMachine` that we will run
-        self.machine = machine
-        #: The class that runs all the algorithms in this Calibration using their assigned `strategies.AlgorithmStrategy`
-        self.algorithms_runner = AlgorithmsRunner()
-        self.setup_defaults()
-        if heartbeat:
-            #: Heartbeat of the monitoring
-            self.heartbeat = heartbeat
-
-    def run(self):
-        """
-        Will be run in a new Thread by calling the start() method
-        """
-        from time import sleep
-        while self.machine.state != "completed":
-            for trigger in self.moves:
-                try:
-                    if trigger in self.machine.get_transitions(self.machine.state):
-                        getattr(self.machine, trigger)()
-                    sleep(self.heartbeat)  # Only sleeps if transition completed
-                except ConditionError:
-                    continue
-
-            if self.machine.state == "failed":
-                break
-
-    def setup_defaults(self):
-        """
-        Anything that is setup by outside config files by default goes here.
-        """
-        import configparser
-        config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
-        if config_file_path:
-            config = configparser.ConfigParser()
-            config.read(config_file_path)
-        else:
-            B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
-        self.heartbeat = decode_json_string(config['CAF_DEFAULTS']['Heartbeat'])

@@ -7,7 +7,7 @@ These classes are used to construct the workflow of the calibration job.
 The actual processing code is mostly in the `caf.state_machines` module.
 """
 
-__all__ = ["Calibration", "Algorithm", "CAF"]
+__all__ = ["CalibrationBase", "Calibration", "Algorithm", "CAF"]
 
 import os
 import sys
@@ -15,6 +15,7 @@ from threading import Thread
 
 from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL
 
+from abc import ABC, abstractmethod
 import ROOT
 
 from caf.utils import past_from_future_dependencies
@@ -34,16 +35,112 @@ import caf.backends
 from caf.state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError
 
 
-class Calibration():
+class CalibrationBase(ABC, Thread):
     """
-    Every Calibration object must have a collector and at least one algorithm.
-    You have the option to add in your collector/algorithm by argument here, or
-    later by changing the properties.
+    :param name: Name of this calibration object
+    :type name: str
+    :param input_files: Input files to run this calibration over
+    :type input_files: list of strings, may contain 'globbable' wildcard expressions
 
+    Abstract base class of Calibration types. The CAF implements the `Calibration` class which inherits from
+    this and runs the C++ CalibrationCollectorModule and CalibrationAlgorithm classes. But by inheriting from this
+    class and providing the minimal necessary methods/attributes you could plug in your own Calibration types
+    that doesn't depend on the C++ CAF at all and run everything in your own way.
+
+    THIS IS NOT RECOMMENDED!! But it's there if you really need it.
+    """
+
+    end_state = "completed"
+    fail_state = "failed"
+
+    def __init__(self, name, input_files=None):
+        """
+        """
+        super().__init__()
+        #: Name of calibration object. This must be unique when adding into the `CAF`.
+        self.name = name
+        #: List of calibration objects that will depend on this one.
+        self.future_dependencies = []
+        #: List of calibration objects, where each one is a dependency of this one.
+        self.dependencies = []
+        #: File -> Iov dictionary, should be
+        #:
+        #: >>> {absolute_file_path:iov}
+        #:
+        #: Where iov is a `caf.utils.IoV` object. Will be filled during the `CAF.run` if empty
+        self.files_to_iovs = {}
+        if input_files:
+            #: Files used for collection procedure
+            self.input_files = input_files
+
+        #: IoV which will be calibrated. This is set by the `CAF` itself when calling `CAF.run`
+        self.iov = None
+        self.output_database_dir = ""
+        self.state = "init"
+
+    @abstractmethod
+    def run(self):
+        """The most important method. Runs inside a new Thread and is called from `CalibrationBase.start`
+        once the dependencies of this `CalibrationBase` have returned with state == end_state i.e. "completed"
+        """
+        pass
+
+    @abstractmethod
+    def is_valid(self):
+        """A simple method you should implement that will return True or False depending on whether
+        the Calibration has been set up correctly and can be run safely."""
+        pass
+
+    def depends_on(self, calibration):
+        """Adds dependency of this calibration on another i.e. This calibration
+        will not run until the dependency has completed, and the constants produced
+        will be used via the database chain.
+
+        You can define multiple dependencies for a single calibration simply
+        by calling this multiple times. Be careful when adding the calibration into
+        the `CAF` not to add a circular/cyclic dependency. If you do the sort will return an
+        empty order and the `CAF` processing  will fail.
+
+        This function appens to the `CalibrationBase.dependencies` and `CalibrationBase.future_dependencies` attributes of this
+        `CalibrationBase` and the input one respectively. This prevents us having to do too much recalculation later on.
+        """
+        # Check that we don't have two calibration names that are the same
+        if self.name != calibration.name:
+            # Tests if we have the calibrations added as dependencies already and adds if not
+            if calibration not in self.dependencies:
+                self.dependencies.append(calibration)
+            if self not in calibration.dependencies:
+                calibration.future_dependencies.append(self)
+        else:
+            B2WARNING(("Tried to add {0} as a dependency for {1} but they have the same name."
+                       "Dependency was not added.".format(calibration, self)))
+
+    def dependencies_met(self):
+        return all(map(lambda x: x.state == x.end_state, self.dependencies))
+
+    def _apply_calibration_defaults(self, defaults):
+        """
+        We pass in default calibration options from the `CAF` instance here if called.
+        Won't overwrite any options already set.
+        """
+        for key, value in defaults.items():
+            try:
+                if not getattr(self, key):
+                    setattr(self, key, value)
+            except AttributeError:
+                print("The calibration", self.name, "does not support the attribute", key)
+
+
+class Calibration(CalibrationBase):
+    """
     :param name: A string to name this calibration. It should be unique for use in the `CAF`
     :param collector: Should be set to a CalibrationCollectorModule or a string with the module name.
     :param algorithms: Should be set to a CalibrationAlgorithm or a list of them.
     :param input_files: A string/list of strings. May contain wildcards useable by glob
+
+    Every Calibration object must have a collector and at least one algorithm.
+    You have the option to add in your collector/algorithm by argument here, or
+    later by changing the properties.
 
     A Calibration won't be valid in the `CAF` until it has all of these four attributes set.
 
@@ -107,12 +204,13 @@ class Calibration():
     By doing this, the `CAF` will respect the ordering of the dependencies and pass the
     calibration constants created by earlier calibrations to dependent ones.
     """
+    #: Allowed transitions that we will use to progress
+    moves = ["submit_collector", "complete", "run_algorithms", "iterate"]
 
     def __init__(self, name, collector=None, algorithms=None, input_files=None):
         """
         """
-        #: Name of calibration object. This must be unique when adding into the `CAF`.
-        self.name = name
+        super().__init__(name, input_files)
         #: Internal calibration collector/algorithms/input_files stored for this calibration
         self._collector = None
         #: Internal calibration algorithms stored for this calibration
@@ -126,9 +224,6 @@ class Calibration():
         if algorithms:
             #: Publicly accessible algorithms
             self.algorithms = algorithms
-        if input_files:
-            #: Files used for collection procedure
-            self.input_files = input_files
         #: Since many collectors require some different setup, this is a path added before the collector and after the
         #: default RootInput module + HistoManager setup. If this path contains RootInput then it's params are used instead,
         #: except for the input_files.
@@ -137,17 +232,6 @@ class Calibration():
         self.results = {}
         #: Output patterns of files produced by collector and which need to be saved in the output directory
         self.output_patterns = ['CollectorOutput.root']
-        #: List of calibration objects that will depend on this one.
-        self.future_dependencies = []
-        #: OrderedDictionary of dependencies of calibration objects, where value is the calibrations
-        #: that the key depends on.
-        self.dependencies = []
-        #: File -> Iov dictionary, should be
-        #:
-        #: >>> {absolute_file_path:iov}
-        #:
-        #: Where iov is a `caf.utils.IoV` object.
-        self.files_to_iovs = dict()
         #: Variable to define the maximum number of iterations for this calibration specifically.
         #: It overrides tha CAF calibration_defaults value if set.
         self.max_iterations = None
@@ -158,15 +242,11 @@ class Calibration():
         #: the collector job. Generally only useful for setting the 'queue' of the batch system backends that the collector
         #: jobs are submitted to e.g. cal.backend_args = {"queue":"short"}
         self.backend_args = {}
-
-        #: The strategy that the algorithm(s) will be run against. Assign a list of strategies the same length as the number of
-        #: algorithms, assign a single strategy to apply it to all algorithms in this `Calibration`. You can sse the choices
-        #: in `strategies`.
-        self.strategies = strategies.SingleIOV()
-
-        #: The `runners.Runner` type to run this overall `Calibration`. You should assign an object inheriting from
-        #: `runners.CalibrationRunner`
-        self.runner = runners.CalibrationRunner()
+        if self.algorithms:
+            #: The strategy that the algorithm(s) will be run against. Assign a list of strategies the same length as the number of
+            #: algorithms, or assign a single strategy to apply it to all algorithms in this `Calibration`. You can see the choices
+            #: in `strategies`.
+            self.strategies = strategies.SingleIOV()
 
         self._local_database_chain = []
 
@@ -179,15 +259,12 @@ class Calibration():
             self.use_central_database(config["CAF_DEFAULTS"]["GlobalTag"])
         else:
             B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
-
-    def _apply_calibration_defaults(self, defaults):
-        """
-        We pass in default calibration options from the `CAF` instance here if called.
-        Won't overwrite any options already set.
-        """
-        for key, value in defaults.items():
-            if not getattr(self, key):
-                setattr(self, key, value)
+        #: The `state_machines.CalibrationMachine` that we will run
+        self.machine = CalibrationMachine(self)
+        #: The class that runs all the algorithms in this Calibration using their assigned `strategies.AlgorithmStrategy`
+        self.algorithms_runner = runners.AlgorithmsRunner()
+        self.backend = None
+        self.setup_defaults()
 
     def is_valid(self):
         """A full calibration consists of a collector AND an associated algorithm AND input_files.
@@ -222,48 +299,6 @@ class Calibration():
         central DB Global tag (if used) -> these local databases -> CAF created local database constants
         """
         self._local_database_chain.append((filename, directory))
-
-    def depends_on(self, calibration):
-        """Adds dependency of this calibration on another i.e. This calibration
-        will not run until the dependency has completed, and the constants produced
-        will be used via the database chain.
-
-        You can define multiple dependencies for a single calibration simply
-        by calling this multiple times. Be careful when adding the calibration into
-        the `CAF` not to add a circular/cyclic dependency. If you do the sort will return an
-        empty order and the `CAF` processing  will fail.
-
-        This function appens to the `Calibration.dependencies` and `Calibration.future_dependencies` attributes of this
-        `Calibration` and the input one respectively. This prevents us having to do too much recalculation later on.
-        """
-        # Check that we don't have two calibration names that are the same
-        if self.name != calibration.name:
-            # Tests if we have the calibrations added as dependencies already and adds if not
-            if calibration not in self.dependencies:
-                self.dependencies.append(calibration)
-            if self not in calibration.dependencies:
-                calibration.future_dependencies.append(self)
-        else:
-            B2WARNING(("Tried to add {0} as a dependency for {1} but they have the same name."
-                       "Dependency was not added.".format(calibration, self)))
-
-    @property
-    def name(self):
-        """
-        Getter for the name property.
-        """
-        return self._name
-
-    @name.setter
-    def name(self, name):
-        """
-        Setter for the name property. Checks that a string was passed in.
-        """
-        if isinstance(name, str):
-            #: Internal storage of calibration object name
-            self._name = name
-        else:
-            B2ERROR("Tried to set Calibration name to a non-string type")
 
     @property
     def collector(self):
@@ -324,39 +359,6 @@ class Calibration():
                 else:
                     B2ERROR(("Something other than CalibrationAlgorithm instance passed in {0}."
                              "Algorithm needs to inherit from Belle2::CalibrationAlgorithm".format(type(value))))
-
-    @property
-    def input_files(self):
-        """
-        Getter for the input_files attribute.
-        """
-        return self._input_files
-
-    @input_files.setter
-    @method_dispatch
-    def input_files(self, file):
-        """
-        Setter for the input_files attribute. Checks that a string/list of strings was passed in.
-        And then builds a list from that.
-        """
-        if isinstance(file, str):
-            self._input_files = [file]
-        else:
-            B2ERROR("Something other than string passed in as an input file.")
-
-    @input_files.fset.register(tuple)
-    @input_files.fset.register(list)
-    def _(self, value):
-        """
-        Alternate input_files setter for lists and tuples of strings
-        """
-        if value:
-            self._input_files = []
-            for file in value:
-                if isinstance(file, str):
-                    self._input_files.append(file)
-                else:
-                    B2ERROR("Something other than string passed in as an input file.")
 
     @property
     def pre_algorithms(self):
@@ -432,6 +434,42 @@ class Calibration():
         """
         return self.name
 
+    def run(self):
+        """
+        Will be run in a new Thread by calling the start() method
+        """
+        self.machine.root_dir = os.path.join(os.getcwd(), self.name)
+        self.machine.iov_to_calibrate = self.iov
+        self.machine.collector_backend = self.backend
+        from time import sleep
+        while self.machine.state != "completed":
+            for trigger in self.moves:
+                try:
+                    if trigger in self.machine.get_transitions(self.machine.state):
+                        B2INFO("Attempting transition: {} for calibration {}.".format(trigger, self.name))
+                        getattr(self.machine, trigger)()
+                    self.state = self.machine.state
+                    sleep(self.heartbeat)  # Only sleeps if transition completed
+                except ConditionError:
+                    continue
+
+            if self.machine.state == "failed":
+                B2FATAL("Calibration {} failed".format(self.name))
+                break
+
+    def setup_defaults(self):
+        """
+        Anything that is setup by outside config files by default goes here.
+        """
+        import configparser
+        config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
+        if config_file_path:
+            config = configparser.ConfigParser()
+            config.read(config_file_path)
+        else:
+            B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
+        self.heartbeat = decode_json_string(config['CAF_DEFAULTS']['Heartbeat'])
+
 
 class Algorithm():
     """
@@ -471,17 +509,20 @@ class Algorithm():
 
 class CAF():
     """
-    :param calibration_defaults: A dictionary ofdefault options for calibrations run by this `CAF` instance
-        e.g. calibration_defaults={"max_iterations":2}. Each calibration can override these options by setting
-        them for itself
+    :param calibration_defaults: A dictionary of default options for calibrations run by this `CAF` instance e.g.
+    >>> calibration_defaults={"max_iterations":2}
+
+    Each calibration can override these options by setting them for itself
 
     This class holds calibration objects and processes them. It defines the initial configuration/setup
     for the calibrations. But most of the real logic is done through the `caf.state_machines.CalibrationMachine`
 
-    The `CAF` class holds the calibration dependencies and sets up the `caf.state_machines.CalibrationRunner` instances.
+    The `CAF` class essentially does some initial setup, holds the `CalibrationBase` instances and calls the
+    `CalibrationBase.start` when the dependencies are met.
+
     Much of the checking for consistency is done in this class so that no processing is done with an invalid
     setup. Choosing which files to use as input should be done from outside during the setup of the `CAF` and
-    `Calibration` instances.
+    `CalibrationBase` instances.
     """
 
     def __init__(self, calibration_defaults=None):
@@ -639,21 +680,27 @@ class CAF():
         self.output_dir = self._make_output_dir()
         # Enter the overall output dir during processing
         with temporary_workdir(self.output_dir):
-            runners = []
-            # Create Runners to spawn threads for each calibration
-            for calibration_name, calibration in self.calibrations.items():
+            for calibration in self.calibrations.values():
+                # Apply defaults given to the `CAF` to the calibrations if they aren't set
                 calibration._apply_calibration_defaults(self.calibration_defaults)
-                machine = CalibrationMachine(calibration, iov)
-                machine.collector_backend = self.backend
-                calibration.runner.machine = machine
-                calibration.runner.heartbeat = self.heartbeat
-                runners.append(calibration.runner)
+                calibration.iov = iov
+                if not calibration.backend:
+                    calibration.backend = self.backend
+            from time import sleep
+            finished = False
+            while not finished:
+                finished = True
+                for calibration in self.calibrations.values():
+                    if calibration.dependencies_met() and not calibration.is_alive():
+                        calibration.start()
 
-            for runner in runners:
-                runner.start()
-
-            for runner in runners:
-                runner.join()
+                    # Join the thread if we've hit an end state
+                    if calibration.state == CalibrationBase.end_state or calibration.state == CalibrationBase.fail_state:
+                        calibration.join()
+                    # If we're not ready yet we should go round again
+                    else:
+                        finished = False
+                sleep(self.heartbeat)
 
         # Close down our processing pools nicely
         if isinstance(self.backend, caf.backends.Local):

@@ -22,8 +22,8 @@ class AlgorithmStrategy(ABC):
     >>> def __init__(self):
     >>>     super().__init__()
 
-    The most important method to implement is a run() method which will take an algorithm and execute it in the required
-    way defined by the options you have selected/attributes set.
+    The most important method to implement is a `AlgorithmStrategy.run` method which will take an algorithm and execute it
+    in the required way defined by the options you have selected/attributes set.
     """
 
     def __init__(self):
@@ -42,7 +42,7 @@ class SingleIOV(AlgorithmStrategy):
     data or only the data corresponding to the requested IoV. The payload IoV is the set to the same as the one
     that was executed.
 
-    This uses a `state_machines.AlgorithmMachine` to actually execute the various steps rather than operating on
+    This uses a `caf.state_machines.AlgorithmMachine` to actually execute the various steps rather than operating on
     a CalibrationAlgorithm C++ class directly.
 """
 

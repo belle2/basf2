@@ -19,7 +19,7 @@ utils
   :members:
 
 state_machines
--------------
+-----------------
 
 .. automodule:: caf.state_machines
   :members:
@@ -40,7 +40,7 @@ strategies
   :show-inheritance:
 
 Job Submission Backends
-=======================
+========================
 
 .. automodule:: caf.backends
   :members:

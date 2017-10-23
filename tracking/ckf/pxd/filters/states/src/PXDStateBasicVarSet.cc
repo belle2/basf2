@@ -28,8 +28,8 @@ bool PXDStateBasicVarSet::extract(const BasePXDStateFilter::Object* pair)
   const std::vector<const CKFToPXDState*>& previousStates = pair->first;
   CKFToPXDState* state = pair->second;
 
-  const RecoTrack* cdcTrack = previousStates.front()->getSeed();
-  B2ASSERT("Path without seed?", cdcTrack);
+  const RecoTrack* seedTrack = previousStates.front()->getSeed();
+  B2ASSERT("Path without seed?", seedTrack);
 
   const SpacePoint* spacePoint = state->getHit();
   B2ASSERT("Path without hit?", spacePoint);
@@ -41,10 +41,18 @@ bool PXDStateBasicVarSet::extract(const BasePXDStateFilter::Object* pair)
     firstMeasurement = previousStates.back()->getMeasuredStateOnPlane();
   }
 
+  const std::vector<CDCHit*>& cdcHits = seedTrack->getSortedCDCHitList();
+  const std::vector<SVDCluster*>& svdHits = seedTrack->getSortedSVDHitList();
+
+  var<named("seed_cdc_hits")>() = cdcHits.size();
+  var<named("seed_svd_hits")>() = svdHits.size();
+  var<named("seed_lowest_cdc_layer")>() = cdcHits.empty() ? 0 : cdcHits.front()->getICLayer();
+  var<named("seed_lowest_svd_layer")>() = svdHits.empty() ? 0 : svdHits.front()->getSensorID().getLayerNumber();
+
   Vector3D position = Vector3D(firstMeasurement.getPos());
   Vector3D momentum = Vector3D(firstMeasurement.getMom());
 
-  const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
+  const CDCTrajectory3D trajectory(position, 0, momentum, seedTrack->getChargeSeed());
 
   const Vector3D& hitPosition = static_cast<Vector3D>(spacePoint->getPosition());
 

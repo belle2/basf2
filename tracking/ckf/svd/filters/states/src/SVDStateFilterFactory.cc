@@ -49,7 +49,7 @@ namespace {
   using RecordingSVDStateFilter = RecordingFilter<VariadicUnionVarSet<SVDStateTruthVarSet, SVDStateBasicVarSet, SVDStateVarSet>>;
 
   /// MVA filter for svd states
-  using MVASVDStateFilter = NegativeFilter<MVAFilter<SVDStateBasicVarSet>>;
+  using MVASVDStateFilter = NegativeFilter<MVAFilter<VariadicUnionVarSet<SVDStateBasicVarSet, SVDStateVarSet>>>;
 
   /// Prescaled recording filter for VXD - CDC relations.
   class SloppyRecordingSVDStateFilter : public RecordingSVDStateFilter {

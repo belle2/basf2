@@ -26,7 +26,6 @@
 #include <tracking/ckf/pxd/utilities/PXDAdvancer.h>
 #include <tracking/ckf/pxd/utilities/PXDKalmanStepper.h>
 
-#include <tracking/ckf/pxd/filters/states/PXDStateVarSet.h>
 #include <tracking/ckf/pxd/filters/states/PXDStateBasicVarSet.h>
 #include <tracking/ckf/pxd/filters/states/PXDStateTruthVarSet.h>
 #include <tracking/ckf/pxd/filters/states/SimplePXDStateFilter.h>
@@ -46,7 +45,7 @@ namespace {
   using SloppyMCPXDStateFilter = Sloppy<TruthVarFilter<PXDStateTruthVarSet>>;
 
   /// Recording filter for VXD - CDC relations.
-  using RecordingPXDStateFilter = RecordingFilter<VariadicUnionVarSet<PXDStateTruthVarSet, PXDStateBasicVarSet, PXDStateVarSet>>;
+  using RecordingPXDStateFilter = RecordingFilter<VariadicUnionVarSet<PXDStateTruthVarSet, PXDStateBasicVarSet>>;
 
   /// MVA filter for pxd states
   using MVAPXDStateFilter = NegativeFilter<MVAFilter<PXDStateBasicVarSet>>;

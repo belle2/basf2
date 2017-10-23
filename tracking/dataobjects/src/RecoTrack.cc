@@ -298,14 +298,13 @@ bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) cons
   for (unsigned int i = 0; i < trackSize; i++) {
     try {
       m_genfitTrack.getFittedState(i, representation);
-      break;
+      return true;
     } catch (const genfit::Exception& exception) {
-      B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
-      return false;
+      B2DEBUG(100, "Can not get mSoP because of: " << exception.what());
     }
   }
 
-  return true;
+  return false;
 }
 
 void RecoTrack::prune()
@@ -490,7 +489,7 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromFirstH
     }
   }
 
-  B2FATAL("There is no single hit with a valid mSoP in this track!");
+  B2FATAL("There is no single hit with a valid mSoP in this track! Check if the fit failed with wasFitSuccessful before");
 }
 
 const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation) const

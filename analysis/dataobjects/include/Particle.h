@@ -765,8 +765,9 @@ namespace Belle2 {
      */
     void setMdstArrayIndex(const int arrayIndex);
 
-    ClassDef(Particle, 8); /**< Class to store reconstructed particles. */
+    ClassDef(Particle, 9); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
+    // v9: added m_pdgCodeUsedForFit
 
     friend class ParticleSubset;
   };

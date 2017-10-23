@@ -4,14 +4,27 @@
 from basf2 import B2ERROR, B2FATAL, B2INFO
 from .utils import AlgResult
 from .utils import runs_overlapping_iov
+from abc import ABC, abstractmethod
 
 
-class AlgorithmStrategyBase():
-    """Base class for Algorithm strategies. These do the actual execution of
-Algorithm Machine class on collected data. Each strategy may be quite different
-in terms of how fast it may be, how database payloads are passed between executions, and
-if the final payloads have an IoV that is independent to the actual runs used to calculates
-them."""
+class AlgorithmStrategy(ABC):
+    """Base class for Algorithm strategies. These do the actual execution of a single
+    algorithm on collected data. Each strategy may be quite different in terms of how fast it may be,
+    how database payloads are passed between executions, and whether or not final payloads have an IoV
+    that is independent to the actual runs used to calculates them.
+
+    This base class defines the basic attributes and methods that will be automatically used by the selected AlgorithmRunner.
+    When defining a derived class you are free to use these attributes or to implement as much functionality as you want.
+
+    If you define your derived class with an __init__ method, then you should first call the base class
+    `AlgorithmStrategy.__init__`  method via super() e.g.
+
+    >>> def __init__(self):
+    >>>     super().__init__()
+
+    The most important method to implement is a run() method which will take an algorithm and execute it in the required
+    way defined by the options you have selected/attributes set.
+    """
 
     def __init__(self):
         self.results = []
@@ -19,14 +32,18 @@ them."""
         self.strategy_specific_args = {}
         self.iov_to_calibrate = None
 
-    def run():
-        raise NotImplementedError('Need to implement a run() method in {} Strategy.'.format(self.__class__.__name__))
+    @abstractmethod
+    def run(self):
+        pass
 
 
-class SingleIOV(AlgorithmStrategyBase):
+class SingleIOV(AlgorithmStrategy):
     """The fastest and simplest Algorithm strategy. Runs the algorithm only once over all of the input
-data or only the data corresponding to the requested IoV. The payload IoV is the set to the same as the one
-that was executed.
+    data or only the data corresponding to the requested IoV. The payload IoV is the set to the same as the one
+    that was executed.
+
+    This uses a `state_machines.AlgorithmMachine` to actually execute the various steps rather than operating on
+    a CalibrationAlgorithm C++ class directly.
 """
 
     def __init__(self):

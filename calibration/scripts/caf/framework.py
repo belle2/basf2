@@ -29,6 +29,7 @@ from caf.utils import IoV
 from caf.utils import IoV_Result
 
 from caf import strategies
+from caf import runners
 import caf.backends
 from caf.state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError
 
@@ -158,10 +159,14 @@ class Calibration():
         #: jobs are submitted to e.g. cal.backend_args = {"queue":"short"}
         self.backend_args = {}
 
-        #: The strategy that the algorithm will be run against. Your choices are:
-        #:     "single_iov" - The default and fastest. All of your collected data will be executed at once.
-        #:                    An IoV will be applied to the payloads that corresponds to the full IoV of the data.
-        self.algorithm_strategy = "single_iov"
+        #: The strategy that the algorithm(s) will be run against. Assign a list of strategies the same length as the number of
+        #: algorithms, assign a single strategy to apply it to all algorithms in this `Calibration`. You can sse the choices
+        #: in `strategies`.
+        self.strategies = strategies.SingleIOV()
+
+        #: The `runners.Runner` type to run this overall `Calibration`. You should assign an object inheriting from
+        #: `runners.CalibrationRunner`
+        self.runner = runners.CalibrationRunner()
 
         self._local_database_chain = []
 
@@ -388,6 +393,40 @@ class Calibration():
         else:
             B2ERROR("Empty container passed in for pre_algorithm functions")
 
+    @property
+    def strategies(self):
+        """
+        Getter for the strategies attribute.
+        """
+        return [alg.strategy for alg in self.algorithms]
+
+    @strategies.setter
+    @method_dispatch
+    def strategies(self, strategy):
+        """
+        Setter for the strategies attribute.
+        """
+        if strategy:
+            for alg in self.algorithms:
+                alg.strategy = strategy
+        else:
+            B2ERROR("Something evaluated as False passed in as a strategy.")
+
+    @strategies.fset.register(tuple)
+    @strategies.fset.register(list)
+    def _(self, values):
+        """
+        Alternate strategies setter for lists and tuples of functions, should be one per algorithm.
+        """
+        if values:
+            if len(values) == len(self.algorithms):
+                for strategy, alg in zip(strategies, self.algorithms):
+                    alg.strategy = strategy
+            else:
+                B2ERROR("Number of strategies and number of algorithms doesn't match.")
+        else:
+            B2ERROR("Empty container passed in for strategies list")
+
     def __repr__(self):
         """
         """
@@ -428,63 +467,6 @@ class Algorithm():
         by default.
         """
         self.algorithm.setInputFileNames(input_file_paths)
-
-
-class RunnerError(Exception):
-    """
-    Base exception class for Machine Runner
-    """
-    pass
-
-
-class CalibrationRunner(Thread):
-    """
-    Runs a `CalibrationMachine` in a Thread. Will process from intial state
-    to the final state.
-    """
-
-    def __init__(self, machine, heartbeat=None):
-        """
-        """
-        super().__init__()
-        #: The `CalibrationMachine` that we will run
-        self.machine = machine
-        #: Allowed transitions that we will use to progress
-        self.moves = ["submit_collector", "complete", "run_algorithms", "iterate"]
-        self.setup_defaults()
-        if heartbeat:
-            #: Heartbeat of the monitoring
-            self.heartbeat = heartbeat
-
-    def run(self):
-        """
-        Will be run in a new Thread by calling the start() method
-        """
-        from time import sleep
-        while self.machine.state != "completed":
-            for trigger in self.moves:
-                try:
-                    if trigger in self.machine.get_transitions(self.machine.state):
-                        getattr(self.machine, trigger)()
-                    sleep(self.heartbeat)  # Only sleeps if transition completed
-                except ConditionError:
-                    continue
-
-            if self.machine.state == "failed":
-                break
-
-    def setup_defaults(self):
-        """
-        Anything that is setup by outside config files by default goes here.
-        """
-        import configparser
-        config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
-        if config_file_path:
-            config = configparser.ConfigParser()
-            config.read(config_file_path)
-        else:
-            B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
-        self.heartbeat = decode_json_string(config['CAF_DEFAULTS']['Heartbeat'])
 
 
 class CAF():
@@ -663,8 +645,9 @@ class CAF():
                 calibration._apply_calibration_defaults(self.calibration_defaults)
                 machine = CalibrationMachine(calibration, iov)
                 machine.collector_backend = self.backend
-                runner = CalibrationRunner(machine, heartbeat=self.heartbeat)
-                runners.append(runner)
+                calibration.runner.machine = machine
+                calibration.runner.heartbeat = self.heartbeat
+                runners.append(calibration.runner)
 
             for runner in runners:
                 runner.start()

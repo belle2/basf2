@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from abc import ABC, abstractmethod
 import subprocess
 import multiprocessing as mp
 from collections import defaultdict
@@ -212,7 +213,7 @@ class Job:
                 subjob.post_process()
 
 
-class Backend():
+class Backend(ABC):
     """
     Base class for backend of CAF.
     Classes derived from this will implement their own submission of basf2 jobs
@@ -224,12 +225,13 @@ class Backend():
     def __init__(self):
         pass
 
+    @abstractmethod
     def submit(self, job):
         """
         Base method for submitting collection jobs to the backend type. This MUST be
         implemented for a correctly written backend class deriving from Backend().
         """
-        raise NotImplementedError('Need to implement a submit() method in {} backend.'.format(self.__class__.__name__))
+        pass
 
     @staticmethod
     def _dump_input_data(job):
@@ -484,12 +486,12 @@ class Batch(Backend):
                                    "method in {} backend.".format(self.__class__.__name__)))
 
     @classmethod
+    @abstractmethod
     def _submit_to_batch(cls, cmd):
         """
         Do the actual batch submission command and collect the output to find out the job id for later monitoring.
         """
-        raise NotImplementedError(("Need to implement a _submit_to_batch(cls, cmd) "
-                                   "method in {} backend.".format(self.__class__.__name__)))
+        pass
 
     @method_dispatch
     def submit(self, job):
@@ -606,12 +608,14 @@ class Batch(Backend):
         B2INFO('All Requested Jobs Submitted')
 
     @classmethod
+    @abstractmethod
     def _create_job_result(cls, job, batch_output):
-        raise NotImplementedError("Need to implement a _create_job_result(job, batch_output) method")
+        pass
 
     @classmethod
+    @abstractmethod
     def _create_cmd(cls, job):
-        raise NotImplementedError("Need to implement a _create_cmd(job) method")
+        pass
 
 
 class PBS(Batch):

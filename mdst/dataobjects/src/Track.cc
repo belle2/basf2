@@ -69,7 +69,7 @@ const TrackFitResult* Track::getTrackFitResultWithClosestMass(const Const::Charg
 {
   // make sure at least one hypothesis exist. No B2 Track should exist which does not have at least
   // one hypothesis
-  assert(getNumberOfFittedHypotheses() > 0);
+  B2ASSERT("Belle2::Track must always have at least one successfully fitted hypothesis.", getNumberOfFittedHypotheses() > 0);
 
   // find fitted hypothesis which is closest to the mass of our requested particle type
   auto allFitRes = getTrackFitResults();

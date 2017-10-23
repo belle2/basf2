@@ -17,7 +17,7 @@ import subprocess
 from fnmatch import fnmatch
 
 
-use_local_database("test/database.txt", "test")
+use_local_database("localDB_toImport/database_toImport.txt", "localDB_toImport")
 
 main = create_path()
 

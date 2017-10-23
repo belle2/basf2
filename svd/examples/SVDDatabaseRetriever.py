@@ -15,8 +15,7 @@ import glob
 import subprocess
 from fnmatch import fnmatch
 
-
-use_local_database("test/database.txt", "test")
+use_central_database("development")
 
 main = create_path()
 

@@ -165,7 +165,8 @@ main.add_module(particlegun)
 simulation.add_simulation(main, components=['PXD', 'SVD', 'MagneticFieldConstant4LimitedRSVD'], usePXDDataReduction=True)
 
 roiPayloadAssembler = register_module('ROIPayloadAssembler')
-roiPayloadAssembler.param({"ROIListName": "ROIs", "SendAllDownscaler": 0, "SendROIsDownscaler": 0, "CutNrROIs": 5})
+roiPayloadAssembler.param({"ROIListName": "ROIs", "SendAllDownscaler": 0,
+                           "SendROIsDownscaler": 0, "CutNrROIs": 5, "AcceptAll": True})
 
 main.add_module(roiPayloadAssembler)
 

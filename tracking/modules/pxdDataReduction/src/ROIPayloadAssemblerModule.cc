@@ -17,7 +17,8 @@
 #include <tracking/dataobjects/ROIpayload.h>
 #include <stdlib.h>
 #include <set>
-
+#include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
@@ -49,6 +50,7 @@ ROIPayloadAssemblerModule::ROIPayloadAssemblerModule() : Module()
            "Send ROIs downscaler; Workaround for missing ONSEN functionality, 0 never set, 1 alway set, 2 set in every second...", 3u);
   addParam("CutNrROIs", mCutNrROIs,
            "If Nr of ROIs per DHHID reach this, send out only one full sensor ROI", 32u);
+  addParam("AcceptAll", mAcceptAll, "Accept all, Ignore HLT decision", false);
 }
 
 ROIPayloadAssemblerModule::~ROIPayloadAssemblerModule()
@@ -122,7 +124,11 @@ void ROIPayloadAssemblerModule::event()
 
   unsigned int evtNr = eventMetaDataPtr->getEvent();
 
-  bool accepted = true; // thats the default until HLT has reject mechanism
+  bool accepted = true;
+  if (!mAcceptAll) {
+    StoreObjPtr<SoftwareTriggerResult> result;
+    accepted = SoftwareTrigger::FinalTriggerDecisionCalculator::getFinalTriggerDecision(*result);
+  }
   payload->setHeader(accepted, mSendAllDS  ? (evtNr % mSendAllDS) == 0 : 0, mSendROIsDS ? (evtNr % mSendROIsDS) == 0 : 0);
   payload->setTriggerNumber(evtNr);
 

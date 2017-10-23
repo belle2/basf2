@@ -71,7 +71,7 @@ namespace Belle2 {
           const PIDLikelihood* trackiPidLikelihood = tracks[i]->getRelated<PIDLikelihood>();
           const Const::ChargedStable trackiChargedStable = trackiPidLikelihood->getMostLikely();
           double trackiMassHypothesis = trackiChargedStable.getMass();
-          const TrackFitResult* tracki = tracks[i]->getTrackFitResult(trackiChargedStable);
+          const TrackFitResult* tracki = tracks[i]->getTrackFitResultWithClosestMass(trackiChargedStable);
           if (tracki == nullptr) continue;
           double energy = sqrt(trackiMassHypothesis * trackiMassHypothesis + (tracki->getMomentum()).Dot(tracki->getMomentum()));
           TLorentzVector trackiVec(tracki->getMomentum(), energy);
@@ -233,8 +233,11 @@ namespace Belle2 {
           if (part->getTrack() == track) continue;
           if (track == nullptr) continue;
           const Const::ChargedStable charged = track->getRelated<PIDLikelihood>()->getMostLikely();
-          if (track->getTrackFitResult(charged) == nullptr) continue;
-          double pt = track->getTrackFitResult(charged)->getTransverseMomentum();
+          // TODO: this will always return something (so not nullptr) contrary to the previous method
+          // used here. This line can be removed as soon as the multi hypothesis fitting method
+          // has been properly established
+          if (track->getTrackFitResultWithClosestMass(charged) == nullptr) continue;
+          double pt = track->getTrackFitResultWithClosestMass(charged)->getTransverseMomentum();
           if (pt == pt) sum += sqrt(pt * pt);
         }
       }
@@ -700,7 +703,7 @@ namespace Belle2 {
           {
             const auto& tracks = roe->getTracks();
             for (auto& x : tracks) {
-              const TrackFitResult* iTrack = x->getTrackFitResult(x->getRelated<PIDLikelihood>()->getMostLikely());
+              const TrackFitResult* iTrack = x->getTrackFitResultWithClosestMass(x->getRelated<PIDLikelihood>()->getMostLikely());
               if (iTrack == nullptr) continue;
               TLorentzVector momtrack(iTrack->getMomentum(), 0);
               if (momtrack == momtrack) momXchargedtracks += momtrack;

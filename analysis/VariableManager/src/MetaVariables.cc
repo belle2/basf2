@@ -252,7 +252,7 @@ namespace Belle2 {
           StoreArray<Track> tracks;
           for (const auto& track : tracks)
           {
-            const TrackFitResult* trackFit = track.getTrackFitResult(Const::pion);
+            const TrackFitResult* trackFit = track.getTrackFitResultWithClosestMass(Const::pion);
             if (trackFit->getChargeSign() == 0) {
               // Ignore track
             } else {

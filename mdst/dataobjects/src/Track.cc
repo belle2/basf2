@@ -65,7 +65,7 @@ std::vector < short int> Track::getValidIndices() const
   return resultParticleIndex;
 }
 
-Track::ChargedStableTrackFitResultPair Track::getFitResultWithClosestMass(const Const::ChargedStable& requestedType) const
+const TrackFitResult* Track::getTrackFitResultWithClosestMass(const Const::ChargedStable& requestedType) const
 {
   // make sure at least one hypothesis exist. No B2 Track should exist which does not have at least
   // one hypothesis
@@ -82,5 +82,5 @@ Track::ChargedStableTrackFitResultPair Track::getFitResultWithClosestMass(const 
     return massDiffA < massDiffB;
   });
 
-  return ChargedStableTrackFitResultPair(bestMassFit->first, bestMassFit->second);
+  return bestMassFit->second;
 }

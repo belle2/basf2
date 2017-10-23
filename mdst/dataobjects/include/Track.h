@@ -65,12 +65,14 @@ namespace Belle2 {
      *
      * For example, if a pion is requested (mass 140 MeV) and only a muon fit (mass 106 MeV) and an
      * electron fit (mass 511 kEV) is available, the muon fit result will be returned.
+     * So this method is guaranteed to always return a TrackFitResult (opposite to getTrackFitResult()
+     * which can return nullptr if the requested Particle type was not fitted).
      *
      * @param requestedType The particle type for which the fit result should be returned.
-     * @return pair of the particle type used for the fit and a pointer to the TrackFitResult object.
-     *
+     * @return a pointer to the TrackFitResult object. Use TrackFitResult::getParticleType()
+     *         to check which fitting hypothesis was actually used for this result.
      */
-    ChargedStableTrackFitResultPair getFitResultWithClosestMass(const Const::ChargedStable& requestedType) const;
+    const TrackFitResult* getTrackFitResultWithClosestMass(const Const::ChargedStable& requestedType) const;
 
     /** Access to all track fit results at the same time
      *

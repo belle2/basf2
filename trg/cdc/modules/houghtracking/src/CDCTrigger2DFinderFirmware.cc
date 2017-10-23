@@ -20,6 +20,7 @@
 #include <string>
 #include <cstring>
 #include <iostream>
+#include <iomanip>
 #include <vector>
 #include <array>
 #include <algorithm>
@@ -34,10 +35,55 @@ namespace Cosim {
   {
     std::string res;
     for (int i = 0; i < size; i++)
-      res +=  std_logic_literal[(int) count[i]];
+      res += std_logic_literal[(int) count[i]];
     return res;
   }
 
+  template<size_t N>
+  std::string slv_to_bin_string(std::array<char, N> signal, bool padding = false)
+  {
+    int ini = padding ? signal.size() % 4 : 0;
+    std::string res(ini, '0');
+    for (auto const& bit : signal) {
+      res += std_logic_literal[(int) bit];
+    }
+    return res;
+  }
+
+  // template<size_t N>
+  // // void display_hex_from_bitset(std::bitset<N> const & signal)
+  // void display_hex(std::bitset<N> const & signal)
+  // {
+  //   std::cout << "binary: " << signal << "\n";
+  //   std::cout << "hex: " << std::hex << signal.to_ulong() << "\n";
+  // }
+
+  // template<size_t N>
+  // void display_hex(const std::array<char, N> & signal)
+  // {
+  //   if (std::any_of(signal.begin(), signal.end(), [] (char i) {return i != 2 && i != 3;})) {
+  //     B2ERROR("Some bit in the signal vector is neither 0 nor 1.");
+  //   }
+  //   display_hex(std::bitset<signal.size()>(slv_to_bin_string(signal)));
+  // }
+
+  template<size_t N>
+  void display_hex(const std::array<char, N>& signal)
+  {
+    std::ios oldState(nullptr);
+    oldState.copyfmt(std::cout);
+    if (std::any_of(signal.begin(), signal.end(), [](char i) {return i != 2 && i != 3;})) {
+      B2WARNING("Some bit in the signal vector is neither 0 nor 1.");
+    }
+    std::string binString = slv_to_bin_string(signal, true);
+    std::cout << std::setfill('0');
+    for (unsigned i = 0; i < signal.size(); i += 4) {
+      std::bitset<4> set(binString.substr(i, 4));
+      std::cout << std::setw(1) << std::hex << set.to_ulong();
+    }
+    std::cout << "\n";
+    std::cout.copyfmt(oldState);
+  }
 }
 
 int Xsi::Loader::get_port_number_or_exit(std::string name)
@@ -217,7 +263,8 @@ void CDCTrigger2DFinderFirmware::event()
       Xsi_Instance.put_value(clk, &one_val);
       Xsi_Instance.run(10);
 
-      std::cout << "clock # " << iClock << "\n";
+      std::cout << "------------------" << "\n";
+      std::cout << "clock #" << iClock << "\n";
       for (unsigned iSL = 0; iSL < nAxialSuperLayer; ++iSL) {
         // firstly, clear the input signal vectors
         tsfInput[iSL].fill(2);
@@ -231,8 +278,10 @@ void CDCTrigger2DFinderFirmware::event()
             advance(itr, m_tsVectorWidth);
           }
         }
-        cout << display_value(tsfInput[iSL].data(), 9) << " " <<
-             display_value(tsfInput[iSL].data() + 9, 105) << "\n";
+        // cout << display_value(tsfInput[iSL].data(), 9) << " " <<
+        //      display_value(tsfInput[iSL].data() + 9, 210) << "\n";
+        cout << "TSF" << iSL << " input: ";
+        display_hex(tsfInput[iSL]);
         // write the input
         Xsi_Instance.put_value(tsf[iSL], tsfInput[iSL].data());
       }
@@ -244,9 +293,9 @@ void CDCTrigger2DFinderFirmware::event()
       Xsi_Instance.put_value(clk, &zero_val);
       Xsi_Instance.run(10);
 
-
-      std::cout << "output: " << display_value(t2d_out, 6) << "\n";
-      for (int j = 0; j < 4; j++) {
+      string found = display_value(t2d_out, 6);
+      std::cout << "output: " << found << "\n";
+      for (unsigned j = 0; j < count(found.begin(), found.end(), '1'); j++) {
         std::cout << display_value(t2d_out + 6 + 121 * j, 121) << "\n";
       }
     }

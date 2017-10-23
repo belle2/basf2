@@ -46,7 +46,7 @@ namespace Belle2 {
 
   private:
     /** how many clocks to simulate per event */
-    static const int m_nClockPerEvent = 24;
+    static const int m_nClockPerEvent = 32;
 
     /** width of TS hit input signal vector */
     static const int m_tsVectorWidth = 21;

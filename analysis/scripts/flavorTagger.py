@@ -224,6 +224,12 @@ def WhichCategories(categories=[
     for code in sorted(categoriesCombination):
         categoriesCombinationCode = categoriesCombinationCode + '%02d' % code
 
+    B2INFO("Flavor Tagger: Required Combiner for Categories:")
+    for category in categories:
+        B2INFO(category)
+
+    B2INFO("Flavor Tagger: which corresponds to a weight file with categories combination code " + categoriesCombinationCode)
+
 
 # Variables for categories on track level - are defined in variables.cc and MetaVariables.cc
 variables = dict()
@@ -797,7 +803,8 @@ def trackAndEventLevels(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_
             mvaExpertKaonPion.param('identifier', identifiersExtrainfosKaonPion[0][1])
 
             trackAndEventLevelKaonPionPath.add_module(mvaExpertKaonPion)
-            return True
+
+        return True
 
 
 def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):

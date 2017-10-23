@@ -43,9 +43,6 @@ namespace Belle2 {
     }
 
     template <class AFilter>
-    Chooseable<AFilter>::~Chooseable() = default;
-
-    template <class AFilter>
     void Chooseable<AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
     {
       Super::exposeParameters(moduleParamList, prefix);
@@ -108,8 +105,5 @@ namespace Belle2 {
       : Super(std::make_unique<AFilterFactory>(), filterName)
     {
     }
-
-    template <class AFilterFactory>
-    ChooseableFilter<AFilterFactory>::~ChooseableFilter() = default;
   }
 }

@@ -85,7 +85,7 @@ namespace Belle2 {
     SVDCluster(VxdID sensorID, bool isU, float position, float positionSigma,
                double clsTime, double clsTimeSigma, float clsCharge, float seedCharge,
                unsigned short clsSize, float clsSN):
-      SVDCluster(sensorID, isU, position, 1.0, clsTime, clsTimeSigma,
+      SVDCluster(sensorID, isU, position, positionSigma, clsTime, clsTimeSigma,
                  clsCharge, seedCharge, clsSize, clsSN, 100.0)
     {}
 
@@ -174,7 +174,7 @@ namespace Belle2 {
     float m_clsSN;             /**< Cluster S/N ratio */
     float m_clsChi2;           /**< Chi2 for time/amplitude fit */
 
-    ClassDef(SVDCluster, 4)
+    ClassDef(SVDCluster, 5)
 
   };
 

@@ -5,7 +5,7 @@
 # Generation of random displacements.
 mkdir displacement
 cd displacement
-basf2 ${BELLE2_LOCAL_DIR}/eklm/examples/Alignment/RandomDisplacement.py
+basf2 ${BELLE2_LOCAL_DIR}/eklm/examples/DisplacementGeneration/RandomDisplacement.py
 cd ..
 
 # Generation of 100000 e+ e- -> mu+ mu- events.

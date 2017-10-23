@@ -100,9 +100,10 @@ namespace Belle2 {
      * @param[out] bword3 Third word.
      * @param[out] bword4 Fourth word.
      */
-    void formatData(int endcap, int layer, int sector, int plane, int strip,
-                    int charge, float ctime, uint16_t& bword1,
-                    uint16_t& bword2, uint16_t& bword3, uint16_t& bword4);
+    void formatData(int endcap, int layer, int plane, int strip,
+                    int charge, float ctime, int finesse_num,
+                    uint16_t& bword1, uint16_t& bword2, uint16_t& bword3,
+                    uint16_t& bword4);
 
     /**
      * Fill m_ModuleIdToelectId.

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMALIGNMENTMODULE_H
-#define EKLMALIGNMENTMODULE_H
+#ifndef EKLMDISPLACEMENTGENERATORMODULE_H
+#define EKLMDISPLACEMENTGENERATORMODULE_H
 
 /* Belle2 headers. */
 #include <framework/core/Module.h>
@@ -17,23 +17,21 @@
 namespace Belle2 {
 
   /**
-   * Module EKLMAlignmentModule.
-   * @details
-   * Module for generation of transformation and alignment data.
+   * Module for generation of displacement or alignment data.
    */
-  class EKLMAlignmentModule : public Module {
+  class EKLMDisplacementGeneratorModule : public Module {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMAlignmentModule();
+    EKLMDisplacementGeneratorModule();
 
     /**
      * Destructor.
      */
-    ~EKLMAlignmentModule();
+    ~EKLMDisplacementGeneratorModule();
 
     /**
      * Initializer.

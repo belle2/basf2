@@ -63,22 +63,28 @@ def rec(input, output, topInCounter=False, magneticField=True,
     #                         override=[
     #                             ("/DetectorComponent[@name='CDC']//GlobalPhiRotation", str(globalPhiRotation), "deg")
     #                         ])
-    main_path.add_module('Gearbox')
-    #
+    if data_period == 'gcr2017':
+        gearbox = register_module('Gearbox',
+                                  fileName="/geometry/GCR_Summer2017.xml",
+                                  override=[("/Global/length", "8.", "m"),
+                                            ("/Global/width", "8.", "m"),
+                                            ("/Global/height", "8.", "m"),
+                                            ])
+        main_path.add_module(gearbox)
+    else:
+        main_path.add_module('Gearbox')
 
     if fieldMapper is True:
         main_path.add_module('CDCJobCntlParModifier',
                              MapperGeometry=True,
                              MapperPhiAngle=mapperAngle)
 
-    if magneticField is False:
+    if magneticField is True:
         main_path.add_module('Geometry',
-                             components=['CDC'])
+                             excludedComponents=['BKLM', 'EKLM'])
     else:
-        #        main_path.add_module('Geometry')
-        main_path.add_module('Geometry', excludedComponents=['SVD', 'PXD', 'ARICH', 'BeamPipe', 'EKLM'])
-        #        main_path.add_module('Geometry',
-        #                             components=['CDC', 'MagneticFieldConstant4LimitedRCDC'])
+        main_path.add_module('Geometry',
+                             components=['CDC', 'ECL'])
 
     main_path.add_module('Progress')
 

@@ -172,10 +172,8 @@ void SVDSimpleClusterizerModule::event()
     int thisCellID = storeDigits[i]->getCellID();
 
     //Ignore digits with insufficient signal
-    //uncomment when calibration will be in
-    //    float ADCnoise = m_NoiseCal->getNoise(thisSensorID, thisSide, thisCellID);
-    //    float thisNoise = m_PulseShapeCal->getChargeFromADC(thisSensorID, thisSide, thisCellID, ADCnoise);
-    float thisNoise = 50; //to be removed when calibration will be in
+    float ADCnoise = m_NoiseCal.getNoise(thisSensorID, thisSide, thisCellID);
+    float thisNoise = m_PulseShapeCal.getChargeFromADC(thisSensorID, thisSide, thisCellID, ADCnoise);
     float thisCharge = storeDigits[i]->getCharge();
     if ((float)thisCharge / thisNoise < m_cutAdjacent) {
       i++;

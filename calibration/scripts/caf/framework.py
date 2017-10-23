@@ -14,6 +14,7 @@ import sys
 from threading import Thread
 
 from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL
+from basf2 import get_default_global_tags
 
 from abc import ABC, abstractmethod
 import ROOT
@@ -249,16 +250,7 @@ class Calibration(CalibrationBase):
             self.strategies = strategies.SingleIOV()
 
         self._local_database_chain = []
-
-        import ROOT
-        config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
-        if config_file_path:
-            import configparser
-            config = configparser.ConfigParser()
-            config.read(config_file_path)
-            self.use_central_database(config["CAF_DEFAULTS"]["GlobalTag"])
-        else:
-            B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
+        self.use_central_database(get_default_global_tags())
         #: The `state_machines.CalibrationMachine` that we will run
         self.machine = CalibrationMachine(self)
         #: The class that runs all the algorithms in this Calibration using their assigned `strategies.AlgorithmStrategy`
@@ -283,7 +275,7 @@ class Calibration(CalibrationBase):
 
     def use_central_database(self, global_tag):
         """
-        Central database global tag to use for this calibration. Default is set from data/caf.cfg
+        Central database global tag to use for this calibration. Default is set from `basf2.get_default_global_tags`
         If this is set manually it will override the default. To turn off central database usage you
         should set this global tag to an empty string.
         """
@@ -692,7 +684,10 @@ class CAF():
                 finished = True
                 for calibration in self.calibrations.values():
                     if calibration.dependencies_met() and not calibration.is_alive():
-                        calibration.start()
+                        if calibration.state != calibration.end_state and \
+                           calibration.state != calibration.fail_state:
+                            print(calibration.name, calibration.state)
+                            calibration.start()
 
                     # Join the thread if we've hit an end state
                     if calibration.state == CalibrationBase.end_state or calibration.state == CalibrationBase.fail_state:

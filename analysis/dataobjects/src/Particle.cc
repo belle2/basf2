@@ -726,6 +726,7 @@ std::string Particle::getInfoHTML() const
   stream << "<br>";
   stream << " <b>flavorType</b>=" << m_flavorType;
   stream << " <b>particleType</b>=" << m_particleType;
+  stream << " <b>particleTypeUsedForFit</b>=" << m_pdgCodeUsedForFit;
   stream << "<br>";
 
   stream << " <b>mdstIndex</b>=" << m_mdstIndex;

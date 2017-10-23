@@ -115,6 +115,9 @@ namespace Belle2 {
     /** If ture additionally assign a common family identifier to all Tracks that are share a node. */
     bool m_PARAMsetFamilies;
 
+    /** If ture create track candidate only for the best candidate of a family. */
+    bool m_PARAMselectBestPerFamily;
+
     /// member variables
 
     /** CA algorithm */

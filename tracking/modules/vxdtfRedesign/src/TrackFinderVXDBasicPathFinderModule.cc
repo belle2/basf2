@@ -67,6 +67,11 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
            "Additionally assign a common family identifier to all Tracks that are share a node.",
            bool(false));
 
+  addParam("selectBestPerFamily",
+           m_PARAMselectBestPerFamily,
+           "Select only the best track candidate for each family.",
+           bool(false));
+
 }
 
 /** *************************************+************************************* **/
@@ -84,7 +89,7 @@ void TrackFinderVXDBasicPathFinderModule::initialize()
   m_network.isRequired(m_PARAMNetworkName);
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
 
-  if (m_PARAMsetFamilies) {
+  if (m_PARAMselectBestPerFamily) {
     m_estimator = std::make_unique<QualityEstimatorTripletFit>();
   }
 }
@@ -131,15 +136,16 @@ void TrackFinderVXDBasicPathFinderModule::event()
           " cells total -> found " << nSeeds << " seeds");
   if (nSeeds == 0) { B2WARNING("TrackFinderVXDBasicPathFinderModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!"); return; }
 
-  m_bestPaths.clear();
-  m_familyIndex.clear();
-
   // mark families
   if (m_PARAMsetFamilies) {
     unsigned short nFamilies = m_familyDefiner.defineFamilies(segmentNetwork);
     B2DEBUG(10, "Number of families in the network: " << nFamilies);
-    m_bestPaths.reserve(nFamilies);
-    m_familyIndex.resize(nFamilies, -1);
+    if (m_PARAMselectBestPerFamily) {
+      m_bestPaths.clear();
+      m_familyIndex.clear();
+      m_bestPaths.reserve(nFamilies);
+      m_familyIndex.resize(nFamilies, -1);
+    }
   }
 
   /// collect all Paths starting from a Seed:
@@ -165,7 +171,7 @@ void TrackFinderVXDBasicPathFinderModule::event()
      * resolution via the families, as defineFamilies should be able to be called independently
      * from the overlap resolving part.
      */
-    if (m_PARAMsetFamilies) {
+    if (m_PARAMselectBestPerFamily) {
       SpacePointTrackCand tempSPTC = SpacePointTrackCand(spPath);
       qi = m_estimator->estimateQuality(tempSPTC.getSortedHits());
       if (m_familyIndex.at(family) == -1) {
@@ -181,7 +187,7 @@ void TrackFinderVXDBasicPathFinderModule::event()
     }
   }
 
-  if (m_PARAMsetFamilies) {
+  if (m_PARAMselectBestPerFamily) {
     for (unsigned short fam = 0; fam < m_familyIndex.size(); fam++) {
       std::vector<const SpacePoint*> path = m_bestPaths.at(m_familyIndex[fam]).getHits();
       m_sptcCreator.createSPTCs(m_TCs, path, fam);

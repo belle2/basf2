@@ -67,6 +67,12 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
            m_PARAMsetFamilies,
            "Additionally assign a common family identifier to all Tracks that are share a node.",
            bool(false));
+
+  addParam("selectBestPerFamily",
+           m_PARAMselectBestPerFamily,
+           "Select only the best track candidate for each family.",
+           bool(false));
+
 }
 
 /** *************************************+************************************* **/
@@ -84,7 +90,7 @@ void TrackFinderVXDCellOMatModule::initialize()
   m_network.isRequired(m_PARAMNetworkName);
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
 
-  if (m_PARAMsetFamilies) {
+  if (m_PARAMselectBestPerFamily) {
     m_estimator = std::make_unique<QualityEstimatorTripletFit>();
   }
 }
@@ -124,16 +130,18 @@ void TrackFinderVXDCellOMatModule::event()
   unsigned int nSeeds = m_cellularAutomaton.findSeeds(segmentNetwork, m_PARAMstrictSeeding);
   if (nSeeds == 0) { B2WARNING("TrackFinderVXDCellOMatModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!"); return; }
 
-  m_bestPaths.clear();
-  m_familyIndex.clear();
-
   // mark families
   if (m_PARAMsetFamilies) {
     unsigned short nFamilies = m_familyDefiner.defineFamilies(segmentNetwork);
     B2DEBUG(10, "Number of families in the network: " << nFamilies);
-    m_bestPaths.reserve(nFamilies);
-    m_familyIndex.resize(nFamilies, -1);
+    if (m_PARAMselectBestPerFamily) {
+      m_bestPaths.clear();
+      m_familyIndex.clear();
+      m_bestPaths.reserve(nFamilies);
+      m_familyIndex.resize(nFamilies, -1);
+    }
   }
+
 
   /// collect all Paths starting from a Seed:
   auto collectedPaths = m_pathCollector.findPaths(segmentNetwork, m_PARAMstoreSubsets);
@@ -153,12 +161,7 @@ void TrackFinderVXDCellOMatModule::event()
       spPath.push_back((*aNodeIt)->getEntry().getOuterHit()->m_spacePoint);
     }
     family = aPath->back()->getFamily();
-    /**
-     * TODO: Eventually introduce another parameter for the application of the 2-SP-Overlap
-     * resolution via the families, as defineFamilies should be able to be called independently
-     * from the overlap resolving part.
-     */
-    if (m_PARAMsetFamilies) {
+    if (m_PARAMselectBestPerFamily) {
       SpacePointTrackCand tempSPTC = SpacePointTrackCand(spPath);
 
       qi = m_estimator->estimateQuality(tempSPTC.getSortedHits());
@@ -177,7 +180,7 @@ void TrackFinderVXDCellOMatModule::event()
     }
   }
 
-  if (m_PARAMsetFamilies) {
+  if (m_PARAMselectBestPerFamily) {
     for (unsigned short fam = 0; fam < m_familyIndex.size(); fam++) {
       std::vector<const SpacePoint*> path = m_bestPaths.at(m_familyIndex[fam]).getHits();
       m_sptcCreator.createSPTCs(m_TCs, path, fam);

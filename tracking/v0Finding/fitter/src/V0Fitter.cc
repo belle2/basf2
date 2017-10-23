@@ -161,6 +161,16 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   }
   genfit::Track& gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
 
+  genfit::AbsTrackRep* plusRepresentation = TrackFitter::getTrackRepresentationForPDG(trackHypotheses.first.getPDGCode(),
+                                            *recoTrackPlus);
+  if (not recoTrackPlus->wasFitSuccessful(plusRepresentation)) {
+    plusRepresentation = TrackFitter::getTrackRepresentationForPDG(Const::pion.getPDGCode(), *recoTrackPlus);
+    if (not recoTrackPlus->wasFitSuccessful(plusRepresentation)) {
+      B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
+      return false;
+    }
+  }
+
   RecoTrack* recoTrackMinus = trackMinus->getRelated<RecoTrack>(m_RecoTrackColName);
   if (not recoTrackMinus) {
     B2ERROR("No RecoTrack for Belle2::Track");
@@ -168,42 +178,19 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   }
   genfit::Track& gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
 
-  const genfit::MeasuredStateOnPlane* stPlusPtr = nullptr;
-  try {
-    stPlusPtr = &recoTrackPlus->getMeasuredStateOnPlaneFromFirstHit(
-                  TrackFitter::getTrackRepresentationForPDG(trackHypotheses.first.getPDGCode(), *recoTrackPlus));
-  } catch (genfit::Exception) {
-    B2DEBUG(100, "Hypotheses " << trackHypotheses.first.getPDGCode() << " not available. Taking default instead.");
-    try {
-      stPlusPtr = &recoTrackPlus->getMeasuredStateOnPlaneFromFirstHit(
-                    TrackFitter::getTrackRepresentationForPDG(Const::pion.getPDGCode(), *recoTrackPlus));
-    } catch (genfit::Exception) {
+  genfit::AbsTrackRep* minusRepresentation = TrackFitter::getTrackRepresentationForPDG(trackHypotheses.second.getPDGCode(),
+                                             *recoTrackMinus);
+  if (not recoTrackMinus->wasFitSuccessful(minusRepresentation)) {
+    minusRepresentation = TrackFitter::getTrackRepresentationForPDG(Const::pion.getPDGCode(), *recoTrackMinus);
+    if (not recoTrackMinus->wasFitSuccessful(minusRepresentation)) {
       B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
       return false;
     }
   }
 
-  const genfit::MeasuredStateOnPlane* stMinusPtr = nullptr;
-  try {
-    stMinusPtr = &recoTrackMinus->getMeasuredStateOnPlaneFromFirstHit(
-                   TrackFitter::getTrackRepresentationForPDG(trackHypotheses.second.getPDGCode(), *recoTrackMinus));
-  } catch (genfit::Exception) {
-    B2DEBUG(100, "Hypotheses " << trackHypotheses.second.getPDGCode() << " not available. Taking default instead.");
-    try {
-      stMinusPtr = &recoTrackMinus->getMeasuredStateOnPlaneFromFirstHit(
-                     TrackFitter::getTrackRepresentationForPDG(Const::pion.getPDGCode(), *recoTrackMinus));
-    } catch (genfit::Exception) {
-      B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
-      return false;
-    }
-  }
 
-  if (not stPlusPtr or not stMinusPtr) {
-    return false;
-  }
-
-  genfit::MeasuredStateOnPlane stPlus = *stPlusPtr;
-  genfit::MeasuredStateOnPlane stMinus = *stMinusPtr;
+  genfit::MeasuredStateOnPlane stPlus = recoTrackPlus->getMeasuredStateOnPlaneFromFirstHit(plusRepresentation);
+  genfit::MeasuredStateOnPlane stMinus = recoTrackMinus->getMeasuredStateOnPlaneFromFirstHit(minusRepresentation);
 
   if (rejectCandidate(stPlus, stMinus)) {
     return false;

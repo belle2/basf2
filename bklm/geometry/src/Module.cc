@@ -36,7 +36,9 @@ namespace Belle2 {
       m_SignalSpeed(0.0),
       m_GlobalOrigin(CLHEP::Hep3Vector()),
       m_LocalReconstructionShift(CLHEP::Hep3Vector()),
-      m_Rotation(CLHEP::HepRotation())
+      m_Rotation(CLHEP::HepRotation()),
+      m_alignment(HepGeom::Transform3D()),
+      m_alignment_inverse(HepGeom::Transform3D())
     {
       m_RotationInverse = m_Rotation.inverse();
       m_PhiScintPositions.clear();
@@ -70,7 +72,9 @@ namespace Belle2 {
       m_SignalSpeed(0.5 * Const::speedOfLight),
       m_GlobalOrigin(globalOrigin),
       m_LocalReconstructionShift(localReconstructionShift),
-      m_Rotation(rotation)
+      m_Rotation(rotation),
+      m_alignment(HepGeom::Transform3D()),
+      m_alignment_inverse(HepGeom::Transform3D())
     {
       m_RotationInverse = m_Rotation.inverse();
       m_PhiScintLengths.clear();
@@ -104,7 +108,9 @@ namespace Belle2 {
       m_SignalSpeed(0.5671 * Const::speedOfLight), // m_firstPhotonlightSpeed, from EKLM
       m_GlobalOrigin(globalOrigin),
       m_LocalReconstructionShift(localReconstructionShift),
-      m_Rotation(rotation)
+      m_Rotation(rotation),
+      m_alignment(HepGeom::Transform3D()),
+      m_alignment_inverse(HepGeom::Transform3D())
     {
       if (isFlipped) m_Rotation.rotateZ(M_PI);
       m_RotationInverse = m_Rotation.inverse();
@@ -133,6 +139,8 @@ namespace Belle2 {
       m_GlobalOrigin(m.m_GlobalOrigin),
       m_LocalReconstructionShift(m.m_LocalReconstructionShift),
       m_Rotation(m.m_Rotation),
+      m_alignment(m.m_alignment),
+      m_alignment_inverse(m.m_alignment_inverse),
       m_RotationInverse(m.m_RotationInverse),
       m_PhiScintLengths(m.m_PhiScintLengths),
       m_PhiScintPositions(m.m_PhiScintPositions),
@@ -184,6 +192,26 @@ namespace Belle2 {
       double dy = m_PhiPositionBase * m_PhiStripWidth - m_PhiSensorSide * local.y();
       double dz = m_ZStripMax * m_ZStripWidth - local.z();
       return CLHEP::Hep3Vector(0.0, dz / m_SignalSpeed, dy / m_SignalSpeed);
+    }
+
+    const CLHEP::Hep3Vector Module::localToGlobal(const CLHEP::Hep3Vector& v, bool m_reco) const
+    {
+      if (m_reco) {
+        HepGeom::Vector3D<double> v3D(v.x(), v.y(), v.z());
+        v3D.transform(m_alignment);
+        CLHEP::Hep3Vector vlocal(v3D.x(), v3D.y(), v3D.z()); // to nomial local
+        return m_Rotation * vlocal + m_GlobalOrigin;
+      } else return m_Rotation * v + m_GlobalOrigin;
+    }
+
+    const CLHEP::Hep3Vector Module::globalToLocal(const CLHEP::Hep3Vector& v, bool reco) const
+    {
+      if (reco) {
+        CLHEP::Hep3Vector vlocal = m_RotationInverse * (v - m_GlobalOrigin); //now in nominal local
+        HepGeom::Vector3D<double> v3D(vlocal.x(), vlocal.y(), vlocal.z());
+        v3D.transform(m_alignment_inverse); // now in real local
+        return CLHEP::Hep3Vector(v3D.x(), v3D.y(), v3D.z());
+      } else return m_RotationInverse * (v - m_GlobalOrigin);
     }
 
   } // end of namespace bklm

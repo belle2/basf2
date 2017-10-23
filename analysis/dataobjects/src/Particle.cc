@@ -105,11 +105,11 @@ Particle::Particle(const Track* track,
 {
   if (!track) return;
 
-  const auto closestMassFitResult = track->getFitResultWithClosestMass(chargedStable);
-  if (!closestMassFitResult.second) return;
+  auto closestMassFitResult = track->getTrackFitResultWithClosestMass(chargedStable);
+  if (closestMassFitResult == nullptr) return;
 
-  m_pdgCodeUsedForFit = closestMassFitResult.first.getPDGCode();
-  const auto trackFit = closestMassFitResult.second;
+  m_pdgCodeUsedForFit = closestMassFitResult->getParticleType().getPDGCode();
+  const auto trackFit = closestMassFitResult;
 
   m_flavorType = c_Flavored; //tracks are charged
   m_particleType = c_Track;

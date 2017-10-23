@@ -179,8 +179,14 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks).set_name(
         "Combined_DAFRecoFitter")
     # create Belle2 Tracks from the genfit Tracks
+    # The following particle hypothesis will be fitted: Pion, Kaon and Proton
+    # Muon fit is working but gives very similar as the Pion due to the closeness of masses
+    # -> therefore not in the default fit list
+    # Electron fit has as systematic bias and therefore not done here. Therefore, pion fits
+    # will be used for electrons which gives a better result as GenFit's current electron
+    # implementation.
     path.add_module('TrackCreator', recoTrackColName=reco_tracks,
-                    pdgCodes=[211, 13, 321, 2212] if trackFitHypotheses is None else trackFitHypotheses)
+                    pdgCodes=[211, 321, 2212] if trackFitHypotheses is None else trackFitHypotheses)
     # V0 finding
     path.add_module('V0Finder', RecoTrackColName=reco_tracks)
 

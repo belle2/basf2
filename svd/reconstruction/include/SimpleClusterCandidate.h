@@ -113,6 +113,7 @@ namespace Belle2 {
        */
       int size() const { return m_strips.size(); }
 
+      const std::vector<stripInCluster> getStripsInCluster() const { return m_strips; };
 
     protected:
 
@@ -153,6 +154,7 @@ namespace Belle2 {
       int m_seedIndex;
 
       /** vector containing the strips in the cluster */
+
       std::vector<stripInCluster> m_strips;
 
     };

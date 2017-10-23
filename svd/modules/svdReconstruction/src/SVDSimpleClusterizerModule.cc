@@ -117,7 +117,7 @@ void SVDSimpleClusterizerModule::initialize()
 
   B2INFO(" 1. COLLECTIONS:");
   B2INFO(" -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
-  B2INFO(" -->  SVDDigits:          " << DataStore::arrayName<SVDRecoDigit>(m_storeRecoDigitsName));
+  B2INFO(" -->  SVDRecoDigits:      " << DataStore::arrayName<SVDRecoDigit>(m_storeRecoDigitsName));
   B2INFO(" -->  SVDClusters:        " << DataStore::arrayName<SVDCluster>(m_storeClustersName));
   B2INFO(" -->  SVDTrueHits:        " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
   B2INFO(" -->  DigitMCRel:         " << m_relRecoDigitMCParticleName);
@@ -229,6 +229,9 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
 {
 
   StoreArray<SVDCluster> storeClusters(m_storeClustersName);
+  const StoreArray<SVDRecoDigit> storeDigits(m_storeRecoDigitsName);
+
+  RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterRecoDigitName);
 
   VxdID sensorID = cluster.getSensorID();
   bool isU = cluster.isUSide();
@@ -246,4 +249,16 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
                             sensorID, isU, position, positionError, time, timeError, seedCharge, charge, size, SNR
                           ));
 
+  //register relation between RecoDigit and Cluster
+  int clsIndex = storeClusters.getEntries();
+
+  vector<pair<int, float> > digit_weights;
+  digit_weights.reserve(size);
+
+  std::vector<stripInCluster> strips = cluster.getStripsInCluster();
+
+  for (auto strip : strips)
+    digit_weights.push_back(make_pair(strip.recoDigitIndex, strip.charge));
+
+  relClusterDigit.add(clsIndex, digit_weights.begin(), digit_weights.end());
 }

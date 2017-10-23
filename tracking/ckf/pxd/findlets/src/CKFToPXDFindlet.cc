@@ -89,7 +89,7 @@ void CKFToPXDFindlet::apply()
   TrackFindingCDC::erase_remove_if(m_spacePointVector, notFromPXD);
 
   const auto hasNoSVD = [](const RecoTrack * recoTrack) {
-    const auto& svdHitList = recoTrack->getSVDHitList();
+    const auto& svdHitList = recoTrack->getSortedSVDHitList();
     return svdHitList.empty() or svdHitList.front()->getSensorID().getLayerNumber() > 4;
   };
   TrackFindingCDC::erase_remove_if(m_recoTracksVector, hasNoSVD);

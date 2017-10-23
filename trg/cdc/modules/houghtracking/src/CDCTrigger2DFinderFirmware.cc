@@ -28,8 +28,16 @@
 #include <bitset>
 
 
+/**
+ * Helper class for software (C++) / firmware (VHDL) co-simulation
+ */
 namespace Cosim {
   const char* std_logic_literal[] = {"U", "X", "0", "1", "Z", "W", "L", "H", "-"};
+
+  /** '1' in XSI VHDL simulation */
+  const char one_val  = 3;
+  /** '0' in XSI VHDL simulation */
+  const char zero_val = 2;
 
   std::string display_value(const char* count, int size)
   {
@@ -72,7 +80,9 @@ namespace Cosim {
   {
     std::ios oldState(nullptr);
     oldState.copyfmt(std::cout);
-    if (std::any_of(signal.begin(), signal.end(), [](char i) {return i != 2 && i != 3;})) {
+    if (std::any_of(signal.begin(), signal.end(), [](char i) {
+    return i != zero_val && i != one_val;
+  })) {
       B2WARNING("Some bit in the signal vector is neither 0 nor 1.");
     }
     std::string binString = slv_to_bin_string(signal, true);
@@ -131,7 +141,7 @@ void CDCTrigger2DFinderFirmware::initialize()
     for (int iSL = 0; iSL < 5; ++iSL) {
       string name = "TSF" + to_string(iSL * 2) + "_input_i";
       tsf[iSL] = Xsi_Instance.get_port_number_or_exit(name);
-      tsfInput[iSL].fill(2);
+      tsfInput[iSL].fill(zero_val);
       Xsi_Instance.put_value(tsf[iSL], tsfInput[iSL].data());
     }
     out  = Xsi_Instance.get_port_number_or_exit("Main_out");
@@ -180,7 +190,7 @@ auto CDCTrigger2DFinderFirmware::toTSSLV(const std::bitset<m_tsVectorWidth> ts)
   std::string word = ts.to_string();
   std::array<char, m_tsVectorWidth> vec;
   for (unsigned i = 0; i < word.size(); ++i) {
-    vec[i] = (word[i] == '0') ? 2 : 3;
+    vec[i] = (word[i] == '0') ? zero_val : one_val;
   }
   return vec;
 }
@@ -267,7 +277,7 @@ void CDCTrigger2DFinderFirmware::event()
       std::cout << "clock #" << iClock << "\n";
       for (unsigned iSL = 0; iSL < nAxialSuperLayer; ++iSL) {
         // firstly, clear the input signal vectors
-        tsfInput[iSL].fill(2);
+        tsfInput[iSL].fill(zero_val);
         // then, copy the TS info to the input signal vectors
         // unless there is no more hit in the SL
         auto itr = tsfInput[iSL].begin() + 9;

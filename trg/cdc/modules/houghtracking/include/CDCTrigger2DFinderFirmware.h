@@ -96,35 +96,28 @@ namespace Belle2 {
     Xsi::Loader Xsi_Instance;
     s_xsi_setup_info info;
 
+    /** '1' in XSI VHDL simulation */
     const char one_val  = 3;
+    /** '0' in XSI VHDL simulation */
     const char zero_val = 2;
-    const char zero_val_vec[2] = {2, 2};
-    const char one_val_vec[2]  = {3, 3};
 
+    /** width of (half-speed) input data width */
     static const int width_in = 219;
+    /** width of output data width, not including the clock counter */
     static const int width_out = 732;
 
-    // Input values
     using inputVector = std::array<char, width_in>;
+    /** array holding 5 axial TSF input data */
     std::array<inputVector, 5> tsfInput;
 
-    char tsf0_in[width_in] = {};
-    char tsf2_in[width_in] = {};
-    char tsf4_in[width_in] = {};
-    char tsf6_in[width_in] = {};
-    char tsf8_in[width_in] = {};
-
-    // Output value
+    /** char array holding 2D output data */
     char t2d_out[width_out] = {};
 
-    // I/O Ports
+    /** clock signal port handle */
     int clk;
+    /** input signal port handle */
     int tsf[5];
-    int tsf0;
-    int tsf2;
-    int tsf4;
-    int tsf6;
-    int tsf8;
+    /** output signal port handle */
     int out;
 
     CDCTrigger2DFinderModule const* m_mod;

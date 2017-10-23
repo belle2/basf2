@@ -68,9 +68,9 @@ void ROIPayloadAssemblerModule::initialize()
 
 }
 
+
 void ROIPayloadAssemblerModule::beginRun()
 {
-
 }
 
 
@@ -92,7 +92,7 @@ void ROIPayloadAssemblerModule::event()
   map<VxdID, set<ROIrawID, ROIrawID>> mapOrderedROIraw;
 
   if (accepted) {
-    // skip the preprocessing if the event is not accepted anyway
+    // skip the preprocessing if the event is not accepted to save CPU time
 
     B2DEBUG(1, " number of ROIs in the list = " << ROIList.getEntries());
 
@@ -104,7 +104,7 @@ void ROIPayloadAssemblerModule::event()
       int ladder = (iROI.getSensorID()).getLadderNumber();
       int sensor = (iROI.getSensorID()).getSensorNumber() - 1;
 
-      m_roiraw.setSystemFlag(0);
+      m_roiraw.setSystemFlag(0);// System 0 is HLT, 1 would be DATCON
       m_roiraw.setDHHID(((layer) << 5) | ((ladder) << 1) | (sensor));
 
       m_roiraw.setMinVid(iROI.getMinVid());
@@ -134,8 +134,9 @@ void ROIPayloadAssemblerModule::event()
 
   payloadPtr.assign(payload);
 
-  payload->setHeader(accepted
-                     || mNoRejectFlag, mSendAllDS  ? (evtNr % mSendAllDS) == 0 : 0, mSendROIsDS ? (evtNr % mSendROIsDS) == 0 : 0);
+  // set all the Header flags and event number
+  payload->setHeader(accepted || mNoRejectFlag,
+                     mSendAllDS  ? (evtNr % mSendAllDS) == 0 : 0, mSendROIsDS ? (evtNr % mSendROIsDS) == 0 : 0);
   payload->setTriggerNumber(evtNr);
 
   // Set run subrun exp number
@@ -144,7 +145,7 @@ void ROIPayloadAssemblerModule::event()
   unsigned int addROI = 0;
 
   if (accepted) {
-    // skip this if the event is not accepted (actually mapOrderedROIraw shoudl be empty anyway)
+    // skip this if the event is not accepted (actually mapOrderedROIraw should be empty anyway)
     // iterate over map
     for (auto& it : mapOrderedROIraw) {
       // check size of set

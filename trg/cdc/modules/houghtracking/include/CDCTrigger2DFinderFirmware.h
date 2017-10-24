@@ -15,6 +15,14 @@ namespace Belle2 {
   class CDCTrigger2DFinderModule;
   class CDCTriggerSegmentHit;
 
+  using tsOut = std::array<int, 4>;
+  using tsOutArray = std::array<tsOut, 5>;
+  struct TRGFinderTrack {
+    double omega;
+    double phi0;
+    tsOutArray ts;
+  };
+
   /**
    * This class is the interface between the 2D finder fast simulation
    * module and the firmware simulation core of ISim.
@@ -44,7 +52,7 @@ namespace Belle2 {
      */
     void event();
 
-  private:
+  protected:
     /** how many clocks to simulate per event */
     static const int m_nClockPerEvent = 32;
 
@@ -53,6 +61,9 @@ namespace Belle2 {
 
     /** number of input ts hits per clock */
     static const int m_nInTSPerClock = 10;
+
+    /** number of output tracks per clock */
+    static const int m_nOutTracksPerClock = 4;
 
     using tsVector = std::array<char, m_tsVectorWidth>;
 
@@ -86,6 +97,13 @@ namespace Belle2 {
      */
     auto toTSSLV(const std::bitset<m_tsVectorWidth>);
 
+
+    tsOut decodeTSHit(std::string tsIn);
+
+    TRGFinderTrack decodeTrack(std::string trackIn);
+
+    void decodeOutput(short latency);
+
     std::string lib_extension = ".so";
     std::string cwd = "/home/belle2/tasheng/tsim";
     /** path to the simulation snapshot */
@@ -109,6 +127,9 @@ namespace Belle2 {
     using inputVector = std::array<char, width_in>;
     /** array holding 5 axial TSF input data */
     std::array<inputVector, 5> tsfInput;
+
+    /** array holding 2D output data */
+    std::array<char, width_out> finderOutput;
 
     /** char array holding 2D output data */
     char t2d_out[width_out] = {};

@@ -16,6 +16,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 
 #include <string>
 #include <cstring>
@@ -26,12 +27,36 @@
 #include <algorithm>
 #include <numeric>
 #include <bitset>
+#include <experimental/array>
+#include <math.h>
+#include <gsl/gsl_const_mksa.h>
+
+using std::experimental::to_array;
+constexpr double pi() { return std::atan(1) * 4; }
+
 
 
 /**
  * Helper class for software (C++) / firmware (VHDL) co-simulation
  */
 namespace Cosim {
+  /* Note: VHDL std_logic value is stored in a byte (char). The
+   * 9 values are mapped as  'U':0, 'X':1, '0':2, '1':3
+   * 'Z':4, 'W':5, 'L':6, 'H':7, '-':8 . The std_logic_vector
+   * is stored as a contiguous array of bytes. For example
+   * "0101Z" is stored in five bytes as char s[5] = {2,3,2,3,4}
+   * An HDL integer type is stored as C int, a HDL real type is
+   * stored as a C double and a VHDL string type is stored as char*.
+   * An array of HDL integer or double is stored as an array of C
+   * integer or double respectively
+   */
+
+  /* In case you are not familiar with VHDL simulation, there are 9 possible
+   * values defined for the standard logic type, instead of just 0 and 1. The
+   * simulator needs to compute all these possible outcomes. Therefore, XSI uses
+   * a byte, instead of a bit, to represent a std_logic. This is represented
+   * with a char with possible values ranging from 0 to 8.
+   */
   const char* std_logic_literal[] = {"U", "X", "0", "1", "Z", "W", "L", "H", "-"};
 
   /** '1' in XSI VHDL simulation */
@@ -80,9 +105,8 @@ namespace Cosim {
   {
     std::ios oldState(nullptr);
     oldState.copyfmt(std::cout);
-    if (std::any_of(signal.begin(), signal.end(), [](char i) {
-    return i != zero_val && i != one_val;
-  })) {
+    if (std::any_of(signal.begin(), signal.end(), [](char i)
+    {return i != zero_val && i != one_val;})) {
       B2WARNING("Some bit in the signal vector is neither 0 nor 1.");
     }
     std::string binString = slv_to_bin_string(signal, true);
@@ -93,6 +117,22 @@ namespace Cosim {
     }
     std::cout << "\n";
     std::cout.copyfmt(oldState);
+  }
+
+
+  /* extract a subset of bitstring, like substring.
+   *
+   * In principle this can be done using only integer manipulations, but for the
+   * sake of simplicity, let's just cast them to string. Beware the endianness.
+   * 0 refer to the rightmost bit in std::bitset, but the leftmost bit in
+   * std::string
+   */
+  template<size_t nbits, size_t min, size_t max>
+  std::bitset < max - min + 1 > subset(std::bitset<nbits> set)
+  {
+    const size_t outWidth = max - min + 1;
+    std::string str = set.to_string();
+    return std::bitset<outWidth>(str.substr(nbits - max - 1, outWidth));
   }
 }
 
@@ -193,6 +233,69 @@ auto CDCTrigger2DFinderFirmware::toTSSLV(const std::bitset<m_tsVectorWidth> ts)
     vec[i] = (word[i] == '0') ? zero_val : one_val;
   }
   return vec;
+}
+
+tsOut CDCTrigger2DFinderFirmware::decodeTSHit(string tsIn)
+{
+  constexpr unsigned lenID = 8;
+  constexpr unsigned lenPriorityTime = 9;
+  constexpr unsigned lenLR = 2;
+  constexpr unsigned lenPriorityPosition = 2;
+  constexpr array<unsigned, 4> tsLens = {lenID, lenPriorityTime, lenLR, lenPriorityPosition};
+  array<unsigned, 5> tsPos = { 0 };
+  partial_sum(tsLens.begin(), tsLens.end(), tsPos.begin() + 1);
+  tsOut tsOutput;
+  tsOutput[0] = bitset<tsLens[0]>(tsIn.substr(tsPos[0], tsLens[0])).to_ulong();
+  tsOutput[1] = bitset<tsLens[1]>(tsIn.substr(tsPos[1], tsLens[1])).to_ulong();
+  tsOutput[2] = bitset<tsLens[2]>(tsIn.substr(tsPos[2], tsLens[2])).to_ulong();
+  tsOutput[3] = bitset<tsLens[3]>(tsIn.substr(tsPos[3], tsLens[3])).to_ulong();
+  return tsOutput;
+}
+
+TRGFinderTrack CDCTrigger2DFinderFirmware::decodeTrack(string trackIn)
+{
+  constexpr unsigned lenCharge = 2;
+  constexpr unsigned lenOmega = 7;
+  constexpr unsigned lenPhi0 = 7;
+  constexpr unsigned lenTS = 21;
+  constexpr array<unsigned, 3> trackLens = {lenCharge, lenOmega, lenPhi0};
+  array<unsigned, 4> trackPos{ 0 };
+  partial_sum(trackLens.begin(), trackLens.end(), trackPos.begin() + 1);
+  const unsigned shift = 16 - lenOmega;
+  TRGFinderTrack trackOut;
+  bitset<trackLens[1]> omega(trackIn.substr(trackPos[1], trackLens[1]));
+  // shift omega to 16 bits, cast it to signed 16-bit int, and shift it back to 7 bits
+  // thus the signed bit is preserved (when right-shifting)
+  int omegaFirm = (int16_t (omega.to_ulong() << shift)) >> shift;
+  trackOut.omega = 29.97 * 1.5e-4 * omegaFirm;
+  int phi0 = bitset<trackLens[2]>(trackIn.substr(trackPos[2], trackLens[2])).to_ulong();
+  trackOut.phi0 = pi() / 4 + 90. / 80 * (phi0 + 1);
+  for (unsigned i = 0; i < 5; ++i) {
+    trackOut.ts[i] = decodeTSHit(trackIn.substr(trackPos.back() + i * lenTS, lenTS));
+  }
+  return trackOut;
+}
+
+void CDCTrigger2DFinderFirmware::decodeOutput(short latency)
+{
+  const unsigned lenTrack = 121;
+  array<int, 4> posTrack;
+  for (unsigned i = 0; i < posTrack.size(); ++i) {
+    posTrack[i] = 6 + lenTrack * i;
+  }
+  string strOutput = slv_to_bin_string(finderOutput);
+  StoreArray<CDCTriggerTrack> storeTracks(m_mod->m_outputCollectionName);
+  for (unsigned i = 0; i < m_nOutTracksPerClock; ++i) {
+    if (finderOutput[i] == one_val) {
+      TRGFinderTrack trk = decodeTrack(strOutput.substr(posTrack[i], lenTrack));
+      const CDCTriggerTrack* track =
+        storeTracks.appendNew(trk.phi0, trk.omega, 0., latency);
+      // TODO: dig out the TS hits in datastore, and
+      // add relations to them
+      B2DEBUG(10, "phi0:" << trk.phi0 << ", omega:" << trk.omega
+              << ", at clock " << latency);
+    }
+  }
 }
 
 void CDCTrigger2DFinderFirmware::event()
@@ -308,10 +411,10 @@ void CDCTrigger2DFinderFirmware::event()
       for (unsigned j = 0; j < count(found.begin(), found.end(), '1'); j++) {
         std::cout << display_value(t2d_out + 6 + 121 * j, 121) << "\n";
       }
+      finderOutput = to_array(t2d_out);
+      decodeOutput(iClock);
     }
-
-    std::cout << status << std::endl;
-
+    std::cout << "status code:" << status << std::endl;
   } catch (std::exception& e) {
     std::cerr << "ERROR: An exception occurred: " << e.what() << std::endl;
     status = 2;
@@ -319,6 +422,4 @@ void CDCTrigger2DFinderFirmware::event()
     std::cerr << "ERROR: An unknown exception occurred." << std::endl;
     status = 3;
   }
-
 }
-

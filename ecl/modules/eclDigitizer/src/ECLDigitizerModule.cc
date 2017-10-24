@@ -195,15 +195,11 @@ void ECLDigitizerModule::makeWaveforms()
 {
   const EclConfiguration& ec = EclConfiguration::get();
   BitStream out(ec.m_nch * ec.m_nsmp * 18 / 32);
-  out.putNBits(m_compAlgo, 8);
-  ECLCompress* comp = NULL;
-  if (m_compAlgo == 1) {
-    comp = new ECLBaseCompress;
-  } else if (m_compAlgo == 2) {
-    comp = new ECLDeltaCompress;
-  } else {
+  out.putNBits(m_compAlgo & 0xff, 8);
+  ECLCompress* comp = selectAlgo(m_compAlgo & 0xff);
+  if (comp == NULL)
     B2FATAL("Unknown compression algorithm: " << m_compAlgo);
-  }
+
   int FitA[ec.m_nsmp]; // buffer for the waveform fitter
   // loop over entire calorimeter
   for (int j = 0; j < ec.m_nch; j++) {
@@ -252,13 +248,9 @@ void ECLDigitizerModule::event()
     std::swap(out.getStore(), wf->getStore());
     out.setPos(0);
     unsigned int compAlgo = out.getNBits(8);
-    if (compAlgo == 1) {
-      comp = new ECLBaseCompress;
-    } else if (compAlgo == 2) {
-      comp = new ECLDeltaCompress;
-    } else {
+    comp = selectAlgo(compAlgo);
+    if (comp == NULL)
       B2FATAL("Unknown compression algorithm: " << compAlgo);
-    }
   }
 
   int FitA[ec.m_nsmp]; // buffer for the waveform fitter

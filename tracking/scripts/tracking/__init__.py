@@ -51,7 +51,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     else:
         add_track_finding(path, components=components, trigger_mode=trigger_mode, reco_tracks=reco_tracks,
                           prune_temporary_tracks=prune_temporary_tracks, use_vxdtf2=use_vxdtf2,
-                          sectormap_file=sectormap_file, use_second_cdc_hits=use_second_cdc_hits)
+                          use_second_cdc_hits=use_second_cdc_hits)
 
     if trigger_mode in ["hlt", "all"]:
         add_mc_matcher(path, components=components, reco_tracks=reco_tracks,

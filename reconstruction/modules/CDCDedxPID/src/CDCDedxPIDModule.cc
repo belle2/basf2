@@ -64,9 +64,9 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
 
   //Parameter definitions
   addParam("trackLevel", m_trackLevel,
-           "Use track-level MC. If false, use hit-level MC", true);
+           "Use track-level MC. If false, use hit-level MC", false);
   addParam("usePrediction", m_usePrediction,
-           "Use parameterized means and resolutions to determine PID values. If false, lookup table PDFs are used.", true);
+           "Use parameterized means and resolutions to determine PID values. If false, lookup table PDFs are used.", false);
   addParam("removeLowest", m_removeLowest,
            "portion of events with low dE/dx that should be discarded", double(0.05));
   addParam("removeHighest", m_removeHighest,
@@ -76,7 +76,7 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
 
   addParam("useIndividualHits", m_useIndividualHits,
            "If using lookup table PDFs, include PDF value for each hit in likelihood. If false, the truncated mean of dedx values will be used.",
-           false);
+           true);
   addParam("pdfFile", m_pdfFile,
            "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.",
            std::string("/data/reconstruction/dedxPID_PDFs_dd92782_500k_events.root"));
@@ -548,15 +548,15 @@ void CDCDedxPIDModule::event()
       dedxTrack->m_dedx = gRandom->Gaus(mean, sigma);
       while (dedxTrack->m_dedx < 0)
         dedxTrack->m_dedx = gRandom->Gaus(mean, sigma);
+      saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_p_cdc, dedxTrack->m_dedx,
+                   std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->l_nHitsUsed);
     } else
-      dedxTrack->m_dedx = dedxTrack->m_dedx_avg_truncated;
+      saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated,
+                   std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->l_nHitsUsed);
 
     // save the PID information for both lookup tables and parameterized means and resolutions
-    if (!m_useIndividualHits) {
+    if (!m_useIndividualHits)
       saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated, m_pdfs[2]);
-    }
-    saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_p_cdc, dedxTrack->m_dedx,
-                 std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->l_nHitsUsed);
 
     // save CDCDedxLikelihood
     //

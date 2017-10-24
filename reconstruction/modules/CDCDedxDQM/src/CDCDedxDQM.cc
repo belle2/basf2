@@ -63,7 +63,7 @@ void CDCDedxDQMModule::beginRun()
   for (unsigned int i = 0; i < 14336; ++i)
     m_h_wiregains->Fill(m_DBWireGains->getWireGain(i));
 
-  int ncosbins = m_DBCosineCor->getNBins();
+  const unsigned int ncosbins = m_DBCosineCor->getNBins();
   for (unsigned int i = 0; i < ncosbins; ++i)
     m_h_cosinegains->SetBinContent(i, m_DBCosineCor->getMean(2 / ncosbins - 1));
 }

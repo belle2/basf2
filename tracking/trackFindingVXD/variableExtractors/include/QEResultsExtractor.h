@@ -33,6 +33,7 @@ namespace Belle2 {
       addVariable(method + "_P_Z", variableSet);
     }
 
+    // TODO: Double into float?
     void extractVariables(QualityEstimationResults const& values)
     {
       m_variables.at(m_method + "_QI") = values.qualityIndicator;

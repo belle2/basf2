@@ -41,6 +41,9 @@ void MVAExpert::beginRun()
 {
   std::unique_ptr<MVA::Weightfile> weightfile = getWeightFile();
   if (weightfile) {
+    // TODO: add other methods besides FastBDT?
+    // FastBDT_version refers to the weightfile version, only FastBDT_VERSION_MAJOR >= 5 can handle FastBDT_version==2
+    // Currently using FastBDT_VERSION_MAJOR = 3 (in externals/v01-05-01/include/root/FastBDT.h )
     if (weightfile->getElement<std::string>("method") == "FastBDT" and
         weightfile->getElement<int>("FastBDT_version") == 1) {
 
@@ -104,5 +107,9 @@ double MVAExpert::predict()
   for (unsigned int i = 0; i < m_namedVariables.size(); ++i) {
     m_dataset->m_input[i] = *(m_namedVariables[i].getValue());
   }
+  // TODO: Why only return element 0 (iEvent) ?
+  // in FastBDT.cc: probabilities[iEvent] = m_expert_forest.Analyse(test_data.m_input)
+  // TODO: calling the full apply seams unnecessary
+  // ----> Dataset.h->SingleDataset: Returns the number of events in this dataset which is always one
   return m_expert->apply(*m_dataset)[0];
 }

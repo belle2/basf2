@@ -64,11 +64,8 @@ namespace Belle2 {
       for (auto& variable : namedVariables) {
         tree.Branch(variable.getName().c_str(), variable.getValue());
       }
-    },
-    fileName,
-    treeName)
-    {
-    }
+    }, fileName, treeName)
+    { }
 
 
     ~SimpleVariableRecorder()

@@ -93,6 +93,7 @@ void QualityEstimatorMVAModule::event()
 
     m_qeResultsExtractor->extractVariables(m_estimator->estimateQualityAndProperties(sortedHits));
 
+    // TODO: Why is this float? In both functions return and parameter are double -> FastBDT uses float everywhere
     float qi = m_mvaExpert->predict();
     aTC.setQualityIndex(qi);
   }

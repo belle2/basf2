@@ -196,6 +196,7 @@ namespace Belle2 {
       virtual unsigned int getNumberOfSpectators() const override { return m_spectators.size(); }
 
       /**
+       * // TODO: Wrong!
        * Returns the number of events in this dataset which is always one
        */
       virtual unsigned int getNumberOfEvents() const override { return m_matrix.size(); }

@@ -43,6 +43,7 @@ namespace Belle2 {
        * Apply this expert onto a dataset
        * @param test_data dataset
        */
+      // TODO: Should be double?
       virtual std::vector<float> apply(Dataset& test_data) const = 0;
 
       /**

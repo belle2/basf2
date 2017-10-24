@@ -8,11 +8,7 @@ env['LIBS'] = ['framework',
                'dl',
                'rt']
                
-vivado_lib = '/home/belle2/tasheng/Vivado_2017.2/lib/lnx64.o/'
-xsim_lib = '/home/belle2/tasheng/Vivado_2017.2/data/xsim/include'
-env.Append(CPPPATH=[vivado_lib])
-env.Append(CPPPATH=[xsim_lib])
-loader = SharedObject(target='xsi_loader.o', source='src/xsi_loader.cpp', CPPPATH=['include', xsim_lib])
+loader = SharedObject(target='xsi_loader.o', source='src/xsi_loader.cpp')
 env.Append(LIBS=loader)
 
 # env['ENV']['LD_LIBRARY_PATH'] += ':/home/belle2/tasheng/Vivado_2017.2/lib/lnx64.o/'

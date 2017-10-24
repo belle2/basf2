@@ -27,10 +27,23 @@ using namespace Belle2;
 
 EKLMDatabaseImporter::EKLMDatabaseImporter()
 {
+  m_ExperimentLow = 0;
+  m_RunLow = 0;
+  m_ExperimentHigh = -1;
+  m_RunHigh = -1;
 }
 
 EKLMDatabaseImporter::~EKLMDatabaseImporter()
 {
+}
+
+void EKLMDatabaseImporter::setIOV(int experimentLow, int runLow,
+                                  int experimentHigh, int runHigh)
+{
+  m_ExperimentLow = experimentLow;
+  m_RunLow = runLow;
+  m_ExperimentHigh = experimentHigh;
+  m_RunHigh = runHigh;
 }
 
 void EKLMDatabaseImporter::importDigitizationParameters()
@@ -55,7 +68,8 @@ void EKLMDatabaseImporter::importDigitizationParameters()
   digPar->setPEAttenuationFrequency(dig.getDouble("PEAttenuationFreq"));
   digPar->setMeanSiPMNoise(dig.getDouble("MeanSiPMNoise"));
   digPar->setEnableConstBkg(dig.getDouble("EnableConstBkg") > 0);
-  IntervalOfValidity iov(0, 0, -1, -1);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
   digPar.import(iov);
 }
 
@@ -66,7 +80,8 @@ void EKLMDatabaseImporter::importReconstructionParameters()
   GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/"
              "Content/DigitizationParams");
   recPar->setTimeResolution(gd.getDouble("TimeResolution"));
-  IntervalOfValidity iov(0, 0, -1, -1);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
   recPar.import(iov);
 }
 
@@ -78,7 +93,8 @@ void EKLMDatabaseImporter::importSimulationParameters()
              "Content/SensitiveDetector");
   simPar->setHitTimeThreshold(
     Unit::convertValue(gd.getDouble("HitTimeThreshold") , "ns"));
-  IntervalOfValidity iov(0, 0, -1, -1);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
   simPar.import(iov);
 }
 
@@ -117,7 +133,8 @@ void EKLMDatabaseImporter::setChannelData(
 
 void EKLMDatabaseImporter::importChannelData()
 {
-  IntervalOfValidity iov(0, 0, -1, -1);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
   m_Channels.import(iov);
 }
 

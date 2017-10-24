@@ -35,6 +35,11 @@ namespace Belle2 {
     ~EKLMDatabaseImporter();
 
     /**
+     * Set interval of validity.
+     */
+    void setIOV(int experimentLow, int runLow, int experimentHigh, int runHigh);
+
+    /**
      * Import digitization parameters.
      */
     void importDigitizationParameters();
@@ -75,6 +80,18 @@ namespace Belle2 {
 
     /** Channel data. */
     DBImportObjPtr<EKLMChannels> m_Channels;
+
+    /** Low experiment. */
+    int m_ExperimentLow;
+
+    /** Low run. */
+    int m_RunLow;
+
+    /** High experiment. */
+    int m_ExperimentHigh;
+
+    /** High run. */
+    int m_RunHigh;
 
   };
 

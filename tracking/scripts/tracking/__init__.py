@@ -548,6 +548,9 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
     :param use_best_results: CKF parameter for useBestNInSeed
     :param use_best_seeds: CKF parameter for UseNStates
     """
+    if "PXDClusterizer" not in path:
+        add_pxd_reconstruction(path)
+
     if "PXDSpacePointCreator" not in path:
         path.add_module("PXDSpacePointCreator")
 

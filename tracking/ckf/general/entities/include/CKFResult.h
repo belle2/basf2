@@ -22,9 +22,9 @@ namespace Belle2 {
   /**
    * Object for temporary storage of a CKF tree search result.
    * It stores the seed together with the associated hits and a chi2 value.
-   * Additionally, it has a storage option for a weight, which can be used to transport e.g. MC information
-   * to the filters.
    * This object will not be stored to the DataStore, but is only for internal usage.
+   *
+   * All sub-detector CKFs should inherit their own object from this.
    */
   template <class ASeed, class AHit>
   class CKFResult {

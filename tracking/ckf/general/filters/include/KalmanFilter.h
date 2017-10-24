@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <genfit/MeasuredStateOnPlane.h>
 
 namespace Belle2 {
   template <class AState, class AKalmanStepper>

@@ -25,5 +25,3 @@ with tempfile.TemporaryDirectory() as tempdir:
     assert(0 == os.system("basf2 " + reco_steering))
     # Check if there are 10 events in the file
     assert(0 == os.system("check_basf2_file -n10 evtgen_bbar.root"))
-
-    shutil.rmtree(tempdir)

@@ -596,7 +596,6 @@ class SavePullAnalysisRefiner(Refiner):
                tdirectory=None,
                groupby_part_name=None,
                groupby_value=None,
-               stackby=None,
                **kwds):
 
         replacement_dict = dict(

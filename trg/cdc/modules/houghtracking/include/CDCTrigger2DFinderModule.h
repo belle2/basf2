@@ -19,8 +19,6 @@
 
 #include <root/TVector2.h>
 
-#include <trg/cdc/modules/houghtracking/CDCTrigger2DFinderFirmware.h>
-
 namespace Belle2 {
   /** Pair of <iSuperLayer, (x, y)>, for hits in conformal space */
   typedef std::pair<unsigned short, TVector2> cdcPair;
@@ -71,10 +69,8 @@ namespace Belle2 {
             a.getCoord().first.Y() == b.getCoord().first.Y());
   }
 
-  /* class CDCTrigger2DFinderFirmware; */
 
   class CDCTrigger2DFinderModule : public Module {
-    friend class CDCTrigger2DFinderFirmware;
   public:
     /** Constructor.  */
     CDCTrigger2DFinderModule();
@@ -250,8 +246,6 @@ namespace Belle2 {
     double radius[9][2];
     /** Number of track segments up to super layer */
     unsigned TSoffset[10];
-    /** Firmware simulation instance */
-    CDCTrigger2DFinderFirmware firmware;
   };//end class declaration
 } // end namespace Belle2
 

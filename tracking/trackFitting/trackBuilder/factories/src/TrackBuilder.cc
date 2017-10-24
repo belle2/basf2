@@ -117,17 +117,19 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
   }
 
   B2DEBUG(100, "Number of fitted hypothesis = " << newTrack.getNumberOfFittedHypotheses());
-  if (newTrack.getNumberOfFittedHypotheses() == 0) {
-    // Do not store the track if there are no fitted hypotheses.
-    return false;
-  }
-
-  Track* addedTrack = tracks.appendNew(newTrack);
-  addedTrack->addRelationTo(&recoTrack);
-  const MCParticle* mcParticle = recoTrack.getRelated<MCParticle>(m_mcParticleColName);
-  if (mcParticle) {
-    B2DEBUG(200, "Relation to MCParticle set.");
-    addedTrack->addRelationTo(mcParticle);
+  if (newTrack.getNumberOfFittedHypotheses() > 0) {
+    Track* addedTrack = tracks.appendNew(newTrack);
+    addedTrack->addRelationTo(&recoTrack);
+    const MCParticle* mcParticle = recoTrack.getRelated<MCParticle>(m_mcParticleColName);
+    if (mcParticle) {
+      B2DEBUG(200, "Relation to MCParticle set.");
+      addedTrack->addRelationTo(mcParticle);
+    } else {
+      B2DEBUG(200, "Relation to MCParticle not set. No related MCParticle to RecoTrack.");
+    }
+    // false positive due to new with placement (cppcheck issue #7163)
+    // cppcheck-suppress memleak
+    return true;
   } else {
     B2DEBUG(200, "Relation to MCParticle not set. No related MCParticle to RecoTrack.");
   }

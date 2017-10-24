@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Moritz Gelb                                 *
+ * Contributors: Fernando Abudinen, Moritz Gelb                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -948,7 +948,7 @@ namespace Belle2 {
           || extraInfoName == "isRightCategory(SlowPion)" || extraInfoName == "isRightCategory(FastPion)" || extraInfoName == "isRightCategory(KaonPion)" || extraInfoName == "isRightCategory(Lambda)"
           || extraInfoName == "isRightCategory(MaximumPstar)" || extraInfoName == "isRightCategory(FSC)"))
           {
-            B2FATAL("hasHighestProbInCat: Not available category" << extraInfoName <<
+            B2FATAL("HighestProbInCat: Not available category" << extraInfoName <<
             ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda."
             << endl <<
             "The possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
@@ -1376,7 +1376,7 @@ namespace Belle2 {
                     target_prob = particlei->getExtraInfo(isRightTrack[indexRightTrack]);
                   }
                 }
-                if (prob > maximumTargetProb) {
+                if (target_prob > maximumTargetProb) {
                   maximumTargetProb = target_prob;
                   target = particlei;
                 }

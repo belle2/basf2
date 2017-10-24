@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Generates random EKLM displacement data.
+# Study of EKLM alignment limits.
 
 import os
 import random
@@ -17,12 +17,10 @@ eventinfosetter.param('evtNumList', [1])
 # XML reader
 xmldata = register_module('Gearbox')
 
-# EKLM alignment
-eklmalignment = register_module('EKLMAlignment')
-eklmalignment.param('Mode', 'FixedSector')
-eklmalignment.param('SectorDx', 1.)
-eklmalignment.param('SectorDy', 0)
-eklmalignment.param('SectorDalpha', 0)
+# EKLM displacement generator
+eklmalignment = register_module('EKLMDisplacementGenerator')
+eklmalignment.param('Mode', 'Limits')
+eklmalignment.param('OutputFile', 'EKLMAlignmentLimits.root')
 
 # Create main path
 main = create_path()

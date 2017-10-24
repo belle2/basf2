@@ -11,6 +11,8 @@
 #include <tracking/ckf/findlets/vxdToCDC/VXDToCDCCKFFindlet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
+#include <tracking/ckf/utilities/ClassMnemomics.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

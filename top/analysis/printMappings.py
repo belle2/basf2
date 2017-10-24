@@ -11,7 +11,7 @@ import sys
 # Usage:  basf2 top/analysis/printMappings.py
 #
 # The filename of the main xml file can be specified as an optional argument
-#   example: basf2 top/analysis/printMapElectronicChToPixels.py testbeam/top/LEPS2013-6/TOP.xml
+#   example: basf2 top/analysis/printMappings.py testbeam/top/LEPS2013-6/TOP.xml
 #            (hint: omit 'data' from the path)
 # ---------------------------------------------------------------------------
 

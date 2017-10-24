@@ -69,7 +69,7 @@ namespace Belle2 {
     /** Stores a Belle2 Track from a Reco Track.
      *
      * Every fitted hypothesis will be extrapolated to the perigee and stored as a TrackFitResult when the fit and the
-     * extrapolation were successful. We will only create a Track mdst object, when we are sure that we have a valid
+     * extrapolation were successful. We will only create a Track mdst object, when we are sure that we have at least one valid
      * hypothesis available. If we do not have this, we discard the track no matter what.
      *
      * The StoreArrayIndex is stored in the Belle2 Track, no relation is set.

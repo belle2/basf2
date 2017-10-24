@@ -733,9 +733,10 @@ namespace Belle2 {
     void GeometryPar::readAlignmentFromDB()
     {
       DBObjPtr<BKLMAlignment> bklmAlignments;
-      if (!bklmAlignments.isValid())
-        B2ERROR("No BKLM alignment data.");
-
+      if (!bklmAlignments.isValid()) {
+        B2INFO("No BKLM alignment data.");
+        return;
+      }
 
       for (int fb = BKLM_FORWARD; fb <= BKLM_BACKWARD; ++fb) {
         bool isForward = (fb == BKLM_FORWARD);

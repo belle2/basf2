@@ -12,6 +12,7 @@
 #define EKLMDATABASEIMPORTER_H
 
 /* Belle2 headers. */
+#include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/dbobjects/EKLMChannels.h>
 #include <framework/database/DBImportObjPtr.h>
 
@@ -76,10 +77,49 @@ namespace Belle2 {
      */
     void importChannelData();
 
+    /**
+     * Load default displacement data (zeros).
+     */
+    void loadDefaultDisplacement();
+
+    /**
+     * Set sector displacement.
+     * @param[in] endcap Endcap number.
+     * @param[in] layer  Layer number.
+     * @param[in] sector Sector number.
+     * @param[in[ dx     dx.
+     * @param[in] dy     dy.
+     * @param[in] dalpha dalpha.
+     */
+    void setSectorDisplacement(int endcap, int layer, int sector,
+                               float dx, float dy, float dalpha);
+
+    /**
+     * Set segment displacement.
+     * @param[in] endcap  Endcap number.
+     * @param[in] layer   Layer number.
+     * @param[in] sector  Sector number.
+     * @param[in] plane   Plane number.
+     * @param[in] segment Segment number.
+     * @param[in] dx      dx.
+     * @param[in] dy      dy.
+     * @param[in] dalpha  dalpha.
+     */
+    void setSegmentDisplacement(int endcap, int layer, int sector, int plane,
+                                int segment, float dx, float dy, float dalpha);
+
+    /**
+     * Import displacement data.
+     */
+    void importDisplacement();
+
   private:
 
     /** Channel data. */
     DBImportObjPtr<EKLMChannels> m_Channels;
+
+    /** Displacement. */
+    DBImportObjPtr<EKLMAlignment> m_Displacement;
 
     /** Low experiment. */
     int m_ExperimentLow;

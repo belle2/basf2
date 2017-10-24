@@ -14,11 +14,7 @@
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorMC.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRandom.h>
-#include <framework/logging/Logger.h>
 #include <geometry/bfieldmap/BFieldMap.h>
-#include <math.h>
-#include <numeric>
-
 
 using namespace Belle2;
 

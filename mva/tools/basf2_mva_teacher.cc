@@ -9,12 +9,9 @@
  **************************************************************************/
 
 #include <mva/interface/Interface.h>
-#include <mva/interface/Options.h>
 #include <mva/utility/Utility.h>
 
 #include <iostream>
-#include <string>
-#include <cerrno>
 
 namespace po = boost::program_options;
 using namespace Belle2::MVA;

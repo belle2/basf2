@@ -28,13 +28,9 @@ V0Fitter::V0Fitter(const std::string& trackFitResultColName, const std::string& 
 }
 
 void V0Fitter::initializeCuts(double beamPipeRadius,
-                              double vertexChi2CutInside,
-                              double massWindowKshortInside,
                               double vertexChi2CutOutside)
 {
   m_beamPipeRadius = beamPipeRadius;
-  m_vertexChi2CutInside = vertexChi2CutInside;
-  m_massWindowKshortInside = massWindowKshortInside;
   m_vertexChi2CutOutside = vertexChi2CutOutside;
 }
 
@@ -143,7 +139,7 @@ std::pair<Const::ParticleType, Const::ParticleType> V0Fitter::getTrackHypotheses
 }
 
 bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
-                           const Const::ParticleType& v0Hypothesis)  // TODO: Give Particle Types
+                           const Const::ParticleType& v0Hypothesis)
 {
   const auto trackHypotheses = getTrackHypotheses(v0Hypothesis);
 
@@ -152,14 +148,38 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     B2ERROR("No RecoTrack for Belle2::Track");
     return false;
   }
-  genfit::Track& gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
+  genfit::Track gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
 
   RecoTrack* recoTrackMinus = trackMinus->getRelated<RecoTrack>(m_RecoTrackColName);
   if (not recoTrackMinus) {
     B2ERROR("No RecoTrack for Belle2::Track");
     return false;
   }
-  genfit::Track& gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
+  genfit::Track gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
+
+  //if existing, pass to the genfit::Track the correct cardinal representation
+  std::vector<genfit::AbsTrackRep*> repsPlus = gfTrackPlus.getTrackReps();
+  std::vector<genfit::AbsTrackRep*> repsMinus = gfTrackMinus.getTrackReps();
+  if (repsPlus.size() == repsMinus.size()) {
+    for (unsigned int id = 0; id < repsPlus.size(); id++) {
+      if (repsPlus[id]->getPDG() == trackHypotheses.first.getPDGCode())
+        gfTrackPlus.setCardinalRep(id);
+      if (repsMinus[id]->getPDG() == trackHypotheses.second.getPDGCode())
+        gfTrackMinus.setCardinalRep(id);
+    }
+  }
+  //the two vectors should always have the same size, and this never happen
+  else {
+    for (unsigned int id = 0; id < repsPlus.size(); id++) {
+      if (repsPlus[id]->getPDG() == trackHypotheses.first.getPDGCode())
+        gfTrackPlus.setCardinalRep(id);
+    }
+    for (unsigned int id = 0; id < repsMinus.size(); id++) {
+      if (repsMinus[id]->getPDG() == trackHypotheses.second.getPDGCode())
+        gfTrackMinus.setCardinalRep(id);
+    }
+  }
+  //
 
   const genfit::MeasuredStateOnPlane* stPlusPtr = nullptr;
   try {
@@ -224,20 +244,8 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   // Apply cuts.  We have one set of cuts inside the beam pipe,
   // the other outside.
   if (posVert.Perp() < m_beamPipeRadius) {
-    if (v0Hypothesis == Const::photon) {
-      return false;  // No converions inside beampipe
-    }
+    return false;
 
-    if (vert.getChi2() > m_vertexChi2CutInside) {
-      B2DEBUG(200, "Vertex inside beam pipe, chi^2 too large.");
-      return false;
-    }
-
-    const double mReco = (lv0 + lv1).M();
-    if (v0Hypothesis == Const::Kshort and fabs(mReco - Const::K0Mass) > m_massWindowKshortInside * Unit::MeV) {
-      B2DEBUG(200, "Vertex inside beam pipe, outside Kshort mass window.");
-      return false;
-    }
   } else {
     if (vert.getChi2() > m_vertexChi2CutOutside) {
       B2DEBUG(200, "Vertex outside beam pipe, chi^2 too large.");

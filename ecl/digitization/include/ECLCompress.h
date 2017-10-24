@@ -28,8 +28,9 @@ namespace Belle2 {
     BitStream(): _pos(0) {}
 
     // constructor with reserved space -- for packing
-    BitStream(int n): _pos(0), _store(n)
+    BitStream(int n): _pos(0)
     {
+      _store.resize(n);
       memset(_store.data(), 0, _store.size()*sizeof(unsigned int));
     }
 
@@ -82,11 +83,19 @@ namespace Belle2 {
   };
 
   class ECLBaseCompress: public ECLCompress {
+  public:
     void compress(BitStream& out, const int* adc);
     void uncompress(BitStream& out, int* adc);
   };
 
   class ECLDeltaCompress: public ECLCompress {
+  public:
+    void compress(BitStream& out, const int* adc);
+    void uncompress(BitStream& out, int* adc);
+  };
+
+  class ECLDCTCompress: public ECLCompress {
+  public:
     void compress(BitStream& out, const int* adc);
     void uncompress(BitStream& out, int* adc);
   };

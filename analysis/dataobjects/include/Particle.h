@@ -159,7 +159,7 @@ namespace Belle2 {
     Particle(const int trackArrayIndex,
              const TrackFitResult* trackFit,
              const Const::ChargedStable& chargedStable,
-             const Const::ChargedStable& charegdStableUsedForFit);
+             const Const::ChargedStable& chargedStableUsedForFit);
 
     /**
      * Constructor of a photon from a reconstructed ECL cluster that is not matched to any charged track.

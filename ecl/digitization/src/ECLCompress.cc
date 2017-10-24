@@ -212,7 +212,7 @@ void ECLDCTCompress::uncompress(BitStream& in, int* adc)
   for (int k = 0; k < N; k++) adc[k] = lrint(out[k]);
 }
 
-ECLCompress* selectAlgo(int compAlgo)
+ECLCompress* Belle2::selectAlgo(int compAlgo)
 {
   ECLCompress* comp = NULL;
   if (compAlgo == 1) {

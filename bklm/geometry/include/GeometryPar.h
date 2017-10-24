@@ -348,7 +348,7 @@ namespace Belle2 {
       //! Get the pointer to the definition of a module
       const Module* findModule(int layer, bool hasChimney) const;
 
-      //! Get the alignmention transformation of a module
+      //! Get the alignment transformation of a module
       const HepGeom::Transform3D getModuleAlignment(bool isForward, int sector, int layer) const;
 
     private:

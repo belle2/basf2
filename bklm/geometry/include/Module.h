@@ -163,7 +163,7 @@ namespace Belle2 {
       double getZStrip(const CLHEP::Hep3Vector& p) const { return p.z() / m_ZStripWidth + m_ZPositionBase; }
 
       //! Transform space-point within this module from local to global coordinates
-      //! @param reco set transformation for reconstruction (true) or nominal (false)
+      //! @param reco set transformation for reconstruction including alignment correctoin (true) or nominal without alignment correction (false)
       const CLHEP::Hep3Vector localToGlobal(const CLHEP::Hep3Vector& v, bool reco = false) const;
 
       //! Rotate a vector from global to local system
@@ -173,7 +173,7 @@ namespace Belle2 {
       const CLHEP::Hep3Vector RotateToGlobal(const CLHEP::Hep3Vector& v) const { return m_Rotation * v;  }
 
       //! Transform space-point within this module from global to local coordinates
-      //! @param reco set transformation for reconstruction (true) or nominal (false)
+      //! @param reco set transformation for reconstruction including alignment correctoin (true) or nominal without alignment correction (false)
       const CLHEP::Hep3Vector globalToLocal(const CLHEP::Hep3Vector& v,  bool reco = false) const;
 
       //! Return the local-coordinate real-vs-ideal translation of this module's sensitive volume; nominally (0,0,0)

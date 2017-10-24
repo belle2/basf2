@@ -79,7 +79,6 @@ namespace Belle2 {
       for (std::map<int, Module*>::iterator m = m_Modules.begin(); m != m_Modules.end(); ++m) { delete m->second; }
       m_Modules.clear();
 
-      //for (std::map<int, HepGeom::Transform3D>::iterator m = m_Alignments.begin(); m != m_Alignments.end(); ++m) { delete m->second; }
       m_Alignments.clear();
     }
 

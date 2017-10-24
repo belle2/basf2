@@ -201,7 +201,7 @@ namespace Belle2 {
         v3D.transform(m_alignment);
         CLHEP::Hep3Vector vlocal(v3D.x(), v3D.y(), v3D.z()); // to nomial local
         return m_Rotation * vlocal + m_GlobalOrigin;
-      } else return m_Rotation * v + m_GlobalOrigin;
+      } else return m_Rotation * v + m_GlobalOrigin; //to global
     }
 
     const CLHEP::Hep3Vector Module::globalToLocal(const CLHEP::Hep3Vector& v, bool reco) const

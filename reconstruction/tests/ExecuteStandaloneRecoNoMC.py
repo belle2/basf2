@@ -15,8 +15,7 @@ evtgen_steering = Belle2.FileSystem.findFile('reconstruction/tests/evtgen_no_mc.
 reco_steering = Belle2.FileSystem.findFile('reconstruction/tests/reco.py_noexec')
 
 # create and move to temporary directory
-tempdir = tempfile.mkdtemp()
-
+tempdir = tempfile.TemporaryDirectory()
 print("Moving to temporary directory " + str(tempdir))
 os.chdir(tempdir)
 

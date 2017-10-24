@@ -49,7 +49,7 @@ bool PXDResultTruthVarSet::extract(const CKFToPXDResult* result)
   var<named("truth_number_of_mc_svd_hits")>() = mcTrack->getNumberOfSVDHits();
   var<named("truth_number_of_mc_cdc_hits")>() = mcTrack->getNumberOfCDCHits();
 
-  var<named("truth")>() = static_cast<double>(numberOfCorrectHits) / (static_cast<double>(mcTrack->getNumberOfPXDHits()) / 2);
+  var<named("truth")>() = static_cast<double>(numberOfCorrectHits) / static_cast<double>(mcTrack->getNumberOfPXDHits());
 
   return true;
 }

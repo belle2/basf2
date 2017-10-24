@@ -4,12 +4,10 @@ env['LIBS'] = ['framework',
                'cdc',
                'cdc_dataobjects',
                'trg_cdc_dataobjects',
-               '',
-               'dl',
-               'rt']
+               '']
                
 loader = SharedObject(target='xsi_loader.o', source='src/xsi_loader.cpp', CPPPATH=['include'])
-env.Append(LIBS=loader)
+env.Append(LIBS=[loader, 'dl', 'rt'])
 
 # env['ENV']['LD_LIBRARY_PATH'] += ':/home/belle2/tasheng/Vivado_2017.2/lib/lnx64.o/'
 Return('env')

@@ -99,5 +99,7 @@ namespace Belle2 {
     void compress(BitStream& out, const int* adc);
     void uncompress(BitStream& out, int* adc);
   };
+
+  ECLCompress* selectAlgo(int compAlgo);
 }
 #endif

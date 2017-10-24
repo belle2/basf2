@@ -360,12 +360,11 @@ namespace Belle2 {
         if (m_trackHypothesis == 0)
           pdgCode = get<c_PListPDGCode>(track2Plist);
         else pdgCode = m_trackHypothesis;
-        //
         Const::ChargedStable type(abs(pdgCode));
 
         // load the TrackFitResult for the requested particle or if not available use
         // the one with the closest mass
-        const auto trackFit = track->getTrackFitResultWithClosestMass(type);
+        const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(type);
 
         if (!trackFit) {
           B2WARNING("Track returned null TrackFitResult pointer for ChargedStable::getPDGCode()  = " << type.getPDGCode());

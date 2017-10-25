@@ -26,7 +26,7 @@ AddVXDTrackCandidateSubSetsModule::AddVXDTrackCandidateSubSetsModule() : Module(
   addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray.", m_nameSpacePointTrackCands);
   addParam("MinOriginalSpacePoints", m_minOriginalSpacePoints,
            "Minimal number of SpacePoints required for the original SpacePointTrackCandidate to create subsets from it."
-           "Should be at least for, so that the subsets have 3 SpacePoints.",
+           " Should be at least 4, so that the subsets have 3 SpacePoints.",
            m_minOriginalSpacePoints);
 }
 

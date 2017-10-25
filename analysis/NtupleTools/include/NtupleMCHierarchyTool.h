@@ -31,15 +31,7 @@ namespace Belle2 {
     /** Great Grand Mother ID. */
     int* m_iGDGDMotherID;
 
-    /** Mother ID. 1 */
-    int* m_iMotherID1;
-    /** Grand Mother ID. 1 */
-    int* m_iGDMotherID1;
-    /** Great Grand Mother ID. 1 */
-    int* m_iGDGDMotherID1;
-    /** MC Info */
-    int* m_iMCINFO;
-
+    /** Flag is true if InterMediate option is used, False if not used. */
     bool m_InterMediate;
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
@@ -48,7 +40,7 @@ namespace Belle2 {
     /** Constuctor. */
     NtupleMCHierarchyTool(TTree* tree, DecayDescriptor& decaydescriptor,
                           const std::string& strOptions)
-      : NtupleFlatTool(tree,  decaydescriptor, strOptions)
+      : NtupleFlatTool(tree, decaydescriptor, strOptions)
     {
       m_InterMediate = false;
       setupTree();

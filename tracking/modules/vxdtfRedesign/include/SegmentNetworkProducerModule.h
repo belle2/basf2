@@ -244,7 +244,7 @@ namespace Belle2 {
     FiltersContainer<SpacePoint>& m_filtersContainer = FiltersContainer<SpacePoint>::getInstance();
 
     /** pointer to the current filter, contains all sectorCombinations and Filters including cuts. */
-    // WARNING: the pointer will change if the DB object is upated!
+    // WARNING: the pointer will change if the DB object is updated!
     VXDTFFilters<SpacePoint>* m_vxdtfFilters = nullptr;
 
     /** contains storeArrays with SpacePoints in it */

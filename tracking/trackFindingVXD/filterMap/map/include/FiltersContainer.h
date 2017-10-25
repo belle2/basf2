@@ -3,8 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                                   *
  *                                                                              *
  * Author: The Belle II Collaboration                                           *
- * Contributors: Eugenio Paoloni                                                *
- *               Thomas Lueck                                                   *
+ * Contributors: Eugenio Paoloni,  Thomas Lueck                                 *
  *                                                                              *
  * This software is provided "as is" without any warranty.                      *
  *******************************************************************************/

@@ -230,6 +230,7 @@ namespace Belle2 {
      * The returned value is now dependent of vCluster and valid only for this cluster!
      * This is only relevant for wedged/slanted sensors because of their trapezoidal shape, for rectangular shapes, the value does not change
      *
+     * function kept only for backward compatibility with VXDTF1
      */
     static double getUWedged(const std::pair<double, double>& hitLocalUnwedged, VxdID vxdID,
                              const VXD::SensorInfoBase* aSensorInfo = nullptr)

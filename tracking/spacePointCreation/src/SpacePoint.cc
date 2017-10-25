@@ -76,6 +76,10 @@ SpacePoint::SpacePoint(std::vector<const SVDCluster*>& clusters,
       m_clustersAssigned.first = true;
       uCoord = aCluster->getPosition();
       uSigma = aCluster->getPositionSigma();
+
+      if ((aSensorInfo->getBackwardWidth() > aSensorInfo->getForwardWidth()) == true) // isWedgeSensor
+        uCoord = aCluster->getPosition(vCoord);
+
     } else {
       m_clustersAssigned.second = true;
       vCoord = aCluster->getPosition();
@@ -83,14 +87,9 @@ SpacePoint::SpacePoint(std::vector<const SVDCluster*>& clusters,
     }
   }
 
-  if ((aSensorInfo->getBackwardWidth() > aSensorInfo->getForwardWidth()) == true) { // isWedgeSensor
-    double uWedged = getUWedged({ uCoord, vCoord } , m_vxdID, aSensorInfo);
-    m_position = aSensorInfo->pointToGlobal(TVector3(uWedged, vCoord, 0));
-    m_normalizedLocal = convertLocalToNormalizedCoordinates({ uWedged, vCoord } , m_vxdID, aSensorInfo);
-  } else { //Point is not on a wedge sensor.
-    m_position = aSensorInfo->pointToGlobal(TVector3(uCoord, vCoord, 0));
-    m_normalizedLocal = convertLocalToNormalizedCoordinates({ uCoord, vCoord } , m_vxdID, aSensorInfo);
-  }
+
+  m_position = aSensorInfo->pointToGlobal(TVector3(uCoord, vCoord, 0));
+  m_normalizedLocal = convertLocalToNormalizedCoordinates({ uCoord, vCoord } , m_vxdID, aSensorInfo);
 
   // if sigma for a coordinate is not known, a uniform distribution over the whole sensor is asumed:
   if (uSigma < 0) {

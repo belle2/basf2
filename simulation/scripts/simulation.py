@@ -49,7 +49,7 @@ def add_PXDDataReduction(path, components, use_vxdtf2=True,
 
     add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2, svd_cluster='__ROIsvdClusters')
 
-    pxdDataRed = register_module('PXDDataReduction')
+    pxdDataRed = register_module('PXDROIFinder')
     param_pxdDataRed = {
         'recoTrackListName': svd_reco_tracks,
         'PXDInterceptListName': 'PXDIntercepts',

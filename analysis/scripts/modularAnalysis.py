@@ -547,8 +547,8 @@ def fillSignalSideParticleList(outputListName, decayString, path):
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False,
-                      enforceFitHypothesis=False,
-                      path=analysis_main):
+                      path=analysis_main,
+                      enforceFitHypothesis=False):
     """
     Creates Particles of the desired types from the corresponding MDST dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
@@ -574,12 +574,12 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      wether RootOutput module should save the created ParticleList
+    @param path          modules are added to this path
     @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
                                 using a mass hypothesis of the exact type passed to fillParticleLists().
                                 If enforceFitHypothesis is False (the default) the next closest fit hypothesis
                                 in terms of mass difference will be used if the fit using exact particle
                                 type is not available.
-    @param path          modules are added to this path
     """
 
     pload = register_module('ParticleLoader')
@@ -594,8 +594,8 @@ def fillParticleList(
     decayString,
     cut,
     writeOut=False,
-    enforceFitHypothesis=False,
     path=analysis_main,
+    enforceFitHypothesis=False
 ):
     """
     Creates Particles of the desired type from the corresponding MDST dataobjects,
@@ -618,12 +618,12 @@ def fillParticleList(
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      wether RootOutput module should save the created ParticleList
+    @param path          modules are added to this path
     @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
                                 using a mass hypothesis of the exact type passed to fillParticleLists().
                                 If enforceFitHypothesis is False (the default) the next closest fit hypothesis
                                 in terms of mass difference will be used if the fit using exact particle
                                 type is not available.
-    @param path          modules are added to this path
     """
 
     pload = register_module('ParticleLoader')

@@ -40,7 +40,7 @@ namespace Belle2 {
     void addSubCandidates(int iCand);
 
     /** Name of input StoreArray containing SpacePointTrackCands */
-    std::string m_nameSpacePointTrackCands;
+    std::string m_nameSpacePointTrackCands = std::string("");
 
 
     // member variables
@@ -48,7 +48,10 @@ namespace Belle2 {
     /** tool for creating SPTCs, fills storeArray directly */
     SpacePointTrackCandCreator<StoreArray<Belle2::SpacePointTrackCand>> m_sptcCreator;
 
-    /** StoreArray for input SpacePointTrackCands*/
+    /** StoreArray for input SpacePointTrackCands */
     StoreArray<SpacePointTrackCand> m_spacePointTrackCands;
+
+    /** Minimal number of SPs of the original SPTC */
+    int m_minOriginalSpacePoints = 4;
   };
 }

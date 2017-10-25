@@ -23,7 +23,11 @@ AddVXDTrackCandidateSubSetsModule::AddVXDTrackCandidateSubSetsModule() : Module(
   setDescription("Module that creates additional candidates that each miss a different SpacePoint.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray.", std::string(""));
+  addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray.", m_nameSpacePointTrackCands);
+  addParam("MinOriginalSpacePoints", m_minOriginalSpacePoints,
+           "Minimal number of SpacePoints required for the original SpacePointTrackCandidate to create subsets from it."
+           "Should be at least for, so that the subsets have 3 SpacePoints.",
+           m_minOriginalSpacePoints);
 }
 
 void AddVXDTrackCandidateSubSetsModule::initialize()
@@ -50,8 +54,9 @@ void AddVXDTrackCandidateSubSetsModule::addSubCandidates(int iCand)
 {
   auto sptc = m_spacePointTrackCands[iCand];
   int nHits = sptc->getNHits();
+
   // minimum length of subset track candidate is 3, thus original track should have at least 4
-  if (nHits < 4) return;
+  if (nHits < m_minOriginalSpacePoints) return;
 
   for (int iHit = 0; iHit < nHits; ++iHit) {
     std::vector<const SpacePoint*> tmp = sptc->getHits();

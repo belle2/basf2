@@ -236,15 +236,3 @@ class MCSideTrackingValidationModule(basic_mc_side_module.BasicMCSideTrackingVal
         # renaming quantity to name that is more suitable for display
         select=dict(hit_efficiency_in_all_found="total hit efficiency in all reconstructed tracks for missing mc tracks")
     )
-
-
-class ExpertMCSideTrackingValidationModule(MCSideTrackingValidationModule):
-    """Module to collect more matching information about the found particles and to generate
-       validation plots and figures of merit on the performance of track finding. This module
-       gives information on the number of hits etc. """
-
-    def __init__(self, *args, **kwds):
-        """Constructor issuing a deprecation warning"""
-        warnings.warn("ExpertMCSideTrackingValidationModule is depricated for MCSideTrackingValidationModule",
-                      DeprecationWarning)
-        super().__init__(*args, **kwds)

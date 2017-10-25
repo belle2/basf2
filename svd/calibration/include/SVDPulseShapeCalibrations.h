@@ -32,9 +32,13 @@ namespace Belle2 {
   public:
     static std::string name;
     typedef SVDCalibrationsBase< SVDCalibrationsVector< SVDStripCalAmp > > t_payload;
+    static std::string time_name;
+    typedef SVDCalibrationsBase< SVDCalibrationsVector< float > > t_time_payload;
 
     /** Constructor, no input argument is required */
-    SVDPulseShapeCalibrations(): m_aDBObjPtr(name)
+    SVDPulseShapeCalibrations()
+      : m_aDBObjPtr(name)
+      , m_time_aDBObjPtr(time_name)
     {}
 
     /** Return the charge (number of electrons/holes) collected on a specific
@@ -155,6 +159,25 @@ namespace Belle2 {
 
     }
 
+    /** Return the time shift to be applied to the basic time estimator
+     * (weighted average of the time)
+     *
+     * Input:
+     * @param sensorID: identity of the sensor for which the
+     * calibration is required
+     * @param isU: sensor side, true for p side, false for n side
+     * @param strip: strip number
+     *
+     * Output: a float number corresponding to the time shift width in ns.
+     */
+    inline float getTimeShiftCorrection(const VxdID& sensorID, const bool& isU,
+                                        const unsigned short& strip) const
+    {
+      return m_time_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                                   m_time_aDBObjPtr->sideIndex(isU), strip);
+
+    }
+
 
   private:
 
@@ -176,6 +199,7 @@ namespace Belle2 {
 
   private:
     DBObjPtr< t_payload > m_aDBObjPtr;
+    DBObjPtr< t_time_payload > m_time_aDBObjPtr;
 
   };
 }

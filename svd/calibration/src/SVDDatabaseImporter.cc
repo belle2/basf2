@@ -48,6 +48,7 @@ void SVDDatabaseImporter::importSVDPulseShapeCalibrations()
 {
 
   DBImportObjPtr<SVDPulseShapeCalibrations::t_payload > svdPulseShapeCal(SVDPulseShapeCalibrations::name);
+  DBImportObjPtr<SVDPulseShapeCalibrations::t_time_payload > svdTimeShiftCal(SVDPulseShapeCalibrations::time_name);
 
   /*
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,

@@ -80,10 +80,9 @@ namespace Belle2 {
      * for the correponding input charge, on the given strip.
      * The output is capped at 255.
      */
-    // it was previously defined as unsigned char, but not working
     inline long int getADCFromCharge(
       const Belle2::VxdID& sensorID,
-      const bool& isU, const unsigned char& strip,
+      const bool& isU, const unsigned short& strip,
       const double& charge) const
     {
       return roundl(charge * getGain(sensorID, isU, strip));
@@ -108,7 +107,7 @@ namespace Belle2 {
 
     inline unsigned char getCappedADCFromCharge(
       const Belle2::VxdID& sensorID,
-      const bool& isU, const unsigned char& strip,
+      const bool& isU, const unsigned short& strip,
       const double& charge) const
     {
       auto chargeLongInt = getADCFromCharge(sensorID, isU, strip, charge);

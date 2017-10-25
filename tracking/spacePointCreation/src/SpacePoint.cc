@@ -100,6 +100,14 @@ SpacePoint::SpacePoint(std::vector<const SVDCluster*>& clusters,
   }
 
   setPositionError(uSigma, vSigma, aSensorInfo);
+
+  //retrieve and set hit times
+  for (const SVDCluster* aCluster : clusters)
+    if (aCluster->isUCluster() == true)
+      m_UClusterTime = aCluster->getClsTime();
+    else
+      m_VClusterTime = aCluster->getClsTime();
+
 }
 
 

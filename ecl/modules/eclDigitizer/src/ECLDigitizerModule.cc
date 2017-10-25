@@ -132,8 +132,10 @@ int ECLDigitizerModule::shapeSignals()
     double hitE       = hit.getEnergyDep() * m_calib[j].ascale / Unit::GeV;
     double hitTimeAve = (hit.getFlightTime() + m_calib[j].tshift + eclp->time2sensor(j, hit.getPosition())) / Unit::us;
     if (m_HadronPulseShape == true) {
-      m_adc[j].AddHit(hitE - hit.getHadronEnergyDep(), hitTimeAve + timeOffset, m_ss[2]);
-      m_adc[j].AddHit(hit.getHadronEnergyDep(), hitTimeAve + timeOffset, m_ss[3]);//Had Comp
+      double hitHadronE       = hit.getHadronEnergyDep() * m_calib[j].ascale / Unit::GeV;
+      m_adc[j].AddHit(hitE - hitHadronE, hitTimeAve + timeOffset, m_ss[2]);//Gamma Component
+      m_adc[j].AddHit(hitHadronE, hitTimeAve + timeOffset, m_ss[3]); //Hadron Component
+      m_adc[j].totalHadron += hit.getHadronEnergyDep();
     } else {
       m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
     }
@@ -362,7 +364,7 @@ void ECLDigitizerModule::readDSPDB()
 
   // at the moment there is only one sampled signal shape in the pool
   // since all shaper parameters are the same for all crystals
-  m_ss.resize(5);
+  m_ss.resize(4);
   float MP[10]; eclWFData->getWaveformParArray(MP);
   m_ss[0].InitSample(MP, 27.7221);
   // parameters vector from ps.dat file, time offset 0.5 usec added to
@@ -371,20 +373,37 @@ void ECLDigitizerModule::readDSPDB()
   // double crystal_params[10] = {0.5, 0.301298, 0.631401, 0.470911, 0.903988, -0.11734200/19.5216, 2.26567, 0.675393, 0.683995, 0.0498786};
   // m_ss[0].InitSample(crystal_params, 0.9999272*19.5216);
   for (int i = 0; i < ec.m_nch; i++) m_tbl[i].iss = 0;
-
+//MP= 0 0.5
+//MP= 1 0.6483
+//MP= 2 0.4017
+//MP= 3 0.3741
+//MP= 4 0.8494
+//MP= 5 0.00144547
+//MP= 6 4.7071
+//MP= 7 0.8156
+//MP= 8 0.5556
+//MP= 9 0.2752
+//
+//2 0.654324
+//3 0.110699
+//4 0.606028
+//5 1.2688
+//6 0.553606
+//7 0.304011
+//8 1.2551
+//9 0.771018
+//10 0.454058
+//11 1.25524
   // one sampled diode response in the pool, parameters vector from
   // pg.dat file, time offset 0.5 usec added to have peak position with
   // parameters from ps.dat roughly in the same place as in current MC
   double diode_params[] = {0 + 0.5, 0.100002, 0.756483, 0.456153, 0.0729031, 0.3906 / 9.98822, 2.85128, 0.842469, 0.854184, 0.110284};
   m_ss[1].InitSample(diode_params, 0.9569100 * 9.98822);
-  double gamma_params_forPSD[] = {0.499906, 0.648324, 0.401711, 0.374167, 0.849417, 0.00144548, 4.70722, 0.815639, 0.555605, 0.305984};
-  m_ss[2].InitSample(gamma_params_forPSD, 27.7475);
-  double psd_params_forPSD[] = {0.578584, 0.394909, 0.50894, 1.40039, 0.483784, 0.158565, 1.29454, 0.713439, 0.442915, 0.958359};
-  m_ss[3].InitSample(psd_params_forPSD, 48.6204);
-  double diode_params_forPSD[] = {0.755178, 0.381177, 0.33478, 0.294525, 0.41143, 0.0531682, 1.64981, 0.687268, 0.516818, 1.19016};
-  m_ss[4].InitSample(diode_params_forPSD, 31.9312);
-  // cout << "crystalsignalshape" << endl; for (int i = 0; i < 32 * 48; i++) { cout << i << " " << m_ss[0].m_ft[i] << "\n"; }
-  // cout << "crystalsignalshape" << endl; for (int i = 0; i < 32 * 48; i++) { cout << i << " " << m_ss[0].m_ft[i] << "\n"; }
+  double gamma_params_forPSD[] = {0.5, 0.648324, 0.401711, 0.374167, 0.849417, 0.00144548, 4.70722, 0.815639, 0.555605, 0.2752};
+  m_ss[2].InitSample(gamma_params_forPSD, 27.7221);
+  double psd_params_forPSD[] = {0.654324, 0.110699, 0.606028, 1.2688, 0.553606, 0.304011, 1.2551, 0.771018, 0.454058, 1.25524};
+  m_ss[3].InitSample(psd_params_forPSD, 27.7221);
+  //cout << "crystalsignalshape" << endl; for (int i = 0; i < 32 * 48; i++) { cout << i << " " << m_ss[0].m_ft[i] << "\n"; }
   // cout <<         "diodeshape" << endl; for (int i = 0; i < 32 * 48; i++) { cout << i << " " << m_ss[1].m_ft[i] << "\n"; }
 
   B2INFO("ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");

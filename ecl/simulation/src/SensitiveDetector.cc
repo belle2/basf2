@@ -65,7 +65,6 @@ double SensitiveDetector::GetHadronIntensityFromDEDX(double x)
   if (x < 2) return 0;
   if (x > 232) return m_HadronEmissionFunction->Eval(232);
   return m_HadronEmissionFunction->Eval(x);
-  //return 0;
 }
 //
 //Return total scintillation efficiency, normalized to 1 for photons, for CsI(Tl) given ionization dEdx value.
@@ -77,8 +76,9 @@ double GetCsITlScintillationEfficiency(double x)
   const double p1 = 0.00344839;
   const double p2 = 2.0;
   double val = 1;
-  if (x > 0) val = p0 / (1 + (p1 * x) + (p2 / x));
-  if (val < 1 && x < 10) val = 1;
+  if (x > 3.9406) {
+    val = (x * p0) / (x + (p1 * x * x) + p2);
+  }
   return val;
 }
 //-----------------------------------------------------
@@ -100,7 +100,7 @@ bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   double ION_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "ionIoni",
                                       StepMaterial) / CLHEP::MeV * CLHEP::cm / 4.51;
   G4double DEDX_val = ELE_DEDX + HAD_DEDX + ION_DEDX; //2/3 should be 0;
-//
+  //
   //  return true;
   G4double edep = aStep->GetTotalEnergyDeposit();
   double LightOutputCorrection = GetCsITlScintillationEfficiency(DEDX_val);

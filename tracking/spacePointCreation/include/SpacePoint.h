@@ -60,6 +60,7 @@ namespace Belle2 {
     /** Default constructor for the ROOT IO. */
     SpacePoint() :
       m_positionError(1., 1., 1.), //TODO: Describe Design Decision for not using the default (0.,0.,0.)
+      m_UClusterTime(0.), m_VClusterTime(0.),
       m_vxdID(0), m_sensorType(VXD::SensorInfoBase::SensorType::VXD) // type is set to generic VXD
     {}
 
@@ -71,10 +72,15 @@ namespace Belle2 {
      *  @param clustersAssigned   states, if u (.first) or v (.second) is assigned.
      *  @param sensorID           VxdID of sensor the SpacePoint shall be on.
      *  @param detID              SensorType detector-type (PXD, SVD, ...) to be used.
+     *  @param UClusterTime       Time in ns of the cluster on the U side
+     *  @param VClusterTime       Time in ns of the cluster on the V side
      */
     SpacePoint(B2Vector3<double> pos, B2Vector3<double> posError, std::pair<double, double> normalizedLocal,
-               std::pair<bool, bool> clustersAssigned, VxdID sensorID, Belle2::VXD::SensorInfoBase::SensorType detID) :
-      m_position(pos), m_positionError(posError), m_normalizedLocal(normalizedLocal),
+               std::pair<bool, bool> clustersAssigned, VxdID sensorID, Belle2::VXD::SensorInfoBase::SensorType detID,
+               double UClusterTime = 0. , double VClusterTime = 0.) :
+      m_position(pos), m_positionError(posError),
+      m_normalizedLocal(normalizedLocal),
+      m_UClusterTime(UClusterTime), m_VClusterTime(VClusterTime),
       m_clustersAssigned(clustersAssigned),
       m_vxdID(sensorID), m_sensorType(detID)
     {}
@@ -119,6 +125,12 @@ namespace Belle2 {
 
     /** return the z-value of the global position of the SpacePoint */
     double Z() const { return m_position.Z(); }
+
+    /** return the time in ns of the cluster on the U side **/
+    double TimeU() const { return m_UClusterTime; }
+
+    /** return the time in ns of the cluster on the V side **/
+    double TimeV() const { return m_VClusterTime; }
 
     /** return the position vector in global coordinates */
     const B2Vector3<double>& getPosition() const { return m_position; }
@@ -314,6 +326,15 @@ namespace Belle2 {
      */
     std::pair<double, double> m_normalizedLocal;
 
+    /** Time of the cluster on the U side in ns
+     */
+    double m_UClusterTime;
+
+    /** Time of the cluster on the V side in ns
+     */
+    double m_VClusterTime;
+
+
     /** The bool value is true, when correct information of the coordinate exists.
      *
      *  .first is true, if this SpacePoint has a UCluster (only relevant for SVD, PXD always true),
@@ -345,6 +366,6 @@ namespace Belle2 {
      */
     mutable bool m_isAssigned {false};
 
-    ClassDefOverride(SpacePoint, 11)
+    ClassDefOverride(SpacePoint, 12)
   };
 }

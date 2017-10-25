@@ -41,7 +41,7 @@ vxdtf = register_module('VXDTF')
 SVD_DQM = register_module('SVDDQM')
 vxdtf_dqm = register_module('VXDTFDQM')
 trackfitter = register_module('DAFRecoFitter')
-roiprod = register_module('PXDDataReduction')
+roiprod = register_module('PXDROIFinder')
 roipayload = register_module('ROIPayloadAssembler')
 
 # create a main path

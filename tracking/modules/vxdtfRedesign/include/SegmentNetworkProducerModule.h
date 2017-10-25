@@ -240,18 +240,15 @@ namespace Belle2 {
     B2Vector3D m_virtualIPErrors;
 
     // input containers
-    /** contains all the sector to filter maps and with it the VXDTFFilters. */
+    /** reference to the container which contains all the sector to filter maps and with it the VXDTFFilters. */
     FiltersContainer<SpacePoint>& m_filtersContainer = FiltersContainer<SpacePoint>::getInstance();
 
-    /** contains all sectorCombinations and Filters including cuts. */
+    /** pointer to the current filter, contains all sectorCombinations and Filters including cuts. */
+    // WARNING: the pointer will change if the DB object is upated!
     VXDTFFilters<SpacePoint>* m_vxdtfFilters = nullptr;
 
     /** contains storeArrays with SpacePoints in it */
     std::vector<StoreArray<Belle2::SpacePoint> > m_spacePoints;
-
-    /** access to the static sectorMap, which will be used in this module */
-
-
 
     // output containers
     /** access to the DirectedNodeNetwork, which will be produced by this module */

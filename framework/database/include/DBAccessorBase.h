@@ -14,8 +14,6 @@
 #include <string>
 #include <utility>
 
-#include <iostream>
-
 class TClass;
 
 namespace Belle2 {
@@ -75,8 +73,6 @@ namespace Belle2 {
       m_ptr = m_entry->object;
       return result;
     }
-
-    void debugOutput() { std::cout << m_iov << std::endl;}
 
     /**
      * Add a callback function.

@@ -90,7 +90,7 @@ namespace Belle2 {
     {
       // case there is already a filter with this name in the container, we delete that filter!
       if (m_allSetupsFilters.count(setupName)) {
-        B2INFO("Replacing existing filter for setup name: " << setupName);
+        B2INFO("FiltersContainer: Replacing existing filter for setup name: " << setupName);
         if (m_allSetupsFilters[ setupName ] && filters != m_allSetupsFilters[ setupName ]) delete m_allSetupsFilters[ setupName ];
       }
       m_allSetupsFilters[ setupName ] = filters;

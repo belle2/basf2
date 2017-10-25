@@ -467,13 +467,9 @@ void
 SectorMapBootstrapModule::retrieveSectorMapFromDB(void)
 {
 
-  // for debugging only
-  B2WARNING("retrieve new Secmap");
-  std::cout << m_ptrDBObjPtr->getName() << std::endl;
-  std::cout << (*m_ptrDBObjPtr)->getFileName() << std::endl;
-  m_ptrDBObjPtr->debugOutput();
+  B2INFO("SectorMapBootstrapModule: retrieve new SectorMap from database. New DB file name: " << (*m_ptrDBObjPtr)->getFileName());
 
-  if (m_ptrDBObjPtr == nullptr) B2FATAL("ERROR: the pointer to the DB payload is not present!");
+  if (m_ptrDBObjPtr == nullptr) B2FATAL("ERROR: the pointer to the DB payload is not set!");
 
   TFile rootFile((*m_ptrDBObjPtr)->getFileName().c_str());
 
@@ -511,14 +507,14 @@ SectorMapBootstrapModule::retrieveSectorMapFromDB(void)
 
     rootFile.cd(setupKeyName->Data());
 
-    B2DEBUG(1, "Retrieving SectorMap with name " << setupKeyName->Data());
+    B2DEBUG(1, "SectorMapBootstrapModule: Retrieving SectorMap with name " << setupKeyName->Data());
 
     VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
 
     string setupKeyNameStd = string(setupKeyName->Data());
     segmentFilters->retrieveFromRootFile(setupKeyName);
 
-    B2DEBUG(1, "Retrieved map with name: " << setupKeyNameStd << " from rootfie.");
+    B2DEBUG(1, "SectorMapBootstrapModule: Retrieved map with name: " << setupKeyNameStd << " from rootfie.");
     filtersContainer.assignFilters(setupKeyNameStd, segmentFilters);
 
     rootFile.cd("..");

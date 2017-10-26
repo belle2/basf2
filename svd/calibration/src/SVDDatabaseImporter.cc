@@ -44,11 +44,62 @@
 using namespace std;
 using namespace Belle2;
 
+void SVDDatabaseImporter::importSVDTimeShiftCorrections()
+{
+
+  DBImportObjPtr<SVDPulseShapeCalibrations::t_time_payload > svdTimeShiftCal(SVDPulseShapeCalibrations::time_name);
+
+  svdTimeShiftCal.construct(3.33);
+
+  m_firstExperiment = 3;
+  m_firstRun = 400;
+  m_lastExperiment = 3;
+  m_lastRun = 400;
+
+  B2INFO("importing default values for run 400 of test beam");
+
+  unsigned int laddersOnLayer[] = { 0, 0, 0, 8, 11, 13, 17 };
+  for (unsigned int layer = 0 ; layer < 7 ; layer ++) {
+    unsigned int sensorsOnLadder[] = {0, 0, 0, 3, 4, 5, 6};
+    for (unsigned int ladder = 1; ladder < laddersOnLayer[layer]; ladder ++) {
+      for (unsigned int sensor = 1; sensor < sensorsOnLadder[layer]; sensor ++) {
+
+        //U side
+        bool side = 1 ;
+
+        float valueToFill = 26;
+
+        for (int strip = 0; strip < 768; strip++)
+          svdTimeShiftCal->set(layer, ladder, sensor, side, strip, valueToFill);
+
+
+        //V side
+        side = 0;
+        valueToFill = 21;
+
+        int maxStripNumber = 512;
+        if (layer == 3) maxStripNumber = 768;
+
+        for (int strip = 0; strip < maxStripNumber; strip++)
+          svdTimeShiftCal->set(layer, ladder, sensor, side, strip, valueToFill);
+
+      }
+    }
+  }
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+
+  svdTimeShiftCal.import(iov);
+
+  B2RESULT("SVDTimeShiftCorrections imported to database.");
+}
+
+
 void SVDDatabaseImporter::importSVDPulseShapeCalibrations()
 {
 
   DBImportObjPtr<SVDPulseShapeCalibrations::t_payload > svdPulseShapeCal(SVDPulseShapeCalibrations::name);
-  DBImportObjPtr<SVDPulseShapeCalibrations::t_time_payload > svdTimeShiftCal(SVDPulseShapeCalibrations::time_name);
 
   /*
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,

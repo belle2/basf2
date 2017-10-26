@@ -49,7 +49,7 @@ namespace Belle2 {
     private:
       SVDNoiseCalibrations m_obj_noise;
       SVDPulseShapeCalibrations m_obj_pulseShape;
-
+      DBObjPtr<SVDLocalRunBadStrips> m_obj_badStrip;
 
 
 

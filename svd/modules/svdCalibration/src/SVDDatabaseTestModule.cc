@@ -12,7 +12,7 @@
 #include <framework/logging/Logger.h>
 
 //#include <svd/dbobjects/SVDPulseShapeCalibrations.h>
-#include <svd/dbobjects/SVDLocalRunBadStrips.h>
+//#include <svd/dbobjects/SVDLocalRunBadStrips.h>
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -53,49 +53,23 @@ void SVDDatabaseTestModule::event()
    * print them
    */
   VxdID sensorID(3, 1, 1);
-  VxdID sensorIDOnFourthLayer(4, 1, 3);
-  VxdID sensorIDOnSixthLayer(6, 6, 4);
-
-  /************************The Noises **********************/
-
   B2INFO("Noise L3_1_1 side V strip 0 = " << m_obj_noise.getNoise(sensorID, false, 0));
   B2INFO("Noise L3_1_1 side U strip 0 = " << m_obj_noise.getNoise(sensorID , true, 0));
   B2INFO("~~~~~~~~~~~~~~\n");
-
-  B2INFO("Noise L4_1_3 side V strip 0 = " << m_obj_noise.getNoise(sensorIDOnFourthLayer, false, 0));
-  B2INFO("Noise L4_1_3 side U strip 0 = " << m_obj_noise.getNoise(sensorIDOnFourthLayer , true, 0));
-  B2INFO("~~~~~~~~~~~~~~\n");
-
-
-  B2INFO("Noise L6_6_4 side V strip 0 = " << m_obj_noise.getNoise(sensorIDOnSixthLayer, false, 0));
-  B2INFO("Noise L6_6_4 side U strip 0 = " << m_obj_noise.getNoise(sensorIDOnSixthLayer , true, 0));
-  B2INFO("~~~~~~~~~~~~~~\n");
-
-  /********************Pulse Shape Properties*******************/
 
   B2INFO("Charge [e]        L3_1_1 side V strip 0 = " << m_obj_pulseShape.getChargeFromADC(sensorID, false, 0, 60));
   B2INFO("ADC counts [a.u.] L3_1_1 side V strip 0 = " << m_obj_pulseShape.getADCFromCharge(sensorID, false, 0, 22500.));
   B2INFO("Peaking time [ns] L3_1_1 side V strip 0 = " << m_obj_pulseShape.getPeakTime(sensorID, false, 0));
   B2INFO("Pulse width [ns]  L3_1_1 side V strip 0 = " << m_obj_pulseShape.getWidth(sensorID, false, 0));
+  B2INFO("Time Correction [ns]  L3_1_1 side V strip 0 = " << m_obj_pulseShape.getTimeShiftCorrection(sensorID, false, 0));
   B2INFO("~~~~~~~~~~~~~~\n");
 
   B2INFO("Charge [e]        L3_1_1 side U strip 0 = " << m_obj_pulseShape.getChargeFromADC(sensorID, true, 0, 60));
   B2INFO("ADC counts [a.u.] L3_1_1 side U strip 0 = " << m_obj_pulseShape.getADCFromCharge(sensorID, true, 0, 22500.));
   B2INFO("Peaking time [ns] L3_1_1 side U strip 0 = " << m_obj_pulseShape.getPeakTime(sensorID, true, 0));
   B2INFO("Pulse width [ns]  L3_1_1 side U strip 0 = " << m_obj_pulseShape.getWidth(sensorID, true, 0));
-  B2INFO("~~~~~~~~~~~~~~\n");
+  B2INFO("Time Correction [ns]  L3_1_1 side V strip 0 = " << m_obj_pulseShape.getTimeShiftCorrection(sensorID, true, 0));
 
-  B2INFO("Charge [e]        L6_6_4 side V strip 0 = " << m_obj_pulseShape.getChargeFromADC(sensorIDOnSixthLayer, false, 0, 60));
-  B2INFO("ADC counts [a.u.] L6_6_4 side V strip 0 = " << m_obj_pulseShape.getADCFromCharge(sensorIDOnSixthLayer, false, 0, 22500.));
-  B2INFO("Peaking time [ns] L6_6_4 side V strip 0 = " << m_obj_pulseShape.getPeakTime(sensorIDOnSixthLayer, false, 0));
-  B2INFO("Pulse width [ns]  L6_6_4 side V strip 0 = " << m_obj_pulseShape.getWidth(sensorIDOnSixthLayer, false, 0));
-  B2INFO("~~~~~~~~~~~~~~\n");
-
-  B2INFO("Charge [e]        L6_6_4 side U strip 0 = " << m_obj_pulseShape.getChargeFromADC(sensorIDOnSixthLayer, true, 0, 60));
-  B2INFO("ADC counts [a.u.] L6_6_4 side U strip 0 = " << m_obj_pulseShape.getADCFromCharge(sensorIDOnSixthLayer, true, 0, 22500.));
-  B2INFO("Peaking time [ns] L6_6_4 side U strip 0 = " << m_obj_pulseShape.getPeakTime(sensorIDOnSixthLayer, true, 0));
-  B2INFO("Pulse width [ns]  L6_6_4 side U strip 0 = " << m_obj_pulseShape.getWidth(sensorIDOnSixthLayer, true, 0));
-
-  //  B2INFO("isBad = " << m_obj_badStrip->isBad(1, true, 1));
+  B2INFO("isBad = " << m_obj_badStrip->isBad(1, true, 1));
 
 }

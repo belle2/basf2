@@ -62,7 +62,9 @@ namespace Belle2 {
      * Currently they are not read from any file, they are fixed to
      * default values.
      */
-    void importSVDPulseShapeCalibrations(/*std::string experimentType*/);
+    void importSVDPulseShapeCalibrations(/*std::string fileName*/);
+
+    void importSVDTimeShiftCorrections(/*std::string fileName*/);
 
     /**
      * This method import to the database the strip
@@ -71,7 +73,7 @@ namespace Belle2 {
      * Currently they are not read from any file, they are fixed to
      * default values.
      */
-    void importSVDNoiseCalibrations(/*std::string experimentType*/);
+    void importSVDNoiseCalibrations(/*std::string fileName*/);
 
     /**
      * This method import to the database the bad strip

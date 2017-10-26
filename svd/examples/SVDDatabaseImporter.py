@@ -16,9 +16,7 @@ import glob
 import subprocess
 from fnmatch import fnmatch
 
-
 use_local_database("localDB_run400_toImport/database_run400_toImport.txt", "localDB_run400_toImport")
-# use_local_database("localDB_run111_toImport/database_run111_toImport.txt", "localDB_run111_toImport")
 
 main = create_path()
 
@@ -51,18 +49,15 @@ dbImporter.importSVDPulseShapeCalibrations()
 
 print("importPulseShape_Done")
 
+# import the time shift calibration constants
+# for the basic time estimator
+dbImporter.importSVDTimeShiftCorrections()
+
+print("importTimeShiftCorrection_Done")
+
 # import the bad strips status
 dbImporter.importSVDLocalRunBadStrips()
 
 print("importBadStrips_Done")
-
-# print the imported information
-# dbImporter.printSVDNoiseCalibrations()
-
-# print the imported information
-# dbImporter.printSVDPulseShapeCalibrations()
-
-# print the imported information
-# dbImporter.printSVDLocalRunBadStrips()
 
 print("IMPORT COMPLETED!!!")

@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jakob Lettenbichler                                      *
+ * Contributors: Jakob Lettenbichler, Jonas Wagner, Felix Metzner         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -183,14 +183,14 @@ void TrackFinderVXDBasicPathFinderModule::event()
         m_bestPaths.at(m_familyIndex[family]) = tempSPTC;
       }
     } else {
-      m_sptcCreator.createSPTCs(m_TCs, spPath, family);
+      m_sptcCreator.createSPTC(m_TCs, spPath, family);
     }
   }
 
   if (m_PARAMselectBestPerFamily) {
     for (unsigned short fam = 0; fam < m_familyIndex.size(); fam++) {
       std::vector<const SpacePoint*> path = m_bestPaths.at(m_familyIndex[fam]).getHits();
-      m_sptcCreator.createSPTCs(m_TCs, path, fam);
+      m_sptcCreator.createSPTC(m_TCs, path, fam);
     }
   }
 

@@ -24,7 +24,6 @@ namespace Belle2 {
     typedef int MCRecoTrackIndex;
     typedef int NMatches;
     typedef std::pair<MCRecoTrackIndex, NMatches> MatchInfo;
-    typedef SpacePoint const* constSPpointer;
 
     QualityEstimatorMC(std::string mcRecoTracksStoreArrayName = "MCRecoTracks",
                        bool strictQualityIndex = true, std::string svdClustersName = "", std::string pxdClustersName = ""):
@@ -38,7 +37,7 @@ namespace Belle2 {
     virtual QualityEstimationResults estimateQualityAndProperties(std::vector<SpacePoint const*> const& measurements) override final;
 
   protected:
-    MatchInfo getBestMatchToMCClusters(std::vector<constSPpointer> const& measurements);
+    MatchInfo getBestMatchToMCClusters(std::vector<SpacePoint const*> const& measurements);
     double calculateQualityIndex(int nClusters, MatchInfo& match);
     void fillMatrixWithMCInformation();
 

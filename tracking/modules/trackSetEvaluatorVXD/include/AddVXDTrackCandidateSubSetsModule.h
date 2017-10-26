@@ -37,14 +37,13 @@ namespace Belle2 {
 
   protected:
 
+    /** Actually creates the new SPTCs by removing single SPs from the SPTC with the provided StoreArray index. */
     void addSubCandidates(int iCand);
 
     /** Name of input StoreArray containing SpacePointTrackCands */
     std::string m_nameSpacePointTrackCands = std::string("");
 
-
-    // member variables
-
+    /// member variables
     /** tool for creating SPTCs, fills storeArray directly */
     SpacePointTrackCandCreator<StoreArray<Belle2::SpacePointTrackCand>> m_sptcCreator;
 

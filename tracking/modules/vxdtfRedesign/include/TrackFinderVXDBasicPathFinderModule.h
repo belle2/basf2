@@ -87,7 +87,6 @@ namespace Belle2 {
   protected:
 
     /// module parameters
-
     /** SpacePoint collection name */
     std::string m_spacePointsName;
 
@@ -119,7 +118,6 @@ namespace Belle2 {
     bool m_PARAMselectBestPerFamily;
 
     /// member variables
-
     /** CA algorithm */
     CellularAutomaton<Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >, Belle2::CAValidator<Belle2::CACell>, Belle2::CALogger>
     m_cellularAutomaton;
@@ -135,6 +133,8 @@ namespace Belle2 {
     /** tool for creating SPTCs, fills storeArray directly */
     SpacePointTrackCandCreator<StoreArray<Belle2::SpacePointTrackCand>> m_sptcCreator;
 
+    /** Class to evaluate connected nodes, in this case for the directed node network, and assigns a family to each
+     *  cluster of connected nodes. */
     NodeFamilyDefiner <
     Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >,
            Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>,
@@ -142,20 +142,20 @@ namespace Belle2 {
            > m_familyDefiner;
 
     /// input containers
-
     /** access to the DirectedNodeNetwork, which contains the network needed for creating TrackCandidates */
     StoreObjPtr<Belle2::DirectedNodeNetworkContainer> m_network;
 
     /// output containers
-
     /** StoreArray for the TCs created in this module */
     StoreArray<Belle2::SpacePointTrackCand> m_TCs;
 
     /** pointer to the QualityEstimator */
     std::unique_ptr<QualityEstimatorBase> m_estimator;
 
+    /** Vector containing the currently best set of SPTCs, one for each family. */
     std::vector<SpacePointTrackCand> m_bestPaths;
 
+    /** Map containing the relation between the indices of m_bestPath to the families. */
     std::vector<short> m_familyIndex;
 
     /// counters and other debug stuff:

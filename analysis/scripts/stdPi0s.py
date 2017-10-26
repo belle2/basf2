@@ -19,13 +19,13 @@ def stdPi0s(listtype='veryLoose', path=analysis_main):
     Function to prepare one of several standardized types of pi0 lists:
 
     - 'pi0:all' using gamma:all
-    - 'pi0:veryLoose' (default) gamma:pi0, mass range selection
+    - 'pi0:veryLoose' gamma:pi0, mass range selection
     - 'pi0:loose' gamma:pi0highE, mass range selection
-    - 'pi0:eff20' gamma:pi0eff20, mass range selection
-    - 'pi0:eff30' gamma:pi0eff30, mass range selection
-    - 'pi0:eff40' gamma:pi0eff40, mass range selection
-    - 'pi0:eff50' gamma:pi0eff50, mass range selection
-    - 'pi0:eff60' gamma:pi0eff60, mass range selection
+    - 'pi0:eff20' gamma:pi0eff20, mass range selection, 20% pi0 efficiency list (Phase 2)
+    - 'pi0:eff30' gamma:pi0eff30, mass range selection, 30% pi0 efficiency list (Phase 2)
+    - 'pi0:eff40' gamma:pi0eff40, mass range selection, 40% pi0 efficiency list (Phase 2)
+    - 'pi0:eff50' gamma:pi0eff50, mass range selection, 50% pi0 efficiency list (Phase 2)
+    - 'pi0:eff60' gamma:pi0eff60, mass range selection, 60% pi0 efficiency list (Phase 2)  (default)
 
     @param listtype name of standard list
     @param path     modules are added to this path
@@ -34,15 +34,6 @@ def stdPi0s(listtype='veryLoose', path=analysis_main):
         fillParticleList('gamma:all', '', True, path)
         reconstructDecay('pi0:all -> gamma:all gamma:all', '', 1, True, path)
         matchMCTruth('pi0:all', path)
-    elif listtype == 'veryLoose':
-        fillParticleList('gamma:pi0', '', True, path)
-        reconstructDecay('pi0:veryLoose -> gamma:pi0 gamma:pi0', '0.09 < M < 0.165', 1, True, path)
-        matchMCTruth('pi0:veryLoose', path)
-    elif listtype == 'loose':
-        fillParticleList('gamma:pi0highE', '', True, path)
-        reconstructDecay('pi0:loose -> gamma:pi0highE gamma:pi0highE', '0.1 < M < 0.160', 1, True, path)
-        matchMCTruth('pi0:loose', path)
-
     elif listtype == 'eff20':
         fillParticleList('gamma:pi0eff20', '', True, path)
         reconstructDecay('pi0:eff20 -> gamma:pi0eff20 gamma:pi0eff20', '0.129 < M < 0.137', 1, True, path)
@@ -63,13 +54,20 @@ def stdPi0s(listtype='veryLoose', path=analysis_main):
         fillParticleList('gamma:pi0eff60', '', True, path)
         reconstructDecay('pi0:eff60 -> gamma:pi0eff60 gamma:pi0eff60', '0.09 < M < 0.175', 1, True, path)
         matchMCTruth('pi0:eff60', path)
+    elif listtype == 'veryLoose':
+        stdPi0s(listtype='pi0eff60')
+        cutAndCopyList('pi0:veryLoose', 'pi0:pi0eff60', '', True, path)
+    elif listtype == 'loose':
+        stdPi0s(listtype='pi0eff40')
+        cutAndCopyList('pi0:loose', 'pi0:pi0eff40', '', True, path)
 
-    elif listtype == 'skim':  # no MC truth matching, vertex fit
-        fillParticleList('gamma:pi0', '', True, path)
-        reconstructDecay('pi0:skim -> gamma:pi0 gamma:pi0', '0.09 < M < 0.165', 1, True, path)
+    # skim list(s)
+    elif listtype == 'skim':
+        stdPi0s(listtype='pi0eff60')
+        cutAndCopyList('pi0:skim', 'pi0:pi0eff60', '', True, path)
         massKFit('pi0:skim', 0.0, '', path)
 
-    # lists with mass constraints fits
+    # same lists with, but with  mass constraints fits
     elif listtype == 'veryLooseFit':
         stdPi0s(listtype='veryLoose')
         cutAndCopyList('pi0:veryLooseFit', 'pi0:veryLoose', '', True, path)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+utf  # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ########################################################
@@ -101,22 +101,10 @@ def stdPhotons(listtype='loose', path=analysis_main):
             path)
     elif listtype == 'pi0':
         stdPhotons('loose', path)
-        cutAndCopyList(
-            'gamma:pi0',
-            'gamma:loose',
-            '',
-            True,
-            path)
+        cutAndCopyList('gamma:pi0', 'gamma:pi0eff60', '', True, path)
     elif listtype == 'pi0highE':
         stdPhotons('loose', path)
-        cutAndCopyList(
-            'gamma:pi0highE',
-            'gamma:loose',
-            'E > 0.2',
-            True,
-            path)
-
-    # Used in skimming code
+        cutAndCopyList('gamma:pi0highE', 'gamma:pi0eff60', 'E > 0.2', True, path)
 
 
 def loadStdSkimPhoton(path=analysis_main):
@@ -128,8 +116,9 @@ def loadStdSkimPhoton(path=analysis_main):
         True,
         path)
 
-
 # Only used for Belle via b2bii
+
+
 def loadStdGoodBellePhoton(path=analysis_main):
     loadStdAllPhoton(path)
     cutAndCopyList('gamma:goodBelle', 'gamma:all', '0.5 < goodBelleGamma < 1.5', True, path)

@@ -308,7 +308,7 @@ hit efficiency - the ratio of hits picked up by the matched pattern recognition 
     #: High values in this hit efficiencies means that the MC track is consumed by other PR tracks but no proper
     #: match could be established.
     save_missing_mc_tracks_hit_efficiency_in_all_found_hist = refiners.save_histograms(
-        above_expert_level=default_expert_leveltas - 1,
+        above_expert_level=default_expert_level - 1,
         filter_on="is_missing",  # show only the efficiencies of missing mc tracks
         # renaming quantity to name that is more suitable for display
         select=dict(hit_efficiency_in_all_found="total hit efficiency in all reconstructed tracks for missing mc tracks")

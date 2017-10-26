@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 
 """
-This defines a function that outputs both udst and mdst outputs for skim testing purposes.
+This defines a function that outputs the  mdst outputs for skim testing purposes.
 """
 
 from basf2 import *
@@ -20,7 +20,7 @@ def skimOutputMdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[], 
     """
     Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
     Write the accepted events as a mdst file, saving only particles from skimParticleLists
-    and from outputParticleLists.
+    and from outputParticleLists. It outputs a .mdst file.
     Additional Store Arrays and Relations to be stored can be specified via includeArrays
     list argument.
 

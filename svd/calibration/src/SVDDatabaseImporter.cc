@@ -49,14 +49,16 @@ void SVDDatabaseImporter::importSVDTimeShiftCorrections()
 
   DBImportObjPtr<SVDPulseShapeCalibrations::t_time_payload > svdTimeShiftCal(SVDPulseShapeCalibrations::time_name);
 
-  svdTimeShiftCal.construct(3.33);
+  svdTimeShiftCal.construct(25);
 
   m_firstExperiment = 3;
+  //  m_firstRun = 111;
   m_firstRun = 400;
   m_lastExperiment = 3;
+  //  m_lastRun = 111;
   m_lastRun = 400;
 
-  B2INFO("importing default values for run 400 of test beam");
+  B2INFO("importing values for run 111 of test beam (evaluated on 10k events of run111");
 
   unsigned int laddersOnLayer[] = { 0, 0, 0, 8, 11, 13, 17 };
   for (unsigned int layer = 0 ; layer < 7 ; layer ++) {
@@ -67,7 +69,17 @@ void SVDDatabaseImporter::importSVDTimeShiftCorrections()
         //U side
         bool side = 1 ;
 
-        float valueToFill = 26;
+        /*  //run111
+              float valueToFill = 31.5; //all layers except L6
+        //RMS = 6 for all layers
+        if(layer == 6)
+          valueToFill = 25.5;
+        */
+
+        float valueToFill = 42; //all layers except L6
+        //RMS = 6 for all layers
+        if (layer == 6)
+          valueToFill = 34.5;
 
         for (int strip = 0; strip < 768; strip++)
           svdTimeShiftCal->set(layer, ladder, sensor, side, strip, valueToFill);
@@ -75,7 +87,8 @@ void SVDDatabaseImporter::importSVDTimeShiftCorrections()
 
         //V side
         side = 0;
-        valueToFill = 21;
+        valueToFill = 30.5;
+        //RMS = 5 for all layers
 
         int maxStripNumber = 512;
         if (layer == 3) maxStripNumber = 768;

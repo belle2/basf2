@@ -26,9 +26,8 @@ namespace Belle2 {
     typedef std::pair<MCRecoTrackIndex, NMatches> MatchInfo;
 
     QualityEstimatorMC(std::string mcRecoTracksStoreArrayName = "MCRecoTracks",
-                       bool strictQualityIndex = true, std::string svdClustersName = "", std::string pxdClustersName = ""):
-      QualityEstimatorBase(), m_strictQualityIndex(strictQualityIndex), m_mcRecoTracksStoreArrayName(mcRecoTracksStoreArrayName),
-      m_svdClustersName(svdClustersName), m_pxdClustersName(pxdClustersName)
+                       bool strictQualityIndex = true):
+      QualityEstimatorBase(), m_strictQualityIndex(strictQualityIndex), m_mcRecoTracksStoreArrayName(mcRecoTracksStoreArrayName)
     { };
 
     virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) final;
@@ -36,10 +35,12 @@ namespace Belle2 {
     /** additionally return momentum_truth if it is a perfect match to a single MCRecoTrack */
     virtual QualityEstimationResults estimateQualityAndProperties(std::vector<SpacePoint const*> const& measurements) override final;
 
+    void setClustersNames(std::string svdClustersName, std::string pxdClustersName)
+    { m_svdClustersName = svdClustersName; m_pxdClustersName = pxdClustersName; };
+
   protected:
     MatchInfo getBestMatchToMCClusters(std::vector<SpacePoint const*> const& measurements);
     double calculateQualityIndex(int nClusters, MatchInfo& match);
-    void fillMatrixWithMCInformation();
 
     // parameters
 
@@ -50,16 +51,13 @@ namespace Belle2 {
 
     std::string m_mcRecoTracksStoreArrayName;
     // module members
-    std::string m_svdClustersName;
-    std::string m_pxdClustersName;
+    std::string m_svdClustersName = "";
+    std::string m_pxdClustersName = "";
 
     /** stores the current match for optional return values */
     MatchInfo m_match;
 
     /** the storeArray for RecoTracks as member */
     StoreArray<RecoTrack> m_mcRecoTracks;
-
-    /** store relation SVDClusterIndex to MCRecoTrackIndex */
-    Eigen::SparseMatrix<bool> m_linkMatrix;
   };
 }

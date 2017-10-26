@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/pxdDataReduction/PXDDataRedAnalysisModule.h>
+#include <tracking/modules/pxdDataReduction/PXDROIFinderAnalysisModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
@@ -38,13 +38,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDDataRedAnalysis)
+REG_MODULE(PXDROIFinderAnalysis)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDDataRedAnalysisModule::PXDDataRedAnalysisModule() : Module()
+PXDROIFinderAnalysisModule::PXDROIFinderAnalysisModule() : Module()
   , m_recoTrackListName()
   , m_PXDInterceptListName()
   , m_ROIListName()
@@ -221,7 +221,7 @@ PXDDataRedAnalysisModule::PXDDataRedAnalysisModule() : Module()
 
 {
   //Set module properties
-  setDescription("This module performs the analysis of the PXDDataReduction module output");
+  setDescription("This module performs the analysis of the PXDROIFinder module output");
 
   addParam("writeToRoot", m_writeToRoot,
            "set true if you want to save the informations in a root file named by parameter 'rootFileName'", bool(true));
@@ -242,12 +242,12 @@ PXDDataRedAnalysisModule::PXDDataRedAnalysisModule() : Module()
   m_rootEvent = 0;
 }
 
-PXDDataRedAnalysisModule::~PXDDataRedAnalysisModule()
+PXDROIFinderAnalysisModule::~PXDROIFinderAnalysisModule()
 {
 }
 
 
-void PXDDataRedAnalysisModule::initialize()
+void PXDROIFinderAnalysisModule::initialize()
 {
 
   StoreArray<RecoTrack>::required(m_recoTrackListName);
@@ -426,7 +426,7 @@ void PXDDataRedAnalysisModule::initialize()
 
 }
 
-void PXDDataRedAnalysisModule::beginRun()
+void PXDROIFinderAnalysisModule::beginRun()
 {
   m_rootEvent = 0;
 
@@ -463,7 +463,7 @@ void PXDDataRedAnalysisModule::beginRun()
 }
 
 
-void PXDDataRedAnalysisModule::event()
+void PXDROIFinderAnalysisModule::event()
 {
 
   typedef RelationIndex < RecoTrack, PXDIntercept>::range_from PXDInterceptsFromRecoTracks;
@@ -482,7 +482,7 @@ void PXDDataRedAnalysisModule::event()
   NtrackHit = 0;
   Ntrack = 0;
 
-  B2DEBUG(1, "  ++++++++++++++ PXDDataRedAnalysisModule");
+  B2DEBUG(1, "  ++++++++++++++ PXDROIFinderAnalysisModule");
 
   int nROIs = 0;
   int okArea_L1 = 0;
@@ -928,7 +928,7 @@ void PXDDataRedAnalysisModule::event()
   n_tracksWithDigitsInROI += NtrackHit;
 
   m_rootEvent++;
-  B2RESULT(" o  PXDDataReduction ANALYSIS: tot ROIs = " << ROIList.getEntries() << ", ok ROIs = " << nROIs);
+  B2RESULT(" o  PXDROIFinder ANALYSIS: tot ROIs = " << ROIList.getEntries() << ", ok ROIs = " << nROIs);
   B2RESULT(" o                           : NtrackHit/Ntrack = " << NtrackHit << "/ " << Ntrack << " = " <<
            (double)NtrackHit / Ntrack);
   if (nROIs > ROIList.getEntries()) B2RESULT(" HOUSTON WE HAVE A PROBLEM!");
@@ -941,12 +941,12 @@ void PXDDataRedAnalysisModule::event()
 }
 
 
-void PXDDataRedAnalysisModule::endRun()
+void PXDROIFinderAnalysisModule::endRun()
 {
 }
 
 
-void PXDDataRedAnalysisModule::terminate()
+void PXDROIFinderAnalysisModule::terminate()
 {
 
   Double_t epsilon[6];

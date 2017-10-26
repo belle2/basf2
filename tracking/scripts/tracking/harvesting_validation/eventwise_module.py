@@ -15,6 +15,8 @@ import tracking.harvest.harvesting as harvesting
 
 class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
 
+    default_expert_level = 10
+
     def __init__(self,
                  name,
                  contact,
@@ -144,7 +146,7 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
     # Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree(folder_name="event_tree",
                                    name="event_tree",
-                                   above_expert_level=1)
+                                   above_expert_level=default_expert_level)
 
     save_clone_rate = refiners.save_fom(
         name="{module.id}_hit_figures_of_merit",

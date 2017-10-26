@@ -25,10 +25,10 @@ void NtupleMCHierarchyTool::setupTree()
 
   if (! m_strOption.empty()) {
     B2INFO("Option is: " << m_strOption);
-    if (m_strOption == "InterMediate")
+    if (m_strOption == "Intermediate")
       m_InterMediate = true;
     else
-      B2WARNING("INVALID option used, only allows * InterMediate *" << m_strOption);
+      B2WARNING("INVALID option used, only allows * Intermediate *" << m_strOption);
   }
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
@@ -72,14 +72,16 @@ void NtupleMCHierarchyTool::eval(const Particle* particle)
 
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    const std::vector<Particle*> daughters = selparticles[iProduct]->getDaughters();
-    int nDaughters = daughters.size();
-    for (int iDaughter = 0; iDaughter < nDaughters; ++iDaughter) {
-      if (nDaughters < 2) { newselparticles.push_back(selparticles[iProduct]); }
-      else if (nDaughters == 2) {newselparticles.push_back(daughters[iDaughter]);}
-      else {
-        B2ERROR("NtupleMCHierarchyTool::eval - More than two daughters!");
-        return;
+    if (!m_InterMediate) { newselparticles.push_back(selparticles[iProduct]); }
+    else {
+      const std::vector<Particle*> daughters = selparticles[iProduct]->getDaughters();
+      int nDaughters = daughters.size();
+      for (int iDaughter = 0; iDaughter < nDaughters; ++iDaughter) {
+        if (nDaughters == 2) {newselparticles.push_back(daughters[iDaughter]);}
+        else {
+          B2ERROR("NtupleMCHierarchyTool::eval - More than two daughters!");
+          return;
+        }
       }
     }
   }

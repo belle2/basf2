@@ -20,8 +20,7 @@
 
 namespace Belle2 {
 
-  /** NtupleTool to write the  mother, grandmother, and greatgrandmother truth ID for a given reconstructed particle
-  to a flat ntuple. */
+  /** NtupleTool to write the  mother, grandmother, and greatgrandmother truth ID for a given reconstructed particle to a flat ntuple. Incase of reconstructed K_S0 and pi0: "Intermediate" option is to be used in order to get mother, grandmother, and greatgrandmother of their daughters */
   class NtupleMCHierarchyTool : public NtupleFlatTool {
   private:
     /** Mother ID. */
@@ -31,13 +30,15 @@ namespace Belle2 {
     /** Great Grand Mother ID. */
     int* m_iGDGDMotherID;
 
-    /** Flag is true if InterMediate option is used, False if not used. */
+    /** Flag is true if Intermediate option is used, False if not used. */
     bool m_InterMediate;
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:
-    /** Constuctor. */
+    /** Constructor
+     * @strOption Takes string option "Intermediate" which determines if intermediate particles are included
+     */
     NtupleMCHierarchyTool(TTree* tree, DecayDescriptor& decaydescriptor,
                           const std::string& strOptions)
       : NtupleFlatTool(tree, decaydescriptor, strOptions)

@@ -1,3 +1,7 @@
+/** This file is a copy of Pythia8Plugins/EvtGen.h from Pythia 8 but slightly
+ * modified for extended evtgen models
+ */
+
 // EvtGen.h is a part of the PYTHIA event generator.
 // Copyright (C) 2016 Torbjorn Sjostrand.
 // PYTHIA is licenced under the GNU GPL version 2, see COPYING for details.
@@ -6,8 +10,7 @@
 
 // This file contains an EvtGen interface. HepMC and EvtGen must be enabled.
 
-#ifndef Pythia8_EvtGen_H
-#define Pythia8_EvtGen_H
+#pragma once
 
 #include "Pythia8/Pythia.h"
 #include "EvtGen/EvtGen.hh"
@@ -88,6 +91,9 @@ class EvtGenDecays {
 
 public:
 
+  // Expert constructor which takes an already initialized EvtGen instance
+  EvtGenDecays(Pythia* pythiaPtrIn, EvtGen* evtGen, bool limit = true);
+
   // Constructor.
   EvtGenDecays(Pythia* pythiaPtrIn, string decayFile, string particleDataFile,
                EvtExternalGenList* extPtrIn = 0, EvtAbsRadCorr* fsrPtrIn = 0,
@@ -101,6 +107,9 @@ public:
     if (extOwner && extPtr) delete extPtr;
     if (fsrOwner && fsrPtr) delete fsrPtr;
   }
+
+  // Get the Decay limits from Pythia
+  void getDecayLimits(bool limit);
 
   // Perform all decays and return the event weight.
   double decay();
@@ -224,6 +233,15 @@ protected:
 //   extUse:           flag to use external models with EvtGen.
 //   fsrUse:           flag to use radiative correction engine with EvtGen.
 
+
+EvtGenDecays::EvtGenDecays(Pythia* pythiaPtrIn, EvtGen* evtGen, bool limit):
+  extOwner(false), fsrOwner(false), extPtr(nullptr), fsrPtr(nullptr),
+  signalSuffix("_SIGNAL"), pythiaPtr(pythiaPtrIn), rndm(nullptr),
+  evtgen(evtGen), updated(false)
+{
+  getDecayLimits(limit);
+}
+
 EvtGenDecays::EvtGenDecays(Pythia* pythiaPtrIn, string decayFile,
                            string particleDataFile, EvtExternalGenList* extPtrIn,
                            EvtAbsRadCorr* fsrPtrIn, int mixing, bool xml, bool limit,
@@ -245,7 +263,11 @@ EvtGenDecays::EvtGenDecays(Pythia* pythiaPtrIn, string decayFile,
   models = extPtr->getListOfModels();
   evtgen = new EvtGen(decayFile.c_str(), particleDataFile.c_str(),
                       &rndm, fsrUse ? fsrPtr : 0, extUse ? &models : 0, mixing, xml);
+  getDecayLimits(limit);
+}
 
+void EvtGenDecays::getDecayLimits(bool limit)
+{
   // Get the Pythia decay limits.
   if (!pythiaPtr) return;
   limitTau0     = pythiaPtr->settings.flag("ParticleDecays:limitTau0");
@@ -630,5 +652,3 @@ bool EvtGenDecays::checkOsc(EvtParticle* egPro)
 }
 
 //==========================================================================
-
-#endif // end Pythia8_EvtGen_H

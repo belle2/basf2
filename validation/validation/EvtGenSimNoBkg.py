@@ -37,9 +37,7 @@ evtgeninput = register_module('EvtGenInput')
 main.add_module(evtgeninput)
 
 # detector simulation, no background files
-# deactivated the cleanup for PXDDatareduction as the constents of the storearrays is needed for validation
 add_simulation(main)
-add_simulation(main, cleanupPXDDataReduction=False)
 
 # trigger simulation
 add_tsim(main)

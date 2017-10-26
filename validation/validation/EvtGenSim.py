@@ -28,9 +28,8 @@ main.add_module('EventInfoSetter', evtNumList=[1000], runList=[1], expList=[1])
 main.add_module('EvtGenInput')
 
 # detector simulation
-# deactivated the cleanup for PXDDatareduction as the constents of the storearrays is needed for validation
 bg = validationtools.get_background_files()
-add_simulation(main, bkgfiles=bg, cleanupPXDDataReduction=False)
+add_simulation(main, bkgfiles=bg)
 
 # trigger simulation
 add_tsim(main)

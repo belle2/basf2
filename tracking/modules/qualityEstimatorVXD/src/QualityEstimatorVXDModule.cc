@@ -15,7 +15,6 @@
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRandom.h>
-#include <framework/logging/Logger.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
 using namespace Belle2;
@@ -67,6 +66,22 @@ void QualityEstimatorVXDModule::beginRun()
   // BField is required by all QualityEstimators
   double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
   m_estimator->setMagneticFieldStrength(bFieldZ);
+
+  if (m_EstimationMethod == "mcInfo") {
+    StoreArray<RecoTrack> mcRecoTracks;
+    mcRecoTracks.isRequired(m_MCRecoTracksStoreArrayName);
+    std::string svdClustersName = ""; std::string pxdClustersName = "";
+
+    if (mcRecoTracks.getEntries() > 0) {
+      svdClustersName = mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
+      pxdClustersName = mcRecoTracks[0]->getStoreArrayNameOfPXDHits();
+    } else {
+      B2WARNING("No Entries in mcRecoTracksStoreArray: using empty cluster name for svd and pxd");
+    }
+
+    QualityEstimatorMC* MCestimator = static_cast<QualityEstimatorMC*>(m_estimator.get());
+    MCestimator->setClustersNames(svdClustersName, pxdClustersName);
+  }
 }
 
 void QualityEstimatorVXDModule::event()

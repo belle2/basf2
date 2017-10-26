@@ -69,7 +69,7 @@ double SensitiveDetector::GetHadronIntensityFromDEDX(double x)
 //
 //Return total scintillation efficiency, normalized to 1 for photons, for CsI(Tl) given ionization dEdx value.
 //See slides: https://kds.kek.jp/indico/event/24563/session/17/contribution/256/material/slides/0.pdf
-//for additional details
+//for additional details. Parameters in function below are for blue dL/dE curve on bottom right of slide 11.
 double GetCsITlScintillationEfficiency(double x)
 {
   const double p0 = 1.52;

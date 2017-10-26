@@ -21,6 +21,7 @@ ap.add_argument(
 ap.add_argument('--npdfs', type=int, default=1, help='how many pdfs should we write out (-1 is one pdf for each track)')
 ap.add_argument('--full-output', action='store_true', help='do you want a full mdst or just the relavent TOP objects?')
 ap.add_argument('--particle', type=int, default=13, help='pdg code of the particles to generate (13, 211, 321, etc)')
+ap.add_argument('--output', '-o', default='TOPOutput.root', help='Output filename')
 opts = ap.parse_args()
 
 # use a pyhon3 enum for readable particle gun configuration setup
@@ -168,7 +169,7 @@ main.add_module(topdqm)
 
 # Output
 output = register_module('RootOutput')
-output.param('outputFileName', 'TOPOutput.root')
+output.param('outputFileName', opts.output)
 branches = [
     'TOPDigits',
     'TOPRawWaveforms',

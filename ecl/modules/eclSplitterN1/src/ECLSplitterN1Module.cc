@@ -569,10 +569,9 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       // DONE!
 
       // check that local maxima are still local maxima
+      std::vector<int> markfordeletion;
       iterateclusters = false;
       for (const auto& locmaxpoint : localMaximumsPoints) {
-
-
 
         // Get locmax cellid
         const int locmaxcellid = locmaxpoint.first;
@@ -596,15 +595,19 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
           // 1) another cell has more energy: energy*weight > lmenergy and cellid != locmaxcellid
           // 2) local maximum has cell has less than threshold energy left: energy*weight < m_threshold and cellid == locmaxcellid
           if ((energy * weight > lmenergy and cellid != locmaxcellid) or (energy * weight < m_threshold and cellid == locmaxcellid)) {
-            // delete from localMaximumsPoints and from centroidpoints
-            localMaximumsPoints.erase(locmaxcellid);
-            centroidPoints.erase(locmaxcellid);
-
+            markfordeletion.push_back(locmaxcellid);
             iterateclusters = true;
             continue;
           }
         }
       }
+
+      // delete LMs
+      for (const auto lmid : markfordeletion) {
+        localMaximumsPoints.erase(lmid);
+        centroidPoints.erase(lmid);
+      }
+
     } while (iterateclusters);
 
     // Create the ECLShower objects, one per LocalMaximumPoints

@@ -139,10 +139,10 @@ namespace Belle2 {
     double m_Edep;            /**< Deposit energy */
     double m_Momentum[3];     /**< Momentum */
     double m_Position[3];        /**< Position */
-    double m_HadronEdep;
+    double m_HadronEdep;      /**< Hadron Energy Deposit */
 
 
-    ClassDef(ECLSimHit, 5);/**< the class title */
+    ClassDef(ECLSimHit, 6);/**< the class title */
 
   };
 } // end namespace Belle2

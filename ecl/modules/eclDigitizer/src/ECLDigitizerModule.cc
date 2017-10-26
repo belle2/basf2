@@ -373,27 +373,6 @@ void ECLDigitizerModule::readDSPDB()
   // double crystal_params[10] = {0.5, 0.301298, 0.631401, 0.470911, 0.903988, -0.11734200/19.5216, 2.26567, 0.675393, 0.683995, 0.0498786};
   // m_ss[0].InitSample(crystal_params, 0.9999272*19.5216);
   for (int i = 0; i < ec.m_nch; i++) m_tbl[i].iss = 0;
-//MP= 0 0.5
-//MP= 1 0.6483
-//MP= 2 0.4017
-//MP= 3 0.3741
-//MP= 4 0.8494
-//MP= 5 0.00144547
-//MP= 6 4.7071
-//MP= 7 0.8156
-//MP= 8 0.5556
-//MP= 9 0.2752
-//
-//2 0.654324
-//3 0.110699
-//4 0.606028
-//5 1.2688
-//6 0.553606
-//7 0.304011
-//8 1.2551
-//9 0.771018
-//10 0.454058
-//11 1.25524
   // one sampled diode response in the pool, parameters vector from
   // pg.dat file, time offset 0.5 usec added to have peak position with
   // parameters from ps.dat roughly in the same place as in current MC
@@ -403,8 +382,6 @@ void ECLDigitizerModule::readDSPDB()
   m_ss[2].InitSample(gamma_params_forPSD, 27.7221);
   double psd_params_forPSD[] = {0.654324, 0.110699, 0.606028, 1.2688, 0.553606, 0.304011, 1.2551, 0.771018, 0.454058, 1.25524};
   m_ss[3].InitSample(psd_params_forPSD, 27.7221);
-  //cout << "crystalsignalshape" << endl; for (int i = 0; i < 32 * 48; i++) { cout << i << " " << m_ss[0].m_ft[i] << "\n"; }
-  // cout <<         "diodeshape" << endl; for (int i = 0; i < 32 * 48; i++) { cout << i << " " << m_ss[1].m_ft[i] << "\n"; }
 
   B2INFO("ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");
 

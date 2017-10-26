@@ -93,13 +93,14 @@ bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   double avgKineticEnergy = 0.5 * (preKineticEnergy + postKineticEnergy);
   const G4ParticleDefinition* StepParticleDefinition = aStep->GetTrack()->GetParticleDefinition();
   G4Material* StepMaterial = aStep->GetTrack()->GetMaterial();
+  const double CsIDensity = 4.51; //gcm^-3
   double ELE_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "eIoni"  ,
-                                      StepMaterial) / CLHEP::MeV * CLHEP::cm / 4.51;
+                                      StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
   double HAD_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "hIoni"  ,
-                                      StepMaterial) / CLHEP::MeV * CLHEP::cm / 4.51;
+                                      StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
   double ION_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "ionIoni",
-                                      StepMaterial) / CLHEP::MeV * CLHEP::cm / 4.51;
-  G4double DEDX_val = ELE_DEDX + HAD_DEDX + ION_DEDX; //2/3 should be 0;
+                                      StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
+  G4double DEDX_val = ELE_DEDX + HAD_DEDX + ION_DEDX; //Ionization dE/dx for any particle type
   //
   //  return true;
   G4double edep = aStep->GetTotalEnergyDeposit();

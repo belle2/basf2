@@ -20,7 +20,7 @@
 
 namespace Belle2 {
 
-  /** NtupleTool to write the  mother, grandmother, and greatgrandmother truth ID for a given reconstructed particle to a flat ntuple. Incase of reconstructed K_S0 and pi0: "Intermediate" option is to be used in order to get mother, grandmother, and greatgrandmother of their daughters */
+  /** NtupleTool to write the  mother, grandmother, and greatgrandmother truth ID for a given reconstructed particle to a flat ntuple. In case of reconstructed K_S0 and pi0: "Intermediate" option is to be used in order to get mother, grandmother, and greatgrandmother of their daughters */
   class NtupleMCHierarchyTool : public NtupleFlatTool {
   private:
     /** Mother ID. */

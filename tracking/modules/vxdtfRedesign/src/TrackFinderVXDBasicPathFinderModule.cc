@@ -166,11 +166,6 @@ void TrackFinderVXDBasicPathFinderModule::event()
       spPath.push_back((*aNodeIt)->getEntry().getOuterHit()->m_spacePoint);
     }
     family = aPath->back()->getFamily();
-    /**
-     * TODO: Eventually introduce another parameter for the application of the 2-SP-Overlap
-     * resolution via the families, as defineFamilies should be able to be called independently
-     * from the overlap resolving part.
-     */
     if (m_PARAMselectBestPerFamily) {
       SpacePointTrackCand tempSPTC = SpacePointTrackCand(spPath);
       qi = m_estimator->estimateQuality(tempSPTC.getSortedHits());

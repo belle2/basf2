@@ -183,9 +183,8 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
 
     # Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree(name="mc_tree", folder_name="mc_tree", above_expert_level=default_expert_level)
-    if not save_tree:
-        save_tree = refiners.save_tree(name="mc_tree", folder_name="mc_tree",
-                                       above_expert_level=default_expert_level // 2, below_expert_level=default_expert_level)
+    save_tree_basic = refiners.save_tree(name="mc_tree", folder_name="mc_tree",
+                                         above_expert_level=default_expert_level // 2, below_expert_level=default_expert_level)
 
     # Generate the average finding efficiencies and hit efficiencies
     save_overview_figures_of_merit = refiners.save_fom(

@@ -138,6 +138,8 @@ void FragmentationModule::initialize()
     }
     evtgen = new EvtGenDecays(pythia, EvtGenInterface::createEvtGen(m_DecFile));
     evtgen->readDecayFile(m_UserDecFile);
+    // Update pythia particle tables from evtgen
+    evtgen->updatePythia();
   }
 
   // List variable(s) that differ from their defaults

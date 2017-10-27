@@ -12,7 +12,7 @@
 // Check the Delta E and Mbc distributions for
 //  B0->K*0[K+pi-]gamma
 // Constributor: Saurabh Sandilya
-// May 17, 2017
+// Oct 27, 2017
 //
 ////////////////////////////////////////////////////////////
 

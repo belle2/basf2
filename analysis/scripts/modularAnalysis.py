@@ -13,6 +13,7 @@ import inspect
 from vertex import *
 from analysisPath import *
 from variables import variables
+import basf2_mva
 
 
 def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
@@ -1747,85 +1748,43 @@ def writePi0EtaVeto(
     particleList,
     decayString,
     workingDirectory='.',
-    timecut=-1,
-    pi0softForward=0.025,
-    pi0softBarrel=0.02,
-    pi0softBackward=0.02,
-    etasoftForward=0.035,
-    etasoftBarrel=0.03,
-    etasoftBackward=0.03,
     pi0softname='PI0SOFT',
     etasoftname='ETASOFT',
     pi0vetoname='Pi0_Prob',
     etavetoname='Eta_Prob',
+    #    downloadFlag=True,
     selection='',
     path=analysis_main,
 ):
     """
     Give pi0/eta probability for hard photon.
 
-    default weight file is set 1.4 GeV as the lower limit of hard photon energy in CMS Frame when mva training for pi0etaveto.
-    The Input Variables are as below. Aliases are set to some variables for convenience when training.
+    default weight files are set 1.4 GeV as the lower limit of hard photon energy in CMS Frame when mva training for pi0etaveto.
+    The Input Variables are as below. Aliases are set to some variables when training.
     M : pi0/eta candidates Invariant mass
     lowE : soft photon energy in lab frame
     cTheta : soft photon ECL cluster's polar angle
     Zmva : soft photon output of MVA using Zernike moments of the cluster
     minC2Hdist : soft photon distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
 
-    You can choose clusterTiming cut pattern by param timecut.
-    timecut=-1 is clusterTiming cut by clusterErrorTiming. This is the default.
-    timecut=-2 is clusterTiming cut by clusterTimingThreshold.
-    clusterTimingThreshold is energy dependent clusterTiming threshold.
-    Others are constant value cut. The constant value is set to to timecut.
-
-    You can also change the energy cut value for each detection region in the ECL.
-    The default cut values are as below.
-    0.025 GeV for forward pi0 soft photon
-    0.02 GeV for other pi0 soft photon
-    0.035 GeV for forward eta soft photon
-    0.03 GeV for other eta soft photon
-
     NOTE for debug
-    Please don't use following ParticleLists elsewhere.
+    Please don't use following ParticleList names elsewhere.
     gamma:HARDPHOTON, gamma:PI0SOFT, gamma:ETASOFT, pi0:PI0VETO, eta:ETAVETO,
-    and ParticleList name you set to pi0softname(etasoftname)
+    and ParticleList names you set to pi0softname(etasoftname).
     Please don't use "lowE", "cTheta", "Zmva", "minC2Hdist" as alias elsewhere.
     If you apply this function more than once in one process,
-    please change pi0softname(etasoftname) parameter from the second application.
-    If you apply this function more than once regarding same particleList in one process,
-    please change pi0vetoname(etavetoname) parameter from the second application.
-    Plese ignore the following WARNINGs when you apply this function more than once in the same process.
-    [WARNING] Another alias with the name'lowE' is already set! I overwrite it!
-    [WARNING] Another alias with the name'cTheta' is already set! I overwrite it!
-    [WARNING] Another alias with the name'Zmva' is already set! I overwrite it!
-    [WARNING] Another alias with the name'minC2Hdist' is already set! I overwrite it!
-
+    please change pi0softname(etasoftname) parameter from second application.
+    Please don't change pi0softname(etasoftname) parameter from first application.
 
     @param particleList     The input ParticleList
     @param decayString specify Particle to be added to the ParticleList
     @param workingDirectory The weight file directory
-    @param timecut The clusterTiming cut pattern
-    @param pi0softForward energy cut value for forward pi0 soft photon
-    @param pi0softBarrel energy cut value for barrel pi0 soft photon
-    @param pi0softBackward energy cut value for backward pi0 soft photon
-    @param etasoftForward energy cut value for forward eta soft photon
-    @param etasoftBarrel energy cut value for barrel eta soft photon
-    @param etasoftBackward energy cut value for backward eta soft photon
     @param pi0softname ParticleList name for pi0 soft photon
     @param etasoftname ParticleList name for eta soft photon
     @param pi0vetoname extraInfo name of pi0 probability
     @param etavetoname extraInfo name of eta probability
     @param selection Selection criteria that Particle needs meet in order for for_each ROE path to continue
     """
-
-    if timecut < -2 or -2 < timecut < -1 or -1 < timecut < 0:
-        B2ERROR('The specifed timecut value is not valid for writePi0EtaVeto.')
-
-    if pi0softForward < 0 or pi0softBarrel < 0 or pi0softBackward < 0:
-        B2ERROR('The specifed energy cut value for pi0 soft photon is not valid for writePi0EtaVeto.')
-
-    if etasoftForward < 0 or etasoftBarrel < 0 or etasoftBackward < 0:
-        B2ERROR('The specifed energy cut value for eta soft photon is not valid for writePi0EtaVeto.')
 
     roe_path = create_path()
 
@@ -1839,92 +1798,30 @@ def writePi0EtaVeto(
     softphoton1 = photon + pi0softname
     softphoton2 = photon + etasoftname
 
-# clusterErrorTiming cut
-    if timecut == -1:
-        fillParticleList(
-            softphoton1,
-            '[clusterReg==1 and E>' +
-            str(pi0softForward) +
-            '] or [clusterReg==2 and E>' +
-            str(pi0softBarrel) +
-            '] or [clusterReg==3 and E>' +
-            str(pi0softBackward) +
-            ']',
-            path=roe_path)
-        applyCuts(softphoton1, 'abs(clusterTiming)<clusterErrorTiming', path=roe_path)
-        fillParticleList(
-            softphoton2,
-            '[clusterReg==1 and E>' +
-            str(etasoftForward) +
-            '] or [clusterReg==2 and E>' +
-            str(etasoftBarrel) +
-            '] or [clusterReg==3 and E>' +
-            str(etasoftBackward) +
-            ']',
-            path=roe_path)
-        applyCuts(softphoton2, 'abs(clusterTiming)<clusterErrorTiming', path=roe_path)
-
-# clusterTimingThreshold cut
-    elif timecut == -2:
-        fillParticleList(
-            softphoton1,
-            '[clusterReg==1 and E>' +
-            str(pi0softForward) +
-            '] or [clusterReg==2 and E>' +
-            str(pi0softBarrel) +
-            '] or [clusterReg==3 and E>' +
-            str(pi0softBackward) +
-            ']',
-            path=roe_path)
-        applyCuts(softphoton1, 'abs(clusterTiming)<clusterTimingThreshold', path=roe_path)
-        fillParticleList(
-            softphoton2,
-            '[clusterReg==1 and E>' +
-            str(etasoftForward) +
-            '] or [clusterReg==2 and E>' +
-            str(etasoftBarrel) +
-            '] or [clusterReg==3 and E>' +
-            str(etasoftBackward) +
-            ']',
-            path=roe_path)
-        applyCuts(softphoton2, 'abs(clusterTiming)<clusterTimingThreshold', path=roe_path)
-
-# constant clusterTiming cut
-    else:
-        fillParticleList(
-            softphoton1,
-            'abs(clusterTiming)<' +
-            str(timecut) +
-            ' and [clusterReg==1 and E>' +
-            str(pi0softForward) +
-            '] or [clusterReg==2 and E>' +
-            str(pi0softBarrel) +
-            '] or [clusterReg==3 and E>' +
-            str(pi0softBackward) +
-            ']',
-            path=roe_path)
-        applyCuts(softphoton1, 'abs(clusterTiming)<' + str(timecut), path=roe_path)
-        fillParticleList(
-            softphoton2,
-            'abs(clusterTiming)<' +
-            str(timecut) +
-            ' and [clusterReg==1 and E>' +
-            str(etasoftForward) +
-            '] or [clusterReg==2 and E>' +
-            str(etasoftBarrel) +
-            '] or [clusterReg==3 and E>' +
-            str(etasoftBackward) +
-            ']',
-            path=roe_path)
-        applyCuts(softphoton2, 'abs(clusterTiming)<' + str(timecut), path=roe_path)
+# create soft photon list
+    fillParticleList(
+        softphoton1,
+        '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]',
+        path=roe_path)
+    applyCuts(softphoton1, 'abs(clusterTiming)<120', path=roe_path)
+    fillParticleList(
+        softphoton2,
+        '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]',
+        path=roe_path)
+    applyCuts(softphoton2, 'abs(clusterTiming)<120', path=roe_path)
 
     reconstructDecay('pi0:PI0VETO -> gamma:HARDPHOTON ' + softphoton1, '', path=roe_path)
     reconstructDecay('eta:ETAVETO -> gamma:HARDPHOTON ' + softphoton2, '', path=roe_path)
 
-    variables.addAlias('lowE', 'daughter(1,E)')
-    variables.addAlias('cTheta', 'daughter(1,clusterTheta)')
-    variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')
-    variables.addAlias('minC2Hdist', 'daughter(1,minC2HDist)')
+    if pi0softname == 'PI0SOFT' and etasoftname == 'ETASOFT':
+        variables.addAlias('lowE', 'daughter(1,E)')
+        variables.addAlias('cTheta', 'daughter(1,clusterTheta)')
+        variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')
+        variables.addAlias('minC2Hdist', 'daughter(1,minC2HDist)')
+
+#    if downloadFlag:
+#        basf2_mva.download('Pi0VetoIdentifier', 'pi0veto.root')
+#        basf2_mva.download('EtaVetoIdentifier', 'etaveto.root')
 
     roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO'], extraInfoName='Pi0Veto',
                         identifier=workingDirectory + '/pi0veto.root')

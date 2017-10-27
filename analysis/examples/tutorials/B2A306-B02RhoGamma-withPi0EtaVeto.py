@@ -45,14 +45,12 @@ from modularAnalysis import printVariableValues
 from modularAnalysis import writePi0EtaVeto
 
 filelist = [
-    '/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000050/s00/e0000/4S/'
-    'r00000/1110021000/sub00/mdst_000001_prod00000050_task00000001.root',
-    '/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000060/s00/e0000/4S/'
-    'r00000/1110022100/sub00/mdst_000989_prod00000060_task00000989.root']
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002326/e0000/4S/'
+    'r00000/1110021010/sub00/mdst_000001_prod00002326_task00000001.root']
 
 # Run B0 -> rho gamma reconstruction over B0 -> rho gamma and B0 -> K0s pi0 MC
 rootOutputFile = 'B2A304-B02RhoGamma-Reconstruction.root'
-inputMdstList('MC5', filelist)
+inputMdstList('default', filelist)
 
 fillParticleList('gamma:highE', 'E > 1.5')
 fillParticleList('pi+:loose', 'abs(d0) < 0.5 and abs(z0) < 0.5 and DLLKaon > 0')
@@ -81,10 +79,10 @@ buildRestOfEvent('B0')
 # into your workingDirectory/.
 # The default working directory is '.'
 
+
 # perform pi0/eta veto
 writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma')
 
-# This is the simplest way of using writePi0EtaVeto.
 # at this stage the B0 candidates should have
 # extraInfo(Pi0_Prob) and extraInfo(Eta_Prob) value attached.
 # extraInfo(Pi0_Prob) means pi0 probability for the B0 candidates whose gamma daughter
@@ -94,39 +92,11 @@ writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma')
 # the extraInfo(Pi0_Prob) and extraInfo(Eta_Prob) does not exist. In these cases
 # -999 will be written to the extraInfo(Pi0_Prob) branch and extraInfo(Eta_Prob) branch
 
-# pi0/eta soft photon selection is important for pi0/eta veto performance.
-# The default cut values are as below.
-# clusterErrorTiming for pi0/eta soft photon abs(clusterTiming)
-# 0.025 GeV for forward pi0 soft photon energy
-# 0.02 GeV for other pi0 soft photon energy
-# 0.035 GeV for forward eta soft photon energy
-# 0.03 GeV for other eta soft photon energy
-
-# You can choose clusterTiming cut pattern by param timecut.
-# For example, you can use clusterTimingThreshold for soft photon clusterTiming cut.
-# clusterTimingThreshold is decided to fit photon energy vs abs(clusterTiming) that contains 99.7% of photon.
-# But clusterTimingThreshold is set to 120ns for E < 0.0615 GeV
-# to prevent from becoming overheat clusterTimingThreshold in low energy region.
-# This definition is effective for pi0/eta veto while photon efficiency may be down in low energy region.
-# If you use the energy dependent clusterTiming cut by clusterTimingThreshold, please set timecut to -2.
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',timecut=-2)
-# If you use the 140 ns constant clusterTiming cut, please set timecut to 140.
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',timecut=140)
-# In other words, timecut=-1 means clusterTiming cut by clusterErrorTiming(default),
-# timecut=-2 means clusterTiming cut by clusterTimingThreshold,
-# and others means clusterTiming cut constant value. The constant value is set to to timecut.
-
-# You can also change the energy cut value for each detection region in the ECL.
-# For example, if you set energy cut value for forward pi0 soft photon to 0.03 GeV, please set pi0softForward to 0.03.
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',pi0softForward=0.03)
-# Energy cut in the barrel and backward region is also available as well.
-
 # You might apply writePi0EtaVeto in one process several times.
 # Please be careful in that case.
 # You have to set pi0softname and etasoftname parameters to your original names except for default
 # from the second application for debug. For example,
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',timecut=140,
-# pi0softname='PI0SOFT_type2',etasoftname='ETASOFT_type2')
+# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',pi0softname='PI0SOFT_type2',etasoftname='ETASOFT_type2')
 # Please note that this is not enough if you apply this function more than once
 # regarding same particleList in one process,
 # you have to set not only pi0softname and etasoftname parameters

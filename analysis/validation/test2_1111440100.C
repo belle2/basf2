@@ -2,7 +2,7 @@
  <header>
  <input>../1111440100.ntup.root</input>
  <output>1111440100_Validation.root</output>
- <contact>A. MordÃ ; morda@pd.infn.it</contact>
+ <contact>A. Mordà ; morda@pd.infn.it</contact>
  </header>
  */
 
@@ -11,7 +11,7 @@
 // test2_1111440100.C
 // Check the Delta E and Mbc distributions for
 //  B0->J/psi(mumu)K0S(pi+pi-)
-// Constributor: A. MordÃ 
+// Constributor: A. Mordà 
 // May 25, 2017
 //
 ////////////////////////////////////////////////////////////
@@ -30,39 +30,38 @@
 void plot_dembc(TFile* pfile, TTree* ptree, TFile *outputFile){
   
  TString tmCuts("B0_isSignal");
-
- TH1F* h_mbc = new TH1F("h_mbc","M_{bc}",180,5.2,5.29);
+ TString title = "B^{0}#rightarrow J/#psi(#mu#mu) K_{S}^{0}";
+ TH1F* h_mbc = new TH1F("h_mbc",title,180,5.2,5.29);
  ptree->Project("h_mbc", "B0_mbc", tmCuts);
  h_mbc->GetXaxis()->SetTitle("M_{bc} (GeV/c^{2})");  
  h_mbc->GetYaxis()->SetTitle("Evts/bin");                     
- h_mbc->GetListOfFunctions()->Add(new TNamed("Description", h_mbc->GetTitle()));
+ h_mbc->GetListOfFunctions()->Add(new TNamed("Description", "B^{0}#rightarrow J/#psi(#mu#mu) K_{S}^{0}  M_{bc} [GeV/c^{2}]"));
  h_mbc->GetListOfFunctions()->Add(new TNamed("Contact" , "morda@pd.infn.it"));
  h_mbc->GetListOfFunctions()->Add(new TNamed("Check", "mass is expected to peak at 5.279 GeV/c^{2}"));
  gStyle->SetStatX(0.1);
  
- TH1F* h_deltae = new TH1F("h_deltae","#Delta E",100,-0.5,0.5);
+ TH1F* h_deltae = new TH1F("h_deltae",title,100,-0.5,0.5);
  ptree->Project("h_deltae", "B0_deltae", tmCuts);
  h_deltae->GetXaxis()->SetTitle("#DeltaE (GeV)"); 
  h_deltae->GetYaxis()->SetTitle("Evts/bin");           
- h_deltae->GetListOfFunctions()->Add(new TNamed("Description", h_deltae->GetTitle()));
+ h_deltae->GetListOfFunctions()->Add(new TNamed("Description", "B^{0}#rightarrow J/#psi(#mu#mu) K_{S}^{0}  #DeltaE [GeV]"));
  h_deltae->GetListOfFunctions()->Add(new TNamed("Contact" , "morda@pd.infn.it"));
  h_deltae->GetListOfFunctions()->Add(new TNamed("Check", "#Delta E is expected to peak at 0 GeV"));
 
- TH1F* h_Tres = new TH1F("h_Tres","#delta(#Delta T) #equiv #Delta T_{rec}-#Delta T_{gen}",100,-10,10);
+ TH1F* h_Tres = new TH1F("h_Tres",title,100,-10,10);
  ptree->Project("h_Tres", "B0_DeltaT-B0_TruthDeltaT", tmCuts);
  h_Tres->GetXaxis()->SetTitle("#delta(#Delta T) [ps]"); 
  h_Tres->GetYaxis()->SetTitle("Evts/bin");           
- h_Tres->GetListOfFunctions()->Add(new TNamed("Description", h_Tres->GetTitle()));
+ h_Tres->GetListOfFunctions()->Add(new TNamed("Description", "B^{0}#rightarrow J/#psi(#mu#mu) K_{S}^{0}  #delta(#Delta T)#equiv B0_DeltaT-B0_TruthDeltaT [ps]"));
  h_Tres->GetListOfFunctions()->Add(new TNamed("Contact" , "morda@pd.infn.it"));
  h_Tres->GetListOfFunctions()->Add(new TNamed("Check", "Time resolution has to peak at 0, the smaller the width of the distribution the better is"));
 
- TH1F* h_eff = new TH1F("h_eff","#varepsilon #equiv #frac{n true selected signal candidates}{total number of candidates}",1,0,1);
+ TH1F* h_eff = new TH1F("h_eff",title,1,0,1);
  h_eff->SetBinContent(1,ptree->GetEntries("B0_isSignal")/1000.0);
  h_eff->GetYaxis()->SetTitle("#varpesilon");           
- h_eff->GetListOfFunctions()->Add(new TNamed("Description", h_eff->GetTitle()));
+ h_eff->GetListOfFunctions()->Add(new TNamed("Description", "B^{0}#rightarrow J/#psi(#mu#mu) K_{S}^{0} #varepsilon #equiv #frac{true selected signal events}{total number of events}"));
  h_eff->GetListOfFunctions()->Add(new TNamed("Contact" , "morda@pd.infn.it"));
  h_eff->GetListOfFunctions()->Add(new TNamed("Check", "Efficiency has to be the greatest as possible"));
-
  
  outputFile->cd();
 
@@ -87,7 +86,7 @@ void test2_1111440100(){
     exit(1);
   }
   if(tree->GetEntries() == 0) {
-    std::cerr << "Input file doesn't contain dE/dx data, aborting!\n";
+    std::cerr << "Input file is empty, aborting!\n";
     exit(1);
   }
  TFile* outputFile = new TFile("1111440100_Validation.root","RECREATE");

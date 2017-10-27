@@ -11,7 +11,7 @@
 
 #######################################################
 #
-# Obtain Delta E and Mbc distribution from the decay:
+# Obtain validation plots from the decay:
 #
 #
 #    B0 -> K*0 + gamma
@@ -19,15 +19,14 @@
 #           +-> K+ pi-
 #
 #
-# Contributors: Saurabh Sandilya (April 2017)
-#
+# Contributors: Saurabh Sandilya
+#               Sam Cunliffe (Last update:Oct 27, 2017)
 ######################################################
 
-from basf2 import *
-from vertex import *
+from basf2 import process, statistics
 from modularAnalysis import *
-from reconstruction import *
 from stdFSParticles import *
+from variables import variables
 
 # load input ROOT file
 inputMdst('default', '../1110021001.dst.root')
@@ -61,9 +60,9 @@ tools += ['RecoStats', '^B0:sig']
 tools += ['Kinematics', '^B0:sig -> [^K*0:kpi -> ^K+:all ^pi-:all] ^gamma:all']
 tools += ['InvMass', '^B0:sig -> [^K*0:kpi -> K+:all pi-:all] gamma:all']
 tools += ['DeltaEMbc', '^B0:sig -> [K*0:kpi -> K+:all pi-:all] gamma:all']
-tools += ['MCTruth', '^B0:sig -> [^K*0:kpi -> ^K+:all ^pi-:all] ^gamma:all']
-tools += ['MCHierarchy', 'B0:sig -> [K*0:kpi -> ^K+:all ^pi-:all] ^gamma:all']
-tools += ['PID', 'B0:sig -> [K*0:kpi -> ^K+:all ^pi-:all] gamma:all']
+variables.addAlias("Egamma", "useRestFrame(daughter(1,E))")
+tools += ['CustomFloats[Egamma]', '^B0 -> [K*0 -> K+ pi-] gamma']
+
 
 # write out the flat ntuple
 ntupleFile('../1110021001.ntup.root')

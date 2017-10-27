@@ -47,7 +47,7 @@ vertexRave('B0:jpsiks', 0.0, 'B0:jpsiks -> [J/psi:mumu -> ^mu+ ^mu-] K_S0', '')
 TagV('B0:jpsiks', MCassociation='breco')
 
 toolsDST = ['EventMetaData', '^B0']
-toolsDST += ['FlavorTagging[TMVA-FBDT, FANN-MLP, qrCategories]', '^B0']
+toolsDST += ['FlavorTagging[TMVA-FBDT, FANN-MLP, qpCategories]', '^B0']
 toolsDST += ['RecoStats', '^B0']
 toolsDST += ['MCVertex', '^B0']
 toolsDST += ['Vertex', '^B0']

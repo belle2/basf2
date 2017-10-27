@@ -119,7 +119,7 @@ if 'B0_FANN_qrCombined' in totalBranches:
 
 usedCategories = []
 for cat in categories:
-    catBranch = 'B0_qr' + cat
+    catBranch = 'B0_qp' + cat
     if catBranch in totalBranches:
         usedCategories.append(cat)
 

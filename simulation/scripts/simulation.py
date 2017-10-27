@@ -74,7 +74,7 @@ def add_PXDDataReduction(path, components, use_vxdtf2=True,
     pxd_digifilter.param('PXDDigitsInsideROIName', 'PXDDigits')
     path.add_module(pxd_digifilter)
 
-    # empty the StoreSrrays which were used for the PXDDatareduction as those are not needed anymore
+    # empty the StoreArrays which were used for the PXDDatareduction as those are not needed anymore
     if doCleanup:
         datastore_cleaner = register_module('PruneDataStore')
         datastore_cleaner.param('keepMatchedEntries', False)

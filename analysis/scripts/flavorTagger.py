@@ -847,7 +847,7 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
     B2INFO('COMBINER LEVEL')
 
     B2INFO("Flavor Tagger: Required Combiner for Categories:")
-    for category in categories:
+    for (particleList, category, combinerVariable) in eventLevelParticleLists:
         B2INFO(category)
 
     B2INFO("Flavor Tagger: which corresponds to a weight file with categories combination code " + categoriesCombinationCode)

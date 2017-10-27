@@ -415,7 +415,7 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
   TTree* tree ;
   rootFile.GetObject(c_setupKeyNameTTreeName.c_str(), tree);
 
-  TString* setupKeyName = NULL;
+  TString* setupKeyName = nullptr;
   tree->SetBranchAddress(c_setupKeyNameBranchName.c_str(),
                          & setupKeyName);
 
@@ -476,13 +476,13 @@ SectorMapBootstrapModule::retrieveSectorMapFromDB(void)
   if (!rootFile.IsOpen()) B2FATAL("The Payload file: " << (*m_ptrDBObjPtr)->getFileName().c_str() <<
                                     " not found in the DB");
 
-  TTree* tree = NULL;
+  TTree* tree = nullptr;
   rootFile.GetObject(c_setupKeyNameTTreeName.c_str(), tree);
 
   // test if the tree was found
   if (!tree) B2FATAL("Did not found the setup tree: " << c_setupKeyNameTTreeName.c_str());
 
-  TString* setupKeyName = NULL;
+  TString* setupKeyName = nullptr;
   tree->SetBranchAddress(c_setupKeyNameBranchName.c_str(),
                          & setupKeyName);
 

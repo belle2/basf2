@@ -53,7 +53,7 @@ namespace Belle2 {
 
 
   template<class point_t>
-  class VXDTFFilters {
+  class VXDTFFilters final {
   public:
 
 
@@ -223,7 +223,7 @@ namespace Belle2 {
       if (staticSector == nullptr)
         return just_in_case;
       const auto* filterPtr = staticSector->getFilter2sp(inner);
-      if (filterPtr == NULL)
+      if (filterPtr == nullptr)
         return just_in_case;
       return *filterPtr;
     }

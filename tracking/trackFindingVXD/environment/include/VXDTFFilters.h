@@ -53,7 +53,7 @@ namespace Belle2 {
 
 
   template<class point_t>
-  class VXDTFFilters {
+  class VXDTFFilters final {
   public:
 
 
@@ -115,6 +115,13 @@ namespace Belle2 {
       m_staticSectors[0] = nullptr;
       // initialize the first slot of the Static sector vector
       m_staticSectors[1] = nullptr;
+    }
+
+    /** Destructor **/
+    ~VXDTFFilters()
+    {
+      // delete the static sectors
+      for (staticSector_t* aSector : m_staticSectors) if (aSector != nullptr) delete aSector;
     }
 
     /** To add an array of sectors on a sensor.
@@ -216,7 +223,7 @@ namespace Belle2 {
       if (staticSector == nullptr)
         return just_in_case;
       const auto* filterPtr = staticSector->getFilter2sp(inner);
-      if (filterPtr == NULL)
+      if (filterPtr == nullptr)
         return just_in_case;
       return *filterPtr;
     }

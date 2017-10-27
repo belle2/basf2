@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/pxdDataReduction/PXDDataReductionModule.h>
+#include <tracking/modules/pxdDataReduction/PXDROIFinderModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <genfit/MaterialEffects.h>
@@ -29,13 +29,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDDataReduction)
+REG_MODULE(PXDROIFinder)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDDataReductionModule::PXDDataReductionModule() : Module()
+PXDROIFinderModule::PXDROIFinderModule() : Module()
 {
   //Set module properties
   setDescription("This module performs the reduction of the PXD data output");
@@ -60,12 +60,12 @@ PXDDataReductionModule::PXDDataReductionModule() : Module()
 
 }
 
-PXDDataReductionModule::~PXDDataReductionModule()
+PXDROIFinderModule::~PXDROIFinderModule()
 {
 }
 
 
-void PXDDataReductionModule::initialize()
+void PXDROIFinderModule::initialize()
 {
   StoreArray<RecoTrack> trackList(m_recoTracksListName);
 
@@ -85,10 +85,10 @@ void PXDDataReductionModule::initialize()
 
 }
 
-void PXDDataReductionModule::beginRun()
+void PXDROIFinderModule::beginRun()
 {
 
-  B2INFO("||| PXDDataReduction Parameters:");
+  B2INFO("||| PXDROIFinder Parameters:");
   B2INFO("    tolerance: phi = " << m_tolerancePhi);
   B2INFO("                z = " << m_toleranceZ);
   B2INFO("    n sigma:    u = " << m_numSigmaTotU);
@@ -115,7 +115,7 @@ void PXDDataReductionModule::beginRun()
 }
 
 
-void PXDDataReductionModule::event()
+void PXDROIFinderModule::event()
 {
 
   StoreArray<PXDIntercept> PXDInterceptList(m_PXDInterceptListName);
@@ -146,14 +146,14 @@ void PXDDataReductionModule::event()
 }
 
 
-void PXDDataReductionModule::endRun()
+void PXDROIFinderModule::endRun()
 {
   delete m_thePixelTranslator;
   delete m_thePXDInterceptor;
 }
 
 
-void PXDDataReductionModule::terminate()
+void PXDROIFinderModule::terminate()
 {
 }
 

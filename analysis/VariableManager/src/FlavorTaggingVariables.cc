@@ -1536,7 +1536,7 @@ namespace Belle2 {
 
             if (nTargets > 0) output = 1;
 
-            if (nTargets > 1) B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
+            // if (nTargets > 1); B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
           }
           return output;
         };
@@ -1575,6 +1575,7 @@ namespace Belle2 {
           double output = 0.0;
 
           std::vector<Particle*> targetParticles;
+          std::vector<Particle*> targetParticlesCategory;
           Variable::Manager& manager = Variable::Manager::Instance();
 
           if (ListOfParticles.isValid())
@@ -1598,11 +1599,24 @@ namespace Belle2 {
             for (auto& targetParticle : targetParticles) {
               if (manager.getVariable("isRightCategory(" +  categoryName + ")")-> function(targetParticle) == 1) {
                 output = 1;
-                nTargets += 1;
+                nTargets += 1; targetParticlesCategory.push_back(targetParticle);
               }
             }
 
-            if (nTargets > 1) B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
+            /*            if (nTargets > 1) {
+                          B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
+                          for (auto& iTargetParticlesCategory : targetParticlesCategory) {
+                            const MCParticle* MCp = iTargetParticlesCategory -> getRelated<MCParticle>();
+
+                            RelationVector<Particle> mcRelations = MCp->getRelationsFrom<Particle>();
+                            if (mcRelations.size() > 1) B2WARNING("MCparticle is related to two particles");
+
+                            B2INFO("MCParticle has pdgCode = " << MCp -> getPDG() << ", MCMother has pdgCode = " << MCp-> getMother() -> getPDG() << " and " <<
+                                   MCp-> getMother() -> getNDaughters() << " daughters.");
+
+                            for (auto& iDaughter : MCp->getMother() -> getDaughters()) B2INFO("iDaughter PDGCode = " << iDaughter -> getPDG());
+                          }
+                        }*/
           }
           return output;
         };

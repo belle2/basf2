@@ -1773,3 +1773,36 @@ if __name__ == '__main__':
     from pager import Pager
     with Pager('List of available functions in modularAnalysis'):
         pretty_print_description_list(desc_list)
+
+
+def markDuplicate(particleList, prioritiseV0, path=analysis_main):
+    """
+    Call DuplicateVertexMarker to find duplicate particles in a list and
+    flag the ones that should be kept
+
+    @param particleList input particle list
+    @param prioritiseV0 if true, give V0s a higher priority
+    """
+    markdup = register_module('DuplicateVertexMarker')
+    markdup.param('particleList', particleList)
+    markdup.param('prioritiseV0', prioritiseV0)
+    path.add_module(markdup)
+
+
+def V0ListMerger(firstList, secondList, prioritiseV0, path=analysis_main):
+    """
+    Merge two particle lists, vertex them and trim duplicates
+
+    @param firstList first particle list to merge
+    @param secondList second particle list to merge
+    @param prioritiseV0 if true, give V0s a higher priority
+    """
+    listName = firstList.split(':')[0]
+    if (listName == secondList.split(':')[0]):
+        outList = listName + ':merged'
+        copyLists(outList, [firstList, secondList], False, path)
+        vertexKFit(outList, 0.0, '', '', path)
+        markDuplicate(outList, prioritiseV0, path)
+        applyCuts(outList, 'extraInfo(highQualityVertex)')
+    else:
+        B2ERROR("Lists to be merged contain different particles")

@@ -26,8 +26,6 @@ namespace Belle2 {
    * calibrations from the noise local runs. It provides the strip noise
    * in ADC units.
    *
-   * Currently the returned values are the default ones and they
-   * are not read from the DB.
    *
    */
   class SVDNoiseCalibrations {
@@ -50,19 +48,20 @@ namespace Belle2 {
      * Output: integer corresponding to the strip noise in ADC counts.
      * it throws std::out_of_range if the strip is unknown
      */
-    float getNoise(VxdID sensorID, bool isU , unsigned short strip) const
+    inline float getNoise(const VxdID& sensorID, const bool& isU , const unsigned short& strip) const
     {
       return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
                               sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
                               strip);
     }
 
-    void setNoise(VxdID sensorID, bool isU , unsigned short strip, float stripNoise)
+    /*    inline void setNoise(const VxdID& sensorID, const bool& isU , const unsigned short& strip, float stripNoise)
     {
       m_aDBObjPtr->set(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
                        sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
                        strip, stripNoise);
     }
+    */
 
   private:
     DBObjPtr< t_payload > m_aDBObjPtr;

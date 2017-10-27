@@ -103,6 +103,7 @@ class Quiet:
         """Exit the context"""
         ROOT.gErrorIgnoreLevel = self.oldlevel
 
+
 # root-file
 # rootfile = ROOT.TFile(workingFile, 'READ')
 # rootfile.cd()
@@ -548,6 +549,7 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     ROOT.gStyle.SetOptStat(0)
     Canvas = ROOT.TCanvas('Bla', 'TITEL BLA', 1200, 800)
     Canvas.cd()  # activate
+    Canvas.SetLogy()
     hist_signal.SetFillColorAlpha(ROOT.kBlue, 0.2)
     hist_signal.SetFillStyle(1001)
     hist_signal.SetTitleSize(0.1)
@@ -565,9 +567,9 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     hist_background.SetLineColor(ROOT.kRed)
 
     hist_signal.SetTitle(category + ' category; #it{qr}-Output ; Events')
-    hist_signal.SetMinimum(0)
+    # hist_signal.SetMinimum(0)
     hist_signal.SetMaximum(Ymax)
-    hist_background.SetMinimum(0)
+    # hist_background.SetMinimum(0)
     hist_background.SetMaximum(Ymax)
 
     hist_signal.Draw('hist')

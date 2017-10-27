@@ -16,6 +16,9 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+#include <framework/database/DBObjPtr.h>
+#include <alignment/dbobjects/BKLMAlignment.h>
+#include <bklm/dataobjects/BKLMElementID.h>
 
 using namespace std;
 
@@ -75,6 +78,8 @@ namespace Belle2 {
     {
       for (std::map<int, Module*>::iterator m = m_Modules.begin(); m != m_Modules.end(); ++m) { delete m->second; }
       m_Modules.clear();
+
+      m_Alignments.clear();
     }
 
     // Get BKLM geometry parameters from Gearbox (no calculations here)
@@ -394,6 +399,10 @@ namespace Belle2 {
       m_GapInnerRadius = m_Gap1InnerRadius + m_Layer1Height - m_LayerHeight;
       m_ModuleReadoutHeight = m_ModuleFoamHeight + (m_ModuleCopperHeight + m_ModuleMylarHeight) * 2.0;
       m_ModuleHeight = (m_ModuleCoverHeight + m_ModuleReadoutHeight + m_ModuleGasHeight + m_ModuleGlassHeight * 2.0) * 2.0;
+
+      // set up ReconstructionAlignment, so that those information can pass to Modules
+      readAlignmentFromDB();
+
       for (int fb = BKLM_FORWARD; fb <= BKLM_BACKWARD; ++fb) {
         bool isForward = (fb == BKLM_FORWARD);
         for (int sector = 1; sector <= m_NSector; ++sector) {
@@ -425,6 +434,7 @@ namespace Belle2 {
                                            localReconstructionShift,
                                            rotation
                                           );
+              pModule->setAlignment(getModuleAlignment(isForward, sector, layer));
               m_Modules.insert(std::pair<int, Module*>(moduleID, pModule));
             } else {
               double dy = getScintEnvelopeOffset(layer, hasChimney).y() * getScintEnvelopeOffsetSign(layer) * (isFlipped ? -1.0 : 1.0);
@@ -438,6 +448,7 @@ namespace Belle2 {
                                            rotation,
                                            isFlipped
                                           );
+              pModule->setAlignment(getModuleAlignment(isForward, sector, layer));
               m_Modules.insert(std::pair<int, Module*>(moduleID, pModule));
               double base = -0.5 * (m_NPhiScints[layer - 1] + 1) * m_ScintWidth;
               for (int scint = 1; scint <= m_NPhiScints[layer - 1]; ++scint) {
@@ -707,6 +718,67 @@ namespace Belle2 {
       }
       map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
       return (iM == m_Modules.end() ? NULL : iM->second);
+    }
+
+    const HepGeom::Transform3D GeometryPar::getModuleAlignment(bool isForward, int sector, int layer) const
+    {
+      int moduleID = (isForward ? BKLM_END_MASK : 0)
+                     | ((sector - 1) << BKLM_SECTOR_BIT)
+                     | ((layer - 1) << BKLM_LAYER_BIT);
+      map<int, HepGeom::Transform3D>::const_iterator iA = m_Alignments.find(moduleID);
+      return (iA == m_Alignments.end() ? HepGeom::Transform3D() : iA->second);
+    }
+
+    void GeometryPar::readAlignmentFromDB()
+    {
+      DBObjPtr<BKLMAlignment> bklmAlignments;
+      if (!bklmAlignments.isValid()) {
+        B2INFO("No BKLM alignment data.");
+        return;
+      }
+
+      for (int fb = BKLM_FORWARD; fb <= BKLM_BACKWARD; ++fb) {
+        bool isForward = (fb == BKLM_FORWARD);
+        for (int sector = 1; sector <= m_NSector; ++sector) {
+          for (int layer = 1; layer <= m_NLayer; ++layer) {
+
+            // BKLM_FORWARD =1, BKLM_BACKWARD=2.
+            BKLMElementID bklmid(fb - 1, sector - 1, layer - 1);
+
+            HepGeom::Transform3D alignment;
+            alignment = getTransformFromAlignmentParams(bklmAlignments->get(bklmid, 1),
+                                                        bklmAlignments->get(bklmid, 2),
+                                                        bklmAlignments->get(bklmid, 3),
+                                                        bklmAlignments->get(bklmid, 4),
+                                                        bklmAlignments->get(bklmid, 5),
+                                                        bklmAlignments->get(bklmid, 6)
+                                                       );
+
+            int moduleID = (isForward ? BKLM_END_MASK : 0)
+                           | ((sector - 1) << BKLM_SECTOR_BIT)
+                           | ((layer - 1) << BKLM_LAYER_BIT);
+
+            m_Alignments.insert(std::pair<int, HepGeom::Transform3D>(moduleID, alignment));
+          }
+        }
+      }
+      // Add callback to itself.
+      bklmAlignments.addCallback(this, &bklm::GeometryPar::readAlignmentFromDB);
+    }
+
+    HepGeom::Transform3D GeometryPar::getTransformFromAlignmentParams(double dU, double dV, double dW, double dAlpha, double dBeta,
+        double dGamma)
+    {
+
+      CLHEP::HepRotation dx = CLHEP::HepRotationX(dGamma);
+      CLHEP::HepRotation dy = CLHEP::HepRotationY(dAlpha);
+      CLHEP::HepRotation dz = CLHEP::HepRotationZ(dBeta);
+      CLHEP::Hep3Vector shift(dW, dU, dV);
+
+      //we do dx-->dz-->dy ( local w-->v-->u), because angles are definded as intrinsic rotations u-->v'-->w''
+      //the equivalent one is extrinsic rotation with the order w (gamma)--> v(beta) --> u (alpha)
+      //and then we map it to global rotation x -> z -> y axis
+      return HepGeom::Transform3D(dy * dz * dx, shift);
     }
 
 

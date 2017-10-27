@@ -126,7 +126,7 @@ def stdMu(listtype='all', path=analysis_main):
     if listtype == 'all':
         fillParticleList('mu+:all', '', True, path)
     elif listtype == '95eff':
-        fillParticleList('e+:95eff', 'muid > 0.625 and chiProb > 0.001', True, path)
+        fillParticleList('mu+:95eff', 'muid > 0.625 and chiProb > 0.001', True, path)
     else:
         fillParticleList('mu+:all', '', True, path)
 

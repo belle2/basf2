@@ -787,8 +787,8 @@ namespace Belle2 {
               for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
                 Particle* pSlowPion = SlowPionList->getParticle(i);
                 if (pSlowPion != nullptr) {
-                  if (pSlowPion -> hasExtraInfo("isRightTrack(SlowPion)")) {
-                    double probSlowPion = pSlowPion->getExtraInfo("isRightTrack(SlowPion)");
+                  if (pSlowPion -> hasExtraInfo("isRightCategory(SlowPion)")) {
+                    double probSlowPion = pSlowPion->getExtraInfo("isRightCategory(SlowPion)");
                     if (probSlowPion > maximumProbSlowPion) {
                       maximumProbSlowPion = probSlowPion;
                       chargeTargetSlowPion =  pSlowPion -> getCharge();

@@ -143,7 +143,7 @@ def add_simulation(
     if components is None or 'PXD' in components:
         if usePXDDataReduction:
             pxd_digits_name = 'pxd_unfiltered_digits'
-        add_pxd_simulation(path, digitsname=pxd_digits_name)
+        add_pxd_simulation(path, digitsName=pxd_digits_name)
 
     # TOP digitization
     if components is None or 'TOP' in components:

@@ -70,10 +70,10 @@ namespace Belle2 {
       double m_cutSeed;
       /** Adjacent cut in units of noise. */
       double m_cutAdjacent;
-      /** Cluster cut in units of m_elNoise */
-      //      double m_cutCluster; //not included yet
       /** Size of the cluster at which we switch from Center of Gravity to Analog Head Tail */
       int m_sizeHeadTail;
+      // Cluster cut in units of m_elNoise, not included (yet?)
+      //  double m_cutCluster;
 
       //calibration objects
       SVDPulseShapeCalibrations m_PulseShapeCal;

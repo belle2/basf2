@@ -50,7 +50,7 @@ SVDSimpleClusterizerModule::SVDSimpleClusterizerModule() : Module(),
   m_cutSeed(5.0), m_cutAdjacent(3.0), m_sizeHeadTail(3)
 {
   //Set module properties
-  setDescription("Clusterize SVDRecoDigits fitted by the basic time estimator");
+  setDescription("Clusterize SVDRecoDigits fitted by the bCenter of Gravity estimator");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // 1. Collections.
@@ -125,10 +125,10 @@ void SVDSimpleClusterizerModule::initialize()
   B2INFO(" -->  ClusterDigitRel:    " << m_relClusterRecoDigitName);
   B2INFO(" -->  DigitTrueRel:       " << m_relRecoDigitTrueHitName);
   B2INFO(" -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
-  B2INFO(" 4. CLUSTERING:");
+  B2INFO(" 2. CLUSTERING:");
   B2INFO(" -->  Neighbour cut:      " << m_cutAdjacent);
   B2INFO(" -->  Seed cut:           " << m_cutSeed);
-
+  B2INFO(" -->  Size HeadTail:      " << m_sizeHeadTail);
 }
 
 
@@ -137,8 +137,12 @@ void SVDSimpleClusterizerModule::event()
 {
   const StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   const StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  const StoreArray<SVDRecoDigit>   storeDigits(m_storeRecoDigitsName);
+  const StoreArray<SVDRecoDigit> storeDigits(m_storeRecoDigitsName);
   StoreArray<SVDCluster> storeClusters(m_storeClustersName);
+
+  int nDigits = storeDigits.getEntries();
+  if (nDigits == 0)
+    return;
 
   storeClusters.clear();
 
@@ -154,9 +158,6 @@ void SVDSimpleClusterizerModule::event()
                                   m_relClusterTrueHitName);
   if (relClusterTrueHit) relClusterTrueHit.clear();
 
-  int nDigits = storeDigits.getEntries();
-  if (nDigits == 0)
-    return;
 
   //create a dummy cluster just to start
   SimpleClusterCandidate* clusterCandidate = new SimpleClusterCandidate(storeDigits[0]->getSensorID(), storeDigits[0]->isUStrip(),
@@ -230,8 +231,17 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
 
   StoreArray<SVDCluster> storeClusters(m_storeClustersName);
   const StoreArray<SVDRecoDigit> storeDigits(m_storeRecoDigitsName);
+  const StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  const StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
 
   RelationArray relClusterDigit(storeClusters, storeDigits, m_relClusterRecoDigitName);
+
+  RelationArray relClusterMCParticle(storeClusters, storeMCParticles, m_relClusterMCParticleName);
+  RelationArray relClusterTrueHit(storeClusters, storeTrueHits, m_relClusterTrueHitName);
+
+  RelationIndex<SVDRecoDigit, MCParticle> relDigitMCParticle(storeDigits, storeMCParticles, m_relRecoDigitMCParticleName);
+  RelationIndex<SVDRecoDigit, SVDTrueHit> relDigitTrueHit(storeDigits, storeTrueHits, m_relRecoDigitTrueHitName);
+
 
   VxdID sensorID = cluster.getSensorID();
   bool isU = cluster.isUSide();
@@ -250,15 +260,50 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
                           ));
 
   //register relation between RecoDigit and Cluster
-  int clsIndex = storeClusters.getEntries();
+  int clsIndex = storeClusters.getEntries() - 1;
+
+  map<int, float> mc_relations;
+  map<int, float> truehit_relations;
 
   vector<pair<int, float> > digit_weights;
   digit_weights.reserve(size);
 
   std::vector<stripInCluster> strips = cluster.getStripsInCluster();
 
-  for (auto strip : strips)
+  for (auto strip : strips) {
+
+    //Fill map with MCParticle relations
+    if (relDigitMCParticle) {
+      typedef const RelationIndex<SVDRecoDigit, MCParticle>::Element relMC_type;
+      for (relMC_type& mcRel : relDigitMCParticle.getElementsFrom(storeDigits[strip.recoDigitIndex])) {
+        //negative weights are from ignored particles, we don't like them and
+        //thus ignore them :D
+        if (mcRel.weight < 0) continue;
+        mc_relations[mcRel.indexTo] += mcRel.weight;
+      };
+    };
+    //Fill map with SVDTrueHit relations
+    if (relDigitTrueHit) {
+      typedef const RelationIndex<SVDRecoDigit, SVDTrueHit>::Element relTrueHit_type;
+      for (relTrueHit_type& trueRel : relDigitTrueHit.getElementsFrom(storeDigits[strip.recoDigitIndex])) {
+        //negative weights are from ignored particles, we don't like them and
+        //thus ignore them :D
+        if (trueRel.weight < 0) continue;
+        truehit_relations[trueRel.indexTo] += trueRel.weight;
+      };
+    };
+
     digit_weights.push_back(make_pair(strip.recoDigitIndex, strip.charge));
+  }
+
+
+  //Create Relations to this Digit
+  if (!mc_relations.empty()) {
+    relClusterMCParticle.add(clsIndex, mc_relations.begin(), mc_relations.end());
+  }
+  if (!truehit_relations.empty()) {
+    relClusterTrueHit.add(clsIndex, truehit_relations.begin(), truehit_relations.end());
+  }
 
   relClusterDigit.add(clsIndex, digit_weights.begin(), digit_weights.end());
 }

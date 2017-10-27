@@ -180,7 +180,10 @@ void ECLTrackShowerMatchModule::computeDepth(const ECLShower& shower, double& lT
     const TrackFitResult* fit = track.getTrackFitResultWithClosestMass(Const::pion);
     double cp = 0;
     if (fit != 0) cp = fit->getMomentum().Mag();
-    if (cp > p) selectedTrk = & track;
+    if (cp > p) {
+      selectedTrk = & track;
+      p = cp;
+    }
   }
   lTrk = 0;
   lShower = 0;

@@ -7,7 +7,8 @@ Usage :
 basf2 runReconstruction.py <input> <output>
 input: Input root file (after CDC unpacker).
        These data are usually stored in
-       /ghi/fs01/belle2/bdata/group/detector/CDC/unpacked/
+       GCR2017 (RAW) /hsm/belle2/bdata/Data/Raw/e0001/
+       GCR2017 (dst) /hsm/belle2/bdata/Data/release-00-09-01/DB00000266/ etc...
 output : Output root file, which contains helix parameters.
          N.B. this is not the basf2 root file!
          To see the helix parameters.
@@ -35,7 +36,7 @@ use_central_database("GT_gen_data_003.04_gcr2017-08", LogLevel.WARNING)
 
 
 def rec(input, output, topInCounter=False, magneticField=True,
-        unpacking=False, fieldMapper=True):
+        unpacking=False, fieldMapper=False):
     main_path = basf2.create_path()
     logging.log_level = LogLevel.INFO
 
@@ -117,4 +118,4 @@ if __name__ == "__main__":
     parser.add_argument('output', help='Output file you want to store the results.')
     args = parser.parse_args()
     rec(args.input, args.output, topInCounter=False, magneticField=True,
-        unpacking=True, fieldMapper=True)
+        unpacking=False, fieldMapper=True)

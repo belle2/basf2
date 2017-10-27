@@ -12,7 +12,7 @@
 #include <framework/logging/Logger.h>
 
 //#include <svd/dbobjects/SVDPulseShapeCalibrations.h>
-#include <svd/dbobjects/SVDLocalRunBadStrips.h>
+//#include <svd/dbobjects/SVDLocalRunBadStrips.h>
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -61,12 +61,14 @@ void SVDDatabaseTestModule::event()
   B2INFO("ADC counts [a.u.] L3_1_1 side V strip 0 = " << m_obj_pulseShape.getADCFromCharge(sensorID, false, 0, 22500.));
   B2INFO("Peaking time [ns] L3_1_1 side V strip 0 = " << m_obj_pulseShape.getPeakTime(sensorID, false, 0));
   B2INFO("Pulse width [ns]  L3_1_1 side V strip 0 = " << m_obj_pulseShape.getWidth(sensorID, false, 0));
+  B2INFO("Time Correction [ns]  L3_1_1 side V strip 0 = " << m_obj_pulseShape.getTimeShiftCorrection(sensorID, false, 0));
   B2INFO("~~~~~~~~~~~~~~\n");
 
   B2INFO("Charge [e]        L3_1_1 side U strip 0 = " << m_obj_pulseShape.getChargeFromADC(sensorID, true, 0, 60));
   B2INFO("ADC counts [a.u.] L3_1_1 side U strip 0 = " << m_obj_pulseShape.getADCFromCharge(sensorID, true, 0, 22500.));
   B2INFO("Peaking time [ns] L3_1_1 side U strip 0 = " << m_obj_pulseShape.getPeakTime(sensorID, true, 0));
   B2INFO("Pulse width [ns]  L3_1_1 side U strip 0 = " << m_obj_pulseShape.getWidth(sensorID, true, 0));
+  B2INFO("Time Correction [ns]  L3_1_1 side V strip 0 = " << m_obj_pulseShape.getTimeShiftCorrection(sensorID, true, 0));
 
   B2INFO("isBad = " << m_obj_badStrip->isBad(1, true, 1));
 

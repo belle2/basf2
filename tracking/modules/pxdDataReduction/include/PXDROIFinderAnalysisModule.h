@@ -31,19 +31,19 @@ namespace Belle2 {
    *
    */
 
-  class PXDDataRedAnalysisModule : public Module {
+  class PXDROIFinderAnalysisModule : public Module {
 
   public:
 
     /**
      * Constructor of the module.
      */
-    PXDDataRedAnalysisModule();
+    PXDROIFinderAnalysisModule();
 
     /**
      * Destructor of the module.
      */
-    virtual ~PXDDataRedAnalysisModule();
+    virtual ~PXDROIFinderAnalysisModule();
 
     /**
      *Initializes the Module.

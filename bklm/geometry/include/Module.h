@@ -186,10 +186,10 @@ namespace Belle2 {
       // void setAlignmentCorrectionSwitch(bool ifreo ) { m_AlignmentCorrectionSwitch = ifreo;}
 
       //! Set the alignment Transformation
-      void setAlignment(HepGeom::Transform3D moduleAlignment);
+      void setAlignment(const HepGeom::Transform3D& moduleAlignment);
 
       //! Set the displaced geometry Transformation
-      void setDisplacedGeo(HepGeom::Transform3D moduleDisplacedGeo);
+      void setDisplacedGeo(const HepGeom::Transform3D& moduleDisplacedGeo);
 
       //! Get the alignment Transformation
       const HepGeom::Transform3D getAlignment() const { return m_Alignment; }

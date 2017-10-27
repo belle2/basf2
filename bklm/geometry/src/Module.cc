@@ -250,7 +250,7 @@ namespace Belle2 {
       return vlocal;
     }
 
-    void Module::setAlignment(HepGeom::Transform3D moduleAlignment)
+    void Module::setAlignment(const HepGeom::Transform3D& moduleAlignment)
     {
       m_Alignment = moduleAlignment;
       m_AlignmentRotation = getRotationFromTransform3D(moduleAlignment);
@@ -259,7 +259,7 @@ namespace Belle2 {
       m_AlignmentRotationInverse = getRotationFromTransform3D(m_AlignmentInverse);
     }
 
-    void Module::setDisplacedGeo(HepGeom::Transform3D moduleDisplacedGeo)
+    void Module::setDisplacedGeo(const HepGeom::Transform3D& moduleDisplacedGeo)
     {
       m_DisplacedGeo = moduleDisplacedGeo;
       m_DisplacedGeoRotation = getRotationFromTransform3D(moduleDisplacedGeo);

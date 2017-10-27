@@ -16,63 +16,74 @@
 #include <string.h>
 
 namespace Belle2 {
-  // find the log base 2 of 32-bit v
+  /** find the log base 2 of 32-bit v */
   unsigned int ilog2(unsigned int v);
 
-  /*!
-    bit stream struct
-  */
+  /** Bit stream struct.
+   * Class contains vector of unsigned ints as a storage and current bit position in the storage.
+   * One can put and fetch up to 32 bits at once.
+   */
   class BitStream {
   public:
-    // default constructor for ROOT
-    BitStream(): _pos(0) {}
+    /** Default constructor for ROOT.
+     *  Current position is at begining of the storage.
+     */
+    BitStream(): m_pos(0) {}
 
-    // constructor with reserved space -- for packing
-    BitStream(int n): _pos(0)
+    /** Constructor with the reserved and cleared storage prepared for
+     *  incoming bits. Be sure the size is enough for incoming data
+     *  since the class does not check bounds.  Current position is at
+     *  begining of the storage.
+     */
+    BitStream(int n): m_pos(0)
     {
-      _store.resize(n);
-      memset(_store.data(), 0, _store.size()*sizeof(unsigned int));
+      m_store.resize(n);
+      memset(m_store.data(), 0, m_store.size()*sizeof(unsigned int));
     }
 
-    // push n least significant bits of "value" to the stream. Update current position accordingly
+    /** Push n least significant bits of "value" to the stream. Update current position accordingly.
+     * @param value -- value to put in the stream
+     * @param n -- how many least signfificant bits of "value" put in the stream (n<=32)
+     */
     void putNBits(unsigned int value, unsigned int n)
     {
-      unsigned int bpos = _pos % 32, wpos = _pos / 32;
+      unsigned int bpos = m_pos % 32, wpos = m_pos / 32;
       value &= (1 << n) - 1;
-      _store[wpos] |= value << bpos;
-      if (bpos + n > 32) _store[wpos + 1] = value >> (32 - bpos);
-      _pos += n;
+      m_store[wpos] |= value << bpos;
+      if (bpos + n > 32) m_store[wpos + 1] = value >> (32 - bpos);
+      m_pos += n;
     }
 
-    // fetch n bits. Update current position accordingly
+    /** Fetch n bits. Update current position accordingly
+     * @param n -- how many bits fetch from the current position in the stream
+     * @return n fetched bits
+     */
     unsigned int getNBits(unsigned int n)
     {
-      unsigned int bpos = _pos % 32, wpos = _pos / 32;
-      unsigned int res = _store[wpos] >> bpos;
-      if (bpos + n > 32) res |= _store[wpos + 1] << (32 - bpos);
-      _pos += n;
+      unsigned int bpos = m_pos % 32, wpos = m_pos / 32;
+      unsigned int res = m_store[wpos] >> bpos;
+      if (bpos + n > 32) res |= m_store[wpos + 1] << (32 - bpos);
+      m_pos += n;
       return res & ((1 << n) - 1);
     }
 
-    // get current position in the stream
-    size_t getPos() const {return _pos;}
+    /** Get current position in the stream. */
+    size_t getPos() const {return m_pos;}
 
-    // set position in the stream
-    void setPos(size_t pos) {_pos = pos;}
+    /** Set position in the stream. */
+    void setPos(size_t pos) {m_pos = pos;}
 
-    // get data vector
-    std::vector<unsigned int>& getStore() {return _store;}
+    /** Get data vector. */
+    std::vector<unsigned int>& getStore() {return m_store;}
 
-    // resize data vector to the current length
+    /** Resize data vector to the current position. */
     void resize()
     {
-      _store.resize((_pos + 31) / 32);
+      m_store.resize((m_pos + 31) / 32);
     }
   protected:
-    // position in the stream
-    size_t _pos;
-    // storage
-    std::vector<unsigned int> _store;
+    size_t m_pos; /**< Current position in the storage. */
+    std::vector<unsigned int> m_store; /**< The bit storage. */
   };
 
   class ECLCompress {

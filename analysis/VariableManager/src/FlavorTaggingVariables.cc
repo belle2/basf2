@@ -388,7 +388,7 @@ namespace Belle2 {
                     if (mcParticle -> getPDG() > 0) BcpFlavor = 2;
                     else BcpFlavor = -2;
                   } else if (BtagFlavor == 0) {
-                    if (TMath::Abs(mcParticle -> getPDG()) == 511) {
+                    if (TMath::Abs(mcParticle -> getPDG()) == 511 || TMath::Abs(mcParticle -> getPDG()) == 521) {
                       if (mcParticle -> getPDG() > 0) BtagFlavor = 1;
                       else BtagFlavor = -1;
                     } else BtagFlavor = 5;
@@ -434,7 +434,7 @@ namespace Belle2 {
                     if (mcParticle -> getPDG() > 0) BcpFlavor = 2;
                     else BcpFlavor = -2;
                   } else if (BtagFlavor == 0) {
-                    if (TMath::Abs(mcParticle -> getPDG()) == 511) {
+                    if (TMath::Abs(mcParticle -> getPDG()) == 511 || TMath::Abs(mcParticle -> getPDG()) == 521) {
                       if (mcParticle -> getPDG() > 0) BtagFlavor = 1;
                       else BtagFlavor = -1;
                     } else BtagFlavor = 5;

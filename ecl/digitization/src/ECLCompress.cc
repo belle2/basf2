@@ -94,10 +94,22 @@ void ECLDeltaCompress::uncompress(BitStream& out, int* adc)
   }
 }
 
+/** Bit widths for the prefix coding to encode integers which are
+ * mainly concentrated around zero and probability density are
+ * decreasing for large absolute values.
+ * @sa stream_int(BitStream& OUT, int x, const width_t& w) and
+ * int fetch_int(BitStream& IN, const width_t& w) function for more details
+ */
 struct width_t {
-  unsigned char w0, w1, w2, w3;
+  unsigned char w0, w1, w2, w3; /** Progressive bit widths to encode an integer value*/
 };
 
+/** Based on phase 3 MC bit widths for prefix coding for all DCT
+ * coefficients with scale factor s=0.25 used in quantization process
+ * which provides the best compression factor. Comment in each line shows
+ * coefficient number and the average number of bits to encode the
+ * coefficient
+ */
 width_t widths_scale025[] = {
   {7, 9, 18, 32},//  0 7.72447
   {5, 7, 18, 32},//  1 5.45839
@@ -132,23 +144,34 @@ width_t widths_scale025[] = {
   {2, 3, 18, 32} // 30 2.00004
 };
 
+/** put integer "x" to the stream OUT with a priory knowledge how "x"
+ *  is distributed encoded in "w".
+ * @param OUT output bit stream
+ * @param x integer to compress and stream out
+ * @param w progessive bit widths
+ */
 void stream_int(BitStream& OUT, int x, const width_t& w)
 {
   int ax = abs(x), m0 = 1 << (w.w0 - 1), m1 = 1 << (w.w1 - 1), m2 = 1 << (w.w2 - 1);
-  if (ax < m0) {
+  if (ax < m0) { // integer fits into w0 bits
     OUT.putNBits(x, w.w0);
-  } else if (ax < m1) {
-    OUT.putNBits((x << w.w0) | m0, w.w1 + w.w0);
-  } else if (ax < m2) {
+  } else if (ax < m1) {// integer fits into w1 bits
+    OUT.putNBits((x << w.w0) | m0, w.w1 + w.w0); // first stream prefix showing that we are switching to the next bit width format
+  } else if (ax < m2) {// integer fits into w2 bits
     OUT.putNBits((m1 << w.w0) | m0, w.w1 + w.w0);
     OUT.putNBits(x, w.w2);
-  } else {
+  } else {// integer fits into w3 bits
     OUT.putNBits((m1 << w.w0) | m0, w.w1 + w.w0);
     OUT.putNBits(m2, w.w2);
     OUT.putNBits(x, w.w3);
   }
 }
 
+/** Extract integer from the stream OUT with a priory knowledge how it
+ *  is distributed encoded in "w".
+ * @param IN input bit stream
+ * @param w progessive bit widths
+ */
 int fetch_int(BitStream& IN, const width_t& w)
 {
   int m0 = 1 << (w.w0 - 1), m1 = 1 << (w.w1 - 1), m2 = 1 << (w.w2 - 1);
@@ -172,7 +195,16 @@ int fetch_int(BitStream& IN, const width_t& w)
 }
 
 extern "C" {
+  /** DCT-II or "the" DCT transformation of 31-point signal
+   * @param I input signal with amplitudes
+   * @param O output coefficients of the transformation
+   */
   void e10_31(const double* I, double* O);
+
+  /** DCT-III or "the inverse" DCT transformation of 31-point signal
+   * @param I input coefficients
+   * @param O output signal amplitudes
+   */
   void e01_31(const double* I, double* O);
 }
 

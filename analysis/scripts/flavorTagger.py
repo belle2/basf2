@@ -224,12 +224,6 @@ def WhichCategories(categories=[
     for code in sorted(categoriesCombination):
         categoriesCombinationCode = categoriesCombinationCode + '%02d' % code
 
-    B2INFO("Flavor Tagger: Required Combiner for Categories:")
-    for category in categories:
-        B2INFO(category)
-
-    B2INFO("Flavor Tagger: which corresponds to a weight file with categories combination code " + categoriesCombinationCode)
-
 
 # Variables for categories on track level - are defined in variables.cc and MetaVariables.cc
 variables = dict()
@@ -625,8 +619,9 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
             if mode == 'Sampler':
                 methodPrefixEventLevelKaonPion = belleOrBelle2Flag + "_" + weightFiles + 'EventLevelKaonPionFBDT'
                 identifierEventLevelKaonPion = filesDirectory + '/' + methodPrefixEventLevelKaonPion + '_1.root'
-                if not os.path.isfile(identifierEventLevelKaonPion) and category != 'SlowPion':
-                    continue
+                if not os.path.isfile(identifierEventLevelKaonPion):
+                    if category != "SlowPion" or category != "Kaon":
+                        continue
 
             if particleList not in identifiersExtraInfosDict and category != 'KaonPion':
                 identifiersExtraInfosDict[particleList] = [(extraInfoName, identifierEventLevel)]
@@ -636,7 +631,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
                 identifiersExtraInfosKaonPion.append((extraInfoName, identifierEventLevel))
 
             ReadyMethods += 1
-
+    print(identifiersExtraInfosDict)
     # Each category has its own Path in order to be skipped if the corresponding particle list is empty
     for particleList in identifiersExtraInfosDict:
         eventLevelPath = create_path()
@@ -850,6 +845,12 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
     """
 
     B2INFO('COMBINER LEVEL')
+
+    B2INFO("Flavor Tagger: Required Combiner for Categories:")
+    for category in categories:
+        B2INFO(category)
+
+    B2INFO("Flavor Tagger: which corresponds to a weight file with categories combination code " + categoriesCombinationCode)
 
     methodPrefixCombinerLevel = belleOrBelle2Flag + "_" + weightFiles + 'Combiner' \
         + categoriesCombinationCode

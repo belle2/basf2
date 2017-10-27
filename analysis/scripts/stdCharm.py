@@ -53,7 +53,7 @@ def loadStdDstar0(path=analysis_main):
     # stdKS()
     Dcuts = '1.95 < M < 2.05'
     D_Channels = ['D0:all pi0:all',
-                  'D0:all gamma:all']
+                  'D0:all gamma:skim']
 
     DList = []
     for chID, channel in enumerate(D_Channels):

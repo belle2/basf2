@@ -155,6 +155,9 @@ namespace Belle2 {
      * @param trackArrayIndex track StoreArray index
      * @param trackFit pointer to TrackFitResult object
      * @param chargedStable Type of charged particle
+     * @param chargedStableUsedForFit Type of particle which has been used in the track fit.
+     *        This can be different as chargedStable as we don't fit all tracks with
+     *        all hypothesis.
      */
     Particle(const int trackArrayIndex,
              const TrackFitResult* trackFit,

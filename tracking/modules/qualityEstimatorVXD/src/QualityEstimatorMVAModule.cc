@@ -52,18 +52,6 @@ void QualityEstimatorMVAModule::initialize()
 
   m_mvaExpert = std::make_unique<MVAExpert>(m_WeightFileIdentifier, m_variableSet);
   m_mvaExpert->initialize();
-}
-
-void QualityEstimatorMVAModule::beginRun()
-{
-  m_mvaExpert->beginRun();
-}
-
-void QualityEstimatorMVAModule::event()
-{
-
-  // BField is required by all QualityEstimators
-  double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
 
   // create pointer to chosen estimator
   if (m_EstimationMethod == "tripletFit") {
@@ -74,9 +62,18 @@ void QualityEstimatorMVAModule::event()
     m_estimator = std::make_unique<QualityEstimatorRiemannHelixFit>();
   }
   B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);
+}
 
+void QualityEstimatorMVAModule::beginRun()
+{
+  m_mvaExpert->beginRun();
+  // BField is required by all QualityEstimators
+  double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
   m_estimator->setMagneticFieldStrength(bFieldZ);
+}
 
+void QualityEstimatorMVAModule::event()
+{
   // assign a QI computed using the selected QualityEstimator for each given SpacePointTrackCand
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
     if (not aTC.hasRefereeStatus(SpacePointTrackCand::c_isActive)) {
@@ -93,7 +90,6 @@ void QualityEstimatorMVAModule::event()
 
     m_qeResultsExtractor->extractVariables(m_estimator->estimateQualityAndProperties(sortedHits));
 
-    // TODO: Why is this float? In both functions return and parameter are double -> FastBDT uses float everywhere
     float qi = m_mvaExpert->predict();
     aTC.setQualityIndex(qi);
   }

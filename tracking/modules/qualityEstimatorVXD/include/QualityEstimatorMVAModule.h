@@ -15,7 +15,6 @@
 #include <tracking/trackFindingVXD/variableExtractors/ClusterInfoExtractor.h>
 #include <tracking/trackFindingVXD/variableExtractors/QEResultsExtractor.h>
 
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
 

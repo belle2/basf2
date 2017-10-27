@@ -58,15 +58,6 @@ void QETrainingDataCollectorModule::initialize()
   }
 
   m_recorder = std::make_unique<SimpleVariableRecorder>(m_variableSet, m_TrainingDataOutputName, "tree");
-}
-
-void QETrainingDataCollectorModule::event()
-{
-  // BField is required by all QualityEstimators
-  double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
-  m_estimatorMC = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
-
-  m_estimatorMC->setMagneticFieldStrength(bFieldZ);
 
   // create pointer to chosen estimator
   if (m_EstimationMethod == "tripletFit") {
@@ -77,9 +68,20 @@ void QETrainingDataCollectorModule::event()
     m_estimator = std::make_unique<QualityEstimatorRiemannHelixFit>();
   }
   B2ASSERT("Not all QualityEstimators could be initialized!", m_estimator);
+}
 
+void QETrainingDataCollectorModule::beginRun()
+{
+  // BField is required by all QualityEstimators
+  double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
   m_estimator->setMagneticFieldStrength(bFieldZ);
 
+  m_estimatorMC = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
+  m_estimatorMC->setMagneticFieldStrength(bFieldZ);
+}
+
+void QETrainingDataCollectorModule::event()
+{
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
 
     if (not aTC.hasRefereeStatus(SpacePointTrackCand::c_isActive)) {
@@ -94,7 +96,8 @@ void QETrainingDataCollectorModule::event()
 
     m_nSpacePoints = sortedHits.size();
 
-    float tmp = m_estimatorMC->estimateQuality(sortedHits);
+    // TODO: What is the point of this? Why not bool?
+    double tmp = m_estimatorMC->estimateQuality(sortedHits);
     m_truth = tmp > 0 ? 1 : 0;
 
     m_qeResultsExtractor->extractVariables(m_estimator->estimateQualityAndProperties(sortedHits));

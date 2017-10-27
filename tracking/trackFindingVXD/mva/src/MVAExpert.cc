@@ -96,7 +96,7 @@ std::unique_ptr<MVA::Weightfile> MVAExpert::getWeightFile()
   }
 }
 
-double MVAExpert::predict()
+float MVAExpert::predict()
 {
   if (not m_expert) {
     B2ERROR("MVA Expert is not loaded! I will return 0");
@@ -107,9 +107,6 @@ double MVAExpert::predict()
   for (unsigned int i = 0; i < m_namedVariables.size(); ++i) {
     m_dataset->m_input[i] = *(m_namedVariables[i].getValue());
   }
-  // TODO: Why only return element 0 (iEvent) ?
-  // in FastBDT.cc: probabilities[iEvent] = m_expert_forest.Analyse(test_data.m_input)
-  // TODO: calling the full apply seams unnecessary
-  // ----> Dataset.h->SingleDataset: Returns the number of events in this dataset which is always one
+
   return m_expert->apply(*m_dataset)[0];
 }

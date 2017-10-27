@@ -47,7 +47,7 @@ namespace Belle2 {
     std::unique_ptr<MVA::Weightfile> getWeightFile();
 
     /// Evaluate the MVA method and return the MVAOutput
-    double predict();
+    float predict();
 
   private:
     /// References to the named values from the source variable set.

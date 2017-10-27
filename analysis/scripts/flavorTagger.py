@@ -562,55 +562,18 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
         targetVariable = 'isRightCategory(' + category + ')'
         extraInfoName = targetVariable
 
-        if not os.path.isfile(identifierEventLevel):
-            if mode == 'Expert':
-                if downloadFlag:
-                    basf2_mva.download(methodPrefixEventLevel, identifierEventLevel)
-                    if not os.path.isfile(identifierEventLevel):
-                        B2FATAL('Flavor Tagger: Weight file ' + identifierEventLevel +
-                                ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
-                else:
-                    B2FATAL(
-                        'Flavor Tagger: ' +
-                        particleList +
-                        ' Eventlevel was not trained. Weight file ' +
-                        identifierEventLevel + ' was not found. Stopped')
-
-            if mode == 'Sampler':
-
-                if category == 'KaonPion':
-                    methodPrefixEventLevelSlowPion = belleOrBelle2Flag + "_" + weightFiles + 'EventLevelSlowPionFBDT'
-                    identifierEventLevelSlowPion = filesDirectory + '/' + methodPrefixEventLevelSlowPion + '_1.root'
-                    if not os.path.isfile(identifierEventLevelSlowPion):
-                        B2INFO("Flavor Tagger: event level weight file for the Slow Pion category is absent." +
-                               "It is required to sample the training information for the KaonPion category." +
-                               "An additional sampling step will be needed after the following training step.")
-                        continue
-
-                B2INFO(
-                    'flavorTagger: file ' + filesDirectory + '/' +
-                    methodPrefixEventLevel + "sampled" + fileId + '.root will be saved.')
-
-                eventLevelpath = create_path()
-                SkipEmptyParticleList = register_module("SkimFilter")
-                SkipEmptyParticleList.set_name('SkimFilter_EventLevel' + category)
-                SkipEmptyParticleList.param('particleLists', particleList)
-                SkipEmptyParticleList.if_true(eventLevelpath, AfterConditionPath.CONTINUE)
-                path.add_module(SkipEmptyParticleList)
-
-                ntuple = register_module('VariablesToNtuple')
-                ntuple.param('fileName', filesDirectory + '/' + methodPrefixEventLevel + "sampled" + fileId + ".root")
-                ntuple.param('treeName', methodPrefixEventLevel + "_tree")
-                variablesToBeSaved = variables[category] + [targetVariable, 'ancestorHasWhichFlavor',
-                                                            'isSignal', 'mcPDG', 'mcErrors', 'genMotherPDG',
-                                                            'nMCMatches', 'B0mcErrors']
-                if category != 'KaonPion' and category != 'FSC':
-                    variablesToBeSaved = variablesToBeSaved + \
-                        ['extraInfo(isRightTrack(' + category + '))',
-                         'hasHighestProbInCat(' + particleList + ', isRightTrack(' + category + '))']
-                ntuple.param('variables', variablesToBeSaved)
-                ntuple.param('particleList', particleList)
-                eventLevelpath.add_module(ntuple)
+        if not os.path.isfile(identifierEventLevel) and mode == 'Expert':
+            if downloadFlag:
+                basf2_mva.download(methodPrefixEventLevel, identifierEventLevel)
+                if not os.path.isfile(identifierEventLevel):
+                    B2FATAL('Flavor Tagger: Weight file ' + identifierEventLevel +
+                            ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+            else:
+                B2FATAL(
+                    'Flavor Tagger: ' +
+                    particleList +
+                    ' Eventlevel was not trained. Weight file ' +
+                    identifierEventLevel + ' was not found. Stopped')
 
         if os.path.isfile(identifierEventLevel) and mode != 'Teacher':
 
@@ -631,7 +594,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
                 identifiersExtraInfosKaonPion.append((extraInfoName, identifierEventLevel))
 
             ReadyMethods += 1
-    print(identifiersExtraInfosDict)
+
     # Each category has its own Path in order to be skipped if the corresponding particle list is empty
     for particleList in identifiersExtraInfosDict:
         eventLevelPath = create_path()
@@ -665,6 +628,48 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
         mvaExpertKaonPion.param('identifier', identifiersExtraInfosKaonPion[0][1])
 
         eventLevelKaonPionPath.add_module(mvaExpertKaonPion)
+
+    for (particleList, category, combinerVariable) in eventLevelParticleLists:
+
+        methodPrefixEventLevel = belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
+        identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
+        targetVariable = 'isRightCategory(' + category + ')'
+
+        if not os.path.isfile(identifierEventLevel) and mode == 'Sampler':
+
+            if category == 'KaonPion':
+                methodPrefixEventLevelSlowPion = belleOrBelle2Flag + "_" + weightFiles + 'EventLevelSlowPionFBDT'
+                identifierEventLevelSlowPion = filesDirectory + '/' + methodPrefixEventLevelSlowPion + '_1.root'
+                if not os.path.isfile(identifierEventLevelSlowPion):
+                    B2INFO("Flavor Tagger: event level weight file for the Slow Pion category is absent." +
+                           "It is required to sample the training information for the KaonPion category." +
+                           "An additional sampling step will be needed after the following training step.")
+                    continue
+
+            B2INFO(
+                'flavorTagger: file ' + filesDirectory + '/' +
+                methodPrefixEventLevel + "sampled" + fileId + '.root will be saved.')
+
+            eventLevelpath = create_path()
+            SkipEmptyParticleList = register_module("SkimFilter")
+            SkipEmptyParticleList.set_name('SkimFilter_EventLevel' + category)
+            SkipEmptyParticleList.param('particleLists', particleList)
+            SkipEmptyParticleList.if_true(eventLevelpath, AfterConditionPath.CONTINUE)
+            path.add_module(SkipEmptyParticleList)
+
+            ntuple = register_module('VariablesToNtuple')
+            ntuple.param('fileName', filesDirectory + '/' + methodPrefixEventLevel + "sampled" + fileId + ".root")
+            ntuple.param('treeName', methodPrefixEventLevel + "_tree")
+            variablesToBeSaved = variables[category] + [targetVariable, 'ancestorHasWhichFlavor',
+                                                        'isSignal', 'mcPDG', 'mcErrors', 'genMotherPDG',
+                                                        'nMCMatches', 'B0mcErrors']
+            if category != 'KaonPion' and category != 'FSC':
+                variablesToBeSaved = variablesToBeSaved + \
+                    ['extraInfo(isRightTrack(' + category + '))',
+                     'hasHighestProbInCat(' + particleList + ', isRightTrack(' + category + '))']
+            ntuple.param('variables', variablesToBeSaved)
+            ntuple.param('particleList', particleList)
+            eventLevelpath.add_module(ntuple)
 
     if ReadyMethods != len(eventLevelParticleLists):
         return False

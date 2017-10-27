@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 #include <tracking/trackFindingCDC/ca/Path.h>
@@ -21,6 +22,11 @@ using namespace TrackFindingCDC;
 std::string TrackCreatorSegmentTripleAutomaton::getDescription()
 {
   return "Constructs tracks by extraction of segment triple paths in a cellular automaton.";
+}
+
+void TrackCreatorSegmentTripleAutomaton::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  m_cellularPathFinder.exposeParameters(moduleParamList, prefix);
 }
 
 void TrackCreatorSegmentTripleAutomaton::apply(const std::vector<CDCSegmentTriple>& inputSegmentTriples,

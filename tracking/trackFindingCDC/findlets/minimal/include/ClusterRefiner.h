@@ -18,8 +18,6 @@
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
-#include <boost/range/adaptor/indirected.hpp>
-
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -61,8 +59,14 @@ namespace Belle2 {
           B2ASSERT("Expect the clusters to be sorted", std::is_sorted(superCluster.begin(),
           superCluster.end()));
 
+          // Obtain the set of wire hits as references
+          std::vector<std::reference_wrapper<CDCWireHit> > wireHits;
+          wireHits.reserve(superCluster.size());
+          for (CDCWireHit* wireHit : superCluster) {
+            wireHits.push_back(std::ref(*wireHit));
+          }
+
           m_wireHitRelations.clear();
-          auto wireHits = superCluster | boost::adaptors::indirected;
           WeightedNeighborhood<CDCWireHit>::appendUsing(m_wireHitRelationFilter, wireHits, m_wireHitRelations);
           WeightedNeighborhood<CDCWireHit> wireHitNeighborhood(m_wireHitRelations);
 

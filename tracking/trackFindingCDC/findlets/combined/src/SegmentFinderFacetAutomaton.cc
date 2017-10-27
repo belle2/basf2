@@ -9,6 +9,9 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/SegmentFinderFacetAutomaton.h>
 
+#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParam.dcl.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -81,6 +84,7 @@ void SegmentFinderFacetAutomaton::apply(std::vector<CDCWireHitCluster>& clusters
   m_segmentFitter.apply(m_intermediateSegments);
 
   m_segmentLinker.apply(m_intermediateSegments, outputSegments);
+  m_segmentFitter.apply(outputSegments);
   m_segmentFitter.apply(outputSegments);
 
   // Move facets to the DataStore

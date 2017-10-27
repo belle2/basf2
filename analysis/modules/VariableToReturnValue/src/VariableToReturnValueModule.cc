@@ -14,6 +14,8 @@
 #include <analysis/VariableManager/Utility.h>
 #include <framework/logging/Logger.h>
 
+#include <cmath>
+
 using namespace Belle2;
 
 // Register module in the framework

@@ -40,7 +40,7 @@ namespace Belle2 {
     //! @param ctime gives lower 16 bits of B2TT CTIME
     //! @param tdc the tdc value
     //! @@param charge the charge (number of photons for the scintillator strips)
-    BKLMDigit(int moduleID, short ctime, short tdc, short charge);
+    BKLMDigit(int moduleID, int ctime, short tdc, short charge);
 
 
     //! Copy constructor
@@ -122,7 +122,7 @@ namespace Belle2 {
     float getNPixel() const { return m_NPixel; }
 
     //! @return ctime
-    short getCTime() const { return m_CTime; }
+    int getCTime() const { return m_CTime; }
 
     //! Get the status of scint pulse-shape fit
     //! @return status of scint pulse-shape fit (enum EKLM::FPGAFitStatus returned as int!)
@@ -159,7 +159,7 @@ namespace Belle2 {
   private:
 
     //!lowest 16 bits of the B2TT CTIME signal
-    short m_CTime;
+    int m_CTime;
 
     //! detector-module identifier
     //! @sa BKLMStatus.h
@@ -188,7 +188,7 @@ namespace Belle2 {
 
     //! Needed to make the ROOT object storable
     //! version 4 adds ctime etc
-    ClassDef(BKLMDigit, 5)
+    ClassDef(BKLMDigit, 6)
 
   };
 

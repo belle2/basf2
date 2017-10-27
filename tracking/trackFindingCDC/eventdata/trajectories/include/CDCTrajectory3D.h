@@ -9,19 +9,20 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
-
-#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
-
 #include <tracking/trackFindingCDC/geometry/UncertainHelix.h>
+#include <tracking/trackFindingCDC/geometry/Helix.h>
+#include <tracking/trackFindingCDC/geometry/HelixParameters.h>
+
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
-#include <framework/datastore/StoreArray.h>
+#include <tracking/trackFindingCDC/numerics/CovarianceMatrix.h>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
 
 #include <TMath.h>
 #include <cmath>
+#include <cstddef>
+#include <iosfwd>
 
 namespace genfit {
   class TrackCand;
@@ -29,40 +30,48 @@ namespace genfit {
 
 namespace Belle2 {
   class MCParticle;
-  class RecoTrack;
-
 
   namespace TrackFindingCDC {
+    class CDCTrajectory2D;
+    class CDCTrajectorySZ;
+
+    class WireLine;
+
+    class UncertainPerigeeCircle;
+    class UncertainSZLine;
 
     /// Particle full three dimensional trajectory.
-    class CDCTrajectory3D  {
+    class CDCTrajectory3D {
 
     public:
       /// Default constructor for ROOT compatibility.
       CDCTrajectory3D()
-        : m_localOrigin(),
-          m_localHelix()
-      {}
+        : m_localOrigin()
+        , m_localHelix()
+      {
+      }
 
       /// Constructs a trajectory from a helix with reference point equivalent to the origin.
       explicit CDCTrajectory3D(const UncertainHelix& helix)
-        : m_localOrigin(0.0, 0.0, 0.0),
-          m_localHelix(helix),
-          m_flightTime(0.0)
-      {}
+        : m_localOrigin(0.0, 0.0, 0.0)
+        , m_localHelix(helix)
+        , m_flightTime(0.0)
+      {
+      }
 
       /// Constructs a trajectory from a local helix taken as relative to the given origin.
       CDCTrajectory3D(const Vector3D& localOrigin,
                       const UncertainHelix& localHelix,
                       double flightTime = NAN)
-        : m_localOrigin(localOrigin),
-          m_localHelix(localHelix),
-          m_flightTime(flightTime)
-      {}
+        : m_localOrigin(localOrigin)
+        , m_localHelix(localHelix)
+        , m_flightTime(flightTime)
+      {
+      }
 
-      /// Construct a three dimensional trajectory from a two dimensional circular trajectory and sz linear trajectory
-      CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,
-                      const CDCTrajectorySZ& trajectorySZ);
+      /// Construct a three dimensional trajectory from a two dimensional circular trajectory and sz
+      /// linear trajectory
+      CDCTrajectory3D(const CDCTrajectory2D& trajectory2D, const CDCTrajectorySZ& trajectorySZ);
 
       /**
        *  Construct a trajectory from a two dimensional circular trajectory
@@ -71,8 +80,10 @@ namespace Belle2 {
       explicit CDCTrajectory3D(const CDCTrajectory2D& trajectory2D);
 
       /**
-       *  Construct a trajectory with given start point, momentum at the start point and given charge.
-       *  Additionally this can takes an explicit bZ value instead of a field value from the instance BFieldMap.
+       *  Construct a trajectory with given start point, momentum at the start point and given
+       * charge.
+       *  Additionally this can takes an explicit bZ value instead of a field value from the
+       * instance BFieldMap.
        */
       CDCTrajectory3D(const Vector3D& pos3D,
                       double time,
@@ -80,7 +91,8 @@ namespace Belle2 {
                       double charge,
                       double bZ);
 
-      /// Construct a trajectory with given start point, momentum at the start point and given charge.
+      /// Construct a trajectory with given start point, momentum at the start point and given
+      /// charge.
       CDCTrajectory3D(const Vector3D& pos3D, double time, const Vector3D& mom3D, double charge);
 
       /// Construct a trajectory from the MCParticles vertex and momentum.
@@ -98,11 +110,15 @@ namespace Belle2 {
     public:
       /// Checks if the trajectory is already set to a valid value.
       bool isInvalid() const
-      { return m_localHelix->isInvalid(); }
+      {
+        return m_localHelix->isInvalid();
+      }
 
       /// Checks if the trajectory has already been set to a valid value.
       bool isFitted() const
-      { return not isInvalid(); }
+      {
+        return not isInvalid();
+      }
 
       /// Clears all information from this trajectoy
       void clear()
@@ -119,11 +135,8 @@ namespace Belle2 {
       /// Copies the trajectory information to the Genfit track candidate
       bool fillInto(genfit::TrackCand& gfTrackCand, double bZ) const;
 
-      /// Copies the trajectory information to the RecoTrack
-      RecoTrack* storeInto(StoreArray<RecoTrack>& recoTracks) const;
-
-      /// Copies the trajectory information to the RecoTrack
-      RecoTrack* storeInto(StoreArray<RecoTrack>& recoTracks, double bZ) const;
+      /// Convert the helix parameters to the cartesian coordinates x,y,z,px,py,pz
+      CovarianceMatrix<6> getCartesianCovariance(double bZ) const;
 
     public:
       /// Reverses the trajectory in place.
@@ -157,16 +170,21 @@ namespace Belle2 {
        *  calculation.
        */
       double calcArcLength2D(const Vector3D& point) const
-      { return getLocalHelix()->circleXY().arcLengthTo((point - getLocalOrigin()).xy()); }
+      {
+        return getLocalHelix()->circleXY().arcLengthTo((point - getLocalOrigin()).xy());
+      }
 
       /// Getter for the arc length for one round trip around the trajectory.
       double getArcLength2DPeriod() const
-      { return getLocalHelix()->arcLength2DPeriod(); }
+      {
+        return getLocalHelix()->arcLength2DPeriod();
+      }
 
     public:
       /**
        *  Adjusts the z0 to the one that lies n periods forward
-       *  @returns The two dimensional arc length needed to travel from the old to the new support point.
+       *  @returns The two dimensional arc length needed to travel from the old to the new support
+       * point.
        */
       double shiftPeriod(int nPeriods);
 
@@ -182,125 +200,152 @@ namespace Belle2 {
 
       /// Get the momentum at the start point of the trajectory
       Vector3D getMom3DAtSupport(const double bZ) const
-      { return  getFlightDirection3DAtSupport() *= getAbsMom3D(bZ);  }
+      {
+        return getFlightDirection3DAtSupport() *= getAbsMom3D(bZ);
+      }
 
       /// Get the momentum at the start point of the trajectory
       Vector3D getMom3DAtSupport() const
-      { return  getFlightDirection3DAtSupport() *= getAbsMom3D();  }
+      {
+        return getFlightDirection3DAtSupport() *= getAbsMom3D();
+      }
 
       /// Get the unit momentum at the start point of the trajectory
       Vector3D getFlightDirection3DAtSupport() const
-      { return  getLocalHelix()->tangential();  }
+      {
+        return getLocalHelix()->tangential();
+      }
 
-      /// Getter for the support point of the trajectory in global coordinates, where arcLength2D = 0
+      /// Getter for the support point of the trajectory in global coordinates, where arcLength2D =
+      /// 0
       Vector3D getSupport() const
-      { return getLocalHelix()->perigee() + getLocalOrigin(); }
+      {
+        return getLocalHelix()->perigee() + getLocalOrigin();
+      }
 
       /// Getter for the closest approach on the trajectory to the global origin
       Vector3D getGlobalPerigee() const
-      { return getLocalHelix()->closestXY(-m_localOrigin.xy()) + m_localOrigin; }
+      {
+        return getLocalHelix()->closestXY(-m_localOrigin.xy()) + m_localOrigin;
+      }
 
       /// Getter for the center of the helix in global coordinates
       Vector2D getGlobalCenter() const
-      { return getLocalHelix()->centerXY() + m_localOrigin.xy(); }
+      {
+        return getLocalHelix()->centerXY() + m_localOrigin.xy();
+      }
 
     public:
-      /// Checks if the trajectory leaves the outer radius of the CDC times the given tolerance factor
+      /// Checks if the trajectory leaves the outer radius of the CDC times the given tolerance
+      /// factor
       bool isCurler(double factor = 1) const;
 
       /// Getter for the maximal distance from the origin
       double getMaximalCylindricalR() const
-      { return std::fabs(getGlobalImpact() + 2 * getLocalHelix()->radiusXY()); }
+      {
+        return std::fabs(getGlobalImpact() + 2 * getLocalHelix()->radiusXY());
+      }
 
       /// Getter for the minimal distance from the origin
       double getMinimalCylindricalR() const
-      { return std::fabs(getGlobalImpact()); }
+      {
+        return std::fabs(getGlobalImpact());
+      }
 
       /// Getter for the signed impact parameter of the trajectory
       double getGlobalImpact() const
-      { return getLocalCircle()->distance(-m_localOrigin.xy()); }
+      {
+        return getLocalHelix()->distanceXY(-m_localOrigin.xy());
+      }
 
     public:
       /// Getter for the two dimensional trajectory
-      CDCTrajectory2D getTrajectory2D() const
-      {
-        return CDCTrajectory2D(getLocalOrigin().xy(),
-                               getLocalHelix().uncertainCircleXY(),
-                               getFlightTime());
-      }
+      CDCTrajectory2D getTrajectory2D() const;
 
       /// Getter for the sz trajectory
-      CDCTrajectorySZ getTrajectorySZ() const
-      {
-        UncertainSZLine globalSZLine = getLocalHelix().uncertainSZLine();
-        globalSZLine.passiveMoveBy(Vector2D(0, -getLocalOrigin().z()));
-        return CDCTrajectorySZ(globalSZLine);
-      }
+      CDCTrajectorySZ getTrajectorySZ() const;
 
       /// Getter for the circle in global coordinates.
-      PerigeeCircle getGlobalCircle() const
-      {
-        // Down cast since we do not necessarily wont the covariance matrix transformed as well
-        PerigeeCircle result(getLocalHelix()->circleXY());
-        result.passiveMoveBy(-getLocalOrigin().xy());
-        return result;
-      }
+      PerigeeCircle getGlobalCircle() const;
 
       /// Getter for the circle in local coordinates
-      UncertainPerigeeCircle getLocalCircle() const
-      { return getLocalHelix().uncertainCircleXY(); }
+      UncertainPerigeeCircle getLocalCircle() const;
 
       /// Getter for the sz line starting from the local origin
-      UncertainSZLine getLocalSZLine() const
-      { return getLocalHelix().uncertainSZLine(); }
+      UncertainSZLine getLocalSZLine() const;
 
       /// Getter for an individual element of the covariance matrix of the local helix parameters.
       double getLocalCovariance(EHelixParameter iRow, EHelixParameter iCol) const
-      { return getLocalHelix().covariance(iRow, iCol); }
+      {
+        return getLocalHelix().covariance(iRow, iCol);
+      }
 
-      /// Getter for an individual diagonal element of the covariance matrix of the local helix parameters.
+      /// Getter for an individual diagonal element of the covariance matrix of the local helix
+      /// parameters.
       double getLocalVariance(EHelixParameter i) const
-      { return getLocalHelix().variance(i); }
+      {
+        return getLocalHelix().variance(i);
+      }
 
       /// Getter for the slope of z over the transverse travel distance s.
       double getTanLambda() const
-      { return getLocalHelix()->tanLambda(); }
+      {
+        return getLocalHelix()->tanLambda();
+      }
 
       /// Getter for the curvature as seen from the xy projection.
       double getCurvatureXY() const
-      { return getLocalHelix()->curvatureXY(); }
+      {
+        return getLocalHelix()->curvatureXY();
+      }
 
       ///  Getter for p-value
       double getPValue() const
-      { return TMath::Prob(getChi2(), getNDF()); }
+      {
+        return TMath::Prob(getChi2(), getNDF());
+      }
 
       /// Getter for the chi2 value of the fit
       double getChi2() const
-      { return getLocalHelix().chi2(); }
+      {
+        return getLocalHelix().chi2();
+      }
 
       /// Setter for the chi square value of the helix fit
       void setChi2(const double chi2)
-      { return m_localHelix.setChi2(chi2); }
+      {
+        return m_localHelix.setChi2(chi2);
+      }
 
       /// Getter for the number of degrees of freedom of the helix fit.
       size_t getNDF() const
-      { return getLocalHelix().ndf(); }
+      {
+        return getLocalHelix().ndf();
+      }
 
       /// Setter for the number of degrees of freedom of the helix fit.
       void setNDF(std::size_t ndf)
-      { return m_localHelix.setNDF(ndf); }
+      {
+        return m_localHelix.setNDF(ndf);
+      }
 
       /// Getter for the helix in local coordinates.
       const UncertainHelix& getLocalHelix() const
-      { return m_localHelix; }
+      {
+        return m_localHelix;
+      }
 
       /// Setter for the helix that describes the trajectory in local coordinates.
       void setLocalHelix(const UncertainHelix& localHelix)
-      { m_localHelix = localHelix; }
+      {
+        m_localHelix = localHelix;
+      }
 
       /// Getter for the origin of the local coordinate system
       const Vector3D& getLocalOrigin() const
-      { return m_localOrigin; }
+      {
+        return m_localOrigin;
+      }
 
       /**
        *  Setter for the origin of the local coordinate system.
@@ -311,30 +356,29 @@ namespace Belle2 {
 
       /// Getter for the time when the particle reached the support point position.
       double getFlightTime() const
-      { return m_flightTime; }
+      {
+        return m_flightTime;
+      }
 
       /// Setter for the time when the particle reached the support point position.
       void setFlightTime(double flightTime)
-      { m_flightTime = flightTime; }
-
-      /// Output helper for debugging
-      friend std::ostream& operator<<(std::ostream& output, const CDCTrajectory3D& trajectory3D)
       {
-        return output << "Local origin : " << trajectory3D.getLocalOrigin() <<  ", "
-               << "local helix : " << trajectory3D.getLocalHelix();
+        m_flightTime = flightTime;
       }
-
     private:
-      /// Memory for local coordinate origin of the circle representing the trajectory in global coordinates
+      /// Memory for local coordinate origin of the circle representing the trajectory in global
+      /// coordinates
       Vector3D m_localOrigin;
 
-      /// Memory for the generalized circle describing the trajectory in coordinates from the local origin
+      /// Memory for the generalized circle describing the trajectory in coordinates from the local
+      /// origin
       UncertainHelix m_localHelix;
 
       /// Memory for the estimation of the time at which the particle arrived at the support point.
       double m_flightTime = NAN;
-
     };
 
+    /// Output helper for debugging
+    std::ostream& operator<<(std::ostream& output, const CDCTrajectory3D& trajectory3D);
   }
 }

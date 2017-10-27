@@ -632,8 +632,7 @@ void PXDDataRedAnalysisModule::event()
       }
       m_globalTime = tmpGlobalTime / tmpNGlobalTime;
 
-      m_coorUmc = pxdDigits_MCParticle[iPXDDigit]->getUCellPosition();
-      m_coorVmc = pxdDigits_MCParticle[iPXDDigit]->getVCellPosition();
+
       m_Uidmc = pxdDigits_MCParticle[iPXDDigit]->getUCellID();
       m_Vidmc = pxdDigits_MCParticle[iPXDDigit]->getVCellID();
       m_vxdIDmc = pxdDigits_MCParticle[iPXDDigit]->getSensorID();
@@ -649,9 +648,12 @@ void PXDDataRedAnalysisModule::event()
       }
 
       VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
-      TVector3 local(m_coorUmc, m_coorVmc, 0);
-
       const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(m_vxdIDmc);
+
+      m_coorUmc = aSensorInfo.getUCellPosition(m_Uidmc);   //pxdDigits_MCParticle[iPXDDigit]->getUCellPosition();
+      m_coorVmc = aSensorInfo.getVCellPosition(m_Vidmc);   //pxdDigits_MCParticle[iPXDDigit]->getVCellPosition();
+
+      TVector3 local(m_coorUmc, m_coorVmc, 0);
       TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local);
 
 

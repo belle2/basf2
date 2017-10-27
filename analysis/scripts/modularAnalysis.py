@@ -752,6 +752,7 @@ def reconstructDecay(
     writeOut=False,
     path=analysis_main,
     candidate_limit=None,
+    ignoreIfTooManyCandidates=True,
 ):
     """
     Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via
@@ -768,12 +769,14 @@ def reconstructDecay(
     @param writeOut    wether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
     @param candidate_limit Maximum amount of candidates to be reconstructed. If
-                       the number of candidates is exceeded no candidate will be
-                       reconstructed for that event and a Warning will be
+                       the number of candidates is exceeded a Warning will be
                        printed.
                        If no value is given the amount is limited to a sensible
                        default. A value <=0 will disable this limit and can
                        cause huge memory amounts so be careful.
+    @param ignoreIfTooManyCandidates weather event should be ignored or not if number of reconstructed
+                       candiades reaches limit. If event is ignored, no candiades are reconstructed,
+                       otherwise, number of candidates in candidate_limit is reconstructed.
     """
 
     pmake = register_module('ParticleCombiner')
@@ -784,6 +787,7 @@ def reconstructDecay(
     pmake.param('writeOut', writeOut)
     if candidate_limit is not None:
         pmake.param("maximumNumberOfCandidates", candidate_limit)
+    pmake.param("ignoreIfTooManyCandidates", ignoreIfTooManyCandidates)
     path.add_module(pmake)
 
 
@@ -1727,6 +1731,20 @@ def inclusiveBtagReconstruction(upsilon_list_name, bsig_list_name, btag_list_nam
     btag.param('btagListName', btag_list_name)
     btag.param('inputListsNames', input_lists_names)
     path.add_module(btag)
+
+
+def selectDaughters(particle_list_name, decay_string, path=analysis_main):
+    """
+    Redefine the Daughters of a particle: select from decayString
+
+    @param particle_list_name input particle list
+    @para decay_string  for selecting the Daughters to be preserved
+    """
+    seld = register_module('SelectDaughters')
+    seld.set_name('SelectDaughters_' + particle_list_name)
+    seld.param('listName', particle_list_name)
+    seld.param('decayString', decay_string)
+    path.add_module(seld)
 
 
 if __name__ == '__main__':

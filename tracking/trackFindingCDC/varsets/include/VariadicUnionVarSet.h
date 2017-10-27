@@ -14,6 +14,7 @@
 
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 #include <tracking/trackFindingCDC/utilities/Named.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
 #include <vector>
@@ -50,7 +51,7 @@ namespace Belle2 {
       /// Create the union variable set.
       explicit VariadicUnionVarSet()
       {
-        EvalVariadic{(m_multiVarSet.push_back(std::make_unique<AVarSets>()), true)...};
+        EvalVariadic{(m_multiVarSet.push_back(makeUnique<AVarSets>()), true)...};
         assert(m_multiVarSet.size() == sizeof...(AVarSets));
       }
 
@@ -99,7 +100,7 @@ namespace Belle2 {
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
-      std::vector<Named<Float_t*>> getNamedVariables(std::string prefix) override
+      std::vector<Named<Float_t*>> getNamedVariables(const std::string& prefix) override
       {
         return m_multiVarSet.getNamedVariables(prefix);
       }
@@ -108,7 +109,7 @@ namespace Belle2 {
        *   Pointer to the variable with the given name.
        *   Returns nullptr if not found.
        */
-      MayBePtr<Float_t> find(std::string varName) override
+      MayBePtr<Float_t> find(const std::string& varName) override
       {
         return m_multiVarSet.find(varName);
       }

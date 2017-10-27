@@ -9,18 +9,20 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <tracking/trackFindingCDC/utilities/Relation.h>
-
-#include <boost/range/iterator_range.hpp>
+#include <tracking/trackFindingCDC/utilities/Range.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+
+    // Guard to prevent repeated instatiations
+    extern template class Filter<Relation<const CDCFacet> >;
 
     /**
      *  Base class for filtering the neighborhood of facets.
@@ -36,7 +38,7 @@ namespace Belle2 {
        *  facets of the given facet out of the sorted range given by the two other argumets.
        */
       template <class AFacetIt>
-      boost::iterator_range<AFacetIt>
+      Range<AFacetIt>
       getPossibleNeighbors(const CDCFacet& facet, const AFacetIt& itBegin, const AFacetIt& itEnd) const
       {
         const CDCRLWireHitPair& rearRLWireHitPair = facet.getRearRLWireHitPair();

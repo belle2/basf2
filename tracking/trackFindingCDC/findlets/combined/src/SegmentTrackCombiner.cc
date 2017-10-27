@@ -12,8 +12,12 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::ChooseableFilter<SegmentTrackFilterFactory>;
 
 SegmentTrackCombiner::SegmentTrackCombiner()
 {

@@ -38,7 +38,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   m_driftLength(0.0), m_flightTime(0.0), m_globalTime(0.0),
   m_tdcBinWidth(1.0), m_tdcBinWidthInv(1.0),
   m_tdcResol(0.2887), m_driftV(4.0e-3),
-  m_driftVInv(250.0), m_propSpeedInv(27.25), m_misalign(true)
+  m_driftVInv(250.0), m_propSpeedInv(27.25), m_align(true)
 {
   // Set description
   setDescription("Creates CDCHits from CDCSimHits.");
@@ -95,7 +95,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            false);
   //Switch to control sense wire sag
   addParam("CorrectForWireSag",   m_correctForWireSag,
-           "A switch for sense wire sag effect; true: drift-time is calculated with the sag taken into account; false: not. Here, sag means the perturbative part which corresponds to (mis)alignment in case of wire-position. The main part (corresponding to design+displacement in wire-position) is taken into account in FullSim; you can control it via CDCJobCntlParModifier.",
+           "A switch for sense wire sag effect; true: drift-time is calculated with the sag taken into account; false: not. Here, sag means the perturbative part which corresponds to alignment in case of wire-position. The main part (corresponding to design+displacement in wire-position) is taken into account in FullSim; you can control it via CDCJobCntlParModifier.",
            true);
 
   //TDC Threshold
@@ -223,33 +223,33 @@ void CDCDigitizerModule::event()
     m_globalTime = m_aCDCSimHit->getGlobalTime();
     m_driftLength = m_aCDCSimHit->getDriftLength() * Unit::cm;
 
-    //include misalignment effects
-    //basically misalign flag should be always on since on/off is controlled by the input misalignment.xml file itself.
-    m_misalign = true;
+    //include alignment effects
+    //basically align flag should be always on since on/off is controlled by the input alignment.xml file itself.
+    m_align = true;
 
-    TVector3 bwpMisalign = m_cdcgp->wireBackwardPosition(m_wireID, CDCGeometryPar::c_Misaligned);
-    TVector3 fwpMisalign = m_cdcgp->wireForwardPosition(m_wireID, CDCGeometryPar::c_Misaligned);
+    TVector3 bwpAlign = m_cdcgp->wireBackwardPosition(m_wireID, CDCGeometryPar::c_Aligned);
+    TVector3 fwpAlign = m_cdcgp->wireForwardPosition(m_wireID, CDCGeometryPar::c_Aligned);
 
     TVector3 bwp = m_cdcgp->wireBackwardPosition(m_wireID);
     TVector3 fwp = m_cdcgp->wireForwardPosition(m_wireID);
 
-    //skip correction for wire-position misalignment if unnecessary
-    if ((bwpMisalign - bwp).Mag() == 0. && (fwpMisalign - fwp).Mag() == 0.) m_misalign = false;
-    //    std::cout << "a m_misalign= " << m_misalign << std::endl;
+    //skip correction for wire-position alignment if unnecessary
+    if ((bwpAlign - bwp).Mag() == 0. && (fwpAlign - fwp).Mag() == 0.) m_align = false;
+    //    std::cout << "a m_align= " << m_align << std::endl;
 
-    if (m_misalign || m_correctForWireSag) {
+    if (m_align || m_correctForWireSag) {
 
-      bwp = bwpMisalign;
-      fwp = fwpMisalign;
+      bwp = bwpAlign;
+      fwp = fwpAlign;
 
       if (m_correctForWireSag) {
         double zpos = m_posWire.z();
         double bckYSag = bwp.y();
         double forYSag = fwp.y();
 
-        //        CDCGeometryPar::EWirePosition set = m_misalign ?
-        //                                            CDCGeometryPar::c_Misaligned : CDCGeometryPar::c_Base;
-        CDCGeometryPar::EWirePosition set = CDCGeometryPar::c_Misaligned;
+        //        CDCGeometryPar::EWirePosition set = m_align ?
+        //                                            CDCGeometryPar::c_Aligned : CDCGeometryPar::c_Base;
+        CDCGeometryPar::EWirePosition set = CDCGeometryPar::c_Aligned;
         const int layerID = m_wireID.getICLayer();
         const int  wireID = m_wireID.getIWire();
         m_cdcgp->getWireSagEffect(set, layerID, wireID, zpos, bckYSag, forYSag);
@@ -633,7 +633,7 @@ float CDCDigitizerModule::getDriftTime(const float driftLength, const bool addTo
 
   if (addDelay) {
     //calculate signal propagation length in the wire
-    CDCGeometryPar::EWirePosition set = m_misalign ? CDCGeometryPar::c_Misaligned : CDCGeometryPar::c_Base;
+    CDCGeometryPar::EWirePosition set = m_align ? CDCGeometryPar::c_Aligned : CDCGeometryPar::c_Base;
     TVector3 backWirePos = m_cdcgp->wireBackwardPosition(m_wireID, set);
 
     double propLength = (m_posWire - backWirePos).Mag();

@@ -32,19 +32,15 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 main.add_module(eventinfosetter)
 
-# Overlay input (before process forking!)
-bginput = register_module('BGOverlayInput')
-bginput.param('inputFileNames', [bg])
-main.add_module(bginput)
-
 # Simulation
-add_simulation(main)
+add_simulation(main, bkgfiles=[bg], bkgOverlay=True)
 
-# BG Overlay (after digitizers)
-overlay = register_module('BGOverlayExecutor')
-overlay.logging.log_level = LogLevel.DEBUG  # comment or remove to turn off
-overlay.logging.debug_level = 100
-main.add_module(overlay)
+# set debug level for overlay executor module
+for m in main.modules():
+    if m.type() == "BGOverlayExecutor":
+        m.logging.log_level = LogLevel.DEBUG  # comment or remove to turn off
+        m.logging.debug_level = 100
+        break
 
 # Reconstruction
 add_reconstruction(main)

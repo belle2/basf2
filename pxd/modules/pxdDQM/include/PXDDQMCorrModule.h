@@ -85,19 +85,29 @@ namespace Belle2 {
      */
     inline const PXD::SensorInfo& getInfo(int index) const;
 
-    std::string m_storeClustersName;      /**< PXDClusters StoreArray name */
-    std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
+    /** PXDClusters StoreArray name */
+    std::string m_storeClustersName;
+    /** Name of the histogram directory in ROOT file */
+    std::string m_histogramDirectoryName;
 
     /** Storearray for clusters   */
     StoreArray<PXDCluster> m_storeClusters;
 
     // +1 in dimensions to protect against noisy VXDID values.
-    TH2F* m_CorrelationU;          /**< Correlation Sensor 1 vs 2 */
-    TH2F* m_CorrelationV;          /**< Correlation Sensor 1 vs 2 */
-    TH1F* m_DeltaU;          /**< Correlation Sensor 1 vs 2 */
-    TH1F* m_DeltaV;          /**< Correlation Sensor 1 vs 2 */
+    /** Correlation Sensor 1 vs 2 */
+    TH2F* m_CorrelationU;
+    /** Correlation Sensor 1 vs 2 */
+    TH2F* m_CorrelationV;
+    /** Correlation Sensor 1 vs 2 */
+    TH1F* m_DeltaU;
+    /** Correlation Sensor 1 vs 2 */
+    TH1F* m_DeltaV;
   };
 
+  /** Utility function to find sonsor ID
+    * @param index Index of the sensor (0,1), _not_ layer number!
+    * @return SensorInfo object for the desired sensor.
+    */
   inline const PXD::SensorInfo& PXDDQMCorrModule::getInfo(int index) const
   {
     int iPlane = indexToPlane(index);

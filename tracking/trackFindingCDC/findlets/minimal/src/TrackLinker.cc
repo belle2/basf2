@@ -29,6 +29,7 @@ std::string TrackLinker::getDescription()
 void TrackLinker::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   m_trackRelationCreator.exposeParameters(moduleParamList, prefix);
+  m_cellularPathFinder.exposeParameters(moduleParamList, prefix);
 }
 
 void TrackLinker::apply(const std::vector<CDCTrack>& inputTracks, std::vector<CDCTrack>& outputTracks)

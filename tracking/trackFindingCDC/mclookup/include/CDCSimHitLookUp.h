@@ -9,13 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
-
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
 #include <map>
+#include <vector>
 
 namespace Belle2 {
 
@@ -23,8 +22,12 @@ namespace Belle2 {
   class CDCSimHit;
 
   namespace TrackFindingCDC {
-
     class CDCMCMap;
+    class CDCRecoHit3D;
+    class CDCRecoHit2D;
+    class CDCRLWireHit;
+    class CDCWireHit;
+    class Vector3D;
 
     /// Singletone class to gather local information about the hits.
     /** Because of the reassignment of secondary hits and the different definition of the right

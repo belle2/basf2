@@ -10,15 +10,19 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCombiner.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
+#include <tracking/trackFindingCDC/numerics/Index.h>
+
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/Range.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 
-#include <boost/range/adaptor/map.hpp>
 #include <map>
 #include <deque>
 
@@ -250,11 +254,12 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
         double prod22 = 0;
         double sum1 = 0;
         double sum2 = 0;
-        for (const std::pair<int, int>& indices : commonRLWireHits | boost::adaptors::map_keys) {
+        for (const auto& commonRLWireHit : commonRLWireHits) {
+          const std::pair<int, int>& indices = commonRLWireHit.first;
           prod11 += indices.first * indices.first;
           prod12 += indices.first * indices.second;
           prod22 += indices.second * indices.second;
-          ;
+
           sum1 += indices.first;
           sum2 += indices.second;
         }

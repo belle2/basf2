@@ -1006,7 +1006,7 @@ class AlgorithmMachine(Machine):
 
         # Here we add the previous iteration's database
         if self.iteration > 0:
-            B2INFO("Adding local database from previous iteration for use by {1}::{2}".format(
+            B2INFO("Adding local database from previous iteration for use by {0}::{1}".format(
                    self.cal_machine.calibration.name, self.name))
             use_local_database(os.path.abspath(os.path.join(self.cal_machine.root_dir,
                                                             str(self.iteration - 1),

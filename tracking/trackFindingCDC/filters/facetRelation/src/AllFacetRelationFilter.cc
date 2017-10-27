@@ -21,5 +21,5 @@ Weight AllFacetRelationFilter::operator()(const CDCFacet& fromFacet, const CDCFa
   // must calculate 3 + (-2) + 3 = 4 as cellstate
   // this can of course be adjusted for a more realistic information measure
   // ( together with the facet creator filter)
-  return fromFacet.getStartWire() == toFacet.getEndWire() ? NAN : -2;
+  return fromFacet.getStartRLWireHit().isOnWire(toFacet.getEndWire()) ? NAN : -2;
 }

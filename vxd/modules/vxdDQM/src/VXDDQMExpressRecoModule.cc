@@ -407,7 +407,7 @@ void VXDDQMExpressRecoModule::event()
         if (fCharge1 < m_CutCorrelationSigPXD) continue;
         VxdID sensorID1 = digitPXD1.getSensorID();
         auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID1));
-        TVector3 rLocal1(digitPXD1.getUCellPosition(), digitPXD1.getVCellPosition(), 0);
+        TVector3 rLocal1(info.getUCellPosition(digitPXD1.getUCellID()), info.getVCellPosition(digitPXD1.getVCellID()), 0);
         TVector3 ral1 = info.pointToGlobal(rLocal1);
         iIsPXD1 = 1;
         iIsU1 = 1;
@@ -543,7 +543,7 @@ void VXDDQMExpressRecoModule::event()
           if (fCharge2 < m_CutCorrelationSigPXD) continue;
           VxdID sensorID2 = digitPXD2.getSensorID();
           auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID2));
-          TVector3 rLocal2(digitPXD2.getUCellPosition(), digitPXD2.getVCellPosition(), 0);
+          TVector3 rLocal2(info.getUCellPosition(digitPXD2.getUCellID()), info.getVCellPosition(digitPXD2.getVCellID()), 0);
           TVector3 ral2 = info.pointToGlobal(rLocal2);
           iIsPXD2 = 1;
           iIsU2 = 1;
@@ -727,9 +727,9 @@ void VXDDQMExpressRecoModule::endRun()
     TFile* f_RefHistFile = new TFile(m_RefHistFileName.c_str(), "read");
     if (f_RefHistFile->IsOpen()) {
       B2INFO("Reference file name: " << m_RefHistFileName.c_str());
-      TVectorD* NoOfEventsRef = NULL;
-      f_RefHistFile->GetObject("DQMER_VXD_NoOfEvents_Ref", NoOfEventsRef);
-      m_NoOfEventsRef = (int)NoOfEventsRef->GetMatrixArray()[0];
+      TVectorD* NoOfEventsRef2 = NULL;
+      f_RefHistFile->GetObject("DQMER_VXD_NoOfEvents_Ref", NoOfEventsRef2);
+      m_NoOfEventsRef = (int)NoOfEventsRef2->GetMatrixArray()[0];
       //    m_NoOfEventsRef = 2;
       string Diru = str(format("Phi"));
       string Dirv = str(format("Theta"));
@@ -1040,11 +1040,11 @@ int VXDDQMExpressRecoModule::SetFlag(int Type, int bin, double* pars, double rat
     }
     iret = 1;
   } else if (Type == 10) {
-    float flag  = refhist->Chi2Test(temp);
+    float flag2  = refhist->Chi2Test(temp);
     flaghist->SetBinContent(bin + 1, 0);
-    if (flag > pars[1])
+    if (flag2 > pars[1])
       flaghist->SetBinContent(bin + 1, 2);
-    if (flag > pars[0])
+    if (flag2 > pars[0])
       flaghist->SetBinContent(bin + 1, 1);
     iret = 1;
   } else if (Type == 100) {

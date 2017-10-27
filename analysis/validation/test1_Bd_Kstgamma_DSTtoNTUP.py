@@ -18,7 +18,7 @@ from stdPhotons import *
 
 inputMdst('default', '../Bd_Kstgamma_GENSIMRECtoDST.dst.root')
 loadStdCharged()
-loadStdPhoton()
+stdPhotons('all')
 
 reconstructDecay('K*0 -> K+:all pi-:all', '0.6 < M < 1.2')
 matchMCTruth('K*0')

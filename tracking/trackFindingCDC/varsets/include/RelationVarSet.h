@@ -14,7 +14,6 @@
 #include <tracking/trackFindingCDC/utilities/Relation.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
-#include <boost/algorithm/string/predicate.hpp>
 #include <vector>
 #include <string>
 #include <cassert>
@@ -93,7 +92,7 @@ namespace Belle2 {
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
-      std::vector<Named<Float_t*>> getNamedVariables(std::string prefix) override
+      std::vector<Named<Float_t*>> getNamedVariables(const std::string& prefix) override
       {
         std::vector<Named<Float_t*> > result = m_firstVarSet.getNamedVariables(prefix + m_firstPrefix);
         std::vector<Named<Float_t*> > extend = m_secondVarSet.getNamedVariables(prefix + m_secondPrefix);
@@ -105,15 +104,15 @@ namespace Belle2 {
        *   Pointer to the variable with the given name.
        *   Returns nullptr if not found.
        */
-      MayBePtr<Float_t> find(std::string varName) override
+      MayBePtr<Float_t> find(const std::string& varName) override
       {
-        if (boost::starts_with(varName, m_firstPrefix)) {
+        if (0 == varName.find(m_firstPrefix)) {
           std::string varNameWithoutPrefix = varName.substr(m_firstPrefix.size());
           MayBePtr<Float_t> found = m_firstVarSet.find(varNameWithoutPrefix);
           if (found) return found;
         }
 
-        if (boost::starts_with(varName, m_secondPrefix)) {
+        if (0 == varName.find(m_secondPrefix)) {
           std::string varNameWithoutPrefix = varName.substr(m_secondPrefix.size());
           MayBePtr<Float_t> found = m_secondVarSet.find(varNameWithoutPrefix);
           if (found) return found;

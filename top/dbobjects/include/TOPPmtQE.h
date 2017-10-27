@@ -67,7 +67,7 @@ namespace Belle2 {
      */
     float getQE(unsigned channel, float lambda) const
     {
-      if (channel > c_NumChannels) channel = c_numChannels;
+      if (channel > c_NumChannels) channel = c_NumChannels;
       channel--;
 
       int vsize = m_QE[channel].size();
@@ -80,7 +80,7 @@ namespace Belle2 {
       float lambdaLow  = m_lambdaFirst + ilLow * m_lambdaStep;
       float lambdaHigh = m_lambdaFirst + (ilLow + 1) * m_lambdaStep;
 
-      float qe = (m_QE[ilLow] * (lambda - lambdaLow) + m_QE[ilLow + 1] * (lambdaHigh - lambda)) / m_lambdaStep;
+      float qe = (m_QE[channel].at(ilLow) * (lambda - lambdaLow) + m_QE[channel].at(ilLow + 1) * (lambdaHigh - lambda)) / m_lambdaStep;
       return qe;
     }
 

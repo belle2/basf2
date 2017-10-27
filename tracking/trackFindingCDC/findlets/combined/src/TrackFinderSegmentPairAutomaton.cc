@@ -9,6 +9,9 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentPairAutomaton.h>
 
+#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParam.dcl.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -43,7 +46,7 @@ void TrackFinderSegmentPairAutomaton::exposeParameters(ModuleParamList* modulePa
 {
   m_segmentPairCreator.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPair"));
   m_segmentPairRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPairRelation"));
-  m_trackCreatorSegmentPairAutomaton.exposeParameters(moduleParamList, prefix);
+  m_trackCreatorSegmentPairAutomaton.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPairRelation"));
   m_trackCreatorSingleSegments.exposeParameters(moduleParamList, prefix);
   m_trackLinker.exposeParameters(moduleParamList, prefixed(prefix, "TrackRelation"));
   m_trackOrienter.exposeParameters(moduleParamList, prefix);

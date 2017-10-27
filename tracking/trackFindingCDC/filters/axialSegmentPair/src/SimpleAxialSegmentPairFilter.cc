@@ -7,10 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/SimpleAxialSegmentPairFilter.h>
 
-#include <framework/logging/Logger.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

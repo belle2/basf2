@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Nils Braun                                               *
@@ -9,19 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
-
-namespace Belle2 {
-  namespace TrackFindingCDC {
-    /// Filter adapter type that passes the weight of a weighted relation as a result
-    template<class AFilter>
-    class PassThroughFilter : public AFilter {
-    public:
-      /// Accept all items.
-      Weight operator()(const typename AFilter::Object& obj) final {
-        return obj.getWeight();
-      }
-
-    };
-  }
-}
+// This header file is deprecated
+// Instead use one of the following headers depending on the *minimal* needs of your use.
+#include <tracking/trackFindingCDC/filters/base/PassThroughFilter.dcl.h>
+#include <tracking/trackFindingCDC/filters/base/PassThroughFilter.icc.h>

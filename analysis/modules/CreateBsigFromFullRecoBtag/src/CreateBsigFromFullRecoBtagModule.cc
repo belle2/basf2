@@ -101,7 +101,6 @@ void CreateBsigFromFullRecoBtagModule::event()
 
   m_BeamSpotCenter = m_beamParams->getVertex();
   m_beamSpotCov.ResizeTo(3, 3);
-  //TMatrixDSym beamSpotCov(3);
   m_beamSpotCov = m_beamParams->getCovVertex();
 
 
@@ -111,7 +110,6 @@ void CreateBsigFromFullRecoBtagModule::event()
     Particle* particle = plist->getParticle(i);
     bool ok = doVertexFit(particle);
     if (!ok) particle->setPValue(-1);
-    //cout<<"is OK = "<<ok<<endl;
     if (m_confidenceLevel > 0. && particle->getPValue() == 0.) {
       toRemove.push_back(particle->getArrayIndex());
     } else {
@@ -119,8 +117,6 @@ void CreateBsigFromFullRecoBtagModule::event()
     }
   }
   plist->removeParticles(toRemove);
-
-  //cout<<"list size after fit = "<<plist->getListSize()<<endl;
 
 
   StoreArray<Particle> particles;
@@ -201,23 +197,16 @@ void CreateBsigFromFullRecoBtagModule::event()
     TMatrix r2(3, 3);  r2.Mult(r2y, r2z);
     TMatrix r2t(3, 3); r2t.Transpose(r2);
 
-
-
-
     TMatrix ppNewPart(3, 3);  ppNewPart.Mult(r2t, ppZ);
     TMatrix ppNew(3, 3); ppNew.Mult(ppNewPart, r2);
 
     TMatrix pvNewPart(3, 3);  pvNewPart.Mult(r2t, pvZ);
     TMatrix pvNew(3, 3); pvNew.Mult(pvNewPart, r2);
 
-
     TMatrixFSym errNew(7);
     errNew.SetSub(0, 0, ppNew);
     errNew.SetSub(4, 4, pvNew);
     errNew(3, 3) = pe;
-
-
-
 
     int newPdg = -1 * particle->getPDGCode();
 
@@ -229,22 +218,12 @@ void CreateBsigFromFullRecoBtagModule::event()
 
     outputList->addParticle(iparticle, newPdg, newParticle.getFlavorType());
 
-    //particle->print();
-    //newParticle.print();
-
 
   }
-  //cout<<"list output size = "<<outputList->getListSize()<<endl;
 
   //free memory allocated by rave. initialize() would be enough, except that we must clean things up before program end...
   analysis::RaveSetup::getInstance()->reset();
 }
-
-
-
-
-
-
 
 
 bool CreateBsigFromFullRecoBtagModule::doVertexFit(Particle* mother)

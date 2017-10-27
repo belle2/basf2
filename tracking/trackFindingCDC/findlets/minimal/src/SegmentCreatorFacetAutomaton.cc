@@ -18,10 +18,14 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 #include <algorithm>
 #include <functional>

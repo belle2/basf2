@@ -16,8 +16,12 @@
 
 #include <tracking/trackFindingCDC/filters/facet/MVAFacetFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.icc.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::UnionRecordingFilter<FacetFilterFactory>;
 
 std::vector<std::string> UnionRecordingFacetFilter::getValidVarSetNames() const
 {

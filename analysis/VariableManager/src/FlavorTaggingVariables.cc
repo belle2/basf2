@@ -1336,7 +1336,7 @@ namespace Belle2 {
                                                              "isRightCategory(SlowPion)",             // 18
                                                              "isRightCategory(FastPion)",             // 19
                                                              "isRightCategory(MaximumPstar)",         // 20
-                                                             "isRightCategory(Lambda)"                // 21
+                                                             "isRightCategory(Lambda)",                // 21
                                                              "isRightCategory(KaonPion)",             // 22
                                                              "isRightCategory(FSC)",                  // 23
                                                        };
@@ -1423,8 +1423,6 @@ namespace Belle2 {
     {
       //used by simple_flavor_tagger
       if (arguments.size() == 3) {
-        auto extraInfoRightCategory = arguments[1];
-        auto extraInfoRightTrack = arguments[2];
 
         auto particleListName = arguments[0];
         auto outputExtraInfo = arguments[1];
@@ -1455,7 +1453,7 @@ namespace Belle2 {
                                                              "isRightCategory(SlowPion)",             // 18
                                                              "isRightCategory(FastPion)",             // 19
                                                              "isRightCategory(MaximumPstar)",         // 20
-                                                             "isRightCategory(Lambda)"                // 21
+                                                             "isRightCategory(Lambda)",                // 21
                                                              "isRightCategory(KaonPion)",             // 22
                                                              "isRightCategory(FSC)",                  // 23
                                                        };
@@ -1470,14 +1468,14 @@ namespace Belle2 {
         }
 
         if (indexRanking == -1) {
-          B2FATAL("QpOf: Not available category " << rankingExtraInfo <<
+          B2FATAL("weightedQpOf: Not available category " << rankingExtraInfo <<
                   ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda"
                   <<
                   ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
         }
 
         if (indexOutput == -1) {
-          B2FATAL("QpOf: Not available category " << outputExtraInfo <<
+          B2FATAL("weightedQpOf: Not available category " << outputExtraInfo <<
                   ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda"
                   <<
                   ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");

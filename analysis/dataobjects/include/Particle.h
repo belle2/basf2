@@ -681,7 +681,7 @@ namespace Belle2 {
 
     // persistent data members
     int m_pdgCode;  /**< PDG code */
-    int m_pdgCodeUsedForFit = 0; /** PDG code used for the track fit */
+    int m_pdgCodeUsedForFit = 0; /**< PDG code used for the track fit */
     float m_mass;   /**< particle (invariant) mass */
     float m_px;     /**< momentum component x */
     float m_py;     /**< momentum component y */

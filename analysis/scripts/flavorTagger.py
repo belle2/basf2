@@ -620,7 +620,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
                 methodPrefixEventLevelKaonPion = belleOrBelle2Flag + "_" + weightFiles + 'EventLevelKaonPionFBDT'
                 identifierEventLevelKaonPion = filesDirectory + '/' + methodPrefixEventLevelKaonPion + '_1.root'
                 if not os.path.isfile(identifierEventLevelKaonPion):
-                    if category != "SlowPion" or category != "Kaon":
+                    if category != "SlowPion" and category != "Kaon":
                         continue
 
             if particleList not in identifiersExtraInfosDict and category != 'KaonPion':

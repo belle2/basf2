@@ -390,7 +390,7 @@ def add_vxdtf_v2(path=None,
                  debug_level=1):
     """
     Convenience Method to setup the redesigned vxd track finding module chain.
-    Reuslt is a store array containing reco tracks called 'RecoTracks'.
+    Result is a store array containing reco tracks called 'RecoTracks'.
     :param sec_map_file: training data for segment network.
     :param path: basf2.Path
     :param use_pxd: if true use pxd hits. Default False.
@@ -530,21 +530,13 @@ def add_vxdtf_v2(path=None,
     #################
 
     if filter_overlapping:
-        overlapNetworkProducer = register_module('SVDOverlapChecker')
-        overlapNetworkProducer.logging.log_level = log_level
-        overlapNetworkProducer.logging.debug_level = debug_level
-        modules.append(overlapNetworkProducer)
-
-        if overlap_filter.lower() == 'hopfield':
-            overlapFilter = register_module('TrackSetEvaluatorHopfieldNNDEV')
-        elif overlap_filter.lower() == 'greedy':
-            overlapFilter = register_module('TrackSetEvaluatorGreedyDEV')
-        else:
-            print("ERROR! unknown overlap filter " + overlap_filter + " is given - can not proceed!")
-            exit
-        overlapFilter.logging.log_level = log_level
-        overlapFilter.logging.debug_level = debug_level
-        modules.append(overlapFilter)
+        overlapResolver = register_module('SVDOverlapResolver')
+        overlapResolver.logging.log_level = log_level
+        overlapResolver.logging.debug_level = debug_level
+        overlapResolver.param('NameSpacePointTrackCands', '')
+        overlapResolver.param('ResolveMethod', overlap_filter.lower())
+        overlapResolver.param('NameSVDClusters', '')
+        modules.append(overlapResolver)
 
     #################
     # VXDTF2 Step 5

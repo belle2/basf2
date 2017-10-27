@@ -86,31 +86,58 @@ namespace Belle2 {
     std::vector<unsigned int> m_store; /**< The bit storage. */
   };
 
+  /** Abstract class (interface) for ECL waveform
+   *  compression/decompression to/from the BitStream storage.
+   */
   class ECLCompress {
   public:
+    /** virtual destructure */
     virtual ~ECLCompress() {};
+
+    /** Compress the ECL waveform
+     * @param out -- where we stream the compressed data
+     * @param adc -- the waveform to compress
+     */
     virtual void compress(BitStream& out, const int* adc) = 0;
+
+    /** Decompress the ECL waveform
+     * @param in -- the stream from which we fetch the compressed data
+     * @param adc -- the decompressed waveform
+     */
     virtual void uncompress(BitStream& in, int* adc) = 0;
   };
 
+  /** ECL waveform compression/decompression to/from the BitStream
+   *  storage with the BASE algorithm
+   */
   class ECLBaseCompress: public ECLCompress {
   public:
     void compress(BitStream& out, const int* adc);
     void uncompress(BitStream& out, int* adc);
   };
 
+  /** ECL waveform compression/decompression to/from the BitStream
+   *  storage with the DELTA algorithm
+   */
   class ECLDeltaCompress: public ECLCompress {
   public:
     void compress(BitStream& out, const int* adc);
     void uncompress(BitStream& out, int* adc);
   };
 
+  /** ECL waveform compression/decompression to/from the BitStream
+   *  storage based on the Discrete Cosine Transform (DCT)
+   */
   class ECLDCTCompress: public ECLCompress {
   public:
     void compress(BitStream& out, const int* adc);
     void uncompress(BitStream& out, int* adc);
   };
 
+  /** The compression algorithm selector function
+   *  @param compAlgo compression algorithm -- 1 - BASE, 2 - DELTA, 3 - DCT
+   *  @return pointer to the selected algorithm or NULL in case of the wrong parameter
+   */
   ECLCompress* selectAlgo(int compAlgo);
 }
 #endif

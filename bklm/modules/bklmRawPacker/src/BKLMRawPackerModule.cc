@@ -72,6 +72,11 @@ void BKLMRawPackerModule::initialize()
 }
 
 
+void BKLMRawPackerModule::beginRun()
+{
+  //load ADCoffset from database
+  m_scintADCOffset = m_ADCParams->getADCOffset();
+}
 
 
 void BKLMRawPackerModule::event()
@@ -101,7 +106,7 @@ void BKLMRawPackerModule::event()
     int iSector = bklmDigit->getSector();
     int isForward = bklmDigit->isForward();
     float iTdc = bklmDigit->getTime();
-    float icharge = bklmDigit->getNPixel();
+    float icharge = bklmDigit->getCharge();
     short iCTime = bklmDigit->getCTime();
     bool isRPC = bklmDigit->inRPC();
     bool isAboveThresh = bklmDigit->isAboveThreshold();
@@ -238,6 +243,10 @@ void BKLMRawPackerModule::event()
   return;
 }
 
+void BKLMRawPackerModule::endRun()
+{
+
+}
 
 
 void BKLMRawPackerModule::formatData(int flag, int channel, int axis, int lane, int tdc, int charge, int ctime,

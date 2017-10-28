@@ -12,15 +12,15 @@
 #include <tracking/trackFindingCDC/mclookup/ITrackType.h>
 #include <tracking/trackFindingCDC/numerics/Index.h>
 
-#include <cdc/dataobjects/CDCHit.h>
 #include <map>
 #include <vector>
 
 namespace Belle2 {
+  class CDCHit;
+
   namespace TrackFindingCDC {
     class CDCMCMap;
     class CDCSimHitLookUp;
-
 
     ///Class to organize and present the monte carlo hit information
     class CDCMCTrackStore {
@@ -107,7 +107,7 @@ namespace Belle2 {
       std::map<ITrackType, CDCHitVector> m_mcTracksByMCParticleIdx;
 
       /// The memory for the segments made of CDCHits sorted for the time of flight and assoziated to the Monte Carlo particle id
-      std::map<ITrackType, std::vector<CDCHitVector>> m_mcSegmentsByMCParticleIdx;
+      std::map<ITrackType, std::vector<CDCHitVector> > m_mcSegmentsByMCParticleIdx;
 
       /// Look up table for index of the hit within its track
       std::map<const CDCHit*, int> m_inTrackIds;

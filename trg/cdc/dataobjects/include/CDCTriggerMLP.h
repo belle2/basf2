@@ -29,6 +29,8 @@ namespace Belle2 {
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerMLP() { }
 
+    /** check if weights are default values or set by some trainer */
+    bool isTrained() const { return trained; }
     /** get number of layers */
     unsigned nLayers() const { return nNodes.size(); }
     /** get number of nodes in a layer */
@@ -84,6 +86,9 @@ namespace Belle2 {
     std::vector<unsigned short> nNodes;
     /** Weights of the network. */
     std::vector<float> weights;
+    /** Indicator whether the weights are just default values or have
+     *  been set by some trainer (set to true when setWeights() is first called). */
+    bool trained;
 
     /** output variables: 1: z, 2: theta, 3: (z, theta) */
     unsigned short targetVars;
@@ -120,7 +125,7 @@ namespace Belle2 {
     std::vector<float> relevantID;
 
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerMLP, 4);
+    ClassDef(CDCTriggerMLP, 5);
   };
 }
 #endif

@@ -1,0 +1,40 @@
+# EventType: 1110640000
+# Descriptor: [B0 -> K*0 tau+ tau-]cc
+# NickName: Bd_Kst0tautau_mumu
+# Documentation: SM B0-> Kstar0 tau tau signal MC both taus to muons
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Sam Cunliffe
+# Email: samuel.cunliffe@pnnl.gov
+# Cuts: None
+# Date: 20170629
+#
+Alias MyK*0 K*0
+Alias Myanti-K*0 anti-K*0
+ChargeConj MyK*0      Myanti-K*0
+#
+Alias Mytau+ tau+
+Alias Mytau- tau-
+ChargeConj    Mytau+  Mytau-
+#
+Decay Upsilon(4S)
+0.5 B0sig anti-B0 VSS;
+0.5 anti-B0sig B0 VSS;
+Enddecay
+#
+Decay B0sig
+1.000        MyK*0    Mytau+    Mytau-           BTOSLLBALL;
+Enddecay
+CDecay anti-B0sig
+#
+Decay MyK*0
+1.000        K+       pi-              VSS;
+Enddecay
+CDecay Myanti-K*0
+#
+Decay Mytau-
+1.00      mu-     anti-nu_mu       nu_tau                PHOTOS TAULNUNU;
+Enddecay
+CDecay Mytau+
+#
+End

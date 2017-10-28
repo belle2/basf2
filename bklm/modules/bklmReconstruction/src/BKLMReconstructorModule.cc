@@ -57,6 +57,9 @@ BKLMReconstructorModule::BKLMReconstructorModule() : Module(), m_GeoPar(NULL)
            "Half-width of prompt window relative to PromptTime",
            //double(50.0));
            double(2000.0));
+  addParam("Alignment correction flag", m_ifAlign,
+           "flag for alignment correction, do the correction (true) or not (false), default is false",
+           bool(false));
 }
 
 BKLMReconstructorModule::~BKLMReconstructorModule()
@@ -141,7 +144,8 @@ void BKLMReconstructorModule::event()
       double phiTime = hit1ds[phiIndex]->getTime() - propagationTimes.y();
       double zTime = hit1ds[zIndex]->getTime() - propagationTimes.z();
       if (std::fabs(phiTime - zTime) > m_DtMax) continue;
-      CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift());
+      //! the second param in localToGlobal is whether do the alignment correction (true) or not (false)
+      CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift(), m_ifAlign);
       double time = 0.5 * (phiTime + zTime) - global.mag() / Const::speedOfLight;
       BKLMHit2d* hit2d = hit2ds.appendNew(hit1ds[phiIndex], hit1ds[zIndex], global, time); // also creates relations hit2d to each hit1d
       if (fabs(time - m_PromptTime) > m_PromptWindow) hit2d->isOutOfTime();

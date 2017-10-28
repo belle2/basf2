@@ -23,9 +23,14 @@ Packer.param('svdDigitListName', 'SVDDigits')
 Packer.param('rawSVDListName', 'SVDRaw')
 Packer.param('xmlMapFileName', '../data/svd_mapping.xml')
 
+
 unPacker = register_module('SVDUnpacker')
 unPacker.param('rawSVDListName', 'SVDRaw')
 unPacker.param('svdDigitListName', 'newSVDDigits')
+
+unPacker.param('GenerateShaperDigts', True)
+unPacker.param('svdShaperDigitListName', 'newSVDShaperDigits')
+
 unPacker.param('xmlMapFileName', '../data/svd_mapping.xml')
 
 

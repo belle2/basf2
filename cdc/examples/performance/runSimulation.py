@@ -19,7 +19,9 @@ from simulation import add_simulation
 
 import os.path
 import sys
-from cdc.cr import getDataPeriod
+from cdc.cr import getDataPeriod, getTriggerType, getMapperAngle
+from cdc.cr import add_cdc_cr_simulation
+from cdc.cr import add_GCR_Trigger_simulation
 
 
 # Set the global log level
@@ -29,10 +31,12 @@ set_log_level(LogLevel.INFO)
 reset_database()
 use_database_chain()
 use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
-use_central_database("GT_gen_data_002.11_gcr2017-07", LogLevel.WARNING)
+# use_central_database("GT_gen_data_002.11_gcr2017-07", LogLevel.WARNING)
+# For GCR, July and August 2017.
+use_central_database("GT_gen_data_003.04_gcr2017-08", LogLevel.WARNING)
 
 
-def sim(exp, run, evt, st, topInCounter=True, magneticField=False):
+def sim(exp, run, evt, st, topInCounter=False, magneticField=True, fieldMapper=False):
     """
     exp : Experimental number
     run : Run number
@@ -52,13 +56,38 @@ def sim(exp, run, evt, st, topInCounter=True, magneticField=False):
     period = getDataPeriod(exp=int(exp),
                            run=int(run))
 
-    if not magneticField:
-        components = ['CDC']
-    else:
-        components = ['CDC', 'MagneticFieldConstant4LimitedRCDC']
+    mapperAngle = getMapperAngle(exp=int(exp),
+                                 run=int(run))
 
-    add_cosmics_generator(main_path, components=components, pre_general_run_setup=period, top_in_counter=topInCounter)
-    add_simulation(main_path, components=components)
+    triggerType = getTriggerType(exp=int(exp),
+                                 run=int(run))
+
+    if fieldMapper is True:
+        main_path.add_module('CDCJobCntlParModifier',
+                             MapperGeometry=True,
+                             MapperPhiAngle=mapperAngle)
+
+    components = ['CDC', 'ECL', 'MagneticField'] if magneticField is True else ['CDC', 'ECL']
+
+    add_cosmics_generator(path=main_path,
+                          components=components,
+                          global_box_size=[8, 8, 8],
+                          accept_box=[0.7, 0.3, 0.3],  # LWH
+                          keep_box=[0.7, 0.3, 0.3],
+                          cosmics_data_dir='data/generators/modules/cryinput/',
+                          setup_file='./cry.setup',
+                          data_taking_period=period,
+                          top_in_counter=topInCounter)
+
+    # add_simulation(main_path)
+    add_cdc_cr_simulation(main_path, components=components)
+
+    if triggerType is not None:
+        add_GCR_Trigger_simulation(main_path,
+                                   backToBack=True if triggerType == 'b2b' else False,
+                                   skipEcl=True)
+    else:
+        B2INFO('skip tsim')
 
     output = register_module('RootOutput',
                              outputFileName='gcr.cdc.{0:04d}.{1:06d}.{2:04d}.root'.format(int(exp), int(run), int(st)))
@@ -78,4 +107,4 @@ if __name__ == "__main__":
     parser.add_argument('st', help='Stream ID')
 
     args = parser.parse_args()
-    sim(args.exp, args.run, args.evt, args.st, topInCounter=False, magneticField=True)
+    sim(args.exp, args.run, args.evt, args.st, topInCounter=False, magneticField=True, fieldMapper=True)

@@ -138,22 +138,49 @@ namespace Belle2 {
       return func;
     }
 
-    double nRemainingTracksInRestOfEvent(const Particle* particle)
+
+    // only the helper function
+    double nRemainingTracksInROE(const Particle* particle, std::string maskName)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
       if (not roe.isValid())
         return 0.0;
-
-
-      int roe_tracks = roe->getNTracks();
-      int par_tracks = 0;
+      std::vector<const Track*> roeTracks = roe->getTracks(maskName);
+      int n_roe_tracks = roe->getNTracks(maskName);
+      int n_par_tracks = 0;
       const auto& daughters = particle->getFinalStateDaughters();
       for (const auto& daughter : daughters) {
         int pdg = abs(daughter->getPDGCode());
-        if (pdg == 11 or pdg == 13 or pdg == 211 or pdg == 321 or pdg == 2212)
-          par_tracks++;
+        if (pdg == 11 or pdg == 13 or pdg == 211 or pdg == 321 or pdg == 2212) {
+          if (std::find(roeTracks.begin(), roeTracks.end(), daughter->getTrack()) != roeTracks.end())
+            n_par_tracks++;
+        }
       }
-      return roe_tracks - par_tracks;
+      return n_roe_tracks - n_par_tracks;
+    }
+
+
+    Manager::FunctionPtr nRemainingTracksInRestOfEventWithMask(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+
+      if (arguments.size() == 0)
+        maskName = "";
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("Wrong number of arguments (1 required) for meta function nROETracks");
+
+      auto func = [maskName](const Particle * particle) -> double {
+        return nRemainingTracksInROE(particle, maskName);
+      };
+      return func;
+    }
+
+
+    double nRemainingTracksInRestOfEvent(const Particle* particle)
+    {
+      return nRemainingTracksInROE(particle);
     }
 
     double nROEKLMClusters(const Particle* particle)
@@ -1589,6 +1616,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent,
                       "Returns number of tracks in ROE - number of tracks of given particle"
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
+
+    REGISTER_VARIABLE("nRemainingTracksInRestOfEvent(maskName)", nRemainingTracksInRestOfEventWithMask,
+                      "Returns number of remaining tracks between the ROE (specified via a mask) and the given particle. For the given particle only tracks are counted which are in the RoE."
+                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray."
+                      "Is required for the specific FEI.");
 
     REGISTER_VARIABLE("nROEKLMClusters", nROEKLMClusters,
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object.");

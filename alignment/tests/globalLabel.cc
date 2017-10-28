@@ -121,7 +121,7 @@ namespace Belle2 {
   TEST_F(GlobalLabelTest, GettersSettersOperators)
   {
     GlobalLabel vxdlabel1(vxdid, paramid);
-    GlobalLabel vxdlabel2(10873609);
+    GlobalLabel vxdlabel2(100873609);
 
     // getters
     EXPECT_EQ(80, GlobalLabel::getCurrentTimeIntervalRef());
@@ -134,8 +134,8 @@ namespace Belle2 {
     EXPECT_EQ(0, GlobalLabel(cdcid, paramid).getVxdID());
     EXPECT_EQ(cdcid, GlobalLabel(cdcid, paramid).getWireID());
     // cast operators
-    EXPECT_EQ(10873609, (int)vxdlabel1);
-    EXPECT_EQ(10873609, (unsigned int)vxdlabel1);
+    EXPECT_EQ(100873609, (int)vxdlabel1);
+    EXPECT_EQ(100873609, (unsigned int)vxdlabel1);
 
     // getters (GlobalLabel from label)
     EXPECT_EQ(80, GlobalLabel::getCurrentTimeIntervalRef());
@@ -148,13 +148,13 @@ namespace Belle2 {
     EXPECT_EQ(0, GlobalLabel(cdcid, paramid).getVxdID());
     EXPECT_EQ(cdcid, GlobalLabel(cdcid, paramid).getWireID());
     // cats operator (GlobalLabel from label)
-    EXPECT_EQ(10873609, (int)vxdlabel2);
-    EXPECT_EQ(10873609, (unsigned int)vxdlabel2);
+    EXPECT_EQ(100873609, (int)vxdlabel2);
+    EXPECT_EQ(100873609, (unsigned int)vxdlabel2);
 
     // Assignment
     GlobalLabel other(cdcid, 20);
     other = vxdlabel1;
-    EXPECT_EQ(10873609, other.label());
+    EXPECT_EQ(100873609, other.label());
   }
 
   /// Test the default way of using this
@@ -164,15 +164,15 @@ namespace Belle2 {
     // Test time indep. detector constructors
     GlobalLabel vxdlabel(vxdid, paramid);
     GlobalLabel cdclabel(cdcid, paramid);
-    EXPECT_EQ(10873609, vxdlabel.label());
-    EXPECT_EQ(20620409, cdclabel.label());
+    EXPECT_EQ(100873609, vxdlabel.label());
+    EXPECT_EQ(200620409, cdclabel.label());
     EXPECT_EQ(vxdid.getLadderNumber(), vxdlabel.getVxdID().getLadderNumber());
     EXPECT_EQ(cdcid.getICLayer(), cdclabel.getWireID().getICLayer());
     EXPECT_EQ(paramid, vxdlabel.getParameterId());
     EXPECT_EQ(paramid, cdclabel.getParameterId());
     // Test time indep. label constructor
-    vxdlabel = GlobalLabel(10873609);
-    cdclabel = GlobalLabel(20620409);
+    vxdlabel = GlobalLabel(100873609);
+    cdclabel = GlobalLabel(200620409);
     EXPECT_EQ(vxdid.getLadderNumber(), vxdlabel.getVxdID().getLadderNumber());
     EXPECT_EQ(cdcid.getICLayer(), cdclabel.getWireID().getICLayer());
     EXPECT_EQ(paramid, vxdlabel.getParameterId());

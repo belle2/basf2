@@ -66,8 +66,6 @@ namespace Belle2 {
       std::string m_PXDRawPedestalsName;  /**< The name of the StoreArray of PXDRawPedestals to be generated */
       std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
       std::string m_RawClusterName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
-      //std::string m_RemapLUTifob;  /**< Name of the LUT which remaps DHP data for inner forward and outer backward modules */
-      //std::string m_RemapLUTibof;  /**< Name of the LUT which remaps DHP data for inner backward and outer forward modules */
       bool m_ignore_headernrframes;
 
       /**  Swap the endianess of the ONSEN header yes/no */

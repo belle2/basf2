@@ -528,7 +528,7 @@ namespace Belle2 {
 
       bool m_displacement = true;  /**< Switch for displacement. */
       bool m_alignment = true;  /**< Switch for alignment. */
-      bool m_misalignment = true;  /**< Switch for misalignment. */
+      bool m_misalignment = false;  /**< Switch for misalignment. */
 
       bool m_displacementInputType = true;  /**< Input type for displacement. */
       bool m_alignmentInputType = true;  /**< Input type for alignment. */

@@ -326,6 +326,24 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr passesEventCut(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string cutString = arguments[0];
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
+        auto func = [cut](const Particle*) -> double {
+          if (cut->check(nullptr))
+            return 1;
+          else
+            return 0;
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function passesEventCut");
+      }
+    }
+
     Manager::FunctionPtr varFor(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
@@ -985,10 +1003,10 @@ endloop:
 
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
-                      "[Eventbased] ]Returns the number of clean Clusters in the event\n"
+                      "[Eventbased] Returns the number of clean Clusters in the event\n"
                       "Clean clusters are defined by the clusters which pass the given cut assuming a photon hypothesis.");
     REGISTER_VARIABLE("nCleanedTracks(cut)", nCleanedTracks,
-                      "[Eventbased] ]Returns the number of clean Tracks in the event\n"
+                      "[Eventbased] Returns the number of clean Tracks in the event\n"
                       "Clean tracks are defined by the tracks which pass the given cut assuming a pion hypothesis.");
     REGISTER_VARIABLE("formula(v1 + v2 * v3 - v4 / v5^v6)", formula,
                       "Returns the result of the given formula, where v1-v6 are variables.\n"
@@ -1008,6 +1026,9 @@ endloop:
                       "Returns 1 if particle passes the cut otherwise 0.\n"
                       "Useful if you want to write out if a particle would have passed a cut or not.\n"
                       "Returns -999 if particle is a nullptr.");
+    REGISTER_VARIABLE("passesEventCut(cut)", passesEventCut,
+                      "[Eventbased] Returns 1 if event passes the cut otherwise 0.\n"
+                      "Useful if you want to select events passing a cut without looping into particles, such as for skimming.\n");
     REGISTER_VARIABLE("countDaughters(cut)", countDaughters,
                       "Returns number of direct daughters which satisfy the cut.\n"
                       "Used by the skimming package (for what exactly?)\n"
@@ -1057,11 +1078,11 @@ endloop:
                       "The extraInfo has to be set first by a module like MVAExpert. If nothing is set under this name, -999 is returned.\n"
                       "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the MVAExpert.");
     REGISTER_VARIABLE("eventExtraInfo(name)", eventExtraInfo,
-                      "[eventbased] Returns extra info stored under the given name in the event extra info.\n"
+                      "[Eventbased] Returns extra info stored under the given name in the event extra info.\n"
                       "The extraInfo has to be set first by another module like MVAExpert in event mode.\n"
                       "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the MVAExpert for an event.");
     REGISTER_VARIABLE("eventCached(variable)", eventCached,
-                      "[eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
+                      "[Eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
                       "The result of second call to this variable in the same event will be provided from the cache.");
     REGISTER_VARIABLE("particleCached(variable)", particleCached,
                       "Returns value of given variable and caches this value in the ParticleExtraInfo of the provided particle.\n"

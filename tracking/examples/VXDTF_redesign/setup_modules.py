@@ -169,6 +169,7 @@ def setup_VXDTF2(path=None,
 
     # Properties
     vIPRemover = register_module('SPTCvirtualIPRemover')
+    vIPRemover.param('tcArrayName', '')
     vIPRemover.param('maxTCLengthForVIPKeeping', 0)  # want to remove virtualIP for any track length
     vIPRemover.logging.log_level = log_level
     vIPRemover.logging.debug_level = debug_level
@@ -180,32 +181,26 @@ def setup_VXDTF2(path=None,
     #################
 
     if filter_overlapping:
-        overlapNetworkProducer = register_module('SVDOverlapChecker')
-        overlapNetworkProducer.logging.log_level = log_level
-        overlapNetworkProducer.logging.debug_level = debug_level
-        modules.append(overlapNetworkProducer)
-
-        if overlap_filter.lower() == 'hopfield':
-            overlapFilter = register_module('TrackSetEvaluatorHopfieldNNDEV')
-        elif overlap_filter.lower() == 'greedy':
-            overlapFilter = register_module('TrackSetEvaluatorGreedyDEV')
-        else:
-            print("ERROR! unknown overlap filter " + overlap_filter + " is given - can not proceed!")
-            exit
-        overlapFilter.logging.log_level = log_level
-        overlapFilter.logging.debug_level = debug_level
-        modules.append(overlapFilter)
+        overlapResolver = register_module('SVDOverlapResolver')
+        overlapResolver.logging.log_level = log_level
+        overlapResolver.logging.debug_level = debug_level
+        overlapResolver.param('NameSpacePointTrackCands', '')
+        overlapResolver.param('ResolveMethod', overlap_filter.lower())
+        overlapResolver.param('NameSVDClusters', '')
+        modules.append(overlapResolver)
 
     #################
     # VXDTF2 Step 5
     # Converter
     #################
     momSeedRetriever = register_module('SPTCmomentumSeedRetriever')
+    momSeedRetriever.param('tcArrayName', '')
     momSeedRetriever.logging.log_level = log_level
     momSeedRetriever.logging.debug_level = debug_level
     modules.append(momSeedRetriever)
 
     converter = register_module('SPTC2RTConverter')
+    converter.param('spacePointsTCsStoreArrayName', '')
     converter.logging.log_level = log_level
     converter.logging.debug_level = debug_level
     modules.append(converter)

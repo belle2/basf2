@@ -248,8 +248,9 @@ void FragmentationModule::event()
       p->setMass(pythia->event[iPythiaPart].m());
 
       // Set vertex
-      p->setProductionVertex(pythia->event[iPythiaPart].xProd(), pythia->event[iPythiaPart].yProd(), pythia->event[iPythiaPart].zProd());
-      p->setProductionTime(pythia->event[iPythiaPart].zProd() * Unit::mm / Const::speedOfLight);
+      p->setProductionVertex(pythia->event[iPythiaPart].xProd() * Unit::mm, pythia->event[iPythiaPart].yProd() * Unit::mm,
+                             pythia->event[iPythiaPart].zProd() * Unit::mm);
+      p->setProductionTime(pythia->event[iPythiaPart].tProd() * Unit::mm / Const::speedOfLight);
       p->setValidVertex(true);
 
       // Set all(!) particles from the generator to primary

@@ -9,11 +9,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCWireHitCluster;
+
+    // Guard to prevent repeated instantiations
+    extern template class Filter<CDCWireHitCluster>;
+
+    /// Base class for wire hit cluster filters
     using BaseClusterFilter = Filter<CDCWireHitCluster>;
   }
 }

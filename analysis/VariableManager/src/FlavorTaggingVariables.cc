@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Moritz Gelb                                 *
+ * Contributors: Fernando Abudinen, Moritz Gelb                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -948,7 +948,7 @@ namespace Belle2 {
           || extraInfoName == "isRightCategory(SlowPion)" || extraInfoName == "isRightCategory(FastPion)" || extraInfoName == "isRightCategory(KaonPion)" || extraInfoName == "isRightCategory(Lambda)"
           || extraInfoName == "isRightCategory(MaximumPstar)" || extraInfoName == "isRightCategory(FSC)"))
           {
-            B2FATAL("hasHighestProbInCat: Not available category" << extraInfoName <<
+            B2FATAL("HighestProbInCat: Not available category" << extraInfoName <<
             ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda."
             << endl <<
             "The possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
@@ -1376,7 +1376,7 @@ namespace Belle2 {
                     target_prob = particlei->getExtraInfo(isRightTrack[indexRightTrack]);
                   }
                 }
-                if (prob > maximumTargetProb) {
+                if (target_prob > maximumTargetProb) {
                   maximumTargetProb = target_prob;
                   target = particlei;
                 }
@@ -1536,7 +1536,7 @@ namespace Belle2 {
 
             if (nTargets > 0) output = 1;
 
-            if (nTargets > 1) B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
+            // if (nTargets > 1); B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
           }
           return output;
         };
@@ -1575,6 +1575,7 @@ namespace Belle2 {
           double output = 0.0;
 
           std::vector<Particle*> targetParticles;
+          std::vector<Particle*> targetParticlesCategory;
           Variable::Manager& manager = Variable::Manager::Instance();
 
           if (ListOfParticles.isValid())
@@ -1598,11 +1599,24 @@ namespace Belle2 {
             for (auto& targetParticle : targetParticles) {
               if (manager.getVariable("isRightCategory(" +  categoryName + ")")-> function(targetParticle) == 1) {
                 output = 1;
-                nTargets += 1;
+                nTargets += 1; targetParticlesCategory.push_back(targetParticle);
               }
             }
 
-            if (nTargets > 1) B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
+            /*            if (nTargets > 1) {
+                          B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
+                          for (auto& iTargetParticlesCategory : targetParticlesCategory) {
+                            const MCParticle* MCp = iTargetParticlesCategory -> getRelated<MCParticle>();
+
+                            RelationVector<Particle> mcRelations = MCp->getRelationsFrom<Particle>();
+                            if (mcRelations.size() > 1) B2WARNING("MCparticle is related to two particles");
+
+                            B2INFO("MCParticle has pdgCode = " << MCp -> getPDG() << ", MCMother has pdgCode = " << MCp-> getMother() -> getPDG() << " and " <<
+                                   MCp-> getMother() -> getNDaughters() << " daughters.");
+
+                            for (auto& iDaughter : MCp->getMother() -> getDaughters()) B2INFO("iDaughter PDGCode = " << iDaughter -> getPDG());
+                          }
+                        }*/
           }
           return output;
         };

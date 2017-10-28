@@ -70,9 +70,9 @@
 # ########################## #
 centraldb/
 Belle2FileCatalog.xml
-results/
-html/
-runtime.dat
+/results/
+/html/
+/runtime.dat
 
 
 # Python byte code #

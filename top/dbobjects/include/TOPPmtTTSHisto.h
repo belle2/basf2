@@ -39,6 +39,19 @@ namespace Belle2 {
       m_serialNumber(serialNumber)
     {}
 
+
+    /**
+     * Append new element to the map
+     * @param channel PMT channel number (1-based)
+     * @param hv high voltage used in taking the TTS histogram
+     * @param histo TH1F of the TTS histogram
+     */
+    void appendHistogram(unsigned channel, double hv, TH1F* histo)
+    {
+      m_histo[channel - 1][hv] = histo;
+    }
+
+
     /**
      * Returns PMT serial number
      * @return serial number
@@ -50,9 +63,9 @@ namespace Belle2 {
      * @param channel channel number
      * @return map of TTS histograms
      */
-    const std::map& getTtsHisto(unsigned channel) const
+    const std::map<float, TH1F*>& getTtsHisto(unsigned channel) const
     {
-      if (channel > c_NumChannels) channel = c_numChannels;
+      if (channel > c_NumChannels) channel = c_NumChannels;
       channel--;
       return m_histo[channel];
     }
@@ -62,8 +75,8 @@ namespace Belle2 {
 
     std::string m_serialNumber;                   /**< serial number, e.g. JTxxxx */
     std::map<float, TH1F*> m_histo[c_NumChannels];  /**< histograms of measured TTS (one for each channel,
-               *   for several HV settings)
-               */
+                 *   for several HV settings)
+                 */
 
     ClassDef(TOPPmtTTSHisto, 1); /**< ClassDef */
 

@@ -18,6 +18,8 @@ from HLTTrigger import add_HLT_Y4S
 from ROOT import Belle2
 import glob
 
+set_random_seed(12345)
+
 # create path
 main = create_path()
 
@@ -27,7 +29,7 @@ print_params(beamparameters)
 
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [100])
+eventinfosetter.param('evtNumList', [1000])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [1])
 main.add_module(eventinfosetter)

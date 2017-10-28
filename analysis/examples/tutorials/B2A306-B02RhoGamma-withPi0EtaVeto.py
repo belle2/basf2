@@ -74,14 +74,15 @@ buildRestOfEvent('B0')
 # In this section, I show how to use the writePi0EtaVeto.
 #
 # Before using the pi0/eta veto you need at least the default weight files: pi0veto.root and etaveto.root.
-# Alternatively you can download them from my home directory:
+# downloadFlag parameter is set to True by default,
+# the default weight files are downloaded to your workingDirectory automatically from the database in that case.
+# You can also download them from my home directory:
 # scp -r /home/belle2/otakyo/pi0etaveto
 # into your workingDirectory/.
-# The default working directory is '.'
-
+# The default workingDirectory is '.'
 
 # perform pi0/eta veto
-writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma')
+writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', workingDirectory='pi0etaveto')
 
 # at this stage the B0 candidates should have
 # extraInfo(Pi0_Prob) and extraInfo(Eta_Prob) value attached.
@@ -102,10 +103,10 @@ writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma')
 # you have to set not only pi0softname and etasoftname parameters
 # but also pi0vetoname and etavetoname parameters to your original names except for default
 # from the second application for debug. For example,
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',timecut=140,
+# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',
 # pi0softname='PI0SOFT_type2',etasoftname='ETASOFT_type2',pi0vetoname='Pi0_Prob2',etavetoname='Eta_Prob2')
 
-# If you train by yourself, for example, you should refer to
+# If you train by yourself, you should refer to
 # B2A701-ContinuumSuppression_Input.py
 # B2A702-ContinuumSuppression_MVATrain.py
 

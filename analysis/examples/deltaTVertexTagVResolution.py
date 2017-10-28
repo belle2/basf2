@@ -34,9 +34,10 @@ import random
 import array
 from operator import itemgetter
 
-if len(sys.argv) != 3:
-    sys.exit("Must provide 2 arguments: [input_sim_file] or ['input_sim_file*'] with wildcards and [treeName]"
-             )
+if len(sys.argv) != 4:
+    sys.exit(
+        "Must provide 3 arguments: [input_sim_file] or ['input_sim_file*'] wildcards, [treeName] " +
+        "and [VXD_requirement (PXD or SVD)]")
 
 PATH = "."
 
@@ -52,15 +53,19 @@ treeName = str(sys.argv[2])
 
 # No PXD hit equired: PXD0. At least one PXD (SVD) hit for one of the muon tracks: PXD1 (SVD1).
 # Hit required for both muon tracks: PXD2 (SVD2)"
-PXDReqs = ["PXD0", "PXD2"]
+VXDReqs = []
+if str(sys.argv[3]) == "PXD":
+    VXDReqs = ["PXD0", "PXD2"]
+elif str(sys.argv[3]) == "SVD":
+    VXDReqs = ["SVD0", "SVD2"]
 
 
 fitResults = []
 
-for PXDReq in PXDReqs:
+for VXDReq in VXDReqs:
     iResult = []
 
-    tdat = ROOT.TChain(treename)
+    tdat = ROOT.TChain(treeName)
 
     for iFile in workingFiles:
         tdat.AddFile(iFile)
@@ -107,14 +112,14 @@ for PXDReq in PXDReqs:
 
     cut = "abs(B0_qrMC) == 1 "  # + "&& abs(B0_DeltaTErr)< " + str(limDeltaTErr) + " "
 
-    if PXDReq == 'PXD1':
+    if VXDReq == 'PXD1':
         cut = cut + "&& (B0_Jpsi_mu0_nPXDHits> 0 || B0_Jpsi_mu1_nPXDHits> 0) "
-    if PXDReq == 'PXD2':
+    if VXDReq == 'PXD2':
         cut = cut + "&& B0_Jpsi_mu0_nPXDHits> 0 && B0_Jpsi_mu1_nPXDHits> 0 "
 
-    if PXDReq == 'SVD1':
+    if VXDReq == 'SVD1':
         cut = cut + "&& (B0_Jpsi_mu0_nSVDHits> 0 || B0_Jpsi_mu1_nSVDHits> 0) "
-    if PXDReq == 'SVD2':
+    if VXDReq == 'SVD2':
         cut = cut + "&& B0_Jpsi_mu0_nSVDHits> 0 && B0_Jpsi_mu1_nSVDHits> 0 "
 
     argSet = ROOT.RooArgSet(
@@ -155,10 +160,10 @@ for PXDReq in PXDReqs:
         argSet,
         cut)
 
-    if PXDReq == 'PXD1' or PXDReq == 'PXD2':
+    if VXDReq == 'PXD1' or VXDReq == 'PXD2':
         fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(
             B0_qrMC, B0_Jpsi_mu0_nPXDHits, B0_Jpsi_mu1_nPXDHits, deltaTErr), cut)
-    elif PXDReq == 'SVD1' or PXDReq == 'SVD2':
+    elif VXDReq == 'SVD1' or VXDReq == 'SVD2':
         fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(
             B0_qrMC, B0_Jpsi_mu0_nSVDHits, B0_Jpsi_mu1_nSVDHits, deltaTErr), cut)
     else:
@@ -252,7 +257,7 @@ for PXDReq in PXDReqs:
             dtErrCBS, gErr1, gErr2), ROOT.RooArgList(
             fracErr1, fracErr2))
 
-    if PXDReq == 'PXD0' or PXDReq == 'PXD1' or PXDReq == 'PXD2':
+    if VXDReq == 'PXD0' or VXDReq == 'PXD1' or VXDReq == 'PXD2':
         CBSFitRes = modelTErr.fitTo(
             fitDataDTErr,
             ROOT.RooFit.Minos(ROOT.kFALSE), ROOT.RooFit.Extended(ROOT.kFALSE),
@@ -345,7 +350,7 @@ for PXDReq in PXDReqs:
     l.SetFillColorAlpha(ROOT.kWhite, 0)
     l.Draw()
     Pad.Update()
-    nPlot = PATH + "/test6_CPVResDeltaT" + PXDReq + ".pdf"
+    nPlot = PATH + "/test6_CPVResDeltaT" + VXDReq + ".pdf"
     c1.SaveAs(nPlot)
     c1.Destructor()
 
@@ -379,7 +384,7 @@ for PXDReq in PXDReqs:
     l.SetFillColorAlpha(ROOT.kWhite, 0)
     # l.Draw()
     Pad.Update()
-    nPlot = PATH + "/test6_CPVResDeltaTError" + PXDReq + ".pdf"
+    nPlot = PATH + "/test6_CPVResDeltaTError" + VXDReq + ".pdf"
     c1.SaveAs(nPlot)
     c1.Destructor()
 
@@ -494,7 +499,7 @@ for PXDReq in PXDReqs:
     l.SetFillColorAlpha(ROOT.kWhite, 0)
     l.Draw()
     Pad.Update()
-    nPlot = PATH + "/test6_CPVResDeltaZsig" + PXDReq + ".pdf"
+    nPlot = PATH + "/test6_CPVResDeltaZsig" + VXDReq + ".pdf"
     cSig.SaveAs(nPlot)
     cSig.Destructor()
 
@@ -605,7 +610,7 @@ for PXDReq in PXDReqs:
     l.SetFillColorAlpha(ROOT.kWhite, 0)
     l.Draw()
     Pad.Update()
-    nPlot = PATH + "/test6_CPVResDeltaZtag" + PXDReq + ".pdf"
+    nPlot = PATH + "/test6_CPVResDeltaZtag" + VXDReq + ".pdf"
     cTag.SaveAs(nPlot)
     cTag.Destructor()
 

@@ -70,6 +70,11 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
            "Select only the best track candidate for each family.",
            bool(false));
 
+  addParam("xBestPerFamily",
+           m_PARAMxBestPerFamily,
+           "Number of best track candidates to be created per family.",
+           m_PARAMxBestPerFamily);
+
 }
 
 /** *************************************+************************************* **/
@@ -86,7 +91,7 @@ void TrackFinderVXDCellOMatModule::initialize()
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
 
   if (m_PARAMselectBestPerFamily) {
-    m_sptcSelector = std::make_unique<SPTCSelectorXBestPerFamily>(5);
+    m_sptcSelector = std::make_unique<SPTCSelectorXBestPerFamily>(m_PARAMxBestPerFamily);
   }
 }
 

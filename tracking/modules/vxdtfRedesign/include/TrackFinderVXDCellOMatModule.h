@@ -117,6 +117,9 @@ namespace Belle2 {
     /** If true create track candidate only for the best candidate of a family. */
     bool m_PARAMselectBestPerFamily;
 
+    /** Maximal number of best candidates to be created per family. */
+    unsigned short m_PARAMxBestPerFamily = 5;
+
     /// member variables
     /** CA algorithm */
     CellularAutomaton<Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >, Belle2::CAValidator<Belle2::CACell>, Belle2::CALogger>

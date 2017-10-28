@@ -4,7 +4,7 @@
 ################################################################################
 #
 # This validation script performs a fit of DeltaT, DeltaTErr, Dz for B0_sig and
-# Deltaz for B0_tag.
+# Deltaz for B0_tag. The signal channel here is B0->JPsiKs.
 # The DeltaT and DeltaZ distributions are fitted with 3 Gaussian functions.
 # DeltaTErr is fitted with a CBShape function and two Gaussians.
 #
@@ -58,6 +58,8 @@ if str(sys.argv[3]) == "PXD":
     VXDReqs = ["PXD0", "PXD2"]
 elif str(sys.argv[3]) == "SVD":
     VXDReqs = ["SVD0", "SVD2"]
+else:
+    B2FATAL('Not available VXD requirement " + str(sys.argv[3]) + ". Available are "PXD" and "SVD".')
 
 
 fitResults = []

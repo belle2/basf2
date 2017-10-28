@@ -32,7 +32,6 @@ CDCHit::CDCHit(unsigned short tdcCount, unsigned short charge,
 
 DigitBase::EAppendStatus CDCHit::addBGDigit(const DigitBase* bg)
 {
-  B2INFO("ADDBGDigit called");
   const auto* bgDigit = static_cast<const CDCHit*>(bg);
   const unsigned short adc = m_adcCount;
   int diff  = static_cast<int>(m_tdcCount) - static_cast<int>(bgDigit->getTDCCount());

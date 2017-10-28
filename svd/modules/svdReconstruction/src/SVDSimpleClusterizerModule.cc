@@ -24,18 +24,10 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 
-#include <boost/math/distributions/chi_squared.hpp>
-#include <algorithm>
-#include <numeric>
-#include <functional>
-
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::SVD;
 
-using boost::math::chi_squared;
-using boost::math::quantile;
-using boost::math::complement;
 
 //-----------------------------------------------------------------
 //                 Register the Module

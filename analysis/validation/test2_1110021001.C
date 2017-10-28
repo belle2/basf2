@@ -24,7 +24,7 @@
 /* Validation script to determine benchmarks for PID cuts. */
 
 void plot_validplots(TFile* pfile, TTree* ptree, TFile *outputFile){
-  char const *contactForAllPlots = "Saurabh Sandilya (saurabhsandilya@gmail.com)";
+  char const *contactForAllPlots = "S. Cunliffe (sam.cunliffe@desy.de), S. Sandilya (saurabhsandilya@gmail.com), M. Schram (malachi.schram@desy.de)";
   char const *title = "B^{0}#rightarrow K*^{0}#gamma";
 
   TH1F* h_mbc = new TH1F("h_mbc",title,180,5.2,5.29);

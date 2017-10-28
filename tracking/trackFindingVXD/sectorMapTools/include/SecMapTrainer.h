@@ -21,8 +21,7 @@
 #include <tracking/trackFindingVXD/sectorMapTools/RawSecMapRootInterface.h>
 //#include <tracking/trackFindingVXD/sectorMapTools/SectorTools.h>
 #include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
-
-
+#include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariableNamesToFunctions.h>
 #include <framework/geometry/B2Vector3.h>
 
 #include <tracking/dataobjects/FullSecID.h>
@@ -38,6 +37,7 @@
 namespace Belle2 {
 
   /** This class contains all relevant tools for training a VXDTFFilters. */
+
   template <class FilterFactoryType>
   class SecMapTrainer {
   protected:
@@ -52,10 +52,8 @@ namespace Belle2 {
     Copy of the config in the SectorMap needed as it is modified (the one in VXDTFFilters is const).  */
     SectorMapConfig m_config;
 
-
     /** A factory taking care of having the correct filters prepared for secMapTraining. */
     FilterFactoryType m_factory;
-
 
     /** Stores the prepared filters and applies them on given hit-combinations. */
     FilterMill<SecMapTrainerHit> m_filterMill;
@@ -279,7 +277,7 @@ namespace Belle2 {
         FullSecID fullSecID = secIDAndSPpair.first;
         B2DEBUG(20, "SecMapTrainer::convertSPTC: found fullSecID: " << fullSecID.getFullSecString());
 
-        newTrack.addHit(SecMapTrainerHit(fullSecID, secIDAndSPpair.second->getPosition()));
+        newTrack.addHit(SecMapTrainerHit(fullSecID,  *secIDAndSPpair.second));
       }
 
       // add vertex (but without real vertexPosition, since origin is assumed)
@@ -302,6 +300,7 @@ namespace Belle2 {
         m_config.vIP.Y(),
         m_config.vIP.Z(),
         m_config.mField),
+
       m_filterMill(),
       m_rootInterface(m_config.secMapName, appendix),
       m_expNo(std::numeric_limits<unsigned>::max()),
@@ -319,24 +318,47 @@ namespace Belle2 {
     /** initialize the trainer (to be called in Module::initialize(). */
     void initialize()
     {
-      // prepare the filters:
-      m_rootInterface.initialize2Hit(m_config.twoHitFilters);
-      for (auto& fName : m_config.twoHitFilters) {
-        auto filter = m_factory.get2HitInterface(fName);
-        m_filterMill.add2HitFilter({fName, filter});
-      }
+      // prepare the filters!
+      // 2 space points:
+      auto TwoSPfilterNamesToFunctions(SelectionVariableNamesToFunctions(VXDTFFilters<SecMapTrainerHit>::twoHitFilter_t()));
 
-      m_rootInterface.initialize3Hit(m_config.threeHitFilters);
-      for (auto& fName : m_config.threeHitFilters) {
-        auto filter = m_factory.get3HitInterface(fName);
-        m_filterMill.add3HitFilter({fName, filter});
-      }
+      std::vector< std::string> twoHitFilters;
+      for (const auto& filterNameToFunction : TwoSPfilterNamesToFunctions)
+        twoHitFilters.push_back(filterNameToFunction.first);
 
-      m_rootInterface.initialize4Hit(m_config.fourHitFilters);
-      for (auto& fName : m_config.fourHitFilters) {
-        auto filter = m_factory.get4HitInterface(fName);
-        m_filterMill.add4HitFilter({fName, filter});
-      }
+      m_rootInterface.initialize2Hit(twoHitFilters);
+      for (auto& nameToFunction : TwoSPfilterNamesToFunctions)
+        m_filterMill.add2HitFilter(nameToFunction);
+
+
+      // 3 space points:
+      auto ThreeSPfilterNamesToFunctions(SelectionVariableNamesToFunctions(
+                                           VXDTFFilters<SecMapTrainerHit>::threeHitFilter_t()));
+
+      std::vector< std::string> threeHitFilters;
+      for (const auto& filterNameToFunction : ThreeSPfilterNamesToFunctions)
+        threeHitFilters.push_back(filterNameToFunction.first);
+
+      m_rootInterface.initialize3Hit(threeHitFilters);
+      for (auto& nameToFunction : ThreeSPfilterNamesToFunctions)
+        m_filterMill.add3HitFilter(nameToFunction);
+      for (auto& nameToFunction : ThreeSPfilterNamesToFunctions)
+        m_filterMill.add3HitFilter(nameToFunction);
+
+
+      // 4 space points apparently unused
+      // m_rootInterface.initialize4Hit(m_config.fourHitFilters);
+
+      // auto FourSPfilterNamesToFunctions( SelectionVariableNamesToFunctions(
+      //                     VXDTFFilters<SecMapTrainerHit>::fourHitFilter_t() ));
+
+      // std::vector< std::string> fourHitFilters;
+      // for (const auto& filterNameToFunction :FourSPfilterNamesToFunctions )
+      //  fourHitFilters.push_back( filterNameToFunction.first );
+
+      // m_rootInterface.initialize4Hit(fourHitFilters);
+      // for (auto& nameToFunction : FourSPfilterNamesToFunctions)
+      //  m_filterMill.add4HitFilter(nameToFunction);
 
       // prevent further modifications:
       m_filterMill.lockMill();

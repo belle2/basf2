@@ -46,6 +46,7 @@ namespace Belle2 {
 
       if (m_familyIndex.at(family) == -1) {
         m_familyIndex.at(family) = m_current_index;
+        sptc.setQualityIndex(qi);
         m_bestPaths.push_back(sptc);
         m_current_index++;
       } else if (qi > m_bestPaths.at(m_familyIndex[family]).getQualityIndex()) {

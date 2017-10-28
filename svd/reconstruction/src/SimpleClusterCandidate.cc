@@ -86,7 +86,7 @@ namespace Belle2 {
         double stripPos = m_isUside ? info.getUCellPosition(aStrip.cellID) : info.getVCellPosition(aStrip.cellID);
         m_position += stripPos * aStrip.charge;
         m_charge += aStrip.charge;
-        m_time += aStrip.time * aStrip.charge;;
+        m_time += aStrip.time * aStrip.charge;
         noise += aStrip.noise * aStrip.noise;
       }
 

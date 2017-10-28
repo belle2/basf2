@@ -26,7 +26,6 @@ REG_MODULE(TrackFinderVXDCellOMat)
 /** ***********************************+ + +*********************************** **/
 /** *************************************+************************************* **/
 
-
 TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
 {
   //Set module properties
@@ -87,7 +86,7 @@ void TrackFinderVXDCellOMatModule::initialize()
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
 
   if (m_PARAMselectBestPerFamily) {
-    m_sptcSelector = std::make_unique<SPTCSelectorXBestPerFamily>(10);
+    m_sptcSelector = std::make_unique<SPTCSelectorXBestPerFamily>(5);
   }
 }
 
@@ -118,12 +117,11 @@ void TrackFinderVXDCellOMatModule::event()
   unsigned int nSeeds = m_cellularAutomaton.findSeeds(segmentNetwork, m_PARAMstrictSeeding);
   if (nSeeds == 0) { B2WARNING("TrackFinderVXDCellOMatModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!"); return; }
 
-  // mark families
+  /// mark families
   if (m_PARAMsetFamilies) {
     unsigned short nFamilies = m_familyDefiner.defineFamilies(segmentNetwork);
     B2DEBUG(10, "Number of families in the network: " << nFamilies);
     m_sptcSelector->prepareSelector(nFamilies);
-    B2DEBUG(10, "Found " << nFamilies << " Families...");
   }
 
   /// collect all Paths starting from a Seed:
@@ -137,7 +135,6 @@ void TrackFinderVXDCellOMatModule::event()
     if (m_PARAMselectBestPerFamily) {
       m_sptcSelector->testNewSPTC(sptc);
     } else {
-      // TODO: refrain from using the conversion to the sptc in advance for this case!
       std::vector<const SpacePoint*> path = sptc.getHits();
       m_sptcCreator.createSPTC(m_TCs, path, sptc.getFamily());
     }

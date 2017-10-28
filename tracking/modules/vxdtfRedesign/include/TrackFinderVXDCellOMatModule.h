@@ -22,10 +22,6 @@
 #include <tracking/trackFindingVXD/algorithms/PathCollectorRecursive.h>
 #include <tracking/trackFindingVXD/algorithms/NodeFamilyDefiner.h>
 
-#include <tracking/trackFindingVXD/algorithms/CALogger.h>
-#include <tracking/trackFindingVXD/algorithms/CAValidator.h>
-#include <tracking/trackFindingVXD/algorithms/NodeCompatibilityCheckerPathCollector.h>
-
 #include <tracking/trackFindingVXD/segmentNetwork/CACell.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
 
@@ -35,8 +31,10 @@
 
 #include <tracking/trackFindingVXD/algorithms/SPTCSelectorBestPerFamily.h>
 #include <tracking/trackFindingVXD/algorithms/SPTCSelectorXBestPerFamily.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
+
+#include <tracking/trackFindingVXD/algorithms/CALogger.h>
+#include <tracking/trackFindingVXD/algorithms/CAValidator.h>
+#include <tracking/trackFindingVXD/algorithms/NodeCompatibilityCheckerPathCollector.h>
 
 
 namespace Belle2 {

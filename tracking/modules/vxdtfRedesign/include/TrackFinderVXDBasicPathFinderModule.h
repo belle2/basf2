@@ -20,11 +20,7 @@
 
 #include <tracking/trackFindingVXD/algorithms/CellularAutomaton.h>
 #include <tracking/trackFindingVXD/algorithms/PathCollectorRecursive.h>
-#include <tracking/trackFindingVXD/algorithms/CALogger.h>
-#include <tracking/trackFindingVXD/algorithms/CAValidator.h>
-#include <tracking/trackFindingVXD/algorithms/NodeCompatibilityCheckerBase.h>
 #include <tracking/trackFindingVXD/algorithms/NodeFamilyDefiner.h>
-
 
 #include <tracking/trackFindingVXD/segmentNetwork/CACell.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
@@ -33,8 +29,12 @@
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
+#include <tracking/trackFindingVXD/algorithms/SPTCSelectorBestPerFamily.h>
+#include <tracking/trackFindingVXD/algorithms/SPTCSelectorXBestPerFamily.h>
+
+#include <tracking/trackFindingVXD/algorithms/CALogger.h>
+#include <tracking/trackFindingVXD/algorithms/CAValidator.h>
+#include <tracking/trackFindingVXD/algorithms/NodeCompatibilityCheckerBase.h>
 
 
 namespace Belle2 {
@@ -149,14 +149,8 @@ namespace Belle2 {
     /** StoreArray for the TCs created in this module */
     StoreArray<Belle2::SpacePointTrackCand> m_TCs;
 
-    /** pointer to the QualityEstimator */
-    std::unique_ptr<QualityEstimatorBase> m_estimator;
-
-    /** Vector containing the currently best set of SPTCs, one for each family. */
-    std::vector<SpacePointTrackCand> m_bestPaths;
-
-    /** Map containing the relation between the indices of m_bestPath to the families. */
-    std::vector<short> m_familyIndex;
+    /** TODO: Add comment */
+    std::unique_ptr<SPTCSelectorXBestPerFamily> m_sptcSelector;
 
     /// counters and other debug stuff:
     /** counts event numbers */

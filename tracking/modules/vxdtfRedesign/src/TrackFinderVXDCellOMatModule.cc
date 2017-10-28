@@ -168,6 +168,7 @@ void TrackFinderVXDCellOMatModule::event()
       if (m_familyIndex.at(family) == -1) {
         m_familyIndex[family] = current_index;
         current_index ++;
+        tempSPTC.setQualityIndex(qi);
         m_bestPaths.push_back(tempSPTC);
       } else if (qi > m_bestPaths.at(m_familyIndex[family]).getQualityIndex()) {
         tempSPTC.setQualityIndex(qi);

@@ -27,7 +27,7 @@ namespace Belle2 {
       m_estimator = std::make_unique<QualityEstimatorTripletFit>();
     };
 
-    /** TODO: Add comment */
+    /** Preparation of Best Candidate Selector by resetting the vectors. */
     void prepareSelector(unsigned short nFamilies)
     {
       m_bestPaths.clear();
@@ -38,7 +38,9 @@ namespace Belle2 {
       m_current_index = 0;
     }
 
-    /** TODO: Add comment */
+    /** Test new SPTC if it is better than the least best of the current x best SPTCs of its respective family.
+     *  If so, the least best is thrown out, and the new is added to the sorted x best SPTC vector.
+     *  If the maximal number of best SPTCs is not reached for the family, yet, the SPTC is just added at the right place.*/
     void testNewSPTC(SpacePointTrackCand sptc)
     {
       auto qi = m_estimator->estimateQuality(sptc.getSortedHits());
@@ -64,7 +66,7 @@ namespace Belle2 {
     }
 
 
-    /** TODO: Add comment */
+    /** Function to insert SPTCs into a vector of SPTC while preserving an order by descending quality indices. */
     void insert(std::vector<SpacePointTrackCand>& paths, SpacePointTrackCand sptc)
     {
       /// Determine position of new SPTC in sorted SPTC vector to keep it sorted
@@ -77,7 +79,7 @@ namespace Belle2 {
     }
 
 
-    /** TODO: Add comment */
+    /** Return vector containing the best SPTCs; maximal m_xBest per family. */
     std::vector<SpacePointTrackCand> returnSelection() const
     {
       unsigned short finalSize = 0;
@@ -95,19 +97,19 @@ namespace Belle2 {
 
 
   private:
-    /** TODO: Add comment */
+    /** Pinter to the Quality Estimator used to evaluate the SPTCs to find the best. */
     std::unique_ptr<QualityEstimatorBase> m_estimator;
 
-    /** TODO: Add comment */
+    /** Vector containing one vector of the best SPTCs per family. */
     std::vector<std::vector<SpacePointTrackCand>> m_bestPaths;
 
-    /** TODO: Add comment */
+    /** Map of family number to respective index for m_bestPaths */
     std::vector<short> m_familyIndex;
 
-    /** TODO: Add comment */
+    /** Counter for current index which is increased each time a family is seen for the first time. */
     unsigned short m_current_index = 0;
 
-    /** TODO: Add comment */
+    /** Number of allowed best SPTCs per family. */
     unsigned short m_xBest;
   };
 }

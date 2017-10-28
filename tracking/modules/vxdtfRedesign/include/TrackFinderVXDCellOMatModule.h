@@ -122,7 +122,7 @@ namespace Belle2 {
     CellularAutomaton<Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >, Belle2::CAValidator<Belle2::CACell>, Belle2::CALogger>
     m_cellularAutomaton;
 
-    /** algorithm for finding paths of segments */
+    /** Algorithm for finding paths of segments. */
     PathCollectorRecursive <
     Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >,
            Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>,
@@ -130,7 +130,7 @@ namespace Belle2 {
            Belle2::NodeCompatibilityCheckerPathCollector<Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>>
            > m_pathCollector;
 
-    /** tool for creating SPTCs, fills storeArray directly */
+    /** Tool for creating SPTCs, which fills storeArray directly. */
     SpacePointTrackCandCreator<StoreArray<Belle2::SpacePointTrackCand>> m_sptcCreator;
 
     /** Class to evaluate connected nodes, in this case for the directed node network, and assigns a family to each
@@ -142,18 +142,17 @@ namespace Belle2 {
            > m_familyDefiner;
 
     /// input containers
-    /** access to the DirectedNodeNetwork, which contains the network needed for creating TrackCandidates */
+    /** Access to the DirectedNodeNetwork, which contains the network needed for creating TrackCandidates. */
     StoreObjPtr<Belle2::DirectedNodeNetworkContainer> m_network;
 
     /// output containers
-    /** StoreArray for the TCs created in this module */
+    /** StoreArray for the TCs created in this module. */
     StoreArray<Belle2::SpacePointTrackCand> m_TCs;
 
-    /** TODO: Add comment */
+    /** Pointer to SPTC selector class which performes the x best candidate selection. */
     std::unique_ptr<SPTCSelectorXBestPerFamily> m_sptcSelector;
 
-    /// counters and other debug stuff:
-    /** counts event numbers */
+    /** Event number counter. */
     unsigned int m_eventCounter = 0;
 
   private:

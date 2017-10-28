@@ -27,7 +27,7 @@ namespace Belle2 {
       m_estimator = std::make_unique<QualityEstimatorTripletFit>();
     };
 
-    /** TODO: Add comment */
+    /** Preparation of Best Candidate Selector by resetting the vectors. */
     void prepareSelector(unsigned short nFamilies)
     {
       m_bestPaths.clear();
@@ -38,7 +38,7 @@ namespace Belle2 {
       m_current_index = 0;
     }
 
-    /** TODO: Add comment */
+    /** Test new SPTC if it is better than the current best one and replace current one if so. */
     void testNewSPTC(SpacePointTrackCand sptc)
     {
       auto qi = m_estimator->estimateQuality(sptc.getSortedHits());
@@ -55,7 +55,7 @@ namespace Belle2 {
       }
     }
 
-    /** TODO: Add comment */
+    /** Return vector containing the best SPTCs; one per family. */
     std::vector<SpacePointTrackCand> returnSelection() const
     {
       return m_bestPaths;
@@ -63,16 +63,16 @@ namespace Belle2 {
 
 
   private:
-    /** TODO: Add comment */
+    /** Pinter to the Quality Estimator used to evaluate the SPTCs to find the best. */
     std::unique_ptr<QualityEstimatorBase> m_estimator;
 
-    /** TODO: Add comment */
+    /** Vector of best SPTCs; one per family. */
     std::vector<SpacePointTrackCand> m_bestPaths;
 
-    /** TODO: Add comment */
+    /** Map of family number to respective index for m_bestPaths */
     std::vector<short> m_familyIndex;
 
-    /** TODO: Add comment */
+    /** Counter for current index which is increased each time a family is seen for the first time. */
     unsigned short m_current_index = 0;
   };
 }

@@ -148,6 +148,7 @@ void TrackFinderVXDBasicPathFinderModule::event()
     }
   }
 
+  /** Create SPTCs in respective StoreArray if family based best candidate selection was performed. */
   if (m_PARAMselectBestPerFamily) {
     std::vector<SpacePointTrackCand> bestPaths = m_sptcSelector->returnSelection();
     for (unsigned short iCand = 0; iCand < bestPaths.size(); iCand++) {

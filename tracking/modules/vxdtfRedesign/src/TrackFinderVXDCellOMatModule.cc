@@ -112,7 +112,6 @@ void TrackFinderVXDCellOMatModule::event()
     DNN::printCANetwork<Segment< Belle2::TrackNode>>(segmentNetwork, fileName);
   }
 
-
   /// mark valid Cells as Seeds:
   unsigned int nSeeds = m_cellularAutomaton.findSeeds(segmentNetwork, m_PARAMstrictSeeding);
   if (nSeeds == 0) { B2WARNING("TrackFinderVXDCellOMatModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!"); return; }
@@ -140,6 +139,7 @@ void TrackFinderVXDCellOMatModule::event()
     }
   }
 
+  /// Create SPTCs in respective StoreArray if family based best candidate selection was performed.
   if (m_PARAMselectBestPerFamily) {
     std::vector<SpacePointTrackCand> bestPaths = m_sptcSelector->returnSelection();
     for (unsigned short iCand = 0; iCand < bestPaths.size(); iCand++) {

@@ -17,6 +17,7 @@
 
 namespace Belle2 {
 
+  /** Create new SPTC from network path. */
   template<class NetworkPath>
   inline SpacePointTrackCand convertNetworkPath(NetworkPath networkPath)
   {
@@ -40,6 +41,7 @@ namespace Belle2 {
   {
     target.push_back(source.m_spacePoint);
   }
+
 
   inline void insertSpacePoints(std::vector<const SpacePoint*>& target, Segment<TrackNode> source)
   {

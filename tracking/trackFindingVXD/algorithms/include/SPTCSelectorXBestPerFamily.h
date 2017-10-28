@@ -45,28 +45,52 @@ namespace Belle2 {
       short family = sptc.getFamily();
 
       if (m_familyIndex.at(family) == -1) {
+        B2DEBUG(100, "Setting index to " << m_current_index << " for family " << family << " and adding sptc with qi of " << qi);
         m_familyIndex.at(family) = m_current_index;
-        m_bestPaths.push_back(sptc);
+        m_bestPaths.push_back(std::vector<SpacePointTrackCand>(1));
+        sptc.setQualityIndex(qi);
+        m_bestPaths.at(m_familyIndex[family]).at(0) = sptc;
         m_current_index++;
       } else if (m_bestPaths.at(m_familyIndex[family]).size() < m_xBest) {
-
-      } else if (qi > m_bestPaths.at(m_familyIndex[family]).getQualityIndex()) {
+        B2DEBUG(100, "Adding new sptc with qi " << qi << " without check, as max lenght not reached, yet...");
         sptc.setQualityIndex(qi);
-        m_bestPaths.at(m_familyIndex[family]) = sptc;
+        insert(m_bestPaths.at(m_familyIndex[family]), sptc);
+      } else if (qi > m_bestPaths.at(m_familyIndex[family]).back().getQualityIndex()) {
+        B2DEBUG(100, "Adding new sptc with qi " << qi << " and throwing out last entry of vector...");
+        sptc.setQualityIndex(qi);
+        insert(m_bestPaths.at(m_familyIndex[family]), sptc);
+        m_bestPaths.at(m_familyIndex[family]).pop_back();
       }
     }
 
-    void insert(std::vector<SpacePointTrackCand>& paths, SpacePointTrackCAnd sptc)
+
+    /** TODO: Add comment */
+    void insert(std::vector<SpacePointTrackCand>& paths, SpacePointTrackCand sptc)
     {
-      std::vector<SpacePointTrackCand>::iterator it = std::lower_bound(paths.begin(), paths.end(), sptc, std::greater<int>());
-      cont.insert(it, value);   // insert before iterator it
+      /// Determine position of new SPTC in sorted SPTC vector to keep it sorted
+      std::vector<SpacePointTrackCand>::iterator it = std::lower_bound(paths.begin(), paths.end(), sptc,
+      [](SpacePointTrackCand & lhs, SpacePointTrackCand rhs) {
+        return lhs.getQualityIndex() > rhs.getQualityIndex();
+      });
+      /// Insert befor iterator it
+      paths.insert(it, sptc);
     }
 
 
     /** TODO: Add comment */
     std::vector<SpacePointTrackCand> returnSelection() const
     {
-      return m_bestPaths;
+      unsigned short finalSize = 0;
+      for (auto set : m_bestPaths) {
+        finalSize += set.size();
+      }
+      std::vector<SpacePointTrackCand> jointBestPaths;
+      jointBestPaths.reserve(finalSize);
+      for (auto set : m_bestPaths) {
+        jointBestPaths.insert(jointBestPaths.end(), set.begin(), set.end());
+      }
+
+      return jointBestPaths;
     }
 
 
@@ -84,6 +108,6 @@ namespace Belle2 {
     unsigned short m_current_index = 0;
 
     /** TODO: Add comment */
-    unsigned short m_XBest;
+    unsigned short m_xBest;
   };
 }

@@ -34,6 +34,7 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 #include <tracking/trackFindingVXD/algorithms/SPTCSelectorBestPerFamily.h>
+#include <tracking/trackFindingVXD/algorithms/SPTCSelectorXBestPerFamily.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
 
@@ -151,7 +152,7 @@ namespace Belle2 {
     StoreArray<Belle2::SpacePointTrackCand> m_TCs;
 
     /** TODO: Add comment */
-    std::unique_ptr<SPTCSelectorBestPerFamily> m_sptcSelector;
+    std::unique_ptr<SPTCSelectorXBestPerFamily> m_sptcSelector;
 
     /// counters and other debug stuff:
     /** counts event numbers */

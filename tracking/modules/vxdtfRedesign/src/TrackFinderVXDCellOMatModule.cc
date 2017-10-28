@@ -11,7 +11,6 @@
 #include <framework/logging/Logger.h>
 
 #include <tracking/modules/vxdtfRedesign/TrackFinderVXDCellOMatModule.h>
-#include <tracking/trackFindingVXD/algorithms/SPTCSelectorBestPerFamily.h>
 #include <tracking/trackFindingVXD/algorithms/NetworkPathConversion.h>
 #include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
 
@@ -88,7 +87,7 @@ void TrackFinderVXDCellOMatModule::initialize()
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
 
   if (m_PARAMselectBestPerFamily) {
-    m_sptcSelector = std::make_unique<SPTCSelectorBestPerFamily>();
+    m_sptcSelector = std::make_unique<SPTCSelectorXBestPerFamily>(10);
   }
 }
 
@@ -138,6 +137,7 @@ void TrackFinderVXDCellOMatModule::event()
     if (m_PARAMselectBestPerFamily) {
       m_sptcSelector->testNewSPTC(sptc);
     } else {
+      // TODO: refrain from using the conversion to the sptc in advance for this case!
       std::vector<const SpacePoint*> path = sptc.getHits();
       m_sptcCreator.createSPTC(m_TCs, path, sptc.getFamily());
     }

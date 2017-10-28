@@ -20,11 +20,11 @@ def stdPhotons(listtype='loose', path=analysis_main):
     - 'gamma:all' with no cuts
     - 'gamma:loose' (default) with some loose quality selections
     - 'gamma:tight' like loose but with higher energy cuts depending on detector regions
-    - 'gamma:pi0eff60' gamma list for 60% pi0 efficiency list (Phase 2)
-    - 'gamma:pi0eff50' gamma list for 50% pi0 efficiency list (Phase 2)
-    - 'gamma:pi0eff40' gamma list for 40% pi0 efficiency list (Phase 2)
-    - 'gamma:pi0eff30' gamma list for 30% pi0 efficiency list (Phase 2)
-    - 'gamma:pi0eff20' gamma list for 20% pi0 efficiency list (Phase 2)
+    - 'gamma:pi0eff60' gamma list for 60% pi0 efficiency list
+    - 'gamma:pi0eff50' gamma list for 50% pi0 efficiency list
+    - 'gamma:pi0eff40' gamma list for 40% pi0 efficiency list
+    - 'gamma:pi0eff30' gamma list for 30% pi0 efficiency list
+    - 'gamma:pi0eff20' gamma list for 20% pi0 efficiency list
     - 'gamma:pi0' gamma list for pi0 list
     - 'gamma:pi0highE' gamma list for pi0 list, high energy selection
 

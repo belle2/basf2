@@ -21,11 +21,11 @@ def stdPi0s(listtype='veryLoose', path=analysis_main):
     - 'pi0:all' using gamma:all
     - 'pi0:veryLoose' gamma:pi0, mass range selection
     - 'pi0:loose' gamma:pi0highE, mass range selection
-    - 'pi0:eff20' gamma:pi0eff20, mass range selection, 20% pi0 efficiency list (Phase 2)
-    - 'pi0:eff30' gamma:pi0eff30, mass range selection, 30% pi0 efficiency list (Phase 2)
-    - 'pi0:eff40' gamma:pi0eff40, mass range selection, 40% pi0 efficiency list (Phase 2)
-    - 'pi0:eff50' gamma:pi0eff50, mass range selection, 50% pi0 efficiency list (Phase 2)
-    - 'pi0:eff60' gamma:pi0eff60, mass range selection, 60% pi0 efficiency list (Phase 2)  (default)
+    - 'pi0:eff20' gamma:pi0eff20, mass range selection, 20% pi0 efficiency list
+    - 'pi0:eff30' gamma:pi0eff30, mass range selection, 30% pi0 efficiency list
+    - 'pi0:eff40' gamma:pi0eff40, mass range selection, 40% pi0 efficiency list
+    - 'pi0:eff50' gamma:pi0eff50, mass range selection, 50% pi0 efficiency list
+    - 'pi0:eff60' gamma:pi0eff60, mass range selection, 60% pi0 efficiency list (default)
 
     @param listtype name of standard list
     @param path     modules are added to this path

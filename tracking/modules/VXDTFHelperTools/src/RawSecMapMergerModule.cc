@@ -132,12 +132,6 @@ RawSecMapMergerModule::prepareNHitSpecificStuff(
     return "3Hit";
   }
 
-  if (nHits == 4) {
-    secBranchNames = { "outerSecID", "outerCenterSecID", "innerCenterSecID", "innerSecID"};
-    //    filterBranchNames = config.fourHitFilters;
-    return "4Hit";
-  }
-
   B2ERROR("prepareNHitSpecificStuff: wrong chainLength!");
   return "";
 }

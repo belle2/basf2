@@ -203,67 +203,6 @@ namespace Belle2 {
     }
 
 
-
-    /** processes all four-hit-combinations of given TC and stores their results. returns number of stored values. */
-    unsigned process4HitCombinations(const SecMapTrainerTC& aTC)
-    {
-      unsigned nValues = 0;
-      B2DEBUG(10, "SecMapTrainer::process4HitCombinations: nHits/trackID/pdg: " << aTC.size() << "/" << aTC.getTrackID() << "/" <<
-              aTC.getPDG());
-      if (aTC.size() < 4) { return nValues; }
-
-      // the iterators mark the hits to be used:
-      SecMapTrainerTC::ConstIterator outerIt = aTC.outermostHit();
-      SecMapTrainerTC::ConstIterator outerCenterIt = ++aTC.outermostHit();
-      SecMapTrainerTC::ConstIterator innerCenterIt = ++(++aTC.outermostHit());
-      SecMapTrainerTC::ConstIterator innerIt = ++(++(++aTC.outermostHit()));
-
-      // loop over all 2-hit-combis, collect data for each filterType and store it in root-tree:
-      std::vector<std::pair<std::string, double> > collectedResults;
-      for (; innerIt != aTC.innerEnd();) {
-        B2DEBUG(10, "SecMapTrainer::process4HitCombinations: outer-/oCenter-/iCenter-/innerHitSecID: " << outerIt->getSectorIDString() <<
-                "/" << outerCenterIt->getSectorIDString() <<
-                "/" << innerCenterIt->getSectorIDString() <<
-                "/" << innerIt->getSectorIDString());
-
-
-        auto& dataSet = m_rootInterface.get4HitDataSet();
-        dataSet.expNo = m_expNo;
-        dataSet.runNo = m_runNo;
-        dataSet.evtNo = m_evtNo;
-        dataSet.trackNo = aTC.getTrackID();
-        dataSet.pdg = aTC.getPDG();
-        dataSet.secIDs.outer = outerIt->getSectorID().getFullSecID();
-        dataSet.secIDs.outerCenter = outerCenterIt->getSectorID().getFullSecID();
-        dataSet.secIDs.innerCenter = innerCenterIt->getSectorID().getFullSecID();
-        dataSet.secIDs.inner = innerIt->getSectorID().getFullSecID();
-
-        // create data for each filterType:
-        FilterMill<SecMapTrainerHit>::HitQuadruplet newHitQuadruplet;
-        newHitQuadruplet.outer = &(*outerIt);
-        newHitQuadruplet.outerCenter = &(*outerCenterIt);
-        newHitQuadruplet.innerCenter = &(*innerCenterIt);
-        newHitQuadruplet.inner = &(*innerIt);
-        m_filterMill.grindData4Hit(newHitQuadruplet, collectedResults);
-
-        // fill data for each filter type:
-        for (const auto& entry : collectedResults) {
-          B2DEBUG(50, "SecMapTrainer::process4HitCombinations: filter/value: " << entry.first << "/" << entry.second);
-          dataSet.setValueOfFilter(entry.first, entry.second);
-          ++nValues;
-        }
-        m_rootInterface.fill4Hit();
-        collectedResults.clear();
-        ++outerIt;
-        ++outerCenterIt;
-        ++innerCenterIt;
-        ++innerIt;
-      }
-      return nValues;
-    }
-
-
-
     /** converts the SpacePoints into a SecMapTrainerTC */
     void convertSP2TC(
       std::vector<std::pair< FullSecID, const SpacePoint*> >& goodSPs,
@@ -481,8 +420,6 @@ namespace Belle2 {
         n2HitResults += process2HitCombinations(tc);
         // three hit:
         n3HitResults += process3HitCombinations(tc);
-        //four hit:
-        n4HitResults += process4HitCombinations(tc);
       }
 
       m_tcs.clear();

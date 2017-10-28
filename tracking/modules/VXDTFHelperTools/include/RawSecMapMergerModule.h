@@ -246,43 +246,10 @@ namespace Belle2 {
           double max = filterCutsMap.at("Distance3DSquared").getMax();
           testDistanceFilter(secIDs, "Distance3DSquared", "max", max, true, true, true);
         }
-
-        // JKL JAN 2016: commented out for minimal working example - test
-//         {
-//           // Distance2DXYSquared:
-//           double min = filterCutsMap.at("Distance2DXYSquared").getMin();
-//           testDistanceFilter(secIDs, "Distance2DXYSquared", "min", min, true, true, false);
-//           double max = filterCutsMap.at("Distance2DXYSquared").getMax();
-//           testDistanceFilter(secIDs, "Distance2DXYSquared", "max", max, true, true, false);
-//         }
-//
-//         {
-//           // Distance1DZ:
-//           double min = filterCutsMap.at("Distance3DSquared").getMin();
-//           testDistanceFilter(secIDs, "Distance3DSquared", "min", min, false, false, true);
-//           double max = filterCutsMap.at("Distance3DSquared").getMax();
-//           testDistanceFilter(secIDs, "Distance3DSquared", "max", max, false, false, true);
-//         }
-
-        {
-          // SlopeRZ: WARNING: TODO  write a functioning test for that (b4: fix test-sample to have slopeRZ stored too)
-//      double min = filterCutsMap.at("Distance3DSquared").getMin();
-//      testFilter(secIDs, "Distance3DSquared", "min", min, false, false, false);
-//      double max = filterCutsMap.at("Distance3DSquared").getMax();
-//      testFilter(secIDs, "Distance3DSquared", "max", max, false, false, false);
-        }
-
-        {
-          // Distance3DNormed: WARNING: TODO  write a functioning test for that (b4: fix test-sample to have slopeRZ stored too)
-//      double max = filterCutsMap.at("Distance3DNormed").getMax();
-//      testFilter(secIDs, "Distance3DNormed", "max", max, false, false, false);
-        }
       }
     }
 
 
-
-    /// WARNING TODO: Filter-> String to big->unsigned is better (or FilterID)
     /** does everything needed for given chainLength of sectors (e.g.: 2 -> twoHitFilters)*/
     void processSectorCombinations(const SectorMapConfig& config, VXDTFFilters<SpacePoint>* xHitFilters,
                                    unsigned secChainLength)
@@ -390,11 +357,7 @@ namespace Belle2 {
         B2INFO("\n\nRawSecMapMerger::initialize(): for mapName " << config.secMapName << ": process 3-hit-combinations:\n\n");
         processSectorCombinations(config, xHitFilters, 3);
 
-        // return; // TODO WARNING DEBUG we do not want to run more than one run yet!
-
-        B2INFO("\n\nRawSecMapMerger::initialize(): for mapName " << config.secMapName << ": process 4-hit-combinations:\n\n");
-        B2INFO(" assigning no filters to the FiltersContainer: ");
-        processSectorCombinations(config, xHitFilters, 4);
+        /* // return; // TODO WARNING DEBUG we do not want to run more than one run yet! */
 
       }
     }

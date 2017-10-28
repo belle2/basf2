@@ -18,6 +18,10 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+
+
+#include <framework/logging/Logger.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/Exception.h>
 #include <utility>
@@ -25,7 +29,43 @@
 #include <TLorentzVector.h>
 
 /** Helper functions for all klid modules to improve readability of the code */
-namespace KlIdHelpers {
+namespace KlId {
+
+  /**get Belle stle track flag */
+  int BelleTrackFlag(const Belle2::KLMCluster& cluster, const float angle = 0.26)
+  {
+    const TVector3& pos = cluster.getClusterPosition();
+
+    Belle2::StoreArray<Belle2::TrackFitResult> tracks;
+    for (const Belle2::TrackFitResult& track : tracks) {
+      const TVector3& trackPos = track.getPosition();
+
+      if (trackPos.Angle(pos) < angle) {
+        B2DEBUG(150, "BelleFlagTracklAngle::" << trackPos.Angle(pos));
+        return 1;
+      }
+    }
+    return 0;
+  }
+
+
+  /**get Belle stle ECL flag */
+  int BelleECLFlag(const Belle2::KLMCluster& cluster, const float angle = 0.26)
+  {
+    const TVector3& pos = cluster.getClusterPosition();
+    Belle2::StoreArray<Belle2::ECLCluster> clusters;
+
+    for (const Belle2::ECLCluster& cluster : clusters) {
+
+      const TVector3& clusterPos = cluster.getClusterPosition();
+
+      if (clusterPos.Angle(pos) < angle) {
+        B2DEBUG(150, "BelleFlagECLAngle::" << clusterPos.Angle(pos));
+        return 1;
+      }
+    }
+    return 0;
+  }
 
   /** return if MCparticle is beambkg */
   int mcParticleIsBeamBKG(Belle2::MCParticle* part)
@@ -44,13 +84,17 @@ namespace KlIdHelpers {
     if (mcParticleIsBeamBKG(part)) {
       return 0;
     }
-
-    while (!(part -> getMother() == nullptr)) {
+    bool stop = false;
+    while (!stop) {
       ++hirachy_counter;
       if (part -> getPDG() == 130) {
         return hirachy_counter;
       }
-      part = part -> getMother();
+      if ((part -> getMother() == nullptr)) {
+        stop = true;
+      } else {
+        part = part -> getMother();
+      }
     }
     return 0;
   }
@@ -83,15 +127,19 @@ namespace KlIdHelpers {
     }
   }
 
-
   /** return if mc particle has a certain pdg in the decay chain*/
   int isMCParticlePDG(Belle2::MCParticle* part, int pdg)
   {
-    while (!(part -> getMother() == nullptr)) {
+    bool stop = false;
+    while (!stop) {
       if (std::abs(part -> getPDG()) == pdg) {
         return true;
       }
-      part = part -> getMother();
+      if ((part -> getMother() == nullptr)) {
+        stop = true;
+      } else {
+        part = part -> getMother();
+      }
     }
     return false;
   }
@@ -109,7 +157,9 @@ namespace KlIdHelpers {
     if (mcParticleIsBeamBKG(part)) {
       return -999;
     }
-    while (!(part -> getMother() == nullptr)) {
+
+    bool stop = false;
+    while (!stop) {
       if (isMCParticlePDG(part, 130)) {
         return 130;
       }
@@ -140,9 +190,13 @@ namespace KlIdHelpers {
       if (isMCParticlePDG(part, 22)) {
         return 22;
       }
-      part = part -> getMother();
+      if ((part -> getMother() == nullptr)) {
+        stop = true;
+      } else {
+        part = part -> getMother();
+      }
     }
-    return 0;
+    return part ->getPDG();
   }
 
 
@@ -253,5 +307,4 @@ namespace KlIdHelpers {
       return std::make_tuple(closestTrack, oldDistance, std::unique_ptr<const TVector3>(new TVector3(poca)));
     }
   }
-
 }//end namespace

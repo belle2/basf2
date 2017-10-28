@@ -27,8 +27,7 @@
 
 using namespace Belle2;
 
-bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::ParticleType& defaultHypothesis,
-                                           const bool useClosestHitToIP, const bool useBFieldAtHit)
+bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const bool useClosestHitToIP, const bool useBFieldAtHit)
 {
 
   StoreArray<Track> tracks(m_trackColName);
@@ -108,14 +107,6 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::Pa
     const int newTrackFitResultArrayIndex = newTrackFitResult->getArrayIndex();
     newTrack.setTrackFitResultIndex(particleType, newTrackFitResultArrayIndex);
 
-  }
-
-  try {
-    const auto msop = recoTrack.getMeasuredStateOnPlaneFromFirstHit(TrackFitter::getTrackRepresentationForPDG(
-                        defaultHypothesis.getPDGCode(), recoTrack));
-  } catch (genfit::Exception e) {
-    B2WARNING("The default hypothesis is not available after track creation. Discarding track.");
-    return false;
   }
 
 

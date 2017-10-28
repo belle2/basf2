@@ -9,6 +9,10 @@
  **************************************************************************/
 
 #include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <framework/datastore/RelationVector.h>
+
 
 using namespace std;
 using namespace Belle2;
@@ -29,15 +33,33 @@ CDCHit::CDCHit(unsigned short tdcCount, unsigned short charge,
 DigitBase::EAppendStatus CDCHit::addBGDigit(const DigitBase* bg)
 {
   const auto* bgDigit = static_cast<const CDCHit*>(bg);
-
+  const unsigned short adc = m_adcCount;
   int diff  = static_cast<int>(m_tdcCount) - static_cast<int>(bgDigit->getTDCCount());
 
-  // If the BG hit is faster than the true hit, the TDC count is replaced.
+  // If the BG hit is faster than the true hit, the TDC count is replaced, and
+  // relation is removed.
   // ADC counts are summed up.
   if (diff < 0) {
-    m_tdcCount = bgDigit->getTDCCount();
+    *this = *bgDigit;
+    auto relSimHits = this->getRelationsFrom<CDCSimHit>();
+    if (relSimHits.size() > 1) {
+      B2WARNING("CDCHit addBGDigit : Number of relations between CDCHit and CDCSimHit = " << relSimHits.size());
+    }
+    for (size_t i = 0; i < relSimHits.size(); ++i) {
+      relSimHits.remove(i);
+    }
+    auto relMCParticles = this->getRelationsFrom<MCParticle>();
+
+    if (relMCParticles.size() > 1) {
+      B2WARNING("CDCHit addBGDigit : Number of relations between CDCHit and MCParticle = " << relMCParticles.size());
+    }
+    for (size_t i = 0; i < relMCParticles.size(); ++i) {
+      relMCParticles.remove(i);
+    }
   }
-  m_adcCount += bgDigit->getADCCount();
+  m_adcCount += adc;
+
+
   return DigitBase::c_DontAppend;
 
 }

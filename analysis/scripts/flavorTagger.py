@@ -224,6 +224,12 @@ def WhichCategories(categories=[
     for code in sorted(categoriesCombination):
         categoriesCombinationCode = categoriesCombinationCode + '%02d' % code
 
+    B2INFO("Flavor Tagger: Required Combiner for Categories:")
+    for category in categories:
+        B2INFO(category)
+
+    B2INFO("Flavor Tagger: which corresponds to a weight file with categories combination code " + categoriesCombinationCode)
+
 
 # Variables for categories on track level - are defined in variables.cc and MetaVariables.cc
 variables = dict()
@@ -797,7 +803,8 @@ def trackAndEventLevels(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_
             mvaExpertKaonPion.param('identifier', identifiersExtrainfosKaonPion[0][1])
 
             trackAndEventLevelKaonPionPath.add_module(mvaExpertKaonPion)
-            return True
+
+        return True
 
 
 def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
@@ -1002,7 +1009,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
 def flavorTagger(
     particleLists=[],
     mode='Expert',
-    weightFiles='B2JpsiKs_mu',
+    weightFiles='B2JpsiKs_muBGx0',
     workingDirectory='.',
     combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
     categories=[
@@ -1037,7 +1044,7 @@ def flavorTagger(
       @param workingDirectory                   Path to the directory containing the FlavorTagging/ folder.
       @param combinerMethods                    Multivariate method used for the combiner: 'TMVA-FBDT' or 'FANN-MLP'.
       @param categories                         Categories used for flavor tagging
-      @param belleOrBelle2                      Uses Files trained for Belle or Belle2 MC
+      @param belleOrBelle2                      Uses Files trained for "Belle" or "Belle2" MC
       @param downloadFromDatabaseIfNotfound     Looks for weight files in the Database if not found in workingDirectory.
       @param uploadToDatabaseAfterTraining      Uploads the weight files into the Database after training.
       @param samplerFileId                      Identifier to paralellize training.
@@ -1150,3 +1157,17 @@ def flavorTagger(
         if trackLevelTeacher(weightFiles):
             if eventLevelTeacher(weightFiles):
                 combinerLevelTeacher(weightFiles)
+
+
+if __name__ == '__main__':
+
+    desc_list = []
+
+    function = globals()["flavorTagger"]
+    signature = inspect.formatargspec(*inspect.getfullargspec(function))
+    signature = signature.replace(repr(analysis_main), 'analysis_main')
+    desc_list.append((function.__name__, signature + '\n' + function.__doc__))
+
+    from pager import Pager
+    with Pager('Flavor Tagger function accepts the following arguments:'):
+        pretty_print_description_list(desc_list)

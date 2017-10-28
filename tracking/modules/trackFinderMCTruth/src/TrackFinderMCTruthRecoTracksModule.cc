@@ -140,7 +140,7 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
   addParam("EnergyCut",
            m_energyCut,
            "Track candidates are only created for MCParticles with energy larger than this cut ",
-           double(0.1));
+           double(0.0));
 
   addParam("Neutrals",
            m_neutrals,

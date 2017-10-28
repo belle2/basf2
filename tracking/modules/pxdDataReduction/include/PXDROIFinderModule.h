@@ -26,25 +26,25 @@
 
 namespace Belle2 {
 
-  /** The PXD Data Reduction Module
+  /** The PXD ROI Finder Module
    *
-   * this module performs the reduction of the PXD data output. A list of tracks (reconstructed using SVD hits) is loaded from the event and then each track is extrapolated on the PXD plans; for each interception, a region around the predicted intersection is identified and the list of pixels belonging to that region is produced
+   * this module performs the ROI Finding for PXD data. A list of tracks (reconstructed using RecoTracks) is loaded from the event and then each track is extrapolated on the PXD planes; for each interception, a region around the predicted intersection is identified and the Region of Interest for pixels belonging to that region is produced
    *
    */
 
-  class PXDDataReductionModule : public Module {
+  class PXDROIFinderModule : public Module {
 
   public:
 
     /**
      * Constructor of the module.
      */
-    PXDDataReductionModule();
+    PXDROIFinderModule();
 
     /**
      * Destructor of the module.
      */
-    virtual ~PXDDataReductionModule();
+    virtual ~PXDROIFinderModule();
 
     /**
      *Initializes the Module.
@@ -89,4 +89,4 @@ namespace Belle2 {
   };
 }
 
-#endif /* PXDDataReductionModule_H_ */
+#endif /* PXDROIFinderModule_H_ */

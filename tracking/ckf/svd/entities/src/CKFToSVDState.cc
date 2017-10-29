@@ -42,10 +42,10 @@ genfit::SharedPlanePtr CKFToSVDState::getPlane(const genfit::MeasuredStateOnPlan
 const SVDRecoHit& CKFToSVDState::getRecoHit() const
 {
   B2ASSERT("You are asking for the reco hit, although no hit is present.", not m_recoHits.empty());
-  return *m_recoHits.front();
+  return m_recoHits.front();
 }
 
-const std::vector<std::unique_ptr<SVDRecoHit>>& CKFToSVDState::getRecoHits() const
+const std::vector<SVDRecoHit>& CKFToSVDState::getRecoHits() const
 {
   B2ASSERT("You are asking for the reco hit, although no hit is present.", not m_recoHits.empty());
   return m_recoHits;
@@ -54,6 +54,6 @@ const std::vector<std::unique_ptr<SVDRecoHit>>& CKFToSVDState::getRecoHits() con
 CKFToSVDState::CKFToSVDState(const SpacePoint* hit) : CKFState<RecoTrack, SpacePoint>(hit)
 {
   for (const SVDCluster& svdCluster : hit->getRelationsTo<SVDCluster>()) {
-    m_recoHits.push_back(std::make_unique<SVDRecoHit>(&svdCluster));
+    m_recoHits.emplace_back(&svdCluster);
   }
 }

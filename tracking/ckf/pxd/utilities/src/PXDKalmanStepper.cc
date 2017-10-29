@@ -20,8 +20,8 @@ using namespace Belle2;
 double PXDKalmanStepper::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const CKFToPXDState& state)
 {
   double chi2 = 0;
-  for (const std::unique_ptr<PXDRecoHit>& pxdRecoHit : state.getRecoHits()) {
-    const std::vector<genfit::MeasurementOnPlane*>& measurementsOnPlane = pxdRecoHit->constructMeasurementsOnPlane(
+  for (const PXDRecoHit& pxdRecoHit : state.getRecoHits()) {
+    const std::vector<genfit::MeasurementOnPlane*>& measurementsOnPlane = pxdRecoHit.constructMeasurementsOnPlane(
           measuredStateOnPlane);
 
     B2ASSERT("I expect exactly one measurement here", measurementsOnPlane.size() == 1);
@@ -43,8 +43,8 @@ double PXDKalmanStepper::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateO
 double PXDKalmanStepper::calculateResidual(genfit::MeasuredStateOnPlane& measuredStateOnPlane, CKFToPXDState& state)
 {
   double residual = 0;
-  for (const std::unique_ptr<PXDRecoHit>& pxdRecoHit : state.getRecoHits()) {
-    const std::vector<genfit::MeasurementOnPlane*>& measurementsOnPlane = pxdRecoHit->constructMeasurementsOnPlane(
+  for (const PXDRecoHit& pxdRecoHit : state.getRecoHits()) {
+    const std::vector<genfit::MeasurementOnPlane*>& measurementsOnPlane = pxdRecoHit.constructMeasurementsOnPlane(
           measuredStateOnPlane);
 
     B2ASSERT("I expect exactly one measurement here", measurementsOnPlane.size() == 1);

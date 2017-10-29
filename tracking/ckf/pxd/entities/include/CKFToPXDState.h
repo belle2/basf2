@@ -42,9 +42,9 @@ namespace Belle2 {
 
     const PXDRecoHit& getRecoHit() const;
 
-    const std::vector<std::unique_ptr<PXDRecoHit>>& getRecoHits() const;
+    const std::vector<PXDRecoHit>& getRecoHits() const;
 
   private:
-    std::vector<std::unique_ptr<PXDRecoHit>> m_recoHits;
+    std::vector<PXDRecoHit> m_recoHits;
   };
 }

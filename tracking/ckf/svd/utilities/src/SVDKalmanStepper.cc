@@ -20,8 +20,8 @@ using namespace Belle2;
 double SVDKalmanStepper::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const CKFToSVDState& state)
 {
   double chi2 = 0;
-  for (const std::unique_ptr<SVDRecoHit>& svdRecoHit : state.getRecoHits()) {
-    const std::vector<genfit::MeasurementOnPlane*>& measurementsOnPlane = svdRecoHit->constructMeasurementsOnPlane(
+  for (const SVDRecoHit& svdRecoHit : state.getRecoHits()) {
+    const std::vector<genfit::MeasurementOnPlane*>& measurementsOnPlane = svdRecoHit.constructMeasurementsOnPlane(
           measuredStateOnPlane);
 
     B2ASSERT("I expect exactly one measurement here", measurementsOnPlane.size() == 1);
@@ -43,8 +43,8 @@ double SVDKalmanStepper::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateO
 double SVDKalmanStepper::calculateResidual(genfit::MeasuredStateOnPlane& measuredStateOnPlane, CKFToSVDState& state)
 {
   double residual = 0;
-  for (const std::unique_ptr<SVDRecoHit>& svdRecoHit : state.getRecoHits()) {
-    const std::vector<genfit::MeasurementOnPlane*>& measurementsOnPlane = svdRecoHit->constructMeasurementsOnPlane(
+  for (const SVDRecoHit& svdRecoHit : state.getRecoHits()) {
+    const std::vector<genfit::MeasurementOnPlane*>& measurementsOnPlane = svdRecoHit.constructMeasurementsOnPlane(
           measuredStateOnPlane);
 
     B2ASSERT("I expect exactly one measurement here", measurementsOnPlane.size() == 1);

@@ -14,10 +14,6 @@
 #include <genfit/MeasuredStateOnPlane.h>
 #include <framework/logging/Logger.h>
 
-#include <TVector3.h>
-#include <TMatrixDSym.h>
-#include <TVector.h>
-
 namespace Belle2 {
   /**
    * State object to store one step in the CKF algorithm together with its parent (the state before), the hit

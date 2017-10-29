@@ -13,13 +13,8 @@ This is a set of utility functions and constant declarations for simulation of S
 to use in training timing networks or for other purposes. These include wave functions (gamma,
 cubic polynomial and beta-prime).
 
-Prerequisites:
-Required packages not included in basf2 externals:
-- scipy
-(pip3 install scipy)
-
 Usage:
-Just import the code to use it.
+Just import the module to use it.
 """
 
 import math
@@ -113,7 +108,7 @@ residual_configs = [
 ]
 
 
-def gen_signal(ampl, t0, tau, sigma=1, w=betaprime_wave):
+def gen_signal(ampl, t0, tau, sigma=1, w=betaprime_wave, tau_sigma=0.0):
     '''Generate random sample of 6 APV signals, properly censored.
     The produced data are normalized to sigma = 1 and the given amplitude.
     The procedure is:
@@ -128,12 +123,16 @@ def gen_signal(ampl, t0, tau, sigma=1, w=betaprime_wave):
     t0 - time shift
     tau - decay time or width of the waveform
     sigma - nosie (default 1: we work with S/N rather than raw signals)
+    tau_sigma - width of tau jitter
     '''
     # reconstruct amplitude
     gen_amplitude = sigma * ampl
     # threshold for data generration from cdf
     gen_thr = int(sigma * threshold_cut + 1.0 - 1.0e-9) - 0.5
-    res = np.zeros(60)
+    res = np.zeros(6)
+    # Add tau jitter, if desired.
+    if tau_sigma > 0:
+        tau += np.random.randn() * tau_sigma
     res0 = gen_amplitude * w(np.linspace(-dt - t0, 4 * dt - t0, 6, endpoint=True), tau)
     if test3(res0, threshold_cut * sigma):
         res = (res0 + sigma * np.random.randn(6) + 0.5).astype(int)
@@ -191,7 +190,7 @@ class SampleGenerator:
     2. Have to think of possible irregular grid.
     '''
 
-    def __init__(self, t0_bounds, tau_bounds, amplitude_bounds, sigma_bounds, bin_size, wf=betaprime_wave):
+    def __init__(self, t0_bounds, tau_bounds, amplitude_bounds, sigma_bounds, tau_sigma, bin_size, wf=betaprime_wave):
         '''
         The constructor takes the following parameters:
         t0_bounds is a tuple, (t0_min, t0_max)
@@ -205,6 +204,7 @@ class SampleGenerator:
         self.amp_min, self.amp_max = amplitude_bounds
         self.sigma_min, self.sigma_max = sigma_bounds
         self.tau_coder = tau_encoder(amplitude_bounds, tau_bounds)
+        self.tau_sigma = tau_sigma
         self.bin_size = bin_size
         self.wf = wf
 
@@ -232,6 +232,18 @@ class SampleGenerator:
         '''
         self.tau_min = tau_min
         self.tau_max = tau_max
+
+    def set_tau_sigma(self, tau_sigma):
+        '''
+        Set width jitter for the simulation.
+        '''
+        self.tau_sigma = tau_sigma
+
+    def get_tau_sigma(self):
+        '''
+        Get width jitter for the simulation.
+        '''
+        return self.tau_sigma
 
     def get_sigma_bounds(self):
         '''
@@ -261,8 +273,8 @@ class SampleGenerator:
         orderedcols = ['test', 'amplitude', 't0', 'tau', 'sigma', 's1', 's2', 's3', 's4', 's5', 's6', 'normed_tau']
         self.stockdata = self.stockdata[orderedcols]
         # This is where the data are generated
-        self.stockdata[['s' + str(i) for i in range(1, 7)]] = self.stockdata.apply(
-            lambda row: pd.Series(gen_signal(row.amplitude, row.t0, row.tau, row.sigma, w=self.wf)), axis=1)
+        self.stockdata[['s' + str(i) for i in range(1, 7)]] = self.stockdata.apply(lambda row: pd.Series(
+            gen_signal(row.amplitude, row.t0, row.tau, row.sigma, tau_sigma=self.tau_sigma, w=self.wf)), axis=1)
         self.t0_bins = np.percentile(self.stockdata.t0, np.arange(0, 101, 4))
         self.t0_bins[0] = self.t0_bins[0] - 0.1
         self.t0_bins[-1] = self.t0_bins[-1] + 0.1
@@ -300,7 +312,7 @@ def tau_hao2real(hao_tau):
     '''
     Convert Hao's raw tau (integral, in latency units) to correct betaprime scale. Includes scaling and fit adjustment.
     '''
-    return 3.93/0.50305 * hao_tau
+    return 3.93 / 0.50305 * hao_tau
 
 
 # ------------------------------------------------------------------------------

@@ -40,9 +40,6 @@ namespace Belle2 {
     void apply(const std::vector<const AState*>& currentPath,
                std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates) override;
 
-    /// Return the truth information requirement of the filter itself
-    virtual bool needsTruthInformation();
-
     /// Copy the filter operator to this method
     virtual TrackFindingCDC::Weight operator()(const Object& object);
   };

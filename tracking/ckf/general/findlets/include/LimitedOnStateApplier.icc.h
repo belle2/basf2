@@ -41,12 +41,6 @@ namespace Belle2 {
   };
 
   template <class AState, class AFilter>
-  bool LimitedOnStateApplier<AState, AFilter>::needsTruthInformation()
-  {
-    return m_filter.needsTruthInformation();
-  };
-
-  template <class AState, class AFilter>
   void LimitedOnStateApplier<AState, AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
     m_filter.exposeParameters(moduleParamList, prefix);

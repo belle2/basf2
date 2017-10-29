@@ -37,8 +37,6 @@ namespace Belle2 {
     /// Copy the filter operator to this method
     TrackFindingCDC::Weight operator()(const Object& object) override;
 
-    bool needsTruthInformation() override;
-
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override ;
 
   private:

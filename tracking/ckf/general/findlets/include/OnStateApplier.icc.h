@@ -41,12 +41,6 @@ namespace Belle2 {
   };
 
   template <class AState>
-  bool OnStateApplier<AState>::needsTruthInformation()
-  {
-    return false;
-  };
-
-  template <class AState>
   TrackFindingCDC::Weight OnStateApplier<AState>::operator()(const Object& object __attribute__((unused)))
   {
     return NAN;

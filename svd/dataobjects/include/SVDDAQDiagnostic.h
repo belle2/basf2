@@ -12,12 +12,13 @@
 #define SVDDAQDIAGNOSTICS_H
 
 #include <cstdint>
+#include <framework/dataobjects/DigitBase.h>
 
 namespace Belle2 {
   /**
    * Class to store SVD DAQ diagnostic information
    */
-  class SVDDAQDiagnostic {
+  class SVDDAQDiagnostic : public TObject {
   public:
     enum {
       /** Number of bits available to represent a trigger type */
@@ -33,10 +34,16 @@ namespace Belle2 {
       /** Number of bits available to represent an APV error code */
       APVErrorBits = 4,
       /** Number of bits available to represent a FTB error code */
-      FTBErrorBits = 3,
+      FTBErrorBits = 8,
+      /** Number of bits available to represent a FTB Flags Field */
+      FTBFlagsBits = 5,
+      /** Number of bits available to represent an Emulated pipeline adress */
+      EMUPipelineAddressBits = 8,
+      /** Number of bits available to represent an APV error OR code */
+      APVErrorORBits = 4,
 
       /** Total bit size of the SVDDAQDiagnostic */
-      Bits = TriggerTypeBits + TriggerNumberBits + PipelineAddressBits + CMC1Bits + CMC2Bits + APVErrorBits + FTBErrorBits,
+      Bits = TriggerTypeBits + TriggerNumberBits + PipelineAddressBits + CMC1Bits + CMC2Bits + APVErrorBits + FTBErrorBits + FTBFlagsBits + EMUPipelineAddressBits + APVErrorORBits,
     };
 
 
@@ -51,6 +58,7 @@ namespace Belle2 {
      */
     SVDDAQDiagnostic(uint8_t triggerNumber, uint8_t triggerType, uint8_t pipelineAddress, uint8_t cmc1, uint8_t cmc2, uint8_t apvError,
                      uint8_t ftbError)
+
     {
       m_info.parts.triggerNumber = triggerNumber;
       m_info.parts.triggerType = triggerType;
@@ -62,17 +70,21 @@ namespace Belle2 {
     }
 
     /** Constructor using the code value.  */
-    // cppcheck-suppress noExplicitConstructor
-    SVDDAQDiagnostic(uint64_t code)
+    SVDDAQDiagnostic(uint64_t code = 0)
     {
       m_info.code = code;
     }
 
     /** Copy constructor */
-    SVDDAQDiagnostic(const SVDDAQDiagnostic& d): m_info(d.m_info) {}
+    SVDDAQDiagnostic(const SVDDAQDiagnostic& d): TObject(), m_info(d.m_info) {}
 
     /** Assignment operator */
-    SVDDAQDiagnostic& operator=(const SVDDAQDiagnostic& d) { m_info = d.m_info; return *this; }
+    SVDDAQDiagnostic& operator=(const SVDDAQDiagnostic& d)
+    {
+      TObject::operator=(d);
+      m_info = d.m_info;
+      return *this;
+    }
     /** Convert to uint64_t */
     operator uint64_t() const { return getCode(); }
     /** Check for equality */
@@ -81,19 +93,37 @@ namespace Belle2 {
     /** Get the diagnostic code */
     uint64_t getCode() const { return m_info.code; }
     /** Get the trigger number */
-    uint8_t getTriggerNumber() const { return m_info.parts.triggerNumber; }
+    uint16_t getTriggerNumber() const { return static_cast<uint16_t>(m_info.parts.triggerNumber); }
     /** Get the trigger type */
-    uint8_t getTriggerType() const { return m_info.parts.triggerType; }
+    uint16_t getTriggerType() const { return static_cast<uint16_t>(m_info.parts.triggerType); }
     /** Get the pipeline address */
-    uint8_t getPipelineAddress() const { return m_info.parts.pipelineAddress; }
+    uint16_t getPipelineAddress() const { return static_cast<uint16_t>(m_info.parts.pipelineAddress); }
     /** Get the Common Mode Correction w/o masking out particle signals */
-    uint8_t getCMC1() const { return m_info.parts.cmc1; }
+    uint16_t getCMC1() const { return static_cast<uint16_t>(m_info.parts.cmc1); }
     /** Get the Common Mode Correction performed after masking particle signals */
-    uint8_t getCMC2() const { return m_info.parts.cmc2; }
+    uint16_t getCMC2() const { return static_cast<uint16_t>(m_info.parts.cmc2); }
     /** Get the APV error code */
-    uint8_t getAPVError() const { return m_info.parts.apvError; }
+    uint16_t getAPVError() const { return static_cast<uint16_t>(m_info.parts.apvError); }
     /** Get the FTB errors field */
-    uint8_t getFTBError() const { return m_info.parts.ftbError; }
+    uint16_t getFTBError() const { return static_cast<uint16_t>(m_info.parts.ftbError); }
+    /** Get the FTB Flags field */
+    uint16_t getFTBFlags() const { return m_info.parts.ftbFlags; }
+    /** Get the emulated pipeline address */
+    uint16_t getEmuPipelineAddress() const { return static_cast<uint16_t>(m_info.parts.emuPipelineAddress); }
+    /** Get the APV error OR code */
+    uint16_t getAPVErrorOR() const { return static_cast<uint16_t>(m_info.parts.apvErrorOR); }
+
+    /** functions for setting values unpacked from FADC trailer
+     * - FTB Flags Field
+     * - emulated pipeline Address
+     * - APV errors OR */
+    void setFTBFlags(uint16_t ftbFlags) { m_info.parts.ftbFlags = ftbFlags; }
+    void setEmuPipelineAddress(uint8_t emuPipelineAddress) { m_info.parts.emuPipelineAddress = emuPipelineAddress; }
+    void setApvErrorOR(uint8_t apvErrorOR) { m_info.parts.apvErrorOR = apvErrorOR; }
+
+    // redefinition of virtual methods
+    //unsigned int getUniqueChannelID() const {return 0;}
+    //EAppendStatus addBGDigit(const DigitBase* bg) {return DigitBase::c_DontAppend;}
 
   private:
     // NB: the awful indentation is due to fixstyle.
@@ -115,8 +145,17 @@ uint8_t cmc2 : CMC2Bits;
 uint8_t apvError : APVErrorBits;
         /** FTB error code */
 uint8_t ftbError : FTBErrorBits;
+        /** FTB Flags Field */
+uint16_t ftbFlags : FTBFlagsBits;
+        /** emulated pipeline Address */
+uint8_t emuPipelineAddress : EMUPipelineAddressBits;
+        /** APV error code in FADC trailer*/
+uint8_t apvErrorOR : APVErrorORBits;
+
       } parts; /**< Struct to contain all components */
     } m_info; /**< Union to store the diagnostic code and all the inividual components */
+
+    //ClassDef(SVDDAQDiagnostic, 5)
   }; // class SVDDAQDiagnostic
 } // namespace Belle2
 

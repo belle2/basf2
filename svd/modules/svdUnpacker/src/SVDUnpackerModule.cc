@@ -27,7 +27,9 @@
 #include <sstream>
 #include <iomanip>
 #include <cstring>
+#include <vector>
 #include <set>
+#include <map>
 
 using namespace std;
 using namespace Belle2;
@@ -60,6 +62,8 @@ SVDUnpackerModule::SVDUnpackerModule() : Module(),
            "if >0 is the number of reported FTB header ERRORs before quiet operations. If <0 full log produced.", -1);
   addParam("FADCTriggerNumberOffset", m_FADCTriggerNumberOffset,
            "number to be added to the FADC trigger number to match the main trigger number", 0);
+  addParam("svdDAQDiagnosticsListName", m_svdDAQDiagnosticsListName, "Name of the DAQDiagnostics  list", string(""));
+
 }
 
 SVDUnpackerModule::~SVDUnpackerModule()
@@ -71,10 +75,15 @@ void SVDUnpackerModule::initialize()
   m_eventMetaDataPtr.required();
   StoreArray<RawSVD>::required(m_rawSVDListName);
   StoreArray<SVDDigit>::registerPersistent(m_svdDigitListName);
+  //StoreArray<SVDDAQDiagnostic>::registerPersistent(m_svdDAQDiagnosticsListName);
+  StoreArray<SVDDAQDiagnostic> storeDAQDiagnostics(m_svdDAQDiagnosticsListName);
+  storeDAQDiagnostics.registerInDataStore();
+  m_svdDAQDiagnosticsListName = storeDAQDiagnostics.getName();
 
   if (m_generateShaperDigts) {
     StoreArray<SVDShaperDigit> storeShaperDigits(m_svdShaperDigitListName);
     storeShaperDigits.registerInDataStore();
+    storeShaperDigits.registerRelationTo(storeDAQDiagnostics);
     m_svdShaperDigitListName = storeShaperDigits.getName();
   }
 
@@ -95,8 +104,12 @@ void SVDUnpackerModule::event()
 {
   StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
   StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
-  set< SVDShaperDigit > SVDShaperDigitsSet;
   StoreArray<SVDShaperDigit> shaperDigits(m_svdShaperDigitListName);
+  StoreArray<SVDDAQDiagnostic> DAQDiagnostics(m_svdDAQDiagnosticsListName); //JW
+
+  vector<SVDDAQDiagnostic> diagnosticVector;
+  int diagnosticIndex;
+  map<int, set<SVDShaperDigit>> diagnosticMap;
 
   if (!m_eventMetaDataPtr.isValid()) {  // give up...
     B2ERROR("Missing valid EventMetaData." << std::endl <<
@@ -133,6 +146,18 @@ void SVDUnpackerModule::event()
       data32tab[2] = (uint32_t*)rawSVDList[i]->Get3rdDetectorBuffer(j);
       data32tab[3] = (uint32_t*)rawSVDList[i]->Get4thDetectorBuffer(j);
 
+
+      unsigned short ftbError = 0; // JW - gdzie to dac?
+      unsigned short trgType = 0;
+      unsigned short trgNumber = 0;
+      unsigned short cmc1;
+      unsigned short cmc2;
+      unsigned short apvErrors;
+      unsigned short pipAddr;
+      unsigned short ftbFlags;
+      unsigned short emuPipAddr;
+      unsigned short apvErrorsOR;
+
       for (unsigned int buf = 0; buf < 4; buf++) { // loop over 4 buffers
 
         //printB2Debug(data32tab[buf], data32tab[buf], &data32tab[buf][nWords[buf] - 1], nWords[buf]);
@@ -141,16 +166,23 @@ void SVDUnpackerModule::event()
         short fadc = 255, apv = 63, strip, sample[6];
         vector<uint32_t> crc16vec;
 
+
         for (; data32_it != &data32tab[buf][nWords[buf]]; data32_it++) {
           m_data32 = *data32_it; //put current 32-bit frame to union
 
           if (m_data32 == 0xffaa0000) {   // first part of FTB header
+            diagnosticMap.clear(); // new set of objects for the current FTB
+            diagnosticVector.clear();
+            diagnosticIndex = -1;
             crc16vec.clear(); // clear the input container for crc16 calculation
             crc16vec.push_back(m_data32);
             data32_it++; // go to 2nd part of FTB header
             crc16vec.push_back(*data32_it);
 
             m_data32 = *data32_it; //put the second 32-bit frame to union
+
+            ftbError = m_FTBHeader.errorsField; // JW
+
             if (m_FTBHeader.eventNumber !=
                 (m_eventMetaDataPtr->getEvent() & 0xFFFFFF)) {
               if (m_shutUpFTBError) { //
@@ -185,8 +217,8 @@ void SVDUnpackerModule::event()
 
           if (m_MainHeader.check == 6) { // FADC header
             fadc = m_MainHeader.FADCnum;
-
-
+            trgType = m_MainHeader.trgType;       //JW
+            trgNumber = m_MainHeader.trgNumber;   //JW
             if (
               m_MainHeader.trgNumber !=
               ((m_eventMetaDataPtr->getEvent() - m_FADCTriggerNumberOffset) & 0xFF)) {
@@ -212,6 +244,18 @@ void SVDUnpackerModule::event()
 
           if (m_APVHeader.check == 2) { // APV header
             apv = m_APVHeader.APVnum;
+
+            cmc1 = m_APVHeader.CMC1;  // odtad JW
+            cmc2 = m_APVHeader.CMC2;
+            apvErrors = m_APVHeader.apvErr;// temp - tylko 3 bity z 4-ech
+            pipAddr = m_APVHeader.pipelineAddr;
+
+            // JW. tutaj wstępnie wypełniam DAQDiagnostic, ale bez trailera
+            // wrzucanie do wektora map
+            diagnosticVector.push_back(
+              SVDDAQDiagnostic(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError)
+            );
+            diagnosticMap[++diagnosticIndex] = set<SVDShaperDigit>();
           }
 
           if (m_data_A.check == 0) { // data
@@ -241,13 +285,46 @@ void SVDUnpackerModule::event()
             if (m_generateShaperDigts) {
               //B2INFO("Generating SVDShaperDigit object");
               SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample, 0.0, m_SVDModeByte);
-              // shaperDigits.appendNew(*newShaperDigit);
-
-              SVDShaperDigitsSet.insert(*newShaperDigit);
+              diagnosticMap[diagnosticIndex].insert(*newShaperDigit);
               delete newShaperDigit;
             }
 
           }  //is data frame
+
+
+          // JW - nowy blok dla trailera FADC
+          if (m_FADCTrailer.check == 14)  { // FADC trailer
+
+            ftbFlags = m_FADCTrailer.FTBFlags;
+            emuPipAddr = m_FADCTrailer.emuPipeAddr;
+            apvErrorsOR = m_FADCTrailer.apvErrOR;
+
+            for (auto& pair : diagnosticMap) {
+              SVDDAQDiagnostic& finalDAQDiagnostic = diagnosticVector[pair.first];
+
+              finalDAQDiagnostic.setFTBFlags(ftbFlags);
+              finalDAQDiagnostic.setEmuPipelineAddress(emuPipAddr);
+              finalDAQDiagnostic.setApvErrorOR(apvErrorsOR);
+
+              DAQDiagnostics.appendNew(finalDAQDiagnostic); // FIXME, causes the following error:
+              /*** Error in `basf2': malloc(): memory corruption: 0x000000000eb1b960 ***
+              ======= Backtrace: =========
+              /lib/x86_64-linux-gnu/libc.so.6(+0x777e5)[0x7f6b2e7dd7e5]
+              /lib/x86_64-linux-gnu/libc.so.6(+0x8213e)[0x7f6b2e7e813e]
+              /lib/x86_64-linux-gnu/libc.so.6(__libc_malloc+0x54)[0x7f6b2e7ea184]
+              /externals/v01-05-01/Linux_x86_64/common/lib64/libstdc++.so.6(_Znwm+0x18)[0x7f6b2edd49a8]
+              /externals/v01-05-01/Linux_x86_64/opt/root/lib/libCore.so(_ZN8TStorage11ObjectAllocEm+0x9)[0x7f6b2e353809]
+              /externals/v01-05-01/Linux_x86_64/opt/root/lib/libCore.so(_ZN12TClonesArrayixEi+0xf9)[0x7f6b2e396c19]
+              /software/modules/Linux_x86_64/opt/libsvdUnpacker.so(_ZN6Belle23SVD17SVDUnpackerModule5eventEv+0x122f)[0x7f6afae0d74f]
+              ...*/
+
+              for (auto& d : pair.second) {
+                shaperDigits.appendNew(d)->addRelationTo(&finalDAQDiagnostic);
+              }
+            }
+
+
+          }// FADC trailer
 
           if (m_FTBTrailer.controlWord == 0xff55)  {// FTB trailer
 
@@ -271,6 +348,7 @@ void SVDUnpackerModule::event()
             }
 
           } // FTB trailer
+
         } // end loop over 32-bit frames in each buffer
 
       } // end iteration on 4 data buffers
@@ -280,9 +358,6 @@ void SVDUnpackerModule::event()
     } // end event loop
 
   }
-
-  for (const SVDShaperDigit& aDigit : SVDShaperDigitsSet)
-    shaperDigits.appendNew(aDigit);
 
 } //end event function
 #ifndef __clang__

@@ -36,7 +36,7 @@ matchMCTruth('B0:jpsiks')
 buildRestOfEvent('B0:jpsiks')
 
 # Get Special GT for the flavor tagger weight files
-use_central_database("GT_gen_prod_003.11_release-00-09-01-FEI-a")
+use_central_database("GT_gen_prod_003.13_Master-20171005-065700")
 
 # Flavor Tagger, Vertex of Signal Side and TagV
 flavorTagger(

@@ -44,14 +44,18 @@ namespace Belle2 {
     CKFState(const CKFState&) = delete;
     /// No copy constructor
     CKFState& operator=(const CKFState&) = delete;
+    /// Move assignment constructor
+    CKFState& operator=(CKFState&&) = default;
+    /// Destructor
+    ~CKFState() = default;
 
     /// Initialize the state as a root without a related hit (but with a seed)
-    CKFState(const Seed* seed) : m_seed(seed)
+    explicit CKFState(const Seed* seed) : m_seed(seed)
     {
     }
 
     /// Initialize the state as non-root with a related hit (and with a seed)
-    CKFState(const Hit* hit) : m_hit(hit)
+    explicit CKFState(const Hit* hit) : m_hit(hit)
     {
     }
 

@@ -14,6 +14,7 @@
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/utilities/Range.h>
 #include <tracking/trackFindingCDC/ca/CellHolder.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 namespace Belle2 {
   template <class AState, class AStateRejecter, class AResult>
@@ -30,11 +31,16 @@ namespace Belle2 {
 
   template <class AState, class AStateRejecter, class AResult>
   void TreeSearcher<AState, AStateRejecter, AResult>::apply(const std::vector<AState>& seededStates,
+                                                            std::vector<AState>& hitStates,
                                                             const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
                                                             std::vector<AResult>& results)
   {
     B2ASSERT("Expected relation to be sorted",
              std::is_sorted(relations.begin(), relations.end()));
+
+    // TODO: May be better to just do this for each seed separately
+    const std::vector<AState*>& statePointers = TrackFindingCDC::as_pointers<AState>(hitStates);
+    m_automaton.applyTo(statePointers, relations);
 
     std::vector<const AState*> path;
     for (const AState& state : seededStates) {

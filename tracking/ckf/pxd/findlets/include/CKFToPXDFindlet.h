@@ -26,8 +26,6 @@
 #include <tracking/ckf/pxd/filters/relations/ChooseablePXDRelationFilter.h>
 #include <tracking/ckf/pxd/filters/results/ChooseablePXDResultFilter.h>
 
-#include <tracking/trackFindingCDC/ca/CellularAutomaton.h>
-
 namespace Belle2 {
   class RecoTrack;
   class SpacePoint;
@@ -94,8 +92,6 @@ namespace Belle2 {
     OverlapResolver<ChooseablePXDResultFilter> m_overlapResolver;
     /// Findlet for tagging the used space points
     SpacePointTagger<CKFToPXDResult, PXDCluster> m_spacePointTagger;
-    /// Findlet for adding a recursion cell state to the states
-    TrackFindingCDC::CellularAutomaton<CKFToPXDState> m_automaton;
 
     // Object pools
     /// Pointers to the Reco tracks as a vector

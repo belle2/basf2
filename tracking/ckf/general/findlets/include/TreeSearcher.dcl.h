@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackFindingCDC/ca/CellularAutomaton.h>
 
 #include <vector>
 #include <string>
@@ -22,10 +23,11 @@ namespace Belle2 {
   /**
    */
   template <class AState, class AStateRejecter, class AResult>
-  class TreeSearcher : public TrackFindingCDC::Findlet<const AState, const TrackFindingCDC::WeightedRelation<AState>, AResult> {
+  class TreeSearcher : public
+    TrackFindingCDC::Findlet<const AState, AState, const TrackFindingCDC::WeightedRelation<AState>, AResult> {
   private:
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const AState, const TrackFindingCDC::WeightedRelation<AState>, AResult>;
+    using Super = TrackFindingCDC::Findlet<const AState, AState, const TrackFindingCDC::WeightedRelation<AState>, AResult>;
 
   public:
     /// Construct this findlet and add the subfindlet as listener
@@ -41,6 +43,7 @@ namespace Belle2 {
      * traversal.
      */
     void apply(const std::vector<AState>& seededStates,
+               std::vector<AState>& hitStates,
                const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
                std::vector<AResult>& results) final;
 
@@ -53,5 +56,8 @@ namespace Belle2 {
   private:
     /// State rejecter to decide which available continuations should be traversed next.
     AStateRejecter m_stateRejecter;
+
+    /// Findlet for adding a recursion cell state to the states
+    TrackFindingCDC::CellularAutomaton<AState> m_automaton;
   };
 }

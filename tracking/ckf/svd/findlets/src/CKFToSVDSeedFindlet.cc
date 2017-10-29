@@ -88,10 +88,7 @@ void CKFToSVDSeedFindlet::apply()
   m_relationCreator.apply(m_seedStates, m_states, m_relations);
   B2DEBUG(50, "Created " << m_relations.size() << " relations.");
 
-  // TODO: May be better to just do this for each seed separately
-  const std::vector<CKFToSVDState*>& statePointers = TrackFindingCDC::as_pointers<CKFToSVDState>(m_states);
-  m_automaton.applyTo(statePointers, m_relations);
-  m_treeSearchFindlet.apply(m_seedStates, m_relations, m_results);
+  m_treeSearchFindlet.apply(m_seedStates, m_states, m_relations, m_results);
   B2DEBUG(50, "Having found " << m_results.size() << " results before overlap check");
 
   TrackFindingCDC::erase_remove_if(m_results, [](const auto & result) {

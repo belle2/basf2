@@ -27,8 +27,6 @@
 #include <tracking/ckf/svd/filters/relations/ChooseableSVDRelationFilter.h>
 #include <tracking/ckf/svd/filters/results/SizeSVDResultFilter.h>
 
-#include <tracking/trackFindingCDC/ca/CellularAutomaton.h>
-
 namespace Belle2 {
   class RecoTrack;
   class SpacePoint;
@@ -71,8 +69,6 @@ namespace Belle2 {
     CKFRelationCreator<CKFToSVDState, ChooseableSVDRelationFilter> m_relationCreator;
     /// Findlet doing the main work: the tree finding
     TreeSearcher<CKFToSVDState, SVDStateRejecter, CKFToSVDResult> m_treeSearchFindlet;
-    /// Findlet for adding a recursion cell state to the states
-    TrackFindingCDC::CellularAutomaton<CKFToSVDState> m_automaton;
     /// Findlet for resolving overlaps
     OverlapResolver<SizeSVDResultFilter> m_overlapResolver;
     /// Findlet for adding unused VXDTF2 results

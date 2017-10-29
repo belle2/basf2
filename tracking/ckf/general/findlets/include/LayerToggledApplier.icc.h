@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/ckf/general/findlets/LayerToggledApplier.dcl.h>
+#include <tracking/ckf/general/findlets/OnStateApplier.icc.h>
 
 namespace Belle2 {
 

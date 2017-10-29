@@ -14,7 +14,6 @@
 #include <tracking/ckf/pxd/filters/states/BasePXDStateFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   /// Factory that can create appropriate cluster filters from associated names.

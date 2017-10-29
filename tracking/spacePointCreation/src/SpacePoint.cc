@@ -39,7 +39,7 @@ SpacePoint::SpacePoint(const PXDCluster* pxdCluster,
 
 //---SVD related constructor---
 SpacePoint::SpacePoint(std::vector<const SVDCluster*>& clusters,
-                       const VXD::SensorInfoBase* aSensorInfo) : m_vxdID(clusters.at(0)->getSensorID())
+                       const VXD::SensorInfoBase* aSensorInfo)
 {
   //---The following contains only sanity checks without effect, if nobody gave buggy information---
   //We have 1 or two SVD Clusters.
@@ -58,6 +58,8 @@ SpacePoint::SpacePoint(std::vector<const SVDCluster*>& clusters,
   }
   //---End sanity checks---
 
+  m_vxdID = clusters[0]->getSensorID();
+
   //We need some handle to translate IDs to local and global coordinates.
   if (aSensorInfo == NULL) {
     aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(m_vxdID);
@@ -71,22 +73,24 @@ SpacePoint::SpacePoint(std::vector<const SVDCluster*>& clusters,
   double uSigma = -1; // negative sigmas are not possible, setting to -1 for catching cases of missing Cluster
   double vSigma = -1; // negative sigmas are not possible, setting to -1 for catching cases of missing Cluster
 
+  const SVDCluster* vCluster(NULL), *uCluster(NULL);
   for (const SVDCluster* aCluster : clusters) {
     if (aCluster->isUCluster() == true) {
       m_clustersAssigned.first = true;
       uCoord = aCluster->getPosition();
       uSigma = aCluster->getPositionSigma();
-
-      if ((aSensorInfo->getBackwardWidth() > aSensorInfo->getForwardWidth()) == true) // isWedgeSensor
-        uCoord = aCluster->getPosition(vCoord);
-
+      uCluster = aCluster;
     } else {
       m_clustersAssigned.second = true;
       vCoord = aCluster->getPosition();
       vSigma = aCluster->getPositionSigma();
+      vCluster = aCluster;
     }
   }
 
+  if (aSensorInfo->getBackwardWidth() > aSensorInfo->getForwardWidth() &&
+      vCluster != NULL && uCluster != NULL) // is a WedgeSensor and we do have a vCluster
+    uCoord = uCluster->getPosition(vCoord);
 
   m_position = aSensorInfo->pointToGlobal(TVector3(uCoord, vCoord, 0));
   m_normalizedLocal = convertLocalToNormalizedCoordinates({ uCoord, vCoord } , m_vxdID, aSensorInfo);
@@ -162,10 +166,10 @@ std::pair<double, double> SpacePoint::convertLocalToNormalizedCoordinates(
 
   double normalizedUPosition = (hitLocal.first +  0.5 * sensorSizeU) /
                                sensorSizeU; // indepedent of the trapezoidal sensor-issue by definition
-  boundaryCheck(normalizedUPosition, 0, 1);
-
   double normalizedVPosition = (hitLocal.second +  0.5 * sensorSizeV) / sensorSizeV;
-  boundaryCheck(normalizedVPosition, 0, 1);
+
+  boundaryEnforce(normalizedUPosition, normalizedVPosition, 0, 1 , 0, vxdID);
+  boundaryEnforce(normalizedVPosition, normalizedUPosition, 0, 1, 1, vxdID);
 
   return { normalizedUPosition, normalizedVPosition };
 }
@@ -182,13 +186,17 @@ std::pair<double, double> SpacePoint::convertNormalizedToLocalCoordinates(
     aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID);
   }
 
-  // normalized range is 0 to 1, but final coordinates are from - halfSensorSize to + halfSensorSize
+  // normalized coordinate range is from 0 to 1
+  // local coordinate range is from - halfSensorSize to + halfSensorSize
   double localVPosition = (hitNormalized.second - 0.5) * aSensorInfo->getVSize();
-  boundaryCheck(localVPosition, -0.5 * aSensorInfo->getVSize(), 0.5 * aSensorInfo->getVSize()); // restrain hits to sensor boundaries
-
   double uSizeAtHit = aSensorInfo->getUSize(localVPosition);
   double localUPosition = (hitNormalized.first - 0.5) * uSizeAtHit;
-  boundaryCheck(localUPosition, -0.5 * uSizeAtHit, 0.5 * uSizeAtHit); // restrain hits to sensor boundaries
+
+  boundaryEnforce(localVPosition, localUPosition,
+                  -0.5 * aSensorInfo->getVSize(), 0.5 * aSensorInfo->getVSize(), 1, vxdID); // restrain hits to sensor boundaries
+
+  boundaryEnforce(localUPosition, localVPosition, -0.5 * uSizeAtHit, 0.5 * uSizeAtHit,
+                  0, vxdID); // restrain hits to sensor boundaries
 
   return { localUPosition, localVPosition };
 }

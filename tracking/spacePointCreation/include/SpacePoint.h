@@ -268,23 +268,33 @@ namespace Belle2 {
 
 
 
-    /** checks first parameter for boundaries.
-     *
-     * does take second/third argument for checking for lower/upper boundary.
-     * if boundary is crossed, value gets reset to boundary value
+    /** Enforce  @param value in the  range [ @param lower, @param higher ].
+     * param = min ( max( param,lower)  ,higher )
+     * @param value is the coordinate that must be constrained in the range
+     * @param lower is the lower limit of the prescribed range
+     * @param higher is the upper limit of the prescribed range
+     * @param otherValue is for debugging and logging purposes
+     * @param side is for debugging purposes: 0 for U side 1 for V side
+     * @paramvxdID vxdID is for debugging purposes
      * */
-    static void boundaryCheck(double& value, double lower = 0, double higher = 1)
+    static void boundaryEnforce(double& value, const double& otherValue, double lower = 0, double higher = 1, unsigned int side = 0,
+                                VxdID vxdID = VxdID())
     {
       // Times to times there are normalized coordinates that are out of the boundaries.
       // We do apply a smal sloppyness here
 
       double sloppyTerm = 1e-3;
       if (value < lower - sloppyTerm) {
-        B2WARNING("SpacePoint::boundaryCheck: value had to be moved (lowerCheck)! old: " << value << ", new: " << lower);
+        B2WARNING("SpacePoint::boundaryEnforce: value had to be moved (lowerCheck)! old: " << value << ", new: " << lower);
+        B2WARNING("On sensor: " << vxdID << " side: " << (side == 0 ? " U " : " V") <<
+                  " when the other coordinate is: " << otherValue);
+
         value = lower;
       }
       if (value > higher + sloppyTerm) {
-        B2WARNING("SpacePoint::boundaryCheck: value had to be moved (higherCheck)! old: " << value << ", new: " << higher);
+        B2WARNING("SpacePoint::boundaryEnforce: value had to be moved (higherCheck)! old: " << value << ", new: " << higher);
+        B2WARNING("On sensor: " << vxdID << " side: " << (side == 0 ? " U " : " V") <<
+                  " when the other coordinate is: " << otherValue);
         value = higher;
       }
 

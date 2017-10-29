@@ -12,7 +12,7 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <tracking/ckf/general/utilities/Advance.h>
+#include <tracking/ckf/general/utilities/Advancer.h>
 
 using namespace std;
 using namespace Belle2;

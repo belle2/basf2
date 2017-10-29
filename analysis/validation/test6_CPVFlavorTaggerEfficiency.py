@@ -627,7 +627,7 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     # histogram of input variable (only background) - not yet a probability! It's a classifier plot!
     hist_background = ROOT.TH1F('Background_' + category, 'Input Background (B0bar)' +
                                 category + ' (binning 50)', 50, -1.0, 1.0)
-    hist_both = ROOT.TH1F('qy_' + category, 'Input Background (B0bar)' +
+    hist_both = ROOT.TH1F('qp_' + category, 'Input Background (B0bar)' +
                           category + ' (binning 50)', 100, -1, 1)
 
     # per definiton that input is not comparable to the network output, this has to be transformed.
@@ -669,7 +669,7 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     tree.Draw('B0_qp' + category + '>>Background_' + category, 'B0_qrMC == -1.0'
               )
     # fill both
-    tree.Draw('B0_qp' + category + '>>qy_' + category, 'abs(B0_qrMC) == 1.0'
+    tree.Draw('B0_qp' + category + '>>qp_' + category, 'abs(B0_qrMC) == 1.0'
               )
 
     # ***** TEST OF CALIBRATION ******
@@ -819,7 +819,7 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     if category == 'MaximumPstar':
         catName = 'MaximumP*'
 
-    hist_signal.SetTitle('; (#it{qy})^{' + catName + '} ; Events')
+    hist_signal.SetTitle('; (#it{qp})^{' + catName + '} ; Events')
     # hist_signal.SetMinimum(0)
     hist_signal.SetMaximum(Ymax)
     # hist_background.SetMinimum(0)
@@ -847,7 +847,7 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
     Canvas.Update()
     with Quiet(ROOT.kError):
-        Canvas.SaveAs(workingDirectory + '/' + 'test6_CPVFTqy_' + category + '_both.pdf')
+        Canvas.SaveAs(workingDirectory + '/' + 'test6_CPVFTqp_' + category + '_both.pdf')
 
     # Validation Plot 4
     hist_both.GetXaxis().SetLabelSize(0.04)
@@ -866,7 +866,7 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     hist_both.SetTitle(
         'Flavor tagger output of the category ' +
         catName +
-        '; #it{qy}_{' +
+        '; #it{qp}_{' +
         catName +
         '} ; Events  (Total = ' +
         '{:<1}'.format(

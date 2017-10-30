@@ -21,6 +21,7 @@
 #include <geometry/dbobjects/MagneticFieldComponent3D.h>
 #include <geometry/CreatorFactory.h>
 #include <framework/database/DBImportObjPtr.h>
+#include <framework/dbobjects/MagneticFieldComponentConstant.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
@@ -73,10 +74,25 @@ MagneticField GeoMagneticField::createConfiguration(const GearDir& content)
     //Get the type of the magnetic field and call the appropriate function
     string compType = component.getString("attribute::type");
     B2DEBUG(10, "GeoMagneticField creator: Loading the parameters for the component type'" << compType << "'");
-    if (compType != "3d") continue;
-    add3dBField(component, fieldmap);
+    if (compType == "3d") add3dBField(component, fieldmap);
+    else if (compType == "Constant") addConstantBField(component, fieldmap);
+    else B2ERROR("The magnetic field type " << compType << " can not yet be stored in the database");
   }
   return fieldmap;
+}
+
+void GeoMagneticField::addConstantBField(const GearDir& component, MagneticField& fieldmap)
+{
+  double xValue = component.getWithUnit("X");
+  double yValue = component.getWithUnit("Y");
+  double zValue = component.getWithUnit("Z");
+  double RminValue = component.getLength("MinR", 0); // stored in cm
+  double RmaxValue = component.getLength("MaxR"); // stored in cm
+  double ZminValue = component.getLength("MinZ"); // stored in cm
+  double ZmaxValue = component.getLength("MaxZ"); // stored in cm
+  auto field = new MagneticFieldComponentConstant(B2Vector3D(xValue, yValue, zValue),
+                                                  RminValue, RmaxValue, ZminValue, ZmaxValue);
+  fieldmap.addComponent(field);
 }
 
 void GeoMagneticField::add3dBField(const GearDir& component, MagneticField& fieldmap)

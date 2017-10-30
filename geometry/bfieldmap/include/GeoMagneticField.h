@@ -99,6 +99,9 @@ namespace Belle2 {
      */
     void read3dBField(const GearDir& component);
 
+    /** Add a constant field component to a magnetic field configuration for the DB */
+    void addConstantBField(const GearDir& component, MagneticField& fieldmap);
+    /** Add a 3D field component to a magnetic field configuration for the DB */
     void add3dBField(const GearDir& component, MagneticField& fielmap);
   private:
 

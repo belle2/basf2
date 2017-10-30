@@ -120,6 +120,27 @@ void plot(TTree* ptree, TTree* pmctree, TFile *outputFile){
   ptree->Project("rec_helR", "B_helR", sigCut);
   rec_helR->GetXaxis()->SetTitle("cos(#theta_{#pi^+#pi^-})");
 
+  TNamed* mo_expert_nc = new TNamed("MetaOptions", "expert, nocompare");
+  TNamed* mo_nc = new TNamed("MetaOptions", "expert, nocompare");
+
+  gen_mbc->GetListOfFunctions()->Add(mo_expert_nc);
+  true_mbc->GetListOfFunctions()->Add(mo_expert_nc);
+  rec_mbc->GetListOfFunctions()->Add(mo_expert_nc);
+  gen_deltae->GetListOfFunctions()->Add(mo_expert_nc);
+  true_deltae->GetListOfFunctions()->Add(mo_expert_nc);
+  rec_deltae->GetListOfFunctions()->Add(mo_expert_nc);
+  gen_MK->GetListOfFunctions()->Add(mo_expert_nc);
+  true_MK->GetListOfFunctions()->Add(mo_expert_nc);
+  rec_MK->GetListOfFunctions()->Add(mo_expert_nc);
+  gen_MR->GetListOfFunctions()->Add(mo_expert_nc);
+  true_MR->GetListOfFunctions()->Add(mo_expert_nc);
+  rec_MR->GetListOfFunctions()->Add(mo_expert_nc);
+  gen_helK->GetListOfFunctions()->Add(mo_expert_nc);
+  true_helK->GetListOfFunctions()->Add(mo_expert_nc);
+  rec_helK->GetListOfFunctions()->Add(mo_nc);
+  gen_helR->GetListOfFunctions()->Add(mo_expert_nc);
+  true_helR->GetListOfFunctions()->Add(mo_expert_nc);
+  rec_helR->GetListOfFunctions()->Add(mo_nc);
 
   outputFile->cd();
   gen_mbc->Write();

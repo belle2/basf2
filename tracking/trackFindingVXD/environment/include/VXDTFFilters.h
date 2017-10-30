@@ -17,11 +17,14 @@
 
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZ.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DNormed.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/DistanceInTimeUside.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/DistanceInTimeVside.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/SlopeRZ.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZSquared.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance2DXYSquared.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DSquared.h>
 
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/DistanceInTime.h>
 #include <tracking/trackFindingVXD/filterMap/threeHitVariables/Angle3DSimple.h>
 #include <tracking/trackFindingVXD/filterMap/threeHitVariables/CosAngleXY.h>
 #include <tracking/trackFindingVXD/filterMap/threeHitVariables/AngleRZSimple.h>
@@ -64,11 +67,13 @@ namespace Belle2 {
     /// big working 2-hits-example used for redesign of VXDTF.
     typedef decltype(
       (
-        0. <= Distance3DSquared<Belle2::SpacePoint>() <= 0.&&
-        0. <= Distance2DXYSquared<Belle2::SpacePoint>() <= 0.&&
-        0. <= Distance1DZ<Belle2::SpacePoint>() <= 0.&&
-        0. <= SlopeRZ<Belle2::SpacePoint>() <= 0.&&
-        0. <= Distance3DNormed<Belle2::SpacePoint>() <= 0.
+        0. <= DistanceInTimeUside<point_t>() <= 0. &&
+        0. <= DistanceInTimeVside<point_t>() <= 0. &&
+        0. <= Distance3DSquared<point_t>() <= 0.&&
+        0. <= Distance2DXYSquared<point_t>() <= 0.&&
+        0. <= Distance1DZ<point_t>() <= 0.&&
+        0. <= SlopeRZ<point_t>() <= 0.&&
+        0. <= Distance3DNormed<point_t>() <= 0.
       )
     ) twoHitFilter_t;
 
@@ -88,6 +93,7 @@ namespace Belle2 {
     /// big working example for 3-hits:
     typedef decltype(
       (
+        0. <= DistanceInTime<point_t>() <= 0. &&
         0. <= Angle3DSimple<point_t>()   <= 0.&&
         0. <= CosAngleXY<point_t>()   <= 0.&&
         0. <= AngleRZSimple<point_t>()   <= 0.&&

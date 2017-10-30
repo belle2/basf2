@@ -42,7 +42,6 @@ SVDCoGTimeEstimatorModule::SVDCoGTimeEstimatorModule() : Module()
   addParam("RecoDigits", m_storeRecoDigitsName,
            "RecoDigits collection name", string(""));
   addParam("FinalShiftWidth", m_FinalShiftWidth, "Width of the 3rd (final) time shift", float(6.0));
-  addParam("AmplitudeArbitraryError", m_AmplitudeArbitraryError, "Approximate error of ADC", float(3.0));
 
 }
 
@@ -195,9 +194,6 @@ float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTimeError()
 
 float SVDCoGTimeEstimatorModule::CalculateAmplitudeError(VxdID ThisSensorID, bool ThisSide, int ThisCellID)
 {
-  //Ultra-simplified error
-  //stripnoise = m_AmplitudeArbitraryError;
-
   float stripnoise;
   stripnoise = m_NoiseCal.getNoise(ThisSensorID, ThisSide, ThisCellID);
 

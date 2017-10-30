@@ -48,75 +48,111 @@ void plot(TTree* ptree, TTree* pmctree, TFile *outputFile){
 
   TString sigCut("(B_isSignal == 1)");
 
-  TH1F* gen_mbc = new TH1F("gen_mbc","M_{bc} (gen-level)",100,5.25,5.29);
+  TH1F* gen_mbc = new TH1F("gen_mbc","M_{bc} (gen-level) \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,5.25,5.29);
   pmctree->Project("gen_mbc", "B_Mbc");
   gen_mbc->GetXaxis()->SetTitle("M_{bc} (GeV/c^{2})");
 
-  TH1F* true_mbc = new TH1F("true_mbc","True M_{bc} of reconstructed signals",100,5.25,5.29);
+  TH1F* true_mbc = new TH1F("true_mbc","True M_{bc} of reconstructed signals \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,5.25,5.29);
   ptree->Project("true_mbc", "B_MCT_Mbc", sigCut);
   true_mbc->GetXaxis()->SetTitle("M_{bc} (GeV/c^{2})");
 
-  TH1F* rec_mbc = new TH1F("rec_mbc","M_{bc} of reconstructed signals",100,5.25,5.29);
+  TH1F* rec_mbc = new TH1F("rec_mbc","M_{bc} of reconstructed signals \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,5.25,5.29);
   ptree->Project("rec_mbc", "B_MCT_Mbc", sigCut);
   rec_mbc->GetXaxis()->SetTitle("M_{bc} (GeV/c^{2})");
 
-  TH1F* gen_deltae = new TH1F("gen_deltae","Generated value of #DeltaE",100,-0.2,0.15);
+  TH1F* gen_deltae = new TH1F("gen_deltae","Generated value of #DeltaE \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,-0.2,0.15);
   pmctree->Project("gen_deltae", "B_deltaE");
   gen_deltae->GetXaxis()->SetTitle("#DeltaE (GeV)");
 
-  TH1F* true_deltae = new TH1F("true_deltae","Generated value for reconstructed candidates: #DeltaE",100,-0.2,0.15);
+  TH1F* true_deltae = new TH1F("true_deltae","Generated value for reconstructed candidates: #DeltaE \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,-0.2,0.15);
   ptree->Project("true_deltae", "B_MCT_deltaE", sigCut);
   true_deltae->GetXaxis()->SetTitle("#DeltaE (GeV)");
 
-  TH1F* rec_deltae = new TH1F("rec_deltae","#Reconstructed value of DeltaE",100,-0.2,0.15);
+  TH1F* rec_deltae = new TH1F("rec_deltae","#Reconstructed value of DeltaE \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,-0.2,0.15);
   ptree->Project("rec_deltae", "B_deltaE", sigCut);
   rec_deltae->GetXaxis()->SetTitle("#DeltaE (GeV)");
 
-  TH1F* gen_MK = new TH1F("gen_MK","Generated value of M_{K*(892)^{+}}",100,0.792,0.992);
+  TH1F* gen_MK = new TH1F("gen_MK","Generated value of M_{K*(892)^{+}} \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,0.792,0.992);
   pmctree->Project("gen_MK", "B_MK");
   gen_MK->GetXaxis()->SetTitle("M_{K*(892)^{+}} (GeV/c^{2})");
 
-  TH1F* true_MK = new TH1F("true_MK","Generated value for reconstructed candidates: M_{K*(892)^{+}}",100,0.792,0.992);
+  TH1F* true_MK = new TH1F("true_MK","Generated value for reconstructed candidates: M_{K*(892)^{+}} \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,0.792,0.992);
   ptree->Project("true_MK", "B_MCT_MK", sigCut);
   true_MK->GetXaxis()->SetTitle("M_{K*(892)^{+}} (GeV/c^{2})");
 
-  TH1F* rec_MK = new TH1F("rec_MK","Reconstructed value of M_{K*(892)^{+}}",100,0.792,0.992);
+  TH1F* rec_MK = new TH1F("rec_MK","Reconstructed value of M_{K*(892)^{+}} \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,0.792,0.992);
   ptree->Project("rec_MK", "B_MK", sigCut);
   rec_MK->GetXaxis()->SetTitle("M_{K*(892)^{+}} (GeV/c^{2})");
 
-  TH1F* gen_MR = new TH1F("gen_MR","Generated value of M_{#rho(770)^{0}}",100,0.5,1.05);
+  TH1F* gen_MR = new TH1F("gen_MR","Generated value of M_{#rho(770)^{0}} \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,0.5,1.05);
   pmctree->Project("gen_MR", "B_MR");
   gen_MR->GetXaxis()->SetTitle("M_{#rho(770)^{0}} (GeV/c^{2})");
 
-  TH1F* true_MR = new TH1F("true_MR","Generated value for reconstructed candidates: M_{#rho(770)^{0}}",100,0.5,1.05);
+  TH1F* true_MR = new TH1F("true_MR","Generated value for reconstructed candidates: M_{#rho(770)^{0}} \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,0.5,1.05);
   ptree->Project("true_MR", "B_MCT_MR", sigCut);
   true_MR->GetXaxis()->SetTitle("M_{#rho(770)^{0}} (GeV/c^{2})");
 
-  TH1F* rec_MR = new TH1F("rec_MR","Reconstructed value of M_{#rho(770)^{0}}",100,0.5,1.05);
+  TH1F* rec_MR = new TH1F("rec_MR","Reconstructed value of M_{#rho(770)^{0}} \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,0.5,1.05);
   ptree->Project("rec_MR", "B_MR", sigCut);
   rec_MR->GetXaxis()->SetTitle("M_{#rho(770)^{0}} (GeV/c^{2})");
 
-  TH1F* gen_helK = new TH1F("gen_helK","Generated value of cos(#theta_{K^+#pi^0})",100,-1.,1.);
+  TH1F* gen_helK = new TH1F("gen_helK","Generated value of cos(#theta_{K^+#pi^0}) \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,-1.,1.);
   pmctree->Project("gen_helK", "B_helK");
   gen_helK->GetXaxis()->SetTitle("cos(#theta_{K^+#pi^0})");
 
-  TH1F* true_helK = new TH1F("true_helK","Generated value for reconstructed candidates: cos(#theta_{K^+#pi^0})",100,-1.,1.);
+  TH1F* true_helK = new TH1F("true_helK","Generated value for reconstructed candidates: cos(#theta_{K^+#pi^0}) \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,-1.,1.);
   ptree->Project("true_helK", "B_MCT_helK", sigCut);
   true_helK->GetXaxis()->SetTitle("cos(#theta_{K^+#pi^0})");
 
-  TH1F* rec_helK = new TH1F("rec_helK","Reconstructed value of cos(#theta_{K^+#pi^0})",100,-1.,1.);
+  TH1F* rec_helK = new TH1F("rec_helK","Reconstructed value of cos(#theta_{K^+#pi^0}) \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,-1.,1.);
   ptree->Project("rec_helK", "B_helK", sigCut);
   rec_helK->GetXaxis()->SetTitle("cos(#theta_{K^+#pi^0})");
 
-  TH1F* gen_helR = new TH1F("gen_helR","Generated value of cos(#theta_{#pi^+#pi^-})",100,-1.,1.);
+  TH1F* gen_helR = new TH1F("gen_helR","Generated value of cos(#theta_{#pi^+#pi^-}) \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,-1.,1.);
   pmctree->Project("gen_helR", "B_helR");
   gen_helR->GetXaxis()->SetTitle("cos(#theta_{#pi^+#pi^-})");
 
-  TH1F* true_helR = new TH1F("true_helR","Generated value for reconstructed candidates: cos(#theta_{#pi^+#pi^-})",100,-1.,1.);
+  TH1F* true_helR = new TH1F("true_helR","Generated value for reconstructed candidates: cos(#theta_{#pi^+#pi^-}) \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,-1.,1.);
   ptree->Project("true_helR", "B_MCT_helR", sigCut);
   true_helR->GetXaxis()->SetTitle("cos(#theta_{#pi^+#pi^-})");
 
-  TH1F* rec_helR = new TH1F("rec_helR","Reconstructed value of cos(#theta_{#pi^+#pi^-})",100,-1.,1.);
+  TH1F* rec_helR = new TH1F("rec_helR","Reconstructed value of cos(#theta_{#pi^+#pi^-}) \
+    (for B #rightarrow K*(892)^{+}(#rightarrow K^{+} #pi^{0})\
+     #rho(770)(#rightarrow #pi #pi), fL=1)",100,-1.,1.);
   ptree->Project("rec_helR", "B_helR", sigCut);
   rec_helR->GetXaxis()->SetTitle("cos(#theta_{#pi^+#pi^-})");
 

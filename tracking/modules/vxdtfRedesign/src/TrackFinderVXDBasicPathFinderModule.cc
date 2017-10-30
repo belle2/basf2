@@ -3,18 +3,17 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jakob Lettenbichler                                      *
+ * Contributors: Jakob Lettenbichler, Jonas Wagner, Felix Metzner         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/vxdtfRedesign/TrackFinderVXDBasicPathFinderModule.h>
-
-#include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
-
 // fw:
 #include <framework/logging/Logger.h>
 
+#include <tracking/modules/vxdtfRedesign/TrackFinderVXDBasicPathFinderModule.h>
+
+#include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
 
 
 using namespace std;
@@ -63,6 +62,16 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
            "Regulates if every subset of sufficient length of a path shall be collected as separate path or not.",
            bool(false));
 
+  addParam("setFamilies",
+           m_PARAMsetFamilies,
+           "Additionally assign a common family identifier to all Tracks that are share a node.",
+           bool(false));
+
+  addParam("selectBestPerFamily",
+           m_PARAMselectBestPerFamily,
+           "Select only the best track candidate for each family.",
+           bool(false));
+
 }
 
 /** *************************************+************************************* **/
@@ -79,6 +88,10 @@ void TrackFinderVXDBasicPathFinderModule::initialize()
 
   m_network.isRequired(m_PARAMNetworkName);
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
+
+  if (m_PARAMselectBestPerFamily) {
+    m_estimator = std::make_unique<QualityEstimatorTripletFit>();
+  }
 }
 
 
@@ -123,6 +136,17 @@ void TrackFinderVXDBasicPathFinderModule::event()
           " cells total -> found " << nSeeds << " seeds");
   if (nSeeds == 0) { B2WARNING("TrackFinderVXDBasicPathFinderModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!"); return; }
 
+  // mark families
+  if (m_PARAMsetFamilies) {
+    unsigned short nFamilies = m_familyDefiner.defineFamilies(segmentNetwork);
+    B2DEBUG(10, "Number of families in the network: " << nFamilies);
+    if (m_PARAMselectBestPerFamily) {
+      m_bestPaths.clear();
+      m_familyIndex.clear();
+      m_bestPaths.reserve(nFamilies);
+      m_familyIndex.resize(nFamilies, -1);
+    }
+  }
 
   /// collect all Paths starting from a Seed:
   auto collectedPaths = m_pathCollector.findPaths(segmentNetwork, m_PARAMstoreSubsets);
@@ -130,15 +154,40 @@ void TrackFinderVXDBasicPathFinderModule::event()
 
   /// convert paths of directedNodeNetwork-nodes to paths of const SpacePoint*:
   //  Resulting SpacePointPath contains SpacePoints sorted from the innermost to the outermost.
-  vector< vector <const SpacePoint*> > collectedSpacePointPaths;
-  collectedSpacePointPaths.reserve(collectedPaths.size());
+  short family = -1;
+  unsigned short current_index = 0;
+  double qi = 0.;
+
   for (auto& aPath : collectedPaths) {
     vector <const SpacePoint*> spPath;
+    spPath.reserve(aPath->size());
     spPath.push_back(aPath->back()->getEntry().getInnerHit()->m_spacePoint);
     for (auto aNodeIt = (*aPath).rbegin(); aNodeIt != (*aPath).rend();  ++aNodeIt) {
       spPath.push_back((*aNodeIt)->getEntry().getOuterHit()->m_spacePoint);
     }
-    collectedSpacePointPaths.push_back(spPath);
+    family = aPath->back()->getFamily();
+    if (m_PARAMselectBestPerFamily) {
+      SpacePointTrackCand tempSPTC = SpacePointTrackCand(spPath);
+      qi = m_estimator->estimateQuality(tempSPTC.getSortedHits());
+      if (m_familyIndex.at(family) == -1) {
+        m_familyIndex[family] = current_index;
+        current_index ++;
+        tempSPTC.setQualityIndex(qi);
+        m_bestPaths.push_back(tempSPTC);
+      } else if (qi > m_bestPaths.at(m_familyIndex[family]).getQualityIndex()) {
+        tempSPTC.setQualityIndex(qi);
+        m_bestPaths.at(m_familyIndex[family]) = tempSPTC;
+      }
+    } else {
+      m_sptcCreator.createSPTC(m_TCs, spPath, family);
+    }
+  }
+
+  if (m_PARAMselectBestPerFamily) {
+    for (unsigned short fam = 0; fam < m_familyIndex.size(); fam++) {
+      std::vector<const SpacePoint*> path = m_bestPaths.at(m_familyIndex[fam]).getHits();
+      m_sptcCreator.createSPTC(m_TCs, path, fam);
+    }
   }
 
 
@@ -150,12 +199,4 @@ void TrackFinderVXDBasicPathFinderModule::event()
           " and " << collectedPaths.size() <<
           " paths while calling its collecting function " << m_pathCollector.nRecursiveCalls <<
           " times.");
-
-
-  /// convert the raw paths to fullgrown SpacePoinTrackCands
-  unsigned int nCreated = m_sptcCreator.createSPTCs(m_TCs, collectedSpacePointPaths);
-  B2DEBUG(10, " TrackFinderVXDCellOMat-event" << m_eventCounter <<
-          ": " << nCreated <<
-          " TCs created and stored into StoreArray!");
-
 }

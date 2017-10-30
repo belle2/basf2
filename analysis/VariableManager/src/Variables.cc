@@ -2043,7 +2043,7 @@ namespace Belle2 {
 
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion,
-                      "detection region in the ECL [1 - forward, 2 - barrel, 3 - backward]");
+                      "Returns reconstructed polar angle  region in the ECL (1 - forward, 2 - barrel, 3 - backward).");
     REGISTER_VARIABLE("clusterDeltaLTemp", eclClusterDeltaL,
                       "Returns DeltaL for the shower shape.\n"
                       "NOTE : this distance is calculated on the reconstructed level and is temporarily\n"
@@ -2058,67 +2058,68 @@ namespace Belle2 {
                       "on the analysis level then this variable will be removed in future releases.\n"
                       "Therefore, keep in mind that this variable might be removed in the future!");
     REGISTER_VARIABLE("minC2HDist", minCluster2HelixDistance,
-                      "Return distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius.");
+                      "Returns distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius.");
     REGISTER_VARIABLE("goodGamma", goodGamma,
-                      "1.0 if photon candidate passes good photon selection criteria");
+                      "Returns 1.0 if photon candidate passes simple region dependent energy selection (100/90/160 MeV).");
     REGISTER_VARIABLE("goodGammaUnCal", goodGammaUncalibrated,
-                      "1.0 if photon candidate passes good photon selection criteria (to be used if photon's energy is not calibrated)");
+                      "Returns 1.0 if photon candidate passes simple region dependent raw energy selection (140/130/200 MeV).");
     REGISTER_VARIABLE("goodBelleGamma", goodBelleGamma,
-                      "1.0 if photon candidate passes good photon selection criteria (For Belle data and MC, hence 50, 100, 150 MeV cuts)");
+                      "Returns 1.0 if photon candidate passes simple region dependent energy selection for Belle data and MC (50/100/150 MeV).");
     REGISTER_VARIABLE("goodSkimGamma", goodSkimGamma,
-                      "1.0 if photon candidate passes good photon skim selection criteria (20, 30, 40 MeV cuts)");
+                      "Returns 1.0 if photon candidate passes simple region dependent energy selection (30/20/40 MeV).");
     REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE,
-                      "ECL cluster's Error on Energy");
+                      "Returns ECL cluster's uncertainty on energy (from background level and energy dependent tabulation).");
     REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE,
-                      "ECL cluster's uncorrected energy");
+                      "Returns ECL cluster's uncorrected energy.");
     REGISTER_VARIABLE("clusterR", eclClusterR,
-                      "ECL cluster's distance");
+                      "Returns ECL cluster's centroid distance from (0,0,0).");
     REGISTER_VARIABLE("clusterPhi", eclClusterPhi,
-                      "ECL cluster's azimuthal angle");
+                      "Returns ECL cluster's azimuthal angle (this is not generally equal to a photon azimuthal angle).");
     REGISTER_VARIABLE("clusterConnectedRegionID", eclClusterConnectedRegionID,
-                      "ECL cluster's connected region ID"
-                      "0 if the cluster is not connected to a nearby track or if the cluster is directly matched to a track.");
+                      "Returns ECL cluster's connected region ID.");
     REGISTER_VARIABLE("clusterBelleQuality", eclClusterDeltaL,
-                      "ECL cluster's quality indicating a good cluster in GSIM(stored in deltaL of ECL cluster object)."
-                      "The Belle people used only clusters with quality == 0 in their E_{extra_ecl}");
+                      "Returns ECL cluster's quality indicating a good cluster in GSIM (stored in deltaL of ECL cluster object)."
+                      "The Belle people used only clusters with quality == 0 in their E_{extra_ecl} (Belle only).");
     REGISTER_VARIABLE("clusterTheta", eclClusterTheta,
-                      "ECL cluster's polar angle");
+                      "Returns ECL cluster's polar angle (this is not generally equal to a photon polar angle).");
     REGISTER_VARIABLE("clusterTiming", eclClusterTiming,
-                      "ECL cluster's timing");
+                      "Returns ECL cluster's timing.");
     REGISTER_VARIABLE("clusterErrorTiming", eclClusterErrorTiming,
-                      "ECL cluster's timing");
+                      "Returns ECL cluster's timing uncertainty that contains 99% of true photons.");
     REGISTER_VARIABLE("clusterHighestE", eclClusterHighestE,
-                      "energy of the crystall with highest  energy");
+                      "Returns energy of the crystal with highest energy in the ECLCluster.");
     REGISTER_VARIABLE("clusterE1E9", eclClusterE1E9,
-                      "ratio of energies of the central crystal and 3x3 crystals around the central crystal");
+                      "Returns ratio of energies of the central crystal and 3x3 crystals around the central crystal.");
     REGISTER_VARIABLE("clusterE9E25", eclClusterE9E25,
-                      "Deprecated - kept for backwards compatibility - returns clusterE9E21");
+                      "Deprecated - kept for backwards compatibility - returns clusterE9E21.");
     REGISTER_VARIABLE("clusterE9E21", eclClusterE9E21,
-                      "ratio of energies in inner 3x3 and (5x5 cells without corners)");
+                      "Returns ratio of energies in inner 3x3 and (5x5 cells without corners).");
     REGISTER_VARIABLE("clusterAbsZernikeMoment40", eclClusterAbsZernikeMoment40,
-                      "absolute value of Zernike moment 40 (shower shape variable)");
+                      "Returns absolute value of Zernike moment 40 (shower shape variable).");
     REGISTER_VARIABLE("clusterAbsZernikeMoment51", eclClusterAbsZernikeMoment51,
-                      "absolute value of Zernike moment 51 (shower shape variable)");
-    REGISTER_VARIABLE("clusterZernikeMVA", eclClusterZernikeMVA, "output of MVA using Zernike moments of the cluster.\n"
+                      "Returns absolute value of Zernike moment 51 (shower shape variable).");
+    REGISTER_VARIABLE("clusterZernikeMVA", eclClusterZernikeMVA,
+                      "Returns output of a MVA using eleven Zernike moments of the cluster.\n"
                       "For cluster with hypothesisId==N1: raw MVA output.\n"
                       "For cluster with hypothesisId==N2: 1 - prod{clusterZernikeMVA}, where the product is on all N1 showers belonging to the same connected region (shower shape variable)");
     REGISTER_VARIABLE("clusterSecondMoment", eclClusterSecondMoment,
-                      "Second moment. Used for merged pi0 identification. (shower shape variable)");
+                      "Returns second moment.");
     REGISTER_VARIABLE("clusterLAT", eclClusterLAT,
-                      "LAT (shower variable)");
+                      "Returns lateral energy distribution (shower variable).");
     REGISTER_VARIABLE("clusterMergedPi0", eclClusterMergedPi0,
-                      "High momentum pi0 likelihood. ");
+                      "Returns high momentum pi0 likelihood (not available yet).");
     REGISTER_VARIABLE("clusterNHits", eclClusterNHits,
-                      "number of hits associated to this cluster");
+                      "Returns sum of crystal weights sum(w_i) with w_i<=1  associated to this cluster. for non-overlapping clusters this is equal to the number of crystals in the cluster.");
     REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched,
-                      "number of charged track matched to this cluster");
+                      "Returns 1.0 if at least one charged track is matched to this cluster.");
     REGISTER_VARIABLE("clusterCRID", eclClusterConnectedRegionId,
-                      "Returns the connected region ID this cluster belongs to.");
+                      "Returns ECL cluster's connected region ID.");
     REGISTER_VARIABLE("clusterClusterID", eclClusterId,
                       "Returns the cluster id of this cluster within the connected region to which it belongs to.");
     REGISTER_VARIABLE("clusterHypothesis", eclClusterHypothesisId,
-                      "Returns the hypothesis ID of this cluster belongs.");
+                      "Returns the hypothesis ID of this cluster.");
 
+    VARIABLE_GROUP("Other");
     REGISTER_VARIABLE("infinity", infinity,
                       "returns std::numeric_limits<double>::infinity()");
     REGISTER_VARIABLE("random", random, "return a random number between 0 and 1. Can be used, e.g. for picking a random"

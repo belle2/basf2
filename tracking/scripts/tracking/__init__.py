@@ -838,7 +838,7 @@ def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", compo
 
 
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
-                                 sectormap_file=None, PXDminSVDSPs=3):
+                                 useTwoStepSelection=False, sectormap_file=None, PXDminSVDSPs=3):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -849,16 +849,19 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     :param path: basf2 path
     :param svd_clusters: SVDCluster collection name
     :param reco_tracks: Name of the output RecoTracks, Defaults to RecoTracks.
-    :param components: List of the detector components to be used in the reconstruction. Defaults to None which means all
-                       components.
+    :param components: List of the detector components to be used in the reconstruction. Defaults to None which means
+                       all components.
     :param suffix: all names of intermediate Storearrays will have the suffix appended. Useful in cases someone needs to
                    put several instances of track finding in one path.
+    :param useTwoStepSelection: if True Families will be defined during path creation and will be used to create only
+                                the best candidate per family.
     :param sectormap_file: if set to a finite value, a file will be used instead of the sectormap in the database.
     :param PXDminSVDSPs: When using PXD require at least this number of SVD SPs for the SPTCs
     """
     ##########################
     # some setting for VXDTF2
     ##########################
+
     use_segment_network_filters = True
     filter_overlapping = True
     # the 'tripletFit' currently does not work with PXD
@@ -878,6 +881,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     # VXDTF2 Step 0
     # Preparation
     #################
+
     nameSPs = 'SpacePoints' + suffix
 
     if 'PXDClusterizer' not in path:
@@ -926,6 +930,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     # VXDTF2 Step 1
     # SegmentNet
     ##################
+
     nameSegNet = 'SegmentNetwork' + suffix
     segNetProducer = register_module('SegmentNetworkProducer')
     segNetProducer.param('CreateNeworks', 3)
@@ -952,7 +957,14 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     cellOmat.param('SpacePoints', nameSPs)
     cellOmat.param('printNetworks', False)
     cellOmat.param('strictSeeding', True)
+    cellOmat.param('setFamilies', useTwoStepSelection)
+    cellOmat.param('selectBestPerFamily', useTwoStepSelection)
     path.add_module(cellOmat)
+
+    if(useTwoStepSelection):
+        subSetModule = register_module('AddVXDTrackCandidateSubSets')
+        subSetModule.param('NameSpacePointTrackCands', nameSPTCs)
+        path.add_module(subSetModule)
 
     #################
     # VXDTF2 Step 3
@@ -997,10 +1009,12 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
         overlapResolver.param('ResolveMethod', overlap_filter.lower())
         overlapResolver.param('NameSVDClusters', svd_clusters)
         path.add_module(overlapResolver)
+
     #################
     # VXDTF2 Step 5
     # Converter
     #################
+
     momSeedRetriever = register_module('SPTCmomentumSeedRetriever')
     momSeedRetriever.param('tcArrayName', nameSPTCs)
     path.add_module(momSeedRetriever)

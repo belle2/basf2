@@ -18,6 +18,10 @@
 #include <geometry/CreatorBase.h>
 #include <geometry/utilities.h>
 #include <geometry/dbobjects/GeoConfiguration.h>
+#include <geometry/bfieldmap/BFieldMap.h>
+#include <geometry/bfieldmap/BFieldFrameworkInterface.h>
+#include <framework/dbobjects/MagneticField.h>
+#include <framework/database/DBStore.h>
 
 #include "G4Box.hh"
 #include "G4ThreeVector.hh"
@@ -221,6 +225,14 @@ namespace Belle2 {
     {
       // remove the old geometry
       clear();
+
+      // if we don't use the DB make sure the magnetic field is properly set
+      // by adding it as a fake database payload
+      BFieldMap::Instance().clear();
+      MagneticField* fieldmap = new MagneticField();
+      fieldmap->addComponent(new BFieldFrameworkInterface());
+      BFieldMap::Instance().initialize();
+      DBStore::Instance().addConstantOverride("MagneticField", fieldmap, false);
 
       //Let Geant4 know that we "modified" the geometry
       G4RunManager* runManager = G4RunManager::GetRunManager();

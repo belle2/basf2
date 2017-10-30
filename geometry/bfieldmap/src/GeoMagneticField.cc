@@ -171,11 +171,7 @@ void GeoMagneticField::create(const GearDir& content, G4LogicalVolume& /*topVolu
     }
   }
 
-  // make it found by the framework fieldmap by adding it as a fake database payload
-  MagneticField* fieldmap = new MagneticField();
-  fieldmap->addComponent(new BFieldFrameworkInterface());
   BFieldMap::Instance().initialize();
-  DBStore::Instance().addConstantOverride("MagneticField", fieldmap, false);
 }
 
 

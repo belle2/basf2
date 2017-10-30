@@ -87,7 +87,7 @@ namespace Belle2 {
      * @returns magnetic field value at position pos
      */
     B2Vector3D calculate(const B2Vector3D& pos) const;
-
+    /** Pointer to the actual magnetic field in the database */
     DBObjPtr<MagneticField> m_magfield;
   };
 

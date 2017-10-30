@@ -422,7 +422,6 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
            string("eclDataAnalysis"));
   addParam("doTracking", m_doTracking, "set true if you want to save the informations from TrackFitResults'rootFileName'",
            bool(false));
-  //  addParam("doMC", m_doMC, "set true if you want to save MC information", bool(false));
   addParam("doSimulation", m_doSimulation, "set true if you want to save the Hit and SimHit informations'", bool(false));
   addParam("doPureCsIStudy", m_doPureCsIStudy, "set true if you want to save the informations for upgrade option'", bool(false));
 
@@ -438,30 +437,6 @@ void ECLDataAnalysisModule::initialize()
 
   B2INFO("[ECLDataAnalysis Module]: Starting initialization of ECLDataAnalysis Module.");
 
-  /*
-  if (m_doSimulation == 1) {
-    m_eclSimHits(eclSimHitArrayName());
-    m_eclHits(eclHitArrayName());
-  }
-
-  m_eclDigits(eclDigitArrayName());
-  m_eclCalDigits(eclCalDigitArrayName());
-  m_eclConnectedRegions(eclConnectedRegionArrayName());
-  m_eclShowers(eclShowerArrayName());
-  m_eclClusters(eclClusterArrayName());
-  m_eclLocalMaximum(eclLocalMaximumArrayName());
-  */
-  //StoreObjPtr<ECLEventInformation> m_eclEventInformation;
-
-  //StoreArray<ECLTrig>::required();
-  //StoreArray<ECLDigit>::required(m_digits);
-  //StoreArray<ECLCalDigit>::required(m_cal_digits);
-  //StoreArray<ECLCluster>::required(m_clusters);
-  //StoreArray<ECLShower>::required(m_showers);
-  //StoreArray<ECLConnectedRegion>::required(m_cr);
-  //StoreArray<ECLLocalMaximum>::required(m_lm);
-  //StoreArray<MCParticle>::required();
-
   m_eclSimHits.registerInDataStore(eclSimHitArrayName());
   m_eclHits.registerInDataStore(eclHitArrayName());
 
@@ -471,7 +446,6 @@ void ECLDataAnalysisModule::initialize()
   m_eclShowers.registerInDataStore(eclShowerArrayName());
   m_eclClusters.registerInDataStore(eclClusterArrayName());
   m_eclLocalMaximums.registerInDataStore(eclLocalMaximumArrayName());
-  //m_eclEventInformation.registerInDataStore(eclEventInformationName());
 
   m_eclCalDigits.registerRelationTo(m_mcParticles);
   m_eclDigits.registerRelationTo(m_mcParticles);
@@ -518,9 +492,7 @@ void ECLDataAnalysisModule::initialize()
 
   m_tree->Branch("eclDigitMultip",     &m_eclDigitMultip,         "ecldigit_Multip/I");
   m_tree->Branch("eclDigitIdx",        "std::vector<int>",         &m_eclDigitIdx);
-  //if (m_doMC == 1) {
   m_tree->Branch("eclDigitToMC",      "std::vector<int>",          &m_eclDigitToMC);
-  //}
   m_tree->Branch("eclDigitCellId",     "std::vector<int>",         &m_eclDigitCellId);
   m_tree->Branch("eclDigitAmp",        "std::vector<int>",         &m_eclDigitAmp);
   m_tree->Branch("eclDigitTimeFit",    "std::vector<int>",         &m_eclDigitTimeFit);
@@ -529,7 +501,6 @@ void ECLDataAnalysisModule::initialize()
 
   m_tree->Branch("eclCalDigitMultip",     &m_eclCalDigitMultip,         "eclCaldigit_Multip/I");
   m_tree->Branch("eclCalDigitIdx",        "std::vector<int>",         &m_eclCalDigitIdx);
-  //if (m_doMC == 1) {
   m_tree->Branch("eclCalDigitToMC1",      "std::vector<int>",       &m_eclCalDigitToMC1);
   m_tree->Branch("eclCalDigitToMC1PDG",      "std::vector<int>",       &m_eclCalDigitToMC1PDG);
   m_tree->Branch("eclCalDigitToMCWeight1",      "std::vector<double>",       &m_eclCalDigitToMCWeight1);
@@ -546,7 +517,6 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("eclCalDigitToMC5PDG",      "std::vector<int>",       &m_eclCalDigitToMC5PDG);
   m_tree->Branch("eclCalDigitToMCWeight5",      "std::vector<double>",       &m_eclCalDigitToMCWeight5);
   m_tree->Branch("eclCalDigitToBkgWeight",      "std::vector<double>",       &m_eclCalDigitToBkgWeight);
-  //}
   m_tree->Branch("eclCalDigitSimHitSum",      "std::vector<double>",       &m_eclCalDigitSimHitSum);
   m_tree->Branch("eclCalDigitToShower",      "std::vector<int>",          &m_eclCalDigitToShower);
   m_tree->Branch("eclCalDigitCellId",     "std::vector<int>",         &m_eclCalDigitCellId);

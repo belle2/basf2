@@ -39,7 +39,7 @@ namespace Belle2 {
     template <class AState>
     CKFResult(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& path, const genfit::MeasuredStateOnPlane& mSoP)
     {
-      for (const AState* state : path) {
+      for (const TrackFindingCDC::WithWeight<const AState*> state : path) {
         const Hit* hit = state->getHit();
         if (hit) {
           m_hits.push_back(hit);
@@ -48,6 +48,8 @@ namespace Belle2 {
         if (state->isFitted()) {
           m_chi2 += state->getChi2();
         }
+
+        m_weightSum = state.getWeight();
       }
 
       m_trackCharge = mSoP.getCharge();
@@ -99,6 +101,12 @@ namespace Belle2 {
       return m_trackCharge;
     }
 
+    /// Getter for the sum of weights
+    double getWeightSum() const
+    {
+      return m_weightSum;
+    }
+
   private:
     /// The stored seed
     const ASeed* m_seed;
@@ -112,5 +120,7 @@ namespace Belle2 {
     TVector3 m_trackMomentum;
     /// The charge of the track
     short m_trackCharge = 0;
+    /// The stored sum of weights
+    TrackFindingCDC::Weight m_weightSum = 0;
   };
 }

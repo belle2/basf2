@@ -105,7 +105,7 @@ void SVDUnpackerModule::event()
   StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
   StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
   StoreArray<SVDShaperDigit> shaperDigits(m_svdShaperDigitListName);
-  StoreArray<SVDDAQDiagnostic> DAQDiagnostics(m_svdDAQDiagnosticsListName); //JW
+  StoreArray<SVDDAQDiagnostic> DAQDiagnostics(m_svdDAQDiagnosticsListName);
 
   vector<SVDDAQDiagnostic> diagnosticVector;
   int diagnosticIndex;
@@ -147,7 +147,7 @@ void SVDUnpackerModule::event()
       data32tab[3] = (uint32_t*)rawSVDList[i]->Get4thDetectorBuffer(j);
 
 
-      unsigned short ftbError = 0; // JW - gdzie to dac?
+      unsigned short ftbError = 0;
       unsigned short trgType = 0;
       unsigned short trgNumber = 0;
       unsigned short cmc1;
@@ -181,7 +181,7 @@ void SVDUnpackerModule::event()
 
             m_data32 = *data32_it; //put the second 32-bit frame to union
 
-            ftbError = m_FTBHeader.errorsField; // JW
+            ftbError = m_FTBHeader.errorsField;
 
             if (m_FTBHeader.eventNumber !=
                 (m_eventMetaDataPtr->getEvent() & 0xFFFFFF)) {
@@ -199,7 +199,7 @@ void SVDUnpackerModule::event()
               }
             }
 
-            if (m_FTBHeader.errorsField != 0) {
+            if (m_FTBHeader.errorsField != 0xf0) {
               if (m_shutUpFTBError) {
                 m_shutUpFTBError -= 1 ;
                 B2ERROR(
@@ -217,8 +217,8 @@ void SVDUnpackerModule::event()
 
           if (m_MainHeader.check == 6) { // FADC header
             fadc = m_MainHeader.FADCnum;
-            trgType = m_MainHeader.trgType;       //JW
-            trgNumber = m_MainHeader.trgNumber;   //JW
+            trgType = m_MainHeader.trgType;
+            trgNumber = m_MainHeader.trgNumber;
             if (
               m_MainHeader.trgNumber !=
               ((m_eventMetaDataPtr->getEvent() - m_FADCTriggerNumberOffset) & 0xFF)) {
@@ -245,13 +245,12 @@ void SVDUnpackerModule::event()
           if (m_APVHeader.check == 2) { // APV header
             apv = m_APVHeader.APVnum;
 
-            cmc1 = m_APVHeader.CMC1;  // odtad JW
+            cmc1 = m_APVHeader.CMC1;
             cmc2 = m_APVHeader.CMC2;
-            apvErrors = m_APVHeader.apvErr;// temp - tylko 3 bity z 4-ech
+            apvErrors = m_APVHeader.apvErr;
             pipAddr = m_APVHeader.pipelineAddr;
 
-            // JW. tutaj wstępnie wypełniam DAQDiagnostic, ale bez trailera
-            // wrzucanie do wektora map
+            // temporary SVDDAQDiagnostic object (no info from trailers)
             diagnosticVector.push_back(
               SVDDAQDiagnostic(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError)
             );
@@ -292,7 +291,6 @@ void SVDUnpackerModule::event()
           }  //is data frame
 
 
-          // JW - nowy blok dla trailera FADC
           if (m_FADCTrailer.check == 14)  { // FADC trailer
 
             ftbFlags = m_FADCTrailer.FTBFlags;
@@ -306,11 +304,7 @@ void SVDUnpackerModule::event()
               finalDAQDiagnostic.setEmuPipelineAddress(emuPipAddr);
               finalDAQDiagnostic.setApvErrorOR(apvErrorsOR);
 
-              auto* storedDAQDiagnostic = DAQDiagnostics.appendNew(finalDAQDiagnostic); // FIXME, causes the following error:
-              /*
-              basf2: malloc.c:2394: sysmalloc: Assertion `(old_top == initial_top (av) && old_size == 0) || ((unsigned long) (old_size) >= MINSIZE && prev_inuse (old_top) && ((unsigned long) old_end & (pagesize - 1)) == 0)' failed.
-              Aborted (core dumped)
-              */
+              auto* storedDAQDiagnostic = DAQDiagnostics.appendNew(finalDAQDiagnostic);
 
               for (auto& d : pair.second) {
                 shaperDigits.appendNew(d)->addRelationTo(storedDAQDiagnostic);

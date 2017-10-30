@@ -41,7 +41,8 @@ class SvdShaperDigitTestModule(Module):
                 x.getSensorID().getLayerNumber(),
                 x.getSensorID().getLadderNumber(),
                 x.getSensorID().getSensorNumber(),
-                x.isUStrip()))
+                x.isUStrip(),
+                x.getCellID()))
 
     def initialize(self):
         B2INFO("test initialize")
@@ -79,6 +80,15 @@ class SvdShaperDigitTestModule(Module):
             if printouts:
                 print()
                 print("object: ", i)
+                print("SVDShaperDigits:")
+                print("i", "sensor", "isU", "strip", "charge")
+                print(indS, sensorS, isuS, stripS, chgS[0])
+                print(" ", sensorS, isuS, stripS, chgS[1])
+                print(" ", sensorS, isuS, stripS, chgS[2])
+                print(" ", sensorS, isuS, stripS, chgS[3])
+                print(" ", sensorS, isuS, stripS, chgS[4])
+                print(" ", sensorS, isuS, stripS, chgS[5])
+
                 print("SVDDigits:")
                 print("i", "sensor", "isU", "strip", "charge")
             for j in range(6):
@@ -90,20 +100,11 @@ class SvdShaperDigitTestModule(Module):
                 isu = hit.isUStrip()
                 chg = hit.getCharge()
 
-                assert (strip == stripS and sensor == sensorS and isu == isuS and chg ==
-                        chgS[j]), B2FATAL("SVDDigits and SVDShaperDigits objects don't match !!!")
-
                 if printouts:
                     print(ind, sensor, isu, strip, chg)
 
-            if printouts:
-                print("SVDShaperDigits:")
-                print(indS, sensorS, isuS, stripS, chgS[0])
-                print(" ", sensorS, isuS, stripS, chgS[1])
-                print(" ", sensorS, isuS, stripS, chgS[2])
-                print(" ", sensorS, isuS, stripS, chgS[3])
-                print(" ", sensorS, isuS, stripS, chgS[4])
-                print(" ", sensorS, isuS, stripS, chgS[5])
+                assert (strip == stripS and sensor == sensorS and isu == isuS and chg ==
+                        chgS[j]), B2FATAL("SVDDigits and SVDShaperDigits objects don't match !!!")
 
 
 # to run the framework the used modules need to be registered
@@ -113,7 +114,7 @@ particlegun.param('nTracks', 10)
 
 # Create Event information
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
 # Show progress of processing
 progress = register_module('Progress')
 

@@ -127,7 +127,7 @@ namespace Belle2 {
     /** APV error code in FADC trailer*/
     uint8_t m_apvErrorOR;
 
-    //ClassDef(SVDDAQDiagnostic, 5)
+    ClassDef(SVDDAQDiagnostic, 1)
   }; // class SVDDAQDiagnostic
 } // namespace Belle2
 

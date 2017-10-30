@@ -306,20 +306,14 @@ void SVDUnpackerModule::event()
               finalDAQDiagnostic.setEmuPipelineAddress(emuPipAddr);
               finalDAQDiagnostic.setApvErrorOR(apvErrorsOR);
 
-              DAQDiagnostics.appendNew(finalDAQDiagnostic); // FIXME, causes the following error:
-              /*** Error in `basf2': malloc(): memory corruption: 0x000000000eb1b960 ***
-              ======= Backtrace: =========
-              /lib/x86_64-linux-gnu/libc.so.6(+0x777e5)[0x7f6b2e7dd7e5]
-              /lib/x86_64-linux-gnu/libc.so.6(+0x8213e)[0x7f6b2e7e813e]
-              /lib/x86_64-linux-gnu/libc.so.6(__libc_malloc+0x54)[0x7f6b2e7ea184]
-              /externals/v01-05-01/Linux_x86_64/common/lib64/libstdc++.so.6(_Znwm+0x18)[0x7f6b2edd49a8]
-              /externals/v01-05-01/Linux_x86_64/opt/root/lib/libCore.so(_ZN8TStorage11ObjectAllocEm+0x9)[0x7f6b2e353809]
-              /externals/v01-05-01/Linux_x86_64/opt/root/lib/libCore.so(_ZN12TClonesArrayixEi+0xf9)[0x7f6b2e396c19]
-              /software/modules/Linux_x86_64/opt/libsvdUnpacker.so(_ZN6Belle23SVD17SVDUnpackerModule5eventEv+0x122f)[0x7f6afae0d74f]
-              ...*/
+              auto* storedDAQDiagnostic = DAQDiagnostics.appendNew(finalDAQDiagnostic); // FIXME, causes the following error:
+              /*
+              basf2: malloc.c:2394: sysmalloc: Assertion `(old_top == initial_top (av) && old_size == 0) || ((unsigned long) (old_size) >= MINSIZE && prev_inuse (old_top) && ((unsigned long) old_end & (pagesize - 1)) == 0)' failed.
+              Aborted (core dumped)
+              */
 
               for (auto& d : pair.second) {
-                shaperDigits.appendNew(d)->addRelationTo(&finalDAQDiagnostic);
+                shaperDigits.appendNew(d)->addRelationTo(storedDAQDiagnostic);
               }
             }
 

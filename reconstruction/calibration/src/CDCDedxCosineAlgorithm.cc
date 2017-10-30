@@ -68,7 +68,6 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
         cosine.push_back(1.0); // FIXME! --> should return not enough data
       } else {
         float mean = dedxcosth[i].GetFunction("gaus")->GetParameter(1);
-        //cosine.push_back(1.0);
         cosine.push_back(mean);
       }
     }

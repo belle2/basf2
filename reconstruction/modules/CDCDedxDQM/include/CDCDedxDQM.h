@@ -10,20 +10,13 @@
 
 #pragma once
 
+#include <reconstruction/dataobjects/CDCDedxTrack.h>
+
 #include <framework/core/HistoModule.h>
-
 #include <framework/datastore/StoreArray.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/DBArray.h>
 
-#include <reconstruction/dbobjects/CDCDedxWireGain.h>
-#include <reconstruction/dbobjects/CDCDedxRunGain.h>
-#include <reconstruction/dbobjects/CDCDedxCosineCor.h>
-
-#include <string>
-#include <vector>
-#include <map>
 #include "TH1F.h"
+#include "TF1.h"
 
 namespace Belle2 {
 
@@ -60,13 +53,12 @@ namespace Belle2 {
 
   private:
 
-    TH1F* m_h_rungains = nullptr; /**< Histogram for run gains */
-    TH1F* m_h_wiregains = nullptr; /**< Histogram for wire gains */
-    TH1F* m_h_cosinegains = nullptr; /**< Histogram for electron saturation constants */
+    /** Store array: CDCDedxTrack */
+    StoreArray<CDCDedxTrack> m_cdcDedxTracks;
 
-    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
-    DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
-    DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
+    TH1F* m_h_dedx = nullptr; /**< Histogram for dE/dx truncated means */
+    TH1F* m_h_dedxmean = nullptr; /**< Histogram for average dE/dx mean */
+    TH1F* m_h_dedxsigma = nullptr; /**< Histogram for dE/dx resolution */
 
   };
 } // Belle2 namespace

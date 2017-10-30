@@ -298,7 +298,7 @@ void CDCDedxPIDModule::event()
     }
 
     // scale factor to make electron dE/dx ~ 1
-    double scale = m_DBScaleFactor->getScaleFactor();
+    dedxTrack->m_scale = m_DBScaleFactor->getScaleFactor();
 
     // store run gains
     dedxTrack->m_rungain = m_DBRunGain->getRunGain();
@@ -440,7 +440,7 @@ void CDCDedxPIDModule::event()
         int driftT = cdcHit->getTDCCount();
 
         // we want electrons to be one, so artificially scale the adcCount
-        adcCount /= scale;
+        double dadcCount = 1.0 * adcCount / dedxTrack->m_scale;
 
         RealisticTDCCountTranslator realistictdc;
         double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, 0, true, pocaOnWire.Z(), pocaMom.Phi(), pocaMom.Theta());
@@ -462,9 +462,9 @@ void CDCDedxPIDModule::event()
 
           // apply the calibration to dE to propagate to both hit and layer measurements
           double correction = dedxTrack->m_rungain * dedxTrack->m_coscor * wiregain * twodcor * onedcor;
-          adcCount = adcCount / correction;
+          dadcCount = dadcCount / correction;
 
-          layerdE += 1.0 * adcCount;
+          layerdE += dadcCount;
           layerdx += celldx;
 
           if (celldx > longesthit) {
@@ -473,7 +473,7 @@ void CDCDedxPIDModule::event()
           }
 
           // save individual hits
-          double cellDedx = (1.0 * adcCount / celldx);
+          double cellDedx = (dadcCount / celldx);
           if (nomom) cellDedx *= sin(std::atan(1 / fitResult->getCotTheta()));
           else  cellDedx *= sin(trackMom.Theta());
 
@@ -537,17 +537,19 @@ void CDCDedxPIDModule::event()
                      dedxTrack->l_dedx);
     }
 
-    if (m_trackLevel) {
-      if (dedxTrack->m_pdg == -999) {
-        B2DEBUG(50, "No MCParticle for this track, skipping dE/dx");
-        dedxTrack->m_dedx = -1; // should continue; leave it in for testing...
-      }
+    if (dedxTrack->m_pdg == -999) {
+      B2DEBUG(50, "No MCParticle for this track, skipping dE/dx");
+      dedxTrack->m_dedx = -1; // should continue; leave it in for testing...
+    } else {
       // determine the predicted mean and resolution
       double mean = getMean(dedxTrack->m_p_true / dedxTrack->m_mcmass);
       double sigma = getSigma(mean, dedxTrack->l_nHitsUsed, std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta));
       dedxTrack->m_dedx = gRandom->Gaus(mean, sigma);
       while (dedxTrack->m_dedx < 0)
         dedxTrack->m_dedx = gRandom->Gaus(mean, sigma);
+    }
+
+    if (m_trackLevel) {
       saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_p_cdc, dedxTrack->m_dedx,
                    std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->l_nHitsUsed);
     } else
@@ -559,7 +561,6 @@ void CDCDedxPIDModule::event()
       saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated, m_pdfs[2]);
 
     // save CDCDedxLikelihood
-    //
     // use parameterized method if called or if pdf file for lookup tables is empty
     if (m_usePrediction || !m_pdfFile.empty()) {
       double* pidvalues;

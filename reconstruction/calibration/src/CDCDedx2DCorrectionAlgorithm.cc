@@ -55,15 +55,24 @@ CalibrationAlgorithm::EResult CDCDedx2DCorrectionAlgorithm::calibrate()
   for (unsigned int i = 0; i < ttree.GetEntries(); ++i) {
     ttree.GetEvent(i);
     for (unsigned int j = 0; j < dedx->size(); ++j) {
-      if (abs(doca->at(j)) > 1.0 || abs(enta->at(j)) > 3.1416 / 2.0) continue;
-      int dbin = (doca->at(j) + 1.0) / ndbins;
-      int ebin = (std::sin(enta->at(j)) + 1.0) / nebins;
+      double myenta = enta->at(j);
+
+      // assume rotational symmetry
+      if (myenta < -3.1416 / 2.0) myenta += 3.1416 / 2.0;
+      if (myenta > 3.1416 / 2.0) myenta -= 3.1416 / 2.0;
+      if (abs(myenta) > 3.1416) continue;
+      int ebin = (std::sin(myenta) + 1.0) / nebins;
+
+      int dbin;
+      if (abs(doca->at(j)) > 1.5) dbin = ndbins - 1;
+      else dbin = (doca->at(j) + 1.5) / ndbins;
+
       twodbin[dbin][ebin].Fill(dedx->at(j));
     }
   }
 
   // fit histograms to get gains in bins of DOCA and entrance angle
-  TH2F twodcor = TH2F("twodcorrection", "dE/dx in bins of DOCA/Enta", ndbins, -1, 1, nebins, -1, 1);
+  TH2F twodcor = TH2F("twodcorrection", "dE/dx in bins of DOCA/Enta", ndbins, -1.5, 1.5, nebins, -1, 1);
   for (unsigned int i = 0; i < ndbins; ++i) {
     for (unsigned int j = 0; j < nebins; ++j) {
       if (twodbin[i][j].Integral() < 50) {

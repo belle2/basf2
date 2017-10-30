@@ -57,8 +57,13 @@ namespace Belle2 {
     {
       if (layer > 56) B2ERROR("No such layer!");
       double mean;
+
+      // assume rotational symmetry
+      if (enta < -3.1416 / 2.0) enta += 3.1416 / 2.0;
+      if (enta > 3.1416 / 2.0) enta -= 3.1416 / 2.0;
+
       int binx = m_twodgains[0].GetXaxis()->FindBin(doca);
-      int biny = m_twodgains[0].GetYaxis()->FindBin(enta);
+      int biny = m_twodgains[0].GetYaxis()->FindBin(sin(enta));
       mean = m_twodgains[0].GetBinContent(binx, biny);
 
       return mean;

@@ -37,7 +37,7 @@ namespace Belle2 {
       RelationsObject(),
       m_track(0), m_charge(0), m_cosTheta(0), m_p(0), m_p_cdc(0),
       m_pdg(0), m_mother_pdg(0), m_p_true(0), m_length(0.0),
-      m_coscor(0), m_rungain(0),
+      m_scale(0), m_coscor(0), m_rungain(0),
       l_nHits(0), l_nHitsUsed(0), h_nHits(0)
     {
       m_dedx = m_dedx_avg = m_dedx_avg_truncated = m_dedx_avg_truncated_err = 0.0;
@@ -213,6 +213,7 @@ namespace Belle2 {
     double m_length;   /**< total distance travelled by the track */
 
     // calibration constants
+    double m_scale; /**< scale factor to make electrons ~1 */
     double m_coscor;  /**< calibration cosine correction */
     double m_rungain; /**< calibration run gain */
     std::vector<double> h_wiregain; /**< calibration hit gain (indexed on number of hits) */

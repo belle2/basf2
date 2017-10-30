@@ -208,7 +208,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         add_ecl_modules(path, components)
 
     if trigger_mode in ["hlt", "all"]:
-        add_ecl_track_matcher_module(path, components)
+        # add_ecl_track_matcher_module(path, components)
         add_ecl_eip_module(path, components)
 
     if trigger_mode in ["hlt", "all"]:
@@ -220,11 +220,11 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
         add_muid_module(path, components)
         add_pid_module(path, components)
+        add_ecl_track_cluster_module(path, components)
 
     if trigger_mode in ["all"] and addClusterExpertModules:
         # FIXME: Disabled for HLT until execution time bug is fixed
         add_cluster_expert_modules(path, components)
-        # add_ecl_track_cluster_module(path, components)
 
     path.add_module('StatisticsSummary').set_name('Sum_Clustering')
 
@@ -351,7 +351,7 @@ def add_muid_module(path, components=None):
         muid = register_module('Muid')
         # muid.logging.log_level = LogLevel.DEBUG
         # muid.logging.debug_level = 100
-        # muid.param("pdgCodes", [11, 13, 211, 321, 2212])
+        muid.param("pdgCodes", [11, 13, 211, 321, 2212])
         path.add_module(muid)
 
 

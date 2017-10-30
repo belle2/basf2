@@ -80,22 +80,22 @@ void ECLTrackClusterMatchingModule::initialize()
   m_tree->Branch("expNo", &m_iExperiment, "expNo/I");
   m_tree->Branch("runNo", &m_iRun, "runNo/I");
   m_tree->Branch("evtNo", &m_iEvent, "evtNo/I");
-  m_tree->Branch("trackNo", "std::vector<int>", &m_trackNo);
+  m_tree->Branch("trackNo", &m_trackNo, "trackNo/I");
 
-  m_tree->Branch("trackMomentum", "std::vector<double>", &m_trackMomentum);
-  m_tree->Branch("deltaPhi", "std::vector<double>",  &m_deltaPhi);
-  m_tree->Branch("phiCluster", "std::vector<double>",  &m_phiCluster);
-  m_tree->Branch("errorPhi_ECLNEAR", "std::vector<double>",  &m_errorPhi_ECLNEAR);
-  m_tree->Branch("errorPhi_ECLCROSS", "std::vector<double>",  &m_errorPhi_ECLCROSS);
-  m_tree->Branch("errorPhi_ECLDL", "std::vector<double>",  &m_errorPhi_ECLDL);
-  m_tree->Branch("deltaTheta", "std::vector<double>",  &m_deltaTheta);
-  m_tree->Branch("thetaCluster", "std::vector<double>",  &m_thetaCluster);
-  m_tree->Branch("errorTheta_ECLNEAR", "std::vector<double>",  &m_errorTheta_ECLNEAR);
-  m_tree->Branch("errorTheta_ECLCROSS", "std::vector<double>",  &m_errorTheta_ECLCROSS);
-  m_tree->Branch("errorTheta_ECLDL", "std::vector<double>",  &m_errorTheta_ECLDL);
-  m_tree->Branch("quality", "std::vector<double>",  &m_quality);
-  m_tree->Branch("quality_best", "std::vector<double>",  &m_quality_best);
-  m_tree->Branch("hitStatus_best", "std::vector<int>",  &m_hitstatus_best);
+  m_tree->Branch("trackMomentum", &m_trackMomentum, "trackMomentum/D");
+  m_tree->Branch("deltaPhi", &m_deltaPhi, "deltaPhi/D");
+  m_tree->Branch("phiCluster", &m_phiCluster, "phiCluster/D");
+  m_tree->Branch("errorPhi_ECLNEAR", &m_errorPhi_ECLNEAR, "errorPhi_ECLNEAR/D");
+  m_tree->Branch("errorPhi_ECLCROSS", &m_errorPhi_ECLCROSS, "errorPhi_ECLCROSS/D");
+  m_tree->Branch("errorPhi_ECLDL", &m_errorPhi_ECLDL, "errorPhi_ECLDL/D");
+  m_tree->Branch("deltaTheta", &m_deltaTheta, "deltaTheta/D");
+  m_tree->Branch("thetaCluster", &m_thetaCluster, "thetaCluster/D");
+  m_tree->Branch("errorTheta_ECLNEAR", &m_errorTheta_ECLNEAR, "errorTheta_ECLNEAR/D");
+  m_tree->Branch("errorTheta_ECLCROSS", &m_errorTheta_ECLCROSS, "errorTheta_ECLCROSS/D");
+  m_tree->Branch("errorTheta_ECLDL", &m_errorTheta_ECLDL, "errorTheta_ECLDL/D");
+  m_tree->Branch("quality", &m_quality, "quality/D");
+  m_tree->Branch("quality_best", &m_quality_best, "quality_best/D");
+  m_tree->Branch("hitStatus_best", &m_hitstatus_best, "hitStatus_best/I");
 
   B2INFO("[ECLTrackClusterMatchingModule]: Initialization of ECLTrackClusterMatching Module completed.");
 }
@@ -106,21 +106,21 @@ void ECLTrackClusterMatchingModule::beginRun()
 
 void ECLTrackClusterMatchingModule::event()
 {
-  m_deltaPhi->clear();
-  m_phiCluster->clear();
-  m_errorPhi_ECLNEAR->clear();
-  m_errorPhi_ECLCROSS->clear();
-  m_errorPhi_ECLDL->clear();
-  m_deltaTheta->clear();
-  m_thetaCluster->clear();
-  m_errorTheta_ECLNEAR->clear();
-  m_errorTheta_ECLCROSS->clear();
-  m_errorTheta_ECLDL->clear();
-  m_quality->clear();
-  m_quality_best->clear();
-  m_trackNo->clear();
-  m_trackMomentum->clear();
-  m_hitstatus_best->clear();
+  // m_deltaPhi->clear();
+  // m_phiCluster->clear();
+  // m_errorPhi_ECLNEAR->clear();
+  // m_errorPhi_ECLCROSS->clear();
+  // m_errorPhi_ECLDL->clear();
+  // m_deltaTheta->clear();
+  // m_thetaCluster->clear();
+  // m_errorTheta_ECLNEAR->clear();
+  // m_errorTheta_ECLCROSS->clear();
+  // m_errorTheta_ECLDL->clear();
+  // m_quality->clear();
+  // m_quality_best->clear();
+  // m_trackNo->clear();
+  // m_trackMomentum->clear();
+  // m_hitstatus_best->clear();
 
   StoreObjPtr<EventMetaData> eventmetadata;
   if (eventmetadata) {
@@ -142,7 +142,7 @@ void ECLTrackClusterMatchingModule::event()
 
     ECLCluster* cluster_best = nullptr;
     double quality_tmp = 1e6;
-    ExtHitStatus hitStatus;
+    ExtHitStatus hitStatus = EXT_FIRST;
     i++;
     // Find extrapolated track hits in the ECL, considering only hit points
     // that either are on the sphere, closest to or on radial direction of an
@@ -153,58 +153,59 @@ void ECLTrackClusterMatchingModule::event()
       if (eclCluster != nullptr) {
         if (eclCluster->getHypothesisId() != 5) continue;
         if (extHit.getStatus() == EXT_ECLNEAR) {
-          m_errorPhi_ECLNEAR->push_back(extHit.getErrorPhi());
-          m_errorTheta_ECLNEAR->push_back(extHit.getErrorTheta());
-          m_errorPhi_ECLCROSS->push_back(-1);
-          m_errorTheta_ECLCROSS->push_back(-1);
-          m_errorPhi_ECLDL->push_back(-1);
-          m_errorTheta_ECLDL->push_back(-1);
+          m_errorPhi_ECLNEAR = extHit.getErrorPhi();
+          m_errorTheta_ECLNEAR = extHit.getErrorTheta();
+          m_errorPhi_ECLCROSS = -1;
+          m_errorTheta_ECLCROSS = -1;
+          m_errorPhi_ECLDL = -1;
+          m_errorTheta_ECLDL = -1;
         } else if (extHit.getStatus() == EXT_ECLCROSS) {
-          m_errorPhi_ECLNEAR->push_back(-1);
-          m_errorTheta_ECLNEAR->push_back(-1);
-          m_errorPhi_ECLCROSS->push_back(extHit.getErrorPhi());
-          m_errorTheta_ECLCROSS->push_back(extHit.getErrorTheta());
-          m_errorPhi_ECLDL->push_back(-1);
-          m_errorTheta_ECLDL->push_back(-1);
+          m_errorPhi_ECLNEAR = -1;
+          m_errorTheta_ECLNEAR = -1;
+          m_errorPhi_ECLCROSS = extHit.getErrorPhi();
+          m_errorTheta_ECLCROSS = extHit.getErrorTheta();
+          m_errorPhi_ECLDL = -1;
+          m_errorTheta_ECLDL = -1;
         } else if (extHit.getStatus() == EXT_ECLDL) {
-          m_errorPhi_ECLNEAR->push_back(-1);
-          m_errorTheta_ECLNEAR->push_back(-1);
-          m_errorPhi_ECLCROSS->push_back(-1);
-          m_errorTheta_ECLCROSS->push_back(-1);
-          m_errorPhi_ECLDL->push_back(extHit.getErrorPhi());
-          m_errorTheta_ECLDL->push_back(extHit.getErrorTheta());
+          m_errorPhi_ECLNEAR = -1;
+          m_errorTheta_ECLNEAR = -1;
+          m_errorPhi_ECLCROSS = -1;
+          m_errorTheta_ECLCROSS = -1;
+          m_errorPhi_ECLDL = extHit.getErrorPhi();
+          m_errorTheta_ECLDL = extHit.getErrorTheta();
         }
         // double errorPhi = extHit.getErrorPhi();
         // if (errorPhi > 2 * M_PI) continue;
-        // m_errorPhi->push_back(errorPhi);
+        // m_errorPhi = errorPhi);
         // double errorTheta = extHit.getErrorTheta();
         // if (errorTheta > M_PI) continue;
-        // m_errorTheta->push_back(errorTheta);
+        // m_errorTheta = errorTheta);
         double deltaPhi = extHit.getPosition().Phi() - eclCluster->getPhi();
-        m_deltaPhi->push_back(deltaPhi);
-        m_phiCluster->push_back(eclCluster->getPhi());
+        m_deltaPhi = deltaPhi;
+        m_phiCluster = eclCluster->getPhi();
         double deltaTheta = extHit.getPosition().Theta() - eclCluster->getTheta();
-        m_deltaTheta->push_back(deltaTheta);
-        m_thetaCluster->push_back(eclCluster->getTheta());
+        m_deltaTheta = deltaTheta;
+        m_thetaCluster = eclCluster->getTheta();
         double quality = clusterQuality(extHit, deltaPhi, deltaTheta);
-        m_quality->push_back(quality);
+        m_quality = quality;
         if (quality < quality_tmp) {
           quality_tmp = quality;
           cluster_best = eclCluster;
           hitStatus = extHit.getStatus();
         }
-        m_trackNo->push_back(i);
-        m_trackMomentum->push_back(track.getTrackFitResult(Const::pion)->getMomentum().Mag());
+        m_trackNo = i;
+        m_trackMomentum = track.getTrackFitResult(Const::pion)->getMomentum().Mag();
       }
+      m_tree->Fill();
     } // end loop on ExtHits related to Track
-    m_quality_best->push_back(quality_tmp);
-    m_hitstatus_best->push_back(hitStatus);
+    m_quality_best = quality_tmp;
+    m_hitstatus_best = hitStatus;
     if (cluster_best != nullptr) {
       cluster_best->setIsTrack(true);
       track.addRelationTo(cluster_best);
     }
   } // end loop on Tracks
-  m_tree->Fill();
+  // m_tree->Fill();
 }
 
 void ECLTrackClusterMatchingModule::endRun()

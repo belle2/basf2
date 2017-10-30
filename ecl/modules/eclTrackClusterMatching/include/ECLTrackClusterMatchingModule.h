@@ -80,21 +80,21 @@ namespace Belle2 {
     int m_iRun; /**< Run number */
     int m_iEvent; /**< Event number */
 
-    std::vector<int>* m_trackNo;
-    std::vector<double>* m_trackMomentum;
-    std::vector<double>* m_deltaPhi;
-    std::vector<double>* m_phiCluster;
-    std::vector<double>* m_errorPhi_ECLNEAR;
-    std::vector<double>* m_errorPhi_ECLCROSS;
-    std::vector<double>* m_errorPhi_ECLDL;
-    std::vector<double>* m_deltaTheta;
-    std::vector<double>* m_thetaCluster;
-    std::vector<double>* m_errorTheta_ECLNEAR;
-    std::vector<double>* m_errorTheta_ECLCROSS;
-    std::vector<double>* m_errorTheta_ECLDL;
-    std::vector<double>* m_quality;
-    std::vector<double>* m_quality_best; /**< Best quality among all extrapolated hits of one track */
-    std::vector<int>* m_hitstatus_best;
+    int m_trackNo;
+    double m_trackMomentum;
+    double m_deltaPhi;
+    double m_phiCluster;
+    double m_errorPhi_ECLNEAR;
+    double m_errorPhi_ECLCROSS;
+    double m_errorPhi_ECLDL;
+    double m_deltaTheta;
+    double m_thetaCluster;
+    double m_errorTheta_ECLNEAR;
+    double m_errorTheta_ECLCROSS;
+    double m_errorTheta_ECLDL;
+    double m_quality;
+    double m_quality_best; /**< Best quality among all extrapolated hits of one track */
+    int m_hitstatus_best;
 
   };
 

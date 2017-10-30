@@ -32,6 +32,7 @@ namespace Belle2 {
     "last_hit_layer",
     "first_hit_layer",
     "chi2",
+    "weight_sum",
     "has_missing_layer_1",
     "has_missing_layer_2",
     "has_missing_layer_3",

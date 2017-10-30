@@ -25,7 +25,7 @@
 #include <tracking/ckf/svd/findlets/SpacePointLoader.h>
 
 #include <tracking/ckf/svd/filters/relations/ChooseableSVDRelationFilter.h>
-#include <tracking/ckf/svd/filters/results/SizeSVDResultFilter.h>
+#include <tracking/ckf/svd/filters/results/WeightSVDResultFilter.h>
 
 namespace Belle2 {
   class RecoTrack;
@@ -70,7 +70,7 @@ namespace Belle2 {
     /// Findlet doing the main work: the tree finding
     TreeSearcher<CKFToSVDState, SVDStateRejecter, CKFToSVDResult> m_treeSearchFindlet;
     /// Findlet for resolving overlaps
-    OverlapResolver<SizeSVDResultFilter> m_overlapResolver;
+    OverlapResolver<WeightSVDResultFilter> m_overlapResolver;
     /// Findlet for adding unused VXDTF2 results
     UnusedVXDTracksAdder m_unusedTracksAdder;
     /// Findlet for tagging the used space points

@@ -21,9 +21,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-// dataobjects
-#include <mdst/dataobjects/MCParticle.h>
-
 // root
 #include <TRandom.h>
 
@@ -44,9 +41,13 @@ namespace Belle2 {
   EventT0GeneratorModule::EventT0GeneratorModule() : Module()
 
   {
-    // set module description (e.g. insert text)
-    setDescription("Simulation of event T0 given by L1 trigger: "
-                   "t = 0 is defined by L1 trigger instead of interaction itself");
+    // set module description
+    setDescription("Module generates discrete event t0 in ~4ns steps (bunch spacing) "
+                   "according to double gaussian distribution and adds it to the "
+                   "production and decay times of MCParticles. This means that after "
+                   "this module the time origin (t = 0) is set to what L1 trigger "
+                   "would give as the interaction time.");
+
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
@@ -57,24 +58,16 @@ namespace Belle2 {
 
   }
 
-  EventT0GeneratorModule::~EventT0GeneratorModule()
-  {
-  }
 
   void EventT0GeneratorModule::initialize()
   {
-    StoreArray<MCParticle> mcParticles;
-    mcParticles.isRequired();
+    m_mcParticles.isRequired();
 
     // bunch time separation: every second bunch is filled
     m_bunchTimeSep = 2 * 1.96516 * Unit::ns; //TODO: get it from DB (which object?)
 
-
   }
 
-  void EventT0GeneratorModule::beginRun()
-  {
-  }
 
   void EventT0GeneratorModule::event()
   {
@@ -85,8 +78,7 @@ namespace Belle2 {
     int relBunchNo = round(gRandom->Gaus(0., sigma) / m_bunchTimeSep);
     double trueT0 = relBunchNo * m_bunchTimeSep; // time at which interaction happens
 
-    StoreArray<MCParticle> mcParticles;
-    for (auto& particle : mcParticles) {
+    for (auto& particle : m_mcParticles) {
       particle.setProductionTime(particle.getProductionTime() + trueT0);
       particle.setDecayTime(particle.getDecayTime() + trueT0);
     }
@@ -94,15 +86,6 @@ namespace Belle2 {
     // t = 0 is from now on the time L1 thinks the interaction happened,
     // but in fact it happened at t = trueT0
 
-  }
-
-
-  void EventT0GeneratorModule::endRun()
-  {
-  }
-
-  void EventT0GeneratorModule::terminate()
-  {
   }
 
 

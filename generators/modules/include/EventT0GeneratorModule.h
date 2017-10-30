@@ -13,10 +13,17 @@
 #include <framework/core/Module.h>
 #include <string>
 
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
+
+
 namespace Belle2 {
 
   /**
-   * Emulation of L1 t0
+   * Module generates discrete event t0 in ~4ns steps (bunch spacing) according to
+   * (double) gaussian distribution and adds it to the production and decay times of
+   * MCParticles. This means that after this module the time origin (t = 0) is set
+   * according to what L1 trigger thinks is the interaction time.
    */
   class EventT0GeneratorModule : public Module {
 
@@ -28,38 +35,15 @@ namespace Belle2 {
     EventT0GeneratorModule();
 
     /**
-     * Destructor
-     */
-    virtual ~EventT0GeneratorModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
     virtual void initialize();
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun();
-
-    /**
      * Event processor.
      */
     virtual void event();
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun();
-
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate();
 
   private:
 
@@ -70,7 +54,7 @@ namespace Belle2 {
 
     // other
     double m_bunchTimeSep = 0;         /**< time between two bunches */
-
+    StoreArray<MCParticle> m_mcParticles; /**< MC particles */
 
   };
 

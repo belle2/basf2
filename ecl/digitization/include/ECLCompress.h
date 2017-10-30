@@ -86,6 +86,16 @@ namespace Belle2 {
     std::vector<unsigned int> m_store; /**< The bit storage. */
   };
 
+  /** Bit widths for the prefix coding to encode integers which are
+   * mainly concentrated around zero and probability density are
+   * decreasing for large absolute values.
+   * @sa stream_int(BitStream& OUT, int x, const width_t& w) and
+   * int fetch_int(BitStream& IN, const width_t& w) function for more details
+   */
+  struct width_t {
+    unsigned char w0, w1, w2, w3; /** Progressive bit widths to encode an integer value*/
+  };
+
   /** Abstract class (interface) for ECL waveform
    *  compression/decompression to/from the BitStream storage.
    */
@@ -130,8 +140,18 @@ namespace Belle2 {
    */
   class ECLDCTCompress: public ECLCompress {
   public:
+    /** Constructor for DCT based compression algorithm
+     *  @param scale scale factor for quantization.
+     *  @param c0 average waveform amplitude.
+     *  @w DCT coefficient probability density based bit widths for quantized coefficients
+     */
+    ECLDCTCompress(double scale, double c0, width_t* w);
     void compress(BitStream& out, const int* adc);
     void uncompress(BitStream& out, int* adc);
+  protected:
+    const double m_scale; /**< Scale factor for quantization. */
+    const double m_c0; /**< Average waveform amplitude */
+    const width_t* m_widths; /**< Bit widths for the DCT coefficients for prefix encoding. */
   };
 
   /** The compression algorithm selector function

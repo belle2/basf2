@@ -94,54 +94,82 @@ void ECLDeltaCompress::uncompress(BitStream& out, int* adc)
   }
 }
 
-/** Bit widths for the prefix coding to encode integers which are
- * mainly concentrated around zero and probability density are
- * decreasing for large absolute values.
- * @sa stream_int(BitStream& OUT, int x, const width_t& w) and
- * int fetch_int(BitStream& IN, const width_t& w) function for more details
- */
-struct width_t {
-  unsigned char w0, w1, w2, w3; /** Progressive bit widths to encode an integer value*/
-};
-
 /** Based on phase 3 MC bit widths for prefix coding for all DCT
  * coefficients with scale factor s=0.25 used in quantization process
- * which provides the best compression factor. Comment in each line shows
- * coefficient number and the average number of bits to encode the
- * coefficient
+ * which provides the best compression factor. Comment in each line
+ * shows the average number of bits to encode the coefficient
  */
 width_t widths_scale025[] = {
-  {7, 9, 18, 32},//  0 7.72447
-  {5, 7, 18, 32},//  1 5.45839
-  {5, 7, 18, 32},//  2 5.41033
-  {5, 7, 18, 32},//  3 5.32805
-  {5, 7, 18, 32},//  4 5.24319
-  {4, 6, 18, 32},//  5 5.01064
-  {4, 6, 18, 32},//  6 4.75667
-  {4, 6, 18, 32},//  7 4.53016
-  {4, 6, 18, 32},//  8 4.33823
-  {3, 5, 18, 32},//  9 4.08838
-  {3, 5, 18, 32},// 10 3.7205
-  {3, 4, 18, 32},// 11 3.41795
-  {2, 4, 18, 32},// 12 3.17582
-  {2, 4, 18, 32},// 13 2.76922
-  {2, 3, 18, 32},// 14 2.42437
-  {2, 3, 18, 32},// 15 2.20985
-  {2, 3, 18, 32},// 16 2.09761
-  {2, 3, 18, 32},// 17 2.04576
-  {2, 3, 18, 32},// 18 2.02288
-  {2, 4, 18, 32},// 19 2.01152
-  {2, 4, 18, 32},// 20 2.00643
-  {2, 4, 18, 32},// 21 2.00386
-  {2, 4, 18, 32},// 22 2.00244
-  {2, 4, 18, 32},// 23 2.00171
-  {2, 4, 18, 32},// 24 2.0012
-  {2, 4, 18, 32},// 25 2.00081
-  {2, 4, 18, 32},// 26 2.00055
-  {2, 4, 18, 32},// 27 2.00036
-  {2, 4, 18, 32},// 28 2.00023
-  {2, 3, 18, 32},// 29 2.00012
-  {2, 3, 18, 32} // 30 2.00004
+  {7, 9, 18, 32},// 7.72447
+  {5, 7, 18, 32},// 5.45839
+  {5, 7, 18, 32},// 5.41033
+  {5, 7, 18, 32},// 5.32805
+  {5, 7, 18, 32},// 5.24319
+  {4, 6, 18, 32},// 5.01064
+  {4, 6, 18, 32},// 4.75667
+  {4, 6, 18, 32},// 4.53016
+  {4, 6, 18, 32},// 4.33823
+  {3, 5, 18, 32},// 4.08838
+  {3, 5, 18, 32},// 3.7205
+  {3, 4, 18, 32},// 3.41795
+  {2, 4, 18, 32},// 3.17582
+  {2, 4, 18, 32},// 2.76922
+  {2, 3, 18, 32},// 2.42437
+  {2, 3, 18, 32},// 2.20985
+  {2, 3, 18, 32},// 2.09761
+  {2, 3, 18, 32},// 2.04576
+  {2, 3, 18, 32},// 2.02288
+  {2, 4, 18, 32},// 2.01152
+  {2, 4, 18, 32},// 2.00643
+  {2, 4, 18, 32},// 2.00386
+  {2, 4, 18, 32},// 2.00244
+  {2, 4, 18, 32},// 2.00171
+  {2, 4, 18, 32},// 2.0012
+  {2, 4, 18, 32},// 2.00081
+  {2, 4, 18, 32},// 2.00055
+  {2, 4, 18, 32},// 2.00036
+  {2, 4, 18, 32},// 2.00023
+  {2, 3, 18, 32},// 2.00012
+  {2, 3, 18, 32} // 2.00004
+};
+
+/** Based on phase 2 MC bit widths for prefix coding for all DCT
+ * coefficients with scale factor s=1 used in quantization process
+ * which provides the best compression factor. Comment in each line
+ * shows the average number of bits to encode the coefficient
+ */
+width_t widths_phs2_scale10[] = {
+  {5, 7, 9, 32},// 5.82104
+  {4, 6, 8, 32},// 4.76806
+  {4, 6, 8, 32},// 4.70815
+  {4, 6, 8, 32},// 4.61517
+  {3, 5, 7, 32},// 4.42656
+  {3, 5, 7, 32},// 4.22157
+  {3, 5, 7, 32},// 4.01412
+  {3, 5, 7, 32},// 3.80959
+  {2, 4, 6, 32},// 3.60224
+  {2, 4, 6, 32},// 3.31705
+  {2, 4, 6, 32},// 3.03457
+  {2, 3, 5, 32},// 2.71501
+  {2, 3, 5, 32},// 2.45094
+  {2, 3, 5, 32},// 2.25788
+  {2, 3, 5, 32},// 2.13303
+  {2, 3, 5, 32},// 2.06428
+  {2, 3, 5, 32},// 2.02847
+  {2, 3, 5, 32},// 2.01253
+  {1, 2, 4, 32},// 1.86085
+  {1, 2, 4, 32},// 1.68465
+  {1, 2, 4, 32},// 1.53003
+  {1, 2, 4, 32},// 1.38031
+  {1, 2, 4, 32},// 1.27103
+  {1, 2, 4, 32},// 1.18264
+  {1, 2, 4, 32},// 1.11546
+  {1, 2, 4, 32},// 1.07223
+  {1, 2, 4, 32},// 1.04641
+  {1, 2, 4, 32},// 1.03003
+  {1, 2, 4, 32},// 1.01772
+  {1, 2, 3, 32},// 1.01304
+  {1, 2, 4, 32},// 1.0107
 };
 
 /** put integer "x" to the stream OUT with a priory knowledge how "x"
@@ -208,9 +236,10 @@ extern "C" {
   void e01_31(const double* I, double* O);
 }
 
+ECLDCTCompress::ECLDCTCompress(double scale, double c0, width_t* w): m_scale(scale), m_c0(c0), m_widths(w) {}
+
 void ECLDCTCompress::compress(BitStream& OUT, const int* a)
 {
-  const double scale = 0.25;
   const int N = EclConfiguration::m_nsmp;
   double buf[N], out[N];
   for (int k = 0; k < N; k++) buf[k] = a[k];
@@ -218,26 +247,26 @@ void ECLDCTCompress::compress(BitStream& OUT, const int* a)
   for (int k = 0; k < N; k++) out[k] *= 1.0 / (2 * N);
 
   int km = N;
-  for (; km > 16; --km) if (lrint(out[km - 1]*scale) != 0) break;
+  for (; km > 16; --km) if (lrint(out[km - 1]*m_scale) != 0) break;
   OUT.putNBits(N - km, 4);
-  out[0] -= 3144;
+  out[0] -= m_c0;
   for (int k = 0; k < km; k++) {
-    int t = lrint(out[k] * scale);
-    stream_int(OUT, t, widths_scale025[k]);
+    int t = lrint(out[k] * m_scale);
+    stream_int(OUT, t, m_widths[k]);
   }
 }
 
 void ECLDCTCompress::uncompress(BitStream& in, int* adc)
 {
-  const double scale = 0.25, iscale = 1 / scale;
+  const double iscale = 1 / m_scale;
   const int N = EclConfiguration::m_nsmp;
   int nz = in.getNBits(4);
-  for (int i = 0; i < N - nz; i++) adc[i] = fetch_int(in, widths_scale025[i]);
+  for (int i = 0; i < N - nz; i++) adc[i] = fetch_int(in, m_widths[i]);
   for (int i = N - nz; i < N; i++) adc[i] = 0;
 
   double c[N], out[N];
   for (int k = 0; k < N; k++) c[k] = adc[k] * iscale;
-  c[0] += 3144;
+  c[0] += m_c0;
 
   e01_31(c, out);
 
@@ -252,7 +281,9 @@ ECLCompress* Belle2::selectAlgo(int compAlgo)
   } else if (compAlgo == 2) {
     comp = new ECLDeltaCompress;
   } else if (compAlgo == 3) {
-    comp = new ECLDCTCompress;
+    comp = new ECLDCTCompress(1, 3012, widths_phs2_scale10);
+  } else if (compAlgo == 4) {
+    comp = new ECLDCTCompress(0.25, 3144, widths_scale025);
   }
   return comp;
 }

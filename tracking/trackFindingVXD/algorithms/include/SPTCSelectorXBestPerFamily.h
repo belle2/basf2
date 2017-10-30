@@ -19,7 +19,9 @@
 
 namespace Belle2 {
   class SPTCSelectorXBestPerFamily : public SPTCSelectorBase {
+
   public:
+
     /// Constructor
     SPTCSelectorXBestPerFamily(unsigned short xBest = 5):
       SPTCSelectorBase(), m_xBest(xBest)
@@ -65,20 +67,6 @@ namespace Belle2 {
       }
     }
 
-
-    /** Function to insert SPTCs into a vector of SPTC while preserving an order by descending quality indices. */
-    void insert(std::vector<SpacePointTrackCand>& paths, SpacePointTrackCand sptc)
-    {
-      /// Determine position of new SPTC in sorted SPTC vector to keep it sorted
-      std::vector<SpacePointTrackCand>::iterator it = std::lower_bound(paths.begin(), paths.end(), sptc,
-      [](SpacePointTrackCand & lhs, SpacePointTrackCand rhs) {
-        return lhs.getQualityIndex() > rhs.getQualityIndex();
-      });
-      /// Insert befor iterator it
-      paths.insert(it, sptc);
-    }
-
-
     /** Return vector containing the best SPTCs; maximal m_xBest per family. */
     std::vector<SpacePointTrackCand> returnSelection() const
     {
@@ -97,7 +85,21 @@ namespace Belle2 {
 
 
   private:
-    /** Pinter to the Quality Estimator used to evaluate the SPTCs to find the best. */
+
+    /** Function to insert SPTCs into a vector of SPTC while preserving an order by descending quality indices. */
+    void insert(std::vector<SpacePointTrackCand>& paths, SpacePointTrackCand sptc)
+    {
+      /// Determine position of new SPTC in sorted SPTC vector to keep it sorted
+      std::vector<SpacePointTrackCand>::iterator it = std::lower_bound(paths.begin(), paths.end(), sptc,
+      [](SpacePointTrackCand & lhs, SpacePointTrackCand rhs) {
+        return lhs.getQualityIndex() > rhs.getQualityIndex();
+      });
+      /// Insert befor iterator it
+      paths.insert(it, sptc);
+    }
+
+
+    /** Pointer to the Quality Estimator used to evaluate the SPTCs to find the best. */
     std::unique_ptr<QualityEstimatorBase> m_estimator;
 
     /** Vector containing one vector of the best SPTCs per family. */

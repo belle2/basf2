@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guglielmo De Nardo                                             *
+ * Contributors: Guglielmo De Nardo, Benjamin Oberhof                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -42,29 +42,40 @@ namespace Belle2 {
 
   protected:
     /** output root file name (given as Module parameter) */
-    std::string m_dataOutFileName, m_dspArrayName1, m_digiArrayName1,
-        m_dspArrayName2, m_digiArrayName2;
+    std::string m_dataOutFileName,  /**< Root file name for saving the output */
+        m_dspArrayName1, /**< Name of first DSP array */
+        m_digiArrayName1,  /**< Name of first digit array */
+        m_dspArrayName2,  /**< Name of second DSP array */
+        m_digiArrayName2;  /**< Name of second digit array */
 
-    /** Root tree and file for saving the output */
-    TTree* m_tree;
-    TFile* m_rootFile;
+    TTree* m_tree;  /**< Root tree for saving the output */
+    TFile* m_rootFile;  /**< Root file for saving the output */
 
-    int m_nhits = 8736;
-    int m_neclhits;
-    int m_cellId[8736];
-    double m_energy[8736], m_allenergy[8736];
-    double m_time[8736];
-    int m_theta[8736];
-    int m_phi[8736];
+    int m_nhits = 8736; /**< Maximum number of hits */
+    int m_neclhits; /**< Actual number of hits */
+    int m_cellId[8736]; /**< Array of cellIDs */
+    double m_energy[8736], /**< Array of deposited MC energy */
+           m_allenergy[8736]; /**< Array of deposited energy */
+    double m_time[8736]; /**< Array of digit time */
+    int m_theta[8736]; /**< Array oh ThetaID */
+    int m_phi[8736]; /**< Array of PhiID */
 
-    int m_DspHit1[8736][31], m_DspHit2[8736][31];
-    int m_baseline1[8736][16], m_baseline2[8736][16];
-    double m_baselineAvg1[8736], m_baselineAvg2[8736];
-    int m_maxVal1[8736], m_maxVal2[8736];
-    int m_digiQual1[8736], m_digiQual2[8736];
-    double m_digiTime1[8736], m_digiTime2[8736];
-    double m_digiE1[8736], m_digiE2[8736];
-    double m_trig1, m_trig2;
+    int m_DspHit1[8736][31], /**< WF sampling points for first digit array */
+        m_DspHit2[8736][31];  /**< WF sampling points for second digit array */
+    int m_baseline1[8736][16],  /**< Baseline sampling points for first digit array */
+        m_baseline2[8736][16];  /**< Baseline sampling points for second digit array */
+    double m_baselineAvg1[8736], /**< Baseline energy for first digit array */
+           m_baselineAvg2[8736]; /**< Baseline energy for second digit array */
+    int m_maxVal1[8736], /**< WF maximum for first digit array */
+        m_maxVal2[8736]; /**< WF maximum for second digit array */
+    int m_digiQual1[8736], /**< Digit quality for first digit array */
+        m_digiQual2[8736]; /**< Digit quality for second digit array */
+    double m_digiTime1[8736], /**< Digit time for first digit array */
+           m_digiTime2[8736] /**< Digit time for second digit array */;
+    double m_digiE1[8736], /**< Deposited energy for first digit array */
+           m_digiE2[8736]; /**< Deposited energy for second digit array */
+    double m_trig1, /**< Trigger time for array 1 */
+           m_trig2; /**< Trigger time for array 2 */
 
   };
 

@@ -257,7 +257,7 @@ namespace Belle2 {
     std::vector<double> h_cellHeight;    /**< height of the CDC cell */
     std::vector<double> h_cellHalfWidth; /**< half-width of the CDC cell */
 
-    ClassDef(CDCDedxTrack, 5); /**< Debug output for CDCDedxPID module. */
+    ClassDef(CDCDedxTrack, 6); /**< Debug output for CDCDedxPID module. */
   };
 }
 #endif

@@ -14,7 +14,8 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/RelationArray.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <svd/reconstruction/StripCalibrationMap.h>
+#include <svd/calibration/SVDNoiseCalibrations.h>
+#include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/reconstruction/NNWaveFitter.h>
 #include <map>
 #include <vector>
@@ -95,10 +96,6 @@ namespace Belle2 {
       std::string m_relClusterRecoDigitName;
 
       //2. Strip and time fitter data
-      /** Name of the StripCalibrationMap xml (only for testbeam data */
-      std::string m_stripMapXmlName;
-      /** Name of the O-O map xml to decode StripCalibrationMap */
-      std::string m_ooMapXmlName;
       /** Name of the time fitter data xml */
       std::string m_timeFitterXmlName;
 
@@ -113,8 +110,10 @@ namespace Belle2 {
       int m_sizeHeadTail = 3;
 
       // 4. Strip map and time fitter handles
-      /** Strip map */
-      std::unique_ptr<StripCalibrationMap> m_stripMap;
+      /** Calibrations: noise */
+      SVDNoiseCalibrations m_noiseCal;
+      /** Calibrations: pusle shape and gain */
+      SVDPulseShapeCalibrations m_pulseShapeCal;
       /** Time fitter */
       NNWaveFitter m_fitter;
 

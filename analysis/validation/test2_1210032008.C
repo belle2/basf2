@@ -3,6 +3,26 @@
 <input>../1210032008.ntup.root</input>
 <output>1210032008_Validation.root</output>
 <contact>Komarov Ilya; ilya.komarov@desy.de</contact>
+<description>Distribuions used in angular analysis for 
+transverse-polarised B->K*(->K+pi0)rho(->pi+pi-) candidates:
+  <ul>
+      <li>&Delta;E</li>
+      <li>Mbc</li>
+      <li>M(&rho;(770))</li>
+      <li>M(K*(892))</li>
+      <li>cos(&theta;(&pi;&pi;))</li>
+      <li>cos(&theta;(K&pi;))</li>
+  </ul>
+For each variables three histograms are created:
+  <ul>
+      <li>Gen-level historgram, i.e. distirbuion of the variable
+       for denerated candidate</li>
+      <li>True value historgram, i.e. distirbuion of true (generated)
+       values of the given variable for the correctly reconstructed candidates</li>
+      <li>Rec-level historgram, i.e. distirbuion of reconstructed
+       values of the given variable for the correctly reconstructed candidates</li>
+  </ul>
+</description>
 </header>
 */
 
@@ -64,17 +84,17 @@ void plot(TTree* ptree, TTree* pmctree, TFile *outputFile){
   ptree->Project("rec_MK", "B_MK", sigCut);
   rec_MK->GetXaxis()->SetTitle("M_{K*(892)^{+}} (GeV/c^{2})");
 
-  TH1F* gen_MR = new TH1F("gen_MR","M_{#rho(880)^{0}}",100,0.5,1.05);
+  TH1F* gen_MR = new TH1F("gen_MR","M_{#rho(770)^{0}}",100,0.5,1.05);
   pmctree->Project("gen_MR", "B_MR");
-  gen_MR->GetXaxis()->SetTitle("M_{#rho(880)^{0}} (GeV/c^{2})");
+  gen_MR->GetXaxis()->SetTitle("M_{#rho(770)^{0}} (GeV/c^{2})");
 
-  TH1F* true_MR = new TH1F("true_MR","M_{#rho(880)^{0}}",100,0.5,1.05);
+  TH1F* true_MR = new TH1F("true_MR","M_{#rho(770)^{0}}",100,0.5,1.05);
   ptree->Project("true_MR", "B_MCT_MR", sigCut);
-  true_MR->GetXaxis()->SetTitle("M_{#rho(880)^{0}} (GeV/c^{2})");
+  true_MR->GetXaxis()->SetTitle("M_{#rho(770)^{0}} (GeV/c^{2})");
 
-  TH1F* rec_MR = new TH1F("rec_MR","M_{#rho(880)^{0}}",100,0.5,1.05);
+  TH1F* rec_MR = new TH1F("rec_MR","M_{#rho(770)^{0}}",100,0.5,1.05);
   ptree->Project("rec_MR", "B_MR", sigCut);
-  rec_MR->GetXaxis()->SetTitle("M_{#rho(880)^{0}} (GeV/c^{2})");
+  rec_MR->GetXaxis()->SetTitle("M_{#rho(770)^{0}} (GeV/c^{2})");
 
   TH1F* gen_helK = new TH1F("gen_helK","cos(#theta_{K^+#pi^0})",100,-1.,1.);
   pmctree->Project("gen_helK", "B_helK");

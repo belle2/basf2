@@ -6,6 +6,17 @@
   <input>../1210032008.dst.root</input>
   <output>../1210032008.ntup.root</output>
   <contact>Komarov Ilya; ilya.komarov@desy.de </contact>
+  <description>Reconstruction of transverse-polarised B->K*(->K+pi0)rho(->pi+pi-) events. Aplied cuts:
+    <ul>
+        <li>&Delta;E &isin; [-0.3; -0.3]</li>
+        <li>Mbc  &isin; [5.179; 5.379]</li>
+        <li>M(&rho;(770))  &isin; [0.52; 1.05]</li>
+        <li>M(K*(892))  &isin; [0.792; 0.992]</li>
+        <li>&pi;0 from stdPi0s('loose')</li>
+        <li>No PID requiremens on charged tracks (stdPi|K('all;))</li>
+        <li>Reconstructed candidates are truth-matched</li>
+    </ul>
+  </description>
 </header>
 """
 

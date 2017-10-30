@@ -66,7 +66,7 @@ main.add_module(arich_digitizer)
 
 # ECL digitization
 ecl_digitizer = register_module('ECLDigitizer')
-main.add_module(ecl_digitizer, WaveformMaker=True, CompressionAlgorithm=2)
+main.add_module(ecl_digitizer, WaveformMaker=True, CompressionAlgorithm=3)
 
 # BKLM digitization
 bklm_digitizer = register_module('BKLMDigitizer')

@@ -18,7 +18,7 @@
 
 using namespace Belle2;
 
-CKFToPXDResult::CKFToPXDResult(const std::vector<const CKFToPXDState*>& path) :
+CKFToPXDResult::CKFToPXDResult(const std::vector<TrackFindingCDC::WithWeight<const CKFToPXDState*>>& path) :
   Super(path, path.back()->getMeasuredStateOnPlane())
 {
 }

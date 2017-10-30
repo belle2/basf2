@@ -18,7 +18,7 @@
 
 using namespace Belle2;
 
-CKFToSVDResult::CKFToSVDResult(const std::vector<const CKFToSVDState*>& path) :
+CKFToSVDResult::CKFToSVDResult(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& path) :
   Super(path, path.back()->getMeasuredStateOnPlane())
 {
 }

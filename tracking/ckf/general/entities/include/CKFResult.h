@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 
 #include <genfit/MeasuredStateOnPlane.h>
 #include <TVector3.h>
@@ -37,7 +37,7 @@ namespace Belle2 {
 
     /// Constructor
     template <class AState>
-    CKFResult(const std::vector<const AState*>& path, const genfit::MeasuredStateOnPlane& mSoP)
+    CKFResult(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& path, const genfit::MeasuredStateOnPlane& mSoP)
     {
       for (const AState* state : path) {
         const Hit* hit = state->getHit();

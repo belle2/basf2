@@ -25,7 +25,7 @@ namespace Belle2 {
   };
 
   template <class AState, class AFilter>
-  void LimitedOnStateApplier<AState, AFilter>::apply(const std::vector<const AState*>& currentPath,
+  void LimitedOnStateApplier<AState, AFilter>::apply(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& currentPath,
                                                      std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates)
   {
     Super::apply(currentPath, childStates);

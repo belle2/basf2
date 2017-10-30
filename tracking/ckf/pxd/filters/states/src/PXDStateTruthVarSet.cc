@@ -18,11 +18,11 @@ using namespace TrackFindingCDC;
 
 bool PXDStateTruthVarSet::extract(const BasePXDStateFilter::Object* pair)
 {
-  const std::vector<const CKFToPXDState*>& previousStates = pair->first;
+  const std::vector<TrackFindingCDC::WithWeight<const CKFToPXDState*>>& previousStates = pair->first;
   CKFToPXDState* state = pair->second;
 
-  std::vector<const CKFToPXDState*> allStates = previousStates;
-  allStates.push_back(state);
+  std::vector<TrackFindingCDC::WithWeight<const CKFToPXDState*>> allStates = previousStates;
+  allStates.emplace_back(state);
 
   const RecoTrack* seedTrack = previousStates.front()->getSeed();
   B2ASSERT("Path without seed?", seedTrack);

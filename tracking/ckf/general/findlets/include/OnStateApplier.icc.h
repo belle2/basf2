@@ -25,7 +25,7 @@ namespace Belle2 {
   };
 
   template <class AState>
-  void OnStateApplier<AState>::apply(const std::vector<const AState*>& currentPath,
+  void OnStateApplier<AState>::apply(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& currentPath,
                                      std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates)
   {
     if (childStates.empty()) {

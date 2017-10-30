@@ -49,7 +49,7 @@ namespace Belle2 {
 
   private:
     /// Implementation of the traverseTree function
-    void traverseTree(std::vector<const AState*>& path,
+    void traverseTree(std::vector<TrackFindingCDC::WithWeight<const AState*>>& path,
                       const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
                       std::vector<AResult>& results);
 
@@ -59,5 +59,8 @@ namespace Belle2 {
 
     /// Findlet for adding a recursion cell state to the states
     TrackFindingCDC::CellularAutomaton<AState> m_automaton;
+
+    /// Parameter: Make it possible to have all subresults in the end results vector.
+    bool m_param_endEarly = true;
   };
 }

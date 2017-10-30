@@ -32,7 +32,7 @@ namespace Belle2 {
                           const std::string& prefix) final;
 
     /// The weight is calculated using the subfilter based on the geometrical layer of the state.
-    void apply(const std::vector<const AState*>& currentPath,
+    void apply(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& currentPath,
                std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates) override;
 
   private:

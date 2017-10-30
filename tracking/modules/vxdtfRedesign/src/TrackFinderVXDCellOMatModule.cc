@@ -134,7 +134,7 @@ void TrackFinderVXDCellOMatModule::event()
   /// convert paths of directedNodeNetwork-nodes to paths of const SpacePoint*:
   ///  Resulting SpacePointPath contains SpacePoints sorted from the innermost to the outermost.
   for (auto& aPath : collectedPaths) {
-    SpacePointTrackCand sptc = convertNetworkPath(std::move(aPath));
+    SpacePointTrackCand sptc = convertNetworkPath(aPath.get());
 
     if (m_PARAMselectBestPerFamily) {
       m_sptcSelector->testNewSPTC(sptc);

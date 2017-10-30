@@ -168,7 +168,7 @@ def add_reconstruction(
                          use_segment_network_filters=True,
                          observerType=0,
                          quality_estimator='circleFit',
-                         overlap_filter='hopfield',  # 'hopfield' or 'greedy'
+                         overlap_filter='greedy',  # 'hopfield' or 'greedy'
                          log_level=LogLevel.ERROR,
                          debug_level=1,
                          usedGeometry=useThisGeometry
@@ -390,7 +390,7 @@ def add_vxdtf_v2(path=None,
                  debug_level=1):
     """
     Convenience Method to setup the redesigned vxd track finding module chain.
-    Result is a store array containing reco tracks called 'RecoTracks'.
+    Reuslt is a store array containing reco tracks called 'RecoTracks'.
     :param sec_map_file: training data for segment network.
     :param path: basf2.Path
     :param use_pxd: if true use pxd hits. Default False.
@@ -485,7 +485,7 @@ def add_vxdtf_v2(path=None,
     segNetProducer.param('printNetworks', False)
     segNetProducer.param('addVirtualIP', False)
     segNetProducer.param('virtualIPCoorindates', [-40, 0, 0])
-    segNetProducer.param('sectorMapName', 'testMap')  # lowTestRedesign')
+    segNetProducer.param('sectorMapName', 'testbeamTEST')  # lowTestRedesign')
     segNetProducer.param('observerType', observerType)
     segNetProducer.logging.log_level = log_level  # LogLevel.DEBUG
     segNetProducer.logging.debug_level = debug_level
@@ -530,13 +530,11 @@ def add_vxdtf_v2(path=None,
     #################
 
     if filter_overlapping:
-        overlapResolver = register_module('SVDOverlapResolver')
-        overlapResolver.logging.log_level = log_level
-        overlapResolver.logging.debug_level = debug_level
-        overlapResolver.param('NameSpacePointTrackCands', '')
-        overlapResolver.param('ResolveMethod', overlap_filter.lower())
-        overlapResolver.param('NameSVDClusters', '')
-        modules.append(overlapResolver)
+        overlapNetworkProducer = register_module('SVDOverlapResolver')
+        overlapNetworkProducer.logging.log_level = log_level
+        overlapNetworkProducer.logging.debug_level = debug_level
+        overlapNetworkProducer.param('ResolveMethod', overlap_filter.lower())
+        modules.append(overlapNetworkProducer)
 
     #################
     # VXDTF2 Step 5

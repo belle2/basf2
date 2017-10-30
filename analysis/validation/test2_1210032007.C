@@ -60,88 +60,124 @@ void plot(TTree* ptree, TTree* pmctree, TFile *outputFile){
   ptree->Project("rec_mbc", "B_MCT_Mbc", sigCut);
   rec_mbc->GetXaxis()->SetTitle("M_{bc} (GeV/c^{2})");
 
-  TH1F* gen_deltae = new TH1F("gen_deltae","#DeltaE",100,-0.2,0.15);
+  TH1F* gen_deltae = new TH1F("gen_deltae","Generated value of #DeltaE",100,-0.2,0.15);
   pmctree->Project("gen_deltae", "B_deltaE");
   gen_deltae->GetXaxis()->SetTitle("#DeltaE (GeV)");
 
-  TH1F* true_deltae = new TH1F("true_deltae","#DeltaE",100,-0.2,0.15);
+  TH1F* true_deltae = new TH1F("true_deltae","Generated value for reconstructed candidates: #DeltaE",100,-0.2,0.15);
   ptree->Project("true_deltae", "B_MCT_deltaE", sigCut);
   true_deltae->GetXaxis()->SetTitle("#DeltaE (GeV)");
 
-  TH1F* rec_deltae = new TH1F("rec_deltae","#DeltaE",100,-0.2,0.15);
+  TH1F* rec_deltae = new TH1F("rec_deltae","#Reconstructed value of DeltaE",100,-0.2,0.15);
   ptree->Project("rec_deltae", "B_deltaE", sigCut);
   rec_deltae->GetXaxis()->SetTitle("#DeltaE (GeV)");
 
-  TH1F* gen_MK = new TH1F("gen_MK","M_{K*(892)^{+}}",100,0.792,0.992);
+  TH1F* gen_MK = new TH1F("gen_MK","Generated value of M_{K*(892)^{+}}",100,0.792,0.992);
   pmctree->Project("gen_MK", "B_MK");
   gen_MK->GetXaxis()->SetTitle("M_{K*(892)^{+}} (GeV/c^{2})");
 
-  TH1F* true_MK = new TH1F("true_MK","M_{K*(892)^{+}}",100,0.792,0.992);
+  TH1F* true_MK = new TH1F("true_MK","Generated value for reconstructed candidates: M_{K*(892)^{+}}",100,0.792,0.992);
   ptree->Project("true_MK", "B_MCT_MK", sigCut);
   true_MK->GetXaxis()->SetTitle("M_{K*(892)^{+}} (GeV/c^{2})");
 
-  TH1F* rec_MK = new TH1F("rec_MK","M_{K*(892)^{+}}",100,0.792,0.992);
+  TH1F* rec_MK = new TH1F("rec_MK","Reconstructed value of M_{K*(892)^{+}}",100,0.792,0.992);
   ptree->Project("rec_MK", "B_MK", sigCut);
   rec_MK->GetXaxis()->SetTitle("M_{K*(892)^{+}} (GeV/c^{2})");
 
-  TH1F* gen_MR = new TH1F("gen_MR","M_{#rho(770)^{0}}",100,0.5,1.05);
+  TH1F* gen_MR = new TH1F("gen_MR","Generated value of M_{#rho(770)^{0}}",100,0.5,1.05);
   pmctree->Project("gen_MR", "B_MR");
   gen_MR->GetXaxis()->SetTitle("M_{#rho(770)^{0}} (GeV/c^{2})");
 
-  TH1F* true_MR = new TH1F("true_MR","M_{#rho(770)^{0}}",100,0.5,1.05);
+  TH1F* true_MR = new TH1F("true_MR","Generated value for reconstructed candidates: M_{#rho(770)^{0}}",100,0.5,1.05);
   ptree->Project("true_MR", "B_MCT_MR", sigCut);
   true_MR->GetXaxis()->SetTitle("M_{#rho(770)^{0}} (GeV/c^{2})");
 
-  TH1F* rec_MR = new TH1F("rec_MR","M_{#rho(770)^{0}}",100,0.5,1.05);
+  TH1F* rec_MR = new TH1F("rec_MR","Reconstructed value of M_{#rho(770)^{0}}",100,0.5,1.05);
   ptree->Project("rec_MR", "B_MR", sigCut);
   rec_MR->GetXaxis()->SetTitle("M_{#rho(770)^{0}} (GeV/c^{2})");
 
-  TH1F* gen_helK = new TH1F("gen_helK","cos(#theta_{K^+#pi^0})",100,-1.,1.);
+  TH1F* gen_helK = new TH1F("gen_helK","Generated value of cos(#theta_{K^+#pi^0})",100,-1.,1.);
   pmctree->Project("gen_helK", "B_helK");
   gen_helK->GetXaxis()->SetTitle("cos(#theta_{K^+#pi^0})");
 
-  TH1F* true_helK = new TH1F("true_helK","cos(#theta_{K^+#pi^0})",100,-1.,1.);
+  TH1F* true_helK = new TH1F("true_helK","Generated value for reconstructed candidates: cos(#theta_{K^+#pi^0})",100,-1.,1.);
   ptree->Project("true_helK", "B_MCT_helK", sigCut);
   true_helK->GetXaxis()->SetTitle("cos(#theta_{K^+#pi^0})");
 
-  TH1F* rec_helK = new TH1F("rec_helK","cos(#theta_{K^+#pi^0})",100,-1.,1.);
+  TH1F* rec_helK = new TH1F("rec_helK","Reconstructed value of cos(#theta_{K^+#pi^0})",100,-1.,1.);
   ptree->Project("rec_helK", "B_helK", sigCut);
   rec_helK->GetXaxis()->SetTitle("cos(#theta_{K^+#pi^0})");
 
-  TH1F* gen_helR = new TH1F("gen_helR","cos(#theta_{#pi^+#pi^-})",100,-1.,1.);
+  TH1F* gen_helR = new TH1F("gen_helR","Generated value of cos(#theta_{#pi^+#pi^-})",100,-1.,1.);
   pmctree->Project("gen_helR", "B_helR");
   gen_helR->GetXaxis()->SetTitle("cos(#theta_{#pi^+#pi^-})");
 
-  TH1F* true_helR = new TH1F("true_helR","cos(#theta_{#pi^+#pi^-})",100,-1.,1.);
+  TH1F* true_helR = new TH1F("true_helR","Generated value for reconstructed candidates: cos(#theta_{#pi^+#pi^-})",100,-1.,1.);
   ptree->Project("true_helR", "B_MCT_helR", sigCut);
   true_helR->GetXaxis()->SetTitle("cos(#theta_{#pi^+#pi^-})");
 
-  TH1F* rec_helR = new TH1F("rec_helR","cos(#theta_{#pi^+#pi^-})",100,-1.,1.);
+  TH1F* rec_helR = new TH1F("rec_helR","Reconstructed value of cos(#theta_{#pi^+#pi^-})",100,-1.,1.);
   ptree->Project("rec_helR", "B_helR", sigCut);
   rec_helR->GetXaxis()->SetTitle("cos(#theta_{#pi^+#pi^-})");
 
   TNamed* mo_expert_nc = new TNamed("MetaOptions", "expert, nocompare");
   TNamed* mo_nc = new TNamed("MetaOptions", "expert, nocompare");
+  TNamed* contact = new TNamed("Contact", "ilya.komarov@desy.de");
 
   gen_mbc->GetListOfFunctions()->Add(mo_expert_nc);
+  gen_mbc->GetListOfFunctions()->Add(new TNamed("Description", gen_mbc->GetTitle()));
+  gen_mbc->GetListOfFunctions()->Add(contact);
   true_mbc->GetListOfFunctions()->Add(mo_expert_nc);
+  true_mbc->GetListOfFunctions()->Add(new TNamed("Description", true_mbc->GetTitle()));
+  true_mbc->GetListOfFunctions()->Add(contact);
   rec_mbc->GetListOfFunctions()->Add(mo_expert_nc);
+  rec_mbc->GetListOfFunctions()->Add(new TNamed("Description", rec_mbc->GetTitle()));
+  rec_mbc->GetListOfFunctions()->Add(contact);
   gen_deltae->GetListOfFunctions()->Add(mo_expert_nc);
+  gen_deltae->GetListOfFunctions()->Add(new TNamed("Description", gen_deltae->GetTitle()));
+  gen_deltae->GetListOfFunctions()->Add(contact);
   true_deltae->GetListOfFunctions()->Add(mo_expert_nc);
+  true_deltae->GetListOfFunctions()->Add(new TNamed("Description", true_deltae->GetTitle()));
+  true_deltae->GetListOfFunctions()->Add(contact);
   rec_deltae->GetListOfFunctions()->Add(mo_expert_nc);
+  rec_deltae->GetListOfFunctions()->Add(new TNamed("Description", rec_deltae->GetTitle()));
+  rec_deltae->GetListOfFunctions()->Add(contact);
   gen_MK->GetListOfFunctions()->Add(mo_expert_nc);
+  gen_MK->GetListOfFunctions()->Add(new TNamed("Description", gen_MK->GetTitle()));
+  gen_MK->GetListOfFunctions()->Add(contact);
   true_MK->GetListOfFunctions()->Add(mo_expert_nc);
+  true_MK->GetListOfFunctions()->Add(new TNamed("Description", true_MK->GetTitle()));
+  true_MK->GetListOfFunctions()->Add(contact);
   rec_MK->GetListOfFunctions()->Add(mo_expert_nc);
+  rec_MK->GetListOfFunctions()->Add(new TNamed("Description", rec_MK->GetTitle()));
+  rec_MK->GetListOfFunctions()->Add(contact);
   gen_MR->GetListOfFunctions()->Add(mo_expert_nc);
+  gen_MR->GetListOfFunctions()->Add(new TNamed("Description", gen_MR->GetTitle()));
+  gen_MR->GetListOfFunctions()->Add(contact);
   true_MR->GetListOfFunctions()->Add(mo_expert_nc);
+  true_MR->GetListOfFunctions()->Add(new TNamed("Description", true_MR->GetTitle()));
+  true_MR->GetListOfFunctions()->Add(contact);
   rec_MR->GetListOfFunctions()->Add(mo_expert_nc);
+  rec_MR->GetListOfFunctions()->Add(new TNamed("Description", rec_MR->GetTitle()));
+  rec_MR->GetListOfFunctions()->Add(contact);
   gen_helK->GetListOfFunctions()->Add(mo_expert_nc);
+  gen_helK->GetListOfFunctions()->Add(new TNamed("Description", gen_helK->GetTitle()));
+  gen_helK->GetListOfFunctions()->Add(contact);
   true_helK->GetListOfFunctions()->Add(mo_expert_nc);
+  true_helK->GetListOfFunctions()->Add(new TNamed("Description", true_helK->GetTitle()));
+  true_helK->GetListOfFunctions()->Add(contact);
   rec_helK->GetListOfFunctions()->Add(mo_nc);
+  rec_helK->GetListOfFunctions()->Add(new TNamed("Description", rec_helK->GetTitle()));
+  rec_helK->GetListOfFunctions()->Add(contact);
   gen_helR->GetListOfFunctions()->Add(mo_expert_nc);
+  gen_helR->GetListOfFunctions()->Add(new TNamed("Description", gen_helR->GetTitle()));
+  gen_helR->GetListOfFunctions()->Add(contact);
   true_helR->GetListOfFunctions()->Add(mo_expert_nc);
+  true_helR->GetListOfFunctions()->Add(new TNamed("Description", true_helR->GetTitle()));
+  true_helR->GetListOfFunctions()->Add(contact);
   rec_helR->GetListOfFunctions()->Add(mo_nc);
-
+  rec_helR->GetListOfFunctions()->Add(new TNamed("Description", rec_helR->GetTitle()));
+  rec_helR->GetListOfFunctions()->Add(contact);
   outputFile->cd();
   gen_mbc->Write();
   true_mbc->Write();

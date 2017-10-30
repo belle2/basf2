@@ -7,7 +7,8 @@
 */
 
 ////////////////////////////////////////////////////////////
-//
+// D+ -> pi+pi0
+// Validation_DpToPipPiz.C
 // test2_2110012000.C
 // Check 
 //
@@ -26,11 +27,21 @@ void plotStd(TFile* pfile, TTree* ptree, TFile *outputFile){
   TString tmCuts("(D_isSignal == 1)");
 
   TH1F* h_D_p = new TH1F("h_D_p","D+ momentum",100,0,7);
+  h_D_p->GetListOfFunctions()->Add(new TNamed("Description", "D+ -> pi+pi0, Momentum of D+"));
+  h_D_p->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
+  h_D_p->GetListOfFunctions()->Add(new TNamed("Check", "Momentum of D+ vary from 0 - 7.0 GeV/c^{2}"));
   ptree->Project("h_D_p", "D_P", tmCuts);
 
   TH1F* h_pip_p = new TH1F("h_pip_p","pi+ momentum",100,0,6);
+  h_D_p->GetListOfFunctions()->Add(new TNamed("Description", "D+ -> pi+pi0, Momentum of pi+"));
+  h_D_p->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
+  h_D_p->GetListOfFunctions()->Add(new TNamed("Check", "Momentum of pi+ should vary from 0 - 6.0 GeV/c^{2}"));
   ptree->Project("h_pip_p", "D_pi_P", tmCuts);
+
   TH1F* h_piz_p = new TH1F("h_piz_p","pi0 momentum",100,0,5);
+  h_D_p->GetListOfFunctions()->Add(new TNamed("Description", "D+ -> pi+pi0, Momentum of pi0"));
+  h_D_p->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
+  h_D_p->GetListOfFunctions()->Add(new TNamed("Check", "Momentum of pi0 should vary from 0 - 5.0 GeV/c^{2}"));
   ptree->Project("h_piz_p", "D_pi0_P", tmCuts);
 
   outputFile->cd();
@@ -51,13 +62,22 @@ void plotTrack(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_pi_d0 = new TH2F("h_pi_d0VSpt","d0 error vs transverse momentum",100,0,4,100,0,0.1);
   ptree->Project("h_pi_d0VSpt","D_pi_d0err:sqrt(D_pi_P4[0]*D_pi_P4[0] + D_pi_P4[1]*D_pi_P4[1])",cuts);
   TProfile * pfx_pi_d0 = h_pi_d0->ProfileX("hprof_pi_d0");
+  pfx_pi_d0->GetListOfFunctions()->Add(new TNamed("Description", "D+ -> pi+pi0, hist->GetTitle()"));
+  pfx_pi_d0->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
+  pfx_pi_d0->GetListOfFunctions()->Add(new TNamed("Check", "ProjectionX of d0 error vs transverse momentum for pion"));
 
   h_pi_z0 = new TH2F("h_pi_z0VSpt","z0 error vs transverse momentum",100,0,4,100,0,0.1);
   ptree->Project("h_pi_z0VSpt","D_pi_z0err:sqrt(D_pi_P4[0]*D_pi_P4[0] + D_pi_P4[1]*D_pi_P4[1])",cuts);
   TProfile * pfx_pi_z0 = h_pi_z0->ProfileX("hprof_pi_z0");
+  pfx_pi_z0->GetListOfFunctions()->Add(new TNamed("Description", "D+ -> pi+pi0, hist->GetTitle()"));
+  pfx_pi_z0->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
+  pfx_pi_z0->GetListOfFunctions()->Add(new TNamed("Check", "ProjectionX of z0 error vs transverse momentum for pion"));
 
   h_pi_pVal = new TH1F("h_pi_pVal", "pVal pion", 100, 0 , 1 );
   ptree->Project("h_pi_pVal", "D_pi_TrPval",cuts);
+  h_pi_pVal->GetListOfFunctions()->Add(new TNamed("Description", "D+ -> pi+pi0, hist->GetTitle()"));
+  h_pi_pVal->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
+  h_pi_pVal->GetListOfFunctions()->Add(new TNamed("Check", "pVal of pion, vary from 0-1"));
   
   
   outputFile->cd();

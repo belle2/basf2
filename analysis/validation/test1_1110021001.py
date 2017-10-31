@@ -60,7 +60,7 @@ tools += ['Kinematics', '^B0:sig -> [^K*0:kpi -> ^K+:99eff ^pi-:99eff] ^gamma:lo
 tools += ['InvMass', '^B0:sig -> [^K*0:kpi -> K+:99eff pi-:99eff] gamma:loose']
 tools += ['DeltaEMbc', '^B0:sig -> [K*0:kpi -> K+:99eff pi-:99eff] gamma:loose']
 variables.addAlias("Egamma", "useRestFrame(daughter(1,E))")
-tools += ['CustomFloats[Egamma]', '^B0:sig -> [K*0:kpi -> K+:99eff pi-:99eff]] gamma:loose']
+tools += ['CustomFloats[Egamma]', '^B0:sig -> [K*0:kpi -> K+:99eff pi-:99eff] gamma:loose']
 
 
 # write out the flat ntuple

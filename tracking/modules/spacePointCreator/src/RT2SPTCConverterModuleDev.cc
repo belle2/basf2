@@ -159,7 +159,7 @@ void RT2SPTCConverterModule::event()
         m_npass++;
         if (m_noKickOutput) {
           m_momSel->Fill(recoTrack.getMomentumSeed().Mag());
-          m_PDGIDCut->Fill(recoTrack.getRelationsTo<MCParticle>()[0]->getPDG());
+          m_PDGIDSel->Fill(recoTrack.getRelationsTo<MCParticle>()[0]->getPDG());
         }
       }
     }

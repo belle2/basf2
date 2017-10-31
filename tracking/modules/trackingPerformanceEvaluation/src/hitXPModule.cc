@@ -33,6 +33,11 @@ hitXPModule::hitXPModule() : Module()
 {
   setDescription("This module builds a ttree with true hit informations (momentum, position). Track parameters hit per hit are accessible too.");
 
+  /** write validation plots */
+  addParam("additionalTree", c_addTree,
+           "produce two additional tree with reduced date: selTree (track with at least one hit per layer), tiSelTree (track with one hit per layer)",
+           false);
+
 }
 
 
@@ -87,7 +92,7 @@ void hitXPModule::initialize()
   //-------------------------------------------------------------------------------------------------//
   //------------------------------------selected Tree creation--------------------------------------//
   //-------------------------------------------------------------------------------------------------//
-  m_outputFileSel = new TFile("TFile_hitXPSel.root", "RECREATE");
+  if (c_addTree) m_outputFileSel = new TFile("TFile_hitXPSel.root", "RECREATE");
   m_treeSel = new TTree("TTree_hitXPSel", "TTree_hitXPSel");
 
   m_treeSel->Branch("hitXP", &m_hitXPSel);
@@ -99,7 +104,7 @@ void hitXPModule::initialize()
   //-------------------------------------------------------------------------------------------------//
   //------------------------------------tight selected Tree creation--------------------------------------//
   //-------------------------------------------------------------------------------------------------//
-  m_outputFileTiSel = new TFile("TFile_hitXPTiSel.root", "RECREATE");
+  if (c_addTree) m_outputFileTiSel = new TFile("TFile_hitXPTiSel.root", "RECREATE");
   m_treeTiSel = new TTree("TTree_hitXPTiSel", "TTree_hitXPTiSel");
 
   m_treeTiSel->Branch("hitXP", &m_hitXPTiSel);
@@ -377,20 +382,22 @@ void hitXPModule::endRun()
   m_tree->Write();
   m_outputFile->Close();
 
-  //-------------------------------------------------------------------------------------------------//
-  //------------------------------------selected Tree storage--------------------------------------//
-  //-------------------------------------------------------------------------------------------------//
-  m_outputFileSel->cd();
-  m_treeSel->Write();
-  m_outputFileSel->Close();
+  if (c_addTree) {
+    //-------------------------------------------------------------------------------------------------//
+    //------------------------------------selected Tree storage--------------------------------------//
+    //-------------------------------------------------------------------------------------------------//
+    m_outputFileSel->cd();
+    m_treeSel->Write();
+    m_outputFileSel->Close();
 
 
-  //-------------------------------------------------------------------------------------------------//
-  //------------------------------------tight selected Tree storage--------------------------------------//
-  //-------------------------------------------------------------------------------------------------//
-  m_outputFileTiSel->cd();
-  m_treeTiSel->Write();
-  m_outputFileTiSel->Close();
+    //-------------------------------------------------------------------------------------------------//
+    //------------------------------------tight selected Tree storage--------------------------------------//
+    //-------------------------------------------------------------------------------------------------//
+    m_outputFileTiSel->cd();
+    m_treeTiSel->Write();
+    m_outputFileTiSel->Close();
+  }
 
 
   //-------------------------------------------------------------------------------------------------//

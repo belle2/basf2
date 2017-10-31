@@ -42,18 +42,11 @@ DigitBase::EAppendStatus CDCHit::addBGDigit(const DigitBase* bg)
   if (diff < 0) {
     *this = *bgDigit;
     auto relSimHits = this->getRelationsFrom<CDCSimHit>();
-    if (relSimHits.size() > 1) {
-      B2WARNING("CDCHit addBGDigit : Number of relations between CDCHit and CDCSimHit = " << relSimHits.size());
-    }
-    for (size_t i = 0; i < relSimHits.size(); ++i) {
+    for (int i = relSimHits.size() - 1; i >= 0; --i) {
       relSimHits.remove(i);
     }
     auto relMCParticles = this->getRelationsFrom<MCParticle>();
-
-    if (relMCParticles.size() > 1) {
-      B2WARNING("CDCHit addBGDigit : Number of relations between CDCHit and MCParticle = " << relMCParticles.size());
-    }
-    for (size_t i = 0; i < relMCParticles.size(); ++i) {
+    for (int i = relMCParticles.size() - 1; i >= 0; --i) {
       relMCParticles.remove(i);
     }
   }

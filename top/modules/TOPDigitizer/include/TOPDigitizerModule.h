@@ -86,10 +86,15 @@ namespace Belle2 {
     bool m_useWaveforms = false; /**< if true, use full waveform digitization */
     bool m_useDatabase = false;  /**< if true, use sample times from database */
     bool m_simulateTTS = true; /**< if true, add TTS to simulated hits */
+    bool m_allChannels = false; /**< if true, always make waveforms for all channels */
+    unsigned m_storageDepth = 0;           /**< ASIC analog storage depth */
 
     // other
     TOPSampleTimes m_sampleTimes; /**< equidistant sample times */
     DBObjPtr<TOPCalTimebase>* m_timebase = 0; /**< sample times from database */
+    double m_timeMin = 0; /**< time range limit: minimal time */
+    double m_timeMax = 0; /**< time range limit: maximal time */
+
 
 
   };

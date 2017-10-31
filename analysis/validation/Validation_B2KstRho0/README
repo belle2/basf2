@@ -14,11 +14,13 @@ Validation consist of two steps: production of nTuples and nTuple analysis
 
     b.  Go to Rec/ directory and submit gb2 jobs:
         > cd Rec
-        > gbasf2 RecMC9_Bu_Rho0Kst+_K+pi0.py -i /belle/MC/prerelease-00-09-00b/DBxxxxxxxx/MC9/prod00002146/s00/e0000/4S/r00000/1210032008/sub00 -f aliases.py BTools.py -p MC9_Kpi0_T -s prerelease-00-09-00b
-        > gbasf2 RecMC9_Bu_Rho0Kst+_K+pi0.py -i /belle/MC/prerelease-00-09-00b/DBxxxxxxxx/MC9/prod00002145/s00/e0000/4S/r00000/1210032007/sub00  -f aliases.py BTools.py -p MC9_Kpi0_L -s prerelease-00-09-00b
+        > gbasf2 RecMC9_Bu_Rho0Kst+_K+pi0.py -i /belle/MC/release-00-09-01/DB00000276/MC9/prod00002457/e0000/4S/r00000/1210032008/sub00 -f aliases.py BTools.py -p MC9bg1_Kpi0_T -s release-00-09-01
+        > gbasf2 RecMC9_Bu_Rho0Kst+_K+pi0.py -i /belle/MC/release-00-09-01/DB00000276/MC9/prod00002456/e0000/4S/r00000/1210032007/sub00  -f aliases.py BTools.py -p MC9bg1_Kpi0_L -s release-00-09-01
         N.B. Scripts might vary from release to release.
         MC9 Transverse:   /belle/MC/prerelease-00-09-00b/DBxxxxxxxx/MC9/prod00002146/s00/e0000/4S/r00000/1210032008/sub00
         MC9 Longitudinal: /belle/MC/prerelease-00-09-00b/DBxxxxxxxx/MC9/prod00002145/s00/e0000/4S/r00000/1210032007/sub00 
+        MC9 Transverse BG1x:   /belle/MC/release-00-09-01/DB00000276/MC9/prod00002457/e0000/4S/r00000/1210032008/sub00  
+        MC9 Longitudinal BG1x: /belle/MC/release-00-09-01/DB00000276/MC9/prod00002456/e0000/4S/r00000/1210032007/sub00  
 
     b'. For prerelease, no need to use gbasf2, just use basf2:
         > cd Rec
@@ -30,12 +32,12 @@ Validation consist of two steps: production of nTuples and nTuple analysis
         In this case, skip sub-steps c and d and go straight to step 2
 
     c.  Once jobs are completed, download otuput tuples:
-        > gb2_ds_get /belle/user/$USER/MC9_Kpi0_T
-        > gb2_ds_get /belle/user/$USER/MC9_Kpi0_L
+        > gb2_ds_get /belle/user/$USER/MC9bg1_Kpi0_T
+        > gb2_ds_get /belle/user/$USER/MC9bg1_Kpi0_L
 
     d.  Merge outputs:
-        > hadd Bu_Rho0Kst+_K+pi0_Transverse.root MC9_Kpi0_T/*.root
-        > hadd Bu_Rho0Kst+_K+pi0_Longitudinal.root MC9_Kpi0_L/*.root
+        > hadd Bu_Rho0Kst+_K+pi0_Transverse.root MC9bg1_Kpi0_T/*.root
+        > hadd Bu_Rho0Kst+_K+pi0_Longitudinal.root MC9bg1_Kpi0_L/*.root
         > hadd Bu_Rho0Kst+_K+pi0.root Bu_Rho0Kst+_K+pi0_Transverse.root Bu_Rho0Kst+_K+pi0_Longitudinal.root
 
     N.B. As a result of this step, you will have Bu_Rho0Kst+_K+pi0_Transverse.root and Bu_Rho0Kst+_K+pi0_Longitudinal.root stred in Rec/ direcotry.

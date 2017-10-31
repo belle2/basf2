@@ -2,7 +2,7 @@
 <header>
 <input>../2610030000.ntup.root</input>
 <output>2610030000_Validation.root</output>
-<contact>Jake Bennett; jvbennett@cmu.edu</contact>
+<contact>Yeqi Chen; chenyq15@mail.ustc.edu.cn</contact>
 </header>
 */
 

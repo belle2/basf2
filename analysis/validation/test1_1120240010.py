@@ -38,7 +38,6 @@ matchMCTruth('K*0:Kpi')
 # reconstruct B0:sig
 reconstructDecay('B0:sig -> K*0:Kpi e+:99eff e-:99eff', '4.8 < M < 5.8')
 matchMCTruth('B0:sig')
-applyCuts('B0:sig', 'isSignal==1')  # force isSignal, as only for validation
 
 # --------------------------------------------------
 # write out useful information to a ROOT file

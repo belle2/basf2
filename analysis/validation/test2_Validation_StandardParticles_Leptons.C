@@ -56,10 +56,17 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree, TFile* 
   TString lepttruthpi("abs("+leptpibranch+"_mcPDG)==211 && "+jpsicuts);
 
   const int pdiv = 6; // number of momentum ranges to test
-  TGraph pcutgr[pdiv], picutgr[pdiv], kcutgr[pdiv], 
-         mucutgr[pdiv], ecutgr[pdiv];
-  TGraph ppigr[pdiv], pkgr[pdiv], pikgr[pdiv], kpigr[pdiv], 
-         mupigr[pdiv], epigr[pdiv];
+  TGraph* pcutgr[pdiv];
+  TGraph* picutgr[pdiv];
+  TGraph* kcutgr[pdiv];
+  TGraph* mucutgr[pdiv];
+  TGraph* ecutgr[pdiv];
+  TGraph* ppigr[pdiv];
+  TGraph* pkgr[pdiv];
+  TGraph* pikgr[pdiv];
+  TGraph* kpigr[pdiv];
+  TGraph* mupigr[pdiv];
+  TGraph* epigr[pdiv];
 
   const int piddiv = 20; // number of PID cuts to test (divisions in ROC plots)
   double cutvalue[piddiv];
@@ -72,16 +79,15 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree, TFile* 
 
 
   // ---------- Momentum distributions (for efficiency determination) ----------
-  for( int j = 0; j <= 5; ++j ){
+  for ( int j = 0; j <= 5; ++j ){
     TString range = TString::Format("100,0.05,%f",j*1.0);
-    if( j == 0 ) range = TString::Format("100,1.0,2.0");
-    else if( j == 5 ) range = TString::Format("100,1.0,4.0");
+    if ( j == 0 ) range = TString::Format("100,1.0,2.0");
+    else if ( j == 5 ) range = TString::Format("100,1.0,4.0");
 
     // check different PID cuts
-    for( int i = 0; i < piddiv; ++i ){
+    for ( int i = 0; i < piddiv; ++i ){
       pidcut = TString::Format("%f",binwidth*i);
-      if( j == 0 )
-	cutvalue[i] = binwidth*i;
+      if ( j == 0 ) cutvalue[i] = binwidth*i;
 
       // ---------- Momentum distributions (for efficiency determination) ----------
       // protons
@@ -124,7 +130,7 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree, TFile* 
 
       // muons
       eemmfile->cd();
-      if( j == 5 ) range = TString::Format("100,0.8,4.0");
+      if ( j == 5 ) range = TString::Format("100,0.8,4.0");
       mutree->Project("hmuall("+range+")",mubranch+"_P",mucuts);
       mutree->Project("hmuacc("+range+")",mubranch+"_P",mubranch+"_"+PIDmu+">"+pidcut+"&&"+mucuts);
       //select from jpsi sample particles that pass the muon ID but are actually pions (I use the Ks side of the decay for this)
@@ -135,7 +141,7 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree, TFile* 
       mueff[i] = hmuacc->Integral()/hmuall->Integral();
       pimufake[i] = hpimufake->Integral()/hmuall->Integral();
       // electrons
-      if( j == 5 ) range = TString::Format("100,0.5,4.0");
+      if ( j == 5 ) range = TString::Format("100,0.5,4.0");
       etree->Project("heall("+range+")",ebranch+"_P",ecuts);
       etree->Project("heacc("+range+")",ebranch+"_P",ebranch+"_"+PIDe+">"+pidcut+"&&"+ecuts);
       //select from jpsi sample particles that pass the electron ID but are actually pions (I use the Ks side of the decay for this)
@@ -148,19 +154,19 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree, TFile* 
     }
 
     // PID cut vs efficiency to determine benchmarks
-    pcutgr[j] = TGraph(piddiv,peff,cutvalue);
-    picutgr[j] = TGraph(piddiv,pieff,cutvalue);
-    kcutgr[j] = TGraph(piddiv,keff,cutvalue);
-    mucutgr[j] = TGraph(piddiv,mueff,cutvalue);
-    ecutgr[j] = TGraph(piddiv,eeff,cutvalue);
+    pcutgr[j] = new TGraph(piddiv,peff,cutvalue);
+    picutgr[j] = new TGraph(piddiv,pieff,cutvalue);
+    kcutgr[j] = new TGraph(piddiv,keff,cutvalue);
+    mucutgr[j] = new TGraph(piddiv,mueff,cutvalue);
+    ecutgr[j] = new TGraph(piddiv,eeff,cutvalue);
 
     // ROC plots to determine fake rates
-    ppigr[j] = TGraph(piddiv,peff,pipfake);
-    pkgr[j]  = TGraph(piddiv,peff,kpfake);
-    pikgr[j] = TGraph(piddiv,pieff,kpifake);
-    kpigr[j] = TGraph(piddiv,keff,pikfake);
-    mupigr[j] = TGraph(piddiv,mueff,pimufake);
-    epigr[j] = TGraph(piddiv,eeff,piefake);
+    ppigr[j] = new TGraph(piddiv,peff,pipfake);
+    pkgr[j]  = new TGraph(piddiv,peff,kpfake);
+    pikgr[j] = new TGraph(piddiv,pieff,kpifake);
+    kpigr[j] = new TGraph(piddiv,keff,pikfake);
+    mupigr[j] = new TGraph(piddiv,mueff,pimufake);
+    epigr[j] = new TGraph(piddiv,eeff,piefake);
   }
 
   TFile* outputFile = new TFile("standardParticlesValidation.root","RECREATE");
@@ -183,18 +189,18 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree, TFile* 
   TH1F* hepifake  = new TH1F("hepifake","e/#pi fake rate",4,0,4);
 
   for( int i = 0; i < 4; ++i ){
-    hpcut->SetBinContent(i+1,pcutgr[5].Eval(xbinval[i]));
-    hpicut->SetBinContent(i+1,picutgr[5].Eval(xbinval[i]));
-    hkcut->SetBinContent(i+1,kcutgr[5].Eval(xbinval[i]));
-    hmucut->SetBinContent(i+1,mucutgr[5].Eval(xbinval[i]));
-    hecut->SetBinContent(i+1,ecutgr[5].Eval(xbinval[i]));
+    hpcut->SetBinContent(i+1,pcutgr[5]->Eval(xbinval[i]));
+    hpicut->SetBinContent(i+1,picutgr[5]->Eval(xbinval[i]));
+    hkcut->SetBinContent(i+1,kcutgr[5]->Eval(xbinval[i]));
+    hmucut->SetBinContent(i+1,mucutgr[5]->Eval(xbinval[i]));
+    hecut->SetBinContent(i+1,ecutgr[5]->Eval(xbinval[i]));
 
-    hppifake->SetBinContent(i+1,ppigr[5].Eval(xbinval[i]));
-    hpkfake->SetBinContent(i+1,pkgr[5].Eval(xbinval[i]));
-    hpikfake->SetBinContent(i+1,pikgr[5].Eval(xbinval[i]));
-    hkpifake->SetBinContent(i+1,kpigr[5].Eval(xbinval[i]));
-    hmupifake->SetBinContent(i+1,mupigr[5].Eval(xbinval[i]));
-    hepifake->SetBinContent(i+1,epigr[5].Eval(xbinval[i]));
+    hppifake->SetBinContent(i+1,ppigr[5]->Eval(xbinval[i]));
+    hpkfake->SetBinContent(i+1,pkgr[5]->Eval(xbinval[i]));
+    hpikfake->SetBinContent(i+1,pikgr[5]->Eval(xbinval[i]));
+    hkpifake->SetBinContent(i+1,kpigr[5]->Eval(xbinval[i]));
+    hmupifake->SetBinContent(i+1,mupigr[5]->Eval(xbinval[i]));
+    hepifake->SetBinContent(i+1,epigr[5]->Eval(xbinval[i]));
 
     hpcut->GetXaxis()->SetBinLabel(i+1,xlabel[i]);
     hpicut->GetXaxis()->SetBinLabel(i+1,xlabel[i]);
@@ -289,23 +295,23 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree, TFile* 
   mupimg->SetTitle("mupimg");
   TMultiGraph *epimg = new TMultiGraph();  
   epimg->SetTitle("epimg");
-  for( int i = 0; i <= 5; ++i ){
+  for ( int i = 0; i <= 5; ++i ){
     //    c->cd(1);
-    mucutgr[i].SetMarkerStyle(20);
-    mucutgr[i].SetMarkerColor(i+2);
-    mucutmg->Add(&mucutgr[i]);
+    mucutgr[i]->SetMarkerStyle(20);
+    mucutgr[i]->SetMarkerColor(i+2);
+    mucutmg->Add(mucutgr[i]);
     //    c->cd(2);
-    ecutgr[i].SetMarkerStyle(20);
-    ecutgr[i].SetMarkerColor(i+2);
-    ecutmg->Add(&ecutgr[i]);
+    ecutgr[i]->SetMarkerStyle(20);
+    ecutgr[i]->SetMarkerColor(i+2);
+    ecutmg->Add(ecutgr[i]);
     //    c->cd(3);
-    mupigr[i].SetMarkerStyle(20);
-    mupigr[i].SetMarkerColor(i+2);
-    mupimg->Add(&mupigr[i]);
+    mupigr[i]->SetMarkerStyle(20);
+    mupigr[i]->SetMarkerColor(i+2);
+    mupimg->Add(mupigr[i]);
     //    c->cd(4);
-    epigr[i].SetMarkerStyle(20);
-    epigr[i].SetMarkerColor(i+2);
-    epimg->Add(&epigr[i]);
+    epigr[i]->SetMarkerStyle(20);
+    epigr[i]->SetMarkerColor(i+2);
+    epimg->Add(epigr[i]);
   }
   c->cd(1);
   mucutmg->Draw("APL");
@@ -320,7 +326,7 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree, TFile* 
   c->SaveAs("lepton_roc.pdf");
 }
 
-void test2_Validation_StandardParticles_withLeptons(){
+void test2_Validation_StandardParticles_Leptons(){
 
   // pion, kaon, and proton samples
   TString pikfile("../ana-dstars.root");

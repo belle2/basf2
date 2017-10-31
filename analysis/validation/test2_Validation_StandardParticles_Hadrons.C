@@ -43,8 +43,13 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   TString pcuts(selectionCuts+"&&"+xiCuts);
 
   const int pdiv = 6; // number of momentum ranges to test
-  TGraph pcutgr[pdiv], picutgr[pdiv], kcutgr[pdiv];
-  TGraph ppigr[pdiv], pkgr[pdiv], pikgr[pdiv], kpigr[pdiv];
+  TGraph* pcutgr[pdiv];
+  TGraph* picutgr[pdiv];
+  TGraph* kcutgr[pdiv];
+  TGraph* ppigr[pdiv];
+  TGraph* pkgr[pdiv];
+  TGraph* pikgr[pdiv];
+  TGraph* kpigr[pdiv];
 
   const int piddiv = 20; // number of PID cuts to test (divisions in ROC plots)
   double cutvalue[piddiv];
@@ -54,16 +59,15 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   double peff[piddiv], ppifake[piddiv];
 
   // ---------- Momentum distributions (for efficiency determination) ----------
-  for( int j = 0; j <= 5; ++j ){
+  for ( int j = 0; j <= pdiv; ++j ){
     TString range = TString::Format("100,0.05,%f",j*1.0);
-    if( j == 0 ) range = TString::Format("100,1.0,2.0");
-    else if( j == 5 ) range = TString::Format("100,1.0,4.0");
+    if ( j == 0 ) range = TString::Format("100,1.0,2.0");
+    else if ( j == pdiv - 1 ) range = TString::Format("100,1.0,4.0");
 
     // check different PID cuts
-    for( int i = 0; i < piddiv; ++i ){
+    for ( int i = 0; i < piddiv; ++i ){
       pidcut = TString::Format("%f",binwidth*i);
-      if( j == 0 )
-	cutvalue[i] = binwidth*i;
+      if ( j == 0 ) cutvalue[i] = binwidth*i;
 
       // ---------- Momentum distributions (for efficiency determination) ----------
       // protons
@@ -106,15 +110,15 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
     }
 
     // PID cut vs efficiency to determine benchmarks
-    pcutgr[j] = TGraph(piddiv,peff,cutvalue);
-    picutgr[j] = TGraph(piddiv,pieff,cutvalue);
-    kcutgr[j] = TGraph(piddiv,keff,cutvalue);
+    pcutgr[j] = new TGraph(piddiv,peff,cutvalue);
+    picutgr[j] = new TGraph(piddiv,pieff,cutvalue);
+    kcutgr[j] = new TGraph(piddiv,keff,cutvalue);
 
     // ROC plots to determine fake rates
-    ppigr[j] = TGraph(piddiv,peff,pipfake);
-    pkgr[j]  = TGraph(piddiv,peff,kpfake);
-    pikgr[j] = TGraph(piddiv,pieff,kpifake);
-    kpigr[j] = TGraph(piddiv,keff,pikfake);
+    ppigr[j] = new TGraph(piddiv,peff,pipfake);
+    pkgr[j]  = new TGraph(piddiv,peff,kpfake);
+    pikgr[j] = new TGraph(piddiv,pieff,kpifake);
+    kpigr[j] = new TGraph(piddiv,keff,pikfake);
   }
 
   TFile* outputFile = new TFile("standardParticlesValidation.root","RECREATE");
@@ -123,6 +127,7 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   const char* xlabel[] = {"85%","90%","95%","99%"};
   const double xbinval[] = {0.85,0.90,0.95,0.99};
 
+  // FIXME What is this magic number 4?
   TH1F* hpcut  = new TH1F("hpcut","PID_p cut efficiency",4,0,4);
   TH1F* hpicut = new TH1F("hpicut","PID_pi cut efficiency",4,0,4);
   TH1F* hkcut  = new TH1F("hkcut","PID_k cut efficiency",4,0,4);
@@ -133,14 +138,14 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   TH1F* hkpifake  = new TH1F("hkpifake","K/#pi fake rate",4,0,4);
 
   for( int i = 0; i < 4; ++i ){
-    hpcut->SetBinContent(i+1,pcutgr[5].Eval(xbinval[i]));
-    hpicut->SetBinContent(i+1,picutgr[5].Eval(xbinval[i]));
-    hkcut->SetBinContent(i+1,kcutgr[5].Eval(xbinval[i]));
+    hpcut->SetBinContent(i+1,pcutgr[5]->Eval(xbinval[i]));
+    hpicut->SetBinContent(i+1,picutgr[5]->Eval(xbinval[i]));
+    hkcut->SetBinContent(i+1,kcutgr[5]->Eval(xbinval[i]));
 
-    hppifake->SetBinContent(i+1,ppigr[5].Eval(xbinval[i]));
-    hpkfake->SetBinContent(i+1,pkgr[5].Eval(xbinval[i]));
-    hpikfake->SetBinContent(i+1,pikgr[5].Eval(xbinval[i]));
-    hkpifake->SetBinContent(i+1,kpigr[5].Eval(xbinval[i]));
+    hppifake->SetBinContent(i+1,ppigr[5]->Eval(xbinval[i]));
+    hpkfake->SetBinContent(i+1,pkgr[5]->Eval(xbinval[i]));
+    hpikfake->SetBinContent(i+1,pikgr[5]->Eval(xbinval[i]));
+    hkpifake->SetBinContent(i+1,kpigr[5]->Eval(xbinval[i]));
 
     hpcut->GetXaxis()->SetBinLabel(i+1,xlabel[i]);
     hpicut->GetXaxis()->SetBinLabel(i+1,xlabel[i]);
@@ -200,7 +205,7 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   outputFile->Close();
 }
 
-void test2_Validation_StandardParticles(){
+void test2_Validation_StandardParticles_Hadrons(){
 
   // pion, kaon, and proton samples
   TString pikfile("../ana-dstars.root");

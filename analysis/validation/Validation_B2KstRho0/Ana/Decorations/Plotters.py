@@ -7,7 +7,10 @@ from ROOT import TFile, TCanvas, TH1F, TH2F, TGaxis, TStyle, TProfile
 from ROOT import gROOT, gStyle, gPad
 import os
 import sys
-import pathlib
+import inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir)
 from Global.fit_variables import fit_variables
 from Global.selection_variables import *
 from Global.cuts import *

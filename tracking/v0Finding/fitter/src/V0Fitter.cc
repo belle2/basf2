@@ -227,7 +227,6 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     return false;
   }
 
-  //bug fix: update the tracks (genfit::MeasuredStateOnPlane) after vertex
   stPlus = gfTrackPlus.getFittedState();
   stMinus = gfTrackMinus.getFittedState();
 
@@ -241,7 +240,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   lv0.SetVectM(tr0->getMom(), trackHypotheses.first.getMass());
   lv1.SetVectM(tr1->getMom(), trackHypotheses.second.getMass());
 
-  // Apply cuts.  We have one set of cuts inside the beam pipe,
+  // Apply cuts. We have one set of cuts inside the beam pipe,
   // the other outside.
   if (posVert.Perp() < m_beamPipeRadius) {
     return false;
@@ -260,8 +259,8 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     return false;
   }
 
-  //const double Bz = getBzAtVertex(posVert);
-  //bug fix: to build the trackFitResult use the magnetic field at the origin
+  // The helix is extrapolated to the IP in a constant magnetic field and material effects are neglected
+  // so that the vertexing tool executed on the MDST object will find again this vertex position
   const TVector3 origin(0, 0, 0);
   const double Bz = getBzAtVertex(origin);
 

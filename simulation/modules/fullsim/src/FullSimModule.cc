@@ -30,6 +30,8 @@
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
 
+#include <simulation/monopoles/G4MonopolePhysics.h>
+
 #include <G4TransportationManager.hh>
 #include <G4Transportation.hh>
 #include <G4VUserPhysicsList.hh>
@@ -60,6 +62,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Simulation;
+using namespace Belle2::Monopoles;
 using namespace G4InuclParticleNames;
 
 //-----------------------------------------------------------------
@@ -93,6 +96,8 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("EmProcessVerbosity", m_emProcessVerbosity, "Em Process verbosity: 0=Silent; 1=info level; 2=debug level", 0);
   addParam("PhysicsList", m_physicsList, "The name of the physics list which is used for the simulation.", string("FTFP_BERT"));
   addParam("RegisterOptics", m_optics, "If true, G4OpticalPhysics is registered in Geant4 PhysicsList.", true);
+  addParam("MonopoleDefinition", m_monopoleDefinition, "Definition of the monopole. If not empty, registers its physics list",
+           string(""));
   addParam("ProductionCut", m_productionCut,
            "[cm] Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance.",
            0.07);
@@ -168,6 +173,11 @@ void FullSimModule::initialize()
   if (physicsList == NULL) B2FATAL("Could not load the physics list " << m_physicsList);
   physicsList->RegisterPhysics(new ExtPhysicsConstructor);
   if (m_optics) physicsList->RegisterPhysics(new G4OpticalPhysics);
+  if (m_monopoleDefinition.length() > 0) {
+    physicsList->RegisterPhysics(new G4MonopolePhysics);
+    G4UImanager* uiManager = G4UImanager::GetUIpointer();
+    uiManager->ApplyCommand("/monopole/setup " + m_monopoleDefinition);
+  }
   physicsList->SetDefaultCutValue((m_productionCut / Unit::mm) * CLHEP::mm);  // default is 0.7 mm
   // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
   // all the energy (as is done in G4ErrorPhysicsList)

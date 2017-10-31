@@ -6,7 +6,7 @@
 * Contributors: Anze Zupanc                                              *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
-jj*************************************************************************/
+**************************************************************************/
 
 #ifndef NTUPLECLUSTERTOOL_H
 #define NTUPLECLUSTERTOOL_H

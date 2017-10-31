@@ -32,7 +32,6 @@ CDCHit::CDCHit(unsigned short tdcCount, unsigned short charge,
 
 DigitBase::EAppendStatus CDCHit::addBGDigit(const DigitBase* bg)
 {
-  B2INFO("ADDBGDigit called");
   const auto* bgDigit = static_cast<const CDCHit*>(bg);
   const unsigned short adc = m_adcCount;
   int diff  = static_cast<int>(m_tdcCount) - static_cast<int>(bgDigit->getTDCCount());
@@ -43,11 +42,11 @@ DigitBase::EAppendStatus CDCHit::addBGDigit(const DigitBase* bg)
   if (diff < 0) {
     *this = *bgDigit;
     auto relSimHits = this->getRelationsFrom<CDCSimHit>();
-    for (size_t i = 0; i < relSimHits.size(); ++i) {
+    for (int i = relSimHits.size() - 1; i >= 0; --i) {
       relSimHits.remove(i);
     }
     auto relMCParticles = this->getRelationsFrom<MCParticle>();
-    for (size_t i = 0; i < relMCParticles.size(); ++i) {
+    for (int i = relMCParticles.size() - 1; i >= 0; --i) {
       relMCParticles.remove(i);
     }
   }

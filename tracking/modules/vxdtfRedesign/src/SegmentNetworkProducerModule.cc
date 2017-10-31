@@ -111,24 +111,18 @@ SegmentNetworkProducerModule::initialize()
 {
   InitializeCounters();
 
-  // searching for correct sectorMap:
-  for (auto& setup : m_filtersContainer.getAllSetups()) {
-    auto& filters = *(setup.second);
+  // get the pointer to the current filters
+  // WARNING: the pointer will change if the DB object changes (see SectorMapBootStrapModule)
+  auto filters = m_filtersContainer.getFilters(m_PARAMsecMapName);
+  if (filters == nullptr) B2FATAL("SegmentNetworkProducerModule::initialize(): requested secMapName '" << m_PARAMsecMapName <<
+                                    "' does not exist! Can not continue...");
 
-    if (filters.getConfig().secMapName != m_PARAMsecMapName) { continue; }
-    B2INFO("SegmentNetworkProducerModule::initialize(): loading mapName: " << m_PARAMsecMapName << " with nCompactSecIDs: " <<
-           filters.size());
+  B2INFO("SegmentNetworkProducerModule::initialize(): loading mapName: " << m_PARAMsecMapName << " with nCompactSecIDs: " <<
+         filters->size());
 
-    m_vxdtfFilters = &filters;
-
-    if (m_PARAMprintToMathematica) {
-      SecMapHelper::printStaticSectorRelations(filters, filters.getConfig().secMapName + "segNetProducer", 2, m_PARAMprintToMathematica,
-                                               true);
-    }
-
-    if (m_vxdtfFilters == nullptr) B2FATAL("SegmentNetworkProducerModule::initialize(): requested secMapName '" << m_PARAMsecMapName <<
-                                             "' does not exist! Can not continue...");
-    break; // have found our secMap no need for further searching
+  if (m_PARAMprintToMathematica) {
+    SecMapHelper::printStaticSectorRelations(*filters, filters->getConfig().secMapName + "segNetProducer", 2, m_PARAMprintToMathematica,
+                                             true);
   }
 
   if (m_PARAMCreateNeworks < 1 or m_PARAMCreateNeworks > 3) {
@@ -187,6 +181,11 @@ void SegmentNetworkProducerModule::event()
 {
   m_eventCounter++;
   B2DEBUG(1, "\n" << "SegmentNetworkProducerModule:event: event " << m_eventCounter << "\n");
+
+  // get the pointer to the filter EACH event, as the DB object may have been update and thus the memory address of the filter changed
+  m_vxdtfFilters = m_filtersContainer.getFilters(m_PARAMsecMapName);
+  if (m_vxdtfFilters == nullptr) B2FATAL("SegmentNetworkProducerModule::initialize(): requested secMapName '" << m_PARAMsecMapName <<
+                                           "' does not exist! Can not continue...");
 
   // make sure that network exists:
   if (! m_network) {

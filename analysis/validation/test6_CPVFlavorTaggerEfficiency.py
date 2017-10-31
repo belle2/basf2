@@ -86,15 +86,21 @@ methods = []
 
 
 class Quiet:
+    """Context handler class to quiet errors in a 'with' statement"""
 
     def __init__(self, level=ROOT.kInfo + 1):
+        """Class constructor"""
+        #: the level to quiet
         self.level = level
 
     def __enter__(self):
+        """Enter the context"""
+        #: the previously set level to be ignored
         self.oldlevel = ROOT.gErrorIgnoreLevel
         ROOT.gErrorIgnoreLevel = self.level
 
     def __exit__(self, type, value, traceback):
+        """Exit the context"""
         ROOT.gErrorIgnoreLevel = self.oldlevel
 
 
@@ -119,7 +125,7 @@ if 'B0_FANN_qrCombined' in totalBranches:
 
 usedCategories = []
 for cat in categories:
-    catBranch = 'B0_qr' + cat
+    catBranch = 'B0_qp' + cat
     if catBranch in totalBranches:
         usedCategories.append(cat)
 
@@ -621,7 +627,7 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     # histogram of input variable (only background) - not yet a probability! It's a classifier plot!
     hist_background = ROOT.TH1F('Background_' + category, 'Input Background (B0bar)' +
                                 category + ' (binning 50)', 50, -1.0, 1.0)
-    hist_both = ROOT.TH1F('qy_' + category, 'Input Background (B0bar)' +
+    hist_both = ROOT.TH1F('qp_' + category, 'Input Background (B0bar)' +
                           category + ' (binning 50)', 100, -1, 1)
 
     # per definiton that input is not comparable to the network output, this has to be transformed.
@@ -632,15 +638,15 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     hist_probB0bar = ROOT.TH1F('ProbabilityB0bar_' + category,
                                'Transformed to probability (B0bar) (' + category + ')',
                                50, 0.0, 1.0)
-    # qr output from -1 to 1 -> transformation below
-    hist_qrB0 = ROOT.TH1F('QRB0_' + category, 'Transformed to qr (B0)(' +
+    # qp output from -1 to 1 -> transformation below
+    hist_qpB0 = ROOT.TH1F('QRB0_' + category, 'Transformed to qp (B0)(' +
                           category + ')', 50, -1.0, 1.0)
-    hist_qrB0bar = ROOT.TH1F('QRB0bar_' + category, 'Transformed to qr (B0bar) (' +
+    hist_qpB0bar = ROOT.TH1F('QRB0bar_' + category, 'Transformed to qp (B0bar) (' +
                              category + ')', 50, -1.0, 1.0)
-    # histogram for abs(qr), i.e. this histogram contains the r-values -> transformation below
+    # histogram for abs(qp), i.e. this histogram contains the r-values -> transformation below
     # also used to get the number of entries, sorted into 6 bins
-    hist_absqrB0 = ROOT.TH1F('AbsQRB0_' + category, 'Abs(qr)(B0) (' + category + ')', 6, r_subsample)
-    hist_absqrB0bar = ROOT.TH1F('AbsQRB0bar_' + category, 'Abs(qr) (B0bar) (' + category + ')', 6, r_subsample)
+    hist_absqpB0 = ROOT.TH1F('AbsQRB0_' + category, 'Abs(qp)(B0) (' + category + ')', 6, r_subsample)
+    hist_absqpB0bar = ROOT.TH1F('AbsQRB0bar_' + category, 'Abs(qp) (B0bar) (' + category + ')', 6, r_subsample)
     # histogram contains at the end the average r values -> calculation below
     # sorted into 6 bins
     hist_aver_rB0 = ROOT.TH1F('AverageRB0_' + category, 'A good one (B0)' +
@@ -651,19 +657,19 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     # for calibration plot we want to have
     hist_all = ROOT.TH1F('All_' + category, 'Input Signal (B0) and Background (B0Bar)' +
                          category + ' (binning 50)', 50, 0.0, 1.0)
-    tree.Draw('B0_qr' + category + '>>All_' + category, 'B0_qrMC!=0')
+    tree.Draw('B0_qp' + category + '>>All_' + category, 'B0_qrMC!=0')
     hist_calib_B0 = ROOT.TH1F('Calib_B0_' + category, 'Calibration Plot for true B0' +
                               category + ' (binning 50)', 50, 0.0, 1.0)
-    tree.Draw('B0_qr' + category + '>>Calib_B0_' + category, 'B0_qrMC == 1.0')
+    tree.Draw('B0_qp' + category + '>>Calib_B0_' + category, 'B0_qrMC == 1.0')
     hist_calib_B0.Divide(hist_all)
 
     # fill signal
-    tree.Draw('B0_qr' + category + '>>Signal_' + category, 'B0_qrMC == 1.0')
+    tree.Draw('B0_qp' + category + '>>Signal_' + category, 'B0_qrMC == 1.0')
     # fill background
-    tree.Draw('B0_qr' + category + '>>Background_' + category, 'B0_qrMC == -1.0'
+    tree.Draw('B0_qp' + category + '>>Background_' + category, 'B0_qrMC == -1.0'
               )
     # fill both
-    tree.Draw('B0_qr' + category + '>>qy_' + category, 'abs(B0_qrMC) == 1.0'
+    tree.Draw('B0_qp' + category + '>>qp_' + category, 'abs(B0_qrMC) == 1.0'
               )
 
     # ***** TEST OF CALIBRATION ******
@@ -701,28 +707,28 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
         hist_probB0.Fill(purityB0[i], signal[i])
         hist_probB0bar.Fill(purityB0bar[i], back[i])
 
-        # filling histogram with qr from -1 to 1
-        hist_qrB0.Fill(dilutionB02[i], signal[i])
-        hist_qrB0bar.Fill(dilutionB0bar2[i], back[i])
+        # filling histogram with qp from -1 to 1
+        hist_qpB0.Fill(dilutionB02[i], signal[i])
+        hist_qpB0bar.Fill(dilutionB0bar2[i], back[i])
 
-        # filling histogram with abs(qr), i.e. this histogram contains the r-values (not qr)
-        hist_absqrB0.Fill(abs(dilutionB02[i]), signal[i])
-        hist_absqrB0bar.Fill(abs(dilutionB0bar2[i]), back[i])
-        # filling histogram with abs(qr) special weighted - needed for average r calculation
+        # filling histogram with abs(qp), i.e. this histogram contains the r-values (not qp)
+        hist_absqpB0.Fill(abs(dilutionB02[i]), signal[i])
+        hist_absqpB0bar.Fill(abs(dilutionB0bar2[i]), back[i])
+        # filling histogram with abs(qp) special weighted - needed for average r calculation
         hist_aver_rB0.Fill(abs(dilutionB02[i]), abs(dilutionB02[i]) * signal[i])
         hist_aver_rB0bar.Fill(abs(dilutionB0bar2[i]), abs(dilutionB0bar2[i]) * back[i])
 
     # hist_aver_rB0bar contains now the average r-value
-    hist_aver_rB0.Divide(hist_absqrB0)
-    hist_aver_rB0bar.Divide(hist_absqrB0bar)
+    hist_aver_rB0.Divide(hist_absqpB0)
+    hist_aver_rB0bar.Divide(hist_absqpB0bar)
     # now calculating the efficiency
 
     # calculating number of events
     tot_entriesB0 = 0
     tot_entriesB0bar = 0
     for i in range(1, r_size):
-        tot_entriesB0 = tot_entriesB0 + hist_absqrB0.GetBinContent(i)
-        tot_entriesB0bar = tot_entriesB0bar + hist_absqrB0bar.GetBinContent(i)
+        tot_entriesB0 = tot_entriesB0 + hist_absqpB0.GetBinContent(i)
+        tot_entriesB0bar = tot_entriesB0bar + hist_absqpB0bar.GetBinContent(i)
     # initializing some arrays
     tot_eff_effB0 = 0
     tot_eff_effB0bar = 0
@@ -738,8 +744,8 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
         rvalueB0[i] = hist_aver_rB0.GetBinContent(i)
         rvalueB0bar[i] = hist_aver_rB0bar.GetBinContent(i)
         # wvalue[i] = (1 - rvalueB0[i]) / 2
-        entriesB0[i] = hist_absqrB0.GetBinContent(i)
-        entriesB0bar[i] = hist_absqrB0bar.GetBinContent(i)
+        entriesB0[i] = hist_absqpB0.GetBinContent(i)
+        entriesB0bar[i] = hist_absqpB0bar.GetBinContent(i)
         event_fractionB0[i] = entriesB0[i] / tot_entriesB0
         event_fractionB0bar[i] = entriesB0bar[i] / tot_entriesB0bar
         # print '*  Bin ' + str(i) + ' r-value: ' + str(rvalueB0[i]), 'entriesB0: ' +
@@ -813,7 +819,7 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     if category == 'MaximumPstar':
         catName = 'MaximumP*'
 
-    hist_signal.SetTitle('; (#it{qy})^{' + catName + '} ; Events')
+    hist_signal.SetTitle('; (#it{qp})^{' + catName + '} ; Events')
     # hist_signal.SetMinimum(0)
     hist_signal.SetMaximum(Ymax)
     # hist_background.SetMinimum(0)
@@ -841,7 +847,7 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
     Canvas.Update()
     with Quiet(ROOT.kError):
-        Canvas.SaveAs(workingDirectory + '/' + 'test6_CPVFTqy_' + category + '_both.pdf')
+        Canvas.SaveAs(workingDirectory + '/' + 'test6_CPVFTqp_' + category + '_both.pdf')
 
     # Validation Plot 4
     hist_both.GetXaxis().SetLabelSize(0.04)
@@ -860,7 +866,7 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     hist_both.SetTitle(
         'Flavor tagger output of the category ' +
         catName +
-        '; #it{qy}_{' +
+        '; #it{qp}_{' +
         catName +
         '} ; Events  (Total = ' +
         '{:<1}'.format(

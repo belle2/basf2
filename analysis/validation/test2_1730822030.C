@@ -42,7 +42,7 @@ void plot_1Smumu(TFile* pfile, TTree* ptree, TFile* outputFile){
    h_M_chi_b12P_1Smumu->GetYaxis()->SetTitle("Event /0.01GeV/c^{2}");
    h_M_chi_b12P_1Smumu->GetListOfFunctions()->Add(new TNamed("Description","Y(3S)->gamma [chi_b2P->gamma [Y(1S)->mu+ mu-]]"));
    h_M_chi_b12P_1Smumu->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
-   h_M_chi_b12P_1Smumu->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of chi_b2P(->gammma Y(1S)) and efficiency "));
+   h_M_chi_b12P_1Smumu->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of chi_b2P(->gammma Y(1S))"));
 
 
    outputFile->cd();
@@ -70,7 +70,7 @@ void plot_1See(TFile* pfile, TTree* ptree, TFile* outputFile){
    h_M_chi_b12P_1See->GetYaxis()->SetTitle("Event /0.01GeV/c^{2}");
    h_M_chi_b12P_1See->GetListOfFunctions()->Add(new TNamed("Description","Y(3S)->gamma [chi_b2P->gamma [Y(1S)->e+ e-]]"));
    h_M_chi_b12P_1See->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
-   h_M_chi_b12P_1See->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of chi_b2P(->gammma Y(1S)) and efficiency"));
+   h_M_chi_b12P_1See->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of chi_b2P(->gammma Y(1S)) "));
    
    outputFile->cd();
     
@@ -97,7 +97,7 @@ void plot_2Smumu(TFile* pfile,TTree *ptree, TFile* outputFile){
    h_M_chi_b12P_2Smumu->GetYaxis()->SetTitle("Event /0.01GeV/c^{2}");
    h_M_chi_b12P_2Smumu->GetListOfFunctions()->Add(new TNamed("Description","Y(3S)->gamma [chi_b2P->gamma [Y(2S)->mu+ mu-]]"));
    h_M_chi_b12P_2Smumu->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
-   h_M_chi_b12P_2Smumu->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of chi_b2P(->gammma mu+ mu-) and efficiency"));
+   h_M_chi_b12P_2Smumu->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of chi_b2P(->gammma mu+ mu-) and efficiency=N(candidate)/N(totol[calculated through genereting events and branch ratio])"));
 
 
    outputFile->cd();
@@ -125,7 +125,7 @@ void plot_2See(TFile* pfile,TTree *ptree, TFile* outputFile){
    h_M_chi_b12P_2See->GetYaxis()->SetTitle("Event /0.01GeV/c^{2}");
    h_M_chi_b12P_2See->GetListOfFunctions()->Add(new TNamed("Description","Y(3S)->gamma [chi_b2P->gamma [Y(2S)->e+ e-]]"));
    h_M_chi_b12P_2See->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
-   h_M_chi_b12P_2See->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of chi_b2P(->gammma e+ e-) and efficiency"));
+   h_M_chi_b12P_2See->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of chi_b2P(->gammma e+ e-)"));
 
    outputFile->cd();
 

@@ -45,7 +45,7 @@ void plot_1Smumu(TFile* pfile, TTree* ptree, TFile* outputFile){
    h_M_Y3S_1Smumu->GetYaxis()->SetTitle("Events /0.01 GeV/c^{2}");
    h_M_Y3S_1Smumu->GetListOfFunctions()->Add(new TNamed("Description","Y(3S)->pi+ pi- [Y(1S)->mu+ mu-]"));
    h_M_Y3S_1Smumu->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
-   h_M_Y3S_1Smumu->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of Y(3S)[->pi+ pi- mu+ mu-] and efficiency"));
+   h_M_Y3S_1Smumu->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of Y(3S)[->pi+ pi- mu+ mu-]"));
    
 
    outputFile->cd();
@@ -76,7 +76,7 @@ void plot_1See(TFile* pfile, TTree* ptree, TFile* outputFile){
    h_M_Y3S_1See->GetYaxis()->SetTitle("Events /0.01 GeV/c^{2}");
    h_M_Y3S_1See->GetListOfFunctions()->Add(new TNamed("Description","Y(3S)->pi+ pi- [Y(1S)->e+ e-]"));
    h_M_Y3S_1See->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
-   h_M_Y3S_1See->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of Y(3S)(->pi+ pi- mu+ mu-) and efficiency"));
+   h_M_Y3S_1See->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of Y(3S)(->pi+ pi- mu+ mu-)"));
 
    outputFile->cd();
 
@@ -105,7 +105,7 @@ void plot_2Smumu(TFile* pfile, TTree* ptree, TFile* outputFile){
    h_M_Y3S_2Smumu->GetYaxis()->SetTitle("Events /0.01 GeV/c^{2}");
    h_M_Y3S_2Smumu->GetListOfFunctions()->Add(new TNamed("Description","Y(3S)->pi+ pi- [Y(2S)->mu+ mu-]"));
    h_M_Y3S_2Smumu->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
-   h_M_Y3S_2Smumu->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of Y(3S)(->pi+ pi- mu+ mu-) and efficiency"));
+   h_M_Y3S_2Smumu->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of Y(3S)(->pi+ pi- mu+ mu-) and efficiency=N(candidate   )/N(totol[calculated through genereting events and branch ratio])"));
 
 
    outputFile->cd();
@@ -136,7 +136,7 @@ void plot_2See(TFile* pfile, TTree* ptree, TFile* outputFile){
    h_M_Y3S_2See->GetYaxis()->SetTitle("Events /0.01 GeV/c^{2}");
    h_M_Y3S_2See->GetListOfFunctions()->Add(new TNamed("Description","Y(3S)->pi+ pi- [Y(2S)->e+ e-]"));
    h_M_Y3S_2See->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
-   h_M_Y3S_2See->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of Y(3S)(->pi+ pi- e+ e-) and efficiency"));
+   h_M_Y3S_2See->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of Y(3S)(->pi+ pi- e+ e-)"));
 
 
    outputFile->cd();

@@ -31,6 +31,13 @@ void NtupleTrackHitsTool::setupTree()
   }
 }
 
+void NtupleTrackHitsTool::dealocateMemory()
+{
+  delete [] m_iNCDCHits;
+  delete [] m_iNSVDHits;
+  delete [] m_iNPXDHits;
+}
+
 void NtupleTrackHitsTool::eval(const Particle* particle)
 {
 

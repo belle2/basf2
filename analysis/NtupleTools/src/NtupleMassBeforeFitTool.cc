@@ -29,6 +29,12 @@ void NtupleMassBeforeFitTool::setupTree()
   }
 }
 
+void NtupleMassBeforeFitTool::dealocateMemory()
+{
+  delete [] m_invM;
+  delete [] m_invMerr;
+}
+
 void NtupleMassBeforeFitTool::eval(const Particle* particle)
 {
   if (!particle) {

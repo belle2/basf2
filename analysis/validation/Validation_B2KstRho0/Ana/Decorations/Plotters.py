@@ -8,7 +8,6 @@ from ROOT import gROOT, gStyle, gPad
 import os
 import sys
 import pathlib
-sys.path.insert(0, pathlib.Path(__file__).parents[1])
 from Global.fit_variables import fit_variables
 from Global.selection_variables import *
 from Global.cuts import *

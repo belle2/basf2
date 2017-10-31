@@ -60,7 +60,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
             'gamma:pi0eff20',
             'gamma:all', 'Theta > 0.296706 and Theta < 2.61799 and \
             [[clusterReg == 1 and E > 0.075] or [clusterReg == 2 and E > 0.075] or [clusterReg == 3 and E > 0.075]] and \
-            [abs(clusterTiming) < 0.1 * clusterErrorTiming or E > 0.1] and [clusterE1E9 > 0.7 or E > 0.1] ',
+            [abs(clusterTiming) < formula(0.1 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.7 or E > 0.1] ',
             True,
             path)
     elif listtype == 'pi0eff30':
@@ -69,7 +69,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
             'gamma:pi0eff30',
             'gamma:all', 'Theta > 0.296706 and Theta < 2.61799 and \
             [[clusterReg == 1 and E > 0.075] or [clusterReg == 2 and E > 0.05] or [clusterReg == 3 and E > 0.075]] and \
-            [abs(clusterTiming) < 0.5 * clusterErrorTiming or E > 0.1] and [clusterE1E9 > 0.7 or E > 0.1] ',
+            [abs(clusterTiming) < formula(0.5 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.7 or E > 0.1] ',
             True,
             path)
     elif listtype == 'pi0eff40':
@@ -78,7 +78,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
             'gamma:pi0eff40',
             'gamma:all', 'Theta > 0.296706 and Theta < 2.61799 and \
             [[clusterReg == 1 and E > 0.075] or [clusterReg == 2 and E > 0.03] or [clusterReg == 3 and E > 0.075]] and \
-            [abs(clusterTiming) < 0.5 * clusterErrorTiming or E > 0.1] and [clusterE1E9 > 0.5 or E > 0.1] ',
+            [abs(clusterTiming) < formula(0.5 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.5 or E > 0.1] ',
             True,
             path)
     elif listtype == 'pi0eff50':
@@ -87,7 +87,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
             'gamma:pi0eff50',
             'gamma:all', 'Theta > 0.296706 and Theta < 2.61799 and \
             [[clusterReg == 1 and E > 0.05] or [clusterReg == 2 and E > 0.03] or [clusterReg == 3 and E > 0.05]] and \
-            [abs(clusterTiming) < 1.0 * clusterErrorTiming or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1] ',
+            [abs(clusterTiming) < formula(1.0 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1] ',
             True,
             path)
     elif listtype == 'pi0eff60':
@@ -96,14 +96,14 @@ def stdPhotons(listtype='loose', path=analysis_main):
             'gamma:pi0eff60',
             'gamma:all', 'Theta > 0.296706 and Theta < 2.61799 and \
             [[clusterReg == 1 and E > 0.03] or [clusterReg == 2 and E > 0.02] or [clusterReg == 3 and E > 0.03]] and \
-            [abs(clusterTiming) < 1.0 * clusterErrorTiming or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1] ',
+            [abs(clusterTiming) < formula(1.0 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1] ',
             True,
             path)
     elif listtype == 'pi0':
-        stdPhotons('loose', path)
+        stdPhotons('pi0eff60', path)
         cutAndCopyList('gamma:pi0', 'gamma:pi0eff60', '', True, path)
     elif listtype == 'pi0highE':
-        stdPhotons('loose', path)
+        stdPhotons('pi0eff60', path)
         cutAndCopyList('gamma:pi0highE', 'gamma:pi0eff60', 'E > 0.2', True, path)
 
 

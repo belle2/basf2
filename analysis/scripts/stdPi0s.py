@@ -52,19 +52,19 @@ def stdPi0s(listtype='veryLoose', path=analysis_main):
         matchMCTruth('pi0:eff50', path)
     elif listtype == 'eff60':
         fillParticleList('gamma:pi0eff60', '', True, path)
-        reconstructDecay('pi0:eff60 -> gamma:pi0eff60 gamma:pi0eff60', '0.09 < M < 0.175', 1, True, path)
+        reconstructDecay('pi0:eff60 -> gamma:pi0eff60 gamma:pi0eff60', '0.075 < M < 0.175', 1, True, path)
         matchMCTruth('pi0:eff60', path)
     elif listtype == 'veryLoose':
-        stdPi0s(listtype='pi0eff60')
-        cutAndCopyList('pi0:veryLoose', 'pi0:pi0eff60', '', True, path)
+        stdPi0s(listtype='eff60')
+        cutAndCopyList('pi0:veryLoose', 'pi0:eff60', '', True, path)
     elif listtype == 'loose':
-        stdPi0s(listtype='pi0eff40')
-        cutAndCopyList('pi0:loose', 'pi0:pi0eff40', '', True, path)
+        stdPi0s(listtype='eff40')
+        cutAndCopyList('pi0:loose', 'pi0:eff40', '', True, path)
 
     # skim list(s)
     elif listtype == 'skim':
-        stdPi0s(listtype='pi0eff60')
-        cutAndCopyList('pi0:skim', 'pi0:pi0eff60', '', True, path)
+        stdPi0s(listtype='eff60')
+        cutAndCopyList('pi0:skim', 'pi0:eff60', '', True, path)
         massKFit('pi0:skim', 0.0, '', path)
 
     # same lists with, but with  mass constraints fits

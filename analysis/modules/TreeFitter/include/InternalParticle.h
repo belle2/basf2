@@ -64,7 +64,7 @@ namespace TreeFitter {
     //    virtual int nFinalChargedCandidates() const ;
     //    virtual void retrieveIndexMap(indexmap& anindexmap) const ;
 
-    virtual void addToConstraintList(constraintlist& alist, int depth) const ;
+    virtual void addToConstraintList(constraintlist& list, int depth) const ;
 
     //    bool swapMotherDaughter(FitParams* fitparams, const ParticleBase* newmother) ;
     void setMassConstraint(bool b) { m_massconstraint = b ; }

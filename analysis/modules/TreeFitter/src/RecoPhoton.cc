@@ -59,9 +59,9 @@ namespace TreeFitter {
     CLHEP::HepVector deltaX(3);
     double deltaX2(0);
     for (int row = 1; row <= 3; ++row) {
-      double dx = m_m(row) - fitparams->par(posindexmother + row) ;
-      deltaX(row) = dx ;
-      deltaX2 += dx * dx ;
+      double dx = m_m(row) - fitparams->par(posindexmother + row);
+      deltaX(row) = dx;
+      deltaX2 += dx * dx;
     }
 
     // get the energy
@@ -70,17 +70,17 @@ namespace TreeFitter {
     // assign the momentum
     int momindex = momIndex();
     for (int row = 1; row <= 3; ++row)
-      fitparams->par(momindex + row) = energy * deltaX(row) / sqrt(deltaX2)  ;
+      fitparams->par(momindex + row) = energy * deltaX(row) / sqrt(deltaX2);
     return ErrCode();
   }
 
   ErrCode RecoPhoton::initCov(FitParams* fitparams) const
   {
     int momindex = momIndex() ;
-    double varEnergy =  m_useEnergy ? m_matrixV.fast(4, 4) : 1 ;
+    double varEnergy =  m_useEnergy ? m_matrixV.fast(4, 4) : 1;
     const double factor = 1000;
     for (int row = 1; row <= 3; ++row)
-      fitparams->cov()(momindex + row, momindex + row) = factor * varEnergy ;
+      fitparams->cov()(momindex + row, momindex + row) = factor * varEnergy;
     return ErrCode();
   }
 
@@ -89,7 +89,7 @@ namespace TreeFitter {
     const Belle2::ECLCluster* recoCalo = particle()->getECLCluster();
     TVector3 centroid = recoCalo->getClusterPosition();
     double energy = recoCalo->getEnergy();
-    m_init = true ;
+    m_init = true;
 
     // This returns the covariance matrix assuming the photons comes from the nominal IP
     Belle2::ClusterUtils C;

@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -22,6 +22,7 @@
 #include <analysis/modules/TreeFitter/FitParams.h>
 #include <analysis/modules/TreeFitter/RecoTrack.h>
 #include <analysis/modules/TreeFitter/HelixUtils.h>
+#include <framework/logging/Logger.h>
 
 #include <TMath.h>
 
@@ -50,27 +51,35 @@ namespace TreeFitter {
       rpt = sqrt(rpx * rpx + rpy * rpy);
       rc =  lpt > rpt;
       */
-      rc =  lhs->particle()->getMomentum().Perp() > rhs->particle()->getMomentum().Perp() ;
+      rc =  lhs->particle()->getMomentum().Perp() > rhs->particle()->getMomentum().Perp();
     } else if (lhs->particle() && rhs->particle() && lhs->particle()->getNDaughters() > 0 &&
-               rhs->particle()->getNDaughters() > 0)
-      rc = lhs->nFinalChargedCandidates() > rhs->nFinalChargedCandidates() ;
-    else
-      rc = lhstype < rhstype ;
-    return rc ;
+               rhs->particle()->getNDaughters() > 0) {
+      rc = lhs->nFinalChargedCandidates() > rhs->nFinalChargedCandidates();
+    } else {
+      rc = lhstype < rhstype;
+    }
+    return rc;
   }
 
   InternalParticle::InternalParticle(Belle2::Particle* particle, const ParticleBase* mother,
                                      bool forceFitAll)
     : ParticleBase(particle, mother), m_massconstraint(false), m_lifetimeconstraint(false)
   {
-    BOOST_FOREACH(Belle2::Particle * daughter, particle->getDaughters())
-    addDaughter(daughter, forceFitAll) ;
 
+    if (particle) {
+      BOOST_FOREACH(Belle2::Particle * daughter, particle->getDaughters()) {
+
+
+        addDaughter(daughter, forceFitAll);
+      }
+    } else {
+      B2ERROR("Trying to create an InternalParticle from NULL. This should never happen.");
+    }
     //FT: old version
     //if(particle) {
     //      int ndaughters = particle->getNDaughters();
     //      Particle* daughter ;
-    //      HepAListIterator<BtaCandidate> iter=bc->daughterIterator(); //MOTHERF-
+    //      HeplistIterator<BtaCandidate> iter=bc->daughterIterator(); //MOTHERF-
     //      for (int i = 0; i < ndaughters; i++){//can't be arsed to make an iterator
     //  daughter = const_cast<Belle2::Particle*>(particle->getDaughter(i)); //hopefully this solves the issues with casting (FT)
     //  addDaughter(daughter,forceFitAll) ;
@@ -89,12 +98,17 @@ namespace TreeFitter {
 
     //FT: Need a method to flag these individually for each particle. Currently I use the PDG code, but I want to switch to DecayDescriptors
     m_massconstraint     = false;
-    int pdgcode = particle->getPDGCode();
+    int pdgcode; //JFK 0 for beamspot
+    if (particle) {
+      pdgcode = particle->getPDGCode();
+    } else {
+      pdgcode = 0;
+    }
+
+    // JFK:: replace with is size > 0 or contructor flag which is even better
     if (std::find(massConstraintList.begin(), massConstraintList.end(), pdgcode) != massConstraintList.end()) {
       m_massconstraint = true;
-      B2DEBUG(80, "We constrain the mass of the " << particle->getName() << " (PDGCode = " << pdgcode << ")");
     }
-    //
 
     //FT: These aren't available yet
     m_lifetimeconstraint = false;
@@ -111,7 +125,7 @@ namespace TreeFitter {
 
   //  void InternalParticle::updateIndex(int& offset)
   //  {
-  //    for(daucontainer::const_iterator it = m_daughters.begin() ;
+  //    for(ParticleBase::Iter it = m_daughters.begin() ;
   //  it != m_daughters.end() ; ++it)
   //      (*it)->updateIndex(offset) ;
   //    ParticleBase::updateIndex(offset) ;
@@ -121,7 +135,7 @@ namespace TreeFitter {
   /*
     void InternalParticle::retrieveIndexMap(indexmap& anindexmap) const
     {
-      for(daucontainer::const_iterator it = m_daughters.begin() ;
+      for(ParticleBase::Iter it = m_daughters.begin() ;
     it != m_daughters.end() ; ++it)
         (*it)->retrieveIndexMap(anindexmap) ;
       ParticleBase::retrieveIndexMap(anindexmap)  ;
@@ -146,23 +160,14 @@ namespace TreeFitter {
   */
   bool compTrkTransverseMomentum(const RecoTrack* lhs, const RecoTrack* rhs)
   {
-    /*
-    double lpx, lpy;
-    lpx = lhs->particle()->getPx();
-    lpy = lhs->particle()->getPy();
-    double rpx, rpy;
-    rpx = rhs->particle()->getPx();
-    rpy = rhs->particle()->getPy();
-    //
-    double deltapt2;
-    deltapt2 = lpx * lpx + lpy * lpy - rpx * rpx - rpy * rpy;
-    return  deltapt2 > 0;
-    */
     return lhs->particle()->getMomentum().Perp() > rhs->particle()->getMomentum().Perp();
   }
 
   ErrCode InternalParticle::initPar1(FitParams* fitparams)
   {
+
+    //std::cout << "Initilizing :" << this->name()  << std::endl;
+
     // This is the most complicated part of the vertexer: an
     // initialization that always works.
 
@@ -178,20 +183,23 @@ namespace TreeFitter {
     // vertex.
     if (vtxverbose >= 3)
       std::cout << "InternalParticle::initPar: "
-                << particle()->getName() << " " << daughters().size() << " "
+                << particle()->getName() << " " << m_daughters.size() << " "
                 << hasPosition() << " " << posIndex() << std::endl ;
     ErrCode status ;
-    int posindex = posIndex() ;
+    int posindex = posIndex();
 
     // logic check: we do not want to call this routine for resonances.
-    assert(hasPosition()) ;
+    assert(hasPosition());
 
     // Start with origin
-    for (int row = 1; row <= 3; ++row) fitparams->par()[row + posindex - 1] = 0 ;
+    for (int row = 1; row <= 3; ++row) {
+      fitparams->par()[row + posindex - 1] = 0;
+    }
 
     // Step 1: pre-initialization of all daughters
-    for (daucontainer::const_iterator it = begin() ; it != end() ; ++it)
-      status |= (*it)->initPar1(fitparams) ;
+    for (ParticleBase::iter it = m_daughters.begin(); it != m_daughters.end(); ++it) { //FIXME conIter?
+      status |= (*it)->initPar1(fitparams);
+    }
 
     // Step 2: initialize the vertex. if we are lucky, we had a
     // recoresonant daughter, and we are already done.
@@ -226,55 +234,51 @@ namespace TreeFitter {
         // create a vector with all daughters that constitute a
         // 'trajectory' (ie tracks, composites and daughters of
         // resonances.)
-
-        daucontainer alldaughters ;
-        ParticleBase::collectVertexDaughters(alldaughters, posindex) ;
+        ParticleBase::ParticleContainer alldaughters;
+        ParticleBase::collectVertexDaughters(alldaughters, posindex);
 
         // select daughters that are either charged, or have an initialized vertex
-        daucontainer vtxdaughters ;
-        vector<RecoTrack*> trkdaughters ;
-        for (daucontainer::const_iterator it = alldaughters.begin() ;
-             it != alldaughters.end() ; ++it) {
+        ParticleBase::ParticleContainer vtxdaughters;
+
+        vector<RecoTrack*> trkdaughters;
+        for (ParticleBase::iter it = alldaughters.begin(); it != alldaughters.end() ; ++it) {
           if ((*it)->type() == ParticleBase::kRecoTrack) {
-            trkdaughters.push_back(static_cast<RecoTrack*>(*it))  ;
+            trkdaughters.push_back(static_cast<RecoTrack*>(*it));
           } else if ((*it)->hasPosition() && fitparams->par((*it)->posIndex() + 1) != 0) {
-            vtxdaughters.push_back(*it) ;
+            vtxdaughters.push_back(*it);
           }
         }
+
         if (trkdaughters.size() >= 2) {
           // sort in pT. not very efficient, but it works.
-          if (trkdaughters.size() > 2)
-            std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum) ;
-          // now, just take the first two ...
-          RecoTrack* dau1 = trkdaughters[0] ;
-          RecoTrack* dau2 = trkdaughters[1] ;
-          //FT: this once again has to use pions
-          std::vector<float> tmphelix1 = dau1->particle()->getTrack()->getTrackFitResult(Belle2::Const::pion)->getTau();
-          std::vector<float> tmphelix2 = dau2->particle()->getTrack()->getTrackFitResult(Belle2::Const::pion)->getTau();
-          CLHEP::HepVector helix1(5), helix2(5);
-          for (int i = 1; i <= 5; ++i) {
-            helix1(i) = tmphelix1[i - 1];
-            helix2(i) = tmphelix2[i - 1];
+          if (trkdaughters.size() > 2) {
+            std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);
           }
-          B2DEBUG(80, "Helix1 is " << helix1(1) << " | " << helix1(2) << " | " << helix1(3) << " | " << helix1(4) << " | " << helix1(5));
-          B2DEBUG(80, "Helix2 is " << helix2(1) << " | " << helix2(2) << " | " << helix2(3) << " | " << helix2(4) << " | " << helix2(5));
-          double flt1(0), flt2(0) ;
+          // now, just take the first two ...
+          RecoTrack* dau1 = trkdaughters[0];
+          RecoTrack* dau2 = trkdaughters[1];
+          //Using pion hypothesis is fine for initialization purposes
+          Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResult(Belle2::Const::pion)->getHelix();
+          Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResult(Belle2::Const::pion)->getHelix();
+          //          B2DEBUG(80, "Helix1 is " << helix1(1) << " | " << helix1(2) << " | " << helix1(3) << " | " << helix1(4) << " | " << helix1(5));
+          //          B2DEBUG(80, "Helix2 is " << helix2(1) << " | " << helix2(2) << " | " << helix2(3) << " | " << helix2(4) << " | " << helix2(5));
+          double flt1(0), flt2(0);
           //    HepPoint v ;
-          TVector3 v ;
-          HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion) ;
-          fitparams->par()(posindex + 1) = -v.x() ;//FT changed sign; this is not justified by the algebra, but gets the correct
-          fitparams->par()(posindex + 2) = -v.y() ;//initialisation... helixPoca function must be checked
-          fitparams->par()(posindex + 3) = -v.z() ;//
+          TVector3 v;
+          HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
+          fitparams->par()(posindex + 1) = -v.x();//FT changed sign; this is not justified by the algebra, but gets the correct
+          fitparams->par()(posindex + 2) = -v.y();//initialisation... helixPoca function must be checked
+          fitparams->par()(posindex + 3) = -v.z();//
 
-          dau1->setFlightLength(flt1) ;
-          dau2->setFlightLength(flt2) ;
+          dau1->setFlightLength(flt1);
+          dau2->setFlightLength(flt2);
 
         } else if (trkdaughters.size() + vtxdaughters.size() >= 2)  {
           // that's unfortunate: no enough charged tracks from this
           // vertex. need all daughters. create trajectories and use
           // normal TrkPoca.
 
-          std::cout << "VtkInternalParticle: Low # charged track initializaton. To be implemented!!" << std::endl ;
+          B2DEBUG(80, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
           /*
             std::vector<const Trajectory*> trajectories ;
             for(vector<RecoTrack*>::const_iterator it = trkdaughters.begin() ;
@@ -283,7 +287,7 @@ namespace TreeFitter {
 
             std::vector<TrkLineTraj> linetrajectories ; // store trajectories of composites
             linetrajectories.reserve(  vtxdaughters.size() ) ;
-            for(daucontainer::const_iterator it = vtxdaughters.begin() ;
+            for(ParticleBase::Iter it = vtxdaughters.begin() ;
           it != vtxdaughters.end() ; ++it) {
               //std::cout << (*it)->bc()->pdtEntry()->name() << std::endl ;
               int dauposindex = (*it)->posIndex() ;
@@ -323,29 +327,29 @@ namespace TreeFitter {
           */
         } else if (mother() && mother()->posIndex() >= 0) {
           // let's hope the mother was initialized
-          int posindexmother = mother()->posIndex() ;
+          int posindexmother = mother()->posIndex();
           for (int ipos = 1; ipos <= 3; ++ipos) {
-            fitparams->par()(posindex + ipos) =
-              fitparams->par()(posindexmother + ipos) ;
+            fitparams->par()(posindex + ipos) = fitparams->par()(posindexmother + ipos);
           }
         } else {
           // something is wrong!
           //    BtaPrintTree treeprinter ;
           std::cout << "There are not sufficient geometric constraints to fit "
                     << "this decay tree. Perhaps you should add a beam constraint. "
+                    << " This happend for a " << this->name() << " candidate." <<
                     //      << bc()->constraint(BtaConstraint::Beam)
-                    << std::endl ;
+                    std::endl ;
           //    << treeprinter.print(*bc()) << endmsg ;
-          status |= ErrCode::badsetup ;
+          status |= ErrCode::badsetup;
         }
       }
     }
     // step 3: do the post initialization step of all daughters
-    for (daucontainer::const_iterator it = daughters().begin(); it != daughters().end() ; ++it) {
-      (*it)->initPar2(fitparams) ;
+    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
+      (*it)->initPar2(fitparams);
     }
     // step 4: initialize the momentum by adding up the daughter 4-vectors
-    initMom(fitparams) ;
+    initMom(fitparams);
     if (vtxverbose >= 3)
       std::cout << "End of initpar: "
                 << particle()->getName() << " ("
@@ -353,57 +357,61 @@ namespace TreeFitter {
                 << fitparams->par()(posindex + 2) << ","
                 << fitparams->par()(posindex + 3) << ")" << std::endl ;
 
-    return status ;
+    return status;
   }
 
   ErrCode InternalParticle::initPar2(FitParams* fitparams)
   {
     // FIX ME: in the unfortunate case (the B-->D0K*- above) that our
     // vertex is still the origin, we copy the mother vertex.
-    int posindex = posIndex() ;
+    int posindex = posIndex();
+    int posindexmom = 0;
     if (hasPosition() && mother() && fitparams->par(posindex + 1) == 0 &&
         fitparams->par(posindex + 2) == 0 && fitparams->par(posindex + 3) == 0) {
-      int posindexmom = mother()->posIndex() ;
-      for (int irow = 1; irow <= 3; ++irow)
-        fitparams->par(posindex + irow) = fitparams->par(posindexmom + irow) ;
+      posindexmom = mother()->posIndex();
+      for (int irow = 1; irow <= 3; ++irow) {
+        fitparams->par(posindex + irow) = fitparams->par(posindexmom + irow);
+      }
     }
     // step 5: initialize the lifetime
-    return initTau(fitparams) ;
+    return initTau(fitparams);
   }
 
   ErrCode InternalParticle::initMom(FitParams* fitparams) const
   {
-    int momindex = momIndex() ;
+    int momindex = momIndex();
     // reset
-    for (int irow = 1; irow <= 4; ++irow)
-      fitparams->par(momindex + irow) = 0 ;
-
+    for (int irow = 1; irow <= 4; ++irow) {
+      fitparams->par(momindex + irow) = 0;
+    }
     // now add daughter momenta
-    for (daucontainer::const_iterator it = begin() ; it != end() ; ++it) {
-      int daumomindex = (*it)->momIndex() ;
-      double e2(0) ;
-      int maxrow = (*it)->hasEnergy() ? 4 : 3 ;
+
+    int daumomindex = 0, maxrow = 0;
+    double e2 = 0, px = 0, mass = 0;
+    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
+      daumomindex = (*it)->momIndex();
+      maxrow = (*it)->hasEnergy() ? 4 : 3;
       for (int irow = 1; irow <= maxrow; ++irow) {
-        double px = fitparams->par()(daumomindex + irow) ;
-        e2 += px * px ;
-        fitparams->par(momindex + irow) += px ;
+        px = fitparams->par()(daumomindex + irow);
+        e2 += px * px;
+        fitparams->par(momindex + irow) += px;
       }
       if (maxrow == 3) {
-        double mass = (*it)->pdgMass() ;
-        fitparams->par(momindex + 4) += sqrt(e2 + mass * mass) ;
+        mass = (*it)->pdgMass();
+        fitparams->par(momindex + 4) += sqrt(e2 + mass * mass);
       }
     }
-    return ErrCode::success ;
+    return ErrCode::success;
   }
 
   ErrCode InternalParticle::initCov(FitParams* fitparams) const
   {
-    ErrCode status ;
-    ParticleBase::initCov(fitparams) ;
-    for (daucontainer::const_iterator it = daughters().begin() ;
-         it != daughters().end() ; ++it)
-      status |= (*it)->initCov(fitparams) ;
-    return status ;
+    ErrCode status;
+    ParticleBase::initCov(fitparams);
+    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
+      status |= (*it)->initCov(fitparams);
+    }
+    return status;
   }
 
   ErrCode InternalParticle::projectKineConstraint(const FitParams& fitparams,
@@ -414,74 +422,78 @@ namespace TreeFitter {
     // CPU.
 
     // first add the mother
-    int momindex = momIndex() ;
+    int momindex = momIndex();
     for (int imom = 1; imom <= 4; ++imom) {
-      p.r(imom)               = fitparams.par()(momindex + imom) ;
-      p.H(imom, momindex + imom) = 1 ;
+      p.r(imom)               = fitparams.par()(momindex + imom);
+      p.H(imom, momindex + imom) = 1;
     }
 
     // now add the daughters
-    for (daucontainer::const_iterator it = daughters().begin() ;
-         it != daughters().end() ; ++it) {
-      int dautauindex = (*it)->tauIndex() ;
-      int daumomindex = (*it)->momIndex() ;
-      double mass = (*it)->pdgMass() ;
-      double e2 = mass * mass ;
-      int maxrow = (*it)->hasEnergy() ? 4 : 3 ;
+    const double posprecision = 1e-4; // 1mu
+    int dautauindex = 0, daumomindex = 0, maxrow = 0;
+    double mass = 0, e2 = 0, px = 0, py = 0, energy = 0, tau = 0, lambda = 0, px0 = 0, py0 = 0, pt0 = 0, sinlt = 0, coslt = 0;
+
+    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
+      dautauindex = (*it)->tauIndex();
+      daumomindex = (*it)->momIndex();
+      mass = (*it)->pdgMass();
+      e2 = mass * mass;
+      maxrow = (*it)->hasEnergy() ? 4 : 3;
       for (int imom = 1; imom <= maxrow; ++imom) {
-        double px = fitparams.par()(daumomindex + imom) ;
-        e2 += px * px ;
-        p.r(imom) += -px ;
-        p.H(imom, daumomindex + imom) = -1 ;
+        px = fitparams.par()(daumomindex + imom);
+        e2 += px * px;
+        p.r(imom) += -px;
+        p.H(imom, daumomindex + imom) = -1;
       }
 
       if (maxrow == 3) {
         // treat the energy for particles that are parameterized with p3
-        double energy = sqrt(e2) ;
-        p.r(4) += -energy ;
+        energy = sqrt(e2);
+        p.r(4) += -energy;
         for (int jmom = 1; jmom <= 3; ++jmom) {
-          double px = fitparams.par()(daumomindex + jmom) ;
-          p.H(4, daumomindex + jmom) = -px / energy ;
+          px = fitparams.par()(daumomindex + jmom);
+          p.H(4, daumomindex + jmom) = -px / energy;
         }
       } else if (dautauindex >= 0 && (*it)->charge() != 0) {
 
-        double tau =  fitparams.par()(dautauindex + 1) ;
-        double lambda = bFieldOverC() * (*it)->charge() ;
-        double px0 = fitparams.par()(daumomindex + 1) ;
-        double py0 = fitparams.par()(daumomindex + 2) ;
-        double pt0 = sqrt(px0 * px0 + py0 * py0) ;
-        const double posprecision = 1e-4 ; // 1mu
+        //JFK changed tau eventually we have to devide it by |p| here
+        tau =  fitparams.par()(dautauindex + 1);
+
+        lambda = bFieldOverC() * (*it)->charge();
+        px0 = fitparams.par()(daumomindex + 1);
+        py0 = fitparams.par()(daumomindex + 2);
+        pt0 = sqrt(px0 * px0 + py0 * py0);
         if (fabs(pt0 * lambda * tau * tau) > posprecision) {
-          double sinlt = sin(lambda * tau) ;
-          double coslt = cos(lambda * tau) ;
-          double px = px0 * coslt - py0 * sinlt ;
-          double py = py0 * coslt + px0 * sinlt ;
-          p.r(1) += px0 - px ;
-          p.r(2) += py0 - py ;
-          p.H(1, daumomindex + 1) +=  1 - coslt ;
-          p.H(1, daumomindex + 2) +=      sinlt ;
-          p.H(1, dautauindex + 1) +=  lambda * py ;
-          p.H(2, daumomindex + 1) +=     -sinlt ;
-          p.H(2, daumomindex + 2) +=  1 - coslt ;
-          p.H(2, dautauindex + 1) += -lambda * px ;
+          sinlt = sin(lambda * tau);
+          coslt = cos(lambda * tau);
+          px = px0 * coslt - py0 * sinlt;
+          py = py0 * coslt + px0 * sinlt;
+          p.r(1) += px0 - px;
+          p.r(2) += py0 - py;
+          p.H(1, daumomindex + 1) +=  1 - coslt;
+          p.H(1, daumomindex + 2) +=      sinlt;
+          p.H(1, dautauindex + 1) +=  lambda * py;
+          p.H(2, daumomindex + 1) +=     -sinlt;
+          p.H(2, daumomindex + 2) +=  1 - coslt;
+          p.H(2, dautauindex + 1) += -lambda * px;
         }
       }
     }
-    return ErrCode::success ;
+    return ErrCode::success;
   }
 
   ErrCode InternalParticle::projectLifeTimeConstraint(const FitParams& fitparams,
                                                       Projection& p) const
   {
-    int tauindex = tauIndex() ;
-    assert(tauindex >= 0) ;
-    double tau = pdgTau() ;
-    B2DEBUG(80, "InternalParticle::projectLifeTimeConstraint: p.r(1) = fitparams.par()(tauindex+1)[" << fitparams.par()(
+    int tauindex = tauIndex();
+    assert(tauindex >= 0);
+    double tau = pdgTau();
+    B2DEBUG(0, "InternalParticle::projectLifeTimeConstraint: p.r(1) = fitparams.par()(tauindex+1)[" << fitparams.par()(
               tauindex + 1) << "] - tau[" << tau << "]");
-    p.r(1)            = fitparams.par()(tauindex + 1) - tau ;
-    p.Vfast(1, 1)      = tau * tau ;
-    p.H(1, tauindex + 1) = 1 ;
-    return ErrCode::success ;
+    p.r(1)            = fitparams.par()(tauindex + 1) - tau;
+    p.Vfast(1, 1)      = tau * tau;
+    p.H(1, tauindex + 1) = 1;
+    return ErrCode::success;
   }
 
 //FT: removed until photon conversion is implemented properly
@@ -525,70 +537,78 @@ namespace TreeFitter {
                                               const FitParams& fitparams,
                                               Projection& p) const
   {
-    ErrCode status ;
+    ErrCode status;
     switch (type) {
       case Constraint::mass:
       case Constraint::massEnergy:
-        status |= projectMassConstraint(fitparams, p) ;
+        status |= projectMassConstraint(fitparams, p);
         //chisq = filterMassConstraintOnDaughters(fitpar) ;
-        break ;
+        break;
       case Constraint::geometric:
-        status |= projectGeoConstraint(fitparams, p) ;
-        break ;
+        status |= projectGeoConstraint(fitparams, p);
+        break;
       case Constraint::kinematic:
-        status |= projectKineConstraint(fitparams, p) ;
-        break ;
+        status |= projectKineConstraint(fitparams, p);
+        break;
       case Constraint::lifetime:
-        status |= projectLifeTimeConstraint(fitparams, p) ;
-        break ;
+        status |= projectLifeTimeConstraint(fitparams, p);
+        break;
       //    case Constraint::conversion: //FT: removed until (if) ConvertedPhoton is implemented
       //      status |= projectConversionConstraint(fitparams,p) ;
       //      break ;
       default:
-        status |= ParticleBase::projectConstraint(type, fitparams, p) ;
+        status |= ParticleBase::projectConstraint(type, fitparams, p);
     }
-    return status ;
+    return status;
   }
 
-  void InternalParticle::addToConstraintList(constraintlist& alist,
+  void InternalParticle::addToConstraintList(constraintlist& list,
                                              int depth) const
   {
     // first the daughters
-    for (daucontainer::const_iterator it = daughters().begin() ;
-         it != daughters().end() ; ++it)
-      (*it)->addToConstraintList(alist, depth - 1) ;
+    // JFK: changed to non const Mon 04 Sep 2017 05:17:18 AM CEST
+    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
+      (*it)->addToConstraintList(list, depth - 1);
+    }
 
     //double geoprecision  = 1e-5 ; // 1mu
     //double massprecision = 4*pdgMass()*pdgMass()*1e-5 ; // 0.01 MeV
 
     // the lifetime constraint
-    if (tauIndex() >= 0 && m_lifetimeconstraint)
-      alist.push_back(Constraint(this, Constraint::lifetime, depth, 1)) ;
+    if (tauIndex() >= 0 && m_lifetimeconstraint) {
+      list.push_back(Constraint(this, Constraint::lifetime, depth, 1));
+    }
+
     // the kinematic constraint
-    if (momIndex() >= 0)
-      alist.push_back(Constraint(this, Constraint::kinematic, depth, 4)) ;
+    if (momIndex() >= 0) {
+      list.push_back(Constraint(this, Constraint::kinematic, depth, 4));
+    }
+
     // the geometric constraint
-    if (mother() && tauIndex() >= 0)
-      alist.push_back(Constraint(this, Constraint::geometric, depth, 3, 0, 3)) ;
+    if (mother() && tauIndex() >= 0) {
+      list.push_back(Constraint(this, Constraint::geometric, depth, 3, 0, 3));
+    }
+
     // the mass constraint
     if (m_massconstraint) {
-      if (!m_isconversion)
+      if (!m_isconversion) {
         //     if( mother() && mother()->type()==ParticleBase::kUpsilon)
-        //  alist.push_back(Constraint(this,Constraint::massEnergy,depth)) ;
+        //  list.push_back(Constraint(this,Constraint::massEnergy,depth)) ;
         //       else
-        alist.push_back(Constraint(this, Constraint::mass, depth, 1, 0, 10)) ;
-      else
-        alist.push_back(Constraint(this, Constraint::conversion, depth, 1, 0, 3)) ;
+        list.push_back(Constraint(this, Constraint::mass, depth, 1, 0, 10));
+      } else {
+        list.push_back(Constraint(this, Constraint::conversion, depth, 1, 0, 3));
+      }
     }
   }
 
 
   std::string InternalParticle::parname(int thisindex) const
   {
-    int id = thisindex ;
+    int id = thisindex;
     // skip the lifetime parameter if there is no mother
-    if (!mother() && id >= 3) ++id ;
-    return ParticleBase::parname(id) ;
+    if (!mother() && id >= 3) {++id;}
+    return ParticleBase::parname(id);
   }
 
 //   struct printfunctor : public unary_function<ParticleBase*,void>
@@ -606,7 +626,7 @@ namespace TreeFitter {
   //     for_each(_daughters.begin(),_daughters.end(),
   //       printfunctor(fitpar) ) ;
 
-      for(daucontainer::const_iterator it = m_daughters.begin() ;
+      for(ParticleBase::Iter it = m_daughters.begin() ;
     it != m_daughters.end() ; ++it)
         (*it)->print(fitpar) ;
     }
@@ -616,7 +636,7 @@ namespace TreeFitter {
     const ParticleBase*  InternalParticle::locate(Particle* aparticle) const
     {
       const ParticleBase* rc = ParticleBase::locate(aparticle) ;
-      for(daucontainer::const_iterator it = m_daughters.begin() ;
+      for(ParticleBase::Iter it = m_daughters.begin() ;
     !rc && it != m_daughters.end(); ++it)
         rc = (*it)->locate(aparticle) ;
       return rc ;
@@ -628,7 +648,7 @@ namespace TreeFitter {
     double InternalParticle::chiSquare(const FitParams* fitparams) const
     {
       double rc = 0;
-      for(daucontainer::const_iterator it = m_daughters.begin() ;
+      for(ParticleBase::Iter it = m_daughters.begin() ;
     it != m_daughters.end(); ++it)
         rc += (*it)->chiSquare(fitparams) ;
       return rc ;
@@ -704,16 +724,19 @@ namespace TreeFitter {
     // ensure that p4 'looks' conserved.
 
     // first the daughters
-    for (daucontainer::const_iterator it = daughters().begin() ;
-         it != daughters().end(); ++it)(*it)->forceP4Sum(fitparams) ;
+    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
+      (*it)->forceP4Sum(fitparams);
+    }
 
-    // now yourself (this is a bit expensive, but easy)
-    int momindex = momIndex() ;
+    int momindex = momIndex();
     if (momindex > 0) {
-      Projection p(fitparams.dim(), 4) ;
-      projectKineConstraint(fitparams, p) ;
-      for (int imom = 1; imom <= 4; ++imom) fitparams.par()(momindex + imom) -= p.r(imom) ;
+      Projection p(fitparams.dim(), 4);
+      projectKineConstraint(fitparams, p);
+      for (int imom = 1; imom <= 4; ++imom) {
+        fitparams.par()(momindex + imom) -= p.r(imom);
+      }
     }
   }
+
 }
 

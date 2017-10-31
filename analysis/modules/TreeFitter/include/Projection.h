@@ -82,12 +82,13 @@ namespace TreeFitter {
       m_offset = 0 ;
     }
 
-    // globalChisq
     double chiSquare() const
     {
+
       CLHEP::HepSymMatrix W = m_matrixV ;
       int ierr;  W.inverse(ierr) ;
-      return W.similarity(m_r) ;
+      double result = W.similarity(m_r);
+      return result;
     }
 
     void incrementOffset(unsigned int i) { m_offset += i ; }

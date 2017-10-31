@@ -21,11 +21,9 @@
 #include "TH1F.h"
 #include "TGraph.h"
 
-/* Validation script to determine benchmarks for PID cuts. */
-
 void plot_validplots(TFile* pfile, TTree* ptree, TFile *outputFile){
   char const *contactForAllPlots = "S. Cunliffe (sam.cunliffe@desy.de), S. Sandilya (saurabhsandilya@gmail.com), M. Schram (malachi.schram@desy.de)";
-  char const *title = "B^{0}#rightarrow K*^{0}#gamma";
+  char const *title = "B^{0}#rightarrowK*^{0}#gamma";
 
   TH1F* h_mbc = new TH1F("h_mbc",title,180,5.2,5.29);
   ptree->Project("h_mbc", "B0_mbc", "1==1");
@@ -49,14 +47,14 @@ void plot_validplots(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_deltae->GetListOfFunctions()->Add(new TNamed("Check", "Distribution should be centred at zero, tail to LHS."));
   h_deltae->GetListOfFunctions()->Add(new TNamed("Contact", contactForAllPlots));
   
-  TH1F* h_egam = new TH1F("h_egam",title,250,1.5,4.0);
+  TH1F* h_egam = new TH1F("h_egam",title,50,1.5,4.0);
   ptree->Project("h_egam", "B0_gamma_P", "1==1");
   h_egam->GetXaxis()->SetTitle("E_{lab}(#gamma) (GeV)");
   h_egam->GetListOfFunctions()->Add(new TNamed("Description", "Lab frame photon energy distribution from B^{0}#rightarrow K*^{0}#gamma"));
   h_egam->GetListOfFunctions()->Add(new TNamed("Check", "Broad distribution bewteen 1.5 and 3 GeV."));
   h_egam->GetListOfFunctions()->Add(new TNamed("Contact", contactForAllPlots));
 
-  TH1F* h_eparentgam = new TH1F("h_eparentgam",title,250,1.5,4.0); ptree->Project("h_eparentgam", "B0_Egamma", "1==1");
+  TH1F* h_eparentgam = new TH1F("h_eparentgam",title,100,1.5,4.0); ptree->Project("h_eparentgam", "B0_Egamma", "1==1");
   h_eparentgam->GetXaxis()->SetTitle("E(#gamma) (GeV)");
   h_eparentgam->GetListOfFunctions()->Add(new TNamed("Description", "Parent rest frame photon energy distribution from B^{0}#rightarrow K*^{0}#gamma"));
   h_eparentgam->GetListOfFunctions()->Add(new TNamed("Check", "Sharp distribution at 2.5 GeV."));

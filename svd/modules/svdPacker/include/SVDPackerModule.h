@@ -113,14 +113,11 @@ namespace Belle2 {
       struct APVHeader {
         unsigned int CMC1 : 8; //LSB
         unsigned int CMC2 : 4;
-
-        unsigned int FIFOfullErr: 1;
-        unsigned int FrameErr: 1;
-        unsigned int DetectErr: 1;
-        unsigned int APVErr : 1;
-
+        unsigned int fifoErr: 1;
+        unsigned int frameErr: 1;
+        unsigned int detectErr: 1;
+        unsigned int apvErr : 1;
         unsigned int pipelineAddr : 8;
-
         unsigned int APVnum : 6;
         unsigned int check : 2; //MSB
       };
@@ -144,13 +141,11 @@ namespace Belle2 {
 
       struct FADCTrailer {
         unsigned int FTBFlags: 16; //LSB
-
         unsigned int emPipeAddr: 8;
-
-        unsigned int wiredOrErr: 1;
-        unsigned int error0: 1;
-        unsigned int error1: 1;
-        unsigned int error2: 1;
+        unsigned int fifoErrOR: 1;
+        unsigned int frameErrOR: 1;
+        unsigned int detectErrOR: 1;
+        unsigned int apvErrOR: 1;
         unsigned int check : 4; //MSB
       };
 

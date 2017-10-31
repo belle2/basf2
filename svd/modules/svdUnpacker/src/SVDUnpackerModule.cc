@@ -3,7 +3,7 @@
 * Copyright(C) 2010 - Belle II Collaboration                                  *
 *                                                                             *
 * Author: The Belle II Collaboration                                          *
-* Contributors: Jarek Wiechczynski, Peter Kvasnicka                           *
+* Contributors: Jarek Wiechczynski, Jacek Stypula, Peter Kvasnicka            *
 *               Giulia Casarosa, Eugenio Paoloni                              *
 *                                                                             *
 * This software is provided "as is" without any warranty.                     *
@@ -30,6 +30,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <utility>
 
 using namespace std;
 using namespace Belle2;
@@ -107,9 +108,9 @@ void SVDUnpackerModule::event()
   StoreArray<SVDShaperDigit> shaperDigits(m_svdShaperDigitListName);
   StoreArray<SVDDAQDiagnostic> DAQDiagnostics(m_svdDAQDiagnosticsListName);
 
-  vector<SVDDAQDiagnostic> diagnosticVector;
-  int diagnosticIndex;
-  map<int, set<SVDShaperDigit>> diagnosticMap;
+  vector<SVDDAQDiagnostic*> diagnosticVector;
+  SVDDAQDiagnostic* currentDAQDiagnostic;
+  map<SVDShaperDigit, SVDDAQDiagnostic*> diagnosticMap;
 
   if (!m_eventMetaDataPtr.isValid()) {  // give up...
     B2ERROR("Missing valid EventMetaData." << std::endl <<
@@ -171,9 +172,7 @@ void SVDUnpackerModule::event()
           m_data32 = *data32_it; //put current 32-bit frame to union
 
           if (m_data32 == 0xffaa0000) {   // first part of FTB header
-            diagnosticMap.clear(); // new set of objects for the current FTB
-            diagnosticVector.clear();
-            diagnosticIndex = -1;
+            diagnosticVector.clear(); // new set of objects for the current FTB
             crc16vec.clear(); // clear the input container for crc16 calculation
             crc16vec.push_back(m_data32);
             data32_it++; // go to 2nd part of FTB header
@@ -251,10 +250,8 @@ void SVDUnpackerModule::event()
             pipAddr = m_APVHeader.pipelineAddr;
 
             // temporary SVDDAQDiagnostic object (no info from trailers)
-            diagnosticVector.push_back(
-              SVDDAQDiagnostic(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError)
-            );
-            diagnosticMap[++diagnosticIndex] = set<SVDShaperDigit>();
+            currentDAQDiagnostic = DAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError);
+            diagnosticVector.push_back(currentDAQDiagnostic);
           }
 
           if (m_data_A.check == 0) { // data
@@ -284,7 +281,7 @@ void SVDUnpackerModule::event()
             if (m_generateShaperDigts) {
               //B2INFO("Generating SVDShaperDigit object");
               SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample, 0.0, m_SVDModeByte);
-              diagnosticMap[diagnosticIndex].insert(*newShaperDigit);
+              diagnosticMap.insert(make_pair(*newShaperDigit, currentDAQDiagnostic));
               delete newShaperDigit;
             }
 
@@ -296,21 +293,11 @@ void SVDUnpackerModule::event()
             ftbFlags = m_FADCTrailer.FTBFlags;
             emuPipAddr = m_FADCTrailer.emuPipeAddr;
             apvErrorsOR = m_FADCTrailer.apvErrOR;
-
-            for (auto& pair : diagnosticMap) {
-              SVDDAQDiagnostic& finalDAQDiagnostic = diagnosticVector[pair.first];
-
-              finalDAQDiagnostic.setFTBFlags(ftbFlags);
-              finalDAQDiagnostic.setEmuPipelineAddress(emuPipAddr);
-              finalDAQDiagnostic.setApvErrorOR(apvErrorsOR);
-
-              auto* storedDAQDiagnostic = DAQDiagnostics.appendNew(finalDAQDiagnostic);
-
-              for (auto& d : pair.second) {
-                shaperDigits.appendNew(d)->addRelationTo(storedDAQDiagnostic);
-              }
+            for (auto* finalDAQDiagnostic : diagnosticVector) {
+              finalDAQDiagnostic->setFTBFlags(ftbFlags);
+              finalDAQDiagnostic->setEmuPipelineAddress(emuPipAddr);
+              finalDAQDiagnostic->setApvErrorOR(apvErrorsOR);
             }
-
 
           }// FADC trailer
 
@@ -346,7 +333,9 @@ void SVDUnpackerModule::event()
     } // end event loop
 
   }
-
+  for (auto& pair : diagnosticMap) {
+    shaperDigits.appendNew(pair.first)->addRelationTo(pair.second);
+  }
 } //end event function
 #ifndef __clang__
 #pragma GCC diagnostic pop

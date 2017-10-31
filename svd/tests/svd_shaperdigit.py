@@ -41,7 +41,7 @@ class SvdShaperDigitTestModule(Module):
                 x.getSensorID().getLayerNumber(),
                 x.getSensorID().getLadderNumber(),
                 x.getSensorID().getSensorNumber(),
-                x.isUStrip(),
+                not x.isUStrip(),
                 x.getCellID()))
 
     def initialize(self):
@@ -61,7 +61,7 @@ class SvdShaperDigitTestModule(Module):
         svdShaperDigits_sorted = svdShaperDigits
         if DigitsSort:
             svdDigits_sorted = self.sortDigits(svdDigits)
-            svdShaperDigits_sorted = self.sortDigits(svdShaperDigits)
+            svdShaperDigits_sorted = svdShaperDigits  # self.sortDigits(svdShaperDigits)
 
         if not len(svdDigits_sorted) == len(svdShaperDigits_sorted) * 6:
             print("#SVDShaperDigits = ", len(svdShaperDigits_sorted), "\n#SVDDigits / 6 = ", len(svdDigits_sorted) / 6)

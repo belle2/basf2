@@ -157,7 +157,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   }
   genfit::Track gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
 
-  //if existing, pass to the genfit::Track the correct cardinal representation
+  // If existing, pass to the genfit::Track the correct cardinal representation
   std::vector<genfit::AbsTrackRep*> repsPlus = gfTrackPlus.getTrackReps();
   std::vector<genfit::AbsTrackRep*> repsMinus = gfTrackMinus.getTrackReps();
   if (repsPlus.size() == repsMinus.size()) {
@@ -168,7 +168,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
         gfTrackMinus.setCardinalRep(id);
     }
   }
-  //the two vectors should always have the same size, and this never happen
+  // The two vectors should always have the same size, and this never happen
   else {
     for (unsigned int id = 0; id < repsPlus.size(); id++) {
       if (repsPlus[id]->getPDG() == trackHypotheses.first.getPDGCode())
@@ -179,7 +179,6 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
         gfTrackMinus.setCardinalRep(id);
     }
   }
-  //
 
   const genfit::MeasuredStateOnPlane* stPlusPtr = nullptr;
   try {
@@ -227,6 +226,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     return false;
   }
 
+  // Update the tracks (genfit::MeasuredStateOnPlane) after vertex
   stPlus = gfTrackPlus.getFittedState();
   stMinus = gfTrackMinus.getFittedState();
 
@@ -259,7 +259,8 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     return false;
   }
 
-  // The helix is extrapolated to the IP in a constant magnetic field and material effects are neglected
+  // To build the trackFitResult  use the magnetic field at the origin;
+  // the helix is extrapolated to the IP in a constant magnetic field and material effects are neglected
   // so that the vertexing tool executed on the MDST object will find again this vertex position
   const TVector3 origin(0, 0, 0);
   const double Bz = getBzAtVertex(origin);

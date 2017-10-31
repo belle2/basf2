@@ -79,7 +79,7 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
            true);
   addParam("pdfFile", m_pdfFile,
            "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.",
-           std::string("/data/reconstruction/dedxPID_PDFs_dd92782_500k_events.root"));
+           std::string("/data/reconstruction/dedxPID_PDFs_fb_500k_events.root"));
 
   addParam("onlyPrimaryParticles", m_onlyPrimaryParticles,
            "Only save data for primary particles (as determined by MC truth)", false);

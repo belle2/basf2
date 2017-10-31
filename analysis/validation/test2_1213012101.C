@@ -13,7 +13,7 @@
 //
 // Constributor: Minakshi Nayak
 // May 17, 2017
-//
+// Modified: October 31, 2017
 ////////////////////////////////////////////////////////////
 
 #include "TFile.h"
@@ -24,7 +24,7 @@
 #include <TROOT.h>
 #include <TSystem.h>
 
-/* Validation script to determine benchmarks for PID cuts. */
+ /* Draw the validation plots. */
 
 void plot(TFile* pfile, TTree* ptree, TFile *outputFile){
 

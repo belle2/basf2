@@ -21,7 +21,7 @@
 #include "TH1F.h"
 #include "TGraph.h"
 
-/* Validation script to determine benchmarks for PID cuts. */
+ /* Draw the validation plots */
 
 void plot(TFile* pfile, TTree* ptree, TFile *outputFile){
 

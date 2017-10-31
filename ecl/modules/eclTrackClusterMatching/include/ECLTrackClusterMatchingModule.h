@@ -103,11 +103,14 @@ namespace Belle2 {
     std::vector<double>* m_thetaCluster;
     std::vector<double>* m_errorTheta;
     std::vector<double>* m_phi_consistency;
+    std::vector<double>* m_phi_consistency_best;
     std::vector<double>* m_theta_consistency;
+    std::vector<double>* m_theta_consistency_best;
     std::vector<double>* m_quality;
     std::vector<double>* m_quality_best; /**< Best quality among all extrapolated hits of one track */
     std::vector<int>* m_hitstatus_best;
-
+    std::vector<int>* m_true_cluster_pdg;
+    std::vector<int>* m_true_track_pdg;
   };
 
 } //Belle2

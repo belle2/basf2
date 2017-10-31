@@ -8,6 +8,7 @@
 
 #include <ecl/modules/eclTrackClusterMatching/ECLTrackClusterMatchingModule.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/RelationVector.h>
@@ -40,10 +41,14 @@ ECLTrackClusterMatchingModule::ECLTrackClusterMatchingModule()
     m_thetaCluster(0),
     m_errorTheta(0),
     m_phi_consistency(0),
+    m_phi_consistency_best(0),
     m_theta_consistency(0),
+    m_theta_consistency_best(0),
     m_quality(0),
     m_quality_best(0),
-    m_hitstatus_best(0)
+    m_hitstatus_best(0),
+    m_true_cluster_pdg(0),
+    m_true_track_pdg(0)
 {
   setDescription("Match Tracks to ECLCluster");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -64,6 +69,7 @@ void ECLTrackClusterMatchingModule::initialize()
 
   StoreArray<Track> tracks;
   StoreArray<ECLCluster> eclClusters;
+  StoreArray<MCParticle>::required();
   tracks.registerRelationTo(eclClusters);
   tracks.registerRelationTo(tracks);
 
@@ -100,10 +106,14 @@ void ECLTrackClusterMatchingModule::initialize()
   m_tree->Branch("thetaCluster", "std::vector<double>",  &m_thetaCluster);
   m_tree->Branch("errorTheta", "std::vector<double>",  &m_errorTheta);
   m_tree->Branch("phi_consistency", "std::vector<double>",  &m_phi_consistency);
+  m_tree->Branch("phi_consistency_best", "std::vector<double>",  &m_phi_consistency_best);
   m_tree->Branch("theta_consistency", "std::vector<double>",  &m_theta_consistency);
+  m_tree->Branch("theta_consistency_best", "std::vector<double>",  &m_theta_consistency_best);
   m_tree->Branch("quality", "std::vector<double>",  &m_quality);
   m_tree->Branch("quality_best", "std::vector<double>",  &m_quality_best);
   m_tree->Branch("hitStatus_best", "std::vector<int>",  &m_hitstatus_best);
+  m_tree->Branch("trueClusterPDG", "std::vector<int>",  &m_true_cluster_pdg);
+  m_tree->Branch("trueTrackPDG", "std::vector<int>",  &m_true_track_pdg);
 
   B2INFO("[ECLTrackClusterMatchingModule]: Initialization of ECLTrackClusterMatching Module completed.");
 }
@@ -121,12 +131,16 @@ void ECLTrackClusterMatchingModule::event()
   m_thetaCluster->clear();
   m_errorTheta->clear();
   m_phi_consistency->clear();
+  m_phi_consistency_best->clear();
   m_theta_consistency->clear();
+  m_theta_consistency_best->clear();
   m_quality->clear();
   m_quality_best->clear();
   m_trackNo->clear();
   m_trackMomentum->clear();
   m_hitstatus_best->clear();
+  m_true_cluster_pdg->clear();
+  m_true_track_pdg->clear();
 
   StoreObjPtr<EventMetaData> eventmetadata;
   if (eventmetadata) {
@@ -148,7 +162,13 @@ void ECLTrackClusterMatchingModule::event()
 
     ECLCluster* cluster_best = nullptr;
     double quality_best = 0;
+    double phi_consistency_best = 0;
+    double theta_consistency_best = 0;
     double momentum = track.getTrackFitResult(Const::pion)->getMomentum().Mag();
+    const MCParticle* relatedMCParticle = track.getRelatedTo<MCParticle>();
+    if (relatedMCParticle) {
+      m_true_track_pdg->push_back(relatedMCParticle->getPDG());
+    }
     // m_trackNo = i;
     // m_trackMomentum = momentum;
     ExtHitStatus hitStatus = EXT_FIRST;
@@ -188,6 +208,8 @@ void ECLTrackClusterMatchingModule::event()
         m_theta_consistency->push_back(thetaConsistency(deltaTheta, momentum));
         if (quality > quality_best) {
           quality_best = quality;
+          phi_consistency_best = phiConsistency(deltaPhi, momentum);
+          theta_consistency_best = thetaConsistency(deltaTheta, momentum);
           cluster_best = eclCluster;
           hitStatus = extHit.getStatus();
         }
@@ -199,10 +221,15 @@ void ECLTrackClusterMatchingModule::event()
     m_trackNo->push_back(i);
     m_trackMomentum->push_back(momentum);
     m_quality_best->push_back(quality_best);
+    m_phi_consistency_best->push_back(phi_consistency_best);
+    m_theta_consistency_best->push_back(theta_consistency_best);
     m_hitstatus_best->push_back(hitStatus);
-    if (cluster_best != nullptr && quality_best > 1e-8) {
+    if (cluster_best != nullptr && quality_best > 1e-6) {
       cluster_best->setIsTrack(true);
       track.addRelationTo(cluster_best);
+      for (const auto& mcparticle : cluster_best->getRelationsTo<MCParticle>()) {
+        m_true_cluster_pdg->push_back(mcparticle.getPDG());
+      }
     }
   } // end loop on Tracks
   m_tree->Fill();
@@ -231,8 +258,8 @@ bool ECLTrackClusterMatchingModule::isECLHit(const ExtHit& extHit) const
 
 double ECLTrackClusterMatchingModule::clusterQuality(double deltaPhi, double deltaTheta, double momentum) const
 {
-  double phi_RMS = 0.0094;
-  double theta_RMS = 0.0094 + 0.0377 * exp(-4.5 * momentum);
+  double phi_RMS = 0.01078 + exp(-1.46 - 4.61 * momentum);;
+  double theta_RMS = 0.010336 + exp(-2.562 - 5.16 * momentum);
   double phi_consistency = erfc(abs(deltaPhi) / phi_RMS);
   double theta_consistency = erfc(abs(deltaTheta) / theta_RMS);
   return phi_consistency * theta_consistency * (1 - log(phi_consistency * theta_consistency));
@@ -240,12 +267,12 @@ double ECLTrackClusterMatchingModule::clusterQuality(double deltaPhi, double del
 
 double ECLTrackClusterMatchingModule::phiConsistency(double deltaPhi, double momentum) const
 {
-  double phi_RMS = 0.010595 + 0.0000114 * exp(9.55 - 4.05 * momentum);
+  double phi_RMS = 0.01078 + exp(-1.46 - 4.61 * momentum);
   return erfc(abs(deltaPhi) / phi_RMS);
 }
 
 double ECLTrackClusterMatchingModule::thetaConsistency(double deltaTheta, double momentum) const
 {
-  double theta_RMS = 0.0094 + 0.0377 * exp(-4.5 * momentum);
+  double theta_RMS = 0.010336 + exp(-2.562 - 5.16 * momentum);
   return erfc(abs(deltaTheta) / theta_RMS);
 }

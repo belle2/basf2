@@ -45,12 +45,15 @@ void plot(TFile* pfile, TTree* ptree, TFile *outputFile){
   TNamed* contact = new TNamed("Contact", "bilas.kanti.pal@desy.de");
 
   h_mbc->GetListOfFunctions()->Add(new TNamed("Description", h_mbc->GetTitle()));
+  h_mbc->GetListOfFunctions()->Add(new TNamed("Check", "Check position and width of the peak"));
   h_mbc->GetListOfFunctions()->Add(contact);
   
   h_deltae->GetListOfFunctions()->Add(new TNamed("Description", h_deltae->GetTitle()));
+  h_deltae->GetListOfFunctions()->Add(new TNamed("Check", "Check position and width of the peak"));
   h_deltae->GetListOfFunctions()->Add(contact);
   
   h_MKs->GetListOfFunctions()->Add(new TNamed("Description", h_MKs->GetTitle()));
+  h_MKs->GetListOfFunctions()->Add(new TNamed("Check", "Check position and width of the peak"));
   h_MKs->GetListOfFunctions()->Add(contact);
 
   outputFile->cd();

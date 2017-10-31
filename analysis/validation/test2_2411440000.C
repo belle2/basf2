@@ -25,10 +25,10 @@
 void plot_pipijpsi(TFile* pfile, TTree* ptree, TFile *outputFile){
 
   TString Cuts("vpho_Jpsi_mu0_muid > 0.1 && vpho_Jpsi_mu1_muid >0.1");
-  TH1F* h_pipijpsi = new TH1F("h_pipijpsi","M_{#pi#piJ/#psi}",180,3.7,5.5);
+  TH1F* h_pipijpsi = new TH1F("h_pipijpsi","M_{#pi#piJ/#psi}", 50, 4,0, 6.0);
   ptree->Project("h_pipijpsi", "vpho_daughterInvariantMass__bo0__cm1__cm2__bc", Cuts);
   h_pipijpsi->GetXaxis()->SetTitle("M_{#pi#piJ/#psi} (GeV/c^{2})");
-  h_pipijpsi->GetYaxis()->SetTitle("Events / (10 MeV/c^{2})");
+  h_pipijpsi->GetYaxis()->SetTitle("Events / (40 MeV/c^{2})");
   h_pipijpsi->GetListOfFunctions()->Add(new TNamed("Description", "e^{+} e^{-} #rightarrow #pi^{+} #pi^{-} J/#psi(#mu#mu)  M_{#pi#piJ/#psi} (GeV/c^{2})"));
   h_pipijpsi->GetListOfFunctions()->Add(new TNamed("Contact" , "liyb@pku.edu.cn"));
   h_pipijpsi->GetListOfFunctions()->Add(new TNamed("Check", "no expected distribution of M_{#pi#piJ/#psi}"));

@@ -136,7 +136,7 @@ namespace Belle2 {
     int getDefaultElectId(int isForward, int sector, int layer, int axis);
 
     //! remap the channel ID for scitilators and RPCs
-    int getChannel(int isForward, int sector, int layer,  int& plane,  int channel);
+    int getChannel(int isForward, int sector, int layer,  int plane,  int channel);
 
   };
 

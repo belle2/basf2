@@ -93,6 +93,12 @@ namespace Belle2 {
     //! Export BKLM scintillator ADC parameters from database
     void exportBklmADCThreshold();
 
+    //! Import BKLM time window cut
+    void importBklmTimeWindow();
+
+    //! Export BKLM time window cut
+    void exportBklmTimeWindow();
+
   private:
 
     ClassDef(BKLMDatabaseImporter, 0); /**< ClassDef */

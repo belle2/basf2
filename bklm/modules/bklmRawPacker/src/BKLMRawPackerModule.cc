@@ -135,10 +135,10 @@ void BKLMRawPackerModule::event()
     int copperId;
     int finesse;
     int lane;
-    int plane;
-    intToElectCoo(electId, copperId, finesse, lane, plane);
+    int axis;
+    intToElectCoo(electId, copperId, finesse, lane, axis);
 
-    B2DEBUG(1, "BKLMRawPacker::copperId " << copperId << " " << isForward << " " << iSector << " " << lane << " " << plane << " " <<
+    B2DEBUG(1, "BKLMRawPacker::copperId " << copperId << " " << isForward << " " << iSector << " " << lane << " " << axis << " " <<
             iChannelNr << " " << iTdc << " " << icharge << " " << iCTime);
 
     unsigned short bword1 = 0;
@@ -148,9 +148,8 @@ void BKLMRawPackerModule::event()
     int flag;
     if (isRPC) flag = 2; //010
     else flag = 4; //100
-    if (isRPC) lane = lane + 5;
-    iChannelNr = getChannel(isForward, iSector, iLayer, plane, iChannelNr);
-    formatData(flag, iChannelNr, plane, lane, iTdc, icharge, iCTime, bword1, bword2, bword3, bword4);
+    iChannelNr = getChannel(isForward, iSector, iLayer, iAx, iChannelNr);
+    formatData(flag, iChannelNr, axis, lane, iTdc, icharge, iCTime, bword1, bword2, bword3, bword4);
     buf[0] |= bword2;
     buf[0] |= ((bword1 << 16));
     buf[1] |= bword4;
@@ -271,7 +270,7 @@ void BKLMRawPackerModule::formatData(int flag, int channel, int axis, int lane, 
 
 void BKLMRawPackerModule::loadMapFromDB()
 {
-  DBArray<BKLMElectronicMapping> elements("BKLMElectronicMapping");
+  DBArray<BKLMElectronicMapping> elements;
   elements.getEntries();
   for (const auto& element : elements) {
     B2DEBUG(1, "Version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " << element.getCopperId() <<
@@ -343,7 +342,7 @@ void BKLMRawPackerModule::loadMap()
 
 }
 
-void BKLMRawPackerModule::intToElectCoo(int id, int& copper, int& finesse, int& lane, int& plane)
+void BKLMRawPackerModule::intToElectCoo(int id, int& copper, int& finesse, int& lane, int& axis)
 {
   copper = 0;
   finesse = 0;
@@ -351,9 +350,9 @@ void BKLMRawPackerModule::intToElectCoo(int id, int& copper, int& finesse, int& 
   copper = (id & 0xF);
   finesse = (id >> 4) & 3;
   lane = 0;
-  lane = (id >> 6) & 0xF;
-  plane = 0;
-  plane = (id >> 10) & 0x1;
+  lane = (id >> 6) & 0x1F;
+  axis = 0;
+  axis = (id >> 11) & 0x1;
 
 }
 
@@ -361,27 +360,29 @@ int BKLMRawPackerModule::electCooToInt(int copper, int finesse, int lane, int ax
 {
   //  there are at most 16 copper -->4 bit
   // 4 finesse --> 2 bit
-  // < 16 lanes -->4 bit
+  // < 20 lanes -->5 bit
   // axis --> 1 bit
   unsigned int ret = 0;
   copper = copper & 0xF;
   ret |= copper;
   finesse = finesse & 3;
   ret |= (finesse << 4);
-  lane = lane & 0xF;
+  lane = lane & 0x1F;
   ret |= (lane << 6);
   axis = axis & 0x1;
-  ret |= (axis << 10);
+  ret |= (axis << 11);
 
   return ret;
 
 }
 
-int BKLMRawPackerModule::getDefaultElectId(int isForward, int sector, int layer, int axis)
+int BKLMRawPackerModule::getDefaultElectId(int isForward, int sector, int layer, int plane)
 {
 
   int copperId = 0;
   int finesse = 0;
+  int lane = 0;
+  int axisId = 0;
   if (isForward && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 1;
   if (isForward && (sector == 1 || sector == 2 || sector == 7 || sector == 8)) copperId = 2;
   if (!isForward && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 3;
@@ -389,13 +390,17 @@ int BKLMRawPackerModule::getDefaultElectId(int isForward, int sector, int layer,
   if (sector == 3 || sector == 4 || sector == 5 || sector == 6) finesse = sector - 3;
   if (sector == 1 || sector == 2) finesse = sector + 1;
   if (sector == 7 || sector == 8) finesse = sector - 7;
+  if (layer > 2) lane = layer + 5;
+  else lane = layer;
+  if (layer > 2) axisId = plane;
+  else { if (plane == 0) axisId = 1; else axisId = 0; }
 
-  return electCooToInt(copperId, finesse , layer, axis);
+  return electCooToInt(copperId, finesse , lane, axisId);
 
 }
 
 //better to put into database
-int BKLMRawPackerModule::getChannel(int isForward, int sector, int layer, int& plane, int channel)
+int BKLMRawPackerModule::getChannel(int isForward, int sector, int layer, int plane, int channel)
 {
 
   //we flip channel to match raw data
@@ -426,11 +431,6 @@ int BKLMRawPackerModule::getChannel(int isForward, int sector, int layer, int& p
     if (layer < 3 && channel > 9) channel = channel + 6;
   }
 
-  //we flip plane to match raw data
-  if (layer < 3) {
-    if (plane == 0) plane = 1;
-    else if (plane == 1) plane = 0;
-  }
   return channel;
 }
 

@@ -41,8 +41,8 @@ reconstructDecay('K_S0:all -> pi-:95eff pi+:95eff', '0.4 < M < 0.6', 1, True, an
 vertexKFit('K_S0:all', 0.0)
 applyCuts('K_S0:all', '0.477614 < M < 0.517614')
 
-fillParticleList('e+:std', 'eid > 0.1 and chiProb > 0.001 and p > 0.25', True, analysis_main)
-fillParticleList('mu+:std', 'muid > 0.1 and chiProb > 0.001 and p > 0.25', True, analysis_main)
+fillParticleList('e+:std', 'electronID > 0.1 and chiProb > 0.001 and p > 0.25', True, analysis_main)
+fillParticleList('mu+:std', 'muonID > 0.1 and chiProb > 0.001 and p > 0.25', True, analysis_main)
 
 # CSL Skim
 from CharmSemileptonic_List import *

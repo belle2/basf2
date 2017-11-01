@@ -44,8 +44,8 @@ inputMdstList('MC5', filelistSIG)
 # use standard final state particle lists
 #
 # creates "highPID" ParticleLists (and c.c.)
-fillParticleList('pi+:highPID', 'piid > 0.5 and d0 < 5 and abs(z0) < 10')
-fillParticleList('mu+:highPID', 'muid > 0.2 and d0 < 2 and abs(z0) < 4')
+fillParticleList('pi+:highPID', 'pionID > 0.5 and d0 < 5 and abs(z0) < 10')
+fillParticleList('mu+:highPID', 'muonID > 0.2 and d0 < 2 and abs(z0) < 4')
 
 
 # reconstruct Ks -> pi+ pi- decay

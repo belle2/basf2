@@ -21,7 +21,7 @@ inputMdstList('default', '../1213012101.dst.root')
 
 stdPi0s('looseFit')
 
-fillParticleList('K+:all', 'Kid > 0.5 and d0 < 0.5 and abs(z0) < 1')
+fillParticleList('K+:all', 'kaonID > 0.5 and d0 < 0.5 and abs(z0) < 1')
 
 # create Ks -> pi+ pi- list from V0
 stdKshorts()

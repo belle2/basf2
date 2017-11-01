@@ -146,11 +146,11 @@ class Sonic(Module):
 
         for i in range(ntracks):
             p = plist.obj().getParticle(i)
-            eid = variables.evaluate('eid', p)
-            kid = variables.evaluate('Kid', p)
-            prid = variables.evaluate('prid', p)
-            muid = variables.evaluate('muid', p)
-            piid = variables.evaluate('piid', p)
+            eid = variables.evaluate('electronID', p)
+            kid = variables.evaluate('kaonID', p)
+            prid = variables.evaluate('protonID', p)
+            muid = variables.evaluate('muonID', p)
+            piid = variables.evaluate('pionID', p)
             pidprob += max([eid, kid, prid, muid])
             trackprob += variables.evaluate('chiProb', p)
         self.instr.modulation['sharpness'].setValue(normalise(pidprob, 0, ntracks))

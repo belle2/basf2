@@ -38,7 +38,7 @@ inputMdst('default', '../1110021010.dst.root')
 # Create and fill final state ParticleLists
 # --------------------------------------------------
 
-fillParticleList('pi+:all', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4 and piid > 0.1')
+fillParticleList('pi+:all', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4 and pionID > 0.1')
 
 fillParticleList('gamma:all', 'E > 0.050 and clusterE9E25 > 0.8')
 

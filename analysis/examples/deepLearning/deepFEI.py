@@ -14,7 +14,7 @@ path.add_module('Gearbox')
 path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
 beamparameters = add_beamparameters(analysis_main, 'Y4S')
 
-fillParticleList('mu+', 'muid > 0.5', path=path)
+fillParticleList('mu+', 'muonID > 0.5', path=path)
 reconstructDecay('tau+ ->  mu+', '', path=path)
 matchMCTruth('tau+', path=path)
 reconstructDecay('B+:sig -> tau+', '', path=path)

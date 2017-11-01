@@ -505,8 +505,8 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
 
     The multiple ParticleLists with their own selection criteria are specified
     via list tuples (decayString, cut), like for example
-    kaons = ('K+:std', 'Kid>0.1')
-    pions = ('pi+:std', 'piid>0.1')
+    kaons = ('K+:std', 'kaonID>0.1')
+    pions = ('pi+:std', 'pionID>0.1')
     fillParticleLists([kaons, pions])
 
     The type of the particles to be loaded is specified via the decayString module parameter.
@@ -660,7 +660,7 @@ def fillParticleListsFromMC(
     The types of the particles to be loaded are specified via the (decayString, cut) tuples given in a list.
     For example:
     kaons = ('K+:gen', '')
-    pions = ('pi+:gen', 'piid>0.1')
+    pions = ('pi+:gen', 'pionID>0.1')
     fillParticleListsFromMC([kaons, pions])
 
     @param decayString   specifies type of Particles and determines the name of the ParticleList

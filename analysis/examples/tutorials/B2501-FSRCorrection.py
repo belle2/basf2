@@ -37,7 +37,7 @@ inputMdstList('default', inputFile)
 
 
 # fill particleLists
-fillParticleList('e+:uncorrected', 'eid > 0.2 and d0 < 2 and abs(z0) < 4')
+fillParticleList('e+:uncorrected', 'electronID > 0.2 and d0 < 2 and abs(z0) < 4')
 fillParticleList('gamma:all', 'E < 1.0', False)
 
 # loose mc matching (recommended)

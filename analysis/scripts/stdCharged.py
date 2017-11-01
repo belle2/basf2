@@ -26,13 +26,13 @@ def stdPi(listtype='95eff', path=analysis_main):
     if listtype == 'all':
         fillParticleList('pi+:all', '', True, path)
     elif listtype == '99eff':
-        fillParticleList('pi+:99eff', 'piid > 0.009 and chiProb > 0.001', True, path)
+        fillParticleList('pi+:99eff', 'pionID > 0.009 and chiProb > 0.001', True, path)
     elif listtype == '95eff':
-        fillParticleList('pi+:95eff', 'piid > 0.046 and chiProb > 0.001', True, path)
+        fillParticleList('pi+:95eff', 'pionID > 0.046 and chiProb > 0.001', True, path)
     elif listtype == '90eff':
-        fillParticleList('pi+:90eff', 'piid > 0.426 and chiProb > 0.001', True, path)
+        fillParticleList('pi+:90eff', 'pionID > 0.426 and chiProb > 0.001', True, path)
     elif listtype == '85eff':
-        fillParticleList('pi+:85eff', 'piid > 0.658 and chiProb > 0.001', True, path)
+        fillParticleList('pi+:85eff', 'pionID > 0.658 and chiProb > 0.001', True, path)
     else:
         fillParticleList('pi+:all', '', True, path)
 
@@ -56,13 +56,13 @@ def stdK(listtype='95eff', path=analysis_main):
     if listtype == 'all':
         fillParticleList('K+:all', '', True, path)
     elif listtype == '99eff':
-        fillParticleList('K+:99eff', 'Kid > 0.010 and chiProb > 0.001', True, path)
+        fillParticleList('K+:99eff', 'kaonID > 0.010 and chiProb > 0.001', True, path)
     elif listtype == '95eff':
-        fillParticleList('K+:95eff', 'Kid > 0.048 and chiProb > 0.001', True, path)
+        fillParticleList('K+:95eff', 'kaonID > 0.048 and chiProb > 0.001', True, path)
     elif listtype == '90eff':
-        fillParticleList('K+:90eff', 'Kid > 0.332 and chiProb > 0.001', True, path)
+        fillParticleList('K+:90eff', 'kaonID > 0.332 and chiProb > 0.001', True, path)
     elif listtype == '85eff':
-        fillParticleList('K+:85eff', 'Kid > 0.674 and chiProb > 0.001', True, path)
+        fillParticleList('K+:85eff', 'kaonID > 0.674 and chiProb > 0.001', True, path)
     else:
         fillParticleList('K+:all', '', True, path)
 
@@ -74,8 +74,8 @@ def stdPr(listtype='95eff', path=analysis_main):
     Function to prepare one of several standartized types of proton lists:
 
       - 'p+:all' with no cuts on track
-      - 'p+:95eff' (default) with tracks satisfying cuts 'prid > 0.079' and 'chiProb > 0.001'
-      - 'p+:90eff' with tracks satisfying cuts 'prid > 0.872' and chiProb > 0.001'
+      - 'p+:95eff' (default) with tracks satisfying cuts 'protonID > 0.079' and 'chiProb > 0.001'
+      - 'p+:90eff' with tracks satisfying cuts 'protonID > 0.872' and chiProb > 0.001'
 
     @param listtype name of standard list
     @param path     modules are added to this path
@@ -84,9 +84,9 @@ def stdPr(listtype='95eff', path=analysis_main):
     if listtype == 'all':
         fillParticleList('p+:all', '', True, path)
     elif listtype == '95eff':
-        fillParticleList('p+:95eff', 'prid > 0.079 and chiProb > 0.001', True, path)
+        fillParticleList('p+:95eff', 'protonID > 0.079 and chiProb > 0.001', True, path)
     elif listtype == '90eff':
-        fillParticleList('p+:90eff', 'prid > 0.872 and chiProb > 0.001', True, path)
+        fillParticleList('p+:90eff', 'protonID > 0.872 and chiProb > 0.001', True, path)
     else:
         fillParticleList('p+:all', '', True, path)
 
@@ -106,7 +106,7 @@ def stdE(listtype='all', path=analysis_main):
     if listtype == 'all':
         fillParticleList('e+:all', '', True, path)
     elif listtype == '99eff':
-        fillParticleList('e+:99eff', 'eid > 0.750 and chiProb > 0.001', True, path)
+        fillParticleList('e+:99eff', 'electronID > 0.750 and chiProb > 0.001', True, path)
     else:
         fillParticleList('e+:all', '', True, path)
 
@@ -126,7 +126,7 @@ def stdMu(listtype='all', path=analysis_main):
     if listtype == 'all':
         fillParticleList('mu+:all', '', True, path)
     elif listtype == '95eff':
-        fillParticleList('e+:95eff', 'muid > 0.625 and chiProb > 0.001', True, path)
+        fillParticleList('e+:95eff', 'muonID > 0.625 and chiProb > 0.001', True, path)
     else:
         fillParticleList('mu+:all', '', True, path)
 
@@ -169,62 +169,62 @@ def stdLoosePi(path=analysis_main):
     """
     Creation of 'pi+:loose' list with the following requirements to the track:
 
-      - 'piid > 0.1'
+      - 'pionID > 0.1'
       - 'chiProb > 0.001'
 
     @param path     modules are added to this path
     """
 
-    fillParticleList('pi+:loose', 'piid > 0.1 and chiProb > 0.001', True, path)
+    fillParticleList('pi+:loose', 'pionID > 0.1 and chiProb > 0.001', True, path)
 
 
 def stdLooseK(path=analysis_main):
     """
     Creation of 'K+:loose' list with the following requirements to the track:
 
-      - 'Kid > 0.1'
+      - 'kaonID > 0.1'
       - 'chiProb > 0.001'
 
     @param path     modules are added to this path
     """
 
-    fillParticleList('K+:loose', 'Kid > 0.1 and chiProb > 0.001', True, path)
+    fillParticleList('K+:loose', 'kaonID > 0.1 and chiProb > 0.001', True, path)
 
 
 def stdLooseMu(path=analysis_main):
     """
     Creation of 'mu+:loose' list with the following requirements to the track:
 
-      - 'muid > 0.1'
+      - 'muonID > 0.1'
       - 'chiProb > 0.001'
 
     @param path     modules are added to this path
     """
 
-    fillParticleList('mu+:loose', 'muid > 0.1 and chiProb > 0.001', True, path)
+    fillParticleList('mu+:loose', 'muonID > 0.1 and chiProb > 0.001', True, path)
 
 
 def stdLooseE(path=analysis_main):
     """
     Creation of 'e+:loose' list with the following requirements to the track:
 
-      - 'eid > 0.1'
+      - 'electronID > 0.1'
       - 'chiProb > 0.001'
 
     @param path     modules are added to this path
     """
 
-    fillParticleList('e+:loose', 'eid > 0.1 and chiProb > 0.001', True, path)
+    fillParticleList('e+:loose', 'electronID > 0.1 and chiProb > 0.001', True, path)
 
 
 def stdLoosePr(path=analysis_main):
     """
     Creation of 'p+:loose' list with the following requirements to the track:
 
-      - 'prid > 0.1'
+      - 'protonID > 0.1'
       - 'chiProb > 0.001'
 
     @param path     modules are added to this path
     """
 
-    fillParticleList('p+:loose', 'prid > 0.1 and chiProb > 0.001', True, path)
+    fillParticleList('p+:loose', 'protonID > 0.1 and chiProb > 0.001', True, path)

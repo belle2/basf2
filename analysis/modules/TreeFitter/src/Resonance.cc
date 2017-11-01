@@ -1,4 +1,5 @@
 /**************************************************************************
+ *
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
@@ -19,6 +20,30 @@ namespace TreeFitter {
   Resonance::Resonance(Belle2::Particle* particle, const ParticleBase* mother,
                        bool forceFitAll)
     : InternalParticle(particle, mother, forceFitAll) {}  //ParticleBase("Resonance unused atm") {}
+
+
+  ErrCode Resonance::initMotherlessParticle(FitParams* fitparams)
+  {
+    ErrCode status;
+    for (ParticleBase::iter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
+      status |= (*it)->initMotherlessParticle(fitparams);
+    }
+    return status;
+  }
+  ErrCode Resonance::initParticleWithMother(FitParams* fitparams)
+  {
+    ErrCode status;
+    for (ParticleBase::iter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
+      status |= (*it)->initParticleWithMother(fitparams);
+    }
+    initMomentum(fitparams);
+    return status;
+  }
+
+  Resonance::~Resonance() {};
+
+
+
 
   ErrCode Resonance::initPar1(FitParams* fitparams)
   {

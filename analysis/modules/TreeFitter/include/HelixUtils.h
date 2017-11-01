@@ -15,12 +15,41 @@
 
 #include <framework/dataobjects/Helix.h>
 #include <framework/dataobjects/UncertainHelix.h>
+#include <analysis/modules/TreeFitter/EigenTypes.h>
 
 namespace TreeFitter {
   class HelixUtils {
   public:
     enum VertexCoor {iX = 0, iY, iZ, iPx, iPy, iPz} ;
     enum HelixCoor  {iD0 = 0, iPhi0, iOmega, iZ0, iTanLambda, iArcLength2D} ;
+
+    /** get helix from a vertex */
+    static void helixFromVertex(const EigenTypes::ColVector& position,
+                                const EigenTypes::ColVector& momentum,
+                                int charge, double Bz,
+                                Belle2::Helix& helix,
+                                double& L,
+                                EigenTypes::MatrixXd& jacobian);
+    /** get helix from a vertex */
+    static void helixFromVertexNumerical(const EigenTypes::ColVector& position,
+                                         const EigenTypes::ColVector& momentum,
+                                         int charge, double Bz,
+                                         Belle2::Helix& helix,
+                                         double& flt,
+                                         EigenTypes::MatrixXd& jacobian);
+    static void getHelixAndJacobianFromVertexNumerical(Eigen::Matrix<double, 1, 6>& positionAndMom,
+                                                       int charge, double Bz,
+                                                       Belle2::Helix& helix,
+                                                       Eigen::Matrix<double, 5, 6>& jacobian);
+
+    static void helixFromVertex(Eigen::Matrix<double, 1, 6>& positionAndMomentum ,
+                                int charge, double Bz,
+                                Belle2::Helix& helix,
+                                double& L,
+                                Eigen::Matrix<double, 5, 6>& jacobian);
+
+
+
 
     static void vertexFromHelix(const Belle2::Helix& helix,
                                 double L, double Bz,

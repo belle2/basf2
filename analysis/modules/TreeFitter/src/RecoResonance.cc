@@ -20,6 +20,34 @@ namespace TreeFitter {
   RecoResonance::RecoResonance(Belle2::Particle* particle, const ParticleBase* mother)
     : RecoComposite(particle, mother) {}
 
+  ErrCode RecoResonance::initParticleWithMother(FitParams* fitparams)
+  {
+    return ErrCode::success;
+  }
+  ErrCode RecoResonance::initMotherlessParticle(FitParams* fitparams)
+  {
+    int posindex = posIndex();
+    int momindex = momIndex();
+
+    //quick map for parameters
+    int indexmap[7];
+    for (int i = 0; i < 3; ++i) {
+      indexmap[i]   = posindex + i;
+    }
+    for (int i = 0; i < 4; ++i) {
+      indexmap[i + 3] = momindex + i;
+    }
+
+    // copy the 'measurement' -> this overwrites mother position !
+    for (int row = 0; row < dimM(); ++row) {
+      fitparams->getStateVector()(indexmap[row]) = m_m[row];
+    }
+    return ErrCode::success;
+  }
+
+  RecoResonance::~RecoResonance() {};
+
+
   ErrCode RecoResonance::initPar1(FitParams* fitparams)
   {
     int posindex = posIndex();
@@ -52,7 +80,7 @@ namespace TreeFitter {
     ErrCode status;
     switch (type) {
       case Constraint::resonance:
-        status |= projectRecoComposite(fitparams, p);
+        status |= projectRecoCompositeCopy(fitparams, p);
         break;
       default:
         status |= ParticleBase::projectConstraint(type, fitparams, p);

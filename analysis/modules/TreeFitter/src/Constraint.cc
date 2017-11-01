@@ -3,15 +3,14 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Francesco Tenchini,Jo-Frederik Krohn                      *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
 #include <iomanip>
 #include <framework/logging/Logger.h>
-//
+
 #include <analysis/modules/TreeFitter/FitParams.h>
 #include <analysis/modules/TreeFitter/ParticleBase.h>
 #include <analysis/modules/TreeFitter/Constraint.h>
@@ -52,15 +51,15 @@ namespace TreeFitter {
            (m_depth == rhs.m_depth && m_type < rhs.m_type);
   }
 
-  ErrCode Constraint::project(const FitParams& fitpar, Projection& p) const
+  ErrCode Constraint::projectCopy(const FitParams& fitpar, Projection& p) const
   {
-    // this one will be overloaded by the MergedConstraint
-    return m_node->projectConstraint(m_type, fitpar, p);
+    return m_node->projectConstraintCopy(m_type, fitpar, p);
   }
 
-  // JFK: no longer const Mon 04 Sep 2017 05:06:10 AM CEST
-  ErrCode Constraint::filter(FitParams* fitpar)
+  ErrCode Constraint::filterCopy(FitParams* fitpar)
   {
+
+    B2DEBUG(82, "----Constraint::filtering " << this->name());
     ErrCode status;
     if (m_type <= Constraint::unknown || m_type >= Constraint::ntypes) {
       std::cout << "VtkConstraint: unknown constraint: " << m_type << std::endl;
@@ -69,139 +68,44 @@ namespace TreeFitter {
       std::cout << "VtkConstraint: filter constraint without a node" << std::endl;
       status |= ErrCode::badsetup;
     } else {
-      if (vtxverbose >= 3) { std::cout << "filtering "  ; print() ;}
-      // save the unfiltered ('predicted') parameters. we need to
-      // store them if we want to iterate constraints.
-      const CLHEP::HepVector* pred(0);
 
-      if (m_maxNIter > 1) {
-        pred = new CLHEP::HepVector(fitpar->par());
-      }
+      Projection p(fitpar->getDimensionOfState(), m_dim);
+      KalmanCalculator kalman;
 
-      Projection p(fitpar->dim(), m_dim) ;
-      KalmanCalculator kalman ;
-      double chisq(0) ;
-      int iter(0) ;
+      double chisq(0);
+      int iter(0);
       bool finished(false) ;
       while (!finished && !status.failure()) {
-        p.reset();
 
-        status |= project(*fitpar, p);
+        B2DEBUG(82, "---- Constraint::filter iteration # " << iter << " current chi2 = " << chisq);
+        p.resetProjection();
+        status |= projectCopy(*fitpar, p);
 
         if (!status.failure()) {
-          status |= kalman.init(p.r(), p.H(), fitpar, &p.V());
+          status |= kalman.init(p.getResiduals(), p.getH(), fitpar, &p.getV());
 
           if (!status.failure()) {
 
-            if (iter == 0 || !pred) {
-              kalman.updatePar(fitpar);
-            } else {
-              kalman.updatePar(*pred, fitpar);
-            }
+            kalman.updateState(fitpar);
+
             const double dchisqconverged = 0.001;
-            double newchisq = kalman.chisq();
+            double newchisq = kalman.getChiSquare();
             double dchisq = newchisq - chisq;
             bool diverging = iter > 0 && dchisq > 0;
             bool converged = fabs(dchisq) < dchisqconverged;
             finished  = ++iter >= m_maxNIter || diverging || converged;
-
-            if (vtxverbose >= 3) {
-              std::cout << "chi2,niter: "
-                        << iter << " " << std::setprecision(7)
-                        << std::setw(12) << chisq << " "
-                        << std::setw(12) << newchisq << " "
-                        << std::setw(12) << dchisq << " "
-                        << diverging << " "
-                        << converged << " "
-                        << status << std::endl;
-            }
             chisq = newchisq;
           }
         }
       }
-      //std::cout << "### Constraints kalman(!) chi2 : " << kalman.chisq() << " dim " << m_dim << " for " << this->name() << std::endl;
+      B2DEBUG(82, "---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = " << chisq <<
+              " NDF" << m_dim << " for " << this->name());
 
-
-      // JFK: the chi2 sum of fitpars will be used as the one for the newton iteration
-      // this also serves as the chi2 for the final PVal calculation
-      // it is reset in decay chain before the loop over the constraints Wed 06 Sep 2017 10:07:53 AM CEST
-      fitpar->addChiSquare(kalman.chisq(), kalman.getConstraintDim());
-      kalman.updateCov(fitpar);
-
-      if (!status.failure()) {
-
-        if (m_nHidden > 0) {
-          fitpar->addChiSquare(0, -m_nHidden);
-        }
-      }
-
-      if (pred) {delete pred;}
-
-      if (vtxverbose >= 4 && m_node && m_node->mother()) {
-        m_node->mother()->print(fitpar);
-      }
+      fitpar->addChiSquare(kalman.getChiSquare(), kalman.getConstraintDim());
+      kalman.updateCovariance(fitpar);
+      m_chi2 = kalman.getChiSquare(); //JFK: FIXME remove 2017-10-26
     }
     return status ;
-  }
-
-
-//FT: new filter function using a fixed reference from last Kalman iteration
-// // JFK: no longer const Mon 04 Sep 2017 05:06:39 AM CEST
-  ErrCode Constraint::filter(FitParams* fitpar, const FitParams* reference)
-
-  {
-
-    // filter but linearize around reference
-    ErrCode status ;
-
-    double chisq = 1e10;
-
-    if (m_type <= Constraint::unknown || m_type >= Constraint::ntypes) {
-      std::cout << "VtkConstraint: unknown constraint: " << m_type
-                << std::endl;
-      status |= ErrCode::badsetup;
-    } else if (m_type != merged && !m_node) {
-      std::cout << "VtkConstraint: filter constraint without a node"
-                << std::endl;
-      status |= ErrCode::badsetup;
-    } else {
-      if (vtxverbose >= 3) { std::cout << "filtering "; print();}
-      // project using the reference
-      Projection p(fitpar->dim(), m_dim);
-      status = project(*reference, p);
-      // now update the residual
-
-      //FT: test output
-      //std::cout << "Delta p.r() = " << p.H() * (fitpar->par() - reference->par()) << std::endl;
-      p.r() += p.H() * (fitpar->par() - reference->par());
-
-      // now call the Kalman update as usual
-      KalmanCalculator kalman;
-      status |= kalman.init(p.r(), p.H(), fitpar, &p.V());
-      kalman.updatePar(fitpar);
-
-      kalman.updateCov(fitpar);
-
-      chisq = kalman.chisq();
-
-      if (fitpar->cov(m_node->index() + 1) < 0 || kalman.chisq() < 0 || std::isnan(kalman.chisq())) {
-        status |= ErrCode::filtererror;
-      }
-    }
-    if (status.failure() && vtxverbose >= 1) {
-      std::cout << "error filtering constraint: "
-                << name() << " " << status << std::endl;
-    }
-
-    return status;
-  }
-
-  void Constraint::print(std::ostream& os) const
-  {
-    os << m_node->index() << " "
-       << m_node->name().c_str() << " "
-       << name().c_str() << " "
-       << m_type << " " << m_depth << std::endl;
   }
 
   std::string Constraint::name() const

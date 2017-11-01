@@ -27,6 +27,13 @@ namespace TreeFitter {
     /** */
     virtual ~RecoParticle() ;
 
+//    /** init particle in case it has a mother */
+//    virtual ErrCode initParticleWithMother(FitParams* fitparams);
+    /** init particle in case it has no mother */
+    virtual ErrCode initMotherlessParticle(FitParams* fitparams);
+
+
+
     /** */
     virtual int dimM() const = 0; // dimension of the measurement
     /** */
@@ -44,7 +51,13 @@ namespace TreeFitter {
     /** */
     virtual ErrCode projectRecoConstraint(const FitParams& fitparams, Projection& p) const = 0 ;
     /** */
+    virtual ErrCode projectRecoConstraintCopy(const FitParams& fitparams, Projection& p) const = 0 ;
+    /** */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const ;
+    /** */
+    virtual ErrCode projectConstraintCopy(Constraint::Type, const FitParams&, Projection&) const ;
+
+
     /** */
     virtual double chiSquare(const FitParams* fitparams) const ;
 

@@ -17,6 +17,7 @@
 
 #include <vector>
 #include <analysis/modules/TreeFitter/ErrCode.h>
+#include <analysis/modules/TreeFitter/EigenTypes.h>
 
 //using namespace CLHEP;
 //using namespace Belle2;
@@ -53,7 +54,35 @@ namespace TreeFitter {
     ~Fitter();
 
     /** main fit function that uses the kalman filter */
-    bool fit(); //FT: had to be changed from void to bool
+    bool fitUseEigen();
+    /** update particles parameters with the fit results */
+    bool updateCandCopy(Belle2::Particle& particle) const;
+    /** locate particle base for a belle2 particle and update the particle with the values from particle base */
+    void updateCandCopy(const ParticleBase& pb, Belle2::Particle& cand) const;
+    /** update the Belle2::Particles with the fit results  */
+    void updateTreeCopy(Belle2::Particle& particle) const;
+
+    /** get covariance matrix */
+    const EigenTypes::MatrixXd& getCovariance() const;
+    /** get parameters */
+    //const EigenTypes::ColVector& par() const;
+    /** extract cov from particle base */
+    void getCovFromPB(const ParticleBase* pb, TMatrixFSym& returncov) const;
+
+    /** get lifetime */
+    std::tuple<double, double> getLifeTime(Belle2::Particle& cand) const;
+
+    /**get decay length */
+    std::tuple<double, double> getDecayLength(const ParticleBase* pb) const;
+    /**get decay length */
+    std::tuple<double, double> getDecayLength(const ParticleBase* pb, const FitParams* fitparams) const;
+    /**get decay length */
+    std::tuple<double, double> getDecayLength(Belle2::Particle& cand) const;
+
+    /** get Statevector */
+    const EigenTypes::ColVector& getStateVector() const;;
+
+
 
     /** covariance matrix of the state vector FIXME describe ordering */
     const CLHEP::HepSymMatrix& cov() const;
@@ -94,12 +123,6 @@ namespace TreeFitter {
 
     /** getter for some errorcode flag  FIXME isnt this vovered by the statusflag?*/
     const ErrCode& errCode() { return m_errCode; }
-
-    /** FIXME unused   */
-    double add(Belle2::Particle& cand);
-
-    /** FIXME unused */
-    double remove(Belle2::Particle& cand);
 
     /** FIXME unused */
     void updateIndex();

@@ -23,6 +23,11 @@ namespace TreeFitter {
     Resonance(Belle2::Particle* particle, const ParticleBase* mother,
               bool forceFitAll);
 
+    virtual ~Resonance() ;
+
+    ErrCode initMotherlessParticle(FitParams* fitparams);
+
+    ErrCode initParticleWithMother(FitParams* fitparams);
     /** **/
     virtual int dim() const { return 4; }
     /** **/

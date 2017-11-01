@@ -15,7 +15,7 @@
 
 #include <analysis/modules/TreeFitter/FitParams.h>
 #include <analysis/modules/TreeFitter/ParticleBase.h>
-#include <analysis/modules/TreeFitter/InteractionPoint.h>//FIXME particle base is maybe better?
+#include <analysis/modules/TreeFitter/InteractionPoint.h>
 #include <analysis/modules/TreeFitter/DecayChain.h>
 
 
@@ -26,9 +26,11 @@ namespace TreeFitter {
     : m_dim(0), m_headOfChain(0), m_isOwner(true)
   {
     if (ipDimension > 1) {
+      B2DEBUG(30, "--DecayChain::constructor with beam contr");
       m_headOfChain = ParticleBase::createInteractionPoint(particle, forceFitAll, ipDimension);
     } else {
       //use the B,D or whatever as head
+      B2DEBUG(30, "--DecayChain::constructor without beam contr");
       m_headOfChain = ParticleBase::createParticle(particle, 0, forceFitAll);
     }
     m_headOfChain->updateIndex(m_dim);
@@ -39,7 +41,9 @@ namespace TreeFitter {
 
   DecayChain::~DecayChain()
   {
-    if (m_headOfChain && m_isOwner) delete m_headOfChain ;
+    if (m_headOfChain && m_isOwner) {
+      delete m_headOfChain;
+    }
   }
 
   void DecayChain::initConstraintList()
@@ -51,7 +55,7 @@ namespace TreeFitter {
     mergedconstraint = MergedConstraint();
     for (ParticleBase::constraintlist::iterator it = m_constraintlist.begin(); it != m_constraintlist.end(); ++it) {
 
-      B2DEBUG(30, "initCostraint:" << (*it).name());
+      B2DEBUG(30, "--DecayChain::initConstraintList name:" << (*it).name());
       if (true) {
         m_mergedconstraintlist.push_back(&(*it)); //FT: never filter constraints together
       } else {
@@ -64,73 +68,39 @@ namespace TreeFitter {
     }
   }
 
-  ErrCode DecayChain::init(FitParams* par)
+  ErrCode DecayChain::initialize(FitParams* par)
   {
+    B2DEBUG(81, "--DecayChain::initialize: head:" << m_headOfChain->name());
     ErrCode status; //seems like I should initialise it now if I want to use bitwise OR (|=) later
-
-    // set everything to 0
-    par->resetPar();
-    status |= m_headOfChain->initPar1(par);
-
-    // let the mother do it
-    par->resetCov();
-    status |= m_headOfChain->initCov(par);
-
+    par->resetStateVector();
+    status |= m_headOfChain->initMotherlessParticle(par);
+    par->resetCovariance();
+    status |= m_headOfChain->initCovariance(par);
     return status;
   }
 
-  ErrCode DecayChain::filter(FitParams& par, bool firstpass)
+  ErrCode DecayChain::filterCopy(FitParams& par, bool firstpass)
   {
+    B2DEBUG(81, "--Filtering DecayChain ");
     ErrCode status;
-    par.resetCov(1000);
-
-    if (firstpass || !par.testCov()) {
-      status |= m_headOfChain->initCov(&par);
+    par.resetCovariance();
+    if (firstpass || !par.testCovariance()) {
+      B2DEBUG(81, "--Filtering DecayChain: Init Covariance");
+      status |= m_headOfChain->initCovariance(&par);
     }
 
-    //FT:
-    //Make a reference to the smoothed parameters from the previous iteration
-    //By using those (fixed) parameters when projecting to the next step instead of the
-    //running parameters (which update after each constraint is applied) the fit
-    //is more stable and less reliant on constraint ordering
+    //JFK: I removed the other thing since we didnt use it 2017-09-27
+    m_chi2SumConstraints = 0;
+    par.resetChiSquare();
+    for (std::vector<Constraint*>::iterator it = m_mergedconstraintlist.begin();
+         it != m_mergedconstraintlist.end(); ++it) {
 
-    FitParams reference = par;
+      B2DEBUG(81, "--Filtering DecayChain: Current Constraint:" << (*it)->name());
 
-    if (m_mergedconstraintlist.empty()) {//FT:Merged constraints actually crash this so the old method is used; go back and find out why
+      status |= (*it)->filterCopy(&par);
 
-      //FT: as far as I can tell, this is never empty?
-      // JFK: CHANGEED TO NON CONST Mon 04 Sep 2017 04:58:05 AM CEST
-      for (ParticleBase::constraintlist::iterator it = m_constraintlist.begin();
-           it != m_constraintlist.end(); ++it) {
-
-        //FIXME can we delete this?
-        status |= it->filter(&par) ;
-        std::cout << "filtering with reference to previous contrs :"   << std::endl;
-
-        //status |= it->filter(&par, &reference);
-
-        if (vtxverbose >= 2 && status.failure()) {
-          std::cout << "status is failure after parsing constraint: ";
-
-          it->print();
-        }
-      }
-    } else {
-      // JFK: CHANGED THIS TO NON CONST Mon 04 Sep 2017 04:55:24 AM CEST
-      m_chi2SumConstraints = 0;
-      // JFK: FIXME Mon 04 Sep 2017 06:54:12 AM CEST
-      par.resetChiSquare();
-
-      for (std::vector<Constraint*>::iterator it = m_mergedconstraintlist.begin();
-           it != m_mergedconstraintlist.end(); ++it) {
-        // JFK: changed this FIXME Mon 04 Sep 2017 02:54:50 AM CEST
-
-        status |= (*it)->filter(&par);
-
-        m_chi2SumConstraints += (*it)->getChi2();
-      }
+      m_chi2SumConstraints += (*it)->getChi2();
     }
-
     return status;
   }
 
@@ -142,7 +112,7 @@ namespace TreeFitter {
   const ParticleBase* DecayChain::locate(Belle2::Particle* particle) const   //FT: This needs investigation
   {
     const ParticleBase* rc(0);
-    B2DEBUG(80, "DecayChain::locate: Trying to locate " << particle->getName() << " in a " << m_particleMap.size() << " sized map.");
+    B2DEBUG(81, "--DecayChain::locate: Trying to locate " << particle->getName() << " in a " << m_particleMap.size() << " sized map.");
     ParticleMap::const_iterator it = m_particleMap.find(particle) ;
 
     if (it == m_particleMap.end()) {

@@ -34,6 +34,26 @@ namespace TreeFitter {
     /**    */
     virtual ~RecoTrack() ;
 
+    /**   init with mother particle (replacing initPar2)  */
+    virtual ErrCode initParticleWithMother(FitParams* fitparams);
+    /** init without mother particle   */
+    virtual ErrCode initMotherlessParticle(FitParams* fitparams);
+    /** init covariance matrix of this particle constraint */
+    ErrCode initCovariance(FitParams* fitparams) const;
+    /** update m_flt */
+    ErrCode updFltToMotherCopy(const FitParams& fitparams);
+    /**   project the constraint (calculate residuals)  */
+    virtual ErrCode projectRecoConstraintCopy(const FitParams&, Projection&) const;
+    /**   project the constraint (calculate residuals)  */
+    virtual ErrCode projectRecoConstraintCopyCopy(const FitParams&, Projection&) const;
+
+
+    /** updated the cahed parameters */
+    ErrCode updateParams(double flt);
+
+
+
+
     /**    */
     virtual ErrCode initPar2(FitParams*) ;
 
@@ -81,11 +101,18 @@ namespace TreeFitter {
     /**    */
     double m_flt ;
 
+
     /**    */
     CLHEP::HepVector    m_m ;
 
     /**    */
     CLHEP::HepSymMatrix m_matrixV ;
+
+    /** column vector to store the measurement */
+    Eigen::Matrix<double, 1, 5> m_params;
+    /** only lower triangle filled! */
+    Eigen::Matrix<double, 5, 5>m_covariance;
+
   };
 }
 #endif //RECOTRACK_H

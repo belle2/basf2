@@ -34,7 +34,13 @@ namespace Belle2 {
     /** performed for each event   */
     virtual void event() override;
 
+    /** stuff at the end */
+    virtual void terminate() override;
+
   private:
+
+    /** plot ascii art and statistics */
+    void plotFancyASCII();
 
     /**   name of the particle list fed to the fitter  */
     std::string m_particleList;     //name of ParticleList
@@ -57,6 +63,12 @@ namespace Belle2 {
 
     /** this fits all particle candidates contained in the m_particleList  */
     bool doTreeFit(Particle* head);
+
+    /** before the fit */
+    unsigned int m_nCandidatesBeforeFit;
+    /** after the fit  */
+    unsigned int m_nCandidatesAfter;
+
 
   };
 }

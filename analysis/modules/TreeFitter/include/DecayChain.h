@@ -34,17 +34,17 @@ namespace TreeFitter {
     /**  destructor   */
     ~DecayChain();
 
+    /** initalize the chain */
+    ErrCode initialize(FitParams* par);
+
+    /** filter down the chain */
+    ErrCode filterCopy(FitParams& par, bool firstpass);
+
     /** get dimension   */
     int dim() const { return m_dim;}
 
     /** init contraintlist   */
     void initConstraintList();
-
-    /**    */
-    ErrCode init(FitParams* par);
-    //    ErrCode filter(FitParams* par, bool firstpass = true) ;
-    /**    */
-    ErrCode filter(FitParams& par, bool firstpass = true);//FT: passing as reference in order to save it
 
     /**    */
     double chiSquare(const FitParams* par) const;

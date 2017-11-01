@@ -35,11 +35,21 @@ namespace TreeFitter {
     /** Constructor */
     InteractionPoint(Belle2::Particle* daughter);
 
+    virtual ~InteractionPoint();
+
+    /** init particle, used if it has a mother */
+    virtual  ErrCode initParticleWithMother(FitParams* fitparams);
+    /** init particle, used if it has no mother */
+    virtual  ErrCode initMotherlessParticle(FitParams* fitparams);
+
     /** init the IP "particle"  */
     ErrCode initBeamSpot(Belle2::Particle* particle);
 
     /** init the IP "particle"  */
     ErrCode initBeamSpot();
+
+    /** init the IP "particle"  */
+    ErrCode initBeamSpotCopy();
 
     /** this is weird  */
     virtual int dim() const { return 3 ; } // (x,y,z)
@@ -53,17 +63,31 @@ namespace TreeFitter {
     /** init covariance matrix of the constraint  */
     virtual ErrCode initCov(FitParams*) const;
 
-    /** particle type */
+    /** init covariance matrix of the constraint  */
+    virtual ErrCode initCovariance(FitParams* fitpar) const;
+
+    /* particle type */
     virtual int type() const { return kInteractionPoint; }
 
     /**  chi2 of the statevector? */
     virtual double chiSquare(const FitParams* par) const;
 
+    /**  chi2 of the statevector? */
+    double  chiSquareCopy(const FitParams* fitparams) const;
+
     /** the actuall constraint projection  */
     ErrCode projectIPConstraint(const FitParams& fitpar, Projection&) const;
 
+
+    /** the actuall constraint projection  */
+    ErrCode projectIPConstraintCopy(const FitParams& fitparams, Projection& p) const;
+
     /** the abstract projection  */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
+
+    /** the abstract projection  */
+    virtual ErrCode projectConstraintCopy(Constraint::Type, const FitParams&, Projection&) const;
+
 
     /** adds the IP as a particle to the contraint list  */
     virtual void addToConstraintList(constraintlist& list, int depth) const;
@@ -99,6 +123,14 @@ namespace TreeFitter {
     /** the parameters are initialze elsewhere this is just a pointer to that */
     Belle2::DBObjPtr<Belle2::BeamParameters> m_beamParams;
 
+    /** vertex position of the IP */
+    EigenTypes::ColVector m_ipPosVec;
+
+    /** covariance of the IP  */
+    EigenTypes::MatrixXd m_ipCovariance;
+
+    /** covariance inverse of the IP  */
+    EigenTypes::MatrixXd m_ipCovInverse;
   };
 }
 #endif //BEAMSPOT_H

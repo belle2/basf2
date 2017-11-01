@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -81,31 +81,24 @@ namespace TreeFitter {
     virtual ~Constraint() {}
 
     /**   call the constraints projection function FIXME its weird that this is buried in particle */
-    virtual ErrCode project(const FitParams& fitpar, Projection& p) const;
+    virtual ErrCode projectCopy(const FitParams& fitpar, Projection& p) const;
 
-    /** filter around x=0 */
-    virtual ErrCode filter(FitParams* fitpar) ;
+    /** filter this constraint */
+    virtual ErrCode filterCopy(FitParams* fitpar);
 
-    //FT: new version of filtering
-    /** does the filtering */
-    virtual ErrCode filter(FitParams* fitpar, const FitParams* reference) ;
-
-    /** print FIXME becomes obsolete woth verbose removal   */
-    virtual void print(std::ostream& os = std::cout) const;
 
     /** get name of constraint  */
     std::string name() const;
 
-    /** set to minus one if constraints needs to be removed on next filter
+    /**
      * JFK dont understand, unused keep for comment above
      * */
-    void setWeight(int w) { m_weight = w < 0 ? -1 : 1; }
+    [[gnu::unused]] void setWeight(int w) { m_weight = w < 0 ? -1 : 1; }
 
-    /** get chi2 over ndf for last kalmaniteration */
+    /** get diension of cosntraint */
+    double getNDF() const {return m_ndf;}
+    /** get chi2 of last kalman iteration for this constraint */
     double getChi2() const {return m_chi2;}
-
-    /** */
-    double getNDF()const {return m_ndf;}
 
   protected:
 
@@ -114,10 +107,10 @@ namespace TreeFitter {
       m_node(0), m_depth(0), m_type(type), m_dim(0), m_nHidden(0),
       m_weight(0), m_maxNIter(0) {}
 
-    /**   set diension of cosntraint */
+    /**   set dimension of cosntraint */
     void setDim(unsigned int d) { m_dim = d; }
 
-    /** set number of iterations for non lin constraint  */
+    /** set max number of iterations for non lin constraint  */
     void setNIter(unsigned int d) { m_maxNIter = d; }
 
   private:
@@ -125,12 +118,10 @@ namespace TreeFitter {
     /** particle behind the constraint  */
     const ParticleBase* m_node;
 
-    /**chi2  of this constraint not divided by ndf! */
-    double m_chi2;
-
     /** ndf */
     double m_ndf;
 
+    double m_chi2;
     /**  */
     int m_depth;
 
@@ -143,7 +134,7 @@ namespace TreeFitter {
     /** the number of hidden 'degrees of freedom'. always zero except for the 'photon' constraint  */
     unsigned int m_nHidden;
 
-    /**  dont understand, unused FIXME  */
+    /** unused FIXME  */
     int m_weight;
 
     /** maximum number of iterations for non-linear constraints    */

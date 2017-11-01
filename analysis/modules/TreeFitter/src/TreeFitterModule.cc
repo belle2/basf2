@@ -1,5 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
+ *
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -25,15 +26,15 @@
 
 using namespace Belle2;
 
-// Register Module
 REG_MODULE(TreeFitter)
 
-// Constructor
 TreeFitterModule::TreeFitterModule() : Module()
 {
   setDescription("Tree Fitter module. Performs simultaneous fit of all vertices in a decay chain.");
   addParam("particleList", m_particleList, "Input mother of the decay tree to fit");
-  addParam("confidenceLevel", m_confidenceLevel, "Confidence level to accept fitted decay tree. -1.0 for failed fits.", 0.0);
+  addParam("confidenceLevel", m_confidenceLevel,
+           "Confidence level to accept fitted decay tree. -1.0 for failed fits. Candidates with < confidenceLevel will be removed from the particle list! ",
+           0.0);
   addParam("convergencePrecision", m_precision, "Upper limit for chi2 fluctuations to accept result.", 1.); //large value for now
   addParam("verbose", m_verbose, "BaBar verbosity (to be phased out in the future)", 5);
   addParam("massConstraintList", m_massConstraintList, "Type::[int]. List of particles to mass constrain with int = pdg code.");
@@ -42,24 +43,21 @@ TreeFitterModule::TreeFitterModule() : Module()
            0);
 }
 
-
-// Initializer
 void TreeFitterModule::initialize()
 {
   StoreObjPtr<ParticleList>::required(m_particleList);
   StoreArray<Belle2::Particle> particles;
   particles.isRequired();
+  m_nCandidatesBeforeFit = 0;
+  m_nCandidatesAfter = 0;
 }
 
-// Start of run
 void TreeFitterModule::beginRun()
 {
 }
 
-// Event Loop
 void TreeFitterModule::event()
 {
-  // input Particle
   StoreObjPtr<ParticleList> plist(m_particleList);
   if (!plist) {
     B2ERROR("ParticleList " << m_particleList << " not found");
@@ -68,31 +66,74 @@ void TreeFitterModule::event()
 
   std::vector<unsigned int> toRemove;
   unsigned int n = plist->getListSize();
-
+  m_nCandidatesBeforeFit += n;
   for (unsigned i = 0; i < n; i++) {
     Belle2::Particle* particle = plist->getParticle(i);
-
     bool ok = doTreeFit(particle);
-
     if (!ok) {
       particle->setPValue(-1);
     }
-
     if (particle->getPValue() < m_confidenceLevel) {
       toRemove.push_back(particle->getArrayIndex());
     }
   }
   plist->removeParticles(toRemove);
+  m_nCandidatesAfter += plist->getListSize();
+}
+
+
+void TreeFitterModule::terminate()
+{
+  if (m_nCandidatesAfter > 0) {
+    plotFancyASCII();
+  } else {
+    B2ERROR("Not a single candidate survived the fit.");
+  }
 }
 
 bool TreeFitterModule::doTreeFit(Belle2::Particle* head)
 {
-  TreeFitter::Fitter* TreeFitObject = new TreeFitter::Fitter(head, m_precision, m_ipConstraintDimension);
+  std::unique_ptr<TreeFitter::Fitter> TreeFitObject(new TreeFitter::Fitter(head, m_precision, m_ipConstraintDimension));
   TreeFitObject->setVerbose(m_verbose);
-  TreeFitObject->setMassConstraintList(m_massConstraintList); // JFK: move to constrcutor Fri 08 Sep 2017 04:48:21 AM CEST
-
-  bool rc = TreeFitObject->fit();
-
-  delete TreeFitObject; //clean up statement, consider using unique_ptr<TreeFitter::Fitter> in the future
+  TreeFitObject->setMassConstraintList(m_massConstraintList);
+  bool rc = TreeFitObject->fitUseEigen();
   return rc;
+}
+
+void TreeFitterModule::plotFancyASCII()
+{
+  //JFK: colors depend on your shell settings...
+  //blinking is unfortunenately just supported by a few terminal species...
+  //TODO write paper to cite...2017-10-27
+  B2INFO("\033[1;35m================================================================================\033[0m");
+  B2INFO("\033[40;39m            ,.,                                                                 \033[0m");
+  B2INFO("\033[40;39m           ;%&M%;_   ,..,                                                       \033[0m");
+  B2INFO("\033[40;39m             \"_ “__” % M % M %;          , ..., ,                               \033[0m");
+  B2INFO("\033[40; 39m      , ..., __.\" --\"    , .,     _ - “ % &W % WM %;                            \033[0m");
+  B2INFO("\033[40; 39m     ; % M&$M % ”___ \"_._   %M%”_.”” _ \"\"\"\"\"\"                                   \033[0m");
+  B2INFO("\033[40;39m       \"\"\"\"\"    \"\" , \\_.   \"_. .\"                                               \033[0m");
+  B2INFO("\033[40; 39m              , ., _\"__ \\__./ .\"                                                \033[0m");
+  B2INFO("\033[40; 39m          ___       __ |  y     , ..,     \033[39;40mThank you for using TreeFitter.       \033[0m");
+  B2INFO("\033[40; 39m         /)'\\    ''''| u  \\ %W%W%%;                                             \033[0m");
+  B2INFO("\033[40;39m     ___)/   \"---\\_ \\   |____”            \033[39;40mCite:                                 \033[0m");
+  B2INFO("\033[40;39m   ;&&%%;           (|__.|)./  ,..,           \033[39;40m(paper here)                      \033[0m");
+  B2INFO("\033[40;39m             ,.., ___\\    |/     &&\"                                            \033[0m");
+  B2INFO("\033[40;39m           &&%%&    (| Uo /        '\"     \033[39;40mEmail:                                \033[0m");
+  B2INFO("\033[40;39m            ''''     \\ 7 \\                   \033[39;40mfrancesco.tenchini@unimelb.edu.au  \033[0m");
+  B2INFO("\033[40;39m  ._______________.-‘____””—.____.           \033[39;40mjo-frederik.krohn@desy.de          \033[0m");
+  B2INFO("\033[40;39m   \\                           /                                                \033[0m");
+  B2INFO("\033[40;39m    \\       \033[0m\033[32;40mTREEFITTER\033[0m\033[40;39m        /                                                 \033[0m");
+  B2INFO("\033[40;39m     \\_______________________/                                                  \033[0m");
+  B2INFO("\033[40;39m      (_)                   (_)                                                 \033[0m");
+  B2INFO("\033[40;39m                                                                                \033[0m");
+  B2INFO("\033[1;35m============= TREEFIT STATISTICS ===============================================\033[0m");
+  B2INFO("\033[1;39mCandidates before fit: " << m_nCandidatesBeforeFit << "\033[0m");
+  B2INFO("\033[1;39mCandidates after fit:  " << m_nCandidatesAfter << "\033[0m");
+  B2INFO("\033[1;39mA total of " << m_nCandidatesBeforeFit - m_nCandidatesAfter << " candidates was removed during the fit.\033[0m");
+  B2INFO("\033[1;39m" << (double)m_nCandidatesAfter / (double)m_nCandidatesBeforeFit * 100.0 <<
+         "% of candidates survived the fit.\033[0m");
+  B2INFO("\033[1;39m" << 100. - (double)m_nCandidatesAfter / (double)m_nCandidatesBeforeFit * 100.0 <<
+         "% of candidates did not.\033[0m");
+  B2INFO("\033[1;39mYou choose to drop all candidates with pValue < " << m_confidenceLevel << ".\033[0m");
+  B2INFO("\033[1;35m================================================================================\033[0m");
 }

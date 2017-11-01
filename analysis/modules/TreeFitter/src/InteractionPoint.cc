@@ -21,27 +21,49 @@ namespace TreeFitter {
 
 
   InteractionPoint::InteractionPoint(Belle2::Particle* daughter, bool forceFitAll, int dimension) : ParticleBase("InteractionPoint"),
-    m_constraintDimension(dimension), m_ipPos(3, 0), m_ipCov(3, 1), m_ipCovInv(3, 1)
+    m_constraintDimension(dimension),
+    m_ipPos(3, 0),
+    m_ipCov(3, 1),
+    m_ipCovInv(3, 1),
+    m_ipPosVec(3),
+    m_ipCovariance(3, 3),
+    m_ipCovInverse(3, 3)
   {
-    //m_constraintDimension = dimension;
     addDaughter(daughter, forceFitAll);
-    initBeamSpot();
+    initBeamSpotCopy();
+    //initBeamSpot(); old non eigen
   }
+
+  ErrCode InteractionPoint::initParticleWithMother(FitParams* fitparams __attribute__((unused)))
+  {
+    return ErrCode::success;
+  }
+  ErrCode InteractionPoint::initMotherlessParticle(FitParams* fitparams)
+  {
+    ErrCode status;
+    int posindex = posIndex();
+    fitparams->getStateVector().segment(posindex, m_constraintDimension) = m_ipPosVec.segment(0, m_constraintDimension);
+
+    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end() ; ++it) {
+
+      status |= (*it)->initMotherlessParticle(fitparams);
+      status |= (*it)->initParticleWithMother(fitparams);
+    }
+    return status;
+  }
+
+  InteractionPoint::~InteractionPoint() {};
+
 
   ErrCode InteractionPoint::initBeamSpot()
   {
     ErrCode status;
     bool success = false;
     if (m_beamParams) {
-
       const TVector3& vertexVector = m_beamParams->getVertex();
       const TMatrixDSym& covVertex = m_beamParams->getCovVertex();
-      /**
-      std::cout << "x pos: " << vertexVector.x()  << std::endl;
-      std::cout << "y pos: " << vertexVector.y()  << std::endl;
-      std::cout << "z pos: " << vertexVector.z()  << std::endl;
-      */
       if (m_constraintDimension == 3) {
+
         m_ipPos(1) = vertexVector.x();
         m_ipPos(2) = vertexVector.y();
         m_ipPos(3) = vertexVector.z();
@@ -60,12 +82,6 @@ namespace TreeFitter {
       } else {
         B2ERROR("The IP constraint has to have a dimension of 2 or 3. This is currently not the case. ");
       }
-      /**
-      std::cout << "InteractionPoint: cov = (" << covVertex(0 , 0) << ", " << covVertex(0 , 1) << ", " << covVertex(0 , 2) << std::endl;
-      std::cout << "InteractionPoint: cov = (" << covVertex(1 , 0) << ", " << covVertex(1 , 1) << ", " << covVertex(1 , 2) << std::endl;
-      std::cout << "InteractionPoint: cov = (" << covVertex(2 , 0) << ", " << covVertex(2 , 1) << ", " << covVertex(2 , 2) << std::endl;
-      */
-
       int ierr;
       m_ipCovInv = m_ipCov.inverse(ierr);
       if (!ierr) {
@@ -83,6 +99,35 @@ namespace TreeFitter {
     }
     return status;
   }
+  ErrCode InteractionPoint::initBeamSpotCopy()
+  {
+    ErrCode status;
+    if (m_beamParams) {
+      const TVector3& vertexVector = m_beamParams->getVertex();
+      const TMatrixDSym& covVertex = m_beamParams->getCovVertex();
+      if (m_constraintDimension == 3) {
+        m_ipPosVec(0) = vertexVector.x();
+        m_ipPosVec(1) = vertexVector.y();
+        m_ipPosVec(2) = vertexVector.z();
+        m_ipCovariance(0, 0) = covVertex(0 , 0);
+        m_ipCovariance(1, 1) = covVertex(1 , 1);
+        m_ipCovariance(2, 2) = covVertex(2 , 2);
+        m_ipCovariance(1, 0) = covVertex(1 , 0);
+        m_ipCovariance(2, 0) = covVertex(2 , 0);
+        m_ipCovariance(2, 1) = covVertex(2 , 1);
+      } else if (m_constraintDimension == 2) {
+        m_ipPosVec(1) = vertexVector.x();
+        m_ipPosVec(2) = vertexVector.y();
+        m_ipCovariance(0, 0) = covVertex(0 , 0);
+        m_ipCovariance(1, 1) = covVertex(1 , 1);
+        m_ipCovariance(1, 0) = covVertex(1 , 0);
+      } else {
+        B2ERROR("The IP constraint has to have a dimension of 2 or 3. This is currently not the case. ");
+      }
+    }
+    return ErrCode::success;
+  }
+
 
 
   ErrCode InteractionPoint::initPar1(FitParams* fitparams)
@@ -121,6 +166,19 @@ namespace TreeFitter {
     }
     return status;
   }
+  ErrCode InteractionPoint::initCovariance(FitParams* fitpar) const
+  {
+    ErrCode status;
+    int posindex = posIndex();
+    for (int row = 0; row < m_constraintDimension; ++row) {
+      fitpar->getCovariance()(posindex + row, posindex + row) = 1000 * m_ipCovariance(row, row);
+    }
+    for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
+      status |= (*it)->initCovariance(fitpar);
+    }
+    return status;
+  }
+
 
   ErrCode InteractionPoint::projectIPConstraint(const FitParams& fitparams, Projection& p) const
   {
@@ -135,6 +193,22 @@ namespace TreeFitter {
     }
     return ErrCode::success;
   }
+  ErrCode InteractionPoint::projectIPConstraintCopy(const FitParams& fitparams, Projection& p) const
+  {
+    int posindex = posIndex();
+    p.getResiduals().segment(0, m_constraintDimension) =
+      fitparams.getStateVector().segment(posindex, m_constraintDimension) -
+      m_ipPosVec.segment(0, m_constraintDimension);
+    for (int row = 0; row < m_constraintDimension; ++row) {
+      p.getH()(row, posindex + row) = 1;
+      for (int col = 0; col <= row; ++col) {
+        p.getV()(row, col) = m_ipCovariance(row, col);
+      }
+    }
+    return ErrCode::success;
+  }
+
+
 
   ErrCode InteractionPoint::projectConstraint(Constraint::Type type, const FitParams& fitparams, Projection& p) const
   {
@@ -148,6 +222,19 @@ namespace TreeFitter {
     }
     return status;
   }
+  ErrCode InteractionPoint::projectConstraintCopy(Constraint::Type type, const FitParams& fitparams, Projection& p) const
+  {
+    ErrCode status;
+    switch (type) {
+      case Constraint::beamspot:
+        status |= projectIPConstraintCopy(fitparams, p);
+        break;
+      default:
+        status |= ParticleBase::projectConstraintCopy(type, fitparams, p);
+    }
+    return status;
+  }
+
 
   double  InteractionPoint::chiSquare(const FitParams* fitparams) const
   {
@@ -157,9 +244,23 @@ namespace TreeFitter {
     double chisq = m_ipCovInv.similarity(residual);
     // add the daughters
     chisq += ParticleBase::chiSquare(fitparams);
-
     return chisq;
   }
+  double  InteractionPoint::chiSquareCopy(const FitParams* fitparams) const
+  {
+    // calculate the chi2
+    int posindex = posIndex();
+    EigenTypes::ColVector residual =
+      m_ipPosVec.segment(posindex, m_constraintDimension) -
+      fitparams->getStateVector().segment(posindex, m_constraintDimension);
+    double chisq =  residual.transpose() * m_ipCovInverse.selfadjointView<Eigen::Lower>()  * residual;
+    // add the daughters
+    chisq += ParticleBase::chiSquare(fitparams);
+    return chisq;
+  }
+
+
+
 
   void InteractionPoint::addToConstraintList(constraintlist& list, int depth) const
   {
@@ -167,7 +268,6 @@ namespace TreeFitter {
     for (ParticleBase::conIter it = m_daughters.begin(); it != m_daughters.end(); ++it) {
       (*it)->addToConstraintList(list, depth - 1);
     }
-
     list.push_back(Constraint(this, Constraint::beamspot, depth, m_constraintDimension)) ;
   }
 }

@@ -1,4 +1,5 @@
 /**************************************************************************
+ *
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
@@ -20,7 +21,7 @@
 #include <framework/logging/Logger.h>
 
 #include <TVector3.h>
-#include "analysis/modules/TreeFitter/HelixUtils.h"
+#include <analysis/modules/TreeFitter/HelixUtils.h>
 
 //#define OLDHELIX
 
@@ -39,6 +40,75 @@ namespace TreeFitter {
     position = helix.getPositionAtArcLength2D(L);
     momentum = helix.getMomentumAtArcLength2D(L, Bz);
     charge = helix.getChargeSign();
+  }
+
+  //JFK: JUMP 2017-10-11
+  void HelixUtils::helixFromVertex(Eigen::Matrix<double, 1, 6>& positionAndMomentum,
+                                   int charge, double Bz,
+                                   Belle2::Helix& helix,
+                                   double& L,
+                                   Eigen::Matrix<double, 5, 6>& jacobian)
+  {
+
+#ifdef OLDHELIX
+    std::cout << "THIS SHOULD NEVER HAPPEN "  << std::endl;
+#else
+
+    TVector3 position(positionAndMomentum(0),
+                      positionAndMomentum(1),
+                      positionAndMomentum(2));
+    TVector3 momentum(positionAndMomentum(3),
+                      positionAndMomentum(4),
+                      positionAndMomentum(5));
+
+    helix = Belle2::Helix(position, momentum, charge, Bz);
+    L = helix.getArcLength2DAtXY(positionAndMomentum(0),
+                                 positionAndMomentum(1));
+
+    const double alpha =  helix.getAlpha(Bz);
+
+    //Copied from Belle2::UncertainHelix
+    // COMPLETELY WRONG SINCE IT ASSUMES IT'S IN THE.operator() PERIGEE,
+    // ONLY A PLACEHOLDER FOR NOW
+    // 1. Rotate to a system where phi0 = 0
+    Eigen::Matrix<double, 6, 6> jacobianRot = Eigen::Matrix<double, 6, 6>::Zero(6, 6);
+
+    const double px = positionAndMomentum(3);
+    const double py = positionAndMomentum(4);
+    const double pt = hypot(px, py);
+    const double cosPhi0 = px / pt;
+    const double sinPhi0 = py / pt;
+
+    // Passive rotation matrix by phi0:
+    jacobianRot(iX, iX) = cosPhi0;
+    jacobianRot(iX, iY) = sinPhi0;
+    jacobianRot(iY, iX) = -sinPhi0;
+    jacobianRot(iY, iY) = cosPhi0;
+    jacobianRot(iZ, iZ) = 1.0;
+
+    jacobianRot(iPx, iPx) = cosPhi0;
+    jacobianRot(iPx, iPy) = sinPhi0;
+    jacobianRot(iPy, iPx) = -sinPhi0;
+    jacobianRot(iPy, iPy) = cosPhi0;
+    jacobianRot(iPz, iPz) = 1.0;
+
+    // 2. Translate to perigee parameters on the position
+    const double pz = positionAndMomentum(5);
+    const double invPt = 1 / pt;
+    const double invPtSquared = invPt * invPt;
+    Eigen::Matrix<double, 5, 6> jacobianToHelixParameters = Eigen::Matrix<double, 5, 6>::Zero(5, 6);
+    jacobianToHelixParameters(iD0, iY) = -1;
+    jacobianToHelixParameters(iPhi0, iX) = charge * invPt / alpha;
+    jacobianToHelixParameters(iPhi0, iPy) = invPt;
+    jacobianToHelixParameters(iOmega, iPx) = -charge * invPtSquared / alpha;
+    jacobianToHelixParameters(iTanLambda, iPx) = - pz * invPtSquared;
+    jacobianToHelixParameters(iTanLambda, iPz) = invPt;
+    jacobianToHelixParameters(iZ0, iX) = - pz * invPt;
+    jacobianToHelixParameters(iZ0, iZ) = 1;
+    //
+    jacobian = jacobianToHelixParameters * jacobianRot;
+
+#endif
   }
 
   void HelixUtils::helixFromVertex(const TVector3& position,
@@ -333,6 +403,56 @@ namespace TreeFitter {
       cout << vertexParName(i + 4).c_str() << momentum[i] << endl ;
     cout << "charge:    " << charge << endl ;
   }
+
+  //JFK: FIXME JUMP 2017-10-11
+  //Calculate Jacobian numerically. Precision is questionable, but you don't have to get the derivative calculation right... good for cross checks
+  void HelixUtils::getHelixAndJacobianFromVertexNumerical(Eigen::Matrix<double, 1, 6>& positionAndMom,
+                                                          int charge, double Bz,
+                                                          Belle2::Helix& helix,
+                                                          Eigen::Matrix<double, 5, 6>& jacobian)
+  {
+
+    TVector3 position(positionAndMom(0),
+                      positionAndMom(1),
+                      positionAndMom(2));
+    TVector3 momentum(positionAndMom(3),
+                      positionAndMom(4),
+                      positionAndMom(5));
+
+    helix = Belle2::Helix(position, momentum, charge, Bz);
+
+    // numeric calculation of the jacobian
+    Belle2::Helix helixPlusDelta;
+
+    double delta = 1e-5 ;// this is quite a random choice.
+
+    TVector3 postmp;
+    TVector3 momtmp;
+
+    for (int jin = 0; jin < 6; ++jin) {
+      for (int i = 0; i < 3; ++i) {
+        postmp[i] = positionAndMom(i);
+        momtmp[i] = positionAndMom(i + 3);
+      }
+      if (jin < 3) {
+        postmp[jin] += delta;
+      } else {
+        momtmp[jin - 3] += delta;
+      }
+      helixPlusDelta = Belle2::Helix(postmp, momtmp, charge, Bz);
+      jacobian(iD0, jin)        = (helixPlusDelta.getD0()        - helix.getD0())        / delta ;
+      jacobian(iPhi0, jin)      = (helixPlusDelta.getPhi0()      - helix.getPhi0())      / delta ;
+      jacobian(iOmega, jin)     = (helixPlusDelta.getOmega()     - helix.getOmega())     / delta ;
+      jacobian(iZ0, jin)        = (helixPlusDelta.getZ0()        - helix.getZ0())        / delta ;
+      jacobian(iTanLambda, jin) = (helixPlusDelta.getTanLambda() - helix.getTanLambda()) / delta ;
+
+      //      jacobian[iArcLength2D][jin] = (LPlusDelta - L) / delta ;
+    }
+    //    cout << "Numerical Jacobian: " << endl << jacobian << endl;
+  }
+
+
+
 
   //Calculate Jacobian numerically. Precision is questionable, but you don't have to get the derivative calculation right... good for cross checks
   void HelixUtils::helixFromVertexNumerical(const TVector3& position,

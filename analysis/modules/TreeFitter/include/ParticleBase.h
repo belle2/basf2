@@ -16,6 +16,7 @@
 #include <analysis/modules/TreeFitter/ErrCode.h>
 
 
+#include <analysis/modules/TreeFitter/EigenTypes.h>
 #include <analysis/dataobjects/Particle.h>
 
 namespace TreeFitter {
@@ -43,17 +44,36 @@ namespace TreeFitter {
     virtual ~ParticleBase();
 
     /**  alias */
-    typedef std::vector<Constraint> constraintlist ;
+    typedef std::vector<Constraint> constraintlist;
     /**  alias */
-    typedef std::vector< std::pair<const ParticleBase*, int> > indexmap ;
+    typedef std::vector< std::pair<const ParticleBase*, int> > indexmap;
 
     /** create the according treeFitter particle obj for a basf2 particle type  */
     static ParticleBase* createParticle(Belle2::Particle* particle,
                                         const ParticleBase* mother,
-                                        bool forceFitAll = false) ;
+                                        bool forceFitAll = false);
 
     /** return an Interaction Point particle */
-    static ParticleBase* createInteractionPoint(Belle2::Particle* daughter, bool forceFitAll, int dimension);
+    static ParticleBase* createInteractionPoint(Belle2::Particle* daughter,
+                                                bool forceFitAll,
+                                                int dimension);
+
+    /**  get dimension of constraint */
+    //virtual int getConstraintDim();
+    /** init particle that does not need a mother vertex  */
+    virtual ErrCode initMotherlessParticle(FitParams*) = 0;
+    /** init particle that does need a mother vertex  */
+    virtual ErrCode initParticleWithMother(FitParams*) = 0;
+    /** init covariance matrix */
+    virtual ErrCode initCovariance(FitParams*) const;
+    /**  get basf2 particle  */
+    Belle2::Particle* getBasf2Particle() const { return m_particle ; }
+
+    /** project geometrical constraint */
+    ErrCode projectGeoConstraintCopy(const FitParams& fitparams, Projection& p) const;
+    /** project mass constraint */
+    ErrCode projectMassConstraintCopy(const FitParams& fitparams,
+                                      Projection& p) const;
 
 
     /**  get dimension of constraint */
@@ -89,6 +109,8 @@ namespace TreeFitter {
     virtual ErrCode projectMassConstraint(const FitParams&, Projection&) const ;
     /** project constraint.   */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
+    /** project constraint.   */
+    virtual ErrCode projectConstraintCopy(Constraint::Type, const FitParams&, Projection&) const;
     /**  force p4 sum conservation all allong the tree */
     virtual void forceP4Sum(FitParams&) const {} ;
 
@@ -148,12 +170,14 @@ namespace TreeFitter {
   protected:
     /** Standard template library::const_iterator */
     typedef std::vector<ParticleBase*>::const_iterator conIter;
-
     /** Standard template library::iterator  */
     typedef std::vector<ParticleBase*>::iterator iter;
-
     /** just an alias */
     typedef std::vector<ParticleBase*> ParticleContainer;
+    /** inti tau */
+    ErrCode initTauCopy(FitParams* fitparams) const;
+
+
 
 
     /**  */

@@ -210,11 +210,15 @@ void ECLDigitCalibratorModule::event()
 
     // perform the digit timing calibration: t = c * (tfit - Te - Ts)
     const int time              = aECLDigit.getTimeFit();
-    if (time == -2048) aECLCalDigit->addStatus(ECLCalDigit::c_IsFailedFit); //this is used to flag failed fits
-    double calibratedTime = m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
-                                                  v_calibrationCrystalTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1];
+    double calibratedTime = 0;
+    if (time == -2048) {
+      aECLCalDigit->addStatus(ECLCalDigit::c_IsFailedFit); //this is used to flag failed fits
+    } else { //only calibrate digit time is we have a good waveform fit
+      calibratedTime = m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
+                                             v_calibrationCrystalTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1];
+    }
 
-    B2DEBUG(175, "cellid = " << cellid << ", amplitude = " << amplitude << ", energy = " << calibratedEnergy);
+    B2DEBUG(175, "cellid = " << cellid << ", amplitude = " << amplitude << ", calibrated energy = " << calibratedEnergy);
     B2DEBUG(175, "cellid = " << cellid << ", time = " << time << ", calibratedTime = " << calibratedTime);
 
     // fill the ECLCalDigit with the cell id, the calibrated information and calibration status
@@ -227,7 +231,6 @@ void ECLDigitCalibratorModule::event()
 
     // set a relation to the ECLDigit
     aECLCalDigit->addRelationTo(&aECLDigit);
-
   }
 
   // determine background level

@@ -123,6 +123,11 @@ namespace Belle2 {
      **/
     double eIDBelle(const Particle*);
 
+    /**
+     * Returns Belle's kaonID.
+     **/
+    double kIDBelle(const Particle*);
+
 
 
   }

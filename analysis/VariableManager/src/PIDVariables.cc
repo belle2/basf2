@@ -384,6 +384,38 @@ namespace Belle2 {
     }
 
 
+    // Needed by the flavor tagger algorithm
+    double kIDBelle(const Particle* part)
+    {
+      //default values Belle style
+      float accs = 0.5;
+      float tofs = 0.5;
+      float cdcs = 0.5;
+
+      const PIDLikelihood* pid = part->getPIDLikelihood();
+
+      if (pid) {
+        Const::PIDDetectorSet set = Const::ARICH;
+        accs = pid->getProbability(Const::kaon, Const::pion, set);
+        set = Const::TOP;
+        tofs = pid->getProbability(Const::kaon, Const::pion, set);
+        set = Const::TOP + Const::SVD;
+        cdcs = pid->getProbability(Const::kaon, Const::pion, set);
+      }
+
+      if (tofs > 0.999) tofs = 0.999;
+      if (tofs < 0.001) tofs = 0.001;
+      if (cdcs > 0.999) cdcs = 0.999;
+      if (cdcs < 0.001) cdcs = 0.001;
+
+      float s = accs * tofs * cdcs;
+      float b = (1. - accs) * (1. - tofs) * (1. - cdcs);
+
+      float r = s / (b + s);
+
+      return r;
+    }
+
 
     VARIABLE_GROUP("PID");
 
@@ -421,5 +453,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("eIDBelle", eIDBelle,
                       "returns Belle's electron ID (eid(3,-1,5).prob()) variable.\n"
                       "To be used only when analysing converted Belle samples.");
+    REGISTER_VARIABLE("kIDBelle", kIDBelle, "kaon identification probability bellestyle.");
+
+
   }
 }

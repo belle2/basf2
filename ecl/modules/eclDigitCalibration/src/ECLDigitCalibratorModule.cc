@@ -213,7 +213,7 @@ void ECLDigitCalibratorModule::event()
     double calibratedTime = 0;
     if (time == -2048) {
       aECLCalDigit->addStatus(ECLCalDigit::c_IsFailedFit); //this is used to flag failed fits
-    } else { //only calibrate digit time is we have a good waveform fit
+    } else { //only calibrate digit time if we have a good waveform fit
       calibratedTime = m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
                                              v_calibrationCrystalTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1];
     }

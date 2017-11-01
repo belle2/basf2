@@ -1772,6 +1772,87 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr qpCategory(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string categoryName = arguments[0];
+        auto func = [categoryName](const Particle * particle) -> double {
+
+          double output = -2;
+          FlavorTaggerInfo* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
+
+          if (flavorTaggerInfo != nullptr)
+          {
+            if (Variable::hasRestOfEventTracks(particle) > 0) {
+              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+              std::map<std::string, float> iQpCategories = flavorTaggerInfo->getMethodMap("FBDT")->getQpCategory();
+              if (iQpCategories.find(categoryName) != iQpCategories.end()) output = iQpCategories.at(categoryName);
+              else B2FATAL("qpCategory: Category with name " << categoryName
+                << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
+            }
+          }
+          return output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function qpCategory");
+      }
+    }
+
+    Manager::FunctionPtr isTrueFTCategory(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string categoryName = arguments[0];
+        auto func = [categoryName](const Particle * particle) -> double {
+
+          double output = -2;
+          FlavorTaggerInfo* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
+
+          if (flavorTaggerInfo != nullptr)
+          {
+            if (Variable::hasRestOfEventTracks(particle) > 0) {
+              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+              std::map<std::string, float> iIsTrueCategories = flavorTaggerInfo->getMethodMap("FBDT")->getIsTrueCategory();
+              if (iIsTrueCategories.find(categoryName) != iIsTrueCategories.end()) output = iIsTrueCategories.at(categoryName);
+              else B2FATAL("isTrueFTCategory: Category with name " << categoryName
+                << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
+            }
+          }
+          return output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function isTrueFTCategory");
+      }
+    }
+
+    Manager::FunctionPtr hasTrueTargets(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string categoryName = arguments[0];
+        auto func = [categoryName](const Particle * particle) -> double {
+
+          double output = -2;
+          FlavorTaggerInfo* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
+
+          if (flavorTaggerInfo != nullptr)
+          {
+            if (Variable::hasRestOfEventTracks(particle) > 0) {
+              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+              std::map<std::string, float> iHasTrueTargets = flavorTaggerInfo->getMethodMap("FBDT")->getHasTrueTarget();
+              if (iHasTrueTargets.find(categoryName) != iHasTrueTargets.end()) output = iHasTrueTargets.at(categoryName);
+              else B2FATAL("hasTrueTargets: Category with name " << categoryName
+                << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
+            }
+          }
+          return output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function hasTrueTargets");
+      }
+    }
+
     VARIABLE_GROUP("Flavor Tagger Variables");
 
     REGISTER_VARIABLE("pMissTag", momentumMissingTagSide,  "Calculates the missing Momentum for a given particle on the tag side.");
@@ -1848,5 +1929,11 @@ namespace Belle2 {
                       "Returns the flavor tag q output of the flavorTagger for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.")
     REGISTER_VARIABLE("rBinBelle(combinerMethod)", rBinBelle,
                       "Returns the corresponding r (dilution) bin according to the Belle binning for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.")
+    REGISTER_VARIABLE("qpCategory(categoryName)", qpCategory,
+                      "Returns the output q (charge of target track) times p (probability that this is the right category) of the category with the given name. The allowed categories are the official Flavor Tagger Category Names.");
+    REGISTER_VARIABLE("isTrueFTCategory(categoryName)", isTrueFTCategory,
+                      "Returns 1 if the target particle (checking the decay chain) of the category with the given name is found in the mc Particles, and if it provides the right Flavor. The allowed categories are the official Flavor Tagger Category Names.");
+    REGISTER_VARIABLE("hasTrueTargets(categoryName)", hasTrueTargets,
+                      "Returns 1 if target particles (checking only the decay chain) of the category with the given name is found in the mc Particles. The allowed categories are the official Flavor Tagger Category Names.");
   }
 }

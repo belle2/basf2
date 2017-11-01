@@ -31,7 +31,8 @@ void plot_pipijpsi(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_pipijpsi->GetYaxis()->SetTitle("Events / (40 MeV/c^{2})");
   h_pipijpsi->GetListOfFunctions()->Add(new TNamed("Description", "e^{+} e^{-} #rightarrow #pi^{+} #pi^{-} J/#psi(#mu#mu)  M_{#pi#piJ/#psi} (GeV/c^{2})"));
   h_pipijpsi->GetListOfFunctions()->Add(new TNamed("Contact" , "liyb@pku.edu.cn"));
-  h_pipijpsi->GetListOfFunctions()->Add(new TNamed("Check", "no expected distribution of M_{#pi#piJ/#psi}"));
+  h_pipijpsi->GetListOfFunctions()->Add(new TNamed("Check", "M_{#pi#piJ
+/#psi} distribution should be smooth and has more events in higher mass side"));
 
   TH1F* h_mm2 = new TH1F("h_mm2","MM^{2}_{#pi#piJ/#psi}",100,-1,1);
   ptree->Project("h_mm2", "vpho_m2Recoil", Cuts);

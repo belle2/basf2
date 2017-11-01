@@ -23,9 +23,9 @@ namespace Belle2 {
   (momentum, energy, mass) to a flat ntuple. */
   class NtuplePIDTool : public NtupleFlatTool {
   private:
-    /** kaon/pion PID. */
+    /** kaon PID. */
     float* m_fPIDk;
-    /** pion/kaon PID. */
+    /** pion PID. */
     float* m_fPIDpi;
     /** electron PID. */
     float* m_fPIDe;
@@ -33,6 +33,8 @@ namespace Belle2 {
     float* m_fPIDmu;
     /** proton PID. */
     float* m_fPIDp;
+    /** deuteron PID. */
+    float* m_fPIDd;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:

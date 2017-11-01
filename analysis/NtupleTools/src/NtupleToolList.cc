@@ -13,7 +13,6 @@
 #include <analysis/NtupleTools/NtupleMCHierarchyTool.h>
 #include <analysis/NtupleTools/NtupleMCKinematicsTool.h>
 #include <analysis/NtupleTools/NtuplePIDTool.h>
-#include <analysis/NtupleTools/NtupleDeltaLogLTool.h>
 #include <analysis/NtupleTools/NtupleTrackTool.h>
 #include <analysis/NtupleTools/NtupleTrackHitsTool.h>
 #include <analysis/NtupleTools/NtupleClusterTool.h>
@@ -101,7 +100,6 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "MCHierarchy") return new NtupleMCHierarchyTool(tree, d);
   else if (strToolName == "MCKinematics") return new NtupleMCKinematicsTool(tree, d);
   else if (strToolName == "PID") return new NtuplePIDTool(tree, d);
-  else if (strToolName == "DeltaLogL") return new NtupleDeltaLogLTool(tree, d);
   else if (strToolName == "RecoStats") return new NtupleRecoStatsTool(tree, d);
   else if (strToolName == "MCReconstructible") return new NtupleMCReconstructibleTool(tree, d);
   else if (strToolName == "Track") return new NtupleTrackTool(tree, d);

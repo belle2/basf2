@@ -244,7 +244,7 @@ tools = [
     # Without any arguments only TMVA is saved. If you want to save the FANN Output please specify it.
     # If you set qrCategories, the output of each category is saved.
     '^B0',
-    'FlavorTagging[TMVA-FBDT, FANN-MLP, qrCategories]', '^B0',
+    'FlavorTagging[TMVA-FBDT, FANN-MLP, qpCategories]', '^B0',
 ]
 # Note: The Ntuple Output is set to zero during training processes, i.e. when the 'Teacher' mode is used
 

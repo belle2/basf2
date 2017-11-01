@@ -17,7 +17,7 @@
 
 
 namespace Belle2 {
-
+  /** Class to calculate the Fox-Wolfram moments */
   class FoxWolfram {
   public:
 

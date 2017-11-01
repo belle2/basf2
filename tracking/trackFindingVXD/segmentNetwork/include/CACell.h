@@ -59,7 +59,6 @@ namespace Belle2 {
     /** returns state of CACell (CA-feature) */
     inline unsigned int getState() const { return m_state; }
 
-
     /** returns whether CACell is allowed to be a seed for TCs */
     inline bool isSeed() const { return m_seed; }
 

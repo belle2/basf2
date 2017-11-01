@@ -35,7 +35,8 @@ TreeFitterModule::TreeFitterModule() : Module()
   //module parameters
   addParam("particleList", m_particleList, "Input mother of the decay tree to fit");
   addParam("confidenceLevel", m_confidenceLevel, "Confidence level to accept fitted decay tree. -1.0 for failed fits.", 0.0);
-  addParam("convergencePrecision", m_precision, "Upper limit for chi2 fluctuations to accept result.", 1.0); //large value for now
+  addParam("convergencePrecision", m_precision, "Upper limit for chi2 fluctuations to accept result.",
+           0.1);// 1.0); //large value for now
   addParam("verbose", m_verbose, "BaBar verbosity (to be phased out in the future)", 5);
   addParam("massConstraintList", m_massConstraintList, "List of particles to mass constrain");
 }

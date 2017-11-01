@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Moritz Gelb, Thomas Keck                                 *
+ * Contributors: Fernando Abudinen, Moritz Gelb, Thomas Keck              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

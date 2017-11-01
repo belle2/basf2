@@ -105,10 +105,10 @@ void ECLDigitCalibratorModule::initialize()
   StoreObjPtr<ECLEventInformation> eclEventInformationPtr(eclEventInformationName());
 
   // Register Digits, CalDigits and their relation in datastore
-  eclDigits.registerInDataStore();
-  eclCalDigits.registerInDataStore();
+  eclDigits.registerInDataStore(eclDigitArrayName());
+  eclCalDigits.registerInDataStore(eclCalDigitArrayName());
   eclCalDigits.registerRelationTo(eclDigits);
-  eclEventInformationPtr.registerInDataStore();
+  eclEventInformationPtr.registerInDataStore(eclEventInformationName());
 
   // initialize calibration
   initializeCalibration();

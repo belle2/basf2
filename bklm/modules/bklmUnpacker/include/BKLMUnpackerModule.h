@@ -51,8 +51,6 @@ namespace Belle2 {
 
   private:
 
-    //! fill m_electIdToModuleId from xml file
-    void loadMap();
     //! fill m_electIdToModuleId from Data Base
     void loadMapFromDB();
 
@@ -62,20 +60,20 @@ namespace Belle2 {
     //! @param lane the lane number, giving for the rpcs the slot number in the crate
     //! @param channel the channel
     //! @param axis z or phi
-    int getModuleId(int copperId, int finesseNum, int lane, int channel, int axis);
+    // int getModuleId(int copperId, int finesseNum, int lane, int channel, int axis);
 
     //!in case the module id is not found in the mapping and useDefaultModuleId flag is set, this computes the default
     //!module id from the lane and the axis. Sector etc are set to 0
     //! @param lane the lane number, giving for the rpcs the slot number in the crate
     //! @param axis z or phi
-    int getDefaultModuleId(int copperId, int finesse, int lane, int axis);
+    int getDefaultModuleId(int copperId, int finesse, int lane, int axis, int channel, bool& outOfRange);
 
     //! To be used to map electronics address to module id
     //! @param copperId id of the copper board
     //! @param finesseNum The Finesse slot on the copper boards
     //! @param lane the lane number, giving for the rpcs the slot number in the crate
     //! @param axis the axis bit in the datapacket
-    int electCooToInt(int copper, int finesse, int lane, int axis);
+    int electCooToInt(int copper, int finesse, int lane, int axis, int channel);
 
     //! remap the channel ID for scitilators and RPCs
     unsigned short getChannel(int layer,  int plane,  unsigned short channel);

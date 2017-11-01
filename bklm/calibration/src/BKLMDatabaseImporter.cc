@@ -47,16 +47,17 @@ BKLMDatabaseImporter::BKLMDatabaseImporter()
 void BKLMDatabaseImporter::importBklmElectronicMapping()
 {
   DBImportArray<BKLMElectronicMapping> m_bklmMapping;
+  int copperId = 0;
+  int slotId = 0;
+  int laneId = 0;
+  int axisId = 0;
+  int BKLM_ID = 117440512;
   for (int isForward = 0; isForward < 2; isForward++) {
     for (int sector = 1; sector < 9; sector++) {
       for (int layer = 1; layer < 16; layer++) {
         //plane = 0 for z; plane = 1 for phi
         for (int plane = 0; plane < 2; plane++) {
-          int copperId = 0;
-          int slotId = 0;
-          int laneId = 0;
-          int axisId = 0;
-          int BKLM_ID = 117440512;
+
           if (isForward == 1 && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 1 + BKLM_ID;
           if (isForward == 1 && (sector == 1 || sector == 2 || sector == 7 || sector == 8)) copperId = 2 + BKLM_ID;
           if (isForward == 0 && (sector == 3 || sector == 4 || sector == 5 || sector == 6)) copperId = 3 + BKLM_ID;
@@ -73,11 +74,42 @@ void BKLMDatabaseImporter::importBklmElectronicMapping()
             else if (plane == 1) axisId = 0;
           } else axisId = plane;
 
-          m_bklmMapping.appendNew(1, copperId, slotId, laneId, axisId, isForward, sector, layer, plane);
-        }
-      }
-    }
-  }
+          int MaxiChannel = 0;
+          if (isForward == 0 && sector == 3 && plane == 0) {
+            if (plane == 0 && layer < 3) MaxiChannel = 38;
+            if (plane == 0 && layer > 2) MaxiChannel = 34;
+          } else {
+            if (layer == 1 && plane == 1) MaxiChannel = 37;
+            if (layer == 2 && plane == 1) MaxiChannel = 42;
+            if (layer > 2 && layer < 7 && plane == 1) MaxiChannel = 36;
+            if (layer > 6 && plane == 1) MaxiChannel = 48;
+
+            if (layer == 1 && plane == 0) MaxiChannel = 54;
+            if (layer == 2 && plane == 0) MaxiChannel = 54;
+            if (layer > 2 && plane == 0) MaxiChannel = 48;
+          }
+
+          bool dontFlip = false;
+          if (isForward == 1 && (sector == 7 ||  sector == 8 ||  sector == 1 ||  sector == 2)) dontFlip = true;
+          if (isForward == 0 && (sector == 4 ||  sector == 5 ||  sector == 6 ||  sector == 7)) dontFlip = true;
+
+          for (int iStrip = 1; iStrip < (MaxiChannel + 1);  iStrip++) {
+            int channelId = iStrip;
+            if (!(dontFlip && layer > 2 && plane == 1)) channelId = MaxiChannel - iStrip + 1;
+
+            if (plane == 1) { //phi strips
+              if (layer == 1)  channelId = channelId + 4;
+              if (layer == 2)  channelId = channelId + 2;
+            } else if (plane == 0) { //z strips
+              if (layer < 3 && channelId > 9) channelId = channelId + 6;
+            }
+
+            m_bklmMapping.appendNew(1, copperId, slotId, laneId, axisId, channelId, isForward, sector, layer, plane, iStrip);
+          }// end of loop channels
+        }//end of loop plane
+      }//end of loop layers
+    }//end of loop sectors
+  }//end fb
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   m_bklmMapping.import(iov);
 
@@ -94,10 +126,13 @@ void BKLMDatabaseImporter::exportBklmElectronicMapping()
   B2INFO("DBArray<BKLMElectronicMapping> entries " << elements.getEntries());
 
   for (const auto& element : elements) {
-    B2INFO("Version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " << element.getCopperId() <<
-           ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
-           ", isForward = " << element.getIsForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
-           " plane(z/phi) = " << element.getPlane());
+    if (element.getStripId() == 1) {
+      B2INFO("Version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " << element.getCopperId() <<
+             ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
+             ", channelId = " << element.getChannelId() <<
+             ", isForward = " << element.getIsForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
+             " plane(z/phi) = " << element.getPlane() << " stripId = " << element.getStripId());
+    }
   }
 }
 

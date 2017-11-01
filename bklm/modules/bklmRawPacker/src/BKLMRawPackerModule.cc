@@ -68,7 +68,6 @@ void BKLMRawPackerModule::initialize()
 
   B2DEBUG(1, "BKLMRawPackerModule: initialize() done.");
   if (m_loadMapFromDB) loadMapFromDB();
-  else loadMap();
 }
 
 
@@ -113,7 +112,8 @@ void BKLMRawPackerModule::event()
     int moduleId = (isForward ? BKLM_END_MASK : 0)
                    | ((iSector - 1) << BKLM_SECTOR_BIT)
                    | ((iLayer - 1) << BKLM_LAYER_BIT)
-                   | ((iAx) << BKLM_PLANE_BIT);
+                   | ((iAx) << BKLM_PLANE_BIT)
+                   | ((iChannelNr - 1) << BKLM_STRIP_BIT);
     B2DEBUG(1, "BKLMRawPackerModule:: digi before packer: sector: " << iSector << " isforward: " << isForward << " layer: " << iLayer <<
             " plane: " << iAx << " icharge " << icharge << " tdc " << iTdc << " ctime " << iCTime << " isAboveThresh " << isAboveThresh <<
             " isRPC " << isRPC << " " << moduleId << bklmDigit->getModuleID());
@@ -122,7 +122,7 @@ void BKLMRawPackerModule::event()
     if (m_ModuleIdToelectId.find(moduleId) == m_ModuleIdToelectId.end()) {
       if (m_useDefaultElectId) {
         B2DEBUG(1, "BKLMRawPacker::can not find in mapping. Use the default ElectId");
-        electId = getDefaultElectId(isForward, iSector, iLayer, iAx);
+        electId = getDefaultElectId(isForward, iSector, iLayer, iAx, iChannelNr);
       } else {
         B2DEBUG(1, "BKLMRawPacker::can not find in mapping for moduleId " << moduleId << " isForward? " << isForward << " , sector " <<
                 iSector);
@@ -136,10 +136,11 @@ void BKLMRawPackerModule::event()
     int finesse;
     int lane;
     int axis;
-    intToElectCoo(electId, copperId, finesse, lane, axis);
+    int channelId;
+    intToElectCoo(electId, copperId, finesse, lane, axis, channelId);
 
     B2DEBUG(1, "BKLMRawPacker::copperId " << copperId << " " << isForward << " " << iSector << " " << lane << " " << axis << " " <<
-            iChannelNr << " " << iTdc << " " << icharge << " " << iCTime);
+            channelId << " " << iTdc << " " << icharge << " " << iCTime);
 
     unsigned short bword1 = 0;
     unsigned short bword2 = 0;
@@ -148,8 +149,7 @@ void BKLMRawPackerModule::event()
     int flag;
     if (isRPC) flag = 2; //010
     else flag = 4; //100
-    iChannelNr = getChannel(isForward, iSector, iLayer, iAx, iChannelNr);
-    formatData(flag, iChannelNr, axis, lane, iTdc, icharge, iCTime, bword1, bword2, bword3, bword4);
+    formatData(flag, channelId, axis, lane, iTdc, icharge, iCTime, bword1, bword2, bword3, bword4);
     buf[0] |= bword2;
     buf[0] |= ((bword1 << 16));
     buf[1] |= bword4;
@@ -282,67 +282,27 @@ void BKLMRawPackerModule::loadMapFromDB()
     int slotId = element.getSlotId();
     int laneId = element.getLaneId();
     int axisId = element.getAxisId();
+    int channelId = element.getChannelId();
     int sector = element.getSector();
     int isForward = element.getIsForward();
     int layer = element.getLayer();
     int plane =  element.getPlane();
-    int elecId = electCooToInt(copperId - BKLM_ID, slotId - 1, laneId, axisId);
+    int stripId = element.getStripId();
+    int elecId = electCooToInt(copperId - BKLM_ID, slotId - 1, laneId, axisId, channelId);
     int moduleId = 0;
     B2DEBUG(1, "BKLMRawPackerModule::reading Data Base for BKLMElectronicMapping...");
     moduleId = (isForward ? BKLM_END_MASK : 0)
                | ((sector - 1) << BKLM_SECTOR_BIT)
                | ((layer - 1) << BKLM_LAYER_BIT)
-               | ((plane) << BKLM_PLANE_BIT);
+               | ((plane) << BKLM_PLANE_BIT)
+               | ((stripId - 1) << BKLM_STRIP_BIT);
     m_ModuleIdToelectId[moduleId] = elecId;
     B2DEBUG(1, " electId: " << elecId << " modId: " << moduleId);
   }
 
 }
 
-void BKLMRawPackerModule::loadMap()
-{
-  GearDir dir("/Detector/ElectronicsMapping/BKLM");
-
-  for (GearDir& copper : dir.getNodes("COPPER")) {
-    //GearDir& ID : copper.getNodes("ID")
-    //int id=copper.getInt("ID");
-    int copperId = copper.getInt("@id");
-    //      cout <<"copper id: "<< id <<endl;
-    for (GearDir& slot : copper.getNodes("Slot")) {
-      int slotId = slot.getInt("@id");
-      //      cout << "slotid : " << slotId << endl;
-      B2DEBUG(1, "slotid: " << slotId);
-      for (GearDir& lane : slot.getNodes("Lane")) {
-        int laneId = lane.getInt("@id");
-        for (GearDir& axis : lane.getNodes("Axis")) {
-          int axisId = axis.getInt("@id");
-          int sector = axis.getInt("Sector");
-          int isForward = axis.getInt("IsForward");
-          int layer = axis.getInt("Layer");
-          int plane = axis.getInt("Plane");
-          //int elecId = electCooToInt(copperId, slotId, laneId, axisId);
-          int elecId = electCooToInt(copperId - BKLM_ID, slotId - 1, laneId, axisId);
-          int moduleId = 0;
-
-
-          B2DEBUG(1, "reading xml file...");
-          B2DEBUG(1, " copperId: " << copperId << " slotId: " << slotId << " laneId: " << laneId << " axisId: " << axisId);
-          B2DEBUG(1, " sector: " << sector << " isforward: " << isForward << " layer: " << layer << " plane: " << plane);
-          moduleId = (isForward ? BKLM_END_MASK : 0)
-                     | ((sector - 1) << BKLM_SECTOR_BIT)
-                     | ((layer - 1) << BKLM_LAYER_BIT)
-                     | ((plane) << BKLM_PLANE_BIT);
-          //m_ModuleIdToelectId[elecId] = moduleId;
-          m_ModuleIdToelectId[moduleId] = elecId;
-          B2DEBUG(1, " electId: " << elecId << " modId: " << moduleId);
-        }
-      }
-    }
-  }
-
-}
-
-void BKLMRawPackerModule::intToElectCoo(int id, int& copper, int& finesse, int& lane, int& axis)
+void BKLMRawPackerModule::intToElectCoo(int id, int& copper, int& finesse, int& lane, int& axis, int& channelId)
 {
   copper = 0;
   finesse = 0;
@@ -353,16 +313,19 @@ void BKLMRawPackerModule::intToElectCoo(int id, int& copper, int& finesse, int& 
   lane = (id >> 6) & 0x1F;
   axis = 0;
   axis = (id >> 11) & 0x1;
+  channelId = 0;
+  channelId = (id >> 12) & 0x3F;
 
 }
 
-int BKLMRawPackerModule::electCooToInt(int copper, int finesse, int lane, int axis)
+int BKLMRawPackerModule::electCooToInt(int copper, int finesse, int lane, int axis, int channel)
 {
   //  there are at most 16 copper -->4 bit
   // 4 finesse --> 2 bit
   // < 20 lanes -->5 bit
   // axis --> 1 bit
-  unsigned int ret = 0;
+  // channel --> 6 bit
+  int ret = 0;
   copper = copper & 0xF;
   ret |= copper;
   finesse = finesse & 3;
@@ -371,12 +334,14 @@ int BKLMRawPackerModule::electCooToInt(int copper, int finesse, int lane, int ax
   ret |= (lane << 6);
   axis = axis & 0x1;
   ret |= (axis << 11);
+  channel = channel & 0x3F;
+  ret |= (channel << 12);
 
   return ret;
 
 }
 
-int BKLMRawPackerModule::getDefaultElectId(int isForward, int sector, int layer, int plane)
+int BKLMRawPackerModule::getDefaultElectId(int isForward, int sector, int layer, int plane, int stripId)
 {
 
   int copperId = 0;
@@ -395,7 +360,8 @@ int BKLMRawPackerModule::getDefaultElectId(int isForward, int sector, int layer,
   if (layer > 2) axisId = plane;
   else { if (plane == 0) axisId = 1; else axisId = 0; }
 
-  return electCooToInt(copperId, finesse , lane, axisId);
+  int channelId = getChannel(isForward, sector, layer, plane, stripId);
+  return electCooToInt(copperId, finesse , lane, axisId, channelId);
 
 }
 

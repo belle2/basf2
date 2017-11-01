@@ -1787,7 +1787,7 @@ namespace Belle2 {
               if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
               std::map<std::string, float> iQpCategories = flavorTaggerInfo->getMethodMap("FBDT")->getQpCategory();
               if (iQpCategories.find(categoryName) != iQpCategories.end()) output = iQpCategories.at(categoryName);
-              else B2FATAL("qpCategory: Category with name " << categoryName
+              else if (iQpCategories.size() != 0) B2FATAL("qpCategory: Category with name " << categoryName
                 << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
             }
           }
@@ -1814,7 +1814,7 @@ namespace Belle2 {
               if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
               std::map<std::string, float> iIsTrueCategories = flavorTaggerInfo->getMethodMap("FBDT")->getIsTrueCategory();
               if (iIsTrueCategories.find(categoryName) != iIsTrueCategories.end()) output = iIsTrueCategories.at(categoryName);
-              else B2FATAL("isTrueFTCategory: Category with name " << categoryName
+              else if (iIsTrueCategories.size() != 0) B2FATAL("isTrueFTCategory: Category with name " << categoryName
                 << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
             }
           }
@@ -1841,7 +1841,7 @@ namespace Belle2 {
               if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
               std::map<std::string, float> iHasTrueTargets = flavorTaggerInfo->getMethodMap("FBDT")->getHasTrueTarget();
               if (iHasTrueTargets.find(categoryName) != iHasTrueTargets.end()) output = iHasTrueTargets.at(categoryName);
-              else B2FATAL("hasTrueTargets: Category with name " << categoryName
+              else if (iHasTrueTargets.size() != 0) B2FATAL("hasTrueTargets: Category with name " << categoryName
                 << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
             }
           }

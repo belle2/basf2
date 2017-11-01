@@ -331,7 +331,7 @@ namespace Belle2 {
     std::vector<double>* m_eclShowerE9oE21; /**< Shower E9oE21 */
     std::vector<double>* m_eclShowerTime;  /**< Shower Timing */
     std::vector<double>* m_eclShowerT99;  /**< Shower T99 */
-    std::vector<double>* m_eclShowerConnectedRegionId; /**< Matched Connetcted Region Idx */
+    std::vector<int>* m_eclShowerConnectedRegionId; /**< Matched Connetcted Region Idx */
     std::vector<int>* m_eclShowerHypothesisId; /**< Shower Particle Hypothesis ID */
     std::vector<int>* m_eclShowerCentralCellId; /**< Cell ID for most energetic crystal */
     std::vector<double>* m_eclShowerEnergyError; /**< Shower Energy Error */

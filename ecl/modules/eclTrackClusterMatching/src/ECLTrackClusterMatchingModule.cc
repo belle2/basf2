@@ -65,7 +65,7 @@ ECLTrackClusterMatchingModule::~ECLTrackClusterMatchingModule()
 
 void ECLTrackClusterMatchingModule::initialize()
 {
-  B2INFO("[ECLTrackClusterMatching Module]: Starting initialization of ECLTrackClusterMatching Module.");
+  B2INFO("[ECLTrackClusterMatchingModule]: Starting initialization of ECLTrackClusterMatching Module.");
 
   StoreArray<Track> tracks;
   StoreArray<ECLCluster> eclClusters;

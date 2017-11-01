@@ -220,7 +220,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
         add_muid_module(path, components)
         add_pid_module(path, components)
-        add_ecl_track_cluster_module(path, components)
+        add_ecl_track_cluster_modules(path, components)
 
     if trigger_mode in ["all"] and addClusterExpertModules:
         # FIXME: Disabled for HLT until execution time bug is fixed
@@ -351,7 +351,7 @@ def add_muid_module(path, components=None):
         muid = register_module('Muid')
         # muid.logging.log_level = LogLevel.DEBUG
         # muid.logging.debug_level = 100
-        muid.param("pdgCodes", [11, 13, 211, 321, 2212])
+        # muid.param("pdgCodes", [11, 13, 211, 321, 2212])
         path.add_module(muid)
 
 
@@ -418,7 +418,7 @@ def add_ecl_track_matcher_module(path, components=None):
         path.add_module(ecl_track_match)
 
 
-def add_ecl_track_cluster_module(path, components=None):
+def add_ecl_track_cluster_modules(path, components=None):
     """
     Add the ECL track cluster matching module to the path.
 
@@ -432,6 +432,9 @@ def add_ecl_track_cluster_module(path, components=None):
         ecl_track_cluster.logging.debug_level = 90
         ecl_track_cluster.param("writeToRoot", True)
         path.add_module(ecl_track_cluster)
+
+        ecl_cluster_properties = register_module('ECLClusterProperties')
+        path.add_module(ecl_cluster_properties)
 
 
 def add_ecl_eip_module(path, components=None):

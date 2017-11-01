@@ -157,6 +157,7 @@ void StatisticsTimingHLTDQMModule::initialize()
     "ARICHReconstructor",
     "ECLTrackShowerMatch",
     "ECLTrackClusterMatching",
+    "ECLClusterProperties",
     "ECLElectronId",
     "MCMatcherECLClusters",
     "EKLMReconstructor",

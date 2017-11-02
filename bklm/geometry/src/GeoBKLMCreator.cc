@@ -781,7 +781,8 @@ namespace Belle2 {
         dx = -dx;
       }
       double dz = moduleHalfSize.z() - gapHalfSize.z();
-      new G4PVPlacement(G4Translate3D(dx, 0.0, dz) * G4RotateZ3D(isFlipped ? M_PI : 0.0),
+      G4Transform3D displacedGeo = m_GeoPar->getModuleDisplacedGeo(fb == BKLM_FORWARD, sector, layer);
+      new G4PVPlacement(G4Translate3D(dx, 0.0, dz) * G4RotateZ3D(isFlipped ? M_PI : 0.0) * displacedGeo,
                         m_LayerModuleLogical[modLvol],
                         physicalName(m_LayerModuleLogical[modLvol]),
                         m_LayerGapLogical[newLvol],

@@ -385,8 +385,11 @@ def FillParticleLists(mode='Expert', path=analysis_main):
                 readyParticleLists.append('pi+:inRoe')
 
             if 'K_S0:inRoe' not in readyParticleLists:
-                reconstructDecay('K_S0:inRoe -> pi+:inRoe pi-:inRoe', '0.40<=M<=0.60', False, path=path)
-                fitVertex('K_S0:inRoe', 0.01, fitter='kfitter', path=path)
+                if getBelleOrBelle2() == 'Belle':
+                    cutAndCopyList('K_S0:inRoe', 'K_S0:mdst', 'extraInfo(ksnbStandard) == 1 and isInRestOfEvent == 1', path=path)
+                else:
+                    reconstructDecay('K_S0:inRoe -> pi+:inRoe pi-:inRoe', '0.40<=M<=0.60', False, path=path)
+                    fitVertex('K_S0:inRoe', 0.01, fitter='kfitter', path=path)
                 readyParticleLists.append('K_S0:inRoe')
 
             if particleList == 'K+:inRoe':

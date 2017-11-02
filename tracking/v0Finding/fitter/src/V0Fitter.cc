@@ -160,11 +160,8 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   genfit::AbsTrackRep* plusRepresentation = TrackFitter::getTrackRepresentationForPDG(trackHypotheses.first.getPDGCode(),
                                             *recoTrackPlus);
   if (not recoTrackPlus->wasFitSuccessful(plusRepresentation)) {
-    plusRepresentation = TrackFitter::getTrackRepresentationForPDG(Const::pion.getPDGCode(), *recoTrackPlus);
-    if (not recoTrackPlus->wasFitSuccessful(plusRepresentation)) {
-      B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
-      return false;
-    }
+    B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
+    return false;
   }
 
   RecoTrack* recoTrackMinus = trackMinus->getRelated<RecoTrack>(m_RecoTrackColName);
@@ -172,7 +169,15 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     B2ERROR("No RecoTrack for Belle2::Track");
     return false;
   }
+
   genfit::Track gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
+
+  genfit::AbsTrackRep* minusRepresentation = TrackFitter::getTrackRepresentationForPDG(trackHypotheses.second.getPDGCode(),
+                                             *recoTrackMinus);
+  if (not recoTrackMinus->wasFitSuccessful(minusRepresentation)) {
+    B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
+    return false;
+  }
 
   // If existing, pass to the genfit::Track the correct cardinal representation
   std::vector<genfit::AbsTrackRep*> repsPlus = gfTrackPlus.getTrackReps();
@@ -196,17 +201,6 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
         gfTrackMinus.setCardinalRep(id);
     }
   }
-
-  genfit::AbsTrackRep* minusRepresentation = TrackFitter::getTrackRepresentationForPDG(trackHypotheses.second.getPDGCode(),
-                                             *recoTrackMinus);
-  if (not recoTrackMinus->wasFitSuccessful(minusRepresentation)) {
-    minusRepresentation = TrackFitter::getTrackRepresentationForPDG(Const::pion.getPDGCode(), *recoTrackMinus);
-    if (not recoTrackMinus->wasFitSuccessful(minusRepresentation)) {
-      B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
-      return false;
-    }
-  }
-
 
   genfit::MeasuredStateOnPlane stPlus = recoTrackPlus->getMeasuredStateOnPlaneFromFirstHit(plusRepresentation);
   genfit::MeasuredStateOnPlane stMinus = recoTrackMinus->getMeasuredStateOnPlaneFromFirstHit(minusRepresentation);

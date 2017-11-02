@@ -71,7 +71,7 @@ namespace Belle2 {
           const PIDLikelihood* trackiPidLikelihood = tracks[i]->getRelated<PIDLikelihood>();
           const Const::ChargedStable trackiChargedStable = trackiPidLikelihood->getMostLikely();
           double trackiMassHypothesis = trackiChargedStable.getMass();
-          const TrackFitResult* tracki = tracks[i]->getTrackFitResult(trackiChargedStable);
+          const TrackFitResult* tracki = tracks[i]->getTrackFitResultWithClosestMass(trackiChargedStable);
           if (tracki == nullptr) continue;
           double energy = sqrt(trackiMassHypothesis * trackiMassHypothesis + (tracki->getMomentum()).Dot(tracki->getMomentum()));
           TLorentzVector trackiVec(tracki->getMomentum(), energy);
@@ -233,8 +233,11 @@ namespace Belle2 {
           if (part->getTrack() == track) continue;
           if (track == nullptr) continue;
           const Const::ChargedStable charged = track->getRelated<PIDLikelihood>()->getMostLikely();
-          if (track->getTrackFitResult(charged) == nullptr) continue;
-          double pt = track->getTrackFitResult(charged)->getTransverseMomentum();
+          // TODO: this will always return something (so not nullptr) contrary to the previous method
+          // used here. This line can be removed as soon as the multi hypothesis fitting method
+          // has been properly established
+          if (track->getTrackFitResultWithClosestMass(charged) == nullptr) continue;
+          double pt = track->getTrackFitResultWithClosestMass(charged)->getTransverseMomentum();
           if (pt == pt) sum += sqrt(pt * pt);
         }
       }
@@ -700,7 +703,7 @@ namespace Belle2 {
           {
             const auto& tracks = roe->getTracks();
             for (auto& x : tracks) {
-              const TrackFitResult* iTrack = x->getTrackFitResult(x->getRelated<PIDLikelihood>()->getMostLikely());
+              const TrackFitResult* iTrack = x->getTrackFitResultWithClosestMass(x->getRelated<PIDLikelihood>()->getMostLikely());
               if (iTrack == nullptr) continue;
               TLorentzVector momtrack(iTrack->getMomentum(), 0);
               if (momtrack == momtrack) momXchargedtracks += momtrack;
@@ -1772,6 +1775,87 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr qpCategory(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string categoryName = arguments[0];
+        auto func = [categoryName](const Particle * particle) -> double {
+
+          double output = -2;
+          FlavorTaggerInfo* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
+
+          if (flavorTaggerInfo != nullptr)
+          {
+            if (Variable::hasRestOfEventTracks(particle) > 0) {
+              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+              std::map<std::string, float> iQpCategories = flavorTaggerInfo->getMethodMap("FBDT")->getQpCategory();
+              if (iQpCategories.find(categoryName) != iQpCategories.end()) output = iQpCategories.at(categoryName);
+              else if (iQpCategories.size() != 0) B2FATAL("qpCategory: Category with name " << categoryName
+                << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
+            }
+          }
+          return output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function qpCategory");
+      }
+    }
+
+    Manager::FunctionPtr isTrueFTCategory(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string categoryName = arguments[0];
+        auto func = [categoryName](const Particle * particle) -> double {
+
+          double output = -2;
+          FlavorTaggerInfo* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
+
+          if (flavorTaggerInfo != nullptr)
+          {
+            if (Variable::hasRestOfEventTracks(particle) > 0) {
+              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+              std::map<std::string, float> iIsTrueCategories = flavorTaggerInfo->getMethodMap("FBDT")->getIsTrueCategory();
+              if (iIsTrueCategories.find(categoryName) != iIsTrueCategories.end()) output = iIsTrueCategories.at(categoryName);
+              else if (iIsTrueCategories.size() != 0) B2FATAL("isTrueFTCategory: Category with name " << categoryName
+                << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
+            }
+          }
+          return output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function isTrueFTCategory");
+      }
+    }
+
+    Manager::FunctionPtr hasTrueTargets(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string categoryName = arguments[0];
+        auto func = [categoryName](const Particle * particle) -> double {
+
+          double output = -2;
+          FlavorTaggerInfo* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
+
+          if (flavorTaggerInfo != nullptr)
+          {
+            if (Variable::hasRestOfEventTracks(particle) > 0) {
+              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+              std::map<std::string, float> iHasTrueTargets = flavorTaggerInfo->getMethodMap("FBDT")->getHasTrueTarget();
+              if (iHasTrueTargets.find(categoryName) != iHasTrueTargets.end()) output = iHasTrueTargets.at(categoryName);
+              else if (iHasTrueTargets.size() != 0) B2FATAL("hasTrueTargets: Category with name " << categoryName
+                << " not found. Check the official category names or if this category is included in the flavor tagger categories list.");
+            }
+          }
+          return output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function hasTrueTargets");
+      }
+    }
+
     VARIABLE_GROUP("Flavor Tagger Variables");
 
     REGISTER_VARIABLE("pMissTag", momentumMissingTagSide,  "Calculates the missing Momentum for a given particle on the tag side.");
@@ -1848,5 +1932,11 @@ namespace Belle2 {
                       "Returns the flavor tag q output of the flavorTagger for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.")
     REGISTER_VARIABLE("rBinBelle(combinerMethod)", rBinBelle,
                       "Returns the corresponding r (dilution) bin according to the Belle binning for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.")
+    REGISTER_VARIABLE("qpCategory(categoryName)", qpCategory,
+                      "Returns the output q (charge of target track) times p (probability that this is the right category) of the category with the given name. The allowed categories are the official Flavor Tagger Category Names.");
+    REGISTER_VARIABLE("isTrueFTCategory(categoryName)", isTrueFTCategory,
+                      "Returns 1 if the target particle (checking the decay chain) of the category with the given name is found in the mc Particles, and if it provides the right Flavor. The allowed categories are the official Flavor Tagger Category Names.");
+    REGISTER_VARIABLE("hasTrueTargets(categoryName)", hasTrueTargets,
+                      "Returns 1 if target particles (checking only the decay chain) of the category with the given name is found in the mc Particles. The allowed categories are the official Flavor Tagger Category Names.");
   }
 }

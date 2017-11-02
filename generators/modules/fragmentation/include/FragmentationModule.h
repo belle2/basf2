@@ -17,7 +17,7 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <Pythia8/Pythia.h>
-#include "Pythia8Plugins/EvtGen.h"
+#include <generators/modules/fragmentation/EvtGenDecays.h>
 
 #include <string>
 #include <vector>

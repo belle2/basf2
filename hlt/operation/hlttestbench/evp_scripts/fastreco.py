@@ -129,7 +129,7 @@ output.param("RingBufferName", argvs[2])
 
 # Output object list
 objlist = ['EventMetaData', 'RawPXDs', 'RawSVDs', 'RawCDCs', 'RawTOPs',
-           'RawARICHs', 'RawECLs', 'RawKLMs',
+           'RawARICHs', 'RawECLs', 'RawKLMs', 'ROIs',
            'SoftwareTriggerResult', 'SoftwareTriggerVariables'
            ]
 output.param("saveObjs", objlist)

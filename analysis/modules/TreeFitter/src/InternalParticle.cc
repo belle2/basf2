@@ -252,8 +252,8 @@ namespace TreeFitter {
           RecoTrack* dau1 = trkdaughters[0];
           RecoTrack* dau2 = trkdaughters[1];
           //Using pion hypothesis is fine for initialization purposes
-          Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResult(Belle2::Const::pion)->getHelix();
-          Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResult(Belle2::Const::pion)->getHelix();
+          Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
+          Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
           //          B2DEBUG(80, "Helix1 is " << helix1(1) << " | " << helix1(2) << " | " << helix1(3) << " | " << helix1(4) << " | " << helix1(5));
           //          B2DEBUG(80, "Helix2 is " << helix2(1) << " | " << helix2(2) << " | " << helix2(3) << " | " << helix2(4) << " | " << helix2(5));
           double flt1(0), flt2(0);
@@ -418,8 +418,8 @@ namespace TreeFitter {
           RecoTrack* dau1 = trkdaughters[0];
           RecoTrack* dau2 = trkdaughters[1];
           //Using pion hypothesis is fine for initialization purposes
-          Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResult(Belle2::Const::pion)->getHelix();
-          Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResult(Belle2::Const::pion)->getHelix();
+          Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
+          Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
           //          B2DEBUG(80, "Helix1 is " << helix1(1) << " | " << helix1(2) << " | " << helix1(3) << " | " << helix1(4) << " | " << helix1(5));
           //          B2DEBUG(80, "Helix2 is " << helix2(1) << " | " << helix2(2) << " | " << helix2(3) << " | " << helix2(4) << " | " << helix2(5));
           double flt1(0), flt2(0);

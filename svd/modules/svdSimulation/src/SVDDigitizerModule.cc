@@ -24,6 +24,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/dataobjects/SVDModeByte.h>
 #include <boost/tuple/tuple.hpp>
 #include <fstream>
 #include <sstream>
@@ -780,7 +781,7 @@ void SVDDigitizerModule::saveDigits()
         });
         // Save as a new digit
         int digIndex = storeShaperDigits.getEntries();
-        storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples));
+        storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, SVDModeByte(0, 0, 0, 0)));
         //If the digit has any relations to MCParticles, add the Relation
         if (particles.size() > 0) {
           relShaperDigitMCParticle.add(digIndex, particles.begin(), particles.end());
@@ -880,7 +881,7 @@ void SVDDigitizerModule::saveDigits()
         });
         // Save as a new digit
         int digIndex = storeShaperDigits.getEntries();
-        storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples));
+        storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, SVDModeByte(0, 0, 0, 0)));
         //If the digit has any relations to MCParticles, add the Relation
         if (particles.size() > 0) {
           relShaperDigitMCParticle.add(digIndex, particles.begin(), particles.end());

@@ -40,6 +40,7 @@ namespace Belle2 {
     int matchedToECLCluster; /**< boolean if matched to ECL cluster */
     int hypothesisOfMatchedECLCluster; /**< hypothesis ID of matched ECL cluster */
 
+    int pdg_gen; /** PDG code of generated particle */
     double mass_gen; /**< generated mass */
     double px_gen; /**< generated momentum in x direction */
     double py_gen; /**< generated momentum in y direction */
@@ -79,6 +80,7 @@ namespace Belle2 {
       matchedToECLCluster = 0;
       hypothesisOfMatchedECLCluster = 0;
 
+      pdg_gen = 0;
       mass_gen = value;
       px_gen = value;
       py_gen = value;

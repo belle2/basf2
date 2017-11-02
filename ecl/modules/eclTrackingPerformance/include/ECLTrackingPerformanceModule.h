@@ -77,6 +77,9 @@ namespace Belle2 {
     /**< total number of fitted tracks */
     double m_nFittedChargedStabletracks;
 
+    /**< boolean for matched ECL cluster */
+    double m_photonCluster;
+
     /**
      * Sets all variables to the default value, here -999.
      * */

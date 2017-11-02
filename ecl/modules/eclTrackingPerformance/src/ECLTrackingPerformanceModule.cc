@@ -96,6 +96,7 @@ void ECLTrackingPerformanceModule::event()
 
       int pdgCode = mcParticle.getPDG();
       B2DEBUG(99, "Primary MCParticle has PDG code " << pdgCode);
+      m_trackProperties.pdg_gen = pdgCode;
 
       m_nGeneratedChargedStableMcParticles++;
 
@@ -188,6 +189,12 @@ void ECLTrackingPerformanceModule::event()
         if (eclCluster != nullptr) {
           m_trackProperties.matchedToECLCluster = 1;
           m_trackProperties.hypothesisOfMatchedECLCluster = eclCluster->getHypothesisId();
+          for (const MCParticle& eclClusterMCParticle : eclCluster->getRelationsTo<MCParticle>()) {
+            if (eclClusterMCParticle.getPDG() == 22) {
+              m_photonCluster = 1;
+              break;
+            }
+          }
         }
       }
 
@@ -218,6 +225,7 @@ void ECLTrackingPerformanceModule::setupTree()
   if (m_dataTree == NULL) {
     B2FATAL("Data tree was not created.");
   }
+  addVariableToTree("pdgCode", m_trackProperties.pdg_gen);
 
   addVariableToTree("cosTheta", m_trackProperties.cosTheta);
   addVariableToTree("cosTheta_gen",  m_trackProperties.cosTheta_gen);
@@ -252,6 +260,7 @@ void ECLTrackingPerformanceModule::setupTree()
   addVariableToTree("pValue", m_pValue);
 
   addVariableToTree("ECLMatch", m_trackProperties.matchedToECLCluster);
+  addVariableToTree("PhotonCluster", m_photonCluster);
   addVariableToTree("HypothesisID", m_trackProperties.hypothesisOfMatchedECLCluster);
 
   addVariableToTree("nPXDhits", m_trackProperties.nPXDhits);
@@ -355,6 +364,8 @@ void ECLTrackingPerformanceModule::setVariablesToDefaultValue()
   m_trackProperties = -999;
 
   m_pValue = -999;
+
+  m_photonCluster = 0;
 }
 
 void ECLTrackingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference)

@@ -277,6 +277,7 @@ mdst_dataobjects = [
     ]),
     DataStorePrinter("Track", ["getNumberOfFittedHypotheses"], {
         "getTrackFitResult": const_stable,
+        "getTrackFitResultWithClosestMass": const_stable,
         "getRelationsWith": ["ECLClusters", "KLMClusters", "MCParticles", "PIDLikelihoods"],
     }),
     DataStorePrinter("V0", ["getTracks", "getTrackFitResults", "getV0Hypothesis"], {

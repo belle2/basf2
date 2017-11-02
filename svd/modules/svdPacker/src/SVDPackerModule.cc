@@ -197,7 +197,7 @@ void SVDPackerModule::event()
     //adds data32 to data vector and to crc16Input for further crc16 calculation
     addData32(data32);
 
-    m_FTBHeader.errorsField = 0;
+    m_FTBHeader.errorsField = 0xf0;
     m_FTBHeader.eventNumber = (m_eventMetaDataPtr->getEvent() & 0xFFFFFF);
 
     addData32(data32);
@@ -221,10 +221,10 @@ void SVDPackerModule::event()
       m_APVHeader.CMC1 = 0;
       m_APVHeader.CMC2 = 0;
 
-      m_APVHeader.FIFOfullErr = 0;
-      m_APVHeader.FrameErr = 0;
-      m_APVHeader.DetectErr = 0;
-      m_APVHeader.APVErr = 0;
+      m_APVHeader.fifoErr = 0;
+      m_APVHeader.frameErr = 0;
+      m_APVHeader.detectErr = 0;
+      m_APVHeader.apvErr = 0;
 
       m_APVHeader.pipelineAddr = 0;
       m_APVHeader.APVnum = iAPV;
@@ -261,10 +261,10 @@ void SVDPackerModule::event()
     // here goes FADC trailer
     m_FADCTrailer.FTBFlags = 0x001f;
     m_FADCTrailer.emPipeAddr = 0;
-    m_FADCTrailer.wiredOrErr = 0;
-    m_FADCTrailer.error0 = 0;
-    m_FADCTrailer.error1 = 0;
-    m_FADCTrailer.error2 = 0;
+    m_FADCTrailer.fifoErrOR = 0;
+    m_FADCTrailer.frameErrOR = 0;
+    m_FADCTrailer.detectErrOR = 0;
+    m_FADCTrailer.apvErrOR = 0;
     m_FADCTrailer.check = 14;
 
     addData32(data32);

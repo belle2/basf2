@@ -32,7 +32,7 @@ namespace TreeFitter {
     if (m_trackfit == 0) {
       //FT: this is superflous as m_trackfit has just been initialised, but we'll need the statement in future developments.
       //FT: For now we still use the pion track hypothesis. Later: add multiple hypotheses, add a flag to allow users to choose whether they want the "true" hypothesis or just the pion (for cases where the pion works better, for whatever reason)
-      m_trackfit = particle->getTrack()->getTrackFitResult(Belle2::Const::pion);
+      m_trackfit = particle->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion);
     }
   }
 

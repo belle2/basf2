@@ -8,6 +8,8 @@
 # http://ajaxsoundstudio.com/software/pyo/
 # You have to install pyo to use it ;-)
 
+# @cond
+
 # Add system python libraries because pyo isn't available via pip
 import sys
 sys.path.append("/usr/lib/python2.7/dist-packages/")
@@ -130,6 +132,7 @@ class Sonic(Module):
         # Let it play for at least 5 seconds
         time.sleep(5)
 
+
 # Create pyo server, tries to connect to pulseaudio, jack or alsa
 # s = Server(audio='offline_nb')
 s = Server()
@@ -149,3 +152,5 @@ process(path)
 # Shutdown server
 # s.recstop()
 s.stop()
+
+# @endcond

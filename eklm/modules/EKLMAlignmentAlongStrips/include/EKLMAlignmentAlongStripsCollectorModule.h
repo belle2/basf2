@@ -64,6 +64,9 @@ namespace Belle2 {
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 
+    /** Transformation data. */
+    EKLM::TransformData* m_TransformData;
+
     /** Event. */
     struct EKLMAlignmentAlongStripsAlgorithm::Event* m_Event;
 

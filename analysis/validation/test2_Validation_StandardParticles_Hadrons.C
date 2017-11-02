@@ -1,7 +1,7 @@
 /*
 <header>
 <input>../ana-dstars.root, ../ana-xi-lambda.root</input>
-<output>standardParticlesValidation.root</output>
+<output>standardParticlesValidation_Hadrons.root</output>
 <contact>Jake Bennett, jvbennett@cmu.edu</contact>
 </header>
 */
@@ -121,13 +121,13 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
     kpigr[j] = new TGraph(piddiv,keff,pikfake);
   }
 
-  TFile* outputFile = new TFile("standardParticlesValidation.root","RECREATE");
+  TFile* outputFile = new TFile("standardParticlesValidation_Hadrons.root","RECREATE");
   outputFile->cd();
 
+  // The following section goes over the different efficiency bins
   const char* xlabel[] = {"85%","90%","95%","99%"};
   const double xbinval[] = {0.85,0.90,0.95,0.99};
 
-  // FIXME What is this magic number 4?
   TH1F* hpcut  = new TH1F("hpcut","PID_p cut efficiency",4,0,4);
   TH1F* hpicut = new TH1F("hpicut","PID_pi cut efficiency",4,0,4);
   TH1F* hkcut  = new TH1F("hkcut","PID_k cut efficiency",4,0,4);
@@ -194,13 +194,20 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   hkpifake->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
 
   hpcut->Write();
+  // hpcut->SaveAs("hpcut_hadrons.pdf");
   hpicut->Write();
+  // hpicut->SaveAs("hpicut_hadrons.pdf");
   hkcut->Write();
+  // hkcut->SaveAs("hkcut_hadrons.pdf");
 
   hppifake->Write();
+  // hppifake->SaveAs("hppifake_hadrons.pdf");
   hpkfake->Write();
+  // hpkfake->SaveAs("hpkfake_hadrons.pdf");
   hpikfake->Write();
+  // hpikfake->SaveAs("hpikfake_hadrons.pdf");
   hkpifake->Write();
+  // hkpifake->SaveAs("hkpifake_hadrons.pdf");
 
   outputFile->Close();
 }

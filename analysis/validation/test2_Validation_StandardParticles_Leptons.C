@@ -1,7 +1,7 @@
 /*
 <header>
 <input>../ana-dstars.root, ../ana-xi-lambda.root, ../ana-jpsiks.root</input>
-<output>standardParticlesValidation.root</output>
+<output>standardParticlesValidation_Leptons.root</output>
 <contact>Jake Bennett, jvbennett@cmu.edu</contact>
 </header>
 */
@@ -169,9 +169,10 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree, TFile* 
     epigr[j] = new TGraph(piddiv,eeff,piefake);
   }
 
-  TFile* outputFile = new TFile("standardParticlesValidation.root","RECREATE");
+  TFile* outputFile = new TFile("standardParticlesValidation_Leptons.root","RECREATE");
   outputFile->cd();
 
+  // The following section goes over the different efficiency bins
   const char* xlabel[] = {"85%","90%","95%","99%"};
   const double xbinval[] = {0.85,0.90,0.95,0.99};
 
@@ -271,17 +272,28 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree, TFile* 
   //add contact for leptons
 
   hpcut->Write();
+  // hpcut->SaveAs("hpcut_leptons.pdf")
   hpicut->Write();
+  // hpicut->SaveAs("hpicut_leptons.pdf");
   hkcut->Write();
+  // hkcut->SaveAs("hkcut_leptons.pdf");
   hmucut->Write();
+  // hmucut->SaveAs("hmucut_leptons.pdf");
   hecut->Write();
+  // hecut->SaveAs("hecut_leptons.pdf");
 
   hppifake->Write();
+  // hppifake->SaveAs("hppifake_leptons.pdf");
   hpkfake->Write();
+  // hpkfake->SaveAs("hpkfake_leptons.pdf");
   hpikfake->Write();
+  // hpikfake->SaveAs("hpikfake_leptons.pdf");
   hkpifake->Write();
+  // hkpifake->SaveAs("hkpifake_leptons.pdf");
   hmupifake->Write();
+  // hmupifake->SaveAs("hmupifake_leptons.pdf");
   hepifake->Write();
+  // hepifake->SaveAs("hepifake_leptons.pdf");
 
   outputFile->Close();
 

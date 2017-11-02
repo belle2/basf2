@@ -29,7 +29,9 @@ namespace {
    * of the test "<testcase>/<test>" as seed.
    */
   class TestEventListener: public ::testing::EmptyTestEventListener {
-    /** Set the random state before the test is run */
+    /** Set the random state before the test is run.
+     * Also provide a constant magnetic field everywhere until the tests which
+     * just assume a magnetic field are fixed (BII-2657). */
     virtual void OnTestStart(const ::testing::TestInfo& test) final override
     {
       std::string name = test.test_case_name();

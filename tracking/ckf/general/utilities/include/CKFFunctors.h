@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
 namespace Belle2 {
   /// Helper Functor to get the Seed of a given result

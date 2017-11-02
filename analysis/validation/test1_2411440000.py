@@ -62,6 +62,7 @@ tools += ['CustomFloats[Ecms:Eher:Eler:XAngle]', '^vpho']
 tools += ['CustomFloats[eid:muid]', 'vpho -> [J/psi -> ^mu+ ^mu-] ^pi+ ^pi- gamma']
 tools += ['CustomFloats[daughterInvariantMass(0,1)]', 'vpho -> [^J/psi -> mu+ mu-] pi+ pi- gamma']
 tools += ['CustomFloats[m2Recoil]', '^vpho']
+tools += ['CustomFloats[daughterInvariantMass(0,1,2)]', '^vpho']
 tools += ['CustomFloats[useCMSFrame(cosTheta)]', '^vpho']
 tools += ['CustomFloats[E]', 'vpho -> J/psi pi+ pi- ^gamma']
 

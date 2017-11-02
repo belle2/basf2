@@ -400,8 +400,7 @@ def FillParticleLists(mode='Expert', path=analysis_main):
 
             if particleList == 'K+:inRoe':
                 fillParticleList(
-                    particleList,
-                    'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1' + samplingCut, path=path)
+                    particleList, 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1' + samplingCut, path=path)
                 # Precut done to prevent from overtraining, might be redundant
                 applyCuts(particleList, '0.1<' + KId[getBelleOrBelle2()], path=path)
                 readyParticleLists.append(particleList)
@@ -413,6 +412,8 @@ def FillParticleLists(mode='Expert', path=analysis_main):
                 fitVertex(particleList, 0.01, fitter='kfitter', path=path)
                 # if mode != 'Expert':
                 matchMCTruth(particleList, path=path)
+                if mode == 'Sampler':
+                    applyCuts(particleList, 'isRightCategory(mcAssociated) > 0')
                 readyParticleLists.append(particleList)
 
     return True

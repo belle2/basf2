@@ -39,7 +39,7 @@ namespace Belle2 {
     }
 
     /** Test new SPTC if it is better than the current best one and replace current one if so. */
-    void testNewSPTC(SpacePointTrackCand sptc)
+    void testNewSPTC(SpacePointTrackCand& sptc)
     {
       auto qi = m_estimator->estimateQuality(sptc.getSortedHits());
       short family = sptc.getFamily();

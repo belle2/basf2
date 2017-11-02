@@ -44,7 +44,7 @@ namespace Belle2 {
     /** Test new SPTC if it is better than the least best of the current x best SPTCs of its respective family.
      *  If so, the least best is thrown out, and the new is added to the sorted x best SPTC vector.
      *  If the maximal number of best SPTCs is not reached for the family, yet, the SPTC is just added at the right place.*/
-    void testNewSPTC(SpacePointTrackCand sptc)
+    void testNewSPTC(SpacePointTrackCand& sptc)
     {
       auto qi = m_estimator->estimateQuality(sptc.getSortedHits());
       short family = sptc.getFamily();
@@ -52,9 +52,8 @@ namespace Belle2 {
       if (m_familyToIndex.at(family) == -1) {
         B2DEBUG(100, "Setting index to " << m_currentIndex << " for family " << family << " and adding sptc with qi of " << qi);
         m_familyToIndex.at(family) = m_currentIndex;
-        m_bestPaths.push_back(std::vector<SpacePointTrackCand>(1));
         sptc.setQualityIndex(qi);
-        m_bestPaths.at(m_familyToIndex[family]).at(0) = sptc;
+        m_bestPaths.emplace_back(std::vector<SpacePointTrackCand> { sptc });
         m_currentIndex++;
       } else if (m_bestPaths.at(m_familyToIndex[family]).size() < m_xBest) {
         B2DEBUG(100, "Adding new sptc with qi " << qi << " without check, as max lenght not reached, yet...");

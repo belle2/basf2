@@ -63,7 +63,7 @@ namespace Belle2 {
     void setupTree();
 
     /** Delete the 'new's */
-    void dealocateMemory();
+    void deallocateMemory();
 
   public:
 
@@ -71,7 +71,7 @@ namespace Belle2 {
     NtupleClusterTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
 
     /** Destructor. */
-    ~NtupleClusterTool() {dealocateMemory();}
+    ~NtupleClusterTool() {deallocateMemory();}
 
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);

@@ -37,14 +37,14 @@ namespace Belle2 {
     void setupTree();
 
     /** Delete 'new's */
-    void dealocateMemory();
+    void deallocateMemory();
 
   public:
     /** Constuctor. */
     NtupleMassBeforeFitTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
 
     /** Destructor */
-    ~NtupleMassBeforeFitTool() {dealocateMemory();}
+    ~NtupleMassBeforeFitTool() {deallocateMemory();}
 
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);

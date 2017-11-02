@@ -45,7 +45,7 @@ namespace Belle2 {
     void setupTree();
 
     /** Delete 'new's */
-    void dealocateMemory();
+    void deallocateMemory();
 
 
   public:
@@ -58,7 +58,7 @@ namespace Belle2 {
     }
 
     /** Destructor. */
-    ~NtupleInvMassTool() {dealocateMemory();}
+    ~NtupleInvMassTool() {deallocateMemory();}
 
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);

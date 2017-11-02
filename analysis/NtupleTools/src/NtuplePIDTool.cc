@@ -35,7 +35,7 @@ void NtuplePIDTool::setupTree()
   }
 }
 
-void NtuplePIDTool::dealocateMemory()
+void NtuplePIDTool::deallocateMemory()
 {
   delete [] m_fPIDk;
   delete [] m_fPIDpi;

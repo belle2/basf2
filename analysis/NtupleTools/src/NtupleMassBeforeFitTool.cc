@@ -29,7 +29,7 @@ void NtupleMassBeforeFitTool::setupTree()
   }
 }
 
-void NtupleMassBeforeFitTool::dealocateMemory()
+void NtupleMassBeforeFitTool::deallocateMemory()
 {
   delete [] m_invM;
   delete [] m_invMerr;

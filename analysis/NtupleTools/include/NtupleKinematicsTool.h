@@ -32,12 +32,12 @@ namespace Belle2 {
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
     /** delete all 'new's */
-    void dealocateMemory();
+    void deallocateMemory();
   public:
     /** Constuctor. */
     NtupleKinematicsTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
     /** Destructor */
-    ~NtupleKinematicsTool() {dealocateMemory();}
+    ~NtupleKinematicsTool() {deallocateMemory();}
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);
   };

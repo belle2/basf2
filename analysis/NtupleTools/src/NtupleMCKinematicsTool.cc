@@ -30,7 +30,7 @@ void NtupleMCKinematicsTool::setupTree()
   }
 }
 
-void NtupleMCKinematicsTool::dealocateMemory()
+void NtupleMCKinematicsTool::deallocateMemory()
 {
   for (int iProduct = 0; iProduct < m_nDecayProducts; iProduct++) {
     delete [] m_fTruthP4[iProduct];

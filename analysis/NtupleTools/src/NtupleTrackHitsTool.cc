@@ -31,7 +31,7 @@ void NtupleTrackHitsTool::setupTree()
   }
 }
 
-void NtupleTrackHitsTool::dealocateMemory()
+void NtupleTrackHitsTool::deallocateMemory()
 {
   delete [] m_iNCDCHits;
   delete [] m_iNSVDHits;

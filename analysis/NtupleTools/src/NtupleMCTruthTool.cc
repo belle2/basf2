@@ -30,7 +30,7 @@ void NtupleMCTruthTool::setupTree()
   }
 }
 
-void NtupleMCTruthTool::dealocateMemory()
+void NtupleMCTruthTool::deallocateMemory()
 {
   delete [] m_iTruthID;
   delete [] m_iTruthIDMatch;

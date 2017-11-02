@@ -39,7 +39,7 @@ void NtupleMCVertexTool::setupTree()
 
 }
 
-void NtupleMCVertexTool::dealocateMemory()
+void NtupleMCVertexTool::deallocateMemory()
 {
   for (int iProduct = 0; iProduct < m_nDecayProducts; iProduct++)
     delete [] m_fTruthProdV[iProduct];

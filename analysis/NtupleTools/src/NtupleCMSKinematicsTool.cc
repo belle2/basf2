@@ -31,7 +31,7 @@ void NtupleCMSKinematicsTool::setupTree()
   }
 }
 
-void NtupleCMSKinematicsTool::dealocateMemory()
+void NtupleCMSKinematicsTool::deallocateMemory()
 {
   for (int iProduct = 0; iProduct < m_nDecayProducts; iProduct++)
     delete [] m_fP4[iProduct];

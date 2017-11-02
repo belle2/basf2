@@ -40,7 +40,7 @@ void NtupleInvMassTool::setupTree()
   }
 }
 
-void NtupleInvMassTool::dealocateMemory()
+void NtupleInvMassTool::deallocateMemory()
 {
   delete [] m_invM;
   delete [] m_invMerr;

@@ -56,7 +56,7 @@ void NtupleClusterTool::setupTree()
   }
 }
 
-void NtupleClusterTool::dealocateMemory()
+void NtupleClusterTool::deallocateMemory()
 {
   delete [] m_region;
   delete [] m_e9e25;

@@ -35,7 +35,7 @@ void NtupleTrackTool::setupTree()
   }
 }
 
-void NtupleTrackTool::dealocateMemory()
+void NtupleTrackTool::deallocateMemory()
 {
   delete [] m_fD0;
   delete [] m_ferrD0;

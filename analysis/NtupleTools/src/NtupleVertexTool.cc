@@ -56,7 +56,7 @@ void NtupleVertexTool::setupTree()
   }
 }
 
-void NtupleVertexTool::dealocateMemory()
+void NtupleVertexTool::deallocateMemory()
 {
   for (int iProduct = 0; iProduct < m_nDecayProducts; iProduct++) {
     delete [] m_fProdV[iProduct];

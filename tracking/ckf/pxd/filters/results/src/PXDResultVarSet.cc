@@ -25,6 +25,8 @@ PXDResultVarSet::PXDResultVarSet() : TrackFindingCDC::VarSet<PXDResultVarNames>(
 
 void PXDResultVarSet::initialize()
 {
+  TrackFindingCDC::VarSet<PXDResultVarNames>::initialize();
+
   ModuleParamList moduleParamList;
   m_advancer.exposeParameters(&moduleParamList, "");
   moduleParamList.getParameter<double>("direction").setValue(1);

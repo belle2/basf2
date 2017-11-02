@@ -23,6 +23,8 @@ SVDResultVarSet::SVDResultVarSet() : TrackFindingCDC::VarSet<SVDResultVarNames>(
 
 void SVDResultVarSet::initialize()
 {
+  TrackFindingCDC::VarSet<SVDResultVarNames>::initialize();
+
   ModuleParamList moduleParamList;
   m_advancer.exposeParameters(&moduleParamList, "");
   moduleParamList.getParameter<double>("direction").setValue(1);

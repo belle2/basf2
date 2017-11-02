@@ -3,17 +3,15 @@
 
 from basf2 import *
 from ROOT import Belle2
-import multiprocessing
 
 
 class TestModule(Module):
     """Test if the DataStore contains the expected content."""
-
-    def isInverted(self):
-        """
-        Returns true if the check should be for the inversion
-        """
-        return False
+    def __init__(self, is_inverted):
+        """Create a new instance. If is_inverted is True we check of absence of content"""
+        super().__init__()
+        #: variable to remember if we test for existence or absence
+        self._is_inverted = is_inverted
 
     def event(self):
         """reimplementation of Module::event().
@@ -26,7 +24,7 @@ class TestModule(Module):
         PXDDigits = Belle2.PyStoreArray('PXDDigits')
 
         # PXDClusters are in our keep list, should still be there
-        if self.isInverted():
+        if self._is_inverted:
             assert PXDClusters.getEntries() == 0
             # while the PXDDigits should be empty
             assert PXDDigits.getEntries() > 0
@@ -41,15 +39,6 @@ class TestModule(Module):
         assert evtmetadata
 
 
-class TestModuleInverted(Module):
-
-    def isInverted(self):
-        """
-        Returns true if the check should be for the inversion
-        """
-        return True
-
-
 set_random_seed("something important")
 # make sure FATAL messages don't have the function signature as this makes
 # problems with clang printing namespaces differently
@@ -62,7 +51,7 @@ main.add_module('EventInfoPrinter')
 main.add_module('PrintCollections')
 main.add_module('PruneDataStore', matchEntries=['PXDClusters.*'])
 main.add_module(register_module('PrintCollections'))
-main.add_module(TestModule())
+main.add_module(TestModule(False))
 
 # ensure the pruned datastore is still write-able to disk
 main.add_module('RootOutput', outputFileName='prune_datastore_output_test.root', updateFileCatalog=False)
@@ -80,7 +69,7 @@ main.add_module('EventInfoPrinter')
 main.add_module('PrintCollections')
 main.add_module('PruneDataStore', matchEntries=['PXDClusters.*'], keepMatchedEntries=False)
 main.add_module(register_module('PrintCollections'))
-main.add_module(TestModuleInverted())
+main.add_module(TestModule(True))
 
 # ensure the pruned datastore is still write-able to disk
 main.add_module('RootOutput', outputFileName='prune_datastore_output_test.root', updateFileCatalog=False)

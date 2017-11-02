@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <svd/modules/svdReconstruction/SVDCoGTimeEstimator.h>
+#include <svd/modules/svdReconstruction/SVDCoGTimeEstimatorModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <svd/dataobjects/SVDShaperDigit.h>

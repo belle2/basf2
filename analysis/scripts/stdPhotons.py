@@ -107,6 +107,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
         cutAndCopyList('gamma:pi0highE', 'gamma:pi0eff60', 'E > 0.2', True, path)
 
 
+# Used in skimming code
 def loadStdSkimPhoton(path=analysis_main):
     stdPhotons('loose', path)
     cutAndCopyList(

@@ -53,7 +53,7 @@ REG_MODULE(ECLShowerShapePureCsI)
 ECLShowerShapeModule::ECLShowerShapeModule() : Module(), m_secondMomentCorrectionArray("ecl_shower_shape_second_moment_corrections")
 {
   // Set description
-  setDescription("ECLShowerShapeModule: Calculate ECL shower shape variable (e.g. E9E21)");
+  setDescription("ECLShowerShapeModule: Calculate ECL shower shape variables (e.g. E9oE21)");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("zernike_n1_rho0", m_zernike_n1_rho0,
@@ -505,7 +505,7 @@ double ECLShowerShapeModule::computeE1oE9(const ECLShower& shower) const
 
   }
 
-  if (energy9 >= 0.0) return energy1 / energy9;
+  if (energy9 > 1e-9) return energy1 / energy9;
   else return 0.0;
 }
 

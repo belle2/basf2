@@ -98,7 +98,8 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "Charge") return new NtupleChargeTool(tree, d);
   else if (strToolName == "PDGCode") return new NtuplePDGCodeTool(tree, d);
   else if (strToolName == "MCTruth") return new NtupleMCTruthTool(tree, d);
-  else if (strToolName == "MCHierarchy") return new NtupleMCHierarchyTool(tree, d);
+  else if (strToolName == "MCHierarchy") return new NtupleMCHierarchyTool(tree, d, strOption);
+
   else if (strToolName == "MCKinematics") return new NtupleMCKinematicsTool(tree, d);
   else if (strToolName == "PID") return new NtuplePIDTool(tree, d);
   else if (strToolName == "DeltaLogL") return new NtupleDeltaLogLTool(tree, d);

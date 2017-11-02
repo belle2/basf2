@@ -298,14 +298,13 @@ bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) cons
   for (unsigned int i = 0; i < trackSize; i++) {
     try {
       m_genfitTrack.getFittedState(i, representation);
-      break;
+      return true;
     } catch (const genfit::Exception& exception) {
-      B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
-      return false;
+      B2DEBUG(100, "Can not get mSoP because of: " << exception.what());
     }
   }
 
-  return true;
+  return false;
 }
 
 void RecoTrack::prune()
@@ -478,7 +477,6 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromRecoHi
   return fittedResult->getFittedState();
 }
 
-
 const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation) const
 {
   const unsigned int trackSize = m_genfitTrack.getNumPoints();
@@ -490,7 +488,7 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromFirstH
     }
   }
 
-  B2FATAL("There is no single hit with a valid mSoP in this track!");
+  B2FATAL("There is no single hit with a valid mSoP in this track! Check if the fit failed with wasFitSuccessful before");
 }
 
 const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation) const
@@ -505,4 +503,24 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromLastHi
   }
 
   B2FATAL("There is no single hit with a valid mSoP in this track!");
+}
+
+std::string RecoTrack::getInfoHTML() const
+{
+  std::stringstream out;
+
+  out << "<b>Charge seed</b>=" << getChargeSeed();
+
+  out << "<b>pT seed</b>=" << getMomentumSeed().Pt();
+  out << ", <b>pZ seed</b>=" << getMomentumSeed().Z();
+  out << "<br>";
+  out << "<b>position seed</b>=" << getMomentumSeed().X() << ", " << getMomentumSeed().Y() << ", " << getMomentumSeed().Z();
+  out << "<br>";
+
+  for (const genfit::AbsTrackRep* rep : getRepresentations()) {
+    out << "<b>was fitted with " << rep->getPDG() << "</b>=" << wasFitSuccessful() << ", ";
+  }
+  out << "<br>";
+
+  return out.str();
 }

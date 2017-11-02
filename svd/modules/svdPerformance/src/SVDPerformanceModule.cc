@@ -131,8 +131,7 @@ void SVDPerformanceModule::initialize()
 
         NameOfHisto = "reco_time_L" + nameLayer + "S" + nameSensor + "" + nameSide;
         TitleOfHisto = "strip time (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
-        //        h_recoTime[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100, "strip time", m_histoList_reco[i]);
-        h_recoTime[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 150, 0, 150, "strip time", m_histoList_reco[i]);
+        h_recoTime[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100, "strip time", m_histoList_reco[i]);
 
 
         //CLUSTERS RELATED TO TRACKS
@@ -159,8 +158,7 @@ void SVDPerformanceModule::initialize()
 
         NameOfHisto = "clTRK_time_L" + nameLayer + "S" + nameSensor + "" + nameSide;
         TitleOfHisto = "cluster time (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
-        //        h_cltrkTime[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time", m_histoList_clTRK[i]);
-        h_cltrkTime[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 150, 0, 150, "cluster time", m_histoList_clTRK[i]);
+        h_cltrkTime[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time", m_histoList_clTRK[i]);
 
         //ONE STRIP CLUSTERS RELATED TO TRACKS
         NameOfHisto = "1clTRK_Charge_L" + nameLayer + "S" + nameSensor + "" + nameSide;
@@ -196,8 +194,8 @@ void SVDPerformanceModule::initialize()
 
         NameOfHisto = "clNOtrk_time_L" + nameLayer + "S" + nameSensor + "" + nameSide;
         TitleOfHisto = "cluster time (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
-        //        h_clTime[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time", m_histoList_cluster[i]);
-        h_clTime[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 150, -0, 150, "cluster time", m_histoList_cluster[i]);
+        h_clTime[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time", m_histoList_cluster[i]);
+
 
       }
 

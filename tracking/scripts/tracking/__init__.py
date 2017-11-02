@@ -838,7 +838,7 @@ def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", compo
 
 
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
-                                 useTwoStepSelection=False, sectormap_file=None, PXDminSVDSPs=3):
+                                 useTwoStepSelection=True, sectormap_file=None, PXDminSVDSPs=3):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -959,6 +959,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     cellOmat.param('strictSeeding', True)
     cellOmat.param('setFamilies', useTwoStepSelection)
     cellOmat.param('selectBestPerFamily', useTwoStepSelection)
+    cellOmat.param('xBestPerFamily', 5)
     path.add_module(cellOmat)
 
     if(useTwoStepSelection):

@@ -59,25 +59,30 @@ namespace Belle2 {
      *  If the maximal number of best SPTCs is not reached for the family, yet, the SPTC is just added at the right place.*/
     void testNewSPTC(SpacePointTrackCand& sptc)
     {
-      auto qi = m_estimator->estimateQuality(sptc.getSortedHits());
+      sptc.setQualityIndex(m_estimator->estimateQuality(sptc.getSortedHits()));
       short family = sptc.getFamily();
 
       if (m_familyToIndex.at(family) == -1) {
-        B2DEBUG(100, "Setting index to " << m_currentIndex << " for family " << family << " and adding sptc with qi of " << qi);
+        //      B2DEBUG(100, "Setting index to " << m_currentIndex << " for family " << family << " and adding sptc with qi of " << qi);
         m_familyToIndex.at(family) = m_currentIndex;
-        sptc.setQualityIndex(qi);
         m_bestPaths.emplace_back(std::vector<SpacePointTrackCand> { sptc });
         m_currentIndex++;
-      } else if (m_bestPaths.at(m_familyToIndex[family]).size() < m_xBest) {
-        B2DEBUG(100, "Adding new sptc with qi " << qi << " without check, as max lenght not reached, yet...");
-        sptc.setQualityIndex(qi);
-        insertSortedByQI(m_bestPaths.at(m_familyToIndex[family]), sptc);
-      } else if (qi > m_bestPaths.at(m_familyToIndex[family]).back().getQualityIndex()) {
-        B2DEBUG(100, "Adding new sptc with qi " << qi << " and throwing out last entry of vector...");
-        sptc.setQualityIndex(qi);
-        insertSortedByQI(m_bestPaths.at(m_familyToIndex[family]), sptc);
+        return;
+      }
+
+      if (m_bestPaths.at(m_familyToIndex[family]).size() == m_xBest) {
+        if (sptc.getQualityIndex() < m_bestPaths.at(m_familyToIndex[family]).back().getQualityIndex()) {
+          return;
+        }
         m_bestPaths.at(m_familyToIndex[family]).pop_back();
       }
+      std::vector<SpacePointTrackCand>::iterator it = std::lower_bound(m_bestPaths.at(m_familyToIndex[family]).begin(),
+                                                      m_bestPaths.at(m_familyToIndex[family]).end(),
+      sptc, [](const SpacePointTrackCand & lhs, const SpacePointTrackCand & rhs) {
+        return lhs.getQualityIndex() > rhs.getQualityIndex();
+      });
+      /// Insert befor iterator it
+      m_bestPaths.at(m_familyToIndex[family]).insert(it, sptc);
     }
 
     /** Return vector containing the best SPTCs; maximal m_xBest per family. */
@@ -101,19 +106,6 @@ namespace Belle2 {
     }
 
   private:
-
-    /** Function to insert SPTCs into a vector of SPTC while preserving an order by descending quality indices. */
-    void insertSortedByQI(std::vector<SpacePointTrackCand>& paths, SpacePointTrackCand& sptc)
-    {
-      /// Determine position of new SPTC in sorted SPTC vector to keep it sorted
-      std::vector<SpacePointTrackCand>::iterator it = std::lower_bound(paths.begin(), paths.end(), sptc,
-      [](SpacePointTrackCand & lhs, SpacePointTrackCand rhs) {
-        return lhs.getQualityIndex() > rhs.getQualityIndex();
-      });
-      /// Insert befor iterator it
-      paths.insert(it, sptc);
-    }
-
 
     /** Pointer to the Quality Estimator used to evaluate the SPTCs to find the best. */
     std::unique_ptr<QualityEstimatorBase> m_estimator;

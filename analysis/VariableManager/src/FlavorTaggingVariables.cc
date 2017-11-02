@@ -1600,7 +1600,7 @@ namespace Belle2 {
               }
             }
 
-            if (!allParticlesHaveMCAssociated) output = -2;
+            if (!particlesHaveMCAssociated) output = -2;
             if (nTargets > 0) output = 1;
 
             // if (nTargets > 1); B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");

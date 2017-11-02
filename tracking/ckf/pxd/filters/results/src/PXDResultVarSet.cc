@@ -23,6 +23,13 @@ PXDResultVarSet::PXDResultVarSet() : TrackFindingCDC::VarSet<PXDResultVarNames>(
   addProcessingSignalListener(&m_advancer);
 }
 
+void PXDResultVarSet::initialize()
+{
+  ModuleParamList moduleParamList;
+  m_advancer.exposeParameters(&moduleParamList, "");
+  moduleParamList.getParameter<double>("direction").setValue(1);
+}
+
 
 bool PXDResultVarSet::extract(const CKFToPXDResult* result)
 {
@@ -93,7 +100,7 @@ bool PXDResultVarSet::extract(const CKFToPXDResult* result)
 
 
   const genfit::MeasuredStateOnPlane& firstCDCHit = seedTrack->getMeasuredStateOnPlaneFromFirstHit();
-  m_advancer.extrapolateToPlane(mSoP, firstCDCHit.getPlane(), 1);
+  m_advancer.extrapolateToPlane(mSoP, firstCDCHit.getPlane());
 
   const auto& distance = mSoP.getPos() - firstCDCHit.getPos();
   var<named("distance_to_seed_track")>() = distance.Mag();

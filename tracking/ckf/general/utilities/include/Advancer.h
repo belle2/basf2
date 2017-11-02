@@ -21,11 +21,12 @@ namespace Belle2 {
   class Advancer : public TrackFindingCDC::ProcessingSignalListener {
   public:
     double extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
-                              const genfit::SharedPlanePtr& plane, double direction = 1);
+                              const genfit::SharedPlanePtr& plane);
 
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 
   private:
     bool m_param_useMaterialEffects = false;
+    double m_param_direction = 1;
   };
 }

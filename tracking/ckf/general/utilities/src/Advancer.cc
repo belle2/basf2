@@ -21,17 +21,17 @@
 using namespace Belle2;
 
 double Advancer::extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
-                                    const genfit::SharedPlanePtr& plane, double direction)
+                                    const genfit::SharedPlanePtr& plane)
 {
   try {
     genfit::MaterialEffects::getInstance()->setNoEffects(not m_param_useMaterialEffects);
     const double extrapolatedS = measuredStateOnPlane.extrapolateToPlane(plane);
     genfit::MaterialEffects::getInstance()->setNoEffects(false);
 
-    if (direction * extrapolatedS > 0) {
+    if (m_param_direction * extrapolatedS > 0) {
       return NAN;
     } else {
-      return direction * extrapolatedS;
+      return m_param_direction * extrapolatedS;
     }
   } catch (const genfit::Exception& e) {
     B2DEBUG(50, "Extrapolation failed: " << e.what());
@@ -43,6 +43,11 @@ void Advancer::exposeParameters(ModuleParamList* moduleParamList, const std::str
 {
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useMaterialEffects"),
                                 m_param_useMaterialEffects,
-                                "",
+                                "Use the material effects during extrapolation.",
                                 m_param_useMaterialEffects);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "direction"),
+                                m_param_direction,
+                                "If direction != 0, forbid any extrapolation into the other direction.",
+                                m_param_direction);
 }

@@ -69,6 +69,8 @@ namespace Belle2 {
   public:
     PXDResultVarSet();
 
+    void initialize() override;
+
     /// Generate and assign the variables from the object.
     bool extract(const CKFToPXDResult* object) final;
 

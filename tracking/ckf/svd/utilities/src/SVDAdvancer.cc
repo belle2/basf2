@@ -16,9 +16,9 @@
 using namespace Belle2;
 
 double SVDAdvancer::extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
-                                       const SpacePoint& spacePoint, double direction)
+                                       const SpacePoint& spacePoint)
 {
   SVDRecoHit recoHit(spacePoint.getRelated<SVDCluster>());
   const genfit::SharedPlanePtr& plane = recoHit.constructPlane(measuredStateOnPlane);
-  return Advancer::extrapolateToPlane(measuredStateOnPlane, plane, direction);
+  return Advancer::extrapolateToPlane(measuredStateOnPlane, plane);
 }

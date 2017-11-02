@@ -26,13 +26,10 @@ namespace Belle2 {
   class CKFToSVDState : public CKFState<RecoTrack, SpacePoint> {
   public:
     /// When constructed by a hit, set the reco hit
-    CKFToSVDState(const SpacePoint* hit);
-
-    /// Copy the constructors from the base class
-    using CKFState::CKFState;
+    explicit CKFToSVDState(const SpacePoint* hit);
 
     /// Constructor setting the state to the position of the first CDC track seed hit
-    CKFToSVDState(const RecoTrack* seed);
+    explicit CKFToSVDState(const RecoTrack* seed);
 
     /// Extract the real layer this state sits on
     unsigned int getGeometricalLayer() const;
@@ -44,7 +41,12 @@ namespace Belle2 {
 
     const std::vector<SVDRecoHit>& getRecoHits() const;
 
+    const RecoTrack* getRelatedSVDTrack() const;
+    void setRelatedSVDTrack(const RecoTrack* relatedSVDTrack);
+
   private:
     std::vector<SVDRecoHit> m_recoHits;
+
+    const RecoTrack* m_relatedSVDTrack = nullptr;
   };
 }

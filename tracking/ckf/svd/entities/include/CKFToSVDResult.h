@@ -20,11 +20,17 @@ namespace Belle2 {
   /// Specialized CKF Result for extrapolating into the SVD
   class CKFToSVDResult : public CKFResult<RecoTrack, SpacePoint> {
     using Super = CKFResult<RecoTrack, SpacePoint>;
+
   public:
     using Super::Super;
 
     CKFToSVDResult(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& path);
 
     void addToRecoTrack(RecoTrack& recoTrack) const;
+
+    const RecoTrack* getRelatedSVDRecoTrack() const;
+
+  private:
+    const RecoTrack* m_relatedSVDRecoTrack = nullptr;
   };
 }

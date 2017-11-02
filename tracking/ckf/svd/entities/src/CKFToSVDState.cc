@@ -47,7 +47,7 @@ const SVDRecoHit& CKFToSVDState::getRecoHit() const
 
 const std::vector<SVDRecoHit>& CKFToSVDState::getRecoHits() const
 {
-  B2ASSERT("You are asking for the reco hit, although no hit is present.", not m_recoHits.empty());
+  B2ASSERT("You are asking for reco hits, although no hit is present.", not m_recoHits.empty());
   return m_recoHits;
 }
 
@@ -56,4 +56,17 @@ CKFToSVDState::CKFToSVDState(const SpacePoint* hit) : CKFState<RecoTrack, SpaceP
   for (const SVDCluster& svdCluster : hit->getRelationsTo<SVDCluster>()) {
     m_recoHits.emplace_back(&svdCluster);
   }
+}
+
+const RecoTrack* CKFToSVDState::getRelatedSVDTrack() const
+{
+  return m_relatedSVDTrack;
+}
+
+void CKFToSVDState::setRelatedSVDTrack(const RecoTrack* relatedSVDTrack)
+{
+  if (m_relatedSVDTrack and m_relatedSVDTrack != relatedSVDTrack) {
+    B2FATAL("You are resetting the related track to a different value!");
+  }
+  m_relatedSVDTrack = relatedSVDTrack;
 }

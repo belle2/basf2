@@ -14,6 +14,20 @@
 #include <framework/gearbox/Unit.h>
 
 namespace Belle2 {
+  /** Magnetic field map.
+   *
+   * It can be used directly using a \ref DBObjPtr "DBObjPtr<MagneticField>"
+   * instance in your class. Alternatively there is a \ref BFieldManager class
+   * which encapsulates the DBObjPtr already. Field evaluation is then a simple
+   * call to BFieldManager::getField().
+   *
+   * This class contains the Magnetic field map to be stored in the Database
+   * and used during simulation and reconstruction. The field can be assembled
+   * from multiple components (constant, 3D, 2D, ...) in different regions. By
+   * default all components valid in a certain region will be added to obtain
+   * the final field value but components can also be flagged as exclusive in
+   * which case only the field of this particular component will be returned.
+   */
   class MagneticField: public TObject {
   public:
     /** Empty Constructor */

@@ -1579,7 +1579,7 @@ namespace Belle2 {
 
           Variable::Manager& manager = Variable::Manager::Instance();
 
-          particlesHaveMCAssociated = false;
+          bool particlesHaveMCAssociated = false;
 
           if (ListOfParticles.isValid())
           {

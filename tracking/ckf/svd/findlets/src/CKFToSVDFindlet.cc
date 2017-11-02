@@ -75,6 +75,7 @@ void CKFToSVDFindlet::beginEvent()
   m_relations.clear();
 
   m_results.clear();
+  m_filteredResults.clear();
 }
 
 void CKFToSVDFindlet::apply()
@@ -99,10 +100,10 @@ void CKFToSVDFindlet::apply()
   };
   TrackFindingCDC::erase_remove_if(m_results, hasLowHitNumber);
 
-  m_overlapResolver.apply(m_results);
+  m_overlapResolver.apply(m_results, m_filteredResults);
 
-  B2DEBUG(50, "Having found " << m_results.size() << " results");
+  B2DEBUG(50, "Having found " << m_filteredResults.size() << " results");
 
-  m_dataHandler.store(m_results);
-  m_spacePointTagger.apply(m_results, m_spacePointVector);
+  m_dataHandler.store(m_filteredResults);
+  m_spacePointTagger.apply(m_filteredResults, m_spacePointVector);
 }

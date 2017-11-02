@@ -16,13 +16,13 @@ namespace Belle2 {
   class ModuleParamList;
 
   template<class AFilter>
-  class OverlapResolver : public TrackFindingCDC::Findlet<typename AFilter::Object> {
+  class OverlapResolver : public TrackFindingCDC::Findlet<typename AFilter::Object, typename AFilter::Object> {
   public:
     /// The object to filter
     using Object = typename AFilter::Object;
 
     /// The parent class
-    using Super = TrackFindingCDC::Findlet<typename AFilter::Object>;
+    using Super = TrackFindingCDC::Findlet<typename AFilter::Object, typename AFilter::Object>;
 
     /// Construct this findlet and add the subfindlet as listener
     OverlapResolver();
@@ -32,15 +32,13 @@ namespace Belle2 {
 
     /**
      */
-    void apply(std::vector<Object>& results) override;
+    void apply(std::vector<Object>& results, std::vector<Object>& filteredResult) override;
 
   private:
     /// Subfindlet for filtering
     AFilter m_filter;
 
     // Temporary vectors
-    /// temporary results vector, that will be swapped with the real results vector.
-    std::vector<Object> m_temporaryResults;
     /// temporary results vector with weights, out of which the overlaps will be build.
     std::vector<TrackFindingCDC::WithWeight<Object*>> m_resultsWithWeight;
 

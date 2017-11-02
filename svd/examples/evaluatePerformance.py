@@ -29,13 +29,8 @@ main.add_module('EvtGenInput')
 bkgFiles = ""
 
 add_simulation(main, components=['MagneticField', 'SVD'], bkgfiles=bkgFiles, usePXDDataReduction=False)
-# main.add_module('Gearbox')
-# main.add_module('Geometry',components=['MagneticField', 'SVD'])
-# main.add_module('FullSim')
-# add_svd_simulation(main)
 
-add_svd_reconstruction_CoG(main)
-# add_svd_reconstruction(main)
+add_svd_reconstruction(main, isROIsimulation=False, useNN=False, useCoG=False)
 
 add_tracking_reconstruction(main, components=["SVD"], use_vxdtf2=True)
 

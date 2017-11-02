@@ -32,7 +32,6 @@ def stdPi0s(listtype='veryLoose', path=analysis_main):
     """
     if listtype == 'all':
         stdPhotons('all')
-        fillParticleList('gamma:all', '', True, path)
         reconstructDecay('pi0:all -> gamma:all gamma:all', '', 1, True, path)
         matchMCTruth('pi0:all', path)
     elif listtype == 'eff20':

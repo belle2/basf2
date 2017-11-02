@@ -1009,6 +1009,7 @@ namespace Belle2 {
                                                "SlowPion",             // 7
                                                "FastPion",             // 8
                                                "Lambda"                // 9
+                                               "mcAssociated"          // 10
                                          };
 
         for (unsigned i = 0; i < names.size(); ++i) {
@@ -1020,89 +1021,86 @@ namespace Belle2 {
                   ". The possibilities are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion and Lambda");
         }
 
-        auto func = [index](const Particle * part) -> double {
+        std::vector<int> charmMesons = { 411, 421, 10411, 10421, 413, 423, 10413, 10423, 20413, 20423, 415, 425, 431, 10431, 433, 10433, 20433, 435};
 
-          const MCParticle* mcParticle = part->getRelated<MCParticle>();
-          if (mcParticle == nullptr) return 0.0;
+        std::vector<int> charmBaryons = { 4122, 4222, 4212, 4112, 4224, 4214, 4114, 4232, 4132, 4322, 4312, 4324, 4314, 4332, 4334, 4412, 4422,
+                                          4414, 4424, 4432, 4434, 4444
+                                        };
+
+        auto func = [index](const Particle * particle) -> double {
+
+          const MCParticle* mcParticle = particle->getRelated<MCParticle>();
+          if (mcParticle == nullptr) return -2.0;
+
+          int mcPDG = TMath::Abs(mcParticle->getPDG());
+
+          // ---------------------------- Mothers and Grandmothers ---------------------------------
+          std::vector<int> mothersPDG;
+
+          const MCParticle* mcMother = mcParticle->getMother();
+          while (mcMother != nullptr)
+          {
+            mothersPDG.push_back(TMath::Abs(mcMother->getPDG()));
+            if (TMath::Abs(mcMother->getPDG()) == 511) break;
+            mcMother = mcMother -> getMother();
+          }
+
+          if (mothersPDG.size() == 0) return -2.0;
+
+          //has associated mothers up to a B meson
+          if (index == 10) return 1.0;
+
+          // ---------------------------------------------------------------------------------------
+
           //direct electron
           else if (index == 0
-          && (mcParticle->getMother() != nullptr
-          && TMath::Abs(mcParticle->getPDG()) == 11
-          && TMath::Abs(mcParticle->getMother()->getPDG()) == 511))
+          && mcPDG == 11
+          && mothersPDG[0] == 511)
           {
             return 1.0;
             //intermediate electron
           } else if (index == 1
-          && mcParticle->getMother() != nullptr
-          && mcParticle->getMother()->getMother() != nullptr
-          && TMath::Abs(mcParticle->getPDG()) == 11
-          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)
+          && mcPDG == 11 && mothersPDG.size() > 1 && mothersPDG[1] == 511)
           {
             return 1.0;
             //direct muon
           } else if (index == 2
-          && (mcParticle->getMother() != nullptr
-          && TMath::Abs(mcParticle->getPDG()) == 13
-          && TMath::Abs(mcParticle->getMother()->getPDG()) == 511))
+          && mcPDG == 13 && mothersPDG[0] == 511)
           {
             return 1.0;
             //intermediate muon
           } else if (index == 3
-          && mcParticle->getMother() != nullptr
-          && mcParticle->getMother()->getMother() != nullptr
-          && TMath::Abs(mcParticle->getPDG()) == 13
-          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)
+          && mcPDG == 13 && mothersPDG.size() > 1 && mothersPDG[1] == 511)
           {
             return 1.0;
             //KinLepton
           } else if (index == 4
-          && mcParticle->getMother() != nullptr
-          && mcParticle->getMother()->getMother() != nullptr
-          && (TMath::Abs(mcParticle->getPDG()) == 13 || TMath::Abs(mcParticle->getPDG()) == 11)
-          && TMath::Abs(mcParticle->getMother()->getPDG()) == 511)
+          && (mcPDG == 13 || mcPDG == 11) && mothersPDG[0] == 511)
           {
             return 1.0;
             //IntermediateKinLepton
           } else if (index == 5
-          && mcParticle->getMother() != nullptr
-          && mcParticle->getMother()->getMother() != nullptr
-          && (TMath::Abs(mcParticle->getPDG()) == 13 || TMath::Abs(mcParticle->getPDG()) == 11)
-          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)
+          && (mcPDG == 13 || mcPDG == 11) && mothersPDG.size() > 1 && mothersPDG[1] == 511)
           {
             return 1.0;
             //kaon
           } else if (index == 6
-          && mcParticle->getMother() != nullptr
-          && mcParticle->getMother()->getMother() != nullptr
-          && TMath::Abs(mcParticle->getPDG()) == 321
-          && TMath::Abs(mcParticle->getMother()->getPDG()) > 400
-          && TMath::Abs(mcParticle->getMother()->getPDG()) < 500
-          && (TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511 ||
-          (mcParticle->getMother()->getMother()->getMother() != nullptr
-          && TMath::Abs(mcParticle->getMother()->getMother()->getMother()->getPDG()) == 511)))
+          && mcPDG == 321 && mothersPDG[0] > 400 && mothersPDG[0] < 500
+          && ((mothersPDG.size() > 1 && mothersPDG[1] == 511) || (mothersPDG.size() > 2 && mothersPDG[2] == 511)))
           {
             return 1.0;
             //slow pion
           } else if (index == 7
-          && mcParticle->getMother() != nullptr
-          && mcParticle->getMother()->getMother() != nullptr
-          && TMath::Abs(mcParticle->getPDG()) == 211
-          && TMath::Abs(mcParticle->getMother()->getPDG()) == 413
-          && TMath::Abs(mcParticle->getMother()->getMother()->getPDG()) == 511)
+          && mcPDG == 211 && mothersPDG[0] == 413 && mothersPDG.size() > 1 && mothersPDG[1] == 511)
           {
             return 1.0;
             //high momentum pions
           } else if (index == 8
-          && mcParticle->getMother() != nullptr
-          && TMath::Abs(mcParticle->getPDG()) == 211
-          && TMath::Abs(mcParticle->getMother()->getPDG()) == 511)
+          && mcPDG == 211 && mothersPDG[0] == 511)
           {
             return 1.0;
             //lambdas
-          } else if (index == 9
-          && mcParticle->getMother() != nullptr
-          && mcParticle->getMother()->getMother() != nullptr
-          && TMath::Abs(mcParticle->getPDG()) == 3122)
+          } else if (index == 9 && mcPDG == 3122)
           {
             return 1.0;
           } else return 0.0;
@@ -1131,6 +1129,7 @@ namespace Belle2 {
                                               "MaximumPstar",         // 10
                                               "FSC",                  // 11
                                               "Lambda"                // 12
+                                              "mcAssociated"          // 13
                                          };
 
         for (unsigned i = 0; i < names.size(); ++i) {
@@ -1143,37 +1142,31 @@ namespace Belle2 {
         }
 
         auto func = [index](const Particle * particle) -> double {
-          Particle* nullParticle = nullptr;
-          float qTarget = 0;
-          float qMC = 0;
-          int mcPDG = 0;
-          int mcMotherPDG = 0;
-          int mcGMotherPDG = 0;
-          int mcGGMotherPDG = 0;
-          const MCParticle* mcParticle = particle ->getRelated<MCParticle>();
-          qTarget = particle -> getCharge();
-          qMC = Variable::isRestOfEventB0Flavor(nullParticle);
 
+
+          Particle* nullParticle = nullptr;
+          float qTarget = particle -> getCharge();
+          float qMC = Variable::isRestOfEventB0Flavor(nullParticle);
+
+          const MCParticle* mcParticle = particle->getRelated<MCParticle>();
+          if (mcParticle == nullptr) return -2.0;
+
+          int mcPDG = TMath::Abs(mcParticle->getPDG());
 
           // ---------------------------- Mothers and Grandmothers ---------------------------------
-          if (mcParticle != nullptr)
-          {
-            mcPDG = TMath::Abs(mcParticle->getPDG());
-            // if not lambda
-            if (index != 12 && mcParticle->getMother() != nullptr) {
-              mcMotherPDG = TMath::Abs(mcParticle->getMother()->getPDG());
-            }
+          std::vector<int> mothersPDG;
 
-            //for some Categories we need the mother of the mother of the particle
-            //   Kaon          slowPion      intElec        intMuon       intKinLep     fastPion
-            if ((index == 6 || index == 7 || index == 1  || index == 3 || index == 5 || index == 8)
-                && mcParticle->getMother()->getMother() != nullptr) {
-              mcGMotherPDG =  TMath::Abs(mcParticle->getMother()->getMother()->getPDG());
-              if (index == 6 && mcParticle->getMother()->getMother()->getMother() != nullptr) {
-                mcGGMotherPDG = TMath::Abs(mcParticle->getMother()->getMother()->getMother()->getPDG());
-              };
-            }
+          const MCParticle* mcMother = mcParticle->getMother();
+          while (mcMother != nullptr)
+          {
+            mothersPDG.push_back(TMath::Abs(mcMother->getPDG()));
+            if (TMath::Abs(mcMother->getPDG()) == 511) break;
+            mcMother = mcMother -> getMother();
           }
+
+          if (mothersPDG.size() == 0) return -2.0;
+          //has associated mothers up to a B meson
+          if (index == 13) return 1.0;
 
           // ----------------------------  For KaonPion Category ------------------------------------
           int SlowPionPDG = 0;
@@ -1245,44 +1238,44 @@ namespace Belle2 {
 
           // ------------------------------  Outputs  -----------------------------------
           if (index == 0 // Electron
-              && qTarget == qMC && mcPDG == 11 && mcMotherPDG == 511)
+              && qTarget == qMC && mcPDG == 11 && mothersPDG[0] == 511)
           {
             return 1.0;
           } else if (index == 1 // IntermediateElectron
-                     && qTarget != qMC && mcPDG == 11 && mcGMotherPDG == 511)
+                     && qTarget != qMC && mcPDG == 11 && mothersPDG.size() > 1 && mothersPDG[1] == 511)
           {
             return 1.0;
           } else if (index == 2 // Muon
-                     && qTarget == qMC && mcPDG == 13 && mcMotherPDG == 511)
+                     && qTarget == qMC && mcPDG == 13 && mothersPDG[0] == 511)
           {
             return 1.0;
           } else if (index == 3 // IntermediateMuon
-                     && qTarget != qMC && mcPDG == 13 && mcGMotherPDG == 511)
+                     && qTarget != qMC && mcPDG == 13 && mothersPDG.size() > 1 && mothersPDG[1] == 511)
           {
             return 1.0;
           }  else if (index == 4 // KinLepton
-                      && qTarget == qMC && (mcPDG == 11 || mcPDG == 13) && mcMotherPDG == 511)
+                      && qTarget == qMC && (mcPDG == 11 || mcPDG == 13) && mothersPDG[0] == 511)
           {
             return 1.0;
           }  else if (index == 5 // IntermediateKinLepton
-                      && qTarget != qMC && (mcPDG == 11 || mcPDG == 13) && mcGMotherPDG == 511)
+                      && qTarget != qMC && (mcPDG == 11 || mcPDG == 13) && mothersPDG.size() > 1 && mothersPDG[1] == 511)
           {
             return 1.0;
           } else if (index == 6 && qTarget == qMC // Kaon
-                     && mcPDG == 321 && mcMotherPDG > 400 && mcMotherPDG < 500
-                     && (mcGMotherPDG == 511 || mcGGMotherPDG == 511))
+                     && mcPDG == 321 && mothersPDG[0] > 400 && mothersPDG[0] < 500
+                     && ((mothersPDG.size() > 1 && mothersPDG[1] == 511) || (mothersPDG.size() > 2 && mothersPDG[2] == 511)))
           {
             return 1.0;
           } else if (index == 7 && qTarget != qMC // SlowPion
-                     && mcPDG == 211 && mcMotherPDG == 413 && mcGMotherPDG == 511)
+                     && mcPDG == 211 && mothersPDG[0] == 413 && mothersPDG.size() > 1 && mothersPDG[1] == 511)
           {
             return 1.0;
           } else if (index == 8 && qTarget == qMC // FastPion
-                     && mcPDG == 211 && mcMotherPDG == 511)
+                     && mcPDG == 211 && mothersPDG[0] == 511)
           {
             return 1.0;
           } else if (index == 9  && qTarget == qMC // KaonPion
-                     && mcPDG == 321 && SlowPionPDG == 211 && mcMotherPDG == SlowPionPDGMother)
+                     && mcPDG == 321 && SlowPionPDG == 211 && mothersPDG[0] == SlowPionPDGMother)
           {
             return 1.0;
           } else if (index == 10 && qTarget == qMC) // MaximumPstar

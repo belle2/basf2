@@ -1008,7 +1008,7 @@ namespace Belle2 {
                                                "Kaon",                 // 6
                                                "SlowPion",             // 7
                                                "FastPion",             // 8
-                                               "Lambda"                // 9
+                                               "Lambda",               // 9
                                                "mcAssociated"          // 10
                                          };
 
@@ -1128,7 +1128,7 @@ namespace Belle2 {
                                               "KaonPion",             // 9
                                               "MaximumPstar",         // 10
                                               "FSC",                  // 11
-                                              "Lambda"                // 12
+                                              "Lambda",               // 12
                                               "mcAssociated"          // 13
                                          };
 

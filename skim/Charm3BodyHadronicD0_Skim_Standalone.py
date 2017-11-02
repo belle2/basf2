@@ -15,7 +15,7 @@ from stdCharged import *
 from stdV0s import *
 from stdPi0s import *
 
-
+gb2_setuprel = 'build-2017-10-16'
 set_log_level(LogLevel.INFO)
 import sys
 import os
@@ -26,22 +26,7 @@ ccbar_wBG = \
      'mdst_00051*_prod00000198_task0000051*.root']
 
 
-if len(sys.argv) > 1:
-    bkgType = sys.argv[1]
-    f = open('inputFiles/' + bkgType + '.txt', 'r')
-    fileList = f.read()
-    f.close()
-    if not os.path.isfile(fileList[:-1]):
-        sys.exit('Could not find root file : ' + fileList[:-1])
-    print('Running over file ' + fileList[:-1])
-elif len(sys.argv) == 1:
-    fileList = ccbar_wBG
-    bkgType = 'ccbarOld'
-
-if len(sys.argv) > 1:
-    inputMdstList('default', fileList[:-1])
-elif len(sys.argv) == 1:
-    inputMdstList('default', fileList)
+inputMdstList('default', fileList)
 
 
 loadStdSkimPi0()
@@ -49,7 +34,7 @@ loadStdCharged()
 from Charm3BodyHadronicD0_List import *
 
 D0ToHpJmPi0List = D0ToHpJmPi0()
-skimOutputUdst('outputFiles/Charm3BodyHadronicD0_' + bkgType, D0ToHpJmPi0List)
+skimOutputUdst('Charm3BodyHadronicD0', D0ToHpJmPi0List)
 summaryOfLists(D0ToHpJmPi0List)
 
 

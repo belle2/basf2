@@ -48,7 +48,7 @@ namespace Belle2 {
     void putNBits(unsigned int value, unsigned int n)
     {
       unsigned int bpos = m_pos % 32, wpos = m_pos / 32;
-      value &= (1 << n) - 1;
+      value &= 0xffffffffu >> (32 - n);
       m_store[wpos] |= value << bpos;
       if (bpos + n > 32) m_store[wpos + 1] = value >> (32 - bpos);
       m_pos += n;
@@ -64,7 +64,7 @@ namespace Belle2 {
       unsigned int res = m_store[wpos] >> bpos;
       if (bpos + n > 32) res |= m_store[wpos + 1] << (32 - bpos);
       m_pos += n;
-      return res & ((1 << n) - 1);
+      return res & (0xffffffffu >> (32 - n));
     }
 
     /** Get current position in the stream. */

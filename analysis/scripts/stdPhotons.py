@@ -8,7 +8,7 @@ from modularAnalysis import *
 def stdPhotons(listtype='loose', path=analysis_main):
 
     if listtype == 'all':
-        fillParticleList('gamma:all', 'clusterHypothesis == 5', True, path)
+        fillParticleList('gamma:all', 'clusterHypothesis == 5', True, path=path)
     elif listtype == 'loose':
         stdPhotons('all', path)
         cutAndCopyList('gamma:loose', 'gamma:all', 'clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]', True, path)
@@ -37,7 +37,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
             True,
             path)
     else:
-        fillParticleList('gamma:all', 'clusterHypothesis == 5', True, path)
+        fillParticleList('gamma:all', 'clusterHypothesis == 5', True, path=path)
 
 # Used in skimming code
 

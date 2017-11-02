@@ -206,12 +206,8 @@ TLorentzVector RestOfEvent::get4VectorTracks(std::string maskName) const
     } else
       particlePDG = pid->getMostLikely(fractions).getPDGCode();
 
-    // TODO: THIS IS A TEMPORARY FIX SO NO CRASH OCCURS
-    if (particlePDG != 11 and particlePDG != 13 and particlePDG != 211 and particlePDG != 321 and particlePDG != 2212
-        and particlePDG != 1000010020)
-      particlePDG = Const::pion.getPDGCode();
     Const::ChargedStable trackParticle = Const::ChargedStable(particlePDG);
-    const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResult(trackParticle);
+    const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResultWithClosestMass(trackParticle);
 
     // Set energy of track
     float tempMass = trackParticle.getMass();

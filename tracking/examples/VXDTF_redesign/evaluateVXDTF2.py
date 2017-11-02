@@ -83,8 +83,7 @@ if performFit:
 
     fitter = register_module('DAFRecoFitter')
     path.add_module(fitter)
-    path.add_module('TrackCreator', defaultPDGCode=211,
-                    additionalPDGCodes=[13, 321, 2212])
+    path.add_module('TrackCreator', pdgCodes=[211, 13, 321, 2212])
 
 # Matching
 mcTrackMatcherModule = register_module('MCRecoTracksMatcher')

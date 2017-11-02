@@ -45,6 +45,7 @@ def str_vector(vec, dim):
     """convert a vector like object (TVector3, TLorentzVector) to a string"""
     return "(" + ",".join("%.6g" % vec[i] for i in range(dim)) + ")"
 
+
 # and override the members of the classes to use our own functions in future
 Belle2.Const.ParticleType.__repr__ = str_ParticleType
 Belle2.Const.DetectorSet.__repr__ = str_DetectorSet
@@ -248,6 +249,7 @@ class DataStorePrinter(object):
         else:
             print(result, weight, sep="")
 
+
 # Now we define a list of all the mdst_dataobjects we want to print out and all
 # the members we want to check
 mdst_dataobjects = [
@@ -275,6 +277,7 @@ mdst_dataobjects = [
     ]),
     DataStorePrinter("Track", ["getNumberOfFittedHypotheses"], {
         "getTrackFitResult": const_stable,
+        "getTrackFitResultWithClosestMass": const_stable,
         "getRelationsWith": ["ECLClusters", "KLMClusters", "MCParticles", "PIDLikelihoods"],
     }),
     DataStorePrinter("V0", ["getTracks", "getTrackFitResults", "getV0Hypothesis"], {
@@ -333,6 +336,7 @@ def print_file(filename):
     main.add_module("EventInfoPrinter")
     main.add_module(PrintMDSTModule())
     process(main, 6)
+
 
 if __name__ == "__main__":
     import ROOT

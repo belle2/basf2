@@ -59,7 +59,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
         if fit_tracks:
             add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
-                                            additionalTrackFitHypotheses=additionalTrackFitHypotheses,
+                                            trackFitHypotheses=additionalTrackFitHypotheses,
                                             reco_tracks=reco_tracks)
 
 
@@ -161,7 +161,7 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use
                                 use_second_cdc_hits=use_second_cdc_hits)
 
 
-def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, additionalTrackFitHypotheses=None,
+def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, trackFitHypotheses=None,
                                     reco_tracks="RecoTracks"):
     """
     Helper function to add the modules performing the
@@ -179,8 +179,14 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, ad
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks).set_name(
         "Combined_DAFRecoFitter")
     # create Belle2 Tracks from the genfit Tracks
-    path.add_module('TrackCreator', defaultPDGCode=211, recoTrackColName=reco_tracks,
-                    additionalPDGCodes=[13, 321, 2212] if additionalTrackFitHypotheses is None else additionalTrackFitHypotheses)
+    # The following particle hypothesis will be fitted: Pion, Kaon and Proton
+    # Muon fit is working but gives very similar as the Pion due to the closeness of masses
+    # -> therefore not in the default fit list
+    # Electron fit has as systematic bias and therefore not done here. Therefore, pion fits
+    # will be used for electrons which gives a better result as GenFit's current electron
+    # implementation.
+    path.add_module('TrackCreator', recoTrackColName=reco_tracks,
+                    pdgCodes=[211, 321, 2212] if trackFitHypotheses is None else trackFitHypotheses)
     # V0 finding
     path.add_module('V0Finder', RecoTrackColName=reco_tracks)
 
@@ -267,6 +273,7 @@ def add_cdc_cr_track_fit_and_track_creator(path, components=None,
 
     # Create Belle2 Tracks from the genfit Tracks
     path.add_module('TrackCreator',
+                    pdgCodes=[13],
                     recoTrackColName=reco_tracks,
                     trackColName=tracks,
                     defaultPDGCode=13,

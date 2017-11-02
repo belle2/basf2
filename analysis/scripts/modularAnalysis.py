@@ -547,7 +547,8 @@ def fillSignalSideParticleList(outputListName, decayString, path):
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False,
-                      path=analysis_main):
+                      path=analysis_main,
+                      enforceFitHypothesis=False):
     """
     Creates Particles of the desired types from the corresponding MDST dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
@@ -574,12 +575,18 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
+    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
+                                using a mass hypothesis of the exact type passed to fillParticleLists().
+                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                in terms of mass difference will be used if the fit using exact particle
+                                type is not available.
     """
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + 'PLists')
     pload.param('decayStringsWithCuts', decayStringsWithCuts)
     pload.param('writeOut', writeOut)
+    pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
 
@@ -588,6 +595,7 @@ def fillParticleList(
     cut,
     writeOut=False,
     path=analysis_main,
+    enforceFitHypothesis=False
 ):
     """
     Creates Particles of the desired type from the corresponding MDST dataobjects,
@@ -611,12 +619,18 @@ def fillParticleList(
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
+    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
+                                using a mass hypothesis of the exact type passed to fillParticleLists().
+                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                in terms of mass difference will be used if the fit using exact particle
+                                type is not available.
     """
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
     pload.param('decayStringsWithCuts', [(decayString, cut)])
     pload.param('writeOut', writeOut)
+    pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
 
@@ -625,6 +639,7 @@ def fillParticleListWithTrackHypothesis(
     cut,
     hypothesis,
     writeOut=False,
+    enforceFitHypothesis=False,
     path=analysis_main,
 ):
     """
@@ -634,6 +649,11 @@ def fillParticleListWithTrackHypothesis(
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param hypothesis    the PDG code of the desired track hypothesis
     @param writeOut      wether RootOutput module should save the created ParticleList
+    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
+                                using a mass hypothesis of the exact type passed to fillParticleLists().
+                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                in terms of mass difference will be used if the fit using exact particle
+                                type is not available.
     @param path          modules are added to this path
     """
 
@@ -642,6 +662,7 @@ def fillParticleListWithTrackHypothesis(
     pload.param('decayStringsWithCuts', [(decayString, cut)])
     pload.param('trackHypothesis', hypothesis)
     pload.param('writeOut', writeOut)
+    pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
 

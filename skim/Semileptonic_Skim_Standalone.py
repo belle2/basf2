@@ -39,7 +39,8 @@ elif len(sys.argv) == 1:
     inputMdstList('default', fileList)
 
 loadStdCharged()
-loadStdPi0()
+loadStdSkimPi0()
+loadStdSkimPhoton()
 loadStdKS()
 
 loadStdD0()

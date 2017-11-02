@@ -42,7 +42,6 @@ elif len(sys.argv) == 1:
 
 
 loadStdCharged()
-loadStdPi0()
 loadStdKS()
 
 fillParticleList('pi+:all', '')

@@ -21,6 +21,7 @@
 #include <tracking/trackFindingVXD/algorithms/CellularAutomaton.h>
 #include <tracking/trackFindingVXD/algorithms/PathCollectorRecursive.h>
 #include <tracking/trackFindingVXD/algorithms/NodeFamilyDefiner.h>
+#include <tracking/trackFindingVXD/algorithms/SPTCSelectorXBestPerFamily.h>
 
 #include <tracking/trackFindingVXD/segmentNetwork/CACell.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
@@ -28,9 +29,6 @@
 #include <tracking/trackFindingVXD/tcTools/SpacePointTrackCandCreator.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
-
-#include <tracking/trackFindingVXD/algorithms/SPTCSelectorBestPerFamily.h>
-#include <tracking/trackFindingVXD/algorithms/SPTCSelectorXBestPerFamily.h>
 
 #include <tracking/trackFindingVXD/algorithms/CALogger.h>
 #include <tracking/trackFindingVXD/algorithms/CAValidator.h>

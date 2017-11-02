@@ -13,7 +13,6 @@
 #include <numeric>
 
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
-#include <tracking/trackFindingVXD/algorithms/SPTCSelectorBase.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
@@ -22,13 +21,13 @@
 
 
 namespace Belle2 {
-  class SPTCSelectorXBestPerFamily : public SPTCSelectorBase {
+  class SPTCSelectorXBestPerFamily {
 
   public:
 
     /// Constructor
     SPTCSelectorXBestPerFamily(unsigned short xBest = 5, std::string estimationMethod = std::string("tripletFit")):
-      SPTCSelectorBase(), m_xBest(xBest)
+      m_xBest(xBest)
     {
       if (estimationMethod == "tripletFit") {
         m_estimator = std::make_unique<QualityEstimatorTripletFit>();
@@ -40,6 +39,9 @@ namespace Belle2 {
         m_estimator = std::make_unique<QualityEstimatorRandom>();
       }
     };
+
+    /// Destructor
+    ~SPTCSelectorXBestPerFamily() = default;
 
     /** Preparation of Best Candidate Selector by resetting the vectors. */
     void prepareSelector(unsigned short nFamilies)

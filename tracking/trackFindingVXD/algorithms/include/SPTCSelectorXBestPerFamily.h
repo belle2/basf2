@@ -12,10 +12,13 @@
 #include <vector>
 #include <numeric>
 
-#include <tracking/trackFindingVXD/algorithms/SPTCSelectorBase.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
+#include <tracking/trackFindingVXD/algorithms/SPTCSelectorBase.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRandom.h>
 
 
 namespace Belle2 {
@@ -24,10 +27,18 @@ namespace Belle2 {
   public:
 
     /// Constructor
-    SPTCSelectorXBestPerFamily(unsigned short xBest = 5):
+    SPTCSelectorXBestPerFamily(unsigned short xBest = 5, std::string estimationMethod = std::string("tripletFit")):
       SPTCSelectorBase(), m_xBest(xBest)
     {
-      m_estimator = std::make_unique<QualityEstimatorTripletFit>();
+      if (estimationMethod == "tripletFit") {
+        m_estimator = std::make_unique<QualityEstimatorTripletFit>();
+      } else if (estimationMethod == "circleFit") {
+        m_estimator = std::make_unique<QualityEstimatorCircleFit>();
+      } else if (estimationMethod == "helixFit") {
+        m_estimator = std::make_unique<QualityEstimatorRiemannHelixFit>();
+      } else if (estimationMethod == "random") {
+        m_estimator = std::make_unique<QualityEstimatorRandom>();
+      }
     };
 
     /** Preparation of Best Candidate Selector by resetting the vectors. */
@@ -81,11 +92,16 @@ namespace Belle2 {
       return jointBestPaths;
     }
 
+    /** Setting magnetic field for the quality estimator. */
+    void setMagneticFieldForQE(double bFieldZ)
+    {
+      m_estimator->setMagneticFieldStrength(bFieldZ);
+    }
 
   private:
 
     /** Function to insert SPTCs into a vector of SPTC while preserving an order by descending quality indices. */
-    void insertSortedByQI(std::vector<SpacePointTrackCand>& paths, SpacePointTrackCand sptc)
+    void insertSortedByQI(std::vector<SpacePointTrackCand>& paths, SpacePointTrackCand& sptc)
     {
       /// Determine position of new SPTC in sorted SPTC vector to keep it sorted
       std::vector<SpacePointTrackCand>::iterator it = std::lower_bound(paths.begin(), paths.end(), sptc,

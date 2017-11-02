@@ -11,20 +11,33 @@
 
 #include <vector>
 
-#include <tracking/trackFindingVXD/algorithms/SPTCSelectorBase.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
+#include <tracking/trackFindingVXD/algorithms/SPTCSelectorBase.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRandom.h>
 
 
 namespace Belle2 {
   class SPTCSelectorBestPerFamily : public SPTCSelectorBase {
+
   public:
+
     /// Constructor
-    SPTCSelectorBestPerFamily():
+    SPTCSelectorBestPerFamily(std::string estimationMethod = std::string("tripletFit")):
       SPTCSelectorBase()
     {
-      m_estimator = std::make_unique<QualityEstimatorTripletFit>();
+      if (estimationMethod == "tripletFit") {
+        m_estimator = std::make_unique<QualityEstimatorTripletFit>();
+      } else if (estimationMethod == "circleFit") {
+        m_estimator = std::make_unique<QualityEstimatorCircleFit>();
+      } else if (estimationMethod == "helixFit") {
+        m_estimator = std::make_unique<QualityEstimatorRiemannHelixFit>();
+      } else if (estimationMethod == "random") {
+        m_estimator = std::make_unique<QualityEstimatorRandom>();
+      }
     };
 
     /** Preparation of Best Candidate Selector by resetting the vectors. */
@@ -61,6 +74,11 @@ namespace Belle2 {
       return m_bestPaths;
     }
 
+    /** Setting magnetic field for the quality estimator. */
+    void setMagneticFieldForQE(double bFieldZ)
+    {
+      m_estimator->setMagneticFieldStrength(bFieldZ);
+    }
 
   private:
     /** Pinter to the Quality Estimator used to evaluate the SPTCs to find the best. */

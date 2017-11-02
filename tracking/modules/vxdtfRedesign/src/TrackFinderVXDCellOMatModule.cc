@@ -10,6 +10,8 @@
 
 #include <framework/logging/Logger.h>
 
+#include <geometry/bfieldmap/BFieldMap.h>
+
 #include <tracking/modules/vxdtfRedesign/TrackFinderVXDCellOMatModule.h>
 #include <tracking/trackFindingVXD/algorithms/NetworkPathConversion.h>
 #include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
@@ -92,6 +94,21 @@ void TrackFinderVXDCellOMatModule::initialize()
 
   if (m_PARAMselectBestPerFamily) {
     m_sptcSelector = std::make_unique<SPTCSelectorXBestPerFamily>(m_PARAMxBestPerFamily);
+  }
+}
+
+/** *************************************+************************************* **/
+/** ***********************************+ + +*********************************** **/
+/** *******************************+ begin run +******************************* **/
+/** ***********************************+ + +*********************************** **/
+/** *************************************+************************************* **/
+
+void TrackFinderVXDCellOMatModule::beginRun()
+{
+  if (m_PARAMselectBestPerFamily) {
+    // BField is required by all QualityEstimators
+    double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+    m_sptcSelector->setMagneticFieldForQE(bFieldZ);
   }
 }
 

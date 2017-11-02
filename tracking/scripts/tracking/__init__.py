@@ -391,7 +391,7 @@ def add_track_finding(
                 add_vxd_track_finding(path, components=["SVD"], reco_tracks=svd_reco_tracks)
 
     if use_svd and use_cdc:
-        if use_pxd or use_cdc:
+        if use_pxd:
             # we will later have to merge those, so we can not output into the final store array already
             svd_cdc_reco_tracks = "SVDCDCRecoTracks"
         else:

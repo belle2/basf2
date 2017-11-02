@@ -43,16 +43,15 @@ if len(sys.argv) > 1:
     inputMdstList('default', fileList[:-1])
 elif len(sys.argv) == 1:
     inputMdstList('default', fileList)
-
-stdPhotons('loose')
-loadStdCharged()
 stdPi0s('loose')
-loadStdAllPi0()
+loadStdSkimPhoton()
+loadStdSkimPi0()
+loadStdCharged()
 stdKshorts()
 loadStdLightMesons()
-loadStdPhoton()
-loadStdPhotonE15()
-loadStdSkimPi0()
+cutAndCopyList('gamma:E15', 'gamma:skim', '1.5<E<100')
+
+
 # EWP Skim
 from BtoXgamma_List import *
 XgammaList = B2XgammaList()

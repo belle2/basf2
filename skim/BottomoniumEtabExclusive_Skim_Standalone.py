@@ -38,7 +38,7 @@ elif len(sys.argv) == 1:
 
 
 # Bottomonium Skim
-from Bottomonium_List import *
+from BottomoniumEtabExclusive_List import *
 EtabList = EtabList()
 skimOutputUdst('outputFiles/BottomoniumEtabExclusive_' + bkgType, EtabList)
 summaryOfLists(EtabList)

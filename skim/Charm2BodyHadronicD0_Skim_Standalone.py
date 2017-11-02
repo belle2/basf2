@@ -48,7 +48,7 @@ elif len(sys.argv) == 1:
 # stdFSParticle()
 loadStdCharged()
 
-from Charm2BodyHadronic_List import *
+from Charm2BodyHadronicD0_List import *
 
 D0ToHpJmList = D0ToHpJm()
 skimOutputUdst('outputFiles/Charm2BodyHadronicD0_' + bkgType, D0ToHpJmList)

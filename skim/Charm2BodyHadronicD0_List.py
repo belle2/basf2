@@ -13,11 +13,11 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def D0ToNeutrals():
+def D0ToHpJm():
     charmcuts = '1.78 < M < 1.94 and useCMSFrame(p)>2'
-    D0_Channels = ['pi0:skim pi0:skim',
-                   'K_S0:all pi0:skim',
-                   'K_S0:all K_S0:all',
+    D0_Channels = ['K-:loose pi+:loose',
+                   'pi+:loose pi-:loose',
+                   'K+:loose K-:loose',
                    ]
 
     D0List = []
@@ -28,18 +28,3 @@ def D0ToNeutrals():
 
     Lists = D0List
     return Lists
-
-
-def DstToD0Neutrals():
-
-    D0List = D0ToNeutrals()
-
-    Dstcuts = '0 < Q < 0.04'
-
-    DstList = []
-    for chID, channel in enumerate(D0List):
-        reconstructDecay('D*+:' + str(chID) + ' -> pi+:all ' + channel, Dstcuts, chID)
-        massVertexRave('D*+:' + str(chID), 0.001)
-        DstList.append('D*+:' + str(chID))
-
-    return DstList

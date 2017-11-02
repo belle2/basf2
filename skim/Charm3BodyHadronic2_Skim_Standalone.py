@@ -43,7 +43,6 @@ if len(sys.argv) > 1:
 elif len(sys.argv) == 1:
     inputMdstList('default', fileList)
 
-stdPi0s('loose')
 stdKshorts()
 loadStdSkimPi0()
 loadStdCharged()

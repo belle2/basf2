@@ -42,14 +42,13 @@ if len(sys.argv) > 1:
     inputMdstList('default', fileList[:-1])
 elif len(sys.argv) == 1:
     inputMdstList('default', fileList)
-loadStdCharged()
+loadStdSkimPi0()
+loadStdSkimPhoton()
 stdPi0s('loose')
-stdPhotons('loose')
+loadStdCharged()
 stdKshorts()
 loadStdLightMesons()
-loadStdSkimPi0()
-
-loadStdPhotonE15()
+cutAndCopyList('gamma:E15', 'gamma:skim', '1.5<E<100')
 # EWP Skim
 from BtoXll_List import *
 

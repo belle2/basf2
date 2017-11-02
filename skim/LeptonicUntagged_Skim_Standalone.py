@@ -11,9 +11,6 @@
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
-from stdPi0s import *
-from stdV0s import *
-from stdCharm import *
 
 set_log_level(LogLevel.INFO)
 import sys
@@ -39,15 +36,8 @@ elif len(sys.argv) == 1:
     inputMdstList('default', fileList)
 
 loadStdCharged()
-loadStdAllPi0()  # for stdCharm.py
-loadStdKS()
 
-loadStdD0()
-loadStdDplus()
-loadStdDstar0()
-loadStdDstarPlus()
-
-# SL Skim
+# Leptonic Skim
 from LeptonicUntagged_List import *
 
 lepList = LeptonicList()

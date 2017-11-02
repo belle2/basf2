@@ -11,7 +11,6 @@
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
-from stdPhotons import *
 
 set_log_level(LogLevel.INFO)
 

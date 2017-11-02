@@ -46,9 +46,7 @@ if len(sys.argv) > 1:
 elif len(sys.argv) == 1:
     inputMdstList('default', fileList)
 loadStdSkimPi0()
-stdPi0s('loose')
 loadStdCharged()
-stdPhotons('loose')
 loadStdKS()
 loadStdDiLeptons(True)
 loadStdLightMesons()

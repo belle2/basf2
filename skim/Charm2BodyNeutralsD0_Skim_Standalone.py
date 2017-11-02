@@ -11,7 +11,6 @@
 from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
-from stdCharged import *
 from stdV0s import *
 from stdPi0s import *
 
@@ -39,7 +38,6 @@ elif len(sys.argv) == 1:
     inputMdstList('default', fileList)
 
 
-loadStdCharged()
 loadStdKS()
 loadStdSkimPi0()
 

@@ -43,24 +43,15 @@ elif len(sys.argv) == 1:
     inputMdstList('default', fileList)
 loadStdSkimPi0()
 loadStdCharged()
-stdPi0s('loose')
-stdPhotons('loose')
-loadStdKS()
 
 
 from Charm3BodyHadronic_List import *
 
-# D0ToHpJmPi0List = D0ToHpJmPi0()
-# skimOutputUdst('D0ToHpJmPi0_Standalone_ccbar_wBG', D0ToHpJmPi0List)
-# summaryOfLists(D0ToHpJmPi0List)
 
 DstToD0PiD0ToHpJmPi0List = DstToD0PiD0ToHpJmPi0()
 skimOutputUdst('outputFiles/Charm3BodyHadronic_' + bkgType, DstToD0PiD0ToHpJmPi0List)
 summaryOfLists(DstToD0PiD0ToHpJmPi0List)
 
-# DstToD0PiD0ToHpHmKsList = DstToD0PiD0ToHpHmKs()
-# skimOutputUdst('DstToD0PiD0ToHpHmKs_Standalone_mixed_wBG', DstToD0PiD0ToHpHmKsList)
-# summaryOfLists(DstToD0PiD0ToHpHmKsList)
 
 process(analysis_main)
 

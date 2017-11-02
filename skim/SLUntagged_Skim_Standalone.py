@@ -39,7 +39,8 @@ elif len(sys.argv) == 1:
     inputMdstList('default', fileList)
 
 loadStdCharged()
-loadStdAllPi0()  # for stdCharm.py
+loadStdSkimPi0()  # for stdCharm.py
+loadStdSkimPhoton()
 loadStdKS()
 
 loadStdD0()

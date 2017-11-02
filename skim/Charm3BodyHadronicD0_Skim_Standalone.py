@@ -35,16 +35,16 @@ if len(sys.argv) > 1:
         sys.exit('Could not find root file : ' + fileList[:-1])
     print('Running over file ' + fileList[:-1])
 elif len(sys.argv) == 1:
-    fileList = ddbar_wBG
-    bkgType = 'ddbarOld'
+    fileList = ccbar_wBG
+    bkgType = 'ccbarOld'
 
 if len(sys.argv) > 1:
     inputMdstList('default', fileList[:-1])
 elif len(sys.argv) == 1:
     inputMdstList('default', fileList)
 
-stdPi0s('loose')
-stdKshorts()
+
+loadStdSkimPi0()
 loadStdCharged()
 from Charm3BodyHadronicD0_List import *
 

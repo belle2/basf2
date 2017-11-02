@@ -10,6 +10,8 @@
 
 from basf2 import *
 from modularAnalysis import *
+from stdCharged import *
+from stdPhotons import *
 
 set_log_level(LogLevel.ERROR)
 
@@ -36,9 +38,10 @@ if len(sys.argv) > 1:
 elif len(sys.argv) == 1:
     inputMdstList('default', fileList)
 
-
+loadStdSkimPhoton()
+loadStdCharged()
 # Bottomonium Skim
-from Bottomonium_List import *
+from BottomoniumHbInclusive_List import *
 HbList = HbInclusiveList()
 skimOutputUdst('outputFiles/BottomoniumHbInclusive_' + bkgType, HbList)
 summaryOfLists(HbList)

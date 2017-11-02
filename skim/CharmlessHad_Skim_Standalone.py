@@ -41,10 +41,6 @@ elif len(sys.argv) == 1:
     inputMdstList('default', fileList)
 
 
-loadStdAllPi0()
-stdPi0s('loose')
-loadStdPhoton()
-stdPhotons('loose')
 loadStdCharged()
 loadStdKS()
 loadStdLightMesons()

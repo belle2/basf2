@@ -35,7 +35,7 @@ namespace Belle2 {
       m_bestPaths.reserve(nFamilies);
       m_familyToIndex.resize(nFamilies, -1);
 
-      m_current_index = 0;
+      m_currentIndex = 0;
     }
 
     /** Test new SPTC if it is better than the current best one and replace current one if so. */
@@ -45,10 +45,10 @@ namespace Belle2 {
       short family = sptc.getFamily();
 
       if (m_familyToIndex.at(family) == -1) {
-        m_familyToIndex.at(family) = m_current_index;
+        m_familyToIndex.at(family) = m_currentIndex;
         sptc.setQualityIndex(qi);
         m_bestPaths.push_back(sptc);
-        m_current_index++;
+        m_currentIndex++;
       } else if (qi > m_bestPaths.at(m_familyToIndex[family]).getQualityIndex()) {
         sptc.setQualityIndex(qi);
         m_bestPaths.at(m_familyToIndex[family]) = sptc;
@@ -72,7 +72,8 @@ namespace Belle2 {
     /** Map of family number to respective index for m_bestPaths */
     std::vector<short> m_familyToIndex;
 
-    /** Counter for current index which is increased each time a family is seen for the first time. */
-    unsigned short m_current_index = 0;
+    /** Counter for current index used for m_familyToIndex. The counter is increased each time a family is seen for
+     *  the first time and thus a new entry for this family is added to m_familyToIndex. */
+    unsigned short m_currentIndex = 0;
   };
 }

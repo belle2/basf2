@@ -10,6 +10,7 @@
 #pragma once
 
 #include <vector>
+#include <numeric>
 
 #include <tracking/trackFindingVXD/algorithms/SPTCSelectorBase.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
@@ -37,7 +38,7 @@ namespace Belle2 {
       m_bestPaths.reserve(nFamilies);
       m_familyToIndex.resize(nFamilies, -1);
 
-      m_current_index = 0;
+      m_currentIndex = 0;
     }
 
     /** Test new SPTC if it is better than the least best of the current x best SPTCs of its respective family.
@@ -49,12 +50,12 @@ namespace Belle2 {
       short family = sptc.getFamily();
 
       if (m_familyToIndex.at(family) == -1) {
-        B2DEBUG(100, "Setting index to " << m_current_index << " for family " << family << " and adding sptc with qi of " << qi);
-        m_familyToIndex.at(family) = m_current_index;
+        B2DEBUG(100, "Setting index to " << m_currentIndex << " for family " << family << " and adding sptc with qi of " << qi);
+        m_familyToIndex.at(family) = m_currentIndex;
         m_bestPaths.push_back(std::vector<SpacePointTrackCand>(1));
         sptc.setQualityIndex(qi);
         m_bestPaths.at(m_familyToIndex[family]).at(0) = sptc;
-        m_current_index++;
+        m_currentIndex++;
       } else if (m_bestPaths.at(m_familyToIndex[family]).size() < m_xBest) {
         B2DEBUG(100, "Adding new sptc with qi " << qi << " without check, as max lenght not reached, yet...");
         sptc.setQualityIndex(qi);
@@ -70,13 +71,11 @@ namespace Belle2 {
     /** Return vector containing the best SPTCs; maximal m_xBest per family. */
     std::vector<SpacePointTrackCand> returnSelection() const
     {
-      unsigned short finalSize = 0;
-      for (auto set : m_bestPaths) {
-        finalSize += set.size();
-      }
       std::vector<SpacePointTrackCand> jointBestPaths;
-      jointBestPaths.reserve(finalSize);
-      for (auto set : m_bestPaths) {
+      jointBestPaths.reserve(std::accumulate(m_bestPaths.begin(), m_bestPaths.end(), 0,
+      [](int a, std::vector<SpacePointTrackCand> b) { return a + b.size(); }));
+
+      for (auto && set : m_bestPaths) {
         jointBestPaths.insert(jointBestPaths.end(), set.begin(), set.end());
       }
 
@@ -108,8 +107,9 @@ namespace Belle2 {
     /** Map of family number to respective index for m_bestPaths */
     std::vector<short> m_familyToIndex;
 
-    /** Counter for current index which is increased each time a family is seen for the first time. */
-    unsigned short m_current_index = 0;
+    /** Counter for current index used for m_familyToIndex. The counter is increased each time a family is seen for
+     *  the first time and thus a new entry for this family is added to m_familyToIndex. */
+    unsigned short m_currentIndex = 0;
 
     /** Number of allowed best SPTCs per family. */
     unsigned short m_xBest;

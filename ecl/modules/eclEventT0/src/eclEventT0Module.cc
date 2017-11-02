@@ -197,10 +197,6 @@ void eclEventT0Module::event()
   if (stdDevAllBut1 > T0Unc) {T0Unc = stdDevAllBut1;}
   EventT0 eclT0;
   eclT0.addEventT0(T0, T0Unc, m_eclID);
-
-  if (iEvent > 100) {return;}
-  printf("%4d %6.1f %6.1f %6.1f\n", iEvent, T0, stdDevAllBut1, WeightedUnc);
-
 }
 
 

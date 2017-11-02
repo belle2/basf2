@@ -1579,7 +1579,7 @@ namespace Belle2 {
 
           Variable::Manager& manager = Variable::Manager::Instance();
 
-          allParticlesHaveMCAssociated = false;
+          particlesHaveMCAssociated = false;
 
           if (ListOfParticles.isValid())
           {
@@ -1593,7 +1593,7 @@ namespace Belle2 {
                 } else {
                   targetFlag = manager.getVariable("isRightTrack(" + trackTargetName + ")")-> function(iParticle);
                 }
-                if (targetFlag != -2) allParticlesHaveMCAssociated = true;
+                if (targetFlag != -2) particlesHaveMCAssociated = true;
                 if (targetFlag == 1) {
                   nTargets += 1;
                 }

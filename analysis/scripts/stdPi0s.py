@@ -31,27 +31,28 @@ def stdPi0s(listtype='veryLoose', path=analysis_main):
     @param path     modules are added to this path
     """
     if listtype == 'all':
+        stdPhotons('all')
         fillParticleList('gamma:all', '', True, path)
         reconstructDecay('pi0:all -> gamma:all gamma:all', '', 1, True, path)
         matchMCTruth('pi0:all', path)
     elif listtype == 'eff20':
-        fillParticleList('gamma:pi0eff20', '', True, path)
+        stdPhotons('pi0eff20')
         reconstructDecay('pi0:eff20 -> gamma:pi0eff20 gamma:pi0eff20', '0.129 < M < 0.137', 1, True, path)
         matchMCTruth('pi0:eff20', path)
     elif listtype == 'eff30':
-        fillParticleList('gamma:pi0eff30', '', True, path)
+        stdPhotons('pi0eff30')
         reconstructDecay('pi0:eff30 -> gamma:pi0eff30 gamma:pi0eff30', '0.126 < M < 0.139', 1, True, path)
         matchMCTruth('pi0:eff30', path)
     elif listtype == 'eff40':
-        fillParticleList('gamma:pi0eff40', '', True, path)
+        stdPhotons('pi0eff40')
         reconstructDecay('pi0:eff40 -> gamma:pi0eff40 gamma:pi0eff40', '0.124 < M < 0.140', 1, True, path)
         matchMCTruth('pi0:eff40', path)
     elif listtype == 'eff50':
-        fillParticleList('gamma:pi0eff50', '', True, path)
+        stdPhotons('pi0eff50')
         reconstructDecay('pi0:eff50 -> gamma:pi0eff50 gamma:pi0eff50', '0.09 < M < 0.175', 1, True, path)
         matchMCTruth('pi0:eff50', path)
     elif listtype == 'eff60_nomcmatch':
-        fillParticleList('gamma:pi0eff60', '', True, path)
+        stdPhotons('pi0eff60')
         reconstructDecay('pi0:eff60_nomcmatch -> gamma:pi0eff60 gamma:pi0eff60', '0.075 < M < 0.175', 1, True, path)
     elif listtype == 'eff60':
         stdPi0s(listtype='eff60_nomcmatch')

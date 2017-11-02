@@ -1579,6 +1579,8 @@ namespace Belle2 {
 
           Variable::Manager& manager = Variable::Manager::Instance();
 
+          allParticlesHaveMCAssociated = false;
+
           if (ListOfParticles.isValid())
           {
             int nTargets = 0;
@@ -1591,12 +1593,14 @@ namespace Belle2 {
                 } else {
                   targetFlag = manager.getVariable("isRightTrack(" + trackTargetName + ")")-> function(iParticle);
                 }
+                if (targetFlag != -2) allParticlesHaveMCAssociated = true;
                 if (targetFlag == 1) {
                   nTargets += 1;
                 }
               }
             }
 
+            if (!allParticlesHaveMCAssociated) output = -2;
             if (nTargets > 0) output = 1;
 
             // if (nTargets > 1); B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
@@ -1660,10 +1664,11 @@ namespace Belle2 {
             }
 
             for (auto& targetParticle : targetParticles) {
-              if (manager.getVariable("isRightCategory(" +  categoryName + ")")-> function(targetParticle) == 1) {
+              double isTargetOfRightCategory = manager.getVariable("isRightCategory(" +  categoryName + ")")-> function(targetParticle);
+              if (isTargetOfRightCategory == 1) {
                 output = 1;
                 nTargets += 1; targetParticlesCategory.push_back(targetParticle);
-              }
+              } else if (isTargetOfRightCategory == -2 && output != 1) output = -2;
             }
 
             /*            if (nTargets > 1) {

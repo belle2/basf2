@@ -124,8 +124,6 @@ def add_pxd_unpacking(path):
     pxd_unpacker.param('IgnoreFrameCount', True)
     pxd_unpacker.param('IgnoreSorFlag', True)
     pxd_unpacker.param('RemapFlag', True)
-    pxd_unpacker.param('RemapLUT_IF_OB', Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IF_OB.csv'))
-    pxd_unpacker.param('RemapLUT_IB_OF', Belle2.FileSystem.findFile('data/testbeam/vxd/LUT_IB_OF.csv'))
     path.add_module(pxd_unpacker)
 
     path.add_module("PXDRawHitSorter")

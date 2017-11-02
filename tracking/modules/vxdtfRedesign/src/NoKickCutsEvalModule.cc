@@ -529,21 +529,21 @@ double NoKickCutsEvalModule::deltaParEval(hitXP hit1, hitXP hit2, NoKickCuts::EP
   return out;
 }
 
-// double NoKickCutsEvalModule::cutFunction(int p, double pwidth)
-// {
-//   double out;
-//   double mom = p * pwidth;
-//   if (mom > 0.04)
-//     out = -7.5 * pow(10, -7) / pow(mom, 3.88) + 1;
-//   else out = 6.3 * mom + 0.57;
-//   return out;
-// }
 double NoKickCutsEvalModule::cutFunction(int p, double pwidth)
 {
   double out;
-  double mom = p * pwidth + c_pmin + pwidth / 2;
-  if (mom > 0.4) {
-    out = 0.999;
-  } else out = -4.57 * pow(10, -7) / pow(mom, 3.31) + 0.999;
+  double mom = p * pwidth;
+  if (mom > 0.04)
+    out = -7.5 * pow(10, -7) / pow(mom, 3.88) + 1;
+  else out = 6.3 * mom + 0.57;
   return out;
 }
+// double NoKickCutsEvalModule::cutFunction(int p, double pwidth)
+// {
+//   double out;
+//   double mom = p * pwidth + c_pmin + pwidth / 2;
+//   if (mom > 0.4) {
+//     out = 0.999;
+//   } else out = -4.57 * pow(10, -7) / pow(mom, 3.31) + 0.999;
+//   return out;
+// }

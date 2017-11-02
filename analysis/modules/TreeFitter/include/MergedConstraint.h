@@ -40,7 +40,6 @@ namespace TreeFitter {
       setNIter(std::max(nIter(), c->nIter())) ;
     }
 
-    virtual void print(std::ostream& os = std::cout) const ;
 
   private:
     constraintlist m_list ;

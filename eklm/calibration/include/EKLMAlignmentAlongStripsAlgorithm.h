@@ -38,6 +38,8 @@ namespace Belle2 {
       float x;           /**< Hit X coordinate. */
       float y;           /**< Hit Y coordinate. */
       float z;           /**< Hit Z coordinate. */
+      float distSiPM;    /**< Distance from hit to the SiPM. */
+      float distFarEnd;  /**< Distance from hit to the far end of the strip. */
     };
 
     /**
@@ -61,6 +63,13 @@ namespace Belle2 {
     void setOutputFile(const char* outputFile);
 
   private:
+
+    /**
+     * Get plane number for average values (0-based).
+     * @param[in] sector Sector number.
+     * @param[in] plane  Plane number.
+     */
+    int getAveragedPlane(int sector, int plane) const;
 
     /** Output file name. */
     std::string m_OutputFile;

@@ -24,9 +24,13 @@
 #pragma link C++ class Belle2::SVDLocalRunBadStrips+;
 
 #pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsVector<float>>+;
-#pragma link C++ class Belle2::SVDCalibrationsVector<float> +;
-
 #pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsVector<Belle2::SVDStripCalAmp>>+;
 #pragma link C++ class Belle2::SVDCalibrationsVector<Belle2::SVDStripCalAmp> +;
+#pragma link C++ class Belle2::SVDCalibrationsVector<float> +;
+
+#pragma link C++ class Belle2::SVDCalibrationsBase<Belle2::SVDCalibrationsScalar< Belle2::SVDTriggerBinDependentConstants >>+;
+#pragma link C++ class Belle2::SVDCalibrationsScalar< Belle2::SVDTriggerBinDependentConstants> +;
+
 #pragma link C++ struct Belle2::SVDStripCalAmp +;
+#pragma link C++ struct Belle2::SVDTriggerBinDependentConstants +;
 #endif

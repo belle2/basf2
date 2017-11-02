@@ -167,7 +167,8 @@ simulation.add_simulation(main, components=['PXD', 'SVD', 'MagneticFieldConstant
                           cleanupPXDDataReduction=False)
 
 roiPayloadAssembler = register_module('ROIPayloadAssembler')
-roiPayloadAssembler.param({"ROIListName": "ROIs", "SendAllDownscaler": 0, "SendROIsDownscaler": 0, "CutNrROIs": 5})
+roiPayloadAssembler.param({"ROIListName": "ROIs", "SendAllDownscaler": 0,
+                           "SendROIsDownscaler": 0, "CutNrROIs": 5, "AcceptAll": True})
 
 main.add_module(roiPayloadAssembler)
 

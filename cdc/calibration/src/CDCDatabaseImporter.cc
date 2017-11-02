@@ -566,8 +566,13 @@ void CDCDatabaseImporter::importDisplacement(std::string fileName)
 
 void CDCDatabaseImporter::importWirPosAlign(std::string fileName)
 {
-  std::ifstream ifs;
-  ifs.open(fileName.c_str());
+  //  std::ifstream ifs;
+  //  ifs.open(fileName.c_str());
+  boost::iostreams::filtering_istream ifs;
+  if ((fileName.rfind(".gz") != string::npos) && (fileName.length() - fileName.rfind(".gz") == 3)) {
+    ifs.push(boost::iostreams::gzip_decompressor());
+  }
+  ifs.push(boost::iostreams::file_source(fileName));
   if (!ifs) {
     B2FATAL("openFile: " << fileName << " *** failed to open");
     return;
@@ -610,7 +615,8 @@ void CDCDatabaseImporter::importWirPosAlign(std::string fileName)
   if (nRead != nSenseWires) B2FATAL("CDCDatabaseimporter::importWirPosAlign: #lines read-in (=" << nRead <<
                                       ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
 
-  ifs.close();
+  //  ifs.close();
+  boost::iostreams::close(ifs);
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);

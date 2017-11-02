@@ -36,7 +36,7 @@ PXDdigiFilterModule::PXDdigiFilterModule() : Module()
   addParam("PXDDigitsOutsideROIName", m_PXDDigitsOutsideROIName, "The name of the StoreArray of Filtered PXDDigits",
            std::string("PXDDigitsOUT"));
   addParam("ROIidsName", m_ROIidsName, "The name of the StoreArray of ROIs", std::string(""));
-  addParam("CreateOutside", m_CreateOutside, "Create ouside pxiel list", false);
+  addParam("CreateOutside", m_CreateOutside, "Create the StoreArray of PXD pixel outside the ROIs", false);
 
 }
 

@@ -35,9 +35,15 @@ namespace Belle2 {
     float* m_fPIDp;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
+    /** delete 'new's */
+    void deallocateMemory();
   public:
     /** Constuctor. */
     NtuplePIDTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
+
+    /** Destructor. */
+    ~NtuplePIDTool() {deallocateMemory();}
+
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);
   };

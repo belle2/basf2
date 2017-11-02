@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <ecl/modules/MCMatcherECLClusters/MCMatcherECLClustersModule.h>
-//#include <iostream>
 
 using namespace Belle2;
 using namespace ECL;
@@ -19,18 +18,18 @@ using namespace ECL;
 //                 Register the Module
 //-----------------------------------------------------------------
 REG_MODULE(MCMatcherECLClusters)
-
+REG_MODULE(MCMatcherECLClustersPureCsI)
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
 MCMatcherECLClustersModule::MCMatcherECLClustersModule() : Module(),
-  m_eclHitToSimHitRelationArray(m_eclHits, m_eclSimHits),
+  m_eclCalDigits(eclCalDigitArrayName()),
+  m_eclDigits(eclDigitArrayName()),
+  m_eclClusters(eclClusterArrayName()),
+  m_eclShowers(eclShowerArrayName()),
   m_mcParticleToECLHitRelationArray(m_mcParticles, m_eclHits),
-  m_mcParticleToECLSimHitRelationArray(m_mcParticles, m_eclSimHits),
-  m_eclCalDigitToMCParticleRelationArray(m_eclCalDigits, m_mcParticles),
-  m_eclDigitToMCParticleRelationArray(m_eclDigits, m_mcParticles),
-  m_eclShowerToMCPart(m_eclShowers, m_mcParticles)
+  m_mcParticleToECLSimHitRelationArray(m_mcParticles, m_eclSimHits)
 {
   // Set description
   setDescription("MCMatcherECLClustersModule");
@@ -44,10 +43,12 @@ MCMatcherECLClustersModule::~MCMatcherECLClustersModule()
 void MCMatcherECLClustersModule::initialize()
 {
   m_mcParticles.registerInDataStore();
+
   m_eclHits.registerInDataStore();
-  m_eclCalDigits.registerInDataStore();
-  m_eclDigits.registerInDataStore();
-  m_eclClusters.registerInDataStore();
+  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
+  m_eclDigits.registerInDataStore(eclDigitArrayName());
+  m_eclClusters.registerInDataStore(eclClusterArrayName());
+  m_eclShowers.registerInDataStore(eclShowerArrayName());
 
   m_mcParticles.registerRelationTo(m_eclHits);
   m_eclCalDigits.registerRelationTo(m_mcParticles);
@@ -62,6 +63,8 @@ void MCMatcherECLClustersModule::beginRun()
 
 void MCMatcherECLClustersModule::event()
 {
+
+  //CalDigits
   short int Index[8736];
   std::fill_n(Index, 8736, -1);
   const TClonesArray* cd = m_eclCalDigits.getPtr();
@@ -74,7 +77,7 @@ void MCMatcherECLClustersModule::event()
   }
 
   RelationArray& p2sh = m_mcParticleToECLSimHitRelationArray;
-  RelationArray& cd2p = m_eclCalDigitToMCParticleRelationArray;
+  //RelationArray& cd2p = m_eclCalDigitToMCParticleRelationArray;
   ECLSimHit** simhits = (ECLSimHit**)(m_eclSimHits.getPtr()->GetObjectRef());
   MCParticle** mcs = (MCParticle**)(m_mcParticles.getPtr()->GetObjectRef());
 
@@ -92,7 +95,11 @@ void MCMatcherECLClustersModule::event()
     for (const std::pair<int, double>& t : e) {
       int ind = Index[t.first];
       double w = t.second;
-      if (ind >= 0 && w > 0) cd2p.add(ind, re.getFromIndex(), w);
+      if (ind >= 0
+          && w > 0) {//cd2p.add(ind, re.getFromIndex(), w); //old relation setter from ECLCalDigit to MC particle, not working when pure CsI digits are introduced
+        const ECLCalDigit* cal_digit = m_eclCalDigits[ind];
+        cal_digit->addRelationTo(mcs[re.getFromIndex()], w);
+      }
     }
 
     //------------------------------------------
@@ -103,7 +110,7 @@ void MCMatcherECLClustersModule::event()
       double shower_mcParWeight = 0; //Weight between shower and MCParticle
 
       //Loop on ECLCalDigits related to this MCParticle
-      const auto shower_CalDigitRelations = shower.getRelationsTo<ECLCalDigit>();
+      const auto shower_CalDigitRelations = shower.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
       for (unsigned int iRelation = 0; iRelation < shower_CalDigitRelations.size(); ++iRelation) {
 
         //Retrieve calDigit
@@ -136,7 +143,7 @@ void MCMatcherECLClustersModule::event()
   }
 
   RelationArray& p2eh = m_mcParticleToECLHitRelationArray;
-  RelationArray& ed2p = m_eclDigitToMCParticleRelationArray;
+  //RelationArray& ed2p = m_eclDigitToMCParticleRelationArray;
   ECLHit** eclhits = (ECLHit**)(m_eclHits.getPtr()->GetObjectRef());
   for (int i = 0, imax = p2eh.getEntries(); i < imax; i++) {
     const RelationElement& re = p2eh[i];
@@ -144,15 +151,19 @@ void MCMatcherECLClustersModule::event()
     for (unsigned int j : eclhitindx) {
       const ECLHit* t = eclhits[j];
       int id = t->getCellId() - 1;
-      if (t->getBackgroundTag() == 0 && Index[id] >= 0)
-        ed2p.add(Index[id], re.getFromIndex()); // relation ECLDigit to MC particle
+      if (t->getBackgroundTag() == 0
+          && Index[id] >=
+          0) { //ed2p.add(Index[id], re.getFromIndex()); // old relation setter from ECLDigit to MC particle, not working when pure CsI digits are introduced
+        const ECLDigit* mdigit = m_eclDigits[Index[id]];
+        mdigit->addRelationTo(mcs[re.getFromIndex()]);
+      }
     }
   }
 
   // to create the relation between ECLCluster->MCParticle with the same weight as
   // the relation between ECLShower->MCParticle.  StoreArray<ECLCluster> eclClusters;
   for (const auto& eclShower : m_eclShowers) {
-    const ECLCluster* eclCluster = eclShower.getRelatedFrom<ECLCluster>();
+    const ECLCluster* eclCluster = eclShower.getRelatedFrom<ECLCluster>(eclClusterArrayName());
     const RelationVector<MCParticle> mcParticles = eclShower.getRelationsTo<MCParticle>();
     for (unsigned int i = 0; i < mcParticles.size(); ++i) {
       const auto mcParticle = mcParticles.object(i);
@@ -160,13 +171,6 @@ void MCMatcherECLClustersModule::event()
       eclCluster->addRelationTo(mcParticle, weight);
     }
   }
-  // for (const auto& eclCluster : m_eclClusters) {
-  //   const auto mcParticleWeightPair = eclCluster.getRelatedToWithWeight<MCParticle>();
-  //   std::cout<< "ClusterID: " << eclCluster.getArrayIndex()
-  //       << " Energy: " <<  eclCluster.getEnergy()
-  //       << " MCParticle: " << mcParticleWeightPair.first->getArrayIndex()
-  //       << " Weight: " << mcParticleWeightPair.second<<std::endl;
-  // }
 }
 
 void MCMatcherECLClustersModule::endRun()

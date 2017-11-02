@@ -7,6 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
+
 #include <framework/logging/LogConfig.h>
 
 namespace Belle2 {

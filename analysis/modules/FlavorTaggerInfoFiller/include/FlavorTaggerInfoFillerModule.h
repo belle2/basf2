@@ -42,7 +42,7 @@ namespace Belle2 {
 
     bool m_TMVAfbdt; /**< Sets if FastBDT Combiner output will be saved or not **/
 
-    bool m_qrCategories; /**< Sets if individual Categories output will be saved or not **/
+    bool m_qpCategories; /**< Sets if individual Categories output will be saved or not **/
 
     bool m_targetProb; /**< Sets if individual Categories output will be saved or not **/
 

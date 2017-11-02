@@ -155,10 +155,14 @@ namespace Belle2 {
      * @param trackArrayIndex track StoreArray index
      * @param trackFit pointer to TrackFitResult object
      * @param chargedStable Type of charged particle
+     * @param chargedStableUsedForFit Type of particle which has been used in the track fit.
+     *        This can be different as chargedStable as we don't fit all tracks with
+     *        all hypothesis.
      */
     Particle(const int trackArrayIndex,
              const TrackFitResult* trackFit,
-             const Const::ChargedStable& chargedStable);
+             const Const::ChargedStable& chargedStable,
+             const Const::ChargedStable& chargedStableUsedForFit);
 
     /**
      * Constructor of a photon from a reconstructed ECL cluster that is not matched to any charged track.
@@ -653,10 +657,31 @@ namespace Belle2 {
       return m_arrayPointer;
     }
 
+    /** Return the always positive PDG code which was used for the
+     * track fit (if there was a track fit) of this particle. This can
+     * be different than the Particle's PDG id as not all mass hypothesis
+     * are fitted during the reconstruction.
+     */
+    int getPDGCodeUsedForFit()
+    {
+      return std::abs(m_pdgCodeUsedForFit);
+    }
+
+    /**
+     * Returns true if the type represented by this Particle object
+     * was used use as a mass hypothesis during the track of this Particle's
+     * parameters.
+     */
+    bool wasExactFitHypothesisUsed() const
+    {
+      return std::abs(m_pdgCodeUsedForFit) == std::abs(m_pdgCode);
+    }
+
   private:
 
     // persistent data members
     int m_pdgCode;  /**< PDG code */
+    int m_pdgCodeUsedForFit = 0; /**< PDG code used for the track fit */
     float m_mass;   /**< particle (invariant) mass */
     float m_px;     /**< momentum component x */
     float m_py;     /**< momentum component y */
@@ -743,8 +768,9 @@ namespace Belle2 {
      */
     void setMdstArrayIndex(const int arrayIndex);
 
-    ClassDef(Particle, 8); /**< Class to store reconstructed particles. */
+    ClassDef(Particle, 9); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
+    // v9: added m_pdgCodeUsedForFit
 
     friend class ParticleSubset;
   };

@@ -35,10 +35,11 @@ namespace Belle2 {
        * @param moduleID TOP module ID
        * @param pixelID pixel ID
        * @param window storage window number (first window of waveform)
+       * @param storageDepth analog storage depth
        * @param generator pulse height generator
        * @param sampleTimes sample times
        */
-      TimeDigitizer(int moduleID, int pixelID, unsigned window,
+      TimeDigitizer(int moduleID, int pixelID, unsigned window, unsigned storageDepth,
                     const TOP::PulseHeightGenerator& generator,
                     const TOPSampleTimes& sampleTimes);
 
@@ -200,6 +201,7 @@ namespace Belle2 {
       int m_moduleID;         /**< module ID (1-based) */
       int m_pixelID;          /**< pixel (e.g. software channel) ID (1-based) */
       unsigned m_window = 0;  /**< storage window number */
+      unsigned m_storageDepth = 0;  /**< ASIC analog storage depth */
       TOP::PulseHeightGenerator m_pulseHeightGenerator; /**< pulse height generator */
       const TOPSampleTimes* m_sampleTimes = 0; /**< sample times */
 

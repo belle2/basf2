@@ -59,7 +59,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
         if fit_tracks:
             add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
-                                            additionalTrackFitHypotheses=additionalTrackFitHypotheses,
+                                            trackFitHypotheses=additionalTrackFitHypotheses,
                                             reco_tracks=reco_tracks)
 
 
@@ -161,7 +161,7 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use
                                 use_second_cdc_hits=use_second_cdc_hits)
 
 
-def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, additionalTrackFitHypotheses=None,
+def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, trackFitHypotheses=None,
                                     reco_tracks="RecoTracks"):
     """
     Helper function to add the modules performing the
@@ -179,8 +179,14 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, ad
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks).set_name(
         "Combined_DAFRecoFitter")
     # create Belle2 Tracks from the genfit Tracks
-    path.add_module('TrackCreator', defaultPDGCode=211, recoTrackColName=reco_tracks,
-                    additionalPDGCodes=[13, 321, 2212] if additionalTrackFitHypotheses is None else additionalTrackFitHypotheses)
+    # The following particle hypothesis will be fitted: Pion, Kaon and Proton
+    # Muon fit is working but gives very similar as the Pion due to the closeness of masses
+    # -> therefore not in the default fit list
+    # Electron fit has as systematic bias and therefore not done here. Therefore, pion fits
+    # will be used for electrons which gives a better result as GenFit's current electron
+    # implementation.
+    path.add_module('TrackCreator', recoTrackColName=reco_tracks,
+                    pdgCodes=[211, 321, 2212] if trackFitHypotheses is None else trackFitHypotheses)
     # V0 finding
     path.add_module('V0Finder', RecoTrackColName=reco_tracks)
 
@@ -267,6 +273,7 @@ def add_cdc_cr_track_fit_and_track_creator(path, components=None,
 
     # Create Belle2 Tracks from the genfit Tracks
     path.add_module('TrackCreator',
+                    pdgCodes=[13],
                     recoTrackColName=reco_tracks,
                     trackColName=tracks,
                     defaultPDGCode=13,
@@ -352,53 +359,80 @@ def add_track_finding(
     if not is_svd_used(components) and not is_cdc_used(components):
         return
 
+    use_pxd = is_pxd_used(components)
     use_svd = is_svd_used(components)
     use_cdc = is_cdc_used(components)
 
-    # if only CDC or VXD are used, the track finding result
-    # will be directly written to the final RecoTracks array
-    # because no merging is required
-
-    if use_cdc and use_svd:
-        cdc_reco_tracks = "CDCRecoTracks"
-        vxd_reco_tracks = "VXDRecoTracks"
-    else:
-        cdc_reco_tracks = reco_tracks
-        vxd_reco_tracks = reco_tracks
-
-    # CDC track finder
-    if use_cdc and trigger_mode in ["fast_reco", "all"]:
-        add_cdc_track_finding(path, reco_tracks=cdc_reco_tracks,
-                              use_second_hits=use_second_cdc_hits)
-
-    # VXD track finder
-    if use_svd and trigger_mode in ["hlt", "all"]:
-        if use_vxdtf2:
-            # version 2 of the track finder
-            add_vxd_track_finding_vxdtf2(
-                path, components=components, reco_tracks=vxd_reco_tracks)
+    if use_cdc:
+        if use_pxd or use_svd:
+            # we will later have to merge those, so we can not output into the final store array already
+            cdc_reco_tracks = "CDCRecoTracks"
         else:
-            # version 1 of the track finder
-            add_vxd_track_finding(
-                path, components=components, reco_tracks=vxd_reco_tracks)
+            # we are the only one, so we can just output into the final array
+            cdc_reco_tracks = reco_tracks
 
-        # track merging
-        if use_svd and use_cdc:
+        if trigger_mode in ["fast_reco", "all"]:
+            add_cdc_track_finding(path, reco_tracks=cdc_reco_tracks, use_second_hits=use_second_cdc_hits)
+
+    if use_svd:
+        if use_pxd or use_cdc:
+            # we will later have to merge those, so we can not output into the final store array already
+            svd_reco_tracks = "SVDRecoTracks"
+        else:
+            # we are the only one, so we can just output into the final array
+            svd_reco_tracks = reco_tracks
+
+        if trigger_mode in ["hlt", "all"]:
+            if use_vxdtf2:
+                # version 2 of the track finder
+                add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks)
+            else:
+                # version 1 of the track finder
+                add_vxd_track_finding(path, components=["SVD"], reco_tracks=svd_reco_tracks)
+
+    if use_svd and use_cdc:
+        if use_pxd or use_cdc:
+            # we will later have to merge those, so we can not output into the final store array already
+            svd_cdc_reco_tracks = "SVDCDCRecoTracks"
+        else:
+            # we are the only one, so we can just output into the final array
+            svd_cdc_reco_tracks = reco_tracks
+
+        if trigger_mode in ["hlt", "all"]:
             # Merge CDC and CXD tracks
             path.add_module('VXDCDCTrackMerger',
                             CDCRecoTrackColName=cdc_reco_tracks,
-                            VXDRecoTrackColName=vxd_reco_tracks)
+                            VXDRecoTrackColName=svd_reco_tracks)
 
-            path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=vxd_reco_tracks,
+            path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=svd_reco_tracks,
                             CDCRecoTracksStoreArrayName=cdc_reco_tracks,
-                            recoTracksStoreArrayName=reco_tracks)
+                            recoTracksStoreArrayName=svd_cdc_reco_tracks)
 
             # Prune the temporary products if requested
             if prune_temporary_tracks:
                 path.add_module('PruneRecoTracks',
                                 storeArrayName=cdc_reco_tracks)
                 path.add_module('PruneRecoTracks',
-                                storeArrayName=vxd_reco_tracks)
+                                storeArrayName=svd_reco_tracks)
+    else:
+        if use_cdc:
+            svd_cdc_reco_tracks = cdc_reco_tracks
+        else:
+            svd_cdc_reco_tracks = svd_reco_tracks
+
+    if use_pxd:
+        # Those can never be he final tracks
+        pxd_reco_tracks = "PXDRecoTracks"
+
+        if trigger_mode in ["all"]:
+            add_pxd_ckf(path, svd_cdc_reco_tracks=svd_cdc_reco_tracks, pxd_reco_tracks=pxd_reco_tracks)
+
+            path.add_module("RelatedTracksCombiner", CDCRecoTracksStoreArrayName=svd_cdc_reco_tracks,
+                            VXDRecoTracksStoreArrayName=pxd_reco_tracks, recoTracksStoreArrayName=reco_tracks)
+
+            if prune_temporary_tracks:
+                path.add_module('PruneRecoTracks',
+                                storeArrayName=pxd_reco_tracks)
 
 
 def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_second_cdc_hits=False):
@@ -420,7 +454,8 @@ def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_se
                         UseCDCHits=is_cdc_used(components))
 
 
-def add_ckf_based_track_finding(path, reco_tracks="RecoTracks",
+def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_before",
+                                reco_tracks="RecoTracks",
                                 cdc_reco_tracks="CDCRecoTracks",
                                 svd_reco_tracks="SVDRecoTracks",
                                 pxd_reco_tracks="PXDRecoTracks",
@@ -461,18 +496,33 @@ def add_ckf_based_track_finding(path, reco_tracks="RecoTracks",
     else:
         svd_cdc_reco_tracks = reco_tracks
 
-    add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks,
-                svd_reco_tracks=svd_reco_tracks, use_mc_truth=use_mc_truth)
+    if svd_ckf_mode == "VXDTF2_before":
+        temporary_vxd_track_cands = "__VXDTF2RecoTracks"
+        add_vxd_track_finding_vxdtf2(path, components=["SVD"],
+                                     reco_tracks=temporary_vxd_track_cands)
+        add_seeded_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks,
+                           temporary_vxd_track_cands=temporary_vxd_track_cands,
+                           svd_reco_tracks=svd_reco_tracks, use_mc_truth=use_mc_truth)
+        add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks,
+                    svd_reco_tracks=svd_reco_tracks, use_mc_truth=use_mc_truth)
 
-    if add_vxdtf2:
-        # Add the VXDTF2 only for SVD
-        add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks)
+        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_reco_tracks)
+    elif svd_ckf_mode == "VXDTF2_after":
+        add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks,
+                    svd_reco_tracks=svd_reco_tracks, use_mc_truth=use_mc_truth)
 
-        if add_merger:
-            # Add the merger for remaining CDC and newly found vxdtf2 tracks
-            path.add_module('VXDCDCTrackMerger',
-                            CDCRecoTrackColName=cdc_reco_tracks,
-                            VXDRecoTrackColName=svd_reco_tracks)
+        if add_vxdtf2:
+            # Add the VXDTF2 only for SVD
+            add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks,
+                                         sectormap_file="/storage/b/fs5-mirror/jowagner/masterthesis/muon_map.root")
+
+            if add_merger:
+                # Add the merger for remaining CDC and newly found vxdtf2 tracks
+                path.add_module('VXDCDCTrackMerger',
+                                CDCRecoTrackColName=cdc_reco_tracks,
+                                VXDRecoTrackColName=svd_reco_tracks)
+    else:
+        raise ValueError(f"Do not understand the svd_ckf_mode {svd_ckf_mode}")
 
     # Write out the combinations of tracks
     path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=svd_reco_tracks,
@@ -480,6 +530,11 @@ def add_ckf_based_track_finding(path, reco_tracks="RecoTracks",
                     recoTracksStoreArrayName=svd_cdc_reco_tracks)
 
     if is_pxd_used(components):
+        if use_mc_truth:
+            path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=True,
+                            mcRecoTracksStoreArrayName="MCRecoTracks",
+                            prRecoTracksStoreArrayName=svd_cdc_reco_tracks)
+
         add_pxd_ckf(path, svd_cdc_reco_tracks=svd_cdc_reco_tracks, pxd_reco_tracks=pxd_reco_tracks,
                     use_mc_truth=use_mc_truth)
 
@@ -487,66 +542,145 @@ def add_ckf_based_track_finding(path, reco_tracks="RecoTracks",
                         VXDRecoTracksStoreArrayName=pxd_reco_tracks, recoTracksStoreArrayName=reco_tracks)
 
 
-def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth,
-                overlap_cut=0.0, use_best_seeds=3, use_best_results=10):
+def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, filter_cut=0.005,
+                overlap_cut=0.0, use_best_seeds=10, use_best_results=1):
     """
     Convenience function to add the PXD ckf to the path.
     :param path: The path to add the module to
     :param svd_cdc_reco_tracks: The name of the already created SVD+CDC reco tracks
     :param pxd_reco_tracks: The name to output the PXD reco tracks to
     :param use_mc_truth: Use the MC information in the CKF
+    :param filter_cut: CKF parameter for MVA state filter
     :param overlap_cut: CKF parameter for MVA overlap filter
-    :param use_best_results: CKF parameter for useNResults
-    :param use_best_seeds: CKF parameter for useBestNInSeed
+    :param use_best_results: CKF parameter for useBestNInSeed
+    :param use_best_seeds: CKF parameter for UseNStates
     """
-    if "SpacePointCreatorPXD" not in path:
-        path.add_module("SpacePointCreatorPXD")
+    if "PXDClusterizer" not in path:
+        add_pxd_reconstruction(path)
 
+    if "PXDSpacePointCreator" not in path:
+        path.add_module("PXDSpacePointCreator")
+
+    # Then, add the CKF
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks)
+
     if use_mc_truth:
         module_parameters = dict(
             firstHighFilter="truth",
-            firstHighUseNResults=0,
-            secondHighFilter="truth",
-            secondHighUseNResults=0,
-            thirdHighFilter="truth",
-            thirdHighUseNResults=0,
 
-            maximalAllowedWrongHits=0,
-            enableOverlapTeacher=True,
-            filter="truth_teacher",
-            useBestNInSeed=1)
+            advanceHighFilter="advance",
 
+            secondHighFilter="all",
+
+            updateHighFilter="fit",
+
+            thirdHighFilter="all",
+
+            filter="truth",
+            useBestNInSeed=1
+        )
     else:
         module_parameters = dict(
-            firstHighFilter="pxd_simple",
-            firstHighUseNResults=use_best_results,
+            firstHighFilter="mva",
+            firstHighFilterParameters={"identifier": "tracking/data/ckf_ToPXDStateFilter_1.xml", "cut": filter_cut},
+            firstHighUseNStates=use_best_seeds,
 
-            secondHighFilter="pxd_simple",
-            secondHighUseNResults=use_best_results,
+            advanceHighFilter="advance",
 
-            thirdHighFilter="pxd_simple",
-            thirdHighUseNResults=use_best_results,
+
+            secondHighFilter="mva",
+            secondHighFilterParameters={"identifier": "tracking/data/ckf_ToPXDStateFilter_2.xml", "cut": filter_cut},
+            secondHighUseNStates=use_best_seeds,
+
+            updateHighFilter="fit",
+
+
+            thirdHighFilter="mva",
+            thirdHighFilterParameters={"identifier": "tracking/data/ckf_ToPXDStateFilter_3.xml", "cut": filter_cut},
+            thirdHighUseNStates=use_best_seeds,
 
             filter="mva",
             filterParameters={"cut": overlap_cut, "identifier": "tracking/data/ckf_PXDTrackCombination.xml"},
-            useBestNInSeed=use_best_seeds)
+            useBestNInSeed=use_best_results,
+        )
 
-    path.add_module("PXDSpacePointCKF",
-                    allowOverlapBetweenSeeds=True,
-                    advanceUseMaterialEffects=False,
-                    enableOverlapResolving=True,
+    path.add_module("ToPXDCKF",
+                    minimalPtRequirement=0,
 
-                    advanceUseCaching=True,
-                    exportTracks=True,
+                    useAssignedHits=False,
 
                     inputRecoTrackStoreArrayName=svd_cdc_reco_tracks,
                     outputRecoTrackStoreArrayName=pxd_reco_tracks,
+                    hitFilter="distance",
+                    seedFilter="distance",
+
+                    enableOverlapResolving=True,
+
+                    **module_parameters)
+
+
+def add_seeded_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth, temporary_vxd_track_cands,
+                       filter_cut=0.1):
+    """
+    Convenience function to add the SVD ckf to the path.
+    :param path: The path to add the module to
+    :param cdc_reco_tracks: The name of the already created CDC reco tracks
+    :param svd_reco_tracks: The name to output the SVD reco tracks to
+    :param use_mc_truth: Use the MC information in the CKF
+    :param filter_cut: CKF parameter for MVA filter
+    """
+
+    if "SVDSpacePointCreator" not in path:
+        path.add_module("SVDSpacePointCreator")
+
+    # Then, add the CKF
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
+
+    if use_mc_truth:
+        module_parameters = dict(
+            firstHighFilter="truth",
+
+            advanceHighFilter="advance",
+
+            secondHighFilter="all",
+
+            updateHighFilter="fit",
+
+            thirdHighFilter="all",
+        )
+
+    else:
+        module_parameters = dict(
+            firstHighFilter="mva",
+            firstHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDSeededStateFilter_1.xml", "cut": filter_cut},
+
+            advanceHighFilter="advance",
+
+            secondHighFilter="mva",
+            secondHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDSeededStateFilter_2.xml", "cut": filter_cut},
+
+            updateHighFilter="fit",
+
+            thirdHighFilter="mva",
+            thirdHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDSeededStateFilter_3.xml", "cut": filter_cut},
+        )
+
+    path.add_module("CDCToSVDSeedCKF",
+                    minimalPtRequirement=0,
+
+                    inputRecoTrackStoreArrayName=cdc_reco_tracks,
+                    outputRecoTrackStoreArrayName=svd_reco_tracks,
+                    temporaryVXDTracksStoreArrayName=temporary_vxd_track_cands,
+
+                    hitFilter="seeded",
+                    hitFilterParameters={"vxdTracksStoreArrayName": temporary_vxd_track_cands},
+                    seedFilter="distance",
+
                     **module_parameters)
 
 
 def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
-                filter_cut=0.1, overlap_cut=0.0, use_best_results=3, use_best_seeds=2):
+                filter_cut=0.1, overlap_cut=0.0, use_best_results=3, use_best_seeds=5):
     """
     Convenience function to add the SVD ckf to the path.
     :param path: The path to add the module to
@@ -559,53 +693,63 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
     :param use_best_seeds: CKF parameter for useBestNInSeed
     """
 
-    if "SpacePointCreatorSVD" not in path:
-        path.add_module("SpacePointCreatorSVD")
+    if "SVDSpacePointCreator" not in path:
+        path.add_module("SVDSpacePointCreator")
 
     # Then, add the CKF
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
+
     if use_mc_truth:
         module_parameters = dict(
             firstHighFilter="truth",
-            firstHighUseNResults=0,
-            secondHighFilter="truth",
-            secondHighUseNResults=0,
-            thirdHighFilter="truth",
-            thirdHighUseNResults=0,
 
-            maximalAllowedWrongHits=0,
-            enableOverlapTeacher=True,
-            filter="truth_teacher",
-            useBestNInSeed=1)
+            advanceHighFilter="advance",
 
+            secondHighFilter="all",
+
+            updateHighFilter="fit",
+
+            thirdHighFilter="all",
+
+            filter="truth",
+            useBestNInSeed=1
+        )
     else:
         module_parameters = dict(
             firstHighFilter="mva",
-            firstHighUseNResults=use_best_results,
-            firstHighFilterParameters={"cut": filter_cut, "identifier": "tracking/data/ckf_CDCSVDStateFilter_1.xml"},
+            firstHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDStateFilter_1.xml", "cut": filter_cut},
+            firstHighUseNStates=use_best_seeds,
+
+            advanceHighFilter="advance",
 
             secondHighFilter="mva",
-            secondHighUseNResults=use_best_results,
-            secondHighFilterParameters={"cut": filter_cut, "identifier": "tracking/data/ckf_CDCSVDStateFilter_2.xml"},
+            secondHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDStateFilter_2.xml", "cut": filter_cut},
+            secondHighUseNStates=use_best_seeds,
+
+            updateHighFilter="fit",
 
             thirdHighFilter="mva",
-            thirdHighUseNResults=use_best_results,
-            thirdHighFilterParameters={"cut": filter_cut, "identifier": "tracking/data/ckf_CDCSVDStateFilter_3.xml"},
+            thirdHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDStateFilter_3.xml", "cut": filter_cut},
+            thirdHighUseNStates=use_best_seeds,
 
             filter="mva",
-            filterParameters={"cut": overlap_cut},
-            useBestNInSeed=use_best_seeds)
+            filterParameters={"cut": overlap_cut, "identifier": "tracking/data/ckf_CDCToSVDResult.xml"},
+            useBestNInSeed=use_best_results,
+        )
 
     path.add_module("CDCToSVDSpacePointCKF",
                     minimalPtRequirement=0,
-                    minimalHitRequirement=0,
+                    minimalHitRequirement=1,
 
-                    allowOverlapBetweenSeeds=True,
-                    advanceUseMaterialEffects=False,
-                    enableOverlapResolving=True,
+                    useAssignedHits=False,
 
                     inputRecoTrackStoreArrayName=cdc_reco_tracks,
                     outputRecoTrackStoreArrayName=svd_reco_tracks,
+                    hitFilter="sensor",
+                    seedFilter="distance",
+
+                    enableOverlapResolving=False,
+
                     **module_parameters)
 
 

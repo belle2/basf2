@@ -229,10 +229,11 @@ namespace Belle2 {
       // if we don't use the DB make sure the magnetic field is properly set
       // by adding it as a fake database payload
       BFieldMap::Instance().clear();
-      MagneticField* fieldmap = new MagneticField();
-      fieldmap->addComponent(new BFieldFrameworkInterface());
-      BFieldMap::Instance().initialize();
-      DBStore::Instance().addConstantOverride("MagneticField", fieldmap, false);
+      if (!useDB) {
+        MagneticField* fieldmap = new MagneticField();
+        fieldmap->addComponent(new BFieldFrameworkInterface());
+        DBStore::Instance().addConstantOverride("MagneticField", fieldmap, false);
+      }
 
       //Let Geant4 know that we "modified" the geometry
       G4RunManager* runManager = G4RunManager::GetRunManager();

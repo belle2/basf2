@@ -31,9 +31,9 @@ namespace Belle2 {
     void prepareSelector(unsigned short nFamilies)
     {
       m_bestPaths.clear();
-      m_familyIndex.clear();
+      m_familyToIndex.clear();
       m_bestPaths.reserve(nFamilies);
-      m_familyIndex.resize(nFamilies, -1);
+      m_familyToIndex.resize(nFamilies, -1);
 
       m_current_index = 0;
     }
@@ -44,14 +44,14 @@ namespace Belle2 {
       auto qi = m_estimator->estimateQuality(sptc.getSortedHits());
       short family = sptc.getFamily();
 
-      if (m_familyIndex.at(family) == -1) {
-        m_familyIndex.at(family) = m_current_index;
+      if (m_familyToIndex.at(family) == -1) {
+        m_familyToIndex.at(family) = m_current_index;
         sptc.setQualityIndex(qi);
         m_bestPaths.push_back(sptc);
         m_current_index++;
-      } else if (qi > m_bestPaths.at(m_familyIndex[family]).getQualityIndex()) {
+      } else if (qi > m_bestPaths.at(m_familyToIndex[family]).getQualityIndex()) {
         sptc.setQualityIndex(qi);
-        m_bestPaths.at(m_familyIndex[family]) = sptc;
+        m_bestPaths.at(m_familyToIndex[family]) = sptc;
       }
     }
 
@@ -70,7 +70,7 @@ namespace Belle2 {
     std::vector<SpacePointTrackCand> m_bestPaths;
 
     /** Map of family number to respective index for m_bestPaths */
-    std::vector<short> m_familyIndex;
+    std::vector<short> m_familyToIndex;
 
     /** Counter for current index which is increased each time a family is seen for the first time. */
     unsigned short m_current_index = 0;

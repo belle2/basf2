@@ -33,9 +33,9 @@ namespace Belle2 {
     void prepareSelector(unsigned short nFamilies)
     {
       m_bestPaths.clear();
-      m_familyIndex.clear();
+      m_familyToIndex.clear();
       m_bestPaths.reserve(nFamilies);
-      m_familyIndex.resize(nFamilies, -1);
+      m_familyToIndex.resize(nFamilies, -1);
 
       m_current_index = 0;
     }
@@ -48,22 +48,22 @@ namespace Belle2 {
       auto qi = m_estimator->estimateQuality(sptc.getSortedHits());
       short family = sptc.getFamily();
 
-      if (m_familyIndex.at(family) == -1) {
+      if (m_familyToIndex.at(family) == -1) {
         B2DEBUG(100, "Setting index to " << m_current_index << " for family " << family << " and adding sptc with qi of " << qi);
-        m_familyIndex.at(family) = m_current_index;
+        m_familyToIndex.at(family) = m_current_index;
         m_bestPaths.push_back(std::vector<SpacePointTrackCand>(1));
         sptc.setQualityIndex(qi);
-        m_bestPaths.at(m_familyIndex[family]).at(0) = sptc;
+        m_bestPaths.at(m_familyToIndex[family]).at(0) = sptc;
         m_current_index++;
-      } else if (m_bestPaths.at(m_familyIndex[family]).size() < m_xBest) {
+      } else if (m_bestPaths.at(m_familyToIndex[family]).size() < m_xBest) {
         B2DEBUG(100, "Adding new sptc with qi " << qi << " without check, as max lenght not reached, yet...");
         sptc.setQualityIndex(qi);
-        insert(m_bestPaths.at(m_familyIndex[family]), sptc);
-      } else if (qi > m_bestPaths.at(m_familyIndex[family]).back().getQualityIndex()) {
+        insertSortedByQI(m_bestPaths.at(m_familyToIndex[family]), sptc);
+      } else if (qi > m_bestPaths.at(m_familyToIndex[family]).back().getQualityIndex()) {
         B2DEBUG(100, "Adding new sptc with qi " << qi << " and throwing out last entry of vector...");
         sptc.setQualityIndex(qi);
-        insert(m_bestPaths.at(m_familyIndex[family]), sptc);
-        m_bestPaths.at(m_familyIndex[family]).pop_back();
+        insertSortedByQI(m_bestPaths.at(m_familyToIndex[family]), sptc);
+        m_bestPaths.at(m_familyToIndex[family]).pop_back();
       }
     }
 
@@ -87,7 +87,7 @@ namespace Belle2 {
   private:
 
     /** Function to insert SPTCs into a vector of SPTC while preserving an order by descending quality indices. */
-    void insert(std::vector<SpacePointTrackCand>& paths, SpacePointTrackCand sptc)
+    void insertSortedByQI(std::vector<SpacePointTrackCand>& paths, SpacePointTrackCand sptc)
     {
       /// Determine position of new SPTC in sorted SPTC vector to keep it sorted
       std::vector<SpacePointTrackCand>::iterator it = std::lower_bound(paths.begin(), paths.end(), sptc,
@@ -106,7 +106,7 @@ namespace Belle2 {
     std::vector<std::vector<SpacePointTrackCand>> m_bestPaths;
 
     /** Map of family number to respective index for m_bestPaths */
-    std::vector<short> m_familyIndex;
+    std::vector<short> m_familyToIndex;
 
     /** Counter for current index which is increased each time a family is seen for the first time. */
     unsigned short m_current_index = 0;

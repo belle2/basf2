@@ -71,7 +71,7 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
             path.add_module(fitter)
 
         if clusterizerName not in [e.name() for e in path.modules()]:
-            clusterizer = register_module('SVDSimpleClusterizer')
+            clusterizer = register_module('SVDNNClusterizer')
             clusterizer.set_name(clusterizerName)
             clusterizer.param('Clusters', clusterName)
             path.add_module(clusterizer)
@@ -85,7 +85,7 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False):
         clusterName = '__ROIsvdClusters'
     else:
         fitterName = 'SVDCoGTimeEstimator'
-        clusterizerName = 'SVDClusterizer'
+        clusterizerName = 'SVDSimpleClusterizer'
         clusterName = ""
 
     if fitterName not in [e.name() for e in path.modules()]:
@@ -103,5 +103,5 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False):
 def add_svd_simulation(path):
 
     digitizer = register_module('SVDDigitizer')
-    # digitizer.param('GenerateShaperDigits', True)
+    digitizer.param('GenerateShaperDigits', True)
     path.add_module(digitizer)

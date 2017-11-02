@@ -181,6 +181,9 @@ namespace Belle2 {
     curl_easy_setopt(m_session->curl, CURLOPT_XFERINFODATA, m_session.get());
     curl_easy_setopt(m_session->curl, CURLOPT_FAILONERROR, true);
     curl_easy_setopt(m_session->curl, CURLOPT_ERRORBUFFER, m_session->errbuf);
+    // Set proxy if defined
+    const char* proxy = std::getenv("BELLE2_CONDB_PROXY");
+    if (proxy) curl_easy_setopt(m_session->curl, CURLOPT_PROXY, proxy);
     return true;
   }
 

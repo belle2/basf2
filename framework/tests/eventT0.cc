@@ -1,3 +1,4 @@
+
 #include <framework/dataobjects/EventT0.h>
 #include <cmath>
 #include <gtest/gtest.h>
@@ -65,5 +66,30 @@ namespace {
 
     ASSERT_TRUE(t0.hasEventT0(Const::PXD));
     ASSERT_TRUE(t0.hasEventT0(Const::CDC));
+  }
+
+  /** Testing to override and remove existing t0 measurements*/
+  TEST(EventT0, AddingRemoving)
+  {
+    EventT0 t0;
+
+    ASSERT_EQ(t0.getDetectors().size(), 0);
+
+    // Add a first event t0
+    t0.addEventT0(2, 1, Const::CDC);
+
+    ASSERT_EQ(t0.getDetectors().size(), 1);
+
+    // Add a new ECL info and overwrite the CDC information
+    t0.addEventT0(10, 2, Const::ECL);
+    t0.addEventT0(10, 2, Const::CDC);
+
+    auto extractedT0 = t0.getEventT0WithUncertainty();
+    ASSERT_EQ(t0.getDetectors().size(), 2);
+    ASSERT_EQ(extractedT0.first, 10);
+
+    t0.removeEventT0(Const::CDC);
+    ASSERT_EQ(t0.getDetectors().size(), 1);
+    ASSERT_FALSE(t0.hasEventT0(Const::CDC));
   }
 }

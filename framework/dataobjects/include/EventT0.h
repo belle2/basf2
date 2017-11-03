@@ -175,15 +175,19 @@ namespace Belle2 {
       return m_eventT0List.empty();
     }
 
-    /// Add another double T0 estimation.
+    /// Add another double T0 estimation. This will override an existing t0 estimation
+    // of the same detector
     void addEventT0(double eventT0, double eventT0Uncertainty, Const::EDetector detector)
     {
+      removeEventT0(detector);
       m_eventT0List.emplace_back(IntOrDouble(eventT0, eventT0Uncertainty * eventT0Uncertainty), detector);
     }
 
-    /// Add another int T0 estimation.
+    /// Add another int T0 estimation. This will override an existing t0 estimation
+    // of the same detector
     void addEventT0(int eventT0, Const::EDetector detector)
     {
+      removeEventT0(detector);
       m_eventT0List.emplace_back(IntOrDouble(eventT0), detector);
     }
 
@@ -202,7 +206,18 @@ namespace Belle2 {
       m_eventT0List.clear();
     }
 
+    /// remove the t0 estimation of one sub-detector. Is useful when the estimate of one
+    // detector gets updated with a refined method later in the reconstruction path.
+    void removeEventT0(Const::EDetector detector)
+    {
+      const auto hasThisDetector = [detector](EventT0Component const & c) {return c.detector == detector;};
+      m_eventT0List.erase(std::remove_if(m_eventT0List.begin(),
+                                         m_eventT0List.end(), hasThisDetector),
+                          m_eventT0List.end());
+    }
+
   private:
+
     /// Internal storage of the event t0 list.
     std::vector<EventT0Component> m_eventT0List;
 

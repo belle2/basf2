@@ -8,50 +8,60 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <ecl/modules/eclEventT0/eclEventT0Module.h>
+#include <ecl/modules/eclEventT0/ECLEventT0Module.h>
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <framework/dataobjects/EventT0.h>
+#include <framework/gearbox/Const.h>
+#include <framework/datastore/StoreObjPtr.h>
+
 
 using namespace Belle2;
 using namespace ECL;
 using namespace std;
 
-int iEvent = 0;
-
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(eclEventT0)
+REG_MODULE(ECLEventT0)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-eclEventT0Module::eclEventT0Module() : Module()
+ECLEventT0Module::ECLEventT0Module() : Module()
 {
   // Set module properties
   setDescription("EventT0 calculated using ECLCalDigits");
+  addParam("isolationDr2", m_isolationDr2, "Miniumum distance squared between digits", 900.);
+  addParam("ethresh", m_ethresh, "Minimum energy for a CalDigit to be used", 0.1);
+  addParam("stdDevNom", m_stdDevNom, "Nominal time resolution ns for a CalDigit with E=ethresh", 20.);
+  addParam("stdDevLarge", m_stdDevLarge, "Reported resolution for events with 0 or 1 selected CalDigits", 1000.);
 
   // Parameter definitions
 
 }
 
-void eclEventT0Module::initialize()
+void ECLEventT0Module::initialize()
 {
 
-  //..ECL geometry
+  /** Register the data object */
+  StoreObjPtr<EventT0> eventT0("EventT0");
+  eventT0.registerInDataStore("EventT0");
+
+  /** ECL geometry */
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();
+  m_xcrys.resize(8736);
+  m_ycrys.resize(8736);
+  m_zcrys.resize(8736);
   for (int crysID = 0; crysID < 8736; crysID++) {
     TVector3 CellPosition = eclp->GetCrystalPos(crysID);
-    m_xcrys.push_back(CellPosition.X());
-    m_ycrys.push_back(CellPosition.Y());
-    m_zcrys.push_back(CellPosition.Z());
+    m_xcrys[crysID] = CellPosition.X();
+    m_ycrys[crysID] = CellPosition.Y();
+    m_zcrys[crysID] = CellPosition.Z();
   }
 }
 
-void eclEventT0Module::event()
+void ECLEventT0Module::event()
 {
-  iEvent++;
   //-----------------------------------------------------------------
   /** Record indices of ECLCalDigits above threshold */
   std::vector<int> iabove;
@@ -78,8 +88,8 @@ void eclEventT0Module::event()
     eMax = 0.;
     int idigitMax = -1;
     for (int ia = 0; ia < nAbove; ia++) {
-      int idig = iabove[ia];
-      float denergy = m_eclCalDigitArray[idig]->getEnergy();
+      const int idig = iabove[ia];
+      const float denergy = m_eclCalDigitArray[idig]->getEnergy();
       if (dveto[ia] != 1 && denergy > eMax) {
         eMax = denergy;
         idigitMax = idig;
@@ -88,37 +98,37 @@ void eclEventT0Module::event()
 
     /** Record the maximum energy digit, if there is one */
     if (eMax > 0.) {
-      float denergy = m_eclCalDigitArray[idigitMax]->getEnergy();
-      float dtime = m_eclCalDigitArray[idigitMax]->getTime();
+      const float denergy = m_eclCalDigitArray[idigitMax]->getEnergy();
+      const float dtime = m_eclCalDigitArray[idigitMax]->getTime();
       digitE.push_back(denergy);
       digitT.push_back(dtime);
       weight.push_back(denergy * denergy);
       weightedT.push_back(denergy * denergy * dtime);
 
       /** Mark all of the digits close to this one (including itself) */
-      int id0 = m_eclCalDigitArray[idigitMax]->getCellId() - 1;
-      float x0 = m_xcrys[id0];
-      float y0 = m_ycrys[id0];
-      float z0 = m_zcrys[id0];
+      const int id0 = m_eclCalDigitArray[idigitMax]->getCellId() - 1;
+      const float x0 = m_xcrys[id0];
+      const float y0 = m_ycrys[id0];
+      const float z0 = m_zcrys[id0];
       for (int ia = 0; ia < nAbove; ia++) {
         if (dveto[ia] != 1) {
-          int idig = iabove[ia];
-          int id1 = m_eclCalDigitArray[idig]->getCellId() - 1;
-          float x1 = m_xcrys[id1];
-          float y1 = m_ycrys[id1];
-          float z1 = m_zcrys[id1];
-          float dr2 = (x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0) + (z1 - z0) * (z1 - z0);
+          const int idig = iabove[ia];
+          const int id1 = m_eclCalDigitArray[idig]->getCellId() - 1;
+          const float x1 = m_xcrys[id1];
+          const float y1 = m_ycrys[id1];
+          const float z1 = m_zcrys[id1];
+          const float dr2 = (x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0) + (z1 - z0) * (z1 - z0);
           if (dr2 < m_isolationDr2) {dveto[ia] = 1;}
         }
       }
     }
   } while (eMax > 0.);
-  int nIsolated = digitT.size();
+  const int nIsolated = digitT.size();
 
   //-----------------------------------------------------------------
   /** Locate and label digits that are outliers in time */
   std::vector<bool> isNotAnOutlier(nIsolated, true);
-  int noutlier = nIsolated / 3;
+  const int noutlier = nIsolated / 3;
 
   /** See which digit is the farthest from the average of the others.
    Repeat this "noutlier" times. */
@@ -195,8 +205,9 @@ void eclEventT0Module::event()
   /** Pick the larger of the two possible uncertainties, and upload */
   double T0Unc = WeightedUnc;
   if (stdDevAllBut1 > T0Unc) {T0Unc = stdDevAllBut1;}
-  EventT0 eclT0;
-  eclT0.addEventT0(T0, T0Unc, m_eclID);
+  StoreObjPtr<EventT0> eventT0("EventT0");
+  if (!eventT0) {eventT0.create();}
+  eventT0->addEventT0(T0, T0Unc, Const::ECL);
 }
 
 

@@ -687,7 +687,7 @@ void SVDDigitizerModule::saveDigits()
   const double bunchTimeSep = 2 * 1.96516; //in ns
   const int bunchXingsInAPVclock = 8; //m_samplingTime/bunchTimeSep;
   int bunchXingsSinceAPVstart = gRandom->Integer(bunchXingsInAPVclock);
-  double initTime = m_startSampling + bunchTimeSep * bunchXingsSinceAPVstart;
+  double initTime = m_startSampling - bunchTimeSep * bunchXingsSinceAPVstart;
 
   // ... to store digit-digit relations
   vector<pair<unsigned int, float> > digit_weights;

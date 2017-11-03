@@ -25,7 +25,11 @@ namespace Belle2 {
 
   public:
 
-    /// Constructor
+    /** Constructor
+     * for the selection of the x best candidates for each family based on the quality index.
+     * @param xBest Maximal number of best candidates to be stored per family.
+     * @param estimationMethod Quality estimator to be used.
+     */
     SPTCSelectorXBestPerFamily(unsigned short xBest = 5, std::string estimationMethod = std::string("tripletFit")):
       m_xBest(xBest)
     {
@@ -38,12 +42,17 @@ namespace Belle2 {
       } else if (estimationMethod == "random") {
         m_estimator = std::make_unique<QualityEstimatorRandom>();
       }
+      B2ASSERT("QualityEstimator could not be initialized with method: " << estimationMethod, m_estimator);
     };
 
     /// Destructor
     ~SPTCSelectorXBestPerFamily() = default;
 
-    /** Preparation of Best Candidate Selector by resetting the vectors. */
+    /** Preparation of Best Candidate Selector by resetting the vectors.
+     * To be executed at the beginning of a new event after the families are defined to reset the respective vectors
+     * and set them up under consideration of the number of families in the event.
+     * @param nFamilies Number of families in the event.
+     */
     void prepareSelector(unsigned short nFamilies)
     {
       m_bestPaths.clear();
@@ -55,42 +64,42 @@ namespace Belle2 {
     }
 
     /** Test new SPTC if it is better than the least best of the current x best SPTCs of its respective family.
-     *  If so, the least best is thrown out, and the new is added to the sorted x best SPTC vector.
-     *  If the maximal number of best SPTCs is not reached for the family, yet, the SPTC is just added at the right place.*/
+     *  If so, the least best is thrown out, and the new is added to the sorted x best SPTC multiset of the family.
+     *  If the maximal number of best SPTCs is not reached for the family, yet, the SPTC is just added at the right place.
+     *  @param sptc SpacePointTrackCandidate to be evaluated for adding.
+     */
     void testNewSPTC(SpacePointTrackCand& sptc)
     {
       sptc.setQualityIndex(m_estimator->estimateQuality(sptc.getSortedHits()));
       short family = sptc.getFamily();
 
       if (m_familyToIndex.at(family) == -1) {
-        //      B2DEBUG(100, "Setting index to " << m_currentIndex << " for family " << family << " and adding sptc with qi of " << qi);
+        m_bestPaths.emplace_back(std::multiset<SpacePointTrackCand> { sptc });
         m_familyToIndex.at(family) = m_currentIndex;
-        m_bestPaths.emplace_back(std::vector<SpacePointTrackCand> { sptc });
         m_currentIndex++;
         return;
       }
 
-      if (m_bestPaths.at(m_familyToIndex[family]).size() == m_xBest) {
-        if (sptc.getQualityIndex() < m_bestPaths.at(m_familyToIndex[family]).back().getQualityIndex()) {
+      auto& currentSet = m_bestPaths.at(m_familyToIndex[family]);
+
+      if (currentSet.size() == m_xBest) {
+        std::multiset<SpacePointTrackCand>::iterator iter = currentSet.begin();
+        if (sptc.getQualityIndex() < iter->getQualityIndex()) {
           return;
         }
-        m_bestPaths.at(m_familyToIndex[family]).pop_back();
+        currentSet.erase(iter);
       }
-      std::vector<SpacePointTrackCand>::iterator it = std::lower_bound(m_bestPaths.at(m_familyToIndex[family]).begin(),
-                                                      m_bestPaths.at(m_familyToIndex[family]).end(),
-      sptc, [](const SpacePointTrackCand & lhs, const SpacePointTrackCand & rhs) {
-        return lhs.getQualityIndex() > rhs.getQualityIndex();
-      });
-      /// Insert befor iterator it
-      m_bestPaths.at(m_familyToIndex[family]).insert(it, sptc);
+      currentSet.emplace_hint(currentSet.cbegin(), sptc);
     }
 
-    /** Return vector containing the best SPTCs; maximal m_xBest per family. */
+    /** Return vector containing the best SPTCs; maximal m_xBest per family.
+     * @returns One vector containing the best SPTC candidates for the whole event.
+     */
     std::vector<SpacePointTrackCand> returnSelection() const
     {
       std::vector<SpacePointTrackCand> jointBestPaths;
       jointBestPaths.reserve(std::accumulate(m_bestPaths.begin(), m_bestPaths.end(), 0,
-      [](int a, std::vector<SpacePointTrackCand> b) { return a + b.size(); }));
+      [](int a, auto b) { return a + b.size(); }));
 
       for (auto && set : m_bestPaths) {
         jointBestPaths.insert(jointBestPaths.end(), set.begin(), set.end());
@@ -99,7 +108,9 @@ namespace Belle2 {
       return jointBestPaths;
     }
 
-    /** Setting magnetic field for the quality estimator. */
+    /** Setting magnetic field for the quality estimator.
+     * @param bFieldZ Magnetic Field value to be used for the Quality Estimation.
+     */
     void setMagneticFieldForQE(double bFieldZ)
     {
       m_estimator->setMagneticFieldStrength(bFieldZ);
@@ -111,7 +122,7 @@ namespace Belle2 {
     std::unique_ptr<QualityEstimatorBase> m_estimator;
 
     /** Vector containing one vector of the best SPTCs per family. */
-    std::vector<std::vector<SpacePointTrackCand>> m_bestPaths;
+    std::vector<std::multiset<SpacePointTrackCand> > m_bestPaths;
 
     /** Map of family number to respective index for m_bestPaths */
     std::vector<short> m_familyToIndex;

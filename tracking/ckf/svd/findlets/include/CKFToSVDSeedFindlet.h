@@ -14,18 +14,13 @@
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
-#include <tracking/ckf/general/findlets/SpacePointTagger.dcl.h>
 #include <tracking/ckf/general/findlets/CKFDataHandler.dcl.h>
 #include <tracking/ckf/general/findlets/StateCreator.dcl.h>
-#include <tracking/ckf/general/findlets/CKFRelationCreator.dcl.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.dcl.h>
-#include <tracking/ckf/general/findlets/OverlapResolver.dcl.h>
 #include <tracking/ckf/svd/findlets/SVDStateRejecter.h>
-#include <tracking/ckf/svd/findlets/UnusedVXDTracksAdder.h>
 #include <tracking/ckf/svd/findlets/SpacePointLoader.h>
 
-#include <tracking/ckf/svd/filters/relations/ChooseableSVDRelationFilter.h>
-#include <tracking/ckf/svd/filters/results/WeightSVDResultFilter.h>
+#include <tracking/ckf/svd/filters/relations/SVDPairFilterFactory.h>
 
 namespace Belle2 {
   class RecoTrack;
@@ -49,7 +44,7 @@ namespace Belle2 {
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
-    /// Do the track/hit finding/merging.
+    /// Do the track/hit finding/merging.ver
     void apply() override;
 
     /// Clear the object pools
@@ -65,16 +60,8 @@ namespace Belle2 {
     StateCreator<RecoTrack, CKFToSVDState> m_stateCreatorFromTracks;
     /// Findlet for creating states out of hits
     StateCreator<const SpacePoint, CKFToSVDState> m_stateCreatorFromHits;
-    /// Findlet for creating relations between states
-    CKFRelationCreator<CKFToSVDState, ChooseableSVDRelationFilter> m_relationCreator;
     /// Findlet doing the main work: the tree finding
     TreeSearcher<CKFToSVDState, SVDStateRejecter, CKFToSVDResult> m_treeSearchFindlet;
-    /// Findlet for resolving overlaps
-    OverlapResolver<WeightSVDResultFilter> m_overlapResolver;
-    /// Findlet for adding unused VXDTF2 results
-    UnusedVXDTracksAdder m_unusedTracksAdder;
-    /// Findlet for tagging the used space points
-    SpacePointTagger<CKFToSVDResult, SVDCluster> m_spacePointTagger;
 
     // Object pools
     /// Pointers to the CDC Reco tracks as a vector
@@ -89,7 +76,8 @@ namespace Belle2 {
     std::vector<TrackFindingCDC::WeightedRelation<CKFToSVDState>> m_relations;
     /// Vector for storing the results
     std::vector<CKFToSVDResult> m_results;
-    /// Vector for storing the filtered results
-    std::vector<CKFToSVDResult> m_filteredResults;
+
+    // Parameters
+    std::string m_param_vxdTracksStoreArrayName = "VXDRecoTracks";
   };
 }

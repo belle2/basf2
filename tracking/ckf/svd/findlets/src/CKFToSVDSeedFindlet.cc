@@ -10,12 +10,9 @@
 
 #include <tracking/ckf/svd/findlets/CKFToSVDSeedFindlet.h>
 
-#include <tracking/ckf/general/findlets/SpacePointTagger.icc.h>
 #include <tracking/ckf/general/findlets/CKFDataHandler.icc.h>
 #include <tracking/ckf/general/findlets/StateCreator.icc.h>
-#include <tracking/ckf/general/findlets/CKFRelationCreator.icc.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.icc.h>
-#include <tracking/ckf/general/findlets/OverlapResolver.icc.h>
 #include <tracking/ckf/general/findlets/StateRejecter.icc.h>
 #include <tracking/ckf/general/findlets/OnStateApplier.icc.h>
 #include <tracking/ckf/general/findlets/LimitedOnStateApplier.icc.h>
@@ -23,13 +20,14 @@
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
-#include <tracking/ckf/svd/filters/relations/LayerSVDRelationFilter.icc.h>
+#include <tracking/trackFindingCDC/utilities/ReversedRange.h>
+#include <tracking/trackFindingCDC/collectors/selectors/BestMatchSelector.h>
+
+#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 #include <framework/core/ModuleParamList.dcl.h>
 
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
-
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -42,11 +40,7 @@ CKFToSVDSeedFindlet::CKFToSVDSeedFindlet()
   addProcessingSignalListener(&m_hitsLoader);
   addProcessingSignalListener(&m_stateCreatorFromTracks);
   addProcessingSignalListener(&m_stateCreatorFromHits);
-  addProcessingSignalListener(&m_relationCreator);
   addProcessingSignalListener(&m_treeSearchFindlet);
-  addProcessingSignalListener(&m_overlapResolver);
-  addProcessingSignalListener(&m_unusedTracksAdder);
-  addProcessingSignalListener(&m_spacePointTagger);
 }
 
 void CKFToSVDSeedFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -57,11 +51,11 @@ void CKFToSVDSeedFindlet::exposeParameters(ModuleParamList* moduleParamList, con
   m_hitsLoader.exposeParameters(moduleParamList, prefix);
   m_stateCreatorFromTracks.exposeParameters(moduleParamList, prefix);
   m_stateCreatorFromHits.exposeParameters(moduleParamList, prefix);
-  m_relationCreator.exposeParameters(moduleParamList, prefix);
   m_treeSearchFindlet.exposeParameters(moduleParamList, prefix);
-  m_overlapResolver.exposeParameters(moduleParamList, prefix);
-  m_unusedTracksAdder.exposeParameters(moduleParamList, prefix);
-  m_spacePointTagger.exposeParameters(moduleParamList, prefix);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "vxdTracksStoreArrayName"), m_param_vxdTracksStoreArrayName,
+                                "Store Array name coming from VXDTF2.", m_param_vxdTracksStoreArrayName);
+
 }
 
 void CKFToSVDSeedFindlet::beginEvent()
@@ -86,7 +80,45 @@ void CKFToSVDSeedFindlet::apply()
 
   m_stateCreatorFromTracks.apply(m_cdcRecoTrackVector, m_seedStates);
   m_stateCreatorFromHits.apply(m_spacePointVector, m_states);
-  m_relationCreator.apply(m_seedStates, m_states, m_relations);
+
+  StoreArray<RecoTrack> vxdRecoTracks(m_param_vxdTracksStoreArrayName);
+
+  for (const RecoTrack& vxdRecoTrack : vxdRecoTracks) {
+    CKFToSVDState* currentState = nullptr;
+
+    // TODO: can this be done better?
+    const SpacePointTrackCand* spacePointTrackCand = vxdRecoTrack.getRelated<SpacePointTrackCand>("SPTrackCands");
+
+    B2ASSERT("There should be a related SPTC!", spacePointTrackCand);
+    const std::vector<const SpacePoint*> spacePoints = spacePointTrackCand->getSortedHits();
+    for (const SpacePoint* spacePoint : TrackFindingCDC::reversedRange(spacePoints)) {
+
+      CKFToSVDState* nextState = nullptr;
+      for (CKFToSVDState& state : m_states) {
+        if (state.getHit() == spacePoint) {
+          nextState = &state;
+        }
+      }
+
+      B2ASSERT("State can not be none!", nextState);
+
+      nextState->setRelatedSVDTrack(&vxdRecoTrack);
+
+      if (currentState) {
+        m_relations.emplace_back(currentState, NAN, nextState);
+      } else {
+        for (CKFToSVDState& seedState : m_seedStates) {
+          // We are not setting the related SVD track of the first state!
+          m_relations.emplace_back(&seedState, NAN, nextState);
+        }
+      }
+
+      currentState = nextState;
+    }
+  }
+
+  std::sort(m_relations.begin(), m_relations.end());
+
   B2DEBUG(50, "Created " << m_relations.size() << " relations.");
 
   m_treeSearchFindlet.apply(m_seedStates, m_states, m_relations, m_results);
@@ -96,14 +128,29 @@ void CKFToSVDSeedFindlet::apply()
     return result.getHits().empty();
   });
 
-  m_overlapResolver.apply(m_results, m_filteredResults);
-
-  m_unusedTracksAdder.apply(m_filteredResults);
-  m_dataHandler.store(m_filteredResults);
-
-  // Reassign the space points according to the new results
-  for (const SpacePoint* spacePoint : m_spacePointVector) {
-    spacePoint->setAssignmentState(false);
+  std::vector<TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>> relatedCDCToSVD;
+  for (const CKFToSVDResult& result : m_results) {
+    const RecoTrack* relatedSVDTrack = result.getRelatedSVDRecoTrack();
+    relatedCDCToSVD.emplace_back(result.getSeed(), -result.getChi2(), relatedSVDTrack);
   }
-  m_spacePointTagger.apply(m_filteredResults, m_spacePointVector);
+
+  std::sort(relatedCDCToSVD.begin(), relatedCDCToSVD.end(), TrackFindingCDC::GreaterWeight());
+
+  // sort out
+  TrackFindingCDC::BestMatchSelector<const RecoTrack, const RecoTrack> bestMatchSelector;
+  bestMatchSelector.apply(relatedCDCToSVD);
+
+  // write out relations
+  for (const TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>& relation : relatedCDCToSVD) {
+    const Weight weight = relation.getWeight();
+
+    if (std::abs(weight) > 10000) {
+      continue;
+    }
+
+    const RecoTrack* cdcTrack = relation.getFrom();
+    const RecoTrack* svdTrack = relation.getTo();
+
+    cdcTrack->addRelationTo(svdTrack);
+  }
 }

@@ -21,6 +21,7 @@
 #include <tracking/ckf/svd/findlets/SpacePointLoader.h>
 
 #include <tracking/ckf/svd/filters/relations/SVDPairFilterFactory.h>
+#include <tracking/ckf/svd/filters/results/ChooseableSVDResultFilter.h>
 
 namespace Belle2 {
   class RecoTrack;
@@ -51,6 +52,12 @@ namespace Belle2 {
     void beginEvent() override;
 
   private:
+    // Parameters
+    /// Minimal hit requirement for the results (counted in number of space points)
+    unsigned int m_param_minimalHitRequirement = 2;
+    /// Store Array name coming from VXDTF2
+    std::string m_param_vxdTracksStoreArrayName = "VXDRecoTracks";
+
     // Findlets
     /// Findlet for retrieving the cdc tracks and writing the result out
     CKFDataHandler<CKFToSVDResult> m_dataHandler;
@@ -62,6 +69,8 @@ namespace Belle2 {
     StateCreator<const SpacePoint, CKFToSVDState> m_stateCreatorFromHits;
     /// Findlet doing the main work: the tree finding
     TreeSearcher<CKFToSVDState, SVDStateRejecter, CKFToSVDResult> m_treeSearchFindlet;
+    /// Filter for the results
+    ChooseableSVDResultFilter m_overlapFilter;
 
     // Object pools
     /// Pointers to the CDC Reco tracks as a vector
@@ -76,8 +85,5 @@ namespace Belle2 {
     std::vector<TrackFindingCDC::WeightedRelation<CKFToSVDState>> m_relations;
     /// Vector for storing the results
     std::vector<CKFToSVDResult> m_results;
-
-    // Parameters
-    std::string m_param_vxdTracksStoreArrayName = "VXDRecoTracks";
   };
 }

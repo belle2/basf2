@@ -41,6 +41,7 @@ CKFToSVDSeedFindlet::CKFToSVDSeedFindlet()
   addProcessingSignalListener(&m_stateCreatorFromTracks);
   addProcessingSignalListener(&m_stateCreatorFromHits);
   addProcessingSignalListener(&m_treeSearchFindlet);
+  addProcessingSignalListener(&m_overlapFilter);
 }
 
 void CKFToSVDSeedFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -52,10 +53,14 @@ void CKFToSVDSeedFindlet::exposeParameters(ModuleParamList* moduleParamList, con
   m_stateCreatorFromTracks.exposeParameters(moduleParamList, prefix);
   m_stateCreatorFromHits.exposeParameters(moduleParamList, prefix);
   m_treeSearchFindlet.exposeParameters(moduleParamList, prefix);
+  m_overlapFilter.exposeParameters(moduleParamList, prefix);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "vxdTracksStoreArrayName"), m_param_vxdTracksStoreArrayName,
                                 "Store Array name coming from VXDTF2.", m_param_vxdTracksStoreArrayName);
 
+  moduleParamList->addParameter("minimalHitRequirement", m_param_minimalHitRequirement,
+                                "Minimal Hit requirement for the results (counted in space points)",
+                                m_param_minimalHitRequirement);
 }
 
 void CKFToSVDSeedFindlet::beginEvent()
@@ -124,14 +129,20 @@ void CKFToSVDSeedFindlet::apply()
   m_treeSearchFindlet.apply(m_seedStates, m_states, m_relations, m_results);
   B2DEBUG(50, "Having found " << m_results.size() << " results before overlap check");
 
-  TrackFindingCDC::erase_remove_if(m_results, [](const auto & result) {
-    return result.getHits().empty();
-  });
+  const auto hasLowHitNumber = [this](const CKFResult<RecoTrack, SpacePoint>& result) {
+    return result.getHits().size() < m_param_minimalHitRequirement;
+  };
+  TrackFindingCDC::erase_remove_if(m_results, hasLowHitNumber);
+  B2DEBUG(50, "After filtering: Having found " << m_results.size() << " results before overlap check");
+
 
   std::vector<TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>> relatedCDCToSVD;
   for (const CKFToSVDResult& result : m_results) {
     const RecoTrack* relatedSVDTrack = result.getRelatedSVDRecoTrack();
-    relatedCDCToSVD.emplace_back(result.getSeed(), -result.getChi2(), relatedSVDTrack);
+    const Weight weight = m_overlapFilter(result);
+    if (not std::isnan(weight)) {
+      relatedCDCToSVD.emplace_back(result.getSeed(), weight, relatedSVDTrack);
+    }
   }
 
   std::sort(relatedCDCToSVD.begin(), relatedCDCToSVD.end(), TrackFindingCDC::GreaterWeight());
@@ -142,15 +153,8 @@ void CKFToSVDSeedFindlet::apply()
 
   // write out relations
   for (const TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>& relation : relatedCDCToSVD) {
-    const Weight weight = relation.getWeight();
-
-    if (std::abs(weight) > 10000) {
-      continue;
-    }
-
     const RecoTrack* cdcTrack = relation.getFrom();
     const RecoTrack* svdTrack = relation.getTo();
-
     cdcTrack->addRelationTo(svdTrack);
   }
 }

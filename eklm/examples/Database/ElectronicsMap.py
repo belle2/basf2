@@ -31,11 +31,11 @@ dbImporter.loadDefaultElectronicsMap()
 #     backward (endcap == 1)     forward (endcap == 2)
 #           _1____2____               _2____1____       Sector number
 #      EB0 /   ||   \\\\ EB1     EF0 /   ||   \\\\ EF1  Crate identifier
-#         /7003||7003\\\\           /7001||7001\\\\     Copper number
+#         /3   ||3   \\\\           /1   ||1   \\\\     Copper number - EKLM_ID
 #        | 0,1 ||2,3  ||||         | 0,1 ||2,3  ||||    Data concentrator number
 # ____\  |____/  \____||||  ____\  |____/  \____||||  _____\
 #     /  |    \  /    ||||      /  |    \  /    ||||       /  Beam (z) direction
-#        | 7004|| 7004||||         | 7002||7002 ||||    Copper number
+#        | 4   || 4   ||||         | 2   ||2    ||||    Copper number - EKLM_ID
 #         \2,3 || 0,1////           \2,3 ||0,1 ////     Data concentrator number
 #      EB3 \___||___//// EB2     EF3 \___||___//// EF2  Crate identifier
 #            4    3                    3    4           Sector number

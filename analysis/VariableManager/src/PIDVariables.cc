@@ -121,7 +121,7 @@ namespace Belle2 {
 
     Manager::FunctionPtr pidDeltaLogLikelihoodValueExpert(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() < 2) {
+      if (arguments.size() < 3) {
         B2ERROR("Need at least three arguments to pidDeltaLogLikelihoodValueExpert");
         return nullptr;
       }

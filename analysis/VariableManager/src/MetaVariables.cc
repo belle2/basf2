@@ -908,50 +908,6 @@ endloop:
 
     }
 
-
-    Manager::FunctionPtr NBDeltaIfMissing(const std::vector<std::string>& arguments)
-    {
-      if (arguments.size() == 2) {
-        Const::PIDDetectorSet set = Const::TOP;
-        int pdgCode = 0;
-        if (arguments[0] == "TOP") {
-          set = Const::TOP;
-        } else if (arguments[0] == "ARICH") {
-          set = Const::ARICH;
-        } else {
-          B2FATAL("Encountered unsupported sub-detector type " + arguments[0] + " in NBDeltaIfMissing only TOP and ARICH are supported."
-                  "Note that other sub-detectors providing PID information like ECL, dEdx do not have missing values!");
-        }
-        try {
-          pdgCode = std::stoi(arguments[1]);
-        } catch (std::invalid_argument& e) {
-          B2ERROR("Second argument of NBDeltaIfMissing must be a PDG code");
-          return nullptr;
-        }
-        if (pdgCode != TMath::Abs(11) && pdgCode != TMath::Abs(13) && pdgCode != TMath::Abs(211) && pdgCode != TMath::Abs(321)
-            && pdgCode != TMath::Abs(2212) && pdgCode != TMath::Abs(1000010020)) {
-          B2ERROR("PDG code " << pdgCode << " does not belong to a stable particle.");
-          return nullptr;
-        }
-
-        std::string variableName = "pidPairProbabilityExpert(" + arguments[1] + ", 211, " + arguments[0] + ")";
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(variableName);
-
-        auto func = [var, set](const Particle * particle) -> double {
-          const PIDLikelihood* pid = particle->getPIDLikelihood();
-          if (!pid)
-            return -999; // NeuroBayes magic number
-          if (not pid->isAvailable(set))
-            return -999; // NeuroBayes magic number
-          return var->function(particle);
-        };
-        return func;
-      } else {
-        B2FATAL("Wrong number of arguments for meta function NBDeltaIfMissing");
-      }
-    }
-
-
     Manager::FunctionPtr matchedMC(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {

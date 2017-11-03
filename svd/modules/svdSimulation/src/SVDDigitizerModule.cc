@@ -683,7 +683,11 @@ void SVDDigitizerModule::saveDigits()
                                      m_relShaperDigitDigitName);
 
   //Set time of the first sample
-  double initTime = m_startSampling;
+
+  const double bunchTimeSep = 2 * 1.96516; //in ns
+  const int bunchXingsInAPVclock = 8; //m_samplingTime/bunchTimeSep;
+  int bunchXingsSinceAPVstart = gRandom->Integer(bunchXingsInAPVclock);
+  double initTime = m_startSampling + bunchTimeSep * bunchXingsSinceAPVstart;
 
   // ... to store digit-digit relations
   vector<pair<unsigned int, float> > digit_weights;
@@ -781,7 +785,8 @@ void SVDDigitizerModule::saveDigits()
         });
         // Save as a new digit
         int digIndex = storeShaperDigits.getEntries();
-        storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, SVDModeByte(0, 0, 0, 0)));
+        storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, SVDModeByte(0, 0, 0,
+                                                   bunchXingsSinceAPVstart >> 1)));
         //If the digit has any relations to MCParticles, add the Relation
         if (particles.size() > 0) {
           relShaperDigitMCParticle.add(digIndex, particles.begin(), particles.end());
@@ -881,7 +886,8 @@ void SVDDigitizerModule::saveDigits()
         });
         // Save as a new digit
         int digIndex = storeShaperDigits.getEntries();
-        storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, SVDModeByte(0, 0, 0, 0)));
+        storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, SVDModeByte(0, 0, 0,
+                                                   bunchXingsSinceAPVstart >> 1)));
         //If the digit has any relations to MCParticles, add the Relation
         if (particles.size() > 0) {
           relShaperDigitMCParticle.add(digIndex, particles.begin(), particles.end());

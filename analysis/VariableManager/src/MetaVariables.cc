@@ -1201,12 +1201,6 @@ endloop:
     REGISTER_VARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
                       "Useful for debugging.");
-    REGISTER_VARIABLE("NBDeltaIfMissing(detector, variable)", NBDeltaIfMissing,
-                      "Returns value of variable if pid information of detector is available otherwise -999 (delta function of NeuroBayes).\n"
-                      "Possible values for detector are TOP and ARICH.\n"
-                      "Useful as a feature variable for the NeuroBayes classifier, which tags missing values with -999.\n"
-                      "E.g. NBDeltaIfMissing(TOP, pidProbabilityExpert(11, TOP)) returns electron id of TOP if this information is available, otherwise -999.\n"
-                      "     NBDeltaIfMissing(ARICH, pidProbabilityExpert(321, ARICH)) returns kaon id of ARICH if this information is available, otherwise -999.");
     REGISTER_VARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut. \n"
                       "For instance one can apply this function on a signal Photon and provide a list of all photons in the rest of event and a cut \n"

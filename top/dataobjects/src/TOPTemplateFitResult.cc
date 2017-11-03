@@ -25,13 +25,16 @@ namespace Belle2 {
     m_backgroundOffset = backgroundOffset;
     m_amplitude = amplitude;
     m_chisquare = chisquare;
+    m_risingEdgeTime = -1.;
   }
 
   TOPTemplateFitResult::TOPTemplateFitResult(double risingEdge, double risingEdgeTime, double backgroundOffset,
                                              double amplitude, double chisquare)
     : m_risingEdge(risingEdge), m_risingEdgeTime(risingEdgeTime), m_backgroundOffset(backgroundOffset), m_amplitude(amplitude),
       m_chisquare(chisquare)
-  {}
+  {
+    m_risingEdgeRaw = -1;
+  }
 
   void TOPTemplateFitResult::setRisingEdgeAndConvert(unsigned short risingEdge)
   {

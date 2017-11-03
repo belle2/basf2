@@ -47,7 +47,7 @@ namespace Belle2 {
   public:
     /** Constructor. */
     NtupleVertexTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor), m_fDX(0), m_fDY(0),
-      m_fDZ(0), m_fDRho(0), m_fPvalue(0) {setupTree();}
+      m_fDZ(0), m_fDRho(0), m_fPvalue(0), m_fProdV(0), m_fProdCov(0) {setupTree();}
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);
   };

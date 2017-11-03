@@ -18,7 +18,8 @@ from modularAnalysis import vertexKFit, massKFit, massVertexKFit
 from modularAnalysis import vertexRave, massVertexRave
 from modularAnalysis import rankByHighest
 from modularAnalysis import copyParticles
-from modularAnalysis import printVariableValues, variablesToExtraInfo, applyCuts, buildRestOfEvent, buildContinuumSuppression
+from modularAnalysis import printVariableValues, variablesToExtraInfo, applyCuts
+from modularAnalysis import buildRestOfEvent, buildContinuumSuppression, appendROEMasks
 import stdPi0s
 import stdCharged
 

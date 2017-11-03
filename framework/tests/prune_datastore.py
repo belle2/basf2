@@ -7,8 +7,13 @@ import multiprocessing
 
 
 class TestModule(Module):
-
     """Test if the DataStore contains the expected content."""
+
+    def isInverted(self):
+        """
+        Returns true if the check should be for the inversion
+        """
+        return False
 
     def event(self):
         """reimplementation of Module::event().
@@ -21,45 +26,64 @@ class TestModule(Module):
         PXDDigits = Belle2.PyStoreArray('PXDDigits')
 
         # PXDClusters are in our keep list, should still be there
-        assert PXDClusters.getEntries() > 0
-        # while the PXDDigits should be empty
-        assert PXDDigits.getEntries() == 0
+        if self.isInverted():
+            assert PXDClusters.getEntries() == 0
+            # while the PXDDigits should be empty
+            assert PXDDigits.getEntries() > 0
+        else:
+            assert PXDClusters.getEntries() > 0
+            # while the PXDDigits should be empty
+            assert PXDDigits.getEntries() == 0
 
         # ensure the eventmetadata has been kept, which is implicitly done by
         # PruneDataStore
         evtmetadata = Belle2.PyStoreObj('EventMetaData')
         assert evtmetadata
 
+
+class TestModuleInverted(Module):
+
+    def isInverted(self):
+        """
+        Returns true if the check should be for the inversion
+        """
+        return True
+
+
 set_random_seed("something important")
 # make sure FATAL messages don't have the function signature as this makes
 # problems with clang printing namespaces differently
 logging.set_info(LogLevel.FATAL, logging.get_info(LogLevel.ERROR))
 
-input = register_module('RootInput')
-eventinfo = register_module('EventInfoPrinter')
-printcollections = register_module('PrintCollections')
-
-input.param('inputFileName', Belle2.FileSystem.findFile('framework/tests/root_input.root'))
 main = create_path()
 
-main.add_module(input)
-main.add_module(eventinfo)
-main.add_module(printcollections)
-
-prune = register_module("PruneDataStore")
-prune.param('keepEntries', ['PXDClusters.*'])
-main.add_module(prune)
-
+main.add_module('RootInput', inputFileName=Belle2.FileSystem.findFile('framework/tests/root_input.root'))
+main.add_module('EventInfoPrinter')
+main.add_module('PrintCollections')
+main.add_module('PruneDataStore', matchEntries=['PXDClusters.*'])
 main.add_module(register_module('PrintCollections'))
 main.add_module(TestModule())
 
 # ensure the pruned datastore is still write-able to disk
-output = register_module('RootOutput')
-output.param('outputFileName', 'prune_datastore_output_test.root')
-output.param('updateFileCatalog', False)
-main.add_module(output)
+main.add_module('RootOutput', outputFileName='prune_datastore_output_test.root', updateFileCatalog=False)
 
 # Process events
 process(main)
 
 os.remove('prune_datastore_output_test.root')
+
+# now test if the negated logic works, too
+main = create_path()
+
+main.add_module('RootInput', inputFileName=Belle2.FileSystem.findFile('framework/tests/root_input.root'))
+main.add_module('EventInfoPrinter')
+main.add_module('PrintCollections')
+main.add_module('PruneDataStore', matchEntries=['PXDClusters.*'], keepMatchedEntries=False)
+main.add_module(register_module('PrintCollections'))
+main.add_module(TestModuleInverted())
+
+# ensure the pruned datastore is still write-able to disk
+main.add_module('RootOutput', outputFileName='prune_datastore_output_test.root', updateFileCatalog=False)
+
+# Process events
+process(main)

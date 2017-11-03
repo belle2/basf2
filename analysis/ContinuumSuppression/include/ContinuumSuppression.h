@@ -15,6 +15,9 @@
 namespace Belle2 {
   class Particle;
 
+  /**
+   * Adds continuum suppression variables
+   */
   void addContinuumSuppression(const Particle* particle, const std::string& maskName);
 
 }

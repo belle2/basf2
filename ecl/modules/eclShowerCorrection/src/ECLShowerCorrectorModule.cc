@@ -43,6 +43,7 @@ using namespace ECL;
 //                 Register the Module
 //-----------------------------------------------------------------
 REG_MODULE(ECLShowerCorrector)
+REG_MODULE(ECLShowerCorrectorPureCsI)
 
 //-----------------------------------------------------------------
 //                 Implementation

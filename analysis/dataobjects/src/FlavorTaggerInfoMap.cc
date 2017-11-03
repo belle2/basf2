@@ -41,9 +41,9 @@ void FlavorTaggerInfoMap::setProbEventLevel(std::string category, float probabil
 }
 
 
-void FlavorTaggerInfoMap::setQrCategory(std::string category, float qr)
+void FlavorTaggerInfoMap::setQpCategory(std::string category, float qp)
 {
-  m_qrCategory.insert(std::pair<std::string, float>(category, qr));
+  m_qpCategory.insert(std::pair<std::string, float>(category, qp));
 }
 
 void FlavorTaggerInfoMap::setHasTrueTarget(std::string category, float isTrue)
@@ -97,9 +97,9 @@ std::map<std::string, float> FlavorTaggerInfoMap::getProbEventLevel()
   return m_probEventLevel;
 }
 
-std::map<std::string, float> FlavorTaggerInfoMap::getQrCategory()
+std::map<std::string, float> FlavorTaggerInfoMap::getQpCategory()
 {
-  return m_qrCategory;
+  return m_qpCategory;
 }
 
 std::map<std::string, float> FlavorTaggerInfoMap::getHasTrueTarget()

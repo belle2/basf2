@@ -22,7 +22,7 @@
 //#include <mdst/dataobjects/ECLCluster.h>
 
 // here's where the functions are hidden
-#include "reconstruction/modules/KlId/KLMExpert/helperFunctions.h"
+#include "reconstruction/modules/KlId/KLMExpert/KlId.h"
 
 #include <TTree.h>
 #include <TFile.h>
@@ -30,6 +30,7 @@
 #include <cstring>
 
 using namespace Belle2;
+using namespace KlId;
 using namespace std;
 
 REG_MODULE(KlongValidation);
@@ -107,7 +108,7 @@ void KlongValidationModule::event()
       m_reconstructedAsKl = false;
     }
     // second param is cut on
-    m_isKl = KlIdHelpers::isKLMClusterSignal(cluster);
+    m_isKl = isKLMClusterSignal(cluster);
 
     // only fill if cluster is correctly reconstructed Kl
     if (m_reconstructedAsKl && m_isKl) {m_passed = true;}

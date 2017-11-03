@@ -66,8 +66,7 @@ namespace Belle2 {
     /** Stores a Belle2 Track from a Reco Track.
      *
      * Every fitted hypothesis will be extrapolated to the perigee and stored as a TrackFitResult when the fit and the
-     * extrapolation were successful. We will only create a Track mdst object, when we are sure that we have a valid
-     * default (pion) hypothesis available. If we do not have this, we discard the track no matter what.
+     * extrapolation were successful.
      *
      * The StoreArrayIndex is stored in the Belle2 Track, no relation is set.
      *
@@ -78,8 +77,8 @@ namespace Belle2 {
      *        one at the POCA. This is also useful for cosmics only.
      * @return
      */
-    bool storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::ParticleType& defaultHypothesis,
-                                 const bool useClosestHitToIP = false, const bool useBFieldAtHit = false);
+    bool storeTrackFromRecoTrack(RecoTrack& recoTrack, const bool useClosestHitToIP = false,
+                                 const bool useBFieldAtHit = false);
 
   private:
     std::string m_trackColName;  ///< TrackColName (output).

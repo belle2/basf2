@@ -50,7 +50,8 @@ photons = ('gamma', '')
 fillParticleListsFromMC([kaons, pions, photons])
 
 # 1. reconstruct pi0 -> gamma gamma decay
-reconstructDecay('pi0 -> gamma gamma', '0.1 < M < 0.15')
+# InvM is the sum of daughter momenta whereas M is the initialised PDG mass ...
+reconstructDecay('pi0 -> gamma gamma', '0.1 < InvM < 0.15')
 
 # 2. reconstruct D0 in multiple decay modes
 reconstructDecay('D0:ch1 -> K- pi+', '1.8 < M < 1.9', 1)

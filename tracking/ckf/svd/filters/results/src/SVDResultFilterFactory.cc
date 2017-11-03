@@ -16,12 +16,14 @@
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/NegativeFilter.icc.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
 #include <tracking/ckf/svd/filters/results/SVDResultVarSet.h>
 #include <tracking/ckf/svd/filters/results/SVDResultTruthVarSet.h>
 #include <tracking/ckf/svd/filters/results/SizeSVDResultFilter.h>
+#include <tracking/ckf/svd/filters/results/Chi2SVDResultFilter.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -62,9 +64,10 @@ std::map<std::string, std::string> SVDResultFilterFactory::getValidFilterNamesAn
     {"all", "all combination are valid"},
     {"recording", "record variables to a TTree"},
     {"mva", "filter based on the trained MVA method"},
-    {"size", "ordering accoring to size"},
+    {"size", "ordering according to size"},
+    {"chi2", "ordering according to chi2"},
     {"truth", "monte carlo truth"},
-    {"truth_teacher", "monte carlo truth returning the result of the teacher"},
+    {"truth_svd_cdc_relation", "monte carlo truth on the related CDC and SVD tracks"},
   };
 }
 
@@ -81,10 +84,12 @@ SVDResultFilterFactory::create(const std::string& filterName) const
     return std::make_unique<MVASVDResultFilter>("tracking/data/ckf_CDCToSVDResult.xml");
   } else if (filterName == "truth") {
     return std::make_unique<ChooseableTruthSVDResultFilter>("truth");
-  } else if (filterName == "truth_teacher") {
-    return std::make_unique<ChooseableTruthSVDResultFilter>("truth_teacher");
+  } else if (filterName == "truth_svd_cdc_relation") {
+    return std::make_unique<ChooseableTruthSVDResultFilter>("truth_svd_cdc_relation");
   } else if (filterName == "size") {
     return std::make_unique<SizeSVDResultFilter>();
+  } else if (filterName == "chi2") {
+    return std::make_unique<TrackFindingCDC::NegativeFilter<Chi2SVDResultFilter>>();
   } else {
     return Super::create(filterName);
   }

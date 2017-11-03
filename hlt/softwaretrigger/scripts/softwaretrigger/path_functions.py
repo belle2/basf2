@@ -5,9 +5,9 @@ from softwaretrigger import (
 
 import reconstruction
 from softwaretrigger import add_fast_reco_software_trigger, add_hlt_software_trigger, \
-    add_calibration_software_trigger
+    add_calibration_software_trigger, add_calcROIs_software_trigger
 
-RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs"]
+RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "ROIs"]
 ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*"]
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
 
@@ -17,7 +17,8 @@ def add_softwaretrigger_reconstruction(
         store_array_debug_prescale=0,
         components=DEFAULT_HLT_COMPONENTS,
         additionalTrackFitHypotheses=[],
-        softwaretrigger_mode='hlt_filter'):
+        softwaretrigger_mode='hlt_filter',
+        calcROIs=True):
     """
     Add all modules, conditions and conditional paths to the given path, that are needed for a full
     reconstruction stack in the HLT using the software trigger modules. Several steps are performed:
@@ -96,8 +97,11 @@ def add_softwaretrigger_reconstruction(
         # Add hlt reconstruction
         reconstruction.add_reconstruction(hlt_reconstruction_path, trigger_mode="hlt", skipGeometryAdding=True,
                                           components=components, additionalTrackFitHypotheses=additionalTrackFitHypotheses)
+
         hlt_cut_module = add_hlt_software_trigger(hlt_reconstruction_path, store_array_debug_prescale)
 
+        # preserve the reconstruction information which is needed for ROI calculation.
+        add_calcROIs_software_trigger(calibration_and_store_only_rawdata_path, calcROIs=calcROIs)
         # Fill the calibration_and_store_only_rawdata_path path
         add_calibration_software_trigger(calibration_and_store_only_rawdata_path, store_array_debug_prescale)
         calibration_and_store_only_rawdata_path.add_path(get_store_only_rawdata_path())

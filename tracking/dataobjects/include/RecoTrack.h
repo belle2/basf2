@@ -718,6 +718,7 @@ namespace Belle2 {
      */
     void deleteFittedInformation();
 
+    virtual std::string getInfoHTML() const;
 
   private:
     /// Internal storage for the genfit track.

@@ -37,6 +37,15 @@ void NtuplePIDTool::setupTree()
   }
 }
 
+void NtuplePIDTool::deallocateMemory()
+{
+  delete [] m_fPIDk;
+  delete [] m_fPIDpi;
+  delete [] m_fPIDe;
+  delete [] m_fPIDmu;
+  delete [] m_fPIDp;
+}
+
 void NtuplePIDTool::eval(const Particle* particle)
 {
   if (!particle) {

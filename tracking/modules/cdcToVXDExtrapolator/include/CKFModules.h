@@ -10,11 +10,11 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
-#include <tracking/ckf/findlets/cdcToSVDSpacePoint/CDCToSVDSpacePointCKFFindlet.h>
-#include <tracking/ckf/findlets/pxdSpacePoint/PXDSpacePointCKFFindlet.h>
-#include <tracking/ckf/findlets/vxdToCDC/VXDToCDCCKFFindlet.h>
+#include <tracking/ckf/svd/findlets/CKFToSVDFindlet.h>
+#include <tracking/ckf/pxd/findlets/CKFToPXDFindlet.h>
+#include <tracking/ckf/svd/findlets/CKFToSVDSeedFindlet.h>
 
-#include <tracking/ckf/utilities/ClassMnemomics.h>
+#include <tracking/ckf/general/utilities/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 
 namespace Belle2 {
@@ -22,7 +22,7 @@ namespace Belle2 {
    * Combinatorical Kalman Filter used for extrapolating CDC tracks into SVD and create merged tracks.
    * All implementation is done in the corresponding findlet.
    */
-  class CDCToSVDSpacePointCKFModule : public TrackFindingCDC::FindletModule<CDCToSVDSpacePointCKFFindlet> {
+  class CDCToSVDSpacePointCKFModule : public TrackFindingCDC::FindletModule<CKFToSVDFindlet> {
 
   public:
     /// Set description
@@ -33,33 +33,26 @@ namespace Belle2 {
     }
   };
 
-  /**
-   * Combinatorical Kalman Filter used for extrapolating all tracks into PXD and create merged tracks.
-   * All implementation is done in the corresponding findlet.
-   */
-  class PXDSpacePointCKFModule : public TrackFindingCDC::FindletModule<PXDSpacePointCKFFindlet> {
+  class CDCToSVDSeedCKFModule : public TrackFindingCDC::FindletModule<CKFToSVDSeedFindlet> {
 
   public:
     /// Set description
-    PXDSpacePointCKFModule()
+    CDCToSVDSeedCKFModule()
     {
-      setDescription("Combinatorical Kalman Filter used for extracting tracks into "
+      setDescription("Combinatorical Kalman Filter used for extracting CDC tracks into "
+                     "SVD and create merged tracks.");
+    }
+  };
+
+  class ToPXDCKFModule : public TrackFindingCDC::FindletModule<CKFToPXDFindlet> {
+
+  public:
+    /// Set description
+    ToPXDCKFModule()
+    {
+      setDescription("Combinatorical Kalman Filter used for extracting SVD/CDC tracks into "
                      "PXD and create merged tracks.");
     }
   };
 
-  /**
-   * Combinatorical Kalman Filter used for extrapolating VXD tracks into CDC and create merged tracks.
-   * All implementation is done in the corresponding findlet.
-   */
-  class VXDToCDCWireHitCKFModule : public TrackFindingCDC::FindletModule<VXDToCDCCKFFindlet> {
-
-  public:
-    /// Set description
-    VXDToCDCWireHitCKFModule() : TrackFindingCDC::FindletModule<VXDToCDCCKFFindlet>( {"CDCWireHitVector"})
-    {
-      setDescription("Combinatorical Kalman Filter used for extracting VXD tracks into "
-                     "CDC and create merged tracks.");
-    }
-  };
 }

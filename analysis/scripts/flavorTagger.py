@@ -381,24 +381,29 @@ def FillParticleLists(mode='Expert', path=analysis_main):
 
         else:
             if 'pi+:inRoe' not in readyParticleLists:
-                fillParticleList('pi+:inRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
+                fillParticleList(
+                    'pi+:inRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
                 readyParticleLists.append('pi+:inRoe')
 
             if 'K_S0:inRoe' not in readyParticleLists:
-                reconstructDecay('K_S0:inRoe -> pi+:inRoe pi-:inRoe', '0.40<=M<=0.60', False, path=path)
-                fitVertex('K_S0:inRoe', 0.01, fitter='kfitter', path=path)
+                if getBelleOrBelle2() == 'Belle':
+                    cutAndCopyList('K_S0:inRoe', 'K_S0:mdst', 'extraInfo(ksnbStandard) == 1 and isInRestOfEvent == 1', path=path)
+                else:
+                    reconstructDecay('K_S0:inRoe -> pi+:inRoe pi-:inRoe', '0.40<=M<=0.60', False, path=path)
+                    fitVertex('K_S0:inRoe', 0.01, fitter='kfitter', path=path)
                 readyParticleLists.append('K_S0:inRoe')
 
             if particleList == 'K+:inRoe':
-                fillParticleList(particleList, 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
+                fillParticleList(
+                    particleList, 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
                 # Precut done to prevent from overtraining, might be redundant
                 applyCuts(particleList, '0.1<' + KId[getBelleOrBelle2()], path=path)
                 readyParticleLists.append(particleList)
 
             if particleList == 'Lambda0:inRoe':
-                fillParticleList('p+:inRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
-                reconstructDecay(particleList + ' -> pi-:inRoe p+:inRoe',
-                                 '1.00<=M<=1.23', False, path=path)
+                fillParticleList(
+                    'p+:inRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
+                reconstructDecay(particleList + ' -> pi-:inRoe p+:inRoe', '1.00<=M<=1.23', False, path=path)
                 fitVertex(particleList, 0.01, fitter='kfitter', path=path)
                 # if mode != 'Expert':
                 matchMCTruth(particleList, path=path)
@@ -650,6 +655,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
                 'flavorTagger: file ' + filesDirectory + '/' +
                 methodPrefixEventLevel + "sampled" + fileId + '.root will be saved.')
 
+            applyCuts(particleList, 'isRightCategory(mcAssociated) > 0', path)
             eventLevelpath = create_path()
             SkipEmptyParticleList = register_module("SkimFilter")
             SkipEmptyParticleList.set_name('SkimFilter_EventLevel' + category)

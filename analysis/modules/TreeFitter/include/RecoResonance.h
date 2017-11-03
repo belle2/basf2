@@ -12,36 +12,53 @@
 #define RECORESONANCE_H
 
 #include <analysis/modules/TreeFitter/RecoComposite.h>
-//#include <CLHEP/Matrix/Vector.h>
-//#include <CLHEP/Matrix/SymMatrix.h>
 
 namespace TreeFitter {
 
+  /** */
   class RecoResonance : public RecoComposite {
   public:
-    RecoResonance(Belle2::Particle* bc, const ParticleBase* mother) ;
-    virtual ~RecoResonance() ;
+    RecoResonance(Belle2::Particle* bc, const ParticleBase* mother);
 
-    virtual int dim() const { return hasEnergy() ? 4 : 3 ; } // (px,py,pz,(E))
+    /** init particle in case it has a mother */
+    virtual ErrCode initParticleWithMother(FitParams* fitparams);
+    /** init particle in case it has no mother */
+    virtual ErrCode initMotherlessParticle(FitParams* fitparams);
 
-    virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const ;
-    virtual ErrCode initPar1(FitParams*) ;
-    virtual ErrCode initPar2(FitParams*) ;
-    virtual int type() const { return kRecoResonance ; }
 
-    virtual int posIndex() const { return mother()->posIndex()  ; }
-    virtual int momIndex() const { return index() ; }
-    virtual int tauIndex() const { return -1 ; }
+    virtual ~RecoResonance();
 
-    virtual std::string parname(int index) const ;
 
-    virtual void addToConstraintList(constraintlist& alist, int depth) const
+
+    /** */
+    virtual int dim() const { return hasEnergy() ? 4 : 3; } // (px,py,pz,(E))
+
+    /** */
+    virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
+    /** */
+    virtual ErrCode initPar1(FitParams*);
+    /** */
+    virtual ErrCode initPar2(FitParams*);
+    /** */
+    virtual int type() const { return kRecoResonance; }
+
+    /** */
+    virtual int posIndex() const { return mother()->posIndex(); }
+    /** */
+    virtual int momIndex() const { return index(); }
+    /** */
+    virtual int tauIndex() const { return -1; }
+
+    /** */
+    virtual std::string parname(int index) const;
+
+    /** */
+    virtual void addToConstraintList(constraintlist& list, int depth) const
     {
-      alist.push_back(Constraint(this, Constraint::resonance, depth, dimM())) ;
+      list.push_back(Constraint(this, Constraint::resonance, depth, dimM()));
     }
 
-  private:
-  } ;
+  };
 
 }
 

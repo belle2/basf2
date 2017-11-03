@@ -33,7 +33,10 @@ namespace Belle2 {
         if (t.getNumberOfFittedHypotheses() == 0)
           continue;
 
-        auto fitRes = t.getTrackFitResult(Const::electron);
+        auto fitRes = t.getTrackFitResultWithClosestMass(Const::electron);
+        if (not fitRes) {
+          continue;
+        }
         ptMax = std::max(ptMax, fitRes->getTransverseMomentum());
       }
 

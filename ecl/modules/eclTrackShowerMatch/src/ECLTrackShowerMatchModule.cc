@@ -177,7 +177,7 @@ void ECLTrackShowerMatchModule::computeDepth(const ECLShower& shower, double& lT
   double p = 0;
   const Track* selectedTrk = nullptr;
   for (const auto& track : shower.getRelationsFrom<Track>()) {
-    const TrackFitResult* fit = track.getTrackFitResult(Const::pion);
+    const TrackFitResult* fit = track.getTrackFitResultWithClosestMass(Const::pion);
     double cp = 0;
     if (fit != 0) cp = fit->getMomentum().Mag();
     if (cp > p) {

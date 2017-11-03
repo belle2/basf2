@@ -85,13 +85,16 @@ void
 SectorMapBootstrapModule::initialize()
 {
 
+  // in case sector map is read from the DB one needs to set the DB pointer
   if (m_readSecMapFromDB) {
-    B2INFO("Retrieving sectormap from DB. Filename: " << m_sectorMapsInputFile.c_str());
+    B2INFO("SectorMapBootstrapModule: Retrieving sectormap from DB. Filename: " << m_sectorMapsInputFile.c_str());
     m_ptrDBObjPtr = new DBObjPtr<PayloadFile>(m_sectorMapsInputFile.c_str());
-    retrieveSectorMapFromDB();
+    if (m_ptrDBObjPtr == nullptr) B2FATAL("SectorMapBootstrapModule: the DBObjPtr not initialized");
     // add a callback function so that the sectormap is updated each time the DBObj changes
-    m_ptrDBObjPtr->addCallback(this,  &SectorMapBootstrapModule::retrieveSectorMapFromDB);
-  } else if (m_readSectorMap)
+    m_ptrDBObjPtr->addCallback(this,  &SectorMapBootstrapModule::retrieveSectorMap);
+  }
+  // retrieve the SectorMap or create an empty one
+  if (m_readSectorMap || m_readSecMapFromDB)
     retrieveSectorMap();
   else
     bootstrapSectorMap();
@@ -410,18 +413,34 @@ void
 SectorMapBootstrapModule::retrieveSectorMap(void)
 {
 
-  TFile rootFile(m_sectorMapsInputFile.c_str());
+  std::string rootFileName = m_sectorMapsInputFile;
+  // if reading from the DB get the root file name from the DB object ptr
+  if (m_readSecMapFromDB) {
+    if (m_ptrDBObjPtr == nullptr) B2FATAL("SectorMapBootstrapModule: the pointer to the DB payload is not set!");
+    if (!(*m_ptrDBObjPtr).isValid()) B2FATAL("SectorMapBootstrapModule the DB object is not valid!");
 
-  TTree* tree ;
+    rootFileName = (*m_ptrDBObjPtr)->getFileName();
+  }
+
+  B2INFO("SectorMapBootstrapModule: retrieving new SectorMap. New file name: " << rootFileName);
+  TFile rootFile(rootFileName.c_str());
+
+  // some cross check that the file is open
+  if (!rootFile.IsOpen()) B2FATAL("The root file: " << rootFileName << " was not found.");
+
+  TTree* tree = nullptr;
   rootFile.GetObject(c_setupKeyNameTTreeName.c_str(), tree);
+  if (tree == nullptr) B2FATAL("SectorMapBootstrapModule: tree not found! tree name: " << c_setupKeyNameTTreeName.c_str());
 
   TString* setupKeyName = nullptr;
   tree->SetBranchAddress(c_setupKeyNameBranchName.c_str(),
                          & setupKeyName);
+  if (setupKeyName == nullptr) B2FATAL("SectorMapBootstrapModule: setupKeyName not found");
 
   // ignore case, so only upper case
   TString setupToRead_upper = m_setupToRead;
   setupToRead_upper.ToUpper();
+
   // to monitor if anything was read from the root files
   bool read_something = false;
 
@@ -456,75 +475,10 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
     read_something = true;
   }
 
-  if (!read_something) B2WARNING("No setup was read from the root file! The requested setup name was: " << m_setupToRead);
+  if (!read_something) B2FATAL("SectorMapBootstrapModule: No setup was read from the root file! " <<
+                                 "The requested setup name was: " << m_setupToRead);
 
   rootFile.Close();
 }
 
-/// Retrieve the whole sector map from the data base
-void
-SectorMapBootstrapModule::retrieveSectorMapFromDB(void)
-{
-
-  B2INFO("SectorMapBootstrapModule: retrieve new SectorMap from database. New DB file name: " << (*m_ptrDBObjPtr)->getFileName());
-
-  if (m_ptrDBObjPtr == nullptr) B2FATAL("ERROR: the pointer to the DB payload is not set!");
-
-  TFile rootFile((*m_ptrDBObjPtr)->getFileName().c_str());
-
-  // some cross check that the file is open
-  if (!rootFile.IsOpen()) B2FATAL("The Payload file: " << (*m_ptrDBObjPtr)->getFileName().c_str() <<
-                                    " not found in the DB");
-
-  TTree* tree = nullptr;
-  rootFile.GetObject(c_setupKeyNameTTreeName.c_str(), tree);
-
-  // test if the tree was found
-  if (!tree) B2FATAL("Did not found the setup tree: " << c_setupKeyNameTTreeName.c_str());
-
-  TString* setupKeyName = nullptr;
-  tree->SetBranchAddress(c_setupKeyNameBranchName.c_str(),
-                         & setupKeyName);
-
-  // ignore case, so only upper case
-  TString setupToRead_upper = m_setupToRead;
-  setupToRead_upper.ToUpper();
-  // to monitor if anything was read from the root files
-  bool read_something = false;
-
-  FiltersContainer<SpacePoint>& filtersContainer = FiltersContainer<SpacePoint>::getInstance();
-  auto nEntries = tree->GetEntriesFast();
-  for (int i = 0;  i < nEntries ; i++) {
-    tree->GetEntry(i);
-
-    // if a setup name is specified only read that one
-    if (setupToRead_upper != "") {
-      TString buff = setupKeyName->Data();
-      buff.ToUpper();
-      if (buff != setupToRead_upper) continue;
-    }
-
-    rootFile.cd(setupKeyName->Data());
-
-    B2DEBUG(1, "SectorMapBootstrapModule: Retrieving SectorMap with name " << setupKeyName->Data());
-
-    VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
-
-    string setupKeyNameStd = string(setupKeyName->Data());
-    segmentFilters->retrieveFromRootFile(setupKeyName);
-
-    B2DEBUG(1, "SectorMapBootstrapModule: Retrieved map with name: " << setupKeyNameStd << " from rootfie.");
-    filtersContainer.assignFilters(setupKeyNameStd, segmentFilters);
-
-    rootFile.cd("..");
-
-    setupKeyName->Clear();
-
-    read_something = true;
-  }
-
-  if (!read_something) B2WARNING("No setup was read from the root file! The requested setup name was: " << m_setupToRead);
-
-  rootFile.Close();
-}
 

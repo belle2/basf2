@@ -105,6 +105,6 @@ namespace Belle2 {
      */
     std::vector < short int > getValidIndices() const;
 
-    ClassDef(Track, 3); // Class that bundles various TrackFitResults.
+    ClassDef(Track, 3); /**< Class that bundles various TrackFitResults. */
   };
 }

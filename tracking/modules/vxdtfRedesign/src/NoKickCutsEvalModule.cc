@@ -423,13 +423,13 @@ void NoKickCutsEvalModule::endRun()
         for (int lay2 = 0; lay2 < c_nbinlay; lay2++) {
           for (int minmax = 0; minmax < 2; minmax++) {
             if (minmax == 0) {
-              double layerdiff = lay2 - lay1;
+              int layerdiff = lay2 - lay1;
               if (layerdiff >= 0 && layerdiff < 3) {
                 cut_m_histo.at(par).at(lay1).at(lay2)->Write();
               }
             }
             if (minmax == 1) {
-              double layerdiff = lay2 - lay1;
+              int layerdiff = lay2 - lay1;
               if (layerdiff >= 0 && layerdiff < 3) {
                 cut_M_histo.at(par).at(lay1).at(lay2)->Write();
               }
@@ -538,14 +538,3 @@ double NoKickCutsEvalModule::cutFunction(int p, double pwidth)
   else out = 6.3 * mom + 0.57;
   return out;
 }
-
-//-------Possible alternative cut-function (less tight cut at low p, tighter cut at high p)-------//
-// double NoKickCutsEvalModule::cutFunction(int p, double pwidth)
-// {
-//   double out;
-//   double mom = p * pwidth + c_pmin + pwidth / 2;
-//   if (mom > 0.4) {
-//     out = 0.999;
-//   } else out = -4.57 * pow(10, -7) / pow(mom, 3.31) + 0.999;
-//   return out;
-// }

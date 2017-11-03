@@ -58,13 +58,6 @@ namespace Belle2 {
     NoKickCuts m_trackCuts; /**< auxiliary member to apply the cuts */
     double m_pmax = 2.; /**< range analyzed with cuts */
     int m_numberOfCuts;
-    // enum Eparameters { /**< name of the track parameters */
-    //   omega,
-    //   d0,
-    //   phi0,
-    //   z0,
-    //   tanlambda
-    // };
 
     /** Constructor with input file for use specific cuts file */
     NoKickRTSel(std::string fileName) :

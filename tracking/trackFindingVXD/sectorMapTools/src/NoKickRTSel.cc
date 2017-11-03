@@ -21,69 +21,71 @@ void NoKickRTSel::hitXPBuilder(const RecoTrack& track)
   StoreArray<MCParticle> MCParticles;
   StoreArray<RecoTrack> recoTracks;
 
+  if (track.getRelationsTo<MCParticle>().size() > 0) {
 
+    const MCParticle* particle = track.getRelationsTo<MCParticle>()[0];
 
-  const MCParticle* particle = track.getRelationsTo<MCParticle>()[0];
-
-  std::vector<Belle2::RecoHitInformation::UsedSVDHit*> clusterListSVD = track.getSVDHitList();
-  for (const SVDCluster* cluster : clusterListSVD) {
-    for (const SVDTrueHit& hit : cluster->getRelationsTo<SVDTrueHit>()) {
-      if (hit.getRelationsFrom<MCParticle>().size() > 0) {
-        if (hit.getRelationsFrom<MCParticle>()[0]->getIndex() != particle->getIndex()) {
-          continue;
+    std::vector<Belle2::RecoHitInformation::UsedSVDHit*> clusterListSVD = track.getSVDHitList();
+    for (const SVDCluster* cluster : clusterListSVD) {
+      for (const SVDTrueHit& hit : cluster->getRelationsTo<SVDTrueHit>()) {
+        RelationVector<MCParticle> hitFromParticle = hit.getRelationsFrom<MCParticle>();
+        if (hitFromParticle.size() > 0) {
+          if (hitFromParticle[0]->getIndex() != particle->getIndex()) {
+            continue;
+          }
+        } else continue;
+        VxdID trueHitSensorID = hit.getSensorID();
+        const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);
+        hitXPDerivate entry(hit, *cluster, *particle, sensorInfo);
+        int NClusterU = 0;
+        int NClusterV = 0;
+        for (SVDCluster Ncluster : hit.getRelationsFrom<SVDCluster>()) {
+          if (Ncluster.isUCluster()) NClusterU++;
+          else NClusterV++;
         }
-      } else continue;
-      VxdID trueHitSensorID = hit.getSensorID();
-      const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);
-      hitXPDerivate entry(hit, *cluster, *particle, sensorInfo);
-      int NClusterU = 0;
-      int NClusterV = 0;
-      for (SVDCluster Ncluster : hit.getRelationsFrom<SVDCluster>()) {
-        if (Ncluster.isUCluster()) NClusterU++;
-        else NClusterV++;
+        entry.setClusterU(NClusterU);
+        entry.setClusterV(NClusterV);
+
+        bool isReconstructed(false);
+        for (const RecoTrack& aRecoTrack : particle->getRelationsFrom<RecoTrack>())
+          isReconstructed |= aRecoTrack.hasSVDHits();
+        entry.setReconstructed(isReconstructed);
+
+        m_setHitXP.insert(entry);
       }
-      entry.setClusterU(NClusterU);
-      entry.setClusterV(NClusterV);
-
-      bool isReconstructed(false);
-      for (const RecoTrack& aRecoTrack : particle->getRelationsFrom<RecoTrack>())
-        isReconstructed |= aRecoTrack.hasSVDHits();
-      entry.setReconstructed(isReconstructed);
-
-      m_setHitXP.insert(entry);
     }
-  }
 
 
-  StoreArray<PXDCluster> PXDClusters;
-  StoreArray<PXDTrueHit> PXDTrueHits;
+    StoreArray<PXDCluster> PXDClusters;
+    StoreArray<PXDTrueHit> PXDTrueHits;
 
-  std::vector<Belle2::RecoHitInformation::UsedPXDHit*> clusterListPXD = track.getPXDHitList();
-  for (const PXDCluster* cluster : clusterListPXD) {
-    for (const PXDTrueHit& hit : cluster->getRelationsTo<PXDTrueHit>()) {
-      if (hit.getRelationsFrom<MCParticle>().size() > 0) {
-        if (hit.getRelationsFrom<MCParticle>()[0]->getIndex() != particle->getIndex()) {
-          continue;
-        }
-      } else continue;
-      VxdID trueHitSensorID = hit.getSensorID();
-      const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);
-      hitXPDerivate entry(hit, *particle, sensorInfo);
+    std::vector<Belle2::RecoHitInformation::UsedPXDHit*> clusterListPXD = track.getPXDHitList();
+    for (const PXDCluster* cluster : clusterListPXD) {
+      for (const PXDTrueHit& hit : cluster->getRelationsTo<PXDTrueHit>()) {
+        RelationVector<MCParticle> hitFromParticle = hit.getRelationsFrom<MCParticle>();
+        if (hitFromParticle.size() > 0) {
+          if (hitFromParticle[0]->getIndex() != particle->getIndex()) {
+            continue;
+          }
+        } else continue;
+        VxdID trueHitSensorID = hit.getSensorID();
+        const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);
+        hitXPDerivate entry(hit, *particle, sensorInfo);
 
-      bool isReconstructed(false);
-      for (const RecoTrack& aRecoTrack : particle->getRelationsFrom<RecoTrack>())
-        isReconstructed |= aRecoTrack.hasPXDHits();
-      entry.setReconstructed(isReconstructed);
+        bool isReconstructed(false);
+        for (const RecoTrack& aRecoTrack : particle->getRelationsFrom<RecoTrack>())
+          isReconstructed |= aRecoTrack.hasPXDHits();
+        entry.setReconstructed(isReconstructed);
 
-      m_setHitXP.insert(entry);
+        m_setHitXP.insert(entry);
+      }
     }
+
+    for (auto element : m_setHitXP) {
+      m_hitXP.push_back(element);
+    }
+
   }
-
-  for (auto element : m_setHitXP) {
-    m_hitXP.push_back(element);
-  }
-
-
 
 }
 

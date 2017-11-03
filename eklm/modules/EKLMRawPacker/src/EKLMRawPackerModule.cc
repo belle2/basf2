@@ -24,6 +24,7 @@ EKLMRawPackerModule::EKLMRawPackerModule() : Module()
   addParam("MaxEventNum", m_MaxNEvents, "Maximum event number to make", -1);
   addParam("useDefaultModuleId", m_useDefaultElectId,
            "Use default elect id if not found in mapping", true);
+  m_GeoDat = NULL;
   m_NEvents = 0;
 }
 
@@ -35,7 +36,7 @@ void EKLMRawPackerModule::initialize()
 {
   m_eventMetaDataPtr.registerInDataStore();
   m_RawKLMArray.registerPersistent();
-  loadMap();
+  m_GeoDat = &(EKLM::GeometryData::Instance());
 }
 
 void EKLMRawPackerModule::beginRun()
@@ -46,62 +47,49 @@ void EKLMRawPackerModule::event()
 {
   B2INFO("pack the event.." << endl);
   StoreArray<EKLMDigit> digits;
-  vector<uint32_t> data_words[4][4];//4 copper, 16 finesse
   B2INFO("EKLMRawPackerModule:: entries of eklmdigits " << digits.getEntries());
-  ///fill data_words
   int n_Gdidgits = 0;
-  for (int d = 0; d < digits.getEntries(); d++) {
-    if (!(digits[d]->isGood())) continue;
+  const EKLMDataConcentratorLane* lane;
+  int i, endcap, layer, sector, sectorGlobal, copper, dataConcentrator;
+  vector<uint32_t> data_words[4][4]; // Indices: copper - 1, data concentrator.
+  uint32_t buf[2];
+  uint16_t bword1, bword2, bword3, bword4;
+  EKLMDigit* eklmDigit;
+  if (!m_ElectronicsMap.isValid())
+    B2FATAL("No EKLM electronics map.");
+  for (i = 0; i < digits.getEntries(); i++) {
+    eklmDigit = digits[i];
+    if (!(eklmDigit->isGood()))
+      continue;
     n_Gdidgits++;
-    int* buf = new int[2];//for one hit, hit length is 2;
     buf[0] = 0;
     buf[1] = 0;
-    EKLMDigit* idigit = digits[d];
-//OBTAIN PARAMETERS OF HIT FROM MC---------------------------
-    int   iEndcap = idigit->getEndcap();
-    int   iLayer  = idigit->getLayer();
-    int   iSector = idigit->getSector();
-    int   iPlane  = idigit->getPlane();
-    int   iStrip  = idigit->getStrip();
-    int   iCharge = idigit->getCharge();
-    float fTDC    = idigit->getTime();
-//    float fGTime   = idigit->getGlobalTime();
-//    int   iCTIME = 0;                           //---Do we need CTIME?
-//GET MODULE ID IN ELECTRONIC FROM PARAMETERS----------------------------------
-    int electId = 1;
-    int moduleId = (iSector - 1)
-                   | ((iLayer  - 1) << 2)
-                   | ((iEndcap - 1) << 6);
-    if (m_ModuleIdToelectId.find(moduleId) == m_ModuleIdToelectId.end()) {
-      B2INFO("EKLMRawPacker::can not find in mapping for moduleId " <<
-             moduleId << " isForward? " << iEndcap << " , layer " << iLayer <<
-             " , sector " << iSector  << endl);
-      if (m_useDefaultElectId)
-        electId = 1;     //Defaults: copper=1; finesse=1;
-      else
-        continue;
-    } else
-      electId = m_ModuleIdToelectId[moduleId];
-    int copperId = electId & 0xF;
-    int finesse = (electId >> 4) & 0xF;
-//MAKE WORDS WITH INFORMATION
-    uint16_t bword1 = 0;
-    uint16_t bword2 = 0;
-    uint16_t bword3 = 0;
-    uint16_t bword4 = 0;
-    formatData(iEndcap, iLayer, iPlane, iStrip, iCharge, fTDC,
-               finesse, bword1, bword2, bword3, bword4);
+    bword1 = 0;
+    bword2 = 0;
+    bword3 = 0;
+    bword4 = 0;
+    endcap = eklmDigit->getEndcap();
+    layer = eklmDigit->getLayer();
+    sector = eklmDigit->getSector();
+    sectorGlobal = m_GeoDat->sectorNumber(endcap, layer, sector);
+    lane = m_ElectronicsMap->getLaneBySector(sectorGlobal);
+    if (lane == NULL)
+      B2FATAL("Incomplete EKLM electronics map.");
+    formatData(lane, eklmDigit->getPlane(),
+               eklmDigit->getStrip(), eklmDigit->getCharge(),
+               eklmDigit->getTime(), bword1, bword2, bword3, bword4);
     buf[0] |= bword2;
     buf[0] |= ((bword1 << 16));
     buf[1] |= bword4;
     buf[1] |= ((bword3 << 16));
-    data_words[copperId][finesse].push_back(buf[0]);
-    data_words[copperId][finesse].push_back(buf[1]);
-    delete [] buf;
+    copper = lane->getCopper() - 1;
+    dataConcentrator = lane->getDataConcentrator();
+    data_words[copper][dataConcentrator].push_back(buf[0]);
+    data_words[copper][dataConcentrator].push_back(buf[1]);
   }
 //  B2INFO("EKLMRawPackerModule:: N_good_eklmdigits " << n_Gdidgits);
   RawCOPPERPackerInfo rawcprpacker_info;
-  for (int i = 0 ; i < 4; i++) {
+  for (i = 0; i < 4; i++) {
     // Fill event info (These values will be stored in RawHeader)
     rawcprpacker_info.exp_num = 1;
     /* Run number : 14bits, subrun number : 8bits. */
@@ -169,22 +157,20 @@ void EKLMRawPackerModule::event()
  *         12 bits, e.g. after packing/unpacking variable changes 4829 -> 733
  */
 void EKLMRawPackerModule::formatData(
-  int endcap, int layer, int plane, int strip, int charge,
-  float TDC, int finesse_num, uint16_t& bword1, uint16_t& bword2,
-  uint16_t& bword3, uint16_t& bword4)
+  const EKLMDataConcentratorLane* lane, int plane, int strip,
+  int charge, float time,
+  uint16_t& bword1, uint16_t& bword2, uint16_t& bword3, uint16_t& bword4)
 {
-  if (endcap == 1) layer -= (finesse_num % 2) * 6;
-  else          layer -= (finesse_num % 2) * 7;
   bword1 = 0;
   bword2 = 0;
   bword3 = 0;
   bword4 = 0;
   bword1 |= (strip & 0x7F);
   bword1 |= (((plane - 1) & 1) << 7);
-  bword1 |= (((layer - 1) & 0x1F) << 8);
+  bword1 |= ((lane->getLane() & 0x1F) << 8);
   bword1 |= (4 << 13);
   //bword2 |= (ctime & 0x7FFF); //Do we need CTIME ?
-  bword3 |= (((int)TDC) & 0x3FF);
+  bword3 |= (((int)time) & 0x3FF);
   bword4 |= (charge & 0xFFFF);  //SHOULD BE 12 BITS!!!
 }
 
@@ -194,22 +180,5 @@ void EKLMRawPackerModule::endRun()
 
 void EKLMRawPackerModule::terminate()
 {
-}
-
-void EKLMRawPackerModule::loadMap()
-{
-  for (int endcap = 1; endcap <= 2; endcap++) {
-    for (int layer = 1; layer <= 12 + (endcap - 1) * 2; layer++) {
-      for (int sector = 1; sector <= 4; sector++) {
-        int copperId  = (2 - endcap) * 2 + (sector == 2) + (sector == 3);
-        int finesseId = (layer > 5 + endcap) + 2 * ((endcap + sector + 1) % 2);
-        int elecid = (copperId & 0xF) | ((finesseId & 0xF) << 4);
-        int moduleId = (sector - 1)
-                       | ((layer  - 1) << 2)
-                       | ((endcap - 1) << 6);
-        m_ModuleIdToelectId[moduleId] = elecid;
-      }
-    }
-  }
 }
 

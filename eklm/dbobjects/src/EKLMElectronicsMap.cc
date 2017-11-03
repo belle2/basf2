@@ -24,19 +24,20 @@ EKLMElectronicsMap::~EKLMElectronicsMap()
 }
 
 const int* EKLMElectronicsMap::getSectorByLane(
-  struct EKLM::DataConcentratorLane* lane) const
+  EKLMDataConcentratorLane* lane) const
 {
-  std::map<struct EKLM::DataConcentratorLane, int,
-        EKLM::DataConcentratorLaneComparison>::const_iterator it;
+  std::map<EKLMDataConcentratorLane, int,
+      EKLMDataConcentratorLaneComparison>::const_iterator it;
   it = m_MapLaneSector.find(*lane);
   if (it == m_MapLaneSector.end())
     return NULL;
   return &(it->second);
 }
 
-const struct EKLM::DataConcentratorLane* EKLMElectronicsMap::getLaneBySector(
-  int sector) const {
-  std::map<int, struct EKLM::DataConcentratorLane>::const_iterator it;
+const EKLMDataConcentratorLane* EKLMElectronicsMap::getLaneBySector(
+  int sector) const
+{
+  std::map<int, EKLMDataConcentratorLane>::const_iterator it;
   it = m_MapSectorLane.find(sector);
   if (it == m_MapSectorLane.end())
     return NULL;
@@ -48,11 +49,11 @@ void EKLMElectronicsMap::addSectorLane(
 {
   static const EKLMElementNumbers elementNumbers;
   int sectorGlobal;
-  struct EKLM::DataConcentratorLane laneId;
+  EKLMDataConcentratorLane laneId;
   sectorGlobal = elementNumbers.sectorNumber(endcap, layer, sector);
-  laneId.copper = copper;
-  laneId.dataConcentrator = dataConcentrator;
-  laneId.lane = lane;
+  laneId.setCopper(copper);
+  laneId.setDataConcentrator(dataConcentrator);
+  laneId.setLane(lane);
   if (m_MapSectorLane.find(sectorGlobal) != m_MapSectorLane.end()) {
     B2ERROR("Sector with global number " << sectorGlobal <<
             "(endcap " << endcap << ", layer " << layer << ", sector " <<
@@ -65,9 +66,9 @@ void EKLMElectronicsMap::addSectorLane(
             " already exists in the electronics map.");
     return;
   }
-  m_MapSectorLane.insert(std::pair<int, struct EKLM::DataConcentratorLane>(
+  m_MapSectorLane.insert(std::pair<int, EKLMDataConcentratorLane>(
                            sectorGlobal, laneId));
-  m_MapLaneSector.insert(std::pair<struct EKLM::DataConcentratorLane, int>(
+  m_MapLaneSector.insert(std::pair<EKLMDataConcentratorLane, int>(
                            laneId, sectorGlobal));
 }
 

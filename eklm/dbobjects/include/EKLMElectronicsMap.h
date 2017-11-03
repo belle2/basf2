@@ -18,48 +18,9 @@
 #include <TObject.h>
 
 /* Belle2 headers. */
-#include <eklm/dbobjects/EKLMChannelData.h>
+#include <eklm/dbobjects/EKLMDataConcentratorLane.h>
 
 namespace Belle2 {
-
-  namespace EKLM {
-
-    /**
-     * EKLM data concentrator lane identifier.
-     */
-    struct DataConcentratorLane {
-      int copper;           /**< Copper number - EKLM_ID (7000). */
-      int dataConcentrator; /**< Data concentrator number. */
-      int lane;             /**< Lane number. */
-    };
-
-    /**
-     * Class for comparison of DataConcentratorLane.
-     */
-    class DataConcentratorLaneComparison {
-
-    public:
-
-      /**
-       * Comparison function.
-       */
-      bool operator()(const struct DataConcentratorLane& l1,
-                      const struct DataConcentratorLane& l2) const
-      {
-        if (l1.copper < l2.copper)
-          return true;
-        else if (l1.copper > l2.copper)
-          return false;
-        if (l1.dataConcentrator < l2.dataConcentrator)
-          return true;
-        else if (l1.dataConcentrator > l2.dataConcentrator)
-          return false;
-        return l1.lane < l2.lane;
-      }
-
-    };
-
-  }
 
   /**
    * Class to store EKLM alignment data in the database.
@@ -83,14 +44,14 @@ namespace Belle2 {
      * @param[in] lane Lane identifier.
      * @return Sector number, NULL if not found.
      */
-    const int* getSectorByLane(struct EKLM::DataConcentratorLane* lane) const;
+    const int* getSectorByLane(EKLMDataConcentratorLane* lane) const;
 
     /**
      * Get lane identifier by global sector number.
      * @param[in] sector Global sector number.
      * @return Lane identifier, NULL if not found.
      */
-    const struct EKLM::DataConcentratorLane* getLaneBySector(int sector) const;
+    const EKLMDataConcentratorLane* getLaneBySector(int sector) const;
 
     /**
      * Add sector-lane pair.
@@ -107,11 +68,11 @@ namespace Belle2 {
   private:
 
     /** Sector - lane map. */
-    std::map<int, struct EKLM::DataConcentratorLane> m_MapSectorLane;
+    std::map<int, EKLMDataConcentratorLane> m_MapSectorLane;
 
     /** Lane - sector map. */
-    std::map<struct EKLM::DataConcentratorLane, int,
-          EKLM::DataConcentratorLaneComparison> m_MapLaneSector;
+    std::map<EKLMDataConcentratorLane, int,
+        EKLMDataConcentratorLaneComparison> m_MapLaneSector;
 
     /** Needed to make objects storable. */
     ClassDef(Belle2::EKLMElectronicsMap, 1);

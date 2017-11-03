@@ -159,6 +159,10 @@ void eclMuMuECollectorModule::collect()
   int iTrack[2] = { -1, -1};
   for (int it = 0; it < nTrack; it++) {
     const TrackFitResult* temptrackFit = TrackArray[it]->getTrackFitResult(Const::ChargedStable(pdgmuon));
+    if (not temptrackFit) {
+      B2WARNING("Skipping track without myon hypothesis.");
+      continue;
+    }
     int imu = 0;
     if (temptrackFit->getChargeSign() == 1) {imu = 1; }
     double temppt = temptrackFit->getTransverseMomentum();

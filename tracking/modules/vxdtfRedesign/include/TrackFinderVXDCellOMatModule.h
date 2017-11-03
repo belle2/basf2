@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jakob Lettenbichler                                      *
+ * Contributors: Jakob Lettenbichler, Jonas Wagner, Felix Metzner         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,6 +20,8 @@
 
 #include <tracking/trackFindingVXD/algorithms/CellularAutomaton.h>
 #include <tracking/trackFindingVXD/algorithms/PathCollectorRecursive.h>
+#include <tracking/trackFindingVXD/algorithms/NodeFamilyDefiner.h>
+
 #include <tracking/trackFindingVXD/algorithms/CALogger.h>
 #include <tracking/trackFindingVXD/algorithms/CAValidator.h>
 #include <tracking/trackFindingVXD/algorithms/NodeCompatibilityCheckerPathCollector.h>
@@ -28,7 +30,11 @@
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
 
 #include <tracking/trackFindingVXD/tcTools/SpacePointTrackCandCreator.h>
+#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
+
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
 
 
 namespace Belle2 {
@@ -80,29 +86,24 @@ namespace Belle2 {
 
   protected:
 
-/// module parameters
+    /// module parameters
+    /**< SpacePoint collection name */
+    std::string m_spacePointsName;
 
-
-    std::string m_spacePointsName; /**< SpacePoint collection name */
-
-    StoreArray<SpacePoint>
-    m_spacePoints; /**< the storeArray for SpacePoint as member, is faster than recreating link for each event */
+    /**< the storeArray for SpacePoint as member, is faster than recreating link for each event */
+    StoreArray<SpacePoint> m_spacePoints;
 
     /** name for StoreArray< SpacePointTrackCand> to be filled */
     std::string m_PARAMSpacePointTrackCandArrayName;
 
-
     /** name for StoreObjPtr< DirectedNodeNetwork> which contains the networks needed */
     std::string m_PARAMNetworkName;
-
 
     /** the name of the SectorMap used for this instance. */
     std::string m_PARAMsecMapName;
 
-
     /** If true for each event and each network created a file with a graph is created. */
     bool m_PARAMprintNetworks;
-
 
     /** Regulates if every node with enough notes below it is used as a seed or only the outermost nodes. */
     bool m_PARAMstrictSeeding;
@@ -110,8 +111,13 @@ namespace Belle2 {
     /** Regulates if every subset of sufficient length of a path shall be collected as separate path or not. */
     bool m_PARAMstoreSubsets;
 
-/// member variables
+    /** If true additionally assign a common family identifier to all Tracks that are share a node. */
+    bool m_PARAMsetFamilies;
 
+    /** If true create track candidate only for the best candidate of a family. */
+    bool m_PARAMselectBestPerFamily;
+
+    /// member variables
     /** CA algorithm */
     CellularAutomaton<Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >, Belle2::CAValidator<Belle2::CACell>, Belle2::CALogger>
     m_cellularAutomaton;
@@ -127,18 +133,30 @@ namespace Belle2 {
     /** tool for creating SPTCs, fills storeArray directly */
     SpacePointTrackCandCreator<StoreArray<Belle2::SpacePointTrackCand>> m_sptcCreator;
 
+    /** Class to evaluate connected nodes, in this case for the directed node network, and assigns a family to each
+     *  cluster of connected nodes. */
+    NodeFamilyDefiner <
+    Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >,
+           Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>,
+           std::vector<Belle2::DirectedNode<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>*>
+           > m_familyDefiner;
 
     /// input containers
-
     /** access to the DirectedNodeNetwork, which contains the network needed for creating TrackCandidates */
     StoreObjPtr<Belle2::DirectedNodeNetworkContainer> m_network;
 
-
     /// output containers
-
     /** StoreArray for the TCs created in this module */
     StoreArray<Belle2::SpacePointTrackCand> m_TCs;
 
+    /** pointer to the QualityEstimator */
+    std::unique_ptr<QualityEstimatorBase> m_estimator;
+
+    /** Vector containing the currently best set of SPTCs, one for each family. */
+    std::vector<SpacePointTrackCand> m_bestPaths;
+
+    /** Map containing the relation between the indices of m_bestPath to the families. */
+    std::vector<short> m_familyIndex;
 
     /// counters and other debug stuff:
     /** counts event numbers */

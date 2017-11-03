@@ -201,8 +201,32 @@ namespace Belle2 {
                      [this](APVRawSampleType x, APVFloatSampleType y)->APVRawSampleType
       { return trimToSampleRange(x + y); }
                     );
-      // FIXME: Reset FADC time flag in mode byt.
+      // FIXME: Reset FADC time flag in mode byte.
       return DigitBase::c_DontAppend;
+    }
+
+    /**
+    *
+    * @param
+    * @return append status
+    */
+    bool operator < (const SVDShaperDigit&   x)const
+    {
+
+      /*
+      //to be re-checked
+      bool sensorOrder = getSensorID()  <= x.getSensorID() ;
+      bool sideOrder = isUStrip() || ( (! isUStrip() && ! x.isUStrip()) );
+      bool cellOrder = getCellID() < x.getCellID();
+      return sensorOrder && sideOrder && cellOrder ;
+      */
+
+      if (getSensorID() != x.getSensorID())
+        return getSensorID() < x. getSensorID();
+      if (isUStrip() != x.isUStrip())
+        return isUStrip();
+      else
+        return getCellID() < x.getCellID();
     }
 
   private:

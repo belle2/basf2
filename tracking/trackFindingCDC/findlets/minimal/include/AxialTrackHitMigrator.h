@@ -41,10 +41,10 @@ namespace Belle2 {
 
     private:
       /// Parameter : Distance for a hit to be removed
-      double m_param_dropDistance = 0.2;
+      double m_param_dropDistance = 0.20;
 
       /// Parameter : Distance for a hit to be added
-      double m_param_addDistance = 0.2;
+      double m_param_addDistance = 0.25;
     };
   }
 }

@@ -246,7 +246,9 @@ void EVEVisualization::addTrackCandidate(const std::string& collectionName,
 
 void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 {
-  const TrackFitResult* fitResult = belle2Track->getTrackFitResult(Const::pion);
+  // load the pion fit hypothesis or the hypothesis which is the closest in mass to a pion
+  // the tracking will not always successfully fit with a pion hypothesis
+  const TrackFitResult* fitResult = belle2Track->getTrackFitResultWithClosestMass(Const::pion);
   if (!fitResult) {
     B2ERROR("Track without TrackFitResult skipped.");
     return;

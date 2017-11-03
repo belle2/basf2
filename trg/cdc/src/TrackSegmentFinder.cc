@@ -130,7 +130,7 @@ namespace Belle2 {
     TRGDebug::enterStage("Track Segment Finder");
 
     // Saves TS information
-    saveTSInformation(tss);
+    //saveTSInformation(tss);
 
     //...Store TS hits...
     const unsigned n = tss.size();
@@ -150,7 +150,7 @@ namespace Belle2 {
     saveTSFResults(segmentHitsSL);
 
     // Saves NNTS information. Only when ts is hit.
-    saveNNTSInformation(tss);
+    //saveNNTSInformation(tss);
 
     if (TRGDebug::level() > 1) {
       cout << TRGDebug::tab() << "TS hit list" << endl;

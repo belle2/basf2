@@ -46,28 +46,30 @@ namespace Belle2 {
     VariablesToExtraInfoModule();
     virtual ~VariablesToExtraInfoModule() override;
 
+    /** initialise */
     virtual void initialize() override;
+    /** process event: actually adds the extra info */
     virtual void event() override;
 
   private:
-    /**< name of input particle list. */
+    /** name of input particle list. */
     std::string m_inputListName;
-    /**< input particle list */
+    /** input particle list */
     StoreObjPtr<ParticleList> m_inputList;
     /** Map of variables and extraInfo names to save in the extra-info field. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
     std::map<std::string, std::string> m_variables;
-    /**< Vector of function pointers corresponding to given variables. */
+    /** Vector of function pointers corresponding to given variables. */
     std::vector<Variable::Manager::FunctionPtr> m_functions;
-    /**< Vector of extra info names */
+    /** Vector of extra info names */
     std::vector<std::string> m_extraInfoNames;
 
-    /**< DecayString specifying the daughter Particle to which the extra-info field will be added */
+    /** DecayString specifying the daughter Particle to which the extra-info field will be added */
     std::string m_decayString;
-    /**< Decay descriptor of the particle being selected */
+    /** Decay descriptor of the particle being selected */
     DecayDescriptor m_pDDescriptor;
-    /**< if true the extraInfo is written to daughter specified by the decay string*/
+    /** if true the extraInfo is written to daughter specified by the decay string*/
     bool m_writeToDaughter = false;
-    /**< -1/0/1: Overwrite if lower / don't overwrite / overwrite if higher, in case if extra info with given name already exists */
+    /** -1/0/1: Overwrite if lower / don't overwrite / overwrite if higher, in case if extra info with given name already exists */
     int m_overwrite = 0;
 
     /**

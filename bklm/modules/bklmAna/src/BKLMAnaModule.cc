@@ -178,7 +178,9 @@ void BKLMAnaModule::event()
 //the second way, require muid
   for (int k = 0; k < tracks.getEntries(); k++) {
     Track* track = tracks[k];
-    const TrackFitResult* fitres = track->getTrackFitResult(Belle2::Const::muon);
+    // load the muon fit hypothesis or the hypothesis which is the clostes in mass to a muon
+    // the tracking will not always fit a muon hypothesis
+    const TrackFitResult* fitres = track->getTrackFitResultWithClosestMass(Belle2::Const::muon);
     double mom = fitres->getMomentum().Mag();
     //double  pt = fitres->getTransverseMomentum();
     TLorentzVector p4 = fitres->get4Momentum();

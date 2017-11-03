@@ -56,7 +56,8 @@ namespace Belle2 {
              "Input DecayDescriptor string (see https://confluence.desy.de/display/BI/Physics+DecayString).");
     addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
     addParam("maximumNumberOfCandidates", m_maximumNumberOfCandidates,
-             "Max. number of candidates reconstructed ", 10000);
+             "Max. number of candidates reconstructed. By default, if the limit is reached no candidates will be produced.\n"
+             "This behaviour can be changed by \'ignoreIfTooManyCandidates\' flag.", 10000);
 
     addParam("ignoreIfTooManyCandidates", m_ignoreIfTooManyCandidates,
              "Don't reconstruct channel if more candidates than given by \'maximumNumberOfCandidates\' are produced.", true);

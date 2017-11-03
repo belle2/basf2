@@ -15,15 +15,13 @@ evtgen_steering = Belle2.FileSystem.findFile('reconstruction/tests/evtgen.py_noe
 reco_steering = Belle2.FileSystem.findFile('reconstruction/tests/reco.py_noexec')
 
 # create and move to temporary directory
-tempdir = tempfile.mkdtemp()
-print("Moving to temporary directory " + str(tempdir))
-os.chdir(tempdir)
+with tempfile.TemporaryDirectory() as tempdir:
+    print("Moving to temporary directory " + str(tempdir))
+    os.chdir(tempdir)
 
-# run generator & simulation
-assert(0 == os.system("basf2 " + evtgen_steering))
-# run reconstruction only
-assert(0 == os.system("basf2 " + reco_steering))
-# Check if there are 10 events in the file
-assert(0 == os.system("check_basf2_file -n10 evtgen_bbar.root"))
-
-shutil.rmtree(tempdir)
+    # run generator & simulation
+    assert(0 == os.system("basf2 " + evtgen_steering))
+    # run reconstruction only
+    assert(0 == os.system("basf2 " + reco_steering))
+    # Check if there are 10 events in the file
+    assert(0 == os.system("check_basf2_file -n10 evtgen_bbar.root"))

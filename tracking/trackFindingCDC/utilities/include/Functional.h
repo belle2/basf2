@@ -11,8 +11,6 @@
 
 #include <tracking/trackFindingCDC/utilities/FunctorTag.h>
 
-#include <tracking/trackFindingCDC/utilities/EnableIf.h>
-
 #include <type_traits>
 #include <utility>
 #include <cassert>
@@ -63,14 +61,14 @@ namespace Belle2 {
 
 
     /// Function coercing a scalar value to a constant functor
-    template<class T, class SFINAE = EnableIf<not isFunctor<T>()> >
+    template<class T, class SFINAE = std::enable_if_t<not isFunctor<T>()> >
     constexpr Constant<T> toFunctor(const T& t)
     {
       return Constant<T> {t};
     }
 
     /// Alternative coercion from a functor yields the functor itself
-    template<class AFunctor, class SFINAE = EnableIf<isFunctor<AFunctor>()> >
+    template<class AFunctor, class SFINAE = std::enable_if_t<isFunctor<AFunctor>()> >
     constexpr const AFunctor & toFunctor(const AFunctor& get)
     {
       return get;
@@ -377,7 +375,7 @@ namespace Belle2 {
     using NotOf = Composition<Not, AFunctor>;
 
     /// Operator to construct a logical negated functor.
-    template <class AFunctor, class SFINAE = EnableIf<isFunctor<AFunctor>()> >
+    template <class AFunctor, class SFINAE = std::enable_if_t<isFunctor<AFunctor>()> >
     NotOf<AFunctor> operator!(const AFunctor& functor)
     {
       return NotOf<AFunctor> {functor};
@@ -475,7 +473,7 @@ namespace Belle2 {
     using LessOf = BinaryJoin<Less, AFunctor1, AFunctor2>;
 
     /// Operator to construct a less comparision functor from two functors or on functor and a constant value.
-    template <class ALHS, class ARHS, class SFINAE = EnableIf<isFunctor<ALHS>() or isFunctor<ARHS>()>>
+    template <class ALHS, class ARHS, class SFINAE = std::enable_if_t<isFunctor<ALHS>() or isFunctor<ARHS>()>>
     LessOf<ToFunctor<ALHS>, ToFunctor<ARHS> > operator<(const ALHS& lhs, const ARHS& rhs)
     {
       return {toFunctor(lhs), toFunctor(rhs)};
@@ -503,7 +501,7 @@ namespace Belle2 {
     using GreaterOf = BinaryJoin<Greater, AFunctor1, AFunctor2>;
 
     /// Operator to construct a greater comparision functor from two functors or on functor and a constant value.
-    template <class ALHS, class ARHS, class SFINAE = EnableIf<isFunctor<ALHS>() or isFunctor<ARHS>()>>
+    template <class ALHS, class ARHS, class SFINAE = std::enable_if_t<isFunctor<ALHS>() or isFunctor<ARHS>()>>
     GreaterOf<ToFunctor<ALHS>, ToFunctor<ARHS> > operator>(const ALHS& lhs, const ARHS& rhs)
     {
       return {toFunctor(lhs), toFunctor(rhs)};
@@ -529,7 +527,7 @@ namespace Belle2 {
     using EqualOf = BinaryJoin<Equal, AFunctor1, AFunctor2>;
 
     /// Operator to construct a equality comparision functor from two functors or on functor and a constant value.
-    template <class ALHS, class ARHS, class SFINAE = EnableIf<isFunctor<ALHS>() or isFunctor<ARHS>()>>
+    template <class ALHS, class ARHS, class SFINAE = std::enable_if_t<isFunctor<ALHS>() or isFunctor<ARHS>()>>
     EqualOf<ToFunctor<ALHS>, ToFunctor<ARHS> > operator==(const ALHS& lhs, const ARHS& rhs)
     {
       return {toFunctor(lhs), toFunctor(rhs)};

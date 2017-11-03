@@ -14,6 +14,8 @@
 #include <memory>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
     /// Filter adapter type that inverts the acceptance criterion for cross checks
     template<class AFilter>
@@ -33,6 +35,9 @@ namespace Belle2 {
 
       /// Default destructor.
       ~NotFilter();
+
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Accept inverse
       Weight operator()(const typename AFilter::Object& obj) final;

@@ -15,7 +15,6 @@
 #include <tracking/trackFindingCDC/filters/trackRelation/ChooseableTrackRelationFilter.h>
 
 #include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
 #include <vector>
 #include <string>
@@ -42,6 +41,7 @@ namespace Belle2 {
 
       /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+
     public:
       /// Main algorithm
       void apply(const std::vector<CDCTrack>& inputTracks, std::vector<CDCTrack>& outputTracks) final;

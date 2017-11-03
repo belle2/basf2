@@ -61,7 +61,7 @@ namespace Belle2 {
 
       private:
         /// Private constructor. Should only be called by the SoftwareTriggerVariableManager.
-        SoftwareTriggerVariable(const std::string& name) : name(name) { }
+        explicit SoftwareTriggerVariable(const std::string& theName) : name(theName) { }
 
         /// Make the object move constructable
         SoftwareTriggerVariable(SoftwareTriggerVariable&&) = default;

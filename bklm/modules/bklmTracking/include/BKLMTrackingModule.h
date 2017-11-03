@@ -63,12 +63,6 @@ namespace Belle2 {
     //! option for efficieny study mode, in this mode, the layer under study should not be used in tracking
     bool m_studyEffi;
 
-    //! Mean hit - trigger time (ns)
-    double m_MeanDt;
-
-    //! Coincidence window half-width for in-time KLM hits (ns)
-    double m_MaxDt;
-
     //! whether match BKLMTrack to RecoTrack
     bool m_MatchToRecoTrack;
 

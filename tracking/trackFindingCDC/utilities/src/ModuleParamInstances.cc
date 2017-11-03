@@ -33,4 +33,5 @@ template class Belle2::ModuleParam<std::vector<std::string>>;
 template class Belle2::ModuleParam<std::map<short, unsigned long>>;
 template class Belle2::ModuleParam<std::map<int, int>>;
 
+template class Belle2::ModuleParam<std::tuple<double, double>>;
 template class Belle2::ModuleParam<std::tuple<double, double, double>>;

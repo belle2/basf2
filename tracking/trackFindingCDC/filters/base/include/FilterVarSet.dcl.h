@@ -44,8 +44,8 @@ namespace Belle2 {
      *  The variables that are extracted from the filter response are the weight
      *  and a boolean whether the response was NaN.
      */
-    template<class AFilter>
-    class  FilterVarSet : public VarSet<FilterVarNames<AFilter> > {
+    template <class AFilter>
+    class FilterVarSet : public VarSet<FilterVarNames<AFilter>> {
 
     private:
       /// Type of the base class
@@ -72,29 +72,17 @@ namespace Belle2 {
       /// Initialize the filter before event processing
       void initialize() final;
 
-      /// Allow setup work to take place at beginning of new run
-      void beginRun() final;
-
-      /// Allow setup work to take place at beginning of new event
-      void beginEvent() final;
-
-      /// Allow clean up to take place at end of run
-      void endRun() final;
-
-      /// Terminate the filter after event processing
-      void terminate() final;
-
       /**
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
-      std::vector<Named<Float_t*>> getNamedVariables(std::string prefix) override;
+      std::vector<Named<Float_t*>> getNamedVariables(const std::string& prefix) override;
 
       /**
        *   Pointer to the variable with the given name.
        *   Returns nullptr if not found.
        */
-      MayBePtr<Float_t> find(std::string varName) override;
+      MayBePtr<Float_t> find(const std::string& varName) override;
 
     public:
       /// The cut on the filter output.

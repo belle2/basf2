@@ -251,7 +251,7 @@ namespace Belle2 {
     };
 
     /**
-     * Convenency function to obtain pointers from a range of objects
+     * Convenience function to obtain pointers from a range of objects
      */
     template <class T, class Ts>
     std::vector<T*> as_pointers(Ts& ts)

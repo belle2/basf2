@@ -71,7 +71,7 @@ namespace Belle2 {
     /** Use default elect id, if not found in mapping file. */
     bool m_useDefaultElectId;
 
-    /** Number of events in a run. */
+    /** Maximal number of events to be produced, negative means unlimited. */
     int m_MaxNEvents;
 
     /** Number of events. */

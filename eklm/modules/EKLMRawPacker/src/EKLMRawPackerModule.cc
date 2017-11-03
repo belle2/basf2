@@ -15,21 +15,12 @@
 using namespace std;
 using namespace Belle2;
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
 REG_MODULE(EKLMRawPacker)
-
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
 
 EKLMRawPackerModule::EKLMRawPackerModule() : Module()
 {
-  ///Set module properties
   setDescription("EKLM raw data packer (creates RawKLM from EKLMDigit).");
   setPropertyFlags(c_ParallelProcessingCertified);
-  ///  maximum # of events to produce( -1 : inifinite)
   addParam("MaxEventNum", m_MaxNEvents, "Maximum event number to make", -1);
   addParam("useDefaultModuleId", m_useDefaultElectId,
            "Use default elect id if not found in mapping", true);

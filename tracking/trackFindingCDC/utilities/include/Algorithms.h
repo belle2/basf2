@@ -260,7 +260,7 @@ namespace Belle2 {
       using std::end;
       std::size_t size = end(ts) - begin(ts);
       std::vector<T*> result(size, nullptr);
-      std::transform(begin(ts), end(ts), result.begin(), std::addressof<T>);
+      std::transform(begin(ts), end(ts), result.begin(), [](T & t) { return std::addressof<T>(t);});
       return result;
     }
   }

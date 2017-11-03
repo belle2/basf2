@@ -342,6 +342,10 @@ namespace Belle2 {
     /** remove a SpacePoint (and its sorting parameter) from the SpacePointTrackCand */
     void removeSpacePoint(int indexInTrackCand);
 
+    /** Overloading the less operator to compare SPTCs based on their quality index. This is used in
+     *  in SPTCSelectorXBestPerFamily for instance. */
+    bool operator <(const SpacePointTrackCand& rhs) const { return m_qualityIndex < rhs.m_qualityIndex; }
+
   protected:
     /**
      * pointers to SpacePoints in the datastore

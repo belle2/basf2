@@ -21,9 +21,6 @@ EKLMRawPackerModule::EKLMRawPackerModule() : Module()
 {
   setDescription("EKLM raw data packer (creates RawKLM from EKLMDigit).");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("MaxEventNum", m_MaxNEvents, "Maximum event number to make", -1);
-  addParam("useDefaultModuleId", m_useDefaultElectId,
-           "Use default elect id if not found in mapping", true);
   m_GeoDat = NULL;
   m_NEvents = 0;
 }
@@ -118,14 +115,6 @@ void EKLMRawPackerModule::event()
       delete[] detectorBuf[j];
   }
   B2INFO("Event # " << m_NEvents);
-  // Monitor
-  if (m_MaxNEvents >= 0) {
-    if (m_NEvents >= m_MaxNEvents && m_MaxNEvents > 0) {
-      B2INFO("RunStop was detected. ( Setting:  Max event # " << m_MaxNEvents <<
-             " ) Processed Event " << m_NEvents);
-      m_eventMetaDataPtr->setEndOfData();
-    }
-  }
   m_NEvents++;
   return;
 }

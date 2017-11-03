@@ -88,12 +88,6 @@ namespace Belle2 {
                     uint16_t& bword1, uint16_t& bword2, uint16_t& bword3,
                     uint16_t& bword4);
 
-    /** Use default elect id, if not found in mapping file. */
-    bool m_useDefaultElectId;
-
-    /** Maximal number of events to be produced, negative means unlimited. */
-    int m_MaxNEvents;
-
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 

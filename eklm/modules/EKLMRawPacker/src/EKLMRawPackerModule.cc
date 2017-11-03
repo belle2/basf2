@@ -50,10 +50,13 @@ void EKLMRawPackerModule::event()
   B2INFO("EKLMRawPackerModule:: entries of eklmdigits " << digits.getEntries());
   int n_Gdidgits = 0;
   const EKLMDataConcentratorLane* lane;
-  int i, endcap, layer, sector, sectorGlobal, copper, dataConcentrator;
-  vector<uint32_t> data_words[4][4]; // Indices: copper - 1, data concentrator.
+  int i, j, k, endcap, layer, sector, sectorGlobal, copper, dataConcentrator;
+  vector<uint32_t> dataWords[4][4]; // Indices: copper - 1, data concentrator.
+  int* detectorBuf[4], nWords[4];
   uint32_t buf[2];
   uint16_t bword1, bword2, bword3, bword4;
+  RawCOPPERPackerInfo packerInfo;
+  RawKLM* rawKlm;
   EKLMDigit* eklmDigit;
   if (!m_ElectronicsMap.isValid())
     B2FATAL("No EKLM electronics map.");
@@ -84,53 +87,35 @@ void EKLMRawPackerModule::event()
     buf[1] |= ((bword3 << 16));
     copper = lane->getCopper() - 1;
     dataConcentrator = lane->getDataConcentrator();
-    data_words[copper][dataConcentrator].push_back(buf[0]);
-    data_words[copper][dataConcentrator].push_back(buf[1]);
+    dataWords[copper][dataConcentrator].push_back(buf[0]);
+    dataWords[copper][dataConcentrator].push_back(buf[1]);
   }
 //  B2INFO("EKLMRawPackerModule:: N_good_eklmdigits " << n_Gdidgits);
-  RawCOPPERPackerInfo rawcprpacker_info;
   for (i = 0; i < 4; i++) {
     // Fill event info (These values will be stored in RawHeader)
-    rawcprpacker_info.exp_num = 1;
+    packerInfo.exp_num = 1;
     /* Run number : 14bits, subrun number : 8bits. */
-    rawcprpacker_info.run_subrun_num = 2;
-    rawcprpacker_info.eve_num = m_NEvents;
-    rawcprpacker_info.node_id = EKLM_ID + 1 + i;
-    rawcprpacker_info.tt_ctime = 0x7123456;
-    rawcprpacker_info.tt_utime = 0xF1234567;  //Triger info may be required
-    rawcprpacker_info.b2l_ctime = 0x7654321;
-    //one call per copper
-    RawKLM* raw_klm = m_RawKLMArray.appendNew();
-    int* buf1, *buf2, *buf3, *buf4;
-    int nwords_1st = data_words[i][0].size();
-    int nwords_2nd = data_words[i][1].size();
-    int nwords_3rd = data_words[i][2].size();
-    int nwords_4th = data_words[i][3].size();
-    buf1 = NULL;
-    buf2 = NULL;
-    buf3 = NULL;
-    buf4 = NULL;
-    buf1 = new int[nwords_1st + 1];
-    buf2 = new int[nwords_2nd + 1];
-    buf3 = new int[nwords_3rd + 1];
-    buf4 = new int[nwords_4th + 1];
-    for (int j = 0; j < nwords_1st; j++) buf1[j] = data_words[i][0][j];
-    buf1[nwords_1st] = 0; // DIVOT
-    for (int j = 0; j < nwords_2nd; j++) buf2[j] = data_words[i][1][j];
-    buf2[nwords_2nd] = 0; // DIVOT
-    for (int j = 0; j < nwords_3rd; j++) buf3[j] = data_words[i][2][j];
-    buf3[nwords_3rd] = 0; // DIVOT
-    for (int j = 0; j < nwords_4th; j++) buf4[j] = data_words[i][3][j];
-    buf4[nwords_4th] = 0; // DIVOT
-    raw_klm->PackDetectorBuf(buf1, nwords_1st + 1,
-                             buf2, nwords_2nd + 1,
-                             buf3, nwords_3rd + 1,
-                             buf4, nwords_4th + 1,
-                             rawcprpacker_info);
-    delete [] buf1;
-    delete [] buf2;
-    delete [] buf3;
-    delete [] buf4;
+    packerInfo.run_subrun_num = 2;
+    packerInfo.eve_num = m_NEvents;
+    packerInfo.node_id = EKLM_ID + 1 + i;
+    packerInfo.tt_ctime = 0x7123456;
+    packerInfo.tt_utime = 0xF1234567;  //Triger info may be required
+    packerInfo.b2l_ctime = 0x7654321;
+    rawKlm = m_RawKLMArray.appendNew();
+    for (j = 0; j < 4; j++) {
+      nWords[j] = dataWords[i][j].size();
+      detectorBuf[j] = new int[nWords[j] + 1];
+      for (k = 0; k < nWords[j]; k++)
+        detectorBuf[j][k] = dataWords[i][j][k];
+      detectorBuf[j][nWords[j]] = 0;
+    }
+    rawKlm->PackDetectorBuf(detectorBuf[0], nWords[0] + 1,
+                            detectorBuf[1], nWords[1] + 1,
+                            detectorBuf[2], nWords[2] + 1,
+                            detectorBuf[3], nWords[3] + 1,
+                            packerInfo);
+    for (j = 0; j < 4; j++)
+      delete[] detectorBuf[j];
   }
   B2INFO("Event # " << m_NEvents);
   // Monitor

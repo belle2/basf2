@@ -19,7 +19,7 @@ import re
 import glob
 import shutil
 import subprocess
-import basf2
+import basf2_version
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -37,8 +37,9 @@ import basf2
 extensions = [
     'sphinx.ext.autodoc',
     # 'sphinx.ext.autosummary',
-    'sphinx.ext.imgmath',
+    'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
+    'sphinxarg.ext',
 ]
 
 # autosummary_generate = True

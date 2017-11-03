@@ -14,20 +14,42 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCTangent.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/ca/AutomatonCell.h>
+
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
 
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/utilities/Relation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFindingCDC/utilities/ReversedRange.h>
 #include <tracking/trackFindingCDC/utilities/GetIterator.h>
 
-#include <boost/range/adaptor/reversed.hpp>
-#include <boost/range/adaptor/indirected.hpp>
-#include <numeric>
+#include <framework/logging/Logger.h>
+
+#include <functional>
+#include <algorithm>
 #include <iterator>
+
+#include <cassert>
+#include <cstddef>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+    class CDCRLWireHit;
+    class CDCWire;
+  }
+}
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 namespace {
   void createTangentSegment(const CDCRLWireHitSegment& rlWireHitSegment,
@@ -67,26 +89,34 @@ namespace {
       //pass
     } else if (nTangents == 1) {
       // Only one tangent no averaging necesssary
-      result.push_back(tangentIt->getFromRecoHit2D());
-      result.push_back(tangentIt->getToRecoHit2D());
+      const CDCTangent& tangent = *tangentIt;
+      result.push_back(tangent.getFromRecoHit2D());
+      result.push_back(tangent.getToRecoHit2D());
 
     } else { // nTangents > 2
       TangentIt firstTangentIt = tangentIt++;
       TangentIt secondTangentIt = tangentIt++;
 
-      result.push_back(firstTangentIt->getFromRecoHit2D());
+      {
+        const CDCTangent& firstTangent = *firstTangentIt;
+        result.push_back(firstTangent.getFromRecoHit2D());
+      }
 
       while (tangentIt != endTangentIt) {
 
         firstTangentIt = secondTangentIt; // tangentSegment[iTangent];
         secondTangentIt = tangentIt++; // tangentSegment[iTangent+1];
 
-        result.push_back(CDCRecoHit2D::average(firstTangentIt->getToRecoHit2D(),
-                                               secondTangentIt->getFromRecoHit2D()));
+        const CDCTangent& firstTangent = *firstTangentIt;
+        const CDCTangent& secondTangent = *secondTangentIt;
+
+        result.push_back(CDCRecoHit2D::average(firstTangent.getToRecoHit2D(),
+                                               secondTangent.getFromRecoHit2D()));
       }
-
-      result.push_back(secondTangentIt->getToRecoHit2D());
-
+      {
+        const CDCTangent& secondTangent = *secondTangentIt;
+        result.push_back(secondTangent.getToRecoHit2D());
+      }
     }
 
     result.receiveISuperCluster();
@@ -108,51 +138,69 @@ namespace {
       //pass
     } else if (nFacets == 1) {
       FacetIt onlyFacetIt = facetIt;
-      result.push_back(onlyFacetIt->getStartRecoHit2D());
-      result.push_back(onlyFacetIt->getMiddleRecoHit2D());
-      result.push_back(onlyFacetIt->getEndRecoHit2D());
+      const CDCFacet& onlyFacet = *onlyFacetIt;
+      result.push_back(onlyFacet.getStartRecoHit2D());
+      result.push_back(onlyFacet.getMiddleRecoHit2D());
+      result.push_back(onlyFacet.getEndRecoHit2D());
 
     } else if (nFacets == 2) {
       FacetIt firstFacetIt = facetIt++;
       FacetIt secondFacetIt = facetIt;
 
-      result.push_back(firstFacetIt->getStartRecoHit2D());
-      result.push_back(CDCRecoHit2D::average(secondFacetIt->getStartRecoHit2D() ,
-                                             firstFacetIt->getMiddleRecoHit2D()));
+      const CDCFacet& firstFacet = *firstFacetIt;
+      const CDCFacet& secondFacet = *secondFacetIt;
 
-      result.push_back(CDCRecoHit2D::average(secondFacetIt->getMiddleRecoHit2D(),
-                                             firstFacetIt->getEndRecoHit2D()));
+      result.push_back(firstFacet.getStartRecoHit2D());
+      result.push_back(CDCRecoHit2D::average(secondFacet.getStartRecoHit2D() ,
+                                             firstFacet.getMiddleRecoHit2D()));
 
-      result.push_back(secondFacetIt->getEndRecoHit2D());
+      result.push_back(CDCRecoHit2D::average(secondFacet.getMiddleRecoHit2D(),
+                                             firstFacet.getEndRecoHit2D()));
+
+      result.push_back(secondFacet.getEndRecoHit2D());
 
     } else { // nFacets > 2
       FacetIt firstFacetIt = facetIt++; // facetSegment[0];
       FacetIt secondFacetIt = facetIt++; // facetSegment[1];
       FacetIt thirdFacetIt = facetIt++;  // facetSegment[2];
 
-      result.push_back(firstFacetIt->getStartRecoHit2D());
+      {
+        const CDCFacet& firstFacet = *firstFacetIt;
+        const CDCFacet& secondFacet = *secondFacetIt;
+        const CDCFacet& thirdFacet = *thirdFacetIt;
 
-      result.push_back(CDCRecoHit2D::average(firstFacetIt->getMiddleRecoHit2D(),
-                                             secondFacetIt->getStartRecoHit2D()));
+        result.push_back(firstFacet.getStartRecoHit2D());
 
-      result.push_back(CDCRecoHit2D::average(firstFacetIt->getEndRecoHit2D(),
-                                             secondFacetIt->getMiddleRecoHit2D(),
-                                             thirdFacetIt->getStartRecoHit2D()));
+        result.push_back(CDCRecoHit2D::average(firstFacet.getMiddleRecoHit2D(),
+                                               secondFacet.getStartRecoHit2D()));
+
+        result.push_back(CDCRecoHit2D::average(firstFacet.getEndRecoHit2D(),
+                                               secondFacet.getMiddleRecoHit2D(),
+                                               thirdFacet.getStartRecoHit2D()));
+      }
 
       while (facetIt != endFacetIt) {
         firstFacetIt = secondFacetIt; // facetSegment[iFacet];
         secondFacetIt = thirdFacetIt; // facetSegment[iFacet+1];
         thirdFacetIt = facetIt++; // facetSegment[iFacet+2];
 
-        result.push_back(CDCRecoHit2D::average(firstFacetIt->getEndRecoHit2D(),
-                                               secondFacetIt->getMiddleRecoHit2D(),
-                                               thirdFacetIt->getStartRecoHit2D()));
+        const CDCFacet& firstFacet = *firstFacetIt;
+        const CDCFacet& secondFacet = *secondFacetIt;
+        const CDCFacet& thirdFacet = *thirdFacetIt;
+
+        result.push_back(CDCRecoHit2D::average(firstFacet.getEndRecoHit2D(),
+                                               secondFacet.getMiddleRecoHit2D(),
+                                               thirdFacet.getStartRecoHit2D()));
       }
+      {
+        const CDCFacet& secondFacet = *secondFacetIt;
+        const CDCFacet& thirdFacet = *thirdFacetIt;
 
-      result.push_back(CDCRecoHit2D::average(secondFacetIt->getEndRecoHit2D(),
-                                             thirdFacetIt->getMiddleRecoHit2D()));
+        result.push_back(CDCRecoHit2D::average(secondFacet.getEndRecoHit2D(),
+                                               thirdFacet.getMiddleRecoHit2D()));
 
-      result.push_back(thirdFacetIt->getEndRecoHit2D());
+        result.push_back(thirdFacet.getEndRecoHit2D());
+      }
     }
 
     result.receiveISuperCluster();
@@ -173,7 +221,13 @@ CDCSegment2D CDCSegment2D::condense(const CDCTangentSegment& tangentSegment)
 
 CDCSegment2D CDCSegment2D::condense(const std::vector<const CDCTangent* >& tangentPath)
 {
-  return ::condenseTangentSegment(tangentPath | boost::adaptors::indirected);
+  std::vector<std::reference_wrapper<const CDCTangent> > tangents;
+  tangents.reserve(tangentPath.size());
+  for (const CDCTangent* tangent : tangentPath) {
+    tangents.push_back(std::ref(*tangent));
+  }
+
+  return ::condenseTangentSegment(tangents);
 }
 
 CDCSegment2D CDCSegment2D::condense(const CDCFacetSegment& facetSegment)
@@ -188,7 +242,13 @@ CDCSegment2D CDCSegment2D::condense(const CDCFacetSegment& facetSegment)
 
 CDCSegment2D CDCSegment2D::condense(const std::vector<const CDCFacet* >& facetPath)
 {
-  return ::condenseFacetSegment(facetPath | boost::adaptors::indirected);
+  std::vector<std::reference_wrapper<const CDCFacet> > facets;
+  facets.reserve(facetPath.size());
+  for (const CDCFacet* facet : facetPath) {
+    facets.push_back(std::ref(*facet));
+  }
+
+  return ::condenseFacetSegment(facets);
 }
 
 CDCSegment2D CDCSegment2D::condense(const std::vector<const CDCSegment2D*>& segmentPath)
@@ -328,7 +388,7 @@ CDCSegment2D CDCSegment2D::reversed() const
 {
   CDCSegment2D reverseSegment;
   reverseSegment.reserve(size());
-  for (const CDCRecoHit2D& recohit : boost::adaptors::reverse(*this)) {
+  for (const CDCRecoHit2D& recohit : reversedRange(*this)) {
     reverseSegment.push_back(recohit.reversed());
   }
 

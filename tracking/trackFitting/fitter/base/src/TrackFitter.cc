@@ -40,7 +40,7 @@ bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRe
 {
   // Fit the track
   try {
-    m_fitter->processTrack(&RecoTrackGenfitAccess::getGenfitTrack(recoTrack), false);
+    m_fitter->processTrackWithRep(&RecoTrackGenfitAccess::getGenfitTrack(recoTrack), &trackRepresentation);
   } catch (genfit::Exception& e) {
     B2WARNING(e.getExcString());
   }

@@ -30,10 +30,13 @@ namespace Belle2 {
       /// Iterator type of the range
       using Iterator = AIterator;
 
+      /// Iterator definition for stl
+      using iterator = Iterator;
+
       /// The type the iterator references
       using Reference = typename std::iterator_traits<AIterator>::reference;
 
-      /// The type the begind the iterator (make it possible to use the range as a "list")
+      /// The type behind the iterator (make it possible to use the range as a "list")
       using value_type = typename std::iterator_traits<AIterator>::value_type;
 
     public:

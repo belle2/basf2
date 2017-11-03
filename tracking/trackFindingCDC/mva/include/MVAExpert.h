@@ -9,27 +9,20 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
+#include <tracking/trackFindingCDC/utilities/Named.h>
 
-#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
-#include <mva/interface/Weightfile.h>
-#include <mva/interface/Expert.h>
+#include <RtypesCore.h>
 
-#include <framework/database/DBObjPtr.h>
+#include <vector>
+#include <memory>
+#include <string>
 
 namespace Belle2 {
-
-  class DatabaseRepresentationOfWeightfile;
-  namespace MVA {
-    class Expert;
-    class SingleDataset;
-    class Weightfile;
-  }
-
   namespace TrackFindingCDC {
 
     /// Class to interact with the MVA package
     class MVAExpert {
+
     public:
       /**
        *  Construct the Expert with the specified weight folder and
@@ -39,37 +32,24 @@ namespace Belle2 {
        */
       MVAExpert(const std::string& identifier, std::vector<Named<Float_t*>> namedVariables);
 
+      /// Destructor must be defined in cpp because of PImpl pointer
+      ~MVAExpert();
+
       /// Initialise the mva method
       void initialize();
 
       /// Update the mva method to the new run
       void beginRun();
 
-      /// Resolves the source of the weight file and unpacks it.
-      std::unique_ptr<MVA::Weightfile> getWeightFile();
-
       /// Evaluate the MVA method and return the MVAOutput
       double predict();
 
     private:
-      /// References to the all named values from the source variable set.
-      std::vector<Named<Float_t*> > m_allNamedVariables;
+      /// Forward declartion of implementation.
+      class Impl;
 
-      /// References to the *selected* named values from the source variable set.
-      std::vector<Named<Float_t*> > m_selectedNamedVariables;
-
-      /// Database pointer to the Database representation of the weightfile
-      std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile> > m_weightfileRepresentation;
-
-      /// Pointer to the current MVA Expert
-      std::unique_ptr<MVA::Expert> m_expert;
-
-      /// Pointer to the current dataset
-      std::unique_ptr<MVA::Dataset> m_dataset;
-
-      /// DB identifier of the expert or file name
-      std::string m_identifier;
+      /// Pointer to implementation hiding the details.
+      std::unique_ptr<Impl> m_impl;
     };
-
   }
 }

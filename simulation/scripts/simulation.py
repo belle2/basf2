@@ -3,6 +3,9 @@
 
 from basf2 import *
 from ROOT import Belle2
+from pxd import add_pxd_simulation
+from svd import add_svd_simulation
+from svd import add_svd_reconstruction
 from tracking import add_tracking_for_PXDDataReduction_simulation
 
 
@@ -34,20 +37,20 @@ def check_simulation(path):
                 % (", ".join(required), ", ".join(found)))
 
 
-def add_PXDDataReduction(path, components, use_vxdtf2=False):
+def add_PXDDataReduction(path, components, use_vxdtf2=True,
+                         pxd_unfiltered_digits='pxd_unfiltered_digits',
+                         doCleanup=True):
 
-    pxd_unfiltered_digits = 'pxd_unfiltered_digits'
-    pxd_digitizer = register_module('PXDDigitizer')
-    pxd_digitizer.param('Digits', pxd_unfiltered_digits)
-    path.add_module(pxd_digitizer)
+    # SVD reconstruction
+    svd_cluster = '__ROIsvdClusters'
+    add_svd_reconstruction(path, isROIsimulation=True)
 
     # SVD tracking
-
     svd_reco_tracks = '__ROIsvdRecoTracks'
 
-    add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2)
+    add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2, svd_cluster='__ROIsvdClusters')
 
-    pxdDataRed = register_module('PXDDataReduction')
+    pxdDataRed = register_module('PXDROIFinder')
     param_pxdDataRed = {
         'recoTrackListName': svd_reco_tracks,
         'PXDInterceptListName': 'PXDIntercepts',
@@ -71,6 +74,22 @@ def add_PXDDataReduction(path, components, use_vxdtf2=False):
     pxd_digifilter.param('PXDDigitsInsideROIName', 'PXDDigits')
     path.add_module(pxd_digifilter)
 
+    # empty the StoreArrays which were used for the PXDDatareduction as those are not needed anymore
+    if doCleanup:
+        datastore_cleaner = register_module('PruneDataStore')
+        datastore_cleaner.param('keepMatchedEntries', False)
+        datastore_cleaner.param('matchEntries', ['ROIs', '__ROIsvdClusters', '__ROIsvdRecoTracks',
+                                                 'SPTrackCands__ROI', 'SpacePoints__ROI', pxd_unfiltered_digits,
+                                                 # till here it are StoreArrays, the following are relations and Datastore objects
+                                                 'SegmentNetwork__ROI', 'PXDInterceptsToROIs',
+                                                 'RecoHitInformationsTo__ROIsvdClusters',
+                                                 'SpacePoints__ROITo__ROIsvdClusters', '__ROIsvdClustersToMCParticles',
+                                                 '__ROIsvdClustersToSVDDigits', '__ROIsvdClustersToSVDTrueHits',
+                                                 '__ROIsvdClustersTo__ROIsvdRecoTracks', '__ROIsvdRecoTracksToPXDIntercepts',
+                                                 '__ROIsvdRecoTracksToRecoHitInformations',
+                                                 '__ROIsvdRecoTracksToSPTrackCands__ROI'])
+        path.add_module(datastore_cleaner)
+
 
 def add_simulation(
         path,
@@ -78,24 +97,32 @@ def add_simulation(
         bkgfiles=None,
         bkgcomponents=None,
         bkgscale=1.0,
+        bkgOverlay=False,
         usePXDDataReduction=True,
-        use_vxdtf2=False,
+        cleanupPXDDataReduction=True,
+        use_vxdtf2=True,
         generate_2nd_cdc_hits=False):
     """
     This function adds the standard simulation modules to a path.
+    @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
     """
 
-    # background mixing
+    # background mixing or overlay input before process forking
     if bkgfiles:
-        bkgmixer = register_module('BeamBkgMixer')
-        bkgmixer.param('backgroundFiles', bkgfiles)
-        if bkgcomponents:
-            bkgmixer.param('components', bkgcomponents)
+        if bkgOverlay:
+            bkginput = register_module('BGOverlayInput')
+            bkginput.param('inputFileNames', bkgfiles)
+            path.add_module(bkginput)
         else:
-            if components:
-                bkgmixer.param('components', components)
-        bkgmixer.param('overallScaleFactor', bkgscale)
-        path.add_module(bkgmixer)
+            bkgmixer = register_module('BeamBkgMixer')
+            bkgmixer.param('backgroundFiles', bkgfiles)
+            if bkgcomponents:
+                bkgmixer.param('components', bkgcomponents)
+            else:
+                if components:
+                    bkgmixer.param('components', components)
+            bkgmixer.param('overallScaleFactor', bkgscale)
+            path.add_module(bkgmixer)
 
     # geometry parameter database
     if 'Gearbox' not in path:
@@ -122,10 +149,7 @@ def add_simulation(
 
     # SVD digitization
     if components is None or 'SVD' in components:
-        svd_digitizer = register_module('SVDDigitizer')
-        path.add_module(svd_digitizer)
-        svd_clusterizer = register_module('SVDClusterizer')
-        path.add_module(svd_clusterizer)
+        add_svd_simulation(path)
 
     # CDC digitization
     if components is None or 'CDC' in components:
@@ -134,14 +158,11 @@ def add_simulation(
         path.add_module(cdc_digitizer)
 
     # PXD digitization
+    pxd_digits_name = ''
     if components is None or 'PXD' in components:
         if usePXDDataReduction:
-            add_PXDDataReduction(path, components, use_vxdtf2)
-        else:
-            pxd_digitizer = register_module('PXDDigitizer')
-            path.add_module(pxd_digitizer)
-        pxd_clusterizer = register_module('PXDClusterizer')
-        path.add_module(pxd_clusterizer)
+            pxd_digits_name = 'pxd_unfiltered_digits'
+        add_pxd_simulation(path, digitsName=pxd_digits_name)
 
     # TOP digitization
     if components is None or 'TOP' in components:
@@ -169,3 +190,16 @@ def add_simulation(
     if components is None or 'EKLM' in components:
         eklm_digitizer = register_module('EKLMDigitizer')
         path.add_module(eklm_digitizer)
+
+    # background overlay executor - after all digitizers
+    if bkgOverlay:
+        bkgexecutor = register_module('BGOverlayExecutor')
+        bkgexecutor.param('PXDDigitsName', pxd_digits_name)
+        path.add_module(bkgexecutor)
+
+    # PXD data reduction - after background overlay executor
+    if (components is None or 'PXD' in components) and usePXDDataReduction:
+        add_PXDDataReduction(path, components, use_vxdtf2, pxd_digits_name, doCleanup=cleanupPXDDataReduction)
+
+    # statistics summary
+    path.add_module('StatisticsSummary').set_name('Sum_Simulation')

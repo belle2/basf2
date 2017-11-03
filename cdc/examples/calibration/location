@@ -1,0 +1,27 @@
+I use grep command on variable name on the left. Don't comment using those name
+can't use ~
+
+unpacked data root file
+dir_data="/hsm/belle2/bdata/Data/Raw/e0001/"  
+
+pre_fix for data input file name
+prefix=""
+
+Store data for each itration
+dir_store="/gpfs/fs02/belle2/users/dvthanh/calib_GCR2017c/"
+
+cdc database location
+dir_dbdata="/home/belle2/dvthanh/work/release/cdc/data/"
+
+subdirectory of database under folder cdc/data. each folder for each data set
+dir_params="GCR2017b/"
+
+out put rootfile location
+dir_root="rootfile/"
+
+starting point, please back up first
+these files will be written over
+t0_file="t0.dat"
+tw_file="tw.dat"
+xt_file="xt_v3_chebyshev.dat"
+sigma_file="sigma.dat"

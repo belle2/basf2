@@ -6,6 +6,8 @@ import random
 import string
 import time
 
+from dateutil.relativedelta import relativedelta
+
 
 class IPythonWidget(object):
     """
@@ -138,8 +140,17 @@ class ProgressBarViewer(IPythonWidget):
             if percentage_delta > 0:
                 time_delta_per_percentage = 1.0 * time_delta / percentage_delta
 
-                display_text = "%d %% Remaining time: %.2f s" % (
-                    100 * current_percentage, time_delta_per_percentage * remaining_percentage)
+                # creates a human-readable time delta like '3 minutes 34 seconds'
+                attrs = ['years', 'months', 'days', 'hours', 'minutes', 'seconds']
+
+                def human_readable(delta): return ['%d %s' % (getattr(delta, attr), getattr(delta, attr) > 1 and attr or attr[:-1])
+                                                   for attr in attrs if getattr(delta, attr)]
+
+                times_list = human_readable(relativedelta(seconds=time_delta_per_percentage * remaining_percentage))
+                human_readable_str = " ".join(times_list)
+
+                display_text = "%d %% Remaining time: %s" % (
+                    100 * current_percentage, human_readable_str)
 
                 js = "set_event_text(\"" + display_text + "\", \"" + self.js_name + "\"); "
                 js += "set_event_number(\"" + str(current_percentage) + "\", \"" + self.js_name + "\"); "

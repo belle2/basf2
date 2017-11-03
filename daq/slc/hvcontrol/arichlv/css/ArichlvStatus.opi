@@ -1,0 +1,1017 @@
+<?xml version="1.0" ?><display typeId="org.csstudio.opibuilder.Display" version="1.0.0">
+  <actions hook="false" hook_all="false"/>
+  <auto_scale_widgets>
+    <auto_scale_widgets>false</auto_scale_widgets>
+    <min_width>-1</min_width>
+    <min_height>-1</min_height>
+  </auto_scale_widgets>
+  <auto_zoom_to_fit_all>false</auto_zoom_to_fit_all>
+  <background_color>
+    <color blue="240" green="240" red="240"/>
+  </background_color>
+  <boy_version>5.1.0.201701171407</boy_version>
+  <foreground_color>
+    <color blue="192" green="192" red="192"/>
+  </foreground_color>
+  <grid_space>6</grid_space>
+  <height>685</height>
+  <macros>
+    <include_parent_macros>true</include_parent_macros>
+    <nsm.node>ARICHLV</nsm.node>
+  </macros>
+  <name/>
+  <rules/>
+  <scripts/>
+  <show_close_button>true</show_close_button>
+  <show_edit_range>true</show_edit_range>
+  <show_grid>true</show_grid>
+  <show_ruler>true</show_ruler>
+  <snap_to_geometry>true</snap_to_geometry>
+  <widget_type>Display</widget_type>
+  <width>685</width>
+  <wuid>-6568a690:15e3184f721:-56df</wuid>
+  <x>-1</x>
+  <y>-1</y>
+  
+  
+  
+  
+  
+  
+<widget typeId="org.csstudio.opibuilder.widgets.groupingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>0</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <fc>false</fc>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <height>627</height>
+    <lock_children>false</lock_children>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    </macros>
+    <name>Grouping Container</name>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <show_scrollbar>true</show_scrollbar>
+    <tooltip/>
+    <transparent>false</transparent>
+    <visible>true</visible>
+    <widget_type>Grouping Container</widget_type>
+    <width>900</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d12</wuid>
+    <x>2</x>
+    <y>2</y>
+  <widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>1</CRATEID><SLOTID>0</SLOTID><ID0>0</ID0><ID1>1</ID1><ID2>2</ID2><ID3>3</ID3></macros>
+    <name>Status:crate[1]:slot[0]:channel[0]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>2</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>1</CRATEID><SLOTID>0</SLOTID><ID0>4</ID0><ID1>5</ID1><ID2>6</ID2><ID3>7</ID3></macros>
+    <name>Status:crate[1]:slot[0]:channel[4]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>27</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>1</CRATEID><SLOTID>1</SLOTID><ID0>0</ID0><ID1>1</ID1><ID2>2</ID2><ID3>3</ID3></macros>
+    <name>Status:crate[1]:slot[1]:channel[0]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>52</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>1</CRATEID><SLOTID>1</SLOTID><ID0>4</ID0><ID1>5</ID1><ID2>6</ID2><ID3>7</ID3></macros>
+    <name>Status:crate[1]:slot[1]:channel[4]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>77</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>1</CRATEID><SLOTID>2</SLOTID><ID0>0</ID0><ID1>1</ID1><ID2>2</ID2><ID3>3</ID3></macros>
+    <name>Status:crate[1]:slot[2]:channel[0]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>102</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>1</CRATEID><SLOTID>2</SLOTID><ID0>4</ID0><ID1>5</ID1><ID2>6</ID2><ID3>7</ID3></macros>
+    <name>Status:crate[1]:slot[2]:channel[4]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>127</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>1</CRATEID><SLOTID>3</SLOTID><ID0>0</ID0><ID1>1</ID1><ID2>2</ID2><ID3>3</ID3></macros>
+    <name>Status:crate[1]:slot[3]:channel[0]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>152</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>1</CRATEID><SLOTID>3</SLOTID><ID0>4</ID0><ID1>5</ID1><ID2>6</ID2><ID3>7</ID3></macros>
+    <name>Status:crate[1]:slot[3]:channel[4]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>177</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>1</CRATEID><SLOTID>4</SLOTID><ID0>0</ID0><ID1>1</ID1><ID2>2</ID2><ID3>3</ID3></macros>
+    <name>Status:crate[1]:slot[4]:channel[0]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>202</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>1</CRATEID><SLOTID>4</SLOTID><ID0>4</ID0><ID1>5</ID1><ID2>6</ID2><ID3>7</ID3></macros>
+    <name>Status:crate[1]:slot[4]:channel[4]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>227</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>1</CRATEID><SLOTID>5</SLOTID><ID0>0</ID0><ID1>1</ID1><ID2>2</ID2><ID3>3</ID3></macros>
+    <name>Status:crate[1]:slot[5]:channel[0]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>252</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>1</CRATEID><SLOTID>5</SLOTID><ID0>4</ID0><ID1>5</ID1><ID2>6</ID2><ID3>7</ID3></macros>
+    <name>Status:crate[1]:slot[5]:channel[4]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>277</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>2</CRATEID><SLOTID>0</SLOTID><ID0>0</ID0><ID1>1</ID1><ID2>2</ID2><ID3>3</ID3></macros>
+    <name>Status:crate[2]:slot[0]:channel[0]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>302</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>2</CRATEID><SLOTID>0</SLOTID><ID0>4</ID0><ID1>5</ID1><ID2>6</ID2><ID3>7</ID3></macros>
+    <name>Status:crate[2]:slot[0]:channel[4]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>327</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>2</CRATEID><SLOTID>1</SLOTID><ID0>0</ID0><ID1>1</ID1><ID2>2</ID2><ID3>3</ID3></macros>
+    <name>Status:crate[2]:slot[1]:channel[0]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>352</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>2</CRATEID><SLOTID>1</SLOTID><ID0>4</ID0><ID1>5</ID1><ID2>6</ID2><ID3>7</ID3></macros>
+    <name>Status:crate[2]:slot[1]:channel[4]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>377</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>2</CRATEID><SLOTID>2</SLOTID><ID0>0</ID0><ID1>1</ID1><ID2>2</ID2><ID3>3</ID3></macros>
+    <name>Status:crate[2]:slot[2]:channel[0]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>402</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>2</CRATEID><SLOTID>2</SLOTID><ID0>4</ID0><ID1>5</ID1><ID2>6</ID2><ID3>7</ID3></macros>
+    <name>Status:crate[2]:slot[2]:channel[4]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>427</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>2</CRATEID><SLOTID>3</SLOTID><ID0>0</ID0><ID1>1</ID1><ID2>2</ID2><ID3>3</ID3></macros>
+    <name>Status:crate[2]:slot[3]:channel[0]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>452</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>2</CRATEID><SLOTID>3</SLOTID><ID0>4</ID0><ID1>5</ID1><ID2>6</ID2><ID3>7</ID3></macros>
+    <name>Status:crate[2]:slot[3]:channel[4]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>477</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>2</CRATEID><SLOTID>4</SLOTID><ID0>0</ID0><ID1>1</ID1><ID2>2</ID2><ID3>3</ID3></macros>
+    <name>Status:crate[2]:slot[4]:channel[0]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>502</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>2</CRATEID><SLOTID>4</SLOTID><ID0>4</ID0><ID1>5</ID1><ID2>6</ID2><ID3>7</ID3></macros>
+    <name>Status:crate[2]:slot[4]:channel[4]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>527</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>2</CRATEID><SLOTID>5</SLOTID><ID0>0</ID0><ID1>1</ID1><ID2>2</ID2><ID3>3</ID3></macros>
+    <name>Status:crate[2]:slot[5]:channel[0]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>552</y>
+  </widget><widget typeId="org.csstudio.opibuilder.widgets.linkingContainer" version="1.0.0">
+    <actions hook="false" hook_all="false"/>
+    <background_color>
+      <color blue="240" green="240" red="240"/>
+    </background_color>
+    <border_color>
+      <color blue="255" green="128" red="0"/>
+    </border_color>
+    <border_style>3</border_style>
+    <border_width>1</border_width>
+    <enabled>true</enabled>
+    <font>
+      <opifont.name fontName="Nimbus Sans L" height="10" style="0">Default</opifont.name>
+    </font>
+    <foreground_color>
+      <color blue="192" green="192" red="192"/>
+    </foreground_color>
+    <group_name/>
+    <height>24</height>
+    <macros>
+      <include_parent_macros>true</include_parent_macros>
+    <CRATEID>2</CRATEID><SLOTID>5</SLOTID><ID0>4</ID0><ID1>5</ID1><ID2>6</ID2><ID3>7</ID3></macros>
+    <name>Status:crate[2]:slot[5]:channel[4]</name>
+    <opi_file>arichlv_chstatus_x4.opi</opi_file>
+    <resize_behaviour>0</resize_behaviour>
+    <rules/>
+    <scale_options>
+      <width_scalable>true</width_scalable>
+      <height_scalable>true</height_scalable>
+      <keep_wh_ratio>false</keep_wh_ratio>
+    </scale_options>
+    <scripts/>
+    <tooltip/>
+    <visible>true</visible>
+    <widget_type>Linking Container</widget_type>
+    <width>895</width>
+    <wuid>-6cadbd5c:15e62488eb5:-7d0e</wuid>
+    <x>2</x>
+    <y>577</y>
+  </widget></widget></display>

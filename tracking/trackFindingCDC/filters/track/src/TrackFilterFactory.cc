@@ -12,12 +12,15 @@
 #include <tracking/trackFindingCDC/filters/track/TruthTrackVarSet.h>
 #include <tracking/trackFindingCDC/filters/track/BasicTrackVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MCFilter.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
+#include <tracking/trackFindingCDC/filters/base/FilterVarSet.icc.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
@@ -27,10 +30,12 @@ using namespace TrackFindingCDC;
 namespace {
   using AllTrackFilter = AllFilter<BaseTrackFilter>;
   using NoneTrackFilter = NoneFilter<BaseTrackFilter>;
-  using MCTrackFilter = MCFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
+  using MCTrackFilter = TruthVarFilter<TruthTrackVarSet>;
   using RecordingTrackFilter = RecordingFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
   using MVATrackFilter = MVAFilter<BasicTrackVarSet>;
 }
+
+template class TrackFindingCDC::FilterFactory<BaseTrackFilter>;
 
 TrackFilterFactory::TrackFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
@@ -64,21 +69,21 @@ std::unique_ptr<BaseTrackFilter>
 TrackFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<NoneTrackFilter>();
+    return std::make_unique<NoneTrackFilter>();
   } else if (filterName == "all") {
-    return makeUnique<AllTrackFilter>();
+    return std::make_unique<AllTrackFilter>();
   } else if (filterName == "truth") {
-    return makeUnique<MCTrackFilter>();
+    return std::make_unique<MCTrackFilter>();
   } else if (filterName == "recording") {
-    return makeUnique<RecordingTrackFilter>("TrackFilter.root");
+    return std::make_unique<RecordingTrackFilter>("TrackFilter.root");
   } else if (filterName == "eval") {
-    auto recordedVarSets = makeUnique<UnionVarSet<CDCTrack>>();
+    auto recordedVarSets = std::make_unique<UnionVarSet<CDCTrack>>();
     using TrackFilterVarSet = FilterVarSet<BaseTrackFilter>;
-    recordedVarSets->push_back(makeUnique<TrackFilterVarSet>("mva", create("mva")));
-    recordedVarSets->push_back(makeUnique<TrackFilterVarSet>("truth", create("truth")));
-    return makeUnique<Recording<BaseTrackFilter>>(std::move(recordedVarSets), "TrackFilter_eval.root");
+    recordedVarSets->push_back(std::make_unique<TrackFilterVarSet>("mva", create("mva")));
+    recordedVarSets->push_back(std::make_unique<TrackFilterVarSet>("truth", create("truth")));
+    return std::make_unique<Recording<BaseTrackFilter>>(std::move(recordedVarSets), "TrackFilter_eval.root");
   } else if (filterName == "mva") {
-    return makeUnique<MVATrackFilter>("tracking/data/trackfindingcdc_TrackFilter.xml", 0.10);
+    return std::make_unique<MVATrackFilter>("tracking/data/trackfindingcdc_TrackFilter.xml", 0.10);
   } else {
     return Super::create(filterName);
   }

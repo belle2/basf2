@@ -55,7 +55,11 @@ BKLMReconstructorModule::BKLMReconstructorModule() : Module(), m_GeoPar(NULL)
   // MC 1 GeV/c muons: 1-sigma width is 0.15 ns
   addParam("Prompt window (ns)", m_PromptWindow,
            "Half-width of prompt window relative to PromptTime",
-           double(50.0));
+           //double(50.0));
+           double(2000.0));
+  addParam("Alignment correction flag", m_ifAlign,
+           "flag for alignment correction, do the correction (true) or not (false), default is false",
+           bool(false));
 }
 
 BKLMReconstructorModule::~BKLMReconstructorModule()
@@ -94,9 +98,9 @@ void BKLMReconstructorModule::event()
   // sort by module+strip number
   std::map<int, int> volIDToDigits;
   for (int d = 0; d < digits.getEntries(); ++d) {
-    BKLMDigit* digit = digits[d];
-    if (digit->inRPC() || digit->isAboveThreshold()) {
-      volIDToDigits.insert(std::pair<int, int>(digit->getModuleID() & BKLM_MODULESTRIPID_MASK, d));
+    BKLMDigit* bklmDigit = digits[d];
+    if (bklmDigit->inRPC() || bklmDigit->isAboveThreshold()) {
+      volIDToDigits.insert(std::pair<int, int>(bklmDigit->getModuleID() & BKLM_MODULESTRIPID_MASK, d));
     }
   }
   if (volIDToDigits.empty()) return;
@@ -109,14 +113,14 @@ void BKLMReconstructorModule::event()
   double averageTime = digits[volIDToDigits.begin()->second]->getTime();
 
   for (std::map<int, int>::iterator iVolMap = volIDToDigits.begin(); iVolMap != volIDToDigits.end(); ++iVolMap) {
-    BKLMDigit* digit = digits[iVolMap->second];
-    if ((iVolMap->first > oldVolID + 1) || (std::fabs(digit->getTime() - averageTime) > m_DtMax)) {
+    BKLMDigit* bklmDigit = digits[iVolMap->second];
+    if ((iVolMap->first > oldVolID + 1) || (std::fabs(bklmDigit->getTime() - averageTime) > m_DtMax)) {
       hit1ds.appendNew(cluster); // also creates relation hit1d to each digit in cluster
       cluster.clear();
     }
     double n = (double)(cluster.size());
-    averageTime = (n * averageTime + digit->getTime()) / (n + 1.0);
-    cluster.push_back(digit);
+    averageTime = (n * averageTime + bklmDigit->getTime()) / (n + 1.0);
+    cluster.push_back(bklmDigit);
     oldVolID = iVolMap->first;
   }
   hit1ds.appendNew(cluster); // also creates relation hit1d to each digit in cluster
@@ -140,7 +144,8 @@ void BKLMReconstructorModule::event()
       double phiTime = hit1ds[phiIndex]->getTime() - propagationTimes.y();
       double zTime = hit1ds[zIndex]->getTime() - propagationTimes.z();
       if (std::fabs(phiTime - zTime) > m_DtMax) continue;
-      CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift());
+      //! the second param in localToGlobal is whether do the alignment correction (true) or not (false)
+      CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift(), m_ifAlign);
       double time = 0.5 * (phiTime + zTime) - global.mag() / Const::speedOfLight;
       BKLMHit2d* hit2d = hit2ds.appendNew(hit1ds[phiIndex], hit1ds[zIndex], global, time); // also creates relations hit2d to each hit1d
       if (fabs(time - m_PromptTime) > m_PromptWindow) hit2d->isOutOfTime();

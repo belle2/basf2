@@ -10,7 +10,11 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
 #include <vector>
+#include <string>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

@@ -7,25 +7,24 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <framework/core/ModuleParamList.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   /**
-   * Findlet for using the relations between two store arrays of RecoTracks
-   * to create new RecoTracks with the merged tracks and write them to a new store array.
-   *
-   * Additionally, this findlet has helper function to
+   * This findlet has helper function to
    * * remove all tracks which have already a related partner from a std::vector of CDC tracks
    * * ... and of VXD tracks
    * * fetch the RecoTracks from a StoreArray and write their pointers into two std::vectors
    */
-  class StoreArrayMerger : public TrackFindingCDC::Findlet<> {
+  class StoreArrayMerger : public TrackFindingCDC::Findlet<RecoTrack*, RecoTrack*> {
+    /// The parent class
+    using Super = TrackFindingCDC::Findlet<RecoTrack*, RecoTrack*>;
   public:
     /// Expose the parameters of the findlet
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
@@ -34,16 +33,7 @@ namespace Belle2 {
     void initialize() override;
 
     /// Fetch the RecoTracks from the two input Store Arrays and fill them into two vectors.
-    void fetch(std::vector<RecoTrack*>& cdcRecoTrackVector, std::vector<RecoTrack*>& vxdRecoTrackVector);
-
-    /**
-     * Use the relations between elements in the two CDC and VXD Store Arrays and
-     * merge them together into a new store array.
-     * During this, all hits are filled into a new reco track (in the order VXD -> CDC)
-     * and the track parameters are chosen, that the position comes from the VXD track and
-     * the momentum from the CDC track.
-     */
-    void apply() override;
+    void apply(std::vector<RecoTrack*>& cdcRecoTrackVector, std::vector<RecoTrack*>& vxdRecoTrackVector) override;
 
     /// Helper function to remove all tracks, which have a related VXD track from the vector.
     void removeCDCRecoTracksWithPartner(std::vector<RecoTrack*>& tracks);
@@ -57,18 +47,12 @@ namespace Belle2 {
     std::string m_param_vxdRecoTrackStoreArrayName;
     /** StoreArray name of the CDC Track Store Array */
     std::string m_param_cdcRecoTrackStoreArrayName;
-    /** StoreArray name of the merged Track Store Array */
-    std::string m_param_mergedRecoTrackStoreArrayName;
-    /** Also add tracks, which could not be fitted and have no partner to the resulting array. */
-    bool m_param_addUnfittableTracks = true;
 
     // Store Arrays
     /// CDC Reco Tracks Store Array
     StoreArray<RecoTrack> m_cdcRecoTracks;
     /// VXD Reco Tracks Store Array
     StoreArray<RecoTrack> m_vxdRecoTracks;
-    /// Merged Reco Tracks Store Array
-    StoreArray<RecoTrack> m_mergedRecoTracks;
 
     /// Helper function to remove all element in a std::vector, which have already a relation to the given store array
     void removeRecoTracksWithPartner(std::vector<RecoTrack*>& tracks, const std::string& partnerStoreArrayName);

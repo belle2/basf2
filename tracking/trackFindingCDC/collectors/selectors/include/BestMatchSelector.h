@@ -10,13 +10,19 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
-#include <framework/logging/Logger.h>
+#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
+
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+
+#include <algorithm>
+#include <vector>
+#include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
   namespace TrackFindingCDC {
     /**
      * Selector to remove all relations in the list, which share the same collection item - except the one which the

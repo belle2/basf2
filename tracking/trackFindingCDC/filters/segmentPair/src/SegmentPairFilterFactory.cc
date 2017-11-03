@@ -18,12 +18,14 @@
 #include <tracking/trackFindingCDC/filters/segmentPair/MVAFeasibleSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/MVARealisticSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::FilterFactory<BaseSegmentPairFilter>;
 
 SegmentPairFilterFactory::SegmentPairFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
@@ -59,21 +61,21 @@ std::unique_ptr<Filter<CDCSegmentPair> >
 SegmentPairFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<NoneFilter<BaseSegmentPairFilter>>();
+    return std::make_unique<NoneFilter<BaseSegmentPairFilter>>();
   } else if (filterName == "all") {
-    return makeUnique<AllSegmentPairFilter>();
+    return std::make_unique<AllSegmentPairFilter>();
   } else if (filterName == "truth") {
-    return makeUnique<MCSegmentPairFilter>();
+    return std::make_unique<MCSegmentPairFilter>();
   } else if (filterName == "fitless") {
-    return makeUnique<FitlessSegmentPairFilter>();
+    return std::make_unique<FitlessSegmentPairFilter>();
   } else if (filterName == "simple") {
-    return makeUnique<SimpleSegmentPairFilter>();
+    return std::make_unique<SimpleSegmentPairFilter>();
   } else if (filterName == "unionrecording") {
-    return makeUnique<UnionRecordingSegmentPairFilter>();
+    return std::make_unique<UnionRecordingSegmentPairFilter>();
   } else if (filterName == "feasible") {
-    return makeUnique<MVAFeasibleSegmentPairFilter>();
+    return std::make_unique<MVAFeasibleSegmentPairFilter>();
   } else if (filterName == "realistic") {
-    return makeUnique<MVARealisticSegmentPairFilter>();
+    return std::make_unique<MVARealisticSegmentPairFilter>();
   } else {
     return Super::create(filterName);
   }

@@ -3,62 +3,22 @@ from softwaretrigger import (
     SOFTWARE_TRIGGER_GLOBAL_TAG_NAME
 )
 
-import rawdata
 import reconstruction
 from softwaretrigger import add_fast_reco_software_trigger, add_hlt_software_trigger, \
-    add_calibration_software_trigger
+    add_calibration_software_trigger, add_calcROIs_software_trigger
 
-RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs"]
+RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "ROIs"]
 ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*"]
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
 
 
-def add_packers(path, components=DEFAULT_HLT_COMPONENTS):
-    """
-    Slightly modified version of rawdata.add_packers to not include the packer for PXD and add the Geometry/Gearbox
-     when needed.
-    :param path: The path to which the packers will be added.
-    :param components: Which components to use.
-    """
-    # Add Gearbox or geometry to path if not already there
-    if "Gearbox" not in path:
-        path.add_module("Gearbox")
-
-    if "Geometry" not in path:
-        path.add_module("Geometry")
-
-    # Exclude PXD
-    rawdata.add_packers(path, components=components)
-
-
-def add_unpackers(path, components=DEFAULT_HLT_COMPONENTS):
-    """
-    Slightly modified version of rawdata.add_unpackers to not include the unpacker for PXD and add the Geometry/Gearbox
-     when needed.
-    :param path: The path to which the unpackers will be added.
-    :param components: Which components to use.
-    """
-    # Add Gearbox or geometry to path if not already there
-    if "Gearbox" not in path:
-        path.add_module("Gearbox")
-
-    if "Geometry" not in path:
-        path.add_module("Geometry")
-
-    # Exclude PXD
-    rawdata.add_unpackers(path, components=components)
-
-    # add clusterizer
-    if not components or "SVD" in components:
-        path.add_module("SVDClusterizer")
-
-
 def add_softwaretrigger_reconstruction(
         path,
-        store_array_debug_prescale=None,
+        store_array_debug_prescale=0,
         components=DEFAULT_HLT_COMPONENTS,
         additionalTrackFitHypotheses=[],
-        softwaretrigger_mode='hlt_filter'):
+        softwaretrigger_mode='hlt_filter',
+        calcROIs=True):
     """
     Add all modules, conditions and conditional paths to the given path, that are needed for a full
     reconstruction stack in the HLT using the software trigger modules. Several steps are performed:
@@ -137,8 +97,11 @@ def add_softwaretrigger_reconstruction(
         # Add hlt reconstruction
         reconstruction.add_reconstruction(hlt_reconstruction_path, trigger_mode="hlt", skipGeometryAdding=True,
                                           components=components, additionalTrackFitHypotheses=additionalTrackFitHypotheses)
+
         hlt_cut_module = add_hlt_software_trigger(hlt_reconstruction_path, store_array_debug_prescale)
 
+        # preserve the reconstruction information which is needed for ROI calculation.
+        add_calcROIs_software_trigger(calibration_and_store_only_rawdata_path, calcROIs=calcROIs)
         # Fill the calibration_and_store_only_rawdata_path path
         add_calibration_software_trigger(calibration_and_store_only_rawdata_path, store_array_debug_prescale)
         calibration_and_store_only_rawdata_path.add_path(get_store_only_rawdata_path())
@@ -152,7 +115,7 @@ def add_softwaretrigger_reconstruction(
             hlt_reconstruction_path.add_path(calibration_and_store_only_rawdata_path)
 
     elif softwaretrigger_mode == 'softwaretrigger_off':
-        fast_reco_reconstruction_path.add_module("PruneDataStore", keepEntries=["EventMetaData"] + RAW_SAVE_STORE_ARRAYS)
+        fast_reco_reconstruction_path.add_module("PruneDataStore", matchEntries=["EventMetaData"] + RAW_SAVE_STORE_ARRAYS)
 
     path.add_path(fast_reco_reconstruction_path)
 
@@ -167,7 +130,7 @@ def get_store_only_metadata_path():
     :return: The created path.
     """
     store_metadata_path = basf2.create_path()
-    store_metadata_path.add_module("PruneDataStore", keepEntries=ALWAYS_SAVE_REGEX). \
+    store_metadata_path.add_module("PruneDataStore", matchEntries=ALWAYS_SAVE_REGEX). \
         set_name("KeepMetaData")
 
     return store_metadata_path
@@ -184,7 +147,7 @@ def get_store_only_rawdata_path():
     :return: The created path.
     """
     store_rawdata_path = basf2.create_path()
-    store_rawdata_path.add_module("PruneDataStore", keepEntries=ALWAYS_SAVE_REGEX + RAW_SAVE_STORE_ARRAYS) \
+    store_rawdata_path.add_module("PruneDataStore", matchEntries=ALWAYS_SAVE_REGEX + RAW_SAVE_STORE_ARRAYS) \
         .set_name("KeepRawData")
 
     return store_rawdata_path

@@ -227,12 +227,14 @@ namespace {
       EXPECT_FLOAT_EQ(aplot_weights[i], aplot * splot_weights[i]);
       EXPECT_FLOAT_EQ(aplot_weights[i + 1], aplot * splot_weights[i + 1]);
     }
-    double aplot = 0.5 / boost_prediction[14];
-    EXPECT_FLOAT_EQ(aplot_weights[28], aplot * splot_weights[28]);
-    EXPECT_FLOAT_EQ(aplot_weights[29], aplot * splot_weights[29]);
-    aplot = 0.4 / boost_prediction[15] + 0.1 / (1 -  boost_prediction[15]);
-    EXPECT_FLOAT_EQ(aplot_weights[30], aplot * splot_weights[30]);
-    EXPECT_FLOAT_EQ(aplot_weights[31], aplot * splot_weights[31]);
+    {
+      double aplot = 0.5 / boost_prediction[14];
+      EXPECT_FLOAT_EQ(aplot_weights[28], aplot * splot_weights[28]);
+      EXPECT_FLOAT_EQ(aplot_weights[29], aplot * splot_weights[29]);
+      aplot = 0.4 / boost_prediction[15] + 0.1 / (1 -  boost_prediction[15]);
+      EXPECT_FLOAT_EQ(aplot_weights[30], aplot * splot_weights[30]);
+      EXPECT_FLOAT_EQ(aplot_weights[31], aplot * splot_weights[31]);
+    }
     for (unsigned int i = 32; i < 40; i += 2) {
       double aplot = 0.5 / boost_prediction[i / 2];
       EXPECT_FLOAT_EQ(aplot_weights[i], aplot * splot_weights[i]);

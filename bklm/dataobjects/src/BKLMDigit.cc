@@ -47,7 +47,7 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   m_ModuleID |= ((strip - 1) << BKLM_MAXSTRIP_BIT);
 }
 
-BKLMDigit::BKLMDigit(int moduleID, short ctime, short tdc, short charge) :
+BKLMDigit::BKLMDigit(int moduleID, int ctime, short tdc, short charge) :
   DigitBase(),
   m_SimTime(0.0),
   m_SimEDep(0.0),
@@ -91,6 +91,21 @@ BKLMDigit::BKLMDigit(const BKLMDigit& digit) :
   m_NPixel(digit.m_NPixel),
   m_FitStatus(digit.m_FitStatus)
 {
+}
+
+// Assignment operator
+BKLMDigit& BKLMDigit::operator=(const BKLMDigit& digit)
+{
+  m_CTime = digit.m_CTime;
+  m_ModuleID = digit.m_ModuleID;
+  m_SimTime = digit.m_SimTime;
+  m_Time = digit.m_Time;
+  m_SimEDep = digit.m_SimEDep;
+  m_EDep = digit.m_EDep;
+  m_SimNPixel = digit.m_SimNPixel;
+  m_NPixel = digit.m_NPixel;
+  m_FitStatus = digit.m_FitStatus;
+  return *this;
 }
 
 DigitBase::EAppendStatus BKLMDigit::addBGDigit(const DigitBase* bg)

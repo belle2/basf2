@@ -13,11 +13,14 @@
 
 #include <tracking/trackFindingCDC/filters/segment/AdvancedSegmentVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MCFilter.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
@@ -27,12 +30,13 @@ using namespace TrackFindingCDC;
 namespace {
   using AllSegmentFilter = AllFilter<BaseSegmentFilter>;
   using NoneSegmentFilter = NoneFilter<BaseSegmentFilter>;
-  using BkgMCSegmentFilter =
-    MCFilter<VariadicUnionVarSet<BkgTruthSegmentVarSet, AdvancedSegmentVarSet>>;
+  using BkgMCSegmentFilter = TruthVarFilter<BkgTruthSegmentVarSet>;
   using BkgRecordingSegmentFilter =
     RecordingFilter<VariadicUnionVarSet<BkgTruthSegmentVarSet, AdvancedSegmentVarSet>>;
   using BkgMVASegmentFilter = MVAFilter<AdvancedSegmentVarSet>;
 }
+
+template class TrackFindingCDC::FilterFactory<BaseSegmentFilter>;
 
 SegmentFilterFactory::SegmentFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
@@ -65,15 +69,15 @@ std::unique_ptr<BaseSegmentFilter>
 SegmentFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<NoneSegmentFilter>();
+    return std::make_unique<NoneSegmentFilter>();
   } else if (filterName == "all") {
-    return makeUnique<AllSegmentFilter>();
+    return std::make_unique<AllSegmentFilter>();
   } else if (filterName == "bkg_truth") {
-    return makeUnique<BkgMCSegmentFilter>();
+    return std::make_unique<BkgMCSegmentFilter>();
   } else if (filterName == "bkg_recording") {
-    return makeUnique<BkgRecordingSegmentFilter>("BackgroundSegmentFilter.root");
+    return std::make_unique<BkgRecordingSegmentFilter>("BackgroundSegmentFilter.root");
   } else if (filterName == "bkg_mva") {
-    return makeUnique<BkgMVASegmentFilter>("tracking/data/trackfindingcdc_BackgroundSegmentFilter.xml");
+    return std::make_unique<BkgMVASegmentFilter>("tracking/data/trackfindingcdc_BackgroundSegmentFilter.xml");
   } else {
     return Super::create(filterName);
   }

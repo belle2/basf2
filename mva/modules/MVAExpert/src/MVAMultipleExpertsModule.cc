@@ -160,12 +160,12 @@ namespace Belle2 {
         Particle* particle = list->getParticle(i);
         std::vector<float> targetValues = analyse(particle);
 
-        for (unsigned int i = 0; i < m_identifiers.size(); ++i) {
-          if (particle->hasExtraInfo(m_extraInfoNames[i])) {
+        for (unsigned int j = 0; j < m_identifiers.size(); ++j) {
+          if (particle->hasExtraInfo(m_extraInfoNames[j])) {
             B2WARNING("Extra Info with given name is already set! Overwriting old value!");
-            particle->setExtraInfo(m_extraInfoNames[i], targetValues[i]);
+            particle->setExtraInfo(m_extraInfoNames[j], targetValues[j]);
           } else {
-            particle->addExtraInfo(m_extraInfoNames[i], targetValues[i]);
+            particle->addExtraInfo(m_extraInfoNames[j], targetValues[j]);
           }
         }
       }
@@ -175,11 +175,11 @@ namespace Belle2 {
       if (not eventExtraInfo.isValid())
         eventExtraInfo.create();
       std::vector<float> targetValues = analyse(nullptr);
-      for (unsigned int i = 0; i < m_identifiers.size(); ++i) {
-        if (eventExtraInfo->hasExtraInfo(m_extraInfoNames[i])) {
+      for (unsigned int j = 0; j < m_identifiers.size(); ++j) {
+        if (eventExtraInfo->hasExtraInfo(m_extraInfoNames[j])) {
           B2WARNING("Extra Info with given name is already set! I won't set it again!");
         } else {
-          eventExtraInfo->addExtraInfo(m_extraInfoNames[i], targetValues[i]);
+          eventExtraInfo->addExtraInfo(m_extraInfoNames[j], targetValues[j]);
         }
       }
     }

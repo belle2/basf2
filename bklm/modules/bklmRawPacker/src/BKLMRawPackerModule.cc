@@ -93,25 +93,25 @@ void BKLMRawPackerModule::event()
     int* buf = new int[2];//for one hit, hit length is 2;
     buf[0] = 0;
     buf[1] = 0;
-    BKLMDigit* digit = digits[d];
+    BKLMDigit* bklmDigit = digits[d];
 
-    int iChannelNr = digit->getStrip();
-    int iAx = digit->isPhiReadout();
-    int iLayer = digit->getLayer();
-    int iSector = digit->getSector();
-    int isForward = digit->isForward();
-    float iTdc = digit->getTime();
-    float icharge = digit->getNPixel();
-    short iCTime = digit->getCTime();
-    bool isRPC = digit->inRPC();
-    bool isAboveThresh = digit->isAboveThreshold();
+    int iChannelNr = bklmDigit->getStrip();
+    int iAx = bklmDigit->isPhiReadout();
+    int iLayer = bklmDigit->getLayer();
+    int iSector = bklmDigit->getSector();
+    int isForward = bklmDigit->isForward();
+    float iTdc = bklmDigit->getTime();
+    float icharge = bklmDigit->getNPixel();
+    short iCTime = bklmDigit->getCTime();
+    bool isRPC = bklmDigit->inRPC();
+    bool isAboveThresh = bklmDigit->isAboveThreshold();
     int moduleId = (isForward ? BKLM_END_MASK : 0)
                    | ((iSector - 1) << BKLM_SECTOR_BIT)
                    | ((iLayer - 1) << BKLM_LAYER_BIT)
                    | ((iAx) << BKLM_PLANE_BIT);
     B2DEBUG(1, "BKLMRawPackerModule:: digi before packer: sector: " << iSector << " isforward: " << isForward << " layer: " << iLayer <<
             " plane: " << iAx << " icharge " << icharge << " tdc " << iTdc << " ctime " << iCTime << " isAboveThresh " << isAboveThresh <<
-            " isRPC " << isRPC << " " << moduleId << digit->getModuleID());
+            " isRPC " << isRPC << " " << moduleId << bklmDigit->getModuleID());
 
     int electId = 0;
     if (m_ModuleIdToelectId.find(moduleId) == m_ModuleIdToelectId.end()) {

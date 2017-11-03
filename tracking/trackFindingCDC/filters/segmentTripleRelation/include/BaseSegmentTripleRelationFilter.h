@@ -7,58 +7,33 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
-
-#include <tracking/trackFindingCDC/numerics/Weight.h>
-#include <tracking/trackFindingCDC/utilities/Relation.h>
-
-#include <boost/range/iterator_range.hpp>
-
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegmentTriple;
+
+    // Guard to prevent repeated instantiations
+    extern template class RelationFilter<const CDCSegmentTriple>;
 
     /// Base class for filtering the neighborhood of segment triples
-    class BaseSegmentTripleRelationFilter : public Filter<Relation<const CDCSegmentTriple>> {
+    class BaseSegmentTripleRelationFilter : public RelationFilter<const CDCSegmentTriple> {
 
     public:
-      /// Returns a two iterator range covering the range of possible neighboring segment triples of the given facet out of the sorted range given by the two other argumets.
-      template<class ACDCSegmentTripleIterator>
-      boost::iterator_range<ACDCSegmentTripleIterator>
-      getPossibleNeighbors(const CDCSegmentTriple& triple,
-                           const ACDCSegmentTripleIterator& itBegin,
-                           const ACDCSegmentTripleIterator& itEnd)
-      {
+      /// Default constructor
+      BaseSegmentTripleRelationFilter();
 
-        const CDCAxialSegment2D* endSegment = triple.getEndSegment();
-        std::pair<ACDCSegmentTripleIterator,  ACDCSegmentTripleIterator> itPairPossibleNeighbors = std::equal_range(itBegin, itEnd,
-            endSegment);
-        return boost::iterator_range<ACDCSegmentTripleIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
+      /// Default destructor
+      ~BaseSegmentTripleRelationFilter();
 
-      }
-
-      /// Main filter method returning the weight of the neighborhood relation. Return NAN if relation shall be rejected.
-      virtual Weight operator()(const CDCSegmentTriple& from  __attribute__((unused)),
-                                const CDCSegmentTriple& to  __attribute__((unused)))
-      {
-        return 1;
-      }
-
-      /** Main filter method overriding the filter interface method.
-       *  Checks the validity of the pointers in the relation and unpacks the relation to
-       *  the method implementing the rejection.*/
-      Weight operator()(const Relation<const CDCSegmentTriple>& relation) override
-      {
-        const CDCSegmentTriple* ptrFrom(relation.first);
-        const CDCSegmentTriple* ptrTo(relation.second);
-        if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
-        return this->operator()(*ptrFrom, *ptrTo);
-      }
+      /// Returns the segment triples form the range that continue on the to site of the given segment triple.
+      std::vector<const CDCSegmentTriple*> getPossibleTos(
+        const CDCSegmentTriple* from,
+        const std::vector<const CDCSegmentTriple*>& segmentTriples) const final;
     };
   }
 }

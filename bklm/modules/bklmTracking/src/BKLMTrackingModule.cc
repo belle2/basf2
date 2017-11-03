@@ -25,8 +25,6 @@ REG_MODULE(BKLMTracking)
 BKLMTrackingModule::BKLMTrackingModule() : Module()
 {
   setDescription("perform standard-alone straight line tracking for BKLM");
-  addParam("MeanDt", m_MeanDt, "[ns] Mean hit-trigger time for coincident hits (default 0)", double(0.0));
-  addParam("MaxDt", m_MaxDt, "[ns] Coincidence window half-width for in-time KLM hits (default +-30)", double(30.0));
   addParam("MatchToRecoTrack", m_MatchToRecoTrack, "[bool], whether match BKLMTrack to RecoTrack; (default is false)", false);
   addParam("MaxAngleRequired", m_maxAngleRequired,
            "[degree], match BKLMTrack to RecoTrack; angle between them is required to be smaller than (default 10)", double(10.0));
@@ -150,11 +148,11 @@ void BKLMTrackingModule::runTracking(int mode, int iForward, int iSector, int iL
     if (mode == 1 && isLayerUnderStudy(iForward, iSector, iLayer, hits2D[hi])) continue;
     if (mode == 1 && !isSectorUnderStudy(iForward, iSector, hits2D[hi])) continue;
     if (hits2D[hi]->isOnStaTrack()) continue;
-    if ((hits2D[hi]->getTime() - m_MeanDt) > m_MaxDt) continue;
+    if (hits2D[hi]->isOutOfTime()) continue;
     for (int hj = hi + 1; hj < hits2D.getEntries(); ++hj) {
 
       if (hits2D[hj]->isOnStaTrack()) { continue; }
-      if ((hits2D[hj]->getTime() - m_MeanDt) > m_MaxDt) continue;
+      if (hits2D[hj]->isOutOfTime()) continue;
       if (!m_globalFit && !sameSector(hits2D[hi], hits2D[hj])) { continue; }
       if (sameSector(hits2D[hi], hits2D[hj]) && abs(hits2D[hi]->getLayer() - hits2D[hj]->getLayer()) < 3) { continue;}
 
@@ -174,7 +172,7 @@ void BKLMTrackingModule::runTracking(int mode, int iForward, int iSector, int iL
         if (hits2D[ho]->isOnStaTrack()) continue;
         if (!m_globalFit && !sameSector(hits2D[ho], hits2D[hi])) continue;
         // if (hits2D[ho]->getLayer() == hits2D[hi]->getLayer() || hits2D[ho]->getLayer() == hits2D[hj]->getLayer()) continue;
-        if ((hits2D[ho]->getTime() - m_MeanDt) > m_MaxDt) continue;
+        if (hits2D[ho]->isOutOfTime()) continue;
         sectorHitList.push_back(hits2D[ho]);
       }
 
@@ -434,7 +432,7 @@ void BKLMTrackingModule::generateEffi(int iForward, int iSector, int iLayer)
 
       for (int he = 0; he < hits2D.getEntries(); ++he) {
         if (!isLayerUnderStudy(iForward, iSector, iLayer, hits2D[he])) continue;
-        if ((hits2D[he]->getTime() - m_MeanDt) > m_MaxDt) continue;
+        if (hits2D[he]->isOutOfTime()) continue;
         //if alreday used, skip
         if (m_pointUsed.find(he) != m_pointUsed.end()) continue;
 

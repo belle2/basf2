@@ -184,6 +184,19 @@ namespace Belle2 {
                     int strip) const;
 
     /**
+     * Get element numbers by strip global number.
+     * @param[in]  stripGlobal Strip global number.
+     * @param[out] endcap      Endcap number.
+     * @param[out] layer       Layer number.
+     * @param[out] sector      Sector number.
+     * @param[out] plane       Plane number.
+     * @param[out] strip       Strip number.
+     */
+    void stripNumberToElementNumbers(
+      int stripGlobal, int* endcap, int* layer, int* sector, int* plane,
+      int* strip) const;
+
+    /**
      * Strip local number (in a plane).
      * @param[in] strip Global strip number.
      */

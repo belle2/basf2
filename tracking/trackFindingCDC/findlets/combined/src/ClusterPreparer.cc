@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/ClusterPreparer.h>
 
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

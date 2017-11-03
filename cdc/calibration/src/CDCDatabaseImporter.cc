@@ -38,7 +38,7 @@
 #include <cdc/dbobjects/CDCSpaceResols.h>
 #include <cdc/dbobjects/CDCDisplacement.h>
 #include <cdc/dbobjects/CDCAlignment.h>
-#include <cdc/dbobjects/CDCMisalignment.h>
+//#include <cdc/dbobjects/CDCMisalignment.h>
 
 #include <iostream>
 #include <fstream>
@@ -511,11 +511,16 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
 
 void CDCDatabaseImporter::importDisplacement(std::string fileName)
 {
-  std::ifstream ifs;
-  ifs.open(fileName.c_str());
+  //read alpha bins
+  //  std::ifstream ifs;
+  //  ifs.open(fileName.c_str());
+  boost::iostreams::filtering_istream ifs;
+  if ((fileName.rfind(".gz") != string::npos) && (fileName.length() - fileName.rfind(".gz") == 3)) {
+    ifs.push(boost::iostreams::gzip_decompressor());
+  }
+  ifs.push(boost::iostreams::file_source(fileName));
   if (!ifs) {
     B2FATAL("openFile: " << fileName << " *** failed to open");
-    return;
   }
   B2INFO(fileName << ": open for reading");
 
@@ -549,7 +554,8 @@ void CDCDatabaseImporter::importDisplacement(std::string fileName)
   if (nRead != nSenseWires) B2FATAL("CDCDatabaseimporter::importDisplacement: #lines read-in (=" << nRead <<
                                       ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
 
-  ifs.close();
+  //  ifs.close();
+  boost::iostreams::close(ifs);
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
@@ -560,8 +566,13 @@ void CDCDatabaseImporter::importDisplacement(std::string fileName)
 
 void CDCDatabaseImporter::importWirPosAlign(std::string fileName)
 {
-  std::ifstream ifs;
-  ifs.open(fileName.c_str());
+  //  std::ifstream ifs;
+  //  ifs.open(fileName.c_str());
+  boost::iostreams::filtering_istream ifs;
+  if ((fileName.rfind(".gz") != string::npos) && (fileName.length() - fileName.rfind(".gz") == 3)) {
+    ifs.push(boost::iostreams::gzip_decompressor());
+  }
+  ifs.push(boost::iostreams::file_source(fileName));
   if (!ifs) {
     B2FATAL("openFile: " << fileName << " *** failed to open");
     return;
@@ -604,67 +615,13 @@ void CDCDatabaseImporter::importWirPosAlign(std::string fileName)
   if (nRead != nSenseWires) B2FATAL("CDCDatabaseimporter::importWirPosAlign: #lines read-in (=" << nRead <<
                                       ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
 
-  ifs.close();
+  //  ifs.close();
+  boost::iostreams::close(ifs);
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
   al.import(iov);
   B2RESULT("Wire alignment table imported to database.");
-}
-
-//TODO: merge the following and importWirPosAlign() somehow
-void CDCDatabaseImporter::importWirPosMisalign(std::string fileName)
-{
-  std::ifstream ifs;
-  ifs.open(fileName.c_str());
-  if (!ifs) {
-    B2FATAL("openFile: " << fileName << " *** failed to open");
-    return;
-  }
-  B2INFO(fileName << ": open for reading");
-
-  DBImportObjPtr<CDCMisalignment> mal;
-  mal.construct();
-
-  int iL(0), iC(0);
-  const int np = 3;
-  double back[np], fwrd[np], tension;
-  unsigned nRead = 0;
-
-  while (true) {
-    ifs >> iL >> iC;
-    for (int i = 0; i < np; ++i) {
-      ifs >> back[i];
-    }
-    for (int i = 0; i < np; ++i) {
-      ifs >> fwrd[i];
-    }
-    ifs >> tension;
-    if (ifs.eof()) break;
-
-    ++nRead;
-    WireID wire(iL, iC);
-
-    for (int i = 0; i < np; ++i) {
-      mal->set(wire, CDCMisalignment::wireBwdX,  back[0]);
-      mal->set(wire, CDCMisalignment::wireBwdY,  back[1]);
-      mal->set(wire, CDCMisalignment::wireBwdZ,  back[2]);
-      mal->set(wire, CDCMisalignment::wireFwdX, fwrd[0]);
-      mal->set(wire, CDCMisalignment::wireFwdY, fwrd[1]);
-      mal->set(wire, CDCMisalignment::wireFwdZ, fwrd[2]);
-    }
-    mal->set(wire, CDCMisalignment::wireTension, tension);
-  }
-
-  if (nRead != nSenseWires) B2FATAL("CDCDatabaseimporter::importWirPosMisalign: #lines read-in (=" << nRead <<
-                                      ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
-
-  ifs.close();
-
-  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
-                         m_lastExperiment, m_lastRun);
-  mal.import(iov);
-  B2RESULT("Wire misalignment table imported to database.");
 }
 
 
@@ -746,3 +703,60 @@ void CDCDatabaseImporter::printWirPosMisalign()
   DBObjPtr<CDCMisalignment> mal;
   mal->dump();
 }
+
+//Note; the following function is no longer needed
+#if 0
+void CDCDatabaseImporter::importWirPosMisalign(std::string fileName)
+{
+  std::ifstream ifs;
+  ifs.open(fileName.c_str());
+  if (!ifs) {
+    B2FATAL("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCMisalignment> mal;
+  mal.construct();
+
+  int iL(0), iC(0);
+  const int np = 3;
+  double back[np], fwrd[np], tension;
+  unsigned nRead = 0;
+
+  while (true) {
+    ifs >> iL >> iC;
+    for (int i = 0; i < np; ++i) {
+      ifs >> back[i];
+    }
+    for (int i = 0; i < np; ++i) {
+      ifs >> fwrd[i];
+    }
+    ifs >> tension;
+    if (ifs.eof()) break;
+
+    ++nRead;
+    WireID wire(iL, iC);
+
+    for (int i = 0; i < np; ++i) {
+      mal->set(wire, CDCMisalignment::wireBwdX,  back[0]);
+      mal->set(wire, CDCMisalignment::wireBwdY,  back[1]);
+      mal->set(wire, CDCMisalignment::wireBwdZ,  back[2]);
+      mal->set(wire, CDCMisalignment::wireFwdX, fwrd[0]);
+      mal->set(wire, CDCMisalignment::wireFwdY, fwrd[1]);
+      mal->set(wire, CDCMisalignment::wireFwdZ, fwrd[2]);
+    }
+    mal->set(wire, CDCMisalignment::wireTension, tension);
+  }
+
+  if (nRead != nSenseWires) B2FATAL("CDCDatabaseimporter::importWirPosMisalign: #lines read-in (=" << nRead <<
+                                      ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
+
+  ifs.close();
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  mal.import(iov);
+  B2RESULT("Wire misalignment table imported to database.");
+}
+#endif

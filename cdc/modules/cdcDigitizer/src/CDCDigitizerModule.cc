@@ -38,7 +38,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   m_driftLength(0.0), m_flightTime(0.0), m_globalTime(0.0),
   m_tdcBinWidth(1.0), m_tdcBinWidthInv(1.0),
   m_tdcResol(0.2887), m_driftV(4.0e-3),
-  m_driftVInv(250.0), m_propSpeedInv(27.25), m_misalign(true)
+  m_driftVInv(250.0), m_propSpeedInv(27.25), m_align(true)
 {
   // Set description
   setDescription("Creates CDCHits from CDCSimHits.");
@@ -95,12 +95,15 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            false);
   //Switch to control sense wire sag
   addParam("CorrectForWireSag",   m_correctForWireSag,
-           "A switch for sense wire sag effect; true: drift-time is calculated with the sag taken into account; false: not. Here, sag means the perturbative part which corresponds to (mis)alignment in case of wire-position. The main part (corresponding to design+displacement in wire-position) is taken into account in FullSim; you can control it via CDCJobCntlParModifier.",
+           "A switch for sense wire sag effect; true: drift-time is calculated with the sag taken into account; false: not. Here, sag means the perturbative part which corresponds to alignment in case of wire-position. The main part (corresponding to design+displacement in wire-position) is taken into account in FullSim; you can control it via CDCJobCntlParModifier.",
            true);
 
   //TDC Threshold
   addParam("Threshold", m_tdcThreshold,
            "dEdx value for TDC Threshold in eV", 40.0);
+  //ADC Threshold
+  addParam("Threshold4ADC", m_adcThreshold,
+           "Threshold for ADC-count (in unit of count). ADC-count <= threshold is treated as count=0.", 0);
   addParam("tMin", m_tMin, "Lower edge of time window in ns", -100.);
   addParam("tMaxOuter", m_tMaxOuter, "Upper edge of time window in ns for the normal-cell layers", 500.);
   addParam("tMaxInner", m_tMaxInner, "Upper edge of time window in ns for the small-cell layers", 300.);
@@ -223,33 +226,33 @@ void CDCDigitizerModule::event()
     m_globalTime = m_aCDCSimHit->getGlobalTime();
     m_driftLength = m_aCDCSimHit->getDriftLength() * Unit::cm;
 
-    //include misalignment effects
-    //basically misalign flag should be always on since on/off is controlled by the input misalignment.xml file itself.
-    m_misalign = true;
+    //include alignment effects
+    //basically align flag should be always on since on/off is controlled by the input alignment.xml file itself.
+    m_align = true;
 
-    TVector3 bwpMisalign = m_cdcgp->wireBackwardPosition(m_wireID, CDCGeometryPar::c_Misaligned);
-    TVector3 fwpMisalign = m_cdcgp->wireForwardPosition(m_wireID, CDCGeometryPar::c_Misaligned);
+    TVector3 bwpAlign = m_cdcgp->wireBackwardPosition(m_wireID, CDCGeometryPar::c_Aligned);
+    TVector3 fwpAlign = m_cdcgp->wireForwardPosition(m_wireID, CDCGeometryPar::c_Aligned);
 
     TVector3 bwp = m_cdcgp->wireBackwardPosition(m_wireID);
     TVector3 fwp = m_cdcgp->wireForwardPosition(m_wireID);
 
-    //skip correction for wire-position misalignment if unnecessary
-    if ((bwpMisalign - bwp).Mag() == 0. && (fwpMisalign - fwp).Mag() == 0.) m_misalign = false;
-    //    std::cout << "a m_misalign= " << m_misalign << std::endl;
+    //skip correction for wire-position alignment if unnecessary
+    if ((bwpAlign - bwp).Mag() == 0. && (fwpAlign - fwp).Mag() == 0.) m_align = false;
+    //    std::cout << "a m_align= " << m_align << std::endl;
 
-    if (m_misalign || m_correctForWireSag) {
+    if (m_align || m_correctForWireSag) {
 
-      bwp = bwpMisalign;
-      fwp = fwpMisalign;
+      bwp = bwpAlign;
+      fwp = fwpAlign;
 
       if (m_correctForWireSag) {
         double zpos = m_posWire.z();
         double bckYSag = bwp.y();
         double forYSag = fwp.y();
 
-        //        CDCGeometryPar::EWirePosition set = m_misalign ?
-        //                                            CDCGeometryPar::c_Misaligned : CDCGeometryPar::c_Base;
-        CDCGeometryPar::EWirePosition set = CDCGeometryPar::c_Misaligned;
+        //        CDCGeometryPar::EWirePosition set = m_align ?
+        //                                            CDCGeometryPar::c_Aligned : CDCGeometryPar::c_Base;
+        CDCGeometryPar::EWirePosition set = CDCGeometryPar::c_Aligned;
         const int layerID = m_wireID.getICLayer();
         const int  wireID = m_wireID.getIWire();
         m_cdcgp->getWireSagEffect(set, layerID, wireID, zpos, bckYSag, forYSag);
@@ -321,11 +324,16 @@ void CDCDigitizerModule::event()
     if (m_wireID.getISuperLayer() == 0) tMax = m_tMaxInner;
     if (hitDriftTime < m_tMin || hitDriftTime > tMax) continue;
 
+    unsigned short adcCount = getADCCount(hitdEdx);
+    if (adcCount <= m_adcThreshold) adcCount = 0;
+    //    B2INFO("adcCount= " << adcCount);
+
     iterSignalMap = signalMap.find(m_wireID);
 
     if (iterSignalMap == signalMap.end()) {
       // new entry
-      signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, hitdEdx)));
+      //      signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, hitdEdx)));
+      signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, adcCount)));
       B2DEBUG(150, "Creating new Signal with encoded wire number: " << m_wireID);
     } else {
       // ... smallest drift time has to be checked, ...
@@ -347,7 +355,8 @@ void CDCDigitizerModule::event()
         iterSignalMap->second.m_simHitIndex3 = iHits;
       }
       // ... total charge has to be updated.
-      iterSignalMap->second.m_charge += hitdEdx;
+      //      iterSignalMap->second.m_charge += hitdEdx;
+      iterSignalMap->second.m_charge += adcCount;
     }
 
     // add one hit per trigger time window to the trigger signal map
@@ -378,7 +387,8 @@ void CDCDigitizerModule::event()
   for (iterSignalMap = signalMap.begin(); iterSignalMap != signalMap.end(); ++iterSignalMap) {
 
     //add time-walk (here for simplicity)
-    unsigned short adcCount = getADCCount(iterSignalMap->second.m_charge);
+    //    unsigned short adcCount = getADCCount(iterSignalMap->second.m_charge);
+    unsigned short adcCount = iterSignalMap->second.m_charge;
     iterSignalMap->second.m_driftTime += m_cdcgp->getTimeWalk(iterSignalMap->first,
                                                               adcCount);
 
@@ -427,7 +437,7 @@ void CDCDigitizerModule::event()
         //        std::cout << "settdc2 " << firstHit->getTDCCount() << " " << secondHit->getTDCCount() << std::endl;
 
         //set a relation: MCParticle -> CDCHit
-        RelationVector<MCParticle> rels = simHits[iterSignalMap->second.m_simHitIndex2]->getRelationsFrom<MCParticle>();
+        rels = simHits[iterSignalMap->second.m_simHitIndex2]->getRelationsFrom<MCParticle>();
         if (rels.size() != 0) {
           //assumption: only one MCParticle
           const MCParticle* mcparticle = rels[0];
@@ -454,7 +464,7 @@ void CDCDigitizerModule::event()
             //            std::cout << "settdc3 " << firstHit->getTDCCount() << " " << secondHit->getTDCCount() << std::endl;
 
             //set a relation: MCParticle -> CDCHit
-            RelationVector<MCParticle> rels = simHits[iterSignalMap->second.m_simHitIndex3]->getRelationsFrom<MCParticle>();
+            rels = simHits[iterSignalMap->second.m_simHitIndex3]->getRelationsFrom<MCParticle>();
             if (rels.size() != 0) {
               //assumption: only one MCParticle
               const MCParticle* mcparticle = rels[0];
@@ -633,7 +643,7 @@ float CDCDigitizerModule::getDriftTime(const float driftLength, const bool addTo
 
   if (addDelay) {
     //calculate signal propagation length in the wire
-    CDCGeometryPar::EWirePosition set = m_misalign ? CDCGeometryPar::c_Misaligned : CDCGeometryPar::c_Base;
+    CDCGeometryPar::EWirePosition set = m_align ? CDCGeometryPar::c_Aligned : CDCGeometryPar::c_Base;
     TVector3 backWirePos = m_cdcgp->wireBackwardPosition(m_wireID, set);
 
     double propLength = (m_posWire - backWirePos).Mag();

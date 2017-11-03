@@ -127,7 +127,7 @@ namespace {
    * @param y Value representing the proportion of the y-coordinate.
    * @param x Value representing the proportion of the x-coordinate.
    */
-  template<int ORDER = 4> /* in c++14: constexpr */ double fast_atan2_minimax(double y, double x)
+  template<int ORDER = 4> constexpr double fast_atan2_minimax(double y, double x)
   {
     static_assert(ORDER >= 1 && ORDER <= 6, "fast_atan2_minimax: Only orders 1-6 are supported");
     constexpr double pi4 = M_PI / 4, pi2 = M_PI / 2;

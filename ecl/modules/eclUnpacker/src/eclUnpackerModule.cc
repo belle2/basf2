@@ -83,6 +83,7 @@ void ECLUnpackerModule::initialize()
     m_eclDigits.registerRelationTo(m_eclTrigs);
   }
   m_eclDsps.registerInDataStore(m_eclDspsName);
+  m_eclDsps.registerRelationTo(m_eclDigits);
 
   // make full name of the initialization file
   std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
@@ -97,7 +98,7 @@ void ECLUnpackerModule::initialize()
 
   B2INFO("ECL Unpacker: eclChannelMapper initialized successfully");
 
-  // or initialize if from DB TODO
+  // or initialize it from DB TODO
 }
 
 void ECLUnpackerModule::beginRun()
@@ -195,7 +196,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
   unsigned int nRead = 0, ind = 0, indSample = 0;
   unsigned int nActiveChannelsWithADCData, nADCSamplesPerChannel, nActiveDSPChannels;
   int triggerPhase;
-  int dspMask, triggerTag;
+  int dspMask = 0, triggerTag = 0;
   int nShapers;
   int adcMask, adcHighMask, dspTime, dspAmplitude, dspQualityFlag;
 
@@ -217,6 +218,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
     // trigger phase of the Collector connected to this FINESSE
     // -1 if there are no triggered shapers
     int triggerPhase0 = -1;
+    int triggerTag0   = -1;
 
     m_bufLength = rawCOPPERData->GetDetectorNwords(n, iFINESSE);
 
@@ -229,14 +231,14 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
     m_bufPtr = (unsigned int*)rawCOPPERData->GetDetectorBuffer(n, iFINESSE);
 
     B2DEBUG(15, "***** iEvt " << m_EvtNum << " node " << std::hex << nodeID);
-    /*
+
     // dump buffer data
     for (int i = 0; i < m_bufLength; i++) {
-          B2DEBUG(15,"" << std::hex << setfill('0') << setw(8) << m_bufPtr[i]);
+      B2DEBUG(500, "" << std::hex << setfill('0') << setw(8) << m_bufPtr[i]);
 
     }
-    B2DEBUG(15,"***** " );
-    */
+    B2DEBUG(15, "***** ");
+
 
     m_bufPos = 0; // set read position to the 1-st word
 
@@ -300,6 +302,10 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         triggerTag = value & 0xFFFF;          // trigger tag
         B2DEBUG(50, "DSPMASK = 0x" << std::hex << dspMask << " triggerTag " << std::dec << triggerTag);
 
+        if (triggerTag0 == -1) triggerTag0 = triggerTag;
+        else if (triggerTag != triggerTag0) B2WARNING("Different trigger tags for crate " << iCrate << " :: " << triggerTag <<
+                                                        " != " << triggerTag0);
+
         value = readNextCollectorWord();
         adcMask = value & 0xFFFF; // mask for channels with ADC data
         adcHighMask = (value >> 16) & 0xFFFF;
@@ -324,7 +330,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           // fill eclDigits data object
           B2DEBUG(100, "New eclDigit: cid = " << cellID << " amp = " << dspAmplitude << " time = " << dspTime << " qflag = " <<
                   dspQualityFlag);
-          //B2DEBUG(10,"iCrate = " << iCrate << " iShaper = " << iShaper << " iChannel = " << iChannel);
 
           // construct eclDigit object and save it in DataStore
           ECLDigit* newEclDigit = m_eclDigits.appendNew();
@@ -384,11 +389,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
             cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
-            if (nADCSamplesPerChannel == 31) { // TODO: change fixed size in eclDsp to parameter
-              ECLDsp* newEclDsp = m_eclDsps.appendNew();
-              newEclDsp->setCellId(cellID);
-              newEclDsp->setDspA(eclWaveformSamples.data());
-            } else B2WARNING("nADCSamplesPerChannel != 31, ADC samples will not be stored");
+            ECLDsp* newEclDsp = m_eclDsps.appendNew(cellID, eclWaveformSamples);
           }
 
           nRead++;
@@ -413,6 +414,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
       if (eclTrig) {
         eclTrig->setTrigId(iCrate);
         eclTrig->setTimeTrig(triggerPhase0);
+        eclTrig->setTrigTag(triggerTag);
       }
 
 

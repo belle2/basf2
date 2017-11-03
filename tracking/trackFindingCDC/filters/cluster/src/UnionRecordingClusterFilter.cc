@@ -12,10 +12,13 @@
 #include <tracking/trackFindingCDC/filters/cluster/BasicClusterVarSet.h>
 #include <tracking/trackFindingCDC/filters/cluster/BkgTruthClusterVarSet.h>
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.icc.h>
+
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::UnionRecordingFilter<ClusterFilterFactory>;
 
 std::vector<std::string> UnionRecordingClusterFilter::getValidVarSetNames() const
 {
@@ -28,9 +31,9 @@ std::unique_ptr<BaseVarSet<CDCWireHitCluster> >
 UnionRecordingClusterFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {
-    return makeUnique<BasicClusterVarSet>();
+    return std::make_unique<BasicClusterVarSet>();
   } else if (name == "bkg_truth") {
-    return makeUnique<BkgTruthClusterVarSet>();
+    return std::make_unique<BkgTruthClusterVarSet>();
   } else {
     return Super::createVarSet(name);
   }

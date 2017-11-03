@@ -130,12 +130,12 @@ namespace Belle2 {
                 << detectorDir.getPath() << " points to the geometry description");
       }
 
-      const double width  = detectorDir.getLength("Global/width",  0);
-      const double height = detectorDir.getLength("Global/height", 0);
-      const double length = detectorDir.getLength("Global/length", 0);
-      const std::string material = detectorDir.getString("Global/material", "Air");
+      const double globalWidth  = detectorDir.getLength("Global/width",  0);
+      const double globalHeight = detectorDir.getLength("Global/height", 0);
+      const double globalLength = detectorDir.getLength("Global/length", 0);
+      const std::string globalMaterial = detectorDir.getString("Global/material", "Air");
 
-      GeoConfiguration config(detectorName, width, height, length, material);
+      GeoConfiguration config(detectorName, globalWidth, globalHeight, globalLength, globalMaterial);
 
       // Add materials
       Materials& materials = Materials::getInstance();
@@ -202,8 +202,8 @@ namespace Belle2 {
       //If there are still names left in the componentNames, excludedNames or
       //additionalNames there is probably an typo in the respective component
       //list. Throw an error for each name left using a small lambda function
-      auto checkRemaining = [](const std::string & type, const std::set<std::string> componentNames) {
-        for (const std::string& name : componentNames) {
+      auto checkRemaining = [](const std::string & type, const std::set<std::string> remainingNames) {
+        for (const std::string& name : remainingNames) {
           B2ERROR("Geometry '" << name << "' is specified in list of "
                   << type << " but could not be found");
         }

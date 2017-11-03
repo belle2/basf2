@@ -50,6 +50,7 @@
 #include <analysis/NtupleTools/NtupleHLTTagTool.h>
 #include <analysis/NtupleTools/NtupleMCGenKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleMCGenCMSKinematicsTool.h>
+#include <analysis/NtupleTools/NtupleKlIdTool.h>
 
 using namespace Belle2;
 using namespace std;
@@ -97,7 +98,8 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "Charge") return new NtupleChargeTool(tree, d);
   else if (strToolName == "PDGCode") return new NtuplePDGCodeTool(tree, d);
   else if (strToolName == "MCTruth") return new NtupleMCTruthTool(tree, d);
-  else if (strToolName == "MCHierarchy") return new NtupleMCHierarchyTool(tree, d);
+  else if (strToolName == "MCHierarchy") return new NtupleMCHierarchyTool(tree, d, strOption);
+
   else if (strToolName == "MCKinematics") return new NtupleMCKinematicsTool(tree, d);
   else if (strToolName == "PID") return new NtuplePIDTool(tree, d);
   else if (strToolName == "DeltaLogL") return new NtupleDeltaLogLTool(tree, d);
@@ -136,6 +138,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "HLTTag")  return new NtupleHLTTagTool(tree, d);
   else if (strToolName == "MCGenKinematics") return new NtupleMCGenKinematicsTool(tree, d, strOption);
   else if (strToolName == "MCGenCMSKinematics") return new NtupleMCGenCMSKinematicsTool(tree, d, strOption);
-  B2WARNING("NtupleTool " << strToolName << " is not available!");
+  else if (strToolName == "KlId") return new NtupleKlIdTool(tree, d);
+  B2ERROR("NtupleTool \"" << strToolName << "\" is not available: no tool with that name could be found!");
   return NULL;
 }

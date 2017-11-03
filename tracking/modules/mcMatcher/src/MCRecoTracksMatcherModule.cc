@@ -447,6 +447,8 @@ void MCRecoTracksMatcherModule::event()
   // ### Building the Monte-Carlo track to highest efficiency patter recognition track relation ###
   // Weighted efficiency
   using Efficiency = float;
+  using Purity = float;
+
   struct MostWeightEfficientPRId {
     RecoTrackId id;
     Efficiency weightedEfficiency;
@@ -460,6 +462,7 @@ void MCRecoTracksMatcherModule::event()
     RecoTrackId bestPrId = 0;
     Efficiency bestWeightedEfficiency = weightedEfficiencyCol(0);
     Efficiency bestEfficiency = efficiencyCol(0);
+    Purity bestPurity = purityMatrix.row(0)(mcId);
 
     // Reject efficiency smaller than the minimal one
     if (bestWeightedEfficiency < m_param_minimalEfficiency) {
@@ -468,19 +471,23 @@ void MCRecoTracksMatcherModule::event()
 
     // In case of a tie in the weighted efficiency we use the regular efficiency to break it.
     for (RecoTrackId prId = 1; prId < nPRRecoTracks; ++prId) {
+      Eigen::RowVectorXd purityRow = purityMatrix.row(prId);
+
       Efficiency currentWeightedEfficiency = weightedEfficiencyCol(prId);
       Efficiency currentEfficiency = efficiencyCol(prId);
+      Purity currentPurity = purityRow(mcId);
 
       // Reject efficiency smaller than the minimal one
       if (currentWeightedEfficiency < m_param_minimalEfficiency) {
         currentWeightedEfficiency = 0;
       }
 
-      if (std::tie(currentWeightedEfficiency, currentEfficiency) >
-          std::tie(bestWeightedEfficiency, bestEfficiency)) {
+      if (std::tie(currentWeightedEfficiency, currentEfficiency, currentPurity) >
+          std::tie(bestWeightedEfficiency, bestEfficiency, bestPurity)) {
         bestPrId = prId;
         bestEfficiency = currentEfficiency;
         bestWeightedEfficiency = currentWeightedEfficiency;
+        bestPurity = currentPurity;
       }
     }
 
@@ -491,7 +498,6 @@ void MCRecoTracksMatcherModule::event()
 
   // ### Building the patter recognition track to highest purity Monte-Carlo track relation ###
   // Unweighted purity
-  using Purity = float;
   struct MostPureMCId {
     RecoTrackId id;
     Purity purity;
@@ -535,8 +541,8 @@ void MCRecoTracksMatcherModule::event()
     }
   }
 
-
-
+  // Count the categories
+  int nMatched{}, nBackground{}, nClones{}, nGhost{};
 
   // ### Classify the patter recognition tracks ###
   // Means saving the highest purity relation to the data store
@@ -563,6 +569,7 @@ void MCRecoTracksMatcherModule::event()
       prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_background);
 
       B2DEBUG(100, "Stored PRTrack " << prId << " as background because of too low purity.");
+      ++nBackground;
       continue;
     }
 
@@ -597,6 +604,7 @@ void MCRecoTracksMatcherModule::event()
       B2DEBUG(100, "Stored PRTrack " << prId << " as matched.");
       B2DEBUG(100, "MC Match prId " << prId << " to mcPartId " << mcParticle->getArrayIndex());
       B2DEBUG(100, "Purity rel: prId " << prId << " -> mcId " << mcId << " : " << purity);
+      ++nMatched;
       continue;
     }
 
@@ -607,6 +615,7 @@ void MCRecoTracksMatcherModule::event()
     if (not(weightedEfficiency >= m_param_minimalEfficiency)) {
       prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_ghost);
       B2DEBUG(100, "Stored PRTrack " << prId << " as ghost because of too low efficiency.");
+      ++nGhost;
       continue;
     }
 
@@ -615,16 +624,20 @@ void MCRecoTracksMatcherModule::event()
     // Setup the relation purity relation
     prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_clone);
     prRecoTrack->addRelationTo(mcRecoTrack, -purity);
+    prRecoTrack->addRelationTo(mcParticle, -purity);
+    ++nClones;
 
     // Add the mc matching relation to the mc particle
-    B2DEBUG(100, "Purity rel: prId " << prId << " -> mcId " << mcId << " : " << -purity);
     B2DEBUG(100, "Stored PRTrack " << prId << " as clone.");
-
-    prRecoTrack->addRelationTo(mcParticle, -purity);
     B2DEBUG(100, "MC Match prId " << prId << " to mcPartId " << mcParticle->getArrayIndex());
+    B2DEBUG(100, "Purity rel: prId " << prId << " -> mcId " << mcId << " : " << -purity);
   } // end for prId
 
 
+  B2DEBUG(100, "Number of matches " << nMatched);
+  B2DEBUG(100, "Number of clones " << nClones);
+  B2DEBUG(100, "Number of bkg " << nBackground);
+  B2DEBUG(100, "Number of ghost " << nGhost);
 
   // ### Classify the Monte-Carlo tracks ###
   // Meaning save the highest weighted efficiency relation to the data store.

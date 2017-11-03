@@ -263,6 +263,7 @@ def writeVCD(data, atlas, fname, size, combine=False):
                 # literalVCD(clocks, atlas, writer)
                 unpack(clocks, atlas, writer)
 
+
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()

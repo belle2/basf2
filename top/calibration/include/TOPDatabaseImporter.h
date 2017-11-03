@@ -76,6 +76,48 @@ namespace Belle2 {
     void generateFakeChannelMask(double fractionDead, double fractionHot);
 
     /**
+     * Import PMT Quantum Efficiency data to database
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtQEData(std::string fileName, std::string treeName);
+
+    /**
+     * Import PMT gain parameters data to database
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtGainData(std::string fileName, std::string treeName);
+
+    /**
+     * Import PMT installation data to database
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtInstallationData(std::string fileName, std::string treeName);
+
+    /**
+     * Import PMT specifications from Hamamatsu (not to be used!)
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtObsoleteData(std::string fileName, std::string treeName);
+
+    /**
+     * Import gaussians fitting the TTS distributions
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtTTSPar(std::string fileName, std::string treeName);
+
+    /**
+     * Import histograms used for PMT TTS determination
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtTTSHisto(std::string fileName, std::string treeName);
+
+    /**
      * for testing purposes only! - will be removed ...
      */
     void importTest(int runNumber, double syncTimeBase);

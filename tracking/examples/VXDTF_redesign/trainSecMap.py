@@ -69,6 +69,8 @@ secMapBootStrap.param('ReadSectorMap', False)
 secMapBootStrap.param('WriteSectorMap', True)
 if secmap_name:
     secMapBootStrap.param('SectorMapsOutputFile', secmap_name)
+elif os.environ.get('USE_BEAST2_GEOMETRY'):
+    secMapBootStrap.param('SectorMapsOutputFile', 'SectorMaps_Beast2.root')
 path.add_module(secMapBootStrap)
 
 # Perform SecMap Training on provided data sample

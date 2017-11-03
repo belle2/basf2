@@ -34,12 +34,16 @@ use_local_database(tempdir + '/localdb/dbcache.txt', tempdir + '/localdb/', Fals
 from fei.default_channels import get_unittest_channels
 import fei
 
-fei.fei.Teacher.MaximumNumberOfMVASamples = int(1e7)
-fei.fei.Teacher.MinimumNumberOfMVASamples = int(10)
+fei.core.Teacher.MaximumNumberOfMVASamples = int(1e7)
+fei.core.Teacher.MinimumNumberOfMVASamples = int(10)
 
 particles = fei.get_unittest_channels()
-inputFile = '/storage/jbod/tkeck/MC6/evtgen-charged/sub00/mdst_000020_prod00000189_task00000020.root'
-# inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/mdst6_BBx0_charged.root')
+
+if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
+    sys.exit(0)
+
+# inputFile = '/storage/jbod/tkeck/MC6/evtgen-charged/sub00/mdst_000020_prod00000189_task00000020.root'
+inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/mdst6_BBx0_charged.root')
 
 path = create_path()
 inputMdstList('MC6', [inputFile], path)

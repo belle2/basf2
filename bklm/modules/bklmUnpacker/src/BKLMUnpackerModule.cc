@@ -321,18 +321,20 @@ void BKLMUnpackerModule::event()
           if (layer > 1) moduleId |= BKLM_INRPC_MASK;
           moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
 
-          BKLMDigit digit(moduleId, ctime, tdc, m_scintADCOffset - charge);
-          if (layer < 2 && !((m_scintADCOffset - charge) < m_scintThreshold))  digit.isAboveThreshold(true);
+          BKLMDigit bklmDigit(moduleId, ctime, tdc, m_scintADCOffset - charge);
+          if (layer < 2 && !((m_scintADCOffset - charge) < m_scintThreshold))  bklmDigit.isAboveThreshold(true);
 
-          B2DEBUG(1, "BKLMUnpackerModule:: digi after Unpacker: sector: " << digit.getSector() << " isforward: " << digit.isForward() <<
-                  " layer: " << digit.getLayer() << " isPhi: " << digit.isPhiReadout());
-          B2DEBUG(1, "BKLMUnpackerModule:: charge " << digit.getNPixel() << " tdc" << digit.getTime() << " ctime " << ctime <<
-                  " isAboveThresh " << digit.isAboveThreshold() << " isRPC " << digit.inRPC() << " moduleId " << digit.getModuleID());
+          B2DEBUG(1, "BKLMUnpackerModule:: digi after Unpacker: sector: " << bklmDigit.getSector() << " isforward: " << bklmDigit.isForward()
+                  <<
+                  " layer: " << bklmDigit.getLayer() << " isPhi: " << bklmDigit.isPhiReadout());
+          B2DEBUG(1, "BKLMUnpackerModule:: charge " << bklmDigit.getNPixel() << " tdc" << bklmDigit.getTime() << " ctime " << ctime <<
+                  " isAboveThresh " << bklmDigit.isAboveThreshold() << " isRPC " << bklmDigit.inRPC() << " moduleId " << bklmDigit.getModuleID());
 
-          bklmDigits.appendNew(digit);
+          bklmDigits.appendNew(bklmDigit);
 
-          B2DEBUG(1, "from digit:sector " << digit.getSector() << " layer: " << digit.getLayer() << " strip: " << digit.getStrip() << ", " <<
-                  " isphi? " << digit.isPhiReadout() << " fwd? " << digit.isForward());
+          B2DEBUG(1, "from bklmDigit:sector " << bklmDigit.getSector() << " layer: " << bklmDigit.getLayer() << " strip: " <<
+                  bklmDigit.getStrip() << ", " <<
+                  " isphi? " << bklmDigit.isPhiReadout() << " fwd? " << bklmDigit.isForward());
         }
       } //finesse boards
 

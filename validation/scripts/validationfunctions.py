@@ -58,7 +58,7 @@ def get_compact_git_hash(repo_folder):
     return current_git_commit
 
 
-def basf2_command_builder(steering_file, parameters, use_multi_processing=True):
+def basf2_command_builder(steering_file, parameters, use_multi_processing=False):
     """
     This utility function takes the steering file name and other basf2 parameters
     and returns a list which can be executed via the OS shell for example to
@@ -189,15 +189,7 @@ def get_validation_folders(location, basepaths, log):
     return results
 
 
-def parse_cmd_line_arguments(isTest=None, tag=None, modes=["local"]):
-    """!
-    Sets up a parser for command line arguments, parses them and returns the
-    arguments.
-    @return: An object containing the parsed command line arguments.
-        Arguments are accessed like they are attributes of the object,
-        i.e. [name_of_object].[desired_argument]
-    """
-
+def get_argument_parser(modes=["local"]):
     # Set up the command line parser
     parser = argparse.ArgumentParser()
 
@@ -258,9 +250,20 @@ def parse_cmd_line_arguments(isTest=None, tag=None, modes=["local"]):
                                        "the local web server and display the validation"
                                        "results in the system's default browser.",
                         action='store_true')
+    return parser
+
+
+def parse_cmd_line_arguments(isTest=None, tag=None, modes=["local"]):
+    """!
+    Sets up a parser for command line arguments, parses them and returns the
+    arguments.
+    @return: An object containing the parsed command line arguments.
+        Arguments are accessed like they are attributes of the object,
+        i.e. [name_of_object].[desired_argument]
+    """
 
     # Return the parsed arguments!
-    return parser.parse_args()
+    return get_argument_parser(modes).parse_args()
 
 
 def scripts_in_dir(dirpath, log, ext='*'):

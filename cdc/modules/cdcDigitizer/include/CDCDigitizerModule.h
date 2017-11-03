@@ -113,6 +113,7 @@ namespace Belle2 {
     double m_mean2;             /**< Mean value of the second Gassian used to smear drift length */
     double m_resolution2;       /**< Resolution of the second Gassian used to smear drift length */
     double m_tdcThreshold;      /**< dEdx value for TDC Threshold in unit of eV */
+    int m_adcThreshold;         /**< Threshold for ADC in unit of count */
     double m_tMin;              /**< Lower edge of time window in ns */
     double m_tMaxOuter;         /**< Upper edge of time window in ns for the outer layers*/
     double m_tMaxInner;         /**< Upper edge of time window in ns for the inner layers */
@@ -146,7 +147,7 @@ namespace Belle2 {
     bool m_addTimeOfFlight4Bg;     /**< A switch used to control adding time of flight into the total drift time or not for beam bg. */
     bool m_outputNegativeDriftTime;     /**< A switch to output negative drift time to CDCHit */
     bool m_output2ndHit;         /**< A switch to output 2nd hit */
-    bool m_misalign;             /**< A switch to control misalignment */
+    bool m_align;             /**< A switch to control alignment */
     bool m_correctForWireSag;    /**< A switch to control wire sag */
 //    float m_eventTime;         /**< It is a timing of event, which includes a time jitter due to the trigger system */
 

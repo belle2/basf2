@@ -12,8 +12,12 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::ChooseableFilter<SegmentTrackFilterFactory>;
 
 SegmentTrackCombiner::SegmentTrackCombiner()
 {
@@ -24,6 +28,13 @@ SegmentTrackCombiner::SegmentTrackCombiner()
   addProcessingSignalListener(&m_singleMatchSelector);
   addProcessingSignalListener(&m_segmentTrackAdderWithNormalization);
   addProcessingSignalListener(&m_trackRejecter);
+
+  ModuleParamList moduleParamList;
+  const std::string prefix =  "";
+  this->exposeParameters(&moduleParamList, prefix);
+  moduleParamList.getParameter<double>("sharedHitsCutValue").setDefaultValue(1.0);
+  moduleParamList.getParameter<bool>("useOnlySingleBestCandidate").setDefaultValue(false);
+  moduleParamList.getParameter<bool>("hitSelectorUseOnlySingleBestCandidate").setDefaultValue(false);
 }
 
 std::string SegmentTrackCombiner::getDescription()

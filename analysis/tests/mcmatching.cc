@@ -182,10 +182,9 @@ namespace {
           //we must make sure that m_graphParticle always corresponds to the same thing in the reconstructed thing.
           if (rd.m_behavior == c_ReconstructFrom) {
             ASSERT_NE(rd.m_optDecay, nullptr);
-            Decay* mcDecay = rd.m_optDecay;
+            d = rd.m_optDecay;
             rd.m_optDecay = nullptr;
             rd.m_behavior = Decay::c_Default;
-            d = mcDecay;
           } else {
             ASSERT_TRUE(decay.m_daughterDecays.size() > i);
             d = &(mcDecay->m_daughterDecays[i]);

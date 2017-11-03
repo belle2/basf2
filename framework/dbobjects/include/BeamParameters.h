@@ -49,7 +49,7 @@ namespace Belle2 {
     {
       // since we only save the covariance matrices with float precision we
       // need to also do the comparison with float precision.
-      auto floatcmp = [](double a, double b) { return (float)a == (float)b; };
+      auto floatcmp = [](double dbl_a, double dbl_b) { return (float)dbl_a == (float)dbl_b; };
       return MCInitialParticles::operator==(b) &&
              std::equal(m_covHER, m_covHER + 6, b.m_covHER, floatcmp) &&
              std::equal(m_covLER, m_covLER + 6, b.m_covLER, floatcmp) &&
@@ -136,6 +136,9 @@ namespace Belle2 {
     //double getEnergySmearingHER() const;
     /** Return energy smearing of the CMS */
     //double getEnergySmearingCMS() const;
+
+    /** Return unique ID of BeamParameters in global Millepede calibration (1) */
+    static unsigned short getGlobalUniqueID() { return 1; }
 
   private:
     /** Calculate FourVector of a beam from energy and angle wrt the z-axis.

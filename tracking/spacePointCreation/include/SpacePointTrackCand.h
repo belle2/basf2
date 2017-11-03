@@ -13,6 +13,7 @@
 // framework
 #include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/core/FrameworkExceptions.h>
 
 // SpacePoint
 #include <tracking/spacePointCreation/SpacePoint.h>
@@ -90,7 +91,7 @@ namespace Belle2 {
      * Also MCTrackID is initialized to -1,
      * Each SpacePointTrackCand is created in c_isActive-state and has to be deactivated manually if need be
      */
-    SpacePointTrackCand();
+    SpacePointTrackCand() = default;
 
     /**
      * constructor from a vector<SpacePoint*> and some additional information:
@@ -111,15 +112,6 @@ namespace Belle2 {
      */
     bool operator == (const SpacePointTrackCand& rhs);
 
-
-    /**
-     * Compares two track candidates and determines if they share hits.
-    *
-    * optional parameter determines if TCs shall be compared at SpacePoint-level (standard, true) or at Cluster level (= false)
-     * If at least one Hit is shared, return value is true -> tracks are overlapping.
-     * Return value is false if no hits are shared.
-     * */
-    bool checkOverlap(const SpacePointTrackCand& rhs, bool compareSPs = true);
 
     /**
      * get hits (space points) of track candidate
@@ -276,6 +268,16 @@ namespace Belle2 {
     std::string getRefereeStatusString(std::string delimiter = " ") const;
 
     /**
+     * return family identifier
+     */
+    short getFamily() const { return m_family; }
+
+    /**
+     * assign family identifier
+     */
+    void setFamily(short family) { m_family = family; }
+
+    /**
      * set the sorting parameters
      */
     void setSortingParameters(const std::vector<double>& sortParams);
@@ -351,35 +353,41 @@ namespace Belle2 {
      */
     std::vector<double> m_sortingParameters;
 
+
+    /**
+     * identifier for tracks that share at least two SpacePoints.
+     */
+    short m_family = -1;
+
     /**
      * PDG code of particle
      */
-    int m_pdg;
+    int m_pdg = 0;
 
     /**
      * track ID from MC simulation
      */
-    int m_MCTrackID;
+    int m_MCTrackID = -1;
 
     /**
      * global momentum plus position state (seed) vector
      */
-    TVectorD m_state6D;
+    TVectorD m_state6D = TVectorD(6);
 
     /**
      * global momentum plus position state (seed) covariance matrix
      */
-    TMatrixDSym m_cov6D;
+    TMatrixDSym m_cov6D = TMatrixDSym(6);
 
     /**
      * charge of the particle in units of elementary charge
      */
-    double m_q;
+    double m_q = 0;
 
     /**
      * direction of flight. true is outgoing, false is ingoing
      */
-    bool m_flightDirection;
+    bool m_flightDirection = true;
 
     /**
      * Index of TrackStub in a curling Track Candidate.
@@ -388,12 +396,12 @@ namespace Belle2 {
      * + If it is a curling TrackCand the counter starts at 1, indicating that this is the first outgoing part of the TrackCand.
      * COULDDO: implement such a feature via something like a linked list (would be much nicer, but for the moment this little workaround works)
      */
-    int m_iTrackStub;
+    int m_iTrackStub = -1;
 
     /**
      * bit-field to indicate different properties that are checked by the referee module
      */
-    unsigned short int m_refereeStatus;
+    unsigned short int m_refereeStatus = c_isActive;
 
     /**
      * An estimation for the quality of the track.
@@ -401,9 +409,9 @@ namespace Belle2 {
      * Normally defined between 0-1 to describe the propability that this track is real(istic).
      * The quality of the track has to be determined by another function or module.
      * */
-    double m_qualityIndex;
+    double m_qualityIndex = 0.5;
 
     // last members added: RefereeStatutsBit(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2), m_qualityIndex
-    ClassDef(SpacePointTrackCand, 8)
+    ClassDef(SpacePointTrackCand, 9)
   };
 }

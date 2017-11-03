@@ -3,8 +3,8 @@ To run this script you have to do the following:
 0. Have BASF2 installed and ready to run
 
 1. Copy an existing FEI training somewhere to your home directory
- - the existing trainings can be found at https://belle2.cc.kek.jp/~twiki/bin/view/Physics/SLMissing
- - for example: https://belle2.cc.kek.jp/~twiki/bin/view/Physics/GenericFEIResults
+ - the existing trainings can be found at https://confluence.desy.de/display/BI/Physics+SLMissing
+ - for example: https://confluence.desy.de/display/BI/Physics+GenericFEIResults
 
 2. Open readBtag-FEI.py script and set the location of the fei_path.pickle file
  - modify the following parameter in readBtag-FEI.py: fei_pickle = '' 
@@ -16,4 +16,4 @@ To run this script you have to do the following:
  - run for example: basf2 /path_to_your_readBtag_script/readBtag-FEI.py test.root 0 10 /ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000001/s00/e0001/4S/r00001/mixed/sub00 -l ERROR -n 100
 
 4. The script produces the flat ntuples containing Btag candidates reconstructed hadronicaly and semileptonicaly
- - the content of the ntuples is described at https://belle2.cc.kek.jp/~twiki/bin/view/Physics/ReadBtagMonitoringOutput
+ - the content of the ntuples is described at https://confluence.desy.de/display/BI/Physics+ReadBtagMonitoringOutput

@@ -100,9 +100,7 @@ void HepevtInputModule::event()
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   if (!eventMetaDataPtr) eventMetaDataPtr.create();
-  // B2INFO("HEPEVT processes event NR " << eventMetaDataPtr->getEvent());
-
-  //MCInitialParticles& initial = m_initial.generate();
+  B2DEBUG(100, "HEPEVT processes event nbr " << eventMetaDataPtr->getEvent());
 
   try {
     mpg.clear();
@@ -137,7 +135,6 @@ void HepevtInputModule::event()
         B2FATAL(e.what());
       }
     } else {
-      StoreObjPtr <EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
       eventMetaDataPtr->setEndOfData();
       B2DEBUG(100, "Reached end of all HepEvt files.");
     }

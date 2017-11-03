@@ -405,23 +405,23 @@ void SVDDQMExpressRecoModule::event()
   // Fired strips
   vector< set<int> > uStrips(c_nSVDSensors); // sets to eliminate multiple samples per strip
   vector< set<int> > vStrips(c_nSVDSensors);
-  for (const SVDDigit& digit : storeSVDDigits) {
-    int iLayer = digit.getSensorID().getLayerNumber();
+  for (const SVDDigit& digitIn : storeSVDDigits) {
+    int iLayer = digitIn.getSensorID().getLayerNumber();
     if ((iLayer < c_firstSVDLayer) || (iLayer > c_lastSVDLayer)) continue;
-    int iLadder = digit.getSensorID().getLadderNumber();
-    int iSensor = digit.getSensorID().getSensorNumber();
+    int iLadder = digitIn.getSensorID().getLadderNumber();
+    int iSensor = digitIn.getSensorID().getSensorNumber();
     int index = getSensorIndex(iLayer, iLadder, iSensor);
     VxdID sensorID(iLayer, iLadder, iSensor);
     SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-    if (digit.isUStrip()) {
-      uStrips.at(index).insert(digit.getCellID());
-      if (m_stripSignalU[index] != NULL) m_stripSignalU[index]->Fill(digit.getCharge());
-      if ((m_hitMapCountsU != NULL) && (digit.getCharge() > m_CutSVDCharge))
+    if (digitIn.isUStrip()) {
+      uStrips.at(index).insert(digitIn.getCellID());
+      if (m_stripSignalU[index] != NULL) m_stripSignalU[index]->Fill(digitIn.getCharge());
+      if ((m_hitMapCountsU != NULL) && (digitIn.getCharge() > m_CutSVDCharge))
         m_hitMapCountsU->Fill(index);
     } else {
-      vStrips.at(index).insert(digit.getCellID());
-      if (m_stripSignalV[index] != NULL) m_stripSignalV[index]->Fill(digit.getCharge());
-      if ((m_hitMapCountsV != NULL) && (digit.getCharge() > m_CutSVDCharge))
+      vStrips.at(index).insert(digitIn.getCellID());
+      if (m_stripSignalV[index] != NULL) m_stripSignalV[index]->Fill(digitIn.getCharge());
+      if ((m_hitMapCountsV != NULL) && (digitIn.getCharge() > m_CutSVDCharge))
         m_hitMapCountsV->Fill(index);
     }
   }
@@ -557,9 +557,9 @@ void SVDDQMExpressRecoModule::endRun()
     TFile* f_RefHistFile = new TFile(m_RefHistFileName.c_str(), "read");
     if (f_RefHistFile->IsOpen()) {
       B2INFO("Reference file name: " << m_RefHistFileName.c_str());
-      TVectorD* NoOfEventsRef = NULL;
-      f_RefHistFile->GetObject("DQMER_SVD_NoOfEvents_Ref", NoOfEventsRef);
-      m_NoOfEventsRef = (int)NoOfEventsRef->GetMatrixArray()[0];
+      TVectorD* NoOfEventsRef2 = NULL;
+      f_RefHistFile->GetObject("DQMER_SVD_NoOfEvents_Ref", NoOfEventsRef2);
+      m_NoOfEventsRef = (int)NoOfEventsRef2->GetMatrixArray()[0];
       //    m_NoOfEventsRef = 2;
       string name = str(format("SVDExpReco/DQMER_SVD_StripHitmapCountsU;1"));
       f_RefHistFile->GetObject(name.c_str(), r_hitMapCountsU);
@@ -930,11 +930,11 @@ int SVDDQMExpressRecoModule::SetFlag(int Type, int bin, double* pars, double rat
     }
     iret = 1;
   } else if (Type == 10) {
-    float flag  = refhist->Chi2Test(temp);
+    float flag2  = refhist->Chi2Test(temp);
     flaghist->SetBinContent(bin + 1, 0);
-    if (flag > pars[1])
+    if (flag2 > pars[1])
       flaghist->SetBinContent(bin + 1, 2);
-    if (flag > pars[0])
+    if (flag2 > pars[0])
       flaghist->SetBinContent(bin + 1, 1);
     iret = 1;
   } else if (Type == 100) {

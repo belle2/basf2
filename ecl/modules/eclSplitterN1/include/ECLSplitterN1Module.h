@@ -26,7 +26,6 @@
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLEventInformation.h>
-//#include <ecl/utility/ECLShowerId.h>
 
 // FRAMEWORK
 #include <framework/core/Module.h>
@@ -79,6 +78,7 @@ namespace Belle2 {
       // Module parameters:
 
       // Splitter
+      double m_threshold; /**< Local maximum threshold after splitting */
       double m_expConstant; /**< Constant a from exp(-a*dist/RM), 1.5 to 2.5 */
       int m_maxIterations; /**< Maximum number of iterations */
       double m_shiftTolerance; /**< Tolerance level for centroid shifts. */

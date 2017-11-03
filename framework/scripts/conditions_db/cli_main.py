@@ -4,14 +4,32 @@
 """
 This script provides a command line interface to all the tasks related to the
 Conditions database: manage global tags and iovs as well as upload new payloads
-or download of existing payloads. Some of the commands are separated out in
-separate modules named cli_*.py
+or download of existing payloads.
+
+The usage of this program is similar to git: there are sub commands like for
+example ``tag`` wich groups all actions related to the management of global
+tags. All the available commands are listed below.
 """
+
+# Creation of command line parser is done semi-automatically: it looks for
+# functions which are called command_* and will take the * as sub command name
+# and the docstring as documentation: the first line as brief explanation and
+# the remainder as dull documentation. command_foo_bar will create subcommand
+# bar inside command foo. The function will be called first with an instance of
+# argument parser where the command line options required for that command
+# should be added. If the command is run it will be called with the parsed
+# arguments first and an instance to the database object as second argument.
+
+# Some of the commands are separated out in separate modules named cli_*.py
 
 import os
 import re
 import argparse
-from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging, pretty_print_table
+import textwrap
+import json
+import difflib
+from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging, \
+    pretty_print_table, LogPythonInterface
 from pager import Pager
 from dateutil.parser import parse as parse_date
 from . import ConditionsDB, enable_debugging, encode_name
@@ -37,11 +55,13 @@ def escape_ctrl_chars(name):
 
 def command_tag(args, db=None):
     """
-    List, show, modify or clone global tags.
+    List, show, create, modify or clone global tags.
 
-    This command allows to list, show, modify or clone global tags in the
-    central database. If not other command is given it will default to show all tags.
+    This command allows to list, show, create modify or clone global tags in the
+    central database. If no other command is given it will list all tags as if
+    "%(prog)s show" was given.
     """
+
     # no arguments to define, just a group command
     if db is not None:
         # normal call, in this case we just divert to list all tags
@@ -58,8 +78,8 @@ def command_tag_list(args, db=None):
     --with-invalid as option. Alternatively one can use --only-published to show
     only tags which have been published
 
-    The searchterm will interpreted as a python regular expression where the
-    case is ignored if the --regex option is supplied.
+    If the --regex option is supplied the searchterm will interpreted as a
+    python regular expression where the case is ignored.
     """
 
     tagfilter = ItemFilter(args)
@@ -102,7 +122,7 @@ def command_tag_list(args, db=None):
     with Pager("List of global tags{}{}".format(tagfilter, " (detailed)" if getattr(args, "detail", False) else ""), True):
         for item in taglist:
             if getattr(args, "detail", False):
-                print_globaltag(item)
+                print_globaltag(db, item)
             else:
                 table.append([
                     item["globalTagId"],
@@ -115,27 +135,45 @@ def command_tag_list(args, db=None):
 
         if not getattr(args, "detail", False):
             table.insert(0, ["id", "name", "description", "type", "status", "# payloads"])
-            pretty_print_table(table, [-10, -30, "*", -10, -10, -10])
+            pretty_print_table(table, [-10, 0, "*", -10, -10, -10], min_flexible_width=32)
 
 
-def print_globaltag(info):
-    """ Print detailed global tag information for the given global tag"""
-    created = parse_date(info["dtmIns"])
-    modified = parse_date(info["dtmMod"])
-    print()
-    results = [
-        ["id", str(info["globalTagId"])],
-        ["name", info["name"]],
-        ["description", escape_ctrl_chars(info.get("description", ""))],
-        ["type", info["globalTagType"]["name"]],
-        ["status", info["globalTagStatus"]["name"]],
-        ["# payloads", info["payloadCount"]],
-        # print created and modified timestamps in local time zone
-        ["created", created.astimezone(tz=None).strftime("%Y-%m-%d %H:%M:%S local time")],
-        ["modified", modified.astimezone(tz=None).strftime("%Y-%m-%d %H:%M:%S local time")],
-        ["modified by", escape_ctrl_chars(info["modifiedBy"])],
-    ]
-    pretty_print_table(results, [-40, '*'], True)
+def print_globaltag(db, *tags):
+    """ Print detailed global tag information for the given global tags side by side"""
+    results = [["id"], ["name"], ["description"], ["type"], ["status"],
+               ["# payloads"], ["created"], ["modified"], ["modified by"]]
+    for info in tags:
+        if info is None:
+            continue
+
+        if isinstance(info, str):
+            try:
+                req = db.request("GET", "/globalTag/{}".format(encode_name(info)),
+                                 "Getting info for global tag {}".format(info))
+            except ConditionsDB.RequestError as e:
+                # ok, there's an error for this one, let's continue with the other
+                # ones
+                B2ERROR(str(e))
+                continue
+
+            info = req.json()
+
+        created = parse_date(info["dtmIns"])
+        modified = parse_date(info["dtmMod"])
+        results[0].append(str(info["globalTagId"])),
+        results[1].append(info["name"]),
+        results[2].append(escape_ctrl_chars(info.get("description", "")))
+        results[3].append(info["globalTagType"]["name"])
+        results[4].append(info["globalTagStatus"]["name"]),
+        results[5].append(info["payloadCount"]),
+        results[6].append(created.astimezone(tz=None).strftime("%Y-%m-%d %H:%M:%S local time"))
+        results[7].append(modified.astimezone(tz=None).strftime("%Y-%m-%d %H:%M:%S local time"))
+        results[8].append(escape_ctrl_chars(info["modifiedBy"]))
+
+    ntags = len(results[0]) - 1
+    if ntags > 0:
+        pretty_print_table(results, [11] + ['*']*ntags, True)
+    return ntags
 
 
 def command_tag_show(args, db=None):
@@ -154,26 +192,14 @@ def command_tag_show(args, db=None):
         args.add_argument("tag", metavar="TAGNAME", nargs="+", help="global tags to show")
         return
 
-    objects = []
-    for tag in args.tag:
-        try:
-            req = db.request("GET", "/globalTag/{}".format(encode_name(tag)),
-                             "Getting info for global tag {}".format(tag))
-        except ConditionsDB.RequestError as e:
-            # ok, there's an error for this one, let's continue with the other
-            # ones
-            B2ERROR(str(e))
-            continue
-
-        objects.append(req.json())
-
     # we retrieved all we could, print them
+    ntags = 0
     with Pager("Global tag Information", True):
-        for info in objects:
-            print_globaltag(info)
+        for tag in args.tag:
+            ntags += print_globaltag(db, tag)
 
     # return the number of tags which could not get retrieved
-    return len(args.tag) - len(objects)
+    return len(args.tag) - ntags
 
 
 def command_tag_create(args, db=None):
@@ -327,13 +353,105 @@ def command_tag_invalidate(args, db):
                "invalidateing global tag {}".format(args.tag))
 
 
+def command_diff(args, db):
+    """Compare two global tags
+
+    This command allows to compare two global tags. It will show the changes in
+    a format similar to a unified diff but by default it will not show any
+    context, only the new or removed payloads. Added payloads are marked with a
+    ``+`` in the first column, removed payloads with a ``-``
+
+    If ``--full`` is given it will show all payloads, even the ones common to
+    both global tags. The differences can be limited to a given run and
+    limited to a set of payloads names using ``--filter`` or ``--exclude``. If
+    the ``--regex`` option is supplied the searchterm will interpreted as a
+    python regular expression where the case is ignored.
+    """
+    iovfilter = ItemFilter(args)
+    if db is None:
+        args.add_argument("--full", default=False, action="store_true",
+                          help="If given print all iovs, also those which are the same in both tags")
+        args.add_argument("--run", type=int, nargs=2, metavar="N", help="exp and run numbers "
+                          "to limit showing iovs to a ones present in a given run")
+        args.add_argument("tagA", metavar="TAGNAME1", help="base for comparison")
+        args.add_argument("tagB", metavar="TAGNAME2", help="tagname to compare")
+        iovfilter.add_arguments("payloads")
+        return
+
+    # check arguments
+    if not iovfilter.check_arguments():
+        return 1
+
+    def get_iovlist(tag):
+        """Return a list of minimized iov informations as json encoded strings
+        to be able to run the difflib difference finder on them"""
+        if args.run is not None:
+            msg = "Obtaining list of iovs for global tag {tag}, exp={exp}, run={run}{filter}".format(
+                tag=tag, exp=args.run[0], run=args.run[1], filter=iovfilter)
+            req = db.request("GET", "/iovPayloads", msg, params={'gtName': tag, 'expNumber': args.run[0],
+                                                                 'runNumber': args.run[1]})
+        else:
+            msg = "Obtaining list of iovs for global tag {tag}{filter}".format(tag=tag, filter=iovfilter)
+            req = db.request("GET", "/globalTag/{}/globalTagPayloads".format(encode_name(tag)), msg)
+
+        table = []
+        for item in req.json():
+            payload = item["payload" if 'payload' in item else "payloadId"]
+            if "payloadIov" in item:
+                iovs = [item['payloadIov']]
+            else:
+                iovs = item['payloadIovs']
+
+            if not iovfilter.check(payload['basf2Module']['name']):
+                continue
+
+            for iov in iovs:
+                table.append([
+                        iov["expStart"], iov["runStart"], iov["expEnd"], iov["runEnd"],
+                        payload['basf2Module']['name'], payload['revision'],
+                        payload['payloadId'],
+                    ])
+
+        table.sort()
+        return [json.dumps(e) for e in table]
+
+    with Pager("Differences between global tags {tagA} and {tagB}{}".format(iovfilter, tagA=args.tagA, tagB=args.tagB), True):
+        print("Global tags to be compared:")
+        ntags = print_globaltag(db, args.tagA, args.tagB)
+        if ntags != 2:
+            return 1
+
+        print()
+        tableA = get_iovlist(args.tagA)
+        tableB = get_iovlist(args.tagB)
+        diff = [["", "First Exp", "First Run", "Final Exp", "Final Run", "Name", "Rev.", "PayloadId"]]
+        B2INFO("Comparing contents ...")
+
+        def color_row(row, widths, line):
+            if not LogPythonInterface.terminal_supports_colors():
+                return line
+            begin = {'+': '\x1b[32m', '-': '\x1b[31m'}.get(row[0], "")
+            end = '\x1b[0m'
+            return begin + line + end
+
+        for token in difflib.ndiff(tableA, tableB):
+            if token.startswith("?") or (not args.full and token.startswith(" ")):
+                continue
+            row = json.loads(token[2:])
+            diff.append([token[0]] + row)
+
+        print(f"Differences betwen {args.tagA} and {args.tagB}")
+        pretty_print_table(diff, [1, 6, 6, 6, 6, "+", -8, 10], transform=color_row)
+
+
 def command_iov(args, db):
     """
     List all IoVs defined in a global tag, optionally limited to a run range
 
     This command lists all IoVs defined in a given global tag. The list can be
-    limited to a given run and optionally searched using --filter or
-    --exclude.
+    limited to a given run and optionally searched using --filter or --exclude.
+    If the --regex option is supplied the searchterm will interpreted as a
+    python regular expression where the case is ignored.
     """
 
     iovfilter = ItemFilter(args)
@@ -412,9 +530,9 @@ def command_iov(args, db):
 
         if not args.detail:
             table.sort()
-            table_header = ["First Exp", "First Run", "Final Exp", "Final Run", "Name", "Rev.", "IoV id", "payload id"]
+            table_header = ["First Exp", "First Run", "Final Exp", "Final Run", "Name", "Rev.", "IovId", "PayloadId"]
             table.insert(0, table_header)
-            pretty_print_table(table, [6, 6, 6, 6, '*', -8, 6, 7])
+            pretty_print_table(table, [6, 6, 6, 6, '+', -8, 6, 9])
 
 
 class FullHelpAction(argparse._HelpAction):
@@ -446,26 +564,11 @@ class FullHelpAction(argparse._HelpAction):
             parser.exit()
 
 
-def main():
+def get_argument_parser():
     """
-    Main function for the command line interface.
-
-    it will automatically create an ArgumentParser including all functions which
-    start with command_ in the global namespace as sub commmands. These
-    functions should take the arguments as first argument and an instance of the
-    ConditionsDB interface as second argument. If the db interface is None the
-    first argument is an instance of argparse.ArgumentParser an in this case the
-    function should just add all needed arguments to the argument parser and
-    return.
+    Build a parser with all arguments of all commands
     """
-
-    # disable error summary
-    logging.enable_summary(False)
-    # modify logging to remove the useless module: lines
-    for level in LogLevel.values.values():
-        logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE)
-
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--debugging", action="store_true",
                         help="Enable debugging of http traffic")
     parser.add_argument("--help-full", action=FullHelpAction,
@@ -475,8 +578,7 @@ def main():
     parser.set_defaults(func=lambda x, y: parser.print_help())
     parsers = parser.add_subparsers(
         title="Top level commands",
-        description="There are several commands to show/modify the contents of the "
-        "conditions database. To get additional help, run '%(prog)s COMMAND --help'"
+        description="To get additional help, run '%(prog)s COMMAND --help'"
     )
 
     subparsers = {}
@@ -499,8 +601,7 @@ def main():
             if parent is None:
                 parent = parent_parser.add_subparsers(
                     title="sub commands",
-                    description="There are several commands to show/modify the contents of the "
-                    "conditions database. To get additional help, run '%(prog)s COMMAND --help'"
+                    description="To get additional help, run '%(prog)s COMMAND --help'"
                 )
                 # now we added a subparser let's also have a recursive
                 # --help-full argument
@@ -511,8 +612,9 @@ def main():
         # function. We use the first part of the function docstring as help text
         # and everything after the first empty line as description of the
         # command
-        helptxt, description = func.__doc__.split("\n\n", 1)
-        command_parser = parent.add_parser(parts[-1], help=helptxt, description=description)
+        helptxt, description = textwrap.dedent(func.__doc__).split("\n\n", 1)
+        command_parser = parent.add_parser(parts[-1], help=helptxt, description=description,
+                                           formatter_class=argparse.RawDescriptionHelpFormatter)
         # now call the function with the parser as first argument and no
         # database instance. This let's them define their own arguments
         func(command_parser, None)
@@ -521,6 +623,29 @@ def main():
         # also add it back to the list of subparsers
         subparsers[tuple(parts)] = [command_parser, None]
 
+    return parser
+
+
+def main():
+    """
+    Main function for the command line interface.
+
+    it will automatically create an ArgumentParser including all functions which
+    start with command_ in the global namespace as sub commmands. These
+    functions should take the arguments as first argument and an instance of the
+    ConditionsDB interface as second argument. If the db interface is None the
+    first argument is an instance of argparse.ArgumentParser an in this case the
+    function should just add all needed arguments to the argument parser and
+    return.
+    """
+
+    # disable error summary
+    logging.enable_summary(False)
+    # modify logging to remove the useless module: lines
+    for level in LogLevel.values.values():
+        logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE)
+
+    parser = get_argument_parser()
     # done, all functions parsed. Create the database instance and call the
     # correct subfunction according to the selected argument
     args = parser.parse_args()

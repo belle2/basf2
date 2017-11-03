@@ -12,13 +12,18 @@ env['LIBS'] = [
     'geometry',
     'cdc', 'cdc_dataobjects',
     "mva", 'mva_dataobjects',
+    # the following four libs are not required by the CDC tracking 
+    # but still generated as symbols for unknown reason.
+    # Therefore adding them here to keep the dependency checker happy
+    'bklm_dataobjects',
+    'eklm_dataobjects',
+    'pxd_dataobjects',
+    'svd_dataobjects',
     'mdst_dataobjects',
     'framework',
     'genfit2',
     '$ROOT_LIBS',
     ]
-
-env.Append(CXXFLAGS=['-Wshadow'])
 
 # Does not work well with cppcheck
 # option = os.environ['BELLE2_OPTION']

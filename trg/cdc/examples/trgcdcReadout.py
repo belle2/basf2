@@ -120,6 +120,7 @@ class TestModule(basf2.Module):
                   "theta[deg] = %.2f" % (particle.getMomentum().Theta() * 180. / np.pi),
                   "z[cm] = %.2f" % particle.getProductionVertex().Z())
 
+
 main.add_module(TestModule())
 
 # Process events

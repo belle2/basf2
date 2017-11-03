@@ -102,7 +102,7 @@ void OverlapCheckerModule::handleOverlap(const std::string& geant4Message)
   std::regex r("(mother)?\\s*local point \\(([-+0-9eE.]+),([-+0-9eE.]+),([-+0-9eE.]+)\\)");
   std::smatch m;
   if (std::regex_search(geant4Message, m, r)) {
-    G4ThreeVector local(std::atof(m[2].str().c_str()), std::atof(m[3].str().c_str()), std::atof(m[4].str().c_str()));
+    G4ThreeVector posLocal(std::atof(m[2].str().c_str()), std::atof(m[3].str().c_str()), std::atof(m[4].str().c_str()));
     if (m[1].length() == 0) {
       // Damn you Geant4, giving me the coordinates in the coordinate system of
       // the sister volume which I don't know exactly is almost useless. Aaah
@@ -115,11 +115,11 @@ void OverlapCheckerModule::handleOverlap(const std::string& geant4Message)
       // And the solid
       G4VSolid* solid = volume->GetLogicalVolume()->GetSolid();
       // Now look for the name of the intersecting volume in the exception message (jaaaay)
-      std::regex r_name("with (.*) volume's");
-      std::smatch m_name;
+      std::regex nameRegex("with (.*) volume's");
+      std::smatch nameMatch;
       // And if we can find the name we can draw the intersection
-      if (std::regex_search(geant4Message, m_name, r_name)) {
-        const std::string& name = m_name[1].str();
+      if (std::regex_search(geant4Message, nameMatch, nameRegex)) {
+        const std::string& name = nameMatch[1].str();
         // By looping over all sisters
         for (int i = 0; i < volume->GetMotherLogical()->GetNoDaughters(); ++i) {
           G4VPhysicalVolume* sister = volume->GetMotherLogical()->GetDaughter(i);
@@ -127,15 +127,15 @@ void OverlapCheckerModule::handleOverlap(const std::string& geant4Message)
           if (name != sister->GetName()) continue;
           // now transform the point into the coordinate system of the volume we actually look at
           G4AffineTransform trans_sister(sister->GetRotation(), sister->GetTranslation());
-          G4ThreeVector mother = trans_sister.TransformPoint(local);
-          G4ThreeVector local = trans_volume.TransformPoint(mother);
+          G4ThreeVector posMother = trans_sister.TransformPoint(posLocal);
+          G4ThreeVector posSister = trans_volume.TransformPoint(posMother);
           // and check if the point is inside our volume
-          if (solid->Inside(local) != kOutside) {
+          if (solid->Inside(posSister) != kOutside) {
             // if so this is the right volume which is intersecting.
             B2INFO("Found intersecting volume " << sister->GetName() << "." << sister->GetCopyNo());
             // so add the point to the display data
             G4AffineTransform t = m_nav.GetTopTransform().Inverse();
-            G4ThreeVector global = t.TransformPoint(mother);
+            G4ThreeVector global = t.TransformPoint(posMother);
             m_displayData->addPoint(geant4Message, TVector3(global[0], global[1], global[2]) * Unit::mm);
           }
         }
@@ -145,7 +145,7 @@ void OverlapCheckerModule::handleOverlap(const std::string& geant4Message)
     } else {
       // in case of overlap with mother the life is so much simpler: just convert the point to global and save it.
       G4AffineTransform t = m_nav.GetTopTransform().Inverse();
-      G4ThreeVector global = t.TransformPoint(local);
+      G4ThreeVector global = t.TransformPoint(posLocal);
       m_displayData->addPoint(geant4Message, TVector3(global[0], global[1], global[2]) * Unit::mm);
     }
   }
@@ -163,7 +163,7 @@ bool OverlapCheckerModule::checkVolume(G4VPhysicalVolume* volume, const std::str
   bool result{false};
   // check if we have a prefix we have to match. if not prefix or prefix matches, check for overlaps
   if (m_prefix.empty() || volumePath.substr(0, m_prefix.size()) == m_prefix) {
-    bool result = volume->CheckOverlaps(m_points, m_tolerance, true, m_maxErrors);
+    result = volume->CheckOverlaps(m_points, m_tolerance, true, m_maxErrors);
     if (result) {
       m_overlaps.push_back(volumePath);
     }

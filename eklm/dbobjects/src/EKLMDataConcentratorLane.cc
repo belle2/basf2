@@ -15,6 +15,9 @@ using namespace Belle2;
 
 EKLMDataConcentratorLane::EKLMDataConcentratorLane()
 {
+  m_Copper = 0;
+  m_DataConcentrator = 0;
+  m_Lane = 0;
 }
 
 EKLMDataConcentratorLane::~EKLMDataConcentratorLane()

@@ -72,7 +72,7 @@ namespace Belle2 {
     std::string m_CDCHitsName;   /**< name of CDC collection to overlay with BG */
     std::string m_TOPDigitsName; /**< name of TOP collection to overlay with BG */
     std::string m_ARICHDigitsName; /**< name of ARICH collection to overlay with BG */
-    std::string m_ECLDspsName;    /**< name of ECL collection to overlay with BG */
+    std::string m_ECLWaveformsName;    /**< name of ECL collection to overlay with BG */
     std::string m_BKLMDigitsName; /**< name of BKLM collection to overlay with BG */
     std::string m_EKLMDigitsName; /**< name of EKLM collection to overlay with BG */
 

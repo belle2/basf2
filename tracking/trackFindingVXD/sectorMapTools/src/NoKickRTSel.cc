@@ -27,7 +27,6 @@ void NoKickRTSel::hitXPBuilder(const RecoTrack& track)
 
   std::vector<Belle2::RecoHitInformation::UsedSVDHit*> clusterListSVD = track.getSVDHitList();
   for (const SVDCluster* cluster : clusterListSVD) {
-    //const MCParticle* particle = cluster->getRelationsTo<MCParticle>()[0];
     for (const SVDTrueHit& hit : cluster->getRelationsTo<SVDTrueHit>()) {
       if (hit.getRelationsFrom<MCParticle>().size() > 0) {
         if (hit.getRelationsFrom<MCParticle>()[0]->getIndex() != particle->getIndex()) {
@@ -61,7 +60,6 @@ void NoKickRTSel::hitXPBuilder(const RecoTrack& track)
 
   std::vector<Belle2::RecoHitInformation::UsedPXDHit*> clusterListPXD = track.getPXDHitList();
   for (const PXDCluster* cluster : clusterListPXD) {
-    //  const MCParticle* particle = cluster->getRelationsTo<MCParticle>()[0];
     for (const PXDTrueHit& hit : cluster->getRelationsTo<PXDTrueHit>()) {
       if (hit.getRelationsFrom<MCParticle>().size() > 0) {
         if (hit.getRelationsFrom<MCParticle>()[0]->getIndex() != particle->getIndex()) {

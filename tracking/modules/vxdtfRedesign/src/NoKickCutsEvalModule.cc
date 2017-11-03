@@ -538,6 +538,8 @@ double NoKickCutsEvalModule::cutFunction(int p, double pwidth)
   else out = 6.3 * mom + 0.57;
   return out;
 }
+
+//-------Possible alternative cut-function (less tight cut at low p, tighter cut at high p)-------//
 // double NoKickCutsEvalModule::cutFunction(int p, double pwidth)
 // {
 //   double out;

@@ -66,6 +66,11 @@ namespace Belle2 {
      */
     void setLane(int lane);
 
+    /**
+     * Operator <.
+     */
+    bool operator<(const EKLMDataConcentratorLane& lane) const;
+
   private:
 
     /** Copper number - EKLM_ID (7000). */
@@ -79,21 +84,6 @@ namespace Belle2 {
 
     /** Needed to make objects storable, */
     ClassDef(EKLMDataConcentratorLane, 1);
-
-  };
-
-  /**
-   * Class for comparison of DataConcentratorLane.
-   */
-  class EKLMDataConcentratorLaneComparison {
-
-  public:
-
-    /**
-     * Comparison function.
-     */
-    bool operator()(const EKLMDataConcentratorLane& l1,
-                    const EKLMDataConcentratorLane& l2) const;
 
   };
 

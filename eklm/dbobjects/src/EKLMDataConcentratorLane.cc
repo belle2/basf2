@@ -54,17 +54,17 @@ void EKLMDataConcentratorLane::setLane(int lane)
   m_Lane = lane;
 }
 
-bool EKLMDataConcentratorLaneComparison::operator()(
-  const EKLMDataConcentratorLane& l1, const EKLMDataConcentratorLane& l2) const
+bool EKLMDataConcentratorLane::operator<(
+  const EKLMDataConcentratorLane& lane) const
 {
-  if (l1.getCopper() < l2.getCopper())
+  if (this->getCopper() < lane.getCopper())
     return true;
-  else if (l1.getCopper() > l2.getCopper())
+  else if (this->getCopper() > lane.getCopper())
     return false;
-  if (l1.getDataConcentrator() < l2.getDataConcentrator())
+  if (this->getDataConcentrator() < lane.getDataConcentrator())
     return true;
-  else if (l1.getDataConcentrator() > l2.getDataConcentrator())
+  else if (this->getDataConcentrator() > lane.getDataConcentrator())
     return false;
-  return l1.getLane() < l2.getLane();
+  return this->getLane() < lane.getLane();
 }
 

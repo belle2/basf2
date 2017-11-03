@@ -71,8 +71,7 @@ namespace Belle2 {
     std::map<int, EKLMDataConcentratorLane> m_MapSectorLane;
 
     /** Lane - sector map. */
-    std::map<EKLMDataConcentratorLane, int,
-        EKLMDataConcentratorLaneComparison> m_MapLaneSector;
+    std::map<EKLMDataConcentratorLane, int> m_MapLaneSector;
 
     /** Needed to make objects storable. */
     ClassDef(Belle2::EKLMElectronicsMap, 1);

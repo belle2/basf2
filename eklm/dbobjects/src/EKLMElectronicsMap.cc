@@ -26,8 +26,7 @@ EKLMElectronicsMap::~EKLMElectronicsMap()
 const int* EKLMElectronicsMap::getSectorByLane(
   EKLMDataConcentratorLane* lane) const
 {
-  std::map<EKLMDataConcentratorLane, int,
-      EKLMDataConcentratorLaneComparison>::const_iterator it;
+  std::map<EKLMDataConcentratorLane, int>::const_iterator it;
   it = m_MapLaneSector.find(*lane);
   if (it == m_MapLaneSector.end())
     return NULL;

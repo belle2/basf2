@@ -5,11 +5,11 @@
 <header>
   <input>../1120240010.ntup.root</input>
   <output>1120240010_Validation.root</output>
-  <contact>Sam Cunliffe; sam.cunliffe@desy.de</contact>
+  <contact>Sam Cunliffe; sam.cunliffe@desy.de,saurabhsandilya@gmail.com</contact>
 </header>
 """
 
-# Validation plotting script for event type: 112024001
+# Validation plotting script for event type: 1120240010
 # i.e. B0 -> K*0 e+ e-
 #            |
 #            +-> K+ pi-

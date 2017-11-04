@@ -5,7 +5,7 @@
 <header>
   <input>../1120240011.ntup.root</input>
   <output>1120240011_Validation.root</output>
-  <contact>Sam Cunliffe; sam.cunliffe@desy.de</contact>
+  <contact>Sam Cunliffe; sam.cunliffe@desy.de,saurabhsandilya@gmail.com</contact>
 </header>
 """
 

@@ -27,22 +27,22 @@ void plotStd(TFile* pfile, TTree* ptree, TFile *outputFile){
   TString tmCuts("(D_isSignal == 1)");
 
   TH1F* h_D_p = new TH1F("h_D_p","D+ momentum",100,0,7);
+  ptree->Project("h_D_p", "D_P", tmCuts);
   h_D_p->GetListOfFunctions()->Add(new TNamed("Description", "D+ -> pi+pi0, Momentum of D+"));
   h_D_p->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   h_D_p->GetListOfFunctions()->Add(new TNamed("Check", "Momentum of D+ vary from 0 - 7.0 GeV/c^{2}"));
-  ptree->Project("h_D_p", "D_P", tmCuts);
 
   TH1F* h_pip_p = new TH1F("h_pip_p","pi+ momentum",100,0,6);
+  ptree->Project("h_pip_p", "D_pi_P", tmCuts);
   h_D_p->GetListOfFunctions()->Add(new TNamed("Description", "D+ -> pi+pi0, Momentum of pi+"));
   h_D_p->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   h_D_p->GetListOfFunctions()->Add(new TNamed("Check", "Momentum of pi+ should vary from 0 - 6.0 GeV/c^{2}"));
-  ptree->Project("h_pip_p", "D_pi_P", tmCuts);
 
   TH1F* h_piz_p = new TH1F("h_piz_p","pi0 momentum",100,0,5);
+  ptree->Project("h_piz_p", "D_pi0_P", tmCuts);
   h_D_p->GetListOfFunctions()->Add(new TNamed("Description", "D+ -> pi+pi0, Momentum of pi0"));
   h_D_p->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   h_D_p->GetListOfFunctions()->Add(new TNamed("Check", "Momentum of pi0 should vary from 0 - 5.0 GeV/c^{2}"));
-  ptree->Project("h_piz_p", "D_pi0_P", tmCuts);
 
   outputFile->cd();
 

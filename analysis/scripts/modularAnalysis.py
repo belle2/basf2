@@ -1835,7 +1835,7 @@ def writePi0EtaVeto(
     Zmva : soft photon output of MVA using Zernike moments of the cluster
     minC2Hdist : soft photon distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
     The default weight files are downloaded to your workingDirectory automatically from the database by default.
-    If you have weight files in your working directory already, please set downloadFlag to False.
+    If you have weight files in your workingDirectory already, please set downloadFlag to False.
     Please refer to analysis/examples/tutorials/B2A306-B02RhoGamma-withPi0EtaVeto.py
     about how to use this function.
 

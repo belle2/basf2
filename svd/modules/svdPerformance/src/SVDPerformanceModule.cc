@@ -346,7 +346,7 @@ void SVDPerformanceModule::event()
 
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(svdClusters[cl]);
 
-    if ((int)theRC.size() < 0)
+    if ((int)theRC.size() > 0)
       continue;
 
     VxdID::baseType theVxdID = (VxdID::baseType)svdClusters[cl]->getSensorID();

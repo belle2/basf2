@@ -12,6 +12,8 @@ import sys
 import inspect
 from vertex import *
 from analysisPath import *
+from variables import variables
+import basf2_mva
 
 
 def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
@@ -1825,13 +1827,17 @@ def writePi0EtaVeto(
     """
     Give pi0/eta probability for hard photon.
 
-    default weight files are set 1.4 GeV as the lower limit of hard photon energy in CMS Frame when mva training for pi0etaveto.
+    The default weight files are set 1.4 GeV as the lower limit of hard photon energy in CMS Frame when mva training for pi0etaveto.
     The Input Variables are as below. Aliases are set to some variables when training.
     M : pi0/eta candidates Invariant mass
     lowE : soft photon energy in lab frame
     cTheta : soft photon ECL cluster's polar angle
     Zmva : soft photon output of MVA using Zernike moments of the cluster
     minC2Hdist : soft photon distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
+    The default weight files are downloaded to your workingDirectory automatically from the database by default.
+    If you have weight files in your working directory already, please set downloadFlag to False.
+    Please refer to analysis/examples/tutorials/B2A306-B02RhoGamma-withPi0EtaVeto.py
+    about how to use this function.
 
     NOTE for debug
     Please don't use following ParticleList names elsewhere.

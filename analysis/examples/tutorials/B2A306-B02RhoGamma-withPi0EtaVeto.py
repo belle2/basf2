@@ -76,13 +76,13 @@ buildRestOfEvent('B0')
 # Before using the pi0/eta veto you need at least the default weight files: pi0veto.root and etaveto.root.
 # downloadFlag parameter is set to True by default,
 # the default weight files are downloaded to your workingDirectory automatically from the database in that case.
-# You can also download them from my home directory:
-# scp -r /home/belle2/otakyo/pi0etaveto
-# into your workingDirectory/.
 # The default workingDirectory is '.'
+# You can also download them from following directory:
+# /gpfs/group/belle2/users/akimasa/pi0etaveto
+# If you have weight files in your workingDirectory already, please set downloadFlag to False.
 
 # perform pi0/eta veto
-writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', workingDirectory='pi0etaveto')
+writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', workingDirectory='./pi0etaveto')
 
 # at this stage the B0 candidates should have
 # extraInfo(Pi0_Prob) and extraInfo(Eta_Prob) value attached.

@@ -260,8 +260,6 @@ void SVDPerformanceModule::event()
     if (m_is2017TBanalysis) {
       if ((tfr->getPValue() < 0.001) || (tfr->getMomentum().Mag() < 1))
         continue;
-      if (tfr->getPValue() < 0.0001)
-        continue;
     }
 
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);

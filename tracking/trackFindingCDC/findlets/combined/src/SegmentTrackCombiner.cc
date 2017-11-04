@@ -28,6 +28,13 @@ SegmentTrackCombiner::SegmentTrackCombiner()
   addProcessingSignalListener(&m_singleMatchSelector);
   addProcessingSignalListener(&m_segmentTrackAdderWithNormalization);
   addProcessingSignalListener(&m_trackRejecter);
+
+  ModuleParamList moduleParamList;
+  const std::string prefix =  "";
+  this->exposeParameters(&moduleParamList, prefix);
+  moduleParamList.getParameter<double>("sharedHitsCutValue").setDefaultValue(1.0);
+  moduleParamList.getParameter<bool>("useOnlySingleBestCandidate").setDefaultValue(false);
+  moduleParamList.getParameter<bool>("hitSelectorUseOnlySingleBestCandidate").setDefaultValue(false);
 }
 
 std::string SegmentTrackCombiner::getDescription()

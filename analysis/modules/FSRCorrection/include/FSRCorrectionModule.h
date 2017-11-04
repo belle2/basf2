@@ -78,7 +78,7 @@ namespace Belle2 {
 
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
 
-    double m_maxAngle; /** max angle */
+    double m_maxAngle; /**< max angle */
 
   };
 

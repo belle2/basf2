@@ -87,6 +87,8 @@ namespace Belle2 {
     std::string m_inColName;         /**< Input collection name from simulation */
     std::string m_outColName;        /**< Output collection name: digitized photons hits */
 
+    bool m_bgOverlay = false; /**< True if BG overlay detected */
+
     DBObjPtr<ARICHModulesInfo> m_modInfo;     /**< information on installed modules from the DB (QEs etc.) */
     DBObjPtr<ARICHSimulationPar> m_simPar;    /**< simulation parameters from the DB */
     DBObjPtr<ARICHGeometryConfig> m_geoPar;   /**< geometry configuration parameters from the DB */

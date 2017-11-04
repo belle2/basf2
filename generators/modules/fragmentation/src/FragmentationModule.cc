@@ -11,6 +11,8 @@
 
 #include <generators/modules/fragmentation/FragmentationModule.h>
 
+#include <generators/evtgen/EvtGenInterface.h>
+
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
@@ -121,8 +123,6 @@ void FragmentationModule::initialize()
 
   // Set EvtGen (after pythia->init())
   evtgen = 0;
-  EvtExternalGenList* genlist = new EvtExternalGenList();
-  EvtAbsRadCorr* radCorrEngine = genlist->getPhotosModel();
 
   if (m_useEvtGen) {
     B2INFO("Using PYTHIA EvtGen Interface");
@@ -136,10 +136,10 @@ void FragmentationModule::initialize()
     } else if (defaultDecFile != m_DecFile) {
       B2INFO("Using non-standard DECAY file \"" << m_DecFile << "\"");
     }
-    FileSystem::TemporaryFile tmp;
-    EvtGenDatabasePDG::Instance()->WriteEvtGenTable(tmp);
-    evtgen = new EvtGenDecays(pythia, m_DecFile, tmp.getName(), genlist, radCorrEngine);
+    evtgen = new EvtGenDecays(pythia, EvtGenInterface::createEvtGen(m_DecFile));
     evtgen->readDecayFile(m_UserDecFile);
+    // Update pythia particle tables from evtgen
+    evtgen->updatePythia();
   }
 
   // List variable(s) that differ from their defaults
@@ -248,8 +248,9 @@ void FragmentationModule::event()
       p->setMass(pythia->event[iPythiaPart].m());
 
       // Set vertex
-      p->setProductionVertex(pythia->event[iPythiaPart].xProd(), pythia->event[iPythiaPart].yProd(), pythia->event[iPythiaPart].zProd());
-      p->setProductionTime(pythia->event[iPythiaPart].zProd() * Unit::mm / Const::speedOfLight);
+      p->setProductionVertex(pythia->event[iPythiaPart].xProd() * Unit::mm, pythia->event[iPythiaPart].yProd() * Unit::mm,
+                             pythia->event[iPythiaPart].zProd() * Unit::mm);
+      p->setProductionTime(pythia->event[iPythiaPart].tProd() * Unit::mm / Const::speedOfLight);
       p->setValidVertex(true);
 
       // Set all(!) particles from the generator to primary

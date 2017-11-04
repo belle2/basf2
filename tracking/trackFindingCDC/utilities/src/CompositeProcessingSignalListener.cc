@@ -14,11 +14,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void CompositeProcessingSignalListener::addProcessingSignalListener(ProcessingSignalListener* psl)
-{
-  m_subordinaryProcessingSignalListeners.push_back(psl);
-}
-
 void CompositeProcessingSignalListener::initialize()
 {
   Super::initialize();
@@ -57,4 +52,14 @@ void CompositeProcessingSignalListener::terminate()
     psl->terminate();
   }
   Super::terminate();
+}
+
+void CompositeProcessingSignalListener::addProcessingSignalListener(ProcessingSignalListener* psl)
+{
+  m_subordinaryProcessingSignalListeners.push_back(psl);
+}
+
+int CompositeProcessingSignalListener::getNProcessingSignalListener()
+{
+  return m_subordinaryProcessingSignalListeners.size();
 }

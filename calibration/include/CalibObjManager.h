@@ -5,6 +5,7 @@
 
 #include <TDirectory.h>
 #include <TNamed.h>
+#include <TTree.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
@@ -105,4 +106,7 @@ namespace Belle2 {
 
     unsigned int extractKeyIndex(std::string& keyName) const;
   };
+  // Template specialization for TTree needs to be defined here to prevent automatic specialization being created
+  template<>
+  TTree* CalibObjManager::cloneObj(TTree* source, std::string newName) const;
 }

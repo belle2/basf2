@@ -20,6 +20,11 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+TrackCreatorSingleSegments::TrackCreatorSingleSegments()
+{
+  m_param_minimalHitsBySuperLayerId = std::map<ISuperLayer, size_t> ({{0, 15}});
+}
+
 std::string TrackCreatorSingleSegments::getDescription()
 {
   return "Creates a track for each segments that is yet unused by any of the given tracks.";

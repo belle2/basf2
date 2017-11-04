@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/SegmentFinderFacetAutomaton.h>
 
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+
 #include <framework/core/ModuleParamList.icc.h>
 #include <framework/core/ModuleParam.dcl.h>
 
@@ -72,8 +74,11 @@ void SegmentFinderFacetAutomaton::apply(std::vector<CDCWireHitCluster>& clusters
   outputSegments.reserve(200);
 
   m_facetCreator.apply(clusters, m_facets);
-  m_facetRelationCreator.apply(m_facets, m_facetRelations);
+
+  std::vector<const CDCFacet*> facetPtrs = as_pointers<const CDCFacet>(m_facets);
+  m_facetRelationCreator.apply(facetPtrs, m_facetRelations);
   if (m_facetRelations.size() == 0) return; // Break point for facet recording runs
+
   m_segmentCreatorFacetAutomaton.apply(m_facets, m_facetRelations, m_segments);
   m_segmentFitter.apply(m_segments);
 
@@ -84,6 +89,7 @@ void SegmentFinderFacetAutomaton::apply(std::vector<CDCWireHitCluster>& clusters
   m_segmentFitter.apply(m_intermediateSegments);
 
   m_segmentLinker.apply(m_intermediateSegments, outputSegments);
+  m_segmentFitter.apply(outputSegments);
   m_segmentFitter.apply(outputSegments);
 
   // Move facets to the DataStore

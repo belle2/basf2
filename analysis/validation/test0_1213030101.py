@@ -16,6 +16,8 @@ from HLTTrigger import add_HLT_Y4S
 from ROOT import Belle2
 import glob
 
+set_random_seed(12345)
+
 # background (collision) files
 # bg = glob.glob('/group/belle2/users/harat/basf2/cvmfsv000700/BG/set1/[A-Z]*.root')  # if you run at KEKCC
 bg = glob.glob('./BG/[A-Z]*.root')

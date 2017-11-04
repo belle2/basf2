@@ -13,6 +13,7 @@
 
 #include "CLHEP/Vector/ThreeVector.h"
 #include "CLHEP/Vector/Rotation.h"
+#include <CLHEP/Geometry/Transform3D.h>
 #include "vector"
 
 namespace Belle2 {
@@ -162,7 +163,8 @@ namespace Belle2 {
       double getZStrip(const CLHEP::Hep3Vector& p) const { return p.z() / m_ZStripWidth + m_ZPositionBase; }
 
       //! Transform space-point within this module from local to global coordinates
-      const CLHEP::Hep3Vector localToGlobal(const CLHEP::Hep3Vector& v) const { return m_Rotation * v + m_GlobalOrigin; }
+      //! @param reco set transformation for reconstruction including alignment correctoin (true) or nominal without alignment correction (false)
+      const CLHEP::Hep3Vector localToGlobal(const CLHEP::Hep3Vector& v, bool reco = false) const;
 
       //! Rotate a vector from global to local system
       const CLHEP::Hep3Vector RotateToLocal(const CLHEP::Hep3Vector& v) const { return m_RotationInverse * v;  }
@@ -171,13 +173,35 @@ namespace Belle2 {
       const CLHEP::Hep3Vector RotateToGlobal(const CLHEP::Hep3Vector& v) const { return m_Rotation * v;  }
 
       //! Transform space-point within this module from global to local coordinates
-      const CLHEP::Hep3Vector globalToLocal(const CLHEP::Hep3Vector& v) const { return m_RotationInverse * (v - m_GlobalOrigin); }
+      //! @param reco set transformation for reconstruction including alignment correctoin (true) or nominal without alignment correction (false)
+      const CLHEP::Hep3Vector globalToLocal(const CLHEP::Hep3Vector& v,  bool reco = false) const;
 
       //! Return the local-coordinate real-vs-ideal translation of this module's sensitive volume; nominally (0,0,0)
       const CLHEP::Hep3Vector getLocalReconstructionShift() const { return m_LocalReconstructionShift; }
 
       //! Return the position (in global coordinates) of this module's sensitive-volume origin
       const CLHEP::Hep3Vector getGlobalOrigin() const {return m_GlobalOrigin;}
+
+      //! Switch on/off the alignment correction
+      // void setAlignmentCorrectionSwitch(bool ifreo ) { m_AlignmentCorrectionSwitch = ifreo;}
+
+      //! Set the alignment Transformation
+      void setAlignment(const HepGeom::Transform3D& moduleAlignment);
+
+      //! Set the displaced geometry Transformation
+      void setDisplacedGeo(const HepGeom::Transform3D& moduleDisplacedGeo);
+
+      //! Get the alignment Transformation
+      const HepGeom::Transform3D getAlignment() const { return m_Alignment; }
+
+      //! Get the displaced geometry Transformation
+      const HepGeom::Transform3D getDisplacedGeo() const { return m_DisplacedGeo; }
+
+      //! Get the rotation from Transform3D
+      const CLHEP::HepRotation getRotationFromTransform3D(const HepGeom::Transform3D& trans) const;
+
+      //! Get the translation from Transform3D
+      const CLHEP::Hep3Vector getTranslationFromTransform3D(const HepGeom::Transform3D& trans) const;
 
     private:
 
@@ -228,6 +252,36 @@ namespace Belle2 {
 
       //! to store the inverse of the rotation matrix (in global coordinates) of this module's sector
       CLHEP::HepRotation m_RotationInverse;
+
+      //! alignment transformation (rotation + shift)
+      HepGeom::Transform3D m_Alignment;
+
+      //! rotation of the alignment transformation
+      CLHEP::HepRotation m_AlignmentRotation;
+
+      //! translation of the alignment transformation
+      CLHEP::Hep3Vector m_AlignmentTranslation;
+
+      //! inverse of alignment transformation
+      HepGeom::Transform3D m_AlignmentInverse;
+
+      //! inverse of the rotation of the alignment transformation
+      CLHEP::HepRotation m_AlignmentRotationInverse;
+
+      //! displaced geometry w.r.t the nominal geometry, as transformation (rotation + shift)
+      HepGeom::Transform3D m_DisplacedGeo;
+
+      //! rotation of the displaced geometry transformation
+      CLHEP::HepRotation m_DisplacedGeoRotation;
+
+      //! translation of the displaced geometry transformation
+      CLHEP::Hep3Vector m_DisplacedGeoTranslation;
+
+      //! inverse of displaced geometry transformation
+      HepGeom::Transform3D m_DisplacedGeoInverse;
+
+      //! inverse of the rotation of displaced geometry transformation
+      CLHEP::HepRotation m_DisplacedGeoRotationInverse;
 
       //! to store the length of each phi-measuring scintillator
       std::vector<double> m_PhiScintLengths;

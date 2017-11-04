@@ -9,11 +9,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 #include <tracking/trackFindingCDC/ca/Path.h>
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+
 #include <vector>
+#include <cassert>
 
 namespace Belle2 {
 
@@ -34,19 +36,22 @@ namespace Belle2 {
 
     public:
       /// Follow paths from all start cells marked with the start flag
-      template<class ACellHolderRange>
-      std::vector<Path<ACellHolder> > followAll(ACellHolderRange& cellHolders,
-                                                const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood,
-                                                Weight minStateToFollow = -INFINITY) const
+      std::vector<Path<ACellHolder>> followAll(
+                                    const std::vector<ACellHolder*>& cellHolders,
+                                    const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations,
+                                    Weight minStateToFollow = -INFINITY) const
       {
+        B2ASSERT("Expected the relations to be sorted",
+                 std::is_sorted(cellHolderRelations.begin(), cellHolderRelations.end()));
+
         // Result
         std::vector<Path<ACellHolder> > paths;
 
         // Stack for back tracking
         Path<ACellHolder> path;
 
-        for (ACellHolder& cellHolder : cellHolders) {
-          const AutomatonCell& automatonCell = cellHolder.getAutomatonCell();
+        for (ACellHolder* cellHolder : cellHolders) {
+          const AutomatonCell& automatonCell = cellHolder->getAutomatonCell();
 
           if (validStartCell(automatonCell, minStateToFollow)) {
             // Cell marks a start point of a path
@@ -55,12 +60,11 @@ namespace Belle2 {
             path.clear();
 
             // Insert a pointer to the cell into the path
-            path.push_back(&cellHolder);
+            path.push_back(cellHolder);
 
             // Recursivly grow the path
-            growAllPaths(path, cellHolderNeighborhood, paths);
+            growAllPaths(path, cellHolderRelations, paths);
             path.pop_back();
-
           }
         }
         return paths;
@@ -71,29 +75,34 @@ namespace Belle2 {
        *  If the start cell is nullptr or has a state lower than the minimum state to follow
        *  an empty vector is returned.
        */
-      Path<ACellHolder> followSingle(ACellHolder* startCellHolderPtr,
-                                     const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood,
+      Path<ACellHolder> followSingle(ACellHolder* startCellHolder,
+                                     const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations,
                                      Weight minStateToFollow = -INFINITY) const
       {
+        assert(std::is_sorted(cellHolderRelations.begin(), cellHolderRelations.end()));
+
         Path<ACellHolder> path;
-        if (not startCellHolderPtr) return path;
-        const AutomatonCell& startCell = startCellHolderPtr->getAutomatonCell();
+        if (not startCellHolder) return path;
+        const AutomatonCell& startCell = startCellHolder->getAutomatonCell();
         if (not validStartCell(startCell, minStateToFollow)) return path;
 
         // Start new path
         path.reserve(20); // Just a guess
 
         // Insert a pointer to the cell into the path
-        path.push_back(startCellHolderPtr);
+        path.push_back(startCellHolder);
         bool grew = true;
         while (grew) {
           grew = false;
-          ACellHolder* lastCellHolderPtr = path.back();
+          ACellHolder* cellHolder = path.back();
 
-          for (const WeightedRelation<ACellHolder>& relation
-               :  cellHolderNeighborhood.equal_range(lastCellHolderPtr)) {
+          auto continuations = asRange(std::equal_range(cellHolderRelations.begin(),
+                                                        cellHolderRelations.end(),
+                                                        cellHolder));
+
+          for (const WeightedRelation<ACellHolder>& relation : continuations) {
             if (isHighestContinuation(relation)) {
-              ACellHolder* neighbor(relation.getTo());
+              ACellHolder* neighbor = relation.getTo();
               path.push_back(neighbor);
               grew = true;
               break;
@@ -111,22 +120,25 @@ namespace Belle2 {
        *  @param[out] paths                   Longest paths generated
        */
       void growAllPaths(Path<ACellHolder>& path,
-                        const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood,
+                        const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations,
                         std::vector<Path<ACellHolder> >& paths) const
       {
         auto growPathByRelation = [&](const WeightedRelation<ACellHolder>& neighborRelation) {
           if (not this->isHighestContinuation(neighborRelation)) return false;
           ACellHolder* neighbor(neighborRelation.getTo());
           path.push_back(neighbor);
-          this->growAllPaths(path, cellHolderNeighborhood, paths);
+          this->growAllPaths(path, cellHolderRelations, paths);
           path.pop_back();
           return true;
         };
 
-        ACellHolder* last = path.back();
-        auto neighborRelations = cellHolderNeighborhood.equal_range(last);
-        int nRelationsUsed = std::count_if(neighborRelations.begin(),
-                                           neighborRelations.end(),
+        ACellHolder* lastCellHolder = path.back();
+
+        auto continuations = asRange(std::equal_range(cellHolderRelations.begin(),
+                                                      cellHolderRelations.end(),
+                                                      lastCellHolder));
+        int nRelationsUsed = std::count_if(continuations.begin(),
+                                           continuations.end(),
                                            growPathByRelation);
 
         if (nRelationsUsed == 0) {

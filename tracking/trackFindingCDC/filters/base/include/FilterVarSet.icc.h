@@ -16,6 +16,7 @@
 
 #include <RtypesCore.h>
 
+#include <algorithm>
 #include <string>
 #include <memory>
 #include <cmath>
@@ -79,8 +80,6 @@ namespace Belle2 {
     template <class AFilter>
     void FilterVarSet<AFilter>::initialize()
     {
-      Super::initialize();
-
       ModuleParamList moduleParamList;
       const std::string prefix = "";
       m_ptrFilter->exposeParameters(&moduleParamList, prefix);
@@ -92,45 +91,19 @@ namespace Belle2 {
         m_cut = cutParam.getValue();
         cutParam.setDefaultValue(NAN);
       }
-      if (m_ptrFilter) m_ptrFilter->initialize();
+
+      this->addProcessingSignalListener(m_ptrFilter.get());
+      Super::initialize();
     }
 
     template <class AFilter>
-    void FilterVarSet<AFilter>::beginRun()
-    {
-      Super::beginRun();
-      if (m_ptrFilter) m_ptrFilter->beginRun();
-    }
-
-    template <class AFilter>
-    void FilterVarSet<AFilter>::beginEvent()
-    {
-      Super::beginEvent();
-      if (m_ptrFilter) m_ptrFilter->beginEvent();
-    }
-
-    template <class AFilter>
-    void FilterVarSet<AFilter>::endRun()
-    {
-      if (m_ptrFilter) m_ptrFilter->endRun();
-      Super::endRun();
-    }
-
-    template <class AFilter>
-    void FilterVarSet<AFilter>::terminate()
-    {
-      if (m_ptrFilter) m_ptrFilter->terminate();
-      Super::terminate();
-    }
-
-    template <class AFilter>
-    std::vector<Named<Float_t*>> FilterVarSet<AFilter>::getNamedVariables(std::string prefix)
+    std::vector<Named<Float_t*>> FilterVarSet<AFilter>::getNamedVariables(const std::string& prefix)
     {
       return Super::getNamedVariables(prefix + m_filterNamePrefix);
     }
 
     template <class AFilter>
-    MayBePtr<Float_t> FilterVarSet<AFilter>::find(std::string varName)
+    MayBePtr<Float_t> FilterVarSet<AFilter>::find(const std::string& varName)
     {
       if (varName.find(m_filterNamePrefix) == 0) {
         std::string varNameWithoutPrefix = varName.substr(m_filterNamePrefix.size());

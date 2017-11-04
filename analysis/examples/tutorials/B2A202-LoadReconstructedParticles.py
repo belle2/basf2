@@ -12,6 +12,7 @@
 # particle type as well.
 #
 # Contributors: A. Zupanc (June 2014)
+#               Vishal (Oct2017) "Intermediate" option in MCHierarchy for Ks,pi0
 #
 ################################################################################
 
@@ -26,7 +27,6 @@ from modularAnalysis import analysis_main
 
 from stdV0s import stdKshorts
 from stdFSParticles import stdPi0s
-
 # check if the required input file exists (from B2A101 example)
 import os.path
 import sys
@@ -138,6 +138,7 @@ toolsK0 += ['Track', 'K_S0 -> ^pi+ ^pi-']
 toolsK0 += ['TrackHits', 'K_S0 -> ^pi+ ^pi-']
 toolsK0 += ['MCTruth', '^K_S0 -> ^pi+ ^pi-']
 toolsK0 += ['CustomFloats[dr:dz:isSignal:chiProb]', '^K_S0']
+toolsK0 += ['MCHierarchy[Intermediate]', '^K_S0']
 
 toolsPI0 = ['MCTruth', '^pi0 -> gamma gamma']
 toolsPI0 += ['Kinematics', '^pi0 -> ^gamma ^gamma']
@@ -145,6 +146,7 @@ toolsPI0 += ['MassBeforeFit', '^pi0']
 toolsPI0 += ['EventMetaData', '^pi0']
 toolsPI0 += ['Cluster', 'pi0 -> ^gamma ^gamma']
 toolsPI0 += ['CustomFloats[extraInfo(BDT):decayAngle(0)]', '^pi0']
+toolsPI0 += ['MCHierarchy[Intermediate]', '^pi0']
 
 ntupleFile('B2A202-LoadReconstructedParticles.root')
 ntupleTree('pion', 'pi+:all', toolsTrackPI)

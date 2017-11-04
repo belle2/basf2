@@ -1,5 +1,5 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
+* BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -7,6 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
+
 #include <framework/core/ModuleParam.icc.h>
 
 #include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
@@ -43,5 +45,6 @@ namespace Belle2 {
   extern template class Belle2::ModuleParam<std::map<short, unsigned long>>;
   extern template class Belle2::ModuleParam<std::map<int, int>>;
 
+  extern template class Belle2::ModuleParam<std::tuple<double, double>>;
   extern template class Belle2::ModuleParam<std::tuple<double, double, double>>;
 }

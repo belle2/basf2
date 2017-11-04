@@ -15,12 +15,15 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/ca/Clusterizer.h>
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
+
+#include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
+
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <functional>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -59,19 +62,14 @@ namespace Belle2 {
           B2ASSERT("Expect the clusters to be sorted", std::is_sorted(superCluster.begin(),
           superCluster.end()));
 
-          // Obtain the set of wire hits as references
-          std::vector<std::reference_wrapper<CDCWireHit> > wireHits;
-          wireHits.reserve(superCluster.size());
-          for (CDCWireHit* wireHit : superCluster) {
-            wireHits.push_back(std::ref(*wireHit));
-          }
+          // Obtain the wire hits as pointers
+          const std::vector<CDCWireHit*>& wireHitPtrs = superCluster;
 
+          // Create the wire hit relations within the supercluster.
           m_wireHitRelations.clear();
-          WeightedNeighborhood<CDCWireHit>::appendUsing(m_wireHitRelationFilter, wireHits, m_wireHitRelations);
-          WeightedNeighborhood<CDCWireHit> wireHitNeighborhood(m_wireHitRelations);
-
+          RelationFilterUtil::appendUsing(m_wireHitRelationFilter, wireHitPtrs, m_wireHitRelations);
           const std::size_t nClustersBefore = outputClusters.size();
-          m_wireHitClusterizer.createFromPointers(superCluster, wireHitNeighborhood, outputClusters);
+          m_wireHitClusterizer.apply(superCluster, m_wireHitRelations, outputClusters);
           const std::size_t nClustersAfter = outputClusters.size();
 
           // Update the super cluster id of the just created clusters
@@ -89,7 +87,7 @@ namespace Belle2 {
       Clusterizer<CDCWireHit, CDCWireHitCluster> m_wireHitClusterizer;
 
       /// Memory for the wire hit neighborhood in a super cluster.
-      std::vector<WeightedRelation<CDCWireHit> > m_wireHitRelations;
+      std::vector<WeightedRelation<CDCWireHit>> m_wireHitRelations;
 
       /// Wire hit neighborhood relation filter
       AWireHitRelationFilter m_wireHitRelationFilter;

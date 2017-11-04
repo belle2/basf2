@@ -11,6 +11,9 @@
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
 
+#include <tracking/trackFindingCDC/filters/base/AndFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/NotFilter.icc.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.dcl.h>
@@ -38,6 +41,30 @@ namespace Belle2 {
     template <class AFilter>
     std::unique_ptr<AFilter> FilterFactory<AFilter>::create(const std::string& filterName) const
     {
+      // Check whether false positive or false negative filter are requested
+      while (filterName == "false_positive" or filterName == "false_negative") {
+        std::string truthFilterName = "truth";
+        std::unique_ptr<AFilter> truthFilter = this->create(truthFilterName);
+        std::unique_ptr<AFilter> defaultFilter = this->create(m_defaultFilterName);
+
+        if (not truthFilter or not defaultFilter) break;
+
+        if (filterName == "false_positive") {
+          std::unique_ptr<AFilter> notTruthFilter =
+            std::make_unique<NotFilter<AFilter>>(std::move(truthFilter));
+          return std::make_unique<AndFilter<AFilter>>(std::move(notTruthFilter),
+                                                      std::move(defaultFilter));
+        }
+
+        if (filterName == "false_negative") {
+          std::unique_ptr<AFilter> notDefaultFilter =
+            std::make_unique<NotFilter<AFilter>>(std::move(defaultFilter));
+          return std::make_unique<AndFilter<AFilter>>(std::move(notDefaultFilter),
+                                                      std::move(truthFilter));
+        }
+        break;
+      }
+
       // Filter not valid
       B2ERROR("Could not create filter with name " << filterName);
       std::ostringstream message;

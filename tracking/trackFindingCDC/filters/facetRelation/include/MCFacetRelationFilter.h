@@ -33,6 +33,12 @@ namespace Belle2 {
        */
       MCFacetRelationFilter(bool allowReverse = false);
 
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+
+      /// Initialize the before event processing.
+      void initialize() final;
+
     public:
       /**
        *  Main filter method returning the weight of the neighborhood relation.

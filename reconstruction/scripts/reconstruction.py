@@ -25,7 +25,7 @@ import mdst
 
 
 def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False,
-                       additionalTrackFitHypotheses=None, addClusterExpertModules=True, use_vxdtf2=False,
+                       additionalTrackFitHypotheses=None, addClusterExpertModules=True, use_vxdtf2=True,
                        use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules to a path.

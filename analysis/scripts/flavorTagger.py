@@ -346,7 +346,7 @@ def setVariables():
         'distance',
         'chiProb'
     ]
-    variables['FastPion'] = = [
+    variables['FastPion'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
         'cosTheta',

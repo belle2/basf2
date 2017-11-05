@@ -880,18 +880,18 @@ def flavorTagger(
       Defines the whole flavor tagging process for each selected Rest of Event (ROE) built in the steering file.
       The flavor is predicted by Multivariate Methods trained with Variables and MetaVariables which use
       Tracks, ECL- and KLMClusters from the corresponding RestOfEvent dataobject.
-      This function can be used to sample the training information, to train or to test the flavorTagger.
+      This module can be used to sample the training information, to train and/or to test the flavorTagger.
 
-      @param particleLists                     The ROEs for flavor tagging are selected from the given particle lists. Default = []
-      @param mode                              The available modes are "Sampler", "Teacher" or "Expert". Default = "Expert"
+      @param particleLists                     The ROEs for flavor tagging are selected from the given particle lists.
+      @param mode                              The available modes are "Sampler", "Teacher" or "Expert".
       @param weightFiles                       Weight files name. Default= "B2JpsiKs_muBGx0". Use 'B2JpsiKs_muBGx1' with BGx1 MC.
-      @param workingDirectory                  Path to the directory containing the FlavorTagging/ folder. Default = "."
+      @param workingDirectory                  Path to the directory containing the FlavorTagging/ folder.
       @param combinerMethods                   MVAs for the combiner: 'TMVA-FBDT' or 'FANN-MLP'. Both used by default.
       @param categories                        Categories used for flavor tagging. By default all are used.
-      @param belleOrBelle2                     Uses Files trained for "Belle" or "Belle2" MC. Default = "Belle2"
-      @param saveCategoriesInfo                Sets to save information of individual categories. Default = True
-      @param downloadFromDatabaseIfNotfound    Weight files from the conditions database if not in workingDirectory. Default = True
-      @param uploadToDatabaseAfterTraining     For librarians: uploads weight files to localdb after training. Default = False.
+      @param belleOrBelle2                     Uses files trained for "Belle" or "Belle2" MC.
+      @param saveCategoriesInfo                Sets to save information of individual categories.
+      @param downloadFromDatabaseIfNotfound    Weight files are downloaded from the conditions database if not in workingDirectory.
+      @param uploadToDatabaseAfterTraining     For librarians: uploads weight files to localdb after training.
       @param samplerFileId                     Identifier to paralellize sampling. Only used in "Sampler" mode.
       @param path                              Modules are added to this path
 

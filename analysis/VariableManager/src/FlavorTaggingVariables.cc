@@ -1046,16 +1046,16 @@ namespace Belle2 {
 
           // ----------------  Is D Meson in the decay chain  --------------------------------------
 
-          bool isCharmedMesonInchain = false;
+          bool isCharmedMesonInChain = false;
 
           std::vector<int> charmMesons = { 411, 421, 10411, 10421, 413, 423, 10413, 10423, 20413, 20423, 415, 425, 431, 10431, 433, 10433, 20433, 435};
 
-          if ((index == 1 || index == 3 || index == 5 || index == 6) && mothersPDG.size() > 1)
+          if ((index == 6) && mothersPDG.size() > 1)
           {
 
             for (auto& iMCMotherPDG : mothersPDG) {
               if (std::find(charmMesons.begin(), charmMesons.end(), iMCMotherPDG) != charmMesons.end()) {
-                isCharmedMesonInchain = true;
+                isCharmedMesonInChain = true;
                 break;
               }
             }
@@ -1064,21 +1064,67 @@ namespace Belle2 {
 
           // ----------------  Is Charmed Baryon in the decay chain  --------------------------------
 
-          bool isCharmedBaryonInchain = false;
+          bool isCharmedBaryonInChain = false;
 
           std::vector<int> charmBaryons = { 4122, 4222, 4212, 4112, 4224, 4214, 4114, 4232, 4132, 4322, 4312, 4324, 4314, 4332, 4334, 4412, 4422,
                                             4414, 4424, 4432, 4434, 4444
                                           };
 
-          if ((index == 1 || index == 3 || index == 5 || index == 6 || index == 12) && mothersPDG.size() > 1)
+          if ((index == 6 || index == 9) && mothersPDG.size() > 1)
           {
 
             for (auto& iMCMotherPDG : mothersPDG) {
               if (std::find(charmBaryons.begin(), charmBaryons.end(), iMCMotherPDG) != charmBaryons.end()) {
-                isCharmedBaryonInchain = true;
+                isCharmedBaryonInChain = true;
                 break;
               }
             }
+          }
+
+          // ----------------  Is neutral ssbar or ccbar Meson in the decay chain  --------------------------------
+
+          bool isSSbarOrCCbarMesonInChain = false;
+
+          std::vector<int> ssbarAndccbarMesons = {// ssbar Mesons
+            221, 331, 9000221, 9010221, 100221, 10221, 100331, 9020221, 10331, 200221, 9030221, 9040221, 9050221, 9060221, 9070221, 223, 333, 10223, 20223,
+            10333, 20333, 100223, 9000223, 9010223, 30223, 100333, 225, 9000225, 335, 9010225, 9020225, 10225, 9030225, 10335, 9040225, 100225, 100335,
+            9050225, 9060225, 9070225, 227, 337, 229, 9000339, 9000229,
+            // ccbar Mesons
+            441, 10441, 100441, 443, 10443, 20443, 100443, 30443, 9000443, 9010443, 9020443, 445, 9000445
+          };
+
+          if ((index == 1 || index == 3 || index == 5 || index == 6) && mothersPDG.size() > 1)
+          {
+
+            for (auto& iMCMotherPDG : mothersPDG) {
+              if (std::find(ssbarAndccbarMesons.begin(), ssbarAndccbarMesons.end(), iMCMotherPDG) != ssbarAndccbarMesons.end()) {
+                isSSbarOrCCbarMesonInChain = true;
+                break;
+              }
+            }
+
+          }
+
+          // --------------  Is the Kaon a descendent of a Meson that conserves flavor  --------------------------
+
+          bool isB0DaughterConservingFlavor = false;
+
+          std::vector<int> flavorConservingMesons = {// Excited light mesons that can decay into Kaons conserving flavor
+            9000211, 10211, 200211, 10213, 20213, 100213, 9020213, 30213, 215, 10215, 217, 219,
+            // Excited K Mesons that hadronize conserving flavor
+            30343, 10311, 10321, 100311, 100321, 200311, 200321, 9000311, 9000321, 313, 323, 10313, 10323, 20313, 20323, 100313, 100323,
+            9000313, 9000323, 30313, 30323, 315, 325, 9000315, 9000325, 10315, 10325, 20315, 20325, 100315, 100325, 9010315,
+            9010325, 317, 327, 9010317, 9010327, 319, 329, 9000319, 9000329
+          };
+
+          if ((index == 6) && mothersPDG.size() > 1)
+          {
+
+            if (std::find(flavorConservingMesons.begin(), flavorConservingMesons.end(),
+                          mothersPDG.rbegin()[1]) != flavorConservingMesons.end()) {
+              isB0DaughterConservingFlavor = true;
+            }
+
           }
 
           //direct electron
@@ -1090,7 +1136,7 @@ namespace Belle2 {
             //intermediate electron
           } else if (index == 1
                      && mcPDG == 11 && mothersPDG.size() > 1
-                     && (isCharmedMesonInchain == true || isCharmedBaryonInchain == true))
+                     && isSSbarOrCCbarMesonInChain == false)
           {
             return 1.0;
             //direct muon
@@ -1101,7 +1147,7 @@ namespace Belle2 {
             //intermediate muon
           } else if (index == 3
                      && mcPDG == 13 && mothersPDG.size() > 1
-                     && (isCharmedMesonInchain == true || isCharmedBaryonInchain == true))
+                     && isSSbarOrCCbarMesonInChain == false)
           {
             return 1.0;
             //KinLepton
@@ -1112,12 +1158,13 @@ namespace Belle2 {
             //IntermediateKinLepton
           } else if (index == 5
                      && (mcPDG == 13 || mcPDG == 11) && mothersPDG.size() > 1
-                     && (isCharmedMesonInchain == true || isCharmedBaryonInchain == true))
+                     && isSSbarOrCCbarMesonInChain == false)
           {
             return 1.0;
             //kaon
           } else if (index == 6
-                     && mcPDG == 321 && (isCharmedMesonInchain == true))
+                     && mcPDG == 321 && isSSbarOrCCbarMesonInChain == false && ((isCharmedMesonInChain == true || isCharmedBaryonInChain == true)
+                         || (mothersPDG[0] == 511 || (isB0DaughterConservingFlavor == true && mothersPDG.rbegin()[0] == 511))))
           {
             return 1.0;
             //slow pion
@@ -1128,10 +1175,11 @@ namespace Belle2 {
             //high momentum pions
           } else if (index == 8
                      && mcPDG == 211 && (mothersPDG[0] == 511 || (mothersPDG.size() > 1 && mothersPDG[0] == 213 && mothersPDG[1] == 511)))
+
           {
             return 1.0;
             //lambdas
-          } else if (index == 9 && mcPDG == 3122 && isCharmedBaryonInchain == true)
+          } else if (index == 9 && mcPDG == 3122 && isCharmedBaryonInChain == true)
           {
             return 1.0;
           } else return 0.0;
@@ -1202,16 +1250,16 @@ namespace Belle2 {
 
           // ----------------  Is D Meson in the decay chain  --------------------------------------
 
-          bool isCharmedMesonInchain = false;
+          bool isCharmedMesonInChain = false;
 
           std::vector<int> charmMesons = { 411, 421, 10411, 10421, 413, 423, 10413, 10423, 20413, 20423, 415, 425, 431, 10431, 433, 10433, 20433, 435};
 
-          if ((index == 1 || index == 3 || index == 5 || index == 6) && mothersPDG.size() > 1)
+          if ((index == 6) && mothersPDG.size() > 1)
           {
 
             for (auto& iMCMotherPDG : mothersPDG) {
               if (std::find(charmMesons.begin(), charmMesons.end(), iMCMotherPDG) != charmMesons.end()) {
-                isCharmedMesonInchain = true;
+                isCharmedMesonInChain = true;
                 break;
               }
             }
@@ -1220,22 +1268,69 @@ namespace Belle2 {
 
           // ----------------  Is Charmed Baryon in the decay chain  --------------------------------
 
-          bool isCharmedBaryonInchain = false;
+          bool isCharmedBaryonInChain = false;
 
           std::vector<int> charmBaryons = { 4122, 4222, 4212, 4112, 4224, 4214, 4114, 4232, 4132, 4322, 4312, 4324, 4314, 4332, 4334, 4412, 4422,
                                             4414, 4424, 4432, 4434, 4444
                                           };
 
-          if ((index == 1 || index == 3 || index == 5 || index == 6 || index == 12) && mothersPDG.size() > 1)
+          if ((index == 6 || index == 12) && mothersPDG.size() > 1)
           {
 
             for (auto& iMCMotherPDG : mothersPDG) {
               if (std::find(charmBaryons.begin(), charmBaryons.end(), iMCMotherPDG) != charmBaryons.end()) {
-                isCharmedBaryonInchain = true;
+                isCharmedBaryonInChain = true;
                 break;
               }
             }
           }
+
+          // ----------------  Is neutral ssbar or ccbar Meson in the decay chain  --------------------------------
+
+          bool isSSbarOrCCbarMesonInChain = false;
+
+          std::vector<int> ssbarAndccbarMesons = {// ssbar Mesons
+            221, 331, 9000221, 9010221, 100221, 10221, 100331, 9020221, 10331, 200221, 9030221, 9040221, 9050221, 9060221, 9070221, 223, 333, 10223, 20223,
+            10333, 20333, 100223, 9000223, 9010223, 30223, 100333, 225, 9000225, 335, 9010225, 9020225, 10225, 9030225, 10335, 9040225, 100225, 100335,
+            9050225, 9060225, 9070225, 227, 337, 229, 9000339, 9000229,
+            // ccbar Mesons
+            441, 10441, 100441, 443, 10443, 20443, 100443, 30443, 9000443, 9010443, 9020443, 445, 9000445
+          };
+
+          if ((index == 1 || index == 3 || index == 5 || index == 6 || index == 11) && mothersPDG.size() > 1)
+          {
+
+            for (auto& iMCMotherPDG : mothersPDG) {
+              if (std::find(ssbarAndccbarMesons.begin(), ssbarAndccbarMesons.end(), iMCMotherPDG) != ssbarAndccbarMesons.end()) {
+                isSSbarOrCCbarMesonInChain = true;
+                break;
+              }
+            }
+
+          }
+
+          // --------------  Is the Kaon a descendent of a Meson that conserves flavor  --------------------------
+
+          bool isB0DaughterConservingFlavor = false;
+
+          std::vector<int> flavorConservingMesons = {// Excited light mesons that can decay into Kaons conserving flavor
+            9000211, 10211, 200211, 10213, 20213, 100213, 9020213, 30213, 215, 10215, 217, 219,
+            // Excited K Mesons that hadronize conserving flavor
+            30343, 10311, 10321, 100311, 100321, 200311, 200321, 9000311, 9000321, 313, 323, 10313, 10323, 20313, 20323, 100313, 100323,
+            9000313, 9000323, 30313, 30323, 315, 325, 9000315, 9000325, 10315, 10325, 20315, 20325, 100315, 100325, 9010315,
+            9010325, 317, 327, 9010317, 9010327, 319, 329, 9000319, 9000329
+          };
+
+          if ((index == 6) && mothersPDG.size() > 1)
+          {
+
+            if (std::find(flavorConservingMesons.begin(), flavorConservingMesons.end(),
+                          mothersPDG.rbegin()[1]) != flavorConservingMesons.end()) {
+              isB0DaughterConservingFlavor = true;
+            }
+
+          }
+
           // ----------------------------  For KaonPion Category ------------------------------------
           const MCParticle* mcSlowPionMother;
           bool haveKaonPionSameMother = false;
@@ -1315,7 +1410,7 @@ namespace Belle2 {
             return 1.0;
           } else if (index == 1 // IntermediateElectron
                      && qTarget != qMC && mcPDG == 11 && mothersPDG.size() > 1
-                     && (isCharmedMesonInchain == true || isCharmedBaryonInchain == true))
+                     && isSSbarOrCCbarMesonInChain == false)
           {
             return 1.0;
           } else if (index == 2 // Muon
@@ -1324,7 +1419,7 @@ namespace Belle2 {
             return 1.0;
           } else if (index == 3 // IntermediateMuon
                      && qTarget != qMC && mcPDG == 13 && mothersPDG.size() > 1
-                     && (isCharmedMesonInchain == true || isCharmedBaryonInchain == true))
+                     && isSSbarOrCCbarMesonInChain == false)
           {
             return 1.0;
           }  else if (index == 4 // KinLepton
@@ -1333,11 +1428,12 @@ namespace Belle2 {
             return 1.0;
           }  else if (index == 5 // IntermediateKinLepton
                       && qTarget != qMC && (mcPDG == 11 || mcPDG == 13) && mothersPDG.size() > 1
-                      && (isCharmedMesonInchain == true || isCharmedBaryonInchain == true))
+                      && isSSbarOrCCbarMesonInChain == false)
           {
             return 1.0;
           } else if (index == 6 && qTarget == qMC // Kaon
-                     && mcPDG == 321 && (isCharmedMesonInchain == true))
+                     && mcPDG == 321 && isSSbarOrCCbarMesonInChain == false && ((isCharmedMesonInChain == true || isCharmedBaryonInChain == true)
+                         || (mothersPDG[0] == 511 || (isB0DaughterConservingFlavor == true && mothersPDG.rbegin()[0] == 511))))
           {
             return 1.0;
           } else if (index == 7 && qTarget != qMC // SlowPion
@@ -1356,11 +1452,11 @@ namespace Belle2 {
           {
             return 1.0;
           } else if (index == 11 && qTarget != qMC && mothersPDG.size() > 1 && qFSC == qMC // "FSC"
-                     && mcPDG == 211 && FastParticlePDGMother == 511)
+                     && mcPDG == 211 && FastParticlePDGMother == 511 && isSSbarOrCCbarMesonInChain == false)
           {
             return 1.0;
           } else if (index == 12 && (particle->getPDGCode() / TMath::Abs(particle->getPDGCode())) != qMC // Lambda
-                     && mcPDG == 3122 && isCharmedBaryonInchain == true)
+                     && mcPDG == 3122 && isCharmedBaryonInChain == true)
           {
             return 1.0;
           } else {

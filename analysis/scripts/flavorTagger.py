@@ -882,17 +882,18 @@ def flavorTagger(
       Tracks, ECL- and KLMClusters from the corresponding RestOfEvent dataobject.
       This function can be used to sample the training information, to train or to test the flavorTagger.
 
-      @param particleLists                      The ROEs for flavor tagging are selected from the given particle lists.
-      @param mode                               The available modes are "Sampler", "Teacher" or "Expert".
-      @param weightFiles                        The name of the weightfiles of the trained method
-      @param workingDirectory                   Path to the directory containing the FlavorTagging/ folder.
-      @param combinerMethods                    Multivariate method used for the combiner: 'TMVA-FBDT' or 'FANN-MLP'.
-      @param categories                         Categories used for flavor tagging
-      @param belleOrBelle2                      Uses Files trained for "Belle" or "Belle2" MC
-      @param downloadFromDatabaseIfNotfound     Looks for weight files in the Database if not found in workingDirectory.
-      @param uploadToDatabaseAfterTraining      Uploads the weight files into the Database after training.
-      @param samplerFileId                      Identifier to paralellize training.
-      @param path                               modules are added to this path
+      @param particleLists                     The ROEs for flavor tagging are selected from the given particle lists. Default = []
+      @param mode                              The available modes are "Sampler", "Teacher" or "Expert". Default = "Expert"
+      @param weightFiles                       Weight files name. Default= "B2JpsiKs_muBGx0". Use 'B2JpsiKs_muBGx1' with BGx1 MC.
+      @param workingDirectory                  Path to the directory containing the FlavorTagging/ folder. Default = "."
+      @param combinerMethods                   MVAs for the combiner: 'TMVA-FBDT' or 'FANN-MLP'. Both used by default.
+      @param categories                        Categories used for flavor tagging. By default all are used.
+      @param belleOrBelle2                     Uses Files trained for "Belle" or "Belle2" MC. Default = "Belle2"
+      @param saveCategoriesInfo                Sets to save information of individual categories. Default = True
+      @param downloadFromDatabaseIfNotfound    Weight files from the conditions database if not in workingDirectory. Default = True
+      @param uploadToDatabaseAfterTraining     For librarians: uploads weight files to localdb after training. Default = False.
+      @param samplerFileId                     Identifier to paralellize sampling. Only used in "Sampler" mode.
+      @param path                              Modules are added to this path
 
     """
 

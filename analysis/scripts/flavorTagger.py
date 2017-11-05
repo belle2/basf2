@@ -241,15 +241,19 @@ def setVariables():
         'useCMSFrame(pt)',
         'p',
         'pt',
+        'cosTheta',
         'eid',
         'eid_dEdx',
         'eid_TOP',
-        'SemiLeptonicVariables(recoilMass)',
-        'SemiLeptonicVariables(pMissCMS)',
-        'SemiLeptonicVariables(cosThetaMissCMS)',
-        'SemiLeptonicVariables(EW90)',
         'eid_ARICH',
         'eid_ECL',
+        'BtagToWBosonVariables(recoilMassSqrd)',
+        'BtagToWBosonVariables(pMissCMS)',
+        'BtagToWBosonVariables(cosThetaMissCMS)',
+        'BtagToWBosonVariables(EW90)',
+        'cosTPTO',
+        'ImpactXY',
+        'distance',
         'chiProb',
     ]
     variables['IntermediateElectron'] = variables['Electron']
@@ -258,14 +262,18 @@ def setVariables():
         'useCMSFrame(pt)',
         'p',
         'pt',
+        'cosTheta',
         muId[getBelleOrBelle2()],
         'muid_dEdx',
         'muid_TOP',
-        'SemiLeptonicVariables(recoilMass)',
-        'SemiLeptonicVariables(pMissCMS)',
-        'SemiLeptonicVariables(cosThetaMissCMS)',
-        'SemiLeptonicVariables(EW90)',
         'muid_ARICH',
+        'BtagToWBosonVariables(recoilMassSqrd)',
+        'BtagToWBosonVariables(pMissCMS)',
+        'BtagToWBosonVariables(cosThetaMissCMS)',
+        'BtagToWBosonVariables(EW90)',
+        'cosTPTO',
+        'ImpactXY',
+        'distance',
         'chiProb',
     ]
     variables['IntermediateMuon'] = variables['Muon']
@@ -274,19 +282,23 @@ def setVariables():
         'useCMSFrame(pt)',
         'p',
         'pt',
+        'cosTheta',
         muId[getBelleOrBelle2()],
         'muid_dEdx',
         'muid_TOP',
-        'SemiLeptonicVariables(recoilMass)',
-        'SemiLeptonicVariables(pMissCMS)',
-        'SemiLeptonicVariables(cosThetaMissCMS)',
-        'SemiLeptonicVariables(EW90)',
         'muid_ARICH',
         'eid',
         'eid_dEdx',
         'eid_TOP',
         'eid_ARICH',
         'eid_ECL',
+        'BtagToWBosonVariables(recoilMassSqrd)',
+        'BtagToWBosonVariables(pMissCMS)',
+        'BtagToWBosonVariables(cosThetaMissCMS)',
+        'BtagToWBosonVariables(EW90)',
+        'cosTPTO',
+        'ImpactXY',
+        'distance',
         'chiProb',
     ]
     variables['IntermediateKinLepton'] = variables['KinLepton']
@@ -301,6 +313,10 @@ def setVariables():
         'Kid_ARICH',
         'NumberOfKShortsInRoe',
         'ptTracksRoe',
+        'BtagToWBosonVariables(recoilMassSqrd)',
+        'BtagToWBosonVariables(cosThetaMissCMS)',
+        'cosTPTO',
+        'ImpactXY',
         'distance',
         'chiProb',
     ]
@@ -315,12 +331,41 @@ def setVariables():
         'piid_TOP',
         'piid_ARICH',
         'pi_vs_edEdxid',
+        KId[getBelleOrBelle2()],
+        'Kid_dEdx',
+        'Kid_TOP',
+        'Kid_ARICH',
+        'NumberOfKShortsInRoe',
+        'ptTracksRoe',
+        'eid',
+        'BtagToWBosonVariables(recoilMassSqrd)',
+        'BtagToWBosonVariables(EW90)',
+        'BtagToWBosonVariables(cosThetaMissCMS)',
         'cosTPTO',
+        'ImpactXY',
+        'distance',
+        'chiProb'
+    ]
+    variables['FastPion'] = = [
+        'useCMSFrame(p)',
+        'useCMSFrame(pt)',
+        'cosTheta',
+        'p',
+        'pt',
+        'piid',
+        'piid_dEdx',
+        'piid_TOP',
+        'piid_ARICH',
+        'pi_vs_edEdxid',
         KId[getBelleOrBelle2()],
         'eid',
+        'BtagToWBosonVariables(EW90)',
+        'cosTPTO',
+        'ImpactXY',
+        'distance',
         'chiProb',
     ]
-    variables['FastPion'] = variables['SlowPion']
+
     variables['Lambda'] = [
         'lambdaFlavor',
         'NumberOfKShortsInRoe',
@@ -335,11 +380,6 @@ def setVariables():
         'distance',
     ]
 
-    # Only for Event Level
-    variables['KaonPion'] = ['extraInfo(isRightCategory(Kaon))',
-                             'HighestProbInCat(pi+:inRoe, isRightCategory(SlowPion))',
-                             'KaonPionVariables(cosKaonPion)', 'KaonPionVariables(HaveOpositeCharges)', KId[getBelleOrBelle2()]]
-
     variables['MaximumPstar'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',
@@ -347,6 +387,7 @@ def setVariables():
         'pt',
         'cosTPTO',
         'ImpactXY',
+        'distance',
     ]
 
     variables['FSC'] = [
@@ -358,6 +399,11 @@ def setVariables():
         'FSCVariables(cosTPTOFast)',
         'FSCVariables(SlowFastHaveOpositeCharges)',
     ]
+
+    # For sampling and teaching in a second step
+    variables['KaonPion'] = ['extraInfo(isRightCategory(Kaon))',
+                             'HighestProbInCat(pi+:inRoe, isRightCategory(SlowPion))',
+                             'KaonPionVariables(cosKaonPion)', 'KaonPionVariables(HaveOpositeCharges)', KId[getBelleOrBelle2()]]
 
 
 def FillParticleLists(mode='Expert', path=analysis_main):
@@ -410,140 +456,6 @@ def FillParticleLists(mode='Expert', path=analysis_main):
                 readyParticleLists.append(particleList)
 
     return True
-
-
-def trackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
-    """
-    Samples data for training or tests all categories at track level except
-    KaonPion, MaximumPstar and FSC which are only at the event level.
-    """
-
-    B2INFO('TRACK LEVEL')
-
-    ReadyMethods = 0
-
-    identifiersExtraInfosDict = dict()
-
-    for (particleList, category) in trackLevelParticleLists:
-
-        methodPrefixTrackLevel = belleOrBelle2Flag + "_" + weightFiles + 'TrackLevel' + category + 'FBDT'
-        identifierTrackLevel = filesDirectory + '/' + methodPrefixTrackLevel + "_1.root"
-        targetVariable = 'isRightTrack(' + category + ')'
-        extraInfoName = targetVariable
-
-        if not os.path.isfile(identifierTrackLevel):
-            if mode == 'Expert':
-                if downloadFlag:
-                    basf2_mva.download(methodPrefixTrackLevel, identifierTrackLevel)
-                    if not os.path.isfile(identifierTrackLevel):
-                        B2FATAL('Flavor Tagger: Weight file ' + identifierTrackLevel +
-                                ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
-                else:
-                    B2FATAL(
-                        'Flavor Tagger: ' + particleList + ' Tracklevel was not trained. Weight file ' +
-                        identifierTrackLevel + ' was not found. Stopped')
-
-            if mode == 'Sampler':
-
-                B2INFO(
-                    'flavorTagger: file ' + filesDirectory + '/' +
-                    methodPrefixTrackLevel + 'sampled' + fileId + '.root will be saved.')
-
-                trackLevelPath = create_path()
-                SkipEmptyParticleList = register_module("SkimFilter")
-                SkipEmptyParticleList.set_name('SkimFilter_TrackLevel' + category)
-                SkipEmptyParticleList.param('particleLists', particleList)
-                SkipEmptyParticleList.if_true(trackLevelPath, AfterConditionPath.CONTINUE)
-                path.add_module(SkipEmptyParticleList)
-
-                ntuple = register_module('VariablesToNtuple')
-                ntuple.param('fileName', filesDirectory + '/' + methodPrefixTrackLevel + "sampled" + fileId + ".root")
-                ntuple.param('treeName', methodPrefixTrackLevel + "_tree")
-                ntuple.param('variables', variables[category] + [targetVariable])
-                ntuple.param('particleList', particleList)
-                trackLevelPath.add_module(ntuple)
-
-        if os.path.isfile(identifierTrackLevel) and mode != 'Teacher':
-
-            B2INFO('flavorTagger: MVAExpert ' + methodPrefixTrackLevel + ' ready.')
-
-            if particleList not in identifiersExtraInfosDict:
-                identifiersExtraInfosDict[particleList] = [(extraInfoName, identifierTrackLevel)]
-            else:
-                identifiersExtraInfosDict[particleList].append((extraInfoName, identifierTrackLevel))
-
-            ReadyMethods += 1
-
-    if ReadyMethods != len(trackLevelParticleLists):
-        return False
-    else:
-        # Each category has its own Path in order to be skipped if the corresponding particle list is empty
-        for particleList in identifiersExtraInfosDict:
-            trackLevelPath = create_path()
-            SkipEmptyParticleList = register_module("SkimFilter")
-            SkipEmptyParticleList.set_name('SkimFilter_TrackLevel_' + particleList)
-            SkipEmptyParticleList.param('particleLists', particleList)
-            SkipEmptyParticleList.if_true(trackLevelPath, AfterConditionPath.CONTINUE)
-            path.add_module(SkipEmptyParticleList)
-
-            mvaMultipleExperts = register_module('MVAMultipleExperts')
-            mvaMultipleExperts.set_name('MVAMultipleExperts_TrackLevel_' + particleList)
-            mvaMultipleExperts.param('listNames', [particleList])
-            mvaMultipleExperts.param('extraInfoNames', [row[0] for row in identifiersExtraInfosDict[particleList]])
-            mvaMultipleExperts.param('signalFraction', signalFraction)
-            mvaMultipleExperts.param('identifiers', [row[1] for row in identifiersExtraInfosDict[particleList]])
-            trackLevelPath.add_module(mvaMultipleExperts)
-
-        return True
-
-
-def trackLevelTeacher(weightFiles='B2JpsiKs_mu'):
-    """
-    Trains all categories at track level except KaonPion, MaximumPstar and FSC which are only at the event level.
-    """
-
-    B2INFO('TRACK LEVEL TEACHER')
-
-    ReadyMethods = 0
-
-    for (particleList, category) in trackLevelParticleLists:
-
-        methodPrefixTrackLevel = belleOrBelle2Flag + "_" + weightFiles + 'TrackLevel' + category + 'FBDT'
-        targetVariable = 'isRightTrack(' + category + ')'
-        weightFile = filesDirectory + '/' + methodPrefixTrackLevel + "_1.root"
-
-        if not os.path.isfile(weightFile):
-
-            sampledFilesList = glob.glob(filesDirectory + '/' + methodPrefixTrackLevel + 'sampled*.root')
-            if len(sampledFilesList) == 0:
-
-                B2INFO('flavorTagger: trackLevelTeacher did not find any ' + filesDirectory + '/' +
-                       methodPrefixTrackLevel + "sampled*.root" + ' file. Please run the flavorTagger in "Sampler" mode.')
-
-            else:
-
-                B2INFO('flavorTagger: MVA Teacher training' + methodPrefixTrackLevel + ' .')
-                trainingOptionsTrackLevel = basf2_mva.GeneralOptions()
-                trainingOptionsTrackLevel.m_datafiles = basf2_mva.vector(*sampledFilesList)
-                trainingOptionsTrackLevel.m_treename = methodPrefixTrackLevel + "_tree"
-                trainingOptionsTrackLevel.m_identifier = weightFile
-                trainingOptionsTrackLevel.m_variables = basf2_mva.vector(*variables[category])
-                trainingOptionsTrackLevel.m_target_variable = targetVariable
-                trainingOptionsTrackLevel.m_max_events = maxEventsNumber
-
-                basf2_mva.teacher(trainingOptionsTrackLevel, fastBDTCategories)
-
-                if uploadFlag:
-                    basf2_mva.upload(weightFile, methodPrefixTrackLevel)
-
-        else:
-
-            ReadyMethods += 1
-
-    if ReadyMethods != len(trackLevelParticleLists):
-        return False
-    else:
-        return True
 
 
 def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
@@ -729,124 +641,6 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu'):
     if ReadyMethods != len(eventLevelParticleLists):
         return False
     else:
-        return True
-
-
-def trackAndEventLevels(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
-    """
-    Tests all categories at event and track level.
-    """
-
-    B2INFO('TRACK AND EVENT LEVELS')
-
-    ReadyMethods = 0
-
-    identifiersExtraInfosDict = dict()
-    identifiersExtraInfosKaonPion = []
-
-    # check if methods are ready and download them from Database if specified
-    for (particleList, category) in trackLevelParticleLists:
-
-        methodPrefixTrackLevel = belleOrBelle2Flag + "_" + weightFiles + 'TrackLevel' + category + 'FBDT'
-        identifierTrackLevel = filesDirectory + '/' + methodPrefixTrackLevel + '_1.root'
-        targetVariable = 'isRightTrack(' + category + ')'
-        extraInfoName = targetVariable
-
-        if not os.path.isfile(identifierTrackLevel):
-            if mode == 'Expert':
-                if downloadFlag:
-                    basf2_mva.download(methodPrefixTrackLevel, identifierTrackLevel)
-                    if not os.path.isfile(identifierTrackLevel):
-                        B2FATAL('Flavor Tagger: Weight file ' + identifierTrackLevel +
-                                ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
-                else:
-                    B2FATAL(
-                        'Flavor Tagger: ' +
-                        particleList +
-                        ' Tracklevel was not trained. Weight file ' +
-                        identifierTrackLevel + ' was not found. Stopped')
-
-        if os.path.isfile(identifierTrackLevel) and mode != 'Teacher':
-            B2INFO('flavorTagger: MVAExpert ' + methodPrefixTrackLevel + ' ready.')
-
-            if particleList not in identifiersExtraInfosDict:
-                identifiersExtraInfosDict[particleList] = [(extraInfoName, identifierTrackLevel)]
-            else:
-                identifiersExtraInfosDict[particleList].append((extraInfoName, identifierTrackLevel))
-
-            ReadyMethods += 1
-
-    for (particleList, category, combinerVariable) in eventLevelParticleLists:
-
-        methodPrefixEventLevel = belleOrBelle2Flag + "_" + weightFiles + 'EventLevel' + category + 'FBDT'
-        identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
-        targetVariable = 'isRightCategory(' + category + ')'
-        extraInfoName = targetVariable
-
-        if not os.path.isfile(identifierEventLevel):
-            if mode == 'Expert':
-                if downloadFlag:
-                    basf2_mva.download(methodPrefixEventLevel, identifierEventLevel)
-                    if not os.path.isfile(identifierEventLevel):
-                        B2FATAL('Flavor Tagger: Weight file ' + identifierEventLevel +
-                                ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
-                else:
-                    B2FATAL(
-                        'Flavor Tagger: ' +
-                        particleList +
-                        ' Eventlevel was not trained. Weight file ' +
-                        identifierEventLevel + ' was not found. Stopped')
-
-        if os.path.isfile(identifierEventLevel) and mode != 'Teacher':
-            B2INFO('flavorTagger: MVAExpert ' + methodPrefixEventLevel + ' ready.')
-
-            if particleList not in identifiersExtraInfosDict and category != 'KaonPion':
-                identifiersExtraInfosDict[particleList] = [(extraInfoName, identifierEventLevel)]
-            elif category != 'KaonPion':
-                identifiersExtraInfosDict[particleList].append((extraInfoName, identifierEventLevel))
-            else:
-                identifiersExtraInfosKaonPion.append((extraInfoName, identifierEventLevel))
-
-            ReadyMethods += 1
-
-    allMethods = len(trackLevelParticleLists) + len(eventLevelParticleLists)
-    if ReadyMethods != allMethods:
-        return False
-    else:
-        # Each category has its own Path in order to be skipped if the corresponding particle list is empty
-        for particleList in identifiersExtraInfosDict:
-            trackAndEventLevelPath = create_path()
-            SkipEmptyParticleList = register_module("SkimFilter")
-            SkipEmptyParticleList.set_name('SkimFilter_' + particleList)
-            SkipEmptyParticleList.param('particleLists', particleList)
-            SkipEmptyParticleList.if_true(trackAndEventLevelPath, AfterConditionPath.CONTINUE)
-            path.add_module(SkipEmptyParticleList)
-
-            mvaMultipleExperts = register_module('MVAMultipleExperts')
-            mvaMultipleExperts.set_name('MVAMultipleExperts_' + particleList)
-            mvaMultipleExperts.param('listNames', [particleList])
-            mvaMultipleExperts.param('extraInfoNames', [row[0] for row in identifiersExtraInfosDict[particleList]])
-            mvaMultipleExperts.param('signalFraction', signalFraction)
-            mvaMultipleExperts.param('identifiers', [row[1] for row in identifiersExtraInfosDict[particleList]])
-            trackAndEventLevelPath.add_module(mvaMultipleExperts)
-
-        if 'KaonPion' in [row[1] for row in eventLevelParticleLists]:
-            trackAndEventLevelKaonPionPath = create_path()
-            SkipEmptyParticleList = register_module("SkimFilter")
-            SkipEmptyParticleList.set_name('SkimFilter_' + 'K+:inRoe')
-            SkipEmptyParticleList.param('particleLists', 'K+:inRoe')
-            SkipEmptyParticleList.if_true(trackAndEventLevelKaonPionPath, AfterConditionPath.CONTINUE)
-            path.add_module(SkipEmptyParticleList)
-
-            mvaExpertKaonPion = register_module("MVAExpert")
-            mvaExpertKaonPion.set_name('MVAExpert_KaonPion_' + 'K+:inRoe')
-            mvaExpertKaonPion.param('listNames', ['K+:inRoe'])
-            mvaExpertKaonPion.param('extraInfoName', identifiersExtraInfosKaonPion[0][0])
-            mvaExpertKaonPion.param('signalFraction', signalFraction)
-            mvaExpertKaonPion.param('identifier', identifiersExtraInfosKaonPion[0][1])
-
-            trackAndEventLevelKaonPionPath.add_module(mvaExpertKaonPion)
-
         return True
 
 
@@ -1076,6 +870,7 @@ def flavorTagger(
         'MaximumPstar',
         'KaonPion'],
     belleOrBelle2="Belle2",
+    saveCategoriesInfo=True,
     downloadFromDatabaseIfNotfound=True,
     uploadToDatabaseAfterTraining=False,
     samplerFileId='',
@@ -1172,10 +967,6 @@ def flavorTagger(
     # sampler or expert
     if mode == 'Sampler' or mode == 'Expert':
         if FillParticleLists(mode, roe_path):
-            # if not trackAndEventLevels(mode, weightFiles, roe_path):
-            #     if trackLevel(mode, weightFiles, roe_path):
-            #         eventLevel(mode, weightFiles, roe_path)
-            # else:
             if eventLevel(mode, weightFiles, roe_path):
                 combinerLevel(mode, weightFiles, roe_path)
                 if mode == 'Expert':
@@ -1184,8 +975,8 @@ def flavorTagger(
                     flavorTaggerInfoFiller.param('eventLevelParticleLists', eventLevelParticleLists)
                     flavorTaggerInfoFiller.param('TMVAfbdt', TMVAfbdt)
                     flavorTaggerInfoFiller.param('FANNmlp', FANNmlp)
-                    flavorTaggerInfoFiller.param('qpCategories', True)
-                    flavorTaggerInfoFiller.param('istrueCategories', True)
+                    flavorTaggerInfoFiller.param('qpCategories', saveCategoriesInfo)
+                    flavorTaggerInfoFiller.param('istrueCategories', saveCategoriesInfo)
                     flavorTaggerInfoFiller.param('targetProb', False)
                     flavorTaggerInfoFiller.param('trackPointers', False)
                     roe_path.add_module(flavorTaggerInfoFiller)  # Add FlavorTag Info filler to roe_path
@@ -1204,7 +995,6 @@ def flavorTagger(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
     if mode == 'Teacher':
-        # if trackLevelTeacher(weightFiles):
         if eventLevelTeacher(weightFiles):
             combinerLevelTeacher(weightFiles)
 

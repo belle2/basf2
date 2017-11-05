@@ -685,7 +685,7 @@ namespace Belle2 {
 
 //  Track and Event Level variables ------------------------------------------------------------------------
 
-    Manager::FunctionPtr SemiLeptonicVariables(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr BtagToWBosonVariables(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
         auto requestedVariable = arguments[0];
@@ -736,6 +736,7 @@ namespace Belle2 {
                                   momTarget; //Total Momentum of the recoiling X in CMS-System
             TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
             if (requestedVariable == "recoilMass") output = momX.M();
+            if (requestedVariable == "recoilMassSqrd") output = momX.M2();
             else if (requestedVariable == "pMissCMS") output = momMiss.Vect().Mag();
             else if (requestedVariable == "cosThetaMissCMS") output = TMath::Cos(momTarget.Angle(momMiss.Vect()));
             else if (requestedVariable == "EW90") {
@@ -755,14 +756,14 @@ namespace Belle2 {
               output = E_W_90;
             } else {
               B2FATAL("Wrong variable  " << requestedVariable <<
-                      " requested. The possibilities are recoilMass, pMissCMS, cosThetaMissCMS or EW90");
+                      " requested. The possibilities are recoilMass, recoilMassSqrd, pMissCMS, cosThetaMissCMS or EW90");
             }
           }
           return output;
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments (1 required) for meta function SemiLeptonicVariables");
+        B2FATAL("Wrong number of arguments (1 required) for meta function BtagToWBosonVariables");
       }
     }
 
@@ -2071,7 +2072,7 @@ namespace Belle2 {
                       "FlavorTagging:[Eventbased] Available checking variables are getListSize for particle lists.");
     REGISTER_VARIABLE("IsDaughterOf(variable)", IsDaughterOf, "Check if the particle is a daughter of the given list.");
 
-    REGISTER_VARIABLE("SemiLeptonicVariables(requestedVariable)", SemiLeptonicVariables,
+    REGISTER_VARIABLE("BtagToWBosonVariables(requestedVariable)", BtagToWBosonVariables,
                       "FlavorTagging:[Eventbased] Kinematical variables (recoilMass, pMissCMS, cosThetaMissCMS or EW90) assuming a semileptonic decay with the given particle as target.");
     REGISTER_VARIABLE("KaonPionVariables(requestedVariable)"  , KaonPionVariables ,
                       " Kinematical variables for KaonPion category (cosKaonPion or HaveOpositeCharges)");

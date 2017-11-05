@@ -40,39 +40,15 @@ twod_alg = CDCDedx2DCorrectionAlgorithm()
 oned_alg = CDCDedx1DCleanupAlgorithm()
 
 # Create Calibration objects from Collector, Algorithm(s), and input files
-run_gains = Calibration(
-    name='CDCDedxRunGainCalibration',
-    collector="CDCDedxElectronCollector",
-    algorithms=run_gain_alg,
-    input_files=input_files)
-wire_gains = Calibration(
-    name='CDCDedxWireGainCalibration',
-    collector="CDCDedxElectronCollector",
-    algorithms=wire_gain_alg,
-    input_files=input_files)
-cosine = Calibration(
-    name='CDCDedxCosineCalibration',
-    collector="CDCDedxElectronCollector",
-    algorithms=cosine_alg,
-    input_files=input_files)
-twod = Calibration(
-    name='CDCDedx2DCalibration',
-    collector="CDCDedxElectronCollector",
-    algorithms=twod_alg,
-    input_files=input_files)
-oned = Calibration(
-    name='CDCDedx1DCleanup',
-    collector="CDCDedxElectronCollector",
-    algorithms=oned_alg,
+cdc_dedx_cal = Calibration(
+    name='CDCDedxCalibrations',
+    collector='CDCDedxElectronCollector',
+    algorithms=[oned_alg, twod_alg, cosine_alg, wire_gain_alg, run_gain_alg],
     input_files=input_files)
 
 # Create a CAF instance and add calibrations
-caf = CAF()
-caf.add_calibration(run_gains)
-caf.add_calibration(wire_gains)
-caf.add_calibration(cosine)
-caf.add_calibration(twod)
-caf.add_calibration(oned)
+caf_fw = CAF()
+caf_fw.add_calibration(cdc_dedx_cal)
 
 # Run the calibration
-caf.run()  # Creates local database files when finished (no auto upload)
+caf_fw.run()  # Creates local database files when finished (no auto upload)

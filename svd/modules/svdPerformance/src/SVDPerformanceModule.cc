@@ -8,9 +8,11 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <time.h>
 #include <list>
+#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/Track.h>
+#include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
@@ -33,6 +35,8 @@ SVDPerformanceModule::SVDPerformanceModule() : Module()
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDPerformance_output.root"));
 
   addParam("is2017TBanalysis", m_is2017TBanalysis, "True if analyzing 2017 TB data.", bool(false));
+
+  addParam("debugLowTime", m_debugLowTime, "Cluster Time below this number will produce a printout.", float(0.));
 
   addParam("ShaperDigitsName", m_ShaperDigitName, "Name of ShaperDigit Store Array.", std::string(""));
   addParam("RecoDigitsName", m_RecoDigitName, "Name of RecoDigit Store Array.", std::string(""));
@@ -160,6 +164,12 @@ void SVDPerformanceModule::initialize()
         TitleOfHisto = "cluster time (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
         h_cltrkTime[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time", m_histoList_clTRK[i]);
 
+        NameOfHisto = "clTRK_timeVStrueTime_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster time VS true hit time (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
+        h_cltrkTimeVSTrueTime[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time", 60, -30, 30,
+                                                           "true time", m_histoList_clTRK[i]);
+
+
         //ONE STRIP CLUSTERS RELATED TO TRACKS
         NameOfHisto = "1clTRK_Charge_L" + nameLayer + "S" + nameSensor + "" + nameSide;
         TitleOfHisto = "1-strip cluster Charge (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
@@ -195,6 +205,11 @@ void SVDPerformanceModule::initialize()
         NameOfHisto = "clNOtrk_time_L" + nameLayer + "S" + nameSensor + "" + nameSide;
         TitleOfHisto = "cluster time (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
         h_clTime[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time", m_histoList_cluster[i]);
+
+        NameOfHisto = "clNOtrk_timeVStrueTime_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster time VS true hit time (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
+        h_clTimeVSTrueTime[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time", 60, -30, 30, "true time",
+                                                        m_histoList_cluster[i]);
 
 
       }
@@ -283,6 +298,35 @@ void SVDPerformanceModule::event()
 
       h_cltrkTime[layer][sensor][side]->Fill(svdClustersTrack[cl]->getClsTime());
 
+
+      if (svdClustersTrack[cl]->getClsTime() < m_debugLowTime) {
+
+        B2DEBUG(10, "CLUSTER WITH A TIME BELOW " << m_debugLowTime << "ns");
+        B2DEBUG(10, "size = " << svdClustersTrack[cl]->getSize() << ", SNR = " << svdClustersTrack[cl]->getSNR() << " charge = " <<
+                svdClustersTrack[cl]->getCharge() << ", SeedCharge = " << svdClustersTrack[cl]->getSeedCharge() << ", time = " <<
+                svdClustersTrack[cl]->getClsTime());
+      }
+
+      RelationVector<SVDTrueHit> svdTrueHitsTrack = DataStore::getRelationsWithObj<SVDTrueHit>(svdClustersTrack[cl]);
+
+      for (int i = 0; i < (int)svdTrueHitsTrack.size(); i++) {
+        //      if(svdTrueHitsTrack.size()>0){
+        h_cltrkTimeVSTrueTime[layer][sensor][side]->Fill(svdClustersTrack[cl]->getClsTime(), svdTrueHitsTrack[i]->getGlobalTime());
+        if (svdClustersTrack[cl]->getClsTime() < m_debugLowTime)
+          B2DEBUG(10, "True Hit Time = " << svdTrueHitsTrack[i]->getGlobalTime() << ", EnergyDep = " << svdTrueHitsTrack[i]->getEnergyDep() <<
+                  ", size = " << svdTrueHitsTrack.size());
+      }
+
+      RelationVector<MCParticle> mcParticleTrack = DataStore::getRelationsWithObj<MCParticle>(svdClustersTrack[cl]);
+
+      if (svdClustersTrack[cl]->getClsTime() < m_debugLowTime)
+        if ((int)mcParticleTrack.size() > 0)
+          B2DEBUG(10, "MCParticle PDG = " << mcParticleTrack[0]->getPDG() << ", energy = " <<  mcParticleTrack[0]->getEnergy() << ", size = "
+                  << mcParticleTrack.size());
+
+
+
+
       if (clSize == 1) {
         h_1cltrkCharge[layer][sensor][side]->Fill(clCharge);
         h_1cltrkSN[layer][sensor][side]->Fill(svdClustersTrack[cl]->getSNR());
@@ -362,6 +406,10 @@ void SVDPerformanceModule::event()
     h_clSN[layer][sensor][side]->Fill(svdClusters[cl]->getSNR());
 
     h_clTime[layer][sensor][side]->Fill(svdClusters[cl]->getClsTime());
+
+    RelationVector<SVDTrueHit> svdTrueHits = DataStore::getRelationsWithObj<SVDTrueHit>(svdClusters[cl]);
+    if (svdTrueHits.size() > 0)
+      h_clTimeVSTrueTime[layer][sensor][side]->Fill(svdClusters[cl]->getClsTime(), svdTrueHits[0]->getGlobalTime());
 
 
   }

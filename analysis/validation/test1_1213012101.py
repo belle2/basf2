@@ -44,10 +44,6 @@ toolsBDk += ['InvMass', '^B- -> [^D0:kspi0 -> ^K_S0:all pi0:all] ^K-:all']
 toolsBDk += ['InvMass[BeforeFit]', 'B- -> [D0:kspi0 -> K_S0:all ^pi0:all] K-:all']
 toolsBDk += ['DeltaEMbc', '^B-']
 # toolsBDk += ['CustomFloats[isSignal]', '^B-']
-toolsBDk += ['CMSKinematics', '^B- -> [D0:kspi0 -> K_S0:all ^pi0:all] ^K-:all']
-toolsBDk += ['PID', '^B- -> [^D0:kspi0 -> ^K_S0:all ^pi0:all] ^K-:all']
-toolsBDk += ['Track', '^B- -> [^D0:kspi0 -> ^K_S0:all ^pi0:all] ^K-:all']
-toolsBDk += ['MCTruth', '^B- -> [^D0:kspi0 -> ^K_S0:all ^pi0:all] ^K-:all']
 
 outputFile = "../1213012101.ntup.root"
 ntupleFile(outputFile)

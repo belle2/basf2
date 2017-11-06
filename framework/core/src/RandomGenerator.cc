@@ -16,6 +16,7 @@
 #include "framework/dataobjects/FileMetaData.h"
 #include <sstream>
 #include <iomanip>
+#include <algorithm>
 
 using namespace Belle2;
 

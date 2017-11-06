@@ -74,6 +74,8 @@ class CalibrationBase(ABC, Thread):
         if input_files:
             #: Files used for collection procedure
             self.input_files = input_files
+        else:
+            self.input_files = []
 
         #: IoV which will be calibrated. This is set by the `CAF` itself when calling `CAF.run`
         self.iov = None

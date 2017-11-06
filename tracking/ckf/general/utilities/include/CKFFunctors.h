@@ -9,10 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#pragma once
-
-#pragma once
-
 namespace Belle2 {
   /// Helper Functor to get the Seed of a given result
   struct SeedGetter {

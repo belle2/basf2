@@ -119,7 +119,6 @@ void Framework::process(PathPtr startPath, long maxEvent)
     LogSystem::Instance().resetMessageCounter();
     DataStore::Instance().reset();
     DataStore::Instance().setInitializeActive(true);
-    DBStore::Instance().reset();
 
     already_executed = true;
     if (Environment::Instance().getNumberProcesses() == 0) {
@@ -131,6 +130,8 @@ void Framework::process(PathPtr startPath, long maxEvent)
       processor.process(startPath, maxEvent);
     }
     errors_from_previous_run = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
+
+    DBStore::Instance().reset();
   } catch (std::exception& e) {
     B2ERROR("Uncaught exception encountered: " << e.what()); //should show module name
     DataStore::Instance().reset(); // ensure we are executed before ROOT's exit handlers

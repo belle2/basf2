@@ -9,7 +9,6 @@
 
 #include <testbeam/vxd/modules/telSimulation/TelDigitizerModule.h>
 #include <vxd/geometry/GeoCache.h>
-#include <geometry/bfieldmap/BFieldMap.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>

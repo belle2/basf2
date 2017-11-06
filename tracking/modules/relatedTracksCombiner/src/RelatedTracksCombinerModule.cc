@@ -11,7 +11,7 @@
 #include <tracking/modules/relatedTracksCombiner/RelatedTracksCombinerModule.h>
 
 #include <framework/dataobjects/Helix.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 using namespace Belle2;
 
@@ -27,7 +27,7 @@ namespace {
 
     std::tie(cdcPosition, cdcMomentum, cdcCharge) = relatedCDCRecoTrack.extractTrackState();
 
-    const auto bField = BFieldMap::Instance().getBField(cdcPosition).Z();
+    const auto bField = BFieldManager::getFieldInTesla(cdcPosition).Z();
 
     const Helix cdcHelix(cdcPosition, cdcMomentum, cdcCharge, bField);
     const double arcLengthOfVXDPosition = cdcHelix.getArcLength2DAtXY(vxdPosition.X(), vxdPosition.Y());

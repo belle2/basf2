@@ -9,12 +9,7 @@ from modularAnalysis import *
 
 main = create_path()
 
-rootinput = register_module('RootInput')
-rootinput.param('inputFileName', Belle2.FileSystem.findFile('analysis/tests/mdst.root'))
-
-
-main.add_module(rootinput)
-
+inputMdst("default", Belle2.FileSystem.findFile('analysis/tests/mdst.root'), path=main)
 
 kaons = ('K-', 'Kid > 0.05')
 pions = ('pi+', 'piid > 0.05')

@@ -547,7 +547,8 @@ def fillSignalSideParticleList(outputListName, decayString, path):
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False,
-                      path=analysis_main):
+                      path=analysis_main,
+                      enforceFitHypothesis=False):
     """
     Creates Particles of the desired types from the corresponding MDST dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
@@ -574,12 +575,18 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
+    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
+                                using a mass hypothesis of the exact type passed to fillParticleLists().
+                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                in terms of mass difference will be used if the fit using exact particle
+                                type is not available.
     """
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + 'PLists')
     pload.param('decayStringsWithCuts', decayStringsWithCuts)
     pload.param('writeOut', writeOut)
+    pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
 
@@ -588,6 +595,7 @@ def fillParticleList(
     cut,
     writeOut=False,
     path=analysis_main,
+    enforceFitHypothesis=False
 ):
     """
     Creates Particles of the desired type from the corresponding MDST dataobjects,
@@ -611,12 +619,18 @@ def fillParticleList(
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
+    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
+                                using a mass hypothesis of the exact type passed to fillParticleLists().
+                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                in terms of mass difference will be used if the fit using exact particle
+                                type is not available.
     """
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
     pload.param('decayStringsWithCuts', [(decayString, cut)])
     pload.param('writeOut', writeOut)
+    pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
 
@@ -625,6 +639,7 @@ def fillParticleListWithTrackHypothesis(
     cut,
     hypothesis,
     writeOut=False,
+    enforceFitHypothesis=False,
     path=analysis_main,
 ):
     """
@@ -634,6 +649,11 @@ def fillParticleListWithTrackHypothesis(
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param hypothesis    the PDG code of the desired track hypothesis
     @param writeOut      wether RootOutput module should save the created ParticleList
+    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
+                                using a mass hypothesis of the exact type passed to fillParticleLists().
+                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                in terms of mass difference will be used if the fit using exact particle
+                                type is not available.
     @param path          modules are added to this path
     """
 
@@ -642,6 +662,7 @@ def fillParticleListWithTrackHypothesis(
     pload.param('decayStringsWithCuts', [(decayString, cut)])
     pload.param('trackHypothesis', hypothesis)
     pload.param('writeOut', writeOut)
+    pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
 
@@ -786,6 +807,8 @@ def reconstructDecay(
     @param candidate_limit Maximum amount of candidates to be reconstructed. If
                        the number of candidates is exceeded a Warning will be
                        printed.
+                       By default, all these candidates will be removed and event will be ignored.
+                       This behaviour can be changed by \'ignoreIfTooManyCandidates\' flag.
                        If no value is given the amount is limited to a sensible
                        default. A value <=0 will disable this limit and can
                        cause huge memory amounts so be careful.
@@ -1773,3 +1796,36 @@ if __name__ == '__main__':
     from pager import Pager
     with Pager('List of available functions in modularAnalysis'):
         pretty_print_description_list(desc_list)
+
+
+def markDuplicate(particleList, prioritiseV0, path=analysis_main):
+    """
+    Call DuplicateVertexMarker to find duplicate particles in a list and
+    flag the ones that should be kept
+
+    @param particleList input particle list
+    @param prioritiseV0 if true, give V0s a higher priority
+    """
+    markdup = register_module('DuplicateVertexMarker')
+    markdup.param('particleList', particleList)
+    markdup.param('prioritiseV0', prioritiseV0)
+    path.add_module(markdup)
+
+
+def V0ListMerger(firstList, secondList, prioritiseV0, path=analysis_main):
+    """
+    Merge two particle lists, vertex them and trim duplicates
+
+    @param firstList first particle list to merge
+    @param secondList second particle list to merge
+    @param prioritiseV0 if true, give V0s a higher priority
+    """
+    listName = firstList.split(':')[0]
+    if (listName == secondList.split(':')[0]):
+        outList = listName + ':merged'
+        copyLists(outList, [firstList, secondList], False, path)
+        vertexKFit(outList, 0.0, '', '', path)
+        markDuplicate(outList, prioritiseV0, path)
+        applyCuts(outList, 'extraInfo(highQualityVertex)')
+    else:
+        B2ERROR("Lists to be merged contain different particles")

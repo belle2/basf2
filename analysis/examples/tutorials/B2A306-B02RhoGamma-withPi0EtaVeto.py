@@ -80,6 +80,9 @@ buildRestOfEvent('B0')
 # You can also download them from following directory:
 # /gpfs/group/belle2/users/akimasa/pi0etaveto
 # If you have weight files in your workingDirectory already, please set downloadFlag to False.
+# If you train by yourself, you should refer to
+# B2A701-ContinuumSuppression_Input.py
+# B2A702-ContinuumSuppression_MVATrain.py
 
 # perform pi0/eta veto
 writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', workingDirectory='./pi0etaveto')
@@ -95,20 +98,15 @@ writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', workingDirectory='./pi0etaveto')
 
 # You might apply writePi0EtaVeto in one process several times.
 # Please be careful in that case.
-# You have to set pi0softname and etasoftname parameters to your original names except for default
-# from the second application for debug. For example,
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',pi0softname='PI0SOFT_type2',etasoftname='ETASOFT_type2')
-# Please note that this is not enough if you apply this function more than once
-# regarding same particleList in one process,
-# you have to set not only pi0softname and etasoftname parameters
-# but also pi0vetoname and etavetoname parameters to your original names except for default
-# from the second application for debug. For example,
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',
-# pi0softname='PI0SOFT_type2',etasoftname='ETASOFT_type2',pi0vetoname='Pi0_Prob2',etavetoname='Eta_Prob2')
-
-# If you train by yourself, you should refer to
-# B2A701-ContinuumSuppression_Input.py
-# B2A702-ContinuumSuppression_MVATrain.py
+# You have to change multiApplication parameter to any name from second application for debug.
+# For example,
+# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',multiApplication='second'),
+# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',multiApplication='2'), etc.
+# But please don't change multiApplication parameter from default when first application.
+# Please note that this is not enough if you apply this function regarding same particleList in one process.
+# You have to change not only multiApplication parameter but also pi0vetoname and etavetoname parameters to any names
+# from second application for debug. For example,
+# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',multiApplication='second',pi0vetoname='Pi0_Prob2',etavetoname='Eta_Prob2')
 
 
 # You can also do a simple veto using delta mass ranking as below.

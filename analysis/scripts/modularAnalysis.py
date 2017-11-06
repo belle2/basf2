@@ -1817,8 +1817,7 @@ def writePi0EtaVeto(
     decayString,
     workingDirectory='.',
     downloadFlag=True,
-    pi0softname='PI0SOFT',
-    etasoftname='ETASOFT',
+    multiApplication='FirstApplication',
     pi0vetoname='Pi0_Prob',
     etavetoname='Eta_Prob',
     selection='',
@@ -1827,37 +1826,39 @@ def writePi0EtaVeto(
     """
     Give pi0/eta probability for hard photon.
 
-    The default weight files are set 1.4 GeV as the lower limit of hard photon energy in CMS Frame when mva training for pi0etaveto.
+    default weight files are set 1.4 GeV as the lower limit of hard photon energy in CMS Frame when mva training for pi0etaveto.
     The Input Variables are as below. Aliases are set to some variables when training.
     M : pi0/eta candidates Invariant mass
     lowE : soft photon energy in lab frame
     cTheta : soft photon ECL cluster's polar angle
     Zmva : soft photon output of MVA using Zernike moments of the cluster
     minC2Hdist : soft photon distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
-    The default weight files are downloaded to your workingDirectory automatically from the database by default.
+    default weight files are downloaded to your workingDirectory automatically from the database by default.
     If you have weight files in your workingDirectory already, please set downloadFlag to False.
     Please refer to analysis/examples/tutorials/B2A306-B02RhoGamma-withPi0EtaVeto.py
     about how to use this function.
 
     NOTE for debug
     Please don't use following ParticleList names elsewhere.
-    gamma:HARDPHOTON, gamma:PI0SOFT, gamma:ETASOFT, pi0:PI0VETO, eta:ETAVETO,
-    and ParticleList names you set to pi0softname(etasoftname).
+    'gamma:HARDPHOTON', 'gamma:PI0SOFT' + multiApplication, 'gamma:ETASOFT' + multiApplication, pi0:PI0VETO, eta:ETAVETO,
     Please don't use "lowE", "cTheta", "Zmva", "minC2Hdist" as alias elsewhere.
     If you apply this function more than once in one process,
-    please change pi0softname(etasoftname) parameter from second application.
-    Please don't change pi0softname(etasoftname) parameter from first application.
+    please change multiApplication parameter from second application.
+    Please don't change multiApplication parameter from first application.
 
     @param particleList     The input ParticleList
     @param decayString specify Particle to be added to the ParticleList
     @param workingDirectory The weight file directory
     @param downloadFlag whether download default weight files or not
-    @param pi0softname ParticleList name for pi0 soft photon
-    @param etasoftname ParticleList name for eta soft photon
+    @param multiApplication tail of ParticleList name for pi0/eta soft photon
     @param pi0vetoname extraInfo name of pi0 probability
     @param etavetoname extraInfo name of eta probability
     @param selection Selection criteria that Particle needs meet in order for for_each ROE path to continue
     """
+
+    if multiApplication == 'FirstApplication':
+        B2INFO('Please change multiApplication parameter to any name \
+when you apply writePi0EtaVeto more than once in one process from second application, if not so.')
 
     roe_path = create_path()
 
@@ -1867,9 +1868,10 @@ def writePi0EtaVeto(
 
     fillSignalSideParticleList('gamma:HARDPHOTON', decayString, path=roe_path)
 
-    photon = 'gamma:'
-    softphoton1 = photon + pi0softname
-    softphoton2 = photon + etasoftname
+    pi0softname = 'gamma:PI0SOFT'
+    etasoftname = 'gamma:ETASOFT'
+    softphoton1 = pi0softname + multiApplication
+    softphoton2 = etasoftname + multiApplication
 
     fillParticleList(
         softphoton1,
@@ -1885,7 +1887,7 @@ def writePi0EtaVeto(
     reconstructDecay('pi0:PI0VETO -> gamma:HARDPHOTON ' + softphoton1, '', path=roe_path)
     reconstructDecay('eta:ETAVETO -> gamma:HARDPHOTON ' + softphoton2, '', path=roe_path)
 
-    if pi0softname == 'PI0SOFT' and etasoftname == 'ETASOFT':
+    if multiApplication == 'FirstApplication':
         variables.addAlias('lowE', 'daughter(1,E)')
         variables.addAlias('cTheta', 'daughter(1,clusterTheta)')
         variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')

@@ -75,7 +75,6 @@ void CKFToSVDSeedFindlet::beginEvent()
   m_relations.clear();
 
   m_results.clear();
-  m_filteredResults.clear();
 }
 
 void CKFToSVDSeedFindlet::apply()

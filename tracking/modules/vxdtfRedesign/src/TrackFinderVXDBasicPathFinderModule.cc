@@ -10,7 +10,7 @@
 
 #include <framework/logging/Logger.h>
 
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 #include <tracking/modules/vxdtfRedesign/TrackFinderVXDBasicPathFinderModule.h>
 #include <tracking/trackFindingVXD/algorithms/NetworkPathConversion.h>
@@ -107,7 +107,7 @@ void TrackFinderVXDBasicPathFinderModule::beginRun()
 {
   if (m_PARAMselectBestPerFamily) {
     // BField is required by all QualityEstimators
-    double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+    double bFieldZ = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
     m_sptcSelector->setMagneticFieldForQE(bFieldZ);
   }
 }

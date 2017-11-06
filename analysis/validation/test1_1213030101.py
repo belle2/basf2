@@ -43,11 +43,6 @@ toolsBDk = ['EventMetaData', 'B-']
 toolsBDk += ['InvMass', '^B- -> [^D0:kspipi -> ^K_S0:all pi+:all pi-:all] ^K-:all']
 toolsBDk += ['DeltaEMbc', '^B-']
 # toolsBDk += ['CustomFloats[isSignal]', '^B-']
-toolsBDk += ['CMSKinematics', '^B- -> [^D0:kspipi -> ^K_S0:all ^pi+:all ^pi-:all] ^K-:all']
-toolsBDk += ['PID', '^B- -> [^D0:kspipi -> ^K_S0:all ^pi+:all ^pi-:all] ^K-:all']
-toolsBDk += ['Track', '^B- -> [^D0:kspipi -> ^K_S0:all ^pi+:all ^pi-:all] ^K-:all']
-toolsBDk += ['Dalitz', 'B- -> [^D0:kspipi -> ^K_S0:all ^pi+:all ^pi-:all] K-:all']
-toolsBDk += ['MCTruth', '^B- -> [^D0:kspipi -> ^K_S0:all ^pi+:all ^pi-:all] ^K-:all']
 
 outputFile = "../1213030101.ntup.root"
 ntupleFile(outputFile)

@@ -29,6 +29,8 @@ class AlgorithmStrategy(ABC):
     """
 
     def __init__(self, algorithm):
+        """
+        """
         #: Algorithm() class that we're running
         self.algorithm = algorithm
         #: The results dictionary that should be filled as the algorithm gets run
@@ -48,6 +50,10 @@ class AlgorithmStrategy(ABC):
 
     @abstractmethod
     def run(self, iov, iteration):
+        """
+        Abstract method that needs to be implemented. It will be called to actually execute the
+        algorithm.
+        """
         pass
 
 
@@ -61,6 +67,8 @@ class SingleIOV(AlgorithmStrategy):
 """
 
     def __init__(self, algorithm):
+        """
+        """
         super().__init__(algorithm)
         #: Create a basic (mostly empty) AlgorithmMachine, gets setup properly in run()
 

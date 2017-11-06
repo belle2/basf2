@@ -16,6 +16,8 @@ class Runner(ABC):
     """Abstract Base Class for Runner type object"""
     @abstractmethod
     def run(self):
+        """
+        """
         pass
 
 
@@ -58,13 +60,23 @@ class AlgorithmsRunner(Runner):
     """
 
     def __init__(self, name):
+        """
+        """
+        #: The name of this runner instance
         self.name = name
+        #: All of the output files made by the collector job and recovered by the "output_patterns"
         self.input_files = []
+        #: User input local database, can be used to apply your own constants
         self.local_database_chain = []
+        #: List of local databases created by previous CAF calibrations/iterations
         self.dependent_databases = []
+        #: The directory of the local database we use to store algorithm payloads from this execution
         self.output_database_dir = ""
+        #: Algorithm results from each algorithm we execute
         self.results = {}
+        #: The list of algorithms that this runner executes
         self.algorithms = None
+        #: Output directory of these algorithms, for logging mostly
         self.output_dir = ""
 
 
@@ -73,9 +85,13 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
     """
 
     def __init__(self, name):
+        """
+        """
         super().__init__(name)
 
     def run(self, iov, iteration):
+        """
+        """
         B2INFO("SequentialAlgorithmsRunner begun for Calibration {}".format(self.name))
         # First we do the setup of algorithm strategies
         strategies = []

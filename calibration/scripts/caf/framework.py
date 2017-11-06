@@ -50,8 +50,9 @@ class CalibrationBase(ABC, Thread):
 
     THIS IS NOT RECOMMENDED!! But it's there if you really need it.
     """
-
+    #: The name of the successful completion state
     end_state = "completed"
+    #: The name of the failure state
     fail_state = "failed"
 
     def __init__(self, name, input_files=None):
@@ -76,7 +77,10 @@ class CalibrationBase(ABC, Thread):
 
         #: IoV which will be calibrated. This is set by the `CAF` itself when calling `CAF.run`
         self.iov = None
+        #: The directory where we'll store the local database payloads from this calibration
         self.output_database_dir = ""
+        #: The current state, you can change this to anything you want. BUT if you change it to
+        #: one of the end states then the CAF will assume you are finished and move on.
         self.state = "init"
 
     @abstractmethod
@@ -117,6 +121,9 @@ class CalibrationBase(ABC, Thread):
                        "Dependency was not added.".format(calibration, self)))
 
     def dependencies_met(self):
+        """
+        Checks if all of the Calibrations that this one depends on have reached a successful end state
+        """
         return all(map(lambda x: x.state == x.end_state, self.dependencies))
 
     def _apply_calibration_defaults(self, defaults):
@@ -257,6 +264,7 @@ class Calibration(CalibrationBase):
         self.machine = CalibrationMachine(self)
         #: The class that runs all the algorithms in this Calibration using their assigned `strategies.AlgorithmStrategy`
         self.algorithms_runner = runners.SeqAlgorithmsRunner
+        #: The backend we'll use for our collector submission in this calibration. Will be set by the CAF if not here
         self.backend = None
         self.setup_defaults()
 
@@ -442,6 +450,7 @@ class Calibration(CalibrationBase):
                     if trigger in self.machine.get_transitions(self.machine.state):
                         B2INFO("Attempting transition: {} for calibration {}.".format(trigger, self.name))
                         getattr(self.machine, trigger)()
+                    #: current state
                     self.state = self.machine.state
                     sleep(self.heartbeat)  # Only sleeps if transition completed
                 except ConditionError:
@@ -462,6 +471,7 @@ class Calibration(CalibrationBase):
             config.read(config_file_path)
         else:
             B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
+        #: This calibration's sleep time before rechecking to see if it can move state
         self.heartbeat = decode_json_string(config['CAF_DEFAULTS']['Heartbeat'])
 
 

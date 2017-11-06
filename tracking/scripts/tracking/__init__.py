@@ -748,7 +748,7 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
                     hitFilter="sensor",
                     seedFilter="distance",
 
-                    enableOverlapResolving=False,
+                    enableOverlapResolving=True,
 
                     **module_parameters)
 

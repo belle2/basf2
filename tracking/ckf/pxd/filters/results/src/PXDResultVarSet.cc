@@ -13,6 +13,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <tracking/ckf/general/utilities/Advancer.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 using namespace std;
 using namespace Belle2;

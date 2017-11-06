@@ -207,6 +207,8 @@ class Calibration(CalibrationBase):
     """
     #: Allowed transitions that we will use to progress
     moves = ["submit_collector", "complete", "run_algorithms", "iterate"]
+    #: Subdirectory name for algorithm output
+    alg_output_dir = "algorithm_output"
 
     def __init__(self, name, collector=None, algorithms=None, input_files=None):
         """
@@ -247,14 +249,14 @@ class Calibration(CalibrationBase):
             #: The strategy that the algorithm(s) will be run against. Assign a list of strategies the same length as the number of
             #: algorithms, or assign a single strategy to apply it to all algorithms in this `Calibration`. You can see the choices
             #: in `strategies`.
-            self.strategies = strategies.SingleIOV()
+            self.strategies = strategies.SingleIOV
 
         self._local_database_chain = []
         self.use_central_database(get_default_global_tags())
         #: The `state_machines.CalibrationMachine` that we will run
         self.machine = CalibrationMachine(self)
         #: The class that runs all the algorithms in this Calibration using their assigned `strategies.AlgorithmStrategy`
-        self.algorithms_runner = runners.AlgorithmsRunner()
+        self.algorithms_runner = runners.SeqAlgorithmsRunner
         self.backend = None
         self.setup_defaults()
 
@@ -479,19 +481,21 @@ class Algorithm():
         """
         #: CalibrationAlgorithm instance (assumed to be true since the Calibration class checks)
         self.algorithm = algorithm
+        #: The name of the algorithm, default is the Algorithm class name
+        self.name = algorithm.__cppname__.replace('Belle2::', '')
         #: Function called before the pre_algorithm method to setup the input data that the CalibrationAlgorithm uses.
         #: The list of input files from the collector output will be passed to it
         self.data_input = data_input
         if not self.data_input:
-            self.data_input = self.default_rootinput_setup
+            self.data_input = self.default_inputdata_setup
         #: Function called after data_input but before algorithm.execute to do any remaining setup
         #: IT MUST ONLY HAVE TWO ARGUMENTS pre_algorithm(algorithm, iteration)  where algorithm can be
         #: assumed to be the CalibrationAlgorithm instance, and iteration is an int e.g. 0, 1, 2...
         self.pre_algorithm = pre_algorithm
         #: The algorithm stratgey that will be used when running over the collected data
-        self.strategy = strategies.SingleIOV()
+        self.strategy_type = strategies.SingleIOV
 
-    def default_rootinput_setup(self, input_file_paths):
+    def default_inputdata_setup(self, input_file_paths):
         """
         Simple setup to set the input file names to the algorithm. Applied to the data_input attribute
         by default.
@@ -686,7 +690,6 @@ class CAF():
                     if calibration.dependencies_met() and not calibration.is_alive():
                         if calibration.state != calibration.end_state and \
                            calibration.state != calibration.fail_state:
-                            print(calibration.name, calibration.state)
                             calibration.start()
 
                     # Join the thread if we've hit an end state

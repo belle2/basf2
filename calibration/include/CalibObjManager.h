@@ -27,7 +27,7 @@ namespace Belle2 {
       * So we are only really responsible for cleaning up the template object which belongs to no directory and
       * is never used directly by an outside user except when creating object that is passed in for the template.
       */
-    virtual ~CalibObjManager() {m_templateObjects.clear(); B2INFO("Destructor of CalibObjManager");}
+    virtual ~CalibObjManager() {m_templateObjects.clear();}
 
     /// Change the directory that we will be using to find/store all our objects, we don't own it
     void setDirectory(TDirectory* dir) {m_dir = dir;}
@@ -64,7 +64,7 @@ namespace Belle2 {
         B2DEBUG(100, "Highest index is only file resident for " << highestIndexName << " in " << objectDir->GetPath() <<
                 ". Will make a higher one");
         std::string newName = name + "_" + std::to_string(highestIndex + 1);
-        obj = cloneObj(dynamic_cast<T*>(m_templateObjects[name].get()), newName);
+        obj = cloneObj<T>(dynamic_cast<T*>(m_templateObjects[name].get()), newName);
         obj->SetDirectory(objectDir);
         obj->Reset();
         // Did SetDirectory work? Or was it a dummy class method?

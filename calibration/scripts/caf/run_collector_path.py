@@ -77,5 +77,6 @@ def run_collectors():
     main.add_path(collector_path)
     process(main)
 
+
 if __name__ == '__main__':
     run_collectors()

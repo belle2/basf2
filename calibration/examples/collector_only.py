@@ -3,10 +3,8 @@
 
 from basf2 import *
 set_log_level(LogLevel.INFO)
-
-# Comment out to turn off debugging
 # logging.package("calibration").log_level = LogLevel.DEBUG
-# logging.package("calibration").debug_level = 90
+# logging.package("calibration").debug_level = 100
 main = create_path()
 main.add_module("RootInput", inputFileNames=["test_data/DST_exp1_run*.root"])
 # HistoManager must be used right after RootInput

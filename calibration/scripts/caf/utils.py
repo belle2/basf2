@@ -129,6 +129,7 @@ class AlgResult(enum.Enum):
     #: failure Return code
     failure = CalibrationAlgorithm.c_Failure
 
+
 IoV_Result = namedtuple('IoV_Result', ['iov', 'result'])
 
 

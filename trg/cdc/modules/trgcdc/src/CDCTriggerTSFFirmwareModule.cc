@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "trg/cdc/modules/houghtracking/xsi_loader.h"
-
-#include <trg/cdc/modules/trgcdc//CDCTriggerTSFFirmwareModule.h>
+#include <trg/cdc/modules/trgcdc/CDCTriggerTSFFirmwareModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -26,7 +24,11 @@
 #include <numeric>
 #include <bitset>
 #include <experimental/array>
-#include <math.h>
+
+#include <cmath>
+#include <cstdlib>
+#include <cstdio>
+#include <unistd.h>
 
 using std::experimental::to_array;
 constexpr double pi() { return std::atan(1) * 4; }
@@ -64,8 +66,14 @@ namespace Cosim {
   std::string display_value(const char* count, int size)
   {
     std::string res;
-    for (int i = 0; i < size; i++)
-      res += std_logic_literal[(int) count[i]];
+    for (int i = 0; i < size; i++) {
+      if (count[i] >= 0 && count[i] < 9) {
+        res += std_logic_literal[(int) count[i]];
+      } else {
+        B2WARNING("invalid signal detected: " << static_cast<int>(count[i]));
+        res += "?";
+      }
+    }
     return res;
   }
 
@@ -75,7 +83,12 @@ namespace Cosim {
     int ini = padding ? signal.size() % 4 : 0;
     std::string res(ini, '0');
     for (auto const& bit : signal) {
-      res += std_logic_literal[(int) bit];
+      if (bit >= 0 && bit < 9) {
+        res += std_logic_literal[(int) bit];
+      } else {
+        B2WARNING("nonvalid signal detected: " << static_cast<int>(bit));
+        res += "0";
+      }
     }
     return res;
   }
@@ -87,13 +100,16 @@ namespace Cosim {
     oldState.copyfmt(std::cout);
     if (std::any_of(signal.begin(), signal.end(), [](char i)
     {return i != zero_val && i != one_val;})) {
-      B2WARNING("Some bit in the signal vector is neither 0 nor 1.");
-    }
-    std::string binString = slv_to_bin_string(signal, true);
-    std::cout << std::setfill('0');
-    for (unsigned i = 0; i < signal.size(); i += 4) {
-      std::bitset<4> set(binString.substr(i, 4));
-      std::cout << std::setw(1) << std::hex << set.to_ulong();
+      B2WARNING("Some bit in the signal vector is neither 0 nor 1. \n" <<
+                "Displaying binary values instead.");
+      std::cout << slv_to_bin_string(signal) << std::endl;
+    } else {
+      std::string binString = slv_to_bin_string(signal, true);
+      std::cout << std::setfill('0');
+      for (unsigned i = 0; i < signal.size(); i += 4) {
+        std::bitset<4> set(binString.substr(i, 4));
+        std::cout << std::setw(1) << std::hex << set.to_ulong();
+      }
     }
     std::cout << "\n";
     std::cout.copyfmt(oldState);
@@ -116,17 +132,6 @@ namespace Cosim {
   }
 }
 
-int Xsi::Loader::get_port_number_or_exit(std::string name)
-{
-  int portNumber = get_port_number(name.c_str());
-  if (portNumber < 0) {
-    std::cerr << "ERROR: " << name << " not found" << std::endl;
-    throw;
-  }
-  return portNumber;
-}
-
-
 using namespace Belle2;
 using namespace Cosim;
 using namespace std;
@@ -142,10 +147,12 @@ CDCTriggerTSFFirmwareModule::CDCTriggerTSFFirmwareModule() :
 
 {
   for (unsigned i = 0; i < m_nSubModules; ++i) {
-    // if (i == 2) continue;
     // loader.emplace_back(new Xsi::Loader(design_libname_pre + to_string(i * 2)
     //                                     + design_libname_post, simengine_libname));
     inputToTSF[i].resize(nMergers[i]);
+    array<char, 256> mer;
+    mer.fill(3);
+    fill(inputToTSF[i].begin(), inputToTSF[i].end(), mer);
   }
   //Set module properties
   setDescription("Firmware simulation of the Track Segment Finder for CDC trigger.");
@@ -161,71 +168,125 @@ CDCTriggerTSFFirmwareModule::CDCTriggerTSFFirmwareModule() :
 
 CDCTriggerTSFFirmwareModule::~CDCTriggerTSFFirmwareModule()
 {
-  for (auto& l : loader) {
-    l->close();
+  // for (auto& l : loader) {
+  //   l->close();
+  // }
+}
+
+void
+writer(const char* message, int count, FILE* stream, FILE* invstream)
+{
+  char buffer[1024];
+  for (; count > 0 ; --count) {
+    fprintf(stream, "%s\n" , message);
+    fflush(stream);
+
+    // inverse
+    fgets(buffer, sizeof(buffer), invstream);
+    fputs(buffer, stdout);
   }
+}
+
+#include <ext/stdio_filebuf.h>
+
+using __gnu_cxx::stdio_filebuf;
+using std::istream;
+using std::ostream;
+
+inline stdio_filebuf<char>* fileBufFromFD(int fd, std::_Ios_Openmode mode)
+{
+  return (new stdio_filebuf<char> (fd, mode));
+}
+
+istream* createInStreamFromFD(int fd)
+{
+  stdio_filebuf<char>* fileBuf = fileBufFromFD(fd, std::ios::in);
+  return (new istream(fileBuf));
+}
+
+ostream* createOutStreamFromFD(int fd)
+{
+  stdio_filebuf<char>* fileBuf = fileBufFromFD(fd, std::ios::out);
+  return (new ostream(fileBuf));
+}
+
+CDCTriggerTSFFirmwareModule::outputArray
+CDCTriggerTSFFirmwareModule::writeRead(const char* message, FILE* outstream, FILE* instream)
+{
+  // write input to TSF firmware
+  fprintf(outstream, "%s\n" , message);
+  fflush(outstream);
+  if (getLogConfig().getDebugLevel() >= 50) {
+    usleep(200000);
+  }
+  // read output from TSF firmware
+  array<char, 2048> buffer;
+  outputArray output;
+  buffer.fill(3);
+  if (fgets(buffer.data(), buffer.size(), instream) == NULL) {
+    B2ERROR("fgets reached end unexpectedly");
+    return output;
+  }
+  // ins->getline(buffer.data(), buffer.size());
+  B2DEBUG(50, "display received TSF output:");
+  if (getLogConfig().getDebugLevel() >= 50) {
+    for (auto i2d = 0; i2d < 4; ++i2d) {
+      B2DEBUG(50, display_value(buffer.data() + width_out * i2d, width_out));
+    }
+  }
+  auto bufferItr = buffer.cbegin();
+  for (int iTracker = 0; iTracker < nTrackers; ++iTracker) {
+    copy(bufferItr, bufferItr + width_out, output[iTracker].begin());
+    bufferItr += width_out;
+  }
+  return output;
 }
 
 void CDCTriggerTSFFirmwareModule::initialize()
 {
-  m_cdcHits.isRequired(m_hitCollectionName);
+  // m_cdcHits.isRequired(m_hitCollectionName);
 
   std::cout << "Design DLL     : " << design_libname_pre << "*" <<
             design_libname_post << std::endl;
   std::cout << "Sim Engine DLL : " << simengine_libname << std::endl;
 
   // try {
-  array<string, m_nSubModules> wdbName;
   for (unsigned i = 0; i < m_nSubModules; ++i) {
-    // if (i==1) continue;
-    if (i < 2) continue;
-    memset(&info[i], 0, sizeof(info[i]));
-    // char logName[] = "firmware.log";
-    // info[i].logFileName = logName;
-    info[i].logFileName = NULL;
-    // char wdbName[] = "tsf" + to_string(i * 2) + ".wdb";
-    // string wdbName = "tsf" + to_string(i * 2) + ".wdb";
-    wdbName[i] = "tsf" + to_string(i * 2) + ".wdb";
-    info[i].wdbFileName = const_cast<char*>(wdbName[i].c_str());
-    // Xsi::Loader thisloader(design_libname_pre + to_string(i * 2)
-    //                        + design_libname_post, simengine_libname);
-    Xsi::Loader thisloader("/home/belle2/tasheng/tsim/xsim.dir/tsf4/xsimk.so",
-                           simengine_libname);
-    cout << "about to open tsf" << i * 2 << "\n";
-    s_xsi_setup_info thisinfo;
-    memset(&thisinfo, 0, sizeof(thisinfo));
-    thisinfo.logFileName = NULL;
-    thisinfo.wdbFileName = const_cast<char*>(wdbName[i].c_str());
-
-    cout << design_libname_pre + to_string(i * 2)
-         + design_libname_post << ", " << simengine_libname << "\n";
-    // loader[i]->open(&thisinfo);
-    thisloader.open(&thisinfo);
-    cout << "loader opened" << "\n";
-    loader[i]->trace_all();
-    cout << "traced" << "\n";
-    clk[i]  = loader[i]->get_port_number_or_exit("user_clk_127");
-    cout << "clock get" << "\n";
+    if (i == 1) continue;
+    // if (i >= 3) continue;
+    // i: input to worker (output from module)
+    // o: output from worker (input to module)
+    /* Create pipe and place the two-end pipe file descriptors*/
+    pipe(inputFileDescriptor[i].data());
+    pipe(outputFileDescriptor[i].data());
+    string str_fd[] = {to_string(inputFileDescriptor[i][0]), to_string(outputFileDescriptor[i][1])};
+    pid_t pid = fork();
+    if (pid < 0) {
+      B2FATAL("Fork failed!");
+    } else if (pid == (pid_t) 0) {
+      /* Child process (consumer) */
+      close(inputFileDescriptor[i][1]);
+      close(outputFileDescriptor[i][0]);
+      string design = design_libname_pre + to_string(i * 2) + design_libname_post;
+      string waveform = wdbName_pre + to_string(i * 2) + wdbName_post;
+      execlp("CDCTriggerTSFFirmwareWorker", "CDCTriggerTSFFirmwareWorker",
+             str_fd[0].c_str(), str_fd[1].c_str(), design.c_str(), waveform.c_str(),
+             to_string(nMergers[i]).c_str(), nullptr);
+      B2FATAL("The firmware simulation program didn't launch!");
+    } else {
+      /* Parent process (producer)  */
+      B2DEBUG(10, "parent " << i);
+      m_pid[i] = pid;
+      // Close the copy of the fds read end
+      close(inputFileDescriptor[i][0]);
+      close(outputFileDescriptor[i][1]);
+      // open the fds
+      stream[i][0] = fdopen(inputFileDescriptor[i][1], "w");
+      stream[i][1] = fdopen(outputFileDescriptor[i][0], "r");
+      // ins = createInStreamFromFD(outputFileDescriptor[i][0]);
+      B2DEBUG(20, "pid for TSF" << i * 2 << ": " << m_pid[i]);
+    }
   }
-
-  for (int iSL = 0; iSL < m_nSubModules; ++iSL) {
-    if (iSL == 1) continue;
-    string inName = "data_in";
-    string outName = "TSF_TRACKER_OUT";
-    string enableInName = "valid_in";
-    string enableTrackerName = "valid_tracker";
-    string enableEVTName = "valid_evttime";
-    inPort[iSL] = loader[iSL]->get_port_number_or_exit(inName);
-    outPort[iSL] = loader[iSL]->get_port_number_or_exit(outName);
-    enableIn[iSL] = loader[iSL]->get_port_number_or_exit(enableInName);
-    enableOutTracker[iSL] = loader[iSL]->get_port_number_or_exit(enableTrackerName);
-    enableOutEVT[iSL] = loader[iSL]->get_port_number_or_exit(enableEVTName);
-    // Start low clock
-    loader[iSL]->put_value(clk[iSL], &zero_val);
-    cout << "ready to run" << "\n";
-    loader[iSL]->run(10);
-  }
-
   // } catch (std::exception& e) {
   //   std::cerr << "ERROR: An exception occurred: " << e.what() << std::endl;
   // } catch (...) {
@@ -233,6 +294,18 @@ void CDCTriggerTSFFirmwareModule::initialize()
   //   // Xsi_Instance.get_error_info();
   //   throw;
   // }
+}
+
+void CDCTriggerTSFFirmwareModule::terminate()
+{
+  B2DEBUG(10, "Waiting for TSF firmware termination...");
+  wait();
+  for (unsigned i = 0; i < m_nSubModules; ++i) {
+    if (i == 1) continue;
+    // if (i >= 3) continue;
+    close(inputFileDescriptor[i][1]);
+    close(outputFileDescriptor[i][0]);
+  }
 }
 
 template<int iSL>
@@ -289,7 +362,7 @@ void CDCTriggerTSFFirmwareModule::event()
     }
   }
   std::sort(iAxialHit.begin(), iAxialHit.end(), [this](int i, int j) {
-    return m_cdcHits[i]->getTDCCount() < m_cdcHits[j]->getTDCCount();
+    return m_cdcHits[i]->getTDCCount() > m_cdcHits[j]->getTDCCount();
   });
 
   for (auto hit : iAxialHit) {
@@ -301,6 +374,7 @@ void CDCTriggerTSFFirmwareModule::event()
     for (int iClock = 0; iClock < m_nClockPerEvent; iClock++) {
       std::cout << "------------------" << "\n";
       std::cout << "clock #" << iClock << "\n";
+
       auto TSF0 = getData<0>(inputToTSF);
       auto TSF2 = getData<1>(inputToTSF);
       auto TSF4 = getData<2>(inputToTSF);
@@ -309,11 +383,9 @@ void CDCTriggerTSFFirmwareModule::event()
       array<char*, m_nSubModules> rawInputToTSF = {TSF0, TSF2, TSF4, TSF6, TSF8};
 
       for (unsigned iSL = 0; iSL < nAxialSuperLayer; ++iSL) {
+        // skip problematic TSF2 simulation
         if (iSL == 1) continue;
-        // Put clk to one
-        loader[iSL]->put_value(clk[iSL], &one_val);
-        loader[iSL]->run(10);
-
+        // if (iSL >= 3) continue;
         // // firstly, clear the input signal vectors
         // tsfInput[iSL].fill(zero_val);
         // // then, copy the TS info to the input signal vectors
@@ -326,26 +398,23 @@ void CDCTriggerTSFFirmwareModule::event()
         //     advance(itr, m_tsVectorWidth);
         //   }
         // }
+        // if (getLogConfig().getDebugLevel())
+        B2DEBUG(100, "input to TSF" << iSL * 2 << ": \n" <<
+                display_value(rawInputToTSF[iSL], nMergers[iSL] * width_in));
+        cout << flush;
+        // write the TSF input
+        // fprintf(stream[iSL][0], "%s\n", rawInputToTSF[iSL]);
 
-        cout << "input to TSF" << iSL * 2 << ": ";
-        display_value(rawInputToTSF[iSL], nMergers[iSL] * width_in);
-        // write the input
-        loader[iSL]->put_value(inPort[iSL], rawInputToTSF[iSL]);
+        outputToTracker[iSL] = writeRead(rawInputToTSF[iSL], stream[iSL][0], stream[iSL][1]);
+        // for (const auto& out : outputToTracker[iSL]) {
+        //   display_hex(out);
+        // }
 
-        // read the output
-        loader[iSL]->get_value(outPort[iSL], outputToTracker[iSL].data());
+        // read the TSF output
+        // cout << "reading output from TSF firmware:" << endl;
+        // fgets(outputToTracker[iSL].data(), width_in * nMergers[iSL], stream[iSL][1]);
 
-        // Put clk to zero
-        loader[iSL]->put_value(clk[iSL], &zero_val);
-        loader[iSL]->run(10);
       }
-
-      // string found = display_value(t2d_out, 6);
-      // std::cout << "output: " << found << "\n";
-      // for (unsigned j = 0; j < count(found.begin(), found.end(), '1'); j++) {
-      //   std::cout << display_value(t2d_out + 6 + 121 * j, 121) << "\n";
-      // }
-      // finderOutput = to_array(t2d_out);
     }
     std::cout << "status code:" << status << std::endl;
   } catch (std::exception& e) {

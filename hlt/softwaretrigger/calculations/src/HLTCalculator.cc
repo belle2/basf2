@@ -293,11 +293,17 @@ namespace Belle2 {
       calculationResult["N2KLMLayer"] = numSecMaxLayerKLM;
 
       //define bhabha_2trk, bhabha_1trk, eclbhabha
+      int charget1 = -10;
+      if (trackWithMaximumRho) charget1 = trackWithMaximumRho->getCharge();
+      int charget2 = -10;
+      if (trackWithSecondMaximumRho) charget2 = trackWithSecondMaximumRho->getCharge();
+
       double Bhabha2Trk = 0.;
       int ntrk_bha = m_pionParticles->getListSize();
       double rp1ob = rhoOfTrackWithMaximumRho / BeamEnergyCMS();
       double rp2ob = rhoOfTrackWithSecondMaximumRho / BeamEnergyCMS();
-      bool bhabha2trk_tag = ntrk_bha >= 2 && maxAngleTTLE > 2.88 && nEidLE >= 1 && rp1ob > 0.35 && rp2ob > 0.35 && (Etot) > 4.0;
+      bool bhabha2trk_tag = ntrk_bha >= 2 && maxAngleTTLE > 2.88 && nEidLE >= 1 && rp1ob > 0.35 && rp2ob > 0.35 && (Etot) > 4.0
+                            && (abs(charget1) == 1 && abs(charget2) == 1 && (charget1 + charget2) == 0);
       if (bhabha2trk_tag) Bhabha2Trk = 1;
       calculationResult["Bhabha2Trk"] = Bhabha2Trk;
 

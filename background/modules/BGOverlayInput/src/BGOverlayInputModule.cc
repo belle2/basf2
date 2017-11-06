@@ -30,7 +30,7 @@
 #include <framework/io/RootIOUtilities.h>
 #include <TClonesArray.h>
 #include <TFile.h>
-
+#include <TRandom.h>
 
 #include <iostream>
 
@@ -97,7 +97,9 @@ namespace Belle2 {
     }
     m_numEvents = m_tree->GetEntries();
     if (m_numEvents == 0) B2ERROR(c_treeNames[DataStore::c_Event] << " has no entires");
-    m_eventCount = 0;
+    m_firstEvent = gRandom->Integer(m_numEvents);
+    B2INFO("BGOverlayInput: starting with event " << m_firstEvent);
+    m_eventCount = m_firstEvent;
 
     // connect selected branches to DataStore
     bool ok = connectBranches();
@@ -134,12 +136,16 @@ namespace Belle2 {
       entry->resetForGetEntry();
     }
 
+    if (m_eventCount == m_firstEvent and !m_start) {
+      B2INFO("BGOverlayInput: events for BG overlay will be re-used");
+      bkgInfo->incrementReusedCounter(m_index);
+    }
+    m_start = false;
+
     m_tree->GetEntry(m_eventCount);
     m_eventCount++;
     if (m_eventCount >= m_numEvents) {
       m_eventCount = 0;
-      B2INFO("BGOverlayInput: events for BG overlay will be re-used");
-      bkgInfo->incrementReusedCounter(m_index);
     }
 
     for (auto entry : m_storeEntries) {

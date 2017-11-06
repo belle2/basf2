@@ -101,5 +101,14 @@ bool SVDResultVarSet::extract(const CKFToSVDResult* result)
   var<named("distance_to_cdc_track")>() = distance.Mag();
   var<named("distance_to_cdc_track_xy")>() = distance.Pt();
 
+
+
+  const RecoTrack* relatedSVDRecoTrack = result->getRelatedSVDRecoTrack();
+  if (relatedSVDRecoTrack) {
+    var<named("number_of_hits_related_svd_track")>() = relatedSVDRecoTrack->getNumberOfSVDHits();
+  } else {
+    var<named("number_of_hits_related_svd_track")>() = -1;
+  }
+
   return true;
 }

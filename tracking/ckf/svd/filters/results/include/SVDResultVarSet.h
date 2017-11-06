@@ -43,6 +43,7 @@ namespace Belle2 {
     "theta",
     "distance_to_cdc_track",
     "distance_to_cdc_track_xy",
+    "number_of_hits_related_svd_track",
   };
 
   /// Vehicle class to transport the variable names

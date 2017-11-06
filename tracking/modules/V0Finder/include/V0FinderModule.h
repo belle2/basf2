@@ -8,19 +8,18 @@
 namespace Belle2 {
   /** A V0 finder module.
    *
-   *  Pairs up all positive and negative tracks, tries to find vertices between them,
-   *  stores found vertices.  There are two sets of cuts, one intended
+   *  Pairs up all positive and negative tracks,
+   *  tries to find vertices between them,
+   *  stores found vertices.
+   *  Only vertices outside the beam pipe are saved, the others are
+   *  recovered in a following analysis level
    *  for use inside the beam pipe, one outside (the difference being
-   *  that B decay tracks can all be matched up to form a vertex, so
-   *  the number of V0s would be n_positiveTracks * n_negativeTracks,
-   *  and this module would be useless).
    *
-   *  Cuts outside the beam pipe are maximum chi^2.
-   *  Cuts inside the beam pipe are a mass window around the Kshort
-   *  mass and a maximum chi^2.
-   *  The value used a beam pipe radius is also an option.
+   *  Cut outside the beam pipe is maximum chi^2.
+   *  The value used as beam pipe radius is an option.
+   *
    *  FIXME once particle hypotheses are thought through, we should
-   *  also deal with Lambda, photon conversion.
+   *  also deal with photon conversion.
    *
    *  The resulting pairs of tracks are stored as mdst::V0.
    */
@@ -69,8 +68,6 @@ namespace Belle2 {
     std::string m_V0ColName; ///< OutputColName of the V0
 
     double m_beamPipeRadius; ///< Radius where inside/outside beampipe is defined.
-    double m_vertexChi2CutInside; ///< Chi2 cut for V0s inside of the beampipe. Applies to all.
-    double m_massWindowKshortInside; ///< Invariant mass cut for reconstructed Kshort inside the beampipe.
     double m_vertexChi2CutOutside; ///< Chi2 cut for V0s outside of the beampipe. Applies to all.
 
     bool m_validation; ///< Flag if use validation.

@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Module: EclCovMatrixNtuple                                                  *
  *                                                                             *
- * Contributors: Guglielmo De Nardo             *
+ * Contributors: Guglielmo De Nardo, Benjamin Oberhof                          *
  *                                                                             *
  * Description: This module write ECL digi information in a root tuple         *
  *              to study amplitude and time info                               *
@@ -115,11 +115,11 @@ void ECLDigiStudyModule::event()
   fill_n(m_theta, 8736, 0);
   fill_n(m_phi, 8736, 0);
 
-  for (int i = 0; i < 8736; i++) {
-    fill_n(m_DspHit1[i], 31, 0);
-    fill_n(m_DspHit2[i], 31, 0);
-    fill_n(m_baseline1[i], 16, 0);
-    fill_n(m_baseline2[i], 16, 0);
+  for (int j = 0; j < 8736; j++) {
+    fill_n(m_DspHit1[j], 31, 0);
+    fill_n(m_DspHit2[j], 31, 0);
+    fill_n(m_baseline1[j], 16, 0);
+    fill_n(m_baseline2[j], 16, 0);
   }
 
   fill_n(m_baselineAvg1, 8736, 0);
@@ -156,18 +156,18 @@ void ECLDigiStudyModule::event()
     m_digiE1[i]    = m_digiE2[i]    = -10.;
   }
 
-  for (const auto& digit : eclDigiArray1) {
-    i              = digit.getCellId() - 1;
-    m_digiTime1[i] = digit.getTimeFit();
-    m_digiE1[i]    = digit.getAmp() / 20000.;
-    m_digiQual1[i] = digit.getQuality();
+  for (const auto& digit1 : eclDigiArray1) {
+    i              = digit1.getCellId() - 1;
+    m_digiTime1[i] = digit1.getTimeFit();
+    m_digiE1[i]    = digit1.getAmp() / 20000.;
+    m_digiQual1[i] = digit1.getQuality();
   }
 
-  for (const auto& digit : eclDigiArray2) {
-    i              = digit.getCellId() - 1;
-    m_digiTime2[i] = digit.getTimeFit() / 1000.;
-    m_digiE2[i]    = digit.getAmp() / 20000.;
-    m_digiQual2[i] = digit.getQuality();
+  for (const auto& digit2 : eclDigiArray2) {
+    i              = digit2.getCellId() - 1;
+    m_digiTime2[i] = digit2.getTimeFit() / 1000.;
+    m_digiE2[i]    = digit2.getAmp() / 20000.;
+    m_digiQual2[i] = digit2.getQuality();
   }
 
   for (const auto& dsp : eclDspArray1) {

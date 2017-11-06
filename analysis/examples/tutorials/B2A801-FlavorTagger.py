@@ -174,7 +174,7 @@ toolsDST += ['ROEMultiplicities', '^B0']
 # create and fill flat Ntuple with MCTruth, kinematic information and Flavor Tagger Output
 # Without any arguments only TMVA is saved. If you want to save the FANN Output please specify it.
 # If you set qrCategories, the output of each category is saved.
-toolsDST += ['FlavorTagging[TMVA-FBDT, FANN-MLP, qrCategories]', '^B0']
+toolsDST += ['FlavorTagging[TMVA-FBDT, FANN-MLP, qpCategories]', '^B0']
 
 toolsDST += ['TagVertex', '^B0']
 toolsDST += ['DeltaT', '^B0']

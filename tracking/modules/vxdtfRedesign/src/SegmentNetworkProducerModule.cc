@@ -111,24 +111,18 @@ SegmentNetworkProducerModule::initialize()
 {
   InitializeCounters();
 
-  // searching for correct sectorMap:
-  for (auto& setup : m_filtersContainer.getAllSetups()) {
-    auto& filters = *(setup.second);
+  // get the pointer to the current filters
+  // WARNING: the pointer will change if the DB object changes (see SectorMapBootStrapModule)
+  auto filters = m_filtersContainer.getFilters(m_PARAMsecMapName);
+  if (filters == nullptr) B2FATAL("SegmentNetworkProducerModule::initialize(): requested secMapName '" << m_PARAMsecMapName <<
+                                    "' does not exist! Can not continue...");
 
-    if (filters.getConfig().secMapName != m_PARAMsecMapName) { continue; }
-    B2INFO("SegmentNetworkProducerModule::initialize(): loading mapName: " << m_PARAMsecMapName << " with nCompactSecIDs: " <<
-           filters.size());
+  B2INFO("SegmentNetworkProducerModule::initialize(): loading mapName: " << m_PARAMsecMapName << " with nCompactSecIDs: " <<
+         filters->size());
 
-    m_vxdtfFilters = &filters;
-
-    if (m_PARAMprintToMathematica) {
-      SecMapHelper::printStaticSectorRelations(filters, filters.getConfig().secMapName + "segNetProducer", 2, m_PARAMprintToMathematica,
-                                               true);
-    }
-
-    if (m_vxdtfFilters == nullptr) B2FATAL("SegmentNetworkProducerModule::initialize(): requested secMapName '" << m_PARAMsecMapName <<
-                                             "' does not exist! Can not continue...");
-    break; // have found our secMap no need for further searching
+  if (m_PARAMprintToMathematica) {
+    SecMapHelper::printStaticSectorRelations(*filters, filters->getConfig().secMapName + "segNetProducer", 2, m_PARAMprintToMathematica,
+                                             true);
   }
 
   if (m_PARAMCreateNeworks < 1 or m_PARAMCreateNeworks > 3) {
@@ -187,6 +181,11 @@ void SegmentNetworkProducerModule::event()
 {
   m_eventCounter++;
   B2DEBUG(1, "\n" << "SegmentNetworkProducerModule:event: event " << m_eventCounter << "\n");
+
+  // get the pointer to the filter EACH event, as the DB object may have been update and thus the memory address of the filter changed
+  m_vxdtfFilters = m_filtersContainer.getFilters(m_PARAMsecMapName);
+  if (m_vxdtfFilters == nullptr) B2FATAL("SegmentNetworkProducerModule::initialize(): requested secMapName '" << m_PARAMsecMapName <<
+                                           "' does not exist! Can not continue...");
 
   // make sure that network exists:
   if (! m_network) {
@@ -519,8 +518,15 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
 
         // the filter accepts spacepoint combinations
         // ->observe gives back an observed version of the filter
-        bool accepted = (filter3sp->observe(ObserverType())).accept(outerHit->getEntry().getHit(), centerHit->getEntry().getHit(),
-                                                                    innerHit->getEntry().getHit());
+        bool accepted = false;
+        // there is an uncaught exception thrown by the CircleCenterXY filter variable if the points are on a straight line
+        try {
+          accepted = (filter3sp->observe(ObserverType())).accept(outerHit->getEntry().getHit(), centerHit->getEntry().getHit(),
+                                                                 innerHit->getEntry().getHit());
+        } catch (...) {
+          // this may produce too much output, so consider to demote it to a B2DEBUG message
+          B2WARNING("SegmentNetworkProducerModule: exception caught thrown by one of the three hit filters");
+        }
 
         B2DEBUG(5, "buildSegmentNetwork: outer/Center/Inner: " << outerHit->getEntry().getName() << "/" << centerHit->getEntry().getName()
                 << "/" << innerHit->getEntry().getName() << ", accepted: " << std::to_string(accepted));

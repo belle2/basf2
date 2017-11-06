@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                                   *
  *                                                                              *
  * Author: The Belle II Collaboration                                           *
- * Contributors: Eugenio Paoloni                                                *
+ * Contributors: Eugenio Paoloni, Thomas Lueck                                  *
  *                                                                              *
  * This software is provided "as is" without any warranty.                      *
  *******************************************************************************/
@@ -22,9 +22,6 @@
 #include "framework/gearbox/Const.h"
 #include "framework/datastore/StoreObjPtr.h"
 
-// DB access:
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/PayloadFile.h>
 
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -78,9 +75,13 @@ void
 SectorMapBootstrapModule::initialize()
 {
 
-  if (m_readSecMapFromDB)
+  if (m_readSecMapFromDB) {
+    B2INFO("Retrieving sectormap from DB. Filename: " << m_sectorMapsInputFile.c_str());
+    m_ptrDBObjPtr = new DBObjPtr<PayloadFile>(m_sectorMapsInputFile.c_str());
     retrieveSectorMapFromDB();
-  else if (m_readSectorMap)
+    // add a callback function so that the sectormap is updated each time the DBObj changes
+    m_ptrDBObjPtr->addCallback(this,  &SectorMapBootstrapModule::retrieveSectorMapFromDB);
+  } else if (m_readSectorMap)
     retrieveSectorMap();
   else
     bootstrapSectorMap();
@@ -385,7 +386,7 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
   TTree* tree ;
   rootFile.GetObject(c_setupKeyNameTTreeName.c_str(), tree);
 
-  TString* setupKeyName = NULL;
+  TString* setupKeyName = nullptr;
   tree->SetBranchAddress(c_setupKeyNameBranchName.c_str(),
                          & setupKeyName);
 
@@ -435,21 +436,24 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
 void
 SectorMapBootstrapModule::retrieveSectorMapFromDB(void)
 {
-  B2INFO("Retrieving sectormap from DB. Filename: " << m_sectorMapsInputFile.c_str());
 
-  DBObjPtr<PayloadFile> sectorMapsInputFile(m_sectorMapsInputFile.c_str());
-  TFile rootFile(sectorMapsInputFile->getFileName().c_str());
+  B2INFO("SectorMapBootstrapModule: retrieve new SectorMap from database. New DB file name: " << (*m_ptrDBObjPtr)->getFileName());
+
+  if (m_ptrDBObjPtr == nullptr) B2FATAL("ERROR: the pointer to the DB payload is not set!");
+
+  TFile rootFile((*m_ptrDBObjPtr)->getFileName().c_str());
 
   // some cross check that the file is open
-  if (!rootFile.IsOpen()) B2FATAL("The Payload file: " << sectorMapsInputFile->getFileName().c_str() << " not found in the DB");
+  if (!rootFile.IsOpen()) B2FATAL("The Payload file: " << (*m_ptrDBObjPtr)->getFileName().c_str() <<
+                                    " not found in the DB");
 
-  TTree* tree = NULL;
+  TTree* tree = nullptr;
   rootFile.GetObject(c_setupKeyNameTTreeName.c_str(), tree);
 
   // test if the tree was found
   if (!tree) B2FATAL("Did not found the setup tree: " << c_setupKeyNameTTreeName.c_str());
 
-  TString* setupKeyName = NULL;
+  TString* setupKeyName = nullptr;
   tree->SetBranchAddress(c_setupKeyNameBranchName.c_str(),
                          & setupKeyName);
 
@@ -473,14 +477,14 @@ SectorMapBootstrapModule::retrieveSectorMapFromDB(void)
 
     rootFile.cd(setupKeyName->Data());
 
-    B2DEBUG(1, "Retrieving SectorMap with name " << setupKeyName->Data());
+    B2DEBUG(1, "SectorMapBootstrapModule: Retrieving SectorMap with name " << setupKeyName->Data());
 
     VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
 
     string setupKeyNameStd = string(setupKeyName->Data());
     segmentFilters->retrieveFromRootFile(setupKeyName);
 
-    B2DEBUG(1, "Retrieved map with name: " << setupKeyNameStd << " from rootfie.");
+    B2DEBUG(1, "SectorMapBootstrapModule: Retrieved map with name: " << setupKeyNameStd << " from rootfie.");
     filtersContainer.assignFilters(setupKeyNameStd, segmentFilters);
 
     rootFile.cd("..");

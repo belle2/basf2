@@ -1,6 +1,7 @@
 import modularAnalysis
 import stdFSParticles
 import vertex
+import basf2
 
 SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "production"
 
@@ -147,3 +148,35 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=0):
                                              preScaleStoreDebugOutputToDataStore=store_array_debug_prescale,
                                              calibParticleListName=calib_particle_list,
                                              calibExtraInfoName=calib_extraInfo_list)
+
+
+def add_calcROIs_software_trigger(path, calcROIs=True):
+    """
+    Add the PXDDataReduction module to preserve the tracking informaiton for ROI calculation
+    :param path: The path to which the module should be added
+    :param calcROIs: True: turn on the ROI calculation, False: turn off
+    """
+
+    pxdDataRed = basf2.register_module('PXDROIFinder')
+    pxdDataRed.param({
+        'recoTrackListName': 'RecoTracks',
+        'PXDInterceptListName': 'PXDIntercepts',
+        'ROIListName': 'ROIs',
+        'tolerancePhi': 0.15,
+        'toleranceZ': 0.5,
+        # optimized performance
+        #    'sigmaSystU': 0.1,
+        #    'sigmaSystV': 0.1,
+        #    'numSigmaTotU': 10,
+        #    'numSigmaTotV': 10,
+        #    'maxWidthU': 2,
+        #    'maxWidthV': 6,
+        # official simulation
+        'sigmaSystU': 0.02,
+        'sigmaSystV': 0.02,
+        'numSigmaTotU': 10,
+        'numSigmaTotV': 10,
+        'maxWidthU': 0.5,
+        'maxWidthV': 0.5})
+    if calcROIs:
+        path.add_module(pxdDataRed)

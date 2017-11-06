@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# this file is used to create the mdst.root file located in this test folder
+# and used for unit testing.
+
+from basf2 import *
+from simulation import add_simulation
+from reconstruction import add_reconstruction
+from mdst import add_mdst_output
+
+set_random_seed(12345)
+
+main = create_path()
+
+# specify number of events to be generated
+main.add_module('EventInfoSetter', evtNumList=[100], runList=[1], expList=[1])
+
+# generate BBbar events
+main.add_module('EvtGenInput')
+add_simulation(main)
+add_reconstruction(main)
+add_mdst_output(main, filename="mdst.root")
+process(main)

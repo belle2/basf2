@@ -519,14 +519,18 @@ def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_after",
         svd_cdc_reco_tracks = reco_tracks
 
     if svd_ckf_mode == "VXDTF2_before":
-        temporary_vxd_track_cands = "__VXDTF2RecoTracks"
-        add_vxd_track_finding_vxdtf2(path, components=["SVD"],
-                                     reco_tracks=temporary_vxd_track_cands)
+        add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks)
+
+        if use_mc_truth:
+            # MC CKF needs MC matching information
+            path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=False,
+                            mcRecoTracksStoreArrayName="MCRecoTracks",
+                            prRecoTracksStoreArrayName=svd_reco_tracks)
+
         add_seeded_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks,
-                           temporary_vxd_track_cands=temporary_vxd_track_cands,
                            svd_reco_tracks=svd_reco_tracks, use_mc_truth=use_mc_truth)
-        add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks,
-                    svd_reco_tracks=svd_reco_tracks, use_mc_truth=use_mc_truth)
+        # add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks,
+        #             svd_reco_tracks=svd_reco_tracks, use_mc_truth=use_mc_truth)
 
         path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_reco_tracks)
     elif svd_ckf_mode == "VXDTF2_after":

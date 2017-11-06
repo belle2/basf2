@@ -71,9 +71,10 @@ matchMCTruth('B0')
 # ROE is required by the veto
 buildRestOfEvent('B0')
 
-# In this section, I show how to use the writePi0EtaVeto.
-#
-# Before using the pi0/eta veto you need at least the default weight files: pi0veto.root and etaveto.root.
+# perform pi0/eta veto
+writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', workingDirectory='./pi0etaveto')
+
+# you need at least the default weight files: pi0veto.root and etaveto.root for writePi0EtaVeto.
 # downloadFlag parameter is set to True by default,
 # the default weight files are downloaded to your workingDirectory automatically from the database in that case.
 # The default workingDirectory is '.'
@@ -84,29 +85,16 @@ buildRestOfEvent('B0')
 # B2A701-ContinuumSuppression_Input.py
 # B2A702-ContinuumSuppression_MVATrain.py
 
-# perform pi0/eta veto
-writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', workingDirectory='./pi0etaveto')
-
 # at this stage the B0 candidates should have
 # extraInfo(Pi0_Prob) and extraInfo(Eta_Prob) value attached.
-# extraInfo(Pi0_Prob) means pi0 probability for the B0 candidates whose gamma daughter
-# extraInfo(Eta_Prob) means eta probability for the B0 candidates whose gamma daughter
+# extraInfo(Pi0_Prob) means pi0 probability for the B0 candidates whose gamma daughter.
+# extraInfo(Eta_Prob) means eta probability for the B0 candidates whose gamma daughter.
 # For the B0 candidates whose gamma daughter could not be combined with
 # any of the remaining photons to form pi0/eta because of soft photon selection
 # the extraInfo(Pi0_Prob) and extraInfo(Eta_Prob) does not exist. In these cases
-# -999 will be written to the extraInfo(Pi0_Prob) branch and extraInfo(Eta_Prob) branch
-
-# You might apply writePi0EtaVeto in one process several times.
-# Please be careful in that case.
-# You have to change multiApplication parameter to any name from second application for debug.
-# For example,
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',multiApplication='second'),
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',multiApplication='2'), etc.
-# But please don't change multiApplication parameter from default when first application.
-# Please note that this is not enough if you apply this function regarding same particleList in one process.
-# You have to change not only multiApplication parameter but also pi0vetoname and etavetoname parameters to any names
-# from second application for debug. For example,
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma',multiApplication='second',pi0vetoname='Pi0_Prob2',etavetoname='Eta_Prob2')
+# -999 will be written to the extraInfo(Pi0_Prob) branch and extraInfo(Eta_Prob) branch.
+# You can change extraInfo names of pi0/eta probability by setting pi0vetoname and etavetoname parameters. For example,
+# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', workingDirectory='./pi0etaveto',pi0vetoname='Pi0_Prob2',etavetoname='Eta_Prob2')
 
 
 # You can also do a simple veto using delta mass ranking as below.

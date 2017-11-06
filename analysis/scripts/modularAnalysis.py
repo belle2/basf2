@@ -1812,12 +1812,14 @@ def V0ListMerger(firstList, secondList, prioritiseV0, path=analysis_main):
         B2ERROR("Lists to be merged contain different particles")
 
 
+PI0ETAVETO_COUNTER = 0
+
+
 def writePi0EtaVeto(
     particleList,
     decayString,
     workingDirectory='.',
     downloadFlag=True,
-    multiApplication='FirstApplication',
     pi0vetoname='Pi0_Prob',
     etavetoname='Eta_Prob',
     selection='',
@@ -1827,6 +1829,7 @@ def writePi0EtaVeto(
     Give pi0/eta probability for hard photon.
 
     default weight files are set 1.4 GeV as the lower limit of hard photon energy in CMS Frame when mva training for pi0etaveto.
+    current default weight files are optimised by MC9.
     The Input Variables are as below. Aliases are set to some variables when training.
     M : pi0/eta candidates Invariant mass
     lowE : soft photon energy in lab frame
@@ -1840,25 +1843,27 @@ def writePi0EtaVeto(
 
     NOTE for debug
     Please don't use following ParticleList names elsewhere.
-    'gamma:HARDPHOTON', 'gamma:PI0SOFT' + multiApplication, 'gamma:ETASOFT' + multiApplication, pi0:PI0VETO, eta:ETAVETO,
+    'gamma:HARDPHOTON', pi0:PI0VETO, eta:ETAVETO,
+    'gamma:PI0SOFT' + str(PI0ETAVETO_COUNTER), 'gamma:ETASOFT' + str(PI0ETAVETO_COUNTER)
     Please don't use "lowE", "cTheta", "Zmva", "minC2Hdist" as alias elsewhere.
-    If you apply this function more than once in one process,
-    please change multiApplication parameter from second application.
-    Please don't change multiApplication parameter from first application.
 
     @param particleList     The input ParticleList
     @param decayString specify Particle to be added to the ParticleList
     @param workingDirectory The weight file directory
     @param downloadFlag whether download default weight files or not
-    @param multiApplication tail of ParticleList name for pi0/eta soft photon
     @param pi0vetoname extraInfo name of pi0 probability
     @param etavetoname extraInfo name of eta probability
     @param selection Selection criteria that Particle needs meet in order for for_each ROE path to continue
     """
+    global PI0ETAVETO_COUNTER
 
-    if multiApplication == 'FirstApplication':
-        B2INFO('Please change multiApplication parameter to any name \
-when you apply writePi0EtaVeto more than once in one process from second application, if not so.')
+    if PI0ETAVETO_COUNTER == 0:
+        variables.addAlias('lowE', 'daughter(1,E)')
+        variables.addAlias('cTheta', 'daughter(1,clusterTheta)')
+        variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')
+        variables.addAlias('minC2Hdist', 'daughter(1,minC2HDist)')
+
+    PI0ETAVETO_COUNTER = PI0ETAVETO_COUNTER + 1
 
     roe_path = create_path()
 
@@ -1870,8 +1875,8 @@ when you apply writePi0EtaVeto more than once in one process from second applica
 
     pi0softname = 'gamma:PI0SOFT'
     etasoftname = 'gamma:ETASOFT'
-    softphoton1 = pi0softname + multiApplication
-    softphoton2 = etasoftname + multiApplication
+    softphoton1 = pi0softname + str(PI0ETAVETO_COUNTER)
+    softphoton2 = etasoftname + str(PI0ETAVETO_COUNTER)
 
     fillParticleList(
         softphoton1,
@@ -1886,12 +1891,6 @@ when you apply writePi0EtaVeto more than once in one process from second applica
 
     reconstructDecay('pi0:PI0VETO -> gamma:HARDPHOTON ' + softphoton1, '', path=roe_path)
     reconstructDecay('eta:ETAVETO -> gamma:HARDPHOTON ' + softphoton2, '', path=roe_path)
-
-    if multiApplication == 'FirstApplication':
-        variables.addAlias('lowE', 'daughter(1,E)')
-        variables.addAlias('cTheta', 'daughter(1,clusterTheta)')
-        variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')
-        variables.addAlias('minC2Hdist', 'daughter(1,minC2HDist)')
 
     if not os.path.isdir(workingDirectory):
         os.mkdir(workingDirectory)

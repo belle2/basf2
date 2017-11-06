@@ -1,6 +1,6 @@
 /**************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2010 - Belle II Collaboration                             *
+* Copyright(C) 2017 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
 * Contributors: Matt Barrett                                             *
@@ -17,11 +17,10 @@
 #include <TBranch.h>
 
 using namespace Belle2;
-using namespace std;
 
 void NtupleMCDecayStringTool::setupTree()
 {
-  vector<string> strNames = m_decaydescriptor.getSelectionNames();
+  std::vector<std::string> strNames = m_decaydescriptor.getSelectionNames();
   if (strNames.empty()) {return;}
 
   m_mcDecayString = new std::string("Default string.");
@@ -38,7 +37,7 @@ void NtupleMCDecayStringTool::eval(const Particle* particle)
     return;
   }
 
-  vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
+  std::vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
   if (selparticles.empty()) {return;}
 
   const StringWrapper* stringWrapper = selparticles[0]->getRelated<StringWrapper>();

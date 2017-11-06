@@ -104,16 +104,6 @@ namespace Belle2 {
     int m_ncut = 0; /**< counter of the cuttet tracks */
     int m_npass = 0; /**< counter of the selected tracks */
 
-    /** validation NoKickCuts members */
-    TFile* m_noKickOutputTFile; /**< validartion output TFile */
-    TH1F* m_momSel; /**< histogram of selected tracks */
-    TH1F* m_momCut; /**< histrogram of cutted tracks */
-    TH1F* m_momEff; /**< histogram for efficiency */
-    TH1F* m_PDGIDCut; /**< histogram for PDGID of cutted track */
-    TH1F* m_PDGIDSel; /**< histogram for PDGID of selected track */
-    TH1F* m_PDGIDEff; /**< histogram for efficiency for each PDGID */
-    TH1F* m_nCutHit; /**< histogram for number of cutted hist per track */
-
 
     // state variables
 

@@ -198,8 +198,24 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
   hit8TrackBuilder(track);
   bool good = true;
   good = globalCut(m_8hitTrack);
-  if (good == false) return good;
-  if (track.getMomentumSeed().Mag() > m_pmax) return good;
+  if (good == false) {
+    if (m_outputFlag) {
+      m_numberOfCuts = 25;
+      m_nCutHit->Fill(m_numberOfCuts);
+      m_momCut->Fill(track.getMomentumSeed().Mag());
+      m_PDGIDCut->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
+    }
+    return good;
+  }
+
+  if (track.getMomentumSeed().Mag() > m_pmax) {
+    if (m_outputFlag) {
+      m_nCutHit->Fill(m_numberOfCuts);
+      m_momSel->Fill(track.getMomentumSeed().Mag());
+      m_PDGIDSel->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
+    }
+    return good;
+  }
   for (int i = 0; i < (int)(m_8hitTrack.size() - 2); i++) {
     double sinTheta = fabs(m_8hitTrack.at(i).m_momentum0.Y()) /
                       sqrt(pow(m_8hitTrack.at(i).m_momentum0.Y(), 2) +
@@ -232,5 +248,42 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
 
     }
   }
+  if (m_outputFlag) {
+    m_nCutHit->Fill(m_numberOfCuts);
+    if (good) {
+      m_momSel->Fill(track.getMomentumSeed().Mag());
+      m_PDGIDSel->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
+    } else {
+      m_momCut->Fill(track.getMomentumSeed().Mag());
+      m_PDGIDCut->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
+    }
+  }
   return good;
+}
+
+
+void NoKickRTSel::produceHistoNoKick()
+{
+  if (m_outputFlag) {
+    m_noKickOutputTFile->cd();
+    m_momSel->Write();
+    m_momCut->Write();
+
+    m_momEff->Add(m_momSel, 1);
+    m_momEff->Add(m_momCut, 1);
+    m_momEff->Divide(m_momSel, m_momEff, 1, 1);
+    m_momEff->Write();
+
+    m_PDGIDSel->Write();
+    m_PDGIDCut->Write();
+
+    m_PDGIDEff->Add(m_PDGIDSel, 1);
+    m_PDGIDEff->Add(m_PDGIDCut, 1);
+    m_PDGIDEff->Divide(m_PDGIDSel, m_PDGIDEff, 1, 1);
+    m_PDGIDEff->Write();
+
+    m_nCutHit->Write();
+
+    delete m_noKickOutputTFile;
+  }
 }

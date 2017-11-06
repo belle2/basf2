@@ -436,7 +436,7 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 
   m_XTetc4Recon = 0;
   //  B2INFO("CDCGeometryPar: Load x-t etc. params. for reconstruction (=1); not load and use the same ones for digitization (=0):" <<
-  B2INFO("CDCGeometryPar: Use the same x-t etc. for reconstruction as those used for digitization");
+  //  B2INFO("CDCGeometryPar: Use the same x-t etc. for reconstruction as those used for digitization");
   if (m_XTetc4Recon) {
     readXT(gbxParams, 1);
     readSigma(gbxParams, 1);
@@ -1982,6 +1982,7 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
     double det = a[1] * a[1] - 4.*a[2] * a[0];
     if (a[2] != 0. && det >= 0.) {
       //2nd-order approx. assuming minTime near zero
+      //Choose the solution which approaches to -a[0]/a[1] for a[2]->0
       minTime = (-a[1] + sqrt(det)) / (2.*a[2]);
     } else if (a[1] != 0.) {
       minTime = -a[0] / a[1];  //1st-order approx.

@@ -249,6 +249,10 @@ bool RawSecMapMergerModule::good(const std::vector<unsigned>& ids)
           FullSecID(ids[1]).getLadderID() == FullSecID(ids[2]).getLadderID()
          )
         return false; // the ids are bad: for us a track cannot cross twice the same ladder
+      if (FullSecID(ids[0]).getLayerID() == FullSecID(ids[2]).getLayerID() &&
+          FullSecID(ids[0]).getLadderID() == FullSecID(ids[2]).getLadderID()
+         )
+        return false; // the ids are bad: for us a track cannot cross twice the same ladder
       return true;
     default:
       return true;

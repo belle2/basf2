@@ -39,15 +39,8 @@
 #include <limits>       // std::numeric_limits
 #include <functional>
 
-// root:
-//#include <TFile.h>
-//#include <TTree.h>
-//#include <TBranch.h>
 #include <TChain.h>
-//boost:
-// #ifndef __CINT__
 #include <boost/chrono.hpp>
-// #endif
 
 namespace Belle2 {
 

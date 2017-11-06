@@ -519,8 +519,15 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
 
         // the filter accepts spacepoint combinations
         // ->observe gives back an observed version of the filter
-        bool accepted = (filter3sp->observe(ObserverType())).accept(outerHit->getEntry().getHit(), centerHit->getEntry().getHit(),
-                                                                    innerHit->getEntry().getHit());
+        bool accepted = false;
+        // there is an uncaught exception thrown by the CircleCenterXY filter variable if the points are on a straight line
+        try {
+          accepted = (filter3sp->observe(ObserverType())).accept(outerHit->getEntry().getHit(), centerHit->getEntry().getHit(),
+                                                                 innerHit->getEntry().getHit());
+        } catch (...) {
+          // this may produce too much output, so consider to demote it to a B2DEBUG message
+          B2WARNING("SegmentNetworkProducerModule: exception caught thrown by one of the three hit filters");
+        }
 
         B2DEBUG(5, "buildSegmentNetwork: outer/Center/Inner: " << outerHit->getEntry().getName() << "/" << centerHit->getEntry().getName()
                 << "/" << innerHit->getEntry().getName() << ", accepted: " << std::to_string(accepted));

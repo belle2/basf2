@@ -147,7 +147,7 @@ main_path.add_module("DAFRecoFitter", logLevel=LogLevel.ERROR,
                      pdgCodesToUseForFitting=13
                      )
 main_path.add_module('TrackCreator',
-                     defaultPDGCode=13,
+                     pdgCodes=[13],
                      useClosestHitToIP=True
                      )
 main_path.add_module('CDCCRTest', logLevel=LogLevel.ERROR,

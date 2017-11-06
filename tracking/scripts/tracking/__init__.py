@@ -276,7 +276,6 @@ def add_cdc_cr_track_fit_and_track_creator(path, components=None,
                     pdgCodes=[13],
                     recoTrackColName=reco_tracks,
                     trackColName=tracks,
-                    defaultPDGCode=13,
                     useClosestHitToIP=True,
                     useBFieldAtHit=True
                     )

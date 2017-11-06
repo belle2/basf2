@@ -13,6 +13,9 @@
 #include <framework/datastore/StoreArray.h>
 #include <TMath.h>
 
+#include <TRandom3.h>
+#include <TLorentzVector.h>
+
 using namespace TMath;
 using namespace std;
 using namespace Belle2;
@@ -40,6 +43,8 @@ PairGenModule::PairGenModule() : Module()
   //Parameter definition
   addParam("pdgCode", m_PDG,
            "PDG code for generated particles", 11);
+  addParam("saveBoth", m_saveBoth,
+           "Store both particles if true, one if false", true);
 }
 
 void PairGenModule::initialize()
@@ -106,7 +111,11 @@ void PairGenModule::event()
     q.setMomentum(vq(0), vq(1), vq(2));
     q.setEnergy(vq(3));
     q.setProductionVertex(0, 0, 0);
-    q.addStatus(MCParticle::c_StableInGenerator);
+    if (m_saveBoth) {
+      q.addStatus(MCParticle::c_StableInGenerator);
+    } else {
+      q.addStatus(MCParticle::c_IsVirtual);
+    }
     //Particle is stable in generator. We could use MCParticleGraph options to
     //do this automatically but setting it here makes the particle correct
     //independent of the options

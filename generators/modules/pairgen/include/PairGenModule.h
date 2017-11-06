@@ -16,9 +16,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
-#include <TRandom3.h>
-#include <TLorentzVector.h>
-
 namespace Belle2 {
 
   /** The PairGen module.
@@ -45,6 +42,8 @@ namespace Belle2 {
   protected:
     /** Particles PDG code */
     int m_PDG;
+    /** Store both particles if true, one if false */
+    bool m_saveBoth;
 
     MCParticleGraph m_particleGraph;
   };

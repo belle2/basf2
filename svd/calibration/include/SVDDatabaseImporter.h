@@ -64,6 +64,8 @@ namespace Belle2 {
      */
     void importSVDPulseShapeCalibrations(/*std::string fileName*/);
 
+    void importSVDTimeShiftCorrections(/*std::string fileName*/);
+
     /**
      * This method import to the database the strip
      * noise from the noise local runs.

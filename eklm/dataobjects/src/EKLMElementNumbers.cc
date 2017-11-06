@@ -42,7 +42,7 @@ void EKLMElementNumbers::checkDetectorLayer(int endcap, int layer) const
 {
   const char* endcapName[2] = {"backward", "forward"};
   if (layer < 0 || layer > m_MaximalDetectorLayerNumber[endcap - 1])
-    B2FATAL("Number of layer must be less from 1 to the maximal number of "
+    B2FATAL("Number of layer must be from 1 to the maximal number of "
             "detector layers in the " << endcapName[endcap - 1] << " endcap ("
             << m_MaximalDetectorLayerNumber[endcap - 1] << ").");
 }

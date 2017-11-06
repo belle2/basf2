@@ -397,7 +397,7 @@ namespace Belle2 {
       const Track* track = daug->getTrack();
       if (!track) return 999.9;
 
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(daug->getPDGCode())));
+      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(daug->getPDGCode())));
       if (!trackFit) return 999.9;
 
       UncertainHelix helix = trackFit->getUncertainHelix();
@@ -423,7 +423,7 @@ namespace Belle2 {
       const Track* track = daug->getTrack();
       if (!track) return 999.9;
 
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(daug->getPDGCode())));
+      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(daug->getPDGCode())));
       if (!trackFit) return 999.9;
 
       UncertainHelix helix = trackFit->getUncertainHelix();

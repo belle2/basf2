@@ -25,28 +25,9 @@
 using namespace std;
 using namespace Belle2;
 
-SpacePointTrackCand::SpacePointTrackCand() :
-  m_pdg(0),
-  m_MCTrackID(-1),
-  m_state6D(6),
-  m_cov6D(6),
-  m_q(0),
-  m_flightDirection(true),
-  m_iTrackStub(-1),
-  m_refereeStatus(c_isActive),
-  m_qualityIndex(0.5)
-{
 
-}
-
-SpacePointTrackCand::SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*>& spacePoints, int pdgCode, double charge,
-                                         int mcTrackID) :
-  m_state6D(6),
-  m_cov6D(6),
-  m_flightDirection(true),
-  m_iTrackStub(-1),
-  m_refereeStatus(c_isActive),
-  m_qualityIndex(0.5)
+SpacePointTrackCand::SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*>& spacePoints, int pdgCode,
+                                         double charge, int mcTrackID)
 {
   m_pdg = pdgCode;
   m_q = charge;

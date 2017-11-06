@@ -10,7 +10,7 @@ from modularAnalysis import *
 main = create_path()
 
 rootinput = register_module('RootInput')
-rootinput.param('inputFileName', Belle2.FileSystem.findFile('analysis/tests/mdst_r10142.root'))
+rootinput.param('inputFileName', Belle2.FileSystem.findFile('analysis/tests/mdst.root'))
 
 
 main.add_module(rootinput)

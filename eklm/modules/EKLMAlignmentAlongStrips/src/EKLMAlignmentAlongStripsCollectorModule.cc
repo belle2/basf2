@@ -36,6 +36,7 @@ EKLMAlignmentAlongStripsCollectorModule() : CalibrationCollectorModule()
   setPropertyFlags(c_ParallelProcessingCertified);
   m_Event = new EKLMAlignmentAlongStripsAlgorithm::Event;
   m_GeoDat = NULL;
+  m_TransformData = NULL;
 }
 
 EKLMAlignmentAlongStripsCollectorModule::
@@ -48,6 +49,8 @@ void EKLMAlignmentAlongStripsCollectorModule::prepare()
 {
   TTree* t;
   m_GeoDat = &(EKLM::GeometryData::Instance());
+  m_TransformData =
+    new EKLM::TransformData(true, EKLM::TransformData::c_Alignment);
   StoreArray<EKLMHit2d>::required();
   StoreArray<EKLMDigit>::required();
   StoreArray<Track>::required();
@@ -60,6 +63,8 @@ void EKLMAlignmentAlongStripsCollectorModule::prepare()
 void EKLMAlignmentAlongStripsCollectorModule::collect()
 {
   int i, j, n, n2, vol;
+  double l;
+  const HepGeom::Transform3D* tr;
   TVector3 hitPosition;
   HepGeom::Point3D<double> hitGlobal, hitLocal;
   StoreArray<Track> tracks;
@@ -106,10 +111,20 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
       m_Event->x = hitPosition.X();
       m_Event->y = hitPosition.Y();
       m_Event->z = hitPosition.Z();
+      hitGlobal.setX(hitPosition.X() / Unit::mm * CLHEP::mm);
+      hitGlobal.setY(hitPosition.Y() / Unit::mm * CLHEP::mm);
+      hitGlobal.setZ(hitPosition.Z() / Unit::mm * CLHEP::mm);
       m_Event->stripGlobal = it2->first;
       m_GeoDat->stripNumberToElementNumbers(
         m_Event->stripGlobal, &m_Event->endcap, &m_Event->layer,
         &m_Event->sector, &m_Event->plane, &m_Event->strip);
+      tr = m_TransformData->getStripGlobalToLocal(
+             m_Event->endcap, m_Event->layer, m_Event->sector, m_Event->plane,
+             m_Event->strip);
+      hitLocal = (*tr) * hitGlobal;
+      l = m_GeoDat->getStripLength(m_Event->strip) / CLHEP::mm * Unit::mm;
+      m_Event->distSiPM = 0.5 * l - hitLocal.x() / CLHEP::mm * Unit::mm;
+      m_Event->distFarEnd = 0.5 * l + hitLocal.x() / CLHEP::mm * Unit::mm;
       m_Event->segmentGlobal =
         m_GeoDat->segmentNumber(
           m_Event->endcap, m_Event->layer, m_Event->sector, m_Event->plane,
@@ -121,5 +136,6 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
 
 void EKLMAlignmentAlongStripsCollectorModule::terminate()
 {
+  delete m_TransformData;
 }
 

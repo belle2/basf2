@@ -146,15 +146,6 @@ def add_cdc_cr_simulation(path,
 
     #    path.add_module(RandomizeTrackTimeModule(8.0))
 
-    # Select events and reset global timing.
-    sel = register_module("CDCCosmicSelectorAfterFullSim",
-                          lOfRegion=500,
-                          wOfRegion=500,
-                          xOfRegion=0,
-                          zOfRegion=50)
-    path.add_module(sel)
-    sel.if_false(empty_path)
-
     # CDC digitization
     if components is None or 'CDC' in components:
         cdc_digitizer = register_module('CDCDigitizer')

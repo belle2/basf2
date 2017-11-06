@@ -202,7 +202,11 @@ template <class FilterType> SectorGraph<FilterType> RawSecMapMergerModule::build
     }
     auto thisEntry = chain->LoadTree(i);
 
-    auto ids = getSecIDs(sectorBranches, thisEntry);
+    std::vector<unsigned> ids = getSecIDs(sectorBranches, thisEntry);
+
+    if (! good(ids))
+      continue;
+
     auto currentID = SubGraphID(ids);
     B2DEBUG(10, "buildGraph-SubGraphID-print: id: " << currentID.print());
 
@@ -227,7 +231,29 @@ template <class FilterType> SectorGraph<FilterType> RawSecMapMergerModule::build
 }
 
 
-
+bool RawSecMapMergerModule::good(const std::vector<unsigned>& ids)
+{
+  switch (ids.size()) {
+    case 2:
+      if (FullSecID(ids[0]).getLayerID() == FullSecID(ids[1]).getLayerID() &&
+          FullSecID(ids[0]).getLadderID() == FullSecID(ids[1]).getLadderID()
+         )
+        return false; // the ids are bad: for us a track cannot cross twice the same ladder
+      return true;
+    case 3:
+      if (FullSecID(ids[0]).getLayerID() == FullSecID(ids[1]).getLayerID() &&
+          FullSecID(ids[0]).getLadderID() == FullSecID(ids[1]).getLadderID()
+         )
+        return false; // the ids are bad: for us a track cannot cross twice the same ladder
+      if (FullSecID(ids[1]).getLayerID() == FullSecID(ids[2]).getLayerID() &&
+          FullSecID(ids[1]).getLadderID() == FullSecID(ids[2]).getLadderID()
+         )
+        return false; // the ids are bad: for us a track cannot cross twice the same ladder
+      return true;
+    default:
+      return true;
+  }
+}
 
 
 void RawSecMapMergerModule::printData(

@@ -40,9 +40,9 @@
 #include <functional>
 
 // root:
-#include <TFile.h>
-#include <TTree.h>
-#include <TBranch.h>
+//#include <TFile.h>
+//#include <TTree.h>
+//#include <TBranch.h>
 #include <TChain.h>
 //boost:
 // #ifndef __CINT__
@@ -178,78 +178,6 @@ namespace Belle2 {
         VXDTFFilters<SpacePoint>& segFilters);
 
 
-    /// cross-check if everything is working as expected. WARNING TODO find out if this does fulfill its purpose!
-    template <class FilterType> void testSegmentFilters(const SectorMapConfig& config, SectorGraph<FilterType>& mainGraph,
-                                                        VXDTFFilters<SpacePoint>& segFilters)
-    {
-      B2DEBUG(1, "testSegmentFilters - now testing config: " << config.secMapName);
-#include <vxd/geometry/SensorInfoBase.h>
-      // store the dummy sensors and clusters:
-      std::vector<VXD::SensorInfoBase> allSensors;
-      std::vector<Belle2::PXDCluster> allPXDClusters;
-
-      /// small lambda for creating a SpacePoint with given global coordinates:
-      auto getSpacePoint = [&](VxdID aVxdID, double globalX, double globalY, double globalZ) -> SpacePoint {
-        VXD::SensorInfoBase sensorInfoBase(VXD::SensorInfoBase::PXD, aVxdID, 1., 1., 0.3, 2, 4, -1.);
-        TGeoRotation r1; r1.SetAngles(45, 20, 30);
-        TGeoTranslation t1(globalX, globalY, globalZ);
-        TGeoCombiTrans c1(t1, r1);
-        TGeoHMatrix transform = c1;
-        sensorInfoBase.setTransformation(transform);
-        allSensors.push_back(sensorInfoBase);
-        PXDCluster aCluster = PXDCluster(aVxdID, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
-        allPXDClusters.push_back(aCluster);
-
-        return SpacePoint(&(allPXDClusters.back()), &(allSensors.back()));
-      };
-
-      /// small lambda for testing a distance-based filter:
-      auto testDistanceFilter = [&](std::vector<FullSecID> secIDs, std::string fName, std::string cutName, double cut, bool doX, bool doY,
-      bool doZ) -> bool {
-        double divider = 0.;
-        if (doX) divider++;
-        if (doY) divider++;
-        if (doZ) divider++;
-        if (divider == 0.) B2FATAL("RawSecMapMerger::testSegmentFilters::testDistanceFilter: was used in an illegal way!");
-        double outerX = 1., outerY = 2., outerZ = 3.;
-        if (doX) outerX += cut / divider;
-        if (doY) outerY += cut / divider;
-        if (doZ) outerZ += cut / divider;
-        SpacePoint outer = getSpacePoint(secIDs.at(0).getVxdID(), outerX, outerY, outerZ);
-        SpacePoint inner = getSpacePoint(secIDs.at(1).getVxdID(), 1., 2., 3.);
-        if (segFilters.getCompactID(secIDs.at(0)) != 0 and
-        segFilters.getTwoHitFilters(secIDs.at(0), secIDs.at(1)).accept(outer, inner))
-        {
-          B2DEBUG(1, "testSegmentFilters-" << fName << ": for secCombi o/i: " << secIDs.at(0).getFullSecString() << "/" << secIDs.at(
-            1).getFullSecString() << " test " << cutName << "/" << cut << " was working fine!");
-          return true;
-        }
-        B2DEBUG(1, "testSegmentFilters-" << fName <<
-        ": forsecCombi o/i: " << secIDs.at(0).getFullSecString() <<
-        "/" << secIDs.at(1).getFullSecString() <<
-        " test " << cutName <<
-        "/" << cut <<
-        " was _not_ working! " <<
-        (segFilters.getCompactID(secIDs.at(0)) == 0 ? "OuterSector was _not_ in map!" : ""));
-        return false;
-      };
-
-      for (auto& entry : mainGraph) {
-        SubGraph<FilterType>& subGraph = entry.second;
-        const auto& filterCutsMap = subGraph.getFinalQuantileValues();
-        auto secIDs = subGraph.getID().getFullSecIDs();
-
-        {
-          // Distance3DSquared:
-          double min = filterCutsMap.at("Distance3DSquared").getMin();
-          testDistanceFilter(secIDs, "Distance3DSquared", "min", min, true, true, true);
-          double max = filterCutsMap.at("Distance3DSquared").getMax();
-          testDistanceFilter(secIDs, "Distance3DSquared", "max", max, true, true, true);
-        }
-      }
-    }
-
-
     /** does everything needed for given chainLength of sectors (e.g.: 2 -> twoHitFilters)*/
     void processSectorCombinations(const SectorMapConfig& config, VXDTFFilters<SpacePoint>* xHitFilters,
                                    unsigned secChainLength)
@@ -305,18 +233,12 @@ namespace Belle2 {
 
       B2INFO("processSectorCombinations: training finished.\n" << mainGraph.print(m_PARAMprintFullGraphs););
 
-      // TODO this is not yet capable of dealing with other than twoHitFilters. -> generalize!
       getSegmentFilters(config, mainGraph, xHitFilters, secChainLength);
 
       if (xHitFilters->size() == 0) {
         // thou shall not delete the filters!
         // delete xHitFilters;
         B2FATAL("processSectorCombinations: an empty VXDTFFilters was returned, training data did not work!");
-      }
-
-      // some testing:
-      if (secChainLength == 2) {
-        testSegmentFilters(config, mainGraph, *xHitFilters);
       }
 
       return;
@@ -362,6 +284,12 @@ namespace Belle2 {
       }
     }
 
+    /** check that the vector of FullSecIDs @param ids is meaningfull for us.
+     * if @param ids size == 2 it checks that the two sectors are not on the same
+     * layer and ladder
+     * if @param ids size == 3 it checks that both segments satisfy the same requirement
+     */
+    bool good(const std::vector< unsigned>& ids);
   };
 
 }

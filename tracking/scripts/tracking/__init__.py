@@ -454,7 +454,7 @@ def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_se
                         UseCDCHits=is_cdc_used(components))
 
 
-def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_before",
+def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_after",
                                 reco_tracks="RecoTracks",
                                 cdc_reco_tracks="CDCRecoTracks",
                                 svd_reco_tracks="SVDRecoTracks",
@@ -467,6 +467,7 @@ def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_before",
     First approach to add the CKF to the path with all the track finding related and needed
      to/for it.
     :param path: The path to add the tracking reconstruction modules to
+    :param svd_ckf_mode: when to apply the CKF (before or after VXDTF2)
     :param reco_tracks: The store array name where to output all tracks
     :param cdc_reco_tracks: The store array name where to output the cdc tracks or where you have already written them to
     :param svd_reco_tracks: The store array name where to output the svd tracks
@@ -513,8 +514,7 @@ def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_before",
 
         if add_vxdtf2:
             # Add the VXDTF2 only for SVD
-            add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks,
-                                         sectormap_file="/storage/b/fs5-mirror/jowagner/masterthesis/muon_map.root")
+            add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks)
 
             if add_merger:
                 # Add the merger for remaining CDC and newly found vxdtf2 tracks

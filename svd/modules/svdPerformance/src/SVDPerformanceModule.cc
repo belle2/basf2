@@ -260,8 +260,6 @@ void SVDPerformanceModule::event()
     if (m_is2017TBanalysis) {
       if ((tfr->getPValue() < 0.001) || (tfr->getMomentum().Mag() < 1))
         continue;
-      if (tfr->getPValue() < 0.0001)
-        continue;
     }
 
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);
@@ -348,7 +346,7 @@ void SVDPerformanceModule::event()
 
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(svdClusters[cl]);
 
-    if ((int)theRC.size() < 0)
+    if ((int)theRC.size() > 0)
       continue;
 
     VxdID::baseType theVxdID = (VxdID::baseType)svdClusters[cl]->getSensorID();

@@ -21,7 +21,7 @@ from stdLightMesons import *
 
 inputMdst('default', '../GenericB_GENSIMRECtoDST.dst.root')
 loadStdCharged()
-stdPhotons('all')
+stdPhotons('loose')  # loose list also creates 'all' list
 loadStdPi0('all')
 loadStdLoosePi0()
 loadStdKS()

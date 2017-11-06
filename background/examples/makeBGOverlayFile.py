@@ -66,7 +66,7 @@ main.add_module(arich_digitizer)
 
 # ECL digitization
 ecl_digitizer = register_module('ECLDigitizer')
-main.add_module(ecl_digitizer)
+main.add_module(ecl_digitizer, WaveformMaker=True, CompressionAlgorithm=3)
 
 # BKLM digitization
 bklm_digitizer = register_module('BKLMDigitizer')
@@ -80,7 +80,7 @@ main.add_module(eklm_digitizer)
 output = register_module('RootOutput')
 output.param('outputFileName', 'BGforOverlay.root')
 output.param('branchNames', ['PXDDigits', 'SVDDigits', 'CDCHits', 'TOPDigits',
-                             'ARICHDigits', 'ECLDsps', 'BKLMDigits', 'EKLMDigits'])
+                             'ARICHDigits', 'ECLWaveforms', 'BKLMDigits', 'EKLMDigits'])
 main.add_module(output)
 
 # Show progress of processing

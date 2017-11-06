@@ -34,6 +34,10 @@ namespace Belle2 {
   class SVDCoGTimeEstimatorModule : public Module {
   public:
 
+    /** Container for a RelationArray Lookup table */
+    typedef std::vector<const RelationElement*> RelationLookup;
+
+    /** Constructor defining the parameters */
     SVDCoGTimeEstimatorModule();
 
     virtual ~SVDCoGTimeEstimatorModule();
@@ -79,12 +83,57 @@ namespace Belle2 {
 
   protected:
 
+    /** Create lookup maps for relations
+     * FIXME: This has to be significantly simplified here, we just copy the
+     * relations, since there is a 1:1 correspondence. We don't even have to do
+     * the copying digit-by-digit.
+     *
+     * We do not use the RelationIndex as we know much more about the
+     * relations: we know the relations get created in a consolidated way by
+     * the Digitizer and that they already point in the right direction so we
+     * only need to speed up finding the correct element. We just create a
+     * vector from digit id to relationElement pointer for fast lookup
+     * @param relation RelationArray to build the lookuptable for
+     * @param lookup Lookuptable to fill
+     * @param digits number of digits in this event
+     */
+    void createRelationLookup(const RelationArray& relation, RelationLookup& lookup,
+                              size_t digits);
+
+    /** Add the relation from a given SVDShaperDigit index to a map
+       * @param lookup Lookuptable to use for the relation
+       * @param relation map to add the entries to
+       * @param index index of the SVDDigit
+       */
+    void fillRelationMap(const RelationLookup& lookup, std::map<unsigned int, float>&
+                         relation, unsigned int index);
+
+    // Relation lookups
+    /** Lookup table for SVDShaperDigit->MCParticle relation */
+    RelationLookup m_mcRelation;
+    /** Lookup table for SVDShaperDigit->SVDTrueHit relation */
+    RelationLookup m_trueRelation;
+
+    /** Name of the collection to use for the MCParticles */
+    std::string m_storeMCParticlesName;
+    /** Name of the collection to use for the SVDTrueHits */
+    std::string m_storeTrueHitsName;
     /** Name of the collection to use for the SVDShaperDigits */
     std::string m_storeShaperDigitsName;
     /** Name of the collection to use for the SVDRecoDigits */
     std::string m_storeRecoDigitsName;
     /** Name of the relation between SVDRecoDigits and SVDShaperDigits */
     std::string m_relRecoDigitShaperDigitName;
+
+    /** Name of the relation between SVDShaperDigits and MCParticles */
+    std::string m_relShaperDigitMCParticleName;
+    /** Name of the relation between SVDShaperDigits and SVDTrueHits */
+    std::string m_relShaperDigitTrueHitName;
+    /** Name of the relation between SVDRecoDigits and MCParticles */
+    std::string m_relRecoDigitMCParticleName;
+    /** Name of the relation between SVDRecoDigits and SVDTrueHits */
+    std::string m_relRecoDigitTrueHitName;
+
     /** Width of the distribution of the times after having substracted the TriggerBin and the CalibrationPeakTime */
     float m_FinalShiftWidth;
     /** Approximate ADC error on each sample */

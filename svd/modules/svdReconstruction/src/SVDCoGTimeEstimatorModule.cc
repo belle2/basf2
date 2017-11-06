@@ -11,8 +11,11 @@
 #include <svd/modules/svdReconstruction/SVDCoGTimeEstimatorModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <svd/dataobjects/SVDTrueHit.h>
 
 #include <string>
 #include "TMath.h"
@@ -53,7 +56,12 @@ SVDCoGTimeEstimatorModule::~SVDCoGTimeEstimatorModule()
 
 void SVDCoGTimeEstimatorModule::initialize()
 {
-  //Inizialization of useful store array
+  StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
+  StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  storeTrueHits.isOptional();
+  storeMCParticles.isOptional();
+
+//Inizialization of useful store array
   StoreArray<SVDShaperDigit> storeShaper(m_storeShaperDigitsName);
   storeShaper.isRequired();
 
@@ -63,16 +71,39 @@ void SVDCoGTimeEstimatorModule::initialize()
 
   RelationArray relRecoDigitShaperDigits(storeReco, storeShaper);
   relRecoDigitShaperDigits.registerInDataStore();
+  RelationArray relRecoDigitTrueHits(storeReco, storeTrueHits);
+  RelationArray relRecoDigitMCParticles(storeReco, storeMCParticles);
+  RelationArray relShaperDigitTrueHits(storeShaper, storeTrueHits);
+  RelationArray relShaperDigitMCParticles(storeShaper, storeMCParticles);
+
+  //Relations to simulation objects only if the ancestor relations exist
+  if (relShaperDigitTrueHits.isOptional())
+    relRecoDigitTrueHits.registerInDataStore();
+  if (relShaperDigitMCParticles.isOptional())
+    relRecoDigitMCParticles.registerInDataStore();
 
   //Store names to speed up creation later
   m_storeRecoDigitsName = storeReco.getName();
   m_storeShaperDigitsName = storeShaper.getName();
+  m_storeTrueHitsName = storeTrueHits.getName();
+  m_storeMCParticlesName = storeMCParticles.getName();
+
   m_relRecoDigitShaperDigitName = relRecoDigitShaperDigits.getName();
+  m_relRecoDigitTrueHitName = relRecoDigitTrueHits.getName();
+  m_relRecoDigitMCParticleName = relRecoDigitMCParticles.getName();
+  m_relShaperDigitTrueHitName = relShaperDigitTrueHits.getName();
+  m_relShaperDigitMCParticleName = relShaperDigitMCParticles.getName();
 
   B2INFO(" 1. COLLECTIONS:");
-  B2INFO(" -->  ShaperDigits:        " << m_storeShaperDigitsName);
+  B2INFO(" -->  MCParticles:        " << m_storeMCParticlesName);
+  B2INFO(" -->  Digits:             " << m_storeShaperDigitsName);
   B2INFO(" -->  RecoDigits:           " << m_storeRecoDigitsName);
-  B2INFO(" -->  RecoDigitShaperDigitRel:    " << m_relRecoDigitShaperDigitName);
+  B2INFO(" -->  TrueHits:           " << m_storeTrueHitsName);
+  B2INFO(" -->  DigitMCRel:         " << m_relShaperDigitMCParticleName);
+  B2INFO(" -->  RecoDigitMCRel:       " << m_relRecoDigitMCParticleName);
+  B2INFO(" -->  RecoDigitDigitRel:    " << m_relRecoDigitShaperDigitName);
+  B2INFO(" -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
+  B2INFO(" -->  RecoDigitTrueRel:     " << m_relRecoDigitTrueHitName);
 
 
 }
@@ -83,18 +114,39 @@ void SVDCoGTimeEstimatorModule::beginRun()
 
 void SVDCoGTimeEstimatorModule::event()
 {
-  StoreArray<SVDShaperDigit> SVDShaperDigits;
-  StoreArray<SVDRecoDigit> SVDRecoDigits;
+  StoreArray<SVDShaperDigit> storeShapers;
+  StoreArray<SVDRecoDigit> storeRecos;
 
   // If no digits, nothing to do
-  if (!SVDShaperDigits || !SVDShaperDigits.getEntries()) return;
+  if (!storeShapers || !storeShapers.getEntries()) return;
 
-  RelationArray relRecoDigitShaperDigit(SVDRecoDigits, SVDShaperDigits,
+  size_t nDigits = storeShapers.getEntries();
+
+  RelationArray relRecoDigitShaperDigit(storeRecos, storeShapers,
                                         m_relRecoDigitShaperDigitName);
   if (relRecoDigitShaperDigit) relRecoDigitShaperDigit.clear();
 
+  const StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
+  const StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
 
-  for (const SVDShaperDigit& shaper : SVDShaperDigits) {
+  RelationArray relShaperDigitMCParticle(storeShapers, storeMCParticles, m_relShaperDigitMCParticleName);
+  RelationArray relShaperDigitTrueHit(storeShapers, storeTrueHits, m_relShaperDigitTrueHitName);
+
+  RelationArray relRecoDigitMCParticle(storeRecos, storeMCParticles,
+                                       m_relRecoDigitMCParticleName);
+  if (relRecoDigitMCParticle) relRecoDigitMCParticle.clear();
+
+
+  RelationArray relRecoDigitTrueHit(storeRecos, storeTrueHits,
+                                    m_relRecoDigitTrueHitName);
+  if (relRecoDigitTrueHit) relRecoDigitTrueHit.clear();
+
+  //Build lookup tables for relations
+  createRelationLookup(relShaperDigitMCParticle, m_mcRelation, nDigits);
+  createRelationLookup(relShaperDigitTrueHit, m_trueRelation, nDigits);
+
+  //start loop on SVDSHaperDigits
+  for (const SVDShaperDigit& shaper : storeShapers) {
     m_Samples_vec = shaper.getSamples();
 
     //retrieve the VxdID, sensor and cellID of the current RecoDigit
@@ -135,15 +187,32 @@ void SVDCoGTimeEstimatorModule::event()
     }
 
     //recording of the RecoDigit
-    SVDRecoDigits.appendNew(SVDRecoDigit(shaper.getSensorID(), shaper.isUStrip(), shaper.getCellID(), m_amplitude, m_amplitudeError,
-                                         m_weightedMeanTime, m_weightedMeanTimeError, m_probabilities, m_chi2, shaper.getModeByte()));
+    storeRecos.appendNew(SVDRecoDigit(shaper.getSensorID(), shaper.isUStrip(), shaper.getCellID(), m_amplitude, m_amplitudeError,
+                                      m_weightedMeanTime, m_weightedMeanTimeError, m_probabilities, m_chi2, shaper.getModeByte()));
 
     //Add digit to the RecoDigit->ShaperDigit relation list
-    int recoDigitIndex = SVDRecoDigits.getEntries() - 1;
+    int recoDigitIndex = storeRecos.getEntries() - 1;
     vector<pair<unsigned int, float> > digit_weights;
     digit_weights.reserve(1);
     digit_weights.emplace_back(shaper.getArrayIndex(), 1.0);
     relRecoDigitShaperDigit.add(recoDigitIndex, digit_weights.begin(), digit_weights.end());
+
+    // Finally, we save the RecoDigit and its relations.
+    map<unsigned int, float> mc_relations;
+    map<unsigned int, float> truehit_relations;
+
+    // Store relations to MCParticles and SVDTrueHits
+    fillRelationMap(m_mcRelation, mc_relations, shaper.getArrayIndex());
+    fillRelationMap(m_trueRelation, truehit_relations, shaper.getArrayIndex());
+
+    //Create relations to the cluster
+    if (!mc_relations.empty()) {
+      relRecoDigitMCParticle.add(recoDigitIndex, mc_relations.begin(), mc_relations.end());
+    }
+    if (!truehit_relations.empty()) {
+      relRecoDigitTrueHit.add(recoDigitIndex, truehit_relations.begin(), truehit_relations.end());
+    }
+
   }
 }
 
@@ -212,6 +281,35 @@ float SVDCoGTimeEstimatorModule::CalculateChi2()
 
 
 
+void SVDCoGTimeEstimatorModule::createRelationLookup(const RelationArray& relation,
+                                                     RelationLookup& lookup, size_t digits)
+{
+  lookup.clear();
+  //If we don't have a relation we don't build a lookuptable
+  if (!relation) return;
+  //Resize to number of digits and set all values
+  lookup.resize(digits);
+  for (const auto& element : relation) {
+    lookup[element.getFromIndex()] = &element;
+  }
+}
+
+void SVDCoGTimeEstimatorModule::fillRelationMap(const RelationLookup& lookup,
+                                                std::map<unsigned int, float>& relation, unsigned int index)
+{
+  //If the lookup table is not empty and the element is set
+  if (!lookup.empty() && lookup[index]) {
+    const RelationElement& element = *lookup[index];
+    const unsigned int size = element.getSize();
+    //Add all Relations to the map
+    for (unsigned int i = 0; i < size; ++i) {
+      //negative weights are from ignored particles, we don't like them and
+      //thus ignore them :D
+      if (element.getWeight(i) < 0) continue;
+      relation[element.getToIndex(i)] += element.getWeight(i);
+    }
+  }
+}
 
 
 

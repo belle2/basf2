@@ -11,5 +11,6 @@
 #pragma link C++ class Belle2::GeoMaterialComponent+;
 #pragma link C++ class Belle2::GeoMaterialProperty+;
 #pragma link C++ class Belle2::GeoOpticalSurface+;
+#pragma link C++ class Belle2::MagneticFieldComponent3D+;
 
 #endif

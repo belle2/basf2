@@ -220,9 +220,7 @@ void MCTrackCandClassifierModule::event()
 {
 
 
-  BFieldMap& bfieldMap = BFieldMap::Instance();
-  TVector3 magField = bfieldMap.getBField(TVector3(0, 0, 0));
-
+  B2Vector3D magField = BFieldManager::getField(0, 0, 0) / Unit::T;
 
   B2DEBUG(1, "+++++ 1. loop on MCTrackCands");
 

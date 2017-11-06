@@ -15,7 +15,6 @@
 #include <framework/gearbox/GearDir.h> // needed for reading xml-files
 #include <framework/core/Environment.h> // getNumberProcesses
 #include <geometry/GeometryManager.h>
-#include <geometry/bfieldmap/BFieldMap.h>
 #include <tracking/dataobjects/VXDTFSecMap.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>

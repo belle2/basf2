@@ -28,8 +28,14 @@ namespace Belle2 {
   namespace CDC {
 
 
+
     /**
-     * Analysis data of CDC-TOP test two tracks case.
+     * Create QAM histograms.
+     */
+    void createQAMHist(TTree*);
+
+    /**
+     * Analysis module for CDC CR data.
      */
 
     class CDCCosmicAnalysisModule : public Module {

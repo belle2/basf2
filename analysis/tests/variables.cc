@@ -1187,89 +1187,11 @@ namespace {
 
   TEST_F(MetaVariableTest, NBDeltaIfMissing)
   {
-    DataStore::Instance().setInitializeActive(true);
-    StoreArray<PIDLikelihood>::registerPersistent();
-    StoreArray<Particle>::registerPersistent();
-    StoreArray<Track>::registerPersistent();
-    StoreArray<TrackFitResult>::registerPersistent();
-    StoreArray<PIDLikelihood> likelihood;
-    StoreArray<Particle> particles;
-    StoreArray<Track> tracks;
-    StoreArray<TrackFitResult> tfrs;
-    tracks.registerRelationTo(likelihood);
-    DataStore::Instance().setInitializeActive(false);
-
-    // create tracks and trackFitResutls
-    TRandom3 generator;
-    const float pValue = 0.5;
-    const float bField = 1.5;
-    const int charge = 1;
-    TMatrixDSym cov6(6);
-    // Generate a random put orthogonal pair of vectors in the r-phi plane
-    TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
-    // Add a random z component
-    TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
-
-    unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
-    tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
-    Track mytrack;
-    mytrack.setTrackFitResultIndex(Const::electron, 0);
-    Track* savedTrack1 = tracks.appendNew(mytrack);
-    Track* savedTrack2 = tracks.appendNew(mytrack);
-    Track* savedTrack3 = tracks.appendNew(mytrack);
-    Track* savedTrack4 = tracks.appendNew(mytrack);
-
-    auto* l1 = likelihood.appendNew();
-    l1->setLogLikelihood(Const::TOP, Const::electron, 0.5);
-    l1->setLogLikelihood(Const::ARICH, Const::electron, 0.5);
-    l1->setLogLikelihood(Const::ECL, Const::electron, 0.5);
-    l1->setLogLikelihood(Const::TOP, Const::pion, 0.5);
-    l1->setLogLikelihood(Const::ARICH, Const::pion, 0.5);
-    l1->setLogLikelihood(Const::ECL, Const::pion, 0.5);
-    savedTrack1->addRelationTo(l1);
-
-    auto* l2 = likelihood.appendNew();
-    l2->setLogLikelihood(Const::TOP, Const::electron, 0.5);
-    l2->setLogLikelihood(Const::ECL, Const::electron, 0.5);
-    l2->setLogLikelihood(Const::TOP, Const::pion, 0.5);
-    l2->setLogLikelihood(Const::ECL, Const::pion, 0.5);
-    savedTrack2->addRelationTo(l2);
-
-    auto* l3 = likelihood.appendNew();
-    l3->setLogLikelihood(Const::TOP, Const::electron, 0.5);
-    l3->setLogLikelihood(Const::TOP, Const::pion, 0.5);
-    savedTrack3->addRelationTo(l3);
-
-    auto* l4 = likelihood.appendNew();
-    l4->setLogLikelihood(Const::ECL, Const::electron, 0.5);
-    l4->setLogLikelihood(Const::ECL, Const::pion, 0.5);
-    savedTrack4->addRelationTo(l4);
-
-    auto* p1 = particles.appendNew(savedTrack1, Const::electron);
-    auto* p2 = particles.appendNew(savedTrack2, Const::electron);
-    auto* p3 = particles.appendNew(savedTrack3, Const::electron);
-    auto* p4 = particles.appendNew(savedTrack4, Const::electron);
-
-    EXPECT_B2FATAL(Manager::Instance().getVariable("NBDeltaIfMissing(TOP, 11, 1)"));
-    EXPECT_B2FATAL(Manager::Instance().getVariable("NBDeltaIfMissing(ECL, 11)"));
-
+    //Variable got removed, test for absence
     const Manager::Var* var = Manager::Instance().getVariable("NBDeltaIfMissing(TOP, 11)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), 0.5);
-    EXPECT_FLOAT_EQ(var->function(p2), 0.5);
-    EXPECT_FLOAT_EQ(var->function(p3), 0.5);
-    EXPECT_FLOAT_EQ(var->function(p4), -999.0);
-
+    ASSERT_EQ(var, nullptr);
     var = Manager::Instance().getVariable("NBDeltaIfMissing(ARICH, 11)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(p1), 0.5);
-    EXPECT_FLOAT_EQ(var->function(p2), -999.0);
-    EXPECT_FLOAT_EQ(var->function(p3), -999.0);
-    EXPECT_FLOAT_EQ(var->function(p4), -999.0);
-
+    ASSERT_EQ(var, nullptr);
   }
 
   TEST_F(MetaVariableTest, matchedMC)

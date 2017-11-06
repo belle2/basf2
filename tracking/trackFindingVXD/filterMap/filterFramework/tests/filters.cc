@@ -262,9 +262,13 @@ namespace VXDTFfilterTest {
   {
     //build an dummy filter which is unobserved (VoidObserver)
     auto dummyFilter = (
+                         // cppcheck-suppress compareBoolExpressionWithInt
                          (-10. <= SquaredDistance3D() <= 10.) &&
+                         // cppcheck-suppress compareBoolExpressionWithInt
                          ((-100. <=  SquaredDistance2Dxy() <= -10.) ||    // put 2nd pair of parentheses to silence warning
+                          // cppcheck-suppress compareBoolExpressionWithInt
                           (-10. <= SquaredDistance1Dx() <= 10.)) &&
+                         // cppcheck-suppress compareBoolExpressionWithInt
                          !(-10. <= SquaredDistance1Dx() <= -10.)
                        );
 
@@ -371,12 +375,14 @@ namespace VXDTFfilterTest {
     EXPECT_FALSE(filterMin2.accept(x1, x2));
     EXPECT_TRUE(filterMin2.accept(x1, x4));
 
+    // cppcheck-suppress compareBoolExpressionWithInt
     auto filterRange = (0. < SquaredDistance3D() < 1);
     EXPECT_FALSE(filterRange.accept(x1, x1));
     EXPECT_TRUE(filterRange.accept(x1, x2));
     EXPECT_FALSE(filterRange.accept(x1, x3));
     EXPECT_FALSE(filterRange.accept(x1, x4));
 
+    // cppcheck-suppress compareBoolExpressionWithInt
     auto filterClosedRange = (0. <= SquaredDistance3D() <= 1);
     EXPECT_TRUE(filterClosedRange.accept(x1, x1));
     EXPECT_TRUE(filterClosedRange.accept(x1, x2));

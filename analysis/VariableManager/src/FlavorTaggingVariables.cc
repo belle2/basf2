@@ -884,16 +884,16 @@ namespace Belle2 {
         auto func = [particleListName, extraInfoName](const Particle * particle) -> double {
           if (!(extraInfoName == "isRightTrack(Electron)" || extraInfoName == "isRightTrack(IntermediateElectron)" || extraInfoName == "isRightTrack(Muon)" || extraInfoName == "isRightTrack(IntermediateMuon)"
           || extraInfoName == "isRightTrack(KinLepton)" || extraInfoName == "isRightTrack(IntermediateKinLepton)" || extraInfoName == "isRightTrack(Kaon)"
-          || extraInfoName == "isRightTrack(SlowPion)" || extraInfoName == "isRightTrack(FastPion)" || extraInfoName == "isRightTrack(MaximumPstar)" || extraInfoName == "isRightTrack(Lambda)"
+          || extraInfoName == "isRightTrack(SlowPion)" || extraInfoName == "isRightTrack(FastHadron)" || extraInfoName == "isRightTrack(MaximumPstar)" || extraInfoName == "isRightTrack(Lambda)"
           || extraInfoName == "isRightCategory(Electron)" || extraInfoName == "isRightCategory(IntermediateElectron)" || extraInfoName == "isRightCategory(Muon)" || extraInfoName == "isRightCategory(IntermediateMuon)"
           || extraInfoName == "isRightCategory(KinLepton)" || extraInfoName == "isRightCategory(IntermediateKinLepton)" || extraInfoName == "isRightCategory(Kaon)"
-          || extraInfoName == "isRightCategory(SlowPion)" || extraInfoName == "isRightCategory(FastPion)" || extraInfoName == "isRightCategory(KaonPion)" || extraInfoName == "isRightCategory(Lambda)"
+          || extraInfoName == "isRightCategory(SlowPion)" || extraInfoName == "isRightCategory(FastHadron)" || extraInfoName == "isRightCategory(KaonPion)" || extraInfoName == "isRightCategory(Lambda)"
           || extraInfoName == "isRightCategory(MaximumPstar)" || extraInfoName == "isRightCategory(FSC)"))
           {
             B2FATAL("hasHighestProbInCat: Not available category" << extraInfoName <<
-            ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda."
+            ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda."
             << endl <<
-            "The possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+            "The possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
             return 0.0;
           }
 
@@ -946,16 +946,16 @@ namespace Belle2 {
         auto func = [particleListName, extraInfoName](const Particle*) -> double {
           if (!(extraInfoName == "isRightTrack(Electron)" || extraInfoName == "isRightTrack(IntermediateElectron)" || extraInfoName == "isRightTrack(Muon)" || extraInfoName == "isRightTrack(IntermediateMuon)"
           || extraInfoName == "isRightTrack(KinLepton)" || extraInfoName == "isRightTrack(IntermediateKinLepton)" || extraInfoName == "isRightTrack(Kaon)"
-          || extraInfoName == "isRightTrack(SlowPion)" || extraInfoName == "isRightTrack(FastPion)" || extraInfoName == "isRightTrack(MaximumPstar)" || extraInfoName == "isRightTrack(Lambda)"
+          || extraInfoName == "isRightTrack(SlowPion)" || extraInfoName == "isRightTrack(FastHadron)" || extraInfoName == "isRightTrack(MaximumPstar)" || extraInfoName == "isRightTrack(Lambda)"
           || extraInfoName == "isRightCategory(Electron)" || extraInfoName == "isRightCategory(IntermediateElectron" || extraInfoName == "isRightCategory(Muon)" || extraInfoName == "isRightCategory(IntermediateMuon)"
           || extraInfoName == "isRightCategory(KinLepton)" || extraInfoName == "isRightCategory(IntermediateKinLepton)" || extraInfoName == "isRightCategory(Kaon)"
-          || extraInfoName == "isRightCategory(SlowPion)" || extraInfoName == "isRightCategory(FastPion)" || extraInfoName == "isRightCategory(KaonPion)" || extraInfoName == "isRightCategory(Lambda)"
+          || extraInfoName == "isRightCategory(SlowPion)" || extraInfoName == "isRightCategory(FastHadron)" || extraInfoName == "isRightCategory(KaonPion)" || extraInfoName == "isRightCategory(Lambda)"
           || extraInfoName == "isRightCategory(MaximumPstar)" || extraInfoName == "isRightCategory(FSC)"))
           {
             B2FATAL("HighestProbInCat: Not available category" << extraInfoName <<
-            ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda."
+            ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda."
             << endl <<
-            "The possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+            "The possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
             return 0.0;
           }
 
@@ -1008,7 +1008,7 @@ namespace Belle2 {
                                                "IntermediateKinLepton",// 5
                                                "Kaon",                 // 6
                                                "SlowPion",             // 7
-                                               "FastPion",             // 8
+                                               "FastHadron",             // 8
                                                "Lambda",               // 9
                                                "mcAssociated"          // 10
                                          };
@@ -1019,7 +1019,7 @@ namespace Belle2 {
 
         if (index == -1) {
           B2FATAL("isRightTrack: Not available category " << particleName <<
-                  ". The possibilities are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion and Lambda");
+                  ". The possibilities are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron and Lambda");
         }
 
         auto func = [index](const Particle * particle) -> double {
@@ -1222,7 +1222,7 @@ namespace Belle2 {
                                               "IntermediateKinLepton",// 5
                                               "Kaon",                 // 6
                                               "SlowPion",             // 7
-                                              "FastPion",             // 8
+                                              "FastHadron",             // 8
                                               "KaonPion",             // 9
                                               "MaximumPstar",         // 10
                                               "FSC",                  // 11
@@ -1236,7 +1236,7 @@ namespace Belle2 {
 
         if (index == -1) {
           B2FATAL("isRightCategory: Not available category " << particleName <<
-                  ". The possibilities are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+                  ". The possibilities are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
         }
 
         auto func = [index](const Particle * particle) -> double {
@@ -1475,7 +1475,7 @@ namespace Belle2 {
                      && mcPDG == 211 && mothersPDG.size() > 1 && mothersPDG[0] == 413 && mothersPDG[1] == 511)
           {
             return 1.0;
-          } else if (index == 8 && qTarget == qMC // FastPion
+          } else if (index == 8 && qTarget == qMC // FastHadron
                      && (mcPDG == 211 || mcPDG == 321) && isQQbarMesonInChain == false && (mothersPDG[0] == 511 || (mothersPDG.rbegin()[0] == 511
                          && (isB0DaughterConservingFlavor == true || isHadronSingleTauDaughter == true))))
           {
@@ -1525,7 +1525,7 @@ namespace Belle2 {
                                                              "isRightTrack(IntermediateKinLepton)",// 5
                                                              "isRightTrack(Kaon)",                 // 6
                                                              "isRightTrack(SlowPion)",             // 7
-                                                             "isRightTrack(FastPion)",             // 8
+                                                             "isRightTrack(FastHadron)",             // 8
                                                              "isRightTrack(MaximumPstar)",         // 9
                                                              "isRightTrack(Lambda)",                // 10
                                                              "isRightCategory(Electron)",             // 11
@@ -1536,7 +1536,7 @@ namespace Belle2 {
                                                              "isRightCategory(IntermediateKinLepton)",// 16
                                                              "isRightCategory(Kaon)",                 // 17
                                                              "isRightCategory(SlowPion)",             // 18
-                                                             "isRightCategory(FastPion)",             // 19
+                                                             "isRightCategory(FastHadron)",             // 19
                                                              "isRightCategory(MaximumPstar)",         // 20
                                                              "isRightCategory(Lambda)",                // 21
                                                              "isRightCategory(KaonPion)",             // 22
@@ -1554,16 +1554,16 @@ namespace Belle2 {
 
         if (indexRanking == -1) {
           B2FATAL("QpOf: Not available category " << rankingExtraInfo <<
-                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda"
+                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
                   <<
-                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
         }
 
         if (indexOutput == -1) {
           B2FATAL("QpOf: Not available category " << outputExtraInfo <<
-                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda"
+                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
                   <<
-                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
         }
 
 
@@ -1642,7 +1642,7 @@ namespace Belle2 {
                                                              "isRightTrack(IntermediateKinLepton)",// 5
                                                              "isRightTrack(Kaon)",                 // 6
                                                              "isRightTrack(SlowPion)",             // 7
-                                                             "isRightTrack(FastPion)",             // 8
+                                                             "isRightTrack(FastHadron)",             // 8
                                                              "isRightTrack(MaximumPstar)",         // 9
                                                              "isRightTrack(Lambda)",                // 10
                                                              "isRightCategory(Electron)",             // 11
@@ -1653,7 +1653,7 @@ namespace Belle2 {
                                                              "isRightCategory(IntermediateKinLepton)",// 16
                                                              "isRightCategory(Kaon)",                 // 17
                                                              "isRightCategory(SlowPion)",             // 18
-                                                             "isRightCategory(FastPion)",             // 19
+                                                             "isRightCategory(FastHadron)",             // 19
                                                              "isRightCategory(MaximumPstar)",         // 20
                                                              "isRightCategory(Lambda)",                // 21
                                                              "isRightCategory(KaonPion)",             // 22
@@ -1671,16 +1671,16 @@ namespace Belle2 {
 
         if (indexRanking == -1) {
           B2FATAL("weightedQpOf: Not available category " << rankingExtraInfo <<
-                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda"
+                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
                   <<
-                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
         }
 
         if (indexOutput == -1) {
           B2FATAL("weightedQpOf: Not available category " << outputExtraInfo <<
-                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda"
+                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
                   <<
-                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
         }
 
         auto func = [particleListName, indexOutput, indexRanking, rankingExtraInfo, availableExtraInfos](const Particle*) -> double {
@@ -1761,10 +1761,10 @@ namespace Belle2 {
         auto categoryName = arguments[0];
         auto func = [categoryName](const Particle*) -> double {
           if (!(categoryName == "Electron" || categoryName == "IntermediateElectron" || categoryName == "Muon" ||  categoryName == "IntermediateMuon" || categoryName == "KinLepton" || categoryName == "IntermediateKinLepton" || categoryName == "Kaon"
-          || categoryName == "SlowPion" ||  categoryName == "FastPion" || categoryName == "KaonPion" || categoryName == "Lambda" || categoryName == "MaximumPstar" ||  categoryName == "FSC"))
+          || categoryName == "SlowPion" ||  categoryName == "FastHadron" || categoryName == "KaonPion" || categoryName == "Lambda" || categoryName == "MaximumPstar" ||  categoryName == "FSC"))
           {
             B2FATAL("isCategoryTrue: Not available category" << categoryName <<
-            ". The possibilities for the category name are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+            ". The possibilities for the category name are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
             return 0.0;
           }
 
@@ -1825,10 +1825,10 @@ namespace Belle2 {
         auto categoryName = arguments[0];
         auto func = [categoryName](const Particle*) -> double {
           if (!(categoryName == "Electron" || categoryName == "IntermediateElectron" || categoryName == "Muon" ||  categoryName == "IntermediateMuon" || categoryName == "KinLepton" || categoryName == "IntermediateKinLepton" || categoryName == "Kaon"
-          || categoryName == "SlowPion" ||  categoryName == "FastPion" || categoryName == "KaonPion" || categoryName == "Lambda" || categoryName == "MaximumPstar" ||  categoryName == "FSC"))
+          || categoryName == "SlowPion" ||  categoryName == "FastHadron" || categoryName == "KaonPion" || categoryName == "Lambda" || categoryName == "MaximumPstar" ||  categoryName == "FSC"))
           {
             B2FATAL("isCategoryTrue: Not available category" << categoryName <<
-            ". The possibilities for the category name are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+            ". The possibilities for the category name are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
             return 0.0;
           }
 

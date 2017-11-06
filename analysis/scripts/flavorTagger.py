@@ -137,11 +137,11 @@ AvailableCategories = {
         'SlowPion',
         'QpOf(pi+:inRoe, isRightCategory(SlowPion), isRightCategory(SlowPion))',
         7],
-    'FastPion': [
+    'FastHadron': [
         'pi+:inRoe',
-        'FastPion',
-        'FastPion',
-        'QpOf(pi+:inRoe, isRightCategory(FastPion), isRightCategory(FastPion))',
+        'FastHadron',
+        'FastHadron',
+        'QpOf(pi+:inRoe, isRightCategory(FastHadron), isRightCategory(FastHadron))',
         8],
     'Lambda': [
         'Lambda0:inRoe',
@@ -181,7 +181,7 @@ def WhichCategories(categories=[
     'KinLepton',
     'Kaon',
     'SlowPion',
-    'FastPion',
+    'FastHadron',
     'Lambda',
     'FSC',
     'MaximumPstar',
@@ -196,7 +196,8 @@ def WhichCategories(categories=[
                 )
         B2FATAL(
             'Flavor Tagger: Possible categories are  "Electron", "IntermediateElectron", "Muon", "IntermediateMuon", '
-            '"KinLepton", "IntermediateKinLepton", "Kaon", "SlowPion", "FastPion", "Lambda", "FSC", "MaximumPstar" or "KaonPion" ')
+            '"KinLepton", "IntermediateKinLepton", "Kaon", "SlowPion", "FastHadron",'
+            '"Lambda", "FSC", "MaximumPstar" or "KaonPion" ')
     categoriesCombination = []
     for category in categories:
         if category in AvailableCategories:
@@ -217,7 +218,7 @@ def WhichCategories(categories=[
         else:
             B2FATAL('Flavor Tagger: ' + category + ' is not a valid category name given')
             B2FATAL('Flavor Tagger: Available categories are  "Electron", "IntermediateElectron", '
-                    '"Muon", "IntermediateMuon", "KinLepton", "IntermediateKinLepton", "Kaon", "SlowPion", "FastPion", '
+                    '"Muon", "IntermediateMuon", "KinLepton", "IntermediateKinLepton", "Kaon", "SlowPion", "FastHadron", '
                     '"Lambda", "FSC", "MaximumPstar" or "KaonPion" ')
     global categoriesCombinationCode
     categoriesCombinationCode = 'CatCode'
@@ -349,7 +350,7 @@ def setVariables():
         'distance',
         'chiProb'
     ]
-    variables['FastPion'] = variables['SlowPion']
+    variables['FastHadron'] = variables['SlowPion']
     variables['Lambda'] = [
         'lambdaFlavor',
         'NumberOfKShortsInRoe',
@@ -835,7 +836,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
 def flavorTagger(
     particleLists=[],
     mode='Expert',
-    weightFiles='B2JpsiKs_muBGx0',
+    weightFiles='B2JpsiKs_muBGx1',
     workingDirectory='.',
     combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
     categories=[
@@ -847,7 +848,7 @@ def flavorTagger(
         'IntermediateKinLepton',
         'Kaon',
         'SlowPion',
-        'FastPion',
+        'FastHadron',
         'Lambda',
         'FSC',
         'MaximumPstar',
@@ -867,7 +868,7 @@ def flavorTagger(
 
       @param particleLists                     The ROEs for flavor tagging are selected from the given particle lists.
       @param mode                              The available modes are "Sampler", "Teacher" or "Expert".
-      @param weightFiles                       Weight files name. Default= "B2JpsiKs_muBGx0". Use 'B2JpsiKs_muBGx1' with BGx1 MC.
+      @param weightFiles                       Weight files name. Default= "B2JpsiKs_muBGx1". Use 'B2JpsiKs_muBGx0' with BGx0 MC.
       @param workingDirectory                  Path to the directory containing the FlavorTagging/ folder.
       @param combinerMethods                   MVAs for the combiner: 'TMVA-FBDT' or 'FANN-MLP'. Both used by default.
       @param categories                        Categories used for flavor tagging. By default all are used.

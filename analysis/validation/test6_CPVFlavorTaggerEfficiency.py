@@ -78,7 +78,7 @@ categories = [
     'SlowPion',
     'FSC',
     'MaximumPstar',
-    'FastPion',
+    'FastHadron',
     'Lambda']
 
 

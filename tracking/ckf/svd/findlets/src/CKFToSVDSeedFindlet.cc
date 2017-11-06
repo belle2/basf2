@@ -76,6 +76,7 @@ void CKFToSVDSeedFindlet::beginEvent()
   m_relations.clear();
 
   m_results.clear();
+  m_filteredResults.clear();
 }
 
 void CKFToSVDSeedFindlet::apply()
@@ -95,14 +96,14 @@ void CKFToSVDSeedFindlet::apply()
     return result.getHits().empty();
   });
 
-  m_overlapResolver.apply(m_results);
+  m_overlapResolver.apply(m_results, m_filteredResults);
 
-  m_unusedTracksAdder.apply(m_results);
-  m_dataHandler.store(m_results);
+  m_unusedTracksAdder.apply(m_filteredResults);
+  m_dataHandler.store(m_filteredResults);
 
   // Reassign the space points according to the new results
   for (const SpacePoint* spacePoint : m_spacePointVector) {
     spacePoint->setAssignmentState(false);
   }
-  m_spacePointTagger.apply(m_results, m_spacePointVector);
+  m_spacePointTagger.apply(m_filteredResults, m_spacePointVector);
 }

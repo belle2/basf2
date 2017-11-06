@@ -22,10 +22,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/core/HistoModule.h>
-#include <pxd/reconstruction/HitCorrector.h>
-#include <pxd/geometry/SensorInfo.h>
-#include <vector>
-#include <TH2F.h>
+#include <TH1F.h>
 
 namespace Belle2 {
 

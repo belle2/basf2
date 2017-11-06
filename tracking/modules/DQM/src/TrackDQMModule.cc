@@ -10,20 +10,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <vxd/geometry/GeoCache.h>
-#include <pxd/geometry/SensorInfo.h>
 #include <genfit/MeasurementOnPlane.h>
 #include <tracking/modules/DQM/TrackDQMModule.h>
-#include <pxd/reconstruction/PXDClusterShape.h>
-#include <pxd/reconstruction/PXDRecoHit.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <pxd/dataobjects/PXDFrame.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
-#include <TFile.h>
-#include <pxd/reconstruction/HitCorrector.h>
 
 #include <framework/database/DBObjPtr.h>
 
@@ -31,12 +23,8 @@
 #include <TVectorD.h>
 
 using namespace Belle2;
-using namespace Belle2::PXD;
 using namespace std;
 using boost::format;
-
-//class PXDClusterShapeCalibrationAlgorithm;
-
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -191,7 +179,6 @@ void TrackDQMModule::beginRun()
 
 void TrackDQMModule::event()
 {
-  const StoreArray<PXDFrame> storeFrames(m_storeFramesName);
   StoreArray<RecoTrack> recotracks(m_storeRecoTrackName);
   int iTrack = 0;
   int iTrackVXD = 0;

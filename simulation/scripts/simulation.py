@@ -131,7 +131,7 @@ def add_simulation(
 
     # detector geometry
     if 'Geometry' not in path:
-        geometry = register_module('Geometry')
+        geometry = register_module('Geometry', useDB=True)
         if components:
             geometry.param('components', components)
         path.add_module(geometry)

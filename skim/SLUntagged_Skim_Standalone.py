@@ -20,13 +20,14 @@ import sys
 import os
 import glob
 
-inputMdstList('default', fileList)
 
 fileList = \
     ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000001/s00/e0001/4S/r00001/mixed/sub00/' +
      'mdst_000001_prod00000001_task00000001.root'
 
      ]
+inputMdstList('default', fileList)
+
 stdPhotons('loose')
 stdPi0s('loose')
 loadStdCharged()

@@ -216,6 +216,10 @@ bool LocalDatabase::addPayload(const std::string& name, const std::string& fileN
     return false;
   }
 
+  if (!fs::exists(m_payloadDir)) {
+    fs::create_directories(m_payloadDir);
+  }
+
   // get lock for write access to database file
   FileSystem::Lock lock(m_absFileName);
   if (!lock.lock()) {

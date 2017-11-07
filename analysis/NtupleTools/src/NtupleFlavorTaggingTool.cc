@@ -34,7 +34,7 @@ void NtupleFlavorTaggingTool::setupTree()
   //string method("");
 
   const char* categories[] = { "Muon",  "IntermediateMuon", "Electron", "IntermediateElectron", "KinLepton",
-                               "IntermediateKinLepton", "Kaon", "SlowPion", "FastPion", "Lambda", "FSC", "MaximumPstar", "KaonPion"
+                               "IntermediateKinLepton", "Kaon", "SlowPion", "FastHadron", "Lambda", "FSC", "MaximumPstar", "KaonPion"
                              };
 
   for (auto& category : categories) {

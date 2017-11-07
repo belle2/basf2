@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/ckf/svd/filters/results/SVDResultFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   using ChooseableSVDResultFilter = TrackFindingCDC::ChooseableFilter<SVDResultFilterFactory>;

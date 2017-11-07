@@ -58,7 +58,7 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("cdcRawHitWaveFormName", m_cdcRawHitWaveFormName, "Name of the CDCRawHit (Raw data mode).", string(""));
   addParam("cdcRawHitName", m_cdcRawHitName, "Name of the CDCRawHit (Suppressed mode).", string(""));
   addParam("cdcHitName", m_cdcHitName, "Name of the CDCHit List name..", string(""));
-  addParam("fadcThreshold", m_fadcThreshold, "Threshold count.", 2);
+  addParam("fadcThreshold", m_fadcThreshold, "Threshold count.", 1);
 
   addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string(""));
   addParam("enableStoreCDCRawHit", m_enableStoreCDCRawHit, "Enable to store to the CDCRawHit object", false);

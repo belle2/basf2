@@ -65,8 +65,8 @@ def get_path(
         path.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
 
     if doAnalysis:
-        ana.fillParticleList('mu+:bbmu', 'muid > 0.1 and useLabFrame(p) > 0.5', True, path)
-        ana.fillParticleList('mu+:qed', 'muid > 0.1 and useLabFrame(p) > 2.', True, path)
+        ana.fillParticleList('mu+:bbmu', 'muonID > 0.1 and useLabFrame(p) > 0.5', True, path)
+        ana.fillParticleList('mu+:qed', 'muonID > 0.1 and useLabFrame(p) > 2.', True, path)
         ana.reconstructDecay('Z0:mumu -> mu-:qed mu+:qed', '', writeOut=True, path=path)
         ana.vertexRaveDaughtersUpdate('Z0:mumu', 0.0, path=path, constraint='ipprofile')
 

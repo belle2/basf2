@@ -111,6 +111,9 @@ namespace Belle2 {
   DEFINE_UNIT_NAME(kg_mm3  , Unit::kg_cm3 / Unit::mm3, "kg/mm3"); /**< [kg/mm^3] */
 
   DEFINE_UNIT(T  , Unit::V * Unit::s / Unit::m2); /**< Standard of [magnetic field] */
+  DEFINE_UNIT(mT , Unit::T * 1e-3); /** < [millitesla] */
+  DEFINE_UNIT(Gauss , Unit::T * 1e-4); /** < [Gauss] */
+  DEFINE_UNIT(kGauss , Unit::Gauss * 1e3); /** < [kiloGauss] */
 
   double Unit::convertValue(double value, const std::string& unitString)
   {

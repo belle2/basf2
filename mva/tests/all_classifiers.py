@@ -13,7 +13,7 @@ import shutil
 
 variables = ['p', 'pz', 'daughter(0, p)', 'daughter(0, pz)', 'daughter(1, p)', 'daughter(1, pz)',
              'chiProb', 'dr', 'dz', 'daughter(0, dr)', 'daughter(1, dr)', 'daughter(0, chiProb)', 'daughter(1, chiProb)',
-             'daughter(0, Kid)', 'daughter(0, piid)', 'daughterAngle(0, 1)']
+             'daughter(0, kaonID)', 'daughter(0, pionID)', 'daughterAngle(0, 1)']
 
 if __name__ == "__main__":
 

@@ -20,7 +20,7 @@ else:
 
 inputMdstList('MC7', [filename])
 
-fillParticleLists([('K-', 'Kid > 0.2'), ('pi+', 'piid > 0.2')])
+fillParticleLists([('K-', 'kaonID > 0.2'), ('pi+', 'pionID > 0.2')])
 reconstructDecay('D0 -> K- pi+', '1.750 < M < 1.95')
 matchMCTruth('D0')
 
@@ -28,7 +28,7 @@ matchMCTruth('D0')
 analysis_main.add_module('VariablesToNtuple',
                          particleList='D0',
                          variables=['dM', 'isSignal', 'mcErrors', 'p', 'E',
-                                    'daughter(0, Kid)', 'daughter(1, piid)'],
+                                    'daughter(0, kaonID)', 'daughter(1, pionID)'],
                          fileName='CandidateVariables.root')
 
 # If the particle list is empty one row per event is written to the Ntuple,

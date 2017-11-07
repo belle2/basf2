@@ -59,7 +59,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
         if fit_tracks:
             add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
-                                            additionalTrackFitHypotheses=additionalTrackFitHypotheses,
+                                            trackFitHypotheses=additionalTrackFitHypotheses,
                                             reco_tracks=reco_tracks)
 
 
@@ -161,7 +161,7 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use
                                 use_second_cdc_hits=use_second_cdc_hits)
 
 
-def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, additionalTrackFitHypotheses=None,
+def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, trackFitHypotheses=None,
                                     reco_tracks="RecoTracks"):
     """
     Helper function to add the modules performing the
@@ -179,8 +179,14 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, ad
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks).set_name(
         "Combined_DAFRecoFitter")
     # create Belle2 Tracks from the genfit Tracks
-    path.add_module('TrackCreator', defaultPDGCode=211, recoTrackColName=reco_tracks,
-                    additionalPDGCodes=[13, 321, 2212] if additionalTrackFitHypotheses is None else additionalTrackFitHypotheses)
+    # The following particle hypothesis will be fitted: Pion, Kaon and Proton
+    # Muon fit is working but gives very similar as the Pion due to the closeness of masses
+    # -> therefore not in the default fit list
+    # Electron fit has as systematic bias and therefore not done here. Therefore, pion fits
+    # will be used for electrons which gives a better result as GenFit's current electron
+    # implementation.
+    path.add_module('TrackCreator', recoTrackColName=reco_tracks,
+                    pdgCodes=[211, 321, 2212] if trackFitHypotheses is None else trackFitHypotheses)
     # V0 finding
     path.add_module('V0Finder', RecoTrackColName=reco_tracks)
 
@@ -267,9 +273,9 @@ def add_cdc_cr_track_fit_and_track_creator(path, components=None,
 
     # Create Belle2 Tracks from the genfit Tracks
     path.add_module('TrackCreator',
+                    pdgCodes=[13],
                     recoTrackColName=reco_tracks,
                     trackColName=tracks,
-                    defaultPDGCode=13,
                     useClosestHitToIP=True,
                     useBFieldAtHit=True
                     )
@@ -384,7 +390,7 @@ def add_track_finding(
                 add_vxd_track_finding(path, components=["SVD"], reco_tracks=svd_reco_tracks)
 
     if use_svd and use_cdc:
-        if use_pxd or use_cdc:
+        if use_pxd:
             # we will later have to merge those, so we can not output into the final store array already
             svd_cdc_reco_tracks = "SVDCDCRecoTracks"
         else:
@@ -447,7 +453,7 @@ def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_se
                         UseCDCHits=is_cdc_used(components))
 
 
-def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_before",
+def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_after",
                                 reco_tracks="RecoTracks",
                                 cdc_reco_tracks="CDCRecoTracks",
                                 svd_reco_tracks="SVDRecoTracks",
@@ -460,6 +466,7 @@ def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_before",
     First approach to add the CKF to the path with all the track finding related and needed
      to/for it.
     :param path: The path to add the tracking reconstruction modules to
+    :param svd_ckf_mode: when to apply the CKF (before or after VXDTF2)
     :param reco_tracks: The store array name where to output all tracks
     :param cdc_reco_tracks: The store array name where to output the cdc tracks or where you have already written them to
     :param svd_reco_tracks: The store array name where to output the svd tracks
@@ -506,8 +513,7 @@ def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_before",
 
         if add_vxdtf2:
             # Add the VXDTF2 only for SVD
-            add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks,
-                                         sectormap_file="/storage/b/fs5-mirror/jowagner/masterthesis/muon_map.root")
+            add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks)
 
             if add_merger:
                 # Add the merger for remaining CDC and newly found vxdtf2 tracks
@@ -741,7 +747,7 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
                     hitFilter="sensor",
                     seedFilter="distance",
 
-                    enableOverlapResolving=False,
+                    enableOverlapResolving=True,
 
                     **module_parameters)
 
@@ -975,7 +981,7 @@ def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", compo
 
 
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
-                                 useTwoStepSelection=False, sectormap_file=None, PXDminSVDSPs=3):
+                                 useTwoStepSelection=True, sectormap_file=None, PXDminSVDSPs=3):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -1096,6 +1102,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     cellOmat.param('strictSeeding', True)
     cellOmat.param('setFamilies', useTwoStepSelection)
     cellOmat.param('selectBestPerFamily', useTwoStepSelection)
+    cellOmat.param('xBestPerFamily', 5)
     path.add_module(cellOmat)
 
     if(useTwoStepSelection):

@@ -5,17 +5,17 @@
 <header>
   <input>../1120240010.ntup.root</input>
   <output>1120240010_Validation.root</output>
-  <contact>Sam Cunliffe; sam.cunliffe@desy.de</contact>
+  <contact>Sam Cunliffe; sam.cunliffe@desy.de,saurabhsandilya@gmail.com</contact>
 </header>
 """
 
-# Validation plotting script for event type: 112024001
+# Validation plotting script for event type: 1120240010
 # i.e. B0 -> K*0 e+ e-
 #            |
 #            +-> K+ pi-
 #
 # Contributors: Sam Cunliffe (October 2017)
-
+#               Saurabh Sandilya (Nov 2017)
 from ROOT import TFile, TTree, TH1F, TNamed
 
 
@@ -52,7 +52,7 @@ hmbc = TH1F("hmbc", title, 180, 5.2, 5.29)
 hmbc.SetXTitle("M_{bc} (GeV/c^{2})")
 tree.Project("hmbc", "B0_mbc")
 
-hdeltae = TH1F("hdeltae", title, 100, -0.5, 0.5)
+hdeltae = TH1F("hdeltae", title, 100, -0.2, 0.2)
 hdeltae.SetXTitle("#Delta E (GeV)")
 tree.Project("hdeltae", "B0_deltae")
 
@@ -65,15 +65,15 @@ hq2.SetXTitle("q^{2} (GeV^{2}/c^{4})")
 tree.Project("hq2", inv_mass_sq('B0_e0', 'B0_e1'))
 
 # add meaningful information to the histograms
-dmbc = TNamed("Description", "Reconstructed M_{bc} distribution for B^{0}#to K*(892)^{0}e^{+}e^{-} decays.")
-cmbc = TNamed("Check", "Consistent shape, centred at 0, longer tail on right")
+dmbc = TNamed("Description", "Reconstructed Mbc distribution for B0 -> K*(892)^{0}e+e- decays.")
+cmbc = TNamed("Check", "Distribution should be centred at B^{0} mass. Tail at low mass")
 pmbc = TNamed("Contact", contactperson)
 hmbc.GetListOfFunctions().Add(dmbc)
 hmbc.GetListOfFunctions().Add(cmbc)
 hmbc.GetListOfFunctions().Add(pmbc)
 
-ddeltae = TNamed("Description", "Reconstructed #Delta E distribution for B^{0}#to K*(892)^{0}e^{+}e^{-} decays.")
-cdeltae = TNamed("Check", "Consistent shape, centred at 0, longer tail on right")
+ddeltae = TNamed("Description", "Reconstructed Delta E distribution for B0 -> K*(892)^{0}e+e- decays.")
+cdeltae = TNamed("Check", "Consistent shape, centred at 0, longer tail on left")
 pdeltae = TNamed("Contact", contactperson)
 hdeltae.GetListOfFunctions().Add(ddeltae)
 hdeltae.GetListOfFunctions().Add(cdeltae)
@@ -81,7 +81,7 @@ hdeltae.GetListOfFunctions().Add(pdeltae)
 
 dmkpi = TNamed(
     "Description",
-    "Reconstructed K#pi invariant mass distribution for K*(892)^{0}#to K#pi, from B^{0}#to K*(892)^{0}e^{+}e^{-} decays.")
+    "Reconstructed Kpi invariant mass distribution for K*(892)^{0} -> K pi, from B0 -> K*(892)^{0}e+e- decays.")
 cmkpi = TNamed("Check", "Consistent Breit-Wigner shape, mean at 0.896 GeV/c^{2}")
 pmkpi = TNamed("Contact", contactperson)
 hmkpi.GetListOfFunctions().Add(dmkpi)
@@ -90,7 +90,7 @@ hmkpi.GetListOfFunctions().Add(pmkpi)
 
 dq2 = TNamed(
     "Description",
-    "Squared invariant mass of the pair of electrons (q^{2}) from B^{0}#to K*(892)^{0}e^{+}e^{-} decays.")
+    "Squared invariant mass of the pair of electrons (q^{2}) from B0 -> K*(892)^{0}e+e- decays.")
 cq2 = TNamed("Check", "Consistent curving shape turns and ends before 25")
 pq2 = TNamed("Contact", contactperson)
 hq2.GetListOfFunctions().Add(dq2)

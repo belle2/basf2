@@ -7,7 +7,7 @@
 
 #include <framework/gearbox/Unit.h>
 #include <testbeam/vxd/geometry/SensorInfo.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 using namespace std;
 using namespace Belle2;
@@ -16,9 +16,9 @@ using namespace Belle2::TEL;
 const TVector3 SensorInfo::getBField(const TVector3& point) const
 {
   TVector3 pointGlobal = pointToGlobal(point);
-  TVector3 bGlobal = BFieldMap::Instance().getBField(pointGlobal);
+  TVector3 bGlobal = BFieldManager::getField(pointGlobal);
   TVector3 bLocal = vectorToLocal(bGlobal);
-  return Unit::T * bLocal;
+  return bLocal;
 }
 
 

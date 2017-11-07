@@ -219,7 +219,7 @@ def add_cdc_cr_reconstruction(path, eventTimingExtraction=True,
 
     # Create Belle2 Tracks from the genfit Tracks
     path.add_module('TrackCreator',
-                    defaultPDGCode=13,
+                    pdgCodes=[13],
                     useClosestHitToIP=True,
                     useBFieldAtHit=True
                     )

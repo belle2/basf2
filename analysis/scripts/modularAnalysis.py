@@ -392,6 +392,9 @@ def correctFSR(
     Takes the particles from the given lepton list copies them to the output list and adds the
     4-vector of the closest photon (considered as radiative) to the lepton, if the given
     criteria for maximal angle and energy are fulfilled.
+    Please note, a new lepton is generated, with the old electron and -if found- a gamma as daughters.
+    Information attached to the track is only available for the old lepton, accessable via the daughter
+    metavariable, e.g. <daughter(0, eid)>.
 
     @param outputListName The output lepton list containing the corrected leptons.
     @param inputListName The initial lepton list containing the leptons to correct, should already exists.
@@ -547,15 +550,16 @@ def fillSignalSideParticleList(outputListName, decayString, path):
 
 
 def fillParticleLists(decayStringsWithCuts, writeOut=False,
-                      path=analysis_main):
+                      path=analysis_main,
+                      enforceFitHypothesis=False):
     """
     Creates Particles of the desired types from the corresponding MDST dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
 
     The multiple ParticleLists with their own selection criteria are specified
     via list tuples (decayString, cut), like for example
-    kaons = ('K+:std', 'Kid>0.1')
-    pions = ('pi+:std', 'piid>0.1')
+    kaons = ('K+:std', 'kaonID>0.1')
+    pions = ('pi+:std', 'pionID>0.1')
     fillParticleLists([kaons, pions])
 
     The type of the particles to be loaded is specified via the decayString module parameter.
@@ -574,12 +578,18 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
+    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
+                                using a mass hypothesis of the exact type passed to fillParticleLists().
+                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                in terms of mass difference will be used if the fit using exact particle
+                                type is not available.
     """
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + 'PLists')
     pload.param('decayStringsWithCuts', decayStringsWithCuts)
     pload.param('writeOut', writeOut)
+    pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
 
@@ -588,6 +598,7 @@ def fillParticleList(
     cut,
     writeOut=False,
     path=analysis_main,
+    enforceFitHypothesis=False
 ):
     """
     Creates Particles of the desired type from the corresponding MDST dataobjects,
@@ -611,12 +622,18 @@ def fillParticleList(
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
+    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
+                                using a mass hypothesis of the exact type passed to fillParticleLists().
+                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                in terms of mass difference will be used if the fit using exact particle
+                                type is not available.
     """
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
     pload.param('decayStringsWithCuts', [(decayString, cut)])
     pload.param('writeOut', writeOut)
+    pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
 
@@ -625,6 +642,7 @@ def fillParticleListWithTrackHypothesis(
     cut,
     hypothesis,
     writeOut=False,
+    enforceFitHypothesis=False,
     path=analysis_main,
 ):
     """
@@ -634,6 +652,11 @@ def fillParticleListWithTrackHypothesis(
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param hypothesis    the PDG code of the desired track hypothesis
     @param writeOut      wether RootOutput module should save the created ParticleList
+    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
+                                using a mass hypothesis of the exact type passed to fillParticleLists().
+                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                in terms of mass difference will be used if the fit using exact particle
+                                type is not available.
     @param path          modules are added to this path
     """
 
@@ -642,6 +665,7 @@ def fillParticleListWithTrackHypothesis(
     pload.param('decayStringsWithCuts', [(decayString, cut)])
     pload.param('trackHypothesis', hypothesis)
     pload.param('writeOut', writeOut)
+    pload.param("enforceFitHypothesis", enforceFitHypothesis)
     path.add_module(pload)
 
 
@@ -709,7 +733,7 @@ def fillParticleListsFromMC(
     The types of the particles to be loaded are specified via the (decayString, cut) tuples given in a list.
     For example:
     kaons = ('K+:gen', '')
-    pions = ('pi+:gen', 'piid>0.1')
+    pions = ('pi+:gen', 'pionID>0.1')
     fillParticleListsFromMC([kaons, pions])
 
     @param decayString   specifies type of Particles and determines the name of the ParticleList

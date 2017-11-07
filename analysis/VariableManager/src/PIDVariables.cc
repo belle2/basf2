@@ -3,13 +3,14 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Anze Zupanc                                *
+ * Contributors: Marko Staric, Anze Zupanc, Umberto Tamponi               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 // Own include
 #include <analysis/VariableManager/PIDVariables.h>
+#include <analysis/VariableManager/Variable.h>
 
 #include <analysis/VariableManager/Manager.h>
 
@@ -23,6 +24,8 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
+#include <boost/algorithm/string.hpp>
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -32,309 +35,11 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-    double deltaLogL(const Particle* part, const Const::ChargedStable& otherHypothesis)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.0;
 
-      Const::ChargedStable thisType = Const::ChargedStable(abs(part->getPDGCode()));
 
-      return pid->getLogL(thisType) - pid->getLogL(otherHypothesis);
-    }
-
-    double particleDeltaLogLPion(const Particle* part)
-    {
-      return deltaLogL(part, Const::pion);
-    }
-
-    double particleDeltaLogLKaon(const Particle* part)
-    {
-      return deltaLogL(part, Const::kaon);
-    }
-
-    double particleDeltaLogLProton(const Particle* part)
-    {
-      return deltaLogL(part, Const::proton);
-    }
-
-    double particleDeltaLogLElectron(const Particle* part)
-    {
-      return deltaLogL(part, Const::electron);
-    }
-
-    double particleDeltaLogLMuon(const Particle* part)
-    {
-      return deltaLogL(part, Const::muon);
-    }
-
-    double particleElectronId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      return pid->getProbability(Const::electron, Const::pion);
-    }
-
-    double particlePionvsElectronId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      return pid->getProbability(Const::pion, Const::electron);
-    }
-
-    double particlePionvsElectrondEdxId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::CDC + Const::SVD;
-      return pid->getProbability(Const::pion, Const::electron, set);
-    }
-
-    double particleElectrondEdxId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::CDC + Const::SVD;
-      return pid->getProbability(Const::electron, Const::pion, set);
-    }
-
-    double particleElectronTOPId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::TOP;
-      return pid->getProbability(Const::electron, Const::pion, set);
-    }
-
-    double particleElectronARICHId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::ARICH;
-      return pid->getProbability(Const::electron, Const::pion, set);
-    }
-
-    double particleElectronECLId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::ECL;
-      return pid->getProbability(Const::electron, Const::pion, set);
-    }
-
-    double particleMuonId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      return pid->getProbability(Const::muon, Const::pion);
-    }
-
-    double particleMuondEdxId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::CDC + Const::SVD;
-      return pid->getProbability(Const::muon, Const::pion, set);
-
-    }
-
-    double particleMuonTOPId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::TOP;
-      return pid->getProbability(Const::muon, Const::pion, set);
-    }
-
-    double particleMuonARICHId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::ARICH;
-      return pid->getProbability(Const::muon, Const::pion, set);
-    }
-
-    double particleMuonKLMId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::KLM;
-      return pid->getProbability(Const::muon, Const::pion, set);
-    }
-
-    double particlePionId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      return pid->getProbability(Const::pion, Const::kaon);
-    }
-
-    double particlePiondEdxId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::CDC + Const::SVD;
-      return pid->getProbability(Const::pion, Const::kaon, set);
-    }
-
-    double particlePionTOPId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::TOP;
-      return pid->getProbability(Const::pion, Const::kaon, set);
-    }
-
-    double particlePionARICHId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::ARICH;
-      return pid->getProbability(Const::pion, Const::kaon, set);
-    }
-
-    double particleKaonId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      return pid->getProbability(Const::kaon, Const::pion);
-    }
-
-    double particleKaondEdxId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::CDC + Const::SVD;
-      return pid->getProbability(Const::kaon, Const::pion, set);
-    }
-
-    double particleKaonTOPId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::TOP;
-      return pid->getProbability(Const::kaon, Const::pion, set);
-    }
-
-    double particleKaonARICHId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::ARICH;
-      return pid->getProbability(Const::kaon, Const::pion, set);
-    }
-
-    double particleProtonId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      return pid->getProbability(Const::proton, Const::pion);
-    }
-
-    double particleProtondEdxId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::CDC + Const::SVD;
-      return pid->getProbability(Const::proton, Const::pion, set);
-    }
-
-    double particleProtonTOPId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::TOP;
-      return pid->getProbability(Const::proton, Const::pion, set);
-    }
-
-    double particleProtonARICHId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return 0.5;
-
-      Const::PIDDetectorSet set = Const::ARICH;
-      return pid->getProbability(Const::proton, Const::pion, set);
-    }
-
-    double particleMissingARICHId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid)
-        return 1.0;
-
-      Const::PIDDetectorSet set = Const::ARICH;
-      if (not pid->isAvailable(set))
-        return 1.0;
-
-      return 0;
-    }
-
-    double particleMissingTOPId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid)
-        return 1.0;
-
-      Const::PIDDetectorSet set = Const::TOP;
-      if (not pid->isAvailable(set))
-        return 1.0;
-
-      return 0;
-    }
-
-    double particleMissingECLId(const Particle* part)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid)
-        return 1.0;
-
-      Const::PIDDetectorSet set = Const::ECL;
-      if (not pid->isAvailable(set))
-        return 1.0;
-
-      return 0;
-    }
-
-    double particleKaonIdBelle(const Particle* part)
-    {
-      float accs = particleKaonARICHId(part);
-      float tofs = particleKaonTOPId(part);
-      float cdcs = particleKaondEdxId(part);
-
-      if (tofs > 0.999) tofs = 0.999;
-      if (tofs < 0.001) tofs = 0.001;
-      if (cdcs > 0.999) cdcs = 0.999;
-      if (cdcs < 0.001) cdcs = 0.001;
-
-      float s = accs * tofs * cdcs;
-      float b = (1. - accs) * (1. - tofs) * (1. - cdcs);
-
-      float r = s / (b + s);
-
-      return r;
-    }
+    //*************
+    // Utilities
+    //*************
 
     // converts Belle numbering scheme for charged final state particles
     // to Belle II ChargedStable
@@ -356,21 +61,267 @@ namespace Belle2 {
       return Const::pion;
     }
 
+    // Parses the detector list for the PID metafunctions
+    Const::PIDDetectorSet parseDetectors(const std::vector<std::string>& arguments)
+    {
+      Const::PIDDetectorSet result;
+      for (std::string val : arguments) {
+        boost::to_lower(val);
+        if (val == "default") return Const::SVD + Const::CDC + Const::TOP + Const::ARICH;
+        else if (val == "all") return Const::SVD + Const::CDC + Const::TOP + Const::ARICH + Const::ECL + Const:: KLM;
+        else if (val == "svd") result += Const::SVD;
+        else if (val == "cdc") result += Const::CDC;
+        else if (val == "top") result += Const::TOP;
+        else if (val == "arich") result += Const::ARICH;
+        else if (val == "ecl") result += Const::ECL;
+        else if (val == "klm") result += Const::KLM;
+        else B2ERROR("Unknown detector component: " << val);
+      }
+      return result;
+    }
+
+
+
+    //*************
+    // Belle II
+    //*************
+
+    Manager::FunctionPtr pidLogLikelihoodValueExpert(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() < 2) {
+        B2ERROR("Need at least two arguments to pidLogLikelihoodValueExpert");
+        return nullptr;
+      }
+      int pdgCode;
+      try {
+        pdgCode = std::stoi(arguments[0]);
+      } catch (std::invalid_argument& e) {
+        B2ERROR("First argument of pidLogLikelihoodValueExpert must be a PDG code");
+        return nullptr;
+      }
+      std::vector<std::string> detectors(arguments.begin() + 1, arguments.end());
+
+      Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
+      Const::ChargedStable hypType = Const::ChargedStable(abs(pdgCode));
+
+      auto func = [hypType, detectorSet](const Particle * part) -> double {
+        const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid)
+          return std::numeric_limits<float>::quiet_NaN();
+        // No informaiton form any subdetector in the list
+        if (pid->getLogL(hypType, detectorSet) == 0)
+          return std::numeric_limits<float>::quiet_NaN();
+
+        return pid->getLogL(hypType, detectorSet);
+      };
+      return func;
+    }
+
+
+
+    Manager::FunctionPtr pidDeltaLogLikelihoodValueExpert(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() < 3) {
+        B2ERROR("Need at least three arguments to pidDeltaLogLikelihoodValueExpert");
+        return nullptr;
+      }
+      int pdgCodeHyp, pdgCodeTest;
+      try {
+        pdgCodeHyp = std::stoi(arguments[0]);
+      } catch (std::invalid_argument& e) {
+        B2ERROR("First argument of pidDeltaLogLikelihoodValueExpert must be a PDG code");
+        return nullptr;
+      }
+      try {
+        pdgCodeTest = std::stoi(arguments[1]);
+      } catch (std::invalid_argument& e) {
+        B2ERROR("Second argument of pidDeltaLogLikelihoodValueExpert must be a PDG code");
+        return nullptr;
+      }
+
+      std::vector<std::string> detectors(arguments.begin() + 2, arguments.end());
+      Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
+      Const::ChargedStable hypType = Const::ChargedStable(abs(pdgCodeHyp));
+      Const::ChargedStable testType = Const::ChargedStable(abs(pdgCodeTest));
+
+      auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
+        const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        // No informaiton form any subdetector in the list
+        if (pid->getLogL(hypType, detectorSet) == 0)
+          return std::numeric_limits<float>::quiet_NaN();
+
+        return (pid->getLogL(hypType, detectorSet) - pid->getLogL(testType, detectorSet));
+      };
+      return func;
+    }
+
+
+    Manager::FunctionPtr pidPairProbabilityExpert(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() < 3) {
+        B2ERROR("Need at least three arguments to pidPairProbabilityExpert");
+        return nullptr;
+      }
+      int pdgCodeHyp, pdgCodeTest;
+      try {
+        pdgCodeHyp = std::stoi(arguments[0]);
+      } catch (std::invalid_argument& e) {
+        B2ERROR("First argument of pidPairProbabilityExpert must be PDG code");
+        return nullptr;
+      }
+      try {
+        pdgCodeTest = std::stoi(arguments[1]);
+      } catch (std::invalid_argument& e) {
+        B2ERROR("Second argument of pidPairProbabilityExpert must be PDG code");
+        return nullptr;
+      }
+
+      std::vector<std::string> detectors(arguments.begin() + 2, arguments.end());
+
+      Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
+      Const::ChargedStable hypType = Const::ChargedStable(abs(pdgCodeHyp));
+      Const::ChargedStable testType = Const::ChargedStable(abs(pdgCodeTest));
+      auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
+        const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        // No informaiton form any subdetector in the list
+        if (pid->getLogL(hypType, detectorSet) == 0)
+          return std::numeric_limits<float>::quiet_NaN();
+
+        return pid->getProbability(hypType, testType, detectorSet);
+      };
+      return func;
+    }
+
+
+    Manager::FunctionPtr pidProbabilityExpert(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() < 2) {
+        B2ERROR("Need at least two arguments for pidProbabilityExpert");
+        return nullptr;
+      }
+      int pdgCodeHyp;
+      try {
+        pdgCodeHyp = std::stoi(arguments[0]);
+      } catch (std::invalid_argument& e) {
+        B2ERROR("First argument of pidProbabilityExpert must be PDG code");
+        return nullptr;
+      }
+
+      std::vector<std::string> detectors(arguments.begin() + 1, arguments.end());
+      Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
+      Const::ChargedStable hypType = Const::ChargedStable(abs(pdgCodeHyp));
+
+      // Placeholder for the priors
+      const unsigned int n = Const::ChargedStable::c_SetSize;
+      double frac[n];
+      for (unsigned int i = 0; i < n; ++i) frac[i] = 1.0; // flat priors
+
+
+      auto func = [hypType, frac, detectorSet](const Particle * part) -> double {
+        const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (!pid) return std::numeric_limits<float>::quiet_NaN();
+        // No informaiton form any subdetector in the list
+        if (pid->getLogL(hypType, detectorSet) == 0)
+          return std::numeric_limits<float>::quiet_NaN();
+
+        return pid->getProbability(hypType, frac, detectorSet);
+      };
+      return func;
+    }
+
+
+    Manager::FunctionPtr pidMissingProbabilityExpert(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() < 1) {
+        B2ERROR("Need at least one argument to pidMissingProbabilityExpert");
+        return nullptr;
+      }
+
+      std::vector<std::string> detectors(arguments.begin(), arguments.end());
+      Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
+
+      auto func = [detectorSet](const Particle * part) -> int {
+        const PIDLikelihood* pid = part->getPIDLikelihood();
+        if (not pid->isAvailable(detectorSet))
+          return 1;
+        else return 0;
+      };
+      return func;
+    }
+
+
+    double electronID(const Particle* part)
+    {
+      const PIDLikelihood* pid = part->getPIDLikelihood();
+      if (!pid) return std::numeric_limits<float>::quiet_NaN();
+
+      return pid->getProbability(Const::electron, Const::pion);
+    }
+
+    double muonID(const Particle* part)
+    {
+      const PIDLikelihood* pid = part->getPIDLikelihood();
+      if (!pid) return std::numeric_limits<float>::quiet_NaN();
+
+      return pid->getProbability(Const::muon, Const::pion);
+    }
+
+    double pionID(const Particle* part)
+    {
+      const PIDLikelihood* pid = part->getPIDLikelihood();
+      if (!pid) return std::numeric_limits<float>::quiet_NaN();
+
+      return pid->getProbability(Const::pion, Const::kaon);
+    }
+
+    double kaonID(const Particle* part)
+    {
+      const PIDLikelihood* pid = part->getPIDLikelihood();
+      if (!pid) return std::numeric_limits<float>::quiet_NaN();
+
+      return pid->getProbability(Const::kaon, Const::pion);
+    }
+
+
+    double protonID(const Particle* part)
+    {
+      const PIDLikelihood* pid = part->getPIDLikelihood();
+      if (!pid) return std::numeric_limits<float>::quiet_NaN();
+
+      return pid->getProbability(Const::proton, Const::pion);
+    }
+
+    double deuteronID(const Particle* part)
+    {
+      const PIDLikelihood* pid = part->getPIDLikelihood();
+      if (!pid) return std::numeric_limits<float>::quiet_NaN();
+
+      return pid->getProbability(Const::deuteron, Const::pion);
+    }
+
+
+
+    //*************
+    // B2BII
+    //*************
+
     double muIDBelle(const Particle* particle)
     {
       const PIDLikelihood* pid = particle->getPIDLikelihood();
-      if (!pid) return 0.5;
+      if (!pid) return 0.5; // Belle standard
 
       if (pid->isAvailable(Const::KLM))
         return exp(pid->getLogL(Const::muon, Const::KLM));
       else
-        return 0;
+        return 0; // Belle standard
     }
 
     double muIDBelleQuality(const Particle* particle)
     {
       const PIDLikelihood* pid = particle->getPIDLikelihood();
-      if (!pid) return 0;
+      if (!pid) return 0;// Belle standard
 
       return pid->isAvailable(Const::KLM);
     }
@@ -381,13 +332,13 @@ namespace Belle2 {
       int bkgHyp = int(std::lround(sigAndBkgHyp[1]));
 
       const PIDLikelihood* pid = particle->getPIDLikelihood();
-      if (!pid) return 0.5;
+      if (!pid) return 0.5; // Belle standard
 
       // ACC = ARICH
       Const::PIDDetectorSet set = Const::ARICH;
       double acc_sig = exp(pid->getLogL(hypothesisConversion(sigHyp), set));
       double acc_bkg = exp(pid->getLogL(hypothesisConversion(bkgHyp), set));
-      double acc = 0.5;
+      double acc = 0.5; // Belle standard
       if (acc_sig + acc_bkg  > 0.0)
         acc = acc_sig / (acc_sig + acc_bkg);
 
@@ -395,7 +346,7 @@ namespace Belle2 {
       set = Const::TOP;
       double tof_sig = exp(pid->getLogL(hypothesisConversion(sigHyp), set));
       double tof_bkg = exp(pid->getLogL(hypothesisConversion(bkgHyp), set));
-      double tof = 0.5;
+      double tof = 0.5; // Belle standard
       double tof_all = tof_sig + tof_bkg;
       if (tof_all != 0) {
         tof = tof_sig / tof_all;
@@ -407,7 +358,7 @@ namespace Belle2 {
       set = Const::CDC;
       double cdc_sig = exp(pid->getLogL(hypothesisConversion(sigHyp), set));
       double cdc_bkg = exp(pid->getLogL(hypothesisConversion(bkgHyp), set));
-      double cdc = 0.5;
+      double cdc = 0.5; // Belle standard
       double cdc_all = cdc_sig + cdc_bkg;
       if (cdc_all != 0) {
         cdc = cdc_sig / cdc_all;
@@ -422,63 +373,88 @@ namespace Belle2 {
       return pid_sig / (pid_sig + pid_bkg);
     }
 
+
+    double eIDBelle(const Particle* part)
+    {
+      const PIDLikelihood* pid = part->getPIDLikelihood();
+      if (!pid) return 0.5; // Belle standard
+
+      Const::PIDDetectorSet set = Const::ECL;
+      return pid->getProbability(Const::electron, Const::pion, set);
+    }
+
+
+    // Needed by the flavor tagger algorithm
+    double kIDBelle(const Particle* part)
+    {
+      //default values Belle style
+      float accs = 0.5;
+      float tofs = 0.5;
+      float cdcs = 0.5;
+
+      const PIDLikelihood* pid = part->getPIDLikelihood();
+
+      if (pid) {
+        Const::PIDDetectorSet set = Const::ARICH;
+        accs = pid->getProbability(Const::kaon, Const::pion, set);
+        set = Const::TOP;
+        tofs = pid->getProbability(Const::kaon, Const::pion, set);
+        set = Const::TOP + Const::SVD;
+        cdcs = pid->getProbability(Const::kaon, Const::pion, set);
+      }
+
+      if (tofs > 0.999) tofs = 0.999;
+      if (tofs < 0.001) tofs = 0.001;
+      if (cdcs > 0.999) cdcs = 0.999;
+      if (cdcs < 0.001) cdcs = 0.001;
+
+      float s = accs * tofs * cdcs;
+      float b = (1. - accs) * (1. - tofs) * (1. - cdcs);
+
+      float r = s / (b + s);
+
+      return r;
+    }
+
+
     VARIABLE_GROUP("PID");
-    REGISTER_VARIABLE("DLLPion", particleDeltaLogLPion,     "Delta Log L = L(particle's hypothesis) - L(pion)");
-    REGISTER_VARIABLE("DLLKaon", particleDeltaLogLKaon,     "Delta Log L = L(particle's hypothesis) - L(kaon)");
-    REGISTER_VARIABLE("DLLProt", particleDeltaLogLProton,   "Delta Log L = L(particle's hypothesis) - L(proton)");
-    REGISTER_VARIABLE("DLLElec", particleDeltaLogLElectron, "Delta Log L = L(particle's hypothesis) - L(electron)");
-    REGISTER_VARIABLE("DLLMuon", particleDeltaLogLMuon,     "Delta Log L = L(particle's hypothesis) - L(muon)");
 
-    REGISTER_VARIABLE("eid", particleElectronId, "electron identification probability");
-    REGISTER_VARIABLE("muid", particleMuonId, "muon identification probability");
-    REGISTER_VARIABLE("piid", particlePionId, "pion identification probability");
-    REGISTER_VARIABLE("Kid", particleKaonId, "kaon identification probability");
-    REGISTER_VARIABLE("Kid_belle", particleKaonIdBelle, "kaon identification probability bellestyle");
-    REGISTER_VARIABLE("prid", particleProtonId, "proton identification probability");
 
-    REGISTER_VARIABLE("K_vs_piid", particleKaonId, "kaon vs pion identification probability");
-    REGISTER_VARIABLE("pi_vs_eid", particlePionvsElectronId, "pion vs electron identification probability");
-    REGISTER_VARIABLE("pi_vs_edEdxid", particlePionvsElectrondEdxId,
-                      "pion vs electron identification probability from dEdx measurement");
+    // PID variables to be used for analysis
+    REGISTER_VARIABLE("electronID", electronID, "electron identification probability");
+    REGISTER_VARIABLE("muonID", muonID, "muon identification probability");
+    REGISTER_VARIABLE("pionID", pionID, "pion identification probability");
+    REGISTER_VARIABLE("kaonID", kaonID, "kaon identification probability");
+    REGISTER_VARIABLE("protonID", protonID, "proton identification probability");
+    REGISTER_VARIABLE("deuteronID", deuteronID, "deuteron identification probability");
 
-    REGISTER_VARIABLE("eid_dEdx", particleElectrondEdxId, "electron identification probability from dEdx measurement");
-    REGISTER_VARIABLE("muid_dEdx", particleMuondEdxId, "muon identification probability from dEdx measurement");
-    REGISTER_VARIABLE("piid_dEdx", particlePiondEdxId, "pion identification probability from dEdx measurement");
-    REGISTER_VARIABLE("Kid_dEdx", particleKaondEdxId, "kaon identification probability from dEdx measurement");
-    REGISTER_VARIABLE("prid_dEdx", particleProtondEdxId, "proton identification probability from dEdx measurement");
+    // Metafunctions for experts to access the basic PID quantities
+    REGISTER_VARIABLE("pidLogLikelihoodValueExpert(pdgCode, detectorList)", pidLogLikelihoodValueExpert,
+                      "returns the likelihood value of for a specific mass hypothesis and  set of detectors. Not to be used in physics analyses, but only by experts doing performance studies.");
+    REGISTER_VARIABLE("pidDeltaLogLikelihoodValueExpert(pdgCode1, pdgCode2, detectorList)", pidDeltaLogLikelihoodValueExpert,
+                      "returns LogL(hyp1) - LogL(hyp2). Not to be used in physics analyses, but only by experts doing performance studies.");
+    REGISTER_VARIABLE("pidPairProbabilityExpert(pdgCodeHyp, pdgCodeTest, detectorList)", pidPairProbabilityExpert,
+                      "probability for the pdgCodeHyp mass hypothesis respect to the pdgCodeTest one, using an arbitrary set of detectors.  Not to be used in physics analyses, but only by experts doing performance studies.");
+    REGISTER_VARIABLE("pidProbabilityExpert(pdgCodeHyp, detectorList)", pidProbabilityExpert,
+                      "probability for the pdgCodeHyp mass hypothesis respect to all the other ones, using an arbitrary set of detectors.  Not to be used in physics analyses, but only by experts doing performance studies.");
+    REGISTER_VARIABLE("pidMissingProbabilityExpert(detectorList)", pidMissingProbabilityExpert,
+                      "returns 1 if the PID probabiliy is missing for the provided detector list, otherwise 0. ");
 
-    REGISTER_VARIABLE("eid_TOP", particleElectronTOPId, "electron identification probability from TOP");
-    REGISTER_VARIABLE("muid_TOP", particleMuonTOPId, "muon identification probability from TOP");
-    REGISTER_VARIABLE("piid_TOP", particlePionTOPId, "pion identification probability from TOP");
-    REGISTER_VARIABLE("Kid_TOP", particleKaonTOPId, "kaon identification probability from TOP");
-    REGISTER_VARIABLE("prid_TOP", particleProtonTOPId, "proton identification probability from TOP");
-    REGISTER_VARIABLE("missing_TOP", particleMissingTOPId, "1.0 if identification probability from TOP is missing");
-
-    REGISTER_VARIABLE("eid_ARICH", particleElectronARICHId, "electron identification probability from ARICH");
-    REGISTER_VARIABLE("muid_ARICH", particleMuonARICHId, "muon identification probability from ARICH");
-    REGISTER_VARIABLE("piid_ARICH", particlePionARICHId, "pion identification probability from ARICH");
-    REGISTER_VARIABLE("Kid_ARICH", particleKaonARICHId, "kaon identification probability from ARICH");
-    REGISTER_VARIABLE("prid_ARICH", particleProtonARICHId, "proton identification probability from ARICH");
-    REGISTER_VARIABLE("missing_ARICH", particleMissingARICHId, "1.0 if identification probability from ARICH is missing");
-
-    REGISTER_VARIABLE("muid_KLM", particleMuonKLMId, "muon identification probability from KLM");
-
-    REGISTER_VARIABLE("eid_ECL", particleElectronECLId, "electron identification probability from ECL");
-    REGISTER_VARIABLE("missing_ECL", particleMissingECLId, "1.0 if identification probability from ECL is missing");
-
+    // B2BII PID
     REGISTER_VARIABLE("atcPIDBelle(i,j)", atcPIDBelle,
                       "returns Belle's PID atc variable: atc_pid(3,1,5,i,j).prob().\n"
                       "To be used only when analysing converted Belle samples.");
-
     REGISTER_VARIABLE("muIDBelle", muIDBelle,
                       "returns Belle's PID Muon_likelihood() variable.\n"
                       "To be used only when analysing converted Belle samples.");
     REGISTER_VARIABLE("muIDBelleQuality", muIDBelleQuality,
                       "returns true if Belle's PID Muon_likelihood() is usable (reliable).\n"
                       "To be used only when analysing converted Belle samples.");
-
-    REGISTER_VARIABLE("eIDBelle", particleElectronECLId,
+    REGISTER_VARIABLE("eIDBelle", eIDBelle,
                       "returns Belle's electron ID (eid(3,-1,5).prob()) variable.\n"
                       "To be used only when analysing converted Belle samples.");
+    REGISTER_VARIABLE("kIDBelle", kIDBelle, "kaon identification probability bellestyle.");
+
+
   }
 }

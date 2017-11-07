@@ -1445,7 +1445,7 @@ namespace Belle2 {
       for (int iTrack = 0; iTrack < tracks.getEntries(); iTrack++) {
 
         //TODO: expand use to all ChargeStable particles
-        const TrackFitResult* tfr = tracks[iTrack]->getTrackFitResult(Const::pion);
+        const TrackFitResult* tfr = tracks[iTrack]->getTrackFitResultWithClosestMass(Const::pion);
         Helix helix = tfr->getHelix();
 
         TVector3 tempv2helix = C2TDistanceUtility::getECLTrackHitPosition(helix, v1);

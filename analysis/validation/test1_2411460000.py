@@ -33,8 +33,8 @@ inputFile = "../2411460000.dst.root"
 inputMdstList('default', inputFile)
 
 # fill candidates
-fillParticleList('pi+:myPion', 'abs(dz) < 4.0 and abs(dr) < 0.5 and piid > 0.6')
-fillParticleList('pi-:myPion', 'abs(dz) < 4.0 and abs(dr) < 0.5 and piid > 0.6')
+fillParticleList('pi+:myPion', 'abs(dz) < 4.0 and abs(dr) < 0.5 and pionID > 0.6')
+fillParticleList('pi-:myPion', 'abs(dz) < 4.0 and abs(dr) < 0.5 and pionID > 0.6')
 fillParticleList('gamma:myISRGamma', 'E > 0.1')
 fillParticleList('mu+:myMuon', 'abs(dz) < 4.0 and abs(dr) < 0.5')
 fillParticleList('mu-:myMuon', 'abs(dz) < 4.0 and abs(dr) < 0.5')
@@ -59,7 +59,7 @@ tools = ['EventMetaData', '^vpho']
 tools += ['DeltaEMbc', '^vpho']
 tools += ['MCTruth', '^vpho']
 tools += ['CustomFloats[Ecms:Eher:Eler:XAngle]', '^vpho']
-tools += ['CustomFloats[eid:muid]', 'vpho -> [psi(2S) -> [J/psi -> ^mu+ ^mu-] ^pi+ ^pi-] ^pi+ ^pi- gamma']
+tools += ['CustomFloats[electronID:muonID]', 'vpho -> [psi(2S) -> [J/psi -> ^mu+ ^mu-] ^pi+ ^pi-] ^pi+ ^pi- gamma']
 tools += ['CustomFloats[daughterInvariantMass(0,1)]', 'vpho -> [psi(2S) -> [^J/psi -> mu+ mu-] pi+ pi-] pi+ pi- gamma']
 tools += ['CustomFloats[daughterInvariantMass(0,1,2)]', 'vpho -> ^psi(2S) pi+ pi- gamma ']
 tools += ['CustomFloats[m2Recoil]', '^vpho']

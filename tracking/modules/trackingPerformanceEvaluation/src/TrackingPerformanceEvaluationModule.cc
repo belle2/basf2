@@ -17,7 +17,7 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
 
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 #include <vxd/geometry/GeoCache.h>
 
@@ -354,8 +354,7 @@ void TrackingPerformanceEvaluationModule::event()
 
   StoreArray<MCParticle> mcParticles(m_MCParticlesName);
 
-  BFieldMap& bfieldMap = BFieldMap::Instance();
-  TVector3 magField = bfieldMap.getBField(TVector3(0, 0, 0));
+  B2Vector3D magField = BFieldManager::getField(0, 0, 0) / Unit::T;
 
   bool hasTrack = false;
   B2DEBUG(99, "+++++ 1. loop on MCParticles");

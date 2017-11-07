@@ -157,14 +157,12 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   }
   genfit::Track gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
 
-  genfit::AbsTrackRep* plusRepresentation = TrackFitter::getTrackRepresentationForPDG(trackHypotheses.first.getPDGCode(),
-                                            *recoTrackPlus);
+  int pdgTrackPlus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getParticleType().getPDGCode();
+
+  genfit::AbsTrackRep* plusRepresentation = TrackFitter::getTrackRepresentationForPDG(pdgTrackPlus, *recoTrackPlus);
   if (not recoTrackPlus->wasFitSuccessful(plusRepresentation)) {
-    plusRepresentation = TrackFitter::getTrackRepresentationForPDG(Const::pion.getPDGCode(), *recoTrackPlus);
-    if (not recoTrackPlus->wasFitSuccessful(plusRepresentation)) {
-      B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
-      return false;
-    }
+    B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
+    return false;
   }
 
   RecoTrack* recoTrackMinus = trackMinus->getRelated<RecoTrack>(m_RecoTrackColName);
@@ -172,41 +170,39 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     B2ERROR("No RecoTrack for Belle2::Track");
     return false;
   }
+
   genfit::Track gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
+
+  int pdgTrackMinus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getParticleType().getPDGCode();
+
+  genfit::AbsTrackRep* minusRepresentation = TrackFitter::getTrackRepresentationForPDG(pdgTrackMinus, *recoTrackMinus);
+  if (not recoTrackMinus->wasFitSuccessful(minusRepresentation)) {
+    B2ERROR("Track hypothesis with closest mass not available. Should never happen, but I can continue savely anyway.");
+    return false;
+  }
 
   // If existing, pass to the genfit::Track the correct cardinal representation
   std::vector<genfit::AbsTrackRep*> repsPlus = gfTrackPlus.getTrackReps();
   std::vector<genfit::AbsTrackRep*> repsMinus = gfTrackMinus.getTrackReps();
   if (repsPlus.size() == repsMinus.size()) {
     for (unsigned int id = 0; id < repsPlus.size(); id++) {
-      if (repsPlus[id]->getPDG() == trackHypotheses.first.getPDGCode())
+      if (abs(repsPlus[id]->getPDG()) == pdgTrackPlus)
         gfTrackPlus.setCardinalRep(id);
-      if (repsMinus[id]->getPDG() == trackHypotheses.second.getPDGCode())
+      if (abs(repsMinus[id]->getPDG()) == pdgTrackMinus)
         gfTrackMinus.setCardinalRep(id);
     }
   }
   // The two vectors should always have the same size, and this never happen
   else {
     for (unsigned int id = 0; id < repsPlus.size(); id++) {
-      if (repsPlus[id]->getPDG() == trackHypotheses.first.getPDGCode())
+      if (abs(repsPlus[id]->getPDG()) == pdgTrackPlus)
         gfTrackPlus.setCardinalRep(id);
     }
     for (unsigned int id = 0; id < repsMinus.size(); id++) {
-      if (repsMinus[id]->getPDG() == trackHypotheses.second.getPDGCode())
+      if (abs(repsMinus[id]->getPDG()) == pdgTrackMinus)
         gfTrackMinus.setCardinalRep(id);
     }
   }
-
-  genfit::AbsTrackRep* minusRepresentation = TrackFitter::getTrackRepresentationForPDG(trackHypotheses.second.getPDGCode(),
-                                             *recoTrackMinus);
-  if (not recoTrackMinus->wasFitSuccessful(minusRepresentation)) {
-    minusRepresentation = TrackFitter::getTrackRepresentationForPDG(Const::pion.getPDGCode(), *recoTrackMinus);
-    if (not recoTrackMinus->wasFitSuccessful(minusRepresentation)) {
-      B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
-      return false;
-    }
-  }
-
 
   genfit::MeasuredStateOnPlane stPlus = recoTrackPlus->getMeasuredStateOnPlaneFromFirstHit(plusRepresentation);
   genfit::MeasuredStateOnPlane stMinus = recoTrackMinus->getMeasuredStateOnPlaneFromFirstHit(minusRepresentation);

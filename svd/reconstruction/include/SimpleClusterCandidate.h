@@ -150,7 +150,10 @@ namespace Belle2 {
       /** SNR of the cluster */
       float m_SNR;
 
-      /** SVDREcoDigit index of the seed strip of the cluster */
+      /** SNR of the seed strip */
+      float m_seedSNR;
+
+      /** SVDRecoDigit index of the seed strip of the cluster */
       int m_seedIndex;
 
       /** vector containing the strips in the cluster */

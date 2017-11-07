@@ -11,7 +11,7 @@
  **************************************************************************/
 
 #include <genfit/MeasurementOnPlane.h>
-#include <tracking/modules/DQM/TrackDQMModule.h>
+#include <tracking/modules/trackingDQM/TrackDQMModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <tracking/dataobjects/RecoTrack.h>

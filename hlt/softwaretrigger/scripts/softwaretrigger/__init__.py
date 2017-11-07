@@ -3,7 +3,7 @@ import stdFSParticles
 import vertex
 import basf2
 
-SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "production"
+SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "development"
 
 
 def add_fast_reco_software_trigger(path, store_array_debug_prescale=0):

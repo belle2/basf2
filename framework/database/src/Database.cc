@@ -36,7 +36,7 @@
 #include <boost/algorithm/string.hpp>
 #include <cstdlib>
 
-#define CURRENT_DEFAULT_TAG "GT_gen_prod_003.13_Master-20171005-065700"
+#define CURRENT_DEFAULT_TAG "GT_gen_prod_004.03_Master-20171106-202500"
 
 using namespace std;
 using namespace Belle2;

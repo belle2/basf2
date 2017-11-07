@@ -57,6 +57,7 @@ namespace Belle2 {
       m_trackPosition = mSoP.getPos();
 
       m_seed = path.front()->getSeed();
+      m_seedMSoP = path.front()->getMeasuredStateOnPlane();
     }
 
     CKFResult(const ASeed* seed, std::vector<const AHit*> hits, double chi2, const TVector3& trackPosition,
@@ -107,6 +108,11 @@ namespace Belle2 {
       return m_weightSum;
     }
 
+    const genfit::MeasuredStateOnPlane& getSeedMSoP() const
+    {
+      return m_seedMSoP;
+    }
+
   private:
     /// The stored seed
     const ASeed* m_seed;
@@ -122,5 +128,7 @@ namespace Belle2 {
     short m_trackCharge = 0;
     /// The stored sum of weights
     TrackFindingCDC::Weight m_weightSum = 0;
+    /// The measured state on plane, which was used from the seed
+    genfit::MeasuredStateOnPlane m_seedMSoP;
   };
 }

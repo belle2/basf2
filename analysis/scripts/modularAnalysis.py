@@ -392,6 +392,9 @@ def correctFSR(
     Takes the particles from the given lepton list copies them to the output list and adds the
     4-vector of the closest photon (considered as radiative) to the lepton, if the given
     criteria for maximal angle and energy are fulfilled.
+    Please note, a new lepton is generated, with the old electron and -if found- a gamma as daughters.
+    Information attached to the track is only available for the old lepton, accessable via the daughter
+    metavariable, e.g. <daughter(0, eid)>.
 
     @param outputListName The output lepton list containing the corrected leptons.
     @param inputListName The initial lepton list containing the leptons to correct, should already exists.

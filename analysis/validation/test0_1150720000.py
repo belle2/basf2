@@ -23,7 +23,7 @@ main = create_path()
 
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [100])
+eventinfosetter.param('evtNumList', [4000])
 main.add_module(eventinfosetter)
 
 # generate BBbar events

@@ -106,6 +106,7 @@
 
   <!-- VXD Tracking and MUID muon identification -->
   <Tracking>
+    <xi:include href="../tracking/VXDTFindex.xml"/>
     <xi:include href="../tracking/MuidParameters.xml"/>
   </Tracking>
 

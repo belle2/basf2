@@ -154,13 +154,13 @@ def get_store_only_rawdata_path():
 
 
 def setup_softwaretrigger_database_access(software_trigger_global_tag_name=SOFTWARE_TRIGGER_GLOBAL_TAG_NAME,
-                                          production_global_tag_name="production"):
+                                          production_global_tag_name="development"):
     """
     Helper function to set up the database chain, needed for typical software trigger applications. This chains
     consists of:
     * access to the local database store in localdb/database.txt in the current folder.
     * global database access with the given software trigger global tag (probably the default one).
-    * global database access with the "production" tag, which is the standard global database.
+    * global database access with the "development" tag, which is the standard global database.
 
     :param software_trigger_global_tag_name: controls the name of the software trigger global tag in the database.
     :param production_global_tag_name: controls the name of the general global tag in the database.

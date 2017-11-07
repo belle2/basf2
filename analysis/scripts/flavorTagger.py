@@ -11,7 +11,7 @@
 from basf2 import *
 from modularAnalysis import *
 import basf2_mva
-import variables as flavorTaggerVariables
+from variables import variables as flavorTaggerVariables
 from ROOT import Belle2
 import os
 import glob

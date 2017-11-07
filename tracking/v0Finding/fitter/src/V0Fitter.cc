@@ -157,9 +157,9 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   }
   genfit::Track gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
 
-  int PDGTrackPlus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getParticleType().getPDGCode();
+  int pdgTrackPlus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getParticleType().getPDGCode();
 
-  genfit::AbsTrackRep* plusRepresentation = TrackFitter::getTrackRepresentationForPDG(PDGTrackPlus, *recoTrackPlus);
+  genfit::AbsTrackRep* plusRepresentation = TrackFitter::getTrackRepresentationForPDG(pdgTrackPlus, *recoTrackPlus);
   if (not recoTrackPlus->wasFitSuccessful(plusRepresentation)) {
     B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
     return false;
@@ -173,9 +173,9 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
 
   genfit::Track gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
 
-  int PDGTrackMinus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getParticleType().getPDGCode();
+  int pdgTrackMinus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getParticleType().getPDGCode();
 
-  genfit::AbsTrackRep* minusRepresentation = TrackFitter::getTrackRepresentationForPDG(PDGTrackMinus, *recoTrackMinus);
+  genfit::AbsTrackRep* minusRepresentation = TrackFitter::getTrackRepresentationForPDG(pdgTrackMinus, *recoTrackMinus);
   if (not recoTrackMinus->wasFitSuccessful(minusRepresentation)) {
     B2ERROR("Track hypothesis with closest mass not available. Should never happen, but I can continue savely anyway.");
     return false;
@@ -186,20 +186,20 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   std::vector<genfit::AbsTrackRep*> repsMinus = gfTrackMinus.getTrackReps();
   if (repsPlus.size() == repsMinus.size()) {
     for (unsigned int id = 0; id < repsPlus.size(); id++) {
-      if (abs(repsPlus[id]->getPDG()) == PDGTrackPlus)
+      if (abs(repsPlus[id]->getPDG()) == pdgTrackPlus)
         gfTrackPlus.setCardinalRep(id);
-      if (abs(repsMinus[id]->getPDG()) == PDGTrackMinus)
+      if (abs(repsMinus[id]->getPDG()) == pdgTrackMinus)
         gfTrackMinus.setCardinalRep(id);
     }
   }
   // The two vectors should always have the same size, and this never happen
   else {
     for (unsigned int id = 0; id < repsPlus.size(); id++) {
-      if (abs(repsPlus[id]->getPDG()) == PDGTrackPlus)
+      if (abs(repsPlus[id]->getPDG()) == pdgTrackPlus)
         gfTrackPlus.setCardinalRep(id);
     }
     for (unsigned int id = 0; id < repsMinus.size(); id++) {
-      if (abs(repsMinus[id]->getPDG()) == PDGTrackMinus)
+      if (abs(repsMinus[id]->getPDG()) == pdgTrackMinus)
         gfTrackMinus.setCardinalRep(id);
     }
   }

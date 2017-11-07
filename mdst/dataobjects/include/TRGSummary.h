@@ -11,8 +11,6 @@
 #ifndef TRGSUMMARY_H
 #define TRGSUMMARY_H
 
-#include <framework/datastore/RelationsObject.h>
-//#include <framework/gearbox/Const.h>
 #include <TObject.h>
 
 namespace Belle2 {
@@ -57,13 +55,13 @@ namespace Belle2 {
      */
     void setTRGSummary(int i, int word) { m_ftdlBits[i] = word;}
 
-    /***/
+    /**set the prescale factor of each bit*/
     void setPreScale(int i, int bit, int pre) {m_prescaleBits[i][bit] = pre;}
 
-    /***/
+    /*get the trigger result, each word has 32 bits**/
     unsigned int getTRGSummary(int i) {return m_ftdlBits[i];}
 
-    /***/
+    /*get the prescale factor which the bit is corresponding**/
     unsigned int getPreScale(int i, int bit) {return m_prescaleBits[i][bit];}
 
     /*! get input bits
@@ -103,19 +101,13 @@ namespace Belle2 {
 
   private:
 
-    // enum TimingSource {c_BPID, c_ECL, c_CDC, c_GDL, c_SPARE}; /**< */
-    // enum TriggerType {c_Physics, c_Random, c_Calibration, c_SPARE}; /**< */
-    // enum {c_PIDDetectorSetSize = 4}; /**< temporary solution for the size */
-
-    // Const::DetectorSet m_detectors;   /**< set of detectors with PID information */
-
     unsigned int m_inputBits[10]; /**< input bits from subdetectors */
     unsigned int m_ftdlBits[10]; /**< ftdl bits. Outputs of trigger logic  */
     unsigned int m_psnmBits[10]; /**< psnm bits. Prescaled ftdl bits */
     unsigned int m_timTypeBits; /**< timing source bits */
     unsigned int m_prescaleBits[10][32]; /**the prescale factor of each bit*/
 
-    ClassDef(TRGSummary, 1); /**< Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
+    ClassDef(TRGSummary, 2); /**< Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
 
   };
 

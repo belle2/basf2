@@ -10,6 +10,8 @@
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <framework/dataobjects/FileMetaData.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <TVector3.h>
 
 using namespace std;
@@ -20,13 +22,16 @@ RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagati
   m_useInWirePropagationDelay(useInWirePropagationDelay), m_gcp(CDCGeoControlPar::getInstance()), m_cdcp(CDCGeometryPar::Instance()),
   m_tdcBinWidth(m_cdcp.getTdcBinWidth())
 {
-  //  m_tdcOffset   = m_cdcp.getTdcOffset();
-  //  m_tdcBinWidth = m_cdcp.getTdcBinWidth();
   StoreObjPtr<FileMetaData> filPtr("", DataStore::c_Persistent);
   if (filPtr) {
     if (filPtr->getMcEvents() == 0) m_realData = true;
-    //    B2INFO("RealisticTDCCountTranslator:: #MCEvents= "<< filPtr->getMcEvents());
+    //    B2INFO("RealisticTDCCountTranslator:: judge from FileMetaData.");
+  } else { //judge from MCParticle
+    StoreArray<MCParticle> mcp;
+    if (!mcp) m_realData = true;
+    //    B2INFO("RealisticTDCCountTranslator:: judge from MCParticle.");
   }
+  //  B2INFO("RealisticTDCCountTranslator:: m_realData= " << m_realData);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;

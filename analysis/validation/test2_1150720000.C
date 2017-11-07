@@ -2,7 +2,7 @@
 <header>
 <input>../1150720000.ntup.root</input>
 <output>1150720000_Validation.root</output>
-<contact>Matic Lubej; matic.lubej@ijs.si</contact>
+<contact>Mario Merola; mario.merola@na.infn.it</contact>
 </header>
 */
 
@@ -38,19 +38,19 @@ void test2_1150720000() {
   TH1F *h_costheta = new TH1F("h_costheta","costheta_{BY}",30,-5,5);
 
   h_deltae->GetListOfFunctions()->Add(new TNamed("Description", "B^{0} #rightarrow #pi l #nu  #DeltaE [GeV]"));
-  h_deltae->GetListOfFunctions()->Add(new TNamed("Contact" , "matic.lubej@ijs.si"));
+  h_deltae->GetListOfFunctions()->Add(new TNamed("Contact" , "mario.merola@na.infn.it"));
   h_deltae->GetListOfFunctions()->Add(new TNamed("Check", "#DeltaE is expected to peak at 0 GeV"));
 
   h_deltae_clean->GetListOfFunctions()->Add(new TNamed("Description", "B^{0} #rightarrow #pi l #nu  #DeltaE [GeV] after Rest Of Event cleaning"));
-  h_deltae_clean->GetListOfFunctions()->Add(new TNamed("Contact" , "matic.lubej@ijs.si"));
+  h_deltae_clean->GetListOfFunctions()->Add(new TNamed("Contact" , "mario.merola@na.infn.it"));
   h_deltae_clean->GetListOfFunctions()->Add(new TNamed("Check", "#DeltaE is expected to peak at 0 GeV"));
 
   h_mbc->GetListOfFunctions()->Add(new TNamed("Description", "B^{0} #rightarrow #pi l #nu  M_{bc} [GeV/c^{2}]"));
-  h_mbc->GetListOfFunctions()->Add(new TNamed("Contact" , "matic.lubej@ijs.si"));
+  h_mbc->GetListOfFunctions()->Add(new TNamed("Contact" , "mario.merola@na.infn.it"));
   h_mbc->GetListOfFunctions()->Add(new TNamed("Check", "M_{bc} is expected to peak at 5.279 GeV/c^{2}"));
 
   h_mbc_clean->GetListOfFunctions()->Add(new TNamed("Description", "B^{0} #rightarrow #pi l #nu  M_{bc} [GeV/c^{2}] after Rest Of Event cleaning"));
-  h_mbc_clean->GetListOfFunctions()->Add(new TNamed("Contact" , "matic.lubej@ijs.si"));
+  h_mbc_clean->GetListOfFunctions()->Add(new TNamed("Contact" , "mario.merola@na.infn.it"));
   h_mbc_clean->GetListOfFunctions()->Add(new TNamed("Check", "M_{bc} is expected to peak at 5.279 GeV/c^{2}"));
 
 

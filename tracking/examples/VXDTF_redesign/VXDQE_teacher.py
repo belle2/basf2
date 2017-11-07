@@ -51,7 +51,7 @@ def main():
         "--method",
         type=str,
         default="FastBDT",
-        help="MVA Method [FastBDT|NeuroBayes|TMVA|XGBoost|Theano|Tensorflow|FANN|SKLearn]"
+        help="MVA Method [FastBDT], not implemented: [NeuroBayes|TMVA|XGBoost|Theano|Tensorflow|FANN|SKLearn]"
     )
 
     argument_parser.add_argument(

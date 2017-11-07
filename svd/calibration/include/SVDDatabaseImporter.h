@@ -64,6 +64,8 @@ namespace Belle2 {
      */
     void importSVDPulseShapeCalibrations(/*std::string fileName*/);
 
+    void importSVDChannelMapping(/*std::string fileName*/);
+
     void importSVDTimeShiftCorrections(/*std::string fileName*/);
 
     /**

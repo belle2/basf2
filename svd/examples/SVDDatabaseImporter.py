@@ -18,6 +18,8 @@ from fnmatch import fnmatch
 
 use_local_database("localDB_run400_toImport/database_run400_toImport.txt", "localDB_run400_toImport")
 
+# use_local_database("test/database.txt", "test")
+
 main = create_path()
 
 # Event info setter - execute single event
@@ -39,6 +41,7 @@ dbImporter = SVDDatabaseImporter()
 
 print("classdefined")
 
+'''
 # import the noises
 dbImporter.importSVDNoiseCalibrations()
 
@@ -59,5 +62,6 @@ print("importTimeShiftCorrection_Done")
 dbImporter.importSVDLocalRunBadStrips()
 
 print("importBadStrips_Done")
-
+'''
+dbImporter.importSVDChannelMapping()
 print("IMPORT COMPLETED!!!")

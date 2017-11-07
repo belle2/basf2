@@ -3,18 +3,20 @@
 
 #######################################################
 #
-# B -> D(*) h(*) skims
-# P. Urquijo, 6/Jan/2015
+# B0 -> pi0 pi0
 #
-######################################################
-from ROOT import Belle2
+# K. Smith
+#
+#######################################################
+
 from basf2 import *
+from ROOT import Belle2
 from modularAnalysis import *
-from stdCharged import *
-from stdV0s import *
+from stdPi0s import *
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'build-2017-10-16'
+
+gb2_setuprel = "release-00-09-00"
 
 fileList = \
     ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000001/s00/e0001/4S/r00001/mixed/sub00/' +
@@ -22,23 +24,17 @@ fileList = \
 
      ]
 
-
 inputMdstList('default', fileList)
 
-loadStdCharged()
-loadStdKS()
 
-fillParticleList('pi+:all', '')
-fillParticleList('K+:all', '')
+# load particle lists
+loadStdSkimPi0()
 
-# B- to D(->Kshh)h- Skim
-from BtoDh_Kshh_List import *
-
-
-loadD()
-BtoDhList = BsigToDhToKshhList()
-skimOutputUdst('BtoDh_Kshh', BtoDhList)
-summaryOfLists(BtoDhList)
+# Had Skim
+from BtoPi0Pi0_List import *
+Pi0Pi0List = BtoPi0Pi0List()
+skimOutputUdst('BtoPi0Pi0', Pi0Pi0List)
+summaryOfLists(Pi0Pi0List)
 
 process(analysis_main)
 

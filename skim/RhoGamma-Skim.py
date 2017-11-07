@@ -24,7 +24,6 @@ from stdCharged import *
 from stdPhotons import *
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'build-2014-08-01'
 
 # Run this either over signal MC or background MC (K*gamma)
 # Add 10 signal MC files (each containing 1000 generated events)

@@ -29,14 +29,14 @@ void Pi0Efficiency(TTree* tree_pi0gen, TTree* tree_pi0reco,  int npoints, TStrin
   float efftot_reco;
   float efftot_reco_unc;
 
-  float pi0cut_gen = 0.;
-  float pi0cut_reco = 0.;
-
   float  sum_pi0_gen = 0.;
   float  sum_pi0_reco = 0.;
  
 
   for (int j = 0; j<npoints; j++){
+    
+    float pi0cut_gen;
+    float pi0cut_reco;
     
     stringstream jstr, jstrstep;
     jstr << 0. + momentum_step*j;
@@ -119,9 +119,6 @@ void Pi0Purity(TTree* tree_pi0, int npoints, TString txtname, TString plotname){
 
   string pi0cutstr_reco, pi0cutstr_true;
 
-  float pi0cut_true = 0.;
-  float pi0cut_reco = 0.;
-
   float  sum_pi0_reco       = 0.;
   float  sum_pi0_true      = 0.;
 
@@ -129,6 +126,9 @@ void Pi0Purity(TTree* tree_pi0, int npoints, TString txtname, TString plotname){
 
   for (int j = 0; j<npoints; j++){
 
+    float pi0cut_true;
+    float pi0cut_reco;
+    
     stringstream jstr, jstrstep;
 
     jstr << 0. + momentum_step*j;
@@ -212,16 +212,15 @@ void Pi0EffvsCostheta(TTree* tree_pi0gen,  TTree* tree_pi0reco, int npoints, TSt
   
   string pi0cutcosth_gen, pi0cutcosth_reco;
 
-  float pi0cutcth_gen = 0.;
-  float pi0cutcth_reco = 0.;
 
   for (int j = 0; j<npoints; j++){
+    
+    float pi0cutcth_gen;
+    float pi0cutcth_reco;
     
     stringstream jstrcth, jstrstepcth;
     jstrcth <<  -1 + costheta_step*j;
     jstrstepcth << -1 + costheta_step + costheta_step*j;
-    
-    string CDCacceptance = "  pi0_gamma0_P4[2]/pi0_gamma0_P4[3] > -0.866023  && pi0_gamma0_P4[2]/pi0_gamma0_P4[3] < 0.956305 && pi0_gamma1_P4[2]/pi0_gamma1_P4[3] > -0.866023  && pi0_gamma1_P4[2]/pi0_gamma1_P4[3] < 0.956305";
     
 
     string gammatruth_cut = "((pi0_gamma0_P4[3] > 0.60 * pi0_gamma0_TruthP4[3]) && (pi0_gamma1_P4[3] > 0.60 * pi0_gamma1_TruthP4[3]))";
@@ -272,13 +271,10 @@ void Pi0Resolution(TTree* tree_pi0, TString treename, double fitmin, double fitm
   
 
   /* Access the Photons and pi0 M*/
-  float pi0_gamma0_P4[4];
-  float pi0_gamma1_P4[4];
   float pi0_M = 0.;
   float pi0_P = 0.;
   int pi0_mcErrors = 0;
 
-  string namelist;
   TNtuple* tvalidation = new TNtuple("pi0mass","tree","mean:meanerror:width:widtherror");
   
   TCanvas *canvas = new TCanvas (treename,treename);
@@ -294,7 +290,8 @@ void Pi0Resolution(TTree* tree_pi0, TString treename, double fitmin, double fitm
   h_pi0_m_truth->GetListOfFunctions()->Add(new TNamed("Description","pi0 mass from photons,with mcErrors==0."));
   h_pi0_m_truth->GetListOfFunctions()->Add(new TNamed("Check","Check if mean is correct."));
   
-  
+  h_pi0_m_truth->GetListOfFunctions()->Add(new TNamed("Contact","Mario Merola (mario.merola@na.infn.it)"));  
+
   tree_pi0->SetBranchAddress("pi0_M",&pi0_M);
   tree_pi0->SetBranchAddress("pi0_P",&pi0_P);
   tree_pi0->SetBranchAddress("pi0_mcErrors",&pi0_mcErrors);

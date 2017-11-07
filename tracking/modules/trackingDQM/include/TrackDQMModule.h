@@ -74,15 +74,15 @@ namespace Belle2 {
     TH1F* m_HitsSVD;
     /** Number of hits on CDC */
     TH1F* m_HitsCDC;
-    /** Number of hits in tracks */
+    /** Number of all hits in tracks */
     TH1F* m_Hits;
-    /** Number of tracks with VXD */
+    /** Number of tracks only with VXD */
     TH1F* m_TracksVXD;
-    /** Number of tracks with CDC */
+    /** Number of tracks only with CDC */
     TH1F* m_TracksCDC;
-    /** Number of tracks with VXD+CDC */
+    /** Number of full tracks with VXD+CDC */
     TH1F* m_TracksVXDCDC;
-    /** Number of finding tracks */
+    /** Number of all finding tracks */
     TH1F* m_Tracks;
 
   };  //end class declaration

@@ -227,8 +227,6 @@ void TrackDQMModule::event()
         (recoTrack.getNumberOfCDCHits() == 0)) iTrackVXD++;
     if (((recoTrack.getNumberOfPXDHits() == 0) && (recoTrack.getNumberOfSVDHits() == 0)) &&
         (recoTrack.getNumberOfCDCHits() > 0)) iTrackCDC++;
-    // if ((recoTrack.getNumberOfPXDHits() > 0) || (recoTrack.getNumberOfSVDHits() > 0)) iTrackVXD++;
-    // if (recoTrack.getNumberOfCDCHits() > 0) iTrackCDC++;
     if (m_MomX != NULL) m_MomX->Fill(genfitTrack.getFittedState().getMom().X());
     if (m_MomY != NULL) m_MomY->Fill(genfitTrack.getFittedState().getMom().Y());
     if (m_MomZ != NULL) m_MomZ->Fill(genfitTrack.getFittedState().getMom().Z());

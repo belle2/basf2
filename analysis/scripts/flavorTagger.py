@@ -314,7 +314,9 @@ def setVariables():
         'NumberOfKShortsInRoe',
         'ptTracksRoe',
         'BtagToWBosonVariables(recoilMassSqrd)',
+        'BtagToWBosonVariables(pMissCMS)',
         'BtagToWBosonVariables(cosThetaMissCMS)',
+        'BtagToWBosonVariables(EW90)',
         'cosTPTO',
         'ImpactXY',
         'distance',
@@ -341,31 +343,13 @@ def setVariables():
         'BtagToWBosonVariables(recoilMassSqrd)',
         'BtagToWBosonVariables(EW90)',
         'BtagToWBosonVariables(cosThetaMissCMS)',
+        'BtagToWBosonVariables(pMissCMS)',
         'cosTPTO',
         'ImpactXY',
         'distance',
         'chiProb'
     ]
-    variables['FastPion'] = [
-        'useCMSFrame(p)',
-        'useCMSFrame(pt)',
-        'cosTheta',
-        'p',
-        'pt',
-        'piid',
-        'piid_dEdx',
-        'piid_TOP',
-        'piid_ARICH',
-        'pi_vs_edEdxid',
-        KId[getBelleOrBelle2()],
-        'eid',
-        'BtagToWBosonVariables(EW90)',
-        'cosTPTO',
-        'ImpactXY',
-        'distance',
-        'chiProb',
-    ]
-
+    variables['FastPion'] = variables['SlowPion']
     variables['Lambda'] = [
         'lambdaFlavor',
         'NumberOfKShortsInRoe',
@@ -379,7 +363,6 @@ def setVariables():
         'chiProb',
         'distance',
     ]
-
     variables['MaximumPstar'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',

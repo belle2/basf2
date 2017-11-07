@@ -71,12 +71,8 @@ void ClusterMatcherModule::event()
 
     const TVector3& eclClusterPos = eclCluster.getClusterPosition();
 
-    Cluster* clusterecl = Clusters.appendNew();/*
-    clusterecl->setLogLikelihood(
-      Const::ECL,
-      Const::clusterKlong,
-      eclCluster.getRelatedTo<KlId>()->getKlId()
-      );*/
+    Cluster* clusterecl = Clusters.appendNew();
+    //Once available we will have to set ECL likelihoods here as is done for KLM
     eclCluster.addRelationTo(clusterecl);
 
     for (KLMCluster& klmcluster : klmClusters) {

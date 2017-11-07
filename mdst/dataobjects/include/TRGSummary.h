@@ -13,14 +13,14 @@
 
 #include <framework/datastore/RelationsObject.h>
 //#include <framework/gearbox/Const.h>
-
+#include <TObject.h>
 
 namespace Belle2 {
 
   /**
    * Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source
    */
-  class TRGSummary : public RelationsObject {
+  class TRGSummary : public TObject {
 
   private:
 
@@ -55,7 +55,16 @@ namespace Belle2 {
     /*! setter
      * @param xxx explanation
      */
-    void setTRGSummary() {;}
+    void setTRGSummary(int i, int word) { m_ftdlBits[i] = word;}
+
+    /***/
+    void setPreScale(int i, int bit, int pre) {m_prescaleBits[i][bit] = pre;}
+
+    /***/
+    unsigned int getTRGSummary(int i) {return m_ftdlBits[i];}
+
+    /***/
+    unsigned int getPreScale(int i, int bit) {return m_prescaleBits[i][bit];}
 
     /*! get input bits
      * @param i index: 0, 1, 2 for bit 0-31, 32-63, 64-95, respectively.
@@ -104,6 +113,7 @@ namespace Belle2 {
     unsigned int m_ftdlBits[10]; /**< ftdl bits. Outputs of trigger logic  */
     unsigned int m_psnmBits[10]; /**< psnm bits. Prescaled ftdl bits */
     unsigned int m_timTypeBits; /**< timing source bits */
+    unsigned int m_prescaleBits[10][32]; /**the prescale factor of each bit*/
 
     ClassDef(TRGSummary, 1); /**< Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
 

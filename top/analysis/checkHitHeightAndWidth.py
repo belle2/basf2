@@ -40,6 +40,7 @@ class Histogrammer(Module):
     def setOutputName(self, outputname):
         ''' Sets the output file name '''
 
+        #: output name
         self.outname = outputname
 
     def event(self):

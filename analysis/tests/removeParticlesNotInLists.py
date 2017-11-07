@@ -11,8 +11,8 @@ main = create_path()
 
 inputMdst("default", Belle2.FileSystem.findFile('analysis/tests/mdst.root'), path=main)
 
-kaons = ('K-', 'Kid > 0.05')
-pions = ('pi+', 'piid > 0.05')
+kaons = ('K-', 'kaonID > 0.05')
+pions = ('pi+', 'pionID > 0.05')
 photons = ('gamma', '')
 fillParticleLists([kaons, pions, photons], path=main)
 

@@ -71,13 +71,12 @@ void ClusterMatcherModule::event()
 
     const TVector3& eclClusterPos = eclCluster.getClusterPosition();
 
-
-    Cluster* clusterecl = Clusters.appendNew();
+    Cluster* clusterecl = Clusters.appendNew();/*
     clusterecl->setLogLikelihood(
       Const::ECL,
       Const::clusterKlong,
       eclCluster.getRelatedTo<KlId>()->getKlId()
-    );
+      );*/
     eclCluster.addRelationTo(clusterecl);
 
     for (KLMCluster& klmcluster : klmClusters) {

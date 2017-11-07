@@ -186,20 +186,20 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   std::vector<genfit::AbsTrackRep*> repsMinus = gfTrackMinus.getTrackReps();
   if (repsPlus.size() == repsMinus.size()) {
     for (unsigned int id = 0; id < repsPlus.size(); id++) {
-      if (repsPlus[id]->getPDG() == trackHypotheses.first.getPDGCode())
+      if (repsPlus[id]->getPDG() == PDGTrackPlus)
         gfTrackPlus.setCardinalRep(id);
-      if (repsMinus[id]->getPDG() == trackHypotheses.second.getPDGCode())
+      if (repsMinus[id]->getPDG() == PDGTrackMinus)
         gfTrackMinus.setCardinalRep(id);
     }
   }
   // The two vectors should always have the same size, and this never happen
   else {
     for (unsigned int id = 0; id < repsPlus.size(); id++) {
-      if (repsPlus[id]->getPDG() == trackHypotheses.first.getPDGCode())
+      if (repsPlus[id]->getPDG() == PDGTrackPlus)
         gfTrackPlus.setCardinalRep(id);
     }
     for (unsigned int id = 0; id < repsMinus.size(); id++) {
-      if (repsMinus[id]->getPDG() == trackHypotheses.second.getPDGCode())
+      if (repsMinus[id]->getPDG() == PDGTrackMinus)
         gfTrackMinus.setCardinalRep(id);
     }
   }

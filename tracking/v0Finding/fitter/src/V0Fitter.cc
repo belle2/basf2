@@ -157,8 +157,9 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   }
   genfit::Track gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
 
-  genfit::AbsTrackRep* plusRepresentation = TrackFitter::getTrackRepresentationForPDG(trackHypotheses.first.getPDGCode(),
-                                            *recoTrackPlus);
+  int PDGTrackPlus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getParticleType().getPDGCode();
+
+  genfit::AbsTrackRep* plusRepresentation = TrackFitter::getTrackRepresentationForPDG(PDGTrackPlus, *recoTrackPlus);
   if (not recoTrackPlus->wasFitSuccessful(plusRepresentation)) {
     B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
     return false;
@@ -172,8 +173,9 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
 
   genfit::Track gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
 
-  genfit::AbsTrackRep* minusRepresentation = TrackFitter::getTrackRepresentationForPDG(trackHypotheses.second.getPDGCode(),
-                                             *recoTrackMinus);
+  int PDGTrackMinus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getParticleType().getPDGCode();
+
+  genfit::AbsTrackRep* minusRepresentation = TrackFitter::getTrackRepresentationForPDG(PDGTrackMinus, *recoTrackMinus);
   if (not recoTrackMinus->wasFitSuccessful(minusRepresentation)) {
     B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
     return false;

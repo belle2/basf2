@@ -177,7 +177,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
 
   genfit::AbsTrackRep* minusRepresentation = TrackFitter::getTrackRepresentationForPDG(PDGTrackMinus, *recoTrackMinus);
   if (not recoTrackMinus->wasFitSuccessful(minusRepresentation)) {
-    B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
+    B2ERROR("Track hypothesis with closest mass not available. Should never happen, but I can continue savely anyway.");
     return false;
   }
 
@@ -186,20 +186,20 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   std::vector<genfit::AbsTrackRep*> repsMinus = gfTrackMinus.getTrackReps();
   if (repsPlus.size() == repsMinus.size()) {
     for (unsigned int id = 0; id < repsPlus.size(); id++) {
-      if (repsPlus[id]->getPDG() == PDGTrackPlus)
+      if (abs(repsPlus[id]->getPDG()) == PDGTrackPlus)
         gfTrackPlus.setCardinalRep(id);
-      if (repsMinus[id]->getPDG() == PDGTrackMinus)
+      if (abs(repsMinus[id]->getPDG()) == PDGTrackMinus)
         gfTrackMinus.setCardinalRep(id);
     }
   }
   // The two vectors should always have the same size, and this never happen
   else {
     for (unsigned int id = 0; id < repsPlus.size(); id++) {
-      if (repsPlus[id]->getPDG() == PDGTrackPlus)
+      if (abs(repsPlus[id]->getPDG()) == PDGTrackPlus)
         gfTrackPlus.setCardinalRep(id);
     }
     for (unsigned int id = 0; id < repsMinus.size(); id++) {
-      if (repsMinus[id]->getPDG() == PDGTrackMinus)
+      if (abs(repsMinus[id]->getPDG()) == PDGTrackMinus)
         gfTrackMinus.setCardinalRep(id);
     }
   }

@@ -11,7 +11,7 @@
 from basf2 import *
 from modularAnalysis import *
 import basf2_mva
-import variables as mc_variables
+import variables as flavorTaggerVariables
 from ROOT import Belle2
 import os
 import glob
@@ -228,8 +228,28 @@ def WhichCategories(categories=[
 
 # Variables for categories on track level - are defined in variables.cc and MetaVariables.cc
 variables = dict()
-KId = {'Belle': 'Kid_belle', 'Belle2': 'Kid'}
-muId = {'Belle': 'muIDBelle', 'Belle2': 'muid'}
+KId = {'Belle': 'kIDBelle', 'Belle2': 'kaonID'}
+muId = {'Belle': 'muIDBelle', 'Belle2': 'muonID'}
+eId = {'Belle': 'eIDBelle', 'Belle2': 'electronID'}
+
+flavorTaggerVariables.addAlias('eid_dEdx', 'pidPairProbabilityExpert(11, 211, CDC, SVD)')
+flavorTaggerVariables.addAlias('eid_TOP', 'pidPairProbabilityExpert(11, 211, TOP)')
+flavorTaggerVariables.addAlias('eid_ARICH', 'pidPairProbabilityExpert(11, 211, ARICH)')
+flavorTaggerVariables.addAlias('eid_ECL', 'pidPairProbabilityExpert(11, 211, ECL)')
+
+flavorTaggerVariables.addAlias('muid_dEdx', 'pidPairProbabilityExpert(13, 211, CDC, SVD)')
+flavorTaggerVariables.addAlias('muid_TOP', 'pidPairProbabilityExpert(13, 211, TOP)')
+flavorTaggerVariables.addAlias('muid_ARICH', 'pidPairProbabilityExpert(13, 211, ARICH)')
+flavorTaggerVariables.addAlias('muid_KLM', 'pidPairProbabilityExpert(13, 211, KLM)')
+
+flavorTaggerVariables.addAlias('piid_dEdx', 'pidPairProbabilityExpert(211, 321, CDC, SVD)')
+flavorTaggerVariables.addAlias('piid_TOP', 'pidPairProbabilityExpert(211, 321, TOP)')
+flavorTaggerVariables.addAlias('piid_ARICH', 'pidPairProbabilityExpert(211, 321, ARICH)')
+flavorTaggerVariables.addAlias('pi_vs_edEdxid', 'pidPairProbabilityExpert(211, 11, CDC, SVD)')
+
+flavorTaggerVariables.addAlias('Kid_TOP', 'pidPairProbabilityExpert(321, 211, TOP)')
+flavorTaggerVariables.addAlias('Kid_ARICH', 'pidPairProbabilityExpert(321, 211, ARICH)')
+flavorTaggerVariables.addAlias('Kid_dEdx', 'pidPairProbabilityExpert(321, 211, CDC, SVD)')
 
 
 def setVariables():
@@ -243,7 +263,7 @@ def setVariables():
         'p',
         'pt',
         'cosTheta',
-        'eid',
+        eId[getBelleOrBelle2()],
         'eid_dEdx',
         'eid_TOP',
         'eid_ARICH',
@@ -268,6 +288,7 @@ def setVariables():
         'muid_dEdx',
         'muid_TOP',
         'muid_ARICH',
+        'muid_KLM',
         'BtagToWBosonVariables(recoilMassSqrd)',
         'BtagToWBosonVariables(pMissCMS)',
         'BtagToWBosonVariables(cosThetaMissCMS)',
@@ -288,7 +309,8 @@ def setVariables():
         'muid_dEdx',
         'muid_TOP',
         'muid_ARICH',
-        'eid',
+        'muid_KLM',
+        eId[getBelleOrBelle2()],
         'eid_dEdx',
         'eid_TOP',
         'eid_ARICH',
@@ -329,7 +351,7 @@ def setVariables():
         'cosTheta',
         'p',
         'pt',
-        'piid',
+        'pionID',
         'piid_dEdx',
         'piid_TOP',
         'piid_ARICH',
@@ -340,7 +362,7 @@ def setVariables():
         'Kid_ARICH',
         'NumberOfKShortsInRoe',
         'ptTracksRoe',
-        'eid',
+        eId[getBelleOrBelle2()],
         'BtagToWBosonVariables(recoilMassSqrd)',
         'BtagToWBosonVariables(EW90)',
         'BtagToWBosonVariables(cosThetaMissCMS)',
@@ -357,12 +379,16 @@ def setVariables():
         'M',
         'cosAngleBetweenMomentumAndVertexVector',
         'lambdaZError',
+        'daughter(0,pionID)',
+        'daughter(0,p)',
+        'daughter(0,useCMSFrame(p))',
+        'daughter(1,protonID)',
         'daughter(1,p)',
         'daughter(1,useCMSFrame(p))',
         'useCMSFrame(p)',
         'p',
-        'chiProb',
         'distance',
+        'chiProb',
     ]
     variables['MaximumPstar'] = [
         'useCMSFrame(p)',

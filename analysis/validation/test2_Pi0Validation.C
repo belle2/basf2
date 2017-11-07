@@ -3,6 +3,7 @@
 <input>GenericB.ntup.root</input>
 <output>test2_Validation_pi0_output.root</output>
 <contact>Mario Merola, mario.merola@na.infn.it</contact>
+<interval>release</interval>
 </header>
 */
 

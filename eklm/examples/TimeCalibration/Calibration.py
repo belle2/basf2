@@ -11,13 +11,11 @@ import sys
 # Set the global log level
 set_log_level(LogLevel.INFO)
 
-inputFileNames = [sys.argv[1]]
-
 gearbox = register_module('Gearbox')
 gearbox.initialize()
 
 algo = Belle2.EKLMTimeCalibrationAlgorithm()
-algo.setInputFileNames(inputFileNames)
+algo.setInputFileNames(sys.argv[1:])
 # Uncomment the following line to draw histograms.
 # algo.setDebug()
 algo.execute()

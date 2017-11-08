@@ -11,13 +11,11 @@ import sys
 # Set the global log level
 set_log_level(LogLevel.INFO)
 
-inputFileNames = [sys.argv[1]]
-
 gearbox = register_module('Gearbox')
 gearbox.initialize()
 
 algo = Belle2.EKLMAlignmentAlongStripsAlgorithm()
-algo.setInputFileNames(inputFileNames)
+algo.setInputFileNames(sys.argv[1:])
 algo.setOutputFile('alignment_along_strips.root')
 algo.execute()
 algo.commit()

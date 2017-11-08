@@ -16,7 +16,15 @@
 namespace Belle2 {
 
   /**
-   * Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source
+   * Trigger Summary Information
+   *   input bits
+   *     input bits from subdetectors
+   *   ftdl (Final Trigger Decision Logic) bits
+   *     output bits of trigger logic
+   *   psnm (Prescale and Mask) bits
+   *     prescaled ftdl bits
+   *   timTypeBits
+   *     4=PSNM, 3=TOP, 2=ECL, 1=CDC, 0=NON
    */
   class TRGSummary : public TObject {
 
@@ -102,9 +110,9 @@ namespace Belle2 {
   private:
 
     unsigned int m_inputBits[10]; /**< input bits from subdetectors */
-    unsigned int m_ftdlBits[10]; /**< ftdl bits. Outputs of trigger logic  */
-    unsigned int m_psnmBits[10]; /**< psnm bits. Prescaled ftdl bits */
-    unsigned int m_timTypeBits; /**< timing source bits */
+    unsigned int m_ftdlBits[10]; /**< ftdl (Final Trigger Decision Logic) bits. Outputs of trigger logic  */
+    unsigned int m_psnmBits[10]; /**< psnm (PreScale aNd Mask) bits. Prescaled ftdl bits */
+    unsigned int m_timTypeBits; /**< timing source bits. 4=PSNM, 3=TOP, 2=ECL, 1=CDC, 0=NON */
     unsigned int m_prescaleBits[10][32]; /**the prescale factor of each bit*/
 
     ClassDef(TRGSummary, 2); /**< Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */

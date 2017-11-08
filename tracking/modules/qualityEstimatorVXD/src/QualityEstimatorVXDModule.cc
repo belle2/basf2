@@ -65,7 +65,7 @@ void QualityEstimatorVXDModule::initialize()
 void QualityEstimatorVXDModule::beginRun()
 {
   // BField is required by all QualityEstimators
-  double bFieldZ = BFieldManager::getField(0, 0, 0).Z();
+  double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
   m_estimator->setMagneticFieldStrength(bFieldZ);
 }
 

@@ -133,6 +133,8 @@ Packer.param('NodeID', nodeid)
 Packer.param('svdDigitListName', 'SVDDigits')
 Packer.param('rawSVDListName', 'SVDRaw')
 Packer.param('xmlMapFileName', mapping_file)
+# optionally produce 3-sample data for specific FADCs
+Packer.param('simulate3sampleData', False)
 main.add_module(Packer)
 
 unPacker = register_module('SVDUnpacker')

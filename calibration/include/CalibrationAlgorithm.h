@@ -65,7 +65,7 @@ namespace Belle2 {
     std::string getCollectorName() const {return getPrefix();}
 
     /// Set the prefix used to identify datastore objects
-    void setPrefix(std::string prefix) {m_prefix = prefix;}
+    void setPrefix(const std::string& prefix) {m_prefix = prefix;}
 
     /// Get the complete list of runs from inspection of datastore
     std::vector<ExpRun> getRunListFromAllData();
@@ -177,7 +177,7 @@ namespace Belle2 {
     // -----------------------------------------------
 
     /// Set algorithm description (in constructor)
-    void setDescription(std::string description) {m_description = description;}
+    void setDescription(const std::string& description) {m_description = description;}
 
   private:
 

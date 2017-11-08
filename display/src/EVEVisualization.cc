@@ -856,28 +856,28 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
       // get eigenvalues & -vectors
       {
         TMatrixDSymEigen eigen_values2(cov.GetSub(0, 2, 0, 2));
-        const TVectorD& ev = eigen_values2.GetEigenValues();
-        const TMatrixD& eVec = eigen_values2.GetEigenVectors();
+        const TVectorD& eVal = eigen_values2.GetEigenValues();
+        const TMatrixD& eVect = eigen_values2.GetEigenVectors();
         // limit
-        ev0 = std::min(ev(0), maxErr);
-        ev1 = std::min(ev(1), maxErr);
-        ev2 = std::min(ev(2), maxErr);
+        ev0 = std::min(eVal(0), maxErr);
+        ev1 = std::min(eVal(1), maxErr);
+        ev2 = std::min(eVal(2), maxErr);
 
         // get two largest eigenvalues/-vectors
         if (ev0 < ev1 && ev0 < ev2) {
-          eVec1.SetXYZ(eVec(0, 1), eVec(1, 1), eVec(2, 1));
+          eVec1.SetXYZ(eVect(0, 1), eVect(1, 1), eVect(2, 1));
           eVec1 *= sqrt(ev1);
-          eVec2.SetXYZ(eVec(0, 2), eVec(1, 2), eVec(2, 2));
+          eVec2.SetXYZ(eVect(0, 2), eVect(1, 2), eVect(2, 2));
           eVec2 *= sqrt(ev2);
         } else if (ev1 < ev0 && ev1 < ev2) {
-          eVec1.SetXYZ(eVec(0, 0), eVec(1, 0), eVec(2, 0));
+          eVec1.SetXYZ(eVect(0, 0), eVect(1, 0), eVect(2, 0));
           eVec1 *= sqrt(ev0);
-          eVec2.SetXYZ(eVec(0, 2), eVec(1, 2), eVec(2, 2));
+          eVec2.SetXYZ(eVect(0, 2), eVect(1, 2), eVect(2, 2));
           eVec2 *= sqrt(ev2);
         } else {
-          eVec1.SetXYZ(eVec(0, 0), eVec(1, 0), eVec(2, 0));
+          eVec1.SetXYZ(eVect(0, 0), eVect(1, 0), eVect(2, 0));
           eVec1 *= sqrt(ev0);
-          eVec2.SetXYZ(eVec(0, 1), eVec(1, 1), eVec(2, 1));
+          eVec2.SetXYZ(eVect(0, 1), eVect(1, 1), eVect(2, 1));
         } eVec2 *= sqrt(ev1);
       }
 
@@ -1012,15 +1012,15 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
       //This will force the track propagation to visit all points in order but
       //provide smooth helix interpolation between the points
       const MCParticleTrajectory& trajectory = dynamic_cast<const MCParticleTrajectory&>(*rel.object);
-      for (const MCTrajectoryPoint& p : trajectory) {
+      for (const MCTrajectoryPoint& pt : trajectory) {
         m_mcparticleTracks[particle].track->AddPathMark(
           TEvePathMark(
             //Add the last trajectory point as decay point to prevent TEve to
             //propagate beyond the end of the track. So lets compare the adress
             //to the address of last point and choose the pathmark accordingly
-            (&p == &trajectory.back()) ? TEvePathMark::kDecay : TEvePathMark::kReference,
-            TEveVector(p.x, p.y, p.z),
-            TEveVector(p.px, p.py, p.pz)
+            (&pt == &trajectory.back()) ? TEvePathMark::kDecay : TEvePathMark::kReference,
+            TEveVector(pt.x, pt.y, pt.z),
+            TEveVector(pt.px, pt.py, pt.pz)
           ));
       }
       //"There can only be One" -> found a trajectory, stop the loop

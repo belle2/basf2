@@ -118,6 +118,6 @@ namespace Belle2 {
     /// granularity used by the collector storing the information.
     std::string m_granularity = "run";
 
-    ClassDef(RunRange, 1) /**< Mergeable set of (exp,run) pairs */
+    ClassDef(RunRange, 2) /**< Mergeable set of (exp,run) pairs */
   };
 }

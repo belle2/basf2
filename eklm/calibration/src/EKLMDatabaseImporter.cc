@@ -213,3 +213,22 @@ void EKLMDatabaseImporter::importDisplacement()
   m_Displacement.import(iov);
 }
 
+void EKLMDatabaseImporter::loadDefaultElectronicsMap()
+{
+  m_ElectronicsMap.construct();
+}
+
+void EKLMDatabaseImporter::addSectorLane(
+  int endcap, int layer, int sector, int copper, int dataConcentrator, int lane)
+{
+  m_ElectronicsMap->addSectorLane(endcap, layer, sector,
+                                  copper, dataConcentrator, lane);
+}
+
+void EKLMDatabaseImporter::importElectronicsMap()
+{
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  m_ElectronicsMap.import(iov);
+}
+

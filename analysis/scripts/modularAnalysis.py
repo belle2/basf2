@@ -1836,8 +1836,9 @@ def writePi0EtaVeto(
     cTheta : soft photon ECL cluster's polar angle
     Zmva : soft photon output of MVA using Zernike moments of the cluster
     minC2Hdist : soft photon distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
-    default weight files are downloaded to your workingDirectory automatically from the database by default.
-    If you have weight files in your workingDirectory already, please set downloadFlag to False.
+
+    If you don't have weight files in your workingDirectory,
+    these files are downloaded from database to your workingDirectory automatically.
     Please refer to analysis/examples/tutorials/B2A306-B02RhoGamma-withPi0EtaVeto.py
     about how to use this function.
 
@@ -1895,16 +1896,19 @@ def writePi0EtaVeto(
 
     if not os.path.isdir(workingDirectory):
         os.mkdir(workingDirectory)
+        B2INFO('writePi0EtaVeto: ' + workingDirectory + ' has been created as workingDirectory.')
 
     if not os.path.isfile(workingDirectory + '/pi0veto.root'):
         if downloadFlag:
             use_central_database('development')
             basf2_mva.download('Pi0VetoIdentifier', workingDirectory + '/pi0veto.root')
+            B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
 
     if not os.path.isfile(workingDirectory + '/etaveto.root'):
         if downloadFlag:
             use_central_database('development')
             basf2_mva.download('EtaVetoIdentifier', workingDirectory + '/etaveto.root')
+            B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
 
     roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO'], extraInfoName='Pi0Veto',
                         identifier=workingDirectory + '/pi0veto.root')

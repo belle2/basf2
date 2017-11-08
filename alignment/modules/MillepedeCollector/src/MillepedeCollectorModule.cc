@@ -147,7 +147,7 @@ void MillepedeCollectorModule::prepare()
   gblDataTree->Branch<std::vector<gbl::GblData>>("GblData", &m_currentGblData, 32000, 99);
   registerObject<TTree>("GblDataTree", gblDataTree);
 
-  registerObject<TH1F>("chi2/ndf", new TH1F("chi2/ndf", "chi2/ndf", 200, 0., 50.));
+  registerObject<TH1F>("chi2_per_ndf", new TH1F("chi2_per_ndf", "chi2 divided by ndf", 200, 0., 50.));
   registerObject<TH1F>("pval", new TH1F("pval", "pval", 100, 0., 1.));
 
   Belle2::alignment::GlobalCalibrationManager::getInstance().initialize(m_components);
@@ -247,7 +247,7 @@ void MillepedeCollectorModule::collect()
       if (!fs->isFittedWithReferenceTrack())
         continue;
 
-      getObjectPtr<TH1F>("chi2/ndf")->Fill(fs->getChi2() / fs->getNdf());
+      getObjectPtr<TH1F>("chi2_per_ndf")->Fill(fs->getChi2() / fs->getNdf());
       getObjectPtr<TH1F>("pval")->Fill(fs->getPVal());
 
       using namespace gbl;
@@ -269,7 +269,7 @@ void MillepedeCollectorModule::collect()
       for (auto& track : getParticlesTracks({list->getParticle(iParticle)}, false)) {
         auto gblfs = dynamic_cast<genfit::GblFitStatus*>(track->getFitStatus());
 
-        getObjectPtr<TH1F>("chi2/ndf")->Fill(gblfs->getChi2() / gblfs->getNdf());
+        getObjectPtr<TH1F>("chi2_per_ndf")->Fill(gblfs->getChi2() / gblfs->getNdf());
         getObjectPtr<TH1F>("pval")->Fill(gblfs->getPVal());
 
         gbl::GblTrajectory trajectory(gbl->collectGblPoints(track, track->getCardinalRep()), gblfs->hasCurvature());
@@ -308,7 +308,7 @@ void MillepedeCollectorModule::collect()
         //if (TMath::Prob(chi2, ndf) > m_minPValue) mille.fill(combined);
         if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
 
-        getObjectPtr<TH1F>("chi2/ndf")->Fill(chi2 / ndf);
+        getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / ndf);
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
       }
     }
@@ -385,7 +385,7 @@ void MillepedeCollectorModule::collect()
 
         if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
 
-        getObjectPtr<TH1F>("chi2/ndf")->Fill(chi2 / ndf);
+        getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / ndf);
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
       }
     }

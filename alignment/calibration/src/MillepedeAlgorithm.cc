@@ -24,7 +24,7 @@ MillepedeAlgorithm::MillepedeAlgorithm() : CalibrationAlgorithm("MillepedeCollec
 
 CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 {
-  auto chisqHist = getObjectPtr<TH1F>("chi2/ndf");
+  auto chisqHist = getObjectPtr<TH1F>("chi2_per_ndf");
   B2INFO(" Mean of Chi2 / NDF of tracks before calibration: " << chisqHist->GetMean());
 
   // Write out binary files from tree and add to steering
@@ -147,7 +147,10 @@ void MillepedeAlgorithm::prepareMilleBinary()
 
   // For no entries, no binary file is created
   auto gblDataTree = getObjectPtr<TTree>("GblDataTree");
-  if (!gblDataTree->GetEntries()) {
+  if (!gblDataTree) {
+    B2WARNING("No GBL data tree object in collected data.");
+    return;
+  } else if (!gblDataTree->GetEntries()) {
     B2WARNING("No trajectories in GBL data tree.");
     return;
   }

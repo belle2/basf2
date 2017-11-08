@@ -198,11 +198,11 @@ class VxdCdcMergerHarvesterPRSide(HarvestingModule):
         else:
             result["mc_store_array_number"] = -1
 
-        result.update(self.peel_matching_information((pr_track, self.mc_track_matcher)))
+        result.update(peel_matching_information((pr_track, self.mc_track_matcher)))
 
         matched_track = pr_track.getRelated(self.others)
 
-        result.update(self.peel_matching_information((matched_track, self.mc_track_matcher_other), key="other_{part_name}"))
+        result.update(peel_matching_information((matched_track, self.mc_track_matcher_other), key="other_{part_name}"))
 
         if matched_track:
             result["matched_store_array_number"] = matched_track.getArrayIndex()

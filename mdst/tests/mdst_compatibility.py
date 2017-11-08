@@ -45,6 +45,7 @@ def str_vector(vec, dim):
     """convert a vector like object (TVector3, TLorentzVector) to a string"""
     return "(" + ",".join("%.6g" % vec[i] for i in range(dim)) + ")"
 
+
 # and override the members of the classes to use our own functions in future
 Belle2.Const.ParticleType.__repr__ = str_ParticleType
 Belle2.Const.DetectorSet.__repr__ = str_DetectorSet
@@ -248,6 +249,7 @@ class DataStorePrinter(object):
         else:
             print(result, weight, sep="")
 
+
 # Now we define a list of all the mdst_dataobjects we want to print out and all
 # the members we want to check
 mdst_dataobjects = [
@@ -275,6 +277,7 @@ mdst_dataobjects = [
     ]),
     DataStorePrinter("Track", ["getNumberOfFittedHypotheses"], {
         "getTrackFitResult": const_stable,
+        "getTrackFitResultWithClosestMass": const_stable,
         "getRelationsWith": ["ECLClusters", "KLMClusters", "MCParticles", "PIDLikelihoods"],
     }),
     DataStorePrinter("V0", ["getTracks", "getTrackFitResults", "getV0Hypothesis"], {
@@ -334,13 +337,16 @@ def print_file(filename):
     main.add_module(PrintMDSTModule())
     process(main, 6)
 
+
 if __name__ == "__main__":
     import ROOT
     # set a constant 1.5T magnetic field and make sure we don't get a warning
     # message for that
     set_log_level(LogLevel.ERROR)
     set_random_seed(1)
-    ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Belle2.Unit.T)
+    field = Belle2.MagneticField()
+    field.addComponent(Belle2.MagneticFieldComponentConstant(Belle2.B2Vector3D(0, 0, 1.5 * ROOT.Belle2.Unit.T)))
+    Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
     set_log_level(LogLevel.INFO)
     # now run the test
     print_file("mdst/tests/mdst-v00-05-02.root")

@@ -160,13 +160,6 @@ namespace Belle2 {
     Manager::FunctionPtr veto(const std::vector<std::string>& arguments);
 
     /**
-      * Returns -999 (delta function of NeuroBayes) instead of variable value if pid from given detector is missing.
-      * First arguments must be TOP or ARICH
-      * Second argument must be a valid variable name
-      */
-    Manager::FunctionPtr NBDeltaIfMissing(const std::vector<std::string>& arguments);
-
-    /**
      * Returns the number of non-overlapping particles in the given particle lists
      * with respect to the particle the variable is applied on.
      * Arguments are the particle lists

@@ -376,7 +376,7 @@ namespace Belle2 {
           StoreArray<Track> tracks;
           for (const auto& track : tracks)
           {
-            const TrackFitResult* trackFit = track.getTrackFitResult(Const::pion);
+            const TrackFitResult* trackFit = track.getTrackFitResultWithClosestMass(Const::pion);
             if (trackFit->getChargeSign() == 0) {
               // Ignore track
             } else {
@@ -1050,35 +1050,6 @@ endloop:
 
     }
 
-
-    Manager::FunctionPtr NBDeltaIfMissing(const std::vector<std::string>& arguments)
-    {
-      if (arguments.size() == 2) {
-        Const::PIDDetectorSet set = Const::TOP;
-        if (arguments[0] == "TOP") {
-          set = Const::TOP;
-        } else if (arguments[0] == "ARICH") {
-          set = Const::ARICH;
-        } else {
-          B2FATAL("Encountered unsupported sub-detector type " + arguments[0] + " in NBDeltaIfMissing only TOP and ARICH are supported."
-                  "Note that other sub-detectors providing PID information like ECL, dEdx do not have missing values!");
-        }
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        auto func = [var, set](const Particle * particle) -> double {
-          const PIDLikelihood* pid = particle->getPIDLikelihood();
-          if (!pid)
-            return -999;
-          if (not pid->isAvailable(set))
-            return -999;
-          return var->function(particle);
-        };
-        return func;
-      } else {
-        B2FATAL("Wrong number of arguments for meta function NBDeltaIfMissing");
-      }
-    }
-
-
     Manager::FunctionPtr matchedMC(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -1230,12 +1201,6 @@ endloop:
     REGISTER_VARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
                       "Useful for debugging.");
-    REGISTER_VARIABLE("NBDeltaIfMissing(detector, variable)", NBDeltaIfMissing,
-                      "Returns value of variable if pid information of detector is available otherwise -999 (delta function of NeuroBayes).\n"
-                      "Possible values for detector are TOP and ARICH.\n"
-                      "Useful as a feature variable for the NeuroBayes classifier, which tags missing values with -999.\n"
-                      "E.g. NBDeltaIfMissing(TOP, eid_TOP) returns electron id of TOP if this information is available, otherwise -999.\n"
-                      "     NBDeltaIfMissing(ARICH, Kid_ARICH) returns kaon id of ARICH if this information is available, otherwise -999.");
     REGISTER_VARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut. \n"
                       "For instance one can apply this function on a signal Photon and provide a list of all photons in the rest of event and a cut \n"

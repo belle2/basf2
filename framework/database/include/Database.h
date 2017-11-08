@@ -18,6 +18,7 @@
 #include <string>
 #include <utility>
 #include <list>
+#include <memory>
 
 class TObject;
 

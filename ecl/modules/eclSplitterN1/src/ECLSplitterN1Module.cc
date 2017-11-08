@@ -190,13 +190,13 @@ void ECLSplitterN1Module::event()
     // list theat will hold all cellids in this connected region
     m_cellIdInCR.clear();
 
-    const unsigned int entries = (aCR.getRelationsWith<ECLCalDigit>()).size();
+    const unsigned int entries = (aCR.getRelationsWith<ECLCalDigit>(eclCalDigitArrayName())).size();
 
     m_cellIdInCR.resize(entries);
 
     // Fill all calDigits ids in this CR into a vector to make them 'find'-able.
     int i = 0;
-    for (const auto& caldigit : aCR.getRelationsWith<ECLCalDigit>()) {
+    for (const auto& caldigit : aCR.getRelationsWith<ECLCalDigit>(eclCalDigitArrayName())) {
       m_cellIdInCR[i] = caldigit.getCellId();
       ++i;
     }
@@ -238,7 +238,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
   }
 
   // Get the number of LMs in this CR
-  const int nLocalMaximums = aCR.getRelationsWith<ECLLocalMaximum>().size();
+  const int nLocalMaximums = aCR.getRelationsWith<ECLLocalMaximum>(eclLocalMaximumArrayName()).size();
 
   B2DEBUG(175, "ECLCRSplitterModule::splitConnectedRegion: nLocalMaximums = " << nLocalMaximums);
 
@@ -266,7 +266,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     unsigned int highestEnergyID = 0;
 
     // Add relation to the LM.
-    RelationVector<ECLLocalMaximum> locmaxvector = aCR.getRelationsWith<ECLLocalMaximum>();
+    RelationVector<ECLLocalMaximum> locmaxvector = aCR.getRelationsWith<ECLLocalMaximum>(eclLocalMaximumArrayName());
     aECLShower->addRelationTo(locmaxvector[0]);
 
     const int locmaxcellid = locmaxvector[0]->getCellId();
@@ -370,7 +370,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     // Fill the maxima positions in a map
     std::map<int, B2Vector3D> localMaximumsPoints; // key = locmaxid, value = maximum position
     std::map<int, B2Vector3D> centroidPoints; // key = locmaxid (as index), value = centroid position
-    for (auto& aLocalMaximum : aCR.getRelationsWith<ECLLocalMaximum>()) {
+    for (auto& aLocalMaximum : aCR.getRelationsWith<ECLLocalMaximum>(eclLocalMaximumArrayName())) {
 
       int cellid = aLocalMaximum.getCellId();
 
@@ -392,7 +392,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       digitVector.clear();
 
       // Fill all digits from this CR in a map
-      for (auto& aCalDigit : aCR.getRelationsWith<ECLCalDigit>()) {
+      for (auto& aCalDigit : aCR.getRelationsWith<ECLCalDigit>(eclCalDigitArrayName())) {
         const int cellid = aCalDigit.getCellId();
         // get the position of this crystal and fill them in a map
         B2Vector3D vectorPosition = m_geom->GetCrystalPos(cellid - 1);

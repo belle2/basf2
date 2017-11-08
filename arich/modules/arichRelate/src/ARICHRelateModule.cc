@@ -81,7 +81,7 @@ namespace Belle2 {
     // Input: reconstructed tracks
     StoreArray<MCParticle> MCParticles("");
     StoreArray<Track> mdstTracks("");
-    StoreArray<ExtHit> extHits("");
+    //    StoreArray<ExtHit> extHits("");
     StoreArray<ARICHAeroHit> aeroHits("");
 
     int nHits = aeroHits.getEntries();

@@ -141,7 +141,7 @@ namespace Belle2 {
      * EW90: Energy in the hemisphere defined by the direction of the virtual W-Boson assuming a semileptonic decay with the given particle as lepton
      * This are Flavor Tagging specific variables!
      */
-    Manager::FunctionPtr SemiLeptonicVariables(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr BtagToWBosonVariables(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns a requested kinematical variable via argument[0] of the group of the flavor tagging variables corresponding to the KaonPion category.
@@ -231,7 +231,26 @@ namespace Belle2 {
      */
     Manager::FunctionPtr rBinBelle(const std::vector<std::string>& arguments);
 
+    /**
+     * Returns function which returns the output q (charge of target track) times p (probability that this is the right category) of the category
+     * with the given name. The allowed categories are the official Flavor Tagger Category Names.
+     * This is a Flavor Tagging variable for general use.
+     */
+    Manager::FunctionPtr qpCategory(const std::vector<std::string>& arguments);
 
+    /**
+     * Returns function which returns 1 if the target particle (checking the decay chain) of the category with the given name is found in the mc Particles,
+     * and if it provides the right Flavor. The allowed categories are the official Flavor Tagger Category Names.
+     * This is a Flavor Tagging variable for general use.
+     */
+    Manager::FunctionPtr isTrueFTCategory(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns 1 if target particles (checking only the decay chain) of the category with the given name
+     * is found in the mc Particles. The allowed categories are the official Flavor Tagger Category Names.
+     * This is a Flavor Tagging variable for general use.
+     */
+    Manager::FunctionPtr hasTrueTargets(const std::vector<std::string>& arguments);
 
 
   }

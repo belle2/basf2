@@ -5,7 +5,7 @@
   <radius desc="Radius at which mirrors are placed" unit="mm">1106</radius>
   <thickness desc="Thickness of mirror plates" unit="mm">2</thickness>
   <width desc="Width of mirror plates" unit="mm">131</width>
-  <length desc="Length of mirror plates" unit="mm">383</length>
+  <length desc="Length of mirror plates" unit="mm">373</length>
   <zPosition desc="position of mirrors in Z direction (starting point)" unit="mm">58.0</zPosition>
   <startAngle desc="Angle of the center of the first mirror plate" unit="deg">0.0</startAngle> 
   

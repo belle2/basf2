@@ -246,9 +246,10 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   float size = cluster.size();
   float SNR = cluster.getSNR();
 
+
   //  Store Cluster into Datastore
   storeClusters.appendNew(SVDCluster(
-                            sensorID, isU, position, positionError, time, timeError, seedCharge, charge, size, SNR
+                            sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1
                           ));
 
   //register relation between RecoDigit and Cluster

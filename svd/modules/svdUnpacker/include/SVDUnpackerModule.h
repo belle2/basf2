@@ -22,6 +22,7 @@
 #include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDTransparentDigit.h>
+#include <svd/dataobjects/SVDDAQDiagnostic.h>
 
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <svd/online/SVDStripNoiseMap.h>
@@ -63,6 +64,7 @@ namespace Belle2 {
 
       bool m_generateShaperDigts;
       std::string m_svdShaperDigitListName;
+      std::string m_svdDAQDiagnosticsListName;
 
       int m_wrongFTBcrc;
 
@@ -102,13 +104,12 @@ namespace Belle2 {
 
       struct APVHeader {
         unsigned int CMC1      : 8; //LSB
-
         unsigned int CMC2      : 4;
-        unsigned int errorMask : 3;
-        unsigned int errorBit  : 1;
-
+//         unsigned int fifoErr   : 1;
+//         unsigned int frameErr  : 1;
+//         unsigned int detectErr : 1;
+        unsigned int apvErr    : 4;
         unsigned int pipelineAddr : 8;
-
         unsigned int APVnum : 6;
         unsigned int check : 2; //MSB
       };
@@ -132,13 +133,11 @@ namespace Belle2 {
 
       struct FADCTrailer {
         unsigned int FTBFlags: 16; //LSB
-
-        unsigned int emPipeAddr: 8;
-
-        unsigned int wiredOrErr: 1;
-        unsigned int error0: 1;
-        unsigned int error1: 1;
-        unsigned int error2: 1;
+        unsigned int emuPipeAddr: 8;
+//         unsigned int fifoErrOR   : 1;
+//         unsigned int frameErrOR  : 1;
+//         unsigned int detectErrOR : 1;
+        unsigned int apvErrOR  : 4;
         unsigned int check : 4; //MSB
       };
 

@@ -35,7 +35,7 @@ namespace VXDTFfilterTest {
 
 
   /** a small filter illustrating the behavior of a distance3D-filter */
-  class SquaredDistance3D : public SelectionVariable< spacePoint , float > {
+  class SquaredDistance3D : public SelectionVariable< spacePoint , 2, float > {
   public:
     /** return name of the class */
     static const std::string name(void) {return "SquaredDistance3D"; };
@@ -52,7 +52,7 @@ namespace VXDTFfilterTest {
 
 
   /** a small filter illustrating the behavior of a distance2D-filter in XY */
-  class SquaredDistance2Dxy : public SelectionVariable< spacePoint , float > {
+  class SquaredDistance2Dxy : public SelectionVariable< spacePoint , 2, float > {
   public:
     /** return name of the class */
     static const std::string name(void) {return "SquaredDistance2Dxy"; };
@@ -68,7 +68,7 @@ namespace VXDTFfilterTest {
 
 
   /** a small filter illustrating the behavior of a distance1D-filter in X */
-  class SquaredDistance1Dx : public SelectionVariable< spacePoint , float > {
+  class SquaredDistance1Dx : public SelectionVariable< spacePoint , 2, float > {
   public:
     /** return name of the class */
     static const std::string name(void) {return "SquaredDistance1Dx"; };
@@ -83,7 +83,7 @@ namespace VXDTFfilterTest {
 
 
   /** a small filter illustrating the behavior of a filter which is compatible with boolean comparisons */
-  class BooleanVariable : public SelectionVariable< spacePoint , bool > {
+  class BooleanVariable : public SelectionVariable< spacePoint , 2, bool > {
   public:
     /** return name of the class */
     static const std::string name(void) {return "BooleanVariable"; };
@@ -262,9 +262,13 @@ namespace VXDTFfilterTest {
   {
     //build an dummy filter which is unobserved (VoidObserver)
     auto dummyFilter = (
+                         // cppcheck-suppress compareBoolExpressionWithInt
                          (-10. <= SquaredDistance3D() <= 10.) &&
+                         // cppcheck-suppress compareBoolExpressionWithInt
                          ((-100. <=  SquaredDistance2Dxy() <= -10.) ||    // put 2nd pair of parentheses to silence warning
+                          // cppcheck-suppress compareBoolExpressionWithInt
                           (-10. <= SquaredDistance1Dx() <= 10.)) &&
+                         // cppcheck-suppress compareBoolExpressionWithInt
                          !(-10. <= SquaredDistance1Dx() <= -10.)
                        );
 
@@ -371,12 +375,14 @@ namespace VXDTFfilterTest {
     EXPECT_FALSE(filterMin2.accept(x1, x2));
     EXPECT_TRUE(filterMin2.accept(x1, x4));
 
+    // cppcheck-suppress compareBoolExpressionWithInt
     auto filterRange = (0. < SquaredDistance3D() < 1);
     EXPECT_FALSE(filterRange.accept(x1, x1));
     EXPECT_TRUE(filterRange.accept(x1, x2));
     EXPECT_FALSE(filterRange.accept(x1, x3));
     EXPECT_FALSE(filterRange.accept(x1, x4));
 
+    // cppcheck-suppress compareBoolExpressionWithInt
     auto filterClosedRange = (0. <= SquaredDistance3D() <= 1);
     EXPECT_TRUE(filterClosedRange.accept(x1, x1));
     EXPECT_TRUE(filterClosedRange.accept(x1, x2));

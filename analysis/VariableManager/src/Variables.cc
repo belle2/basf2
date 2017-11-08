@@ -499,6 +499,30 @@ namespace Belle2 {
       return frame.getVertex(part).Z();
     }
 
+    inline double getParticleUncertaintyByIndex(const Particle* part, unsigned int index)
+    {
+      if (!part) {
+        B2FATAL("The particle provide does not exist.");
+      }
+      const auto& errMatrix = part->getVertexErrorMatrix();
+      return std::sqrt(errMatrix(index, index));
+    }
+
+    double particleDXUncertainty(const Particle* part)
+    {
+      return getParticleUncertaintyByIndex(part, 0);
+    }
+
+    double particleDYUncertainty(const Particle* part)
+    {
+      return getParticleUncertaintyByIndex(part, 1);
+    }
+
+    double particleDZUncertainty(const Particle* part)
+    {
+      return getParticleUncertaintyByIndex(part, 2);
+    }
+
     double particleDRho(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -1445,7 +1469,7 @@ namespace Belle2 {
       for (int iTrack = 0; iTrack < tracks.getEntries(); iTrack++) {
 
         //TODO: expand use to all ChargeStable particles
-        const TrackFitResult* tfr = tracks[iTrack]->getTrackFitResult(Const::pion);
+        const TrackFitResult* tfr = tracks[iTrack]->getTrackFitResultWithClosestMass(Const::pion);
         Helix helix = tfr->getHelix();
 
         TVector3 tempv2helix = C2TDistanceUtility::getECLTrackHitPosition(helix, v1);
@@ -1828,6 +1852,8 @@ namespace Belle2 {
     }
 
 
+
+
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
@@ -1888,6 +1914,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("x", particleDX, "x coordinate of vertex");
     REGISTER_VARIABLE("y", particleDY, "y coordinate of vertex");
     REGISTER_VARIABLE("z", particleDZ, "z coordinate of vertex");
+    REGISTER_VARIABLE("x_uncertainty", particleDXUncertainty, "uncertainty on x");
+    REGISTER_VARIABLE("y_uncertainty", particleDYUncertainty, "uncertainty on y");
+    REGISTER_VARIABLE("z_uncertainty", particleDZUncertainty, "uncertainty on z");
     REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP");
     REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle in degrees in respect to IP");
     REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex polar angle in respect to IP");

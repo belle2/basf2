@@ -30,13 +30,9 @@ V0Fitter::V0Fitter(const std::string& trackFitResultColName, const std::string& 
 }
 
 void V0Fitter::initializeCuts(double beamPipeRadius,
-                              double vertexChi2CutInside,
-                              double massWindowKshortInside,
                               double vertexChi2CutOutside)
 {
   m_beamPipeRadius = beamPipeRadius;
-  m_vertexChi2CutInside = vertexChi2CutInside;
-  m_massWindowKshortInside = massWindowKshortInside;
   m_vertexChi2CutOutside = vertexChi2CutOutside;
 }
 
@@ -150,7 +146,7 @@ std::pair<Const::ParticleType, Const::ParticleType> V0Fitter::getTrackHypotheses
 }
 
 bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
-                           const Const::ParticleType& v0Hypothesis)  // TODO: Give Particle Types
+                           const Const::ParticleType& v0Hypothesis)
 {
   const auto trackHypotheses = getTrackHypotheses(v0Hypothesis);
 
@@ -159,16 +155,14 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     B2ERROR("No RecoTrack for Belle2::Track");
     return false;
   }
-  genfit::Track& gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
+  genfit::Track gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
 
-  genfit::AbsTrackRep* plusRepresentation = TrackFitter::getTrackRepresentationForPDG(trackHypotheses.first.getPDGCode(),
-                                            *recoTrackPlus);
+  int pdgTrackPlus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getParticleType().getPDGCode();
+
+  genfit::AbsTrackRep* plusRepresentation = TrackFitter::getTrackRepresentationForPDG(pdgTrackPlus, *recoTrackPlus);
   if (not recoTrackPlus->wasFitSuccessful(plusRepresentation)) {
-    plusRepresentation = TrackFitter::getTrackRepresentationForPDG(Const::pion.getPDGCode(), *recoTrackPlus);
-    if (not recoTrackPlus->wasFitSuccessful(plusRepresentation)) {
-      B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
-      return false;
-    }
+    B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
+    return false;
   }
 
   RecoTrack* recoTrackMinus = trackMinus->getRelated<RecoTrack>(m_RecoTrackColName);
@@ -176,18 +170,39 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     B2ERROR("No RecoTrack for Belle2::Track");
     return false;
   }
-  genfit::Track& gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
 
-  genfit::AbsTrackRep* minusRepresentation = TrackFitter::getTrackRepresentationForPDG(trackHypotheses.second.getPDGCode(),
-                                             *recoTrackMinus);
+  genfit::Track gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
+
+  int pdgTrackMinus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getParticleType().getPDGCode();
+
+  genfit::AbsTrackRep* minusRepresentation = TrackFitter::getTrackRepresentationForPDG(pdgTrackMinus, *recoTrackMinus);
   if (not recoTrackMinus->wasFitSuccessful(minusRepresentation)) {
-    minusRepresentation = TrackFitter::getTrackRepresentationForPDG(Const::pion.getPDGCode(), *recoTrackMinus);
-    if (not recoTrackMinus->wasFitSuccessful(minusRepresentation)) {
-      B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
-      return false;
-    }
+    B2ERROR("Track hypothesis with closest mass not available. Should never happen, but I can continue savely anyway.");
+    return false;
   }
 
+  // If existing, pass to the genfit::Track the correct cardinal representation
+  std::vector<genfit::AbsTrackRep*> repsPlus = gfTrackPlus.getTrackReps();
+  std::vector<genfit::AbsTrackRep*> repsMinus = gfTrackMinus.getTrackReps();
+  if (repsPlus.size() == repsMinus.size()) {
+    for (unsigned int id = 0; id < repsPlus.size(); id++) {
+      if (abs(repsPlus[id]->getPDG()) == pdgTrackPlus)
+        gfTrackPlus.setCardinalRep(id);
+      if (abs(repsMinus[id]->getPDG()) == pdgTrackMinus)
+        gfTrackMinus.setCardinalRep(id);
+    }
+  }
+  // The two vectors should always have the same size, and this never happen
+  else {
+    for (unsigned int id = 0; id < repsPlus.size(); id++) {
+      if (abs(repsPlus[id]->getPDG()) == pdgTrackPlus)
+        gfTrackPlus.setCardinalRep(id);
+    }
+    for (unsigned int id = 0; id < repsMinus.size(); id++) {
+      if (abs(repsMinus[id]->getPDG()) == pdgTrackMinus)
+        gfTrackMinus.setCardinalRep(id);
+    }
+  }
 
   genfit::MeasuredStateOnPlane stPlus = recoTrackPlus->getMeasuredStateOnPlaneFromFirstHit(plusRepresentation);
   genfit::MeasuredStateOnPlane stMinus = recoTrackMinus->getMeasuredStateOnPlaneFromFirstHit(minusRepresentation);
@@ -201,6 +216,10 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     return false;
   }
 
+  // Update the tracks (genfit::MeasuredStateOnPlane) after vertex
+  stPlus = gfTrackPlus.getFittedState();
+  stMinus = gfTrackMinus.getFittedState();
+
   const genfit::GFRaveTrackParameters* tr0 = vert.getParameters(0);
   const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
 
@@ -211,23 +230,11 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   lv0.SetVectM(tr0->getMom(), trackHypotheses.first.getMass());
   lv1.SetVectM(tr1->getMom(), trackHypotheses.second.getMass());
 
-  // Apply cuts.  We have one set of cuts inside the beam pipe,
+  // Apply cuts. We have one set of cuts inside the beam pipe,
   // the other outside.
   if (posVert.Perp() < m_beamPipeRadius) {
-    if (v0Hypothesis == Const::photon) {
-      return false;  // No converions inside beampipe
-    }
+    return false;
 
-    if (vert.getChi2() > m_vertexChi2CutInside) {
-      B2DEBUG(200, "Vertex inside beam pipe, chi^2 too large.");
-      return false;
-    }
-
-    const double mReco = (lv0 + lv1).M();
-    if (v0Hypothesis == Const::Kshort and fabs(mReco - Const::K0Mass) > m_massWindowKshortInside * Unit::MeV) {
-      B2DEBUG(200, "Vertex inside beam pipe, outside Kshort mass window.");
-      return false;
-    }
   } else {
     if (vert.getChi2() > m_vertexChi2CutOutside) {
       B2DEBUG(200, "Vertex outside beam pipe, chi^2 too large.");
@@ -242,7 +249,11 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     return false;
   }
 
-  const double Bz = getBzAtVertex(posVert);
+  // To build the trackFitResult  use the magnetic field at the origin;
+  // the helix is extrapolated to the IP in a constant magnetic field and material effects are neglected
+  // so that the vertexing tool executed on the MDST object will find again this vertex position
+  const TVector3 origin(0, 0, 0);
+  const double Bz = getBzAtVertex(origin);
 
   TrackFitResult* tfrPlusVtx = buildTrackFitResult(gfTrackPlus, stPlus, Bz, trackHypotheses.first);
   TrackFitResult* tfrMinusVtx = buildTrackFitResult(gfTrackMinus, stMinus, Bz, trackHypotheses.second);

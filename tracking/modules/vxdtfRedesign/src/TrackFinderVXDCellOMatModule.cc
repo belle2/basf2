@@ -8,25 +8,19 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/vxdtfRedesign/TrackFinderVXDCellOMatModule.h>
-
-#include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
-
-// fw:
 #include <framework/logging/Logger.h>
 
+#include <framework/geometry/BFieldManager.h>
+
+#include <tracking/modules/vxdtfRedesign/TrackFinderVXDCellOMatModule.h>
+#include <tracking/trackFindingVXD/algorithms/NetworkPathConversion.h>
+#include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
 
 
 using namespace std;
 using namespace Belle2;
 
 REG_MODULE(TrackFinderVXDCellOMat)
-
-/** *************************************+************************************* **/
-/** ***********************************+ + +*********************************** **/
-/** ******************************+ constructor +****************************** **/
-/** ***********************************+ + +*********************************** **/
-/** *************************************+************************************* **/
 
 
 TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
@@ -73,14 +67,12 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
            "Select only the best track candidate for each family.",
            bool(false));
 
+  addParam("xBestPerFamily",
+           m_PARAMxBestPerFamily,
+           "Number of best track candidates to be created per family.",
+           m_PARAMxBestPerFamily);
+
 }
-
-/** *************************************+************************************* **/
-/** ***********************************+ + +*********************************** **/
-/** ******************************+ initialize +******************************* **/
-/** ***********************************+ + +*********************************** **/
-/** *************************************+************************************* **/
-
 
 
 void TrackFinderVXDCellOMatModule::initialize()
@@ -91,26 +83,23 @@ void TrackFinderVXDCellOMatModule::initialize()
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
 
   if (m_PARAMselectBestPerFamily) {
-    m_estimator = std::make_unique<QualityEstimatorTripletFit>();
+    m_sptcSelector = std::make_unique<SPTCSelectorXBestPerFamily>(m_PARAMxBestPerFamily);
   }
 }
 
 
+void TrackFinderVXDCellOMatModule::beginRun()
+{
+  if (m_PARAMselectBestPerFamily) {
+    // BField is required by all QualityEstimators
+    double bFieldZ = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
+    m_sptcSelector->setMagneticFieldForQE(bFieldZ);
+  }
+}
 
-
-/** *************************************+************************************* **/
-/** ***********************************+ + +*********************************** **/
-/** *********************************+ event +********************************* **/
-/** ***********************************+ + +*********************************** **/
-/** *************************************+************************************* **/
 
 void TrackFinderVXDCellOMatModule::event()
 {
-  /**
-   * TODO:
-   * - add parameters for:
-   * -- seed-threshold (m_cellularAutomaton.findSeeds),
-   * */
   m_eventCounter++;
 
 
@@ -125,69 +114,43 @@ void TrackFinderVXDCellOMatModule::event()
     DNN::printCANetwork<Segment< Belle2::TrackNode>>(segmentNetwork, fileName);
   }
 
-
   /// mark valid Cells as Seeds:
   unsigned int nSeeds = m_cellularAutomaton.findSeeds(segmentNetwork, m_PARAMstrictSeeding);
   if (nSeeds == 0) { B2WARNING("TrackFinderVXDCellOMatModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!"); return; }
 
-  // mark families
+  /// mark families
   if (m_PARAMsetFamilies) {
     unsigned short nFamilies = m_familyDefiner.defineFamilies(segmentNetwork);
     B2DEBUG(10, "Number of families in the network: " << nFamilies);
-    if (m_PARAMselectBestPerFamily) {
-      m_bestPaths.clear();
-      m_familyIndex.clear();
-      m_bestPaths.reserve(nFamilies);
-      m_familyIndex.resize(nFamilies, -1);
-    }
+    m_sptcSelector->prepareSelector(nFamilies);
   }
-
 
   /// collect all Paths starting from a Seed:
   auto collectedPaths = m_pathCollector.findPaths(segmentNetwork, m_PARAMstoreSubsets);
 
-
   /// convert paths of directedNodeNetwork-nodes to paths of const SpacePoint*:
-  //  Resulting SpacePointPath contains SpacePoints sorted from the innermost to the outermost.
-  short family = -1;
-  unsigned short current_index = 0;
-  double qi = 0.;
-
+  ///  Resulting SpacePointPath contains SpacePoints sorted from the innermost to the outermost.
   for (auto& aPath : collectedPaths) {
-    vector <const SpacePoint*> spPath;
-    spPath.reserve(aPath->size());
-    spPath.push_back(aPath->back()->getEntry().getInnerHit()->m_spacePoint);
-    for (auto aNodeIt = (*aPath).rbegin(); aNodeIt != (*aPath).rend();  ++aNodeIt) {
-      spPath.push_back((*aNodeIt)->getEntry().getOuterHit()->m_spacePoint);
-    }
-    family = aPath->back()->getFamily();
+    SpacePointTrackCand sptc = convertNetworkPath(aPath.get());
+
     if (m_PARAMselectBestPerFamily) {
-      SpacePointTrackCand tempSPTC = SpacePointTrackCand(spPath);
-
-      qi = m_estimator->estimateQuality(tempSPTC.getSortedHits());
-      if (m_familyIndex.at(family) == -1) {
-        m_familyIndex[family] = current_index;
-        current_index ++;
-        tempSPTC.setQualityIndex(qi);
-        m_bestPaths.push_back(tempSPTC);
-      } else if (qi > m_bestPaths.at(m_familyIndex[family]).getQualityIndex()) {
-        tempSPTC.setQualityIndex(qi);
-        m_bestPaths.at(m_familyIndex[family]) = tempSPTC;
-      } else {
-        continue;
-      }
+      m_sptcSelector->testNewSPTC(sptc);
     } else {
-      m_sptcCreator.createSPTC(m_TCs, spPath, family);
+      std::vector<const SpacePoint*> path = sptc.getHits();
+      m_sptcCreator.createSPTC(m_TCs, path, sptc.getFamily());
     }
   }
 
+  /// Create SPTCs in respective StoreArray if family based best candidate selection was performed.
   if (m_PARAMselectBestPerFamily) {
-    for (unsigned short fam = 0; fam < m_familyIndex.size(); fam++) {
-      std::vector<const SpacePoint*> path = m_bestPaths.at(m_familyIndex[fam]).getHits();
-      m_sptcCreator.createSPTC(m_TCs, path, fam);
+    std::vector<SpacePointTrackCand> bestPaths = m_sptcSelector->returnSelection();
+    for (unsigned short iCand = 0; iCand < bestPaths.size(); iCand++) {
+      SpacePointTrackCand cand = bestPaths.at(iCand);
+      std::vector<const SpacePoint*> path = cand.getHits();
+      m_sptcCreator.createSPTC(m_TCs, path, cand.getFamily());
     }
+    B2DEBUG(10, "Created " << bestPaths.size() << " TCs...");
   }
-
 
   B2DEBUG(10, " TrackFinderVXDCellOMat-event" << m_eventCounter <<
           ": CA needed " << nRounds <<

@@ -33,6 +33,7 @@ namespace Belle2 {
       , m_position(0)
       , m_positionError(0)
       , m_SNR(0)
+      , m_seedSNR(0)
       , m_strips(4) {m_strips.clear();};
 
     bool SimpleClusterCandidate::add(VxdID vxdID, bool isUside, struct  stripInCluster& aStrip)
@@ -59,6 +60,7 @@ namespace Belle2 {
 
         if (aStrip.charge > m_seedCharge) {
           m_seedCharge = aStrip.charge;
+          m_seedSNR = aStrip.charge / aStrip.noise;
           m_seedIndex = m_strips.size() - 1;
         }
       }
@@ -130,7 +132,7 @@ namespace Belle2 {
 
       bool isGood = false;
 
-      if (m_seedCharge > 0)
+      if (m_seedCharge > 0 && m_seedSNR >= m_cutSeed)
         isGood = true;
 
       return isGood;

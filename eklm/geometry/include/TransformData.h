@@ -139,6 +139,19 @@ namespace Belle2 {
                         int strip) const;
 
       /**
+       * Get strip global to local transformation by hit.
+       * @param[in] endcap Endcap number.
+       * @param[in] layer  Layer number.
+       * @param[in] sector Sector number.
+       * @param[in] plane  Plane number.
+       * @param[in] strip  Strip number.
+       * @return Transformation.
+       */
+      const HepGeom::Transform3D*
+      getStripGlobalToLocal(int endcap, int layer, int sector, int plane,
+                            int strip) const;
+
+      /**
        * Check if strips intersect, and find intersection point if yes.
        * @param[in] hit1   First hit.
        * @param[in] hit2   Second hit.

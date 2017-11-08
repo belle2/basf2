@@ -29,20 +29,20 @@ ARICHCopperMapping::ARICHCopperMapping()
 
 unsigned ARICHCopperMapping::getCopperID(unsigned mergerID) const
 {
-  if (mergerID > N_MERGERS + 1 || mergerID == 0) B2ERROR("ARICHCopperMapping::getCopperID: invalid merger ID number!");
+// if (mergerID > N_MERGERS + 1 || mergerID == 0) B2ERROR("ARICHCopperMapping::getCopperID: invalid merger ID number!");
   return (unsigned)m_merger2copper[mergerID - 1].first;
 }
 
 unsigned ARICHCopperMapping::getFinesse(unsigned mergerID) const
 {
-  if (mergerID > N_MERGERS + 1 || mergerID == 0) B2ERROR("ARICHCopperMapping::getFinesse: invalid merger ID number!");
+// if (mergerID > N_MERGERS + 1 || mergerID == 0) B2ERROR("ARICHCopperMapping::getFinesse: invalid merger ID number!");
   return (unsigned)m_merger2copper[mergerID - 1].second;
 }
 
 void ARICHCopperMapping::addMapping(unsigned mergerID, unsigned copperID, unsigned finesse)
 {
 
-  if (mergerID > N_MERGERS + 1 || mergerID == 0) B2ERROR("ARICHCopperMapping::addMapping: invalid merger ID number!");
+// if (mergerID > N_MERGERS + 1 || mergerID == 0) B2ERROR("ARICHCopperMapping::addMapping: invalid merger ID number!");
   if (finesse > 3) B2ERROR("ARICHCopperMapping::addMapping: invalid finesse number (0-3)!");
 
   m_merger2copper[mergerID - 1] = std::make_pair(copperID, finesse);

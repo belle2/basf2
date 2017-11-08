@@ -159,15 +159,15 @@ namespace Belle2 {
         B2INFO("id    : " << runparam.getString("@id", ""));
         BOOST_FOREACH(const GearDir & aeroparam, runparam.getNodes("aerogel")) {
           aerogelname       = aeroparam.getString(".", "");
-          string Type       = aeroparam.getString("@type", "");
-          B2INFO(Type << " aerogelname    : " << aerogelname);
+          string stype       = aeroparam.getString("@type", "");
+          B2INFO(stype << " aerogelname    : " << aerogelname);
           sprintf(nodestr, "setup/aerogelinfo/row[@id=\"%s\"]", aerogelname.c_str());
           GearDir infoparam(content, nodestr);
 
           double agelrefind    =  infoparam.getDouble("refind", 1);
           double ageltrlen     =  infoparam.getLength("trlen", 0);
           double agelthickness =  infoparam.getLength("thickness", 0);
-          if (Type != string("left")) {
+          if (stype != string("left")) {
             m_ageltrlen.push_back(ageltrlen);
             m_agelrefind.push_back(agelrefind);
             m_agelthickness.push_back(agelthickness);

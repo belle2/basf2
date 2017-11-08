@@ -27,6 +27,7 @@ from ROOT import Belle2
 
 main = create_path()
 main.add_module('RootInput', inputFileNames=['/nfs/dust/belle2/user/ferber/data/kkmc_mumu/kkmc-mumu-1485213008/out-*.root'])
+main.add_module("HistoManager", histoFileName="eclMuMuECollectorOutput.root")
 
 # Genfit and track extrapolation
 gearbox = register_module('Gearbox')
@@ -53,7 +54,6 @@ eclMuMuE.param('thetaLabMaxDeg', 126.)
 eclMuMuE.param('useTrueEnergy', False)
 main.add_module(eclMuMuE)
 
-main.add_module('RootOutput', branchNames=["EventMetaData"], outputFileName="eclMuMuECollectorOutput.root")
 main.add_module('Progress')
 
 set_log_level(LogLevel.INFO)

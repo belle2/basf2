@@ -53,9 +53,9 @@ namespace Belle2 {
 
     size_t m_param_binCountTimeHistogram = 50; /** number of bins in the timing histogram */
 
-    bool m_param_rejectByBackgroundFlag = true; /** don't use hits for the fit which have been flagged as background */
+    bool m_param_rejectByBackgroundFlag = false; /** don't use hits for the fit which have been flagged as background */
 
-    bool m_param_rejectIfNotTakenFlag = false; /** don't use hits for the fit which have not been assigned to any track */
+    bool m_param_rejectIfNotTakenFlag = true; /** don't use hits for the fit which have not been assigned to any track */
 
     bool m_param_storeAllFits = false; /** store an image of the histogram and fit result, for debug purpose only */
 

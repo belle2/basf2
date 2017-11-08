@@ -1854,6 +1854,7 @@ def writePi0EtaVeto(
     @param pi0vetoname extraInfo name of pi0 probability
     @param etavetoname extraInfo name of eta probability
     @param selection Selection criteria that Particle needs meet in order for for_each ROE path to continue
+    @param path       modules are added to this path
     """
     global PI0ETAVETO_COUNTER
 

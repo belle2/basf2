@@ -21,7 +21,7 @@
 #   iii) write value of pi0/eta probability
 #
 # Note: This example uses the signal MC sample created in
-# MC campaign 5.0, therefore it can be ran only on KEKCC computers.
+# MC campaign 9, therefore it can be ran only on KEKCC computers.
 #
 # Contributors: A. Zupanc (June 2014) and K. Ota (Oct 2017)
 #
@@ -74,17 +74,6 @@ buildRestOfEvent('B0')
 # perform pi0/eta veto
 writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', workingDirectory='./pi0etaveto')
 
-# you need at least the default weight files: pi0veto.root and etaveto.root for writePi0EtaVeto.
-# downloadFlag parameter is set to True by default,
-# the default weight files are downloaded to your workingDirectory automatically from the database in that case.
-# The default workingDirectory is '.'
-# You can also download them from following directory:
-# /gpfs/group/belle2/users/akimasa/pi0etaveto
-# If you have weight files in your workingDirectory already, please set downloadFlag to False.
-# If you train by yourself, you should refer to
-# B2A701-ContinuumSuppression_Input.py
-# B2A702-ContinuumSuppression_MVATrain.py
-
 # at this stage the B0 candidates should have
 # extraInfo(Pi0_Prob) and extraInfo(Eta_Prob) value attached.
 # extraInfo(Pi0_Prob) means pi0 probability for the B0 candidates whose gamma daughter.
@@ -94,7 +83,19 @@ writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', workingDirectory='./pi0etaveto')
 # the extraInfo(Pi0_Prob) and extraInfo(Eta_Prob) does not exist. In these cases
 # -999 will be written to the extraInfo(Pi0_Prob) branch and extraInfo(Eta_Prob) branch.
 # You can change extraInfo names of pi0/eta probability by setting pi0vetoname and etavetoname parameters. For example,
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', workingDirectory='./pi0etaveto',pi0vetoname='Pi0_Prob2',etavetoname='Eta_Prob2')
+# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', workingDirectory='./pi0etaveto', pi0vetoname='Pi0_Prob2', etavetoname='Eta_Prob2')
+
+# you need at least the default weight files: pi0veto.root and etaveto.root for writePi0EtaVeto.
+# These files are optimised by MC campaign 9.
+# downloadFlag parameter is set to True by default,
+# the default weight files are downloaded to your workingDirectory automatically from the database in that case.
+# The default workingDirectory is '.'
+# You can also download them from following directory in KEKCC:
+# /gpfs/group/belle2/users/akimasa/pi0etaveto
+# If you have weight files in your workingDirectory already, please set downloadFlag to False.
+# If you train by yourself, you should refer to
+# B2A701-ContinuumSuppression_Input.py
+# B2A702-ContinuumSuppression_MVATrain.py
 
 
 # You can also do a simple veto using delta mass ranking as below.

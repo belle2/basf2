@@ -10,22 +10,20 @@
 #       |
 #       +-> pi+ pi-
 #
-# and construct pi0 veto for the signal photon. In this
+# and construct pi0/eta veto for the signal photon. In this
 # example the pi0 veto is constructed in the following
 # way:
 # - for each B0 -> rho gamma candidate
 #     i) combine photon (gamma) used in the reconstruction
-#        of the B0 candidate with all other photons found
-#        in the event to form pi0 candidates
-#    ii) find pi0 candidate with invariant mass closest to
-#        pi0's nomina mass (closestMass)
-#   iii) write value of closestMass as pi0veto extraInfo
-#        flag to the B0 candidate
+#        of the B0 candidate with all other soft photons defined
+#        in analysis/scripts/modularAnalysis.py
+#    ii) find pi0/eta candidate with highest pi0/eta probability
+#   iii) write value of pi0/eta probability
 #
 # Note: This example uses the signal MC sample created in
-# MC campaign 5.0, therefore it can be ran only on KEKCC computers.
+# MC campaign 9, therefore it can be ran only on KEKCC computers.
 #
-# Contributors: A. Zupanc (June 2014)
+# Contributors: A. Zupanc (June 2014) and K. Ota (Oct 2017)
 #
 ######################################################
 
@@ -44,16 +42,15 @@ from modularAnalysis import variablesToExtraInfo
 from modularAnalysis import signalSideParticleFilter
 from modularAnalysis import fillSignalSideParticleList
 from modularAnalysis import printVariableValues
+from modularAnalysis import writePi0EtaVeto
 
 filelist = [
-    '/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000050/s00/e0000/4S/'
-    'r00000/1110021000/sub00/mdst_000001_prod00000050_task00000001.root',
-    '/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000060/s00/e0000/4S/'
-    'r00000/1110022100/sub00/mdst_000989_prod00000060_task00000989.root']
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002326/e0000/4S/'
+    'r00000/1110021010/sub00/mdst_000001_prod00002326_task00000001.root']
 
 # Run B0 -> rho gamma reconstruction over B0 -> rho gamma and B0 -> K0s pi0 MC
 rootOutputFile = 'B2A304-B02RhoGamma-Reconstruction.root'
-inputMdstList('MC5', filelist)
+inputMdstList('default', filelist)
 
 fillParticleList('gamma:highE', 'E > 1.5')
 fillParticleList('pi+:loose', 'abs(d0) < 0.5 and abs(z0) < 0.5 and DLLKaon > 0')
@@ -73,6 +70,34 @@ matchMCTruth('B0')
 # build RestOfEvent (ROE) object for each B0 candidate
 # ROE is required by the veto
 buildRestOfEvent('B0')
+
+# perform pi0/eta veto
+writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', workingDirectory='./pi0etaveto')
+
+# at this stage the B0 candidates should have
+# extraInfo(Pi0_Prob) and extraInfo(Eta_Prob) value attached.
+# extraInfo(Pi0_Prob) means pi0 probability for the B0 candidates whose gamma daughter.
+# extraInfo(Eta_Prob) means eta probability for the B0 candidates whose gamma daughter.
+# For the B0 candidates whose gamma daughter could not be combined with
+# any of the remaining photons to form pi0/eta because of soft photon selection
+# the extraInfo(Pi0_Prob) and extraInfo(Eta_Prob) does not exist. In these cases
+# -999 will be written to the extraInfo(Pi0_Prob) branch and extraInfo(Eta_Prob) branch.
+# You can change extraInfo names of pi0/eta probability by setting pi0vetoname and etavetoname parameters. For example,
+# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', workingDirectory='./pi0etaveto', pi0vetoname='Pi0_Prob2', etavetoname='Eta_Prob2')
+
+# You need at least the default weight files: pi0veto.root and etaveto.root for writePi0EtaVeto.
+# The default files are optimised by MC campaign 9.
+# If you don't have weight files in your workingDirectory,
+# these files are downloaded from database to your workingDirectory automatically.
+# The default workingDirectory is '.'
+# You can also download them from following directory in KEKCC:
+# /gpfs/group/belle2/users/akimasa/pi0etaveto
+# If you train by yourself, you should refer to
+# B2A701-ContinuumSuppression_Input.py
+# B2A702-ContinuumSuppression_MVATrain.py
+
+
+# You can also do a simple veto using delta mass ranking as below.
 
 # VETO starts here
 # ----------------
@@ -150,7 +175,7 @@ toolsB0 += ['DeltaEMbc', '^B0']
 toolsB0 += ['Track', 'B0 -> [rho0 -> ^pi+ ^pi-] gamma']
 toolsB0 += ['Cluster', 'B0 -> rho0 ^gamma']
 toolsB0 += ['MCHierarchy', 'B0 -> rho0 ^gamma']
-toolsB0 += ['CustomFloats[isSignal:extraInfo(pi0veto)]', '^B0']
+toolsB0 += ['CustomFloats[isSignal:extraInfo(Pi0_Prob):extraInfo(Eta_Prob):extraInfo(pi0veto)]', '^B0']
 
 # write out the flat ntuple
 ntupleFile(rootOutputFile)

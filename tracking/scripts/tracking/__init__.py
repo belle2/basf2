@@ -44,6 +44,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         path.add_module('SetupGenfitExtrapolation',
                         energyLossBrems=False, noiseBrems=False)
 
+    if is_svd_used(components):
+        add_svd_reconstruction(path)
+
     if mcTrackFinding:
         # Always add the MC finder in all trigger modes.
         add_mc_track_finding(path, components=components, reco_tracks=reco_tracks,
@@ -946,9 +949,6 @@ def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", compo
         if 'PXDClusterizer' not in path:
             add_pxd_reconstruction(path)
 
-    if 'SVDClusterizer' not in path:
-        add_svd_reconstruction(path)
-
     # Temporary array
     # add a suffix to be able to have different
     vxd_trackcands = '__VXDGFTrackCands' + suffix
@@ -1039,11 +1039,6 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
             spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
             spCreatorPXD.param('SpacePoints', nameSPs)
             path.add_module(spCreatorPXD)
-
-    # the clusterizer is needed twice (for HLT and reco)! Here it only works because it is added earlier
-    # without checking for existence see agira ticket BII-2618
-    if 'SVDClusterizer' not in path:
-        add_svd_reconstruction(path)
 
     # check for the name instead of the type as the HLT also need those module under (should have different names)
     svdSPCreatorName = 'SVDSpacePointCreator' + suffix

@@ -25,19 +25,25 @@ main.add_module(eventinfosetter)
 main.add_module('EventInfoPrinter')
 main.add_module('EvtGenInput')
 
-# bkgFiles = glob.glob('/sw/belle2/bkg/*.root')
+bkgFiles = glob.glob('/sw/belle2/bkg/*.root')
 # bkgFiles = "/sw/belle2/bkg/twoPhoton_usual-phase3-optimized.root"
-bkgFiles = ""
+# bkgFiles = ""
 
 add_simulation(main, components=['MagneticField', 'SVD'], bkgfiles=bkgFiles, usePXDDataReduction=False)
 
 add_svd_reconstruction(main, isROIsimulation=False, useNN=False, useCoG=True)
 
-add_tracking_reconstruction(main, components=["SVD"], use_vxdtf2=True, mcTrackFinding=True, additionalTrackFitHypotheses=[211])
+add_tracking_reconstruction(
+    main,
+    components=["SVD"],
+    use_vxdtf2=True,
+    mcTrackFinding=True,
+    additionalTrackFitHypotheses=[211],
+    skipHitPreparerAdding=True)
 
 
 svdperf = register_module('SVDPerformance')
-svdperf.param('outputFileName', "SVDPerformance_Y4S_noBKG_CoG_MCTF.root")
+svdperf.param('outputFileName', "SVDPerformance_Y4S_wBKG_CoG_MCTF.root")
 main.add_module(svdperf)
 
 

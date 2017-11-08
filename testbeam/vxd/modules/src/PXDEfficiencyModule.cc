@@ -139,13 +139,14 @@ void PXDEfficiencyModule::event()
   //hard cut on the number of tracks as more tracks will complicate things
   if (tracks.getEntries() != 1) return;
 
+  if (!tracks[0]->wasFitSuccessful()) return;
+
   //not sure at which position that is but the correct momentum is not really needed
   genfit::MeasuredStateOnPlane trackstate;
   const genfit::FitStatus* fitstatus = NULL;
-  try {
+  try {//RecoTrack now gives a B2FATAL, so with the check above this might be superfluous now
     fitstatus = tracks[0]->getTrackFitStatus(); //(const AbsTrackRep* rep = NULL)
     trackstate = tracks[0]->getMeasuredStateOnPlaneFromFirstHit();
-
 
     //Function getMeasuredStateOnPlaneFromHit has become private, but with argument 0 this does the same
     //Argument was false to take unbiased, but due to wrong ordering in the genfit::Track function it actually meant taking sensorID 0, and it stayed biased. Recreating this here...

@@ -20,7 +20,7 @@ namespace Belle2 {
   /** This is a specialization returning floats, where value calculates the  cos of the angle of the segment of two hits
       in the XY plane */
   template <typename PointType >
-  class COSDIRECTIONXY_NAME : public SelectionVariable< PointType , double > {
+  class COSDIRECTIONXY_NAME : public SelectionVariable< PointType , 2, double > {
   public:
     /** is replaced by "static const std:string name(void)" frunction which returns name of the Class */
     PUT_NAME_FUNCTION(COSDIRECTIONXY_NAME);

@@ -136,6 +136,7 @@ namespace Belle2 {
 
     /** Handy typedef */
     typedef  typename Variable::argumentType argumentType;
+    typedef  typename Variable::functionType functionType;
 
     /** All the real computations are occuring in this method */
     template< typename ... argsType >
@@ -295,6 +296,7 @@ namespace Belle2 {
     Filter()  {};
 
     typedef  typename Variable::argumentType argumentType;
+    typedef  typename Variable::functionType functionType;
 
     /** All the real computations are occuring in this method */
     template< typename ... argsType >
@@ -392,6 +394,7 @@ namespace Belle2 {
 
     /** Handy typedef */
     typedef  typename Variable::argumentType argumentType;
+    typedef  typename Variable::functionType functionType;
 
     /** All the real computations are occuring here */
     template< typename ... argsType >
@@ -436,7 +439,7 @@ namespace Belle2 {
   public:
 
     typedef  typename someFilter::argumentType argumentType;
-
+    typedef  typename someFilter::functionType functionType;
 
     template< typename ... argsType >
     typename std::enable_if< all_same< argumentType,
@@ -519,6 +522,10 @@ namespace Belle2 {
 
     typedef  typename FilterA::argumentType argumentType;
     typedef  typename FilterB::argumentType argumentTypeB;
+    typedef  typename FilterA::functionType functionTypeA;
+    typedef  typename FilterB::functionType functionTypeB;
+    typedef typename std::enable_if< all_same< functionTypeA, functionTypeB >::value,
+            functionTypeA>::type functionType;
 
     template< typename ... argsType >
     typename std::enable_if <
@@ -655,6 +662,10 @@ namespace Belle2 {
 
     typedef  typename FilterA::argumentType argumentType;
     typedef  typename FilterB::argumentType argumentTypeB;
+    typedef  typename FilterA::functionType functionTypeA;
+    typedef  typename FilterB::functionType functionTypeB;
+    typedef  typename std::enable_if< all_same< functionTypeA, functionTypeB >::value,
+             functionTypeA>::type functionType;
 
 
 

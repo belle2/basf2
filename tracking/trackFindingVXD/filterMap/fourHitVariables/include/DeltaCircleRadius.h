@@ -23,7 +23,7 @@ namespace Belle2 {
   /** calculates delta-circleRadius-value (difference in circle radii of 2 subsets of the hits), returning unit: cm.
    * */
   template <typename PointType >
-  class DELTACIRCLERADIUS_NAME : public SelectionVariable< PointType , double > {
+  class DELTACIRCLERADIUS_NAME : public SelectionVariable< PointType , 4, double > {
   public:
     /** is replaced by "static const std:string name(void)" frunction which returns name of the Class */
     PUT_NAME_FUNCTION(DELTACIRCLERADIUS_NAME);

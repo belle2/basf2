@@ -135,8 +135,7 @@ namespace Belle2 {
 
     // should throw, since no clusters given:
     std::vector<const SVDCluster*> badNoClusters;
-//  SpacePoint blaBla = SpacePoint(badNoClusters, &sensorInfoBase);
-    EXPECT_THROW(SpacePoint(badNoClusters, &sensorInfoBase), std::out_of_range);
+    EXPECT_B2FATAL(SpacePoint(badNoClusters, &sensorInfoBase));
 
     // should throw, since too many clusters (of same sensor) given:
     std::vector<const SVDCluster*> bad3Clusters = { &clusterU1, &clusterV1, &clusterU2 };

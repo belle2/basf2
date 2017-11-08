@@ -10,7 +10,7 @@ from gdltrigger import add_gdl_trigger
 from effCalculation import EffCalculation
 
 
-def add_tsim(path, SimulationMode=1, shortTracks=False, OpenFilter=False, Belle2Phase="Phase2"):
+def add_tsim(path, SimulationMode=1, shortTracks=False, OpenFilter=False, Belle2Phase="Phase2", PrintResult=False):
     """
     add the gdl module to path
     @param path            module is added to this path
@@ -29,7 +29,8 @@ def add_tsim(path, SimulationMode=1, shortTracks=False, OpenFilter=False, Belle2
     add_klm_trigger(path)
     add_grl_trigger(path, SimulationMode)
     add_gdl_trigger(path=path, SimulationMode=SimulationMode, OpenFilter=OpenFilter, Belle2Phase=Belle2Phase)
-    EffCalculation(path)
+    if PrintResult:
+        EffCalculation(path)
     path.add_module('StatisticsSummary').set_name('Sum_TriggerSimulation')
 
 
@@ -43,7 +44,7 @@ def add_subdetector_tsim(path, SimulationMode=1, shortTracks=False, OpenFilter=F
     add_klm_trigger(path=path)
 
 
-def add_grl_gdl_tsim(path, SimulationMode=1, OpenFilter=False, Belle2Phase="Phase2"):
+def add_grl_gdl_tsim(path, SimulationMode=1, OpenFilter=False, Belle2Phase="Phase2", PrintResult=False):
     """
     add grl and gdl, the function have to applied based on the
     dataobjects produced in add_subdetector_trigger_simulation
@@ -51,4 +52,5 @@ def add_grl_gdl_tsim(path, SimulationMode=1, OpenFilter=False, Belle2Phase="Phas
     """
     add_grl_trigger(path, SimulationMode)
     add_gdl_trigger(path, SimulationMode, OpenFilter, Belle2Phase)
-    EffCalculation(path)
+    if PrintResult:
+        EffCalculation(path)

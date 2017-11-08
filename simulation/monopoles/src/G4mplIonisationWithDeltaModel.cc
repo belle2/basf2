@@ -184,10 +184,13 @@ G4mplIonisationWithDeltaModel::ComputeDEDXAhlen(const G4Material* material,
 
   // Ahlen's formula for nonconductors, [1]p157, f(5.7)
   G4double dedx =
-    0.5 * (log(2.0 * electron_mass_c2 * bg2 * cutEnergy / (eexc * eexc)) - 1.0);
+    0.5 * (log(2.0 * electron_mass_c2 * bg2 * cutEnergy / (eexc * eexc)) - 1.0);//"Conventional" ionisation
+//   G4double dedx =
+//     1.0 * (log(2.0 * electron_mass_c2 * bg2 * cutEnergy / (eexc * eexc)));//Fryberger magneticon ionisation
 
   // Kazama et al. cross-section correction
-  G4double  k = 0.406;
+  //G4double  k = 0.406;
+  G4double  k = 0.0; //No Kazama correction for low charges
   if (nmpl > 1) { k = 0.346; }
 
   // Bloch correction

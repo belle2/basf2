@@ -41,7 +41,10 @@ REG_MODULE(SVDPacker)
 //                 Implementation
 //-----------------------------------------------------------------
 
+std::string Belle2::SVD::SVDPackerModule::m_xmlFileName = std::string("SVDChannelMapping.xml");
+
 SVDPackerModule::SVDPackerModule() : Module(),
+  m_mapping(m_xmlFileName),
   m_FADCTriggerNumberOffset(0)
 {
   // Set module properties
@@ -50,8 +53,7 @@ SVDPackerModule::SVDPackerModule() : Module(),
   // Parameter definitions
   addParam("svdDigitListName", m_svdDigitListName, "Name of the SVD Digits List", string(""));
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
-  //addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string(""));
-  addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", FileSystem::findFile("data/svd/svd_mapping.xml"));
+  //addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", FileSystem::findFile("data/svd/svd_mapping.xml"));
   addParam("NodeID", m_nodeid, "Node ID", 0);
   addParam("FADCTriggerNumberOffset", m_FADCTriggerNumberOffset,
            "number to be added to the FADC trigger number to match the main trigger number", 0);
@@ -73,7 +75,6 @@ void SVDPackerModule::initialize()
   StoreArray<RawSVD>::registerPersistent(m_rawSVDListName);
   StoreArray<SVDDigit>::required(m_svdDigitListName);
   m_eventMetaDataPtr.required();
-  loadMap();
   prepFADClist();
 
 }
@@ -81,7 +82,7 @@ void SVDPackerModule::initialize()
 
 void SVDPackerModule::beginRun()
 {
-
+  if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
 }
 
 
@@ -346,8 +347,6 @@ void SVDPackerModule::event()
 
 void SVDPackerModule::terminate()
 {
-  delete m_map;
-
 }
 
 
@@ -356,12 +355,6 @@ void SVDPackerModule::endRun()
 
 }
 
-//load the sensor MAP from xml file
-void SVDPackerModule::loadMap()
-{
-  m_map = new SVDOnlineToOfflineMap(m_xmlMapFileName);
-
-}
 
 // mapping FADC numbers as 0-47
 void SVDPackerModule::prepFADClist()

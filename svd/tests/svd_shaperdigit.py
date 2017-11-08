@@ -17,7 +17,7 @@ DigitsSort = True  # sort digits by sensor
 printouts = False  # print SVDDigits <-> SVDShaperDigits comparison
 
 
-mapping_file = Belle2.FileSystem.findFile("svd/data/svd_mapping.xml")
+# mapping_file = Belle2.FileSystem.findFile("svd/data/svd_mapping.xml")
 svd_digits_pack_unpack_collection = "SVDDigits_test"
 svd_shaperdigits_pack_unpack_collection = "SVDShaperDigits_test"
 set_random_seed(42)
@@ -118,6 +118,8 @@ eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
 # Show progress of processing
 progress = register_module('Progress')
 
+use_central_database("development")
+
 main = create_path()
 # init path
 main.add_module(eventinfosetter)
@@ -132,7 +134,7 @@ Packer = register_module('SVDPacker')
 Packer.param('NodeID', nodeid)
 Packer.param('svdDigitListName', 'SVDDigits')
 Packer.param('rawSVDListName', 'SVDRaw')
-Packer.param('xmlMapFileName', mapping_file)
+# Packer.param('xmlMapFileName', mapping_file)
 main.add_module(Packer)
 
 unPacker = register_module('SVDUnpacker')
@@ -141,11 +143,8 @@ unPacker.param('svdDigitListName', svd_digits_pack_unpack_collection)
 unPacker.param('GenerateShaperDigts', True)
 unPacker.param('svdShaperDigitListName', svd_shaperdigits_pack_unpack_collection)
 unPacker.param('svdDAQDiagnosticsListName', 'myDAQDiagnostics')
-unPacker.param('xmlMapFileName', mapping_file)
+# unPacker.param('xmlMapFileName', mapping_file)
 main.add_module(unPacker)
-
-# run custom test module to check if the SVDDigits and the
-# svd_digits_pack_unpack_collection collections are equal
 main.add_module(SvdShaperDigitTestModule())
 
 

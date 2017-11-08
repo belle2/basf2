@@ -112,13 +112,13 @@ void plot4StauSL(TFile* pfile, TTree* ptree, TFile *outputFile, TString Cuts, TS
 
 void test2_1290310000(){
 
-  TString inputfile("1290310000_mc8bg1_big.root");
+  TString inputfile("../1290310000.ntup.root");
 
   TFile* sample = new TFile(inputfile);
   TTree* tree4StauHad = (TTree*)sample->Get("BHadBtaunu");
   TTree* tree4StauSL = (TTree*)sample->Get("BSLBtaunu");
 
-  TFile* outputFile = new TFile("1290310000_Validation_mc8.root","RECREATE");
+  TFile* outputFile = new TFile("1290310000_Validation.root","RECREATE");
   
   TString Cuts = "(Upsilon4S_B1_d0_dmID==4 && Upsilon4S_B_tau_eid>0.750) || (Upsilon4S_B1_d0_dmID==3 && Upsilon4S_B_tau_muid>0.625 && Upsilon4S_B_tau_eid<0.750) || (((Upsilon4S_B1_d0_dmID==5 && iCand==0) || (Upsilon4S_B1_d0_dmID==6 && nCands>1 && iCand==0)) && Upsilon4S_B_tau_piid>0.429 && Upsilon4S_B_tau_eid<0.750 && Upsilon4S_B_tau_muid<0.625)";
   

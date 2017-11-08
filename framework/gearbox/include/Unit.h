@@ -40,16 +40,34 @@ namespace Belle2 {
 
   public:
 
-    // standard units
+    /**
+     * Standard units with the value = 1.
+     */
     static const double cm;           /**< Standard of [length] */
     static const double ns;           /**< Standard of [time] */
     static const double GHz;          /**< Standard of [frequency] */
     static const double rad;          /**< Standard of [angle] */
     static const double GeV;          /**< Standard of [energy, momentum, mass] */
     static const double K;            /**< Standard of [temperature] */
-    static const double T;            /**< Standard of [magnetic field] */
     static const double e;            /**< Standard of [electric charge] */
+
+    /**
+     * Standard units with the value NOT equal to 1.
+     * Their values are calculated by using the other standard units.
+     */
+    static const double T;            /**< Standard of [magnetic field] */
+
+    /**
+     * Practical units with the value set at 1.
+     * These units are NOT consistent with the other standard units.
+     * Please use them carefully.
+     */
     static const double g_cm3;        /**< Standard of [density] */
+
+
+    /**
+     * Derived units.
+     */
 
     // length units
     static const double km;           /**< [kilometers] */
@@ -140,6 +158,11 @@ namespace Belle2 {
      * @return The value converted to the given unit.
      */
     static double convertValueToUnit(double value, const std::string& unitString);
+
+    /**
+     * Get the magnetic field value in a unit where 1 Tesla = 1.0
+     */
+    static double getFieldInTesla(double value);
 
   protected:
     /** registers the name and value of a conversion in s_conversionFactors. */

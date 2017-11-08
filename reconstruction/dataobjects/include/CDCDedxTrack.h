@@ -94,7 +94,7 @@ namespace Belle2 {
     /** Get the identity of the particle */
     double getPDG() const { return m_pdg; }
 
-    /** Get the dE/dx mean for this track */
+    /** Get the track-level MC dE/dx mean for this track */
     double getDedx() const { return m_dedx; }
     /** Get the dE/dx mean for this track */
     double getDedxMean() const { return m_dedx_avg; }
@@ -120,7 +120,7 @@ namespace Belle2 {
     /** Return the run gain for this track */
     double getRunGain() const { return m_rungain; }
 
-    /** Set the dE/dx mean for this track */
+    /** Set the track level MC dE/dx mean for this track */
     void setDedx(double dedx) { m_dedx = dedx; }
     /** Set the dE/dx mean for this track */
     void setDedxMean(double mean) { m_dedx_avg = mean; }
@@ -223,7 +223,7 @@ namespace Belle2 {
     double m_predres[Const::ChargedStable::c_SetSize];  /**< predicted dE/dx resolution */
 
     // track level dE/dx measurements
-    double m_dedx;     /**< dE/dx truncated mean used to get PID value */
+    double m_dedx;     /**< track level MC dE/dx truncated mean used to get PID value */
     double m_dedx_avg;               /**< dE/dx mean value per track */
     double m_dedx_avg_truncated;     /**< dE/dx truncated mean per track */
     double m_dedx_avg_truncated_err; /**< standard deviation of m_dedx_avg_truncated */

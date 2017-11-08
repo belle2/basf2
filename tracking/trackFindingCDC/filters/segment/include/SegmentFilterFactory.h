@@ -10,10 +10,13 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/segment/BaseSegmentFilter.h>
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    // Guard to prevent repeated instantiations
+    extern template class FilterFactory<BaseSegmentFilter>;
 
     /// Factory that can create appropriate segment filters for new tracks from associated names.
     class SegmentFilterFactory : public FilterFactory<BaseSegmentFilter> {

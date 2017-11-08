@@ -293,7 +293,18 @@ bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) cons
     return false;
   }
 
-  return true;
+  // make sure there is at least one hit with a valid mSoP
+  const unsigned int trackSize = m_genfitTrack.getNumPoints();
+  for (unsigned int i = 0; i < trackSize; i++) {
+    try {
+      m_genfitTrack.getFittedState(i, representation);
+      return true;
+    } catch (const genfit::Exception& exception) {
+      B2DEBUG(100, "Can not get mSoP because of: " << exception.what());
+    }
+  }
+
+  return false;
 }
 
 void RecoTrack::prune()
@@ -337,13 +348,18 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(
   const genfit::MeasuredStateOnPlane* nearestStateOnPlane = nullptr;
   double minimalDistance2 = 0;
   for (unsigned int hitIndex = 0; hitIndex < numberOfPoints; hitIndex++) {
-    const genfit::MeasuredStateOnPlane& measuredStateOnPlane = m_genfitTrack.getFittedState(hitIndex, representation);
+    try {
+      const genfit::MeasuredStateOnPlane& measuredStateOnPlane = m_genfitTrack.getFittedState(hitIndex, representation);
 
-    const double currentDistance2 = (measuredStateOnPlane.getPos() - closestPoint).Mag2();
+      const double currentDistance2 = (measuredStateOnPlane.getPos() - closestPoint).Mag2();
 
-    if (not nearestStateOnPlane or currentDistance2 < minimalDistance2) {
-      nearestStateOnPlane = &measuredStateOnPlane;
-      minimalDistance2 = currentDistance2;
+      if (not nearestStateOnPlane or currentDistance2 < minimalDistance2) {
+        nearestStateOnPlane = &measuredStateOnPlane;
+        minimalDistance2 = currentDistance2;
+      }
+    } catch (const genfit::Exception& exception) {
+      B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
+      continue;
     }
   }
   return *nearestStateOnPlane;
@@ -459,4 +475,52 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromRecoHi
   }
 
   return fittedResult->getFittedState();
+}
+
+const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation) const
+{
+  const unsigned int trackSize = m_genfitTrack.getNumPoints();
+  for (unsigned int i = 0; i < trackSize; i++) {
+    try {
+      return m_genfitTrack.getFittedState(i, representation);
+    } catch (const genfit::Exception& exception) {
+      B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
+    }
+  }
+
+  B2FATAL("There is no single hit with a valid mSoP in this track! Check if the fit failed with wasFitSuccessful before");
+}
+
+const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation) const
+{
+  int trackSize = m_genfitTrack.getNumPoints();
+  for (int i = -1; i >= -trackSize; i--) {
+    try {
+      return m_genfitTrack.getFittedState(i, representation);
+    } catch (const genfit::Exception& exception) {
+      B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
+    }
+  }
+
+  B2FATAL("There is no single hit with a valid mSoP in this track!");
+}
+
+std::string RecoTrack::getInfoHTML() const
+{
+  std::stringstream out;
+
+  out << "<b>Charge seed</b>=" << getChargeSeed();
+
+  out << "<b>pT seed</b>=" << getMomentumSeed().Pt();
+  out << ", <b>pZ seed</b>=" << getMomentumSeed().Z();
+  out << "<br>";
+  out << "<b>position seed</b>=" << getMomentumSeed().X() << ", " << getMomentumSeed().Y() << ", " << getMomentumSeed().Z();
+  out << "<br>";
+
+  for (const genfit::AbsTrackRep* rep : getRepresentations()) {
+    out << "<b>was fitted with " << rep->getPDG() << "</b>=" << wasFitSuccessful() << ", ";
+  }
+  out << "<br>";
+
+  return out.str();
 }

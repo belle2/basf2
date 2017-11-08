@@ -21,8 +21,7 @@
 #include <tracking/trackFindingVXD/sectorMapTools/RawSecMapRootInterface.h>
 //#include <tracking/trackFindingVXD/sectorMapTools/SectorTools.h>
 #include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
-
-
+#include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariableNamesToFunctions.h>
 #include <framework/geometry/B2Vector3.h>
 
 #include <tracking/dataobjects/FullSecID.h>
@@ -38,6 +37,7 @@
 namespace Belle2 {
 
   /** This class contains all relevant tools for training a VXDTFFilters. */
+
   template <class FilterFactoryType>
   class SecMapTrainer {
   protected:
@@ -52,10 +52,8 @@ namespace Belle2 {
     Copy of the config in the SectorMap needed as it is modified (the one in VXDTFFilters is const).  */
     SectorMapConfig m_config;
 
-
     /** A factory taking care of having the correct filters prepared for secMapTraining. */
     FilterFactoryType m_factory;
-
 
     /** Stores the prepared filters and applies them on given hit-combinations. */
     FilterMill<SecMapTrainerHit> m_filterMill;
@@ -205,67 +203,6 @@ namespace Belle2 {
     }
 
 
-
-    /** processes all four-hit-combinations of given TC and stores their results. returns number of stored values. */
-    unsigned process4HitCombinations(const SecMapTrainerTC& aTC)
-    {
-      unsigned nValues = 0;
-      B2DEBUG(10, "SecMapTrainer::process4HitCombinations: nHits/trackID/pdg: " << aTC.size() << "/" << aTC.getTrackID() << "/" <<
-              aTC.getPDG());
-      if (aTC.size() < 4) { return nValues; }
-
-      // the iterators mark the hits to be used:
-      SecMapTrainerTC::ConstIterator outerIt = aTC.outermostHit();
-      SecMapTrainerTC::ConstIterator outerCenterIt = ++aTC.outermostHit();
-      SecMapTrainerTC::ConstIterator innerCenterIt = ++(++aTC.outermostHit());
-      SecMapTrainerTC::ConstIterator innerIt = ++(++(++aTC.outermostHit()));
-
-      // loop over all 2-hit-combis, collect data for each filterType and store it in root-tree:
-      std::vector<std::pair<std::string, double> > collectedResults;
-      for (; innerIt != aTC.innerEnd();) {
-        B2DEBUG(10, "SecMapTrainer::process4HitCombinations: outer-/oCenter-/iCenter-/innerHitSecID: " << outerIt->getSectorIDString() <<
-                "/" << outerCenterIt->getSectorIDString() <<
-                "/" << innerCenterIt->getSectorIDString() <<
-                "/" << innerIt->getSectorIDString());
-
-
-        auto& dataSet = m_rootInterface.get4HitDataSet();
-        dataSet.expNo = m_expNo;
-        dataSet.runNo = m_runNo;
-        dataSet.evtNo = m_evtNo;
-        dataSet.trackNo = aTC.getTrackID();
-        dataSet.pdg = aTC.getPDG();
-        dataSet.secIDs.outer = outerIt->getSectorID().getFullSecID();
-        dataSet.secIDs.outerCenter = outerCenterIt->getSectorID().getFullSecID();
-        dataSet.secIDs.innerCenter = innerCenterIt->getSectorID().getFullSecID();
-        dataSet.secIDs.inner = innerIt->getSectorID().getFullSecID();
-
-        // create data for each filterType:
-        FilterMill<SecMapTrainerHit>::HitQuadruplet newHitQuadruplet;
-        newHitQuadruplet.outer = &(*outerIt);
-        newHitQuadruplet.outerCenter = &(*outerCenterIt);
-        newHitQuadruplet.innerCenter = &(*innerCenterIt);
-        newHitQuadruplet.inner = &(*innerIt);
-        m_filterMill.grindData4Hit(newHitQuadruplet, collectedResults);
-
-        // fill data for each filter type:
-        for (const auto& entry : collectedResults) {
-          B2DEBUG(50, "SecMapTrainer::process4HitCombinations: filter/value: " << entry.first << "/" << entry.second);
-          dataSet.setValueOfFilter(entry.first, entry.second);
-          ++nValues;
-        }
-        m_rootInterface.fill4Hit();
-        collectedResults.clear();
-        ++outerIt;
-        ++outerCenterIt;
-        ++innerCenterIt;
-        ++innerIt;
-      }
-      return nValues;
-    }
-
-
-
     /** converts the SpacePoints into a SecMapTrainerTC */
     void convertSP2TC(
       std::vector<std::pair< FullSecID, const SpacePoint*> >& goodSPs,
@@ -279,7 +216,7 @@ namespace Belle2 {
         FullSecID fullSecID = secIDAndSPpair.first;
         B2DEBUG(20, "SecMapTrainer::convertSPTC: found fullSecID: " << fullSecID.getFullSecString());
 
-        newTrack.addHit(SecMapTrainerHit(fullSecID, secIDAndSPpair.second->getPosition()));
+        newTrack.addHit(SecMapTrainerHit(fullSecID,  *secIDAndSPpair.second));
       }
 
       // add vertex (but without real vertexPosition, since origin is assumed)
@@ -302,6 +239,7 @@ namespace Belle2 {
         m_config.vIP.Y(),
         m_config.vIP.Z(),
         m_config.mField),
+
       m_filterMill(),
       m_rootInterface(m_config.secMapName, appendix),
       m_expNo(std::numeric_limits<unsigned>::max()),
@@ -319,24 +257,47 @@ namespace Belle2 {
     /** initialize the trainer (to be called in Module::initialize(). */
     void initialize()
     {
-      // prepare the filters:
-      m_rootInterface.initialize2Hit(m_config.twoHitFilters);
-      for (auto& fName : m_config.twoHitFilters) {
-        auto filter = m_factory.get2HitInterface(fName);
-        m_filterMill.add2HitFilter({fName, filter});
-      }
+      // prepare the filters!
+      // 2 space points:
+      auto TwoSPfilterNamesToFunctions(SelectionVariableNamesToFunctions(VXDTFFilters<SecMapTrainerHit>::twoHitFilter_t()));
 
-      m_rootInterface.initialize3Hit(m_config.threeHitFilters);
-      for (auto& fName : m_config.threeHitFilters) {
-        auto filter = m_factory.get3HitInterface(fName);
-        m_filterMill.add3HitFilter({fName, filter});
-      }
+      std::vector< std::string> twoHitFilters;
+      for (const auto& filterNameToFunction : TwoSPfilterNamesToFunctions)
+        twoHitFilters.push_back(filterNameToFunction.first);
 
-      m_rootInterface.initialize4Hit(m_config.fourHitFilters);
-      for (auto& fName : m_config.fourHitFilters) {
-        auto filter = m_factory.get4HitInterface(fName);
-        m_filterMill.add4HitFilter({fName, filter});
-      }
+      m_rootInterface.initialize2Hit(twoHitFilters);
+      for (auto& nameToFunction : TwoSPfilterNamesToFunctions)
+        m_filterMill.add2HitFilter(nameToFunction);
+
+
+      // 3 space points:
+      auto ThreeSPfilterNamesToFunctions(SelectionVariableNamesToFunctions(
+                                           VXDTFFilters<SecMapTrainerHit>::threeHitFilter_t()));
+
+      std::vector< std::string> threeHitFilters;
+      for (const auto& filterNameToFunction : ThreeSPfilterNamesToFunctions)
+        threeHitFilters.push_back(filterNameToFunction.first);
+
+      m_rootInterface.initialize3Hit(threeHitFilters);
+      for (auto& nameToFunction : ThreeSPfilterNamesToFunctions)
+        m_filterMill.add3HitFilter(nameToFunction);
+      for (auto& nameToFunction : ThreeSPfilterNamesToFunctions)
+        m_filterMill.add3HitFilter(nameToFunction);
+
+
+      // 4 space points apparently unused
+      // m_rootInterface.initialize4Hit(m_config.fourHitFilters);
+
+      // auto FourSPfilterNamesToFunctions( SelectionVariableNamesToFunctions(
+      //                     VXDTFFilters<SecMapTrainerHit>::fourHitFilter_t() ));
+
+      // std::vector< std::string> fourHitFilters;
+      // for (const auto& filterNameToFunction :FourSPfilterNamesToFunctions )
+      //  fourHitFilters.push_back( filterNameToFunction.first );
+
+      // m_rootInterface.initialize4Hit(fourHitFilters);
+      // for (auto& nameToFunction : FourSPfilterNamesToFunctions)
+      //  m_filterMill.add4HitFilter(nameToFunction);
 
       // prevent further modifications:
       m_filterMill.lockMill();
@@ -459,8 +420,6 @@ namespace Belle2 {
         n2HitResults += process2HitCombinations(tc);
         // three hit:
         n3HitResults += process3HitCombinations(tc);
-        //four hit:
-        n4HitResults += process4HitCombinations(tc);
       }
 
       m_tcs.clear();

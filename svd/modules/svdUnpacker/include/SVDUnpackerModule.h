@@ -22,6 +22,7 @@
 #include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDTransparentDigit.h>
+#include <svd/dataobjects/SVDDAQDiagnostic.h>
 
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <svd/online/SVDStripNoiseMap.h>
@@ -63,14 +64,19 @@ namespace Belle2 {
 
       bool m_generateShaperDigts;
       std::string m_svdShaperDigitListName;
+      std::string m_svdDAQDiagnosticsListName;
 
       int m_wrongFTBcrc;
+
+
 
 
     private:
 
       std::unique_ptr<SVDOnlineToOfflineMap> m_map;
       //unsigned short m_runType;
+
+      SVDModeByte m_SVDModeByte;
 
       void loadMap();
       void printB2Debug(uint32_t* data32, uint32_t* data32_min, uint32_t* data32_max, int nWords);
@@ -86,22 +92,24 @@ namespace Belle2 {
 
       struct MainHeader {
         unsigned int trgNumber : 8; //LSB
-        unsigned int trgTiming : 8;
+        unsigned int trgType   : 4;
+        unsigned int trgTiming : 3;
+        unsigned int onebit    : 1;
         unsigned int FADCnum   : 8;
-        unsigned int evtType   : 3;
+        unsigned int evtType   : 1; // Event type(0): 0…TTD event, 1…standalone event
+        unsigned int DAQMode   : 2; // Event type(2:1): "00"…1-sample, "01"…3-sample, "10"…6-sample
         unsigned int runType   : 2;
         unsigned int check     : 3; //MSB
       };
 
       struct APVHeader {
         unsigned int CMC1      : 8; //LSB
-
         unsigned int CMC2      : 4;
-        unsigned int errorMask : 3;
-        unsigned int errorBit  : 1;
-
+//         unsigned int fifoErr   : 1;
+//         unsigned int frameErr  : 1;
+//         unsigned int detectErr : 1;
+        unsigned int apvErr    : 4;
         unsigned int pipelineAddr : 8;
-
         unsigned int APVnum : 6;
         unsigned int check : 2; //MSB
       };
@@ -125,13 +133,11 @@ namespace Belle2 {
 
       struct FADCTrailer {
         unsigned int FTBFlags: 16; //LSB
-
-        unsigned int emPipeAddr: 8;
-
-        unsigned int wiredOrErr: 1;
-        unsigned int error0: 1;
-        unsigned int error1: 1;
-        unsigned int error2: 1;
+        unsigned int emuPipeAddr: 8;
+//         unsigned int fifoErrOR   : 1;
+//         unsigned int frameErrOR  : 1;
+//         unsigned int detectErrOR : 1;
+        unsigned int apvErrOR  : 4;
         unsigned int check : 4; //MSB
       };
 

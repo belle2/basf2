@@ -87,6 +87,9 @@ namespace Belle2 {
              "minimal number of samples above threshold", 3);
     addParam("useWaveforms", m_useWaveforms,
              "if true, use full waveform digitization", false);
+    addParam("allChannels", m_allChannels,
+             "if true, make waveforms for all 8192 channels "
+             "(note: this will slow-down digitization)", false);
     addParam("useDatabase", m_useDatabase,
              "if true, use sample times from database instead of equidistant time base",
              false);
@@ -94,8 +97,10 @@ namespace Belle2 {
              "if true, simulate time transition spread. "
              "Should be always switched ON, except for some dedicated timing studies.",
              true);
+    addParam("storageDepth", m_storageDepth, "ASIC analog storage depth", (unsigned) 510);
 
   }
+
 
   TOPDigitizerModule::~TOPDigitizerModule()
   {
@@ -153,6 +158,10 @@ namespace Belle2 {
 
     if (m_useDatabase) m_timebase = new DBObjPtr<TOPCalTimebase>;
 
+    // time range
+    m_timeMin = geo->getNominalTDC().getTimeMin() + geo->getSignalShape().getTMin();
+    m_timeMax = geo->getNominalTDC().getTimeMax() + geo->getSignalShape().getTMax();
+
   }
 
   void TOPDigitizerModule::beginRun()
@@ -191,7 +200,7 @@ namespace Belle2 {
 
     // storage window number
 
-    unsigned window = int(gRandom->Rndm() * 512);
+    unsigned window = gRandom->Integer(m_storageDepth);
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
@@ -235,8 +244,12 @@ namespace Belle2 {
       double time = simHit.getTime() - startTime;
       if (m_simulateTTS) time += tts.generateTTS();
 
+      // time range cut (to speed up digitization)
+      if (time < m_timeMin) continue;
+      if (time > m_timeMax) continue;
+
       // add time to digitizer of a given pixel
-      TimeDigitizer digitizer(moduleID, pixelID, window,
+      TimeDigitizer digitizer(moduleID, pixelID, window, m_storageDepth,
                               pulseHeightGenerator, m_sampleTimes);
       if (!digitizer.isValid()) continue;
       if (m_timebase) {
@@ -261,7 +274,7 @@ namespace Belle2 {
         for (int i = 0; i < numHits; i++) {
           int pixelID = int(gRandom->Rndm() * numPixels) + 1;
           double time = (timeMax - timeMin) * gRandom->Rndm() + timeMin;
-          TimeDigitizer digitizer(moduleID, pixelID, window,
+          TimeDigitizer digitizer(moduleID, pixelID, window, m_storageDepth,
                                   pulseHeightGenerator, m_sampleTimes);
           if (!digitizer.isValid()) continue;
           if (m_timebase) {
@@ -272,6 +285,22 @@ namespace Belle2 {
           unsigned id = digitizer.getUniqueID();
           Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
           it->second.addTimeOfHit(time);
+        }
+      }
+    }
+
+    // make waveforms for all channels? Then add missing ones.
+
+    if (m_allChannels) {
+      int numModules = geo->getNumModules();
+      for (int moduleID = 1; moduleID <= numModules; moduleID++) {
+        int numPixels = geo->getModule(moduleID).getPMTArray().getNumPixels();
+        for (int pixelID = 1; pixelID <= numPixels; pixelID++) {
+          TimeDigitizer digitizer(moduleID, pixelID, window, m_storageDepth,
+                                  pulseHeightGenerator, m_sampleTimes);
+          if (!digitizer.isValid()) continue;
+          unsigned id = digitizer.getUniqueID();
+          pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer));
         }
       }
     }

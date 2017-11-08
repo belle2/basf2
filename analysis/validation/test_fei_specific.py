@@ -48,7 +48,7 @@ inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/mds
 
 sig_path = create_path()
 inputMdstList('MC6', [inputFile], sig_path)
-fillParticleList('mu+:sig', 'muid > 0.5 and dr < 1 and abs(dz) < 2', writeOut=True, path=sig_path)
+fillParticleList('mu+:sig', 'muonID > 0.5 and dr < 1 and abs(dz) < 2', writeOut=True, path=sig_path)
 reconstructDecay('tau+:sig -> mu+:sig', '', 1, writeOut=True, path=sig_path)
 matchMCTruth('tau+:sig', path=sig_path)
 reconstructDecay('B+:sig -> tau+:sig', '', writeOut=True, path=sig_path)

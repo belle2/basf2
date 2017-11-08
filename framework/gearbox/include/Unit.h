@@ -103,6 +103,10 @@ namespace Belle2 {
     static const double J;            /**< [joule] */
     static const double V;            /**< [voltage] */
 
+    static const double mT;           /**< [millitesla] */
+    static const double Gauss;        /**< [gauss] */
+    static const double kGauss;       /**< [kilogauss] */
+
     // charge units
     static const double C;            /**< [coulomb] */
     static const double fC;           /**< [femtocoulomb] */

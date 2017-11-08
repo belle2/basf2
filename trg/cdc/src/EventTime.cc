@@ -19,6 +19,7 @@
 #include "trg/cdc/EventTime.h"
 #include <cstdlib>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <bitset>
 #include <sstream>

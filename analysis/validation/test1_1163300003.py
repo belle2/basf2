@@ -128,8 +128,8 @@ variables.addAlias('d1_d0_d0_mcPDG', 'daughter(1,daughter(0,daughter(0,mcPDG)))'
 variables.addAlias('d1_d0_d1_mcPDG', 'daughter(1,daughter(0,daughter(1,mcPDG)))')
 
 
-variables.addAlias('tau_eid', 'daughter(1,daughter(0,eid))')
-variables.addAlias('tau_muid', 'daughter(1,daughter(0,muid))')
+variables.addAlias('tau_eid', 'daughter(1,daughter(0,electronID))')
+variables.addAlias('tau_muid', 'daughter(1,daughter(0,muonID))')
 outputRootFile = 'dstarptaunuOutput.root'
 
 

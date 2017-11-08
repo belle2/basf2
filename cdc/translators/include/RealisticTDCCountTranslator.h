@@ -91,6 +91,11 @@ namespace Belle2 {
       bool m_useInWirePropagationDelay;
 
       /**
+       * Flag to distinguish betw. data and MC.
+       */
+      bool m_realData = false;
+
+      /**
        * Event timing. The event time is fetched from the data store using this pointer.
        */
       StoreObjPtr<EventT0> m_eventTimeStoreObject;

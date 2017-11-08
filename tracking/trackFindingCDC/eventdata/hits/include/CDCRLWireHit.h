@@ -9,13 +9,25 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/topology/EStereoKind.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+
 #include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
+
+#include <iosfwd>
 
 namespace Belle2 {
   class CDCSimHit;
+  class CDCHit;
+  class WireID;
 
   namespace TrackFindingCDC {
+    class CDCTrajectory2D;
+    class CDCWireHit;
+    class CDCWire;
+    class Vector3D;
+    class Vector2D;
 
     /**
      *  Class representing an oriented hit wire including a hypotheses
@@ -53,17 +65,15 @@ namespace Belle2 {
        *  Constructs the average of two wire hits with right left passage informations.
        *  Takes the average of the estimated drift lengths.
        */
-      static CDCRLWireHit average(const CDCRLWireHit& rlWireHit1,
-                                  const CDCRLWireHit& rlWireHit2);
+      static CDCRLWireHit average(const CDCRLWireHit& rlWireHit1, const CDCRLWireHit& rlWireHit2);
 
       /**
        *  Constructs the average of three wire hits with right left passage informations.
        *  Takes the average of the estimated drift lengths.
        */
       static CDCRLWireHit average(const CDCRLWireHit& rlWireHit1,
-                                  const CDCRLWireHit& rlWireHit2 ,
+                                  const CDCRLWireHit& rlWireHit2,
                                   const CDCRLWireHit& rlWireHit3);
-
 
       /**
        *  Constructs an oriented wire hit from a CDCSimHit and the associated wirehit.
@@ -84,16 +94,21 @@ namespace Belle2 {
 
       /// Swiches the right left passage to its opposite inplace.
       void reverse()
-      { m_rlInfo = NRightLeft::reversed(m_rlInfo); }
+      {
+        m_rlInfo = NRightLeft::reversed(m_rlInfo);
+      }
 
       /// Returns the aliased version of this oriented wire hit - here same as reverse
       CDCRLWireHit getAlias() const
-      { return reversed(); }
+      {
+        return reversed();
+      }
 
       /// Equality comparison based on wire hit, left right passage information.
       bool operator==(const CDCRLWireHit& rhs) const
-      { return getWireHit() == rhs.getWireHit() and getRLInfo() == rhs.getRLInfo(); }
-
+      {
+        return &getWireHit() == &rhs.getWireHit() and getRLInfo() == rhs.getRLInfo();
+      }
 
       /**
        *  Total ordering relation based on wire hit and left right passage information
@@ -101,108 +116,129 @@ namespace Belle2 {
        */
       bool operator<(const CDCRLWireHit& rhs) const
       {
-        return getWireHit() <  rhs.getWireHit() or (
-                 getWireHit() == rhs.getWireHit() and (
-                   getRLInfo() < rhs.getRLInfo()));
+        return &getWireHit() < &rhs.getWireHit() or
+               (&getWireHit() == &rhs.getWireHit() and (getRLInfo() < rhs.getRLInfo()));
       }
 
       /// Defines wires and oriented wire hits to be coaligned on the wire on which they are based.
       friend bool operator<(const CDCRLWireHit& rlWireHit, const CDCWire& wire)
-      { return rlWireHit.getWire() < wire; }
+      {
+        return &rlWireHit.getWire() < &wire;
+      }
 
       /// Defines oriented wire hits and wires to be coaligned on the wire on which they are based.
       friend bool operator<(const CDCWire& wire, const CDCRLWireHit& rlWireHit)
-      { return wire < rlWireHit.getWire(); }
+      {
+        return &wire < &rlWireHit.getWire();
+      }
 
       /**
        *  Defines wire hits and oriented wire hits to be coaligned on the wire hit
        *  on which they are based.
        */
       friend bool operator<(const CDCRLWireHit& rlWireHit, const CDCWireHit& wireHit)
-      { return rlWireHit.getWireHit() < wireHit; }
+      {
+        return &rlWireHit.getWireHit() < &wireHit;
+      }
 
       /**
        *  Defines oriented wire hits and wire hits to be coaligned on the wire hit
        *  on which they are based.
        */
       friend bool operator<(const CDCWireHit& wireHit, const CDCRLWireHit& rlWireHit)
-      { return wireHit < rlWireHit.getWireHit(); }
+      {
+        return &wireHit < rlWireHit.m_wireHit;
+      }
 
       /// Make the wire hit automatically castable to its underlying cdcHit.
       operator const Belle2::CDCHit* () const
-      { return getWireHit().getHit(); }
+      {
+        return getHit();
+      }
 
       /// Getter for the CDCHit pointer into the StoreArray.
-      const CDCHit* getHit() const
-      { return getWireHit().getHit(); }
+      const CDCHit* getHit() const;
 
       /// Getter for the wire the oriented hit associated to.
-      const CDCWire& getWire() const
-      { return getWireHit().getWire(); }
+      const CDCWire& getWire() const;
 
       /// Checks if the oriented hit is associated with the give wire.
       bool isOnWire(const CDCWire& wire) const
-      { return getWire() == wire; }
+      {
+        return &getWire() == &wire;
+      }
 
       /// Getter for the WireID of the wire the hit is located on.
-      const WireID& getWireID() const
-      { return getWire().getWireID(); }
+      const WireID& getWireID() const;
 
       /// Getter for the superlayer id.
-      ISuperLayer getISuperLayer() const
-      { return getWire().getISuperLayer(); }
+      ISuperLayer getISuperLayer() const;
 
       /// Getter for the stereo type of the underlying wire.
-      EStereoKind getStereoKind() const
-      { return getWire().getStereoKind(); }
+      EStereoKind getStereoKind() const;
 
       /// Indicator if the underlying wire is axial.
-      bool isAxial() const
-      { return getWire().isAxial(); }
+      bool isAxial() const;
 
       /// The two dimensional reference position of the underlying wire.
-      const Vector2D& getRefPos2D() const
-      { return getWire().getRefPos2D(); }
+      const Vector2D& getRefPos2D() const;
 
       /// The distance from the beam line at reference position of the underlying wire.
-      double getRefCylindricalR() const
-      { return getWire().getRefCylindricalR(); }
+      double getRefCylindricalR() const;
 
       /// Getter for the wire hit associated with the oriented hit.
       const CDCWireHit& getWireHit() const
-      { return *m_wireHit; }
+      {
+        return *m_wireHit;
+      }
 
       /// Checks if the oriented hit is associated with the give wire hit.
       bool hasWireHit(const CDCWireHit& wirehit) const
-      { return getWireHit() == wirehit; }
+      {
+        return &getWireHit() == &wirehit;
+      }
 
       /// Getter for the  drift length at the reference position of the wire.
       double getRefDriftLength() const
-      { return m_refDriftLength; }
+      {
+        return m_refDriftLength;
+      }
 
       /// Setter for the  drift length at the reference position of the wire.
       void setRefDriftLength(double driftLength)
-      { m_refDriftLength = driftLength; }
+      {
+        m_refDriftLength = driftLength;
+      }
 
       /// Getter for the  drift length at the reference position of the wire.
       double getSignedRefDriftLength() const
-      { return static_cast<ESign>(getRLInfo()) * getRefDriftLength(); }
+      {
+        return static_cast<ESign>(getRLInfo()) * getRefDriftLength();
+      }
 
       /// Getter for the variance of the drift length at the reference position of the wire.
       double getRefDriftLengthVariance() const
-      { return m_refDriftLengthVariance; }
+      {
+        return m_refDriftLengthVariance;
+      }
 
       /// Setter for the variance of the drift length at the reference position of the wire.
       void setRefDriftLengthVariance(double driftLengthVariance)
-      { m_refDriftLengthVariance = driftLengthVariance; }
+      {
+        m_refDriftLengthVariance = driftLengthVariance;
+      }
 
       /// Getter for the right left passage information.
       ERightLeft getRLInfo() const
-      { return m_rlInfo; }
+      {
+        return m_rlInfo;
+      }
 
       /// Setter for the right left passage information.
       void setRLInfo(const ERightLeft rlInfo)
-      { m_rlInfo = rlInfo; }
+      {
+        m_rlInfo = rlInfo;
+      }
 
       /**
        *  Reconstructs a position of primary ionisation on the drift circle.
@@ -228,15 +264,7 @@ namespace Belle2 {
        *    yield the closest approach of the drift circle to the trajectory
        *    in the reference plane.
        */
-      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D) const;
-
-      /// Output operator. Help debugging.
-      friend std::ostream& operator<<(std::ostream& output, const CDCRLWireHit& rlWireHit)
-      {
-        output << "CDCRLWireHit(" << rlWireHit.getWireHit() << ","
-               << static_cast<typename std::underlying_type<ERightLeft>::type>(rlWireHit.getRLInfo()) << ")" ;
-        return output;
-      }
+      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, double z = 0) const;
 
     private:
       /// Memory for the reference to the assiziated wire hit.
@@ -251,5 +279,8 @@ namespace Belle2 {
       /// Memory for the reestimated drift length variance
       double m_refDriftLengthVariance = 0.0;
     };
+
+    /// Output operator. Help debugging.
+    std::ostream& operator<<(std::ostream& output, const CDCRLWireHit& rlWireHit);
   }
 }

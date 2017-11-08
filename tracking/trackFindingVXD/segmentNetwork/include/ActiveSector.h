@@ -77,7 +77,7 @@ namespace Belle2 {
 /// getters:
 
     /** return ID of this sector */
-    const std::int32_t getID() const { return m_identifier; }
+    std::int32_t getID() const { return m_identifier; }
 
     /** returns longer debugging name of this sector */
     std::string getName() const

@@ -10,17 +10,25 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
-#include <tracking/trackFindingCDC/geometry/Circle2D.h>
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
 
 #include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/numerics/Angle.h>
+
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackFindingCDC/numerics/ERotation.h>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
+
+#include <utility>
+#include <cmath>
+#include <iosfwd>
 
 namespace Belle2 {
 
   namespace TrackFindingCDC {
+    class Circle2D;
 
     /// Extension of the generalized circle also caching the perigee coordinates.
     class PerigeeCircle {
@@ -481,15 +489,6 @@ namespace Belle2 {
         m_curvature = curvature;
       }
 
-      /// Debug helper
-      friend std::ostream& operator<<(std::ostream& output, const PerigeeCircle& circle)
-      {
-        return output << "PerigeeCircle("
-               << "curvature=" << circle.curvature() << ","
-               << "phi0=" << circle.phi0() << ","
-               << "impact=" << circle.impact() << ")";
-      }
-
     private:
       /// Helper method to calculate the arc length to a point at distance  delta to the perigee and dr to circle.
       double arcLengthAtDeltaLength(double delta, double dr) const;
@@ -512,5 +511,7 @@ namespace Belle2 {
 
     };
 
+    /// Debug helper
+    std::ostream& operator<<(std::ostream& output, const PerigeeCircle& circle);
   }
 }

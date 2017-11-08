@@ -13,6 +13,11 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
 #include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
+
+#include <tracking/trackFindingCDC/topology/EWirePositionToCDC.h>
+#include <tracking/trackFindingCDC/topology/EWirePosition.h>
+
+#include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 using namespace Belle2;
@@ -54,8 +59,8 @@ const CDCWire* CDCWire::getInstance(const CDCHit& hit)
 CDCWire::CDCWire(const WireID& wireID)
   : m_wireID(wireID)
 {
-  CDC::CDCGeometryPar::EWirePosition wirePosSet = CDC::CDCGeometryPar::c_Base;
-  initialize(wirePosSet, false);
+  EWirePosition wirePosition = EWirePosition::c_Base;
+  initialize(wirePosition, false);
 }
 
 CDCWire::CDCWire(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire)
@@ -63,9 +68,10 @@ CDCWire::CDCWire(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire)
 {
 }
 
-void CDCWire::initialize(CDC::CDCGeometryPar::EWirePosition wirePosSet, bool ignoreWireSag)
+void CDCWire::initialize(EWirePosition wirePosition, bool ignoreWireSag)
 {
   CDC::CDCGeometryPar& cdcgp = CDC::CDCGeometryPar::Instance();
+  CDC::CDCGeometryPar::EWirePosition wirePosSet = toCDC(wirePosition);
 
   IWire iWire = getIWire();
   ILayer iCLayer = getICLayer();

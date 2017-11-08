@@ -61,7 +61,7 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
                           "(combination not recommended), using networks for lowPt=False")
         path.add_module('CDCTriggerNeuro', filename=filename)
         path.add_module('CDCTriggerTrackCombiner',
-                        thetaDefition=thetaDef, zDefinition=zDef)
+                        thetaDefinition=thetaDef, zDefinition=zDef)
     elif SimulationMode == 2:
         B2WARNING("full simulation mode does not include all CDC trigger modules yet")
         # standard CDC trigger

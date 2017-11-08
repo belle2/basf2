@@ -49,7 +49,7 @@ namespace Belle2 {
                         m_probTrackLevel({}),
                         m_targetEventLevel({}),
                         m_probEventLevel({}),
-                        m_qrCategory({}),
+                        m_qpCategory({}),
                         m_hasTrueTarget({}),
                         m_isTrueCategory({}),
                         m_qrCombined(-2),
@@ -104,7 +104,7 @@ namespace Belle2 {
     * @param category string name of the given category
     * @param qr output of the given category
     */
-    void setQrCategory(std::string category, float qr);
+    void setQpCategory(std::string category, float qr);
 
     /**
     * Map filler: Set the category name and the corresponding MC target truth value.
@@ -141,58 +141,64 @@ namespace Belle2 {
 
 
     /**
-     * GETTERS
-     */
-
-    /**< map containing the category name and the corresponding pointer to the track with highest target probability in Track Level
+     * get map containing the category name and the corresponding pointer to the track with highest target probability in Track Level
     * @return map
     */
     std::map<std::string, const Belle2::Track*> getTargetTrackLevel();
 
-    /**< map containing the category name and thecorresponding highest target track probability in Track Level
+    /**
+     * get map containing the category name and thecorresponding highest target track probability in Track Level
     * @return map
     */
     std::map<std::string, float> getProbTrackLevel();
 
-    /**< map containing the category name and the corresponding pointer to the track with highest category probability in Event Level
+    /**
+     * get map containing the category name and the corresponding pointer to the track with highest category probability in Event Level
     * @return map
     */
     std::map<std::string, const Belle2::Track*> getTargetEventLevel();
 
-    /**< map containing the category name and the corresponding highest category probability in Event Level
+    /**
+     * get map containing the category name and the corresponding highest category probability in Event Level
     * @return map
     */
     std::map<std::string, float> getProbEventLevel();
 
-    /**< map containing the category name and the corresponding qr Output
+    /**
+     * get map containing the category name and the corresponding qr Output
     * @return map
     */
-    std::map<std::string, float> getQrCategory();
+    std::map<std::string, float> getQpCategory();
 
-    /**< map containing the category truth. 1 if the Category has a target or 0 else.
+    /**
+     * get map containing the category truth. 1 if the Category has a target or 0 else.
     * @return map
     */
     std::map<std::string, float> getHasTrueTarget();
 
-    /**< map containing the category truth. 1 if the Category tags the B0 MC flavor correctly 0 else.
-    * @return map
-    */
+    /**
+     * get map containing the category truth. 1 if the Category tags the B0 MC flavor correctly 0 else.
+     * @return map
+     */
     std::map<std::string, float> getIsTrueCategory();
 
-    /**qr Output of the Combiner. Output of the FlavorTagger after the complete process.
+    /**
+     * qr Output of the Combiner. Output of the FlavorTagger after the complete process.
     * @return qr
     */
     float getQrCombined();
 
-    /**Probability of being a B0. Output of the FlavorTagger after the complete process.
+    /**
+     * Probability of being a B0. Output of the FlavorTagger after the complete process.
     * @return B0Probability
     */
     float getB0Probability();
 
-    /**Probability of being a B0bar. Output of the FlavorTagger after the complete process.
+    /**
+     * Probability of being a B0bar. Output of the FlavorTagger after the complete process.
     * @return B0barProbability
     */
-    float getB0barProbability(); /**< Direct Output of the Combiner: Probability of being a B0bar).*/
+    float getB0barProbability();
 
 
   private:
@@ -210,7 +216,7 @@ namespace Belle2 {
     std::map<std::string, float>
     m_probEventLevel; /**< map containing the category name and the corresponding highest category probability in Event Level*/
     std::map<std::string, float>
-    m_qrCategory; /**< map containing the category name and the corresponding qr Output, i.e. the Combiner input value. They could be used for independent tags.*/
+    m_qpCategory; /**< map containing the category name and the corresponding qr Output, i.e. the Combiner input value. They could be used for independent tags.*/
     std::map<std::string, float>
     m_hasTrueTarget; /**< map containing the category name and a float value which is 1 if the corresponding category has a target or 0 else.*/
     std::map<std::string, float>

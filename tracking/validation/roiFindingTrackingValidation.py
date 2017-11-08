@@ -215,7 +215,7 @@ svd_reco_tracks = '__ROIsvdRecoTracks'
 add_tracking_for_PXDDataReduction_simulation(path, ['SVD', 'CDC'], False)  # CDC is not used at the moment!
 
 # ROI Finding
-pxdDataRed = basf2.register_module('PXDDataReduction')
+pxdDataRed = basf2.register_module('PXDROIFinder')
 param_pxdDataRed = {
     'recoTrackListName': svd_reco_tracks,
     'PXDInterceptListName': 'PXDIntercepts',

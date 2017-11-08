@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+
 #include <tracking/trackFindingCDC/numerics/Modulo.h>
 
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
@@ -15,8 +16,6 @@
 
 #include <tracking/trackFindingCDC/numerics/EIncDec.h>
 #include <tracking/trackFindingCDC/numerics/ESign.h>
-
-#include <framework/logging/Logger.h>
 
 #include <utility>
 #include <cmath>

@@ -17,12 +17,3 @@ BFieldManager& BFieldManager::getInstance()
   static BFieldManager instance;
   return instance;
 }
-
-void BFieldManager::clearComponents()
-{
-  for (BFieldComponent* c : m_components) {
-    delete c;
-  }
-  m_components.clear();
-  m_fallbackActive = false;
-}

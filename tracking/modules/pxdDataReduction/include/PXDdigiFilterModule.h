@@ -53,6 +53,7 @@ namespace Belle2 {
 
   private:
 
+    bool m_CreateOutside; /**< if set, create list of outside pixels, too */
     std::string m_PXDDigitsName;  /**< The name of the StoreArray of PXDDigits to be filtered */
     std::string m_PXDDigitsInsideROIName;  /**< The name of the StoreArray of Filtered PXDDigits */
     std::string m_PXDDigitsOutsideROIName;  /**< The name of the StoreArray of Filtered PXDDigits */

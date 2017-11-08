@@ -11,9 +11,10 @@
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 
-#include <tracking/trackFindingCDC/utilities/GetValueType.h>
-#include <tracking/trackFindingCDC/utilities/GetIterator.h>
-#include <tracking/trackFindingCDC/utilities/Range.h>
+#include <tracking/trackFindingCDC/utilities/VectorRange.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <framework/logging/Logger.h>
 
@@ -33,126 +34,133 @@ namespace Belle2 {
      *    by using the WithAutomatonCell mixin.
      *  * ACluster can be anything that is default constructable and supports .insert(end(), ACellHolder*).
      */
-    template<class ACellHolder, class ACluster = std::vector<ACellHolder*> >
-    class Clusterizer {
-
-      /// Pointer type used to refer to the objects to be clustered.
-      using CellHolderPtr = ACellHolder*;
+    template <class ACellHolder, class ACluster = std::vector<ACellHolder*> >
+    class Clusterizer
+      : public Findlet<ACellHolder* const, WeightedRelation<ACellHolder> const, ACluster> {
 
     public:
       /**
        *  Creates the clusters.
-       *  Repeatly expands a neighborhood of reference objects that have an AutomatonCell.
+       *  Repeatly expands a neighborhood of referenced objects that have an AutomatonCell.
        *  The CellState after the clusterization is the index of the generated cluster.
-       *  The CellWeight is set to the total number of relations each cell has with in the neighborhood.
-       *  * ACellHolderRange is required to be a range of cells convertable to ACellHolder*
-       *  * ACellHolderNeighborhood is required to have a .equal_range() method
-       *    that yields a range of pairs which .second elements are the sought neighbors.
-       *  @param cellHolderPtrs         Pointers to objects that should be clustered.
-       *  @param cellHolderNeighborhood  Relations between the objects that should be clustered
-       *  @param[out] clusters          Groups of connected objects in the neighborhood.
+       *  The CellWeight is set to the total number of neighbors of each cell.
+       *
+       *  @param cellHolders          Pointers to objects that should be clustered.
+       *  @param cellHolderRelations  Relations between the objects that should be clustered
+       *  @param[out] clusters        Groups of connected objects in the neighborhood.
        */
-      template<class ACellHolderPtrRange, class ACellHolderNeighborhood>
-      void createFromPointers(const ACellHolderPtrRange& cellHolderPtrs,
-                              const ACellHolderNeighborhood& cellHolderNeighborhood,
-                              std::vector<ACluster>& clusters) const
+      void apply(std::vector<ACellHolder*> const& cellHolders,
+                 std::vector<WeightedRelation<ACellHolder> > const& cellHolderRelations,
+                 std::vector<ACluster>& clusters) override
       {
+        // Expect the relations to be sorted for lookup
+        assert(std::is_sorted(cellHolderRelations.begin(),
+                              cellHolderRelations.end()));
+
+        // Prepare some output clusters
         clusters.reserve(30);
 
         // Prepare states
-        for (CellHolderPtr cellHolderPtr : cellHolderPtrs) {
-          setCellState(cellHolderPtr, -1);
+        for (ACellHolder* cellHolder : cellHolders) {
+          setCellState(cellHolder, -1);
         }
 
-        int iCluster = -1;
-        for (CellHolderPtr cellHolderPtr : cellHolderPtrs) {
-          if (getCellState(cellHolderPtr) != -1) continue;
+        // Work horse cluster
+        std::vector<ACellHolder*> cluster;
 
-          clusters.push_back(ACluster());
-          ACluster& newCluster = clusters.back();
+        // Go through each cell holder and start a cluster on each that is unassigned yet
+        int iCluster = -1;
+        for (ACellHolder* cellHolder : cellHolders) {
+          if (getCellState(cellHolder) != -1) continue;
+
+          cluster.clear();
+
           ++iCluster;
-          startCluster(cellHolderPtr, cellHolderNeighborhood, iCluster, newCluster);
+          setCellState(cellHolder, iCluster);
+          cluster.push_back(cellHolder);
+
+          expandCluster(cellHolderRelations, cluster);
+
+          clusters.emplace_back(std::move(cluster));
+          cluster.clear();
         }
       }
 
     private:
-      /// Helper function. Starting a new cluster and iterativelly (not recursively) expands it.
-      template<class ACellHolderNeighborhood>
-      void startCluster(CellHolderPtr seedCellHolderPtr,
-                        const ACellHolderNeighborhood& cellHolderNeighborhood,
-                        int iCluster,
-                        ACluster& newCluster) const
+      /// Helper function. Starting a new cluster and iterativelly expands it.
+      void expandCluster(std::vector<WeightedRelation<ACellHolder>> const& cellHolderRelations,
+                         std::vector<ACellHolder*>& cluster) const
       {
-        setCellState(seedCellHolderPtr, iCluster);
-        newCluster.insert(newCluster.end(), seedCellHolderPtr);
+        ACellHolder* seedCellHolder = cluster.front();
+        int iCluster = getCellState(seedCellHolder);
 
         // Grow the cluster iterativelly
-        std::vector<CellHolderPtr> checkNow;
-        std::vector<CellHolderPtr> checkNext;
+        std::vector<ACellHolder*> checkNow;
+        std::vector<ACellHolder*> checkNext;
 
         checkNow.reserve(10);
         checkNext.reserve(10);
 
-        checkNext.push_back(seedCellHolderPtr);
+        checkNext.push_back(seedCellHolder);
 
         while (not checkNext.empty()) {
 
           checkNow.swap(checkNext);
           checkNext.clear();
 
-          for (CellHolderPtr cellHolderPtr : checkNow) {
-            size_t nNeighbors = 0;
+          for (ACellHolder* cellHolder : checkNow) {
 
-            auto cellHolderRelations = cellHolderNeighborhood.equal_range(cellHolderPtr);
-            using CellHolderRelationIterator = GetIterator<const ACellHolderNeighborhood>;
-            using CellHolderRelation = GetValueType<const ACellHolderNeighborhood>;
-            for (const CellHolderRelation & cellHolderRelation
-                 : Range<CellHolderRelationIterator>(cellHolderRelations)) {
-              CellHolderPtr neighborCellHolderPtr = cellHolderRelation.second;
-              ++nNeighbors;
-
-              Weight neighborICluster = getCellState(neighborCellHolderPtr);
-              if (neighborICluster == -1) {
-                // Neighbor not yet in cluster
-                setCellState(neighborCellHolderPtr, iCluster);
-                newCluster.insert(newCluster.end(), neighborCellHolderPtr);
-
-                // Register neighbor for further expansion
-                checkNext.push_back(neighborCellHolderPtr);
-
-              } else if (neighborICluster != iCluster) {
-                B2WARNING("Clusterizer: Neighboring item was already assigned to different cluster. Check if the neighborhood is symmetric.");
-
-              } else {
-
-              }
-            }
+            ConstVectorRange<WeightedRelation<ACellHolder> > neighborRelations(
+              std::equal_range(cellHolderRelations.begin(),
+                               cellHolderRelations.end(),
+                               cellHolder));
 
             // Setting the cell weight to the number of neighbors
-            setCellWeight(cellHolderPtr, nNeighbors);
+            size_t nNeighbors = neighborRelations.size();
+            setCellWeight(cellHolder, nNeighbors);
 
-          } // end (CellHolderPtr cellHolderPtr : checkNow)
-        } // end while(not checkNext.empty())
+            for (const WeightedRelation<ACellHolder>& neighborRelation : neighborRelations) {
+              ACellHolder* neighborCellHolder = neighborRelation.getTo();
+
+              Weight neighborICluster = getCellState(neighborCellHolder);
+              if (neighborICluster == -1) {
+                // Neighbor not yet in cluster
+                setCellState(neighborCellHolder, iCluster);
+                cluster.push_back(neighborCellHolder);
+
+                // Register neighbor for further expansion
+                checkNext.push_back(neighborCellHolder);
+                continue;
+              }
+
+              if (neighborICluster != iCluster) {
+                B2WARNING("Clusterizer: Neighboring item was already assigned to different "
+                          "cluster. Check if the neighborhood is symmetric.");
+                continue;
+              }
+            }
+          }
+        }
       }
 
       /// Setter for the cell state of a pointed object that holds an AutomatonCell
-      void setCellState(CellHolderPtr cellHolderPtr, Weight cellState) const
+      void setCellState(ACellHolder* cellHolder, Weight cellState) const
       {
-        AutomatonCell& automatonCell = cellHolderPtr->getAutomatonCell();
+        AutomatonCell& automatonCell = cellHolder->getAutomatonCell();
         automatonCell.setCellState(cellState);
       }
 
       /// Getter for the cell state of a pointed object that holds an AutomatonCell
-      Weight getCellState(CellHolderPtr cellHolderPtr) const
+      Weight getCellState(ACellHolder* cellHolder) const
       {
-        const AutomatonCell& automatonCell = cellHolderPtr->getAutomatonCell();
+        const AutomatonCell& automatonCell = cellHolder->getAutomatonCell();
         return automatonCell.getCellState();
       }
 
       /// Setter for the cell weight of a pointed object that holds an AutomatonCell
-      void setCellWeight(CellHolderPtr cellHolderPtr, Weight cellWeight) const
+      void setCellWeight(ACellHolder* cellHolder, Weight cellWeight) const
       {
-        AutomatonCell& automatonCell = cellHolderPtr->getAutomatonCell();
+        AutomatonCell& automatonCell = cellHolder->getAutomatonCell();
         automatonCell.setCellWeight(cellWeight);
       }
 

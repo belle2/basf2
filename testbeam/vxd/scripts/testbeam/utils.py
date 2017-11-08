@@ -191,7 +191,7 @@ def add_reconstruction(
     path.add_module(daf)
     track_creator = register_module('TrackCreator')
     track_creator.param('beamSpot', [0., 0., 0.])
-    track_creator.param('defaultPDGCode', 11)
+    track_creator.param('pdgCodes', [11])
     track_creator.logging.log_level = LogLevel.ERROR
     path.add_module(track_creator)
 
@@ -213,7 +213,7 @@ def add_offline_tracking(path, magnet=True, svd_only=False, telescopes=False, mo
     track_creator = register_module('TrackCreator')
     track_creator.logging.log_level = LogLevel.RESULT
     track_creator.param('beamSpot', [-20., 0., 0.])
-    track_creator.param('defaultPDGCode', 11)
+    track_creator.param('pdgCodes', [11])
     track_creator.param('recoTrackColName', 'offlineRecoTracks')
     track_creator.param('trackColName', 'offlineTracks')
     track_creator.param('trackFitResultColName', 'offlineTrackFitResults')

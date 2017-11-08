@@ -9,8 +9,11 @@
  **************************************************************************/
 
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <framework/datastore/RelationVector.h>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 
@@ -55,14 +58,40 @@ namespace Belle2 {
         // m_integral =
       }
       m_pulseHeight = int(sum);
-      // double reweight = sum > 0 ? pulseHeight[0]/sum : 0.5;
-      // this->modifyRelationsTo<TOPSimHit>(reweight);
-      // this->modifyRelationsTo<MCParticle>(reweight);
+      double reweight = sum > 0 ? pulseHeight[0] / sum : 0.5;
+      auto relSimHits = this->getRelationsTo<TOPSimHit>();
+      for (size_t i = 0; i < relSimHits.size(); ++i) {
+        float weight = relSimHits.weight(i) * reweight;
+        relSimHits.setWeight(i, weight);
+      }
+      auto relRawDigits = this->getRelationsTo<TOPRawDigit>();
+      for (size_t i = 0; i < relRawDigits.size(); ++i) {
+        float weight = relRawDigits.weight(i) * reweight;
+        relRawDigits.setWeight(i, weight);
+      }
+      auto relMCParticles = this->getRelationsTo<MCParticle>();
+      for (size_t i = 0; i < relMCParticles.size(); ++i) {
+        float weight = relMCParticles.weight(i) * reweight;
+        relMCParticles.setWeight(i, weight);
+      }
     } else { // pile-up results in discarding the second-in-time hit
-      if (diff > 0) { // bg digit is the first-in-time hit, therefore replace
+      if (diff > 0) {
+        // bg digit is the first-in-time hit, therefore replace and remove relations
         *this = *bgDigit;
-        // this->removeRelationsTo<TOPSimHit>();
-        // this->removeRelationsTo<MCParticle>();
+
+        // remove relations (going from back side!)
+        auto relSimHits = this->getRelationsTo<TOPSimHit>();
+        for (int i = relSimHits.size() - 1; i >= 0; --i) {
+          relSimHits.remove(i);
+        }
+        auto relRawDigits = this->getRelationsTo<TOPRawDigit>();
+        for (int i = relRawDigits.size() - 1; i >= 0; --i) {
+          relRawDigits.remove(i);
+        }
+        auto relMCParticles = this->getRelationsTo<MCParticle>();
+        for (int i = relMCParticles.size() - 1; i >= 0; --i) {
+          relMCParticles.remove(i);
+        }
       }
     }
     return DigitBase::c_DontAppend;

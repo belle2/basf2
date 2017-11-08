@@ -30,6 +30,7 @@ EKLMUnpackerModule::EKLMUnpackerModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("outputDigitsName", m_outputDigitsName,
            "Name of EKLMDigit store array", string("EKLMDigits"));
+  m_GeoDat = NULL;
 }
 
 EKLMUnpackerModule::~EKLMUnpackerModule()
@@ -40,6 +41,7 @@ void EKLMUnpackerModule::initialize()
 {
   StoreArray<EKLMDigit>eklmDigits(m_outputDigitsName);
   eklmDigits.registerInDataStore();
+  m_GeoDat = &(EKLM::GeometryData::Instance());
 }
 
 void EKLMUnpackerModule::beginRun()
@@ -53,9 +55,13 @@ void EKLMUnpackerModule::event()
    * detector buffer
    */
   const int hitLength = 2;
+  int endcap, layer, sector;
+  const int* sectorGlobal;
+  EKLMDataConcentratorLane lane;
   StoreArray<RawKLM> rawKLM;
   StoreArray<EKLMDigit> eklmDigits(m_outputDigitsName);
-
+  if (!m_ElectronicsMap.isValid())
+    B2FATAL("No EKLM electronics map.");
   B2DEBUG(1, "Unpacker has have " << rawKLM.getEntries() << " entries");
   for (int i = 0; i < rawKLM.getEntries(); i++) {
     if (rawKLM[i]->GetNumEvents() != 1) {
@@ -71,64 +77,67 @@ void EKLMUnpackerModule::event()
      */
     for (int j = 0; j < rawKLM[i]->GetNumEntries(); j++) {
       unsigned int copperId = rawKLM[i]->GetNodeID(j);
-      if (copperId < EKLM_ID || copperId > EKLM_ID + 3)
+      B2DEBUG(1, "Opening data package from the COPPER " << copperId);
+      if (copperId < EKLM_ID || copperId > EKLM_ID + 4)
         continue;
+      uint16_t copperN = copperId - EKLM_ID;
+      lane.setCopper(copperN);
       rawKLM[i]->GetBuffer(j);
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
         //addendum: There is always an additional word (count) in the end
         int numDetNwords = rawKLM[i]->GetDetectorNwords(j, finesse_num);
+        int* buf_slot    = rawKLM[i]->GetDetectorBuffer(j, finesse_num);
         int numHits = numDetNwords / hitLength;
-        int* buf_slot = rawKLM[i]->GetDetectorBuffer(j, finesse_num);
-        //either no data (finesse not connected) or with the count word
+        lane.setDataConcentrator(finesse_num);
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
           B2DEBUG(1, "word count incorrect: " << numDetNwords);
           continue;
         }
-        B2DEBUG(1, "this finesse has " << numHits << " hits");
-        if (numDetNwords > 0)
-          B2DEBUG(1, "counter is: " << (buf_slot[numDetNwords - 1] & 0xFFFF));
+        if (numDetNwords > 0) B2DEBUG(1, "Opening finesse " << finesse_num <<
+                                        " number of words is " << numDetNwords <<
+                                        ", counter is " << (buf_slot[numDetNwords - 1] & 0xFFFF));
+
+
         for (int iHit = 0; iHit < numHits; iHit++) {
-          B2DEBUG(1, "unpacking first word: " <<
-                  buf_slot[iHit * hitLength + 0] << ", second: " <<
-                  buf_slot[iHit * hitLength + 1]);
-          uint16_t bword2 = buf_slot[iHit * hitLength + 0] & 0xFFFF;
+          uint16_t bword2 =  buf_slot[iHit * hitLength + 0] & 0xFFFF;
           uint16_t bword1 = (buf_slot[iHit * hitLength + 0] >> 16) & 0xFFFF;
-          uint16_t bword4 = buf_slot[iHit * hitLength + 1] & 0xFFFF;
-          /* Unused yet? */
+          uint16_t bword4 =  buf_slot[iHit * hitLength + 1] & 0xFFFF;
           uint16_t bword3 = (buf_slot[iHit * hitLength + 1] >> 16) & 0xFFFF;
           B2DEBUG(1, "unpacking " << bword1 << ", " << bword2 << ", " <<
                   bword3 << ", " << bword4);
-          uint16_t strip = bword1 & 0x7F;
-          uint16_t plane = ((bword1 >> 7) & 1) + 1;
-          uint16_t sector = ((bword1 >> 8) & 3) + 1;
-          uint16_t layer = ((bword1 >> 10) & 0xF) + 1;
-          uint16_t endcap = ((bword1 >> 14) & 1) + 1;
-          uint16_t ctime = bword2 & 0xFFFF; //full bword
-          /* Unused yet? */
-          //uint16_t tdc = bword3 & 0x7FF;
-          uint16_t charge = bword4 & 0x7FFF;
-          B2DEBUG(1, "copper: " << copperId << " finesse: " << finesse_num);
-          EKLMDigit* eklmDigit = eklmDigits.appendNew();
-          eklmDigit->setTime(ctime);
-          eklmDigit->setEndcap(endcap);
-          eklmDigit->setLayer(layer);
-          eklmDigit->setSector(sector);
-          eklmDigit->setPlane(plane);
-          eklmDigit->setStrip(strip);
-          eklmDigit->isGood(true);
-          eklmDigit->setCharge(charge);
-          //eklmDigit->setEDep(charge);
-          B2DEBUG(1, "from digit: endcap: " << eklmDigit->getEndcap() <<
-                  " layer: " << eklmDigit->getLayer() <<
-                  " strip: " << eklmDigit->getSector() <<
-                  " plane: " << eklmDigit->getPlane() <<
-                  " strip: " << eklmDigit->getStrip() <<
-                  " charge: " << eklmDigit->getEDep() <<
-                  " time: " << eklmDigit->getTime());
+          uint16_t strip  =   bword1 & 0x7F;
+          uint16_t plane  = ((bword1 >> 7) & 1) + 1;
+          lane.setLane((bword1 >> 8) & 0x1F);
+//        uint16_t ctime  =   bword2 & 0xFFFF; //full bword      unused yet
+          uint16_t tdc    =   bword3 & 0x7FF;
+          uint16_t charge =   bword4 & 0xFFFF;  // !!! THERE IS 15 BITS NOW!!!
+          // !!! SHOULD BE 12 BITS !!!
+
+          sectorGlobal = m_ElectronicsMap->getSectorByLane(&lane);
+          if (sectorGlobal == NULL)
+            B2FATAL("Incomplete EKLM electronics map.");
+          m_GeoDat->sectorNumberToElementNumbers(*sectorGlobal,
+                                                 &endcap, &layer, &sector);
+          EKLMDigit* idigit = eklmDigits.appendNew();
+          idigit->setTime(tdc);
+          idigit->setEndcap(endcap);
+          idigit->setLayer(layer);
+          idigit->setSector(sector);
+          idigit->setPlane(plane);
+          idigit->setStrip(strip);
+          idigit->isGood(true);
+          idigit->setCharge(charge);
+          B2DEBUG(1, " Digit: endcap=" << idigit->getEndcap() <<
+                  " layer=" << idigit->getLayer() <<
+                  " strip=" << idigit->getSector() <<
+                  " plane=" << idigit->getPlane() <<
+                  " strip=" << idigit->getStrip() <<
+                  " charge=" << idigit->getEDep()  <<
+                  " time=" << idigit->getTime());
         }
       } //finesse boards
-    } //copper boards
-  }  // events... should be only 1...
+    }  //copper boards
+  }   // events... There should be only 1...
 }
 
 void EKLMUnpackerModule::endRun()

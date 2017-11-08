@@ -108,16 +108,7 @@ void RT2SPTCConverterModule::initialize()
   // register Relation to RecoTrack
   spTrackCand.registerRelationTo(recoTracks);
 
-  m_trackSel = new NoKickRTSel(m_noKickCutsFile);
-
-  if (m_noKickOutput) {
-    m_momentumTFile = new TFile("TrackSelection_NoKick.root", "RECREATE");
-    m_momSel = new TH1F("m_momSel", "m_momSel", 100, 0, 4);
-    m_momCut = new TH1F("m_momCut", "m_momCut", 100, 0, 4);
-    m_momEff = new TH1F("m_momEff", "m_momEff", 100, 0, 4);
-  }
-
-
+  m_trackSel = new NoKickRTSel(m_noKickCutsFile, m_noKickOutput);
 
 }
 
@@ -139,11 +130,9 @@ void RT2SPTCConverterModule::event()
       bool passCut = m_trackSel->trackSelector(recoTrack);
       if (!passCut) {
         m_ncut++;
-        if (m_noKickOutput) m_momCut->Fill(recoTrack.getMomentumSeed().Mag());
         continue; //exclude tracks with catastrophic multiple scattering interactions
       } else {
         m_npass++;
-        if (m_noKickOutput) m_momSel->Fill(recoTrack.getMomentumSeed().Mag());
       }
     }
     std::pair<std::vector<const SpacePoint*>, ConversionState> spacePointStatePair;
@@ -396,20 +385,9 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
 void RT2SPTCConverterModule::endRun()
 {
   B2RESULT("Number of Selected Tracks (NoKickRTSel): " << m_npass);
-  B2RESULT("Number of Cutted Tracks (NoKickRTSel): " << m_ncut);
+  B2RESULT("Number of Rejected Tracks (NoKickRTSel): " << m_ncut);
 
-  if (m_noKickOutput) {
-    m_momentumTFile->cd();
-    m_momSel->Write();
-    m_momCut->Write();
-
-    m_momEff->Add(m_momSel, 1);
-    m_momEff->Add(m_momCut, 1);
-    m_momEff->Divide(m_momSel, m_momEff, 1, 1);
-    m_momEff->Write();
-
-    delete m_momentumTFile;
-  }
+  m_trackSel->produceHistoNoKick();
 }
 
 // -------------------------------- TERMINATE --------------------------------------------------------

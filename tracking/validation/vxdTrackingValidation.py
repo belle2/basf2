@@ -38,7 +38,7 @@ class VXD(TrackingValidationRun):
     components = None
 
     #: lambda method which is used by the validation to add the vxd finder modules
-    finder_module = staticmethod(lambda path: tracking.add_vxd_track_finding(path, components=["PXD", "SVD"]))
+    finder_module = staticmethod(lambda path: tracking.add_vxd_track_finding_vxdtf2(path, components=["PXD", "SVD"]))
 
     #: fit the tracks after the track finder
     fit_tracks = True

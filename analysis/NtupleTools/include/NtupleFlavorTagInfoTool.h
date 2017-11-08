@@ -53,7 +53,7 @@ namespace Belle2 {
     /** number of tracks coming from Btag in the FlavorTagInfo object **/
     float m_goodTracksFT;
     /** categories used in the TMVA */
-    std::string m_categories[8] = {"Electron", "Muon", "KinLepton", "Kaon", "SlowPion", "FastPion", "Lambda", "MaximumP"};
+    std::string m_categories[8] = {"Electron", "Muon", "KinLepton", "Kaon", "SlowPion", "FastHadron", "Lambda", "MaximumP"};
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();

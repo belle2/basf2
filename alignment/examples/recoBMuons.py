@@ -19,7 +19,7 @@ main.add_module('Geometry')
 reco.add_reconstruction(main, pruneTracks=False)
 
 # Select single muons for aligment...
-ana.fillParticleList('mu+:bbmu', 'muid > 0.1 and useLabFrame(p) > 0.5', True, main)
+ana.fillParticleList('mu+:bbmu', 'muonID > 0.1 and useLabFrame(p) > 0.5', True, main)
 
 """
 main.add_module('MillepedeCollector', components=dbobjects, tracks=[], particles=['mu+:bbmu'], vertices=[], primaryVertices=[])

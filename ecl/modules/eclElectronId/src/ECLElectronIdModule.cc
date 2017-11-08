@@ -67,7 +67,9 @@ void ECLElectronIdModule::event()
   StoreArray<ECLPidLikelihood> eclPidLikelihoods;
 
   for (const auto& track : tracks) {
-    const TrackFitResult* fitRes = track.getTrackFitResult(Const::pion);
+    // load the pion fit hypothesis or the hypothesis which is the closest in mass to a pion
+    // the tracking will not always successfully fit with a pion hypothesis
+    const TrackFitResult* fitRes = track.getTrackFitResultWithClosestMass(Const::pion);
     if (fitRes == nullptr) continue;
     const auto relShowers = track.getRelationsTo<ECLShower>();
     if (relShowers.size() == 0) continue;

@@ -21,7 +21,7 @@ inputMdstList('default', '../1213012101.dst.root')
 
 stdPi0s('looseFit')
 
-fillParticleList('K+:all', 'Kid > 0.5 and d0 < 0.5 and abs(z0) < 1')
+fillParticleList('K+:all', 'kaonID > 0.5 and d0 < 0.5 and abs(z0) < 1')
 
 # create Ks -> pi+ pi- list from V0
 stdKshorts()
@@ -46,6 +46,7 @@ matchMCTruth('B-:dk')
 
 toolsBDk = ['EventMetaData', 'B-']
 toolsBDk += ['InvMass', '^B- -> [^D0:kspi0 -> ^K_S0:all pi0:all] ^K-:all']
+toolsBDk += ['InvMass[BeforeFit]', 'B- -> [D0:kspi0 -> K_S0:all ^pi0:all] K-:all']
 toolsBDk += ['DeltaEMbc', '^B-']
 # toolsBDk += ['CustomFloats[isSignal]', '^B-']
 # toolsBDk += ['CustomFloats[isNotContinuumEvent]', '^B-']

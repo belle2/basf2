@@ -7,11 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/modules/vxdCDCTrackMerger/VXDCDCTrackMergerModule.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
+
+#include <mdst/dataobjects/MCParticle.h>
 
 using namespace Belle2;
 

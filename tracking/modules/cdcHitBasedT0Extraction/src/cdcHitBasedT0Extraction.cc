@@ -136,7 +136,7 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
 
   // add an overall offset of 1 to not have to care about empty bins in
   // the cumulated plot
-  timingHistgram.SetBinContent(0, timingHistgram.GetBinContent(0) + 1);
+  timingHistgram.SetBinContent(1, timingHistgram.GetBinContent(1) + 1);
 
   B2INFO(
     "Filled histogram with " << timingHistgram.GetEntries() << " Entries");

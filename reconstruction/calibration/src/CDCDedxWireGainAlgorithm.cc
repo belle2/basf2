@@ -8,6 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <algorithm>
+
 #include <reconstruction/calibration/CDCDedxWireGainAlgorithm.h>
 
 using namespace Belle2;

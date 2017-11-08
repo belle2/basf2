@@ -14,10 +14,15 @@ import tracking.harvest.peelers as peelers
 
 
 class MCSideTrackingValidationModule(harvesting.HarvestingModule):
-
     """Module to collect matching information about the found particles and to generate
        validation plots and figures of merit on the performance of track finding."""
 
+    """ Expert level behavior:
+        expert_level = default_expert_level: all figures and plots from this module except tree entries
+        expert_level > default_expert_level: everything including tree entries
+        expert_level <= default_expert_level//2: only basic figures
+        default_expert_level//2 < expert_level < default_expert_level: basic figures and basic tree entries
+    """
     default_expert_level = 10
 
     def __init__(

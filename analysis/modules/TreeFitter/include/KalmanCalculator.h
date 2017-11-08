@@ -26,9 +26,6 @@ namespace TreeFitter {
     /** update statevector */
     void updateState(FitParams* fitparams);
 
-    /** update statevector */
-    void updateState(const EigenTypes::ColVector& prediction, FitParams* fitparams);
-
     /** update the statevectors covariance */
     void updateCovariance(FitParams* fitparams);
 

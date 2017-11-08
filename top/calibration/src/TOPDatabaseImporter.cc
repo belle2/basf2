@@ -191,7 +191,7 @@ namespace Belle2 {
       fileNames.push_back(fName);
     }
 
-    auto& chMapper = TOPGeometryPar::Instance()->getChannelMapper();
+    //    auto& chMapper = TOPGeometryPar::Instance()->getChannelMapper();
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
     DBImportObjPtr<TOPCalChannelT0> channelT0;
@@ -237,9 +237,9 @@ namespace Belle2 {
                   "). Skipping the entry.");
           continue;
         }
-        auto channel = chMapper.getChannel(channelID);
+        //        auto channel = chMapper.getChannel(channelID);
         double err = 0.; // No error provided yet!!
-        channelT0->setT0(slotID, channel, t0Cal, err);
+        channelT0->setT0(slotID, channelID, t0Cal, err);
         nCal[slotID - 1]++;
       }
 
@@ -253,7 +253,8 @@ namespace Belle2 {
     B2INFO("Summary: ");
     for (int iSlot = 1; iSlot < 17; iSlot++) {
       B2INFO("--> number of calibrated channels on Slot " << iSlot << " : " << nCal[iSlot - 1] << "/512");
-      B2INFO(channelT0->getT0(iSlot, 0) << " " << channelT0->getT0(iSlot, 256) << " " << channelT0->getT0(iSlot, 511));
+      B2INFO("--> Cal on ch 0, 256 and 511: " << channelT0->getT0(iSlot, 0) << " " << channelT0->getT0(iSlot,
+             256) << " " << channelT0->getT0(iSlot, 511));
       nCalTot += nCal[iSlot - 1];
     }
 

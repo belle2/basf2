@@ -31,13 +31,13 @@ bkgFiles = ""
 
 add_simulation(main, components=['MagneticField', 'SVD'], bkgfiles=bkgFiles, usePXDDataReduction=False)
 
-add_svd_reconstruction(main, isROIsimulation=False, useNN=False, useCoG=False)
+add_svd_reconstruction(main, isROIsimulation=False, useNN=False, useCoG=True)
 
-add_tracking_reconstruction(main, components=["SVD"], use_vxdtf2=True, mcTrackFinding=False, additionalTrackFitHypotheses=[211])
+add_tracking_reconstruction(main, components=["SVD"], use_vxdtf2=True, mcTrackFinding=True, additionalTrackFitHypotheses=[211])
 
 
 svdperf = register_module('SVDPerformance')
-svdperf.param('outputFileName', "SVDPerformance_Y4S_phase_noBKG_VXDTF2.root")
+svdperf.param('outputFileName', "SVDPerformance_Y4S_noBKG_CoG_MCTF.root")
 main.add_module(svdperf)
 
 

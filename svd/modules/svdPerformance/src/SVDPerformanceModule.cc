@@ -265,18 +265,21 @@ void SVDPerformanceModule::event()
 
   BOOST_FOREACH(Track & track, Tracks) {
 
-    const TrackFitResult* tfr = track.getTrackFitResult(Const::pion);
+    const TrackFitResult* tfr = NULL;
     if (m_is2017TBanalysis)
       tfr = track.getTrackFitResult(Const::electron);
-    m_Pvalue->Fill(tfr->getPValue());
-    m_mom->Fill(tfr->getMomentum().Mag());
-    m_nSVDhits->Fill((tfr->getHitPatternVXD()).getNSVDHits());
+    else
+      tfr = track.getTrackFitResult(Const::pion);
+    if (tfr) {
+      m_Pvalue->Fill(tfr->getPValue());
+      m_mom->Fill(tfr->getMomentum().Mag());
+      m_nSVDhits->Fill((tfr->getHitPatternVXD()).getNSVDHits());
 
-    if (m_is2017TBanalysis) {
-      if ((tfr->getPValue() < 0.001) || (tfr->getMomentum().Mag() < 1))
-        continue;
+      if (m_is2017TBanalysis) {
+        if ((tfr->getPValue() < 0.001) || (tfr->getMomentum().Mag() < 1))
+          continue;
+      }
     }
-
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);
     RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(theRC[0]);
 

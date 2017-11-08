@@ -32,17 +32,27 @@
 
 using namespace std;
 
+namespace {
+
+  Belle2::TrackFitResult const* getTrackFitResultFromParticle(Belle2::Particle const* particle)
+  {
+    const Belle2::Track* track = particle->getTrack();
+    if (!track) {
+      return nullptr;
+    }
+
+    const Belle2::TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(abs(
+                                               particle->getPDGCode())));
+    return trackFit;
+  }
+}
+
 namespace Belle2 {
   namespace Variable {
 
     double trackNHits(const Particle* part, const Const::EDetector& det)
     {
-      const Track* track = part->getTrack();
-      if (!track) {
-        return 0.0;
-      }
-
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
+      auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
         return 0.0;
       }
@@ -80,11 +90,7 @@ namespace Belle2 {
 
     double trackFirstSVDLayer(const Particle* part)
     {
-      const Track* track = part->getTrack();
-      if (!track) {
-        return 0.0;
-      }
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
+      auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
         return 0.0;
       }
@@ -93,11 +99,7 @@ namespace Belle2 {
 
     double trackFirstPXDLayer(const Particle* part)
     {
-      const Track* track = part->getTrack();
-      if (!track) {
-        return 0.0;
-      }
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
+      auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
         return 0.0;
       }
@@ -106,66 +108,55 @@ namespace Belle2 {
 
     double trackD0(const Particle* part)
     {
-      const Track* track = part->getTrack();
-      if (!track) return 0.0;
-
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
-      if (!trackFit) return 0.0;
-
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return 0.0;
+      }
       return trackFit->getD0();
     }
 
     double trackPhi0(const Particle* part)
     {
-      const Track* track = part->getTrack();
-      if (!track) return 0.0;
-
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
-      if (!trackFit) return 0.0;
-
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return 0.0;
+      }
       return trackFit->getPhi0();
     }
 
     double trackOmega(const Particle* part)
     {
-      const Track* track = part->getTrack();
-      if (!track) return 0.0;
-
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
-      if (!trackFit) return 0.0;
-
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return 0.0;
+      }
       return trackFit->getOmega();
     }
 
     double trackZ0(const Particle* part)
     {
-      const Track* track = part->getTrack();
-      if (!track) return 0.0;
-
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
-      if (!trackFit) return 0.0;
-
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return 0.0;
+      }
       return trackFit->getZ0();
     }
 
     double trackTanLambda(const Particle* part)
     {
-      const Track* track = part->getTrack();
-      if (!track) return 0.0;
-
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
-      if (!trackFit) return 0.0;
-
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return 0.0;
+      }
       return trackFit->getTanLambda();
     }
 
     double trackD0Error(const Particle* part)
     {
-      const Track* track = part->getTrack();
-      if (!track) return 0.0;
-
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
-      if (!trackFit) return 0.0;
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return 0.0;
+      }
 
       double errorSquared = trackFit->getCovariance5()[0][0];
       if (errorSquared > 0.0)
@@ -176,11 +167,10 @@ namespace Belle2 {
 
     double trackPhi0Error(const Particle* part)
     {
-      const Track* track = part->getTrack();
-      if (!track) return 0.0;
-
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
-      if (!trackFit) return 0.0;
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return 0.0;
+      }
 
       double errorSquared = trackFit->getCovariance5()[1][1];
       if (errorSquared > 0.0)
@@ -191,11 +181,10 @@ namespace Belle2 {
 
     double trackOmegaError(const Particle* part)
     {
-      const Track* track = part->getTrack();
-      if (!track) return 0.0;
-
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
-      if (!trackFit) return 0.0;
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return 0.0;
+      }
 
       double errorSquared = trackFit->getCovariance5()[2][2];
       if (errorSquared > 0.0)
@@ -206,11 +195,10 @@ namespace Belle2 {
 
     double trackZ0Error(const Particle* part)
     {
-      const Track* track = part->getTrack();
-      if (!track) return 0.0;
-
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
-      if (!trackFit) return 0.0;
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return 0.0;
+      }
 
       double errorSquared = trackFit->getCovariance5()[3][3];
       if (errorSquared > 0.0)
@@ -221,11 +209,10 @@ namespace Belle2 {
 
     double trackTanLambdaError(const Particle* part)
     {
-      const Track* track = part->getTrack();
-      if (!track) return 0.0;
-
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
-      if (!trackFit) return 0.0;
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return 0.0;
+      }
 
       double errorSquared = trackFit->getCovariance5()[4][4];
       if (errorSquared > 0.0)
@@ -236,17 +223,16 @@ namespace Belle2 {
 
     double trackPValue(const Particle* part)
     {
-      const Track* track = part->getTrack();
-      if (!track) return 0.0;
-
-      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
-      if (!trackFit) return 0.0;
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return 0.0;
+      }
 
       return trackFit->getPValue();
     }
 
 
-    VARIABLE_GROUP("PID");
+    VARIABLE_GROUP("Tracking");
     REGISTER_VARIABLE("nCDCHits", trackNCDCHits,     "Number of CDC hits associated to the track");
     REGISTER_VARIABLE("nSVDHits", trackNSVDHits,     "Number of SVD hits associated to the track");
     REGISTER_VARIABLE("nPXDHits", trackNPXDHits,     "Number of PXD hits associated to the track");

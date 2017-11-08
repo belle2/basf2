@@ -293,34 +293,24 @@ namespace Belle2 {
       return addHit(eklmHit, foundByTrackFinder, sortingParameter);
     }
 
-    /// Return the reco hit information for a given cdc hit or nullptr if there is none.
-    RecoHitInformation* getRecoHitInformation(const UsedCDCHit* cdcHit) const
+    /**
+     * Return the reco hit information for a generic hit from the storeArray.
+     * @param hit the hit to look for.
+     * @return The connected RecoHitInformation or a nullptr when the hit is not connected to the track.
+     */
+    template<class HitType>
+    RecoHitInformation* getRecoHitInformation(HitType* hit) const
     {
-      return getRecoHitInformation(cdcHit, m_storeArrayNameOfCDCHits);
-    }
+      RelationVector<RecoHitInformation> relatedHitInformationToHit = hit->template getRelationsFrom<RecoHitInformation>
+      (m_storeArrayNameOfRecoHitInformation);
 
-    /// Return the reco hit information for a given svd hit or nullptr if there is none.
-    RecoHitInformation* getRecoHitInformation(const UsedSVDHit* svdHit) const
-    {
-      return getRecoHitInformation(svdHit, m_storeArrayNameOfSVDHits);
-    }
+      for (RecoHitInformation& recoHitInformation : relatedHitInformationToHit) {
+        if (recoHitInformation.getRelatedFrom<RecoTrack>(this->getArrayName()) == this) {
+          return &recoHitInformation;
+        }
+      }
 
-    /// Return the reco hit information for a given pxd hit or nullptr if there is none.
-    RecoHitInformation* getRecoHitInformation(const UsedPXDHit* pxdHit) const
-    {
-      return getRecoHitInformation(pxdHit, m_storeArrayNameOfPXDHits);
-    }
-
-    /// Return the reco hit information for a given bklm hit or nullptr if there is none.
-    RecoHitInformation* getRecoHitInformation(const UsedBKLMHit* bklmHit) const
-    {
-      return getRecoHitInformation(bklmHit, m_storeArrayNameOfBKLMHits);
-    }
-
-    /// Return the reco hit information for a given eklm hit or nullptr if there is none.
-    RecoHitInformation* getRecoHitInformation(const UsedEKLMHit* eklmHit) const
-    {
-      return getRecoHitInformation(eklmHit, m_storeArrayNameOfEKLMHits);
+      return nullptr;
     }
 
     // Hits Information Questioning
@@ -560,37 +550,15 @@ namespace Belle2 {
 
     /** Return genfit's MeasuredStateOnPlane for the first hit in a fit
     * useful for extrapolation of measurements to other locations
-    */
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation = nullptr)
-    {
-      return getMeasuredStateOnPlaneFromHit(0, representation);
-    }
-
-    /** Return genfit's MeasuredStateOnPlane for the first hit in a fit
-    * useful for extrapolation of measurements to other locations
     * Const version.
     */
-    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation = nullptr) const
-    {
-      return getMeasuredStateOnPlaneFromHit(0, representation);
-    }
-
-    /** Return genfit's MeasuredStateOnPlane for the last hit in a fit
-    * useful for extrapolation of measurements to other locations
-    */
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation = nullptr)
-    {
-      return getMeasuredStateOnPlaneFromHit(-1, representation);
-    }
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation = nullptr) const;
 
     /** Return genfit's MeasuredStateOnPlane for the last hit in a fit
     * useful for extrapolation of measurements to other locations
     * Const version.
     */
-    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation = nullptr) const
-    {
-      return getMeasuredStateOnPlaneFromHit(-1, representation);
-    }
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation = nullptr) const;
 
     /**
      * Return genfit's MeasuredStateOnPlane on plane for associated with one RecoHitInformation. The caller needs to ensure that
@@ -750,6 +718,7 @@ namespace Belle2 {
      */
     void deleteFittedInformation();
 
+    virtual std::string getInfoHTML() const;
 
   private:
     /// Internal storage for the genfit track.
@@ -807,27 +776,6 @@ namespace Belle2 {
       addRelationTo(recoHitInformation);
 
       setDirtyFlag();
-    }
-
-    /**
-     * Return the reco hit information for a generic hit from the storeArray.
-     * @param hit the hit to look for.
-     * @param storeArrayNameOfHits The name of the StoreArray the hit belongs to.
-     * @return The connected RecoHitInformation or a nullptr when the hit is not connected to the track.
-     */
-    template<class HitType>
-    RecoHitInformation* getRecoHitInformation(HitType* hit, const std::string& storeArrayNameOfHits) const
-    {
-      RelationVector<RecoHitInformation> relatedHitInformationToRecoTrack = getRelationsTo<RecoHitInformation>
-          (m_storeArrayNameOfRecoHitInformation);
-
-      for (RecoHitInformation& recoHitInformation : relatedHitInformationToRecoTrack) {
-        if (recoHitInformation.getRelatedTo<HitType>(storeArrayNameOfHits) == hit) {
-          return &recoHitInformation;
-        }
-      }
-
-      return nullptr;
     }
 
     /// Returns the reco hit information for a given hit or throws an exception if the hit is not related to the track.
@@ -899,25 +847,6 @@ namespace Belle2 {
       }
 
       return hitList;
-    }
-
-    /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
-    * useful for extrapolation of measurements to other locations
-    */
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr)
-    {
-      checkDirtyFlag();
-      return m_genfitTrack.getFittedState(id, representation);
-    }
-
-    /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
-    * useful for extrapolation of measurements other locations
-    * Const version.
-    */
-    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr) const
-    {
-      checkDirtyFlag();
-      return m_genfitTrack.getFittedState(id, representation);
     }
 
     /// Helper: Check the dirty flag and produce a warning, whenever a fit result is accessed.

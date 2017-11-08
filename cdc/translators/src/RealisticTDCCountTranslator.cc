@@ -9,6 +9,9 @@
  **************************************************************************/
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <framework/dataobjects/FileMetaData.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <TVector3.h>
 
 using namespace std;
@@ -19,8 +22,16 @@ RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagati
   m_useInWirePropagationDelay(useInWirePropagationDelay), m_gcp(CDCGeoControlPar::getInstance()), m_cdcp(CDCGeometryPar::Instance()),
   m_tdcBinWidth(m_cdcp.getTdcBinWidth())
 {
-  //  m_tdcOffset   = m_cdcp.getTdcOffset();
-  //  m_tdcBinWidth = m_cdcp.getTdcBinWidth();
+  StoreObjPtr<FileMetaData> filPtr("", DataStore::c_Persistent);
+  if (filPtr) {
+    if (filPtr->getMcEvents() == 0) m_realData = true;
+    //    B2INFO("RealisticTDCCountTranslator:: judge from FileMetaData.");
+  } else { //judge from MCParticle
+    StoreArray<MCParticle> mcp;
+    if (!mcp) m_realData = true;
+    //    B2INFO("RealisticTDCCountTranslator:: judge from MCParticle.");
+  }
+  //  B2INFO("RealisticTDCCountTranslator:: m_realData= " << m_realData);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;
@@ -74,7 +85,13 @@ double RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
   driftTime -= timeOfFlightEstimator;
 
   //Forth: Time-walk correction
-  driftTime -= m_cdcp.getTimeWalk(wireID, adcCount);
+  //Correct for data only now. Eventually correct also for MC (don't forget to switch on this effect in digitizer in that case).
+  if (m_realData) {
+    driftTime -= m_cdcp.getTimeWalk(wireID, adcCount);
+    //    B2INFO("RealisticTDCCountTranslator:: time-walk corr. done.");
+    //  } else {
+    //    B2INFO("RealisticTDCCountTranslator:: no time-walk corr. for MC now.");
+  }
 
   //Now we have an estimate for the time it took from the ionisation to the hitting of the wire.
   //Need to reverse calculate the relation between drift lenght and drift time.

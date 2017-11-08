@@ -32,7 +32,7 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <fstream>
+//#include <fstream>
 
 #include "TVector3.h"
 
@@ -104,12 +104,12 @@ namespace Belle2 {
       //       */
       //      void readDeltaz(const CDCGeometry&);
 
-      /**
-       * Open a file
-       * @param[in] ifs input file-stream
-       * @param[in] fileName0 file-name on cdc/data directory
-       */
-      void openFile(std::ifstream& ifs, const std::string& fileName0) const;
+      //      /**
+      //       * Open a file
+      //       * @param[in] ifs input file-stream
+      //       * @param[in] fileName0 file-name on cdc/data directory
+      //       */
+      //      void openFile(std::ifstream& ifs, const std::string& fileName0) const;
 
       /**
        * Read displacement or (mis)alignment params from text file.
@@ -800,6 +800,16 @@ namespace Belle2 {
 
       double getDriftLength(double dt, unsigned short layer, unsigned short lr, double alpha = 0., double theta = 0.5 * M_PI,
                             bool calculateMinTime = true, double minTime = 0.) const;
+
+      /**
+       * Return the drift dength to the sense wire; tentative ver.
+       * @param[in] dt Drift time (ns).
+       * @param[in] layer Layer ID.
+       * @param[in] lr Left/Right
+       * @param[in] alpha incident angle (in rphi plane) w.r.t. the cell (rad).
+       * @param[in] theta incident angle (polar angle) (rad).
+       */
+      double getDriftLength0(double dt, unsigned short layer, unsigned short lr, double alpha = 0., double theta = 0.5 * M_PI) const;
 
       /**
        * Return the min. drift time (ns).

@@ -11,6 +11,29 @@ Tools to help with debugging and checking code quality
     :nodefault:
     :nogroupsections:
 
+``b2code-findsymbol``: Look for a given C++ symbol
+--------------------------------------------------
+
+This script will try to find all libraries which contain a given C++ symbol.
+The intended use is to find out which library to add to the ``SConscript`` file
+as a dependency in case of an unresolved symbol error. Just run it with the
+symbol name as an argument::
+
+    b2code-findsymbol <symbolname>
+
+The symbol name can be any valid grep pattern. It is advisable to quote the
+symbol name in single quotes to prevent the shell to interpret special
+characters. For example to look for ``Belle2::MCParticle::Class()`` one would
+use::
+
+    b2code-findsymbold 'Belle2::MCParticle::Class()'
+
+It will print all the symbols found prefixed with the library name and a
+condensed list of all libraries containing the match at the end. When adding
+libraries to a ``SConscript`` please remove the ``lib`` prefix and ``.so``
+extension.
+
+
 ``b2code-doxygen-warnings``: Show warnings when running doxygen
 ---------------------------------------------------------------
 

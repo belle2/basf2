@@ -125,8 +125,8 @@ variables.addAlias('d1_mcPDG', 'daughter(1,mcPDG)')
 variables.addAlias('d1_d0_mcPDG', 'daughter(1,daughter(0,mcPDG))')
 variables.addAlias('d1_d0_d0_mcPDG', 'daughter(1,daughter(0,daughter(0,mcPDG)))')
 variables.addAlias('d1_d0_d1_mcPDG', 'daughter(1,daughter(0,daughter(1,mcPDG)))')
-variables.addAlias('d1_eid', 'daughter(1,eid)')
-variables.addAlias('d1_muid', 'daughter(1,muid)')
+variables.addAlias('d1_eid', 'daughter(1,electronID)')
+variables.addAlias('d1_muid', 'daughter(1,muonID)')
 
 outputRootFile = 'dstarlnuOutput.root'
 

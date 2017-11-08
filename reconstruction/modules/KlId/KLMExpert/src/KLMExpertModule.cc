@@ -27,9 +27,9 @@
 #include <mva/interface/Interface.h>
 
 // here's where the functions are hidden
-#include "reconstruction/modules/KlId/KLMExpert/helperFunctions.h"
+#include "reconstruction/modules/KlId/KLMExpert/KlId.h"
 
-using namespace KlIdHelpers;
+using namespace KlId;
 using namespace Belle2;
 using namespace std;
 
@@ -134,7 +134,7 @@ void KLMExpertModule::event()
     m_KLMnInnermostLayer = cluster.getInnermostLayer();
     m_KLMtime            = cluster.getTime();
     m_KLMenergy          = cluster.getEnergy();
-    m_KLMhitDepth        = cluster.getClusterPosition().Mag2();
+    m_KLMhitDepth        = cluster.getClusterPosition().Mag();
 
     // find nearest ecl cluster and calculate distance
     pair<ECLCluster*, double> closestECLAndDist = findClosestECLCluster(clusterPos);
@@ -150,12 +150,9 @@ void KLMExpertModule::event()
       m_KLMECLEerror           = closestECLCluster -> getUncertaintyEnergy();
       m_KLMECLdeltaL           = closestECLCluster -> getDeltaL();
       m_KLMECLminTrackDist     = closestECLCluster -> getMinTrkDistance();
-      //m_KLMECLHypo             = closestECLCluster -> getHypothesisId();
       m_KLMECLZMVA             = closestECLCluster -> getZernikeMVA();
       m_KLMECLZ40              = closestECLCluster -> getAbsZernike40();
       m_KLMECLZ51              = closestECLCluster -> getAbsZernike51();
-      //m_KLMECLUncertaintyPhi   = closestECLCluster -> getUncertaintyPhi();
-      //m_KLMECLUncertaintyTheta = closestECLCluster -> getUncertaintyTheta();
     } else {
       m_KLMECLdeltaL           = -999;
       m_KLMECLminTrackDist     = -999;
@@ -164,12 +161,9 @@ void KLMExpertModule::event()
       m_KLMECLTiming           = -999;
       m_KLMECLTerror           = -999;
       m_KLMECLEerror           = -999;
-      //m_KLMECLHypo             = -999;
       m_KLMECLZMVA             = -999;
       m_KLMECLZ40              = -999;
       m_KLMECLZ51              = -999;
-      //m_KLMECLUncertaintyPhi   = -999;
-      //m_KLMECLUncertaintyTheta = -999;
     }
 
     // calculate distance to next cluster

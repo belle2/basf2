@@ -108,10 +108,10 @@ ParticleGunModule::ParticleGunModule() : Module()
            "Parameters for the momentum generation. Meaning of the parameters "
            "depends on the chosen distribution", m_parameters.momentumParams);
   addParam("phiParams", m_parameters.phiParams,
-           "Parameters for the phi generation. Meaning of the parameters "
+           "Parameters for the phi generation in degrees. Meaning of the parameters "
            "depends on the chosen distribution", m_parameters.phiParams);
   addParam("thetaParams", m_parameters.thetaParams,
-           "Parameters for the theta generation. Meaning of the parameters "
+           "Parameters for the theta generation in degrees. Meaning of the parameters "
            "depends on the chosen distribution", m_parameters.thetaParams);
   addParam("xVertexParams", m_parameters.xVertexParams,
            "Parameters for the x vertex generation. Meaning of the parameters "

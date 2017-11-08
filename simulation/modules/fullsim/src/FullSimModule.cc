@@ -184,7 +184,7 @@ void FullSimModule::initialize()
 
   //Create the magnetic field for the Geant4 simulation
   if (m_magneticFieldName != "none") {
-    m_magneticField = new MagneticField();
+    m_magneticField = new Belle2::Simulation::MagneticField();
     if (m_magneticCacheDistance > 0) {
       m_uncachedField = m_magneticField;
       m_magneticField = new G4CachedMagneticField(m_uncachedField, m_magneticCacheDistance);

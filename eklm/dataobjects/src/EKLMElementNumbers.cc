@@ -42,7 +42,7 @@ void EKLMElementNumbers::checkDetectorLayer(int endcap, int layer) const
 {
   const char* endcapName[2] = {"backward", "forward"};
   if (layer < 0 || layer > m_MaximalDetectorLayerNumber[endcap - 1])
-    B2FATAL("Number of layer must be less from 1 to the maximal number of "
+    B2FATAL("Number of layer must be from 1 to the maximal number of "
             "detector layers in the " << endcapName[endcap - 1] << " endcap ("
             << m_MaximalDetectorLayerNumber[endcap - 1] << ").");
 }
@@ -165,6 +165,19 @@ int EKLMElementNumbers::stripNumber(int endcap, int layer, int sector,
   checkStrip(strip);
   return m_MaximalStripNumber * (planeNumber(endcap, layer, sector, plane) - 1)
          + strip;
+}
+
+void EKLMElementNumbers::stripNumberToElementNumbers(
+  int stripGlobal, int* endcap, int* layer, int* sector, int* plane,
+  int* strip) const
+{
+  static int maxStrip = getMaximalStripGlobalNumber();
+  int planeGlobal;
+  if (stripGlobal <= 0 || stripGlobal > maxStrip)
+    B2FATAL("Number of strip must be from 1 to " << maxStrip << ".");
+  *strip = (stripGlobal - 1) % m_MaximalStripNumber + 1;
+  planeGlobal = (stripGlobal - 1) / m_MaximalStripNumber + 1;
+  planeNumberToElementNumbers(planeGlobal, endcap, layer, sector, plane);
 }
 
 int EKLMElementNumbers::stripLocalNumber(int strip) const

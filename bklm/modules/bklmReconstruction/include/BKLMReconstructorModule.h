@@ -54,6 +54,9 @@ namespace Belle2 {
     //! half-width window (ns) of 2D hit relative to mean prompt time
     double m_PromptWindow;
 
+    //! flag for alignment correction, do the correction (true) or not (false)
+    bool m_ifAlign;
+
   };
 } // end namespace Belle2
 #endif

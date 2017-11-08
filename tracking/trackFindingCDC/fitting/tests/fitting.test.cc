@@ -11,15 +11,25 @@
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
-#include <tracking/trackFindingCDC/fitting/CDCFitter2D.h>
+#include <tracking/trackFindingCDC/fitting/CDCFitter2D.icc.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZObservations.h>
 
+#include <tracking/trackFindingCDC/fitting/ExtendedRiemannsMethod.h>
 #include <tracking/trackFindingCDC/fitting/RiemannsMethod.h>
 
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/geometry/UncertainSZLine.h>
+#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
+#include <tracking/trackFindingCDC/geometry/Circle2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 #include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
+
+#include <framework/logging/Logger.h>
 
 #include <gtest/gtest.h>
 

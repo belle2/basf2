@@ -118,6 +118,7 @@ class TestModule(basf2.Module):
         else:
             basf2.B2WARNING("old T0 %d, new T0 %d" % (oldT0, newT0))
 
+
 main.add_module(TestModule(), logLevel=basf2.LogLevel.INFO)
 
 # Process events

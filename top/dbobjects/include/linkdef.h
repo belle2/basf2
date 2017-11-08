@@ -36,6 +36,12 @@
 #pragma link C++ class Belle2::TOPNominalTDC+;
 #pragma link C++ class Belle2::TOPGeometry+;
 #pragma link C++ class Belle2::TOPPmtGainPar+;
+#pragma link C++ class Belle2::TOPPmtInstallation+;
+#pragma link C++ class Belle2::TOPPmtObsoleteData+;
+//#pragma link C++ class Belle2::TOPPmtQETest+;
+#pragma link C++ class Belle2::TOPPmtQE+;
+#pragma link C++ class Belle2::TOPPmtTTSHisto+;
+#pragma link C++ class Belle2::TOPPmtTTSPar+;
 #pragma link C++ class Belle2::TOPCalChannelMask+;
 #pragma link C++ class Belle2::TOPCalModuleAlignment+;
 #pragma link C++ class Belle2::TOPCalChannelThreshold+;

@@ -11,6 +11,12 @@
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
+#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
+
+#include <cmath>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 

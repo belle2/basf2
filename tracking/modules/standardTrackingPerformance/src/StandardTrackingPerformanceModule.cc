@@ -134,7 +134,7 @@ void StandardTrackingPerformanceModule::event()
       if (recoTrack) {
         const Track* b2Track = recoTrack->getRelated<Track>();
         const TrackFitResult* fitResult = b2Track->getTrackFitResult(Const::pion);
-        B2ASSERT("Related Belle2 Track has no related track fit result!", fitResult);
+        B2ASSERT("Related Belle2 Track has no related track fit result for pion!", fitResult);
 
         m_nFittedChargedStabletracks++;
         // write some data to the root tree
@@ -291,8 +291,8 @@ bool StandardTrackingPerformanceModule::isSignalDecay(const MCParticle& mcPartic
   // remove photons from list
   daughterMcParticles = removeFinalStateRadiation(daughterMcParticles);
 
-  for (auto mcParticle : daughterMcParticles) {
-    daughterPDGs.push_back(mcParticle->getPDG());
+  for (auto daughterMCParticle : daughterMcParticles) {
+    daughterPDGs.push_back(daughterMCParticle->getPDG());
   }
 
   std::sort(daughterPDGs.begin(), daughterPDGs.end());

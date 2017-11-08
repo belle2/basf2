@@ -12,6 +12,7 @@
 #include <map>
 #include <array>
 #include <iostream>
+#include <algorithm>
 #include <TObject.h>
 
 namespace Belle2 {

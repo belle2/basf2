@@ -11,8 +11,6 @@
 
 #include <tracking/trackFindingCDC/fitting/EFitVariance.h>
 
-#include <Eigen/Dense>
-
 #include <vector>
 
 namespace Belle2 {
@@ -41,16 +39,16 @@ namespace Belle2 {
       }
 
     public:
-      /**
-       *  Matrix type used to wrap the raw memory chunk of values
-       *  generated from the various hit types for structured vectorized access.
-       */
-      using EigenObservationMatrix = Eigen::Map< Eigen::Matrix< double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor > >;
-
       /// Returns the number of observations stored
       std::size_t size() const
       {
         return m_szObservations.size() / 3;
+      }
+
+      /// Return the pointer to the number buffer
+      double* data()
+      {
+        return m_szObservations.data();
       }
 
       /// Returns true if there are no observations stored.
@@ -131,31 +129,6 @@ namespace Belle2 {
 
       /// Picks one observation as a reference point and transform all observations to that new origin
       Vector2D centralize();
-
-      /**
-       *  Returns the observations structured as an Eigen matrix
-       *  This returns a reference to the stored observations.
-       *  @note      Operations may alter the content of the underlying memory and
-       *             render it useless for subceeding calculations.
-       */
-      EigenObservationMatrix getObservationMatrix();
-
-      /**
-       *  Constructs a symmetric matrix of weighted sums of s, z as relevant for line fits.
-       *
-       *  Cumulates weights, s positions, z positions and products thereof
-       *  @returns symmetric matrix s with the following:
-       *  * \f$ s_{00} = \sum w \f$
-       *  * \f$ s_{01} = \sum s * w \f$
-       *  * \f$ s_{02} = \sum z * w \f$
-       *
-       *  * \f$ s_{11} = \sum s * s * w \f$
-       *  * \f$ s_{12} = \sum s * z * w \f$
-       *
-       *  * \f$ s_{22} = \sum z * z * w \f$
-       *  * + symmetric.
-       */
-      Eigen::Matrix<double, 3, 3> getWSZSumMatrix();
 
     public:
       /// Setter for the indicator that the drift variance should be used.

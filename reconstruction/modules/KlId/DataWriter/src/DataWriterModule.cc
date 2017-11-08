@@ -30,11 +30,11 @@
 #include <cstring>
 #include <utility>
 
-#include "reconstruction/modules/KlId/KLMExpert/helperFunctions.h"
+#include "reconstruction/modules/KlId/KLMExpert/KlId.h"
 
 using namespace Belle2;
 using namespace std;
-using namespace KlIdHelpers;
+using namespace KlId;
 
 
 // --------------------------------------Module----------------------------------------------
@@ -242,7 +242,7 @@ void DataWriterModule::event()
     m_KLMtime                        = cluster.getTime();
     m_KLMinvM                        = cluster.getMomentum().M2();
     m_KLMenergy                      = cluster.getEnergy();
-    m_KLMhitDepth                    = cluster.getClusterPosition().Mag2();
+    m_KLMhitDepth                    = cluster.getClusterPosition().Mag();
     m_KLMtrackFlag                   = cluster.getAssociatedTrackFlag();
     m_KLMeclFlag                     = cluster.getAssociatedEclClusterFlag();
 
@@ -253,7 +253,7 @@ void DataWriterModule::event()
     m_KLMTrackClusterSepAngle = -999;
     auto trackSeperations = cluster.getRelationsTo<TrackClusterSeparation>();
     TrackClusterSeparation* trackSep;
-    float best_dist = 10000000000000;
+    float best_dist = 100000000;
     float dist;
     for (auto trackSeperation :  trackSeperations) {
       dist = trackSeperation.getDistance();
@@ -339,7 +339,7 @@ void DataWriterModule::event()
       m_KLMMCLifetime   = part->getLifetime();
       m_KLMMCPDG        = std::abs(part->getPDG());
       m_KLMMCPrimaryPDG = getPrimaryPDG(part);
-      m_KLMMCMom        = part->getMomentum().Mag2();
+      m_KLMMCMom        = part->getMomentum().Mag();
       m_KLMMCPhi        = part->getMomentum().Phi();
       m_KLMMCTheta      = part->getMomentum().Theta();
     } else {

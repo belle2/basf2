@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guglielmo De Nardo                                             *
+ * Contributors: Guglielmo De Nardo, Benjamin Oberhof                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -35,7 +35,6 @@ namespace Belle2 {
     /** Initializes the module. */
     virtual void initialize();
 
-    /** Terminates the module. */
     virtual void terminate();
 
     /** Method is called for each event. */
@@ -43,69 +42,40 @@ namespace Belle2 {
 
   protected:
     /** output root file name (given as Module parameter) */
-    std::string m_dataOutFileName,
-        /**name of input ECLDsp Array*/
-        m_dspArrayName1,
-        /**name of input Pure ECLDigit Array*/
-        m_digiArrayName1,
-        /**name of input Pure CsI ECLDsp Array*/
-        m_dspArrayName2,
-        /**name of input Pure CsI ECLDigit Array*/
-        m_digiArrayName2;
+    std::string m_dataOutFileName,  /**< Root file name for saving the output */
+        m_dspArrayName1, /**< Name of first DSP array */
+        m_digiArrayName1,  /**< Name of first digit array */
+        m_dspArrayName2,  /**< Name of second DSP array */
+        m_digiArrayName2;  /**< Name of second digit array */
 
-    /** Root tree name */
-    TTree* m_tree;
-    /** Root file name for saving the output */
-    TFile* m_rootFile;
+    TTree* m_tree;  /**< Root tree for saving the output */
+    TFile* m_rootFile;  /**< Root file for saving the output */
 
-    int m_nhits = 8736;
-    /** Number of eclHits */
-    int m_neclhits;
-    /** eclHit Crystal ID */
-    int m_cellId[8736];
-    /** eclHit Non-bkg energy deposition */
-    double m_energy[8736];
-    /** eclHit Energy deposition */
-    double m_allenergy[8736];
-    /** eclHit Time average */
-    double m_time[8736];
-    /** eclThetaID*/
-    int m_theta[8736];
-    /** eclPhiID*/
-    int m_phi[8736];
+    int m_nhits = 8736; /**< Maximum number of hits */
+    int m_neclhits; /**< Actual number of hits */
+    int m_cellId[8736]; /**< Array of cellIDs */
+    double m_energy[8736], /**< Array of deposited MC energy */
+           m_allenergy[8736]; /**< Array of deposited energy */
+    double m_time[8736]; /**< Array of digit time */
+    int m_theta[8736]; /**< Array oh ThetaID */
+    int m_phi[8736]; /**< Array of PhiID */
 
-    /** Waveform sample */
-    int m_DspHit1[8736][31];
-    /** PureCsI Waveform sample */
-    int m_DspHit2[8736][31];
-    /** Baseline sample */
-    int m_baseline1[8736][16];
-    /** PureCsI baseline sample */
-    int  m_baseline2[8736][16];
-    /** Baseline average */
-    double m_baselineAvg1[8736];
-    /** PureCsI baseline average */
-    double m_baselineAvg2[8736];
-    /** eclDigit Fit Max */
-    int m_maxVal1[8736];
-    /** PureCsI eclDigit Fit Max */
-    int m_maxVal2[8736];
-    /** eclDigit Fit Quality */
-    int m_digiQual1[8736];
-    /** PureCsI eclDigit Fit Quality */
-    int m_digiQual2[8736];
-    /** eclDigit Time */
-    double m_digiTime1[8736];
-    /** PureCsI eclDigit Time */
-    double m_digiTime2[8736];
-    /** eclDigit Energy */
-    double m_digiE1[8736];
-    /** PureCsI eclDigit Energy */
-    double  m_digiE2[8736];
-    /** eclTrigTime */
-    double m_trig1;
-    /** PureCsI eclTrigTime */
-    double m_trig2;
+    int m_DspHit1[8736][31], /**< WF sampling points for first digit array */
+        m_DspHit2[8736][31];  /**< WF sampling points for second digit array */
+    int m_baseline1[8736][16],  /**< Baseline sampling points for first digit array */
+        m_baseline2[8736][16];  /**< Baseline sampling points for second digit array */
+    double m_baselineAvg1[8736], /**< Baseline energy for first digit array */
+           m_baselineAvg2[8736]; /**< Baseline energy for second digit array */
+    int m_maxVal1[8736], /**< WF maximum for first digit array */
+        m_maxVal2[8736]; /**< WF maximum for second digit array */
+    int m_digiQual1[8736], /**< Digit quality for first digit array */
+        m_digiQual2[8736]; /**< Digit quality for second digit array */
+    double m_digiTime1[8736], /**< Digit time for first digit array */
+           m_digiTime2[8736] /**< Digit time for second digit array */;
+    double m_digiE1[8736], /**< Deposited energy for first digit array */
+           m_digiE2[8736]; /**< Deposited energy for second digit array */
+    double m_trig1, /**< Trigger time for array 1 */
+           m_trig2; /**< Trigger time for array 2 */
 
   };
 

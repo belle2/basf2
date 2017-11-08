@@ -37,7 +37,7 @@ namespace Belle2 {
      * @param arrayNumber number of PMT array
      * @param position position of PMT within array (module)
      */
-    TOPPmtInstallation(const std::string& serialNumber, float lambdaFirst, float lambdaStep, float CE):
+    TOPPmtInstallation(const std::string& serialNumber, int moduleCNumber, int arrayNumber, int position):
       m_serialNumber(serialNumber), m_moduleCNumber(moduleCNumber), m_arrayNumber(arrayNumber), m_position(position)
     {}
 

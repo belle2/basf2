@@ -159,6 +159,7 @@ class TestModule(basf2.Module):
                 basf2.B2WARNING("old: " + oldString)
                 basf2.B2WARNING("new: " + newString)
 
+
 main.add_module(TestModule(), logLevel=basf2.LogLevel.INFO)
 
 # Process events

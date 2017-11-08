@@ -34,7 +34,6 @@ EKLMTimeCalibrationCollectorModule::EKLMTimeCalibrationCollectorModule() :
 {
   setDescription("Module for EKLM time calibration (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_nStripDifferent = -1;
   m_ev = {0, 0, 0};
   m_Strip = 0;
   m_TransformData = NULL;
@@ -43,15 +42,12 @@ EKLMTimeCalibrationCollectorModule::EKLMTimeCalibrationCollectorModule() :
 
 EKLMTimeCalibrationCollectorModule::~EKLMTimeCalibrationCollectorModule()
 {
-  if (m_TransformData != NULL)
-    delete m_TransformData;
 }
 
 void EKLMTimeCalibrationCollectorModule::prepare()
 {
   TTree* t;
   m_GeoDat = &(EKLM::GeometryData::Instance());
-  m_nStripDifferent = m_GeoDat->getNStripsDifferentLength();
   StoreArray<EKLMHit2d>::required();
   StoreArray<EKLMDigit>::required();
   StoreArray<Track>::required();
@@ -82,7 +78,7 @@ void EKLMTimeCalibrationCollectorModule::collect()
     RelationVector<ExtHit> extHits = tracks[i]->getRelationsTo<ExtHit>();
     n2 = extHits.size();
     for (j = 0; j < n2; j++) {
-      if (extHits[j]->getDetectorID() != Const::EDetector::KLM)
+      if (extHits[j]->getDetectorID() != Const::EDetector::EKLM)
         continue;
       if (!m_GeoDat->hitInEKLM(extHits[j]->getPosition().Z()))
         continue;
@@ -155,5 +151,7 @@ void EKLMTimeCalibrationCollectorModule::collect()
 
 void EKLMTimeCalibrationCollectorModule::terminate()
 {
+  if (m_TransformData != NULL)
+    delete m_TransformData;
 }
 

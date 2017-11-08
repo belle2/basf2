@@ -21,6 +21,7 @@
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
 #include <tracking/ckf/svd/filters/results/SVDResultVarSet.h>
+#include <tracking/ckf/svd/filters/results/RelationSVDResultVarSet.h>
 #include <tracking/ckf/svd/filters/results/SVDResultTruthVarSet.h>
 #include <tracking/ckf/svd/filters/results/SizeSVDResultFilter.h>
 #include <tracking/ckf/svd/filters/results/Chi2SVDResultFilter.h>
@@ -33,7 +34,8 @@ namespace {
   using ChooseableTruthSVDResultFilter = ChoosableFromVarSetFilter<SVDResultTruthVarSet>;
 
   /// Basic recording filter for SVD - CDC results.
-  using RecordingSVDResultFilter = RecordingFilter<VariadicUnionVarSet<SVDResultTruthVarSet, SVDResultVarSet>>;
+  using RecordingSVDResultFilter =
+    RecordingFilter<VariadicUnionVarSet<SVDResultTruthVarSet, SVDResultVarSet, RelationSVDResultVarSet>>;
 
   /// Filter using a trained MVA method
   using MVASVDResultFilter = MVAFilter<SVDResultVarSet>;

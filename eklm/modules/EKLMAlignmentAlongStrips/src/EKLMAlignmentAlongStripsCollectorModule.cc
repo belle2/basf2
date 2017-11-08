@@ -73,6 +73,7 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
   std::multimap<int, ExtHit*>::iterator it, it2, itLower, itUpper;
   std::set<int> digitVolumes;
   ExtHit* extHit;
+  TTree* calibrationData = getObjectPtr<TTree>("calibration_data");
   /* Create volume - extHit map. */
   n = tracks.getEntries();
   for (i = 0; i < n; i++) {
@@ -95,7 +96,6 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
                                 digits[i]->getStrip());
     digitVolumes.insert(vol);
   }
-  auto calib_data = getObjectPtr<TTree>("calibration_data");
   /* Search for strips with extHits, but without signal. */
   for (it = mapExtHit.begin(); it != mapExtHit.end();) {
     itLower = it;
@@ -130,7 +130,7 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
         m_GeoDat->segmentNumber(
           m_Event->endcap, m_Event->layer, m_Event->sector, m_Event->plane,
           (m_Event->strip - 1) / m_GeoDat->getNStripsSegment() + 1);
-      calib_data->Fill();
+      calibrationData->Fill();
     }
   }
 }

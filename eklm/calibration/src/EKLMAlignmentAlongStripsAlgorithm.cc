@@ -48,7 +48,7 @@ CalibrationAlgorithm::EResult EKLMAlignmentAlongStripsAlgorithm::calibrate()
   struct Event* event = NULL;
   TFile* f_out;
   TTree* t_out;
-  auto t_in = getObjectPtr<TTree>("calibration_data");
+  std::shared_ptr<TTree> t_in = getObjectPtr<TTree>("calibration_data");
   t_in->SetBranchAddress("event", &event);
   nEndcaps = geoDat->getNEndcaps();
   nSectors = geoDat->getNSectors();

@@ -69,6 +69,7 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   bool* calibrateStrip;
   TH1F* h, *h2;
   TF1* fcn;
+  std::shared_ptr<TTree> t;
   TCanvas* c1 = NULL;
   if (m_Debug)
     c1 = new TCanvas();
@@ -79,8 +80,7 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   averageSqrtN = new double[m_maxStrip];
   timeShift = new double[m_maxStrip];
   calibrateStrip = new bool[m_maxStrip];
-
-  auto t = getObjectPtr<TTree>("calibration_data");
+  t = getObjectPtr<TTree>("calibration_data");
   t->SetBranchAddress("time", &ev.time);
   t->SetBranchAddress("dist", &ev.dist);
   t->SetBranchAddress("npe", &ev.npe);

@@ -65,11 +65,11 @@ namespace Belle2 {
        * @param adcCount              ADC count.
        * @return Drift time (ns)
        */
-      virtual double getDriftTime(unsigned short tdcCount,
-                                  const WireID& wireID,
-                                  double timeOfFlightEstimator,
-                                  double z,
-                                  unsigned short) = 0;
+      double getDriftTime(unsigned short tdcCount,
+                          const WireID& wireID,
+                          double timeOfFlightEstimator,
+                          double z,
+                          unsigned short) override;
 
       /** Uncertainty corresponding to drift length from getDriftLength of this class.
        *

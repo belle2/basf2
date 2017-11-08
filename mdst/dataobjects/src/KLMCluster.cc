@@ -72,10 +72,10 @@ TMatrixDSym KLMCluster::getError4x4() const
   double vertexDist3;
   TMatrixDSym errorMatrix(4);
   TMatrixD jacobian(4, 4);
-  errorMatrix[0] = m_errorX;
-  errorMatrix[1] = m_errorY;
-  errorMatrix[2] = m_errorZ;
-  errorMatrix[3] = m_errorP;
+  errorMatrix[0][0] = m_errorX;
+  errorMatrix[1][1] = m_errorY;
+  errorMatrix[2][2] = m_errorZ;
+  errorMatrix[3][3] = m_errorP;
   vertexDist3 = pow(m_globalX * m_globalX + m_globalY * m_globalY +
                     m_globalZ * m_globalZ, 1.5);
   jacobian(0, 0) = m_p * (m_globalY * m_globalY + m_globalZ * m_globalZ) /

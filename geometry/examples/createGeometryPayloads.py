@@ -34,7 +34,12 @@ line_match = re.compile("^dbstore/(.*?) (\d+)")
 with open("localdb/database.txt") as dbfile:
     for line in dbfile:
         match = line_match.search(line)
-        if (match.group(1) not in varying) and match.group(2) != "1":
+        if (match.group(1) in varying):
+            if match.group(2) == "1":
+                # limit phase3 to max experiment 999
+                database_content.append("%s 0,0,999,-1\n" % match.group(0))
+                continue
+        elif match.group(2) != "1":
             continue
         database_content.append(line)
 

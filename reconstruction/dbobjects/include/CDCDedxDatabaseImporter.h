@@ -18,41 +18,46 @@ namespace Belle2 {
   /*!
     This module writes data from e.g. a ROOT histogram to database.
   */
-  class DedxDatabaseImporter {
+  class CDCDedxDatabaseImporter {
 
   public:
 
     /**
      * Constructor
      */
-    DedxDatabaseImporter(std::string inputFileName, std::string m_name);
+    CDCDedxDatabaseImporter(std::string inputFileName, std::string m_name);
 
     /**
      * Destructor
      */
-    virtual ~DedxDatabaseImporter() {};
+    virtual ~CDCDedxDatabaseImporter() {};
 
     /**
-     * Import CDC wire gain calibration constants to the database
+     * Import a scale factor to make electron dE/dx ~ 1
      */
-    void importWireGainCalibration();
+    void importScaleFactor(double scale);
 
     /**
-     * Import CDC run gain calibration constants to the database
+     * Import parameters for the hadron correction
      */
-    void importRunGainCalibration();
+    void importHadronCorrection();
 
     /**
-     * Import CDC electron saturation calibration constants to the database
+     * Import predicted mean parameters to the database
      */
-    void importCosineCalibration();
+    void importCurveParameters();
+
+    /**
+     * Import predicted resolution parameters to the database
+     */
+    void importSigmaParameters();
 
   private:
 
     std::vector<std::string> m_inputFileNames; /**< Name of input ROOT files */
     std::string m_name; /**< Name of database ROOT file */
 
-    ClassDef(DedxDatabaseImporter, 1); /**< ClassDef */
+    ClassDef(CDCDedxDatabaseImporter, 1); /**< ClassDef */
   };
 
 } // Belle2 namespace

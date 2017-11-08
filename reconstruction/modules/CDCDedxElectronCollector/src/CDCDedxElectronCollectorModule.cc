@@ -8,23 +8,23 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <reconstruction/modules/CDCDedxWireGainCollector/CDCDedxWireGainCollectorModule.h>
+#include <reconstruction/modules/CDCDedxElectronCollector/CDCDedxElectronCollectorModule.h>
 
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCDedxWireGainCollector)
+REG_MODULE(CDCDedxElectronCollector)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-CDCDedxWireGainCollectorModule::CDCDedxWireGainCollectorModule() : CalibrationCollectorModule()
+CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCollectorModule()
 {
   // Set module properties
-  setDescription("A collector module for CDC dE/dx wire gain calibration");
+  setDescription("A collector module for CDC dE/dx electron calibrations");
 
   // Parameter definitions
   addParam("maxNumHits", m_maxNumHits,
@@ -35,21 +35,27 @@ CDCDedxWireGainCollectorModule::CDCDedxWireGainCollectorModule() : CalibrationCo
 //                 Create ROOT objects
 //-----------------------------------------------------------------
 
-void CDCDedxWireGainCollectorModule::prepare()
+void CDCDedxElectronCollectorModule::prepare()
 {
   StoreArray<CDCDedxTrack>::required();
+  StoreArray<Track>::required();
+  StoreArray<TrackFitResult>::required();
 
   // Data object creation
-  auto ttree = new TTree("dedxTree", "Tree with dE/dx information");
+  auto means = new TH1F("means", "CDC dE/dx truncated means", 100, 0, 2);
+  auto ttree = new TTree("tree", "Tree with dE/dx information");
+
   ttree->Branch<double>("dedx", &m_dedx);
   ttree->Branch<double>("costh", &m_costh);
-  // No longer need to store the nhits as the size of the wire/layer/dedxhit vectors are the same as the number of hits
 
   ttree->Branch("wire", &m_wire);
   ttree->Branch("layer", &m_layer);
+  ttree->Branch("doca", &m_doca);
+  ttree->Branch("enta", &m_enta);
   ttree->Branch("dedxhit", &m_dedxhit);
 
   // Collector object registration
+  registerObject<TH1F>("means", means);
   registerObject<TTree>("tree", ttree);
 }
 
@@ -57,31 +63,46 @@ void CDCDedxWireGainCollectorModule::prepare()
 //                 Fill ROOT objects
 //-----------------------------------------------------------------
 
-void CDCDedxWireGainCollectorModule::collect()
+void CDCDedxElectronCollectorModule::collect()
 {
-  StoreArray<CDCDedxTrack> tracks;
+  StoreArray<CDCDedxTrack> dedxTracks;
+
   // Collector object access
+  auto& means = getObject<TH1F>("means");
   auto& tree = getObject<TTree>("tree");
 
-  for (auto track : tracks) {
+  for (int idedx = 0; idedx < dedxTracks.getEntries(); idedx++) {
+    CDCDedxTrack* dedxTrack = dedxTracks[idedx];
+    const Track* track = dedxTrack->getRelatedFrom<Track>();
+    const TrackFitResult* fitResult = track->getTrackFitResult(Const::pion);
+    if (!fitResult) {
+      B2WARNING("No related fit for this track...");
+      continue;
+    }
+
     // Make sure to remove all the data in vectors from the previous track
     m_wire.clear();
     m_layer.clear();
+    m_doca.clear();
+    m_enta.clear();
     m_dedxhit.clear();
 
     // Simple numbers don't need to be cleared
-    m_dedx = track.getTruncatedMean();
-    m_costh = track.getCosTheta();
-    m_nhits = track.getNLayerHits();  // Used in loop below but not saved to TTree
+    m_dedx = dedxTrack->getTruncatedMean();
+    m_costh = dedxTrack->getCosTheta();
+    m_nhits = dedxTrack->size();
 
-    if (m_nhits > m_maxNumHits) continue;  // Do you want this maximum if you don't 'have' to have it?
+    if (m_nhits > m_maxNumHits) continue;
     for (int i = 0; i < m_nhits; ++i) {
-      m_wire.push_back(track.getWire(i));
-      m_layer.push_back(track.getLayer(i));
-      m_dedxhit.push_back(track.getDedx(i));
+      m_wire.push_back(dedxTrack->getWire(i));
+      m_layer.push_back(dedxTrack->getHitLayer(i));
+      m_doca.push_back(dedxTrack->getDoca(i));
+      m_enta.push_back(dedxTrack->getEnta(i));
+      m_dedxhit.push_back(dedxTrack->getDedx(i));
     }
 
     // Track information filled
     tree.Fill();
+    means.Fill(m_dedx);
   }
 }

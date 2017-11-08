@@ -15,43 +15,40 @@
 namespace Belle2 {
 
   /**
-   *   dE/dx wire gain calibration constants
+   *   dE/dx run gain calibration constants
    */
 
-  class CDCDedxCosine: public TObject {
-
+  class CDCDedxScaleFactor: public TObject {
   public:
 
     /**
      * Default constructor
      */
-    CDCDedxCosine(): m_nbins(30), m_costh(m_nbins, 0), m_means(m_nbins, 0) {};
+    CDCDedxScaleFactor(): m_scale(0) {};
 
     /**
      * Constructor
      */
-    CDCDedxCosine(int nbins, std::vector<float>& costh, std::vector<float>& means): m_nbins(nbins), m_costh(costh), m_means(means) {};
+    CDCDedxScaleFactor(double scale): m_scale(scale) {};
 
     /**
      * Destructor
      */
-    ~CDCDedxCosine() {};
+    ~CDCDedxScaleFactor() {};
 
-    /** Return cos(theta)
-     * @return cos(theta)
+    /** Return scale factor
+     * @return scale factor
      */
-    float getCosTheta(int bin) const {return m_costh[bin]; };
+    double getScaleFactor() const {return m_scale; };
 
-    /** Return dE/dx mean value
-     * @return dE/dx mean value
+    /** Set scale factor
+     * @param scale factor
      */
-    float getCosine(int bin) const {return m_means[bin]; };
+    void setScaleFactor(double scale) {m_scale = scale; };
 
   private:
-    int m_nbins; /**< number of cos(theta) bins for electron saturation correction */
-    std::vector<float> m_costh; /**< central bin values for cos(theta) bins */
-    std::vector<float> m_means; /**< dE/dx means in bins of cos(theta) */
+    double m_scale; /**< Scale factor to make electron dE/dx ~ 1 */
 
-    ClassDef(CDCDedxCosine, 1); /**< ClassDef */
+    ClassDef(CDCDedxScaleFactor, 1); /**< ClassDef */
   };
 } // end namespace Belle2

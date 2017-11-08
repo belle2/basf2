@@ -8,51 +8,57 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDEDXSCANMODULE_H
-#define CDCDEDXSCANMODULE_H
+#pragma once
 
-#include <reconstruction/dataobjects/DedxConstants.h>
+#include <reconstruction/dataobjects/CDCDedxTrack.h>
 
-#include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
+#include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <string>
-#include <vector>
-#include <TFile.h>
-#include <TTree.h>
-#include <TVector3.h>
+#include "TH1F.h"
+#include "TF1.h"
 
 namespace Belle2 {
 
-  class CDCDedxTrack;
-
-  /** This class performs the same function as CDCDedxPIDModule, but does so
-   * without using real objects from BASF2. Instead, it scans values of
-   * DOCA and entrance angle for a cell in each layer of the CDC.
+  /** Extracts dE/dx information for calibration testing. Writes a ROOT file.
    */
-  class CDCDedxScanModule : public Module {
+  class CDCDedxDQMModule : public HistoModule {
 
   public:
 
     /** Default constructor */
-    CDCDedxScanModule();
+    CDCDedxDQMModule();
 
     /** Destructor */
-    virtual ~CDCDedxScanModule();
+    virtual ~CDCDedxDQMModule();
 
     /** Initialize the module */
     virtual void initialize();
+
+    /** This method is called for each run */
+    virtual void beginRun();
 
     /** This method is called for each event. All processing of the event
      * takes place in this method. */
     virtual void event();
 
+    /** This method is called at the end of each run */
+    virtual void endRun();
+
     /** End of the event processing. */
     virtual void terminate();
 
+    /** Function to define histograms. */
+    virtual void defineHisto();
+
   private:
+
+    /** Store array: CDCDedxTrack */
+    StoreArray<CDCDedxTrack> m_cdcDedxTracks;
+
+    TH1F* m_h_dedx = nullptr; /**< Histogram for dE/dx truncated means */
+    TH1F* m_h_dedxmean = nullptr; /**< Histogram for average dE/dx mean */
+    TH1F* m_h_dedxsigma = nullptr; /**< Histogram for dE/dx resolution */
 
   };
 } // Belle2 namespace
-#endif

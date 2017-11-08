@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <reconstruction/dbobjects/CDCDedxCosineCor.h>
+#include <reconstruction/dbobjects/CDCDedx1DCleanup.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include "TF1.h"
 
@@ -19,19 +19,19 @@ namespace Belle2 {
    * A calibration algorithm for CDC dE/dx electron cos(theta) dependence
    *
    */
-  class CDCDedxCosineAlgorithm : public CalibrationAlgorithm {
+  class CDCDedx1DCleanupAlgorithm : public CalibrationAlgorithm {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the algorithm.
      */
-    CDCDedxCosineAlgorithm();
+    CDCDedx1DCleanupAlgorithm();
 
     /**
      * Destructor
      */
-    virtual ~CDCDedxCosineAlgorithm() {}
+    virtual ~CDCDedx1DCleanupAlgorithm() {}
 
   protected:
 
@@ -42,6 +42,6 @@ namespace Belle2 {
 
   private:
 
-    ClassDef(CDCDedxCosineAlgorithm, 0); /**< Class for CDC dE/dx calibration algorithm **/
+    ClassDef(CDCDedx1DCleanupAlgorithm, 0); /**< Class for CDC dE/dx 1D cleanup correction **/
   };
 } // namespace Belle2

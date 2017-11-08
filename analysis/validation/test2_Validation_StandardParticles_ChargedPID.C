@@ -161,23 +161,37 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   piktree->Project("piefake_vs_momentum", pibranch+"_P", pibranch+"_"+PIDmu+">"+pidcut+"&&"+pikcuts);
   piktree->Project("pimufake_vs_momentum", pibranch+"_P", pibranch+"_"+PIDe+">"+pidcut+"&&"+pikcuts);
   piktree->Project("Kpifake_vs_momentum", kbranch+"_P", kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
-  piktree->Project("Kpfake_vs_momentum", kbranch+"_P", pikcuts);
-  piktree->Project("kplusRecoEff_vs_cosTheta", kbranch+"_P4[3]/"+kbranch+"_P", "("+kbranch+"_Charge > 0) && "+kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts)
-  piktree->Project("kminusRecoEff_vs_cosTheta", kbranch+"_P4[3]/"+kbranch+"_P", "("+kbranch+"_Charge < 0) && "+kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts)
-  piktree->Project("krecoEff_vs_cosTheta", kbranch+"_P4[3]/"+kbranch+"_P", kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts)
-
-  kPlusRecoEff_vs_cosTheta->Divide(krecoEff_vs_cosTheta);
-  kMinusRecoEff_vs_cosTheta->Divide(krecoEff_vs_cosTheta);
-  kPlusRecoEff_vs_cosTheta->Minus(kMinusRecoEff_vs_cosTheta);
-
-
+  piktree->Project("Kpfake_vs_momentum", kbranch+"_P", kbranch+"_"+PIDk+">"+pidcut+"&&"+pikcuts);
   outputFile->WriteTObject(piKfake_vs_momentum);
   outputFile->WriteTObject(piefake_vs_momentum);
   outputFile->WriteTObject(pimufake_vs_momentum);
   outputFile->WriteTObject(Kpfake_vs_momentum);
   outputFile->WriteTObject(Kpifake_vs_momentum);
 
+  piktree->Project("kplusRecoEff_vs_cosTheta", kbranch+"_P4[3]/"+kbranch+"_P", "("+kbranch+"_Charge > 0) && "+kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts)
+  piktree->Project("kminusRecoEff_vs_cosTheta", kbranch+"_P4[3]/"+kbranch+"_P", "("+kbranch+"_Charge < 0) && "+kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts)
+  piktree->Project("krecoEff_vs_cosTheta", kbranch+"_P4[3]/"+kbranch+"_P", kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts)
+  kPlusRecoEff_vs_cosTheta->Divide(krecoEff_vs_cosTheta);
+  kMinusRecoEff_vs_cosTheta->Divide(krecoEff_vs_cosTheta);
+  kPlusRecoEff_vs_cosTheta->Minus(kMinusRecoEff_vs_cosTheta);
   outputFile->WriteTObject(kPlusRecoEff_vs_cosTheta);
+
+  TH1F* Kpifake_vs_cosTheta = new TH1F("Kpifake_vs_cosTheta", "K/#pi fake rate vs. cosTheta", 100, 0.5, 4.0);
+  TH1F* Kpfake_vs_cosTheta = new TH1F("Kpfake_vs_cosTheta", "K/p fake rate vs. cosTheta", 100, 0.5, 4.0);
+  TH1F* piKfake_vs_cosTheta = new TH1F("piKfake_vs_cosTheta", "#pi/K fake rate vs. cosTheta", 100, 0.5, 4.0);
+  TH1F* pimufake_vs_cosTheta = new TH1F("pimufake_vs_cosTheta", "#pi/#mu fake rate vs. cosTheta", 100, 0.5, 4.0);
+  TH1F* piefake_vs_cosTheta = new TH1F("piefake_vs_cosTheta", "#pi/e fake rate vs. cosTheta", 100, 0.5, 4.0);
+  piktree->Project("piKfake_vs_momentum", pibranch+"_P4[3]/"+pibranch+"_P", pibranch+"_"+PIDk+">"+pidcut+"&&"+pikcuts);
+  piktree->Project("piefake_vs_momentum", pibranch+"_P4[3]/"+pibranch+"_P", pibranch+"_"+PIDmu+">"+pidcut+"&&"+pikcuts);
+  piktree->Project("pimufake_vs_momentum", pibranch+"_P4[3]/"+pibranch+"_P", pibranch+"_"+PIDe+">"+pidcut+"&&"+pikcuts);
+  piktree->Project("Kpifake_vs_momentum", kbranch+"_P4[3]/"+kbranch+"_P", kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
+  piktree->Project("Kpfake_vs_momentum", kbranch+"_P4[3]/"+kbranch+"_P", kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
+  outputFile->WriteTObject(piKfake_vs_momentum);
+  outputFile->WriteTObject(piefake_vs_momentum);
+  outputFile->WriteTObject(pimufake_vs_momentum);
+  outputFile->WriteTObject(Kpfake_vs_momentum);
+  outputFile->WriteTObject(Kpifake_vs_momentum);
+
 
   // The following section goes over the different efficiency bins
   const vector<string> xlabel = {"85%","90%","95%","99%"};
@@ -216,7 +230,6 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
     hpcut->GetXaxis()->SetBinLabel(i+1,xlabel[i].c_str());
     hpicut->GetXaxis()->SetBinLabel(i+1,xlabel[i].c_str());
     hkcut->GetXaxis()->SetBinLabel(i+1,xlabel[i].c_str());
-
   }
   
   hpcut->SetXTitle("Proton efficiency");

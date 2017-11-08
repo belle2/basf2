@@ -145,8 +145,8 @@ unPacker.param('svdShaperDigitListName', svd_shaperdigits_pack_unpack_collection
 unPacker.param('svdDAQDiagnosticsListName', 'myDAQDiagnostics')
 # unPacker.param('xmlMapFileName', mapping_file)
 main.add_module(unPacker)
-main.add_module(SvdShaperDigitTestModule())
 
+main.add_module(SvdShaperDigitTestModule())
 
 # Process events
 process(main)

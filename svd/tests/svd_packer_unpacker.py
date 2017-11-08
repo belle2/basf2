@@ -114,7 +114,6 @@ main.add_module(Packer)
 unPacker = register_module('SVDUnpacker')
 unPacker.param('rawSVDListName', 'SVDRaw')
 unPacker.param('svdDigitListName', svd_digits_pack_unpack_collection)
-unPacker.param('xmlMapFileName', mapping_file)
 main.add_module(unPacker)
 
 # run custom test module to check if the SVDDigits and the

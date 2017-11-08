@@ -141,7 +141,6 @@ unPacker.param('svdDigitListName', svd_digits_pack_unpack_collection)
 unPacker.param('GenerateShaperDigts', True)
 unPacker.param('svdShaperDigitListName', svd_shaperdigits_pack_unpack_collection)
 unPacker.param('svdDAQDiagnosticsListName', 'myDAQDiagnostics')
-unPacker.param('xmlMapFileName', mapping_file)
 main.add_module(unPacker)
 
 # run custom test module to check if the SVDDigits and the

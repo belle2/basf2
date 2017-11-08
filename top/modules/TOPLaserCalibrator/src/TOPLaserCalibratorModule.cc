@@ -69,6 +69,7 @@ namespace Belle2 {
     addParam("fitChannel", m_fitChannel, "set 0 - 511 to a specific channel; set 0 to all channels in the fit",
              512);
     addParam("barID", m_barID, "ID of TOP module to calibrate");
+    addParam("refCh", m_refCh, "reference channel of T0 constant");
     addParam("fitMethod", m_fitMethod, "gaus: single gaussian; cb: single Crystal Ball; cb2: double Crystal Ball", string("gauss"));
     addParam("fitRange", m_fitRange, "fit range[nbins, xmin, xmax]", frange);
 
@@ -157,10 +158,11 @@ namespace Belle2 {
       mcT[channel_mc] = maxpos;
     }
 
-    //w.r.t. channel 0
-    for (int i = 1; i < c_NumChannels; i++) {
-      dataT[i] = dataT[i] - dataT[0];
-      mcT[i] = mcT[i] - mcT[0];
+    //w.r.t. ref. channel
+    for (int i = 0; i < c_NumChannels; i++) {
+      if (i == m_refCh) continue;
+      dataT[i] = dataT[i] - dataT[m_refCh];
+      mcT[i] = mcT[i] - mcT[m_refCh];
     }
 
     delete tree;
@@ -176,10 +178,12 @@ namespace Belle2 {
 
     otree->Branch("t0Const", &t0_const, "t0_const/D");
     otree->Branch("channel", &channel, "channel/I");
+    otree->Branch("slot", &m_barID, "slot/I");
 
-    for (int i = 1; i < c_NumChannels; i++) {
+    for (int i = 0; i < c_NumChannels; i++) {
       channel = i;
       t0_const = mcT[i] - dataT[i];
+      if (i == m_refCh) t0_const = 0;
       otree->Fill();
     }
     otree->Write();

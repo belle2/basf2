@@ -28,9 +28,6 @@ namespace Belle2 {
     /// When constructed by a hit, set the reco hit
     CKFToPXDState(const SpacePoint* hit);
 
-    /// Copy the constructors from the base class
-    using CKFState::CKFState;
-
     /// Constructor setting the state to the position of the first CDC track seed hit
     CKFToPXDState(const RecoTrack* seed);
 

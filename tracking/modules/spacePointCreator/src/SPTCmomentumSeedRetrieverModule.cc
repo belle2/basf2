@@ -10,7 +10,7 @@
 
 #include <tracking/modules/spacePointCreator/SPTCmomentumSeedRetrieverModule.h>
 #include <framework/logging/Logger.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 // ROOT
 #include <TVector3.h>
@@ -38,7 +38,7 @@ void SPTCmomentumSeedRetrieverModule::beginRun()
   InitializeCounters();
 
   // BField is required by all QualityEstimators
-  double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+  double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
 
   m_estimator = QualityEstimatorRiemannHelixFit();
   m_estimator.setMagneticFieldStrength(bFieldZ);

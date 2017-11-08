@@ -344,7 +344,9 @@ if __name__ == "__main__":
     # message for that
     set_log_level(LogLevel.ERROR)
     set_random_seed(1)
-    ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Belle2.Unit.T)
+    field = Belle2.MagneticField()
+    field.addComponent(Belle2.MagneticFieldComponentConstant(Belle2.B2Vector3D(0, 0, 1.5 * ROOT.Belle2.Unit.T)))
+    Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
     set_log_level(LogLevel.INFO)
     # now run the test
     print_file("mdst/tests/mdst-v00-05-02.root")

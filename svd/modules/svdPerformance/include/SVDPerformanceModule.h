@@ -61,6 +61,7 @@ namespace Belle2 {
     std::string m_TrackName; /**< */
     bool m_is2017TBanalysis; /**< true if we analyze 2017 TB data*/
 
+    float m_debugLowTime; /** cluster Time below this number will produce a printout */
 
 
     /* user-defined parameters */
@@ -106,18 +107,20 @@ namespace Belle2 {
     //CLUSTERS NOT RELATED TO TRACKS
     TH1F* h_nCl[m_nLayers][m_nSensors][m_nSides]; //number per event
     TH1F* h_clSize[m_nLayers][m_nSensors][m_nSides]; //size
-    TH1F* h_clCharge[m_nLayers][m_nSensors][m_nSides]; //size
+    TH1F* h_clCharge[m_nLayers][m_nSensors][m_nSides]; //charge
     TH1F* h_clSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
     TH2F* h_clChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH1F* h_clTime[m_nLayers][m_nSensors][m_nSides];  //time
+    TH2F* h_clTimeVSTrueTime[m_nLayers][m_nSensors][m_nSides];  //time VS true time
 
     //CLUSTERS RELATED TO TRACKS
     TH1F* h_nCltrk[m_nLayers][m_nSensors][m_nSides]; //number per event
     TH1F* h_cltrkSize[m_nLayers][m_nSensors][m_nSides]; //size
-    TH1F* h_cltrkCharge[m_nLayers][m_nSensors][m_nSides]; //size
+    TH1F* h_cltrkCharge[m_nLayers][m_nSensors][m_nSides]; //charge
     TH1F* h_cltrkSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
     TH2F* h_cltrkChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH1F* h_cltrkTime[m_nLayers][m_nSensors][m_nSides];  //time
+    TH2F* h_cltrkTimeVSTrueTime[m_nLayers][m_nSensors][m_nSides];  //time VS true time
 
     //1-STRIP CLUSTERS
     TH1F* h_1cltrkCharge[m_nLayers][m_nSensors][m_nSides]; //charge

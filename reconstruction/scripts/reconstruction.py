@@ -289,6 +289,8 @@ def add_cluster_expert_modules(path, components=None):
     if components is None or ('EKLM' in components and 'BKLM' in components and 'ECL' in components):
         KLMClassifier = register_module('KLMExpert')
         path.add_module(KLMClassifier)
+        ClusterMatch = register_module('ClusterMatcher')
+        path.add_module(ClusterMatch)
 
 
 def add_pid_module(path, components=None):

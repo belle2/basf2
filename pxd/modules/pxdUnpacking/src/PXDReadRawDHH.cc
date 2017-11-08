@@ -113,7 +113,7 @@ int PXDReadRawDHHModule::readOneEvent()
 
     len -= 8;
     if (len >= 8) {
-      int br = read_data(data + 8, 8);
+      br = read_data(data + 8, 8);
       if (br <= 0) return br;
       // Read 8 bytes header (client)
       // compare len

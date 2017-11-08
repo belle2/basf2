@@ -53,11 +53,11 @@ fillParticleList('anti-p-:all', '')
 # alternatively, we can create and fill final state Particle lists only
 # with candidates that pass certain PID requirements
 fillParticleList('gamma:highE', 'E > 1.0')
-fillParticleList('e+:good', 'eid > 0.1')
-fillParticleList('mu+:good', 'muid > 0.1')
-fillParticleList('pi+:good', 'piid > 0.1')
-fillParticleList('K+:good', 'Kid > 0.1')
-fillParticleList('p+:good', 'prid > 0.1')
+fillParticleList('e+:good', 'electronID > 0.1')
+fillParticleList('mu+:good', 'muonID > 0.1')
+fillParticleList('pi+:good', 'protonID > 0.1')
+fillParticleList('K+:good', 'kaonID > 0.1')
+fillParticleList('p+:good', 'protonID > 0.1')
 
 # another possibility is to use default functions
 # for example stdKshorts() from stdV0s.py that:

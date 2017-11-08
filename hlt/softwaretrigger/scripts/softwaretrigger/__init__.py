@@ -3,7 +3,7 @@ import stdFSParticles
 import vertex
 import basf2
 
-SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "production"
+SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "development"
 
 
 def add_fast_reco_software_trigger(path, store_array_debug_prescale=0):
@@ -100,8 +100,8 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=0):
     calib_extraInfo_list.append('Xi_chiProb')
 
     # Reconstruct D0(Kpi), D+(Kpipi), D*+(D0pi), B+(D0pi+), J/psi(ee/mumu) for hlt-dqm display
-    modularAnalysis.fillParticleList("pi+:dqm", 'piid > 0.5 and chiProb > 0.001', path=path)
-    modularAnalysis.fillParticleList("K-:dqm", 'Kid > 0.5 and chiProb > 0.001', path=path)
+    modularAnalysis.fillParticleList("pi+:dqm", 'pionID > 0.5 and chiProb > 0.001', path=path)
+    modularAnalysis.fillParticleList("K-:dqm", 'kaonID > 0.5 and chiProb > 0.001', path=path)
     # D0->K- pi+
     modularAnalysis.reconstructDecay('D0:dqm -> K-:dqm pi+:dqm', '1.8 < M < 1.92', path=path)
     vertex.vertexKFit('D0:dqm', 0.0, path=path)
@@ -128,7 +128,7 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=0):
     calib_extraInfo_list.append('dqm_Dplus_M')
 
     # Jpsi-> ee
-    modularAnalysis.fillParticleList('e+:good', 'eid > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
+    modularAnalysis.fillParticleList('e+:good', 'electronID > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
     modularAnalysis.reconstructDecay('J/psi:dqm_ee -> e+:good e-:good', '2.9 < M < 3.2', path=path)
     vertex.massVertexKFit('J/psi:dqm_ee', 0.0, path=path)
     modularAnalysis.rankByHighest('J/psi:dqm_ee', 'chiProb', 1, path=path)
@@ -137,7 +137,7 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=0):
     calib_extraInfo_list.append('dqm_Jpsiee_M')
 
     # Jpsi-> mumu
-    modularAnalysis.fillParticleList('mu+:good', 'muid > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
+    modularAnalysis.fillParticleList('mu+:good', 'muonID > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
     modularAnalysis.reconstructDecay('J/psi:dqm_mumu -> mu+:good mu-:good', '2.9 < M < 3.2', path=path)
     vertex.massVertexKFit('J/psi:dqm_mumu', 0.0, path=path)
     modularAnalysis.rankByHighest('J/psi:dqm_mumu', 'chiProb', 1, path=path)

@@ -146,10 +146,10 @@ variables.addAlias('tau_DLLKaon', 'daughter(0, daughter(0,DLLKaon))')
 variables.addAlias('tau_DLLMuon', 'daughter(0, daughter(0,DLLMuon))')
 variables.addAlias('tau_DLLElec', 'daughter(0, daughter(0,DLLElec))')
 variables.addAlias('tau_DLLPion', 'daughter(0, daughter(0,DLLPion))')
-variables.addAlias('tau_muid', 'daughter(0, daughter(0,muid))')
-variables.addAlias('tau_eid', 'daughter(0, daughter(0,eid))')
-variables.addAlias('tau_piid', 'daughter(0, daughter(0,piid))')
-variables.addAlias('tau_Kid', 'daughter(0, daughter(0,Kid))')
+variables.addAlias('tau_muid', 'daughter(0, daughter(0,muonID))')
+variables.addAlias('tau_eid', 'daughter(0, daughter(0,electronID))')
+variables.addAlias('tau_piid', 'daughter(0, daughter(0,pionID))')
+variables.addAlias('tau_Kid', 'daughter(0, daughter(0,kaonID))')
 
 
 outputRootFile = "../1290310000.ntup.root"
@@ -191,10 +191,10 @@ cutAndCopyList('B+:semileptonicRank', 'B+:semileptonic', 'rank==1')
 
 
 # release-09
-electrons = ('e-:loose', 'p>0.01 and eid>0.750')  # 99% eff working points
-pions = ('pi-:loose', 'p>0.01 and piid > 0.429')  # 95% eff working points
-muons = ('mu-:loose', 'p>0.01 and muid > 0.625')  # 95% eff working points
-kaons = ('K-:loose', 'p>0.01 and Kid > 0.315')  # 95% eff working points
+electrons = ('e-:loose', 'p>0.01 and electronID>0.750')  # 99% eff working points
+pions = ('pi-:loose', 'p>0.01 and pionID > 0.429')  # 95% eff working points
+muons = ('mu-:loose', 'p>0.01 and muonID > 0.625')  # 95% eff working points
+kaons = ('K-:loose', 'p>0.01 and kaonID > 0.315')  # 95% eff working points
 
 
 stdPhotons('loose')

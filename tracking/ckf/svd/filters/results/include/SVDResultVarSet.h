@@ -71,6 +71,8 @@ namespace Belle2 {
     /// Generate and assign the variables from the object.
     bool extract(const CKFToSVDResult* object) final;
 
+    void initialize() override;
+
   private:
     /// Findlet for advancing
     SVDAdvancer m_advancer;

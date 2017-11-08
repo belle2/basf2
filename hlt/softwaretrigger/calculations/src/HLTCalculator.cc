@@ -119,6 +119,40 @@ namespace Belle2 {
       }
       calculationResult["nECLClustersLE"] = neclClusters;
 
+      int nb2bcc_PhiHigh = 0;
+      int nb2bcc_PhiLow = 0;
+      int nb2bcc_3D = 0;
+      ClusterUtils C;
+      for (int i = 0; i < eclClusters.getEntries() - 1; i++) {
+        if (eclClusters[i]->getHypothesisId() != 1 &&
+            eclClusters[i]->getHypothesisId() != 5)
+          continue;
+        TLorentzVector V4g1 = C.Get4MomentumFromCluster(eclClusters[i]);
+        double Eg1 = V4g1.E();
+        for (int j = i + 1; j < eclClusters.getEntries(); j++) {
+          if (eclClusters[j]->getHypothesisId() != 1 &&
+              eclClusters[j]->getHypothesisId() != 5)
+            continue;
+          TLorentzVector V4g2 = C.Get4MomentumFromCluster(eclClusters[j]);
+          double Eg2 = V4g2.E();
+          const TVector3 V3g1 = (PCmsLabTransform::labToCms(V4g1)).Vect();
+          const TVector3 V3g2 = (PCmsLabTransform::labToCms(V4g2)).Vect();
+          double Thetag1 = (PCmsLabTransform::labToCms(V4g1)).Theta() * 180. / 3.1415926;
+          double Thetag2 = (PCmsLabTransform::labToCms(V4g2)).Theta() * 180. / 3.1415926;
+          double deltphi = fabs(V3g1.DeltaPhi(V3g2) * 180. / 3.1415926);
+          double Tsum = Thetag1 + Thetag2;
+          if (deltphi > 170. && (Eg1 > 0.25 && Eg2 > 0.25)) nb2bcc_PhiHigh++;
+          if (deltphi > 170. && (Eg1 < 0.25 || Eg2 < 0.25)) nb2bcc_PhiLow++;
+          if (deltphi > 160. && (Tsum > 160. && Tsum < 200.)) nb2bcc_3D++;
+        }
+      }
+
+      calculationResult["nB2BCCPhiHighLE"] = nb2bcc_PhiHigh;
+      calculationResult["nB2BCCPhiLowLE"] = nb2bcc_PhiLow;
+      calculationResult["nB2BCC3DLE"] = nb2bcc_3D;
+
+
+
       // AngleGTLE
       double angleGTLE = -10.;
       if (gammaWithMaximumRho) {
@@ -259,11 +293,17 @@ namespace Belle2 {
       calculationResult["N2KLMLayer"] = numSecMaxLayerKLM;
 
       //define bhabha_2trk, bhabha_1trk, eclbhabha
+      int charget1 = -10;
+      if (trackWithMaximumRho) charget1 = trackWithMaximumRho->getCharge();
+      int charget2 = -10;
+      if (trackWithSecondMaximumRho) charget2 = trackWithSecondMaximumRho->getCharge();
+
       double Bhabha2Trk = 0.;
       int ntrk_bha = m_pionParticles->getListSize();
       double rp1ob = rhoOfTrackWithMaximumRho / BeamEnergyCMS();
       double rp2ob = rhoOfTrackWithSecondMaximumRho / BeamEnergyCMS();
-      bool bhabha2trk_tag = ntrk_bha >= 2 && maxAngleTTLE > 2.88 && nEidLE >= 1 && rp1ob > 0.35 && rp2ob > 0.35 && (Etot) > 4.0;
+      bool bhabha2trk_tag = ntrk_bha >= 2 && maxAngleTTLE > 2.88 && nEidLE >= 1 && rp1ob > 0.35 && rp2ob > 0.35 && (Etot) > 4.0
+                            && (abs(charget1) == 1 && abs(charget2) == 1 && (charget1 + charget2) == 0);
       if (bhabha2trk_tag) Bhabha2Trk = 1;
       calculationResult["Bhabha2Trk"] = Bhabha2Trk;
 

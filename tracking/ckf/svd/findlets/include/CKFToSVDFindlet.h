@@ -106,5 +106,7 @@ namespace Belle2 {
     std::vector<TrackFindingCDC::WeightedRelation<CKFToSVDState>> m_relations;
     /// Vector for storing the results
     std::vector<CKFToSVDResult> m_results;
+    /// Vector for storing the filtered results
+    std::vector<CKFToSVDResult> m_filteredResults;
   };
 }

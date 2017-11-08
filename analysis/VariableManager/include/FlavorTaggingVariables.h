@@ -141,7 +141,7 @@ namespace Belle2 {
      * EW90: Energy in the hemisphere defined by the direction of the virtual W-Boson assuming a semileptonic decay with the given particle as lepton
      * This are Flavor Tagging specific variables!
      */
-    Manager::FunctionPtr SemiLeptonicVariables(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr BtagToWBosonVariables(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns a requested kinematical variable via argument[0] of the group of the flavor tagging variables corresponding to the KaonPion category.

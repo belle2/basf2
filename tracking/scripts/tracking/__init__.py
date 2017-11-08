@@ -276,7 +276,6 @@ def add_cdc_cr_track_fit_and_track_creator(path, components=None,
                     pdgCodes=[13],
                     recoTrackColName=reco_tracks,
                     trackColName=tracks,
-                    defaultPDGCode=13,
                     useClosestHitToIP=True,
                     useBFieldAtHit=True
                     )
@@ -454,7 +453,7 @@ def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_se
                         UseCDCHits=is_cdc_used(components))
 
 
-def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_before",
+def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_after",
                                 reco_tracks="RecoTracks",
                                 cdc_reco_tracks="CDCRecoTracks",
                                 svd_reco_tracks="SVDRecoTracks",
@@ -467,6 +466,7 @@ def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_before",
     First approach to add the CKF to the path with all the track finding related and needed
      to/for it.
     :param path: The path to add the tracking reconstruction modules to
+    :param svd_ckf_mode: when to apply the CKF (before or after VXDTF2)
     :param reco_tracks: The store array name where to output all tracks
     :param cdc_reco_tracks: The store array name where to output the cdc tracks or where you have already written them to
     :param svd_reco_tracks: The store array name where to output the svd tracks
@@ -513,8 +513,7 @@ def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_before",
 
         if add_vxdtf2:
             # Add the VXDTF2 only for SVD
-            add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks,
-                                         sectormap_file="/storage/b/fs5-mirror/jowagner/masterthesis/muon_map.root")
+            add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks)
 
             if add_merger:
                 # Add the merger for remaining CDC and newly found vxdtf2 tracks
@@ -748,7 +747,7 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
                     hitFilter="sensor",
                     seedFilter="distance",
 
-                    enableOverlapResolving=False,
+                    enableOverlapResolving=True,
 
                     **module_parameters)
 
@@ -982,7 +981,7 @@ def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", compo
 
 
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
-                                 useTwoStepSelection=False, sectormap_file=None, PXDminSVDSPs=3):
+                                 useTwoStepSelection=True, sectormap_file=None, PXDminSVDSPs=3):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -1103,6 +1102,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     cellOmat.param('strictSeeding', True)
     cellOmat.param('setFamilies', useTwoStepSelection)
     cellOmat.param('selectBestPerFamily', useTwoStepSelection)
+    cellOmat.param('xBestPerFamily', 5)
     path.add_module(cellOmat)
 
     if(useTwoStepSelection):

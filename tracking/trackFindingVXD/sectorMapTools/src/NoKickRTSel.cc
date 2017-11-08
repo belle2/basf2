@@ -21,65 +21,71 @@ void NoKickRTSel::hitXPBuilder(const RecoTrack& track)
   StoreArray<MCParticle> MCParticles;
   StoreArray<RecoTrack> recoTracks;
 
-  //const MCParticle* particle = track.getRelationFrom<MCParticle>();
+  if (track.getRelationsTo<MCParticle>().size() > 0) {
 
-  std::vector<Belle2::RecoHitInformation::UsedSVDHit*> clusterListSVD = track.getSVDHitList();
-  for (const SVDCluster* cluster : clusterListSVD) {
-    const MCParticle* particle = cluster->getRelationsTo<MCParticle>()[0];
-    for (const SVDTrueHit& hit : cluster->getRelationsTo<SVDTrueHit>()) {
-      //if(hit->GetRelationFrom<MCParticle>()!=particle){
-      //continue;
-      //}
-      VxdID trueHitSensorID = hit.getSensorID();
-      const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);
-      hitXPDerivate entry(hit, *cluster, *particle, sensorInfo);
-      int NClusterU = 0;
-      int NClusterV = 0;
-      for (SVDCluster Ncluster : hit.getRelationsFrom<SVDCluster>()) {
-        if (Ncluster.isUCluster()) NClusterU++;
-        else NClusterV++;
+    const MCParticle* particle = track.getRelationsTo<MCParticle>()[0];
+
+    std::vector<Belle2::RecoHitInformation::UsedSVDHit*> clusterListSVD = track.getSVDHitList();
+    for (const SVDCluster* cluster : clusterListSVD) {
+      for (const SVDTrueHit& hit : cluster->getRelationsTo<SVDTrueHit>()) {
+        RelationVector<MCParticle> hitFromParticle = hit.getRelationsFrom<MCParticle>();
+        if (hitFromParticle.size() > 0) {
+          if (hitFromParticle[0]->getIndex() != particle->getIndex()) {
+            continue;
+          }
+        } else continue;
+        VxdID trueHitSensorID = hit.getSensorID();
+        const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);
+        hitXPDerivate entry(hit, *cluster, *particle, sensorInfo);
+        int NClusterU = 0;
+        int NClusterV = 0;
+        for (SVDCluster Ncluster : hit.getRelationsFrom<SVDCluster>()) {
+          if (Ncluster.isUCluster()) NClusterU++;
+          else NClusterV++;
+        }
+        entry.setClusterU(NClusterU);
+        entry.setClusterV(NClusterV);
+
+        bool isReconstructed(false);
+        for (const RecoTrack& aRecoTrack : particle->getRelationsFrom<RecoTrack>())
+          isReconstructed |= aRecoTrack.hasSVDHits();
+        entry.setReconstructed(isReconstructed);
+
+        m_setHitXP.insert(entry);
       }
-      entry.setClusterU(NClusterU);
-      entry.setClusterV(NClusterV);
-
-      bool isReconstructed(false);
-      for (const RecoTrack& aRecoTrack : particle->getRelationsFrom<RecoTrack>())
-        isReconstructed |= aRecoTrack.hasSVDHits();
-      entry.setReconstructed(isReconstructed);
-
-      m_setHitXP.insert(entry);
     }
-  }
 
 
-  StoreArray<PXDCluster> PXDClusters;
-  StoreArray<PXDTrueHit> PXDTrueHits;
+    StoreArray<PXDCluster> PXDClusters;
+    StoreArray<PXDTrueHit> PXDTrueHits;
 
-  std::vector<Belle2::RecoHitInformation::UsedPXDHit*> clusterListPXD = track.getPXDHitList();
-  for (const PXDCluster* cluster : clusterListPXD) {
-    const MCParticle* particle = cluster->getRelationsTo<MCParticle>()[0];
-    for (const PXDTrueHit& hit : cluster->getRelationsTo<PXDTrueHit>()) {
-      //   if(hit->GetRelationFrom<MCParticle>()!=particle){
-      //     continue;
-      //   }
-      VxdID trueHitSensorID = hit.getSensorID();
-      const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);
-      hitXPDerivate entry(hit, *particle, sensorInfo);
+    std::vector<Belle2::RecoHitInformation::UsedPXDHit*> clusterListPXD = track.getPXDHitList();
+    for (const PXDCluster* cluster : clusterListPXD) {
+      for (const PXDTrueHit& hit : cluster->getRelationsTo<PXDTrueHit>()) {
+        RelationVector<MCParticle> hitFromParticle = hit.getRelationsFrom<MCParticle>();
+        if (hitFromParticle.size() > 0) {
+          if (hitFromParticle[0]->getIndex() != particle->getIndex()) {
+            continue;
+          }
+        } else continue;
+        VxdID trueHitSensorID = hit.getSensorID();
+        const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);
+        hitXPDerivate entry(hit, *particle, sensorInfo);
 
-      bool isReconstructed(false);
-      for (const RecoTrack& aRecoTrack : particle->getRelationsFrom<RecoTrack>())
-        isReconstructed |= aRecoTrack.hasPXDHits();
-      entry.setReconstructed(isReconstructed);
+        bool isReconstructed(false);
+        for (const RecoTrack& aRecoTrack : particle->getRelationsFrom<RecoTrack>())
+          isReconstructed |= aRecoTrack.hasPXDHits();
+        entry.setReconstructed(isReconstructed);
 
-      m_setHitXP.insert(entry);
+        m_setHitXP.insert(entry);
+      }
     }
+
+    for (auto element : m_setHitXP) {
+      m_hitXP.push_back(element);
+    }
+
   }
-
-  for (auto element : m_setHitXP) {
-    m_hitXP.push_back(element);
-  }
-
-
 
 }
 
@@ -192,8 +198,24 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
   hit8TrackBuilder(track);
   bool good = true;
   good = globalCut(m_8hitTrack);
-  if (good == false) return good;
-  if (track.getMomentumSeed().Mag() > m_pmax) return good;
+  if (good == false) {
+    if (m_outputFlag) {
+      m_numberOfCuts = 25;
+      m_nCutHit->Fill(m_numberOfCuts);
+      m_momCut->Fill(track.getMomentumSeed().Mag());
+      m_PDGIDCut->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
+    }
+    return good;
+  }
+
+  if (track.getMomentumSeed().Mag() > m_pmax) {
+    if (m_outputFlag) {
+      m_nCutHit->Fill(m_numberOfCuts);
+      m_momSel->Fill(track.getMomentumSeed().Mag());
+      m_PDGIDSel->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
+    }
+    return good;
+  }
   for (int i = 0; i < (int)(m_8hitTrack.size() - 2); i++) {
     double sinTheta = fabs(m_8hitTrack.at(i).m_momentum0.Y()) /
                       sqrt(pow(m_8hitTrack.at(i).m_momentum0.Y(), 2) +
@@ -211,18 +233,57 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
 
       if (!goodSeg) {
         good = false;
+        m_numberOfCuts++;
       }
-      if (i == 0) { //PXD crossing
+      if (i == 0) { //beampipe crossing
         std::vector<double> selCut0 = m_trackCuts.cutSelector(sinTheta, momentum, 0, m_8hitTrack.at(i).m_sensorLayer,
                                                               (NoKickCuts::EParameters) j);
 
         bool goodSeg0 = segmentSelector(m_8hitTrack.at(i), m_8hitTrack.at(i), selCut, (NoKickCuts::EParameters) j, true);
         if (!goodSeg0) {
           good = false;
+          m_numberOfCuts++;
         }
       }
 
     }
   }
+  if (m_outputFlag) {
+    m_nCutHit->Fill(m_numberOfCuts);
+    if (good) {
+      m_momSel->Fill(track.getMomentumSeed().Mag());
+      m_PDGIDSel->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
+    } else {
+      m_momCut->Fill(track.getMomentumSeed().Mag());
+      m_PDGIDCut->Fill(track.getRelationsTo<MCParticle>()[0]->getPDG());
+    }
+  }
   return good;
+}
+
+
+void NoKickRTSel::produceHistoNoKick()
+{
+  if (m_outputFlag) {
+    m_noKickOutputTFile->cd();
+    m_momSel->Write();
+    m_momCut->Write();
+
+    m_momEff->Add(m_momSel, 1);
+    m_momEff->Add(m_momCut, 1);
+    m_momEff->Divide(m_momSel, m_momEff, 1, 1);
+    m_momEff->Write();
+
+    m_PDGIDSel->Write();
+    m_PDGIDCut->Write();
+
+    m_PDGIDEff->Add(m_PDGIDSel, 1);
+    m_PDGIDEff->Add(m_PDGIDCut, 1);
+    m_PDGIDEff->Divide(m_PDGIDSel, m_PDGIDEff, 1, 1);
+    m_PDGIDEff->Write();
+
+    m_nCutHit->Write();
+
+    delete m_noKickOutputTFile;
+  }
 }

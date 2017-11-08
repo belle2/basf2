@@ -685,7 +685,7 @@ namespace Belle2 {
 
 //  Track and Event Level variables ------------------------------------------------------------------------
 
-    Manager::FunctionPtr SemiLeptonicVariables(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr BtagToWBosonVariables(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
         auto requestedVariable = arguments[0];
@@ -736,6 +736,7 @@ namespace Belle2 {
                                   momTarget; //Total Momentum of the recoiling X in CMS-System
             TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
             if (requestedVariable == "recoilMass") output = momX.M();
+            if (requestedVariable == "recoilMassSqrd") output = momX.M2();
             else if (requestedVariable == "pMissCMS") output = momMiss.Vect().Mag();
             else if (requestedVariable == "cosThetaMissCMS") output = TMath::Cos(momTarget.Angle(momMiss.Vect()));
             else if (requestedVariable == "EW90") {
@@ -755,14 +756,14 @@ namespace Belle2 {
               output = E_W_90;
             } else {
               B2FATAL("Wrong variable  " << requestedVariable <<
-                      " requested. The possibilities are recoilMass, pMissCMS, cosThetaMissCMS or EW90");
+                      " requested. The possibilities are recoilMass, recoilMassSqrd, pMissCMS, cosThetaMissCMS or EW90");
             }
           }
           return output;
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments (1 required) for meta function SemiLeptonicVariables");
+        B2FATAL("Wrong number of arguments (1 required) for meta function BtagToWBosonVariables");
       }
     }
 
@@ -883,16 +884,16 @@ namespace Belle2 {
         auto func = [particleListName, extraInfoName](const Particle * particle) -> double {
           if (!(extraInfoName == "isRightTrack(Electron)" || extraInfoName == "isRightTrack(IntermediateElectron)" || extraInfoName == "isRightTrack(Muon)" || extraInfoName == "isRightTrack(IntermediateMuon)"
           || extraInfoName == "isRightTrack(KinLepton)" || extraInfoName == "isRightTrack(IntermediateKinLepton)" || extraInfoName == "isRightTrack(Kaon)"
-          || extraInfoName == "isRightTrack(SlowPion)" || extraInfoName == "isRightTrack(FastPion)" || extraInfoName == "isRightTrack(MaximumPstar)" || extraInfoName == "isRightTrack(Lambda)"
+          || extraInfoName == "isRightTrack(SlowPion)" || extraInfoName == "isRightTrack(FastHadron)" || extraInfoName == "isRightTrack(MaximumPstar)" || extraInfoName == "isRightTrack(Lambda)"
           || extraInfoName == "isRightCategory(Electron)" || extraInfoName == "isRightCategory(IntermediateElectron)" || extraInfoName == "isRightCategory(Muon)" || extraInfoName == "isRightCategory(IntermediateMuon)"
           || extraInfoName == "isRightCategory(KinLepton)" || extraInfoName == "isRightCategory(IntermediateKinLepton)" || extraInfoName == "isRightCategory(Kaon)"
-          || extraInfoName == "isRightCategory(SlowPion)" || extraInfoName == "isRightCategory(FastPion)" || extraInfoName == "isRightCategory(KaonPion)" || extraInfoName == "isRightCategory(Lambda)"
+          || extraInfoName == "isRightCategory(SlowPion)" || extraInfoName == "isRightCategory(FastHadron)" || extraInfoName == "isRightCategory(KaonPion)" || extraInfoName == "isRightCategory(Lambda)"
           || extraInfoName == "isRightCategory(MaximumPstar)" || extraInfoName == "isRightCategory(FSC)"))
           {
             B2FATAL("hasHighestProbInCat: Not available category" << extraInfoName <<
-            ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda."
+            ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda."
             << endl <<
-            "The possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+            "The possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
             return 0.0;
           }
 
@@ -945,16 +946,16 @@ namespace Belle2 {
         auto func = [particleListName, extraInfoName](const Particle*) -> double {
           if (!(extraInfoName == "isRightTrack(Electron)" || extraInfoName == "isRightTrack(IntermediateElectron)" || extraInfoName == "isRightTrack(Muon)" || extraInfoName == "isRightTrack(IntermediateMuon)"
           || extraInfoName == "isRightTrack(KinLepton)" || extraInfoName == "isRightTrack(IntermediateKinLepton)" || extraInfoName == "isRightTrack(Kaon)"
-          || extraInfoName == "isRightTrack(SlowPion)" || extraInfoName == "isRightTrack(FastPion)" || extraInfoName == "isRightTrack(MaximumPstar)" || extraInfoName == "isRightTrack(Lambda)"
+          || extraInfoName == "isRightTrack(SlowPion)" || extraInfoName == "isRightTrack(FastHadron)" || extraInfoName == "isRightTrack(MaximumPstar)" || extraInfoName == "isRightTrack(Lambda)"
           || extraInfoName == "isRightCategory(Electron)" || extraInfoName == "isRightCategory(IntermediateElectron" || extraInfoName == "isRightCategory(Muon)" || extraInfoName == "isRightCategory(IntermediateMuon)"
           || extraInfoName == "isRightCategory(KinLepton)" || extraInfoName == "isRightCategory(IntermediateKinLepton)" || extraInfoName == "isRightCategory(Kaon)"
-          || extraInfoName == "isRightCategory(SlowPion)" || extraInfoName == "isRightCategory(FastPion)" || extraInfoName == "isRightCategory(KaonPion)" || extraInfoName == "isRightCategory(Lambda)"
+          || extraInfoName == "isRightCategory(SlowPion)" || extraInfoName == "isRightCategory(FastHadron)" || extraInfoName == "isRightCategory(KaonPion)" || extraInfoName == "isRightCategory(Lambda)"
           || extraInfoName == "isRightCategory(MaximumPstar)" || extraInfoName == "isRightCategory(FSC)"))
           {
             B2FATAL("HighestProbInCat: Not available category" << extraInfoName <<
-            ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda."
+            ". The possibilities for isRightTrack() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda."
             << endl <<
-            "The possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+            "The possibilities for isRightCategory() are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
             return 0.0;
           }
 
@@ -1007,7 +1008,7 @@ namespace Belle2 {
                                                "IntermediateKinLepton",// 5
                                                "Kaon",                 // 6
                                                "SlowPion",             // 7
-                                               "FastPion",             // 8
+                                               "FastHadron",             // 8
                                                "Lambda",               // 9
                                                "mcAssociated"          // 10
                                          };
@@ -1018,14 +1019,8 @@ namespace Belle2 {
 
         if (index == -1) {
           B2FATAL("isRightTrack: Not available category " << particleName <<
-                  ". The possibilities are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion and Lambda");
+                  ". The possibilities are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron and Lambda");
         }
-
-        std::vector<int> charmMesons = { 411, 421, 10411, 10421, 413, 423, 10413, 10423, 20413, 20423, 415, 425, 431, 10431, 433, 10433, 20433, 435};
-
-        std::vector<int> charmBaryons = { 4122, 4222, 4212, 4112, 4224, 4214, 4114, 4232, 4132, 4322, 4312, 4324, 4314, 4332, 4334, 4412, 4422,
-                                          4414, 4424, 4432, 4434, 4444
-                                        };
 
         auto func = [index](const Particle * particle) -> double {
 
@@ -1034,13 +1029,15 @@ namespace Belle2 {
 
           int mcPDG = TMath::Abs(mcParticle->getPDG());
 
-          // ---------------------------- Mothers and Grandmothers ---------------------------------
+          // ---------------------------- Mothers and Grandmothers ----------------------------------
           std::vector<int> mothersPDG;
+          std::vector<const MCParticle*> mothersPointers;
 
           const MCParticle* mcMother = mcParticle->getMother();
           while (mcMother != nullptr)
           {
             mothersPDG.push_back(TMath::Abs(mcMother->getPDG()));
+            if (index == 8) mothersPointers.push_back(mcMother);
             if (TMath::Abs(mcMother->getPDG()) == 511) break;
             mcMother = mcMother -> getMother();
           }
@@ -1050,57 +1047,158 @@ namespace Belle2 {
           //has associated mothers up to a B meson
           if (index == 10) return 1.0;
 
-          // ---------------------------------------------------------------------------------------
+          // ----------------  Is D Meson in the decay chain  --------------------------------------
+
+          bool isCharmedMesonInChain = false;
+
+          std::vector<int> charmMesons = { 411, 421, 10411, 10421, 413, 423, 10413, 10423, 20413, 20423, 415, 425, 431, 10431, 433, 10433, 20433, 435};
+
+          if ((index == 6) && mothersPDG.size() > 1)
+          {
+
+            for (auto& iMCMotherPDG : mothersPDG) {
+              if (std::find(charmMesons.begin(), charmMesons.end(), iMCMotherPDG) != charmMesons.end()) {
+                isCharmedMesonInChain = true;
+                break;
+              }
+            }
+
+          }
+
+          // ----------------  Is Charmed Baryon in the decay chain  --------------------------------
+
+          bool isCharmedBaryonInChain = false;
+
+          std::vector<int> charmBaryons = { 4122, 4222, 4212, 4112, 4224, 4214, 4114, 4232, 4132, 4322, 4312, 4324, 4314, 4332, 4334, 4412, 4422,
+                                            4414, 4424, 4432, 4434, 4444
+                                          };
+
+          if ((index == 6 || index == 9) && mothersPDG.size() > 1)
+          {
+
+            for (auto& iMCMotherPDG : mothersPDG) {
+              if (std::find(charmBaryons.begin(), charmBaryons.end(), iMCMotherPDG) != charmBaryons.end()) {
+                isCharmedBaryonInChain = true;
+                break;
+              }
+            }
+          }
+
+          // ----------------  Is neutral qqbar Meson in the decay chain  --------------------------------
+
+          bool isQQbarMesonInChain = false;
+
+          std::vector<int> qqbarMesons = {// light qqbar
+            111, 9000111, 100111, 10111, 200111, 113, 10113, 20113, 9000113, 100113, 9010113, 9020113, 30113, 9030113, 9040113,
+            115, 10115, 100115, 9000115, 117, 9000117, 9010117, 119,
+            // ssbar Mesons
+            221, 331, 9000221, 9010221, 100221, 10221, 100331, 9020221, 10331, 200221, 9030221, 9040221, 9050221, 9060221, 9070221, 223, 333, 10223, 20223,
+            10333, 20333, 100223, 9000223, 9010223, 30223, 100333, 225, 9000225, 335, 9010225, 9020225, 10225, 9030225, 10335, 9040225, 100225, 100335,
+            9050225, 9060225, 9070225, 227, 337, 229, 9000339, 9000229,
+            // ccbar Mesons
+            441, 10441, 100441, 443, 10443, 20443, 100443, 30443, 9000443, 9010443, 9020443, 445, 9000445
+          };
+
+          if ((index == 1 || index == 3 || index == 5 || index == 6 || index == 8) && mothersPDG.size() > 1)
+          {
+
+            for (auto& iMCMotherPDG : mothersPDG) {
+              if (std::find(qqbarMesons.begin(), qqbarMesons.end(), iMCMotherPDG) != qqbarMesons.end()) {
+                isQQbarMesonInChain = true;
+                break;
+              }
+            }
+
+          }
+
+          // --------------  Is the Hadron a descendent of a Meson that conserves flavor  --------------------------
+
+          bool isB0DaughterConservingFlavor = false;
+
+          std::vector<int> flavorConservingMesons = {// Excited light mesons that can decay into hadrons conserving flavor
+            9000211, 100211, 10211, 200211, 213, 10213, 20213, 9000213, 100213, 9010213, 9020213, 30213, 9030213, 9040213,
+            215, 10215, 100215, 9000215, 217, 9000217, 9010217, 219,
+            // Excited K Mesons that hadronize conserving flavor
+            30343, 10311, 10321, 100311, 100321, 200311, 200321, 9000311, 9000321, 313, 323, 10313, 10323, 20313, 20323, 100313, 100323,
+            9000313, 9000323, 30313, 30323, 315, 325, 9000315, 9000325, 10315, 10325, 20315, 20325, 100315, 100325, 9010315,
+            9010325, 317, 327, 9010317, 9010327, 319, 329, 9000319, 9000329
+          };
+
+          if ((index == 8) && mothersPDG.size() > 1)
+          {
+
+            if (std::find(flavorConservingMesons.begin(), flavorConservingMesons.end(),
+                          mothersPDG.rbegin()[1]) != flavorConservingMesons.end()) {
+              isB0DaughterConservingFlavor = true;
+            }
+
+          }
+
+          // -----------------------------  Is the Hadron a single daugther of a tau ----- --------------------------
+
+          bool isHadronSingleTauDaughter = false;
+
+          if (index == 8 && mothersPDG.size() > 1 && mothersPDG.rbegin()[1] == 15)
+          {
+            int numberOfChargedDaughters = 0;
+            for (auto& tauDaughter : mothersPointers.rbegin()[1] -> getDaughters()) {
+              if (tauDaughter -> getCharge() != 0) numberOfChargedDaughters += 1;
+            }
+            if (numberOfChargedDaughters == 1) isHadronSingleTauDaughter = true;
+          }
 
           //direct electron
-          else if (index == 0
-          && mcPDG == 11
-          && mothersPDG[0] == 511)
+          if (index == 0
+              && mcPDG == 11
+              && mothersPDG[0] == 511)
           {
             return 1.0;
             //intermediate electron
           } else if (index == 1
-          && mcPDG == 11 && mothersPDG.size() > 1 && mothersPDG[1] == 511)
+                     && mcPDG == 11 && mothersPDG.size() > 1
+                     && isQQbarMesonInChain == false)
           {
             return 1.0;
             //direct muon
           } else if (index == 2
-          && mcPDG == 13 && mothersPDG[0] == 511)
+                     && mcPDG == 13 && mothersPDG[0] == 511)
           {
             return 1.0;
             //intermediate muon
           } else if (index == 3
-          && mcPDG == 13 && mothersPDG.size() > 1 && mothersPDG[1] == 511)
+                     && mcPDG == 13 && mothersPDG.size() > 1
+                     && isQQbarMesonInChain == false)
           {
             return 1.0;
             //KinLepton
           } else if (index == 4
-          && (mcPDG == 13 || mcPDG == 11) && mothersPDG[0] == 511)
+                     && (mcPDG == 13 || mcPDG == 11) && mothersPDG[0] == 511)
           {
             return 1.0;
             //IntermediateKinLepton
           } else if (index == 5
-          && (mcPDG == 13 || mcPDG == 11) && mothersPDG.size() > 1 && mothersPDG[1] == 511)
+                     && (mcPDG == 13 || mcPDG == 11) && mothersPDG.size() > 1
+                     && isQQbarMesonInChain == false)
           {
             return 1.0;
             //kaon
           } else if (index == 6
-          && mcPDG == 321 && mothersPDG[0] > 400 && mothersPDG[0] < 500
-          && ((mothersPDG.size() > 1 && mothersPDG[1] == 511) || (mothersPDG.size() > 2 && mothersPDG[2] == 511)))
+                     && mcPDG == 321 && isQQbarMesonInChain == false && (isCharmedMesonInChain == true || isCharmedBaryonInChain == true))
           {
             return 1.0;
             //slow pion
           } else if (index == 7
-          && mcPDG == 211 && mothersPDG[0] == 413 && mothersPDG.size() > 1 && mothersPDG[1] == 511)
+                     && mcPDG == 211 && mothersPDG.size() > 1 && mothersPDG[0] == 413 && mothersPDG[1] == 511)
           {
             return 1.0;
-            //high momentum pions
+            //high momentum hadrons
           } else if (index == 8
-          && mcPDG == 211 && mothersPDG[0] == 511)
+                     && (mcPDG == 211 || mcPDG == 321) && isQQbarMesonInChain == false && (mothersPDG[0] == 511 || (mothersPDG.rbegin()[0] == 511
+                         && (isB0DaughterConservingFlavor == true || isHadronSingleTauDaughter == true))))
           {
             return 1.0;
             //lambdas
-          } else if (index == 9 && mcPDG == 3122)
+          } else if (index == 9 && mcPDG == 3122 && isCharmedBaryonInChain == true)
           {
             return 1.0;
           } else return 0.0;
@@ -1124,7 +1222,7 @@ namespace Belle2 {
                                               "IntermediateKinLepton",// 5
                                               "Kaon",                 // 6
                                               "SlowPion",             // 7
-                                              "FastPion",             // 8
+                                              "FastHadron",             // 8
                                               "KaonPion",             // 9
                                               "MaximumPstar",         // 10
                                               "FSC",                  // 11
@@ -1138,11 +1236,10 @@ namespace Belle2 {
 
         if (index == -1) {
           B2FATAL("isRightCategory: Not available category " << particleName <<
-                  ". The possibilities are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+                  ". The possibilities are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
         }
 
         auto func = [index](const Particle * particle) -> double {
-
 
           Particle* nullParticle = nullptr;
           float qTarget = particle -> getCharge();
@@ -1155,11 +1252,13 @@ namespace Belle2 {
 
           // ---------------------------- Mothers and Grandmothers ---------------------------------
           std::vector<int> mothersPDG;
+          std::vector<const MCParticle*> mothersPointers;
 
           const MCParticle* mcMother = mcParticle->getMother();
           while (mcMother != nullptr)
           {
             mothersPDG.push_back(TMath::Abs(mcMother->getPDG()));
+            if (index == 8 || index == 9) mothersPointers.push_back(mcMother);
             if (TMath::Abs(mcMother->getPDG()) == 511) break;
             mcMother = mcMother -> getMother();
           }
@@ -1168,9 +1267,109 @@ namespace Belle2 {
           //has associated mothers up to a B meson
           if (index == 13) return 1.0;
 
+          // ----------------  Is D Meson in the decay chain  --------------------------------------
+
+          bool isCharmedMesonInChain = false;
+
+          std::vector<int> charmMesons = { 411, 421, 10411, 10421, 413, 423, 10413, 10423, 20413, 20423, 415, 425, 431, 10431, 433, 10433, 20433, 435};
+
+          if ((index == 6) && mothersPDG.size() > 1)
+          {
+
+            for (auto& iMCMotherPDG : mothersPDG) {
+              if (std::find(charmMesons.begin(), charmMesons.end(), iMCMotherPDG) != charmMesons.end()) {
+                isCharmedMesonInChain = true;
+                break;
+              }
+            }
+
+          }
+
+          // ----------------  Is Charmed Baryon in the decay chain  --------------------------------
+
+          bool isCharmedBaryonInChain = false;
+
+          std::vector<int> charmBaryons = { 4122, 4222, 4212, 4112, 4224, 4214, 4114, 4232, 4132, 4322, 4312, 4324, 4314, 4332, 4334, 4412, 4422,
+                                            4414, 4424, 4432, 4434, 4444
+                                          };
+
+          if ((index == 6 || index == 12) && mothersPDG.size() > 1)
+          {
+
+            for (auto& iMCMotherPDG : mothersPDG) {
+              if (std::find(charmBaryons.begin(), charmBaryons.end(), iMCMotherPDG) != charmBaryons.end()) {
+                isCharmedBaryonInChain = true;
+                break;
+              }
+            }
+          }
+
+          // ----------------  Is neutral qqbar Meson in the decay chain  --------------------------------
+
+          bool isQQbarMesonInChain = false;
+
+          std::vector<int> qqbarMesons = {// light qqbar
+            111, 9000111, 100111, 10111, 200111, 113, 10113, 20113, 9000113, 100113, 9010113, 9020113, 30113, 9030113, 9040113,
+            115, 10115, 100115, 9000115, 117, 9000117, 9010117, 119,
+            // ssbar Mesons
+            221, 331, 9000221, 9010221, 100221, 10221, 100331, 9020221, 10331, 200221, 9030221, 9040221, 9050221, 9060221, 9070221, 223, 333, 10223, 20223,
+            10333, 20333, 100223, 9000223, 9010223, 30223, 100333, 225, 9000225, 335, 9010225, 9020225, 10225, 9030225, 10335, 9040225, 100225, 100335,
+            9050225, 9060225, 9070225, 227, 337, 229, 9000339, 9000229,
+            // ccbar Mesons
+            441, 10441, 100441, 443, 10443, 20443, 100443, 30443, 9000443, 9010443, 9020443, 445, 9000445
+          };
+
+          if ((index == 1 || index == 3 || index == 5 || index == 6 || index == 8 || index == 11) && mothersPDG.size() > 1)
+          {
+
+            for (auto& iMCMotherPDG : mothersPDG) {
+              if (std::find(qqbarMesons.begin(), qqbarMesons.end(), iMCMotherPDG) != qqbarMesons.end()) {
+                isQQbarMesonInChain = true;
+                break;
+              }
+            }
+
+          }
+
+          // --------------  Is the Hadron a descendent of a Meson that conserves flavor  --------------------------
+
+          bool isB0DaughterConservingFlavor = false;
+
+          std::vector<int> flavorConservingMesons = {// Excited light mesons that can decay into hadrons conserving flavor
+            9000211, 100211, 10211, 200211, 213, 10213, 20213, 9000213, 100213, 9010213, 9020213, 30213, 9030213, 9040213,
+            215, 10215, 100215, 9000215, 217, 9000217, 9010217, 219,
+            // Excited K Mesons that hadronize conserving flavor
+            30343, 10311, 10321, 100311, 100321, 200311, 200321, 9000311, 9000321, 313, 323, 10313, 10323, 20313, 20323, 100313, 100323,
+            9000313, 9000323, 30313, 30323, 315, 325, 9000315, 9000325, 10315, 10325, 20315, 20325, 100315, 100325, 9010315,
+            9010325, 317, 327, 9010317, 9010327, 319, 329, 9000319, 9000329
+          };
+
+          if ((index == 8) && mothersPDG.size() > 1)
+          {
+
+            if (std::find(flavorConservingMesons.begin(), flavorConservingMesons.end(),
+                          mothersPDG.rbegin()[1]) != flavorConservingMesons.end()) {
+              isB0DaughterConservingFlavor = true;
+            }
+
+          }
+
+          // -----------------------------  Is the Hadron a single daugther of a tau ----- --------------------------
+
+          bool isHadronSingleTauDaughter = false;
+
+          if (index == 8 && mothersPDG.size() > 1 && mothersPDG.rbegin()[1] == 15)
+          {
+            int numberOfChargedDaughters = 0;
+            for (auto& tauDaughter : mothersPointers.rbegin()[1] -> getDaughters()) {
+              if (tauDaughter -> getCharge() != 0) numberOfChargedDaughters += 1;
+            }
+            if (numberOfChargedDaughters == 1) isHadronSingleTauDaughter = true;
+          }
+
           // ----------------------------  For KaonPion Category ------------------------------------
-          int SlowPionPDG = 0;
-          int SlowPionPDGMother = 0;
+          const MCParticle* mcSlowPionMother;
+          bool haveKaonPionSameMother = false;
           // if KaonPion
           if (index == 9)
           {
@@ -1193,12 +1392,16 @@ namespace Belle2 {
               if (targetSlowPion != nullptr) {
                 const MCParticle* mcSlowPion = targetSlowPion ->getRelated<MCParticle>();
 //               SlowPion_q = targetSlowPion -> getCharge();
-                if (mcSlowPion != nullptr && mcSlowPion->getMother() != nullptr) {
-                  SlowPionPDG = TMath::Abs(mcSlowPion->getPDG());
-                  SlowPionPDGMother = TMath::Abs(mcSlowPion->getMother()->getPDG());
+                if (mcSlowPion != nullptr && mcSlowPion->getMother() != nullptr
+                    && TMath::Abs(mcSlowPion->getPDG()) == 211 && TMath::Abs(mcSlowPion->getMother()->getPDG()) == 413) {
+                  mcSlowPionMother = mcSlowPion->getMother();
                 }
               }
             }
+
+            if (std::find(mothersPointers.begin(), mothersPointers.end(), mcSlowPionMother) != mothersPointers.end())
+              haveKaonPionSameMother = true;
+
           }
 
           // ----------------------------  For FastSlowCorrelated Category ----------------------------
@@ -1242,7 +1445,8 @@ namespace Belle2 {
           {
             return 1.0;
           } else if (index == 1 // IntermediateElectron
-                     && qTarget != qMC && mcPDG == 11 && mothersPDG.size() > 1 && mothersPDG[1] == 511)
+                     && qTarget != qMC && mcPDG == 11 && mothersPDG.size() > 1
+                     && isQQbarMesonInChain == false)
           {
             return 1.0;
           } else if (index == 2 // Muon
@@ -1250,7 +1454,8 @@ namespace Belle2 {
           {
             return 1.0;
           } else if (index == 3 // IntermediateMuon
-                     && qTarget != qMC && mcPDG == 13 && mothersPDG.size() > 1 && mothersPDG[1] == 511)
+                     && qTarget != qMC && mcPDG == 13 && mothersPDG.size() > 1
+                     && isQQbarMesonInChain == false)
           {
             return 1.0;
           }  else if (index == 4 // KinLepton
@@ -1258,35 +1463,36 @@ namespace Belle2 {
           {
             return 1.0;
           }  else if (index == 5 // IntermediateKinLepton
-                      && qTarget != qMC && (mcPDG == 11 || mcPDG == 13) && mothersPDG.size() > 1 && mothersPDG[1] == 511)
+                      && qTarget != qMC && (mcPDG == 11 || mcPDG == 13) && mothersPDG.size() > 1
+                      && isQQbarMesonInChain == false)
           {
             return 1.0;
           } else if (index == 6 && qTarget == qMC // Kaon
-                     && mcPDG == 321 && mothersPDG[0] > 400 && mothersPDG[0] < 500
-                     && ((mothersPDG.size() > 1 && mothersPDG[1] == 511) || (mothersPDG.size() > 2 && mothersPDG[2] == 511)))
+                     && mcPDG == 321 && isQQbarMesonInChain == false && (isCharmedMesonInChain == true || isCharmedBaryonInChain == true))
           {
             return 1.0;
           } else if (index == 7 && qTarget != qMC // SlowPion
-                     && mcPDG == 211 && mothersPDG[0] == 413 && mothersPDG.size() > 1 && mothersPDG[1] == 511)
+                     && mcPDG == 211 && mothersPDG.size() > 1 && mothersPDG[0] == 413 && mothersPDG[1] == 511)
           {
             return 1.0;
-          } else if (index == 8 && qTarget == qMC // FastPion
-                     && mcPDG == 211 && mothersPDG[0] == 511)
+          } else if (index == 8 && qTarget == qMC // FastHadron
+                     && (mcPDG == 211 || mcPDG == 321) && isQQbarMesonInChain == false && (mothersPDG[0] == 511 || (mothersPDG.rbegin()[0] == 511
+                         && (isB0DaughterConservingFlavor == true || isHadronSingleTauDaughter == true))))
           {
             return 1.0;
           } else if (index == 9  && qTarget == qMC // KaonPion
-                     && mcPDG == 321 && SlowPionPDG == 211 && mothersPDG[0] == SlowPionPDGMother)
+                     && mcPDG == 321 && haveKaonPionSameMother == true)
           {
             return 1.0;
           } else if (index == 10 && qTarget == qMC) // MaximumPstar
           {
             return 1.0;
-          } else if (index == 11 && qTarget != qMC && qFSC == qMC // "FSC"
-                     && mcPDG == 211 && FastParticlePDGMother == 511)
+          } else if (index == 11 && qTarget != qMC && mothersPDG.size() > 1 && qFSC == qMC // "FSC"
+                     && mcPDG == 211 && FastParticlePDGMother == 511 && isQQbarMesonInChain == false)
           {
             return 1.0;
           } else if (index == 12 && (particle->getPDGCode() / TMath::Abs(particle->getPDGCode())) != qMC // Lambda
-                     && mcPDG == 3122)
+                     && mcPDG == 3122 && isCharmedBaryonInChain == true)
           {
             return 1.0;
           } else {
@@ -1319,7 +1525,7 @@ namespace Belle2 {
                                                              "isRightTrack(IntermediateKinLepton)",// 5
                                                              "isRightTrack(Kaon)",                 // 6
                                                              "isRightTrack(SlowPion)",             // 7
-                                                             "isRightTrack(FastPion)",             // 8
+                                                             "isRightTrack(FastHadron)",             // 8
                                                              "isRightTrack(MaximumPstar)",         // 9
                                                              "isRightTrack(Lambda)",                // 10
                                                              "isRightCategory(Electron)",             // 11
@@ -1330,7 +1536,7 @@ namespace Belle2 {
                                                              "isRightCategory(IntermediateKinLepton)",// 16
                                                              "isRightCategory(Kaon)",                 // 17
                                                              "isRightCategory(SlowPion)",             // 18
-                                                             "isRightCategory(FastPion)",             // 19
+                                                             "isRightCategory(FastHadron)",             // 19
                                                              "isRightCategory(MaximumPstar)",         // 20
                                                              "isRightCategory(Lambda)",                // 21
                                                              "isRightCategory(KaonPion)",             // 22
@@ -1348,16 +1554,16 @@ namespace Belle2 {
 
         if (indexRanking == -1) {
           B2FATAL("QpOf: Not available category " << rankingExtraInfo <<
-                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda"
+                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
                   <<
-                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
         }
 
         if (indexOutput == -1) {
           B2FATAL("QpOf: Not available category " << outputExtraInfo <<
-                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda"
+                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
                   <<
-                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
         }
 
 
@@ -1436,7 +1642,7 @@ namespace Belle2 {
                                                              "isRightTrack(IntermediateKinLepton)",// 5
                                                              "isRightTrack(Kaon)",                 // 6
                                                              "isRightTrack(SlowPion)",             // 7
-                                                             "isRightTrack(FastPion)",             // 8
+                                                             "isRightTrack(FastHadron)",             // 8
                                                              "isRightTrack(MaximumPstar)",         // 9
                                                              "isRightTrack(Lambda)",                // 10
                                                              "isRightCategory(Electron)",             // 11
@@ -1447,7 +1653,7 @@ namespace Belle2 {
                                                              "isRightCategory(IntermediateKinLepton)",// 16
                                                              "isRightCategory(Kaon)",                 // 17
                                                              "isRightCategory(SlowPion)",             // 18
-                                                             "isRightCategory(FastPion)",             // 19
+                                                             "isRightCategory(FastHadron)",             // 19
                                                              "isRightCategory(MaximumPstar)",         // 20
                                                              "isRightCategory(Lambda)",                // 21
                                                              "isRightCategory(KaonPion)",             // 22
@@ -1465,16 +1671,16 @@ namespace Belle2 {
 
         if (indexRanking == -1) {
           B2FATAL("weightedQpOf: Not available category " << rankingExtraInfo <<
-                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda"
+                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
                   <<
-                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
         }
 
         if (indexOutput == -1) {
           B2FATAL("weightedQpOf: Not available category " << outputExtraInfo <<
-                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, MaximumPstar, and Lambda"
+                  ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
                   <<
-                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+                  ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
         }
 
         auto func = [particleListName, indexOutput, indexRanking, rankingExtraInfo, availableExtraInfos](const Particle*) -> double {
@@ -1555,10 +1761,10 @@ namespace Belle2 {
         auto categoryName = arguments[0];
         auto func = [categoryName](const Particle*) -> double {
           if (!(categoryName == "Electron" || categoryName == "IntermediateElectron" || categoryName == "Muon" ||  categoryName == "IntermediateMuon" || categoryName == "KinLepton" || categoryName == "IntermediateKinLepton" || categoryName == "Kaon"
-          || categoryName == "SlowPion" ||  categoryName == "FastPion" || categoryName == "KaonPion" || categoryName == "Lambda" || categoryName == "MaximumPstar" ||  categoryName == "FSC"))
+          || categoryName == "SlowPion" ||  categoryName == "FastHadron" || categoryName == "KaonPion" || categoryName == "Lambda" || categoryName == "MaximumPstar" ||  categoryName == "FSC"))
           {
             B2FATAL("isCategoryTrue: Not available category" << categoryName <<
-            ". The possibilities for the category name are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+            ". The possibilities for the category name are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
             return 0.0;
           }
 
@@ -1619,10 +1825,10 @@ namespace Belle2 {
         auto categoryName = arguments[0];
         auto func = [categoryName](const Particle*) -> double {
           if (!(categoryName == "Electron" || categoryName == "IntermediateElectron" || categoryName == "Muon" ||  categoryName == "IntermediateMuon" || categoryName == "KinLepton" || categoryName == "IntermediateKinLepton" || categoryName == "Kaon"
-          || categoryName == "SlowPion" ||  categoryName == "FastPion" || categoryName == "KaonPion" || categoryName == "Lambda" || categoryName == "MaximumPstar" ||  categoryName == "FSC"))
+          || categoryName == "SlowPion" ||  categoryName == "FastHadron" || categoryName == "KaonPion" || categoryName == "Lambda" || categoryName == "MaximumPstar" ||  categoryName == "FSC"))
           {
             B2FATAL("isCategoryTrue: Not available category" << categoryName <<
-            ". The possibilities for the category name are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+            ". The possibilities for the category name are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
             return 0.0;
           }
 
@@ -1901,7 +2107,7 @@ namespace Belle2 {
                       "FlavorTagging:[Eventbased] Available checking variables are getListSize for particle lists.");
     REGISTER_VARIABLE("IsDaughterOf(variable)", IsDaughterOf, "Check if the particle is a daughter of the given list.");
 
-    REGISTER_VARIABLE("SemiLeptonicVariables(requestedVariable)", SemiLeptonicVariables,
+    REGISTER_VARIABLE("BtagToWBosonVariables(requestedVariable)", BtagToWBosonVariables,
                       "FlavorTagging:[Eventbased] Kinematical variables (recoilMass, pMissCMS, cosThetaMissCMS or EW90) assuming a semileptonic decay with the given particle as target.");
     REGISTER_VARIABLE("KaonPionVariables(requestedVariable)"  , KaonPionVariables ,
                       " Kinematical variables for KaonPion category (cosKaonPion or HaveOpositeCharges)");

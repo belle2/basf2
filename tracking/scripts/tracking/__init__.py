@@ -775,6 +775,9 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False, use_sec
                     ClusterFilter="mva_bkg",
                     ClusterFilterParameters={"cut": 0.2})
 
+    # run fast t0 estimation from CDC hits only
+    path.add_module("CDCHitBasedT0Extraction")
+
     # Find segments within the clusters
     path.add_module("TFCDC_SegmentFinderFacetAutomaton")
 

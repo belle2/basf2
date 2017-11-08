@@ -49,6 +49,7 @@ namespace Belle2 {
     public:
       ExecutionData() {};
       ~ExecutionData() {};
+      /// Resets this class back to what is needed at the beginning of an execution
       void reset()
       {
         B2DEBUG(100, "Resetting ExecutionData of algorithm");
@@ -258,6 +259,7 @@ namespace Belle2 {
     /// Set algorithm description (in constructor)
     void setDescription(std::string description) {m_description = description;}
 
+    /// Returns the Exp,Run pair that means 'Everything'. Currently unused.
     Calibration::ExpRun getAllGranularityExpRun() const {return m_allExpRun;}
 
   private:

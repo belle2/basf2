@@ -14,6 +14,7 @@
 
 namespace Belle2 {
 
+  /// Manager class for collector registered data. Handles much of the TDirectory/TObject manipulation
   class CalibObjManager {
 
   public:
@@ -37,20 +38,30 @@ namespace Belle2 {
       */
     void addObject(std::string name, std::shared_ptr<TNamed> object);
 
+    /// For each templated object we know about, we find an in memory object for this exprun and write to the TDirectory
     void writeCurrentObjects(const Calibration::ExpRun& expRun);
 
+    /// Deletes all in-memory objects in the exprun directories for all the collector objects we know about
     void clearCurrentObjects(const Calibration::ExpRun& expRun);
+
     /** Each object gets its own TDirectory under the main manager directory to store its objects.
       * We create them using this function.
       */
     void createDirectories();
 
+    /// For each templated object, we create a new TDirectory for this exprun
     void createExpRunDirectories(Calibration::ExpRun& expRun) const;
 
+    /// Scans the directory to get the highest "_i" index of an object with this name
     unsigned int getHighestIndexObject(const std::string name, const TDirectory* dir) const;
 
+    /// Clears the map of templated objects -> causing their destruction
     void deleteHeldObjects();
 
+    /** Gets the collector object of this name for the given exprun. If there already exists
+      * some objects it gets the highest index one if it is in-memory. If the highest index
+      * object is file resident it creates a new in memory object with a higher index.
+      */
     template<class T>
     T* getObject(const std::string name, const Belle2::Calibration::ExpRun expRun)
     {
@@ -106,7 +117,7 @@ namespace Belle2 {
 
     unsigned int extractKeyIndex(std::string& keyName) const;
   };
-  // Template specialization for TTree needs to be defined here to prevent automatic specialization being created
+  /// Template specialization for TTree needs to be defined here to prevent automatic specialization being created
   template<>
   TTree* CalibObjManager::cloneObj(TTree* source, std::string newName) const;
 }

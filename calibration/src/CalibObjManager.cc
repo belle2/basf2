@@ -85,7 +85,6 @@ namespace Belle2 {
     }
   }
 
-/// Scans the directory to get the highest "_i" index of an object with this name
   unsigned int CalibObjManager::getHighestIndexObject(const string name, const TDirectory* dir) const
   {
     unsigned int index = 0;

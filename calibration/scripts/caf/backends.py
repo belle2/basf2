@@ -28,6 +28,9 @@ _input_data_file_path = "input_data_files.data"
 
 
 def get_input_data():
+    """
+    Simple pickle load of the default input data pickle file name for the CAF
+    """
     with open(_input_data_file_path, 'br') as input_data_file:
         input_data = list(pickle.load(input_data_file))
     return input_data
@@ -52,8 +55,13 @@ class Job:
         """
 
         def __init__(self, job, subjob_id, input_files=None):
+            """
+            """
+            #: Id of Subjob
             self.id = subjob_id
+            #: Job() instance of parent to this SubJob
             self.parent = job
+            #: Input files specific to this subjob
             self.input_files = input_files
 
         @property
@@ -219,10 +227,12 @@ class Backend(ABC):
     Classes derived from this will implement their own submission of basf2 jobs
     to whatever backend they describe. Common methods/attributes go here.
     """
-
+    #: Default submission script name
     submit_script = "submit.sh"
 
     def __init__(self):
+        """
+        """
         pass
 
     @abstractmethod
@@ -473,7 +483,7 @@ class Batch(Backend):
         """
         Init method for Batch Backend. Does default setup based on config file.
         """
-        self.subjobs_to_files = None
+        #: ConfigParser object containing some setup config for this class
         self.config = configparser.ConfigParser()
         self.config.read(default_config_file)
 
@@ -610,11 +620,15 @@ class Batch(Backend):
     @classmethod
     @abstractmethod
     def _create_job_result(cls, job, batch_output):
+        """
+        """
         pass
 
     @classmethod
     @abstractmethod
     def _create_cmd(cls, job):
+        """
+        """
         pass
 
 
@@ -659,11 +673,15 @@ class PBS(Batch):
 
     @classmethod
     def _create_job_result(cls, job, batch_output):
+        """
+        """
         job_id = batch_output.replace("\n", "")
         job.result = cls.Result(job, job_id)
 
     @classmethod
     def _create_cmd(cls, script_path):
+        """
+        """
         submission_cmd = cls.submission_cmds[:]
         submission_cmd.append(script_path)
         return submission_cmd
@@ -757,6 +775,8 @@ class LSF(Batch):
 
     @classmethod
     def _create_cmd(cls, script_path):
+        """
+        """
         submission_cmd = cls.submission_cmds[:]
         submission_cmd.append(script_path)
         submission_cmd = " ".join(submission_cmd)
@@ -813,6 +833,8 @@ class LSF(Batch):
 
     @classmethod
     def _create_job_result(cls, job, batch_output):
+        """
+        """
         job_id = batch_output.split(" ")[1]
         for wrap in ["<", ">"]:
             job_id = job_id.replace(wrap, "")

@@ -85,6 +85,7 @@ namespace Belle2 {
       return nMerged;
     }
 
+    /// Set the m_granularity to an allowed value
     void setGranularity(std::string& granularity)
     {
       if (granularity == "all" || granularity == "run") {
@@ -94,6 +95,7 @@ namespace Belle2 {
       }
     }
 
+    /// Gets the m_granularity
     std::string getGranularity() const {return m_granularity;}
     /** Root-like Reset function for "template compatibility" with ROOT objects. Alias for clear(). */
     void Reset() {clear();}

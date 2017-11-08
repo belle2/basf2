@@ -49,7 +49,7 @@ namespace Belle2 {
     void endRun() final;
     /// Write the final objects to the file
     void terminate() final;
-
+    /// Runs due to HistoManager, allows us to discover the correct file
     void defineHisto() final;
 
     /// Register object with a name, takes ownership, do not access the pointer beyond prepare()
@@ -61,6 +61,7 @@ namespace Belle2 {
       m_manager.addObject(name, calObj);
     }
 
+    /// Calls the CalibObjManager to get the requested stored collector data
     template<class T>
     T* getObjectPtr(std::string name)
     {
@@ -81,6 +82,7 @@ namespace Belle2 {
     /// Replacement for defineHisto(). Do anything you would normally do in defineHisto here.
     virtual void inDefineHisto() {}
 
+    /// The top TDirectory that collector objects for this collector will be stored beneath
     TDirectory* m_dir;
 
     /// Controls the creation, collection and access to calibration objects
@@ -107,14 +109,16 @@ namespace Belle2 {
 
     /// Whether or not we will run the collect() at all this run, basically skips the event() function if false
     bool m_runCollectOnRun = true;
-    /// How many events processed for each ExpRun so far, stops counting up once max is hit
-    /// Only used/incremented if m_maxEventsPerRun > -1
+    /** How many events processed for each ExpRun so far, stops counting up once max is hit
+      * Only used/incremented if m_maxEventsPerRun > -1
+      */
     std::map<Calibration::ExpRun, int> m_expRunEvents;
     /// Will point at correct value in m_expRunEvents
     int* m_eventsCollectedInRun;
-    /// I'm a little worried about floating point precision when comparing to 0.0 and 1.0 as special values.
-    /// But since a user will have set them (or left them as default) as exactly equal to 0.0 or 1.0 rather
-    /// than calculating them in almost every case, I think we can assume that the equalities hold.
+    /** I'm a little worried about floating point precision when comparing to 0.0 and 1.0 as special values.
+      * But since a user will have set them (or left them as default) as exactly equal to 0.0 or 1.0 rather
+      * than calculating them in almost every case, I think we can assume that the equalities hold.
+      */
     bool getPreScaleChoice()
     {
       if (m_preScale == 1.) {

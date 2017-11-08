@@ -73,6 +73,7 @@ void EKLMTimeCalibrationCollectorModule::collect()
   std::multimap<int, ExtHit*>::iterator it, itLower, itUpper;
   ExtHit* extHit, *entryHit[2], *exitHit[2];
   const HepGeom::Transform3D* tr;
+  TTree* calibrationData = getObjectPtr<TTree>("calibration_data");
   n = tracks.getEntries();
   for (i = 0; i < n; i++) {
     RelationVector<ExtHit> extHits = tracks[i]->getRelationsTo<ExtHit>();
@@ -144,7 +145,7 @@ void EKLMTimeCalibrationCollectorModule::collect()
         m_GeoDat->stripNumber(digits[j]->getEndcap(), digits[j]->getLayer(),
                               digits[j]->getSector(), digits[j]->getPlane(),
                               digits[j]->getStrip());
-      getObjectPtr<TTree>("calibration_data")->Fill();
+      calibrationData->Fill();
     }
   }
 }

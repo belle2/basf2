@@ -54,6 +54,8 @@ namespace Belle2 {
     /**
      * Standard units with the value NOT equal to 1.
      * Their values are calculated by using the other standard units.
+     * If you need the magnetic field value in the unit where 1 Tesla = 1.0,
+     * use BFieldManager::getFieldInTesla(const B2Vector3D& pos).
      */
     static const double T;            /**< Standard of [magnetic field] */
 

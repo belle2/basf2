@@ -157,11 +157,6 @@ namespace Belle2 {
     return value;
   }
 
-  double Unit::getFieldInTesla(double value)
-  {
-    return value / Unit::T;
-  }
-
 }
 
 /*** The implementation of the Const class defined in Const.h starts here ***/

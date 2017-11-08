@@ -215,12 +215,13 @@ namespace Belle2 {
       }
 
       double t0Cal = 0.;
-      int channelID = 0; // 1-512
+      int channelID = 0; // 0-511
       int slotID = 0;    // 1-16
 
-      treeCal->SetBranchAddress("t0_const", &t0Cal);
+      treeCal->Show(1);
       treeCal->SetBranchAddress("channel", &channelID);
       treeCal->SetBranchAddress("slot", &slotID);
+      treeCal->SetBranchAddress("t0Const", &t0Cal);
 
       B2INFO("--> importing constats ");
 
@@ -231,7 +232,7 @@ namespace Belle2 {
                   "). Skipping the entry.");
           continue;
         }
-        if (channelID < 1 || channelID > 512) {
+        if (channelID < 0 || channelID > 511) {
           B2ERROR("Channel ID is not valid (fileName = " << fileName << ", SlotID = " << slotID << ", ChannelID = " << channelID <<
                   "). Skipping the entry.");
           continue;
@@ -250,9 +251,10 @@ namespace Belle2 {
 
     short nCalTot = 0;
     B2INFO("Summary: ");
-    for (int iSlot = 0; iSlot < 16; iSlot++) {
-      B2INFO("--> number of calibrated channels on Slot " << iSlot << " : " << nCal[iSlot] << "/512");
-      nCalTot += nCal[iSlot];
+    for (int iSlot = 1; iSlot < 17; iSlot++) {
+      B2INFO("--> number of calibrated channels on Slot " << iSlot << " : " << nCal[iSlot - 1] << "/512");
+      B2INFO(channelT0->getT0(iSlot, 0) << " " << channelT0->getT0(iSlot, 256) << " " << channelT0->getT0(iSlot, 511));
+      nCalTot += nCal[iSlot - 1];
     }
 
 

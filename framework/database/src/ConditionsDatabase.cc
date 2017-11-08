@@ -35,6 +35,7 @@ void ConditionsDatabase::createDefaultInstance(const std::string& globalTag, Log
 {
   ConditionsDatabase* database = new ConditionsDatabase(globalTag, payloadDir);
   database->setLogLevel(logLevel);
+  database->addLocalDirectory("/cvmfs/belle.cern.ch/conditions", EConditionsDirectoryStructure::c_flatDirectory);
   Database::setInstance(database);
 }
 
@@ -46,6 +47,7 @@ void ConditionsDatabase::createInstance(const std::string& globalTag, const std:
   ConditionsDatabase* database = new ConditionsDatabase(globalTag, fileBaseLocal);
   database->setRESTBase(restBaseName);
   database->addLocalDirectory(fileBaseName, EConditionsDirectoryStructure::c_logicalSubdirectories);
+  database->addLocalDirectory("/cvmfs/belle.cern.ch/conditions", EConditionsDirectoryStructure::c_flatDirectory);
   database->setLogLevel(logLevel, invertLogging);
   Database::setInstance(database);
 }

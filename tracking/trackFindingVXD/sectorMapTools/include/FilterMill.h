@@ -11,7 +11,7 @@
 #pragma once
 
 #include <framework/logging/Logger.h>
-
+#include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 #include <string>
 #include <vector>
 #include <utility> // std::pair, std::move
@@ -100,7 +100,7 @@ namespace Belle2 {
 
 
     /** add new Filter for 2 Hits . */
-    void add2HitFilter(std::pair<std::string, TwoHitFunction> newFilter)
+    void add2HitFilter(std::pair<const std::string, TwoHitFunction> newFilter)
     {
       if (m_locked) {
         B2ERROR("FilterMill-add2HitFilter: someone tried to add filter " << newFilter.first <<

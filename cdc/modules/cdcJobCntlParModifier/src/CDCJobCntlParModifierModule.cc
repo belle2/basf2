@@ -102,7 +102,7 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
 
   //displacement file
   addParam("DisplacementFile", m_displacementFile, "Input file name (on cdc/data) for wire displacement.",
-           string("displacement_v1.1.dat"));
+           string("displacement_v2.2.1.dat"));
   //alignment file
   addParam("AlignmentFile", m_alignmentFile, "Input file name (on cdc/data) for wire alignment.",  string("alignment_v2.dat"));
   //misalignment file

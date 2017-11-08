@@ -214,6 +214,9 @@ namespace Belle2 {
 
     /** some statistics for all files read so far. */
     ReadStats m_readStats;
+
+    /** Input ROOT File Cache size in MB, <0 means default */
+    int m_cacheSize{0};
   };
 } // end namespace Belle2
 

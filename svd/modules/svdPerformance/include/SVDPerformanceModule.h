@@ -54,22 +54,92 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
+    std::string m_ShaperDigitName; /**< */
+    std::string m_RecoDigitName; /**< */
     std::string m_ClusterName; /**< */
     std::string m_TrackFitResultName; /**< */
     std::string m_TrackName; /**< */
+    bool m_is2017TBanalysis; /**< true if we analyze 2017 TB data*/
 
-    bool isDUT(VxdID::baseType theVxdID);
-    bool isDUT_L3(VxdID::baseType theVxdID);
-    bool isDUT_L4(VxdID::baseType theVxdID);
-    bool isDUT_L5(VxdID::baseType theVxdID);
-    bool isDUT_L6(VxdID::baseType theVxdID);
+    float m_debugLowTime; /** cluster Time below this number will produce a printout */
 
-    TList* m_histoList;
+
+    /* user-defined parameters */
+    std::string m_rootFileName;   /**< root file name */
+
+    /* ROOT file related parameters */
+    TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
+
+  private:
+
+    SVDNoiseCalibrations m_NoiseCal;
+    SVDPulseShapeCalibrations m_PulseShapeCal;
+
+    int m_ntracks;
+
+    static const int m_nLayers = 4;
+    static const int m_nSensors = 5;
+    static const int m_nSides = 2;
+
+    unsigned int sensorsOnLayer[4];
 
     TList* m_histoList_track;
-    TList* m_histoList_clustertrk;
-    TList* m_histoList_cluster;
-    TList* m_histoList_shaper;
+    TList* m_histoList_clTRK[m_nLayers];
+    TList* m_histoList_cluster[m_nLayers];
+    TList* m_histoList_shaper[m_nLayers];
+    TList* m_histoList_reco[m_nLayers];
+
+    //TRACKS
+    TH1F* m_nTracks; /**< number of tracks*/
+    TH1F* m_Pvalue; /**< track p value*/
+    TH1F* m_mom; /**< track momentum*/
+    TH1F* m_nSVDhits; /**< track momentum*/
+
+    //SHAPER
+    TH1F* h_nShaper[m_nLayers][m_nSensors][m_nSides]; //number per event
+
+    //RECO
+    TH1F* h_nReco[m_nLayers][m_nSensors][m_nSides]; //number per event
+    TH1F* h_recoCharge[m_nLayers][m_nSensors][m_nSides]; //size
+    TH1F* h_stripNoise[m_nLayers][m_nSensors][m_nSides];  //strip noise
+    TH1F* h_recoTime[m_nLayers][m_nSensors][m_nSides];  //time
+
+    //CLUSTERS NOT RELATED TO TRACKS
+    TH1F* h_nCl[m_nLayers][m_nSensors][m_nSides]; //number per event
+    TH1F* h_clSize[m_nLayers][m_nSensors][m_nSides]; //size
+    TH1F* h_clCharge[m_nLayers][m_nSensors][m_nSides]; //charge
+    TH1F* h_clSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
+    TH2F* h_clChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
+    TH1F* h_clTime[m_nLayers][m_nSensors][m_nSides];  //time
+    TH2F* h_clTimeVSTrueTime[m_nLayers][m_nSensors][m_nSides];  //time VS true time
+
+    //CLUSTERS RELATED TO TRACKS
+    TH1F* h_nCltrk[m_nLayers][m_nSensors][m_nSides]; //number per event
+    TH1F* h_cltrkSize[m_nLayers][m_nSensors][m_nSides]; //size
+    TH1F* h_cltrkCharge[m_nLayers][m_nSensors][m_nSides]; //charge
+    TH1F* h_cltrkSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
+    TH2F* h_cltrkChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
+    TH1F* h_cltrkTime[m_nLayers][m_nSensors][m_nSides];  //time
+    TH2F* h_cltrkTimeVSTrueTime[m_nLayers][m_nSensors][m_nSides];  //time VS true time
+
+    //1-STRIP CLUSTERS
+    TH1F* h_1cltrkCharge[m_nLayers][m_nSensors][m_nSides]; //charge
+    TH1F* h_1cltrkSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
+
+    int getSensor(int layer, int sensor, bool isTB)
+    {
+      int result = 0;
+      if (isTB) {
+        if (layer == 0)
+          result = sensor - 1;
+        else if (layer == 1 || layer == 2)
+          result = sensor - 2;
+        else if (layer == 3)
+          result = sensor - 3;
+      } else result = sensor - 1;
+
+      return result;
+    }
 
     //list of functions to create histograms:
     TH1F* createHistogram1D(const char* name, const char* title,
@@ -107,48 +177,6 @@ namespace Belle2 {
     void addInefficiencyPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL,
                               TH3F* h3_MCParticle = NULL);  /**< inefficiency */
     void addPurityPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL, TH3F* h3_MCParticle = NULL);  /**< purity */
-
-
-    /* user-defined parameters */
-    std::string m_rootFileName;   /**< root file name */
-
-    /* ROOT file related parameters */
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
-
-  private:
-    SVDNoiseCalibrations m_NoiseCal;
-    SVDPulseShapeCalibrations m_PulseShapeCal;
-
-    int m_ntracks;
-
-    //TRACKS
-    TH1F* m_nTracks; /**< number of tracks*/
-    TH1F* m_Pvalue; /**< track p value*/
-    TH1F* m_mom; /**< track momentum*/
-    TH1F* m_nSVDhits; /**< track momentum*/
-
-    //STRIPS //layer sensor side
-    TH1F* h_stripNoise[4][2][2];  //strip noise
-
-    //CLUSTERS  //layer sensor side
-    TH1F* h_nCltrk[4][2][2]; //number per event
-    TH1F* h_cltrkSize[4][2][2]; //size
-    //1-STRIP CLUSTERS //layer sensor side
-    TH1F* h_1cltrkCharge[4][2][2]; //charge
-    TH2F* h_cltrkChargeVSSize[4][2][2]; //charge VS size
-    TH1F* h_1cltrkSN[4][2][2]; //signal over noise
-
-    int getSensor(int layer, int sensor)
-    {
-      int result = 0;
-      if (layer == 0)
-        result = sensor - 1;
-      else if (layer == 1 || layer == 2)
-        result = sensor - 2;
-      else if (layer == 3)
-        result = sensor - 3;
-      return result;
-    }
 
   };
 }

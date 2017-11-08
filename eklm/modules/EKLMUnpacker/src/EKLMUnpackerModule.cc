@@ -30,6 +30,7 @@ EKLMUnpackerModule::EKLMUnpackerModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("outputDigitsName", m_outputDigitsName,
            "Name of EKLMDigit store array", string("EKLMDigits"));
+  m_GeoDat = NULL;
 }
 
 EKLMUnpackerModule::~EKLMUnpackerModule()
@@ -40,6 +41,7 @@ void EKLMUnpackerModule::initialize()
 {
   StoreArray<EKLMDigit>eklmDigits(m_outputDigitsName);
   eklmDigits.registerInDataStore();
+  m_GeoDat = &(EKLM::GeometryData::Instance());
 }
 
 void EKLMUnpackerModule::beginRun()
@@ -53,9 +55,13 @@ void EKLMUnpackerModule::event()
    * detector buffer
    */
   const int hitLength = 2;
+  int endcap, layer, sector;
+  const int* sectorGlobal;
+  EKLMDataConcentratorLane lane;
   StoreArray<RawKLM> rawKLM;
   StoreArray<EKLMDigit> eklmDigits(m_outputDigitsName);
-
+  if (!m_ElectronicsMap.isValid())
+    B2FATAL("No EKLM electronics map.");
   B2DEBUG(1, "Unpacker has have " << rawKLM.getEntries() << " entries");
   for (int i = 0; i < rawKLM.getEntries(); i++) {
     if (rawKLM[i]->GetNumEvents() != 1) {
@@ -74,43 +80,15 @@ void EKLMUnpackerModule::event()
       B2DEBUG(1, "Opening data package from the COPPER " << copperId);
       if (copperId < EKLM_ID || copperId > EKLM_ID + 4)
         continue;
+      uint16_t copperN = copperId - EKLM_ID;
+      lane.setCopper(copperN);
       rawKLM[i]->GetBuffer(j);
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
         //addendum: There is always an additional word (count) in the end
         int numDetNwords = rawKLM[i]->GetDetectorNwords(j, finesse_num);
         int* buf_slot    = rawKLM[i]->GetDetectorBuffer(j, finesse_num);
         int numHits = numDetNwords / hitLength;
-
-        /*               Notes on geometry
-         *
-         *   Finesse = Data Concentrator number
-         *
-         *   Lower finesse is closer to the IP; a,b,c,d -> 0,1,2,3
-         *   Lower layer is lower lane in the data concentrator
-         *   !!!!MAY BE WRONG in the BACKWARD!!!!!
-         *
-         *           Endcap=1                  Endcap=2
-         *           _4____1____               _1____4____<--------- Sector number
-         *      EB0 /   ||   \\\\ EB1     EF0 /   ||   \\\\ EF1 <--- Number indicated on the crate
-         *         /7003||7003\\\\           /7001||7001\\\\ <------ Copper number
-         *        | a,b || c,d ||||         | a,b || c,d |||| <----- Finesse number
-         *_____\  |____/  \____||||  ____\  |____/  \____||||  _____\
-         *     /  |7004\  /7004||||      /  |    \  /    ||||       /  accelerator
-         *        |c,d  ||  a,b||||         | 7002||7002 ||||          direction
-         *         \    ||    ////           \c,d || a,b////
-         *      EB3 \___||___//// EB2     EF3 \___||___//// EF2
-         *            3    2                    2    3
-         */
-
-        uint16_t copperN = copperId - EKLM_ID;
-        uint16_t endcap = 2;
-        if (copperN > 2) endcap = 1;
-
-        uint16_t sector = 1;
-        if ((copperN == 4 && finesse_num < 2) || (copperN == 2 && finesse_num > 1)) sector = 2;
-        if ((copperN == 4 && finesse_num > 1) || (copperN == 2 && finesse_num < 2)) sector = 3;
-        if ((copperN == 3 && finesse_num < 2) || (copperN == 1 && finesse_num > 1)) sector = 4;
-
+        lane.setDataConcentrator(finesse_num);
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
           B2DEBUG(1, "word count incorrect: " << numDetNwords);
           continue;
@@ -129,13 +107,17 @@ void EKLMUnpackerModule::event()
                   bword3 << ", " << bword4);
           uint16_t strip  =   bword1 & 0x7F;
           uint16_t plane  = ((bword1 >> 7) & 1) + 1;
-          uint16_t layer  = ((bword1 >> 8) & 0x1F) + 1;
-          layer += (finesse_num % 2) * (5 + endcap);
+          lane.setLane((bword1 >> 8) & 0x1F);
 //        uint16_t ctime  =   bword2 & 0xFFFF; //full bword      unused yet
           uint16_t tdc    =   bword3 & 0x7FF;
           uint16_t charge =   bword4 & 0xFFFF;  // !!! THERE IS 15 BITS NOW!!!
           // !!! SHOULD BE 12 BITS !!!
 
+          sectorGlobal = m_ElectronicsMap->getSectorByLane(&lane);
+          if (sectorGlobal == NULL)
+            B2FATAL("Incomplete EKLM electronics map.");
+          m_GeoDat->sectorNumberToElementNumbers(*sectorGlobal,
+                                                 &endcap, &layer, &sector);
           EKLMDigit* idigit = eklmDigits.appendNew();
           idigit->setTime(tdc);
           idigit->setEndcap(endcap);

@@ -113,7 +113,7 @@ assert len(glob.glob('D*')) == 5
 
 # One training will fail D -> pi pi due to low statistic
 fei.do_trainings(particles, configuration)
-assert len(glob.glob('D*')) == 14
+assert len(glob.glob('D*')) == 15
 
 path = create_path()
 inputMdstList('MC6', ['./RootOutput.root'], path)

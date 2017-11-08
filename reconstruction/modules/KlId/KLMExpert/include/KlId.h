@@ -53,11 +53,11 @@ namespace KlId {
   int BelleECLFlag(const Belle2::KLMCluster& cluster, const float angle = 0.26)
   {
     const TVector3& pos = cluster.getClusterPosition();
-    Belle2::StoreArray<Belle2::ECLCluster> clusters;
+    Belle2::StoreArray<Belle2::ECLCluster> eclclusters;
 
-    for (const Belle2::ECLCluster& cluster : clusters) {
+    for (const Belle2::ECLCluster& eclcluster : eclclusters) {
 
-      const TVector3& clusterPos = cluster.getClusterPosition();
+      const TVector3& clusterPos = eclcluster.getClusterPosition();
 
       if (clusterPos.Angle(pos) < angle) {
         B2DEBUG(150, "BelleFlagECLAngle::" << clusterPos.Angle(pos));

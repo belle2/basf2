@@ -116,7 +116,7 @@ crashsafe_path.add_module("DAFRecoFitter",
 
 # Create Belle2 Tracks from the genfit Tracks
 crashsafe_path.add_module('TrackCreator',
-                          defaultPDGCode=13,
+                          pdgCodes=[13],
                           useClosestHitToIP=True
                           )
 

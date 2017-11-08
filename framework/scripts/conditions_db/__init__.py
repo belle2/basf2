@@ -8,6 +8,7 @@ conditions_db
 Python interface to the ConditionsDB
 """
 
+import os
 from basf2 import B2FATAL, B2ERROR, B2INFO
 import requests
 from requests.packages.urllib3.fields import RequestField
@@ -59,6 +60,11 @@ class ConditionsDB:
         self._session.mount(self._base_url, requests.adapters.HTTPAdapter(
             pool_connections=max_connections, pool_maxsize=max_connections,
             max_retries=retries, pool_block=True))
+        if "BELLE2_CONDB_PROXY" in os.environ:
+            self._session.proxies = {
+                "http": os.environ.get("BELLE2_CONDB_PROXY"),
+                "https": os.environ.get("BELLE2_CONDB_PROXY"),
+            }
 
     def request(self, method, url, message=None, *args, **argk):
         """

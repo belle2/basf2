@@ -386,11 +386,11 @@ void CDCDigitizerModule::event()
 
   for (iterSignalMap = signalMap.begin(); iterSignalMap != signalMap.end(); ++iterSignalMap) {
 
+    //switch off time-walk effect for a while
     //add time-walk (here for simplicity)
     //    unsigned short adcCount = getADCCount(iterSignalMap->second.m_charge);
     unsigned short adcCount = iterSignalMap->second.m_charge;
-    iterSignalMap->second.m_driftTime += m_cdcgp->getTimeWalk(iterSignalMap->first,
-                                                              adcCount);
+    //    iterSignalMap->second.m_driftTime += m_cdcgp->getTimeWalk(iterSignalMap->first, adcCount);
 
     //remove negative drift time (TDC) upon request
     if (!m_outputNegativeDriftTime &&

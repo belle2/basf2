@@ -37,7 +37,7 @@ inputMdstList('default', inputFile)
 
 
 # fill particleLists
-fillParticleList('e+:uncorrected', 'eid > 0.2 and d0 < 2 and abs(z0) < 4')
+fillParticleList('e+:uncorrected', 'electronID > 0.2 and d0 < 2 and abs(z0) < 4')
 fillParticleList('gamma:all', 'E < 1.0', False)
 
 # loose mc matching (recommended)
@@ -64,6 +64,11 @@ looseMCTruth('J/psi:corrected')
 fillParticleListFromMC('J/psi:MC', '', False, False)
 
 # write out ntuples
+
+# Please note, a new lepton is generated, with the old electron and -if found- a gamma as daughters.
+# Information attached to the track is only available for the old lepton, accessable via the daughter
+# metavariable, e.g. <daughter(0, eid)>.
+
 var0 = ['p',
         'px',
         'py',
@@ -71,6 +76,7 @@ var0 = ['p',
         'x',
         'y',
         'z',
+        'daughter(0, eid)',
         'PDG',
         'mcPDG',
         'E',

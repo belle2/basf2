@@ -17,10 +17,11 @@
 #include <geometry/CreatorManager.h>
 #include <geometry/CreatorBase.h>
 #include <geometry/utilities.h>
-#include <geometry/bfieldmap/BFieldMap.h>
-#include <framework/geometry/BFieldManager.h>
-#include <geometry/bfieldmap/BFieldFrameworkInterface.h>
 #include <geometry/dbobjects/GeoConfiguration.h>
+#include <geometry/bfieldmap/BFieldMap.h>
+#include <geometry/bfieldmap/BFieldFrameworkInterface.h>
+#include <framework/dbobjects/MagneticField.h>
+#include <framework/database/DBStore.h>
 
 #include "G4Box.hh"
 #include "G4ThreeVector.hh"
@@ -105,8 +106,6 @@ namespace Belle2 {
       for (CreatorBase* creator : m_creators) delete creator;
       m_creators.clear();
       m_topVolume = 0;
-      // empty magnetic field
-      BFieldManager::getInstance().clearComponents();
       //Clean up existing Geometry
       G4GeometryManager::GetInstance()->OpenGeometry();
       G4PhysicalVolumeStore::Clean();
@@ -227,6 +226,15 @@ namespace Belle2 {
       // remove the old geometry
       clear();
 
+      // if we don't use the DB make sure the magnetic field is properly set
+      // by adding it as a fake database payload
+      BFieldMap::Instance().clear();
+      if (!useDB) {
+        MagneticField* fieldmap = new MagneticField();
+        fieldmap->addComponent(new BFieldFrameworkInterface());
+        DBStore::Instance().addConstantOverride("MagneticField", fieldmap, false);
+      }
+
       //Let Geant4 know that we "modified" the geometry
       G4RunManager* runManager = G4RunManager::GetRunManager();
       if (runManager) runManager->ReinitializeGeometry(true, true);
@@ -239,9 +247,6 @@ namespace Belle2 {
       for (const GeoMaterial& mat : config.getMaterials()) {
         materials.createMaterial(mat);
       }
-
-      //Interface the magnetic field
-      BFieldManager::getInstance().addComponent(new BFieldFrameworkInterface());
 
       //Now set Top volume. Be aware that Geant4 uses "half size" so the size
       //will be in each direction even though the member name suggests a total size
@@ -315,8 +320,6 @@ namespace Belle2 {
       top_box->SetYHalfLength(getTopMinSize("y", kYAxis, top_log, yHalfLength));
       top_box->SetZHalfLength(getTopMinSize("z", kZAxis, top_log, zHalfLength));
 
-      B2DEBUG(50, "Initializing magnetic field if present ...");
-      BFieldMap::Instance().initialize();
       B2DEBUG(50, "Optimizing geometry and creating lookup tables ...");
       G4GeometryManager::GetInstance()->CloseGeometry(true, LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 200, PACKAGENAME()));
     }

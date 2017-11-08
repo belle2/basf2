@@ -19,16 +19,24 @@ using namespace std;
 void NtupleCMSKinematicsTool::setupTree()
 {
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
-  int nDecayProducts = strNames.size();
+  m_nDecayProducts = strNames.size();
 
-  m_fP = new float[nDecayProducts];
-  m_fP4 = new float*[nDecayProducts];
+  m_fP = new float[m_nDecayProducts];
+  m_fP4 = new float*[m_nDecayProducts];
 
-  for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
+  for (int iProduct = 0; iProduct < m_nDecayProducts; iProduct++) {
     m_tree->Branch((strNames[iProduct] + "_Pcms").c_str(), &m_fP[iProduct], (strNames[iProduct] + "_Pcms/F").c_str());
     m_fP4[iProduct] = new float[4];
     m_tree->Branch((strNames[iProduct] + "_P4cms").c_str(), &m_fP4[iProduct][0], (strNames[iProduct] + "_P4cms[4]/F").c_str());
   }
+}
+
+void NtupleCMSKinematicsTool::deallocateMemory()
+{
+  for (int iProduct = 0; iProduct < m_nDecayProducts; iProduct++)
+    delete [] m_fP4[iProduct];
+  delete [] m_fP;
+  delete [] m_fP4;
 }
 
 void NtupleCMSKinematicsTool::eval(const Particle* particle)

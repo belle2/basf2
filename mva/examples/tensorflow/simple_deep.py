@@ -92,7 +92,7 @@ def partial_fit(state, X, S, y, w, epoch):
             if epoch % 1000 == 0:
                 avg_cost = state.session.run(state.cost, feed_dict=feed_dict)
                 new_time = time.time()
-                print("Time Difference", new_time-old_time)
+                print("Time Difference", new_time - old_time)
                 old_time = new_time
                 print("Epoch:", '%04d' % (epoch), "cost=", "{:.9f}".format(avg_cost))
     return False
@@ -111,7 +111,7 @@ if __name__ == "__main__":
                  'daughter(0, dr)', 'daughter(1, dr)',
                  'daughter(0, dz)', 'daughter(1, dz)',
                  'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
-                 'daughter(0, Kid)', 'daughter(0, piid)',
+                 'daughter(0, kaonID)', 'daughter(0, pionID)',
                  'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"

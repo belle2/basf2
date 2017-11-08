@@ -73,6 +73,8 @@ void ECLLocalMaximumFinderModule::initialize()
   B2DEBUG(200, "ECLLocalMaximumFinderModule::initialize()");
 
   m_eclLocalMaximums.registerInDataStore(eclLocalMaximumArrayName());
+  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
+  m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
   m_eclConnectedRegions.registerRelationTo(m_eclLocalMaximums);
   m_eclCalDigits.registerRelationTo(m_eclLocalMaximums);
 
@@ -319,7 +321,7 @@ void ECLLocalMaximumFinderModule::event()
       double highestEnergy = 0.0;
 
       // Loop over all entries in this CR.
-      for (const ECLCalDigit& aECLCalDigit : aCR.getRelationsTo<ECLCalDigit>()) {
+      for (const ECLCalDigit& aECLCalDigit : aCR.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName())) {
         if (aECLCalDigit.getEnergy() > highestEnergy) {
           highestEnergyCellId = aECLCalDigit.getCellId();
           highestEnergy = aECLCalDigit.getEnergy();

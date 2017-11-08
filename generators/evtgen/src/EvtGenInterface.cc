@@ -32,6 +32,8 @@
 using namespace std;
 using namespace Belle2;
 
+EvtGenFwRandEngine EvtGenInterface::m_eng;
+
 EvtGenInterface::~EvtGenInterface()
 {
   EvtDecayTable* evtDecayTable = EvtDecayTable::getInstance();
@@ -43,15 +45,11 @@ EvtGenInterface::~EvtGenInterface()
   if (m_Generator) delete m_Generator;
 }
 
-int EvtGenInterface::setup(const std::string& DECFileName, const std::string& parentParticle,
-                           const std::string& userFileName)
+EvtGen* EvtGenInterface::createEvtGen(const std::string& DECFileName)
 {
-  B2INFO("Begin initialisation of EvtGen Interface.");
-
-  //tauola prints normal things to stderr.. oh well.
   IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Info, LogConfig::c_Info);
   initLogCapture.start();
-  EvtRandom::setRandomEngine((EvtRandomEngine*)&m_eng);
+  EvtRandom::setRandomEngine(&EvtGenInterface::m_eng);
 
   // Official BelleII models
   std::list<EvtDecayBase*> extraModels = EvtGenModelRegister::getModels();
@@ -62,13 +60,22 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
   list<EvtDecayBase*> modelList = genList.getListOfModels();
   extraModels.insert(extraModels.end(), modelList.begin(), modelList.end());
 
-  // Method to add User EvtGen models here
+  FileSystem::TemporaryFile tmp;
+  EvtGenDatabasePDG::Instance()->WriteEvtGenTable(tmp);
+  return new EvtGen(DECFileName.c_str(), tmp.getName().c_str(), &EvtGenInterface::m_eng,
+                    radCorrEngine, &extraModels, EvtCPUtil::Coherent);
+}
+
+int EvtGenInterface::setup(const std::string& DECFileName, const std::string& parentParticle,
+                           const std::string& userFileName)
+{
+  B2INFO("Begin initialisation of EvtGen Interface.");
+
+  //tauola prints normal things to stderr.. oh well.
+  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Info, LogConfig::c_Info);
+  initLogCapture.start();
   if (!m_Generator) {
-    FileSystem::TemporaryFile tmp;
-    EvtGenDatabasePDG::Instance()->WriteEvtGenTable(tmp);
-    int mixingType = EvtCPUtil::Coherent;
-    m_Generator = new EvtGen(DECFileName.c_str(), tmp.getName().c_str(), (EvtRandomEngine*)&m_eng, radCorrEngine, &extraModels,
-                             mixingType);
+    m_Generator = createEvtGen(DECFileName);
   }
   if (!userFileName.empty()) {
     m_Generator->readUDecay(userFileName.c_str());

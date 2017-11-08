@@ -58,7 +58,7 @@ void plot_dembc(TFile* pfile, TTree* ptree, TFile *outputFile){
 
  TH1F* h_eff = new TH1F("h_eff",title,1,0,1);
  h_eff->SetBinContent(1,ptree->GetEntries("B0_isSignal")/1000.0);
- h_eff->GetYaxis()->SetTitle("#varpesilon");           
+ h_eff->GetYaxis()->SetTitle("#varepsilon");           
  h_eff->GetListOfFunctions()->Add(new TNamed("Description", "B^{0}#rightarrow J/#psi(ee) K_{S}^{0} #varepsilon #equiv #frac{true selected signal events}{total number of events}"));
  h_eff->GetListOfFunctions()->Add(new TNamed("Contact" , "morda@pd.infn.it"));
  h_eff->GetListOfFunctions()->Add(new TNamed("Check", "Efficiency has to be the greatest as possible"));

@@ -69,9 +69,6 @@ SecMapTrainerVXDTFModule::SecMapTrainerVXDTFModule() :
   testData1.nHitsMin = 3;
   testData1.vIP = B2Vector3D(0, 0, 0);
   testData1.secMapName = "lowTestVXDTF";
-  testData1.twoHitFilters = { "distance3D", "distanceXY", "slopeRZ"};
-  testData1.threeHitFilters = { "angles3D", "deltaSlopeRZ"};
-  testData1.fourHitFilters = { "deltaDistance2IP"};
   testData1.mField = 1.5;
   testData1.rarenessThreshold = 0.001;
   testData1.quantiles = {0.005, 0.005};

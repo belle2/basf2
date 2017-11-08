@@ -19,8 +19,8 @@ from glob import glob
 inputMdstList('default', '../1213030101.dst.root')
 
 # create and fill pi/K ParticleLists
-fillParticleList('pi+:all', 'piid > 0.5 and d0 < 0.5 and abs(z0) < 1')
-fillParticleList('K+:all', 'Kid > 0.5 and d0 < 0.5 and abs(z0) < 1')
+fillParticleList('pi+:all', 'pionID > 0.5 and d0 < 0.5 and abs(z0) < 1')
+fillParticleList('K+:all', 'kaonID > 0.5 and d0 < 0.5 and abs(z0) < 1')
 
 # create Ks -> pi+ pi- list from V0
 stdKshorts()

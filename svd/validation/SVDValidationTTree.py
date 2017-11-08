@@ -114,24 +114,27 @@ class SVDValidationTTree(Module):
                 self.data.cluster_charge = cluster.getCharge()
                 self.data.cluster_seedCharge = cluster.getSeedCharge()
                 self.data.cluster_size = cluster.getSize()
+                cluster_position = cluster.getPosition()
+                if cluster.isUCluster():
+                    cluster_position = cluster.getPosition(truehit.getV())
                 # Interstrip position calculations
                 if cluster.isUCluster():
                     strip_dir = 0
-                    strip_pitch = sensorInfo.getUPitch(cluster.getPosition())
+                    strip_pitch = sensorInfo.getUPitch(cluster_position)
                 else:
                     strip_dir = 1
-                    strip_pitch = sensorInfo.getVPitch(cluster.getPosition())
+                    strip_pitch = sensorInfo.getVPitch(cluster_position)
                 self.data.strip_dir = strip_dir
                 self.data.strip_pitch = strip_pitch
-                cluster_interstripPosition = cluster.getPosition() % strip_pitch / strip_pitch
+                cluster_interstripPosition = cluster_position % strip_pitch / strip_pitch
                 self.data.cluster_interstripPosition = cluster_interstripPosition
                 # theta and phi definitions
                 if cluster.isUCluster():
-                    uPos = cluster.getPosition()
+                    uPos = cluster_position
                     vPos = 0
                 else:
                     uPos = 0
-                    vPos = cluster.getPosition()
+                    vPos = cluster_position
                 localPosition = TVector3(uPos, vPos, 0)  # sensor center at (0, 0, 0)
                 globalPosition = sensorInfo.pointToGlobal(localPosition)
                 x = globalPosition[0]
@@ -153,7 +156,7 @@ class SVDValidationTTree(Module):
                 self.data.cluster_theta = theta
                 self.data.cluster_phi = phi
                 # Pull calculations
-                clusterPos = cluster.getPosition()
+                clusterPos = cluster_position
                 clusterPosSigma = cluster.getPositionSigma()
                 if cluster.isUCluster():
                     truehitPos = truehit.getU()

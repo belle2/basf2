@@ -122,6 +122,14 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
         && !wireHit.getAutomatonCell().hasTakenFlag())
       continue;
 
+    // the taken flag is also set for background hits. Therefore we must
+    // also hits to be also classified as background to not get flooded
+    // with background hits
+    if (m_param_rejectIfNotTakenFlag
+        && wireHit.getAutomatonCell().hasTakenFlag()
+        && wireHit.getAutomatonCell().hasBackgroundFlag())
+      continue;
+
     timingHistgram.Fill(wireHit.getDriftTime());
   }
 

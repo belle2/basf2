@@ -1013,11 +1013,11 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     # setting different for pxd and svd:
     if is_pxd_used(components):
         setup_name = "SVDPXDDefault"
-        db_sec_map_file = "SVDPXDDefaultMap.root"
+        db_sec_map_file = "VXDSectorMap_v000.root"
         use_pxd = True
     else:
         setup_name = "SVDOnlyDefault"
-        db_sec_map_file = "SVDOnlyDefaultMap.root"
+        db_sec_map_file = "SVDSectorMap_v000.root"
         use_pxd = False
 
     #################

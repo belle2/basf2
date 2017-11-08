@@ -24,7 +24,7 @@ namespace Belle2 {
    * WARNING this method throws an exception!
    * */
   template <typename PointType >
-  class CIRCLECENTERXY_NAME : public SelectionVariable< PointType, B2Vector3<double> > {
+  class CIRCLECENTERXY_NAME : public SelectionVariable< PointType, 3, B2Vector3<double> > {
   public:
     /** this exception is thrown by the CircleFit and occurs when the track is too straight. */
     BELLE2_DEFINE_EXCEPTION(Straight_Line, "The hits are on a straight Line (or indistinguishably near to being on it).");

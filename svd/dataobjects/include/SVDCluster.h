@@ -13,6 +13,9 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <vxd/geometry/SensorInfoBase.h>
+#include <vxd/geometry/GeoCache.h>
+
 #include <sstream>
 
 namespace Belle2 {
@@ -103,9 +106,18 @@ namespace Belle2 {
     bool isUCluster() const { return m_isU; }
 
     /** Get the coordinate of reconstructed hit.
+     * The returned value is now dependent of vCluster and valid only and
+     * it is only relevant for wedged/slanted sensors because of their trapezoidal shape, for rectangular shapes, the value does not change
      * @return coordinate of the reconstructed hit.
      */
-    float getPosition() const { return m_position; }
+    float getPosition(double v = 0) const
+    {
+      if (v == 0) return m_position;
+      else {
+        const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(m_sensorID);
+        return (aSensorInfo->getWidth(v) / aSensorInfo->getWidth()) * m_position;
+      }
+    }
 
     /** Get the error of the reconstructed hit coordinate.
      * @return error of the reconstructed hit coordinate.

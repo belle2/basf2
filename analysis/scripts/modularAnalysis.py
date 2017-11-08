@@ -1896,10 +1896,15 @@ def writePi0EtaVeto(
     if not os.path.isdir(workingDirectory):
         os.mkdir(workingDirectory)
 
-    if downloadFlag:
-        use_central_database('development')
-        basf2_mva.download('Pi0VetoIdentifier', workingDirectory + '/pi0veto.root')
-        basf2_mva.download('EtaVetoIdentifier', workingDirectory + '/etaveto.root')
+    if not os.path.isfile(workingDirectory + '/pi0veto.root'):
+        if downloadFlag:
+            use_central_database('development')
+            basf2_mva.download('Pi0VetoIdentifier', workingDirectory + '/pi0veto.root')
+
+    if not os.path.isfile(workingDirectory + '/etaveto.root'):
+        if downloadFlag:
+            use_central_database('development')
+            basf2_mva.download('EtaVetoIdentifier', workingDirectory + '/etaveto.root')
 
     roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO'], extraInfoName='Pi0Veto',
                         identifier=workingDirectory + '/pi0veto.root')

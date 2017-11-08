@@ -85,14 +85,12 @@ writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', workingDirectory='./pi0etaveto')
 # You can change extraInfo names of pi0/eta probability by setting pi0vetoname and etavetoname parameters. For example,
 # writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', workingDirectory='./pi0etaveto', pi0vetoname='Pi0_Prob2', etavetoname='Eta_Prob2')
 
-# you need at least the default weight files: pi0veto.root and etaveto.root for writePi0EtaVeto.
-# These files are optimised by MC campaign 9.
-# downloadFlag parameter is set to True by default,
-# the default weight files are downloaded to your workingDirectory automatically from the database in that case.
+# You need at least the default weight files: pi0veto.root and etaveto.root for writePi0EtaVeto.
+# The default files are optimised by MC campaign 9.
+# These files are downloaded to your workingDirectory automatically from the database.
 # The default workingDirectory is '.'
 # You can also download them from following directory in KEKCC:
 # /gpfs/group/belle2/users/akimasa/pi0etaveto
-# If you have weight files in your workingDirectory already, please set downloadFlag to False.
 # If you train by yourself, you should refer to
 # B2A701-ContinuumSuppression_Input.py
 # B2A702-ContinuumSuppression_MVATrain.py

@@ -50,14 +50,11 @@ ADCCountTranslatorBase& CDCWireHit::getADCCountTranslator()
   return s_adcCountTranslator;
 }
 
-CDCWireHit::CDCWireHit()
-{
-}
-
 CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
                        const double driftLength,
                        const double driftLengthVariance,
-                       const double chargeDeposit)
+                       const double chargeDeposit,
+                       const double driftTime)
   : m_wireID(ptrHit->getID())
   , m_wire(CDCWire::getInstance(*ptrHit))
   , m_automatonCell(1)
@@ -65,6 +62,7 @@ CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
   , m_refDriftLengthVariance(driftLengthVariance)
   , m_refChargeDeposit(chargeDeposit)
   , m_hit(ptrHit)
+  , m_refDriftTime(driftTime)
 {
 }
 
@@ -100,6 +98,12 @@ CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
                              initialTOFEstimate,
                              true, // bool leftRight
                              getWire().getRefZ());
+
+  m_refDriftTime = tdcCountTranslator.getDriftTime(hit.getTDCCount(),
+                                                   getWireID(),
+                                                   initialTOFEstimate,
+                                                   getWire().getRefZ(),
+                                                   hit.getADCCount());
 
   m_refDriftLength = (refDriftLengthLeft + refDriftLengthRight) / 2.0;
 

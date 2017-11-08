@@ -74,7 +74,8 @@ void CDCHitBasedT0Extraction::exposeParameters(ModuleParamList* moduleParamList,
 
   moduleParamList->addParameter(prefixed(prefix, "rejectIfNotTakenFlag"),
                                 m_param_rejectIfNotTakenFlag,
-                                "Don't consider hits which have not been assigned during track finding",
+                                "Don't consider hits which have not been assigned during track finding. The CDC track finding has "
+                                "to be run before for this flag to be useful.",
                                 m_param_rejectIfNotTakenFlag);
 
   moduleParamList->addParameter(prefixed(prefix, "rejectIfChiSquareLargerThan"),

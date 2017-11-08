@@ -505,7 +505,12 @@ class Algorithm():
         #: assumed to be the CalibrationAlgorithm instance, and iteration is an int e.g. 0, 1, 2...
         self.pre_algorithm = pre_algorithm
         #: The algorithm stratgey that will be used when running over the collected data
-        self.strategy_type = strategies.SingleIOV
+        self.strategy = strategies.SingleIOV
+        #: Parameters that could be used in the execution of the algorithm strategy/runner to modify behaviour.
+        #: By default this is empty and not used by the `strategies.SingleIOV` class. But more complex strategies
+        #: or your own custom ones could use it to configure behaviour. Note that if you modify this inside a subprocess
+        #: the modification won't persist outside, you would have to change it in the parent process
+        self.params = {}
 
     def default_inputdata_setup(self, input_file_paths):
         """
@@ -694,6 +699,8 @@ class CAF():
                 calibration.iov = iov
                 if not calibration.backend:
                     calibration.backend = self.backend
+                # Daemonize so that it exits if the main program exits
+                calibration.daemon = True
             from time import sleep
             finished = False
             while not finished:

@@ -71,7 +71,6 @@ class SingleIOV(AlgorithmStrategy):
         """
         super().__init__(algorithm)
         #: Create a basic (mostly empty) AlgorithmMachine, gets setup properly in run()
-
         self.machine = AlgorithmMachine(self.algorithm)
 
     def run(self, iov, iteration):

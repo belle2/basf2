@@ -56,17 +56,19 @@ namespace Belle2 {
 
   private:
     /** Name of the collection to use for the Reco Track */
-    std::string m_storeRecoTrackName;
+//    std::string m_storeRecoTrackName;
     /** Frames StoreArray name */
-    std::string m_storeFramesName;
+//    std::string m_storeFramesName;
 
-    /** Track momentum - X */
+    /** Track momentum Pt.X */
     TH1F* m_MomX;
-    /** Track momentum - Y */
+    /** Track momentum Pt.Y */
     TH1F* m_MomY;
-    /** Track momentum - Z */
+    /** Track momentum Pt.Z */
     TH1F* m_MomZ;
-    /** Track momentum pT */
+    /** Track momentum Pt */
+    TH1F* m_MomPt;
+    /** Track momentum Magnitude */
     TH1F* m_Mom;
     /** Number of hits on PXD */
     TH1F* m_HitsPXD;

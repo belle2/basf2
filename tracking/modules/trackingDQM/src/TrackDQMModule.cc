@@ -5,7 +5,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Peter Kodys                                              *
  *                                                                        *
- * Prepared for cluster shape correction quality check                    *
+ * Prepared for Tracking DQM                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,8 +14,9 @@
 #include <tracking/modules/trackingDQM/TrackDQMModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <tracking/dataobjects/RecoTrack.h>
+#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
+#include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 #include <framework/database/DBObjPtr.h>
 
@@ -61,8 +62,6 @@ void TrackDQMModule::initialize()
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 
-  StoreArray<RecoTrack> recotracks(m_storeRecoTrackName);
-  m_storeRecoTrackName = recotracks.getName();
 }
 
 void TrackDQMModule::defineHisto()
@@ -108,8 +107,13 @@ void TrackDQMModule::defineHisto()
   m_MomZ = new TH1F(name.c_str(), title.c_str(), 2 * iMomRange, -fMomRange, fMomRange);
   m_MomZ->GetXaxis()->SetTitle("Momentum");
   m_MomZ->GetYaxis()->SetTitle("counts");
-  name = str(format("TrackMomentum"));
-  title = str(format("Track Momentum"));
+  name = str(format("TrackMomentumPt"));
+  title = str(format("Track Momentum pT"));
+  m_MomPt = new TH1F(name.c_str(), title.c_str(), 2 * iMomRange, 0.0, fMomRange);
+  m_MomPt->GetXaxis()->SetTitle("Momentum");
+  m_MomPt->GetYaxis()->SetTitle("counts");
+  name = str(format("TrackMomentumMag"));
+  title = str(format("Track Momentum Magnitude"));
   m_Mom = new TH1F(name.c_str(), title.c_str(), 2 * iMomRange, 0.0, fMomRange);
   m_Mom->GetXaxis()->SetTitle("Momentum");
   m_Mom->GetYaxis()->SetTitle("counts");
@@ -179,65 +183,45 @@ void TrackDQMModule::beginRun()
 
 void TrackDQMModule::event()
 {
-  StoreArray<RecoTrack> recotracks(m_storeRecoTrackName);
   int iTrack = 0;
   int iTrackVXD = 0;
   int iTrackCDC = 0;
   int iTrackVXDCDC = 0;
-  for (auto& recoTrack : recotracks) {  // over recotracks
-    if (!recoTrack.wasFitSuccessful())
-      continue;
-    if (!recoTrack.getTrackFitStatus())
-      continue;
-    auto& genfitTrack = RecoTrackGenfitAccess::getGenfitTrack(recoTrack);
-    TString message = Form("TrackDQM: track %3i, Mom: %f, %f, %f, Pt: %f +- %f, Hits: ",
-                           iTrack,
-                           genfitTrack.getFittedState().getMom().X(),
-                           genfitTrack.getFittedState().getMom().Y(),
-                           genfitTrack.getFittedState().getMom().Z(),
-                           genfitTrack.getFittedState().getMom().Perp(),
-                           genfitTrack.getFittedState().getMomVar()
-                          );
-    int valAll = 0;
-    int val = 0;
-    if (recoTrack.getNumberOfPXDHits() > 0) {
-      val = recoTrack.getNumberOfPXDHits();
-    }
-    message = Form("%sPXD %i ", message.Data(), val);
-    valAll += val;
-    val = 0;
-    if (recoTrack.getNumberOfSVDHits() > 0) {
-      val = recoTrack.getNumberOfSVDHits();
-    }
-    message = Form("%sSVD %i ", message.Data(), val);
-    valAll += val;
-    val = 0;
-    if (recoTrack.getNumberOfCDCHits() > 0) {
-      val = recoTrack.getNumberOfCDCHits();
-    }
-    message = Form("%sCDC %i ", message.Data(), val);
-    valAll += val;
-    message = Form("%sSuma %i (%i) ", message.Data(), valAll, genfitTrack.getNumPoints());
-    B2DEBUG(230, message.Data());
 
+  StoreArray<Track> tracks;
+  for (const Track& track : tracks) {
+    RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);
+    RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(theRC[0]);
+    int nPXD = (int)pxdClustersTrack.size();
+    RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(theRC[0]);
+    int nSVD = (int)svdClustersTrack.size();
+    RelationVector<CDCHit> cdcHitTrack = DataStore::getRelationsWithObj<CDCHit>(theRC[0]);
+    int nCDC = (int)cdcHitTrack.size();
+    const TrackFitResult* tfr = track.getTrackFitResult(Const::pion);
+    if (tfr == nullptr) continue;
+    TString message = Form("TrackDQM: track %3i, Mom: %f, %f, %f, Pt: %f, Mag: %f, Hits: PXD %i SVD %i CDC %i Suma %i\n",
+                           iTrack,
+                           (float)tfr->getMomentum().Px(),
+                           (float)tfr->getMomentum().Py(),
+                           (float)tfr->getMomentum().Pz(),
+                           (float)tfr->getMomentum().Pt(),
+                           (float)tfr->getMomentum().Mag(),
+                           nPXD, nSVD, nCDC, nPXD + nSVD + nCDC
+                          );
+    B2DEBUG(230, message.Data());
     iTrack++;
-    if (((recoTrack.getNumberOfPXDHits() > 0) || (recoTrack.getNumberOfSVDHits() > 0)) &&
-        (recoTrack.getNumberOfCDCHits() > 0)) iTrackVXDCDC++;
-    if (((recoTrack.getNumberOfPXDHits() > 0) || (recoTrack.getNumberOfSVDHits() > 0)) &&
-        (recoTrack.getNumberOfCDCHits() == 0)) iTrackVXD++;
-    if (((recoTrack.getNumberOfPXDHits() == 0) && (recoTrack.getNumberOfSVDHits() == 0)) &&
-        (recoTrack.getNumberOfCDCHits() > 0)) iTrackCDC++;
-    if (m_MomX != NULL) m_MomX->Fill(genfitTrack.getFittedState().getMom().X());
-    if (m_MomY != NULL) m_MomY->Fill(genfitTrack.getFittedState().getMom().Y());
-    if (m_MomZ != NULL) m_MomZ->Fill(genfitTrack.getFittedState().getMom().Z());
-    if (m_Mom != NULL) m_Mom->Fill(genfitTrack.getFittedState().getMom().Perp());
-    if (m_HitsPXD != NULL) m_HitsPXD->Fill(recoTrack.getNumberOfPXDHits());
-    if (m_HitsSVD != NULL) m_HitsSVD->Fill(recoTrack.getNumberOfSVDHits());
-    if (m_HitsCDC != NULL) m_HitsCDC->Fill(recoTrack.getNumberOfCDCHits());
-    // if (m_Hits != NULL) m_Hits->Fill(genfitTrack.getNumPoints()); // not works for Phase2 geometry!!!
-    if (m_Hits != NULL) m_Hits->Fill(recoTrack.getNumberOfPXDHits() +
-                                       recoTrack.getNumberOfSVDHits() + recoTrack.getNumberOfCDCHits()
-                                      );
+    if (((nPXD > 0) || (nSVD > 0)) && (nCDC > 0)) iTrackVXDCDC++;
+    if (((nPXD > 0) || (nSVD > 0)) && (nCDC == 0)) iTrackVXD++;
+    if (((nPXD == 0) && (nSVD == 0)) && (nCDC > 0)) iTrackCDC++;
+    if (m_MomX != NULL) m_MomX->Fill(tfr->getMomentum().Px());
+    if (m_MomY != NULL) m_MomY->Fill(tfr->getMomentum().Py());
+    if (m_MomZ != NULL) m_MomZ->Fill(tfr->getMomentum().Pz());
+    if (m_MomPt != NULL) m_MomPt->Fill(tfr->getMomentum().Pt());
+    if (m_Mom != NULL) m_Mom->Fill(tfr->getMomentum().Mag());
+    if (m_HitsPXD != NULL) m_HitsPXD->Fill(nPXD);
+    if (m_HitsSVD != NULL) m_HitsSVD->Fill(nSVD);
+    if (m_HitsCDC != NULL) m_HitsCDC->Fill(nCDC);
+    if (m_Hits != NULL) m_Hits->Fill(nPXD + nSVD + nCDC);
   }
   if (m_TracksVXD != NULL) m_TracksVXD->Fill(iTrackVXD);
   if (m_TracksCDC != NULL) m_TracksCDC->Fill(iTrackCDC);

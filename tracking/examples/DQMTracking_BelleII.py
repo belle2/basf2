@@ -40,7 +40,7 @@ main = create_path()
 main.add_module('EventInfoSetter', evtNumList=num_events)
 
 # in case you need to fix seed of random numbers
-# set_random_seed(1111123)
+# set_random_seed(1234123)
 
 # generate BBbar events
 evtgeninput = register_module('EvtGenInput')
@@ -76,7 +76,7 @@ main.add_module(histomanager)
 # DQM of tracking
 trackDQM = register_module('TrackDQM')
 # In case to see more details:
-trackDQM.logging.log_level = LogLevel.DEBUG
+# trackDQM.logging.log_level = LogLevel.DEBUG
 trackDQM.logging.debug_level = 250
 main.add_module(trackDQM)
 

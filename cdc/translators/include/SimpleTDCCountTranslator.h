@@ -54,7 +54,7 @@ namespace Belle2 {
                             double z = 0,
                             double = 0,
                             double = 0,
-                            unsigned short = 0);
+                            unsigned short = 0) override;
 
       /**
        * Get Drift time.
@@ -82,7 +82,7 @@ namespace Belle2 {
                                       bool = false,
                                       double = 0,
                                       double = 0,
-                                      double = 0);
+                                      double = 0) override;
 
     private:
       /**

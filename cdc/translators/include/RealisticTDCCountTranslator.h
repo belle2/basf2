@@ -62,7 +62,7 @@ namespace Belle2 {
                             double z = 0,
                             double alpha = 0,
                             double theta = static_cast<double>(TMath::Pi() / 2.),
-                            unsigned short adcCount = 0);
+                            unsigned short adcCount = 0) override;
 
       /**
        * Get Drift time.
@@ -77,7 +77,7 @@ namespace Belle2 {
                           const WireID& wireID,
                           double timeOfFlightEstimator,
                           double z,
-                          unsigned short adcCount);
+                          unsigned short adcCount) override;
 
       /**
        * Get position resolution^2 corresponding to the drift length
@@ -95,7 +95,7 @@ namespace Belle2 {
                                       bool leftRight = false,
                                       double z = 0,
                                       double alpha = 0,
-                                      double = static_cast<double>(TMath::Pi() / 2.));
+                                      double = static_cast<double>(TMath::Pi() / 2.)) override;
 
     private:
       /**

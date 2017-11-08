@@ -138,8 +138,8 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
   // the cumulated plot
   timingHistgram.SetBinContent(1, timingHistgram.GetBinContent(1) + 1);
 
-  B2INFO(
-    "Filled histogram with " << timingHistgram.GetEntries() << " Entries");
+  B2DEBUG(50,
+          "Filled histogram with " << timingHistgram.GetEntries() << " Entries");
 
   std::unique_ptr<TH1> cumTimingHistogram(timingHistgram.GetCumulative());
   // detach histogram from any directory so we can delete it ourselves
@@ -227,7 +227,7 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
                                            fitted_t0_first - m_param_refitWindow, fitted_t0_first + m_param_refitWindow);
       refitSuccess = true;
     } else {
-      B2INFO("First t0 estimate not in proper range" << fitted_t0_first);
+      B2DEBUG(50, "First t0 estimate not in proper range" << fitted_t0_first);
     }
 
     if (m_param_storeAllFits) {
@@ -240,21 +240,21 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
       const double fitted_t0_error = fitresFull->Error(3);
 
       if (fitresFull->Chi2() > m_param_rejectIfChiSquareLargerThan) {
-        B2INFO(
-          "T0 fit has too large Chi2 " << fitresFull->Chi2());
+        B2DEBUG(50,
+                "T0 fit has too large Chi2 " << fitresFull->Chi2());
       } else {
 
         m_eventT0->addEventT0(fitted_t0, fitted_t0_error, Const::CDC);
-        B2INFO(
-          "Successful t0 extraction with CDC hits: " << fitted_t0 << " +- " << fitted_t0_error);
+        B2DEBUG(50,
+                "Successful t0 extraction with CDC hits: " << fitted_t0 << " +- " << fitted_t0_error);
       }
     } else {
-      B2INFO(
-        "Cannot fit t0 from CDC hits only. Won't set EventT0 for now.");
+      B2DEBUG(50,
+              "Cannot fit t0 from CDC hits only. Won't set EventT0 for now.");
     }
   } else {
-    B2INFO(
-      "Cannot extract background or signal segment because fit failed. Won't set EventT0 for now.");
+    B2DEBUG(50,
+            "Cannot extract background or signal segment because fit failed. Won't set EventT0 for now.");
   }
 
   if (m_param_storeAllFits) {

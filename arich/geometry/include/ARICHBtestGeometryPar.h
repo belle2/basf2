@@ -25,6 +25,7 @@
 #include <G4MaterialPropertyVector.hh>
 #include <cmath>
 #include <boost/format.hpp>
+#include <iomanip>
 
 
 namespace Belle2 {

@@ -3,7 +3,7 @@
 * Copyright(C) 2014 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Jakob Lettenbichler (jakob.lettenbichler@oeaw.ac.at)     *
+* Contributors: Eugenio Paloni                                           *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -11,26 +11,25 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariable.h>
-#include <math.h>
 
-#define DISTANCE2DXYSQUARED_NAME Distance2DXYSquared
+#define DISTANCEINTIME DistanceInTime
 
 namespace Belle2 {
 
-  /** This is the specialization for SpacePoints with returning floats, where value calculates the squared distance between two hits in 2D on the X-Y-plane */
+  /** This variable returns the difference among the V and U side clusters of th ecenter space point*/
   template <typename PointType>
-  class DISTANCE2DXYSQUARED_NAME : public SelectionVariable< PointType , 2, double > {
+  class DISTANCEINTIME : public SelectionVariable< PointType , 3, double > {
   public:
 
     /** is expanded as "static const std:string name(void)" frunction which returns name of the Class */
-    PUT_NAME_FUNCTION(DISTANCE2DXYSQUARED_NAME);
+    PUT_NAME_FUNCTION(DISTANCEINTIME);
 
-    /** calculates the squared distance between the hits (2D on the X-Y-plane), returning unit: cm^2 for speed optimization */
-    static double value(const PointType& outerHit, const PointType& innerHit)
+    /** return the time difference (ns) among the V and U side clusters of th ecenter space point */
+    static double value(const PointType&, const PointType& centerHit, const PointType&)
+
     {
       return
-        std::pow(outerHit.X() - innerHit.X() , 2) +
-        std::pow(outerHit.Y() - innerHit.Y() , 2);
+        centerHit.TimeV() - centerHit.TimeU();
     }
   };
 

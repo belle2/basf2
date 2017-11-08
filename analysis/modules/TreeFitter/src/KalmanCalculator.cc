@@ -66,18 +66,6 @@ namespace TreeFitter {
     m_chisq = m_res.transpose() * m_Rinverse.selfadjointView<Eigen::Lower>() * m_res;
   }
 
-  [[gnu::maybe_unused]] void KalmanCalculator::updateState(const EigenTypes::ColVector& prediction, FitParams* fitparams)
-  {
-    //JFK: transposing here is a bit annoying... 2017-09-21
-    EigenTypes::ColVector tempColVec = prediction - fitparams->getStateVector();
-    EigenTypes::RowVector temp = m_res +  m_G * tempColVec;
-
-    EigenTypes::RowVector result = prediction - m_K * temp;
-    fitparams->getStateVector() = result;
-
-    m_chisq = result * m_Rinverse.selfadjointView<Eigen::Lower>() * result.transpose();
-  }
-
   void KalmanCalculator::updateCovariance(FitParams* fitparams)
   {
     EigenTypes::MatrixXd fitCov;

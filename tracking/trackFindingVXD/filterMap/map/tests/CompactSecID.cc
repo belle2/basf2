@@ -135,6 +135,8 @@ TEST(CompactSecIDs, stressTest)
     cout << endl;
   }
 
+  // the compactsecids dont throw exceptions anymore
+  /**
   for (double u = 1.e-6 ; u < 1.3; u += .25) {
     for (double v = 1.e-6; v < 1.3; v += .2) {
       if (u < 0. or u > 1. or v < 0. or v >1.) {
@@ -145,6 +147,7 @@ TEST(CompactSecIDs, stressTest)
     }
     cout << endl;
   }
+  **/
 
   for (double u = .25 ; u < 1.25; u += .25) {
     for (double v = 0.2; v < 1.2; v += .2) {

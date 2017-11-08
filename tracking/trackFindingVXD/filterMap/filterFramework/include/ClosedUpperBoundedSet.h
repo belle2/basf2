@@ -11,6 +11,9 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/TBranchLeafType.h>
+
+#include <framework/logging/Logger.h>
+
 #include <TBranch.h>
 #include <TTree.h>
 
@@ -64,7 +67,7 @@ namespace Belle2 {
     void setBranchAddress(TTree* t, const std::string& branchName,
                           const std::string& /*variableName*/)
     {
-      t->SetBranchAddress(branchName.c_str(), & m_max);
+      if (t->SetBranchAddress(branchName.c_str(), & m_max) < 0) B2FATAL("ClosedUpperBoundedSet: branch address not valid!");
     }
 
     /** Accessor to the sup of the set (which is also the max) */

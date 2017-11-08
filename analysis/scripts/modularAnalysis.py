@@ -1819,9 +1819,9 @@ def writePi0EtaVeto(
     particleList,
     decayString,
     workingDirectory='.',
-    downloadFlag=True,
     pi0vetoname='Pi0_Prob',
     etavetoname='Eta_Prob',
+    downloadFlag=True,
     selection='',
     path=analysis_main,
 ):

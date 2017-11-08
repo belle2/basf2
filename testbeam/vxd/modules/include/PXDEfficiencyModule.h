@@ -154,10 +154,8 @@ namespace Belle2 {
     std::map<VxdID, TH2D*> m_h_digitsROI;
     std::map<VxdID, TH2D*> m_h_clusterROI;
 
-    /*TEST TEST TEST*/
     std::map<VxdID, TH1D*> m_h_frame_nr;
     std::map<VxdID, TH2D*> m_h_broken_frame_pos;
-    /*ENDE ENDE ENDE*/
 
     //ROI information
     std::map<VxdID, int> m_roi_number_of;
@@ -178,13 +176,8 @@ namespace Belle2 {
     std::map<VxdID, int> m_roi_ucell_residual;
     std::map<VxdID, int> m_roi_vcell_residual;
 
-
-    /*TEST TEST TEST*/
     std::map<VxdID, int> m_matched_frame;
-    std::map<VxdID, int> m_matched_DHPframe;
-    std::map<VxdID, int> m_matched_DHEframe;
     std::map<VxdID, int> m_hit_count;
-    /*ENDE ENDE ENDE*/
   };
 }
 

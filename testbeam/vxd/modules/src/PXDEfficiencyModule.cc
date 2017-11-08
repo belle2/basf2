@@ -11,11 +11,7 @@
 #include <testbeam/vxd/modules/PXDEfficiencyModule.h>
 #include "TMatrixDSym.h"
 #include <tracking/dataobjects/ROIid.h>
-
-/*TEST TEST TEST*/
-#include <fstream>
 #include <pxd/dataobjects/PXDRawHit.h>
-/*ENDE ENDE ENDE*/
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -67,75 +63,29 @@ void PXDEfficiencyModule::initialize()
 
 void PXDEfficiencyModule::event()
 {
+  //Set dummy values in all maps
+  dummyAllMaps();
 
-  /*TEST TEST TEST*/
-  static int evtCount = 0;
-  static int brokenFrameTot = 0;
-  static int brokenFrameEvt = 0;
-  evtCount++;
-  bool brokenFrameNrHere = false;
+
+
   StoreArray<PXDRawHit> RawHits("PXDRawHits");
-  //std::multimap<VxdID,unsigned short> mapRawFrame;
-  std::multimap<VxdID, std::vector<unsigned int>> mapRawFrame;
-  std::multimap<VxdID, unsigned int> mapDHPFrame;
-  std::multimap<VxdID, unsigned int> mapDHEFrame;
-  std::multimap<VxdID, unsigned short> mapClusterFrame;
   for (int ihit = 0; ihit < RawHits.getEntries(); ihit++) {
     VxdID hitID = RawHits[ihit]->getSensorID();
     m_hit_count[hitID]++;
     unsigned short frameNr = RawHits[ihit]->getFrameNr();
     m_h_frame_nr[hitID]->Fill(frameNr);
-    mapRawFrame.insert(std::pair<VxdID, std::vector<unsigned int>>(hitID, {frameNr, RawHits[ihit]->getDHPFrameNr(), RawHits[ihit]->getDHEFrameNr()}));
-    //mapRawFrame.insert(std::pair<VxdID,unsigned short>(hitID,frameNr));
     if (frameNr > 1) {
-      brokenFrameNrHere = true;
-      brokenFrameTot++;
       m_h_broken_frame_pos[hitID]->Fill(RawHits[ihit]->getColumn(), RawHits[ihit]->getRow());
     }
-    //std::cout<<RawHits[ihit]->getRow()<<" "<<RawHits[ihit]->getStartRow()<<std::endl;
   }
-  if (brokenFrameNrHere) brokenFrameEvt++;
-  if (mapRawFrame.size() > 0 && brokenFrameNrHere) {
-    std::cout << "Frame Nr in PXDRawHit, DHP, DHE:" << std::endl;
-    for (auto mapiter : mapRawFrame) {
-      std::cout << mapiter.first << " " << mapiter.second[0] << " " << mapiter.second[1] << " " << mapiter.second[2] << std::endl;
-    }
-    for (int iclus = 0; iclus < m_pxdclusters.getEntries(); iclus++) {
-      VxdID clusterID = m_pxdclusters[iclus]->getSensorID();
-      unsigned short clusFrameNr = clusterID.getSegmentNumber();
-      mapClusterFrame.insert(std::pair<VxdID, unsigned short>(clusterID, clusFrameNr));
-    }
-    std::cout << "Frame Nr in PXDCluster:" << std::endl;
-    for (auto clusiter : mapClusterFrame) {
-      std::cout << clusiter.first << " " << clusiter.second << std::endl;
-    }
-  }
-  if (brokenFrameNrHere) std::cout << "Event Nr: " << evtCount << " Total broken: " << brokenFrameTot << " Evts with broken: " <<
-                                     brokenFrameEvt << std::endl;
-  //Just started event dumper
-  // static int text_count = 0;
-  // if (brokenFrameNrHere && RawHits.getEntries() ){ //textoutput
-  //   std::ofstream TextFile;
-  //   TextFile.open(TString::Format("BkgHist%i",h));
-  // }
-  /*ENDE ENDE ENDE*/
 
 
-
-
-
-
-  //TODO This should be same as clusters
   StoreArray<RecoTrack> tracks(m_tracksname);
-
-  //Set dummy values in all maps
-  dummyAllMaps();
 
   B2DEBUG(1, "Number of clusters found: " << m_pxdclusters.getEntries());
   B2DEBUG(1, "Number of digits found: " << m_pxddigits.getEntries());
   B2DEBUG(1, "Number of tracks found: " << tracks.getEntries());
 
-  //TODO Remove this
   //hard cut on the number of tracks as more tracks will complicate things
   if (tracks.getEntries() != 1) return;
 
@@ -323,6 +273,7 @@ void PXDEfficiencyModule::event()
     int iu = m_vxdGeometry.getSensorInfo(aVxdID).getUCellID(m_u_fit[aVxdID]);
     int iv = m_vxdGeometry.getSensorInfo(aVxdID).getVCellID(m_v_fit[aVxdID]);
 
+
     //fill ROI like so no cut on having hit on the other layer
     {
       m_h_tracksROI[aVxdID]->Fill(iu, iv);
@@ -335,17 +286,13 @@ void PXDEfficiencyModule::event()
         m_digit_matched[aVxdID] = 0;
         m_h_digitsROI[aVxdID]->Fill(iu, iv);
 
-        /*TEST TEST TEST*/
+        //For now only match digits, this should work in almost all cases and is much easier
         for (int ihit = 0; ihit < RawHits.getEntries(); ihit++) {
           if (RawHits[ihit]->getSensorID() == aVxdID && RawHits[ihit]->getColumn() == m_ucell_digi[aVxdID]
               && RawHits[ihit]->getRow() == m_vcell_digi[aVxdID]) {
             m_matched_frame[aVxdID] = RawHits[ihit]->getFrameNr();
-            //These do not exist on master
-            m_matched_DHPframe[aVxdID] = RawHits[ihit]->getDHPFrameNr();
-            m_matched_DHEframe[aVxdID] = RawHits[ihit]->getDHEFrameNr();
           }
         }
-        /*ENDE ENDE ENDE*/
       }
     }
 
@@ -367,7 +314,7 @@ void PXDEfficiencyModule::event()
 
   }
 
-  //Old code, has more histos so keep for now
+  //Old histos, don't work with arbitrary geometry but keep as reference for re-implementation later
   /*
   //fill histograms to calculate efficiencies
   // WARNING: this uses hardcoded sensor ids!
@@ -383,16 +330,13 @@ void PXDEfficiencyModule::event()
   if (dist_digit_L1.Mag() <= m_distcut) {
     int iu = m_vxdGeometry.getSensorInfo(L2id).getUCellID(m_u_fit[L2id]);
     int iv = m_vxdGeometry.getSensorInfo(L2id).getVCellID(m_v_fit[L2id]);
-    m_otherpxd_digit_matched[L2id] = 0;
     m_h_tracksdigit[L2id]->Fill(iu, iv);
     if (dist_digit_L2.Mag() <= m_distcut) m_h_digits[L2id]->Fill(iu, iv);
-
   }
   //has digit on L2
   if (dist_digit_L2.Mag() <= m_distcut) {
     int iu = m_vxdGeometry.getSensorInfo(L1id).getUCellID(m_u_fit[L1id]);
     int iv = m_vxdGeometry.getSensorInfo(L1id).getVCellID(m_v_fit[L1id]);
-    m_otherpxd_digit_matched[L1id] = 0;
     m_h_tracksdigit[L1id]->Fill(iu, iv);
     if (dist_digit_L1.Mag() <= m_distcut) m_h_digits[L1id]->Fill(iu, iv);
   }
@@ -401,8 +345,6 @@ void PXDEfficiencyModule::event()
     int iu = m_vxdGeometry.getSensorInfo(L2id).getUCellID(m_u_fit[L2id]);
     int iv = m_vxdGeometry.getSensorInfo(L2id).getVCellID(m_v_fit[L2id]);
 
-
-    if (dist_clus_L1.Mag() <= m_otherdistcut) m_otherpxd_cluster_matched[L2id] = 0;
     m_h_trackscluster[L2id]->Fill(iu, iv);
     if (dist_clus_L2.Mag() <= m_distcut) m_h_cluster[L2id]->Fill(iu, iv);
   }
@@ -410,41 +352,8 @@ void PXDEfficiencyModule::event()
   if (dist_clus_L2.Mag() <= m_distcut) {
     int iu = m_vxdGeometry.getSensorInfo(L1id).getUCellID(m_u_fit[L1id]);
     int iv = m_vxdGeometry.getSensorInfo(L1id).getVCellID(m_v_fit[L1id]);
-
-
-    if (dist_clus_L2.Mag() <= m_otherdistcut) m_otherpxd_cluster_matched[L1id] = 0;
     m_h_trackscluster[L1id]->Fill(iu, iv);
     if (dist_clus_L1.Mag() <= m_distcut) m_h_cluster[L1id]->Fill(iu, iv);
-  }
-
-  //fill ROI like so no cut on having hit on the other layer
-  //L1
-  {
-    int iu = m_vxdGeometry.getSensorInfo(L1id).getUCellID(m_u_fit[L1id]);
-    int iv = m_vxdGeometry.getSensorInfo(L1id).getVCellID(m_v_fit[L1id]);
-    m_h_tracksROI[L1id]->Fill(iu, iv);
-    if (dist_clus_L1.Mag() <= m_distcut)  {
-      m_h_clusterROI[L1id]->Fill(iu, iv);
-      m_cluster_matched[L1id] = 0;
-    }
-    if (dist_digit_L1.Mag() <= m_distcut) {
-      m_digit_matched[L1id] = 0;
-      m_h_digitsROI[L1id]->Fill(iu, iv);
-    }
-  }
-  //L2
-  {
-    int iu = m_vxdGeometry.getSensorInfo(L2id).getUCellID(m_u_fit[L2id]);
-    int iv = m_vxdGeometry.getSensorInfo(L2id).getVCellID(m_v_fit[L2id]);
-    m_h_tracksROI[L2id]->Fill(iu, iv);
-    if (dist_clus_L2.Mag() <= m_distcut) {
-      m_h_clusterROI[L2id]->Fill(iu, iv);
-      m_cluster_matched[L2id] = 0;
-    }
-    if (dist_digit_L2.Mag() <= m_distcut) {
-      m_digit_matched[L2id] = 0;
-      m_h_digitsROI[L2id]->Fill(iu, iv);
-    }
   }
   */
 
@@ -586,12 +495,8 @@ void PXDEfficiencyModule::defineHisto()
     m_tree->Branch("roi_v_residual_" + buff, &(m_roi_v_residual[avxdid]), "roi_v_residual_" + buff + "/D");
     m_tree->Branch("roi_ucell_residual_" + buff, &(m_roi_ucell_residual[avxdid]), "roi_ucell_residual_" + buff + "/I");
     m_tree->Branch("roi_vcell_residual_" + buff, &(m_roi_vcell_residual[avxdid]), "roi_vcell_residual_" + buff + "/I");
-    /*TEST TEST TEST*/
     m_tree->Branch("fit_matched_frame_" + buff, &(m_matched_frame[avxdid]), "fit_matched_frame_" + buff + "/I");
-    m_tree->Branch("fit_matched_DHPframe_" + buff, &(m_matched_DHPframe[avxdid]), "fit_matched_DHPframe_" + buff + "/I");
-    m_tree->Branch("fit_matched_DHEframe_" + buff, &(m_matched_DHEframe[avxdid]), "fit_matched_DHEframe_" + buff + "/I");
     m_tree->Branch("number_of_hits_" + buff, &(m_hit_count[avxdid]), "number_of_hits_" + buff + "/I");
-    /*ENDE ENDE ENDE*/
 
     int nu = info.getUCells();
     int nv = info.getVCells();
@@ -615,12 +520,10 @@ void PXDEfficiencyModule::defineHisto()
     m_h_clusterROI[avxdid] = new TH2D("clustersROI_" + buff, "hits for sensor " + buff,
                                       nu + 1, -0.5, nu + 0.5, nv + 1, -0.5, nv + 0.5);
 
-    /*TEST TEST TEST*/
     m_h_frame_nr[avxdid] = new TH1D("frameNr_" + buff, "Frame Nr. distribution on sensor " + buff,
                                     64, -0.5, 63.5);
     m_h_broken_frame_pos[avxdid] = new TH2D("frameNr_broken_pos_" + buff, "Position of Frame Nr>1 on sensor " + buff,
                                             nu + 1, -0.5, nu + 0.5, nv + 1, -0.5, nv + 0.5);
-    /*ENDE ENDE ENDE*/
   }
 }
 
@@ -755,13 +658,8 @@ void PXDEfficiencyModule::dummyAllMaps(void)
     m_roi_v_residual[aVxdID] = -99999;
     m_roi_ucell_residual[aVxdID] = -99999;
     m_roi_vcell_residual[aVxdID] = -99999;
-
-    /*TEST TEST TEST*/
     m_matched_frame[aVxdID] = -99999;
-    m_matched_DHPframe[aVxdID] = -99999;
-    m_matched_DHEframe[aVxdID] = -99999;
     //Count these upwards
     m_hit_count[aVxdID] = 0;
-    /*ENDE ENDE ENDE*/
   }
 }

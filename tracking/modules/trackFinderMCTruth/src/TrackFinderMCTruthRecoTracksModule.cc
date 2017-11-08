@@ -599,7 +599,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
     } // end if m_useSVDHits
 
     // prepare rejection of CDC hits from higher order loops
-    const double Bz = BFieldManager::getField(0, 0, 0).Z();
+    const double Bz = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
     auto isWithinNLoops = [Bz](const CDCHit * cdcHit, double nLoops) {
       const CDCSimHit* cdcSimHit = cdcHit->getRelated<CDCSimHit>();
       if (not cdcSimHit) return false;

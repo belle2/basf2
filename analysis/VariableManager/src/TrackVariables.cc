@@ -232,7 +232,7 @@ namespace Belle2 {
     }
 
 
-    VARIABLE_GROUP("PID");
+    VARIABLE_GROUP("Tracking");
     REGISTER_VARIABLE("nCDCHits", trackNCDCHits,     "Number of CDC hits associated to the track");
     REGISTER_VARIABLE("nSVDHits", trackNSVDHits,     "Number of SVD hits associated to the track");
     REGISTER_VARIABLE("nPXDHits", trackNPXDHits,     "Number of PXD hits associated to the track");

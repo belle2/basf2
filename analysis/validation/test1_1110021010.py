@@ -36,8 +36,10 @@ inputMdst('default', '../1110021010.dst.root')
 # --------------------------------------------------
 # Create and fill final state ParticleLists
 # --------------------------------------------------
+
 stdPi('99eff')
 stdPhotons('loose')
+
 # reconstruct rho0:pipi
 reconstructDecay('rho0:pipi -> pi+:99eff pi-:99eff', '0.35 < M < 1.2')
 matchMCTruth('rho0:pipi')

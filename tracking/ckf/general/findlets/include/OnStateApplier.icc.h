@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/ckf/general/findlets/OnStateApplier.dcl.h>
+#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
 
 namespace Belle2 {
   template <class AState>

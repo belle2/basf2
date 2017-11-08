@@ -63,6 +63,7 @@ void NtupleVertexTool::deallocateMemory()
     for (int i = 0; i < 3; i++) {
       delete [] m_fProdCov[iProduct][i];
     }
+    delete [] m_fProdCov[iProduct];
   }
   delete [] m_fProdCov;
   delete [] m_fProdV;

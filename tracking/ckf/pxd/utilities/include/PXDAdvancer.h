@@ -17,7 +17,7 @@ namespace Belle2 {
   class PXDAdvancer : public Advancer {
   public:
     double extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
-                              const SpacePoint& spacePoint, double direction = 1);
+                              const SpacePoint& spacePoint);
 
     using Advancer::extrapolateToPlane;
   };

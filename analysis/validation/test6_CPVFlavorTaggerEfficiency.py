@@ -78,7 +78,7 @@ categories = [
     'SlowPion',
     'FSC',
     'MaximumPstar',
-    'FastPion',
+    'FastHadron',
     'Lambda']
 
 
@@ -364,7 +364,8 @@ for method in methods:
 
     # produce a pdf
     ROOT.gStyle.SetOptStat(0)
-    Canvas1 = ROOT.TCanvas('Bla', 'Final Output', 1200, 800)
+    with Quiet(ROOT.kError):
+        Canvas1 = ROOT.TCanvas('Bla', 'Final Output', 1200, 800)
     Canvas1.cd()  # activate
     Canvas1.SetLeftMargin(0.13)
     Canvas1.SetRightMargin(0.04)
@@ -522,7 +523,8 @@ for method in methods:
     # IPython.embed()
 
     # produce the nice calibration plot
-    Canvas2 = ROOT.TCanvas('Bla2', 'Calibration plot for true B0', 1200, 800)
+    with Quiet(ROOT.kError):
+        Canvas2 = ROOT.TCanvas('Bla2', 'Calibration plot for true B0', 1200, 800)
     Canvas2.cd()  # activate
     Canvas2.SetLeftMargin(0.13)
     Canvas2.SetRightMargin(0.04)
@@ -601,8 +603,8 @@ for method in methods:
     histo_m0.Delete()
     histo_m1.Delete()
     histo_m2.Delete()
-    Canvas1.Destructor()
-    Canvas2.Destructor()
+    Canvas1.Clear()
+    Canvas2.Clear()
 
 
 # **********************************************
@@ -787,7 +789,8 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     Ymax = Ymax + Ymax / 12
 
     ROOT.gStyle.SetOptStat(0)
-    Canvas = ROOT.TCanvas('Bla', 'TITEL BLA', 1200, 800)
+    with Quiet(ROOT.kError):
+        Canvas = ROOT.TCanvas('Bla', 'TITEL BLA', 1200, 800)
     Canvas.cd()  # activate
     Canvas.SetLogy()
     Canvas.SetLeftMargin(0.13)
@@ -876,7 +879,7 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     # hist_both.SetStats(False)
     hist_both.Write()
 
-    Canvas.Destructor()
+    Canvas.Clear()
 
 outputNtuple.Fill(array('f', efficienciesForNtuple))
 outputNtuple.Write()

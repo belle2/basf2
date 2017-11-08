@@ -11,6 +11,7 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 using namespace std;
 using namespace Belle2;
@@ -21,6 +22,14 @@ SVDResultVarSet::SVDResultVarSet() : TrackFindingCDC::VarSet<SVDResultVarNames>(
   addProcessingSignalListener(&m_advancer);
 }
 
+void SVDResultVarSet::initialize()
+{
+  TrackFindingCDC::VarSet<SVDResultVarNames>::initialize();
+
+  ModuleParamList moduleParamList;
+  m_advancer.exposeParameters(&moduleParamList, "");
+  moduleParamList.getParameter<double>("direction").setValue(1);
+}
 
 bool SVDResultVarSet::extract(const CKFToSVDResult* result)
 {
@@ -90,7 +99,7 @@ bool SVDResultVarSet::extract(const CKFToSVDResult* result)
 
 
   const genfit::MeasuredStateOnPlane& firstCDCHit = seedTrack->getMeasuredStateOnPlaneFromFirstHit();
-  m_advancer.extrapolateToPlane(mSoP, firstCDCHit.getPlane(), 1);
+  m_advancer.extrapolateToPlane(mSoP, firstCDCHit.getPlane());
 
   const auto& distance = mSoP.getPos() - firstCDCHit.getPos();
   var<named("distance_to_cdc_track")>() = distance.Mag();

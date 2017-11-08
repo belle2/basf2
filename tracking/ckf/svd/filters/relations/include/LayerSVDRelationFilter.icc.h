@@ -7,6 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
+
 #include <tracking/ckf/svd/filters/relations/LayerSVDRelationFilter.dcl.h>
 #include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
 

@@ -80,7 +80,7 @@ categories = [
     'SlowPion',
     'FSC',
     'MaximumPstar',
-    'FastPion',
+    'FastHadron',
     'Lambda']
 
 
@@ -455,8 +455,8 @@ for method in methods:
     histo_m0.Delete()
     histo_m1.Delete()
     histo_m2.Delete()
-    Canvas1.Destructor()
-    Canvas2.Destructor()
+    Canvas1.Clear()
+    Canvas2.Clear()
 
     print('\\begin{tabular}{| l | r  r | r  r | r  r |}\n\\hline')
     print(r'$r$- Interval & $\varepsilon_i(\%)$ & $\Delta \varepsilon_i(\%) $ & $w_i(\%) $ ' +
@@ -549,7 +549,8 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     Ymax = Ymax + Ymax / 12
 
     ROOT.gStyle.SetOptStat(0)
-    Canvas = ROOT.TCanvas('Bla', 'TITEL BLA', 1200, 800)
+    with Quiet(ROOT.kError):
+        Canvas = ROOT.TCanvas('Bla', 'TITEL BLA', 1200, 800)
     Canvas.cd()  # activate
     Canvas.SetLogy()
     hist_signal.SetFillColorAlpha(ROOT.kBlue, 0.2)
@@ -707,7 +708,8 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     # hist_all.Write('', ROOT.TObject.kOverwrite)
     # hist_calib_B0.Write('', ROOT.TObject.kOverwrite)
     categoriesPerformance.append((category, effAverage, effDiff))
-    Canvas.Destructor()
+    with Quiet(ROOT.kError):
+        Canvas.Clear()
 # if average_eff != 0:
     # print '*    -------------------------------------------------------------------------'
     # print '*    ' + '{: > 8.2f}'.format(average_eff * 100) + ' %' \

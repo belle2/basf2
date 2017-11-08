@@ -16,9 +16,9 @@
 using namespace Belle2;
 
 double PXDAdvancer::extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
-                                       const SpacePoint& spacePoint, double direction)
+                                       const SpacePoint& spacePoint)
 {
   PXDRecoHit recoHit(spacePoint.getRelated<PXDCluster>());
   const genfit::SharedPlanePtr& plane = recoHit.constructPlane(measuredStateOnPlane);
-  return Advancer::extrapolateToPlane(measuredStateOnPlane, plane, direction);
+  return Advancer::extrapolateToPlane(measuredStateOnPlane, plane);
 }

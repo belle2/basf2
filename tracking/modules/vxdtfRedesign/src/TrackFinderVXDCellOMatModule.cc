@@ -10,7 +10,7 @@
 
 #include <framework/logging/Logger.h>
 
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 #include <tracking/modules/vxdtfRedesign/TrackFinderVXDCellOMatModule.h>
 #include <tracking/trackFindingVXD/algorithms/NetworkPathConversion.h>
@@ -22,11 +22,6 @@ using namespace Belle2;
 
 REG_MODULE(TrackFinderVXDCellOMat)
 
-/** *************************************+************************************* **/
-/** ***********************************+ + +*********************************** **/
-/** ******************************+ constructor +****************************** **/
-/** ***********************************+ + +*********************************** **/
-/** *************************************+************************************* **/
 
 TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
 {
@@ -79,11 +74,6 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
 
 }
 
-/** *************************************+************************************* **/
-/** ***********************************+ + +*********************************** **/
-/** ******************************+ initialize +******************************* **/
-/** ***********************************+ + +*********************************** **/
-/** *************************************+************************************* **/
 
 void TrackFinderVXDCellOMatModule::initialize()
 {
@@ -97,26 +87,16 @@ void TrackFinderVXDCellOMatModule::initialize()
   }
 }
 
-/** *************************************+************************************* **/
-/** ***********************************+ + +*********************************** **/
-/** *******************************+ begin run +******************************* **/
-/** ***********************************+ + +*********************************** **/
-/** *************************************+************************************* **/
 
 void TrackFinderVXDCellOMatModule::beginRun()
 {
   if (m_PARAMselectBestPerFamily) {
     // BField is required by all QualityEstimators
-    double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+    double bFieldZ = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
     m_sptcSelector->setMagneticFieldForQE(bFieldZ);
   }
 }
 
-/** *************************************+************************************* **/
-/** ***********************************+ + +*********************************** **/
-/** *********************************+ event +********************************* **/
-/** ***********************************+ + +*********************************** **/
-/** *************************************+************************************* **/
 
 void TrackFinderVXDCellOMatModule::event()
 {

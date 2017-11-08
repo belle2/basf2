@@ -40,46 +40,21 @@ namespace Belle2 {
    *
    * It uses the output produced by the SegmentNetworkProducerModule to create SpacePointTrackCands by simply storing all possible paths stored in the SegmentNetwork.
    */
-  class TrackFinderVXDBasicPathFinderModule : public Module {
+  class TrackFinderVXDBasicPathFinderModule final : public Module {
 
   public:
-
 
     /** Constructor */
     TrackFinderVXDBasicPathFinderModule();
 
-
-    /** Destructor */
-    virtual ~TrackFinderVXDBasicPathFinderModule() {}
-
-
     /** initialize */
     virtual void initialize() override;
-
 
     /** beginRun */
     virtual void beginRun() override;
 
-
     /** event */
     virtual void event() override;
-
-
-    /** endRun */
-    virtual void endRun() {}
-
-
-    /** terminate */
-    virtual void terminate() {}
-
-
-
-    /** *************************************+************************************* **/
-    /** ***********************************+ + +*********************************** **/
-    /** *******************************+ functions +******************************* **/
-    /** ***********************************+ + +*********************************** **/
-    /** *************************************+************************************* **/
-
 
 
   protected:

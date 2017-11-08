@@ -40,46 +40,21 @@ namespace Belle2 {
    *
    * It uses the output produced by the SegmentNetworkProducerModule to create SpacePointTrackCands using a Cellular Automaton algorithm implementation.
    */
-  class TrackFinderVXDCellOMatModule : public Module {
+  class TrackFinderVXDCellOMatModule final : public Module {
 
   public:
-
 
     /** Constructor */
     TrackFinderVXDCellOMatModule();
 
-
-    /** Destructor */
-    virtual ~TrackFinderVXDCellOMatModule() {}
-
-
     /** initialize */
     virtual void initialize() override;
-
 
     /** beginRun */
     virtual void beginRun() override;
 
-
     /** event */
     virtual void event() override;
-
-
-    /** endRun */
-    virtual void endRun() {}
-
-
-    /** terminate */
-    virtual void terminate() {}
-
-
-
-    /** *************************************+************************************* **/
-    /** ***********************************+ + +*********************************** **/
-    /** *******************************+ functions +******************************* **/
-    /** ***********************************+ + +*********************************** **/
-    /** *************************************+************************************* **/
-
 
 
   protected:

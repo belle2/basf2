@@ -10,7 +10,9 @@
 
 #pragma once
 
+#include <reconstruction/dbobjects/CDCDedxRunGain.h>
 #include <calibration/CalibrationAlgorithm.h>
+#include "TF1.h"
 
 namespace Belle2 {
   /**

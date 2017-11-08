@@ -44,13 +44,12 @@ namespace Belle2 {
   }
 
   template<class AFilter>
-  void OverlapResolver<AFilter>::apply(std::vector<typename AFilter::Object>& results)
+  void OverlapResolver<AFilter>::apply(std::vector<typename AFilter::Object>& results,
+                                       std::vector<typename AFilter::Object>& filteredResults)
   {
     if (not m_param_enableOverlapResolving or results.empty()) {
       return;
     }
-
-    m_temporaryResults.clear();
 
     // Sort results by seed, as it makes the next operations faster
     std::sort(results.begin(), results.end(), TrackFindingCDC::LessOf<SeedGetter>());
@@ -58,9 +57,6 @@ namespace Belle2 {
     // resolve overlaps in each seed separately
     const auto& groupedBySeed = TrackFindingCDC::adjacent_groupby(results.begin(), results.end(), SeedGetter());
     for (const TrackFindingCDC::VectorRange<Object>& resultsWithSameSeed : groupedBySeed) {
-
-      // Apply MC teacher if enabled
-      //TODO m_overlapTeacher.apply(resultsWithSameSeed);
 
       m_resultsWithWeight.clear();
       for (Object& result : resultsWithSameSeed) {
@@ -80,10 +76,8 @@ namespace Belle2 {
         const auto& lastItemToUse = std::next(m_resultsWithWeight.begin(), useBestNResults);
         const auto& longestElement = *(std::max_element(m_resultsWithWeight.begin(), lastItemToUse,
                                                         TrackFindingCDC::LessOf<NumberOfHitsGetter>()));
-        m_temporaryResults.push_back(*(longestElement));
+        filteredResults.push_back(*(longestElement));
       }
     }
-
-    results.swap(m_temporaryResults);
   }
 }

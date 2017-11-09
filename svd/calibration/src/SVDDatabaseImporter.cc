@@ -23,6 +23,8 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
+#include <framework/utilities/FileSystem.h>
+
 // wrapper objects
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
@@ -43,6 +45,17 @@
 
 using namespace std;
 using namespace Belle2;
+
+void SVDDatabaseImporter::importSVDChannelMapping()
+{
+
+  IntervalOfValidity iov = IntervalOfValidity::always();
+  const std::string filename = FileSystem::findFile("svd/data/svd_mapping.xml"); //phase 3 xmlMapping
+  //  const std::string filename = FileSystem::findFile("testbeam/vxd/data/2017_svd_mapping.xml");
+  const std::string payloadname = "SVDChannelMapping.xml";
+  Database::Instance().addPayload(payloadname, filename, iov);
+}
+
 
 void SVDDatabaseImporter::importSVDTimeShiftCorrections()
 {

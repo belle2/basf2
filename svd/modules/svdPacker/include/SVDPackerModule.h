@@ -24,6 +24,9 @@
 
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <svd/online/SVDStripNoiseMap.h>
+
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/PayloadFile.h>
 //
 
 
@@ -51,8 +54,10 @@ namespace Belle2 {
 
       std::string m_rawSVDListName;
       std::string m_svdDigitListName;
-      std::string m_xmlMapFileName;
+
+
       bool m_simulate3sampleData;
+
 
     private:
       //   table of FADC numbers as in xml file      forward  |  backward
@@ -65,8 +70,10 @@ namespace Belle2 {
       int n_basf2evt; //event number
       int m_nodeid; // Node ID
 
+      static std::string m_xmlFileName;
+      DBObjPtr<PayloadFile> m_mapping;
 
-      SVDOnlineToOfflineMap* m_map;
+      std::unique_ptr<SVDOnlineToOfflineMap> m_map;
       //SVDStripNoiseMap* m_noiseMap;
       std::unordered_map<unsigned short, unsigned short> fadcNumbers;
       short iCRC;
@@ -82,7 +89,6 @@ namespace Belle2 {
       }
 
 
-      void loadMap();
       void prepFADClist();
       void binPrintout(unsigned int nwords);
 

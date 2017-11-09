@@ -9,7 +9,7 @@ payload = Belle2.VXDAlignment()
 ying = Belle2.VxdID(1, 0, 0, 1).getID()
 yang = Belle2.VxdID(1, 0, 0, 2).getID()
 pat = Belle2.VxdID(3, 0, 0, 1).getID()
-mat = Belle2.VxdID(1, 0, 0, 2).getID()
+mat = Belle2.VxdID(3, 0, 0, 2).getID()
 
 x = 1
 y = 2

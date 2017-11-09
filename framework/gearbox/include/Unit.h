@@ -52,7 +52,7 @@ namespace Belle2 {
     static const double e;            /**< Standard of [electric charge] */
 
     /**
-     * Standard units whose value are NOT necessarily equal to 1.
+     * Standard units whose values are NOT necessarily equal to 1.
      * These values are calculated by using the other standard units.
      * If you need the magnetic field value in the unit where 1 Tesla = 1.0,
      * use BFieldManager::getFieldInTesla(const B2Vector3D& pos).

@@ -14,7 +14,9 @@
 #include <string>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <framework/dataobjects/MCInitialParticles.h>
 
 
 namespace Belle2 {
@@ -23,7 +25,7 @@ namespace Belle2 {
    * Module generates discrete event t0 in ~4ns steps (bunch spacing) according to
    * (double) gaussian distribution and adds it to the production and decay times of
    * MCParticles. This means that after this module the time origin (t = 0) is set
-   * according to what L1 trigger thinks is the interaction time.
+   * according to what L1 trigger thinks is the collision time.
    */
   class EventT0GeneratorModule : public Module {
 
@@ -55,6 +57,7 @@ namespace Belle2 {
     // other
     double m_bunchTimeSep = 0;         /**< time between two bunches */
     StoreArray<MCParticle> m_mcParticles; /**< MC particles */
+    StoreObjPtr<MCInitialParticles> m_initialParticles; /**< beam particles */
 
   };
 

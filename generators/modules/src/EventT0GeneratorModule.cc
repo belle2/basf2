@@ -46,7 +46,7 @@ namespace Belle2 {
                    "according to double gaussian distribution and adds it to the "
                    "production and decay times of MCParticles. This means that after "
                    "this module the time origin (t = 0) is set to what L1 trigger "
-                   "would give as the interaction time.");
+                   "would give as the collision time.");
 
     setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -62,6 +62,7 @@ namespace Belle2 {
   void EventT0GeneratorModule::initialize()
   {
     m_mcParticles.isRequired();
+    m_initialParticles.registerInDataStore();
 
     // bunch time separation: every second bunch is filled
     m_bunchTimeSep = 2 * 1.96516 * Unit::ns; //TODO: get it from DB (which object?)
@@ -72,19 +73,25 @@ namespace Belle2 {
   void EventT0GeneratorModule::event()
   {
 
+    // generate collision time
     double sigma = m_coreGaussWidth;
     if (gRandom->Rndm() < m_tailGaussFraction) sigma = m_tailGaussWidth;
 
     int relBunchNo = round(gRandom->Gaus(0., sigma) / m_bunchTimeSep);
-    double trueT0 = relBunchNo * m_bunchTimeSep; // time at which interaction happens
+    double collisionTime = relBunchNo * m_bunchTimeSep;
 
+    // correct MC particles times according to generated collision time
     for (auto& particle : m_mcParticles) {
-      particle.setProductionTime(particle.getProductionTime() + trueT0);
-      particle.setDecayTime(particle.getDecayTime() + trueT0);
+      particle.setProductionTime(particle.getProductionTime() + collisionTime);
+      particle.setDecayTime(particle.getDecayTime() + collisionTime);
     }
 
-    // t = 0 is from now on the time L1 thinks the interaction happened,
-    // but in fact it happened at t = trueT0
+    // store collision time to MC initial particles (e.g. beam particles)
+    if (!m_initialParticles.isValid()) m_initialParticles.create();
+    m_initialParticles->setTime(collisionTime);
+
+    // t = 0 is from now on the time L1 thinks the collision happened,
+    // but in fact it happened at t = collisionTime
 
   }
 

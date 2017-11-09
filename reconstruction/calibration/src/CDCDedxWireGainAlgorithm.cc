@@ -56,7 +56,6 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 
   std::vector<double> means;
   for (unsigned int i = 0; i < 14336; ++i) {
-    std::cout << "Wire gain: " << i;
     if (wirededx[i].size() < 50) {
       means.push_back(1.0); // <-- FIX ME, should return not enough data
     } else {

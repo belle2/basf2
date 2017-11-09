@@ -46,7 +46,7 @@ namespace Belle2 {
 
   private:
     // module params
-    int m_maxNumHits;
+    int m_maxNumHits; /**< maximum number of hits allowed */
 
     // track level information
     double m_dedx = -1;  /**< dE/dx truncated mean */

@@ -28,7 +28,7 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    CDCDedx1DCleanup(): m_onedgains() {};
+    CDCDedx1DCleanup(): m_version(0), m_nbins(100), m_onedgains() {};
 
     /**
      * Constructor
@@ -74,6 +74,6 @@ namespace Belle2 {
     short m_nbins;  /**< number of entrance angle bins */
     std::vector<std::vector<double>> m_onedgains; /**< dE/dx means in entrance angle bins */
 
-    ClassDef(CDCDedx1DCleanup, 1); /**< ClassDef */
+    ClassDef(CDCDedx1DCleanup, 2); /**< ClassDef */
   };
 } // end namespace Belle2

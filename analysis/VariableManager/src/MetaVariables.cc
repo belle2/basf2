@@ -819,6 +819,22 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr ifNANgive05(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+
+        auto func = [var](const Particle * particle) -> double {
+          double output = var->function(particle);
+          if (std::isnan(output)) return 0.5;
+          else return output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function ifNANgive05");
+      }
+    }
+
     Manager::FunctionPtr isInfinity(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -1198,6 +1214,9 @@ endloop:
     REGISTER_VARIABLE("isNAN(variable)", isNAN,
                       "Returns true if variable value evaluates to nan (determined via std::isnan(double)).\n"
                       "Useful for debugging.");
+    REGISTER_VARIABLE("ifNANgive05(variable)", ifNANgive05,
+                      "Returns 0.5 if variable value evaluates to nan (determined via std::isnan(double)).\n"
+                      "Useful for technical purposes while training MVAs.");
     REGISTER_VARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
                       "Useful for debugging.");

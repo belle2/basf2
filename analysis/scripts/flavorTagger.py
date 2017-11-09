@@ -232,24 +232,24 @@ KId = {'Belle': 'kIDBelle', 'Belle2': 'kaonID'}
 muId = {'Belle': 'muIDBelle', 'Belle2': 'muonID'}
 eId = {'Belle': 'eIDBelle', 'Belle2': 'electronID'}
 
-flavorTaggerVariables.addAlias('eid_dEdx', 'pidPairProbabilityExpert(11, 211, CDC, SVD)')
-flavorTaggerVariables.addAlias('eid_TOP', 'pidPairProbabilityExpert(11, 211, TOP)')
-flavorTaggerVariables.addAlias('eid_ARICH', 'pidPairProbabilityExpert(11, 211, ARICH)')
-flavorTaggerVariables.addAlias('eid_ECL', 'pidPairProbabilityExpert(11, 211, ECL)')
+flavorTaggerVariables.addAlias('eid_dEdx', 'ifNANgive05(pidPairProbabilityExpert(11, 211, CDC, SVD))')
+flavorTaggerVariables.addAlias('eid_TOP', 'ifNANgive05(pidPairProbabilityExpert(11, 211, TOP))')
+flavorTaggerVariables.addAlias('eid_ARICH', 'ifNANgive05(pidPairProbabilityExpert(11, 211, ARICH))')
+flavorTaggerVariables.addAlias('eid_ECL', 'ifNANgive05(pidPairProbabilityExpert(11, 211, ECL))')
 
-flavorTaggerVariables.addAlias('muid_dEdx', 'pidPairProbabilityExpert(13, 211, CDC, SVD)')
-flavorTaggerVariables.addAlias('muid_TOP', 'pidPairProbabilityExpert(13, 211, TOP)')
-flavorTaggerVariables.addAlias('muid_ARICH', 'pidPairProbabilityExpert(13, 211, ARICH)')
-flavorTaggerVariables.addAlias('muid_KLM', 'pidPairProbabilityExpert(13, 211, KLM)')
+flavorTaggerVariables.addAlias('muid_dEdx', 'ifNANgive05(pidPairProbabilityExpert(13, 211, CDC, SVD))')
+flavorTaggerVariables.addAlias('muid_TOP', 'ifNANgive05(pidPairProbabilityExpert(13, 211, TOP))')
+flavorTaggerVariables.addAlias('muid_ARICH', 'ifNANgive05(pidPairProbabilityExpert(13, 211, ARICH))')
+flavorTaggerVariables.addAlias('muid_KLM', 'ifNANgive05(pidPairProbabilityExpert(13, 211, KLM))')
 
-flavorTaggerVariables.addAlias('piid_dEdx', 'pidPairProbabilityExpert(211, 321, CDC, SVD)')
-flavorTaggerVariables.addAlias('piid_TOP', 'pidPairProbabilityExpert(211, 321, TOP)')
-flavorTaggerVariables.addAlias('piid_ARICH', 'pidPairProbabilityExpert(211, 321, ARICH)')
-flavorTaggerVariables.addAlias('pi_vs_edEdxid', 'pidPairProbabilityExpert(211, 11, CDC, SVD)')
+flavorTaggerVariables.addAlias('piid_dEdx', 'ifNANgive05(pidPairProbabilityExpert(211, 321, CDC, SVD))')
+flavorTaggerVariables.addAlias('piid_TOP', 'ifNANgive05(pidPairProbabilityExpert(211, 321, TOP))')
+flavorTaggerVariables.addAlias('piid_ARICH', 'ifNANgive05(pidPairProbabilityExpert(211, 321, ARICH))')
+flavorTaggerVariables.addAlias('pi_vs_edEdxid', 'ifNANgive05(pidPairProbabilityExpert(211, 11, CDC, SVD))')
 
-flavorTaggerVariables.addAlias('Kid_TOP', 'pidPairProbabilityExpert(321, 211, TOP)')
-flavorTaggerVariables.addAlias('Kid_ARICH', 'pidPairProbabilityExpert(321, 211, ARICH)')
-flavorTaggerVariables.addAlias('Kid_dEdx', 'pidPairProbabilityExpert(321, 211, CDC, SVD)')
+flavorTaggerVariables.addAlias('Kid_TOP', 'ifNANgive05(pidPairProbabilityExpert(321, 211, TOP))')
+flavorTaggerVariables.addAlias('Kid_ARICH', 'ifNANgive05(pidPairProbabilityExpert(321, 211, ARICH))')
+flavorTaggerVariables.addAlias('Kid_dEdx', 'ifNANgive05(pidPairProbabilityExpert(321, 211, CDC, SVD))')
 
 
 def setVariables():

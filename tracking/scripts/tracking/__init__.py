@@ -6,7 +6,7 @@ from basf2 import *
 from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
 
-from ckf.path_functions import add_seeded_svd_ckf, add_svd_ckf, add_pxd_ckf
+from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf
 
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
@@ -475,7 +475,7 @@ def add_mc_track_finding(path, components=None, reco_tracks="RecoTracks", use_se
                         UseCDCHits=is_cdc_used(components))
 
 
-def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_after",
+def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_before",
                                 reco_tracks="RecoTracks",
                                 cdc_reco_tracks="CDCRecoTracks",
                                 svd_reco_tracks="SVDRecoTracks",
@@ -485,22 +485,25 @@ def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_after",
                                 add_vxdtf2=True,
                                 components=None):
     """
-    First approach to add the CKF to the path with all the track finding related and needed
-     to/for it.
+    Add the CKF to the path with all the track finding related to and needed for it.
     :param path: The path to add the tracking reconstruction modules to
-    :param svd_ckf_mode: when to apply the CKF (before or after VXDTF2)
+    :param svd_ckf_mode: when to apply the CKF (VXDTF2 running before or after)
     :param reco_tracks: The store array name where to output all tracks
     :param cdc_reco_tracks: The store array name where to output the cdc tracks or where you have already written them to
     :param svd_reco_tracks: The store array name where to output the svd tracks
     :param pxd_reco_tracks: The store array name where to output the pxd tracks
-    :param components:  the list of geometry components in use or None for all components.
+    :param components: the list of geometry components in use or None for all components.
     :param use_mc_truth: Use the truth information in the CKF modules
-    :param add_merger: add the merger between VXDTF2 and CDC tracks
-    :param add_vxdtf2: add the VXDTF2 for the remaining SVD tracks
-    :return:
+    :param add_merger: add the merger between VXDTF2 and CDC tracks (only in VXDTF2_after mode)
+    :param add_vxdtf2: add the VXDTF2 for the remaining SVD tracks (only in VXDTF2_after mode)
     """
     if not is_svd_used(components):
         raise ValueError("SVD must be present in the components!")
+
+    if is_pxd_used(components):
+        svd_cdc_reco_tracks = "SVDCDCRecoTracks"
+    else:
+        svd_cdc_reco_tracks = reco_tracks
 
     if is_cdc_used(components):
         # First, start with a normal CDC track finding.
@@ -513,41 +516,24 @@ def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_after",
                         mcRecoTracksStoreArrayName="MCRecoTracks",
                         prRecoTracksStoreArrayName=cdc_reco_tracks)
 
-    if is_pxd_used(components):
-        svd_cdc_reco_tracks = "SVDCDCRecoTracks"
-    else:
-        svd_cdc_reco_tracks = reco_tracks
-
     if svd_ckf_mode == "VXDTF2_before":
         add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks)
+        add_ckf_based_merger(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
+                             use_mc_truth=use_mc_truth)
 
-        if use_mc_truth:
-            # MC CKF needs MC matching information
-            path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=False,
-                            mcRecoTracksStoreArrayName="MCRecoTracks",
-                            prRecoTracksStoreArrayName=svd_reco_tracks)
-
-        add_seeded_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks,
-                           svd_reco_tracks=svd_reco_tracks, use_mc_truth=use_mc_truth)
-        # add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks,
-        #             svd_reco_tracks=svd_reco_tracks, use_mc_truth=use_mc_truth)
-
-        path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_reco_tracks)
     elif svd_ckf_mode == "VXDTF2_after":
         add_svd_ckf(path, cdc_reco_tracks=cdc_reco_tracks,
                     svd_reco_tracks=svd_reco_tracks, use_mc_truth=use_mc_truth)
 
         if add_vxdtf2:
-            # Add the VXDTF2 only for SVD
             add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks)
-
             if add_merger:
-                # Add the merger for remaining CDC and newly found vxdtf2 tracks
-                path.add_module('VXDCDCTrackMerger',
-                                CDCRecoTrackColName=cdc_reco_tracks,
-                                VXDRecoTrackColName=svd_reco_tracks)
+                add_ckf_based_merger(path, cdc_reco_tracks=cdc_reco_tracks, svd_reco_tracks=svd_reco_tracks,
+                                     use_mc_truth=use_mc_truth)
     else:
         raise ValueError(f"Do not understand the svd_ckf_mode {svd_ckf_mode}")
+
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_reco_tracks)
 
     # Write out the combinations of tracks
     path.add_module("RelatedTracksCombiner", VXDRecoTracksStoreArrayName=svd_reco_tracks,
@@ -555,11 +541,6 @@ def add_ckf_based_track_finding(path, svd_ckf_mode="VXDTF2_after",
                     recoTracksStoreArrayName=svd_cdc_reco_tracks)
 
     if is_pxd_used(components):
-        if use_mc_truth:
-            path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=True,
-                            mcRecoTracksStoreArrayName="MCRecoTracks",
-                            prRecoTracksStoreArrayName=svd_cdc_reco_tracks)
-
         add_pxd_ckf(path, svd_cdc_reco_tracks=svd_cdc_reco_tracks, pxd_reco_tracks=pxd_reco_tracks,
                     use_mc_truth=use_mc_truth)
 

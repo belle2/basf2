@@ -1,3 +1,34 @@
+def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth):
+    """
+    Convenience function to add the SVD track finding using VXDTF2 and the merger based on the CKF to the path.
+    :param path: The path to add the module to
+    :param cdc_reco_tracks: The name of the already created CDC Reco Tracks
+    :param svd_reco_tracks: The name of the already created CDC Reco Tracks
+    :param use_mc_truth: Use the MC information in the CKF
+    """
+    # The CDC tracks need to be fitted
+    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
+
+    if use_mc_truth:
+        # MC CKF needs MC matching information
+        path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=False,
+                        mcRecoTracksStoreArrayName="MCRecoTracks",
+                        prRecoTracksStoreArrayName=svd_reco_tracks)
+
+        result_filter = "truth_svd_cdc_relation"
+    else:
+        result_filter = "chi2"
+
+    path.add_module("CDCToSVDSeedCKF",
+                    advanceHighFilterParameters={"direction": 0.0},
+
+                    inputRecoTrackStoreArrayName=cdc_reco_tracks,
+                    outputRecoTrackStoreArrayName=svd_reco_tracks,
+                    vxdTracksStoreArrayName=svd_reco_tracks,
+
+                    filter=result_filter)
+
+
 def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, filter_cut=0.03,
                 overlap_cut=0.2, use_best_seeds=10, use_best_results=2):
     """
@@ -18,6 +49,10 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks)
 
     if use_mc_truth:
+        path.add_module("MCRecoTracksMatcher", UsePXDHits=False, UseSVDHits=True, UseCDCHits=True,
+                        mcRecoTracksStoreArrayName="MCRecoTracks",
+                        prRecoTracksStoreArrayName=svd_cdc_reco_tracks)
+
         module_parameters = dict(
             firstHighFilter="truth",
             secondHighFilter="all",
@@ -47,68 +82,8 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
                     **module_parameters)
 
 
-def add_seeded_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth, temporary_vxd_track_cands,
-                       filter_cut=0.1):
-    """
-    Convenience function to add the SVD ckf to the path.
-    :param path: The path to add the module to
-    :param cdc_reco_tracks: The name of the already created CDC reco tracks
-    :param svd_reco_tracks: The name to output the SVD reco tracks to
-    :param use_mc_truth: Use the MC information in the CKF
-    :param filter_cut: CKF parameter for MVA filter
-    """
-
-    if "SVDSpacePointCreator" not in path:
-        path.add_module("SVDSpacePointCreator")
-
-    # Then, add the CKF
-    path.add_module("DAFRecoFitter", recoTracksStoreArrayName=cdc_reco_tracks)
-
-    if use_mc_truth:
-        module_parameters = dict(
-            firstHighFilter="truth",
-
-            advanceHighFilter="advance",
-
-            secondHighFilter="all",
-
-            updateHighFilter="fit",
-
-            thirdHighFilter="all",
-        )
-
-    else:
-        module_parameters = dict(
-            firstHighFilter="mva",
-            firstHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDSeededStateFilter_1.xml", "cut": filter_cut},
-
-            advanceHighFilter="advance",
-
-            secondHighFilter="mva",
-            secondHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDSeededStateFilter_2.xml", "cut": filter_cut},
-
-            updateHighFilter="fit",
-
-            thirdHighFilter="mva",
-            thirdHighFilterParameters={"identifier": "tracking/data/ckf_CDCSVDSeededStateFilter_3.xml", "cut": filter_cut},
-        )
-
-    path.add_module("CDCToSVDSeedCKF",
-                    minimalPtRequirement=0,
-
-                    inputRecoTrackStoreArrayName=cdc_reco_tracks,
-                    outputRecoTrackStoreArrayName=svd_reco_tracks,
-                    temporaryVXDTracksStoreArrayName=temporary_vxd_track_cands,
-
-                    hitFilter="seeded",
-                    hitFilterParameters={"vxdTracksStoreArrayName": temporary_vxd_track_cands},
-                    seedFilter="distance",
-
-                    **module_parameters)
-
-
 def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
-                filter_cut=0.1, overlap_cut=0.0, use_best_results=3, use_best_seeds=5):
+                filter_cut=0.0, overlap_cut=0.1, use_best_results=5, use_best_seeds=5):
     """
     Convenience function to add the SVD ckf to the path.
     :param path: The path to add the module to
@@ -173,7 +148,7 @@ def add_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth,
 
                     inputRecoTrackStoreArrayName=cdc_reco_tracks,
                     outputRecoTrackStoreArrayName=svd_reco_tracks,
-                    hitFilter="sensor",
+                    hitFilter="distance",
                     seedFilter="distance",
 
                     enableOverlapResolving=True,

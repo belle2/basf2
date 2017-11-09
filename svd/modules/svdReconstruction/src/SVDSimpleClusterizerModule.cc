@@ -213,6 +213,7 @@ void SVDSimpleClusterizerModule::event()
     if (clusterCandidate->isGoodCluster())
       writeClusters(*clusterCandidate);
   }
+  delete clusterCandidate;
 
   B2DEBUG(1, "Number of clusters: " << storeClusters.getEntries());
 }

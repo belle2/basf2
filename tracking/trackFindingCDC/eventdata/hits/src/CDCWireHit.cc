@@ -61,8 +61,8 @@ CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
   , m_refDriftLength(driftLength)
   , m_refDriftLengthVariance(driftLengthVariance)
   , m_refChargeDeposit(chargeDeposit)
-  , m_hit(ptrHit)
   , m_refDriftTime(driftTime)
+  , m_hit(ptrHit)
 {
 }
 

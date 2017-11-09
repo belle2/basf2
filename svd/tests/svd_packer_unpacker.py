@@ -8,7 +8,6 @@ import numpy
 
 import simulation
 
-# mapping_file = Belle2.FileSystem.findFile("svd/data/svd_mapping.xml")
 svd_digits_pack_unpack_collection = "SVDDigits_test"
 set_random_seed(42)
 
@@ -95,8 +94,6 @@ eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 # Show progress of processing
 progress = register_module('Progress')
 
-use_central_database("development")
-
 main = create_path()
 # init path
 main.add_module(eventinfosetter)
@@ -111,13 +108,11 @@ Packer = register_module('SVDPacker')
 Packer.param('NodeID', nodeid)
 Packer.param('svdDigitListName', 'SVDDigits')
 Packer.param('rawSVDListName', 'SVDRaw')
-# Packer.param('xmlMapFileName', mapping_file)
 main.add_module(Packer)
 
 unPacker = register_module('SVDUnpacker')
 unPacker.param('rawSVDListName', 'SVDRaw')
 unPacker.param('svdDigitListName', svd_digits_pack_unpack_collection)
-# unPacker.param('xmlMapFileName', mapping_file)
 main.add_module(unPacker)
 
 # run custom test module to check if the SVDDigits and the

@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Umberto Tamponi                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -191,7 +191,6 @@ namespace Belle2 {
       fileNames.push_back(fName);
     }
 
-    //    auto& chMapper = TOPGeometryPar::Instance()->getChannelMapper();
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
     DBImportObjPtr<TOPCalChannelT0> channelT0;
@@ -201,6 +200,8 @@ namespace Belle2 {
 
     for (const auto& fileName : fileNames) {
       TFile* file = new TFile(fileName.c_str(), "r");
+      B2INFO("--> Opening constants file " << fileName);
+
       if (!file) {
         B2ERROR("openFile: " << fileName << " *** failed to open");
         continue;
@@ -218,12 +219,11 @@ namespace Belle2 {
       int channelID = 0; // 0-511
       int slotID = 0;    // 1-16
 
-      treeCal->Show(1);
       treeCal->SetBranchAddress("channel", &channelID);
       treeCal->SetBranchAddress("slot", &slotID);
       treeCal->SetBranchAddress("t0Const", &t0Cal);
 
-      B2INFO("--> importing constats ");
+      B2INFO("--> importing constats");
 
       for (int iCal = 0; iCal < treeCal->GetEntries(); iCal++) {
         treeCal->GetEntry(iCal);
@@ -237,7 +237,6 @@ namespace Belle2 {
                   "). Skipping the entry.");
           continue;
         }
-        //        auto channel = chMapper.getChannel(channelID);
         double err = 0.; // No error provided yet!!
         channelT0->setT0(slotID, channelID, t0Cal, err);
         nCal[slotID - 1]++;
@@ -252,9 +251,9 @@ namespace Belle2 {
     short nCalTot = 0;
     B2INFO("Summary: ");
     for (int iSlot = 1; iSlot < 17; iSlot++) {
-      B2INFO("--> number of calibrated channels on Slot " << iSlot << " : " << nCal[iSlot - 1] << "/512");
-      B2INFO("--> Cal on ch 0, 256 and 511: " << channelT0->getT0(iSlot, 0) << " " << channelT0->getT0(iSlot,
-             256) << " " << channelT0->getT0(iSlot, 511));
+      B2INFO("--> Number of calibrated channels on Slot " << iSlot << " : " << nCal[iSlot - 1] << "/512");
+      B2INFO("--> Cal on ch 1, 256 and 511:    " << channelT0->getT0(iSlot, 0) << ", " << channelT0->getT0(iSlot,
+             257) << ", " << channelT0->getT0(iSlot, 511));
       nCalTot += nCal[iSlot - 1];
     }
 

@@ -44,7 +44,9 @@ from ROOT import Belle2
 # at KEKCC /home/belle2/tkeck/feiv4/Belle2_2017_MC7_Track14_2/ )
 use_central_database('production', LogLevel.WARNING, 'fei_database')
 
+
 from variables import variables
+
 
 variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
 variables.addAlias('daugSigProbProduct', 'daughterProductOf(extraInfo(SignalProbability))')
@@ -142,20 +144,22 @@ variables.addAlias('tau_pi0_gamma2_E', 'daughter(0, daughter(1,daughter(1,E)))')
 
 
 # PID
-variables.addAlias('tau_DLLKaon', 'daughter(0, daughter(0,DLLKaon))')
-variables.addAlias('tau_DLLMuon', 'daughter(0, daughter(0,DLLMuon))')
-variables.addAlias('tau_DLLElec', 'daughter(0, daughter(0,DLLElec))')
-variables.addAlias('tau_DLLPion', 'daughter(0, daughter(0,DLLPion))')
 variables.addAlias('tau_muid', 'daughter(0, daughter(0,muonID))')
 variables.addAlias('tau_eid', 'daughter(0, daughter(0,electronID))')
 variables.addAlias('tau_piid', 'daughter(0, daughter(0,pionID))')
 variables.addAlias('tau_Kid', 'daughter(0, daughter(0,kaonID))')
 
+variables.addAlias('d1_d1_mcPDG', 'daughter(1,daughter(1,mcPDG))')
+variables.addAlias('d1_d0_d2_mcPDG', 'daughter(1,daughter(0,daughter(2,mcPDG)))')
+
+
+from fei import backward_compatibility_layer
+backward_compatibility_layer.pid_renaming_oktober_2017()
 
 outputRootFile = "../1290310000.ntup.root"
 
-path = create_path()
 
+path = create_path()
 
 import fei
 particles = fei.get_default_channels()
@@ -294,17 +298,17 @@ tools4StauHad += ['CustomFloats[d0_d0_E:d0_d1_E]', 'Upsilon(4S) ->  B+:genericRa
 tools4StauHad += ['CustomFloats[d0_M:d0_d0_M:d0_d1_M]', 'Upsilon(4S) ->  ^B+:genericRank ^B-:taunu']
 tools4StauHad += ['CustomFloats[d0_p:d0_pCMS:d0_d0_p:d0_d0_pCMS]', 'Upsilon(4S) ->  B+:genericRank ^B-:taunu']
 tools4StauHad += ['CustomFloats[d0_d1_pCMS:d0_d1_d0_pCMS:d0_d1_d1_pCMS]', 'Upsilon(4S) ->  B+:genericRank ^B-:taunu']
-tools4StauHad += ['CustomFloats[d0_mcPDG:d1_mcPDG:d1_d0_mcPDG:d1_d0_d0_mcPDG:d1_d0_d1_mcPDG]',
+tools4StauHad += ['CustomFloats[d0_mcPDG:d1_mcPDG:d1_d0_mcPDG:d1_d1_mcPDG:d1_d0_d0_mcPDG:d1_d0_d1_mcPDG:d1_d0_d2_mcPDG]',
                   '^Upsilon(4S) ->  B+:genericRank B-:taunu']
 tools4StauHad += ['CustomFloats[dmID:d0_dmID:d1_dmID:d0_d0_dmID:d0_d1_dmID:d1_d0_dmID]',
                   'Upsilon(4S) ->  ^B+:genericRank ^B-:taunu']
 tools4StauHad += ['CustomFloats[isSignal:isExtendedSignal:isSignalAcceptMissingNeutrino]',
                   'Upsilon(4S) ->  ^B+:genericRank ^B-:taunu']
 tools4StauHad += ['MCTruth', 'Upsilon(4S) ->  ^B+:genericRank ^B-:taunu']
-tools4StauHad += ['CustomFloats[tau_DLLKaon:tau_Kid]', 'Upsilon(4S)  ->  B+:genericRank ^B-:taunu']
-tools4StauHad += ['CustomFloats[tau_DLLMuon:tau_muid]', 'Upsilon(4S)  ->  B+:genericRank ^B-:taunu']
-tools4StauHad += ['CustomFloats[tau_DLLElec:tau_eid]', 'Upsilon(4S)  ->  B+:genericRank ^B-:taunu']
-tools4StauHad += ['CustomFloats[tau_DLLPion:tau_piid]', 'Upsilon(4S)  ->  B+:genericRank ^B-:taunu']
+tools4StauHad += ['CustomFloats[tau_Kid]', 'Upsilon(4S)  ->  B+:genericRank ^B-:taunu']
+tools4StauHad += ['CustomFloats[tau_muid]', 'Upsilon(4S)  ->  B+:genericRank ^B-:taunu']
+tools4StauHad += ['CustomFloats[tau_eid]', 'Upsilon(4S)  ->  B+:genericRank ^B-:taunu']
+tools4StauHad += ['CustomFloats[tau_piid]', 'Upsilon(4S)  ->  B+:genericRank ^B-:taunu']
 tools4StauHad += ['CustomFloats[tau_pi0_gamma1_clusterTiming:tau_pi0_gamma2_clusterTiming]',
                   'Upsilon(4S) -> B+:genericRank ^B-:taunu']
 tools4StauHad += ['CustomFloats[tau_pi0_gamma1_clusterTheta:tau_pi0_gamma2_clusterTheta]',
@@ -335,10 +339,10 @@ tools4StauSL += ['CustomFloats[dmID:d0_dmID:d1_dmID:d0_d0_dmID:d0_d1_dmID:d1_d0_
 tools4StauSL += ['CustomFloats[isSignal:isExtendedSignal:isSignalAcceptMissingNeutrino]',
                  'Upsilon(4S) ->  ^B+:semileptonicRank ^B-:taunu']
 tools4StauSL += ['MCTruth', 'Upsilon(4S) ->  ^B+:semileptonicRank ^B-:taunu']
-tools4StauSL += ['CustomFloats[tau_DLLKaon:tau_Kid]', 'Upsilon(4S)  ->  B+:semileptonicRank ^B-:taunu']
-tools4StauSL += ['CustomFloats[tau_DLLMuon:tau_muid]', 'Upsilon(4S)  ->  B+:semileptonicRank ^B-:taunu']
-tools4StauSL += ['CustomFloats[tau_DLLElec:tau_eid]', 'Upsilon(4S)  ->  B+:semileptonicRank ^B-:taunu']
-tools4StauSL += ['CustomFloats[tau_DLLPion:tau_piid]', 'Upsilon(4S)  ->  B+:semileptonicRank ^B-:taunu']
+tools4StauSL += ['CustomFloats[tau_Kid]', 'Upsilon(4S)  ->  B+:semileptonicRank ^B-:taunu']
+tools4StauSL += ['CustomFloats[tau_muid]', 'Upsilon(4S)  ->  B+:semileptonicRank ^B-:taunu']
+tools4StauSL += ['CustomFloats[tau_eid]', 'Upsilon(4S)  ->  B+:semileptonicRank ^B-:taunu']
+tools4StauSL += ['CustomFloats[tau_piid]', 'Upsilon(4S)  ->  B+:semileptonicRank ^B-:taunu']
 
 
 # create and fill flat Ntuple

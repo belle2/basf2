@@ -64,12 +64,12 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
     new((*exampleDBArrayConstants)[i]) TestCalibObject(val);
   }
   saveCalibration(exampleDBArrayConstants, "TestCalibObjects");
-  return c_OK;
-
-//  // Iterate until we find answer to the most fundamental question...
-//  B2INFO("mean: " << mean);
-//  B2INFO("meanError: " << meanError);
-//  if (mean - 42. >= 1.)
-//    return c_Iterate;
-//
+  // Iterate until we find answer to the most fundamental question...
+  B2INFO("mean: " << mean);
+  B2INFO("meanError: " << meanError);
+  if (mean - 42. >= 1.) {
+    return c_Iterate;
+  } else {
+    return c_OK;
+  }
 }

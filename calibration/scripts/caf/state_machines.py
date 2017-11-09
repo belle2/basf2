@@ -658,12 +658,9 @@ class CalibrationMachine(Machine):
         # Add previous iteration databases from this calibration
         if self.iteration > 0:
             previous_iteration_dir = os.path.join(self.root_dir, str(self.iteration - 1))
-            for algorithm in self.calibration.algorithms:
-                algorithm_name = algorithm.algorithm.__cppname__.replace('Belle2::', '')
-                database_dir = os.path.join(previous_iteration_dir, self.calibration.alg_output_dir, 'outputdb')
-                list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
-                B2INFO('Adding local database from previous iteration of {0} for use by {1}'.format(algorithm_name,
-                                                                                                    self.calibration.name))
+            database_dir = os.path.join(previous_iteration_dir, self.calibration.alg_output_dir, 'outputdb')
+            list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
+            B2INFO('Adding local database from previous iteration of {}'.format(self.calibration.name))
 
         # Let's make a directory to store some files later to the collector jobs
         input_data_directory = os.path.join(self.root_dir, str(self.iteration), 'collector_input')
@@ -753,8 +750,7 @@ class CalibrationMachine(Machine):
             previous_iteration_dir = os.path.join(self.root_dir, str(self.iteration - 1))
             database_dir = os.path.join(previous_iteration_dir, self.calibration.alg_output_dir, 'outputdb')
             list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
-            B2INFO('Adding local database from previous iteration of {0} for use by {1}'.format(algorithm_name,
-                                                                                                self.calibration.name))
+            B2INFO('Adding local database from previous iteration of {}'.format(self.calibration.name))
         algs_runner.dependent_databases = list_dependent_databases
         B2DEBUG(100, "Setting Algortihm Runner {} to use global tag {}".format(algs_runner.name, self.calibration._global_tag))
         algs_runner.global_tag = self.calibration._global_tag

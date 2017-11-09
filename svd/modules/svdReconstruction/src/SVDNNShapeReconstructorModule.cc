@@ -18,6 +18,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
 #include <svd/reconstruction/NNWaveFitTool.h>
 
@@ -56,10 +57,13 @@ SVDNNShapeReconstructorModule::SVDNNShapeReconstructorModule() : Module()
            "TrueHits collection name", string(""));
   addParam("MCParticles", m_storeMCParticlesName,
            "MCParticles collection name", string(""));
-  addParam("TimeFitterFileName", m_timeFitterXmlName,
-           "Name of time fitter data file", string("svd/data/SVDTimeNet.xml"));
   addParam("WriteRecoDigits", m_writeRecoDigits,
            "Write RecoDigits to output?", m_writeRecoDigits);
+  // 2. Calibration and time fitter sources
+  addParam("TimeFitterName", m_timeFitterName,
+           "Name of time fitter data file", string("SVDTimeNet_6samples"));
+  addParam("CalibratePeak", m_calibratePeak, "Use calibrattion (vs. default) for peak widths and positions", bool(false));
+  // 3. Zero suppression
   addParam("ZeroSuppressionCut", m_cutAdjacent, "Zero-suppression cut on digits",
            m_cutAdjacent);
 }
@@ -121,10 +125,13 @@ void SVDNNShapeReconstructorModule::initialize()
   B2INFO(" -->  RecoDigitTrueRel:     " << m_relRecoDigitTrueHitName);
   B2INFO(" -->  Save RecoDigits?    " << (m_writeRecoDigits ? "Y" : "N"));
   B2INFO(" 2. CALIBRATION:");
-  B2INFO(" -->  Time NN:            " << m_timeFitterXmlName);
+  B2INFO(" -->  Time NN:            " << m_timeFitterName);
 
   // Properly initialize the NN time fitter
-  m_fitter.setNetwrok(m_timeFitterXmlName);
+  // FIXME: Should be moved to beginRun
+  // FIXME: No support for 3/6 sample switching within a run/event
+  DBObjPtr<DatabaseRepresentationOfWeightfile> dbXml(m_timeFitterName);
+  m_fitter.setNetwrok(dbXml->m_data);
 }
 
 void SVDNNShapeReconstructorModule::createRelationLookup(const RelationArray& relation,
@@ -232,10 +239,16 @@ void SVDNNShapeReconstructorModule::event()
       // Get things from the database.
       // Noise is good as it comes.
       float stripNoiseADU = m_noiseCal.getNoise(sensorID, isU, stripNo);
-      // Width is FWHM in ns. Must convert to beta-prime width. FIXME: There should be a method of the functor returning width based on FWHM!
-      float stripSignalWidth = 1.988 * m_pulseShapeCal.getWidth(sensorID, isU, stripNo);
-      // T0 is said to be in ns...
-      float stripT0 = m_pulseShapeCal.getPeakTime(sensorID, isU, stripNo) - 0.25 * stripSignalWidth;
+      // Some calibrations magic.
+      // FIXME: Only use calibration on real data. Until simulations correspond to
+      // default calibrtion, we cannot use it.
+      double stripSignalWidth = 270;
+      double stripT0 = isU ? 4.0 : 0.0;
+      if (m_calibratePeak) {
+        stripSignalWidth = 1.988 * m_pulseShapeCal.getWidth(sensorID, isU, stripNo);
+        stripT0 = m_pulseShapeCal.getPeakTime(sensorID, isU, stripNo)
+                  - 0.25 * stripSignalWidth;
+      }
 
       B2DEBUG(300, "Strip parameters: stripNoiseADU: " << stripNoiseADU <<
               " Width: " << stripSignalWidth <<

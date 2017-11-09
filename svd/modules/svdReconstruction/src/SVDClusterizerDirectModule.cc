@@ -21,6 +21,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
 #include <svd/reconstruction/NNWaveFitTool.h>
 
@@ -61,8 +62,9 @@ SVDClusterizerDirectModule::SVDClusterizerDirectModule() : Module()
            "MCParticles collection name", string(""));
 
   // 2. Calibration and time fitter sources
-  addParam("TimeFitterFileName", m_timeFitterXmlName,
-           "Name of time fitter data file", string("svd/data/SVDTimeNet.xml"));
+  addParam("TimeFitterName", m_timeFitterName,
+           "Name of time fitter data file", string("SVDTimeNet_6samples"));
+  addParam("CalibratePeak", m_calibratePeak, "Use calibrattion (vs. default) for peak widths and positions", bool(false));
 
   // 3. Clustering
   // FIXME: Idiotic names of parameters kept for compatibility with the old clusterizer.
@@ -126,7 +128,7 @@ void SVDClusterizerDirectModule::initialize()
   B2INFO(" -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
   B2INFO(" -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
   B2INFO(" 2. CALIBRATION DATA:");
-  B2INFO(" -->  Time NN:            " << m_timeFitterXmlName);
+  B2INFO(" -->  Time NN:            " << m_timeFitterName);
   B2INFO(" 4. CLUSTERING:");
   B2INFO(" -->  Neighbour cut:      " << m_cutAdjacent);
   B2INFO(" -->  Seed cut:           " << m_cutSeed);
@@ -134,7 +136,10 @@ void SVDClusterizerDirectModule::initialize()
   B2INFO(" -->  HT for clusters >:  " << m_sizeHeadTail);
 
   // Properly initialize the NN time fitter
-  m_fitter.setNetwrok(m_timeFitterXmlName);
+  // FIXME: Should be moved to beginRun
+  // FIXME: No support for 3/6 sample switching within a run/event
+  DBObjPtr<DatabaseRepresentationOfWeightfile> dbXml(m_timeFitterName);
+  m_fitter.setNetwrok(dbXml->m_data);
 }
 
 void SVDClusterizerDirectModule::createRelationLookup(const RelationArray& relation,
@@ -360,10 +365,17 @@ void SVDClusterizerDirectModule::event()
           m_pulseShapeCal.getChargeFromADC(sensorID, isU, stripNo, stripNoiseADU)
         );
         // Some calibrations magic.
-        double peakWidth = 1.988 * m_pulseShapeCal.getWidth(sensorID, isU, stripNo);
+        // FIXME: Only use calibration on real data. Until simulations correspond to
+        // default calibrtion, we cannot use it.
+        double peakWidth = 270;
+        double timeShift = isU ? 4.0 : 0.0;
+        if (m_calibratePeak) {
+          peakWidth = 1.988 * m_pulseShapeCal.getWidth(sensorID, isU, stripNo);
+          timeShift = m_pulseShapeCal.getPeakTime(sensorID, isU, stripNo)
+                      - 0.25 * peakWidth;
+        }
         waveWidths.push_back(peakWidth);
-        timeShifts.push_back(m_pulseShapeCal.getPeakTime(sensorID, isU, stripNo)
-                             - 0.25 * peakWidth);
+        timeShifts.push_back(timeShift);
         stripPositions.push_back(
           isU ? info.getUCellPosition(stripNo) : info.getVCellPosition(stripNo)
         );

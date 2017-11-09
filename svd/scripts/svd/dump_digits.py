@@ -14,7 +14,7 @@ class dump_digits(Module):
 
     """A simple module to check the reconstruction of SVD hits."""
 
-    def __init__(self, calmap='', oo_map='testbeam/vxd/data/2017_svd_mapping.xml', filename='dumped_digits.txt'):
+    def __init__(self, filename='dumped_digits.txt'):
         """Initialize the module"""
 
         super(dump_digits, self).__init__()
@@ -25,18 +25,16 @@ class dump_digits(Module):
         # Get a handle on the GeoCache
         self.geoCache = Belle2.VXD.GeoCache.getInstance()
         # Record filenames
-        self.oo_map = oo_map
-        self.calmap = calmap
+        self.noise_cal = Belle2.SVDNoiseCalibrations()
+        self.pulse_cal = Belle2.SVDPulseShapeCalibrations()
 
     def beginRun(self):
         """ Tasks at the start of a run """
         # Write header to output file
         self.outfile.write(
             'EventNo Layer Ladder Sensor Side StripNo TimeTrigger ' +
-            'GoodStrip Noise Width TimeShift' +
+            'GoodStrip Gain Noise Width TimeShift ' +
             'Sample0 Sample1 Sample2 Sample3 Sample4 Sample5 Charge TimeFit Chi2\n')
-        # Initialize stripmap
-        self.strip_map = Belle2.SVD.StripCalibrationMap(self.oo_map, self.calmap)
 
     def event(self):
         """Cycle through RecoDigit/ShaperDigit pairs and dump the corresponding data"""
@@ -68,26 +66,18 @@ class dump_digits(Module):
             triggerTime = 0.25 * 31.44 * (-4 + triggerBin + 0.5)
             s += '{trigger:.3f} '.format(trigger=triggerTime)
             # Calibrations
-            stripCals = self.strip_map.getStripData(sensorID, reco_digit.isUStrip(), stripNo)
+            stripNoise = self.noise_cal.getNoise(sensorID, reco_digit.isUStrip(), stripNo)
+            stripGain = 22500 / self.pulse_cal.getADCFromCharge(sensorID, reco_digit.isUStrip(), stripNo, 22500)
+
+            stripWidth = self.pulse_cal.getPeakTime(sensorID, reco_digit.isUStrip(), stripNo)
+            stripT0 = self.pulse_cal.getWidth(sensorID, reco_digit.isUStrip(), stripNo)
             s += '{mask} {gain:.3f} {noise:.3f} {width} {delay:.3f} '.format(
-                mask=('y' if stripCals.m_goodStrip else 'n'),
-                gain=stripCals.m_calPeak,
-                noise=stripCals.m_noise,
-                width=stripCals.m_calWidth,
-                delay=stripCals.m_calTimeDelay
+                mask='y',
+                gain=stripGain,
+                noise=stripNoise,
+                width=stripWidth,
+                delay=stripT0
             )
-            # Mask: True if good strip
-            stripMask = stripCals.m_goodStrip
-            # Gain: electrons per ADU
-            stripGain = stripCals.m_calPeak
-            if stripGain == 0:
-                stripGain = 1.0e6
-            # Noise: in electrons, convert to ADU
-            stripNoise = stripCals.m_noise / stripGain
-            # Width: correct beta-prime scale
-            stripWaveWidth = stripCals.m_calWidth
-            # TimeDelay: beta-prime shift,
-            stripTimeDelay = stripCals.m_calTimeDelay
 
             # Digit information
             samples = shaper_digit.getSamples()

@@ -19,6 +19,7 @@ set_log_level(LogLevel.WARNING)
 """
 For phase 3 related studies, use this tag
 """
+# use_local_database('localDB_NN_toImport/database_NN_toImport.txt','localDB_NN_toImport')
 use_central_database("development")
 
 # Register modules
@@ -50,7 +51,7 @@ SVDSIGR = register_module('SVDNNShapeReconstructor')
 # Write RecoDigits so that we can check them
 SVDSIGR.param('WriteRecoDigits', True)
 # RecoDigit clusterizer
-# SVDCLUST1 = register_module('SVDNNClusterizer')
+SVDCLUST1 = register_module('SVDNNClusterizer')
 # ShaperDigit clusterizer
 SVDCLUST2 = register_module("SVDClusterizerDirect")
 # Save output of simulation
@@ -69,7 +70,7 @@ particlegun.param('pdgCodes', [-11, 11])
 particlegun.param('nTracks', 1)
 
 # Set the number of events to be processed (100 events)
-eventinfosetter.param({'evtNumList': [10], 'expList': [3], 'runList': [400]})
+eventinfosetter.param({'evtNumList': [1000], 'expList': [0], 'runList': [0]})
 
 # Set output filename
 output.param('outputFileName', 'SVDTestOutput.root')

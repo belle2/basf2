@@ -94,8 +94,12 @@ namespace Belle2 {
       std::string m_relClusterShaperDigitName;
 
       //2. Strip and time fitter data
-      /** Name of the time fitter data xml */
-      std::string m_timeFitterXmlName;
+      /** Name of the time fitter (db label) */
+      std::string m_timeFitterName;
+      /** Use peak widths and peak time calibrations?
+       * Unitl this is also simulated, set to true only for testbeam data. */
+      bool m_calibratePeak = false;
+
 
       //3. Clustering
       /** Noise (cluster member) cut in units of m_elNoise. */

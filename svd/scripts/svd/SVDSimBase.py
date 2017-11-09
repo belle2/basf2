@@ -275,7 +275,7 @@ class SampleGenerator:
         # This is where the data are generated
         self.stockdata[['s' + str(i) for i in range(1, 7)]] = self.stockdata.apply(lambda row: pd.Series(
             gen_signal(row.amplitude, row.t0, row.tau, row.sigma, tau_sigma=self.tau_sigma, w=self.wf)), axis=1)
-        self.t0_bins = np.percentile(self.stockdata.t0, np.arange(0, 101, 4))
+        self.t0_bins = np.percentile(self.stockdata.t0, np.arange(0, 101, self.bin_size))
         self.t0_bins[0] = self.t0_bins[0] - 0.1
         self.t0_bins[-1] = self.t0_bins[-1] + 0.1
         self.stockdata['t0_bin'] = np.digitize(self.stockdata.t0, self.t0_bins)

@@ -70,14 +70,14 @@ namespace Belle2 {
 
       /** Cnnstructor
        * constructs the wavefitter from data in xml file.
-       * @param xmlFileName basf2 path to a network definition xml file
+       * @param xmlData string containing the network definition xml tree
        */
-      NNWaveFitter(std::string xmlFileName = "");
+      NNWaveFitter(std::string xmlData = "");
 
       /**Set proper network definition file.
-       * @param xmlFileName basf2 path to a network definition xml file
+       * @param xmlData string containing the network definition xml tree
        */
-      void setNetwrok(const std::string& xmlFileName);
+      void setNetwrok(const std::string& xmlData);
 
       /** Fitting method
        * Send data and get rseult structure.
@@ -154,7 +154,7 @@ namespace Belle2 {
       Eigen::VectorXd softmax(const Eigen::VectorXd& input)
       {
         auto output = input.array().unaryExpr(
-                        [](double x)->double { return ((x > 0) ? exp(x) : 0.0); }
+                        [](double x)->double { return ((x > -12) ? exp(x) : exp(-22)); }
                       );
         double norm = output.sum();
         return output / norm;

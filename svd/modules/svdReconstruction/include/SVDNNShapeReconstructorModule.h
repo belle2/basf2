@@ -98,7 +98,10 @@ namespace Belle2 {
 
       //2. Strip and time fitter data
       /** Name of the time fitter data xml */
-      std::string m_timeFitterXmlName;
+      std::string m_timeFitterName;
+      /** Use peak widths and peak time calibrations?
+       * Unitl this is also simulated, set to true only for testbeam data. */
+      bool m_calibratePeak = false;
 
       /** Calibrations: noise */
       SVDNoiseCalibrations m_noiseCal;

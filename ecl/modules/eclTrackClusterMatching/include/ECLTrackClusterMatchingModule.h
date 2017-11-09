@@ -82,35 +82,48 @@ namespace Belle2 {
     int m_iRun; /**< Run number */
     int m_iEvent; /**< Event number */
 
-    // int m_trackNo;
-    // double m_trackMomentum;
-    // double m_deltaPhi;
-    // double m_phiCluster;
-    // double m_errorPhi;
-    // double m_deltaTheta;
-    // double m_thetaCluster;
-    // double m_errorTheta;
-    // double m_quality;
-    // double m_quality_best; /**< Best quality among all extrapolated hits of one track */
-    // int m_hitstatus_best;
-
+    int m_trackNo;
+    double m_trackMomentum;
+    double m_deltaPhi;
+    double m_phiCluster;
+    double m_phiHit;
+    double m_errorPhi;
+    double m_deltaTheta;
+    double m_thetaCluster;
+    double m_thetaHit;
+    double m_errorTheta;
+    double m_phi_consistency;
+    double m_phi_consistency_best;
+    double m_theta_consistency;
+    double m_theta_consistency_best;
+    double m_quality;
+    double m_quality_best;
+    int m_hitstatus;
+    int m_hitstatus_best;
+    int m_true_cluster_pdg;
+    int m_true_track_pdg;
+    /*
     std::vector<int>* m_trackNo;
     std::vector<double>* m_trackMomentum;
     std::vector<double>* m_deltaPhi;
     std::vector<double>* m_phiCluster;
+    std::vector<double>* m_phiHit;
     std::vector<double>* m_errorPhi;
     std::vector<double>* m_deltaTheta;
     std::vector<double>* m_thetaCluster;
+    std::vector<double>* m_thetaHit;
     std::vector<double>* m_errorTheta;
     std::vector<double>* m_phi_consistency;
     std::vector<double>* m_phi_consistency_best;
     std::vector<double>* m_theta_consistency;
     std::vector<double>* m_theta_consistency_best;
     std::vector<double>* m_quality;
-    std::vector<double>* m_quality_best; /**< Best quality among all extrapolated hits of one track */
+    std::vector<double>* m_quality_best;
+    std::vector<int>* m_hitstatus;
     std::vector<int>* m_hitstatus_best;
     std::vector<int>* m_true_cluster_pdg;
     std::vector<int>* m_true_track_pdg;
+    */
   };
 
 } //Belle2

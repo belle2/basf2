@@ -2,17 +2,13 @@
 <header>
 <input>../ana-dstars.root, ../ana-xi-lambda.root</input>
 <output>standardParticlesValidation_ChargedPID.root</output>
-<contact>Jake Bennett, jvbennett@cmu.edu</contact>
+<contact>Jan Strube, jan.strube@desy.de</contact>
 </header>
 */
 
 ////////////////////////////////////////////////////////////
 //
-// Validation_StandardParticles.C
 // Check the PID cut values for given efficiencies and fakes
-//
-// Constributor: Jake Bennett
-// October 3, 2016
 //
 ////////////////////////////////////////////////////////////
 
@@ -74,7 +70,7 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
 
 
   // ---------- Momentum distributions (for efficiency determination) ----------
-  for ( int j = 0; j <= pdiv; ++j ){
+  for ( int j = 0; j < pdiv; ++j ){
     TString range = TString::Format("100,0.05,%f",j*1.0);
     if ( j == 0 ) range = TString::Format("100,1.0,2.0");
     else if ( j == pdiv - 1 ) range = TString::Format("100,1.0,4.0");
@@ -271,15 +267,15 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   hkpifake_eff->GetListOfFunctions()->Add(new TNamed("Description", hkpifake_eff->GetTitle()));
   hkpfake_eff->GetListOfFunctions()->Add(new TNamed("Description", hkpfake_eff->GetTitle()));
 
-  hpcut->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
-  hpicut->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
-  hkcut->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
+  hpcut->GetListOfFunctions()->Add(new TNamed("Contact","jan.strube@desy.de"));
+  hpicut->GetListOfFunctions()->Add(new TNamed("Contact","jan.strube@desy.de"));
+  hkcut->GetListOfFunctions()->Add(new TNamed("Contact","jan.strube@desy.de"));
 
-  hpikfake_eff->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
-  hpimufake_eff->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
-  hpiefake_eff->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
-  hkpifake_eff->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
-  hkpfake_eff->GetListOfFunctions()->Add(new TNamed("Contact","jvbennett@cmu.edu"));
+  hpikfake_eff->GetListOfFunctions()->Add(new TNamed("Contact","jan.strube@desy.de"));
+  hpimufake_eff->GetListOfFunctions()->Add(new TNamed("Contact","jan.strube@desy.de"));
+  hpiefake_eff->GetListOfFunctions()->Add(new TNamed("Contact","jan.strube@desy.de"));
+  hkpifake_eff->GetListOfFunctions()->Add(new TNamed("Contact","jan.strube@desy.de"));
+  hkpfake_eff->GetListOfFunctions()->Add(new TNamed("Contact","jan.strube@desy.de"));
 
   hpcut->Write();
   // hpcut->SaveAs("hpcut_hadrons.pdf");

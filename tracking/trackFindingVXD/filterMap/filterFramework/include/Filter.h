@@ -688,7 +688,7 @@ namespace Belle2 {
     Filter() {};
 
 
-    /** will set the observer for this and both "OR" filters it contains, all subseqent Boolean Filters will not observed (VoidObserver)
+    /** will set the observer for this and both "OR" filters it contains, all subsequent Boolean Filters will not observed (VoidObserver)
     @param otherObserver : the new observer
     */
     template< class otherObserver >

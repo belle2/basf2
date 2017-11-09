@@ -17,10 +17,11 @@
 #include <tracking/ckf/general/findlets/CKFDataHandler.dcl.h>
 #include <tracking/ckf/general/findlets/StateCreator.dcl.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.dcl.h>
+#include <tracking/trackFindingCDC/collectors/selectors/BestMatchSelector.h>
 #include <tracking/ckf/svd/findlets/SVDStateRejecter.h>
 #include <tracking/ckf/svd/findlets/SpacePointLoader.h>
+#include <tracking/ckf/svd/findlets/RelationFromSVDTracksCreator.h>
 
-#include <tracking/ckf/svd/filters/relations/SVDPairFilterFactory.h>
 #include <tracking/ckf/svd/filters/results/ChooseableSVDResultFilter.h>
 
 namespace Belle2 {
@@ -66,10 +67,6 @@ namespace Belle2 {
     // Parameters
     /// Minimal hit requirement for the results (counted in number of space points)
     unsigned int m_param_minimalHitRequirement = 2;
-    /// Store Array name coming from VXDTF2
-    std::string m_param_vxdTracksStoreArrayName = "VXDRecoTracks";
-    /// Store Array name of the space point track candidates coming from VXDTF2
-    std::string m_param_spacePointTrackCandidateName = "SPTrackCands";
 
     // Findlets
     /// Findlet for retrieving the cdc tracks and writing the result out
@@ -80,10 +77,14 @@ namespace Belle2 {
     StateCreator<RecoTrack, CKFToSVDState> m_stateCreatorFromTracks;
     /// Findlet for creating states out of hits
     StateCreator<const SpacePoint, CKFToSVDState> m_stateCreatorFromHits;
+    /// Relation Creator
+    RelationFromSVDTracksCreator m_relationCreator;
     /// Findlet doing the main work: the tree finding
     TreeSearcher<CKFToSVDState, SVDStateRejecter, CKFToSVDResult> m_treeSearchFindlet;
     /// Filter for the results
     ChooseableSVDResultFilter m_overlapFilter;
+    /// Greedy filter for the relations between SVD and CDC Reco Tracks
+    TrackFindingCDC::BestMatchSelector<const RecoTrack, const RecoTrack> m_bestMatchSelector;
 
     // Object pools
     /// Pointers to the CDC Reco tracks as a vector
@@ -98,5 +99,7 @@ namespace Belle2 {
     std::vector<TrackFindingCDC::WeightedRelation<CKFToSVDState>> m_relations;
     /// Vector for storing the results
     std::vector<CKFToSVDResult> m_results;
+    /// Relations between CDC tracks and SVD tracks
+    std::vector<TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>> m_relationsCDCToSVD;
   };
 }

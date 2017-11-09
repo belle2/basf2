@@ -71,6 +71,11 @@ namespace Belle2 {
       m_useDistance4sort(sortByDistance)
     {}
 
+    /**
+     * Generate the default copy constructor
+     */
+    Sector(const Sector&) = default;
+
 
     /** overloaded assignment operator */
     Sector& operator=(const Sector& aSector)

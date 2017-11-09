@@ -851,7 +851,8 @@ class AlgorithmMachine(Machine):
             use_local_database(filename, directory)
 
         # Create a directory to store the payloads of this algorithm
-        os.mkdir(self.output_database_dir)
+        if not os.path.exists(self.output_database_dir):
+            os.mkdir(self.output_database_dir)
         # add local database to save payloads
         B2INFO("Output local database for {} stored at {}".format(
                self.algorithm.name,

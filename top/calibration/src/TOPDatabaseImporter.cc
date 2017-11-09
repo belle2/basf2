@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Umberto Tamponi                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -179,11 +179,10 @@ namespace Belle2 {
 
     B2RESULT("Sample time calibration constants imported to database, calibrated channels: "
              << ncal << "/" << nall);
-
   }
 
 
-  void TOPDatabaseImporter::importSampleTimeCalibrationKichimi(string fNames)
+  void TOPDatabaseImporter::importLocalT0Calibration(string fNames)
   {
     vector<string> fileNames;
     stringstream ss(fNames);
@@ -192,181 +191,75 @@ namespace Belle2 {
       fileNames.push_back(fName);
     }
 
-    auto& feMapper = TOPGeometryPar::Instance()->getFrontEndMapper();
-    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-    auto syncTimeBase = geo->getNominalTDC().getSyncTimeBase();
-
-    DBImportObjPtr<TOPCalTimebase> timeBase;
-    timeBase.construct(syncTimeBase);
-
-    for (const auto& fileName : fileNames) {
-      TFile* file = new TFile(fileName.c_str(), "r");
-      if (!file) {
-        B2ERROR("openFile: " << fileName << " *** failed to open");
-        continue;
-      }
-      B2INFO(fileName << ": open for reading");
-
-      // parse module ID from the file name
-      auto i = fileName.rfind("/");
-      if (i != string::npos) {
-        i++;
-      } else {
-        i = 0;
-      }
-      if (fileName.substr(i, 1) != "s") {
-        B2ERROR("No 's' found in the file name");
-        continue;
-      }
-      string slot = fileName.substr(i + 1, 2);
-      int moduleID = stoi(slot);
-      if (!geo->isModuleIDValid(moduleID)) {
-        B2ERROR("Module ID is not valid (incorrectly parsed from file name?): " << moduleID);
-        continue;
-      }
-      B2INFO("--> importing constats for slot " << moduleID);
-
-      string hname = "h_qasic[" +  to_string(moduleID) + "];1";
-      TH1D* quality = (TH1D*) file->Get(hname.c_str());
-      if (!quality) {
-        B2ERROR("Quality histogram '" << hname << "' not found");
-        continue;
-      }
-
-      int goodChannels = 0;
-      for (int as = 0; as < 64; as++) { // as = ASIC + carrier * 4 + BS * 16
-
-        hname = "tbcval[" +  to_string(as) + "];1";
-        TH1D* tbcval = (TH1D*) file->Get(hname.c_str());
-        if (!tbcval) {
-          B2ERROR("Histogram '" << hname << "' with calibration constants not found");
-          continue;
-        }
-
-        vector<double> sampleTimes;
-        if (quality->GetBinContent(as + 1) == 0 and tbcval->GetEntries() > 0) {
-          double rescale = 1;
-          if (tbcval->GetBinContent(257) > 0)
-            rescale = 2 * syncTimeBase / tbcval->GetBinContent(257);
-          for (int isamp = 0; isamp < 256; isamp++) {
-            sampleTimes.push_back(tbcval->GetBinContent(isamp + 1) * rescale);
-          }
-          goodChannels++;
-        }
-
-        auto boardStack = as / 16;
-        auto* femap = feMapper.getMap(moduleID, boardStack);
-        if (!femap) {
-          B2ERROR("No FrontEnd map available for boardstack " << boardStack <<
-                  " of module " << moduleID);
-          continue;
-        }
-        auto scrodID = femap->getScrodID();
-        for (int ch = 0; ch < 8; ch++) {
-          auto channel = as * 8 + ch;
-          if (!sampleTimes.empty()) {
-            timeBase->append(scrodID, channel % 128, sampleTimes);
-          }
-        }
-      }
-      file->Close();
-      B2INFO("--> number of calibrated asics: " << goodChannels << "/64");
-      B2INFO("file closed");
-    }
-
-    int nall = timeBase->getSampleTimes().size();
-    int ncal = 0;
-    for (const auto& sampleTimes : timeBase->getSampleTimes()) {
-      if (sampleTimes.isCalibrated()) ncal++;
-    }
-
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
-    timeBase.import(iov);
-
-    B2RESULT("Sample time calibration constants imported to database, calibrated channels: "
-             << ncal << "/" << nall);
-
-  }
-
-
-
-  void TOPDatabaseImporter::importChannelT0CalibrationKichimi(string fNames)
-  {
-    vector<string> fileNames;
-    stringstream ss(fNames);
-    string fName;
-    while (ss >> fName) {
-      fileNames.push_back(fName);
-    }
-
-    auto& chMapper = TOPGeometryPar::Instance()->getChannelMapper();
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
     DBImportObjPtr<TOPCalChannelT0> channelT0;
     channelT0.construct();
 
-    int nall = 0;
-    int ncal = 0;
+    int nCal[16] = {0}; // number of calibrated channels per slot
+
     for (const auto& fileName : fileNames) {
       TFile* file = new TFile(fileName.c_str(), "r");
+      B2INFO("--> Opening constants file " << fileName);
+
       if (!file) {
         B2ERROR("openFile: " << fileName << " *** failed to open");
         continue;
       }
-      B2INFO(fileName << ": open for reading");
+      B2INFO("--> " << fileName << ": open for reading");
 
-      // parse module ID from the file name
-      auto i = fileName.rfind("/");
-      if (i != string::npos) {
-        i++;
-      } else {
-        i = 0;
-      }
-      if (fileName.substr(i, 1) != "s") {
-        B2ERROR("No 's' found in the file name");
-        continue;
-      }
-      string slot = fileName.substr(i + 1, 2);
-      int moduleID = stoi(slot);
-      if (!geo->isModuleIDValid(moduleID)) {
-        B2ERROR("Module ID is not valid (incorrectly parsed from file name?): " << moduleID);
-        continue;
-      }
-      B2INFO("--> importing constats for slot " << moduleID);
+      TTree* treeCal = (TTree*)file->Get("chT0");
 
-      string qname = "t0good[" +  to_string(moduleID) + "];1";
-      TH1D* quality = (TH1D*) file->Get(qname.c_str());
-      if (!quality) {
-        B2ERROR("Quality histogram '" << qname << "' not found");
+      if (!treeCal) {
+        B2ERROR("openFile: no tree named chT0 found in " << fileName);
         continue;
       }
 
-      string hname = "t0val[" +  to_string(moduleID) + "];1";
-      TH1D* t0val = (TH1D*) file->Get(hname.c_str());
-      if (!t0val) {
-        B2ERROR("Histogram '" << hname << "' with calibration constants not found");
-        continue;
+      double t0Cal = 0.;
+      int channelID = 0; // 0-511
+      int slotID = 0;    // 1-16
+
+      treeCal->SetBranchAddress("channel", &channelID);
+      treeCal->SetBranchAddress("slot", &slotID);
+      treeCal->SetBranchAddress("t0Const", &t0Cal);
+
+      B2INFO("--> importing constats");
+
+      for (int iCal = 0; iCal < treeCal->GetEntries(); iCal++) {
+        treeCal->GetEntry(iCal);
+        if (!geo->isModuleIDValid(slotID)) {
+          B2ERROR("Slot ID is not valid (fileName = " << fileName << ", SlotID = " << slotID << ", ChannelID = " << channelID <<
+                  "). Skipping the entry.");
+          continue;
+        }
+        if (channelID < 0 || channelID > 511) {
+          B2ERROR("Channel ID is not valid (fileName = " << fileName << ", SlotID = " << slotID << ", ChannelID = " << channelID <<
+                  "). Skipping the entry.");
+          continue;
+        }
+        double err = 0.; // No error provided yet!!
+        channelT0->setT0(slotID, channelID, t0Cal, err);
+        nCal[slotID - 1]++;
       }
 
-      int goodChannels = 0;
-      for (int pixel = 1; pixel <= 512; pixel++) {
-        auto channel = chMapper.getChannel(pixel);
-        double err = 50e-3 * quality->GetBinContent(pixel); // 0 for bad constant
-        channelT0->setT0(moduleID, channel, t0val->GetBinContent(pixel), err);
-        nall++;
-        if (err != 0) {goodChannels++; ncal++;}
-      }
       file->Close();
-      B2INFO("--> number of calibrated channels: " << goodChannels << "/512");
-      B2INFO("file closed");
+      B2INFO("--> Input file closed");
     }
-
     IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
     channelT0.import(iov);
 
-    B2RESULT("Channel T0 calibration constants imported to database, calibrated channels: "
-             << ncal << "/" << nall);
+    short nCalTot = 0;
+    B2INFO("Summary: ");
+    for (int iSlot = 1; iSlot < 17; iSlot++) {
+      B2INFO("--> Number of calibrated channels on Slot " << iSlot << " : " << nCal[iSlot - 1] << "/512");
+      B2INFO("--> Cal on ch 1, 256 and 511:    " << channelT0->getT0(iSlot, 0) << ", " << channelT0->getT0(iSlot,
+             257) << ", " << channelT0->getT0(iSlot, 511));
+      nCalTot += nCal[iSlot - 1];
+    }
 
+
+    B2RESULT("Channel T0 calibration constants imported to database, calibrated channels: "
+             << nCalTot << "/ 8192");
   }
 
 
@@ -427,7 +320,6 @@ namespace Belle2 {
     }
 
   }
-
 
 
   void TOPDatabaseImporter::generateFakeChannelMask(double fractionDead, double fractionHot)

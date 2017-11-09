@@ -91,7 +91,7 @@ void CKFToSVDSeedFindlet::apply()
     CKFToSVDState* currentState = nullptr;
 
     // TODO: can this be done better?
-    const SpacePointTrackCand* spacePointTrackCand = vxdRecoTrack.getRelated<SpacePointTrackCand>("SPTrackCands");
+    const SpacePointTrackCand* spacePointTrackCand = vxdRecoTrack.getRelated<SpacePointTrackCand>(m_param_spacePointTrackCandidateName);
 
     B2ASSERT("There should be a related SPTC!", spacePointTrackCand);
     const std::vector<const SpacePoint*> spacePoints = spacePointTrackCand->getSortedHits();

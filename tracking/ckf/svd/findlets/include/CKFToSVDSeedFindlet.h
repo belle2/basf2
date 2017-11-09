@@ -30,7 +30,18 @@ namespace Belle2 {
 
   class ModuleParamList;
 
-
+  /**
+   * Findlet for combining CDC tracks with SVD tracks.
+   *
+   * The idea is to use every fitted CDC track, extrapolate it to every
+   * SVD track and extrapolate/Kalman fit it with every hit of the track.
+   *
+   * Then, a filter is applied to every CDC-SVD combination and the combinations
+   * are resolved using this filter information.
+   *
+   * This module does only output relations - the combination
+   * has to be done afterwards.
+   */
   class CKFToSVDSeedFindlet : public TrackFindingCDC::Findlet<> {
     /// Parent class
     using Super = TrackFindingCDC::Findlet<>;
@@ -42,10 +53,10 @@ namespace Belle2 {
     /// Default desctructor
     ~CKFToSVDSeedFindlet();
 
-    /// Expose the parameters of the sub findlets.
+    /// Expose the parameters (also of the sub findlets).
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
-    /// Do the track/hit finding/merging.ver
+    /// Do the track merging.
     void apply() override;
 
     /// Clear the object pools
@@ -57,6 +68,8 @@ namespace Belle2 {
     unsigned int m_param_minimalHitRequirement = 2;
     /// Store Array name coming from VXDTF2
     std::string m_param_vxdTracksStoreArrayName = "VXDRecoTracks";
+    /// Store Array name of the space point track candidates coming from VXDTF2
+    std::string m_param_spacePointTrackCandidateName = "SPTrackCands";
 
     // Findlets
     /// Findlet for retrieving the cdc tracks and writing the result out

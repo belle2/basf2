@@ -78,14 +78,15 @@ class MillepedeCalibration():
             path.add_module('Geometry')
             path.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
 
+        #: the algorithm
         self.algo = Belle2.MillepedeAlgorithm()
-        """ the algorithm """
+        #: pre-collector path
         self.path = path
-        """ pre-collector path """
+        #: the collector module
         self.collector = register_module('MillepedeCollector')
-        """ the collector module """
+        #: Parameter config at algo level (fixing)
         self.parameters = OrderedDict()
-        """ Parameter config at algo level (fixing) """
+        #: Commands for pede steering
         self.commands = OrderedDict()
 
         self.set_components(components)
@@ -107,6 +108,7 @@ class MillepedeCalibration():
 
     def set_components(self, components):
         """ Select db objects for calibration from list of their names """
+        #: db objects for calibration
         self.components = components
         calibrate_vertex = ((components == []) or ('BeamParameters' in components))
 
@@ -266,13 +268,14 @@ class MillepedeCalibration():
     # EKLM helpers --------------------------------------------------------------------------------------------------
     def fixEKLMSector(self, endcap, layer, sector, parameters=[1, 2, 6]):
         """ Fix EKLM sector parameters """
+
         for ipar in parameters:
             self.fixGlobalParam(Belle2.EKLMAlignment.getGlobalUniqueID(),
                                 Belle2.EKLMElementID(endcap, layer, sector).getGlobalNumber(),
                                 ipar)
 
+    # Fix (all by default) EKLM sectors
     def fixEKLMSectors(self, endcaps=range(1, 3), layers={1: 12, 2: 14}, sectors=range(1, 5)):
-        """ Fix (all by default) EKLM sectors """
         for endcap in endcaps:
             for layer in range(1, layers[endcap] + 1):
                 for sector in sectors:
@@ -285,10 +288,10 @@ class MillepedeCalibration():
                                 Belle2.EKLMElementID(endcap, layer, sector, plane, segment).getGlobalNumber(),
                                 ipar)
 
+    # Fix (all by default) EKLM segments
     def fixEKLMSegments(self, endcaps=range(1, 3), layers={1: 12, 2: 14},
                         sectors=range(1, 5), planes=range(1, 3),
                         segments=range(1, 6)):
-        """ Fix (all by default) EKLM segments """
         for endcap in endcaps:
             for layer in range(1, layers[endcap] + 1):
                 for sector in sectors:

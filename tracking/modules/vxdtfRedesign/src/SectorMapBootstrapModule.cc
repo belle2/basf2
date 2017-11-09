@@ -9,16 +9,6 @@
  *******************************************************************************/
 
 #include <iostream>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZ.h>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DNormed.h>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/SlopeRZ.h>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZSquared.h>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance2DXYSquared.h>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DSquared.h>
-
-
-#include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
-#include <tracking/trackFindingVXD/filterMap/filterFramework/Observer.h>
 
 #include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
@@ -157,9 +147,6 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1.nHitsMin = 3;
   config1.vIP = B2Vector3D(0, 0, 0);
   config1.secMapName = "SVDOnlyDefault"; // has been: "lowTestRedesign";
-  config1.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "Distance1DZ", "SlopeRZ", "Distance3DNormed"};
-  config1.threeHitFilters = { "Angle3DSimple", "CosAngleXY", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
-  config1.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
   config1.mField = 1.5;
   config1.rarenessThreshold = 0.; //0.001;
   config1.quantiles = {0., 1.};  //{0.005, 1. - 0.005};
@@ -182,9 +169,6 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1point1.nHitsMin = 3;
   config1point1.vIP = B2Vector3D(0, 0, 0);
   config1point1.secMapName = "SVDPXDDefault"; // has been: "lowTestSVDPXD";
-  config1point1.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "Distance1DZ", "SlopeRZ", "Distance3DNormed"};
-  config1point1.threeHitFilters = { "Angle3DSimple", "CosAngleXY", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
-  config1point1.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
   config1point1.mField = 1.5;
   config1point1.rarenessThreshold = 0.; //0.001;
   config1point1.quantiles = {0., 1.};  //{0.005, 1. - 0.005};
@@ -204,9 +188,6 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config2.nHitsMin = 3;
   config2.vIP = B2Vector3D(0, 0, 0);
   config2.secMapName = "medTestRedesign";
-  config2.twoHitFilters = { "Distance3DSquared"/*, "Distance2DXYSquared", "SlopeRZ", "CircleDist2IPHighOccupancy"*/};
-  config2.threeHitFilters = { "Angle3DSimple"/*, "DeltaSlopeRZ"*/};
-  config2.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
   config2.mField = 1.5;
   config2.rarenessThreshold = 0.001;
   config2.quantiles = {0.005, 1. - 0.005};
@@ -226,9 +207,6 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config3.nHitsMin = 3;
   config3.vIP = B2Vector3D(0, 0, 0);
   config3.secMapName = "highTestRedesign";
-  config3.twoHitFilters = { "Distance3DSquared"/*, "Distance2DXYSquared", "SlopeRZ"*/};
-  config3.threeHitFilters = { "Angle3DSimple"/*, "DeltaCircleRadiusHighOccupancy"*/};
-  config3.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
   config3.mField = 1.5;
   config3.rarenessThreshold = 0.001;
   config3.quantiles = {0.005, 1. - 0.005};
@@ -250,10 +228,6 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config4.vIP = B2Vector3D(0, 0, 0);
 
   config4.secMapName = "STRESS";
-
-  config4.twoHitFilters = { "Distance3DSquared"/*, "Distance2DXYSquared", "SlopeRZ"*/};
-  config4.threeHitFilters = { "Angle3DSimple"/*, "DeltaCircleRadiusHighOccupancy"*/};
-  config4.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
   config4.mField = 1.5;
   config4.rarenessThreshold = 0.001;
   config4.quantiles = {0.005, 1. - 0.005};
@@ -280,9 +254,6 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   configTB.nHitsMin = 3;
   configTB.vIP = B2Vector3D(-100, 0, 0); // should be the same as for the MC generation!
   configTB.secMapName = "testbeamTEST";
-  configTB.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "Distance1DZ", "SlopeRZ", "Distance3DNormed"};
-  configTB.threeHitFilters = { "Angle3DSimple", "CosAngleXY", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
-  configTB.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
   configTB.mField = 1.;
   configTB.rarenessThreshold = 0.; //0.001;
   configTB.quantiles = {0., 1.};  //{0.005, 1. - 0.005};

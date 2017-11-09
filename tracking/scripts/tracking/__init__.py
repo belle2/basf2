@@ -11,7 +11,7 @@ from pxd import add_pxd_reconstruction
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trigger_mode="all", additionalTrackFitHypotheses=None,
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, use_vxdtf2=True,
-                                fit_tracks=True, use_second_cdc_hits=False):
+                                fit_tracks=True, use_second_cdc_hits=False, skipHitPreparerAdding=False):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.
@@ -23,6 +23,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
         determine, if the geometry is already loaded. This flag can be used o just turn off the geometry adding at
         all (but you will have to add it on your own then).
+    :param skipHitPreparerAdding: Advanced flag: do not add the hit preparation (esp. VXD cluster creation
+        modules. This is useful if they have been added before already.
     :param mcTrackFinding: Use the MC track finders instead of the realistic ones.
     :param trigger_mode: For a description of the available trigger modes see add_reconstruction.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
@@ -38,6 +40,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     if not skipGeometryAdding:
         # Add the geometry in all trigger modes if not already in the path
         add_geometry_modules(path, components=components)
+
+    if not skipHitPreparerAdding:
+        add_hit_preparation_modules(path, components=components)
 
     # Material effects for all track extrapolations
     if trigger_mode in ["all", "hlt"] and 'SetupGenfitExtrapolation' not in path:
@@ -142,6 +147,20 @@ def add_geometry_modules(path, components=None):
     if 'SetupGenfitExtrapolation' not in path:
         path.add_module('SetupGenfitExtrapolation',
                         energyLossBrems=False, noiseBrems=False)
+
+
+def add_hit_preparation_modules(path, components=None):
+    """
+    Helper fucntion to prepare the hit information to be used by tracking.
+    """
+
+    # Preparation of the SVD clusters
+    if is_svd_used(components):
+        add_svd_reconstruction(path)
+
+    # Preparation of the PXD clusters
+    if is_pxd_used(components):
+        add_pxd_reconstruction(path)
 
 
 def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use_second_cdc_hits=False):
@@ -554,8 +573,6 @@ def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, 
     :param use_best_results: CKF parameter for useBestNInSeed
     :param use_best_seeds: CKF parameter for UseNStates
     """
-    if "PXDClusterizer" not in path:
-        add_pxd_reconstruction(path)
 
     if "PXDSpacePointCreator" not in path:
         path.add_module("PXDSpacePointCreator")
@@ -941,14 +958,6 @@ def add_vxd_track_finding(path, svd_clusters="", reco_tracks="RecoTracks", compo
                    instances of track finding in one path.
     """
 
-    # Preparation of the VXD clusters
-    if is_pxd_used(components):
-        if 'PXDClusterizer' not in path:
-            add_pxd_reconstruction(path)
-
-    if 'SVDClusterizer' not in path:
-        add_svd_reconstruction(path)
-
     # Temporary array
     # add a suffix to be able to have different
     vxd_trackcands = '__VXDGFTrackCands' + suffix
@@ -1013,11 +1022,11 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     # setting different for pxd and svd:
     if is_pxd_used(components):
         setup_name = "SVDPXDDefault"
-        db_sec_map_file = "SVDPXDDefaultMap.root"
+        db_sec_map_file = "VXDSectorMap_v000.root"
         use_pxd = True
     else:
         setup_name = "SVDOnlyDefault"
-        db_sec_map_file = "SVDOnlyDefaultMap.root"
+        db_sec_map_file = "SVDSectorMap_v000.root"
         use_pxd = False
 
     #################
@@ -1027,10 +1036,6 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
 
     nameSPs = 'SpacePoints' + suffix
 
-    if 'PXDClusterizer' not in path:
-        if use_pxd:
-            add_pxd_reconstruction(path)
-
     pxdSPCreatorName = 'PXDSpacePointCreator' + suffix
     if pxdSPCreatorName not in [e.name() for e in path.modules()]:
         if use_pxd:
@@ -1039,11 +1044,6 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
             spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
             spCreatorPXD.param('SpacePoints', nameSPs)
             path.add_module(spCreatorPXD)
-
-    # the clusterizer is needed twice (for HLT and reco)! Here it only works because it is added earlier
-    # without checking for existence see agira ticket BII-2618
-    if 'SVDClusterizer' not in path:
-        add_svd_reconstruction(path)
 
     # check for the name instead of the type as the HLT also need those module under (should have different names)
     svdSPCreatorName = 'SVDSpacePointCreator' + suffix

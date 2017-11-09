@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <algorithm>
+#include <iostream>
 
 #include <reconstruction/calibration/CDCDedxWireGainAlgorithm.h>
 
@@ -19,7 +20,7 @@ using namespace Belle2;
 //                 Implementation
 //-----------------------------------------------------------------
 
-CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() : CalibrationAlgorithm("CDCDedxWireGainCollector")
+CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() : CalibrationAlgorithm("CDCDedxElectronCollector")
 {
   // Set module properties
   setDescription("A calibration algorithm for CDC dE/dx wire gains");
@@ -38,14 +39,14 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   if (ttree->GetEntries() < 100)
     return c_NotEnoughData;
 
-  // You HAVE to set these pointers to 0!
+  // HAVE to set these pointers to 0!
   std::vector<int>* wire = 0;
   std::vector<double>* dedxhit = 0;
 
   ttree->SetBranchAddress("wire", &wire);
   ttree->SetBranchAddress("dedxhit", &dedxhit);
 
-  std::map<int, std::vector<double> > wirededx;
+  std::vector<double> wirededx[14336];
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
     for (unsigned int j = 0; j < wire->size(); ++j) {
@@ -53,14 +54,21 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     }
   }
 
-  B2INFO("dE/dx Calibration done for " << wirededx.size() << " CDC wires");
-
-  TClonesArray* gains = new TClonesArray("Belle2::CDCDedxWireGain");
-  int counter = 0;
-  for (auto const& awire : wirededx) {
-    new((*gains)[counter++]) CDCDedxWireGain(awire.first, calculateMean(awire.second, 0.05, 0.25));
+  std::vector<double> means;
+  for (unsigned int i = 0; i < 14336; ++i) {
+    std::cout << "Wire gain: " << i;
+    if (wirededx[i].size() < 50) {
+      means.push_back(1.0); // <-- FIX ME, should return not enough data
+    } else {
+      double mean = calculateMean(wirededx[i], 0.05, 0.25);
+      means.push_back(mean);
+    }
   }
-  saveCalibration(gains, "CDCDedxWireGains");
+
+  B2INFO("dE/dx Calibration done for " << means.size() << " CDC wires");
+
+  CDCDedxWireGain* gains = new CDCDedxWireGain(means);
+  saveCalibration(gains, "CDCDedxWireGain");
 
   // Iterate
   //  B2INFO("mean: " << mean);

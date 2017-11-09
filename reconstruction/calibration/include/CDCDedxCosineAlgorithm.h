@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <reconstruction/dbobjects/CDCDedxCosineCor.h>
 #include <calibration/CalibrationAlgorithm.h>
 
 namespace Belle2 {
@@ -37,7 +38,6 @@ namespace Belle2 {
      * Run algorithm
      */
     virtual EResult calibrate();
-
 
   private:
 

@@ -44,6 +44,7 @@ void NtuplePIDTool::deallocateMemory()
   delete [] m_fPIDe;
   delete [] m_fPIDmu;
   delete [] m_fPIDp;
+  delete [] m_fPIDd;
 }
 
 void NtuplePIDTool::eval(const Particle* particle)

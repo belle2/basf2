@@ -413,7 +413,7 @@ namespace Belle2 {
       truncSigma = sqrt((truncSigma / n - truncMean * truncMean) / n);
     }
 
-    dedxTrack->setMean(mean);
+    dedxTrack->setDedxMean(mean);
     dedxTrack->setTruncatedMean(truncMean);
     dedxTrack->setError(truncSigma);
     return true;

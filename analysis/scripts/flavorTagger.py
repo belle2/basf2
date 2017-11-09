@@ -379,10 +379,8 @@ def setVariables():
         'M',
         'cosAngleBetweenMomentumAndVertexVector',
         'lambdaZError',
-        'daughter(0,pionID)',
         'daughter(0,p)',
         'daughter(0,useCMSFrame(p))',
-        'daughter(1,protonID)',
         'daughter(1,p)',
         'daughter(1,useCMSFrame(p))',
         'useCMSFrame(p)',
@@ -390,6 +388,10 @@ def setVariables():
         'distance',
         'chiProb',
     ]
+    if getBelleOrBelle2() != "Belle":
+        variables['Lambda'].append('daughter(1,protonID)')  # protonID always 0 in B2BII check in future
+        variables['Lambda'].append('daughter(0,pionID)')  # not very powerful in B2BII
+
     variables['MaximumPstar'] = [
         'useCMSFrame(p)',
         'useCMSFrame(pt)',

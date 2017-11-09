@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <reconstruction/dbobjects/CDCDedxRunGain.h>
 #include <calibration/CalibrationAlgorithm.h>
 
 namespace Belle2 {

@@ -21,13 +21,12 @@
 #include <tracking/ckf/svd/findlets/SVDStateRejecter.h>
 #include <tracking/ckf/svd/findlets/SpacePointLoader.h>
 #include <tracking/ckf/svd/findlets/RelationFromSVDTracksCreator.h>
-
-#include <tracking/ckf/svd/filters/results/ChooseableSVDResultFilter.h>
+#include <tracking/ckf/svd/findlets/RecoTrackRelator.h>
+#include <tracking/ckf/svd/findlets/RelationApplier.h>
 
 namespace Belle2 {
   class RecoTrack;
   class SpacePoint;
-  class SVDCluster;
 
   class ModuleParamList;
 
@@ -81,10 +80,12 @@ namespace Belle2 {
     RelationFromSVDTracksCreator m_relationCreator;
     /// Findlet doing the main work: the tree finding
     TreeSearcher<CKFToSVDState, SVDStateRejecter, CKFToSVDResult> m_treeSearchFindlet;
-    /// Filter for the results
-    ChooseableSVDResultFilter m_overlapFilter;
+    /// Findlet transforming the hit results to track relations.
+    RecoTrackRelator m_recoTrackRelator;
     /// Greedy filter for the relations between SVD and CDC Reco Tracks
     TrackFindingCDC::BestMatchSelector<const RecoTrack, const RecoTrack> m_bestMatchSelector;
+    /// Copy the result relations to the store array
+    RelationApplier m_relationApplier;
 
     // Object pools
     /// Pointers to the CDC Reco tracks as a vector

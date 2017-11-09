@@ -19,7 +19,6 @@
 #include <tracking/ckf/general/findlets/LayerToggledApplier.icc.h>
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
 
 #include <framework/core/ModuleParamList.dcl.h>
 
@@ -38,8 +37,9 @@ CKFToSVDSeedFindlet::CKFToSVDSeedFindlet()
   addProcessingSignalListener(&m_stateCreatorFromHits);
   addProcessingSignalListener(&m_relationCreator);
   addProcessingSignalListener(&m_treeSearchFindlet);
-  addProcessingSignalListener(&m_overlapFilter);
+  addProcessingSignalListener(&m_recoTrackRelator);
   addProcessingSignalListener(&m_bestMatchSelector);
+  addProcessingSignalListener(&m_relationApplier);
 }
 
 void CKFToSVDSeedFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -53,7 +53,8 @@ void CKFToSVDSeedFindlet::exposeParameters(ModuleParamList* moduleParamList, con
   m_relationCreator.exposeParameters(moduleParamList, prefix);
   m_treeSearchFindlet.exposeParameters(moduleParamList, prefix);
   m_bestMatchSelector.exposeParameters(moduleParamList, prefix);
-  m_overlapFilter.exposeParameters(moduleParamList, prefix);
+  m_recoTrackRelator.exposeParameters(moduleParamList, prefix);
+  m_relationApplier.exposeParameters(moduleParamList, prefix);
 
   moduleParamList->addParameter("minimalHitRequirement", m_param_minimalHitRequirement,
                                 "Minimal Hit requirement for the results (counted in space points)",
@@ -96,23 +97,7 @@ void CKFToSVDSeedFindlet::apply()
   TrackFindingCDC::erase_remove_if(m_results, hasLowHitNumber);
   B2DEBUG(50, "After filtering: Having found " << m_results.size() << " results before overlap check");
 
-
-  // TODO: in findlet
-  for (const CKFToSVDResult& result : m_results) {
-    const Weight weight = m_overlapFilter(result);
-    if (not std::isnan(weight)) {
-      const RecoTrack* relatedSVDTrack = result.getRelatedSVDRecoTrack();
-      m_relationsCDCToSVD.emplace_back(result.getSeed(), weight, relatedSVDTrack);
-    }
-  }
-
+  m_recoTrackRelator.apply(m_results, m_relationsCDCToSVD);
   m_bestMatchSelector.apply(m_relationsCDCToSVD);
-
-  // TODO: in findlet
-  // write out relations
-  for (const TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>& relation : m_relationsCDCToSVD) {
-    const RecoTrack* cdcTrack = relation.getFrom();
-    const RecoTrack* svdTrack = relation.getTo();
-    cdcTrack->addRelationTo(svdTrack);
-  }
+  m_relationApplier.apply(m_relationsCDCToSVD);
 }

@@ -109,11 +109,11 @@ namespace Belle2 {
 
   private:
 
-    unsigned int m_inputBits[10]; /**< input bits from subdetectors */
-    unsigned int m_ftdlBits[10]; /**< ftdl (Final Trigger Decision Logic) bits. Outputs of trigger logic  */
-    unsigned int m_psnmBits[10]; /**< psnm (PreScale aNd Mask) bits. Prescaled ftdl bits */
-    unsigned int m_timTypeBits; /**< timing source bits. 4=PSNM, 3=TOP, 2=ECL, 1=CDC, 0=NON */
-    unsigned int m_prescaleBits[10][32]; /**the prescale factor of each bit*/
+    unsigned int m_inputBits[10] = {0}; /**< input bits from subdetectors */
+    unsigned int m_ftdlBits[10] = {0}; /**< ftdl (Final Trigger Decision Logic) bits. Outputs of trigger logic  */
+    unsigned int m_psnmBits[10] = {0}; /**< psnm (PreScale aNd Mask) bits. Prescaled ftdl bits */
+    unsigned int m_timTypeBits = 0; /**< timing source bits. 4=PSNM, 3=TOP, 2=ECL, 1=CDC, 0=NON */
+    unsigned int m_prescaleBits[10][32] = {0}; /**the prescale factor of each bit*/
 
     ClassDef(TRGSummary, 2); /**< Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
 

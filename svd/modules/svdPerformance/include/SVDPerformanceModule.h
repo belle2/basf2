@@ -7,10 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-/* Additional Info:
- * This Module is in an early stage of developement. The comments are mainly for temporal purposes
- * and will be changed and corrected in later stages of developement. So please ignore them.
- */
 
 #ifndef SVD_PERFORMANCE_H_
 #define SVD_PERFORMANCE_H_
@@ -84,6 +80,7 @@ namespace Belle2 {
     unsigned int sensorsOnLayer[4];
 
     TList* m_histoList_track;
+    TList* m_histoList_corr;
     TList* m_histoList_clTRK[m_nLayers];
     TList* m_histoList_cluster[m_nLayers];
     TList* m_histoList_shaper[m_nLayers];
@@ -125,6 +122,15 @@ namespace Belle2 {
     //1-STRIP CLUSTERS
     TH1F* h_1cltrkCharge[m_nLayers][m_nSensors][m_nSides]; //charge
     TH1F* h_1cltrkSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
+
+    //CORRELATIONS
+    TH1F* h_cltrk_UU;
+    TH1F* h_cltrk_VV;
+    TH1F* h_cltrk_UV;
+
+    TH1F* h_cl_UU;
+    TH1F* h_cl_VV;
+    TH1F* h_cl_UV;
 
     int getSensor(int layer, int sensor, bool isTB)
     {

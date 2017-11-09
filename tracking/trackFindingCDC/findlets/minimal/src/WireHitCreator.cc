@@ -245,11 +245,11 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
     const double flightTimeEstimate =
       FlightTimeEstimator::instance().getFlightTime2D(pos2D, alpha, beta);
 
-    double drifTimeMeas =  tdcCountTranslator.getDriftTime(hit.getTDCCount(),
-                                                           wire.getWireID(),
-                                                           flightTimeEstimate,
-                                                           wire.getRefZ(),
-                                                           hit.getADCCount());
+    const double drifTime =  tdcCountTranslator.getDriftTime(hit.getTDCCount(),
+                                                             wire.getWireID(),
+                                                             flightTimeEstimate,
+                                                             wire.getRefZ(),
+                                                             hit.getADCCount());
     const bool left = false;
     const bool right = true;
     const double theta = M_PI / 2;
@@ -311,7 +311,7 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
     const double refChargeDeposit =
       (leftRefChargeDeposit + rightRefChargeDeposit) / 2.0;
 
-    outputWireHits.emplace_back(&hit, refDriftLength, refDriftLengthVariance, refChargeDeposit, drifTimeMeas);
+    outputWireHits.emplace_back(&hit, refDriftLength, refDriftLengthVariance, refChargeDeposit, drifTime);
   }
 
   std::sort(outputWireHits.begin(), outputWireHits.end());

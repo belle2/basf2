@@ -13,7 +13,7 @@
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRandom.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 using namespace Belle2;
 
@@ -68,7 +68,7 @@ void QualityEstimatorMVAModule::beginRun()
 {
   m_mvaExpert->beginRun();
   // BField is required by all QualityEstimators
-  double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+  double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
   m_estimator->setMagneticFieldStrength(bFieldZ);
 }
 

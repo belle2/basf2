@@ -12,12 +12,18 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <framework/core/ModuleParamList.icc.h>
 
 using namespace Belle2;
 
 RecoTrackRelator::RecoTrackRelator()
 {
   addProcessingSignalListener(&m_overlapFilter);
+}
+
+void RecoTrackRelator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  m_overlapFilter.exposeParameters(moduleParamList, prefix);
 }
 
 void RecoTrackRelator::apply(const std::vector<CKFToSVDResult>& results,

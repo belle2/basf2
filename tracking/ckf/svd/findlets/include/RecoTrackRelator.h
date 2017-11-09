@@ -14,6 +14,7 @@
 #include <tracking/ckf/svd/filters/results/ChooseableSVDResultFilter.h>
 
 namespace Belle2 {
+  class ModuleParamList;
   class RecoTrack;
   class CKFToSVDResult;
 
@@ -33,6 +34,9 @@ namespace Belle2 {
 
     /// Add the sub findelts as listener
     RecoTrackRelator();
+
+    /// Expose the parameters of the sub findlet
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
     /// Create relations between tracks from the results (applying a filter)
     void apply(const std::vector<CKFToSVDResult>& results,

@@ -24,6 +24,7 @@ RelationFromSVDTracksCreator::RelationFromSVDTracksCreator()
 
 void RelationFromSVDTracksCreator::initialize()
 {
+  Super::initialize();
   m_vxdRecoTracks.isRequired(m_param_vxdTracksStoreArrayName);
 }
 

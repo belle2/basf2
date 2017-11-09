@@ -24,6 +24,7 @@ EventT0ShifterModule::EventT0ShifterModule() : Module()
 {
   // set module description
   setDescription("Shift the time of all MCParticles so that the collision time is t=0."
+                 "It reverts the shift done by the EventT0Generator module and should be used after the simulation."
                  "Note that the collisionTime in the MCInitialParticles is not changed.");
 
   setPropertyFlags(c_ParallelProcessingCertified);

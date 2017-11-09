@@ -18,6 +18,7 @@
 #include <tracking/ckf/general/findlets/LimitedOnStateApplier.icc.h>
 #include <tracking/ckf/general/findlets/LayerToggledApplier.icc.h>
 
+#include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 
 #include <framework/core/ModuleParamList.dcl.h>
@@ -59,6 +60,14 @@ void CKFToSVDSeedFindlet::exposeParameters(ModuleParamList* moduleParamList, con
   moduleParamList->addParameter("minimalHitRequirement", m_param_minimalHitRequirement,
                                 "Minimal Hit requirement for the results (counted in space points)",
                                 m_param_minimalHitRequirement);
+
+  moduleParamList->getParameter<std::string>("firstHighFilter").setDefaultValue("all");
+  moduleParamList->getParameter<std::string>("advanceHighFilter").setDefaultValue("advance");
+  moduleParamList->getParameter<std::string>("secondHighFilter").setDefaultValue("all");
+  moduleParamList->getParameter<std::string>("updateHighFilter").setDefaultValue("fit");
+  moduleParamList->getParameter<std::string>("thirdHighFilter").setDefaultValue("all");
+
+  moduleParamList->getParameter<bool>("endEarly").setDefaultValue(false);
 }
 
 void CKFToSVDSeedFindlet::beginEvent()

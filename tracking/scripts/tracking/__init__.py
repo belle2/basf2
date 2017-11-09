@@ -138,8 +138,10 @@ def add_geometry_modules(path, components=None):
     """
     # check for detector geometry, necessary for track extrapolation in genfit
     if 'Geometry' not in path:
-        geometry = register_module('Geometry')
-        if components:
+        geometry = register_module('Geometry', useDB=True)
+        if components is not None:
+            B2WARNING("Custom detector components specified, disabling Geometry from Database")
+            geometry.param('useDB', False)
             geometry.param('components', components)
         path.add_module(geometry)
 

@@ -122,10 +122,12 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
     progress = register_module('ProgressBar')
     path.add_module(progress)
 
+    # None means don't create custom magnetic field, use whatever comes from the
+    # DB
     environToMagneticField = {'MC5': 'MagneticFieldConstant',
-                              'MC6': 'MagneticField',
-                              'MC7': 'MagneticField',
-                              'default': 'MagneticField',
+                              'MC6': None,
+                              'MC7': None,
+                              'default': None,
                               'Belle': 'MagneticFieldConstantBelle'}
 
     fixECLClusters = {'MC5': True,
@@ -135,8 +137,10 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
                       'Belle': False}
 
     if environmentType in environToMagneticField:
-        path.add_module('Gearbox')
-        path.add_module('Geometry', ignoreIfPresent=False, components=[environToMagneticField.get(environmentType)])
+        fieldType = environToMagneticField[environmentType]
+        if fieldType is not None:
+            path.add_module('Gearbox')
+            path.add_module('Geometry', ignoreIfPresent=False, components=[fieldType])
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:

@@ -18,10 +18,7 @@
 using namespace Belle2;
 
 MillepedeTreeConversionAlgorithm::MillepedeTreeConversionAlgorithm() :
-  CalibrationAlgorithm("MillepedeCollector")
-{
-  m_OutputFile = "millepede_data.root";
-}
+  CalibrationAlgorithm("MillepedeCollector"), m_OutputFile("millepede_data.root") {}
 
 MillepedeTreeConversionAlgorithm::~MillepedeTreeConversionAlgorithm()
 {

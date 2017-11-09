@@ -150,7 +150,7 @@ namespace Belle2 {
     std::string getCollectorName() const {return getPrefix();}
 
     /// Set the prefix used to identify datastore objects
-    void setPrefix(std::string prefix) {m_prefix = prefix;}
+    void setPrefix(const std::string& prefix) {m_prefix = prefix;}
 
     /// Set the input file names used for this algorithm from a Python list
     void setInputFileNames(PyObject* inputFileNames);
@@ -257,7 +257,7 @@ namespace Belle2 {
     // -----------------------------------------------
 
     /// Set algorithm description (in constructor)
-    void setDescription(std::string description) {m_description = description;}
+    void setDescription(const std::string& description) {m_description = description;}
 
     /// Returns the Exp,Run pair that means 'Everything'. Currently unused.
     Calibration::ExpRun getAllGranularityExpRun() const {return m_allExpRun;}

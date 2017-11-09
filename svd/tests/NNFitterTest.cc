@@ -50,12 +50,12 @@ namespace Belle2 {
      * dtype='object')
      * Columns labeled by numerals contain probabilities.
      */
-    TEST(NNTimeFitter, CompareFits)
+    TEST(NNTimeFitter, DISABLED_CompareFits)
     {
       const size_t max_lines = 100; // maximum number of lines to be read
 
       // Create an instance of the NN fitter and the fitter tool.
-      NNWaveFitter fitter("svd/data/SVDTimeNet.xml");
+      NNWaveFitter fitter("SVDTimeNet_6samples");
       auto fitTool = fitter.getFitTool();
       size_t nProbs = fitTool.getBinCenters().size();
 

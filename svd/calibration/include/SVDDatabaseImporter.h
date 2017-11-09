@@ -87,6 +87,16 @@ namespace Belle2 {
      */
     void importSVDLocalRunBadStrips(/*std::string fileName*/);
 
+    /**
+     * This method imports SVD hit time estimator data to the database.
+     * The data are in the form of an xml file created by the training
+     * script.
+     * The same is used for 3- and 6-sample networks.
+     * @param filename name of the network definition xml to be imported.
+     * @param threeSamples Attach label for 3-samples?
+     */
+    void importSVDHitTimeNeuralNetwork(std::string fileName, bool threeSamples = false);
+
     /**********************************************/
 
     /**

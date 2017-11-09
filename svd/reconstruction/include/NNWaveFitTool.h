@@ -127,11 +127,22 @@ namespace Belle2 {
       /** Multiply probabilities.
        * Modify first probability distribution by multiplying it with
        * the second.
+       * If this produces a degenerate distribution, return mean distribution squared.
        */
       void multiply(nnFitterBinData& p, const nnFitterBinData& p1)
       {
+        nnFitterBinData pResult(getBinCenters().size());
         std::transform(p.begin(), p.end(),
-                       p1.begin(), p.begin(), std::multiplies<double>());
+                       p1.begin(), pResult.begin(), std::multiplies<double>());
+        double pnorm = std::accumulate(pResult.begin(), pResult.end(), 0.0);
+        // If the norm is too small, return mean distribution squared.
+        if (pnorm < 1.0e-10) {
+          std::transform(p.begin(), p.end(), p1.begin(), pResult.begin(),
+          [](double p1, double p2)->double {
+            return (p1 + p2) * (p1 + p2);
+          });
+        }
+        std::copy(pResult.begin(), pResult.end(), p.begin());
         normalize(p);
       }
 
@@ -175,13 +186,18 @@ namespace Belle2 {
        * After shifting, multiplications or other ooperations on probabilities,
        * we need to restore the normalization and re-build the list used for
        * calculation of EmpiricalDistributionFunction.
+       * If probabilities vanish over all bins, return uniform distribution.
        */
       void normalize(nnFitterBinData& p)
       {
         // Subtract background
         double pnorm = std::accumulate(p.begin(), p.end(), 0.0);
-        // Inly normalize if the norm makes sense.
-        if (pnorm > 0.0) {
+        // If the norm is too small, return default distribution.
+        if (pnorm < 1.0e-10) {
+          double uniformP = 1.0 / std::distance(p.begin(), p.end());
+          std::fill(p.begin(), p.end(), uniformP);
+        } else {
+          // Normalize if the norm makes sense.
           std::transform(p.begin(), p.end(), p.begin(),
                          std::bind2nd(std::divides<double>(), pnorm));
         }

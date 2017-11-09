@@ -79,9 +79,13 @@ class MillepedeCalibration():
             path.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
 
         self.algo = Belle2.MillepedeAlgorithm()
+        """ the algorithm """
         self.path = path
+        """ pre-collector path """
         self.collector = register_module('MillepedeCollector')
+        """ the collector module """
         self.parameters = OrderedDict()
+        """ Parameter config at algo level (fixing) """
         self.commands = OrderedDict()
 
         self.set_components(components)
@@ -102,6 +106,7 @@ class MillepedeCalibration():
         self.set_command('dwfractioncut 0.1')
 
     def set_components(self, components):
+        """ Select db objects for calibration from list of their names """
         self.components = components
         calibrate_vertex = ((components == []) or ('BeamParameters' in components))
 
@@ -114,6 +119,7 @@ class MillepedeCalibration():
         self.collector.param('calibrateVertex', calibrate_vertex)
 
     def set_command(self, cmd_name, command=''):
+        """ Set command for Millepede steering """
         if command is None:
             self.commands[cmd_name] = ''
             return
@@ -127,9 +133,12 @@ class MillepedeCalibration():
         self.commands[cmd_words[0]] = command
 
     def pre_algo(self, algorithm, iteration):
+        """ Fcn to execute before algorithm... """
         pass
 
     def create(self, name, input_files):
+        """ Create the CAF Calibration object """
+
         # We keep steering options for pede in python
         # as long as possible for the user before passing to algo
         for command in self.commands.values():
@@ -156,6 +165,7 @@ class MillepedeCalibration():
         return cal
 
     def get_param(self, param, module=None):
+        """ Get parameter of the collector module or any module in path (given its name) """
         module = self.get_module(module)
         for mpi in module.available_params():
             if mpi.name == param:
@@ -163,11 +173,13 @@ class MillepedeCalibration():
         return None
 
     def set_param(self, value, param, module=None):
+        """ Set parameter of the collector module or any module in path (given its name) """
         module = self.get_module(module)
         if module is not None:
             module.param(param, value)
 
     def get_module(self, module=None):
+        """ Get collector module or any other module from path (given its name) """
         if module is None or module == self.collector.name() or module == self.collector:
             module = self.collector
         else:
@@ -180,39 +192,51 @@ class MillepedeCalibration():
         return None
 
     def __getstate__(self):
+        """ serialization """
+
         state = self.__dict__.copy()
         state['path'] = serialize_path(self.path)
         state['collector'] = serialize_module(self.collector)
         return state
 
     def __setstate__(self, state):
+        """ de-serialization """
+
         self.__dict__.update(state)
         self.collector = deserialize_module(state['collector'])
         self.path = deserialize_path(state['path'])
 
     def fixGlobalParam(self, uid, element, param, value=0.):
+        """ Generic fcn to manipulate (fix to given value) parameters identified by db object id (uid),
+            element and parameter number """
         label = Belle2.GlobalLabel()
         label.construct(uid, element, param)
         self.parameters[str(label.label())] = (str(label.label()) + ' ' + str(value) + ' -1.')
 
     # CDC helpers --------------------------------------------------------------------------------------------------
     def fixCDCLayerX(self, layer):
+        """ fix CDC layer X-shift """
         self.fixGlobalParam(Belle2.CDCLayerAlignment.getGlobalUniqueID(), layer, Belle2.CDCLayerAlignment.layerX)
 
     def fixCDCLayerY(self, layer):
+        """ fix CDC layer Y-shift """
         self.fixGlobalParam(Belle2.CDCLayerAlignment.getGlobalUniqueID(), layer, Belle2.CDCLayerAlignment.layerY)
 
     def fixCDCLayerRot(self, layer):
+        """ fix CDC layer Phi rotation """
         self.fixGlobalParam(Belle2.CDCLayerAlignment.getGlobalUniqueID(), layer, Belle2.CDCLayerAlignment.layerPhi)
 
     def fixCDCTimeWalk(self, board_id):
+        """ fix CDC time walk parameter for given board """
         self.fixGlobalParam(Belle2.CDCTimeWalks.getGlobalUniqueID(), board_id, 0)
 
     def fixCDCTimeZero(self, wire_id):
+        """ fix CDC tie zero parameter for given wire """
         self.fixGlobalParam(Belle2.CDCTimeZeros.getGlobalUniqueID(), wire_id, 0)
 
     # VXD helpers --------------------------------------------------------------------------------------------------
     def fixVXDid(self, layer, ladder, sensor, segment=0, parameters=[1, 2, 3, 4, 5, 6]):
+        """ Fix VXD element parameters by layer,ladder,sensor and segment number """
         for param in parameters:
             self.fixGlobalParam(Belle2.VXDAlignment.getGlobalUniqueID(), Belle2.VxdID(
                 layer, ladder, sensor, segment).getID(), param)
@@ -224,31 +248,38 @@ class MillepedeCalibration():
         """
 
     def fixPXDYing(self, parameters=UVWABC):
+        """ fix PXD Ying half-shell """
         self.fixVXDid(1, 0, 0, 1, parameters)
 
     def fixPXDYang(self, parameters=UVWABC):
+        """ fix PXD Yang half-shell """
         self.fixVXDid(1, 0, 0, 2, parameters)
 
     def fixSVDPat(self, parameters=UVWABC):
+        """ fix SVD Pat half-shell """
         self.fixVXDid(3, 0, 0, 1, parameters)
 
     def fixSVDMat(self, parameters=UVWABC):
+        """ fix SVD Mat half-shell """
         self.fixVXDid(3, 0, 0, 2, parameters)
 
     # EKLM helpers --------------------------------------------------------------------------------------------------
     def fixEKLMSector(self, endcap, layer, sector, parameters=[1, 2, 6]):
+        """ Fix EKLM sector parameters """
         for ipar in parameters:
             self.fixGlobalParam(Belle2.EKLMAlignment.getGlobalUniqueID(),
                                 Belle2.EKLMElementID(endcap, layer, sector).getGlobalNumber(),
                                 ipar)
 
     def fixEKLMSectors(self, endcaps=range(1, 3), layers={1: 12, 2: 14}, sectors=range(1, 5)):
+        """ Fix (all by default) EKLM sectors """
         for endcap in endcaps:
             for layer in range(1, layers[endcap] + 1):
                 for sector in sectors:
                     self.fixEKLMSector(endcap, layer, sector)
 
     def fixEKLMSegment(self, endcap, layer, sector, plane, segment, parameters=[1, 2, 6]):
+        """ Fix EKLM segment parameters """
         for ipar in parameters:
             self.fixGlobalParam(Belle2.EKLMAlignment.getGlobalUniqueID(),
                                 Belle2.EKLMElementID(endcap, layer, sector, plane, segment).getGlobalNumber(),
@@ -257,6 +288,7 @@ class MillepedeCalibration():
     def fixEKLMSegments(self, endcaps=range(1, 3), layers={1: 12, 2: 14},
                         sectors=range(1, 5), planes=range(1, 3),
                         segments=range(1, 6)):
+        """ Fix (all by default) EKLM segments """
         for endcap in endcaps:
             for layer in range(1, layers[endcap] + 1):
                 for sector in sectors:
@@ -266,6 +298,7 @@ class MillepedeCalibration():
 
     # BKLM helpers --------------------------------------------------------------------------------------------------
     def fixBKLMModule(self, sector, layer, forward, parameters=UVWABC):
+        """ Fix a BKLM module """
         for ipar in parameters:
             self.fixGlobalParam(
                 Belle2.BKLMAlignment.getGlobalUniqueID(),
@@ -276,6 +309,7 @@ class MillepedeCalibration():
                 ipar)
 
     def fixBKLM(self, sectors=range(1, 9), layers=range(1, 16), forbackwards=[0, 1]):
+        """ Fix (all by default) BKLM modules """
         for sector in sectors:
             for layer in layers:
                 for forward in forbackwards:

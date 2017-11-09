@@ -15,11 +15,13 @@
 namespace Belle2 {
   class SpacePoint;
 
+  /// Load the space points from the store array to the given vector.
   class SpacePointLoader : public TrackFindingCDC::Findlet<const SpacePoint*> {
     /// Parent class
     using Super = TrackFindingCDC::StoreArrayLoader<const SpacePoint>;
 
   public:
+    /// Add the sub findlet as a listener
     SpacePointLoader();
 
     /// Expose the parameters of the sub findlets.

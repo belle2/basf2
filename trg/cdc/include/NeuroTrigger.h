@@ -128,20 +128,21 @@ namespace Belle2 {
     /** add an MLP to the list of networks */
     void addMLP(const CDCTriggerMLP& newMLP) { m_MLPs.push_back(newMLP); }
 
-    /** Select one expert MLP based on the track parameters of the given track
-     * and the hit pattern.
-     * This function assumes that sectors are unique.
-     * The first matching sector is returned without checking the rest.
-     * @return index of the selected MLP, -1 if the track does not fit any sector
-     */
-    int selectMLP(const CDCTriggerTrack& track);
-
     /** Select all matching expert MLPs based on the given track parameters.
-     * This function is used only during training to train overlapping sectors.
-     * At the end of the training, sectors are redefined to be unique.
+     * If the sectors are overlapping, there may be more than one matching expert.
+     * During training this is intended, afterwards sectors should be redefined to be unique.
+     * For unique geometrical sectors, this function can still find several experts
+     * with different sector patterns.
      * @return indices of the selected MLPs, empty if the track does not fit any sector
      */
     std::vector<int> selectMLPs(float phi0, float invpt, float theta);
+
+    /** Select one MLP from a list of sector indices.
+     * The selected expert either matches the given sector pattern,
+     * or has no pattern restriction. An unrestricted expert is returned only
+     * if there is no exactly matching expert.
+     * @return index of the selected MLP, -1 if no matching MLP is found */
+    int selectMLPbyPattern(std::vector<int>& MLPs, unsigned long pattern);
 
     /** Calculate 2D phi position and arclength for the given track and store them. */
     void updateTrack(const CDCTriggerTrack& track);

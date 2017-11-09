@@ -246,50 +246,6 @@ NeuroTrigger::setConstants()
   }
 }
 
-int
-NeuroTrigger::selectMLP(const CDCTriggerTrack& track)
-{
-  if (m_MLPs.size() == 0) {
-    B2WARNING("Trying to select MLP before initializing MLPs.");
-    return -1;
-  }
-
-  float phi0 = track.getPhi0();
-  float invpt = track.getKappa(1.5);
-  float theta = atan2(1., track.getCotTheta());
-
-  // find sector
-  // ranges should be unique
-  // if several sectors match, first in the list is taken
-  int bestIndex = -1;
-  for (unsigned isector = 0; isector < m_MLPs.size(); ++isector) {
-    if (m_MLPs[isector].inPhiRange(phi0) && m_MLPs[isector].inInvptRange(invpt)
-        && m_MLPs[isector].inThetaRange(theta)) {
-      unsigned long hitPattern = getInputPattern(isector, track);
-      unsigned long sectorPattern = m_MLPs[isector].getSLpattern();
-      B2DEBUG(250, "hitPattern " << hitPattern << " sectorPattern " << sectorPattern);
-      // no hit pattern restriction -> keep looking for exact match
-      if (sectorPattern == 0) {
-        B2DEBUG(250, "found match for general sector");
-        bestIndex = isector;
-      }
-      // exact match -> keep this sector
-      if (hitPattern == sectorPattern) {
-        B2DEBUG(250, "found match for hit pattern " << hitPattern);
-        bestIndex = isector;
-        break;
-      }
-    }
-  }
-
-  if (bestIndex < 0) {
-    B2DEBUG(150, "Track does not match any sector.");
-    B2DEBUG(150, "invpt=" << invpt << ", phi=" << phi0 * 180. / M_PI << ", theta=" << theta * 180. / M_PI);
-  }
-
-  return bestIndex;
-}
-
 vector<int>
 NeuroTrigger::selectMLPs(float phi0, float invpt, float theta)
 {
@@ -315,6 +271,39 @@ NeuroTrigger::selectMLPs(float phi0, float invpt, float theta)
 
   return indices;
 }
+
+
+int
+NeuroTrigger::selectMLPbyPattern(std::vector<int>& MLPs, unsigned long pattern)
+{
+  if (MLPs.size() == 0) {
+    return -1;
+  }
+
+  int bestIndex = -1;
+  for (unsigned i = 0; i < MLPs.size(); ++i) {
+    int isector = MLPs[i];
+    unsigned long sectorPattern = m_MLPs[isector].getSLpattern();
+    B2DEBUG(250, "hitPattern " << pattern << " sectorPattern " << sectorPattern);
+    // no hit pattern restriction -> keep looking for exact match
+    if (sectorPattern == 0) {
+      B2DEBUG(250, "found match for general sector");
+      bestIndex = isector;
+    }
+    // exact match -> keep this sector and stop searching
+    if (pattern == sectorPattern) {
+      B2DEBUG(250, "found match for hit pattern " << pattern);
+      bestIndex = isector;
+      break;
+    }
+  }
+
+  if (bestIndex < 0) {
+    B2DEBUG(150, "No sector found to match pattern " << pattern << ".");
+  }
+  return bestIndex;
+}
+
 
 void
 NeuroTrigger::updateTrack(const CDCTriggerTrack& track)

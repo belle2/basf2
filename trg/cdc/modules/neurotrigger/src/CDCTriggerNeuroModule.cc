@@ -87,35 +87,48 @@ CDCTriggerNeuroModule::event()
   StoreArray<CDCTriggerTrack> tracksNN(m_outputCollectionName);
   StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
   for (int itrack = 0; itrack < tracks2D.getEntries(); ++itrack) {
+    // calculate parameters that depend only on track
     if (m_fixedPoint) {
       m_NeuroTrigger.updateTrackFix(*tracks2D[itrack]);
     } else {
       m_NeuroTrigger.updateTrack(*tracks2D[itrack]);
     }
-    int isector = m_NeuroTrigger.selectMLP(*tracks2D[itrack]);
-    if (isector >= 0) {
-      vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector, *tracks2D[itrack]);
-      vector<float> MLPinput = m_NeuroTrigger.getInputVector(isector, hitIds);
-      vector<float> target;
-      if (m_fixedPoint) {
-        target = m_NeuroTrigger.runMLPFix(isector, MLPinput);
-      } else {
-        target = m_NeuroTrigger.runMLP(isector, MLPinput);
-      }
-      int zIndex = m_NeuroTrigger[isector].zIndex();
-      double z = (zIndex >= 0) ? target[zIndex] : 0.;
-      int thetaIndex = m_NeuroTrigger[isector].thetaIndex();
-      double cot = (thetaIndex >= 0) ? cos(target[thetaIndex]) / sin(target[thetaIndex]) : 0.;
-      const CDCTriggerTrack* NNtrack =
-        tracksNN.appendNew(tracks2D[itrack]->getPhi0(),
-                           tracks2D[itrack]->getOmega(),
-                           tracks2D[itrack]->getChi2D(),
-                           z, cot, 0.);
-      tracks2D[itrack]->addRelationTo(NNtrack);
-      // relations to hits used in MLP
-      for (unsigned i = 0; i < hitIds.size(); ++i) {
-        NNtrack->addRelationTo(segmentHits[hitIds[i]]);
-      }
+    // get all MLPs that match the phase space sector
+    vector<int> geoSectors =
+      m_NeuroTrigger.selectMLPs(tracks2D[itrack]->getPhi0(),
+                                tracks2D[itrack]->getKappa(1.5),
+                                atan2(1., tracks2D[itrack]->getCotTheta()));
+    if (geoSectors.size() == 0) continue;
+    // get the hit pattern (depends on phase space sector)
+    unsigned long hitPattern =
+      m_NeuroTrigger.getInputPattern(geoSectors[0], *tracks2D[itrack]);
+    // get the MLP that matches the hit pattern
+    int isector = m_NeuroTrigger.selectMLPbyPattern(geoSectors, hitPattern);
+    if (isector < 0) continue;
+    // get the input for the MLP
+    vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector, *tracks2D[itrack]);
+    vector<float> MLPinput = m_NeuroTrigger.getInputVector(isector, hitIds, *tracks2D[itrack]);
+    // run the MLP
+    vector<float> target;
+    if (m_fixedPoint) {
+      target = m_NeuroTrigger.runMLPFix(isector, MLPinput);
+    } else {
+      target = m_NeuroTrigger.runMLP(isector, MLPinput);
+    }
+    // create a new track with the MLP output values
+    int zIndex = m_NeuroTrigger[isector].zIndex();
+    double z = (zIndex >= 0) ? target[zIndex] : 0.;
+    int thetaIndex = m_NeuroTrigger[isector].thetaIndex();
+    double cot = (thetaIndex >= 0) ? cos(target[thetaIndex]) / sin(target[thetaIndex]) : 0.;
+    const CDCTriggerTrack* NNtrack =
+      tracksNN.appendNew(tracks2D[itrack]->getPhi0(),
+                         tracks2D[itrack]->getOmega(),
+                         tracks2D[itrack]->getChi2D(),
+                         z, cot, 0.);
+    tracks2D[itrack]->addRelationTo(NNtrack);
+    // relations to hits used in MLP
+    for (unsigned i = 0; i < hitIds.size(); ++i) {
+      NNtrack->addRelationTo(segmentHits[hitIds[i]]);
     }
   }
 }

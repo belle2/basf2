@@ -26,6 +26,7 @@ set_random_seed(100)
 main = create_path()
 
 main.add_module('RootInput')
+main.add_module('HistoManager', histoFileName='CollectorOutput.root')
 main.add_module('Gearbox')
 main.add_module('Geometry', excludedComponents=excludedComponents)
 main.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
@@ -56,7 +57,6 @@ main.add_module('MillepedeCollector',
                 primaryVertices=['Z0:mumu'],
                 calibrateVertex=True,
                 useGblTree=False)
-main.add_module('RootOutput', branchNames=['EventMetaData'])
 main.add_module('Progress')
 
 # main.add_module('GBLdiagnostics')

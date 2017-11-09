@@ -8,6 +8,7 @@ set_log_level(LogLevel.INFO)
 main = create_path()
 
 main.add_module("RootInput")
+main.add_module("HistoManager", histoFileName="CollectorOutput.root")
 main.add_module('Gearbox')
 main.add_module('Geometry', components=[])
 
@@ -21,7 +22,6 @@ main.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=
 # main.add_module('GBLfit', UseClusters=True, addDummyVertexPoint=True, externalIterations=0, StoreFailedTracks=True)
 main.add_module('MillepedeCollector', tracks=[], primaryVertices=primary_vertices, calibrateVertex=True)
 # main.add_module('GBLdiagnostics')
-main.add_module("RootOutput", branchNames=['EventMetaData'])
 
 process(main)
 print(statistics)

@@ -8,6 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <algorithm>
+#include <iostream>
+
 #include <reconstruction/calibration/CDCDedxWireGainAlgorithm.h>
 
 using namespace Belle2;
@@ -30,22 +33,22 @@ CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() : CalibrationAlgorithm("CDC
 CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 {
   // Get data objects
-  auto& ttree = getObject<TTree>("tree");
+  auto ttree = getObjectPtr<TTree>("tree");
 
   // require at least 100 tracks (arbitrary for now)
-  if (ttree.GetEntries() < 100)
+  if (ttree->GetEntries() < 100)
     return c_NotEnoughData;
 
   // HAVE to set these pointers to 0!
   std::vector<int>* wire = 0;
   std::vector<double>* dedxhit = 0;
 
-  ttree.SetBranchAddress("wire", &wire);
-  ttree.SetBranchAddress("dedxhit", &dedxhit);
+  ttree->SetBranchAddress("wire", &wire);
+  ttree->SetBranchAddress("dedxhit", &dedxhit);
 
   std::vector<double> wirededx[14336];
-  for (int i = 0; i < ttree.GetEntries(); ++i) {
-    ttree.GetEvent(i);
+  for (int i = 0; i < ttree->GetEntries(); ++i) {
+    ttree->GetEvent(i);
     for (unsigned int j = 0; j < wire->size(); ++j) {
       wirededx[wire->at(j)].push_back(dedxhit->at(j));
     }

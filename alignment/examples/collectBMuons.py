@@ -17,6 +17,7 @@ use_local_database('localdb/database.txt')
 main = create_path()
 
 main.add_module("RootInput")
+main.add_module("HistoManager", histoFileName="CollectorOutput.root")
 main.add_module('Gearbox')
 main.add_module('Geometry')
 reco.add_reconstruction(main, pruneTracks=False)
@@ -32,7 +33,6 @@ main.add_module(
     components=['VXDAlignment'])
 
 main.add_module("Progress")
-main.add_module("RootOutput", branchNames=['EventMetaData'])
 
 
 # generate events

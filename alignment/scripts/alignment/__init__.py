@@ -18,9 +18,9 @@ def collect(calibration, basf2_args=[]):
 
     main = create_path()
     main.add_module('RootInput', inputFileNames=calibration.input_files)
+    main.add_module('HistoManager', histoFileName='RootOutput.root')
     main.add_path(calibration.pre_collector_path)
     main.add_module(calibration.collector)
-    main.add_module('RootOutput', branchNames=['EventMetaData'])
 
     path_file_name = calibration.name + '.path'
     with open(path_file_name, 'bw') as serialized_path_file:
@@ -30,10 +30,8 @@ def collect(calibration, basf2_args=[]):
 
 
 def calibrate(calibration, input_file='RootOutput.root'):
-    input = register_module('RootInput', inputFileName=input_file)
-    input.initialize()
-
     for algo in calibration.algorithms:
+        algo.algorithm.setInputFileNames([input_file])
         algo.algorithm.execute()
         algo.algorithm.commit()
 

@@ -9,6 +9,8 @@
  **************************************************************************/
 
 #include <reconstruction/calibration/CDCDedxCosineAlgorithm.h>
+#include <TF1.h>
+#include <TH1F.h>
 
 using namespace Belle2;
 
@@ -30,15 +32,15 @@ CDCDedxCosineAlgorithm::CDCDedxCosineAlgorithm() : CalibrationAlgorithm("CDCDedx
 CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 {
   // Get data objects
-  auto& ttree = getObject<TTree>("tree");
+  auto ttree = getObjectPtr<TTree>("tree");
 
   // require at least 100 tracks (arbitrary for now)
-  if (ttree.GetEntries() < 100)
+  if (ttree->GetEntries() < 100)
     return c_NotEnoughData;
 
   double dedx, costh;
-  ttree.SetBranchAddress("dedx", &dedx);
-  ttree.SetBranchAddress("costh", &costh);
+  ttree->SetBranchAddress("dedx", &dedx);
+  ttree->SetBranchAddress("costh", &costh);
 
   // make histograms to store dE/dx values in bins of cos(theta)
   // bin size can be arbitrary, for now just make uniform bins
@@ -49,8 +51,8 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   }
 
   // fill histograms, bin size may be arbitrary
-  for (int i = 0; i < ttree.GetEntries(); ++i) {
-    ttree.GetEvent(i);
+  for (int i = 0; i < ttree->GetEntries(); ++i) {
+    ttree->GetEvent(i);
     if (costh < -1.0 || costh > 1.0) continue;
     int bin = (costh + 1.0) / (2.0 / nbins);
     if (bin < 0 || bin >= nbins) continue;

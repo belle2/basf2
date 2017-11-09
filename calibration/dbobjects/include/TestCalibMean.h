@@ -11,22 +11,24 @@
 #pragma once
 
 namespace Belle2 {
-  // Test DBObject
+  /// Test DBObject
   class TestCalibMean: public TObject {
 
   public:
 
-    // Default constructor
+    /// Default constructor
     TestCalibMean(): m_mean(0), m_meanError(0) {};
 
-    // Constructor
+    /// Constructor
     TestCalibMean(float mean, float meanError): m_mean(mean), m_meanError(meanError) {};
 
-    // Could extend this class with more methods to access/calculate things.
+    /// Gets the stored mean
     float getMean() const {return m_mean;};
+    /// Gets the stored error on the mean
     float getMeanError() const {return m_meanError;};
-
+    /// Sets the stored mean
     void setMean(float mean) {m_mean = mean;};
+    /// Sets the Stored mean error
     void setMeanError(float meanError) {m_meanError = meanError;};
   private:
 

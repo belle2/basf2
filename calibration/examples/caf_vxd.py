@@ -61,6 +61,7 @@ def main(argv):
     caf.run()
     print("Finished CAF Processing")
 
+
 if __name__ == "__main__":
     # Pass arguments after script name as input files
     main(sys.argv[1:])

@@ -9,6 +9,8 @@
  **************************************************************************/
 
 #include <reconstruction/modules/CDCDedxElectronCollector/CDCDedxElectronCollectorModule.h>
+#include <TTree.h>
+#include <TH1F.h>
 
 using namespace Belle2;
 
@@ -68,8 +70,8 @@ void CDCDedxElectronCollectorModule::collect()
   StoreArray<CDCDedxTrack> dedxTracks;
 
   // Collector object access
-  auto& means = getObject<TH1F>("means");
-  auto& tree = getObject<TTree>("tree");
+  auto means = getObjectPtr<TH1F>("means");
+  auto tree = getObjectPtr<TTree>("tree");
 
   for (int idedx = 0; idedx < dedxTracks.getEntries(); idedx++) {
     CDCDedxTrack* dedxTrack = dedxTracks[idedx];
@@ -102,7 +104,7 @@ void CDCDedxElectronCollectorModule::collect()
     }
 
     // Track information filled
-    tree.Fill();
-    means.Fill(m_dedx);
+    tree->Fill();
+    means->Fill(m_dedx);
   }
 }

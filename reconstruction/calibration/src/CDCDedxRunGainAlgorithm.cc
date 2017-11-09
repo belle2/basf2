@@ -9,6 +9,8 @@
  **************************************************************************/
 
 #include <reconstruction/calibration/CDCDedxRunGainAlgorithm.h>
+#include <TF1.h>
+#include <TH1F.h>
 
 using namespace Belle2;
 
@@ -31,13 +33,13 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
 {
 
   // Get data objects
-  auto& means = getObject<TH1F>("means");
+  auto means = getObjectPtr<TH1F>("means");
 
-  if (means.GetEntries() < 100)
+  if (means->GetEntries() < 100)
     return c_NotEnoughData;
 
-  means.Fit("gaus");
-  double rungain = means.GetFunction("gaus")->GetParameter(1);
+  means->Fit("gaus");
+  double rungain = means->GetFunction("gaus")->GetParameter(1);
 
   B2INFO("dE/dx run gains done: " << rungain);
 

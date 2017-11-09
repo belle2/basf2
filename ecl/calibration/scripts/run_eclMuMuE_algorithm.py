@@ -28,11 +28,8 @@ from ROOT import Belle2
 # run_eclMuMuE.py performs both stages of the calibration in a single job.
 
 
-input = register_module('RootInput')
-input.param('inputFileName', 'output/CollectorOutput.root')
-input.initialize()
-
 algo = Belle2.eclMuMuEAlgorithm()
+algo.setInputFiles(['output/CollectorOutput.root'])
 # barrel is [1152,7775]; barrel plus one endcap ring is [1008,7919]
 algo.cellIDLo = 1008
 algo.cellIDHi = 7919
@@ -44,10 +41,8 @@ algo.performFits = True
 
 exprun_vector = algo.getRunListFromAllData()
 for exprun in exprun_vector:
-    iov_to_execute = ROOT.vector("std::pair<int,int>")()
-    iov_to_execute.push_back(exprun)
+    iov_to_execute = [(exprun.first, exprun.second)]
     alg_result = algo.execute(iov_to_execute, 0)
     print("result was", alg_result)
-
-# Commits a successful list of dbobjects to localdb/
-algo.commit()
+    # Commits a successful list of dbobjects to localdb/
+    algo.commit()

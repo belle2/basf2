@@ -17,7 +17,6 @@
 
 #include <framework/datastore/StoreArray.h>
 
-#include <TTree.h>
 #include <vector>
 
 namespace Belle2 {

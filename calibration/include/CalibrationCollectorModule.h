@@ -4,30 +4,34 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Tadeas Bilka (tadeas.bilka@gmail.com)                    *
+ *               David Dossett (david.dossett@unimelb.edu.au)             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
 
-#include <framework/core/Module.h>
-#include <string>
-#include <TFile.h>
+#include <memory>
+#include <utility>
 
+#include <TDirectory.h>
+#include <TFile.h>
+#include <TRandom.h>
+
+#include <framework/core/HistoModule.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <calibration/dataobjects/CalibRootObj.h>
+#include <framework/logging/Logger.h>
 
-#include <TH1.h>
-#include <TTree.h>
-#include <TRandom.h>
-#include <alignment/dataobjects/MilleData.h>
+#include <calibration/dataobjects/RunRange.h>
+#include <calibration/CalibObjManager.h>
+#include <calibration/Utilities.h>
 
 namespace Belle2 {
   /**
    * Calibration collector module base class
    */
-  class CalibrationCollectorModule: public Module {
+  class CalibrationCollectorModule: public HistoModule {
 
   public:
     /// Constructor. Sets the default prefix for calibration dataobjects
@@ -41,6 +45,28 @@ namespace Belle2 {
     void event() final;
     /// Reset the m_runCollectOnRun flag, if necessary, to begin collection again
     void beginRun() final;
+    /// Write the current collector objects to a file and clear their memory
+    void endRun() final;
+    /// Write the final objects to the file
+    void terminate() final;
+    /// Runs due to HistoManager, allows us to discover the correct file
+    void defineHisto() final;
+
+    /// Register object with a name, takes ownership, do not access the pointer beyond prepare()
+    template <class T>
+    void registerObject(std::string name, T* obj)
+    {
+      std::shared_ptr<T> calObj(obj);
+      calObj->SetName(name.c_str());
+      m_manager.addObject(name, calObj);
+    }
+
+    /// Calls the CalibObjManager to get the requested stored collector data
+    template<class T>
+    T* getObjectPtr(std::string name)
+    {
+      return m_manager.getObject<T>(name, m_expRun);
+    }
 
   protected:
     /// Replacement for initialize(). Register calibration dataobjects here as well
@@ -49,37 +75,29 @@ namespace Belle2 {
     virtual void collect() {}
     /// Replacement for beginRun(). Do anything you would normally do in beginRun here
     virtual void startRun() {}
+    /// Replacement for endRun(). Do anything you would normally do in endRun here.
+    virtual void closeRun() {}
+    /// Replacement for terminate(). Do anything you would normally do in terminate here.
+    virtual void finish() {}
+    /// Replacement for defineHisto(). Do anything you would normally do in defineHisto here.
+    virtual void inDefineHisto() {}
 
-    /// Register object with name, takes ownership, do not access the pointer beyond prepare()
-    template <class T>
-    void registerObject(std::string name, T* obj)
-    {
-      std::string fullName = getName() + "_" + name;
+    /// The top TDirectory that collector objects for this collector will be stored beneath
+    TDirectory* m_dir;
 
-      StoreObjPtr<CalibRootObj<T>> storeobj(fullName, DataStore::c_Persistent);
-      storeobj.registerInDataStore();
+    /// Controls the creation, collection and access to calibration objects
+    CalibObjManager m_manager;
 
-      if (storeobj.isValid()) {
-        B2WARNING("Replacing existing calibration data object internal template. Potentially dangerous...");
-        storeobj->replaceObject(obj);
-      } else
-        storeobj.construct(obj);
-    }
+    /// Overall list of runs processed
+    RunRange* m_runRange;
 
-    /// Get object valid for current experiment and run by its name
-    template <class T>
-    T& getObject(std::string name)
-    {
-      std::string strExpRun = std::to_string(m_currentExpRun.first) + "." + std::to_string(m_currentExpRun.second);
-      std::string fullName = getName() + "_" + name;
-      StoreObjPtr<CalibRootObj<T>> storeobj(fullName, DataStore::c_Persistent);
-      return storeobj->getObject(strExpRun);
-    }
+    /// Current ExpRun for object retrieval (becomes -1,-1 for granularity=all)
+    Calibration::ExpRun m_expRun;
+
+    /// Current EventMetaData
+    StoreObjPtr<EventMetaData> m_emd;
 
   private:
-    /// Current exp, run for correct object retrieval/creation
-    std::pair<int, int> m_currentExpRun = { -999, -999};
-
     /****** Module Parameters *******/
     /// Granularity of data collection = run|all(= no granularity, exp,run=-1,-1)
     std::string m_granularity;
@@ -91,15 +109,16 @@ namespace Belle2 {
 
     /// Whether or not we will run the collect() at all this run, basically skips the event() function if false
     bool m_runCollectOnRun = true;
-    /// How many events processed for each ExpRun so far, stops counting up once max is hit
-    /// Only used/incremented if m_maxEventsPerRun > -1
-    std::map<std::pair<int, int>, int> m_expRunEvents;
+    /** How many events processed for each ExpRun so far, stops counting up once max is hit
+      * Only used/incremented if m_maxEventsPerRun > -1
+      */
+    std::map<Calibration::ExpRun, int> m_expRunEvents;
     /// Will point at correct value in m_expRunEvents
     int* m_eventsCollectedInRun;
-
-    /// I'm a little worried about floating point precision when comparing to 0.0 and 1.0 as special values.
-    /// But since a user will have set them (or left them as default) as exactly equal to 0.0 or 1.0 rather
-    /// than calculating them in almost every case, I think we can assume that the equalities hold.
+    /** I'm a little worried about floating point precision when comparing to 0.0 and 1.0 as special values.
+      * But since a user will have set them (or left them as default) as exactly equal to 0.0 or 1.0 rather
+      * than calculating them in almost every case, I think we can assume that the equalities hold.
+      */
     bool getPreScaleChoice()
     {
       if (m_preScale == 1.) {
@@ -113,4 +132,3 @@ namespace Belle2 {
     }
   };
 } // Belle2 namespace
-

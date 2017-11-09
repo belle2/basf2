@@ -100,13 +100,8 @@ if (args.inputFileName != ''):
 
 # "/scratch/kodys/tempdataBasf2/pxdClShCalSrc_RealDataFalse_PixelKind-1_005mils6*"
 # pxdClShCalSrc_RealDataFalse_PixelKind0_10mils9.root
-# Only initialize RootInput, as we do not loop over events,
-# only load persistent objects stored during data collection
-input = register_module('RootInput')
-input.param('inputFileName', inputFileName)
-input.initialize()
-
 algo = Belle2.PXDClusterShapeCalibrationAlgorithm()
+algo.setInputFiles([inputFileName])
 algo.setUseRealData(args.UseRealData)
 algo.setPixelKind(args.PixelKind)
 algo.setStoreEECorrectionType(args.StoreEECorrectionType)

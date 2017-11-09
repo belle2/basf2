@@ -57,7 +57,7 @@ namespace Belle2 {
     /**
      * This method is called at the end of the event processing.
      */
-    void terminate();
+    void finish();
 
   private:
 

@@ -71,10 +71,12 @@ def run_collectors():
         root_input_mod.param('inputFileNames', input_data)
     else:
         main.add_module('RootInput', inputFileNames=input_data)
+    if 'HistoManager' not in pe:
+        main.add_module('HistoManager', histoFileName='CollectorOutput.root')
 
     main.add_path(collector_path)
-    main.add_module('RootOutput', branchNames=["EventMetaData"])
     process(main)
+
 
 if __name__ == '__main__':
     run_collectors()

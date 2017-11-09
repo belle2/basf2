@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+<output>dstarlnuOutput.root</output>
+<contact>Racha Cheaib; rcheaib@olemiss.edu </header>
+<description>Tests FEI for B->D(*)lv</description>
+<interval>release</interval>
+"""
+
 #######################################################
 #
 # This script demonstrates how to reconstruct Btag using
@@ -125,6 +133,8 @@ variables.addAlias('d1_mcPDG', 'daughter(1,mcPDG)')
 variables.addAlias('d1_d0_mcPDG', 'daughter(1,daughter(0,mcPDG))')
 variables.addAlias('d1_d0_d0_mcPDG', 'daughter(1,daughter(0,daughter(0,mcPDG)))')
 variables.addAlias('d1_d0_d1_mcPDG', 'daughter(1,daughter(0,daughter(1,mcPDG)))')
+from fei import backward_compatibility_layer
+backward_compatibility_layer.pid_renaming_oktober_2017()
 variables.addAlias('d1_eid', 'daughter(1,electronID)')
 variables.addAlias('d1_muid', 'daughter(1,muonID)')
 

@@ -23,6 +23,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
+#include <framework/database/DBObjPtr.h>
+#include <bklm/dbobjects/BKLMADCThreshold.h>
 
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawKLM.h>
@@ -44,6 +46,12 @@ namespace Belle2 {
     //! Module functions to be called from main process
     virtual void initialize();
 
+    //! begin run functions to be called from main process
+    virtual void beginRun();
+
+    //! end run functions to be called from main process
+    virtual void endRun();
+
     //! Module functions to be called from event process
     virtual void event();
 
@@ -61,7 +69,7 @@ namespace Belle2 {
     bool m_loadMapFromDB = false;
 
     //! offset of the scintillator ADC
-    const int m_scintADCOffset = 3400;
+    int m_scintADCOffset = 3400;
 
     //! # of events in a run
     int max_nevt;
@@ -86,6 +94,9 @@ namespace Belle2 {
 
     //! to map logical coordinates to hardware coordinates
     std::map<int, int> m_ModuleIdToelectId;
+
+    //! ADC offset and threshold read from database
+    DBObjPtr<BKLMADCThreshold> m_ADCParams;
 
     //! format the data
     //! @param[in] channel rpc channel

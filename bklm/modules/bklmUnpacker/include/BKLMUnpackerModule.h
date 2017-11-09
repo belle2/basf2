@@ -16,7 +16,9 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
+#include <framework/database/DBObjPtr.h>
 #include <bklm/dataobjects/BKLMDigit.h>
+#include <bklm/dbobjects/BKLMADCThreshold.h>
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
@@ -96,11 +98,14 @@ namespace Belle2 {
     //!use electronic map from DataBase or not
     bool m_loadMapFromDB = true;
 
+    //! load threshold from DataBase (true) or not (false)
+    bool m_loadThresholdFromDB = true;
+
     //! offset of the scintillator ADC
-    const int m_scintADCOffset = 3400;
+    int m_scintADCOffset = 3400;
 
     //! threshold for the scintillator NPE
-    double m_scintThreshold = 7;
+    double m_scintThreshold = 140;
 
     //! is this real data (true) or MC data (false)
     bool m_rawdata;
@@ -113,6 +118,10 @@ namespace Belle2 {
 
     //! warnig message: number of channels rejected due to un-reasonable channel number
     std::map<std::string, long> m_rejected;
+
+    //! ADC offset and threshold read from database
+    DBObjPtr<BKLMADCThreshold> m_ADCParams;
+
   };
 
 

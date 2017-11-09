@@ -47,8 +47,9 @@ BKLMUnpackerModule::BKLMUnpackerModule() : Module()
   addParam("keepEvenPackages", m_keepEvenPackages, "keep packages that have even length normally indicating that data was corrupted ",
            false);
   addParam("outputDigitsName", m_outputDigitsName, "name of BKLMDigit store array", string("BKLMDigits"));
-  addParam("SciThreshold", m_scintThreshold, "scintillator strip hits with NPE lower this value will be marked as bad",
-           double(7.0));
+  addParam("SciThreshold", m_scintThreshold, "scintillator strip hits with charge lower this value will be marked as bad",
+           double(140.0));
+  addParam("loadThresholdFromDB", m_loadThresholdFromDB, "load threshold from DataBase (true) or not (false)", true);
   addParam("loadMapFromDB", m_loadMapFromDB, "whether load electronic map from DataBase", true);
   addParam("rawdata", m_rawdata, "is this real rawdata (true) or MC data (false)", false);
 }
@@ -144,6 +145,11 @@ void BKLMUnpackerModule::beginRun()
 {
   if (m_loadMapFromDB) loadMapFromDB();
   else loadMap();
+
+  if (m_loadThresholdFromDB) {
+    m_scintADCOffset = m_ADCParams->getADCOffset();
+    m_scintThreshold = m_ADCParams->getADCThreshold();
+  }
 
 }
 
@@ -322,12 +328,12 @@ void BKLMUnpackerModule::event()
           moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
 
           BKLMDigit bklmDigit(moduleId, ctime, tdc, m_scintADCOffset - charge);
-          if (layer < 2 && !((m_scintADCOffset - charge) < m_scintThreshold))  bklmDigit.isAboveThreshold(true);
+          if (layer < 2 && ((m_scintADCOffset - charge) > m_scintThreshold))  bklmDigit.isAboveThreshold(true);
 
           B2DEBUG(1, "BKLMUnpackerModule:: digi after Unpacker: sector: " << bklmDigit.getSector() << " isforward: " << bklmDigit.isForward()
                   <<
                   " layer: " << bklmDigit.getLayer() << " isPhi: " << bklmDigit.isPhiReadout());
-          B2DEBUG(1, "BKLMUnpackerModule:: charge " << bklmDigit.getNPixel() << " tdc" << bklmDigit.getTime() << " ctime " << ctime <<
+          B2DEBUG(1, "BKLMUnpackerModule:: charge " << bklmDigit.getCharge() << " tdc" << bklmDigit.getTime() << " ctime " << ctime <<
                   " isAboveThresh " << bklmDigit.isAboveThreshold() << " isRPC " << bklmDigit.inRPC() << " moduleId " << bklmDigit.getModuleID());
 
           bklmDigits.appendNew(bklmDigit);

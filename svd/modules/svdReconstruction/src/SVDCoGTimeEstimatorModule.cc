@@ -114,6 +114,8 @@ void SVDCoGTimeEstimatorModule::beginRun()
 
 void SVDCoGTimeEstimatorModule::event()
 {
+  m_probabilities.clear();
+
   StoreArray<SVDShaperDigit> storeShapers;
   StoreArray<SVDRecoDigit> storeRecos;
 

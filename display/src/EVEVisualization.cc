@@ -151,6 +151,11 @@ EVEVisualization::EVEVisualization():
   m_gftrackpropagator->SetMagFieldObj(m_bfield, false);
   m_gftrackpropagator->SetMaxOrbs(0.5); //stop after track markers
 
+  m_consttrackpropagator = new TEveTrackPropagator();
+  m_consttrackpropagator->IncDenyDestroy();
+  m_consttrackpropagator->SetMagField(0, 0, -1.5);
+  m_consttrackpropagator->SetMaxR(EveGeometry::getMaxR());
+
   m_calo3d = new TEveCalo3D(NULL, "ECLClusters");
   m_calo3d->SetBarrelRadius(125.80); //inner radius of ECL barrel
   m_calo3d->SetForwardEndCapPos(196.5); //inner edge of forward endcap
@@ -181,6 +186,7 @@ EVEVisualization::~EVEVisualization()
   destroyEveElement(m_tracklist);
   destroyEveElement(m_trackpropagator);
   destroyEveElement(m_gftrackpropagator);
+  destroyEveElement(m_consttrackpropagator);
   destroyEveElement(m_calo3d);
   delete m_bfield;
 }
@@ -242,6 +248,44 @@ void EVEVisualization::addTrackCandidate(const std::string& collectionName,
   track_lines->AddElement(lines);
   addToGroup(collectionName, track_lines);
   addObject(&recoTrack, track_lines);
+}
+
+void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,
+                                          const CDCTriggerTrack& trgTrack)
+{
+  const TString label = ObjectInfo::getIdentifier(&trgTrack);
+
+  TVector3 track_pos = TVector3(0, 0, trgTrack.getZ0());
+  TVector3 track_mom = (trgTrack.getChargeSign() == 0) ?
+                       trgTrack.getDirection() * 1000 :
+                       trgTrack.getMomentum(1.5);
+
+  TEveRecTrack rectrack;
+  rectrack.fP.Set(track_mom);
+  rectrack.fV.Set(track_pos);
+
+  TEveTrack* track_lines = new TEveTrack(&rectrack, m_consttrackpropagator);
+  track_lines->SetName(label); //popup label set at end of function
+  track_lines->SetPropagator(m_consttrackpropagator);
+  track_lines->SetLineColor(kOrange + 2);
+  track_lines->SetLineWidth(1);
+  track_lines->SetTitle(ObjectInfo::getTitle(&trgTrack) +
+                        TString::Format("\ncharge: %d, phi: %.2fdeg, pt: %.2fGeV, theta: %.2fdeg, z: %.2fcm",
+                                        trgTrack.getChargeSign(),
+                                        trgTrack.getPhi0() * 180 / M_PI,
+                                        trgTrack.getTransverseMomentum(1.5),
+                                        trgTrack.getDirection().Theta() * 180 / M_PI,
+                                        trgTrack.getZ0()));
+
+
+  track_lines->SetCharge(trgTrack.getChargeSign());
+
+  // show 2D tracks with dashed lines
+  if (trgTrack.getZ0() == 0 && trgTrack.getCotTheta() == 0)
+    track_lines->SetLineStyle(2);
+
+  addToGroup(collectionName, track_lines);
+  addObject(&trgTrack, track_lines);
 }
 
 void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
@@ -1151,6 +1195,8 @@ void EVEVisualization::makeTracks()
     }
   }
 
+  m_consttrackpropagator->SetMagField(0, 0, -1.5);
+
   m_eclData->DataChanged(); //update limits (Empty() won't work otherwise)
   if (!m_eclData->Empty()) {
     m_eclData->SetAxisFromBins(0.0,
@@ -1450,7 +1496,7 @@ void EVEVisualization::addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines)
 
 }
 
-void EVEVisualization::addCDCHit(const CDCHit* hit)
+void EVEVisualization::addCDCHit(const CDCHit* hit, bool showTriggerHits)
 {
   static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
   const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));
@@ -1484,10 +1530,23 @@ void EVEVisualization::addCDCHit(const CDCHit* hit)
   TGeoCombiTrans det_trans(midPoint(0), midPoint(1), midPoint(2), &det_rot);
   cov_shape->SetTransMatrix(det_trans);
 
+  // get relation to trigger track segments
+  bool isPartOfTS = false;
+  const auto segments = hit->getRelationsFrom<CDCTriggerSegmentHit>();
+  if (showTriggerHits && segments.size() > 0) {
+    isPartOfTS = true;
+  }
+
   if (hit->getISuperLayer() % 2 == 0) {
-    cov_shape->SetMainColor(kCyan);
+    if (isPartOfTS)
+      cov_shape->SetMainColor(kCyan + 3);
+    else
+      cov_shape->SetMainColor(kCyan);
   } else {
-    cov_shape->SetMainColor(kPink + 7);
+    if (isPartOfTS)
+      cov_shape->SetMainColor(kPink + 6);
+    else
+      cov_shape->SetMainColor(kPink + 7);
   }
 
   cov_shape->SetMainTransparency(50);
@@ -1497,6 +1556,103 @@ void EVEVisualization::addCDCHit(const CDCHit* hit)
 
   addToGroup("CDCHits", cov_shape);
   addObject(hit, cov_shape);
+  if (isPartOfTS) {
+    addToGroup("CDCTriggerSegmentHits", cov_shape);
+    for (auto rel : segments.relations()) {
+      addObject(rel.object, cov_shape);
+    }
+  }
+}
+
+void EVEVisualization::addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit)
+{
+  static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
+  TEveStraightLineSet* shape = new TEveStraightLineSet();
+
+  // get center wire
+  unsigned iL = WireID(hit->getID()).getICLayer();
+  if (hit->getPriorityPosition() < 3) iL -= 1;
+  unsigned nWires = cdcgeo.nWiresInLayer(iL);
+  unsigned iCenter = hit->getIWire();
+  if (hit->getPriorityPosition() == 1) iCenter += 1;
+
+  // a track segment consists of 11 wires (15 in SL0) in a special configuration
+  // -> get the shift with respect to the center wire (*) for all wires
+  // SL 1-8:
+  //  _ _ _
+  // |_|_|_|
+  //  |_|_|
+  //   |*|
+  //  |_|_|
+  // |_|_|_|
+  std::vector<int> layershift = { -2, -1, 0, 1, 2};
+  std::vector<std::vector<float>> cellshift = {
+    { -1, 0, 1},
+    { -0.5, 0.5},
+    { 0},
+    { -0.5, 0.5},
+    { -1, 0, 1}
+  };
+  // SL 0:
+  //  _ _ _ _ _
+  // |_|_|_|_|_|
+  //  |_|_|_|_|
+  //   |_|_|_|
+  //    |_|_|
+  //     |*|
+  if (hit->getISuperLayer() == 0) {
+    layershift = { 0, 1, 2, 3, 4};
+    cellshift = {
+      { 0},
+      { -0.5, 0.5},
+      { -1, 0, 1},
+      { -1.5, -0.5, 0.5, 1.5},
+      { -2, -1, 0, 1, 2}
+    };
+  }
+
+  // draw all cells in segment
+  for (unsigned il = 0; il < layershift.size(); ++il) {
+    for (unsigned ic = 0; ic < cellshift[il].size(); ++ic) {
+      TVector3 corners[2][2];
+      for (unsigned ir = 0; ir < 2; ++ir) {
+        double r = cdcgeo.fieldWireR(iL + layershift[il] - ir);
+        double fz = cdcgeo.fieldWireFZ(iL + layershift[il] - ir);
+        double bz = cdcgeo.fieldWireBZ(iL + layershift[il] - ir);
+        for (unsigned iphi = 0; iphi < 2; ++iphi) {
+          double phib = (iCenter + cellshift[il][ic] + iphi - 0.5) * 2 * M_PI / nWires;
+          double phif = phib + cdcgeo.nShifts(iL + layershift[il]) * M_PI / nWires;
+
+          TVector3 pos_f = TVector3(cos(phif) * r, sin(phif) * r, fz);
+          TVector3 pos_b = TVector3(cos(phib) * r, sin(phib) * r, bz);
+          TVector3 zaxis = pos_b - pos_f;
+          corners[ir][iphi] = pos_f - zaxis * (pos_f.z() / zaxis.z());
+        }
+      }
+
+      shape->AddLine(corners[0][0].x(), corners[0][0].y(), 0,
+                     corners[0][1].x(), corners[0][1].y(), 0);
+      shape->AddLine(corners[0][1].x(), corners[0][1].y(), 0,
+                     corners[1][1].x(), corners[1][1].y(), 0);
+      shape->AddLine(corners[1][1].x(), corners[1][1].y(), 0,
+                     corners[1][0].x(), corners[1][0].y(), 0);
+      shape->AddLine(corners[1][0].x(), corners[1][0].y(), 0,
+                     corners[0][0].x(), corners[0][0].y(), 0);
+    }
+  }
+
+  if (hit->getISuperLayer() % 2 == 0) {
+    shape->SetMainColor(kCyan + 3);
+  } else {
+    shape->SetMainColor(kPink + 6);
+  }
+
+  shape->SetName(ObjectInfo::getIdentifier(hit));
+  shape->SetTitle(ObjectInfo::getTitle(hit) +
+                  TString::Format("\nPriority: %d\nLeft/Right: %d",
+                                  hit->getPriorityPosition(), hit->getLeftRight()));
+  addToGroup("CDCTriggerSegmentHits", shape);
+  addObject(hit, shape);
 }
 
 void EVEVisualization::addARICHHit(const ARICHHit* hit)

@@ -131,8 +131,10 @@ def add_simulation(
 
     # detector geometry
     if 'Geometry' not in path:
-        geometry = register_module('Geometry')
-        if components:
+        geometry = register_module('Geometry', useDB=True)
+        if components is not None:
+            B2WARNING("Custom detector components specified, disabling Geometry from Database")
+            geometry.param('useDB', False)
             geometry.param('components', components)
         path.add_module(geometry)
 

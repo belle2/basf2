@@ -872,7 +872,7 @@ namespace TreeFitter {
 
     // the geometric constraint
     if (mother() && tauIndex() >= 0) {
-      list.push_back(Constraint(this, Constraint::geometric, depth, 3, 0, 3));
+      list.push_back(Constraint(this, Constraint::geometric, depth, 3, 3));
     }
 
     // the mass constraint
@@ -881,9 +881,9 @@ namespace TreeFitter {
         //     if( mother() && mother()->type()==ParticleBase::kUpsilon)
         //  list.push_back(Constraint(this,Constraint::massEnergy,depth)) ;
         //       else
-        list.push_back(Constraint(this, Constraint::mass, depth, 1, 0, 10));
+        list.push_back(Constraint(this, Constraint::mass, depth, 1, 10));
       } else {
-        list.push_back(Constraint(this, Constraint::conversion, depth, 1, 0, 3));
+        list.push_back(Constraint(this, Constraint::conversion, depth, 1, 3));
       }
     }
   }

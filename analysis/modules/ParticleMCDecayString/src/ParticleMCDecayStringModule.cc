@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck                                              *
+ * Contributors: Thomas Keck, Matt Barrett                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,11 +13,13 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <analysis/dataobjects/StringWrapper.h>
 #include <analysis/utility/MCMatching.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
@@ -45,6 +47,15 @@ namespace Belle2 {
   void ParticleMCDecayStringModule::initialize()
   {
     StoreObjPtr<ParticleList>::required(m_listName);
+
+    //This might not work for non-default names of Particle array:
+    StoreArray<Particle> particles;
+    particles.isRequired();
+
+    StoreArray<StringWrapper> stringWrapperArray;
+    stringWrapperArray.registerInDataStore();
+    particles.registerRelationTo(stringWrapperArray);
+
 
     // Initializing the output root file
     if (m_fileName != "") {
@@ -80,6 +91,7 @@ namespace Belle2 {
   {
 
     StoreObjPtr<ParticleList> pList(m_listName);
+    StoreArray<StringWrapper> stringWrapperArray;
 
     for (unsigned iParticle = 0; iParticle < pList->getListSize(); ++iParticle) {
       Particle* particle = pList->getParticle(iParticle);
@@ -112,6 +124,10 @@ namespace Belle2 {
       particle->addExtraInfo(c_ExtraInfoNameExtended, m_decayHashExtended);
 
       m_decayString = decayStringExtended;
+
+      StringWrapper* stringWrapper = stringWrapperArray.appendNew();
+      particle->addRelationTo(stringWrapper);
+      stringWrapper->setString(m_decayString);
 
       auto it = m_hashset->get().find(m_decayHashFull);
       if (it == m_hashset->get().end()) {

@@ -70,6 +70,7 @@ void SVDPerformanceModule::initialize()
 
   //create list of histograms to be saved in the rootfile
   m_histoList_track = new TList;
+  m_histoList_corr = new TList;
 
   for (int i = 0; i < m_nLayers; i++) {
     m_histoList_cluster[i] = new TList;
@@ -214,6 +215,22 @@ void SVDPerformanceModule::initialize()
 
       }
 
+  //correlations
+  h_cltrk_UU = createHistogram1D("clTRK_dt_UU", "track-related U-U clusters time difference", 200, -100, 100, "time difference (ns)",
+                                 m_histoList_corr);
+  h_cltrk_VV = createHistogram1D("clTRK_dt_VV", "track-related V-V clusters time difference", 200, -100, 100, "time difference (ns)",
+                                 m_histoList_corr);
+  h_cltrk_UV = createHistogram1D("clTRK_dt_UV", "track-related U-V clusters time difference", 200, -100, 100, "time difference (ns)",
+                                 m_histoList_corr);
+
+  //correlations
+  h_cl_UU = createHistogram1D("clNOTRK_dt_UU", "track-related U-U clusters time difference", 200, -100, 100, "time difference (ns)",
+                              m_histoList_corr);
+  h_cl_VV = createHistogram1D("clNOTRK_dt_VV", "track-related V-V clusters time difference", 200, -100, 100, "time difference (ns)",
+                              m_histoList_corr);
+  h_cl_UV = createHistogram1D("clNOTRK_dt_UV", "track-related U-V clusters time difference", 200, -100, 100, "time difference (ns)",
+                              m_histoList_corr);
+
   //tracks
   m_nTracks = createHistogram1D("h1nTracks", "number of Tracks per event", 50, 0, 50, "n Tracks", m_histoList_track);
   m_Pvalue = createHistogram1D("h1pValue", "Tracks p value", 100, 0, 1, "p value", m_histoList_track);
@@ -265,18 +282,21 @@ void SVDPerformanceModule::event()
 
   BOOST_FOREACH(Track & track, Tracks) {
 
-    const TrackFitResult* tfr = track.getTrackFitResult(Const::pion);
+    const TrackFitResult* tfr = NULL;
     if (m_is2017TBanalysis)
       tfr = track.getTrackFitResult(Const::electron);
-    m_Pvalue->Fill(tfr->getPValue());
-    m_mom->Fill(tfr->getMomentum().Mag());
-    m_nSVDhits->Fill((tfr->getHitPatternVXD()).getNSVDHits());
+    else
+      tfr = track.getTrackFitResult(Const::pion);
+    if (tfr) {
+      m_Pvalue->Fill(tfr->getPValue());
+      m_mom->Fill(tfr->getMomentum().Mag());
+      m_nSVDhits->Fill((tfr->getHitPatternVXD()).getNSVDHits());
 
-    if (m_is2017TBanalysis) {
-      if ((tfr->getPValue() < 0.001) || (tfr->getMomentum().Mag() < 1))
-        continue;
+      if (m_is2017TBanalysis) {
+        if ((tfr->getPValue() < 0.001) || (tfr->getMomentum().Mag() < 1))
+          continue;
+      }
     }
-
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);
     RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(theRC[0]);
 
@@ -298,6 +318,30 @@ void SVDPerformanceModule::event()
 
       h_cltrkTime[layer][sensor][side]->Fill(svdClustersTrack[cl]->getClsTime());
 
+      //fill time difference
+      for (int cl2 = 0 ; cl2 < cl ; cl2++) {
+
+        int layerDist = abs(VxdID(theVxdID).getLayerNumber() - svdClustersTrack[cl2]->getSensorID().getLayerNumber());
+
+        int side2 = svdClustersTrack[cl2]->isUCluster();
+
+        if (layerDist == 0) {
+          if ((side == 0) && (side2 == 1))
+            h_cltrk_UV -> Fill(svdClustersTrack[cl2]->getClsTime() - svdClustersTrack[cl]->getClsTime());
+
+          if ((side == 1) && (side2 == 0))
+            h_cltrk_UV -> Fill(svdClustersTrack[cl]->getClsTime() - svdClustersTrack[cl2]->getClsTime());
+        } else if (layerDist == 1) {
+          if ((side == 1) && (side2 == 1))
+            h_cltrk_UU -> Fill(svdClustersTrack[cl]->getClsTime() - svdClustersTrack[cl2]->getClsTime());
+
+          if ((side == 0) && (side2 == 0))
+            h_cltrk_VV -> Fill(svdClustersTrack[cl]->getClsTime() - svdClustersTrack[cl2]->getClsTime());
+        }
+
+
+
+      }
 
       if (svdClustersTrack[cl]->getClsTime() < m_debugLowTime) {
 
@@ -394,9 +438,33 @@ void SVDPerformanceModule::event()
       continue;
 
     VxdID::baseType theVxdID = (VxdID::baseType)svdClusters[cl]->getSensorID();
+    int side = svdClusters[cl]->isUCluster();
+
+    //fill time difference
+    for (int cl2 = 0 ; cl2 < cl ; cl2++) {
+
+      int layerDist = abs(VxdID(theVxdID).getLayerNumber() - svdClusters[cl2]->getSensorID().getLayerNumber());
+
+      int side2 = svdClusters[cl2]->isUCluster();
+      if (layerDist == 0) {
+        if ((side == 0) && (side2 == 1))
+          h_cl_UV -> Fill(svdClusters[cl2]->getClsTime() - svdClusters[cl]->getClsTime());
+
+        if ((side == 1) && (side2 == 0))
+          h_cl_UV -> Fill(svdClusters[cl]->getClsTime() - svdClusters[cl2]->getClsTime());
+      } else if (layerDist == 1) {
+        if ((side == 1) && (side2 == 1))
+          h_cl_UU -> Fill(svdClusters[cl]->getClsTime() - svdClusters[cl2]->getClsTime());
+
+        if ((side == 0) && (side2 == 0))
+          h_cl_VV -> Fill(svdClusters[cl]->getClsTime() - svdClusters[cl2]->getClsTime());
+      }
+
+    }
+
     int layer = VxdID(theVxdID).getLayerNumber() - 3;
     int sensor = getSensor(layer, VxdID(theVxdID).getSensorNumber(), m_is2017TBanalysis);
-    int side = svdClusters[cl]->isUCluster();
+
 
     nCl[layer][sensor][side]++;
 
@@ -506,7 +574,15 @@ void SVDPerformanceModule::terminate()
       while ((obj = nextH_clTRK()))
         obj->Write();
     }
+
+    oldDir->cd();
+    TIter nextH_corr(m_histoList_corr);
+    while ((obj = nextH_corr()))
+      obj->Write();
+
     m_rootFilePtr->Close();
+
+
   }
 
 

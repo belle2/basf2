@@ -128,7 +128,7 @@ for PXDReq in PXDReqs:
     histo_DeltaZTag = ROOT.TH1F('B0_DeltaZtag_' + PXDReq, 'Residual of DeltaZsig',
                                 100, -limZTag, limZTag)
 
-    cut = "abs(B0_qrMC) == 1 "  # + "&& abs(B0_DeltaTErr)< " + str(limDeltaTErr) + " "
+    cut = "B0_isSignal == 1 "  # + "&& abs(B0_DeltaTErr)< " + str(limDeltaTErr) + " "
 
     if PXDReq == 'PXD1':
         cut = cut + "&& (B0_Jpsi_mu0_nPXDHits> 0 || B0_Jpsi_mu1_nPXDHits> 0) "
@@ -229,7 +229,7 @@ for PXDReq in PXDReqs:
     argSet.add(B0_Jpsi_mu0_nSVDHits)
     argSet.add(B0_Jpsi_mu1_nSVDHits)
 
-    # argSet.add(B0_isSignal)
+    argSet.add(B0_isSignal)
 
     # argSet.add(B0_X)
     # argSet.add(B0_TruthX)
@@ -242,7 +242,7 @@ for PXDReq in PXDReqs:
     # argSet.add(B0_TruthTagVy)
 
     # argSet.add(deltaTErr)
-    argSet.add(B0_qrMC)
+    # argSet.add(B0_qrMC)
 
     data = ROOT.RooDataSet(
         "data",
@@ -253,12 +253,12 @@ for PXDReq in PXDReqs:
 
     if PXDReq == 'PXD1' or PXDReq == 'PXD2':
         fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(
-            B0_qrMC, B0_Jpsi_mu0_nPXDHits, B0_Jpsi_mu1_nPXDHits, deltaTErr), cut)
+            B0_isSignal, B0_Jpsi_mu0_nPXDHits, B0_Jpsi_mu1_nPXDHits, deltaTErr), cut)
     elif PXDReq == 'SVD1' or PXDReq == 'SVD2':
         fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(
-            B0_qrMC, B0_Jpsi_mu0_nSVDHits, B0_Jpsi_mu1_nSVDHits, deltaTErr), cut)
+            B0_isSignal, B0_Jpsi_mu0_nSVDHits, B0_Jpsi_mu1_nSVDHits, deltaTErr), cut)
     else:
-        fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(B0_qrMC, deltaTErr), cut)
+        fitDataDTErr = ROOT.RooDataSet("data", "data", tdat, ROOT.RooArgSet(B0_isSignal, deltaTErr), cut)
 
     # fitData.append(data)
 
@@ -443,7 +443,7 @@ for PXDReq in PXDReqs:
     Pad.Update()
     nPlot = PATH + "/test6_CPVResDeltaT" + PXDReq + ".pdf"
     c1.SaveAs(nPlot)
-    c1.Destructor()
+    c1.Clear()
 
     iResult.append(['mu = ' + '{: 4.2f}'.format(shift) + ' +- ' + '{:4.2f}'.format(shiftErr) + ' ps',
                     'sigma =' + '{: 4.2f}'.format(resolution) + ' +- ' + '{:4.2f}'.format(resolutionErr) + ' ps'])
@@ -479,7 +479,7 @@ for PXDReq in PXDReqs:
     Pad.Update()
     nPlot = PATH + "/test6_CPVResDeltaTError" + PXDReq + ".pdf"
     c1.SaveAs(nPlot)
-    c1.Destructor()
+    c1.Clear()
 
     fitRes.Clear()
     model.Clear()
@@ -594,7 +594,7 @@ for PXDReq in PXDReqs:
     Pad.Update()
     nPlot = PATH + "/test6_CPVResDeltaZsig" + PXDReq + ".pdf"
     cSig.SaveAs(nPlot)
-    cSig.Destructor()
+    cSig.Clear()
 
     fitResSigZ.Clear()
     modelSigZ.Clear()
@@ -707,7 +707,7 @@ for PXDReq in PXDReqs:
     Pad.Update()
     nPlot = PATH + "/test6_CPVResDeltaZtag" + PXDReq + ".pdf"
     cTag.SaveAs(nPlot)
-    cTag.Destructor()
+    cTag.Clear()
 
     iResult.append(['mu = ' + '{:^5.1f}'.format(shiftTagZ) + ' +- ' + '{:^4.1f}'.format(shiftErrTagZ) + ' mum',
                     'sigma = ' + '{:^4.1f}'.format(resolutionTagZ) + ' +- ' + '{:^4.1f}'.format(resolutionErrTagZ) + ' mum'])

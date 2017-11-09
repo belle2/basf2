@@ -22,7 +22,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <trg/gdl/dataobjects/TRGGDLResults.h>
+#include <mdst/dataobjects/TRGSummary.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 
 using namespace std;
@@ -99,7 +99,7 @@ namespace Belle2 {
            << endl;
     }
     StoreObjPtr<TRGGRLInfo>::required("TRGGRLObjects");
-    StoreObjPtr<TRGGDLResults>::registerPersistent();
+    StoreObjPtr<TRGSummary>::registerPersistent();
   }
 
   void
@@ -139,9 +139,9 @@ namespace Belle2 {
     _gdl->simulate();
 
     int result_summary = 0;
-    StoreObjPtr<TRGGDLResults> gdlResult;
+    StoreObjPtr<TRGSummary> gdlResult;
     if (gdlResult)
-      result_summary = gdlResult->getL1TriggerResults();
+      result_summary = gdlResult->getTRGSummary(0);
 
     setReturnValue(result_summary);
 

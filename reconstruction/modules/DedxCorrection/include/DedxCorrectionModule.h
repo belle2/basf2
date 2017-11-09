@@ -22,9 +22,12 @@
 #include <framework/database/DBArray.h>
 
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
+#include <reconstruction/dbobjects/CDCDedxRunGain.h>
+#include <reconstruction/dbobjects/CDCDedxCosineCor.h>
 
 #include <string>
 #include <vector>
+#include <map>
 
 namespace Belle2 {
   class CDCDedxTrack;
@@ -56,35 +59,39 @@ namespace Belle2 {
     /** End of the event processing. */
     virtual void terminate();
 
-    /** Retrieve the calibration constants (placeholder for now) */
-    void initializeParameters();
-
     /** Perform a run gain correction */
-    double RunGainCorrection(double& dedx) const;
-    /** Perform a wire gain correction */
-    double WireGainCorrection(int wireID, double& dedx) const;
+    void RunGainCorrection(double& dedx) const;
 
-    /** Perform a standard set of corrections */
-    double StandardCorrection(int wireID, double dedx) const;
+    /** Perform a wire gain correction */
+    void WireGainCorrection(int wireID, double& dedx) const;
+
+    /** Perform the cosine correction */
+    void CosineCorrection(double costheta, double& dedx) const;
 
     /** Perform a hadron saturation correction.
      * (Set the peak of the truncated mean for electrons to 1) */
-    double HadronCorrection(double costheta,  double dedx) const;
+    void HadronCorrection(double costheta,  double& dedx) const;
+
+    /** Perform a standard set of corrections */
+    void StandardCorrection(int wireID, double costheta, double& dedx) const;
 
     /** Saturation correction:
      * convert the measured ionization (D) to actual ionization (I) */
-    double D2I(const double& cosTheta, const double& D) const;
+    double D2I(const double cosTheta, const double D) const;
+
     /** Saturation correction:
      * convert the actural ionization (I) to measured ionization (D) */
-    double I2D(const double& cosTheta, const double& I) const;
+    double I2D(const double cosTheta, const double I) const;
 
   private:
 
     /** Store array: CDCDedxTrack */
     StoreArray<CDCDedxTrack> m_cdcDedxTracks;
 
-    DBArray<CDCDedxWireGain> m_DBGains; /**< Wire gain DB objects */
-    std::map<int, double> m_wireGains; /**< CDC dE/dx wire gains */
+    //parameters: calibration constants
+    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
+    DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
+    DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
 
     /** Recalculate the dE/dx mean values after corrections */
     void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;
@@ -93,9 +100,6 @@ namespace Belle2 {
     double m_removeLowest;
     /** upper bound for truncated mean */
     double m_removeHighest;
-
-    /** the run gain correction parameters */
-    double m_runGain;
 
     /** saturation correction parameter: alpha */
     double  m_alpha;

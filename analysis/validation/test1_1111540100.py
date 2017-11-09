@@ -90,7 +90,6 @@ tools += ['ROEMultiplicities', "^B0"]
 tools += ['PID', 'B0 -> [J/psi -> ^e+ ^e-] [K_S0 -> ^pi+ ^pi-]']
 tools += ['Track', 'B0 -> [J/psi -> ^e+ ^e-] [K_S0 -> ^pi+ ^pi-]']
 tools += ['TrackHits', 'B0 -> [J/psi -> ^e+ ^e-] [K_S0 -> ^pi+ ^pi-]']
-tools += ['DeltaLogL', 'B0 -> [J/psi -> ^e+ ^e-] [K_S0 -> ^pi+ ^pi-]']
 
 
 # ACTUAL VARIABLES FOR THE CP ASYMMETRY MEASUREMENT

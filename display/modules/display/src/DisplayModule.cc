@@ -50,6 +50,8 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
            "If true, track candidates (RecoTracks) and reconstructed hits will be shown in the display.", false);
   addParam("showCDCHits", m_showCDCHits,
            "If true, CDCHit objects will be shown as drift cylinders (shortened, z position set to zero).", false);
+  addParam("showTriggerObjects", m_showTriggerObjects,
+           "If true, CDCHit objects will be assigned to trigger segments and trigger tracks will be shown.", false);
   addParam("showBKLM2dHits", m_showBKLM2dHits,
            "If true, BKLM2dHit objects will be shown in the display", true);
   addParam("showARICHHits", m_showARICHHits,
@@ -91,6 +93,7 @@ void DisplayModule::initialize()
   StoreArray<PXDCluster>::optional();
   StoreArray<SVDCluster>::optional();
   StoreArray<CDCHit>::optional();
+  StoreArray<CDCTriggerSegmentHit>::optional();
   StoreArray<ARICHHit>::optional();
   StoreArray<TOPDigit>::optional();
   StoreArray<ROIid>::optional();
@@ -220,10 +223,25 @@ void DisplayModule::event()
     }
   }
 
-  if (m_showCDCHits) {
+  if (m_showCDCHits || m_showTriggerObjects) {
     StoreArray<CDCHit> cdchits;
     for (auto& hit : cdchits)
-      m_visualizer->addCDCHit(&hit);
+      m_visualizer->addCDCHit(&hit, m_showTriggerObjects);
+  }
+
+  if (m_showTriggerObjects) {
+    StoreArray<CDCTriggerSegmentHit> tshits;
+    for (auto& hit : tshits)
+      m_visualizer->addCDCTriggerSegmentHit(&hit);
+
+    //add all possible track candidate arrays
+    const auto trgTrackArrays = StoreArray<CDCTriggerTrack>::getArrayList();
+    for (std::string colName : trgTrackArrays) {
+      StoreArray<CDCTriggerTrack> trgTracks(colName);
+      for (const CDCTriggerTrack& trgTrack : trgTracks) {
+        m_visualizer->addCDCTriggerTrack(colName, trgTrack);
+      }
+    }
   }
 
   if (m_showBKLM2dHits) {

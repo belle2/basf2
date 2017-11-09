@@ -68,14 +68,13 @@ namespace TreeFitter {
 
     /** constructor  */
     Constraint() : m_node(0), m_depth(0), m_type(unknown), //FT: Now fully initialised, but rarely used
-      m_dim(0), m_nHidden(0), m_weight(0), m_maxNIter(0) {}
+      m_dim(0), m_weight(0), m_maxNIter(0) {}
 
     /** constructor */
     Constraint(const ParticleBase* node, Type type, int depth,
-               unsigned int dim, unsigned int nhidden = 0,
-               int maxniter = 1) //, double precision=1e-5)
+               unsigned int dim, int maxniter = 1) //, double precision=1e-5)
       : m_node(node), m_depth(depth), m_type(type), m_dim(dim),
-        m_nHidden(nhidden), m_weight(1), m_maxNIter(maxniter) {}
+        m_weight(1), m_maxNIter(maxniter) {}
 
     /** destructor */
     virtual ~Constraint() {}
@@ -104,7 +103,7 @@ namespace TreeFitter {
 
     /**  constructor */
     Constraint(Constraint::Type type) :
-      m_node(0), m_depth(0), m_type(type), m_dim(0), m_nHidden(0),
+      m_node(0), m_depth(0), m_type(type), m_dim(0),
       m_weight(0), m_maxNIter(0) {}
 
     /**   set dimension of cosntraint */
@@ -130,9 +129,6 @@ namespace TreeFitter {
 
     /**  dimension of constraint */
     unsigned int m_dim;
-
-    /** the number of hidden 'degrees of freedom'. always zero except for the 'photon' constraint  */
-    unsigned int m_nHidden;
 
     /** unused FIXME  */
     int m_weight;

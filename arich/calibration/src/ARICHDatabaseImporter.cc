@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <arich/calibration/ARICHDatabaseImporter.h>
+#include <arich/calibration/ARICHDatabaseTools.h>
 #include <arich/dbobjects/ARICHAerogelMap.h>
 #include <arich/dbobjects/ARICHAsicInfo.h>
 #include <arich/dbobjects/ARICHHapdQA.h>
@@ -20,7 +21,13 @@
 #include <arich/dbobjects/ARICHModuleTest.h>
 #include <arich/dbobjects/ARICHSensorModuleInfo.h>
 #include <arich/dbobjects/ARICHSensorModuleMap.h>
-
+#include <arich/dbobjects/ARICHBiasCablesMapping.h>
+#include <arich/dbobjects/ARICHBiasChannelsMapping.h>
+#include <arich/dbobjects/ARICHBiasVoltages.h>
+#include <arich/dbobjects/ARICHBiasCrateCableMapping.h>
+#include <arich/dbobjects/ARICHHvCablesMapping.h>
+#include <arich/dbobjects/ARICHHvChannelsMapping.h>
+#include <arich/dbobjects/ARICHHvCrateCableMapping.h>
 // database classes used by simulation/reconstruction software
 #include <arich/dbobjects/ARICHChannelMask.h>
 #include <arich/dbobjects/ARICHChannelMapping.h>
@@ -30,6 +37,7 @@
 #include <arich/dbobjects/ARICHSimulationPar.h>
 #include <arich/dbobjects/ARICHReconstructionPar.h>
 #include <arich/dbobjects/ARICHGeometryConfig.h>
+#include <arich/dbobjects/ARICHAeroTilesInfo.h>
 
 // channel histogram
 #include <arich/utility/ARICHChannelHist.h>
@@ -63,14 +71,21 @@
 #include <TClonesArray.h>
 #include <TTree.h>
 #include <tuple>
+#include <iomanip>
 #include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace Belle2;
 
-ARICHDatabaseImporter::ARICHDatabaseImporter(vector<string> inputFilesHapdQA, vector<string> inputFilesAsicRoot,
-                                             vector<string> inputFilesAsicTxt, vector<string> inputFilesHapdQE, vector<string> inputFilesFebTest)
+
+ARICHDatabaseImporter::ARICHDatabaseImporter(const vector<string>& inputFilesHapdQA, const vector<string>& inputFilesAsicRoot,
+                                             const vector<string>& inputFilesAsicTxt, const vector<string>& inputFilesHapdQE, const vector<string>& inputFilesFebTest)
 {
+  m_inputFilesHapdQA.reserve(inputFilesHapdQA.size());
+  m_inputFilesAsicRoot.reserve(inputFilesAsicRoot.size());
+  m_inputFilesAsicTxt.reserve(inputFilesAsicTxt.size());
+  m_inputFilesHapdQE.reserve(inputFilesHapdQE.size());
+  m_inputFilesFebTest.reserve(inputFilesFebTest.size());
   for (unsigned int i = 0; i < inputFilesHapdQA.size(); i++) {  m_inputFilesHapdQA.push_back(inputFilesHapdQA[i]); }
   for (unsigned int i = 0; i < inputFilesAsicRoot.size(); i++) {  m_inputFilesAsicRoot.push_back(inputFilesAsicRoot[i]); }
   for (unsigned int i = 0; i < inputFilesAsicTxt.size(); i++) {  m_inputFilesAsicTxt.push_back(inputFilesAsicTxt[i]); }
@@ -106,7 +121,7 @@ void ARICHDatabaseImporter::importModulesInfo()
 
   // get list of installed modules from xml
   content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/InstalledModules");
-  std::cout << "Installed modules" << std::endl;
+  B2INFO("Installed modules\n");
 
   std::vector<std::string> installed;
 
@@ -117,7 +132,7 @@ void ARICHDatabaseImporter::importModulesInfo()
     unsigned ring = module.getInt("Ring");
     unsigned azimuth = module.getInt("Azimuth");
     bool isActive = (bool)module.getInt("isActive");
-    std::cout << " " << hapdID << ":  S " << sector << "  R " << ring << "  Z " << azimuth <<  ", isActive: " << isActive << std::endl;
+    B2INFO(" " << hapdID << ":  S " << sector << "  R " << ring << "  Z " << azimuth <<  ", isActive: " << isActive << '\n');
 
     if (std::find(installed.begin(), installed.end(), hapdID) != installed.end()) {
       B2WARNING("ARICHDatabaseImporter::importModulesInfo: hapd " << hapdID << " installed multiple times!");
@@ -139,7 +154,7 @@ void ARICHDatabaseImporter::importModulesInfo()
           }
         }
         init = true;
-        std::cout << "  Channels QE map found and set." << std::endl;
+        B2INFO("  Channels QE map found and set.\n");
       }
     }
 
@@ -186,34 +201,20 @@ void ARICHDatabaseImporter::importChannelMask()
   DBObjPtr<ARICHGeometryConfig> geoConfig;
 
   // module test results from DB (we take list of dead channels from here)
-  DBArray<ARICHModuleTest> moduleTest("ARICHModuleTest");
+  DBArray<ARICHModuleTest> moduleTest("ARICHModuleTestHV");
 
   ARICHChannelMask chanMask;
 
-  // read mapping of HAPD channels to asic channels from xml file
-  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/ChannelMapping");
-  istringstream chstream2;
-  int hapdCh, asic;
-  chstream2.str(content.getString("HapdAsicChannelMapping"));
-  std::vector<int> hapdChMap;
-  hapdChMap.assign(144, -1);
-  while (chstream2 >> hapdCh >> asic) {
-    hapdChMap[hapdCh - 1] = asic;
-  }
-
-  for (auto ch : hapdChMap) if (ch == -1)
-      B2ERROR("ARICHDatabaseImporter::importLWClasses: HAPD channel to asic channel mapping not set correctly!");
-
   // loop over installed modules (from xml file)
-  content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/InstalledModules");
-  std::cout << "Installed modules" << std::endl;
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/InstalledModules");
+  B2INFO("Installed modules\n");
   for (const GearDir& module : content.getNodes("Module")) {
     std::string hapdID = module.getString("@hapdID");
     unsigned sector = module.getInt("Sector");
     unsigned ring = module.getInt("Ring");
     unsigned azimuth = module.getInt("Azimuth");
     bool isActive = (bool)module.getInt("isActive");
-    std::cout << " " << hapdID << ":  S " << sector << "  R " << ring << "  Z " << azimuth <<  ", isActive: " << isActive << std::endl;
+    B2INFO(" " << hapdID << ":  S " << sector << "  R " << ring << "  Z " << azimuth <<  ", isActive: " << isActive << '\n');
     unsigned moduleID = geoConfig->getDetectorPlane().getSlotIDFromSRF(sector, ring, azimuth);
 
     // get and set channel mask (mask dead channels)
@@ -223,11 +224,12 @@ void ARICHDatabaseImporter::importChannelMask()
 
         // loop over list of dead channels
         for (int i = 0; i < test.getDeadChsSize(); i++) {
-          unsigned hapdCh = test.getDeadCh(i);
-          chanMask.setActiveCh(moduleID, hapdChMap[hapdCh - 1], false);
+          unsigned asicCh = test.getDeadCh(i);
+          if (asicCh > 143)B2ERROR("ARICHDatabaseImporter::importLWClasses: Asic channel for HAPD " << hapdID << " is out of range!");
+          chanMask.setActiveCh(moduleID, asicCh, false);
         }
         init = true;
-        std::cout << "  List of dead channels (from module test) found and set." << std::endl;
+        B2INFO("  List of dead channels (from module test) found and set.\n");
       }
     }
 
@@ -304,11 +306,12 @@ void ARICHDatabaseImporter::importChannelMapping()
   istringstream chstream;
   int x, y, asic;
   chstream.str(content.getString("ChannelMapping/SoftChannelMapping"));
-  std::cout << "Importing channel x,y to asic channel map" << std::endl;
-  std::cout << "  x   y   asic" << std::endl;
+
+  B2INFO("Importing channel x,y to asic channel map\n");
+  B2INFO("  x   y   asic\n");
   while (chstream >> x >> y >> asic) {
     chMap.mapXY2Asic(x, y, asic);
-    std::cout << " " << setw(2) << x << "  " << setw(2) << y << "   " << setw(3) << asic << std::endl;
+    B2INFO(" " << setw(2) << x << "  " << setw(2) << y << "   " << setw(3) << asic << '\n');
   }
 
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
@@ -331,21 +334,25 @@ void ARICHDatabaseImporter::importFEMappings()
 
   for (const GearDir& merger : mapping.getNodes("Merger")) {
     unsigned mergerID = (unsigned) merger.getInt("@id");
-    std::cout << std::endl << "Mapping of modules to merger no. " << mergerID << std::endl;
+    unsigned mergerSN = (unsigned) merger.getInt("@sn");
+    B2INFO('\n' << "Mapping of modules to merger no. " << mergerID << ", SN = " << mergerSN << '\n');
     for (const GearDir& module : merger.getNodes("Modules/Module")) {
       unsigned sector = module.getInt("Sector");
       unsigned ring = module.getInt("Ring");
       unsigned azimuth = module.getInt("Azimuth");
+      std::cout << "ring = " << ring << '\n';
       unsigned moduleID = geoConfig->getDetectorPlane().getSlotIDFromSRF(sector, ring, azimuth);
+      std::cout << "moduleID = " << moduleID << '\n';
       unsigned slot = (unsigned) module.getInt("@FEBSlot");
-      mergerMap.addMapping(moduleID, mergerID, slot);
-      std::cout << std::endl << " FEB slot: " << slot << ", module position: S" << sector << " R" << ring << " Z" << azimuth <<
-                ", module ID: " << moduleID << std::endl;
+      mergerMap.addMapping(moduleID, mergerID, slot, mergerSN);
+      std::cout << '\n' << " FEB slot: " << slot << ", module position: S" << sector << " R" << ring << " Z" << azimuth <<
+                ", module ID: " << moduleID << '\n';
       std::cout << " crosscheck:  mergerMap.getMergerID(" << moduleID << ") = " <<  mergerMap.getMergerID(
                   moduleID) << ", mergerMap.getFEBSlot(" << moduleID << ") = " << mergerMap.getFEBSlot(moduleID) << ", mergerMap.getModuleID(" <<
-                mergerID << "," << slot << ") = " <<  mergerMap.getModuleID(mergerID, slot) << std::endl;
+                mergerID << "," << slot << ") = " <<  mergerMap.getModuleID(mergerID, slot) << '\n';
+
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 
     unsigned copperID = (unsigned) merger.getInt("COPPERid");
     string finesseSlot = merger.getString("FinesseSlot");
@@ -360,7 +367,7 @@ void ARICHDatabaseImporter::importFEMappings()
       continue;
     }
     copperMap.addMapping(mergerID, copperID, finesse);
-    std::cout << "Merger " << mergerID << " connected to copper " << copperID << ", finesse " << finesse << std::endl;
+    std::cout << "Merger " << mergerID << " connected to copper " << copperID << ", finesse " << finesse << '\n';
 
   }
 
@@ -428,6 +435,335 @@ void ARICHDatabaseImporter::importCosmicTestGeometry()
   geoImport.construct(*geoConfig);
   geoImport.import(iov);
 
+}
+
+void ARICHDatabaseImporter::importAeroTilesInfo()
+{
+  ARICHAeroTilesInfo tilesInfo;
+
+  DBArray<ARICHAerogelMap> elements("ARICHAerogelMap");
+  elements.getEntries();
+  DBArray<ARICHAerogelInfo> elementsInfo("ARICHAerogelInfo");
+  elementsInfo.getEntries();
+
+  for (int slot = 1; slot < 125; slot++) {
+    int ring = ARICHDatabaseImporter::getAeroTileRing(slot);
+    int column = ARICHDatabaseImporter::getAeroTileColumn(slot);
+    std::string aeroID = "";
+    float refractiveIndex = 0.;
+    float transmissionLength = 0.;
+    for (int layer = 0; layer < 2; layer++) {
+      for (const auto& element : elements) {
+        if (element.getAerogelLayer(layer) == 1 && element.getAerogelRingID() == ring
+            && element.getAerogelColumnID() == column) aeroID = element.getAerogelID();
+      }
+      for (const auto& elementInfo : elementsInfo) {
+        if (elementInfo.getAerogelSerial() == aeroID) {
+          refractiveIndex = elementInfo.getAerogelRefractiveIndex();
+          transmissionLength = elementInfo.getAerogelTransmissionLength();
+        }
+      }
+
+      B2INFO("adding mapping... slot " << slot << ", layer " << layer << ", refIn " << refractiveIndex << ", transLen " <<
+             transmissionLength << '\n');
+      tilesInfo.addMapping(slot, layer, refractiveIndex, transmissionLength);
+
+    }
+  }
+
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  DBImportObjPtr<ARICHAeroTilesInfo> importObj;
+  importObj.construct(tilesInfo);
+  importObj.import(iov);
+}
+
+int ARICHDatabaseImporter::getAeroTileRing(int slot)
+{
+  int ring = 0;
+  if (slot < 23) ring = 1;
+  else if (slot > 22 && slot < 51) ring = 2;
+  else if (slot > 50 && slot < 85) ring = 3;
+  else ring = 4;
+
+  return ring;
+}
+
+int ARICHDatabaseImporter::getAeroTileColumn(int slot)
+{
+  int column = 0;
+  if (slot < 23) column = slot;
+  else if (slot > 22 && slot < 51) column = slot - 22;
+  else if (slot > 50 && slot < 85) column = slot - 50;
+  else column = slot - 84;
+
+  return column;
+}
+
+
+void ARICHDatabaseImporter::printAeroTileInfo()
+{
+  DBObjPtr<ARICHAeroTilesInfo> tilesInfo;
+  tilesInfo->print();
+}
+
+
+// classes for DAQ
+
+void ARICHDatabaseImporter::importBiasMappings()
+{
+
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+
+  DBObjPtr<ARICHGeometryConfig> geoConfig;
+
+  ARICHBiasCablesMapping biasMap;
+  GearDir mapping(content, "biasCableMapping");
+
+  for (const GearDir& module : mapping.getNodes("cableMap")) {
+    unsigned cableID = (unsigned) module.getInt("cableID");
+    unsigned innerID = module.getInt("innerID");
+    unsigned ring = module.getInt("ring");
+    unsigned azimuth = module.getInt("azimuth");
+    for (unsigned sector = 1; sector < 7; sector++) {
+      unsigned moduleID = geoConfig->getDetectorPlane().getSlotIDFromSRF(sector, ring, azimuth);
+      biasMap.addMapping(moduleID, sector, cableID, innerID);
+    }
+  }
+
+  ARICHBiasChannelsMapping channelsMap;
+  GearDir mappingCH(content, "biasChannelMapping");
+
+  for (const GearDir& module : mappingCH.getNodes("channelMap")) {
+    int crate = module.getInt("crate");
+    int slot = module.getInt("slot");
+    int channelID = module.getInt("channelID");
+    int pinID = module.getInt("pinID");
+    int connectionID = module.getInt("connectionID");
+    int innerID = module.getInt("innerID");
+    std::string type = module.getString("type");
+    channelsMap.addMapping(crate, slot, channelID, pinID, connectionID, innerID, type);
+  }
+
+  ARICHBiasCrateCableMapping crateMap;
+  GearDir mappingCrate(content, "biasCrateToCable");
+
+  for (const GearDir& module : mappingCrate.getNodes("connection")) {
+    int connectionID = module.getInt("connectionID");
+    int sector = module.getInt("sector");
+    int cable = module.getInt("cable");
+    std::vector<int> sectorCable{sector, cable};
+
+    crateMap.addMapping(connectionID, sectorCable);
+  }
+
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+
+  DBImportObjPtr<ARICHBiasCablesMapping> importObjBias;
+  importObjBias.construct(biasMap);
+  importObjBias.import(iov);
+
+  DBImportObjPtr<ARICHBiasChannelsMapping> importObjBiasCH;
+  importObjBiasCH.construct(channelsMap);
+  importObjBiasCH.import(iov);
+
+  DBImportObjPtr<ARICHBiasCrateCableMapping> importObjBiasCrate;
+  importObjBiasCrate.construct(crateMap);
+  importObjBiasCrate.import(iov);
+}
+
+void ARICHDatabaseImporter::importHvMappings()
+{
+
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+
+  DBObjPtr<ARICHGeometryConfig> geoConfig;
+
+  ARICHHvCablesMapping hvMap;
+  GearDir mapping(content, "hvCableMapping");
+
+  for (const GearDir& module : mapping.getNodes("cableMap")) {
+    unsigned cableID = (unsigned) module.getInt("cableID");
+    unsigned innerID = module.getInt("innerID");
+    unsigned ring = module.getInt("ring");
+    unsigned azimuth = module.getInt("azimuth");
+    for (unsigned sector = 1; sector < 7; sector++) {
+      unsigned moduleID = geoConfig->getDetectorPlane().getSlotIDFromSRF(sector, ring, azimuth);
+      hvMap.addMapping(moduleID, sector, cableID, innerID);
+    }
+  }
+
+  ARICHHvChannelsMapping channelsMap;
+  GearDir mappingCH(content, "hvChannelMapping");
+
+  for (const GearDir& module : mappingCH.getNodes("channelMap")) {
+    int crate = module.getInt("crate");
+    int slot = module.getInt("slot");
+    int channelID = module.getInt("channelID");
+    int connectionID = module.getInt("connectionID");
+    int pinID = module.getInt("pinID");
+    channelsMap.addMapping(crate, slot, channelID, connectionID, pinID);
+  }
+
+  ARICHHvCrateCableMapping crateMap;
+  GearDir mappingCrate(content, "hvCrateToCable");
+
+  for (const GearDir& module : mappingCrate.getNodes("connection")) {
+    int connectionID = module.getInt("connectionID");
+    int sector = module.getInt("sector");
+    int cable = module.getInt("cable");
+    std::vector<int> sectorCable{sector, cable};
+
+    crateMap.addMapping(connectionID, sectorCable);
+  }
+
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+
+  DBImportObjPtr<ARICHHvCablesMapping> importObjHv;
+  importObjHv.construct(hvMap);
+  importObjHv.import(iov);
+
+  DBImportObjPtr<ARICHHvChannelsMapping> importObjHvCH;
+  importObjHvCH.construct(channelsMap);
+  importObjHvCH.import(iov);
+
+  DBImportObjPtr<ARICHHvCrateCableMapping> importObjHvCrate;
+  importObjHvCrate.construct(crateMap);
+  importObjHvCrate.import(iov);
+}
+
+
+
+void ARICHDatabaseImporter::importNominalBiasVoltages()
+{
+
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+
+  DBObjPtr<ARICHGeometryConfig> geoConfig;
+
+  ARICHBiasVoltages biasVolt;
+  GearDir biasVoltages(content, "biasVoltages");
+
+  for (const GearDir& module : biasVoltages.getNodes("hapd")) {
+    std::string hapdID = module.getString("@id");
+    int biasA = module.getInt("biasA");
+    int biasB = module.getInt("biasB");
+    int biasC = module.getInt("biasC");
+    int biasD = module.getInt("biasD");
+    int guard = module.getInt("guard");
+    std::vector<int> voltages{biasA, biasB, biasC, biasD, guard};
+    biasVolt.addVoltages(hapdID, voltages);
+  }
+
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+
+  DBImportObjPtr<ARICHBiasVoltages> importObjBiasVolt;
+  importObjBiasVolt.construct(biasVolt);
+  importObjBiasVolt.import(iov);
+}
+
+
+void ARICHDatabaseImporter::printBiasMappings()
+{
+  DBObjPtr<ARICHBiasCablesMapping> biasMap;
+  biasMap->print();
+  DBObjPtr<ARICHBiasChannelsMapping> channelsMap;
+  channelsMap->print();
+  DBObjPtr<ARICHBiasCrateCableMapping> crateMap;
+  crateMap->print();
+}
+
+void ARICHDatabaseImporter::printNominalBiasVoltages()
+{
+  DBObjPtr<ARICHBiasVoltages> biasVolt;
+  biasVolt->print();
+}
+
+void ARICHDatabaseImporter::printNominalBiasVoltageForChannel(std::vector<int> channel)
+{
+  DBObjPtr<ARICHBiasCablesMapping> biasMap;
+  DBObjPtr<ARICHBiasChannelsMapping> channelsMap;
+  DBObjPtr<ARICHBiasCrateCableMapping> crateMap;
+  DBObjPtr<ARICHBiasVoltages> biasVolt;
+  DBArray<ARICHSensorModuleInfo> elements("ARICHSensorModuleInfo");
+  elements.getEntries();
+
+  int connectionID = std::get<0>(channelsMap->getInnerConnection(channel));
+  int innerCable = std::get<1>(channelsMap->getInnerConnection(channel));
+  std::string biasType = std::get<2>(channelsMap->getInnerConnection(channel));
+
+  int sector = crateMap->getSector(connectionID);
+  int outerCable = crateMap->getCable(connectionID);
+
+  int moduleID = (int) biasMap->getModuleID(sector, outerCable, innerCable);
+  std::string hapdID = "";
+  for (const auto& element : elements) {
+    if (element.getSensorModuleID() == moduleID) hapdID = element.getHAPDserial();
+  }
+
+  std::vector<int> voltages = biasVolt->getBiasVoltages(hapdID);
+  int appliedVoltage = 0;
+//  std::string appliedVoltage = "zero";
+  if (biasType == "bias-a") appliedVoltage = voltages[0];
+  if (biasType == "bias-b") appliedVoltage = voltages[1];
+  if (biasType == "bias-c") appliedVoltage = voltages[2];
+  if (biasType == "bias-d") appliedVoltage = voltages[3];
+  if (biasType == "guard") appliedVoltage = voltages[4];
+
+
+  B2INFO("Crate " << channel[0] << ", slot " << channel[1] << ", slot channel " << channel[2] << " belongs to hapd " << hapdID <<
+         " (module ID = " << moduleID << ") in sector " << sector << ".\n       Corresponding cable is " << sector << "-" << outerCable <<
+         ".\n       Cable type is " << biasType << " with applied voltage " << appliedVoltage << " V.");
+// B2WARNING("Please, note that the crate-slot mapping of bias cables is still random! Do not try to apply given voltages to the HAPDs yet!");
+}
+
+void ARICHDatabaseImporter::printHapdPositionFromCrateSlot(int crate, int slot, int channelID)
+{
+  DBObjPtr<ARICHBiasCablesMapping> biasMap;
+  DBObjPtr<ARICHBiasChannelsMapping> channelsMap;
+  DBObjPtr<ARICHBiasCrateCableMapping> crateMap;
+  DBObjPtr<ARICHMergerMapping> mrgMap;
+
+  DBArray<ARICHSensorModuleMap> elements("ARICHSensorModuleMap");
+  elements.getEntries();
+
+  std::vector<int> channel{crate, slot, channelID};
+  int connectionID = std::get<0>(channelsMap->getInnerConnection(channel));
+  int innerCableNum = std::get<1>(channelsMap->getInnerConnection(channel));
+  std::string biasType = channelsMap->getType(channel);
+
+  int sector = crateMap->getSector(connectionID);
+  int outerCable = crateMap->getCable(connectionID);
+
+  int moduleID = (int)biasMap->getModuleID(sector, outerCable, innerCableNum);
+
+  unsigned mergerID = mrgMap->getMergerID((unsigned)moduleID);
+  unsigned mergerSN = mrgMap->getMergerSN((unsigned)mergerID);
+  unsigned febSlot = mrgMap->getFEBSlot((unsigned)moduleID);
+  int febSlotDaq = ARICHDatabaseImporter::getFebDaqSlot(febSlot);
+
+  for (const auto& element : elements) {
+    if (element.getSensorGlobalID() == moduleID) B2INFO("HAPD for crate " << crate + 1 << ", slot " << slot << ", inner cable " <<
+                                                          innerCableNum << " has ID number " << moduleID << ". Bias cable number is " << sector << "-" << outerCable <<
+                                                          ".\n      Position is: RING " << element.getSensorModuleRingID() << " COLUMN " << element.getSensorModuleColumnID() <<
+                                                          ". \n      Bias type for channel " << channelID << " is " << biasType << ".\n      It belongs to merger " << mergerID << " (SN " <<
+                                                          mergerSN << ") and has DAQ feb slot " << febSlotDaq);
+  }
+
+}
+
+int ARICHDatabaseImporter::getFebDaqSlot(unsigned febSlot)
+{
+  std::map<unsigned, int> febSlots;
+  febSlots.insert(std::pair<unsigned, int>(6, 0));
+  febSlots.insert(std::pair<unsigned, int>(5, 1));
+  febSlots.insert(std::pair<unsigned, int>(4, 2));
+  febSlots.insert(std::pair<unsigned, int>(1, 3));
+  febSlots.insert(std::pair<unsigned, int>(2, 4));
+  febSlots.insert(std::pair<unsigned, int>(3, 5));
+
+  int febDaqSlot = febSlots.find(febSlot)->second;
+
+  return febDaqSlot;
 }
 
 void ARICHDatabaseImporter::printSimulationPar()
@@ -1034,30 +1370,9 @@ vector<int> ARICHDatabaseImporter::channelsList(std::string badCH)
 
   vector<int> CHs;
 
-  // parse string to get numbers of all bad channels
-  if (!badCH.empty()) {
-    if (badCH.find(",") != string::npos) {
-      while (badCH.find(",") != string::npos) {
-        string CH = badCH.substr(0, badCH.find(","));
-        int badchannel = atoi(CH.c_str());
-        CHs.push_back(badchannel);
-        badCH = badCH.substr(badCH.find(",") + 1);
-      }
-      int badchannel = atoi(badCH.c_str());
-      CHs.push_back(badchannel);
-    }
-  }
-  // store 5000 if there are many bad channels
-  else if (badCH.find("many") != string::npos) {
-    CHs.push_back(5000);
-  }
-  // store 10000 if all channels are bad
-  else if (badCH.find("all") != string::npos) {
-    CHs.push_back(10000);
-  } else {
-    int badchannel = atoi(badCH.c_str());
-    CHs.push_back(badchannel);
-  }
+  if ((badCH.find("many") != string::npos) || (badCH.find("all") != string::npos))   CHs.emplace_back(-1);
+  else ARICHTools::StringToVector::convert<int>(badCH, ',');
+
   return CHs;
 }
 
@@ -1550,10 +1865,10 @@ void ARICHDatabaseImporter::importHapdChipInfo()
     for (const auto& chipInfo : hapdInfo.getNodes("chipinfo")) {
       chip[chip_ABCD] = chipInfo.getString("chip");
       bias[chip_ABCD] = chipInfo.getInt("bias");
-//      string badL = chipInfo.getString("deadlist");
-//      string cutL = chipInfo.getString("cutlist");
-//      if (badL.find("ch") != string::npos) { string badLsub = badL.substr(3); badlist[chip_ABCD] = ARICHDatabaseImporter::channelsListHapd(badLsub.c_str(), 0); }
-//      if (cutL.find("ch") != string::npos) {  string cutLsub = cutL.substr(3); cutlist[chip_ABCD] = ARICHDatabaseImporter::channelsListHapd(cutLsub.c_str(), 0); }
+      string badL = chipInfo.getString("deadlist");
+      string cutL = chipInfo.getString("cutlist");
+      if (badL.find("ch") != string::npos) { string badLsub = badL.substr(3); badlist[chip_ABCD] = ARICHDatabaseImporter::channelsListHapd(badLsub.c_str(), chip[chip_ABCD]); }
+      if (cutL.find("ch") != string::npos) {  string cutLsub = cutL.substr(3); cutlist[chip_ABCD] = ARICHDatabaseImporter::channelsListHapd(cutLsub.c_str(), chip[chip_ABCD]); }
       string gain_str = chipInfo.getString("gain");
       gain[chip_ABCD] = atoi(gain_str.c_str());
       chip_ABCD++;
@@ -1777,23 +2092,31 @@ void ARICHDatabaseImporter::importHapdInfo()
 
 
 // get list of bad channels on HAPD
-std::vector<int> ARICHDatabaseImporter::channelsListHapd(std::string chlist, int channelDelay)
+std::vector<int> ARICHDatabaseImporter::channelsListHapd(std::string chlist, std::string chipDelay)
 {
-  vector<int> CHs;
-  // parse string to get numbers of all bad channels
-  if (chlist.find(",") != string::npos) {
-    while (chlist.find(",") != string::npos) {
-      string CH = chlist.substr(0, chlist.find(","));
-      int badChannel = atoi(CH.c_str()) + channelDelay;
-      CHs.push_back(badChannel);
-      chlist = chlist.substr(chlist.find(",") + 1);
+  B2INFO("channel list = " << chlist << ", chip = " << chipDelay);
+  string chlistDig = ARICHTools::remove_chars_if_not(chlist, "0123456789,～");
+  /*
+    auto iss = std::istringstream(chlistDig);
+    auto token = std::string();
+    auto strReplace = std::string();
+    const char delim = ',';
+
+    if(chlistDig.find("～") != string::npos)  {
+      while (std::getline(iss, token, delim))  {
+        if(token.find("～") != std::string::npos) {
+          for(int i = std::stoi(token.substr(0,token.find("～")))+1; i < std::stoi(token.substr(token.find("～")+3)); i++) strReplace.append(','+std::to_string(i));
+          chlistDig.replace(chlistDig.find("～"), 3, ",");
+          chlistDig.append(strReplace);
+          strReplace.clear();
     }
-    int badChannel = atoi(chlist.c_str()) + channelDelay;
-    CHs.push_back(badChannel);
-  } else {
-    int badChannel = atoi(chlist.c_str()) + channelDelay;
-    CHs.push_back(badChannel);
   }
+      }*/
+
+  vector<int> CHs = ARICHTools::getDeadCutList(*chipDelay.c_str(), ARICHTools::StringToVector::parse<int>(chlistDig, ','));
+
+  B2INFO("All channels: ");
+  printContainer(CHs);
   return CHs;
 }
 
@@ -1955,7 +2278,7 @@ void ARICHDatabaseImporter::exportHapdQE()
 
 }
 
-void ARICHDatabaseImporter::getBiasVoltagesForHapdChip(const std::string& serialNumber)
+void ARICHDatabaseImporter::printBiasVoltagesForHapdChip(const std::string& serialNumber)
 {
   // example that shows how to extract and use data
   // it calculates bias voltage at gain = 40 for each chip
@@ -2002,7 +2325,7 @@ void ARICHDatabaseImporter::getBiasVoltagesForHapdChip(const std::string& serial
   }
 }
 
-void ARICHDatabaseImporter::getMyParams(const std::string& aeroSerialNumber)
+void ARICHDatabaseImporter::printMyParams(const std::string& aeroSerialNumber)
 {
   map<string, float> aerogelParams = ARICHDatabaseImporter::getAerogelParams(aeroSerialNumber);
 
@@ -2149,47 +2472,20 @@ void ARICHDatabaseImporter::importModuleTest(const std::string& mypath, const st
     vector<int> deadChannels;
 
     if (HVtest == "no") {
-      vector<string> deadChs;
-      string channels = moduletest.getString("dead");
-      if (!channels.empty()) {
-        if (channels.find(",") != string::npos) {
-          while (channels.find(",") != string::npos) {
-            string badchannel = channels.substr(0, channels.find(","));
-            deadChs.push_back(badchannel);
-            channels = channels.substr(channels.find(",") + 1);
-          }
-          deadChs.push_back(channels);
-        }
-      }
-
-      for (unsigned int i = 0; i < deadChs.size(); i++)  {
-        string CH = deadChs.at(i);
-        int CHint = -1;
-        if (CH.find("B") != string::npos) CHint = atoi((CH.substr(1)).c_str()) + 36;
-        else if (CH.find("C") != string::npos) CHint = atoi((CH.substr(1)).c_str()) + 2 * 36;
-        else if (CH.find("D") != string::npos) CHint = atoi((CH.substr(1)).c_str()) + 3 * 36;
-        else CHint = atoi((CH.substr(1)).c_str());
-
-        deadChannels.push_back(CHint);
-      }
+      auto ids = ARICHTools::StringToVector::convert<ARICHTools::ModuleID_t>(moduletest.getString("dead"), ',');
+      deadChannels.reserve(ids.size());
+      for (const auto& rID : ids)
+        deadChannels.emplace_back(rID.getNumbering());
     }
+
+
 
     if (HVtest == "yes") {
-      vector<int> deadChs;
-      string channels = moduletest.getString("dead");
-      if (!channels.empty()) {
-        if (channels.find(",") != string::npos) {
-          while (channels.find(",") != string::npos) {
-            string badchannel = channels.substr(0, channels.find(","));
-            deadChs.push_back(atoi(badchannel.c_str()));
-            channels = channels.substr(channels.find(",") + 1);
-          }
-          deadChs.push_back(atoi(channels.c_str()));
-        }
-      }
-      deadChannels = deadChs;
+      deadChannels = ARICHTools::StringToVector::convert<int>(moduletest.getString("dead"), ',');
     }
 
+    B2INFO("Dead channels: ");
+    printContainer(deadChannels);
     // define histograms
     TGraph* guardBias_th = 0;
     TGraph* chipVdiff_th[4] = {0};

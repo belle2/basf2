@@ -9,11 +9,10 @@
  **************************************************************************/
 
 #include <tracking/modules/VXDTFHelperTools/RawSecMapMergerModule.h>
-#include <tracking/trackFindingVXD/filterTools/SelectionVariableType.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
 #include <tracking/trackFindingVXD/filterTools/ObserverCheckMCPurity.h>
-
+#include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariableNamesToFunctions.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace std;
@@ -104,40 +103,38 @@ template<class ValueType> std::vector<BranchInterface<ValueType>> RawSecMapMerge
   return branches;
 }
 
-
-
-
-
-std::string RawSecMapMergerModule::prepareNHitSpecificStuff(
+std::string
+RawSecMapMergerModule::prepareNHitSpecificStuff(
   unsigned nHits,
-  const SectorMapConfig& config,
+  const SectorMapConfig&,
   std::vector<std::string>& secBranchNames,
   std::vector<std::string>& filterBranchNames)
 {
   if (nHits == 2) {
     secBranchNames = { "outerSecID", "innerSecID"};
-    filterBranchNames = config.twoHitFilters;
+    auto twoHitsFilterNameToFunction(SelectionVariableNamesToFunctions(VXDTFFilters<SpacePoint>::twoHitFilter_t()));
+
+    for (const auto& filterNameToFunction : twoHitsFilterNameToFunction) {
+      string filterName = filterNameToFunction.first ;
+      filterBranchNames.push_back(filterName);
+    }
     return "2Hit";
   }
 
   if (nHits == 3) {
     secBranchNames = { "outerSecID", "centerSecID", "innerSecID"};
-    filterBranchNames = config.threeHitFilters;
-    return "3Hit";
-  }
+    auto threeHitsFilterNameToFunction(SelectionVariableNamesToFunctions(VXDTFFilters<SpacePoint>::threeHitFilter_t()));
 
-  if (nHits == 4) {
-    secBranchNames = { "outerSecID", "outerCenterSecID", "innerCenterSecID", "innerSecID"};
-    filterBranchNames = config.fourHitFilters;
-    return "4Hit";
+    for (const auto& filterNameToFunction : threeHitsFilterNameToFunction) {
+      string filterName = filterNameToFunction.first ;
+      filterBranchNames.push_back(filterName);
+    }
+    return "3Hit";
   }
 
   B2ERROR("prepareNHitSpecificStuff: wrong chainLength!");
   return "";
 }
-
-
-
 
 template <class FilterType> void RawSecMapMergerModule::trainGraph(
   SectorGraph<FilterType>& mainGraph,
@@ -205,7 +202,11 @@ template <class FilterType> SectorGraph<FilterType> RawSecMapMergerModule::build
     }
     auto thisEntry = chain->LoadTree(i);
 
-    auto ids = getSecIDs(sectorBranches, thisEntry);
+    std::vector<unsigned> ids = getSecIDs(sectorBranches, thisEntry);
+
+    if (! good(ids))
+      continue;
+
     auto currentID = SubGraphID(ids);
     B2DEBUG(10, "buildGraph-SubGraphID-print: id: " << currentID.print());
 
@@ -230,7 +231,33 @@ template <class FilterType> SectorGraph<FilterType> RawSecMapMergerModule::build
 }
 
 
-
+bool RawSecMapMergerModule::good(const std::vector<unsigned>& ids)
+{
+  switch (ids.size()) {
+    case 2:
+      if (FullSecID(ids[0]).getLayerID() == FullSecID(ids[1]).getLayerID() &&
+          FullSecID(ids[0]).getLadderID() == FullSecID(ids[1]).getLadderID()
+         )
+        return false; // the ids are bad: for us a track cannot cross twice the same ladder
+      return true;
+    case 3:
+      if (FullSecID(ids[0]).getLayerID() == FullSecID(ids[1]).getLayerID() &&
+          FullSecID(ids[0]).getLadderID() == FullSecID(ids[1]).getLadderID()
+         )
+        return false; // the ids are bad: for us a track cannot cross twice the same ladder
+      if (FullSecID(ids[1]).getLayerID() == FullSecID(ids[2]).getLayerID() &&
+          FullSecID(ids[1]).getLadderID() == FullSecID(ids[2]).getLadderID()
+         )
+        return false; // the ids are bad: for us a track cannot cross twice the same ladder
+      if (FullSecID(ids[0]).getLayerID() == FullSecID(ids[2]).getLayerID() &&
+          FullSecID(ids[0]).getLadderID() == FullSecID(ids[2]).getLadderID()
+         )
+        return false; // the ids are bad: for us a track cannot cross twice the same ladder
+      return true;
+    default:
+      return true;
+  }
+}
 
 
 void RawSecMapMergerModule::printData(
@@ -402,8 +429,11 @@ template <class FilterType> void RawSecMapMergerModule::add2HitFilters(VXDTFFilt
   const auto& filterCutsMap = subGraph.getFinalQuantileValues();
   /// TODO tune cutoffs
 
+  auto filterNameToFunctions(SelectionVariableNamesToFunctions(
+                               VXDTFFilters<SpacePoint>::twoHitFilter_t()));
   std::string filterVals;
-  for (auto& filterName : config.twoHitFilters) {
+  for (const auto& filterNameToFunction : filterNameToFunctions) {
+    string filterName = filterNameToFunction.first ;
     filterVals += filterName + ": "
                   + std::to_string(filterCutsMap.at(filterName).getMin())
                   + "/"
@@ -411,33 +441,13 @@ template <class FilterType> void RawSecMapMergerModule::add2HitFilters(VXDTFFilt
   }
   B2DEBUG(1, "SubGraph " << subGraph.getID().print() << " - filter:min/max: " << filterVals);
 
-//   B2DEBUG(1, "SubGraph " << subGraph.getID().print() << " - min/max: " << named3D << ": " << filterCutsMap.at(named3D).getMin() << "/" << filterCutsMap.at(
-//  named3D).getMax() << ", ")
-  // // // //     B2DEBUG(1, namedXY << ": " << filterCutsMap.at(namedXY).getMin() << "/" << filterCutsMap.at(namedXY).getMax() << ", ")
-  // // // //     B2DEBUG(1,  namesRZ << ": " << filterCutsMap.at(namesRZ).getMin() << "/" << filterCutsMap.at(namesRZ).getMax() << ", ")
-
-
-  /// JKL Jan 2016 - minimal working example:
-//   VXDTFFilters<SpacePoint>::twoHitFilter_t friendSectorsSegmentFilter =
-//   ((filterCutsMap.at("Distance3DSquared").getMin() <= Distance3DSquared<SpacePoint>() <= filterCutsMap.at("Distance3DSquared").getMax()).observe(ObserverPrintResults()));
-
-
-  /// JKL Feb 2016 - big working example:
-//   VXDTFFilters<SpacePoint>::twoHitFilter_t friendSectorsSegmentFilter =
-//     (
-//       (filterCutsMap.at("Distance3DSquared").getMin() <= Distance3DSquared<SpacePoint>() <=
-//        filterCutsMap.at("Distance3DSquared").getMax()).observe(VoidObserver()) &&
-//       (filterCutsMap.at("Distance2DXYSquared").getMin() <= Distance2DXYSquared<SpacePoint>() <=
-//        filterCutsMap.at("Distance2DXYSquared").getMax()).observe(VoidObserver()) &&
-//       (filterCutsMap.at("Distance1DZ").getMin() <= Distance1DZ<SpacePoint>() <= filterCutsMap.at("Distance1DZ").getMax()).observe(
-//         VoidObserver()) &&
-//       (filterCutsMap.at("SlopeRZ").getMin() <= SlopeRZ<SpacePoint>() <= filterCutsMap.at("SlopeRZ").getMax()).observe(VoidObserver()) &&
-//       (filterCutsMap.at("Distance3DNormed").getMin() <= Distance3DNormed<SpacePoint>() <=
-//        filterCutsMap.at("Distance3DNormed").getMax()).observe(VoidObserver())
-//     );
   VXDTFFilters<SpacePoint>::twoHitFilter_t friendSectorsSegmentFilter =
     (
       (
+        (filterCutsMap.at("DistanceInTimeUside").getMin() <= DistanceInTimeUside<SpacePoint>() <=
+         filterCutsMap.at("DistanceInTimeUside").getMax()) &&
+        (filterCutsMap.at("DistanceInTimeVside").getMin() <= DistanceInTimeVside<SpacePoint>() <=
+         filterCutsMap.at("DistanceInTimeVside").getMax()) &&
         (filterCutsMap.at("Distance3DSquared").getMin() <= Distance3DSquared<SpacePoint>() <=
          filterCutsMap.at("Distance3DSquared").getMax())  &&
         (filterCutsMap.at("Distance2DXYSquared").getMin() <= Distance2DXYSquared<SpacePoint>() <=
@@ -448,39 +458,6 @@ template <class FilterType> void RawSecMapMergerModule::add2HitFilters(VXDTFFilt
          filterCutsMap.at("Distance3DNormed").getMax())
       )
     );
-
-
-
-  // JKL Jan 2016 - standard version:
-  // // // // // // //       (
-  // // // // // // //         (
-  // // // // // // //           filterCutsMap.at(named3D).getMin() <= Distance3DSquared<SpacePoint>() <= filterCutsMap.at(named3D).getMax()
-  // // // // // // //         ).observe(Observer()).enable() &&
-  // // // // // // //
-  // // // // // // //         (
-  // // // // // // //           filterCutsMap.at(namedXY).getMin() <= Distance2DXYSquared<SpacePoint>() <= filterCutsMap.at(namedXY).getMax()
-  // // // // // // //         ).observe(Observer()).enable() &&
-  // // // // // // //
-  // // // // // // // //    (
-  // // // // // // // //    filterCutsMap.at(nameddZ).getMin() <
-  // // // // // // // //    Distance1DZ<SpacePoint>() <
-  // // // // // // // //    filterCutsMap.at(nameddZ).getMax()
-  // // // // // // // //    )/*.observe(Observer())*/.enable() &&
-  // // // // // // //         ( /// WARNING HACK:
-  // // // // // // //           /*filterCutsMap.at(named3D).getMin()*/std::numeric_limits< double >::min() <= Distance1DZ<SpacePoint>() <=
-  // // // // // // //           std::numeric_limits< double >::max()/*filterCutsMap.at(named3D).getMax()*/
-  // // // // // // //         )/*.observe(Observer())*/.enable() &&
-  // // // // // // //
-  // // // // // // //         (
-  // // // // // // //           filterCutsMap.at(namesRZ).getMin() <= SlopeRZ<SpacePoint>() <= filterCutsMap.at(namesRZ).getMax()
-  // // // // // // //         ).observe(Observer()).enable() &&
-  // // // // // // //
-  // // // // // // // //    (
-  // // // // // // // //    Distance3DNormed<SpacePoint>() <
-  // // // // // // // //    filterCutsMap.at(named3Dn).getMax()
-  // // // // // // // //    ).enable()
-  // // // // // // //         (Distance3DNormed<SpacePoint>() <= std::numeric_limits< double >::max()/*filterCutsMap.at(named3D).getMax()*/).enable()
-  // // // // // // //       );
 
   auto secIDs = subGraph.getID().getFullSecIDs();
 
@@ -501,8 +478,12 @@ template <class FilterType> void RawSecMapMergerModule::add3HitFilters(VXDTFFilt
   const auto& filterCutsMap = subGraph.getFinalQuantileValues();
   /// TODO tune cutoffs
 
+  auto filterNameToFunctions(SelectionVariableNamesToFunctions(
+                               VXDTFFilters<SpacePoint>::threeHitFilter_t ()));
   std::string filterVals;
-  for (auto& filterName : config.threeHitFilters) {
+
+  for (auto& filterNameToFunction : filterNameToFunctions) {
+    string filterName = filterNameToFunction.first ;
     filterVals += filterName + ": "
                   + std::to_string(filterCutsMap.at(filterName).getMin())
                   + "/"
@@ -511,28 +492,20 @@ template <class FilterType> void RawSecMapMergerModule::add3HitFilters(VXDTFFilt
   B2DEBUG(1, "SubGraph " << subGraph.getID().print() << " - filter:min/max: " << filterVals);
 
 
-  /// JKL Jan 2016 - minimal working example:
-//   VXDTFFilters<SpacePoint>::threeHitFilter_t threeHitFilter =
-//     (
-//       (filterCutsMap.at("Angle3DSimple").getMin() <= Angle3DSimple<SpacePoint>() <= filterCutsMap.at("Angle3DSimple").getMax()).observe(Observer3HitPrintResults())
-//       );
-
-
-  /// JKL Feb 2016 - big working example:
   VXDTFFilters<SpacePoint>::threeHitFilter_t threeHitFilter =
-    (
-      (filterCutsMap.at("Angle3DSimple").getMin() <= Angle3DSimple<SpacePoint>() <= filterCutsMap.at("Angle3DSimple").getMax()) &&
-      (filterCutsMap.at("CosAngleXY").getMin() <= CosAngleXY<SpacePoint>() <= filterCutsMap.at("CosAngleXY").getMax()) &&
-      (filterCutsMap.at("AngleRZSimple").getMin() <= AngleRZSimple<SpacePoint>() <= filterCutsMap.at("AngleRZSimple").getMax()) &&
-      (CircleDist2IP<SpacePoint>() <= filterCutsMap.at("CircleDist2IP").getMax()) &&
-      (filterCutsMap.at("DeltaSlopeRZ").getMin() <= DeltaSlopeRZ<SpacePoint>()) <= filterCutsMap.at("DeltaSlopeRZ").getMax() &&
-      (filterCutsMap.at("DeltaSlopeZoverS").getMin() <= DeltaSlopeZoverS<SpacePoint>() <=
-       filterCutsMap.at("DeltaSlopeZoverS").getMax())  &&
-      (filterCutsMap.at("DeltaSoverZ").getMin() <= DeltaSoverZ<SpacePoint>() <= filterCutsMap.at("DeltaSoverZ").getMax()) &&
-      (filterCutsMap.at("HelixParameterFit").getMin() <= HelixParameterFit<SpacePoint>() <=
-       filterCutsMap.at("HelixParameterFit").getMax()) &&
-      (filterCutsMap.at("Pt").getMin() <= Pt<SpacePoint>() <= filterCutsMap.at("Pt").getMax()) &&
-      (filterCutsMap.at("CircleRadius").getMin() <= CircleRadius<SpacePoint>() <= filterCutsMap.at("CircleRadius").getMax())
+    ((filterCutsMap.at("DistanceInTime").getMin() <= DistanceInTime<SpacePoint>() <= filterCutsMap.at("DistanceInTime").getMax()) &&
+     (filterCutsMap.at("Angle3DSimple").getMin() <= Angle3DSimple<SpacePoint>() <= filterCutsMap.at("Angle3DSimple").getMax()) &&
+     (filterCutsMap.at("CosAngleXY").getMin() <= CosAngleXY<SpacePoint>() <= filterCutsMap.at("CosAngleXY").getMax()) &&
+     (filterCutsMap.at("AngleRZSimple").getMin() <= AngleRZSimple<SpacePoint>() <= filterCutsMap.at("AngleRZSimple").getMax()) &&
+     (CircleDist2IP<SpacePoint>() <= filterCutsMap.at("CircleDist2IP").getMax()) &&
+     (filterCutsMap.at("DeltaSlopeRZ").getMin() <= DeltaSlopeRZ<SpacePoint>()) <= filterCutsMap.at("DeltaSlopeRZ").getMax() &&
+     (filterCutsMap.at("DeltaSlopeZoverS").getMin() <= DeltaSlopeZoverS<SpacePoint>() <=
+      filterCutsMap.at("DeltaSlopeZoverS").getMax())  &&
+     (filterCutsMap.at("DeltaSoverZ").getMin() <= DeltaSoverZ<SpacePoint>() <= filterCutsMap.at("DeltaSoverZ").getMax()) &&
+     (filterCutsMap.at("HelixParameterFit").getMin() <= HelixParameterFit<SpacePoint>() <=
+      filterCutsMap.at("HelixParameterFit").getMax()) &&
+     (filterCutsMap.at("Pt").getMin() <= Pt<SpacePoint>() <= filterCutsMap.at("Pt").getMax()) &&
+     (filterCutsMap.at("CircleRadius").getMin() <= CircleRadius<SpacePoint>() <= filterCutsMap.at("CircleRadius").getMax())
 
     ).observe(VoidObserver());
 

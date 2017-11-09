@@ -1812,7 +1812,7 @@ double CDCGeometryPar::getDriftLength0(const double time, const unsigned short i
     } //end of weighted mean loop
   }
 
-  dist = fabs(dist);
+  //  dist = fabs(dist);
   return dist;
 
 }

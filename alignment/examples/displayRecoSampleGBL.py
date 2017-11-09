@@ -23,6 +23,7 @@ from ROOT import Belle2
 main = create_path()
 
 main.add_module('RootInput')
+main.add_module('HistoManager', histoFileName='CollectorOutput.root')
 main.add_module('Gearbox')
 main.add_module('Geometry', excludedComponents=['ECL'])
 main.add_module('SetupGenfitExtrapolation')

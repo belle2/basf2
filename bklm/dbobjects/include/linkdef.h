@@ -13,5 +13,6 @@
 #pragma link C++ class Belle2::BKLMDisplacement+;
 #pragma link C++ class Belle2::BKLMScinDigitizationParams+;
 #pragma link C++ class Belle2::BKLMADCThreshold+;
+#pragma link C++ class Belle2::BKLMTimeWindow+;
 
 #endif

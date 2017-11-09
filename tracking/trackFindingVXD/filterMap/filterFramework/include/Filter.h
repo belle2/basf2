@@ -654,6 +654,7 @@ namespace Belle2 {
     class FilterB,
     class templateObserverType
     >
+  // cppcheck-suppress copyCtorAndEqOperator
   class Filter < Belle2::OperatorOr, FilterA, FilterB, templateObserverType > {
     const char* c_orSuffixA = "_or_A";
     const char* c_orSuffixB = "_or_B";

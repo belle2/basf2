@@ -55,6 +55,7 @@ SVDPackerModule::SVDPackerModule() : Module(),
   addParam("NodeID", m_nodeid, "Node ID", 0);
   addParam("FADCTriggerNumberOffset", m_FADCTriggerNumberOffset,
            "number to be added to the FADC trigger number to match the main trigger number", 0);
+  addParam("simulate3sampleData", m_simulate3sampleData, "Simulate 3-sample RAW Data", bool(false));
   // initialize event #
   n_basf2evt = 0;
 
@@ -181,10 +182,15 @@ void SVDPackerModule::event()
 
   // for each buffer in RawSVD object we store 12 FTBs/FADCs (48 in total)
   unsigned int j_buf[3]; // table of values indicating where new buffer begins
+  bool sim3sample;
 
   for (unsigned int iFADC = 0; iFADC < 48; iFADC++) {
 
     iCRC = 0;
+    sim3sample = false;
+
+    // if m_simulate3sampleData==true, 3-sample data will be simulated for FADCs: 168,144,48,24
+    if (m_simulate3sampleData and iFADCnumber[iFADC] % 24 == 0) sim3sample = true;
 
     // here goes FTB header
     data32 = 0xffaa0000;
@@ -210,6 +216,10 @@ void SVDPackerModule::event()
     m_MainHeader.onebit = 0;
     m_MainHeader.FADCnum = iFADCnumber[iFADC]; // write original FADC number
     m_MainHeader.evtType = 0;
+
+    m_MainHeader.DAQMode = 2;
+    if (sim3sample) m_MainHeader.DAQMode = 1;
+
     m_MainHeader.runType = 0x2; //zero-suppressed mode
     m_MainHeader.check = 6; // 110
 
@@ -238,13 +248,16 @@ void SVDPackerModule::event()
       if (apv_data_vec.size() > 0) { // if any data for given FADC/APV
         for (std::vector<DataInfo>::iterator apv_data = apv_data_vec.begin(); apv_data != apv_data_vec.end(); ++apv_data) {
 
-          m_data_A.sample1 = apv_data->data[0];
-          m_data_A.sample2 = apv_data->data[1];
-          m_data_A.sample3 = apv_data->data[2];
-          m_data_A.stripNum = apv_data->channel;
-          m_data_A.check = 0;
+          //skip 1st data frame if simulate 3-sample data
+          if (not sim3sample) {
+            m_data_A.sample1 = apv_data->data[0];
+            m_data_A.sample2 = apv_data->data[1];
+            m_data_A.sample3 = apv_data->data[2];
+            m_data_A.stripNum = apv_data->channel;
+            m_data_A.check = 0;
 
-          addData32(data32);
+            addData32(data32);
+          }
 
           m_data_B.sample4 = apv_data->data[3];
           m_data_B.sample5 = apv_data->data[4];
@@ -253,6 +266,7 @@ void SVDPackerModule::event()
           m_data_B.check = 0;
 
           addData32(data32);
+
         }
       }
 

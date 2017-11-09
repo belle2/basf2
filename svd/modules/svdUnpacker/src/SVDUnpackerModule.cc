@@ -159,6 +159,8 @@ void SVDUnpackerModule::event()
       unsigned short emuPipAddr;
       unsigned short apvErrorsOR;
 
+      bool is3sampleData = false;
+
       for (unsigned int buf = 0; buf < 4; buf++) { // loop over 4 buffers
 
         //printB2Debug(data32tab[buf], data32tab[buf], &data32tab[buf][nWords[buf] - 1], nWords[buf]);
@@ -170,6 +172,7 @@ void SVDUnpackerModule::event()
 
         for (; data32_it != &data32tab[buf][nWords[buf]]; data32_it++) {
           m_data32 = *data32_it; //put current 32-bit frame to union
+
 
           if (m_data32 == 0xffaa0000) {   // first part of FTB header
             diagnosticVector.clear(); // new set of objects for the current FTB
@@ -218,6 +221,10 @@ void SVDUnpackerModule::event()
             fadc = m_MainHeader.FADCnum;
             trgType = m_MainHeader.trgType;
             trgNumber = m_MainHeader.trgNumber;
+
+            is3sampleData = false;
+            if (m_MainHeader.DAQMode == 1) is3sampleData = true;
+
             if (
               m_MainHeader.trgNumber !=
               ((m_eventMetaDataPtr->getEvent() - m_FADCTriggerNumberOffset) & 0xFF)) {
@@ -261,14 +268,21 @@ void SVDUnpackerModule::event()
             sample[1] = m_data_A.sample2;
             sample[2] = m_data_A.sample3;
 
-            data32_it++;
-            m_data32 = *data32_it; // 2nd frame with data
-            crc16vec.push_back(m_data32);
 
-            sample[3] = m_data_B.sample4;
-            sample[4] = m_data_B.sample5;
-            sample[5] = m_data_B.sample6;
+            sample[3] = 0;
+            sample[4] = 0;
+            sample[5] = 0;
 
+            if (not is3sampleData) {
+
+              data32_it++;
+              m_data32 = *data32_it; // 2nd frame with data
+              crc16vec.push_back(m_data32);
+
+              sample[3] = m_data_B.sample4;
+              sample[4] = m_data_B.sample5;
+              sample[5] = m_data_B.sample6;
+            }
 
             for (unsigned int idat = 0; idat < 6; idat++) {
               // m_cellPosition member of the SVDDigit object is set to zero by NewDigit function

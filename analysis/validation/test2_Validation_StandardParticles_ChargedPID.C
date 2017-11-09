@@ -62,11 +62,12 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   double peff[piddiv]; 
   double pipfake[piddiv];
   double pikfake[piddiv];
+  double pimufake[piddiv];
+  double piefake[piddiv];
   double kpfake[piddiv];
   double kpifake[piddiv];
   double ppifake[piddiv];
-  double pimufake[piddiv];
-  double piefake[piddiv];
+  double pkfake[piddiv];
 
 
   // ---------- Momentum distributions (for efficiency determination) ----------
@@ -86,11 +87,14 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
       ptree->Project("hpall("+range+")",pbranch+"_P",pcuts);
       ptree->Project("hpacc("+range+")",pbranch+"_P",pbranch+"_"+PIDp+">"+pidcut+"&&"+pcuts);
       ptree->Project("hppifake("+range+")",pbranch+"_P",pbranch+"_"+PIDpi+">"+pidcut+"&&"+pcuts);
+      ptree->Project("hpkfake("+range+")",pbranch+"_P",pbranch+"_"+PIDk+">"+pidcut+"&&"+pcuts);
       TH1F* hpall = (TH1F*)pfile->Get("hpall");
       TH1F* hpacc = (TH1F*)pfile->Get("hpacc");
       TH1F* hppifake = (TH1F*)pfile->Get("hppifake");
+      TH1F* hpkfake = (TH1F*)pfile->Get("hpkfake");
       peff[i] = hpacc->Integral()/hpall->Integral();
       ppifake[i] = hppifake->Integral()/hpall->Integral();
+      pkfake[i] = hpkfake->Integral()/hpall->Integral();
 
       // pions
       pikfile->cd();
@@ -110,6 +114,8 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
       pieff[i] = hpiacc->Integral()/hpiall->Integral();
       pipfake[i] = hpipfake->Integral()/hpiall->Integral();
       pikfake[i] = hpikfake->Integral()/hpiall->Integral();
+      pimufake[i] = hpimufake->Integral()/hpiall->Integral();
+      piefake[i] = hpiefake->Integral()/hpiall->Integral();
 
       // kaons
       piktree->Project("hkall("+range+")",kbranch+"_P",pikcuts);
@@ -131,10 +137,10 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
     kcutgr[j] = new TGraph(piddiv,keff,cutvalue);
 
     // ROC plots to determine fake rates
-    ppigr[j] = new TGraph(piddiv,peff,pipfake);
-    pkgr[j]  = new TGraph(piddiv,peff,kpfake);
-    pikgr[j] = new TGraph(piddiv,pieff,kpifake);
-    kpigr[j] = new TGraph(piddiv,keff,pikfake);
+    ppigr[j] = new TGraph(piddiv,peff,ppifake);
+    pkgr[j]  = new TGraph(piddiv,peff,pkfake);
+    pikgr[j] = new TGraph(piddiv,pieff,pikfake);
+    kpigr[j] = new TGraph(piddiv,keff,kpifake);
     kpgr[j] = new TGraph(piddiv,keff,kpfake);
     pimugr[j] = new TGraph(piddiv,keff,pimufake);
     piegr[j] = new TGraph(piddiv,keff,piefake);

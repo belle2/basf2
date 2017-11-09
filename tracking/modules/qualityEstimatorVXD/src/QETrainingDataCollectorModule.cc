@@ -14,7 +14,7 @@
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorMC.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRandom.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 using namespace Belle2;
 
@@ -68,15 +68,16 @@ void QETrainingDataCollectorModule::initialize()
     m_estimator = std::make_unique<QualityEstimatorRiemannHelixFit>();
   }
   B2ASSERT("Not all QualityEstimators could be initialized!", m_estimator);
+
+  m_estimatorMC = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
+  B2ASSERT("QualityEstimatorMC could be initialized!", m_estimatorMC);
 }
 
 void QETrainingDataCollectorModule::beginRun()
 {
   // BField is required by all QualityEstimators
-  double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+  double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
   m_estimator->setMagneticFieldStrength(bFieldZ);
-
-  m_estimatorMC = std::make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
   m_estimatorMC->setMagneticFieldStrength(bFieldZ);
 }
 

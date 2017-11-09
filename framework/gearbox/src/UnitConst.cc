@@ -116,7 +116,7 @@ namespace Belle2 {
   DEFINE_UNIT(fC , Unit::C / 1.0e15);            /**< [femtoCoulomb] */
 
 // magnetic field units
-  DEFINE_UNIT(T  , Unit::V * Unit::s / Unit::m2); /**< Standard of [magnetic field] */
+  DEFINE_UNIT(T  , Unit::V * Unit::s / Unit::m2); /**< [Tesla] */
   DEFINE_UNIT(mT , Unit::T * 1e-3);               /**< [millitesla] */
   DEFINE_UNIT(Gauss , Unit::T * 1e-4);            /**< [Gauss] */
   DEFINE_UNIT(kGauss , Unit::Gauss * 1e3);        /**< [kiloGauss] */

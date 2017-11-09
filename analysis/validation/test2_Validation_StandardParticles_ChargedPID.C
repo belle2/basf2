@@ -55,12 +55,10 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   const int piddiv = 20; // number of PID cuts to test (divisions in ROC plots)
   double cutvalue[piddiv];
   double binwidth = 1.0/piddiv;
-  double eeff[piddiv];
-  double mueff[piddiv];
   double pieff[piddiv];
   double keff[piddiv];
   double peff[piddiv]; 
-  double pipfake[piddiv];
+  //double pipfake[piddiv];
   double pikfake[piddiv];
   double pimufake[piddiv];
   double piefake[piddiv];
@@ -106,13 +104,13 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
       piktree->Project("hpiefake("+range+")",pibranch+"_P",pibranch+"_"+PIDe+">"+pidcut+"&&"+pikcuts);
       TH1F* hpiall = (TH1F*)pikfile->Get("hpiall");
       TH1F* hpiacc = (TH1F*)pikfile->Get("hpiacc");
-      TH1F* hpipfake = (TH1F*)pikfile->Get("hpipfake");
+      //TH1F* hpipfake = (TH1F*)pikfile->Get("hpipfake");
       TH1F* hpikfake = (TH1F*)pikfile->Get("hpikfake");
       TH1F* hpimufake = (TH1F*)pikfile->Get("hpimufake");
       TH1F* hpiefake = (TH1F*)pikfile->Get("hpiefake");
 
       pieff[i] = hpiacc->Integral()/hpiall->Integral();
-      pipfake[i] = hpipfake->Integral()/hpiall->Integral();
+      //pipfake[i] = hpipfake->Integral()/hpiall->Integral();
       pikfake[i] = hpikfake->Integral()/hpiall->Integral();
       pimufake[i] = hpimufake->Integral()/hpiall->Integral();
       piefake[i] = hpiefake->Integral()/hpiall->Integral();

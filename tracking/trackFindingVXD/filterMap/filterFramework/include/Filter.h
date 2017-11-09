@@ -705,7 +705,7 @@ namespace Belle2 {
 
 
     /** will set the observer for  both "OR" filters it contains, this filter will not be observed (VoidObserver)
-    NOTE: if this function is used on the top level Boolean filter, the whole filter will NOT be observed! See accept funtion!
+    NOTE: if this function is used on the top level Boolean filter, the whole filter will NOT be observed! See accept function!
     @param otherObserver : the new observer
     */
     template< class otherObserver >

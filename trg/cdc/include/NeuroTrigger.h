@@ -153,6 +153,9 @@ namespace Belle2 {
      * (scaled to number of wires). */
     double getRelId(const CDCTriggerSegmentHit& hit);
 
+    /** Determine the event time from the shortest priority time of all hit candidates. */
+    int getEventTime(unsigned isector, const CDCTriggerTrack& track);
+
     /** Calculate input pattern for MLP.
      * @param isector index of the MLP that will use the input
      * @param track   axial hit relations are taken from given track

@@ -373,6 +373,41 @@ NeuroTrigger::getRelId(const CDCTriggerSegmentHit& hit)
   return relId;
 }
 
+int
+NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track)
+{
+  int T0 = 9999;
+  CDCTriggerMLP& expert = m_MLPs[isector];
+  // find shortest time of related and relevant axial hits
+  RelationVector<CDCTriggerSegmentHit> axialHits =
+    track.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
+  for (unsigned ihit = 0; ihit < axialHits.size(); ++ihit) {
+    // skip hits with negative relation weight (not selected in finder)
+    if (axialHits.weight(ihit) < 0) continue;
+    unsigned short iSL = axialHits[ihit]->getISuperLayer();
+    // skip stereo hits (should not be related to track, but check anyway)
+    if (iSL % 2 == 1) continue;
+    // get shortest time of relevant hits
+    double relId = getRelId(*axialHits[ihit]);
+    if (expert.isRelevant(relId, iSL) && axialHits[ihit]->priorityTime() < T0) {
+      T0 = axialHits[ihit]->priorityTime();
+    }
+  }
+  // find shortest time of relevant stereo hits
+  StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
+  for (int ihit = 0; ihit < hits.getEntries(); ++ihit) {
+    unsigned short iSL = hits[ihit]->getISuperLayer();
+    // skip axial hits
+    if (iSL % 2 == 0) continue;
+    // get shortest time of relevant hits
+    double relId = getRelId(*hits[ihit]);
+    if (expert.isRelevant(relId, iSL) && hits[ihit]->priorityTime() < T0) {
+      T0 = hits[ihit]->priorityTime();
+    }
+  }
+  return T0;
+}
+
 unsigned long
 NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track)
 {

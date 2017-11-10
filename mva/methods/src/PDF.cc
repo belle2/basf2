@@ -9,9 +9,6 @@
  **************************************************************************/
 
 #include <mva/methods/PDF.h>
-
-#include <algorithm>
-
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {

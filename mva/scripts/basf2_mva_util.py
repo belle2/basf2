@@ -11,10 +11,6 @@ import numpy as np
 
 import ROOT
 from ROOT import Belle2
-from ROOT import gSystem
-
-import shutil
-import os
 
 
 def tree2dict(tree, tree_columns, dict_columns=None):
@@ -67,9 +63,9 @@ def calculate_flatness(f, p, w=None):
     binning_feature = np.unique(np.percentile(f, q=quantiles))
     binning_probability = np.unique(np.percentile(p, q=quantiles))
     if len(binning_feature) < 2:
-        binning_feature = np.array([np.min(f)-1, np.max(f)+1])
+        binning_feature = np.array([np.min(f) - 1, np.max(f) + 1])
     if len(binning_probability) < 2:
-        binning_probability = np.array([np.min(p)-1, np.max(p)+1])
+        binning_probability = np.array([np.min(p) - 1, np.max(p) + 1])
     hist_n, _ = np.histogramdd(np.c_[p, f],
                                bins=[binning_probability, binning_feature],
                                weights=w)
@@ -79,7 +75,7 @@ def calculate_flatness(f, p, w=None):
     hist_n = hist_n.cumsum(axis=0)
     hist_inc = hist_inc.cumsum(axis=0)
     diff = (hist_n.T - hist_inc)**2
-    return np.sqrt(diff.sum() / (100*99))
+    return np.sqrt(diff.sum() / (100 * 99))
 
 
 class Method(object):

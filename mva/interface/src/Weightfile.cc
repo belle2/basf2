@@ -113,6 +113,11 @@ namespace Belle2 {
       in.close();
     }
 
+    void Weightfile::addFile(const std::string& identifier)
+    {
+      addFile(identifier, getFileName());
+    }
+
     void Weightfile::addStream(const std::string& identifier, std::istream& in)
     {
       typedef boost::archive::iterators::base64_from_binary<boost::archive::iterators::transform_width<std::string::const_iterator, 6, 8>>
@@ -132,6 +137,11 @@ namespace Belle2 {
     {
       std::ofstream out(custom_weightfile, std::ios::out | std::ios::binary);
       out << getStream(identifier);
+    }
+
+    void Weightfile::getFile(const std::string& identifier)
+    {
+      getFile(identifier, getFileName());
     }
 
     std::string Weightfile::getStream(const std::string& identifier) const

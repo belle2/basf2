@@ -18,8 +18,6 @@
 #include <mva/methods/Reweighter.h>
 #include <mva/methods/Combination.h>
 
-#include <framework/logging/Logger.h>
-
 namespace Belle2 {
   namespace MVA {
 

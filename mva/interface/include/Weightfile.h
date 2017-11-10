@@ -100,6 +100,12 @@ namespace Belle2 {
       void addFile(const std::string& identifier, const std::string& custom_weightfile);
 
       /**
+      * Add a file (mostly a weightfile from a MVA library) to our Weightfile
+      * @param identifier of this weightfile
+      */
+      void addFile(const std::string& identifier);
+
+      /**
        * Add a stream to our weightfile
        * @param identifier of the stream
        * @param in the stream
@@ -137,6 +143,12 @@ namespace Belle2 {
        * @param custom_weightfile the filename which is created
        */
       void getFile(const std::string& identifier, const std::string& custom_weightfile);
+
+      /**
+      * Creates a file from our weightfile (mostly this will be a weightfile of an MVA library)
+      * @param identifier of the file
+      */
+      void getFile(const std::string& identifier);
 
       /**
        * Returns the content of a stored stream as string

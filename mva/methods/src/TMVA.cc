@@ -9,22 +9,10 @@
  **************************************************************************/
 
 #include <mva/methods/TMVA.h>
-
-#include <framework/logging/Logger.h>
-
-#include <TFile.h>
-#include <TTree.h>
 #include <TPluginManager.h>
-#include <TROOT.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem/operations.hpp>
-
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 
 namespace Belle2 {
   namespace MVA {

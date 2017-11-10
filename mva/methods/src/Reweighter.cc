@@ -10,9 +10,6 @@
 
 #include <mva/methods/Reweighter.h>
 #include <mva/interface/Interface.h>
-
-#include <algorithm>
-
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {

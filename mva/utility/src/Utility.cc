@@ -15,31 +15,14 @@
 #include <mva/methods/Trivial.h>
 #include <mva/methods/Combination.h>
 
-#include <mva/interface/Interface.h>
-#include <mva/interface/Options.h>
-#include <mva/interface/Weightfile.h>
-
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/dataobjects/EventMetaData.h>
-
 #include <framework/logging/Logger.h>
 
 #include <framework/utilities/MakeROOTCompatible.h>
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include <TFile.h>
-#include <TTree.h>
-#include <TBranch.h>
-
 #include <iostream>
-#include <vector>
-#include <string>
-#include <fstream>
-#include <cerrno>
-#include <memory>
 #include <chrono>
 
 namespace Belle2 {

@@ -90,7 +90,7 @@ namespace Belle2 {
     std::vector<bool> m_isMapped;           /**< vector of mapped modules */
     std::map<unsigned, unsigned> m_mergerID; /**< map mergers ID to SN */
 
-    ClassDef(ARICHMergerMapping, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(ARICHMergerMapping, 2);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 

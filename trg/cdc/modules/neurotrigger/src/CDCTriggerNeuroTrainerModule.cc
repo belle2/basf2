@@ -414,6 +414,8 @@ CDCTriggerNeuroTrainerModule::event()
         if (m_trainSets[isector].nSamples() > (nTrainMax + m_nValid + m_nTest)) {
           continue;
         }
+        // read out or determine event time
+        m_NeuroTrigger.getEventTime(isector, *tracks[itrack]);
         // check hit pattern
         unsigned long hitPattern = m_NeuroTrigger.getInputPattern(isector, *tracks[itrack]);
         unsigned long sectorPattern = m_NeuroTrigger[isector].getSLpattern();

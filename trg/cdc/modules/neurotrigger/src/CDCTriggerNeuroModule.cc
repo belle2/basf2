@@ -99,6 +99,8 @@ CDCTriggerNeuroModule::event()
                                 tracks2D[itrack]->getKappa(1.5),
                                 atan2(1., tracks2D[itrack]->getCotTheta()));
     if (geoSectors.size() == 0) continue;
+    // read out or determine event time
+    m_NeuroTrigger.getEventTime(geoSectors[0], *tracks2D[itrack]);
     // get the hit pattern (depends on phase space sector)
     unsigned long hitPattern =
       m_NeuroTrigger.getInputPattern(geoSectors[0], *tracks2D[itrack]);

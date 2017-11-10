@@ -10,68 +10,38 @@
 
 #pragma once
 
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
+#include <tracking/modules/qualityEstimatorVXD/QualityEstimatorBaseModule.h>
+
 // TODO: This should probably not be in the mva folder?
 #include <tracking/trackFindingVXD/mva/SimpleVariableRecorder.h>
 #include <tracking/trackFindingVXD/variableExtractors/ClusterInfoExtractor.h>
 #include <tracking/trackFindingVXD/variableExtractors/QEResultsExtractor.h>
 
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/core/Module.h>
-
-#include <memory>
-
-
 namespace Belle2 {
-  class QETrainingDataCollectorModule : public Module {
+  class QETrainingDataCollectorModule : public QualityEstimatorBaseModule {
 
   public:
     /** Constructor of the module. */
     QETrainingDataCollectorModule();
 
     /** Initializes the Module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
-    virtual void beginRun();
+    virtual void beginRun() override;
 
-    /** Applies the selected quality estimation method for a given set of TCs */
-    virtual void event();
+    /** TODO: docu */
+    virtual void singleSPTCevent(SpacePointTrackCand&) override;
 
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   protected:
 
     // module parameters
 
-    /** Identifier which estimation method to use. Valid identifiers are:
-     * CircleFit
-     * TripletFit
-     * Random
-     */
-    std::string m_EstimationMethod;
-
-    /** sets the name of the expected StoreArray containing SpacePointTrackCands */
-    std::string m_SpacePointTrackCandsStoreArrayName;
-
-    /** sets the name of the expected StoreArray containing MCRecoTracks. Only required for MCInfo method */
-    std::string m_MCRecoTracksStoreArrayName;
-
-    /** Only required for MCInfo method */
-    bool m_MCStrictQualityEstimator;
-
     std::string m_ClusterInformation;
 
     // member variables
-
-    /** the storeArray for SpacePointTrackCands as member, is faster than recreating link for each event */
-    StoreArray<SpacePointTrackCand> m_spacePointTrackCands;
-
-
-    /** pointer to the selected QualityEstimator */
-    std::unique_ptr<QualityEstimatorBase> m_estimator;
 
     /** QualityEstimatorMC as target for training */
     std::unique_ptr<QualityEstimatorBase> m_estimatorMC;

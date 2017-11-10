@@ -107,7 +107,7 @@ CDCTriggerNeuroModule::event()
     if (isector < 0) continue;
     // get the input for the MLP
     vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector, *tracks2D[itrack]);
-    vector<float> MLPinput = m_NeuroTrigger.getInputVector(isector, hitIds, *tracks2D[itrack]);
+    vector<float> MLPinput = m_NeuroTrigger.getInputVector(isector, hitIds);
     // run the MLP
     vector<float> target;
     if (m_fixedPoint) {

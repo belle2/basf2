@@ -101,7 +101,8 @@ def add_simulation(
         usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
         use_vxdtf2=True,
-        generate_2nd_cdc_hits=False):
+        generate_2nd_cdc_hits=False,
+        simulateT0jitter=False):
     """
     This function adds the standard simulation modules to a path.
     @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
@@ -137,6 +138,11 @@ def add_simulation(
             geometry.param('useDB', False)
             geometry.param('components', components)
         path.add_module(geometry)
+
+    # event T0 jitter simulation
+    if simulateT0jitter and 'EventT0Generator' not in path:
+        eventt0 = register_module('EventT0Generator')
+        path.add_module(eventt0)
 
     # detector simulation
     if 'FullSim' not in path:

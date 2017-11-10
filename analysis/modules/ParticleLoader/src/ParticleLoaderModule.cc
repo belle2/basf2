@@ -17,7 +17,7 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
-#include <framework/core/ModuleParam.icc.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 // dataobjects
 #include <mdst/dataobjects/V0.h>

@@ -24,7 +24,7 @@
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 #include <tracking/ckf/pxd/filters/relations/LayerPXDRelationFilter.icc.h>
 
-#include <framework/core/ModuleParamList.dcl.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
 

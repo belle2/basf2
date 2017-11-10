@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
-#include <framework/core/ModuleParamList.dcl.h>
+#include <framework/core/ModuleParamList.h>
 #include <genfit/SharedPlanePtr.h>
 
 namespace genfit {

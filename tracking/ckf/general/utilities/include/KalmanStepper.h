@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/ckf/general/utilities/EigenHelper.h>
-#include <framework/core/ModuleParamList.dcl.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/MeasurementOnPlane.h>

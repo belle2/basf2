@@ -33,7 +33,7 @@
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/dataobjects/CDCHit.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <TRandom.h>
 

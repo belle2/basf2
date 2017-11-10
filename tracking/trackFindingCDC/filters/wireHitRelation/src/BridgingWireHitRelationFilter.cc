@@ -21,7 +21,7 @@
 #include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <vector>
 #include <string>

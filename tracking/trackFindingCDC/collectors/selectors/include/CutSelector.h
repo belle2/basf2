@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 

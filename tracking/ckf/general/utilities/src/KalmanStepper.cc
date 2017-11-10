@@ -9,6 +9,6 @@
  **************************************************************************/
 
 #include <tracking/ckf/general/utilities/KalmanStepper.h>
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;

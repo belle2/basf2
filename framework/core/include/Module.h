@@ -11,6 +11,7 @@
 #pragma once
 
 #include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/core/ModuleCondition.h>
 #include <framework/core/PathElement.h>
 

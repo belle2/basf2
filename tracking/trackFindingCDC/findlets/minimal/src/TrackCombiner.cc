@@ -21,7 +21,7 @@
 #include <tracking/trackFindingCDC/utilities/Range.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <map>
 #include <deque>

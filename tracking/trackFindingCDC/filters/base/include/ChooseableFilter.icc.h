@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 

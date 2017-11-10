@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 #include <vxd/geometry/GeoCache.h>
 
 namespace Belle2 {

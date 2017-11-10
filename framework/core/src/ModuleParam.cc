@@ -1,4 +1,4 @@
-#include <framework/core/ModuleParam.icc.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/core/Path.h>
 
 template class Belle2::ModuleParam<bool>;

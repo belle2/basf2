@@ -18,7 +18,7 @@
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 
-#include <framework/core/ModuleParam.icc.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {

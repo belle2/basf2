@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/SloppyFilter.dcl.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <TRandom.h>
 

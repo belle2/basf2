@@ -18,7 +18,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <TMatrixDSym.h>
 

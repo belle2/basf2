@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <vector>
 #include <string>

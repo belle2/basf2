@@ -27,7 +27,7 @@ namespace Belle2 {
       /// turn on/off debug.
       virtual void setDebug(bool debug = false) {m_debug = debug; }
       /// use DB or text mode.
-      virtual void setUseDB(bool useDB = false) {m_useDB = useDB; }
+      virtual void setUseDB(bool useDB = true) {m_useDB = useDB; }
       /// store Hisotgram or not.
       virtual void storeHisto(bool storeHist = false) {m_storeHisto = storeHist;}
       /// minimum ndf require for track.
@@ -41,19 +41,14 @@ namespace Belle2 {
 
       /// output xt T0 file name (for text mode)
       void outputT0FileName(std::string outputname) {m_outputT0FileName.assign(outputname);}
-      /// run t0 correction.
-      //      void execute()
-      //      {
-      //        calibrate();
-      //}
 
     protected:
       /// Run algo on data
       virtual EResult calibrate();
       ///create histo for each channel
-      virtual void CreateHisto();
+      virtual void createHisto();
       /// write outut or store db
-      virtual void Write();
+      virtual void write();
     private:
       TH1F* m_hTotal;       /**< 1D histogram of delta T whole channel */
       TH1F* m_h1[56][385];    /**<1D histogram for each channel*/
@@ -74,11 +69,6 @@ namespace Belle2 {
       bool m_storeHisto; /**< store histo or not*/
       bool m_useDB; /**< use DB or text mode*/
       std::string m_outputT0FileName = "t0_new.dat"; /**<output t0 file name for text file*/
-      //      std::string m_inputRootFileName = "rootfile/output*"; /**< input file names*/
-      int m_firstExperiment; /**< First experiment. */
-      int m_firstRun; /**< First run. */
-      int m_lastExperiment; /**< Last experiment */
-      int m_lastRun; /**< Last run. */
       //      ClassDef(T0Correction4CAF, 0); /**< class implementing T0 correction algorithm */
     };
   }// name space CDC

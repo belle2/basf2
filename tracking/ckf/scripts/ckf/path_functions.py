@@ -19,7 +19,7 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth):
         result_filter_parameters = {}
     else:
         result_filter = "mva_with_relations"
-        result_filter_parameters = {"cut": 0.05}
+        result_filter_parameters = {"cut": 0.2}
 
     path.add_module("CDCToSVDSeedCKF",
                     advanceHighFilterParameters={"direction": 0.0},

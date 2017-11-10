@@ -77,6 +77,8 @@ namespace Belle2 {
       std::vector<unsigned long> SLpatternMask = {0};
       /** Maximal drift time, identical for all networks. */
       unsigned tMax = 256;
+      /** If true, determine event time from relevant hits if it is missing. */
+      bool T0fromHits = false;
     };
 
     /** Default constructor. */
@@ -154,8 +156,11 @@ namespace Belle2 {
      * (scaled to number of wires). */
     double getRelId(const CDCTriggerSegmentHit& hit);
 
-    /** Determine the event time from the shortest priority time of all hit candidates. */
-    int getEventTime(unsigned isector, const CDCTriggerTrack& track);
+    /** Read out the event time and store it.
+     * If there is no valid event time, it can be determined
+     * from the shortest priority time of all hit candidates,
+     * if the option is enabled for the given sector. */
+    void getEventTime(unsigned isector, const CDCTriggerTrack& track);
 
     /** Calculate input pattern for MLP.
      * @param isector index of the MLP that will use the input
@@ -200,6 +205,10 @@ namespace Belle2 {
     double m_idRef[9][2] = {};
     /** 2D crossing angle of current track */
     double m_alpha[9][2] = {};
+    /** Event time of current event / track */
+    int m_T0 = 0;
+    /** Flag to show if stored event time is valid */
+    bool m_hasT0 = false;
     /** Fixed point precision in bit after radix point.
      *  8 values:
      *  - 2D track parameters: omega, phi

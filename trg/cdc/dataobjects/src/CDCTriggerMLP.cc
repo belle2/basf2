@@ -15,25 +15,27 @@ CDCTriggerMLP::CDCTriggerMLP():
               -10.5, 1.,
               -1., 1.,
               -1., 11.,
-              -1., 1.}
+              -1., 1.},
+  T0fromHits(false)
 {
   weights.assign(nWeightsCal(), 0.);
 }
 
-CDCTriggerMLP::CDCTriggerMLP(std::vector<unsigned short>& nNodes,
-                             unsigned short targetVars,
-                             std::vector<float>& outputScale,
-                             std::vector<float>& phiRange,
-                             std::vector<float>& invptRange,
-                             std::vector<float>& thetaRange,
+CDCTriggerMLP::CDCTriggerMLP(std::vector<unsigned short>& nodes,
+                             unsigned short targets,
+                             std::vector<float>& outputscale,
+                             std::vector<float>& phirange,
+                             std::vector<float>& invptrange,
+                             std::vector<float>& thetarange,
                              unsigned short maxHits,
-                             unsigned long SLpattern,
-                             unsigned long SLpatternMask,
-                             unsigned short tMax):
-  nNodes(nNodes), trained(false), targetVars(targetVars), outputScale(outputScale),
-  phiRange(phiRange), invptRange(invptRange), thetaRange(thetaRange),
-  maxHitsPerSL(maxHits), SLpattern(SLpattern), SLpatternMask(SLpatternMask),
-  tMax(tMax),
+                             unsigned long pattern,
+                             unsigned long patternMask,
+                             unsigned short tmax,
+                             bool calcT0):
+  nNodes(nodes), trained(false), targetVars(targets), outputScale(outputscale),
+  phiRange(phirange), invptRange(invptrange), thetaRange(thetarange),
+  maxHitsPerSL(maxHits), SLpattern(pattern), SLpatternMask(patternMask),
+  tMax(tmax),
   relevantID{ -1., 1.,
               -10., 1.,
               -1., 1.,
@@ -42,7 +44,8 @@ CDCTriggerMLP::CDCTriggerMLP(std::vector<unsigned short>& nNodes,
               -10.5, 1.,
               -1., 1.,
               -1., 11.,
-              -1., 1.}
+              -1., 1.},
+  T0fromHits(calcT0)
 {
   weights.assign(nWeightsCal(), 0.);
 }

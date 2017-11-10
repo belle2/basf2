@@ -16,8 +16,10 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth):
                         prRecoTracksStoreArrayName=svd_reco_tracks)
 
         result_filter = "truth_svd_cdc_relation"
+        result_filter_parameters = {}
     else:
-        result_filter = "chi2"
+        result_filter = "mva_with_relations"
+        result_filter_parameters = {"cut": 0.05}
 
     path.add_module("CDCToSVDSeedCKF",
                     advanceHighFilterParameters={"direction": 0.0},
@@ -26,7 +28,9 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth):
                     outputRecoTrackStoreArrayName=svd_reco_tracks,
                     vxdTracksStoreArrayName=svd_reco_tracks,
 
-                    filter=result_filter)
+                    filter=result_filter,
+                    filterParameters=result_filter_parameters
+                    )
 
 
 def add_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, filter_cut=0.03,

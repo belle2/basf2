@@ -39,6 +39,9 @@ namespace {
 
   /// Filter using a trained MVA method
   using MVASVDResultFilter = MVAFilter<SVDResultVarSet>;
+
+  /// Filter using a trained MVA method
+  using MVASVDSeededResultFilter = MVAFilter<VariadicUnionVarSet<SVDResultVarSet, RelationSVDResultVarSet>>;
 }
 
 
@@ -66,6 +69,7 @@ std::map<std::string, std::string> SVDResultFilterFactory::getValidFilterNamesAn
     {"all", "all combination are valid"},
     {"recording", "record variables to a TTree"},
     {"mva", "filter based on the trained MVA method"},
+    {"mva_with_relations", "filter based on the trained MVA method"},
     {"size", "ordering according to size"},
     {"chi2", "ordering according to chi2"},
     {"truth", "monte carlo truth"},
@@ -84,6 +88,8 @@ SVDResultFilterFactory::create(const std::string& filterName) const
     return std::make_unique<RecordingSVDResultFilter>();
   } else if (filterName == "mva") {
     return std::make_unique<MVASVDResultFilter>("tracking/data/ckf_CDCToSVDResult.xml");
+  } else if (filterName == "mva_with_relations") {
+    return std::make_unique<MVASVDSeededResultFilter>("tracking/data/ckf_SeededCDCToSVDResult.xml");
   } else if (filterName == "truth") {
     return std::make_unique<ChooseableTruthSVDResultFilter>("truth");
   } else if (filterName == "truth_svd_cdc_relation") {

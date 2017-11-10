@@ -115,6 +115,7 @@ namespace TrgTest {
     StoreObjPtr<EventT0> T0("EventT0");
     T0.create();
     T0->addEventT0(0, Const::CDC);
+    neuroTrigger.getEventTime(0, *track);
 
     // define different hit numbers to test
     // the basis is a combination that should pass all requirements,

@@ -147,6 +147,13 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
 
   TFile* outputFile = new TFile("standardParticlesValidation_ChargedPID.root","RECREATE");
   outputFile->cd();
+  TH1F* Kall_vs_momentum = new TH1F("Kall_vs_momentum", "K rate vs. momentum", 100, 0.5, 4.0);
+  TH1F* piall_vs_momentum = new TH1F("piall_vs_momentum", "#pi rate vs. momentum", 100, 0.5, 4.0);
+  piktree->Project("piall_vs_momentum", pibranch+"_P", pikcuts);
+  piktree->Project("Kall_vs_momentum", kbranch+"_P", pikcuts);
+  outputFile->WriteTObject(piall_vs_momentum);
+  outputFile->WriteTObject(Kall_vs_momentum);
+
   TH1F* Kpifake_vs_momentum = new TH1F("Kpifake_vs_momentum", "K/#pi fake rate vs. momentum", 100, 0.5, 4.0);
   TH1F* Kpfake_vs_momentum = new TH1F("Kpfake_vs_momentum", "K/p fake rate vs. momentum", 100, 0.5, 4.0);
   TH1F* piKfake_vs_momentum = new TH1F("piKfake_vs_momentum", "#pi/K fake rate vs. momentum", 100, 0.5, 4.0);
@@ -158,6 +165,11 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   piktree->Project("pimufake_vs_momentum", pibranch+"_P", pibranch+"_"+PIDe+">"+pidcut+"&&"+pikcuts);
   piktree->Project("Kpifake_vs_momentum", kbranch+"_P", kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
   piktree->Project("Kpfake_vs_momentum", kbranch+"_P", kbranch+"_"+PIDk+">"+pidcut+"&&"+pikcuts);
+  Kpifake_vs_momentum->Divide(Kall_vs_momentum);
+  Kpfake_vs_momentum->Divide(Kall_vs_momentum);
+  piKfake_vs_momentum->Divide(piall_vs_momentum); 
+  pimufake_vs_momentum->Divide(piall_vs_momentum); 
+  piefake_vs_momentum->Divide(piall_vs_momentum); 
   outputFile->WriteTObject(piKfake_vs_momentum);
   outputFile->WriteTObject(piefake_vs_momentum);
   outputFile->WriteTObject(pimufake_vs_momentum);
@@ -167,24 +179,36 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   TH1F* kplusRecoEff_vs_cosTheta = new TH1F("kplusRecoEff_vs_cosTheta", "charge-dependent Kaon reconstruction efficiency", 200, -1, 1);
   TH1F* kminusRecoEff_vs_cosTheta = new TH1F("kminusRecoEff_vs_cosTheta", "charge-dependent Kaon reconstruction efficiency", 200, -1, 1);
   TH1F* krecoEff_vs_cosTheta = new TH1F("krecoEff_vs_cosTheta", "charge-dependent Kaon reconstruction efficiency", 200, -1, 1);
-  piktree->Project("kplusRecoEff_vs_cosTheta", kbranch+"_P4[3]/"+kbranch+"_P", "("+kbranch+"_charge > 0) && "+kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
-  piktree->Project("kminusRecoEff_vs_cosTheta", kbranch+"_P4[3]/"+kbranch+"_P", "("+kbranch+"_charge < 0) && "+kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
-  piktree->Project("krecoEff_vs_cosTheta", kbranch+"_P4[3]/"+kbranch+"_P", kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
+  piktree->Project("kplusRecoEff_vs_cosTheta", kbranch+"_P4[2]/"+kbranch+"_P", "("+kbranch+"_charge > 0) && "+kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
+  piktree->Project("kminusRecoEff_vs_cosTheta", kbranch+"_P4[2]/"+kbranch+"_P", "("+kbranch+"_charge < 0) && "+kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
+  piktree->Project("krecoEff_vs_cosTheta", kbranch+"_P4[2]/"+kbranch+"_P", kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
   kplusRecoEff_vs_cosTheta->Divide(krecoEff_vs_cosTheta);
   kminusRecoEff_vs_cosTheta->Divide(krecoEff_vs_cosTheta);
   kplusRecoEff_vs_cosTheta->Add(kminusRecoEff_vs_cosTheta, -1);
   outputFile->WriteTObject(kplusRecoEff_vs_cosTheta);
+
+  TH1F* Kall_vs_cosTheta = new TH1F("Kall_vs_cosTheta", "K rate vs. cosTheta", 200, -1, 1);
+  TH1F* piall_vs_cosTheta = new TH1F("piall_vs_cosTheta", "#pi rate vs. cosTheta", 200, -1, 1);
+  piktree->Project("Kall_vs_cosTheta", kbranch+"_P4[2]/"+kbranch+"_P", pikcuts);
+  piktree->Project("piall_vs_cosTheta", pibranch+"_P4[2]/"+pibranch+"_P", pikcuts);
+  outputFile->WriteTObject(Kall_vs_cosTheta);
+  outputFile->WriteTObject(piall_vs_cosTheta);
 
   TH1F* Kpifake_vs_cosTheta = new TH1F("Kpifake_vs_cosTheta", "K/#pi fake rate vs. cosTheta", 200, -1, 1);
   TH1F* Kpfake_vs_cosTheta = new TH1F("Kpfake_vs_cosTheta", "K/p fake rate vs. cosTheta", 200, -1, 1);
   TH1F* piKfake_vs_cosTheta = new TH1F("piKfake_vs_cosTheta", "#pi/K fake rate vs. cosTheta", 200, -1, 1);
   TH1F* pimufake_vs_cosTheta = new TH1F("pimufake_vs_cosTheta", "#pi/#mu fake rate vs. cosTheta", 200, -1, 1);
   TH1F* piefake_vs_cosTheta = new TH1F("piefake_vs_cosTheta", "#pi/e fake rate vs. cosTheta", 200, -1, 1);
-  piktree->Project("piKfake_vs_cosTheta", pibranch+"_P4[3]/"+pibranch+"_P", pibranch+"_"+PIDk+">"+pidcut+"&&"+pikcuts);
-  piktree->Project("piefake_vs_cosTheta", pibranch+"_P4[3]/"+pibranch+"_P", pibranch+"_"+PIDmu+">"+pidcut+"&&"+pikcuts);
-  piktree->Project("pimufake_vs_cosTheta", pibranch+"_P4[3]/"+pibranch+"_P", pibranch+"_"+PIDe+">"+pidcut+"&&"+pikcuts);
-  piktree->Project("Kpifake_vs_cosTheta", kbranch+"_P4[3]/"+kbranch+"_P", kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
-  piktree->Project("Kpfake_vs_cosTheta", kbranch+"_P4[3]/"+kbranch+"_P", kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
+  piktree->Project("piKfake_vs_cosTheta", pibranch+"_P4[2]/"+pibranch+"_P", pibranch+"_"+PIDk+">"+pidcut+"&&"+pikcuts);
+  piktree->Project("piefake_vs_cosTheta", pibranch+"_P4[2]/"+pibranch+"_P", pibranch+"_"+PIDmu+">"+pidcut+"&&"+pikcuts);
+  piktree->Project("pimufake_vs_cosTheta", pibranch+"_P4[2]/"+pibranch+"_P", pibranch+"_"+PIDe+">"+pidcut+"&&"+pikcuts);
+  piktree->Project("Kpifake_vs_cosTheta", kbranch+"_P4[2]/"+kbranch+"_P", kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
+  piktree->Project("Kpfake_vs_cosTheta", kbranch+"_P4[2]/"+kbranch+"_P", kbranch+"_"+PIDp+">"+pidcut+"&&"+pikcuts);
+  Kpfake_vs_cosTheta->Divide(Kall_vs_cosTheta);
+  Kpifake_vs_cosTheta->Divide(Kall_vs_cosTheta);
+  piKfake_vs_cosTheta->Divide(piall_vs_cosTheta);
+  piefake_vs_cosTheta->Divide(piall_vs_cosTheta);
+  pimufake_vs_cosTheta->Divide(piall_vs_cosTheta);
   outputFile->WriteTObject(piKfake_vs_cosTheta);
   outputFile->WriteTObject(piefake_vs_cosTheta);
   outputFile->WriteTObject(pimufake_vs_cosTheta);

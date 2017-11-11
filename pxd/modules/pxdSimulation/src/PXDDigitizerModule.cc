@@ -369,7 +369,8 @@ void PXDDigitizerModule::driftCharge(const TVector3& r, double electrons)
     double du = gRandom->Gaus(0.0, sigmaDrift_u), dv = gRandom->Gaus(0.0, sigmaDrift_v);
     double uPos = r.x() + du + dx;
     double vPos = r.y() + dv;
-    for (int step = 0; step < m_elMaxSteps; ++step) {
+    int step = 0;
+    for (; step < m_elMaxSteps; ++step) {
       int id = info.getTrappedID(uPos, vPos);
       //Check if cloud inside of IG region
       if (id >= 0) {
@@ -381,6 +382,11 @@ void PXDDigitizerModule::driftCharge(const TVector3& r, double electrons)
       dv = gRandom->Gaus(0.0, sigmaDiffus), du = gRandom->Gaus(0.0, sigmaDiffus);
       uPos += du;
       vPos += dv;
+    }
+    if (step == m_elMaxSteps) {
+      // cloud is not trapped but save it anyway into the closest pixel
+      int iu = info.getUCellID(uPos, vPos, 1), iv = info.getVCellID(vPos, 1);
+      sensor[Digit(iu, iv)].add(groupCharge, m_currentParticle, m_currentTrueHit);
     }
   }
 }

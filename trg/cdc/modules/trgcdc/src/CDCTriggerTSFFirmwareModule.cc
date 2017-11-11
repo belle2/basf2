@@ -11,22 +11,17 @@
 #include <trg/cdc/modules/trgcdc/CDCTriggerTSFFirmwareModule.h>
 #include <trg/cdc/Cosim.h>
 #include <framework/datastore/StoreArray.h>
-#include <cdc/dataobjects/CDCHit.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <cdc/dataobjects/CDCHit.h>
 #include <framework/logging/Logger.h>
 
-#include <string>
-#include <cstring>
-#include <iostream>
-#include <iomanip>
 #include <vector>
 #include <array>
+#include <bitset>
+#include <string>
 #include <algorithm>
 #include <numeric>
-#include <bitset>
 
-#include <cmath>
-#include <cstdlib>
 #include <cstdio>
 #include <unistd.h>
 
@@ -37,12 +32,11 @@ using namespace CDCTrigger;
 
 REG_MODULE(CDCTriggerTSFFirmware)
 
-
 constexpr std::array<int, Belle2::CDCTriggerTSFFirmwareModule::m_nSubModules>
 Belle2::CDCTriggerTSFFirmwareModule::nAxialMergers;
 
 CDCTriggerTSFFirmwareModule::CDCTriggerTSFFirmwareModule() :
-  Module(), m_cdcHits("")
+  Module(), m_cdcHits{""}
 
 {
   for (unsigned i = 0; i < m_nSubModules; ++i) {
@@ -59,7 +53,7 @@ CDCTriggerTSFFirmwareModule::CDCTriggerTSFFirmwareModule() :
   // Define module parameters
   addParam("hitCollectionName", m_hitCollectionName,
            "Name of the input StoreArray of CDCHits.",
-           string(""));
+           string("CDCHits"));
 
   // addParam("outputCollectionName", m_outputCollectionName,
   //          "Name of the StoreArray holding the tracks found in the Hough tracking.",
@@ -100,39 +94,7 @@ CDCTriggerTSFFirmwareModule::read(FILE* instream)
   }
   // ins->getline(buffer.data(), buffer.size());
   B2DEBUG(50, "display received TSF output:");
-  if (getLogConfig().getDebugLevel() >= 50) {
-    for (auto i2d = 0; i2d < 4; ++i2d) {
-      B2DEBUG(50, display_value(buffer.data() + width_out * i2d, width_out));
-    }
-  }
-  auto bufferItr = buffer.cbegin();
-  for (int iTracker = 0; iTracker < nTrackers; ++iTracker) {
-    copy(bufferItr, bufferItr + width_out, output[iTracker].begin());
-    bufferItr += width_out;
-  }
-  return output;
-}
-
-CDCTriggerTSFFirmwareModule::outputArray
-CDCTriggerTSFFirmwareModule::writeRead(const char* message, FILE* outstream, FILE* instream)
-{
-  // write input to TSF firmware
-  fprintf(outstream, "%s\n" , message);
-  fflush(outstream);
-  if (getLogConfig().getDebugLevel() >= 50) {
-    usleep(200000);
-  }
-  // read output from TSF firmware
-  array<char, 2048> buffer;
-  outputArray output;
-  buffer.fill(one_val);
-  if (fgets(buffer.data(), buffer.size(), instream) == NULL) {
-    B2ERROR("fgets reached end unexpectedly");
-    return output;
-  }
-  // ins->getline(buffer.data(), buffer.size());
-  B2DEBUG(50, "display received TSF output:");
-  if (getLogConfig().getDebugLevel() >= 50) {
+  if (m_debugLevel >= 50) {
     for (auto i2d = 0; i2d < 4; ++i2d) {
       B2DEBUG(50, display_value(buffer.data() + width_out * i2d, width_out));
     }
@@ -147,15 +109,10 @@ CDCTriggerTSFFirmwareModule::writeRead(const char* message, FILE* outstream, FIL
 
 void CDCTriggerTSFFirmwareModule::initialize()
 {
-  // m_cdcHits.isRequired(m_hitCollectionName);
-
-  std::cout << "Design DLL     : " << design_libname_pre << "*" <<
-            design_libname_post << std::endl;
-  std::cout << "Sim Engine DLL : " << simengine_libname << std::endl;
-
+  m_cdcHits.isRequired(m_hitCollectionName);
+  m_debugLevel = getLogConfig().getDebugLevel();
   for (unsigned i = 0; i < m_nSubModules; ++i) {
     if (i == 1) continue;
-    // if (i >= 3) continue;
     // i: input to worker (output from module)
     // o: output from worker (input to module)
     /* Create pipe and place the two-end pipe file descriptors*/
@@ -194,6 +151,7 @@ void CDCTriggerTSFFirmwareModule::initialize()
     }
   }
   computeEdges();
+  if (m_debugLevel >= 50) usleep(1500000);
 }
 
 void CDCTriggerTSFFirmwareModule::terminate()
@@ -202,7 +160,6 @@ void CDCTriggerTSFFirmwareModule::terminate()
   wait();
   for (unsigned i = 0; i < m_nSubModules; ++i) {
     if (i == 1) continue;
-    // if (i >= 3) continue;
     close(inputFileDescriptor[i][1]);
     close(outputFileDescriptor[i][0]);
   }
@@ -232,20 +189,6 @@ char* CDCTriggerTSFFirmwareModule::getData(inputToTSFArray input)
     itr += mergerWidth;
   }
   return data.data();
-}
-
-int CDCTriggerTSFFirmwareModule::localSegmentID(int globalID)
-{
-  std::array<int, 9> nSegmentsPerSL = {160, 160, 192, 224, 256, 288, 320, 352, 384};
-  // std::array<int, 8> nFEPerLayer = {5, 5, 6, 7, 8, 9, 10, 11, 12};
-  std::array<int, 10> nAccumulate;
-  std::partial_sum(nSegmentsPerSL.begin(), nSegmentsPerSL.end(), nAccumulate.begin() + 1);
-  // shift the ID by 16 in SL8
-  if (globalID > nAccumulate[7]) {
-    globalID += 16;
-  }
-  auto nSegmentsInside = std::lower_bound(nAccumulate.begin(), nAccumulate.end(), globalID) - 1;
-  return globalID - *nSegmentsInside;
 }
 
 unsigned short CDCTriggerTSFFirmwareModule::trgTime(int index, int iFirstHit)
@@ -496,10 +439,6 @@ void CDCTriggerTSFFirmwareModule::pack(Belle2::CDCTriggerTSFFirmwareModule::inpu
     unsigned instance = (width == 1) ? 0 : n / width;
     char logic = (get<field>(output)[instance][n % width]) ? one_val : zero_val;
     ++n;
-    if (logic == one_val)
-    {
-      B2DEBUG(150, "n: " << n << ",num: " << number << ", width: " << width);
-    }
     return logic;});
   input += number * width;
 }
@@ -510,46 +449,45 @@ void CDCTriggerTSFFirmwareModule::event()
   int status = 0;
 
   initializeMerger();
-  // assign input signals
-  // try {
-  for (int iClock = 0; iClock < m_nClockPerEvent; iClock++) {
-    std::cout << "------------------" << "\n";
-    std::cout << "clock #" << iClock << "\n";
-    simulateMerger(iClock);
+  try {
+    for (int iClock = 0; iClock < m_nClockPerEvent; iClock++) {
+      B2INFO(string(15, '=') << " clock #" << iClock << " " << string(15, '='));
+      simulateMerger(iClock);
 
-    auto TSF0 = getData<0>(inputToTSF);
-    auto TSF2 = getData<1>(inputToTSF);
-    auto TSF4 = getData<2>(inputToTSF);
-    auto TSF6 = getData<3>(inputToTSF);
-    auto TSF8 = getData<4>(inputToTSF);
-    array<char*, m_nSubModules> rawInputToTSF = {TSF0, TSF2, TSF4, TSF6, TSF8};
+      auto TSF0 = getData<0>(inputToTSF);
+      auto TSF2 = getData<1>(inputToTSF);
+      auto TSF4 = getData<2>(inputToTSF);
+      auto TSF6 = getData<3>(inputToTSF);
+      auto TSF8 = getData<4>(inputToTSF);
+      array<char*, m_nSubModules> rawInputToTSF = {TSF0, TSF2, TSF4, TSF6, TSF8};
 
-    for (unsigned iSL = 0; iSL < m_nSubModules; ++iSL) {
-      // skip problematic TSF2 simulation
-      if (iSL == 1) continue;
-      B2DEBUG(100, "input to TSF" << iSL * 2 << ": \n" <<
-              display_value(rawInputToTSF[iSL], nAxialMergers[iSL] * mergerWidth));
-      write(rawInputToTSF[iSL], stream[iSL][0]);
-    }
-    if (getLogConfig().getDebugLevel() >= 50) {
-      usleep(100000);
-    }
-    for (unsigned iSL = 0; iSL < m_nSubModules; ++iSL) {
-      if (iSL == 1) continue;
-      outputToTracker[iSL] = read(stream[iSL][1]);
-      if (getLogConfig().getDebugLevel() >= 50) {
-        for (const auto& out : outputToTracker[iSL]) {
-          display_hex(out);
+      for (unsigned iSL = 0; iSL < m_nSubModules; ++iSL) {
+        // skip problematic TSF2 simulation
+        if (iSL == 1) continue;
+        B2DEBUG(100, "input to TSF" << iSL * 2 << ": \n" <<
+                display_value(rawInputToTSF[iSL], nAxialMergers[iSL] * mergerWidth));
+        write(rawInputToTSF[iSL], stream[iSL][0]);
+      }
+      // don't mess up stdout order with child processes
+      if (m_debugLevel >= 50) {
+        usleep(2000 * m_debugLevel);
+      }
+      for (unsigned iSL = 0; iSL < m_nSubModules; ++iSL) {
+        if (iSL == 1) continue;
+        outputToTracker[iSL] = read(stream[iSL][1]);
+        if (getLogConfig().getDebugLevel() >= 50) {
+          for (const auto& out : outputToTracker[iSL]) {
+            display_hex(out);
+          }
         }
       }
     }
+    B2DEBUG(50, "status code:" << status);
+  } catch (std::exception& e) {
+    B2ERROR("ERROR: An exception occurred: " << e.what());
+    status = 2;
+  } catch (...) {
+    B2ERROR("ERROR: An unknown exception occurred.");
+    status = 3;
   }
-  std::cout << "status code:" << status << std::endl;
-  // } catch (std::exception& e) {
-  //   std::cerr << "ERROR: An exception occurred: " << e.what() << std::endl;
-  //   status = 2;
-  // } catch (...) {
-  //   std::cerr << "ERROR: An unknown exception occurred." << std::endl;
-  //   status = 3;
-  // }
 }

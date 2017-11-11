@@ -60,11 +60,14 @@ namespace Belle2 {
     /** Name of the StoreArray containing the tracks found by the Hough tracking. */
     std::string m_outputCollectionName;
 
-    /** how many clocks to simulate per event */
-    static const int m_nClockPerEvent = 16;
-
     /** CDCHit array */
     Belle2::StoreArray<CDCHit> m_cdcHits;
+
+    /** debug level specified in the steering file */
+    int m_debugLevel;
+
+    /** how many clocks to simulate per event */
+    static const int m_nClockPerEvent = 16;
 
     int m_TDCCountForT0 = 4988;
 
@@ -73,15 +76,6 @@ namespace Belle2 {
         Otherwise, m_TDCCountForT0 becomes 0 (as in the fast TSIM).
      */
     bool m_allPositiveTime = true;
-
-    /**
-     * Calculate local segment ID from global ID
-     *
-     * @param globalID global TS ID
-     *
-     * @return local TS ID in the Super Layer. TS in SL8 is shifted by 16.
-     */
-    int localSegmentID(int globalID);
 
     std::string lib_extension = ".so";
     std::string libdir = "/home/belle2/tasheng/tsim";
@@ -175,8 +169,8 @@ namespace Belle2 {
     // <priority time (4 bits x 16),
     // fast time (4 bits x 16),
     // edge timing (4 bits x 3 or 5),
-    // hitmap (80 bits),
-    // 2nd priority hit (1 bit x 16)>
+    // hitmap (80 bits x 1),
+    // 2nd priority hit (16 bit x 1)>
     template<size_t nEdges>
     using mergerStructElement = std::tuple <
                                 std::array<timeVec, nSegmentsInMerger>,

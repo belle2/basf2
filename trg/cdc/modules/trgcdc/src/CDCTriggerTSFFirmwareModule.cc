@@ -205,6 +205,39 @@ ostream* createOutStreamFromFD(int fd)
   return (new ostream(fileBuf));
 }
 
+void CDCTriggerTSFFirmwareModule::write(const char* message, FILE* outstream)
+{
+  // write input to TSF firmware
+  fprintf(outstream, "%s\n" , message);
+  fflush(outstream);
+}
+
+CDCTriggerTSFFirmwareModule::outputArray
+CDCTriggerTSFFirmwareModule::read(FILE* instream)
+{
+  // read output from TSF firmware
+  array<char, 2048> buffer;
+  outputArray output;
+  buffer.fill(one_val);
+  if (fgets(buffer.data(), buffer.size(), instream) == NULL) {
+    B2ERROR("fgets reached end unexpectedly");
+    return output;
+  }
+  // ins->getline(buffer.data(), buffer.size());
+  B2DEBUG(50, "display received TSF output:");
+  if (getLogConfig().getDebugLevel() >= 50) {
+    for (auto i2d = 0; i2d < 4; ++i2d) {
+      B2DEBUG(50, display_value(buffer.data() + width_out * i2d, width_out));
+    }
+  }
+  auto bufferItr = buffer.cbegin();
+  for (int iTracker = 0; iTracker < nTrackers; ++iTracker) {
+    copy(bufferItr, bufferItr + width_out, output[iTracker].begin());
+    bufferItr += width_out;
+  }
+  return output;
+}
+
 CDCTriggerTSFFirmwareModule::outputArray
 CDCTriggerTSFFirmwareModule::writeRead(const char* message, FILE* outstream, FILE* instream)
 {
@@ -621,11 +654,19 @@ void CDCTriggerTSFFirmwareModule::event()
       if (iSL == 1) continue;
       B2DEBUG(100, "input to TSF" << iSL * 2 << ": \n" <<
               display_value(rawInputToTSF[iSL], nAxialMergers[iSL] * mergerWidth));
-
-      outputToTracker[iSL] = writeRead(rawInputToTSF[iSL], stream[iSL][0], stream[iSL][1]);
-      // for (const auto& out : outputToTracker[iSL]) {
-      //   display_hex(out);
-      // }
+      write(rawInputToTSF[iSL], stream[iSL][0]);
+    }
+    if (getLogConfig().getDebugLevel() >= 50) {
+      usleep(100000);
+    }
+    for (unsigned iSL = 0; iSL < m_nSubModules; ++iSL) {
+      if (iSL == 1) continue;
+      outputToTracker[iSL] = read(stream[iSL][1]);
+      if (getLogConfig().getDebugLevel() >= 50) {
+        for (const auto& out : outputToTracker[iSL]) {
+          display_hex(out);
+        }
+      }
     }
   }
   std::cout << "status code:" << status << std::endl;

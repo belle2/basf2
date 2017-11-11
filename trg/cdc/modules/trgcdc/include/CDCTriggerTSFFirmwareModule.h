@@ -159,6 +159,8 @@ namespace Belle2 {
 
     outputArray writeRead(const char*,  FILE*, FILE*);
 
+    void write(const char*, FILE*);
+    outputArray read(FILE*);
     std::istream* ins;
 
     /**************************************************

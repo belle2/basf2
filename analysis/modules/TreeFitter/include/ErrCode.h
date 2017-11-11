@@ -30,6 +30,7 @@ namespace TreeFitter {
 
     ErrCode() : m_flag(success) {}
 
+    // cppcheck-suppress noExplicitConstructor
     ErrCode(Status flag) : m_flag(flag) {}
 
     const ErrCode& operator|=(const ErrCode& rhs)

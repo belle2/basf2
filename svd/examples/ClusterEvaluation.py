@@ -33,6 +33,10 @@ add_simulation(main, components=['MagneticField', 'SVD'], bkgfiles=bkgFiles, use
 
 add_svd_reconstruction(main, isROIsimulation=False, useNN=False, useCoG=True)
 
+# add_tracking_reconstruction(main, components=["SVD"], use_vxdtf2=True, mcTrackFinding=True,
+#                            additionalTrackFitHypotheses=[211], skipHitPreparerAdding=True)
+add_svd_reconstruction(main, isROIsimulation=False, useNN=False, useCoG=True)
+
 clseval = register_module('SVDClusterEvaluation')
 clseval.param('outputFileName', "ClusterEvaluation_Y4S_wBKG_MC_CoG.root")
 main.add_module(clseval)

@@ -66,23 +66,52 @@ namespace Belle2 {
     TFile* m_outputFile;
     std::string m_outputFileName;
 
-
     int indexForHistosAndGraphs;
 
-    TH1F* m_histo_ClusterUPositionResolution[m_NsetsRed];
-    TH1F* m_histo_ClusterVPositionResolution[m_NsetsRed];
+    TString NameOfHisto, TitleOfHisto;
+
     TH1F* m_histo_StripTimeResolution[m_Nsets];
     TH1F* m_histo_ClusterTimeResolution[m_Nsets];
-    TH1F* m_histo_PurityInsideCluster[m_Nsets];
+    TH1F* m_histo_ClusterUPositionResolution[m_NsetsRed];
+    TH1F* m_histo_ClusterVPositionResolution[m_NsetsRed];
+    TH1F* m_histo_PurityInsideTMCluster[m_Nsets];
+    TH2F* m_histo2D_PurityInsideTMCluster[m_Nsets];
+    TH1F* m_histo_PurityInsideNOTMCluster[m_Nsets];
     TH1F* m_histo_Puddlyness[m_Nsets];
+    TH1F* m_histo_PuddlynessTM[m_Nsets];
 
-    TString NameOfHisto, TitleOfHisto;
+    float m_mean_StripTimeResolution[m_Nsets];
+    float m_RMS_StripTimeResolution[m_Nsets];
+
+    float m_mean_ClusterTimeResolution[m_Nsets];
+    float m_RMS_ClusterTimeResolution[m_Nsets];
+
+    float m_mean_ClusterUPositionResolution[m_Nsets];
+    float m_RMS_ClusterUPositionResolution[m_Nsets];
+
+    float m_mean_ClusterVPositionResolution[m_Nsets];
+    float m_RMS_ClusterVPositionResolution[m_Nsets];
+
+    float m_mean_PurityInsideTMCluster[m_Nsets];
+    float m_RMS_PurityInsideTMCluster[m_Nsets];
+
+    float m_mean_Puddlyness[m_Nsets];
+    float m_RMS_Puddlyness[m_Nsets];
+
+    float m_mean_PuddlynessTM[m_Nsets];
+    float m_RMS_PuddlynessTM[m_Nsets];
+
+    float m_OrderingVec[m_Nsets] = {1., 2., 3., 4., 5., 6.};
+    float m_NullVec[m_Nsets] = {0.};
 
     TList* m_histoList_StripTimeResolution;
     TList* m_histoList_ClusterTimeResolution;
     TList* m_histoList_ClusterPositionResolution;
-    TList* m_histoList_PurityInsideCluster;
+    TList* m_histoList_PurityInsideTMCluster;
+    TList* m_histo2DList_PurityInsideTMCluster;
+    TList* m_histoList_PurityInsideNOTMCluster;
     TList* m_histoList_Puddlyness;
+    TList* m_histoList_PuddlynessTM;
     TList* m_graphList;
 
     int m_NumberOfShaperDigit[m_Nsets] = {0};
@@ -95,6 +124,7 @@ namespace Belle2 {
     int m_NumberOfTMClusters[m_Nsets] = {0};
 
     int m_NumberOfTMRecoInTMCluster = 0;
+    int m_NumberOfTMRecoInNOTMCluster = 0;
 
   protected:
 
@@ -110,11 +140,25 @@ namespace Belle2 {
                             Int_t nbins, Double_t min, Double_t max,
                             const char* xtitle, TList* histoList);
 
-
+    TH2F* createHistogram2D(const char* name, const char* title,
+                            Int_t nbinsX, Double_t minX, Double_t maxX,
+                            const char* titleX,
+                            Int_t nbinsY, Double_t minY, Double_t maxY,
+                            const char* titleY, TList* histoList);
 
     void createEfficiencyGraph(const char* name, const char* title, int vNum[m_Nsets], int vDen[m_Nsets], TString xTitle,
                                TString yTitle, TList* list);
 
+    void createArbitraryGraphErrorChooser(const char* name, const char* title, float x[m_Nsets], float xErr[m_Nsets], float y[m_Nsets],
+                                          float yErr[m_Nsets], TString xTitle, TString yTitle, TList* list, int len);
+
+    void createArbitraryGraphError_Std(const char* name, const char* title, float x[m_Nsets], float xErr[m_Nsets], float y[m_Nsets],
+                                       float yErr[m_Nsets], TString xTitle, TString yTitle, TList* list);
+
+    void createArbitraryGraphError_Red(const char* name, const char* title, float x[m_NsetsRed], float xErr[m_NsetsRed],
+                                       float y[m_NsetsRed], float yErr[m_NsetsRed], TString xTitle, TString yTitle, TList* list);
+
+    /*float getMeanFromHistoWithoutABin(TH1F* histo, int BadBin);*/
 
   };
 }

@@ -819,19 +819,25 @@ endloop:
       }
     }
 
-    Manager::FunctionPtr ifNANgive05(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr ifNANgiveX(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 1) {
+      if (arguments.size() == 2) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-
-        auto func = [var](const Particle * particle) -> double {
+        double defaultOutput;
+        try {
+          defaultOutput = Belle2::convertString<double>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The arguments of daughterInvM meta function must be a number!");
+          return nullptr;
+        }
+        auto func = [var, defaultOutput](const Particle * particle) -> double {
           double output = var->function(particle);
-          if (std::isnan(output)) return 0.5;
+          if (std::isnan(output)) return defaultOutput;
           else return output;
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function ifNANgive05");
+        B2FATAL("Wrong number of arguments for meta function ifNANgiveX");
       }
     }
 
@@ -1214,8 +1220,8 @@ endloop:
     REGISTER_VARIABLE("isNAN(variable)", isNAN,
                       "Returns true if variable value evaluates to nan (determined via std::isnan(double)).\n"
                       "Useful for debugging.");
-    REGISTER_VARIABLE("ifNANgive05(variable)", ifNANgive05,
-                      "Returns 0.5 if variable value evaluates to nan (determined via std::isnan(double)).\n"
+    REGISTER_VARIABLE("ifNANgiveX(variable, x)", ifNANgiveX,
+                      "Returns x (has to be a number) if variable value is nan (determined via std::isnan(double)).\n"
                       "Useful for technical purposes while training MVAs.");
     REGISTER_VARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"

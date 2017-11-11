@@ -36,7 +36,7 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(0.660522, thrustB.Z());
   }
 
-  /** Test the calculation of a the CleoClones variables */
+  /** Test the calculation of the CleoClones variables */
   TEST_F(ContinuumSuppressionTests, CleoCones)
   {
     const bool use_all = true;

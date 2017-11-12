@@ -240,7 +240,7 @@ namespace Belle2 {
     void simulateMerger(unsigned);
 
     template<CDCTrigger::MergerOut, size_t>
-    void pack(inputVector::iterator&, unsigned, mergerStructElement<5>&);
+    void pack(inputVector::reverse_iterator&, unsigned, mergerStructElement<5>&);
 
     bool notHit(CDCTrigger::MergerOut, unsigned, registeredStructElement&);
 

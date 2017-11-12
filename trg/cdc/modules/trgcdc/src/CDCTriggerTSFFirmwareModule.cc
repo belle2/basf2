@@ -410,7 +410,7 @@ void CDCTriggerTSFFirmwareModule::simulateMerger(unsigned iClock)
   for (auto iAx = 0; iAx < m_nSubModules; ++iAx) {
     unsigned nEdges = (iAx == 0) ? 5 : 3;
     for (unsigned iMerger = 0; iMerger < inputToTSF[iAx].size(); ++iMerger) {
-      auto input = inputToTSF[iAx][iMerger].begin();
+      auto input = inputToTSF[iAx][iMerger].rbegin();
       auto& output = dataInClock[2 * iAx][iMerger];
       pack<MergerOut::hitmap, 1> (input, nWiresInMerger, output);
       pack<MergerOut::priorityTime, timeWidth> (input, nCellsInLayer, output);
@@ -437,7 +437,7 @@ void CDCTriggerTSFFirmwareModule::simulateMerger(unsigned iClock)
 }
 
 template<MergerOut field, size_t width>
-void CDCTriggerTSFFirmwareModule::pack(Belle2::CDCTriggerTSFFirmwareModule::inputVector::iterator& input, unsigned number,
+void CDCTriggerTSFFirmwareModule::pack(Belle2::CDCTriggerTSFFirmwareModule::inputVector::reverse_iterator& input, unsigned number,
                                        mergerStructElement<5>& output)
 {
   std::generate(input, input + number * width, [&, n = 0]() mutable {

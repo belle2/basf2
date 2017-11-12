@@ -64,7 +64,6 @@ namespace Belle2 {
       /*Condition to stop iterate minDt <m_maxDt and rmsDt<m_maxRMS*/
       double m_maxMeanDt = 0.2;   /**< Mean of dT distribution  of all channels;*/
       double m_maxRMSDt = 1;   /**< RMS of dT distribution  of all channels*/
-      double t0[56][385] = {{0.}};     /**< t0 */
       double dt[56][385] = {{0.}};     /**< dt of each channel */
       double err_dt[56][385] = {{0.}}; /**< error of dt of each channel*/
       double dtb[300] = {0.};        /**< dt of each board*/

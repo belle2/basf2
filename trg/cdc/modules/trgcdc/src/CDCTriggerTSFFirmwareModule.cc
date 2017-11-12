@@ -93,11 +93,8 @@ CDCTriggerTSFFirmwareModule::read(FILE* instream)
     return output;
   }
   // ins->getline(buffer.data(), buffer.size());
-  B2DEBUG(50, "display received TSF output:");
-  if (m_debugLevel >= 50) {
-    for (auto i2d = 0; i2d < 4; ++i2d) {
-      B2DEBUG(50, display_value(buffer.data() + width_out * i2d, width_out));
-    }
+  for (auto i2d = 0; i2d < 4; ++i2d) {
+    B2DEBUG(50, display_value(buffer.data() + width_out * i2d, width_out));
   }
   auto bufferItr = buffer.cbegin();
   for (int iTracker = 0; iTracker < nTrackers; ++iTracker) {
@@ -112,7 +109,6 @@ void CDCTriggerTSFFirmwareModule::initialize()
   m_cdcHits.isRequired(m_hitCollectionName);
   m_debugLevel = getLogConfig().getDebugLevel();
   for (unsigned i = 0; i < m_nSubModules; ++i) {
-    if (i == 1) continue;
     // i: input to worker (output from module)
     // o: output from worker (input to module)
     /* Create pipe and place the two-end pipe file descriptors*/
@@ -151,7 +147,10 @@ void CDCTriggerTSFFirmwareModule::initialize()
     }
   }
   computeEdges();
-  if (m_debugLevel >= 50) usleep(1500000);
+  for (unsigned i = 0; i < m_nSubModules; ++i) {
+    // wait for worker initialization
+    read(stream[i][1]);
+  }
 }
 
 void CDCTriggerTSFFirmwareModule::terminate()
@@ -159,7 +158,6 @@ void CDCTriggerTSFFirmwareModule::terminate()
   B2DEBUG(10, "Waiting for TSF firmware termination...");
   wait();
   for (unsigned i = 0; i < m_nSubModules; ++i) {
-    if (i == 1) continue;
     close(inputFileDescriptor[i][1]);
     close(outputFileDescriptor[i][0]);
   }
@@ -462,8 +460,6 @@ void CDCTriggerTSFFirmwareModule::event()
       array<char*, m_nSubModules> rawInputToTSF = {TSF0, TSF2, TSF4, TSF6, TSF8};
 
       for (unsigned iSL = 0; iSL < m_nSubModules; ++iSL) {
-        // skip problematic TSF2 simulation
-        if (iSL == 1) continue;
         B2DEBUG(100, "input to TSF" << iSL * 2 << ": \n" <<
                 display_value(rawInputToTSF[iSL], nAxialMergers[iSL] * mergerWidth));
         write(rawInputToTSF[iSL], stream[iSL][0]);
@@ -473,9 +469,10 @@ void CDCTriggerTSFFirmwareModule::event()
         usleep(2000 * m_debugLevel);
       }
       for (unsigned iSL = 0; iSL < m_nSubModules; ++iSL) {
-        if (iSL == 1) continue;
+        B2DEBUG(50, "Reading buffer from TSF " << iSL * 2 << ":");
         outputToTracker[iSL] = read(stream[iSL][1]);
-        if (getLogConfig().getDebugLevel() >= 50) {
+        B2DEBUG(30, "received TSF " << iSL * 2 << ":");
+        if (m_debugLevel >= 30) {
           for (const auto& out : outputToTracker[iSL]) {
             display_hex(out);
           }

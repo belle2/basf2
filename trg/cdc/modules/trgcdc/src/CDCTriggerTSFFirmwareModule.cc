@@ -58,6 +58,10 @@ CDCTriggerTSFFirmwareModule::CDCTriggerTSFFirmwareModule() :
   // addParam("outputCollectionName", m_outputCollectionName,
   //          "Name of the StoreArray holding the tracks found in the Hough tracking.",
   //          string("TRGCDCTSFFirmwareTracks"));
+
+  addParam("mergerOnly", m_mergerOnly,
+           "Flag to only simulate merger and not TSF",
+           false);
 }
 
 CDCTriggerTSFFirmwareModule::~CDCTriggerTSFFirmwareModule()
@@ -108,6 +112,10 @@ void CDCTriggerTSFFirmwareModule::initialize()
 {
   m_cdcHits.isRequired(m_hitCollectionName);
   m_debugLevel = getLogConfig().getDebugLevel();
+  if (m_mergerOnly) {
+    computeEdges();
+    return;
+  }
   for (unsigned i = 0; i < m_nSubModules; ++i) {
     // i: input to worker (output from module)
     // o: output from worker (input to module)
@@ -412,18 +420,18 @@ void CDCTriggerTSFFirmwareModule::simulateMerger(unsigned iClock)
       pack<MergerOut::edgeTime, timeWidth> (input, nEdges, output);
 
       if (get<MergerOut::hitmap>(output)[0].any()) {
-        B2DEBUG(150, "merger " << iAx * 2 << "-" << iMerger << '\n' <<
-                "hitmap:" << get<MergerOut::hitmap>(output)[0] <<
-                "second hit:" << get<MergerOut::secondPriorityHit>(output)[0]);
         string priTime, fasTime, edgTime;
         for (int i = 0; i < 16; ++i) {
           priTime += get<MergerOut::priorityTime>(output)[i].to_string() + ",";
           fasTime += get<MergerOut::fastestTime>(output)[i].to_string() + ",";
           edgTime += get<MergerOut::edgeTime>(output)[i].to_string() + ",";
         }
-        B2DEBUG(150, "prioiry Time:" << priTime);
-        B2DEBUG(150, "fastest Time:" << fasTime);
-        B2DEBUG(150, "edge    Time:" << edgTime);
+        B2DEBUG(150, "merger " << iAx * 2 << "-" << iMerger <<
+                "\nhitmap:       " << get<MergerOut::hitmap>(output)[0] <<
+                "\nsecond hit:   " << get<MergerOut::secondPriorityHit>(output)[0] <<
+                "\nprioiry Time: " << priTime <<
+                "\nfastest Time: " << fasTime <<
+                "\nedge    Time: " << edgTime);
       }
     }
   }
@@ -445,12 +453,31 @@ void CDCTriggerTSFFirmwareModule::event()
 {
   // TODO: what if there is 0 CDC hit?
   int status = 0;
-
   initializeMerger();
   try {
     for (int iClock = 0; iClock < m_nClockPerEvent; iClock++) {
       B2INFO(string(15, '=') << " clock #" << iClock << " " << string(15, '='));
       simulateMerger(iClock);
+      if (m_mergerOnly) {
+        cout << std::hex;
+        int iSL = 0;
+        for (const auto& sl : inputToTSF) {
+          int iMerger = 0;
+          for (const auto& mergerOut : sl) {
+            if (std::any_of(mergerOut.begin(), mergerOut.end(), [](char i) {
+            return i != zero_val;
+          })) {
+              cout << "Merger " << iSL * 2 << "-" << iMerger / 2 << " u" << iMerger % 2 << ": ";
+              // display_hex(mergerOut);
+              cout << slv_to_bin_string(mergerOut) << "\n";
+            }
+            iMerger++;
+          }
+          iSL++;
+        }
+        cout << std::dec;
+        continue;
+      }
 
       auto TSF0 = getData<0>(inputToTSF);
       auto TSF2 = getData<1>(inputToTSF);

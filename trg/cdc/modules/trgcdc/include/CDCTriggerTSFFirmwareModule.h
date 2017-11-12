@@ -63,6 +63,9 @@ namespace Belle2 {
     /** CDCHit array */
     Belle2::StoreArray<CDCHit> m_cdcHits;
 
+    /** flag to only simulation merger and not TSF */
+    bool m_mergerOnly;
+
     /** debug level specified in the steering file */
     int m_debugLevel;
 

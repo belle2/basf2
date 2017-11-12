@@ -31,11 +31,27 @@ void test2_1150720000() {
   TFile *f = TFile::Open("../1150720000.ntup.root");
   TTree *t = (TTree*) f->Get("rec");
 
-  TH1F *h_deltae = new TH1F("h_deltae","Signal #DeltaE",30,-3,5);
-  TH1F *h_deltae_clean = new TH1F("h_deltae_clean","Signal #DeltaE",30,-3,5);
-  TH1F *h_mbc = new TH1F("h_mbc","Signal M_{bc}",30,4.5,5.3);
-  TH1F *h_mbc_clean = new TH1F("h_mbc_clean","Signal M_{bc}",30,4.5,5.3);
+  TH1F *h_deltae = new TH1F("h_deltae","B^{0} #rightarrow #pi l #nu #DeltaE",30,-3,5);
+  TH1F *h_deltae_clean = new TH1F("h_deltae_clean","B^{0} #rightarrow #pi l #nu #DeltaE",30,-3,5);
+  TH1F *h_mbc = new TH1F("h_mbc","B^{0} #rightarrow #pi l #nu M_{bc}",30,4.5,5.3);
+  TH1F *h_mbc_clean = new TH1F("h_mbc_clean","B^{0} #rightarrow #pi l #nu M_{bc}",30,4.5,5.3);
   TH1F *h_costheta = new TH1F("h_costheta","costheta_{BY}",30,-5,5);
+
+  h_deltae->SetLineColor(kRed);
+  h_mbc->SetLineColor(kRed);
+
+  h_deltae_clean->SetLineColor(kBlue);
+  h_mbc_clean->SetLineColor(kBlue);
+
+  h_costheta->SetLineColor(kBlack);
+
+
+
+  t->Project("h_deltae","B0_sigDE0","B0_isSignalAcceptMissingNeutrino == 1");
+  t->Project("h_deltae_clean","B0_sigDE1","B0_isSignalAcceptMissingNeutrino == 1");
+  t->Project("h_mbc","B0_sigMbc0","B0_isSignalAcceptMissingNeutrino == 1");
+  t->Project("h_mbc_clean","B0_sigMbc1","B0_isSignalAcceptMissingNeutrino == 1");
+  t->Project("h_costheta","B0_cosThetaBetweenParticleAndTrueB","B0_isSignalAcceptMissingNeutrino == 1");
 
   h_deltae->GetListOfFunctions()->Add(new TNamed("Description", "B^{0} #rightarrow #pi l #nu  #DeltaE [GeV]"));
   h_deltae->GetListOfFunctions()->Add(new TNamed("Contact" , "mario.merola@na.infn.it"));
@@ -54,22 +70,6 @@ void test2_1150720000() {
   h_mbc_clean->GetListOfFunctions()->Add(new TNamed("Check", "M_{bc} is expected to peak at 5.279 GeV/c^{2}"));
 
 
-
-  h_deltae->SetLineColor(kRed);
-  h_mbc->SetLineColor(kRed);
-
-  h_deltae_clean->SetLineColor(kBlue);
-  h_mbc_clean->SetLineColor(kBlue);
-
-  h_costheta->SetLineColor(kBlack);
-
-
-
-  t->Project("h_deltae","B0_sigDE0","B0_isSignalAcceptMissingNeutrino == 1");
-  t->Project("h_deltae_clean","B0_sigDE1","B0_isSignalAcceptMissingNeutrino == 1");
-  t->Project("h_mbc","B0_sigMbc0","B0_isSignalAcceptMissingNeutrino == 1");
-  t->Project("h_mbc_clean","B0_sigMbc1","B0_isSignalAcceptMissingNeutrino == 1");
-  t->Project("h_costheta","B0_cosThetaBetweenParticleAndTrueB","B0_isSignalAcceptMissingNeutrino == 1");
 
 
 

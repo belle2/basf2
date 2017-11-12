@@ -130,6 +130,9 @@ variables.addAlias('d1_muid', 'daughter(1,muonID)')
 
 outputRootFile = 'dstarlnuOutput.root'
 
+from fei import backward_compatibility_layer
+backward_compatibility_layer.pid_renaming_oktober_2017()
+
 
 # TODO: specify the location of database (faster)
 use_central_database('production', LogLevel.WARNING, 'fei_database')
@@ -142,9 +145,12 @@ configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MC7_Track14_2', t
 feistate = fei.get_path(particles, configuration)
 path.add_path(feistate.path)
 
-fileList = ['/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/prod00000962/s00/e0000/4S/r00000/mixed/sub00/' +
-            'mdst_001724_prod00000962_task00001729.root'
-            ]
+# fileList = ['/ghi/fs01/belle2/bdata/MC/release-00-08-00/DB00000208/MC8/prod00000962/s00/e0000/4S/r00000/mixed/sub00/' +
+#            'mdst_001724_prod00000962_task00001729.root'
+#            ]
+
+fileList = ["../1263700001.dst.root"]
+
 inputMdstList('default', fileList)
 
 # execute path and return back to the analysis_main

@@ -43,9 +43,6 @@ CDCTriggerTSFFirmwareModule::CDCTriggerTSFFirmwareModule() :
     // loader.emplace_back(new Xsi::Loader(design_libname_pre + to_string(i * 2)
     //                                     + design_libname_post, simengine_libname));
     inputToTSF[i].resize(nAxialMergers[i]);
-    array<char, 256> mer;
-    mer.fill(2);
-    fill(inputToTSF[i].begin(), inputToTSF[i].end(), mer);
   }
   //Set module properties
   setDescription("Firmware simulation of the Track Segment Finder for CDC trigger.");
@@ -308,12 +305,14 @@ void CDCTriggerTSFFirmwareModule::registerHit(MergerOut field, unsigned iTS,
 
 void CDCTriggerTSFFirmwareModule::simulateMerger(unsigned iClock)
 {
-  if (iClock >= iAxialHitInClock.size()) {
-    for (auto& sl : inputToTSF) {
-      for (auto& merger : sl) {
-        merger.fill(zero_val);
-      }
+  // clean up TSF input signals
+  for (auto& sl : inputToTSF) {
+    for (auto& merger : sl) {
+      merger.fill(zero_val);
     }
+  }
+  // don't do simulation if there are no more CDC hits
+  if (iClock >= iAxialHitInClock.size()) {
     return;
   }
   // mergerStruct<5> innerDataInClock(nAxialMergers[0]);
@@ -442,8 +441,13 @@ void CDCTriggerTSFFirmwareModule::pack(Belle2::CDCTriggerTSFFirmwareModule::inpu
                                        mergerStructElement<5>& output)
 {
   std::generate(input, input + number * width, [&, n = 0]() mutable {
-    unsigned instance = (width == 1) ? 0 : n / width;
-    char logic = (get<field>(output)[instance][n % width]) ? one_val : zero_val;
+    char logic;
+    if (width == 1)
+    {
+      logic = (get<field>(output)[0][n]) ? one_val : zero_val;
+    } else {
+      logic = (get<field>(output)[n / width][n % width]) ? one_val : zero_val;
+    }
     ++n;
     return logic;});
   input += number * width;
@@ -468,8 +472,7 @@ void CDCTriggerTSFFirmwareModule::event()
             return i != zero_val;
           })) {
               cout << "Merger " << iSL * 2 << "-" << iMerger / 2 << " u" << iMerger % 2 << ": ";
-              // display_hex(mergerOut);
-              cout << slv_to_bin_string(mergerOut) << "\n";
+              display_hex(mergerOut);
             }
             iMerger++;
           }

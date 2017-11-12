@@ -53,6 +53,36 @@ namespace Belle2 {
      */
     void event();
 
+    /** number of TSF to simulate */
+    static constexpr int m_nSubModules = 5;
+
+    /** number of mergers in each super layer */
+    static constexpr std::array<int, 9> nMergers = {10, 10, 12, 14, 16, 18, 20, 22, 24};
+
+    /* number of mergers in axial super layers */
+    static constexpr std::array<int, m_nSubModules> nAxialMergers = {10, 12, 16, 20, 24};
+
+    /* number of trackers */
+    static constexpr int nTrackers = 4;
+
+    /** merger output data width */
+    static constexpr int mergerWidth = 256;
+
+    /** width of output data width*/
+    static constexpr int width_out = 429;
+
+    /* number of wire/cell in a single merger unit */
+    static constexpr int nWiresInMerger = 80;
+
+    /* Number of wire/cells in a single layer per merger unit */
+    static constexpr int nCellsInLayer = 16;
+
+    /* number of track segments in a single merger unit */
+    static constexpr int nSegmentsInMerger = 16;
+
+    /* bit width for priority time and fast time */
+    static constexpr size_t timeWidth = 4;
+
   protected:
     /** Name of the StoreArray containing the input track segment hits. */
     std::string m_hitCollectionName;
@@ -91,9 +121,6 @@ namespace Belle2 {
     std::string wdbName_pre = "tsf";
     std::string wdbName_post = ".wdb";
 
-    /** number of TSF to simulate */
-    static const int m_nSubModules = 5;
-
     /** '1' in XSI VHDL simulation */
     /* static constexpr char one_val  = 3; */
     /** '0' in XSI VHDL simulation */
@@ -101,29 +128,6 @@ namespace Belle2 {
 
     /** array holding child process ID */
     std::array<pid_t, m_nSubModules> m_pid;
-
-    /** number of mergers in each super layer */
-    static constexpr std::array<int, 9> nMergers = {10, 10, 12, 14, 16, 18, 20, 22, 24};
-
-    /* number of mergers in axial super layers */
-    static constexpr std::array<int, m_nSubModules> nAxialMergers = {10, 12, 16, 20, 24};
-
-    /* number of trackers */
-    static constexpr int nTrackers = 4;
-
-    /** merger output data width */
-    static constexpr int mergerWidth = 256;
-
-    /** width of output data width*/
-    static constexpr int width_out = 429;
-
-    /* number of wire/cell in a single merger unit */
-    static constexpr int nWiresInMerger = 80;
-
-    /* number of track segments in a single merger unit */
-    static constexpr int nSegmentsInMerger = 16;
-
-    static constexpr int nCellsInLayer = 16;
 
     using mergerVector = std::bitset<mergerWidth>;
     using mergerOutput = std::vector<mergerVector>;
@@ -154,18 +158,29 @@ namespace Belle2 {
     std::array<std::array<int, 2>, m_nSubModules> inputFileDescriptor;
     std::array<std::array<int, 2>, m_nSubModules> outputFileDescriptor;
 
-    outputArray writeRead(const char*,  FILE*, FILE*);
+    /**
+     *  write TSF input signals to the worker
+     *
+     *  @param message    words to write
+     *
+     *  @param outstream  output file descriptor
+     */
+    void write(const char* message, FILE* outstream);
 
-    void write(const char*, FILE*);
-    outputArray read(FILE*);
+    /**
+     *  write TSF output signals from the worker
+     *
+     *  @param instream  input file descriptor
+     *
+     *  @return          array holding TSF output
+     */
+    outputArray read(FILE* instream);
+
     std::istream* ins;
 
     /**************************************************
      *  Merger simulation
      **************************************************/
-
-    // bit width for priority time and fast time
-    static constexpr size_t timeWidth = 4;
 
     using timeVec = std::bitset<timeWidth>;
     // data structure to hold merger output
@@ -217,34 +232,121 @@ namespace Belle2 {
     /* ID of the earlist CDC hit in an event */
     int m_iFirstHit;
 
-    CDCTrigger::Priority priority(int);
+    /**
+     *  write TSF input signals to the worker
+     *
+     *  @param index  index of CDC hit
+     *
+     *  @return       what type of priority hit it is
+     */
+    CDCTrigger::Priority priority(int index);
 
-    unsigned short trgTime(int, int);
+    /**
+     *  Get the trigger time of the CDC hit
+     *
+     *  @param index      index of the CDC hit in question
+     *
+     *  @param iFirstHit  index of the first hit
+     *
+     *  @return           the trigger time of the hit (in unit of about 2ns)
+     */
+    unsigned short trgTime(int index, int iFirstHit);
 
-    unsigned short mergerCellID(int);
+    /**
+     *  Get the cell ID in the merger
+     *
+     *  @param index      index of the CDC hit in question
+     *
+     *  @return           the cell ID (0-79)
+     */
+    unsigned short mergerCellID(int index);
 
-    unsigned short mergerNumber(int);
+    /**
+     *  Get the merger unit ID in a super layer
+     *
+     *  @param index      index of the CDC hit in question
+     *
+     *  @return           the merger unit ID
+     */
+    unsigned short mergerNumber(int index);
 
+    /**
+     *  Get the list of associated track segments with a hit
+     *
+     *  @param index      index of the CDC hit in question
+     *
+     *  @return           list of TS ID (0-15) containing the hit
+     */
     WireSet segmentID(int iHit);
 
+    /**
+     *  Get the trigger time stamp of a hit
+     *
+     *  @param index      index of the CDC hit in question
+     *
+     *  @param iFirstHit  index of the first hit
+     *
+     *  @return           trigger time stamp (least significant 4 bits)
+     */
     std::bitset<4> timeStamp(int index, int iFirstHit);
 
+    /**
+     *  Compute the map from merger cell ID to all its related edge fields
+     */
     void computeEdges();
 
-    timeVec& edge();
-
-    void writeMergerOutput();
-
+    /**
+     *  Get CDC hits from the DataStore and distribute them to clocks.
+     *  Within each clock, faster hit has a smaller index
+     */
     void initializeMerger();
 
-    void simulateMerger(unsigned);
+    /**
+     *  Simulate 1 clock of merger
+     *
+     *  @param iclock  index of data clock
+     */
+    void simulateMerger(unsigned iclock);
 
-    template<CDCTrigger::MergerOut, size_t>
-    void pack(inputVector::reverse_iterator&, unsigned, mergerStructElement<5>&);
+    /**
+     *  Pack the merger output data structure to TSF input vector
+     *
+     *  @param field   type of output to be packed
+     *
+     *  @param width   bit width of a single output unit
+     *
+     *  @param rInput  iterator of the TSF input vector
+     *
+     *  @param number  total number of the output units in a merger unit
+     *
+     *  @param output  merger output data structre
+     */
+    template<CDCTrigger::MergerOut field, size_t width>
+    void pack(inputVector::reverse_iterator& rInput,
+              unsigned number, mergerStructElement<5>& output);
 
-    bool notHit(CDCTrigger::MergerOut, unsigned, registeredStructElement&);
+    /**
+     *  Whether a time field in a merger has been hit in the clock cycle
+     *
+     *  @param field   one of (priority, fastest, edge) time
+     *
+     *  @param iTS     index of the track segment or edge
+     *
+     *  @param reg     record of the timing fields in merger
+     *
+     *  @return        true if the TS has not been hit
+     */
+    bool notHit(CDCTrigger::MergerOut field, unsigned iTS, registeredStructElement& reg);
 
-    void registerHit(CDCTrigger::MergerOut, unsigned, registeredStructElement&);
-
+    /**
+     *  Register the timing field so that later hits won't overwrite it
+     *
+     *  @param field   one of (priority, fastest, edge) time
+     *
+     *  @param iTS     index of the track segment or edge
+     *
+     *  @param reg     record of the timing fields in merger
+     */
+    void registerHit(CDCTrigger::MergerOut field, unsigned iTS, registeredStructElement& reg);
   };
 }

@@ -29,13 +29,13 @@ using namespace Belle2;
 using namespace Cosim;
 using namespace std;
 using namespace CDCTrigger;
+using TSF = CDCTriggerTSFFirmwareModule;
 
 REG_MODULE(CDCTriggerTSFFirmware)
 
-constexpr std::array<int, Belle2::CDCTriggerTSFFirmwareModule::m_nSubModules>
-Belle2::CDCTriggerTSFFirmwareModule::nAxialMergers;
+constexpr std::array<int, TSF::m_nSubModules> TSF::nAxialMergers;
 
-CDCTriggerTSFFirmwareModule::CDCTriggerTSFFirmwareModule() :
+TSF::CDCTriggerTSFFirmwareModule() :
   Module(), m_cdcHits{""}
 
 {
@@ -61,10 +61,10 @@ CDCTriggerTSFFirmwareModule::CDCTriggerTSFFirmwareModule() :
            false);
 }
 
-CDCTriggerTSFFirmwareModule::~CDCTriggerTSFFirmwareModule()
+TSF::~CDCTriggerTSFFirmwareModule()
 {}
 
-Priority CDCTriggerTSFFirmwareModule::priority(int index)
+Priority TSF::priority(int index)
 {
   CDCHit* hit = m_cdcHits[index];
   int offset = (hit->getISuperLayer() == 0) ? 0 : 1;
@@ -75,15 +75,14 @@ Priority CDCTriggerTSFFirmwareModule::priority(int index)
   }
 }
 
-void CDCTriggerTSFFirmwareModule::write(const char* message, FILE* outstream)
+void TSF::write(const char* message, FILE* outstream)
 {
   // write input to TSF firmware
   fprintf(outstream, "%s\n" , message);
   fflush(outstream);
 }
 
-CDCTriggerTSFFirmwareModule::outputArray
-CDCTriggerTSFFirmwareModule::read(FILE* instream)
+TSF::outputArray TSF::read(FILE* instream)
 {
   // read output from TSF firmware
   array<char, 2048> buffer;
@@ -105,7 +104,7 @@ CDCTriggerTSFFirmwareModule::read(FILE* instream)
   return output;
 }
 
-void CDCTriggerTSFFirmwareModule::initialize()
+void TSF::initialize()
 {
   m_cdcHits.isRequired(m_hitCollectionName);
   m_debugLevel = getLogConfig().getDebugLevel();
@@ -139,7 +138,7 @@ void CDCTriggerTSFFirmwareModule::initialize()
       B2FATAL("The firmware simulation program didn't launch!");
     } else {
       /* Parent process (BASF2) */
-      B2DEBUG(10, "parent " << i);
+      B2DEBUG(100, "parent " << i);
       m_pid[i] = pid;
       // Close the copy of the fds read/write end
       close(inputFileDescriptor[i][0]);
@@ -152,13 +151,14 @@ void CDCTriggerTSFFirmwareModule::initialize()
     }
   }
   computeEdges();
+  B2INFO("It can take a while for TSF0 to load the LUT.");
   for (unsigned i = 0; i < m_nSubModules; ++i) {
     // wait for worker initialization
     read(stream[i][1]);
   }
 }
 
-void CDCTriggerTSFFirmwareModule::terminate()
+void TSF::terminate()
 {
   B2DEBUG(10, "Waiting for TSF firmware termination...");
   wait();
@@ -168,7 +168,7 @@ void CDCTriggerTSFFirmwareModule::terminate()
   }
 }
 
-void CDCTriggerTSFFirmwareModule::computeEdges()
+void TSF::computeEdges()
 {
   for (unsigned short iEdge = 0; iEdge < 5; ++iEdge) {
     for (const auto& cell : innerInvEdge[iEdge]) {
@@ -183,7 +183,7 @@ void CDCTriggerTSFFirmwareModule::computeEdges()
 }
 
 template<int iSL>
-char* CDCTriggerTSFFirmwareModule::getData(inputToTSFArray input)
+char* TSF::getData(inputToTSFArray input)
 {
   static array<char, mergerWidth* nAxialMergers[iSL]> data;
   auto itr = data.begin();
@@ -194,7 +194,7 @@ char* CDCTriggerTSFFirmwareModule::getData(inputToTSFArray input)
   return data.data();
 }
 
-unsigned short CDCTriggerTSFFirmwareModule::trgTime(int index, int iFirstHit)
+unsigned short TSF::trgTime(int index, int iFirstHit)
 {
   if (m_allPositiveTime) {
     return (m_cdcHits[iFirstHit]->getTDCCount() - m_cdcHits[index]->getTDCCount()) / 2;
@@ -204,19 +204,19 @@ unsigned short CDCTriggerTSFFirmwareModule::trgTime(int index, int iFirstHit)
   }
 }
 
-std::bitset<4> CDCTriggerTSFFirmwareModule::timeStamp(int index, int iFirstHit)
+std::bitset<4> TSF::timeStamp(int index, int iFirstHit)
 {
   return std::bitset<4> (trgTime(index, iFirstHit) % 16);
 }
 
-unsigned short CDCTriggerTSFFirmwareModule::mergerCellID(int index)
+unsigned short TSF::mergerCellID(int index)
 {
   const CDCHit& hit = (*m_cdcHits[index]);
   const unsigned offset = (hit.getISuperLayer() == 0) ? 3 : 0;
   return (hit.getILayer() - offset) * 16 + hit.getIWire() % 16;
 }
 
-unsigned short CDCTriggerTSFFirmwareModule::mergerNumber(int index)
+unsigned short TSF::mergerNumber(int index)
 {
   const CDCHit& hit = (*m_cdcHits[index]);
   return hit.getIWire() / 16;
@@ -225,8 +225,7 @@ unsigned short CDCTriggerTSFFirmwareModule::mergerNumber(int index)
 using WireSet = std::vector<unsigned short>;
 using TSMap = std::unordered_map<int, WireSet>;
 
-Belle2::CDCTriggerTSFFirmwareModule::WireSet
-CDCTriggerTSFFirmwareModule::segmentID(int iHit)
+TSF::WireSet TSF::segmentID(int iHit)
 {
   const bool innerMost = (m_cdcHits[iHit]->getISuperLayer() == 0);
   const unsigned short iLayer = m_cdcHits[iHit]->getILayer();
@@ -250,7 +249,7 @@ CDCTriggerTSFFirmwareModule::segmentID(int iHit)
   }
 }
 
-void CDCTriggerTSFFirmwareModule::initializeMerger()
+void TSF::initializeMerger()
 {
   // data clock period (32ns) in unit of 2ns
   const int clockPeriod = 16;
@@ -292,18 +291,17 @@ void CDCTriggerTSFFirmwareModule::initializeMerger()
   m_iFirstHit = iAxialHit.front();
 }
 
-bool CDCTriggerTSFFirmwareModule::notHit(MergerOut field, unsigned iTS, CDCTriggerTSFFirmwareModule::registeredStructElement& reg)
+bool TSF::notHit(MergerOut field, unsigned iTS, TSF::registeredStructElement& reg)
 {
   return ! reg[field][iTS];
 }
 
-void CDCTriggerTSFFirmwareModule::registerHit(MergerOut field, unsigned iTS,
-                                              CDCTriggerTSFFirmwareModule::registeredStructElement& reg)
+void TSF::registerHit(MergerOut field, unsigned iTS, TSF::registeredStructElement& reg)
 {
   reg[field].set(iTS);
 }
 
-void CDCTriggerTSFFirmwareModule::simulateMerger(unsigned iClock)
+void TSF::simulateMerger(unsigned iClock)
 {
   // clean up TSF input signals
   for (auto& sl : inputToTSF) {
@@ -437,23 +435,20 @@ void CDCTriggerTSFFirmwareModule::simulateMerger(unsigned iClock)
 }
 
 template<MergerOut field, size_t width>
-void CDCTriggerTSFFirmwareModule::pack(Belle2::CDCTriggerTSFFirmwareModule::inputVector::reverse_iterator& input, unsigned number,
-                                       mergerStructElement<5>& output)
+void TSF::pack(inputVector::reverse_iterator& input, unsigned number,
+               mergerStructElement<5>& output)
 {
   std::generate(input, input + number * width, [&, n = 0]() mutable {
-    char logic;
+    int i = n++;
     if (width == 1)
     {
-      logic = (get<field>(output)[0][n]) ? one_val : zero_val;
+      return (get<field>(output)[0][i]) ? one_val : zero_val;
     } else {
-      logic = (get<field>(output)[n / width][n % width]) ? one_val : zero_val;
-    }
-    ++n;
-    return logic;});
+      return (get<field>(output)[i / width][i % width]) ? one_val : zero_val;}});
   input += number * width;
 }
 
-void CDCTriggerTSFFirmwareModule::event()
+void TSF::event()
 {
   // TODO: what if there is 0 CDC hit?
   int status = 0;

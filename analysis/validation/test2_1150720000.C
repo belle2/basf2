@@ -31,10 +31,10 @@ void test2_1150720000() {
   TFile *f = TFile::Open("../1150720000.ntup.root");
   TTree *t = (TTree*) f->Get("rec");
 
-  TH1F *h_deltae = new TH1F("h_deltae","B^{0} #rightarrow #pi l #nu #DeltaE",30,-3,5);
-  TH1F *h_deltae_clean = new TH1F("h_deltae_clean","B^{0} #rightarrow #pi l #nu #DeltaE",30,-3,5);
-  TH1F *h_mbc = new TH1F("h_mbc","B^{0} #rightarrow #pi l #nu M_{bc}",30,4.5,5.3);
-  TH1F *h_mbc_clean = new TH1F("h_mbc_clean","B^{0} #rightarrow #pi l #nu M_{bc}",30,4.5,5.3);
+  TH1F *h_deltae = new TH1F("h_deltae","#DeltaE (B^{0} #rightarrow #pi l #nu)",30,-3,5);
+  TH1F *h_deltae_clean = new TH1F("h_deltae_clean","#DeltaE (B^{0} #rightarrow #pi l #nu)",30,-3,5);
+  TH1F *h_mbc = new TH1F("h_mbc","M_{bc} (B^{0} #rightarrow #pi l #nu)",30,4.5,5.3);
+  TH1F *h_mbc_clean = new TH1F("h_mbc_clean","M_{bc} (B^{0} #rightarrow #pi l #nu)",30,4.5,5.3);
   TH1F *h_costheta = new TH1F("h_costheta","costheta_{BY}",30,-5,5);
 
   h_deltae->SetLineColor(kRed);
@@ -107,8 +107,8 @@ void test2_1150720000() {
   h_costheta->GetXaxis()->SetTitle("cos_{BY}");
 
 
-  h_mbc_clean->SetTitle("M_{bc} after ROE cleaning");
-  h_deltae_clean->SetTitle("#DeltaE after ROE cleaning");
+  h_mbc_clean->SetTitle("M_{bc} after ROE cleaning (B^{0} #rightarrow #pi l #nu)");
+  h_deltae_clean->SetTitle("#DeltaE after ROE cleaning (B^{0} #rightarrow #pi l #nu)");
 
   h_mbc->Write();
   h_mbc_clean->Write();

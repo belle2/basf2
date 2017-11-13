@@ -70,11 +70,16 @@ void ECLTrackClusterMatchingModule::initialize()
 {
   B2INFO("[ECLTrackClusterMatchingModule]: Starting initialization of ECLTrackClusterMatching Module.");
 
+  StoreObjPtr<EventMetaData>::optional();
+  StoreArray<ExtHit>::required();
+  StoreArray<MCParticle>::optional();
+
   StoreArray<Track> tracks;
   StoreArray<ECLCluster> eclClusters;
-  StoreArray<MCParticle>::required();
   tracks.registerRelationTo(eclClusters);
-  tracks.registerRelationTo(tracks);
+
+  tracks.isRequired();
+  eclClusters.isRequired();
 
   if (m_writeToRoot == true) {
     m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");

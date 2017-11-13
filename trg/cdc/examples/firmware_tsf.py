@@ -8,19 +8,23 @@ from math import pi, tan
 import os
 from subprocess import call
 
-# set run time library path
-rdi_path = '/home/belle2/tasheng/Vivado_2017.2/lib/lnx64.o'
-if rdi_path not in os.environ['LD_LIBRARY_PATH']:
-    print('please set environment variable first! do either')
-    print('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:' + rdi_path)
-    print('or')
-    print('setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:' + rdi_path)
-    exit(1)
+read_data = True
+mermger_only = True
 
-# link to 2D design snapshot
-for link in ['xsim.dir', 'innerLRLUT.mif', 'outerLRLUT.mif']:
-    if link not in os.listdir(os.getcwd()):
-        call(['ln', '-s', '/home/belle2/tasheng/tsim/' + link])
+if not mermger_only:
+    # set run time library path
+    rdi_path = '/home/belle2/tasheng/Vivado_2017.2/lib/lnx64.o'
+    if rdi_path not in os.environ['LD_LIBRARY_PATH']:
+        print('please set environment variable first! do either')
+        print('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:' + rdi_path)
+        print('or')
+        print('setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:' + rdi_path)
+        exit(1)
+
+    # link to 2D design snapshot
+    for link in ['xsim.dir', 'innerLRLUT.mif', 'outerLRLUT.mif']:
+        if link not in os.listdir(os.getcwd()):
+            call(['ln', '-s', '/home/belle2/tasheng/tsim/' + link])
 
 """
 generate tracks with particle gun, simulate CDC and CDC trigger, save the output.
@@ -50,6 +54,8 @@ particlegun_params = {
 # ------------------------- #
 # create path up to trigger #
 # ------------------------- #
+environment = Belle2.Environment.Instance()
+environment.setNumberEventsOverride(evtnum)
 
 # set random seed
 basf2.set_random_seed(seed)
@@ -60,21 +66,23 @@ main = basf2.create_path()
 
 empty_path = basf2.create_path()
 
-main.add_module('RootInput', inputFileName='/home/belle2/tasheng/gcr/cdc/cosmic.0001.03898.HLT1.f00007.root')
+if read_data:
+    main.add_module('RootInput', inputFileName='/home/belle2/tasheng/gcr/cdc/cosmic.0001.03898.HLT1.f00007.root')
 
-# main.add_module('EventInfoSetter', evtNumList=evtnum)
 main.add_module('Progress')
 
-# main.add_module('Gearbox')
-# main.add_module('Geometry', components=['BeamPipe',
-#                                         'PXD', 'SVD', 'CDC',
-#                                         'MagneticFieldConstant4LimitedRCDC'])
-# particlegun = basf2.register_module('ParticleGun')
-# particlegun.param(particlegun_params)
-# main.add_module(particlegun)
+if not read_data:
+    main.add_module('EventInfoSetter', evtNumList=evtnum)
+    main.add_module('Gearbox')
+    main.add_module('Geometry', components=['BeamPipe',
+                                            'PXD', 'SVD', 'CDC',
+                                            'MagneticFieldConstant4LimitedRCDC'])
+    particlegun = basf2.register_module('ParticleGun')
+    particlegun.param(particlegun_params)
+    main.add_module(particlegun)
 
-# main.add_module('FullSim')
-# main.add_module('CDCDigitizer')
+    main.add_module('FullSim')
+    main.add_module('CDCDigitizer')
 
 # ---------------------- #
 # CDC trigger and output #

@@ -430,6 +430,13 @@ void TSF::simulateMerger(unsigned iClock)
                 "\nfastest Time: " << fasTime <<
                 "\nedge    Time: " << edgTime);
       }
+      // simulate clock counter
+      if (m_simulateCC) {
+        bitset<9> cc(iClock);
+        generate(inputToTSF[iAx][iMerger].rend() - 9,
+        inputToTSF[iAx][iMerger].rend(), [&cc, i = 0]() mutable {
+          return (cc[i++]) ? one_val : zero_val;});
+      }
     }
   }
 }

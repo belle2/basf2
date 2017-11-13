@@ -96,6 +96,9 @@ namespace Belle2 {
     /** flag to only simulation merger and not TSF */
     bool m_mergerOnly;
 
+    /** flag to simulate front-end clock counter */
+    bool m_simulateCC = false;
+
     /** debug level specified in the steering file */
     int m_debugLevel;
 

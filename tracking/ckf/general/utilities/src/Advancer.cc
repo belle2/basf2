@@ -35,6 +35,7 @@ double Advancer::extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateO
     }
   } catch (const genfit::Exception& e) {
     B2DEBUG(50, "Extrapolation failed: " << e.what());
+    genfit::MaterialEffects::getInstance()->setNoEffects(false);
     return NAN;
   }
 }

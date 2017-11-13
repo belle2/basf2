@@ -16,7 +16,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
-
 namespace Belle2 {
   class QualityEstimatorMC : public QualityEstimatorBase {
 
@@ -50,6 +49,7 @@ namespace Belle2 {
      */
     bool m_strictQualityIndex;
 
+    std::string m_mcRecoTracksStoreArrayName;
     // module members
     std::string m_svdClustersName = "";
     std::string m_pxdClustersName = "";
@@ -61,4 +61,3 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_mcRecoTracks;
   };
 }
-

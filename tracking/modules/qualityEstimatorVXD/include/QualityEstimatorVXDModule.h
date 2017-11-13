@@ -64,7 +64,6 @@ namespace Belle2 {
     /** Only required for MCInfo method */
     bool m_MCStrictQualityEstimator;
 
-
     // member variables
 
     /** the storeArray for SpacePointTrackCands as member, is faster than recreating link for each event */

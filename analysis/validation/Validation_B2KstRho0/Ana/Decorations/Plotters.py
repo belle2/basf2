@@ -8,7 +8,9 @@ from ROOT import gROOT, gStyle, gPad
 import os
 import sys
 import inspect
+#: get the current directory
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+#: get the parent directory
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 from Global.fit_variables import fit_variables

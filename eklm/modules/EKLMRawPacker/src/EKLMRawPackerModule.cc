@@ -42,9 +42,7 @@ void EKLMRawPackerModule::beginRun()
 
 void EKLMRawPackerModule::event()
 {
-  B2INFO("pack the event.." << endl);
   StoreArray<EKLMDigit> digits;
-  B2INFO("EKLMRawPackerModule:: entries of eklmdigits " << digits.getEntries());
   int n_Gdidgits = 0;
   const EKLMDataConcentratorLane* lane;
   int i, j, k, endcap, layer, sector, sectorGlobal, copper, dataConcentrator;
@@ -87,7 +85,6 @@ void EKLMRawPackerModule::event()
     dataWords[copper][dataConcentrator].push_back(buf[0]);
     dataWords[copper][dataConcentrator].push_back(buf[1]);
   }
-//  B2INFO("EKLMRawPackerModule:: N_good_eklmdigits " << n_Gdidgits);
   for (i = 0; i < 4; i++) {
     // Fill event info (These values will be stored in RawHeader)
     packerInfo.exp_num = 1;
@@ -114,7 +111,6 @@ void EKLMRawPackerModule::event()
     for (j = 0; j < 4; j++)
       delete[] detectorBuf[j];
   }
-  B2INFO("Event # " << m_NEvents);
   m_NEvents++;
   return;
 }

@@ -3,8 +3,7 @@
 // Date : 13 - Aug - 2010
 //-
 
-#ifndef SEQROOT_INPUT_H
-#define SEQROOT_INPUT_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/pcore/DataStoreStreamer.h>
@@ -64,5 +63,3 @@ namespace Belle2 {
     double m_size2; /**< sum of squares of data transferred in each event, in kB^2. */
   };
 } // end namespace Belle2
-
-#endif

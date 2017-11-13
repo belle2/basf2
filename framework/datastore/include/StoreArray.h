@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef STOREARRAY_H
-#define STOREARRAY_H
+#pragma once
 
 #include <framework/datastore/StoreAccessorBase.h>
 #include <framework/datastore/DataStore.h>
@@ -387,4 +386,3 @@ namespace Belle2 {
 
   };
 } // end namespace Belle2
-#endif

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LOGMESSAGE_H_
-#define LOGMESSAGE_H_
+#pragma once
 
 #include <framework/logging/LogConfig.h>
 
@@ -114,5 +113,3 @@ namespace Belle2 {
  * Operator to print a log message.
  */
 extern std::ostream& operator<< (std::ostream& out, const Belle2::LogMessage& logMessage);
-
-#endif /* LOGMESSAGE_H_ */

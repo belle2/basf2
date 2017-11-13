@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PRINTCOLLECTIONSMODULE_H_
-#define PRINTCOLLECTIONSMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
@@ -52,5 +51,3 @@ namespace Belle2 {
     unsigned int m_printForEvent = 1;
   };
 }
-
-#endif /* PRINTCOLLECTIONSMODULE_H_ */

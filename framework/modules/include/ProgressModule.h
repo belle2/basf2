@@ -7,8 +7,7 @@
  *                                                                        *
  **************************************************************************/
 
-#ifndef ProgressModule_H
-#define ProgressModule_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -54,5 +53,3 @@ namespace Belle2 {
     boost::format m_output;
   };
 } // end namespace Belle2
-
-#endif // ProgressModule_H

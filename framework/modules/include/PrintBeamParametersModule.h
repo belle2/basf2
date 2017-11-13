@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef PRINTBEAMPARAMETERSMODULE_H
-#define PRINTBEAMPARAMETERSMODULE_H
 
 #include <framework/core/Module.h>
 #include <framework/dbobjects/BeamParameters.h>
@@ -42,5 +40,3 @@ namespace Belle2 {
     DBObjPtr<BeamParameters> m_beamparams;
   };
 }
-
-#endif /* PRINTBEAMPARAMETERSMODULE_H */

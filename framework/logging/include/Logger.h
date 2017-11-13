@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LOGGER_H
-#define LOGGER_H
+#pragma once
 
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogMessage.h>
@@ -132,5 +131,3 @@
     } \
   } while(false)
 #endif
-
-#endif  // LOGGER_H

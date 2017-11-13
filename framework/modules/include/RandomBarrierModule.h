@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef RANDOMBARRIERMODULE_H
-#define RANDOMBARRIERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -45,5 +44,3 @@ namespace Belle2 {
   private:
   };
 }
-
-#endif

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef INTERACTIVEPYTHON_H
-#define INTERACTIVEPYTHON_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -36,5 +35,3 @@ namespace Belle2 {
     virtual void event();
   };
 }
-
-#endif

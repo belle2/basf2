@@ -5,8 +5,7 @@
 // Date : 13 - Aug - 2010
 //-
 
-#ifndef PSEQROOT_OUTPUT_H
-#define PSEQROOT_OUTPUT_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/pcore/EvtMessage.h>
@@ -86,5 +85,3 @@ namespace Belle2 {
 
   };
 } // end namespace Belle2
-
-#endif

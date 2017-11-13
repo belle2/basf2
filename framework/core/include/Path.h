@@ -8,13 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PATH_H_
-#define PATH_H_
+#pragma once
 
 #include <framework/core/PathElement.h>
-
 #include <boost/shared_ptr.hpp>
-
 #include <list>
 
 namespace boost {
@@ -133,5 +130,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif /* PATH_H_ */

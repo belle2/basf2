@@ -1,4 +1,3 @@
-#pragma once
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2014 - Belle II Collaboration                             *
@@ -9,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
 
 #include <TObject.h>
 

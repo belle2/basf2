@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEARBOXMODULE_H_
-#define GEARBOXMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -72,5 +71,3 @@ namespace Belle2 {
     std::vector<std::tuple<std::string, std::string, std::string>> m_multipleOverrides;
   };
 }
-
-#endif /* GEARBOXMODULE_H_ */

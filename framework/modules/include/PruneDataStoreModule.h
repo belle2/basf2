@@ -7,8 +7,7 @@
  *                                                                        *
  **************************************************************************/
 
-#ifndef PruneDataStoreModule_H
-#define PruneDataStoreModule_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -66,5 +65,3 @@ namespace Belle2 {
 
   };
 } // end namespace Belle2
-
-#endif // PruneDataStoreModule_H

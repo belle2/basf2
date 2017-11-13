@@ -35,6 +35,7 @@ def fixLayerParam(layer, param):
     label.construct(Belle2.CDCLayerAlignment.getGlobalUniqueID(), layer, param)
     algo.steering().command(str(label.label()) + ' 0.0 -1.')
 
+
 fixLayerParam(0, 1)  # X
 fixLayerParam(0, 2)  # Y
 fixLayerParam(55, 1)  # X

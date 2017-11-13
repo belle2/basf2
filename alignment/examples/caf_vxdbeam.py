@@ -15,7 +15,7 @@ from alignment import MillepedeCalibration
 import reconstruction as reco
 import modularAnalysis as ana
 
-inputFiles = Belle2.Environment.Instance().getInputFilesOverride()
+inputFiles = [os.path.abspath(file) for file in Belle2.Environment.Instance().getInputFilesOverride()]
 if not len(inputFiles):
     print(' Please specify input files for calibration via the -i option of basf2')
     sys.exit(1)

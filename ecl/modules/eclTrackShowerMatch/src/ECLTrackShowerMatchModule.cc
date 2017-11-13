@@ -41,6 +41,12 @@ void ECLTrackShowerMatchModule::initialize()
   StoreArray<ECLCluster> eclClusters;
   tracks.registerRelationTo(eclShowers);
   tracks.registerRelationTo(eclClusters);
+
+  tracks.isRequired();
+  eclShowers.isRequired();
+  eclClusters.isRequired();
+  StoreArray<ECLCalDigit>::required();
+  StoreArray<ExtHit>::required();
 }
 
 void ECLTrackShowerMatchModule::beginRun()

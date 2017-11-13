@@ -94,7 +94,7 @@ CDCTriggerTrackCombinerModule::event()
       track2Dfinder->getRelatedTo<CDCTriggerTrack>(m_neuroCollectionName);
 
     if (!track3Dfitter && !trackNeuro) {
-      B2INFO("skip track without 3D parameters");
+      B2DEBUG(100, "skip track without 3D parameters");
       continue;
     }
 
@@ -109,19 +109,19 @@ CDCTriggerTrackCombinerModule::event()
     bool usedNN = false;
 
     if (!track3Dfitter) {
-      B2INFO("no 3D fitter results, use neuro results");
+      B2DEBUG(100, "no 3D fitter results, use neuro results");
       z = trackNeuro->getZ0();
       cotTheta = trackNeuro->getCotTheta();
       chi3D = trackNeuro->getChi3D();
       usedNN = true;
     } else if (!trackNeuro) {
-      B2INFO("no neuro results, use 3D fitter results");
+      B2DEBUG(100, "no neuro results, use 3D fitter results");
       z = track3Dfitter->getZ0();
       cotTheta = track3Dfitter->getCotTheta();
       chi3D = track3Dfitter->getCotTheta();
       usedFit = true;
     } else {
-      B2INFO("combine 3D fitter and neuro results");
+      B2DEBUG(100, "combine 3D fitter and neuro results");
       // z options
       if (m_zDefinition == "3Dfitter") {
         z = track3Dfitter->getZ0();
@@ -146,7 +146,7 @@ CDCTriggerTrackCombinerModule::event()
         usedFit = true;
         usedNN = true;
       } else {
-        B2FATAL("invalid option for zDefinition " << m_zDefinition
+        B2ERROR("invalid option for zDefinition " << m_zDefinition
                 << " (choose one of 3Dfitter, neuro, avg, min, max)");
       }
       // theta options
@@ -161,7 +161,7 @@ CDCTriggerTrackCombinerModule::event()
         usedFit = true;
         usedNN = true;
       } else {
-        B2FATAL("invalid option for thetaDefinition " << m_thetaDefinition
+        B2ERROR("invalid option for thetaDefinition " << m_thetaDefinition
                 << " (choose one of 3Dfitter, neuro, avg)");
       }
       // only fitter calculates a chi2 value

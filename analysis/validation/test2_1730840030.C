@@ -151,6 +151,11 @@ void plot_Mrecoil(TFile* pfile,TTree *ptree, TFile* outputFile){
 
    TH1F* h_MRecoil_pipi = new TH1F("h_MRecoil_pipi","M(pipi)_recoil",500,9.3,10.3);
    ptree->Project("h_MRecoil_pipi","Upsilon3S_Mrecoil",piidCut);
+   h_MRecoil_pipi->GetXaxis()->SetTitle("MM_{#pi#pi} (GeV/c^{2})");
+   h_MRecoil_pipi->GetYaxis()->SetTitle("Events / 2MeV/c^{2}"); 
+   h_MRecoil_pipi->GetListOfFunctions()->Add(new TNamed("Description","check the recoil mass distribution of this mode"));
+   h_MRecoil_pipi->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
+   h_MRecoil_pipi->GetListOfFunctions()->Add(new TNamed("Check","Y(1S) and Y(2S) would be observed"));
 
    outputFile->cd();
 

@@ -1,14 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-<header>
-<output>dstarptaunuOutput.root</output>
-<contact>Racha Cheaib; rcheaib@olemiss.edu </header>
-<description>Tests FEI for B->D(*)tauv</description>
-<interval>release</interval>
-"""
-
 #######################################################
 #
 # This script demonstrates how to reconstruct Btag using
@@ -136,8 +128,6 @@ variables.addAlias('d1_d0_d0_mcPDG', 'daughter(1,daughter(0,daughter(0,mcPDG)))'
 variables.addAlias('d1_d0_d1_mcPDG', 'daughter(1,daughter(0,daughter(1,mcPDG)))')
 
 
-from fei import backward_compatibility_layer
-backward_compatibility_layer.pid_renaming_oktober_2017()
 variables.addAlias('tau_eid', 'daughter(1,daughter(0,electronID))')
 variables.addAlias('tau_muid', 'daughter(1,daughter(0,muonID))')
 outputRootFile = 'dstarptaunuOutput.root'
@@ -245,6 +235,7 @@ ROEclusters = ('ROEclusters', '', '')
 
 appendROEMasks('Upsilon(4S):BhadBsig0', [ROEclusters, ROETracks])
 appendROEMasks('Upsilon(4S):BslBsig0', [ROEclusters, ROETracks])
+
 
 variables.addAlias('ROE_eextraSel', 'ROE_eextra(ROEclusters)')
 variables.addAlias('ROE_neextraSel', 'ROE_neextra(ROEclusters)')

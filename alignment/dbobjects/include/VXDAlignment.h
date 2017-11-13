@@ -35,12 +35,24 @@ namespace Belle2 {
     /// Correction of Lorentz shift w.r.t. common per layer
     static const baseType dLayerLorentzAngle = 12;
 
-    static unsigned short getGlobalUniqueID() {return 1;}
-
     /// Constructor
     VXDAlignment() : DBObjCalibrationConstMapBase() {}
     /// Destructor
     ~VXDAlignment() {}
+
+    // ------------- Interface to global Millepede calibration ----------------
+    /// Get global unique id
+    static unsigned short getGlobalUniqueID() {return 10;}
+    /// Get global parameter
+    double getGlobalParam(unsigned short element, unsigned short param) {return get(element, param);}
+    /// Set global parameter
+    void setGlobalParam(double value, unsigned short element, unsigned short param) {set(element, param, value);}
+    /// TODO: list stored global parameters
+    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {};}
+    /// Not used
+    void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>&) {}
+    // ------------------------------------------------------------------------
+
   private:
     ClassDef(VXDAlignment, 2); /**< VXD allignment and calibration constants */
   };

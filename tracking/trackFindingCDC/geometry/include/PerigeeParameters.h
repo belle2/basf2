@@ -37,16 +37,31 @@ namespace Belle2 {
     /// Importing the enumeration for the namespace but not the constants.
     using EPerigeeParameter = NPerigeeParameterIndices::EPerigeeParameter;
 
+    // Guard to prevent repeated template symbol emission
+    struct PerigeeUtil;
+    extern template struct UncertainParametersUtil<PerigeeUtil, EPerigeeParameter>;
+
     /// Utility struct for functions and types related to the perigee parameters.
     struct PerigeeUtil : UncertainParametersUtil<PerigeeUtil, EPerigeeParameter> {
 
       /// Getter for the signs which have to be applied to reverse the traversal direction
       static ParameterVector reversalSigns()
       {
-        ParameterVector result;
-        result << -1, 1, -1;
-        return result;
+        return ParameterVector({ -1.0, 1.0, -1.0});
       }
+
+      /**
+       *  Calculates the weighted average between two perigee parameter sets
+       *  with their respective covariance matrix.
+       *
+       *  Returns the chi2 value of the average.
+       */
+      static double average(const PerigeeUtil::ParameterVector& fromPar,
+                            const PerigeeUtil::CovarianceMatrix& fromCov,
+                            const PerigeeUtil::ParameterVector& toPar,
+                            const PerigeeUtil::CovarianceMatrix& toCov,
+                            PerigeeUtil::ParameterVector& avgPar,
+                            PerigeeUtil::CovarianceMatrix& avgCov);
     };
 
     /// Vector of the perigee parameters

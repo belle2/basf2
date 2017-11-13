@@ -39,7 +39,7 @@
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
 #include <top/geometry/TOPGeometryPar.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 #include <iostream>
 #include <iomanip>
@@ -168,7 +168,7 @@ namespace Belle2 {
     if (!recBunch.isValid()) recBunch.create();
     recBunch->setReconstructed(0, -m_startTime, 0, 0);
 
-    double Bfield = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+    double Bfield = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
 
     for (int icand = 0; icand < trackCandidates.getEntries(); icand++) {
 
@@ -413,7 +413,7 @@ namespace Belle2 {
       truncSigma = sqrt((truncSigma / n - truncMean * truncMean) / n);
     }
 
-    dedxTrack->setMean(mean);
+    dedxTrack->setDedxMean(mean);
     dedxTrack->setTruncatedMean(truncMean);
     dedxTrack->setError(truncSigma);
     return true;

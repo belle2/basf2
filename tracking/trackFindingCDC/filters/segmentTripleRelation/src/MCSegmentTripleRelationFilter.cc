@@ -7,11 +7,17 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/segmentTripleRelation/MCSegmentTripleRelationFilter.h>
+
+#include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.icc.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::MCSymmetric<BaseSegmentTripleRelationFilter>;
 
 MCSegmentTripleRelationFilter::MCSegmentTripleRelationFilter(bool allowReverse) :
   m_mcSegmentTripleFilter(allowReverse)
@@ -19,12 +25,33 @@ MCSegmentTripleRelationFilter::MCSegmentTripleRelationFilter(bool allowReverse) 
   this->addProcessingSignalListener(&m_mcSegmentTripleFilter);
 }
 
-Weight MCSegmentTripleRelationFilter::operator()(const CDCSegmentTriple& triple,
-                                                 const CDCSegmentTriple& neighborTriple)
+void MCSegmentTripleRelationFilter::exposeParameters(ModuleParamList* moduleParamList,
+                                                     const std::string& prefix)
 {
-  Weight mcTripleWeight = m_mcSegmentTripleFilter(triple);
-  Weight mcNeighborTripleWeight = m_mcSegmentTripleFilter(neighborTriple);
+  m_mcSegmentTripleFilter.exposeParameters(moduleParamList, prefix);
+}
 
-  bool mcDecision = (not std::isnan(mcTripleWeight)) and (not std::isnan(mcNeighborTripleWeight));
-  return mcDecision ? - neighborTriple.getStartSegment()->size() : NAN;
+void MCSegmentTripleRelationFilter::initialize()
+{
+  Super::initialize();
+  setAllowReverse(m_mcSegmentTripleFilter.getAllowReverse());
+}
+
+Weight MCSegmentTripleRelationFilter::operator()(const CDCSegmentTriple& fromTriple,
+                                                 const CDCSegmentTriple& toTriple)
+{
+  if (fromTriple.getEndSegment() != toTriple.getStartSegment()) return NAN;
+
+  Weight mcFromTripleWeight = m_mcSegmentTripleFilter(fromTriple);
+  Weight mcToTripleWeight = m_mcSegmentTripleFilter(toTriple);
+
+  ESign fromFBInfo = sign(mcFromTripleWeight);
+  ESign toFBInfo = sign(mcToTripleWeight);
+
+  if (not isValid(fromFBInfo) or not isValid(toFBInfo) or fromFBInfo != toFBInfo) return NAN;
+
+  ESign commonFBInfo = fromFBInfo;
+
+  Weight overlapWeight = toTriple.getStartSegment()->size();
+  return commonFBInfo > 0 ? overlapWeight  : -overlapWeight;
 }

@@ -9,8 +9,8 @@
 
 #include <svd/modules/svdSimulation/SVDDigitizerModule.h>
 #include <vxd/geometry/GeoCache.h>
-#include <geometry/bfieldmap/BFieldMap.h>
 
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
@@ -23,7 +23,11 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/dataobjects/SVDModeByte.h>
 #include <boost/tuple/tuple.hpp>
+#include <fstream>
+#include <sstream>
+#include <regex>
 #include <algorithm>
 #include <numeric>
 #include <deque>
@@ -90,17 +94,19 @@ SVDDigitizerModule::SVDDigitizerModule() :
 
   // 4. Timing
   addParam("APVShapingTime", m_shapingTime, "APV25 shpaing time in ns",
-           double(50.0));
+           double(250.0));
   addParam("ADCSamplingTime", m_samplingTime,
            "Interval between ADC samples in ns", double(31.44));
-  addParam("UseIntegrationWindow", m_applyWindow, "Use integration window?",
-           bool(true));
   addParam("StartSampling", m_startSampling,
            "Start of the sampling window, in ns", double(-31.44));
   addParam("nAPV25Samples", m_nAPV25Samples, "number of APV25 samples",
            6);
-  addParam("RandomPhaseSampling", m_randomPhaseSampling,
-           "Start sampling at a random time?", bool(false));
+  addParam("RandomizeEventTimes", m_randomizeEventTimes,
+           "Randomize event times over a frame interval", bool(false));
+  addParam("TimeFrameLow", m_minTimeFrame,
+           "Left edge of event time randomization window, ns", m_minTimeFrame);
+  addParam("TimeFrameHigh", m_maxTimeFrame,
+           "Right edge of event time randomization window, ns", m_maxTimeFrame);
 
   // 5. Reporting
   addParam("statisticsFilename", m_rootFilename,
@@ -108,6 +114,9 @@ SVDDigitizerModule::SVDDigitizerModule() :
            string(""));
   addParam("storeWaveforms", m_storeWaveforms,
            "Store waveforms in a TTree in the statistics file.", bool(false));
+  addParam("signalsList", m_signalsList,
+           "Store signals (time/charge/tau) in a tab-delimited file",
+           m_signalsList);
 }
 
 void SVDDigitizerModule::initialize()
@@ -121,6 +130,9 @@ void SVDDigitizerModule::initialize()
 
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
   storeDigits.registerRelationTo(storeTrueHits);
+
+  if (m_randomizeEventTimes)
+    StoreObjPtr<EventMetaData> storeEvents;
 
   //Set names in case default was used. We need the names to initialize the RelationIndices.
   m_relMCParticleSimHitName = DataStore::relationName(
@@ -159,6 +171,8 @@ void SVDDigitizerModule::initialize()
   m_noiseFraction = TMath::Freq(m_SNAdjacent); // 0.9... !
   m_samplingTime *= Unit::ns;
   m_shapingTime *= Unit::ns;
+  m_minTimeFrame *= Unit::ns;
+  m_maxTimeFrame *= Unit::ns;
 
   B2INFO(
     "SVDDigitizer parameters (in default system units, *=cannot be set directly):");
@@ -186,11 +200,9 @@ void SVDDigitizerModule::initialize()
   B2INFO(" TIMING: ");
   B2INFO(" -->  APV25 shaping time: " << m_shapingTime);
   B2INFO(" -->  Sampling time:      " << m_samplingTime);
-  B2INFO(" -->  IntegrationWindow:  " << (m_applyWindow ? "true" : "false"));
   B2INFO(" -->  Start of int. wind.:" << m_startSampling);
   B2INFO(" -->  Number of samples:  " << m_nAPV25Samples);
-  B2INFO(
-    " -->  Random phase sampl.:" << (m_randomPhaseSampling ? "true" : "false"));
+  B2INFO(" -->  Random event times. " << (m_randomizeEventTimes ? "true" : "false"));
   B2INFO(" REPORTING: ");
   B2INFO(" -->  statisticsFilename: " << m_rootFilename);
   B2INFO(
@@ -281,9 +293,16 @@ void SVDDigitizerModule::beginRun()
 
 void SVDDigitizerModule::event()
 {
+  // Generate current event time
+  if (m_randomizeEventTimes) {
+    StoreObjPtr<EventMetaData> storeEvent;
+    m_currentEventTime = gRandom->Uniform(m_minTimeFrame, m_maxTimeFrame);
+    storeEvent->setTime(static_cast<unsigned long>(1000 + m_currentEventTime));
+  } else
+    m_currentEventTime = 0.0;
+
   //Clear sensors and process SimHits
   for (Sensors::value_type& sensor : m_sensors) {
-
     sensor.second.first.clear();  // u strips
     sensor.second.second.clear(); // v strips
   }
@@ -393,26 +412,16 @@ void SVDDigitizerModule::event()
     m_rootFile->cd();
     saveWaveforms();
   }
+  if (m_signalsList != "")
+    saveSignals();
 
   saveDigits();
 }
 
 void SVDDigitizerModule::processHit()
 {
-  if (m_applyWindow) {
-    //Ignore hits which are outside of the SVD active time frame.
-    //Here we can only discard hits that arrived after the window was closed;
-    //we will later start sampling only after the window opened.
-    double stopSampling = m_startSampling + m_nAPV25Samples * m_samplingTime;
-    B2DEBUG(30,
-            "Checking if hit is in timeframe " << m_currentHit->getGlobalTime() << " <= " << stopSampling);
-
-    if (m_currentHit->getGlobalTime() > stopSampling)
-      return;
-  }
-
-  // Set time of the event
-  m_currentTime = m_currentHit->getGlobalTime();
+  // Set time of the hit
+  m_currentTime = m_currentEventTime + m_currentHit->getGlobalTime();
 
   //Get Steplength and direction
   const TVector3& startPoint = m_currentHit->getPosIn();
@@ -630,7 +639,9 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
   // Store
   double recoveredCharge = 0;
   for (std::size_t index = 0; index <  readoutStrips.size(); index ++) {
-    digits[readoutStrips[index]].add(m_currentTime + driftTime, readoutCharges[index],
+    // NB> To first approximation, we assign to the signal 1/2*driftTime.
+    // This doesn't change the charge collection, only charge collection timing.
+    digits[readoutStrips[index]].add(m_currentTime + 0.5 * driftTime, readoutCharges[index],
                                      m_shapingTime, m_currentParticle, m_currentTrueHit);
     recoveredCharge += readoutCharges[index];
     B2DEBUG(30, "strip: " << readoutStrips[index] << " charge: " << readoutCharges[index]);
@@ -671,10 +682,11 @@ void SVDDigitizerModule::saveDigits()
                                      m_relShaperDigitDigitName);
 
   //Set time of the first sample
-  double initTime = m_startSampling;
-  if (m_randomPhaseSampling) {
-    initTime = gRandom->Uniform(0.0, m_samplingTime);
-  }
+
+  const double bunchTimeSep = 2 * 1.96516; //in ns
+  const int bunchXingsInAPVclock = 8; //m_samplingTime/bunchTimeSep;
+  int bunchXingsSinceAPVstart = gRandom->Integer(bunchXingsInAPVclock);
+  double initTime = m_startSampling - bunchTimeSep * bunchXingsSinceAPVstart;
 
   // ... to store digit-digit relations
   vector<pair<unsigned int, float> > digit_weights;
@@ -772,7 +784,8 @@ void SVDDigitizerModule::saveDigits()
         });
         // Save as a new digit
         int digIndex = storeShaperDigits.getEntries();
-        storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples));
+        storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, SVDModeByte(0, 0, 0,
+                                                   bunchXingsSinceAPVstart >> 1)));
         //If the digit has any relations to MCParticles, add the Relation
         if (particles.size() > 0) {
           relShaperDigitMCParticle.add(digIndex, particles.begin(), particles.end());
@@ -872,7 +885,8 @@ void SVDDigitizerModule::saveDigits()
         });
         // Save as a new digit
         int digIndex = storeShaperDigits.getEntries();
-        storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples));
+        storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, SVDModeByte(0, 0, 0,
+                                                   bunchXingsSinceAPVstart >> 1)));
         //If the digit has any relations to MCParticles, add the Relation
         if (particles.size() > 0) {
           relShaperDigitMCParticle.add(digIndex, particles.begin(), particles.end());
@@ -923,6 +937,58 @@ void SVDDigitizerModule::saveWaveforms()
     } // FOREACH stripSignal
   } // FOREACH sensor
   m_rootFile->Flush();
+}
+
+void SVDDigitizerModule::saveSignals()
+{
+  static size_t recordNo = 0;
+  static const string header("Event\tSensor\tSide\tStrip\tContrib\tTime\tCharge\tTau");
+  regex startLine("^|\n"); // for inserting event/sensor/etc info
+  ofstream outfile(m_signalsList, ios::out | ios::app);
+  if (recordNo == 0) outfile << header << endl;
+  for (Sensors::value_type& sensor : m_sensors) {
+    VxdID sensorID(sensor.first);
+    const SensorInfo& info =
+      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensor.first));
+    // u-side digits:
+    size_t isU = 1;
+    double thresholdU = 3.0 * info.getElectronicNoiseU();
+    for (StripSignals::value_type& stripSignal : sensor.second.first) {
+      size_t strip = stripSignal.first;
+      SVDSignal& s = stripSignal.second;
+      // Read the value only if the signal is large enough.
+      if (s.getCharge() < thresholdU)
+        continue;
+      // Else print to a string
+      ostringstream preamble;
+      // We don't have eventNo, but we don't care about event boundaries.
+      preamble << "$&" << recordNo << '\t' << sensorID << '\t' << isU << '\t' << strip << '\t';
+      string signalString = s.toString();
+      signalString.pop_back(); // remove the last newline!!!
+      string tableString = regex_replace(signalString, startLine, preamble.str());
+      outfile << tableString << endl; // now we have to add the newline back.
+    } // FOREACH stripSignal
+    // x-side digits:
+    isU = 0;
+    double thresholdV = 3.0 * info.getElectronicNoiseV();
+    for (StripSignals::value_type& stripSignal : sensor.second.second) {
+      size_t strip = stripSignal.first;
+      SVDSignal& s = stripSignal.second;
+      // Read the value only if the signal is large enough.
+      if (s.getCharge() < thresholdV)
+        continue;
+      // Else print to a string
+      ostringstream preamble;
+      // We don't have eventNo, but we don't care about event boundaries.
+      preamble << "$&" << recordNo << '\t' << sensorID << '\t' << isU << '\t' << strip << '\t';
+      string signalString = s.toString();
+      signalString.pop_back(); // remove the last newline!!!
+      string tableString = regex_replace(signalString, startLine, preamble.str());
+      outfile << tableString << endl; // now we have to add the newline back.
+    } // FOREACH stripSignal
+  } // for sensors
+  outfile.close();
+  recordNo++;
 }
 
 void SVDDigitizerModule::terminate()

@@ -21,7 +21,9 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/dataobjects/ECLWaveforms.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <vector>
 
@@ -109,29 +111,49 @@ namespace Belle2 {
 
       /** Storage for adc hits from entire calorimeter (8736 crystals) */
       std::vector<adccounts_t> m_adc;  /**< ACD counts */
+
+      /** calibration constants per channel */
+      struct calibration_t {
+        float ascale; /**< amplitude scale */
+        float tshift; /**< time shift */
+      };
+      /** Storage for calibration constants */
+      std::vector<calibration_t> m_calib;
+
       /** function wrapper for waveform fit */
       void shapeFitterWrapper(const int j, const int* FitA, const int m_ttrig,
                               int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const ;
 
       /** read Shaper-DSP data from root file */
       void readDSPDB();
-
+      /** Emulate response of energy deposition in a crystal and attached photodiode and make waveforms*/
+      int shapeSignals();
+      /** Produce and compress waveforms for beam background overlay */
+      void makeWaveforms();
+      /** repack waveform fit parameters from ROOT format to plain array of unsigned short for the shapeFitter function */
       void repack(const ECLWFAlgoParams&, algoparams_t&);
+      /** load waveform fit parameters for the shapeFitter function */
       void getfitparams(const ECLWaveformData&, const ECLWFAlgoParams&, fitparams_t&);
+      /** fill the waveform array FitA by electronic noise and bias it for channel J [0-8735]*/
+      void makeElectronicNoiseAndPedestal(int j, int* FitA);
 
       /** input arrays */
       StoreArray<ECLHit>    m_eclHits;  /**< hits array  */
-      StoreArray<ECLHit>    m_eclDiodeHits;
-      StoreArray<ECLSimHit> m_eclSimHits;
+      StoreArray<ECLHit>    m_eclDiodeHits; /**< diode hits array  */
+      StoreArray<ECLSimHit> m_eclSimHits; /**< SimHits array  */
+      StoreObjPtr<ECLWaveforms> m_eclWaveforms; /**< compressed waveforms  */
       /** Output Arrays */
-      StoreArray<ECLDigit>  m_eclDigits;
-      StoreArray<ECLDsp>    m_eclDsps;
-      StoreArray<ECLTrig>   m_eclTrigs;
+      StoreArray<ECLDigit>  m_eclDigits;/**<  waveform fit result */
+      StoreArray<ECLDsp>    m_eclDsps;/**<  generated waveforms */
+      StoreArray<ECLTrig>   m_eclTrigs;/**< trigger information */
 
       /** Module parameters */
       bool m_background;  /**< background flag */
       bool m_calibration;  /**< calibration flag */
-      bool m_inter;
+      bool m_inter; /**< internuclear counter effect */
+      bool m_waveformMaker; /**< produce only waveform digits */
+      unsigned int m_compAlgo; /**< compression algorithm for background waveforms */
+      std::string m_eclWaveformsName;   /**< name of background waveforms storage*/
     };
   }//ECL
 }//Belle2

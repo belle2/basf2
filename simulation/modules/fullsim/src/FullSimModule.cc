@@ -98,7 +98,7 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
            0.07);
   addParam("MaxNumberSteps", m_maxNumberSteps,
            "The maximum number of steps before the track transportation is stopped and the track is killed.", 100000);
-  addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 0.35);
+  addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 0.5);
   addParam("EnableVisualization", m_EnableVisualization, "If set to True the Geant4 visualization support is enabled.", false);
   addParam("StoreOpticalPhotons", m_storeOpticalPhotons, "If set to True optical photons are stored in MCParticles", false);
   addParam("StoreAllSecondaries", m_storeSecondaries,
@@ -184,7 +184,7 @@ void FullSimModule::initialize()
 
   //Create the magnetic field for the Geant4 simulation
   if (m_magneticFieldName != "none") {
-    m_magneticField = new MagneticField();
+    m_magneticField = new Belle2::Simulation::MagneticField();
     if (m_magneticCacheDistance > 0) {
       m_uncachedField = m_magneticField;
       m_magneticField = new G4CachedMagneticField(m_uncachedField, m_magneticCacheDistance);

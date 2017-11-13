@@ -19,6 +19,7 @@
 
 #include <string>
 #include <typeinfo>
+#include <functional>
 #include <TBranch.h>
 #include <TTree.h>
 
@@ -52,8 +53,32 @@ namespace Belle2 {
 
 
    */
-  template < class templateArgumentType, class templateReturnType = double >
+  template < class templateArgumentType, size_t Nargs, class templateReturnType = double >
   class SelectionVariable {
+
+    /** this struct is an internal utility.
+     * She provides the typename of an std:function taking
+     * n parameters type parameterType and Ts... additional parameters.
+     * e.g.:
+     * FunctionOf<2, double, SpacePoint>::functionType is the type of
+     * a function returning a double and having two SpacePoint as arguments
+     */
+    template <size_t n , class returnType, class parameterType, class ... Ts>
+    struct FunctionOf {
+      typedef  typename FunctionOf < n - 1, returnType, parameterType,
+               parameterType, Ts... >::functionType functionType;
+    };
+
+    /** this struct is an internal utility.
+     * She is the guardian of the recursion if n = 0
+     * the job is done: 0 parameterType just Ts
+     */
+    template <  class returnType, class parameterType, class ... Ts>
+    struct FunctionOf<0, returnType, parameterType, Ts...> {
+
+      typedef  std::function< returnType(Ts...) > functionType;
+
+    };
 
   public:
 
@@ -63,7 +88,12 @@ namespace Belle2 {
     /** Type of the argument object. Needed for SFINAE in Filter.hh */
     typedef templateArgumentType argumentType;
 
-    /** Static method that return the
+    /** Type of the function returning the value. Needed for the automated training */
+    typedef typename FunctionOf<Nargs, variableType,
+            const argumentType&>::functionType functionType;
+
+    static const size_t c_Nargs = Nargs;
+    /** Static method that return the variable associated to:
      *
      * @param arg1 first object of the pair
      * @param arg2 second object of the pair
@@ -81,9 +111,9 @@ namespace Belle2 {
 
   };
 
-#define SELECTION_VARIABLE( variableName, argumentType, implementation ) \
+#define SELECTION_VARIABLE( variableName, nArgs, argumentType, implementation ) \
   class variableName:             \
-    public SelectionVariable< argumentType , double >     \
+    public SelectionVariable< argumentType , nArgs, double >     \
   {                 \
   public:               \
     static const std::string name(void) {return #variableName; };   \

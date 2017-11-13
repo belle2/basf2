@@ -13,7 +13,7 @@ import variableCollections
 
 # You can also define collections yourself
 import variables
-variables.variables.addCollection('MyCollection', variables.std_vector('daughter(0, Kid)', 'daughter(1, piid)'))
+variables.variables.addCollection('MyCollection', variables.std_vector('daughter(0, kaonID)', 'daughter(1, pionID)'))
 
 import os
 if os.path.isfile('mdst.root'):
@@ -29,7 +29,7 @@ else:
 
 inputMdstList('MC7', [filename])
 
-fillParticleLists([('K-', 'Kid > 0.2'), ('pi+', 'piid > 0.2')])
+fillParticleLists([('K-', 'kaonID > 0.2'), ('pi+', 'pionID > 0.2')])
 reconstructDecay('D0 -> K- pi+', '1.750 < M < 1.95')
 matchMCTruth('D0')
 

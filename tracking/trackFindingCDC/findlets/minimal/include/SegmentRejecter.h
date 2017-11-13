@@ -12,13 +12,13 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/filters/segment/SegmentFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
+
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 
 #include <vector>
 #include <string>
 
 namespace Belle2 {
-  class ModuleParamList;
 
   namespace TrackFindingCDC {
     class CDCSegment2D;

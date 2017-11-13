@@ -348,6 +348,12 @@ namespace Belle2 {
       //! Get the pointer to the definition of a module
       const Module* findModule(int layer, bool hasChimney) const;
 
+      //! Get the alignment transformation of a module
+      const HepGeom::Transform3D getModuleAlignment(bool isForward, int sector, int layer) const;
+
+      //! Get the displacement transformation of a module
+      const HepGeom::Transform3D getModuleDisplacedGeo(bool isForward, int sector, int layer) const;
+
     private:
 
       //! Hidden constructor
@@ -376,6 +382,21 @@ namespace Belle2 {
 
       //! Calculate additional geometry parameters
       void calculate();
+
+      //! Initialize and Updates alignment parameters from DB for reconstruction, that is for Module construction
+      //! and registers itself for subsequent updates of DB objects to keep the hierarchy up-to-date.
+      //! note that alignment are supposed to only for reconstruction correction, but NOT the geometry constructor
+      void readAlignmentFromDB();
+
+      //! Initialize and Updates displacements parameters from DB for geometry constructor,
+      //! registers itself for subsequent updates of DB objects to keep the hierarchy up-to-date.
+      void readDisplacedGeoFromDB();
+
+      //! Convert 6 rigid body params (alignment/displacement) to corresponding Transform3D
+      //! Angles in radians, length units in centimeters.
+      //! three angles are defined as the intrinsic rotations, that is around u (alpha) --> v' (beta) --> w'' (gamma) axis
+      //! note this is equivalent with extrinsic rotation with the order w (gamma)--> v(beta) --> u (alpha)
+      HepGeom::Transform3D getTransformFromRigidBodyParams(double dU, double dV, double dW, double dAlpha, double dBeta, double dGamma);
 
       //! Flag for enabling beam background study (=use bkg sensitive-detector function too)
       bool m_DoBeamBackgroundStudy;
@@ -704,6 +725,12 @@ namespace Belle2 {
 
       //! map of <volumeIDs, pointers to defined modules>
       std::map<int, Module*> m_Modules;
+
+      //! map of <volumeIDs, alignment Transform3D>
+      std::map<int, HepGeom::Transform3D> m_Alignments;
+
+      //! map of <volumeIDs, displacement Transform3D>
+      std::map<int, HepGeom::Transform3D> m_Displacements;
 
       //! static pointer to the singleton instance of this class
       static GeometryPar* m_Instance;

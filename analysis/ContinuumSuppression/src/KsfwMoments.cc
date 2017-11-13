@@ -27,11 +27,10 @@
 
 namespace Belle2 {
 
-// ----------------------------------------------------------------------
-// Legendre
-// ----------------------------------------------------------------------
-  inline double
-  legendre(const double z, const int i)
+  /**
+   * Legendre polynomials
+   */
+  inline double legendre(const double z, const int i)
   {
     switch (i) {
       case 0:  return 1.;

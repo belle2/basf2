@@ -91,7 +91,7 @@ namespace Belle2 {
      * Set vector of dead channel numbers
      * @param channel ASIC channel id
      */
-    void setDeadChannels(std::vector<int> deadChannels) {m_deadChannel = deadChannels; }
+    void setDeadChannels(const std::vector<int>& deadChannels) {m_deadChannel = deadChannels; }
 
     /**
      * Return size of the list of dead channels
@@ -122,7 +122,7 @@ namespace Belle2 {
      * Set vector of bad connection channel numbers
      * @param channel ASIC channel id
      */
-    void setBadConnChannels(std::vector<int> badConnChannels) {m_badConnChannel = badConnChannels; }
+    void setBadConnChannels(const std::vector<int>& badConnChannels) {m_badConnChannel = badConnChannels; }
 
     /**
      * Return a channel number from the list of channels with bad offset adjustment
@@ -147,7 +147,7 @@ namespace Belle2 {
      * Set vector of bad offset channel numbers
      * @param channel ASIC channel id
      */
-    void setBadOffsetChannels(std::vector<int> badOffsetChannels) {m_badOffsetChannel = badOffsetChannels; }
+    void setBadOffsetChannels(const std::vector<int>&  badOffsetChannels) {m_badOffsetChannel = badOffsetChannels; }
 
     /**
      * Return a channel number from the list of channels with bad linearity
@@ -172,7 +172,7 @@ namespace Belle2 {
      * Set vector of bad linearity channel numbers
      * @param channel ASIC channel id
      */
-    void setBadLinChannels(std::vector<int> badLinChannels) {m_badLinChannel = badLinChannels; }
+    void setBadLinChannels(const std::vector<int>& badLinChannels) {m_badLinChannel = badLinChannels; }
 
     /** Return number of problematic channels
      * @return number of problematic channels

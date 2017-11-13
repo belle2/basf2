@@ -11,7 +11,7 @@
 #include <tracking/modules/relatedTracksCombiner/RelatedTracksCombinerModule.h>
 
 #include <framework/dataobjects/Helix.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 using namespace Belle2;
 
@@ -27,7 +27,7 @@ namespace {
 
     std::tie(cdcPosition, cdcMomentum, cdcCharge) = relatedCDCRecoTrack.extractTrackState();
 
-    const auto bField = BFieldMap::Instance().getBField(cdcPosition).Z();
+    const auto bField = BFieldManager::getFieldInTesla(cdcPosition).Z();
 
     const Helix cdcHelix(cdcPosition, cdcMomentum, cdcCharge, bField);
     const double arcLengthOfVXDPosition = cdcHelix.getArcLength2DAtXY(vxdPosition.X(), vxdPosition.Y());
@@ -91,6 +91,9 @@ void RelatedTracksCombinerModule::event()
         newMergedTrack->setChargeSeed(cdcCharge);
         newMergedTrack->addHitsFromRecoTrack(&vxdRecoTrack);
         newMergedTrack->addHitsFromRecoTrack(&cdcRecoTrack, newMergedTrack->getNumberOfTotalHits());
+
+        newMergedTrack->addRelationTo(&vxdRecoTrack);
+        newMergedTrack->addRelationTo(&cdcRecoTrack);
       } catch (genfit::Exception& e) {
         B2WARNING("Could not combine tracks, because of: " << e.what());
       }
@@ -99,6 +102,7 @@ void RelatedTracksCombinerModule::event()
     if (not hasPartner and (not m_useOnlyFittedTracksInSingles or cdcRecoTrack.wasFitSuccessful())) {
       RecoTrack* newTrack = cdcRecoTrack.copyToStoreArray(m_recoTracks);
       newTrack->addHitsFromRecoTrack(&cdcRecoTrack);
+      newTrack->addRelationTo(&cdcRecoTrack);
     }
   }
 
@@ -109,6 +113,7 @@ void RelatedTracksCombinerModule::event()
       if (not m_useOnlyFittedTracksInSingles or vxdRecoTrack.wasFitSuccessful()) {
         RecoTrack* newTrack = vxdRecoTrack.copyToStoreArray(m_recoTracks);
         newTrack->addHitsFromRecoTrack(&vxdRecoTrack);
+        newTrack->addRelationTo(&vxdRecoTrack);
       }
     }
   }

@@ -2,6 +2,8 @@
 #define BKLMRECONSTRUCTIONMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <bklm/dbobjects/BKLMTimeWindow.h>
 
 namespace Belle2 {
 
@@ -53,6 +55,15 @@ namespace Belle2 {
 
     //! half-width window (ns) of 2D hit relative to mean prompt time
     double m_PromptWindow;
+
+    //! flag for alignment correction, do the correction (true) or not (false)
+    bool m_ifAlign;
+
+    //! load timing cut from database or not
+    bool m_loadTimingFromDB;
+
+    //! time window parameters from dbobject
+    DBObjPtr<BKLMTimeWindow> m_timing;
 
   };
 } // end namespace Belle2

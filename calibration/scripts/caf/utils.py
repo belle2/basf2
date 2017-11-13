@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from basf2 import *
 import os
 from collections import deque
@@ -104,6 +107,8 @@ class IoV():
         return self._cpp_iov.overlaps(iov._cpp_iov)
 
     def __repr__(self):
+        """
+        """
         return "IoV(" + (",".join(["exp_low=" + str(self.exp_low),
                                    "run_low=" + str(self.run_low),
                                    "exp_high=" + str(self.exp_high),
@@ -126,35 +131,42 @@ class AlgResult(enum.Enum):
     #: failure Return code
     failure = CalibrationAlgorithm.c_Failure
 
+
 IoV_Result = namedtuple('IoV_Result', ['iov', 'result'])
 
 
-def runs_overlapping_iov(iov, vector_of_runs):
+def runs_overlapping_iov(iov, runs):
     """
-    Takes an overall IoV() object and a vector of runs vector<pair<int,int>>
-    and returns a vector containing only those runs that overlap
+    Takes an overall IoV() object and a list of Exp,Run tuples (i,j)
+    and returns the list of Exp,Run tuples containing only those runs that overlap
     with the IoV range.
     """
-    overlapping_runs = ROOT.vector('std::pair<int,int>')()
-    for run in vector_of_runs:
-        exp_low = run.first
-        run_low = run.second
-        if exp_low < 0:
-            exp_low = 0
-        if run_low < 0:
-            run_low = 0
-        run_iov = IoV(exp_low, run_low, run.first, run.second)
+    overlapping_runs = []
+    for run in runs:
+        # Construct an IOV of one run
+        run_iov = IoV(run[0], run[1], run[0], run[1])
         if run_iov.overlaps(iov):
-            overlapping_runs.push_back(run)
+            overlapping_runs.append(run)
     return overlapping_runs
 
 
-def iov_from_vector(iov_vector):
+def iov_from_runs(runs):
+    """
+    Takes a list of (Exp,Run) and returns the overall IoV from the lowest ExpRun to the highest.
+    It returns an IoV() object and assumes that the list was in order to begin with.
+    """
+    if len(runs) > 1:
+        exprun_low, exprun_high = runs[0], runs[-1]
+    else:
+        exprun_low, exprun_high = runs[0], runs[0]
+    return IoV(exprun_low[0], exprun_low[1], exprun_high[0], exprun_high[1])
+
+
+def iov_from_runvector(iov_vector):
     """
     Takes a vector of ExpRun from CalibrationAlgorithm and returns
     the overall IoV from the lowest ExpRun to the highest. It returns
-    a tuple of the form ((exp_low, run_low), (exp_high, run_high))
-    It assumes that the vector was in order to begine with.
+    an IoV() object. It assumes that the vector was in order to begin with.
     """
     import copy
     exprun_list = [list((iov.first, iov.second)) for iov in iov_vector]
@@ -162,13 +174,15 @@ def iov_from_vector(iov_vector):
         exprun_low, exprun_high = exprun_list[0], exprun_list[-1]
     else:
         exprun_low, exprun_high = exprun_list[0], copy.deepcopy(exprun_list[0])
-    # Makes sure that we never have exp_low and run_low less than 0
-    # Sets them to 0 if they are
-    if exprun_low[0] < 0:
-        exprun_low[0] = 0
-    if exprun_low[1] < 0:
-        exprun_low[1] = 0
     return IoV(exprun_low[0], exprun_low[1], exprun_high[0], exprun_high[1])
+
+
+def runs_from_vector(exprun_vector):
+    """
+    Takes a vector of ExpRun from CalibrationAlgorithm and returns
+    a Python list of (exp,run) tuples in the same order.
+    """
+    return [(exprun.first, exprun.second) for exprun in exprun_vector]
 
 
 def find_sources(dependencies):

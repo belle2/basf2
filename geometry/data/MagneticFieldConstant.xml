@@ -8,9 +8,9 @@
 		<Components>
 		        <!-- Homogeneous magnetic field -->		
 			<Component type="Constant">
-				<X>0.0</X>
-				<Y>0.0</Y>
-				<Z>1.5</Z>
+				<X unit="T">0.0</X>
+				<Y unit="T">0.0</Y>
+				<Z unit="T">1.5</Z>
 				<MaxR unit="mm">0.0</MaxR>
 				<MinZ unit="mm">-4000.0</MinZ>
 				<MaxZ unit="mm">4000.0</MaxZ>

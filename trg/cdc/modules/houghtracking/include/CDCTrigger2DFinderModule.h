@@ -95,6 +95,10 @@ namespace Belle2 {
     /** count the number of super layers with hits
      *  @param array of hit/no hit for all super layers */
     unsigned short countSL(bool*);
+    /** check the short track condition
+     *  (= hits in the inner super layers rather than any super layers)
+     *  @param array of hit/no hit for all super layers */
+    bool shortTrack(bool*);
 
     /** Combine Hough candidates to tracks by merging connected cells.
      *  The track coordinate is the center of gravity of the resulting cell cluster. */
@@ -191,6 +195,9 @@ namespace Belle2 {
     /** minimum number of hits from different super layers in a Hough cell
      *  to form a candidate */
     unsigned m_minHits;
+    /** short tracks require hits in the first minHitsShort super layers
+     *  to form a candidate */
+    unsigned m_minHitsShort;
     /** minimum number of cells in a cluster to form a track */
     unsigned m_minCells;
     /** switch to ignore candidates connected to cells with higher super layer count */

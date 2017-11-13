@@ -170,7 +170,7 @@ void pxdClusterShapeCalibrationModule::prepare()
     fasc = fopen("PQClusters.asc", "w");
 }
 
-void pxdClusterShapeCalibrationModule::terminate()
+void pxdClusterShapeCalibrationModule::finish()
 {
   if (m_ExportDataForPQ)
     fclose(fasc);
@@ -408,10 +408,10 @@ void pxdClusterShapeCalibrationModule::collect()
                             m_ResidUTrueRH * 10000, m_ResidVTrueRH * 10000, m_ResidUTrueCl * 10000, m_ResidVTrueCl * 10000);
         B2DEBUG(200, strDebugInfo.Data());
 
-        getObject<TTree>("pxdCal").Fill();
+        getObjectPtr<TTree>("pxdCal")->Fill();
         if (m_iCls % 1000 == 0) {
-          getObject<TTree>("pxdCal").FlushBaskets();
-          getObject<TTree>("pxdCal").AutoSave();
+          getObjectPtr<TTree>("pxdCal")->FlushBaskets();
+          getObjectPtr<TTree>("pxdCal")->AutoSave();
         }
         m_iCls++;
       }
@@ -488,10 +488,10 @@ void pxdClusterShapeCalibrationModule::collect()
           double trVmid = info.getVCellPosition(iTrV);
           float trUNorm = (trU - trUmid) / uPitch;
           float trVNorm = (trV - trVmid) / vPitch;
-          for (auto digit : cluster.getRelationsTo<PXDDigit>()) {
-            float signal = digit.getCharge();
-            short int idigU = digit.getUCellID();
-            short int idigV = digit.getVCellID();
+          for (auto digit1 : cluster.getRelationsTo<PXDDigit>()) {
+            float signal = digit1.getCharge();
+            short int idigU = digit1.getUCellID();
+            short int idigV = digit1.getVCellID();
             int ind1 = 2 - idigU + iTrU;
             int ind2 = 2 - idigV + iTrV;
             if ((ind1 < 0) || (ind1 > 4)) continue;
@@ -526,10 +526,10 @@ void pxdClusterShapeCalibrationModule::collect()
         m_InPixUTrue = (truehit.getU() - info.getUCellPosition(info.getUCellID(truehit.getU()))) / info.getUPitch(truehit.getU());
         m_InPixVTrue = (truehit.getV() - info.getVCellPosition(info.getVCellID(truehit.getV()))) / info.getVPitch(truehit.getV());
 
-        getObject<TTree>("pxdCal").Fill();
+        getObjectPtr<TTree>("pxdCal")->Fill();
         if (m_iCls % 1000 == 0) {
-          getObject<TTree>("pxdCal").FlushBaskets();
-          getObject<TTree>("pxdCal").AutoSave();
+          getObjectPtr<TTree>("pxdCal")->FlushBaskets();
+          getObjectPtr<TTree>("pxdCal")->AutoSave();
         }
         m_iCls++;
       } // end of truehit

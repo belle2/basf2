@@ -7,8 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
+
+#include <tracking/trackFindingCDC/geometry/SZParameters.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

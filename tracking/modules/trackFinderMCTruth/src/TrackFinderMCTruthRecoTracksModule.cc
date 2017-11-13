@@ -30,7 +30,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/WireTrackCandHit.h>
 
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 #include <boost/foreach.hpp>
 
@@ -140,7 +140,7 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
   addParam("EnergyCut",
            m_energyCut,
            "Track candidates are only created for MCParticles with energy larger than this cut ",
-           double(0.1));
+           double(0.0));
 
   addParam("Neutrals",
            m_neutrals,
@@ -599,8 +599,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
     } // end if m_useSVDHits
 
     // prepare rejection of CDC hits from higher order loops
-    const TVector3 origin(0.0, 0.0, 0.0);
-    const double Bz = BFieldMap::Instance().getBField(origin).Z();
+    const double Bz = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
     auto isWithinNLoops = [Bz](const CDCHit * cdcHit, double nLoops) {
       const CDCSimHit* cdcSimHit = cdcHit->getRelated<CDCSimHit>();
       if (not cdcSimHit) return false;

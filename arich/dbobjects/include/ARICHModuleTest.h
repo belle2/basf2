@@ -126,7 +126,7 @@ namespace Belle2 {
      * Set vector of dead channel numbers
      * @param HAPD channel id
      */
-    void setDeadChs(std::vector<int> deadChs) {m_deadCh = deadChs; }
+    void setDeadChs(const std::vector<int>& deadChs) {m_deadCh = deadChs; }
 
     /**
      * Return size of the list of dead channels
@@ -151,7 +151,7 @@ namespace Belle2 {
      * Set vector of strange channel numbers
      * @param HAPD channel id
      */
-    void setStrangeChs(std::vector<int> strangeChs) {m_strangeCh = strangeChs; }
+    void setStrangeChs(const std::vector<int>& strangeChs) {m_strangeCh = strangeChs; }
 
     /**
      * Return size of the list of strange channels

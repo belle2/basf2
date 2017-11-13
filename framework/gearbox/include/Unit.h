@@ -40,16 +40,28 @@ namespace Belle2 {
 
   public:
 
-    // standard units
+    /**
+     * Standard units with the value = 1.
+     */
     static const double cm;           /**< Standard of [length] */
     static const double ns;           /**< Standard of [time] */
     static const double GHz;          /**< Standard of [frequency] */
     static const double rad;          /**< Standard of [angle] */
     static const double GeV;          /**< Standard of [energy, momentum, mass] */
     static const double K;            /**< Standard of [temperature] */
-    static const double T;            /**< Standard of [magnetic field] */
     static const double e;            /**< Standard of [electric charge] */
+
+    /**
+     * Practical units with the value set at 1.
+     * These units are NOT consistent with the other standard units.
+     * Please use them carefully.
+     */
     static const double g_cm3;        /**< Standard of [density] */
+
+
+    /**
+     * Derived units.
+     */
 
     // length units
     static const double km;           /**< [kilometers] */
@@ -102,6 +114,12 @@ namespace Belle2 {
     static const double TeV;          /**< [teraelectronvolt] */
     static const double J;            /**< [joule] */
     static const double V;            /**< [voltage] */
+
+    // magnetic field units
+    static const double T;            /**< [tesla] */
+    static const double mT;           /**< [millitesla] */
+    static const double Gauss;        /**< [gauss] */
+    static const double kGauss;       /**< [kilogauss] */
 
     // charge units
     static const double C;            /**< [coulomb] */

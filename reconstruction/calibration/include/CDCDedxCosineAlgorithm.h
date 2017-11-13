@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <reconstruction/dbobjects/CDCDedxCosineCor.h>
 #include <calibration/CalibrationAlgorithm.h>
 
 namespace Belle2 {
@@ -38,9 +39,7 @@ namespace Belle2 {
      */
     virtual EResult calibrate();
 
-
   private:
 
-    ClassDef(CDCDedxCosineAlgorithm, 0); /**< Class for CDC dE/dx calibration algorithm **/
   };
 } // namespace Belle2

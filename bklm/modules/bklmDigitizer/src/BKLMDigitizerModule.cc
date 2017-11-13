@@ -59,6 +59,9 @@ BKLMDigitizerModule::BKLMDigitizerModule() : Module()
   m_enableConstBkg = 0;
   m_timeResolution = 3.0; // ns
   m_ADCRange = 4096; // to be filled by actual value in FPGA
+  m_MPPCGain = 20;
+  m_ADCOffset = 3400;
+  m_ADCThreshold = 140;
 
 }
 
@@ -75,27 +78,31 @@ void BKLMDigitizerModule::initialize()
   StoreArray<BKLMDigit> bklmDigit;
   bklmDigit.registerInDataStore();
   bklmSimHit.registerRelationTo(bklmDigit);
-  GearDir dig("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/DigitizationParams");
-  m_ADCSamplingTime = dig.getDouble("ADCSamplingTime");
-  m_nDigitizations = dig.getDouble("nDigitizations");
-  m_nPEperMeV = dig.getDouble("nPEperMeV");
-  m_minCosTheta = cos(M_PI * dig.getDouble("MaxTotalIRAngle") / 180.0);
-  m_mirrorReflectiveIndex = dig.getDouble("MirrorReflectiveIndex");
-  m_scintillatorDeExcitationTime = dig.getDouble("ScintDeExTime");
-  m_fiberDeExcitationTime = dig.getDouble("FiberDeExTime");
-  m_fiberLightSpeed = dig.getDouble("FiberLightSpeed");
-  m_attenuationLength = dig.getDouble("AttenuationLength");
-  m_PEAttenuationFreq = dig.getDouble("PEAttenuationFreq"); // wrong value
-  m_PEAttenuationFreq = 1.0 / 8.75; // from T2K paper by F. Retiere: PoS (PD07) 017
-  m_meanSiPMNoise = dig.getDouble("MeanSiPMNoise");
-  m_enableConstBkg = dig.getDouble("EnableConstBkg") > 0;
-  m_timeResolution = dig.getDouble("TimeResolution");
+
+  m_ADCRange = m_digitParams->getADCRange();
+  m_ADCSamplingTime = m_digitParams->getADCSamplingTime();
+  m_nDigitizations = m_digitParams->getNDigitizations();
+  m_nPEperMeV = m_digitParams->getNPEperMeV();
+  m_minCosTheta = m_digitParams->getMinCosTheta();
+  m_mirrorReflectiveIndex = m_digitParams->getMirrorReflectiveIndex();
+  m_scintillatorDeExcitationTime = m_digitParams->getScintillatorDeExcitationTime();
+  m_fiberDeExcitationTime = m_digitParams->getFiberDeExcitationTime();
+  m_fiberLightSpeed = m_digitParams->getFiberLightSpeed();
+  m_attenuationLength = m_digitParams->getAttenuationLength();
+  m_PEAttenuationFreq = m_digitParams->getPEAttenuationFrequency();
+  m_meanSiPMNoise = m_digitParams->getMeanSiPMNoise();
+  m_enableConstBkg = m_digitParams->getEnableConstBkg();
+  m_timeResolution = m_digitParams->getTimeResolution();
 }
 
 void BKLMDigitizerModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
   B2INFO("BKLMDigitizer: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
+
+  m_MPPCGain = m_ADCParams->getMPPCGain();
+  m_ADCOffset = m_ADCParams->getADCOffset();
+  m_ADCThreshold = m_ADCParams->getADCThreshold();
 }
 
 void BKLMDigitizerModule::event()
@@ -257,9 +264,14 @@ void BKLMDigitizerModule::processEntry(std::vector<std::pair<int, BKLMSimHit*> >
   double bkgAmplitude = 0.0;
   if (bkgCount > 0) bkgAmplitude = bkgArea / double(bkgCount);
 
-  bklmDigit->setNPixel((sum - (last - first + 1) * bkgAmplitude) * 2.0 / m_ADCRange);
+  double recNPE = (sum - (last - first + 1) * bkgAmplitude) * 2.0 / m_ADCRange;
+  int charge = recNPE * m_MPPCGain;
+  if (charge > m_ADCOffset) charge = m_ADCOffset; //need improvement
+  bklmDigit->setNPixel(recNPE);
+  bklmDigit->setCharge(charge);
   bklmDigit->setEDep(bklmDigit->getNPixel() / m_nPEperMeV);
-  bklmDigit->isAboveThreshold(nPE > m_discriminatorThreshold);
+  //bklmDigit->isAboveThreshold(nPE > m_discriminatorThreshold);
+  bklmDigit->isAboveThreshold(charge > m_ADCThreshold);
   return;
 }
 

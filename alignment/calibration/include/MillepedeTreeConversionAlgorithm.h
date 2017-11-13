@@ -50,9 +50,6 @@ namespace Belle2 {
     /** Output file name. */
     std::string m_OutputFile;
 
-    /** To make objects storable. */
-    ClassDef(MillepedeTreeConversionAlgorithm, 1);
-
   };
 
 }

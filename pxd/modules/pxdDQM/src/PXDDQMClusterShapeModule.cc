@@ -373,7 +373,7 @@ void PXDDQMClusterShapeModule::defineHisto()
               i_vector += i_angleV;
               int i_vectorSpecial[4];  // Vectors to special file with correction only in one i_pk case
               for (int i = 0; i < 4; i++) {
-                int i_pkSp;
+                int i_pkSp = 0;
                 if (i == 0) i_pkSp = 2;
                 else if (i == 1) i_pkSp = 3;
                 else if (i == 2) i_pkSp = 6;

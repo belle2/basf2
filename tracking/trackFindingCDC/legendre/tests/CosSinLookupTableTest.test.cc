@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 
-#include <boost/math/constants/constants.hpp>
+#include <cmath>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -21,13 +21,13 @@ TEST(CosSinLookupTableTest, compute_sin_cos)
   auto inst = AxialHitQuadTreeProcessor::getCosSinLookupTable();
 
   auto binCount = inst.getNBins();
-  double binWidth = 2.0f * boost::math::constants::pi<double>() / binCount;
+  float binWidth = 2 * M_PI / binCount;
 
   // test the range of bins
   for (long i = 0; i <= binCount; i++) {
     float cs_0 = inst.at(i).x();
-    EXPECT_NEAR(cos(i * binWidth -  boost::math::constants::pi<double>()), cs_0, 0.000001);
+    EXPECT_NEAR(cos(i * binWidth - M_PI), cs_0, 0.000001);
     float ss_0 = inst.at(i).y();
-    EXPECT_NEAR(sin(i * binWidth -  boost::math::constants::pi<double>()), ss_0, 0.000001);
+    EXPECT_NEAR(sin(i * binWidth - M_PI), ss_0, 0.000001);
   }
 }

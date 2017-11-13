@@ -27,8 +27,15 @@ namespace Belle2 {
 
   namespace CDC {
 
+
+
     /**
-     * Analysis data of CDC-TOP test two tracks case.
+     * Create QAM histograms.
+     */
+    void createQAMHist(TTree*);
+
+    /**
+     * Analysis module for CDC CR data.
      */
 
     class CDCCosmicAnalysisModule : public Module {
@@ -66,7 +73,6 @@ namespace Belle2 {
        * Termination action.
        */
       virtual void terminate();
-
 
     private:
       StoreObjPtr<EventT0> m_eventTimeStoreObject; /**<Event t0 */
@@ -121,6 +127,7 @@ namespace Belle2 {
       bool m_noBFit; /**< fit incase no magnetic Field of not, if true, NDF=4 in cal P-value */
       bool m_EventT0Extraction;/**< run with event t0 extraction*/
       bool m_phi0InRad; /**< Unit of phi0, true: radian, false: degree */
+      bool m_qam; /**< Enable output of QAM histogram */
     };
   }
 }

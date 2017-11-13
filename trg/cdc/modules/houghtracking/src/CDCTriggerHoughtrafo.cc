@@ -37,6 +37,19 @@ CDCTrigger2DFinderModule::countSL(bool* layer)
   return lcnt;
 }
 
+bool
+CDCTrigger2DFinderModule::shortTrack(bool* layer)
+{
+  unsigned short lcnt = 0;
+  // check axial super layers (even layer number),
+  // break at first layer without hit
+  for (int i = 0; i < CDC_SUPER_LAYERS; i += 2) {
+    if (layer[i] == true) ++lcnt;
+    else break;
+  }
+  return (lcnt >= m_minHitsShort);
+}
+
 /*
 * Find the intercept in hough space.
 * In each iteration the Hough plane is divided in quarters.
@@ -130,7 +143,7 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
               << " layerHit " << int(layerHit[0]) << int(layerHit[2])
               << int(layerHit[4]) << int(layerHit[6]) << int(layerHit[8])
               << " nSL " << nSL);
-      if (nSL >= m_minHits) {
+      if (nSL >= m_minHits || shortTrack(layerHit)) {
         if (iterations != maxIterations) {
           fastInterceptFinder(hits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);
         } else {

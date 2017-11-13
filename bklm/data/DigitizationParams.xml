@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DigitizationParams>
+  <ADCRange desc="ADC range">4096</ADCRange>
+  <ADCSamplingTime desc="ns">1.0</ADCSamplingTime>
+  <nDigitizations desc="">200</nDigitizations>
+  <nPEperMeV desc="">22</nPEperMeV>
+  <!--<ADCPedestal desc="ADC pedestal">100</ADCPedestal> -->
+  <!--<ADCPEAmplitude desc="ADC photoelectron amplitude">30</ADCPEAmplitude> -->
+  <!--<ADCSaturation desc="ADC readout corresponding to saturation">1023</ADCSaturation>-->
+  <MaxTotalIRAngle desc="deg">26.7</MaxTotalIRAngle>
+  <MirrorReflectiveIndex desc="">0.95</MirrorReflectiveIndex>
+  <ScintDeExTime desc="ns">3.0</ScintDeExTime>
+  <FiberDeExTime desc="ns">10.0</FiberDeExTime>
+  <FiberLightSpeed desc="cm/ns">17.0</FiberLightSpeed>
+  <AttenuationLength desc="cm">300.0</AttenuationLength>
+  <PEAttenuationFreq desc="ns^-1">0.114286</PEAttenuationFreq>
+  <MeanSiPMNoise desc="">-1</MeanSiPMNoise>
+  <EnableConstBkg desc="">0</EnableConstBkg>
+  <TimeResolution desc="ns">3.0</TimeResolution>
+  <MPPCGain desc="">20</MPPCGain>
+  <ADCOffset desc="ADC offset">3400</ADCOffset>
+  <ADCThreshold desc="">140</ADCThreshold>
+</DigitizationParams>

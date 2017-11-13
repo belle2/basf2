@@ -47,7 +47,7 @@ if __name__ == "__main__":
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = training_data
     general_options.m_treename = "tree"
-    general_options.m_variables = basf2_mva.vector('p', 'pz', 'daughter(0, Kid)', 'chiProb', 'M')
+    general_options.m_variables = basf2_mva.vector('p', 'pz', 'daughter(0, kaonID)', 'chiProb', 'M')
     general_options.m_target_variable = "isSignal"
 
     # Start optimization

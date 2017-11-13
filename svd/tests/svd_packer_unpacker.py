@@ -8,7 +8,6 @@ import numpy
 
 import simulation
 
-mapping_file = Belle2.FileSystem.findFile("svd/data/svd_mapping.xml")
 svd_digits_pack_unpack_collection = "SVDDigits_test"
 set_random_seed(42)
 
@@ -83,6 +82,7 @@ class SvdPackerUnpackerTestModule(Module):
             assert hit.getSensorID().getSensorNumber() == hitPackedUnpacked.getSensorID().getSensorNumber()
             assert hit.getSensorID().getSegmentNumber() == hitPackedUnpacked.getSensorID().getSegmentNumber()
 
+
 # to run the framework the used modules need to be registered
 particlegun = register_module('ParticleGun')
 particlegun.param('pdgCodes', [13, -13])
@@ -108,13 +108,11 @@ Packer = register_module('SVDPacker')
 Packer.param('NodeID', nodeid)
 Packer.param('svdDigitListName', 'SVDDigits')
 Packer.param('rawSVDListName', 'SVDRaw')
-Packer.param('xmlMapFileName', mapping_file)
 main.add_module(Packer)
 
 unPacker = register_module('SVDUnpacker')
 unPacker.param('rawSVDListName', 'SVDRaw')
 unPacker.param('svdDigitListName', svd_digits_pack_unpack_collection)
-unPacker.param('xmlMapFileName', mapping_file)
 main.add_module(unPacker)
 
 # run custom test module to check if the SVDDigits and the

@@ -37,7 +37,9 @@ namespace Belle2 {
   /** Define a new Unit and take the variable name as name for the conversion table */
 #define DEFINE_UNIT(var,value) DEFINE_UNIT_NAME(var,value,#var)
 
-// standard units
+  /**
+   * Standard units with the value = 1.
+   */
   DEFINE_UNIT(cm    , 1.); /**< Standard of [length] */
   DEFINE_UNIT(ns    , 1.); /**< Standard of [time] */
   DEFINE_UNIT(GHz   , 1.); /**< Standard of [frequency] */
@@ -45,7 +47,17 @@ namespace Belle2 {
   DEFINE_UNIT(GeV   , 1.); /**< Standard of [energy, momentum, mass] */
   DEFINE_UNIT(K     , 1.); /**< Standard of [temperature] */
   DEFINE_UNIT(e     , 1.); /**< Standard of [electric charge] */
+
+  /**
+   * Practical units with the value = 1.
+   * These units are NOT consistent with the other standard units.
+   * Please use them carefully.
+   */
   DEFINE_UNIT_NAME(g_cm3 , 1., "g/cm3"); /**< Standard of [density] */
+
+  /**
+   * Derived units
+   */
 
 // length units
   DEFINE_UNIT(km  , Unit::cm * 1e5);   /**< [kilometers] */
@@ -103,6 +115,12 @@ namespace Belle2 {
   DEFINE_UNIT(C  , 1.0 / TMath::Qe() * Unit::e); /**< [Coulomb] */
   DEFINE_UNIT(fC , Unit::C / 1.0e15);            /**< [femtoCoulomb] */
 
+// magnetic field units
+  DEFINE_UNIT(T  , Unit::V * Unit::s / Unit::m2); /**< [Tesla] */
+  DEFINE_UNIT(mT , Unit::T * 1e-3);               /**< [millitesla] */
+  DEFINE_UNIT(Gauss , Unit::T * 1e-4);            /**< [Gauss] */
+  DEFINE_UNIT(kGauss , Unit::Gauss * 1e3);        /**< [kiloGauss] */
+
 // density units
   DEFINE_UNIT_NAME(mg_cm3  , Unit::g_cm3 * 1e-3, "mg/cm3"); /**< [mg/cm^3] */
   DEFINE_UNIT_NAME(kg_cm3  , Unit::g_cm3 * 1e3, "kg/cm3");  /**< [kg/cm^3] */
@@ -110,7 +128,6 @@ namespace Belle2 {
   DEFINE_UNIT_NAME(mg_mm3  , Unit::mg_cm3 / Unit::mm3, "mg/mm3"); /**< [mg/mm^3] */
   DEFINE_UNIT_NAME(kg_mm3  , Unit::kg_cm3 / Unit::mm3, "kg/mm3"); /**< [kg/mm^3] */
 
-  DEFINE_UNIT(T  , Unit::V * Unit::s / Unit::m2); /**< Standard of [magnetic field] */
 
   double Unit::convertValue(double value, const std::string& unitString)
   {

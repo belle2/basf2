@@ -23,13 +23,39 @@ namespace TreeFitter {
   extern int vtxverbose ;
 
   RecoComposite::RecoComposite(Belle2::Particle* particle, const ParticleBase* mother)
-    : ParticleBase(particle, mother), m_m(), m_matrixV(), m_hasEnergy(true)
+    : ParticleBase(particle, mother), m_m(), m_params(), m_matrixV(), m_hasEnergy(true)
   {
     //FT: this requires the ability to flag a vertex for mass constraining, which we can't easily do right now
     //    bool massconstraint = particle && particle->constraint(BtaConstraint::Mass) ;
     //    m_hasEnergy = !massconstraint ;
-    updCache() ;
+    //updCache() ;
+    updateParams();
   }
+
+  ErrCode RecoComposite::initParticleWithMother(FitParams* fitparams)
+  {
+    //JFK: replacing initPar2 2017-09-25
+    return initTauCopy(fitparams);
+  }
+  ErrCode RecoComposite::initMotherlessParticle(FitParams* fitparams)
+  {
+    //JFK: replacing initPar1 2017-09-25
+    int posindex = posIndex() ;
+    int momindex = momIndex() ;
+    fitparams->getStateVector().segment(posindex, 3) = m_params.segment(0, 3);
+    if (7 == dimMeas()) {
+      fitparams->getStateVector().segment(momindex, 4) = m_params.segment(3, 4);
+    } else {
+      fitparams->getStateVector().segment(momindex, 3) = m_params.segment(3, 3);
+
+    }
+    return ErrCode::success ;
+  }
+
+
+
+
+
 
   void RecoComposite::updCache()//FT had to split up all calls to "btafitparams"
   {
@@ -65,11 +91,6 @@ namespace TreeFitter {
         cov7out(row, col) = cov7in[3 + row][3 + col];
       }
     }
-    for (int row = 1; row <= 4; ++row) { //and the diagonal
-      for (int col = 1; col <= 3; ++col) {
-        cov7out(col, 3 + row) = cov7in[row - 1][3 + col];
-      }
-    }
     //FT: the above has to be optimized later into a single loop; doesn't matter right now since we don't use it.
     m_matrixV = cov7out.sub(1, dimM()) ; // so either 7 or 6, depending on mass constraint
     if (vtxverbose >= 4) {
@@ -77,6 +98,43 @@ namespace TreeFitter {
                 << " " << dimM() << " " << m_matrixV << std::endl ;
     }
   }
+  void RecoComposite::updateParams()//FT had to split up all calls to "btafitparams"
+  {
+    // cache par7 (x,y,z,px,py,pz,E) cov7
+    //JFK: change dimension for massconstraint 2017-09-25
+    TVector3 pos = particle()->getVertex();
+    TVector3 mom = particle()->getMomentum();
+    double energy = particle()->getEnergy();
+    const int size = dimMeas();
+    m_params = EigenTypes::ColVector::Zero(size, 1);
+    m_params(0) = pos.X();
+    m_params(1) = pos.Y();
+    m_params(2) = pos.Z();
+    m_params(3) = mom.X();
+    m_params(4) = mom.Y();
+    m_params(5) = mom.Z();
+    if (7 == size) {
+      m_params(6) = energy ; //JFK: change this for massconstraints 2017-09-25
+    }
+    m_covariance = EigenTypes::MatrixXd::Zero(size, size);
+    TMatrixFSym cov7in = getBasf2Particle()->getMomentumVertexErrorMatrix(); //this is (p,E,x)
+    //JFK: (p,E,x)->(x,p,E); didnt touch the part below except for 4->size-3 hope it is correct 2017-09-25
+    for (int row = 0; row < size - 3; ++row) { //first the p,E block
+      for (int col = 0; col <= row; ++col) {
+        m_covariance(3 + row, 3 + col) = cov7in[row][col];
+      }
+    }
+    for (int row = 0; row < 3; ++row) { //then the x block
+      for (int col = 0; col <= row; ++col) {
+        m_covariance(row, col) = cov7in[3 + row][3 + col];
+      }
+    }
+  }// end updateParams()
+
+
+
+
+
 
   RecoComposite::~RecoComposite() {}
 
@@ -119,6 +177,30 @@ namespace TreeFitter {
     }
     return ErrCode::success ;
   }
+  ErrCode RecoComposite::projectRecoCompositeCopy(const FitParams& fitparams, Projection& p) const
+  {
+    int posindex = posIndex() ;
+    int momindex = momIndex() ;
+    int size = dimMeas();
+    p.getResiduals().segment(0, 3) = fitparams.getStateVector().segment(posindex, 4) - m_params.segment(0, 3);
+    if (size == 7) {
+      p.getResiduals().segment(3, 4) = fitparams.getStateVector().segment(momindex, 4) - m_params.segment(3, 4);
+    } else if (size == 6) {
+      p.getResiduals().segment(3, 3) = fitparams.getStateVector().segment(momindex, 3) - m_params.segment(3, 3);
+    }
+
+    for (int row = 0; row < 3; ++row) {
+      p.getH()(row,  posindex + row) = 1;
+    }
+    for (int row = 0; row < size - 3; ++row) {
+      p.getH()(3 + row,  momindex + row) = 1;
+    }
+    p.getV().triangularView<Eigen::Lower>() = m_covariance.triangularView<Eigen::Lower>();
+    return ErrCode::success ;
+  }
+
+
+
 
   ErrCode RecoComposite::projectConstraint(Constraint::Type type, const FitParams& fitparams, Projection& p) const
   {

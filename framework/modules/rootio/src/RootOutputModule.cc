@@ -73,17 +73,22 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
   addParam(c_SteerBranchNames[1], m_branchNames[1],
            "Names of persistent durability branches to be saved. Empty means all branches. Objects with c_DontWriteOut flag added here will also be saved. (FileMetaData is always saved)",
            emptyvector);
-
+  addParam(c_SteerAdditionalBranchNames[0], m_additionalBranchNames[0],
+           "Add additional event branch names without the need to specify all branchnames.",
+           emptyvector);
+  addParam(c_SteerAdditionalBranchNames[1], m_additionalBranchNames[1],
+           "Add additional persistent branch names without the need to specify all branchnames.",
+           emptyvector);
   addParam(c_SteerExcludeBranchNames[0], m_excludeBranchNames[0],
            "Names of event durability branches NOT to be saved. Branches also in branchNames are not saved.", emptyvector);
   addParam(c_SteerExcludeBranchNames[1], m_excludeBranchNames[1],
            "Names of persistent durability branches NOT to be saved. Branches also in branchNamesPersistent are not saved.", emptyvector);
   addParam("autoFlushSize", m_autoflush,
            "Value for TTree SetAutoFlush(): a positive value tells ROOT to flush all baskets to disk after n entries, a negative value to flush after -n bytes",
-           -30000000);
+           -10000000);
   addParam("autoSaveSize", m_autosave,
            "Value for TTree SetAutoSave(): a positive value tells ROOT to write the TTree metadata after n entries, a negative value to write the metadata after -n bytes",
-           -30000000);
+           -10000000);
   addParam("basketSize", m_basketsize, "Basketsize for Branches in the Tree in bytes", 32000);
   addParam("additionalDataDescription", m_additionalDataDescription, "Additional dictionary of "
            "name->value pairs to be added to the file metadata to describe the data",
@@ -139,7 +144,9 @@ void RootOutputModule::initialize()
       const std::string& branchName = iter->first;
       //skip transient entries (allow overriding via branchNames)
       if (iter->second.dontWriteOut
-          && find(m_branchNames[durability].begin(), m_branchNames[durability].end(), branchName) == m_branchNames[durability].end())
+          && find(m_branchNames[durability].begin(), m_branchNames[durability].end(), branchName) == m_branchNames[durability].end()
+          && find(m_additionalBranchNames[durability].begin(), m_additionalBranchNames[durability].end(),
+                  branchName) ==  m_additionalBranchNames[durability].end())
         continue;
       //skip branches the user doesn't want
       if (branchList.count(branchName) == 0) {

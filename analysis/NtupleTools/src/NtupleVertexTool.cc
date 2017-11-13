@@ -24,20 +24,20 @@ void NtupleVertexTool::setupTree()
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
   if (strNames.empty()) return;
 
-  int nDecayProducts = strNames.size();
+  m_nDecayProducts = strNames.size();
 
-  m_fDX     = new float[nDecayProducts];
-  m_fDY     = new float[nDecayProducts];
-  m_fDZ     = new float[nDecayProducts];
-  m_fDEX     = new float[nDecayProducts];
-  m_fDEY     = new float[nDecayProducts];
-  m_fDEZ     = new float[nDecayProducts];
-  m_fDRho   = new float[nDecayProducts];
-  m_fPvalue = new float[nDecayProducts];
-  m_fProdV     = new float*[nDecayProducts];
-  m_fProdCov   = new float** [nDecayProducts];
+  m_fDX     = new float[m_nDecayProducts];
+  m_fDY     = new float[m_nDecayProducts];
+  m_fDZ     = new float[m_nDecayProducts];
+  m_fDEX     = new float[m_nDecayProducts];
+  m_fDEY     = new float[m_nDecayProducts];
+  m_fDEZ     = new float[m_nDecayProducts];
+  m_fDRho   = new float[m_nDecayProducts];
+  m_fPvalue = new float[m_nDecayProducts];
+  m_fProdV     = new float*[m_nDecayProducts];
+  m_fProdCov   = new float** [m_nDecayProducts];
 
-  for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
+  for (int iProduct = 0; iProduct < m_nDecayProducts; iProduct++) {
     m_tree->Branch((strNames[iProduct] + "_X").c_str(), &m_fDX[iProduct], (strNames[iProduct] + "_X/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_ErrX").c_str(), &m_fDEX[iProduct], (strNames[iProduct] + "_ErrX/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_Y").c_str(), &m_fDY[iProduct], (strNames[iProduct] + "_Y/F").c_str());
@@ -54,6 +54,27 @@ void NtupleVertexTool::setupTree()
                    (strNames[iProduct] + "_VtxProdCov[3][3]/F").c_str());
 
   }
+}
+
+void NtupleVertexTool::deallocateMemory()
+{
+  for (int iProduct = 0; iProduct < m_nDecayProducts; iProduct++) {
+    delete [] m_fProdV[iProduct];
+    for (int i = 0; i < 3; i++) {
+      delete [] m_fProdCov[iProduct][i];
+    }
+    delete [] m_fProdCov[iProduct];
+  }
+  delete [] m_fProdCov;
+  delete [] m_fProdV;
+  delete m_fPvalue;
+  delete m_fDRho;
+  delete m_fDEZ;
+  delete m_fDEY;
+  delete m_fDEX;
+  delete m_fDZ;
+  delete m_fDY;
+  delete m_fDX;
 }
 
 void NtupleVertexTool::eval(const Particle* particle)

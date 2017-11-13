@@ -57,7 +57,7 @@ namespace Belle2 {
     /**
      * This method is called at the end of the event processing.
      */
-    void terminate();
+    void finish();
 
   private:
 
@@ -66,9 +66,6 @@ namespace Belle2 {
 
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
-
-    /** Number of strips with different lengths. */
-    int m_nStripDifferent;
 
     /** Event (for tree branches). */
     struct EKLMTimeCalibrationAlgorithm::Event m_ev;

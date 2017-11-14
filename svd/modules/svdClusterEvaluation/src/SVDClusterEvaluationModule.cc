@@ -83,53 +83,54 @@ void SVDClusterEvaluationModule::initialize()
 
     if (i % 2 == 0) { //even index, U side
       NameOfHisto = "histo_ClusterUPositionResolution_" + IntExtFromIndex(i) + "_" + FWFromIndex(i);
-      TitleOfHisto = "Cluster U Position Resolution (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ")";
+      TitleOfHisto = "U-Cluster Position Resolution (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ")";
       m_histo_ClusterUPositionResolution[i / 2] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -0.1, 0.1,
-                                                  "U_Reconstructed - U_TrueHit",
+                                                  "U_reco - U_true (cm)",
                                                   m_histoList_ClusterPositionResolution);
 
       NameOfHisto = "histo_ClusterUPositionPull_" + IntExtFromIndex(i) + "_" + FWFromIndex(i);
-      TitleOfHisto = "Cluster U Position Pull (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ")";
+      TitleOfHisto = "U-Cluster Position Pull (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ")";
       m_histo_ClusterUPositionPull[i / 2] = createHistogram1D(NameOfHisto, TitleOfHisto, 210, -10, 11,
-                                                              "U_Reconstructed - U_TrueHit",
+                                                              "(U_reco - U_true)/U_sigma",
                                                               m_histoList_ClusterPositionPull);
     } else { //odd index, V side
       NameOfHisto = "histo_ClusterVPositionResolution_" + IntExtFromIndex(i) + "_" + FWFromIndex(i);
-      TitleOfHisto = "Cluster V Position Resolution (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ")";
+      TitleOfHisto = "V-Cluster Position Resolution (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ")";
       m_histo_ClusterVPositionResolution[(i - 1) / 2] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -0.1, 0.1,
-                                                        "V_Reconstructed - V_TrueHit", m_histoList_ClusterPositionResolution);
+                                                        "V_reco - V_true (cm)", m_histoList_ClusterPositionResolution);
 
       NameOfHisto = "histo_ClusterVPositionPull_" + IntExtFromIndex(i) + "_" + FWFromIndex(i);
       TitleOfHisto = "Cluster V Position Pull (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ")";
       m_histo_ClusterVPositionPull[(i - 1) / 2] = createHistogram1D(NameOfHisto, TitleOfHisto, 210, -10, 11,
-                                                  "V_Reconstructed - V_TrueHit", m_histoList_ClusterPositionPull);
+                                                  "(V_reco- V_true)/V_sigma", m_histoList_ClusterPositionPull);
     }
 
     NameOfHisto = "histo_StripTimeResolution_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
     TitleOfHisto = "Strip Time Resolution (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_StripTimeResolution[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_Reconstructed - t_TrueHit",
+    m_histo_StripTimeResolution[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_reco - t_true (ns)",
                                                        m_histoList_StripTimeResolution);
 
     NameOfHisto = "histo_ClusterTimeResolution_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
     TitleOfHisto = "Cluster Time Resolution (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_ClusterTimeResolution[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_Reconstructed - t_TrueHit",
+    m_histo_ClusterTimeResolution[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_reco - t_true (ns)",
                                                          m_histoList_ClusterTimeResolution);
 
     NameOfHisto = "histo_ClusterTimePull_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
     TitleOfHisto = "Cluster Time Pull (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_ClusterTimePull[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_Reconstructed - t_TrueHit",
+    m_histo_ClusterTimePull[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "(t_reco - t_true)/t_sigma",
                                                    m_histoList_ClusterTimePull);
 
     NameOfHisto = "histo2D_TresVsPosres_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Residual time (t Rec - t TH) Vs Residual U/V position (U/V rec - U/V TH) (" + IntExtFromIndex(
+    TitleOfHisto = "Time Residuals Vs U/V Position Residuals (" + IntExtFromIndex(
                      i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(i) + ")";
-    m_histo2D_TresVsPosres[i] = createHistogram2D(NameOfHisto, TitleOfHisto, 200, -0.1, 0.1, "U/V_rec - U/V_TH", 180, -120, 60,
-                                                  "t_rec - t_TH", m_histo2DList_TresVsPosres);
+    m_histo2D_TresVsPosres[i] = createHistogram2D(NameOfHisto, TitleOfHisto, 200, -0.1, 0.1, "U/V_reco - U/V_true (cm)", 180, -120, 60,
+                                                  "t_reco - t_true (ns)", m_histo2DList_TresVsPosres);
 
     NameOfHisto = "histo_PurityInsideTMCluster_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Fraction of Truth-matched Recos inside a Truth-matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
+    TitleOfHisto = "Fraction of Truth-Matched RecoDigits inside a Truth-Matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
                      i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_PurityInsideTMCluster[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 110, 0, 1.10, "number of TM recos / cluster size",
+    m_histo_PurityInsideTMCluster[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 110, 0, 1.10,
+                                                         "number of TM recoDigits / cluster size",
                                                          m_histoList_PurityInsideTMCluster);
 
     NameOfHisto = "histo2D_PurityInsideTMCluster_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
@@ -139,9 +140,11 @@ void SVDClusterEvaluationModule::initialize()
                                                            "number of TM recos", m_histo2DList_PurityInsideTMCluster);
 
     NameOfHisto = "histo_PurityInsideNOTMCluster_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
-    TitleOfHisto = "Fraction of Truth-matched Recos inside a NOT Truth-matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
+    TitleOfHisto = "Fraction of Truth-matched RecoDigits inside a NOT Truth-matched Cluster (" + IntExtFromIndex(
+                     i) + ", " + FWFromIndex(
                      i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_PurityInsideNOTMCluster[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 110, 0, 1.10, "number of TM recos / cluster size",
+    m_histo_PurityInsideNOTMCluster[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 110, 0, 1.10,
+                                                           "number of TM recoDigits / cluster size",
                                                            m_histoList_PurityInsideNOTMCluster);
 
     NameOfHisto = "m_histoList_Puddlyness_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
@@ -354,10 +357,10 @@ void SVDClusterEvaluationModule::endRun()
   }
 
   //GRAPHS
-  createEfficiencyGraph("recoEff", "Efficiency of Recoing ( RecoDigits / ShaperDigits )", m_NumberOfRecoDigit, m_NumberOfShaperDigit,
+  createEfficiencyGraph("recoEff", "Strip Fit Efficiency ( RecoDigits / ShaperDigits )", m_NumberOfRecoDigit, m_NumberOfShaperDigit,
                         "set", "efficiency", m_graphList);
 
-  createEfficiencyGraph("clusterEff", "Efficiency of Clustering ( Truth-Matched Clusters / TrueHits )", m_NumberOfClustersRelatedToTH,
+  createEfficiencyGraph("clusterEff", "Clustering Efficiency ( Truth-Matched Clusters / TrueHits )", m_NumberOfClustersRelatedToTH,
                         m_NumberOfTH, "set", "efficiency", m_graphList);
 
   createEfficiencyGraph("clusterPurity", "Purity of Clusters ( Truth-Matched Clusters / All Clusters )", m_NumberOfTMClusters,
@@ -365,28 +368,28 @@ void SVDClusterEvaluationModule::endRun()
 
   //means-from-histos graphs
   createArbitraryGraphErrorChooser("stripTime_Means", "Strip Time Resolution", m_OrderingVec, m_NullVec, m_mean_StripTimeResolution,
-                                   m_RMS_StripTimeResolution, "set", "mean t_Reconstructed - t_TrueHit", m_graphList, m_Nsets);
+                                   m_RMS_StripTimeResolution, "set", "time residuals (ns)", m_graphList, m_Nsets);
 
   createArbitraryGraphErrorChooser("clusterTime_Means", "Cluster Time Resolution", m_OrderingVec, m_NullVec,
-                                   m_mean_ClusterTimeResolution, m_RMS_ClusterTimeResolution, "set", "mean t_Reconstructed - t_TrueHit", m_graphList, m_Nsets);
+                                   m_mean_ClusterTimeResolution, m_RMS_ClusterTimeResolution, "set", "time residuals (ns)", m_graphList, m_Nsets);
 
   createArbitraryGraphErrorChooser("clusterUposition_Means", "Cluster U Position Resolution", m_OrderingVec, m_NullVec,
-                                   m_mean_ClusterUPositionResolution, m_RMS_ClusterUPositionResolution, "set", "mean U_Reconstructed - U_TrueHit", m_graphList,
+                                   m_mean_ClusterUPositionResolution, m_RMS_ClusterUPositionResolution, "set", "U position residuals (cm)", m_graphList,
                                    m_NsetsRed);
 
   createArbitraryGraphErrorChooser("clusterVposition_Means", "Cluster V Position Resolution", m_OrderingVec, m_NullVec,
-                                   m_mean_ClusterVPositionResolution, m_RMS_ClusterVPositionResolution, "set", "mean V_Reconstructed - V_TrueHit", m_graphList,
+                                   m_mean_ClusterVPositionResolution, m_RMS_ClusterVPositionResolution, "set", "V position residuals (cm)", m_graphList,
                                    m_NsetsRed);
 
   createArbitraryGraphErrorChooser("clusterInternalPurity_Means", "Fraction of Truth-matched Recos inside a Truth-matched Cluster",
                                    m_OrderingVec, m_NullVec, m_mean_PurityInsideTMCluster, m_RMS_PurityInsideTMCluster, "set",
-                                   "mean number of TM recos / cluster size", m_graphList, m_Nsets);
+                                   "number of TM recos / cluster size", m_graphList, m_Nsets);
 
   createArbitraryGraphErrorChooser("puddlyness_Means", "Number of True Hits inside a Cluster", m_OrderingVec, m_NullVec,
-                                   m_mean_Puddlyness, m_RMS_Puddlyness, "set", "mean number of TH per cluster", m_graphList, m_Nsets);
+                                   m_mean_Puddlyness, m_RMS_Puddlyness, "set", "number of TH per cluster", m_graphList, m_Nsets);
 
   createArbitraryGraphErrorChooser("puddlynessTM_Means", "Number of True Hits inside a TM Cluster", m_OrderingVec, m_NullVec,
-                                   m_mean_PuddlynessTM, m_RMS_PuddlynessTM, "set", "mean number of TH per TM cluster", m_graphList, m_Nsets);
+                                   m_mean_PuddlynessTM, m_RMS_PuddlynessTM, "set", "number of TH per TM cluster", m_graphList, m_Nsets);
 
   ///////////////////////////
   //WRITE HISTOS AND GRAPHS//

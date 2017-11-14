@@ -170,11 +170,16 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   piKfake_vs_momentum->Divide(piall_vs_momentum); 
   pimufake_vs_momentum->Divide(piall_vs_momentum); 
   piefake_vs_momentum->Divide(piall_vs_momentum); 
-  Kpfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats"));
-  Kpifake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats"));
-  piKfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats"));
-  piefake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats"));
-  pimufake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats"));
+  Kpfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
+  Kpifake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats", expert));
+  piKfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats", expert));
+  piefake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats", expert));
+  pimufake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats", expert));
+  Kpfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Description", "Rate of Kaons faking protons vs. momentum"));
+  Kpifake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Description", "Rate of Kaons faking pions vs. momentum"));
+  piKfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Description", "Rate of pions faking Kaons vs. momentum"));
+  piefake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Description", "Rate of pions faking electrons vs. momentum"));
+  pimufake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Description", "Rate of pions faking muons vs. momentum"));
   Kpfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Contact", "jan.strube@desy.de"));
   Kpifake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Contact", "jan.strube@desy.de"));
   piKfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Contact", "jan.strube@desy.de"));
@@ -219,11 +224,16 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   piKfake_vs_cosTheta->Divide(piall_vs_cosTheta);
   piefake_vs_cosTheta->Divide(piall_vs_cosTheta);
   pimufake_vs_cosTheta->Divide(piall_vs_cosTheta);
-  Kpfake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Meta", "nostats"));
-  Kpifake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Meta", "nostats"));
-  piKfake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Meta", "nostats"));
-  piefake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Meta", "nostats"));
-  pimufake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Meta", "nostats"));
+  Kpfake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
+  Kpifake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
+  piKfake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
+  piefake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
+  pimufake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
+  Kpfake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Description", "Rate of Kaons faking protons vs. cosTheta"));
+  Kpifake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Description", "Rate of Kaons faking pions vs. cosTheta"));
+  piKfake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Description", "Rate of pions faking Kaons vs. cosTheta"));
+  piefake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Description", "Rate of pions faking electrons vs. cosTheta"));
+  pimufake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Description", "Rate of pions faking muons vs. cosTheta"));
   Kpfake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Contact", "jan.strube@desy.de"));
   Kpifake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Contact", "jan.strube@desy.de"));
   piKfake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Contact", "jan.strube@desy.de"));
@@ -314,6 +324,16 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   hpiefake_eff->GetListOfFunctions()->Add(new TNamed("Description", hpiefake_eff->GetTitle()));
   hkpifake_eff->GetListOfFunctions()->Add(new TNamed("Description", hkpifake_eff->GetTitle()));
   hkpfake_eff->GetListOfFunctions()->Add(new TNamed("Description", hkpfake_eff->GetTitle()));
+
+  hpcut->GetListOfFunctions()->Add(new TNamed("Check", "Consistency between the different histograms"));
+  hpicut->GetListOfFunctions()->Add(new TNamed("Check", "Consistency between the different histograms"));
+  hkcut->GetListOfFunctions()->Add(new TNamed("Check", "Consistency between the different histograms"));
+
+  hpikfake_eff->GetListOfFunctions()->Add(new TNamed("Check", "Consistency between the different histograms"));
+  hpimufake_eff->GetListOfFunctions()->Add(new TNamed("Check", "Consistency between the different histograms"));
+  hpiefake_eff->GetListOfFunctions()->Add(new TNamed("Check", "Consistency between the different histograms"));
+  hkpifake_eff->GetListOfFunctions()->Add(new TNamed("Check", "Consistency between the different histograms"));
+  hkpfake_eff->GetListOfFunctions()->Add(new TNamed("Check", "Consistency between the different histograms"));
 
   hpcut->GetListOfFunctions()->Add(new TNamed("Contact","jan.strube@desy.de"));
   hpicut->GetListOfFunctions()->Add(new TNamed("Contact","jan.strube@desy.de"));

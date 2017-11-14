@@ -152,8 +152,8 @@ void SVDSimpleClusterizerModule::event()
 
 
   //create a dummy cluster just to start
-  SimpleClusterCandidate* clusterCandidate = new SimpleClusterCandidate(storeDigits[0]->getSensorID(), storeDigits[0]->isUStrip(),
-      m_sizeHeadTail, m_cutSeed, m_cutAdjacent);
+  SimpleClusterCandidate clusterCandidate(storeDigits[0]->getSensorID(), storeDigits[0]->isUStrip(),
+                                          m_sizeHeadTail, m_cutSeed, m_cutAdjacent);
 
   //loop over the SVDRecoDigits
   int i = 0;
@@ -182,25 +182,21 @@ void SVDSimpleClusterizerModule::event()
     aStrip.time = storeDigits[i]->getTime();
 
     //try to add the strip to the existing cluster
-    if (! clusterCandidate->add(thisSensorID, thisSide, aStrip)) {
+    if (! clusterCandidate.add(thisSensorID, thisSide, aStrip)) {
 
       //if the strip is not added, write the cluster, if present and good:
-      if (clusterCandidate->size() > 0) {
-        clusterCandidate->finalizeCluster();
-        if (clusterCandidate->isGoodCluster()) {
-          writeClusters(*clusterCandidate);
+      if (clusterCandidate.size() > 0) {
+        clusterCandidate.finalizeCluster();
+        if (clusterCandidate.isGoodCluster()) {
+          writeClusters(clusterCandidate);
         }
       }
 
       //prepare for the next cluster:
-
-      //      clusterCandidate->clear(); //not needed with pointer
-      delete clusterCandidate;
-
-      clusterCandidate = new SimpleClusterCandidate(thisSensorID, thisSide, m_sizeHeadTail, m_cutSeed, m_cutAdjacent);
+      clusterCandidate = SimpleClusterCandidate(thisSensorID, thisSide, m_sizeHeadTail, m_cutSeed, m_cutAdjacent);
 
       //start another cluster:
-      if (! clusterCandidate->add(thisSensorID, thisSide, aStrip))
+      if (! clusterCandidate.add(thisSensorID, thisSide, aStrip))
         B2WARNING("this state is forbidden!!");
 
     }
@@ -208,12 +204,11 @@ void SVDSimpleClusterizerModule::event()
   } //exit loop on RecoDigits
 
   //write the last cluster, if good
-  if (clusterCandidate->size() > 0) {
-    clusterCandidate->finalizeCluster();
-    if (clusterCandidate->isGoodCluster())
-      writeClusters(*clusterCandidate);
+  if (clusterCandidate.size() > 0) {
+    clusterCandidate.finalizeCluster();
+    if (clusterCandidate.isGoodCluster())
+      writeClusters(clusterCandidate);
   }
-  delete clusterCandidate;
 
   B2DEBUG(1, "Number of clusters: " << storeClusters.getEntries());
 }

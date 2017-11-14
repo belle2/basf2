@@ -115,7 +115,7 @@ void SVDCoGTimeEstimatorModule::beginRun()
 void SVDCoGTimeEstimatorModule::event()
 {
   /** Probabilities, to be defined here */
-  std::vector<float> m_probabilities = {0.5};
+  std::vector<float> probabilities = {0.5};
 
   StoreArray<SVDShaperDigit> storeShapers;
   StoreArray<SVDRecoDigit> storeRecos;
@@ -192,7 +192,7 @@ void SVDCoGTimeEstimatorModule::event()
 
     //recording of the RecoDigit
     storeRecos.appendNew(SVDRecoDigit(shaper.getSensorID(), shaper.isUStrip(), shaper.getCellID(), m_amplitude, m_amplitudeError,
-                                      m_weightedMeanTime, m_weightedMeanTimeError, m_probabilities, m_chi2, shaper.getModeByte()));
+                                      m_weightedMeanTime, m_weightedMeanTimeError, probabilities, m_chi2, shaper.getModeByte()));
 
     //Add digit to the RecoDigit->ShaperDigit relation list
     int recoDigitIndex = storeRecos.getEntries() - 1;

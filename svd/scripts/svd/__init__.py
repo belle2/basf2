@@ -27,11 +27,25 @@ def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=Fals
 def add_svd_reconstruction_tb(path, isROIsimulation=False):
 
     if(isROIsimulation):
+        splitterName = '__ROISVDDigitSplitter'
+        sorterName = '__ROISVDDigitSorter'
         clusterizerName = '__ROISVDClusterizer'
         clusterName = '__ROIsvdClusters'
     else:
+        splitterName = 'SVDDigitSplitter'
+        sorterName = 'SVDDigitSorter'
         clusterizerName = 'SVDClusterizer'
         clusterName = ""
+
+    if splitterName not in [e.name() for e in path.modules()]:
+        splitter = register_module('SVDDigitSplitter')
+        splitter.set_name(splitterName)
+        path.add_module(splitter)
+
+    if sorterName not in [e.name() for e in path.modules()]:
+        sorter = register_module('SVDDigitSorter')
+        sorter.set_name(sorterName)
+        path.add_module(sorter)
 
     if clusterizerName not in [e.name() for e in path.modules()]:
         clusterizer = register_module('SVDClusterizer')
@@ -140,5 +154,4 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
 def add_svd_simulation(path):
 
     digitizer = register_module('SVDDigitizer')
-    digitizer.param('GenerateShaperDigits', True)
     path.add_module(digitizer)

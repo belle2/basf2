@@ -60,9 +60,6 @@ namespace Belle2 {
 
   private:
 
-    /** vector containing the 6/3 samples*/
-    Belle2::SVDShaperDigit::APVFloatSamples m_Samples_vec;
-
     /** The peak time estimation */
     float m_weightedMeanTime;
     /** The peak time estimation error */
@@ -73,8 +70,6 @@ namespace Belle2 {
     /** The shaper amplitude estimation error */
     float m_amplitudeError;
 
-    /** Probabilities, to be defined here */
-    std::vector<float> m_probabilities;
     /** Chi2, to be defined here */
     float m_chi2;
 
@@ -147,8 +142,6 @@ namespace Belle2 {
     float CalculateWeightedMeanPeakTimeError();
     /** Function to calculate the amplitude error, obtained as 1/10 of the amplitude itself */
     float CalculateAmplitudeError(VxdID ThisSensorID, bool ThisSide, int ThisCellID);
-    /** Function to calculate probabilities, that is not used here, so just set at 0.99 */
-    void CalculateProbabilities();
     /** Function to calculate chi2, that is not used here, so just set at 0.01 */
     float CalculateChi2();
 

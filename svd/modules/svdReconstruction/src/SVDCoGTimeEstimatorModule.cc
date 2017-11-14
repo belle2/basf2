@@ -114,7 +114,8 @@ void SVDCoGTimeEstimatorModule::beginRun()
 
 void SVDCoGTimeEstimatorModule::event()
 {
-  m_probabilities.clear();
+  /** Probabilities, to be defined here */
+  std::vector<float> probabilities = {0.5};
 
   StoreArray<SVDShaperDigit> storeShapers;
   StoreArray<SVDRecoDigit> storeRecos;
@@ -148,8 +149,10 @@ void SVDCoGTimeEstimatorModule::event()
   createRelationLookup(relShaperDigitTrueHit, m_trueRelation, nDigits);
 
   //start loop on SVDSHaperDigits
+  Belle2::SVDShaperDigit::APVFloatSamples samples_vec;
+
   for (const SVDShaperDigit& shaper : storeShapers) {
-    m_Samples_vec = shaper.getSamples();
+    samples_vec = shaper.getSamples();
 
     //retrieve the VxdID, sensor and cellID of the current RecoDigit
     VxdID thisSensorID = shaper.getSensorID();
@@ -157,11 +160,10 @@ void SVDCoGTimeEstimatorModule::event()
     int thisCellID = shaper.getCellID();
 
     //call of the functions doomed to calculate the required quantities
-    m_weightedMeanTime = CalculateWeightedMeanPeakTime(m_Samples_vec);
+    m_weightedMeanTime = CalculateWeightedMeanPeakTime(samples_vec);
     m_weightedMeanTimeError = CalculateWeightedMeanPeakTimeError();
-    m_amplitude = CalculateAmplitude(m_Samples_vec);
+    m_amplitude = CalculateAmplitude(samples_vec);
     m_amplitudeError = CalculateAmplitudeError(thisSensorID, thisSide, thisCellID);
-    CalculateProbabilities();
     m_chi2 = CalculateChi2();
 
     //CALIBRATION
@@ -190,7 +192,7 @@ void SVDCoGTimeEstimatorModule::event()
 
     //recording of the RecoDigit
     storeRecos.appendNew(SVDRecoDigit(shaper.getSensorID(), shaper.isUStrip(), shaper.getCellID(), m_amplitude, m_amplitudeError,
-                                      m_weightedMeanTime, m_weightedMeanTimeError, m_probabilities, m_chi2, shaper.getModeByte()));
+                                      m_weightedMeanTime, m_weightedMeanTimeError, probabilities, m_chi2, shaper.getModeByte()));
 
     //Add digit to the RecoDigit->ShaperDigit relation list
     int recoDigitIndex = storeRecos.getEntries() - 1;
@@ -269,11 +271,6 @@ float SVDCoGTimeEstimatorModule::CalculateAmplitudeError(VxdID ThisSensorID, boo
   stripnoise = m_NoiseCal.getNoise(ThisSensorID, ThisSide, ThisCellID);
 
   return stripnoise;
-}
-
-void SVDCoGTimeEstimatorModule::CalculateProbabilities()
-{
-  m_probabilities.push_back(0.5);
 }
 
 float SVDCoGTimeEstimatorModule::CalculateChi2()

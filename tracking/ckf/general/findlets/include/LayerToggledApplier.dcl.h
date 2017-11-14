@@ -44,6 +44,6 @@ namespace Belle2 {
     AFindlet m_lowLayerFindlet;
 
     /// On which N to toggle the layers
-    int m_param_toggleOnLayer = -1;
+    int m_param_toggleOnLayer = -99;
   };
 }

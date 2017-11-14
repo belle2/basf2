@@ -201,9 +201,9 @@ def add_simulation(
 
     # background overlay executor - after all digitizers
     if bkgOverlay:
-        bkgexecutor = register_module('BGOverlayExecutor')
-        bkgexecutor.param('PXDDigitsName', pxd_digits_name)
-        path.add_module(bkgexecutor)
+        path.add_module('BGOverlayExecutor', PXDDigitsName=pxd_digits_name)
+        if components is None or 'PXD' in components:
+            path.add_module("PXDDigitSorter", digits=pxd_digits_name)
 
     # PXD data reduction - after background overlay executor
     if (components is None or 'PXD' in components) and usePXDDataReduction:

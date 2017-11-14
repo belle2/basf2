@@ -11,6 +11,7 @@
 #include <mva/methods/FastBDT.h>
 
 #include <framework/logging/Logger.h>
+#include <sstream>
 
 // Template specialization to fix NAN sort bug of FastBDT in upto Version 3.2
 #if FastBDT_VERSION_MAJOR <= 3 && FastBDT_VERSION_MINOR <= 2
@@ -301,7 +302,6 @@ namespace Belle2 {
     {
 
       std::string custom_weightfile = weightfile.getFileName();
-      // Fix: What is the point of this?
       weightfile.getFile("FastBDT_Weightfile", custom_weightfile);
       std::fstream file(custom_weightfile, std::ios_base::in);
 

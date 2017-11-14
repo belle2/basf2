@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import basf2_mva
 import basf2_mva_util
 
 from basf2_mva_evaluation import plotting
@@ -14,6 +15,8 @@ import ROOT
 
 import os
 import shutil
+import sys
+import hashlib
 import collections
 
 

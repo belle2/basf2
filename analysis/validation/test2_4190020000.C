@@ -33,9 +33,9 @@ void plot_Mrecoil_pipi(TFile* pfile, TTree* ptree, TFile* outputFile){
    ptree->Project("h_Mrecoil_pipi","Upsilon6S_Mrecoil",Cuts);
    h_Mrecoil_pipi->GetXaxis()->SetTitle("M_{recoil}(#pi^{+}#pi^{-}) (GeV/c^{2})");
    h_Mrecoil_pipi->GetYaxis()->SetTitle("Events / 0.002 GeV/c^{2}");
-   h_Mrecoil_pipi->GetListOfFunctions()->Add(new TNamed("Description","Y(6S)-> pi [Zb(10610) -> pi h_b]"));
+   h_Mrecoil_pipi->GetListOfFunctions()->Add(new TNamed("Description","the recoil pi+ pi- mass for Y(6S)-> pi [Zb(10610) -> pi h_b]"));
    h_Mrecoil_pipi->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
-   h_Mrecoil_pipi->GetListOfFunctions()->Add(new TNamed("Check","expect to see the h_b peak"));
+   h_Mrecoil_pipi->GetListOfFunctions()->Add(new TNamed("Check","Broad shape with distinctive h_b peak at 9.9 GeV/c^2"));
 
 
    outputFile->cd();
@@ -54,10 +54,9 @@ void plot_Mrecoil_pi(TFile* pfile, TTree* ptree, TFile* outputFile){
    ptree->Project("h_Mrecoil_pi","Upsilon6S_Mrecoil",Cuts);
    h_Mrecoil_pi->GetXaxis()->SetTitle("M_{recoil}(#pi^{+}) (GeV/c^{2})");
    h_Mrecoil_pi->GetYaxis()->SetTitle("Events /0.005 GeV/c^{2}");
-   h_Mrecoil_pi->GetListOfFunctions()->Add(new TNamed("Description","Y(6S)-> pi [Zb(10610) -> pi h_b]"));
+   h_Mrecoil_pi->GetListOfFunctions()->Add(new TNamed("Description","the recoil pi mass for Y(6S)-> pi [Zb(10610) -> pi h_b]"));
    h_Mrecoil_pi->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
-   h_Mrecoil_pi->GetListOfFunctions()->Add(new TNamed("Check","expect to see the Zb(10610) and h_b peak"));
-
+   h_Mrecoil_pi->GetListOfFunctions()->Add(new TNamed("Check","Broad shape with distinctive Zb(10610) and reflection peaks at 10.6 and 10.3 GeV/c^2 "));
 
    outputFile->cd();
 

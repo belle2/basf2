@@ -171,10 +171,10 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   pimufake_vs_momentum->Divide(piall_vs_momentum); 
   piefake_vs_momentum->Divide(piall_vs_momentum); 
   Kpfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
-  Kpifake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats", expert));
-  piKfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats", expert));
-  piefake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats", expert));
-  pimufake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats", expert));
+  Kpifake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
+  piKfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
+  piefake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
+  pimufake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
   Kpfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Description", "Rate of Kaons faking protons vs. momentum"));
   Kpifake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Description", "Rate of Kaons faking pions vs. momentum"));
   piKfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Description", "Rate of pions faking Kaons vs. momentum"));

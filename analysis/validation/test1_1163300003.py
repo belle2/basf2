@@ -1,19 +1,15 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-#######################################################
-#
+# -*- coding: utf-8 -*
+"""
+<input>../1163300003.dst.root</input>
+<output>../1163300003.ntup.root</output>
+<contact> Racha Cheaib rcheaib@olemiss.edu, Mario Merola mario.merola@na.infn.it</contact>
+<interval>nightly</interval>
+</header>
+"""
+# der>
 # This script demonstrates how to reconstruct Btag using
 # generically trained FEI and how to validate D(*)+tau- v and D(*)
-#
-#
-# This script is used as well for the production of
-# of official monitoring and validation single tag samples.
-#
-# Contributors: Racha Cheaib April 2017
-#
-#
-#
 #  Release required: build-2017-09-08 or later
 #
 ######################################################

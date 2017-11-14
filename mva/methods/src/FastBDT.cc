@@ -10,6 +10,7 @@
 
 #include <mva/methods/FastBDT.h>
 #include <framework/logging/Logger.h>
+#include <sstream>
 
 // Template specialization to fix NAN sort bug of FastBDT in upto Version 3.2
 #if FastBDT_VERSION_MAJOR <= 3 && FastBDT_VERSION_MINOR <= 2

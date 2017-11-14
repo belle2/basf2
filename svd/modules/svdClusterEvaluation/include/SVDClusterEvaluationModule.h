@@ -172,7 +172,7 @@ namespace Belle2 {
     void createArbitraryGraphError_Red(const char* name, const char* title, float x[m_NsetsRed], float xErr[m_NsetsRed],
                                        float y[m_NsetsRed], float yErr[m_NsetsRed], TString xTitle, TString yTitle, TList* list);
 
-    bool goodTrueHit(SVDTrueHit thino);
+    bool goodTrueHit(const SVDTrueHit* thino);
 
     /*float getMeanFromHistoWithoutABin(TH1F* histo, int BadBin);*/
 

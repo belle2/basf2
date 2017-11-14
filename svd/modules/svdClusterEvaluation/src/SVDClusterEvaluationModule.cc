@@ -219,7 +219,7 @@ void SVDClusterEvaluationModule::event()
   //loop on TrueHits
   for (const SVDTrueHit& trhi : SVDTrueHits) {
 
-    if (goodTrueHit(trhi)) { //enter only if the TH is related to a primary and charged MC particle
+    if (goodTrueHit(&trhi)) { //enter only if the TH is related to a primary and charged MC particle
       indexForHistosAndGraphs = indexFromLayerSensorSide(trhi.getSensorID().getLayerNumber() , trhi.getSensorID().getSensorNumber() , 1);
 
       RelationVector<SVDCluster> relatVectorTHToClus = DataStore::getRelationsWithObj<SVDCluster>(&trhi);
@@ -227,10 +227,21 @@ void SVDClusterEvaluationModule::event()
       //efficiencies TH to cluster
       m_NumberOfTH[indexForHistosAndGraphs] ++; //U
       m_NumberOfTH[indexForHistosAndGraphs + 1] ++; //V
+
+      bool hasU = false;
+      bool hasV = false;
+
       for (int j = 0; j < (int) relatVectorTHToClus.size(); j ++) {
         indexForHistosAndGraphs = indexFromLayerSensorSide(relatVectorTHToClus[j]->getSensorID().getLayerNumber() ,
                                                            relatVectorTHToClus[j]->getSensorID().getSensorNumber() , relatVectorTHToClus[j]->isUCluster());
-        m_NumberOfClustersRelatedToTH[indexForHistosAndGraphs] ++;
+
+        if (relatVectorTHToClus[j]->isUCluster() && ! hasU) {
+          m_NumberOfClustersRelatedToTH[indexForHistosAndGraphs] ++;
+          hasU = true;
+        } else if (!relatVectorTHToClus[j]->isUCluster() && ! hasV) {
+          m_NumberOfClustersRelatedToTH[indexForHistosAndGraphs] ++;
+          hasV = true;
+        }
       }
     }
   }
@@ -329,7 +340,7 @@ void SVDClusterEvaluationModule::endRun()
     m_RMS_PurityInsideTMCluster[k] = m_histo_PurityInsideTMCluster[k]->GetRMS() / sqrt(m_histo_PurityInsideTMCluster[k]->GetEntries());
 
     m_mean_Puddlyness[k] = m_histo_Puddlyness[k]->GetMean();
-    m_RMS_Puddlyness[k] = m_histo_Puddlyness[k]->GetRMS() / sqrt(m_histo_PuddlynessTM[k]->GetEntries());
+    m_RMS_Puddlyness[k] = m_histo_Puddlyness[k]->GetRMS() / sqrt(m_histo_Puddlyness[k]->GetEntries());
 
     m_mean_PuddlynessTM[k] = m_histo_PuddlynessTM[k]->GetMean();
     m_RMS_PuddlynessTM[k] = m_histo_PuddlynessTM[k]->GetRMS() / sqrt(m_histo_PuddlynessTM[k]->GetEntries());
@@ -601,7 +612,9 @@ void SVDClusterEvaluationModule::createEfficiencyGraph(const char* name, const c
   g->GetXaxis()->SetTitle(xTitle.Data());
   g->GetYaxis()->SetTitle(yTitle.Data());
   g->GetYaxis()->SetRangeUser(0.00001, 1.10);
-  g->Draw();
+  g->Draw("AP");
+  g->SetMarkerStyle(20);
+  g->SetMarkerSize(0.8);
   TAxis* xAxis = g->GetXaxis();
 
   TText* t = new TText();
@@ -640,7 +653,9 @@ void SVDClusterEvaluationModule::createArbitraryGraphError_Std(const char* name,
   g->SetTitle(title);
   g->GetXaxis()->SetTitle(xTitle.Data());
   g->GetYaxis()->SetTitle(yTitle.Data());
-  g->Draw();
+  g->Draw("AP");
+  g->SetMarkerStyle(20);
+  g->SetMarkerSize(0.8);
   TAxis* xAxis = g->GetXaxis();
 
   TText* t = new TText();
@@ -667,7 +682,9 @@ void SVDClusterEvaluationModule::createArbitraryGraphError_Red(const char* name,
   g->SetTitle(title);
   g->GetXaxis()->SetTitle(xTitle.Data());
   g->GetYaxis()->SetTitle(yTitle.Data());
-  g->Draw();
+  g->Draw("AP");
+  g->SetMarkerStyle(20);
+  g->SetMarkerSize(0.8);
   TAxis* xAxis = g->GetXaxis();
 
   TText* t = new TText();
@@ -684,57 +701,31 @@ void SVDClusterEvaluationModule::createArbitraryGraphError_Red(const char* name,
 
 }
 
-bool SVDClusterEvaluationModule::goodTrueHit(SVDTrueHit thino)
+bool SVDClusterEvaluationModule::goodTrueHit(const SVDTrueHit* thino)
 {
-  if (0) {
-    float charge;
-    bool firsty;
 
-    B2INFO("Check: Inside goodTrueHit function: 1");
+  float charge = 0;
+  bool primary = false;
 
-    RelationVector<SVDSimHit> relatVectorTHToSim = DataStore::getRelationsWithObj<SVDSimHit>(&thino);
+  bool isGood = false;
 
-    B2INFO("Check: Inside goodTrueHit function: 2");
+  RelationVector<MCParticle> relatVectorTHToMC = thino->getRelationsFrom<MCParticle>();
 
-    if (relatVectorTHToSim.size() > 0) {
-      RelationVector<MCParticle> relatVectorSimToMC = DataStore::getRelationsWithObj<MCParticle>(relatVectorTHToSim[0]);
+  if (relatVectorTHToMC.size() > 0) {
 
-      B2INFO("Check: Inside goodTrueHit function: 3");
+    m_histoControl_THToMCsize->Fill(relatVectorTHToMC.size());
 
-      m_histoControl_THToMCsize->Fill(relatVectorSimToMC.size());
+    charge = relatVectorTHToMC[0]->getCharge();
+    primary = relatVectorTHToMC[0]->isPrimaryParticle();
 
-      B2INFO("Check: Inside goodTrueHit function: 4");
+    m_histoControl_MCcharge->Fill(charge);
+    m_histoControl_MCisPrimary->Fill(primary);
 
-      if (relatVectorSimToMC.size() > 0) {
-        B2INFO("Check: Inside goodTrueHit function: 5");
-
-        charge = relatVectorSimToMC[0]->getCharge();
-        firsty = relatVectorSimToMC[0]->isPrimaryParticle();
-
-        B2INFO("Check: Inside goodTrueHit function: 6");
-
-        m_histoControl_MCcharge->Fill(charge);
-        m_histoControl_MCisPrimary->Fill(firsty);
-
-        B2INFO("Check: Inside goodTrueHit function: 7");
-
-        if (charge != 0 && firsty)
-          return true;
-        else
-          return false;
-      } else {
-        B2INFO("Check: Inside goodTrueHit function: 8, relatVectorTHToMC <= 0");
-
-        return false;
-      }
-    } else {
-      B2INFO("Check: Inside goodTrueHit function: 9, relatVectorTHToSim.size <= 0");
-
-      return false;
-    }
-  } else {
-    return true;
+    if (charge != 0 && primary)
+      isGood = true;
   }
+
+  return isGood;
 }
 
 /*float SVDClusterEvaluationModule::getMeanFromHistoWithoutABin(TH1F* histo, int BadBin)

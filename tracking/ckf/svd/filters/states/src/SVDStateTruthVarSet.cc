@@ -22,7 +22,7 @@ bool SVDStateTruthVarSet::extract(const BaseSVDStateFilter::Object* pair)
   CKFToSVDState* state = pair->second;
 
   std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>> allStates = previousStates;
-  allStates.emplace_back(state);
+  allStates.emplace_back(state, 0);
 
   const RecoTrack* seedTrack = previousStates.front()->getSeed();
   B2ASSERT("Path without seed?", seedTrack);

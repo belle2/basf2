@@ -103,7 +103,7 @@ bool SVDStateVarSet::extract(const BaseSVDStateFilter::Object* pair)
   B2ASSERT("Path without hit?", spacePoint);
 
   std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>> allStates = previousStates;
-  allStates.emplace_back(state);
+  allStates.emplace_back(state, 0);
 
   const std::vector<CDCHit*>& cdcHits = cdcTrack->getSortedCDCHitList();
 

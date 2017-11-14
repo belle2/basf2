@@ -51,7 +51,7 @@ namespace Belle2 {
     for (const AState& state : seededStates) {
       B2DEBUG(50, "Starting with new seed...");
 
-      path.emplace_back(&state);
+      path.emplace_back(&state, 0);
       traverseTree(path, relations, results);
       path.pop_back();
       B2ASSERT("Something went wrong during the path traversal", path.empty());

@@ -151,7 +151,9 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
             path.add_module(clusterizer)
 
 
-def add_svd_simulation(path):
+def add_svd_simulation(path, createDigits=False):
 
     digitizer = register_module('SVDDigitizer')
+    if createDigits:
+        digitizer.param('GenerateDigits', True)
     path.add_module(digitizer)

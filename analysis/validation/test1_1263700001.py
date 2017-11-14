@@ -329,8 +329,8 @@ tools4SBplusSL += ['MCTruth', 'Upsilon(4S):BslBsigp ->  ^B+:semileptonicRank ^B-
 # Make lists and outptu to mdst and udst files.
 # write out the flat ntuple
 ntupleFile(outputRootFile)
-ntupleTree('Ups:BplusSL', 'Upsilon(4S):BslBsigp', tools4SBplusSL)
-ntupleTree('Ups:BplusHad', 'Upsilon(4S):BhadBsigp', tools4SBplusHad)
+ntupleTree('UpsBplusSL', 'Upsilon(4S):BslBsigp', tools4SBplusSL)
+ntupleTree('UpsBplusHad', 'Upsilon(4S):BhadBsigp', tools4SBplusHad)
 ntupleTree('BPHadTag', 'B+:generic', toolsBP)
 ntupleTree('BPSLTag', 'B+:semileptonic', toolsBPSL)
 

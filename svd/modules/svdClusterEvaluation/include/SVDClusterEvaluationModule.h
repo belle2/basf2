@@ -19,6 +19,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <svd/dataobjects/SVDTrueHit.h>
 #include <TList.h>
 #include <svd/geometry/SensorInfo.h>
 #include <TFile.h>
@@ -72,8 +73,12 @@ namespace Belle2 {
 
     TH1F* m_histo_StripTimeResolution[m_Nsets];
     TH1F* m_histo_ClusterTimeResolution[m_Nsets];
+    TH1F* m_histo_ClusterTimePull[m_Nsets];
     TH1F* m_histo_ClusterUPositionResolution[m_NsetsRed];
     TH1F* m_histo_ClusterVPositionResolution[m_NsetsRed];
+    TH1F* m_histo_ClusterUPositionPull[m_NsetsRed];
+    TH1F* m_histo_ClusterVPositionPull[m_NsetsRed];
+    TH2F* m_histo2D_TresVsPosres[m_Nsets];
     TH1F* m_histo_PurityInsideTMCluster[m_Nsets];
     TH2F* m_histo2D_PurityInsideTMCluster[m_Nsets];
     TH1F* m_histo_PurityInsideNOTMCluster[m_Nsets];
@@ -106,7 +111,10 @@ namespace Belle2 {
 
     TList* m_histoList_StripTimeResolution;
     TList* m_histoList_ClusterTimeResolution;
+    TList* m_histoList_ClusterTimePull;
     TList* m_histoList_ClusterPositionResolution;
+    TList* m_histoList_ClusterPositionPull;
+    TList* m_histo2DList_TresVsPosres;
     TList* m_histoList_PurityInsideTMCluster;
     TList* m_histo2DList_PurityInsideTMCluster;
     TList* m_histoList_PurityInsideNOTMCluster;
@@ -125,6 +133,12 @@ namespace Belle2 {
 
     int m_NumberOfTMRecoInTMCluster = 0;
     int m_NumberOfTMRecoInNOTMCluster = 0;
+
+    //Control Objects
+    TH1F* m_histoControl_MCcharge;
+    TH1F* m_histoControl_MCisPrimary;
+    TH1F* m_histoControl_THToMCsize;
+    TList* m_histoList_Control;
 
   protected:
 
@@ -157,6 +171,8 @@ namespace Belle2 {
 
     void createArbitraryGraphError_Red(const char* name, const char* title, float x[m_NsetsRed], float xErr[m_NsetsRed],
                                        float y[m_NsetsRed], float yErr[m_NsetsRed], TString xTitle, TString yTitle, TList* list);
+
+    bool goodTrueHit(SVDTrueHit thino);
 
     /*float getMeanFromHistoWithoutABin(TH1F* histo, int BadBin);*/
 

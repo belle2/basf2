@@ -17,6 +17,7 @@
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
+#include <svd/dataobjects/SVDSimHit.h>
 #include <TFile.h>
 #include <TText.h>
 #include <TH1F.h>
@@ -63,15 +64,20 @@ void SVDClusterEvaluationModule::initialize()
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
 
-  m_histoList_ClusterPositionResolution = new TList;
   m_histoList_StripTimeResolution = new TList;
   m_histoList_ClusterTimeResolution = new TList;
+  m_histoList_ClusterTimePull = new TList;
+  m_histoList_ClusterPositionResolution = new TList;
+  m_histoList_ClusterPositionPull = new TList;
+  m_histo2DList_TresVsPosres = new TList;
   m_histoList_PurityInsideTMCluster = new TList;
   m_histo2DList_PurityInsideTMCluster = new TList;
   m_histoList_PurityInsideNOTMCluster = new TList;
   m_histoList_Puddlyness = new TList;
   m_histoList_PuddlynessTM = new TList;
   m_graphList = new TList;
+  //Control List
+  m_histoList_Control = new TList;
 
   for (int i = 0; i < m_Nsets; i ++) {
 
@@ -81,11 +87,22 @@ void SVDClusterEvaluationModule::initialize()
       m_histo_ClusterUPositionResolution[i / 2] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -0.1, 0.1,
                                                   "U_Reconstructed - U_TrueHit",
                                                   m_histoList_ClusterPositionResolution);
+
+      NameOfHisto = "histo_ClusterUPositionPull_" + IntExtFromIndex(i) + "_" + FWFromIndex(i);
+      TitleOfHisto = "Cluster U Position Pull (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ")";
+      m_histo_ClusterUPositionPull[i / 2] = createHistogram1D(NameOfHisto, TitleOfHisto, 210, -10, 11,
+                                                              "U_Reconstructed - U_TrueHit",
+                                                              m_histoList_ClusterPositionPull);
     } else { //odd index, V side
       NameOfHisto = "histo_ClusterVPositionResolution_" + IntExtFromIndex(i) + "_" + FWFromIndex(i);
       TitleOfHisto = "Cluster V Position Resolution (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ")";
       m_histo_ClusterVPositionResolution[(i - 1) / 2] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -0.1, 0.1,
                                                         "V_Reconstructed - V_TrueHit", m_histoList_ClusterPositionResolution);
+
+      NameOfHisto = "histo_ClusterVPositionPull_" + IntExtFromIndex(i) + "_" + FWFromIndex(i);
+      TitleOfHisto = "Cluster V Position Pull (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ")";
+      m_histo_ClusterVPositionPull[(i - 1) / 2] = createHistogram1D(NameOfHisto, TitleOfHisto, 210, -10, 11,
+                                                  "V_Reconstructed - V_TrueHit", m_histoList_ClusterPositionPull);
     }
 
     NameOfHisto = "histo_StripTimeResolution_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
@@ -97,6 +114,17 @@ void SVDClusterEvaluationModule::initialize()
     TitleOfHisto = "Cluster Time Resolution (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(i) + ")";
     m_histo_ClusterTimeResolution[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_Reconstructed - t_TrueHit",
                                                          m_histoList_ClusterTimeResolution);
+
+    NameOfHisto = "histo_ClusterTimePull_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
+    TitleOfHisto = "Cluster Time Pull (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(i) + ")";
+    m_histo_ClusterTimePull[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, -100, 100, "t_Reconstructed - t_TrueHit",
+                                                   m_histoList_ClusterTimePull);
+
+    NameOfHisto = "histo2D_TresVsPosres_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
+    TitleOfHisto = "Residual time (t Rec - t TH) Vs Residual U/V position (U/V rec - U/V TH) (" + IntExtFromIndex(
+                     i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(i) + ")";
+    m_histo2D_TresVsPosres[i] = createHistogram2D(NameOfHisto, TitleOfHisto, 200, -0.1, 0.1, "U/V_rec - U/V_TH", 180, -120, 60,
+                                                  "t_rec - t_TH", m_histo2DList_TresVsPosres);
 
     NameOfHisto = "histo_PurityInsideTMCluster_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
     TitleOfHisto = "Fraction of Truth-matched Recos inside a Truth-matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
@@ -119,16 +147,23 @@ void SVDClusterEvaluationModule::initialize()
     NameOfHisto = "m_histoList_Puddlyness_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
     TitleOfHisto = "Number of True Hits inside a Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(
                      i) + ")";
-    m_histo_Puddlyness[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 10, 0 , 10, "number of TH per cluster",
+    m_histo_Puddlyness[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of TH per cluster",
                                               m_histoList_Puddlyness);
 
     NameOfHisto = "m_histoList_PuddlynessTM_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
     TitleOfHisto = "Number of True Hits inside a Truth-matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
                      i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_PuddlynessTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 10, 0 , 10, "number of TH per cluster",
+    m_histo_PuddlynessTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of TH per cluster",
                                                 m_histoList_PuddlynessTM);
   }
 
+  //Control Histos
+  m_histoControl_MCcharge = createHistogram1D("m_histoControl_MCcharge", "m_histoControl_MCcharge", 5, -2, 3,
+                                              "charge of the first MC particle related to a True Hit", m_histoList_Control);
+  m_histoControl_MCisPrimary = createHistogram1D("m_histoControl_MCisPrimary", "m_histoControl_MCisPrimary", 2, 0, 2,
+                                                 "isPrimary of the first MC particle related to a True Hit", m_histoList_Control);
+  m_histoControl_THToMCsize = createHistogram1D("m_histoControl_THToMCsize", "m_histoControl_THToMCsize", 10, -1, 9,
+                                                "size of the THToMC relation arrau", m_histoList_Control);
 }
 
 
@@ -183,17 +218,20 @@ void SVDClusterEvaluationModule::event()
 
   //loop on TrueHits
   for (const SVDTrueHit& trhi : SVDTrueHits) {
-    indexForHistosAndGraphs = indexFromLayerSensorSide(trhi.getSensorID().getLayerNumber() , trhi.getSensorID().getSensorNumber() , 1);
 
-    RelationVector<SVDCluster> relatVectorTHToClus = DataStore::getRelationsWithObj<SVDCluster>(&trhi);
+    if (goodTrueHit(trhi)) { //enter only if the TH is related to a primary and charged MC particle
+      indexForHistosAndGraphs = indexFromLayerSensorSide(trhi.getSensorID().getLayerNumber() , trhi.getSensorID().getSensorNumber() , 1);
 
-    //efficiencies TH to cluster
-    m_NumberOfTH[indexForHistosAndGraphs] ++; //U
-    m_NumberOfTH[indexForHistosAndGraphs + 1] ++; //V
-    for (int j = 0; j < (int) relatVectorTHToClus.size(); j ++) {
-      indexForHistosAndGraphs = indexFromLayerSensorSide(relatVectorTHToClus[j]->getSensorID().getLayerNumber() ,
-                                                         relatVectorTHToClus[j]->getSensorID().getSensorNumber() , relatVectorTHToClus[j]->isUCluster());
-      m_NumberOfClustersRelatedToTH[indexForHistosAndGraphs] ++;
+      RelationVector<SVDCluster> relatVectorTHToClus = DataStore::getRelationsWithObj<SVDCluster>(&trhi);
+
+      //efficiencies TH to cluster
+      m_NumberOfTH[indexForHistosAndGraphs] ++; //U
+      m_NumberOfTH[indexForHistosAndGraphs + 1] ++; //V
+      for (int j = 0; j < (int) relatVectorTHToClus.size(); j ++) {
+        indexForHistosAndGraphs = indexFromLayerSensorSide(relatVectorTHToClus[j]->getSensorID().getLayerNumber() ,
+                                                           relatVectorTHToClus[j]->getSensorID().getSensorNumber() , relatVectorTHToClus[j]->isUCluster());
+        m_NumberOfClustersRelatedToTH[indexForHistosAndGraphs] ++;
+      }
     }
   }
   //close loop on TrueHits
@@ -215,16 +253,25 @@ void SVDClusterEvaluationModule::event()
 
     //loop on the TH related to the cluster
     for (int q = 0; q < (int)relatVectorClusToTH.size(); q ++) {
-      //cluster time resolution
+      //cluster time resolution and pull
       m_histo_ClusterTimeResolution[indexForHistosAndGraphs]->Fill(clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime());
+      m_histo_ClusterTimePull[indexForHistosAndGraphs]->Fill((clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime()) /
+                                                             (clus.getClsTimeSigma()));
 
-      //cluster position resolution
+      //cluster position resolution and pull, also correlation between time res and position res
       if (clus.isUCluster()) {
         m_histo_ClusterUPositionResolution[indexForHistosAndGraphs / 2]->Fill(clus.getPosition((relatVectorClusToTH[q])->getV()) -
             (relatVectorClusToTH[q])->getU());
+        m_histo_ClusterUPositionPull[indexForHistosAndGraphs / 2]->Fill((clus.getPosition((relatVectorClusToTH[q])->getV()) -
+            (relatVectorClusToTH[q])->getU()) / (clus.getPositionSigma()));
+        m_histo2D_TresVsPosres[indexForHistosAndGraphs]->Fill((clus.getPosition((relatVectorClusToTH[q])->getV()) -
+                                                               (relatVectorClusToTH[q])->getU()) , (clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime()));
       } else {
-        m_histo_ClusterVPositionResolution[(indexForHistosAndGraphs - 1) / 2]->Fill(clus.getPosition() -
-            (relatVectorClusToTH[q])->getV());
+        m_histo_ClusterVPositionResolution[(indexForHistosAndGraphs - 1) / 2]->Fill(clus.getPosition() - (relatVectorClusToTH[q])->getV());
+        m_histo_ClusterVPositionPull[(indexForHistosAndGraphs - 1) / 2]->Fill((clus.getPosition() - (relatVectorClusToTH[q])->getV()) /
+            (clus.getPositionSigma()));
+        m_histo2D_TresVsPosres[indexForHistosAndGraphs]->Fill((clus.getPosition() - (relatVectorClusToTH[q])->getV()) ,
+                                                              (clus.getClsTime() - (relatVectorClusToTH[q])->getGlobalTime()));
       }
     }
 
@@ -264,7 +311,6 @@ void SVDClusterEvaluationModule::event()
     }
   }
   //close loop on clusters
-
 }
 
 
@@ -280,13 +326,13 @@ void SVDClusterEvaluationModule::endRun()
     m_RMS_ClusterTimeResolution[k] = m_histo_ClusterTimeResolution[k]->GetRMS();
 
     m_mean_PurityInsideTMCluster[k] = m_histo_PurityInsideTMCluster[k]->GetMean();
-    m_RMS_PurityInsideTMCluster[k] = m_histo_PurityInsideTMCluster[k]->GetRMS();
+    m_RMS_PurityInsideTMCluster[k] = m_histo_PurityInsideTMCluster[k]->GetRMS() / sqrt(m_histo_PurityInsideTMCluster[k]->GetEntries());
 
     m_mean_Puddlyness[k] = m_histo_Puddlyness[k]->GetMean();
-    m_RMS_Puddlyness[k] = m_histo_Puddlyness[k]->GetRMS();
+    m_RMS_Puddlyness[k] = m_histo_Puddlyness[k]->GetRMS() / sqrt(m_histo_PuddlynessTM[k]->GetEntries());
 
     m_mean_PuddlynessTM[k] = m_histo_PuddlynessTM[k]->GetMean();
-    m_RMS_PuddlynessTM[k] = m_histo_PuddlynessTM[k]->GetRMS();
+    m_RMS_PuddlynessTM[k] = m_histo_PuddlynessTM[k]->GetRMS() / sqrt(m_histo_PuddlynessTM[k]->GetEntries());
   }
   for (int k = 0; k < m_NsetsRed; k ++) {
     m_mean_ClusterUPositionResolution[k] = m_histo_ClusterUPositionResolution[k]->GetMean();
@@ -300,7 +346,7 @@ void SVDClusterEvaluationModule::endRun()
   createEfficiencyGraph("recoEff", "Efficiency of Recoing ( RecoDigits / ShaperDigits )", m_NumberOfRecoDigit, m_NumberOfShaperDigit,
                         "set", "efficiency", m_graphList);
 
-  createEfficiencyGraph("clusterEff", "Efficiency of Clustering ( TrueHits / Truth-Matched Clusters )", m_NumberOfClustersRelatedToTH,
+  createEfficiencyGraph("clusterEff", "Efficiency of Clustering ( Truth-Matched Clusters / TrueHits )", m_NumberOfClustersRelatedToTH,
                         m_NumberOfTH, "set", "efficiency", m_graphList);
 
   createEfficiencyGraph("clusterPurity", "Purity of Clusters ( Truth-Matched Clusters / All Clusters )", m_NumberOfTMClusters,
@@ -353,10 +399,28 @@ void SVDClusterEvaluationModule::endRun()
     while ((obj = nextH_cltime()))
       obj->Write();
 
+    TDirectory* dir_cltimepull = oldDir->mkdir("cluster_time_pull");
+    dir_cltimepull->cd();
+    TIter nextH_cltimepull(m_histoList_ClusterTimePull);
+    while ((obj = nextH_cltimepull()))
+      obj->Write();
+
     TDirectory* dir_clpos = oldDir->mkdir("cluster_position");
     dir_clpos->cd();
     TIter nextH_clpos(m_histoList_ClusterPositionResolution);
     while ((obj = nextH_clpos()))
+      obj->Write();
+
+    TDirectory* dir_clpospull = oldDir->mkdir("cluster_position_pull");
+    dir_clpospull->cd();
+    TIter nextH_clpospull(m_histoList_ClusterPositionPull);
+    while ((obj = nextH_clpospull()))
+      obj->Write();
+
+    TDirectory* dir_clpostime = oldDir->mkdir("cluster_timeVSposition");
+    dir_clpostime->cd();
+    TIter nextH_clpostime(m_histo2DList_TresVsPosres);
+    while ((obj = nextH_clpostime()))
       obj->Write();
 
     TDirectory* dir_clinpurTM = oldDir->mkdir("intra_cluster_purity_TM");
@@ -395,6 +459,11 @@ void SVDClusterEvaluationModule::endRun()
     while ((obj = nextH_graph()))
       obj->Write();
 
+    TDirectory* dir_controlsMC = oldDir->mkdir("controlMC");
+    dir_controlsMC->cd();
+    TIter nextH_controlsMC(m_histoList_Control);
+    while ((obj = nextH_controlsMC()))
+      obj->Write();
 
     m_outputFile->Close();
   }
@@ -613,6 +682,59 @@ void SVDClusterEvaluationModule::createArbitraryGraphError_Red(const char* name,
   if (list)
     list->Add(c);
 
+}
+
+bool SVDClusterEvaluationModule::goodTrueHit(SVDTrueHit thino)
+{
+  if (0) {
+    float charge;
+    bool firsty;
+
+    B2INFO("Check: Inside goodTrueHit function: 1");
+
+    RelationVector<SVDSimHit> relatVectorTHToSim = DataStore::getRelationsWithObj<SVDSimHit>(&thino);
+
+    B2INFO("Check: Inside goodTrueHit function: 2");
+
+    if (relatVectorTHToSim.size() > 0) {
+      RelationVector<MCParticle> relatVectorSimToMC = DataStore::getRelationsWithObj<MCParticle>(relatVectorTHToSim[0]);
+
+      B2INFO("Check: Inside goodTrueHit function: 3");
+
+      m_histoControl_THToMCsize->Fill(relatVectorSimToMC.size());
+
+      B2INFO("Check: Inside goodTrueHit function: 4");
+
+      if (relatVectorSimToMC.size() > 0) {
+        B2INFO("Check: Inside goodTrueHit function: 5");
+
+        charge = relatVectorSimToMC[0]->getCharge();
+        firsty = relatVectorSimToMC[0]->isPrimaryParticle();
+
+        B2INFO("Check: Inside goodTrueHit function: 6");
+
+        m_histoControl_MCcharge->Fill(charge);
+        m_histoControl_MCisPrimary->Fill(firsty);
+
+        B2INFO("Check: Inside goodTrueHit function: 7");
+
+        if (charge != 0 && firsty)
+          return true;
+        else
+          return false;
+      } else {
+        B2INFO("Check: Inside goodTrueHit function: 8, relatVectorTHToMC <= 0");
+
+        return false;
+      }
+    } else {
+      B2INFO("Check: Inside goodTrueHit function: 9, relatVectorTHToSim.size <= 0");
+
+      return false;
+    }
+  } else {
+    return true;
+  }
 }
 
 /*float SVDClusterEvaluationModule::getMeanFromHistoWithoutABin(TH1F* histo, int BadBin)

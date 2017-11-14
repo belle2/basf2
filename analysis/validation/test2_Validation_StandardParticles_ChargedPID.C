@@ -180,6 +180,11 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   piKfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Description", "Rate of pions faking Kaons vs. momentum"));
   piefake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Description", "Rate of pions faking electrons vs. momentum"));
   pimufake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Description", "Rate of pions faking muons vs. momentum"));
+  Kpfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Check", "Currently low stats, but should be consistent across versions"));
+  Kpifake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Check", "Currently low stats, but should be consistent across versions"));
+  piKfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Check", "Currently low stats, but should be consistent across versions"));
+  piefake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Check", "Currently low stats, but should be consistent across versions"));
+  pimufake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Check", "Currently low stats, but should be consistent across versions"));
   Kpfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Contact", "jan.strube@desy.de"));
   Kpifake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Contact", "jan.strube@desy.de"));
   piKfake_vs_momentum->GetListOfFunctions()->Add(new TNamed("Contact", "jan.strube@desy.de"));
@@ -197,6 +202,10 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   piktree->Project("kplusRecoEff_vs_cosTheta", kbranch+"_P4[2]/"+kbranch+"_P", "("+kbranch+"_charge > 0) && "+kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
   piktree->Project("kminusRecoEff_vs_cosTheta", kbranch+"_P4[2]/"+kbranch+"_P", "("+kbranch+"_charge < 0) && "+kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
   piktree->Project("krecoEff_vs_cosTheta", kbranch+"_P4[2]/"+kbranch+"_P", kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
+  kplusRecoEff_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
+  kplusRecoEff_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Description", "Difference in reco efficiency between K+ and K-"));
+  kplusRecoEff_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Contact", "jan.strube@desy.de"));
+  kplusRecoEff_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Check", "flat line across the whole range"));
   kplusRecoEff_vs_cosTheta->Divide(krecoEff_vs_cosTheta);
   kminusRecoEff_vs_cosTheta->Divide(krecoEff_vs_cosTheta);
   kplusRecoEff_vs_cosTheta->Add(kminusRecoEff_vs_cosTheta, -1);
@@ -229,6 +238,11 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   piKfake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
   piefake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
   pimufake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
+  Kpfake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Check", "Currently low stats, but should be consistent across versions"));
+  Kpifake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Check", "Currently low stats, but should be consistent across versions"));
+  piKfake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Check", "Currently low stats, but should be consistent across versions"));
+  piefake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Check", "Currently low stats, but should be consistent across versions"));
+  pimufake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Check", "Currently low stats, but should be consistent across versions"));
   Kpfake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Description", "Rate of Kaons faking protons vs. cosTheta"));
   Kpifake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Description", "Rate of Kaons faking pions vs. cosTheta"));
   piKfake_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Description", "Rate of pions faking Kaons vs. cosTheta"));

@@ -22,7 +22,7 @@ REG_MODULE(PXDRawDumper)
 
 void PXDRawDumperModule::initialize(void)
 {
-  m_storeRaw.required();
+  m_storeRaw.isRequired();
 }
 
 void PXDRawDumperModule::event(void)

@@ -44,7 +44,7 @@ CDCCosmicSelectorModule::CDCCosmicSelectorModule() : Module()
 void CDCCosmicSelectorModule::initialize()
 {
   StoreArray<MCParticle> mcParticles;
-  mcParticles.required();
+  mcParticles.isRequired();
 }
 
 

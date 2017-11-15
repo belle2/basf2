@@ -128,8 +128,13 @@ void EKLMUnpackerModule::event()
           // !!! SHOULD BE 12 BITS !!!
 
           sectorGlobal = m_ElectronicsMap->getSectorByLane(&lane);
-          if (sectorGlobal == NULL)
-            B2FATAL("Incomplete EKLM electronics map.");
+          if (sectorGlobal == NULL) {
+            B2ERROR("Lane with copper = " << lane.getCopper() <<
+                    ", data concentrator = " << lane.getDataConcentrator() <<
+                    ", lane = " << lane.getLane() << " does not exist in the "
+                    "EKLM electronics map.");
+            continue;
+          }
           m_GeoDat->sectorNumberToElementNumbers(*sectorGlobal,
                                                  &endcap, &layer, &sector);
           EKLMDigit* idigit = eklmDigits.appendNew();

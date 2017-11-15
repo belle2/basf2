@@ -89,7 +89,7 @@ if not read_data:
 # ---------------------- #
 
 firmtsf = register_module('CDCTriggerTSFFirmware')
-firmtsf.param('mergerOnly', True)
+firmtsf.param('mergerOnly', mergerOnly)
 firmtsf.logging.log_level = basf2.LogLevel.DEBUG
 firmtsf.logging.debug_level = 30
 firmtsf.logging.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)

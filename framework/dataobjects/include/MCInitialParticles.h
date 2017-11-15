@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FRAMEWORK_DATAOBJECTS_MCINITIALPARTICLES_H
-#define FRAMEWORK_DATAOBJECTS_MCINITIALPARTICLES_H
 
 #include <TLorentzVector.h>
 #include <TLorentzRotation.h>
@@ -204,4 +202,3 @@ namespace Belle2 {
   }
 
 } //Belle2 namespace
-#endif // FRAMEWORK_DATAOBJECTS_MCINITIALPARTICLES_H

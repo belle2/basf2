@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CONST_H
-#define CONST_H
+#pragma once
 
 #include <framework/core/FrameworkExceptions.h>
 
@@ -592,5 +591,3 @@ Belle2::Const::DetectorSet operator + (Belle2::Const::EDetector firstDet, Belle2
  * Combination of particle sets.
  */
 Belle2::Const::ParticleSet operator + (const Belle2::Const::ParticleSet& firstSet, const Belle2::Const::ParticleSet& secondSet);
-
-#endif /* CONST_H */

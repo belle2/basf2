@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef STOREOBJPTR_H
-#define STOREOBJPTR_H
+#pragma once
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreAccessorBase.h>
@@ -215,5 +214,3 @@ namespace Belle2 {
     TObject** m_storeObjPtr;
   };
 } // end namespace Belle2
-
-#endif

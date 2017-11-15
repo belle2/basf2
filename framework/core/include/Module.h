@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MODULE_H
-#define MODULE_H
+#pragma once
 
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleCondition.h>
@@ -621,6 +620,3 @@ namespace Belle2 {
     } proxy##moduleName##Module; }
 
 } // end namespace Belle2
-
-#endif // MODULE_H
-

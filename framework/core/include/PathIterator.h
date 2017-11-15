@@ -8,11 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PATHITERATOR_H
-#define PATHITERATOR_H
+#pragma once
 
 #include <framework/core/Path.h>
-
 #include <boost/shared_ptr.hpp>
 
 
@@ -83,5 +81,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

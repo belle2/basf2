@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEARBOX_STRINGHANDLER_H
-#define GEARBOX_STRINGHANDLER_H
+#pragma once
 
 #include <framework/gearbox/InputHandler.h>
 #include <sstream>
@@ -49,5 +48,3 @@ namespace Belle2 {
     };
   }
 }
-
-#endif

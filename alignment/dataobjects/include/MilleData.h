@@ -38,6 +38,7 @@ namespace Belle2 {
       m_binary(nullptr),
       m_numRecords(other.m_numRecords) {}
 
+    /// Clone object (with optionally a new name)
     virtual MilleData* Clone(const char* newname = "") const override;
 
     /// Get number of records (trajectories) written to binary files

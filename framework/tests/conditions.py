@@ -21,9 +21,8 @@ from basf2 import *
 from ROOT import Belle2
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
-from contextlib import contextmanager
+from b2test_utils import clean_working_directory, safe_process, skip_test
 import multiprocessing
-import tempfile
 import shutil
 
 
@@ -131,8 +130,8 @@ def run_mockdb(pipe):
     try:
         httpd = HTTPServer(("127.0.0.1", 12701), SimpleConditionsDB)
     except OSError:
-        print("TEST SKIPPED: Socket 12701 is in use, cannot continue", file=sys.stderr)
         pipe.send(None)
+        skip_test("Socket 12701 is in use, cannot continue")
         return
     # so see which port we actually got
     port = httpd.socket.getsockname()[1]
@@ -142,19 +141,6 @@ def run_mockdb(pipe):
     httpd.serve_forever()
 
 
-@contextmanager
-def clean_working_directory():
-    """Context manager to create a temporary directory and directly us it as
-    current working directory"""
-    dirname = os.getcwd()
-    try:
-        with tempfile.TemporaryDirectory() as tempdir:
-            os.chdir(tempdir)
-            yield tempdir
-    finally:
-        os.chdir(dirname)
-
-
 def dbprocess(host, path):
     """Process a given path in a child process so that FATAL will not abort this
     script but just the child and configure to use a central database at the given host"""
@@ -162,11 +148,8 @@ def dbprocess(host, path):
     reset_database()
     # now run the path in a child process inside of a clean working directory
     with clean_working_directory() as tempdir:
-        os.chdir(tempdir)
         use_central_database("localtest", host, host, "", LogLevel.WARNING)
-        child = multiprocessing.Process(target=process, args=(path,))
-        child.start()
-        child.join()
+        safe_process(path)
 
 # keep timeouts short for testing
 set_central_database_networkparams(backoff_factor=1, connection_timeout=5, stalled_timeout=5)

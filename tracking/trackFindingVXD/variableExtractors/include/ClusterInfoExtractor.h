@@ -27,6 +27,8 @@ namespace Belle2 {
       initializeStats("seedCharge", variableSet);
       initializeStats("size", variableSet);
       initializeStats("energyLoss", variableSet);
+      initializeStats("time", variableSet);
+      initializeStats("timeSigma", variableSet);
     }
 
     void extractVariables(std::vector<SpacePoint const*> const& spacePoints)
@@ -63,6 +65,18 @@ namespace Belle2 {
         values[i] = clusters[i]->getCharge() / clusters[i]->getSize();
       }
       setStats("energyLoss", values);
+
+
+      for (unsigned int i = 0; i < clusters.size(); ++i) {
+        values[i] = clusters[i]->getClsTime();
+      }
+      setStats("time", values);
+
+      for (unsigned int i = 0; i < clusters.size(); ++i) {
+        values[i] = clusters[i]->getClsTimeSigma();
+      }
+      setStats("timeSigma", values);
+
     }
 
   protected:

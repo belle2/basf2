@@ -22,18 +22,21 @@ def main():
     )
 
     argument_parser.add_argument(
+        "-r",
         "--treename",
-        default="records",
+        default="tree",
         help="Name of the input TTree in the ROOT file",
     )
 
     argument_parser.add_argument(
+        "-i",
         "--identifier",
         default=argparse.SUPPRESS,
         help="Database identifier or name of weight file to be generated",
     )
 
     argument_parser.add_argument(
+        "-t",
         "--truth",
         type=str,
         default="truth",
@@ -45,6 +48,14 @@ def main():
         default=None,
         nargs='+',
         help="Name of the column containing the variables to be used."
+    )
+
+    argument_parser.add_argument(
+        "-x",
+        "--variable_excludes",
+        default=None,
+        nargs='+',
+        help="Variables to be excluded"
     )
 
     argument_parser.add_argument(
@@ -67,6 +78,14 @@ def main():
     treename = arguments.treename
     feature_names = arguments.variables
 
+    excludes = arguments.variable_excludes
+    if excludes is None:
+        excludes = ["truth"]
+    elif "truth" not in excludes:
+        excludes.append("truth")
+
+    print('excludes: ', excludes)
+
     # Figure out feature variables
     if feature_names is None:
         with root_utils.root_open(records_file_path) as records_tfile:
@@ -81,7 +100,7 @@ def main():
     # Remove the variables that have Monte Carlo truth information unless explicitly selected
     truth_free_variable_names = [name for name
                                  in feature_names
-                                 if "truth" not in name]
+                                 if name not in excludes]
 
     weight_variable = ""
     if "weight" in truth_free_variable_names:

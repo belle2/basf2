@@ -86,6 +86,14 @@ namespace Cosim {
     std::cout.copyfmt(oldState);
   }
 
+  template<size_t N>
+  void display_nonzero_hex(const std::array<char, N>& signal)
+  {
+    if (std::any_of(signal.begin(), signal.end(), [](char i)
+    {return i != zero_val;})) {
+      display_hex(signal);
+    }
+  }
 
   /* extract a subset of bitstring, like substring.
    *

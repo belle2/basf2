@@ -407,6 +407,7 @@ namespace TreeFitter {
       //FT:  LHCb iteration method, requires to define properly m_daughters in ParticleBase instead of InternalParticle, OR to do some hacks
       for (ParticleBase::conIter it = m_daughters.begin(); !rc && it != m_daughters.end(); ++it) {
         rc = (*it)->locate(particle);
+        if (rc) {break;}
       }
     }
     return rc;

@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter                                            *
+ * Contributors: James Kahn, Martin Ritter                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,16 +13,16 @@
 
 namespace Belle2 {
   /**
-   * foo
+   * Marks all objects in DataStore except those of type ParticleList as WrtieOut=False.
+   * Intedend to run before outputting an index file to remove unecessary arrays.
    */
   class OnlyParticleListsModule : public Module {
 
   public:
     /**
-     * Constructor: Sets the description, the properties and the parameters of the module.
+     * Constructor
      */
-    OnlyParticleListsModule() {}
-    /** naah */
+    OnlyParticleListsModule();
     virtual void initialize();
   };
 }

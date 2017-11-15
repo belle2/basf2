@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter                                            *
+ * Contributors: James Kahn, Martin Ritter                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,6 +15,11 @@
 using namespace Belle2;
 
 REG_MODULE(OnlyParticleLists)
+
+OnlyParticleListsModule::OnlyParticleListsModule()
+{
+  setDescription("Marks all objects in DataStore except those of type ParticleList as WrtieOut=False. Intedend to run before outputting an index file to remove unecessary arrays.");
+}
 
 void OnlyParticleListsModule::initialize()
 {

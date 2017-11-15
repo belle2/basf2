@@ -94,8 +94,22 @@ void EKLMUnpackerModule::event()
           uint16_t bword1 = (buf_slot[iHit * hitLength + 0] >> 16) & 0xFFFF;
           uint16_t bword4 =  buf_slot[iHit * hitLength + 1] & 0xFFFF;
           uint16_t bword3 = (buf_slot[iHit * hitLength + 1] >> 16) & 0xFFFF;
-          uint16_t strip  =   bword1 & 0x7F;
-          uint16_t plane  = ((bword1 >> 7) & 1) + 1;
+          uint16_t strip = bword1 & 0x7F;
+          /**
+           * The possible values of the strip number in the raw data are
+           * from 0 to 127, while the actual range of strip numbers is from
+           * 1 to 75. A check is required.
+           */
+          if (!m_GeoDat->checkStrip(strip, false)) {
+            B2ERROR("Incorrect strip number (" << strip << ") in raw data.");
+          }
+          uint16_t plane = ((bword1 >> 7) & 1) + 1;
+          /*
+           * The possible values of the plane number in the raw data are from
+           * 1 to 2. The range is the same as in the detector geometry.
+           * Consequently, a check of the plane number is useless: it is
+           * always correct.
+           */
           lane.setLane((bword1 >> 8) & 0x1F);
           //uint16_t ctime  =   bword2 & 0xFFFF; //full bword      unused yet
           uint16_t tdc    =   bword3 & 0x7FF;

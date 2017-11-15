@@ -31,7 +31,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
-#include <iostream>
 
 using namespace std;
 using namespace Belle2;

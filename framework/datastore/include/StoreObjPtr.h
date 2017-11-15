@@ -102,6 +102,7 @@ namespace Belle2 {
      *  @param errorIfExisting  Flag whether an error will be reported if the object was already registered.
      *  @return            True if the registration succeeded.
      */
+    [[deprecated("Please use registerInDataStore() on an instance and consider making the StoreObjPtr a member of your class")]]
     static bool registerPersistent(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
                                    bool errorIfExisting = true)
     {
@@ -119,6 +120,7 @@ namespace Belle2 {
      *  @param durability  Specifies lifetime of object in question.
      *  @return            True if the object exists.
      */
+    [[deprecated("Please use isRequired() on an instance and consider making the StoreObjPtr a member of your class")]]
     static bool required(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
     {
       std::string objName = DataStore::objectName<T>(name);
@@ -135,6 +137,7 @@ namespace Belle2 {
      *  @param durability  Specifies lifetime of object in question.
      *  @return            True if the object exists.
      */
+    [[deprecated("Please use isOptional() on an instance and consider making the StoreObjPtr a member of your class")]]
     static bool optional(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event)
     {
       std::string objName = DataStore::objectName<T>(name);

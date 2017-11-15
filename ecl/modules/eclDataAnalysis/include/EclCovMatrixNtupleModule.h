@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Lukin, Alexander Bobrov, Guglielmo De Nardo        *      *                                                                        *
+ * Contributors: Peter Lukin, Alexander Bobrov, Guglielmo De Nardo        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

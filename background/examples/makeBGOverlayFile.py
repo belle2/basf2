@@ -8,6 +8,7 @@ import sys
 
 # -----------------------------------------------------------------------------------
 # This example is for preparing a root file for BG overlay using simulated BG samples
+# Setup for phase 3 (for phase 2 change compression algorithm in ECLDigitizer)
 # Output file: BGforOverlay.root
 # -----------------------------------------------------------------------------------
 
@@ -66,7 +67,8 @@ main.add_module(arich_digitizer)
 
 # ECL digitization
 ecl_digitizer = register_module('ECLDigitizer')
-main.add_module(ecl_digitizer, WaveformMaker=True, CompressionAlgorithm=3)
+main.add_module(ecl_digitizer, WaveformMaker=True, CompressionAlgorithm=4)  # phase 3
+# main.add_module(ecl_digitizer, WaveformMaker=True, CompressionAlgorithm=3)  # phase 2
 
 # BKLM digitization
 bklm_digitizer = register_module('BKLMDigitizer')

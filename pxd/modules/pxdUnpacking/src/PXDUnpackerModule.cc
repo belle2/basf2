@@ -789,11 +789,11 @@ void PXDUnpackerModule::terminate()
     flag |= m_errorCounter[i];
   }
   if (flag != 0) {
-    B2ERROR("PXD Unpacker --> Error Statistics (counted once per event!) in Events: " << m_unpackedEventsCount);
-    B2ERROR(errstr + " )");
+    B2RESULT("PXD Unpacker --> Error Statistics (counted once per event!) in Events: " << m_unpackedEventsCount);
+    B2RESULT(errstr + " )");
     for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
       if (m_errorCounter[i]) {
-        B2ERROR(error_name[i] << ": " << m_errorCounter[i]);
+        B2RESULT(error_name[i] << ": " << m_errorCounter[i]);
       }
     }
   } else {

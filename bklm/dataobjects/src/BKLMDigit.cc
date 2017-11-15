@@ -55,6 +55,7 @@ BKLMDigit::BKLMDigit(int moduleID, int ctime, short tdc, short charge) :
   m_SimEDep(0.0),
   m_EDep(0.0),
   m_SimNPixel(0),
+  m_NPixel(0.0),
   m_FitStatus(0)
 {
   //this assaumes that the strip is already zero based...

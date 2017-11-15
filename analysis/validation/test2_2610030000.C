@@ -35,28 +35,28 @@ void plotStd(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_Dst_Q->GetListOfFunctions()->Add(new TNamed("Check", "Q value expected to peak at 5.85  MeV/c^{2}"));
 
   TH1F* h_D0_p = new TH1F("h_D0_p","D0 momentum",100,0,7);
+  ptree->Project("h_D0_p", "DST_D0_P", tmCuts);
   h_D0_p->GetListOfFunctions()->Add(new TNamed("Description", "D*+ -> D0(Kpi)pi_s, Momentum of D0"));
   h_D0_p->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   h_D0_p->GetListOfFunctions()->Add(new TNamed("Check", "Momentum of D0 should vary from 0 - 7.0 GeV/c^{2}"));
-  ptree->Project("h_D0_p", "DST_D0_P", tmCuts);
 
   TH1F* h_pis_p = new TH1F("h_pis_p","soft pi momentum",100,0,0.6);
+  ptree->Project("h_pis_p", "DST_pi_P", tmCuts);
   h_pis_p->GetListOfFunctions()->Add(new TNamed("Description", "D*+ -> D0(Kpi)pi_s, Momentum of slow pion"));
   h_pis_p->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   h_pis_p->GetListOfFunctions()->Add(new TNamed("Check", "Momentum of slow pion is smaller than 0.6 GeV/c^{2}"));
-  ptree->Project("h_pis_p", "DST_pi_P", tmCuts);
 
   TH1F* h_pi_p = new TH1F("h_pi_p","pi momentum",100,0,5);
+  ptree->Project("h_pi_p", "DST_D0_pi_P", tmCuts);
   h_pi_p->GetListOfFunctions()->Add(new TNamed("Description", "D*+ -> D0(Kpi)pi_s, Momentum of pion"));
   h_pi_p->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   h_pi_p->GetListOfFunctions()->Add(new TNamed("Check", "Momentum of pion vary from 0 - 5 GeV/c^{2}"));
-  ptree->Project("h_pi_p", "DST_D0_pi_P", tmCuts);
 
   TH1F* h_k_p = new TH1F("h_k_p","K momentum",100,0,5);
+  ptree->Project("h_k_p", "DST_D0_K_P", tmCuts);
   h_k_p->GetListOfFunctions()->Add(new TNamed("Description", "D*+ -> D0(Kpi)pi_s, Momentum of Kaon"));
   h_k_p->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   h_k_p->GetListOfFunctions()->Add(new TNamed("Check", "Momentum of kaon vary from 0 - 5 GeV/c^{2}"));
-  ptree->Project("h_k_p", "DST_D0_K_P", tmCuts);
 
   outputFile->cd();
 
@@ -92,10 +92,10 @@ void plotTime(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_sigmat_all->GetListOfFunctions()->Add(new TNamed("Check", "D0 flight time error is about 73 fs"));
 
   h_sig_all = new TH1F("h_sig_all", "D0 flight time significance", 100,0, 20);
+  ptree->Project("h_sig_all", "DST_D0_FT/DST_D0_FTE",tmCuts);
   h_sig_all->GetListOfFunctions()->Add(new TNamed("Description", "D*+ -> D0(Kpi)pi_s, hist->GetTitle()"));
   h_sig_all->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   h_sig_all->GetListOfFunctions()->Add(new TNamed("Check", "Ratio of D0 flight time resolution to time error"));
-  ptree->Project("h_sig_all", "DST_D0_FT/DST_D0_FTE",tmCuts);
   
   
   outputFile->cd();
@@ -157,22 +157,22 @@ void plotTrack(TFile* pfile, TTree* ptree, TFile *outputFile){
   pfx_k_z0->GetListOfFunctions()->Add(new TNamed("Check", "ProjectionX of z0 error and transverse momentum for kaon"));
 
   h_pis_pVal = new TH1F("h_pis_pVal", "pVal slow pion", 100, 0 , 1 );
+  ptree->Project("h_pis_pVal", "DST_pi_TrPval",cuts);
   h_pis_pVal->GetListOfFunctions()->Add(new TNamed("Description", "D*+ -> D0(Kpi)pi_s, hist->GetTitle()"));
   h_pis_pVal->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   h_pis_pVal->GetListOfFunctions()->Add(new TNamed("Check", "pVal slow pion, vary from 0 - 1"));
-  ptree->Project("h_pis_pVal", "DST_pi_TrPval",cuts);
 
   h_pi_pVal = new TH1F("h_pi_pVal", "pVal D0 pion", 100, 0 , 1 );
+  ptree->Project("h_pi_pVal", "DST_D0_pi_TrPval",cuts);
   h_pi_pVal->GetListOfFunctions()->Add(new TNamed("Description", "D*+ -> D0(Kpi)pi_s, hist->GetTitle()"));
   h_pi_pVal->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   h_pi_pVal->GetListOfFunctions()->Add(new TNamed("Check", "pVal pion, vary from 0 - 1"));
-  ptree->Project("h_pi_pVal", "DST_D0_pi_TrPval",cuts);
 
   h_k_pVal = new TH1F("h_k_pVal", "pVal D0 kaon", 100, 0 , 1 );
+  ptree->Project("h_k_pVal", "DST_D0_K_TrPval",cuts);
   h_k_pVal->GetListOfFunctions()->Add(new TNamed("Description", "D*+ -> D0(Kpi)pi_s, hist->GetTitle()"));
   h_k_pVal->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   h_k_pVal->GetListOfFunctions()->Add(new TNamed("Check", "pVal kaon, vary from 0 - 1"));
-  ptree->Project("h_k_pVal", "DST_D0_K_TrPval",cuts);
   
   
   outputFile->cd();

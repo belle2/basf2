@@ -26,22 +26,22 @@ void plotStd(TFile* pfile, TTree* ptree, TFile *outputFile){
   TString tmCuts("(D0_isSignal == 1)");
 
   TH1F* h_D0_p = new TH1F("h_D0_p","D0 momentum",100,0,7);
+  ptree->Project("h_D0_p", "D0_P", tmCuts);
   h_D0_p->GetListOfFunctions()->Add(new TNamed("Description", "D0 -> KSpi0, Momentum of D0"));
   h_D0_p->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   h_D0_p->GetListOfFunctions()->Add(new TNamed("Check", "Momentum of D0 vary from 0 - 7.0 GeV/c^{2}"));
-  ptree->Project("h_D0_p", "D0_P", tmCuts);
 
   TH1F* h_ks_p = new TH1F("h_ks_p","Ks momentum",100,0,6);
+  ptree->Project("h_ks_p", "D0_K_S0_P", tmCuts);
   h_ks_p->GetListOfFunctions()->Add(new TNamed("Description", "D0 -> KSpi0, Momentum of KS"));
   h_ks_p->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   h_ks_p->GetListOfFunctions()->Add(new TNamed("Check", "Momentum of D0 vary from 0 - 6.0 GeV/c^{2}"));
-  ptree->Project("h_ks_p", "D0_K_S0_P", tmCuts);
 
   TH1F* h_piz_p = new TH1F("h_piz_p","pi0 momentum",100,0,5);
+  ptree->Project("h_piz_p", "D0_pi0_P", tmCuts);
   h_piz_p->GetListOfFunctions()->Add(new TNamed("Description", "D0 -> KSpi0, Momentum of pi0"));
   h_piz_p->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   h_piz_p->GetListOfFunctions()->Add(new TNamed("Check", "Momentum of D0 vary from 0 - 5.0 GeV/c^{2}"));
-  ptree->Project("h_piz_p", "D0_pi0_P", tmCuts);
 
   outputFile->cd();
 
@@ -73,10 +73,10 @@ void plotTime(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_sigmat_all->GetListOfFunctions()->Add(new TNamed("Check", "D0 flight time error is about 73 fs"));
 
   h_sig_all = new TH1F("h_sig_all", "D0 flight time significance", 100,0, 200);
+  ptree->Project("h_sig_all", "D0_K_S0_FT/D0_K_S0_FTE",tmCuts);
   h_sig_all->GetListOfFunctions()->Add(new TNamed("Description", "D0 -> KSpi0,  D0 flight time significance"));
   h_sig_all->GetListOfFunctions()->Add(new TNamed("Contact" , "chenyq15@mail.ustc.edu.cn"));
   h_sig_all->GetListOfFunctions()->Add(new TNamed("Check", "Ratio of D0 flight time resolution to time error"));
-  ptree->Project("h_sig_all", "D0_K_S0_FT/D0_K_S0_FTE",tmCuts);
   
   
   outputFile->cd();

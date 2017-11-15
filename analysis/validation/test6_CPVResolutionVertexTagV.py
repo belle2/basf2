@@ -52,7 +52,7 @@ outputNtuple = ROOT.TNtuple(
     "Vertex_TagV_Resols",
     "Weighted averages of the resolution params of Vertex and TagV Tools",
     "mu_DT_PXD0:sigma_DT_PXD0:mu_DZsig_PXD0:sigma_DZsig_PXD0:mu_DZtag_PXD0:sigma_DZtag_PXD0:" +
-    "mu_DT_PXD1:sigma_DT_PXD1:mu_DZsig_PXD1:sigma_DZsig_PXD1:mu_DZtag_PXD1:sigma_DZtag_PXD1")
+    "mu_DT_PXD2:sigma_DT_PXD2:mu_DZsig_PXD2:sigma_DZsig_PXD2:mu_DZtag_PXD2:sigma_DZtag_PXD2:PXD2_PXD0_Eff")
 
 outputNtuple.SetAlias('Description', "These are the weighted averages of the mean and the standard deviation " +
                       "of the residuals for DeltaT, DeltaZsig and DeltaZtag. The fit is performed with 3 Gaussian functions." +
@@ -70,6 +70,7 @@ PXDReqs = ["PXD0", "PXD2"]
 
 fitResults = []
 fitResultsForNtuple = []
+numberOfEntries = []
 
 for PXDReq in PXDReqs:
     iResult = []
@@ -291,6 +292,7 @@ for PXDReq in PXDReqs:
     fitDataDT.Print()
     fitDataSigZ.Print()
     fitDataTagZ.Print()
+    numberOfEntries.append(data.numEntries())
 
 # Fit and plot of the DeltaT Error and DeltaTRECO - DeltaTMC
 
@@ -716,6 +718,7 @@ for PXDReq in PXDReqs:
 
     fitResults.append(iResult)
 
+fitResultsForNtuple.append(float((numberOfEntries[1] / numberOfEntries[0]) * 100))
 outputNtuple.Fill(array.array('f', fitResultsForNtuple))
 outputNtuple.Write()
 outputFile.Close()
@@ -740,6 +743,11 @@ print('*                                                             *')
 print('*    ' + fitResults[0][2][0] + '        ' + fitResults[0][2][1] + '   *')
 print('*                                                             *')
 print('********REQUIRING BOTH MUON TRACKS TO HAVE A PXD HIT***********')
+print('*                                                             *')
+print('* Efficiency                                                  *')
+print('*                                                             *')
+print('* N_' + PXDReqs[1] + '/N_' + PXDReqs[0] + ' = ' + str(numberOfEntries[1]) + "/" + str(numberOfEntries[0]) + ' = ' +
+      '{:^3.2f}'.format(float((numberOfEntries[1] / numberOfEntries[0]) * 100)) + '%             *')
 print('*                                                             *')
 print('* DeltaT - Gen. DeltaT                                        *')
 print('*                                                             *')

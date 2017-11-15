@@ -62,22 +62,18 @@ void EKLMUnpackerModule::event()
   StoreArray<EKLMDigit> eklmDigits(m_outputDigitsName);
   if (!m_ElectronicsMap.isValid())
     B2FATAL("No EKLM electronics map.");
-  B2DEBUG(1, "Unpacker has have " << rawKLM.getEntries() << " entries");
   for (int i = 0; i < rawKLM.getEntries(); i++) {
     if (rawKLM[i]->GetNumEvents() != 1) {
-      B2DEBUG(1, "rawKLM index " << i << " has more than one entry: " <<
-              rawKLM[i]->GetNumEvents());
+      B2ERROR("RawKLM with index " << i << " has " <<
+              rawKLM[i]->GetNumEvents() << " entries (should be 1). ");
       continue;
     }
-    B2DEBUG(1, "num events in buffer: " << rawKLM[i]->GetNumEvents() <<
-            " number of nodes (copper boards) " << rawKLM[i]->GetNumNodes());
     /*
      * getNumEntries is defined in RawDataBlock.h and gives the
      * numberOfNodes*numberOfEvents. Number of nodes is num copper boards.
      */
     for (int j = 0; j < rawKLM[i]->GetNumEntries(); j++) {
       unsigned int copperId = rawKLM[i]->GetNodeID(j);
-      B2DEBUG(1, "Opening data package from the COPPER " << copperId);
       if (copperId < EKLM_ID || copperId > EKLM_ID + 4)
         continue;
       uint16_t copperN = copperId - EKLM_ID;
@@ -90,21 +86,14 @@ void EKLMUnpackerModule::event()
         int numHits = numDetNwords / hitLength;
         lane.setDataConcentrator(finesse_num);
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
-          B2DEBUG(1, "word count incorrect: " << numDetNwords);
+          B2ERROR("Incorrect number of data words: " << numDetNwords);
           continue;
         }
-        if (numDetNwords > 0) B2DEBUG(1, "Opening finesse " << finesse_num <<
-                                        " number of words is " << numDetNwords <<
-                                        ", counter is " << (buf_slot[numDetNwords - 1] & 0xFFFF));
-
-
         for (int iHit = 0; iHit < numHits; iHit++) {
-          uint16_t bword2 =  buf_slot[iHit * hitLength + 0] & 0xFFFF;
+          //uint16_t bword2 =  buf_slot[iHit * hitLength + 0] & 0xFFFF;
           uint16_t bword1 = (buf_slot[iHit * hitLength + 0] >> 16) & 0xFFFF;
           uint16_t bword4 =  buf_slot[iHit * hitLength + 1] & 0xFFFF;
           uint16_t bword3 = (buf_slot[iHit * hitLength + 1] >> 16) & 0xFFFF;
-          B2DEBUG(1, "unpacking " << bword1 << ", " << bword2 << ", " <<
-                  bword3 << ", " << bword4);
           uint16_t strip = bword1 & 0x7F;
           /**
            * The possible values of the strip number in the raw data are
@@ -122,7 +111,7 @@ void EKLMUnpackerModule::event()
            * always correct.
            */
           lane.setLane((bword1 >> 8) & 0x1F);
-//        uint16_t ctime  =   bword2 & 0xFFFF; //full bword      unused yet
+          //uint16_t ctime  =   bword2 & 0xFFFF; //full bword      unused yet
           uint16_t tdc    =   bword3 & 0x7FF;
           uint16_t charge =   bword4 & 0xFFFF;  // !!! THERE IS 15 BITS NOW!!!
           // !!! SHOULD BE 12 BITS !!!
@@ -146,13 +135,6 @@ void EKLMUnpackerModule::event()
           idigit->setStrip(strip);
           idigit->isGood(true);
           idigit->setCharge(charge);
-          B2DEBUG(1, " Digit: endcap=" << idigit->getEndcap() <<
-                  " layer=" << idigit->getLayer() <<
-                  " strip=" << idigit->getSector() <<
-                  " plane=" << idigit->getPlane() <<
-                  " strip=" << idigit->getStrip() <<
-                  " charge=" << idigit->getEDep()  <<
-                  " time=" << idigit->getTime());
         }
       } //finesse boards
     }  //copper boards

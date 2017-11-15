@@ -186,10 +186,12 @@ template<int iSL>
 char* TSF::getData(inputToTSFArray input)
 {
   static array<char, mergerWidth* nAxialMergers[iSL]> data;
-  auto itr = data.begin();
+  // 2-D array in XSI is totally in LSB, like this
+  // ((012), (345), (678))
+  auto itr = data.end() - mergerWidth;
   for (const auto& merger : input[iSL]) {
     copy(merger.begin(), merger.end(), itr);
-    itr += mergerWidth;
+    itr -= mergerWidth;
   }
   return data.data();
 }

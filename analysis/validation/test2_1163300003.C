@@ -27,7 +27,7 @@ void plotUpsHad(TFile* pfile, TTree* ptree, TFile *outputFile){
   gStyle->SetHistMinimumZero();
   // General Info
   TH1F* h_Mbc = new TH1F("h_Mbc","Btag Mbc",100,5.22,5.29);
-//  ptree->Project("h_Mbc", "Upsilon4S_d0_Mbc");
+  ptree->Project("h_Mbc", "Upsilon4S_d0_Mbc");
   TH1F* h_DeltaE = new TH1F("h_DeltaE","Btag DeltaE",100,-0.50,0.50);
   ptree->Project("h_DeltaE", "Upsilon4S_d0_deltaE");
   TH1F* h_EExtra = new TH1F("h_EExtra","EExtra",50,0,5);
@@ -42,10 +42,10 @@ void plotUpsHad(TFile* pfile, TTree* ptree, TFile *outputFile){
   ptree->Project("h_cosTBTO", "Upsilon4S_B0_cosTBTO");
 
   // Missing quantities and signal side relevant variables
-  //TH1F* h_missM2 = new TH1F("h_missM2","squared missing mass",40,0,40);
-  //ptree->Project("h_missM2", "Upsilon4S_missM2__boROEclusters__cm0__bc");
-  //TH1F* h_missP = new TH1F("h_missP","missing momentum",40,0,4);
-  //ptree->Project("h_missP", "Upsilon4S_missP__boROEclusters__cm0__bc");
+  TH1F* h_missM2 = new TH1F("h_missM2","squared missing mass",40,0,40);
+  ptree->Project("h_missM2", "Upsilon4S_missM2__boROEclusters__cm0__bc");
+  TH1F* h_missP = new TH1F("h_missP","missing momentum",40,0,4);
+  ptree->Project("h_missP", "Upsilon4S_missP__boROEclusters__cm0__bc");
   TH1F* h_DstarMomentum = new TH1F("h_DstarMomentum","D* momentum",40,0,4);
   ptree->Project("h_DstarMomentum", "Upsilon4S_B0_d0_pCMS");
   TH1F* h_Dmass = new TH1F("h_Dmass","invariant mass of D meson from D* decay",40,1.8,1.9);
@@ -67,8 +67,8 @@ void plotUpsHad(TFile* pfile, TTree* ptree, TFile *outputFile){
 
   h_R2->Write();
   h_cosTBTO->Write();
- // h_missM2->Write();
-// h_missP->Write();
+  h_missM2->Write();
+  h_missP->Write();
   h_DstarMomentum->Write();
   h_Dmass->Write();
   h_DstarMass->Write();
@@ -83,11 +83,11 @@ void plotUpsSL(TFile* pfile, TTree* ptree, TFile *outputFile){
   gStyle->SetHistMinimumZero();
 
   TH1F* h_Mbc = new TH1F("h_Mbc","Mbc",100,5.22,5.29);
-// ptree->Project("h_Mbc", "Upsilon4S_d0_Mbc");
+  ptree->Project("h_Mbc", "Upsilon4S_d0_Mbc");
   TH1F* h_DeltaE = new TH1F("h_DeltaE","DeltaE",100,-0.50,0.50);
-//  ptree->Project("h_DeltaE", "Upsilon4S_d0_deltaE");
+  ptree->Project("h_DeltaE", "Upsilon4S_d0_deltaE");
   TH1F* h_EExtra = new TH1F("h_EExtra","EExtra",50,0,5);
-//  ptree->Project("h_EExtra", "Upsilon4S_ROE_eextraSel");
+  ptree->Project("h_EExtra", "Upsilon4S_ROE_eextraSel");
   TH1F* h_SigProb = new TH1F("h_SigProb","B-tag signal probability",50,0,1);
   ptree->Project("h_SigProb", "Upsilon4S_B0_sigProb");
   TH1F * h_cosThetaBtag= new TH1F("h_cosThetaBtag","Btag cos Theta between particle and true B", 100,-10,5);
@@ -139,7 +139,7 @@ void test2_1163300003(){
 
   TFile* sample = new TFile(inputfile);
   TTree* treeUpsHad = (TTree*)sample->Get("UpsB0Had");
-  TTree* treeUpsSL = (TTree*)sample->Get("UpsB0SL");
+  TTree* treeUpsSL = (TTree*)sample->Get("UpsB0sl");
   
 
   TFile* outputFile = new TFile("1163300003_Validation.root","RECREATE");

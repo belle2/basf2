@@ -45,9 +45,9 @@ void plotUpsHad(TFile* pfile, TTree* ptree, TFile *outputFile){
 
   // Missing quantities and signal side relevant variables
   TH1F* h_missM2 = new TH1F("h_missM2","squared missing mass",40,0,40);
-  //ptree->Project("h_missM2", "Upsilon4S_missM2__boROEclusters__cm0__bc");
+  ptree->Project("h_missM2", "Upsilon4S_missM2__boROEclusters__cm0__bc");
   TH1F* h_missP = new TH1F("h_missP","missing momentum",40,0,4);
-  //ptree->Project("h_missP", "Upsilon4S_missP__boROEclusters__cm0__bc");
+  ptree->Project("h_missP", "Upsilon4S_missP__boROEclusters__cm0__bc");
   TH1F* h_DstarMomentum = new TH1F("h_DstarMomentum","D* momentum",40,0,4);
   ptree->Project("h_DstarMomentum", "Upsilon4S_B0_d0_pCMS");
   TH1F* h_Dmass = new TH1F("h_Dmass","invariant mass of D meson from D* decay",40,1.8,1.9);
@@ -92,7 +92,7 @@ void plotUpsSL(TFile* pfile, TTree* ptree, TFile *outputFile){
   TH1F* h_SigProb = new TH1F("h_SigProb","B-tag signal probability",50,0,1);
   ptree->Project("h_SigProb", "Upsilon4S_B0_sigProb");
   TH1F * h_cosThetaBtag= new TH1F("h_cosThetaBtag","Btag cos Theta between particle and true B", 100,-10,5);
-  //ptree->Project("h_cosThetaBtag","Upsilon4S_B0_cosThetaBetweenParticleAndTrueB");
+  ptree->Project("h_cosThetaBtag","Upsilon4S_B0_cosThetaBetweenParticleAndTrueB");
 
 
   // Continuum suppression variables
@@ -103,9 +103,9 @@ void plotUpsSL(TFile* pfile, TTree* ptree, TFile *outputFile){
 
   // Missing quantities and signal side relevant variables
   TH1F* h_missM2 = new TH1F("h_missM2","squared missing mass",40,0,40);
- // ptree->Project("h_missM2", "Upsilon4S_missM2__boROEclusters__cm0__bc");
+  ptree->Project("h_missM2", "Upsilon4S_missM2__boROEclusters__cm0__bc");
   TH1F* h_missP = new TH1F("h_missP","missing momentum",40,0,4);
-  //ptree->Project("h_missP", "Upsilon4S_missP__boROEclusters__cm0__bc");
+  ptree->Project("h_missP", "Upsilon4S_missP__boROEclusters__cm0__bc");
   TH1F* h_DstarMomentum = new TH1F("h_DstarMomentum","D* momentum",40,0,4);
   ptree->Project("h_DstarMomentum", "Upsilon4S_B0_d0_pCMS");
   TH1F* h_Dmass = new TH1F("h_Dmass","invariant mass of D meson from D* decay",40,1.8,1.9);
@@ -135,8 +135,7 @@ void plotUpsSL(TFile* pfile, TTree* ptree, TFile *outputFile){
 
 void test2_1263700001(){
 
-  TString inputfile("1263700001.ntuple.root");
-l
+  TString inputfile("1263700001.ntup.root");
   TFile* sample = new TFile(inputfile);
   TTree* treeUpsHad = (TTree*)sample->Get("UpsBplusHad");
   TTree* treeUpsSL = (TTree*)sample->Get("UpsBplusSl");

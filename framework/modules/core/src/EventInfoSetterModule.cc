@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/modules/EventInfoSetterModule.h>
+#include <framework/modules/core/EventInfoSetterModule.h>
 
 #include <framework/core/Environment.h>
 #include <framework/utilities/Utils.h>

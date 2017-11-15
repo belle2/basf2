@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/modules/PrescaleModule.h>
+#include <framework/modules/core/PrescaleModule.h>
 #include <TRandom.h>
 
 using namespace Belle2;

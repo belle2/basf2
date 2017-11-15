@@ -9,7 +9,7 @@
  **************************************************************************/
 
 
-#include <framework/modules/fileinout_modules/RootInputModule.h>
+#include <framework/modules/rootio/RootInputModule.h>
 
 #include <framework/io/RootIOUtilities.h>
 #include <framework/core/InputController.h>

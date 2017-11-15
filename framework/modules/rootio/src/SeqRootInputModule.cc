@@ -4,7 +4,7 @@
 //         6 - Sep - 2012     modified to use DataStoreStreamer, clean up
 //-
 
-#include <framework/modules/fileinout_modules/SeqRootInputModule.h>
+#include <framework/modules/rootio/SeqRootInputModule.h>
 
 #include <framework/core/Environment.h>
 #include <framework/datastore/DataStore.h>

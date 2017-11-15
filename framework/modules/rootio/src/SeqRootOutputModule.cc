@@ -4,7 +4,7 @@
 //         6 - Sep - 2012,  Use of DataStoreStreamer, clean up
 //-
 
-#include <framework/modules/fileinout_modules/SeqRootOutputModule.h>
+#include <framework/modules/rootio/SeqRootOutputModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/core/Environment.h>
 

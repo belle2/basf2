@@ -7,7 +7,7 @@
  *                                                                        *
  **************************************************************************/
 
-#include <framework/modules/ToFileLogger.h>
+#include <framework/modules/core/ToFileLogger.h>
 #include <stdio.h>
 
 using namespace std;

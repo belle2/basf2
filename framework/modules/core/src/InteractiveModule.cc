@@ -9,7 +9,7 @@
  **************************************************************************/
 #include <boost/python.hpp>
 
-#include <framework/modules/InteractiveModule.h>
+#include <framework/modules/core/InteractiveModule.h>
 
 #include <framework/logging/Logger.h>
 

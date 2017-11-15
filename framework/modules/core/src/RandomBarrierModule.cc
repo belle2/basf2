@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/modules/RandomBarrierModule.h>
+#include <framework/modules/core/RandomBarrierModule.h>
 #include <framework/core/RandomNumbers.h>
 
 

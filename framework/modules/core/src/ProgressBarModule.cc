@@ -7,7 +7,7 @@
  *                                                                        *
  **************************************************************************/
 
-#include <framework/modules/ProgressBarModule.h>
+#include <framework/modules/core/ProgressBarModule.h>
 
 #include <framework/core/Environment.h>
 #include <framework/utilities/Utils.h>

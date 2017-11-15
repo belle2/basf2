@@ -7,7 +7,7 @@
  *                                                                        *
  **************************************************************************/
 
-#include <framework/modules/PruneDataStoreModule.h>
+#include <framework/modules/core/PruneDataStoreModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
 

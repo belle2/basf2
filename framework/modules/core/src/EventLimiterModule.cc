@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <framework/modules/EventLimiterModule.h>
+#include <framework/modules/core/EventLimiterModule.h>
 #include <framework/core/Module.h>
 
 using namespace Belle2;

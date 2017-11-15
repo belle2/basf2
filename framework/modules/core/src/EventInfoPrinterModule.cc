@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/modules/EventInfoPrinterModule.h>
+#include <framework/modules/core/EventInfoPrinterModule.h>
 
 #include <boost/format.hpp>
 #include <chrono>

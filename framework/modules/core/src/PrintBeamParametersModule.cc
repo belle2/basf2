@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/modules/PrintBeamParametersModule.h>
+#include <framework/modules/core/PrintBeamParametersModule.h>
 #include <framework/logging/Logger.h>
 
 

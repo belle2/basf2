@@ -185,6 +185,9 @@ namespace Belle2 {
 
     /** Whether or not we want to build an event index */
     bool m_buildIndex{true};
+
+    /** Whether to keep parents same as that of input file */
+    bool m_keepParents{false};
   };
 } // end namespace Belle2
 

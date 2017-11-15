@@ -50,7 +50,7 @@ main.add_module('RootInput', inputFileName=Belle2.FileSystem.findFile('framework
 main.add_module('EventInfoPrinter')
 main.add_module('PrintCollections')
 main.add_module('PruneDataStore', matchEntries=['PXDClusters.*'])
-main.add_module(register_module('PrintCollections'))
+main.add_module('PrintCollections')
 main.add_module(TestModule(False))
 
 # ensure the pruned datastore is still write-able to disk
@@ -68,7 +68,7 @@ main.add_module('RootInput', inputFileName=Belle2.FileSystem.findFile('framework
 main.add_module('EventInfoPrinter')
 main.add_module('PrintCollections')
 main.add_module('PruneDataStore', matchEntries=['PXDClusters.*'], keepMatchedEntries=False)
-main.add_module(register_module('PrintCollections'))
+main.add_module('PrintCollections')
 main.add_module(TestModule(True))
 
 # ensure the pruned datastore is still write-able to disk

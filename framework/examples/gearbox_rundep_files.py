@@ -7,18 +7,14 @@
 # Example steering file - 2014 Belle II Collaboration
 ############################################################
 
-import os
 from basf2 import *
 
+main = create_path()
 # EventInfoSetter - generate event meta data
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({
-    'expList': [71, 71, 73],
-    'runList': [3, 4, 10],
-    'evtNumList': [1, 1, 1]
-})
+main.add_module('EventInfoSetter', expList=[71, 71, 73], runList=[3, 4, 10], evtNumList=[1, 1, 1])
 
-gearbox = register_module("Gearbox")
+# LogLevel.INFO will print all filenames if opend by a run-dependent backend
+gearbox = main.add_module("Gearbox", logLevel=LogLevel.INFO)
 gearbox.param({
     # For each xml file "foo/bar.xml" requested the gearbox will look for
     "backends": [
@@ -40,15 +36,6 @@ gearbox.param({
 # second and so on, e.g. one could have a
 # rundata-071-0003-pxd-PXD-Alignment.xml
 # to override the pxd/PXD-Alignment.xml
-
-# LogLevel.INFO will print all filenames if opend by a run-dependent backend
-gearbox.set_log_level(LogLevel.INFO)
-
-main = create_path()
-
-# Add modules to main path
-main.add_module(eventinfosetter)
-main.add_module(gearbox)
 
 # Process all events
 process(main)

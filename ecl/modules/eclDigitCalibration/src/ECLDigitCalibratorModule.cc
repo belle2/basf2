@@ -31,6 +31,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
@@ -223,11 +224,22 @@ void ECLDigitCalibratorModule::event()
 
     // fill the ECLCalDigit with the cell id, the calibrated information and calibration status
     aECLCalDigit->setCellId(cellid);
-    aECLCalDigit->setEnergy(calibratedEnergy);
-    aECLCalDigit->addStatus(ECLCalDigit::c_IsEnergyCalibrated);
+    std::string a(eclDigitArrayName());
+    if (!a.compare("ECLDigitsPureCsI")) {
+      const int pure_amplitude = aECLDigit.getAmp();
+      double pure_e = pure_amplitude * 0.00005;
+      aECLCalDigit->setEnergy(pure_e);
+      aECLCalDigit->addStatus(ECLCalDigit::c_IsEnergyCalibrated);
 
-    aECLCalDigit->setTime(calibratedTime);
-    aECLCalDigit->addStatus(ECLCalDigit::c_IsTimeCalibrated);
+      aECLCalDigit->setTime(aECLDigit.getTimeFit());
+      aECLCalDigit->addStatus(ECLCalDigit::c_IsTimeCalibrated);
+    } else {
+      aECLCalDigit->setEnergy(calibratedEnergy);
+      aECLCalDigit->addStatus(ECLCalDigit::c_IsEnergyCalibrated);
+
+      aECLCalDigit->setTime(calibratedTime);
+      aECLCalDigit->addStatus(ECLCalDigit::c_IsTimeCalibrated);
+    }
 
     // set a relation to the ECLDigit
     aECLCalDigit->addRelationTo(&aECLDigit);

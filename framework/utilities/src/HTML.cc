@@ -1,7 +1,7 @@
 #include <framework/utilities/HTML.h>
 
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/regex.hpp>
+#include <regex>
 
 #include <TMatrixFBase.h>
 #include <TMatrixD.h>
@@ -143,8 +143,8 @@ std::string HTML::htmlToPlainText(const std::string& html)
   replace_all(tmp, "\x0b5", "u");
 
   //remove all unknown tags (non-greedy match)
-  const static boost::regex tagRegex("<.*?>");
-  tmp = boost::regex_replace(tmp, tagRegex, "");
+  const static std::regex tagRegex("<.*?>");
+  tmp = std::regex_replace(tmp, tagRegex, "");
 
   tmp = unescape(tmp);
 

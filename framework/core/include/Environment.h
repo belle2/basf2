@@ -13,10 +13,7 @@
 #include <list>
 #include <string>
 #include <vector>
-
-namespace boost {
-  template<class T> class shared_ptr;
-}
+#include <memory>
 
 namespace Belle2 {
   class Path;
@@ -179,7 +176,7 @@ namespace Belle2 {
     bool getDryRun() const { return m_dryRun; }
 
     /** Set info from path executed by the framework. */
-    void setJobInformation(const boost::shared_ptr<Path>& path);
+    void setJobInformation(const std::shared_ptr<Path>& path);
 
     /** Print information on input/output files in current steering file, used by --dry-run.
      *

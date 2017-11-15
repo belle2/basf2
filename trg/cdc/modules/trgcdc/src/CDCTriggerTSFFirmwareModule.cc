@@ -12,6 +12,8 @@
 #include <trg/cdc/Cosim.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <trg/cdc/dataobjects/Bitstream.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <framework/logging/Logger.h>
 
@@ -51,13 +53,17 @@ TSF::CDCTriggerTSFFirmwareModule() :
   addParam("hitCollectionName", m_hitCollectionName,
            "Name of the input StoreArray of CDCHits.",
            string("CDCHits"));
-
-  // addParam("outputCollectionName", m_outputCollectionName,
-  //          "Name of the StoreArray holding the tracks found in the Hough tracking.",
-  //          string("TRGCDCTSFFirmwareTracks"));
-
+  addParam("outputCollectionName", m_outputCollectionName,
+           "Name of the StoreArray holding the found TS hits.",
+           string("CDCTriggerFirmwareSegmentHits"));
+  addParam("outputBitstreamNameTo2D", m_outputBitstreamNameTo2D,
+           "Name of the StoreArray holding the raw bit content to 2D trackers",
+           string("BitstreamTSF-2D"));
   addParam("mergerOnly", m_mergerOnly,
            "Flag to only simulate merger and not TSF",
+           false);
+  addParam("simulateCC", m_simulateCC,
+           "Flag to run the front-end clock counter",
            false);
 }
 
@@ -112,6 +118,8 @@ void TSF::initialize()
     computeEdges();
     return;
   }
+  m_bitsTo2D.registerInDataStore();
+  m_bitsTo2D.registerPersistent(m_outputBitstreamNameTo2D);
   for (unsigned i = 0; i < m_nSubModules; ++i) {
     // i: input to worker (output from module)
     // o: output from worker (input to module)
@@ -457,6 +465,22 @@ void TSF::pack(inputVector::reverse_iterator& input, unsigned number,
   input += number * width;
 }
 
+void TSF::saveFirmwareOutput()
+{
+  // using signalBus = std::array<outputArray, m_nSubModules>;
+  // using signalBitStream = Bitstream<signalBus>;
+  // StoreArray<signalBitStream> storeBits;
+  m_bitsTo2D.appendNew(outputToTracker);
+}
+
+void TSF::saveFastOutput()
+{
+  StoreArray<CDCTriggerSegmentHit> storeHits;
+
+  // scan through all CDC hits to get the central hit
+  // need to figure out how TSF firmware output set time
+}
+
 void TSF::event()
 {
   // TODO: what if there is 0 CDC hit?
@@ -512,8 +536,9 @@ void TSF::event()
           }
         }
       }
+      saveFirmwareOutput();
+      // saveFastOutput();
     }
-    B2DEBUG(50, "status code:" << status);
   } catch (std::exception& e) {
     B2ERROR("ERROR: An exception occurred: " << e.what());
     status = 2;
@@ -521,4 +546,5 @@ void TSF::event()
     B2ERROR("ERROR: An unknown exception occurred.");
     status = 3;
   }
+  B2DEBUG(50, "status code:" << status);
 }

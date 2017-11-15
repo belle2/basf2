@@ -2,6 +2,7 @@
 #include <framework/core/Module.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <framework/datastore/StoreArray.h>
+#include <trg/cdc/dataobjects/Bitstream.h>
 
 #include <memory>
 #include <string>
@@ -87,17 +88,29 @@ namespace Belle2 {
     /** Name of the StoreArray containing the input track segment hits. */
     std::string m_hitCollectionName;
 
-    /** Name of the StoreArray containing the tracks found by the Hough tracking. */
+    /** Name of the StoreArray holding the found TS hits. */
     std::string m_outputCollectionName;
+
+    /** Name of the StoreArray holding the raw bit content to 2D trackers. */
+    std::string m_outputBitstreamNameTo2D;
 
     /** CDCHit array */
     Belle2::StoreArray<CDCHit> m_cdcHits;
+
+    using outputVector = std::array<char, width_out>;
+    using outputArray = std::array<outputVector, nTrackers>;
+
+    using signalBus = std::array<outputArray, m_nSubModules>;
+    using signalBitStream = Bitstream<signalBus>;
+
+    /** bitstream of TSF output to 2D tracker */
+    StoreArray<signalBitStream> m_bitsTo2D;
 
     /** flag to only simulation merger and not TSF */
     bool m_mergerOnly;
 
     /** flag to simulate front-end clock counter */
-    bool m_simulateCC = false;
+    bool m_simulateCC;
 
     /** debug level specified in the steering file */
     int m_debugLevel;
@@ -144,8 +157,6 @@ namespace Belle2 {
     /* XSI compliant format of input to TSF */
     inputToTSFArray inputToTSF;
 
-    using outputVector = std::array<char, width_out>;
-    using outputArray = std::array<outputVector, nTrackers>;
     /** array holding TSF output data */
     std::array<outputArray, m_nSubModules> outputToTracker;
 
@@ -351,5 +362,9 @@ namespace Belle2 {
      *  @param reg     record of the timing fields in merger
      */
     void registerHit(CDCTrigger::MergerOut field, unsigned iTS, registeredStructElement& reg);
+
+    void saveFirmwareOutput();
+
+    void saveFastOutput();
   };
 }

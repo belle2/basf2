@@ -12,7 +12,7 @@ from ROOT import Belle2
 
 class dump_digits(Module):
 
-    """A simple module to check the reconstruction of SVD hits."""
+    """A simple module to check SVD digit fits."""
 
     def __init__(self, filename='dumped_digits.txt'):
         """Initialize the module"""
@@ -69,8 +69,8 @@ class dump_digits(Module):
             stripNoise = self.noise_cal.getNoise(sensorID, reco_digit.isUStrip(), stripNo)
             stripGain = 22500 / self.pulse_cal.getADCFromCharge(sensorID, reco_digit.isUStrip(), stripNo, 22500)
 
-            stripWidth = self.pulse_cal.getPeakTime(sensorID, reco_digit.isUStrip(), stripNo)
-            stripT0 = self.pulse_cal.getWidth(sensorID, reco_digit.isUStrip(), stripNo)
+            stripT0 = self.pulse_cal.getPeakTime(sensorID, reco_digit.isUStrip(), stripNo)
+            stripWidth = self.pulse_cal.getWidth(sensorID, reco_digit.isUStrip(), stripNo)
             s += '{mask} {gain:.3f} {noise:.3f} {width} {delay:.3f} '.format(
                 mask='y',
                 gain=stripGain,

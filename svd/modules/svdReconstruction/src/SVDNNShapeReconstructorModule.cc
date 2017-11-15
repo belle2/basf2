@@ -236,6 +236,8 @@ void SVDNNShapeReconstructorModule::event()
       const SVDShaperDigit& shaperDigit = *storeShaperDigits[iDigit];
       unsigned short stripNo = shaperDigit.getCellID();
       bool validDigit = true; // FIXME: We don't care about local run bad strips for now.
+      const double triggerBinSep = 4 * 1.96516; //in ns
+      double apvPhase = triggerBinSep * (0.5 + static_cast<int>(shaperDigit.getModeByte().getTriggerBin()));
       // Get things from the database.
       // Noise is good as it comes.
       float stripNoiseADU = m_noiseCal.getNoise(sensorID, isU, stripNo);
@@ -243,7 +245,7 @@ void SVDNNShapeReconstructorModule::event()
       // FIXME: Only use calibration on real data. Until simulations correspond to
       // default calibrtion, we cannot use it.
       double stripSignalWidth = 270;
-      double stripT0 = isU ? 4.0 : 0.0;
+      double stripT0 = isU ? 2.5 : -2.2;
       if (m_calibratePeak) {
         stripSignalWidth = 1.988 * m_pulseShapeCal.getWidth(sensorID, isU, stripNo);
         stripT0 = m_pulseShapeCal.getPeakTime(sensorID, isU, stripNo)
@@ -280,7 +282,7 @@ void SVDNNShapeReconstructorModule::event()
       copy(pStrip->begin(), pStrip->end(), ostream_iterator<double>(os, " "));
       os << endl;
       // Apply strip time shift to pdf
-      fitTool.shiftInTime(*pStrip, -stripT0);
+      fitTool.shiftInTime(*pStrip, -apvPhase - stripT0);
       B2DEBUG(200, os.str());
       // Calculate time and its error, amplitude and its error, and chi2
       double stripTime, stripTimeError;

@@ -18,10 +18,12 @@ namespace Belle2 {
   */
   class VXDEnvelopePar: public VXDRotationSolidPar {
   public:
+    /** Constructor */
     VXDEnvelopePar(const std::string& name, const std::string& material, const std::string& color,
                    double minPhi, double maxPhi, bool exists):
       VXDRotationSolidPar(name, material, color, minPhi, maxPhi, exists)
     {}
+    /** Constructor */
     VXDEnvelopePar():
       VXDRotationSolidPar()
     {}

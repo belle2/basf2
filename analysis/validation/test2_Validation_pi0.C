@@ -2,21 +2,18 @@
 <header>
 <input>GenericB.ntup.root</input>
 <output>test2_Validation_pi0_output.root</output>
-<contact>Luis Pesantez, pesantez@uni-bonn.de</contact>
+<contact>Sam Cunliffe (sam.cunliffe@desy.de), Mario Merola (mario.merola@na.infn.it)</contact>
+<description>
+Check the calibration of the ECL in the MC by determining the measured pi0 invariant mass,
+Fit parameter constraints need some tuning.
+</description>
 </header>
 */
-////////////////////////////////////////////////////////////
-// Validation_pi0.cc
-// Check the calibration of the ECL in the MC by
-// determining the measured pi0 invariant mass
-// Fit parameter constraints need some tuning.
-//
-// Note: MC matching is not currently available in the ECL
-//
-// Phillip Urquijo, Luis Pesantez
-// May 3,2013
-// Update: Oct 11, 2014
-//
+
+// Authors: Phillip Urquijo, Luis Pesantez, May 2013
+// Updated: Oct 2014
+//          Nov 2017
+
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -53,7 +50,7 @@
 using namespace RooFit ;
 
 void test2_Validation_pi0() {
-    const char[] contact = "mario.merola@na.infn.it; sam.cunliffe@desy.de";
+    const char *contact = "mario.merola@na.infn.it; sam.cunliffe@desy.de";
 
     /* Take the pi0tuple prepared by the NtupleMaker */
     TChain * recoTree = new TChain("pi0tuple");
@@ -65,6 +62,9 @@ void test2_Validation_pi0() {
     //Plots used in offline validation
     /* Invariant mass after Egamma>0.05 GeV criterion */
     TH1F * h_pi0_m_cut = new TH1F("pi0_m_cut",";Mass with photon energy cut m(#pi^{0}) [GeV];N",40,0.08,0.18);
+    h_pi0_m_cut->GetListOfFunctions()->Add(new TNamed("Description","pi0 invariant mass after Egamma>0.05 GeV cut. A Generic BBbar sample is used."));
+    h_pi0_m_cut->GetListOfFunctions()->Add(new TNamed("Check","Stable S/B,non-empty (i.e. pi0 import to analysis modules is working),consistent mean."));
+    h_pi0_m_cut->GetListOfFunctions()->Add(new TNamed("Contact",contact));
 
     /* Mass constrained fit value,as stored in Particle */
     TH1F * h_pi0_m_fit = new TH1F("pi0_m_fit",";Mass constrained fit m(#pi^{0}) [GeV];N",40,0.133,0.137);

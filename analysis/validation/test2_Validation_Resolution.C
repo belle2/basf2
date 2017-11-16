@@ -2,18 +2,16 @@
 <header>
 <input>GenericB.ntup.root</input>
 <output>test2_Validation_Resolution_output.root</output>
-<contact>Luis Pesantez, pesantez@uni-bonn.de</contact>
+<contact>Sam Cunliffe (sam.cunliffe@desy.de); Phillip Urquijo (phillip.urquijo@unimelb.edu.au)</contact>
+<description>
+Check the Reconstruction resolution with single particles, using truth matching
+</description>
 </header>
 */
-////////////////////////////////////////////////////////////
-// Validation_Resolution.cc
-// Check the Reconstruction resolution
-// Look at single particles, and use truth matching
-//
-// Phillip Urquijo, Luis Pesantez
-// June 30, 2013
-// Update: Oct 11, 2014
-//
+
+// Authors: Phillip Urquijo, Luis Pesantez, Jun 2013
+// Updated: Oct 2014
+//          Nov 2017
 
 #include <vector>
 #include <fstream>
@@ -80,7 +78,7 @@ int find_bin( float pt ) {
 }
 
 void pi_plots(bool runOffline) {
-    const char[] contact = "sam.cunliffe@desy.de";
+    const char *contact = "sam.cunliffe@desy.de";
     TString infile (Form( "../GenericB.ntup.root" ) );
     TChain* recoTree = new TChain("pituple");
     recoTree->AddFile(infile);
@@ -228,6 +226,7 @@ void pi_plots(bool runOffline) {
     TH1F *h_Bias = new TH1F("h_Bias", ";p_{T} (#pi) GeV;Mean Bias (Rec-True)/Mean", NBINSP, MINP, MAXP);
     h_Bias->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction pT bias of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. The relative bias, i.e. (Mean(Rec)-Mean(True))/Mean is shown. A Generic BBbar sample is used."));
     h_Bias->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution. Low pT tracks < 100 MeV exhibit larger relative bias."));
+    h_Bias->GetListOfFunctions()->Add(new TNamed("Contact", contact));
     h_Bias->SetFillColor(kBlue);    h_Bias->SetMarkerColor(kBlue);
     h_Bias->SetMinimum(-0.002);     h_Bias->SetMaximum(0.002);
     for( int bin=0; bin<NBINSP; bin++ ){
@@ -283,7 +282,7 @@ void pi_plots(bool runOffline) {
 }
 
 void photon_plots(bool runOffline) {
-    const char[] contact = "sam.cunliffe@desy.de; torben.ferber@desy.de";
+    const char *contact = "sam.cunliffe@desy.de; torben.ferber@desy.de";
     TString infile (Form( "../GenericB.ntup.root" ) );
     TChain* recoTree = new TChain("gammatuple");
     recoTree->AddFile(infile);

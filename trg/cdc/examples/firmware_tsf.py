@@ -9,9 +9,11 @@ import os
 from subprocess import call
 
 read_data = True
-mermger_only = True
+# merger_only = True
+merger_only = False
+save_outout = True
 
-if not mermger_only:
+if not merger_only:
     # set run time library path
     rdi_path = '/home/belle2/tasheng/Vivado_2017.2/lib/lnx64.o'
     if rdi_path not in os.environ['LD_LIBRARY_PATH']:
@@ -88,10 +90,18 @@ if not read_data:
 # CDC trigger and output #
 # ---------------------- #
 
+main.add_module('Gearbox')
+main.add_module('Geometry', components=['BeamPipe',
+                                        'PXD', 'SVD', 'CDC',
+                                        'MagneticFieldConstant4LimitedRCDC'])
+main.add_module('CDCTriggerTSF',
+                InnerTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_Bkg_p0.70_b0.80.coe"),
+                OuterTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_Bkg_p0.70_b0.80.coe"))
+
 firmtsf = register_module('CDCTriggerTSFFirmware')
-firmtsf.param('mergerOnly', mergerOnly)
+firmtsf.param('mergerOnly', merger_only)
 firmtsf.logging.log_level = basf2.LogLevel.DEBUG
-firmtsf.logging.debug_level = 30
+firmtsf.logging.debug_level = 10
 firmtsf.logging.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
 main.add_module(firmtsf)
 
@@ -102,6 +112,9 @@ main.add_module(firmtsf)
 # firm2d.logging.debug_level = 20
 # firm2d.logging.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
 # main.add_module(firm2d)
+
+if save_outout:
+    main.add_module('RootOutput', outputFileName='tsfout.root')
 
 # Process events
 basf2.process(main)

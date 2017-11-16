@@ -57,7 +57,7 @@ namespace Cosim {
       if (bit >= 0 && bit < 9) {
         res += std_logic_literal[(int) bit];
       } else {
-        B2WARNING("nonvalid signal detected: " << static_cast<int>(bit));
+        B2WARNING("invalid signal detected: " << static_cast<int>(bit));
         res += "0";
       }
     }

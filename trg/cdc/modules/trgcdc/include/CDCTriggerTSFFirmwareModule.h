@@ -3,6 +3,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/Bitstream.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 
 #include <memory>
 #include <string>
@@ -106,6 +107,9 @@ namespace Belle2 {
     /** bitstream of TSF output to 2D tracker */
     StoreArray<signalBitStream> m_bitsTo2D;
 
+    /** unpacked track segment hit */
+    StoreArray<CDCTriggerSegmentHit> m_tsHits;
+
     /** flag to only simulation merger and not TSF */
     bool m_mergerOnly;
 
@@ -116,7 +120,7 @@ namespace Belle2 {
     int m_debugLevel;
 
     /** how many clocks to simulate per event */
-    static const int m_nClockPerEvent = 16;
+    static constexpr int m_nClockPerEvent = 32;
 
     int m_TDCCountForT0 = 4988;
 
@@ -217,6 +221,12 @@ namespace Belle2 {
     using registeredStructElement = std::array<std::bitset<nCellsInLayer>, 3>;
     using registeredStruct = std::vector<registeredStructElement>;
 
+    using priorityHitInMerger = std::map<unsigned, int>;
+    using priorityHitStructInSL = std::vector<priorityHitInMerger>;
+    using priorityHitStructInClock = std::map<unsigned, priorityHitStructInSL>;
+    using priorityHitStruct = std::array<priorityHitStructInClock, m_nClockPerEvent>;
+    /* list keeping the index of priority hit of a TS for making fastsim ts hit object */
+    priorityHitStruct m_priorityHit;
     /** CDC hit ID in each clock */
     std::vector<std::vector<int> > iAxialHitInClock;
 
@@ -365,6 +375,6 @@ namespace Belle2 {
 
     void saveFirmwareOutput();
 
-    void saveFastOutput();
+    void saveFastOutput(short iclock);
   };
 }

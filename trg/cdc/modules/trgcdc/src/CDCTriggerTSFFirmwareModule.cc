@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <trg/cdc/modules/trgcdc/CDCTriggerTSFFirmwareModule.h>
+#include <trg/cdc/CDCTrigger.h>
 #include <trg/cdc/Cosim.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -41,10 +42,11 @@ TSF::CDCTriggerTSFFirmwareModule() :
   Module(), m_cdcHits{""}
 
 {
-  for (unsigned i = 0; i < m_nSubModules; ++i) {
-    // loader.emplace_back(new Xsi::Loader(design_libname_pre + to_string(i * 2)
-    //                                     + design_libname_post, simengine_libname));
-    inputToTSF[i].resize(nAxialMergers[i]);
+  for (unsigned iAx = 0; iAx < m_nSubModules; ++iAx) {
+    inputToTSF[iAx].resize(nAxialMergers[iAx]);
+    for (auto& clock : m_priorityHit) {
+      clock.insert({2 * iAx, priorityHitStructInSL(nAxialMergers[iAx])});
+    }
   }
   //Set module properties
   setDescription("Firmware simulation of the Track Segment Finder for CDC trigger.");
@@ -103,7 +105,8 @@ TSF::outputArray TSF::read(FILE* instream)
     B2DEBUG(50, display_value(buffer.data() + width_out * i2d, width_out));
   }
   auto bufferItr = buffer.cbegin();
-  for (int iTracker = 0; iTracker < nTrackers; ++iTracker) {
+  // for (int iTracker = 0; iTracker < nTrackers; ++iTracker) {
+  for (int iTracker = nTrackers - 1; iTracker >= 0; --iTracker) {
     copy(bufferItr, bufferItr + width_out, output[iTracker].begin());
     bufferItr += width_out;
   }
@@ -118,8 +121,8 @@ void TSF::initialize()
     computeEdges();
     return;
   }
-  m_bitsTo2D.registerInDataStore();
-  m_bitsTo2D.registerPersistent(m_outputBitstreamNameTo2D);
+  m_bitsTo2D.registerInDataStore(m_outputBitstreamNameTo2D);
+  m_tsHits.registerInDataStore(m_outputCollectionName);
   for (unsigned i = 0; i < m_nSubModules; ++i) {
     // i: input to worker (output from module)
     // o: output from worker (input to module)
@@ -299,6 +302,15 @@ void TSF::initializeMerger()
     itr->push_back(ihit);
   }
   m_iFirstHit = iAxialHit.front();
+
+  // In addition, clear the list holding priority hit indices
+  for (auto& clock : m_priorityHit) {
+    for (auto& sl : clock) {
+      for (auto& merger : sl.second) {
+        merger.clear();
+      }
+    }
+  }
 }
 
 bool TSF::notHit(MergerOut field, unsigned iTS, TSF::registeredStructElement& reg)
@@ -350,6 +362,7 @@ void TSF::simulateMerger(unsigned iClock)
     const timeVec hitTime = timeStamp(iHit, m_iFirstHit);
     auto& mergerData = dataInClock[iSL][iMerger];
     auto& registeredCell = registered[iSL][iMerger];
+    auto& priorityHit = m_priorityHit[iClock][iSL][iMerger];
     B2DEBUG(50, "iHit: " << iHit << ", Merger" << iSL << "-" << iMerger <<
             ", iCell: " << iCell);
     // update hit map
@@ -378,6 +391,7 @@ void TSF::simulateMerger(unsigned iClock)
           priorityTime = hitTime;
           registerHit(MergerOut::priorityTime, priTS, registeredCell);
           get<MergerOut::secondPriorityHit>(mergerData)[0].reset(priTS);
+          priorityHit.insert({priTS, iHit});
         }
         break;
       }
@@ -394,9 +408,11 @@ void TSF::simulateMerger(unsigned iClock)
             priorityTime = hitTime;
             registerHit(MergerOut::priorityTime, priTS, registeredCell);
             get<MergerOut::secondPriorityHit>(mergerData)[0].set(priTS, ! i);
+            priorityHit.insert({priTS, iHit});
             // set the 2nd pri bit to right when T_left == T_right
           } else if (hitTime.to_ulong() == priorityTime.to_ulong() && i == 1) {
             get<MergerOut::secondPriorityHit>(mergerData)[0].reset(priTS);
+            priorityHit[priTS] = iHit;
           }
         }
         break;
@@ -469,18 +485,94 @@ void TSF::pack(inputVector::reverse_iterator& input, unsigned number,
 
 void TSF::saveFirmwareOutput()
 {
-  // using signalBus = std::array<outputArray, m_nSubModules>;
-  // using signalBitStream = Bitstream<signalBus>;
-  // StoreArray<signalBitStream> storeBits;
   m_bitsTo2D.appendNew(outputToTracker);
 }
 
-void TSF::saveFastOutput()
+void TSF::saveFastOutput(short iclock)
 {
-  StoreArray<CDCTriggerSegmentHit> storeHits;
+  const int ccWidth = 9;
+  const int widenedClocks = 15;
 
-  // scan through all CDC hits to get the central hit
-  // need to figure out how TSF firmware output set time
+  int iAx = 0;
+  for (const auto& sl : outputToTracker) {
+    // keep a list of found TS hit in the same SL so that outputs to different
+    // trackers won't be recorded twice
+    std::map<unsigned, int> foundTS;
+    unsigned short iTracker = 0;
+    for (auto& tracker : sl) {
+      string output = slv_to_bin_string(tracker);
+      // loop through all TS hits in the output
+      for (int i = ccWidth; i < width_out; i += tsInfoWidth) {
+        string ts = output.substr(i, tsInfoWidth);
+        tsOut decoded = decodeTSHit(ts);
+        // finish if no more TS hit is present
+        if (decoded[2] == 0) {
+          break;
+        }
+        const unsigned nCellsInSL = nAxialMergers[iAx] * nCellsInLayer;
+        // get global TS ID
+        unsigned iTS = decoded[0] + nCellsInSL * iTracker / nTrackers;
+        // periodic ID overflow when phi0 > 0 for the 4th tracker
+        if (iTS > nCellsInSL) {
+          iTS -= nCellsInSL;
+        }
+        // ID in SL8 is shifted by 16
+        if (iAx == 4) {
+          iTS -= 16;
+        }
+        int iHit = -1;
+        // TSF latency in unit of data clocks
+        const int latency = 0;
+        int firstClock = iclock - widenedClocks - latency;
+        if (firstClock < 0) {
+          firstClock = 0;
+        }
+        int lastClock = iclock - latency;
+        B2DEBUG(10, "iAx:" << iAx << ", iTS:" << iTS << ", iTracker: " << iTracker);
+        // scan through all CDC hits to get the priority hit
+        for (int iclkPri = firstClock; iclkPri < lastClock; ++iclkPri) {
+          auto priMap = m_priorityHit[iclkPri][2 * iAx][iTS / 16];
+          if (priMap.find(iTS % 16) != priMap.end()) {
+            iHit = priMap[iTS % 16];
+            B2DEBUG(10, "iHit:" << iHit);
+            B2DEBUG(10, "TDC: " << m_cdcHits[iHit]->getTDCCount() << ", TSF: " << decoded[1]);
+            // TODO: priority(iHit)
+          }
+        }
+        // check if the same TS hit to another tracker is already there
+        // TODO: some duplicates are from different clocks,
+        // so they won't be caught here
+        // This mostly likely means the wrong phase of TSF firmware output is used
+        if (foundTS.find(iTS) != foundTS.end()) {
+          if (iHit != foundTS[iTS]) {
+            B2WARNING("Same TS ID exists, but they point to different CDC hit");
+          }
+          continue;
+        }
+        foundTS.insert({iTS, iHit});
+        if (iHit < 0) {
+          B2WARNING("No corresponding priority CDC hit can be found.");
+          if (iclock < 15) {
+            B2WARNING("It could be the left over TS hits from the last event.\n" <<
+                      "Try increasing m_nClockPerEvent");
+          }
+        }
+        CDCHit cdchit = (iHit < 0) ? CDCHit() : *m_cdcHits[iHit];
+        m_tsHits.appendNew(cdchit,
+                           globalSegmentID(iTS, 2 * iAx),
+                           decoded[2],
+                           decoded[3],
+                           // TODO: pri time should be the same as the CDCHit in 1st arg
+                           // when the proper clock counter is given to firmware TSF
+                           decoded[1],
+                           // TODO: fastest time from ETF output
+                           0,
+                           iclock);
+      }
+      ++iTracker;
+    }
+    ++iAx;
+  }
 }
 
 void TSF::event()
@@ -539,7 +631,7 @@ void TSF::event()
         }
       }
       saveFirmwareOutput();
-      // saveFastOutput();
+      saveFastOutput(iClock);
     }
   } catch (std::exception& e) {
     B2ERROR("ERROR: An exception occurred: " << e.what());

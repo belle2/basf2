@@ -16,6 +16,7 @@
 #include <map>
 
 /* Belle2 headers. */
+#include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dbobjects/EKLMElectronicsMap.h>
 #include <eklm/geometry/GeometryData.h>
 #include <framework/core/Module.h>
@@ -100,8 +101,11 @@ namespace Belle2 {
     /** Event metadata. */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
-    /** RawKLM array. */
-    StoreArray<RawKLM> m_RawKLMArray;
+    /** Raw data. */
+    StoreArray<RawKLM> m_RawKLMs;
+
+    /** Digits. */
+    StoreArray<EKLMDigit> m_Digits;
 
   };
 

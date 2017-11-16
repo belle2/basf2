@@ -33,7 +33,7 @@ simulation = register_module('FullSim')
 PXDDIGI = register_module('PXDDigitizer')
 # SVD digitization module
 SVDDIGI = register_module('SVDDigitizer')
-SVDDIGI.param('GenerateShaperDigits', True)
+SVDDIGI.param('GenerateDigits', True)
 # SVD digit checker
 SVDCHCK = register_module('SVDCheckDigits')
 SVDCHCK.set_log_level(LogLevel.DEBUG)
@@ -76,7 +76,7 @@ main.add_module(SVDDIGI)
 main.add_module(SVDCHCK)
 
 # Process events
-process(main)
+# process(main)
 
 # Print call statistics
-print(statistics)
+# print(statistics)

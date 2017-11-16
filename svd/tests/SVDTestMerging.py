@@ -38,6 +38,7 @@ simulation = register_module('FullSim')
 PXDDIGI = register_module('PXDDigitizer')
 # SVD digitization module
 SVDDIGI = register_module('SVDDigitizer')
+SVDDIGI.param('GenerateDigits', True)
 # SVD digit merger
 SVDMERG = register_module('SVDDigitMerger')
 SVDMERG.set_log_level(LogLevel.DEBUG)

@@ -98,7 +98,7 @@ main.add_module(eklm_digitizer)
 # Output: digitized hits only
 output = register_module('RootOutput')
 output.param('outputFileName', 'BGforOverlay.root')
-output.param('branchNames', ['PXDDigits', 'SVDDigits', 'CDCHits', 'TOPDigits',
+output.param('branchNames', ['PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
                              'ARICHDigits', 'ECLWaveforms', 'BKLMDigits', 'EKLMDigits'])
 main.add_module(output)
 

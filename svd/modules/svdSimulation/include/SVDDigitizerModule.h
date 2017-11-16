@@ -96,7 +96,7 @@ namespace Belle2 {
       // 1. Collections
       /** Name of the collection for the MCParticles */
       std::string m_storeMCParticlesName;
-      /** Name of the collection for the SVDDigits */
+      /** Name of the (optional) collection for the SVDDigits */
       std::string m_storeDigitsName;
       /** Name of the collection for the SVDSimhits */
       std::string m_storeSimHitsName;
@@ -112,9 +112,9 @@ namespace Belle2 {
       std::string m_relDigitTrueHitName;
 
       // 1* Production of SVDShaperDigits
-      /** Whether or not to generate compound SVDShaperDigits */
-      bool m_generateShaperDigits;
-      /** Name of the (optional) collection for the SVDShaperDigits */
+      /** Whether or not to generate compound SVDDigits */
+      bool m_generateDigits;
+      /** Name of the collection for the SVDShaperDigits */
       std::string m_storeShaperDigitsName;
       /** Name of the relation between SVDShaperDigits and MCParticles */
       std::string m_relShaperDigitMCParticleName;

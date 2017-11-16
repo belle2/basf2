@@ -75,6 +75,7 @@ void SVDClusterEvaluationModule::initialize()
   m_histoList_PurityInsideNOTMCluster = new TList;
   m_histoList_Puddlyness = new TList;
   m_histoList_PuddlynessTM = new TList;
+  m_histoList_GoodPuddlynessTM = new TList;
   m_graphList = new TList;
   //Control List
   m_histoList_Control = new TList;
@@ -158,6 +159,12 @@ void SVDClusterEvaluationModule::initialize()
                      i) + ", side" + UVFromIndex(i) + ")";
     m_histo_PuddlynessTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of TH per cluster",
                                                 m_histoList_PuddlynessTM);
+
+    NameOfHisto = "m_histoList_GoodPuddlynessTM_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
+    TitleOfHisto = "Number of Good True Hits inside a Truth-matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
+                     i) + ", side" + UVFromIndex(i) + ")";
+    m_histo_GoodPuddlynessTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of Good TH per cluster",
+                                                    m_histoList_GoodPuddlynessTM);
   }
 
   //Control Histos
@@ -293,8 +300,15 @@ void SVDClusterEvaluationModule::event()
     //enter only if the cluster is TM
     if (relatVectorClusToTH.size() > 0) {
 
-      //fill the puddlyness histo with the number of TH a TM cluster is composed of
+      //fill the puddlyness histo with the number of TH (and good TH) a TM cluster is composed of
       m_histo_PuddlynessTM[indexForHistosAndGraphs]->Fill(relatVectorClusToTH.size());
+      int numberOfGoodTHInACluster = 0;
+      for (int k = 0; k < (int)(relatVectorClusToTH.size()); k ++) {
+        if (goodTrueHit(relatVectorClusToTH[k])) {
+          numberOfGoodTHInACluster ++;
+        }
+      }
+      m_histo_GoodPuddlynessTM[indexForHistosAndGraphs]->Fill(numberOfGoodTHInACluster);
 
       //count number of recodigit, composing the Truth-matched cluster, that are linked with a TH (internal purity)
       m_NumberOfTMRecoInTMCluster = 0;
@@ -347,6 +361,9 @@ void SVDClusterEvaluationModule::endRun()
 
     m_mean_PuddlynessTM[k] = m_histo_PuddlynessTM[k]->GetMean();
     m_RMS_PuddlynessTM[k] = m_histo_PuddlynessTM[k]->GetRMS() / sqrt(m_histo_PuddlynessTM[k]->GetEntries());
+
+    m_mean_GoodPuddlynessTM[k] = m_histo_GoodPuddlynessTM[k]->GetMean();
+    m_RMS_GoodPuddlynessTM[k] = m_histo_GoodPuddlynessTM[k]->GetRMS() / sqrt(m_histo_GoodPuddlynessTM[k]->GetEntries());
   }
   for (int k = 0; k < m_NsetsRed; k ++) {
     m_mean_ClusterUPositionResolution[k] = m_histo_ClusterUPositionResolution[k]->GetMean();
@@ -390,6 +407,9 @@ void SVDClusterEvaluationModule::endRun()
 
   createArbitraryGraphErrorChooser("puddlynessTM_Means", "Number of True Hits inside a TM Cluster", m_OrderingVec, m_NullVec,
                                    m_mean_PuddlynessTM, m_RMS_PuddlynessTM, "set", "number of TH per TM cluster", m_graphList, m_Nsets);
+
+  createArbitraryGraphErrorChooser("goodPuddlynessTM_Means", "Number of Good True Hits inside a TM Cluster", m_OrderingVec, m_NullVec,
+                                   m_mean_GoodPuddlynessTM, m_RMS_GoodPuddlynessTM, "set", "number of Good TH per TM cluster", m_graphList, m_Nsets);
 
   ///////////////////////////
   //WRITE HISTOS AND GRAPHS//
@@ -465,6 +485,12 @@ void SVDClusterEvaluationModule::endRun()
     dir_puddleTM->cd();
     TIter nextH_puddleTM(m_histoList_PuddlynessTM);
     while ((obj = nextH_puddleTM()))
+      obj->Write();
+
+    TDirectory* dir_goodPuddleTM = oldDir->mkdir("goodTrueHits_in_TMcluster");
+    dir_goodPuddleTM->cd();
+    TIter nextH_GoodPuddleTM(m_histoList_GoodPuddlynessTM);
+    while ((obj = nextH_GoodPuddleTM()))
       obj->Write();
 
     TDirectory* dir_graph = oldDir->mkdir("graphs");
@@ -626,7 +652,6 @@ void SVDClusterEvaluationModule::createEfficiencyGraph(const char* name, const c
   t->SetTextFont(72);
   TString labels[m_Nsets] = {"3U", "3V", "456FU", "456FV", "456BU", "456BV"};
   for (Int_t i = 0; i < m_Nsets; i++) {
-    //xAxis->SetBinLabel(i + 1, labels[i].Data());
     xAxis->SetBinLabel(xAxis->FindBin(i + 1) , labels[i].Data());
   }
 
@@ -731,33 +756,6 @@ bool SVDClusterEvaluationModule::goodTrueHit(const SVDTrueHit* thino)
   return isGood;
 }
 
-/*float SVDClusterEvaluationModule::getMeanFromHistoWithoutABin(TH1F* histo, int BadBin)
-{
-  float almostMean = 0, almostEntries = 0, numer = 0;
-  float binval, bincont;
-  int NumberOfBin;
-
-  NumberOfBin = histo->GetSize();
-  NumberOfBin = NumberOfBin - 2;
-  B2INFO ("NumberOfBin = " << NumberOfBin);
-  if (NumberOfBin >= 1)
-  {
-    for (int k = 1; k <= NumberOfBin; k ++)
-    {
-      if (k != BadBin)
-      {
-        bincont = histo->GetBinContent(k);
-        almostEntries += bincont;
-        binval = histo->GetBinLowEdge();
-        numer += bincont * binval;
-      }
-    }
-  }
-
-  almostMean = numer / almostEntries;
-
-  return almostMean;
-}*/
 
 
 

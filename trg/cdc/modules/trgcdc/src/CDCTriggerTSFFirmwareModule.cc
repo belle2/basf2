@@ -365,6 +365,7 @@ void TSF::simulateMerger(unsigned iClock)
         // compare timing, since they are already sorted. However,
         // leaving it here makes the code a bit cleaner.
         fastestTime = hitTime;
+        registerHit(MergerOut::fastestTime, iTS, registeredCell);
       }
     }
     switch (priority(iHit)) {
@@ -410,6 +411,7 @@ void TSF::simulateMerger(unsigned iClock)
         if (notHit(MergerOut::edgeTime, iEdgeTime, registeredCell) ||
             hitTime.to_ulong() < edgeTime.to_ulong()) {
           edgeTime = hitTime;
+          registerHit(MergerOut::edgeTime, iEdgeTime, registeredCell);
         }
       }
     }

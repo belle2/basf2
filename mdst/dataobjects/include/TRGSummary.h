@@ -66,10 +66,10 @@ namespace Belle2 {
     /**set the prescale factor of each bit*/
     void setPreScale(int i, int bit, int pre) {m_prescaleBits[i][bit] = pre;}
 
-    /*get the trigger result, each word has 32 bits**/
+    /** get the trigger result, each word has 32 bits*/
     unsigned int getTRGSummary(int i) {return m_ftdlBits[i];}
 
-    /*get the prescale factor which the bit is corresponding**/
+    /** get the prescale factor which the bit is corresponding*/
     unsigned int getPreScale(int i, int bit) {return m_prescaleBits[i][bit];}
 
     /*! get input bits
@@ -109,13 +109,23 @@ namespace Belle2 {
 
   private:
 
-    unsigned int m_inputBits[10] = {0}; /**< input bits from subdetectors */
-    unsigned int m_ftdlBits[10] = {0}; /**< ftdl (Final Trigger Decision Logic) bits. Outputs of trigger logic  */
-    unsigned int m_psnmBits[10] = {0}; /**< psnm (PreScale aNd Mask) bits. Prescaled ftdl bits */
-    unsigned int m_timTypeBits = 0; /**< timing source bits. 4=PSNM, 3=TOP, 2=ECL, 1=CDC, 0=NON */
-    unsigned int m_prescaleBits[10][32] = {0}; /**the prescale factor of each bit*/
+    /** input bits from subdetectors */
+    unsigned int m_inputBits[10] = {0};
 
-    ClassDef(TRGSummary, 2); /**< Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
+    /** ftdl (Final Trigger Decision Logic) bits. Outputs of trigger logic  */
+    unsigned int m_ftdlBits[10] = {0};
+
+    /** psnm (PreScale aNd Mask) bits. Prescaled ftdl bits */
+    unsigned int m_psnmBits[10] = {0};
+
+    /** timing source bits. 4=PSNM, 3=TOP, 2=ECL, 1=CDC, 0=NON */
+    unsigned int m_timTypeBits = 0;
+
+    /** the prescale factor of each bit*/
+    unsigned int m_prescaleBits[10][32] = {0};
+
+    /**  Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
+    ClassDef(TRGSummary, 2);
 
   };
 

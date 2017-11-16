@@ -92,6 +92,7 @@ void test2_Validation_RecoStats() {
     TNtuple* trecostats = new TNtuple("RecoStats", "Reco Stats: N(objects)/Event", Form("%s",string(RecoStatsList).c_str()));
     trecostats->SetAlias("Description", "Average MDST reconstruction object multiplicities per event. Useful to trace back problems to specific input.");
     trecostats->SetAlias("Check", "Look for any MDST classes that are empty, or changed substantially.");
+    trecostats->SetAlias("Contact", "sam.cunliffe@desy.de");
     trecostats->Fill(RecoStatsMeans);
 
     output->cd();

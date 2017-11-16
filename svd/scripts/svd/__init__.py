@@ -5,7 +5,7 @@ from basf2 import *
 from ROOT import Belle2
 
 
-def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=False):
+def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True):
 
     if(useNN and useCoG):
         print("WARNING! you can't select both NN and CoG for SVD reconstruction. Using the default algorithm (TB-equivalent)")

@@ -4,6 +4,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/Bitstream.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/cdc/Cosim.h>
 
 #include <memory>
 #include <string>
@@ -131,9 +132,9 @@ namespace Belle2 {
     bool m_allPositiveTime = true;
 
     std::string lib_extension = ".so";
-    std::string libdir = "/home/belle2/tasheng/tsim";
+    std::string cwd = getcurrentdir();
     /** path to the simulation snapshot */
-    std::string design_libname_pre = libdir + "/xsim.dir/tsf";
+    std::string design_libname_pre = cwd + "/xsim.dir/tsf";
     std::string design_libname_post = "/xsimk" + lib_extension;
     /** path to the simulation engine */
     std::string simengine_libname = "librdi_simulator_kernel" + lib_extension;

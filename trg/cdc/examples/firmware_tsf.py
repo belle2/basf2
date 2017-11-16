@@ -12,6 +12,18 @@ read_data = True
 # merger_only = True
 merger_only = False
 save_outout = True
+kekcc = True
+btrgpc09 = False
+
+if kekcc:
+    lib_source = '/home/belle2/tasheng/tsim/'
+    rdi_path = '/home/belle2/tasheng/Vivado_2017.2/lib/lnx64.o'
+elif btrgpc09:
+    lib_source = '/home/trgadmin/tsim/'
+    rdi_path = '/home/trgadmin/Xilinx/Vivado/2017.2/lib/lnx64.o'
+else:
+    lib_source = ''
+    rdi_path = ''
 
 if not merger_only:
     # set run time library path
@@ -26,7 +38,7 @@ if not merger_only:
     # link to 2D design snapshot
     for link in ['xsim.dir', 'innerLRLUT.mif', 'outerLRLUT.mif']:
         if link not in os.listdir(os.getcwd()):
-            call(['ln', '-s', '/home/belle2/tasheng/tsim/' + link])
+            call(['ln', '-s', lib_source + link])
 
 """
 generate tracks with particle gun, simulate CDC and CDC trigger, save the output.

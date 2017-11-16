@@ -1,3 +1,5 @@
+#pragma once
+
 #include <framework/logging/Logger.h>
 
 #include <string>
@@ -5,6 +7,8 @@
 #include <iomanip>
 #include <bitset>
 #include <algorithm>
+
+#include <unistd.h>
 
 /**
  * Helper class for software (C++) / firmware (VHDL) co-simulation
@@ -132,4 +136,12 @@ ostream* createOutStreamFromFD(int fd)
 {
   stdio_filebuf<char>* fileBuf = fileBufFromFD(fd, std::ios::out);
   return (new ostream(fileBuf));
+}
+
+std::string getcurrentdir()
+{
+  char buf[1024];
+  getcwd(buf, sizeof(buf) - 1);
+  buf[sizeof(buf) - 1] = 0;
+  return buf;
 }

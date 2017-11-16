@@ -10,9 +10,20 @@ from subprocess import call
 
 read_tsf = True
 save_outout = False
+kekcc = True
+btrgpc09 = False
+
+if kekcc:
+    lib_source = '/home/belle2/tasheng/tsim/'
+    rdi_path = '/home/belle2/tasheng/Vivado_2017.2/lib/lnx64.o'
+elif btrgpc09:
+    lib_source = '/home/trgadmin/tsim/'
+    rdi_path = '/home/trgadmin/Xilinx/Vivado/2017.2/lib/lnx64.o'
+else:
+    lib_source = ''
+    rdi_path = ''
 
 # set run time library path
-rdi_path = '/home/belle2/tasheng/Vivado_2017.2/lib/lnx64.o'
 if rdi_path not in os.environ['LD_LIBRARY_PATH']:
     print('please set environment variable first! do either')
     print('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:' + rdi_path)
@@ -23,7 +34,7 @@ if rdi_path not in os.environ['LD_LIBRARY_PATH']:
 # link to 2D design snapshot
 for link in ['xsim.dir', 'innerLRLUT.mif', 'outerLRLUT.mif']:
     if link not in os.listdir(os.getcwd()):
-        call(['ln', '-s', '/home/belle2/tasheng/tsim/' + link])
+        call(['ln', '-s', lib_source + link])
 
 """
 generate tracks with particle gun, simulate CDC and CDC trigger, save the output.

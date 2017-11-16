@@ -11,7 +11,7 @@
 #pragma once
 
 #include <framework/core/Path.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 
 namespace Belle2 {
@@ -56,7 +56,7 @@ namespace Belle2 {
     {
       if (!isDone() and dynamic_cast<Path*>(m_iter->get())) {
         //we're pointing to another Path
-        *this = PathIterator(boost::static_pointer_cast<Path>(*m_iter), *this);
+        *this = PathIterator(std::static_pointer_cast<Path>(*m_iter), *this);
       }
       //check _afterwards_ if we need to jump back up
       if (isDone() and m_parentIterator) {
@@ -75,9 +75,9 @@ namespace Belle2 {
 
   private:
     PathPtr m_path; /**< keep the path around to ensure iterators remain valid. */
-    std::list<boost::shared_ptr<PathElement> >::const_iterator m_iter; /**< wrapped path list iterator. */
-    std::list<boost::shared_ptr<PathElement> >::const_iterator m_end; /**< iterator to end of Path. */
-    boost::shared_ptr<PathIterator> m_parentIterator; /**< If this is non-NULL, we jump to m_parentIterator+1 after m_iter is done. */
+    std::list<std::shared_ptr<PathElement> >::const_iterator m_iter; /**< wrapped path list iterator. */
+    std::list<std::shared_ptr<PathElement> >::const_iterator m_end; /**< iterator to end of Path. */
+    std::shared_ptr<PathIterator> m_parentIterator; /**< If this is non-NULL, we jump to m_parentIterator+1 after m_iter is done. */
   };
 
 } // end namespace Belle2

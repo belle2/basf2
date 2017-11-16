@@ -75,7 +75,7 @@ main.add_module(RandomTestModule("test2"))
 # and start processing
 logging_framework = logging.package("framework")
 logging_framework.set_log_level(LogLevel.DEBUG)
-logging_framework.set_debug_level(100)
+logging_framework.set_debug_level(200)
 logging_framework.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
 set_random_seed("this is the seed")
 

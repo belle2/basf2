@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FRAMEWORK_UTILITIES_SHA3HASH_HASH_H
-#define FRAMEWORK_UTILITIES_SHA3HASH_HASH_H
 
 #include <vector>
 
@@ -81,4 +79,3 @@ namespace Belle2 {
     EHashMode m_mode;
   };
 } //Belle2 namespace
-#endif // FRAMEWORK_UTILITIES_SHA3HASH_HASH_H

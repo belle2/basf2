@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef RANDOMNUMBERS_H
-#define RANDOMNUMBERS_H
+#pragma once
 
 #include <string>
 #include <framework/core/RandomGenerator.h>
@@ -103,5 +102,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /*RANDOMNUMBERS_H */

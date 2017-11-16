@@ -8,11 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PYMODULE_H
-#define PYMODULE_H
+#pragma once
 
 #include <boost/python/call_method.hpp>
-
 #include <framework/core/Module.h>
 
 namespace Belle2 {
@@ -113,4 +111,3 @@ namespace Belle2 {
     PyObject* m_self; /**< the actual python module */
   };
 }
-#endif

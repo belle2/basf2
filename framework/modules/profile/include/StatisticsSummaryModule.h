@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef STATISTICSSUMMARYMODULE_H
-#define STATISTICSSUMMARYMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -55,5 +54,3 @@ namespace Belle2 {
     StoreObjPtr<ProcessStatistics> m_processStatistics;
   };
 }
-
-#endif /* STATISTICSSUMMARYMODULE_H_ */

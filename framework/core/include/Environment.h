@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ENVIRONMENT_H
-#define ENVIRONMENT_H
+#pragma once
 
 #include <list>
 #include <string>
@@ -256,5 +255,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* ENVIRONMENT_H */

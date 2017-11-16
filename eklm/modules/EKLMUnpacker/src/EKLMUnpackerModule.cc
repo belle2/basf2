@@ -12,12 +12,10 @@
 #include <cstdint>
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/modules/EKLMUnpacker/EKLMUnpackerModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
-#include <rawdata/dataobjects/RawKLM.h>
 
 using namespace std;
 using namespace Belle2;
@@ -29,7 +27,7 @@ EKLMUnpackerModule::EKLMUnpackerModule() : Module()
   setDescription("EKLM unpacker (creates EKLMDigit from RawKLM).");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("outputDigitsName", m_outputDigitsName,
-           "Name of EKLMDigit store array", string("EKLMDigits"));
+           "Name of EKLMDigit store array", string("Digits"));
   m_GeoDat = NULL;
 }
 
@@ -39,8 +37,8 @@ EKLMUnpackerModule::~EKLMUnpackerModule()
 
 void EKLMUnpackerModule::initialize()
 {
-  StoreArray<EKLMDigit>eklmDigits(m_outputDigitsName);
-  eklmDigits.registerInDataStore();
+  m_RawKLMs.isRequired();
+  m_Digits.registerInDataStore(m_outputDigitsName);
   m_GeoDat = &(EKLM::GeometryData::Instance());
 }
 
@@ -58,31 +56,29 @@ void EKLMUnpackerModule::event()
   int endcap, layer, sector;
   const int* sectorGlobal;
   EKLMDataConcentratorLane lane;
-  StoreArray<RawKLM> rawKLM;
-  StoreArray<EKLMDigit> eklmDigits(m_outputDigitsName);
   if (!m_ElectronicsMap.isValid())
     B2FATAL("No EKLM electronics map.");
-  for (int i = 0; i < rawKLM.getEntries(); i++) {
-    if (rawKLM[i]->GetNumEvents() != 1) {
+  for (int i = 0; i < m_RawKLMs.getEntries(); i++) {
+    if (m_RawKLMs[i]->GetNumEvents() != 1) {
       B2ERROR("RawKLM with index " << i << " has " <<
-              rawKLM[i]->GetNumEvents() << " entries (should be 1). ");
+              m_RawKLMs[i]->GetNumEvents() << " entries (should be 1). ");
       continue;
     }
     /*
      * getNumEntries is defined in RawDataBlock.h and gives the
      * numberOfNodes*numberOfEvents. Number of nodes is num copper boards.
      */
-    for (int j = 0; j < rawKLM[i]->GetNumEntries(); j++) {
-      unsigned int copperId = rawKLM[i]->GetNodeID(j);
+    for (int j = 0; j < m_RawKLMs[i]->GetNumEntries(); j++) {
+      unsigned int copperId = m_RawKLMs[i]->GetNodeID(j);
       if (copperId < EKLM_ID || copperId > EKLM_ID + 4)
         continue;
       uint16_t copperN = copperId - EKLM_ID;
       lane.setCopper(copperN);
-      rawKLM[i]->GetBuffer(j);
+      m_RawKLMs[i]->GetBuffer(j);
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
         //addendum: There is always an additional word (count) in the end
-        int numDetNwords = rawKLM[i]->GetDetectorNwords(j, finesse_num);
-        int* buf_slot    = rawKLM[i]->GetDetectorBuffer(j, finesse_num);
+        int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, finesse_num);
+        int* buf_slot    = m_RawKLMs[i]->GetDetectorBuffer(j, finesse_num);
         int numHits = numDetNwords / hitLength;
         lane.setDataConcentrator(finesse_num);
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
@@ -107,7 +103,7 @@ void EKLMUnpackerModule::event()
             B2FATAL("Incomplete EKLM electronics map.");
           m_GeoDat->sectorNumberToElementNumbers(*sectorGlobal,
                                                  &endcap, &layer, &sector);
-          EKLMDigit* idigit = eklmDigits.appendNew();
+          EKLMDigit* idigit = m_Digits.appendNew();
           idigit->setTime(tdc);
           idigit->setEndcap(endcap);
           idigit->setLayer(layer);

@@ -7,8 +7,7 @@
  *                                                                        *
  **************************************************************************/
 
-#ifndef RelationIndexContainer_H
-#define RelationIndexContainer_H
+#pragma once
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -205,5 +204,3 @@ namespace Belle2 {
   }
 
 } // end namespace Belle2
-
-#endif

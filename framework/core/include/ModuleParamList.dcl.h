@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef MODULEPARAMLIST_DCL_H_
-#define MODULEPARAMLIST_DCL_H_
+
+#pragma once
 
 #include <framework/core/ModuleParam.dcl.h>
 
@@ -224,4 +224,3 @@ namespace Belle2 {
   };
 
 } //end of Belle2 namespace
-#endif

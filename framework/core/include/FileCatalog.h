@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef FILECATALOG_H
-#define FILECATALOG_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -86,5 +85,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /*FILECATALOG_H */

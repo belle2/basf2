@@ -789,11 +789,11 @@ void PXDUnpackerModule::terminate()
     flag |= m_errorCounter[i];
   }
   if (flag != 0) {
-    B2ERROR("PXD Unpacker --> Error Statistics (counted once per event!) in Events: " << m_unpackedEventsCount);
-    B2ERROR(errstr + " )");
+    B2RESULT("PXD Unpacker --> Error Statistics (counted once per event!) in Events: " << m_unpackedEventsCount);
+    B2RESULT(errstr + " )");
     for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
       if (m_errorCounter[i]) {
-        B2ERROR(error_name[i] << ": " << m_errorCounter[i]);
+        B2RESULT(error_name[i] << ": " << m_errorCounter[i]);
       }
     }
   } else {
@@ -823,16 +823,14 @@ void PXDUnpackerModule::event()
 
   for (int k = 0 ; k < ONSEN_MAX_TYPE_ERR ; k++) {error_block[k] = 0;}
 
-  int nsr = 0;// number of packets
   for (auto& it : m_storeRawPXD) {
     if (verbose) {
       B2DEBUG(20, "PXD Unpacker --> Unpack Objects: ");
     };
     unpack_event(it);
-    nsr++;
   }
 
-  if (nsr == 0) m_errorMask |= ONSEN_ERR_FLAG_NO_PXD;
+  if (nRaws == 0) m_errorMask |= ONSEN_ERR_FLAG_NO_PXD;
 
   const char* errWptr[6];
   for (int i = 0 ; i < 6 ; i++) {
@@ -873,10 +871,6 @@ void PXDUnpackerModule::event()
   first_event = true;
 }
 
-#ifndef __clang__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstack-usage="
-#endif
 void PXDUnpackerModule::unpack_event(RawPXD& px)
 {
   int Frames_in_event;
@@ -888,9 +882,9 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
     m_errorMask |= ONSEN_ERR_FLAG_PACKET_SIZE;
     return;
   }
-  unsigned int data[px.size()];// size cannot be unlimited, because we check it before
+  std::vector<unsigned int> data(px.size());
   fullsize = px.size() * 4; /// in bytes ... rounded up to next 32bit boundary
-  memcpy(data, (unsigned int*)px.data(), fullsize);
+  std::copy_n(px.data(), px.size(), data.begin());
 
   if (fullsize < 8) {
     B2ERROR("Data is to small to hold a valid Header! Will not unpack anything. Size:" << fullsize);
@@ -904,8 +898,8 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
     return;
   }
 
-  if (m_headerEndianSwap) Frames_in_event = ((ubig32_t*)data)[1];
-  else Frames_in_event = ((ulittle32_t*)data)[1];
+  if (m_headerEndianSwap) Frames_in_event = ((ubig32_t*)data.data())[1];
+  else Frames_in_event = ((ulittle32_t*)data.data())[1];
   if (Frames_in_event < 0 || Frames_in_event > 256) {
     B2ERROR("Number of Frames invalid: Will not unpack anything. Header corrupted! Frames in event: " << Frames_in_event);
     m_errorMask |= ONSEN_ERR_FLAG_FRAME_NR;
@@ -914,12 +908,12 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
 
   /// NEW format
   if (verbose) {
-    B2DEBUG(20, "PXD Unpacker --> data[0]: <-- Magic " << hex << data[0]);
-    B2DEBUG(20, "PXD Unpacker --> data[1]: <-- #Frames " << htonl(data[1]) << " in hex " << hex << data[1]);
-    if (data[1] >= 1 && fullsize < 12) B2DEBUG(20, "PXD Unpacker --> data[2]: <-- Frame 1 len " << hex << data[2]);
-    if (data[1] >= 2 && fullsize < 16) B2DEBUG(20, "PXD Unpacker --> data[3]: <-- Frame 2 len " << hex << data[3]);
-    if (data[1] >= 3 && fullsize < 20) B2DEBUG(20, "PXD Unpacker --> data[4]: <-- Frame 3 len " << hex << data[4]);
-    if (data[1] >= 4 && fullsize < 24) B2DEBUG(20, "PXD Unpacker --> data[5]: <-- Frame 4 len " << hex << data[5]);
+    B2DEBUG(20, "PXD Unpacker --> data[0]: <-- Magic $" << hex << data[0]);
+    B2DEBUG(20, "PXD Unpacker --> data[1]: <-- #Frames $" << hex << data[1]);
+    if (data[1] >= 1 && fullsize < 12) B2DEBUG(20, "PXD Unpacker --> data[2]: <-- Frame 1 len $" << hex << data[2]);
+    if (data[1] >= 2 && fullsize < 16) B2DEBUG(20, "PXD Unpacker --> data[3]: <-- Frame 2 len $" << hex << data[3]);
+    if (data[1] >= 3 && fullsize < 20) B2DEBUG(20, "PXD Unpacker --> data[4]: <-- Frame 3 len $" << hex << data[4]);
+    if (data[1] >= 4 && fullsize < 24) B2DEBUG(20, "PXD Unpacker --> data[5]: <-- Frame 4 len $" << hex << data[5]);
   };
 
   unsigned int* tableptr;
@@ -956,9 +950,6 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
   }
 
 }
-#ifndef __clang__
-#pragma GCC diagnostic pop
-#endif
 
 void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsigned int dhe_ID, unsigned dhe_DHPport, VxdID vxd_id)
 {
@@ -1064,7 +1055,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   unsigned int second_dhp_dhe_id = 0;
   unsigned int dhp_dhp_id       = 0;
 
-  unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0, sorPreWord = 0;
+  unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
   unsigned int v_cellID = 0, u_cellID = 0;
   unsigned int dhp_offset = 0;
   bool rowflag = false;
@@ -1154,7 +1145,6 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
           return;
         } else {
           if (!rowflag) { //HOT FIX GRADIENT
-            sorPreWord = dhp_pix[i];
             B2ERROR("DHP Unpacking: Word before Start of Row : $" << hex << dhp_pix[i]);//HOT FIX GRADIENT
           }//HOT FIX GRADIENT
           if (rowflag) { //HOT FIX GRADIENT

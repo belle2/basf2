@@ -62,7 +62,7 @@ if (args.magnet_off):
 add_geometry(main, magnet=not args.magnet_off, field_override=None, target=None, geometry_version=geom)
 
 # unpack data
-main.add_module('SVDUnpacker', xmlMapFileName='testbeam/vxd/data/2017_svd_mapping.xml', GenerateShaperDigts=True, shutUpFTBError=1)
+main.add_module('SVDUnpacker', shutUpFTBError=1)
 
 # uncomment only if using the old TB reconstruction (SVDClusterizer)
 # path.add_module('SVDDigitSorter')

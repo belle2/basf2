@@ -72,7 +72,7 @@ BKLMDigitizerModule::~BKLMDigitizerModule()
 void BKLMDigitizerModule::initialize()
 {
   StoreArray<BKLMSimHit> bklmSimHit;
-  bklmSimHit.required();
+  bklmSimHit.isRequired();
 
   // Force creation and persistence of BKLM output datastores
   StoreArray<BKLMDigit> bklmDigit;

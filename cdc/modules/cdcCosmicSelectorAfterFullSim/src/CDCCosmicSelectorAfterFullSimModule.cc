@@ -40,9 +40,9 @@ CDCCosmicSelectorAfterFullSimModule::CDCCosmicSelectorAfterFullSimModule() : Mod
 void CDCCosmicSelectorAfterFullSimModule::initialize()
 {
   StoreArray<MCParticle> mcParticles;
-  mcParticles.required();
+  mcParticles.isRequired();
   StoreArray<CDCSimHit> simHits;
-  simHits.required();
+  simHits.isRequired();
 }
 
 

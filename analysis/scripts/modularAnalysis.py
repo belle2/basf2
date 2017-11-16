@@ -278,7 +278,7 @@ def outputIndex(filename, path, includeArrays=[], keepParents=False, mc=True):
     """
 
     # Module to mark all branches to not be saved except particle lists
-    onlyPLists = register_module('OnlyParticleLists')
+    onlyPLists = register_module('OnlyWriteOutParticleLists')
     path.add_module(onlyPLists)
 
     # Set up list of all other branches we need to make index file complete

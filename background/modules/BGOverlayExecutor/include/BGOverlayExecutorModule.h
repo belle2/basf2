@@ -68,7 +68,7 @@ namespace Belle2 {
   private:
 
     std::string m_PXDDigitsName; /**< name of PXD collection to overlay with BG */
-    std::string m_SVDDigitsName; /**< name of SVD collection to overlay with BG */
+    std::string m_SVDShaperDigitsName; /**< name of SVD collection to overlay with BG */
     std::string m_CDCHitsName;   /**< name of CDC collection to overlay with BG */
     std::string m_TOPDigitsName; /**< name of TOP collection to overlay with BG */
     std::string m_ARICHDigitsName; /**< name of ARICH collection to overlay with BG */

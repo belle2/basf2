@@ -204,6 +204,9 @@ def add_simulation(
         path.add_module('BGOverlayExecutor', PXDDigitsName=pxd_digits_name)
         if components is None or 'PXD' in components:
             path.add_module("PXDDigitSorter", digits=pxd_digits_name)
+        # sort SVDShaperDigits before PXD data reduction
+        if components is None or 'SVD' in components:
+            path.add_module("SVDShaperDigitSorter")
 
     # PXD data reduction - after background overlay executor
     if (components is None or 'PXD' in components) and usePXDDataReduction:

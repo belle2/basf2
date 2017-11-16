@@ -129,16 +129,20 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
         store_array_crops = peelers.peel_store_array_info(reco_track, key="pr_{part_name}")
         mc_store_array_crops = peelers.peel_store_array_info(mc_reco_track, key="mc_{part_name}")
 
-        crops = dict(multiplicity=multiplicity,
-                     **mc_to_pr_match_info_crops,
-                     **hit_content_crops,
-                     **mc_particle_crops,
-                     **subdetector_hit_efficiency_crops,
-                     **mc_hit_efficiencies_in_all_pr_tracks_crops,
-                     **event_crops,
-                     **store_array_crops,
-                     **mc_store_array_crops
-                     )
+        # # Custom peel function to get QI
+        # qualityindex_crops = {'QualityIndex': reco_track.getRelated('SPTrackCands').getQualityIndex()}
+
+        crops = dict(  # **qualityindex_crops,
+            multiplicity=multiplicity,
+            **mc_to_pr_match_info_crops,
+            **hit_content_crops,
+            **mc_particle_crops,
+            **subdetector_hit_efficiency_crops,
+            **mc_hit_efficiencies_in_all_pr_tracks_crops,
+            **event_crops,
+            **store_array_crops,
+            **mc_store_array_crops
+        )
 
         return crops
 

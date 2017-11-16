@@ -11,7 +11,8 @@ from pxd import add_pxd_reconstruction
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trigger_mode="all", additionalTrackFitHypotheses=None,
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, use_vxdtf2=True,
-                                fit_tracks=True, use_second_cdc_hits=False, skipHitPreparerAdding=False):
+                                fit_tracks=True, use_second_cdc_hits=False, skipHitPreparerAdding=False,
+                                sectormap_file=None):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.
@@ -56,7 +57,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     else:
         add_track_finding(path, components=components, trigger_mode=trigger_mode, reco_tracks=reco_tracks,
                           prune_temporary_tracks=prune_temporary_tracks, use_vxdtf2=use_vxdtf2,
-                          use_second_cdc_hits=use_second_cdc_hits)
+                          use_second_cdc_hits=use_second_cdc_hits, sectormap_file=sectormap_file)
 
     if trigger_mode in ["hlt", "all"]:
         add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
@@ -151,14 +152,14 @@ def add_geometry_modules(path, components=None):
                         energyLossBrems=False, noiseBrems=False)
 
 
-def add_hit_preparation_modules(path, components=None):
+def add_hit_preparation_modules(path, components=None, isROIsimulation=False, useNN=False, useCoG=False):
     """
     Helper fucntion to prepare the hit information to be used by tracking.
     """
 
     # Preparation of the SVD clusters
     if is_svd_used(components):
-        add_svd_reconstruction(path)
+        add_svd_reconstruction(path, isROIsimulation, useNN, useCoG)
 
     # Preparation of the PXD clusters
     if is_pxd_used(components):
@@ -363,7 +364,8 @@ def add_track_finding(
         reco_tracks="RecoTracks",
         prune_temporary_tracks=True,
         use_vxdtf2=True,
-        use_second_cdc_hits=False):
+        use_second_cdc_hits=False,
+        sectormap_file=None):
     """
     Adds the realistic track finding to the path.
     The result is a StoreArray 'RecoTracks' full of RecoTracks (not TrackCands any more!).
@@ -405,7 +407,7 @@ def add_track_finding(
         if trigger_mode in ["hlt", "all"]:
             if use_vxdtf2:
                 # version 2 of the track finder
-                add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks)
+                add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=svd_reco_tracks, sectormap_file=sectormap_file)
             else:
                 # version 1 of the track finder
                 add_vxd_track_finding(path, components=["SVD"], reco_tracks=svd_reco_tracks)
@@ -1128,9 +1130,11 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
         path.add_module(pxdSVDCut)
 
     # Quality
-    qualityEstimator = register_module('QualityEstimatorVXD')
+    qualityEstimator = register_module('QualityEstimatorMVA')
     qualityEstimator.param('EstimationMethod', quality_estimator)
     qualityEstimator.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
+    qualityEstimator.param('WeightFileIdentifier', '/local/scratch/ssd/sracs/VXDTF2-MVA-Tests/FastBDT-SMrev5-noTime.weights.xml')
+    qualityEstimator.param('ClusterInformation', 'Average')
     path.add_module(qualityEstimator)
 
     # will discard track candidates (with low quality estimators) if the number of TC is above threshold

@@ -32,7 +32,7 @@ EKLMRawPackerModule::~EKLMRawPackerModule()
 void EKLMRawPackerModule::initialize()
 {
   m_eventMetaDataPtr.registerInDataStore();
-  m_RawKLMArray.registerPersistent();
+  m_RawKLMArray.registerInDataStore();
   m_GeoDat = &(EKLM::GeometryData::Instance());
 }
 

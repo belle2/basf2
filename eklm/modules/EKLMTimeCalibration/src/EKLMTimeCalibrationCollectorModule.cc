@@ -18,11 +18,8 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/modules/EKLMTimeCalibration/EKLMTimeCalibrationCollectorModule.h>
-
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
-#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 
 using namespace Belle2;
@@ -48,10 +45,12 @@ void EKLMTimeCalibrationCollectorModule::prepare()
 {
   TTree* t;
   m_GeoDat = &(EKLM::GeometryData::Instance());
-  StoreArray<EKLMHit2d>::required();
-  StoreArray<EKLMDigit>::required();
-  StoreArray<Track>::required();
-  StoreArray<ExtHit>::required();
+  m_EKLMHit2ds.isRequired();
+  m_Tracks.isRequired();
+  StoreArray<EKLMDigit> eklmDigits;
+  m_EKLMHit2ds.requireRelationTo(eklmDigits);
+  StoreArray<ExtHit> extHits;
+  m_Tracks.requireRelationTo(extHits);
   m_TransformData = new EKLM::TransformData(true, EKLM::TransformData::c_None);
   t = new TTree("calibration_data", "");
   t->Branch("time", &m_ev.time, "time/F");
@@ -67,16 +66,14 @@ void EKLMTimeCalibrationCollectorModule::collect()
   double l, hitTime;
   TVector3 hitPosition;
   HepGeom::Point3D<double> hitGlobal, hitLocal;
-  StoreArray<Track> tracks;
-  StoreArray<EKLMHit2d> hit2ds;
   std::multimap<int, ExtHit*> mapExtHit;
   std::multimap<int, ExtHit*>::iterator it, itLower, itUpper;
   ExtHit* extHit, *entryHit[2], *exitHit[2];
   const HepGeom::Transform3D* tr;
   TTree* calibrationData = getObjectPtr<TTree>("calibration_data");
-  n = tracks.getEntries();
+  n = m_Tracks.getEntries();
   for (i = 0; i < n; i++) {
-    RelationVector<ExtHit> extHits = tracks[i]->getRelationsTo<ExtHit>();
+    RelationVector<ExtHit> extHits = m_Tracks[i]->getRelationsTo<ExtHit>();
     n2 = extHits.size();
     for (j = 0; j < n2; j++) {
       if (extHits[j]->getDetectorID() != Const::EDetector::EKLM)
@@ -87,9 +84,10 @@ void EKLMTimeCalibrationCollectorModule::collect()
                                                extHits[j]));
     }
   }
-  n = hit2ds.getEntries();
+  n = m_EKLMHit2ds.getEntries();
   for (i = 0; i < n; i++) {
-    RelationVector<EKLMDigit> digits = hit2ds[i]->getRelationsTo<EKLMDigit>();
+    RelationVector<EKLMDigit> digits =
+      m_EKLMHit2ds[i]->getRelationsTo<EKLMDigit>();
     if (digits.size() != 2)
       B2FATAL("Wrong number of related EKLMDigits.");
     for (j = 0; j < 2; j++) {

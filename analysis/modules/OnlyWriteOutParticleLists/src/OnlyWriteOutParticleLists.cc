@@ -8,20 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/modules/OnlyParticleLists/OnlyParticleLists.h>
+#include <analysis/modules/OnlyWriteOutParticleLists/OnlyWriteOutParticleLists.h>
 #include <framework/datastore/DataStore.h>
 #include <analysis/dataobjects/ParticleList.h>
 
 using namespace Belle2;
 
-REG_MODULE(OnlyParticleLists)
+REG_MODULE(OnlyWriteOutParticleLists)
 
-OnlyParticleListsModule::OnlyParticleListsModule()
+OnlyWriteOutParticleListsModule::OnlyWriteOutParticleListsModule()
 {
   setDescription("Marks all objects in DataStore except those of type ParticleList as WrtieOut=False. Intedend to run before outputting an index file to remove unecessary arrays.");
 }
 
-void OnlyParticleListsModule::initialize()
+void OnlyWriteOutParticleListsModule::initialize()
 {
   for (auto& entry : DataStore::Instance().getStoreEntryMap(DataStore::c_Event)) {
     entry.second.dontWriteOut = entry.second.objClass != ParticleList::Class();

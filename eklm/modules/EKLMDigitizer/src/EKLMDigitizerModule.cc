@@ -226,10 +226,6 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
       eklmDigit->setNPE(0);
     }
     eklmDigit->setFitStatus(fes.getFitStatus());
-    if (eklmDigit->getNPE() > m_DiscriminatorThreshold)
-      eklmDigit->isGood(true);
-    else
-      eklmDigit->isGood(false);
     if (fes.getFitStatus() == EKLM::c_FPGASuccessfulFit && m_SaveFPGAFit) {
       EKLMFPGAFit* fit = m_FPGAFits.appendNew(*fes.getFPGAFit());
       eklmDigit->addRelationTo(fit);

@@ -16,12 +16,9 @@
 
 /* Belle2 headers. */
 #include <bklm/dbobjects/BKLMGeometryPar.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Const.h>
-#include <eklm/modules/KLMK0LReconstructor/KLMHit2d.h>
 #include <eklm/modules/KLMK0LReconstructor/KLMK0LReconstructorModule.h>
-#include <mdst/dataobjects/KLMCluster.h>
+#include <framework/datastore/RelationArray.h>
+#include <framework/gearbox/Const.h>
 
 using namespace Belle2;
 
@@ -47,14 +44,11 @@ KLMK0LReconstructorModule::~KLMK0LReconstructorModule()
 
 void KLMK0LReconstructorModule::initialize()
 {
-  StoreArray<KLMCluster> klmClusters;
-  StoreArray<BKLMHit2d> bklmHit2ds;
-  StoreArray<EKLMHit2d> eklmHit2ds;
-  klmClusters.registerInDataStore();
-  bklmHit2ds.isRequired();
-  eklmHit2ds.isRequired();
-  klmClusters.registerRelationTo(bklmHit2ds);
-  klmClusters.registerRelationTo(eklmHit2ds);
+  m_KLMClusters.registerInDataStore();
+  m_BKLMHit2ds.isRequired();
+  m_EKLMHit2ds.isRequired();
+  m_KLMClusters.registerRelationTo(m_BKLMHit2ds);
+  m_KLMClusters.registerRelationTo(m_EKLMHit2ds);
   m_GeoDat = &(EKLM::GeometryData::Instance());
   if (m_PositionModeString == "FullAverage")
     m_PositionMode = c_FullAverage;
@@ -87,9 +81,6 @@ void KLMK0LReconstructorModule::event()
   int* layerHitsBKLM, *layerHitsEKLM;
   float minTime = -1;
   double p, v;
-  StoreArray<KLMCluster> klmClusters;
-  StoreArray<BKLMHit2d> bklmHit2ds;
-  StoreArray<EKLMHit2d> eklmHit2ds;
   std::vector<KLMHit2d> klmHit2ds, klmClusterHits;
   std::vector<KLMHit2d>::iterator it, it0, it2;
   KLMCluster* klmCluster;
@@ -98,15 +89,15 @@ void KLMK0LReconstructorModule::event()
   layerHitsBKLM = new int[nLayersBKLM];
   layerHitsEKLM = new int[nLayersEKLM];
   /* Fill vector of 2d hits. */
-  n = bklmHit2ds.getEntries();
+  n = m_BKLMHit2ds.getEntries();
   for (i = 0; i < n; i++) {
-    if (bklmHit2ds[i]->isOutOfTime())
+    if (m_BKLMHit2ds[i]->isOutOfTime())
       continue;
-    klmHit2ds.push_back(KLMHit2d(bklmHit2ds[i]));
+    klmHit2ds.push_back(KLMHit2d(m_BKLMHit2ds[i]));
   }
-  n = eklmHit2ds.getEntries();
+  n = m_EKLMHit2ds.getEntries();
   for (i = 0; i < n; i++) {
-    klmHit2ds.push_back(KLMHit2d(eklmHit2ds[i]));
+    klmHit2ds.push_back(KLMHit2d(m_EKLMHit2ds[i]));
   }
   /* Sort by the distance from center. */
   sort(klmHit2ds.begin(), klmHit2ds.end(), compareDistance);
@@ -197,7 +188,7 @@ clusterFound:;
       else
         p = 0;
     }
-    klmCluster = klmClusters.appendNew(
+    klmCluster = m_KLMClusters.appendNew(
                    hitPos.x(), hitPos.y(), hitPos.z(), minTime, nLayers,
                    innermostLayer, p);
     for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it) {

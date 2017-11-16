@@ -7,8 +7,7 @@
  *                                                                        *
  **************************************************************************/
 
-#ifndef RELATIONELEMENT_H
-#define RELATIONELEMENT_H
+#pragma once
 
 #include <TObject.h>
 
@@ -125,5 +124,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif

@@ -63,6 +63,7 @@ else:
 
 
 fitResults = []
+numberOfEntries = []
 
 for VXDReq in VXDReqs:
     iResult = []
@@ -202,6 +203,7 @@ for VXDReq in VXDReqs:
     fitDataDT.Print()
     fitDataSigZ.Print()
     fitDataTagZ.Print()
+    numberOfEntries.append(data.numEntries())
 
 # Fit and plot of the DeltaT Error and DeltaTRECO - DeltaTMC
 
@@ -642,6 +644,11 @@ print('*                                                             *')
 print('*    ' + fitResults[0][2][0] + '        ' + fitResults[0][2][1] + '   *')
 print('*                                                             *')
 print('********REQUIRING BOTH MUON TRACKS TO HAVE A PXD HIT***********')
+print('*                                                             *')
+print('* Efficiency                                                  *')
+print('*                                                             *')
+print('* N_' + VXDReqs[1] + '/N_' + VXDReqs[0] + ' = ' + str(numberOfEntries[1]) + "/" + str(numberOfEntries[0]) + ' = ' +
+      '{:^3.2f}'.format(float((numberOfEntries[1] / numberOfEntries[0]) * 100)) + '%  *')
 print('*                                                             *')
 print('* DeltaT - Gen. DeltaT                                        *')
 print('*                                                             *')

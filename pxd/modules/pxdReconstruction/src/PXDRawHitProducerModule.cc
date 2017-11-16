@@ -48,7 +48,7 @@ void PXDRawHitProducerModule::initialize()
   storeRawHits.registerInDataStore();
 
   StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
-  storeDigits.required();
+  storeDigits.isRequired();
 
   m_storeRawHitsName = storeRawHits.getName();
   m_storeDigitsName = storeDigits.getName();

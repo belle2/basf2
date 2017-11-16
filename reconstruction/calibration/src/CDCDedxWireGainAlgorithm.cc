@@ -46,7 +46,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   ttree->SetBranchAddress("wire", &wire);
   ttree->SetBranchAddress("dedxhit", &dedxhit);
 
-  std::vector<double> wirededx[14336];
+  std::vector<std::vector<double>> wirededx(14336, std::vector<double>());
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
     for (unsigned int j = 0; j < wire->size(); ++j) {

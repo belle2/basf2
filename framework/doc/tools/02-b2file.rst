@@ -112,9 +112,9 @@ just split into smaller ones for convinience. As such the following
 restrictions apply:
 
 * The files have to be created with the same release and steering file
-* The persistent tree is only allowed to contain FileMetaData, BackgroundInfo
-  and objects inheriting from Mergeable and the same list of objects needs to
-  be present in all files.
+* The persistent tree is only allowed to contain FileMetaData and objects
+  inheriting from Mergeable and the same list of objects needs to be present in
+  all files.
 * The event tree needs to contain the same DataStore entries in all files.
 
 ::

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MODULEMANAGER_H_
-#define MODULEMANAGER_H_
+#pragma once
 
 #include <framework/core/FrameworkExceptions.h>
 
@@ -196,5 +195,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* MODULEMANAGER_H_ */

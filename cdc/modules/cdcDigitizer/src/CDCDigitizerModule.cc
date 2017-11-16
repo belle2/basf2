@@ -121,7 +121,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
 void CDCDigitizerModule::initialize()
 {
   StoreArray<CDCSimHit> cdcSimHits(m_inputCDCSimHitsName);
-  cdcSimHits.required();
+  cdcSimHits.isRequired();
 
   // Register the arrays in the DataStore, that are to be added in this module.
   StoreArray<CDCHit> cdcHits(m_outputCDCHitsName);

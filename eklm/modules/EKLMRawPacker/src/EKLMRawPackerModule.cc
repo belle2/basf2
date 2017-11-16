@@ -31,8 +31,8 @@ EKLMRawPackerModule::~EKLMRawPackerModule()
 
 void EKLMRawPackerModule::initialize()
 {
-  m_eventMetaDataPtr.registerInDataStore();
-  m_RawKLMArray.registerPersistent();
+  m_Digits.isRequired();
+  m_RawKLMs.registerInDataStore();
   m_GeoDat = &(EKLM::GeometryData::Instance());
 }
 
@@ -42,9 +42,6 @@ void EKLMRawPackerModule::beginRun()
 
 void EKLMRawPackerModule::event()
 {
-  B2INFO("pack the event.." << endl);
-  StoreArray<EKLMDigit> digits;
-  B2INFO("EKLMRawPackerModule:: entries of eklmdigits " << digits.getEntries());
   int n_Gdidgits = 0;
   const EKLMDataConcentratorLane* lane;
   int i, j, k, endcap, layer, sector, sectorGlobal, copper, dataConcentrator;
@@ -57,8 +54,8 @@ void EKLMRawPackerModule::event()
   EKLMDigit* eklmDigit;
   if (!m_ElectronicsMap.isValid())
     B2FATAL("No EKLM electronics map.");
-  for (i = 0; i < digits.getEntries(); i++) {
-    eklmDigit = digits[i];
+  for (i = 0; i < m_Digits.getEntries(); i++) {
+    eklmDigit = m_Digits[i];
     if (!(eklmDigit->isGood()))
       continue;
     n_Gdidgits++;
@@ -87,7 +84,6 @@ void EKLMRawPackerModule::event()
     dataWords[copper][dataConcentrator].push_back(buf[0]);
     dataWords[copper][dataConcentrator].push_back(buf[1]);
   }
-//  B2INFO("EKLMRawPackerModule:: N_good_eklmdigits " << n_Gdidgits);
   for (i = 0; i < 4; i++) {
     // Fill event info (These values will be stored in RawHeader)
     packerInfo.exp_num = 1;
@@ -98,7 +94,7 @@ void EKLMRawPackerModule::event()
     packerInfo.tt_ctime = 0x7123456;
     packerInfo.tt_utime = 0xF1234567;  //Triger info may be required
     packerInfo.b2l_ctime = 0x7654321;
-    rawKlm = m_RawKLMArray.appendNew();
+    rawKlm = m_RawKLMs.appendNew();
     for (j = 0; j < 4; j++) {
       nWords[j] = dataWords[i][j].size();
       detectorBuf[j] = new int[nWords[j] + 1];
@@ -114,7 +110,6 @@ void EKLMRawPackerModule::event()
     for (j = 0; j < 4; j++)
       delete[] detectorBuf[j];
   }
-  B2INFO("Event # " << m_NEvents);
   m_NEvents++;
   return;
 }

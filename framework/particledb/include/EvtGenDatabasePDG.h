@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FRAMEWORK_PARTICLEDB_EVTGENDATABASEPDG_H
-#define FRAMEWORK_PARTICLEDB_EVTGENDATABASEPDG_H
 
 #include <framework/particledb/EvtGenParticlePDG.h>
 #include <TDatabasePDG.h>
@@ -50,5 +48,3 @@ namespace Belle2 {
     ClassDefOverride(EvtGenDatabasePDG, 1); /**< Replacement for TDatabasePDG that is filled from EvtGen's evt.pdl. */
   };
 } //Belle2 namespace
-
-#endif // FRAMEWORK_PARTICLEDB_EVTGENDATABASEPDG_H

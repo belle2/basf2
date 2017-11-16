@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LOGCONNECTIONBASE_H_
-#define LOGCONNECTIONBASE_H_
+#pragma once
 
 namespace Belle2 {
   class LogMessage;
@@ -49,5 +48,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif /* LOGCONNECTIONBASE_H_ */

@@ -24,9 +24,8 @@
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
-T0Correction4CAF::T0Correction4CAF(): CalibrationAlgorithm("CDCCalibrationCollector"),
-  m_firstExperiment(0), m_firstRun(0),
-  m_lastExperiment(-1), m_lastRun(-1)
+
+T0Correction4CAF::T0Correction4CAF(): CalibrationAlgorithm("CDCCalibrationCollector")
 {
   /*
    setDescription(
@@ -40,7 +39,7 @@ T0Correction4CAF::T0Correction4CAF(): CalibrationAlgorithm("CDCCalibrationCollec
   */
 }
 
-void T0Correction4CAF::CreateHisto()
+void T0Correction4CAF::createHisto()
 {
 
   B2INFO("CreateHisto");
@@ -54,8 +53,6 @@ void T0Correction4CAF::CreateHisto()
   int lay;
 
   auto tree = getObjectPtr<TTree>("tree");
-  //  TChain* tree = new TChain("tree");
-  //  tree->Add(m_inputRootFileName.c_str());
   tree->SetBranchAddress("lay", &lay);
   tree->SetBranchAddress("IWire", &IWire);
   tree->SetBranchAddress("x_u", &x);
@@ -109,7 +106,7 @@ CalibrationAlgorithm::EResult T0Correction4CAF::calibrate()
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
 
-  CreateHisto();
+  createHisto();
 
   TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels;#DeltaT;#channels", 100, -10, 10);
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
@@ -209,20 +206,19 @@ CalibrationAlgorithm::EResult T0Correction4CAF::calibrate()
     fout->Close();
   }
   B2INFO("Write constants");
-  Write();
+  write();
   if (fabs(hm_All->GetMean()) < m_maxMeanDt && hm_All->GetRMS() < m_maxRMSDt) {
     return c_OK;
   } else {
     return c_Iterate;
   }
 }
-void T0Correction4CAF::Write()
+
+void T0Correction4CAF::write()
 {
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   ofstream ofs(m_outputT0FileName.c_str());
-  DBImportObjPtr<CDCTimeZeros> tz;
-  tz.construct();
-
+  CDCTimeZeros* tz = new CDCTimeZeros();
   double T0;
   TH1F* T0B[300];
   for (int ib = 0; ib < 300; ++ib) {
@@ -243,7 +239,6 @@ void T0Correction4CAF::Write()
       WireID wireid(ilay, iwire);
       int bID = cdcgeo.getBoardID(wireid);
       if (abs(err_dt[ilay][iwire]) > 2 || abs(dt[ilay][iwire]) > 1.e3) {
-        //      if (abs(err_dt[ilay][iwire]) > 2) {
         T0 = T0B[bID]->GetMean();
         dt[ilay][iwire] = dtb[bID];
       } else {
@@ -257,10 +252,7 @@ void T0Correction4CAF::Write()
   }
   ofs.close();
   if (m_useDB) {
-    IntervalOfValidity iov(m_firstExperiment, m_firstRun,
-                           m_lastExperiment, m_lastRun);
-    tz.import(iov);
-    B2RESULT("T0 was calibrated and imported to database.");
+    saveCalibration(tz, "CDCTimeZeros");
   }
 
 }

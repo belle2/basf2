@@ -148,13 +148,13 @@ namespace Belle2 {
         [](double x) -> double { double e = std::exp(x); return e / (1.0 + e); };
 
       /** Softmax function, normalization for the network's output layer.
-       * This is actually a modified softmax that maps zero values back to
-       * zero.
+       * This is a strange softmax that maps zero values back to
+       * zero, but this is what scikit-learn returns.
        */
       Eigen::VectorXd softmax(const Eigen::VectorXd& input)
       {
         auto output = input.array().unaryExpr(
-                        [](double x)->double { return ((x > -12) ? exp(x) : exp(-22)); }
+                        [](double x)->double { return ((x > 0.0) ? exp(x) : 0.0); }
                       );
         double norm = output.sum();
         return output / norm;

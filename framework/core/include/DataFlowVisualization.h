@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef DATAFLOWVISUALIZATION_H
-#define DATAFLOWVISUALIZATION_H
+#pragma once
 
 #include <framework/datastore/DependencyMap.h>
 
@@ -58,4 +57,3 @@ namespace Belle2 {
     std::string m_arrowcolor[DependencyMap::c_NEntryTypes]; /**< arrow colors. */
   };
 }
-#endif

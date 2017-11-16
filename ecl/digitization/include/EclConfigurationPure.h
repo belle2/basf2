@@ -10,19 +10,18 @@ namespace Belle2 {
 
     class EclConfigurationPure {
     public:
-      static constexpr int    m_nch      = 72 * 16; // total number of electronic channels (crystals) in fwd endcap calorimeter
-
-      static constexpr int    m_nsmp     = EclConfiguration::m_nsmp; // number of ADC measurements for signal fitting
-      static constexpr double m_tmin     = -15; // lower range of the signal fitting region in ADC clocks
-      static constexpr int    m_ntrg     = EclConfiguration::m_ntrg; // number of trigger counts per ADC clock tick
+      static constexpr int    m_nch      = 72 * 16; /**< total number of electronic channels (crystals) in fwd endcap calorimeter */
+      static constexpr int    m_nsmp     = EclConfiguration::m_nsmp; /**< number of ADC measurements for signal fitting */
+      static constexpr double m_tmin     = -15; /**<  lower range of the signal fitting region in ADC clocks */
+      static constexpr int    m_ntrg     = EclConfiguration::m_ntrg; /**< number of trigger counts per ADC clock tick */
       static double           m_tickPure;
-      static constexpr int    m_nlPure   = EclConfiguration::m_nl * 15; // length of samples signal in number of ADC clocks
-      static constexpr int    m_ns       = EclConfiguration::m_ns; // number of samples per ADC clock
+      static constexpr int    m_nlPure   = EclConfiguration::m_nl * 15; /**< length of samples signal in number of ADC clocks */
+      static constexpr int    m_ns       = EclConfiguration::m_ns; /**< number of samples per ADC clock */
 
-      static constexpr int    m_ndtPure  = m_ns; // number of points per ADC tick where signal fit procedure parameters are evaluated
+      static constexpr int    m_ndtPure  = m_ns; /**< number of points per ADC tick where signal fit procedure parameters are evaluated */
 
       struct signalsamplepure_t {
-        double m_sumscale; // energy deposit in fitting window scale factor
+        double m_sumscale; /**< energy deposit in fitting window scale factor */
         double m_ft[m_nlPure * m_ns];
         double m_ft1[m_nlPure * m_ns];
 
@@ -31,8 +30,8 @@ namespace Belle2 {
       };
 
       struct adccountspure_t {
-        double total; // total deposition (sum of m_s array)
-        double c[m_nsmp]; // flash ADC measurements
+        double total; /**< total deposition (sum of m_s array) */
+        double c[m_nsmp]; /**< flash ADC measurements */
         void AddHit(const double a, const double t0, const signalsamplepure_t& q);
       };
 

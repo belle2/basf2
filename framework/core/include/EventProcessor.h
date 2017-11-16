@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVENTPROCESSOR_H_
-#define EVENTPROCESSOR_H_
+#pragma once
 
 #include <framework/core/Path.h>
 #include <framework/core/Module.h>
@@ -169,5 +168,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif /* EVENTPROCESSOR_H_ */

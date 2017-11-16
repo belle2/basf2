@@ -134,7 +134,7 @@ namespace Belle2 {
       G4VSolid* createTrapezoidal(const std::string& name, double width, double
                                   width2, double length, double& height, double angle = 0);
 
-
+      /** Create diamond radiation sensors. */
       void createDiamonds(const VXDGeoRadiationSensorsPar& params, G4LogicalVolume& topVolume, G4LogicalVolume& envelopeVolume);
 
       /**

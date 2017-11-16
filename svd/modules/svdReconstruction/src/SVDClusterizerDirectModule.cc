@@ -88,7 +88,7 @@ void SVDClusterizerDirectModule::initialize()
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
   storeClusters.registerInDataStore();
-  storeShaperDigits.required();
+  storeShaperDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
 
@@ -368,12 +368,16 @@ void SVDClusterizerDirectModule::event()
         // FIXME: Only use calibration on real data. Until simulations correspond to
         // default calibrtion, we cannot use it.
         double peakWidth = 270;
-        double timeShift = isU ? 4.0 : 0.0;
+        double timeShift = isU ? 2.5 : -2.2;
         if (m_calibratePeak) {
           peakWidth = 1.988 * m_pulseShapeCal.getWidth(sensorID, isU, stripNo);
           timeShift = m_pulseShapeCal.getPeakTime(sensorID, isU, stripNo)
                       - 0.25 * peakWidth;
         }
+        // Correct with trigger bin information
+        const double triggerBinSep = 4 * 1.96516; //in ns
+        double apvPhase = triggerBinSep * (0.5 + static_cast<int>(digit.getModeByte().getTriggerBin()));
+        timeShift = timeShift + apvPhase;
         waveWidths.push_back(peakWidth);
         timeShifts.push_back(timeShift);
         stripPositions.push_back(

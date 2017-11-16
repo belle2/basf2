@@ -82,23 +82,23 @@ namespace Belle2 {
     std::string m_rootTSFFilename;
     TFile* m_fileTSF;
 
-    TTree* m_treeInputTSF;
+    TTree* m_treeInputTSF = 0;
     //// [TODO] Stores hitpattern information. [superlayer id, hitpattern, mc l/r, validation mc l/r, mc fine phi]
     //// validation mc l/r => 0: not valid, 1: priority, 2: secondary right, 3: secondary left
     // Stores hitpattern information. 9 components
     // [mc particle id, superlayer id, hitpattern, priorityLR, priorityPhi, secondPriorityRLR, secondPriorityRPhi, secondPriorityLLR, secondPriorityLPhi]
-    TClonesArray* m_hitPatternInformation;
+    TClonesArray* m_hitPatternInformation = 0;
 
-    TTree* m_treeOutputTSF;
+    TTree* m_treeOutputTSF = 0;
     // [Efficiency, Pt, # MC TS]
     // Efficiency = -1 means that # MC TS is 0.
-    TClonesArray* m_particleEfficiency;
+    TClonesArray* m_particleEfficiency = 0;
     // [SuperLayer Id, Wire Id, Priority Timing]
-    TClonesArray* m_tsInformation;
+    TClonesArray* m_tsInformation = 0;
 
-    TTree* m_treeNNTSF;
+    TTree* m_treeNNTSF = 0;
     // [superlayer id, lrDriftTime, timeWire0, timeWire1, ..., ...]
-    TClonesArray* m_nnPatternInformation;
+    TClonesArray* m_nnPatternInformation = 0;
 
     bool m_makeRootFile;
 

@@ -47,7 +47,7 @@ class MillepedeCalibration():
                  primary_vertices=None,
                  path=None):
         """
-        components are the names of DB obejcts to calibrate (BeamParameters etc.)
+        components are the names of DB objects to calibrate (BeamParameters etc.)
         tracks are collections of RecoTracks of fitted charged tracks (usually cosmic rays, no associated particle)
         particles are names of ParticleLists with single charged particles
         vertices are names ParticleLists with at least two body decays fitted with vertex constraint
@@ -214,6 +214,7 @@ class MillepedeCalibration():
         self.parameters[str(label.label())] = (str(label.label()) + ' ' + str(value) + ' -1.')
 
     # CDC helpers --------------------------------------------------------------------------------------------------
+
     def fixCDCLayerX(self, layer):
         """ fix CDC layer X-shift """
         self.fixGlobalParam(Belle2.CDCLayerAlignment.getGlobalUniqueID(), layer, Belle2.CDCLayerAlignment.layerX)
@@ -235,6 +236,7 @@ class MillepedeCalibration():
         self.fixGlobalParam(Belle2.CDCTimeZeros.getGlobalUniqueID(), wire_id, 0)
 
     # VXD helpers --------------------------------------------------------------------------------------------------
+
     def fixVXDid(self, layer, ladder, sensor, segment=0, parameters=[1, 2, 3, 4, 5, 6]):
         """ Fix VXD element parameters by layer,ladder,sensor and segment number """
         for param in parameters:
@@ -264,6 +266,7 @@ class MillepedeCalibration():
         self.fixVXDid(3, 0, 0, 2, parameters)
 
     # EKLM helpers --------------------------------------------------------------------------------------------------
+
     def fixEKLMSector(self, endcap, layer, sector, parameters=[1, 2, 6]):
         """ Fix EKLM sector parameters """
 
@@ -272,13 +275,6 @@ class MillepedeCalibration():
                                 Belle2.EKLMElementID(endcap, layer, sector).getGlobalNumber(),
                                 ipar)
 
-    # Fix (all by default) EKLM sectors
-    def fixEKLMSectors(self, endcaps=range(1, 3), layers={1: 12, 2: 14}, sectors=range(1, 5)):
-        for endcap in endcaps:
-            for layer in range(1, layers[endcap] + 1):
-                for sector in sectors:
-                    self.fixEKLMSector(endcap, layer, sector)
-
     def fixEKLMSegment(self, endcap, layer, sector, plane, segment, parameters=[1, 2, 6]):
         """ Fix EKLM segment parameters """
         for ipar in parameters:
@@ -286,18 +282,8 @@ class MillepedeCalibration():
                                 Belle2.EKLMElementID(endcap, layer, sector, plane, segment).getGlobalNumber(),
                                 ipar)
 
-    # Fix (all by default) EKLM segments
-    def fixEKLMSegments(self, endcaps=range(1, 3), layers={1: 12, 2: 14},
-                        sectors=range(1, 5), planes=range(1, 3),
-                        segments=range(1, 6)):
-        for endcap in endcaps:
-            for layer in range(1, layers[endcap] + 1):
-                for sector in sectors:
-                    for plane in planes:
-                        for segment in segments:
-                            self.fixEKLMSegment(endcap, layer, sector, plane, segment)
-
     # BKLM helpers --------------------------------------------------------------------------------------------------
+
     def fixBKLMModule(self, sector, layer, forward, parameters=UVWABC):
         """ Fix a BKLM module """
         for ipar in parameters:

@@ -192,7 +192,7 @@ void MaskingModule::initialize()
   // EventMetaData
   StoreObjPtr<EventMetaData> storeEventMetaData;
   //StoreObjPtr<EventMetaData> storeEventMetaData;
-  storeEventMetaData.required();
+  storeEventMetaData.isRequired();
 
   //const StoreObjPtr<FileMetaData> storeFileMetaData(m_storeFileMetaDataName, DataStore::c_Persistent);
   //unsigned int EventLow = storeFileMetaData->getEventLow();

@@ -66,7 +66,7 @@ void BKLMSimHistogrammerModule::initialize()
   StoreArray<BKLMHit1d> bklmHit1ds;
   StoreArray<BKLMDigit> digits;
 
-  bklmSimHit.required();
+  bklmSimHit.isRequired();
 
 
   m_file = new TFile(m_filename.c_str(), "recreate");

@@ -32,7 +32,6 @@ EKLMRawPackerModule::~EKLMRawPackerModule()
 void EKLMRawPackerModule::initialize()
 {
   m_Digits.isRequired();
-  m_eventMetaDataPtr.registerInDataStore();
   m_RawKLMs.registerInDataStore();
   m_GeoDat = &(EKLM::GeometryData::Instance());
 }

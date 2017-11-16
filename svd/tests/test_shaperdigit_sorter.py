@@ -80,6 +80,8 @@ class PrintDigitsAndClusters(basf2.Module):
 
 
 if __name__ == "__main__":
+    # Load the dictionary before changing directory, otherwise ROOT won't find it.
+    dummy = Belle2.SVDShaperDigit()
     with clean_working_directory():
         # basf2.set_log_level(basf2.LogLevel.ERROR)
         sig_digits = [

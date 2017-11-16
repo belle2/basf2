@@ -37,8 +37,11 @@ namespace Belle2 {
     const std::map< int, std::vector<std::pair<int, double>> >& getLayers() const { return m_layers; }
 
   private:
+    /** Name of half shell */
     std::string m_name;
+    /** Rotation angle of half shell */
     double m_shellAngle;
+    /** Map for keeping ladderID and its phi rotation angle for all layers */
     std::map< int, std::vector<std::pair<int, double>> > m_layers;
 
     ClassDef(VXDHalfShellPar, 5);  /**< ClassDef, must be the last term before the closing {}*/

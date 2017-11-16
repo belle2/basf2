@@ -25,6 +25,9 @@ namespace Belle2 {
 
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 
+    void setMaterialEffectsToParameterValue() const;
+    void resetMaterialEffects() const;
+
   private:
     bool m_param_useMaterialEffects = false;
     double m_param_direction = 1;

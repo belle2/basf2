@@ -14,10 +14,11 @@
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 
 #include <genfit/MeasuredStateOnPlane.h>
+#include <genfit/Exception.h>
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
-  template <class AState, class AnAdvancer = Advancer>
+  template <class AState, class AnAdvancer>
   class AdvanceFilter : public
     TrackFindingCDC::Filter<std::pair<const std::vector<TrackFindingCDC::WithWeight<const AState*>>, AState*>> {
   public:
@@ -34,6 +35,8 @@ namespace Belle2 {
     TrackFindingCDC::Weight operator()(const std::pair<const std::vector<TrackFindingCDC::WithWeight<const AState*>>, AState*>& pair)
     override
     {
+      m_advancer.setMaterialEffectsToParameterValue();
+
       const std::vector<TrackFindingCDC::WithWeight<const AState*>>& previousStates = pair.first;
       B2ASSERT("Can not extrapolate with nothing", not previousStates.empty());
 
@@ -43,13 +46,19 @@ namespace Belle2 {
       B2ASSERT("Can not extrapolate with nothing", lastState->mSoPSet());
       genfit::MeasuredStateOnPlane mSoP = lastState->getMeasuredStateOnPlane();
 
-      genfit::SharedPlanePtr plane = currentState->getPlane(mSoP);
-
-      const double returnValue = m_advancer.extrapolateToPlane(mSoP, plane);
+      double returnValue = NAN;
+      try {
+        genfit::SharedPlanePtr plane = currentState->getPlane(mSoP);
+        returnValue = m_advancer.extrapolateToPlane(mSoP, plane);
+      } catch (genfit::Exception& e) {
+        B2DEBUG(50, "Plane extraction failed: " << e.what());
+      }
 
       if (not std::isnan(returnValue)) {
         currentState->setMeasuredStateOnPlane(mSoP);
       }
+
+      m_advancer.resetMaterialEffects();
 
       return returnValue;
     }

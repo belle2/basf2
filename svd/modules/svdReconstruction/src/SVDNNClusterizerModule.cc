@@ -89,7 +89,7 @@ void SVDNNClusterizerModule::initialize()
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
   storeClusters.registerInDataStore();
-  storeRecoDigits.required();
+  storeRecoDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
 

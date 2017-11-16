@@ -37,7 +37,7 @@ PXDTriggerShifterModule::PXDTriggerShifterModule(void)
 
 void PXDTriggerShifterModule::initialize(void)
 {
-  m_storeRaw.required();
+  m_storeRaw.isRequired();
 }
 
 void PXDTriggerShifterModule::terminate(void)

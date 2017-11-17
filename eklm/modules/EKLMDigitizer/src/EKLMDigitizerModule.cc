@@ -25,8 +25,8 @@ EKLMDigitizerModule::EKLMDigitizerModule() : Module()
   setDescription("EKLM digitization module");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("DiscriminatorThreshold", m_DiscriminatorThreshold,
-           "Strip hits with npe lower this value will be marked as bad",
-           double(7.));
+           "ADC amplitude threshold in units of the maximal amplitude of "
+           "one photoelectron signal.", double(3.));
   addParam("DigitizationInitialTime", m_DigitizationInitialTime,
            "Initial digitization time (ns).", double(-40.));
   addParam("CreateSim2Hits", m_CreateSim2Hits,
@@ -207,7 +207,15 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
   for (it = m_SimHitVolumeMap.begin(); it != m_SimHitVolumeMap.end();
        it = m_SimHitVolumeMap.upper_bound(it->first)) {
     ub = m_SimHitVolumeMap.upper_bound(it->first);
+    /* Set hits. */
     fes.setHitRange(it, ub);
+    /*
+     * Set threshold. Currently, the threshold is 3 maximal amplitudes
+     * of 1 photoelectron signal (about 7 photoelectrons of the true signal).
+     * TODO: a strip-specific threshold from the database is necessary.
+     */
+    fes.setThreshold(m_DiscriminatorThreshold);
+    /* Simulation for a strip. */
     fes.processEntry();
     if (fes.getGeneratedNPE() == 0)
       continue;

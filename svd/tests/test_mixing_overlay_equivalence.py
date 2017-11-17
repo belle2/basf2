@@ -10,14 +10,15 @@ import b2test_utils
 # 2. Produce background overlay sample from background sample. .
 # 3. Set aside SimHits and SVDShaperDigits from a selected sensor to
 #    create signal-background collisions.
-# 4. Inject collision SimHits and the background mixer with background
-#    sample to generate SVDShaperDigits.
-# 5. Inject collision SVDShaperDigits and use background overlay to add
-#    background.
+# 4. Inject collision SimHits and use the background mixer with the
+#    background sample to generate SVDShaperDigits.
+# 5. Inject collision SimHits, digitize, and use background overlay
+#    to add background.
 # 6. Sort both digit samples before saving. Normally, the digits require
 #    sorting only after background overlay, but it happens that the
-#    Digitizer sorts digits differently from ShaperDigitSorter. And
-#    the sorting to correct is that in the digitizer.
+#    Digitizer sorts digits differently from ShaperDigitSorter. Both
+#    sortings are correct, but the sorting to correct is that in the
+#    digitizer.
 # 7. Compare SVDShaperDigits in the two ROOT files.
 # ====================================================================
 

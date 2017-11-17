@@ -125,6 +125,8 @@ namespace Belle2 {
     NeuroTrigger m_NeuroTrigger;
     /** Sets of training data for all sectors. */
     std::vector<CDCTriggerMLPData> m_trainSets;
+    /** List of input tracks. */
+    StoreArray<CDCTriggerTrack> m_tracks;
 
     //monitoring histograms
     std::vector<TH1D*> phiHistsMC;   /**< phi of MCParticles */

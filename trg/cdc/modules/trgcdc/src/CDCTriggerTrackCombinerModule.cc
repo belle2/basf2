@@ -1,9 +1,6 @@
 #include "trg/cdc/modules/trgcdc/CDCTriggerTrackCombinerModule.h"
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationVector.h>
-#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 
 using namespace std;
 using namespace Belle2;
@@ -62,28 +59,24 @@ void
 CDCTriggerTrackCombinerModule::initialize()
 {
   // register DataStore elements
-  StoreArray<CDCTriggerTrack>::required(m_2DfinderCollectionName);
-  StoreArray<CDCTriggerTrack>::required(m_2DfitterCollectionName);
-  StoreArray<CDCTriggerTrack>::required(m_3DfitterCollectionName);
-  StoreArray<CDCTriggerTrack>::required(m_neuroCollectionName);
-  StoreArray<CDCTriggerTrack>::registerPersistent(m_outputCollectionName);
+  StoreArray<CDCTriggerTrack> tracks2Dfitter(m_2DfitterCollectionName);
+  StoreArray<CDCTriggerTrack> tracks3Dfitter(m_3DfitterCollectionName);
+  StoreArray<CDCTriggerTrack> tracksNeuro(m_neuroCollectionName);
+  m_tracks2Dfinder.isRequired(m_2DfinderCollectionName);
+  tracks2Dfitter.isRequired(m_2DfitterCollectionName);
+  tracks3Dfitter.isRequired(m_3DfitterCollectionName);
+  tracksNeuro.isRequired(m_neuroCollectionName);
+  m_tracksCombined.registerInDataStore(m_outputCollectionName);
   // register relations
-  StoreArray<CDCTriggerTrack> tracks2Dfinder(m_2DfinderCollectionName);
-  StoreArray<CDCTriggerTrack> tracksOutput(m_outputCollectionName);
-  StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
-  tracks2Dfinder.registerRelationTo(tracksOutput);
-  tracksOutput.registerRelationTo(segmentHits);
+  m_tracks2Dfinder.registerRelationTo(m_tracksCombined);
+  m_tracksCombined.registerRelationTo(m_segmentHits);
 }
 
 void
 CDCTriggerTrackCombinerModule::event()
 {
-  StoreArray<CDCTriggerTrack> tracks2Dfinder(m_2DfinderCollectionName);
-  StoreArray<CDCTriggerTrack> tracksCombined(m_outputCollectionName);
-  StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
-
-  for (int itrack = 0; itrack < tracks2Dfinder.getEntries(); ++itrack) {
-    CDCTriggerTrack* track2Dfinder = tracks2Dfinder[itrack];
+  for (int itrack = 0; itrack < m_tracks2Dfinder.getEntries(); ++itrack) {
+    CDCTriggerTrack* track2Dfinder = m_tracks2Dfinder[itrack];
     CDCTriggerTrack* track2Dfitter =
       track2Dfinder->getRelatedTo<CDCTriggerTrack>(m_2DfitterCollectionName);
     CDCTriggerTrack* track3Dfitter =
@@ -171,11 +164,11 @@ CDCTriggerTrackCombinerModule::event()
 
     // create new track
     CDCTriggerTrack* combinedTrack =
-      tracksCombined.appendNew(track2D->getPhi0(), track2D->getOmega(), track2D->getChi2D(),
-                               z, cotTheta, chi3D);
+      m_tracksCombined.appendNew(track2D->getPhi0(), track2D->getOmega(), track2D->getChi2D(),
+                                 z, cotTheta, chi3D);
     track2Dfinder->addRelationTo(combinedTrack);
     // get hit relations from all tracks, but without duplicates
-    vector<bool> usedHit(hits.getEntries(), false);
+    vector<bool> usedHit(m_segmentHits.getEntries(), false);
     for (const CDCTriggerSegmentHit& hit :
          track2Dfinder->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName)) {
       combinedTrack->addRelationTo(&hit);

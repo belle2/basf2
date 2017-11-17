@@ -136,6 +136,9 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
     recoHit3D->getWireHit()->setTakenFlag();
   }
 
+  // Drop tracks which have no hits
+  TrackFindingCDC::erase_remove_if(tracks, [](const CDCTrack & track) { return track.empty(); });
+
   // Establish the ordering
   for (CDCTrack& track : tracks) {
     track.sortByArcLength2D();

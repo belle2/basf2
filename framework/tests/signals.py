@@ -22,7 +22,9 @@ class TestModule(Module):
     def __init__(self, init_signal, event_signal):
         """Setup module for given signal settings"""
         super().__init__()
+        #: signal to emit to ourselves during initialize()
         self.init_signal = init_signal
+        #: signal to emit to ourselves during event()
         self.event_signal = event_signal
 
     def initialize(self):

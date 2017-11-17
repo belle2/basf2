@@ -44,11 +44,13 @@ set_random_seed("something important")
 # make sure FATAL messages don't have the function signature as this makes
 # problems with clang printing namespaces differently
 logging.set_info(LogLevel.FATAL, logging.get_info(LogLevel.ERROR))
+# find file to read
+input_file = Belle2.FileSystem.findFile('framework/tests/root_input.root')
 
 with clean_working_directory():
     main = create_path()
 
-    main.add_module('RootInput', inputFileName=Belle2.FileSystem.findFile('framework/tests/root_input.root'))
+    main.add_module('RootInput', inputFileName=input_file)
     main.add_module('EventInfoPrinter')
     main.add_module('PrintCollections')
     main.add_module('PruneDataStore', matchEntries=['PXDClusters.*'])
@@ -64,7 +66,7 @@ with clean_working_directory():
     # now test if the negated logic works, too
     main = create_path()
 
-    main.add_module('RootInput', inputFileName=Belle2.FileSystem.findFile('framework/tests/root_input.root'))
+    main.add_module('RootInput', inputFileName=input_file)
     main.add_module('EventInfoPrinter')
     main.add_module('PrintCollections')
     main.add_module('PruneDataStore', matchEntries=['PXDClusters.*'], keepMatchedEntries=False)

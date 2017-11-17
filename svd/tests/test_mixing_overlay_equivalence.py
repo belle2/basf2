@@ -8,18 +8,21 @@ import b2test_utils
 # 1. Simulate a few hundred ParticleGun events to produce a background
 #    sample.
 # 2. Produce background overlay sample from background sample. .
-# 3. Set aside SimHits and SVDShaperDigits from a selected sensor to
-#    create signal-background collisions.
-# 4. Inject collision SimHits and use the background mixer with the
-#    background sample to generate SVDShaperDigits.
+# 3. Set aside SimHits from a selected sensor to create signal-background
+#    collisions.
+# 4. Inject collision SimHits, add background using the background mixer,
+#    and digitize. Sort and save.
 # 5. Inject collision SimHits, digitize, and use background overlay
-#    to add background.
-# 6. Sort both digit samples before saving. Normally, the digits require
-#    sorting only after background overlay, but it happens that the
-#    Digitizer sorts digits differently from ShaperDigitSorter. Both
-#    sortings are correct, but the sorting to correct is that in the
-#    digitizer.
+#    to add background. Sort and save.
 # 7. Compare SVDShaperDigits in the two ROOT files.
+#
+# NB: I sort both digit samples before saving. Normally, the digits
+# require sorting only after background overlay, but SVDDigitizer happens
+# to sort digits differently than ShaperDigitSorter. Both sortings are
+# correct, but the sorting to eventually correct is that in the
+# digitizer.
+# NB: Switching off electronic effects in SVDDigitizer prevents it from
+# adding noise digits.
 # ====================================================================
 
 

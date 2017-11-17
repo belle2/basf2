@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <svd/modules/svdClusterEvaluation/SVDClusterEvaluationModule.h>
+#include <svd/modules/svdPerformance/SVDClusterEvaluationModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
@@ -37,9 +37,9 @@ REG_MODULE(SVDClusterEvaluation)
 
 SVDClusterEvaluationModule::SVDClusterEvaluationModule() : Module()
 {
-  setDescription("This modules generates a TTree containing the hit profile for sensor 6, test beam.");
+  setDescription("This modules generates performance plots on SVD clustering.");
 
-  addParam("outputFileName", m_outputFileName, "output rootfile name", std::string("ClusterEvaluation.root"));
+  addParam("outputFileName", m_outputFileName, "output rootfile name", std::string("SVDClusterEvaluation.root"));
 }
 
 
@@ -51,7 +51,7 @@ SVDClusterEvaluationModule::~SVDClusterEvaluationModule()
 void SVDClusterEvaluationModule::initialize()
 {
 
-  /* initialize of useful store array */
+  /* initialize useful store array */
   StoreArray<SVDShaperDigit> SVDShaperDigits;
   StoreArray<SVDRecoDigit> SVDRecoDigits;
   StoreArray<SVDCluster> SVDClusters;
@@ -73,9 +73,9 @@ void SVDClusterEvaluationModule::initialize()
   m_histoList_PurityInsideTMCluster = new TList;
   m_histo2DList_PurityInsideTMCluster = new TList;
   m_histoList_PurityInsideNOTMCluster = new TList;
-  m_histoList_Puddlyness = new TList;
-  m_histoList_PuddlynessTM = new TList;
-  m_histoList_GoodPuddlynessTM = new TList;
+  m_histoList_THinCluster = new TList;
+  m_histoList_THinClusterTM = new TList;
+  m_histoList_GoodTHinClusterTM = new TList;
   m_graphList = new TList;
   //Control List
   m_histoList_Control = new TList;
@@ -148,23 +148,23 @@ void SVDClusterEvaluationModule::initialize()
                                                            "number of TM recoDigits / cluster size",
                                                            m_histoList_PurityInsideNOTMCluster);
 
-    NameOfHisto = "m_histoList_Puddlyness_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
+    NameOfHisto = "m_histoList_THinCluster_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
     TitleOfHisto = "Number of True Hits inside a Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(i) + ", side" + UVFromIndex(
                      i) + ")";
-    m_histo_Puddlyness[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of TH per cluster",
-                                              m_histoList_Puddlyness);
+    m_histo_THinCluster[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of TH per cluster",
+                                               m_histoList_THinCluster);
 
-    NameOfHisto = "m_histoList_PuddlynessTM_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
+    NameOfHisto = "m_histoList_THinClusterTM_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
     TitleOfHisto = "Number of True Hits inside a Truth-matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
                      i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_PuddlynessTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of TH per cluster",
-                                                m_histoList_PuddlynessTM);
+    m_histo_THinClusterTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of TH per cluster",
+                                                 m_histoList_THinClusterTM);
 
-    NameOfHisto = "m_histoList_GoodPuddlynessTM_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
+    NameOfHisto = "m_histoList_GoodTHinClusterTM_" + IntExtFromIndex(i) + "_" + FWFromIndex(i) + "_Side" + UVFromIndex(i);
     TitleOfHisto = "Number of Good True Hits inside a Truth-matched Cluster (" + IntExtFromIndex(i) + ", " + FWFromIndex(
                      i) + ", side" + UVFromIndex(i) + ")";
-    m_histo_GoodPuddlynessTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of Good TH per cluster",
-                                                    m_histoList_GoodPuddlynessTM);
+    m_histo_GoodTHinClusterTM[i] = createHistogram1D(NameOfHisto, TitleOfHisto, 15, 0 , 15, "number of Good TH per cluster",
+                                                     m_histoList_GoodTHinClusterTM);
   }
 
   //Control Histos
@@ -269,8 +269,8 @@ void SVDClusterEvaluationModule::event()
     if (relatVectorClusToTH.size() > 0)
       m_NumberOfTMClusters[indexForHistosAndGraphs] ++;
 
-    //fill the puddlyness histo with the number of TH a cluster is composed of
-    m_histo_Puddlyness[indexForHistosAndGraphs]->Fill(relatVectorClusToTH.size());
+    //fill the THinCluster histo with the number of TH a cluster is composed of
+    m_histo_THinCluster[indexForHistosAndGraphs]->Fill(relatVectorClusToTH.size());
 
     //loop on the TH related to the cluster
     for (int q = 0; q < (int)relatVectorClusToTH.size(); q ++) {
@@ -300,15 +300,15 @@ void SVDClusterEvaluationModule::event()
     //enter only if the cluster is TM
     if (relatVectorClusToTH.size() > 0) {
 
-      //fill the puddlyness histo with the number of TH (and good TH) a TM cluster is composed of
-      m_histo_PuddlynessTM[indexForHistosAndGraphs]->Fill(relatVectorClusToTH.size());
+      //fill the THinCluster histo with the number of TH (and good TH) a TM cluster is composed of
+      m_histo_THinClusterTM[indexForHistosAndGraphs]->Fill(relatVectorClusToTH.size());
       int numberOfGoodTHInACluster = 0;
       for (int k = 0; k < (int)(relatVectorClusToTH.size()); k ++) {
         if (goodTrueHit(relatVectorClusToTH[k])) {
           numberOfGoodTHInACluster ++;
         }
       }
-      m_histo_GoodPuddlynessTM[indexForHistosAndGraphs]->Fill(numberOfGoodTHInACluster);
+      m_histo_GoodTHinClusterTM[indexForHistosAndGraphs]->Fill(numberOfGoodTHInACluster);
 
       //count number of recodigit, composing the Truth-matched cluster, that are linked with a TH (internal purity)
       m_NumberOfTMRecoInTMCluster = 0;
@@ -356,14 +356,14 @@ void SVDClusterEvaluationModule::endRun()
     m_mean_PurityInsideTMCluster[k] = m_histo_PurityInsideTMCluster[k]->GetMean();
     m_RMS_PurityInsideTMCluster[k] = m_histo_PurityInsideTMCluster[k]->GetRMS() / sqrt(m_histo_PurityInsideTMCluster[k]->GetEntries());
 
-    m_mean_Puddlyness[k] = m_histo_Puddlyness[k]->GetMean();
-    m_RMS_Puddlyness[k] = m_histo_Puddlyness[k]->GetRMS() / sqrt(m_histo_Puddlyness[k]->GetEntries());
+    m_mean_THinCluster[k] = m_histo_THinCluster[k]->GetMean();
+    m_RMS_THinCluster[k] = m_histo_THinCluster[k]->GetRMS() / sqrt(m_histo_THinCluster[k]->GetEntries());
 
-    m_mean_PuddlynessTM[k] = m_histo_PuddlynessTM[k]->GetMean();
-    m_RMS_PuddlynessTM[k] = m_histo_PuddlynessTM[k]->GetRMS() / sqrt(m_histo_PuddlynessTM[k]->GetEntries());
+    m_mean_THinClusterTM[k] = m_histo_THinClusterTM[k]->GetMean();
+    m_RMS_THinClusterTM[k] = m_histo_THinClusterTM[k]->GetRMS() / sqrt(m_histo_THinClusterTM[k]->GetEntries());
 
-    m_mean_GoodPuddlynessTM[k] = m_histo_GoodPuddlynessTM[k]->GetMean();
-    m_RMS_GoodPuddlynessTM[k] = m_histo_GoodPuddlynessTM[k]->GetRMS() / sqrt(m_histo_GoodPuddlynessTM[k]->GetEntries());
+    m_mean_GoodTHinClusterTM[k] = m_histo_GoodTHinClusterTM[k]->GetMean();
+    m_RMS_GoodTHinClusterTM[k] = m_histo_GoodTHinClusterTM[k]->GetRMS() / sqrt(m_histo_GoodTHinClusterTM[k]->GetEntries());
   }
   for (int k = 0; k < m_NsetsRed; k ++) {
     m_mean_ClusterUPositionResolution[k] = m_histo_ClusterUPositionResolution[k]->GetMean();
@@ -402,14 +402,15 @@ void SVDClusterEvaluationModule::endRun()
                                    m_OrderingVec, m_NullVec, m_mean_PurityInsideTMCluster, m_RMS_PurityInsideTMCluster, "set",
                                    "number of TM recos / cluster size", m_graphList, m_Nsets);
 
-  createArbitraryGraphErrorChooser("puddlyness_Means", "Number of True Hits inside a Cluster", m_OrderingVec, m_NullVec,
-                                   m_mean_Puddlyness, m_RMS_Puddlyness, "set", "number of TH per cluster", m_graphList, m_Nsets);
+  createArbitraryGraphErrorChooser("THinCluster_Means", "Number of True Hits inside a Cluster", m_OrderingVec, m_NullVec,
+                                   m_mean_THinCluster, m_RMS_THinCluster, "set", "number of TH per cluster", m_graphList, m_Nsets);
 
-  createArbitraryGraphErrorChooser("puddlynessTM_Means", "Number of True Hits inside a TM Cluster", m_OrderingVec, m_NullVec,
-                                   m_mean_PuddlynessTM, m_RMS_PuddlynessTM, "set", "number of TH per TM cluster", m_graphList, m_Nsets);
+  createArbitraryGraphErrorChooser("THinClusterTM_Means", "Number of True Hits inside a TM Cluster", m_OrderingVec, m_NullVec,
+                                   m_mean_THinClusterTM, m_RMS_THinClusterTM, "set", "number of TH per TM cluster", m_graphList, m_Nsets);
 
-  createArbitraryGraphErrorChooser("goodPuddlynessTM_Means", "Number of Good True Hits inside a TM Cluster", m_OrderingVec, m_NullVec,
-                                   m_mean_GoodPuddlynessTM, m_RMS_GoodPuddlynessTM, "set", "number of Good TH per TM cluster", m_graphList, m_Nsets);
+  createArbitraryGraphErrorChooser("goodTHinClusterTM_Means", "Number of Good True Hits inside a TM Cluster", m_OrderingVec,
+                                   m_NullVec,
+                                   m_mean_GoodTHinClusterTM, m_RMS_GoodTHinClusterTM, "set", "number of Good TH per TM cluster", m_graphList, m_Nsets);
 
   ///////////////////////////
   //WRITE HISTOS AND GRAPHS//
@@ -477,19 +478,19 @@ void SVDClusterEvaluationModule::endRun()
 
     TDirectory* dir_puddle = oldDir->mkdir("trueHits_in_cluster");
     dir_puddle->cd();
-    TIter nextH_puddle(m_histoList_Puddlyness);
+    TIter nextH_puddle(m_histoList_THinCluster);
     while ((obj = nextH_puddle()))
       obj->Write();
 
     TDirectory* dir_puddleTM = oldDir->mkdir("trueHits_in_TMcluster");
     dir_puddleTM->cd();
-    TIter nextH_puddleTM(m_histoList_PuddlynessTM);
+    TIter nextH_puddleTM(m_histoList_THinClusterTM);
     while ((obj = nextH_puddleTM()))
       obj->Write();
 
     TDirectory* dir_goodPuddleTM = oldDir->mkdir("goodTrueHits_in_TMcluster");
     dir_goodPuddleTM->cd();
-    TIter nextH_GoodPuddleTM(m_histoList_GoodPuddlynessTM);
+    TIter nextH_GoodPuddleTM(m_histoList_GoodTHinClusterTM);
     while ((obj = nextH_GoodPuddleTM()))
       obj->Write();
 

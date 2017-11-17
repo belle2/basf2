@@ -96,11 +96,11 @@ namespace Belle2 {
     /** Vector of histograms depicting TM Cluster Internal Purity (TM Recos over Reco inside a Cluster) */
     TH1F* m_histo_PurityInsideNOTMCluster[m_Nsets];
     /** Vector of histograms depicting Number of TH inside a Cluster */
-    TH1F* m_histo_Puddlyness[m_Nsets];
+    TH1F* m_histo_THinCluster[m_Nsets];
     /** Vector of histograms depicting Number of TH inside a TM Cluster */
-    TH1F* m_histo_PuddlynessTM[m_Nsets];
+    TH1F* m_histo_THinClusterTM[m_Nsets];
     /** Vector of histograms depicting Number of Good TH inside a TM Cluster */
-    TH1F* m_histo_GoodPuddlynessTM[m_Nsets];
+    TH1F* m_histo_GoodTHinClusterTM[m_Nsets];
 
     /** Vectors of floats containing the mean and the RMS from the corresponding histo */
     float m_mean_StripTimeResolution[m_Nsets];
@@ -113,12 +113,12 @@ namespace Belle2 {
     float m_RMS_ClusterVPositionResolution[m_Nsets];
     float m_mean_PurityInsideTMCluster[m_Nsets];
     float m_RMS_PurityInsideTMCluster[m_Nsets];
-    float m_mean_Puddlyness[m_Nsets];
-    float m_RMS_Puddlyness[m_Nsets];
-    float m_mean_PuddlynessTM[m_Nsets];
-    float m_RMS_PuddlynessTM[m_Nsets];
-    float m_mean_GoodPuddlynessTM[m_Nsets];
-    float m_RMS_GoodPuddlynessTM[m_Nsets];
+    float m_mean_THinCluster[m_Nsets];
+    float m_RMS_THinCluster[m_Nsets];
+    float m_mean_THinClusterTM[m_Nsets];
+    float m_RMS_THinClusterTM[m_Nsets];
+    float m_mean_GoodTHinClusterTM[m_Nsets];
+    float m_RMS_GoodTHinClusterTM[m_Nsets];
 
     /** Vectors used to Draw the TGraphs (defined in the cc) depicting the averages and the means of the histos above for the various sets of sensor*/
     float m_OrderingVec[m_Nsets] = {1., 2., 3., 4., 5., 6.};
@@ -134,9 +134,9 @@ namespace Belle2 {
     TList* m_histoList_PurityInsideTMCluster;
     TList* m_histo2DList_PurityInsideTMCluster;
     TList* m_histoList_PurityInsideNOTMCluster;
-    TList* m_histoList_Puddlyness;
-    TList* m_histoList_PuddlynessTM;
-    TList* m_histoList_GoodPuddlynessTM;
+    TList* m_histoList_THinCluster;
+    TList* m_histoList_THinClusterTM;
+    TList* m_histoList_GoodTHinClusterTM;
     TList* m_graphList;
 
     /** Vectors used to compute the quantities depicted in Histos and Graphs */

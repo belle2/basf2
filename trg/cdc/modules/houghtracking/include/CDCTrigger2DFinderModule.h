@@ -19,6 +19,12 @@
 
 #include <root/TVector2.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/cdc/dataobjects/CDCTriggerHoughCluster.h>
+
 namespace Belle2 {
   /** Pair of <iSuperLayer, (x, y)>, for hits in conformal space */
   typedef std::pair<unsigned short, TVector2> cdcPair;
@@ -247,6 +253,15 @@ namespace Belle2 {
     double radius[9][2];
     /** Number of track segments up to super layer */
     unsigned TSoffset[10];
+
+    /** list of track segment hits */
+    StoreArray<CDCTriggerSegmentHit> m_segmentHits;
+    /** list of found tracks */
+    StoreArray<CDCTriggerTrack> m_tracks;
+    /** list of clusters in the Hough map */
+    StoreArray<CDCTriggerHoughCluster> m_clusters;
+    /** matrix containing the Hough plane */
+    StoreObjPtr<TMatrix> m_houghPlane;
   };//end class declaration
 } // end namespace Belle2
 

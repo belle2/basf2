@@ -46,6 +46,7 @@ void ECLEventT0Module::initialize()
   /** Register the data object */
   StoreObjPtr<EventT0> eventT0("EventT0");
   eventT0.registerInDataStore("EventT0");
+  m_eclCalDigitArray.isRequired();
 
   /** ECL geometry */
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();

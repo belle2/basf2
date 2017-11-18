@@ -343,7 +343,7 @@ void MillepedeCollectorModule::collect()
         DBObjPtr<BeamParameters> beam;
 
         TMatrixDSym vertexPrec(beam->getCovVertex().Invert());
-        TVector3 vertexResidual = mother->getVertex() - beam->getVertex();
+        TVector3 vertexResidual = - (mother->getVertex() - beam->getVertex());
 
         TVectorD extMeasurements(3);
         extMeasurements[0] = vertexResidual[0];

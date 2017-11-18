@@ -121,7 +121,7 @@ int SocketIO::get_wordbuf(int sock, int* wrdbuf, int len)
     printf("buffer too small : %d(%d)", gcount, len);
     exit(0);
   }
-  int bcount = read_data(sock, (char*)&wrdbuf[1], (gcount - 1) * sizeof(int));
+  read_data(sock, (char*)&wrdbuf[1], (gcount - 1) * sizeof(int));
   //  printf ( "term = %8.8x\n", wrdbuf[gcount-1] );
   return (wrdbuf[0]);
 }
@@ -130,7 +130,7 @@ int SocketIO::get_pxd(int sock, char* data, int len)
 {
 #define MAX_PXD_FRAMES  256
   const int headerlen = 8;
-  int* pxdheader = (int*) data;
+  unsigned int* pxdheader = (unsigned int*) data;
   int* pxdheadertable = (int*) &data[headerlen];
   int framenr = 0, tablelen = 0, datalen = 0;
   int br = read_data(sock, data, headerlen);
@@ -189,7 +189,7 @@ int SocketIO::read_data(int sock, char* data, int len)
           continue;
         default:
           perror("SocketIO:read");
-          fprintf(stderr, "sock = %d, buf=%x, len = %d\n", sock, buf, len - bcount);
+          fprintf(stderr, "sock = %d, buf=%p, len = %d\n", sock, buf, len - bcount);
           return -1;
       }
     }

@@ -79,10 +79,10 @@ void DQMHistAnalysisEpicsExampleModule::initialize()
     if (m_parameters > 10) m_parameters = 10; // hard limit
 //    SEVCHK(ca_context_create(ca_disable_preemptive_callback),"ca_context_create");
     for (auto i = 0; i < m_parameters; i++) {
-      std::string a;
-      a = m_f1->GetParName(i);
-      if (a == "") a = "par" + i;
-      a = m_pvname + ":" + a;
+      std::string aa;
+      aa = m_f1->GetParName(i);
+      if (aa == "") aa = "par" + i;
+      aa = m_pvname + ":" + aa;
 //      SEVCHK(ca_create_channel(a.c_str(),NULL,NULL,10,&mychid[i]),"ca_create_channel failure");
       // Read LO and HI limits from EPICS, seems this needs additional channels?
       //SEVCHK(ca_get(DBR_DOUBLE,mychid[i],(void*)&data),"ca_get failure"); // data is only valid after ca_pend_io!!
@@ -215,8 +215,8 @@ void DQMHistAnalysisEpicsExampleModule::event()
 
   if (m_parameters > 0) {
     for (auto i = 0; i < m_parameters; i++) {
-      double data;
-      data = m_f1->GetParameter(i);
+      //double data;
+      //data = m_f1->GetParameter(i);
 //      SEVCHK(ca_put(DBR_DOUBLE,mychid[i],(void*)&data),"ca_set failure");
     }
 //    SEVCHK(ca_pend_io(5.0),"ca_pend_io failure");

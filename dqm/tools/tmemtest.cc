@@ -7,7 +7,7 @@
 using namespace Belle2;
 using namespace std;
 
-int main(int argc, char** argv)
+int main()
 {
   SharedMem* shm = new SharedMem("testhisto", 2000000);
   //  TMemFile* file = new TMemFile ( "TestHisto", (char*)shm->ptr(), 2000000, "RECREATE", "", 0 );

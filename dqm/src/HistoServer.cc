@@ -75,7 +75,7 @@ int HistoServer::server()
           vector<string> strlist;
           msghdl.decode_msg(hmsg, objlist, strlist);
           int nobjs = (hmsg->header())->reserved[1];
-          int narys = (hmsg->header())->reserved[2];
+          //int narys = (hmsg->header())->reserved[2];
           //    string subdir = "ROOT";
           string subdir = "";
           printf("HistoServer : received nobjs = %d\n", nobjs);

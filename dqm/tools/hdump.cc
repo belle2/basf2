@@ -1,4 +1,5 @@
 #include "dqm/DqmMemFile.h"
+#include <iostream>
 
 
 using namespace Belle2;
@@ -7,6 +8,10 @@ using namespace std;
 int main(int argc, char** argv)
 {
 
+  if (argc < 2) {
+    cout << "Usage: hdump dqmmemfile" << endl;
+    return 1;
+  }
   //  DqmMemFile* mfile = new DqmMemFile ( "dqmmemfile" );
   DqmMemFile* mfile = new DqmMemFile(argv[1]);
 

@@ -98,7 +98,7 @@ if __name__ == "__main__":
         with b2test_utils.show_only_errors():
             b2test_utils.safe_process(create_ovrfile)
 
-        basf2.B2INFO('Background mixingi...')
+        basf2.B2INFO('Background mixing...')
 
         produce_mixed = basf2.create_path()
         produce_mixed.add_module('EventInfoSetter', expList=[0], runList=[0], evtNumList=[1])
@@ -131,7 +131,7 @@ if __name__ == "__main__":
         with b2test_utils.show_only_errors():
             b2test_utils.safe_process(produce_overlaid)
 
-        basf2.B2INFO('Comparinng...')
+        basf2.B2INFO('Comparing...')
 
         # Compare diigts stored in the two root files
         f_mixed = ROOT.TFile('mixedBg.root')

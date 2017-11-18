@@ -9,9 +9,8 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisInput.h>
 
-#include <dqm/StringUtil.h>
-
 using namespace Belle2;
+typedef std::vector<std::string> StringList;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -62,7 +61,23 @@ void DQMHistAnalysisInputModule::event()
     TH1* h = (TH1*)key->ReadObj();
     hs.push_back(h);
     TString a = h->GetName();
-    StringList s = StringUtil::split(a.Data(), '/');
+
+    StringList s;
+    const std::string& str = a.Data();
+    const char type = '/';
+    size_t max = 0;
+    size_t current = 0, found;
+    while ((found = str.find_first_of(type, current)) != std::string::npos) {
+      s.push_back(std::string(str, current, found - current));
+      current = found + 1;
+    }
+    if (str.size() - current > 0) {
+      s.push_back(std::string(str, current, str.size() - current));
+    }
+    while (max > 0 && s.size() < max) {
+      s.push_back("");
+    }
+
     a.ReplaceAll("/", "_");
     std::string name = a.Data();
     if (m_cs.find(name) == m_cs.end()) {

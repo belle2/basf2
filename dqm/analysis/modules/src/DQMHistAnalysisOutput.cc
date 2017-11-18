@@ -9,7 +9,7 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisOutput.h>
 
-#include <dqm/StringUtil.h>
+#include <TString.h>
 
 using namespace std;
 using namespace Belle2;
@@ -56,7 +56,9 @@ void DQMHistAnalysisOutputModule::event()
   TextList& texts(getTexts());
   for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); i++) {
     std::string pname = i->first;
-    std::string vname = StringUtil::tolower(StringUtil::replace(pname, "/", "."));
+    TString& vvname = TString(pname).ReplaceAll('/', '.');
+    vvname.ToLower();
+    std::string vname = vvname.Data();
     switch (i->second) {
       case INT:
         B2INFO(vname << " " << vints[pname]);

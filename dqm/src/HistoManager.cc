@@ -30,14 +30,14 @@ bool HistoManager::add(string& subdir, string& name, int pid, TH1* histo)
   // Check for subdirectory
   if (m_subdir.find(subdir) == m_subdir.end()) {
     // Work dir and hist
-    map<string, map<int, TH1*>>* newsubdir = new map<string, map<int, TH1*>>;
-    map<int, TH1*>* newhlist = new map<int, TH1*> ;
-    (*newsubdir)[name] = *newhlist;
-    m_subdir[subdir] = *newsubdir;
+    map<string, map<int, TH1*>> newsubdir;
+    map<int, TH1*> newhlist;
+    newsubdir[name] = newhlist;
+    m_subdir[subdir] = newsubdir;
     // Merge dir and hist
-    map<string, TH1*>* newmergedir = new map<string, TH1*>;
-    (*newmergedir)[name] = NULL; // TH1 is not yet created
-    m_mergedir[subdir] = *newmergedir;
+    map<string, TH1*> newmergedir;
+    newmergedir[name] = NULL; // TH1 is not yet created
+    m_mergedir[subdir] = newmergedir;
     printf("HistoManager: new list created for subdir %s\n", subdir.c_str());
   }
 

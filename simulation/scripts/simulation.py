@@ -97,7 +97,7 @@ def add_simulation(
         bkgfiles=None,
         bkgcomponents=None,
         bkgscale=1.0,
-        bkgOverlay=False,
+        bkgOverlay=True,
         usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
         use_vxdtf2=True,

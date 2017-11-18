@@ -19,7 +19,7 @@
 #include <framework/logging/Logger.h>
 
 #include <boost/crc.hpp>
-#include <rawdata/dataobjects/RawKLM.h>
+//#include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 #include <framework/database/DBArray.h>
@@ -62,9 +62,9 @@ BKLMUnpackerModule::~BKLMUnpackerModule()
 
 void BKLMUnpackerModule::initialize()
 {
-  //StoreArray<BKLMDigit>::registerPersistent();
-  StoreArray<BKLMDigit>bklmDigits(m_outputDigitsName);
-  bklmDigits.registerInDataStore();
+  rawKLM.isRequired();
+  //StoreArray<BKLMDigit>bklmDigits(m_outputDigitsName);
+  bklmDigits.registerInDataStore(m_outputDigitsName);
   if (m_loadMapFromDB) loadMapFromDB();
 }
 
@@ -117,8 +117,7 @@ void BKLMUnpackerModule::beginRun()
 void BKLMUnpackerModule::event()
 {
 
-  StoreArray<RawKLM> rawKLM;
-  StoreArray<BKLMDigit> bklmDigits(m_outputDigitsName);
+  //StoreArray<BKLMDigit> bklmDigits(m_outputDigitsName);
   bklmDigits.clear();
 
   B2DEBUG(1, "Unpacker has have " << rawKLM.getEntries() << " entries");

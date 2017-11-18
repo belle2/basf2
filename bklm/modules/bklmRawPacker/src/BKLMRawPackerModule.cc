@@ -6,7 +6,6 @@
 //-
 
 #include <bklm/modules/bklmRawPacker/BKLMRawPackerModule.h>
-#include <bklm/dataobjects/BKLMDigit.h>
 #include <framework/database/DBArray.h>
 #include <bklm/dbobjects/BKLMElectronicMapping.h>
 
@@ -64,7 +63,7 @@ void BKLMRawPackerModule::initialize()
   /// Initialize EvtMetaData
   m_eventMetaDataPtr.registerInDataStore();
 
-  rawklmarray.registerPersistent();
+  rawklmarray.registerInDataStore();
 
   B2DEBUG(1, "BKLMRawPackerModule: initialize() done.");
   if (m_loadMapFromDB) loadMapFromDB();
@@ -81,7 +80,6 @@ void BKLMRawPackerModule::beginRun()
 void BKLMRawPackerModule::event()
 {
   B2DEBUG(1, "pack the event..");
-  StoreArray<BKLMDigit> digits;
   vector<uint32_t> data_words[4][4];//4 copper, 16 finesse
   //data_words[4][4].clear();
   for (unsigned int ii = 0; ii < 4; ++ii) {

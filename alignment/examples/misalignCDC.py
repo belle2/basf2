@@ -16,15 +16,13 @@ wires_in_layer = [
     320, 320, 320, 320, 320, 320,
     352, 352, 352, 352, 352, 352,
     384, 384, 384, 384, 384, 384]
-x = 1
-y = 2
-phi = 6
 
 layer = 1
 
 for wire in range(0, wires_in_layer[layer]):
     wireid = Belle2.WireID(layer, wire).getEWire()
-    payload.setGlobalParam(0.01, wireid, y)
+    payload.set(wireid, Belle2.CDCAlignment.wireFwdY, 0.01)
+    payload.set(wireid, Belle2.CDCAlignment.wireBwdY, 0.01)
 
 iov = Belle2.IntervalOfValidity(0, 0, -1, -1)
 Belle2.Database.Instance().storeData('CDCAlignment', payload, iov)

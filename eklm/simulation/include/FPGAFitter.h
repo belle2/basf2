@@ -24,14 +24,6 @@ namespace Belle2 {
   namespace EKLM {
 
     /**
-     * FPGA fit status.
-     */
-    enum FPGAFitStatus {
-      c_FPGASuccessfulFit, /**< Successful fit. */
-      c_FPGANoSignal,      /**< Signal is too small to do any fitting. */
-    };
-
-    /**
      * FPGA fitter class.
      */
     class FPGAFitter {

@@ -16,6 +16,10 @@ HistoServer::HistoServer(int port, string filename)
   m_port = port;
   m_force_exit = 0;
   m_filename = filename;
+  m_sock = NULL;
+  m_man = NULL;
+  m_hman = NULL;
+  m_memfile = NULL;
 }
 
 HistoServer::~HistoServer()
@@ -27,6 +31,7 @@ HistoServer::~HistoServer()
 
 int HistoServer:: init()
 {
+  if (m_sock != NULL) delete m_sock;
   m_sock = new EvtSocketRecv(m_port, false);
   m_man = new EvtSocketManager(m_sock);
   //  m_mapfile = TMapFile::Create(m_filename.c_str(), "RECREATE", MAPFILESIZE);

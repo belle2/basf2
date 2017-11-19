@@ -81,7 +81,7 @@ void DQMHistAnalysisEpicsExampleModule::initialize()
     for (auto i = 0; i < m_parameters; i++) {
       std::string aa;
       aa = m_f1->GetParName(i);
-      if (aa == "") aa = "par" + i;
+      if (aa == "") aa = "par" + std::to_string(i);
       aa = m_pvname + ":" + aa;
 //      SEVCHK(ca_create_channel(a.c_str(),NULL,NULL,10,&mychid[i]),"ca_create_channel failure");
       // Read LO and HI limits from EPICS, seems this needs additional channels?

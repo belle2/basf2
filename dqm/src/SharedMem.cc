@@ -91,17 +91,18 @@ SharedMem::SharedMem(const char* name, int size)
   }
   printf("SharedMem: created. shmid = %d, semid = %d\n", m_shmid, m_semid);
 
+  m_strbuf = NULL;
 }
 
-SharedMem::SharedMem(int shm_id)
-{
-  m_shmid = shm_id;
-  m_shmadr = (int*) shmat(m_shmid, 0, 0);
-  if (m_shmadr == (int*) - 1) {
-    perror("SharedMem::shmat");
-    return;
-  }
-}
+//SharedMem::SharedMem(int shm_id)
+//{
+//  m_shmid = shm_id;
+//  m_shmadr = (int*) shmat(m_shmid, 0, 0);
+//  if (m_shmadr == (int*) - 1) {
+//    perror("SharedMem::shmat");
+//    return;
+//  }
+//}
 
 SharedMem::~SharedMem(void)
 {

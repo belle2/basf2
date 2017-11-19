@@ -29,6 +29,7 @@ using namespace Belle2;
 // SocketIO class
 SocketIO::SocketIO()
 {
+  m_int = 0;
 }
 
 SocketIO::~SocketIO()

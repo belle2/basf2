@@ -21,6 +21,7 @@ HistoRelay::HistoRelay(string& file, string& dest, int port)
   m_memfile = new DqmMemFile(file);
   m_sock = new EvtSocketSend(dest.c_str(), port);
   //  m_msg = new MsgHandler(0);
+  m_msg = NULL;
 }
 
 HistoRelay::~HistoRelay()

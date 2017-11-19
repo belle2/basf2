@@ -17,47 +17,48 @@
 
 typedef unsigned short u_short;
 
-using namespace Belle2;
+namespace Belle2 {
 
-class EvtSocketSend {
-public:
-  EvtSocketSend(std::string hostname, int port);
-  ~EvtSocketSend();
+  class EvtSocketSend {
+  public:
+    EvtSocketSend(std::string hostname, int port);
+    ~EvtSocketSend();
 
-  int status();
+    int status();
 
-  int send(EvtMessage* msg);
-  EvtMessage* recv(void);
+    int send(EvtMessage* msg);
+    EvtMessage* recv(void);
 
-  int send_buffer(int size, char* buf);
-  int recv_buffer(char* buf);
-  int recv_pxd_buffer(char* buf);
+    int send_buffer(int size, char* buf);
+    int recv_buffer(char* buf);
+    int recv_pxd_buffer(char* buf);
 
-  SocketSend* sock(void);
+    SocketSend* sock(void);
 
-private:
-  SocketSend* m_sock;
-  char* m_recbuf;
-};
+  private:
+    SocketSend* m_sock;
+    char* m_recbuf;
+  };
 
-class EvtSocketRecv {
-public:
-  EvtSocketRecv(int port, bool accept_at_init = true);
-  ~EvtSocketRecv();
+  class EvtSocketRecv {
+  public:
+    EvtSocketRecv(int port, bool accept_at_init = true);
+    ~EvtSocketRecv();
 
-  int status();
+    int status();
 
-  int send(EvtMessage* msg);
-  EvtMessage* recv(void);
+    int send(EvtMessage* msg);
+    EvtMessage* recv(void);
 
-  int send_buffer(int size, char* buf);
-  int recv_buffer(char* buf);
+    int send_buffer(int size, char* buf);
+    int recv_buffer(char* buf);
 
-  SocketRecv* sock(void);
+    SocketRecv* sock(void);
 
-private:
-  SocketRecv* m_sock;
-  char* m_recbuf;
+  private:
+    SocketRecv* m_sock;
+    char* m_recbuf;
+  };
 };
 #endif
 

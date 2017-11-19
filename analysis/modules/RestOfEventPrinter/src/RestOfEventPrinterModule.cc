@@ -59,7 +59,7 @@ namespace Belle2 {
 
   void RestOfEventPrinterModule::initialize()
   {
-    StoreArray<RestOfEvent>::required();
+    StoreArray<RestOfEvent>().isRequired();
   }
 
   void RestOfEventPrinterModule::event()

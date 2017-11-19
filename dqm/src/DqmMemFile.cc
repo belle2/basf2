@@ -110,7 +110,7 @@ int DqmMemFile::StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numob
   TIter nextkey(keylist);
   TKey* key = 0;
   int nkeys = 0;
-  int nobjs = 0;
+  //int nobjs = 0;
   while ((key = (TKey*)nextkey())) {
     nkeys++;
     TObject* obj = curdir->FindObjectAny(key->GetName());
@@ -119,7 +119,7 @@ int DqmMemFile::StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numob
       //      printf ( "Key = %s, entry = %f\n", key->GetName(), h1->GetEntries() );
       //      if (h1->GetEntries() > 0) {    // Do not send empty histograms
       msg->add(h1, h1->GetName());
-      nobjs++;
+      //nobjs++;
       numobjs++;
       //      }
     } else if (obj->IsA()->InheritsFrom(TDirectory::Class())) {
@@ -128,13 +128,13 @@ int DqmMemFile::StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numob
       //      m_msg->add(tdir, tdir->GetName());
       TText subdir(0, 0, tdir->GetName());
       msg->add(&subdir, "SUBDIR:" + string(obj->GetName())) ;
-      nobjs++;
+      //nobjs++;
       numobjs++;
       tdir->cd();
       StreamHistograms(tdir, msg, numobjs);
       TText command(0, 0, "COMMAND:EXIT");
       msg->add(&command, "SUBDIR:EXIT");
-      nobjs++;
+      //nobjs++;
       numobjs++;
       curdir->cd();
     }

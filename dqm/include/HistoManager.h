@@ -19,7 +19,7 @@ namespace Belle2 {
 
   class HistoManager {
   public:
-    HistoManager(DqmMemFile* mapfile);
+    explicit HistoManager(DqmMemFile* mapfile);
     ~HistoManager();
 
     // Register histogram

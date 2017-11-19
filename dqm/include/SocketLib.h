@@ -57,7 +57,7 @@ namespace Belle2 {
 
   class SocketRecv : public SocketIO {
   public:
-    SocketRecv(u_short port);
+    explicit SocketRecv(u_short port);
     ~SocketRecv();
 
     int examine();

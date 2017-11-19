@@ -11,11 +11,11 @@ using namespace Belle2;
 using namespace std;
 
 // Constructor / Destructor
-HistoServer::HistoServer(int port, string filename)
+HistoServer::HistoServer(int port, string& filename) : m_filename(filename)
 {
   m_port = port;
   m_force_exit = 0;
-  m_filename = filename;
+  //m_filename = filename;
   m_sock = NULL;
   m_man = NULL;
   m_hman = NULL;

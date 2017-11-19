@@ -31,7 +31,7 @@ namespace Belle2 {
 
   class HistoServer {
   public:
-    HistoServer(int port, std::string mapfile);
+    HistoServer(int port, std::string& mapfile);
     ~HistoServer();
 
     int init();
@@ -45,7 +45,7 @@ namespace Belle2 {
     int m_force_exit;
 
   private:
-    std::string m_filename;
+    std::string& m_filename;
     DqmMemFile* m_memfile;
     HistoManager* m_hman;
   };

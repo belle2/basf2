@@ -26,6 +26,7 @@ HistoRelay::HistoRelay(string& file, string& dest, int port)
 
 HistoRelay::~HistoRelay()
 {
+  delete m_memfile;
   delete m_sock;
   delete m_msg;
 }

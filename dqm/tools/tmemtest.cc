@@ -36,7 +36,7 @@ int main()
   }
   //    h1->Reset();
   //  }
-  cpysize = file->CopyTo(shm->ptr(), 500000);
+  file->CopyTo(shm->ptr(), 500000);
   file->ls();
   file->Print();
   file->Write();

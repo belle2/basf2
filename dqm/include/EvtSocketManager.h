@@ -18,7 +18,7 @@ namespace Belle2 {
 
   class EvtSocketManager {
   public:
-    EvtSocketManager(EvtSocketRecv* sock);
+    explicit EvtSocketManager(EvtSocketRecv* sock);
     ~EvtSocketManager();
 
     int examine();

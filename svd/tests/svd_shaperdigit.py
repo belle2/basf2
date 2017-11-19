@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from svd import add_svd_simulation
 from ROOT import Belle2, TFile, TTree
 import os
 import numpy
@@ -122,7 +123,7 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(particlegun)
 # add simulation for svd only
-simulation.add_simulation(main, components=['SVD'])
+add_svd_simulation(main, createDigits=True)
 
 main.add_module(progress)
 

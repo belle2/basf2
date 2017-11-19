@@ -22,7 +22,7 @@
 #include <string>
 #include <set>
 
-using namespace   Belle2;
+using namespace Belle2;
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
@@ -316,7 +316,11 @@ The following restrictions apply:
       // and either insert it into the map of mergeables or merge with the existing one
       auto it = persistentMergeables.insert(std::make_pair(br->GetName(), std::make_pair(object, 1)));
       if(!it.second) {
-        it.first->second.first->merge(object);
+        try {
+          it.first->second.first->merge(object);
+        }catch(std::exception &e){
+          B2FATAL("Cannot merge " << boost::io::quoted(br->GetName()) << " in " << boost::io::quoted(input) << ": " << e.what());
+        }
         it.first->second.second++;
         // ok, merged, get rid of it.
         delete object;
@@ -478,7 +482,7 @@ The following restrictions apply:
   output.cd();
   TTree outputMetaDataTree("persistent", "persistent");
   outputMetaDataTree.Branch("FileMetaData", &outputMetaData);
-  for(auto it: persistentMergeables){
+  for(auto &it: persistentMergeables){
     outputMetaDataTree.Branch(it.first.c_str(), &it.second.first);
   }
   if(outputBackgroundInfo->GetEntriesFast()){

@@ -61,6 +61,19 @@ void CKFToPXDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   moduleParamList->addParameter("minimalHitRequirement", m_param_minimalHitRequirement,
                                 "Minimal Hit requirement for the results (counted in space points)",
                                 m_param_minimalHitRequirement);
+
+  // Default values
+  moduleParamList->getParameter<std::string>("advanceHighFilter").setDefaultValue("advance");
+  moduleParamList->getParameter<std::string>("updateHighFilter").setDefaultValue("advance");
+
+  moduleParamList->getParameter<std::string>("firstHighFilter").setDefaultValue("mva");
+  moduleParamList->getParameter<std::string>("secondHighFilter").setDefaultValue("mva");
+  moduleParamList->getParameter<std::string>("thirdHighFilter").setDefaultValue("mva");
+
+  moduleParamList->getParameter<bool>("useAssignedHits").setDefaultValue(false);
+
+  moduleParamList->getParameter<std::string>("hitFilter").setDefaultValue("distance");
+  moduleParamList->getParameter<std::string>("seedFilter").setDefaultValue("distance");
 }
 
 void CKFToPXDFindlet::beginEvent()

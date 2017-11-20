@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LOGCONFIG_H_
-#define LOGCONFIG_H_
+#pragma once
 
 namespace Belle2 {
 
@@ -127,5 +126,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif /* LOGCONFIG_H_ */

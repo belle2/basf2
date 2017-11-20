@@ -6,8 +6,7 @@
 // Date : 13 - Aug - 2010
 //-
 
-#ifndef RXMODULE_H
-#define RXMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/pcore/RingBuffer.h>
@@ -66,5 +65,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MEMORYPOOL_H
-#define MEMORYPOOL_H
+#pragma once
 
 #include <vector>
 #include <cstddef>
@@ -109,5 +108,3 @@ namespace Belle2 {
   };
 
 } //end namespace Belle2
-
-#endif //MEMORYPOOL_H

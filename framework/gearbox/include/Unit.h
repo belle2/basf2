@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef UNIT_H
-#define UNIT_H
+#pragma once
 
 #include <string>
 #include <map>
@@ -174,5 +173,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif /* UNIT_H */

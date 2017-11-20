@@ -7,16 +7,8 @@ from ROOT import Belle2
 set_random_seed("something important")
 
 path = create_path()
-
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [5, 1])
-eventinfosetter.param('runList', [0, 1])
-eventinfosetter.param('expList', [0, 1])
-path.add_module(eventinfosetter)
-
-pgun = register_module('ParticleGun')
-pgun.param('nTracks', 3)
-path.add_module(pgun)
+path.add_module('EventInfoSetter', evtNumList=[5, 1], runList=[0, 1], expList=[0, 1])
+pgun = path.add_module('ParticleGun', nTracks=3)
 
 
 class TestModule(Module):

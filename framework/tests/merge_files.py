@@ -6,25 +6,11 @@ import sys
 import re
 import subprocess
 import itertools
-import tempfile
 import ROOT
 from ROOT.Belle2 import FileMetaData, EventMetaData
-from contextlib import contextmanager
 # we don't really need basf2 but it fixes the print buffering problem
 import basf2
-
-
-@contextmanager
-def clean_working_directory():
-    """Context manager to create a temporary directory and directly us it as
-    current working directory"""
-    dirname = os.getcwd()
-    try:
-        with tempfile.TemporaryDirectory() as tempdir:
-            os.chdir(tempdir)
-            yield tempdir
-    finally:
-        os.chdir(dirname)
+from b2test_utils import clean_working_directory
 
 
 def create_testfile(name, release=None, exp=0, run=0, events=100, branchNames=[], **argk):

@@ -17,13 +17,6 @@
 
 #include <stdint.h>
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-#if defined(__dummy_close_bracket_to_cheat_emacs_auto_indent)
-}
-#endif
-
 /* FEE registers as implemented in belle2link_cdc */
 
 #define HSREG_SERIAL    0x00
@@ -155,9 +148,6 @@ extern "C" {
 #define HSREGL_VETOCNT 0x8c
 #define HSREGL_VETOBUF0 0x8d
 #define HSREGL_VETOBUF1 0x8e
-#define HSREGL_CNTFF00     0x95 /* new in hslb055 */
-#define HSREGL_CNTDATAPKT  0x96 /* new in hslb055 */
-#define HSREGL_CNTDATAWORD 0x97 /* new in hslb055 */
 
 static const int hsreg_revision = 1;
 
@@ -187,22 +177,9 @@ struct hsreg {
   uint32_t vetoset; /* 8b */
   uint32_t vetocnt; /* 8c */
   uint32_t vetobuf[2]; /* 8d, 8e */
-  uint32_t cntff00;     /* 95 */
-  uint32_t cntdatapkt;  /* 96 */
-  uint32_t cntdataword; /* 97 */
 };
 
 typedef struct hsreg hsreg_t;
-
-int hsreg_read(int fd /* 0-3 */, hsreg_t*);
-int hsreg_getfee(int fd /* 0-3 */, hsreg_t*);
-
-#if defined(__dummy_open_bracket_to_cheat_emacs_auto_indent)
-__dummy_open_bracket_to_cheat_emacs_auto_indent {
-#endif
-#if defined(__cplusplus)
-}
-#endif
 
 #endif /* __HSREG_H__ */
 

@@ -45,16 +45,13 @@ EKLMDigitizerModule::~EKLMDigitizerModule()
 
 void EKLMDigitizerModule::initialize()
 {
-  StoreArray<EKLMDigit> digits;
-  StoreArray<EKLMSimHit> simHits;
-  digits.registerInDataStore();
-  digits.registerRelationTo(simHits);
+  m_Digits.registerInDataStore();
+  m_Digits.registerRelationTo(m_SimHits);
   if (m_CreateSim2Hits)
-    StoreArray<EKLMSim2Hit>::registerPersistent();
+    m_Sim2Hits.registerInDataStore();
   if (m_SaveFPGAFit) {
-    StoreArray<EKLMFPGAFit> fpgaFits;
-    fpgaFits.registerPersistent();
-    digits.registerRelationTo(fpgaFits);
+    m_FPGAFits.registerInDataStore();
+    m_Digits.registerRelationTo(m_FPGAFits);
   }
   m_GeoDat = &(EKLM::GeometryData::Instance());
   m_Fitter = new EKLM::FPGAFitter(m_DigPar->getNDigitizations());
@@ -69,12 +66,11 @@ void EKLMDigitizerModule::beginRun()
 void EKLMDigitizerModule::readAndSortSimHits()
 {
   EKLMSimHit* hit;
-  StoreArray<EKLMSimHit> simHitsArray;
   int i, strip, maxStrip;
   maxStrip = m_GeoDat->getMaximalStripGlobalNumber();
   m_SimHitVolumeMap.clear();
-  for (i = 0; i < simHitsArray.getEntries(); i++) {
-    hit = simHitsArray[i];
+  for (i = 0; i < m_SimHits.getEntries(); i++) {
+    hit = m_SimHits[i];
     strip = hit->getVolumeID();
     if (strip <= 0)
       B2FATAL("Incorrect (non-positive) strip number in EKLM digitizer.");
@@ -239,8 +235,7 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
     }
     eklmDigit->setFitStatus(fes.getFitStatus());
     if (fes.getFitStatus() == EKLM::c_FPGASuccessfulFit && m_SaveFPGAFit) {
-      StoreArray<EKLMFPGAFit> fpgaFits;
-      EKLMFPGAFit* fit = fpgaFits.appendNew(*fes.getFPGAFit());
+      EKLMFPGAFit* fit = m_FPGAFits.appendNew(*fes.getFPGAFit());
       eklmDigit->addRelationTo(fit);
     }
   }

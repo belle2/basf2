@@ -351,19 +351,19 @@ namespace Belle2 {
 
         G4RotationMatrix rotation(0, -M_PI / 2.0, -M_PI / 2.0);
         G4Transform3D sensorAlign = getAlignment(parameters.getAlignment(sensorID));
-        G4Transform3D placement = G4Rotate3D(rotation) * sensorAlign * reflection;
+        G4Transform3D sensorPlacement = G4Rotate3D(rotation) * sensorAlign * reflection;
 
         if (s.getSlanted()) {
-          placement = G4TranslateX3D(m_ladder.getSlantedRadius() - m_ladder.getRadius()) * G4RotateY3D(
-                        -m_ladder.getSlantedAngle()) * placement;
+          sensorPlacement = G4TranslateX3D(m_ladder.getSlantedRadius() - m_ladder.getRadius()) * G4RotateY3D(
+                              -m_ladder.getSlantedAngle()) * sensorPlacement;
         }
-        placement = G4Translate3D(0.0, 0.0, p.getZ()) * placement;
+        sensorPlacement = G4Translate3D(0.0, 0.0, p.getZ()) * sensorPlacement;
         // Remember the placement of sensor into ladder
-        VXD::GeoCache::getInstance().addSensorPlacement(ladder, sensorID, placement * activePosition * reflection);
-        placement = ladderPlacement * placement;
+        VXD::GeoCache::getInstance().addSensorPlacement(ladder, sensorID, sensorPlacement * activePosition * reflection);
+        sensorPlacement = ladderPlacement * sensorPlacement;
 
         assembly.add(s.getVolume());
-        assembly.place(volume, placement);
+        assembly.place(volume, sensorPlacement);
 
         //See if we want to glue the modules together
         if (!m_ladder.getGlueMaterial().empty() && !m_onlyActiveMaterial) {
@@ -372,10 +372,10 @@ namespace Belle2 {
           double w = s.getHeight() / 2.0 + m_ladder.getGlueSize();
           std::vector<G4Point3D> curSensorEdge(4);
           //Lets get the forward corners of the sensor by applying the unreflected placement matrix
-          curSensorEdge[0] = placement * reflection * G4Point3D(u, v, + w);
-          curSensorEdge[1] = placement * reflection * G4Point3D(u, v, - w);
-          curSensorEdge[2] = placement * reflection * G4Point3D(-u, v, - w);
-          curSensorEdge[3] = placement * reflection * G4Point3D(-u, v, + w);
+          curSensorEdge[0] = sensorPlacement * reflection * G4Point3D(u, v, + w);
+          curSensorEdge[1] = sensorPlacement * reflection * G4Point3D(u, v, - w);
+          curSensorEdge[2] = sensorPlacement * reflection * G4Point3D(-u, v, - w);
+          curSensorEdge[3] = sensorPlacement * reflection * G4Point3D(-u, v, + w);
           //If we already have backward edges this is not the first module so we can apply the glue
           if (lastSensorEdge.size()) {
             //Check that the modules don't overlap in z
@@ -426,10 +426,10 @@ namespace Belle2 {
           }
           //Remember the backward edge of this sensor to be glued to.
           lastSensorEdge.resize(4);
-          lastSensorEdge[0] = placement * reflection * G4Point3D(u, -v, + w);
-          lastSensorEdge[1] = placement * reflection * G4Point3D(u, -v, - w);
-          lastSensorEdge[2] = placement * reflection * G4Point3D(-u, -v, - w);
-          lastSensorEdge[3] = placement * reflection * G4Point3D(-u, -v, + w);
+          lastSensorEdge[0] = sensorPlacement * reflection * G4Point3D(u, -v, + w);
+          lastSensorEdge[1] = sensorPlacement * reflection * G4Point3D(u, -v, - w);
+          lastSensorEdge[2] = sensorPlacement * reflection * G4Point3D(-u, -v, - w);
+          lastSensorEdge[3] = sensorPlacement * reflection * G4Point3D(-u, -v, + w);
         }
       }
 

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LOGSYSTEM_H_
-#define LOGSYSTEM_H_
+#pragma once
 
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogMessage.h>
@@ -204,5 +203,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* LOGSYSTEM_H_ */

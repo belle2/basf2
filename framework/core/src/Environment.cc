@@ -16,7 +16,7 @@
 #include <framework/core/InputController.h>
 
 #include <boost/filesystem/path.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <iostream>
 #include <cstdlib>
@@ -126,7 +126,7 @@ Environment::~Environment()
 {
 }
 
-void Environment::setJobInformation(const boost::shared_ptr<Path>& path)
+void Environment::setJobInformation(const std::shared_ptr<Path>& path)
 {
   const std::list<ModulePtr>& modules = path->getModules();
 

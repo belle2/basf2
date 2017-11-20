@@ -42,8 +42,8 @@ namespace Belle2 {
     //Create some TrackFitResults in the the DataStore.
     //PDGCode of the TrackFitResult will be used in the test to identify the TFR.
     DataStore::Instance().setInitializeActive(true);
-    StoreArray<TrackFitResult>::registerPersistent();
     StoreArray<TrackFitResult> myResults;
+    myResults.registerInDataStore();
 
     const auto myPion = addDummyTrack(myResults, Const::pion);
     const auto myKaon = addDummyTrack(myResults, Const::kaon);
@@ -106,8 +106,8 @@ namespace Belle2 {
     //Create some TrackFitResults in the the DataStore.
     //PDGCode of the TrackFitResult will be used in the test to identify the TFR.
     DataStore::Instance().setInitializeActive(true);
-    StoreArray<TrackFitResult>::registerPersistent();
     StoreArray<TrackFitResult> myResults;
+    myResults.registerInDataStore();
 
     // add two fit results
     const auto myKaon = addDummyTrack(myResults, Const::kaon);

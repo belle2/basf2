@@ -112,11 +112,17 @@ namespace Belle2 {
     /** FPGA fitter. */
     EKLM::FPGAFitter* m_Fitter;
 
-    /** SimHit storage initialization. */
+    /** Simulation hits. */
+    StoreArray<EKLMSimHit> m_SimHits;
+
+    /** Partly merged simulation hits (not created by default). */
     StoreArray<EKLMSim2Hit> m_Sim2Hits;
 
-    /** StripHit storage initialization. */
+    /** Digits. */
     StoreArray<EKLMDigit> m_Digits;
+
+    /** FPGA fits. */
+    StoreArray<EKLMFPGAFit> m_FPGAFits;
 
   };
 

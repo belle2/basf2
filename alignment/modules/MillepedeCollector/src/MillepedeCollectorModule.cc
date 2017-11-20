@@ -343,7 +343,7 @@ void MillepedeCollectorModule::collect()
         DBObjPtr<BeamParameters> beam;
 
         TMatrixDSym vertexPrec(beam->getCovVertex().Invert());
-        TVector3 vertexResidual = mother->getVertex() - beam->getVertex();
+        TVector3 vertexResidual = - (mother->getVertex() - beam->getVertex());
 
         TVectorD extMeasurements(3);
         extMeasurements[0] = vertexResidual[0];
@@ -457,38 +457,42 @@ std::string MillepedeCollectorModule::getUniqueMilleName()
 
 void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* particle)
 {
-  // For already fitted tracks, try to get fitted (DAF) weights for CDC
-  if (recoTrack.getTrackFitStatus() && recoTrack.getTrackFitStatus()->isFitted()) {
-    // Do the hits synchronisation
-    auto relatedRecoHitInformation =
-      recoTrack.getRelationsTo<RecoHitInformation>(recoTrack.getStoreArrayNameOfRecoHitInformation());
+  try {
+    // For already fitted tracks, try to get fitted (DAF) weights for CDC
+    if (recoTrack.getTrackFitStatus() && recoTrack.getTrackFitStatus()->isFitted()) {
+      // Do the hits synchronisation
+      auto relatedRecoHitInformation =
+        recoTrack.getRelationsTo<RecoHitInformation>(recoTrack.getStoreArrayNameOfRecoHitInformation());
 
-    for (RecoHitInformation& recoHitInformation : relatedRecoHitInformation) {
+      for (RecoHitInformation& recoHitInformation : relatedRecoHitInformation) {
 
-      if (recoHitInformation.getFlag() == RecoHitInformation::c_pruned) {
-        B2FATAL("Found pruned point in RecoTrack. Pruned tracks cannot be used in MillepedeCollector.");
-      }
+        if (recoHitInformation.getFlag() == RecoHitInformation::c_pruned) {
+          B2FATAL("Found pruned point in RecoTrack. Pruned tracks cannot be used in MillepedeCollector.");
+        }
 
-      const genfit::TrackPoint* trackPoint = recoTrack.getCreatedTrackPoint(&recoHitInformation);
-      if (trackPoint) {
-        if (not trackPoint->hasFitterInfo(recoTrack.getCardinalRepresentation()))
-          continue;
-        auto kalmanFitterInfo = dynamic_cast<genfit::KalmanFitterInfo*>(trackPoint->getFitterInfo());
-        if (not kalmanFitterInfo) {
-          continue;
-        } else {
-          std::vector<double> weights = kalmanFitterInfo->getWeights();
-          if (weights.size() == 2) {
-            if (weights.at(0) > weights.at(1))
-              recoHitInformation.setRightLeftInformation(RecoHitInformation::c_left);
-            else if (weights.at(0) < weights.at(1))
-              recoHitInformation.setRightLeftInformation(RecoHitInformation::c_right);
+        const genfit::TrackPoint* trackPoint = recoTrack.getCreatedTrackPoint(&recoHitInformation);
+        if (trackPoint) {
+          if (not trackPoint->hasFitterInfo(recoTrack.getCardinalRepresentation()))
+            continue;
+          auto kalmanFitterInfo = dynamic_cast<genfit::KalmanFitterInfo*>(trackPoint->getFitterInfo());
+          if (not kalmanFitterInfo) {
+            continue;
+          } else {
+            std::vector<double> weights = kalmanFitterInfo->getWeights();
+            if (weights.size() == 2) {
+              if (weights.at(0) > weights.at(1))
+                recoHitInformation.setRightLeftInformation(RecoHitInformation::c_left);
+              else if (weights.at(0) < weights.at(1))
+                recoHitInformation.setRightLeftInformation(RecoHitInformation::c_right);
+            }
           }
         }
       }
     }
+  } catch (...) {
+    B2ERROR("Error in checking DAF weights from previous fit to resolve hit ambiguity. Why? Failed fit points in DAF? Skip track to be sure.");
+    return;
   }
-
   std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
   gbl->setOptions("", true, true, 1, 1);
   //gbl->setTrackSegmentController(new GblMultipleScatteringController);

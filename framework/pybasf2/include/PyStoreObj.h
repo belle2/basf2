@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PYSTOREOBJ_H
-#define PYSTOREOBJ_H
+#pragma once
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreAccessorBase.h>
@@ -184,4 +183,3 @@ namespace Belle2 {
     mutable StoreEntry* m_storeEntry = nullptr;
   };
 }
-#endif

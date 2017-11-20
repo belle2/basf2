@@ -73,10 +73,7 @@ void TrackAnaModule::event()
   //  printf ( "***** Generator Event List : Event %d ; multi = %d *****\n", evtno, npart );
   for (int i = 0; i < ntrk; i++) {
     Track* trk = trklist[i];
-    // load the pion fit hypothesis or the hypothesis which is the closest in mass to a pion
-    // the tracking will not always successfully fit a pion hypothesis
-    const TrackFitResult* fit = trk->getTrackFitResultWithClosestMass(Const::pion);
-    B2ASSERT("The fit assumed by this script failed.", fit);
+    const TrackFitResult* fit = trk->getTrackFitResult(Const::pion);
     TLorentzVector p4 = fit->get4Momentum();
     for (int j = 0; j < 4; j++) {
       h_p[j]->Fill(p4[j]);

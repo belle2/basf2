@@ -12,7 +12,6 @@
 
 #include <reconstruction/dbobjects/CDCDedx1DCleanup.h>
 #include <calibration/CalibrationAlgorithm.h>
-#include "TF1.h"
 
 namespace Belle2 {
   /**
@@ -42,6 +41,5 @@ namespace Belle2 {
 
   private:
 
-    ClassDef(CDCDedx1DCleanupAlgorithm, 0); /**< Class for CDC dE/dx 1D cleanup correction **/
   };
 } // namespace Belle2

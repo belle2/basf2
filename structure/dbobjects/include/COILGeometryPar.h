@@ -74,7 +74,7 @@ namespace Belle2 {
     std::string getCryoMaterial() const { return m_strMatCryo; }
 
     //! Set the Material of the cryostat vessel (as a std::string)
-    void setCryoMaterial(std::string material) { m_strMatCryo = material; }
+    void setCryoMaterial(const std::string& material) { m_strMatCryo = material; }
 
     //! Get the Inner radius of the cryostat vessel
     double getCryoRmin() const
@@ -121,7 +121,7 @@ namespace Belle2 {
     std::string getCav1Material() const { return m_strMatCav1; }
 
     //! Set the Material of the cavity #1 (as a std::string)
-    void setCav1Material(std::string material) { m_strMatCav1 = material; }
+    void setCav1Material(const std::string& material) { m_strMatCav1 = material; }
 
     //! Get the Inner radius of the cavity #1
     double getCav1Rmin() const
@@ -168,7 +168,7 @@ namespace Belle2 {
     std::string getCav2Material() const { return m_strMatCav2; }
 
     //! Set the Material of the cavity #2 (as a std::string)
-    void setCav2Material(std::string material) { m_strMatCav2 = material; }
+    void setCav2Material(const std::string& material) { m_strMatCav2 = material; }
 
     //! Get the Inner radius of the cavity #2
     double getCav2Rmin() const
@@ -215,7 +215,7 @@ namespace Belle2 {
     std::string getShieldMaterial() const { return m_strMatShield; }
 
     //! Set the Material of the radiation shield (as a std::string)
-    void setShieldMaterial(std::string material) { m_strMatShield = material; }
+    void setShieldMaterial(const std::string& material) { m_strMatShield = material; }
 
     //! Get the Inner radius of the radiation shield
     double getShieldRmin() const
@@ -262,7 +262,7 @@ namespace Belle2 {
     std::string getCoilMaterial() const { return m_strMatCoil; }
 
     //! Set the Material of the superconducting coil (as a std::string)
-    void setCoilMaterial(std::string material) { m_strMatCoil = material; }
+    void setCoilMaterial(const std::string& material) { m_strMatCoil = material; }
 
     //! Get the Inner radius of the superconducting coil
     double getCoilRmin() const

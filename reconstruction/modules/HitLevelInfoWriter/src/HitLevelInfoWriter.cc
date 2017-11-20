@@ -98,8 +98,8 @@ void HitLevelInfoWriterModule::initialize()
   m_tree->Branch("hEnta", h_enta, "hEnta[hNHits]/D");
   m_tree->Branch("hDriftT", h_driftT, "hDriftT[hNHits]/D");
   m_tree->Branch("hWireGain", h_wireGain, "hWireGain[hNHits]/D");
-  //  m_tree->Branch("hTwodcor", &h_twodcor, "hTwodcor[hNHits]/D");
-  //  m_tree->Branch("hOnedcor", &h_onedcor, "hOnedcor[hNHits]/D");
+  m_tree->Branch("hTwodcor", &h_twodcor, "hTwodcor[hNHits]/D");
+  m_tree->Branch("hOnedcor", &h_onedcor, "hOnedcor[hNHits]/D");
 
 }
 
@@ -257,8 +257,8 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
     h_enta[ihit] = dedxTrack->getEnta(ihit);
     h_driftT[ihit] = dedxTrack->getDriftT(ihit);
     h_wireGain[ihit] = dedxTrack->getWireGain(ihit);
-    //    h_twodcor[ihit] = dedxTrack->getTwoDCorrection(ihit);
-    //    h_onedcor[ihit] = dedxTrack->getOneDCorrection(ihit);
+    h_twodcor[ihit] = dedxTrack->getTwoDCorrection(ihit);
+    h_onedcor[ihit] = dedxTrack->getOneDCorrection(ihit);
   }
 }
 
@@ -285,5 +285,7 @@ HitLevelInfoWriterModule::clearEntries()
     h_enta[ihit] = 0;
     h_driftT[ihit] = 0;
     h_wireGain[ihit] = 0;
+    h_twodcor[ihit] = 0;
+    h_onedcor[ihit] = 0;
   }
 }

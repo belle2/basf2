@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PROFILEMODULE_H
-#define PROFILEMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <vector>
@@ -139,5 +138,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif /* PROFILEMODULE_H_ */

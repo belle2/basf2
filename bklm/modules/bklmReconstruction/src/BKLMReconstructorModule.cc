@@ -60,6 +60,9 @@ BKLMReconstructorModule::BKLMReconstructorModule() : Module(), m_GeoPar(NULL)
   addParam("Alignment correction flag", m_ifAlign,
            "flag for alignment correction, do the correction (true) or not (false), default is false",
            bool(false));
+  addParam("load time window from db", m_loadTimingFromDB,
+           "locad timing window from database (true) or not (false), default is true",
+           bool(true));
 }
 
 BKLMReconstructorModule::~BKLMReconstructorModule()
@@ -87,6 +90,13 @@ void BKLMReconstructorModule::beginRun()
 {
   StoreObjPtr<EventMetaData> evtMetaData;
   B2INFO("BKLMReconstructor: Experiment " << evtMetaData->getExperiment() << "  run " << evtMetaData->getRun());
+
+  if (m_loadTimingFromDB) {
+    m_DtMax = m_timing->getCoincidenceWindow();
+    m_PromptTime = m_timing->getPromptTime();
+    m_PromptWindow = m_timing->getPromptWindow();
+  }
+
 }
 
 void BKLMReconstructorModule::event()

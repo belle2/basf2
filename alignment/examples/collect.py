@@ -26,8 +26,9 @@ set_random_seed(100)
 main = create_path()
 
 main.add_module('RootInput')
+main.add_module('HistoManager', histoFileName='CollectorOutput.root')
 main.add_module('Gearbox')
-main.add_module('Geometry', excludedComponents=excludedComponents)
+main.add_module('Geometry', excludedComponents=excludedComponents, useDB=False)
 main.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
 
 """
@@ -44,7 +45,7 @@ the available objects are:
 BeamParameters, VXDAlignment, CDCAlignment, CDCLayerAlignment,
 CDCTimeWalks, CDCTimeZeros, BKLMALignment, EKLMALignment
 """
-dbobjects = ['VXDAlignment']
+dbobjects = ['VXDAlignment', 'BeamParameters']
 
 # All data sources from samples as possible input
 main.add_module('MillepedeCollector',
@@ -56,10 +57,8 @@ main.add_module('MillepedeCollector',
                 primaryVertices=['Z0:mumu'],
                 calibrateVertex=True,
                 useGblTree=False)
-main.add_module('RootOutput', branchNames=['EventMetaData'])
 main.add_module('Progress')
+main.add_module('RootOutput')
 
-# main.add_module('GBLdiagnostics')
-print_path(main)
 process(main)
 print(statistics)

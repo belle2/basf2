@@ -17,6 +17,7 @@ namespace Belle2 {
   protected:
   };
 
+  /** Test the calculation of a thrust axis */
   TEST_F(ContinuumSuppressionTests, Thrust)
   {
     std::vector<TVector3> momenta;
@@ -35,6 +36,7 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(0.660522, thrustB.Z());
   }
 
+  /** Test the calculation of the CleoClones variables */
   TEST_F(ContinuumSuppressionTests, CleoCones)
   {
     const bool use_all = true;
@@ -99,6 +101,7 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(0, cleo_cone_with_roe[8]);
   }
 
+  /** Test the calculation of the Fox-Wolfram moments */
   TEST_F(ContinuumSuppressionTests, FoxWolfram)
   {
     std::vector<TVector3> momenta;

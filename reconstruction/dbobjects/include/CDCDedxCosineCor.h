@@ -26,7 +26,7 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    CDCDedxCosineCor(): m_cosgains() {};
+    CDCDedxCosineCor(): m_nbins(100), m_cosgains() {};
 
     /**
      * Constructor
@@ -47,7 +47,7 @@ namespace Belle2 {
      */
     double getMean(double costh) const
     {
-      if (abs(costh) > 1) return 0;
+      if (std::abs(costh) > 1) return 0;
 
       // gains are stored at the center of the bins
       // find the bin center immediately preceding this value of costh
@@ -59,10 +59,10 @@ namespace Belle2 {
       // extrapolate forward for highest half-bin and center negative half-bin
       int thisbin = bin, nextbin = bin + 1;
       double frac = ((costh - 0.5 * binsize + 1.0) / binsize) - bin;
-      if ((costh + 1) < (binsize / 2) || (costh > 0 && abs(costh) < (binsize / 2))) {
+      if ((costh + 1) < (binsize / 2) || (costh > 0 && std::abs(costh) < (binsize / 2))) {
         thisbin = bin + 1; nextbin = bin + 2;
       } else {
-        if ((costh - 1) > -1.0 * (binsize / 2) || (costh < 0 && abs(costh) < (binsize / 2))) {
+        if ((costh - 1) > -1.0 * (binsize / 2) || (costh < 0 && std::abs(costh) < (binsize / 2))) {
           thisbin = bin - 1; nextbin = bin;
         }
       }
@@ -74,6 +74,6 @@ namespace Belle2 {
     short m_nbins; /**< number of cosine bins */
     std::vector<double> m_cosgains; /**< dE/dx gains in cos(theta) bins */
 
-    ClassDef(CDCDedxCosineCor, 1); /**< ClassDef */
+    ClassDef(CDCDedxCosineCor, 2); /**< ClassDef */
   };
 } // end namespace Belle2

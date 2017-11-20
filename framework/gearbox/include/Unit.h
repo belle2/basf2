@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef UNIT_H
-#define UNIT_H
+#pragma once
 
 #include <string>
 #include <map>
@@ -50,14 +49,6 @@ namespace Belle2 {
     static const double GeV;          /**< Standard of [energy, momentum, mass] */
     static const double K;            /**< Standard of [temperature] */
     static const double e;            /**< Standard of [electric charge] */
-
-    /**
-     * Standard units with the value NOT equal to 1.
-     * Their values are calculated by using the other standard units.
-     * If you need the magnetic field value in the unit where 1 Tesla = 1.0,
-     * use BFieldManager::getFieldInTesla(const B2Vector3D& pos).
-     */
-    static const double T;            /**< Standard of [magnetic field] */
 
     /**
      * Practical units with the value set at 1.
@@ -123,6 +114,8 @@ namespace Belle2 {
     static const double J;            /**< [joule] */
     static const double V;            /**< [voltage] */
 
+    // magnetic field units
+    static const double T;            /**< [tesla] */
     static const double mT;           /**< [millitesla] */
     static const double Gauss;        /**< [gauss] */
     static const double kGauss;       /**< [kilogauss] */
@@ -161,11 +154,6 @@ namespace Belle2 {
      */
     static double convertValueToUnit(double value, const std::string& unitString);
 
-    /**
-     * Get the magnetic field value in a unit where 1 Tesla = 1.0
-     */
-    static double getFieldInTesla(double value);
-
   protected:
     /** registers the name and value of a conversion in s_conversionFactors. */
     static double registerConversion(const std::string& name, double value);
@@ -185,5 +173,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif /* UNIT_H */

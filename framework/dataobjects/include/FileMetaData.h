@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef FILEMETADATA_H
-#define FILEMETADATA_H
+
+#pragma once
 
 #include <TObject.h>
 
@@ -270,4 +270,3 @@ namespace Belle2 {
   }; //class
 
 } // namespace Belle2
-#endif // FILEMETADATA

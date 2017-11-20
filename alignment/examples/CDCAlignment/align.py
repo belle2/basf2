@@ -10,17 +10,13 @@ from ROOT import Belle2
 set_debug_level(1000)
 use_local_database('localdb/database.txt')
 
-# Only initialize RootInput, as we do not loop over events,
-# only load persistent objects stored during data collection
-input = register_module('RootInput')
-input.param('inputFileName', 'RootOutput.root')
-input.initialize()
-
 components = ROOT.vector('string')()
 components.push_back('CDCAlignment')
 components.push_back('CDCLayerAlignment')
 
 algo = Belle2.MillepedeAlgorithm()
+algo.setInputFileNames(['CollectorOutput.root'])
+
 algo.setComponents(components)
 algo.invertSign()
 algo.steering().command('method diagonalization 3 0.1')
@@ -38,6 +34,7 @@ def fixLayerParam(layer, param):
     label = Belle2.GlobalLabel()
     label.construct(Belle2.CDCLayerAlignment.getGlobalUniqueID(), layer, param)
     algo.steering().command(str(label.label()) + ' 0.0 -1.')
+
 
 fixLayerParam(0, 1)  # X
 fixLayerParam(0, 2)  # Y

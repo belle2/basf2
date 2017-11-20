@@ -279,8 +279,8 @@ namespace Belle2 {
     }
 
     // register DataStore elements
-    StoreArray<CDCTriggerSegmentHit>::registerPersistent();
     StoreArray<CDCTriggerSegmentHit> segmentHits;
+    segmentHits.registerInDataStore();
     StoreArray<CDCHit> cdcHits(m_inputCollectionName);
     cdcHits.isRequired();
     StoreArray<MCParticle> mcparticles;
@@ -288,19 +288,20 @@ namespace Belle2 {
     mcparticles.registerRelationTo(segmentHits);
     // register tracks only for full simulation (not for TSF simulation)
     if (!(_fastSimulationMode & 1)) {
-      StoreArray<CDCTriggerTrack>::registerPersistent(m_2DfinderCollectionName);
-      StoreArray<CDCTriggerTrack>::registerPersistent(m_2DfitterCollectionName);
-      StoreArray<CDCTriggerTrack>::registerPersistent(m_3DfitterCollectionName);
       StoreArray<CDCTriggerTrack> tracks2Dfinder(m_2DfinderCollectionName);
       StoreArray<CDCTriggerTrack> tracks2Dfitter(m_2DfitterCollectionName);
       StoreArray<CDCTriggerTrack> tracks3Dfitter(m_3DfitterCollectionName);
+      tracks2Dfinder.registerInDataStore(m_2DfinderCollectionName);
+      tracks2Dfitter.registerInDataStore(m_2DfitterCollectionName);
+      tracks3Dfitter.registerInDataStore(m_3DfitterCollectionName);
       tracks2Dfinder.registerRelationTo(segmentHits); // hits related over Hough cell
       tracks2Dfitter.registerRelationTo(segmentHits); // hits used for the 2D fit
       tracks3Dfitter.registerRelationTo(segmentHits); // hits used for the 2D and 3D fit
       tracks2Dfinder.registerRelationTo(tracks2Dfitter);
       tracks2Dfinder.registerRelationTo(tracks3Dfitter);
     }
-    StoreObjPtr<TRGTiming>::registerPersistent("CDCTriggerEventTime");
+    StoreObjPtr<TRGTiming> eventTime("CDCTriggerEventTime");
+    eventTime.registerInDataStore("CDCTriggerEventTime");
 
     //...CDC trigger config. name...
     static string cfn = _configFilename;

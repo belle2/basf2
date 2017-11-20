@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FRAMEWORK_PARTICLEDB_EVTGENPARTICLEPDG_H
-#define FRAMEWORK_PARTICLEDB_EVTGENPARTICLEPDG_H
 
 #include <TParticlePDG.h>
 
@@ -46,5 +44,3 @@ namespace Belle2 {
   };
 
 } //Belle2 namespace
-
-#endif // FRAMEWORK_PARTICLEDB_EVTGENPARTICLEPDG_H

@@ -167,8 +167,8 @@ void DataFlowVisualization::generateModulePlot(std::ofstream& file, const Module
 void DataFlowVisualization::executeModuleAndCreateIOPlot(const std::string& module)
 {
   // construct given module and gearbox
-  boost::shared_ptr<Module> modulePtr = ModuleManager::Instance().registerModule(module);
-  boost::shared_ptr<Module> gearboxPtr = ModuleManager::Instance().registerModule("Gearbox");
+  std::shared_ptr<Module> modulePtr = ModuleManager::Instance().registerModule(module);
+  std::shared_ptr<Module> gearboxPtr = ModuleManager::Instance().registerModule("Gearbox");
 
   // call initialize() method
   //may throw some ERRORs, but that's OK.

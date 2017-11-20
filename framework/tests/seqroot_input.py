@@ -6,12 +6,10 @@
 
 from basf2 import *
 from ROOT import Belle2
-from contextlib import contextmanager
-import tempfile
 import gzip
 import glob
 import struct
-import multiprocessing
+from b2test_utils import clean_working_directory, safe_process
 
 set_random_seed("something important")
 # simplify logging output to just the type and the message
@@ -39,28 +37,8 @@ class TestModule(Module):
             print()
 
 
-@contextmanager
-def clean_working_directory():
-    """Context manager to create a temporary directory and directly us it as
-    current working directory"""
-    dirname = os.getcwd()
-    try:
-        with tempfile.TemporaryDirectory() as tempdir:
-            os.chdir(tempdir)
-            yield tempdir
-    finally:
-        os.chdir(dirname)
-
-
-def fork_process(*args, target=process):
-    """Run function in forked child to eliminate side effects"""
-    sub = multiprocessing.Process(target=target, args=args)
-    sub.start()
-    sub.join()
-
 # ============================================================================
 # Now lets create the necessary modules to perform a simulation
-
 
 filename = Belle2.FileSystem.findFile('framework/tests/seqroot_input.sroot')
 
@@ -108,4 +86,4 @@ with clean_working_directory():
     for filename in files:
         print("Trying", filename, "...")
         seqinput.param("inputFileName", filename)
-        fork_process(main)
+        safe_process(main)

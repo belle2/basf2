@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <string>
 
 namespace Belle2 {
@@ -34,7 +34,7 @@ namespace Belle2 {
     };
 
     /** initialize from string expression (see class doc). Throws runtime_error if expression is invalid. */
-    ModuleCondition(std::string expression, boost::shared_ptr<Path> conditionPath, EAfterConditionPath afterConditionPath);
+    ModuleCondition(std::string expression, std::shared_ptr<Path> conditionPath, EAfterConditionPath afterConditionPath);
     /** copy ctor (uses Path::clone()). */
     ModuleCondition(const ModuleCondition& other);
     ~ModuleCondition() { };
@@ -43,7 +43,7 @@ namespace Belle2 {
     bool evaluate(int value) const;
 
     /** Returns the path of the condition.  */
-    const boost::shared_ptr<Path>& getPath() const {return m_conditionPath; };
+    const std::shared_ptr<Path>& getPath() const {return m_conditionPath; };
 
     /** Returns the value of the condition.  */
     int getConditionValue() const {return m_conditionValue; };
@@ -66,7 +66,7 @@ namespace Belle2 {
     /** no default constructed objects. */
     ModuleCondition() = delete;
 
-    boost::shared_ptr<Path> m_conditionPath; /**< The path which which will be executed if the condition is evaluated to true. */
+    std::shared_ptr<Path> m_conditionPath; /**< The path which which will be executed if the condition is evaluated to true. */
     EConditionOperators m_conditionOperator;  /**< The operator of the condition (set by parsing the condition expression). */
     int m_conditionValue;                    /**< Numeric value used in the condition (set by parsing the condition expression). */
     EAfterConditionPath m_afterConditionPath; /**< What to do after a conditional path is finished. */

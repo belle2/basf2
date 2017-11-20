@@ -38,7 +38,8 @@ namespace Belle2 {
      * @param posOut End point of electron deposition in local coordinates
      */
     VXDSimHit(VxdID sensorID, int pdg, float globalTime, const float* posIn, const float* posOut):
-      SimHitBase(), m_pdg(pdg), m_globalTime(globalTime), m_sensorID(sensorID) {
+      SimHitBase(), m_pdg(pdg), m_globalTime(globalTime), m_sensorID(sensorID)
+    {
       std::copy_n(posIn, 3, m_posIn);
       std::copy_n(posOut, 3, m_posOut);
     }
@@ -53,7 +54,8 @@ namespace Belle2 {
      * @param electronProfile list of energy depositions along the simhit,
      * encoded using ElectronDeposit class. Will be empty after call
      */
-    void setEnergyDeposit(std::vector<unsigned int>& electronProfile) {
+    void setEnergyDeposit(std::vector<unsigned int>& electronProfile)
+    {
       m_electronProfile.clear();
       std::swap(m_electronProfile, electronProfile);
     }
@@ -114,7 +116,7 @@ namespace Belle2 {
      * @param length target number of electrons per step
      * @return vector of (fraction, electron) pairs
      */
-    std::vector<std::pair<float, float> > getElectronsConstantNumber(double electrons) const;
+    std::vector<std::pair<float, float> > getElectronsConstantNumber(double electronsPerStep) const;
 
   private:
     /** Energy depsoition profile encoded using the ElectronDeposit class */

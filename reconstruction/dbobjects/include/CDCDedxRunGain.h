@@ -24,12 +24,12 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    CDCDedxRunGain(): m_gain(0) {};
+    CDCDedxRunGain(): m_gain(1.0) {};
 
     /**
      * Constructor
      */
-    CDCDedxRunGain(double gain): m_gain(gain) {};
+    explicit CDCDedxRunGain(double gain): m_gain(gain) {};
 
     /**
      * Destructor
@@ -49,6 +49,6 @@ namespace Belle2 {
   private:
     double m_gain; /**< Run gain */
 
-    ClassDef(CDCDedxRunGain, 2); /**< ClassDef */
+    ClassDef(CDCDedxRunGain, 3); /**< ClassDef */
   };
 } // end namespace Belle2

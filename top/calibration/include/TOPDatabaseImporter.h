@@ -44,19 +44,14 @@ namespace Belle2 {
      */
     void importSampleTimeCalibration(std::string fileNames);
 
-    /**
-     * Import sample time calibration constants to database
-     * Kichimi-san data, root files
-     * @param fileNames file names separated by space (since vector doesn't work!)
-     */
-    void importSampleTimeCalibrationKichimi(std::string fileNames);
 
     /**
-     * Import channel T0 calibration constants to database
-     * Kichimi-san data, root files
+     * Import channel-by-channel T0 calibration constants to database
+     * The input is the root file produced by TOPLaserCalibrator
      * @param fileNames file names separated by space (since vector doesn't work!)
      */
-    void importChannelT0CalibrationKichimi(std::string fileNames);
+    void importLocalT0Calibration(std::string fileNames);
+
 
     /**
      * Prints sample time calibration info about constants stored in database

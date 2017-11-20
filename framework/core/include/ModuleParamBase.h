@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef MODULEPARAMBASE_H_
-#define MODULEPARAMBASE_H_
+
+#pragma once
 
 #include <string>
 
@@ -117,5 +117,3 @@ namespace Belle2 {
     bool m_setInSteering;
   };
 } // end of Belle2 namespace
-
-#endif /* MODULEPARAMBASE_H_ */

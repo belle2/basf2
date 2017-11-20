@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEARBOX_INTERFACE_H
-#define GEARBOX_INTERFACE_H
+#pragma once
 
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/gearbox/Unit.h>
@@ -499,5 +498,3 @@ namespace Belle2 {
     };
   }
 }
-
-#endif

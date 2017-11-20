@@ -127,22 +127,11 @@ namespace Belle2 {
       /** Multiply probabilities.
        * Modify first probability distribution by multiplying it with
        * the second.
-       * If this produces a degenerate distribution, return mean distribution squared.
        */
       void multiply(nnFitterBinData& p, const nnFitterBinData& p1)
       {
-        nnFitterBinData pResult(getBinCenters().size());
         std::transform(p.begin(), p.end(),
-                       p1.begin(), pResult.begin(), std::multiplies<double>());
-        double pnorm = std::accumulate(pResult.begin(), pResult.end(), 0.0);
-        // If the norm is too small, return mean distribution squared.
-        if (pnorm < 1.0e-10) {
-          std::transform(p.begin(), p.end(), p1.begin(), pResult.begin(),
-          [](double p1, double p2)->double {
-            return (p1 + p2) * (p1 + p2);
-          });
-        }
-        std::copy(pResult.begin(), pResult.end(), p.begin());
+                       p1.begin(), p.begin(), std::multiplies<double>());
         normalize(p);
       }
 
@@ -190,7 +179,6 @@ namespace Belle2 {
        */
       void normalize(nnFitterBinData& p)
       {
-        // Subtract background
         double pnorm = std::accumulate(p.begin(), p.end(), 0.0);
         // If the norm is too small, return default distribution.
         if (pnorm < 1.0e-10) {

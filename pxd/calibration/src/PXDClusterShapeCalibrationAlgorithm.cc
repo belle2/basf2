@@ -965,7 +965,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
     fExpertHistograms->cd("NoSorting");
   }
 
-  int nEntries = getObject<TTree>(name_SourceTree.Data()).GetEntries();
+  auto tree = getObjectPtr<TTree>(name_SourceTree.Data());
+  int nEntries = tree->GetEntries();
 
   B2INFO("Entries: " << nEntries);
   SummariesInfo[0] = nEntries;
@@ -973,53 +974,53 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
          ", PixelKind: " << m_UsePixelKind
         );
 
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("event", &m_evt);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("run", &m_run);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("exp", &m_exp);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("pid", &m_procId);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("layer", &m_layer);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("sensor", &m_sensor);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("pixelKind", &m_pixelKind);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("closeEdge", &m_closeEdge);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("shape", &m_shape);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("phiTrue", &m_phiTrue);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("thetaTrue", &m_thetaTrue);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("signal", &m_signal);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("seed", &m_seed);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("InPixUTrue", &m_InPixUTrue);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("InPixVTrue", &m_InPixVTrue);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("InPixUReco", &m_InPixUReco);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("InPixVReco", &m_InPixVReco);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidUTrueCl", &m_ResidUTrueCl);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidVTrueCl", &m_ResidVTrueCl);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("SigmaUReco", &m_SigmaUReco);
-  getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("SigmaVReco", &m_SigmaVReco);
+  tree->SetBranchAddress("event", &m_evt);
+  tree->SetBranchAddress("run", &m_run);
+  tree->SetBranchAddress("exp", &m_exp);
+  tree->SetBranchAddress("pid", &m_procId);
+  tree->SetBranchAddress("layer", &m_layer);
+  tree->SetBranchAddress("sensor", &m_sensor);
+  tree->SetBranchAddress("pixelKind", &m_pixelKind);
+  tree->SetBranchAddress("closeEdge", &m_closeEdge);
+  tree->SetBranchAddress("shape", &m_shape);
+  tree->SetBranchAddress("phiTrue", &m_phiTrue);
+  tree->SetBranchAddress("thetaTrue", &m_thetaTrue);
+  tree->SetBranchAddress("signal", &m_signal);
+  tree->SetBranchAddress("seed", &m_seed);
+  tree->SetBranchAddress("InPixUTrue", &m_InPixUTrue);
+  tree->SetBranchAddress("InPixVTrue", &m_InPixVTrue);
+  tree->SetBranchAddress("InPixUReco", &m_InPixUReco);
+  tree->SetBranchAddress("InPixVReco", &m_InPixVReco);
+  tree->SetBranchAddress("ResidUTrueCl", &m_ResidUTrueCl);
+  tree->SetBranchAddress("ResidVTrueCl", &m_ResidVTrueCl);
+  tree->SetBranchAddress("SigmaUReco", &m_SigmaUReco);
+  tree->SetBranchAddress("SigmaVReco", &m_SigmaVReco);
 
   if (m_UsePixelKind < 0) {  // only tracking used
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("phiTrack", &m_phiTrack);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("thetaTrack", &m_thetaTrack);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidUPlaneRHBias", &m_ResidUPlaneRHBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidVPlaneRHBias", &m_ResidVPlaneRHBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidUPlaneRHUnBias", &m_ResidUPlaneRHUnBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidVPlaneRHUnBias", &m_ResidVPlaneRHUnBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidUPlaneClBias", &m_ResidUPlaneClBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidVPlaneClBias", &m_ResidVPlaneClBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidUTruePlaneBias", &m_ResidUTruePlaneBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidVTruePlaneBias", &m_ResidVTruePlaneBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidUTruePlaneUnBias", &m_ResidUTruePlaneUnBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidVTruePlaneUnBias", &m_ResidVTruePlaneUnBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidUTrueRH", &m_ResidUTrueRH);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ResidVTrueRH", &m_ResidVTrueRH);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ErrorEstimateCovarUVBias", &m_ErrorEstimateCovarUVBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("ErrorEstimateCovarUVUnBias", &m_ErrorEstimateCovarUVUnBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("SigmaUTrackBias", &m_SigmaUTrackBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("SigmaVTrackBias", &m_SigmaVTrackBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("SigmaUResBias", &m_SigmaUResBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("SigmaVResBias", &m_SigmaVResBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("SigmaUTrackUnBias", &m_SigmaUTrackUnBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("SigmaVTrackUnBias", &m_SigmaVTrackUnBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("SigmaUResUnBias", &m_SigmaUResUnBias);
-    getObject<TTree>(name_SourceTree.Data()).SetBranchAddress("SigmaVResUnBias", &m_SigmaVResUnBias);
+    tree->SetBranchAddress("phiTrack", &m_phiTrack);
+    tree->SetBranchAddress("thetaTrack", &m_thetaTrack);
+    tree->SetBranchAddress("ResidUPlaneRHBias", &m_ResidUPlaneRHBias);
+    tree->SetBranchAddress("ResidVPlaneRHBias", &m_ResidVPlaneRHBias);
+    tree->SetBranchAddress("ResidUPlaneRHUnBias", &m_ResidUPlaneRHUnBias);
+    tree->SetBranchAddress("ResidVPlaneRHUnBias", &m_ResidVPlaneRHUnBias);
+    tree->SetBranchAddress("ResidUPlaneClBias", &m_ResidUPlaneClBias);
+    tree->SetBranchAddress("ResidVPlaneClBias", &m_ResidVPlaneClBias);
+    tree->SetBranchAddress("ResidUTruePlaneBias", &m_ResidUTruePlaneBias);
+    tree->SetBranchAddress("ResidVTruePlaneBias", &m_ResidVTruePlaneBias);
+    tree->SetBranchAddress("ResidUTruePlaneUnBias", &m_ResidUTruePlaneUnBias);
+    tree->SetBranchAddress("ResidVTruePlaneUnBias", &m_ResidVTruePlaneUnBias);
+    tree->SetBranchAddress("ResidUTrueRH", &m_ResidUTrueRH);
+    tree->SetBranchAddress("ResidVTrueRH", &m_ResidVTrueRH);
+    tree->SetBranchAddress("ErrorEstimateCovarUVBias", &m_ErrorEstimateCovarUVBias);
+    tree->SetBranchAddress("ErrorEstimateCovarUVUnBias", &m_ErrorEstimateCovarUVUnBias);
+    tree->SetBranchAddress("SigmaUTrackBias", &m_SigmaUTrackBias);
+    tree->SetBranchAddress("SigmaVTrackBias", &m_SigmaVTrackBias);
+    tree->SetBranchAddress("SigmaUResBias", &m_SigmaUResBias);
+    tree->SetBranchAddress("SigmaVResBias", &m_SigmaVResBias);
+    tree->SetBranchAddress("SigmaUTrackUnBias", &m_SigmaUTrackUnBias);
+    tree->SetBranchAddress("SigmaVTrackUnBias", &m_SigmaVTrackUnBias);
+    tree->SetBranchAddress("SigmaUResUnBias", &m_SigmaUResUnBias);
+    tree->SetBranchAddress("SigmaVResUnBias", &m_SigmaVResUnBias);
   }
   // create vector for storing on database:
 
@@ -1096,7 +1097,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
   if (m_DoExpertHistograms) {
     for (int i_ev = 0; i_ev < nEntries; i_ev++) {
-      getObject<TTree>(name_SourceTree.Data()).GetEntry(i_ev);
+      tree->GetEntry(i_ev);
       int iShp = m_shape;
       if (iShp < 1) iShp = 1;
       if (iShp > m_shapes) iShp = m_shapes;
@@ -1123,7 +1124,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
   }
   // To be fun show first few entries:
   for (int i_ev = 0; i_ev < 3; i_ev++) {
-    getObject<TTree>(name_SourceTree.Data()).Show(i_ev);
+    tree->Show(i_ev);
   }
 
   // presets of vectors and tables:
@@ -1159,8 +1160,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
                  i_shape + 1)].c_str()
           );
     if (!m_DoExpertHistograms) {  // acceleration of calibration process
-      getObject<TTree>(name_SourceTree.Data()).Draw("ResidUPlaneRHUnBias:ResidUPlaneRHUnBias", c1, "goff");
-      nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
+      tree->Draw("ResidUPlaneRHUnBias:ResidUPlaneRHUnBias", c1, "goff");
+      nSelRowsTemp = (int)tree->GetSelectedRows();
       if (nSelRowsTemp < m_MinClustersCorrections) continue;
     }
     int iFrom2 = 0;
@@ -1175,8 +1176,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
       cCat = Form("pixelKind == %i", i_pk);
       c2.SetTitle(cCat.Data());
       if (!m_DoExpertHistograms) {  // acceleration of calibration process
-        getObject<TTree>(name_SourceTree.Data()).Draw("ResidUPlaneRHUnBias:ResidUPlaneRHUnBias", c1 + c2, "goff");
-        nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
+        tree->Draw("ResidUPlaneRHUnBias:ResidUPlaneRHUnBias", c1 + c2, "goff");
+        nSelRowsTemp = (int)tree->GetSelectedRows();
         if (nSelRowsTemp < m_MinClustersCorrections) continue;
       }
       B2INFO("   ---> Processing pixel kind: " << i_pk <<
@@ -1207,8 +1208,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
           c3b.SetTitle(cCat.Data());
         }
         if (!m_DoExpertHistograms) {  // acceleration of calibration process
-          getObject<TTree>(name_SourceTree.Data()).Draw("ResidUPlaneRHUnBias:ResidUPlaneRHUnBias", c1 + c2 + c3a + c3b, "goff");
-          nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
+          tree->Draw("ResidUPlaneRHUnBias:ResidUPlaneRHUnBias", c1 + c2 + c3a + c3b, "goff");
+          nSelRowsTemp = (int)tree->GetSelectedRows();
           if (nSelRowsTemp < m_MinClustersCorrections) continue;
         }
         int iFrom4 = 0;
@@ -1241,8 +1242,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
             c4b.SetTitle(cCat.Data());
           }
           if (!m_DoExpertHistograms) {  // acceleration of calibration process
-            getObject<TTree>(name_SourceTree.Data()).Draw("ResidUPlaneRHUnBias:ResidUPlaneRHUnBias", c1 + c2 + c3a + c3b + c4a + c4b, "goff");
-            nSelRowsTemp = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
+            tree->Draw("ResidUPlaneRHUnBias:ResidUPlaneRHUnBias", c1 + c2 + c3a + c3b + c4a + c4b, "goff");
+            nSelRowsTemp = (int)tree->GetSelectedRows();
             if (nSelRowsTemp < m_MinClustersCorrections) continue;
           }
           cCat = Form("closeEdge == 0");
@@ -1252,9 +1253,9 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
           cFin = c1 && c2 && c3a && c3b && c4a && c4b && c5;  // full selection
           // cFin = c1 && c2 && c5;  // For tuning time: no angle selection...
           // cFin = c2 && c5;  // For tuning time: no shape and angle selection...
-          getObject<TTree>(name_SourceTree.Data()).Draw(">>selection", cFin);
+          tree->Draw(">>selection", cFin);
           TEventList* selectionn = (TEventList*)gDirectory->Get("selection");
-          int nSelRows = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
+          int nSelRows = (int)tree->GetSelectedRows();
           B2DEBUG(130, "  --> Selection criteria: " << cFin.GetTitle() << ", rows: " << nSelRows);
           SummariesInfoSh[i_shape] += nSelRows;
           SummariesInfoAng[i_angleU * m_anglesV + i_angleV] += nSelRows;
@@ -1263,7 +1264,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
           if (iDebugCalculation) {
             B2DEBUG(190, "nSelRows: " << nSelRows << "\n");
             for (int i = 0; i < nSelRows; i++) {
-              getObject<TTree>(name_SourceTree.Data()).GetEntry(selectionn->GetEntry(i));
+              tree->GetEntry(selectionn->GetEntry(i));
               B2DEBUG(190, "Shape: " << m_shape << ", ClEE_u: " << m_SigmaUReco * 10000 <<
                       ", ClEE_v: " << m_SigmaVReco * 10000 << "\n");
             }
@@ -1282,7 +1283,7 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
             std::vector<float> Colm13(nSelRows);
             std::vector<float> Colm14(nSelRows);
             for (int i = 0; i < nSelRows; i++) {
-              getObject<TTree>(name_SourceTree.Data()).GetEntry(selectionn->GetEntry(i));
+              tree->GetEntry(selectionn->GetEntry(i));
               if (m_UsePixelKind == -1) {
                 Colm1[i] = m_ResidUPlaneRHUnBias;
                 Colm2[i] = m_ResidVPlaneRHUnBias;
@@ -1641,8 +1642,8 @@ Belle2::CalibrationAlgorithm::EResult PXDClusterShapeCalibrationAlgorithm::calib
 
                     cFin = c6a && c6b && c7a && c7b && c1 && c2 && c3a && c3b && c4a && c4b && c5;
 
-                    getObject<TTree>(name_SourceTree.Data()).Draw(sVarexp.Data(), cFin, "goff");
-                    int nSelRows2 = (int)getObject<TTree>(name_SourceTree.Data()).GetSelectedRows();
+                    tree->Draw(sVarexp.Data(), cFin, "goff");
+                    int nSelRows2 = (int)tree->GetSelectedRows();
                     if (nSelRows2 >= m_MinHitsAcceptInPixels) {
                       TInPixelPositionMap[make_tuple(i_shape, i_pk, i_angleU, i_angleV, i_ipU, i_ipV)] = 1.0;  // Dummy value
                     }

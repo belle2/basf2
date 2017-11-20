@@ -16,8 +16,6 @@ set_random_seed("something important")
 
 
 def run_test():
-    eventinfosetter = register_module('EventInfoSetter', evtNumList=[5])
-
     class CrashyModule(Module):
         """test"""
 
@@ -48,7 +46,7 @@ def run_test():
 
     # Create paths
     main = create_path()
-    main.add_module(eventinfosetter)
+    main.add_module('EventInfoSetter', evtNumList=[5])
 
     wrappedpath = create_path()
     testmod = wrappedpath.add_module(CrashyModule())
@@ -66,14 +64,11 @@ def run_test():
     assert statistics.get(printcollections).calls(statistics.EVENT) == 5
 
 
-# set_log_level(LogLevel.WARNING)
 for nproc in [0, 3]:
     B2WARNING(80*'=')
     B2WARNING("Starting test with {} processes...".format(nproc))
     set_nprocesses(nproc)
     run_test()
-
-set_log_level(LogLevel.INFO)
 
 ret = os.system('clear_basf2_ipc')
 if ret != 0:

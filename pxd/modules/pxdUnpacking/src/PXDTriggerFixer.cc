@@ -40,7 +40,7 @@ PXDTriggerFixerModule::PXDTriggerFixerModule(void)
 
 void PXDTriggerFixerModule::initialize(void)
 {
-  m_storeRaw.required();
+  m_storeRaw.isRequired();
 
   if (!m_wants_Meta && !m_wants_HLT && !m_wants_DHC) B2FATAL("No source for wanted look up trigger number given (EvtMeta, HLT, DHC)");
   if (!m_refs_HLT && !m_refs_DHC && !m_refs_DHE) B2FATAL("No source for reference trigger number given (HLT, DHC, DHE)");

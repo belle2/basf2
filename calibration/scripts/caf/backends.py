@@ -1,4 +1,8 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from basf2 import *
+from abc import ABC, abstractmethod
 import subprocess
 import multiprocessing as mp
 from collections import defaultdict
@@ -24,6 +28,9 @@ _input_data_file_path = "input_data_files.data"
 
 
 def get_input_data():
+    """
+    Simple pickle load of the default input data pickle file name for the CAF
+    """
     with open(_input_data_file_path, 'br') as input_data_file:
         input_data = list(pickle.load(input_data_file))
     return input_data
@@ -48,8 +55,13 @@ class Job:
         """
 
         def __init__(self, job, subjob_id, input_files=None):
+            """
+            """
+            #: Id of Subjob
             self.id = subjob_id
+            #: Job() instance of parent to this SubJob
             self.parent = job
+            #: Input files specific to this subjob
             self.input_files = input_files
 
         @property
@@ -209,24 +221,27 @@ class Job:
                 subjob.post_process()
 
 
-class Backend():
+class Backend(ABC):
     """
     Base class for backend of CAF.
     Classes derived from this will implement their own submission of basf2 jobs
     to whatever backend they describe. Common methods/attributes go here.
     """
-
+    #: Default submission script name
     submit_script = "submit.sh"
 
     def __init__(self):
+        """
+        """
         pass
 
+    @abstractmethod
     def submit(self, job):
         """
         Base method for submitting collection jobs to the backend type. This MUST be
         implemented for a correctly written backend class deriving from Backend().
         """
-        raise NotImplementedError('Need to implement a submit() method in {} backend.'.format(self.__class__.__name__))
+        pass
 
     @staticmethod
     def _dump_input_data(job):
@@ -468,7 +483,7 @@ class Batch(Backend):
         """
         Init method for Batch Backend. Does default setup based on config file.
         """
-        self.subjobs_to_files = None
+        #: ConfigParser object containing some setup config for this class
         self.config = configparser.ConfigParser()
         self.config.read(default_config_file)
 
@@ -481,12 +496,12 @@ class Batch(Backend):
                                    "method in {} backend.".format(self.__class__.__name__)))
 
     @classmethod
+    @abstractmethod
     def _submit_to_batch(cls, cmd):
         """
         Do the actual batch submission command and collect the output to find out the job id for later monitoring.
         """
-        raise NotImplementedError(("Need to implement a _submit_to_batch(cls, cmd) "
-                                   "method in {} backend.".format(self.__class__.__name__)))
+        pass
 
     @method_dispatch
     def submit(self, job):
@@ -603,12 +618,18 @@ class Batch(Backend):
         B2INFO('All Requested Jobs Submitted')
 
     @classmethod
+    @abstractmethod
     def _create_job_result(cls, job, batch_output):
-        raise NotImplementedError("Need to implement a _create_job_result(job, batch_output) method")
+        """
+        """
+        pass
 
     @classmethod
+    @abstractmethod
     def _create_cmd(cls, job):
-        raise NotImplementedError("Need to implement a _create_cmd(job) method")
+        """
+        """
+        pass
 
 
 class PBS(Batch):
@@ -652,11 +673,15 @@ class PBS(Batch):
 
     @classmethod
     def _create_job_result(cls, job, batch_output):
+        """
+        """
         job_id = batch_output.replace("\n", "")
         job.result = cls.Result(job, job_id)
 
     @classmethod
     def _create_cmd(cls, script_path):
+        """
+        """
         submission_cmd = cls.submission_cmds[:]
         submission_cmd.append(script_path)
         return submission_cmd
@@ -666,7 +691,7 @@ class PBS(Batch):
         """
         Do the actual batch submission command and collect the output to find out the job id for later monitoring.
         """
-        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True)
+        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, env={})
         return sub_out
 
     class Result():
@@ -750,6 +775,8 @@ class LSF(Batch):
 
     @classmethod
     def _create_cmd(cls, script_path):
+        """
+        """
         submission_cmd = cls.submission_cmds[:]
         submission_cmd.append(script_path)
         submission_cmd = " ".join(submission_cmd)
@@ -806,6 +833,8 @@ class LSF(Batch):
 
     @classmethod
     def _create_job_result(cls, job, batch_output):
+        """
+        """
         job_id = batch_output.split(" ")[1]
         for wrap in ["<", ">"]:
             job_id = job_id.replace(wrap, "")

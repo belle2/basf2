@@ -27,6 +27,7 @@
 //root stuff
 #include "TTree.h"
 #include "TString.h"
+#include "TH1D.h"
 #include "TH2D.h"
 #include "TVector3.h"
 
@@ -69,6 +70,7 @@ namespace Belle2 {
 
 
 
+  private:
     /** helper functions to do some of the calculations*/
     /* returns the space point in local coordinates where the track hits the sensor:
       sensorInfo: info of the sensor under investigation
@@ -81,9 +83,12 @@ namespace Belle2 {
     int findClosestDigit(VxdID& vxdid, TVector3 intersection);
     int findClosestCluster(VxdID& vxdid, TVector3 intersection);
 
+    /*
+      Writes the dummy values to all the member variables later in the output
+      There should be a more elegant solution than this...
+     */
+    void dummyAllMaps();
 
-
-  private:
     //if true alignment will be used!
     bool m_useAlignment;
 
@@ -120,6 +125,8 @@ namespace Belle2 {
     std::map<VxdID, int> m_vcell_clus;
     std::map<VxdID, double> m_u_digi;
     std::map<VxdID, double> m_v_digi;
+    std::map<VxdID, double> m_ucell_digi;
+    std::map<VxdID, double> m_vcell_digi;
     std::map<VxdID, double> m_sigma_u_fit;
     std::map<VxdID, double> m_sigma_v_fit;
     std::map<VxdID, int> m_ucell_fit;
@@ -137,7 +144,7 @@ namespace Belle2 {
     std::map<VxdID, int> m_clus_vsize;
 
     //track quality indicators
-    double m_fit_pValue, m_fit_mom, m_fit_theta, m_fit_phi, m_fit_chi2;
+    double m_fit_pValue, m_fit_mom, m_fit_theta, m_fit_phi, m_fit_chi2, m_fit_charge, m_fit_x, m_fit_y, m_fit_z;
     int m_fit_ndf, m_event, m_run, m_subrun;
     std::map<VxdID, TH2D*> m_h_tracksdigit;
     std::map<VxdID, TH2D*> m_h_trackscluster;
@@ -146,6 +153,9 @@ namespace Belle2 {
     std::map<VxdID, TH2D*> m_h_tracksROI;
     std::map<VxdID, TH2D*> m_h_digitsROI;
     std::map<VxdID, TH2D*> m_h_clusterROI;
+
+    std::map<VxdID, TH1D*> m_h_frame_nr;
+    std::map<VxdID, TH2D*> m_h_broken_frame_pos;
 
     //ROI information
     std::map<VxdID, int> m_roi_number_of;
@@ -165,6 +175,9 @@ namespace Belle2 {
     std::map<VxdID, double> m_roi_v_residual;
     std::map<VxdID, int> m_roi_ucell_residual;
     std::map<VxdID, int> m_roi_vcell_residual;
+
+    std::map<VxdID, int> m_matched_frame;
+    std::map<VxdID, int> m_hit_count;
   };
 }
 

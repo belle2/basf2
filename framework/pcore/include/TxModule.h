@@ -6,8 +6,7 @@
 // Date : 13 - Aug - 2010
 //-
 
-#ifndef TXMODULE_H
-#define TXMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/pcore/RingBuffer.h>
@@ -76,5 +75,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

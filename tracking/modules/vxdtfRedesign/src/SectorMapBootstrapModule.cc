@@ -450,6 +450,11 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
                                  "The requested setup name was: " << m_setupToRead);
 
   rootFile.Close();
+
+  // delete the TString which was allocated by ROOT but not cleaned up
+  if (setupKeyName != nullptr) {
+    delete setupKeyName;
+  }
 }
 
 

@@ -30,18 +30,18 @@ CDCDedx2DCorrectionAlgorithm::CDCDedx2DCorrectionAlgorithm() : CalibrationAlgori
 CalibrationAlgorithm::EResult CDCDedx2DCorrectionAlgorithm::calibrate()
 {
   // Get data objects
-  auto& ttree = getObject<TTree>("tree");
+  auto ttree = getObjectPtr<TTree>("tree");
 
   // require at least 100 tracks (arbitrary for now)
-  if (ttree.GetEntries() < 100)
+  if (ttree->GetEntries() < 100)
     return c_NotEnoughData;
 
   std::vector<double>* dedx = 0, *doca = 0, *enta = 0;
   TBranch* bdedx = 0, *bdoca = 0, *benta = 0;
 
-  ttree.SetBranchAddress("dedxhit", &dedx, &bdedx);
-  ttree.SetBranchAddress("doca", &doca, &bdoca);
-  ttree.SetBranchAddress("enta", &enta, &benta);
+  ttree->SetBranchAddress("dedxhit", &dedx, &bdedx);
+  ttree->SetBranchAddress("doca", &doca, &bdoca);
+  ttree->SetBranchAddress("enta", &enta, &benta);
 
   const int ndbins = 10, nebins = 10;
   TH1F twodbin[ndbins][nebins];
@@ -52,8 +52,8 @@ CalibrationAlgorithm::EResult CDCDedx2DCorrectionAlgorithm::calibrate()
   }
 
   // fill histograms
-  for (unsigned int i = 0; i < ttree.GetEntries(); ++i) {
-    ttree.GetEvent(i);
+  for (unsigned int i = 0; i < ttree->GetEntries(); ++i) {
+    ttree->GetEvent(i);
     for (unsigned int j = 0; j < dedx->size(); ++j) {
       double myenta = enta->at(j);
 

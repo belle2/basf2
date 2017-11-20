@@ -62,7 +62,7 @@ namespace Belle2 {
       static constexpr const double c_simpleDriftLengthVariance = 0.000169;
 
       /// Default constructor for ROOT compatibility.
-      CDCWireHit();
+      CDCWireHit() = default;
 
       /**
        *  Constructor associating the CDCHit with estimates of the drift length and charge deposit.
@@ -73,11 +73,13 @@ namespace Belle2 {
        *  @param driftLength          Initial estimate of the drift length at the reference position.
        *  @param driftLengthVariance  Initial estimate of the variance of the dirft length at the reference position.
        *  @param chargeDeposit        Initial estimate of the deposited charge in the drift cell.
+       *  @param driftTime            Measured drift time
        */
       CDCWireHit(const CDCHit* ptrHit,
                  double driftLength,
                  double driftLengthVariance = c_simpleDriftLengthVariance,
-                 double chargeDeposit = 0);
+                 double chargeDeposit = 0,
+                 double driftTime = 0);
 
       /**
        *  Constructor for augmenting the CDCHit with the geometry information of the CDCWire.
@@ -300,6 +302,12 @@ namespace Belle2 {
         m_iSuperCluster = iSuperCluster;
       }
 
+      /// Return the drift time measured by the CDC for this hit
+      double getDriftTime() const
+      {
+        return m_refDriftTime;
+      }
+
     private:
       /// Memory for the WireID.
       WireID m_wireID;
@@ -321,6 +329,9 @@ namespace Belle2 {
 
       /// Memory for the super cluster id
       int m_iSuperCluster = -1;
+
+      /// Measured drift time of the CDC hit
+      double m_refDriftTime = 0.0f;
 
       /// Memory for the CDCHit pointer.
       const CDCHit* m_hit = nullptr;

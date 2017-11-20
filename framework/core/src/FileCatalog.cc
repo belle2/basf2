@@ -53,7 +53,7 @@ FileCatalog::FileCatalog() : m_fileName("")
   // check whether file exists and is readable, otherwise try to create it
   std::ifstream ifile(m_fileName.c_str());
   if (!ifile.good()) {
-    B2DEBUG(50, "Creating file catalog " << m_fileName);
+    B2DEBUG(100, "Creating file catalog " << m_fileName);
     FileSystem::Lock lock(m_fileName);
     if (!lock.lock()) {
       B2ERROR("Creation of file catalog " << m_fileName << " failed.");

@@ -141,8 +141,8 @@ void eclMuMuECollectorModule::collect()
   //..First event, record the muon kinematics
   if (iEvent == 0) {
     for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-      getObject<TH1F>("MuonLabPvsCellID0").SetBinContent(iECLCell + 1, MuPlab[iECLCell]);
-      getObject<TH1F>("MuonLabPvsCellID0").SetBinError(iECLCell + 1, 0);
+      getObjectPtr<TH1F>("MuonLabPvsCellID0")->SetBinContent(iECLCell + 1, MuPlab[iECLCell]);
+      getObjectPtr<TH1F>("MuonLabPvsCellID0")->SetBinError(iECLCell + 1, 0);
     }
   }
   if (iEvent % 10000 == 0) {B2INFO("eclMuMuECollector: iEvent = " << iEvent);}
@@ -262,7 +262,7 @@ void eclMuMuECollectorModule::collect()
       if (noNeighborSignal) {
         double eStore = EnergyPerCell[extCellID0[imu]];
         if (m_useTrueEnergy) {eStore = MCCalibConstant * TrueEnergy[imu];}
-        getObject<TH2F>("EmuVsCellID0").Fill(extCellID0[imu] + 0.001, eStore);
+        getObjectPtr<TH2F>("EmuVsCellID0")->Fill(extCellID0[imu] + 0.001, eStore);
       }
     }
   }

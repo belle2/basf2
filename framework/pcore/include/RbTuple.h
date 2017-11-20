@@ -1,5 +1,3 @@
-#ifndef RBTUPLE_H
-#define RBTUPLE_H
 //+
 // File : RbTuple.h
 // Description : Collect ROOT histogram/Ntuples from event processes
@@ -9,6 +7,7 @@
 // Modified : 27 - Jul - 2010, for pbasf2
 //-
 
+#pragma once
 
 #include <vector>
 #include <string>
@@ -75,4 +74,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-#endif

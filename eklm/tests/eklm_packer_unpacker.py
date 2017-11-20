@@ -72,6 +72,7 @@ class PackerUnpackerTest(Module):
             assert digit.getPlane() == digitUnpacked.getPlane()
             assert digit.getStrip() == digitUnpacked.getStrip()
             assert digit.getCharge() == digitUnpacked.getCharge()
+            assert digit.getFitStatus() == digitUnpacked.getFitStatus()
 
 
 main = create_path()

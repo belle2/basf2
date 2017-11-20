@@ -13,7 +13,6 @@
 #include <bklm/modules/bklmEffnRadio/BKLMEffnRadioModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
@@ -89,8 +88,8 @@ void BKLMEffnRadioModule::initialize()
 {
   m_eventCounter = 0;
   set_plot_style();
-  StoreArray<BKLMHit2d>::required();
-  StoreArray<BKLMHit1d>::required();
+  hits1D.isRequired();
+  hits2D.isRequired();
 
   m_file = new TFile(m_filename.c_str(), "recreate");
 
@@ -278,7 +277,6 @@ void BKLMEffnRadioModule::event()
   if (!(m_eventCounter % 1000))
     B2DEBUG(1, "looking at event nr " << m_eventCounter);
 
-  StoreArray<BKLMHit1d> hits1D;
   //   cout <<" we have " << hits1D.getEntries() << " 1D hits " << endl;
 
   m_hHitsPerEvent1D->Fill(hits1D.getEntries());
@@ -489,7 +487,6 @@ void BKLMEffnRadioModule::getEffs()
   //  cout <<"get Effs " <<endl;
 
 
-  StoreArray<BKLMHit2d> hits2D;
   m_GeoPar = GeometryPar::instance();
   //  cout <<"we have " <<hits2D.getEntries() <<" 2d hits " <<endl;
   m_hHitsPerEvent2D->Fill(hits2D.getEntries());
@@ -679,7 +676,7 @@ void BKLMEffnRadioModule::getEffs()
 
 
 //check if we find another hit in this module that is close to the track
-bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  StoreArray<BKLMHit2d>& hits2D,
+bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  StoreArray<BKLMHit2d>& bklmHits2D,
                                               vector<SimplePoint*>& points, const Belle2::bklm::Module* refMod, int effLayer)
 {
 
@@ -688,40 +685,40 @@ bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  Stor
     B2DEBUG(1, "point vector not empty...");
   }
 
-  int layer1 = hits2D[firstHit]->getLayer();
-  int sector1 = hits2D[firstHit]->getSector();
+  int layer1 = bklmHits2D[firstHit]->getLayer();
+  int sector1 = bklmHits2D[firstHit]->getSector();
   int fwd1 = 0;
 
-  if (hits2D[firstHit]->isForward())
+  if (bklmHits2D[firstHit]->isForward())
     fwd1 = 1;
 
-  int layer2 = hits2D[secondHit]->getLayer();
-  int sector2 = hits2D[secondHit]->getSector();
+  int layer2 = bklmHits2D[secondHit]->getLayer();
+  int sector2 = bklmHits2D[secondHit]->getSector();
   int fwd2 = 0;
 
-  if (hits2D[secondHit]->isForward())
+  if (bklmHits2D[secondHit]->isForward())
     fwd2 = 1;
 
 
-  for (int h = 0; h < hits2D.getEntries(); ++h) {
-    int layer = hits2D[h]->getLayer();
-    int sector = hits2D[h]->getSector();
+  for (int h = 0; h < bklmHits2D.getEntries(); ++h) {
+    int layer = bklmHits2D[h]->getLayer();
+    int sector = bklmHits2D[h]->getSector();
     if (layer == effLayer)
       continue;
     //differnt layer, same sector
     if ((layer == layer1) || (layer == layer2))
       continue;
     //same sector necessary? probably not, the test is pretty simple...
-    if ((sector != sector1) || (sector != sector2) || (fwd1 != hits2D[h]->isForward()) || (fwd2 != fwd1))
+    if ((sector != sector1) || (sector != sector2) || (fwd1 != bklmHits2D[h]->isForward()) || (fwd2 != fwd1))
       continue;
     //don't use points that are already part of other tracks... So don't allow sharing
     //tried only to disallow the same seeds but that doesn't seem to be enough...
     if (m_pointIndices.find(h) != m_pointIndices.end())
       continue;
 
-    TVector3 gl1 = hits2D[firstHit]->getGlobalPosition();
-    TVector3 gl2 = hits2D[secondHit]->getGlobalPosition();
-    TVector3 gl = hits2D[h]->getGlobalPosition();
+    TVector3 gl1 = bklmHits2D[firstHit]->getGlobalPosition();
+    TVector3 gl2 = bklmHits2D[secondHit]->getGlobalPosition();
+    TVector3 gl = bklmHits2D[h]->getGlobalPosition();
     TVector3 diff1 = gl1 - gl;
     TVector3 diff2 = gl2 - gl;
     //if gl, gl1 and gl2 lie on the same line (track), the angle between the respective difference vectors should be small..
@@ -741,7 +738,7 @@ bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  Stor
       //we found a point on the track, so let's add it to the points of the track...
       //but first translate it into the reference coordinate system
 
-      TVector3 candGlPos = hits2D[h]->getGlobalPosition();
+      TVector3 candGlPos = bklmHits2D[h]->getGlobalPosition();
       Hep3Vector candGlPos_cl(candGlPos.x(), candGlPos.y(), candGlPos.z());
       const Hep3Vector candLocPos_cl = refMod->globalToLocal(candGlPos_cl);
       SimplePoint* p = new SimplePoint;
@@ -757,7 +754,7 @@ bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  Stor
   if ((int)points.size() >= m_minNumPointsOnTrack - 2) {
     //add seed points
 
-    TVector3 candGlPos = hits2D[firstHit]->getGlobalPosition();
+    TVector3 candGlPos = bklmHits2D[firstHit]->getGlobalPosition();
     Hep3Vector candGlPos_cl(candGlPos.x(), candGlPos.y(), candGlPos.z());
     const Hep3Vector candLocPos_cl = refMod->globalToLocal(candGlPos_cl);
     SimplePoint* p = new SimplePoint;
@@ -766,7 +763,7 @@ bool BKLMEffnRadioModule::validTrackCandidate(int firstHit, int secondHit,  Stor
     p->z = candLocPos_cl.z();
     points.push_back(p);
 
-    candGlPos = hits2D[secondHit]->getGlobalPosition();
+    candGlPos = bklmHits2D[secondHit]->getGlobalPosition();
     Hep3Vector candGlPos_cl2(candGlPos.x(), candGlPos.y(), candGlPos.z());
     const Hep3Vector candLocPos_cl2 = refMod->globalToLocal(candGlPos_cl2);
     SimplePoint* p2 = new SimplePoint;

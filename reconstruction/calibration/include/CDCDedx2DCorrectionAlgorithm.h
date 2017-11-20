@@ -43,6 +43,5 @@ namespace Belle2 {
 
   private:
 
-    ClassDef(CDCDedx2DCorrectionAlgorithm, 0); /**< Class for CDC dE/dx 2D correction **/
   };
 } // namespace Belle2

@@ -42,6 +42,7 @@ class TestRCCallback(RCCallback):
     def monitor(self):
         return
 
+
 if __name__ == '__main__':
     callback = TestRCCallback()
     callback.run("runcontrol")

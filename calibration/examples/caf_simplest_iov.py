@@ -50,5 +50,6 @@ def main(argv):
     cal_fw.run(iov=iov_to_calibrate)
     print("End of CAF processing.")
 
+
 if __name__ == "__main__":
     main(sys.argv[1:])

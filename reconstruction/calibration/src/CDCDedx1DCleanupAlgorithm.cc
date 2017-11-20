@@ -9,6 +9,9 @@
  **************************************************************************/
 
 #include <reconstruction/calibration/CDCDedx1DCleanupAlgorithm.h>
+#include <TF1.h>
+#include <TH1F.h>
+#include <TTree.h>
 
 using namespace Belle2;
 
@@ -30,17 +33,17 @@ CDCDedx1DCleanupAlgorithm::CDCDedx1DCleanupAlgorithm() : CalibrationAlgorithm("C
 CalibrationAlgorithm::EResult CDCDedx1DCleanupAlgorithm::calibrate()
 {
   // Get data objects
-  auto& ttree = getObject<TTree>("tree");
+  auto ttree = getObjectPtr<TTree>("tree");
 
   // require at least 100 tracks (arbitrary for now)
-  if (ttree.GetEntries() < 100)
+  if (ttree->GetEntries() < 100)
     return c_NotEnoughData;
 
   std::vector<double>* dedx = 0, *enta = 0;
   TBranch* bdedx = 0, *benta = 0;
 
-  ttree.SetBranchAddress("dedxhit", &dedx, &bdedx);
-  ttree.SetBranchAddress("enta", &enta, &benta);
+  ttree->SetBranchAddress("dedxhit", &dedx, &bdedx);
+  ttree->SetBranchAddress("enta", &enta, &benta);
 
   // make histograms to store dE/dx values in bins of entrance angle
   const int nbins = 20;
@@ -51,8 +54,8 @@ CalibrationAlgorithm::EResult CDCDedx1DCleanupAlgorithm::calibrate()
   }
 
   // fill histograms
-  for (int i = 0; i < ttree.GetEntries(); ++i) {
-    ttree.GetEvent(i);
+  for (int i = 0; i < ttree->GetEntries(); ++i) {
+    ttree->GetEvent(i);
     for (unsigned int j = 0; j < dedx->size(); ++j) {
       double myenta = enta->at(j);
 

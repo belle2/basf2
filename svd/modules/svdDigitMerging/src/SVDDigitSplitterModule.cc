@@ -63,7 +63,7 @@ void SVDDigitSplitterModule::initialize()
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
-  storeShaperDigits.required();
+  storeShaperDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
 

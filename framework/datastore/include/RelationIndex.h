@@ -7,8 +7,7 @@
  *                                                                        *
  **************************************************************************/
 
-#ifndef RelationIndex_H
-#define RelationIndex_H
+#pragma once
 
 #include <framework/datastore/RelationIndexManager.h>
 
@@ -248,4 +247,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-#endif

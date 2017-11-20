@@ -32,13 +32,13 @@
 
 void calib4_printPayloads(){
   std::cout << "Run gain corrections:" << std::endl;  
-  TFile* runfile = new TFile("calibration_results/CDCDedxRunGainCalibration/outputdb/dbstore_CDCDedxRunGain_rev_1.root");
+  TFile* runfile = new TFile("calibration_results/CDCDedxCalibrations/outputdb/dbstore_CDCDedxRunGain_rev_1.root");
   Belle2::CDCDedxRunGain* rg = (Belle2::CDCDedxRunGain*)runfile->Get("CDCDedxRunGain");
   std::cout << rg->getRunGain() << std::endl;
   
   TH1F* hwg = new TH1F("hwg",";Wire Number (continuous);Wire Gains",14336,-0.5,14335.5);
   std::cout << "Wire gain corrections:" << std::endl;  
-  TFile* wirefile = new TFile("calibration_results/CDCDedxWireGainCalibration/outputdb/dbstore_CDCDedxWireGain_rev_1.root");
+  TFile* wirefile = new TFile("calibration_results/CDCDedxCalibrations/outputdb/dbstore_CDCDedxWireGain_rev_1.root");
   Belle2::CDCDedxWireGain* wg = (Belle2::CDCDedxWireGain*)wirefile->Get("CDCDedxWireGain");
   for( int i = 0; i < 14336; ++i ){
     hwg->SetBinContent(i,wg->getWireGain(i));
@@ -49,7 +49,7 @@ void calib4_printPayloads(){
   hwg->Draw();
 
   std::cout << "Cosine corrections:" << std::endl;
-  TFile* cosfile = new TFile("calibration_results/CDCDedxCosineCalibration/outputdb/dbstore_CDCDedxCosineCor_rev_1.root");
+  TFile* cosfile = new TFile("calibration_results/CDCDedxCalibrations/outputdb/dbstore_CDCDedxCosineCor_rev_1.root");
   Belle2::CDCDedxCosineCor* cc = (Belle2::CDCDedxCosineCor*)cosfile->Get("CDCDedxCosineCor");
   const int ncbins = cc->getNBins();
   std::cout << "cosine: " << ncbins << std::endl;
@@ -64,7 +64,7 @@ void calib4_printPayloads(){
   hcg->Draw();
 
   std::cout << "2D corrections:" << std::endl;
-  TFile* twodfile = new TFile("calibration_results/CDCDedx2DCalibration/outputdb/dbstore_CDCDedx2DCor_rev_1.root");
+  TFile* twodfile = new TFile("calibration_results/CDCDedxCalibrations/outputdb/dbstore_CDCDedx2DCor_rev_1.root");
   Belle2::CDCDedx2DCor* twod = (Belle2::CDCDedx2DCor*)twodfile->Get("CDCDedx2DCor");
   const TH2F* h2d = twod->getHist();
   TCanvas* can4 = new TCanvas("can4","",600,600);
@@ -72,7 +72,7 @@ void calib4_printPayloads(){
   h2d->DrawCopy("colz");
 
   std::cout << "1D cleanup:" << std::endl;
-  TFile* onedfile = new TFile("calibration_results/CDCDedx1DCleanup/outputdb/dbstore_CDCDedx1DCleanup_rev_1.root");
+  TFile* onedfile = new TFile("calibration_results/CDCDedxCalibrations/outputdb/dbstore_CDCDedx1DCleanup_rev_1.root");
   Belle2::CDCDedx1DCleanup* oned = (Belle2::CDCDedx1DCleanup*)onedfile->Get("CDCDedx1DCleanup");
   const int n1dbins = oned->getNBins();
   std::cout << "1D: " << n1dbins << std::endl;

@@ -101,7 +101,7 @@ void Framework::process(PathPtr startPath, long maxEvent)
     for (auto m : moduleListUnique) {
       if (previously_run_modules.count(m.get()) > 0) {
         //only clone if modules have been run before
-        startPath = boost::static_pointer_cast<Path>(startPath->clone());
+        startPath = std::static_pointer_cast<Path>(startPath->clone());
         break;
       }
     }

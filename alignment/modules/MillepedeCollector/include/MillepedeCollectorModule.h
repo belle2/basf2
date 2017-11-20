@@ -16,6 +16,7 @@
 #include <genfit/StateOnPlane.h>
 #include <genfit/MeasuredStateOnPlane.h>
 #include <analysis/dataobjects/Particle.h>
+#include <genfit/GblTrajectory.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -42,10 +43,10 @@ namespace Belle2 {
     virtual void collect();
 
     /** Only for closing mille binaries after each run */
-    virtual void endRun();
+    virtual void closeRun();
 
     /** Register mille binaries in file catalog */
-    virtual void terminate();
+    virtual void finish();
 
     /** Make a name for mille binary (encodes module name + starting exp, run and event + process id) */
     std::string getUniqueMilleName();

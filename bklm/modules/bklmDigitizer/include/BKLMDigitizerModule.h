@@ -14,6 +14,9 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <eklm/simulation/FPGAFitter.h>
+#include <bklm/dbobjects/BKLMScinDigitizationParams.h>
+#include <bklm/dbobjects/BKLMADCThreshold.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <map>
 
@@ -116,9 +119,29 @@ namespace Belle2 {
     //! FPGA's ADC range (# of channels for full range)
     int m_ADCRange;
 
+    //! MPPC's gain
+    double m_MPPCGain;
+
+    //! ADC offset
+    int m_ADCOffset;
+
+    //! ADC thrshold
+    double m_ADCThreshold;
+
     //! User parameter: Discriminator threshold (# of photoelectrons)
     double m_discriminatorThreshold;
 
+    //! Scintillator digitization params read from database
+    DBObjPtr<BKLMScinDigitizationParams> m_digitParams;
+
+    //! MPPC gain, pedestal and threshold read from database
+    DBObjPtr<BKLMADCThreshold> m_ADCParams;
+
+    //! simHits StoreArray
+    StoreArray<BKLMSimHit> simHits;
+
+    //! digits StoreArray
+    StoreArray<BKLMDigit> bklmDigits;
   };
 
 } // end of namespace Belle2

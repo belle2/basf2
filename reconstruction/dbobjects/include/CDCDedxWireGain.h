@@ -31,7 +31,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedxWireGain(std::vector<double>& wiregains): m_wiregains(wiregains) {};
+    explicit CDCDedxWireGain(std::vector<double>& wiregains): m_wiregains(wiregains) {};
 
     /**
      * Destructor
@@ -55,6 +55,6 @@ namespace Belle2 {
     std::vector<double> m_wiregains; /**< dE/dx gains for each wire */
 
 
-    ClassDef(CDCDedxWireGain, 2); /**< ClassDef */
+    ClassDef(CDCDedxWireGain, 3); /**< ClassDef */
   };
 } // end namespace Belle2

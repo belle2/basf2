@@ -74,6 +74,18 @@ namespace Belle2 {
     int m_size;
   };
 
+  CPRHANDLER_INT_GET(NSMVHandlerOutputPort);
+  CPRHANDLER_INT_GET(NSMVHandlerCOPPERROPID);
+  CPRHANDLER_INT_GET(NSMVHandlerFifoEmpty);
+  CPRHANDLER_INT_GET(NSMVHandlerFifoFull);
+  CPRHANDLER_INT_GET(NSMVHandlerLengthFifoFull);
+  CPRHANDLER_INT_GET(NSMVHandlerHSLBBelle2LinkDown);
+  CPRHANDLER_INT_GET(NSMVHandlerHSLBCOPPERFifoFull);
+  CPRHANDLER_INT_GET(NSMVHandlerHSLBCOPPERLengthFifoFull);
+  CPRHANDLER_INT_GET(NSMVHandlerHSLBFifoFull);
+  CPRHANDLER_INT_GET(NSMVHandlerHSLBCRCError);
+  CPRHANDLER_INT_GET(NSMVHandlerTTRXBelle2LinkError);
+  CPRHANDLER_INT_GET(NSMVHandlerTTRXLinkUpError);
   class NSMVHandlerHSLBUsed : public NSMVHandlerInt, HandlerCPR {
   public:
     NSMVHandlerHSLBUsed(COPPERCallback& callback, const std::string& name,
@@ -84,11 +96,17 @@ namespace Belle2 {
     virtual bool handleGetInt(int& val);
     virtual bool handleSetInt(int val);
   };
-  CPRHANDLER_TEXT_GET(NSMVHandlerHSLBTest);
-  CPRHANDLER_TEXT(NSMVHandlerTTRXBoot);
+  CPRHANDLER_INT(NSMVHandlerHSLBRegValue);
+  CPRHANDLER_INT(NSMVHandlerHSLBRegFixed);
   CPRHANDLER_TEXT(NSMVHandlerHSLBBoot);
+  CPRHANDLER_TEXT_GET(NSMVHandlerHSLBTest);
+  //CPRHANDLER_TEXT_GET(NSMVHandlerHSLBCheckFee);
+  CPRHANDLER_TEXT(NSMVHandlerTTRXFirmware);
+  CPRHANDLER_TEXT(NSMVHandlerHSLBFirmware);
+  CPRHANDLER_TEXT(NSMVHandlerFEEStream);
   CPRHANDLER_TEXT(NSMVHandlerFEEBoot);
   CPRHANDLER_TEXT(NSMVHandlerFEELoad);
+  CPRHANDLER_INT_SET(NSMVHandlerFEELoadAll);
 
 }
 

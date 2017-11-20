@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROOTINPUTMODULE_H
-#define ROOTINPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
@@ -219,5 +218,3 @@ namespace Belle2 {
     int m_cacheSize{0};
   };
 } // end namespace Belle2
-
-#endif

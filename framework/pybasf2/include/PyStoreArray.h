@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef PYSTOREARRAY_H
-#define PYSTOREARRAY_H
+
+#pragma once
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreAccessorBase.h>
@@ -18,7 +18,6 @@
 class TClonesArray;
 class TClass;
 class TObject;
-
 
 #include <string>
 
@@ -222,4 +221,3 @@ namespace Belle2 {
     mutable StoreEntry* m_storeEntry = nullptr;
   };
 }
-#endif

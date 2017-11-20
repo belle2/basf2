@@ -1,8 +1,5 @@
 #include "trg/cdc/modules/trgcdc/CDCTriggerTSFModule.h"
 
-#include <framework/datastore/StoreArray.h>
-#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
-#include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -69,19 +66,18 @@ void
 CDCTriggerTSFModule::initialize()
 {
   // register DataStore elements
-  StoreArray<CDCTriggerSegmentHit>::registerPersistent(m_TSHitCollectionName);
-  StoreArray<CDCHit>::required(m_CDCHitCollectionName);
+  m_segmentHits.registerInDataStore(m_TSHitCollectionName);
+  m_cdcHits.isRequired(m_CDCHitCollectionName);
   if (m_makeTrueLRTable) {
-    StoreArray<CDCSimHit>::required();
+    StoreArray<CDCSimHit> simhits;
+    simhits.isRequired();
     innerTrueLRTable.assign(pow(2, 16), vector<unsigned>(3, 0));
     outerTrueLRTable.assign(pow(2, 12), vector<unsigned>(3, 0));
   }
   // register relations
-  StoreArray<CDCTriggerSegmentHit> segmentHits(m_TSHitCollectionName);
-  StoreArray<CDCHit> cdcHits(m_CDCHitCollectionName);
   StoreArray<MCParticle> mcparticles;
-  segmentHits.registerRelationTo(cdcHits);
-  mcparticles.registerRelationTo(segmentHits);
+  m_segmentHits.registerRelationTo(m_cdcHits);
+  mcparticles.registerRelationTo(m_segmentHits);
 
   // Prepare track segment shapes.
   // First a structure of wires is created for all layers and super layers.
@@ -260,16 +256,14 @@ CDCTriggerTSFModule::initialize()
 void
 CDCTriggerTSFModule::event()
 {
-  StoreArray<CDCHit> CDCHits(m_CDCHitCollectionName);
-  StoreArray<CDCTriggerSegmentHit> TSHits(m_TSHitCollectionName);
   CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
 
   // fill CDCHits into track segment shapes
 
   //...Loop over CDCHits...
-  for (int i = 0; i < CDCHits.getEntries(); ++i) {
+  for (int i = 0; i < m_cdcHits.getEntries(); ++i) {
     // get the wire
-    const CDCHit& h = *CDCHits[i];
+    const CDCHit& h = *m_cdcHits[i];
     TRGCDCWire& w =
       (TRGCDCWire&) superLayers[h.getISuperLayer()][h.getILayer()]->cell(h.getIWire());
 
@@ -301,22 +295,22 @@ CDCTriggerTSFModule::event()
       // for clock simulation already done in simulate
       // TODO: move it to simulate also for simulateWithoutClock?
       if (!m_clockSimulation && s.signal().active()) {
-        const CDCHit* priorityHit = CDCHits[s.priority().hit()->iCDCHit()];
+        const CDCHit* priorityHit = m_cdcHits[s.priority().hit()->iCDCHit()];
         const CDCTriggerSegmentHit* tsHit =
-          TSHits.appendNew(*priorityHit,
-                           s.id(),
-                           s.priorityPosition(),
-                           s.LUT()->getValue(s.lutPattern()),
-                           s.priorityTime(),
-                           s.fastestTime(),
-                           s.foundTime());
+          m_segmentHits.appendNew(*priorityHit,
+                                  s.id(),
+                                  s.priorityPosition(),
+                                  s.LUT()->getValue(s.lutPattern()),
+                                  s.priorityTime(),
+                                  s.fastestTime(),
+                                  s.foundTime());
         // relation to all CDCHits in segment
         for (unsigned iw = 0; iw < s.wires().size(); ++iw) {
           const TRGCDCWire* wire = (TRGCDCWire*)s[iw];
           if (wire->signal().active()) {
             // priority wire has relation weight 2
             double weight = (wire == &(s.priority())) ? 2. : 1.;
-            tsHit->addRelationTo(CDCHits[wire->hit()->iCDCHit()], weight);
+            tsHit->addRelationTo(m_cdcHits[wire->hit()->iCDCHit()], weight);
           }
         }
         // relation to MCParticles (same as priority hit)

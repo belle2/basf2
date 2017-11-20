@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MRUCACHE_H
-#define MRUCACHE_H
+#pragma once
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
@@ -163,5 +162,3 @@ namespace Belle2 {
     unsigned int m_overflows;
   };
 }
-
-#endif

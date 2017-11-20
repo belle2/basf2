@@ -61,7 +61,9 @@ reconstructDecay('D*+ -> D0:kpi pi+:all', '0.0 < Q < 0.020 and 2.5 < useCMSFrame
 matchMCTruth('D*+')
 
 # add the ParticleMCDecayString module to the analysis
-analysis_main.add_module('ParticleMCDecayString', listName='D*+')
+# More details on the format of the MC decay string can be found here:
+# https://confluence.desy.de/display/BI/Physics+MCDecayString
+analysis_main.add_module('ParticleMCDecayString', listName='D*+', conciseString=False)
 
 # create and fill flat Ntuple with MCTruth and kinematic information
 toolsDST = ['EventMetaData', '^D*+']

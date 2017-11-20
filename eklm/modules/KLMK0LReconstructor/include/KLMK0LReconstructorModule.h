@@ -13,7 +13,10 @@
 
 /* Belle2 headers. */
 #include <eklm/geometry/GeometryData.h>
+#include <eklm/modules/KLMK0LReconstructor/KLMHit2d.h>
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/KLMCluster.h>
 
 namespace Belle2 {
 
@@ -96,6 +99,15 @@ namespace Belle2 {
 
     /** Clusterization mode. */
     enum ClusterMode m_ClusterMode;
+
+    /** KLM clusters. */
+    StoreArray<KLMCluster> m_KLMClusters;
+
+    /** BKLM 2d hits. */
+    StoreArray<BKLMHit2d> m_BKLMHit2ds;
+
+    /** EKLM 2d hits. */
+    StoreArray<EKLMHit2d> m_EKLMHit2ds;
 
   };
 

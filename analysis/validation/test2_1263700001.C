@@ -129,13 +129,15 @@ void plotUpsSL(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_DstarMomentum->Write();
   h_DstarMass->Write();
   h_Dmass->Write();
+  h_missM2->Write();
+  h_missP->Write();
 
 }
 
 
 void test2_1263700001(){
 
-  TString inputfile("1263700001.ntup.root");
+  TString inputfile("../1263700001.ntup.root");
   TFile* sample = new TFile(inputfile);
   TTree* treeUpsHad = (TTree*)sample->Get("UpsBplusHad");
   TTree* treeUpsSL = (TTree*)sample->Get("UpsBplusSl");

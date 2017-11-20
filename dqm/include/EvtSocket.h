@@ -22,6 +22,7 @@ namespace Belle2 {
   class EvtSocketSend {
   public:
     EvtSocketSend(std::string hostname, int port);
+    EvtSocketSend(const EvtSocketSend& es);
     ~EvtSocketSend();
 
     int status();
@@ -43,6 +44,7 @@ namespace Belle2 {
   class EvtSocketRecv {
   public:
     EvtSocketRecv(int port, bool accept_at_init = true);
+    EvtSocketRecv(const EvtSocketRecv& es);
     ~EvtSocketRecv();
 
     int status();

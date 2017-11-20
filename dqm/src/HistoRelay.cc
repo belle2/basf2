@@ -24,6 +24,13 @@ HistoRelay::HistoRelay(string& file, string& dest, int port)
   m_msg = NULL;
 }
 
+HistoRelay::HistoRelay(const HistoRelay& hr)
+{
+  m_memfile = hr.m_memfile;
+  m_sock = hr.m_sock;
+  m_msg = NULL;
+}
+
 HistoRelay::~HistoRelay()
 {
   delete m_memfile;

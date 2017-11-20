@@ -18,6 +18,12 @@ EvtSocketSend::EvtSocketSend(std::string host, int port)
   m_recbuf = new char[MAXEVTSIZE];
 }
 
+EvtSocketSend::EvtSocketSend(const EvtSocketSend& es)
+{
+  m_sock = es.m_sock;
+  m_recbuf = new char[MAXEVTSIZE];
+}
+
 EvtSocketSend::~EvtSocketSend()
 {
   delete m_sock;
@@ -70,6 +76,12 @@ EvtSocketRecv::EvtSocketRecv(int port, bool accept_at_init)
   m_recbuf = new char[MAXEVTSIZE];
   if (accept_at_init)
     m_sock->accept();
+}
+
+EvtSocketRecv::EvtSocketRecv(const EvtSocketRecv& es)
+{
+  m_sock = es.m_sock;
+  m_recbuf = new char[MAXEVTSIZE];
 }
 
 EvtSocketRecv::~EvtSocketRecv()

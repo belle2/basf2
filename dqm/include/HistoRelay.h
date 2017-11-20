@@ -21,6 +21,7 @@ namespace Belle2 {
   class HistoRelay {
   public:
     HistoRelay(std::string& filename, std::string& dest, int port);
+    HistoRelay(const HistoRelay& hr);
     ~HistoRelay();
 
     int collect();

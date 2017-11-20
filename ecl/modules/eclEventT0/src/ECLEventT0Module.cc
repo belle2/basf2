@@ -35,9 +35,7 @@ ECLEventT0Module::ECLEventT0Module() : Module()
   addParam("ethresh", m_ethresh, "Minimum energy for a CalDigit to be used", 0.1);
   addParam("stdDevNom", m_stdDevNom, "Nominal time resolution ns for a CalDigit with E=ethresh", 20.);
   addParam("stdDevLarge", m_stdDevLarge, "Reported resolution for events with 0 or 1 selected CalDigits", 1000.);
-
-  // Parameter definitions
-
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 void ECLEventT0Module::initialize()

@@ -144,13 +144,22 @@ YmaxForQrPlot = 0
 
 for method in methods:
     # bekommt man mit GetBinError(), setzten mit SetBinError()
-    # histogram contains the average r in each of 6 bins -> calculation see below
-    histo_avr_r = ROOT.TH1F('Average_r', 'Average r in each of 6 bins (B0 and B0bar)', 6,
+    # histogram contains the average r in each of 7 bins -> calculation see below
+    histo_avr_r = ROOT.TH1F('Average_r', 'Average r in each of 6 bins (B0 and B0bar)', int(r_size - 2),
                             r_subsample)
-    histo_avr_rB0 = ROOT.TH1F('Average_rB0', 'Average r in each of 6 bins (B0)', 6,
+    histo_avr_rB0 = ROOT.TH1F('Average_rB0', 'Average r in each of 6 bins (B0)', int(r_size - 2),
                               r_subsample)
-    histo_avr_rB0bar = ROOT.TH1F('Average_rB0bar', 'Average r in each of 6 bins (B0bar)', 6,
+    histo_avr_rB0bar = ROOT.TH1F('Average_rB0bar', 'Average r in each of 6 bins (B0bar)', int(r_size - 2),
                                  r_subsample)
+
+    # histogram contains the mean squared of r in each of 7 bins -> calculation see below
+    histo_ms_r = ROOT.TH1F('MS_r', 'Mean squared average of r in each of 6 bins (B0 and B0bar)', 6,
+                           r_subsample)
+    histo_ms_rB0 = ROOT.TH1F('MS_rB0', 'Mean squared average of r in each of 6 bins (B0)', 6,
+                             r_subsample)
+    histo_ms_rB0bar = ROOT.TH1F('MS_rB0bar', 'Mean squared average of r in each of 6 bins (B0bar)', 6,
+                                r_subsample)
+
     # histogram with number of entries in for each bin
     histo_entries_per_bin = ROOT.TH1F(
         'entries_per_bin',
@@ -176,6 +185,11 @@ for method in methods:
     histo_belleplotB0bar = ROOT.TH1F('BellePlot_B0Bar',
                                      'BellePlot for true B0Bar (binning 50)',
                                      50, -1.0, 1.0)
+
+    histo_notTaggedEvents = ROOT.TH1F('notTaggedEvents',
+                                      'Histogram for not tagged events',
+                                      1, -3.0, -1.0)
+
     # calibration plot for B0. If we get a linaer line our MC is fine, than the assumption r ~ 1- 2w is reasonable
     # expectation is, that for B0 calibration plot:  qr=0  half B0 and half B0bar, qr = 1 only B0 and qr = -1
     # no B0. Inverse for B0bar calibration plot
@@ -210,6 +224,14 @@ for method in methods:
     tree.Draw('B0_' + method + '_qrCombined>>Calibration_B0', 'B0_qrMC == 1')
     tree.Draw('B0_' + method + '_qrCombined>>Calibration_B0Bar', 'B0_qrMC == -1')
 
+    tree.Draw(
+        'B0_' +
+        method +
+        '_qrCombined>>notTaggedEvents',
+        'abs(B0_qrMC) == 0 && B0_isSignal == 1 && B0_' +
+        method +
+        '_qrCombined < -1')
+
     # filling histograms wrong efficiency calculation
     tree.Draw('B0_' + method + '_qrCombined>>BellePlot_B0_m0',
               'B0_qrMC == 1 && B0_' + method + '_qrCombined>0')
@@ -221,10 +243,16 @@ for method in methods:
     # filling with abs(qr) in one of 6 bins with its weight
     # separate calculation for B0 and B0bar
 
-    tree.Project('Average_r', 'abs(B0_' + method + '_qrCombined)',
-                 'abs(B0_' + method + '_qrCombined)')
+    tree.Project('Average_r', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_' + method + '_qrCombined)*(abs(B0_qrMC) == 1)')
     tree.Project('Average_rB0', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_' + method + '_qrCombined)*(B0_qrMC==1)')
     tree.Project('Average_rB0bar', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_' + method + '_qrCombined)*(B0_qrMC==-1)')
+
+    tree.Project('MS_r', 'abs(B0_' + method + '_qrCombined)', '(B0_' + method +
+                 '_qrCombined*B0_' + method + '_qrCombined)*(abs(B0_qrMC) == 1)')
+    tree.Project('MS_rB0', 'abs(B0_' + method + '_qrCombined)',
+                 '(B0_' + method + '_qrCombined*B0_' + method + '_qrCombined)*(B0_qrMC==1)')
+    tree.Project('MS_rB0bar', 'abs(B0_' + method + '_qrCombined)',
+                 '(B0_' + method + '_qrCombined*B0_' + method + '_qrCombined)*(B0_qrMC==-1)')
 
     # filling with abs(qr) in one of 6 bins
     tree.Project('entries_per_bin', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_qrMC) == 1')
@@ -235,6 +263,10 @@ for method in methods:
     histo_avr_r.Divide(histo_entries_per_bin)
     histo_avr_rB0.Divide(histo_entries_per_binB0)
     histo_avr_rB0bar.Divide(histo_entries_per_binB0bar)
+
+    histo_ms_r.Divide(histo_entries_per_bin)
+    histo_ms_rB0.Divide(histo_entries_per_binB0)
+    histo_ms_rB0bar.Divide(histo_entries_per_binB0bar)
 
     # producing the calibration plots
     # Errors ok
@@ -252,11 +284,18 @@ for method in methods:
     print('****************** MEASURED EFFECTIVE EFFICIENCY FOR COMBINER USING ' + method + ' ***************************')
     print('*                                                                                                  *')
     # get total number of entries
-    total_entries = histo_entries_per_bin.GetEntries()
-    total_entries_B0 = histo_entries_per_binB0.GetEntries()
-    total_entries_B0bar = histo_entries_per_binB0bar.GetEntries()
+    total_tagged = histo_entries_per_bin.GetEntries()
+    total_tagged_B0 = histo_entries_per_binB0.GetEntries()
+    total_tagged_B0bar = histo_entries_per_binB0bar.GetEntries()
+    total_notTagged = histo_notTaggedEvents.GetEntries()
+    total_entries = (total_tagged + total_notTagged)
+    tagging_eff = total_tagged / (total_tagged + total_notTagged)
+    DeltaTagging_eff = math.sqrt(total_tagged * total_notTagged**2 + total_notTagged * total_tagged**2) / (total_entries**2)
     tot_eff_effB0 = 0
     tot_eff_effB0bar = 0
+    uncertainty_eff_effB0 = 0
+    uncertainty_eff_effB0bar = 0
+    uncertainty_eff_effAverage = 0
     event_fractionB0 = array('f', [0] * r_size)
     event_fractionB0bar = array('f', [0] * r_size)
     event_fractionTotal = array('f', [0] * r_size)
@@ -264,21 +303,31 @@ for method in methods:
     rvalueB0 = array('f', [0] * r_size)
     rvalueB0bar = array('f', [0] * r_size)
     rvalueB0Average = array('f', [0] * r_size)
+    rvalueStdB0 = array('f', [0] * r_size)
+    rvalueStdB0bar = array('f', [0] * r_size)
+    rvalueStdB0Average = array('f', [0] * r_size)
     wvalue = array('f', [0] * r_size)
+    wvalueUncertainty = array('f', [0] * r_size)
     wvalueB0 = array('f', [0] * r_size)
     wvalueB0bar = array('f', [0] * r_size)
     wvalueDiff = array('f', [0] * r_size)
+    wvalueDiffUncertainty = array('f', [0] * r_size)
     entries = array('f', [0] * r_size)
     entriesB0 = array('f', [0] * r_size)
     entriesB0bar = array('f', [0] * r_size)
     iEffEfficiency = array('f', [0] * r_size)
+    iEffEfficiencyUncertainty = array('f', [0] * r_size)
+    iEffEfficiencyB0Uncertainty = array('f', [0] * r_size)
+    iEffEfficiencyB0barUncertainty = array('f', [0] * r_size)
     iDeltaEffEfficiency = array('f', [0] * r_size)
+    iDeltaEffEfficiencyUncertainty = array('f', [0] * r_size)
+    diff_eff_Uncertainty = 0
     # intervallEff = array('f', [0] * r_size)
 
     print('*                 -->  DETERMINATION BASED ON MONTE CARLO                                          *')
     print('*                                                                                                  *')
     print('* ------------------------------------------------------------------------------------------------ *')
-    print('*   r-interval        <r>        Efficiency       Delta_Efficiency        w         Delta_w        *')
+    print('*   r-interval        <r>   Efficiency    Delta_Efficiency          w               Delta_w        *')
     print('* ------------------------------------------------------------------------------------------------ *')
     performance = []
     for i in range(1, r_size):
@@ -286,55 +335,116 @@ for method in methods:
         rvalueB0[i] = histo_avr_rB0.GetBinContent(i)
         rvalueB0bar[i] = histo_avr_rB0bar.GetBinContent(i)
         rvalueB0Average[i] = (rvalueB0[i] + rvalueB0bar[i]) / 2
+        # get the average r-value standard deviation
+        rvalueStdB0[i] = math.sqrt(histo_ms_rB0.GetBinContent(i) - (histo_avr_rB0.GetBinContent(i))**2)
+        rvalueStdB0bar[i] = math.sqrt(histo_ms_rB0bar.GetBinContent(i) - (histo_avr_rB0bar.GetBinContent(i))**2)
+        rvalueStdB0Average[i] = math.sqrt(histo_ms_r.GetBinContent(i) - (histo_avr_r.GetBinContent(i))**2)
         # calculate the wrong tag fractin (only true if MC data good)
         wvalue[i] = (1 - rvalueB0Average[i]) / 2
+        wvalueUncertainty[i] = rvalueStdB0Average[i] / 2
         wvalueB0[i] = (1 - rvalueB0[i]) / 2
         wvalueB0bar[i] = (1 - rvalueB0bar[i]) / 2
         wvalueDiff[i] = wvalueB0[i] - wvalueB0bar[i]
+        wvalueDiffUncertainty[i] = math.sqrt((rvalueStdB0[i] / 2)**2 + (rvalueStdB0bar[i] / 2)**2)
         entries[i] = histo_entries_per_bin.GetBinContent(i)
         entriesB0[i] = histo_entries_per_binB0.GetBinContent(i)
         entriesB0bar[i] = histo_entries_per_binB0bar.GetBinContent(i)
         # fraction of events/all events
-        event_fractionTotal[i] = (entriesB0[i] + entriesB0bar[i]) / total_entries
-        event_fractionDiff[i] = (entriesB0[i] - entriesB0bar[i]) / total_entries
-        event_fractionB0[i] = entriesB0[i] / total_entries_B0
-        event_fractionB0bar[i] = entriesB0bar[i] / total_entries_B0bar
-        iEffEfficiency[i] = (event_fractionB0[i] * rvalueB0[i] * rvalueB0[i] +
-                             event_fractionB0bar[i] * rvalueB0bar[i] * rvalueB0bar[i]) / 2
+        event_fractionTotal[i] = (entriesB0[i] + entriesB0bar[i]) / total_tagged
+        event_fractionDiff[i] = (entriesB0[i] - entriesB0bar[i]) / total_tagged
+        event_fractionB0[i] = entriesB0[i] / total_tagged_B0
+        event_fractionB0bar[i] = entriesB0bar[i] / total_tagged_B0bar
+
+        iEffEfficiency[i] = tagging_eff * (event_fractionB0[i] * rvalueB0[i] * rvalueB0[i] +
+                                           event_fractionB0bar[i] * rvalueB0bar[i] * rvalueB0bar[i]) / 2
+        iEffEfficiencyUncertainty[i] = rvalueB0Average[i] * \
+            math.sqrt((2 * total_entries * event_fractionTotal[i] * rvalueStdB0Average[i])**2 +
+                      rvalueB0Average[i]**2 * event_fractionTotal[i] *
+                      (total_entries * (total_entries - event_fractionTotal[i]) +
+                       event_fractionTotal[i] * total_notTagged)) / (total_entries**2)
+
+        iEffEfficiencyB0Uncertainty[i] = rvalueB0[i] * \
+            math.sqrt((2 * total_entries * event_fractionB0[i] * rvalueStdB0[i])**2 +
+                      rvalueB0[i]**2 * event_fractionB0[i] *
+                      (total_entries * (total_entries - event_fractionB0[i]) +
+                       event_fractionB0[i] * total_notTagged)) / (total_entries**2)
+        iEffEfficiencyB0barUncertainty[i] = rvalueB0bar[i] * \
+            math.sqrt((2 * total_entries * event_fractionB0bar[i] * rvalueStdB0bar[i])**2 +
+                      rvalueB0bar[i]**2 * event_fractionB0bar[i] *
+                      (total_entries * (total_entries - event_fractionB0bar[i]) +
+                       event_fractionB0bar[i] * total_notTagged)) / (total_entries**2)
+
         iDeltaEffEfficiency[i] = event_fractionB0[i] * rvalueB0[i] * \
             rvalueB0[i] - event_fractionB0bar[i] * rvalueB0bar[i] * rvalueB0bar[i]
+
+        iDeltaEffEfficiencyUncertainty[i] = math.sqrt(iEffEfficiencyB0Uncertainty[i]**2 + iEffEfficiencyB0barUncertainty[i]**2)
+
+        diff_eff_Uncertainty = diff_eff_Uncertainty + iDeltaEffEfficiencyUncertainty[i]**2
+
         # intervallEff[i] = event_fractionTotal[i] * rvalueB0Average[i] * rvalueB0Average[i]
         print('* ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '      ' +
-              '{:.3f}'.format(rvalueB0Average[i]) + '          ' +
-              '{:.4f}'.format(event_fractionTotal[i]) + '           ' +
-              '{: .4f}'.format(event_fractionDiff[i]) + '           ' +
-              '{:.4f}'.format(wvalue[i]) + '       ' +
-              '{: .4f}'.format(wvalueDiff[i]) + '        *')
+              '{:.3f}'.format(rvalueB0Average[i]) + '    ' +
+              '{:.4f}'.format(event_fractionTotal[i]) + '         ' +
+              '{: .4f}'.format(event_fractionDiff[i]) + '         ' +
+              '{:.4f}'.format(wvalue[i]) + ' +- ' + '{:.4f}'.format(wvalueUncertainty[i]) + '   ' +
+              '{: .4f}'.format(wvalueDiff[i]) + ' +- ' + '{:.4f}'.format(wvalueDiffUncertainty[i]) + '  *')
         # finally calculating the total effective efficiency
         tot_eff_effB0 = tot_eff_effB0 + event_fractionB0[i] * rvalueB0[i] * rvalueB0[i]
         tot_eff_effB0bar = tot_eff_effB0bar + event_fractionB0bar[i] * rvalueB0bar[i] * rvalueB0bar[i]
+        uncertainty_eff_effAverage = uncertainty_eff_effAverage + iEffEfficiencyUncertainty[i]**2
 
-    average_eff = (tot_eff_effB0 + tot_eff_effB0bar) / 2
+    average_eff_eff = (tot_eff_effB0 + tot_eff_effB0bar) / 2
+    uncertainty_eff_effAverage = math.sqrt(uncertainty_eff_effAverage)
     diff_eff = tot_eff_effB0 - tot_eff_effB0bar
+    diff_eff_Uncertainty = math.sqrt(diff_eff_Uncertainty)
     print('* ------------------------------------------------------------------------------------------------ *')
     print('*                                                                                                  *')
     print('*    __________________________________________________________________________________________    *')
     print('*   |                                                                                          |   *')
     print('*   | TOTAL NUMBER OF TAGGED EVENTS  =  ' +
-          '{:<24}'.format("%.0f" % total_entries) + '{:>36}'.format('|   *'))
+          '{:<24}'.format("%.0f" % total_tagged) + '{:>36}'.format('|   *'))
     print('*   |                                                                                          |   *')
-    print('*   | TOTAL AVERAGE EFFECTIVE EFFICIENCY  (q=+-1)=  ' + '{:.2f}'.format(average_eff * 100) +
-          ' %                                    |   *')
+    print(
+        '*   | TOTAL AVERAGE EFFICIENCY  (q=+-1)=  ' +
+        '{:.2f}'.format(
+            tagging_eff *
+            100) +
+        " +- " +
+        '{:.2f}'.format(
+            DeltaTagging_eff *
+            100) +
+        ' %                                      |   *')
+    print('*   |                                                                                          |   *')
+    print(
+        '*   | TOTAL AVERAGE EFFECTIVE EFFICIENCY  (q=+-1)=  ' +
+        '{:.6f}'.format(
+            average_eff_eff *
+            100) +
+        " +- " +
+        '{:.6f}'.format(
+            uncertainty_eff_effAverage *
+            100) +
+        ' %                    |   *')
+    print('*   |                                                                                          |   *')
+    print(
+        '*   | TOTAL AVERAGE EFFECTIVE EFFICIENCY ASYMMETRY (q=+-1)=  ' +
+        '{:^9.6f}'.format(
+            diff_eff *
+            100) +
+        " +- " +
+        '{:.6f}'.format(
+            diff_eff_Uncertainty *
+            100) +
+        ' %           |   *')
     print('*   |                                                                                          |   *')
     print('*   | B0-TAGGER  TOTAL EFFECTIVE EFFICIENCIES: ' +
           '{:.2f}'.format(tot_eff_effB0 * 100) + ' % (q=+1)  ' +
-          '{:.2f}'.format(tot_eff_effB0bar * 100) + ' % (q=-1)  EffDiff=' +
-          '{:^5.2f}'.format(diff_eff * 100) + ' % |   *')
+          '{:.2f}'.format(tot_eff_effB0bar * 100) + ' % (q=-1) ' + '                 |   *')
     print('*   |                                                                                          |   *')
     print('*   | FLAVOR PERCENTAGE (MC):                  ' +
-          '{:.2f}'.format(total_entries_B0 / total_entries * 100) + ' % (q=+1)  ' +
-          '{:.2f}'.format(total_entries_B0bar / total_entries * 100) + ' % (q=-1)  Diff=' +
-          '{:^5.2f}'.format((total_entries_B0 - total_entries_B0bar) / total_entries * 100) + ' %    |   *')
+          '{:.2f}'.format(total_tagged_B0 / total_tagged * 100) + ' % (q=+1)  ' +
+          '{:.2f}'.format(total_tagged_B0bar / total_tagged * 100) + ' % (q=-1)  Diff=' +
+          '{:^5.2f}'.format((total_tagged_B0 - total_tagged_B0bar) / total_tagged * 100) + ' %    |   *')
     print('*   |__________________________________________________________________________________________|   *')
     print('*                                                                                                  *')
     print('****************************************************************************************************')
@@ -344,16 +454,16 @@ for method in methods:
     print('* ---------------------------------                                                                *')
     print('* Efficiency Determination - easiest way                                                           *')
     print('* ---------------------------------                                                                *')
-    total_entries_B0 = histo_belleplotB0.GetEntries()
-    total_entries_B0Bar = histo_belleplotB0bar.GetEntries()
-    total_entries_B0_wrong = histo_m1.GetEntries()
-    total_entries_B0Bar_wrong = histo_m2.GetEntries()
-    total_entries = total_entries_B0 + total_entries_B0Bar
-    total_entries_wrong = total_entries_B0_wrong + total_entries_B0Bar_wrong
+    total_tagged_B0 = histo_belleplotB0.GetEntries()
+    total_tagged_B0Bar = histo_belleplotB0bar.GetEntries()
+    total_tagged_B0_wrong = histo_m1.GetEntries()
+    total_tagged_B0Bar_wrong = histo_m2.GetEntries()
+    total_tagged = total_tagged_B0 + total_tagged_B0Bar
+    total_tagged_wrong = total_tagged_B0_wrong + total_tagged_B0Bar_wrong
 
-    wrong_tag_fraction_B0 = total_entries_B0_wrong / total_entries_B0
-    wrong_tag_fraction_B0Bar = total_entries_B0Bar_wrong / total_entries_B0Bar
-    wrong_tag_fraction = total_entries_wrong / total_entries
+    wrong_tag_fraction_B0 = total_tagged_B0_wrong / total_tagged_B0
+    wrong_tag_fraction_B0Bar = total_tagged_B0Bar_wrong / total_tagged_B0Bar
+    wrong_tag_fraction = total_tagged_wrong / total_tagged
     right_tag_fraction_B0 = 1 - 2 * wrong_tag_fraction_B0
     right_tag_fraction_B0Bar = 1 - 2 * wrong_tag_fraction_B0Bar
     right_tag_fraction = 1 - 2 * wrong_tag_fraction
@@ -442,6 +552,10 @@ for method in methods:
     histo_avr_r.Delete()
     histo_avr_rB0.Delete()
     histo_avr_rB0bar.Delete()
+    histo_ms_r.Delete()
+    histo_ms_rB0.Delete()
+    histo_ms_rB0bar.Delete()
+    histo_notTaggedEvents.Delete()
     histo_entries_per_bin.Delete()
     histo_entries_per_binB0.Delete()
     histo_entries_per_binB0bar.Delete()
@@ -458,22 +572,24 @@ for method in methods:
     Canvas1.Clear()
     Canvas2.Clear()
 
-    print('\\begin{tabular}{| l | r  r | r  r | r  r |}\n\\hline')
-    print(r'$r$- Interval & $\varepsilon_i(\%)$ & $\Delta \varepsilon_i(\%) $ & $w_i(\%) $ ' +
+    print('\\begin{tabular}{ l  r  r  r  r  r }\n\\hline')
+    print(r'$r$- Interval & $\varepsilon_i(\%)$ & $w_i(\%) $ ' +
           r' & $\Delta w_i(\%) $& $\varepsilon_{\text{eff}, i}(\%) $& $\Delta \varepsilon_{\text{eff}, i}(\%) $\\ \hline\hline')
     for i in range(1, r_size):
         print('$ ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '$ & $'
               '{: 6.1f}'.format(event_fractionTotal[i] * 100) + '$ & $' +
-              '{: 6.1f}'.format(event_fractionDiff[i] * 100) + '$ & $' +
-              '{: 6.1f}'.format(wvalue[i] * 100) + '$ & $' +
-              '{: 6.1f}'.format(wvalueDiff[i] * 100) + '$ & $' +
-              '{: 6.1f}'.format(iEffEfficiency[i] * 100) + '$ & $' +
-              '{: 6.1f}'.format(iDeltaEffEfficiency[i] * 100) + r'$ \\ ')
+              '{: 6.1f}'.format(wvalue[i] * 100) + " \pm " + '{:2.1f}'.format(wvalueUncertainty[i] * 100) + '$ & $' +
+              '{: 6.1f}'.format(wvalueDiff[i] * 100) + " \pm " + '{:2.1f}'.format(wvalueDiffUncertainty[i] * 100) + '$ & $' +
+              # + " \pm " + '{:2.4f}'.format(iEffEfficiencyUncertainty[i] * 100) + '$ & $' +
+              '{: 6.2f}'.format(iEffEfficiency[i] * 100) + '$ & $' +
+              # " \pm " + '{:2.4f}'.format(iDeltaEffEfficiencyUncertainty[i] * 100) +
+              '{: 6.2f}'.format(iDeltaEffEfficiency[i] * 100) +
+              r'$ \\ ')
     print('\hline\hline')
-    print(r'\multicolumn{1}{|r|}{Total} &  \multicolumn{4}{r|}{ $\varepsilon_\text{eff} = ' +
+    print(r'\multicolumn{1}{r}{Total} &  \multicolumn{3}{r}{ $\varepsilon_\text{eff} = ' +
           r'\sum_i \varepsilon_i \cdot \langle 1-2w_i\rangle^2 = ' +
-          '{: 6.1f}'.format(average_eff * 100) + r' \%$ }')
-    print(r'& \multicolumn{2}{r|}{ $\Delta \varepsilon_\text{eff} = ' +
+          '{: 6.1f}'.format(average_eff_eff * 100) + r' \%$ }')
+    print(r'& \multicolumn{2}{r}{ $\Delta \varepsilon_\text{eff} = ' +
           '{: 6.1f}'.format(diff_eff * 100) + r' \%$ }' + r' \\')
     print('\\hline\n\\end{tabular}')
 

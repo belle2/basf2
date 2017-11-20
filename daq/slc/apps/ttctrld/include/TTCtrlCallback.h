@@ -42,7 +42,7 @@ namespace Belle2 {
     std::map<std::string, int> m_trgcommands;
 
   private:
-    void send(RCNode& node, const NSMMessage& msg) throw(RCHandlerException);
+    void send(const NSMMessage& msg) throw(RCHandlerException);
     void statftx(ftsw_t* ftsw, int ftswid);
 
   };

@@ -15,8 +15,8 @@ extern "C" {
 #endif
 
 //void statft(ftsw_t *ftsw, int ftswid, char* ss)
-//void statft_jitter(ftsw_t* ftsw, int reg_jctl, int reg_jreg, char* ss);
-//void statft_headline(int ftswid, int fpgaid, int fpgaver, struct timeval* tvp, char* ss);
+void statft_jitter(ftsw_t* ftsw, int reg_jctl, int reg_jreg, char* ss);
+void statft_headline(int ftswid, int fpgaid, int fpgaver, struct timeval* tvp, char* ss);
 const char* localtimestr(int utim);
 const char* dumtrgstr(int rate);
 

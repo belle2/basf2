@@ -60,9 +60,6 @@ void HVConfig::set(const DBObject& obj) throw()
     if (c_crate.hasText("name")) {
       crate.setName(c_crate.getText("name"));
     }
-    if (c_crate.hasText("host")) {
-      crate.setHost(c_crate.getText("host"));
-    }
     if (!c_crate.hasObject("channel")) {
       LogFile::error("No channel entry in %s", m_obj.getName().c_str());
       continue;

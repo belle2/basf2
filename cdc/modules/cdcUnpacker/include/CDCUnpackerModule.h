@@ -275,6 +275,10 @@ namespace Belle2 {
       int m_tdcOffset;
 
       /**
+       * TDC auxiliary offset (nsec).
+       */
+      int m_tdcAuxOffset;
+      /**
        * Board ID for the trigger.
        */
       int m_boardIDTrig;
@@ -307,6 +311,11 @@ namespace Belle2 {
        */
       DBArray<CDCChannelMap> m_channelMapFromDB;
 
+
+      /**
+       * Input array for CDC Raw.
+       */
+      StoreArray<RawCDC> m_rawCDCs;
 
     };//end class declaration
 

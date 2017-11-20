@@ -97,7 +97,7 @@ def add_simulation(
         bkgfiles=None,
         bkgcomponents=None,
         bkgscale=1.0,
-        bkgOverlay=False,
+        bkgOverlay=True,
         usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
         use_vxdtf2=True,
@@ -200,7 +200,7 @@ def add_simulation(
         path.add_module(eklm_digitizer)
 
     # background overlay executor - after all digitizers
-    if bkgOverlay:
+    if bkgfiles is not None and bkgOverlay:
         path.add_module('BGOverlayExecutor', PXDDigitsName=pxd_digits_name)
         if components is None or 'PXD' in components:
             path.add_module("PXDDigitSorter", digits=pxd_digits_name)

@@ -62,7 +62,10 @@ namespace Belle2 {
       if (enta > 3.1416 / 2.0) enta -= 3.1416 / 2.0;
 
       int bin = std::floor((sin(enta) + 1.0) / (2.0 / m_nbins));
-      if (bin < 0 || bin >= m_nbins) return 0;
+      if (bin < 0 || bin >= m_nbins) {
+        B2WARNING("Problem with CDC dE/dx 2D binning");
+        return 1.0;
+      }
       return m_onedgains[0][bin];
     };
 

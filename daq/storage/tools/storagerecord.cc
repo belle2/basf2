@@ -46,6 +46,7 @@ const unsigned long long MAX_FILE_SIZE = 2 * GB;
 const char* g_table = "datafiles";
 unsigned int g_streamersize = 0;
 char* g_streamerinfo = new char[1000000];
+int g_diskid = 0;
 
 class FileHandler {
 
@@ -103,7 +104,7 @@ public:
         std::ofstream fout(filename);
         fout << 1;
         fout.close();
-        B2WARNING("disk : " << m_diskid << " is full " << usage);
+        B2WARNING("disk-" << m_diskid << " is full " << usage);
       }
       m_diskid++;
       if (m_diskid > ndisks) m_diskid = 1;
@@ -119,6 +120,11 @@ public:
                                   m_runtype.c_str(), expno, runno, m_host.c_str(), m_fileid);
     m_path = filedir + m_filename;
     m_file = ::open(m_path.c_str(),  O_WRONLY | O_CREAT | O_EXCL, 0664);
+    if (g_diskid > 0 && g_diskid != m_diskid) {
+      B2FATAL("disk-" << m_diskid << " is already full! Terminating process..");
+      exit(1);
+    }
+    g_diskid = m_diskid;
     if (m_file < 0) {
       B2FATAL("Failed to open file : " << m_path);
       exit(1);

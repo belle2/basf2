@@ -55,6 +55,8 @@ namespace Belle2 {
     addParam("tailGaussWidth", m_tailGaussWidth, "sigma of tail gaussian [ns]", 20.0);
     addParam("tailGaussFraction", m_tailGaussFraction,
              "fraction (by area) of tail gaussian", 0.0);
+    addParam("fixedT0",  m_fixedT0,
+             "If set, a fixed event t0 is used instead of simulating the bunch timing.", m_fixedT0);
 
   }
 
@@ -72,13 +74,18 @@ namespace Belle2 {
 
   void EventT0GeneratorModule::event()
   {
+    double collisionTime = 0.0f;
 
-    // generate collision time
-    double sigma = m_coreGaussWidth;
-    if (gRandom->Rndm() < m_tailGaussFraction) sigma = m_tailGaussWidth;
+    if (std::isnan(m_fixedT0)) {
+      // generate collision time
+      double sigma = m_coreGaussWidth;
+      if (gRandom->Rndm() < m_tailGaussFraction) sigma = m_tailGaussWidth;
 
-    int relBunchNo = round(gRandom->Gaus(0., sigma) / m_bunchTimeSep);
-    double collisionTime = relBunchNo * m_bunchTimeSep;
+      int relBunchNo = round(gRandom->Gaus(0., sigma) / m_bunchTimeSep);
+      collisionTime = relBunchNo * m_bunchTimeSep;
+    } else {
+      collisionTime = m_fixedT0;
+    }
 
     // correct MC particles times according to generated collision time
     for (auto& particle : m_mcParticles) {

@@ -79,7 +79,7 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
            true);
   addParam("pdfFile", m_pdfFile,
            "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.",
-           std::string("/data/reconstruction/dedxPID_PDFs_e1f8a54_500k_events.root"));
+           std::string("/data/reconstruction/dedxPID_PDFs_7b7a9f_500k_events.root"));
 
   addParam("onlyPrimaryParticles", m_onlyPrimaryParticles,
            "Only save data for primary particles (as determined by MC truth)", false);
@@ -239,11 +239,9 @@ void CDCDedxPIDModule::event()
     std::shared_ptr<CDCDedxTrack> dedxTrack = std::make_shared<CDCDedxTrack>();
     dedxTrack->m_track = mtrack++;
 
-    // get pion fit hypothesis for now
-    //  Should be ok in most cases, for MC fitting this will return the fit with the
-    //  true PDG value. At some point, it might be worthwhile to look into using a
-    //  different fit if the differences are large
-    const TrackFitResult* fitResult = track.getTrackFitResult(Const::pion);
+    // load the pion fit hypothesis or the hypothesis which is the closest in mass to a pion
+    // the tracking will not always successfully fit with a pion hypothesis
+    const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(Const::pion);
     if (!fitResult) {
       B2WARNING("No related fit for track ...");
       continue;
@@ -462,12 +460,13 @@ void CDCDedxPIDModule::event()
 
           // apply the calibration to dE to propagate to both hit and layer measurements
           double correction = dedxTrack->m_rungain * dedxTrack->m_coscor * wiregain * twodcor * onedcor;
-          dadcCount = dadcCount / correction;
+          if (correction == 0) dadcCount = 0;
+          else dadcCount = dadcCount / correction;
 
           layerdE += dadcCount;
           layerdx += celldx;
 
-          if (celldx > longesthit) {
+          if (celldx > longesthit && dadcCount != 0) {
             longesthit = celldx;
             wirelongesthit = iwire;
           }
@@ -489,18 +488,20 @@ void CDCDedxPIDModule::event()
 
       // check if there are any more hits in this layer
       if (lastHitInCurrentLayer) {
-        double totalDistance;
-        if (nomom) totalDistance = layerdx / sin(std::atan(1 / fitResult->getCotTheta()));
-        else  totalDistance = layerdx / sin(trackMom.Theta());
-        double layerDedx = layerdE / totalDistance;
+        if (layerdx > 0) {
+          double totalDistance;
+          if (nomom) totalDistance = layerdx / sin(std::atan(1 / fitResult->getCotTheta()));
+          else  totalDistance = layerdx / sin(trackMom.Theta());
+          double layerDedx = layerdE / totalDistance;
 
-        // save the information for this layer
-        if (layerDedx > 0) {
-          dedxTrack->addDedx(nhitscombined, wirelongesthit, currentLayer, totalDistance, layerDedx);
-          // save the PID information if using individual hits
-          if (!m_pdfFile.empty() and m_useIndividualHits) {
-            // use the momentum valid in the cdc
-            saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, layerDedx, m_pdfs[2]);
+          // save the information for this layer
+          if (layerDedx > 0) {
+            dedxTrack->addDedx(nhitscombined, wirelongesthit, currentLayer, totalDistance, layerDedx);
+            // save the PID information if using individual hits
+            if (!m_pdfFile.empty() and m_useIndividualHits) {
+              // use the momentum valid in the cdc
+              saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, layerDedx, m_pdfs[2]);
+            }
           }
         }
 
@@ -537,16 +538,16 @@ void CDCDedxPIDModule::event()
                      dedxTrack->l_dedx);
     }
 
-    if (dedxTrack->m_pdg == -999) {
-      B2DEBUG(50, "No MCParticle for this track, skipping dE/dx");
-      dedxTrack->m_dedx = -1; // should continue; leave it in for testing...
-    } else {
+    if (dedxTrack->m_pdg != -999 && dedxTrack->m_mcmass > 0 && dedxTrack->m_p_true != 0) {
       // determine the predicted mean and resolution
       double mean = getMean(dedxTrack->m_p_true / dedxTrack->m_mcmass);
       double sigma = getSigma(mean, dedxTrack->l_nHitsUsed, std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta));
       dedxTrack->m_dedx = gRandom->Gaus(mean, sigma);
       while (dedxTrack->m_dedx < 0)
         dedxTrack->m_dedx = gRandom->Gaus(mean, sigma);
+    } else {
+      B2DEBUG(50, "No MCParticle for this track, skipping dE/dx");
+      dedxTrack->m_dedx = -1; // should continue; leave it in for testing...
     }
 
     if (m_trackLevel) {

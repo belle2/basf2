@@ -86,6 +86,11 @@ namespace Belle2 {
       if (!f or !f->IsOpen()) {
         B2FATAL("Couldn't open input file " + fileName);
       }
+      auto* persistent = (TTree*) f->Get("persistent");
+      if (!persistent) B2ERROR("No 'persistent' tree found in " + fileName);
+      // check and issue error if file is for BG mixing
+      TBranch* branch = persistent->GetBranch("BackgroundMetaData");
+      if (branch) B2ERROR(fileName << ": wrong sample, this one is aimed for BG mixing");
       delete f;
     }
     dir->cd();

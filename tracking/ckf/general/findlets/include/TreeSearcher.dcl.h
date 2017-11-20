@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/ca/CellularAutomaton.h>
 

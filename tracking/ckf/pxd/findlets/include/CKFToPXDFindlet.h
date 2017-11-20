@@ -10,26 +10,30 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
-#include <tracking/ckf/pxd/entities/CKFToPXDState.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
-#include <tracking/ckf/general/findlets/SpacePointTagger.dcl.h>
+#include <tracking/ckf/svd/findlets/SpacePointLoader.h>
 #include <tracking/ckf/general/findlets/CKFDataHandler.dcl.h>
 #include <tracking/ckf/general/findlets/StateCreator.dcl.h>
 #include <tracking/ckf/general/findlets/CKFRelationCreator.dcl.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.dcl.h>
 #include <tracking/ckf/general/findlets/OverlapResolver.dcl.h>
 #include <tracking/ckf/pxd/findlets/PXDStateRejecter.h>
-#include <tracking/ckf/svd/findlets/SpacePointLoader.h>
+#include <tracking/ckf/general/findlets/SpacePointTagger.dcl.h>
 
 #include <tracking/ckf/pxd/filters/relations/ChooseablePXDRelationFilter.h>
 #include <tracking/ckf/pxd/filters/results/ChooseablePXDResultFilter.h>
+
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+
+#include <string>
+#include <vector>
 
 namespace Belle2 {
   class RecoTrack;
   class SpacePoint;
   class PXDCluster;
+  class CKFToPXDResult;
+  class CKFToPXDState;
 
   class ModuleParamList;
 

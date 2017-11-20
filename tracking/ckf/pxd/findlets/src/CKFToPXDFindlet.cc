@@ -10,23 +10,23 @@
 
 #include <tracking/ckf/pxd/findlets/CKFToPXDFindlet.h>
 
-#include <tracking/ckf/general/findlets/SpacePointTagger.icc.h>
 #include <tracking/ckf/general/findlets/CKFDataHandler.icc.h>
 #include <tracking/ckf/general/findlets/StateCreator.icc.h>
 #include <tracking/ckf/general/findlets/CKFRelationCreator.icc.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.icc.h>
 #include <tracking/ckf/general/findlets/OverlapResolver.icc.h>
-#include <tracking/ckf/general/findlets/StateRejecter.icc.h>
-#include <tracking/ckf/general/findlets/OnStateApplier.icc.h>
-#include <tracking/ckf/general/findlets/LimitedOnStateApplier.icc.h>
-#include <tracking/ckf/general/findlets/LayerToggledApplier.icc.h>
+#include <tracking/ckf/general/findlets/SpacePointTagger.icc.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
-#include <tracking/ckf/pxd/filters/relations/LayerPXDRelationFilter.icc.h>
-
-#include <framework/core/ModuleParamList.dcl.h>
+#include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
+#include <tracking/ckf/pxd/entities/CKFToPXDState.h>
 
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
+
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
+#include <pxd/dataobjects/PXDCluster.h>
+
+#include <framework/core/ModuleParamList.dcl.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

@@ -7,14 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
+#include <tracking/ckf/pxd/findlets/PXDStateRejecter.h>
+#include <tracking/ckf/general/findlets/StateRejecter.icc.h>
 
-#include <tracking/ckf/pxd/filters/relations/LayerPXDRelationFilter.dcl.h>
-#include <tracking/ckf/pxd/filters/relations/PXDPairFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/ckf/pxd/entities/CKFToPXDState.h>
 
-namespace Belle2 {
-  /// A chooseable filter for picking out the relations between states
-  extern template class LayerPXDRelationFilter<TrackFindingCDC::ChooseableFilter<PXDPairFilterFactory>>;
-  using ChooseablePXDRelationFilter = LayerPXDRelationFilter<TrackFindingCDC::ChooseableFilter<PXDPairFilterFactory>>;
-}
+using namespace Belle2;
+
+template class Belle2::StateRejecter<CKFToPXDState, ChooseableOnPXDStateApplier>;

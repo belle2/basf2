@@ -7,12 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
+#include <tracking/ckf/pxd/filters/results/ChooseablePXDResultFilter.h>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 
-#include <tracking/ckf/pxd/filters/results/PXDResultFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+using namespace Belle2;
 
-namespace Belle2 {
-  extern template class TrackFindingCDC::ChooseableFilter<PXDResultFilterFactory>;
-  using ChooseablePXDResultFilter = TrackFindingCDC::ChooseableFilter<PXDResultFilterFactory>;
-}
+template class TrackFindingCDC::ChooseableFilter<PXDResultFilterFactory>;

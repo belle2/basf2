@@ -19,48 +19,43 @@ namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
   static char const* const pxdStateBasicVarNames[] = {
-    "distance",
-    "xy_distance",
-    "z_distance",
+    "distance", //
+    "xy_distance", //
+    "z_distance", //
 
-    "mSoP_distance",
-    "mSoP_xy_distance",
-    "mSoP_z_distance",
+    "mSoP_distance", //
+    "mSoP_xy_distance", //
+    "mSoP_z_distance", //
 
-    "same_hemisphere",
+    "same_hemisphere", //
 
-    "layer",
-    "number",
+    "layer", //
+    "number", //
 
-    "arcLengthOfHitPosition",
-    "arcLengthOfCenterPosition",
+    "arcLengthOfHitPosition", //
+    "arcLengthOfCenterPosition", //
 
-    "pt",
-    "tan_lambda",
-    "phi",
+    "pt", //
+    "tan_lambda", //
+    "phi", //
 
-    "sigma_uv",
-    "residual_over_sigma",
+    "sigma_uv", //
+    "residual_over_sigma", //
 
-    "residual",
+    "residual", //
 
-    "chi2",
+    "chi2", //
 
-    "ladder",
-    "sensor",
-    "segment",
+    "ladder", //
+    "sensor", //
+    "segment", //
     "id",
 
-    "last_layer",
-    "last_ladder",
-    "last_sensor",
-    "last_segment",
+    "last_layer", //
+    "last_ladder", //
+    "last_sensor", //
+    "last_segment", //
     "last_id",
-
-    "seed_cdc_hits",
-    "seed_svd_hits",
-    "seed_lowest_cdc_layer",
-    "seed_lowest_svd_layer",
   };
 
   /// Vehicle class to transport the variable names

@@ -21,7 +21,7 @@ int main(int argc, char** argv)
     int timeout = config.getInt("timeout");
     if (timeout <= 0) timeout = 5;
     Rc2eb1Callback* callback = new Rc2eb1Callback(name, config, timeout);
-    Rc2eb1BridgeCallback* callback2 = new Rc2eb1BridgeCallback(callback);
+    Rc2eb1BridgeCallback* callback2 = new Rc2eb1BridgeCallback(callback, name);
     NSMNodeDaemon(callback, host, port, callback2, host2, port2).run();
   }
   return 0;

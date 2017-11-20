@@ -91,7 +91,7 @@ namespace Belle2 {
    * Condition which has to be fulfilled: the first entry is always an u cluster, the second always a v-cluster
    */
   inline void findPossibleCombinations(const Belle2::ClustersOnSensor& aSensor,
-                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations, int minClusterTime)
+                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations, float minClusterTime)
   {
 
     for (const SVDCluster* uCluster : aSensor.clustersU) {
@@ -120,7 +120,7 @@ namespace Belle2 {
    * relationweights code the type of the cluster. +1 for u and -1 for v
    */
   template <class SpacePointType> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
-      StoreArray<SpacePointType>& spacePoints, int minClusterTime)
+      StoreArray<SpacePointType>& spacePoints, float minClusterTime)
   {
     std::unordered_map<VxdID::baseType, ClustersOnSensor>
     activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?

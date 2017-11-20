@@ -44,7 +44,7 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
            bool(false));
 
   addParam("MinClusterTime", m_minClusterTime, "clusters with time below this value are not considered to make spacePoints.",
-           int(-20));
+           float(-20));
 }
 
 

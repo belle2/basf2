@@ -362,6 +362,8 @@ namespace Belle2 {
     double momentum = arichTrack.getMomentum();
 
     double thcResolution = m_recPars->getThcResolution(momentum);
+    if (thcResolution < 0) thcResolution = 0.01; // happens for spurious tracks with 100 GeV momentum!
+
     double wideGaussFract = (m_recPars->getParameters())[0];
     double wideGaussSigma = (m_recPars->getParameters())[1];
 

@@ -101,7 +101,7 @@ namespace Belle2 {
       const Track* track = DataStore::getRelated<Track>(particle);
       if (!track) continue;
 
-      const TrackFitResult* fitResult = track->getTrackFitResult(Const::pion);
+      const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::pion);
       if (!fitResult) continue;
 
       RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(track);

@@ -170,7 +170,7 @@ namespace Belle2 {
 
       const Track* mdstTrack = lkh->getRelated<Track>();
       if (mdstTrack) {
-        const TrackFitResult* fitResult = mdstTrack->getTrackFitResult(Const::pion);
+        const TrackFitResult* fitResult = mdstTrack->getTrackFitResultWithClosestMass(Const::pion);
         if (fitResult) {
           m_arich.pValue = fitResult->getPValue();
           TVector3 trkPos = fitResult->getPosition();

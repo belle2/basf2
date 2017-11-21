@@ -231,7 +231,7 @@ void test2_1263700001(){
   TString inputfile("../1263700001.ntup.root");
   TFile* sample = new TFile(inputfile);
   TTree* treeUpsHad = (TTree*)sample->Get("UpsBplusHad");
-  TTree* treeUpsSL = (TTree*)sample->Get("UpsBplusSl");
+  TTree* treeUpsSL = (TTree*)sample->Get("UpsBplusSL");
   
 
   TFile* outputFile = new TFile("1263700001_Validation.root","RECREATE");

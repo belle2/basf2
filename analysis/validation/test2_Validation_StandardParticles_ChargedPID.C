@@ -70,9 +70,9 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
 
   // ---------- Momentum distributions (for efficiency determination) ----------
   for ( int j = 0; j < pdiv; ++j ){
-    TString range = TString::Format("100,0.05,%f",j*1.0);
-    if ( j == 0 ) range = TString::Format("100,1.0,2.0");
-    else if ( j == pdiv - 1 ) range = TString::Format("100,1.0,4.0");
+    TString range = TString::Format("30,0.05,%f",j*1.0);
+    if ( j == 0 ) range = TString::Format("30,1.0,2.0");
+    else if ( j == pdiv - 1 ) range = TString::Format("30,1.0,4.0");
 
     // check different PID cuts
     for ( int i = 0; i < piddiv; ++i ){
@@ -147,18 +147,31 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
 
   TFile* outputFile = new TFile("standardParticlesValidation_ChargedPID.root","RECREATE");
   outputFile->cd();
-  TH1F* Kall_vs_momentum = new TH1F("Kall_vs_momentum", "K rate vs. momentum;p_{K} (GeV);#tracks", 100, 0.5, 4.0);
-  TH1F* piall_vs_momentum = new TH1F("piall_vs_momentum", "#pi rate vs. momentum;p_{#pi} (GeV);#tracks", 100, 0.5, 4.0);
+  TH1F* Kall_vs_momentum = new TH1F("Kall_vs_momentum", "K rate vs. momentum;p_{K} (GeV);#tracks", 30, 0.5, 4.0);
+  TH1F* piall_vs_momentum = new TH1F("piall_vs_momentum", "#pi rate vs. momentum;p_{#pi} (GeV);#tracks", 30, 0.5, 4.0);
   piktree->Project("piall_vs_momentum", pibranch+"_P", pikcuts);
   piktree->Project("Kall_vs_momentum", kbranch+"_P", pikcuts);
-  outputFile->WriteTObject(piall_vs_momentum);
-  outputFile->WriteTObject(Kall_vs_momentum);
 
-  TH1F* Kpifake_vs_momentum = new TH1F("Kpifake_vs_momentum", "K/#pi fake rate vs. momentum;p_{K} (GeV);#pi ID efficiency", 100, 0.5, 4.0);
-  TH1F* Kpfake_vs_momentum = new TH1F("Kpfake_vs_momentum", "K/p fake rate vs. momentum;p_{K} (GeV);p ID efficiency", 100, 0.5, 4.0);
-  TH1F* piKfake_vs_momentum = new TH1F("piKfake_vs_momentum", "#pi/K fake rate vs. momentum;p_{#pi} (GeV);K ID efficiency", 100, 0.5, 4.0);
-  TH1F* pimufake_vs_momentum = new TH1F("pimufake_vs_momentum", "#pi/#mu fake rate vs. momentum;p_{#pi} (GeV);#mu ID efficiency", 100, 0.5, 4.0);
-  TH1F* piefake_vs_momentum = new TH1F("piefake_vs_momentum", "#pi/e fake rate vs. momentum;p_{#pi} (GeV);e ID efficiency", 100, 0.5, 4.0);
+  TH1F* Krate_vs_momentum = new TH1F("Krate_vs_momentum", "K rate vs. momentum;cos(#theta_{K});K ID efficiency", 30, 0.5, 4.0);
+  TH1F* pirate_vs_momentum = new TH1F("pirate_vs_momentum", "#pi rate vs. momentum;cos(#theta_{#pi});#pi ID efficiency", 30, 0.5, 4.0);
+  piktree->Project("Krate_vs_momentum", kbranch+"_P", kbranch+"_"+PIDk+">"+pidcut+"&&"+pikcuts);
+  piktree->Project("pirate_vs_momentum", pibranch+"_P", pibranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
+  Krate_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
+  pirate_vs_momentum->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
+  Krate_vs_momentum->GetListOfFunctions()->Add(new TNamed("Check", "Currently low stats, but should be consistent across versions"));
+  pirate_vs_momentum->GetListOfFunctions()->Add(new TNamed("Check", "Currently low stats, but should be consistent across versions"));
+  Krate_vs_momentum->GetListOfFunctions()->Add(new TNamed("Description", "K ID efficiency vs. momentum"));
+  pirate_vs_momentum->GetListOfFunctions()->Add(new TNamed("Description", "#pi ID efficiency vs. momentum"));
+  Krate_vs_momentum->Divide(Kall_vs_momentum);
+  pirate_vs_momentum->Divide(Kall_vs_momentum);
+  outputFile->WriteTObject(Krate_vs_momentum);
+  outputFile->WriteTObject(pirate_vs_momentum);
+
+  TH1F* Kpifake_vs_momentum = new TH1F("Kpifake_vs_momentum", "K/#pi fake rate vs. momentum;p_{K} (GeV);#pi ID efficiency", 30, 0.5, 4.0);
+  TH1F* Kpfake_vs_momentum = new TH1F("Kpfake_vs_momentum", "K/p fake rate vs. momentum;p_{K} (GeV);p ID efficiency", 30, 0.5, 4.0);
+  TH1F* piKfake_vs_momentum = new TH1F("piKfake_vs_momentum", "#pi/K fake rate vs. momentum;p_{#pi} (GeV);K ID efficiency", 30, 0.5, 4.0);
+  TH1F* pimufake_vs_momentum = new TH1F("pimufake_vs_momentum", "#pi/#mu fake rate vs. momentum;p_{#pi} (GeV);#mu ID efficiency", 30, 0.5, 4.0);
+  TH1F* piefake_vs_momentum = new TH1F("piefake_vs_momentum", "#pi/e fake rate vs. momentum;p_{#pi} (GeV);e ID efficiency", 30, 0.5, 4.0);
 
   piktree->Project("piKfake_vs_momentum", pibranch+"_P", pibranch+"_"+PIDk+">"+pidcut+"&&"+pikcuts);
   piktree->Project("piefake_vs_momentum", pibranch+"_P", pibranch+"_"+PIDmu+">"+pidcut+"&&"+pikcuts);
@@ -196,9 +209,9 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   outputFile->WriteTObject(Kpfake_vs_momentum);
   outputFile->WriteTObject(Kpifake_vs_momentum);
 
-  TH1F* kplusRecoEff_vs_cosTheta = new TH1F("kplusRecoEff_vs_cosTheta", "charge-dependent Kaon reconstruction efficiency;cos(#theta_{K});#epsilon(K+)-#epsilon(K-)", 200, -1, 1);
-  TH1F* kminusRecoEff_vs_cosTheta = new TH1F("kminusRecoEff_vs_cosTheta", "charge-dependent Kaon reconstruction efficiency", 200, -1, 1);
-  TH1F* krecoEff_vs_cosTheta = new TH1F("krecoEff_vs_cosTheta", "charge-dependent Kaon reconstruction efficiency", 200, -1, 1);
+  TH1F* kplusRecoEff_vs_cosTheta = new TH1F("kplusRecoEff_vs_cosTheta", "charge-dependent Kaon reconstruction efficiency;cos(#theta_{K});#epsilon(K+)-#epsilon(K-)", 30, -1, 1);
+  TH1F* kminusRecoEff_vs_cosTheta = new TH1F("kminusRecoEff_vs_cosTheta", "charge-dependent Kaon reconstruction efficiency", 30, -1, 1);
+  TH1F* krecoEff_vs_cosTheta = new TH1F("krecoEff_vs_cosTheta", "charge-dependent Kaon reconstruction efficiency", 30, -1, 1);
   piktree->Project("kplusRecoEff_vs_cosTheta", kbranch+"_P4[2]/"+kbranch+"_P", "("+kbranch+"_charge > 0) && "+kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
   piktree->Project("kminusRecoEff_vs_cosTheta", kbranch+"_P4[2]/"+kbranch+"_P", "("+kbranch+"_charge < 0) && "+kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
   piktree->Project("krecoEff_vs_cosTheta", kbranch+"_P4[2]/"+kbranch+"_P", kbranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
@@ -211,18 +224,31 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   kplusRecoEff_vs_cosTheta->Add(kminusRecoEff_vs_cosTheta, -1);
   outputFile->WriteTObject(kplusRecoEff_vs_cosTheta);
 
-  TH1F* Kall_vs_cosTheta = new TH1F("Kall_vs_cosTheta", "K rate vs. cosTheta;cos(#theta_{K});#tracks", 200, -1, 1);
-  TH1F* piall_vs_cosTheta = new TH1F("piall_vs_cosTheta", "#pi rate vs. cosTheta;cos(#theta_{#pi});#tracks", 200, -1, 1);
+  TH1F* Kall_vs_cosTheta = new TH1F("Kall_vs_cosTheta", "K rate vs. cosTheta;cos(#theta_{K});#tracks", 30, -1, 1);
+  TH1F* piall_vs_cosTheta = new TH1F("piall_vs_cosTheta", "#pi rate vs. cosTheta;cos(#theta_{#pi});#tracks", 30, -1, 1);
   piktree->Project("Kall_vs_cosTheta", kbranch+"_P4[2]/"+kbranch+"_P", pikcuts);
   piktree->Project("piall_vs_cosTheta", pibranch+"_P4[2]/"+pibranch+"_P", pikcuts);
-  outputFile->WriteTObject(Kall_vs_cosTheta);
-  outputFile->WriteTObject(piall_vs_cosTheta);
 
-  TH1F* Kpifake_vs_cosTheta = new TH1F("Kpifake_vs_cosTheta", "K/#pi fake rate vs. cosTheta;cos(#theta_{K});#pi ID efficiency", 200, -1, 1);
-  TH1F* Kpfake_vs_cosTheta = new TH1F("Kpfake_vs_cosTheta", "K/p fake rate vs. cosTheta;cos(#theta_{K});p ID efficiency", 200, -1, 1);
-  TH1F* piKfake_vs_cosTheta = new TH1F("piKfake_vs_cosTheta", "#pi/K fake rate vs. cosTheta;cos(#theta_{#pi});K ID efficiency", 200, -1, 1);
-  TH1F* pimufake_vs_cosTheta = new TH1F("pimufake_vs_cosTheta", "#pi/#mu fake rate vs. cosTheta;cos(#theta_{#pi});#mu ID efficiency", 200, -1, 1);
-  TH1F* piefake_vs_cosTheta = new TH1F("piefake_vs_cosTheta", "#pi/e fake rate vs. cosTheta;cos(#theta_{#pi});e ID efficiency", 200, -1, 1);
+  TH1F* Krate_vs_cosTheta = new TH1F("Krate_vs_cosTheta", "K rate vs. cosTheta;cos(#theta_{K});K ID efficiency", 30, -1, 1);
+  TH1F* pirate_vs_cosTheta = new TH1F("pirate_vs_cosTheta", "#pi rate vs. cosTheta;cos(#theta_{#pi});#pi ID efficiency", 30, -1, 1);
+  piktree->Project("Krate_vs_cosTheta", kbranch+"_P4[2]/"+kbranch+"_P", kbranch+"_"+PIDk+">"+pidcut+"&&"+pikcuts);
+  piktree->Project("pirate_vs_cosTheta", pibranch+"_P4[2]/"+pibranch+"_P", pibranch+"_"+PIDpi+">"+pidcut+"&&"+pikcuts);
+  Krate_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
+  pirate_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Meta", "nostats, expert"));
+  Krate_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Check", "Currently low stats, but should be consistent across versions"));
+  pirate_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Check", "Currently low stats, but should be consistent across versions"));
+  Krate_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Description", "K ID efficiency vs. cosTheta"));
+  pirate_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Description", "#pi ID efficiency vs. cosTheta"));
+  Krate_vs_cosTheta->Divide(Kall_vs_cosTheta);
+  pirate_vs_cosTheta->Divide(Kall_vs_cosTheta);
+  outputFile->WriteTObject(Krate_vs_cosTheta);
+  outputFile->WriteTObject(pirate_vs_cosTheta);
+
+  TH1F* Kpifake_vs_cosTheta = new TH1F("Kpifake_vs_cosTheta", "K/#pi fake rate vs. cosTheta;cos(#theta_{K});#pi ID efficiency", 30, -1, 1);
+  TH1F* Kpfake_vs_cosTheta = new TH1F("Kpfake_vs_cosTheta", "K/p fake rate vs. cosTheta;cos(#theta_{K});p ID efficiency", 30, -1, 1);
+  TH1F* piKfake_vs_cosTheta = new TH1F("piKfake_vs_cosTheta", "#pi/K fake rate vs. cosTheta;cos(#theta_{#pi});K ID efficiency", 30, -1, 1);
+  TH1F* pimufake_vs_cosTheta = new TH1F("pimufake_vs_cosTheta", "#pi/#mu fake rate vs. cosTheta;cos(#theta_{#pi});#mu ID efficiency", 30, -1, 1);
+  TH1F* piefake_vs_cosTheta = new TH1F("piefake_vs_cosTheta", "#pi/e fake rate vs. cosTheta;cos(#theta_{#pi});e ID efficiency", 30, -1, 1);
   piktree->Project("piKfake_vs_cosTheta", pibranch+"_P4[2]/"+pibranch+"_P", pibranch+"_"+PIDk+">"+pidcut+"&&"+pikcuts);
   piktree->Project("piefake_vs_cosTheta", pibranch+"_P4[2]/"+pibranch+"_P", pibranch+"_"+PIDmu+">"+pidcut+"&&"+pikcuts);
   piktree->Project("pimufake_vs_cosTheta", pibranch+"_P4[2]/"+pibranch+"_P", pibranch+"_"+PIDe+">"+pidcut+"&&"+pikcuts);
@@ -313,11 +339,11 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   hkpifake_eff->SetXTitle("Kaon efficiency");
   hkpfake_eff->SetXTitle("Kaon efficiency");
 
-  hpiefake_eff->SetYTitle("Electron fake rate");
-  hpimufake_eff->SetYTitle("Muon fake rate");
-  hpikfake_eff->SetYTitle("Kaon fake rate");
-  hkpifake_eff->SetYTitle("Pion fake rate");
-  hkpfake_eff->SetYTitle("Proton fake rate");
+  hpiefake_eff->SetYTitle("Electron efficiency");
+  hpimufake_eff->SetYTitle("Muon efficiency");
+  hpikfake_eff->SetYTitle("Kaon efficiency");
+  hkpifake_eff->SetYTitle("Pion efficiency");
+  hkpfake_eff->SetYTitle("Proton efficiency");
 
   hpcut->GetListOfFunctions()->Add(new TNamed("Meta", "nostats"));
   hpicut->GetListOfFunctions()->Add(new TNamed("Meta", "nostats"));

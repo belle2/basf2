@@ -145,7 +145,7 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
 
   }
 
-  TFile* outputFile = new TFile("standardParticlesValidation_ChargedPID.root","RECREATE");
+  TFile* outputFile = new TFile("test2_Validation_PID_charged_dedicatedSamples_output.root","RECREATE");
   outputFile->cd();
   TH1F* Kall_vs_momentum = new TH1F("Kall_vs_momentum", "K rate vs. momentum;p_{K} (GeV);#tracks", 30, 0.5, 4.0);
   TH1F* piall_vs_momentum = new TH1F("piall_vs_momentum", "#pi rate vs. momentum;p_{#pi} (GeV);#tracks", 30, 0.5, 4.0);

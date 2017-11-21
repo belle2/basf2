@@ -34,7 +34,7 @@ addpkg trg
 ########################
 #  start from here if you have already installed basf2
 git fetch
-git checkout origin/feature/trg-cdc-firmware-cosimulation
+git checkout feature/trg-cdc-firmware-cosimulation
 scons trg/cdc
 
 # set xsim runtime library path

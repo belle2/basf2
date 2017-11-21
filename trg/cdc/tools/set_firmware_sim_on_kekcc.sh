@@ -5,8 +5,10 @@ BELLE2_USER=USERNAME
 # change if you want a different directory name for basf2 installation
 basf2_top=basf2_firmware_sim
 
-# We will use http authentication. You will need to enter your password at least 4 times.
-# If you want to use ssh and have uploaded you public key to Stash, exchange the below two lines.
+echo We will use http authentication.
+echo You will need to enter your password at least 4 times.
+echo If you wish to use ssh and have uploaded you public key to Bitbucket/Stash,
+echo modify the variable BELLE2_GIT_ACCESS in the script to ssh
 BELLE2_GIT_ACCESS=http
 # BELLE2_GIT_ACCESS=ssh
 
@@ -25,12 +27,11 @@ fi
 cd $basf2_top
 setuprel
 
-addpkg cdc
 addpkg trg
 ########################
 #  start from here if you have already installed basf2
 git fetch
-git checkout origin/feature/trg-cdc-firmware-cosimulation
+git checkout feature/trg-cdc-firmware-cosimulation
 scons trg/cdc
 
 # set xsim runtime library path

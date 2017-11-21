@@ -560,8 +560,8 @@ void TSF::saveFastOutput(short iclock)
         CDCHit cdchit = (iHit < 0) ? CDCHit() : *m_cdcHits[iHit];
         m_tsHits.appendNew(cdchit,
                            globalSegmentID(iTS, 2 * iAx),
-                           decoded[2],
-                           decoded[3],
+                           decoded[3], // priority position
+                           decoded[2], // L/R
                            // TODO: pri time should be the same as the CDCHit in 1st arg
                            // when the proper clock counter is given to firmware TSF
                            decoded[1],

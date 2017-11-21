@@ -27,7 +27,6 @@ else:
 
 if not merger_only:
     # set run time library path
-    rdi_path = '/home/belle2/tasheng/Vivado_2017.2/lib/lnx64.o'
     if rdi_path not in os.environ['LD_LIBRARY_PATH']:
         print('please set environment variable first! do either')
         print('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:' + rdi_path)
@@ -80,6 +79,7 @@ main = basf2.create_path()
 
 empty_path = basf2.create_path()
 
+# The root file is on KEKCC
 if read_data:
     main.add_module('RootInput', inputFileName='/home/belle2/tasheng/gcr/cdc/cosmic.0001.03898.HLT1.f00007.root')
 

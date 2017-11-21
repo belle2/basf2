@@ -23,6 +23,16 @@ namespace Belle2 {
 
   namespace CDCTrigger {
     enum class Priority : unsigned char {nothing, first, second};
+    /* map and function to convert priorityPosition to Priority class */
+    std::unordered_map<unsigned, Priority> toPriorityMap = {{0, Priority::nothing},
+      {1, Priority::second},
+      {2, Priority::second},
+      {3, Priority::first}
+    };
+    Priority toPriority(unsigned priorityPosition)
+    {
+      return toPriorityMap[priorityPosition];
+    }
     enum MergerOut : long unsigned int {priorityTime, fastestTime, edgeTime, hitmap, secondPriorityHit};
   }
 

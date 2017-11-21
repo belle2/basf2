@@ -532,11 +532,14 @@ void TSF::saveFastOutput(short iclock)
         // scan through all CDC hits to get the priority hit
         for (int iclkPri = firstClock; iclkPri < lastClock; ++iclkPri) {
           auto priMap = m_priorityHit[iclkPri][2 * iAx][iTS / 16];
-          if (priMap.find(iTS % 16) != priMap.end()) {
+          // Pick up the first CDCHit which agrees to the priority position
+          // of firmware sim output
+          if (priMap.find(iTS % 16) != priMap.end() &&
+              toPriority(decoded[3]) == priority(priMap[iTS % 16])) {
             iHit = priMap[iTS % 16];
             B2DEBUG(10, "iHit:" << iHit);
             B2DEBUG(10, "TDC: " << m_cdcHits[iHit]->getTDCCount() << ", TSF: " << decoded[1]);
-            // TODO: priority(iHit)
+            break;
           }
         }
         // check if the same TS hit to another tracker is already there

@@ -162,6 +162,8 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   pirate_vs_momentum->GetListOfFunctions()->Add(new TNamed("Check", "Currently low stats, but should be consistent across versions"));
   Krate_vs_momentum->GetListOfFunctions()->Add(new TNamed("Description", "K ID efficiency vs. momentum"));
   pirate_vs_momentum->GetListOfFunctions()->Add(new TNamed("Description", "#pi ID efficiency vs. momentum"));
+  Krate_vs_momentum->GetListOfFunctions()->Add(new TNamed("Contact", "jan.strube@desy.de"));
+  pirate_vs_momentum->GetListOfFunctions()->Add(new TNamed("Contact", "jan.strube@desy.de"));
   Krate_vs_momentum->Divide(Kall_vs_momentum);
   pirate_vs_momentum->Divide(Kall_vs_momentum);
   outputFile->WriteTObject(Krate_vs_momentum);
@@ -239,6 +241,8 @@ void plotROC(TFile* pfile, TTree* ptree, TFile* pikfile, TTree* piktree){
   pirate_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Check", "Currently low stats, but should be consistent across versions"));
   Krate_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Description", "K ID efficiency vs. cosTheta"));
   pirate_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Description", "#pi ID efficiency vs. cosTheta"));
+  Krate_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Contact", "jan.strube@desy.de"));
+  pirate_vs_cosTheta->GetListOfFunctions()->Add(new TNamed("Contact", "jan.strube@desy.de"));
   Krate_vs_cosTheta->Divide(Kall_vs_cosTheta);
   pirate_vs_cosTheta->Divide(Kall_vs_cosTheta);
   outputFile->WriteTObject(Krate_vs_cosTheta);

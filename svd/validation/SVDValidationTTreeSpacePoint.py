@@ -32,7 +32,6 @@ gROOT.ProcessLine('struct EventDataSpacePoint {\
     int sensor_type;\
     float time_u;\
     float time_v;\
-    int n_clusters;\
     };')
 
 from ROOT import EventDataSpacePoint
@@ -69,6 +68,7 @@ class SVDValidationTTreeSpacePoint(Module):
         # Start with SpacePoints and use the relation to get the corresponding
         # digits
         spacepoints = Belle2.PyStoreArray('SpacePoints')
+
         for sp in spacepoints:
 
             # Sensor identification
@@ -78,8 +78,9 @@ class SVDValidationTTreeSpacePoint(Module):
             self.data.sensor = sensorNum
             layerNum = sensorID.getLayerNumber()
 
+            # look at SP on SVD only
             sp_type = sp.getType()
-            if sp_type == 0:
+            if sp_type != 1:
                 continue
 
             self.data.layer = layerNum
@@ -99,8 +100,7 @@ class SVDValidationTTreeSpacePoint(Module):
             timeV = sp.TimeV()
             self.data.time_u = timeU
             self.data.time_v = timeV
-            print('TIME U')
-            print(timeU)
+
             # Fill tree
             self.file.cd()
             self.tree.Fill()

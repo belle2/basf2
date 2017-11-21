@@ -20,7 +20,7 @@ EvtSocketSend::EvtSocketSend(std::string host, int port)
 
 EvtSocketSend::EvtSocketSend(const EvtSocketSend& es)
 {
-  m_sock = es.m_sock;
+  m_sock = new SocketSend((es.m_sock)->node(), (u_short)(es.m_sock)->port());
   m_recbuf = new char[MAXEVTSIZE];
 }
 
@@ -28,6 +28,13 @@ EvtSocketSend::~EvtSocketSend()
 {
   delete m_sock;
   delete[] m_recbuf;
+}
+
+EvtSocketSend& EvtSocketSend::operator=(EvtSocketSend& other)
+{
+  if (m_sock != NULL) delete m_sock;
+  m_sock = new SocketSend((other.m_sock)->node(), (u_short)(other.m_sock)->port());
+  return *this;
 }
 
 int EvtSocketSend::send(EvtMessage* msg)
@@ -76,12 +83,6 @@ EvtSocketRecv::EvtSocketRecv(int port, bool accept_at_init)
   m_recbuf = new char[MAXEVTSIZE];
   if (accept_at_init)
     m_sock->accept();
-}
-
-EvtSocketRecv::EvtSocketRecv(const EvtSocketRecv& es)
-{
-  m_sock = es.m_sock;
-  m_recbuf = new char[MAXEVTSIZE];
 }
 
 EvtSocketRecv::~EvtSocketRecv()

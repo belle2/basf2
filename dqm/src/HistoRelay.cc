@@ -15,7 +15,7 @@
 using namespace Belle2;
 using namespace std;
 
-HistoRelay::HistoRelay(string& file, string& dest, int port)
+HistoRelay::HistoRelay(string& file, string& dest, int port) : m_filename(file), m_dest(dest), m_port(port)
 {
   //  m_map = TMapFile::Create(file.c_str());
   m_memfile = new DqmMemFile(file);
@@ -24,11 +24,11 @@ HistoRelay::HistoRelay(string& file, string& dest, int port)
   m_msg = NULL;
 }
 
-HistoRelay::HistoRelay(const HistoRelay& hr)
+HistoRelay::HistoRelay(const HistoRelay& hr) : HistoRelay(hr.m_filename, hr.m_dest, hr.m_port)
 {
-  m_memfile = hr.m_memfile;
-  m_sock = hr.m_sock;
-  m_msg = NULL;
+  //m_memfile = new DqmMemFile(hr.m_filename);
+  //m_sock = new EvtSocketSend(hr.m_dest, hr.m_port);
+  //m_msg = NULL;
 }
 
 HistoRelay::~HistoRelay()
@@ -36,6 +36,17 @@ HistoRelay::~HistoRelay()
   delete m_memfile;
   delete m_sock;
   delete m_msg;
+}
+
+HistoRelay& HistoRelay::operator=(const HistoRelay& hr)
+{
+  if (m_memfile != NULL) delete m_memfile;
+  if (m_sock != NULL) delete m_sock;
+  if (m_msg != NULL) delete m_msg;
+  m_memfile = new DqmMemFile(hr.m_filename);
+  m_sock = new EvtSocketSend(hr.m_dest, hr.m_port);
+  m_msg = NULL;
+  return *this;
 }
 
 int HistoRelay::collect()

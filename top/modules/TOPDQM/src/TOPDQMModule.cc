@@ -176,7 +176,7 @@ namespace Belle2 {
       m_barHits->Fill(digit.getModuleID());
       int i = digit.getModuleID() - 1;
       if (i < 0 || i >= m_numModules) {
-        B2ERROR("Invalid module ID found in TOPDigits: ID = " << i);
+        B2ERROR("Invalid module ID found in TOPDigits: ID = " << i + 1);
         continue;
       }
       m_pixelHits[i]->Fill(digit.getPixelID());
@@ -185,7 +185,7 @@ namespace Belle2 {
 
     StoreArray<Track> tracks;
     for (const auto& track : tracks) {
-      const auto* trackFit = track.getTrackFitResult(Const::pion);
+      const auto* trackFit = track.getTrackFitResultWithClosestMass(Const::pion);
       if (!trackFit) continue;
       if (trackFit->getMomentum().Mag() < m_momentumCut) continue;
       if (trackFit->getPValue() < m_pValueCut) continue;

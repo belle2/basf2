@@ -122,7 +122,7 @@ namespace Belle2 {
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
     for (const auto& track : tracks) {
-      const TrackFitResult* trackFit = track.getTrackFitResult(Const::pion);
+      const auto* trackFit = track.getTrackFitResultWithClosestMass(Const::pion);
       if (!trackFit) continue;
       const TOPLikelihood* top = track.getRelated<TOPLikelihood>();
       if (!top) continue;

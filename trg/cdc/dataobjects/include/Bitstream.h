@@ -45,11 +45,6 @@ namespace Belle2 {
       return m_signal;
     }
 
-    auto signal(int i)
-    {
-      return m_signal.at(i);
-    }
-
   protected:
     SignalBus m_signal;
 

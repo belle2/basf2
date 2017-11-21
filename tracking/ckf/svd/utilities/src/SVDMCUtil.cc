@@ -15,6 +15,7 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <functional>
 
 using namespace Belle2;
@@ -75,7 +76,7 @@ unsigned int MCUtil::getNumberOfCorrectHits(const RecoTrack* mcRecoTrack, const 
   return numberOfCorrectHits;
 }
 
-bool MCUtil::allStatesCorrect(const std::vector<const CKFToSVDState*>& states) const
+bool MCUtil::allStatesCorrect(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& states) const
 {
   const RecoTrack* seed = states.front()->getSeed();
 

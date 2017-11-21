@@ -20,10 +20,11 @@ namespace Belle2 {
   class ModuleParamList;
 
   template <class AState, class AFilter>
-  class StateRejecter : public TrackFindingCDC::Findlet<const AState* const, TrackFindingCDC::WithWeight<AState*>> {
+  class StateRejecter : public
+    TrackFindingCDC::Findlet<const TrackFindingCDC::WithWeight<const AState*>, TrackFindingCDC::WithWeight<AState*>> {
   private:
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const AState* const, TrackFindingCDC::WithWeight<AState*>>;
+    using Super = TrackFindingCDC::Findlet<const TrackFindingCDC::WithWeight<const AState*>, TrackFindingCDC::WithWeight<AState*>>;
 
   public:
     /// Construct this findlet and add the subfindlet as listener
@@ -34,7 +35,7 @@ namespace Belle2 {
 
     /**
      */
-    void apply(const std::vector<const AState*>& currentPath,
+    void apply(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& currentPath,
                std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates) final;
 
   private:

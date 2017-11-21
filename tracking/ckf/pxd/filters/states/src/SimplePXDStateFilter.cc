@@ -47,7 +47,7 @@ void SimplePXDStateFilter::beginRun()
 
 Weight SimplePXDStateFilter::operator()(const BasePXDStateFilter::Object& pair)
 {
-  const std::vector<const CKFToPXDState*>& previousStates = pair.first;
+  const std::vector<TrackFindingCDC::WithWeight<const CKFToPXDState*>>& previousStates = pair.first;
   CKFToPXDState* currentState = pair.second;
 
   const auto* spacePoint = currentState->getHit();

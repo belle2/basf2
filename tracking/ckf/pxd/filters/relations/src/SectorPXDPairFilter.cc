@@ -34,7 +34,7 @@ namespace {
     const VXD::SensorInfoBase& currentSensorInfo = geoCache.getSensorInfo(currentSensor);
     const VXD::SensorInfoBase& nextSensorInfo = geoCache.getSensorInfo(nextSensor);
 
-    TVector3 origin;
+    static const TVector3 origin;
 
     const Vector2D currentCenter = Vector3D(currentSensorInfo.pointToGlobal(origin)).xy();
     const Vector2D nextCenter = Vector3D(nextSensorInfo.pointToGlobal(origin)).xy();

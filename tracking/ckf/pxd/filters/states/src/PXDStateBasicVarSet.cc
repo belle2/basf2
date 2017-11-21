@@ -25,7 +25,7 @@ using namespace TrackFindingCDC;
 
 bool PXDStateBasicVarSet::extract(const BasePXDStateFilter::Object* pair)
 {
-  const std::vector<const CKFToPXDState*>& previousStates = pair->first;
+  const std::vector<TrackFindingCDC::WithWeight<const CKFToPXDState*>>& previousStates = pair->first;
   CKFToPXDState* state = pair->second;
 
   const RecoTrack* seedTrack = previousStates.front()->getSeed();

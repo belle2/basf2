@@ -23,20 +23,32 @@ using namespace Belle2;
 double Advancer::extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
                                     const genfit::SharedPlanePtr& plane)
 {
-  try {
-    genfit::MaterialEffects::getInstance()->setNoEffects(not m_param_useMaterialEffects);
-    const double extrapolatedS = measuredStateOnPlane.extrapolateToPlane(plane);
-    genfit::MaterialEffects::getInstance()->setNoEffects(false);
+  setMaterialEffectsToParameterValue();
 
-    if (m_param_direction * extrapolatedS > 0) {
-      return NAN;
-    } else {
-      return m_param_direction * extrapolatedS;
+  double returnValue = NAN;
+  try {
+    const double extrapolatedS = measuredStateOnPlane.extrapolateToPlane(plane);
+
+
+    if (m_param_direction * extrapolatedS <= 0) {
+      returnValue = m_param_direction * extrapolatedS;
     }
   } catch (const genfit::Exception& e) {
     B2DEBUG(50, "Extrapolation failed: " << e.what());
-    return NAN;
   }
+
+  resetMaterialEffects();
+  return returnValue;
+}
+
+void Advancer::setMaterialEffectsToParameterValue() const
+{
+  genfit::MaterialEffects::getInstance()->setNoEffects(not m_param_useMaterialEffects);
+}
+
+void Advancer::resetMaterialEffects() const
+{
+  genfit::MaterialEffects::getInstance()->setNoEffects(false);
 }
 
 void Advancer::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)

@@ -75,7 +75,7 @@ TSF::~CDCTriggerTSFFirmwareModule()
 Priority TSF::priority(int index)
 {
   CDCHit* hit = m_cdcHits[index];
-  int offset = (hit->getISuperLayer() == 0) ? 0 : 1;
+  int offset = (hit->getISuperLayer() == 0) ? 1 : 0;
   switch (hit->getILayer() - 2 - offset) {
     case 0: return Priority::first;
     case 1: return Priority::second;

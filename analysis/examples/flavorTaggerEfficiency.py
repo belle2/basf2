@@ -60,7 +60,6 @@ r_subsample = array('d', [
     0.875,
     1.0])
 r_size = len(r_subsample)
-average_eff = 0
 
 # working directory
 # needs the B0_B0bar_final.root-file
@@ -145,32 +144,32 @@ YmaxForQrPlot = 0
 for method in methods:
     # bekommt man mit GetBinError(), setzten mit SetBinError()
     # histogram contains the average r in each of 7 bins -> calculation see below
-    histo_avr_r = ROOT.TH1F('Average_r', 'Average r in each of 6 bins (B0 and B0bar)', int(r_size - 2),
+    histo_avr_r = ROOT.TH1F('Average_r', 'Average r in each of the bins (B0 and B0bar)', int(r_size - 2),
                             r_subsample)
-    histo_avr_rB0 = ROOT.TH1F('Average_rB0', 'Average r in each of 6 bins (B0)', int(r_size - 2),
+    histo_avr_rB0 = ROOT.TH1F('Average_rB0', 'Average r in each of the bins (B0)', int(r_size - 2),
                               r_subsample)
-    histo_avr_rB0bar = ROOT.TH1F('Average_rB0bar', 'Average r in each of 6 bins (B0bar)', int(r_size - 2),
+    histo_avr_rB0bar = ROOT.TH1F('Average_rB0bar', 'Average r in each of the bins (B0bar)', int(r_size - 2),
                                  r_subsample)
 
     # histogram contains the mean squared of r in each of 7 bins -> calculation see below
-    histo_ms_r = ROOT.TH1F('MS_r', 'Mean squared average of r in each of 6 bins (B0 and B0bar)', 6,
+    histo_ms_r = ROOT.TH1F('MS_r', 'Mean squared average of r in each of the bins (B0 and B0bar)', int(r_size - 2),
                            r_subsample)
-    histo_ms_rB0 = ROOT.TH1F('MS_rB0', 'Mean squared average of r in each of 6 bins (B0)', 6,
+    histo_ms_rB0 = ROOT.TH1F('MS_rB0', 'Mean squared average of r in each of the bins (B0)', int(r_size - 2),
                              r_subsample)
-    histo_ms_rB0bar = ROOT.TH1F('MS_rB0bar', 'Mean squared average of r in each of 6 bins (B0bar)', 6,
+    histo_ms_rB0bar = ROOT.TH1F('MS_rB0bar', 'Mean squared average of r in each of the bins (B0bar)', int(r_size - 2),
                                 r_subsample)
 
     # histogram with number of entries in for each bin
     histo_entries_per_bin = ROOT.TH1F(
         'entries_per_bin',
         'Events binned in r_subsample according to their r-value for B0 and B0bar prob',
-        6,
+        int(r_size - 2),
         r_subsample)
     histo_entries_per_binB0 = ROOT.TH1F('entries_per_binB0', 'Events binned in r_subsample according '
-                                        'to their r-value for B0 prob', 6, r_subsample)
+                                        'to their r-value for B0 prob', int(r_size - 2), r_subsample)
     histo_entries_per_binB0bar = ROOT.TH1F('entries_per_binB0bar',
                                            'Events binned in r_subsample according to their r-value '
-                                           'for B0bar prob', 6, r_subsample)
+                                           'for B0bar prob', int(r_size - 2), r_subsample)
     # histogram network output (not qr and not r) for true B0 (signal) - not necessary
     histo_Cnet_output_B0 = ROOT.TH1F('Comb_Net_Output_B0', 'Combiner network output [not equal to r] '
                                      'for true B0 (binning 100)', 100, 0.0, 1.0)
@@ -299,6 +298,9 @@ for method in methods:
     event_fractionB0 = array('f', [0] * r_size)
     event_fractionB0bar = array('f', [0] * r_size)
     event_fractionTotal = array('f', [0] * r_size)
+    eventsInBin_B0 = array('f', [0] * r_size)
+    eventsInBin_B0bar = array('f', [0] * r_size)
+    eventsInBin_Total = array('f', [0] * r_size)
     event_fractionDiff = array('f', [0] * r_size)
     rvalueB0 = array('f', [0] * r_size)
     rvalueB0bar = array('f', [0] * r_size)
@@ -327,7 +329,7 @@ for method in methods:
     print('*                 -->  DETERMINATION BASED ON MONTE CARLO                                          *')
     print('*                                                                                                  *')
     print('* ------------------------------------------------------------------------------------------------ *')
-    print('*   r-interval        <r>   Efficiency    Delta_Efficiency          w               Delta_w        *')
+    print('*   r-interval          <r>        Efficiency   Delta_Effcy         w               Delta_w        *')
     print('* ------------------------------------------------------------------------------------------------ *')
     performance = []
     for i in range(1, r_size):
@@ -335,7 +337,6 @@ for method in methods:
         rvalueB0[i] = histo_avr_rB0.GetBinContent(i)
         rvalueB0bar[i] = histo_avr_rB0bar.GetBinContent(i)
         rvalueB0Average[i] = (rvalueB0[i] + rvalueB0bar[i]) / 2
-        # get the average r-value standard deviation
         rvalueStdB0[i] = math.sqrt(histo_ms_rB0.GetBinContent(i) - (histo_avr_rB0.GetBinContent(i))**2)
         rvalueStdB0bar[i] = math.sqrt(histo_ms_rB0bar.GetBinContent(i) - (histo_avr_rB0bar.GetBinContent(i))**2)
         rvalueStdB0Average[i] = math.sqrt(histo_ms_r.GetBinContent(i) - (histo_avr_r.GetBinContent(i))**2)
@@ -351,28 +352,33 @@ for method in methods:
         entriesB0bar[i] = histo_entries_per_binB0bar.GetBinContent(i)
         # fraction of events/all events
         event_fractionTotal[i] = (entriesB0[i] + entriesB0bar[i]) / total_tagged
-        event_fractionDiff[i] = (entriesB0[i] - entriesB0bar[i]) / total_tagged
         event_fractionB0[i] = entriesB0[i] / total_tagged_B0
         event_fractionB0bar[i] = entriesB0bar[i] / total_tagged_B0bar
+        eventsInBin_Total[i] = (entriesB0[i] + entriesB0bar[i])
+        eventsInBin_B0[i] = entriesB0[i]
+        eventsInBin_B0bar[i] = entriesB0bar[i]
+
+        event_fractionDiff[i] = (entriesB0[i] - entriesB0bar[i]) / total_tagged
 
         iEffEfficiency[i] = tagging_eff * (event_fractionB0[i] * rvalueB0[i] * rvalueB0[i] +
                                            event_fractionB0bar[i] * rvalueB0bar[i] * rvalueB0bar[i]) / 2
         iEffEfficiencyUncertainty[i] = rvalueB0Average[i] * \
-            math.sqrt((2 * total_entries * event_fractionTotal[i] * rvalueStdB0Average[i])**2 +
-                      rvalueB0Average[i]**2 * event_fractionTotal[i] *
-                      (total_entries * (total_entries - event_fractionTotal[i]) +
-                       event_fractionTotal[i] * total_notTagged)) / (total_entries**2)
+            math.sqrt((2 * total_entries * eventsInBin_Total[i] * rvalueStdB0Average[i])**2 +
+                      rvalueB0Average[i]**2 * eventsInBin_Total[i] *
+                      (total_entries * (total_entries - eventsInBin_Total[i]) +
+                       eventsInBin_Total[i] * total_notTagged)) / (total_entries**2)
 
+        # To a good approximation we ignore total_notTagged in the denominator
         iEffEfficiencyB0Uncertainty[i] = rvalueB0[i] * \
-            math.sqrt((2 * total_entries * event_fractionB0[i] * rvalueStdB0[i])**2 +
-                      rvalueB0[i]**2 * event_fractionB0[i] *
-                      (total_entries * (total_entries - event_fractionB0[i]) +
-                       event_fractionB0[i] * total_notTagged)) / (total_entries**2)
+            math.sqrt((2 * total_tagged_B0 * eventsInBin_B0[i] * rvalueStdB0[i])**2 +
+                      rvalueB0[i]**2 * eventsInBin_B0[i] *
+                      (total_tagged_B0 * (total_tagged_B0 - eventsInBin_B0[i]) +
+                       eventsInBin_B0[i] * total_notTagged)) / (total_tagged_B0**2)
         iEffEfficiencyB0barUncertainty[i] = rvalueB0bar[i] * \
-            math.sqrt((2 * total_entries * event_fractionB0bar[i] * rvalueStdB0bar[i])**2 +
-                      rvalueB0bar[i]**2 * event_fractionB0bar[i] *
-                      (total_entries * (total_entries - event_fractionB0bar[i]) +
-                       event_fractionB0bar[i] * total_notTagged)) / (total_entries**2)
+            math.sqrt((2 * total_tagged_B0bar * eventsInBin_B0bar[i] * rvalueStdB0bar[i])**2 +
+                      rvalueB0bar[i]**2 * eventsInBin_B0bar[i] *
+                      (total_tagged_B0bar * (total_tagged_B0bar - eventsInBin_B0bar[i]) +
+                       eventsInBin_B0bar[i] * total_notTagged)) / (total_tagged_B0bar**2)
 
         iDeltaEffEfficiency[i] = event_fractionB0[i] * rvalueB0[i] * \
             rvalueB0[i] - event_fractionB0bar[i] * rvalueB0bar[i] * rvalueB0bar[i]
@@ -382,10 +388,10 @@ for method in methods:
         diff_eff_Uncertainty = diff_eff_Uncertainty + iDeltaEffEfficiencyUncertainty[i]**2
 
         # intervallEff[i] = event_fractionTotal[i] * rvalueB0Average[i] * rvalueB0Average[i]
-        print('* ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '      ' +
-              '{:.3f}'.format(rvalueB0Average[i]) + '    ' +
-              '{:.4f}'.format(event_fractionTotal[i]) + '         ' +
-              '{: .4f}'.format(event_fractionDiff[i]) + '         ' +
+        print('* ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '   ' +
+              '{:.3f}'.format(rvalueB0Average[i]) + ' +- ' + '{:.4f}'.format(rvalueStdB0Average[i]) + '    ' +
+              '{:.4f}'.format(event_fractionTotal[i]) + '      ' +
+              '{: .4f}'.format(event_fractionDiff[i]) + '     ' +
               '{:.4f}'.format(wvalue[i]) + ' +- ' + '{:.4f}'.format(wvalueUncertainty[i]) + '   ' +
               '{: .4f}'.format(wvalueDiff[i]) + ' +- ' + '{:.4f}'.format(wvalueDiffUncertainty[i]) + '  *')
         # finally calculating the total effective efficiency
@@ -573,24 +579,25 @@ for method in methods:
     Canvas2.Clear()
 
     print('\\begin{tabular}{ l  r  r  r  r  r }\n\\hline')
-    print(r'$r$- Interval & $\varepsilon_i(\%)$ & $w_i(\%) $ ' +
-          r' & $\Delta w_i(\%) $& $\varepsilon_{\text{eff}, i}(\%) $& $\Delta \varepsilon_{\text{eff}, i}(\%) $\\ \hline\hline')
+    print(r'$r$- Interval & $\varepsilon_i\ $ & $w_i \pm \delta w_i\ $ ' +
+          r' & $\Delta w_i \pm \delta\Delta w_i $& $\varepsilon_{\text{eff}, i} \pm \delta\varepsilon_{\text{eff}, i}$ ' +
+          r'& $\Delta \varepsilon_{\text{eff}, i}  \pm \delta\Delta \varepsilon_{\text{eff}, i} $\\ \hline\hline')
     for i in range(1, r_size):
         print('$ ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '$ & $'
               '{: 6.1f}'.format(event_fractionTotal[i] * 100) + '$ & $' +
               '{: 6.1f}'.format(wvalue[i] * 100) + " \pm " + '{:2.1f}'.format(wvalueUncertainty[i] * 100) + '$ & $' +
               '{: 6.1f}'.format(wvalueDiff[i] * 100) + " \pm " + '{:2.1f}'.format(wvalueDiffUncertainty[i] * 100) + '$ & $' +
-              # + " \pm " + '{:2.4f}'.format(iEffEfficiencyUncertainty[i] * 100) + '$ & $' +
-              '{: 6.2f}'.format(iEffEfficiency[i] * 100) + '$ & $' +
-              # " \pm " + '{:2.4f}'.format(iDeltaEffEfficiencyUncertainty[i] * 100) +
-              '{: 6.2f}'.format(iDeltaEffEfficiency[i] * 100) +
+              '{: 6.2f}'.format(iEffEfficiency[i] * 100) +  # + '$ & $' +
+              " \pm " + '{:2.2f}'.format(iEffEfficiencyUncertainty[i] * 100) + '$ & $' +
+              '{: 6.2f}'.format(iDeltaEffEfficiency[i] * 100) +  # +
+              " \pm " + '{:2.2f}'.format(iDeltaEffEfficiencyUncertainty[i] * 100) +
               r'$ \\ ')
     print('\hline\hline')
     print(r'\multicolumn{1}{r}{Total} &  \multicolumn{3}{r}{ $\varepsilon_\text{eff} = ' +
           r'\sum_i \varepsilon_i \cdot \langle 1-2w_i\rangle^2 = ' +
-          '{: 6.1f}'.format(average_eff_eff * 100) + r' \%$ }')
+          '{: 6.1f}'.format(average_eff_eff * 100) + " \pm " + '{: 6.1f}'.format(uncertainty_eff_effAverage * 100) + r'\, \%$ }')
     print(r'& \multicolumn{2}{r}{ $\Delta \varepsilon_\text{eff} = ' +
-          '{: 6.1f}'.format(diff_eff * 100) + r' \%$ }' + r' \\')
+          '{: 6.1f}'.format(diff_eff * 100) + " \pm " + '{: 6.1f}'.format(diff_eff_Uncertainty * 100) + r'\, \%$ }' + r' \\')
     print('\\hline\n\\end{tabular}')
 
 

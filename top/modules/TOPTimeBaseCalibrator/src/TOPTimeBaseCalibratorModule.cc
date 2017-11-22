@@ -107,7 +107,7 @@ namespace Belle2 {
   {
 
     // input
-    StoreArray<TOPDigit>::required();
+    m_digits.isRequired();
 
     // checks
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
@@ -135,8 +135,7 @@ namespace Belle2 {
 
     vector<pair<double, double> > hits[c_NumChannels];
 
-    StoreArray<TOPDigit> digits;
-    for (const auto& digit : digits) {
+    for (const auto& digit : m_digits) {
       if (digit.getModuleID() != m_moduleID) continue;
       if (digit.getHitQuality() != TOPDigit::c_CalPulse) continue;
       double t = digit.getRawTime() + digit.getFirstWindow() * c_WindowSize;

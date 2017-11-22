@@ -53,7 +53,7 @@ class Calculation:
 
         self.map_on_processes(f, index)
 
-    def start_partially_and_wait_for_end(self, max_processes=None):
+    def start_batched_and_wait_for_end(self, max_processes=None):
         """
         Start part of the processes and wait for all to finish. If max_processes is None,
         only n processes will be started where n is the number of cores on the current machine.
@@ -115,7 +115,7 @@ class Calculation:
                                  is hosted on the local desktop machine.
         :param max_processes: The maximum number of processes which will be run on the machine. This
                               has no effect when start() has been called before. This parameter can
-                              not be used directly, but start_partially_and_wait_for_end() should be
+                              not be used directly, but start_batched_and_wait_for_end() should be
                               used.
         """
 

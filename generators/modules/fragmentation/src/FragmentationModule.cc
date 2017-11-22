@@ -61,6 +61,7 @@ FragmentationModule::FragmentationModule() : Module()
   addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC)",
            FileSystem::findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC", true));
   addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file", std::string(""));
+  addParam("useEvtGenParticleData", m_useEvtGenParticleData, "Use evt.pdl particle data in PYTHIA as well", 0);
 
   //initialize member variables
   evtgen  = 0;
@@ -138,8 +139,11 @@ void FragmentationModule::initialize()
     }
     evtgen = new EvtGenDecays(pythia, EvtGenInterface::createEvtGen(m_DecFile));
     evtgen->readDecayFile(m_UserDecFile);
+
     // Update pythia particle tables from evtgen
-    evtgen->updatePythia();
+    if (m_useEvtGenParticleData > 0) {
+      evtgen->updatePythia();
+    }
   }
 
   // List variable(s) that differ from their defaults

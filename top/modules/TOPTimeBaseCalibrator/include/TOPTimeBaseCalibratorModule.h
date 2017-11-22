@@ -11,6 +11,9 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <top/dataobjects/TOPDigit.h>
+
 #include <string>
 #include <vector>
 #include <TMatrixDSym.h>
@@ -218,6 +221,7 @@ namespace Belle2 {
 
     std::vector<TwoTimes> m_ntuples[c_NumChannels]; /**< channel wise data */
     double m_syncTimeBase = 0; /**< synchronization time (two ASIC windows) */
+    StoreArray<TOPDigit> m_digits; /**< collection of digits */
 
     /**
      * parameters for iTBC

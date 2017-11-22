@@ -37,7 +37,7 @@ reconstructDecay('K*0:Kpi -> K+:95eff pi-:95eff', '0.795 < M < 0.995')
 matchMCTruth('K*0:Kpi')
 
 # reconstruct B0:sig
-reconstructDecay('B0:sig -> K*0:Kpi mu+:95eff mu-:95eff', '4.8 < M < 5.8')
+reconstructDecay('B0:sig -> K*0:Kpi mu+:95eff mu-:95eff', 'Mbc > 5.2 and abs(deltaE) < 0.2')
 matchMCTruth('B0:sig')
 
 # --------------------------------------------------

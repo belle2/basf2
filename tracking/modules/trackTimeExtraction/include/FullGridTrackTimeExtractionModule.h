@@ -32,7 +32,7 @@ namespace Belle2 {
    * * Use 4 defined event time seeds between T0 min and T0 max. Set the event time to this seed and extract the event
    *   time using the derivatives of chi^2 calculated in the TimeExtractionUtils after arXiv:0810.2241.
    *   This shift in event time is then applied to the reco tracks and the time is extracted again.
-   *   One extracted time is called "converged" or "finished", if the second derivatve of chi^2 to the event time is
+   *   One extracted time is called "converged" or "finished", if the second derivitive of chi^2 to the event time is
    *   large (which means that the measurement uncertainty on the event time is small) and the chi^2 is small too.
    *   If the fit which is needed in each step fails, do not use this extracted time.
    *   If the extracted time is not between min T0 and max T0, do also not use this extracted time.
